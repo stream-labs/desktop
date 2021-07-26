@@ -84,7 +84,9 @@ Array [
                     "subCategory": "Streaming",
                   },
                 ],
-                "value": "obs_x264",
+                "values": Array [
+                  "obs_x264",
+                ],
               },
               Object {
                 "params": Array [
@@ -96,7 +98,9 @@ Array [
                     "subCategory": "Streaming",
                   },
                 ],
-                "value": "qsv",
+                "values": Array [
+                  "qsv",
+                ],
               },
               Object {
                 "params": Array [
@@ -108,7 +112,10 @@ Array [
                     "subCategory": "Streaming",
                   },
                 ],
-                "value": "nvenc",
+                "values": Array [
+                  "nvenc",
+                  "jim_nvenc",
+                ],
               },
             ],
             "key": "encoder",
@@ -117,7 +124,9 @@ Array [
             "subCategory": "Streaming",
           },
         ],
-        "value": "Simple",
+        "values": Array [
+          "Simple",
+        ],
       },
     ],
     "key": "outputMode",

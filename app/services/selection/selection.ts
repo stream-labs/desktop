@@ -1,19 +1,22 @@
 import { uniq } from 'lodash';
 import electron from 'electron';
-import { mutation, StatefulService, ServiceHelper } from 'services/stateful-service';
+import { mutation, StatefulService, ServiceHelper } from 'services/core';
 import {
-  Scene,
-  SceneItem,
   ScenesService,
+  TSceneNodeModel,
+  Scene,
+  SceneItemFolder,
+  SceneItem,
+  TSceneNode,
   ISceneItem,
   ISceneItemSettings,
+  ISceneItemNode,
   IPartialTransform,
-  TSceneNode, ISceneItemNode, SceneItemFolder, TSceneNodeModel
 } from 'services/scenes';
 import { $t } from 'services/i18n';
-import { Inject } from '../../util/injector';
+import { Inject } from '../core/injector';
 import { shortcut } from '../shortcuts';
-import { ISelection, ISelectionServiceApi, ISelectionState, TNodesList } from './selection-api';
+import { ISelectionState, TNodesList } from './index';
 import { Subject } from 'rxjs';
 import Utils from '../utils';
 import { Source } from '../sources';
@@ -23,11 +26,7 @@ import { CenteringAxis } from 'util/ScalableRectangle';
 /**
  * represents selection of active scene and provide shortcuts
  */
-export class SelectionService
-  extends StatefulService<ISelectionState>
-  implements ISelectionServiceApi
-{
-
+export class SelectionService extends StatefulService<ISelectionState> {
   static initialState: ISelectionState = {
     selectedIds: [],
     lastSelectedId: ''
@@ -135,7 +134,7 @@ export class SelectionService
   /**
    * @override Selection.select
    */
-  select(items: TNodesList): ISelection {
+  select(items: TNodesList): void {
     this.getSelection().select.call(this, items);
 
     const scene = this.getScene();
@@ -152,7 +151,6 @@ export class SelectionService
     });
 
     this.updated.next(this.state);
-    return this;
   }
 
 
@@ -184,7 +182,7 @@ export class SelectionService
  * Helper for working with multiple sceneItems
  */
 @ServiceHelper()
-export class Selection implements ISelection {
+export class Selection {
 
   @Inject() private scenesService: ScenesService;
 

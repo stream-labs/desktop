@@ -1,7 +1,7 @@
-import { StatefulService, mutation } from './stateful-service';
+import { StatefulService, mutation } from './core/stateful-service';
 import { NavigationService } from './navigation';
 import { UserService } from './user';
-import { Inject } from '../util/injector';
+import { Inject } from './core/injector';
 import electron from 'electron';
 
 type TOnboardingStep =

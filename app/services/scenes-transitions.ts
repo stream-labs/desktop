@@ -1,11 +1,11 @@
-import { mutation, StatefulService } from './stateful-service';
+import { mutation, StatefulService } from './core/stateful-service';
 import * as obs from '../../obs-api';
 import {
   getPropertiesFormData,
   IObsListOption, setPropertiesFormData,
   TObsFormData, TObsValue
 } from 'components/obs/inputs/ObsInput';
-import { Inject } from '../util/injector';
+import { Inject } from './core/injector';
 import { WindowsService } from './windows';
 import { $t } from 'services/i18n';
 

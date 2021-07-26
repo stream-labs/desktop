@@ -86,11 +86,11 @@ export const metadata = {
 const validationMessages = {
   en: {
     messages: {
-      required: () => $t('The field is required'),
-      min_value: (fieldName: string, params: number[]) => `The field value must be ${ params[0] } or larger`,
-      max_value: (fieldName: string, params: number[]) => `The field value must be ${ params[0] } or less`,
-      date_format: (fieldName: string, params: number[]) => `The date must be in ${ params[0] } format`,
-      alpha_num: () => $t('This field may only contain alphabetic characters or numbers')
+      required: () => $t('common.fieldIsRequired'),
+      min_value: (fieldName: string, params: number[]) => $t('common.fieldMustBeLarger', {value: params[0]}),
+      max_value: (fieldName: string, params: number[]) => $t('common.fieldMustBeLess', {value: params[0]}),
+      date_format: (fieldName: string, params: number[]) => $t('common.dateFieldFormat', {format: params[0]}),
+      alpha_num: () => $t('common.fieldAlphaNumeric'),
     }
   }
 };

@@ -1,5 +1,5 @@
 import { TIssueCode } from 'services/troubleshooter';
-import { IJsonRpcRequest } from 'services/jsonrpc';
+import { IJsonRpcRequest } from 'services/api/jsonrpc';
 import { Observable } from 'rxjs';
 import { TObsFormData } from 'components/obs/inputs/ObsInput';
 

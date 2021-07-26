@@ -1,7 +1,7 @@
-import { Service } from 'services/service';
+import { Service } from 'services/core/service';
 import { SettingsService, ISettingsSubCategory } from 'services/settings';
 import { StreamingService, EStreamingState } from 'services/streaming';
-import { Inject } from '../../util/injector';
+import { Inject } from '../core/injector';
 import { IProfile, IEncoderPreset, Presets } from './definitions';
 import { cloneDeep } from 'lodash';
 

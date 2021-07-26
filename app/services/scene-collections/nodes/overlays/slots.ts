@@ -3,7 +3,7 @@ import { SceneItem, Scene, TSceneNode, TSceneNodeType, ScenesService } from 'ser
 import { VideoService } from 'services/video';
 import { SourcesService } from 'services/sources';
 import { SourceFiltersService, TSourceFilterType } from 'services/source-filters';
-import { Inject } from 'util/injector';
+import { Inject } from 'services/core/injector';
 import { ImageNode } from './image';
 import { TextNode } from './text';
 import { WebcamNode } from './webcam';
@@ -17,8 +17,7 @@ type TContent =
   | TextNode
   | WebcamNode
   | VideoNode
-  | SceneSourceNode
-  ;
+  | SceneSourceNode;
 
 interface IFilterInfo {
   name: string;
@@ -78,13 +77,12 @@ export class SlotsNode extends ArrayNode<TSlotSchema, IContext, TSceneNode> {
   }
 
   async saveItem(sceneNode: TSceneNode, context: IContext): Promise<TSlotSchema> {
-
     if (sceneNode.isFolder()) {
       return {
         id: sceneNode.id,
         sceneNodeType: 'folder',
         name: sceneNode.name,
-        childrenIds: sceneNode.childrenIds || []
+        childrenIds: sceneNode.childrenIds || [],
       };
     }
 
@@ -104,9 +102,9 @@ export class SlotsNode extends ArrayNode<TSlotSchema, IContext, TSceneNode> {
         return {
           name: filter.name,
           type: filter.id,
-          settings: filter.settings
+          settings: filter.settings,
         };
-      })
+      }),
     };
 
     if (sceneNode.getObsInput().audioMixers) {
@@ -175,7 +173,7 @@ export class SlotsNode extends ArrayNode<TSlotSchema, IContext, TSceneNode> {
       await obj.content.load({
         sceneItem,
         assetsPath: context.assetsPath,
-        existing: existingWebcam !== void 0
+        existing: existingWebcam !== void 0,
       });
 
       return;
@@ -188,7 +186,6 @@ export class SlotsNode extends ArrayNode<TSlotSchema, IContext, TSceneNode> {
     } else if (obj.content instanceof VideoNode) {
       sceneItem = context.scene.createAndAddSource(obj.name, 'ffmpeg_source', {}, { id });
     } else if (obj.content instanceof SceneSourceNode) {
-
       // Add a new scene to scenesServices if this scene is not exist.
       // It is not the best way to create a scene here instead of `./scenes.ts` file,
       // but the other way requires to much refactoring
@@ -212,7 +209,7 @@ export class SlotsNode extends ArrayNode<TSlotSchema, IContext, TSceneNode> {
           sceneItem.sourceId,
           filter.type as TSourceFilterType,
           filter.name,
-          filter.settings
+          filter.settings,
         );
       });
     }
@@ -226,10 +223,10 @@ export class SlotsNode extends ArrayNode<TSlotSchema, IContext, TSceneNode> {
       },
       scale: {
         x: obj.scaleX * this.videoService.baseWidth,
-        y: obj.scaleY * this.videoService.baseHeight
+        y: obj.scaleY * this.videoService.baseHeight,
       },
       crop: obj.crop,
-      rotation: obj.rotation
+      rotation: obj.rotation,
     });
   }
 }

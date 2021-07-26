@@ -4,6 +4,7 @@
   "badPathError": "出力先のURL、またはファイルパスが無効です。配信設定のURL、または出力設定の録画パスを確認してください。",
   "connectFailedError": "配信サーバーに接続、またはファイルに保存できませんでした。インターネットの接続状態または出力ディレクトリーの権限や残り容量を確認してください。",
   "disconnectedError": "配信サーバーから切断されました。インターネットの接続状態を確認してください。",
+  "attemptingToReconnect": "サーバーから切断されました。再接続しています。",
   "invalidStreamError": "ニコニコにログインしていないか、またはストリームキーが無効です。ニコニコ生放送に配信する場合はログインしてください。それ以外は配信設定のストリームキーを確認してください。いずれも正しい場合は、サーバーへの接続に問題がある可能性があります。",
   "noSpaceError": "録画を続けるのに十分なディスク容量が確保できませんでした。",
   "unsupportedError": "出力フォーマットがサポートされていないか、１つ以上の音声トラックがサポートされていません。設定を確認して、再度お試しください。",
@@ -20,6 +21,9 @@
   "endingWithDelay": "配信終了中 %{delaySeconds}秒",
   "reconnecting": "再接続中",
   "goLive": "配信開始",
+  "startReplayBuffer": "リプレイ録画をスタンバイ状態にする",
+  "stopReplayBuffer": "リプレイ録画のスタンバイ状態を終了する",
+  "saveReplay": "リプレイ保存",
   "endStreamInStreamingConfirm": "配信中ですが、N Airを終了してもよろしいですか？",
   "enableThePreviewStream": "配信プレビューを有効にする",
   "recordTooltip": "設定 > 出力で録画パスを指定できます",
@@ -52,7 +56,7 @@
       },
       "programSelect": {
         "menuTitle": "配信番組",
-        "title":"配信番組を選択",
+        "title": "配信番組を選択",
         "description": "配信を開始する番組を選択してください。"
       },
       "confirm": {

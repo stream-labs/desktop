@@ -1,9 +1,9 @@
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
-import { Inject } from '../../util/injector';
+import { Inject } from '../../services/core/injector';
 import ModalLayout from '../ModalLayout.vue';
 import { WindowsService } from '../../services/windows';
-import { IScenesServiceApi } from '../../services/scenes';
+import { ScenesService } from '../../services/scenes';
 import { $t } from 'services/i18n';
 
 
@@ -12,7 +12,7 @@ import { $t } from 'services/i18n';
 })
 export default class NameFolder extends Vue {
 
-  @Inject() scenesService: IScenesServiceApi;
+  @Inject() scenesService: ScenesService;
   @Inject() windowsService: WindowsService;
 
   options: {

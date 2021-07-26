@@ -1,8 +1,8 @@
 import electron, { BrowserWindow } from 'electron';
-import { Inject } from 'util/injector';
+import { Inject } from 'services/core/injector';
 import { WindowsService } from 'services/windows';
 import { ISourcesServiceApi } from 'services/sources';
-import { StatefulService, mutation } from '../stateful-service';
+import { StatefulService, mutation } from '../core/stateful-service';
 import { ScalableRectangle, ResizeBoxPoint } from 'util/ScalableRectangle';
 import { SceneItem } from '../scenes';
 

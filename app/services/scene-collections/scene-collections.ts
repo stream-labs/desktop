@@ -1,5 +1,5 @@
-import { Service } from 'services/service';
-import { Inject } from 'util/injector';
+import { Service } from 'services/core/service';
+import { Inject } from 'services/core/injector';
 import { RootNode } from './nodes/root';
 import { SourcesNode, ISourceInfo } from './nodes/sources';
 import { ScenesNode, ISceneSchema } from './nodes/scenes';
@@ -19,7 +19,7 @@ import { HotkeysService } from 'services/hotkeys';
 import namingHelpers from '../../util/NamingHelpers';
 import { WindowsService } from 'services/windows';
 import { UserService } from 'services/user';
-import { TcpServerService } from 'services/tcp-server';
+import { TcpServerService } from 'services/api/tcp-server';
 import { OverlaysPersistenceService, IDownloadProgress } from './overlays';
 import {
   ISceneCollectionsManifestEntry,
@@ -127,13 +127,16 @@ export class SceneCollectionsService extends Service
       await this.installPresetSceneCollection();
     }
 
+    // 読み込んだソース情報を環境に合わせて更新する
+    this.sourcesService.fixSourceSettings();
+
     this.initialized = true;
   }
 
   /// install preset scene collection into active scene collection
   async installPresetSceneCollection() {
     // 既存scene を消す
-    this.scenesService.scenes.forEach(scene => scene.remove(true));
+    this.scenesService.removeAllScenes();
 
     // キャンバス解像度を 1280x720 に変更する
     const CanvasResolution = '1280x720';
@@ -578,7 +581,7 @@ export class SceneCollectionsService extends Service
       this.transitionsService.deleteAllTransitions();
       this.transitionsService.deleteAllConnections();
     } catch (e) {
-      console.error('Error deloading application state');
+      console.error('Error deloading application state', e);
     }
 
     this.hotkeysService.clearAllHotkeys();

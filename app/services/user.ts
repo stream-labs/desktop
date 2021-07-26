@@ -1,8 +1,8 @@
 import Vue from 'vue';
 import URI from 'urijs';
-import { PersistentStatefulService } from 'services/persistent-stateful-service';
-import { Inject } from 'util/injector';
-import { mutation } from 'services/stateful-service';
+import { PersistentStatefulService } from 'services/core/persistent-stateful-service';
+import { Inject } from 'services/core/injector';
+import { mutation } from 'services/core/stateful-service';
 import electron from 'electron';
 import { IncrementalRolloutService } from 'services/incremental-rollout';
 import { HostsService } from './hosts';
@@ -119,12 +119,11 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   }
 
   /**
-   * @deprecated
    * This is a uuid that persists across the application lifetime and uniquely
    * identifies this particular installation of N Air, even when the user is
    * not logged in.
    */
-  private getLocalUserId() {
+  getLocalUserId() {
     const localStorageKey = 'NAirLocalUserId';
     let userId = localStorage.getItem(localStorageKey);
 
@@ -366,17 +365,6 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
         exceptionWhenGetSystemInfo: err,
       };
     }
-  }
-
-  popoutRecentEvents() {
-    this.windowsService.createOneOffWindow({
-      componentName: 'RecentEvents',
-      title: $t('Recent Events'),
-      size: {
-        width: 800,
-        height: 600
-      }
-    }, 'RecentEvents');
   }
 
   async updateStreamSettings(programId: string): Promise<IStreamingSetting> {

@@ -1,7 +1,6 @@
-import test from 'ava';
-import { useSpectron } from '../helpers/spectron';
+import { useSpectron, test } from '../helpers/spectron';
 import { getClient } from '../helpers/api-client';
-import { IScenesServiceApi } from '../../app/services/scenes/scenes-api';
+import { ScenesService } from 'services/scenes';
 import { sleep } from '../helpers/sleep';
 import { SceneBuilder } from '../helpers/scene-builder';
 import { DefaultSceneName } from '../helpers/spectron/scenes';
@@ -9,20 +8,17 @@ const path = require('path');
 
 useSpectron({ restartAppAfterEachTest: false });
 
-
 test('The default scene exists', async t => {
   const client = await getClient();
-  const scenesService = client.getResource<IScenesServiceApi>('ScenesService');
+  const scenesService = client.getResource<ScenesService>('ScenesService');
   const scenes = scenesService.getScenes();
 
   t.true(scenes.length === 1);
-
 });
-
 
 test('Creating, fetching and removing scenes', async t => {
   const client = await getClient();
-  const scenesService = client.getResource<IScenesServiceApi>('ScenesService');
+  const scenesService = client.getResource<ScenesService>('ScenesService');
   t.is(scenesService.getScenes().length, 1);
   const scene1name = scenesService.getScenes()[0].name;
 
@@ -42,16 +38,14 @@ test('Creating, fetching and removing scenes', async t => {
   t.deepEqual(scenesNames, [scene1name]);
 });
 
-
 test('Switching between scenes', async t => {
   const client = await getClient();
-  const scenesService = client.getResource<IScenesServiceApi>('ScenesService');
+  const scenesService = client.getResource<ScenesService>('ScenesService');
   t.is(scenesService.getScenes().length, 1);
   const scene1name = scenesService.getScenes()[0].name;
 
   const scene = scenesService.getSceneByName(scene1name);
   const scene2 = scenesService.createScene('Scene2');
-
 
   t.is(scene.id, scenesService.activeSceneId);
 
@@ -65,10 +59,9 @@ test('Switching between scenes', async t => {
 
 });
 
-
 test('Creating, fetching and removing scene-items', async t => {
   const client = await getClient();
-  const scenesService = client.getResource<IScenesServiceApi>('ScenesService');
+  const scenesService = client.getResource<ScenesService>('ScenesService');
 
   const scene = scenesService.getSceneByName(DefaultSceneName);
   const presetItemIds = scene.getItems().map(item => item.id);
@@ -80,19 +73,16 @@ test('Creating, fetching and removing scene-items', async t => {
   let itemsNames = items.map(item => item['name']);
   t.deepEqual(itemsNames, ['Image2', 'Image1']);
 
-
   scene.removeItem(image2.sceneItemId);
   items = scene.getItems().filter(i => !presetItemIds.includes(i.id));
   itemsNames = items.map(item => item['name']);
   t.deepEqual(itemsNames, ['Image1']);
-
 });
-
 
 test('Scenes events', async t => {
   const client = await getClient();
-  const scenesService = client.getResource<IScenesServiceApi>('ScenesService');
-  let eventData: Dictionary<any>;
+  const scenesService = client.getResource<ScenesService>('ScenesService');
+  let event: Dictionary<any>;
 
   scenesService.sceneSwitched.subscribe(() => void 0);
   scenesService.sceneAdded.subscribe(() => void 0);
@@ -102,42 +92,37 @@ test('Scenes events', async t => {
   scenesService.itemUpdated.subscribe(() => void 0);
 
   const scene2 = scenesService.createScene('Scene2');
-  eventData = await client.fetchNextEvent();
+  event = await client.fetchNextEvent();
 
-  t.is(eventData.name, 'Scene2');
+  t.is(event.data.name, 'Scene2');
 
   const scene3 = scenesService.createScene('Scene3');
   await client.fetchNextEvent();
 
   scenesService.makeSceneActive(scene2.id);
-  eventData = await client.fetchNextEvent();
-  t.is(eventData.name, 'Scene2');
+  event = await client.fetchNextEvent();
+  t.is(event.data.name, 'Scene2');
 
   scene3.remove();
-  eventData = await client.fetchNextEvent();
-  t.is(eventData.name, 'Scene3');
-
+  event = await client.fetchNextEvent();
+  t.is(event.data.name, 'Scene3');
 
   const image = scene2.createAndAddSource('image', 'image_source');
-  eventData = await client.fetchNextEvent();
-  t.is(eventData.sceneItemId, image.sceneItemId);
-
+  event = await client.fetchNextEvent();
+  t.is(event.data.sceneItemId, image.sceneItemId);
 
   image.setVisibility(false);
-  eventData = await client.fetchNextEvent();
-  t.is(eventData.visible, false);
-
+  event = await client.fetchNextEvent();
+  t.is(event.data.visible, false);
 
   image.remove();
-  eventData = await client.fetchNextEvent();
-  t.is(eventData.sceneItemId, image.sceneItemId);
-
+  event = await client.fetchNextEvent();
+  t.is(event.data.sceneItemId, image.sceneItemId);
 });
-
 
 test('Creating nested scenes', async t => {
   const client = await getClient();
-  const scenesService = client.getResource<IScenesServiceApi>('ScenesService');
+  const scenesService = client.getResource<ScenesService>('ScenesService');
 
   const sceneA = scenesService.createScene('SceneA');
   const sceneB = scenesService.createScene('SceneB');
@@ -161,13 +146,11 @@ test('Creating nested scenes', async t => {
   itemsANames = sceneAItems.map(item => item['name']);
 
   t.deepEqual(itemsANames, ['SceneB']);
-
 });
-
 
 test('SceneItem.setSettings()', async t => {
   const client = await getClient();
-  const scenesService = client.getResource<IScenesServiceApi>('ScenesService');
+  const scenesService = client.getResource<ScenesService>('ScenesService');
   const scene = scenesService.activeScene;
 
   const sceneItem = scene.createAndAddSource('MyColorSource', 'color_source');
@@ -196,14 +179,11 @@ test('SceneItem.setSettings()', async t => {
     left: 7,
     right: 10,
   });
-
-
 });
-
 
 test('SceneItem.resetTransform()', async t => {
   const client = await getClient();
-  const scenesService = client.getResource<IScenesServiceApi>('ScenesService');
+  const scenesService = client.getResource<ScenesService>('ScenesService');
   const scene = scenesService.activeScene;
 
   const sceneItem = scene.createAndAddSource('MyColorSource', 'color_source');
@@ -223,8 +203,6 @@ test('SceneItem.resetTransform()', async t => {
     crop: { top: 0, right: 0, bottom: 0, left: 0 },
     rotation: 0,
   });
-
-
 });
 
 test('SceneItem.addFile()', async t => {
@@ -232,7 +210,7 @@ test('SceneItem.addFile()', async t => {
 
   const client = await getClient();
   const sceneBuilder = new SceneBuilder(client);
-  const scenesService = client.getResource<IScenesServiceApi>('ScenesService');
+  const scenesService = client.getResource<ScenesService>('ScenesService');
   const scene = scenesService.activeScene;
 
   scene.clear();
@@ -251,6 +229,4 @@ test('SceneItem.addFile()', async t => {
       text
         hello.txt: text_gdiplus
   `));
-
-
 });

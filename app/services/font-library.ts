@@ -1,4 +1,4 @@
-import { Service } from './service';
+import { Service } from './core/service';
 import path from 'path';
 import fs from 'fs';
 import https from 'https';

@@ -18,7 +18,7 @@ https://live.nicovideo.jp/my<br />
   ).toMatchInlineSnapshot(`
 "
 わいわい<br />
-<a href=\\"https://live2.nicovideo.jp/watch/lv1\\">lv1</a> <a href=\\"https://com.nicovideo.jp/community/co1\\">co1</a> <a href=\\"https://www.nicovideo.jp/watch/sm9\\">sm9</a><br />
+<a href=\\"https://live.nicovideo.jp/watch/lv1\\">lv1</a> <a href=\\"https://com.nicovideo.jp/community/co1\\">co1</a> <a href=\\"https://www.nicovideo.jp/watch/sm9\\">sm9</a><br />
 <b>これはbタグで <a href=\\"https://www.nicovideo.jp/watch/sm9\\">sm9</a> を含む</b><br />
 <a href=\\"https://live.nicovideo.jp\\">https://live.nicovideo.jp</a><br />
 <a href=\\"https://live.nicovideo.jp/\\">https://live.nicovideo.jp/</a><br />
@@ -51,7 +51,7 @@ test('series/1', () => {
 });
 
 test('lv1', () => {
-  expect(apply('lv1')).toMatchInlineSnapshot(`"<a href=\\"https://live2.nicovideo.jp/watch/lv1\\">lv1</a>"`);
+  expect(apply('lv1')).toMatchInlineSnapshot(`"<a href=\\"https://live.nicovideo.jp/watch/lv1\\">lv1</a>"`);
 });
 
 test('co1', () => {

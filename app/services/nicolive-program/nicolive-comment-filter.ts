@@ -1,7 +1,7 @@
-import { StatefulService, mutation } from 'services/stateful-service';
+import { StatefulService, mutation } from 'services/core/stateful-service';
 import { NicoliveClient, isOk } from './NicoliveClient';
 import { FilterRecord } from './ResponseTypes';
-import { Inject } from 'util/injector';
+import { Inject } from 'services/core/injector';
 import { NicoliveProgramService } from 'services/nicolive-program/nicolive-program';
 import { map, distinctUntilChanged } from 'rxjs/operators';
 import { NicoliveFailure } from './NicoliveFailure';

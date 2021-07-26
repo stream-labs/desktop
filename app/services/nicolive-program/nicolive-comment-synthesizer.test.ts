@@ -16,8 +16,8 @@ const setup = createSetupFunction({
 jest.mock('services/nicolive-program/state', () => ({ NicoliveProgramStateService: {} }));
 
 beforeEach(() => {
-    jest.doMock('services/stateful-service');
-    jest.doMock('util/injector');
+    jest.doMock('services/core/stateful-service');
+    jest.doMock('services/core/injector');
 });
 
 afterEach(() => {

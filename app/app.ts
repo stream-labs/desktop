@@ -26,25 +26,12 @@ import VModal from 'vue-js-modal';
 import VeeValidate from 'vee-validate';
 import ChildWindow from 'components/windows/ChildWindow.vue';
 import OneOffWindow from 'components/windows/OneOffWindow.vue';
+import electronLog from 'electron-log';
 
 const { ipcRenderer, remote } = electron;
 
 const nAirVersion = remote.process.env.NAIR_VERSION;
 const isProduction = process.env.NODE_ENV === 'production';
-
-window['obs'] = window['require']('obs-studio-node');
-
-{ // Set up things for IPC
-  // Connect to the IPC Server
-  try {
-    window['obs'].IPC.connect(remote.process.env.NAIR_IPC_PATH);
-  } catch (e) {
-    console.log(`obs.IPC.connect failed: ${e}`);
-  }
-  document.addEventListener('close', (e) => {
-    window['obs'].IPC.disconnect();
-  });
-}
 
 type SentryParams = {
   organization: string
@@ -130,27 +117,32 @@ document.addEventListener('dragenter', event => event.preventDefault());
 document.addEventListener('drop', event => event.preventDefault());
 
 document.addEventListener('DOMContentLoaded', () => {
-  const storePromise = createStore();
-  const servicesManager: ServicesManager = ServicesManager.instance;
-  const windowsService: WindowsService = WindowsService.instance;
-  const i18nService: I18nService = I18nService.instance;
-  const windowId = Utils.getCurrentUrlParams().windowId;
+  createStore().then(async store => {
+    const windowsService: WindowsService = WindowsService.instance;
 
-  if (Utils.isMainWindow()) {
-    ipcRenderer.on('closeWindow', () => windowsService.closeMainWindow());
-    AppService.instance.load();
-  } else {
-    if (Utils.isChildWindow()) {
-      ipcRenderer.on('closeWindow', () => windowsService.closeChildWindow());
+    if (Utils.isMainWindow()) {
+      ipcRenderer.on('closeWindow', () => windowsService.closeMainWindow());
+      AppService.instance.load();
+    } else {
+      if (Utils.isChildWindow()) {
+        ipcRenderer.on('closeWindow', () => windowsService.closeChildWindow());
+      }
+
+      /* TODO
+      if (usingSentry) {
+        const userService = getResource<UserService>('UserService');
+
+        const ctx = userService.getSentryContext();
+        if (ctx) setSentryContext(ctx);
+        userService.sentryContext.subscribe(setSentryContext);
+      }
+      */
     }
-    servicesManager.listenMessages();
-  }
 
-  storePromise.then(async store => {
-
+    // setup VueI18n plugin
     Vue.use(VueI18n);
-
-    await i18nService.load();
+    const i18nService: I18nService = I18nService.instance;
+    await i18nService.load(); // load translations from a disk
 
     const i18n = new VueI18n({
       locale: i18nService.state.locale,
@@ -163,11 +155,9 @@ document.addEventListener('DOMContentLoaded', () => {
             // this adds huge amount of lines to console.
 
             // console.warn(`i18n missing key - ${key}: ${values[0].fallback}`);
+            console.warn(`i18n missing key - ${key}: (フォールバックなし)`);
           }
           return values[0].fallback;
-        }
-        if (!isProduction) {
-          console.warn(`i18n missing key - ${key}: (フォールバックなし)`);
         }
 
         // 返すべきものがないときは何も返さずデフォルト動作に任せる
@@ -181,6 +171,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const momentLocale = i18nService.state.locale.split('-')[0];
     moment.locale(momentLocale);
 
+    // create a root Vue component
+    const windowId = Utils.getCurrentUrlParams().windowId;
     const vm = new Vue({
       el: '#app',
       i18n,
@@ -198,3 +190,55 @@ document.addEventListener('DOMContentLoaded', () => {
     setupGlobalContextMenuForEditableElement();
   });
 });
+
+if (Utils.isDevMode()) {
+  window.addEventListener('error', () => ipcRenderer.send('showErrorAlert'));
+  window.addEventListener('keyup', ev => {
+    if (ev.key === 'F12') electron.ipcRenderer.send('openDevTools');
+  });
+}
+
+// ERRORS LOGGING
+
+// catch and log unhandled errors/rejected promises:
+electronLog.catchErrors({ onError: e => electronLog.log(`from ${Utils.getWindowId()}`, e) });
+
+// override console.error
+const consoleError = console.error;
+console.error = function(...args: any[]) {
+  // TODO: Suppress N-API error until we upgrade electron to v4.x
+  if (/N\-API is an experimental feature/.test(args[0])) return;
+
+  if (Utils.isDevMode()) ipcRenderer.send('showErrorAlert');
+  writeErrorToLog(...args);
+  consoleError.call(console, ...args);
+};
+
+/**
+ * Try to serialize error arguments and stack and write them to the log file
+ */
+function writeErrorToLog(...errors: (Error | string)[]) {
+  let message = '';
+
+  // format error arguments depending on the type
+  const formattedErrors = errors.map(error => {
+    if (error instanceof Error) {
+      message = error.stack;
+    } else if (typeof error === 'string') {
+      message = error;
+    } else {
+      try {
+        message = JSON.stringify(error);
+      } catch (e) {
+        message = 'UNSERIALIZABLE';
+      }
+    }
+    return message;
+  });
+
+  // send error to the main process via IPC
+  electronLog.error(`Error from ${Utils.getWindowId()} window:
+    ${formattedErrors.join('\n')}
+  `);
+}
+

@@ -1,10 +1,9 @@
-import test from 'ava';
-import { useSpectron } from '../helpers/spectron';
+import { TExecutionContext, useSpectron, test } from '../helpers/spectron';
 import { getClient } from '../helpers/api-client';
 import {
   IStreamingServiceApi,
   EStreamingState,
-  ERecordingState
+  ERecordingState,
 } from '../../app/services/streaming/streaming-api';
 import { ISettingsServiceApi } from '../../app/services/settings';
 
@@ -45,22 +44,22 @@ test('Streaming to server via API', async t => {
 
   streamingService.toggleStreaming();
 
-  streamingStatus = await client.fetchNextEvent();
+  streamingStatus = (await client.fetchNextEvent()).data;
   t.is(streamingStatus, EStreamingState.Starting);
 
-  streamingStatus = await client.fetchNextEvent();
+  streamingStatus = (await client.fetchNextEvent()).data;
   t.is(streamingStatus, EStreamingState.Live);
 
   streamingService.toggleStreaming();
 
-  streamingStatus = await client.fetchNextEvent();
+  streamingStatus = (await client.fetchNextEvent()).data;
   t.is(streamingStatus, EStreamingState.Ending);
 
-  streamingStatus = await client.fetchNextEvent();
+  streamingStatus = (await client.fetchNextEvent()).data;
   t.is(streamingStatus, EStreamingState.Offline);
 });
 
-test('Recording via API', async t => {
+test('Recording via API', async (t: TExecutionContext) => {
   const client = await getClient();
   const streamingService = client.getResource<IStreamingServiceApi>('StreamingService');
   const settingsService = client.getResource<ISettingsServiceApi>('SettingsService');
@@ -81,14 +80,14 @@ test('Recording via API', async t => {
 
   streamingService.toggleRecording();
 
-  recordingStatus = await client.fetchNextEvent();
+  recordingStatus = (await client.fetchNextEvent()).data;
   t.is(recordingStatus, ERecordingState.Recording);
 
   streamingService.toggleRecording();
 
-  recordingStatus = await client.fetchNextEvent();
+  recordingStatus = (await client.fetchNextEvent()).data;
   t.is(recordingStatus, ERecordingState.Stopping);
 
-  recordingStatus = await client.fetchNextEvent();
+  recordingStatus = (await client.fetchNextEvent()).data;
   t.is(recordingStatus, ERecordingState.Offline);
 });

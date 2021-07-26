@@ -32,7 +32,7 @@ const autoLinkPatterns = [
   // negative lookbehindが使えないので user/\d+ より先にニコニコモンズユーザーページを判定させる
   { matcher: /\bniconicommons\.jp\/user\/\d+\b/, replace: '<a href="https://www.$&">$&</a>' },
   { matcher: /\buser\/\d+\b/, replace: '<a href="https://www.nicovideo.jp/$&">$&</a>' },
-  { matcher: /\blv\d+\b/, replace: '<a href="https://live2.nicovideo.jp/watch/$&">$&</a>' },
+  { matcher: /\blv\d+\b/, replace: '<a href="https://live.nicovideo.jp/watch/$&">$&</a>' },
   { matcher: /\bco\d+\b/, replace: '<a href="https://com.nicovideo.jp/community/$&">$&</a>' },
   { matcher: /\bmylist\/\d+(?:\/\d+)?\b/, replace: '<a href="https://www.nicovideo.jp/$&">$&</a>' },
   { matcher: /\bnc\d+\b/, replace: '<a href="https://www.niconicommons.jp/material/$&">$&</a>' },

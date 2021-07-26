@@ -1,4 +1,4 @@
-import { StatefulService } from './stateful-service';
+import { StatefulService } from './core/stateful-service';
 import crypto from 'crypto';
 import base64 from 'base64-js';
 import uuidv4 from 'uuid/v4';

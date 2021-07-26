@@ -20,13 +20,13 @@ export function createSetupFunction({
   }: { injectee?: Table | Factory; state?: Table | Factory } = {}) {
     const state = isFunction(stateFactory) ? stateFactory() : stateFactory;
     const injectee = isFunction(injecteeFactory) ? injecteeFactory() : injecteeFactory;
-    const mockedStatefulService = require('services/stateful-service');
-    const mockedInjectorUtil = require('util/injector');
+    const mockedStatefulService = require('services/core/stateful-service');
+    const mockedInjectorUtil = require('services/core/injector');
     if (!isFunction(mockedStatefulService.__setup)) {
-      throw new Error("`jest.mock('services/stateful-service')` が必要です");
+      throw new Error("`jest.mock('services/core/stateful-service')` が必要です");
     }
     if (!isFunction(mockedInjectorUtil.__setup)) {
-      throw new Error("`jest.mock('util/injector')` が必要です");
+      throw new Error("`jest.mock('services/core/injector')` が必要です");
     }
     mockedStatefulService.__setup(merge({}, defaultState, state));
     mockedInjectorUtil.__setup(merge({}, defaultInjectee, injectee));

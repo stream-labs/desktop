@@ -1,9 +1,11 @@
+import { IObsInput, IObsListInput, TObsFormData, TObsValue } from 'components/obs/inputs/ObsInput';
 import { $t } from 'services/i18n';
 import { ISettingsSubCategory } from './settings-api';
 
 export enum EncoderType {
   x264 = 'obs_x264',
   nvenc = 'nvenc',
+  nvencNew = 'jim_nvenc',
   amd = 'amd_amf_h264',
   qsv = 'qsv',
   advancedQsv = 'obs_qsv11',
@@ -28,6 +30,7 @@ export enum OptimizationKey {
     advX264Tune = 'advX264Tune',
     audioBitrate = 'audioBitrate',
     advAudioTrackIndex = 'advAudioTrackIndex',
+    audioSampleRate = 'audioSampleRate',
 }
 
 // OptimizationKey のキーと完全対応していること
@@ -42,7 +45,7 @@ export type OptimizeSettings = {
     targetUsage?: 'quality' | 'balanced' | 'speed' // for QSV
     encoderPreset?: ('ultrafast' | 'superfast' | 'veryfast' | 'faster' | 'fast' |
     'medium' | 'slow' | 'slower') // for x264
-    NVENCPreset?: 'default' | 'hq' | 'hp' | 'll' | 'llhp' | 'llhq' | 'llhp' // for NVENC
+    NVENCPreset?: 'default' | 'mq' | 'hq' | 'hp' | 'll' | 'llhp' | 'llhq' | 'llhp' // for NVENC
     advRateControl?: 'CBR' | 'VBR' | 'ABR' | 'CRF'
     videoBitrate?: number
     advKeyframeInterval?: number
@@ -50,12 +53,14 @@ export type OptimizeSettings = {
     advX264Tune?: string
     audioBitrate?: string
     advAudioTrackIndex?: string
+    audioSampleRate?: 441000 | 48000
 };
 
 export enum CategoryName {
     output = 'Output',
     video = 'Video',
     advanced = 'Advanced',
+    audio = 'Audio',
 }
 
 export type KeyDescription = {
@@ -65,7 +70,7 @@ export type KeyDescription = {
     setting: string,
     label?: string,
     lookupValueName?: boolean, //< 値をキーに翻訳を引くかどうか
-    dependents?: { value: any, params: KeyDescription[] }[],
+    dependents?: { values: TObsValue[], params: KeyDescription[] }[],
 };
 
 export const AllKeyDescriptions: KeyDescription[] = [
@@ -77,7 +82,7 @@ export const AllKeyDescriptions: KeyDescription[] = [
         lookupValueName: true,
         dependents: [
             {
-                value: 'Advanced',
+                values: ['Advanced'],
                 params: [
                     {
                         key: OptimizationKey.encoder,
@@ -87,7 +92,7 @@ export const AllKeyDescriptions: KeyDescription[] = [
                         lookupValueName: true,
                         dependents: [
                             {
-                                value: 'obs_x264',
+                                values: ['obs_x264'],
                                 params: [
                                     {
                                         key: OptimizationKey.advRateControl,
@@ -97,7 +102,7 @@ export const AllKeyDescriptions: KeyDescription[] = [
                                         lookupValueName: true,
                                         dependents: [
                                             {
-                                                value: 'CBR',
+                                                values: ['CBR'],
                                                 params: [
                                                     {
                                                         key: OptimizationKey.videoBitrate,
@@ -141,7 +146,7 @@ export const AllKeyDescriptions: KeyDescription[] = [
                                 ]
                             },
                             {
-                                value: 'qsv',
+                                values: ['qsv'],
                                 params: [
                                     {
                                         key: OptimizationKey.targetUsage,
@@ -177,7 +182,7 @@ export const AllKeyDescriptions: KeyDescription[] = [
                                         lookupValueName: true,
                                         dependents: [
                                             {
-                                                value: 'CBR',
+                                                values: ['CBR'],
                                                 params: [
                                                     {
                                                         key: OptimizationKey.videoBitrate,
@@ -193,7 +198,7 @@ export const AllKeyDescriptions: KeyDescription[] = [
                                 ]
                             },
                             {
-                                value: 'nvenc',
+                                values: ['nvenc', 'jim_nvenc'],
                                 params: [
                                     // 'Rescale' // bool
                                     //    'RescaleRes' // '1920x1200' ... '640x400' (10個)
@@ -236,7 +241,7 @@ export const AllKeyDescriptions: KeyDescription[] = [
                                         lookupValueName: true,
                                         dependents: [
                                             {
-                                                value: 'CBR',
+                                                values: ['CBR'],
                                                 params: [
                                                     {
                                                         key: OptimizationKey.videoBitrate,
@@ -275,7 +280,7 @@ export const AllKeyDescriptions: KeyDescription[] = [
                 ]
             },
             {
-                value: 'Simple',
+                values: ['Simple'],
                 params: [
                     {
                         key: OptimizationKey.videoBitrate,
@@ -292,7 +297,7 @@ export const AllKeyDescriptions: KeyDescription[] = [
                         lookupValueName: true,
                         dependents: [
                             {
-                                value: 'obs_x264',
+                                values: ['obs_x264'],
                                 params: [
                                     {
                                         key: OptimizationKey.simpleUseAdvanced,
@@ -302,7 +307,7 @@ export const AllKeyDescriptions: KeyDescription[] = [
                                         lookupValueName: true,
                                         dependents: [
                                             {
-                                                value: true,
+                                                values: [true],
                                                 params: [
                                                     {
                                                         key: OptimizationKey.encoderPreset,
@@ -318,7 +323,7 @@ export const AllKeyDescriptions: KeyDescription[] = [
                                 ]
                             },
                             {
-                                value: 'qsv',
+                                values: ['qsv'],
                                 params: [
                                     {
                                         key: OptimizationKey.simpleUseAdvanced,
@@ -328,7 +333,7 @@ export const AllKeyDescriptions: KeyDescription[] = [
                                         lookupValueName: true,
                                         dependents: [
                                             {
-                                                value: true,
+                                                values: [true],
                                                 params: [
                                                     {
                                                         key: OptimizationKey.targetUsage,
@@ -343,7 +348,7 @@ export const AllKeyDescriptions: KeyDescription[] = [
                                 ]
                             },
                             {
-                                value: 'nvenc',
+                                values: ['nvenc', 'jim_nvenc'],
                                 params: [
                                     {
                                         key: OptimizationKey.simpleUseAdvanced,
@@ -353,7 +358,7 @@ export const AllKeyDescriptions: KeyDescription[] = [
                                         lookupValueName: true,
                                         dependents: [
                                             {
-                                                value: true,
+                                                values: [true],
                                                 params: [
                                                     {
                                                         key: OptimizationKey.NVENCPreset,
@@ -396,7 +401,7 @@ export const AllKeyDescriptions: KeyDescription[] = [
         lookupValueName: true,
         dependents: [
             {
-                value: 'Common FPS Values',
+                values: ['Common FPS Values'],
                 params: [
                     {
                         key: OptimizationKey.fpsCommon,
@@ -408,6 +413,14 @@ export const AllKeyDescriptions: KeyDescription[] = [
                 ]
             }
         ]
+    },
+    {
+        key: OptimizationKey.audioSampleRate,
+        category: CategoryName.audio,
+        subCategory: 'Untitled',
+        setting: 'SampleRate',
+        label: 'stream.sampleRate',
+        lookupValueName: true,
     },
 ];
 
@@ -514,7 +527,7 @@ export function* iterateKeyDescriptions(
                 newItem.dependents = [];
                 yield newItem;
                 for (const dependent of item.dependents) {
-                    if (dependent.value == values[item.key]) {
+                    if (dependent.values.includes(values[item.key])) {
                         yield *iterateKeyDescriptions(values, dependent.params);
                     }
                 }
@@ -536,7 +549,8 @@ function* iterateAllKeyDescriptions(keyDescriptionis: KeyDescription[]): Iterabl
     }
 }
 
-// items の中のいずれかの要素を values が保持しているかを確認する
+/** items の中のいずれかの要素を values が保持しているかを再帰的に確認する
+ */
 function isDependOnItems(values: OptimizeSettings, items: KeyDescription[]): boolean {
     for (const item of items) {
         if (values.hasOwnProperty(item.key)) {
@@ -591,7 +605,8 @@ export function filterKeyDescriptions(keysNeeded: OptimizeSettings, source: KeyD
     return result;
 }
 
-// params の中に、 OptimizationKey 型の全ての値を key として保持しているかどうかを確認する。
+/** params の中に、 OptimizationKey 型の全ての値を key として保持しているかどうかを確認する。
+ */
 function validateKeyDescriptions(params: KeyDescription[]) {
     // ここは全ての枝を列挙する
     const actual = new Set<string>(Array.from(iterateAllKeyDescriptions(params)).map(d => d.key));
@@ -609,8 +624,8 @@ validateKeyDescriptions(AllKeyDescriptions);
 
 export interface ISettingsAccessor {
     getSettingsFormData(categoryName: string): ISettingsSubCategory[];
-    findSetting(settings: ISettingsSubCategory[], category: string, setting: string): any;
-    findSettingValue(settings: ISettingsSubCategory[], category: string, setting: string): any;
+    findSetting(settings: ISettingsSubCategory[], category: string, setting: string): TObsFormData[number] | undefined;
+    findSettingValue(settings: ISettingsSubCategory[], category: string, setting: string): TObsValue;
     setSettings(categoryName: string, settingsData: ISettingsSubCategory[]): void;
 }
 
@@ -670,15 +685,24 @@ export class SettingsKeyAccessor {
         this.categoryCache.clear();
     }
 
-    private findValue(i: KeyDescription) {
+    /**
+     * 実際の設定値を取得する
+     */
+    private findValue(i: KeyDescription): TObsValue {
         return this.accessor.findSettingValue(this.getCategory(i.category), i.subCategory, i.setting);
     }
 
-    private findSetting(i: KeyDescription) {
+    /**
+     * 実際の設定値の選択肢を含む情報を取得する(更新時にもこれを使う)
+     */
+    private findSetting(i: KeyDescription): IObsInput<TObsValue> | IObsListInput<TObsValue> {
         return this.accessor.findSetting(this.getCategory(i.category), i.subCategory, i.setting);
     }
 
-    setValue(item: KeyDescription, value: any) {
+    /**
+     * 値を1つ設定する
+     */
+    setValue(item: KeyDescription, value: TObsValue) {
         console.log(`setValue: ${item.category}/${item.key}: ${value}`);
         const setting = this.findSetting(item);
         if (setting) {
@@ -726,7 +750,7 @@ export class SettingsKeyAccessor {
                 const value = this.findValue(item);
                 if (value) {
                     for (const dependent of item.dependents) {
-                        if (value === dependent.value) {
+                        if (dependent.values.includes(value)) {
                             yield* this.travarseKeyDescriptions(dependent.params, f);
                         }
                     }
@@ -770,17 +794,17 @@ export class SettingsKeyAccessor {
         for (const item of keyDescriptions) {
             const key = item.key;
             if (item.dependents) {
-                let value = this.findValue(item);
+                let currentValue = this.findValue(item);
                 for (const dependent of item.dependents) {
                     if (isDependOnItems(values, dependent.params)) {
-                        this.setValue(item, dependent.value);
+                        this.setValue(item, dependent.values[0]);
                         this.setValues(values, dependent.params);
                     }
                 }
                 if (values.hasOwnProperty(key)) {
-                    value = values[key];
+                    currentValue = values[key];
                 }
-                this.setValue(item, value);
+                this.setValue(item, currentValue);
             } else {
                 if (values.hasOwnProperty(key)) {
                     this.setValue(item, values[key]);

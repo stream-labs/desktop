@@ -23,7 +23,7 @@ import OptimizeForNiconico from 'components/windows/OptimizeForNiconico.vue';
 import CroppingOverlay from 'components/windows/CroppingOverlay.vue';
 import NicoliveProgramSelector from 'components/windows/NicoliveProgramSelector.vue';
 import Informations from 'components/windows/Informations.vue';
-import { mutation, StatefulService } from 'services/stateful-service';
+import { mutation, StatefulService } from 'services/core/stateful-service';
 import electron from 'electron';
 import Vue from 'vue';
 import Util from 'services/utils';
@@ -81,7 +81,7 @@ export interface IWindowOptions {
   alwaysOnTop?: boolean;
   isPreserved?: boolean;
   preservePrevWindow?: boolean;
-  prevWindowOptions? : IWindowOptions;
+  prevWindowOptions?: IWindowOptions;
   isFullScreen?: boolean;
   hideBlankSlate?: boolean;
 }
@@ -93,7 +93,7 @@ interface IWindowsState {
 const DEFAULT_WINDOW_OPTIONS: IWindowOptions = {
   componentName: '',
   scaleFactor: 1,
-  isShown: true
+  isShown: true,
 };
 
 export class WindowsService extends StatefulService<IWindowsState> {
@@ -107,24 +107,23 @@ export class WindowsService extends StatefulService<IWindowsState> {
     main: {
       componentName: 'Main',
       scaleFactor: 1,
+      isShown: true,
       title: `${remote.process.env.NAIR_PRODUCT_NAME} - Ver: ${remote.process.env.NAIR_VERSION}`,
-      isShown: true
     },
     child: {
       componentName: '',
       scaleFactor: 1,
-      isShown: false
-    }
+      isShown: false,
+    },
   };
 
   // This is a list of components that are registered to be
   // top level components in new child windows.
   components = getComponents();
 
-  windowUpdated = new Subject<{windowId: string, options: IWindowOptions}>();
+  windowUpdated = new Subject<{ windowId: string; options: IWindowOptions }>();
   windowDestroyed = new Subject<string>();
   private windows: Dictionary<Electron.BrowserWindow> = {};
-
 
   init() {
     const windows = BrowserWindow.getAllWindows();
@@ -140,9 +139,11 @@ export class WindowsService extends StatefulService<IWindowsState> {
 
   private updateScaleFactor(windowId: string) {
     const window = this.windows[windowId];
-    const bounds = window.getBounds();
-    const currentDisplay = electron.screen.getDisplayMatching(bounds);
-    this.UPDATE_SCALE_FACTOR(windowId, currentDisplay.scaleFactor);
+    if (window) {
+      const bounds = window.getBounds();
+      const currentDisplay = electron.remote.screen.getDisplayMatching(bounds);
+      this.UPDATE_SCALE_FACTOR(windowId, currentDisplay.scaleFactor);
+    }
   }
 
   showWindow(options: Partial<IWindowOptions>) {
@@ -161,14 +162,13 @@ export class WindowsService extends StatefulService<IWindowsState> {
     if (windowOptions.preservePrevWindow && windowOptions.prevWindowOptions) {
       const options = {
         ...windowOptions.prevWindowOptions,
-        isPreserved: true
+        isPreserved: true,
       };
 
       ipcRenderer.send('window-showChildWindow', options);
       this.updateChildWindowOptions(options);
       return;
     }
-
 
     // This prevents you from seeing the previous contents
     // of the window for a split second after it is shown.
@@ -182,7 +182,6 @@ export class WindowsService extends StatefulService<IWindowsState> {
   closeMainWindow() {
     remote.getCurrentWindow().close();
   }
-
 
   /**
    * Creates a one-off window that will not impact or close
@@ -201,15 +200,16 @@ export class WindowsService extends StatefulService<IWindowsState> {
       return windowId;
     }
 
-    this.CREATE_ONE_OFF_WINDOW(windowId, options);
+    this.CREATE_ONE_OFF_WINDOW(windowId, { ...DEFAULT_WINDOW_OPTIONS, ...options });
 
-    const newWindow = this.windows[windowId] = new BrowserWindow({
+    const newWindow = (this.windows[windowId] = new BrowserWindow({
       frame: false,
       title: options.title || 'New Window',
       transparent: options.transparent,
       resizable: options.resizable,
       alwaysOnTop: options.alwaysOnTop,
-    });
+      webPreferences: { nodeIntegration: true, webviewTag: true },
+    }));
 
     newWindow.setMenu(null);
     newWindow.on('closed', () => {
@@ -217,6 +217,9 @@ export class WindowsService extends StatefulService<IWindowsState> {
       delete this.windows[windowId];
       this.DELETE_ONE_OFF_WINDOW(windowId);
     });
+
+    this.updateScaleFactor(windowId);
+    newWindow.on('move', () => this.updateScaleFactor(windowId));
 
     if (Util.isDevMode()) {
       newWindow.webContents.openDevTools({ mode: 'detach' });
@@ -250,22 +253,24 @@ export class WindowsService extends StatefulService<IWindowsState> {
   /**
    * Closes all one-off windows
    */
-  closeAllOneOffs() {
+  closeAllOneOffs(): Promise<any> {
+    const closingPromises: Promise<void>[] = [];
     Object.keys(this.windows).forEach(windowId => {
       if (windowId === 'main') return;
       if (windowId === 'child') return;
       this.closeOneOffWindow(windowId);
+      closingPromises.push(this.closeOneOffWindow(windowId));
+    });
+    return Promise.all(closingPromises);
+  }
+
+  closeOneOffWindow(windowId: string): Promise<void> {
+    if (!this.windows[windowId] || this.windows[windowId].isDestroyed()) return Promise.resolve();
+    return new Promise(resolve => {
+      this.windows[windowId].on('closed', resolve);
+      this.windows[windowId].destroy();
     });
   }
-
-  closeOneOffWindow(windowId: string) {
-    if (this.windows[windowId]) {
-      if (!this.windows[windowId].isDestroyed()) {
-        this.windows[windowId].destroy();
-      }
-    }
-  }
-
 
   // @ExecuteInCurrentWindow()
   getChildWindowOptions(): IWindowOptions {
@@ -296,7 +301,9 @@ export class WindowsService extends StatefulService<IWindowsState> {
       const currentOptions = cloneDeep(this.state.child);
 
       if (currentOptions.preservePrevWindow) {
-        throw new Error('You can\'t use preservePrevWindow option for more that 1 window in the row');
+        throw new Error(
+          "You can't use preservePrevWindow option for more that 1 window in the row",
+        );
       }
 
       newOptions.prevWindowOptions = currentOptions;
@@ -334,7 +341,7 @@ export class WindowsService extends StatefulService<IWindowsState> {
     const opts = {
       componentName: 'Blank',
       scaleFactor: 1,
-      ...options
+      ...options,
     };
 
     Vue.set(this.state, windowId, opts);
@@ -343,7 +350,7 @@ export class WindowsService extends StatefulService<IWindowsState> {
   @mutation()
   private UPDATE_ONE_OFF_WINDOW(windowId: string, options: Partial<IWindowOptions>) {
     const oldOpts = this.state[windowId];
-    Vue.set(this.state, windowId, { ...oldOpts, ...options })
+    Vue.set(this.state, windowId, { ...oldOpts, ...options });
   }
 
   @mutation()

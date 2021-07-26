@@ -1,7 +1,7 @@
 import { Menu } from './Menu';
 import { ScenesService } from 'services/scenes';
 import { SelectionService } from 'services/selection';
-import { Inject } from '../../util/injector';
+import { Inject } from '../../services/core/injector';
 import { $t } from 'services/i18n';
 import { Source } from 'services/sources';
 import { EDeinterlaceMode, EDeinterlaceFieldOrder } from 'obs-studio-node';

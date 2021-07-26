@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
-import { Inject } from 'util/injector';
+import { Inject } from 'services/core/injector';
 import { TransitionsService, ETransitionType } from 'services/transitions';
 import { WindowsService } from 'services/windows';
 import ModalLayout from 'components/ModalLayout.vue';

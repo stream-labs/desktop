@@ -1,11 +1,10 @@
-import { StatefulService, mutation, Service } from '../stateful-service';
+import { StatefulService, mutation, Service, Inject } from '../core';
 import * as obs from '../../../obs-api';
-import { Inject } from '../../util/injector';
 import { NotificationsService, ENotificationType } from 'services/notifications';
 import { ServicesManager } from '../../services-manager';
 import { PerformanceService } from 'services/performance';
 import { Subscription } from 'rxjs';
-import { JsonrpcService } from '../jsonrpc/jsonrpc';
+import { JsonrpcService } from '../api/jsonrpc/jsonrpc';
 import { TroubleshooterService, TIssueCode } from 'services/troubleshooter';
 import { $t } from 'services/i18n';
 
@@ -72,8 +71,8 @@ export class PerformanceMonitorService extends StatefulService<IMonitorState> {
     const currentStats: IMonitorState = {
       framesLagged: obs.Global.laggedFrames,
       framesRendered: obs.Global.totalFrames,
-      framesSkipped: obs.VideoFactory.getGlobal()?.skippedFrames || 0,
-      framesEncoded: obs.VideoFactory.getGlobal()?.totalFrames || 0,
+      framesSkipped: obs.Video.skippedFrames,
+      framesEncoded: obs.Video.encodedFrames,
     };
 
     const {

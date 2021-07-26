@@ -1,4 +1,4 @@
-import { Service } from '../service';
+import { Service } from '../core/service';
 import { RootNode } from './nodes/overlays/root';
 import { ScenesNode } from './nodes/overlays/scenes';
 import { SlotsNode } from './nodes/overlays/slots';
@@ -8,7 +8,7 @@ import { WebcamNode } from './nodes/overlays/webcam';
 import { VideoNode } from './nodes/overlays/video';
 import { TransitionNode } from './nodes/overlays/transition';
 import { parse } from './parse';
-import { Inject } from '../../util/injector';
+import { Inject } from '../core/injector';
 import electron from 'electron';
 import fs from 'fs';
 import os from 'os';

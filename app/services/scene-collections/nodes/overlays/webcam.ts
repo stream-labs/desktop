@@ -36,7 +36,7 @@ export class WebcamNode extends Node<ISchema, IContext> {
 
     this.data = {
       width: rect.scaledWidth / this.videoService.baseWidth,
-      height: rect.scaledHeight / this.videoService.baseHeight
+      height: rect.scaledHeight / this.videoService.baseHeight,
     };
   }
 
@@ -60,7 +60,7 @@ export class WebcamNode extends Node<ISchema, IContext> {
       top: 0,
       left: 0,
       right: 0,
-      bottom: 0
+      bottom: 0,
     };
     let scale: number;
 
@@ -85,7 +85,7 @@ export class WebcamNode extends Node<ISchema, IContext> {
 
   // This selects the video device and picks the best resolution.
   // It should not be performed if context.existing is true
-  performInitialSetup(item: SceneItem) {
+  performInitialSetup(item: SceneItem): IResolution {
     const targetWidth = this.data.width * this.videoService.baseWidth;
     const targetHeight = this.data.height * this.videoService.baseHeight;
     const targetAspect = targetWidth / targetHeight;
@@ -186,7 +186,7 @@ export class WebcamNode extends Node<ISchema, IContext> {
     return {
       value: resString,
       width: parseInt(parts[0], 10),
-      height: parseInt(parts[1], 10)
+      height: parseInt(parts[1], 10),
     };
   }
 }

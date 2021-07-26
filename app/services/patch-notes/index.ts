@@ -1,10 +1,10 @@
-import { PersistentStatefulService } from 'services/persistent-stateful-service';
-import { mutation } from 'services/stateful-service';
+import { PersistentStatefulService } from 'services/core/persistent-stateful-service';
+import { mutation } from 'services/core/stateful-service';
 import electron from 'electron';
 import Util from 'services/utils';
 import { notes } from './notes';
 import { NavigationService } from 'services/navigation';
-import { Inject } from 'util/injector';
+import { Inject } from 'services/core/injector';
 
 interface IPatchNotesState {
   lastVersionSeen: string;

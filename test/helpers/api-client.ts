@@ -1,10 +1,10 @@
-import { IJsonRpcRequest } from '../../app/services/jsonrpc';
-import { Subject } from 'rxjs';
+import { IJsonRpcEvent, IJsonRpcRequest } from '../../app/services/api/jsonrpc';
+import { Observable, Subject, Subscription } from 'rxjs';
 import { first } from 'rxjs/operators';
+import { isEqual } from 'lodash';
 
 const net = require('net');
-const { spawnSync } = require('child_process');
-
+const snp = require('node-win32-np');
 
 const PIPE_NAME = 'n-air-app';
 const PIPE_PATH = '\\\\.\\pipe\\' + PIPE_NAME;
@@ -12,14 +12,13 @@ const PROMISE_TIMEOUT = 20000;
 
 let clientInstance: ApiClient = null;
 
-export type TConnectionStatus = 'disconnected'|'pending'|'connected';
+export type TConnectionStatus = 'disconnected' | 'pending' | 'connected';
 
 export class ApiClient {
-
-  eventReceived = new Subject<any>();
+  eventReceived = new Subject<IJsonRpcEvent>();
 
   private nextRequestId = 1;
-  private socket = new net.Socket();
+  private socket: any;
   private resolveConnection: Function;
   private rejectConnection: Function;
   private requests = {};
@@ -31,7 +30,6 @@ export class ApiClient {
    */
   private resourceSchemes: Dictionary<Dictionary<string>> = {};
 
-
   /**
    * if result of calling a service method is promise -
    * we create a linked promise and keep it callbacks here until
@@ -39,12 +37,26 @@ export class ApiClient {
    */
   private promises: Dictionary<Function[]> = {};
 
-
   // set to 'true' for debugging
   logsEnabled = false;
 
-  constructor() {
+  connect(): Promise<void> {
+    if (this.socket) this.socket.destroy();
 
+    this.socket = new net.Socket();
+    this.bindListeners();
+
+    this.log('connecting...');
+    this.connectionStatus = 'pending';
+
+    return new Promise((resolve, reject) => {
+      this.resolveConnection = resolve;
+      this.rejectConnection = reject;
+      this.socket.connect(PIPE_PATH);
+    });
+  }
+
+  bindListeners() {
     this.socket.on('connect', () => {
       this.log('connected');
       this.connectionStatus = 'connected';
@@ -54,7 +66,7 @@ export class ApiClient {
     this.socket.on('error', (error: any) => {
       this.log('error', error);
       this.connectionStatus = 'disconnected';
-      this.rejectConnection();
+      this.rejectConnection(error);
     });
 
     this.socket.on('data', (data: any) => {
@@ -68,82 +80,55 @@ export class ApiClient {
     });
   }
 
-  connect() {
-    this.log('connecting...');
-    this.connectionStatus = 'pending';
-    return new Promise((resolve, reject) => {
-      this.resolveConnection = resolve;
-      this.rejectConnection = reject;
-      this.socket.connect(PIPE_PATH);
-    });
-  }
-
-
   disconnect() {
     this.socket.end();
     this.resolveConnection = null;
     this.rejectConnection = null;
   }
 
-
   getConnectionStatus(): TConnectionStatus {
     return this.connectionStatus;
   }
-
 
   log(...messages: string[]) {
     if (this.logsEnabled) console.log(...messages);
   }
 
-
   async request(resourceId: string, methodName: string, ...args: any[]) {
-
     if (this.connectionStatus === 'disconnected') {
       await this.connect();
     }
 
     const id = String(this.nextRequestId++);
     const requestBody: IJsonRpcRequest = {
-      jsonrpc: '2.0',
       id,
+      jsonrpc: '2.0',
       method: methodName,
-      params: { resource: resourceId, args }
+      params: { args, resource: resourceId },
     };
     return this.sendMessage(requestBody);
   }
 
-
   requestSync(resourceId: string, methodName: string, ...args: string[]) {
-    this.log('SYNC_REQUEST:', resourceId, methodName, ...args);
+    const id = String(this.nextRequestId++);
+    const requestBody: IJsonRpcRequest = {
+      id,
+      jsonrpc: '2.0',
+      method: methodName,
+      params: { args, resource: resourceId },
+    };
 
-    const stringifiedArgs = args.map(arg => {
-      if (typeof arg === 'string') {
-        return `\"${arg}\"`;
-      } else if (typeof arg === 'object') {
-        return JSON.stringify(arg);
-      } else {
-        return arg;
-      }
-    });
+    const response = this.sendMessageSync(requestBody);
+    const parsedResponse = JSON.parse(response.toString());
 
-    const process = spawnSync(
-      'node',
-      ['./test-dist/test/helpers/cmd-client.js', resourceId, methodName, ...stringifiedArgs],
-      { timeout: 10000 }
-    );
-
-    const err = process.stderr.toString();
-    const responseStr = process.stdout.toString();
-
-    if (err) {
-      this.log('SYNC_RESPONSE_ERR:', err);
-      throw err;
+    if (parsedResponse.error) {
+      throw parsedResponse.error;
     }
-    this.log('SYNC_RESPONSE:', responseStr);
-    const response = JSON.parse(responseStr);
-    return response;
-  }
 
+    if (this.logsEnabled) this.log('Response Sync:', parsedResponse);
+
+    return parsedResponse.result;
+  }
 
   sendMessage(message: string | Object) {
     let requestBody: IJsonRpcRequest = message as IJsonRpcRequest;
@@ -159,10 +144,10 @@ export class ApiClient {
 
     return new Promise((resolve, reject) => {
       this.requests[requestBody.id] = {
-        body: requestBody,
         resolve,
         reject,
-        completed: false
+        body: requestBody,
+        completed: false,
       };
       const rawMessage = JSON.stringify(requestBody) + '\n';
       this.log('Sent:', rawMessage);
@@ -170,72 +155,95 @@ export class ApiClient {
     });
   }
 
-
-  onMessageHandler(data: ArrayBuffer) {
-    data.toString().split('\n').forEach(rawMessage => {
-      if (!rawMessage) return;
-      const message = JSON.parse(rawMessage);
-      const request = this.requests[message.id];
-
-      if (request) {
-        if (message.error) {
-          request.reject(message.error);
-        } else {
-          request.resolve(message.result);
-        }
-        delete this.requests[message.id];
+  sendMessageSync(message: string | Object) {
+    let requestBody: IJsonRpcRequest = message as IJsonRpcRequest;
+    if (typeof message === 'string') {
+      try {
+        requestBody = JSON.parse(message);
+      } catch (e) {
+        throw 'Invalid JSON';
       }
+    }
 
-      const result = message.result;
-      if (!result) return;
+    if (!requestBody.id) throw 'id is required';
 
-      if (result._type === 'EVENT') {
-        if (result.emitter === 'STREAM') {
-          const eventSubject = this.subscriptions[message.result.resourceId];
-          this.eventReceived.next(result.data);
-          if (eventSubject) eventSubject.next(result.data);
+    const rawMessage = `${JSON.stringify(requestBody)}\n`;
+    this.log('Sent:', rawMessage);
 
-        } else if (result.emitter === 'PROMISE') {
+    const client = new snp.Client(PIPE_PATH);
+    client.write(Buffer.from(rawMessage));
 
-          // case when listenAllSubscriptions = true
-          if (!this.promises[result.resourceId]) return;
+    /* \x0a is being used as a message delimiter for
+     * JSON-RPC messages. */
+    const response = client.read_until('\x0a');
+    client.close();
 
-          const [resolve, reject] = this.promises[result.resourceId];
-          if (result.isRejected) {
-            reject(result.data);
-          } else {
-            resolve(result.data);
-          }
-        }
-      }
-    });
-
+    return Buffer.concat(response);
   }
 
+  onMessageHandler(data: ArrayBuffer) {
+    data
+      .toString()
+      .split('\n')
+      .forEach(rawMessage => {
+        if (!rawMessage) return;
+        const message = JSON.parse(rawMessage);
+        const request = this.requests[message.id];
 
-  unsubscribe(subscriptionId: string) {
+        if (request) {
+          if (message.error) {
+            request.reject(message.error);
+          } else {
+            request.resolve(message.result);
+          }
+          delete this.requests[message.id];
+        }
+
+        const result = message.result;
+        if (!result) return;
+
+        if (result._type === 'EVENT') {
+          if (result.emitter === 'STREAM') {
+            const eventSubject = this.subscriptions[message.result.resourceId];
+            this.eventReceived.next(result);
+            if (eventSubject) eventSubject.next(result.data);
+          } else if (result.emitter === 'PROMISE') {
+            // case when listenAllSubscriptions = true
+            if (!this.promises[result.resourceId]) return;
+
+            const [resolve, reject] = this.promises[result.resourceId];
+            if (result.isRejected) {
+              reject(result.data);
+            } else {
+              resolve(result.data);
+            }
+          }
+        }
+      });
+  }
+
+  unsubscribe(subscriptionId: string): Promise<any> {
     delete this.subscriptions[subscriptionId];
     return this.request(subscriptionId, 'unsubscribe');
   }
 
-
-  unsubscribeAll() {
+  unsubscribeAll(): Promise<any> {
     return Promise.all(
-      Object.keys(this.subscriptions).map(subscriptionId => this.unsubscribe(subscriptionId))
+      Object.keys(this.subscriptions).map(subscriptionId => this.unsubscribe(subscriptionId)),
     );
   }
 
-
   getResource<TResourceType>(resourceId: string, resourceModel = {}): TResourceType {
-
     const handleRequest = (resourceId: string, property: string, ...args: any[]): any => {
-
       const result = this.requestSync(resourceId, property as string, ...args);
 
       if (result && result._type === 'SUBSCRIPTION' && result.emitter === 'PROMISE') {
         return new Promise((resolve, reject) => {
           this.promises[result.resourceId] = [resolve, reject];
-          setTimeout(() => reject(`promise timeout for ${resourceId}.${property}`), PROMISE_TIMEOUT);
+          setTimeout(
+            () => reject(`promise timeout for ${resourceId}.${property}`),
+            PROMISE_TIMEOUT,
+          );
         });
       } else if (result && result._type === 'SUBSCRIPTION' && result.emitter === 'STREAM') {
         let subject = this.subscriptions[result.resourceId];
@@ -244,7 +252,6 @@ export class ApiClient {
       } else if (result && (result._type === 'HELPER' || result._type === 'SERVICE')) {
         return this.getResource(result.resourceId, result);
       } else {
-
         // result can contain helpers-objects
 
         if (Array.isArray(result)) {
@@ -258,59 +265,54 @@ export class ApiClient {
 
         return result;
       }
-
     };
 
     return new Proxy(resourceModel, {
-
       get: (target, property: string, receiver) => {
-
-
         if (resourceModel[property] !== void 0) return resourceModel[property];
 
         const resourceScheme = this.getResourceScheme(resourceId);
 
-        if (resourceScheme[property as string] !== 'function') {
+        if (resourceScheme[property] !== 'function') {
           return handleRequest(resourceId, property as string);
         }
 
         return (...args: any[]) => {
           return handleRequest(resourceId, property as string, ...args);
         };
-
-      }
+      },
     }) as TResourceType;
   }
 
-
-  fetchNextEvent(): Promise<any> {
+  fetchNextEvent(): Promise<IJsonRpcEvent> {
     return new Promise((resolve, reject) => {
       this.eventReceived.pipe(first()).subscribe(event => resolve(event));
       setTimeout(() => reject('Promise timeout'), PROMISE_TIMEOUT);
     });
   }
 
+  watchForEvents(eventNames: string[]): ApiEventWatcher {
+    return new ApiEventWatcher(this, eventNames);
+  }
 
   private getResourceTypeName(resourceId: string): string {
     return resourceId.split('[')[0];
   }
-
 
   private getResourceScheme(resourceId: string): Dictionary<string> {
     const resourceTypeName = this.getResourceTypeName(resourceId);
 
     if (!this.resourceSchemes[resourceTypeName]) {
       this.resourceSchemes[resourceTypeName] = this.requestSync(
-        'ServicesManager',
+        'ExternalApiService',
         'getResourceScheme',
-        resourceId
+        resourceId,
       );
     }
 
     return this.resourceSchemes[resourceTypeName];
   }
 }
-
 
 export async function getClient() {
   if (!clientInstance) clientInstance = new ApiClient();
@@ -321,4 +323,63 @@ export async function getClient() {
   }
 
   return clientInstance;
+}
+
+/**
+ * Watcher for testing API events
+ */
+class ApiEventWatcher {
+  receivedEvents: IJsonRpcEvent[] = [];
+  private subscriptions: Subscription[];
+  private eventReceived = new Subject();
+
+  constructor(private apiClient: ApiClient, private eventNames: string[]) {
+    // start watching for events
+    this.subscriptions = this.eventNames.map(eventName => {
+      const [resourceId, prop] = eventName.split('.');
+      const observable = this.apiClient.getResource(resourceId)[prop] as Observable<any>;
+      return observable.subscribe(() => void 0);
+    });
+
+    this.apiClient.eventReceived.subscribe(event => this.onEventHandler(event));
+  }
+
+  /**
+   * wait for API to emit events in the specific order
+   */
+  waitForSequence(eventNames: string[], timeout = 10000): Promise<void> {
+    return new Promise((resolve, reject) => {
+      // compare already received events with required order
+      const checkSequence = () => {
+        if (isEqual(this.getReceivedEventNames(), eventNames)) {
+          resolve();
+          return true;
+        }
+      };
+
+      // check the situation when the all events are already received
+      if (checkSequence()) return;
+
+      // if events are not received then listen for them and wait until timeout
+      const subscription = this.eventReceived.subscribe(checkSequence);
+      setTimeout(() => {
+        subscription.unsubscribe();
+        reject(`Unexpected events sequence: \n${this.getReceivedEventNames().join('\n')}`);
+      }, timeout);
+    });
+  }
+
+  waitForAll(timeout?: number): Promise<void> {
+    return this.waitForSequence(this.eventNames, timeout);
+  }
+
+  private getReceivedEventNames(): string[] {
+    return this.receivedEvents.map(ev => ev.resourceId);
+  }
+
+  private onEventHandler(event: IJsonRpcEvent) {
+    if (!this.eventNames.includes(event.resourceId)) return;
+    this.receivedEvents.push(event);
+    this.eventReceived.next();
+  }
 }

@@ -1,27 +1,25 @@
 import WritableStream = NodeJS.WritableStream;
 import os from 'os';
 import crypto from 'crypto';
-import { ServicesManager } from '../../services-manager';
-import { PersistentStatefulService } from 'services/persistent-stateful-service';
+import { PersistentStatefulService, Inject, mutation } from 'services/core';
 import { IObsInput } from 'components/obs/inputs/ObsInput';
-import { ISettingsSubCategory } from 'services/settings';
-import { mutation } from 'services/stateful-service';
-import { Inject } from '../../util/injector';
+import { ISettingsSubCategory } from 'services/settings/index';
 import {
   JsonrpcService,
   E_JSON_RPC_ERROR,
   IJsonRpcEvent,
   IJsonRpcRequest,
-  IJsonRpcResponse
-} from 'services/jsonrpc';
+  IJsonRpcResponse,
+} from 'services/api/jsonrpc/index';
 import { IIPAddressDescription, ITcpServerServiceApi, ITcpServersSettings } from './tcp-server-api';
+import { UsageStatisticsService } from 'services/usage-statistics';
+import { ExternalApiService } from '../external-api';
+import { SceneCollectionsService } from 'services/scene-collections';
 
 const net = require('net');
 
-
 const LOCAL_HOST_NAME = '127.0.0.1';
 const WILDCARD_HOST_NAME = '0.0.0.0';
-
 
 interface IClient {
   id: number;
@@ -46,18 +44,27 @@ interface IServer {
 
 const TCP_PORT = 28194;
 
-export class TcpServerService extends PersistentStatefulService<ITcpServersSettings> implements ITcpServerServiceApi {
-
+/**
+ * A transport layer for TCP and Websockets communications with internal API
+ */
+export class TcpServerService extends PersistentStatefulService<ITcpServersSettings>
+  implements ITcpServerServiceApi {
   static defaultState: ITcpServersSettings = {
     token: '',
     namedPipe: {
       enabled: true,
-      pipeName: 'n-air-app'
-    }
+      pipeName: 'n-air-app',
+    },
+    websockets: {
+      enabled: false,
+      port: 59650,
+      allowRemote: false,
+    },
   };
 
   @Inject() private jsonrpcService: JsonrpcService;
-  private servicesManager: ServicesManager = ServicesManager.instance;
+  @Inject() private usageStatisticsService: UsageStatisticsService;
+  @Inject() private externalApiService: ExternalApiService;
   private clients: Dictionary<IClient> = {};
   private nextClientId = 1;
   private servers: IServer[] = [];
@@ -66,18 +73,16 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
   // enable to debug
   private enableLogs = false;
 
-
   init() {
     super.init();
-    this.servicesManager.serviceEvent.subscribe(event => this.onServiceEventHandler(event));
+    this.externalApiService.serviceEvent.subscribe(event => this.onServiceEventHandler(event));
   }
-
 
   listen() {
     this.listenConnections(this.createTcpServer());
     if (this.state.namedPipe.enabled) this.listenConnections(this.createNamedPipeServer());
+    if (this.state.websockets.enabled) this.listenConnections(this.createWebsoketsServer());
   }
-
 
   /**
    * stop handle any requests
@@ -92,10 +97,25 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
     this.isRequestsHandlingStopped = false;
   }
 
-
   stopListening() {
     this.servers.forEach(server => server.close());
     Object.keys(this.clients).forEach(clientId => this.disconnectClient(Number(clientId)));
+  }
+
+  enableWebsoketsRemoteConnections() {
+    this.stopListening();
+
+    // update websockets settings
+    const defaultWebsoketsSettings = this.getDefaultSettings().websockets;
+    this.setSettings({
+      websockets: {
+        ...defaultWebsoketsSettings,
+        enabled: true,
+        allowRemote: true,
+      },
+    });
+
+    this.listen();
   }
 
   getDefaultSettings(): ITcpServersSettings {
@@ -103,6 +123,9 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
   }
 
   setSettings(settings: Partial<ITcpServersSettings>) {
+    const needToGenerateToken =
+      settings.websockets && settings.websockets.allowRemote && !this.state.token;
+    if (needToGenerateToken) this.generateToken();
     this.SET_SETTINGS(settings);
   }
 
@@ -117,7 +140,7 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
         nameSubCategory: 'Named Pipe',
         codeSubCategory: 'namedPipe',
         parameters: [
-          <IObsInput<boolean>> {
+          <IObsInput<boolean>>{
             value: settings.namedPipe.enabled,
             name: 'enabled',
             description: 'Enabled',
@@ -126,16 +149,50 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
             enabled: true,
           },
 
-          <IObsInput<string>> {
+          <IObsInput<string>>{
             value: settings.namedPipe.pipeName,
             name: 'pipeName',
             description: 'Pipe Name',
             type: 'OBS_PROPERTY_TEXT',
             visible: true,
             enabled: settings.namedPipe.enabled,
-          }
-        ]
-      }
+          },
+        ],
+      },
+      {
+        nameSubCategory: 'Websockets',
+        codeSubCategory: 'websockets',
+        parameters: [
+          <IObsInput<boolean>>{
+            value: settings.websockets.enabled,
+            name: 'enabled',
+            description: 'Enabled',
+            type: 'OBS_PROPERTY_BOOL',
+            visible: true,
+            enabled: true,
+          },
+
+          <IObsInput<boolean>>{
+            value: settings.websockets.allowRemote,
+            name: 'allowRemote',
+            description: 'Allow Remote Connections',
+            type: 'OBS_PROPERTY_BOOL',
+            visible: true,
+            enabled: settings.websockets.enabled,
+          },
+
+          <IObsInput<number>>{
+            value: settings.websockets.port,
+            name: 'port',
+            description: 'Port',
+            type: 'OBS_PROPERTY_INT',
+            minVal: 0,
+            maxVal: 65535,
+            visible: true,
+            enabled: settings.websockets.enabled,
+          },
+        ],
+      },
     ];
   }
 
@@ -149,37 +206,44 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
           interface: ifaceName,
           address: interfaceInfo.address,
           family: interfaceInfo.family,
-          internal: interfaceInfo.internal
+          internal: interfaceInfo.internal,
         });
       });
     });
     return addresses;
   }
 
+  generateToken(): string {
+    const buf = new Uint8Array(20);
+    crypto.randomFillSync(buf);
+    let token = '';
+    buf.forEach(val => (token += val.toString(16)));
+    this.setSettings({ token });
+    return token;
+  }
+
   private listenConnections(server: IServer) {
     this.servers.push(server);
 
-    server.nativeServer.on('connection', (socket) => this.onConnectionHandler(socket, server));
+    server.nativeServer.on('connection', socket => this.onConnectionHandler(socket, server));
 
-    server.nativeServer.on('error', (error) => {
+    server.nativeServer.on('error', error => {
       throw error;
     });
   }
 
-
   private createNamedPipeServer(): IServer {
     const settings = this.state.namedPipe;
     const server = net.createServer();
-    server.listen('\\\\.\\pipe\\' + settings.pipeName);
+    server.listen(`\\\\.\\pipe\\${settings.pipeName}`);
     return {
       type: 'namedPipe',
       nativeServer: server,
       close() {
         server.close();
-      }
+      },
     };
   }
-
 
   private createTcpServer(): IServer {
     const server = net.createServer();
@@ -189,20 +253,37 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
       nativeServer: server,
       close() {
         server.close();
-      }
+      },
     };
   }
 
+  private createWebsoketsServer(): IServer {
+    const settings = this.state.websockets;
+    const http = require('http');
+    const sockjs = require('sockjs');
+    const websocketsServer = sockjs.createServer();
+    const httpServer = http.createServer();
+    websocketsServer.installHandlers(httpServer, { prefix: '/api' });
+    httpServer.listen(settings.port, settings.allowRemote ? WILDCARD_HOST_NAME : LOCAL_HOST_NAME);
+    return {
+      type: 'websockets',
+      nativeServer: websocketsServer,
+      close() {
+        httpServer.close();
+      },
+    };
+  }
 
   private onConnectionHandler(socket: WritableStream, server: IServer) {
     this.log('new connection', socket);
 
     const id = this.nextClientId++;
     const client: IClient = {
-      id, socket,
+      id,
+      socket,
       subscriptions: [],
       listenAllSubscriptions: false,
-      isAuthorized: false
+      isAuthorized: false,
     };
     this.clients[id] = client;
 
@@ -221,8 +302,17 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
     socket.on('close', () => {
       this.onDisconnectHandler(client);
     });
-  }
 
+    socket.on('error', e => {
+      if (e.code === 'EPIPE') {
+        // Client has silently disconnected
+        console.debug('TCP Server: Socket was disconnected', e);
+        this.onDisconnectHandler(client);
+      } else {
+        throw e;
+      }
+    });
+  }
 
   private authorizeClient(client: IClient) {
     client.isAuthorized = true;
@@ -239,11 +329,13 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
     this.log('tcp request', data);
 
     if (this.isRequestsHandlingStopped) {
-
-      this.sendResponse(client, this.jsonrpcService.createError(null, {
-        code: E_JSON_RPC_ERROR.INTERNAL_JSON_RPC_ERROR,
-        message: 'API server is busy. Try again later'
-      }));
+      this.sendResponse(
+        client,
+        this.jsonrpcService.createError(null, {
+          code: E_JSON_RPC_ERROR.INTERNAL_JSON_RPC_ERROR,
+          message: 'API server is busy. Try again later',
+        }),
+      );
 
       return;
     }
@@ -253,13 +345,14 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
       if (!requestString) return;
       try {
         const request: IJsonRpcRequest = JSON.parse(requestString);
+        this.usageStatisticsService.recordAnalyticsEvent('TCP_API_REQUEST', request);
 
         const errorMessage = this.validateRequest(request);
 
         if (errorMessage) {
           const errorResponse = this.jsonrpcService.createError(request, {
             code: E_JSON_RPC_ERROR.INVALID_PARAMS,
-            message: errorMessage
+            message: errorMessage,
           });
           this.sendResponse(client, errorResponse);
           return;
@@ -268,7 +361,7 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
         // some requests have to be handled by TcpServerService
         if (this.hadleTcpServerDirectives(client, request)) return;
 
-        const response = this.servicesManager.executeServiceRequest(request);
+        const response = this.externalApiService.executeServiceRequest(request);
 
         // if response is subscription then add this subscription to client
         if (response.result && response.result._type === 'SUBSCRIPTION') {
@@ -282,26 +375,40 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
       } catch (e) {
         this.sendResponse(
           client,
-          this.jsonrpcService.createError(null,{
+          this.jsonrpcService.createError(null, {
             code: E_JSON_RPC_ERROR.INVALID_REQUEST,
-            message: 'Make sure that the request is valid json. ' +
-            'If request string contains multiple requests, ensure requests are separated ' +
-            'by a single newline character LF ( ASCII code 10)'
-          }));
+            message:
+              'Make sure that the request is valid json. ' +
+              'If request string contains multiple requests, ensure requests are separated ' +
+              'by a single newline character LF ( ASCII code 10)',
+          }),
+        );
       }
     });
   }
-
 
   private onServiceEventHandler(event: IJsonRpcResponse<IJsonRpcEvent>) {
     // send event to subscribed clients
     Object.keys(this.clients).forEach(clientId => {
       const client = this.clients[clientId];
-      const needToSendEvent = client.listenAllSubscriptions || client.subscriptions.includes(event.result.resourceId);
-      if (needToSendEvent) this.sendResponse(client, event);
+      const eventName = event.result.resourceId.split('.')[1];
+
+      // these events will be sent to the client even if isRequestsHandlingStopped = true
+      // this allows to send this event even if the app is in the loading state
+      const whitelistedEvents: (keyof SceneCollectionsService)[] = [
+        'collectionWillSwitch',
+        'collectionAdded',
+        'collectionRemoved',
+        'collectionSwitched',
+        'collectionUpdated',
+      ];
+      const force = (whitelistedEvents as string[]).includes(eventName);
+
+      const needToSendEvent =
+        client.listenAllSubscriptions || client.subscriptions.includes(event.result.resourceId);
+      if (needToSendEvent) this.sendResponse(client, event, force);
     });
   }
-
 
   private validateRequest(request: IJsonRpcRequest): string {
     let message = '';
@@ -311,28 +418,24 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
     return message;
   }
 
-
   private hadleTcpServerDirectives(client: IClient, request: IJsonRpcRequest) {
-
     // handle auth
-    if (
-      request.method === 'auth' &&
-      request.params.resource === 'TcpServerService'
-    ) {
+    if (request.method === 'auth' && request.params.resource === 'TcpServerService') {
       if (this.state.token && request.params.args[0] === this.state.token) {
         this.authorizeClient(client);
-        this.sendResponse(client,{
+        this.sendResponse(client, {
           jsonrpc: '2.0',
           id: request.id,
-          result: true
+          result: true,
         });
       } else {
         this.sendResponse(
           client,
-          this.jsonrpcService.createError(request,{
+          this.jsonrpcService.createError(request, {
             code: E_JSON_RPC_ERROR.INTERNAL_JSON_RPC_ERROR,
-            message: 'Invalid token'
-          }));
+            message: 'Invalid token',
+          }),
+        );
       }
 
       return true;
@@ -341,25 +444,25 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
     if (!client.isAuthorized) {
       this.sendResponse(
         client,
-        this.jsonrpcService.createError(request,{
+        this.jsonrpcService.createError(request, {
           code: E_JSON_RPC_ERROR.INTERNAL_JSON_RPC_ERROR,
-          message: 'Authorization required. Use TcpServerService.auth(token) method'
-        }));
+          message: 'Authorization required. Use TcpServerService.auth(token) method',
+        }),
+      );
       return true;
     }
-
 
     // handle unsubscribing by clearing client subscriptions
     if (
       request.method === 'unsubscribe' &&
-      this.servicesManager.subscriptions[request.params.resource]
+      this.externalApiService.subscriptions[request.params.resource]
     ) {
       const subscriptionInd = client.subscriptions.indexOf(request.params.resource);
       if (subscriptionInd !== -1) client.subscriptions.splice(subscriptionInd, 1);
-      this.sendResponse(client,{
+      this.sendResponse(client, {
         jsonrpc: '2.0',
         id: request.id,
-        result: subscriptionInd !== -1
+        result: subscriptionInd !== -1,
       });
       return true;
     }
@@ -370,30 +473,31 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
       request.params.resource === 'TcpServerService'
     ) {
       client.listenAllSubscriptions = true;
-      this.sendResponse(client,{
+      this.sendResponse(client, {
         jsonrpc: '2.0',
         id: request.id,
-        result: true
+        result: true,
       });
       return true;
     }
   }
-
 
   private onDisconnectHandler(client: IClient) {
     this.log('client disconnected');
     delete this.clients[client.id];
   }
 
+  private sendResponse(client: IClient, response: IJsonRpcResponse<any>, force = false) {
+    if (this.isRequestsHandlingStopped && !force) return;
 
-  private sendResponse(client: IClient, response: IJsonRpcResponse<any>) {
     this.log('send response', response);
 
     // unhandled exceptions completely destroy Rx.Observable subscription
     try {
-      client.socket.write(JSON.stringify(response) + '\n');
+      client.socket.write(`${JSON.stringify(response)}\n`);
     } catch (e) {
-      console.error(e);
+      // probably the client has been silently disconnected
+      console.info('unable to send response', response, e);
     }
   }
 

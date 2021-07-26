@@ -24,11 +24,11 @@ export async function clickSourceProperties(t) {
 
 export async function selectSource(t, name) {
   const sel = `[data-test="SourceSelector"] [data-test="${name}"]`;
-  t.context.app.client.execute((selector) => {
+  /* t.context.app.client.execute((selector) => {
     const el = document.querySelector(selector);
     el.dispatchEvent(new MouseEvent('down', { button: 0 }));
     el.dispatchEvent(new MouseEvent('up', { button: 0 }));
-  }, sel);
+  }, sel); */
   await t.context.app.client.click(sel);
 }
 
@@ -38,11 +38,11 @@ export async function selectTestSource(t) {
 
 export async function rightClickSource(t, name) {
   const sel = `[data-test="SourceSelector"] [data-test="${name}"]`;
-  t.context.app.client.execute((selector) => {
+  /* t.context.app.client.execute((selector) => {
     const el = document.querySelector(selector);
     el.dispatchEvent(new MouseEvent('down', { button: 2 }));
     el.dispatchEvent(new MouseEvent('up', { button: 2 }));
-  }, sel);
+  }, sel); */
   await t.context.app.client.rightClick(sel);
 }
 

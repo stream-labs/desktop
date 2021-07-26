@@ -1,8 +1,8 @@
-import { Service } from 'services/service';
+import { Service } from 'services/core/service';
 import { IPlatformService, IStreamingSetting } from '.';
 import { HostsService } from 'services/hosts';
 import { SettingsService } from 'services/settings';
-import { Inject } from 'util/injector';
+import { Inject } from 'services/core/injector';
 import { sleep } from 'util/sleep';
 import { handleErrors, requiresToken, authorizedHeaders } from 'util/requests';
 import { UserService } from 'services/user';

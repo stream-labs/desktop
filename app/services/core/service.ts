@@ -19,16 +19,14 @@ export abstract class Service {
   private static proxyFn: (service: Service) => Service;
 
   /**
-   * returns true if service has been successfully initialized
+   * custom init function
    */
-  private static initFn: (service: Service) => boolean;
+  private static initFn: (service: Service) => void;
 
   serviceName = this.constructor.name;
 
   static get instance() {
-    const instance = !this.hasInstance
-      ? Service.createInstance(this)
-      : this[singleton];
+    const instance = !this.hasInstance ? Service.createInstance(this) : this[singleton];
     return this.proxyFn ? this.proxyFn(instance) : instance;
   }
 
@@ -62,7 +60,10 @@ export abstract class Service {
     ServiceClass[singleton] = instance;
     instances[ServiceClass.name] = instance;
 
-    const mustInit = this.initFn ? !this.initFn(instance) : true;
+    const mustInit = !this.initFn;
+
+    // call a custom init function if exists
+    if (this.initFn) this.initFn(instance);
 
     if (mustInit) instance.init();
 

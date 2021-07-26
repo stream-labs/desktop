@@ -7,8 +7,8 @@ const setup = createSetupFunction({
   },
 });
 
-jest.mock('services/stateful-service');
-jest.mock('util/injector');
+jest.mock('services/core/stateful-service');
+jest.mock('services/core/injector');
 jest.mock('services/settings', () => ({}));
 jest.mock('services/customization', () => ({}));
 jest.mock('../../../obs-api', () => ({

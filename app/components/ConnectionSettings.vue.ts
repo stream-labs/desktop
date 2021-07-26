@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
-import { Inject } from 'util/injector';
+import { Inject } from 'services/core/injector';
 import { TransitionsService } from 'services/transitions';
 import * as inputComponents from 'components/obs/inputs';
 import { IObsListInput } from 'components/obs/inputs/ObsInput';

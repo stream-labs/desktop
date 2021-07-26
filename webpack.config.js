@@ -29,7 +29,7 @@ module.exports = {
     filename: '[name].js'
   },
 
-  devtool: 'sourcemap',
+  devtool: 'source-map',
 
   target: 'electron-renderer',
 
@@ -69,8 +69,6 @@ module.exports = {
       },
       {
         test: /\.ts$/,
-        // TODO: use recommended by MS awesome-typescript-loader when the issue will be resoled
-        // https://github.com/s-panferov/awesome-typescript-loader/issues/356
         loader: 'ts-loader',
         exclude: /node_modules|vue\/src/
       },

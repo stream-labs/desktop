@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
-import { Inject } from '../util/injector';
+import { Inject } from '../services/core/injector';
 import { SourcesService } from 'services/sources';
 import { ScenesService, ISceneItemNode, TSceneNode } from 'services/scenes';
 import { SelectionService } from 'services/selection/selection';
@@ -72,7 +72,7 @@ export default class SourceSelector extends Vue {
       });
     };
 
-    return getSlVueTreeNodes(this.scene.getRootNodes());
+    return getSlVueTreeNodes(this.scene?.getRootNodes() || []);
   }
 
   determineIcon(isLeaf: boolean, sourceId: string) {

@@ -129,6 +129,9 @@ isUnskippable: ${this.updateState.isUnskippable}`);
     const browserWindow = new BrowserWindow({
       width: 596,
       height: 369,
+      webPreferences: {
+        nodeIntegration: true,
+      },
       useContentSize: true,
       title: `${process.env.NAIR_PRODUCT_NAME} - Ver: ${process.env.NAIR_VERSION}`,
       frame: true,

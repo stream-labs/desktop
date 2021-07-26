@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
-import { Inject } from '../util/injector';
+import { Inject } from '../services/core/injector';
 import Selector from './Selector.vue';
 import { ScenesService } from 'services/scenes';
 import { Menu } from '../util/menus/Menu';
@@ -113,7 +113,7 @@ export default class SceneSelector extends Vue {
     if (this.searchQuery) {
       const fuse = new Fuse(list, {
         shouldSort: true,
-        keys: ['name']
+        keys: ['name'],
       });
 
       return fuse.search(this.searchQuery);

@@ -206,26 +206,26 @@ button,
 
 .button--create-program {
   font-size: 14px;
-  background-color: @nicolive-button;
+  background-color: @text-secondary;
 
   &:hover {
-     background-color: @nicolive-button-hover;
+     background-color: @text-tertiary;
   }
 
   &:disabled {
     &:hover {
-      background-color: @nicolive-button;
+      background-color: @text-secondary;
     }
   }
 }
 
 .button--fetch-program {
   font-size: 13px;
-  color:@nicolive-button;
+  color:@text-secondary;
   background-color: transparent;
   border-width: 1px;
   border-style: solid;
-  border-color: @nicolive-button;
+  border-color: @text-secondary;
 
    &:hover {
     opacity: .5;
@@ -235,7 +235,7 @@ button,
 
   &:disabled {
     &:hover {
-      color:@nicolive-button;
+      color:@text-secondary;
       background-color: transparent;
     }
   }
@@ -243,15 +243,15 @@ button,
 
 .button-nicolive--action {
   color: @white;
-  background-color: @nicolive-button;
+  background-color: @text-secondary;
 
   &:hover {
-    background-color: @nicolive-button-hover;
+    background-color: @text-tertiary;
  }
 
  &:disabled {
    &:hover {
-     background-color: @nicolive-button;
+     background-color: @text-secondary;
    }
  }
 }
@@ -259,4 +259,13 @@ button,
 .button-nicolive--default {
   color: @white;
   background-color: @grey;
+}
+
+.button--replay-buffer {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  .transition;
 }

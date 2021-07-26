@@ -8,8 +8,7 @@ import {
   ISourceComparison,
   PROPERTIES_MANAGER_TYPES
 } from './index';
-import { mutation, ServiceHelper } from 'services/stateful-service';
-import { Inject } from 'util/injector';
+import { mutation, ServiceHelper, Inject } from '../core';
 import { ScenesService } from 'services/scenes';
 import { TObsFormData } from 'components/obs/inputs/ObsInput';
 import Utils from 'services/utils';
@@ -33,8 +32,9 @@ export class Source implements ISourceApi {
   deinterlaceMode: obs.EDeinterlaceMode;
   deinterlaceFieldOrder: obs.EDeinterlaceFieldOrder;
   resourceId: string;
+  propertiesManagerType: TPropertiesManager;
 
-  sourceState: ISource;
+  state: ISource;
 
   @Inject()
   scenesService: ScenesService;
@@ -44,14 +44,14 @@ export class Source implements ISourceApi {
   }
 
   getModel() {
-    return this.sourceState;
+    return this.state;
   }
 
   updateSettings(settings: Dictionary<any>) {
-    this.getObsInput().update(settings);
-    this.sourcesService.sourceUpdated.next(this.sourceState);
+    const obsInputSettings = this.sourcesService.getObsSourceSettings(this.type, settings);
+    this.getObsInput().update(obsInputSettings);
+    this.sourcesService.sourceUpdated.next(this.state);
   }
-
 
   getSettings(): Dictionary<any> {
     return this.getObsInput().settings;
@@ -77,16 +77,13 @@ export class Source implements ISourceApi {
     return details;
   }
 
-
   getPropertiesManagerType(): TPropertiesManager {
-    return this.sourcesService.propertiesManagers[this.sourceId].type;
+    return this.propertiesManagerType;
   }
-
 
   getPropertiesManagerSettings(): Dictionary<any> {
     return this.sourcesService.propertiesManagers[this.sourceId].manager.settings;
   }
-
 
   getPropertiesManagerUI(): string {
     return this.sourcesService.propertiesManagers[this.sourceId].manager.customUIComponent;
@@ -102,43 +99,43 @@ export class Source implements ISourceApi {
     oldManager.destroy();
 
     const managerKlass = PROPERTIES_MANAGER_TYPES[type];
-    this.sourcesService.propertiesManagers[this.sourceId].manager =
-      new managerKlass(this.getObsInput(), settings);
+    this.sourcesService.propertiesManagers[this.sourceId].manager = new managerKlass(
+      this.getObsInput(),
+      settings,
+    );
     this.sourcesService.propertiesManagers[this.sourceId].type = type;
+    this.SET_PROPERTIES_MANAGER_TYPE(type);
+    this.sourcesService.sourceUpdated.next(this.getModel());
   }
-
 
   setPropertiesManagerSettings(settings: Dictionary<any>) {
     this.sourcesService.propertiesManagers[this.sourceId].manager.applySettings(settings);
   }
-
 
   getPropertiesFormData(): TObsFormData {
     const manager = this.sourcesService.propertiesManagers[this.sourceId].manager;
     return manager.getPropertiesFormData();
   }
 
-
   setPropertiesFormData(properties: TObsFormData) {
     const manager = this.sourcesService.propertiesManagers[this.sourceId].manager;
     manager.setPropertiesFormData(properties);
-    this.sourcesService.sourceUpdated.next(this.sourceState);
+    this.sourcesService.sourceUpdated.next(this.state);
   }
 
-
-  duplicate(): Source {
+  duplicate(newSourceId?: string): Source {
     if (this.doNotDuplicate) return null;
     return this.sourcesService.createSource(
       this.name,
       this.type,
       this.getSettings(),
       {
+        sourceId: newSourceId,
         propertiesManager: this.getPropertiesManagerType(),
         propertiesManagerSettings: this.getPropertiesManagerSettings()
       }
     );
   }
-
 
   remove() {
     this.sourcesService.removeSource(this.sourceId);
@@ -146,19 +143,19 @@ export class Source implements ISourceApi {
 
   setName(newName: string) {
     this.SET_NAME(newName);
-    this.sourcesService.sourceUpdated.next(this.sourceState);
+    this.sourcesService.sourceUpdated.next(this.state);
   }
 
   setDeinterlaceMode(newMode: obs.EDeinterlaceMode) {
     this.getObsInput().deinterlaceMode = newMode;
     this.SET_DEINTERLACE_MODE(newMode);
-    this.sourcesService.sourceUpdated.next(this.sourceState);
+    this.sourcesService.sourceUpdated.next(this.state);
   }
 
   setDeinterlaceFieldOrder(newOrder: obs.EDeinterlaceFieldOrder) {
     this.getObsInput().deinterlaceFieldOrder = newOrder;
     this.SET_DEINTERLACE_FIELD_ORDER(newOrder);
-    this.sourcesService.sourceUpdated.next(this.sourceState);
+    this.sourcesService.sourceUpdated.next(this.state);
   }
 
   hasProps(): boolean {
@@ -174,7 +171,6 @@ export class Source implements ISourceApi {
       .buttonClicked(obsInput);
   }
 
-
   @Inject()
   protected sourcesService: SourcesService;
 
@@ -185,26 +181,31 @@ export class Source implements ISourceApi {
     // the read-only nature of this data
     const isTemporarySource = !!this.sourcesService.state.temporarySources[sourceId];
     if (isTemporarySource) {
-      this.sourceState = this.sourcesService.state.temporarySources[sourceId];
+      this.state = this.sourcesService.state.temporarySources[sourceId];
       Utils.applyProxy(this, this.sourcesService.state.temporarySources[sourceId]);
     } else {
-      this.sourceState = this.sourcesService.state.sources[sourceId];
+      this.state = this.sourcesService.state.sources[sourceId];
       Utils.applyProxy(this, this.sourcesService.state.sources[sourceId]);
     }
   }
 
   @mutation()
   private SET_NAME(newName: string) {
-    this.sourceState.name = newName;
+    this.state.name = newName;
+  }
+
+  @mutation()
+  private SET_PROPERTIES_MANAGER_TYPE(type: TPropertiesManager) {
+    this.state.propertiesManagerType = type;
   }
 
   @mutation()
   private SET_DEINTERLACE_MODE(newMode: obs.EDeinterlaceMode) {
-    this.sourceState.deinterlaceMode = newMode;
+    this.state.deinterlaceMode = newMode;
   }
 
   @mutation()
   private SET_DEINTERLACE_FIELD_ORDER(newOrder: obs.EDeinterlaceFieldOrder) {
-    this.sourceState.deinterlaceFieldOrder = newOrder;
+    this.state.deinterlaceFieldOrder = newOrder;
   }
 }

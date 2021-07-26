@@ -1,5 +1,5 @@
-import { mutation, StatefulService } from 'services/stateful-service';
-import { Inject } from 'util/injector';
+import { mutation, StatefulService } from 'services/core/stateful-service';
+import { Inject } from 'services/core/injector';
 import { NicoliveProgramStateService } from './state';
 import { ParaphraseDictionary } from './ParaphraseDictionary';
 import { WrappedChat } from './WrappedChat';

@@ -323,8 +323,6 @@ export function getPropertiesFormData(obsSource: obs.ISource): TObsFormData {
   const obsProps = obsSource.properties;
   const obsSettings = obsSource.settings;
 
-  setupConfigurableDefaults(obsSource, obsProps, obsSettings);
-
   if (!obsProps) return null;
   if (!obsProps.count()) return null;
 
@@ -360,7 +358,7 @@ export function getPropertiesFormData(obsSource: obs.ISource): TObsFormData {
     }
 
     const formItem: IObsInput<TObsValue> = {
-      value: obsSettings[obsProp.name],
+      value: obsProp.value,
       name: obsProp.name,
       description: $t(
         `source-props.${sourceType}['${obsProp.name}'].name`,
@@ -368,22 +366,21 @@ export function getPropertiesFormData(obsSource: obs.ISource): TObsFormData {
       ),
       enabled: obsProp.enabled,
       visible: obsProp.visible,
-      type: obsType
+      type: obsType,
     };
 
     // handle property details
 
     if (isListProperty(obsProp)) {
-      const options: IObsListOption<any>[] = obsProp.details.items.map(option => {
+      (formItem as IObsListInput<TObsValue>).options = obsProp.details.items.map(option => {
         return {
           value: option.value,
           description: $t(
             `source-props.${sourceType}['${obsProp.name}']['${option.value}']`,
             { fallback: option.name }
-          )
+          ),
         };
       });
-      (formItem as IObsListInput<TObsValue>).options = options;
     }
 
     if (isNumberProperty(obsProp)) {
@@ -465,40 +462,21 @@ export function setPropertiesFormData(obsSource: obs.ISource, form: TObsFormData
   if (formInputs.length === 0) return;
 
   obsSource.update(settings);
-}
 
+  // validate list-inputs and update properties again if some of list inputs are invalid
+  const updatedFormData = getPropertiesFormData(obsSource);
+  let needUpdatePropsAgain = false;
+  updatedFormData.forEach(prop => {
+    if (prop.type !== 'OBS_PROPERTY_LIST') return;
+    const listProp = prop as IObsListInput<TObsValue>;
+    if (!listProp.options.length) return;
+    const optionExists = !!listProp.options.find(option => option.value === listProp.value);
+    if (optionExists) return;
 
-/* Passing a properties and settings object here
- * prevents a copy and object creation which
- * also requires IPC. Highly recommended to
- * pass all parameters. */
-export function setupConfigurableDefaults(
-  configurable: obs.IConfigurable,
-  properties?: obs.IProperties,
-  settings?: obs.ISettings
-) {
-  if (!settings) settings = configurable.settings;
-  if (!properties) properties = configurable.properties;
-  const defaultSettings = {};
-
-  if (!properties) return;
-
-  let obsProp = properties.first();
-  do {
-    if (!isListProperty(obsProp)) continue;
-
-    const items = obsProp.details.items;
-
-    if (items.length === 0) continue;
-
-    /* If setting isn't set at all, set to first element. */
-    if (settings[obsProp.name] === void 0) {
-      defaultSettings[obsProp.name] = items[0].value;
-      continue;
-    }
-  } while ((obsProp = obsProp.next()));
-  const needUpdate = Object.keys(defaultSettings).length > 0;
-  if (needUpdate) configurable.update(defaultSettings);
+    needUpdatePropsAgain = true;
+    listProp.value = listProp.options[0].value;
+  });
+  if (needUpdatePropsAgain) setPropertiesFormData(obsSource, updatedFormData);
 }
 
 export abstract class ObsInput<TValueType> extends Vue {

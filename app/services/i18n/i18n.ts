@@ -1,8 +1,8 @@
 import * as electron from 'electron';
 import VueI18n from 'vue-i18n';
-import { PersistentStatefulService } from 'services/persistent-stateful-service';
-import { mutation } from 'services/stateful-service';
-import { Inject } from 'util/injector';
+import { PersistentStatefulService } from 'services/core/persistent-stateful-service';
+import { mutation } from 'services/core/stateful-service';
+import { Inject } from 'services/core/injector';
 import { FileManagerService } from 'services/file-manager';
 import { AppService } from 'services/app';
 import { IObsListInput, TObsFormData } from 'components/obs/inputs/ObsInput';
@@ -196,15 +196,32 @@ export class I18nService extends PersistentStatefulService<II18nState> implement
 
     const dictionary: Dictionary<string> = {};
     let lastReadFilePath = '';
+    let rawJSON = '';
     try {
       for (const fileName of dictionaryFiles) {
         const filePath = `${i18nPath}/${locale}/${fileName}.json`;
         lastReadFilePath = filePath;
-        dictionary[fileName] = JSON.parse(this.fileManagerService.read(filePath));
+        rawJSON = this.fileManagerService.read(filePath);
+        dictionary[fileName] = JSON.parse(rawJSON);
       }
     } catch (e) {
-      throw new Error(`in file: ${require('path').resolve(lastReadFilePath)}\n${e.message}`);
+      let lineInfo = '';
+      const posMatch = e.message.match(/ at position ([0-9]+)$/);
+      if (posMatch.length == 2) {
+        const pos = parseInt(posMatch[1], 10)
+        let lineStart = 0;
+        for (let line = 1; ; ++line) {
+          const nextLF = rawJSON.indexOf('\n', lineStart);
+          if (nextLF < 0 || nextLF > pos) {
+            lineInfo = ` line ${line} column ${pos - lineStart}`;
+            break;
+          }
+          lineStart = nextLF + 1;
+        }
+      }
+      throw new Error(`in file: ${require('path').resolve(lastReadFilePath)}\n${e.message}${lineInfo}`);
     }
+    rawJSON = '';
     this.loadedDictionaries[locale] = dictionary;
     return dictionary;
   }

@@ -1,12 +1,10 @@
 import Vue from 'vue';
 import { Subject, Subscription, Observable } from 'rxjs';
-import { mutation, StatefulService, ServiceHelper } from 'services/stateful-service';
+import { mutation, StatefulService, ServiceHelper, InitAfter, Inject } from 'services/core';
 import { SourcesService, ISource, Source } from 'services/sources';
 import { ScenesService } from 'services/scenes';
 import * as obs from '../../../obs-api';
 import Utils from 'services/utils';
-import { Inject } from 'util/injector';
-import { InitAfter } from 'util/service-observer';
 import { WindowsService } from 'services/windows';
 import {
   IObsBitmaskInput, IObsInput, IObsListInput, IObsNumberInputValue, TObsFormData,
@@ -107,6 +105,9 @@ export class AudioService extends StatefulService<IAudioSourcesState> implements
 
   getSourcesForScene(sceneId: string): AudioSource[] {
     const scene = this.scenesService.getScene(sceneId);
+    if (!scene) {
+      return [];
+    }
     const sceneSources = scene.getNestedSources({ excludeScenes: true })
       .filter(sceneItem => sceneItem.audio);
 
@@ -342,7 +343,7 @@ export class AudioSource implements IAudioSourceApi {
   }
 
   getModel(): IAudioSource & ISource {
-    return { ...this.source.sourceState, ...this.audioSourceState };
+    return { ...this.source.state, ...this.audioSourceState };
   }
 
   getSettingsForm(): TObsFormData {

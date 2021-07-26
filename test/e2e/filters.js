@@ -1,10 +1,8 @@
-import test from 'ava';
-import { useSpectron, focusChild } from '../helpers/spectron/index';
+import { useSpectron, focusChild, test } from '../helpers/spectron/index';
 import { addFilter, openFiltersWindow, removeFilter } from '../helpers/spectron/filters';
 import { addSource } from '../helpers/spectron/sources';
 
-useSpectron();
-
+useSpectron({ restartAppAfterEachTest: false });
 
 test('Adding and removing a source filter', async t => {
   const app = t.context.app;

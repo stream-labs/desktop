@@ -6,9 +6,9 @@ import { setFormDropdown, setFormInput } from './forms';
 
 export async function openFiltersWindow(t, sourceName) {
   await focusMain(t);
-  await selectSource(t, sourceName);
+  //await selectSource(t, sourceName);
   await rightClickSource(t, sourceName);
-  await new Promise(x => setTimeout(x, 250));
+  //await new Promise(x => setTimeout(x, 250));
   await contextMenuClick(t, 'Filters');
   await focusChild(t);
 }

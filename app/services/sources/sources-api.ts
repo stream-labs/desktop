@@ -1,6 +1,7 @@
 import { IPropertyManager } from './properties-managers/properties-manager';
 import { IObsListOption, TObsFormData } from 'components/obs/inputs/ObsInput';
 import { Observable } from 'rxjs';
+import { IAudioSource } from '../audio';
 import * as obs from '../../../obs-api';
 
 export interface ISource extends IResource {
@@ -14,6 +15,7 @@ export interface ISource extends IResource {
   width: number;
   height: number;
   doNotDuplicate: boolean;
+  propertiesManagerType: TPropertiesManager;
   channel?: number;
   deinterlaceMode: obs.EDeinterlaceMode;
   deinterlaceFieldOrder: obs.EDeinterlaceFieldOrder;
@@ -52,7 +54,7 @@ export interface ISourcesServiceApi {
     name: string,
     type: TSourceType,
     settings?: Dictionary<any>,
-    options?: ISourceCreateOptions
+    options?: ISourceAddOptions
   ): ISourceApi;
   removeSource(id: string): void;
   getAvailableSourcesTypes(): TSourceType[];
@@ -76,11 +78,12 @@ export interface ISourcesServiceApi {
 }
 
 
-export interface ISourceCreateOptions {
+export interface ISourceAddOptions<TPropertiesManagerSettings = Dictionary<any>> {
   channel?: number;
   sourceId?: string; // A new ID will be generated if one is not specified
   propertiesManager?: TPropertiesManager;
   propertiesManagerSettings?: Dictionary<any>;
+  audioSettings?: Partial<IAudioSource>;
   isTemporary?: boolean;
 }
 
@@ -103,7 +106,8 @@ export type TSourceType =
   'ndi_source' |
   'openvr_capture' |
   'liv_capture' |
-  'ovrstream_dc_source'
+  'ovrstream_dc_source' |
+  'vlc_source'
   ;
 
 // Register new properties manager here
@@ -117,9 +121,4 @@ export interface ISourcesState {
 export interface IActivePropertyManager {
   manager: IPropertyManager;
   type: TPropertiesManager;
-}
-
-export interface ISourceAddOptions {
-  propertiesManager: TPropertiesManager;
-  propertiesManagerSettings: Dictionary<any>;
 }

@@ -5,7 +5,7 @@ import ObsImport from './onboarding_steps/ObsImport.vue';
 import SuccessfullyImported from './onboarding_steps/SuccessfullyImported.vue';
 import SceneCollectionsImport from './onboarding_steps/SceneCollectionsImport.vue';
 import { OnboardingService } from '../../services/onboarding';
-import { Inject } from '../../util/injector';
+import { Inject } from '../../services/core/injector';
 
 @Component({
   components: {

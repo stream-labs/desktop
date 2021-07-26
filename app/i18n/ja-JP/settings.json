@@ -19,10 +19,10 @@
         "name": "配信終了後も録画を続ける"
       },
       "ReplayBufferWhileStreaming": {
-        "name": null
+        "name": "配信時にリプレイ録画を自動的に開始する"
       },
       "KeepReplayBufferStreamStops": {
-        "name": null
+        "name": "配信終了後もリプレイ録画を続ける"
       }
     },
     "Source Alignement Snapping": {
@@ -40,7 +40,7 @@
         "name": "ソースを他のソースにスナップする"
       },
       "CenterSnapping": {
-        "name": null
+        "name": "ソースを中央にスナップする"
       }
     },
     "Projectors": {
@@ -115,7 +115,8 @@
         "ffmpeg_nvenc": "@:settings.Output.Streaming.Encoder.ffmpeg_nvenc",
         "x264": "@:settings.Output.Streaming.Encoder.obs_x264",
         "qsv": "@:settings.Output.Streaming.Encoder.obs_qsv11",
-        "nvenc": "@:settings.Output.Streaming.Encoder.ffmpeg_nvenc"
+        "nvenc": "@:settings.Output.Streaming.Encoder.ffmpeg_nvenc",
+        "jim_nvenc": "@:settings.Output.Streaming.Encoder.jim_nvenc"
       },
       "ABitrate": {
         "name": "音声ビットレート（kbps）"
@@ -150,6 +151,7 @@
       "NVENCPreset": {
         "name": "エンコーダープリセット",
         "default": "規定",
+        "mq": "最高品質",
         "hq": "高品質",
         "hp": "高性能",
         "ll": "低遅延",
@@ -166,7 +168,8 @@
         "name": "エンコーダ",
         "obs_x264": "ソフトウェア（x264）",
         "obs_qsv11": "ハードウェア（QSV）",
-        "ffmpeg_nvenc": "ハードウェア (NVENC)"
+        "ffmpeg_nvenc": "ハードウェア (NVENC)",
+        "jim_nvenc": "ハードウェア (NVENC(新))"
       },
       "ApplyServiceSettings": {
         "name": "@:settings.Output.Streaming.EnforceBitrate.name"
@@ -201,6 +204,13 @@
       },
       "preset": {
         "name": "エンコーダープリセット（上にいくほどCPU使用率は低くなります）",
+        "mq": "@:settings.Output.Streaming.NVENCPreset.mq",
+        "hq": "@:settings.Output.Streaming.NVENCPreset.hq",
+        "default": "@:settings.Output.Streaming.NVENCPreset.default",
+        "hp": "@:settings.Output.Streaming.NVENCPreset.hp",
+        "ll": "@:settings.Output.Streaming.NVENCPreset.ll",
+        "llhq": "@:settings.Output.Streaming.NVENCPreset.llhq",
+        "llhp": "@:settings.Output.Streaming.NVENCPreset.llhp",
         "ultrafast": null,
         "superfast": null,
         "veryfast": null,
@@ -393,10 +403,31 @@
       "Track6Bitrate": {
         "name": "@:settings.audioBitrate"
       }
+    },
+    "Replay Buffer": {
+      "name": "リプレイ録画",
+      "RecRB": {
+        "name": "リプレイ録画を有効にする"
+      },
+      "RecRBTime": {
+        "name": "最大リプレイ時間（秒）"
+      }
     }
   },
   "Audio": {
-    "name": "音声"
+    "name": "音声",
+    "Untitled": {
+      "SampleRate": {
+        "44100": "44.1kHz",
+        "48000": "48kHz",
+        "name": "サンプリングレート（設定の反映には再起動が必要）"
+      },
+      "ChannelSetup": {
+        "name": "チャンネル（設定の反映には再起動が必要）",
+        "Mono": "モノラル",
+        "Stereo": "ステレオ"
+      }
+    }
   },
   "Video": {
     "name": "映像",
@@ -476,14 +507,17 @@
         "RGB": null
       },
       "ColorSpace": {
-        "name": "YUVカラースペース",
         "601": null,
-        "709": null
+        "709": null,
+        "name": "YUVカラースペース"
       },
       "ColorRange": {
         "name": "YUVカラーレンジ",
         "Partial": null,
         "Full": null
+      },
+      "ForceGPUAsRenderDevice": {
+        "name": "描画デバイスにGPUを強制的に指定する"
       }
     },
     "Audio": {
@@ -499,16 +533,10 @@
     "Recording": {
       "name": "録画",
       "FilenameFormatting": {
-        "name": null
+        "name": "ファイル名の書式"
       },
       "OverwriteIfExists": {
-        "name": null
-      },
-      "RecRBPrefix": {
-        "name": null
-      },
-      "RecRBSuffix": {
-        "name": null
+        "name": "存在したら上書きする"
       }
     },
     "Stream Delay": {
@@ -524,27 +552,49 @@
       }
     },
     "Automatically Reconnect": {
-      "name": null,
+      "name": "自動再接続",
       "Reconnect": {
-        "name": null
+        "name": "自動で再接続する"
       },
       "RetryDelay": {
-        "name": null
+        "name": "再接続までの待ち時間"
       },
       "MaxRetries": {
-        "name": null
+        "name": "最大再接続回数"
       }
     },
     "Network": {
-      "name": null,
+      "name": "ネットワーク",
       "BindIP": {
-        "name": null
+        "name": "使用するネットワークインターフェイス（Bind to IP）",
+        "default": "既定"
       },
       "NewSocketLoopEnable": {
-        "name": null
+        "name": "新しい通信処理を有効にする"
       },
       "LowLatencyEnable": {
-        "name": null
+        "name": "低遅延を有効にする"
+      }
+    },
+    "Replay Buffer": {
+      "name": "リプレイ録画",
+      "RecRBPrefix": {
+        "name": "ファイル名の接頭語"
+      },
+      "RecRBSuffix": {
+        "name": "ファイル名の接尾語"
+      }
+    },
+    "Sources": {
+      "name": "ソース",
+      "browserHWAccel": {
+        "name": "Webページソース使用時にブラウザのハードウェアアクセラレーションを有効にする"
+      }
+    },
+    "Media Files": {
+      "name": "メディアファイル",
+      "fileCaching": {
+        "name": "ファイルをキャッシュする"
       }
     }
   },

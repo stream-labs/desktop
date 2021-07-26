@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import electron from 'electron';
 import { Component } from 'vue-property-decorator';
-import { Inject } from 'util/injector';
+import { Inject } from 'services/core/injector';
 import ObsBoolInput from 'components/obs/inputs/ObsBoolInput.vue';
 import { CustomizationService } from 'services/customization';
 import { IObsInput } from 'components/obs/inputs/ObsInput';

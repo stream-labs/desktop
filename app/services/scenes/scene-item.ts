@@ -1,10 +1,9 @@
 import { merge } from 'lodash';
-import { mutation, ServiceHelper } from '../stateful-service';
+import { mutation, ServiceHelper, Inject } from '../core';
 import Utils from '../utils';
 import { SourcesService, TSourceType, ISource } from 'services/sources';
 import { VideoService } from 'services/video';
 import { ScalableRectangle, CenteringAxis } from 'util/ScalableRectangle';
-import { Inject } from 'util/injector';
 import { TObsFormData } from 'components/obs/inputs/ObsInput';
 import * as obs from '../../../obs-api';
 
@@ -16,18 +15,17 @@ import {
   ScenesService,
   Scene,
   ISceneItem,
-  ISceneItemApi,
   ISceneItemInfo,
-  TSceneNodeType
 } from './index';
 import { SceneItemNode } from './scene-node';
+import { TSceneNodeType } from './scenes';
 /**
  * A SceneItem is a source that contains
  * all of the information about that source, and
  * how it fits in to the given scene
  */
 @ServiceHelper()
-export class SceneItem extends SceneItemNode implements ISceneItemApi {
+export class SceneItem extends SceneItemNode {
 
   sourceId: string;
   name: string;
@@ -47,6 +45,9 @@ export class SceneItem extends SceneItemNode implements ISceneItemApi {
   transform: ITransform;
   visible: boolean;
   locked: boolean;
+
+  sceneNodeType: TSceneNodeType = 'item';
+
   deinterlaceMode: obs.EDeinterlaceMode;
   deinterlaceFieldOrder: obs.EDeinterlaceFieldOrder;
 
@@ -65,7 +66,7 @@ export class SceneItem extends SceneItemNode implements ISceneItemApi {
     return (this.video && (this.width > 0) && (this.height > 0)) && !this.locked;
   }
 
-  sceneItemState: ISceneItem;
+  state: ISceneItem;
 
   @Inject() protected scenesService: ScenesService;
   @Inject() private sourcesService: SourcesService;
@@ -77,13 +78,13 @@ export class SceneItem extends SceneItemNode implements ISceneItemApi {
       return item.id === sceneItemId;
     }) as ISceneItem;
     const sourceState = this.sourcesService.state.sources[sourceId];
-    this.sceneItemState = sceneItemState;
+    this.state = sceneItemState;
     Utils.applyProxy(this, sourceState);
-    Utils.applyProxy(this, this.sceneItemState);
+    Utils.applyProxy(this, this.state);
   }
 
   getModel(): ISceneItem & ISource {
-    return { ...this.source.sourceState, ...this.sceneItemState };
+    return { ...this.source.state, ...this.state };
   }
 
   getScene(): Scene {
@@ -118,12 +119,12 @@ export class SceneItem extends SceneItemNode implements ISceneItemApi {
 
     // update only changed settings to reduce the amount of IPC calls
     const obsSceneItem = this.getObsSceneItem();
-    const changed = Utils.getChangedParams(this.sceneItemState, patch);
-    const newSettings = merge({}, this.sceneItemState, patch);
+    const changed = Utils.getChangedParams(this.state, patch);
+    const newSettings = merge({}, this.state, patch);
 
     if (changed.transform) {
       const changedTransform = Utils.getChangedParams(
-        this.sceneItemState.transform,
+        this.state.transform,
         patch.transform
       );
 
@@ -313,10 +314,6 @@ export class SceneItem extends SceneItemNode implements ISceneItemApi {
       .findIndex(sceneItemModel => sceneItemModel.id === this.id);
   }
 
-  protected get state() {
-    return this.sceneItemState;
-  }
-
   /**
    * only for scene sources
    */
@@ -395,6 +392,6 @@ export class SceneItem extends SceneItemNode implements ISceneItemApi {
 
   @mutation()
   private UPDATE(patch: {sceneItemId: string} & IPartialSettings) {
-    merge(this.sceneItemState, patch);
+    merge(this.state, patch);
   }
 }

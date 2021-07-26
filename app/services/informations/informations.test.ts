@@ -5,8 +5,8 @@ import { createSetupFunction } from 'util/test-setup';
 const xmlFeed = readFileSync(resolve(__dirname, './__fixtures__/feed.xml'), 'utf8');
 const parsedFeed = require('./__fixtures__/parsedFeed.json');
 
-jest.mock('services/stateful-service');
-jest.mock('util/injector');
+jest.mock('services/core/stateful-service');
+jest.mock('services/core/injector');
 jest.mock('services/i18n', () => ({}));
 jest.mock('services/hosts', () => ({}));
 jest.mock('services/windows', () => ({}));
