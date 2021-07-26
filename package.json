@@ -197,7 +197,7 @@
     "ts-loader": "8.0.11",
     "ts-node": "7.0.1",
     "typescript": "4.0.7",
-    "urijs": "1.19.6",
+    "urijs": "1.19.7",
     "v-selectpage": "2.0.2",
     "v-tooltip": "v2.0.3",
     "vee-validate": "2.2.0",
