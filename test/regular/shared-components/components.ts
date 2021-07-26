@@ -4,7 +4,10 @@ import { clickButton, clickTab } from '../../helpers/modules/core';
 import { useForm } from '../../helpers/modules/forms';
 useSpectron();
 
-test('Shared components ', async t => {
+/**
+ * Test shared input components
+ */
+test('Form inputs', async t => {
   const { readForm, fillForm, assertFormContains } = useForm('demo-form');
 
   // open demo-form
@@ -12,6 +15,7 @@ test('Shared components ', async t => {
   await clickButton('Show Shared Components Library');
   await clickTab('Demo Form');
 
+  // test that we can read the form data correctly
   const initialFormData = await readForm();
 
   t.deepEqual(initialFormData, [
@@ -25,6 +29,7 @@ test('Shared components ', async t => {
     { name: 'confirm2', value: false, displayValue: false },
   ]);
 
+  // fill out all inputs
   await fillForm({
     name: 'John Doe',
     gender: 'Male',
@@ -37,6 +42,7 @@ test('Shared components ', async t => {
     confirm2: true,
   });
 
+  // read the form again and test that it was filled out correctly
   const filledFormData = await readForm();
 
   t.deepEqual(filledFormData, [
@@ -59,6 +65,7 @@ test('Shared components ', async t => {
     { name: 'confirm2', value: true, displayValue: true },
   ]);
 
+  // test assertion
   assertFormContains({
     name: 'John Doe',
     gender: 'Male',

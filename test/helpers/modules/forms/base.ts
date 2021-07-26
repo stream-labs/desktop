@@ -1,20 +1,43 @@
 import { SpectronClient } from 'spectron';
 import { getClient, select, TSelectorOrEl } from '../core';
 
+/**
+ * A base class for all input controllers
+ */
 export abstract class BaseInputController<TValue> {
   protected client: SpectronClient;
 
   constructor(private selectorOrEl: TSelectorOrEl, public name: string) {}
 
+  /**
+   * returns input's DOM element
+   */
   async getElement() {
     return select(this.selectorOrEl);
   }
+
+  /**
+   * Set the input value
+   */
   abstract async setValue(value: TValue): Promise<string | Error | void>;
+
+  /**
+   * Get the current input value
+   */
   abstract async getValue(): Promise<TValue>;
 
+  /**
+   * Set the display value
+   * Useful for ListInput and TagsInput where actual and displayed values are different
+   */
   async setDisplayValue(value: unknown): Promise<string | Error | void> {
     return this.setValue((value as unknown) as TValue);
   }
+
+  /**
+   * Get the current display value
+   * Useful for ListInput and TagsInput where actual and displayed values are different
+   */
   async getDisplayValue(): Promise<string> {
     return (this.getValue() as unknown) as Promise<string>;
   }

@@ -1,6 +1,6 @@
-import { BaseInputController, setInputValue } from './base';
+import { BaseInputController } from './base';
 import { select } from '../core';
-import {sleep} from "../../sleep";
+import { sleep } from '../../sleep';
 
 export class ListInputController<TValue> extends BaseInputController<TValue> {
   async setValue(value: TValue) {

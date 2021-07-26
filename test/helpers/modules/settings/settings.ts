@@ -6,6 +6,10 @@ import { setInputValue } from '../forms/base';
 import { FormMonkey } from '../../form-monkey';
 import { getContext } from '../../spectron';
 
+/**
+ * Open the settings window with a given category selected
+ * If callback provided then focus the child window and execute the callback
+ */
 export async function showSettingsWindow(category: string, cb?: () => Promise<unknown>) {
   await useMainWindow(async () => {
     await click('.side-nav .icon-settings');
@@ -33,6 +37,11 @@ export async function setTemporaryRecordingPath(): Promise<string> {
   return tmpDir;
 }
 
+/**
+ * Set output resolution
+ * It's recommended to set low resolution for streaming and recording tests
+ * to prevent high CPU usage
+ */
 export async function setOutputResolution(resolution: string) {
   const [width, height] = resolution.split('x');
   await showSettingsWindow('Video', async () => {

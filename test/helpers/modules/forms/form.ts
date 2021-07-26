@@ -1,4 +1,3 @@
-import { getContext } from '../../spectron';
 import * as inputControllers from './inputs';
 import { BaseInputController } from './base';
 import { pascalize } from 'humps';
@@ -9,10 +8,16 @@ import { sleep } from '../../sleep';
 const DEFAULT_FORM_SELECTOR = 'body';
 export type TFormData = Record<string, unknown>;
 
+/**
+ * A helper utility for filling and reading web forms
+ */
 export function useForm(name?: string) {
   const client = getClient();
   const formSelector = name ? `[data-role="form"][data-name="${name}"]` : DEFAULT_FORM_SELECTOR;
 
+  /**
+   * Find all input's DOM elements
+   */
   async function getInputElements(): Promise<WebdriverIO.ElementArray> {
     // wait for form appear
     if (formSelector !== DEFAULT_FORM_SELECTOR) {
@@ -21,10 +26,6 @@ export function useForm(name?: string) {
 
     const $inputs = await client.$$(`${formSelector} [data-role=input]`);
     return $inputs;
-  }
-
-  async function waitFormForDisplayed() {
-    await waitForDisplayed(formSelector);
   }
 
   /**
@@ -48,6 +49,9 @@ export function useForm(name?: string) {
     return mapValues(fieldsMap, 'displayValue');
   }
 
+  /**
+   * Fill the form with a given values
+   */
   async function fillForm(formData: TFormData) {
     // traverse form and fill inputs
     const filledFields: string[] = [];
@@ -117,7 +121,7 @@ export function useForm(name?: string) {
    */
   async function getInputControllers() {
     // wait for form to be visible
-    await waitFormForDisplayed();
+    await waitForDisplayed(formSelector);
     const $inputs = await getInputElements();
     const controllers: BaseInputController<any>[] = [];
     for (const $input of $inputs) {
@@ -133,6 +137,10 @@ export function useForm(name?: string) {
     return controllers;
   }
 
+  /**
+   * Check if form contains expected data
+   * Throws an exception if not
+   */
   async function assertFormContains(expectedFormData: TFormData) {
     const actualFormData = await readFields();
     const expectedFieldNames = Object.keys(expectedFormData);
@@ -144,6 +152,8 @@ export function useForm(name?: string) {
         );
       }
       const actualValue = actualFormData[fieldName];
+
+      // stringify values to achieve a non strict comparison where 1 = "1"
       const stringifiedActualValue = stringifyValue(actualValue);
       const stringifiedExpectedValue = stringifyValue(expectedValue);
 
@@ -153,7 +163,6 @@ export function useForm(name?: string) {
         throw new Error(`Expected field "${fieldName}" to be ${expected} but got ${actual}`);
       }
     }
-    getContext().pass();
   }
 
   function stringifyValue(value: unknown) {
@@ -198,6 +207,9 @@ export async function assertFormContains(...args: unknown[]): Promise<unknown> {
   }
 }
 
+/**
+ * Returns an input controller for a specific type
+ */
 function getInputControllerForType<
   TReturnType extends new (...args: any) => BaseInputController<any>
 >(type: string): TReturnType {

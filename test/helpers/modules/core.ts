@@ -1,5 +1,8 @@
+/*
+ * The core module provides methods for the most frequent actions
+ */
+
 import { getContext } from '../spectron';
-import { sleep } from '../sleep';
 
 export type TSelectorOrEl = string | WebdriverIO.Element;
 
@@ -94,6 +97,10 @@ export async function focusMain() {
   return focusWindow('main');
 }
 
+/**
+ * Focus the given window and execute a callback
+ * Than return focus to the previous window
+ */
 export async function useWindow<TCallbackResult>(
   targetWinId: string,
   cb: () => Promise<TCallbackResult>,

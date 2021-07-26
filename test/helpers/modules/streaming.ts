@@ -1,14 +1,22 @@
+/*
+ * The streaming module provides helper-methods for everything related to
+ * starting, scheduling, and updating streams
+ */
+
 import { getClient } from '../api-client';
 import {
   click,
   clickButton,
-  focusChild, isDisplayed, select,
-  selectButton, useChildWindow,
+  focusChild,
+  isDisplayed,
+  selectButton,
+  useChildWindow,
   useMainWindow,
-  waitForDisplayed, waitForEnabled
+  waitForDisplayed,
+  waitForEnabled,
 } from './core';
 import { sleep } from '../sleep';
-import { useForm } from './forms';
+import {fillForm, TFormData, useForm} from './forms';
 import { setOutputResolution } from './settings/settings';
 import { StreamSettingsService } from '../../../app/services/settings/streaming';
 
@@ -99,7 +107,6 @@ export async function waitForStreamStop() {
 
 export async function chatIsVisible() {
   return await useMainWindow(async () => {
-
     return await isDisplayed('a=Refresh Chat');
   });
 }
@@ -130,11 +137,12 @@ export async function switchAdvancedMode() {
 /**
  * Open liveDock and edit stream settings
  */
-export async function updateChannelSettings(prefillData?: Record<string, any>) {
+export async function updateChannelSettings(prefillData: TFormData) {
   await useMainWindow(async () => {
     await click('.live-dock'); // open LiveDock
     await click('.icon-edit'); // click Edit
     await focusChild();
+    if (prefillData) await fillForm('editStreamForm', prefillData);
     await clickButton('Update');
     await waitForDisplayed('div=Successfully updated');
   });
