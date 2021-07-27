@@ -133,6 +133,7 @@ export interface IYoutubeVideo {
     description: string;
     categoryId: string;
     tags: string[];
+    defaultLanguage: string;
   };
 }
 
