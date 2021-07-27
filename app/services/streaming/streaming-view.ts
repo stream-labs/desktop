@@ -230,7 +230,6 @@ export class StreamInfoView<T extends Object> extends ViewHandler<T> {
         commonFields[fieldName] = destSettings[fieldName];
       });
     });
-
     return commonFields;
   }
 

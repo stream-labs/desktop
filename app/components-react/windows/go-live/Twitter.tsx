@@ -1,13 +1,12 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect } from 'react';
 import InputWrapper from '../../shared/inputs/InputWrapper';
 import { Services } from '../../service-provider';
 import cx from 'classnames';
 import { $t } from '../../../services/i18n';
 import css from './Twitter.m.less';
-import { CheckboxInput, SwitchInput, TextAreaInput, TextInput } from '../../shared/inputs';
+import { CheckboxInput, SwitchInput, TextAreaInput } from '../../shared/inputs';
 import { Row, Col, Button } from 'antd';
 import { useGoLiveSettings } from './useGoLiveSettings';
-import { useVuex } from '../../hooks';
 
 export default function TwitterInput() {
   const { TwitterService, UserService } = Services;
@@ -17,13 +16,15 @@ export default function TwitterInput() {
     getTweetText,
     getSettings,
     streamTitle,
-  } = useGoLiveSettings().selectExtra(module => ({
-    streamTitle: module.commonFields.title,
-  }));
-
-  const { tweetWhenGoingLive, linked, screenName, platform, useStreamlabsUrl } = useVuex(() => {
+    platform,
+    useStreamlabsUrl,
+    tweetWhenGoingLive,
+    screenName,
+    linked,
+  } = useGoLiveSettings().selectExtra(module => {
     const state = TwitterService.state;
     return {
+      streamTitle: module.commonFields.title,
       tweetWhenGoingLive: state.tweetWhenGoingLive,
       useStreamlabsUrl: state.creatorSiteOnboardingComplete,
       linked: state.linked,
@@ -36,7 +37,7 @@ export default function TwitterInput() {
   useEffect(() => {
     const tweetText = getTweetText(streamTitle);
     if (getSettings().tweetText !== tweetText) updateSettings({ tweetText });
-  }, [streamTitle]);
+  }, [streamTitle, useStreamlabsUrl]);
 
   function unlink() {
     TwitterService.actions.return
