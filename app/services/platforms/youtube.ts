@@ -67,6 +67,7 @@ export interface IYoutubeLiveBroadcast {
     description: string;
     scheduledStartTime: string;
     isDefaultBroadcast: boolean;
+    defaultLanguage: string;
     liveChatId: string;
     thumbnails: {
       default: {
