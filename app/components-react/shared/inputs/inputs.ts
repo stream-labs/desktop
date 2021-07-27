@@ -437,6 +437,8 @@ export function InputComponent<T extends Function>(f: T): T {
 export function getInputComponentByType(
   type: TInputType,
 ): JSX.Element & { getAntdValue?: (value: unknown) => unknown } {
-  const componentName = pascalize(`${type}Input`);
-  return InputComponents[componentName];
+  const name = Object.keys(InputComponents).find(componentName => {
+    return componentName.split('Input')[0].toLowerCase() === type;
+  });
+  return name ? InputComponents[name] : null;
 }
