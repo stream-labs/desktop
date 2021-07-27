@@ -45,7 +45,7 @@ test('Multistream default mode', async t => {
   await stopStream(t);
 });
 
-test('Multistream advanced mode', async t => {
+test.skip('Multistream advanced mode', async t => {
   const client = t.context.app.client;
   await logIn(t, null, { multistream: true });
   await prepareToGoLive(t);
