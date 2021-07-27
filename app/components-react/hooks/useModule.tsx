@@ -74,7 +74,10 @@ export function useModule<
     ): InstanceType<TModuleClass> & TComputedProps {
       // create DependencyWatcher as a source of state to select from
       if (!dependencyWatcherRef.current) {
-        if (fn) computedPropsFnRef.current = fn;
+        if (fn) {
+          computedPropsFnRef.current = fn;
+          calculateComputedProps();
+        }
         // we have several sources of data to select from
         // use `merge` function to join them into a single object
         const mergedModule = merge(

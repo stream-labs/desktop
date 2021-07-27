@@ -13,7 +13,19 @@ export class AudioCrossfader {
 
   async export() {
     const inputArgs = this.clips.reduce((args: string[], clip) => {
-      return [...args, '-i', clip.audioSource.outPath];
+      if (clip.hasAudio) {
+        return [...args, '-i', clip.audioSource.outPath];
+      } else {
+        return [
+          ...args,
+          '-f',
+          'lavfi',
+          '-t',
+          clip.frameSource.trimmedDuration.toString(),
+          '-i',
+          'anullsrc',
+        ];
+      }
     }, []);
 
     const args = [...inputArgs];
