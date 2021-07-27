@@ -488,9 +488,9 @@ export class FacebookService
     try {
       return (
         await this.requestFacebook<{ data: IFacebookGroup[] }>(
-          `${this.apiBase}/me/groups?fields=administrator,id,name,icon,privacy&limit=100`,
+          `${this.apiBase}/me/groups?admin_only=true&fields=administrator,id,name,icon,privacy&limit=100`,
         )
-      ).data.filter(group => group.administrator);
+      ).data;
     } catch (e: unknown) {
       console.error('Error fetching Facebook groups', e);
       this.SET_OUTAGE_WARN(
