@@ -66,6 +66,7 @@ export interface IYoutubeLiveBroadcast {
     description: string;
     scheduledStartTime: string;
     isDefaultBroadcast: boolean;
+    defaultLanguage: string;
     liveChatId: string;
     thumbnails: {
       default: {
@@ -131,6 +132,7 @@ export interface IYoutubeVideo {
     description: string;
     categoryId: string;
     tags: string[];
+    defaultLanguage: string;
   };
 }
 
@@ -377,11 +379,11 @@ export class YoutubeService
   private async updateCategory(broadcastId: string, categoryId: string) {
     const video = await this.fetchVideo(broadcastId);
     const endpoint = 'videos?part=snippet';
-    const { title, description, tags } = video.snippet;
+    const { title, description, tags, defaultLanguage } = video.snippet;
     await this.requestYoutube({
       body: JSON.stringify({
         id: broadcastId,
-        snippet: { categoryId, title, description, tags },
+        snippet: { categoryId, title, description, tags, defaultLanguage },
       }),
       method: 'PUT',
       url: `${this.apiBase}/${endpoint}&access_token=${this.oauthToken}`,
