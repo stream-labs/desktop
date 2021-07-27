@@ -22,6 +22,11 @@ export class AudioMixer {
     const filterGraph = `amix=inputs=${this.inputs.length}:duration=first:weights=${this.inputs
       .map(i => i.volume)
       .join(' ')}`;
+
+    this.inputs.forEach((input, index) => {
+      args.push('-map', `${index}:a`);
+    });
+
     args.push('-filter_complex', filterGraph);
 
     args.push('-c:a', 'flac', '-y', this.outputPath);

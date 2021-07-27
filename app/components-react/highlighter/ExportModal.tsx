@@ -23,7 +23,8 @@ export default function ExportModal(p: { close: () => void }) {
 
   function getExportFileFromVideoName(videoName: string) {
     const parsed = path.parse(v.exportInfo.file);
-    return path.join(parsed.dir, `${path.basename(videoName)}${parsed.ext}`);
+    const sanitized = videoName.replace(/[/\\?%*:|"<>\.,;=#]/g, '');
+    return path.join(parsed.dir, `${sanitized}${parsed.ext}`);
   }
 
   function getVideoNameFromExportFile(exportFile: string) {

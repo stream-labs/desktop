@@ -1,17 +1,15 @@
 import { IPatchNotes } from '.';
 
 export const notes: IPatchNotes = {
-  version: '1.1.0',
-  title: 'A New Look',
+  version: '1.3.0',
+  title: 'Grow Tab',
   showChest: false,
   notes: [
-    'Updated logo and favicon to match new Streamlabs branding',
-    'Added Twitch VOD audio track',
-    'Added ability to login with TikTok',
-    'Added increased reactivity and other UX improvements to the Go Live window',
-    'Fixed several bugs relating to the MiniFeed',
-    'Fixed YouTube thumbnails being re-uploaded in a small resolution',
-    'Fixed FFZ settings not correctly applying',
+    'Added Grow tab to help new users in their journey through streaming',
+    'Integrated the Track Matte Stinger and new Display Capture API',
+    'Added option to use Twitch or Streamlabs URL in stream tweets',
+    'Fixed bug related to FFZ and BTTV emotes not appearing in the Game Overlay',
+    'Fixed various Alert Box variation conditions',
     'Minor bugfixes and stability improvements',
   ],
 };

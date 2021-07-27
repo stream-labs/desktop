@@ -15,7 +15,9 @@ const duplicatedFiles = migratedFiles.filter(file => {
   return found;
 });
 
-const progress = (migratedFiles.length - duplicatedFiles.length / 2) / allFiles.length;
+const progress =
+  (migratedFiles.length - duplicatedFiles.length / 2) /
+  (allFiles.length + (migratedFiles.length - duplicatedFiles.length / 2));
 const scale = 30;
 const barsCount = Math.round(progress * scale);
 
@@ -24,4 +26,8 @@ console.log(
   `[${'#'.repeat(barsCount)}${'-'.repeat(scale - barsCount)}] ${Math.round(progress * 100)}%`,
 );
 console.log('migrated:', migratedFiles.length - duplicatedFiles.length / 2, 'files');
-console.log('total:', allFiles.length, 'files');
+console.log(
+  'total:',
+  allFiles.length + (migratedFiles.length - duplicatedFiles.length / 2),
+  'files',
+);

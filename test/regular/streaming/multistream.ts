@@ -1,19 +1,17 @@
-import { test, useSpectron } from '../../helpers/spectron';
 import {
   clickGoLive,
   prepareToGoLive,
   stopStream,
   submit,
   switchAdvancedMode,
-  tryToGoLive,
   waitForSettingsWindowLoaded,
 } from '../../helpers/modules/streaming';
-import {fillForm, useForm} from '../../helpers/modules/forms';
-import { sleep } from '../../helpers/sleep';
+import { fillForm, useForm } from '../../helpers/modules/forms';
 import { click, clickButton, isDisplayed, waitForDisplayed } from '../../helpers/modules/core';
 import { logIn } from '../../helpers/modules/user';
 import { releaseUserInPool, reserveUserFromPool } from '../../helpers/spectron/user';
 import { showSettingsWindow } from '../../helpers/modules/settings/settings';
+import { test, useSpectron } from '../../helpers/spectron';
 
 useSpectron({ implicitTimeout: 0 });
 
