@@ -117,7 +117,6 @@
   flex-grow: 1;
   display: grid;
   grid-template-rows: minmax(0, 1fr) 48px;
-  overflow: hidden;
   position: relative;
   height: 100%;
 }
