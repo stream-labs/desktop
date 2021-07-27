@@ -89,10 +89,17 @@ export function useFormState<T extends object>(initializer: T | (() => T)): TUse
   // create a reference to the last actual state
   const stateRef = useRef(s);
 
+  // use isDestroyed flag to prevent updating state on destroyed components
+  const isDestroyedRef = useRef(false);
+  useOnDestroy(() => {
+    isDestroyedRef.current = true;
+  });
+
   // create a reference to AntForm
   const form = useForm();
 
   function setState(newState: T) {
+    if (isDestroyedRef.current) return;
     // keep the reference in sync when we update the state
     stateRef.current = newState;
     setStateRaw(newState);

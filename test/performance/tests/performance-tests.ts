@@ -6,12 +6,15 @@ import { ScenesService } from '../../../app/services/api/external-api/scenes';
 import { getMeter } from '../meter';
 import { spawnSync } from 'child_process';
 import { sleep } from '../../helpers/sleep';
-import { setOutputResolution, setTemporaryRecordingPath } from '../../helpers/spectron/output';
-import { startRecording, stopRecording } from '../../helpers/spectron/streaming';
+import { startRecording, stopRecording } from '../../helpers/modules/streaming';
 import { getCPUUsage, getMemoryUsage, logTiming, usePerformanceTest } from '../tools';
 import { logIn } from '../../helpers/spectron/user';
 import { ExecutionContext } from 'ava';
 import { CustomizationService } from '../../../app/services/customization';
+import {
+  setOutputResolution,
+  setTemporaryRecordingPath,
+} from '../../helpers/modules/settings/settings';
 const fs = require('fs-extra');
 const _7z = require('7zip')['7z'];
 const path = require('path');
@@ -131,15 +134,15 @@ test('Empty collection (logged-in twitch)', async t => {
 });
 
 test('Recording', async t => {
-  await setTemporaryRecordingPath(t);
-  await setOutputResolution(t, '100x100');
+  await setTemporaryRecordingPath();
+  await setOutputResolution('100x100');
   const api = await getClient();
   const scenesService = api.getResource<ScenesService>('ScenesService');
   scenesService.activeScene.createAndAddSource('Color', 'color_source');
 
-  await startRecording(t);
+  await startRecording();
   await measureMemoryAndCPU(t);
-  await stopRecording(t);
+  await stopRecording();
 
   t.pass();
 });
