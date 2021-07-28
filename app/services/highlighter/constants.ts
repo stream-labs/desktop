@@ -1,13 +1,14 @@
 import path from 'path';
 import Utils from 'services/utils';
 import electron from 'electron';
+import { getOS, OS } from 'util/operating-systems';
 
 export const FFMPEG_DIR = Utils.isDevMode()
   ? path.resolve('node_modules', 'ffmpeg-ffprobe-static')
   : path.resolve(process.resourcesPath, 'node_modules', 'ffmpeg-ffprobe-static');
 
-export const FFMPEG_EXE = path.join(FFMPEG_DIR, 'ffmpeg.exe');
-export const FFPROBE_EXE = path.join(FFMPEG_DIR, 'ffprobe.exe');
+export const FFMPEG_EXE = path.join(FFMPEG_DIR, getOS() === OS.Mac ? 'ffmpeg' : 'ffmpeg.exe');
+export const FFPROBE_EXE = path.join(FFMPEG_DIR, getOS() === OS.Mac ? 'ffprobe' : 'ffprobe.exe');
 
 // TODO: Used for test mode only
 export const CLIP_DIR = path.resolve('C:/', 'Users', 'acree', 'Videos');
