@@ -1,15 +1,19 @@
 import { readdir } from 'fs-extra';
 import { focusChild, focusMain, test, useSpectron } from '../helpers/spectron';
 import { sleep } from '../helpers/sleep';
-import { setOutputResolution, setTemporaryRecordingPath } from '../helpers/spectron/output';
+import {
+  setOutputResolution,
+  setTemporaryRecordingPath,
+} from '../helpers/modules/settings/settings';
 
 useSpectron();
 
 test('Replay Buffer', async t => {
-  const tmpDir = await setTemporaryRecordingPath(t);
-  await setOutputResolution(t, '100x100');
+  const tmpDir = await setTemporaryRecordingPath();
+  await setOutputResolution('100x100');
   const { client } = t.context.app;
 
+  await focusMain(t);
   await (await client.$('button .icon-replay-buffer')).click();
   await (await client.$('button .icon-save')).click();
   await (await client.$('button .fa.fa-stop')).click();

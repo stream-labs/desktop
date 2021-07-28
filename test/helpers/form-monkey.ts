@@ -34,6 +34,8 @@ const months = [
 
 /**
  * helper for simulating user input into SLOBS forms
+ * Use it for Vuex inputs only
+ * @deprecated
  */
 export class FormMonkey {
   constructor(
