@@ -1,19 +1,21 @@
 import { readdir } from 'fs-extra';
 import { focusChild, focusMain, test, useSpectron } from '../helpers/spectron';
-import { setFormDropdown } from '../helpers/spectron/forms';
 import { sleep } from '../helpers/sleep';
-import { startRecording, stopRecording } from '../helpers/spectron/streaming';
-import { setOutputResolution, setTemporaryRecordingPath } from '../helpers/spectron/output';
+import { startRecording, stopRecording } from '../helpers/modules/streaming';
 import { FormMonkey } from '../helpers/form-monkey';
+import {
+  setOutputResolution,
+  setTemporaryRecordingPath,
+} from '../helpers/modules/settings/settings';
 
 useSpectron();
 
 test('Recording', async t => {
   const { app } = t.context;
-  const tmpDir = await setTemporaryRecordingPath(t);
+  const tmpDir = await setTemporaryRecordingPath();
 
   // low resolution reduces CPU usage
-  await setOutputResolution(t, '100x100');
+  await setOutputResolution('100x100');
 
   const formats = ['flv', 'mp4', 'mov', 'mkv', 'ts', 'm3u8'];
 
@@ -29,9 +31,9 @@ test('Recording', async t => {
     await (await app.client.$('button=Done')).click();
     await focusMain(t);
 
-    await startRecording(t);
+    await startRecording();
     await sleep(2000);
-    await stopRecording(t);
+    await stopRecording();
 
     // Wait to ensure that output setting are editable
     await sleep(2000);

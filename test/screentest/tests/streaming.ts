@@ -9,12 +9,11 @@ import { logIn } from '../../helpers/spectron/user';
 import { fillForm, selectTitle } from '../../helpers/form-monkey';
 import { makeScreenshots, useScreentest } from '../screenshoter';
 import { TPlatform } from '../../../app/services/platforms';
-import { setOutputResolution } from '../../helpers/spectron/output';
 import { fetchMock, resetFetchMock } from '../../helpers/spectron/network';
 import { getClient } from '../../helpers/api-client';
 import { ScenesService } from 'services/api/external-api/scenes';
 import { sleep } from '../../helpers/sleep';
-import { prepareToGoLive } from '../../helpers/spectron/streaming';
+import { prepareToGoLive } from '../../helpers/modules/streaming';
 
 useSpectron();
 useScreentest();
@@ -35,7 +34,7 @@ platforms.forEach(platform => {
     if (!(await logIn(t, platform))) return;
     const app = t.context.app;
 
-    await prepareToGoLive(t);
+    await prepareToGoLive();
 
     // open EditStreamInfo window
     await focusMain(t);

@@ -14,7 +14,7 @@ export type TTextAreaInputProps = TSlobsInputProps<
 >;
 
 export const TextAreaInput = InputComponent((p: TTextAreaInputProps) => {
-  const { inputAttrs, wrapperAttrs } = useTextInput(p, ANT_TEXTAREA_FEATURES);
+  const { inputAttrs, wrapperAttrs } = useTextInput('textarea', p, ANT_TEXTAREA_FEATURES);
   return (
     <InputWrapper {...wrapperAttrs}>
       <Input.TextArea {...inputAttrs} />

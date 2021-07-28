@@ -21,6 +21,7 @@ import {
   GoLiveWindow,
   EditStreamWindow,
   IconLibraryProperties,
+  SharedComponentsLibrary,
   PerformanceMetrics,
   RenameSource,
   AdvancedStatistics,
@@ -140,6 +141,7 @@ export function getComponents() {
     EditStreamWindowDeprecated,
     ScheduleStreamWindow,
     IconLibraryProperties,
+    SharedComponentsLibrary,
   };
 }
 
