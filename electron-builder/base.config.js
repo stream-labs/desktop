@@ -78,6 +78,10 @@ const base = {
       //   "filter": ["**/*"]
       // }
     ],
+    extraResources: [
+      'node_modules/ffmpeg-ffprobe-static/ffmpeg',
+      'node_modules/ffmpeg-ffprobe-static/ffprobe',
+    ],
     icon: 'media/images/icon-mac.icns',
     hardenedRuntime: true,
     entitlements: 'electron-builder/entitlements.plist',
