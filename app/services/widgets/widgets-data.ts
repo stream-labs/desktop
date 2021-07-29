@@ -32,6 +32,7 @@ export enum WidgetType {
   SupporterGoal = 17,
   CharityGoal = 18,
   Poll = 19,
+  EmoteWall = 20,
 }
 
 export const WidgetTesters: IWidgetTester[] = [
