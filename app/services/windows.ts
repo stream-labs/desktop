@@ -21,6 +21,7 @@ import {
   GoLiveWindow,
   EditStreamWindow,
   IconLibraryProperties,
+  SharedComponentsLibrary,
   RenameSource,
   AdvancedStatistics,
 } from 'components/shared/ReactComponent';
@@ -136,6 +137,7 @@ export function getComponents() {
     EditStreamWindowDeprecated,
     ScheduleStreamWindow,
     IconLibraryProperties,
+    SharedComponentsLibrary,
   };
 }
 

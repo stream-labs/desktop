@@ -1,8 +1,10 @@
 import { readdir } from 'fs-extra';
 import { focusMain, test, useSpectron } from '../helpers/spectron';
-import { sleep } from '../helpers/sleep';
-import { setOutputResolution, setTemporaryRecordingPath } from '../helpers/spectron/output';
 import { addSource } from '../helpers/spectron/sources';
+import {
+  setOutputResolution,
+  setTemporaryRecordingPath,
+} from '../helpers/modules/settings/settings';
 
 useSpectron();
 
@@ -10,10 +12,10 @@ test('Selective Recording', async t => {
   const sourceType = 'Browser Source';
   const sourceName = `Example ${sourceType}`;
   const { client } = t.context.app;
-  const tmpDir = await setTemporaryRecordingPath(t);
+  const tmpDir = await setTemporaryRecordingPath();
 
   // set lower resolution for better performance in CI
-  await setOutputResolution(t, '100x100');
+  await setOutputResolution('100x100');
 
   // Add a browser source
   await addSource(t, sourceType, sourceName);

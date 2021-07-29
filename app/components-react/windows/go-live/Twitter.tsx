@@ -4,36 +4,41 @@ import { Services } from '../../service-provider';
 import cx from 'classnames';
 import { $t } from '../../../services/i18n';
 import css from './Twitter.m.less';
-import { SwitchInput, TextAreaInput, CheckboxInput } from '../../shared/inputs';
+import { CheckboxInput, SwitchInput, TextAreaInput, TextInput } from '../../shared/inputs';
 import { Row, Col, Button } from 'antd';
 import { useGoLiveSettings } from './useGoLiveSettings';
 import { useVuex } from '../../hooks';
 
 export default function TwitterInput() {
   const { TwitterService, UserService } = Services;
-  const { tweetText, updateSettings, getTweetText, streamTitle } = useGoLiveSettings(view => ({
-    streamTitle: view.commonFields.title,
-  }));
-
-  const { tweetWhenGoingLive, linked, screenName, useStreamlabsUrl, platform, url } = useVuex(
-    () => {
-      const state = TwitterService.state;
-      return {
-        tweetWhenGoingLive: state.tweetWhenGoingLive,
-        useStreamlabsUrl: state.creatorSiteOnboardingComplete,
-        linked: state.linked,
-        screenName: state.screenName,
-        platform: UserService.views.platform?.type,
-        url: TwitterService.views.url,
-      };
-    },
-  );
+  const {
+    tweetText,
+    updateSettings,
+    getTweetText,
+    getSettings,
+    streamTitle,
+    tweetWhenGoingLive,
+    linked,
+    screenName,
+    platform,
+    useStreamlabsUrl,
+  } = useGoLiveSettings().selectExtra(module => {
+    const state = TwitterService.state;
+    return {
+      streamTitle: module.commonFields.title,
+      tweetWhenGoingLive: state.tweetWhenGoingLive,
+      useStreamlabsUrl: state.creatorSiteOnboardingComplete,
+      linked: state.linked,
+      screenName: state.screenName,
+      platform: UserService.views.platform?.type,
+      url: TwitterService.views.url,
+    };
+  });
 
   useEffect(() => {
-    console.log('update tweet text');
     const tweetText = getTweetText(streamTitle);
-    updateSettings({ tweetText });
-  }, [streamTitle, url]);
+    if (getSettings().tweetText !== tweetText) updateSettings({ tweetText });
+  }, [streamTitle, useStreamlabsUrl]);
 
   function unlink() {
     TwitterService.actions.return

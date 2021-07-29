@@ -30,6 +30,7 @@ export function TwitchTagsInput(p: TTwitchTagsInputProps) {
   function render() {
     return (
       <TagsInput
+        name="twitchTags"
         label={p.label}
         value={p.value && p.value.map(tag => tag.tag_id)}
         max={5}
