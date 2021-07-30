@@ -5,6 +5,7 @@ import { Services } from 'components-react/service-provider';
 import times from 'lodash/times';
 import styles from './ClipTrimmer.m.less';
 import cx from 'classnames';
+import { $t } from 'services/i18n';
 
 type TDragType = 'start' | 'end';
 
@@ -188,7 +189,7 @@ export default function ClipTrimmer(props: { clip: IClip }) {
         }}
         onClick={togglePlayPause}
       />
-      <h3 style={{ margin: '6px 0 10px' }}>Trim Clip</h3>
+      <h3 style={{ margin: '6px 0 10px' }}>{$t('Trim Clip')}</h3>
       <div
         ref={timelineRef}
         style={{
