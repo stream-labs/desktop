@@ -14,8 +14,15 @@ import keyBy from 'lodash/keyBy';
  *
  * </pre>
  */
-export default function Translate(p: { message: string; children: ReactElement[] | ReactElement }) {
-  const children = Array.isArray(p.children) ? p.children : [p.children];
+export default function Translate(p: {
+  message: string;
+  children?: ReactElement[] | ReactElement;
+}) {
+  let children: ReactElement[] = [];
+  if (p.children) {
+    children = Array.isArray(p.children) ? p.children : [p.children];
+  }
+
   const [s, setState] = useState<{
     xmlNodes: ChildNode[];
     xmlNamedNodes: Record<string, ChildNode>;

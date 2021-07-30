@@ -408,6 +408,8 @@ export class ObsImporterService extends StatefulService<{ progress: number; tota
           syncOffset: obsAudioSource.sync / 1000000,
           forceMono: !!(obsAudioSource.flags & obs.ESourceFlags.ForceMono),
         });
+
+        this.importFilters(obsAudioSource.filters, newSource);
       }
     });
   }

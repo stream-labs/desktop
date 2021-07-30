@@ -116,7 +116,7 @@ export default class Main extends Vue {
     window.removeEventListener('resize', this.windowSizeHandler);
   }
 
-  minEditorWidth = 500;
+  minEditorWidth = 750;
 
   get title() {
     return this.windowsService.state.main.title;
