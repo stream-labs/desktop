@@ -69,7 +69,7 @@ export async function logOut(t: TExecutionContext, skipUI = false) {
     await (await t.context.app.client.$('.icon-settings')).click();
     await focusChild(t);
     await (await t.context.app.client.$('.fa-sign-out-alt')).click();
-    await dialogDismiss(t, 'Yes');
+    await dialogDismiss('Yes');
     await focusMain(t);
     await (await t.context.app.client.$('.icon-settings')).click();
     await focusChild(t);

@@ -1,11 +1,11 @@
 import { focusMain, test, useSpectron } from '../../helpers/spectron';
 import { assertOptions } from '../../helpers/spectron/assertions';
-import { showSettings } from '../../helpers/spectron/settings';
+import { showSettingsWindow } from '../../helpers/modules/settings/settings';
 
 useSpectron();
 
 test('Populates audio settings', async t => {
-  await showSettings(t, 'Audio');
+  await showSettingsWindow('Audio');
 
   await assertOptions(t, 'SampleRate', '44.1khz', ['44.1khz', '48khz']);
 

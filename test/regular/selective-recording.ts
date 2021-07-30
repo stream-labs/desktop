@@ -1,6 +1,6 @@
 import { readdir } from 'fs-extra';
 import { focusMain, test, useSpectron } from '../helpers/spectron';
-import { addSource } from '../helpers/spectron/sources';
+import { addSource } from '../helpers/modules/sources';
 import {
   setOutputResolution,
   setTemporaryRecordingPath,
@@ -18,7 +18,7 @@ test('Selective Recording', async t => {
   await setOutputResolution('100x100');
 
   // Add a browser source
-  await addSource(t, sourceType, sourceName);
+  await addSource(sourceType, sourceName);
 
   // Toggle selective recording
   await focusMain(t);

@@ -1,5 +1,5 @@
 import { useSpectron, focusMain, test, TExecutionContext } from '../helpers/spectron';
-import { addSource, sourceIsExisting } from '../helpers/spectron/sources';
+import { addSource, sourceIsExisting } from '../helpers/modules/sources';
 import {
   addScene,
   clickRemoveScene,
@@ -48,20 +48,20 @@ test('Scene switching with sources', async t => {
   const sceneName = 'Coolest Scene Ever';
   const sourceName = 'Awesome Source';
 
-  await addSource(t, 'Color Source', sourceName);
+  await addSource('Color Source', sourceName);
 
   await focusMain(t);
-  t.true(await sourceIsExisting(t, sourceName));
+  t.true(await sourceIsExisting(sourceName));
 
   // Adding a new scene will make that scene active, so we can't see
   // the source we just added.
   await addScene(t, sceneName);
   await focusMain(t);
-  t.false(await sourceIsExisting(t, sourceName));
+  t.false(await sourceIsExisting(sourceName));
 
   // Switch back to the default scene
   await selectScene(t, 'Scene');
-  t.true(await sourceIsExisting(t, sourceName));
+  t.true(await sourceIsExisting(sourceName));
 });
 
 test('Restarting the app preserves the default sources', async t => {

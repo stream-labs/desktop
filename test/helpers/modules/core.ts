@@ -2,7 +2,7 @@
  * The core module provides methods for the most frequent actions
  */
 
-import { getContext } from '../spectron';
+import {getContext, TExecutionContext} from '../spectron';
 
 export type TSelectorOrEl = string | WebdriverIO.Element;
 
@@ -29,7 +29,9 @@ export function selectButton(buttonText: string) {
 // CLICK SHORTCUTS
 
 export async function click(selectorOrEl: TSelectorOrEl) {
-  await (await select(selectorOrEl)).click();
+  const $el = await select(selectorOrEl);
+  await $el.waitForClickable();
+  await $el.click();
 }
 
 export async function clickIfDisplayed(selectorOrEl: TSelectorOrEl) {
@@ -44,7 +46,7 @@ export async function clickText(text: string) {
 
 export async function clickButton(buttonText: string) {
   const $button = await selectButton(buttonText);
-  await $button.click();
+  await click($button);
 }
 
 export async function clickTab(tabText: string) {
@@ -95,6 +97,12 @@ export async function focusChild() {
 
 export async function focusMain() {
   return focusWindow('main');
+}
+
+export async function closeWindow(winId: string) {
+  await useWindow(winId, async () => {
+    await getContext().context.app.browserWindow.close();
+  });
 }
 
 /**

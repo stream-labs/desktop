@@ -10,7 +10,7 @@ import {
   test,
 } from '../helpers/spectron/index';
 import { addScene, clickRemoveScene } from '../helpers/spectron/scenes';
-import { addSource, clickRemoveSource, rightClickSource } from '../helpers/spectron/sources';
+import { addSource, clickRemoveSource, rightClickSource } from '../helpers/modules/sources';
 import { contextMenuClick } from '../helpers/spectron/context-menu';
 
 useSpectron();
@@ -81,7 +81,7 @@ async function addRandomSource(t: TExecutionContext) {
   console.log('  Source:', name);
 
   await focusMain(t);
-  await addSource(t, type, name);
+  await addSource(type, name);
 }
 
 async function removeRandomSource(t: TExecutionContext) {
@@ -95,7 +95,7 @@ async function removeRandomSource(t: TExecutionContext) {
     console.log('  Source:', text);
 
     await source.click();
-    await clickRemoveSource(t);
+    await clickRemoveSource();
   }
 }
 
@@ -120,8 +120,8 @@ async function createProjector(t: TExecutionContext) {
   await focusMain(t);
   const sourceName = await selectRandomSource(t);
   if (!sourceName) return;
-  await rightClickSource(t, sourceName);
-  await contextMenuClick(t, 'Create Source Projector');
+  await rightClickSource(sourceName);
+  await contextMenuClick('Create Source Projector');
 }
 
 async function destroyProjector(t: TExecutionContext) {

@@ -1,5 +1,5 @@
 import { test, useSpectron } from '../../helpers/spectron';
-import { addSource } from '../../helpers/spectron/sources';
+import { addSource } from '../../helpers/modules/sources';
 import { logIn } from '../../helpers/spectron/user';
 import { FormMonkey } from '../../helpers/form-monkey';
 import { waitForWidgetSettingsSync } from '../../helpers/widget-helpers';
@@ -9,7 +9,7 @@ useSpectron();
 test('Chatbox Visual Settings', async t => {
   const client = t.context.app.client;
   if (!(await logIn(t))) return;
-  await addSource(t, 'Chatbox', '__Chat Box', false);
+  await addSource('Chatbox', '__Chat Box', false);
 
   await (await client.$('li=Visual Settings')).click();
   const formMonkey = new FormMonkey(t, 'form[name=visual-properties-form]');
@@ -52,7 +52,7 @@ test('Chatbox Visual Settings', async t => {
 test('Chatbox Font Settings', async t => {
   const client = t.context.app.client;
   if (!(await logIn(t))) return;
-  await addSource(t, 'Chatbox', '__Chat Box', false);
+  await addSource('Chatbox', '__Chat Box', false);
 
   await (await client.$('li=Font Settings')).click();
   const formMonkey = new FormMonkey(t, 'form[name=font-properties-form]');

@@ -12,7 +12,7 @@ test('Populates simple output mode settings', async t => {
   await focusChild(t);
   await (await app.client.$('li=Output')).click();
 
-  await setFormDropdown(t, 'Output Mode', 'Simple');
+  await setFormDropdown('Output Mode', 'Simple');
 
   // Video Bitrate
   const videoBitrate = await (
@@ -37,7 +37,7 @@ test('Populates simple output mode settings', async t => {
     'Software (x264)', // CI doesn't have hardware support
   ]) {
     await t.notThrowsAsync(
-      setFormDropdown(t, 'Encoder', encoder),
+      setFormDropdown( 'Encoder', encoder),
       `${encoder} was not found as an option`,
     );
   }

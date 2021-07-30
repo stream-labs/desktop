@@ -1,5 +1,5 @@
 import { useSpectron, test, focusMain, TExecutionContext } from '../helpers/spectron';
-import { addSource, sourceIsExisting } from '../helpers/spectron/sources';
+import { addSource, sourceIsExisting } from '../helpers/modules/sources';
 import { SceneBuilder } from '../helpers/scene-builder';
 import { getClient } from '../helpers/api-client';
 import {
@@ -9,7 +9,6 @@ import {
   duplicateScene,
   sceneExisting,
 } from '../helpers/spectron/scenes';
-import { sleep } from '../helpers/sleep';
 
 useSpectron();
 
@@ -26,41 +25,41 @@ async function redo(t: TExecutionContext) {
 test('Creating some sources with undo/redo', async t => {
   await focusMain(t);
 
-  await addSource(t, 'Color Source', 'Color Source');
-  await addSource(t, 'Color Source', 'Color Source 2');
-  await addSource(t, 'Color Source', 'Color Source 3');
+  await addSource( 'Color Source', 'Color Source');
+  await addSource( 'Color Source', 'Color Source 2');
+  await addSource( 'Color Source', 'Color Source 3');
 
   await focusMain(t);
 
-  t.true(await sourceIsExisting(t, 'Color Source'));
-  t.true(await sourceIsExisting(t, 'Color Source 2'));
-  t.true(await sourceIsExisting(t, 'Color Source 3'));
+  t.true(await sourceIsExisting( 'Color Source'));
+  t.true(await sourceIsExisting( 'Color Source 2'));
+  t.true(await sourceIsExisting( 'Color Source 3'));
 
   await undo(t);
 
-  t.true(await sourceIsExisting(t, 'Color Source'));
-  t.true(await sourceIsExisting(t, 'Color Source 2'));
-  t.false(await sourceIsExisting(t, 'Color Source 3'));
+  t.true(await sourceIsExisting( 'Color Source'));
+  t.true(await sourceIsExisting( 'Color Source 2'));
+  t.false(await sourceIsExisting( 'Color Source 3'));
 
   await undo(t);
 
-  t.true(await sourceIsExisting(t, 'Color Source'));
-  t.false(await sourceIsExisting(t, 'Color Source 2'));
-  t.false(await sourceIsExisting(t, 'Color Source 3'));
+  t.true(await sourceIsExisting( 'Color Source'));
+  t.false(await sourceIsExisting( 'Color Source 2'));
+  t.false(await sourceIsExisting( 'Color Source 3'));
 
   await undo(t);
 
-  t.false(await sourceIsExisting(t, 'Color Source'));
-  t.false(await sourceIsExisting(t, 'Color Source 2'));
-  t.false(await sourceIsExisting(t, 'Color Source 3'));
+  t.false(await sourceIsExisting( 'Color Source'));
+  t.false(await sourceIsExisting( 'Color Source 2'));
+  t.false(await sourceIsExisting( 'Color Source 3'));
 
   await redo(t);
   await redo(t);
   await redo(t);
 
-  t.true(await sourceIsExisting(t, 'Color Source'));
-  t.true(await sourceIsExisting(t, 'Color Source 2'));
-  t.true(await sourceIsExisting(t, 'Color Source 3'));
+  t.true(await sourceIsExisting( 'Color Source'));
+  t.true(await sourceIsExisting( 'Color Source 2'));
+  t.true(await sourceIsExisting( 'Color Source 3'));
 });
 
 test('Deleting a scene with undo/redo', async t => {

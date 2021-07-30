@@ -1,4 +1,4 @@
-import { focusMain, focusWorker, TExecutionContext } from './index';
+import { focusWorker, TExecutionContext } from './index';
 
 /**
  * install the fetch-mock lib

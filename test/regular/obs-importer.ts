@@ -1,7 +1,7 @@
 import { focusChild, focusMain, test, useSpectron } from '../helpers/spectron';
 import { sleep } from '../helpers/sleep';
 import { sceneExisting, switchCollection } from '../helpers/spectron/scenes';
-import { sourceIsExisting } from '../helpers/spectron/sources';
+import { sourceIsExisting } from '../helpers/modules/sources';
 import { getClient } from '../helpers/api-client';
 import { WidgetsService } from '../../app/services/widgets';
 import { EWidgetType } from '../helpers/widget-helpers';
@@ -57,8 +57,8 @@ test('OBS Importer', async t => {
   await switchCollection(t, 'Collection 1');
   t.true(await sceneExisting(t, 'Scene'));
   t.true(await sceneExisting(t, 'Scene 2'));
-  t.true(await sourceIsExisting(t, 'Color Source'));
-  t.true(await sourceIsExisting(t, 'Text (GDI+)'));
+  t.true(await sourceIsExisting( 'Color Source'));
+  t.true(await sourceIsExisting( 'Text (GDI+)'));
 
   // check collection 2 exists
   await focusMain(t);

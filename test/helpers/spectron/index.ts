@@ -84,6 +84,7 @@ export async function closeWindow(t: TExecutionContext) {
 
 export async function waitForLoader(t: TExecutionContext) {
   await (await t.context.app.client.$('.main-loading')).waitForExist({
+    interval: 100, // we need a smaller interval to run tests faster
     timeout: 20000,
     reverse: true,
   });
@@ -188,6 +189,7 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
     const appArgs = options.appArgs ? options.appArgs.split(' ') : [];
     if (options.networkLogging) appArgs.push('--network-logging');
     if (options.noSync) appArgs.push('--nosync');
+
     app = t.context.app = new Application({
       path: path.join(__dirname, '..', '..', '..', '..', 'node_modules', '.bin', 'electron.cmd'),
       args: [
@@ -218,12 +220,9 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
     `;
     await focusMain(t);
     await t.context.app.webContents.executeJavaScript(disableTransitionsCode);
-
-    // allow usage of fetch-mock library
-    await installFetchMock(t);
     await focusMain(t);
 
-    // Wait up to 2 seconds before giving up looking for an element.
+    // Wait up to N seconds before giving up looking for an element.
     // This will slightly slow down negative assertions, but makes
     // the tests much more stable, especially on slow systems.
     await t.context.app.client.setTimeout({ implicit: options.implicitTimeout });
@@ -387,20 +386,5 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
   function getSyncIPCCalls() {
     return lastLogs.split('\n').filter(line => line.match('Calling synchronous service method'))
       .length;
-  }
-}
-
-// the built-in 'click' method doesn't show selector in the error message
-// wrap this method to achieve this functionality
-
-export async function click(t: TExecutionContext, selector: string) {
-  try {
-    return await (await t.context.app.client.$(selector)).click();
-  } catch (e: unknown) {
-    const windowId = String(activeWindow);
-    const message = `click to "${selector}" failed in window ${windowId}: ${(e as any).message} ${
-      (e as any).type
-    }`;
-    throw new Error(message);
   }
 }

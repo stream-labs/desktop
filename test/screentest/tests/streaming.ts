@@ -9,7 +9,7 @@ import { logIn } from '../../helpers/spectron/user';
 import { fillForm, selectTitle } from '../../helpers/form-monkey';
 import { makeScreenshots, useScreentest } from '../screenshoter';
 import { TPlatform } from '../../../app/services/platforms';
-import { fetchMock, resetFetchMock } from '../../helpers/spectron/network';
+import {fetchMock, installFetchMock, resetFetchMock} from '../../helpers/spectron/network';
 import { getClient } from '../../helpers/api-client';
 import { ScenesService } from 'services/api/external-api/scenes';
 import { sleep } from '../../helpers/sleep';
@@ -135,6 +135,7 @@ test('Go live error', async t => {
   await addColorSource();
 
   // simulate issues with the twitch api
+  await installFetchMock(t);
   await fetchMock(t, /api\.twitch\.tv/, 404);
   skipCheckingErrorsInLog();
 

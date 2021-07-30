@@ -14,7 +14,7 @@ export async function clickAddScene(t: TExecutionContext) {
 
 export async function clickRemoveScene(t: TExecutionContext) {
   await clickSceneAction(t, '.icon-subtract');
-  await dialogDismiss(t, 'OK');
+  await dialogDismiss( 'OK');
 }
 
 export async function clickSceneTransitions(t: TExecutionContext) {
@@ -48,14 +48,14 @@ export async function addScene(t: TExecutionContext, name: string) {
 export async function openRenameWindow(t: TExecutionContext, sceneName: string) {
   await focusMain(t);
   await rightClickScene(t, sceneName);
-  await contextMenuClick(t, 'Rename');
+  await contextMenuClick('Rename');
   await focusChild(t);
 }
 
 export async function openDuplicateWindow(t: TExecutionContext, sceneName: string) {
   await focusMain(t);
   await rightClickScene(t, sceneName);
-  await contextMenuClick(t, 'Duplicate');
+  await contextMenuClick('Duplicate');
   await focusChild(t);
 }
 
