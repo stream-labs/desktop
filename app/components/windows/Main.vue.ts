@@ -292,6 +292,7 @@ export default class Main extends Vue {
   }
 
   handleEditorWidth(width: number) {
+    if (width < 750) return;
     this.minEditorWidth = width;
   }
 
