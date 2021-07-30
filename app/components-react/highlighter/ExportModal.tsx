@@ -9,6 +9,7 @@ import { Button, Progress, Alert } from 'antd';
 import YoutubeUpload from './YoutubeUpload';
 import { RadioInput } from 'components-react/shared/inputs/RadioInput';
 import { confirmAsync } from 'components-react/modals';
+import { $t } from 'services/i18n';
 
 export default function ExportModal(p: { close: () => void }) {
   const { HighlighterService, UsageStatisticsService } = Services;
@@ -35,16 +36,13 @@ export default function ExportModal(p: { close: () => void }) {
   const [videoName, setVideoName] = useState('My Video');
   const [exportFile, setExportFile] = useState<string>(getExportFileFromVideoName(videoName));
 
-  // TODO: Give warning overwriting
-  // TODO: Show confirm when closing modal after export
-
   function getFileExportStep() {
     return (
       <div>
         <h2>Export Video</h2>
         <Form>
           <TextInput
-            label="Video Name"
+            label={$t('Video Name')}
             value={videoName}
             onInput={name => {
               setVideoName(name);
@@ -53,9 +51,9 @@ export default function ExportModal(p: { close: () => void }) {
             uncontrolled={false}
           />
           <FileInput
-            label="Export Location"
+            label={$t('Export Location')}
             save={true}
-            filters={[{ name: 'MP4 Video File', extensions: ['mp4'] }]}
+            filters={[{ name: $t('MP4 Video File'), extensions: ['mp4'] }]}
             value={exportFile}
             onChange={file => {
               setExportFile(file);
@@ -63,7 +61,7 @@ export default function ExportModal(p: { close: () => void }) {
             }}
           />
           <RadioInput
-            label="Resolution"
+            label={$t('Resolution')}
             value={v.exportInfo.resolution.toString()}
             options={[
               { value: '720', label: '720p' },
@@ -75,7 +73,7 @@ export default function ExportModal(p: { close: () => void }) {
             buttons={true}
           />
           <RadioInput
-            label="Frame Rate"
+            label={$t('Frame Rate')}
             value={v.exportInfo.fps.toString()}
             options={[
               { value: '30', label: '30 FPS' },
@@ -87,12 +85,12 @@ export default function ExportModal(p: { close: () => void }) {
             buttons={true}
           />
           <RadioInput
-            label="File Size"
+            label={$t('File Size')}
             value={v.exportInfo.preset}
             options={[
-              { value: 'ultrafast', label: 'Faster Export' },
-              { value: 'fast', label: 'Balanced' },
-              { value: 'slow', label: 'Smaller File' },
+              { value: 'ultrafast', label: $t('Faster Export') },
+              { value: 'fast', label: $t('Balanced') },
+              { value: 'slow', label: $t('Smaller File') },
             ]}
             onChange={val => {
               HighlighterService.actions.setPreset(val as TPreset);
@@ -111,7 +109,7 @@ export default function ExportModal(p: { close: () => void }) {
           )}
           <div style={{ textAlign: 'right' }}>
             <Button style={{ marginRight: 8 }} onClick={p.close}>
-              Close
+              {$t('Close')}
             </Button>
             <Button
               type="primary"
@@ -119,11 +117,11 @@ export default function ExportModal(p: { close: () => void }) {
                 if (await HighlighterService.actions.return.fileExists(exportFile)) {
                   if (
                     !(await confirmAsync({
-                      title: 'Overwite File?',
-                      content: `${path.basename(
-                        exportFile,
-                      )} already exists. Would you like to overwrite it?`,
-                      okText: 'Overwrite',
+                      title: $t('Overwite File?'),
+                      content: $t('%{filename} already exists. Would you like to overwrite it?', {
+                        filename: path.basename(exportFile),
+                      }),
+                      okText: $t('Overwrite'),
                     }))
                   ) {
                     return;
@@ -136,7 +134,7 @@ export default function ExportModal(p: { close: () => void }) {
                 HighlighterService.actions.export();
               }}
             >
-              Export
+              {$t('Export')}
             </Button>
           </div>
         </Form>
@@ -147,7 +145,7 @@ export default function ExportModal(p: { close: () => void }) {
   function getExportProgress() {
     return (
       <div>
-        <h2>Export Progress</h2>
+        <h2>{$t('Export Progress')}</h2>
         <Progress
           percent={Math.round((v.exportInfo.currentFrame / v.exportInfo.totalFrames) * 100)}
           trailColor="var(--section)"
@@ -155,16 +153,19 @@ export default function ExportModal(p: { close: () => void }) {
         />
         {!v.exportInfo.cancelRequested && v.exportInfo.step === EExportStep.FrameRender && (
           <div>
-            Rendering Frames: {v.exportInfo.currentFrame}/{v.exportInfo.totalFrames}
+            {$t('Rendering Frames: %{currentFrame}/%{totalFrames}', {
+              currentFrame: v.exportInfo.currentFrame,
+              totalFrames: v.exportInfo.totalFrames,
+            })}
           </div>
         )}
         {!v.exportInfo.cancelRequested && v.exportInfo.step === EExportStep.AudioMix && (
           <div>
-            Mixing Audio:
+            {$t('Mixing Audio:')}
             <i className="fa fa-pulse fa-spinner" style={{ marginLeft: '12px' }} />
           </div>
         )}
-        {v.exportInfo.cancelRequested && <span>Canceling...</span>}
+        {v.exportInfo.cancelRequested && <span>{$t('Canceling...')}</span>}
         <br />
         <button
           className="button button--soft-warning"
@@ -172,7 +173,7 @@ export default function ExportModal(p: { close: () => void }) {
           style={{ marginTop: '16px' }}
           disabled={v.exportInfo.cancelRequested}
         >
-          Cancel
+          {$t('Cancel')}
         </button>
       </div>
     );
