@@ -2,7 +2,7 @@ import { focusLibrary, focusMain, test, TExecutionContext, useSpectron } from '.
 import { logIn } from '../helpers/spectron/user';
 import { sleep } from '../helpers/sleep';
 import { FormMonkey } from '../helpers/form-monkey';
-import { sceneExisting } from '../helpers/spectron/scenes';
+import { sceneExisting } from '../helpers/modules/scenes';
 
 useSpectron();
 
@@ -40,7 +40,7 @@ test('Installing a theme', async (t: TExecutionContext) => {
 
   // Should've populated scenes
   for (const scene of OVERLAY_SCENES) {
-    t.true(await sceneExisting(t, scene), `Scene ${scene} was not found`);
+    t.true(await sceneExisting(scene), `Scene ${scene} was not found`);
   }
 
   // Should've populated sources (this checks Starting Soon scene sources)

@@ -9,7 +9,7 @@ import {
   closeWindow,
   test,
 } from '../helpers/spectron/index';
-import { addScene, clickRemoveScene } from '../helpers/spectron/scenes';
+import { addScene, clickRemoveScene } from '../helpers/modules/scenes';
 import { addSource, clickRemoveSource, rightClickSource } from '../helpers/modules/sources';
 import { contextMenuClick } from '../helpers/spectron/context-menu';
 
@@ -50,7 +50,7 @@ async function addRandomScene(t: TExecutionContext) {
   const name = uniqueId('scene_');
 
   await focusMain(t);
-  await addScene(t, name);
+  await addScene(name);
 }
 
 async function removeRandomScene(t: TExecutionContext) {
@@ -60,7 +60,7 @@ async function removeRandomScene(t: TExecutionContext) {
   if (scenes.length > 1) {
     const scene = sample(scenes);
     await await scene.click();
-    await clickRemoveScene(t);
+    await clickRemoveScene();
   }
 }
 

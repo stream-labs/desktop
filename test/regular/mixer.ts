@@ -5,15 +5,15 @@ import {
   clickRemoveSource,
   addExistingSource,
 } from '../helpers/modules/sources';
-import { addScene } from '../helpers/spectron/scenes';
+import { addScene } from '../helpers/modules/scenes';
 
 useSpectron();
 
 test('Adding and removing a AudioSource', async t => {
   const app = t.context.app;
 
-  await addSource( 'Media Source', 'Source With Audio');
-  await addSource( 'Color Source', 'Source Without Audio');
+  await addSource('Media Source', 'Source With Audio');
+  await addSource('Color Source', 'Source Without Audio');
   await focusMain(t);
 
   t.true(
@@ -35,12 +35,12 @@ test('Adding and removing a AudioSource', async t => {
 test('Nested scenes should provide audio sources to mixer', async t => {
   const app = t.context.app;
 
-  await addSource( 'Media Source', 'Nested Media Source');
+  await addSource('Media Source', 'Nested Media Source');
   await focusMain(t);
 
-  await addScene(t, 'New Scene');
-  await addSource( 'Media Source', 'Simple Media Source');
-  await addExistingSource( 'Scene', 'Scene');
+  await addScene('New Scene');
+  await addSource('Media Source', 'Simple Media Source');
+  await addExistingSource('Scene', 'Scene');
 
   await focusMain(t);
   t.true(

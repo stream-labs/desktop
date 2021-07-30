@@ -16,6 +16,7 @@ import {
   testFn,
 } from './runner-utils';
 import { skipOnboarding } from '../modules/onboarding';
+import {select} from "../modules/core";
 export const test = testFn; // the overridden "test" function
 
 const path = require('path');
@@ -82,8 +83,8 @@ export async function closeWindow(t: TExecutionContext) {
   await t.context.app.browserWindow.close();
 }
 
-export async function waitForLoader(t: TExecutionContext) {
-  await (await t.context.app.client.$('.main-loading')).waitForExist({
+export async function waitForLoader() {
+  await (await select('.main-loading')).waitForExist({
     interval: 100, // we need a smaller interval to run tests faster
     timeout: 20000,
     reverse: true,
@@ -229,7 +230,7 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
 
     // Pretty much all tests except for onboarding-specific
     // tests will want to skip this flow, so we do it automatically.
-    await waitForLoader(t);
+    await waitForLoader();
 
     if (options.skipOnboarding) await skipOnboarding();
 

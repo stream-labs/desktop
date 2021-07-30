@@ -1,6 +1,6 @@
 import { focusChild, focusMain, test, useSpectron } from '../helpers/spectron';
 import { sleep } from '../helpers/sleep';
-import { sceneExisting, switchCollection } from '../helpers/spectron/scenes';
+import { sceneExisting, switchCollection } from '../helpers/modules/scenes';
 import { sourceIsExisting } from '../helpers/modules/sources';
 import { getClient } from '../helpers/api-client';
 import { WidgetsService } from '../../app/services/widgets';
@@ -54,15 +54,15 @@ test('OBS Importer', async t => {
   }
 
   // check collection 1 and sources
-  await switchCollection(t, 'Collection 1');
-  t.true(await sceneExisting(t, 'Scene'));
-  t.true(await sceneExisting(t, 'Scene 2'));
+  await switchCollection('Collection 1');
+  t.true(await sceneExisting('Scene'));
+  t.true(await sceneExisting('Scene 2'));
   t.true(await sourceIsExisting( 'Color Source'));
   t.true(await sourceIsExisting( 'Text (GDI+)'));
 
   // check collection 2 exists
   await focusMain(t);
-  await switchCollection(t, 'Collection 2');
+  await switchCollection('Collection 2');
 
   // check settings
   await (await client.$('.side-nav .icon-settings')).click();
@@ -74,7 +74,7 @@ test('OBS Importer', async t => {
 
   // check that widgets have been migrated
   await focusMain(t);
-  await switchCollection(t, 'Widgets');
+  await switchCollection('Widgets');
   const api = await getClient();
   const widgetsService = api.getResource<WidgetsService>('WidgetsService');
 

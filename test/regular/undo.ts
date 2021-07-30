@@ -8,7 +8,7 @@ import {
   selectScene,
   duplicateScene,
   sceneExisting,
-} from '../helpers/spectron/scenes';
+} from '../helpers/modules/scenes';
 
 useSpectron();
 
@@ -66,7 +66,7 @@ test('Deleting a scene with undo/redo', async t => {
   const client = await getClient();
   const sceneBuilder = new SceneBuilder(client);
 
-  await addScene(t, 'New Scene');
+  await addScene('New Scene');
 
   // Build a complex item and folder hierarchy
   const sketch = `
@@ -90,12 +90,12 @@ test('Deleting a scene with undo/redo', async t => {
   sceneBuilder.build(sketch);
 
   await focusMain(t);
-  await clickRemoveScene(t);
+  await clickRemoveScene();
 
   t.true(sceneBuilder.isEqualTo(''));
 
   await undo(t);
-  await selectScene(t, 'New Scene');
+  await selectScene('New Scene');
 
   t.true(sceneBuilder.isEqualTo(sketch));
 
@@ -127,21 +127,21 @@ test('Duplicating a scene with undo/redo', async t => {
   `;
 
   sceneBuilder.build(sketch);
-  await duplicateScene(t, 'Scene', 'Duplicate');
+  await duplicateScene('Scene', 'Duplicate');
   await focusMain(t);
 
-  await selectScene(t, 'Duplicate');
+  await selectScene('Duplicate');
   t.true(sceneBuilder.isEqualTo(sketch));
 
-  await selectScene(t, 'Scene');
+  await selectScene('Scene');
   t.true(sceneBuilder.isEqualTo(sketch));
 
   await undo(t);
 
-  t.false(await sceneExisting(t, 'Duplicate'));
+  t.false(await sceneExisting('Duplicate'));
 
   await redo(t);
 
-  await selectScene(t, 'Duplicate');
+  await selectScene('Duplicate');
   t.true(sceneBuilder.isEqualTo(sketch));
 });

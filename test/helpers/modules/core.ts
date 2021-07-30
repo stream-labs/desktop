@@ -28,10 +28,10 @@ export function selectButton(buttonText: string) {
 
 // CLICK SHORTCUTS
 
-export async function click(selectorOrEl: TSelectorOrEl) {
+export async function click(selectorOrEl: TSelectorOrEl, options?: WebdriverIO.ClickOptions) {
   const $el = await select(selectorOrEl);
   await $el.waitForClickable();
-  await $el.click();
+  await $el.click(options);
 }
 
 export async function clickIfDisplayed(selectorOrEl: TSelectorOrEl) {
