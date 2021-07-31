@@ -72,6 +72,12 @@ test('Selection actions', async t => {
   const selection = client.getResource<SelectionService>('SelectionService');
   const scene = scenesService.activeScene;
 
+  sceneBuilder.build(`
+     Color1:
+     Color2:
+     Color3:
+  `);
+
   let [color1, color2, color3] = scene.getItems();
 
   selection.select([color1.sceneItemId, color2.sceneItemId]);
@@ -89,6 +95,11 @@ test('Invalid selection', async t => {
   const client = await getApiClient();
   const scenesService = client.getResource<ScenesService>('ScenesService');
   const selection = client.getResource<SelectionService>('SelectionService');
+  sceneBuilder.build(`
+     Color1:
+     Color2:
+     Color3:
+  `);
   const anotherScene = scenesService.createScene('Another scene');
   const colorFromAnotherScene = anotherScene.createAndAddSource('MyColor', 'color_source');
   const [colorSource] = scenesService.activeScene.getItems();

@@ -7,7 +7,7 @@ import { WidgetsService } from '../../app/services/widgets';
 import { EWidgetType } from '../helpers/widget-helpers';
 import { FormMonkey } from '../helpers/form-monkey';
 import { ExecutionContext } from 'ava';
-import {focusChild, focusMain} from "../helpers/modules/core";
+import { click, focusChild, focusMain, waitForDisplayed } from '../helpers/modules/core';
 
 const path = require('path');
 
@@ -36,30 +36,20 @@ test('OBS Importer', async t => {
   const client = t.context.app.client;
 
   // skip auth
-  if (await (await t.context.app.client.$('span=Skip')).isExisting()) {
-    await (await t.context.app.client.$('span=Skip')).click();
-    await sleep(1000);
-  }
-
-  // Skip purchasing prime
-  if (await (await t.context.app.client.$('div=Choose Starter')).isExisting()) {
-    await (await t.context.app.client.$('div=Choose Starter')).click();
-    await sleep(1000);
-  }
+  await click('span=Skip');
 
   // import from OBS
-  if (await (await t.context.app.client.$('div=Import from OBS')).isExisting()) {
-    await (await t.context.app.client.$('div=Import from OBS')).click();
-    await (await t.context.app.client.$('div=Start')).click();
-    await sleep(10000);
-  }
+  await click('div=Import from OBS');
+  await click('div=Start');
+
+  await waitForDisplayed('.scene-collections-wrapper');
 
   // check collection 1 and sources
   await switchCollection('Collection 1');
   t.true(await sceneExisting('Scene'));
   t.true(await sceneExisting('Scene 2'));
-  t.true(await sourceIsExisting( 'Color Source'));
-  t.true(await sourceIsExisting( 'Text (GDI+)'));
+  t.true(await sourceIsExisting('Color Source'));
+  t.true(await sourceIsExisting('Text (GDI+)'));
 
   // check collection 2 exists
   await focusMain();

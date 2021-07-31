@@ -77,7 +77,7 @@ interface ITestRunnerOptions {
 const DEFAULT_OPTIONS: ITestRunnerOptions = {
   skipOnboarding: true,
   restartAppAfterEachTest: true,
-  clearCollectionAfterEachTest: true,
+  clearCollectionAfterEachTest: false,
   noSync: true,
   networkLogging: false,
   pauseIfFailed: false,
@@ -195,10 +195,6 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
     await focusMain();
     appIsRunning = true;
 
-    for (const callback of afterStartCallbacks) {
-      await callback(t);
-    }
-
     return app;
   };
 
@@ -266,6 +262,9 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
     } else {
       // Set the cache dir to what it previously was, since we are re-using it
       t.context.cacheDir = lastCacheDir;
+    }
+    for (const callback of afterStartCallbacks) {
+      await callback(t);
     }
     testStartTime = Date.now();
   });
