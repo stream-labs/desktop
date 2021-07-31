@@ -4,13 +4,12 @@ import { uniqueId, sample } from 'lodash';
 import {
   useSpectron,
   TExecutionContext,
-  focusWindow,
   test,
 } from '../helpers/spectron/index';
 import { addScene, clickRemoveScene } from '../helpers/modules/scenes';
 import { addSource, clickRemoveSource, rightClickSource } from '../helpers/modules/sources';
 import { contextMenuClick } from '../helpers/spectron/context-menu';
-import {closeWindow, focusMain} from "../helpers/modules/core";
+import {closeWindow, focusMain, focusWindow} from "../helpers/modules/core";
 
 useSpectron();
 
@@ -124,7 +123,7 @@ async function createProjector(t: TExecutionContext) {
 }
 
 async function destroyProjector(t: TExecutionContext) {
-  if (await focusWindow(t, /windowId=(?!main)(?!child)/)) {
+  if (await focusWindow( /windowId=(?!main)(?!child)/)) {
     await closeWindow('child');
   }
   await focusMain();

@@ -28,7 +28,6 @@ const ALMOST_INFINITY = Math.pow(2, 31) - 1; // max 32bit int
 const testStats: Record<string, ITestStats> = {};
 
 let testStartTime = 0;
-let activeWindow: string | RegExp;
 
 const afterStartCallbacks: ((t: TExecutionContext) => any)[] = [];
 export function afterAppStart(cb: (t: TExecutionContext) => any) {
@@ -37,28 +36,6 @@ export function afterAppStart(cb: (t: TExecutionContext) => any) {
 const afterStopCallbacks: ((t: TExecutionContext) => any)[] = [];
 export function afterAppStop(cb: (t: TExecutionContext) => any) {
   afterStopCallbacks.push(cb);
-}
-
-export async function focusWindow(t: TExecutionContext, regex: RegExp): Promise<boolean> {
-  const count = await t.context.app.client.getWindowCount();
-
-  for (let i = 0; i < count; i++) {
-    await t.context.app.client.windowByIndex(i);
-    const url = await t.context.app.client.getUrl();
-    if (url.match(regex)) {
-      activeWindow = regex;
-      return true;
-    }
-  }
-
-  return false;
-}
-
-// Focuses the Library webview
-export async function focusLibrary(t: TExecutionContext) {
-  // doesn't work without delay, probably need to wait until load
-  await sleep(2000);
-  await focusWindow(t, /streamlabs\.com\/library/);
 }
 
 let testContext: TExecutionContext;

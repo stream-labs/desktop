@@ -80,13 +80,19 @@ export async function getFocusedWindowId(): Promise<string> {
   return url.match(/windowId=main$/) ? 'main' : 'child';
 }
 
-export async function focusWindow(winId: string): Promise<boolean> {
+export async function focusWindow(winIdOrRegexp: string | RegExp): Promise<boolean> {
   const client = await getClient();
   const count = await getClient().getWindowCount();
   for (let i = 0; i < count; i++) {
     await client.windowByIndex(i);
     const url = await client.getUrl();
-    if (url.includes(`windowId=${winId}`)) return true;
+    if (typeof winIdOrRegexp === 'string') {
+      const winId = winIdOrRegexp;
+      if (url.includes(`windowId=${winId}`)) return true;
+    } else {
+      const regex = winIdOrRegexp as RegExp;
+      if (url.match(regex)) return true;
+    }
   }
   return false;
 }
