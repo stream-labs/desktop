@@ -105,7 +105,7 @@ export const store = configureStore();
  * Redux Modules are perfect for situations where:
  *  - You want to share some logic or state between several React components that are intended to work together
  *  - You want to simplify a complex React component so it should be responsible only for rendering, and you extract everything unrelated to rendering to a module
- *  - You have performance issues in your React component related to a redundant re-renderings
+ *  - You have performance issues in your React component related to a redundant re-renderings or multiple IPC calls to Services
  *
  * StatefulServices and Services are perfect for situations where:
  *  - You want to have some global reactive state across multiple windows

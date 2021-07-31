@@ -417,7 +417,7 @@ export class YoutubeService
   }
 
   /**
-   * Create or update a YT broadcast (event) for the future stream
+   * Create a YT broadcast (event) for the future stream
    */
   async scheduleStream(
     scheduledStartTime: number,

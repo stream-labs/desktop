@@ -4,7 +4,7 @@ import { Services } from '../../service-provider';
 import cx from 'classnames';
 import { $t } from '../../../services/i18n';
 import css from './Twitter.m.less';
-import { SwitchInput, TextAreaInput, CheckboxInput } from '../../shared/inputs';
+import { CheckboxInput, SwitchInput, TextAreaInput, TextInput } from '../../shared/inputs';
 import { Row, Col, Button } from 'antd';
 import { useGoLiveSettings } from './useGoLiveSettings';
 import { useVuex } from '../../hooks';

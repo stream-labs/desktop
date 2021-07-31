@@ -3,7 +3,6 @@ import {
   IPlatformService,
   IGame,
   TPlatformCapability,
-  EPlatformCallResult,
   IPlatformRequest,
   IPlatformState,
 } from '.';
@@ -12,14 +11,12 @@ import { Inject } from 'services/core/injector';
 import { authorizedHeaders } from 'util/requests';
 import { UserService } from 'services/user';
 import { platformAuthorizedRequest, platformRequest } from './utils';
-import { $t } from 'services/i18n';
-import { StreamSettingsService } from 'services/settings/streaming';
 import { IGoLiveSettings } from 'services/streaming';
 import { throwStreamError } from 'services/streaming/stream-error';
 import { BasePlatformService } from './base-platform';
 import electron from 'electron';
 import { WindowsService } from '../windows';
-import {assertIsDefined, getDefined} from '../../util/properties-type-guards';
+import { assertIsDefined, getDefined } from '../../util/properties-type-guards';
 import { flatten } from 'lodash';
 
 interface IFacebookPage {
@@ -532,7 +529,6 @@ export class FacebookService
     if (this.state.grantedPermissions.includes('publish_video')) {
       const destinationType = 'me';
       const destinationId = 'me';
-      console.log('request timeline');
       requests.push(
         this.fetchScheduledVideos(destinationType, destinationId).then(videos =>
           videos.map(video => ({
@@ -549,7 +545,6 @@ export class FacebookService
       const destinationType = 'group';
       this.state.facebookGroups.forEach(group => {
         const destinationId = group.id;
-        console.log('request group', group.id);
         requests.push(
           this.fetchScheduledVideos(destinationType, destinationId).then(videos =>
             videos.map(video => ({
@@ -566,7 +561,6 @@ export class FacebookService
     this.state.facebookPages.forEach(page => {
       const destinationType = 'page';
       const destinationId = page.id;
-      console.log('request page', page.id);
       requests.push(
         this.fetchScheduledVideos(destinationType, destinationId).then(videos =>
           videos.map(video => ({

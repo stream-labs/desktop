@@ -8,9 +8,9 @@ import {
   stopStream,
 } from '../../helpers/spectron/streaming';
 
-import {focusChild, isDisplayed, waitForDisplayed} from '../../helpers/modules/core';
+import { focusChild, isDisplayed, waitForDisplayed } from '../../helpers/modules/core';
 
-useSpectron({ implicitTimeout: 0 });
+useSpectron();
 
 test('Streaming to Youtube', async t => {
   await logIn('youtube', { multistream: false });
@@ -26,11 +26,7 @@ test('Streaming to Youtube', async t => {
 });
 
 // TODO
-test.skip('Streaming to the scheduled event on Youtube', async t => {
-  /// await logIn(t, 'youtube', { multistream: false });
-  t.true(await chatIsVisible(), 'Chat should be visible');
-  await stopStream();
-});
+test.skip('Streaming to the scheduled event on Youtube', async t => {});
 
 test('Start stream twice to the same YT event', async t => {
   await logIn('youtube', { multistream: false });
