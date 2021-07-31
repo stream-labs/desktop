@@ -1,10 +1,4 @@
-import {
-  startApp,
-  stopApp,
-  test,
-  useSpectron,
-  skipCheckingErrorsInLog,
-} from '../helpers/spectron';
+import { startApp, stopApp, test, useSpectron, skipCheckingErrorsInLog } from '../helpers/spectron';
 
 import { getApiClient } from '../helpers/api-client';
 const path = require('path');
@@ -14,7 +8,7 @@ import os = require('os');
 import { logIn } from '../helpers/spectron/user';
 import { SceneCollectionsService } from 'services/api/external-api/scene-collections';
 import { ScenesService } from '../../app/services/api/external-api/scenes';
-import {focusChild} from "../helpers/modules/core";
+import { focusChild } from '../helpers/modules/core';
 
 useSpectron({ noSync: false });
 

@@ -1,5 +1,4 @@
 import { test, useSpectron } from '../helpers/spectron';
-import { sleep } from '../helpers/sleep';
 import { sceneExisting, switchCollection } from '../helpers/modules/scenes';
 import { sourceIsExisting } from '../helpers/modules/sources';
 import { getApiClient } from '../helpers/api-client';
