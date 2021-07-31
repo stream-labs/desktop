@@ -1,4 +1,4 @@
-import { getClient } from '../helpers/api-client';
+import { getApiClient } from '../helpers/api-client';
 import { CustomizationService } from '../../app/services/customization';
 import { getConfigsVariations, getConfig } from './utils';
 import test from 'ava';
@@ -18,7 +18,7 @@ let branchName: string;
 let screenshotsCaptured = false;
 
 async function applyConfig(t: TExecutionContext, config: Dictionary<any>) {
-  const api = await getClient();
+  const api = await getApiClient();
   const customizationService = api.getResource<CustomizationService>('CustomizationService');
 
   customizationService.setTheme(config.nightMode ? 'night-theme' : 'day-theme');
@@ -37,7 +37,7 @@ async function getFocusedWindowId(t: TExecutionContext): Promise<string> {
 }
 
 export async function makeScreenshots(t: TExecutionContext, title = '') {
-  const api = await getClient();
+  const api = await getApiClient();
   const performanceService = api.getResource<PerformanceService>('PerformanceService');
   const audioService = api.getResource<IAudioServiceApi>('AudioService');
   const windowService = api.getResource<WindowsService>('WindowsService');

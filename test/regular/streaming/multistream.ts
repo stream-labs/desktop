@@ -13,7 +13,7 @@ import { releaseUserInPool, reserveUserFromPool } from '../../helpers/spectron/u
 import { showSettingsWindow } from '../../helpers/modules/settings/settings';
 import { test, useSpectron } from '../../helpers/spectron';
 
-useSpectron({ implicitTimeout: 0 });
+useSpectron();
 
 test('Multistream default mode', async t => {
   await logIn(null, { multistream: true });

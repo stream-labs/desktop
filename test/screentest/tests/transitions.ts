@@ -1,5 +1,5 @@
 import { useSpectron, test, TExecutionContext } from '../../helpers/spectron';
-import { getClient } from '../../helpers/api-client';
+import { getApiClient } from '../../helpers/api-client';
 import { makeScreenshots, useScreentest } from '../screenshoter';
 import { ScenesService } from 'services/api/external-api/scenes';
 import { TransitionsService } from 'services/transitions';
@@ -9,7 +9,7 @@ useSpectron({ restartAppAfterEachTest: false });
 useScreentest();
 
 test('Transitions', async (t: TExecutionContext) => {
-  const client = await getClient();
+  const client = await getApiClient();
   const scenesService = client.getResource<ScenesService>('ScenesService');
   const transitionService = client.getResource<TransitionsService>('TransitionsService');
 

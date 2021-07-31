@@ -1,5 +1,5 @@
 import { useSpectron, test, TExecutionContext } from '../../helpers/spectron';
-import { getClient } from '../../helpers/api-client';
+import { getApiClient } from '../../helpers/api-client';
 import { makeScreenshots, useScreentest } from '../screenshoter';
 import { SettingsService } from '../../../app/services/settings';
 import { logIn, logOut } from '../../helpers/spectron/user';
@@ -11,7 +11,7 @@ useSpectron({ restartAppAfterEachTest: false });
 useScreentest();
 
 test('Settings General', async t => {
-  const client = await getClient();
+  const client = await getApiClient();
   const settingsService = client.getResource<SettingsService>('SettingsService');
   settingsService.showSettings();
   await focusChild();
@@ -19,7 +19,7 @@ test('Settings General', async t => {
 });
 
 test('Settings Stream Offline', async t => {
-  const client = await getClient();
+  const client = await getApiClient();
   const settingsService = client.getResource<SettingsService>('SettingsService');
   settingsService.showSettings('Stream');
   await focusChild();
@@ -27,7 +27,7 @@ test('Settings Stream Offline', async t => {
 });
 
 test('Settings Stream Twitch', async (t: TExecutionContext) => {
-  const client = await getClient();
+  const client = await getApiClient();
   const settingsService = client.getResource<SettingsService>('SettingsService');
   await logIn(t, 'twitch');
   settingsService.showSettings('Stream');
@@ -36,7 +36,7 @@ test('Settings Stream Twitch', async (t: TExecutionContext) => {
 });
 
 test('Settings Stream Youtube', async (t: TExecutionContext) => {
-  const client = await getClient();
+  const client = await getApiClient();
   const settingsService = client.getResource<SettingsService>('SettingsService');
   await logIn(t, 'youtube');
   settingsService.showSettings('Stream');
@@ -45,7 +45,7 @@ test('Settings Stream Youtube', async (t: TExecutionContext) => {
 });
 
 test('Settings Stream Facebook', async (t: TExecutionContext) => {
-  const client = await getClient();
+  const client = await getApiClient();
   const settingsService = client.getResource<SettingsService>('SettingsService');
   await logIn(t, 'facebook');
   settingsService.showSettings('Stream');
@@ -54,7 +54,7 @@ test('Settings Stream Facebook', async (t: TExecutionContext) => {
 });
 
 test('Settings Output', async t => {
-  const client = await getClient();
+  const client = await getApiClient();
   const settingsService = client.getResource<SettingsService>('SettingsService');
   settingsService.showSettings('Output');
   await focusChild();
@@ -62,7 +62,7 @@ test('Settings Output', async t => {
 });
 
 test('Settings Video', async t => {
-  const client = await getClient();
+  const client = await getApiClient();
   const settingsService = client.getResource<SettingsService>('SettingsService');
   settingsService.showSettings('Video');
   await focusChild();
@@ -70,7 +70,7 @@ test('Settings Video', async t => {
 });
 
 test('Settings Hotkeys', async t => {
-  const client = await getClient();
+  const client = await getApiClient();
   const settingsService = client.getResource<SettingsService>('SettingsService');
   settingsService.showSettings('Hotkeys');
   await focusChild();
@@ -78,7 +78,7 @@ test('Settings Hotkeys', async t => {
 });
 
 test('Settings Scene Collections', async t => {
-  const client = await getClient();
+  const client = await getApiClient();
   const settingsService = client.getResource<SettingsService>('SettingsService');
   settingsService.showSettings('Scene Collections');
   await focusChild();
@@ -86,7 +86,7 @@ test('Settings Scene Collections', async t => {
 });
 
 test('Settings Notifications', async t => {
-  const client = await getClient();
+  const client = await getApiClient();
   const settingsService = client.getResource<SettingsService>('SettingsService');
   settingsService.showSettings('Notifications');
   await focusChild();
@@ -94,7 +94,7 @@ test('Settings Notifications', async t => {
 });
 
 test('Settings Appearance', async t => {
-  const client = await getClient();
+  const client = await getApiClient();
   const settingsService = client.getResource<SettingsService>('SettingsService');
   await sleep(1000);
   settingsService.showSettings('Appearance');
@@ -103,7 +103,7 @@ test('Settings Appearance', async t => {
 });
 
 test('Settings Game Overlay', async (t: TExecutionContext) => {
-  const client = await getClient();
+  const client = await getApiClient();
   const settingsService = client.getResource<SettingsService>('SettingsService');
 
   // take offline screenshot

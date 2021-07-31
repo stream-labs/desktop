@@ -1,7 +1,7 @@
 import { useSpectron, test } from '../helpers/spectron';
 import { logIn } from '../helpers/spectron/user';
 import { sleep } from '../helpers/sleep';
-import {focusChild, focusMain} from "../helpers/modules/core";
+import { focusChild, focusMain } from '../helpers/modules/core';
 
 useSpectron();
 

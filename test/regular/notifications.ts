@@ -1,5 +1,5 @@
 import { useSpectron, test } from '../helpers/spectron';
-import { getClient } from '../helpers/api-client';
+import { getApiClient } from '../helpers/api-client';
 import { PerformanceService } from 'app-services';
 import { focusChild } from '../helpers/modules/core';
 
@@ -7,7 +7,7 @@ useSpectron();
 
 test('Receiving notifications', async t => {
   const app = t.context.app;
-  const client = await getClient();
+  const client = await getApiClient();
   const performanceMonitor = client.getResource<PerformanceService>('PerformanceService');
 
   await (await t.context.app.client.$('.metrics-icon')).click();
@@ -22,7 +22,7 @@ test('Receiving notifications', async t => {
 
 test('Clicking notifications', async t => {
   const app = t.context.app;
-  const client = await getClient();
+  const client = await getApiClient();
   const performanceMonitor = client.getResource<PerformanceService>('PerformanceService');
 
   performanceMonitor.pushLaggedFramesNotify(0.5);

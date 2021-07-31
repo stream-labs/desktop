@@ -1,11 +1,11 @@
 import { useSpectron, test } from '../../helpers/spectron';
-import { getClient } from '../../helpers/api-client';
+import { getApiClient } from '../../helpers/api-client';
 import { TransitionsService } from 'services/api/external-api/transitions';
 
 useSpectron({ restartAppAfterEachTest: false });
 
 test('Transitions', async t => {
-  const api = await getClient();
+  const api = await getApiClient();
   const transitionsService = api.getResource<TransitionsService>('TransitionsService');
 
   // test enable studio mode

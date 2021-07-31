@@ -7,11 +7,11 @@ import {
   openRenameWindow,
   openDuplicateWindow,
 } from '../helpers/modules/scenes';
-import { getClient } from '../helpers/api-client';
+import { getApiClient } from '../helpers/api-client';
 import { SceneCollectionsService } from 'app-services';
 import { clickButton, focusMain, select, waitForDisplayed } from '../helpers/modules/core';
 
-useSpectron({ implicitTimeout: 0});
+useSpectron();
 
 // Checks for the default audio sources
 async function checkDefaultSources() {
@@ -63,7 +63,7 @@ test('Scene switching with sources', async t => {
 });
 
 test('Restarting the app preserves the default sources', async t => {
-  const client = await getClient();
+  const client = await getApiClient();
   const sceneName = 'Coolest Scene Ever';
   const sceneCollectionsService = client.getResource<SceneCollectionsService>(
     'SceneCollectionsService',

@@ -1,7 +1,7 @@
 import { test, useSpectron } from '../../helpers/spectron';
 import { assertOptions } from '../../helpers/spectron/assertions';
 import { showSettingsWindow } from '../../helpers/modules/settings/settings';
-import {focusMain} from "../../helpers/modules/core";
+import { focusMain } from '../../helpers/modules/core';
 
 useSpectron();
 

@@ -1,6 +1,6 @@
 import { startApp, stopApp, test, useSpectron } from '../../../helpers/spectron';
 import { SceneBuilder } from '../../../helpers/scene-builder';
-import { getClient } from '../../../helpers/api-client';
+import { getApiClient } from '../../../helpers/api-client';
 import { logIn, loginWithAuthInfo } from '../../../helpers/spectron/user';
 
 useSpectron({ noSync: false });
@@ -11,7 +11,7 @@ test('Scene-collections cloud-backup', async t => {
   const authInfo = await logIn(t);
 
   // build the scene
-  const sceneBuilder = new SceneBuilder(await getClient());
+  const sceneBuilder = new SceneBuilder(await getApiClient());
   const sketch = `
     Folder1
       Item1: color_source

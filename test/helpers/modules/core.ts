@@ -2,7 +2,7 @@
  * The core module provides methods for the most frequent actions
  */
 
-import {getContext, TExecutionContext} from '../spectron';
+import { getContext, TExecutionContext } from '../spectron';
 
 export type TSelectorOrEl = string | WebdriverIO.Element;
 
@@ -55,7 +55,18 @@ export async function clickTab(tabText: string) {
 
 // OTHER SHORTCUTS
 
-export async function isDisplayed(selectorOrEl: TSelectorOrEl) {
+export async function isDisplayed(
+  selectorOrEl: TSelectorOrEl,
+  waitForOptions?: WebdriverIO.WaitForOptions,
+) {
+  if (waitForOptions) {
+    try {
+      await waitForDisplayed(selectorOrEl, waitForOptions);
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
   return await (await select(selectorOrEl)).isDisplayed();
 }
 

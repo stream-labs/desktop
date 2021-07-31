@@ -1,7 +1,7 @@
 let lastEventTime = 0;
 import { afterAppStart, afterAppStop, TExecutionContext, useSpectron } from '../helpers/spectron';
 import test, { ExecutionContext } from 'ava';
-import { getClient } from '../helpers/api-client';
+import { getApiClient } from '../helpers/api-client';
 import { PerformanceService } from '../../app/services/performance';
 import { getMeter } from './meter';
 const tasklist = require('tasklist');
@@ -63,7 +63,7 @@ export async function getMemoryUsage(): Promise<number> {
 }
 
 export async function getCPUUsage(): Promise<number> {
-  const api = await getClient();
+  const api = await getApiClient();
   const performanceService = api.getResource<PerformanceService>('PerformanceService');
   const cpuUsage = performanceService.state.CPU;
   return cpuUsage;

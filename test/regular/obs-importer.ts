@@ -2,7 +2,7 @@ import { test, useSpectron } from '../helpers/spectron';
 import { sleep } from '../helpers/sleep';
 import { sceneExisting, switchCollection } from '../helpers/modules/scenes';
 import { sourceIsExisting } from '../helpers/modules/sources';
-import { getClient } from '../helpers/api-client';
+import { getApiClient } from '../helpers/api-client';
 import { WidgetsService } from '../../app/services/widgets';
 import { EWidgetType } from '../helpers/widget-helpers';
 import { FormMonkey } from '../helpers/form-monkey';
@@ -76,7 +76,7 @@ test('OBS Importer', async t => {
   // check that widgets have been migrated
   await focusMain();
   await switchCollection('Widgets');
-  const api = await getClient();
+  const api = await getApiClient();
   const widgetsService = api.getResource<WidgetsService>('WidgetsService');
 
   t.deepEqual(

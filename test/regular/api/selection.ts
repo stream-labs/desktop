@@ -1,5 +1,5 @@
 import { useSpectron, test, afterAppStart } from '../../helpers/spectron';
-import { getClient } from '../../helpers/api-client';
+import { getApiClient } from '../../helpers/api-client';
 
 import { SceneBuilder } from '../../helpers/scene-builder';
 import { sleep } from '../../helpers/sleep';
@@ -15,7 +15,7 @@ let getNodeId: (name: string) => string;
 let selectionService: SelectionService;
 
 afterAppStart(async t => {
-  const client = await getClient();
+  const client = await getApiClient();
   selectionService = client.getResource('SelectionService');
   sceneBuilder = new SceneBuilder(client);
   scene = sceneBuilder.scene;
@@ -24,7 +24,7 @@ afterAppStart(async t => {
 });
 
 test('Selection', async t => {
-  const client = await getClient();
+  const client = await getApiClient();
   const scenesService = client.getResource<ScenesService>('ScenesService');
   const selection = client.getResource<SelectionService>('SelectionService');
   const scene = scenesService.activeScene;
@@ -67,7 +67,7 @@ test('Selection', async t => {
 });
 
 test('Selection actions', async t => {
-  const client = await getClient();
+  const client = await getApiClient();
   const scenesService = client.getResource<ScenesService>('ScenesService');
   const selection = client.getResource<SelectionService>('SelectionService');
   const scene = scenesService.activeScene;
@@ -86,7 +86,7 @@ test('Selection actions', async t => {
 });
 
 test('Invalid selection', async t => {
-  const client = await getClient();
+  const client = await getApiClient();
   const scenesService = client.getResource<ScenesService>('ScenesService');
   const selection = client.getResource<SelectionService>('SelectionService');
   const anotherScene = scenesService.createScene('Another scene');

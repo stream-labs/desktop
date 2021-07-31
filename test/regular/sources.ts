@@ -6,7 +6,6 @@ import {
   clickSourceProperties,
   selectSource,
   openRenameWindow,
-  sourceIsExisting,
   waitForSourceExist,
 } from '../helpers/modules/sources';
 import {
@@ -17,7 +16,7 @@ import {
   waitForDisplayed,
 } from '../helpers/modules/core';
 
-useSpectron({ implicitTimeout: 0, restartAppAfterEachTest: false });
+useSpectron({ restartAppAfterEachTest: false });
 
 test('Create/Remove Color Source and view Source Properties', async t => {
   const sourceName = 'Color Source';

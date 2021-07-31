@@ -1,5 +1,5 @@
 import { useSpectron, test } from '../../helpers/spectron';
-import { getClient } from '../../helpers/api-client';
+import { getApiClient } from '../../helpers/api-client';
 import { ScenesService } from 'services/api/external-api/scenes/scenes';
 import { SourcesService } from 'services/api/external-api/sources/sources';
 import { sleep } from '../../helpers/sleep';
@@ -7,7 +7,7 @@ import { sleep } from '../../helpers/sleep';
 useSpectron({ restartAppAfterEachTest: false });
 
 test('Creating, fetching and removing sources', async t => {
-  const client = await getClient();
+  const client = await getApiClient();
   const scenesService = client.getResource<ScenesService>('ScenesService');
   const sourcesService = client.getResource<SourcesService>('SourcesService');
   const scene = scenesService.activeScene;
@@ -34,7 +34,7 @@ test('Creating, fetching and removing sources', async t => {
 });
 
 test('Source events', async t => {
-  const client = await getClient();
+  const client = await getApiClient();
   const scenesService = client.getResource<ScenesService>('ScenesService');
   const sourcesService = client.getResource<SourcesService>('SourcesService');
 

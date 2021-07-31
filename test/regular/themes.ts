@@ -11,7 +11,7 @@ import {
   waitForDisplayed,
 } from '../helpers/modules/core';
 
-useSpectron({ implicitTimeout: 0 });
+useSpectron();
 
 const OVERLAY_NAME = 'Portals';
 const OVERLAY_SCENES = ['Live Scene', 'Starting Soon', 'Be Right Back', 'Offline'];

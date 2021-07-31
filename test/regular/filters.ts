@@ -1,9 +1,12 @@
 import { useSpectron, test } from '../helpers/spectron';
 import { addFilter, openFiltersWindow, removeFilter } from '../helpers/modules/filters';
-import {addSource, removeAllSources} from '../helpers/modules/sources';
+import { addSource } from '../helpers/modules/sources';
 import { focusChild, isDisplayed, waitForDisplayed } from '../helpers/modules/core';
 
-useSpectron({ restartAppAfterEachTest: false, implicitTimeout: 0 });
+useSpectron({
+  restartAppAfterEachTest: false,
+  clearCollectionAfterEachTest: true,
+});
 
 test('Adding and removing a Color Correction filter', async t => {
   const sourceName = 'Color Source';
@@ -26,7 +29,6 @@ test('Adding and removing a Color Correction filter', async t => {
   await openFiltersWindow(sourceName);
 
   t.false(await isDisplayed('label=Gamma'));
-  await removeAllSources();
 });
 
 test('Adding and removing a Image Mask filter', async t => {
@@ -43,7 +45,6 @@ test('Adding and removing a Image Mask filter', async t => {
   await waitForDisplayed('label=Color');
   await waitForDisplayed('label=Opacity');
   await removeFilter(sourceName, filterName);
-  await removeAllSources();
   t.pass();
 });
 
@@ -62,7 +63,6 @@ test('Adding and removing a Crop Pad filter', async t => {
   await waitForDisplayed('label=Bottom');
 
   await removeFilter(sourceName, filterName);
-  await removeAllSources();
   t.pass();
 });
 
@@ -79,7 +79,6 @@ test('Adding and removing a Scaling aspect filter', async t => {
   await waitForDisplayed('label=Resolution');
 
   await removeFilter(sourceName, filterName);
-  await removeAllSources();
   t.pass();
 });
 
@@ -96,7 +95,6 @@ test('Adding and removing a Scroll filter', async t => {
   await waitForDisplayed('label=Vertical Speed');
   await waitForDisplayed('label=Limit Width');
   await waitForDisplayed('label=Limit Height');
-  await removeAllSources();
   t.pass();
 });
 
@@ -109,7 +107,6 @@ test('Adding and removing a Render Delay filter', async t => {
   await openFiltersWindow(sourceName);
   await focusChild();
   await isDisplayed('label=Delay');
-  await removeAllSources();
   t.pass();
 });
 
@@ -131,7 +128,6 @@ test('Adding and removing a Color Key filter', async t => {
   await waitForDisplayed('label=Gamma');
 
   await removeFilter(sourceName, filterName);
-  await removeAllSources();
   t.pass();
 });
 
@@ -148,7 +144,6 @@ test('Adding and removing a LUT filter', async t => {
   await waitForDisplayed('label=Amount');
 
   await removeFilter(sourceName, filterName);
-  await removeAllSources();
   t.pass();
 });
 
@@ -163,7 +158,6 @@ test('Adding and removing a Sharpen filter', async t => {
 
   await waitForDisplayed('label=Sharpness');
   await removeFilter(sourceName, filterName);
-  await removeAllSources();
   t.pass();
 });
 
@@ -185,7 +179,6 @@ test('Adding and removing a Chroma Key filter', async t => {
   await waitForDisplayed('label=Gamma');
 
   await removeFilter(sourceName, filterName);
-  await removeAllSources();
   t.pass();
 });
 
@@ -201,7 +194,6 @@ test('Adding and removing a Invert Polarity filter', async t => {
   await waitForDisplayed('div=No settings are available for this filter');
 
   await removeFilter(sourceName, filterName);
-  await removeAllSources();
   t.pass();
 });
 
@@ -217,7 +209,6 @@ test('Adding and removing a Gain filter', async t => {
   await waitForDisplayed('label=Gain');
 
   await removeFilter(sourceName, filterName);
-  await removeAllSources();
   t.pass();
 });
 
@@ -225,16 +216,15 @@ test('Adding and removing a Noise Suppression filter', async t => {
   const sourceName = 'Audio Input Capture 2';
   const filterName = 'Noise Suppression';
 
-  await addSource( 'Audio Input Capture', sourceName);
-  await addFilter( sourceName, filterName, filterName);
-  await openFiltersWindow( sourceName);
+  await addSource('Audio Input Capture', sourceName);
+  await addFilter(sourceName, filterName, filterName);
+  await openFiltersWindow(sourceName);
   await focusChild();
 
   await waitForDisplayed('label=Method');
   await waitForDisplayed('label=Suppression Level');
 
   await removeFilter(sourceName, filterName);
-  await removeAllSources();
   t.pass();
 });
 
@@ -254,7 +244,6 @@ test('Adding and removing a Noise Gate filter', async t => {
   await waitForDisplayed('label=Release Time');
 
   await removeFilter(sourceName, filterName);
-  await removeAllSources();
   t.pass();
 });
 
@@ -275,7 +264,6 @@ test('Adding and removing a Compressor filter', async t => {
   await waitForDisplayed('label=Sidechain/Ducking Source');
 
   await removeFilter(sourceName, filterName);
-  await removeAllSources();
   t.pass();
 });
 
@@ -293,7 +281,6 @@ test('Adding and removing a Limiter filter', async t => {
 
   await removeFilter(sourceName, filterName);
   await openFiltersWindow(sourceName);
-  await removeAllSources();
   t.pass();
 });
 
@@ -315,6 +302,5 @@ test('Adding and removing an Expander filter', async t => {
   await waitForDisplayed('label=Detection');
 
   await removeFilter(sourceName, filterName);
-  await removeAllSources();
   t.pass();
 });

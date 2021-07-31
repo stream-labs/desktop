@@ -1,7 +1,6 @@
 import { useSpectron, test, TExecutionContext } from '../helpers/spectron';
 import { addSource, sourceIsExisting } from '../helpers/modules/sources';
 import { SceneBuilder } from '../helpers/scene-builder';
-import { getClient } from '../helpers/api-client';
 import {
   addScene,
   clickRemoveScene,
@@ -9,63 +8,87 @@ import {
   duplicateScene,
   sceneExisting,
 } from '../helpers/modules/scenes';
-import { focusMain } from '../helpers/modules/core';
+import { focusMain, getClient, useMainWindow } from '../helpers/modules/core';
+import { getApiClient } from '../helpers/api-client';
 
-useSpectron();
+useSpectron({
+  clearCollectionAfterEachTest: true,
+  restartAppAfterEachTest: false,
+});
 
-async function undo(t: TExecutionContext) {
-  await ((t.context.app.client.keys(['Control', 'z']) as any) as Promise<any>);
-  await ((t.context.app.client.keys('Control') as any) as Promise<any>);
+async function undo() {
+  await useMainWindow(async () => {
+    await ((getClient().keys(['Control', 'z']) as any) as Promise<any>);
+    await ((getClient().keys('Control') as any) as Promise<any>);
+  });
 }
 
-async function redo(t: TExecutionContext) {
-  await ((t.context.app.client.keys(['Control', 'y']) as any) as Promise<any>);
-  await ((t.context.app.client.keys('Control') as any) as Promise<any>);
+async function redo() {
+  await useMainWindow(async () => {
+    await ((getClient().keys(['Control', 'y']) as any) as Promise<any>);
+    await ((getClient().keys('Control') as any) as Promise<any>);
+  });
 }
 
 test('Creating some sources with undo/redo', async t => {
   await focusMain();
 
+  const sceneBuilder = new SceneBuilder(await getApiClient());
+
   await addSource('Color Source', 'Color Source');
   await addSource('Color Source', 'Color Source 2');
   await addSource('Color Source', 'Color Source 3');
 
-  await focusMain();
+  t.true(
+    sceneBuilder.isEqualTo(
+      `
+    Color Source 3:
+    Color Source 2:
+    Color Source:
+  `,
+    ),
+  );
 
-  t.true(await sourceIsExisting('Color Source'));
-  t.true(await sourceIsExisting('Color Source 2'));
-  t.true(await sourceIsExisting('Color Source 3'));
+  await undo();
 
-  await undo(t);
+  t.true(
+    sceneBuilder.isEqualTo(
+      `
+    Color Source 2:
+    Color Source:
+  `,
+    ),
+  );
 
-  t.true(await sourceIsExisting('Color Source'));
-  t.true(await sourceIsExisting('Color Source 2'));
-  t.false(await sourceIsExisting('Color Source 3'));
+  await undo();
+  t.true(
+    sceneBuilder.isEqualTo(
+      `
+    Color Source:
+  `,
+    ),
+  );
 
-  await undo(t);
+  await undo();
+  t.true(sceneBuilder.isEqualTo(''));
 
-  t.true(await sourceIsExisting('Color Source'));
-  t.false(await sourceIsExisting('Color Source 2'));
-  t.false(await sourceIsExisting('Color Source 3'));
+  await redo();
+  await redo();
+  await redo();
 
-  await undo(t);
-
-  t.false(await sourceIsExisting('Color Source'));
-  t.false(await sourceIsExisting('Color Source 2'));
-  t.false(await sourceIsExisting('Color Source 3'));
-
-  await redo(t);
-  await redo(t);
-  await redo(t);
-
-  t.true(await sourceIsExisting('Color Source'));
-  t.true(await sourceIsExisting('Color Source 2'));
-  t.true(await sourceIsExisting('Color Source 3'));
+  t.true(
+    sceneBuilder.isEqualTo(
+      `
+    Color Source 3:
+    Color Source 2:
+    Color Source:
+  `,
+    ),
+  );
 });
 
 test('Deleting a scene with undo/redo', async t => {
-  const client = await getClient();
-  const sceneBuilder = new SceneBuilder(client);
+  const sceneBuilder = new SceneBuilder(await getApiClient());
 
   await addScene('New Scene');
 
@@ -95,18 +118,17 @@ test('Deleting a scene with undo/redo', async t => {
 
   t.true(sceneBuilder.isEqualTo(''));
 
-  await undo(t);
+  await undo();
   await selectScene('New Scene');
 
   t.true(sceneBuilder.isEqualTo(sketch));
 
-  await redo(t);
+  await redo();
   t.true(sceneBuilder.isEqualTo(''));
 });
 
 test('Duplicating a scene with undo/redo', async t => {
-  const client = await getClient();
-  const sceneBuilder = new SceneBuilder(client);
+  const sceneBuilder = new SceneBuilder(await getApiClient());
 
   // Build a complex item and folder hierarchy
   const sketch = `
@@ -137,11 +159,11 @@ test('Duplicating a scene with undo/redo', async t => {
   await selectScene('Scene');
   t.true(sceneBuilder.isEqualTo(sketch));
 
-  await undo(t);
+  await undo();
 
   t.false(await sceneExisting('Duplicate'));
 
-  await redo(t);
+  await redo();
 
   await selectScene('Duplicate');
   t.true(sceneBuilder.isEqualTo(sketch));

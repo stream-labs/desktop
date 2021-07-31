@@ -2,7 +2,7 @@ import { logIn } from '../../helpers/modules/user';
 import { chatIsVisible, goLive, stopStream } from '../../helpers/modules/streaming';
 import { test, useSpectron } from '../../helpers/spectron';
 
-useSpectron({ implicitTimeout: 0 });
+useSpectron();
 
 test('Streaming to a Facebook Page', async t => {
   await logIn('facebook', { multistream: false });

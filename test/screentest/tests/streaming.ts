@@ -4,7 +4,7 @@ import { fillForm, selectTitle } from '../../helpers/form-monkey';
 import { makeScreenshots, useScreentest } from '../screenshoter';
 import { TPlatform } from '../../../app/services/platforms';
 import { fetchMock, installFetchMock, resetFetchMock } from '../../helpers/spectron/network';
-import { getClient } from '../../helpers/api-client';
+import { getApiClient } from '../../helpers/api-client';
 import { ScenesService } from 'services/api/external-api/scenes';
 import { sleep } from '../../helpers/sleep';
 import { prepareToGoLive } from '../../helpers/modules/streaming';
@@ -14,7 +14,7 @@ useSpectron();
 useScreentest();
 
 async function addColorSource() {
-  const api = await getClient();
+  const api = await getApiClient();
   api
     .getResource<ScenesService>('ScenesService')
     .activeScene.createAndAddSource('MyColorSource', 'color_source');

@@ -1,8 +1,8 @@
 /// <reference path="../../../app/index.d.ts" />
 /// <reference path="../../../app/jsx.d.ts" />
-import avaTest, { ExecutionContext } from 'ava';
+import avaTest, {afterEach, ExecutionContext} from 'ava';
 import { Application } from 'spectron';
-import { getClient } from '../api-client';
+import { getApiClient } from '../api-client';
 import { DismissablesService } from 'services/dismissables';
 import { getUser, logOut } from './user';
 import { sleep } from '../sleep';
@@ -16,6 +16,7 @@ import {
 } from './runner-utils';
 import { skipOnboarding } from '../modules/onboarding';
 import { focusChild, focusMain, waitForLoader } from '../modules/core';
+import {clearCollections} from "../modules/api/scenes";
 export const test = testFn; // the overridden "test" function
 
 const path = require('path');
@@ -49,6 +50,7 @@ export function getContext(): TExecutionContext {
 interface ITestRunnerOptions {
   skipOnboarding?: boolean;
   restartAppAfterEachTest?: boolean;
+  clearCollectionAfterEachTest?: boolean;
   pauseIfFailed?: boolean;
   appArgs?: string;
   implicitTimeout?: number;
@@ -75,10 +77,11 @@ interface ITestRunnerOptions {
 const DEFAULT_OPTIONS: ITestRunnerOptions = {
   skipOnboarding: true,
   restartAppAfterEachTest: true,
+  clearCollectionAfterEachTest: true,
   noSync: true,
   networkLogging: false,
   pauseIfFailed: false,
-  implicitTimeout: 2000,
+  implicitTimeout: 0,
 };
 
 export interface ITestContext {
@@ -182,7 +185,7 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
     if (options.skipOnboarding) await skipOnboarding();
 
     // disable the popups that prevents context menu to be shown
-    const client = await getClient();
+    const client = await getApiClient();
     const dismissablesService = client.getResource<DismissablesService>('DismissablesService');
     dismissablesService.dismissAll();
 
@@ -281,10 +284,11 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
     // wrap in try/catch for the situation when we have a crash
     // so we still can read the logs after the crash
     try {
+      if (appIsRunning && options.clearCollectionAfterEachTest) await clearCollections();
       await logOut(t, true);
       if (options.restartAppAfterEachTest) {
         if (appIsRunning) {
-          const client = await getClient();
+          const client = await getApiClient();
           await client.unsubscribeAll();
           client.disconnect();
           await stopAppFn(t);

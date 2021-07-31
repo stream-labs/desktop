@@ -2,7 +2,7 @@ import { sleep } from './sleep';
 import { TExecutionContext } from './spectron';
 import { WidgetsService, WidgetType } from '../../app/services/widgets';
 import { SourcesService } from '../../app/services/sources';
-import { getClient } from './api-client';
+import { getApiClient } from './api-client';
 import {focusChild} from "./modules/core";
 
 export async function waitForWidgetSettingsSync(t: TExecutionContext) {
@@ -37,7 +37,7 @@ export enum EWidgetType {
  * Add a widget and open the props window
  */
 export async function addWidget(t: TExecutionContext, type: EWidgetType, name: string) {
-  const api = await getClient();
+  const api = await getApiClient();
   const widgetService = api.getResource<WidgetsService>('WidgetsService');
   const sourcesService = api.getResource<SourcesService>('SourcesService');
 

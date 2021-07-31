@@ -8,9 +8,9 @@ import {
   stopStream,
 } from '../../helpers/modules/streaming';
 
-import {focusChild, isDisplayed, waitForDisplayed} from '../../helpers/modules/core';
+import { focusChild, isDisplayed, waitForDisplayed } from '../../helpers/modules/core';
 
-useSpectron({ implicitTimeout: 0 });
+useSpectron();
 
 test('Streaming to Youtube', async t => {
   await logIn('youtube', { multistream: false });

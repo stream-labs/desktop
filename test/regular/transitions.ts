@@ -5,7 +5,10 @@ import { dismissModal } from '../helpers/spectron/modals';
 import { FormMonkey } from '../helpers/form-monkey';
 import { click, clickButton, focusChild, focusMain } from '../helpers/modules/core';
 
-useSpectron({ implicitTimeout: 0 });
+useSpectron({
+  restartAppAfterEachTest: false,
+  clearCollectionAfterEachTest: true,
+});
 
 test('Changing transition options', async t => {
   const app = t.context.app;

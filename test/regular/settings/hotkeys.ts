@@ -1,10 +1,5 @@
-import {
-  restartApp,
-  test,
-  TExecutionContext,
-  useSpectron,
-} from '../../helpers/spectron';
-import {focusChild, focusMain} from "../../helpers/modules/core";
+import { restartApp, test, TExecutionContext, useSpectron } from '../../helpers/spectron';
+import { focusChild, focusMain } from '../../helpers/modules/core';
 
 useSpectron();
 

@@ -6,7 +6,7 @@ import {
   skipCheckingErrorsInLog,
 } from '../helpers/spectron';
 
-import { getClient } from '../helpers/api-client';
+import { getApiClient } from '../helpers/api-client';
 const path = require('path');
 import fse = require('fs-extra');
 import fs = require('fs');
@@ -44,7 +44,7 @@ test('Media backup', async t => {
   // media sync works only in log-in state
   await logIn(t);
 
-  const api = await getClient();
+  const api = await getApiClient();
   const collectionsService = api.getResource<SceneCollectionsService>('SceneCollectionsService');
 
   // create an new empty collection

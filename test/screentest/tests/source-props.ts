@@ -1,5 +1,5 @@
 import { useSpectron, test, afterAppStart } from '../../helpers/spectron';
-import { getClient } from '../../helpers/api-client';
+import { getApiClient } from '../../helpers/api-client';
 import { ISourcesServiceApi, TSourceType } from '../../../app/services/sources/sources-api';
 import { useScreentest } from '../screenshoter';
 import { sleep } from '../../helpers/sleep';
@@ -29,7 +29,7 @@ afterAppStart(async t => {
     'ndi_source',
   ];
 
-  const client = await getClient();
+  const client = await getApiClient();
   const scenesService = client.getResource<ScenesService>('ScenesService');
   const sourcesService = client.getResource<ISourcesServiceApi>('SourcesService');
   const customizationService = client.getResource<CustomizationService>('CustomizationService');

@@ -1,7 +1,7 @@
 import { test, TExecutionContext, useSpectron } from '../../helpers/spectron';
 import { FormMonkey } from '../../helpers/form-monkey';
 import { ISceneCollectionsServiceApi } from '../../../app/services/scene-collections';
-import { getClient } from '../../helpers/api-client';
+import { getApiClient } from '../../helpers/api-client';
 import {closeWindow, focusChild, focusMain} from '../../helpers/modules/core';
 
 useSpectron();
@@ -60,7 +60,7 @@ test('Change Advanced Audio Settings', async t => {
   t.true(await micAuxForm.includes(updatedSettings));
 
   // reload config
-  const apiClient = await getClient();
+  const apiClient = await getApiClient();
   const sceneCollectionsService = apiClient.getResource<ISceneCollectionsServiceApi>(
     'SceneCollectionsService',
   );

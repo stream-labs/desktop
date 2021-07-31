@@ -1,5 +1,5 @@
 import { useSpectron, test, afterAppStart } from '../../helpers/spectron';
-import { getClient } from '../../helpers/api-client';
+import { getApiClient } from '../../helpers/api-client';
 import { SceneBuilder } from '../../helpers/scene-builder';
 import { SelectionService } from 'services/api/external-api/selection';
 import { ClipboardService } from 'services/clipboard';
@@ -21,7 +21,7 @@ let sourcesService: ISourcesServiceApi;
 let scenesService: ScenesService;
 
 afterAppStart(async t => {
-  const client = await getClient();
+  const client = await getApiClient();
   scenesService = client.getResource('ScenesService');
   sourcesService = client.getResource('SourcesService');
   selectionService = client.getResource('SelectionService');
