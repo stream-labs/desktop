@@ -1,7 +1,7 @@
 // Tools for dealing with forms in spectron
 
 import { TExecutionContext } from './index';
-import {getClient, waitForDisplayed} from '../modules/core';
+import { getClient, waitForDisplayed } from '../modules/core';
 
 export async function setFormInput(label: string, value: string, index = 0) {
   const $el = (await getClient().$$(`label=${label}`))[index];
