@@ -10,7 +10,6 @@ import { CheckboxChangeEvent } from 'antd/lib/checkbox';
 import { $t } from '../../../services/i18n';
 import pick from 'lodash/pick';
 import isEqual from 'lodash/isEqual';
-import { pascalize } from 'humps';
 import * as InputComponents from './index';
 
 type TInputType =

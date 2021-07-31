@@ -6,7 +6,7 @@ import {
   goLive,
   prepareToGoLive,
   stopStream,
-} from '../../helpers/modules/streaming';
+} from '../../helpers/spectron/streaming';
 
 import {focusChild, isDisplayed, waitForDisplayed} from '../../helpers/modules/core';
 
@@ -21,6 +21,13 @@ test('Streaming to Youtube', async t => {
     description: 'SLOBS Test Stream Description',
   });
 
+  t.true(await chatIsVisible(t), 'Chat should be visible');
+  await stopStream(t);
+});
+
+// TODO
+test.skip('Streaming to the scheduled event on Youtube', async t => {
+  /// await logIn(t, 'youtube', { multistream: false });
   t.true(await chatIsVisible(), 'Chat should be visible');
   await stopStream();
 });

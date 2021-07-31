@@ -451,7 +451,7 @@ export class StreamingService
   /**
    * Schedule stream for eligible platforms
    */
-  async scheduleStream(settings: IStreamSettings, time: string) {
+  async scheduleStream(settings: IStreamSettings, time: number) {
     const destinations = settings.platforms;
     const platforms = (Object.keys(destinations) as TPlatform[]).filter(
       dest => destinations[dest]?.enabled && this.views.supports('stream-schedule', [dest]),
