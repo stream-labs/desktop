@@ -1,4 +1,4 @@
-import { useSpectron, focusMain, test } from '../helpers/spectron';
+import { useSpectron, test } from '../helpers/spectron';
 import {
   addSource,
   selectSource,
@@ -6,6 +6,7 @@ import {
   addExistingSource,
 } from '../helpers/modules/sources';
 import { addScene } from '../helpers/modules/scenes';
+import { focusMain } from '../helpers/modules/core';
 
 useSpectron();
 
@@ -14,7 +15,7 @@ test('Adding and removing a AudioSource', async t => {
 
   await addSource('Media Source', 'Source With Audio');
   await addSource('Color Source', 'Source Without Audio');
-  await focusMain(t);
+  await focusMain();
 
   t.true(
     await (await (await app.client.$('.mixer-panel')).$('div=Source With Audio')).isExisting(),
@@ -36,13 +37,13 @@ test('Nested scenes should provide audio sources to mixer', async t => {
   const app = t.context.app;
 
   await addSource('Media Source', 'Nested Media Source');
-  await focusMain(t);
+  await focusMain();
 
   await addScene('New Scene');
   await addSource('Media Source', 'Simple Media Source');
   await addExistingSource('Scene', 'Scene');
 
-  await focusMain(t);
+  await focusMain();
   t.true(
     await (await (await app.client.$('.mixer-panel')).$('div=Simple Media Source')).isExisting(),
   );

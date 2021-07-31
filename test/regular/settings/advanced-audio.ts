@@ -1,15 +1,8 @@
-import {
-  closeWindow,
-  focusChild,
-  focusMain,
-  test,
-  TExecutionContext,
-  useSpectron,
-} from '../../helpers/spectron';
+import { test, TExecutionContext, useSpectron } from '../../helpers/spectron';
 import { FormMonkey } from '../../helpers/form-monkey';
 import { ISceneCollectionsServiceApi } from '../../../app/services/scene-collections';
 import { getClient } from '../../helpers/api-client';
-import { sleep } from '../../helpers/sleep';
+import {closeWindow, focusChild, focusMain} from '../../helpers/modules/core';
 
 useSpectron();
 
@@ -34,7 +27,7 @@ const DEFAULT_SOURCE_SETTINGS = {
 
 test('Change Advanced Audio Settings', async t => {
   await clickAdvancedAudio(t);
-  await focusChild(t);
+  await focusChild();
   const desktopAudioForm = new FormMonkey(t, 'tr[name="Desktop Audio"]');
   const micAuxForm = new FormMonkey(t, 'tr[name="Mic/Aux"]');
 
@@ -59,10 +52,10 @@ test('Change Advanced Audio Settings', async t => {
   await micAuxForm.fill(updatedSettings);
 
   // check settings are still updated after window close
-  await closeWindow(t);
-  await focusMain(t);
+  await closeWindow('child');
+  await focusMain();
   await clickAdvancedAudio(t);
-  await focusChild(t);
+  await focusChild();
   t.true(await desktopAudioForm.includes(updatedSettings));
   t.true(await micAuxForm.includes(updatedSettings));
 
@@ -74,9 +67,9 @@ test('Change Advanced Audio Settings', async t => {
   await sceneCollectionsService.load(sceneCollectionsService.collections[0].id);
 
   // check settings are still updated after config reload
-  await focusMain(t);
+  await focusMain();
   await clickAdvancedAudio(t);
-  await focusChild(t);
+  await focusChild();
   t.true(await desktopAudioForm.includes(updatedSettings));
   t.true(await micAuxForm.includes(updatedSettings));
 });

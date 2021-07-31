@@ -3,15 +3,14 @@
 import { uniqueId, sample } from 'lodash';
 import {
   useSpectron,
-  focusMain,
   TExecutionContext,
   focusWindow,
-  closeWindow,
   test,
 } from '../helpers/spectron/index';
 import { addScene, clickRemoveScene } from '../helpers/modules/scenes';
 import { addSource, clickRemoveSource, rightClickSource } from '../helpers/modules/sources';
 import { contextMenuClick } from '../helpers/spectron/context-menu';
+import {closeWindow, focusMain} from "../helpers/modules/core";
 
 useSpectron();
 
@@ -49,12 +48,12 @@ async function getSourceElements(t: TExecutionContext) {
 async function addRandomScene(t: TExecutionContext) {
   const name = uniqueId('scene_');
 
-  await focusMain(t);
+  await focusMain();
   await addScene(name);
 }
 
 async function removeRandomScene(t: TExecutionContext) {
-  await focusMain(t);
+  await focusMain();
   const scenes = await getSceneElements(t);
 
   if (scenes.length > 1) {
@@ -65,7 +64,7 @@ async function removeRandomScene(t: TExecutionContext) {
 }
 
 async function selectRandomScene(t: TExecutionContext) {
-  await focusMain(t);
+  await focusMain();
   const scenes = await getSceneElements(t);
 
   if (scenes.length > 0) {
@@ -80,12 +79,12 @@ async function addRandomSource(t: TExecutionContext) {
 
   console.log('  Source:', name);
 
-  await focusMain(t);
+  await focusMain();
   await addSource(type, name);
 }
 
 async function removeRandomSource(t: TExecutionContext) {
-  await focusMain(t);
+  await focusMain();
   const sources = await getSourceElements(t);
 
   if (sources.length > 0) {
@@ -100,7 +99,7 @@ async function removeRandomSource(t: TExecutionContext) {
 }
 
 async function selectRandomSource(t: TExecutionContext): Promise<TSourceName> {
-  await focusMain(t);
+  await focusMain();
   const sources = await getSourceElements(t);
 
   if (sources.length > 0) {
@@ -117,7 +116,7 @@ async function selectRandomSource(t: TExecutionContext): Promise<TSourceName> {
 }
 
 async function createProjector(t: TExecutionContext) {
-  await focusMain(t);
+  await focusMain();
   const sourceName = await selectRandomSource(t);
   if (!sourceName) return;
   await rightClickSource(sourceName);
@@ -126,18 +125,18 @@ async function createProjector(t: TExecutionContext) {
 
 async function destroyProjector(t: TExecutionContext) {
   if (await focusWindow(t, /windowId=(?!main)(?!child)/)) {
-    await closeWindow(t);
+    await closeWindow('child');
   }
-  await focusMain(t);
+  await focusMain();
 }
 
 async function toggleDayNightMode(t: TExecutionContext) {
-  await focusMain(t);
+  await focusMain();
   await (await t.context.app.client.$('button.theme-toggle')).click();
 }
 
 async function toggleStudioNode(t: TExecutionContext) {
-  await focusMain(t);
+  await focusMain();
   await (await t.context.app.client.$('.icon-studio-mode-3')).click();
 }
 

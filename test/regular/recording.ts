@@ -1,5 +1,5 @@
 import { readdir } from 'fs-extra';
-import { focusChild, focusMain, test, useSpectron } from '../helpers/spectron';
+import { test, useSpectron } from '../helpers/spectron';
 import { sleep } from '../helpers/sleep';
 import { startRecording, stopRecording } from '../helpers/modules/streaming';
 import { FormMonkey } from '../helpers/form-monkey';
@@ -7,6 +7,7 @@ import {
   setOutputResolution,
   setTemporaryRecordingPath,
 } from '../helpers/modules/settings/settings';
+import {focusChild, focusMain} from "../helpers/modules/core";
 
 useSpectron();
 
@@ -21,15 +22,15 @@ test('Recording', async t => {
 
   // Record 2s video in every format
   for (const format of formats) {
-    await focusMain(t);
+    await focusMain();
     await (await app.client.$('.side-nav .icon-settings')).click();
 
-    await focusChild(t);
+    await focusChild();
     await (await app.client.$('li=Output')).click();
     const form = new FormMonkey(t);
     await form.setInputValue(await form.getInputSelectorByTitle('Recording Format'), format);
     await (await app.client.$('button=Done')).click();
-    await focusMain(t);
+    await focusMain();
 
     await startRecording();
     await sleep(2000);

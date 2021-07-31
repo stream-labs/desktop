@@ -1,6 +1,7 @@
-import { useSpectron, test, focusChild } from '../helpers/spectron';
+import { useSpectron, test } from '../helpers/spectron';
 import { getClient } from '../helpers/api-client';
 import { PerformanceService } from 'app-services';
+import { focusChild } from '../helpers/modules/core';
 
 useSpectron();
 
@@ -10,7 +11,7 @@ test('Receiving notifications', async t => {
   const performanceMonitor = client.getResource<PerformanceService>('PerformanceService');
 
   await (await t.context.app.client.$('.metrics-icon')).click();
-  await focusChild(t);
+  await focusChild();
 
   t.false(await (await app.client.$('div[data-name=notification]')).isExisting());
 
@@ -27,9 +28,9 @@ test('Clicking notifications', async t => {
   performanceMonitor.pushLaggedFramesNotify(0.5);
 
   await (await app.client.$('.fa-exclamation-triangle')).click();
-  await focusChild(t);
+  await focusChild();
 
   await (await app.client.$('.has-action')).click();
 
   t.true(await (await app.client.$('h4=What does this mean?')).isExisting());
-})
+});

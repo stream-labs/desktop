@@ -128,3 +128,11 @@ export async function useMainWindow<TCallbackResult>(cb: () => Promise<TCallback
 export async function useChildWindow<TCallbackResult>(cb: () => Promise<TCallbackResult>) {
   return useWindow('child', cb);
 }
+
+export async function waitForLoader() {
+  await (await select('.main-loading')).waitForExist({
+    interval: 100, // we need a smaller interval to run tests faster
+    timeout: 20000,
+    reverse: true,
+  });
+}

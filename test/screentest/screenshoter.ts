@@ -3,11 +3,12 @@ import { CustomizationService } from '../../app/services/customization';
 import { getConfigsVariations, getConfig } from './utils';
 import test from 'ava';
 import { sleep } from '../helpers/sleep';
-import { afterAppStart, focusChild, focusMain, TExecutionContext } from '../helpers/spectron';
+import { afterAppStart, TExecutionContext } from '../helpers/spectron';
 import { PerformanceService } from '../../app/services/performance';
 import { IAudioServiceApi } from '../../app/services/audio';
 import { WindowsService } from '../../app/services/windows';
 import NativeImage = Electron.NativeImage;
+import {focusChild, focusMain} from "../helpers/modules/core";
 
 const fs = require('fs');
 const CONFIG = getConfig();
@@ -110,9 +111,9 @@ export function useScreentest() {
       document.head.appendChild(disableCaretEl);
     `;
     await t.context.app.webContents.executeJavaScript(disableCaretCode);
-    await focusChild(t);
+    await focusChild();
     await t.context.app.webContents.executeJavaScript(disableCaretCode);
-    await focusMain(t);
+    await focusMain();
   });
 }
 

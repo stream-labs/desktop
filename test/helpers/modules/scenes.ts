@@ -1,8 +1,8 @@
 // Scene helper functions
-import { waitForLoader } from '../spectron';
 import { contextMenuClick } from '../spectron/context-menu';
 import { dialogDismiss } from '../spectron/dialog';
-import { click, clickButton, focusChild, focusMain, select } from './core';
+import { click, clickButton, focusChild, focusMain, select, waitForLoader } from './core';
+import {sleep} from "../sleep";
 
 async function clickSceneAction(selector: string) {
   await click(`[rel=SceneSelector] ${selector}`);
@@ -18,6 +18,7 @@ export async function clickRemoveScene() {
 }
 
 export async function clickSceneTransitions() {
+  await sleep(100);
   await clickSceneAction('.icon-settings');
 }
 

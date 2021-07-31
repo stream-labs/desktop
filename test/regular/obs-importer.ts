@@ -1,4 +1,4 @@
-import { focusChild, focusMain, test, useSpectron } from '../helpers/spectron';
+import { test, useSpectron } from '../helpers/spectron';
 import { sleep } from '../helpers/sleep';
 import { sceneExisting, switchCollection } from '../helpers/modules/scenes';
 import { sourceIsExisting } from '../helpers/modules/sources';
@@ -7,6 +7,7 @@ import { WidgetsService } from '../../app/services/widgets';
 import { EWidgetType } from '../helpers/widget-helpers';
 import { FormMonkey } from '../helpers/form-monkey';
 import { ExecutionContext } from 'ava';
+import {focusChild, focusMain} from "../helpers/modules/core";
 
 const path = require('path');
 
@@ -61,19 +62,19 @@ test('OBS Importer', async t => {
   t.true(await sourceIsExisting( 'Text (GDI+)'));
 
   // check collection 2 exists
-  await focusMain(t);
+  await focusMain();
   await switchCollection('Collection 2');
 
   // check settings
   await (await client.$('.side-nav .icon-settings')).click();
-  await focusChild(t);
+  await focusChild();
   await (await client.$('li=Output')).click();
   const form = new FormMonkey(t);
   await form.setInputValue(await form.getInputSelectorByTitle('Video Bitrate'), '5000');
   await form.setInputValue(await form.getInputSelectorByTitle('Encoder'), 'Software (x264)');
 
   // check that widgets have been migrated
-  await focusMain(t);
+  await focusMain();
   await switchCollection('Widgets');
   const api = await getClient();
   const widgetsService = api.getResource<WidgetsService>('WidgetsService');

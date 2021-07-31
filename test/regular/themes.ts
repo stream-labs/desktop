@@ -1,8 +1,9 @@
-import { focusLibrary, focusMain, test, TExecutionContext, useSpectron } from '../helpers/spectron';
+import { focusLibrary, test, TExecutionContext, useSpectron } from '../helpers/spectron';
 import { logIn } from '../helpers/spectron/user';
 import { sleep } from '../helpers/sleep';
 import { FormMonkey } from '../helpers/form-monkey';
 import { sceneExisting } from '../helpers/modules/scenes';
+import { focusMain } from '../helpers/modules/core';
 
 useSpectron();
 
@@ -32,7 +33,7 @@ test('Installing a theme', async (t: TExecutionContext) => {
   await (await app.client.$('button=Install Overlay')).click();
 
   // wait for installation complete
-  await focusMain(t);
+  await focusMain();
   await (await app.client.$('.editor-page')).waitForExist({ timeout: 60000 });
 
   // Should've loaded the overlay as a new scene collection

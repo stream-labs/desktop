@@ -1,12 +1,11 @@
 /// <reference path="../../../app/index.d.ts" />
 /// <reference path="../../../app/jsx.d.ts" />
-import avaTest, { ExecutionContext, TestInterface } from 'ava';
+import avaTest, { ExecutionContext } from 'ava';
 import { Application } from 'spectron';
 import { getClient } from '../api-client';
 import { DismissablesService } from 'services/dismissables';
-import { getUser, logOut, releaseUserInPool } from './user';
+import { getUser, logOut } from './user';
 import { sleep } from '../sleep';
-import { installFetchMock } from './network';
 
 import {
   ITestStats,
@@ -16,7 +15,7 @@ import {
   testFn,
 } from './runner-utils';
 import { skipOnboarding } from '../modules/onboarding';
-import {select} from "../modules/core";
+import { focusChild, focusMain, waitForLoader } from '../modules/core';
 export const test = testFn; // the overridden "test" function
 
 const path = require('path');
@@ -55,40 +54,11 @@ export async function focusWindow(t: TExecutionContext, regex: RegExp): Promise<
   return false;
 }
 
-// Focuses the worker window
-// Should not usually be used
-export async function focusWorker(t: TExecutionContext) {
-  await focusWindow(t, /windowId=worker$/);
-}
-
-// Focuses the main window
-export async function focusMain(t: TExecutionContext) {
-  await focusWindow(t, /windowId=main$/);
-}
-
-// Focuses the child window
-export async function focusChild(t: TExecutionContext) {
-  await focusWindow(t, /windowId=child/);
-}
-
 // Focuses the Library webview
 export async function focusLibrary(t: TExecutionContext) {
   // doesn't work without delay, probably need to wait until load
   await sleep(2000);
   await focusWindow(t, /streamlabs\.com\/library/);
-}
-
-// Close current focused window
-export async function closeWindow(t: TExecutionContext) {
-  await t.context.app.browserWindow.close();
-}
-
-export async function waitForLoader() {
-  await (await select('.main-loading')).waitForExist({
-    interval: 100, // we need a smaller interval to run tests faster
-    timeout: 20000,
-    reverse: true,
-  });
 }
 
 let testContext: TExecutionContext;
@@ -219,9 +189,9 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
       document.head.appendChild(disableAnimationsEl);
       0; // Prevent returning a value that cannot be serialized
     `;
-    await focusMain(t);
+    await focusMain();
     await t.context.app.webContents.executeJavaScript(disableTransitionsCode);
-    await focusMain(t);
+    await focusMain();
 
     // Wait up to N seconds before giving up looking for an element.
     // This will slightly slow down negative assertions, but makes
@@ -240,9 +210,9 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
     dismissablesService.dismissAll();
 
     // disable animations in the child window
-    await focusChild(t);
+    await focusChild();
     await t.context.app.webContents.executeJavaScript(disableTransitionsCode);
-    await focusMain(t);
+    await focusMain();
     appIsRunning = true;
 
     for (const callback of afterStartCallbacks) {

@@ -1,10 +1,11 @@
-import { useSpectron, test, afterAppStart, focusChild } from '../../helpers/spectron';
+import { useSpectron, test, afterAppStart } from '../../helpers/spectron';
 import { getClient } from '../../helpers/api-client';
 import { ISourcesServiceApi, TSourceType } from '../../../app/services/sources/sources-api';
 import { useScreentest } from '../screenshoter';
 import { sleep } from '../../helpers/sleep';
 import { ScenesService } from '../../../app/services/api/external-api/scenes';
 import { CustomizationService } from '../../../app/services/customization';
+import { focusChild } from '../../helpers/modules/core';
 
 let showSourceProps: (name: string) => void;
 
@@ -44,9 +45,8 @@ afterAppStart(async t => {
   showSourceProps = async (name: string) => {
     const sourceId = sourcesService.getSourcesByName(name)[0].sourceId;
     sourcesService.showSourceProperties(sourceId);
-    await focusChild(t);
+    await focusChild();
   };
-
 });
 
 test('image_source', async t => {

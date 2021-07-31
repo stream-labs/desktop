@@ -1,4 +1,4 @@
-import { focusChild, focusMain, test, useSpectron } from '../../helpers/spectron';
+import { test, useSpectron } from '../../helpers/spectron';
 import { FormMonkey } from '../../helpers/form-monkey';
 import { assertOptions } from '../../helpers/spectron/assertions';
 import { getFormCheckbox, getFormInput } from '../../helpers/spectron/forms';

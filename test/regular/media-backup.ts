@@ -3,7 +3,6 @@ import {
   stopApp,
   test,
   useSpectron,
-  focusChild,
   skipCheckingErrorsInLog,
 } from '../helpers/spectron';
 
@@ -15,6 +14,7 @@ import os = require('os');
 import { logIn } from '../helpers/spectron/user';
 import { SceneCollectionsService } from 'services/api/external-api/scene-collections';
 import { ScenesService } from '../../app/services/api/external-api/scenes';
+import {focusChild} from "../helpers/modules/core";
 
 useSpectron({ noSync: false });
 
@@ -71,7 +71,7 @@ test('Media backup', async t => {
     // media-backup sync should be started
     // wait for the sync-succeed icon
     await (await t.context.app.client.$('.metrics-icon')).click();
-    await focusChild(t);
+    await focusChild();
     await (await t.context.app.client.$("div[data-syncstatus='1']")).waitForDisplayed();
 
     // restart app and delete local images

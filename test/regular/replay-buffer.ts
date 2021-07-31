@@ -1,10 +1,11 @@
 import { readdir } from 'fs-extra';
-import { focusChild, focusMain, test, useSpectron } from '../helpers/spectron';
+import { test, useSpectron } from '../helpers/spectron';
 import { sleep } from '../helpers/sleep';
 import {
   setOutputResolution,
   setTemporaryRecordingPath,
 } from '../helpers/modules/settings/settings';
+import { focusChild, focusMain } from '../helpers/modules/core';
 
 useSpectron();
 
@@ -13,7 +14,7 @@ test('Replay Buffer', async t => {
   await setOutputResolution('100x100');
   const { client } = t.context.app;
 
-  await focusMain(t);
+  await focusMain();
   await (await client.$('button .icon-replay-buffer')).click();
   await (await client.$('button .icon-save')).click();
   await (await client.$('button .fa.fa-stop')).click();
@@ -26,11 +27,11 @@ test('Replay Buffer', async t => {
 
   // disable replay buffer
   await (await client.$('.side-nav .icon-settings')).click();
-  await focusChild(t);
+  await focusChild();
   await (await client.$('li=Output')).click();
   await (await client.$('label=Enable Replay Buffer')).click();
 
   // check Start Replay Buffer is not visible
-  await focusMain(t);
+  await focusMain();
   t.false(await (await client.$('button .icon-replay-buffer')).isExisting());
 });
