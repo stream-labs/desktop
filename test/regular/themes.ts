@@ -29,13 +29,7 @@ test('Installing a theme', async (t: TExecutionContext) => {
   await logIn(t);
   await click('div[title=Themes]');
   await focusLibrary();
-
-  // search a theme
-  // console.log('wait for input');
-  // await waitForDisplayed('input');
-  console.log('set val');
   await formMonkey.setInputValue('input', OVERLAY_NAME);
-  console.log('is set');
 
   // the input field has a debounce search
   await sleep(2000);
