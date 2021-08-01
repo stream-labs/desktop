@@ -1,11 +1,5 @@
 import { mutation, InheritMutations, ViewHandler } from '../core/stateful-service';
-import {
-  IPlatformService,
-  IGame,
-  TPlatformCapability,
-  IPlatformRequest,
-  IPlatformState,
-} from '.';
+import { IPlatformService, IGame, TPlatformCapability, IPlatformRequest, IPlatformState } from '.';
 import { HostsService } from 'services/hosts';
 import { Inject } from 'services/core/injector';
 import { authorizedHeaders } from 'util/requests';
