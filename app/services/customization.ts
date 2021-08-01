@@ -63,7 +63,6 @@ export interface ICustomizationServiceState {
   mediaBackupOptOut: boolean;
   navigateToLiveOnStreamStart: boolean;
   experimental?: {
-    legacyGoLive?: boolean;
     volmetersFPSLimit?: number;
   };
   designerMode: boolean;
@@ -142,16 +141,7 @@ class CustomizationViews extends ViewHandler<ICustomizationServiceState> {
   }
 
   get experimentalSettingsFormData(): TObsFormData {
-    return [
-      <IObsInput<boolean>>{
-        value: this.state.experimental.legacyGoLive,
-        name: 'legacyGoLive',
-        description: 'Use legacy GoLive window',
-        type: 'OBS_PROPERTY_BOOL',
-        visible: true,
-        enabled: true,
-      },
-    ];
+    return [];
   }
 
   get pinnedStatistics() {
