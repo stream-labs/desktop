@@ -16,6 +16,7 @@ const DISPLAY_ELEMENT_POLLING_INTERVAL = 500;
 export interface IDisplayOptions {
   sourceId?: string;
   paddingSize?: number;
+  renderingMode?: number;
 }
 
 export class Display {
@@ -42,6 +43,7 @@ export class Display {
   private readonly selectionSubscription: Subscription;
 
   sourceId: string;
+  renderingMode: number;
 
   boundDestroy: any;
   boundClose: any;
@@ -52,9 +54,18 @@ export class Display {
     this.electronWindowId = remote.getCurrentWindow().id;
 
     this.windowId = Utils.getCurrentUrlParams().windowId;
+    this.renderingMode = options.renderingMode
+      ? options.renderingMode
+      : obs.ERenderingMode.OBS_MAIN_RENDERING;
+
     const electronWindow = remote.BrowserWindow.fromId(this.electronWindowId);
 
-    this.videoService.createOBSDisplay(this.electronWindowId, name, this.sourceId);
+    this.videoService.createOBSDisplay(
+      this.electronWindowId,
+      name,
+      this.renderingMode,
+      this.sourceId,
+    );
 
     this.displayDestroyed = false;
 
@@ -151,9 +162,13 @@ export class Display {
     this.outputRegionCallbacks.push(cb);
   }
 
-  refreshOutputRegion() {
-    const position = this.videoService.getOBSDisplayPreviewOffset(this.name);
-    const size = this.videoService.getOBSDisplayPreviewSize(this.name);
+  async refreshOutputRegion() {
+    const position = await this.videoService.getOBSDisplayPreviewOffset(this.name);
+
+    // This can happen while we were async fetching the offset
+    if (this.displayDestroyed) return;
+
+    const size = await this.videoService.getOBSDisplayPreviewSize(this.name);
 
     this.outputRegion = {
       ...position,
@@ -186,14 +201,6 @@ export class VideoService extends Service {
     this.settingsService.loadSettingsIntoStore();
   }
 
-  // Generates a random string:
-  // https://gist.github.com/6174/6062387
-  getRandomDisplayId() {
-    return (
-      Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15)
-    );
-  }
-
   getScreenRectangle() {
     return new ScalableRectangle({
       x: 0,
@@ -222,10 +229,23 @@ export class VideoService extends Service {
     };
   }
 
+  setBaseResolution(resolution: { width: number; height: number }) {
+    this.settingsService.setSettingValue(
+      'Video',
+      'Base',
+      `${resolution.width}x${resolution.height}`,
+    );
+  }
+
   /**
    * @warning DO NOT USE THIS METHOD. Use the Display class instead
    */
-  createOBSDisplay(electronWindowId: number, name: string, sourceId?: string) {
+  createOBSDisplay(
+    electronWindowId: number,
+    name: string,
+    renderingMode: number,
+    sourceId?: string,
+  ) {
     const electronWindow = remote.BrowserWindow.fromId(electronWindowId);
 
     if (sourceId) {
@@ -235,7 +255,11 @@ export class VideoService extends Service {
         name,
       );
     } else {
-      obs.NodeObs.OBS_content_createDisplay(electronWindow.getNativeWindowHandle(), name);
+      obs.NodeObs.OBS_content_createDisplay(
+        electronWindow.getNativeWindowHandle(),
+        name,
+        renderingMode,
+      );
     }
   }
 
