@@ -76,21 +76,19 @@ export default class SceneSelector extends Vue {
 
   removeScene() {
     const name = this.scenesService.activeScene.name;
-    electron.remote.dialog.showMessageBox(
-      electron.remote.getCurrentWindow(),
-      {
+    electron.remote.dialog
+      .showMessageBox(electron.remote.getCurrentWindow(), {
         type: 'warning',
         message: $t('scenes.removeSceneConfirm', { sceneName: name }),
         buttons: [$t('common.cancel'), $t('common.ok')],
         noLink: true,
-      },
-      ok => {
+      })
+      .then(({ response: ok }) => {
         if (!ok) return;
         if (!this.scenesService.removeScene(this.activeSceneId)) {
           alert($t('scenes.mustHaveLeastOnceScene'));
         }
-      },
-    );
+      });
   }
 
   showTransitions() {

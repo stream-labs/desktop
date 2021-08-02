@@ -15,7 +15,7 @@ export default class LanguageSettings extends Vue {
   settings = this.i18nService.getLocaleFormData();
 
   private async save(data: TObsFormData) {
-    const choice = electron.remote.dialog.showMessageBox(electron.remote.getCurrentWindow(), {
+    const choice = await electron.remote.dialog.showMessageBox(electron.remote.getCurrentWindow(), {
       type: 'question',
       buttons: [$t('common.yes'), $t('common.no')],
       title: $t('common.confirm'),
@@ -24,7 +24,7 @@ export default class LanguageSettings extends Vue {
       cancelId: 1,
     });
 
-    if (choice !== 0) return;
+    if (choice.response !== 0) return;
 
     await this.i18nService.setLocale(data[0].value as string);
     this.settings = this.i18nService.getLocaleFormData();

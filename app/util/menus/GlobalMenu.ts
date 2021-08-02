@@ -49,7 +49,7 @@ export function setupGlobalContextMenuForEditableElement() {
     menu.append({
       label: $t('common.selectAll'),
       accelerator: 'Ctrl+A',
-      role: 'selectall',
+      role: 'selectAll',
       enabled: params.editFlags.canSelectAll,
       visible: params.isEditable,
     });

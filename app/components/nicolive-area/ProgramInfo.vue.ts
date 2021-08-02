@@ -84,16 +84,14 @@ export default class ProgramInfo extends Vue {
       if (!this.streamingService.isStreaming) {
         const startStreaming = await new Promise(resolve => {
           // TODO: 翻訳
-          remote.dialog.showMessageBox(
-            remote.getCurrentWindow(),
-            {
+          remote.dialog
+            .showMessageBox(remote.getCurrentWindow(), {
               type: 'warning',
               message: $t('program-info.start-streaming-confirmation'),
               buttons: [$t('streaming.goLive'), $t('program-info.later')],
               noLink: true,
-            },
-            idx => resolve(idx === 0),
-          );
+            })
+            .then(({ response: idx }) => resolve(idx === 0));
         });
         if (startStreaming) {
           // 開始
@@ -118,16 +116,14 @@ export default class ProgramInfo extends Vue {
       this.isEnding = true;
       const isOk = await new Promise(resolve => {
         // TODO: 翻訳
-        remote.dialog.showMessageBox(
-          remote.getCurrentWindow(),
-          {
+        remote.dialog
+          .showMessageBox(remote.getCurrentWindow(), {
             type: 'warning',
             message: '番組を終了しますか？',
             buttons: ['終了する', $t('common.cancel')],
             noLink: true,
-          },
-          idx => resolve(idx === 0),
-        );
+          })
+          .then(({ response: idx }) => resolve(idx === 0));
       });
 
       if (isOk) {
