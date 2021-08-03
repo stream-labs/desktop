@@ -53,10 +53,4 @@ export class EmoteWallService extends WidgetSettingsService<IEmoteWallData> {
       ignoreDuplicates: metadata.toggle({ title: $t('Ignore Duplicates') }),
     });
   }
-
-  patchAfterFetch(data: { settings: IEmoteWallSettings }) {
-    // data.settings.combo_timeframe = data.settings.combo_timeframe / 1000;
-    // data.settings.emote_animation_duration = data.settings.emote_animation_duration / 1000;
-    return data;
-  }
 }

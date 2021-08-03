@@ -23,7 +23,6 @@ export default class EmoteWall extends WidgetSettings<IEmoteWallData, EmoteWallS
   }
 
   render() {
-    console.log(this.wData);
     return (
       this.wData && (
         <WidgetEditor navItems={this.navItems}>
