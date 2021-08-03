@@ -424,7 +424,7 @@ export const WidgetDefinitions: { [x: number]: IWidget } = {
   [WidgetType.EmoteWall]: {
     name: 'Emote Wall',
     url(host, token) {
-      return `https://${host}/widgets/emote-wall/${token}`;
+      return `https://${host}/widgets/emote-wall?token=${token}`;
     },
 
     width: 800,

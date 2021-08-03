@@ -31,8 +31,8 @@ export class EmoteWallService extends WidgetSettingsService<IEmoteWallData> {
   getApiSettings() {
     return {
       type: WidgetType.EmoteWall,
-      url: WidgetDefinitions[WidgetType.Poll].url(this.getHost(), this.getWidgetToken()),
-      previewUrl: `https://${this.getHost()}/widgets/emotewall/${this.getWidgetToken()}?simulate=1`,
+      url: WidgetDefinitions[WidgetType.EmoteWall].url(this.getHost(), this.getWidgetToken()),
+      previewUrl: `https://${this.getHost()}/widgets/emote-wall?token=${this.getWidgetToken()}&simulate=1`,
       dataFetchUrl: `https://${this.getHost()}/api/v5/slobs/widget/emote-wall`,
       settingsSaveUrl: `https://${this.getHost()}/api/v5/slobs/widget/emote-wall`,
       settingsUpdateEvent: 'emoteWallSettingsUpdate',
@@ -46,7 +46,7 @@ export class EmoteWallService extends WidgetSettingsService<IEmoteWallData> {
     return formMetadata({
       enabled: metadata.toggle({ title: $t('Enabled') }),
       duration: metadata.slider({ title: $t('Duration'), min: 1, max: 60 }),
-      scale: metadata.slider({ title: $t('Title'), min: 1, max: 10 }),
+      scale: metadata.slider({ title: $t('Emote Scale'), min: 1, max: 10 }),
       comboRequired: metadata.toggle({ title: $t('Combo Required') }),
       comboCount: metadata.slider({ title: $t('Combo Count'), min: 2, max: 100 }),
       comboTimeframe: metadata.slider({ title: $t('Combo Timeframe'), min: 1, max: 60 }),
@@ -54,11 +54,9 @@ export class EmoteWallService extends WidgetSettingsService<IEmoteWallData> {
     });
   }
 
-  patchAfterFetch(data: IEmoteWallSettings) {
-    return {
-      ...data,
-      combo_timeframe: data.combo_timeframe / 1000,
-      emote_animation_duration: data.emote_animation_duration / 1000,
-    };
+  patchAfterFetch(data: { settings: IEmoteWallSettings }) {
+    // data.settings.combo_timeframe = data.settings.combo_timeframe / 1000;
+    // data.settings.emote_animation_duration = data.settings.emote_animation_duration / 1000;
+    return data;
   }
 }
