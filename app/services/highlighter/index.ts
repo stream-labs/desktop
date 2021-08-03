@@ -25,6 +25,7 @@ import { HighlighterError } from './errors';
 import { AudioMixer } from './audio-mixer';
 import { UsageStatisticsService } from 'services/usage-statistics';
 import * as Sentry from '@sentry/browser';
+import { $t } from 'services/i18n';
 
 export interface IClip {
   path: string;
@@ -124,53 +125,77 @@ export interface IAvailableTransition {
 
 const availableTransitions: IAvailableTransition[] = [
   {
-    displayName: 'None',
+    get displayName() {
+      return $t('None');
+    },
     type: 'None',
   },
   {
-    displayName: 'Random',
+    get displayName() {
+      return $t('Random');
+    },
     type: 'Random',
   },
   {
-    displayName: 'Fade',
+    get displayName() {
+      return $t('Fade');
+    },
     type: 'fade',
   },
   {
-    displayName: 'Slide',
+    get displayName() {
+      return $t('Slide');
+    },
     type: 'Directional',
     params: { direction: [1, 0] },
   },
   {
-    displayName: 'Cube',
+    get displayName() {
+      return $t('Cube');
+    },
     type: 'cube',
   },
   {
-    displayName: 'Warp',
+    get displayName() {
+      return $t('Warp');
+    },
     type: 'crosswarp',
   },
   {
-    displayName: 'Wind',
+    get displayName() {
+      return $t('Wind');
+    },
     type: 'wind',
   },
   {
-    displayName: "90's Game",
+    get displayName() {
+      return $t("90's Game");
+    },
     type: 'DoomScreenTransition',
     params: { bars: 100 },
   },
   {
-    displayName: 'Grid Flip',
+    get displayName() {
+      return $t('Grid Flip');
+    },
     type: 'GridFlip',
   },
   {
-    displayName: 'Dreamy',
+    get displayName() {
+      return $t('Dreamy');
+    },
     type: 'Dreamy',
   },
   {
-    displayName: 'Zoom',
+    get displayName() {
+      return $t('Zoom');
+    },
     type: 'SimpleZoom',
   },
   {
-    displayName: 'Pixelize',
+    get displayName() {
+      return $t('Pixelize');
+    },
     type: 'pixelize',
   },
 ];
@@ -553,7 +578,9 @@ export class HighlighterService extends StatefulService<IHighligherState> {
       if (!SUPPORTED_FILE_TYPES.map(e => `.${e}`).includes(path.parse(c.path).ext)) {
         this.REMOVE_CLIP(c.path);
         this.SET_ERROR(
-          'One or more clips could not be imported because they were not recorded in a supported file format.',
+          $t(
+            'One or more clips could not be imported because they were not recorded in a supported file format.',
+          ),
         );
       }
 
@@ -821,7 +848,7 @@ export class HighlighterService extends StatefulService<IHighligherState> {
           error: e.constructor.name,
         });
       } else {
-        this.SET_EXPORT_INFO({ error: 'An error occurred while exporting the video' });
+        this.SET_EXPORT_INFO({ error: $t('An error occurred while exporting the video') });
         this.usageStatisticsService.recordAnalyticsEvent('Highlighter', {
           type: 'ExportError',
           error: 'Unknown',

@@ -8,6 +8,7 @@ import { Button, Progress, Tooltip, Alert } from 'antd';
 import { RadioInput } from 'components-react/shared/inputs/RadioInput';
 import { TPrivacyStatus } from 'services/platforms/youtube/uploader';
 import electron from 'electron';
+import { $t } from 'services/i18n';
 
 // Source: https://stackoverflow.com/questions/10420352/converting-file-size-in-bytes-to-human-readable-string/10420404
 function humanFileSize(bytes: number, si: boolean) {
@@ -51,25 +52,29 @@ export default function YoutubeUpload(props: { defaultTitle: string; close: () =
           {v.youtubeLinked && (
             <div style={{ flexGrow: 1 }}>
               <Form layout="vertical">
-                <TextInput label="Title" value={title} onChange={setTitle} />
-                <TextAreaInput label="Description" value={description} onChange={setDescription} />
+                <TextInput label={$t('Title')} value={title} onChange={setTitle} />
+                <TextAreaInput
+                  label={$t('Description')}
+                  value={description}
+                  onChange={setDescription}
+                />
                 <RadioInput
-                  label="Privacy Status"
+                  label={$t('Privacy Status')}
                   options={[
                     {
-                      label: 'Private',
+                      label: $t('Private'),
                       value: 'private',
-                      description: 'Only you and people you choose can watch your video',
+                      description: $t('Only you and people you choose can watch your video'),
                     },
                     {
-                      label: 'Unlisted',
+                      label: $t('Unlisted'),
                       value: 'unlisted',
-                      description: 'Anyone with the video link can watch your video',
+                      description: $t('Anyone with the video link can watch your video'),
                     },
                     {
-                      label: 'Public',
+                      label: $t('Public'),
                       value: 'public',
-                      description: 'Everyone can watch your video',
+                      description: $t('Everyone can watch your video'),
                     },
                   ]}
                   value={privacy}
@@ -80,7 +85,9 @@ export default function YoutubeUpload(props: { defaultTitle: string; close: () =
           )}
           {!v.youtubeLinked && (
             <div style={{ flexGrow: 1 }}>
-              <div>Please connect your YouTube account to upload your video to YouTube.</div>
+              <div>
+                {$t('Please connect your YouTube account to upload your video to YouTube.')}
+              </div>
               <button
                 style={{ marginTop: 8 }}
                 className="button button--youtube"
@@ -91,7 +98,7 @@ export default function YoutubeUpload(props: { defaultTitle: string; close: () =
                   })
                 }
               >
-                Connect
+                {$t('Connect')}
               </button>
             </div>
           )}
@@ -130,7 +137,7 @@ export default function YoutubeUpload(props: { defaultTitle: string; close: () =
                   electron.remote.shell.showItemInFolder(v.exportInfo.file);
                 }}
               >
-                Open file location
+                {$t('Open file location')}
               </a>
             </div>
           </div>
@@ -138,7 +145,7 @@ export default function YoutubeUpload(props: { defaultTitle: string; close: () =
         {v.uploadInfo.error && (
           <Alert
             style={{ marginBottom: 24 }}
-            message="An error occurred while uploading to YouTube"
+            message={$t('An error occurred while uploading to YouTube')}
             type="error"
             closable
             showIcon
@@ -147,7 +154,7 @@ export default function YoutubeUpload(props: { defaultTitle: string; close: () =
         )}
         <div style={{ textAlign: 'right' }}>
           <Button style={{ marginRight: 8 }} onClick={props.close}>
-            Close
+            {$t('Close')}
           </Button>
           {v.youtubeLinked && (
             <Button
@@ -161,7 +168,7 @@ export default function YoutubeUpload(props: { defaultTitle: string; close: () =
                 });
               }}
             >
-              Publish
+              {$t('Publish')}
             </Button>
           )}
         </div>
@@ -172,7 +179,7 @@ export default function YoutubeUpload(props: { defaultTitle: string; close: () =
   function getUploadProgress() {
     return (
       <div>
-        <h2>Upload Progress</h2>
+        <h2>{$t('Upload Progress')}</h2>
         <Progress
           percent={Math.round((v.uploadInfo.uploadedBytes / v.uploadInfo.totalBytes) * 100)}
           trailColor="var(--section)"
@@ -180,11 +187,13 @@ export default function YoutubeUpload(props: { defaultTitle: string; close: () =
         />
         {!v.uploadInfo.cancelRequested && (
           <div>
-            Uploading: {humanFileSize(v.uploadInfo.uploadedBytes, false)}/
-            {humanFileSize(v.uploadInfo.totalBytes, false)}
+            {$t('Uploading: %{uploadedBytes}/%{totalBytes}', {
+              uploadedBytes: humanFileSize(v.uploadInfo.uploadedBytes, false),
+              totalBytes: humanFileSize(v.uploadInfo.totalBytes, false),
+            })}
           </div>
         )}
-        {v.uploadInfo.cancelRequested && <span>Canceling...</span>}
+        {v.uploadInfo.cancelRequested && <span>{$t('Canceling...')}</span>}
         <br />
         <button
           className="button button--soft-warning"
@@ -192,7 +201,7 @@ export default function YoutubeUpload(props: { defaultTitle: string; close: () =
           style={{ marginTop: '16px' }}
           disabled={v.uploadInfo.cancelRequested}
         >
-          Cancel
+          {$t('Cancel')}
         </button>
       </div>
     );
@@ -204,8 +213,9 @@ export default function YoutubeUpload(props: { defaultTitle: string; close: () =
     return (
       <div>
         <p>
-          Your video was successfully uploaded! Click the link below to access your video. Please
-          note that YouTube will take some time to process your video.
+          {$t(
+            'Your video was successfully uploaded! Click the link below to access your video. Please note that YouTube will take some time to process your video.',
+          )}
         </p>
         <br />
         <a onClick={() => electron.remote.shell.openExternal(url)}>{url}</a>
@@ -225,7 +235,7 @@ export default function YoutubeUpload(props: { defaultTitle: string; close: () =
 
   return (
     <div>
-      <h2>Upload to YouTube</h2>
+      <h2>{$t('Upload to YouTube')}</h2>
       {!v.uploadInfo.uploading && !v.uploadInfo.videoId && getYoutubeForm()}
       {v.youtubeLinked && v.uploadInfo.uploading && getUploadProgress()}
       {v.youtubeLinked && v.uploadInfo.videoId && getUploadDone()}
