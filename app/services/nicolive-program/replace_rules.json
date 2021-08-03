@@ -109,6 +109,10 @@
     {
       "regularExpression": "初見",
       "replacement": "しょけん"
+    },
+    {
+      "regularExpression": "古参",
+      "replacement": "こさん"
     }
   ]
 }
