@@ -4,9 +4,9 @@
   "Share Your Stream": "Compartir su stream",
   "Connect to Twitter": "Conectar a Twitter",
   "Enable Tweet Sharing": "Activar uso compartido de tuit",
-  "Tweet when going live": "Tuit al emitir en directo",
+  "Tweet when going live": "Tuit al transmitir en directo",
   "Unlink Twitter": "Desvincular Twitter",
   "Tweet & Go Live": "Tuit e iniciar directo",
-  "Could not connect to Twitter": "Could not connect to Twitter",
-  "Use Streamlabs URL": "Use Streamlabs URL"
+  "Could not connect to Twitter": "No se pudo conectar a Twitter",
+  "Use Streamlabs URL": "Usar URL de Streamlabs"
 }
