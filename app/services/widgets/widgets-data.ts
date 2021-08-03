@@ -607,5 +607,6 @@ export const WidgetDisplayData = (platform?: string): { [x: number]: IWidgetDisp
     demoVideo: false,
     demoFilename: 'poll.png',
     supportList: [],
+    platforms: new Set(['twitch']),
   },
 });
