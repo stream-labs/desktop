@@ -25,7 +25,7 @@ export interface IEmoteWallData extends IWidgetData {
 }
 
 @InheritMutations()
-export class PollService extends WidgetSettingsService<IEmoteWallData> {
+export class EmoteWallService extends WidgetSettingsService<IEmoteWallData> {
   static initialState = WIDGET_INITIAL_STATE;
 
   getApiSettings() {
@@ -52,5 +52,13 @@ export class PollService extends WidgetSettingsService<IEmoteWallData> {
       comboTimeframe: metadata.slider({ title: $t('Combo Timeframe'), min: 1, max: 60 }),
       ignoreDuplicates: metadata.toggle({ title: $t('Ignore Duplicates') }),
     });
+  }
+
+  patchAfterFetch(data: IEmoteWallSettings) {
+    return {
+      ...data,
+      combo_timeframe: data.combo_timeframe / 1000,
+      emote_animation_duration: data.emote_animation_duration / 1000,
+    };
   }
 }

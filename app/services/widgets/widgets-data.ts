@@ -421,6 +421,20 @@ export const WidgetDefinitions: { [x: number]: IWidget } = {
 
     anchor: AnchorPoint.Center,
   },
+  [WidgetType.EmoteWall]: {
+    name: 'Emote Wall',
+    url(host, token) {
+      return `https://${host}/widgets/emote-wall/${token}`;
+    },
+
+    width: 800,
+    height: 600,
+
+    x: 0.5,
+    y: 0.5,
+
+    anchor: AnchorPoint.Center,
+  },
 };
 
 export const WidgetDisplayData = (platform?: string): { [x: number]: IWidgetDisplayData } => ({
@@ -581,6 +595,15 @@ export const WidgetDisplayData = (platform?: string): { [x: number]: IWidgetDisp
   [WidgetType.Poll]: {
     name: $t('Poll'),
     description: $t('Let your viewers vote on a result'),
+    demoVideo: false,
+    demoFilename: 'poll.png',
+    supportList: [],
+  },
+  [WidgetType.EmoteWall]: {
+    name: $t('Emote Wall'),
+    description: $t(
+      'Display and animate emotes that are seen in chat, improving chat participation via positive feedback.',
+    ),
     demoVideo: false,
     demoFilename: 'poll.png',
     supportList: [],
