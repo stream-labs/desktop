@@ -133,6 +133,7 @@ export class MediaShareService extends WidgetSettingsService<IMediaShareData> {
     // backend makes settings into advanced.settings and store in json
     // without deleting, it will nest settings.advanced_settings.advanced_settings x infinity
     delete settings.advanced_settings;
+    settings.buffer_time = settings.buffer_time * 1000;
     return { settings };
   }
 }
