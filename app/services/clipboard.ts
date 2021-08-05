@@ -456,16 +456,21 @@ export class ClipboardService extends StatefulService<IClipboardState> {
   private getFiles() {
     return byOS({
       [OS.Windows]: () => {
-        // electron clipboard doesn't support file system
-        // use .NET API instead
-        return execSync(
-          'Powershell -command Add-Type -AssemblyName System.Windows.Forms;' +
-            '[System.Windows.Forms.Clipboard]::GetFileDropList()',
-        )
-          .toString()
-          .split('\n')
-          .filter(fineName => fineName)
-          .map(fileName => fileName.trim());
+        try {
+          // electron clipboard doesn't support file system
+          // use .NET API instead
+          return execSync(
+            'Powershell -command Add-Type -AssemblyName System.Windows.Forms;' +
+              '[System.Windows.Forms.Clipboard]::GetFileDropList()',
+          )
+            .toString()
+            .split('\n')
+            .filter(fineName => fineName)
+            .map(fileName => fileName.trim());
+        } catch (e: unknown) {
+          console.error('Error fetching clipboard files from powershell', e);
+          return [];
+        }
       },
       // We don't support this on mac for now
       [OS.Mac]: [],
