@@ -14,7 +14,7 @@ import { Subscription } from 'rxjs';
 const CHANNEL_HEIGHT = 3;
 const SPACE_BETWEEN_CHANNELS = 2;
 const PADDING_TOP = 39;
-const PADDING_BOTTOM = 37;
+const PADDING_BOTTOM = 41;
 const PEAK_WIDTH = 4;
 const PEAK_HOLD_CYCLES = 100;
 const WARNING_LEVEL = -20;
@@ -358,8 +358,11 @@ export default class GLVolmeters extends TsxComponent<VolmetersProps> {
       offsetTop += PADDING_TOP;
       const volmeter = this.subscriptions[sourceId];
       this.drawVolmeterWebgl(volmeter, offsetTop);
+
       offsetTop +=
-        (CHANNEL_HEIGHT + SPACE_BETWEEN_CHANNELS) * volmeter.channelsCount + PADDING_BOTTOM;
+        CHANNEL_HEIGHT * volmeter.channelsCount +
+        SPACE_BETWEEN_CHANNELS * (volmeter.channelsCount - 1) +
+        PADDING_BOTTOM;
     });
   }
 
