@@ -373,15 +373,15 @@ export class StreamInfoView<T extends Object> extends ViewHandler<T> {
   }
 
   get isStreaming() {
-    return this.state.streamingStatus !== EStreamingState.Offline;
+    return this.streamingState.streamingStatus !== EStreamingState.Offline;
   }
 
   get isRecording() {
-    return this.state.recordingStatus !== ERecordingState.Offline;
+    return this.streamingState.recordingStatus !== ERecordingState.Offline;
   }
 
   get isReplayBufferActive() {
-    return this.state.replayBufferStatus !== EReplayBufferState.Offline;
+    return this.streamingState.replayBufferStatus !== EReplayBufferState.Offline;
   }
 
   get isIdle(): boolean {
