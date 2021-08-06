@@ -102,7 +102,7 @@ export default function AppsNav() {
     <div className={styles.wrapper}>
       <div className={styles.scroll} ref={scroll} onScroll={handleScroll}>
         {navApps().map(app => (
-          <div style={{ position: 'relative' }}>
+          <div style={{ position: 'relative' }} key={app.id}>
             {<div className={cx(styles.activeApp, { [styles.active]: isSelectedApp(app.id) })} />}
             <div
               title={app.manifest.name}
