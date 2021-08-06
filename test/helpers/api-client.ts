@@ -324,7 +324,7 @@ export class ApiClient {
   }
 }
 
-export async function getClient() {
+export async function getApiClient() {
   if (!clientInstance) clientInstance = new ApiClient();
 
   if (clientInstance.getConnectionStatus() === 'disconnected') {

@@ -1,6 +1,6 @@
 import { MetricsService } from '../../../app/services/metrics';
 import { test, stopApp, startApp, TExecutionContext } from '../../helpers/spectron';
-import { ApiClient, getClient } from '../../helpers/api-client';
+import { ApiClient, getApiClient } from '../../helpers/api-client';
 import { TSourceType } from '../../../app/services/sources/sources-api';
 import { ScenesService } from '../../../app/services/api/external-api/scenes';
 import { getMeter } from '../meter';
@@ -84,7 +84,7 @@ test('Empty collection', async t => {
   let attempts = RELOAD_ATTEMPTS;
   while (attempts--) {
     await startApp(t, true);
-    const api = await getClient();
+    const api = await getApiClient();
     measureStartupTime(api);
     await stopApp(t, false);
   }
@@ -105,7 +105,7 @@ test('Large collection', async t => {
   let i = RELOAD_ATTEMPTS;
   while (i--) {
     await startApp(t, true);
-    const api = await getClient();
+    const api = await getApiClient();
     measureStartupTime(api);
     await stopApp(t, false);
   }
@@ -126,7 +126,7 @@ test('Empty collection (logged-in twitch)', async t => {
   let attempts = RELOAD_ATTEMPTS;
   while (attempts--) {
     await startApp(t, true);
-    const api = await getClient();
+    const api = await getApiClient();
     measureStartupTime(api);
     await stopApp(t, false);
   }
@@ -136,7 +136,7 @@ test('Empty collection (logged-in twitch)', async t => {
 test('Recording', async t => {
   await setTemporaryRecordingPath();
   await setOutputResolution('100x100');
-  const api = await getClient();
+  const api = await getApiClient();
   const scenesService = api.getResource<ScenesService>('ScenesService');
   scenesService.activeScene.createAndAddSource('Color', 'color_source');
 
@@ -170,7 +170,7 @@ test('Create sources', async t => {
     'dshow_input',
   ];
 
-  const api = await getClient();
+  const api = await getApiClient();
   const scenesService = api.getResource<ScenesService>('ScenesService');
   const cs = api.getResource<CustomizationService>('CustomizationService');
   cs.setSettings({ performanceMode: false });
@@ -199,7 +199,7 @@ test('Create sources', async t => {
 });
 
 test('Add and remove items and folders', async t => {
-  const api = await getClient();
+  const api = await getApiClient();
   const scenesService = api.getResource<ScenesService>('ScenesService');
   const meter = getMeter();
 

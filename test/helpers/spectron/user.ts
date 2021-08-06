@@ -1,9 +1,10 @@
-import { focusMain, TExecutionContext, focusWorker, focusChild, closeWindow } from './index';
+import { TExecutionContext } from './index';
 import { TPlatform } from '../../../app/services/platforms';
 import { sleep } from '../sleep';
 import { dialogDismiss } from './dialog';
 import { ExecutionContext } from 'ava';
 import { requestUtilsServer, USER_POOL_TOKEN } from './runner-utils';
+import {closeWindow, focusChild, focusMain, focusWindow} from '../modules/core';
 
 let user: ITestUser; // keep user's name if SLOBS is logged-in
 
@@ -65,17 +66,17 @@ export interface ITestUserFeatures {
 export async function logOut(t: TExecutionContext, skipUI = false) {
   // logout from the SLOBS app
   if (!skipUI) {
-    await focusMain(t);
+    await focusMain();
     await (await t.context.app.client.$('.icon-settings')).click();
-    await focusChild(t);
+    await focusChild();
     await (await t.context.app.client.$('.fa-sign-out-alt')).click();
-    await dialogDismiss(t, 'Yes');
-    await focusMain(t);
+    await dialogDismiss('Yes');
+    await focusMain();
     await (await t.context.app.client.$('.icon-settings')).click();
-    await focusChild(t);
+    await focusChild();
     await (await t.context.app.client.$('.fa-sign-in-alt')).waitForDisplayed(); // wait for the log-in button
-    await closeWindow(t);
-    await focusMain(t);
+    await closeWindow('child');
+    await focusMain();
   }
   // release the testing user
   await releaseUserInPool(user);
@@ -127,9 +128,9 @@ export async function loginWithAuthInfo(
     },
     hasRelogged: true,
   };
-  await focusWorker(t);
+  await focusWindow('worker');
   t.context.app.webContents.send('testing-fakeAuth', authInfo, isOnboardingTest);
-  await focusMain(t);
+  await focusMain();
   if (!waitForUI) return true;
   return await isLoggedIn(t);
 }
@@ -137,10 +138,10 @@ export async function loginWithAuthInfo(
 export async function isLoggedIn(t: TExecutionContext) {
   await (await t.context.app.client.$('.icon-settings')).waitForDisplayed();
   await (await t.context.app.client.$('.icon-settings')).click();
-  await focusChild(t);
+  await focusChild();
   const isLoggedIn = await (await t.context.app.client.$('.fa-sign-out-alt')).isDisplayed();
-  await closeWindow(t);
-  await focusMain(t);
+  await closeWindow('child');
+  await focusMain();
   return isLoggedIn;
 }
 

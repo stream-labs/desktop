@@ -1,25 +1,20 @@
-import {
-  focusChild,
-  focusMain,
-  skipCheckingErrorsInLog,
-  test,
-  useSpectron,
-} from '../../helpers/spectron';
+import { skipCheckingErrorsInLog, test, useSpectron } from '../../helpers/spectron';
 import { logIn } from '../../helpers/spectron/user';
 import { fillForm, selectTitle } from '../../helpers/form-monkey';
 import { makeScreenshots, useScreentest } from '../screenshoter';
 import { TPlatform } from '../../../app/services/platforms';
-import { fetchMock, resetFetchMock } from '../../helpers/spectron/network';
-import { getClient } from '../../helpers/api-client';
+import { fetchMock, installFetchMock, resetFetchMock } from '../../helpers/spectron/network';
+import { getApiClient } from '../../helpers/api-client';
 import { ScenesService } from 'services/api/external-api/scenes';
 import { sleep } from '../../helpers/sleep';
 import { prepareToGoLive } from '../../helpers/modules/streaming';
+import { focusChild, focusMain } from '../../helpers/modules/core';
 
 useSpectron();
 useScreentest();
 
 async function addColorSource() {
-  const api = await getClient();
+  const api = await getApiClient();
   api
     .getResource<ScenesService>('ScenesService')
     .activeScene.createAndAddSource('MyColorSource', 'color_source');
@@ -37,9 +32,9 @@ platforms.forEach(platform => {
     await prepareToGoLive();
 
     // open EditStreamInfo window
-    await focusMain(t);
+    await focusMain();
     await (await app.client.$('button=Go Live')).click();
-    await focusChild(t);
+    await focusChild();
     if (await (await app.client.$('button=Go Live')).isExisting()) {
       await (await app.client.$('button=Go Live')).click();
     }
@@ -75,7 +70,7 @@ platforms.forEach(platform => {
     await (await app.client.$('button=Confirm & Go Live')).click();
 
     // check we're streaming
-    await focusMain(t);
+    await focusMain();
     await (await app.client.$('button=End Stream')).waitForExist({ timeout: 20 * 1000 });
 
     // give the GoLive window a couple of seconds to become closed
@@ -83,7 +78,7 @@ platforms.forEach(platform => {
 
     // open the editStreamInfo dialog
     await (await app.client.$('.live-dock-info .icon-edit')).click();
-    await focusChild(t);
+    await focusChild();
     await (await app.client.$('input')).waitForExist({ timeout: 20 * 1000 });
     await makeScreenshots(t, 'in_stream');
     t.pass();
@@ -99,9 +94,9 @@ schedulingPlatforms.forEach(platform => {
     const app = t.context.app;
 
     // open EditStreamInfo window
-    await focusMain(t);
+    await focusMain();
     await (await app.client.$('button .icon-date')).click();
-    await focusChild(t);
+    await focusChild();
 
     // fill streaming data
     switch (platform) {
@@ -135,13 +130,14 @@ test('Go live error', async t => {
   await addColorSource();
 
   // simulate issues with the twitch api
+  await installFetchMock(t);
   await fetchMock(t, /api\.twitch\.tv/, 404);
   skipCheckingErrorsInLog();
 
   // open EditStreamInfo window
-  await focusMain(t);
+  await focusMain();
   await (await app.client.$('button=Go Live')).click();
-  await focusChild(t);
+  await focusChild();
 
   // check that the error text is shown
   await (await app.client.$('a=just go live')).waitForDisplayed();

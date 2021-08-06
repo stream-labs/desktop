@@ -2,7 +2,7 @@
  * The core module provides methods for the most frequent actions
  */
 
-import { getContext } from '../spectron';
+import { getContext, TExecutionContext } from '../spectron';
 
 export type TSelectorOrEl = string | WebdriverIO.Element;
 
@@ -28,8 +28,10 @@ export function selectButton(buttonText: string) {
 
 // CLICK SHORTCUTS
 
-export async function click(selectorOrEl: TSelectorOrEl) {
-  await (await select(selectorOrEl)).click();
+export async function click(selectorOrEl: TSelectorOrEl, options?: WebdriverIO.ClickOptions) {
+  const $el = await select(selectorOrEl);
+  await $el.waitForClickable();
+  await $el.click(options);
 }
 
 export async function clickIfDisplayed(selectorOrEl: TSelectorOrEl) {
@@ -44,7 +46,7 @@ export async function clickText(text: string) {
 
 export async function clickButton(buttonText: string) {
   const $button = await selectButton(buttonText);
-  await $button.click();
+  await click($button);
 }
 
 export async function clickTab(tabText: string) {
@@ -53,7 +55,18 @@ export async function clickTab(tabText: string) {
 
 // OTHER SHORTCUTS
 
-export async function isDisplayed(selectorOrEl: TSelectorOrEl) {
+export async function isDisplayed(
+  selectorOrEl: TSelectorOrEl,
+  waitForOptions?: WebdriverIO.WaitForOptions,
+) {
+  if (waitForOptions) {
+    try {
+      await waitForDisplayed(selectorOrEl, waitForOptions);
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
   return await (await select(selectorOrEl)).isDisplayed();
 }
 
@@ -62,6 +75,10 @@ export async function waitForDisplayed(
   options?: WebdriverIO.WaitForOptions,
 ) {
   await (await select(selectorOrEl)).waitForDisplayed(options);
+}
+
+export function waitForText(text: string) {
+  return waitForDisplayed(`*="${text}"`);
 }
 
 export async function waitForEnabled(
@@ -78,13 +95,19 @@ export async function getFocusedWindowId(): Promise<string> {
   return url.match(/windowId=main$/) ? 'main' : 'child';
 }
 
-export async function focusWindow(winId: string): Promise<boolean> {
+export async function focusWindow(winIdOrRegexp: string | RegExp): Promise<boolean> {
   const client = await getClient();
   const count = await getClient().getWindowCount();
   for (let i = 0; i < count; i++) {
     await client.windowByIndex(i);
     const url = await client.getUrl();
-    if (url.includes(`windowId=${winId}`)) return true;
+    if (typeof winIdOrRegexp === 'string') {
+      const winId = winIdOrRegexp;
+      if (url.includes(`windowId=${winId}`)) return true;
+    } else {
+      const regex = winIdOrRegexp as RegExp;
+      if (url.match(regex)) return true;
+    }
   }
   return false;
 }
@@ -95,6 +118,12 @@ export async function focusChild() {
 
 export async function focusMain() {
   return focusWindow('main');
+}
+
+export async function closeWindow(winId: string) {
+  await useWindow(winId, async () => {
+    await getContext().context.app.browserWindow.close();
+  });
 }
 
 /**
@@ -119,4 +148,12 @@ export async function useMainWindow<TCallbackResult>(cb: () => Promise<TCallback
 
 export async function useChildWindow<TCallbackResult>(cb: () => Promise<TCallbackResult>) {
   return useWindow('child', cb);
+}
+
+export async function waitForLoader() {
+  await (await select('.main-loading')).waitForExist({
+    interval: 100, // we need a smaller interval to run tests faster
+    timeout: 20000,
+    reverse: true,
+  });
 }
