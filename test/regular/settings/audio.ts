@@ -1,11 +1,12 @@
-import { focusMain, test, useSpectron } from '../../helpers/spectron';
+import { test, useSpectron } from '../../helpers/spectron';
 import { assertOptions } from '../../helpers/spectron/assertions';
-import { showSettings } from '../../helpers/spectron/settings';
+import { showSettingsWindow } from '../../helpers/modules/settings/settings';
+import { focusMain } from '../../helpers/modules/core';
 
 useSpectron();
 
 test('Populates audio settings', async t => {
-  await showSettings(t, 'Audio');
+  await showSettingsWindow('Audio');
 
   await assertOptions(t, 'SampleRate', '44.1khz', ['44.1khz', '48khz']);
 
@@ -33,7 +34,7 @@ test('Populates audio settings', async t => {
 
   // Test that we're displaying mixer settings in the footer
   await (await app.client.$('button=Done')).click();
-  await focusMain(t);
+  await focusMain();
   t.true(await (await app.client.$('.source-name=Desktop Audio')).isExisting());
   t.true(await (await app.client.$('.source-name*=Mic')).isExisting());
   t.true(await (await app.client.$('.volmeter-container')).isExisting());

@@ -1,5 +1,5 @@
 import { useSpectron, test } from '../../helpers/spectron';
-import { getClient } from '../../helpers/api-client';
+import { getApiClient } from '../../helpers/api-client';
 import { ISourcesServiceApi } from '../../../app/services/sources/sources-api';
 import { useScreentest } from '../screenshoter';
 import { ScenesService } from '../../../app/services/api/external-api/scenes';
@@ -8,12 +8,12 @@ useSpectron({ restartAppAfterEachTest: false });
 useScreentest();
 
 test('Editor without sources', async t => {
-  const client = await getClient();
+  const client = await getApiClient();
   t.pass();
 });
 
 test('Editor with sources', async t => {
-  const client = await getClient();
+  const client = await getApiClient();
   const scenesService = client.getResource<ScenesService>('ScenesService');
   const sourcesService = client.getResource<ISourcesServiceApi>('SourcesService');
   const scene = scenesService.activeScene;
@@ -25,7 +25,7 @@ test('Editor with sources', async t => {
 });
 
 test('Editor with the big amount of sources and scenes', async t => {
-  const client = await getClient();
+  const client = await getApiClient();
   const scenesService = client.getResource<ScenesService>('ScenesService');
 
   let scenesCount = 10;

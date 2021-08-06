@@ -3,7 +3,7 @@
  * starting, scheduling, and updating streams
  */
 
-import { getClient } from '../api-client';
+import { getApiClient } from '../api-client';
 import {
   click,
   clickButton,
@@ -36,7 +36,7 @@ export async function prepareToGoLive() {
   await setOutputResolution('100x100');
 
   // disable warning when trying to start stream without video-sources
-  (await getClient())
+  (await getApiClient())
     .getResource<StreamSettingsService>('StreamSettingsService')
     .setSettings({ warnNoVideoSources: false });
 }

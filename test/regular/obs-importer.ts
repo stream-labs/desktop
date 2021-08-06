@@ -1,12 +1,12 @@
-import { focusChild, focusMain, test, useSpectron } from '../helpers/spectron';
-import { sleep } from '../helpers/sleep';
-import { sceneExisting, switchCollection } from '../helpers/spectron/scenes';
-import { sourceIsExisting } from '../helpers/spectron/sources';
-import { getClient } from '../helpers/api-client';
+import { test, useSpectron } from '../helpers/spectron';
+import { sceneExisting, switchCollection } from '../helpers/modules/scenes';
+import { sourceIsExisting } from '../helpers/modules/sources';
+import { getApiClient } from '../helpers/api-client';
 import { WidgetsService } from '../../app/services/widgets';
 import { EWidgetType } from '../helpers/widget-helpers';
 import { FormMonkey } from '../helpers/form-monkey';
 import { ExecutionContext } from 'ava';
+import { click, focusChild, focusMain, waitForDisplayed } from '../helpers/modules/core';
 
 const path = require('path');
 
@@ -35,47 +35,37 @@ test('OBS Importer', async t => {
   const client = t.context.app.client;
 
   // skip auth
-  if (await (await t.context.app.client.$('span=Skip')).isExisting()) {
-    await (await t.context.app.client.$('span=Skip')).click();
-    await sleep(1000);
-  }
-
-  // Skip purchasing prime
-  if (await (await t.context.app.client.$('div=Choose Starter')).isExisting()) {
-    await (await t.context.app.client.$('div=Choose Starter')).click();
-    await sleep(1000);
-  }
+  await click('span=Skip');
 
   // import from OBS
-  if (await (await t.context.app.client.$('div=Import from OBS')).isExisting()) {
-    await (await t.context.app.client.$('div=Import from OBS')).click();
-    await (await t.context.app.client.$('div=Start')).click();
-    await sleep(10000);
-  }
+  await click('div=Import from OBS');
+  await click('div=Start');
+
+  await waitForDisplayed('.scene-collections-wrapper');
 
   // check collection 1 and sources
-  await switchCollection(t, 'Collection 1');
-  t.true(await sceneExisting(t, 'Scene'));
-  t.true(await sceneExisting(t, 'Scene 2'));
-  t.true(await sourceIsExisting(t, 'Color Source'));
-  t.true(await sourceIsExisting(t, 'Text (GDI+)'));
+  await switchCollection('Collection 1');
+  t.true(await sceneExisting('Scene'));
+  t.true(await sceneExisting('Scene 2'));
+  t.true(await sourceIsExisting('Color Source'));
+  t.true(await sourceIsExisting('Text (GDI+)'));
 
   // check collection 2 exists
-  await focusMain(t);
-  await switchCollection(t, 'Collection 2');
+  await focusMain();
+  await switchCollection('Collection 2');
 
   // check settings
   await (await client.$('.side-nav .icon-settings')).click();
-  await focusChild(t);
+  await focusChild();
   await (await client.$('li=Output')).click();
   const form = new FormMonkey(t);
   await form.setInputValue(await form.getInputSelectorByTitle('Video Bitrate'), '5000');
   await form.setInputValue(await form.getInputSelectorByTitle('Encoder'), 'Software (x264)');
 
   // check that widgets have been migrated
-  await focusMain(t);
-  await switchCollection(t, 'Widgets');
-  const api = await getClient();
+  await focusMain();
+  await switchCollection('Widgets');
+  const api = await getApiClient();
   const widgetsService = api.getResource<WidgetsService>('WidgetsService');
 
   t.deepEqual(
