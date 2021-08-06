@@ -605,7 +605,7 @@ export const WidgetDisplayData = (platform?: string): { [x: number]: IWidgetDisp
       'Display and animate emotes that are seen in chat, improving chat participation via positive feedback.',
     ),
     demoVideo: false,
-    demoFilename: 'poll.png',
+    demoFilename: 'emote-wall.gif',
     supportList: [],
     platforms: new Set(['twitch']),
   },
