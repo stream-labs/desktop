@@ -21,6 +21,7 @@ import { IHotkey } from 'services/hotkeys';
 import { getBindingString } from 'components-react/shared/HotkeyBinding';
 import Animate from 'rc-animate';
 import TransitionSelector from 'components-react/highlighter/TransitionSelector';
+import { $t } from 'services/i18n';
 
 type TModal = 'trim' | 'export' | 'preview' | 'remove';
 
@@ -87,13 +88,6 @@ export default function Highlighter() {
   }
 
   function getControls() {
-    const transitionTypes = HighlighterService.views.availableTransitions.map(t => {
-      return {
-        label: t.displayName,
-        value: t.type,
-      };
-    });
-
     function setTransitionDuration(duration: number) {
       HighlighterService.actions.setTransition({ duration });
     }
@@ -126,7 +120,7 @@ export default function Highlighter() {
         <Form layout="vertical">
           <TransitionSelector />
           <SliderInput
-            label="Transition Duration"
+            label={$t('Transition Duration')}
             value={v.transition.duration}
             onChange={setTransitionDuration}
             min={0.5}
@@ -138,7 +132,7 @@ export default function Highlighter() {
             tipFormatter={v => `${v}s`}
           />
           <SwitchInput
-            label="Background Music"
+            label={$t('Background Music')}
             value={v.audio.musicEnabled}
             onChange={setMusicEnabled}
           />
@@ -146,13 +140,13 @@ export default function Highlighter() {
             {v.audio.musicEnabled && (
               <div>
                 <FileInput
-                  label="Music File"
+                  label={$t('Music File')}
                   value={v.audio.musicPath}
-                  filters={[{ name: 'Audio File', extensions: musicExtensions }]}
+                  filters={[{ name: $t('Audio File'), extensions: musicExtensions }]}
                   onChange={setMusicFile}
                 />
                 <SliderInput
-                  label="Music Volume"
+                  label={$t('Music Volume')}
                   value={v.audio.musicVolume}
                   onChange={setMusicVolume}
                   min={0}
@@ -171,10 +165,10 @@ export default function Highlighter() {
           style={{ marginTop: '16px', marginRight: '8px' }}
           onClick={() => setShowModal('preview')}
         >
-          Preview
+          {$t('Preview')}
         </Button>
         <Button type="primary" style={{ marginTop: '16px' }} onClick={() => setShowModal('export')}>
-          Export
+          {$t('Export')}
         </Button>
       </Scrollable>
     );
@@ -241,18 +235,18 @@ export default function Highlighter() {
           <div style={{ display: 'flex', paddingRight: 20 }}>
             <div style={{ flexGrow: 1 }}>
               <h1>
-                Highlighter{' '}
+                {$t('Highlighter')}{' '}
                 <span style={{ fontSize: 12, verticalAlign: 'top', color: 'var(--beta-text)' }}>
-                  Beta
+                  {$t('Beta')}
                 </span>
               </h1>
-              <p>{'Drag & drop to reorder clips.'}</p>
+              <p>{$t('Drag & drop to reorder clips.')}</p>
             </div>
             <div>
               {hotkey && hotkey.bindings[0] && (
                 <b style={{ marginRight: 20 }}>{getBindingString(hotkey.bindings[0])}</b>
               )}
-              <Button onClick={() => setShowTutorial(true)}>View Tutorial</Button>
+              <Button onClick={() => setShowTutorial(true)}>{$t('View Tutorial')}</Button>
             </div>
           </div>
           <ReactSortable
@@ -339,7 +333,7 @@ function AddClip() {
       electron.remote.getCurrentWindow(),
       {
         properties: ['openFile', 'multiSelections'],
-        filters: [{ name: 'Video Files', extensions: SUPPORTED_FILE_TYPES }],
+        filters: [{ name: $t('Video Files'), extensions: SUPPORTED_FILE_TYPES }],
       },
     );
 
@@ -359,9 +353,9 @@ function AddClip() {
     >
       <div style={{ fontSize: 24, textAlign: 'center', marginTop: 50 }}>
         <i className="icon-add" style={{ marginRight: 8 }} />
-        Add Clip
+        {$t('Add Clip')}
       </div>
-      <p style={{ textAlign: 'center' }}>{'Drag & drop or click to add clips'}</p>
+      <p style={{ textAlign: 'center' }}>{$t('Drag & drop or click to add clips')}</p>
     </div>
   );
 }
@@ -371,13 +365,14 @@ function RemoveClip(p: { clip: IClip; close: () => void }) {
 
   return (
     <div style={{ textAlign: 'center' }}>
-      <h2>Remove the clip?</h2>
+      <h2>{$t('Remove the clip?')}</h2>
       <p>
-        Are you sure you want to remove the clip? You will need to manually import it again to
-        reverse this action.
+        {$t(
+          'Are you sure you want to remove the clip? You will need to manually import it again to reverse this action.',
+        )}
       </p>
       <Button style={{ marginRight: 8 }} onClick={p.close}>
-        Canncel
+        {$t('Cancel')}
       </Button>
       <Button
         type="primary"
@@ -387,7 +382,7 @@ function RemoveClip(p: { clip: IClip; close: () => void }) {
           p.close();
         }}
       >
-        Remove
+        {$t('Remove')}
       </Button>
     </div>
   );

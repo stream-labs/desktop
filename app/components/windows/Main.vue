@@ -111,6 +111,10 @@
 
 .main-contents--onboarding {
   grid-template-columns: 1fr;
+
+  .main-middle {
+    grid-template-rows: 1fr;
+  }
 }
 
 .main-middle {

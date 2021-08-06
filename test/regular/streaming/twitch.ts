@@ -14,12 +14,12 @@ import {clickButton, focusChild, isDisplayed, waitForDisplayed} from '../../help
 import { restartApp, test, useSpectron } from '../../helpers/spectron';
 import { reserveUserFromPool } from '../../helpers/spectron/user';
 import { setInputValue } from '../../helpers/modules/forms/base';
-import { getClient } from '../../helpers/api-client';
+import { getApiClient } from '../../helpers/api-client';
 import { StreamSettingsService } from '../../../app/services/settings/streaming';
 import { assertFormContains, fillForm } from '../../helpers/modules/forms';
 import { logIn } from '../../helpers/modules/user';
 
-useSpectron({ implicitTimeout: 0 });
+useSpectron();
 
 test('Streaming to Twitch', async t => {
   await logIn('twitch', { multistream: false });
@@ -57,7 +57,7 @@ test('Migrate the twitch account to the protected mode', async t => {
   await logIn('twitch');
 
   // change stream key before go live
-  const streamSettings = (await getClient()).getResource<StreamSettingsService>(
+  const streamSettings = (await getApiClient()).getResource<StreamSettingsService>(
     'StreamSettingsService',
   );
   streamSettings.setSettings({ key: 'fake key', protectedModeMigrationRequired: true });

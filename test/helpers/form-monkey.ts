@@ -1,6 +1,7 @@
 import { sleep } from './sleep';
 import { cloneDeep, isMatch } from 'lodash';
-import { click, TExecutionContext } from './spectron';
+import { TExecutionContext } from './spectron';
+import { click } from './modules/core';
 
 interface IUIInput {
   type: string;
@@ -487,13 +488,13 @@ export class FormMonkey {
     const year = date.getFullYear();
 
     // open calendar
-    await click(this.t, selector);
+    await click(selector);
 
     // switch to month selection
-    await click(this.t, `${selector} .day__month_btn`);
+    await click(`${selector} .day__month_btn`);
 
     // switch to year selection
-    await click(this.t, `${selector} .month__year_btn`);
+    await click(`${selector} .month__year_btn`);
 
     const $el = await this.client.$(selector);
 
@@ -603,7 +604,7 @@ export function selectTitle(optionTitle: string): FNValueSetter {
     await form.waitForLoading(input.name);
 
     // click on the first option
-    await click(form.t, `${input.selector} .multiselect__element`);
+    await click( `${input.selector} .multiselect__element`);
   };
 }
 
@@ -624,7 +625,6 @@ export function selectGamesByTitles(
     for (const game of games) {
       // click to the option
       await click(
-        form.t,
         `${input.selector} .multiselect__element [data-option-value="${game.platform} ${game.title}"]`,
       );
     }

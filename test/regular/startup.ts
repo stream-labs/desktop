@@ -1,14 +1,15 @@
-import { useSpectron, focusMain, focusChild, test } from '../helpers/spectron';
+import { useSpectron, test } from '../helpers/spectron';
 import { logIn } from '../helpers/spectron/user';
 import { sleep } from '../helpers/sleep';
+import { focusChild, focusMain } from '../helpers/modules/core';
 
 useSpectron();
 
 test('Main and child window visibility', async t => {
   const app = t.context.app;
-  await focusMain(t);
+  await focusMain();
   t.true(await app.browserWindow.isVisible());
-  await focusChild(t);
+  await focusChild();
   t.false(await app.browserWindow.isVisible());
 });
 
