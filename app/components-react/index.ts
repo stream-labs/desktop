@@ -20,6 +20,7 @@ import StartStreamingButton from './root/StartStreamingButton';
 import TestWidgets from './root/TestWidgets';
 import RenameSource from './windows/RenameSource';
 import NotificationsArea from './root/NotificationsArea';
+import AppsNav from './sidebar/AppsNav';
 
 // list of React components to be used inside Vue components
 export const components = {
@@ -44,4 +45,5 @@ export const components = {
   TestWidgets,
   RenameSource,
   NotificationsArea,
+  AppsNav,
 };
