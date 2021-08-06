@@ -1,358 +1,349 @@
 import { FormMonkey } from '../helpers/form-monkey';
-import { useSpectron, focusMain, focusChild, test } from '../helpers/spectron';
+import { useSpectron, test } from '../helpers/spectron';
 import {
   addSource,
   clickRemoveSource,
   clickSourceProperties,
   selectSource,
   openRenameWindow,
-  sourceIsExisting,
   waitForSourceExist,
-} from '../helpers/spectron/sources';
+} from '../helpers/modules/sources';
+import {
+  clickButton,
+  focusChild,
+  focusMain,
+  select,
+  waitForDisplayed,
+} from '../helpers/modules/core';
 
-useSpectron();
+useSpectron({ restartAppAfterEachTest: false });
 
 test('Create/Remove Color Source and view Source Properties', async t => {
-  const app = t.context.app;
   const sourceName = 'Color Source';
 
-  await addSource(t, 'Color Source', sourceName);
-  await focusMain(t);
+  await addSource('Color Source', sourceName);
+  await focusMain();
 
-  t.true(await sourceIsExisting(t, sourceName));
+  await selectSource(sourceName);
+  await clickSourceProperties();
 
-  await selectSource(t, sourceName);
-  await clickSourceProperties(t);
+  await focusChild();
+  await waitForDisplayed('label=Color');
+  await waitForDisplayed('label=Width');
+  await waitForDisplayed('label=Height');
 
-  await focusChild(t);
-  t.true(await (await app.client.$('label=Color')).isExisting());
-  t.true(await (await app.client.$('label=Width')).isExisting());
-  t.true(await (await app.client.$('label=Height')).isExisting());
-
-  await focusMain(t);
-  await selectSource(t, sourceName);
-  await clickRemoveSource(t);
-  await waitForSourceExist(t, sourceName, true);
+  await focusMain();
+  await selectSource(sourceName);
+  await clickRemoveSource();
+  await waitForSourceExist(sourceName, true);
+  t.pass();
 });
 
 test('Create/Remove Image Source and view Source Properties', async t => {
-  const app = t.context.app;
   const sourceName = 'Image Source';
+  await addSource('Image', sourceName);
+  await focusMain();
 
-  await addSource(t, 'Image', sourceName);
-  await focusMain(t);
+  await selectSource(sourceName);
+  await clickSourceProperties();
 
-  t.true(await sourceIsExisting(t, sourceName));
+  await focusChild();
+  await waitForDisplayed('label=Image File');
 
-  await selectSource(t, sourceName);
-  await clickSourceProperties(t);
-
-  await focusChild(t);
-  t.true(await (await app.client.$('label=Image File')).isExisting());
-
-  await focusMain(t);
-  await selectSource(t, sourceName);
-  await clickRemoveSource(t);
-  await waitForSourceExist(t, sourceName, true);
-})
+  await focusMain();
+  await selectSource(sourceName);
+  await clickRemoveSource();
+  await waitForSourceExist(sourceName, true);
+  t.pass();
+});
 
 test('Create/Remove Browser Source and view Source Properties', async t => {
-  const app = t.context.app;
   const sourceName = 'Browser Source';
 
-  await addSource(t, 'Browser Source', sourceName);
-  await focusMain(t);
+  await addSource('Browser Source', sourceName);
+  await focusMain();
 
-  t.true(await sourceIsExisting(t, sourceName));
+  await selectSource(sourceName);
+  await clickSourceProperties();
 
-  await selectSource(t, sourceName);
-  await clickSourceProperties(t);
+  await focusChild();
 
-  await focusChild(t);
-  t.true(await (await app.client.$('label=URL')).isExisting());
-  t.true(await (await app.client.$('label=Width')).isExisting());
-  t.true(await (await app.client.$('label=Height')).isExisting());
+  await waitForDisplayed('label=URL');
+  await waitForDisplayed('label=Width');
+  await waitForDisplayed('label=Height');
 
-  await (await (await app.client.$('[data-name=fps_custom')).$('[type=checkbox]')).click();
-  t.true(await (await app.client.$('label=FPS')).isExisting());
-  t.true(await (await app.client.$('label=Custom CSS')).isExisting());
+  await (await (await select('[data-name=fps_custom')).$('[type=checkbox]')).click();
 
-  await focusMain(t);
-  await selectSource(t, sourceName);
-  await clickRemoveSource(t);
-  await waitForSourceExist(t, sourceName, true);
-})
+  await waitForDisplayed('label=FPS');
+  await waitForDisplayed('label=Custom CSS');
+
+  await focusMain();
+  await selectSource(sourceName);
+  await clickRemoveSource();
+  await waitForSourceExist(sourceName, true);
+  t.pass();
+});
 
 test('Create/Remove Media Source and view Source Properties', async t => {
-  const app = t.context.app;
   const sourceName = 'Media Source';
 
-  await addSource(t, 'Media Source', sourceName);
-  await focusMain(t);
+  await addSource('Media Source', sourceName);
+  await focusMain();
 
-  t.true(await sourceIsExisting(t, sourceName));
+  await selectSource(sourceName);
+  await clickSourceProperties();
 
-  await selectSource(t, sourceName);
-  await clickSourceProperties(t);
+  await focusChild();
 
-  await focusChild(t);
-  t.true(await (await app.client.$('label=Local File')).isExisting());
-  t.true(await (await app.client.$('label=Speed')).isExisting());
-  t.true(await (await app.client.$('label=YUV Color Range')).isExisting());
+  await waitForDisplayed('label=Local File');
+  await waitForDisplayed('label=Speed');
+  await waitForDisplayed('label=YUV Color Range');
 
-  await (await (await app.client.$('[data-name=is_local_file')).$('[type=checkbox]')).click();
-  t.true(await (await app.client.$('label=Network Buffering')).isExisting());
-  t.true(await (await app.client.$('label=Input')).isExisting());
-  t.true(await (await app.client.$('label=Input Format')).isExisting());
-  t.true(await (await app.client.$('label=Reconnect Delay')).isExisting());
+  await (await (await select('[data-name=is_local_file')).$('[type=checkbox]')).click();
+  await waitForDisplayed('label=Network Buffering');
+  await waitForDisplayed('label=Input');
+  await waitForDisplayed('label=Input Format');
+  await waitForDisplayed('label=Reconnect Delay');
 
-  await focusMain(t);
-  await selectSource(t, sourceName);
-  await clickRemoveSource(t);
-  await waitForSourceExist(t, sourceName, true);
-})
+  await focusMain();
+  await selectSource(sourceName);
+  await clickRemoveSource();
+  await waitForSourceExist(sourceName, true);
+  t.pass();
+});
 
 test('Create/Remove Image Slideshow and view Source Properties', async t => {
-  const app = t.context.app;
   const sourceName = 'Image Slide Show';
 
-  await addSource(t, 'Image Slide Show', sourceName);
-  await focusMain(t);
+  await addSource('Image Slide Show', sourceName);
+  await focusMain();
 
-  t.true(await sourceIsExisting(t, sourceName));
+  await selectSource(sourceName);
+  await clickSourceProperties();
 
-  await selectSource(t, sourceName);
-  await clickSourceProperties(t);
+  await focusChild();
+  await waitForDisplayed('label=Visibility Behavior');
+  await waitForDisplayed('label=Slide Mode');
+  await waitForDisplayed('label=Transition');
+  await waitForDisplayed('label=Time Between Slides (milliseconds)');
+  await waitForDisplayed('label=Transition Speed (milliseconds)');
+  await waitForDisplayed('label=Bounding Size/Aspect Ratio');
+  await waitForDisplayed('label=Image Files');
 
-  await focusChild(t);
-  t.true(await (await app.client.$('label=Visibility Behavior')).isExisting());
-  t.true(await (await app.client.$('label=Slide Mode')).isExisting());
-  t.true(await (await app.client.$('label=Transition')).isExisting());
-  t.true(await (await app.client.$('label=Time Between Slides (milliseconds)')).isExisting());
-  t.true(await (await app.client.$('label=Transition Speed (milliseconds)')).isExisting());
-  t.true(await (await app.client.$('label=Bounding Size/Aspect Ratio')).isExisting());
-  t.true(await (await app.client.$('label=Image Files')).isExisting());
-
-  await focusMain(t);
-  await selectSource(t, sourceName);
-  await clickRemoveSource(t);
-  await waitForSourceExist(t, sourceName, true);
-})
+  await focusMain();
+  await selectSource(sourceName);
+  await clickRemoveSource();
+  await waitForSourceExist(sourceName, true);
+  t.pass();
+});
 
 test('Create/Remove Text Source and view Source Properties', async t => {
-  const app = t.context.app;
   const sourceName = 'Text Source';
 
-  await addSource(t, 'Text (GDI+)', sourceName);
-  await focusMain(t);
+  await addSource('Text (GDI+)', sourceName);
+  await focusMain();
 
-  t.true(await sourceIsExisting(t, sourceName));
+  await selectSource(sourceName);
+  await clickSourceProperties();
 
-  await selectSource(t, sourceName);
-  await clickSourceProperties(t);
+  await focusChild();
 
-  await focusChild(t);
-  t.true(await (await app.client.$('label=Use Google Font')).isExisting());
-  t.true(await (await app.client.$('label=Font Family')).isExisting());
-  t.true(await (await app.client.$('label=Font Style')).isExisting());
-  t.true(await (await app.client.$('label=Font Size')).isExisting());
-  t.true(await (await app.client.$('label=Text')).isExisting());
+  await waitForDisplayed('label=Use Google Font');
+  await waitForDisplayed('label=Font Family');
+  await waitForDisplayed('label=Font Style');
+  await waitForDisplayed('label=Font Size');
+  await waitForDisplayed('label=Text');
 
-  await (await (await app.client.$('[data-name=read_from_file')).$('[type=checkbox]')).click();
-  t.true(await (await app.client.$('label=Text File (UTF-8)')).isExisting());
+  await (await (await select('[data-name=read_from_file')).$('[type=checkbox]')).click();
 
-  t.true(await (await app.client.$('label=Text Transform')).isExisting());
-  t.true(await (await app.client.$('label=Color')).isExisting());
-  t.true(await (await app.client.$('label=Opacity')).isExisting());
+  await waitForDisplayed('label=Text File (UTF-8)');
+  await waitForDisplayed('label=Text Transform');
+  await waitForDisplayed('label=Color');
+  await waitForDisplayed('label=Opacity');
 
-  await (await (await app.client.$('[data-name=gradient')).$('[type=checkbox]')).click();
-  t.true(await (await app.client.$('label=Gradient Color')).isExisting());
-  t.true(await (await app.client.$('label=Gradient Opacity')).isExisting());
-  t.true(await (await app.client.$('label=Gradient Direction')).isExisting());
+  await (await (await select('[data-name=gradient')).$('[type=checkbox]')).click();
 
-  t.true(await (await app.client.$('label=Background Color')).isExisting());
-  t.true(await (await app.client.$('label=Background Opacity')).isExisting());
-  t.true(await (await app.client.$('label=Alignment')).isExisting());
-  t.true(await (await app.client.$('label=Vertical Alignment')).isExisting());
+  await waitForDisplayed('label=Gradient Color');
+  await waitForDisplayed('label=Gradient Opacity');
+  await waitForDisplayed('label=Gradient Direction');
 
-  await (await (await app.client.$('[data-name=outline')).$('[type=checkbox]')).click();
-  t.true(await (await app.client.$('label=Outline Size')).isExisting());
-  t.true(await (await app.client.$('label=Outline Color')).isExisting());
-  t.true(await (await app.client.$('label=Outline Opacity')).isExisting());
+  await waitForDisplayed('label=Background Color');
+  await waitForDisplayed('label=Background Opacity');
+  await waitForDisplayed('label=Alignment');
+  await waitForDisplayed('label=Vertical Alignment');
 
-  await (await (await app.client.$('[data-name=chatlog')).$('[type=checkbox]')).click();
-  t.true(await (await app.client.$('label=Chatlog Line Limit')).isExisting());
+  await (await (await select('[data-name=outline')).$('[type=checkbox]')).click();
 
-  await (await (await app.client.$('[data-name=extents')).$('[type=checkbox]')).click();
-  t.true(await (await app.client.$('label=Width')).isExisting());
-  t.true(await (await app.client.$('label=Height')).isExisting());
+  await waitForDisplayed('label=Outline Size');
+  await waitForDisplayed('label=Outline Color');
+  await waitForDisplayed('label=Outline Opacity');
 
-  await focusMain(t);
-  await selectSource(t, sourceName);
-  await clickRemoveSource(t);
-  await waitForSourceExist(t, sourceName, true);
-})
+  await (await (await select('[data-name=chatlog')).$('[type=checkbox]')).click();
+
+  await waitForDisplayed('label=Chatlog Line Limit');
+
+  await (await (await select('[data-name=extents')).$('[type=checkbox]')).click();
+
+  await waitForDisplayed('label=Width');
+  await waitForDisplayed('label=Height');
+
+  await focusMain();
+  await selectSource(sourceName);
+  await clickRemoveSource();
+  await waitForSourceExist(sourceName, true);
+  t.pass();
+});
 
 test('Create/Remove Display Capture and view Source Properties', async t => {
-  const app = t.context.app;
   const sourceName = 'Display Capture';
 
-  await addSource(t, 'Display Capture', sourceName);
-  await focusMain(t);
+  await addSource('Display Capture', sourceName);
+  await focusMain();
 
-  t.true(await sourceIsExisting(t, sourceName));
+  await selectSource(sourceName);
+  await clickSourceProperties();
 
-  await selectSource(t, sourceName);
-  await clickSourceProperties(t);
-
-  await focusChild(t);
+  await focusChild();
   // this feature is in v1.3.0, uncomment once it is fully shipped
   // t.true(await (await app.client.$('label=Capture Method')).isExisting());
-  t.true(await (await app.client.$('label=Display')).isExisting());
 
-  await focusMain(t);
-  await selectSource(t, sourceName);
-  await clickRemoveSource(t);
-  await waitForSourceExist(t, sourceName, true);
-})
+  await waitForDisplayed('label=Display');
+
+  await focusMain();
+  await selectSource(sourceName);
+  await clickRemoveSource();
+  await waitForSourceExist(sourceName, true);
+  t.pass();
+});
 
 test('Create/Remove Window Capture and view Source Properties', async t => {
-  const app = t.context.app;
   const sourceName = 'Window Capture';
 
-  await addSource(t, 'Window Capture', sourceName);
-  await focusMain(t);
+  await addSource('Window Capture', sourceName);
+  await focusMain();
 
-  t.true(await sourceIsExisting(t, sourceName));
+  await selectSource(sourceName);
+  await clickSourceProperties();
 
-  await selectSource(t, sourceName);
-  await clickSourceProperties(t);
+  await focusChild();
 
-  await focusChild(t);
-  t.true(await (await app.client.$('label=Window')).isExisting());
-  t.true(await (await app.client.$('label=Capture Method')).isExisting());
-  t.true(await (await app.client.$('label=Window Match Priority')).isExisting());
+  await waitForDisplayed('label=Window');
+  await waitForDisplayed('label=Capture Method');
+  await waitForDisplayed('label=Window Match Priority');
 
-  await focusMain(t);
-  await selectSource(t, sourceName);
-  await clickRemoveSource(t);
-  await waitForSourceExist(t, sourceName, true);
-})
+  await focusMain();
+  await selectSource(sourceName);
+  await clickRemoveSource();
+  await waitForSourceExist(sourceName, true);
+  t.pass();
+});
 
 test('Create/Remove Game Capture and view Source Properties', async t => {
-  const app = t.context.app;
   const sourceName = 'Game Capture';
 
-  await addSource(t, 'Game Capture', sourceName);
-  await focusMain(t);
+  await addSource('Game Capture', sourceName);
+  await focusMain();
 
-  t.true(await sourceIsExisting(t, sourceName));
+  await selectSource(sourceName);
+  await clickSourceProperties();
 
-  await selectSource(t, sourceName);
-  await clickSourceProperties(t);
+  await focusChild();
+  await waitForDisplayed('label=Mode');
+  await waitForDisplayed('label=Hook Rate');
 
-  await focusChild(t);
-  t.true(await (await app.client.$('label=Mode')).isExisting());
-  t.true(await (await app.client.$('label=Hook Rate')).isExisting());
+  await (await (await select('[data-name=user_placeholder_use')).$('[type=checkbox]')).click();
+  await waitForDisplayed('label=Placeholder Image');
 
-  await (await (await app.client.$('[data-name=user_placeholder_use')).$('[type=checkbox]')).click();
-  t.true(await (await app.client.$('label=Placeholder Image')).isExisting());
-
-  await focusMain(t);
-  await selectSource(t, sourceName);
-  await clickRemoveSource(t);
-  await waitForSourceExist(t, sourceName, true);
-})
+  await focusMain();
+  await selectSource(sourceName);
+  await clickRemoveSource();
+  await waitForSourceExist(sourceName, true);
+  t.pass();
+});
 
 test('Create/Remove Video Capture Device and view Source Properties', async t => {
-  const app = t.context.app;
   const sourceName = 'Video Capture Device';
 
-  await addSource(t, 'Video Capture Device', sourceName);
-  await focusMain(t);
+  await addSource('Video Capture Device', sourceName);
+  await focusMain();
 
-  t.true(await sourceIsExisting(t, sourceName));
+  await selectSource(sourceName);
+  await clickSourceProperties();
 
-  await selectSource(t, sourceName);
-  await clickSourceProperties(t);
-
-  await focusChild(t);
-  t.true(await (await app.client.$('label=Device')).isExisting());
-  t.true(await (await app.client.$('label=Resolution/FPS Type')).isExisting());
-  t.true(await (await app.client.$('label=Resolution')).isExisting());
-  t.true(await (await app.client.$('label=FPS')).isExisting());
-  t.true(await (await app.client.$('label=Video Format')).isExisting());
-  t.true(await (await app.client.$('label=Color Space')).isExisting());
-  t.true(await (await app.client.$('label=Color Range')).isExisting());
-  t.true(await (await app.client.$('label=Buffering')).isExisting());
-  t.true(await (await app.client.$('label=Audio Output Mode')).isExisting());
+  await focusChild();
+  await waitForDisplayed('label=Device');
+  await waitForDisplayed('label=Resolution/FPS Type');
+  await waitForDisplayed('label=Resolution');
+  await waitForDisplayed('label=FPS');
+  await waitForDisplayed('label=Video Format');
+  await waitForDisplayed('label=Color Space');
+  await waitForDisplayed('label=Color Range');
+  await waitForDisplayed('label=Buffering');
+  await waitForDisplayed('label=Audio Output Mode');
 
   // this test fails on CI for some reason, investigating
   // await (await app.client.$('[data-name=use_custom_audio_device] input')).click();
   // t.true(await (await app.client.$('label=Audio Device')).isExisting());
 
-  await focusMain(t);
-  await selectSource(t, sourceName);
-  await clickRemoveSource(t);
-  await waitForSourceExist(t, sourceName, true);
-})
+  await focusMain();
+  await selectSource(sourceName);
+  await clickRemoveSource();
+  await waitForSourceExist(sourceName, true);
+  t.pass();
+});
 
 test('Create/Remove Audio Input Capture and view Source Properties', async t => {
-  const app = t.context.app;
   const sourceName = 'Audio Input Capture';
 
-  await addSource(t, 'Audio Input Capture', sourceName);
-  await focusMain(t);
+  await addSource('Audio Input Capture', sourceName);
+  await focusMain();
 
-  t.true(await sourceIsExisting(t, sourceName));
+  await selectSource(sourceName);
+  await clickSourceProperties();
 
-  await selectSource(t, sourceName);
-  await clickSourceProperties(t);
+  await focusChild();
+  await waitForDisplayed('label=Device');
 
-  await focusChild(t);
-  t.true(await (await app.client.$('label=Device')).isExisting());
-
-  await focusMain(t);
-  await selectSource(t, sourceName);
-  await clickRemoveSource(t);
-  await waitForSourceExist(t, sourceName, true);
-})
+  await focusMain();
+  await selectSource(sourceName);
+  await clickRemoveSource();
+  await waitForSourceExist(sourceName, true);
+  t.pass();
+});
 
 test('Create/Remove Audio Output Capture and view Source Properties', async t => {
-  const app = t.context.app;
   const sourceName = 'Audio Output Capture';
 
-  await addSource(t, 'Audio Output Capture', sourceName);
-  await focusMain(t);
+  await addSource('Audio Output Capture', sourceName);
+  await focusMain();
 
-  t.true(await sourceIsExisting(t, sourceName));
+  await selectSource(sourceName);
+  await clickSourceProperties();
 
-  await selectSource(t, sourceName);
-  await clickSourceProperties(t);
+  await focusChild();
+  await waitForDisplayed('label=Device');
 
-  await focusChild(t);
-  t.true(await (await app.client.$('label=Device')).isExisting());
-
-  await focusMain(t);
-  await selectSource(t, sourceName);
-  await clickRemoveSource(t);
-  await waitForSourceExist(t, sourceName, true);
-})
+  await focusMain();
+  await selectSource(sourceName);
+  await clickRemoveSource();
+  await waitForSourceExist(sourceName, true);
+  t.pass();
+});
 
 test('Rename source', async t => {
-  const app = t.context.app;
   const sourceName = 'MyColorSource1';
   const newSourceName = 'MyColorSource2';
 
-  await addSource(t, 'Color Source', sourceName);
+  await addSource('Color Source', sourceName);
 
-  await openRenameWindow(t, sourceName);
+  await openRenameWindow(sourceName);
 
-  await focusChild(t);
+  await focusChild();
   const form = new FormMonkey(t);
   await form.setInputValue('[data-name=sourceName]', newSourceName);
-  await (await app.client.$('button=Done')).click();
+  await clickButton('Done');
 
-  await focusMain(t);
-  t.true(await sourceIsExisting(t, newSourceName));
+  await focusMain();
+  await waitForSourceExist(newSourceName);
+  t.pass();
 });

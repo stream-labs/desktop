@@ -1,8 +1,9 @@
-import { useSpectron, test, focusMain } from '../../helpers/spectron';
+import { useSpectron, test } from '../../helpers/spectron';
 import { disableGifAnimations, makeScreenshots, useScreentest } from '../screenshoter';
 import { logIn } from '../../helpers/spectron/user';
 import { spawnSync } from 'child_process';
 import { sleep } from '../../helpers/sleep';
+import {focusMain} from "../../helpers/modules/core";
 const path = require('path');
 const _7z = require('7zip')['7z'];
 
@@ -11,7 +12,7 @@ useScreentest();
 
 test('Onboarding steps', async t => {
   const app = t.context.app;
-  await focusMain(t);
+  await focusMain();
 
   // Wait for the auth screen to appear
   await (await app.client.$('h1=Connect')).waitForDisplayed();

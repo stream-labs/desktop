@@ -1,9 +1,10 @@
 // Tools for dealing with forms in spectron
 
 import { TExecutionContext } from './index';
+import { getClient, waitForDisplayed } from '../modules/core';
 
-export async function setFormInput(t: TExecutionContext, label: string, value: string, index = 0) {
-  const $el = (await t.context.app.client.$$(`label=${label}`))[index];
+export async function setFormInput(label: string, value: string, index = 0) {
+  const $el = (await getClient().$$(`label=${label}`))[index];
   const $input = await (await $el.$('../..')).$('input');
 
   await $input.setValue(value);
@@ -34,13 +35,9 @@ export async function clickFormInput(t: TExecutionContext, label: string, index 
   await $input.click();
 }
 
-export async function setFormDropdown(
-  t: TExecutionContext,
-  label: string,
-  value: string,
-  index = 0,
-) {
-  const $el = (await t.context.app.client.$$(`label=${label}`))[index];
+export async function setFormDropdown(label: string, value: string, index = 0) {
+  await waitForDisplayed('label');
+  const $el = (await getClient().$$(`label=${label}`))[index];
   const $multiselect = await (await $el.$('../..')).$('.multiselect');
   await $multiselect.click();
 

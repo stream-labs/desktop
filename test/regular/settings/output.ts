@@ -1,18 +1,19 @@
-import { focusChild, focusMain, test, useSpectron } from '../../helpers/spectron';
+import { test, useSpectron } from '../../helpers/spectron';
 import { setFormDropdown } from '../../helpers/spectron/forms';
+import { focusChild, focusMain } from '../../helpers/modules/core';
 
 useSpectron();
 
 test('Populates simple output mode settings', async t => {
   const { app } = t.context;
 
-  await focusMain(t);
+  await focusMain();
   await (await app.client.$('.side-nav .icon-settings')).click();
 
-  await focusChild(t);
+  await focusChild();
   await (await app.client.$('li=Output')).click();
 
-  await setFormDropdown(t, 'Output Mode', 'Simple');
+  await setFormDropdown('Output Mode', 'Simple');
 
   // Video Bitrate
   const videoBitrate = await (
@@ -37,7 +38,7 @@ test('Populates simple output mode settings', async t => {
     'Software (x264)', // CI doesn't have hardware support
   ]) {
     await t.notThrowsAsync(
-      setFormDropdown(t, 'Encoder', encoder),
+      setFormDropdown('Encoder', encoder),
       `${encoder} was not found as an option`,
     );
   }
