@@ -146,6 +146,7 @@ import { HostsService } from './services/hosts';
 import { OnboardingService } from './services/onboarding';
 import { CacheUploaderService } from './services/cache-uploader';
 import { StreamlabelsService } from './services/streamlabels';
+import { TroubleshooterService } from './services/troubleshooter';
 
 export const AppServices = {
   AppService,
@@ -184,4 +185,5 @@ export const AppServices = {
   OnboardingService,
   CacheUploaderService,
   StreamlabelsService,
+  TroubleshooterService,
 };

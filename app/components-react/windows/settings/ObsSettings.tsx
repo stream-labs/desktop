@@ -23,9 +23,10 @@ export function ObsGenericSettingsForm() {
   );
 }
 
-export function ObsSettingsSection(p: HTMLAttributes<unknown>) {
+export function ObsSettingsSection(p: HTMLAttributes<unknown> & { title?: string }) {
   return (
     <div className="section">
+      {p.title && <h2>{p.title}</h2>}
       <div className="section-content">
         <Form layout="vertical">{p.children}</Form>
       </div>
