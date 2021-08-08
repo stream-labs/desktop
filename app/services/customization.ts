@@ -300,14 +300,14 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
 
   get themeOptions() {
     const options = [
-      { value: 'night-theme', title: $t('Night') },
-      { value: 'day-theme', title: $t('Day') },
+      { value: 'night-theme', label: $t('Night') },
+      { value: 'day-theme', label: $t('Day') },
     ];
 
     if (this.userService.isPrime) {
       options.push(
-        { value: 'prime-dark', title: $t('Obsidian Prime') },
-        { value: 'prime-light', title: $t('Alabaster Prime') },
+        { value: 'prime-dark', label: $t('Obsidian Prime') },
+        { value: 'prime-light', label: $t('Alabaster Prime') },
       );
     }
     return options;
