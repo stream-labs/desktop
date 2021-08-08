@@ -1,10 +1,12 @@
 import { combineReducers, createAction, createReducer, createStore, Store } from '@reduxjs/toolkit';
 import { batch, useSelector as useReduxSelector } from 'react-redux';
 import { StatefulService } from '../../services';
-import isPlainObject from 'lodash/isPlainObject';
+import { pick } from 'lodash';
 import { useOnCreate } from '../hooks';
 import { useEffect, useRef } from 'react';
 import { isSimilar } from '../../util/isDeepEqual';
+import { createBinding, TBindings } from '../shared/inputs';
+import {getDefined} from "../../util/properties-type-guards";
 
 /*
  * This file provides Redux integration in a modular way
@@ -462,6 +464,37 @@ export function createDependencyWatcher<T extends object>(watchedObject: T) {
   }
 
   return { watcherProxy, getDependentFields, getDependentValues };
+}
+
+// replacement for get/set pattern
+export function useBinding<
+  TState extends object,
+  TFieldName extends keyof TState,
+  TExtraProps extends object = {}
+>(
+  stateGetter: TState | (() => TState),
+  stateSetter?: (newTarget: Partial<TState>) => unknown,
+  extraPropsGenerator?: (fieldName: keyof TState) => TExtraProps,
+): TBindings<TState, TFieldName, TExtraProps> {
+  const bindingRef = useRef<TBindings<TState, TFieldName, TExtraProps>>();
+
+  if (!bindingRef.current) {
+    // create binding
+    bindingRef.current = createBinding(stateGetter, stateSetter, extraPropsGenerator);
+  }
+
+  // make dependencies reactive
+  useSelector(() => {
+    const binding = getDefined(bindingRef.current);
+    const dependentFields = Object.keys(binding._binding.dependencies);
+    const result = {};
+    dependentFields.forEach(fieldName => {
+      result[fieldName] = binding[fieldName];
+    });
+    return result;
+  });
+
+  return bindingRef.current;
 }
 
 export interface IReduxModule<TInitParams, TState> {

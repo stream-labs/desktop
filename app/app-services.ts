@@ -110,6 +110,7 @@ export { SpinWheelService } from 'services/widgets/settings/spin-wheel';
 export { PollService } from 'services/widgets/settings/poll';
 export { EmoteWallService } from 'services/widgets/settings/emote-wall';
 
+import { AppService } from './services/app';
 import { WindowsService } from './services/windows';
 import { CustomizationService } from './services/customization';
 import { ScenesService } from './services/scenes';
@@ -143,8 +144,11 @@ import { HotkeysService } from './services/hotkeys';
 import { WidgetsService } from './services/widgets';
 import { HostsService } from './services/hosts';
 import { OnboardingService } from './services/onboarding';
+import { CacheUploaderService } from './services/cache-uploader';
+import { StreamlabelsService } from './services/streamlabels';
 
 export const AppServices = {
+  AppService,
   WindowsService,
   ScenesService,
   NavigationService,
@@ -178,4 +182,6 @@ export const AppServices = {
   WidgetsService,
   HostsService,
   OnboardingService,
+  CacheUploaderService,
+  StreamlabelsService,
 };

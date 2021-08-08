@@ -8,7 +8,6 @@ import NavItem from 'components/shared/NavItem.vue';
 import GenericFormGroups from 'components/obs/inputs/GenericFormGroups.vue';
 import { WindowsService } from 'services/windows';
 import { ISettingsSubCategory, SettingsService } from 'services/settings/index';
-import ExtraSettings from './ExtraSettings.vue';
 import DeveloperSettings from './DeveloperSettings';
 import InstalledApps from 'components/InstalledApps.vue';
 import Hotkeys from './Hotkeys.vue';
@@ -36,7 +35,6 @@ import { debounce } from 'lodash-decorators';
     GenericFormGroups,
     NavMenu,
     NavItem,
-    ExtraSettings,
     Hotkeys,
     DeveloperSettings,
     OverlaySettings,

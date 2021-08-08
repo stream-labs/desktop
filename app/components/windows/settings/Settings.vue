@@ -75,7 +75,6 @@
           @scanCompleted="onScanCompletedHandler"
           v-slot:default="{ page, scanning }"
         >
-          <extra-settings v-if="page === 'General'" />
           <hotkeys
             v-if="page === 'Hotkeys'"
             :globalSearchStr="scanning ? '' : searchStr"

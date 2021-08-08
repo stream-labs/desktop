@@ -3,11 +3,16 @@ import * as pageComponents from './pages';
 import { useObsSettings } from './useObsSettings';
 import { ObsFormGroup } from '../../obs/ObsForm';
 import Form from '../../shared/inputs/Form';
+import css from './ObsSettings.m.less';
 
 export function ObsSettings() {
   const { page } = useObsSettings();
   const PageComponent = getPageComponent(page);
-  return <PageComponent />;
+  return (
+    <div className={css.obsSettingsWindow}>
+      <PageComponent />
+    </div>
+  );
 }
 
 export function ObsGenericSettingsForm() {

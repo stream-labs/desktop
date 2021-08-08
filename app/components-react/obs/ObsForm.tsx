@@ -57,7 +57,7 @@ function ObsInput(p: IObsInputProps) {
 
   switch (type) {
     case 'OBS_PROPERTY_BOOL':
-      return <CheckboxInput {...inputProps} style={{ marginBottom: '8px' }} />;
+      return <CheckboxInput {...inputProps} />;
     case 'OBS_PROPERTY_DOUBLE':
       return <NumberInput {...inputProps} />;
     default:
@@ -77,10 +77,11 @@ export function ObsFormGroup(p: IObsFormGroupProps) {
     newVal[ind].parameters = formData;
     p.onChange(newVal);
   }
+  const sections = p.value.filter(section => section.parameters.filter(p => p.visible).length);
 
   return (
     <div className="form-groups">
-      {p.value.map((sectionProps, ind) => (
+      {sections.map((sectionProps, ind) => (
         <div className="section" key={ind}>
           {sectionProps.nameSubCategory !== 'Untitled' && (
             <h2 className="section-title">{sectionProps.nameSubCategory}</h2>
