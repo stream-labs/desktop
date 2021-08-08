@@ -1,9 +1,15 @@
 import React from 'react';
 import { ISettingsSubCategory } from '../../services/settings';
-import { IObsInput, TObsFormData, TObsValue } from '../../components/obs/inputs/ObsInput';
+import {
+  IObsInput,
+  IObsListInput,
+  TObsFormData,
+  TObsValue,
+} from '../../components/obs/inputs/ObsInput';
 import Form from '../shared/inputs/Form';
-import { CheckboxInput, NumberInput } from '../shared/inputs';
+import { CheckboxInput, ListInput, NumberInput } from '../shared/inputs';
 import { cloneDeep } from 'lodash';
+import {$t} from "../../services/i18n";
 
 interface IObsFormProps {
   value: IObsInput<TObsValue>[];
@@ -60,6 +66,19 @@ function ObsInput(p: IObsInputProps) {
       return <CheckboxInput {...inputProps} />;
     case 'OBS_PROPERTY_DOUBLE':
       return <NumberInput {...inputProps} />;
+    case 'OBS_PROPERTY_LIST':
+      // eslint-disable-next-line no-case-declarations
+      const options = (p.value as IObsListInput<unknown>).options.map(opt => {
+        // treat 0 as an non-selected option if the description is empty
+        if (opt.value === 0 && opt.description === '') {
+          return { label: $t('Select Option'), value: 0 };
+        }
+        return {
+          value: opt.value,
+          label: opt.description,
+        };
+      });
+      return <ListInput {...inputProps} options={options} />;
     default:
       return <span style={{ color: 'red' }}>Unknown input type {type}</span>;
   }
