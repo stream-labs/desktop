@@ -17,7 +17,6 @@ import NotificationsSettings from './NotificationsSettings.vue';
 import AppearanceSettings from './AppearanceSettings';
 import ExperimentalSettings from './ExperimentalSettings.vue';
 import RemoteControlSettings from './RemoteControlSettings.vue';
-import LanguageSettings from './LanguageSettings.vue';
 import GameOverlaySettings from './GameOverlaySettings';
 import SearchablePages from 'components/shared/SearchablePages';
 import FormInput from 'components/shared/inputs/FormInput.vue';
@@ -26,7 +25,7 @@ import VirtualWebcamSettings from './VirtualWebcamSettings';
 import { MagicLinkService } from 'services/magic-link';
 import { UserService } from 'services/user';
 import Scrollable from 'components/shared/Scrollable';
-import { PlatformLogo } from 'components/shared/ReactComponent';
+import { ObsSettings, PlatformLogo } from 'components/shared/ReactComponent';
 import { $t } from 'services/i18n';
 import { debounce } from 'lodash-decorators';
 
@@ -45,7 +44,6 @@ import { debounce } from 'lodash-decorators';
     AppearanceSettings,
     RemoteControlSettings,
     ExperimentalSettings,
-    LanguageSettings,
     InstalledApps,
     GameOverlaySettings,
     FormInput,
@@ -53,6 +51,7 @@ import { debounce } from 'lodash-decorators';
     VirtualWebcamSettings,
     Scrollable,
     PlatformLogo,
+    ObsSettings,
   },
 })
 export default class Settings extends Vue {
@@ -125,6 +124,34 @@ export default class Settings extends Vue {
 
   get isLoggedIn() {
     return this.userService.views.isLoggedIn;
+  }
+
+  /**
+   * returns the list of the pages ported to React
+   */
+  get reactPages() {
+    return ['General'];
+  }
+
+  get shouldShowReactPage() {
+    return this.reactPages.includes(this.categoryName);
+  }
+
+  get shouldShowVuePage() {
+    if (this.reactPages.includes(this.categoryName)) return false;
+    return ![
+      'Hotkeys',
+      'Stream',
+      'API',
+      'Overlays',
+      'Notifications',
+      'Appearance',
+      'Experimental',
+      'Remote Control',
+      'Installed Apps',
+      'Virtual Webcam',
+      'Developer',
+    ].includes(this.categoryName);
   }
 
   getInitialCategoryName() {
