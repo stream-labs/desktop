@@ -64,6 +64,8 @@ function ObsInput(p: IObsInputProps) {
   switch (type) {
     case 'OBS_PROPERTY_BOOL':
       return <CheckboxInput {...inputProps} />;
+    case 'OBS_PROPERTY_INT':
+      return <NumberInput {...inputProps} step={1} />;
     case 'OBS_PROPERTY_DOUBLE':
       return <NumberInput {...inputProps} />;
     case 'OBS_PROPERTY_LIST':

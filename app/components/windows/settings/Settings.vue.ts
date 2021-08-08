@@ -128,7 +128,7 @@ export default class Settings extends Vue {
    * returns the list of the pages ported to React
    */
   get reactPages() {
-    return ['General'];
+    return ['General', 'Advanced'];
   }
 
   get shouldShowReactPage() {
