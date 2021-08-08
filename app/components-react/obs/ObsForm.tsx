@@ -9,13 +9,16 @@ import {
 import Form from '../shared/inputs/Form';
 import { CheckboxInput, ListInput, NumberInput } from '../shared/inputs';
 import { cloneDeep } from 'lodash';
-import {$t} from "../../services/i18n";
+import { $t } from '../../services/i18n';
 
 interface IObsFormProps {
   value: IObsInput<TObsValue>[];
   onChange: (newValue: IObsInput<TObsValue>[]) => unknown;
 }
 
+/**
+ * Renders a form with OBS inputs
+ */
 export function ObsForm(p: IObsFormProps) {
   function onInputHandler(value: IObsInput<TObsValue>, index: number) {
     const newValue = cloneDeep(p.value);
@@ -44,6 +47,9 @@ interface IObsInputProps {
   onChange: (newValue: IObsInput<TObsValue>, inputInd: number) => unknown;
 }
 
+/**
+ * Renders a single OBS input
+ */
 function ObsInput(p: IObsInputProps) {
   if (!p.value.visible) return <></>;
   const type = p.value.type;
@@ -90,6 +96,9 @@ interface IObsFormGroupProps {
   onChange: (newValue: ISettingsSubCategory[]) => unknown;
 }
 
+/**
+ * Renders a group of OBS forms
+ */
 export function ObsFormGroup(p: IObsFormGroupProps) {
   function onChangeHandler(formData: TObsFormData, ind: number) {
     const newVal = cloneDeep(p.value);

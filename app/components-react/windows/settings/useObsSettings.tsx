@@ -2,9 +2,11 @@ import React from 'react';
 import { useModule } from '../../hooks/useModule';
 import { mutation } from '../../store';
 import { Services } from '../../service-provider';
-import { ObsFormGroup } from '../../obs/ObsForm';
 import { ISettingsSubCategory } from '../../../services/settings';
 
+/**
+ * A module for components in the SettingsWindow
+ */
 class ObsSettingsModule {
   state = {
     page: '',
@@ -30,7 +32,6 @@ class ObsSettingsModule {
   }
 
   saveSettings(newSettings: ISettingsSubCategory[]) {
-    console.log('save settings', this.state.page, newSettings);
     this.settingsService.setSettings(this.state.page, newSettings);
   }
 
@@ -39,6 +40,7 @@ class ObsSettingsModule {
   }
 }
 
+// wrap the module in a hook
 export function useObsSettings() {
   return useModule(ObsSettingsModule).select();
 }
