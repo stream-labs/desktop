@@ -199,5 +199,10 @@ export class TestWidgets extends ReactComponent<{ testers: string[] }> {}
 @Component({ props: { name: { default: 'NotificationsArea' } } })
 export class NotificationsArea extends ReactComponent {}
 
-@Component({ props: { name: { default: 'ObsSettings' } } })
+@Component({
+  props: {
+    name: { default: 'ObsSettings' },
+    componentProps: { default: () => ({ page: 'General' }) },
+  },
+})
 export class ObsSettings extends ReactComponent {}

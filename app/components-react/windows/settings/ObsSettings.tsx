@@ -5,9 +5,10 @@ import { ObsFormGroup } from '../../obs/ObsForm';
 import Form from '../../shared/inputs/Form';
 import css from './ObsSettings.m.less';
 
-export function ObsSettings() {
-  const { page } = useObsSettings();
-  const PageComponent = getPageComponent(page);
+export function ObsSettings(p: { page: string }) {
+  const { setPage } = useObsSettings();
+  setPage(p.page);
+  const PageComponent = getPageComponent(p.page);
   return (
     <div className={css.obsSettingsWindow}>
       <PageComponent />
