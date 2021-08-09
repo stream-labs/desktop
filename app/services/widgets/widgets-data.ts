@@ -427,8 +427,8 @@ export const WidgetDefinitions: { [x: number]: IWidget } = {
       return `https://${host}/widgets/emote-wall?token=${token}`;
     },
 
-    width: 800,
-    height: 600,
+    width: 1280,
+    height: 720,
 
     x: 0.5,
     y: 0.5,
