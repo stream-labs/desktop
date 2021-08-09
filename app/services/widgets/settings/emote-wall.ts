@@ -64,6 +64,6 @@ export class EmoteWallService extends WidgetSettingsService<IEmoteWallData> {
   patchBeforeSend(settings: IEmoteWallSettings) {
     settings.combo_timeframe = settings.combo_timeframe * 1000;
     settings.emote_animation_duration = settings.emote_animation_duration * 1000;
-    return { settings };
+    return settings;
   }
 }
