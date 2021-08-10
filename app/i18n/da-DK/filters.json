@@ -20,7 +20,7 @@
   "Filter name": "Filternavn",
   "Add source filter": "Tilføj kildefilter",
   "No filters applied": "Ingen filtre anvendt",
-  "Source filters": "Kildefiltre",
+  "Filters for %{sourceName}": "Filters for %{sourceName}",
   "Invert Polarity": "Inverter polaritet",
   "Limiter": "Limiter",
   "Expander": "Expander",
