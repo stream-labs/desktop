@@ -20,7 +20,7 @@
   "Filter name": "篩選器名稱",
   "Add source filter": "新增來源篩選器",
   "No filters applied": "未套用篩選器",
-  "Source filters": "來源篩選器",
+  "Filters for %{sourceName}": "Filters for %{sourceName}",
   "Invert Polarity": "反轉極性",
   "Limiter": "限制器",
   "Expander": "擴展器",
