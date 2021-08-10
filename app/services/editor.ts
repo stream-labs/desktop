@@ -415,24 +415,33 @@ export class EditorService extends StatefulService<IEditorServiceState> {
 
   updateCursor(event: IMouseEvent) {
     if (this.dragHandler) {
-      this.SET_CURSOR('-webkit-grabbing');
+      this.setCursor('-webkit-grabbing');
     } else if (this.resizeRegion) {
-      this.SET_CURSOR(this.resizeRegion.cursor);
+      this.setCursor(this.resizeRegion.cursor);
     } else {
       const overResize = this.isOverResize(event);
 
       if (overResize) {
-        this.SET_CURSOR(overResize.cursor);
+        this.setCursor(overResize.cursor);
       } else {
         const overSource = this.getOverSources(event)[0];
 
         if (overSource) {
-          this.SET_CURSOR('-webkit-grab');
+          this.setCursor('-webkit-grab');
         } else {
-          this.SET_CURSOR('default');
+          this.setCursor('default');
         }
       }
     }
+  }
+
+  /**
+   * Prevents running unnecessary mutations that get synced to every
+   * window by only running a mutation if it would change the cursor.
+   * @param cursor The cursor value to set
+   */
+  private setCursor(cursor: string) {
+    if (this.state.cursor !== cursor) this.SET_CURSOR(cursor);
   }
 
   // Takes the given mouse event, and determines if it is
