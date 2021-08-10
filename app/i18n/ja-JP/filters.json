@@ -20,7 +20,7 @@
   "Filter name": "フィルター名",
   "Add source filter": "ソースフィルターを追加",
   "No filters applied": "フィルターが適用されていません",
-  "Source filters": "ソースフィルター",
+  "Filters for %{sourceName}": "Filters for %{sourceName}",
   "Invert Polarity": "極性を反転",
   "Limiter": "リミッター",
   "Expander": "エキスパンダー",
