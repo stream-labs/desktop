@@ -99,7 +99,7 @@ export default function AppsNav() {
   }
 
   return (
-    <div className={styles.wrapper}>
+    <>
       <div className={styles.scroll} ref={scroll} onScroll={handleScroll}>
         {navApps().map(app => (
           <div style={{ position: 'relative' }} key={app.id}>
@@ -131,6 +131,6 @@ export default function AppsNav() {
           <i className="icon-down" />
         </div>
       )}
-    </div>
+    </>
   );
 }
