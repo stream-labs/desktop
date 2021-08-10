@@ -1,3 +1,4 @@
+import ResizeObserver from 'resize-observer-polyfill';
 import React, { useState, useRef, useEffect } from 'react';
 import cx from 'classnames';
 import { EAppPageSlot, ILoadedApp } from '../../services/platform-apps';
@@ -22,7 +23,23 @@ export default function AppsNav() {
 
   const scroll = useRef<HTMLDivElement>(null);
 
-  useEffect(handleScroll, []);
+  const resizeObserver = new ResizeObserver((entries: ResizeObserverEntry[]) => {
+    entries.forEach(entry => {
+      if (entry.target.clientHeight) {
+        handleScroll();
+      }
+    });
+  });
+
+  useEffect(() => {
+    if (!scroll.current) return;
+    resizeObserver.observe(scroll.current);
+
+    return () => {
+      if (!scroll.current) return;
+      resizeObserver.unobserve(scroll.current);
+    };
+  }, [scroll.current]);
 
   function isSelectedApp(appId: string) {
     return currentPage === 'PlatformAppMainPage' && NavigationService.state.params.appId === appId;
