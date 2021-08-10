@@ -20,7 +20,7 @@
   "Filter name": "필터 이름",
   "Add source filter": "소스 필터 추가",
   "No filters applied": "적용된 필터 없음",
-  "Source filters": "소스 필터",
+  "Filters for %{sourceName}": "Filters for %{sourceName}",
   "Invert Polarity": "양극 전환",
   "Limiter": "리미터",
   "Expander": "익스팬더",
