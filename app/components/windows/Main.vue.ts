@@ -266,7 +266,6 @@ export default class Main extends Vue {
   updateLiveDockContraints() {
     const paddedArea = this.compactView ? 84 : 84 + 32;
     this.maxDockWidth = this.windowWidth - (this.minEditorWidth + paddedArea);
-    console.log(this.windowWidth, this.minEditorWidth, this.maxDockWidth);
   }
 
   windowSizeHandler() {
