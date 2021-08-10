@@ -20,7 +20,7 @@
   "Filter name": "Filtre ismi",
   "Add source filter": "Kaynak filtresi ekle",
   "No filters applied": "Herhangi bir filtre uygulanmadı",
-  "Source filters": "Kaynak filtreleri",
+  "Filters for %{sourceName}": "Filters for %{sourceName}",
   "Invert Polarity": "Polariteyi Tersine Çevir",
   "Limiter": "Sınırlandırıcı",
   "Expander": "Genişletici",
