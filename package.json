@@ -171,7 +171,7 @@
     "pixelmatch": "^4.0.2",
     "pngjs": "^3.3.1",
     "prettier": "1.14.0",
-    "shx": "^0.3.2",
+    "shx": "^0.3.3",
     "spectron": "^7.0.0",
     "style-loader": "^0.23.1",
     "terser-webpack-plugin": "^2.0.0",
