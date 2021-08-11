@@ -35,6 +35,7 @@ const widgetIconMap = {
   [WidgetType.SubscriberGoal]: 'fas fa-calendar',
   [WidgetType.MediaShare]: 'icon-share',
   [WidgetType.Poll]: 'icon-text-align-left',
+  [WidgetType.EmoteWall]: 'icon-smile',
 };
 
 const sourceIconMap = {

@@ -4,7 +4,7 @@
 import cloneDeep from 'lodash/cloneDeep';
 import { mutation, StatefulService } from 'services/core/stateful-service';
 import electron from 'electron';
-import Vue from 'vue';
+import Vue, { Component } from 'vue';
 import Utils from 'services/utils';
 import { Subject } from 'rxjs';
 import { throttle } from 'lodash-decorators';
@@ -67,6 +67,7 @@ import MediaShare from 'components/widgets/MediaShare';
 import AlertBox from 'components/widgets/AlertBox.vue';
 import SpinWheel from 'components/widgets/SpinWheel.vue';
 import Poll from 'components/widgets/Poll';
+import EmoteWall from 'components/widgets/EmoteWall';
 
 import { byOS, OS } from 'util/operating-systems';
 import { UsageStatisticsService } from './usage-statistics';
@@ -131,6 +132,7 @@ export function getComponents() {
     AlertBox,
     SpinWheel,
     Poll,
+    EmoteWall,
     WelcomeToPrime,
     GoLiveWindow,
     EditStreamWindow,

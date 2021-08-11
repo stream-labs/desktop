@@ -108,6 +108,7 @@ export { MediaShareService } from 'services/widgets/settings/media-share';
 export { AlertBoxService } from 'services/widgets/settings/alert-box';
 export { SpinWheelService } from 'services/widgets/settings/spin-wheel';
 export { PollService } from 'services/widgets/settings/poll';
+export { EmoteWallService } from 'services/widgets/settings/emote-wall';
 
 import { WindowsService } from './services/windows';
 import { CustomizationService } from './services/customization';

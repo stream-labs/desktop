@@ -1,53 +1,59 @@
-import { focusLibrary, focusMain, test, TExecutionContext, useSpectron } from '../helpers/spectron';
+import { test, TExecutionContext, useSpectron } from '../helpers/spectron';
 import { logIn } from '../helpers/spectron/user';
 import { sleep } from '../helpers/sleep';
 import { FormMonkey } from '../helpers/form-monkey';
-import { sceneExisting } from '../helpers/spectron/scenes';
+import { sceneExisting } from '../helpers/modules/scenes';
+import {
+  click,
+  focusMain,
+  focusWindow,
+  isDisplayed,
+  waitForDisplayed,
+} from '../helpers/modules/core';
 
 useSpectron();
 
 const OVERLAY_NAME = 'Portals';
 const OVERLAY_SCENES = ['Live Scene', 'Starting Soon', 'Be Right Back', 'Offline'];
 
+// Focuses the Library webview
+export async function focusLibrary() {
+  // doesn't work without delay, probably need to wait until load
+  await sleep(2000);
+  await focusWindow(/streamlabs\.com\/library/);
+}
+
 test('Installing a theme', async (t: TExecutionContext) => {
-  const { app } = t.context;
   const formMonkey = new FormMonkey(t);
 
   await logIn(t);
-  await (await app.client.$('div[title=Themes]')).click();
-
-  await focusLibrary(t);
-
-  // search a theme
+  await click('div[title=Themes]');
+  await focusLibrary();
   await formMonkey.setInputValue('input', OVERLAY_NAME);
 
   // the input field has a debounce search
   await sleep(2000);
   // wait items load
-  await (await app.client.$('.market-item')).click();
+  await click('.market-item');
 
   // install overlay
-  await (await app.client.$('button=Install Overlay')).waitForDisplayed();
   await sleep(2000); // wait for the scroll animation
-  await (await app.client.$('button=Install Overlay')).click();
+  await click('button=Install Overlay');
 
   // wait for installation complete
-  await focusMain(t);
-  await (await app.client.$('.editor-page')).waitForExist({ timeout: 60000 });
+  await focusMain();
+  await waitForDisplayed('.editor-page', { timeout: 60000 });
 
   // Should've loaded the overlay as a new scene collection
-  t.true(await (await app.client.$(`span=${OVERLAY_NAME}`)).isExisting());
+  await waitForDisplayed(`span=${OVERLAY_NAME}`);
 
   // Should've populated scenes
   for (const scene of OVERLAY_SCENES) {
-    t.true(await sceneExisting(t, scene), `Scene ${scene} was not found`);
+    t.true(await sceneExisting(scene), `Scene ${scene} should exist`);
   }
 
   // Should've populated sources (this checks Starting Soon scene sources)
   for (const source of ['Starting']) {
-    t.true(
-      await (await app.client.$(`span.item-title=${source}`)).isExisting(),
-      `Source ${source}`,
-    );
+    t.true(await isDisplayed(`span.item-title=${source}`), `Source ${source} should exist`);
   }
 });
