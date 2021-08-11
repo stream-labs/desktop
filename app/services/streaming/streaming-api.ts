@@ -6,6 +6,7 @@ import { IFacebookStartStreamOptions } from '../platforms/facebook';
 import { IStreamError } from './stream-error';
 import { ICustomStreamDestination } from '../settings/streaming';
 import { ITiktokStartStreamOptions } from '../platforms/tiktok';
+import {TPlatform} from "../platforms";
 
 export enum EStreamingState {
   Offline = 'offline',
@@ -67,6 +68,10 @@ export interface IStreamSettings {
 export interface IGoLiveSettings extends IStreamSettings {
   optimizedProfile?: IEncoderProfile;
   tweetText?: string;
+  prepopulateOptions?: {
+    platform: TPlatform;
+    eventId: string;
+  };
 }
 
 export interface IPlatformFlags {

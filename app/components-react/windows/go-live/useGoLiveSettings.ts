@@ -32,12 +32,15 @@ export class GoLiveSettingsModule extends StreamInfoView<IGoLiveSettingsState> {
     optimizedProfile: undefined,
     advancedMode: false,
     needPrepopulate: true,
+    prepopulateOptions: undefined,
   };
 
   // initial setup
   init(params: { isUpdateMode: boolean; form: FormInstance }) {
     this.form = params.form;
     this.state.isUpdateMode = params.isUpdateMode;
+    this.state.prepopulateOptions = (Services.WindowsService.state.child
+      .queryParams as unknown) as IGoLiveSettingsState['prepopulateOptions'];
     this.prepopulate();
   }
 
@@ -45,7 +48,7 @@ export class GoLiveSettingsModule extends StreamInfoView<IGoLiveSettingsState> {
    * Fetch settings for each platform
    */
   async prepopulate() {
-    await Services.StreamingService.actions.return.prepopulateInfo();
+    await Services.StreamingService.actions.return.prepopulateInfo(this.state.prepopulateOptions);
     const view = new StreamInfoView({});
     const settings = {
       ...view.savedSettings, // copy saved stream settings

@@ -161,8 +161,8 @@ export class StreamingService
   /**
    * sync the settings from platforms with the local state
    */
-  async prepopulateInfo(platforms?: TPlatform[]) {
-    platforms = platforms || this.views.enabledPlatforms;
+  async prepopulateInfo(options?: IGoLiveSettings['prepopulateOptions']) {
+    const platforms = this.views.enabledPlatforms;
     this.UPDATE_STREAM_INFO({ lifecycle: 'prepopulate', error: null });
 
     // prepopulate settings for all platforms in parallel mode
@@ -196,7 +196,8 @@ export class StreamingService
         }
 
         try {
-          await service.prepopulateInfo();
+          const eventId = options?.platform === service.platform ? options.eventId : null;
+          await service.prepopulateInfo(eventId);
         } catch (e: unknown) {
           // cast all PLATFORM_REQUEST_FAILED errors to PREPOPULATE_FAILED
           if (e instanceof StreamError) {
@@ -755,7 +756,7 @@ export class StreamingService
     }
   }
 
-  showGoLiveWindow() {
+  showGoLiveWindow(prepopulateOptions?: IGoLiveSettings['prepopulateOptions']) {
     const height = this.views.linkedPlatforms.length > 1 ? 750 : 650;
     const width = 900;
 
@@ -772,6 +773,7 @@ export class StreamingService
         height,
         width,
       },
+      queryParams: prepopulateOptions,
     });
   }
 

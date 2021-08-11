@@ -10,6 +10,8 @@ import { ListInput, TimeInput } from '../../shared/inputs';
 import Form, { useForm } from '../../shared/inputs/Form';
 import { confirmAsync } from '../../modals';
 import { IStreamEvent, useStreamScheduler } from './useStreamScheduler';
+import { Services } from '../../service-provider';
+import {getDefined} from "../../../util/properties-type-guards";
 
 /**
  * StreamScheduler page layout
@@ -194,9 +196,11 @@ function EventSettingsModal() {
  * Renders Schedule/Save/Delete buttons
  */
 function ModalButtons() {
+  const { StreamingService } = Services;
   const { selectedEvent, remove, submit, isLoading } = useStreamScheduler();
   const shouldShowSave = !!selectedEvent;
   const shouldShowSchedule = !selectedEvent;
+  const shouldShowGoLive = selectedEvent && selectedEvent.status === 'scheduled';
 
   // allow removing only those events which the user has not streamed to
   // removing the event with the finished stream leads to deletion of recorded video too
@@ -207,6 +211,15 @@ function ModalButtons() {
    */
   async function onDeleteClick() {
     if (await confirmAsync($t('Delete the event?'))) remove();
+  }
+
+  async function goLive() {
+    const event = getDefined(selectedEvent);
+    await submit();
+    await StreamingService.actions.showGoLiveWindow({
+      platform: event.platform,
+      eventId: event.id,
+    });
   }
 
   return (
@@ -220,8 +233,12 @@ function ModalButtons() {
         )}
       </Col>
       <Col flex={'50%'}>
-        {/*/!* GO LIVE BUTTON *!/*/}
-        {/*{shouldShowGoLive && <Button type="primary">{$t('Go Live')}</Button>}*/}
+        {/* GO LIVE BUTTON */}
+        {shouldShowGoLive && (
+          <Button onClick={goLive} type="primary">
+            {$t('Go Live')}
+          </Button>
+        )}
 
         {/* SAVE BUTTON */}
         {shouldShowSave && (

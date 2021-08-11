@@ -173,7 +173,7 @@ export interface IPlatformService {
 
   afterStopStream?: () => Promise<void>;
 
-  prepopulateInfo: () => Promise<unknown>;
+  prepopulateInfo: (eventId?: string) => Promise<unknown>;
 
   scheduleStream?: (startTime: number, info: TStartStreamOptions) => Promise<any>;
 

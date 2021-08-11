@@ -404,14 +404,20 @@ export class YoutubeService
   /**
    * returns perilled data for the GoLive window
    */
-  async prepopulateInfo(): Promise<void> {
+  async prepopulateInfo(eventId?: string): Promise<void> {
     if (!this.state.liveStreamingEnabled) {
       throw throwStreamError('YOUTUBE_STREAMING_DISABLED');
     }
-    const settings = this.state.settings;
-    this.UPDATE_STREAM_SETTINGS({
-      description: settings.description || (await this.fetchDefaultDescription()),
-    });
+    if (eventId) {
+      const settings = await this.fetchStartStreamOptionsForBroadcast(eventId);
+      this.UPDATE_STREAM_SETTINGS(settings);
+    } else {
+      const settings = this.state.settings;
+      this.UPDATE_STREAM_SETTINGS({
+        description: settings.description || (await this.fetchDefaultDescription()),
+      });
+    }
+
     if (!this.state.categories.length) this.SET_CATEGORIES(await this.fetchCategories());
     this.SET_PREPOPULATED(true);
   }
