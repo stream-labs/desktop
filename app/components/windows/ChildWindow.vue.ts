@@ -8,14 +8,13 @@ import TitleBar from '../TitleBar.vue';
 @Component({
   components: {
     TitleBar,
-    ...getComponents()
-  }
+    ...getComponents(),
+  },
 })
 export default class ChildWindow extends Vue {
   @Inject() private windowsService: WindowsService;
 
-
-  components: { name: string; isShown: boolean; title: string; }[] = [];
+  components: { name: string; isShown: boolean; title: string }[] = [];
   private refreshingTimeout = 0;
 
   mounted() {
@@ -29,7 +28,6 @@ export default class ChildWindow extends Vue {
   get options() {
     return this.windowsService.state.child;
   }
-
 
   get currentComponent() {
     return this.components[this.components.length - 1];

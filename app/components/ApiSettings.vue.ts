@@ -7,10 +7,9 @@ import { ITcpServerServiceApi, ITcpServersSettings } from '../services/api/tcp-s
 import { ISettingsSubCategory } from '../services/settings';
 
 @Component({
-  components: { GenericFormGroups, ObsTextInput }
+  components: { GenericFormGroups, ObsTextInput },
 })
 export default class ApiSettings extends Vue {
-
   @Inject()
   tcpServerService: ITcpServerServiceApi;
 
@@ -26,7 +25,7 @@ export default class ApiSettings extends Vue {
     return {
       description: 'API Token',
       value: this.tcpServerService.state.token,
-      masked: true
+      masked: true,
     };
   }
 
@@ -34,12 +33,10 @@ export default class ApiSettings extends Vue {
     this.tcpServerService.listen();
   }
 
-
   restoreDefaults() {
     this.tcpServerService.setSettings(this.tcpServerService.getDefaultSettings());
     this.settingsFormData = this.getApiSettingsFormData();
   }
-
 
   save(settingsData: ISettingsSubCategory[]) {
     const settings: Partial<ITcpServersSettings> = {};
@@ -56,5 +53,4 @@ export default class ApiSettings extends Vue {
   private getApiSettingsFormData(): ISettingsSubCategory[] {
     return this.tcpServerService.getApiSettingsFormData();
   }
-
 }

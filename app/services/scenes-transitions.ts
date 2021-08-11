@@ -2,8 +2,10 @@ import { mutation, StatefulService } from './core/stateful-service';
 import * as obs from '../../obs-api';
 import {
   getPropertiesFormData,
-  IObsListOption, setPropertiesFormData,
-  TObsFormData, TObsValue
+  IObsListOption,
+  setPropertiesFormData,
+  TObsFormData,
+  TObsValue,
 } from 'components/obs/inputs/ObsInput';
 import { Inject } from './core/injector';
 import { WindowsService } from './windows';
@@ -17,7 +19,6 @@ interface ISceneTransitionsState {
 }
 
 export class ScenesTransitionsService extends StatefulService<ISceneTransitionsState> {
-
   static initialState = {
     duration: 300,
     type: '',
@@ -26,18 +27,15 @@ export class ScenesTransitionsService extends StatefulService<ISceneTransitionsS
   @Inject()
   windowsService: WindowsService;
 
-
   init() {
     // Set the default transition type
     this.setType('cut_transition');
   }
 
-
   @mutation()
   private SET_TYPE(type: string) {
     this.state.type = type;
   }
-
 
   @mutation()
   private SET_DURATION(duration: number) {
@@ -50,9 +48,12 @@ export class ScenesTransitionsService extends StatefulService<ISceneTransitionsS
       { description: $t('transitions.fade_transition'), value: 'fade_transition' },
       { description: $t('transitions.swipe_transition'), value: 'swipe_transition' },
       { description: $t('transitions.slide_transition'), value: 'slide_transition' },
-      { description: $t('transitions.fade_to_color_transition'), value: 'fade_to_color_transition' },
+      {
+        description: $t('transitions.fade_to_color_transition'),
+        value: 'fade_to_color_transition',
+      },
       { description: $t('transitions.wipe_transition'), value: 'wipe_transition' },
-      { description: $t('transitions.obs_stinger_transition'), value: 'obs_stinger_transition' }
+      { description: $t('transitions.obs_stinger_transition'), value: 'obs_stinger_transition' },
     ];
   }
 
@@ -60,7 +61,6 @@ export class ScenesTransitionsService extends StatefulService<ISceneTransitionsS
     const transition = this.getCurrentTransition();
     transition.start(this.state.duration, scene);
   }
-
 
   release() {
     this.getCurrentTransition().release();
@@ -75,7 +75,7 @@ export class ScenesTransitionsService extends StatefulService<ISceneTransitionsS
     return this.getCurrentTransition().settings;
   }
 
-  setSettings(settings: Dictionary<TObsValue>)  {
+  setSettings(settings: Dictionary<TObsValue>) {
     this.getCurrentTransition().update(settings);
   }
 
@@ -90,7 +90,6 @@ export class ScenesTransitionsService extends StatefulService<ISceneTransitionsS
   private getCurrentTransition() {
     return obs.Global.getOutputSource(0) as obs.ITransition;
   }
-
 
   setType(type: string) {
     const oldTransition = this.getCurrentTransition() as obs.ITransition;
@@ -112,11 +111,9 @@ export class ScenesTransitionsService extends StatefulService<ISceneTransitionsS
     }
   }
 
-
   setDuration(duration: number) {
     this.SET_DURATION(duration);
   }
-
 
   getFormData() {
     return {
@@ -124,16 +121,15 @@ export class ScenesTransitionsService extends StatefulService<ISceneTransitionsS
         description: $t('transitions.transitionType'),
         name: 'type',
         value: this.state.type,
-        options: this.getTypes()
+        options: this.getTypes(),
       },
       duration: {
         description: $t('transitions.duration'),
         name: 'duration',
-        value: this.state.duration
-      }
+        value: this.state.duration,
+      },
     };
   }
-
 
   showSceneTransitions() {
     this.windowsService.showWindow({
@@ -141,8 +137,8 @@ export class ScenesTransitionsService extends StatefulService<ISceneTransitionsS
       title: $t('transitions.sceneTransition'),
       size: {
         width: 500,
-        height: 600
-      }
+        height: 600,
+      },
     });
   }
 }

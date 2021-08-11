@@ -50,10 +50,7 @@ export class SceneItemsNode extends Node<ISchema, {}> {
   scenesService: ScenesService;
 
   getItems(context: IContext) {
-    return context.scene
-      .getNodes()
-      .slice()
-      .reverse();
+    return context.scene.getNodes().slice().reverse();
   }
 
   save(context: IContext): Promise<void> {

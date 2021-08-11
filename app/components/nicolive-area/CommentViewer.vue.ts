@@ -1,13 +1,8 @@
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import { Inject } from 'services/core/injector';
-import {
-  NicoliveCommentViewerService,
-} from 'services/nicolive-program/nicolive-comment-viewer';
-import {
-  WrappedChat,
-  WrappedChatWithComponent
-} from 'services/nicolive-program/WrappedChat';
+import { NicoliveCommentViewerService } from 'services/nicolive-program/nicolive-comment-viewer';
+import { WrappedChat, WrappedChatWithComponent } from 'services/nicolive-program/WrappedChat';
 import CommentForm from './CommentForm.vue';
 import CommentFilter from './CommentFilter.vue';
 import CommentSettings from './CommentSettings.vue';
@@ -42,7 +37,7 @@ const componentMap: { [type in ChatComponentType]: Vue.Component } = {
     GiftComment,
     EmotionComment,
     SystemMessage,
-  }
+  },
 })
 export default class CommentViewer extends Vue {
   @Inject()
@@ -129,7 +124,7 @@ export default class CommentViewer extends Vue {
       },
     });
     menu.append({
-      id: 'Copy comment owner\'s id',
+      id: "Copy comment owner's id",
       label: 'ユーザーIDをコピー',
       click: () => {
         clipboard.writeText(item.value.user_id);
@@ -177,7 +172,7 @@ export default class CommentViewer extends Vue {
 
   mounted() {
     const sentinelEl = this.$refs.sentinel as HTMLElement;
-    const ioCallback: IntersectionObserverCallback = (entries) => {
+    const ioCallback: IntersectionObserverCallback = entries => {
       this.isLatestVisible = entries[0].isIntersecting;
     };
     const ioOptions = {
@@ -195,7 +190,7 @@ export default class CommentViewer extends Vue {
     } else {
       const popouts = this.nicoliveCommentViewerService.recentPopoutsLocalFiltered;
       const opt = {
-        top: -popouts.length * 32 /* item's height */
+        top: -popouts.length * 32, // item's height
       };
       scrollEl.scrollBy(opt);
     }

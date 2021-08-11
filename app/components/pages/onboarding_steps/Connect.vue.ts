@@ -8,8 +8,8 @@ import NAirLogo from '../../../../media/images/n-air-logo.svg';
 
 @Component({
   components: {
-    NAirLogo
-  }
+    NAirLogo,
+  },
 })
 export default class Connect extends Vue {
   @Inject() userService: UserService;
@@ -26,7 +26,7 @@ export default class Connect extends Vue {
       },
       onAuthFinish: () => {
         this.onboardingService.next();
-      }
+      },
     });
   }
 
@@ -34,7 +34,7 @@ export default class Connect extends Vue {
     if (this.loadingState) return 'icon-spinner icon-spin';
 
     return {
-      niconico: 'icon-niconico'
+      niconico: 'icon-niconico',
     }[platform];
   }
 
@@ -45,5 +45,4 @@ export default class Connect extends Vue {
   get isSecurityUpgrade() {
     return this.onboardingService.options.isSecurityUpgrade;
   }
-
 }

@@ -13,7 +13,6 @@ interface ISchema {
 
 // This is the root node of the config file
 export class RootNode extends Node<ISchema, {}> {
-
   schemaVersion = 2;
 
   async save(): Promise<void> {
@@ -31,7 +30,7 @@ export class RootNode extends Node<ISchema, {}> {
       sources,
       scenes,
       transitions,
-      hotkeys
+      hotkeys,
     };
   }
 

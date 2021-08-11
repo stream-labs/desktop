@@ -12,11 +12,10 @@ import NAirObsLogo from '../../../../media/images/n-air-obs-logo.svg';
 @Component({
   components: {
     Multiselect,
-    NAirObsLogo
-  }
+    NAirObsLogo,
+  },
 })
 export default class ObsImport extends Vue {
-
   @Inject()
   onboardingService: OnboardingService;
 
@@ -35,7 +34,7 @@ export default class ObsImport extends Vue {
   selectedProfile = this.profiles[0] || '';
 
   created() {
-    if (this.sceneCollections && (this.sceneCollections.length > 0)) return;
+    if (this.sceneCollections && this.sceneCollections.length > 0) return;
     this.startFresh();
   }
 
@@ -83,5 +82,4 @@ export default class ObsImport extends Vue {
   next() {
     this.onboardingService.next();
   }
-
 }

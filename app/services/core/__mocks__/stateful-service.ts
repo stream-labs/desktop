@@ -2,20 +2,19 @@ import { Service } from '../service';
 import { merge } from 'lodash';
 
 export function mutation() {
-  return function(x: any) {
+  return function (x: any) {
     return x;
   };
 }
 
 export class StatefulService<State> extends Service {
-
   static store: { [serviceName: string]: any } = {};
   static overrideState: { [serviceName: string]: any } = null;
 
   get store(): { [serviceName: string]: any } {
     return {
       state: StatefulService.store,
-      watch() {}
+      watch() {},
     };
   }
 

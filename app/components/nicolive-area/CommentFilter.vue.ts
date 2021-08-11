@@ -4,7 +4,10 @@ import { Inject } from 'services/core/injector';
 import { NicoliveCommentFilterService } from 'services/nicolive-program/nicolive-comment-filter';
 import { FilterType, FilterRecord } from 'services/nicolive-program/ResponseTypes';
 import { UserService } from 'services/user';
-import { NicoliveFailure, openErrorDialogFromFailure } from 'services/nicolive-program/NicoliveFailure';
+import {
+  NicoliveFailure,
+  openErrorDialogFromFailure,
+} from 'services/nicolive-program/NicoliveFailure';
 
 @Component({})
 export default class CommentFilter extends Vue {
@@ -30,7 +33,7 @@ export default class CommentFilter extends Vue {
   async deleteFilter(record: FilterRecord) {
     try {
       this.deleting = true;
-      await this.nicoliveCommentFilterService.deleteFilters([ record.id ]);
+      await this.nicoliveCommentFilterService.deleteFilters([record.id]);
     } catch (caught) {
       if (caught instanceof NicoliveFailure) {
         await openErrorDialogFromFailure(caught);

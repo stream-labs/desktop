@@ -35,7 +35,7 @@ export class ProfanityFilterService extends Service {
     w: '(w|w\\.|w\\-|ω|ψ|Ψ)',
     x: '(x|x\\.|x\\-|Χ|χ)',
     y: '(y|y\\.|y\\-|¥|γ|ÿ|ý|Ÿ|Ý)',
-    z: '(z|z\\.|z\\-|Ζ)'
+    z: '(z|z\\.|z\\-|Ζ)',
   };
 
   badWords = [
@@ -93,7 +93,7 @@ export class ProfanityFilterService extends Service {
     /twat/,
     /vagina/,
     /(\s|^)wank/,
-    /whore/
+    /whore/,
   ];
 
   DEFAULT_REPLACEMENTS = [
@@ -106,7 +106,7 @@ export class ProfanityFilterService extends Service {
     'puppy',
     'joyful',
     'rainbows',
-    'unicorn'
+    'unicorn',
   ];
 
   DEFAULT_REGEX = /(?:)/;
@@ -121,7 +121,7 @@ export class ProfanityFilterService extends Service {
     Object.keys(this.leetReplace).forEach(letter => {
       badWordsStrings = badWordsStrings.replace(
         new RegExp(/([^\\])/.source + letter, 'gi'),
-        '$1' + this.leetReplace[letter]
+        '$1' + this.leetReplace[letter],
       );
     });
 
@@ -139,9 +139,9 @@ export class ProfanityFilterService extends Service {
     const mergedOptions: IProfanityFilterOptions = Object.assign(
       {
         useDefaultRegex: true,
-        extraRegex: null
+        extraRegex: null,
       },
-      options
+      options,
     );
 
     if (mergedOptions.useDefaultRegex) {
@@ -166,16 +166,16 @@ export class ProfanityFilterService extends Service {
         extraRegex: null,
         useDefaultRegex: true,
         replace: false,
-        obscureSymbol: '*'
+        obscureSymbol: '*',
       },
-      options
+      options,
     );
 
-    const matches:any[] = [];
+    const matches: any[] = [];
     let purified = str;
 
     if (mergedOptions.extraRegex) {
-      purified = purified.replace(mergedOptions.extraRegex, (val) => {
+      purified = purified.replace(mergedOptions.extraRegex, val => {
         matches.push(val);
         if (mergedOptions.replace) {
           return mergedOptions.replacementsList[
@@ -192,7 +192,7 @@ export class ProfanityFilterService extends Service {
     }
 
     if (mergedOptions.useDefaultRegex) {
-      purified = purified.replace(this.DEFAULT_REGEX, (val) => {
+      purified = purified.replace(this.DEFAULT_REGEX, val => {
         matches.push(val);
         if (mergedOptions.replace) {
           return mergedOptions.replacementsList[
@@ -211,7 +211,7 @@ export class ProfanityFilterService extends Service {
     return [purified, matches];
   }
 
-  processString(str = '', options = {}):[string, boolean] {
+  processString(str = '', options = {}): [string, boolean] {
     const mergedOptions = Object.assign(
       {
         replacementsList: this.DEFAULT_REPLACEMENTS,
@@ -219,15 +219,15 @@ export class ProfanityFilterService extends Service {
         useDefaultRegex: true,
         replace: false,
         isName: false,
-        obscureSymbol: '*'
+        obscureSymbol: '*',
       },
-      options
+      options,
     );
 
     // split the string into the words
     const words = str.split(' ');
     let wordsNew = words;
-    const badWordsPos:any[] = [];
+    const badWordsPos: any[] = [];
 
     words.forEach((word, i) => {
       // clean the word from all special characters

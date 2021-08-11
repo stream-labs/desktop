@@ -29,12 +29,11 @@ export class ScenesNode extends ArrayNode<ISchema, IContext, Scene> {
     return {
       name: scene.name,
       sceneId: scene.id,
-      slots
+      slots,
     };
   }
 
   async loadItem(obj: ISchema, context: IContext): Promise<void> {
-
     // scene can be already created if it is a scene-source of previous loaded scene
     let scene = this.scenesService.getScene(obj.sceneId);
 
@@ -42,7 +41,7 @@ export class ScenesNode extends ArrayNode<ISchema, IContext, Scene> {
     if (!scene) {
       scene = this.scenesService.createScene(obj.name, {
         makeActive: true,
-        sceneId: obj.sceneId
+        sceneId: obj.sceneId,
       });
     }
 
@@ -61,12 +60,12 @@ export class ScenesNode extends ArrayNode<ISchema, IContext, Scene> {
   }
 
   migrate(version: number) {
-    if (version == 1) {
+    if (version === 1) {
       // version 1 doesn't have sceneId, so generate a random id
       this.data.items = this.data.items.map(item => {
         if (item.sceneId) return item;
-        return ({ ...item, sceneId: uuid()});
-      })
+        return { ...item, sceneId: uuid() };
+      });
     }
   }
 }

@@ -46,8 +46,10 @@ interface IOBSOutputSignalInfo {
   error: string;
 }
 
-export class StreamingService extends StatefulService<IStreamingServiceState>
-  implements IStreamingServiceApi {
+export class StreamingService
+  extends StatefulService<IStreamingServiceState>
+  implements IStreamingServiceApi
+{
   @Inject() settingsService: SettingsService;
   @Inject() userService: UserService;
   @Inject() windowsService: WindowsService;
@@ -80,11 +82,9 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
   init() {
     super.init();
 
-    obs.NodeObs.OBS_service_connectOutputSignals(
-      (info: IOBSOutputSignalInfo) => {
-        this.handleOBSOutputSignal(info);
-      }
-    );
+    obs.NodeObs.OBS_service_connectOutputSignals((info: IOBSOutputSignalInfo) => {
+      this.handleOBSOutputSignal(info);
+    });
   }
 
   getModel() {
@@ -124,35 +124,38 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
           buttons: [$t('common.close')],
           noLink: true,
         },
-        done => resolve(done)
+        done => resolve(done),
       );
     });
   }
 
   /**
    * 配信開始ボタンまたはショートカットキーによる配信開始(対話可能)
-   * 
+   *
    * 現在ログインされているユーザーで、配信可能なチャンネルが存在する場合には、配信番組選択ウィンドウを開きます。
-   * 
+   *
    * 配信番組選択ウィンドウで「配信開始」ボタンを押した時にもこのメソッドが呼ばれ、
    * options.nicoliveProgramSelectorResult に、ウィンドウで選ばれた配信種別と
    * チャンネル番組の場合は番組IDが与えられます。
-   * 
+   *
    * 配信番組選択ウィンドウからの呼び出しの場合、および現在ログインされているユーザーで
    * 配信可能なチャンネルが存在しない場合には、配信開始を試みます。
    */
   async toggleStreamingAsync(
     options: {
       nicoliveProgramSelectorResult?: {
-        providerType: 'channel' | 'user',
+        providerType: 'channel' | 'user';
         channelProgramId?: string;
-      },
-      mustShowOptimizationDialog?: boolean
-    } = {}
+      };
+      mustShowOptimizationDialog?: boolean;
+    } = {},
   ) {
-    const opts = Object.assign({
-      mustShowOptimizationDialog: false
-    }, options);
+    const opts = Object.assign(
+      {
+        mustShowOptimizationDialog: false,
+      },
+      options,
+    );
 
     if (this.isStreaming) {
       this.toggleStreaming();
@@ -177,8 +180,8 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
               componentName: 'NicoliveProgramSelector',
               size: {
                 width: 800,
-                height: 800
-              }
+                height: 800,
+              },
             });
             return;
           }
@@ -193,10 +196,10 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
         // ユーザー番組については、即時番組があればそれを優先し、なければ予約番組の番組IDを採用する。
         const programId =
           opts.nicoliveProgramSelectorResult &&
-            opts.nicoliveProgramSelectorResult.providerType === 'channel' &&
-            opts.nicoliveProgramSelectorResult.channelProgramId ?
-            opts.nicoliveProgramSelectorResult.channelProgramId :
-            (broadcastableUserProgram.programId || broadcastableUserProgram.nextProgramId)
+          opts.nicoliveProgramSelectorResult.providerType === 'channel' &&
+          opts.nicoliveProgramSelectorResult.channelProgramId
+            ? opts.nicoliveProgramSelectorResult.channelProgramId
+            : broadcastableUserProgram.programId || broadcastableUserProgram.nextProgramId;
 
         // 配信番組選択ウィンドウでユーザー番組を選んだが、配信可能なユーザー番組がない場合
         if (!programId) {
@@ -209,12 +212,16 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
           return this.showNotBroadcastingMessageBox();
         }
         if (this.customizationService.optimizeForNiconico) {
-          return this.optimizeForNiconicoAndStartStreaming(setting, opts.mustShowOptimizationDialog);
+          return this.optimizeForNiconicoAndStartStreaming(
+            setting,
+            opts.mustShowOptimizationDialog,
+          );
         }
       } catch (e) {
-        const message = e instanceof Response
-          ? $t('streaming.broadcastStatusFetchingError.httpError', { statusText: e.statusText })
-          : $t('streaming.broadcastStatusFetchingError.default');
+        const message =
+          e instanceof Response
+            ? $t('streaming.broadcastStatusFetchingError.httpError', { statusText: e.statusText })
+            : $t('streaming.broadcastStatusFetchingError.default');
 
         return new Promise(resolve => {
           electron.remote.dialog.showMessageBox(
@@ -225,7 +232,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
               buttons: [$t('common.close')],
               noLink: true,
             },
-            done => resolve(done)
+            done => resolve(done),
           );
         });
       } finally {
@@ -237,15 +244,12 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
 
   toggleStreaming() {
     if (this.state.streamingStatus === EStreamingState.Offline) {
-      const shouldConfirm = this.settingsService.state.General
-        .WarnBeforeStartingStream;
+      const shouldConfirm = this.settingsService.state.General.WarnBeforeStartingStream;
       const confirmText = $t('streaming.startStreamingConfirm');
 
       if (shouldConfirm && !confirm(confirmText)) return;
 
-      this.powerSaveId = electron.remote.powerSaveBlocker.start(
-        'prevent-display-sleep'
-      );
+      this.powerSaveId = electron.remote.powerSaveBlocker.start('prevent-display-sleep');
       obs.NodeObs.OBS_service_startStreaming();
 
       return;
@@ -256,8 +260,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
       this.state.streamingStatus === EStreamingState.Live ||
       this.state.streamingStatus === EStreamingState.Reconnecting
     ) {
-      const shouldConfirm = this.settingsService.state.General
-        .WarnBeforeStoppingStream;
+      const shouldConfirm = this.settingsService.state.General.WarnBeforeStoppingStream;
       const confirmText = $t('streaming.stopStreamingConfirm');
 
       if (shouldConfirm && !confirm(confirmText)) return;
@@ -297,8 +300,13 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     const categoryOverhead = 22.4 + 4 + 8 + 8 + 12;
     const lineHeight = 20.8;
 
-    const overhead = windowHeader + descriptionLabel + useHardwareCheck + doNotShowCheck
-      + contentOverhead + modalControls;
+    const overhead =
+      windowHeader +
+      descriptionLabel +
+      useHardwareCheck +
+      doNotShowCheck +
+      contentOverhead +
+      modalControls;
 
     const numCategories = settings.info.length;
     const numLines = settings.info.reduce((sum, tuple) => sum + tuple[1].length, 0);
@@ -311,7 +319,10 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
    * @param streamingSetting 番組の情報から得られる最適化の前提となる情報
    * @param mustShowDialog trueなら、設定に変更が必要ない場合や、最適化ダイアログを表示しない接敵のときであっても最適化ダイアログを表示する。
    */
-  private async optimizeForNiconicoAndStartStreaming(streamingSetting: IStreamingSetting, mustShowDialog: boolean) {
+  private async optimizeForNiconicoAndStartStreaming(
+    streamingSetting: IStreamingSetting,
+    mustShowDialog: boolean,
+  ) {
     if (streamingSetting.bitrate === undefined) {
       return new Promise(resolve => {
         electron.remote.dialog.showMessageBox(
@@ -323,7 +334,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
             buttons: [$t('common.close')],
             noLink: true,
           },
-          done => resolve(done)
+          done => resolve(done),
         );
       });
     }
@@ -339,8 +350,8 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
           queryParams: settings,
           size: {
             width: 500,
-            height: this.calculateOptimizeWindowSize(settings)
-          }
+            height: this.calculateOptimizeWindowSize(settings),
+          },
         });
       } else {
         this.settingsService.optimizeForNiconico(settings.best);
@@ -428,8 +439,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
       this.state.streamingStatus === EStreamingState.Starting ||
       this.state.streamingStatus === EStreamingState.Ending
     ) {
-      const elapsedTime =
-        moment().unix() - this.streamingStateChangeTime.unix();
+      const elapsedTime = moment().unix() - this.streamingStateChangeTime.unix();
       return Math.max(this.delaySeconds - elapsedTime, 0);
     }
 
@@ -450,19 +460,21 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
 
   private sendReconnectingNotification() {
     const msg = $t('streaming.attemptingToReconnect');
-    const existingReconnectNotif = this.notificationsService.getUnread()
+    const existingReconnectNotif = this.notificationsService
+      .getUnread()
       .filter((notice: INotification) => notice.message === msg);
     if (existingReconnectNotif.length !== 0) return;
     this.notificationsService.push({
       type: ENotificationType.WARNING,
       lifeTime: -1,
       showTime: true,
-      message: $t('streaming.attemptingToReconnect')
+      message: $t('streaming.attemptingToReconnect'),
     });
   }
 
   private clearReconnectingNotification() {
-    const notice = this.notificationsService.getAll()
+    const notice = this.notificationsService
+      .getAll()
       .find((notice: INotification) => notice.message === $t('streaming.attemptingToReconnect'));
     if (!notice) return;
     this.notificationsService.markAsRead(notice.id);
@@ -499,10 +511,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
         }
 
         const recordWhenStreaming = this.settingsService.state.General.RecordWhenStreaming;
-        if (
-          recordWhenStreaming &&
-          this.state.recordingStatus === ERecordingState.Offline
-        ) {
+        if (recordWhenStreaming && this.state.recordingStatus === ERecordingState.Offline) {
           this.toggleRecording();
         }
 
@@ -567,22 +576,17 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
       let errorText = '';
 
       if (info.code === obs.EOutputCode.BadPath) {
-        errorText =
-          $t('streaming.badPathError');
+        errorText = $t('streaming.badPathError');
       } else if (info.code === obs.EOutputCode.ConnectFailed) {
-        errorText =
-          $t('streaming.connectFailedError');
+        errorText = $t('streaming.connectFailedError');
       } else if (info.code === obs.EOutputCode.Disconnected) {
-        errorText =
-          $t('streaming.disconnectedError');
+        errorText = $t('streaming.disconnectedError');
       } else if (info.code === obs.EOutputCode.InvalidStream) {
-        errorText =
-          $t('streaming.invalidStreamError');
+        errorText = $t('streaming.invalidStreamError');
       } else if (info.code === obs.EOutputCode.NoSpace) {
         errorText = $t('streaming.noSpaceError');
       } else if (info.code === obs.EOutputCode.Unsupported) {
-        errorText =
-          $t('streaming.unsupportedError');
+        errorText = $t('streaming.unsupportedError');
       } else if (info.code === obs.EOutputCode.Error) {
         errorText = $t('streaming.error') + info.error;
       }

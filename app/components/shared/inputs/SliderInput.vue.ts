@@ -7,9 +7,9 @@ import { Inject } from '../../../services/core/injector';
 import { ISliderMetadata } from './index';
 
 @Component({
-  components: { VueSlider }
+  components: { VueSlider },
 })
-export default class SliderInput extends BaseInput<number, ISliderMetadata>  {
+export default class SliderInput extends BaseInput<number, ISliderMetadata> {
   @Inject() customizationService: CustomizationService;
 
   @Prop() readonly value: number;
@@ -22,7 +22,6 @@ export default class SliderInput extends BaseInput<number, ISliderMetadata>  {
   $refs: { slider: any };
 
   mounted() {
-
     // setup defaults
     this.interval = this.options.interval || 1;
     this.usePercentages = this.options.usePercentages || false;

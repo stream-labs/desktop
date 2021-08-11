@@ -3,13 +3,10 @@ import VueColor from 'vue-color';
 import { BaseInput } from './BaseInput';
 import { IInputMetadata } from './index';
 
-
 @Component({
-  components: { ColorPicker: VueColor.Sketch }
+  components: { ColorPicker: VueColor.Sketch },
 })
 export default class ColorInput extends BaseInput<string, IInputMetadata> {
-
-
   @Prop() readonly value: string;
   @Prop() readonly metadata: IInputMetadata;
 
@@ -21,9 +18,7 @@ export default class ColorInput extends BaseInput<string, IInputMetadata> {
 
   get swatchStyle() {
     return {
-      backgroundColor: this.value
+      backgroundColor: this.value,
     };
   }
-
-
 }

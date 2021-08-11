@@ -4,13 +4,12 @@ import NavMenu from './NavMenu.vue';
 
 interface INavMenu {
   value: string;
-  setValue: (value: string) => void,
+  setValue: (value: string) => void;
   isChild: boolean;
 }
 
 @Component({})
 export default class NavItem extends Vue {
-
   @Prop()
   to: string;
 
@@ -22,14 +21,16 @@ export default class NavItem extends Vue {
 
   expanded = false;
 
-  get value() { return this.rootNavMenu.value; }
+  get value() {
+    return this.rootNavMenu.value;
+  }
 
   onClickHandler(event: MouseEvent) {
     if (!this.enabled) return;
     if (this.expandable) {
       this.expanded = !this.expanded;
       return;
-    };
+    }
     this.rootNavMenu.setValue(this.to);
     event.stopPropagation();
   }
@@ -46,11 +47,10 @@ export default class NavItem extends Vue {
   }
 
   get parent() {
-    return (this.$parent as any) as INavMenu;
+    return this.$parent as any as INavMenu;
   }
 
   get rootNavMenu() {
-
     function getRoot(element: Vue): any {
       if (element instanceof NavMenu && !(element.$parent instanceof NavItem)) return element;
       return getRoot(element.$parent);
@@ -62,5 +62,4 @@ export default class NavItem extends Vue {
   get expandable() {
     return !!this.$slots['children'];
   }
-
 }

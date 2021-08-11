@@ -4,7 +4,6 @@ import NavItem from './NavItem.vue';
 
 @Component({})
 export default class NavMenu extends Vue {
-
   @Prop()
   value: string;
 
@@ -15,5 +14,4 @@ export default class NavMenu extends Vue {
   setValue(value: string) {
     this.$emit('input', value);
   }
-
 }

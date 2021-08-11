@@ -12,7 +12,10 @@ import ToolBar from './ToolBar.vue';
 import TopNav from './TopNav.vue';
 import ControlsArrow from '../../../media/images/controls-arrow-vertical.svg';
 import AreaSwitcher from './AreaSwitcher.vue';
-import { NicoliveFailure, openErrorDialogFromFailure } from 'services/nicolive-program/NicoliveFailure';
+import {
+  NicoliveFailure,
+  openErrorDialogFromFailure,
+} from 'services/nicolive-program/NicoliveFailure';
 
 @Component({
   components: {
@@ -36,14 +39,14 @@ export default class NicolivePanelRoot extends Vue {
       {
         name: 'コメント',
         text: '番組に投稿されたコメントを閲覧します',
-        slotName: 'commentViewer'
+        slotName: 'commentViewer',
       },
       {
         name: '番組説明文',
         text: '番組作成時に設定した説明文の表示を確認します',
-        slotName: 'description'
+        slotName: 'description',
       },
-    ]
+    ];
   }
 
   get opened(): boolean {
@@ -87,5 +90,4 @@ export default class NicolivePanelRoot extends Vue {
   get hasProgram(): boolean {
     return this.nicoliveProgramService.hasProgram;
   }
-
 }

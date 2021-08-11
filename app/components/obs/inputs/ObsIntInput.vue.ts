@@ -3,7 +3,6 @@ import { TObsType, ObsInput, IObsNumberInputValue } from './ObsInput';
 
 @Component
 class ObsIntInput extends ObsInput<IObsNumberInputValue> {
-
   static obsType: TObsType[];
 
   @Prop()
@@ -11,12 +10,12 @@ class ObsIntInput extends ObsInput<IObsNumberInputValue> {
   testingAnchor = `Form/Int/${this.value.name}`;
 
   $refs: {
-    input: HTMLInputElement
+    input: HTMLInputElement;
   };
 
   updateValue(value: string) {
-    let formattedValue = String(isNaN(parseInt(value)) ? 0 : parseInt(value));
-    if (this.value.type == 'OBS_PROPERTY_UINT' && Number(formattedValue) < 0) {
+    let formattedValue = String(isNaN(parseInt(value, 10)) ? 0 : parseInt(value, 10));
+    if (this.value.type === 'OBS_PROPERTY_UINT' && Number(formattedValue) < 0) {
       formattedValue = '0';
     }
 
@@ -28,8 +27,7 @@ class ObsIntInput extends ObsInput<IObsNumberInputValue> {
       formattedValue = String(this.value.maxVal);
     }
 
-
-    if (formattedValue != value) {
+    if (formattedValue !== value) {
       this.$refs.input.value = formattedValue;
     }
     // Emit the number value through the input event
@@ -45,15 +43,13 @@ class ObsIntInput extends ObsInput<IObsNumberInputValue> {
   }
 
   onMouseWheelHandler(event: WheelEvent) {
-    const canChange = (
-      event.target !== this.$refs.input ||
-      this.$refs.input === document.activeElement
-    );
+    const canChange =
+      event.target !== this.$refs.input || this.$refs.input === document.activeElement;
     if (!canChange) return;
-    if (event.deltaY > 0) this.decrement(); else this.increment();
+    if (event.deltaY > 0) this.decrement();
+    else this.increment();
     event.preventDefault();
   }
-
 }
 
 ObsIntInput.obsType = ['OBS_PROPERTY_INT', 'OBS_PROPERTY_UINT'];

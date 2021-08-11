@@ -25,6 +25,7 @@
     "release": "yarn install --cwd bin && node bin/release/mini-release.js",
     "patch-note": "yarn install --cwd bin && node bin/release/generatePatchNote.js",
     "webfont": "yarn install --cwd bin && node bin/generate-webfont.js",
+    "eslint": "eslint app/**/*.ts",
     "test": "node bin/i18n-early-check.js && tsc -p test && ava -v",
     "test:unit": "yarn test:unit:app && yarn test:unit:bin",
     "test:unit:app": "jest --silent --config ./jest.config.js",
@@ -45,14 +46,17 @@
     "timeout": "2min",
     "serial": true
   },
-  "cmake-js": {
-    "runtime": "electron",
-    "runtimeVersion": "2.0.8",
-    "arch": "x64"
+  "prettier": {
+    "singleQuote": true,
+    "printWidth": 100,
+    "endOfLine": "lf",
+    "trailingComma": "all",
+    "arrowParens": "avoid"
   },
   "lint-staged": {
     "*.ts": [
-      "tslint"
+      "eslint --fix",
+      "git add"
     ],
     "app/i18n/*/*.json": [
       "node ./bin/i18n-early-check.js"
@@ -71,6 +75,7 @@
     "electron-log": "3.0.4",
     "electron-updater": "^4.0.0",
     "electron-window-state": "5.0.3",
+    "eslint-loader": "^4.0.2",
     "font-manager": "https://github.com/stream-labs/font-manager/releases/download/v1.0.7/iojs-v5.0.4-font-manager.tar.gz",
     "fuse.js": "^3.2.0",
     "lodash": "^4.17.4",
@@ -139,6 +144,7 @@
     "@types/uuid": "^3.4.3",
     "@types/webdriverio": "^4.13.0",
     "@types/xml2js": "^0.4.3",
+    "@typescript-eslint/eslint-plugin": "^4.29.1",
     "@xkeshi/vue-qrcode": "^0.3.0",
     "ava": "^3.0.0",
     "babel-eslint": "^10.0.1",
@@ -152,12 +158,12 @@
     "electron-builder": "20.38.5",
     "electron-devtools-installer": "2.2.4",
     "emojione": "^3.1.7",
-    "eslint": "^5.16.0",
-    "eslint-config-airbnb": "^17.1.0",
-    "eslint-plugin-import": "^2.17.2",
-    "eslint-plugin-jsx-a11y": "^6.2.1",
-    "eslint-plugin-react": "^7.13.0",
-    "eslint-plugin-vue": "^5.2.2",
+    "eslint": "^7.32.0",
+    "eslint-config-airbnb-base": "^14.2.1",
+    "eslint-plugin-import": "^2.24.0",
+    "eslint-plugin-jest": "^24.4.0",
+    "eslint-plugin-prettier": "^3.4.0",
+    "eslint-plugin-vue": "^7.16.0",
     "fetch-mock": "^7.3.3",
     "file-loader": "^3.0.1",
     "husky": "^2.3.0",
@@ -170,16 +176,14 @@
     "node-win32-np": "1.0.6",
     "pixelmatch": "^4.0.2",
     "pngjs": "^3.3.1",
-    "prettier": "1.14.0",
+    "prettier": "^2.3.2",
+    "prettier-eslint": "^13.0.0",
     "shx": "^0.3.3",
     "spectron": "^7.0.0",
     "style-loader": "^0.23.1",
     "terser-webpack-plugin": "^2.0.0",
     "ts-jest": "^24.0.2",
     "ts-loader": "^8.1.0",
-    "tslint": "^5.18.0",
-    "tslint-config-prettier": "^1.14.0",
-    "tslint-loader": "^3.6.0",
     "typedoc": "^0.9.0",
     "typescript": "^3.7.2",
     "vue-loader": "^15.7.0",

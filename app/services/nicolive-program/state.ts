@@ -7,12 +7,12 @@ type SpeechSynthesizerSettingsState = {
   pitch: number;
   rate: number;
   volume: number;
-}
+};
 
 interface IState {
   autoExtensionEnabled: boolean;
   panelOpened: boolean;
-  speechSynthesizerSettings?: SpeechSynthesizerSettingsState; 
+  speechSynthesizerSettings?: SpeechSynthesizerSettingsState;
 }
 
 /**

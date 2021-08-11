@@ -27,8 +27,7 @@ export function addClipboardMenu(window: Electron.BrowserWindow) {
         enabled: params.editFlags.canPaste,
       });
       menu.popup();
-    }
-    else if (params.selectionText) {
+    } else if (params.selectionText) {
       const menu = new Menu();
       menu.append({
         id: 'Copy',

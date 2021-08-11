@@ -7,10 +7,9 @@ import BaseFormGroup from './BaseFormGroup';
  * Horizontal layout for input-component
  */
 @Component({
-  components: { FormInput }
+  components: { FormInput },
 })
 export default class HFormGroup extends BaseFormGroup {
-
   @Prop()
   readonly type: EInputType;
 
@@ -22,5 +21,4 @@ export default class HFormGroup extends BaseFormGroup {
 
   @Prop()
   readonly title: string;
-
 }

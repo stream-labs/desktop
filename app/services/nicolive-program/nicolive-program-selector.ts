@@ -30,13 +30,14 @@ export type TStep = typeof steps[number];
  * ```
  * {
  *   'providerTypeSelect': 0
- *   'channelSelect': 1, 
+ *   'channelSelect': 1,
  *   // ...
  * }
  * ```
  */
-const stepsMap = steps.reduce<{ [key in TStep]?: number }>((prev, current, index) => (
-  { ...prev, [current]: index }), {}
+const stepsMap = steps.reduce<{ [key in TStep]?: number }>(
+  (prev, current, index) => ({ ...prev, [current]: index }),
+  {},
 ) as { [key in TStep]: number };
 
 export interface INicoliveProgramSelectorState {
@@ -50,7 +51,6 @@ export interface INicoliveProgramSelectorState {
 }
 
 export class NicoliveProgramSelectorService extends StatefulService<INicoliveProgramSelectorState> {
-
   static initialState: INicoliveProgramSelectorState = {
     selectedProviderType: null,
     selectedChannel: null,
@@ -58,7 +58,7 @@ export class NicoliveProgramSelectorService extends StatefulService<INicolivePro
     candidateChannels: [],
     candidatePrograms: [],
     isLoading: false,
-    currentStep: 'providerTypeSelect'
+    currentStep: 'providerTypeSelect',
   };
 
   client = new NicoliveClient();
@@ -75,7 +75,7 @@ export class NicoliveProgramSelectorService extends StatefulService<INicolivePro
       this.SET_STATE({
         currentStep: 'channelSelect',
         selectedProviderType: 'channel',
-        isLoading: true
+        isLoading: true,
       });
       try {
         const methodName = 'fetchOnairChannels';
@@ -88,17 +88,18 @@ export class NicoliveProgramSelectorService extends StatefulService<INicolivePro
         }
         this.SET_STATE({
           isLoading: false,
-          candidateChannels: onairChannelsResult.value
+          candidateChannels: onairChannelsResult.value,
         });
       } catch (error) {
         await openErrorDialogFromFailure(error);
-        this.SET_STATE({ isLoading: false })
+        this.SET_STATE({ isLoading: false });
       }
-    } else { // providerType === 'user'
+    } else {
+      // providerType === 'user'
       this.SET_STATE({
         selectedProviderType: 'user',
         selectedChannel: null,
-        currentStep: 'confirm'
+        currentStep: 'confirm',
       });
     }
   }
@@ -106,14 +107,14 @@ export class NicoliveProgramSelectorService extends StatefulService<INicolivePro
   private async fetchOnairChannelPrograms(channelId: string) {
     try {
       const onairChannelProgramResult = await this.client.fetchOnairChannelProgram(channelId);
-      if ((isOk(onairChannelProgramResult))) {
+      if (isOk(onairChannelProgramResult)) {
         const { testProgramId, programId, nextProgramId } = onairChannelProgramResult.value;
         return [testProgramId, programId, nextProgramId];
       } else {
         throw onairChannelProgramResult;
       }
     } catch (error) {
-        throw NicoliveFailure.fromClientError('fetchOnairChannelProgram', error);
+      throw NicoliveFailure.fromClientError('fetchOnairChannelProgram', error);
     }
   }
 
@@ -131,25 +132,32 @@ export class NicoliveProgramSelectorService extends StatefulService<INicolivePro
       selectedChannel: { id, name },
       currentStep: 'programSelect',
       candidatePrograms: [],
-      isLoading: true
+      isLoading: true,
     });
     try {
       const programs = await this.fetchOnairChannelPrograms(id);
       const candidateProgramIds = programs.filter(Boolean);
-      const candidatePrograms = (await Promise.all(candidateProgramIds.map(async (programId) => {
-        const programResult = await this.client.fetchProgram(programId);
-        if (isOk(programResult)) {
-          return { id: programId, title: programResult.value.title }
-        } else if (programResult.value instanceof Error || programResult.value.meta.status !== 404) {
-          // ネットワークエラー, メンテナンスの場合など
-          throw NicoliveFailure.fromClientError('fetchProgram', programResult);
-        }
-        // 与えられた lv の番組が見つからない場合 (HTTP 404 時) はその番組は出さない
-        return undefined;
-      }))).filter(Boolean);
+      const candidatePrograms = (
+        await Promise.all(
+          candidateProgramIds.map(async programId => {
+            const programResult = await this.client.fetchProgram(programId);
+            if (isOk(programResult)) {
+              return { id: programId, title: programResult.value.title };
+            } else if (
+              programResult.value instanceof Error ||
+              programResult.value.meta.status !== 404
+            ) {
+              // ネットワークエラー, メンテナンスの場合など
+              throw NicoliveFailure.fromClientError('fetchProgram', programResult);
+            }
+            // 与えられた lv の番組が見つからない場合 (HTTP 404 時) はその番組は出さない
+            return undefined;
+          }),
+        )
+      ).filter(Boolean);
       this.SET_STATE({
         candidatePrograms,
-        isLoading: false
+        isLoading: false,
       });
     } catch (error) {
       await openErrorDialogFromFailure(error);
@@ -163,7 +171,7 @@ export class NicoliveProgramSelectorService extends StatefulService<INicolivePro
     }
     this.SET_STATE({
       selectedChannelProgram: { id, title },
-      currentStep: 'confirm'
+      currentStep: 'confirm',
     });
   }
 
@@ -180,7 +188,7 @@ export class NicoliveProgramSelectorService extends StatefulService<INicolivePro
 
   /**
    * 与えられたステップがすでに完了したステップであるか.
-   * @param step 
+   * @param step
    */
   isCompletedStep(step: TStep): boolean {
     if (this.isStepToSkip(step, this.state.selectedProviderType)) {
@@ -201,7 +209,7 @@ export class NicoliveProgramSelectorService extends StatefulService<INicolivePro
    * 指定ステップに戻る.
    * 指定ステップ以降で設定された値は初期値にリセットする.
    * 完了していないステップが与えられた場合は何もしない.
-   * @param step 
+   * @param step
    */
   backTo(step: TStep) {
     if (!this.isCompletedStep(step)) {
@@ -209,11 +217,16 @@ export class NicoliveProgramSelectorService extends StatefulService<INicolivePro
     }
     this.SET_STATE({
       currentStep: step,
-      candidateChannels: stepsMap[step] <= stepsMap['providerTypeSelect'] ? [] : this.state.candidateChannels,
-      candidatePrograms: stepsMap[step] <= stepsMap['channelSelect'] ? [] : this.state.candidatePrograms,
-      selectedProviderType: stepsMap[step] <= stepsMap['providerTypeSelect'] ? null : this.state.selectedProviderType,
-      selectedChannel: stepsMap[step] <= stepsMap['channelSelect'] ? null : this.state.selectedChannel,
-      selectedChannelProgram: stepsMap[step] <= stepsMap['programSelect'] ? null : this.state.selectedChannelProgram,
+      candidateChannels:
+        stepsMap[step] <= stepsMap['providerTypeSelect'] ? [] : this.state.candidateChannels,
+      candidatePrograms:
+        stepsMap[step] <= stepsMap['channelSelect'] ? [] : this.state.candidatePrograms,
+      selectedProviderType:
+        stepsMap[step] <= stepsMap['providerTypeSelect'] ? null : this.state.selectedProviderType,
+      selectedChannel:
+        stepsMap[step] <= stepsMap['channelSelect'] ? null : this.state.selectedChannel,
+      selectedChannelProgram:
+        stepsMap[step] <= stepsMap['programSelect'] ? null : this.state.selectedChannelProgram,
     });
   }
 
@@ -221,15 +234,11 @@ export class NicoliveProgramSelectorService extends StatefulService<INicolivePro
    * ユーザー生放送が選択されている場合,
    * 与えられたステップがスキップされるべきものなら true を, さもなくば false を返す.
    * チャンネル生放送が選択されている場合, 常に false を返す.
-   * @param step 
-   * @param providerType 
+   * @param step
+   * @param providerType
    */
   private isStepToSkip(step: TStep, providerType: TProviderType): boolean {
-    return (
-      providerType === 'user' && (
-        step === 'programSelect' || step === 'channelSelect'
-      )
-    );
+    return providerType === 'user' && (step === 'programSelect' || step === 'channelSelect');
   }
 
   @mutation()

@@ -5,7 +5,6 @@ import Util from 'services/utils';
 // we should allow overriding this value. But for now we
 // are just keeping the value in one place.
 export class HostsService extends Service {
-
   get niconicoAccount() {
     return 'https://account.nicovideo.jp';
   }
@@ -23,11 +22,7 @@ export class HostsService extends Service {
       return process.env.NAIR_LOGIN_URL;
     }
 
-    const scopes = [
-      'openid',
-      'profile',
-      'user.premium',
-    ];
+    const scopes = ['openid', 'profile', 'user.premium'];
 
     const url = new URL('https://n-air-app.nicovideo.jp/authorize');
     url.searchParams.set('scope', scopes.join(' '));

@@ -62,7 +62,6 @@ export function getComponents() {
   };
 }
 
-
 export interface IWindowOptions {
   componentName: string;
   queryParams?: Dictionary<any>;
@@ -97,7 +96,6 @@ const DEFAULT_WINDOW_OPTIONS: IWindowOptions = {
 };
 
 export class WindowsService extends StatefulService<IWindowsState> {
-
   /**
    * 'main' and 'child' are special window ids that always exist
    * and have special purposes.  All other windows ids are considered
@@ -230,7 +228,8 @@ export class WindowsService extends StatefulService<IWindowsState> {
     // サイズ指定をコンストラクタで行うと、メインモニタより大きなウィンドウを作れない
     // enableLargerThanScreenを指定しても効かなかったので後から明示的に与える
     const width = options.size && typeof options.size.width === 'number' ? options.size.width : 400;
-    const height = options.size && typeof options.size.height === 'number' ? options.size.height : 400;
+    const height =
+      options.size && typeof options.size.height === 'number' ? options.size.height : 400;
     newWindow.setSize(width, height);
 
     if (options.size && typeof options.size.x === 'number' && typeof options.size.y === 'number') {

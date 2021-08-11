@@ -9,8 +9,8 @@ import TitleBar from '../TitleBar.vue';
 @Component({
   components: {
     TitleBar,
-    ...getComponents()
-  }
+    ...getComponents(),
+  },
 })
 export default class OneOffWindow extends Vue {
   @Inject() private windowsService: WindowsService;

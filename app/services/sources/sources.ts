@@ -133,7 +133,6 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
     settings: Dictionary<any> = {},
     options: ISourceAddOptions = {},
   ): Source {
-
     const id: string = options.sourceId || `${type}_${uuid()}`;
     const obsInputSettings = this.getObsSourceCreateSettings(type, settings);
     const obsInput = obs.InputFactory.create(type, id, obsInputSettings);
@@ -196,7 +195,20 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
   addFile(path: string): Source {
     const SUPPORTED_EXT = {
       image_source: ['png', 'jpg', 'jpeg', 'tga', 'bmp'],
-      ffmpeg_source: ['mp4', 'ts', 'mov', 'flv', 'mkv', 'avi', 'mp3', 'ogg', 'aac', 'wav', 'gif', 'webm'],
+      ffmpeg_source: [
+        'mp4',
+        'ts',
+        'mov',
+        'flv',
+        'mkv',
+        'avi',
+        'mp3',
+        'ogg',
+        'aac',
+        'wav',
+        'gif',
+        'webm',
+      ],
       browser_source: ['html'],
       text_gdiplus: ['txt'],
     };
@@ -253,7 +265,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
       // resolve the device id by the device name here
       if (!['device_id', 'video_device_id', 'audio_device_id'].includes(propName)) return;
 
-      /* N Airには　hardwareService がないため無効
+      /* N Airには hardwareService がないため無効
       const device =
         type === 'dshow_input'
           ? this.hardwareService.getDshowDeviceByName(settings[propName])
@@ -314,15 +326,16 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
       'vlc_source',
     ];
 
-    const availableWhitelistedType = whitelistedTypes.filter(type => obsAvailableTypes.includes(type));
+    const availableWhitelistedType = whitelistedTypes.filter(type =>
+      obsAvailableTypes.includes(type),
+    );
     // 'scene' is not an obs input type so we have to set it manually
     availableWhitelistedType.push('scene');
 
-    const availableWhitelistedSourceType =
-      availableWhitelistedType.map((value) => ({
-        value,
-        description: $t(`source-props.${value}.name`)
-      }));
+    const availableWhitelistedSourceType = availableWhitelistedType.map(value => ({
+      value,
+      description: $t(`source-props.${value}.name`),
+    }));
 
     return availableWhitelistedSourceType;
   }
@@ -380,7 +393,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
     const async = !!(AsyncFlag & flags);
     const doNotDuplicate = !!(DoNotDuplicateFlag & flags);
 
-    if ((source.audio !== audio) || (source.video !== video) || (source.async !== async)) {
+    if (source.audio !== audio || source.video !== video || source.async !== async) {
       this.UPDATE_SOURCE({ id: source.sourceId, audio, video, async, doNotDuplicate });
 
       if (!doNotEmit) this.sourceUpdated.next(source);

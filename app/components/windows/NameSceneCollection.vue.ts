@@ -12,7 +12,7 @@ interface INameSceneCollectionOptions {
 }
 
 @Component({
-  components: { ModalLayout }
+  components: { ModalLayout },
 })
 export default class NameSceneCollection extends Vue {
   name = '';

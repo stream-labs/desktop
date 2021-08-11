@@ -17,4 +17,3 @@ export class CommentBase extends Vue {
     return `${this.computedContent} (${this.$props.getFormattedLiveTime(this.chat.value)})`;
   }
 }
-

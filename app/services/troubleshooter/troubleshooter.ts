@@ -1,22 +1,23 @@
 import { mutation } from '../core/stateful-service';
 import { PersistentStatefulService } from 'services/core/persistent-stateful-service';
 import { IObsInput, IObsNumberInputValue, TObsFormData } from 'components/obs/inputs/ObsInput';
-import { ITroubleshooterServiceApi, ITroubleshooterSettings, TIssueCode } from './troubleshooter-api';
+import {
+  ITroubleshooterServiceApi,
+  ITroubleshooterSettings,
+  TIssueCode,
+} from './troubleshooter-api';
 import { WindowsService } from 'services/windows';
 import { Inject } from '../core/injector';
 import { $t } from 'services/i18n';
-
 
 interface ITroubleshooterState {
   settings: ITroubleshooterSettings;
 }
 
-
 export class TroubleshooterService
   extends PersistentStatefulService<ITroubleshooterState>
   implements ITroubleshooterServiceApi
 {
-
   static defaultState: ITroubleshooterState = {
     settings: {
       skippedEnabled: false,
@@ -25,21 +26,20 @@ export class TroubleshooterService
       laggedThreshold: 0.15,
       droppedEnabled: false,
       droppedThreshold: 0.1,
-    }
+    },
   };
 
   @Inject() private windowsService: WindowsService;
 
-  getSettings(): ITroubleshooterSettings  {
+  getSettings(): ITroubleshooterSettings {
     return this.state.settings;
   }
 
   getSettingsFormData(): TObsFormData {
-
     const settings = this.state.settings;
 
     return [
-      <IObsInput<boolean>> {
+      <IObsInput<boolean>>{
         value: settings.skippedEnabled,
         name: 'skippedEnabled',
         description: $t('notifications.detectSkippedFrames'),
@@ -48,7 +48,7 @@ export class TroubleshooterService
         enabled: true,
       },
 
-      <IObsNumberInputValue> {
+      <IObsNumberInputValue>{
         value: settings.skippedThreshold,
         name: 'skippedThreshold',
         description: $t('notifications.skippedFramesThreshold'),
@@ -61,7 +61,7 @@ export class TroubleshooterService
         usePercentages: true,
       },
 
-      <IObsInput<boolean>> {
+      <IObsInput<boolean>>{
         value: settings.laggedEnabled,
         name: 'laggedEnabled',
         description: $t('notifications.detectLaggedFrames'),
@@ -70,7 +70,7 @@ export class TroubleshooterService
         enabled: true,
       },
 
-      <IObsNumberInputValue> {
+      <IObsNumberInputValue>{
         value: settings.laggedThreshold,
         name: 'laggedThreshold',
         description: $t('notifications.laggedFramesThreshold'),
@@ -83,7 +83,7 @@ export class TroubleshooterService
         usePercentages: true,
       },
 
-      <IObsInput<boolean>> {
+      <IObsInput<boolean>>{
         value: settings.droppedEnabled,
         name: 'droppedEnabled',
         description: $t('notifications.detectDroppedFrames'),
@@ -92,7 +92,7 @@ export class TroubleshooterService
         enabled: true,
       },
 
-      <IObsNumberInputValue> {
+      <IObsNumberInputValue>{
         value: settings.droppedThreshold,
         name: 'droppedThreshold',
         description: $t('notifications.droppedFramesThreshold'),
@@ -103,9 +103,8 @@ export class TroubleshooterService
         visible: settings.droppedEnabled,
         enabled: true,
         usePercentages: true,
-      }
+      },
     ];
-
   }
 
   setSettings(settingsPatch: Partial<ITroubleshooterSettings>) {
@@ -123,8 +122,8 @@ export class TroubleshooterService
       queryParams: { issueCode },
       size: {
         width: 500,
-        height: 500
-      }
+        height: 500,
+      },
     });
   }
 
@@ -132,5 +131,4 @@ export class TroubleshooterService
   private SET_SETTINGS(settingsPatch: Partial<ITroubleshooterSettings>) {
     this.state.settings = { ...this.state.settings, ...settingsPatch };
   }
-
 }

@@ -68,9 +68,7 @@ export default class PerformanceMetrics extends Vue {
 
   get percentDropped() {
     if (!this.customizationService.pollingPerformanceStatistics) return '--';
-    return (this.performanceService.state.percentageDroppedFrames || 0).toFixed(
-      1
-    );
+    return (this.performanceService.state.percentageDroppedFrames || 0).toFixed(1);
   }
 
   get bandwidth() {

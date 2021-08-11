@@ -15,7 +15,7 @@ import { SettingsService } from 'services/settings';
     StartStreamingButton,
     PerformanceMetrics,
     NotificationsArea,
-  }
+  },
 })
 export default class StudioFooterComponent extends Vue {
   @Inject() streamingService: StreamingService;
@@ -71,7 +71,7 @@ export default class StudioFooterComponent extends Vue {
 
   streamingElapsedTime: string = '--:--:--';
   @Watch('streamingStatus')
-  updateStreamingElapsedTime (): void {
+  updateStreamingElapsedTime(): void {
     if (this.streamingService.state.streamingStatus !== EStreamingState.Live) {
       this.streamingElapsedTime = '--:--:--';
       return;

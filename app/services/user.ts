@@ -11,7 +11,7 @@ import {
   IPlatformAuth,
   TPlatform,
   IPlatformService,
-  IStreamingSetting
+  IStreamingSetting,
 } from './platforms';
 import Raven from 'raven-js';
 import { AppService } from 'services/app';
@@ -84,13 +84,10 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
 
   mounted() {
     // This is used for faking authentication in tests
-    electron.ipcRenderer.on(
-      'testing-fakeAuth',
-      async (e: Electron.Event, auth: any) => {
-        this.LOGIN(auth);
-        await this.sceneCollectionsService.setupNewUser();
-      }
-    );
+    electron.ipcRenderer.on('testing-fakeAuth', async (e: Electron.Event, auth: any) => {
+      this.LOGIN(auth);
+      await this.sceneCollectionsService.setupNewUser();
+    });
   }
 
   // Makes sure the user's login is still good
@@ -190,7 +187,6 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     this.onboardingService.start({ isLogin: true });
   }
 
-
   private async login(service: IPlatformService, rawAuth: IPlatformAuth) {
     const isPremium = await service.isPremium(rawAuth.platform.token);
     const auth = { ...rawAuth, platform: { ...rawAuth.platform, isPremium } };
@@ -227,9 +223,9 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     onAuthClose,
     onAuthFinish,
   }: {
-    platform: TPlatform,
-    onAuthClose: (...args: any[]) => any,
-    onAuthFinish: (...args: any[]) => any,
+    platform: TPlatform;
+    onAuthClose: (...args: any[]) => any;
+    onAuthFinish: (...args: any[]) => any;
   }) {
     const service = getPlatformService(platform);
     console.log('startAuth service = ' + JSON.stringify(service));
@@ -241,8 +237,8 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
       webPreferences: {
         nodeIntegration: false,
         nativeWindowOpen: true,
-        sandbox: true
-      }
+        sandbox: true,
+      },
     });
 
     authWindow.webContents.on('did-navigate', async (e, url) => {
@@ -314,7 +310,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
           token: query.platform_token,
           id: query.platform_id,
           userIcon: query.platform_user_icon,
-        }
+        },
       } as IPlatformAuth;
     }
 
@@ -332,7 +328,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   }
 
   async getUserExtraContext() {
-    try{
+    try {
       const [graphics, cpu, osInfo, osUuid] = await Promise.all([
         systemInfoGraphics(),
         systemInfoCpu(),
@@ -391,7 +387,7 @@ export function requiresLogin() {
         if (UserService.instance.isLoggedIn()) {
           return original.apply(target, args);
         }
-      }
+      },
     };
   };
 }

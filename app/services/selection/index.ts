@@ -1,7 +1,5 @@
 export * from './selection';
-import {
-  ISceneItemNode,
-} from 'services/scenes';
+import { ISceneItemNode } from 'services/scenes';
 
 export interface ISelectionState {
   selectedIds: string[];

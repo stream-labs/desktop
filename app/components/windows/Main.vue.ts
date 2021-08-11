@@ -29,7 +29,7 @@ import electron from 'electron';
     CustomLoader,
     PatchNotes,
     NicoliveArea,
-  }
+  },
 })
 export default class Main extends Vue {
   @Inject() customizationService: CustomizationService;
@@ -76,10 +76,7 @@ export default class Main extends Vue {
    * is loading.  Other pages are OK to keep using.
    */
   get shouldLockContent() {
-    return (
-      this.applicationLoading &&
-      this.navigationService.state.currentPage === 'Studio'
-    );
+    return this.applicationLoading && this.navigationService.state.currentPage === 'Studio';
   }
 
   onDropHandler(event: DragEvent) {

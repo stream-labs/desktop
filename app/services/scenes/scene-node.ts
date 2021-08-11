@@ -4,7 +4,14 @@
 import { ServiceHelper, mutation } from '../core';
 import { TSceneNodeType } from './scenes';
 import { Inject } from '../core/injector';
-import { ScenesService, Scene, ISceneItemNode, SceneItemFolder, SceneItem, TSceneNode } from './index';
+import {
+  ScenesService,
+  Scene,
+  ISceneItemNode,
+  SceneItemFolder,
+  SceneItem,
+  TSceneNode,
+} from './index';
 import { SelectionService } from 'services/selection';
 
 export function isFolder(node: SceneItemNode): node is SceneItemFolder {
@@ -83,18 +90,18 @@ export abstract class SceneItemNode implements ISceneItemNode {
   }
 
   getPrevSiblingNode(): TSceneNode {
-    const siblingsIds = this.parentId ?
-      this.getParent().getNestedNodesIds() :
-      this.getScene().getRootNodesIds();
+    const siblingsIds = this.parentId
+      ? this.getParent().getNestedNodesIds()
+      : this.getScene().getRootNodesIds();
 
     const childInd = siblingsIds.indexOf(this.id);
     if (childInd !== 0) return this.getScene().getNode(siblingsIds[childInd - 1]);
   }
 
   getNextSiblingNode(): TSceneNode {
-    const siblingsIds = this.parentId ?
-      this.getParent().getNestedNodesIds() :
-      this.getScene().getRootNodesIds();
+    const siblingsIds = this.parentId
+      ? this.getParent().getNestedNodesIds()
+      : this.getScene().getRootNodesIds();
 
     const childInd = siblingsIds.indexOf(this.id);
     if (childInd !== 0) return this.getScene().getNode(siblingsIds[childInd + 1]);

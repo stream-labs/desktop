@@ -1,6 +1,7 @@
 import { createSetupFunction } from 'util/test-setup';
 import { Subject } from 'rxjs';
-type NicoliveCommentViewerService = import('./nicolive-comment-viewer').NicoliveCommentViewerService;
+type NicoliveCommentViewerService =
+  import('./nicolive-comment-viewer').NicoliveCommentViewerService;
 
 const setup = createSetupFunction({
   injectee: {
@@ -13,14 +14,20 @@ const setup = createSetupFunction({
     NicoliveCommentSynthesizerService: {
       stateChange: new Subject(),
       available: false,
-    }
+    },
   },
 });
 
 jest.mock('services/nicolive-program/nicolive-program', () => ({ NicoliveProgramService: {} }));
-jest.mock('services/nicolive-program/nicolive-comment-filter', () => ({ NicoliveCommentFilterService: {} }));
-jest.mock('services/nicolive-program/nicolive-comment-local-filter', () => ({ NicoliveCommentLocalFilterService: {} }));
-jest.mock('services/nicolive-program/nicolive-comment-synthesizer', () => ({ NicoliveCommentSynthesizerService: {} }));
+jest.mock('services/nicolive-program/nicolive-comment-filter', () => ({
+  NicoliveCommentFilterService: {},
+}));
+jest.mock('services/nicolive-program/nicolive-comment-local-filter', () => ({
+  NicoliveCommentLocalFilterService: {},
+}));
+jest.mock('services/nicolive-program/nicolive-comment-synthesizer', () => ({
+  NicoliveCommentSynthesizerService: {},
+}));
 
 beforeEach(() => {
   jest.doMock('services/core/stateful-service');
@@ -154,8 +161,8 @@ test('chatメッセージはstateに保持する', () => {
 
   // bufferTime tweaks
   clientSubject.complete();
-  expect(clientSubject.hasError).toBeFalsy()
-  expect(clientSubject.thrownError).toBeNull()
+  expect(clientSubject.hasError).toBeFalsy();
+  expect(clientSubject.thrownError).toBeNull();
 
   expect(instance.state.messages).toMatchInlineSnapshot(`
     Array [
@@ -196,7 +203,9 @@ test('chatメッセージはstateに最新100件保持し、あふれた物がpo
   const numberOfSystemMessages = 1; // "サーバーとの接続が終了しました";
 
   const overflow = 2; // あふれ保持の順序確認用に2以上必要
-  const chats = Array(retainSize - numberOfSystemMessages + overflow).fill(0).map((v,i) => `#${i}`);
+  const chats = Array(retainSize - numberOfSystemMessages + overflow)
+    .fill(0)
+    .map((v, i) => `#${i}`);
 
   for (const chat of chats) {
     clientSubject.next({
@@ -212,12 +221,11 @@ test('chatメッセージはstateに最新100件保持し、あふれた物がpo
   expect(instance.state.messages.length).toEqual(retainSize);
   expect(instance.state.messages[0].value.content).toEqual(chats[overflow]);
   expect(instance.state.messages[retainSize - numberOfSystemMessages - 1].value.content).toEqual(
-    chats[chats.length - 1]
+    chats[chats.length - 1],
   );
   expect(instance.state.popoutMessages.length).toEqual(overflow);
   expect(instance.state.popoutMessages[0].value.content).toEqual(chats[0]);
 });
-
 
 test('接続エラー時にメッセージを表示する', () => {
   jest.spyOn(Date, 'now').mockImplementation(() => 1582175622000);

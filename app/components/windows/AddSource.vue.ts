@@ -10,7 +10,7 @@ import Display from 'components/shared/Display.vue';
 import { $t } from 'services/i18n';
 
 @Component({
-  components: { ModalLayout, Selector, Display }
+  components: { ModalLayout, Selector, Display },
 })
 export default class AddSource extends Vue {
   @Inject() sourcesService: ISourcesServiceApi;
@@ -20,13 +20,16 @@ export default class AddSource extends Vue {
   name = '';
   error = '';
   sourceType = this.windowsService.getChildWindowQueryParams().sourceType as TSourceType;
-  sourceAddOptions = this.windowsService.getChildWindowQueryParams().sourceAddOptions as ISourceAddOptions;
+  sourceAddOptions = this.windowsService.getChildWindowQueryParams()
+    .sourceAddOptions as ISourceAddOptions;
 
   sources = this.sourcesService.getSources().filter(source => {
-    return source.isSameType({
-      type: this.sourceType,
-      propertiesManager: this.sourceAddOptions.propertiesManager,
-    }) && source.sourceId !== this.scenesService.activeSceneId;
+    return (
+      source.isSameType({
+        type: this.sourceType,
+        propertiesManager: this.sourceAddOptions.propertiesManager,
+      }) && source.sourceId !== this.scenesService.activeSceneId
+    );
   });
 
   existingSources = this.sources.map(source => {
@@ -38,10 +41,11 @@ export default class AddSource extends Vue {
   mounted() {
     const sourceType =
       this.sourceType &&
-      this.sourcesService.getAvailableSourcesTypesList()
+      this.sourcesService
+        .getAvailableSourcesTypesList()
         .find(sourceTypeDef => sourceTypeDef.value === this.sourceType);
 
-    this.name = this.sourcesService.suggestName((this.sourceType && sourceType.description));
+    this.name = this.sourcesService.suggestName(this.sourceType && sourceType.description);
   }
 
   addExisting() {
@@ -59,21 +63,18 @@ export default class AddSource extends Vue {
     this.windowsService.closeChildWindow();
   }
 
-
   addNew() {
     if (!this.name) {
       this.error = $t('sources.sourceNameIsRequired');
     } else {
-      let source: ISourceApi;
-
-      source = this.sourcesService.createSource(
+      const source: ISourceApi = this.sourcesService.createSource(
         this.name,
         this.sourceType,
         {}, // IPCがundefinedをnullに変換するのでデフォルト値は使わない
         {
           propertiesManager: this.sourceAddOptions.propertiesManager,
-          propertiesManagerSettings: this.sourceAddOptions.propertiesManagerSettings
-        }
+          propertiesManagerSettings: this.sourceAddOptions.propertiesManagerSettings,
+        },
       );
 
       this.scenesService.activeScene.addSource(source.sourceId);
@@ -89,5 +90,4 @@ export default class AddSource extends Vue {
   get selectedSource() {
     return this.sourcesService.getSource(this.selectedSourceId);
   }
-
 }

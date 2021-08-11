@@ -10,6 +10,6 @@ export const notes: IPatchNotes = {
     '修正: 同種ソースが存在しない場合の文言を和訳 (#463)',
     '修正: 配信最適化時に出力が詳細になっているとハードウェアエンコーダーが選択されなかった(エンコー',
     'ダー名称もおかしかった) (#460)',
-    '開発: crash report送信先をbacktraceからsentryに変更 (#449)'
-  ]
+    '開発: crash report送信先をbacktraceからsentryに変更 (#449)',
+  ],
 };

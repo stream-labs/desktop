@@ -29,7 +29,7 @@ export class PerformanceService extends StatefulService<IPerformanceState> {
     numberDroppedFrames: 0,
     percentageDroppedFrames: 0,
     bandwidth: 0,
-    frameRate: 0
+    frameRate: 0,
   };
 
   droppedFramesDetected = new Subject<number>();
@@ -66,9 +66,11 @@ export class PerformanceService extends StatefulService<IPerformanceState> {
 
     const am = electron.remote.app.getAppMetrics();
 
-    stats.CPU += am.map(proc => {
-      return proc.cpu.percentCPUUsage;
-    }).reduce((sum, usage) => sum + usage);
+    stats.CPU += am
+      .map(proc => {
+        return proc.cpu.percentCPUUsage;
+      })
+      .reduce((sum, usage) => sum + usage);
 
     this.SET_PERFORMANCE_STATS(stats);
   }

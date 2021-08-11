@@ -13,7 +13,6 @@ import { Subject } from 'rxjs';
  */
 @Component({})
 export default class ValidatedForm extends Vue {
-
   validated = new Subject<ErrorField[]>();
   validationScopeId = uuid();
 

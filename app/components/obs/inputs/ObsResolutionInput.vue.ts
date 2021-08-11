@@ -4,11 +4,9 @@ import { Multiselect } from 'vue-multiselect';
 import { $t } from '../../../services/i18n';
 
 @Component({
-  components: { Multiselect }
+  components: { Multiselect },
 })
-
 class ObsResolutionInput extends ObsInput<IObsListInput<TObsValue>> {
-
   static obsType: TObsType;
 
   @Prop()
@@ -18,7 +16,6 @@ class ObsResolutionInput extends ObsInput<IObsListInput<TObsValue>> {
   @Prop()
   placeholder: string;
 
-
   onInputHandler(option: IObsListOption<string>) {
     this.emitInput({ ...this.value, value: option.value });
   }
@@ -27,9 +24,7 @@ class ObsResolutionInput extends ObsInput<IObsListInput<TObsValue>> {
     this.$emit('search-change', value);
   }
 
-
   get currentValue() {
-
     let option = this.value.options.find((opt: IObsListOption<string>) => {
       return this.value.value === opt.value;
     });
@@ -49,10 +44,9 @@ class ObsResolutionInput extends ObsInput<IObsListInput<TObsValue>> {
     const match = search.match(/\d+/g) || [];
     const width = match[0] || 400;
     const height = match[1] || 400;
-    const value = `${ width }x${ height }`;
+    const value = `${width}x${height}`;
     return { value, description: value };
   }
-
 }
 
 ObsResolutionInput.obsType = 'OBS_INPUT_RESOLUTION_LIST';

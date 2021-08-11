@@ -5,11 +5,7 @@ import { SourcesService } from 'services/sources';
 import { ScenesService, ISceneItemNode, TSceneNode } from 'services/scenes';
 import { SelectionService } from 'services/selection/selection';
 import { EditMenu } from '../util/menus/EditMenu';
-import SlVueTree, {
-  ISlTreeNode,
-  ISlTreeNodeModel,
-  ICursorPosition
-} from 'sl-vue-tree';
+import SlVueTree, { ISlTreeNode, ISlTreeNodeModel, ICursorPosition } from 'sl-vue-tree';
 import { $t } from 'services/i18n';
 
 const sourceIconMap = {
@@ -30,10 +26,10 @@ const sourceIconMap = {
   liv_capture: 'icon-vr-google',
   ndi_source: 'icon-NDI',
   'decklink-input': 'icon-blackmagic',
-}
+};
 
 @Component({
-  components: { SlVueTree }
+  components: { SlVueTree },
 })
 export default class SourceSelector extends Vue {
   @Inject() private scenesService: ScenesService;
@@ -55,9 +51,7 @@ export default class SourceSelector extends Vue {
 
   get nodes(): ISlTreeNodeModel<ISceneItemNode>[] {
     // recursive function for transform SceneNode[] to ISlTreeNodeModel[]
-    const getSlVueTreeNodes = (
-      sceneNodes: TSceneNode[]
-    ): ISlTreeNodeModel<ISceneItemNode>[] => {
+    const getSlVueTreeNodes = (sceneNodes: TSceneNode[]): ISlTreeNodeModel<ISceneItemNode>[] => {
       return sceneNodes.map(sceneNode => {
         return {
           title: sceneNode.name,
@@ -65,9 +59,7 @@ export default class SourceSelector extends Vue {
           isLeaf: sceneNode.isItem(),
           isExpanded: this.expandedFoldersIds.indexOf(sceneNode.id) !== -1,
           data: sceneNode.getModel(),
-          children: sceneNode.isFolder()
-            ? getSlVueTreeNodes(sceneNode.getNodes())
-            : null
+          children: sceneNode.isFolder() ? getSlVueTreeNodes(sceneNode.getNodes()) : null,
         };
       });
     };
@@ -76,7 +68,9 @@ export default class SourceSelector extends Vue {
   }
 
   determineIcon(isLeaf: boolean, sourceId: string) {
-    if (!isLeaf) { return 'icon-folder'; }
+    if (!isLeaf) {
+      return 'icon-folder';
+    }
     const sourceDetails = this.sourcesService.getSource(sourceId).getComparisonDetails();
     return sourceIconMap[sourceDetails.type] || 'icon-file';
   }
@@ -106,7 +100,7 @@ export default class SourceSelector extends Vue {
       ? {
           selectedSceneId: this.scene.id,
           sceneNodeId,
-          showSceneItemMenu: true
+          showSceneItemMenu: true,
         }
       : { selectedSceneId: this.scene.id };
 
@@ -134,11 +128,9 @@ export default class SourceSelector extends Vue {
 
   handleSort(
     treeNodesToMove: ISlTreeNode<ISceneItemNode>[],
-    position: ICursorPosition<TSceneNode>
+    position: ICursorPosition<TSceneNode>,
   ) {
-    const nodesToMove = this.scene.getSelection(
-      treeNodesToMove.map(node => node.data.id)
-    );
+    const nodesToMove = this.scene.getSelection(treeNodesToMove.map(node => node.data.id));
 
     const destNode = this.scene.getNode(position.node.data.id);
 
@@ -160,10 +152,7 @@ export default class SourceSelector extends Vue {
   toggleFolder(treeNode: ISlTreeNode<ISceneItemNode>) {
     const nodeId = treeNode.data.id;
     if (treeNode.isExpanded) {
-      this.expandedFoldersIds.splice(
-        this.expandedFoldersIds.indexOf(nodeId),
-        1
-      );
+      this.expandedFoldersIds.splice(this.expandedFoldersIds.indexOf(nodeId), 1);
     } else {
       this.expandedFoldersIds.push(nodeId);
     }
@@ -194,7 +183,7 @@ export default class SourceSelector extends Vue {
 
     return {
       'icon-unhide': visible,
-      'icon-hide': !visible
+      'icon-hide': !visible,
     };
   }
 
@@ -204,7 +193,7 @@ export default class SourceSelector extends Vue {
 
     return {
       'icon-lock': locked,
-      'icon-unlock': !locked
+      'icon-unlock': !locked,
     };
   }
 

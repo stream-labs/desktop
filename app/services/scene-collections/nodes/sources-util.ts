@@ -3,7 +3,7 @@ import { remote } from 'electron';
 import { ISourceInfo } from './sources';
 
 function getPresetBasePath() {
-  const execFile = basename(process.execPath).toLowerCase()
+  const execFile = basename(process.execPath).toLowerCase();
   const isPackaged = execFile !== 'electron.exe';
 
   const APP_PATH = remote.app.getAppPath();
@@ -15,7 +15,10 @@ function getPresetBasePath() {
  * export for testing
  * JSONから読みだしたパスのうちプリセットと判定できるものを、実際にOBSに渡すパスに変換する
  */
-export function convertPresetPath(pathMaybePreset: string, presetBasePath = getPresetBasePath()): string {
+export function convertPresetPath(
+  pathMaybePreset: string,
+  presetBasePath = getPresetBasePath(),
+): string {
   if (isAbsolute(pathMaybePreset)) {
     return pathMaybePreset;
   }
@@ -34,7 +37,10 @@ export function convertPresetPath(pathMaybePreset: string, presetBasePath = getP
  * export for testing
  * プリセットのファイルを参照するパスを、JSONに書き出す用の相対パスに変換する
  */
-export function revertPresetPath(pathMaybePreset: string, presetBasePath = getPresetBasePath()): string {
+export function revertPresetPath(
+  pathMaybePreset: string,
+  presetBasePath = getPresetBasePath(),
+): string {
   if (!isAbsolute(pathMaybePreset)) {
     return pathMaybePreset;
   }
@@ -57,7 +63,7 @@ export function revertPresetPath(pathMaybePreset: string, presetBasePath = getPr
 /** プリセットのファイル参照をつねにexeから相対パスとして解釈する */
 export function applyPathConvertForPreset(
   sourceType: ISourceInfo['type'],
-  settings: ISourceInfo['settings']
+  settings: ISourceInfo['settings'],
 ): ISourceInfo['settings'] {
   if (sourceType === 'image_source' && typeof settings.file === 'string') {
     settings.file = convertPresetPath(settings.file);
@@ -67,11 +73,10 @@ export function applyPathConvertForPreset(
 
 export function unapplyPathConvertForPreset(
   sourceType: ISourceInfo['type'],
-  settings: ISourceInfo['settings']
+  settings: ISourceInfo['settings'],
 ): ISourceInfo['settings'] {
   if (sourceType === 'image_source' && typeof settings.file === 'string') {
     settings.file = revertPresetPath(settings.file);
   }
   return settings;
 }
-

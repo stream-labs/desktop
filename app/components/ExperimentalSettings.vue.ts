@@ -9,16 +9,13 @@ import { ICustomizationServiceApi } from 'services/customization';
   components: { GenericForm },
 })
 export default class ExperimentalSettings extends Vue {
-
   @Inject() private customizationService: ICustomizationServiceApi;
 
   settingsFormData: TObsFormData = null;
 
-
   created() {
     this.settingsFormData = this.customizationService.getExperimentalSettingsFormData();
   }
-
 
   saveSettings(formData: TObsFormData) {
     const settings: Dictionary<TObsValue> = {};
@@ -28,5 +25,4 @@ export default class ExperimentalSettings extends Vue {
     this.customizationService.setSettings({ experimental: settings });
     this.settingsFormData = this.customizationService.getExperimentalSettingsFormData();
   }
-
 }

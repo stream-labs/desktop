@@ -7,11 +7,11 @@ import { $t } from 'services/i18n';
 import { Menu } from 'util/menus/Menu';
 
 @Component({
-  components: { MixerItem }
+  components: { MixerItem },
 })
 export default class Mixer extends Vue {
   @Inject() audioService: AudioService;
-  
+
   advancedSettingsTooltip = $t('audio.advancedSettingsTooltip');
   mixerTooltip = $t('audio.mixerTooltip');
 
@@ -24,7 +24,7 @@ export default class Mixer extends Vue {
     menu.append({
       id: 'Unhide All',
       label: $t('sources.unhideAll'),
-      click: () => this.audioService.unhideAllSourcesForCurrentScene()
+      click: () => this.audioService.unhideAllSourcesForCurrentScene(),
     });
     menu.popup();
   }

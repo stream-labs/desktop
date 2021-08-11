@@ -82,7 +82,7 @@ export class InternalApiClient {
           );
 
           if (response.error) {
-            throw 'IPC request failed: check the errors in the main window';
+            throw Error('IPC request failed: check the errors in the main window');
           }
 
           const result = response.result;
@@ -152,7 +152,7 @@ export class InternalApiClient {
   }
 
   /**
-   *  The main window sends results of promises resolve/reject and RXJS events as JSON messages via 
+   *  The main window sends results of promises resolve/reject and RXJS events as JSON messages via
    * IPC to the child window
    *  Listen and handle these messages here
    */

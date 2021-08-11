@@ -12,7 +12,7 @@ jest.mock('services/core/injector');
 jest.mock('services/settings', () => ({}));
 jest.mock('services/customization', () => ({}));
 jest.mock('../../../obs-api', () => ({
-  NodeObs: {}
+  NodeObs: {},
 }));
 
 beforeEach(() => {
@@ -34,15 +34,15 @@ test('update', () => {
               {
                 cpu: {
                   percentCPUUsage: 1,
-                }
+                },
               },
               {
                 cpu: {
                   percentCPUUsage: 2,
-                }
-              }
+                },
+              },
             ];
-          }
+          },
         },
       },
     },
@@ -51,7 +51,7 @@ test('update', () => {
     NodeObs: {
       OBS_API_getPerformanceStatistics() {
         return { dummy: 'obs result', CPU: 0 };
-      }
+      },
     },
   }));
   setup();
@@ -61,6 +61,7 @@ test('update', () => {
   instance.SET_PERFORMANCE_STATS = jest.fn();
   instance.update();
   expect(instance.SET_PERFORMANCE_STATS).toHaveBeenNthCalledWith(1, {
-    dummy: 'obs result', CPU: 3
+    dummy: 'obs result',
+    CPU: 3,
   });
 });

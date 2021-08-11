@@ -79,41 +79,38 @@ export class EditMenu extends Menu {
         label: $t('sources.pasteReference'),
         enabled: this.clipboardService.hasData(),
         accelerator: 'CommandOrControl+V',
-        click: () => this.clipboardService.paste()
+        click: () => this.clipboardService.paste(),
       });
 
       this.append({
         id: 'Paste (Duplicate)',
         label: $t('sources.pasteDuplicate'),
         enabled: this.clipboardService.hasItems(),
-        click: () => this.clipboardService.paste(true)
+        click: () => this.clipboardService.paste(true),
       });
     }
 
     if (this.options.showSceneItemMenu) {
-
       const selectedItem = this.selectionService.getLastSelected();
 
       this.append({
         id: 'Copy',
         label: $t('common.copy'),
         accelerator: 'CommandOrControl+C',
-        click: () => this.clipboardService.copy()
+        click: () => this.clipboardService.copy(),
       });
-
 
       this.append({
         id: 'Select All',
         label: $t('common.selectAll'),
         accelerator: 'CommandOrControl+A',
-        click: () => this.selectionService.selectAll()
+        click: () => this.selectionService.selectAll(),
       });
       this.append({
         id: 'Invert Selection',
         label: $t('sources.invertSelection'),
-        click: () => this.selectionService.invert()
+        click: () => this.selectionService.invert(),
       });
-
 
       this.append({ type: 'separator' });
 
@@ -123,19 +120,19 @@ export class EditMenu extends Menu {
         accelerator: 'Delete',
         click: () => {
           this.selectionService.remove();
-        }
+        },
       });
 
       this.append({
         id: 'Transform',
         label: $t('sources.transform'),
-        submenu: this.transformSubmenu().menu
+        submenu: this.transformSubmenu().menu,
       });
 
       this.append({
         id: 'Group',
         label: $t('sources.group'),
-        submenu: this.groupSubmenu().menu
+        submenu: this.groupSubmenu().menu,
       });
 
       if (selectedItem) {
@@ -147,14 +144,14 @@ export class EditMenu extends Menu {
             label: visibilityLabel,
             click: () => {
               selectedItem.setVisibility(!selectedItem.visible);
-            }
+            },
           });
           this.append({
             id: 'Create Source Projector',
             label: $t('sources.createSourceProjector'),
             click: () => {
               this.projectorService.createProjector(selectedItem.sourceId);
-            }
+            },
           });
         } else {
           this.append({
@@ -162,14 +159,14 @@ export class EditMenu extends Menu {
             label: $t('common.show'),
             click: () => {
               this.selectionService.setVisibility(true);
-            }
+            },
           });
           this.append({
             id: 'Hide',
             label: $t('common.hide'),
             click: () => {
               this.selectionService.setVisibility(false);
-            }
+            },
           });
         }
       }
@@ -181,19 +178,16 @@ export class EditMenu extends Menu {
         label: $t('common.rename'),
         click: () =>
           this.scenesService.showNameFolder({
-            renameId:  this.selectionService.getFolders()[0].id
-          })
+            renameId: this.selectionService.getFolders()[0].id,
+          }),
       });
     }
 
-
     if (this.source && !isMultipleSelection) {
-
       this.append({
         id: 'Rename',
         label: $t('common.rename'),
-        click: () =>
-          this.sourcesService.showRenameSource(this.source.sourceId)
+        click: () => this.sourcesService.showRenameSource(this.source.sourceId),
       });
 
       this.append({ type: 'separator' });
@@ -202,7 +196,7 @@ export class EditMenu extends Menu {
         this.append({
           id: 'Deinterlacing',
           label: $t('common.deinterlacing'),
-          submenu: this.deinterlaceSubmenu().menu
+          submenu: this.deinterlaceSubmenu().menu,
         });
       }
 
@@ -213,20 +207,20 @@ export class EditMenu extends Menu {
         label: $t('common.filters') + (filtersCount > 0 ? ` (${filtersCount})` : ''),
         click: () => {
           this.showFilters();
-        }
+        },
       });
 
       this.append({
         id: 'Copy Filters',
         label: $t('sources.copyFilters'),
-        click: () => this.clipboardService.copyFilters()
+        click: () => this.clipboardService.copyFilters(),
       });
 
       this.append({
         id: 'Paste Filters',
         label: $t('sources.pasteFilters'),
         click: () => this.clipboardService.pasteFilters(),
-        enabled: this.clipboardService.hasFilters()
+        enabled: this.clipboardService.hasFilters(),
       });
 
       this.append({ type: 'separator' });
@@ -237,7 +231,7 @@ export class EditMenu extends Menu {
         click: () => {
           this.showProperties();
         },
-        enabled: this.source.hasProps()
+        enabled: this.source.hasProps(),
       });
     }
 
@@ -247,13 +241,13 @@ export class EditMenu extends Menu {
       this.append({
         id: 'Lock Sources',
         label: $t('sources.lock'),
-        click: () => this.scenesService.setLockOnAllScenes(true)
+        click: () => this.scenesService.setLockOnAllScenes(true),
       });
 
       this.append({
         id: 'Unlock Sources',
         label: $t('sources.unlock'),
-        click: () => this.scenesService.setLockOnAllScenes(false)
+        click: () => this.scenesService.setLockOnAllScenes(false),
       });
 
       this.append({
@@ -261,9 +255,10 @@ export class EditMenu extends Menu {
         label: $t('scenes.performanceMode'),
         type: 'checkbox',
         checked: this.customizationService.state.performanceMode,
-        click: () => this.customizationService.setSettings({
-          performanceMode: !this.customizationService.state.performanceMode
-        })
+        click: () =>
+          this.customizationService.setSettings({
+            performanceMode: !this.customizationService.state.performanceMode,
+          }),
       });
     }
 
@@ -272,7 +267,7 @@ export class EditMenu extends Menu {
     this.append({
       id: 'Create Output Projector',
       label: $t('scenes.createOutputProjector'),
-      click: () => this.projectorService.createProjector()
+      click: () => this.projectorService.createProjector(),
     });
 
     if (this.options.showAudioMixerMenu) {
@@ -283,16 +278,15 @@ export class EditMenu extends Menu {
         label: $t('common.hide'),
         click: () => {
           this.audioService.getSource(this.source.sourceId).setHidden(true);
-        }
+        },
       });
 
       this.append({
         id: 'Unhide All',
         label: $t('sources.unhideAll'),
-        click: () => this.audioService.unhideAllSourcesForCurrentScene()
+        click: () => this.audioService.unhideAllSourcesForCurrentScene(),
       });
     }
-
   }
 
   private showFilters() {

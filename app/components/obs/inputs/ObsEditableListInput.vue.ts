@@ -2,7 +2,7 @@ import _ from 'lodash';
 import electron from 'electron';
 import Selector from '../../Selector.vue';
 import { Component, Prop } from 'vue-property-decorator';
-import  { IObsEditableListInputValue, ObsInput, TObsType } from './ObsInput';
+import { IObsEditableListInputValue, ObsInput, TObsType } from './ObsInput';
 import { Menu } from '../../../util/menus/Menu';
 import { $t } from '../../../services/i18n';
 
@@ -12,10 +12,9 @@ interface ISelectorSortEventData {
 }
 
 @Component({
-  components: { Selector }
+  components: { Selector },
 })
 class ObsEditableListProperty extends ObsInput<IObsEditableListInputValue> {
-
   static obsType: TObsType;
 
   @Prop()
@@ -31,7 +30,7 @@ class ObsEditableListProperty extends ObsInput<IObsEditableListInputValue> {
       label: $t('settings.addFiles'),
       click: () => {
         this.showFileDialog();
-      }
+      },
     });
 
     this.menu.append({
@@ -39,7 +38,7 @@ class ObsEditableListProperty extends ObsInput<IObsEditableListInputValue> {
       label: $t('settings.addDirectory'),
       click: () => {
         this.showDirDialog();
-      }
+      },
     });
   }
 
@@ -63,11 +62,11 @@ class ObsEditableListProperty extends ObsInput<IObsEditableListInputValue> {
     const files = electron.remote.dialog.showOpenDialog({
       defaultPath: this.value.defaultPath,
       filters: this.value.filters,
-      properties: ['openFile']
+      properties: ['openFile'],
     });
 
     if (files) {
-      let activeIndex = _.indexOf(this.list, this.activeItem);
+      const activeIndex = _.indexOf(this.list, this.activeItem);
 
       this.list[activeIndex] = files[0];
 
@@ -81,7 +80,7 @@ class ObsEditableListProperty extends ObsInput<IObsEditableListInputValue> {
     const files = electron.remote.dialog.showOpenDialog({
       defaultPath: this.value.defaultPath,
       filters: this.value.filters,
-      properties: ['openFile', 'multiSelections']
+      properties: ['openFile', 'multiSelections'],
     });
 
     if (files) {
@@ -92,7 +91,7 @@ class ObsEditableListProperty extends ObsInput<IObsEditableListInputValue> {
   showDirDialog() {
     const dir = electron.remote.dialog.showOpenDialog({
       defaultPath: this.value.defaultPath,
-      properties: ['openDirectory']
+      properties: ['openDirectory'],
     });
 
     if (dir) {
@@ -106,9 +105,8 @@ class ObsEditableListProperty extends ObsInput<IObsEditableListInputValue> {
 
   get list(): string[] {
     const items = this.value.value || [];
-    return _.cloneDeep(items.map(item => item.value ));
+    return _.cloneDeep(items.map(item => item.value));
   }
-
 }
 
 ObsEditableListProperty.obsType = 'OBS_PROPERTY_EDITABLE_LIST';

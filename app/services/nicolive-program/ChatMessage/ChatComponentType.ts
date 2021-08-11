@@ -1,11 +1,6 @@
 import { ChatMessageType } from './classifier';
 
-export type ChatComponentType =
-  'common' |
-  'nicoad' |
-  'gift' |
-  'emotion' |
-  'system';
+export type ChatComponentType = 'common' | 'nicoad' | 'gift' | 'emotion' | 'system';
 
 export const chatComponentTypeMap: {
   [type in ChatMessageType]: ChatComponentType;
@@ -23,6 +18,8 @@ export const chatComponentTypeMap: {
   invisible: 'system',
 } as const;
 
-export function AddComponent<T extends { type: ChatMessageType }>(chat: T): T & { component: ChatComponentType } {
+export function AddComponent<T extends { type: ChatMessageType }>(
+  chat: T,
+): T & { component: ChatComponentType } {
   return { ...chat, component: chatComponentTypeMap[chat.type] };
 }

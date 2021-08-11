@@ -75,7 +75,7 @@ module.exports = {
       {
         test: /\.ts$/,
         enforce: 'pre',
-        loader: 'tslint-loader'
+        loader: 'eslint-loader'
       },
       {
         test: /\.js$/,

@@ -7,13 +7,13 @@ export class NicoliveFailure {
     public type: 'logic' | 'http_error' | 'network_error',
     public method: string,
     public reason: string,
-    public additionalMessage: string = ''
+    public additionalMessage: string = '',
   ) {}
 
   static fromClientError(method: string, res: FailedResult) {
     if (res.value instanceof NotLoggedInError) {
       console.error(res.value);
-      return new this('logic', method, 'not_logged_in')
+      return new this('logic', method, 'not_logged_in');
     }
     if (res.value instanceof Error) {
       console.error(res.value);
@@ -29,7 +29,13 @@ export class NicoliveFailure {
   }
 }
 
-async function openErrorDialog({ title, message }: { title: string; message: string }): Promise<void> {
+async function openErrorDialog({
+  title,
+  message,
+}: {
+  title: string;
+  message: string;
+}): Promise<void> {
   return new Promise<void>(resolve => {
     remote.dialog.showMessageBox(
       remote.getCurrentWindow(),
@@ -40,7 +46,7 @@ async function openErrorDialog({ title, message }: { title: string; message: str
         buttons: [$t('common.close')],
         noLink: true,
       },
-      _ => resolve()
+      _ => resolve(),
     );
   });
 }
@@ -64,13 +70,18 @@ export async function openErrorDialogFromFailure(failure: NicoliveFailure): Prom
   /** 4xx, 5xxエラーに対する文言がなかったら400や500向けの文言を出す */
   return openErrorDialog({
     title: $t(`nicolive-program.errors.api.${failure.method}.${failure.reason}.title`, {
-      fallback: $t(`nicolive-program.errors.api.${failure.method}.${fallbackToX00(failure.reason)}.title`),
+      fallback: $t(
+        `nicolive-program.errors.api.${failure.method}.${fallbackToX00(failure.reason)}.title`,
+      ),
     }),
     message: $t(`nicolive-program.errors.api.${failure.method}.${failure.reason}.message`, {
       additionalMessage: failure.additionalMessage,
-      fallback: $t(`nicolive-program.errors.api.${failure.method}.${fallbackToX00(failure.reason)}.message`, {
-        additionalMessage: failure.additionalMessage,
-      }),
+      fallback: $t(
+        `nicolive-program.errors.api.${failure.method}.${fallbackToX00(failure.reason)}.message`,
+        {
+          additionalMessage: failure.additionalMessage,
+        },
+      ),
     }),
   });
 }

@@ -2,7 +2,6 @@ import { ArrayNode } from './array-node';
 import { HotkeysService, IHotkey, Hotkey } from '../../hotkeys';
 import { Inject } from '../../core/injector';
 
-
 interface IContext {
   sceneId?: string;
   sceneItemId?: string;
@@ -10,7 +9,6 @@ interface IContext {
 }
 
 export class HotkeysNode extends ArrayNode<IHotkey, IContext, Hotkey> {
-
   schemaVersion = 2;
 
   @Inject()
@@ -30,23 +28,19 @@ export class HotkeysNode extends ArrayNode<IHotkey, IContext, Hotkey> {
     return items.filter(hotkey => hotkey.bindings.length);
   }
 
-
   saveItem(hotkey: Hotkey, context: IContext): Promise<IHotkey> {
     const hotkeyObj = hotkey.getModel();
     Object.keys(context).forEach(key => delete hotkeyObj[key]);
     return Promise.resolve(hotkeyObj);
   }
 
-
   loadItem(obj: IHotkey, context: IContext): Promise<void> {
     this.hotkeysService.addHotkey({ ...obj, ...context });
     return Promise.resolve();
   }
 
-
   migrate(version: number) {
     // We don't support version 1 hotkey schemas
     if (version === 1) this.data = { items: [] };
   }
-
 }

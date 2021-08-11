@@ -30,7 +30,7 @@ type ProgramState = {
   comments: number;
   adPoint: number;
   giftPoint: number;
-}
+};
 
 interface INicoliveProgramState extends ProgramState {
   /**
@@ -93,7 +93,7 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
     this.stateService.updated.subscribe({
       next: persistentState => {
         this.setState(persistentState);
-      }
+      },
     });
 
     this.userService.userLoginState.subscribe({
@@ -102,7 +102,7 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
         if (!user) {
           this.setState(NicoliveProgramService.programInitialState);
         }
-      }
+      },
     });
 
     // UserServiceのSubjectをBehaviorに変更するのは影響が広すぎる
@@ -132,7 +132,7 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
   static findSuitableProgram(schedules: Schedules): null | Schedule {
     // テスト中・放送中の番組があればそれで確定
     const currentProgram = schedules.find(
-      s => s.socialGroupId.startsWith('co') && (s.status === 'test' || s.status === 'onAir')
+      s => s.socialGroupId.startsWith('co') && (s.status === 'test' || s.status === 'onAir'),
     );
     if (currentProgram) return currentProgram;
 
@@ -212,7 +212,7 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
         console.error(
           'fetchCommunity',
           communityResponse.value.meta.status,
-          communityResponse.value.meta.errorMessage || ''
+          communityResponse.value.meta.errorMessage || '',
         );
       }
     }
@@ -309,7 +309,10 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
   }
 
   private statsTimer: number = 0;
-  refreshStatisticsPolling(prevState: INicoliveProgramState, nextState: INicoliveProgramState): void {
+  refreshStatisticsPolling(
+    prevState: INicoliveProgramState,
+    nextState: INicoliveProgramState,
+  ): void {
     const programUpdated = prevState.programID !== nextState.programID;
 
     const prev = prevState.status === 'onAir';
@@ -318,7 +321,11 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
     if ((!prev && next) || (next && programUpdated)) {
       clearInterval(this.statsTimer);
       this.updateStatistics(nextState.programID); // run and forget
-      this.statsTimer = window.setInterval((id: string) => this.updateStatistics(id), 60 * 1000, nextState.programID);
+      this.statsTimer = window.setInterval(
+        (id: string) => this.updateStatistics(id),
+        60 * 1000,
+        nextState.programID,
+      );
     } else if (prev && !next) {
       clearInterval(this.statsTimer);
     }
@@ -353,7 +360,10 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
   }
 
   async sendOperatorComment(text: string, isPermanent: boolean): Promise<void> {
-    const result = await this.client.sendOperatorComment(this.state.programID, { text, isPermanent });
+    const result = await this.client.sendOperatorComment(this.state.programID, {
+      text,
+      isPermanent,
+    });
     if (!isOk(result)) {
       throw NicoliveFailure.fromClientError('sendOperatorComment', result);
     }
@@ -366,19 +376,25 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
     onAir: 'endTime',
   };
   private refreshProgramTimer = 0;
-  refreshProgramStatusTimer(prevState: INicoliveProgramState, nextState: INicoliveProgramState): void {
+  refreshProgramStatusTimer(
+    prevState: INicoliveProgramState,
+    nextState: INicoliveProgramState,
+  ): void {
     const programUpdated = prevState.programID !== nextState.programID;
     const statusUpdated = prevState.status !== nextState.status;
 
     /** 放送状態が変化しなかった前提で、放送状態が次に変化するであろう時刻 */
-    const prevTargetTime: number = prevState[NicoliveProgramService.REFRESH_TARGET_TIME_TABLE[nextState.status]];
+    const prevTargetTime: number =
+      prevState[NicoliveProgramService.REFRESH_TARGET_TIME_TABLE[nextState.status]];
     /*: 予約番組で現在時刻が開始時刻より30分以上前なら、30分を切ったときに再取得するための補正項 */
     const readyTimeTermIfReserved =
-      nextState.status === 'reserved' && nextState.startTime - Math.floor(Date.now() / 1000) > 30 * 60
+      nextState.status === 'reserved' &&
+      nextState.startTime - Math.floor(Date.now() / 1000) > 30 * 60
         ? -30 * 60
         : 0;
     const nextTargetTime: number =
-      nextState[NicoliveProgramService.REFRESH_TARGET_TIME_TABLE[nextState.status]] + readyTimeTermIfReserved;
+      nextState[NicoliveProgramService.REFRESH_TARGET_TIME_TABLE[nextState.status]] +
+      readyTimeTermIfReserved;
     const targetTimeUpdated = !statusUpdated && prevTargetTime !== nextTargetTime;
 
     const prev = prevState.status !== 'end';
@@ -399,14 +415,19 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
   }
 
   private autoExtensionTimer = 0;
-  refreshAutoExtensionTimer(prevState: INicoliveProgramState, nextState: INicoliveProgramState): void {
+  refreshAutoExtensionTimer(
+    prevState: INicoliveProgramState,
+    nextState: INicoliveProgramState,
+  ): void {
     const now = Date.now();
     const endTimeUpdated = prevState.endTime !== nextState.endTime;
 
     /** 更新前の状態でタイマーが動作しているべきか */
-    const prev = prevState.autoExtensionEnabled && NicoliveProgramService.isProgramExtendable(prevState);
+    const prev =
+      prevState.autoExtensionEnabled && NicoliveProgramService.isProgramExtendable(prevState);
     /** 更新後の状態でタイマーが動作しているべきか */
-    const next = nextState.autoExtensionEnabled && NicoliveProgramService.isProgramExtendable(nextState);
+    const next =
+      nextState.autoExtensionEnabled && NicoliveProgramService.isProgramExtendable(nextState);
 
     // 動作すべき状態になる OR 終了時刻が変わったら再設定
     if ((next && !prev) || (next && endTimeUpdated)) {
@@ -422,7 +443,7 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
         console.log(
           '自動延長タイマーが（再）設定されました ',
           Math.floor(((nextState.endTime - 5 * 60) * 1000 - now) / 1000),
-          '秒後に自動延長します'
+          '秒後に自動延長します',
         );
       }
       return;
@@ -459,12 +480,27 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
 
   /** パネルが出る幅の分だけ画面の最小幅を拡張する */
   refreshWindowSize(prevState: INicoliveProgramState, nextState: INicoliveProgramState): void {
-    if (prevState.panelOpened === nextState.panelOpened && prevState.isLoggedIn === nextState.isLoggedIn) return;
+    if (
+      prevState.panelOpened === nextState.panelOpened &&
+      prevState.isLoggedIn === nextState.isLoggedIn
+    ) {
+      return;
+    }
 
-    const prevPanelState = NicoliveProgramService.getPanelState(prevState.panelOpened, prevState.isLoggedIn);
-    const nextPanelState = NicoliveProgramService.getPanelState(nextState.panelOpened, nextState.isLoggedIn);
+    const prevPanelState = NicoliveProgramService.getPanelState(
+      prevState.panelOpened,
+      prevState.isLoggedIn,
+    );
+    const nextPanelState = NicoliveProgramService.getPanelState(
+      nextState.panelOpened,
+      nextState.isLoggedIn,
+    );
     if (prevPanelState !== nextPanelState) {
-      NicoliveProgramService.updateWindowSize(this.windowsService.getWindow('main'), prevPanelState, nextPanelState);
+      NicoliveProgramService.updateWindowSize(
+        this.windowsService.getWindow('main'),
+        prevPanelState,
+        nextPanelState,
+      );
     }
   }
 

@@ -19,8 +19,10 @@ interface INotificationsState {
   notifications: INotification[];
 }
 
-export class NotificationsService extends PersistentStatefulService<INotificationsState>
-  implements INotificationsServiceApi {
+export class NotificationsService
+  extends PersistentStatefulService<INotificationsState>
+  implements INotificationsServiceApi
+{
   static defaultState: INotificationsState = {
     notifications: [],
     settings: {

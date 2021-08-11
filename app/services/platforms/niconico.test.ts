@@ -7,7 +7,7 @@ const setup = createSetupFunction({
     UserService: {},
     StreamingService: {
       streamingStatusChange: {
-        subscribe() { },
+        subscribe() {},
       },
     },
     WindowsService: {},
@@ -51,7 +51,11 @@ test('setupStreamSettingsでストリーム情報がとれた場合', async () =
   getSettingsFormData.mockReturnValue([
     {
       nameSubCategory: 'Untitled',
-      parameters: [{ name: 'service', value: '' }, { name: 'server', value: '' }, { name: 'key', value: '' }],
+      parameters: [
+        { name: 'service', value: '' },
+        { name: 'server', value: '' },
+        { name: 'key', value: '' },
+      ],
     },
   ]);
 
@@ -64,7 +68,7 @@ test('setupStreamSettingsでストリーム情報がとれた場合', async () =
       setSettings,
     },
     WindowsService: {
-      showWindow: showWindow,
+      showWindow,
     },
   };
 
@@ -72,10 +76,12 @@ test('setupStreamSettingsでストリーム情報がとれた場合', async () =
   const { NiconicoService } = require('./niconico');
   const { instance } = NiconicoService;
 
-  instance.client.fetchBroadcastStream = jest.fn((programId: string) => Promise.resolve({
-    url: 'url1',
-    name: 'key1'
-  }));
+  instance.client.fetchBroadcastStream = jest.fn((programId: string) =>
+    Promise.resolve({
+      url: 'url1',
+      name: 'key1',
+    }),
+  );
   instance.client.fetchMaxBitrate = jest.fn((programId: string) => Promise.resolve(6000));
 
   const result = await instance.setupStreamSettings('lv12345');
@@ -94,23 +100,29 @@ test('setupStreamSettingsで番組取得にリトライで成功する場合', a
   getSettingsFormData.mockReturnValue([
     {
       nameSubCategory: 'Untitled',
-      parameters: [{ name: 'service', value: '' }, { name: 'server', value: '' }, { name: 'key', value: '' }],
+      parameters: [
+        { name: 'service', value: '' },
+        { name: 'server', value: '' },
+        { name: 'key', value: '' },
+      ],
     },
   ]);
 
   const injectee = {
-    UserService: { updatePlatformChannelId: updatePlatformChannelId },
-    SettingsService: { getSettingsFormData: getSettingsFormData, setSettings: setSettings },
+    UserService: { updatePlatformChannelId },
+    SettingsService: { getSettingsFormData, setSettings },
   };
 
   setup({ injectee });
   const { NiconicoService } = require('./niconico');
   const { instance } = NiconicoService;
 
-  instance.client.fetchBroadcastStream = jest.fn((programId: string) => Promise.resolve({
-    url: 'url1',
-    name: 'key1'
-  }))
+  instance.client.fetchBroadcastStream = jest.fn((programId: string) =>
+    Promise.resolve({
+      url: 'url1',
+      name: 'key1',
+    }),
+  );
   instance.client.fetchMaxBitrate = jest.fn((programId: string) => Promise.resolve(6000));
 
   const result = await instance.setupStreamSettings();

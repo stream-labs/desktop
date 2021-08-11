@@ -6,24 +6,20 @@ import querystring from 'querystring';
 
 type LicenseApiResponse = {
   meta: {
-    status: number,
-    state?: 'NEW-CREATE' | 'DATE-CONFIRMED' | 'KEY-MATCH',
-    errorCode?: 'ENQUETE-REQUIRED' | 'INVALID-PARAM' | 'UNKNOWN_ERROR',
-    errorMessage: string
-  },
+    status: number;
+    state?: 'NEW-CREATE' | 'DATE-CONFIRMED' | 'KEY-MATCH';
+    errorCode?: 'ENQUETE-REQUIRED' | 'INVALID-PARAM' | 'UNKNOWN_ERROR';
+    errorMessage: string;
+  };
   data?: {
-    serial?: string,
-    url?: string
-  }
+    serial?: string;
+    url?: string;
+  };
 };
 
-interface IQuestionaireServiceState {
-}
+interface IQuestionaireServiceState {}
 
-export class QuestionaireService extends StatefulService<
-  IQuestionaireServiceState
-  > {
-
+export class QuestionaireService extends StatefulService<IQuestionaireServiceState> {
   localStorageKey = 'InstallationUuidv4';
   private _uuid: string = null;
 
@@ -38,7 +34,7 @@ export class QuestionaireService extends StatefulService<
     return this._uuid;
   }
 
-  private makeHash(options: { uuid: string, key: string }): string {
+  private makeHash(options: { uuid: string; key: string }): string {
     const { uuid, key } = options;
     const keyArray = base64.toByteArray(key);
     const binaryKey = Buffer.from(keyArray.buffer as ArrayBuffer);
@@ -48,7 +44,7 @@ export class QuestionaireService extends StatefulService<
     return hash;
   }
 
-  callLicenseApi(options: { uuid: string, hash: string }): Promise<LicenseApiResponse> {
+  callLicenseApi(options: { uuid: string; hash: string }): Promise<LicenseApiResponse> {
     const { uuid, hash } = options;
     const query = querystring.stringify({ c: hash, uuid });
     const requestUrl = `http://live.nicovideo.jp/encoder/getlicensenair?${query}`;
@@ -56,8 +52,7 @@ export class QuestionaireService extends StatefulService<
 
     const headers = new Headers();
     const request = new Request(requestUrl, { headers, credentials: 'include' });
-    return fetch(request)
-      .then(response => response.json());
+    return fetch(request).then(response => response.json());
   }
 
   private generateUuid(): string {
@@ -98,16 +93,20 @@ export class QuestionaireService extends StatefulService<
 
       // 以前はアンケートを出す判断をする目的で呼び出していたAPIだが、アンケートはなくなったため、
       // 現在はインストール数を集計する目的で利用している
-      return this.callLicenseApi({ uuid, hash }).then((result: LicenseApiResponse) => {
-        console.log('getlicenseair response: ', result);
-        if (result.meta.status != 200) {
-          throw new Error('getlicenseair error: '
-            + `status(${result.meta.status})`
-            + `, errorCode(${result.meta.errorCode}`
-            + `, errorMessage(${result.meta.errorMessage})`);
-        }
-        return false;
-      }).catch(() => false);
+      return this.callLicenseApi({ uuid, hash })
+        .then((result: LicenseApiResponse) => {
+          console.log('getlicenseair response: ', result);
+          if (result.meta.status !== 200) {
+            throw new Error(
+              'getlicenseair error: ' +
+                `status(${result.meta.status})` +
+                `, errorCode(${result.meta.errorCode}` +
+                `, errorMessage(${result.meta.errorMessage})`,
+            );
+          }
+          return false;
+        })
+        .catch(() => false);
     });
   }
 }

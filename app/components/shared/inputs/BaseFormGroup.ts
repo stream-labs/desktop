@@ -10,7 +10,6 @@ import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
  * Base class for input-component layouts
  */
 export default abstract class BaseFormGroup extends BaseInput<any, IInputMetadata> {
-
   @Prop()
   readonly type: EInputType;
 
@@ -39,7 +38,7 @@ export default abstract class BaseFormGroup extends BaseInput<any, IInputMetadat
   created() {
     if (!this.form) return;
     this.form.validated.subscribe(errors => {
-      this.inputErrors = errors.filter(error => error.field == this.uuid);
+      this.inputErrors = errors.filter(error => error.field === this.uuid);
     });
   }
 

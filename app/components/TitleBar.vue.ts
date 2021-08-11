@@ -8,7 +8,7 @@ import Utils from 'services/utils';
 import { $t } from 'services/i18n';
 
 @Component({
-  components: {}
+  components: {},
 })
 export default class TitleBar extends Vue {
   @Inject() customizationService: CustomizationService;
@@ -49,5 +49,4 @@ export default class TitleBar extends Vue {
   get isStreaming() {
     return this.streamingService.isStreaming;
   }
-
 }

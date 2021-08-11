@@ -1,4 +1,3 @@
-
 import {
   ISourceApi,
   TSourceType,
@@ -6,7 +5,7 @@ import {
   SourcesService,
   TPropertiesManager,
   ISourceComparison,
-  PROPERTIES_MANAGER_TYPES
+  PROPERTIES_MANAGER_TYPES,
 } from './index';
 import { mutation, ServiceHelper, Inject } from '../core';
 import { ScenesService } from 'services/scenes';
@@ -14,7 +13,6 @@ import { TObsFormData } from 'components/obs/inputs/ObsInput';
 import Utils from 'services/utils';
 import * as obs from '../../../obs-api';
 import { isEqual } from 'lodash';
-
 
 @ServiceHelper()
 export class Source implements ISourceApi {
@@ -71,7 +69,7 @@ export class Source implements ISourceApi {
   getComparisonDetails(): ISourceComparison {
     const details: ISourceComparison = {
       type: this.type,
-      propertiesManager: this.getPropertiesManagerType()
+      propertiesManager: this.getPropertiesManagerType(),
     };
 
     return details;
@@ -125,16 +123,11 @@ export class Source implements ISourceApi {
 
   duplicate(newSourceId?: string): Source {
     if (this.doNotDuplicate) return null;
-    return this.sourcesService.createSource(
-      this.name,
-      this.type,
-      this.getSettings(),
-      {
-        sourceId: newSourceId,
-        propertiesManager: this.getPropertiesManagerType(),
-        propertiesManagerSettings: this.getPropertiesManagerSettings()
-      }
-    );
+    return this.sourcesService.createSource(this.name, this.type, this.getSettings(), {
+      sourceId: newSourceId,
+      propertiesManager: this.getPropertiesManagerType(),
+      propertiesManagerSettings: this.getPropertiesManagerSettings(),
+    });
   }
 
   remove() {
@@ -167,8 +160,7 @@ export class Source implements ISourceApi {
    */
   refresh() {
     const obsInput = this.getObsInput();
-    (obsInput.properties.get('refreshnocache') as obs.IButtonProperty)
-      .buttonClicked(obsInput);
+    (obsInput.properties.get('refreshnocache') as obs.IButtonProperty).buttonClicked(obsInput);
   }
 
   @Inject()

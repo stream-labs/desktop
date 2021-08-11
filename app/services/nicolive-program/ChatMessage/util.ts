@@ -42,7 +42,7 @@ export function parseCommandArgument(chat: ChatMessage): string {
   return matched && matched[1] ? matched[1] : '';
 }
 
-export function parseJsonContent(chat: ChatMessage): { commandName: string, value: any} | null {
+export function parseJsonContent(chat: ChatMessage): { commandName: string; value: any } | null {
   const content = chat.content ?? '';
   const matched = content.match(/(\S+)\s+(.+)/);
   if (matched && matched.length > 2) {
@@ -70,7 +70,7 @@ enum ParseState {
 
 const SPACES = [' ', '\t'];
 
-export function parseContent(chat: ChatMessage): { commandName: string, values: string[] } {
+export function parseContent(chat: ChatMessage): { commandName: string; values: string[] } {
   const content = chat.content ?? '';
   const values = [];
   let currentStr = '';
@@ -79,7 +79,7 @@ export function parseContent(chat: ChatMessage): { commandName: string, values: 
 
   for (const char of content) {
     switch (state) {
-      case ParseState.init: {
+      case ParseState.init:
         if (SPACES.includes(char)) {
           state = ParseState.init;
         } else if (char === '"') {
@@ -90,8 +90,8 @@ export function parseContent(chat: ChatMessage): { commandName: string, values: 
           state = ParseState.reading;
           currentStr += char;
         }
-      } break;
-      case ParseState.reading: {
+        break;
+      case ParseState.reading:
         if (SPACES.includes(char)) {
           values.push(currentStr);
           currentStr = '';
@@ -101,12 +101,12 @@ export function parseContent(chat: ChatMessage): { commandName: string, values: 
         } else {
           currentStr += char;
         }
-      } break;
-      case ParseState.readingEsc: {
+        break;
+      case ParseState.readingEsc:
         currentStr += char;
         state = ParseState.reading;
-      } break;
-      case ParseState.quoted: {
+        break;
+      case ParseState.quoted:
         if (char === '"') {
           values.push(currentStr);
           currentStr = '';
@@ -116,11 +116,11 @@ export function parseContent(chat: ChatMessage): { commandName: string, values: 
         } else {
           currentStr += char;
         }
-      } break;
-      case ParseState.quotedEsc: {
+        break;
+      case ParseState.quotedEsc:
         currentStr += char;
         state = ParseState.quoted;
-      } break;
+        break;
     }
   }
 

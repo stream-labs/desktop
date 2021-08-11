@@ -61,8 +61,8 @@ interface IHotkeyAction {
  *
  * WARNING: Changing the name of existing hotkey actions
  * will cause people to lose their saved keybindings. The
-* name shouldn't really change after it is added.
-*/
+ * name shouldn't really change after it is added.
+ */
 const HOTKEY_ACTIONS: Dictionary<IHotkeyAction[]> = {
   GENERAL: [
     {
@@ -72,7 +72,7 @@ const HOTKEY_ACTIONS: Dictionary<IHotkeyAction[]> = {
       isActive: () => {
         const streamingService = getStreamingService();
         return streamingService.isStreaming;
-      }
+      },
     },
     {
       name: 'TOGGLE_STOP_STREAMING',
@@ -84,36 +84,36 @@ const HOTKEY_ACTIONS: Dictionary<IHotkeyAction[]> = {
       isActive: () => {
         const streamingService = getStreamingService();
         return !streamingService.isStreaming;
-      }
+      },
     },
     {
       name: 'TOGGLE_START_RECORDING',
       description: () => $t('hotkeys.startRecording'),
       down: () => getStreamingService().toggleRecording(),
-      isActive: () => getStreamingService().isRecording
+      isActive: () => getStreamingService().isRecording,
     },
     {
       name: 'TOGGLE_STOP_RECORDING',
       description: () => $t('hotkeys.stopRecording'),
       down: () => getStreamingService().toggleRecording(),
-      isActive: () => !getStreamingService().isRecording
+      isActive: () => !getStreamingService().isRecording,
     },
     {
       name: 'ENABLE_STUDIO_MODE',
       description: () => $t('hotkeys.enableStudioMode'),
       down: () => getTransitionsService().enableStudioMode(),
-      isActive: () => getTransitionsService().state.studioMode
+      isActive: () => getTransitionsService().state.studioMode,
     },
     {
       name: 'DISABLE_STUDIO_MODE',
       description: () => $t('hotkeys.disableStudioMode'),
       down: () => getTransitionsService().disableStudioMode(),
-      isActive: () => !getTransitionsService().state.studioMode
+      isActive: () => !getTransitionsService().state.studioMode,
     },
     {
       name: 'TRANSITION_STUDIO_MODE',
       description: () => $t('hotkeys.studioModeTransition'),
-      down: () => getTransitionsService().executeStudioModeTransition()
+      down: () => getTransitionsService().executeStudioModeTransition(),
     },
     {
       name: 'SAVE_REPLAY',
@@ -126,64 +126,64 @@ const HOTKEY_ACTIONS: Dictionary<IHotkeyAction[]> = {
     {
       name: 'SWITCH_TO_SCENE',
       description: () => $t('hotkeys.switchToScene'),
-      down: (sceneId) => getScenesService().makeSceneActive(sceneId)
-    }
+      down: sceneId => getScenesService().makeSceneActive(sceneId),
+    },
   ],
 
   SCENE_ITEM: [
     {
       name: 'TOGGLE_SOURCE_VISIBILITY_SHOW',
-      description: (sceneItemId) => {
+      description: sceneItemId => {
         const sceneItem = getScenesService().getSceneItem(sceneItemId);
         return $t('hotkeys.showSource', { sourcename: sceneItem.source.name });
       },
-      shouldApply: (sceneItemId) => getScenesService().getSceneItem(sceneItemId).video,
-      isActive: (sceneItemId) => getScenesService().getSceneItem(sceneItemId).visible,
-      down: (sceneItemId) => getScenesService().getSceneItem(sceneItemId).setVisibility(true)
+      shouldApply: sceneItemId => getScenesService().getSceneItem(sceneItemId).video,
+      isActive: sceneItemId => getScenesService().getSceneItem(sceneItemId).visible,
+      down: sceneItemId => getScenesService().getSceneItem(sceneItemId).setVisibility(true),
     },
 
     {
       name: 'TOGGLE_SOURCE_VISIBILITY_HIDE',
-      description: (sceneItemId) => {
+      description: sceneItemId => {
         const sceneItem = getScenesService().getSceneItem(sceneItemId);
         return $t('hotkeys.hideSource', { sourcename: sceneItem.source.name });
       },
-      shouldApply: (sceneItemId) => getScenesService().getSceneItem(sceneItemId).video,
-      isActive: (sceneItemId) => !getScenesService().getSceneItem(sceneItemId).visible,
-      down: (sceneItemId) => getScenesService().getSceneItem(sceneItemId).setVisibility(false)
-    }
+      shouldApply: sceneItemId => getScenesService().getSceneItem(sceneItemId).video,
+      isActive: sceneItemId => !getScenesService().getSceneItem(sceneItemId).visible,
+      down: sceneItemId => getScenesService().getSceneItem(sceneItemId).setVisibility(false),
+    },
   ],
 
   SOURCE: [
     {
       name: 'TOGGLE_MUTE',
       description: () => $t('hotkeys.mute'),
-      down: (sourceId) => getSourcesService().setMuted(sourceId, true),
-      isActive: (sourceId) => getSourcesService().getSource(sourceId).muted,
-      shouldApply: (sourceId) => getSourcesService().getSource(sourceId).audio
+      down: sourceId => getSourcesService().setMuted(sourceId, true),
+      isActive: sourceId => getSourcesService().getSource(sourceId).muted,
+      shouldApply: sourceId => getSourcesService().getSource(sourceId).audio,
     },
     {
       name: 'TOGGLE_UNMUTE',
       description: () => $t('hotkeys.unmute'),
-      down: (sourceId) => getSourcesService().setMuted(sourceId, false),
-      isActive: (sourceId) => !getSourcesService().getSource(sourceId).muted,
-      shouldApply: (sourceId) => getSourcesService().getSource(sourceId).audio
+      down: sourceId => getSourcesService().setMuted(sourceId, false),
+      isActive: sourceId => !getSourcesService().getSource(sourceId).muted,
+      shouldApply: sourceId => getSourcesService().getSource(sourceId).audio,
     },
     {
       name: 'PUSH_TO_MUTE',
       description: () => $t('hotkeys.pushToMute'),
-      down: (sourceId) => getSourcesService().setMuted(sourceId, true),
-      up: (sourceId) => getSourcesService().setMuted(sourceId, false),
-      shouldApply: (sourceId) => getSourcesService().getSource(sourceId).audio
+      down: sourceId => getSourcesService().setMuted(sourceId, true),
+      up: sourceId => getSourcesService().setMuted(sourceId, false),
+      shouldApply: sourceId => getSourcesService().getSource(sourceId).audio,
     },
     {
       name: 'PUSH_TO_TALK',
       description: () => $t('hotkeys.pushToTalk'),
-      down: (sourceId) => getSourcesService().setMuted(sourceId, false),
-      up: (sourceId) => getSourcesService().setMuted(sourceId, true),
-      shouldApply: (sourceId) => getSourcesService().getSource(sourceId).audio
-    }
-  ]
+      down: sourceId => getSourcesService().setMuted(sourceId, false),
+      up: sourceId => getSourcesService().setMuted(sourceId, true),
+      shouldApply: sourceId => getSourcesService().getSource(sourceId).audio,
+    },
+  ],
 };
 
 /**
@@ -282,7 +282,7 @@ export class HotkeysService extends StatefulService<IHotkeysServiceState> {
         hotkeys.push({
           actionName: action.name,
           bindings: [],
-          sourceId: source.sourceId
+          sourceId: source.sourceId,
         });
       });
     });
@@ -499,10 +499,12 @@ export class Hotkey implements IHotkey {
   }
 
   isSameHotkey(other: IHotkey) {
-    return (this.actionName === other.actionName) &&
-      (this.sceneId === other.sceneId) &&
-      (this.sourceId === other.sourceId) &&
-      (this.sceneItemId === other.sceneItemId);
+    return (
+      this.actionName === other.actionName &&
+      this.sceneId === other.sceneId &&
+      this.sourceId === other.sourceId &&
+      this.sceneItemId === other.sceneItemId
+    );
   }
 
   getModel(): IHotkey {
@@ -510,9 +512,11 @@ export class Hotkey implements IHotkey {
   }
 
   private getAction(entityId: string): IHotkeyAction {
-    const action = { ...HOTKEY_ACTIONS[this.type].find(action => {
-      return action.name === this.actionName;
-    }) };
+    const action = {
+      ...HOTKEY_ACTIONS[this.type].find(action => {
+        return action.name === this.actionName;
+      }),
+    };
 
     const { up, down } = action;
 

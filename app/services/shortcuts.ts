@@ -5,7 +5,7 @@ type TShortcutHandler = (event: KeyboardEvent) => void;
 
 // Only works on singletons
 export function shortcut(key: string) {
-  return function(target: any, methodName: string, descriptor: PropertyDescriptor) {
+  return function (target: any, methodName: string, descriptor: PropertyDescriptor) {
     const shortcutsService: ShortcutsService = ShortcutsService.instance;
 
     shortcutsService.registerShortcut(key, e => target.constructor.instance[methodName](e));

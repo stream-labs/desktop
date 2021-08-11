@@ -15,7 +15,6 @@ export interface ISceneSchema {
 }
 
 export class ScenesNode extends ArrayNode<ISceneSchema, {}, Scene> {
-
   schemaVersion = 1;
 
   scenesService: ScenesService = ScenesService.instance;
@@ -31,20 +30,24 @@ export class ScenesNode extends ArrayNode<ISceneSchema, {}, Scene> {
       const hotkeys = new HotkeysNode();
       const filters = new SceneFiltersNode();
 
-      sceneItems.save({ scene }).then(() => {
-        return hotkeys.save({ sceneId: scene.id });
-      }).then(() => {
-        return filters.save({ sceneId: scene.id });
-      }).then(() => {
-        resolve({
-          id: scene.id,
-          name: scene.name,
-          sceneItems,
-          hotkeys,
-          filters,
-          active: this.scenesService.activeSceneId === scene.id
+      sceneItems
+        .save({ scene })
+        .then(() => {
+          return hotkeys.save({ sceneId: scene.id });
+        })
+        .then(() => {
+          return filters.save({ sceneId: scene.id });
+        })
+        .then(() => {
+          resolve({
+            id: scene.id,
+            name: scene.name,
+            sceneItems,
+            hotkeys,
+            filters,
+            active: this.scenesService.activeSceneId === scene.id,
+          });
         });
-      });
     });
   }
 
@@ -65,10 +68,7 @@ export class ScenesNode extends ArrayNode<ISceneSchema, {}, Scene> {
 
   loadItem(obj: ISceneSchema): Promise<() => Promise<void>> {
     return new Promise(resolve => {
-      const scene = this.scenesService.createScene(
-        obj.name,
-        { sceneId: obj.id }
-      );
+      const scene = this.scenesService.createScene(obj.name, { sceneId: obj.id });
 
       if (obj.filters) obj.filters.load({ sceneId: scene.id });
 
@@ -84,10 +84,7 @@ export class ScenesNode extends ArrayNode<ISceneSchema, {}, Scene> {
             }
           });
         });
-
       });
-
     });
   }
-
 }

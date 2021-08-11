@@ -31,17 +31,17 @@ function pluckItems(feedResult: any) {
 
 interface IInformationsState {
   /** インフォ一覧を取得中か否か */
-  fetching: boolean,
+  fetching: boolean;
   /** インフォ一覧の取得中にエラーが発生したか否か */
-  hasError: boolean,
+  hasError: boolean;
   /** 取得済みのインフォ一覧 */
   informations: {
     /** インフォのタイトル */
-    title: string,
+    title: string;
     /** インフォ記事のURL */
-    url: string,
+    url: string;
     /** インフォの作成日 */
-    date: number,
+    date: number;
   }[];
 }
 
@@ -95,7 +95,7 @@ export class InformationsService extends StatefulService<IInformationsState> {
       const feedResult = await this.fetchFeed();
       const informations = InformationsService.pluckItems(feedResult);
       this.SET_INFORMATIONS(informations);
-    } catch(e) {
+    } catch (e) {
       console.error(e);
       this.SET_HAS_ERROR(true);
     }
@@ -129,11 +129,11 @@ export class InformationsService extends StatefulService<IInformationsState> {
     this.windowsService.showWindow({
       componentName: 'Informations',
       title: $t('informations.title'),
-      queryParams: { },
+      queryParams: {},
       size: {
         width: 600,
-        height: 400
-      }
+        height: 400,
+      },
     });
   }
 }

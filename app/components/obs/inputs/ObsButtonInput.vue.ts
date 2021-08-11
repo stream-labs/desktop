@@ -3,7 +3,6 @@ import { ObsInput, IObsInput, TObsType } from './ObsInput';
 
 @Component
 class ObsButtonInput extends ObsInput<IObsInput<boolean>> {
-
   static obsType: TObsType;
 
   @Prop()
@@ -13,7 +12,6 @@ class ObsButtonInput extends ObsInput<IObsInput<boolean>> {
   handleClick() {
     this.emitInput({ ...this.value, value: true });
   }
-
 }
 
 ObsButtonInput.obsType = 'OBS_PROPERTY_BUTTON';

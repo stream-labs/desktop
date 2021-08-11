@@ -17,11 +17,10 @@ export interface IPatchNotes {
 }
 
 export class PatchNotesService extends PersistentStatefulService<IPatchNotesState> {
-
   @Inject() navigationService: NavigationService;
 
   static defaultState: IPatchNotesState = {
-    lastVersionSeen: null
+    lastVersionSeen: null,
   };
 
   init() {
@@ -71,5 +70,4 @@ export class PatchNotesService extends PersistentStatefulService<IPatchNotesStat
   private SET_LAST_VERSION_SEEN(version: string) {
     this.state.lastVersionSeen = version;
   }
-
 }

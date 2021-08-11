@@ -11,40 +11,41 @@ const callbacks = {};
 
 // Behaves just like the node-obs library, but proxies
 // all methods via the main process
-export const nodeObs: Dictionary<Function> = new Proxy({}, {
-  get(target, key) {
-    return (...args: any[]) => {
-      const mappedArgs = args.map(arg => {
-        if (typeof arg === 'function') {
-          idCounter += 1;
+export const nodeObs: Dictionary<Function> = new Proxy(
+  {},
+  {
+    get(target, key) {
+      return (...args: any[]) => {
+        const mappedArgs = args.map(arg => {
+          if (typeof arg === 'function') {
+            idCounter += 1;
 
-          callbacks[idCounter] = arg;
+            callbacks[idCounter] = arg;
 
-          return {
-            __obsCallback: true,
-            id: idCounter
-          };
-        }
+            return {
+              __obsCallback: true,
+              id: idCounter,
+            };
+          }
 
-        return arg;
-      });
+          return arg;
+        });
 
-      return ipcRenderer.sendSync('obs-apiCall', {
-        method: key,
-        args: mappedArgs,
-      });
-    };
-  }
-});
+        return ipcRenderer.sendSync('obs-apiCall', {
+          method: key,
+          args: mappedArgs,
+        });
+      };
+    },
+  },
+);
 
 ipcRenderer.on('obs-apiCallback', (event: Electron.Event, cbInfo: any) => {
   callbacks[cbInfo.id](...cbInfo.args);
 });
 
 export class ObsApiService extends Service {
-
   nodeObs = nodeObs;
-
 
   isObsInstalled() {
     return nodeObs.OBS_API_isOBS_installed();

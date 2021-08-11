@@ -26,23 +26,23 @@ function createInstance() {
         id: 'ch2',
         thumbnailUrl: 'https://secure-dcdn.cdn.nimg.jp/nicoaccount/usericon/defaults/blank.jpg',
         name: 'テスト用チャンネル2',
-      }
-    ] as OnairChannelData[]
+      },
+    ] as OnairChannelData[],
   });
   instance.client.fetchOnairChannelProgram = jest.fn().mockResolvedValue({
     ok: true,
     value: {
       testProgramId: 'lv1111111111',
-      programId: 'lv2222222222'
-    } as OnairChannelProgramData
+      programId: 'lv2222222222',
+    } as OnairChannelProgramData,
   });
-  instance.client.fetchProgram = jest.fn().mockImplementation(
-    (programId: string) => Promise.resolve({
+  instance.client.fetchProgram = jest.fn().mockImplementation((programId: string) =>
+    Promise.resolve({
       ok: true,
       value: {
-        title: `これは ${programId} のタイトルです`
-      }
-    })
+        title: `これは ${programId} のタイトルです`,
+      },
+    }),
   );
   return instance;
 }
@@ -86,10 +86,13 @@ test('チャンネル番組を選んで配信開始のための番組情報を�
 
   // 番組選択へ
   const selectedChannelId = 'ch9999';
-  const selectedChannelName = 'チャンネルああああ'
+  const selectedChannelName = 'チャンネルああああ';
   await instance.onSelectChannel(selectedChannelId, selectedChannelName);
   expect(instance.state.currentStep).toBe('programSelect');
-  expect(instance.state.selectedChannel).toMatchObject({ id: selectedChannelId, name: selectedChannelName })
+  expect(instance.state.selectedChannel).toMatchObject({
+    id: selectedChannelId,
+    name: selectedChannelName,
+  });
   expect(instance.state.candidatePrograms[0].id).toBe('lv1111111111');
   expect(instance.state.candidatePrograms[0].title).toBe('これは lv1111111111 のタイトルです');
   expect(instance.state.candidatePrograms[1].id).toBe('lv2222222222');
@@ -101,8 +104,14 @@ test('チャンネル番組を選んで配信開始のための番組情報を�
   instance.onSelectBroadcastingProgram(selectedProgramId, selectedProgramTitle);
   expect(instance.state.currentStep).toBe('confirm');
   expect(instance.state.selectedProviderType).toBe('channel');
-  expect(instance.state.selectedChannel).toMatchObject({ id: selectedChannelId, name: selectedChannelName });
-  expect(instance.state.selectedChannelProgram).toMatchObject({ id: selectedProgramId, title: selectedProgramTitle });
+  expect(instance.state.selectedChannel).toMatchObject({
+    id: selectedChannelId,
+    name: selectedChannelName,
+  });
+  expect(instance.state.selectedChannelProgram).toMatchObject({
+    id: selectedProgramId,
+    title: selectedProgramTitle,
+  });
 });
 
 test('番組選択ステップで, チャンネルや番組の選択をしようとしても何も起きない.', async () => {
@@ -116,7 +125,7 @@ test('番組選択ステップで, チャンネルや番組の選択をしよう
   expect(instance.state.selectedChannel).toBeNull();
 
   // 番組選択ができない
-  instance.onSelectBroadcastingProgram('lv1', 'title')
+  instance.onSelectBroadcastingProgram('lv1', 'title');
   expect(instance.state.currentStep).toBe('providerTypeSelect');
   expect(instance.state.selectedChannelProgram).toBeNull();
 });
@@ -142,7 +151,7 @@ test('チャンネル選択ステップで, 配信種別や番組の選択をし
   expect(instance.state.selectedProviderType).toBe('channel');
 
   // 番組を選択できない
-  instance.onSelectBroadcastingProgram('lv1', 'title')
+  instance.onSelectBroadcastingProgram('lv1', 'title');
   expect(instance.state.currentStep).toBe('channelSelect');
   expect(instance.state.selectedChannelProgram).toBeNull();
 });
@@ -171,9 +180,9 @@ test('番組選択ステップで, 配信種別やチャンネルの選択をし
   expect(instance.state.selectedProviderType).toBe('channel');
 
   // チャンネルを選択しようとしても何も起きない
-  instance.onSelectChannel('ch100000000', 'name')
+  instance.onSelectChannel('ch100000000', 'name');
   expect(instance.state.currentStep).toBe('programSelect');
-  expect(instance.state.selectedChannel.id).toBe(selectedChannelId)
+  expect(instance.state.selectedChannel.id).toBe(selectedChannelId);
 });
 
 test('ユーザー番組の確認ステップでは, あらゆる設定済の項目を変更することはできない.', async () => {
@@ -196,13 +205,13 @@ test('ユーザー番組の確認ステップでは, あらゆる設定済の項
   expect(instance.state.selectedProviderType).toBe('user');
 
   // チャンネルを選択しようとしても何も起きない
-  await instance.onSelectChannel('ch1111', 'name')
+  await instance.onSelectChannel('ch1111', 'name');
   expect(instance.state.currentStep).toBe('confirm');
   expect(instance.state.selectedProviderType).toBe('user');
   expect(instance.state.selectedChannel).toBeNull();
 
   // 番組を選択しようとしても変更できない
-  instance.onSelectBroadcastingProgram('lv1111', 'title')
+  instance.onSelectBroadcastingProgram('lv1111', 'title');
   expect(instance.state.currentStep).toBe('confirm');
   expect(instance.state.selectedProviderType).toBe('user');
   expect(instance.state.selectedChannel).toBeNull();
@@ -235,13 +244,13 @@ test('チャンネル番組の確認ステップでは, あらゆる設定済の
   expect(instance.state.selectedProviderType).toBe('channel');
 
   // チャンネルを選択しようとしても変更できない
-  await instance.onSelectChannel('ch1111', 'name')
+  await instance.onSelectChannel('ch1111', 'name');
   expect(instance.state.currentStep).toBe('confirm');
   expect(instance.state.selectedProviderType).toBe('channel');
   expect(instance.state.selectedChannel.id).toBe(selectedChannelId);
 
   // 番組を選択しようとしても変更できない
-  instance.onSelectBroadcastingProgram('lv2222', 'title')
+  instance.onSelectBroadcastingProgram('lv2222', 'title');
   expect(instance.state.currentStep).toBe('confirm');
   expect(instance.state.selectedProviderType).toBe('channel');
   expect(instance.state.selectedChannelProgram.id).toBe(selectedProgram);
@@ -260,7 +269,7 @@ describe('ステップ比較系メソッド', () => {
           await instance.onSelectProviderType('user');
           return instance;
         default:
-          throw new Error('作れません')
+          throw new Error('作れません');
       }
     } else {
       switch (step) {
@@ -378,7 +387,7 @@ describe('ステップ比較系メソッド', () => {
         instance.backTo('programSelect');
         instance.backTo('confirm');
         expect((instance as any).SET_STATE).not.toBeCalled();
-      })
+      });
     });
     describe('broadcastChanelSelect ステップのインスタンスに対して状態をクリアできる', () => {
       test('providerTypeSelect ステップに戻るときに適切な状態に初期化できる', async () => {
@@ -390,7 +399,7 @@ describe('ステップ比較系メソッド', () => {
           candidatePrograms: [],
           selectedProviderType: null,
           selectedChannel: null,
-          selectedChannelProgram: null
+          selectedChannelProgram: null,
         });
       });
       test('その他のステップに戻ろうとしても何も起こらない', async () => {
@@ -400,7 +409,7 @@ describe('ステップ比較系メソッド', () => {
         instance.backTo('programSelect');
         instance.backTo('confirm');
         expect((instance as any).SET_STATE).not.toBeCalled();
-      })
+      });
     });
     describe('programSelect ステップのインスタンスに対して状態をクリアできる', () => {
       test('providerTypeSelect ステップに戻るときに適切な状態に初期化できる', async () => {
@@ -412,7 +421,7 @@ describe('ステップ比較系メソッド', () => {
           candidatePrograms: [],
           selectedProviderType: null,
           selectedChannel: null,
-          selectedChannelProgram: null
+          selectedChannelProgram: null,
         });
       });
       test('channelSelect ステップに戻るときに適切な状態に初期化できる', async () => {
@@ -424,7 +433,7 @@ describe('ステップ比較系メソッド', () => {
           candidatePrograms: [],
           selectedProviderType: 'channel',
           selectedChannel: null,
-          selectedChannelProgram: null
+          selectedChannelProgram: null,
         });
       });
       test('その他のステップに戻ろうとしても何も起こらない', async () => {
@@ -445,7 +454,7 @@ describe('ステップ比較系メソッド', () => {
           candidatePrograms: [],
           selectedProviderType: null,
           selectedChannel: null,
-          selectedChannelProgram: null
+          selectedChannelProgram: null,
         });
       });
       test('channelSelect ステップに戻るときに適切な状態に初期化できる', async () => {
@@ -457,7 +466,7 @@ describe('ステップ比較系メソッド', () => {
           candidatePrograms: [],
           selectedProviderType: 'channel',
           selectedChannel: null,
-          selectedChannelProgram: null
+          selectedChannelProgram: null,
         });
       });
       test('programSelect ステップに戻るときに適切な状態に初期化できる', async () => {
@@ -472,7 +481,7 @@ describe('ステップ比較系メソッド', () => {
           ],
           selectedProviderType: 'channel',
           selectedChannel: { id: 'ch9999', name: 'name' },
-          selectedChannelProgram: null
+          selectedChannelProgram: null,
         });
       });
       test('confirm ステップに戻ろうとしても何も起こらない', async () => {
@@ -492,18 +501,17 @@ describe('ステップ比較系メソッド', () => {
           candidatePrograms: [],
           selectedProviderType: null,
           selectedChannel: null,
-          selectedChannelProgram: null
+          selectedChannelProgram: null,
         });
       });
       test('他のステップに戻ろうとしても何も起こらない', async () => {
         const instance = await createServiceInstanceByStep('confirm', 'user');
         (instance as any).SET_STATE = jest.fn();
         instance.backTo('channelSelect'); // ユーザー番組ではスキップされるため無効
-        instance.backTo('programSelect');  // ユーザー番組ではスキップされるため無効
+        instance.backTo('programSelect'); // ユーザー番組ではスキップされるため無効
         instance.backTo('confirm');
         expect((instance as any).SET_STATE).not.toBeCalled();
       });
     });
-  })
-})
-
+  });
+});

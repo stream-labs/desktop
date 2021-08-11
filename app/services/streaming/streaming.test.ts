@@ -3,7 +3,7 @@ import { EStreamingState, ERecordingState } from './streaming-api';
 
 import { createSetupFunction } from 'util/test-setup';
 
-function noop(..._args: any[]) { }
+function noop(..._args: any[]) {}
 
 jest.mock('services/core/stateful-service');
 jest.mock('services/core/injector');
@@ -12,7 +12,7 @@ jest.mock('../../../obs-api', () => ({
     OBS_service_startStreaming: noop,
     OBS_service_stopStreaming: noop,
     OBS_service_connectOutputSignals: noop,
-  }
+  },
 }));
 jest.mock('services/settings', () => ({}));
 jest.mock('services/windows', () => ({}));
@@ -59,7 +59,7 @@ const createInjectee = ({
     optimizeForNiconico,
   },
   WindowsService: {
-    showWindow: showWindow,
+    showWindow,
   },
 });
 
@@ -92,7 +92,7 @@ test('toggleStreamingでstreamingStatusがofflineの場合', () => {
       OBS_service_startStreaming,
       OBS_service_stopStreaming,
       OBS_service_connectOutputSignals: noop,
-    }
+    },
   }));
 
   setup({
@@ -126,7 +126,7 @@ test('toggleStreamingでstreamingStatusがoffline、配信開始時に確認し�
       OBS_service_startStreaming,
       OBS_service_stopStreaming,
       OBS_service_connectOutputSignals: noop,
-    }
+    },
   }));
 
   setup({
@@ -163,7 +163,7 @@ test('toggleStreamingでstreamingStatusがoffline、配信開始時に確認し�
       OBS_service_startStreaming,
       OBS_service_stopStreaming,
       OBS_service_connectOutputSignals: noop,
-    }
+    },
   }));
 
   setup({
@@ -202,7 +202,7 @@ test('toggleStreamingでstreamingStatusがoffline、配信開始と同時に録�
       OBS_service_startStreaming,
       OBS_service_stopStreaming,
       OBS_service_connectOutputSignals,
-    }
+    },
   }));
 
   setup({
@@ -233,153 +233,154 @@ test('toggleStreamingでstreamingStatusがoffline、配信開始と同時に録�
   expect(OBS_service_stopStreaming).not.toHaveBeenCalled();
 });
 
-[EStreamingState.Starting, EStreamingState.Live, EStreamingState.Reconnecting].forEach(streamingStatus => {
-  test(`toggleStreamingでstreamingStatusが${streamingStatus}の場合`, () => {
-    const OBS_service_startStreaming = jest.fn();
-    const OBS_service_stopStreaming = jest.fn();
+[EStreamingState.Starting, EStreamingState.Live, EStreamingState.Reconnecting].forEach(
+  streamingStatus => {
+    test(`toggleStreamingでstreamingStatusが${streamingStatus}の場合`, () => {
+      const OBS_service_startStreaming = jest.fn();
+      const OBS_service_stopStreaming = jest.fn();
 
-    jest.mock('../../../obs-api', () => ({
-      NodeObs: {
-        OBS_service_startStreaming,
-        OBS_service_stopStreaming,
-        OBS_service_connectOutputSignals: noop,
-      }
-    }));
-
-    setup({
-      injectee: createInjectee({
-      }),
-      state: {
-        StreamingService: {
-          streamingStatus,
-          recordingStatus: ERecordingState.Offline,
+      jest.mock('../../../obs-api', () => ({
+        NodeObs: {
+          OBS_service_startStreaming,
+          OBS_service_stopStreaming,
+          OBS_service_connectOutputSignals: noop,
         },
-      },
+      }));
+
+      setup({
+        injectee: createInjectee({}),
+        state: {
+          StreamingService: {
+            streamingStatus,
+            recordingStatus: ERecordingState.Offline,
+          },
+        },
+      });
+
+      const { StreamingService } = require('./streaming');
+      const { instance } = StreamingService;
+
+      instance.toggleRecording = jest.fn();
+      instance.toggleStreaming();
+
+      expect(instance.toggleRecording).not.toHaveBeenCalled();
+      expect(OBS_service_startStreaming).not.toHaveBeenCalled();
+      expect(OBS_service_stopStreaming).toHaveBeenCalledTimes(1);
+      expect(OBS_service_stopStreaming).toHaveBeenCalledWith(false);
     });
 
-    const { StreamingService } = require('./streaming');
-    const { instance } = StreamingService;
+    test(`toggleStreamingでstreamingStatusが${streamingStatus}、配信終了前に確認して、配信終了をやめる場合`, () => {
+      const OBS_service_startStreaming = jest.fn();
+      const OBS_service_stopStreaming = jest.fn();
 
-    instance.toggleRecording = jest.fn();
-    instance.toggleStreaming();
-
-    expect(instance.toggleRecording).not.toHaveBeenCalled();
-    expect(OBS_service_startStreaming).not.toHaveBeenCalled();
-    expect(OBS_service_stopStreaming).toHaveBeenCalledTimes(1);
-    expect(OBS_service_stopStreaming).toHaveBeenCalledWith(false);
-  });
-
-  test(`toggleStreamingでstreamingStatusが${streamingStatus}、配信終了前に確認して、配信終了をやめる場合`, () => {
-    const OBS_service_startStreaming = jest.fn();
-    const OBS_service_stopStreaming = jest.fn();
-
-    jest.mock('../../../obs-api', () => ({
-      NodeObs: {
-        OBS_service_startStreaming,
-        OBS_service_stopStreaming,
-        OBS_service_connectOutputSignals: noop,
-      }
-    }));
-
-    setup({
-      injectee: createInjectee({
-        WarnBeforeStoppingStream: true,
-      }),
-      state: {
-        StreamingService: {
-          streamingStatus,
-          recordingStatus: ERecordingState.Offline,
+      jest.mock('../../../obs-api', () => ({
+        NodeObs: {
+          OBS_service_startStreaming,
+          OBS_service_stopStreaming,
+          OBS_service_connectOutputSignals: noop,
         },
-      },
+      }));
+
+      setup({
+        injectee: createInjectee({
+          WarnBeforeStoppingStream: true,
+        }),
+        state: {
+          StreamingService: {
+            streamingStatus,
+            recordingStatus: ERecordingState.Offline,
+          },
+        },
+      });
+
+      const { StreamingService } = require('./streaming');
+      const { instance } = StreamingService;
+
+      instance.toggleRecording = jest.fn();
+      jest.spyOn(window, 'confirm').mockReturnValue(false);
+      instance.toggleStreaming();
+
+      expect(window.confirm).toHaveBeenCalledTimes(1);
+      expect(instance.toggleRecording).not.toHaveBeenCalled();
+      expect(OBS_service_startStreaming).not.toHaveBeenCalled();
+      expect(OBS_service_stopStreaming).not.toHaveBeenCalled();
     });
 
-    const { StreamingService } = require('./streaming');
-    const { instance } = StreamingService;
+    test(`toggleStreamingでstreamingStatusが${streamingStatus}、配信終了前に確認して、配信終了する場合`, () => {
+      const OBS_service_startStreaming = jest.fn();
+      const OBS_service_stopStreaming = jest.fn();
 
-    instance.toggleRecording = jest.fn();
-    jest.spyOn(window, 'confirm').mockReturnValue(false);
-    instance.toggleStreaming();
-
-    expect(window.confirm).toHaveBeenCalledTimes(1);
-    expect(instance.toggleRecording).not.toHaveBeenCalled();
-    expect(OBS_service_startStreaming).not.toHaveBeenCalled();
-    expect(OBS_service_stopStreaming).not.toHaveBeenCalled();
-  });
-
-  test(`toggleStreamingでstreamingStatusが${streamingStatus}、配信終了前に確認して、配信終了する場合`, () => {
-    const OBS_service_startStreaming = jest.fn();
-    const OBS_service_stopStreaming = jest.fn();
-
-    jest.mock('../../../obs-api', () => ({
-      NodeObs: {
-        OBS_service_startStreaming,
-        OBS_service_stopStreaming,
-        OBS_service_connectOutputSignals: noop,
-      }
-    }));
-
-    setup({
-      injectee: createInjectee({
-        WarnBeforeStoppingStream: true,
-      }),
-      state: {
-        StreamingService: {
-          streamingStatus,
-          recordingStatus: ERecordingState.Offline,
+      jest.mock('../../../obs-api', () => ({
+        NodeObs: {
+          OBS_service_startStreaming,
+          OBS_service_stopStreaming,
+          OBS_service_connectOutputSignals: noop,
         },
-      },
+      }));
+
+      setup({
+        injectee: createInjectee({
+          WarnBeforeStoppingStream: true,
+        }),
+        state: {
+          StreamingService: {
+            streamingStatus,
+            recordingStatus: ERecordingState.Offline,
+          },
+        },
+      });
+
+      const { StreamingService } = require('./streaming');
+      const { instance } = StreamingService;
+
+      instance.toggleRecording = jest.fn();
+      jest.spyOn(window, 'confirm').mockReturnValue(true);
+      instance.toggleStreaming();
+
+      expect(window.confirm).toHaveBeenCalledTimes(1);
+      expect(instance.toggleRecording).not.toHaveBeenCalled();
+      expect(OBS_service_startStreaming).not.toHaveBeenCalled();
+      expect(OBS_service_stopStreaming).toHaveBeenCalledTimes(1);
+      expect(OBS_service_stopStreaming).toHaveBeenCalledWith(false);
     });
 
-    const { StreamingService } = require('./streaming');
-    const { instance } = StreamingService;
+    test(`toggleStreamingでstreamingStatusが${streamingStatus}、配信終了と同時に録画終了する場合`, () => {
+      const OBS_service_startStreaming = jest.fn();
+      const OBS_service_stopStreaming = jest.fn();
 
-    instance.toggleRecording = jest.fn();
-    jest.spyOn(window, 'confirm').mockReturnValue(true);
-    instance.toggleStreaming();
-
-    expect(window.confirm).toHaveBeenCalledTimes(1);
-    expect(instance.toggleRecording).not.toHaveBeenCalled();
-    expect(OBS_service_startStreaming).not.toHaveBeenCalled();
-    expect(OBS_service_stopStreaming).toHaveBeenCalledTimes(1);
-    expect(OBS_service_stopStreaming).toHaveBeenCalledWith(false);
-  });
-
-  test(`toggleStreamingでstreamingStatusが${streamingStatus}、配信終了と同時に録画終了する場合`, () => {
-    const OBS_service_startStreaming = jest.fn();
-    const OBS_service_stopStreaming = jest.fn();
-
-    jest.mock('../../../obs-api', () => ({
-      NodeObs: {
-        OBS_service_startStreaming,
-        OBS_service_stopStreaming,
-        OBS_service_connectOutputSignals: noop,
-      }
-    }));
-
-    setup({
-      injectee: createInjectee({
-        KeepRecordingWhenStreamStops: false,
-      }),
-      state: {
-        StreamingService: {
-          streamingStatus,
-          recordingStatus: ERecordingState.Recording,
+      jest.mock('../../../obs-api', () => ({
+        NodeObs: {
+          OBS_service_startStreaming,
+          OBS_service_stopStreaming,
+          OBS_service_connectOutputSignals: noop,
         },
-      },
+      }));
+
+      setup({
+        injectee: createInjectee({
+          KeepRecordingWhenStreamStops: false,
+        }),
+        state: {
+          StreamingService: {
+            streamingStatus,
+            recordingStatus: ERecordingState.Recording,
+          },
+        },
+      });
+
+      const { StreamingService } = require('./streaming');
+      const { instance } = StreamingService;
+
+      instance.toggleRecording = jest.fn();
+      instance.toggleStreaming();
+
+      expect(instance.toggleRecording).toHaveBeenCalledTimes(1);
+      expect(OBS_service_startStreaming).not.toHaveBeenCalled();
+      expect(OBS_service_stopStreaming).toHaveBeenCalledTimes(1);
+      expect(OBS_service_stopStreaming).toHaveBeenCalledWith(false);
     });
-
-    const { StreamingService } = require('./streaming');
-    const { instance } = StreamingService;
-
-    instance.toggleRecording = jest.fn();
-    instance.toggleStreaming();
-
-    expect(instance.toggleRecording).toHaveBeenCalledTimes(1);
-    expect(OBS_service_startStreaming).not.toHaveBeenCalled();
-    expect(OBS_service_stopStreaming).toHaveBeenCalledTimes(1);
-    expect(OBS_service_stopStreaming).toHaveBeenCalledWith(false);
-  });
-});
+  },
+);
 
 test('toggleStreamingでstreamingStatusがendingの場合', () => {
   const OBS_service_startStreaming = jest.fn();
@@ -390,7 +391,7 @@ test('toggleStreamingでstreamingStatusがendingの場合', () => {
       OBS_service_startStreaming,
       OBS_service_stopStreaming,
       OBS_service_connectOutputSignals: noop,
-    }
+    },
   }));
 
   setup({
@@ -476,16 +477,20 @@ test('toggleStreamingAsyncでstreamingStatusがoffline、ニコニコにログ�
 
   const { StreamingService } = require('./streaming');
   const { instance } = StreamingService;
-  const channels = [{
-    id: 'id',
-    name: 'name',
-    ownerName: 'ownerName',
-    thumbnailUrl: 'thumbnailUrl',
-    smallThumbnailUrl: 'smallThumbnailUrl',
-  }];
+  const channels = [
+    {
+      id: 'id',
+      name: 'name',
+      ownerName: 'ownerName',
+      thumbnailUrl: 'thumbnailUrl',
+      smallThumbnailUrl: 'smallThumbnailUrl',
+    },
+  ];
 
   instance.client.fetchOnairUserProgram = jest.fn(() => Promise.resolve({ programId: 'lv12345' }));
-  instance.client.fetchOnairChannels = jest.fn(() => Promise.resolve({ ok: true, value: channels }));
+  instance.client.fetchOnairChannels = jest.fn(() =>
+    Promise.resolve({ ok: true, value: channels }),
+  );
 
   instance.toggleStreaming = jest.fn();
 
@@ -583,10 +588,12 @@ test('toggleStreamingAsyncでstreamingStatusがoffline、ニコニコにログ�
   instance.optimizeForNiconicoAndStartStreaming = jest.fn();
   instance.toggleStreaming = jest.fn();
 
-  instance.client.fetchOnairUserProgram = jest.fn(() => Promise.resolve({
-    programId: 'lv12345',
-    nextProgramId: 'lv67890'
-  }));
+  instance.client.fetchOnairUserProgram = jest.fn(() =>
+    Promise.resolve({
+      programId: 'lv12345',
+      nextProgramId: 'lv67890',
+    }),
+  );
   instance.client.fetchOnairChannels = jest.fn(() => Promise.resolve({ ok: true, value: [] }));
 
   await instance.toggleStreamingAsync();
@@ -617,7 +624,9 @@ test('toggleStreamingAsyncでstreamingStatusがoffline、ニコニコにログ�
   instance.optimizeForNiconicoAndStartStreaming = jest.fn();
   instance.toggleStreaming = jest.fn();
 
-  instance.client.fetchOnairUserProgram = jest.fn(() => Promise.resolve({ nextProgramId: 'lv67890' }));
+  instance.client.fetchOnairUserProgram = jest.fn(() =>
+    Promise.resolve({ nextProgramId: 'lv67890' }),
+  );
   instance.client.fetchOnairChannels = jest.fn(() => Promise.resolve({ ok: true, value: [] }));
 
   await instance.toggleStreamingAsync();

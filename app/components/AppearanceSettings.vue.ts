@@ -6,19 +6,16 @@ import { TObsFormData } from 'components/obs/inputs/ObsInput';
 import { ICustomizationServiceApi, ICustomizationSettings } from 'services/customization';
 
 @Component({
-  components: { GenericForm }
+  components: { GenericForm },
 })
 export default class AppearanceSettings extends Vue {
-
   @Inject() private customizationService: ICustomizationServiceApi;
 
   settingsFormData: TObsFormData = null;
 
-
   created() {
     this.settingsFormData = this.customizationService.getSettingsFormData();
   }
-
 
   saveSettings(formData: TObsFormData) {
     const settings: Partial<ICustomizationSettings> = {};
@@ -28,5 +25,4 @@ export default class AppearanceSettings extends Vue {
     this.customizationService.setSettings(settings);
     this.settingsFormData = this.customizationService.getSettingsFormData();
   }
-
 }

@@ -5,7 +5,6 @@ import uuid from 'uuid/v4';
 import { IInputMetadata } from './index';
 
 export class BaseInput<TValueType, TMetadataType extends IInputMetadata> extends Vue {
-
   @Prop()
   readonly value: TValueType;
 
@@ -45,7 +44,7 @@ export class BaseInput<TValueType, TMetadataType extends IInputMetadata> extends
   getOptions(): TMetadataType {
     // merge props and metadata to the 'options' object
     // override this method if you need add more props to the 'option' object
-    const metadata = this.metadata || {} as TMetadataType;
+    const metadata = this.metadata || ({} as TMetadataType);
     const options = cloneDeep(metadata);
     options.title = this.title || metadata.title;
     return options;
@@ -54,6 +53,4 @@ export class BaseInput<TValueType, TMetadataType extends IInputMetadata> extends
   get options(): TMetadataType {
     return this.getOptions();
   }
-
 }
-

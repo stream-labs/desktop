@@ -6,7 +6,6 @@ import { Component } from 'vue-property-decorator';
 
 @Component({})
 export default class PerformanceMetrics extends Vue {
-
   @Inject()
   streamingService: StreamingService;
 
@@ -24,5 +23,4 @@ export default class PerformanceMetrics extends Vue {
   get bandwidth() {
     return this.performanceService.state.bandwidth.toFixed(0);
   }
-
 }

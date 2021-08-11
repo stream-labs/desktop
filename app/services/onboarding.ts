@@ -4,14 +4,12 @@ import { UserService } from './user';
 import { Inject } from './core/injector';
 import electron from 'electron';
 
-type TOnboardingStep =
-  | 'Connect'
-  | 'ObsImport';
+type TOnboardingStep = 'Connect' | 'ObsImport';
 
 interface IOnboardingOptions {
   isLogin: boolean; // When logging into a new account after onboarding
   isSecurityUpgrade: boolean; // When logging in, display a special message
-                              // about our security upgrade.
+  // about our security upgrade.
 }
 
 interface IOnboardingServiceState {
@@ -34,27 +32,25 @@ interface IOnboardingStep {
 const ONBOARDING_STEPS: Dictionary<IOnboardingStep> = {
   Connect: {
     isEligible: () => true,
-    next: 'ObsImport'
+    next: 'ObsImport',
   },
 
   ObsImport: {
     isEligible: service => {
       if (service.options.isLogin) return false;
       return true;
-    }
-  }
+    },
+  },
 };
 
-export class OnboardingService extends StatefulService<
-  IOnboardingServiceState
-> {
+export class OnboardingService extends StatefulService<IOnboardingServiceState> {
   static initialState: IOnboardingServiceState = {
     options: {
       isLogin: false,
-      isSecurityUpgrade: false
+      isSecurityUpgrade: false,
     },
     currentStep: null,
-    completedSteps: []
+    completedSteps: [],
   };
 
   localStorageKey = 'UserHasBeenOnboarded';
@@ -121,7 +117,7 @@ export class OnboardingService extends StatefulService<
     const actualOptions: IOnboardingOptions = {
       isLogin: false,
       isSecurityUpgrade: false,
-      ...options
+      ...options,
     };
 
     this.RESET_COMPLETED_STEPS();

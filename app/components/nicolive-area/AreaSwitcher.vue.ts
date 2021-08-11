@@ -2,17 +2,16 @@ import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 import Popper from 'vue-popperjs';
 
-interface IArea{
+interface IArea {
   name: string;
   slotName: string;
   defaultSelected?: boolean;
 }
 
 @Component({
-  components: { Popper }
+  components: { Popper },
 })
 export default class AreaSwitcher extends Vue {
-
   @Prop()
   contents: IArea[];
 
@@ -21,5 +20,4 @@ export default class AreaSwitcher extends Vue {
   select(slotName: string) {
     this.activeContent = this.contents.find(c => c.slotName === slotName)!;
   }
-
 }

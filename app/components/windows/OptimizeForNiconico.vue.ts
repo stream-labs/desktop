@@ -15,7 +15,7 @@ import { CategoryIcons } from './CategoryIcons';
 @Component({
   components: {
     ModalLayout,
-    BoolInput
+    BoolInput,
   },
 })
 export default class OptimizeNiconico extends Vue {
@@ -24,14 +24,15 @@ export default class OptimizeNiconico extends Vue {
   @Inject() windowsService: WindowsService;
   @Inject() settingsService: SettingsService;
 
-  settings: OptimizedSettings = this.windowsService.getChildWindowQueryParams() as any as OptimizedSettings;
+  settings: OptimizedSettings =
+    this.windowsService.getChildWindowQueryParams() as any as OptimizedSettings;
   icons = CategoryIcons;
 
   get doNotShowAgain(): IObsInput<boolean> {
     return {
       name: 'do_not_show_again',
       description: $t('streaming.doNotShowAgainOptimizationDialog'),
-      value: this.customizationService.showOptimizationDialogForNiconico === false
+      value: this.customizationService.showOptimizationDialogForNiconico === false,
     };
   }
 
@@ -43,7 +44,7 @@ export default class OptimizeNiconico extends Vue {
     return {
       name: 'use_hardware_encoder',
       description: $t('streaming.optimizeWithHardwareEncoder'),
-      value: this.customizationService.optimizeWithHardwareEncoder === true
+      value: this.customizationService.optimizeWithHardwareEncoder === true,
     };
   }
 
@@ -51,7 +52,7 @@ export default class OptimizeNiconico extends Vue {
     this.customizationService.setOptimizeWithHardwareEncoder(model.value);
     // close the dialog and open again to apply new optimization settings
     this.windowsService.closeChildWindow();
-    this.streamingService.toggleStreamingAsync({mustShowOptimizationDialog: true});
+    this.streamingService.toggleStreamingAsync({ mustShowOptimizationDialog: true });
   }
 
   optimizeAndGoLive() {

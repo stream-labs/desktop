@@ -16,5 +16,4 @@ export default class SceneCollectionsImport extends Vue {
   next() {
     this.onboardingService.next();
   }
-
 }
