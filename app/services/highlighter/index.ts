@@ -36,6 +36,7 @@ export interface IClip {
   endTrim: number;
   duration?: number;
   deleted: boolean;
+  source: 'ReplayBuffer' | 'Manual';
 }
 
 export enum EExportStep {
@@ -470,6 +471,7 @@ export class HighlighterService extends StatefulService<IHighligherState> {
           startTrim: 0,
           endTrim: 0,
           deleted: false,
+          source: 'Manual',
         });
       });
     } else {
@@ -481,6 +483,7 @@ export class HighlighterService extends StatefulService<IHighligherState> {
           startTrim: 0,
           endTrim: 0,
           deleted: false,
+          source: 'ReplayBuffer',
         });
       });
     }
@@ -498,6 +501,7 @@ export class HighlighterService extends StatefulService<IHighligherState> {
         startTrim: 0,
         endTrim: 0,
         deleted: false,
+        source: 'Manual',
       });
     });
   }
@@ -591,8 +595,13 @@ export class HighlighterService extends StatefulService<IHighligherState> {
       this.views.clips.filter(c => !c.loaded),
       c => this.clips[c.path].init(),
       {
-        concurrency: 5, // TODO
+        concurrency: os.cpus().length,
         onProgress: completed => {
+          this.usageStatisticsService.recordAnalyticsEvent('Highlighter', {
+            type: 'ClipImport',
+            source: completed.source,
+          });
+
           this.UPDATE_CLIP({
             path: completed.path,
             loaded: true,

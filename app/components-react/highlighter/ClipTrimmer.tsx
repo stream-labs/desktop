@@ -28,7 +28,7 @@ function useStateRef<T>(initialValue: T): [RefObject<T>, (newValue: T) => void] 
 }
 
 export default function ClipTrimmer(props: { clip: IClip }) {
-  const { HighlighterService } = Services;
+  const { HighlighterService, UsageStatisticsService } = Services;
   const videoRef = useRef<HTMLVideoElement>(null);
   const timelineRef = useRef<HTMLDivElement>(null);
   const startDragRef = useRef<HTMLDivElement>(null);
@@ -151,8 +151,10 @@ export default function ClipTrimmer(props: { clip: IClip }) {
   function stopDragging() {
     if (isDragging.current === 'start') {
       HighlighterService.actions.setStartTrim(props.clip.path, localStartTrim);
+      UsageStatisticsService.actions.recordAnalyticsEvent('Highlighter', { type: 'Trim' });
     } else if (isDragging.current === 'end') {
       HighlighterService.actions.setEndTrim(props.clip.path, localEndTrim);
+      UsageStatisticsService.actions.recordAnalyticsEvent('Highlighter', { type: 'Trim' });
     }
 
     isDragging.current = null;
