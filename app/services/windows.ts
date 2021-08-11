@@ -48,7 +48,6 @@ import OverlayWindow from 'components/windows/OverlayWindow.vue';
 import OverlayPlaceholder from 'components/windows/OverlayPlaceholder';
 import BrowserSourceInteraction from 'components/windows/BrowserSourceInteraction';
 import WelcomeToPrime from 'components/windows/WelcomeToPrime';
-import ScheduleStreamWindow from 'components/windows/go-live/ScheduleStreamWindow';
 
 import BitGoal from 'components/widgets/goal/BitGoal';
 import DonationGoal from 'components/widgets/goal/DonationGoal';
@@ -141,7 +140,6 @@ export function getComponents() {
     EditStreamWindow,
     GoLiveWindowDeprecated,
     EditStreamWindowDeprecated,
-    ScheduleStreamWindow,
     IconLibraryProperties,
     SharedComponentsLibrary,
   };
