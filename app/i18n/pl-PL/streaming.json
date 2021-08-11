@@ -156,6 +156,12 @@
   "You cannot disable the platform you used to sign in to Streamlabs OBS. Please sign in with a different platform to disable streaming to this destinationType.": "Nie można wyłączyć platformy użytej do zalogowania się do systemu Streamlabs OBS. Proszę zalogować się za pomocą innej platformy, aby wyłączyć przesyłanie strumieniowe do tego typu miejsca docelowego.",
   "canNotDisablePrimaryPlatform": "Nie można wyłączyć platformy, na której się zalogowałeś.<br/>Czy chcesz zamiast tego <switch-account-link>zalogować się na inne konto</switch-account-link> ?",
   "Your stream title or description contain banned words": "Tytuł lub opis twojego przekazu strumieniowego zawiera niedozwolone słowa",
+  "Platform": "Platform",
+  "Update scheduled event": "Update scheduled event",
+  "Schedule new stream": "Schedule new stream",
+  "Stream scheduled": "Stream scheduled",
   "Invalid settings. Please check the form": "Nieprawidłowe ustawienia. Proszę sprawdzić formularz",
-  "Common Stream Settings": "Typowe ustawienia przekazu strumieniowego"
+  "Common Stream Settings": "Typowe ustawienia przekazu strumieniowego",
+  "Schedule Stream for %{formattedDate}": "Schedule Stream for %{formattedDate}",
+  "Update Scheduled Stream for %{formattedDate}": "Update Scheduled Stream for %{formattedDate}"
 }
