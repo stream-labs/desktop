@@ -156,6 +156,12 @@
   "You cannot disable the platform you used to sign in to Streamlabs OBS. Please sign in with a different platform to disable streaming to this destinationType.": "Streamlabs OBS'de oturum açmak için kullandığınız platformu devre dışı bırakamazsınız. Bu hedef türüne yayını devre dışı bırakmak için lütfen farklı bir platformda oturum açın.",
   "canNotDisablePrimaryPlatform": "Giriş yaptığınız platformu devre dışı bırakamazsınız.<br/> Bunun yerine <switch-account-link>başka bir hesapta oturum açmak</switch-account-link> ister misiniz?",
   "Your stream title or description contain banned words": "Yayın başlığınız veya tanımınız yasaklı kelimeler içeriyor",
+  "Platform": "Platform",
+  "Update scheduled event": "Update scheduled event",
+  "Schedule new stream": "Schedule new stream",
+  "Stream scheduled": "Stream scheduled",
   "Invalid settings. Please check the form": "Geçersiz ayarlar. Lütfen formu kontrol edin",
-  "Common Stream Settings": "Yaygın Yayın Ayarları"
+  "Common Stream Settings": "Yaygın Yayın Ayarları",
+  "Schedule Stream for %{formattedDate}": "Schedule Stream for %{formattedDate}",
+  "Update Scheduled Stream for %{formattedDate}": "Update Scheduled Stream for %{formattedDate}"
 }
