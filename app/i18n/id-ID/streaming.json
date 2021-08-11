@@ -156,6 +156,12 @@
   "You cannot disable the platform you used to sign in to Streamlabs OBS. Please sign in with a different platform to disable streaming to this destinationType.": "Anda tidak bisa menonaktifkan platform yang Anda gunakan untuk sign in ke Streamlabs OBS. Harap sign in dengan platform yang berbeda untuk menonaktifkan streaming ke jenis tujuan ini.",
   "canNotDisablePrimaryPlatform": "Anda tidak bisa menonaktifkan platform yang Anda gunakan untuk logged in.<br/> Apakah Anda ingin <switch-account-link>log in ke akun lain</switch-account-link>?",
   "Your stream title or description contain banned words": "Judul atau deskripsi streaming Anda berisi kata yang dilarang",
+  "Platform": "Platform",
+  "Update scheduled event": "Update scheduled event",
+  "Schedule new stream": "Schedule new stream",
+  "Stream scheduled": "Stream scheduled",
   "Invalid settings. Please check the form": "Pengaturan tidak valid. Harap periksa formulir",
-  "Common Stream Settings": "Pengaturan Streaming yang Umum"
+  "Common Stream Settings": "Pengaturan Streaming yang Umum",
+  "Schedule Stream for %{formattedDate}": "Schedule Stream for %{formattedDate}",
+  "Update Scheduled Stream for %{formattedDate}": "Update Scheduled Stream for %{formattedDate}"
 }
