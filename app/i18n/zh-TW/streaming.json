@@ -156,6 +156,12 @@
   "You cannot disable the platform you used to sign in to Streamlabs OBS. Please sign in with a different platform to disable streaming to this destinationType.": "您不可以停用用來登入到 Streamlabs OBS 的平台。請使用不同平台登入以停用直播到此目的地類型。",
   "canNotDisablePrimaryPlatform": "您可以停用用以登入的平台。<br/>您要改為<switch-account-link>登入到其他帳戶</switch-account-link>嗎？",
   "Your stream title or description contain banned words": "您的直播標題或說明包含封鎖文字",
+  "Platform": "Platform",
+  "Update scheduled event": "Update scheduled event",
+  "Schedule new stream": "Schedule new stream",
+  "Stream scheduled": "Stream scheduled",
   "Invalid settings. Please check the form": "無效的設定。請檢查表單",
-  "Common Stream Settings": "一般直播設定"
+  "Common Stream Settings": "一般直播設定",
+  "Schedule Stream for %{formattedDate}": "Schedule Stream for %{formattedDate}",
+  "Update Scheduled Stream for %{formattedDate}": "Update Scheduled Stream for %{formattedDate}"
 }
