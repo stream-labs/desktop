@@ -6,7 +6,6 @@ import { TInputLayout } from './inputs';
 type TFormContext = {
   antForm: FormInstance;
   layout?: TInputLayout;
-  disabled?: boolean;
 } & Pick<FormItemProps, 'labelCol' | 'wrapperCol'>;
 
 /**
