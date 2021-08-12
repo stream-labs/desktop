@@ -37,8 +37,6 @@ import process from 'process';
 import { MetricsService } from 'services/metrics';
 import { UsageStatisticsService } from 'services/usage-statistics';
 
-const crashHandler = window['require']('crash-handler');
-
 const { ipcRenderer, remote, app, contentTracing } = electron;
 const slobsVersion = Utils.env.SLOBS_VERSION;
 const isProduction = Utils.env.NODE_ENV === 'production';
@@ -268,7 +266,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   I18nService.setVuei18nInstance(i18n);
 
   if (!Utils.isOneOffWindow()) {
-    crashHandler.registerProcess(process.pid, false);
+    ipcRenderer.send('register-in-crash-handler', { pid: process.pid, critical: false });
   }
 
   // The worker window can safely access services immediately
@@ -283,7 +281,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     window['obs'] = obs;
 
     // Host a new OBS server instance
-    obs.IPC.host(`slobs-${uuid()}`);
+    obs.IPC.host(electron.remote.process.env.IPC_UUID);
     obs.NodeObs.SetWorkingDirectory(
       path.join(
         electron.remote.app.getAppPath().replace('app.asar', 'app.asar.unpacked'),
@@ -305,7 +303,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       const message = apiInitErrorResultToMessage(apiResult);
       showDialog(message);
 
-      crashHandler.unregisterProcess(process.pid);
+      ipcRenderer.send('unregister-in-crash-handler', { pid: process.pid });
 
       obs.NodeObs.InitShutdownSequence();
       obs.IPC.disconnect();
