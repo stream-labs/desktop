@@ -53,8 +53,8 @@ export class GoLiveSettingsModule extends StreamInfoView<IGoLiveSettingsState> {
    * Fetch settings for each platform
    */
   async prepopulate() {
-    const { StreamingService, FacebookService } = Services;
-    await StreamingService.actions.return.prepopulateInfo(this.state.prepopulateOptions);
+    const { StreamingService } = Services;
+    await StreamingService.actions.return.prepopulateInfo();
     const prepopulateOptions = this.state.prepopulateOptions;
     const view = new StreamInfoView({});
     const settings = {
