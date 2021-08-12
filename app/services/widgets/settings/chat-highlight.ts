@@ -7,6 +7,8 @@ import {
 } from 'services/widgets';
 import { WIDGET_INITIAL_STATE } from './widget-settings';
 import { InheritMutations } from 'services/core/stateful-service';
+import { formMetadata, metadata } from 'components/shared/inputs';
+import { $t } from 'services/i18n';
 
 export interface IChatHighlightSettings extends IWidgetSettings {
   enabled: boolean;
@@ -42,5 +44,12 @@ export class ChatHighlightService extends WidgetSettingsService<IChatHighlightDa
   patchBeforeSend(settings: IChatHighlightSettings) {
     settings.highlight_duration = settings.highlight_duration * 1000;
     return settings;
+  }
+
+  getMetadata() {
+    return formMetadata({
+      enabled: metadata.toggle({ title: $t('Enabled') }),
+      duration: metadata.slider({ title: $t('Duration') }),
+    });
   }
 }
