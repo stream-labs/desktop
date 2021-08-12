@@ -762,16 +762,4 @@ export class FacebookView extends ViewHandler<IFacebookServiceState> {
     }
     return '';
   }
-
-  getDestinationSettings(destinationType: TDestinationType, destinationId: string) {
-    switch (destinationType) {
-      case 'me':
-        return { destinationType };
-      case 'group':
-        return { destinationType, groupId: destinationId };
-      case 'page':
-        return { destinationType, pageId: destinationId };
-    }
-    return {};
-  }
 }

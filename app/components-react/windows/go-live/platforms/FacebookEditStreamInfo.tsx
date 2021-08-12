@@ -125,35 +125,6 @@ export default function FacebookEditStreamInfo(p: IPlatformComponentParams<'face
       scheduledVideos.push(selectedVideo);
     }
 
-    // let destinationId = FacebookService.views.getDestinationId(fbSettings);
-    // if (!destinationId) return;
-    //
-    // // by some unknown reason FB returns scheduled events for groups
-    // // only if you request these events from the user's personal page
-    // const destinationType =
-    //   fbSettings.destinationType === 'group' ? 'me' : fbSettings.destinationType;
-    // if (destinationType === 'me') destinationId = 'me';
-    //
-    // const selectedVideoId = fbSettings.liveVideoId;
-    // const scheduledVideos = await FacebookService.actions.return.fetchScheduledVideos(
-    //   destinationType,
-    //   destinationId,
-    //   true,
-    // );
-    //
-    // const shouldFetchSelectedVideo =
-    //   selectedVideoId && !scheduledVideos.find(v => v.id === selectedVideoId);
-    //
-    // if (shouldFetchSelectedVideo) {
-    //   assertIsDefined(selectedVideoId);
-    //   const selectedVideo = await FacebookService.actions.return.fetchVideo(
-    //     selectedVideoId,
-    //     destinationType,
-    //     destinationId,
-    //   );
-    //   scheduledVideos.push(selectedVideo);
-    // }
-
     updateState({
       scheduledVideos,
       scheduledVideosLoaded: true,

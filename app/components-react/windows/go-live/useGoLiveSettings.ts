@@ -9,7 +9,6 @@ import { mutation } from '../../store';
 import { useModule } from '../../hooks/useModule';
 import { useForm } from '../../shared/inputs/Form';
 import { getDefined } from '../../../util/properties-type-guards';
-import Utils from '../../../services/utils';
 import { isEqual } from 'lodash';
 
 type TCommonFieldName = 'title' | 'description';
@@ -41,6 +40,8 @@ export class GoLiveSettingsModule extends StreamInfoView<IGoLiveSettingsState> {
   init(params: { isUpdateMode: boolean; form: FormInstance }) {
     this.form = params.form;
     this.state.isUpdateMode = params.isUpdateMode;
+
+    // take prefill options from the windows' `queryParams`
     const windowParams = Services.WindowsService.state.child.queryParams as unknown;
     if (!isEqual(windowParams, {})) {
       this.state.prepopulateOptions = windowParams as IGoLiveSettingsState['prepopulateOptions'];
@@ -55,12 +56,6 @@ export class GoLiveSettingsModule extends StreamInfoView<IGoLiveSettingsState> {
     const { StreamingService, FacebookService } = Services;
     await StreamingService.actions.return.prepopulateInfo(this.state.prepopulateOptions);
     const prepopulateOptions = this.state.prepopulateOptions;
-
-    // if (prepopulateOptions) {
-    //   // TODO: investigate why settings are not prepopulated without Sleep here
-    //   await Utils.sleep(100);
-    // }
-
     const view = new StreamInfoView({});
     const settings = {
       ...view.savedSettings, // copy saved stream settings
