@@ -144,7 +144,6 @@ import { HotkeysService } from './services/hotkeys';
 import { WidgetsService } from './services/widgets';
 import { HostsService } from './services/hosts';
 import { OnboardingService } from './services/onboarding';
-import { PlatformAppsService } from './services/platform-apps';
 
 export const AppServices = {
   WindowsService,
@@ -181,5 +180,4 @@ export const AppServices = {
   WidgetsService,
   HostsService,
   OnboardingService,
-  PlatformAppsService,
 };
