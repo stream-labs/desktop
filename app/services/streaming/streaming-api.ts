@@ -2,7 +2,7 @@ import { Observable } from 'rxjs';
 import { IEncoderProfile } from '../video-encoding-optimizations';
 import { ITwitchStartStreamOptions } from '../platforms/twitch';
 import { IYoutubeStartStreamOptions } from '../platforms/youtube';
-import { IFacebookStartStreamOptions } from '../platforms/facebook';
+import {IFacebookStartStreamOptions, TDestinationType} from '../platforms/facebook';
 import { IStreamError } from './stream-error';
 import { ICustomStreamDestination } from '../settings/streaming';
 import { ITiktokStartStreamOptions } from '../platforms/tiktok';
@@ -69,8 +69,8 @@ export interface IGoLiveSettings extends IStreamSettings {
   optimizedProfile?: IEncoderProfile;
   tweetText?: string;
   prepopulateOptions?: {
-    platform: TPlatform;
-    eventId: string;
+    youtube?: Partial<IYoutubeStartStreamOptions>;
+    facebook?: Partial<IFacebookStartStreamOptions>;
   };
 }
 

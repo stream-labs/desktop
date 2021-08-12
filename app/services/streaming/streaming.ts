@@ -196,8 +196,7 @@ export class StreamingService
         }
 
         try {
-          const eventId = options?.platform === service.platform ? options.eventId : null;
-          await service.prepopulateInfo(eventId);
+          await service.prepopulateInfo();
         } catch (e: unknown) {
           // cast all PLATFORM_REQUEST_FAILED errors to PREPOPULATE_FAILED
           if (e instanceof StreamError) {

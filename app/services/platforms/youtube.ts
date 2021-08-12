@@ -20,6 +20,7 @@ import electron from 'electron';
 import Utils from '../utils';
 import { YoutubeUploader } from './youtube/uploader';
 import { lazyModule } from 'util/lazy-module';
+import { omit } from 'lodash';
 
 interface IYoutubeServiceState extends IPlatformState {
   liveStreamingEnabled: boolean;
@@ -404,19 +405,14 @@ export class YoutubeService
   /**
    * returns perilled data for the GoLive window
    */
-  async prepopulateInfo(eventId?: string): Promise<void> {
+  async prepopulateInfo(): Promise<void> {
     if (!this.state.liveStreamingEnabled) {
       throw throwStreamError('YOUTUBE_STREAMING_DISABLED');
     }
-    if (eventId) {
-      const settings = await this.fetchStartStreamOptionsForBroadcast(eventId);
-      this.UPDATE_STREAM_SETTINGS(settings);
-    } else {
-      const settings = this.state.settings;
-      this.UPDATE_STREAM_SETTINGS({
-        description: settings.description || (await this.fetchDefaultDescription()),
-      });
-    }
+    const settings = this.state.settings;
+    this.UPDATE_STREAM_SETTINGS({
+      description: settings.description || (await this.fetchDefaultDescription()),
+    });
 
     if (!this.state.categories.length) this.SET_CATEGORIES(await this.fetchCategories());
     this.SET_PREPOPULATED(true);
