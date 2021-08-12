@@ -14,8 +14,14 @@ const DEFAULT_SCROLL_DELTA = 43;
 export default function AppsNav() {
   const { PlatformAppsService, NavigationService } = Services;
 
-  const { currentPage } = useVuex(() => ({
+  const { currentPage, navApps, selectedApp } = useVuex(() => ({
     currentPage: NavigationService.state.currentPage,
+    navApps: PlatformAppsService.views.enabledApps.filter(app => {
+      return !!app.manifest.pages.find(page => {
+        return page.slot === EAppPageSlot.TopNav;
+      });
+    }),
+    selectedApp: NavigationService.state.params.appId,
   }));
 
   const [upArrowVisible, setUpArrowVisible] = useState(false);
@@ -31,6 +37,8 @@ export default function AppsNav() {
     });
   });
 
+  useEffect(handleScroll, [navApps]);
+
   useEffect(() => {
     if (!scroll.current) return;
     resizeObserver.observe(scroll.current);
@@ -42,15 +50,7 @@ export default function AppsNav() {
   }, [scroll.current]);
 
   function isSelectedApp(appId: string) {
-    return currentPage === 'PlatformAppMainPage' && NavigationService.state.params.appId === appId;
-  }
-
-  function navApps() {
-    return PlatformAppsService.enabledApps.filter(app => {
-      return !!app.manifest.pages.find(page => {
-        return page.slot === EAppPageSlot.TopNav;
-      });
-    });
+    return currentPage === 'PlatformAppMainPage' && selectedApp === appId;
   }
 
   function isPopOutAllowed(app: ILoadedApp) {
@@ -63,15 +63,15 @@ export default function AppsNav() {
 
   function popOut(app: ILoadedApp) {
     if (!isPopOutAllowed(app)) return;
-    PlatformAppsService.popOutAppPage(app.id, EAppPageSlot.TopNav);
+    PlatformAppsService.actions.popOutAppPage(app.id, EAppPageSlot.TopNav);
   }
 
   function refreshApp(appId: string) {
-    PlatformAppsService.refreshApp(appId);
+    PlatformAppsService.actions.refreshApp(appId);
   }
 
   function navigateApp(appId: string) {
-    NavigationService.navigate('PlatformAppMainPage', { appId });
+    NavigationService.actions.navigate('PlatformAppMainPage', { appId });
   }
 
   function iconSrc(appId: string, path: string) {
@@ -118,7 +118,7 @@ export default function AppsNav() {
   return (
     <>
       <div className={styles.scroll} ref={scroll} onScroll={handleScroll}>
-        {navApps().map(app => (
+        {navApps.map(app => (
           <div style={{ position: 'relative' }} key={app.id}>
             {<div className={cx(styles.activeApp, { [styles.active]: isSelectedApp(app.id) })} />}
             <div
