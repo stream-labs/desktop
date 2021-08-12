@@ -2,11 +2,10 @@ import { Observable } from 'rxjs';
 import { IEncoderProfile } from '../video-encoding-optimizations';
 import { ITwitchStartStreamOptions } from '../platforms/twitch';
 import { IYoutubeStartStreamOptions } from '../platforms/youtube';
-import {IFacebookStartStreamOptions, TDestinationType} from '../platforms/facebook';
+import { IFacebookStartStreamOptions } from '../platforms/facebook';
 import { IStreamError } from './stream-error';
 import { ICustomStreamDestination } from '../settings/streaming';
 import { ITiktokStartStreamOptions } from '../platforms/tiktok';
-import {TPlatform} from "../platforms";
 
 export enum EStreamingState {
   Offline = 'offline',
