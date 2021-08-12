@@ -8,19 +8,21 @@ import PatchNotes from './pages/PatchNotes';
 import Display from './shared/Display';
 import TitleBar from './shared/TitleBar';
 import Chat from './root/Chat';
-import SharedComponentsLibrary from './windows/SharedComponentsLibrary/SharedComponentsLibrary';
 import Highlighter from './pages/Highlighter';
 import Grow from './pages/Grow/Grow';
 import Loader from './pages/Loader';
 import NavTools from './sidebar/NavTools';
 import PlatformLogo from './shared/PlatformLogo';
 import AdvancedStatistics from './windows/AdvancedStatistics';
+import StreamScheduler from './pages/stream-scheduler/StreamScheduler';
 import { createRoot } from './root/ReactRoot';
 import StartStreamingButton from './root/StartStreamingButton';
 import TestWidgets from './root/TestWidgets';
 import RenameSource from './windows/RenameSource';
 import NotificationsArea from './root/NotificationsArea';
 import AppsNav from './sidebar/AppsNav';
+import StudioEditor from './root/StudioEditor';
+import SharedComponentsLibrary from './windows/sharedComponentsLibrary/SharedComponentsLibrary';
 
 // list of React components to be used inside Vue components
 export const components = {
@@ -39,6 +41,7 @@ export const components = {
   Loader,
   NavTools,
   PlatformLogo,
+  StreamScheduler: createRoot(StreamScheduler),
   AdvancedStatistics,
   SharedComponentsLibrary: createRoot(SharedComponentsLibrary),
   StartStreamingButton,
@@ -46,4 +49,5 @@ export const components = {
   RenameSource,
   NotificationsArea,
   AppsNav,
+  StudioEditor,
 };

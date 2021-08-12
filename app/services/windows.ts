@@ -27,8 +27,6 @@ import {
   AdvancedStatistics,
 } from 'components/shared/ReactComponent';
 
-import GoLiveWindowDeprecated from 'components/windows/go-live/GoLiveWindow';
-import EditStreamWindowDeprecated from 'components/windows/go-live/EditStreamWindow';
 import SourceProperties from 'components/windows/SourceProperties.vue';
 import SourceFilters from 'components/windows/SourceFilters.vue';
 import AddSourceFilter from 'components/windows/AddSourceFilter';
@@ -48,7 +46,6 @@ import OverlayWindow from 'components/windows/OverlayWindow.vue';
 import OverlayPlaceholder from 'components/windows/OverlayPlaceholder';
 import BrowserSourceInteraction from 'components/windows/BrowserSourceInteraction';
 import WelcomeToPrime from 'components/windows/WelcomeToPrime';
-import ScheduleStreamWindow from 'components/windows/go-live/ScheduleStreamWindow';
 
 import BitGoal from 'components/widgets/goal/BitGoal';
 import DonationGoal from 'components/widgets/goal/DonationGoal';
@@ -139,9 +136,6 @@ export function getComponents() {
     WelcomeToPrime,
     GoLiveWindow,
     EditStreamWindow,
-    GoLiveWindowDeprecated,
-    EditStreamWindowDeprecated,
-    ScheduleStreamWindow,
     IconLibraryProperties,
     SharedComponentsLibrary,
   };
