@@ -10,8 +10,6 @@ import { ListInput, TimeInput } from '../../shared/inputs';
 import Form, { useForm } from '../../shared/inputs/Form';
 import { confirmAsync } from '../../modals';
 import { IStreamEvent, useStreamScheduler } from './useStreamScheduler';
-import { Services } from '../../service-provider';
-import { getDefined } from '../../../util/properties-type-guards';
 
 /**
  * StreamScheduler page layout
@@ -153,6 +151,7 @@ function EventSettingsModal() {
           {canChangePlatform && (
             <ListInput
               label={$t('Platform')}
+              name="platform"
               value={selectedPlatform}
               options={platforms.map(platform => ({
                 value: platform,
