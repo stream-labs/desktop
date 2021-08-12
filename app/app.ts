@@ -42,12 +42,6 @@ const slobsVersion = Utils.env.SLOBS_VERSION;
 const isProduction = Utils.env.NODE_ENV === 'production';
 const isPreview = !!Utils.env.SLOBS_PREVIEW;
 
-// Used by Eddy for debugging on mac.
-if (!isProduction) {
-  const windowId = Utils.getWindowId();
-  process.title = `SLOBS Renderer ${windowId}`;
-}
-
 // This is the development DSN
 let sentryDsn = 'https://8f444a81edd446b69ce75421d5e91d4d@sentry.io/252950';
 
@@ -113,6 +107,13 @@ window.addEventListener('unhandledrejection', e => {
 if (window['_startupErrorHandler']) {
   window.removeEventListener('error', window['_startupErrorHandler']);
   delete window['_startupErrorHandler'];
+}
+
+// Used by Eddy for debugging on mac.
+if (!isProduction) {
+  const windowId = Utils.getWindowId();
+  process.title = `SLOBS Renderer ${windowId}`;
+  console.log(`${windowId} - PID: ${process.pid}`);
 }
 
 if (isProduction || process.env.SLOBS_REPORT_TO_SENTRY) {
