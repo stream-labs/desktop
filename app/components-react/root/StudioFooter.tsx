@@ -36,6 +36,7 @@ export default function StudioFooterComponent(p: { locked?: boolean }) {
     replayBufferOffline,
     replayBufferStopping,
     replayBufferSaving,
+    youtubeEnabled,
   } = useVuex(() => ({
     streamingStatus: StreamingService.views.streamingStatus,
     platform: UserService.views.platform?.type,
@@ -47,6 +48,7 @@ export default function StudioFooterComponent(p: { locked?: boolean }) {
     replayBufferOffline: StreamingService.state.replayBufferStatus === EReplayBufferState.Offline,
     replayBufferStopping: StreamingService.state.replayBufferStatus === EReplayBufferState.Stopping,
     replayBufferSaving: StreamingService.state.replayBufferStatus === EReplayBufferState.Saving,
+    youtubeEnabled: YoutubeService.state.liveStreamingEnabled,
   }));
 
   useRenderInterval(() => {
@@ -55,8 +57,6 @@ export default function StudioFooterComponent(p: { locked?: boolean }) {
   }, 1000);
 
   useEffect(confirmYoutubeEnabled, [platform]);
-
-  const youtubeEnabled = platform === 'youtube' ? YoutubeService.state.liveStreamingEnabled : true;
 
   function toggleRecording() {
     StreamingService.toggleRecording();
@@ -124,7 +124,7 @@ export default function StudioFooterComponent(p: { locked?: boolean }) {
   return (
     <div className={styles.footer}>
       <div className="flex flex--center flex--grow flex--justify-start">
-        {isLoggedIn && youtubeEnabled && (
+        {isLoggedIn && platform === 'youtube' && !youtubeEnabled && (
           <div className={styles.errorWrapper}>
             <div className={styles.platformError}>
               <i className="fa fa-exclamation-triangle" />
