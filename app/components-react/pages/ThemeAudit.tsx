@@ -7,6 +7,7 @@ import { ExclamationCircleOutlined } from '@ant-design/icons';
 import Scrollable from 'components-react/shared/Scrollable';
 import styles from './ThemeAudit.m.less';
 import groupBy from 'lodash/groupBy';
+import { Tabs } from 'antd';
 
 class MediaFileReader {
   constructor(public readonly filePath: string) {}
@@ -74,7 +75,7 @@ async function readMediaInfo(): Promise<IMediaSourceInfo[]> {
 type TWarningLevel = 'OK' | 'WARN' | 'CRITICAL';
 
 export default function ThemeAudit() {
-  const { SceneCollectionsService, ScenesService } = Services;
+  const { SceneCollectionsService, ScenesService, SourcesService } = Services;
   const [mediaInfo, setMediaInfo] = useState<IMediaSourceInfo[] | null>(null);
 
   useEffect(() => {
@@ -83,17 +84,12 @@ export default function ThemeAudit() {
 
   const grouped = groupBy(mediaInfo ?? [], s => s.scene);
 
-  function renderStat(
-    label: string,
-    displayValue: string,
-    numericValue: number,
-    thresholds: [number, number],
-  ) {
-    let type: TWarningLevel = 'OK';
+  const sources = SourcesService.views.sources;
+  const sourceCount = sources.length;
+  const hasWebcam = !!sources.find(s => s.type === 'dshow_input');
+  const hasGameCapture = !!sources.find(s => s.type === 'game_capture');
 
-    if (numericValue > thresholds[0]) type = 'WARN';
-    if (numericValue > thresholds[1]) type = 'CRITICAL';
-
+  function renderStat(label: string, displayValue: string | number, type: TWarningLevel) {
     const color = {
       OK: 'inherit',
       WARN: 'var(--info)',
@@ -108,44 +104,84 @@ export default function ThemeAudit() {
     );
   }
 
+  function renderNumericStat(
+    label: string,
+    displayValue: string | number,
+    numericValue: number,
+    thresholds: [number, number],
+  ) {
+    let type: TWarningLevel = 'OK';
+
+    if (numericValue > thresholds[0]) type = 'WARN';
+    if (numericValue > thresholds[1]) type = 'CRITICAL';
+
+    return renderStat(label, displayValue, type);
+  }
+
   return (
     <div style={{ width: '100%', display: 'flex' }} className={styles.themeAuditRoot}>
       <Scrollable style={{ flexGrow: 1, padding: 20 }}>
         <h1>Theme Audit: {SceneCollectionsService.activeCollection?.name}</h1>
 
-        <h2>Media Sources</h2>
-        {mediaInfo && (
-          <div>
-            {ScenesService.views.scenes.map(scene => (
-              <div key={scene.name} className="section">
-                <h3>{scene.name}</h3>
-                <div>
-                  {renderStat(
-                    'Source Count',
-                    (grouped[scene.name] ?? []).length.toString(),
-                    (grouped[scene.name] ?? []).length,
-                    [2, 4],
-                  )}
-                </div>
-                {(grouped[scene.name] ?? []).map(info => (
-                  <div key={info.id} style={{ padding: '5px 0' }}>
-                    <i className="fas fa-film" /> <b>{info.name}</b>
-                    <br />
-                    {renderStat(
-                      'Resolution',
-                      `${info.width} x ${info.height}`,
-                      info.width * info.height,
-                      [1280 * 720 - 1, 1920 * 1080 - 1],
-                    )}
-                    {renderStat('FPS', info.fps.toFixed(2), info.fps, [30, 59])}
-                    {renderStat('Duration', info.duration.toFixed(2), info.duration, [8, 15])}
+        <Tabs>
+          <Tabs.TabPane tab="Overview" key="overview">
+            <div className="section">
+              <h2>Overall Stats</h2>
+              <div>{renderNumericStat('Source Count', sourceCount, sourceCount, [49, 99])}</div>
+              <div>
+                {renderStat(
+                  'Webcam',
+                  hasWebcam ? 'Present' : 'Missing',
+                  hasWebcam ? 'OK' : 'CRITICAL',
+                )}
+              </div>
+              <div>
+                {renderStat(
+                  'Game Capture',
+                  hasGameCapture ? 'Present' : 'Missing',
+                  hasGameCapture ? 'OK' : 'CRITICAL',
+                )}
+              </div>
+            </div>
+          </Tabs.TabPane>
+          <Tabs.TabPane tab="Media Sources" key="media">
+            {mediaInfo && (
+              <div>
+                {ScenesService.views.scenes.map(scene => (
+                  <div key={scene.name} className="section">
+                    <h3>{scene.name}</h3>
+                    <div>
+                      {renderNumericStat(
+                        'Media Source Count',
+                        (grouped[scene.name] ?? []).length.toString(),
+                        (grouped[scene.name] ?? []).length,
+                        [2, 4],
+                      )}
+                    </div>
+                    {(grouped[scene.name] ?? []).map(info => (
+                      <div key={info.id} style={{ padding: '5px 0' }}>
+                        <i className="fas fa-film" /> <b>{info.name}</b>
+                        <br />
+                        {renderNumericStat(
+                          'Resolution',
+                          `${info.width} x ${info.height}`,
+                          info.width * info.height,
+                          [1280 * 720 - 1, 1920 * 1080 - 1],
+                        )}
+                        {renderNumericStat('FPS', info.fps.toFixed(2), info.fps, [30, 59])}
+                        {renderNumericStat('Duration', info.duration.toFixed(2), info.duration, [
+                          10,
+                          18,
+                        ])}
+                      </div>
+                    ))}
                   </div>
                 ))}
               </div>
-            ))}
-          </div>
-        )}
-        {mediaInfo == null && <div>Loading...</div>}
+            )}
+            {mediaInfo == null && <div>Loading...</div>}
+          </Tabs.TabPane>
+        </Tabs>
       </Scrollable>
     </div>
   );
