@@ -1,12 +1,11 @@
 import { combineReducers, createAction, createReducer, createStore, Store } from '@reduxjs/toolkit';
 import { batch, useSelector as useReduxSelector } from 'react-redux';
 import { StatefulService } from '../../services';
-import { pick } from 'lodash';
 import { useOnCreate } from '../hooks';
 import { useEffect, useRef } from 'react';
 import { isSimilar } from '../../util/isDeepEqual';
 import { createBinding, TBindings } from '../shared/inputs';
-import {getDefined} from "../../util/properties-type-guards";
+import { getDefined } from '../../util/properties-type-guards';
 
 /*
  * This file provides Redux integration in a modular way
