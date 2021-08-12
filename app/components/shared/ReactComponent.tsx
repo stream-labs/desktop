@@ -202,3 +202,5 @@ export class StartStreamingButton extends ReactComponent {}
 export class TestWidgets extends ReactComponent<{ testers: string[] }> {}
 @Component({ props: { name: { default: 'NotificationsArea' } } })
 export class NotificationsArea extends ReactComponent {}
+@Component({ props: { name: { default: 'ThemeAudit' } } })
+export class ThemeAudit extends ReactComponent {}

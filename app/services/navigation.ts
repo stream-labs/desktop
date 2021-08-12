@@ -14,7 +14,8 @@ export type TAppPage =
   | 'AlertboxLibrary'
   | 'StreamScheduler'
   | 'Highlighter'
-  | 'Grow';
+  | 'Grow'
+  | 'ThemeAudit';
 
 interface INavigationState {
   currentPage: TAppPage;
@@ -23,7 +24,7 @@ interface INavigationState {
 
 export class NavigationService extends StatefulService<INavigationState> {
   static initialState: INavigationState = {
-    currentPage: 'Studio',
+    currentPage: 'ThemeAudit',
     params: {},
   };
 

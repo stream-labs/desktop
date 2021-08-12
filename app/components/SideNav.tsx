@@ -141,6 +141,13 @@ export default class SideNav extends Vue {
       });
     }
 
+    pageData.push({
+      target: 'ThemeAudit',
+      icon: 'fas fa-exclamation-triangle',
+      title: 'Theme Audit',
+      trackingTarget: 'themeaudit',
+    });
+
     return pageData;
   }
 
