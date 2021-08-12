@@ -39,6 +39,51 @@ loadLazyEmotes();
   /*eslint-enable */
 }
 
+function extractProperties(el: HTMLDivElement) {
+  const userColor = el.children.item(1).attributes.getNamedItem('style');
+  const msgText = el.children.item(2).children.item(0).innerHTML;
+  const badges = Array.prototype.map
+    .call(el.children.item(0).children, (child: Element) => child.attributes['data-badge'])
+    .join('/');
+  return {
+    messageToPin: {
+      tags: {
+        badges,
+        color: userColor,
+        'display-name': el.attributes['data-user'],
+        emotes: '',
+        id: '',
+        'user-type': '',
+      },
+      prefix: '',
+      command: 'PRIVMSG',
+      params: [`#${el.attributes['data-user']}`],
+      crlf: msgText,
+    },
+  };
+}
+
+function highlightMenu() {
+  const els = document.getElementsByClassName('chat-line__message');
+  Array.prototype.forEach.call(els, (el: HTMLDivElement) => {
+    const chatHighlight = document.createElement('i');
+    chatHighlight.className = 'chat-highlight-icon';
+    chatHighlight.addEventListener('click', (e: Event) => {
+      extractProperties(el);
+    });
+    el.append(chatHighlight);
+  });
+}
+
+function addHighlightMenu() {
+  return `
+    var els = document.getElementsByClassName('chat-line__message');
+    Array.prototype.forEach.call((els, el) => {
+      el.append
+    })
+  `;
+}
+
 @InitAfter('StreamingService')
 export class ChatService extends Service {
   @Inject() userService: UserService;
@@ -85,6 +130,7 @@ export class ChatService extends Service {
     this.electronWindowId = electronWindowId;
     const win = electron.remote.BrowserWindow.fromId(electronWindowId);
     if (this.chatView && win) win.addBrowserView(this.chatView);
+    if (this.chatView) this.chatView.webContents.openDevTools({ mode: 'detach' });
   }
 
   setChatBounds(position: IVec2, size: IVec2) {
