@@ -204,21 +204,3 @@ export class TestWidgets extends ReactComponent<{ testers: string[] }> {}
 export class NotificationsArea extends ReactComponent {}
 @Component({ props: { name: { default: 'StudioEditor' } } })
 export class StudioEditor extends ReactComponent {}
-@Component({
-  props: {
-    name: { default: 'AppsNav' },
-    wrapperStyles: {
-      default: () => ({
-        background: 'var(--section-alt)',
-        position: 'relative',
-        width: '52px',
-        height: 0,
-        paddingTop: '6px',
-        flexGrow: 1,
-        flexBasis: 0,
-        overflow: 'hidden',
-      }),
-    },
-  },
-})
-export class AppsNav extends ReactComponent {}
