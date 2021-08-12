@@ -21,6 +21,7 @@ import TestWidgets from './root/TestWidgets';
 import RenameSource from './windows/RenameSource';
 import NotificationsArea from './root/NotificationsArea';
 import StudioEditor from './root/StudioEditor';
+import AppsNav from './sidebar/AppsNav';
 import SharedComponentsLibrary from './windows/sharedComponentsLibrary/SharedComponentsLibrary';
 
 // list of React components to be used inside Vue components
@@ -48,4 +49,5 @@ export const components = {
   RenameSource,
   NotificationsArea,
   StudioEditor,
+  AppsNav,
 };
