@@ -187,6 +187,10 @@ export class RenameSource extends ReactComponent {}
   },
 })
 export class AdvancedStatistics extends ReactComponent {}
+
+@Component({ props: { name: { default: 'StreamScheduler' } } })
+export class StreamScheduler extends ReactComponent {}
+
 @Component({ props: { name: { default: 'StartStreamingButton' } } })
 export class StartStreamingButton extends ReactComponent {}
 @Component({
@@ -206,3 +210,5 @@ export class NotificationsArea extends ReactComponent {}
   },
 })
 export class ObsSettings extends ReactComponent {}
+@Component({ props: { name: { default: 'StudioEditor' } } })
+export class StudioEditor extends ReactComponent {}

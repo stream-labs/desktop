@@ -5,6 +5,9 @@ import { ObsFormGroup } from '../../obs/ObsForm';
 import Form from '../../shared/inputs/Form';
 import css from './ObsSettings.m.less';
 
+/**
+ * Renders a settings page
+ */
 export function ObsSettings(p: { page: string }) {
   const { setPage } = useObsSettings();
   setPage(p.page);
@@ -16,6 +19,9 @@ export function ObsSettings(p: { page: string }) {
   );
 }
 
+/**
+ * Renders generic inputs from OBS
+ */
 export function ObsGenericSettingsForm() {
   const { settingsFormData, saveSettings } = useObsSettings();
   return (
@@ -23,7 +29,10 @@ export function ObsGenericSettingsForm() {
   );
 }
 
-export function ObsSettingsSection(p: HTMLAttributes<unknown>) {
+/**
+ * A section layout for settings
+ */
+export function ObsSettingsSection(p: HTMLAttributes<unknown> & { title?: string }) {
   return (
     <div className="section">
       <div className="section-content">
