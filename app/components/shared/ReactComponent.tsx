@@ -210,3 +210,5 @@ export class NotificationsArea extends ReactComponent {}
   },
 })
 export class ObsSettings extends ReactComponent {}
+@Component({ props: { name: { default: 'StudioEditor' } } })
+export class StudioEditor extends ReactComponent {}
