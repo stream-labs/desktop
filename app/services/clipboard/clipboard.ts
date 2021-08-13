@@ -67,8 +67,10 @@ interface IClipboardState {
   unloadedCollectionClipboard?: IUnloadedCollectionClipboard;
 }
 
-export class ClipboardService extends StatefulService<IClipboardState>
-  implements IClipboardServiceApi {
+export class ClipboardService
+  extends StatefulService<IClipboardState>
+  implements IClipboardServiceApi
+{
   static initialState: IClipboardState = {
     itemsSceneId: '',
     sceneNodesIds: [],
@@ -295,9 +297,9 @@ export class ClipboardService extends StatefulService<IClipboardState>
       clipboard.files.forEach(filePath => scene.addFile(filePath));
       return;
     }
-    const urlRegex = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/;
+    const urlRegex =
+      /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/;
     const text = clipboard.text;
-
 
     if (text.match(urlRegex)) {
       scene.createAndAddSource(text, 'browser_source', {

@@ -9,7 +9,7 @@ import {
   ISceneItemInfo,
   ISceneItemFolder,
   SceneItemFolder,
-  ISceneItemNode
+  ISceneItemNode,
 } from './index';
 import Utils from 'services/utils';
 import * as obs from '../../../obs-api';
@@ -20,9 +20,7 @@ import { TSceneNodeInfo } from 'services/scene-collections/nodes/scene-items';
 import * as fs from 'fs';
 import uuid from 'uuid/v4';
 
-
 export type TSceneNode = SceneItem | SceneItemFolder;
-
 
 export interface ISceneHierarchy extends ISceneItemNode {
   children: ISceneHierarchy[];
@@ -62,24 +60,25 @@ export class Scene {
   }
 
   getNode(sceneNodeId: string): TSceneNode {
-    const nodeModel = this.state.nodes
-      .find(sceneItemModel => sceneItemModel.id === sceneNodeId) as ISceneItem;
+    const nodeModel = this.state.nodes.find(
+      sceneItemModel => sceneItemModel.id === sceneNodeId,
+    ) as ISceneItem;
 
     if (!nodeModel) return null;
 
-    return nodeModel.sceneNodeType === 'item' ?
-      new SceneItem(this.id, nodeModel.id, nodeModel.sourceId) :
-      new SceneItemFolder(this.id, nodeModel.id);
+    return nodeModel.sceneNodeType === 'item'
+      ? new SceneItem(this.id, nodeModel.id, nodeModel.sourceId)
+      : new SceneItemFolder(this.id, nodeModel.id);
   }
 
   getItem(sceneItemId: string): SceneItem {
     const node = this.getNode(sceneItemId);
-    return (node && node.sceneNodeType === 'item') ? node as SceneItem : null;
+    return node && node.sceneNodeType === 'item' ? (node as SceneItem) : null;
   }
 
   getFolder(sceneFolderId: string): SceneItemFolder {
     const node = this.getNode(sceneFolderId);
-    return (node && node.sceneNodeType === 'folder') ? node as SceneItemFolder : null;
+    return node && node.sceneNodeType === 'folder' ? (node as SceneItemFolder) : null;
   }
 
   /**
@@ -102,12 +101,9 @@ export class Scene {
   }
 
   getNodes(): TSceneNode[] {
-    return (this.state.nodes
-      .map(node => {
-        return node.sceneNodeType === 'folder' ?
-          this.getFolder(node.id) :
-          this.getItem(node.id);
-      }));
+    return this.state.nodes.map(node => {
+      return node.sceneNodeType === 'folder' ? this.getFolder(node.id) : this.getItem(node.id);
+    });
   }
 
   getRootNodes(): TSceneNode[] {
@@ -134,32 +130,25 @@ export class Scene {
 
   createAndAddSource(
     sourceName: string,
-    type: TSourceType, settings?: Dictionary<any>,
-    options: ISceneNodeAddOptions = {}
+    type: TSourceType,
+    settings?: Dictionary<any>,
+    options: ISceneNodeAddOptions = {},
   ): SceneItem {
     const source = this.sourcesService.createSource(sourceName, type, settings);
     return this.addSource(source.sourceId, options);
   }
 
-
   addSource(sourceId: string, options: ISceneNodeAddOptions = {}): SceneItem {
-
     const source = this.sourcesService.getSource(sourceId);
     if (!source) throw new Error(`Source ${sourceId} not found`);
 
     if (!this.canAddSource(sourceId)) return null;
 
-
     const sceneItemId = options.id || uuid();
 
-    let obsSceneItem: obs.ISceneItem;
-    obsSceneItem = this.getObsScene().add(source.getObsInput());
+    const obsSceneItem: obs.ISceneItem = this.getObsScene().add(source.getObsInput());
 
-    this.ADD_SOURCE_TO_SCENE(
-      sceneItemId,
-      source.sourceId,
-      obsSceneItem.id
-    );
+    this.ADD_SOURCE_TO_SCENE(sceneItemId, source.sourceId, obsSceneItem.id);
     const sceneItem = this.getItem(sceneItemId);
 
     sceneItem.loadAttributes();
@@ -192,7 +181,6 @@ export class Scene {
   }
 
   createFolder(name: string, options: ISceneNodeAddOptions = {}) {
-
     const id = options.id || uuid();
 
     this.ADD_FOLDER_TO_SCENE({
@@ -219,7 +207,6 @@ export class Scene {
     return this.scenesService.removeScene(this.id, force);
   }
 
-
   removeItem(sceneItemId: string) {
     const sceneItem = this.getItem(sceneItemId);
     if (!sceneItem) return;
@@ -235,11 +222,9 @@ export class Scene {
     this.getSelection().selectAll().remove();
   }
 
-
   setLockOnAllItems(locked: boolean) {
     this.getItems().forEach(item => item.setSettings({ locked }));
   }
-
 
   placeAfter(sourceNodeId: string, destNodeId?: string) {
     const sourceNode = this.getNode(sourceNodeId);
@@ -276,7 +261,7 @@ export class Scene {
     const sceneNodesIds = this.getNodesIds();
     const nodesToMoveIds: string[] =
       sourceNode.sceneNodeType === 'folder'
-        ?  [sourceNode.id].concat((sourceNode as SceneItemFolder).getNestedNodesIds())
+        ? [sourceNode.id].concat((sourceNode as SceneItemFolder).getNestedNodesIds())
         : [sourceNode.id];
     const firstNodeIndex = this.getNode(nodesToMoveIds[0]).getNodeIndex();
 
@@ -285,9 +270,10 @@ export class Scene {
     if (destNode) {
       const destNodeIndex = destNode.getNodeIndex();
 
-      newNodeIndex = destNode.isFolder() && !destNodeIsParentForSourceNode ?
-        destNodeIndex + destNode.getNestedNodes().length + 1 :
-        destNodeIndex + 1;
+      newNodeIndex =
+        destNode.isFolder() && !destNodeIsParentForSourceNode
+          ? destNodeIndex + destNode.getNestedNodes().length + 1
+          : destNodeIndex + 1;
 
       if (destNodeIndex > firstNodeIndex) {
         // Adjust for moved items
@@ -333,7 +319,6 @@ export class Scene {
     }
   }
 
-
   addSources(nodes: TSceneNodeInfo[]) {
     const arrayItems: (ISceneItemInfo & obs.ISceneItemInfo)[] = [];
 
@@ -353,7 +338,7 @@ export class Scene {
         x: item.x == null ? 0 : item.x,
         y: item.y == null ? 0 : item.y,
         locked: item.locked,
-        rotation: item.rotation || 0
+        rotation: item.rotation || 0,
       });
       return true;
     });
@@ -362,7 +347,7 @@ export class Scene {
 
     // create folder and items
     let itemIndex = 0;
-    nodes.forEach((nodeModel) => {
+    nodes.forEach(nodeModel => {
       if (nodeModel.sceneNodeType === 'folder') {
         this.createFolder(nodeModel.name, { id: nodeModel.id });
       } else {
@@ -380,7 +365,6 @@ export class Scene {
     });
   }
 
-
   canAddSource(sourceId: string): boolean {
     const source = this.sourcesService.getSource(sourceId);
     if (!source) return false;
@@ -392,7 +376,6 @@ export class Scene {
     const sceneToAdd = this.scenesService.getScene(source.sourceId);
     return !sceneToAdd.hasNestedScene(this.id);
   }
-
 
   hasNestedScene(sceneId: string) {
     const childScenes = this.getItems()
@@ -407,7 +390,6 @@ export class Scene {
     return false;
   }
 
-
   /**
    * returns scene items of scene + scene items of nested scenes
    */
@@ -417,18 +399,17 @@ export class Scene {
       .filter(sceneItem => sceneItem.type === 'scene')
       .map(sceneItem => {
         return this.scenesService.getScene(sceneItem.sourceId).getNestedItems();
-      }).forEach(sceneItems => {
+      })
+      .forEach(sceneItems => {
         result = result.concat(sceneItems);
       });
     if (options.excludeScenes) result = result.filter(sceneItem => sceneItem.type !== 'scene');
     return uniqBy(result, 'sceneItemId');
   }
 
-
   makeActive() {
     this.scenesService.makeSceneActive(this.id);
   }
-
 
   /**
    * returns sources of scene + sources of nested scenes
@@ -500,15 +481,14 @@ export class Scene {
           top: 0,
           bottom: 0,
           left: 0,
-          right: 0
+          right: 0,
         },
 
         rotation: 0,
-
       },
 
       visible: true,
-      locked: false
+      locked: false,
     });
   }
 
@@ -516,7 +496,6 @@ export class Scene {
   private ADD_FOLDER_TO_SCENE(folderModel: ISceneItemFolder) {
     this.state.nodes.unshift(folderModel);
   }
-
 
   @mutation()
   private REMOVE_NODE_FROM_SCENE(nodeId: string) {
@@ -527,7 +506,6 @@ export class Scene {
 
   @mutation()
   private SET_NODES_ORDER(order: string[]) {
-
     // TODO: This is O(n^2)
     this.state.nodes = order.map(id => {
       return this.state.nodes.find(item => {

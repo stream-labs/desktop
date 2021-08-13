@@ -3,17 +3,15 @@ import { EInputType, IInputMetadata } from 'components/shared/inputs';
 import { Component, Prop } from 'vue-property-decorator';
 import { BaseInput } from './BaseInput';
 
-
 /**
  * Generic Form Input
  */
 @Component({
   components: {
     ...sharedInputComponents,
-  }
+  },
 })
 export default class FormInput extends BaseInput<any, IInputMetadata> {
-
   @Prop()
   readonly type: EInputType;
 
@@ -41,5 +39,4 @@ export default class FormInput extends BaseInput<any, IInputMetadata> {
     options.title = this.title || options.title;
     return options;
   }
-
 }

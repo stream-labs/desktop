@@ -3,7 +3,10 @@ import { Component, Watch } from 'vue-property-decorator';
 import { Inject } from 'services/core/injector';
 import { $t } from 'services/i18n';
 import { NicoliveProgramService } from 'services/nicolive-program/nicolive-program';
-import { NicoliveFailure, openErrorDialogFromFailure } from 'services/nicolive-program/NicoliveFailure';
+import {
+  NicoliveFailure,
+  openErrorDialogFromFailure,
+} from 'services/nicolive-program/NicoliveFailure';
 
 @Component({})
 export default class ToolBar extends Vue {
@@ -50,7 +53,9 @@ export default class ToolBar extends Vue {
   }
 
   get isProgramExtendable() {
-    return this.nicoliveProgramService.isProgramExtendable && this.programEndTime - this.currentTime > 60;
+    return (
+      this.nicoliveProgramService.isProgramExtendable && this.programEndTime - this.currentTime > 60
+    );
   }
 
   get autoExtensionEnabled() {
@@ -74,7 +79,7 @@ export default class ToolBar extends Vue {
   onStatusChange(newValue: string, oldValue: string) {
     if (newValue === 'end') {
       clearInterval(this.timeTimer);
-    　this.currentTime = NaN;
+      this.currentTime = NaN;
     } else if (oldValue === 'end') {
       clearInterval(this.timeTimer);
       this.startTimer();
@@ -82,7 +87,7 @@ export default class ToolBar extends Vue {
   }
 
   startTimer() {
-    this.timeTimer = (setInterval(() => this.updateCurrrentTime(), 1000) as any) as number;
+    this.timeTimer = setInterval(() => this.updateCurrrentTime(), 1000) as any as number;
   }
 
   timeTimer: number = 0;

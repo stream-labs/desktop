@@ -8,15 +8,13 @@ import ModalLayout from '../ModalLayout.vue';
 import { TObsValue } from 'components/obs/inputs/ObsInput';
 
 @Component({
-  components: { ModalLayout }
+  components: { ModalLayout },
 })
 export default class AdvancedAudio extends Vue {
-
   @Inject() audioService: IAudioServiceApi;
   @Inject() windowsService: WindowsService;
 
   propertyComponentForType = propertyComponentForType;
-
 
   get audioSources() {
     return this.audioService.getSourcesForCurrentScene();
@@ -29,5 +27,4 @@ export default class AdvancedAudio extends Vue {
       audioSource.setSettings({ [name]: value });
     }
   }
-
 }

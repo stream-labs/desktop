@@ -12,12 +12,7 @@ import { SceneSourceNode } from './scene';
 import { AudioService } from 'services/audio';
 import * as obs from '../../../../../obs-api';
 
-type TContent =
-  | ImageNode
-  | TextNode
-  | WebcamNode
-  | VideoNode
-  | SceneSourceNode;
+type TContent = ImageNode | TextNode | WebcamNode | VideoNode | SceneSourceNode;
 
 interface IFilterInfo {
   name: string;
@@ -70,10 +65,7 @@ export class SlotsNode extends ArrayNode<TSlotSchema, IContext, TSceneNode> {
   @Inject() audioService: AudioService;
 
   getItems(context: IContext) {
-    return context.scene
-      .getNodes()
-      .slice()
-      .reverse();
+    return context.scene.getNodes().slice().reverse();
   }
 
   async saveItem(sceneNode: TSceneNode, context: IContext): Promise<TSlotSchema> {

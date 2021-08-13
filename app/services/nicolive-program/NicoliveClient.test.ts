@@ -40,7 +40,10 @@ test('wrapResultはレスポンスのdataを取り出す', async () => {
   fetchMock.get(dummyURL, dummyBody);
   const res = await fetch(dummyURL);
 
-  await expect(NicoliveClient.wrapResult(res)).resolves.toEqual({ ok: true, value: dummyBody.data });
+  await expect(NicoliveClient.wrapResult(res)).resolves.toEqual({
+    ok: true,
+    value: dummyBody.data,
+  });
   expect(fetchMock.done()).toBe(true);
 });
 
@@ -48,7 +51,10 @@ test('wrapResultは結果が200でないときレスポンス全体を返す', a
   fetchMock.get(dummyURL, { body: dummyErrorBody, status: 404 });
   const res = await fetch(dummyURL);
 
-  await expect(NicoliveClient.wrapResult(res)).resolves.toEqual({ ok: false, value: dummyErrorBody });
+  await expect(NicoliveClient.wrapResult(res)).resolves.toEqual({
+    ok: false,
+    value: dummyErrorBody,
+  });
   expect(fetchMock.done()).toBe(true);
 });
 
@@ -160,7 +166,10 @@ const dummyCommunities = {
 test('fetchCommunityはコミュをひとつだけ返す', async () => {
   const client = new NicoliveClient();
 
-  fetchMock.get(`${NicoliveClient.publicBaseURL}/v1/communities.json?communityIds=${communityID}`, dummyCommunities);
+  fetchMock.get(
+    `${NicoliveClient.publicBaseURL}/v1/communities.json?communityIds=${communityID}`,
+    dummyCommunities,
+  );
   const result = await client.fetchCommunity(communityID);
 
   expect(result).toEqual({ ok: true, value: dummyCommunities.data.communities[0] });
@@ -170,7 +179,10 @@ test('fetchCommunityはコミュをひとつだけ返す', async () => {
 test('fetchCommunityはbodyがJSONでなければSyntaxErrorをwrapして返す', async () => {
   const client = new NicoliveClient();
 
-  fetchMock.get(`${NicoliveClient.publicBaseURL}/v1/communities.json?communityIds=${communityID}`, 'invalid json');
+  fetchMock.get(
+    `${NicoliveClient.publicBaseURL}/v1/communities.json?communityIds=${communityID}`,
+    'invalid json',
+  );
   const result = client.fetchCommunity(communityID);
 
   await expect(result).resolves.toMatchInlineSnapshot(`
@@ -227,8 +239,8 @@ function setupMock() {
     remote: {
       BrowserWindow,
       shell: {
-        openExternal
-      }
+        openExternal,
+      },
     },
     ipcRenderer: {
       send() {},

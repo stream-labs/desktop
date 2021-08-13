@@ -2,7 +2,10 @@ import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import { Inject } from 'services/core/injector';
 import { NicoliveProgramService } from 'services/nicolive-program/nicolive-program';
-import { NicoliveFailure, openErrorDialogFromFailure } from 'services/nicolive-program/NicoliveFailure';
+import {
+  NicoliveFailure,
+  openErrorDialogFromFailure,
+} from 'services/nicolive-program/NicoliveFailure';
 
 @Component({})
 export default class CommentForm extends Vue {

@@ -102,7 +102,7 @@ export interface ProgramInfo {
       maxQuality: '6Mbps720p' | '2Mbps450p' | '1Mbps450p' | '384kbps288p' | '192kbps288p';
       /** 配信の向き */
       orientation: 'Landscape' | 'Portrait';
-    }
+    };
   };
 }
 
@@ -213,13 +213,13 @@ export interface Filters {
 export type OnairUserProgramData = {
   programId?: string;
   nextProgramId?: string;
-}
+};
 
 export type OnairChannelProgramData = {
   testProgramId?: string;
   programId?: string;
   nextProgramId?: string;
-}
+};
 
 export type OnairChannelData = {
   id: string;
@@ -232,4 +232,4 @@ export type OnairChannelData = {
 export type BroadcastStreamData = {
   url: string;
   name: string;
-}
+};

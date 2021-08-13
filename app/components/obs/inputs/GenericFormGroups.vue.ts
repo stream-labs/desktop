@@ -4,10 +4,9 @@ import { Component, Prop } from 'vue-property-decorator';
 import { ISettingsSubCategory } from '../../../services/settings';
 
 @Component({
-  components: { GenericForm }
+  components: { GenericForm },
 })
 export default class GenericFormGroups extends Vue {
-
   @Prop()
   value: ISettingsSubCategory[];
 
@@ -29,5 +28,4 @@ export default class GenericFormGroups extends Vue {
       return setting.visible;
     });
   }
-
 }

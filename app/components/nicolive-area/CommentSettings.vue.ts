@@ -7,7 +7,7 @@ import CommentSynthesizer from './CommentSynthesizer.vue';
   components: {
     CommentLocalFilter,
     CommentSynthesizer,
-  }
+  },
 })
 export default class CommentSettings extends Vue {
   close() {

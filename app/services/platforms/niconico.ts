@@ -12,9 +12,9 @@ import { WindowsService } from 'services/windows';
 import { NicoliveClient } from 'services/nicolive-program/NicoliveClient';
 
 export type INiconicoProgramSelection = {
-  info: LiveProgramInfo
-  selectedId: string
-}
+  info: LiveProgramInfo;
+  selectedId: string;
+};
 
 function parseXml(xml: String): Promise<object> {
   return new Promise((resolve, reject) => {
@@ -40,16 +40,14 @@ type SocialGroup = {
   name: string;
   thumbnailUrl: string;
   broadcastablePrograms: Program[];
-}
+};
 
 export type LiveProgramInfo = {
   community?: SocialGroup;
   channels?: SocialGroup[];
-}
-
+};
 
 export class NiconicoService extends Service implements IPlatformService {
-
   @Inject() hostsService: HostsService;
   @Inject() settingsService: SettingsService;
   @Inject() userService: UserService;
@@ -97,7 +95,7 @@ export class NiconicoService extends Service implements IPlatformService {
     const request = new Request(url, { credentials: 'same-origin' });
     return fetch(request)
       .then(handleErrors)
-      .then(() => { });
+      .then(() => {});
   }
 
   get authUrl() {
@@ -176,7 +174,7 @@ export class NiconicoService extends Service implements IPlatformService {
   private async _setupStreamSettings(programId: string): Promise<IStreamingSetting> {
     const [stream, bitrate] = await Promise.all([
       this.client.fetchBroadcastStream(programId),
-      this.client.fetchMaxBitrate(programId)
+      this.client.fetchMaxBitrate(programId),
     ]);
     const url = stream.url;
     const key = stream.name;
@@ -208,8 +206,11 @@ export class NiconicoService extends Service implements IPlatformService {
     return NiconicoService.createStreamingSetting('', '');
   }
 
-  private static createStreamingSetting(url: string, key: string, bitrate?: number)
-    : IStreamingSetting {
+  private static createStreamingSetting(
+    url: string,
+    key: string,
+    bitrate?: number,
+  ): IStreamingSetting {
     return { url, key, bitrate };
   }
 
@@ -222,10 +223,6 @@ export class NiconicoService extends Service implements IPlatformService {
     return fetch(request)
       .then(handleErrors)
       .then(response => response.json())
-      .then(response =>
-        this.userService.updatePlatformToken(response.access_token)
-      );
+      .then(response => this.userService.updatePlatformToken(response.access_token));
   }
-
 }
-

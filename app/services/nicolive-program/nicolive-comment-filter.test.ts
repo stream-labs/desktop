@@ -1,7 +1,8 @@
 import { createSetupFunction } from 'util/test-setup';
 import { Subject } from 'rxjs';
 import { WrappedChat } from './WrappedChat';
-type NicoliveCommentFilterService = import('./nicolive-comment-filter').NicoliveCommentFilterService;
+type NicoliveCommentFilterService =
+  import('./nicolive-comment-filter').NicoliveCommentFilterService;
 
 const setup = createSetupFunction({
   injectee: {
@@ -14,7 +15,9 @@ const setup = createSetupFunction({
   },
 });
 
-jest.mock('services/nicolive-program/nicolive-program', () => ({ NicoliveProgramStateService: {} }));
+jest.mock('services/nicolive-program/nicolive-program', () => ({
+  NicoliveProgramStateService: {},
+}));
 
 // NicoliveFailureが依存している
 jest.mock('services/i18n', () => ({}));
@@ -35,7 +38,9 @@ test('fetchFilters/通常成功', async () => {
   const { NicoliveCommentFilterService } = require('./nicolive-comment-filter');
   const instance = NicoliveCommentFilterService.instance as NicoliveCommentFilterService;
 
-  const fetchFilters = jest.fn().mockResolvedValue({ ok: true, value: [{ type: 'word', body: '810', id: 114514 }] });
+  const fetchFilters = jest
+    .fn()
+    .mockResolvedValue({ ok: true, value: [{ type: 'word', body: '810', id: 114514 }] });
   (instance as any).client.fetchFilters = fetchFilters;
 
   const UPDATE_FILTERS = jest.fn();
@@ -78,7 +83,9 @@ test('addFilters/通常成功', async () => {
   const { NicoliveCommentFilterService } = require('./nicolive-comment-filter');
   const instance = NicoliveCommentFilterService.instance as NicoliveCommentFilterService;
 
-  const addFilters = jest.fn().mockResolvedValue({ ok: true, value: [{ type: 'word', body: '810', id: 114514 }] });
+  const addFilters = jest
+    .fn()
+    .mockResolvedValue({ ok: true, value: [{ type: 'word', body: '810', id: 114514 }] });
   (instance as any).client.addFilters = addFilters;
 
   const UPDATE_FILTERS = jest.fn();
@@ -140,7 +147,10 @@ test('deleteFilters', async () => {
   setup();
   const { NicoliveCommentFilterService } = require('./nicolive-comment-filter');
   const instance = NicoliveCommentFilterService.instance as NicoliveCommentFilterService;
-  instance.state.filters = [{ type: 'word', body: '810', id: 114514 }, { type: 'word', body: 'yay', id: 114515 }];
+  instance.state.filters = [
+    { type: 'word', body: '810', id: 114514 },
+    { type: 'word', body: 'yay', id: 114515 },
+  ];
 
   const deleteFilters = jest.fn().mockResolvedValue({ ok: true });
   (instance as any).client.deleteFilters = deleteFilters;
@@ -158,7 +168,10 @@ test('deleteFilters/失敗', async () => {
   setup();
   const { NicoliveCommentFilterService } = require('./nicolive-comment-filter');
   const instance = NicoliveCommentFilterService.instance as NicoliveCommentFilterService;
-  instance.state.filters = [{ type: 'word', body: '810', id: 114514 }, { type: 'word', body: 'yay', id: 114515 }];
+  instance.state.filters = [
+    { type: 'word', body: '810', id: 114514 },
+    { type: 'word', body: 'yay', id: 114515 },
+  ];
 
   const deleteFilters = jest.fn().mockResolvedValue({
     ok: false,

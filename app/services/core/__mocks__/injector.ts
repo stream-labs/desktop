@@ -8,7 +8,7 @@ export function __setup(obj: { [key: string]: any }): void {
 }
 
 export function Inject(serviceName?: string) {
-  return function(target: Object, key: string) {
+  return function (target: Object, key: string) {
     Object.defineProperty(target, key, {
       get() {
         const name = serviceName || key.charAt(0).toUpperCase() + key.slice(1);

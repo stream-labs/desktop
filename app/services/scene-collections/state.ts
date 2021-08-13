@@ -22,14 +22,12 @@ export const ScenePresetId = 'preset/basic';
  * to the rest of the app.  It is an internal module in the scene collections
  * service.
  */
-export class SceneCollectionsStateService extends StatefulService<
-  ISceneCollectionsManifest
-> {
+export class SceneCollectionsStateService extends StatefulService<ISceneCollectionsManifest> {
   @Inject() fileManagerService: FileManagerService;
 
   static initialState: ISceneCollectionsManifest = {
     activeId: null,
-    collections: []
+    collections: [],
   };
 
   get collections() {
@@ -89,7 +87,9 @@ export class SceneCollectionsStateService extends StatefulService<
    * errors.  If possible, it will attempt to recover it.
    * Otherwise, it will return undefined.
    */
-  async checkAndRecoverManifest(obj: ISceneCollectionsManifest): Promise<ISceneCollectionsManifest> {
+  async checkAndRecoverManifest(
+    obj: ISceneCollectionsManifest,
+  ): Promise<ISceneCollectionsManifest> {
     // If there is no collections array, this is unrecoverable
     if (!Array.isArray(obj.collections)) return;
 
@@ -100,7 +100,7 @@ export class SceneCollectionsStateService extends StatefulService<
 
       // We can recover these
       if (coll.deleted == null) coll.deleted = false;
-      if (coll.modified == null) coll.modified = (new Date()).toISOString();
+      if (coll.modified == null) coll.modified = new Date().toISOString();
 
       return true;
     });
@@ -139,7 +139,7 @@ export class SceneCollectionsStateService extends StatefulService<
     if (backup) filePath = `${filePath}.bak`;
     return this.fileManagerService.read(filePath, {
       validateJSON: true,
-      retries: 2
+      retries: 2,
     });
   }
 
@@ -163,7 +163,7 @@ export class SceneCollectionsStateService extends StatefulService<
   copyCollectionFile(sourceId: string, destId: string) {
     this.fileManagerService.copy(
       this.getCollectionFilePath(sourceId),
-      this.getCollectionFilePath(destId)
+      this.getCollectionFilePath(destId),
     );
   }
 
@@ -190,10 +190,7 @@ export class SceneCollectionsStateService extends StatefulService<
   }
 
   get collectionsDirectory() {
-    return path.join(
-      electron.remote.app.getPath('userData'),
-      'SceneCollections'
-    );
+    return path.join(electron.remote.app.getPath('userData'), 'SceneCollections');
   }
 
   getCollectionFilePath(id: string) {
@@ -215,7 +212,7 @@ export class SceneCollectionsStateService extends StatefulService<
       name,
       deleted: false,
       modified,
-      needsRename: false
+      needsRename: false,
     });
   }
 
@@ -249,9 +246,7 @@ export class SceneCollectionsStateService extends StatefulService<
 
   @mutation()
   HARD_DELETE_COLLECTION(id: string) {
-    this.state.collections = this.state.collections.filter(
-      coll => coll.id !== id
-    );
+    this.state.collections = this.state.collections.filter(coll => coll.id !== id);
   }
 
   @mutation()

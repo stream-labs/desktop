@@ -136,7 +136,7 @@ export class AppService extends StatefulService<IAppState> {
     // await this.platformAppsService.initialize();
 
     await this.sceneCollectionsService.initialize();
-    const questionaireStarted = await this.questionaireService.startIfRequired()
+    const questionaireStarted = await this.questionaireService.startIfRequired();
 
     const onboarded = !questionaireStarted && this.onboardingService.startOnboardingIfRequired();
 
@@ -146,9 +146,7 @@ export class AppService extends StatefulService<IAppState> {
     });
 
     // Eager load services
-    const _ = [
-      this.shortcutsService,
-    ];
+    const _ = [this.shortcutsService];
 
     this.performanceMonitorService.start();
 
@@ -253,7 +251,6 @@ export class AppService extends StatefulService<IAppState> {
     if (error) throw error;
     return returningValue;
   }
-
 
   relaunch({ clearCacheDir }: { clearCacheDir?: boolean } = {}) {
     const originalArgs: string[] = electron.remote.process.argv.slice(1);

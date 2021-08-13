@@ -16,5 +16,4 @@ export default class Dashboard extends Vue {
   done() {
     this.navigationService.navigate('Studio');
   }
-
 }

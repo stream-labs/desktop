@@ -51,7 +51,7 @@ export default class CroppingOverlay extends Vue {
     };
   }
 
-  handleMouseDown (event: MouseEvent) {
+  handleMouseDown(event: MouseEvent) {
     if (event.button !== 0) return;
     this.isCropping = true;
 
@@ -64,7 +64,7 @@ export default class CroppingOverlay extends Vue {
     this.movingPositionY = y;
   }
 
-  handleMouseMove (event: MouseEvent) {
+  handleMouseMove(event: MouseEvent) {
     if (event.button !== 0) return;
     if (!this.isCropping) return;
 
@@ -75,7 +75,7 @@ export default class CroppingOverlay extends Vue {
     this.movingPositionY = y;
   }
 
-  handleMouseUp (event: MouseEvent) {
+  handleMouseUp(event: MouseEvent) {
     if (event.button !== 0) return;
     if (!this.isCropping) return;
 
@@ -84,5 +84,4 @@ export default class CroppingOverlay extends Vue {
     this.isCropping = false;
     window.close();
   }
-
 }

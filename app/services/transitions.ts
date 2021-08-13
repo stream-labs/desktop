@@ -1,11 +1,7 @@
 import { mutation, StatefulService } from 'services/core/stateful-service';
 import * as obs from '../../obs-api';
 import { Inject } from 'services/core/injector';
-import {
-  IObsListOption,
-  TObsValue,
-  TObsFormData
-} from 'components/obs/inputs/ObsInput';
+import { IObsListOption, TObsValue, TObsFormData } from 'components/obs/inputs/ObsInput';
 import { WindowsService } from 'services/windows';
 import { ScenesService } from 'services/scenes';
 import uuid from 'uuid/v4';
@@ -21,7 +17,7 @@ export enum ETransitionType {
   Slide = 'slide_transition',
   FadeToColor = 'fade_to_color_transition',
   LumaWipe = 'wipe_transition',
-  Stinger = 'obs_stinger_transition'
+  Stinger = 'obs_stinger_transition',
 }
 
 interface ITransitionsState {
@@ -57,7 +53,7 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
     transitions: [],
     connections: [],
     defaultTransitionId: null,
-    studioMode: false
+    studioMode: false,
   } as ITransitionsState;
 
   @Inject() windowsService: WindowsService;
@@ -106,9 +102,12 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
       { description: $t('transitions.fade_transition'), value: ETransitionType.Fade },
       { description: $t('transitions.swipe_transition'), value: ETransitionType.Swipe },
       { description: $t('transitions.slide_transition'), value: ETransitionType.Slide },
-      { description: $t('transitions.fade_to_color_transition'), value: ETransitionType.FadeToColor },
+      {
+        description: $t('transitions.fade_to_color_transition'),
+        value: ETransitionType.FadeToColor,
+      },
       { description: $t('transitions.wipe_transition'), value: ETransitionType.LumaWipe },
-      { description: $t('transitions.obs_stinger_transition'), value: ETransitionType.Stinger }
+      { description: $t('transitions.obs_stinger_transition'), value: ETransitionType.Stinger },
     ];
   }
 
@@ -120,10 +119,7 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
 
     if (!this.studioModeTransition) this.createStudioModeTransition();
     const currentScene = this.scenesService.activeScene.getObsScene();
-    this.sceneDuplicate = currentScene.duplicate(
-      uuid(),
-      obs.ESceneDupType.Copy
-    );
+    this.sceneDuplicate = currentScene.duplicate(uuid(), obs.ESceneDupType.Copy);
 
     // Immediately switch to the duplicated scene
     this.getCurrentTransition().set(this.sceneDuplicate);
@@ -137,9 +133,7 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
     this.SET_STUDIO_MODE(false);
     this.studioModeChanged.next(false);
 
-    this.getCurrentTransition().set(
-      this.scenesService.activeScene.getObsScene()
-    );
+    this.getCurrentTransition().set(this.scenesService.activeScene.getObsScene());
     this.releaseStudioModeObjects();
   }
 
@@ -155,10 +149,7 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
     const currentScene = this.scenesService.activeScene.getObsScene();
 
     const oldDuplicate = this.sceneDuplicate;
-    this.sceneDuplicate = currentScene.duplicate(
-      uuid(),
-      obs.ESceneDupType.Copy
-    );
+    this.sceneDuplicate = currentScene.duplicate(uuid(), obs.ESceneDupType.Copy);
 
     // TODO: Make this a dropdown box
     const transition = this.getDefaultTransition();
@@ -186,7 +177,7 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
   createStudioModeTransition() {
     this.studioModeTransition = obs.TransitionFactory.create(
       ETransitionType.Cut,
-      `studio_transition_${uuid()}`
+      `studio_transition_${uuid()}`,
     );
   }
 
@@ -243,7 +234,7 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
    */
   getConnectedTransition(fromId: string, toId: string): ITransition {
     const matchedConnection = this.state.connections.find(connection => {
-      return (connection.fromSceneId === fromId) && (connection.toSceneId === toId);
+      return connection.fromSceneId === fromId && connection.toSceneId === toId;
     });
 
     if (matchedConnection && this.getTransition(matchedConnection.transitionId)) {
@@ -367,7 +358,7 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
       id,
       fromSceneId: fromId,
       toSceneId: toId,
-      transitionId
+      transitionId,
     });
     return this.getConnection(id);
   }
@@ -389,7 +380,7 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
     const connection = this.getConnection(id);
 
     const match = this.state.connections.find(conn => {
-      return (conn.fromSceneId === connection.fromSceneId) && (conn.toSceneId === connection.toSceneId);
+      return conn.fromSceneId === connection.fromSceneId && conn.toSceneId === connection.toSceneId;
     });
 
     return match.id !== connection.id;
@@ -409,8 +400,8 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
       title: $t('transitions.sceneTransition'),
       size: {
         width: 800,
-        height: 650
-      }
+        height: 650,
+      },
     });
   }
 
@@ -420,7 +411,7 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
       id,
       name,
       type,
-      duration
+      duration,
     });
   }
 
@@ -437,9 +428,7 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
 
   @mutation()
   private DELETE_TRANSITION(id: string) {
-    this.state.transitions = this.state.transitions.filter(
-      tran => tran.id !== id
-    );
+    this.state.transitions = this.state.transitions.filter(tran => tran.id !== id);
 
     if (this.state.defaultTransitionId === id) {
       if (this.state.transitions.length > 0) {

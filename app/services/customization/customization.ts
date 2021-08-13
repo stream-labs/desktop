@@ -4,7 +4,7 @@ import { mutation } from '../core/stateful-service';
 import {
   ICustomizationServiceApi,
   ICustomizationServiceState,
-  ICustomizationSettings
+  ICustomizationSettings,
 } from './customization-api';
 import { TObsFormData } from 'components/obs/inputs/ObsInput';
 import Utils from 'services/utils';
@@ -18,7 +18,6 @@ export class CustomizationService
   extends PersistentStatefulService<ICustomizationServiceState>
   implements ICustomizationServiceApi
 {
-
   static defaultState: ICustomizationServiceState = {
     performanceMode: false,
     studioControlsOpened: true,
@@ -28,7 +27,7 @@ export class CustomizationService
     pollingPerformanceStatistics: true,
     experimental: {
       // put experimental features here
-    }
+    },
   };
 
   settingsChanged = new Subject<Partial<ICustomizationSettings>>();
@@ -58,7 +57,7 @@ export class CustomizationService
   setOptimizeForNiconico(optimize: boolean) {
     this.setSettings({
       optimizeForNiconico: optimize,
-      showOptimizationDialogForNiconico: optimize
+      showOptimizationDialogForNiconico: optimize,
     });
   }
 
@@ -104,5 +103,4 @@ export class CustomizationService
   private SET_SETTINGS(settingsPatch: Partial<ICustomizationSettings>) {
     Object.assign(this.state, settingsPatch);
   }
-
 }

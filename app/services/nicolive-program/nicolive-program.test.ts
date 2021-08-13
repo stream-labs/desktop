@@ -136,7 +136,9 @@ test('isProgramExtendable', () => {
   const { NicoliveProgramService } = require('./nicolive-program');
   const { isProgramExtendable } = NicoliveProgramService;
 
-  expect(isProgramExtendable({ status: 'reserved', startTime: 0, endTime: 5.5 * 60 * 60 })).toBe(false);
+  expect(isProgramExtendable({ status: 'reserved', startTime: 0, endTime: 5.5 * 60 * 60 })).toBe(
+    false,
+  );
   expect(isProgramExtendable({ status: 'test', startTime: 0, endTime: 5.5 * 60 * 60 })).toBe(false);
   expect(isProgramExtendable({ status: 'onAir', startTime: 0, endTime: 5.5 * 60 * 60 })).toBe(true);
   expect(isProgramExtendable({ status: 'end', startTime: 0, endTime: 5.5 * 60 * 60 })).toBe(false);
@@ -163,37 +165,38 @@ test('findSuitableProgram', () => {
   expect(findSuitableProgram([reserved2])).toBe(reserved2);
 });
 
-test.each([['CREATED', 1], ['RESERVED', 0], ['OTHER', 0]])(
-  'createProgram with %s',
-  async (result: string, fetchProgramCalled: number) => {
-    setup();
-    const { NicoliveProgramService } = require('./nicolive-program');
-    const instance = NicoliveProgramService.instance as NicoliveProgramService;
+test.each([
+  ['CREATED', 1],
+  ['RESERVED', 0],
+  ['OTHER', 0],
+])('createProgram with %s', async (result: string, fetchProgramCalled: number) => {
+  setup();
+  const { NicoliveProgramService } = require('./nicolive-program');
+  const instance = NicoliveProgramService.instance as NicoliveProgramService;
 
-    instance.client.createProgram = jest.fn().mockResolvedValue(result);
-    instance.fetchProgram = jest.fn();
+  instance.client.createProgram = jest.fn().mockResolvedValue(result);
+  instance.fetchProgram = jest.fn();
 
-    await expect(instance.createProgram()).resolves.toBe(result);
-    expect(instance.client.createProgram).toHaveBeenCalledTimes(1);
-    expect(instance.fetchProgram).toHaveBeenCalledTimes(fetchProgramCalled);
-  }
-);
+  await expect(instance.createProgram()).resolves.toBe(result);
+  expect(instance.client.createProgram).toHaveBeenCalledTimes(1);
+  expect(instance.fetchProgram).toHaveBeenCalledTimes(fetchProgramCalled);
+});
 
-test.each([['EDITED', 1], ['OTHER', 0]])(
-  'editProgram with %s',
-  async (result: string, refreshProgramCalled: number) => {
-    setup();
-    const m = require('./nicolive-program');
-    const instance = m.NicoliveProgramService.instance as NicoliveProgramService;
+test.each([
+  ['EDITED', 1],
+  ['OTHER', 0],
+])('editProgram with %s', async (result: string, refreshProgramCalled: number) => {
+  setup();
+  const m = require('./nicolive-program');
+  const instance = m.NicoliveProgramService.instance as NicoliveProgramService;
 
-    instance.client.editProgram = jest.fn().mockResolvedValue(result);
-    instance.refreshProgram = jest.fn();
+  instance.client.editProgram = jest.fn().mockResolvedValue(result);
+  instance.refreshProgram = jest.fn();
 
-    await expect(instance.editProgram()).resolves.toBe(result);
-    expect(instance.client.editProgram).toHaveBeenCalledTimes(1);
-    expect(instance.refreshProgram).toHaveBeenCalledTimes(refreshProgramCalled);
-  }
-);
+  await expect(instance.editProgram()).resolves.toBe(result);
+  expect(instance.client.editProgram).toHaveBeenCalledTimes(1);
+  expect(instance.refreshProgram).toHaveBeenCalledTimes(refreshProgramCalled);
+});
 
 test('fetchProgramで結果が空ならエラー', async () => {
   setup();
@@ -227,11 +230,14 @@ test('fetchProgram:成功', async () => {
   const { NicoliveProgramService } = require('./nicolive-program');
   const instance = NicoliveProgramService.instance as NicoliveProgramService;
 
-  instance.client.fetchProgramSchedules = jest.fn().mockResolvedValue({ ok: true, value: [schedules.onAir] });
-  instance.client.fetchProgram = jest.fn().mockResolvedValue({ ok: true, value: programs.onAir });
-  instance.client.fetchCommunity = jest
+  instance.client.fetchProgramSchedules = jest
     .fn()
-    .mockResolvedValue({ ok: true, value: { name: 'comunity.name', thumbnailUrl: { small: 'symbol url' } } });
+    .mockResolvedValue({ ok: true, value: [schedules.onAir] });
+  instance.client.fetchProgram = jest.fn().mockResolvedValue({ ok: true, value: programs.onAir });
+  instance.client.fetchCommunity = jest.fn().mockResolvedValue({
+    ok: true,
+    value: { name: 'comunity.name', thumbnailUrl: { small: 'symbol url' } },
+  });
 
   // TODO: StatefulServiceのモックをVue非依存にする
   (instance as any).setState = jest.fn();
@@ -267,14 +273,17 @@ test('fetchProgramで番組があったが取りに行ったらエラー', async
   const instance = NicoliveProgramService.instance as NicoliveProgramService;
   const value = { meta: { status: 404 } };
 
-  instance.client.fetchProgramSchedules = jest.fn().mockResolvedValue({ ok: true, value: [schedules.onAir] });
+  instance.client.fetchProgramSchedules = jest
+    .fn()
+    .mockResolvedValue({ ok: true, value: [schedules.onAir] });
   instance.client.fetchProgram = jest.fn().mockResolvedValue({
     ok: false,
     value,
   });
-  instance.client.fetchCommunity = jest
-    .fn()
-    .mockResolvedValue({ ok: true, value: { name: 'comunity.name', thumbnailUrl: { small: 'symbol url' } } });
+  instance.client.fetchCommunity = jest.fn().mockResolvedValue({
+    ok: true,
+    value: { name: 'comunity.name', thumbnailUrl: { small: 'symbol url' } },
+  });
 
   (instance as any).setState = jest.fn();
 
@@ -298,7 +307,9 @@ test('fetchProgramでコミュ情報がエラーでも番組があったら先�
   const instance = NicoliveProgramService.instance as NicoliveProgramService;
   const value = { meta: { status: 404 } };
 
-  instance.client.fetchProgramSchedules = jest.fn().mockResolvedValue({ ok: true, value: [schedules.onAir] });
+  instance.client.fetchProgramSchedules = jest
+    .fn()
+    .mockResolvedValue({ ok: true, value: [schedules.onAir] });
   instance.client.fetchProgram = jest.fn().mockResolvedValue({
     ok: true,
     value: programs.onAir,
@@ -433,7 +444,9 @@ test('extendProgram:成功', async () => {
   const m = require('./nicolive-program');
   const instance = m.NicoliveProgramService.instance as NicoliveProgramService;
 
-  instance.client.extendProgram = jest.fn().mockResolvedValue({ ok: true, value: { end_time: 125 } });
+  instance.client.extendProgram = jest
+    .fn()
+    .mockResolvedValue({ ok: true, value: { end_time: 125 } });
   (instance as any).setState = jest.fn();
 
   await expect(instance.extendProgram()).resolves.toBeUndefined();
@@ -568,7 +581,11 @@ describe('refreshStatisticsPolling', () => {
           expect(window.clearInterval).toHaveBeenCalledTimes(1);
           expect(window.clearInterval).toHaveBeenCalledWith(0);
           expect(window.setInterval).toHaveBeenCalledTimes(1);
-          expect(window.setInterval).toHaveBeenCalledWith(expect.anything(), 60 * 1000, suite.next.programID);
+          expect(window.setInterval).toHaveBeenCalledWith(
+            expect.anything(),
+            60 * 1000,
+            suite.next.programID,
+          );
           break;
         case 'STOP':
           expect(window.clearInterval).toHaveBeenCalledTimes(1);
@@ -625,8 +642,12 @@ test('updateStatistics:APIがエラーでも無視', async () => {
   const { NicoliveProgramService } = require('./nicolive-program');
   const instance = NicoliveProgramService.instance as NicoliveProgramService;
 
-  instance.client.fetchStatistics = jest.fn().mockResolvedValue({ ok: false, value: { meta: { status: 500 } } });
-  instance.client.fetchNicoadStatistics = jest.fn().mockResolvedValue({ ok: false, value: { meta: { status: 500 } } });
+  instance.client.fetchStatistics = jest
+    .fn()
+    .mockResolvedValue({ ok: false, value: { meta: { status: 500 } } });
+  instance.client.fetchNicoadStatistics = jest
+    .fn()
+    .mockResolvedValue({ ok: false, value: { meta: { status: 500 } } });
 
   (instance as any).setState = jest.fn();
 
@@ -652,7 +673,13 @@ describe('refreshProgramStatusTimer', () => {
     {
       name: '初期状態から予約状態の番組を開くとタイマーを更新する',
       prev: null,
-      next: { status: 'reserved', programID: 'lv1', testStartTime: 100, startTime: 200, endTime: 300 },
+      next: {
+        status: 'reserved',
+        programID: 'lv1',
+        testStartTime: 100,
+        startTime: 200,
+        endTime: 300,
+      },
       result: 'REFRESH',
     },
     {
@@ -676,12 +703,24 @@ describe('refreshProgramStatusTimer', () => {
     {
       name: '終了状態から予約状態になったらタイマーを更新する',
       prev: { status: 'end', programID: 'lv0', testStartTime: 10, startTime: 20, endTime: 30 },
-      next: { status: 'reserved', programID: 'lv1', testStartTime: 100, startTime: 200, endTime: 300 },
+      next: {
+        status: 'reserved',
+        programID: 'lv1',
+        testStartTime: 100,
+        startTime: 200,
+        endTime: 300,
+      },
       result: 'REFRESH',
     },
     {
       name: '予約状態から放送中状態になったらタイマーを更新する',
-      prev: { status: 'reserved', programID: 'lv1', testStartTime: 100, startTime: 200, endTime: 300 },
+      prev: {
+        status: 'reserved',
+        programID: 'lv1',
+        testStartTime: 100,
+        startTime: 200,
+        endTime: 300,
+      },
       next: { status: 'onAir', programID: 'lv1', testStartTime: 100, startTime: 200, endTime: 300 },
       result: 'REFRESH',
     },
@@ -712,8 +751,20 @@ describe('refreshProgramStatusTimer', () => {
     // 以下、N Air外部で状態を操作した場合に壊れないことを保証したい
     {
       name: '予約状態から別番組の予約状態になったらタイマーを更新する',
-      prev: { status: 'reserved', programID: 'lv1', testStartTime: 100, startTime: 200, endTime: 300 },
-      next: { status: 'reserved', programID: 'lv2', testStartTime: 400, startTime: 500, endTime: 600 },
+      prev: {
+        status: 'reserved',
+        programID: 'lv1',
+        testStartTime: 100,
+        startTime: 200,
+        endTime: 300,
+      },
+      next: {
+        status: 'reserved',
+        programID: 'lv2',
+        testStartTime: 400,
+        startTime: 500,
+        endTime: 600,
+      },
       result: 'REFRESH',
     },
     {
@@ -784,84 +835,192 @@ describe('refreshAutoExtensionTimer', () => {
     {
       name: '初期値から遷移して延長が有効なとき放送中番組を取得して終了5分前を切っていると即延長する',
       prev: null,
-      next: { status: 'onAir', programID: 'lv1', startTime: 0, endTime: 30 * 60, autoExtensionEnabled: true },
+      next: {
+        status: 'onAir',
+        programID: 'lv1',
+        startTime: 0,
+        endTime: 30 * 60,
+        autoExtensionEnabled: true,
+      },
       now: 25 * 60,
       result: 'IMMEDIATE',
     },
     {
       name: '初期値から遷移して延長が無効なとき放送中番組を取得して終了5分前を切っていても何もしない',
       prev: null,
-      next: { status: 'onAir', programID: 'lv1', startTime: 0, endTime: 30 * 60, autoExtensionEnabled: false },
+      next: {
+        status: 'onAir',
+        programID: 'lv1',
+        startTime: 0,
+        endTime: 30 * 60,
+        autoExtensionEnabled: false,
+      },
       now: 25 * 60,
       result: 'NOOP',
     },
     {
       name: '初期値から遷移して延長が有効なとき放送中番組を取得して終了5分前より前ならタイマーをセットする',
       prev: null,
-      next: { status: 'onAir', programID: 'lv1', startTime: 0, endTime: 30 * 60, autoExtensionEnabled: true },
+      next: {
+        status: 'onAir',
+        programID: 'lv1',
+        startTime: 0,
+        endTime: 30 * 60,
+        autoExtensionEnabled: true,
+      },
       now: 24 * 60,
       result: 'WAIT',
     },
     {
       name: '初期値から遷移して延長が無効なとき放送中番組を取得して終了5分前より前で何もしない',
       prev: null,
-      next: { status: 'onAir', programID: 'lv1', startTime: 0, endTime: 30 * 60, autoExtensionEnabled: false },
+      next: {
+        status: 'onAir',
+        programID: 'lv1',
+        startTime: 0,
+        endTime: 30 * 60,
+        autoExtensionEnabled: false,
+      },
       now: 24 * 60,
       result: 'NOOP',
     },
     {
       name: '初期値から遷移して延長が有効なとき放送中番組でないなら何もしない',
       prev: null,
-      next: { status: 'test', programID: 'lv1', startTime: 0, endTime: 30 * 60, autoExtensionEnabled: true },
+      next: {
+        status: 'test',
+        programID: 'lv1',
+        startTime: 0,
+        endTime: 30 * 60,
+        autoExtensionEnabled: true,
+      },
       now: -30 * 60,
       result: 'NOOP',
     },
     {
       name: '初期値から遷移して延長が無効なとき放送中番組でないなら何もしない',
       prev: null,
-      next: { status: 'test', programID: 'lv1', startTime: 0, endTime: 30 * 60, autoExtensionEnabled: false },
+      next: {
+        status: 'test',
+        programID: 'lv1',
+        startTime: 0,
+        endTime: 30 * 60,
+        autoExtensionEnabled: false,
+      },
       now: -30 * 60,
       result: 'NOOP',
     },
     {
       name: '延長完了したらタイマーをセットする',
-      prev: { status: 'onAir', programID: 'lv1', startTime: 0, endTime: 30 * 60, autoExtensionEnabled: true },
-      next: { status: 'onAir', programID: 'lv1', startTime: 0, endTime: 60 * 60, autoExtensionEnabled: true },
+      prev: {
+        status: 'onAir',
+        programID: 'lv1',
+        startTime: 0,
+        endTime: 30 * 60,
+        autoExtensionEnabled: true,
+      },
+      next: {
+        status: 'onAir',
+        programID: 'lv1',
+        startTime: 0,
+        endTime: 60 * 60,
+        autoExtensionEnabled: true,
+      },
       now: 25 * 60,
       result: 'WAIT',
     },
     {
       name: '終了時刻が変わって延長上限に当たったらタイマーをクリアする',
-      prev: { status: 'onAir', programID: 'lv1', startTime: 0, endTime: 330 * 60, autoExtensionEnabled: true },
-      next: { status: 'onAir', programID: 'lv1', startTime: 0, endTime: 360 * 60, autoExtensionEnabled: true },
+      prev: {
+        status: 'onAir',
+        programID: 'lv1',
+        startTime: 0,
+        endTime: 330 * 60,
+        autoExtensionEnabled: true,
+      },
+      next: {
+        status: 'onAir',
+        programID: 'lv1',
+        startTime: 0,
+        endTime: 360 * 60,
+        autoExtensionEnabled: true,
+      },
       now: 325 * 60,
       result: 'CLEAR',
     },
     {
       name: '放送開始したらタイマーをセットする',
-      prev: { status: 'test', programID: 'lv1', startTime: 0, endTime: 30 * 60, autoExtensionEnabled: true },
-      next: { status: 'onAir', programID: 'lv1', startTime: 0, endTime: 30 * 60, autoExtensionEnabled: true },
+      prev: {
+        status: 'test',
+        programID: 'lv1',
+        startTime: 0,
+        endTime: 30 * 60,
+        autoExtensionEnabled: true,
+      },
+      next: {
+        status: 'onAir',
+        programID: 'lv1',
+        startTime: 0,
+        endTime: 30 * 60,
+        autoExtensionEnabled: true,
+      },
       now: 0,
       result: 'WAIT',
     },
     {
       name: '放送終了したらタイマーをクリアする',
-      prev: { status: 'onAir', programID: 'lv1', startTime: 0, endTime: 30 * 60, autoExtensionEnabled: true },
-      next: { status: 'end', programID: 'lv1', startTime: 0, endTime: 30 * 60, autoExtensionEnabled: true },
+      prev: {
+        status: 'onAir',
+        programID: 'lv1',
+        startTime: 0,
+        endTime: 30 * 60,
+        autoExtensionEnabled: true,
+      },
+      next: {
+        status: 'end',
+        programID: 'lv1',
+        startTime: 0,
+        endTime: 30 * 60,
+        autoExtensionEnabled: true,
+      },
       now: 30 * 60,
       result: 'CLEAR',
     },
     {
       name: '自動延長を有効にしたらタイマーをセットする',
-      prev: { status: 'onAir', programID: 'lv1', startTime: 0, endTime: 30 * 60, autoExtensionEnabled: false },
-      next: { status: 'onAir', programID: 'lv1', startTime: 0, endTime: 30 * 60, autoExtensionEnabled: true },
+      prev: {
+        status: 'onAir',
+        programID: 'lv1',
+        startTime: 0,
+        endTime: 30 * 60,
+        autoExtensionEnabled: false,
+      },
+      next: {
+        status: 'onAir',
+        programID: 'lv1',
+        startTime: 0,
+        endTime: 30 * 60,
+        autoExtensionEnabled: true,
+      },
       now: 24 * 60,
       result: 'WAIT',
     },
     {
       name: '自動延長を切ったらタイマーをクリアする',
-      prev: { status: 'onAir', programID: 'lv1', startTime: 0, endTime: 30 * 60, autoExtensionEnabled: true },
-      next: { status: 'onAir', programID: 'lv1', startTime: 0, endTime: 30 * 60, autoExtensionEnabled: false },
+      prev: {
+        status: 'onAir',
+        programID: 'lv1',
+        startTime: 0,
+        endTime: 30 * 60,
+        autoExtensionEnabled: true,
+      },
+      next: {
+        status: 'onAir',
+        programID: 'lv1',
+        startTime: 0,
+        endTime: 30 * 60,
+        autoExtensionEnabled: false,
+      },
       now: 24 * 60,
       result: 'CLEAR',
     },
@@ -1020,7 +1179,12 @@ describe('refreshWindowSize', () => {
       userLoginState.next(suite.isLoggedIn);
 
       suite.states.forEach((item, index, arr) => {
-        expect(updateWindowSize).toHaveBeenNthCalledWith(index + 1, expect.anything(), arr[index - 1] || null, item);
+        expect(updateWindowSize).toHaveBeenNthCalledWith(
+          index + 1,
+          expect.anything(),
+          arr[index - 1] || null,
+          item,
+        );
       });
       expect(updateWindowSize).toHaveBeenCalledTimes(suite.states.length);
     });
@@ -1063,7 +1227,9 @@ describe('updateWindowSize', () => {
       setup();
       const { NicoliveProgramService } = require('./nicolive-program');
       const { WINDOW_MIN_WIDTH } = NicoliveProgramService;
-      const WIDTH = suite.smallerThanMinWidth ? SMALL_WIDTH : WINDOW_MIN_WIDTH[suite.next] || BASE_WIDTH;
+      const WIDTH = suite.smallerThanMinWidth
+        ? SMALL_WIDTH
+        : WINDOW_MIN_WIDTH[suite.next] || BASE_WIDTH;
 
       const win = {
         getMinimumSize: () => [WINDOW_MIN_WIDTH[suite.prev], BASE_HEIGHT],
@@ -1075,7 +1241,11 @@ describe('updateWindowSize', () => {
 
       NicoliveProgramService.updateWindowSize(win, suite.prev, suite.next);
       expect(win.setMinimumSize).toHaveBeenCalledTimes(1);
-      expect(win.setMinimumSize).toHaveBeenNthCalledWith(1, WINDOW_MIN_WIDTH[suite.next], BASE_HEIGHT);
+      expect(win.setMinimumSize).toHaveBeenNthCalledWith(
+        1,
+        WINDOW_MIN_WIDTH[suite.next],
+        BASE_HEIGHT,
+      );
 
       if (suite.smallerThanMinWidth) {
         expect(win.setSize).toHaveBeenCalledTimes(1);
@@ -1125,13 +1295,21 @@ describe('updateWindowSize', () => {
       NicoliveProgramService.updateWindowSize(win, suite.prev, suite.next);
 
       expect(win.setMinimumSize).toHaveBeenCalledTimes(1);
-      expect(win.setMinimumSize).toHaveBeenNthCalledWith(1, WINDOW_MIN_WIDTH[suite.next], BASE_HEIGHT);
+      expect(win.setMinimumSize).toHaveBeenNthCalledWith(
+        1,
+        WINDOW_MIN_WIDTH[suite.next],
+        BASE_HEIGHT,
+      );
 
       if (suite.isMaximized) {
         expect(win.setSize).toHaveBeenCalledTimes(0);
       } else {
         expect(win.setSize).toHaveBeenCalledTimes(1);
-        expect(win.setSize).toHaveBeenNthCalledWith(1, WINDOW_MIN_WIDTH[suite.next] + WIDTH_DIFF, BASE_HEIGHT);
+        expect(win.setSize).toHaveBeenNthCalledWith(
+          1,
+          WINDOW_MIN_WIDTH[suite.next] + WIDTH_DIFF,
+          BASE_HEIGHT,
+        );
       }
     });
   }

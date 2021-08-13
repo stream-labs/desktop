@@ -10,8 +10,8 @@ import StartStreamingIcon from '../../media/images/start-streaming-icon.svg';
 
 @Component({
   components: {
-    StartStreamingIcon
-  }
+    StartStreamingIcon,
+  },
 })
 export default class StartStreamingButton extends Vue {
   @Inject() streamingService: StreamingService;
@@ -49,7 +49,9 @@ export default class StartStreamingButton extends Vue {
 
     if (this.streamingStatus === EStreamingState.Starting) {
       if (this.streamingService.delayEnabled) {
-        return $t('streaming.startingWithDelay', { delaySeconds: this.streamingService.delaySecondsRemaining });
+        return $t('streaming.startingWithDelay', {
+          delaySeconds: this.streamingService.delaySecondsRemaining,
+        });
       }
 
       return $t('streaming.starting');
@@ -57,7 +59,9 @@ export default class StartStreamingButton extends Vue {
 
     if (this.streamingStatus === EStreamingState.Ending) {
       if (this.streamingService.delayEnabled) {
-        return $t('streaming.endingWithDelay', { delaySeconds: this.streamingService.delaySecondsRemaining });
+        return $t('streaming.endingWithDelay', {
+          delaySeconds: this.streamingService.delaySecondsRemaining,
+        });
       }
 
       return $t('streaming.ending');
@@ -75,9 +79,14 @@ export default class StartStreamingButton extends Vue {
   }
 
   get isDisabled() {
-    return this.disabled || this.programFetching ||
-      ((this.streamingStatus === EStreamingState.Starting) && (this.streamingService.delaySecondsRemaining === 0)) ||
-      ((this.streamingStatus === EStreamingState.Ending) && (this.streamingService.delaySecondsRemaining === 0));
+    return (
+      this.disabled ||
+      this.programFetching ||
+      (this.streamingStatus === EStreamingState.Starting &&
+        this.streamingService.delaySecondsRemaining === 0) ||
+      (this.streamingStatus === EStreamingState.Ending &&
+        this.streamingService.delaySecondsRemaining === 0)
+    );
   }
 
   @Watch('streamingStatus')

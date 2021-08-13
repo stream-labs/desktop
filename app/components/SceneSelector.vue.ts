@@ -34,31 +34,30 @@ export default class SceneSelector extends Vue {
     menu.append({
       id: 'Duplicate',
       label: $t('common.duplicate'),
-      click: () => this.scenesService.showDuplicateScene(this.scenesService.activeScene.id)
+      click: () => this.scenesService.showDuplicateScene(this.scenesService.activeScene.id),
     });
     menu.append({
       id: 'Rename',
       label: $t('common.rename'),
-      click: () => this.scenesService.showNameScene({
-        rename: this.scenesService.activeScene.id
-      })
+      click: () =>
+        this.scenesService.showNameScene({
+          rename: this.scenesService.activeScene.id,
+        }),
     });
     menu.append({
       id: 'Remove',
       label: $t('common.remove'),
-      click: () => this.removeScene()
+      click: () => this.removeScene(),
     });
     menu.append({
       id: 'Filters',
       label: $t('common.filters'),
-      click: () => this.sourceFiltersService.showSourceFilters(
-        this.scenesService.activeScene.id
-      )
+      click: () => this.sourceFiltersService.showSourceFilters(this.scenesService.activeScene.id),
     });
     menu.append({
       id: 'Create Scene Projector',
       label: $t('scenes.createSceneProjector'),
-      click: () => this.projectorService.createProjector(this.scenesService.activeScene.id)
+      click: () => this.projectorService.createProjector(this.scenesService.activeScene.id),
     });
     menu.popup();
   }
@@ -90,7 +89,7 @@ export default class SceneSelector extends Vue {
         if (!this.scenesService.removeScene(this.activeSceneId)) {
           alert($t('scenes.mustHaveLeastOnceScene'));
         }
-      }
+      },
     );
   }
 
@@ -102,7 +101,7 @@ export default class SceneSelector extends Vue {
     return this.scenesService.scenes.map(scene => {
       return {
         name: scene.name,
-        value: scene.id
+        value: scene.id,
       };
     });
   }

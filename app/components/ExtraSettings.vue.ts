@@ -17,10 +17,9 @@ import ClipBoardCopy from '../../media/images/clipboard-copy.svg';
 @Component({
   components: {
     ObsBoolInput,
-    ClipBoardCopy
-  }
+    ClipBoardCopy,
+  },
 })
-
 export default class ExtraSettings extends Vue {
   @Inject() customizationService: CustomizationService;
   @Inject() onboardingService: OnboardingService;
@@ -33,8 +32,8 @@ export default class ExtraSettings extends Vue {
   cacheUploading = false;
   showCacheId = false;
 
-  get cacheId() : string {
-     return this.questionaireService.uuid;
+  get cacheId(): string {
+    return this.questionaireService.uuid;
   }
 
   copyToClipboard(text: string) {
@@ -46,7 +45,7 @@ export default class ExtraSettings extends Vue {
       name: 'optimize_for_niconico',
       description: $t('settings.optimizeForNiconico'),
       value: this.customizationService.state.optimizeForNiconico,
-      enabled: this.streamingService.isStreaming === false
+      enabled: this.streamingService.isStreaming === false,
     };
   }
 
@@ -59,7 +58,7 @@ export default class ExtraSettings extends Vue {
       name: 'show_optimization_dialog_for_niconico',
       description: $t('settings.showOptimizationDialogForNiconico'),
       value: this.customizationService.state.showOptimizationDialogForNiconico,
-      enabled: this.streamingService.isStreaming === false
+      enabled: this.streamingService.isStreaming === false,
     };
   }
 
@@ -72,7 +71,7 @@ export default class ExtraSettings extends Vue {
       name: 'optimize_with_hardware_encoder',
       description: $t('settings.optimizeWithHardwareEncoder'),
       value: this.customizationService.state.optimizeWithHardwareEncoder,
-      enabled: this.streamingService.isStreaming === false
+      enabled: this.streamingService.isStreaming === false,
     };
   }
 
@@ -84,7 +83,7 @@ export default class ExtraSettings extends Vue {
     return {
       name: 'polling_performance_statistics',
       description: $t('settings.pollingPerformanceStatistics'),
-      value: this.customizationService.pollingPerformanceStatistics
+      value: this.customizationService.pollingPerformanceStatistics,
     };
   }
 
@@ -93,17 +92,11 @@ export default class ExtraSettings extends Vue {
   }
 
   showCacheDir() {
-    electron.remote.shell.showItemInFolder(
-      electron.remote.app.getPath('userData')
-    );
+    electron.remote.shell.showItemInFolder(electron.remote.app.getPath('userData'));
   }
 
   deleteCacheDir() {
-    if (
-      confirm(
-        $t('settings.clearCacheConfirm')
-      )
-    ) {
+    if (confirm($t('settings.clearCacheConfirm'))) {
       this.appService.relaunch({ clearCacheDir: true });
     }
   }

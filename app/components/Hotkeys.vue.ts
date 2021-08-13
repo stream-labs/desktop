@@ -36,5 +36,4 @@ export default class Hotkeys extends Vue {
   get sources() {
     return this.sourcesService.sources;
   }
-
 }

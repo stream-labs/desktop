@@ -15,7 +15,7 @@ interface IMonitorCaptureCroppingServiceState {
 
 interface Area {
   top: number;
-  left: number
+  left: number;
   width: number;
   height: number;
 }
@@ -102,7 +102,11 @@ export class MonitorCaptureCroppingService extends StatefulService<IMonitorCaptu
       return;
     }
 
-    const sceneItem = new SceneItem(this.state.sceneId, this.state.sceneItemId, this.state.sourceId);
+    const sceneItem = new SceneItem(
+      this.state.sceneId,
+      this.state.sceneItemId,
+      this.state.sourceId,
+    );
     const rect = new ScalableRectangle(sceneItem.getRectangle());
 
     const source = sceneItem.getSource();
@@ -128,13 +132,12 @@ export class MonitorCaptureCroppingService extends StatefulService<IMonitorCaptu
 
     sceneItem.setTransform({
       position: { x: rect.x, y: rect.y },
-      crop: rect.crop
+      crop: rect.crop,
     });
   }
 
   @mutation()
   START_CROPPING(sceneId: string, sceneItemId: string, sourceId: string) {
-
     this.state.sceneId = sceneId;
     this.state.sceneItemId = sceneItemId;
     this.state.sourceId = sourceId;

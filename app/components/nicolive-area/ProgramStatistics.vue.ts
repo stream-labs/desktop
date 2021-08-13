@@ -8,7 +8,7 @@ import { remote } from 'electron';
 import Popper from 'vue-popperjs';
 
 @Component({
-  components: { Popper }
+  components: { Popper },
 })
 export default class ProgramStatistics extends Vue {
   @Inject()
@@ -20,13 +20,14 @@ export default class ProgramStatistics extends Vue {
   giftPointTooltip = $t('common.numberOfgiftPoint');
   twitterShareTooltip = $t('common.twitter');
 
-  showPopupMenu:boolean = false;
+  showPopupMenu: boolean = false;
 
   get programID(): string {
     return this.nicoliveProgramService.state.programID;
   }
 
-  get programStatus() { // 推論させる
+  get programStatus() {
+    // 推論させる
     return this.nicoliveProgramService.state.status;
   }
 
@@ -46,7 +47,7 @@ export default class ProgramStatistics extends Vue {
     return url.toString();
   }
 
-  private twitterShareContent(): { text: string, url: string } {
+  private twitterShareContent(): { text: string; url: string } {
     const title = this.nicoliveProgramService.state.title;
     const url = `https://live.nicovideo.jp/watch/${this.programID}?ref=sharetw`;
     const time = this.nicoliveProgramService.state.startTime;

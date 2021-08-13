@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 import WritableStream = NodeJS.WritableStream;
 import os from 'os';
 import crypto from 'crypto';
@@ -47,8 +48,10 @@ const TCP_PORT = 28194;
 /**
  * A transport layer for TCP and Websockets communications with internal API
  */
-export class TcpServerService extends PersistentStatefulService<ITcpServersSettings>
-  implements ITcpServerServiceApi {
+export class TcpServerService
+  extends PersistentStatefulService<ITcpServersSettings>
+  implements ITcpServerServiceApi
+{
   static defaultState: ITcpServersSettings = {
     token: '',
     namedPipe: {

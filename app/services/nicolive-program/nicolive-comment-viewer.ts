@@ -30,7 +30,7 @@ import { NicoliveCommentLocalFilterService } from './nicolive-comment-local-filt
 
 function makeEmulatedChat(
   content: string,
-  date: number = Math.floor(Date.now() / 1000)
+  date: number = Math.floor(Date.now() / 1000),
 ): Pick<WrappedChat, 'type' | 'value'> {
   return {
     type: 'n-air-emulated' as const,
@@ -38,7 +38,7 @@ function makeEmulatedChat(
       content,
       date,
     },
-  }
+  };
 }
 
 interface INicoliveCommentViewerState {
@@ -97,31 +97,25 @@ export class NicoliveCommentViewerService extends StatefulService<INicoliveComme
     super.init();
     this.nicoliveProgramService.stateChange
       .pipe(
-        map(({
-          roomURL,
-          roomThreadID,
-        }) => ({
+        map(({ roomURL, roomThreadID }) => ({
           roomURL,
           roomThreadID,
         })),
-        distinctUntilChanged((prev, curr) => (
-          prev.roomURL === curr.roomURL
-          && prev.roomThreadID === curr.roomThreadID
-        ))
-      ).subscribe(state => this.onNextConfig(state));
+        distinctUntilChanged(
+          (prev, curr) => prev.roomURL === curr.roomURL && prev.roomThreadID === curr.roomThreadID,
+        ),
+      )
+      .subscribe(state => this.onNextConfig(state));
 
     this.nicoliveCommentFilterService.stateChange.subscribe(() => {
       this.SET_STATE({
-        messages: this.items.map(chat => this.nicoliveCommentFilterService.applyFilter(chat))
+        messages: this.items.map(chat => this.nicoliveCommentFilterService.applyFilter(chat)),
       });
-    })
+    });
   }
 
   lastSubscription: Subscription = null;
-  private onNextConfig({
-    roomURL,
-    roomThreadID,
-  }: MessageServerConfig): void {
+  private onNextConfig({ roomURL, roomThreadID }: MessageServerConfig): void {
     this.unsubscribe();
     this.clearList();
     this.pinComment(null);
@@ -146,38 +140,35 @@ export class NicoliveCommentViewerService extends StatefulService<INicoliveComme
   }
 
   private connect() {
-    this.lastSubscription = this.client.connect()
+    this.lastSubscription = this.client
+      .connect()
       .pipe(
         groupBy(msg => Object.keys(msg)[0]),
         mergeMap((group$): Observable<Pick<WrappedChat, 'type' | 'value'>> => {
           switch (group$.key) {
             case 'chat':
-              return group$
-                .pipe(
-                  filter(isChatMessage),
-                  map(({ chat }) => ({
-                    type: classify(chat),
-                    value: chat,
-                  })),
-                );
+              return group$.pipe(
+                filter(isChatMessage),
+                map(({ chat }) => ({
+                  type: classify(chat),
+                  value: chat,
+                })),
+              );
             case 'thread':
-              return group$
-                .pipe(
-                  filter(isThreadMessage),
-                  filter(msg => (msg.thread.resultcode ?? 0) !== 0),
-                  mapTo(makeEmulatedChat('コメントの取得に失敗しました'))
-                );
+              return group$.pipe(
+                filter(isThreadMessage),
+                filter(msg => (msg.thread.resultcode ?? 0) !== 0),
+                mapTo(makeEmulatedChat('コメントの取得に失敗しました')),
+              );
             case 'leave_thread':
-              return group$
-                .pipe(
-                  mapTo(makeEmulatedChat('コメントの取得に失敗しました'))
-                );
-            default: EMPTY;
+              return group$.pipe(mapTo(makeEmulatedChat('コメントの取得に失敗しました')));
+            default:
+              EMPTY;
           }
         }),
         catchError(err => {
           console.error(err);
-          return of(makeEmulatedChat(`エラーが発生しました: ${err.message}`))
+          return of(makeEmulatedChat(`エラーが発生しました: ${err.message}`));
         }),
         endWith(makeEmulatedChat('サーバーとの接続が終了しました')),
         tap(v => {
@@ -190,7 +181,8 @@ export class NicoliveCommentViewerService extends StatefulService<INicoliveComme
         map(({ type, value }, seqId) => ({ type, value, seqId })),
         bufferTime(1000),
         filter(arr => arr.length > 0),
-      ).subscribe(values => this.onMessage(values.map(c => AddComponent(c))));
+      )
+      .subscribe(values => this.onMessage(values.map(c => AddComponent(c))));
     this.client.requestLatestMessages();
   }
 
@@ -201,19 +193,21 @@ export class NicoliveCommentViewerService extends StatefulService<INicoliveComme
     for (const chat of values) {
       const speech = this.nicoliveCommentSynthesizerService.makeSpeech(chat);
       if (speech) {
-        this.nicoliveCommentSynthesizerService.speakText(speech,
+        this.nicoliveCommentSynthesizerService.speakText(
+          speech,
           () => {
             this.SET_STATE({
-              speakingSeqId: chat.seqId
+              speakingSeqId: chat.seqId,
             });
           },
           () => {
-            if (this.state.speakingSeqId == chat.seqId) {
+            if (this.state.speakingSeqId === chat.seqId) {
               this.SET_STATE({
-                speakingSeqId: null
+                speakingSeqId: null,
               });
             }
-          });
+          },
+        );
       }
     }
   }
@@ -223,18 +217,22 @@ export class NicoliveCommentViewerService extends StatefulService<INicoliveComme
     const recentSeconds = 60;
 
     const nowSeconds = Date.now() / 1000;
-    this.queueToSpeech(values.filter(c => {
-      if (!this.filterFn(c)) {
-        return false;
-      }
-      if (!c.value || !c.value.date) {
-        return false;
-      }
-      if (c.value.date < (nowSeconds - recentSeconds)) {
-        return false;
-      }
-      return true;
-    }).slice(-maxQueueToSpeak));
+    this.queueToSpeech(
+      values
+        .filter(c => {
+          if (!this.filterFn(c)) {
+            return false;
+          }
+          if (!c.value || !c.value.date) {
+            return false;
+          }
+          if (c.value.date < nowSeconds - recentSeconds) {
+            return false;
+          }
+          return true;
+        })
+        .slice(-maxQueueToSpeak),
+    );
 
     const maxRetain = 100; // 最新からこの件数を一覧に保持する
     const concatMessages = this.state.messages.concat(values);
@@ -257,5 +255,4 @@ export class NicoliveCommentViewerService extends StatefulService<INicoliveComme
   private SET_STATE(nextState: Partial<INicoliveCommentViewerState>) {
     this.state = { ...this.state, ...nextState };
   }
-
 }

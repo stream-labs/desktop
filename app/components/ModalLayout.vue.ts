@@ -8,7 +8,6 @@ import electron from 'electron';
 
 @Component({})
 export default class ModalLayout extends Vue {
-
   contentStyle: Object = {};
   fixedStyle: Object = {};
 
@@ -48,7 +47,7 @@ export default class ModalLayout extends Vue {
 
   created() {
     const fixedStyle = {
-      height: (this.fixedSectionHeight || 0).toString() + 'px'
+      height: (this.fixedSectionHeight || 0).toString() + 'px',
     };
 
     this.fixedStyle = fixedStyle;
@@ -73,5 +72,4 @@ export default class ModalLayout extends Vue {
   get loading() {
     return this.appService.state.loading;
   }
-
 }

@@ -9,7 +9,6 @@ import electron from 'electron';
 
 export type TKeyEventType = 'registerKeydown' | 'registerKeyup';
 
-
 export interface IKeyBinding {
   callback?: () => void;
   eventType: TKeyEventType;
@@ -22,7 +21,6 @@ export interface IKeyBinding {
   };
 }
 
-
 /**
  * Node libuiohook is a native addon for binding global hotkeys
  */
@@ -33,7 +31,6 @@ interface INodeLibuiohook {
 }
 
 export class KeyListenerService extends Service {
-
   private libuiohook: INodeLibuiohook;
 
   // key -> namepsace -> function
@@ -65,7 +62,7 @@ export class KeyListenerService extends Service {
           Object.keys(this.bindings[keystr]).forEach(namespace => {
             this.bindings[keystr][namespace].callback();
           });
-        }
+        },
       });
 
       if (!success) return;
@@ -93,8 +90,9 @@ export class KeyListenerService extends Service {
 
   // Returns a string used for fast lookup of this keybinding
   private getKeyString(binding: IKeyBinding) {
-    return `${binding.key}-${binding.eventType}-${!!binding.modifiers.alt}-` +
-      `${!!binding.modifiers.ctrl}-${!!binding.modifiers.shift}-${!!binding.modifiers.meta}`;
+    return (
+      `${binding.key}-${binding.eventType}-${!!binding.modifiers.alt}-` +
+      `${!!binding.modifiers.ctrl}-${!!binding.modifiers.shift}-${!!binding.modifiers.meta}`
+    );
   }
-
 }

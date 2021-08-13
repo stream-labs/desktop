@@ -1,15 +1,14 @@
 import { NiconicoService } from './niconico';
 
 export type IStreamingSetting = {
-  url: string,
-  key: string,
-  bitrate: number | undefined
-}
+  url: string;
+  key: string;
+  bitrate: number | undefined;
+};
 
 // All platform services should implement
 // this interface.
 export interface IPlatformService {
-
   authWindowOptions: Electron.BrowserWindowConstructorOptions;
 
   authUrl: string;
@@ -40,6 +39,6 @@ export type TPlatform = 'niconico';
 
 export function getPlatformService(platform: TPlatform): IPlatformService {
   return {
-    niconico: NiconicoService.instance
+    niconico: NiconicoService.instance,
   }[platform];
 }

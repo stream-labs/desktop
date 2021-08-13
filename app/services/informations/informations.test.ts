@@ -39,7 +39,7 @@ const setup = createSetupFunction({
     HostsService: {
       niconicoNAirInformationsFeed: dummyURL,
     },
-  }
+  },
 });
 
 test('get instance', () => {
@@ -95,7 +95,9 @@ test('fetchFeed(private):パース失敗', async () => {
   const instance = m.InformationsService.instance;
   expect(instance.updateInformations).toHaveBeenCalledTimes(1);
 
-  m.InformationsService.parseXml = jest.fn().mockImplementation(() => { throw new Error('parse error'); });
+  m.InformationsService.parseXml = jest.fn().mockImplementation(() => {
+    throw new Error('parse error');
+  });
 
   (instance as any).SET_FETCHING = jest.fn();
 

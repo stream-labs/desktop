@@ -23,7 +23,7 @@ import { $t } from 'services/i18n';
     ModalLayout,
     NavMenu,
     NavItem,
-    Step
+    Step,
   },
 })
 export default class NicoliveProgramSelector extends Vue {
@@ -87,11 +87,8 @@ export default class NicoliveProgramSelector extends Vue {
   }
 
   getSelectedValueForDisplay(navItemStep: TSelectionStep): string {
-    const {
-       selectedProviderType,
-       selectedChannel,
-       selectedChannelProgram
-    } = this.nicoliveProgramSelectorService.state;
+    const { selectedProviderType, selectedChannel, selectedChannelProgram } =
+      this.nicoliveProgramSelectorService.state;
     switch (navItemStep) {
       case 'providerTypeSelect':
         return this.getProviderTypeProgramText(selectedProviderType) || this.BLANK;
@@ -129,8 +126,9 @@ export default class NicoliveProgramSelector extends Vue {
     this.streamingService.toggleStreamingAsync({
       nicoliveProgramSelectorResult: {
         providerType: this.nicoliveProgramSelectorService.state.selectedProviderType,
-        channelProgramId: this.nicoliveProgramSelectorService.state.selectedChannelProgram?.id ?? undefined
-      }
+        channelProgramId:
+          this.nicoliveProgramSelectorService.state.selectedChannelProgram?.id ?? undefined,
+      },
     });
 
     this.windowsService.closeChildWindow();

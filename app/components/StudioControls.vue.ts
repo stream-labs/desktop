@@ -12,8 +12,8 @@ import ControlsArrow from '../../media/images/controls-arrow.svg';
     SceneSelector,
     SourceSelector,
     Mixer,
-    ControlsArrow
-  }
+    ControlsArrow,
+  },
 })
 export default class StudioControls extends Vue {
   @Inject() customizationService: CustomizationService;

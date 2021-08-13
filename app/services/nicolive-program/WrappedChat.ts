@@ -2,7 +2,6 @@ import { ChatMessage } from './ChatMessage';
 import { ChatMessageType } from './ChatMessage/classifier';
 import { ChatComponentType } from './ChatMessage/ChatComponentType';
 
-
 export type WrappedChat = {
   type: ChatMessageType;
   value: ChatMessage;
@@ -11,4 +10,4 @@ export type WrappedChat = {
   filtered?: boolean;
 };
 
-export type WrappedChatWithComponent = WrappedChat & { component: ChatComponentType; };
+export type WrappedChatWithComponent = WrappedChat & { component: ChatComponentType };

@@ -7,7 +7,6 @@ import { Selection, SelectionService } from 'services/selection';
 import { SceneItem, ISceneHierarchy, TSceneNode, isFolder, isItem } from 'services/scenes';
 import { TSceneNodeType } from './scenes';
 
-
 import { SceneItemNode } from './scene-node';
 import { ISceneItemFolder } from '.';
 
@@ -64,7 +63,6 @@ export class SceneItemFolder extends SceneItemNode {
     return this.getNodes().filter(isFolder);
   }
 
-
   getScene(): Scene {
     return this.scenesService.getScene(this.sceneId);
   }
@@ -94,9 +92,7 @@ export class SceneItemFolder extends SceneItemNode {
     return nodes.map(node => {
       return {
         ...node.getModel(),
-        children: node.sceneNodeType === 'folder' ?
-          (node as SceneItemFolder).getHierarchy() :
-          []
+        children: node.sceneNodeType === 'folder' ? (node as SceneItemFolder).getHierarchy() : [],
       };
     });
   }
@@ -113,14 +109,13 @@ export class SceneItemFolder extends SceneItemNode {
       nodes.push(node);
       traversedNodesIds.push(node.id);
       if (node.sceneNodeType !== 'folder') return;
-      nodes.push(...((node as SceneItemFolder).getNestedNodes(traversedNodesIds)));
+      nodes.push(...(node as SceneItemFolder).getNestedNodes(traversedNodesIds));
     });
     return nodes;
   }
 
   getNestedItems(): SceneItem[] {
-    return this.getNestedNodes()
-      .filter(node => node.sceneNodeType === 'item') as SceneItem[];
+    return this.getNestedNodes().filter(node => node.sceneNodeType === 'item') as SceneItem[];
   }
 
   getNestedFolders(): SceneItemFolder[] {

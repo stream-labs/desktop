@@ -15,7 +15,7 @@ export default class Display extends Vue {
   @Prop() clickHandler: boolean;
 
   $refs: {
-    display: HTMLElement
+    display: HTMLElement;
   };
 
   display: OBSDisplay;
@@ -60,5 +60,4 @@ export default class Display extends Vue {
   beforeDestroy() {
     this.destroyDisplay();
   }
-
 }

@@ -10,11 +10,11 @@
 import { inheritMutations } from './stateful-service';
 
 export function ServiceHelper(): ClassDecorator {
-  return function(target: any) {
+  return function (target: any) {
     const original = target;
 
     // create new constructor that will save arguments in instance
-    const f: any = function(this: any, ...args: any[]) {
+    const f: any = function (this: any, ...args: any[]) {
       original.apply(this, args);
       this._isHelper = true;
       this._constructorArgs = args;

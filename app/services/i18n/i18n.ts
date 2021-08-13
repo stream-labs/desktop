@@ -21,10 +21,7 @@ export function $t(...args: any[]): string {
   // some tests try to call this function before dictionaries have been loaded
   if (!vueI18nInstance) return args[0];
 
-  return vueI18nInstance.t.call(
-    I18nService.vueI18nInstance,
-    ...args
-  );
+  return vueI18nInstance.t.call(I18nService.vueI18nInstance, ...args);
 }
 
 /**
@@ -33,27 +30,25 @@ export function $t(...args: any[]): string {
 const LANG_CODE_MAP = {
   cs: { lang: 'Czech', locale: 'cs-CZ' },
   de: { lang: 'German', locale: 'de-DE' },
-  'en-US':	{ lang: 'English', locale: 'en-US' },
+  'en-US': { lang: 'English', locale: 'en-US' },
   es: { lang: 'Spanish', locale: 'es-ES' },
   fr: { lang: 'French', locale: 'fr-FR' },
-  it:	{ lang: 'Italian', locale: 'it-IT' },
+  it: { lang: 'Italian', locale: 'it-IT' },
   ja: { lang: 'Japanese', locale: 'ja-JP' },
-  ko:	{ lang: 'Korean', locale: 'ko-KR' },
-  pl: { lang:	'Polish', locale: 'pl-PL' },
+  ko: { lang: 'Korean', locale: 'ko-KR' },
+  pl: { lang: 'Polish', locale: 'pl-PL' },
   pt: { lang: 'Portuguese', locale: 'pt-PT' },
   'pt-BR': { lang: 'Portuguese (Brazil)', locale: 'pt-BR' },
   ru: { lang: 'Russian', locale: 'ru-RU' },
   sk: { lang: 'Slovak', locale: 'sk-SK' },
-  th:	{ lang: 'Thai', locale: 'th-TH' },
-  tr:	{ lang: 'Turkish', locale: 'tr-TR' },
-  'zh-CN': { lang: 'Chinese (Simplified)' }
+  th: { lang: 'Thai', locale: 'th-TH' },
+  tr: { lang: 'Turkish', locale: 'tr-TR' },
+  'zh-CN': { lang: 'Chinese (Simplified)' },
 };
 
-
 export class I18nService extends PersistentStatefulService<II18nState> implements I18nServiceApi {
-
   static defaultState: II18nState = {
-    locale: 'ja-JP'
+    locale: 'ja-JP',
   };
 
   static vueI18nInstance: VueI18n;
@@ -69,12 +64,8 @@ export class I18nService extends PersistentStatefulService<II18nState> implement
   @Inject() fileManagerService: FileManagerService;
   @Inject() appService: AppService;
 
-
   async load() {
-
-    const WHITE_LIST = [
-      'en-US', 'ja-JP',
-    ];
+    const WHITE_LIST = ['en-US', 'ja-JP'];
 
     if (this.isLoaded) return;
     const i18nPath = this.getI18nPath();
@@ -84,7 +75,9 @@ export class I18nService extends PersistentStatefulService<II18nState> implement
 
     for (const locale of localeFiles) {
       if (!WHITE_LIST.includes(locale)) continue;
-      this.availableLocales[locale] = this.fileManagerService.read(`${i18nPath}/${locale}/langname.txt`);
+      this.availableLocales[locale] = this.fileManagerService.read(
+        `${i18nPath}/${locale}/langname.txt`,
+      );
     }
 
     // if locale is not set than use electron's one
@@ -102,8 +95,8 @@ export class I18nService extends PersistentStatefulService<II18nState> implement
         electron.remote.dialog.showErrorBox(
           'N Air - Error',
           `${locale}向けの辞書ファイル読み込みに失敗しました。\n` +
-          `Failed to read the dictionary file for ${locale}.\n` +
-          e.message
+            `Failed to read the dictionary file for ${locale}.\n` +
+            e.message,
         );
       });
     }
@@ -116,8 +109,8 @@ export class I18nService extends PersistentStatefulService<II18nState> implement
         electron.remote.dialog.showErrorBox(
           'N Air - Error',
           `${fallbackLocale}向けの辞書ファイル読み込みに失敗しました。\n` +
-          `Failed to read the dictionary file for ${fallbackLocale}.\n` +
-          e.message
+            `Failed to read the dictionary file for ${fallbackLocale}.\n` +
+            e.message,
         );
       });
     }
@@ -157,13 +150,12 @@ export class I18nService extends PersistentStatefulService<II18nState> implement
   }
 
   getLocaleFormData(): TObsFormData {
-    const options = Object.keys(this.availableLocales)
-      .map(locale => {
-        return {
-          value: locale,
-          description: this.availableLocales[locale]
-        };
-      });
+    const options = Object.keys(this.availableLocales).map(locale => {
+      return {
+        value: locale,
+        description: this.availableLocales[locale],
+      };
+    });
 
     return [
       <IObsListInput<string>>{
@@ -173,13 +165,13 @@ export class I18nService extends PersistentStatefulService<II18nState> implement
         value: this.state.locale,
         enabled: true,
         visible: true,
-        options
-      }
+        options,
+      },
     ];
   }
 
   private getI18nPath() {
-    return path.join(electron.remote.app.getAppPath(),'app/i18n');
+    return path.join(electron.remote.app.getAppPath(), 'app/i18n');
   }
 
   private async loadDictionary(locale: string): Promise<Dictionary<string>> {
@@ -187,7 +179,7 @@ export class I18nService extends PersistentStatefulService<II18nState> implement
 
     const i18nPath = this.getI18nPath();
     const files = await new Promise<string[]>((resolve, reject) => {
-      fs.readdir(`${i18nPath}/${locale}`, (err, files) => err ? reject(err) : resolve(files));
+      fs.readdir(`${i18nPath}/${locale}`, (err, files) => (err ? reject(err) : resolve(files)));
     });
 
     const dictionaryFiles = files
@@ -207,8 +199,8 @@ export class I18nService extends PersistentStatefulService<II18nState> implement
     } catch (e) {
       let lineInfo = '';
       const posMatch = e.message.match(/ at position ([0-9]+)$/);
-      if (posMatch.length == 2) {
-        const pos = parseInt(posMatch[1], 10)
+      if (posMatch.length === 2) {
+        const pos = parseInt(posMatch[1], 10);
         let lineStart = 0;
         for (let line = 1; ; ++line) {
           const nextLF = rawJSON.indexOf('\n', lineStart);
@@ -219,7 +211,9 @@ export class I18nService extends PersistentStatefulService<II18nState> implement
           lineStart = nextLF + 1;
         }
       }
-      throw new Error(`in file: ${require('path').resolve(lastReadFilePath)}\n${e.message}${lineInfo}`);
+      throw new Error(
+        `in file: ${require('path').resolve(lastReadFilePath)}\n${e.message}${lineInfo}`,
+      );
     }
     rawJSON = '';
     this.loadedDictionaries[locale] = dictionary;
@@ -230,5 +224,4 @@ export class I18nService extends PersistentStatefulService<II18nState> implement
   private SET_LOCALE(locale: string) {
     this.state.locale = locale;
   }
-
 }

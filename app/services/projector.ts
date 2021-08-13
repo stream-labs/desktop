@@ -24,8 +24,8 @@ export class ProjectorService extends Service {
       queryParams: { sourceId },
       size: {
         width: 640,
-        height: 400
-      }
+        height: 400,
+      },
     });
   }
 }

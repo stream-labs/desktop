@@ -126,7 +126,6 @@ export class ScenesService extends StatefulService<IScenesState> {
       nodes: [],
     });
     this.state.displayOrder.push(id);
-    this.state.activeSceneId = this.state.activeSceneId;
   }
 
   @mutation()

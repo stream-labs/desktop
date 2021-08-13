@@ -108,9 +108,9 @@ export class WebcamNode extends Node<ISchema, IContext> {
     input.update(settings);
 
     // Figure out which resolutions this device can run at
-    const resolutionOptions = (deviceProperties.get(
-      'resolution'
-    ) as IListProperty).details.items.map(item => {
+    const resolutionOptions = (
+      deviceProperties.get('resolution') as IListProperty
+    ).details.items.map(item => {
       return this.resStringToResolution(item.value as string);
     });
 
@@ -177,7 +177,7 @@ export class WebcamNode extends Node<ISchema, IContext> {
         x: scale,
         y: scale,
       },
-      crop
+      crop,
     });
   }
 

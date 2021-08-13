@@ -20,7 +20,6 @@ import electron from 'electron';
   },
 })
 export default class SourceProperties extends Vue {
-
   @Inject()
   sourcesService: ISourcesServiceApi;
 
@@ -50,14 +49,12 @@ export default class SourceProperties extends Vue {
   }
 
   get propertiesManagerUI() {
-    if (this.source) return  this.source.getPropertiesManagerUI();
+    if (this.source) return this.source.getPropertiesManagerUI();
   }
 
   onInputHandler(properties: TObsFormData, changedIndex: number) {
     const source = this.sourcesService.getSource(this.sourceId);
-    source.setPropertiesFormData(
-      [properties[changedIndex]]
-    );
+    source.setPropertiesFormData([properties[changedIndex]]);
     this.tainted = true;
     this.refresh();
   }
@@ -77,9 +74,7 @@ export default class SourceProperties extends Vue {
   cancel() {
     if (this.tainted) {
       const source = this.sourcesService.getSource(this.sourceId);
-      source.setPropertiesFormData(
-        this.initialProperties
-      );
+      source.setPropertiesFormData(this.initialProperties);
     }
     this.closeWindow();
   }
@@ -88,5 +83,4 @@ export default class SourceProperties extends Vue {
     const source = this.sourcesService.getSource(this.sourceId);
     return source ? $t('sources.propertyWindowTitle', { sourceName: source.name }) : '';
   }
-
 }

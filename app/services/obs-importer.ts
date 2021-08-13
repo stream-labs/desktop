@@ -51,7 +51,7 @@ interface IOBSConfigSource {
   channel?: number;
   muted: boolean;
   volume: number;
-  filters:IOBSConfigFilter[];
+  filters: IOBSConfigFilter[];
 }
 
 interface IOBSConfigTransition {
@@ -108,13 +108,8 @@ export class ObsImporterService extends Service {
   }
 
   private async importCollection(collection: ISceneCollection) {
-    const sceneCollectionPath = path.join(
-      this.sceneCollectionsDirectory,
-      collection.filename
-    );
-    const configJSON: IOBSConfigJSON = JSON.parse(
-      fs.readFileSync(sceneCollectionPath).toString()
-    );
+    const sceneCollectionPath = path.join(this.sceneCollectionsDirectory, collection.filename);
+    const configJSON: IOBSConfigJSON = JSON.parse(fs.readFileSync(sceneCollectionPath).toString());
 
     await this.sceneCollectionsService.create({
       name: collection.name,
@@ -130,34 +125,25 @@ export class ObsImporterService extends Service {
         }
 
         return true;
-      }
+      },
     });
   }
 
   importFilters(filtersJSON: IOBSConfigFilter[], source: Source) {
     if (Array.isArray(filtersJSON)) {
       filtersJSON.forEach(filterJSON => {
-        const isFilterAvailable = this.filtersService
-          .getTypes()
-          .find(availableFilter => {
-            return availableFilter.type === filterJSON.id;
-          });
+        const isFilterAvailable = this.filtersService.getTypes().find(availableFilter => {
+          return availableFilter.type === filterJSON.id;
+        });
 
         if (isFilterAvailable) {
           const sourceId = this.sourcesService.getSourcesByName(source.name)[0].sourceId;
 
-          const filter = this.filtersService.add(
-            sourceId,
-            filterJSON.id,
-            filterJSON.name
-          );
+          const filter = this.filtersService.add(sourceId, filterJSON.id, filterJSON.name);
           filter.enabled = filterJSON.enabled;
 
           // Setting properties
-          const properties = this.filtersService.getPropertiesFormData(
-            sourceId,
-            filterJSON.name
-          );
+          const properties = this.filtersService.getPropertiesFormData(sourceId, filterJSON.name);
 
           if (properties) {
             if (Array.isArray(properties)) {
@@ -169,11 +155,7 @@ export class ObsImporterService extends Service {
             }
           }
 
-          this.filtersService.setPropertiesFormData(
-            sourceId,
-            filterJSON.name,
-            properties
-          );
+          this.filtersService.setPropertiesFormData(sourceId, filterJSON.name, properties);
         } else {
           // TODO Report to the user that N Air does not support the filter
         }
@@ -202,17 +184,13 @@ export class ObsImporterService extends Service {
               sourceJSON.id,
               sourceJSON.settings,
               {
-                channel: sourceJSON.channel !== 0 ? sourceJSON.channel : void 0
-              }
+                channel: sourceJSON.channel !== 0 ? sourceJSON.channel : void 0,
+              },
             );
 
             if (source.audio) {
-              this.audioService
-                .getSource(source.sourceId)
-                .setMuted(sourceJSON.muted);
-              this.audioService
-                .getSource(source.sourceId)
-                .setMul(sourceJSON.volume);
+              this.audioService.getSource(source.sourceId).setMuted(sourceJSON.muted);
+              this.audioService.getSource(source.sourceId).setMul(sourceJSON.volume);
             }
 
             // Adding the filters
@@ -239,7 +217,7 @@ export class ObsImporterService extends Service {
       sourcesJSON.forEach(sourceJSON => {
         if (sourceJSON.id === 'scene') {
           const scene = this.scenesService.createScene(sourceJSON.name, {
-            makeActive: sourceJSON.name === currentScene
+            makeActive: sourceJSON.name === currentScene,
           });
           nameToIdMap[scene.name] = scene.id;
         }
@@ -255,11 +233,9 @@ export class ObsImporterService extends Service {
           if (Array.isArray(sceneItems)) {
             // Looking for the source to add to the scene
             sceneItems.forEach(item => {
-              const sourceToAdd = this.sourcesService
-                .getSources()
-                .find(source => {
-                  return source.name === item.name;
-                });
+              const sourceToAdd = this.sourcesService.getSources().find(source => {
+                return source.name === item.name;
+              });
               if (sourceToAdd) {
                 const sceneItem = scene.addSource(sourceToAdd.sourceId);
 
@@ -267,7 +243,7 @@ export class ObsImporterService extends Service {
                   bottom: item.crop_bottom,
                   left: item.crop_left,
                   right: item.crop_right,
-                  top: item.crop_top
+                  top: item.crop_top,
                 };
                 const pos = item.pos;
                 const scale = item.scale;
@@ -277,8 +253,8 @@ export class ObsImporterService extends Service {
                   transform: {
                     crop,
                     scale,
-                    position: pos
-                  }
+                    position: pos,
+                  },
                 });
               }
             });
@@ -298,7 +274,7 @@ export class ObsImporterService extends Service {
         sceneNames.push(
           listScene.find(scene => {
             return scene.name === obsScene.name;
-          }).id
+          }).id,
         );
       });
     }
@@ -311,7 +287,7 @@ export class ObsImporterService extends Service {
       'DesktopAudioDevice2',
       'AuxAudioDevice1',
       'AuxAudioDevice2',
-      'AuxAudioDevice3'
+      'AuxAudioDevice3',
     ];
     channelNames.forEach((channelName, i) => {
       const audioSource = configJSON[channelName];
@@ -320,15 +296,11 @@ export class ObsImporterService extends Service {
           channelName,
           audioSource.id,
           {},
-          { channel: i + 1 }
+          { channel: i + 1 },
         );
 
-        this.audioService
-          .getSource(newSource.sourceId)
-          .setMuted(audioSource.muted);
-        this.audioService
-          .getSource(newSource.sourceId)
-          .setMul(audioSource.volume);
+        this.audioService.getSource(newSource.sourceId).setMuted(audioSource.muted);
+        this.audioService.getSource(newSource.sourceId).setMul(audioSource.volume);
       }
     });
   }
@@ -342,7 +314,7 @@ export class ObsImporterService extends Service {
       this.transitionsService.createTransition(
         configJSON.transitions[0].id as ETransitionType,
         'Global Transition',
-        { duration: configJSON.transition_duration }
+        { duration: configJSON.transition_duration },
       );
     }
   }
@@ -352,11 +324,7 @@ export class ObsImporterService extends Service {
     const files = fs.readdirSync(profileDirectory);
 
     files.forEach(file => {
-      if (
-        file === 'basic.ini' ||
-        file === 'streamEncoder.json' ||
-        file === 'recordEncoder.json'
-      ) {
+      if (file === 'basic.ini' || file === 'streamEncoder.json' || file === 'recordEncoder.json') {
         const obsFilePath = path.join(profileDirectory, file);
 
         const appData = electron.remote.app.getPath('userData');
@@ -378,7 +346,7 @@ export class ObsImporterService extends Service {
     return files.map(file => {
       return {
         filename: file,
-        name: file.replace('_', ' ').replace('.json', '')
+        name: file.replace('_', ' ').replace('.json', ''),
       };
     });
   }

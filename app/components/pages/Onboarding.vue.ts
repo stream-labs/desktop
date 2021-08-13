@@ -11,16 +11,14 @@ import { Inject } from '../../services/core/injector';
   components: {
     Connect,
     ObsImport,
-    SuccessfullyImported
-  }
+    SuccessfullyImported,
+  },
 })
 export default class Onboarding extends Vue {
-
   @Inject()
   onboardingService: OnboardingService;
 
   get currentView() {
     return this.onboardingService.currentStep;
   }
-
 }

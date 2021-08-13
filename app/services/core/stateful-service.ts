@@ -4,7 +4,7 @@ import { Service } from './service';
 import Utils from '../utils';
 
 export function mutation(options = { unsafe: false }) {
-  return function(target: any, methodName: string, descriptor: PropertyDescriptor) {
+  return function (target: any, methodName: string, descriptor: PropertyDescriptor) {
     return registerMutation(target, methodName, descriptor, options);
   };
 }
@@ -23,7 +23,7 @@ function registerMutation(
   target.mutationOptions = target.mutationOptions || {};
   target.mutationOptions[methodName] = options;
   target.mutations = target.mutations || {};
-  target.mutations[mutationName] = function(
+  target.mutations[mutationName] = function (
     localState: any,
     payload: { args: any; constructorArgs: any },
   ) {
@@ -112,7 +112,7 @@ export abstract class StatefulService<TState extends object> extends Service {
   }
 
   static getStore() {
-    if (!this.store) throw 'vuex store is not set';
+    if (!this.store) throw Error('vuex store is not set');
     return this.store;
   }
 
@@ -153,7 +153,7 @@ export function getModule(ModuleContainer: any): Module<any, any> {
 
 // tslint:disable-next-line:function-name
 export function InheritMutations(): ClassDecorator {
-  return function(target: any) {
+  return function (target: any) {
     inheritMutations(target);
   };
 }

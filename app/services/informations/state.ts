@@ -3,11 +3,10 @@ import { PersistentStatefulService } from 'services/core/persistent-stateful-ser
 
 interface IInformationsLastOpen {
   /** 最後にインフォ一覧を開いた時刻のミリ秒単位unixtime */
-  lastOpen: number,
+  lastOpen: number;
 }
 
 export class InformationsStateService extends PersistentStatefulService<IInformationsLastOpen> {
-
   static defaultState: IInformationsLastOpen = {
     lastOpen: 0,
   };

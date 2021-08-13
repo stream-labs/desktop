@@ -1,10 +1,6 @@
 import { Node } from './node';
 import { HotkeysNode } from './hotkeys';
-import {
-  SourcesService,
-  TSourceType,
-  TPropertiesManager
-} from 'services/sources';
+import { SourcesService, TSourceType, TPropertiesManager } from 'services/sources';
 import { FontLibraryService } from 'services/font-library';
 import { AudioService } from 'services/audio';
 import { Inject } from '../../core/injector';
@@ -88,7 +84,7 @@ export class SourcesNode extends Node<ISchema, {}> {
 
           const obsInput = source.getObsInput();
           if (!obsInput) {
-            throw `source '${source.sourceId}': getObsInput() not found`;
+            throw Error(`source '${source.sourceId}': getObsInput() not found`);
           }
 
           /* Signal to the source that it needs to save settings as
@@ -115,12 +111,12 @@ export class SourcesNode extends Node<ISchema, {}> {
                   name: filter.name,
                   type: filter.id,
                   settings: filter.settings,
-                  enabled: filter.enabled
+                  enabled: filter.enabled,
                 };
-              })
+              }),
             },
             propertiesManager: source.getPropertiesManagerType(),
-            propertiesManagerSettings: source.getPropertiesManagerSettings()
+            propertiesManagerSettings: source.getPropertiesManagerSettings(),
           };
 
           if (source.video && source.async) {
@@ -128,7 +124,7 @@ export class SourcesNode extends Node<ISchema, {}> {
               ...data,
               deinterlaceMode: source.deinterlaceMode,
               deinterlaceFieldOrder: source.deinterlaceFieldOrder,
-            }
+            };
           }
 
           if (audioSource) {
@@ -138,7 +134,7 @@ export class SourcesNode extends Node<ISchema, {}> {
               syncOffset: AudioService.msToTimeSpec(audioSource.syncOffset),
               audioMixers: audioSource.audioMixers,
               monitoringType: audioSource.monitoringType,
-              mixerHidden: audioSource.mixerHidden
+              mixerHidden: audioSource.mixerHidden,
             };
           }
 
@@ -188,8 +184,7 @@ export class SourcesNode extends Node<ISchema, {}> {
     settings['font']['face'] = fontInfo.family_name;
 
     settings['font']['flags'] =
-      (fontInfo.italic ? obs.EFontStyle.Italic : 0) |
-      (fontInfo.bold ? obs.EFontStyle.Bold : 0);
+      (fontInfo.italic ? obs.EFontStyle.Italic : 0) | (fontInfo.bold ? obs.EFontStyle.Bold : 0);
 
     const source = this.sourcesService.getSource(item.id);
     source.updateSettings({ font: settings.font });
@@ -235,7 +230,7 @@ export class SourcesNode extends Node<ISchema, {}> {
             enabled: filter.enabled === void 0 ? true : filter.enabled,
           };
         }),
-        syncOffset: {sec: 0, nsec: 0}, // streamlabs v0.16.3 にはないが無いとコンパイルエラーが出る
+        syncOffset: { sec: 0, nsec: 0 }, // streamlabs v0.16.3 にはないが無いとコンパイルエラーが出る
       };
     });
 
@@ -255,7 +250,7 @@ export class SourcesNode extends Node<ISchema, {}> {
         propertiesManagerSettings: sourceInfo.propertiesManagerSettings || {},
       });
 
-      let newSource = this.sourcesService.getSource(sourceInfo.id);
+      const newSource = this.sourcesService.getSource(sourceInfo.id);
       if (newSource.async && newSource.video) {
         if (sourceInfo.deinterlaceMode !== void 0) {
           newSource.setDeinterlaceMode(sourceInfo.deinterlaceMode);

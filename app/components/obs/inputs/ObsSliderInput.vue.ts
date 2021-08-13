@@ -4,10 +4,9 @@ import { TObsType, ObsInput, IObsSliderInputValue } from './ObsInput';
 import Slider from '../../shared/Slider.vue';
 
 @Component({
-  components: { Slider }
+  components: { Slider },
 })
 class ObsSliderInput extends ObsInput<IObsSliderInputValue> {
-
   static obsType: TObsType;
 
   @Prop() value: IObsSliderInputValue;
@@ -26,7 +25,6 @@ class ObsSliderInput extends ObsInput<IObsSliderInputValue> {
   emitValue(value: number) {
     this.emitInput({ ...this.value, value });
   }
-
 }
 
 ObsSliderInput.obsType = 'OBS_PROPERTY_SLIDER';

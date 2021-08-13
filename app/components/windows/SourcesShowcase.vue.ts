@@ -10,6 +10,7 @@ import { UserService } from 'services/user';
 import BrowserSourceIcon from '../../../media/images/browser-source-icon.svg';
 import ColorSourceIcon from '../../../media/images/color-source-icon.svg';
 import DshowInputIcon from '../../../media/images/display-icon.svg';
+// eslint-disable-next-line import/no-duplicates
 import ImageSourceIcon from '../../../media/images/slideshow-icon.svg';
 import WindowCaptureIcon from '../../../media/images/window-capture-icon.svg';
 import AddSceneIcon from '../../../media/images/add-scene-icon.svg';
@@ -18,6 +19,7 @@ import WasapiInputCaptureIcon from '../../../media/images/wasapi-input-icon.svg'
 import GameCaptureIcon from '../../../media/images/game-capture-icon.svg';
 import TextGdiplusIcon from '../../../media/images/text-gdiplus-icon.svg';
 import FfmpegSourceIcon from '../../../media/images/ffmpeg-source-icon.svg';
+// eslint-disable-next-line import/no-duplicates
 import SlideshowIcon from '../../../media/images/slideshow-icon.svg';
 import WasapiOutputIcon from '../../../media/images/wasapi-output-icon.svg';
 import MonitorCaptureIcon from '../../../media/images/monitor-capture-icon.svg';
@@ -49,7 +51,7 @@ interface ISelectSourceOptions {
     WasapiOutputIcon,
     MonitorCaptureIcon,
     NdiSourceIcon,
-    BlackmagicSourceIcon
+    BlackmagicSourceIcon,
   },
 })
 export default class SourcesShowcase extends Vue {
@@ -63,7 +65,7 @@ export default class SourcesShowcase extends Vue {
 
     this.sourcesService.showAddSource(sourceType, {
       propertiesManager: managerType,
-      propertiesManagerSettings: {}
+      propertiesManagerSettings: {},
     });
   }
 
@@ -83,7 +85,9 @@ export default class SourcesShowcase extends Vue {
   }
 
   selectInspectedSource() {
-    if (this.sourcesService.getAvailableSourcesTypes().includes(this.inspectedSource as TSourceType)) {
+    if (
+      this.sourcesService.getAvailableSourcesTypes().includes(this.inspectedSource as TSourceType)
+    ) {
       this.selectSource(this.inspectedSource as TSourceType);
     }
   }

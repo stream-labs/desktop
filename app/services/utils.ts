@@ -2,21 +2,22 @@ import URI from 'urijs';
 import { isEqual } from 'lodash';
 import electron from 'electron';
 
-export const enum EBit { ZERO, ONE }
+export const enum EBit {
+  ZERO,
+  ONE,
+}
 
 export default class Utils {
-
   static applyProxy(target: Object, source: Object) {
     Object.keys(source).forEach(propName => {
       Object.defineProperty(target, propName, {
         configurable: true,
         get() {
           return source[propName];
-        }
+        },
       });
     });
   }
-
 
   static getCurrentUrlParams(): Dictionary<string> {
     return this.getUrlParams(window.location.href);
@@ -71,13 +72,12 @@ export default class Utils {
    */
   static intToRgba(value: number) {
     return {
-      r: (value & 0x000000ff),
+      r: value & 0x000000ff,
       g: (value & 0x0000ff00) >>> 8,
       b: (value & 0x00ff0000) >>> 16,
-      a: (value & 0xff000000) >>> 24
+      a: (value & 0xff000000) >>> 24,
     };
   }
-
 
   static numberToBinnaryArray(num: number, size: number): EBit[] {
     const result: EBit[] = [];
@@ -89,7 +89,6 @@ export default class Utils {
     }
     return result;
   }
-
 
   static binnaryArrayToNumber(arr: EBit[]): number {
     let result = 0;
@@ -137,9 +136,11 @@ export default class Utils {
         const derivedDescriptor = Object.getOwnPropertyDescriptor(derivedCtor.prototype, name);
         // ignore getters
         if (
-          baseDescriptor && baseDescriptor.get ||
-          derivedDescriptor && derivedDescriptor.get
-        ) return;
+          (baseDescriptor && baseDescriptor.get) ||
+          (derivedDescriptor && derivedDescriptor.get)
+        ) {
+          return;
+        }
 
         // ignore the property already exist
         if (derivedCtor.prototype[name]) return;

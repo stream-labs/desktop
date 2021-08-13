@@ -25,7 +25,7 @@ import {
   ISceneCollectionsManifestEntry,
   ISceneCollectionSchema,
   ISceneCollectionsServiceApi,
-  ISceneCollectionCreateOptions
+  ISceneCollectionCreateOptions,
 } from '.';
 import { SceneCollectionsStateService, ScenePresetId } from './state';
 import { Subject } from 'rxjs';
@@ -44,7 +44,7 @@ export const NODE_TYPES = {
   TransitionNode: TransitionsNode, // Alias old name to new node
   TransitionsNode,
   HotkeysNode,
-  SceneFiltersNode
+  SceneFiltersNode,
 };
 
 const DEFAULT_COLLECTION_NAME = 'Scenes';
@@ -63,8 +63,7 @@ interface ISceneCollectionInternalCreateOptions extends ISceneCollectionCreateOp
  * - Completely asynchronous
  * - Server side backup
  */
-export class SceneCollectionsService extends Service
-  implements ISceneCollectionsServiceApi {
+export class SceneCollectionsService extends Service implements ISceneCollectionsServiceApi {
   @Inject('SceneCollectionsStateService')
   stateService: SceneCollectionsStateService;
   @Inject() scenesService: ScenesService;
@@ -204,10 +203,7 @@ export class SceneCollectionsService extends Service
     if (!this.collectionLoaded) return;
     if (!this.activeCollection) return;
     await this.saveCurrentApplicationStateAs(this.activeCollection.id);
-    this.stateService.SET_MODIFIED(
-      this.activeCollection.id,
-      new Date().toISOString()
-    );
+    this.stateService.SET_MODIFIED(this.activeCollection.id, new Date().toISOString());
   }
 
   /**
@@ -229,9 +225,7 @@ export class SceneCollectionsService extends Service
     } catch (e) {
       console.error('Error loading collection!', e);
 
-      console.warn(
-        `Unsuccessful recovery of scene collection ${id} attempted`
-      );
+      console.warn(`Unsuccessful recovery of scene collection ${id} attempted`);
       alert($t('scenes.failedToLoadSceneCollection'));
       await this.create();
     }
@@ -245,14 +239,17 @@ export class SceneCollectionsService extends Service
    * up some state.  This should really only be used by the OBS
    * importer.
    */
-  async create(options: ISceneCollectionInternalCreateOptions = {}): Promise<ISceneCollectionsManifestEntry> {
+  async create(
+    options: ISceneCollectionInternalCreateOptions = {},
+  ): Promise<ISceneCollectionsManifestEntry> {
     this.startLoadingOperation();
     await this.deloadCurrentApplicationState();
 
-    const name = options.name || this.suggestName(
-      $t('scenes.sceneCollectionDefaultName',
-      { fallback: DEFAULT_COLLECTION_NAME }
-    ));
+    const name =
+      options.name ||
+      this.suggestName(
+        $t('scenes.sceneCollectionDefaultName', { fallback: DEFAULT_COLLECTION_NAME }),
+      );
     const id: string = uuid();
 
     await this.insertCollection(id, name);
@@ -301,7 +298,7 @@ export class SceneCollectionsService extends Service
     this.stateService.RENAME_COLLECTION(
       id || this.activeCollection.id,
       name,
-      new Date().toISOString()
+      new Date().toISOString(),
     );
     this.collectionUpdated.next(this.getCollection(id));
   }
@@ -330,14 +327,11 @@ export class SceneCollectionsService extends Service
   async installOverlay(
     url: string,
     name: string,
-    progressCallback?: (info: IDownloadProgress) => void
+    progressCallback?: (info: IDownloadProgress) => void,
   ) {
     this.startLoadingOperation(); // memo: calling this in loadOverlay() too
 
-    const pathName = await this.overlaysPersistenceService.downloadOverlay(
-      url,
-      progressCallback
-    );
+    const pathName = await this.overlaysPersistenceService.downloadOverlay(url, progressCallback);
     const collectionName = this.suggestName(name);
     await this.loadOverlay(pathName, collectionName);
   }
@@ -389,20 +383,18 @@ export class SceneCollectionsService extends Service
    * Show the window to name a new scene collection
    * @param options options
    */
-  showNameConfig(
-    options: { sceneCollectionToDuplicate?: string; rename?: boolean } = {}
-  ) {
+  showNameConfig(options: { sceneCollectionToDuplicate?: string; rename?: boolean } = {}) {
     this.windowsService.showWindow({
       componentName: 'NameSceneCollection',
       title: $t('scenes.nameSceneCollection'),
       queryParams: {
         sceneCollectionToDuplicate: options.sceneCollectionToDuplicate,
-        rename: options.rename ? 'true' : ''
+        rename: options.rename ? 'true' : '',
       },
       size: {
         width: 400,
-        height: 250
-      }
+        height: 250,
+      },
     });
   }
 
@@ -415,8 +407,8 @@ export class SceneCollectionsService extends Service
       title: $t('scenes.manageSceneCollections'),
       size: {
         width: 700,
-        height: 800
-      }
+        height: 800,
+      },
     });
   }
 
@@ -445,37 +437,31 @@ export class SceneCollectionsService extends Service
             id: collection.id,
             name: collection.name,
 
-            scenes: root.data.scenes.data.items.map(
-              (sceneData: ISceneSchema) => {
-                return {
-                  id: sceneData.id,
-                  name: sceneData.name,
-                  sceneItems: sceneData.sceneItems.data.items.map(
-                    (sceneItemData: ISceneItemInfo) => {
-                      return {
-                        sceneItemId: sceneItemData.id,
-                        sourceId: sceneItemData.sourceId
-                      };
-                    }
-                  )
-                };
-              }
-            ),
+            scenes: root.data.scenes.data.items.map((sceneData: ISceneSchema) => {
+              return {
+                id: sceneData.id,
+                name: sceneData.name,
+                sceneItems: sceneData.sceneItems.data.items.map((sceneItemData: ISceneItemInfo) => {
+                  return {
+                    sceneItemId: sceneItemData.id,
+                    sourceId: sceneItemData.sourceId,
+                  };
+                }),
+              };
+            }),
 
-            sources: root.data.sources.data.items.map(
-              (sourceData: ISourceInfo) => {
-                return {
-                  id: sourceData.id,
-                  name: sourceData.name,
-                  type: sourceData.type,
-                  channel: sourceData.channel
-                };
-              }
-            )
+            sources: root.data.sources.data.items.map((sourceData: ISourceInfo) => {
+              return {
+                id: sourceData.id,
+                name: sourceData.name,
+                type: sourceData.type,
+                channel: sourceData.channel,
+              };
+            }),
           };
 
           resolve(collectionSchema);
-        })
+        }),
       );
     });
 
@@ -626,14 +612,14 @@ export class SceneCollectionsService extends Service
       $t('sources.desktopAudio'),
       'wasapi_output_capture',
       {},
-      { channel: E_AUDIO_CHANNELS.OUTPUT_1 }
+      { channel: E_AUDIO_CHANNELS.OUTPUT_1 },
     );
 
     this.sourcesService.createSource(
       $t('sources.micAux'),
       'wasapi_input_capture',
       {},
-      { channel: E_AUDIO_CHANNELS.INPUT_1 }
+      { channel: E_AUDIO_CHANNELS.INPUT_1 },
     );
   }
 
@@ -698,9 +684,7 @@ export class SceneCollectionsService extends Service
     });
 
     const newExists = await new Promise<boolean>(resolve => {
-      fs.exists(this.stateService.collectionsDirectory, exists =>
-        resolve(exists)
-      );
+      fs.exists(this.stateService.collectionsDirectory, exists => resolve(exists));
     });
 
     if (legacyExists && !newExists) {
@@ -741,15 +725,13 @@ export class SceneCollectionsService extends Service
           this.stateService.ADD_COLLECTION(
             id,
             file.replace(/\.[^/.]+$/, ''),
-            new Date().toISOString()
+            new Date().toISOString(),
           );
         }
       }
 
       // Try to import the active collection
-      const data = localStorage.getItem(
-        'PersistentStatefulService-ScenesCollectionsService'
-      );
+      const data = localStorage.getItem('PersistentStatefulService-ScenesCollectionsService');
 
       if (data) {
         const parsed = JSON.parse(data);

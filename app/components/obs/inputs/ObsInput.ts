@@ -8,7 +8,7 @@ import {
   isNumberProperty,
   isTextProperty,
   isFontProperty,
-  isPathProperty
+  isPathProperty,
 } from '../../../util/properties-type-guards';
 import { $t } from 'services/i18n/index';
 
@@ -16,23 +16,23 @@ import { $t } from 'services/i18n/index';
  * all possible OBS properties types
  */
 export declare type TObsType =
-  'OBS_PROPERTY_BOOL' |
-  'OBS_PROPERTY_INT' |
-  'OBS_PROPERTY_LIST' |
-  'OBS_PROPERTY_PATH' |
-  'OBS_PROPERTY_FILE' |
-  'OBS_PROPERTY_EDIT_TEXT' |
-  'OBS_PROPERTY_TEXT' |
-  'OBS_PROPERTY_UINT' |
-  'OBS_PROPERTY_COLOR' |
-  'OBS_PROPERTY_DOUBLE' |
-  'OBS_PROPERTY_FLOAT' |
-  'OBS_PROPERTY_SLIDER' |
-  'OBS_PROPERTY_FONT' |
-  'OBS_PROPERTY_EDITABLE_LIST' |
-  'OBS_PROPERTY_BUTTON' |
-  'OBS_PROPERTY_BITMASK' |
-  'OBS_INPUT_RESOLUTION_LIST';
+  | 'OBS_PROPERTY_BOOL'
+  | 'OBS_PROPERTY_INT'
+  | 'OBS_PROPERTY_LIST'
+  | 'OBS_PROPERTY_PATH'
+  | 'OBS_PROPERTY_FILE'
+  | 'OBS_PROPERTY_EDIT_TEXT'
+  | 'OBS_PROPERTY_TEXT'
+  | 'OBS_PROPERTY_UINT'
+  | 'OBS_PROPERTY_COLOR'
+  | 'OBS_PROPERTY_DOUBLE'
+  | 'OBS_PROPERTY_FLOAT'
+  | 'OBS_PROPERTY_SLIDER'
+  | 'OBS_PROPERTY_FONT'
+  | 'OBS_PROPERTY_EDITABLE_LIST'
+  | 'OBS_PROPERTY_BUTTON'
+  | 'OBS_PROPERTY_BITMASK'
+  | 'OBS_INPUT_RESOLUTION_LIST';
 
 /**
  * OBS values that frontend application can change
@@ -122,8 +122,8 @@ function parsePathFilters(filterStr: string): IElectronOpenDialogFilter[] {
     return [
       {
         name: 'All Files',
-        extensions: ['*']
-      }
+        extensions: ['*'],
+      },
     ];
   }
 
@@ -139,7 +139,7 @@ function parsePathFilters(filterStr: string): IElectronOpenDialogFilter[] {
     // This is the format that electron file dialogs use
     return {
       name: desc,
-      extensions: types
+      extensions: types,
     };
   });
 }
@@ -160,9 +160,8 @@ export function obsValuesToInputValues(
   category: string,
   subCategory: string,
   obsProps: Dictionary<any>[],
-  options: IObsFetchOptions = {}
+  options: IObsFetchOptions = {},
 ): TObsFormData {
-
   const resultProps: TObsFormData = [];
 
   for (const obsProp of obsProps) {
@@ -186,10 +185,9 @@ export function obsValuesToInputValues(
       各設定項目の説明に翻訳がかかるようになっている。
       存在しない場合はOBSが返してくる説明の文言をそのまま返す。
     */
-    prop.description = $t(
-      `settings.${category}['${subCategory}']['${prop.name}'].name`,
-      { fallback: prop.description }
-    );
+    prop.description = $t(`settings.${category}['${subCategory}']['${prop.name}'].name`, {
+      fallback: prop.description,
+    });
     prop.value = obsValue;
     prop.masked = !!obsProp.masked;
     prop.enabled = !!obsProp.enabled;
@@ -203,7 +201,7 @@ export function obsValuesToInputValues(
       const listOptions: any[] = [];
 
       if (options.transformListOptions) {
-        for (const listOption of (obsProp.values || []))  {
+        for (const listOption of obsProp.values || []) {
           const key = Object.keys(listOption)[0];
           /*
             リストから選択する項目にも翻訳がかかるようになっている。
@@ -213,8 +211,8 @@ export function obsValuesToInputValues(
             value: listOption[key],
             description: $t(
               `settings.${category}['${subCategory}']['${obsProp.name}']['${listOption[key]}']`,
-              { fallback: key }
-            )
+              { fallback: key },
+            ),
           });
         }
       }
@@ -233,30 +231,28 @@ export function obsValuesToInputValues(
       if (needToSetDefaultValue) prop.value = listOptions[0].value;
 
       (<any>prop).options = listOptions;
-
     } else if (obsProp.type === 'OBS_PROPERTY_BOOL') {
-
       prop.value = !!prop.value;
-
-    } else if (['OBS_PROPERTY_INT', 'OBS_PROPERTY_FLOAT', 'OBS_PROPERTY_DOUBLE'].includes(obsProp.type)) {
+    } else if (
+      ['OBS_PROPERTY_INT', 'OBS_PROPERTY_FLOAT', 'OBS_PROPERTY_DOUBLE'].includes(obsProp.type)
+    ) {
       prop = {
         ...prop,
         value: Number(prop.value),
         minVal: obsProp.minVal,
         maxVal: obsProp.maxVal,
-        stepVal: obsProp.stepVal
+        stepVal: obsProp.stepVal,
       } as IObsNumberInputValue;
 
       if (obsProp.subType === 'OBS_NUMBER_SLIDER') {
         prop.type = 'OBS_PROPERTY_SLIDER';
       }
     } else if (obsProp.type === 'OBS_PROPERTY_PATH') {
-
       if (valueObject && valueObject.type === 'OBS_PATH_FILE') {
         prop = {
           ...prop,
           type: 'OBS_PROPERTY_FILE',
-          filters: parsePathFilters(valueObject.filter)
+          filters: parsePathFilters(valueObject.filter),
         } as IObsPathInputValue;
       }
     } else if (obsProp.type === 'OBS_PROPERTY_FONT') {
@@ -266,7 +262,7 @@ export function obsValuesToInputValues(
         ...prop,
         value: valueObject,
         filters: parsePathFilters(valueObject.filter),
-        defaultPath: valueObject.default_path
+        defaultPath: valueObject.default_path,
       } as IObsEditableListInputValue;
     }
 
@@ -288,7 +284,7 @@ interface IObsSaveOptions {
 
 export function inputValuesToObsValues(
   props: TObsFormData,
-  options: IObsSaveOptions = {}
+  options: IObsSaveOptions = {},
 ): Dictionary<any>[] {
   const obsProps: Dictionary<any>[] = [];
 
@@ -304,7 +300,9 @@ export function inputValuesToObsValues(
 
     if (
       options.valueToObject &&
-      !['OBS_PROPERTY_FONT', 'OBS_PROPERTY_EDITABLE_LIST', 'OBS_PROPERTY_BUTTON'].includes(prop.type)
+      !['OBS_PROPERTY_FONT', 'OBS_PROPERTY_EDITABLE_LIST', 'OBS_PROPERTY_BUTTON'].includes(
+        prop.type,
+      )
     ) {
       obsProp.value = { value: obsProp.value };
     }
@@ -315,7 +313,6 @@ export function inputValuesToObsValues(
   }
   return obsProps;
 }
-
 
 export function getPropertiesFormData(obsSource: obs.ISource): TObsFormData {
   const sourceType = obsSource.id;
@@ -332,27 +329,40 @@ export function getPropertiesFormData(obsSource: obs.ISource): TObsFormData {
 
     switch (obsProp.type) {
       case obs.EPropertyType.Boolean:
-        obsType = 'OBS_PROPERTY_BOOL'; break;
+        obsType = 'OBS_PROPERTY_BOOL';
+        break;
       case obs.EPropertyType.Int:
-        obsType = 'OBS_PROPERTY_INT'; break;
+        obsType = 'OBS_PROPERTY_INT';
+        break;
       case obs.EPropertyType.Float:
-        obsType = 'OBS_PROPERTY_FLOAT'; break;
+        obsType = 'OBS_PROPERTY_FLOAT';
+        break;
       case obs.EPropertyType.List:
-        obsType = 'OBS_PROPERTY_LIST'; break;
+        obsType = 'OBS_PROPERTY_LIST';
+        break;
       case obs.EPropertyType.Text:
-        obsType = 'OBS_PROPERTY_TEXT'; break;
+        obsType = 'OBS_PROPERTY_TEXT';
+        break;
       case obs.EPropertyType.Color:
-        obsType = 'OBS_PROPERTY_COLOR'; break;
+        obsType = 'OBS_PROPERTY_COLOR';
+        break;
       case obs.EPropertyType.Font:
-        obsType = 'OBS_PROPERTY_FONT'; break;
+        obsType = 'OBS_PROPERTY_FONT';
+        break;
       case obs.EPropertyType.EditableList:
-        obsType = 'OBS_PROPERTY_EDITABLE_LIST'; break;
+        obsType = 'OBS_PROPERTY_EDITABLE_LIST';
+        break;
       case obs.EPropertyType.Button:
-        obsType = 'OBS_PROPERTY_BUTTON'; break;
+        obsType = 'OBS_PROPERTY_BUTTON';
+        break;
       case obs.EPropertyType.Path:
         switch ((obsProp as obs.IPathProperty).details.type) {
-          case obs.EPathType.File: obsType = 'OBS_PROPERTY_FILE'; break;
-          case obs.EPathType.Directory: obsType = 'OBS_PROPERTY_PATH'; break;
+          case obs.EPathType.File:
+            obsType = 'OBS_PROPERTY_FILE';
+            break;
+          case obs.EPathType.Directory:
+            obsType = 'OBS_PROPERTY_PATH';
+            break;
         }
         break;
     }
@@ -360,10 +370,9 @@ export function getPropertiesFormData(obsSource: obs.ISource): TObsFormData {
     const formItem: IObsInput<TObsValue> = {
       value: obsProp.value,
       name: obsProp.name,
-      description: $t(
-        `source-props.${sourceType}['${obsProp.name}'].name`,
-        { fallback: obsProp.description }
-      ),
+      description: $t(`source-props.${sourceType}['${obsProp.name}'].name`, {
+        fallback: obsProp.description,
+      }),
       enabled: obsProp.enabled,
       visible: obsProp.visible,
       type: obsType,
@@ -372,13 +381,13 @@ export function getPropertiesFormData(obsSource: obs.ISource): TObsFormData {
     // handle property details
 
     if (isListProperty(obsProp)) {
+      const name = obsProp.name;
       (formItem as IObsListInput<TObsValue>).options = obsProp.details.items.map(option => {
         return {
           value: option.value,
-          description: $t(
-            `source-props.${sourceType}['${obsProp.name}']['${option.value}']`,
-            { fallback: option.name }
-          ),
+          description: $t(`source-props.${sourceType}['${name}']['${option.value}']`, {
+            fallback: option.name,
+          }),
         };
       });
     }
@@ -387,7 +396,7 @@ export function getPropertiesFormData(obsSource: obs.ISource): TObsFormData {
       Object.assign(formItem as IObsNumberInputValue, {
         minVal: obsProp.details.min,
         maxVal: obsProp.details.max,
-        stepVal: obsProp.details.step
+        stepVal: obsProp.details.step,
       });
 
       if (obsProp.details.type === obs.ENumberType.Slider) {
@@ -398,20 +407,20 @@ export function getPropertiesFormData(obsSource: obs.ISource): TObsFormData {
     if (isEditableListProperty(obsProp)) {
       Object.assign(formItem as IObsEditableListInputValue, {
         filters: parsePathFilters(obsProp.details.filter),
-        defaultPath: obsProp.details.defaultPath
+        defaultPath: obsProp.details.defaultPath,
       });
     }
 
     if (isPathProperty(obsProp)) {
       Object.assign(formItem as IObsPathInputValue, {
         filters: parsePathFilters(obsProp.details.filter),
-        defaultPath: obsProp.details.defaultPath
+        defaultPath: obsProp.details.defaultPath,
       });
     }
 
     if (isTextProperty(obsProp)) {
       Object.assign(formItem as IObsTextInputValue, {
-        multiline: obsProp.details.type === obs.ETextType.Multiline
+        multiline: obsProp.details.type === obs.ETextType.Multiline,
       });
     }
 
@@ -420,11 +429,10 @@ export function getPropertiesFormData(obsSource: obs.ISource): TObsFormData {
     }
 
     formData.push(formItem);
-  } while (obsProp = obsProp.next());
+  } while ((obsProp = obsProp.next()));
 
   return formData;
 }
-
 
 export function setPropertiesFormData(obsSource: obs.ISource, form: TObsFormData) {
   const buttons: IObsInput<boolean>[] = [];
@@ -480,7 +488,6 @@ export function setPropertiesFormData(obsSource: obs.ISource, form: TObsFormData
 }
 
 export abstract class ObsInput<TValueType> extends Vue {
-
   @Prop()
   value: TValueType;
 
@@ -493,5 +500,4 @@ export abstract class ObsInput<TValueType> extends Vue {
   emitInput(eventData: TValueType) {
     this.$emit('input', eventData);
   }
-
 }

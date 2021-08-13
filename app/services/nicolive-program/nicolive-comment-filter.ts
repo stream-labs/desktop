@@ -10,7 +10,7 @@ import { Subject } from 'rxjs';
 
 interface INicoliveCommentFilterState {
   filters: FilterRecord[];
-};
+}
 
 export class NicoliveCommentFilterService extends StatefulService<INicoliveCommentFilterState> {
   @Inject() private nicoliveProgramService: NicoliveProgramService;
@@ -27,10 +27,12 @@ export class NicoliveCommentFilterService extends StatefulService<INicoliveComme
     if (wrapped.type === 'normal') {
       for (const record of this.state.filters) {
         if (
-          (record.type === 'word' && wrapped.value.content?.includes(record.body))
-          || (record.type === 'user' && wrapped.value.user_id === record.body)
-          || (record.type === 'command' && wrapped.value.mail?.split(/\s/).includes(record.body))
-        ) return {...wrapped, filtered: true};
+          (record.type === 'word' && wrapped.value.content?.includes(record.body)) ||
+          (record.type === 'user' && wrapped.value.user_id === record.body) ||
+          (record.type === 'command' && wrapped.value.mail?.split(/\s/).includes(record.body))
+        ) {
+          return { ...wrapped, filtered: true };
+        }
       }
     }
     if (wrapped.filtered) return { ...wrapped, filtered: false };
@@ -48,18 +50,20 @@ export class NicoliveCommentFilterService extends StatefulService<INicoliveComme
   init() {
     super.init();
 
-    this.nicoliveProgramService.stateChange.pipe(
-      map(({ programID }) => programID),
-      distinctUntilChanged()
-    ).subscribe(() => {
-      this.fetchFilters().catch(caught => {
-        if (caught instanceof NicoliveFailure) {
-          // ignore
-        } else {
-          throw caught;
-        }
+    this.nicoliveProgramService.stateChange
+      .pipe(
+        map(({ programID }) => programID),
+        distinctUntilChanged(),
+      )
+      .subscribe(() => {
+        this.fetchFilters().catch(caught => {
+          if (caught instanceof NicoliveFailure) {
+            // ignore
+          } else {
+            throw caught;
+          }
+        });
       });
-    });
   }
 
   async fetchFilters() {
@@ -78,7 +82,7 @@ export class NicoliveCommentFilterService extends StatefulService<INicoliveComme
     }
 
     const resultRecord = result.value.find(
-      (rec: FilterRecord) => rec.type === record.type && rec.body === record.body
+      (rec: FilterRecord) => rec.type === record.type && rec.body === record.body,
     );
 
     if (!resultRecord) {

@@ -21,19 +21,27 @@ export class DeinterlaceMenu extends Menu {
 
   appendMenuItems() {
     const DEINTERLACE_MODES = [
-      { id: 'Disable',   value: EDeinterlaceMode.Disable,  label: $t('deinterlace.disable')  },
-      { id: 'Discard',   value: EDeinterlaceMode.Discard,  label: $t('deinterlace.discard')  },
-      { id: 'Retro',     value: EDeinterlaceMode.Retro,    label: $t('deinterlace.retro')    },
-      { id: 'Blend',     value: EDeinterlaceMode.Blend,    label: $t('deinterlace.blend')    },
-      { id: 'Blend 2x',  value: EDeinterlaceMode.Blend2X,  label: $t('deinterlace.blend2x')  },
-      { id: 'Linear',    value: EDeinterlaceMode.Linear,   label: $t('deinterlace.linear')   },
+      { id: 'Disable', value: EDeinterlaceMode.Disable, label: $t('deinterlace.disable') },
+      { id: 'Discard', value: EDeinterlaceMode.Discard, label: $t('deinterlace.discard') },
+      { id: 'Retro', value: EDeinterlaceMode.Retro, label: $t('deinterlace.retro') },
+      { id: 'Blend', value: EDeinterlaceMode.Blend, label: $t('deinterlace.blend') },
+      { id: 'Blend 2x', value: EDeinterlaceMode.Blend2X, label: $t('deinterlace.blend2x') },
+      { id: 'Linear', value: EDeinterlaceMode.Linear, label: $t('deinterlace.linear') },
       { id: 'Linear 2x', value: EDeinterlaceMode.Linear2X, label: $t('deinterlace.linear2x') },
-      { id: 'Yadif',     value: EDeinterlaceMode.Yadif,    label: $t('deinterlace.yadif')    },
-      { id: 'Yadif 2x',  value: EDeinterlaceMode.Yadif2X,  label: $t('deinterlace.yadif2x')  },
+      { id: 'Yadif', value: EDeinterlaceMode.Yadif, label: $t('deinterlace.yadif') },
+      { id: 'Yadif 2x', value: EDeinterlaceMode.Yadif2X, label: $t('deinterlace.yadif2x') },
     ];
     const DEINTERLACE_FIELD_ORDERS = [
-      { id: 'Top field first',    value: EDeinterlaceFieldOrder.Top,    label: $t('deinterlace.top_field_first')    },
-      { id: 'Bottom field first', value: EDeinterlaceFieldOrder.Bottom, label: $t('deinterlace.bottom_field_first') },
+      {
+        id: 'Top field first',
+        value: EDeinterlaceFieldOrder.Top,
+        label: $t('deinterlace.top_field_first'),
+      },
+      {
+        id: 'Bottom field first',
+        value: EDeinterlaceFieldOrder.Bottom,
+        label: $t('deinterlace.bottom_field_first'),
+      },
     ];
 
     for (const mode of DEINTERLACE_MODES) {
@@ -42,7 +50,9 @@ export class DeinterlaceMenu extends Menu {
         type: 'checkbox',
         checked: this.source.deinterlaceMode === mode.value,
         label: mode.label,
-        click: () => { this.source.setDeinterlaceMode(mode.value) },
+        click: () => {
+          this.source.setDeinterlaceMode(mode.value);
+        },
       });
     }
 
@@ -54,7 +64,9 @@ export class DeinterlaceMenu extends Menu {
         type: 'checkbox',
         checked: this.source.deinterlaceFieldOrder === mode.value,
         label: mode.label,
-        click: () => { this.source.setDeinterlaceFieldOrder(mode.value) },
+        click: () => {
+          this.source.setDeinterlaceFieldOrder(mode.value);
+        },
       });
     }
   }

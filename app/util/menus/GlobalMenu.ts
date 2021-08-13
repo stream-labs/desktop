@@ -4,7 +4,7 @@ import { remote } from 'electron';
 
 export function setupGlobalContextMenuForEditableElement() {
   const win = remote.getCurrentWindow();
-  win.webContents.on('context-menu', function contextMenuEventHandler(event, params) {
+  win.webContents.on('context-menu', (event, params) => {
     if (!params.isEditable) return;
 
     const hasText = params.selectionText.trim().length > 0;

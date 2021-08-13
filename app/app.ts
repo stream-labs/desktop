@@ -1,5 +1,6 @@
 import { I18nService } from 'services/i18n';
 
+// eslint-disable-next-line
 window['eval'] = global.eval = () => {
   throw new Error('window.eval() is disabled for security');
 };
@@ -34,10 +35,10 @@ const nAirVersion = remote.process.env.NAIR_VERSION;
 const isProduction = process.env.NODE_ENV === 'production';
 
 type SentryParams = {
-  organization: string
-  key: string
-  project: string
-}
+  organization: string;
+  key: string;
+  project: string;
+};
 const sentryOrg = 'o170115';
 
 function getSentryDsn(p: SentryParams): string {
@@ -50,24 +51,25 @@ function getSentryCrashReportUrl(p: SentryParams): string {
 
 // This is the development DSN
 let sentryParam: SentryParams = {
-  organization: sentryOrg, project: '1262580', key: '1cb5cdf6a93c466dad570861b8c82b61'
+  organization: sentryOrg,
+  project: '1262580',
+  key: '1cb5cdf6a93c466dad570861b8c82b61',
 };
 
 if (isProduction) {
   // This is the production DSN
   sentryParam = Utils.isUnstable()
-    ? {organization: sentryOrg, project: '1546758', key: '7451aaa71b7640a69ee1d31d6fd9ef78'}
-    : {organization: sentryOrg, project: '1246812', key: '35a02d8ebec14fd3aadc9d95894fabcf'};
+    ? { organization: sentryOrg, project: '1546758', key: '7451aaa71b7640a69ee1d31d6fd9ef78' }
+    : { organization: sentryOrg, project: '1246812', key: '35a02d8ebec14fd3aadc9d95894fabcf' };
 
   electron.crashReporter.start({
     productName: 'n-air-app',
     companyName: 'n-air-app',
-    submitURL:
-      getSentryCrashReportUrl(sentryParam),
+    submitURL: getSentryCrashReportUrl(sentryParam),
     extra: {
       version: nAirVersion,
-      processType: 'renderer'
-    }
+      processType: 'renderer',
+    },
   });
 }
 
@@ -94,7 +96,7 @@ if ((isProduction || process.env.NAIR_REPORT_TO_SENTRY) && !electron.remote.proc
       }
 
       return data;
-    }
+    },
   })
     .addPlugin(RavenVue, Vue)
     .addPlugin(RavenConsole, console, { levels: ['error'] })
@@ -109,7 +111,6 @@ VTooltip.options.defaultContainer = '#mainWrapper';
 Vue.use(Toasted);
 Vue.use(VeeValidate); // form validations
 Vue.use(VModal);
-
 
 // Disable chrome default drag/drop behavior
 document.addEventListener('dragover', event => event.preventDefault());
@@ -148,7 +149,7 @@ document.addEventListener('DOMContentLoaded', () => {
       locale: i18nService.state.locale,
       fallbackLocale: i18nService.getFallbackLocale(),
       messages: i18nService.getLoadedDictionaries(),
-      missing: ((locale: VueI18n.Locale, key: VueI18n.Path, vm: Vue, values: any[]): string  => {
+      missing: ((locale: VueI18n.Locale, key: VueI18n.Path, vm: Vue, values: any[]): string => {
         if (values[0] && typeof values[0].fallback === 'string') {
           if (!isProduction) {
             // beware: enable following line only when investigating around i18n keys!
@@ -163,7 +164,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // 返すべきものがないときは何も返さずデフォルト動作に任せる
         // ref. https://github.com/kazupon/vue-i18n/blob/79e3bfe537d28b11a3119ff9ed0704e5dfa72cf3/src/index.js#L172-L188
       }) as any, // 型定義と実装が異なっているのでanyに飛ばす
-      silentTranslationWarn: true
+      silentTranslationWarn: true,
     });
 
     I18nService.setVuei18nInstance(i18n);
@@ -184,7 +185,7 @@ document.addEventListener('DOMContentLoaded', () => {
           return h(windowsService.components[componentName]);
         }
         return h(OneOffWindow);
-      }
+      },
     });
 
     setupGlobalContextMenuForEditableElement();
@@ -205,7 +206,7 @@ electronLog.catchErrors({ onError: e => electronLog.log(`from ${Utils.getWindowI
 
 // override console.error
 const consoleError = console.error;
-console.error = function(...args: any[]) {
+console.error = function (...args: any[]) {
   // TODO: Suppress N-API error until we upgrade electron to v4.x
   if (/N\-API is an experimental feature/.test(args[0])) return;
 
@@ -241,4 +242,3 @@ function writeErrorToLog(...errors: (Error | string)[]) {
     ${formattedErrors.join('\n')}
   `);
 }
-

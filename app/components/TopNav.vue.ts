@@ -16,8 +16,8 @@ import { IncrementalRolloutService, EAvailableFeatures } from 'services/incremen
 @Component({
   components: {
     Login,
-    StreamingStatus
-  }
+    StreamingStatus,
+  },
 })
 export default class TopNav extends Vue {
   @Inject() settingsService: SettingsService;
@@ -71,7 +71,9 @@ export default class TopNav extends Vue {
   }
 
   openHelp() {
-    electron.remote.shell.openExternal('https://qa.nicovideo.jp/faq/show/11857?site_domain=default');
+    electron.remote.shell.openExternal(
+      'https://qa.nicovideo.jp/faq/show/11857?site_domain=default',
+    );
   }
 
   get isDevMode() {

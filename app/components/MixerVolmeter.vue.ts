@@ -50,10 +50,7 @@ export default class MixerVolmeter extends Vue {
     this.peakHolds = [];
     this.setChannelCount(1);
     this.ctx = this.$refs.canvas.getContext('2d');
-    this.canvasWidthInterval = window.setInterval(
-      () => this.setCanvasWidth(),
-      500
-    );
+    this.canvasWidthInterval = window.setInterval(() => this.setCanvasWidth(), 500);
   }
 
   destroyed() {
@@ -64,8 +61,7 @@ export default class MixerVolmeter extends Vue {
   setChannelCount(channels: number) {
     if (channels !== this.channelCount) {
       this.channelCount = channels;
-      this.canvasHeight =
-        channels * (CHANNEL_HEIGHT + PADDING_HEIGHT) - PADDING_HEIGHT;
+      this.canvasHeight = channels * (CHANNEL_HEIGHT + PADDING_HEIGHT) - PADDING_HEIGHT;
       this.$refs.canvas.height = this.canvasHeight;
       this.$refs.canvas.style.height = `${this.canvasHeight}px`;
       this.$refs.spacer.style.height = `${this.canvasHeight}px`;
@@ -101,19 +97,9 @@ export default class MixerVolmeter extends Vue {
     this.ctx.fillStyle = GREEN_BG;
     this.ctx.fillRect(0, heightOffset, warningPx, CHANNEL_HEIGHT);
     this.ctx.fillStyle = YELLOW_BG;
-    this.ctx.fillRect(
-      warningPx,
-      heightOffset,
-      dangerPx - warningPx,
-      CHANNEL_HEIGHT
-    );
+    this.ctx.fillRect(warningPx, heightOffset, dangerPx - warningPx, CHANNEL_HEIGHT);
     this.ctx.fillStyle = RED_BG;
-    this.ctx.fillRect(
-      dangerPx,
-      heightOffset,
-      this.canvasWidth - dangerPx,
-      CHANNEL_HEIGHT
-    );
+    this.ctx.fillRect(dangerPx, heightOffset, this.canvasWidth - dangerPx, CHANNEL_HEIGHT);
 
     const peakPx = this.dbToPx(peak);
 
@@ -124,22 +110,12 @@ export default class MixerVolmeter extends Vue {
     if (peak > WARNING_LEVEL) {
       const yellowLevel = Math.min(peakPx, dangerPx);
       this.ctx.fillStyle = YELLOW;
-      this.ctx.fillRect(
-        warningPx,
-        heightOffset,
-        yellowLevel - warningPx,
-        CHANNEL_HEIGHT
-      );
+      this.ctx.fillRect(warningPx, heightOffset, yellowLevel - warningPx, CHANNEL_HEIGHT);
     }
 
     if (peak > DANGER_LEVEL) {
       this.ctx.fillStyle = RED;
-      this.ctx.fillRect(
-        dangerPx,
-        heightOffset,
-        peakPx - dangerPx,
-        CHANNEL_HEIGHT
-      );
+      this.ctx.fillRect(dangerPx, heightOffset, peakPx - dangerPx, CHANNEL_HEIGHT);
     }
 
     this.ctx.fillStyle = GREEN;
@@ -149,7 +125,7 @@ export default class MixerVolmeter extends Vue {
       this.dbToPx(this.peakHolds[channel]) - PEAK_WIDTH / 2,
       heightOffset,
       PEAK_WIDTH,
-      CHANNEL_HEIGHT
+      CHANNEL_HEIGHT,
     );
   }
 

@@ -5,9 +5,8 @@ import { UserService } from 'services/user';
 import { HostsService } from './hosts';
 import Utils from 'services/utils';
 
-
 export enum EAvailableFeatures {
-  chatbot = 'slobs--chatbot'
+  chatbot = 'slobs--chatbot',
 }
 
 interface IIncrementalRolloutServiceState {
@@ -19,8 +18,8 @@ export class IncrementalRolloutService extends StatefulService<IIncrementalRollo
   @Inject() private hostsService: HostsService;
 
   static defaultState: IIncrementalRolloutServiceState = {
-    availableFeatures: []
-  }
+    availableFeatures: [],
+  };
 
   @mutation()
   private SET_AVAILABLE_FEATURES(features: string[]) {
@@ -40,5 +39,4 @@ export class IncrementalRolloutService extends StatefulService<IIncrementalRollo
   async fetchAvailableFeatures() {
     // TODO: replace
   }
-
 }

@@ -5,25 +5,11 @@ jest.mock('./sources', () => ({}));
 
 const DUMMY_BASE_PATH = 'c:\\Users\\user';
 
-const ABSOLUTES = [
-  '\\',
-  '\\\\',
-  'c:\\',
-  'd:\\',
-  'c:\\Users\\another',
-  '\\\\server\\file'
-];
+const ABSOLUTES = ['\\', '\\\\', 'c:\\', 'd:\\', 'c:\\Users\\another', '\\\\server\\file'];
 
-const INNER_RELATIVES = [
-  '.',
-  'c:cwd/another',
-  'cwd/another'
-];
+const INNER_RELATIVES = ['.', 'c:cwd/another', 'cwd/another'];
 
-const OUTER_RELATIVES = [
-  '..',
-  '../yay'
-];
+const OUTER_RELATIVES = ['..', '../yay'];
 
 test('convertPresetPath: as-is', () => {
   for (const p of ABSOLUTES) {
@@ -53,4 +39,4 @@ test('revertPresetPath: as-is', () => {
 test('revertPresetPath: revert', () => {
   expect(revertPresetPath('c:\\Users\\user\\file', DUMMY_BASE_PATH)).toBe('file');
   expect(revertPresetPath('c:\\Users\\user\\cwd\\another', DUMMY_BASE_PATH)).toBe('cwd\\another');
-})
+});

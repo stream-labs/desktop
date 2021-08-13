@@ -30,7 +30,10 @@ test('4xxで未定義文言だったら400にフォールバックする', async
   const m = require('./NicoliveFailure');
   const NicoliveFailure = m.NicoliveFailure as NicoliveFailureType;
   const openErrorDialogFromFailure = m.openErrorDialogFromFailure;
-  const failure = NicoliveFailure.fromClientError('method', { ok: false, value: { meta: { status: 403 } } });
+  const failure = NicoliveFailure.fromClientError('method', {
+    ok: false,
+    value: { meta: { status: 403 } },
+  });
 
   await openErrorDialogFromFailure(failure);
   expect(showMessageBox.mock.calls[0][1].title).toBe('title');
@@ -62,7 +65,10 @@ test('5xxで未定義文言だったら500にフォールバックする', async
   const m = require('./NicoliveFailure');
   const NicoliveFailure = m.NicoliveFailure as NicoliveFailureType;
   const openErrorDialogFromFailure = m.openErrorDialogFromFailure;
-  const failure = NicoliveFailure.fromClientError('method', { ok: false, value: { meta: { status: 503 } } });
+  const failure = NicoliveFailure.fromClientError('method', {
+    ok: false,
+    value: { meta: { status: 503 } },
+  });
 
   await openErrorDialogFromFailure(failure);
   expect(showMessageBox.mock.calls[0][1].title).toBe('title');

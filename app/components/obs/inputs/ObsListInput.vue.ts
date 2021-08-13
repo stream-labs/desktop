@@ -4,11 +4,9 @@ import { Multiselect } from 'vue-multiselect';
 import { $t } from '../../../services/i18n';
 
 @Component({
-  components: { Multiselect }
+  components: { Multiselect },
 })
-
 class ObsListInput extends ObsInput<IObsListInput<TObsValue>> {
-
   static obsType: TObsType;
 
   @Prop()
@@ -36,7 +34,6 @@ class ObsListInput extends ObsInput<IObsListInput<TObsValue>> {
   }
 
   get currentValue() {
-
     const option = this.value.options.find((opt: IObsListOption<string>) => {
       return this.value.value === opt.value;
     });
@@ -45,8 +42,6 @@ class ObsListInput extends ObsInput<IObsListInput<TObsValue>> {
     if (this.allowEmpty) return '';
     return this.value.options[0];
   }
-
-
 }
 
 ObsListInput.obsType = 'OBS_PROPERTY_LIST';

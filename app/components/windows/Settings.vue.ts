@@ -30,7 +30,7 @@ import { CategoryIcons } from './CategoryIcons';
     NotificationsSettings,
     AppearanceSettings,
     ExperimentalSettings,
-    LanguageSettings
+    LanguageSettings,
   },
 })
 export default class Settings extends Vue {
@@ -40,7 +40,7 @@ export default class Settings extends Vue {
   @Inject() customizationService: CustomizationService;
   @Inject() streamingService: StreamingService;
 
-  $refs: { settingsContainer: HTMLElement }
+  $refs: { settingsContainer: HTMLElement };
 
   categoryName: string = 'General';
   settingsData: ISettingsSubCategory[] = [];
@@ -92,5 +92,4 @@ export default class Settings extends Vue {
     this.settingsData = this.settingsService.getSettingsFormData(categoryName);
     this.$refs.settingsContainer.scrollTop = 0;
   }
-
 }

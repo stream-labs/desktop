@@ -101,20 +101,25 @@ test('parseJsonContent', () => {
 
 test('parseContent', () => {
   expect(parseContent(operatorCommand)).toEqual({ commandName: '/vote', values: ['stop'] });
-  expect(parseContent(textContent)).toEqual({ commandName: '/type', values: ['some', 'message', 'values'] });
+  expect(parseContent(textContent)).toEqual({
+    commandName: '/type',
+    values: ['some', 'message', 'values'],
+  });
   expect(
     parseContent({
       content: '[header] "quo ted" [trailer]',
-    }).values
+    }).values,
   ).toEqual(['[header]', 'quo ted', '[trailer]']);
 
   expect(
     parseContent({
       content: '[header] \\"esc aped [trailer]',
-    }).values
+    }).values,
   ).toEqual(['[header]', '"esc', 'aped', '[trailer]']);
 
-  expect(parseContent({
+  expect(
+    parseContent({
       content: '[header] "\\"esc aped value" [trailer]',
-    }).values).toEqual(['[header]', '"esc aped value', '[trailer]']);
+    }).values,
+  ).toEqual(['[header]', '"esc aped value', '[trailer]']);
 });

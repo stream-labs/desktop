@@ -53,7 +53,9 @@ export class DefaultManager extends PropertiesManager {
     // TODO: 選択肢単位のフィルタリング機構がないので暫定対処、これ以上増やしたくなったらやり方を考えること
     // TODO: ホットキーのフォームが未実装
     if (this.obsSource.id === 'game_capture') {
-      const captureModeProp = propArray.find(prop => prop.name === 'capture_mode') as IObsListInput<TObsValue>;
+      const captureModeProp = propArray.find(
+        prop => prop.name === 'capture_mode',
+      ) as IObsListInput<TObsValue>;
       if (captureModeProp) {
         captureModeProp.options = captureModeProp.options.filter(option => {
           return option.value !== 'hotkey';
@@ -75,8 +77,7 @@ export class DefaultManager extends PropertiesManager {
 
     const filename = path.parse(settings['custom_font']).base;
 
-    const fontPath =
-      await this.fontLibraryService.downloadFont(filename);
+    const fontPath = await this.fontLibraryService.downloadFont(filename);
 
     // Make sure this wasn't destroyed while fetching the font
     if (this.destroyed) return;
@@ -97,10 +98,8 @@ export class DefaultManager extends PropertiesManager {
     newSettings['font'] = newSettings['font'] || {};
     newSettings['font']['face'] = fontInfo.family_name;
     newSettings['font']['flags'] =
-      (fontInfo.italic ? EFontStyle.Italic : 0) |
-      (fontInfo.bold ? EFontStyle.Bold : 0);
+      (fontInfo.italic ? EFontStyle.Italic : 0) | (fontInfo.bold ? EFontStyle.Bold : 0);
 
     this.obsSource.update(newSettings);
   }
-
 }

@@ -29,7 +29,6 @@ interface ISchema {
  * transitions and connections.
  */
 export class TransitionsNode extends Node<ISchema, {}> {
-
   schemaVersion = 2;
 
   @Inject() transitionsService: TransitionsService;
@@ -43,17 +42,19 @@ export class TransitionsNode extends Node<ISchema, {}> {
           type: transition.type,
           duration: transition.duration,
           settings: this.transitionsService.getSettings(transition.id),
-          propertiesManagerSettings: this.transitionsService.getPropertiesManagerSettings(transition.id)
+          propertiesManagerSettings: this.transitionsService.getPropertiesManagerSettings(
+            transition.id,
+          ),
         };
       }),
       connections: this.transitionsService.state.connections.map(connection => {
         return {
           fromSceneId: connection.fromSceneId,
           toSceneId: connection.toSceneId,
-          transitionId: connection.transitionId
+          transitionId: connection.transitionId,
         };
       }),
-      defaultTransitionId: this.transitionsService.state.defaultTransitionId
+      defaultTransitionId: this.transitionsService.state.defaultTransitionId,
     };
   }
 
@@ -61,16 +62,12 @@ export class TransitionsNode extends Node<ISchema, {}> {
     // Double check we are starting from a blank state
     this.transitionsService.deleteAllTransitions();
     this.data.transitions.forEach(transition => {
-      this.transitionsService.createTransition(
-        transition.type,
-        transition.name,
-        {
-          id: transition.id,
-          duration: transition.duration,
-          settings: transition.settings,
-          propertiesManagerSettings: transition.propertiesManagerSettings
-        }
-      );
+      this.transitionsService.createTransition(transition.type, transition.name, {
+        id: transition.id,
+        duration: transition.duration,
+        settings: transition.settings,
+        propertiesManagerSettings: transition.propertiesManagerSettings,
+      });
     });
 
     // Double check we are starting from a blank state
@@ -79,7 +76,7 @@ export class TransitionsNode extends Node<ISchema, {}> {
       this.transitionsService.addConnection(
         connection.fromSceneId,
         connection.toSceneId,
-        connection.transitionId
+        connection.transitionId,
       );
     });
 
@@ -98,11 +95,10 @@ export class TransitionsNode extends Node<ISchema, {}> {
         type: this.data['type'],
         duration: this.data['duration'],
         settings: this.data['settings'],
-        propertiesManagerSettings: this.data['propertiesManagerSettings']
+        propertiesManagerSettings: this.data['propertiesManagerSettings'],
       };
       this.data.transitions = [transition];
       this.data.connections = [];
     }
   }
-
 }

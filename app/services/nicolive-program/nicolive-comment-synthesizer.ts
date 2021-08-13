@@ -11,14 +11,14 @@ export type Speech = {
   pitch?: number;
   rate?: number;
   volume?: number;
-}
+};
 
 interface ICommentSynthesizerState {
   enabled: boolean;
   pitch: number; // SpeechSynthesisUtterance.pitch; 0.1(lowest) to 2(highest) (default: 1)
   rate: number; // SpeechSynthesisUtterence.rate; 0.1(lowest) to 10(highest); default:1
   volume: number; // SpeechSynthesisUtterance.volume; 0.1(lowest) to 1(highest)
-};
+}
 
 export class NicoliveCommentSynthesizerService extends StatefulService<ICommentSynthesizerState> {
   @Inject('NicoliveProgramStateService') stateService: NicoliveProgramStateService;
@@ -28,14 +28,16 @@ export class NicoliveCommentSynthesizerService extends StatefulService<ICommentS
     pitch: 1,
     rate: 1,
     volume: 1,
-  }
+  };
 
   init(): void {
     this.stateService.updated.subscribe({
       next: persistentState => {
-        const newState = persistentState.speechSynthesizerSettings || NicoliveCommentSynthesizerService.initialState;
+        const newState =
+          persistentState.speechSynthesizerSettings ||
+          NicoliveCommentSynthesizerService.initialState;
         this.SET_STATE(newState);
-      }
+      },
     });
   }
 
@@ -115,9 +117,10 @@ export class NicoliveCommentSynthesizerService extends StatefulService<ICommentS
     });
   }
 
-  speakText(speech: Speech,
+  speakText(
+    speech: Speech,
     onstart: (this: SpeechSynthesisUtterance, ev: SpeechSynthesisEvent) => void,
-    onend: (this: SpeechSynthesisUtterance, ev: SpeechSynthesisEvent) => void
+    onend: (this: SpeechSynthesisUtterance, ev: SpeechSynthesisEvent) => void,
   ) {
     if (!this.enabled) {
       return;
@@ -152,11 +155,12 @@ export class NicoliveCommentSynthesizer {
     return converted;
   }
 
-  speakText(speech: Speech,
+  speakText(
+    speech: Speech,
     onstart: (this: SpeechSynthesisUtterance, ev: SpeechSynthesisEvent) => void,
-    onend: (this: SpeechSynthesisUtterance, ev: SpeechSynthesisEvent) => void
+    onend: (this: SpeechSynthesisUtterance, ev: SpeechSynthesisEvent) => void,
   ) {
-    if (!speech || speech.text == '' || !this.available) {
+    if (!speech || speech.text === '' || !this.available) {
       return;
     }
 

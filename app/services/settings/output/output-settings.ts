@@ -213,8 +213,16 @@ export class OutputSettingsService extends Service {
      * P.S. Settings needs a refactor... badly
      */
     const encoder = obsEncoderToEncoderFamily(
-      this.settingsService.findSettingValue(output, 'Streaming', 'Encoder') as EObsSimpleEncoder ||
-        this.settingsService.findSettingValue(output, 'Streaming', 'StreamEncoder') as EObsAdvancedEncoder,
+      (this.settingsService.findSettingValue(
+        output,
+        'Streaming',
+        'Encoder',
+      ) as EObsSimpleEncoder) ||
+        (this.settingsService.findSettingValue(
+          output,
+          'Streaming',
+          'StreamEncoder',
+        ) as EObsAdvancedEncoder),
     ) as EEncoderFamily;
     let preset: string;
 
@@ -235,19 +243,25 @@ export class OutputSettingsService extends Service {
     }
 
     const bitrate: number =
-      this.settingsService.findSettingValue(output, 'Streaming', 'bitrate') as number ||
-      this.settingsService.findSettingValue(output, 'Streaming', 'VBitrate') as number;
+      (this.settingsService.findSettingValue(output, 'Streaming', 'bitrate') as number) ||
+      (this.settingsService.findSettingValue(output, 'Streaming', 'VBitrate') as number);
     const outputResolution: string =
-      this.settingsService.findSettingValue(output, 'Streaming', 'RescaleRes') as string ||
-      this.settingsService.findSettingValue(video, 'Untitled', 'Output') as string;
+      (this.settingsService.findSettingValue(output, 'Streaming', 'RescaleRes') as string) ||
+      (this.settingsService.findSettingValue(video, 'Untitled', 'Output') as string);
     const encoderOptions =
-      this.settingsService.findSettingValue(output, 'Streaming', 'x264Settings') as string ||
-      this.settingsService.findSettingValue(output, 'Streaming', 'x264opts') as string;
-    const rescaleOutput = this.settingsService.findSettingValue(output, 'Streaming', 'Rescale') as boolean;
+      (this.settingsService.findSettingValue(output, 'Streaming', 'x264Settings') as string) ||
+      (this.settingsService.findSettingValue(output, 'Streaming', 'x264opts') as string);
+    const rescaleOutput = this.settingsService.findSettingValue(
+      output,
+      'Streaming',
+      'Rescale',
+    ) as boolean;
 
-    const resolutions = (this.settingsService
-      .findSetting(video, 'Untitled', 'Output') as unknown as {options: {value: string}[]})
-      .options.map(option => option.value);
+    const resolutions = (
+      this.settingsService.findSetting(video, 'Untitled', 'Output') as unknown as {
+        options: { value: string }[];
+      }
+    ).options.map(option => option.value);
 
     const hasCustomResolution = !resolutions.includes(outputResolution);
 
@@ -270,8 +284,8 @@ export class OutputSettingsService extends Service {
   ): IRecordingEncoderSettings {
     const path =
       mode === 'Simple'
-        ? this.settingsService.findSettingValue(output, 'Recording', 'FilePath') as string
-        : this.settingsService.findSettingValue(output, 'Recording', 'RecFilePath') as string;
+        ? (this.settingsService.findSettingValue(output, 'Recording', 'FilePath') as string)
+        : (this.settingsService.findSettingValue(output, 'Recording', 'RecFilePath') as string);
 
     const format = this.settingsService.findValidListValue(
       output,
@@ -280,12 +294,12 @@ export class OutputSettingsService extends Service {
     ) as EFileFormat;
 
     let encoder = obsEncoderToEncoderFamily(
-      this.settingsService.findSettingValue(output, 'Recording', 'RecEncoder')as EObsSimpleEncoder,
+      this.settingsService.findSettingValue(output, 'Recording', 'RecEncoder') as EObsSimpleEncoder,
     ) as EEncoderFamily;
 
     const outputResolution: string =
-      this.settingsService.findSettingValue(output, 'Recording', 'RecRescaleRes') as string ||
-      this.settingsService.findSettingValue(video, 'Untitled', 'Output') as string;
+      (this.settingsService.findSettingValue(output, 'Recording', 'RecRescaleRes') as string) ||
+      (this.settingsService.findSettingValue(video, 'Untitled', 'Output') as string);
 
     const quality = this.settingsService.findValidListValue(output, 'Recording', 'RecQuality');
 

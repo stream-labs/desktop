@@ -98,7 +98,6 @@ export class Display {
         rect.width !== this.currentPosition.width ||
         rect.height !== this.currentPosition.height
       ) {
-
         this.move(rect.x, rect.y);
         this.resize(rect.width, rect.height);
       }
@@ -191,12 +190,7 @@ export class VideoService extends Service {
   // https://gist.github.com/6174/6062387
   getRandomDisplayId() {
     return (
-      Math.random()
-        .toString(36)
-        .substring(2, 15) +
-      Math.random()
-        .toString(36)
-        .substring(2, 15)
+      Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15)
     );
   }
 
