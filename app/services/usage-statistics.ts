@@ -34,7 +34,8 @@ type TAnalyticsEvent =
   | 'Session'
   | 'Shown'
   | 'AppStart'
-  | 'Highlighter';
+  | 'Highlighter'
+  | 'Hardware';
 
 interface IAnalyticsEvent {
   product: string;
