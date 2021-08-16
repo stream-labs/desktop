@@ -7,7 +7,7 @@ import { ExclamationCircleOutlined } from '@ant-design/icons';
 import Scrollable from 'components-react/shared/Scrollable';
 import styles from './ThemeAudit.m.less';
 import groupBy from 'lodash/groupBy';
-import { Tabs } from 'antd';
+import { Tabs, Modal } from 'antd';
 
 class MediaFileReader {
   constructor(public readonly filePath: string) {}
@@ -77,6 +77,7 @@ type TWarningLevel = 'OK' | 'WARN' | 'CRITICAL';
 export default function ThemeAudit() {
   const { SceneCollectionsService, ScenesService, SourcesService } = Services;
   const [mediaInfo, setMediaInfo] = useState<IMediaSourceInfo[] | null>(null);
+  const [inspectedSource, setInspectedSource] = useState<string | null>(null);
 
   useEffect(() => {
     readMediaInfo().then(info => setMediaInfo(info));
@@ -116,6 +117,11 @@ export default function ThemeAudit() {
     if (numericValue > thresholds[1]) type = 'CRITICAL';
 
     return renderStat(label, displayValue, type);
+  }
+
+  function inspect(sourceId: string | null) {
+    setInspectedSource(sourceId);
+    console.log('inspect', sourceId);
   }
 
   return (
@@ -161,6 +167,9 @@ export default function ThemeAudit() {
                     {(grouped[scene.name] ?? []).map(info => (
                       <div key={info.id} style={{ padding: '5px 0' }}>
                         <i className="fas fa-film" /> <b>{info.name}</b>
+                        <button className="button button--trans" onClick={() => inspect(info.id)}>
+                          Inspect
+                        </button>
                         <br />
                         {renderNumericStat(
                           'Resolution',
@@ -182,6 +191,14 @@ export default function ThemeAudit() {
             {mediaInfo == null && <div>Loading...</div>}
           </Tabs.TabPane>
         </Tabs>
+        <Modal
+          visible={!!inspectedSource}
+          destroyOnClose={true}
+          closable={false}
+          onCancel={() => inspect(null)}
+        >
+          {inspectedSource}
+        </Modal>
       </Scrollable>
     </div>
   );
