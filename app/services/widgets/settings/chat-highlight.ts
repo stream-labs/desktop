@@ -10,6 +10,23 @@ import { InheritMutations } from 'services/core/stateful-service';
 import { formMetadata, metadata } from 'components/shared/inputs';
 import { $t } from 'services/i18n';
 
+export interface IChatHighlightMessage {
+  messageToPin: {
+    tags: {
+      badges: string;
+      color: string;
+      'display-name': string;
+      emotes: string;
+      id: string;
+      'user-type': string;
+    };
+    prefix: string;
+    command: string;
+    params: string[];
+    crlf: string;
+  };
+}
+
 export interface IChatHighlightSettings extends IWidgetSettings {
   enabled: boolean;
   highlight_duration: number; // milliseconds
