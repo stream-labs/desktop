@@ -3,6 +3,14 @@
 // the Foundation library interferes with some calendar styles
 // so we need to add some css fixes here
 .stream-scheduler-page {
+
+  // make calendar cell narrower for the small screens
+  @media (max-height: 1024px) {
+    :global(.ant-picker-calendar-full .ant-picker-panel .ant-picker-calendar-date-content) {
+      height: 60px;
+    }
+  }
+
   padding: 8px;
 
   // set padding for calendar header

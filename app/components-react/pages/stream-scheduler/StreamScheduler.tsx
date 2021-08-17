@@ -60,6 +60,7 @@ function SchedulerCalendar() {
     return (
       <p
         key={event.id}
+        title={event.title}
         className={cx({
           [css.event]: true,
           [css.eventFacebook]: event.platform === 'facebook',
