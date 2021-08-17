@@ -10,6 +10,7 @@ import { ListInput, TimeInput } from '../../shared/inputs';
 import Form, { useForm } from '../../shared/inputs/Form';
 import { confirmAsync } from '../../modals';
 import { IStreamEvent, useStreamScheduler } from './useStreamScheduler';
+import Scrollable from '../../shared/Scrollable';
 
 /**
  * StreamScheduler page layout
@@ -17,12 +18,12 @@ import { IStreamEvent, useStreamScheduler } from './useStreamScheduler';
 export default function StreamScheduler() {
   const { isEventsLoaded } = useStreamScheduler();
   return (
-    <div className={cx(css.streamSchedulerPage)}>
+    <Scrollable className={cx(css.streamSchedulerPage)}>
       <Spin tip="Loading..." spinning={!isEventsLoaded}>
         <SchedulerCalendar />
       </Spin>
       <EventSettingsModal />
-    </div>
+    </Scrollable>
   );
 }
 
