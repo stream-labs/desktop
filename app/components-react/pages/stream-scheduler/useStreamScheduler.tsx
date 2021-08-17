@@ -207,6 +207,12 @@ class StreamSchedulerModule {
 
   getPlatformDisplayName = this.streamingView.getPlatformDisplayName;
 
+  private recordFeatureUsage(
+    featureName: 'StreamSchedulerView' | 'StreamSchedulerEdit' | 'StreamSchedulerGoLive',
+  ) {
+    this.recordFeatureUsage('StreamSchedulerView');
+  }
+
   /**
    * Shows a modal for creating a new event
    */
@@ -222,6 +228,7 @@ class StreamSchedulerModule {
     this.state.selectedPlatform = platform;
     this.state.isModalVisible = true;
     this.setTime(time.valueOf());
+    this.recordFeatureUsage('StreamSchedulerView');
   }
 
   /**
@@ -249,6 +256,7 @@ class StreamSchedulerModule {
    * Validates and submits the event editor form
    */
   async submit(): Promise<boolean> {
+    this.recordFeatureUsage('StreamSchedulerEdit');
     // validate form
     try {
       await this.form.validateFields();
@@ -354,6 +362,7 @@ class StreamSchedulerModule {
    * Start stream to a selected event
    */
   async goLive() {
+    this.recordFeatureUsage('StreamSchedulerGoLive');
     const event = getDefined(this.selectedEvent);
     const prepopulateOptions = {
       [event.platform]: this.state.platformSettings[event.platform],
