@@ -41,10 +41,9 @@ loadLazyEmotes();
 
 function addHighlightScript() {
   return `
-    var els = document.getElementsByClassName('chat-line__message');
-    Array.prototype.forEach.call((els, el) => {
-      el.append
-    })
+    var chatHighlightScript = document.createElement('script');
+    chatHighlightScript.setAttribute('src', ${require('./widgets/settings/chat-highlight-script.js')});
+    document.head.appendChild(chatHighlightScript);
   `;
 }
 
@@ -254,6 +253,8 @@ export class ChatService extends Service {
           true,
         );
       }
+
+      this.chatView.webContents.executeJavaScript(addHighlightScript(), true);
 
       // facebook chat doesn't fit our layout by default
       // inject a script that removes scrollbars and sets auto width for the chat
