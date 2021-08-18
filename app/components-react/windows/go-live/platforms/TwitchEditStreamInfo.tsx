@@ -30,7 +30,7 @@ export function TwitchEditStreamInfo(p: IPlatformComponentParams<'twitch'>) {
             onChange={updateSettings}
           />
         }
-        requiredFields={<GameSelector key="required" platform={'twitch'} {...bind.game} />}
+        requiredFields={<GameSelector key="required" platform={'twitch'} {...bind.gameId} />}
         optionalFields={<TwitchTagsInput key="optional" label={$t('Twitch Tags')} {...bind.tags} />}
       />
     </Form>

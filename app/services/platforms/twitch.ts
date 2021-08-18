@@ -23,7 +23,8 @@ import Utils from '../utils';
 
 export interface ITwitchStartStreamOptions {
   title: string;
-  game?: string;
+  gameId?: string;
+  gameName?: string;
   tags?: TTwitchTag[];
 }
 
@@ -81,7 +82,8 @@ export class TwitchService
     availableTags: [],
     settings: {
       title: '',
-      game: '',
+      gameId: '',
+      gameName: '',
       tags: [],
     },
   };
@@ -259,11 +261,12 @@ export class TwitchService
    */
   async prepopulateInfo(): Promise<void> {
     const [channelInfo, hasUpdateTagsPermission] = await Promise.all([
-      this.requestTwitch<{ data: { title: string; game_name: string }[] }>(
+      this.requestTwitch<{ data: { title: string; game_id: string; game_name: string }[] }>(
         `${this.apiBase}/helix/channels?broadcaster_id=${this.twitchId}`,
       ).then(json => ({
         title: json.data[0].title,
-        game: json.data[0].game_name,
+        gameId: json.data[0].game_id,
+        gameName: json.data[0].game_name,
       })),
       this.getHasUpdateTagsPermission(),
     ]);
@@ -273,7 +276,10 @@ export class TwitchService
       [tags] = await Promise.all([this.getStreamTags(), this.getAllTags()]);
     }
     this.SET_PREPOPULATED(true);
-    this.SET_STREAM_SETTINGS({ tags, title: channelInfo.title, game: channelInfo.game });
+    this.SET_STREAM_SETTINGS({
+      tags,
+      ...channelInfo,
+    });
   }
 
   @mutation()
@@ -307,13 +313,12 @@ export class TwitchService
     }).then(json => json.total);
   }
 
-  async putChannelInfo({ title, game, tags = [] }: ITwitchStartStreamOptions): Promise<void> {
-    let gameId;
-    if (game) {
-      gameId = await this.requestTwitch<{ data: { id: string }[] }>(
-        `${this.apiBase}/helix/games?name=${encodeURIComponent(game)}`,
-      ).then(json => json.data[0].id);
-    }
+  async putChannelInfo({
+    title,
+    gameId,
+    gameName,
+    tags = [],
+  }: ITwitchStartStreamOptions): Promise<void> {
     await Promise.all([
       this.requestTwitch({
         url: `${this.apiBase}/helix/channels?broadcaster_id=${this.twitchId}`,
@@ -322,7 +327,7 @@ export class TwitchService
       }),
       this.setStreamTags(tags),
     ]);
-    this.SET_STREAM_SETTINGS({ title, game, tags });
+    this.SET_STREAM_SETTINGS({ title, gameId, gameName, tags });
   }
 
   async searchGames(searchString: string): Promise<IGame[]> {
@@ -333,10 +338,10 @@ export class TwitchService
     return gamesResponse.data.map(g => ({ id: g.id, name: g.name, image: g.box_art_url }));
   }
 
-  async fetchGame(name: string): Promise<IGame> {
+  async fetchGame(id: string): Promise<IGame> {
     const gamesResponse = await platformAuthorizedRequest<{
       data: { id: string; name: string; box_art_url: string }[];
-    }>('twitch', `${this.apiBase}/helix/games?name=${encodeURIComponent(name)}`);
+    }>('twitch', `${this.apiBase}/helix/games?id=${encodeURIComponent(id)}`);
     return gamesResponse.data.map(g => {
       const imageTemplate = g.box_art_url;
       const imageSize = this.gameImageSize;

@@ -9,6 +9,7 @@ import { mutation } from '../../store';
 import { useModule } from '../../hooks/useModule';
 import { useForm } from '../../shared/inputs/Form';
 import { getDefined } from '../../../util/properties-type-guards';
+import Utils from '../../../services/utils';
 
 type TCommonFieldName = 'title' | 'description';
 
@@ -46,6 +47,11 @@ export class GoLiveSettingsModule extends StreamInfoView<IGoLiveSettingsState> {
    */
   async prepopulate() {
     await Services.StreamingService.actions.return.prepopulateInfo();
+
+    // TODO: investigate why mutations from `StreamingService.prepopulateInfo` are not applied at this moment
+    // use `sleep` to wait for mutations as a temporary fix
+    await Utils.sleep(100);
+
     const view = new StreamInfoView({});
     const settings = {
       ...view.savedSettings, // copy saved stream settings
