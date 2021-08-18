@@ -10,6 +10,7 @@ import { IncrementalRolloutService } from './incremental-rollout';
 import electron from 'electron';
 import { StreamingService } from './streaming';
 import { FacebookService } from './platforms/facebook';
+import { TiktokService } from './platforms/tiktok';
 
 interface IRestreamTarget {
   id: number;
@@ -43,6 +44,7 @@ export class RestreamService extends StatefulService<IRestreamState> {
   @Inject() streamingService: StreamingService;
   @Inject() incrementalRolloutService: IncrementalRolloutService;
   @Inject() facebookService: FacebookService;
+  @Inject() tiktokService: TiktokService;
 
   settings: IUserSettingsResponse;
 
@@ -168,12 +170,13 @@ export class RestreamService extends StatefulService<IRestreamState> {
   }
 
   async setupTargets() {
+    // delete existing targets
     const targets = await this.fetchTargets();
     const promises = targets.map(t => this.deleteTarget(t.id));
-
     await Promise.all(promises);
 
-    await this.createTargets([
+    // setup new targets
+    const newTargets = [
       ...this.streamInfo.enabledPlatforms.map(platform => {
         return {
           platform: platform as TPlatform,
@@ -183,7 +186,17 @@ export class RestreamService extends StatefulService<IRestreamState> {
       ...this.streamInfo.savedSettings.customDestinations
         .filter(dest => dest.enabled)
         .map(dest => ({ platform: 'relay' as 'relay', streamKey: `${dest.url}${dest.streamKey}` })),
-    ]);
+    ];
+
+    // treat tiktok as a custom destination
+    const tikTokTarget = newTargets.find(t => t.platform === 'tiktok');
+    if (tikTokTarget) {
+      const ttSettings = this.tiktokService.state.settings;
+      tikTokTarget.platform = 'relay';
+      tikTokTarget.streamKey = `${ttSettings.serverUrl}/${ttSettings.streamKey}`;
+    }
+
+    await this.createTargets(newTargets);
   }
 
   checkStatus(): Promise<boolean> {

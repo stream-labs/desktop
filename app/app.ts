@@ -32,7 +32,7 @@ import util from 'util';
 import uuid from 'uuid/v4';
 import Blank from 'components/windows/Blank.vue';
 import Main from 'components/windows/Main.vue';
-import CustomLoader from 'components/CustomLoader';
+import { Loader } from 'components/shared/ReactComponent';
 import process from 'process';
 import { MetricsService } from 'services/metrics';
 import { UsageStatisticsService } from 'services/usage-statistics';
@@ -43,12 +43,6 @@ const { ipcRenderer, remote, app, contentTracing } = electron;
 const slobsVersion = Utils.env.SLOBS_VERSION;
 const isProduction = Utils.env.NODE_ENV === 'production';
 const isPreview = !!Utils.env.SLOBS_PREVIEW;
-
-// Used by Eddy for debugging on mac.
-if (!isProduction) {
-  const windowId = Utils.getWindowId();
-  process.title = `SLOBS Renderer ${windowId}`;
-}
 
 // This is the development DSN
 let sentryDsn = 'https://8f444a81edd446b69ce75421d5e91d4d@sentry.io/252950';
@@ -117,6 +111,13 @@ if (window['_startupErrorHandler']) {
   delete window['_startupErrorHandler'];
 }
 
+// Used by Eddy for debugging on mac.
+if (!isProduction) {
+  const windowId = Utils.getWindowId();
+  process.title = `SLOBS Renderer ${windowId}`;
+  console.log(`${windowId} - PID: ${process.pid}`);
+}
+
 if (isProduction || process.env.SLOBS_REPORT_TO_SENTRY) {
   const sampleRate = isPreview || process.env.SLOBS_REPORT_TO_SENTRY ? 1.0 : 0.1;
   const isSampled = Math.random() < sampleRate;
@@ -164,7 +165,7 @@ if (isProduction || process.env.SLOBS_REPORT_TO_SENTRY) {
         event.request.url = normalize(event.request.url);
       }
 
-      return isSampled ? event : null;
+      return isSampled || event.tags?.feature === 'highlighter' ? event : null;
     },
     integrations: [new Integrations.Vue({ Vue })],
   });
@@ -339,7 +340,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           return h(ChildWindow);
         }
 
-        return h(CustomLoader);
+        return h(Loader);
       }
       if (windowId === 'main') return h(Main);
       return h(OneOffWindow);

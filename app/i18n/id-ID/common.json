@@ -11,6 +11,7 @@
   "Settings": "Pengaturan",
   "That name is already taken": "Nama itu sudah dipakai",
   "Search": "Cari",
+  "Searching...": "Searching...",
   "Create New": "Buat Baru",
   "Language": "Bahasa",
   "Name is required": "Memerlukan nama",
@@ -129,5 +130,6 @@
   "Height": "Tinggi",
   "Use Custom": "Use Custom",
   "Apply": "Daftar",
-  "Do not show this message again": "Do not show this message again"
+  "Do not show this message again": "Do not show this message again",
+  "You can only select up to %{max} items": "You can only select up to %{max} items"
 }

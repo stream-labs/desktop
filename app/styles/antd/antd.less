@@ -36,11 +36,13 @@ body {
   // Use lighter color for input borders
   .ant-input,
   .ant-select-selector,
-  .ant-checkbox-inner {
+  .ant-checkbox-inner,
+  .ant-input-number {
     border: 1px solid var(--button);
   }
   .ant-input:hover,
-  .ant-select-selector:hover {
+  .ant-select-selector:hover,
+  .ant-input-number:hover {
     border: 1px solid var(--paragraph);
   }
   .ant-checkbox:hover {
@@ -50,7 +52,8 @@ body {
   }
   .ant-input:focus,
   .ant-select-focused .ant-select-selector,
-  .ant-checkbox-inner:focus {
+  .ant-checkbox-inner:focus,
+  .ant-input-number:focus {
     border: 1px solid var(--teal-hover);
   }
 
@@ -89,6 +92,18 @@ body {
   ::-webkit-scrollbar-corner,
   ::-webkit-resizer {
     background: transparent !important;
+  }
+}
+
+// fix list input label wrapping with long names
+.ant-select-selection-item {
+  .ant-row {
+    flex-flow: nowrap;
+    overflow: hidden;
+  }
+
+  .ant-col:first-of-type {
+    flex-shrink: 0;
   }
 }
 

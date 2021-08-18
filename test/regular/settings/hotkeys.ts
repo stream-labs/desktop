@@ -1,21 +1,15 @@
-import {
-  focusChild,
-  focusMain,
-  restartApp,
-  test,
-  TExecutionContext,
-  useSpectron,
-} from '../../helpers/spectron';
+import { restartApp, test, TExecutionContext, useSpectron } from '../../helpers/spectron';
+import { focusChild, focusMain } from '../../helpers/modules/core';
 
 useSpectron();
 
 test('Populates essential hotkeys for them to be bound', async t => {
   const { app } = t.context;
 
-  await focusMain(t);
+  await focusMain();
   await (await app.client.$('.side-nav .icon-settings')).click();
 
-  await focusChild(t);
+  await focusChild();
 
   await (await app.client.$('li=Hotkeys')).click();
   await (await app.client.$('h2=Mic/Aux')).click();
@@ -73,10 +67,10 @@ test('Binds a hotkey', async t => {
 
 const openHotkeySettings = async (t: TExecutionContext) => {
   const { app } = t.context;
-  await focusMain(t);
+  await focusMain();
   await (await app.client.$('.side-nav .icon-settings')).click();
 
-  await focusChild(t);
+  await focusChild();
 
   // Wait for hotkeys to populate
   await (await app.client.$('li=Hotkeys')).click();

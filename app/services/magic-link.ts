@@ -32,6 +32,19 @@ export class MagicLinkService extends Service {
     return jfetch(request);
   }
 
+  /**
+   * open the prime onboarding in the browser
+   * @param refl a referral tag for analytics
+   */
+  async linkToPrime(refl: string) {
+    try {
+      const link = await this.getDashboardMagicLink('prime', refl);
+      electron.remote.shell.openExternal(link);
+    } catch (e: unknown) {
+      console.error('Error generating dashboard magic link', e);
+    }
+  }
+
   async openWidgetThemesMagicLink() {
     try {
       const link = await this.getDashboardMagicLink('widgetthemes');

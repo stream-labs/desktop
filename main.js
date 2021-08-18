@@ -65,7 +65,6 @@ const uuid = require('uuid/v4');
 const semver = require('semver');
 const windowStateKeeper = require('electron-window-state');
 const pid = require('process').pid;
-const crashHandler = require('crash-handler');
 
 app.commandLine.appendSwitch('force-ui-direction', 'ltr');
 app.commandLine.appendSwitch(
@@ -257,6 +256,7 @@ const waitingVuexStores = [];
 let workerInitFinished = false;
 
 async function startApp() {
+  const crashHandler = require('crash-handler');
   const isDevMode = process.env.NODE_ENV !== 'production' && process.env.NODE_ENV !== 'test';
   const crashHandlerLogPath = app.getPath('userData');
 
@@ -411,6 +411,7 @@ async function startApp() {
     webPreferences: {
       nodeIntegration: true,
       enableRemoteModule: true,
+      backgroundThrottling: false,
     },
   });
 

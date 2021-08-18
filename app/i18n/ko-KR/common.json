@@ -11,6 +11,7 @@
   "Settings": "설정",
   "That name is already taken": "이미 사용 중인 이름입니다",
   "Search": "검색",
+  "Searching...": "Searching...",
   "Create New": "신규 생성",
   "Language": "언어",
   "Name is required": "이름이 필요합니다",
@@ -32,7 +33,7 @@
   "Submit": "제출",
   "Save": "저장",
   "Edit": "편집",
-  "Log In": "Log In",
+  "Log In": "로그인",
   "Yes": "예",
   "No": "아니요",
   "OK": "확인",
@@ -129,5 +130,6 @@
   "Height": "높이",
   "Use Custom": "Use Custom",
   "Apply": "신청",
-  "Do not show this message again": "Do not show this message again"
+  "Do not show this message again": "Do not show this message again",
+  "You can only select up to %{max} items": "You can only select up to %{max} items"
 }

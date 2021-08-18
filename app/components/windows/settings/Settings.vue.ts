@@ -19,7 +19,6 @@ import ExperimentalSettings from './ExperimentalSettings.vue';
 import RemoteControlSettings from './RemoteControlSettings.vue';
 import LanguageSettings from './LanguageSettings.vue';
 import GameOverlaySettings from './GameOverlaySettings';
-import FacemaskSettings from './FacemaskSettings.vue';
 import SearchablePages from 'components/shared/SearchablePages';
 import FormInput from 'components/shared/inputs/FormInput.vue';
 import StreamSettings from './StreamSettings';
@@ -27,7 +26,7 @@ import VirtualWebcamSettings from './VirtualWebcamSettings';
 import { MagicLinkService } from 'services/magic-link';
 import { UserService } from 'services/user';
 import Scrollable from 'components/shared/Scrollable';
-import PlatformLogo from 'components/shared/PlatformLogo';
+import { PlatformLogo } from 'components/shared/ReactComponent';
 import { $t } from 'services/i18n';
 import { debounce } from 'lodash-decorators';
 
@@ -49,7 +48,6 @@ import { debounce } from 'lodash-decorators';
     LanguageSettings,
     InstalledApps,
     GameOverlaySettings,
-    FacemaskSettings,
     FormInput,
     StreamSettings,
     VirtualWebcamSettings,
@@ -115,7 +113,7 @@ export default class Settings extends Vue {
 
   set categoryName(val: string) {
     if (val === 'Prime') {
-      this.userService.openPrimeUrl('slobs-settings');
+      this.magicLinkService.actions.linkToPrime('slobs-settings');
     } else {
       this.internalCategoryName = val;
     }

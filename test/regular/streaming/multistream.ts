@@ -1,158 +1,150 @@
-import { click, test, useSpectron } from '../../helpers/spectron';
-import { logIn, releaseUserInPool, reserveUserFromPool } from '../../helpers/spectron/user';
 import {
   clickGoLive,
   prepareToGoLive,
   stopStream,
   submit,
-  tryToGoLive,
-} from '../../helpers/spectron/streaming';
-import { fillForm, selectTitle } from '../../helpers/form-monkey';
-import { sleep } from '../../helpers/sleep';
-import { showSettings } from '../../helpers/spectron/settings';
+  switchAdvancedMode,
+  waitForSettingsWindowLoaded,
+} from '../../helpers/modules/streaming';
+import { fillForm, useForm } from '../../helpers/modules/forms';
+import { click, clickButton, isDisplayed, waitForDisplayed } from '../../helpers/modules/core';
+import { logIn } from '../../helpers/modules/user';
+import { releaseUserInPool, reserveUserFromPool } from '../../helpers/spectron/user';
+import { showSettingsWindow } from '../../helpers/modules/settings/settings';
+import { test, useSpectron } from '../../helpers/spectron';
 
 useSpectron();
 
 test('Multistream default mode', async t => {
-  const client = t.context.app.client;
-  await logIn(t, null, { multistream: true });
-  await prepareToGoLive(t);
-  await clickGoLive(t);
+  await logIn(null, { multistream: true });
+  await prepareToGoLive();
+  await clickGoLive();
+  await waitForSettingsWindowLoaded();
 
   // enable all platforms
-  await fillForm(t, null, {
+  await fillForm({
     twitch: true,
     facebook: true,
     youtube: true,
   });
-
-  // wait until all platforms prepopulate data
-  await sleep(2000);
+  await waitForSettingsWindowLoaded();
 
   // add settings
-  await fillForm(t, null, {
+  await fillForm({
     title: 'Test stream',
     description: 'Test stream description',
-    twitchGame: selectTitle('Fortnite'),
+    twitchGame: 'Fortnite',
   });
 
-  await submit(t);
-  t.true(
-    await (await client.$('span=Configure the Multistream service')).isExisting(),
-    'Mutlistream should be enabled',
-  );
-  await (await client.$("h1=You're live!")).waitForDisplayed({ timeout: 60000 });
-  await stopStream(t);
+  await submit();
+  await waitForDisplayed('span=Configure the Multistream service');
+  await waitForDisplayed("h1=You're live!", { timeout: 60000 });
+  await stopStream();
+  await t.pass();
 });
 
 test('Multistream advanced mode', async t => {
-  const client = t.context.app.client;
-  await logIn(t, null, { multistream: true });
-  await prepareToGoLive(t);
-  await clickGoLive(t);
+  await logIn(null, { multistream: true });
+  await prepareToGoLive();
+  await clickGoLive();
+  await waitForSettingsWindowLoaded();
 
   // enable all platforms
-  await fillForm(t, null, {
+  await fillForm({
     twitch: true,
     facebook: true,
     youtube: true,
   });
 
-  // wait until all platforms prepopulate data
-  await sleep(2000);
+  await switchAdvancedMode();
+  await waitForSettingsWindowLoaded();
 
-  // switch advanced mode on
-  await fillForm(t, null, {
-    advancedMode: true,
-  });
-
-  await fillForm(t, 'form[name="twitch-settings"]', {
+  const twitchForm = useForm('twitch-settings');
+  await twitchForm.fillForm({
     customEnabled: true,
     title: 'twitch title',
-    twitchGame: selectTitle('Fortnite'),
-    tags: ['100%'],
+    twitchGame: 'Fortnite',
+    twitchTags: ['100%'],
   });
 
-  await fillForm(t, 'form[name="youtube-settings"]', {
+  const youtubeForm = useForm('youtube-settings');
+  await youtubeForm.fillForm({
     customEnabled: true,
     title: 'youtube title',
     description: 'youtube description',
   });
 
-  await fillForm(t, 'form[name="facebook-settings"]', {
+  const facebookForm = useForm('facebook-settings');
+  await facebookForm.fillForm({
     customEnabled: true,
-    facebookGame: selectTitle('Fortnite'),
+    facebookGame: 'Doom',
     title: 'facebook title',
     description: 'facebook description',
   });
 
-  await submit(t);
-  t.true(
-    await (await client.$('span=Configure the Multistream service')).isExisting(),
-    'Mutlistream should be enabled',
-  );
-  await (await client.$("h1=You're live!")).waitForDisplayed({ timeout: 60000 });
-  await stopStream(t);
+  await submit();
+  await waitForDisplayed('span=Configure the Multistream service');
+  await waitForDisplayed("h1=You're live!", { timeout: 60000 });
+  await stopStream();
+  await t.pass();
 });
 
 test('Custom stream destinations', async t => {
-  const client = t.context.app.client;
-  await logIn(t, 'twitch', { prime: true });
+  await logIn('twitch', { prime: true });
 
   // fetch a new stream key
   const user = await reserveUserFromPool(t, 'twitch');
 
   // add new destination
-  await showSettings(t, 'Stream');
-  await click(t, 'span=Add Destination');
-  await fillForm(t, null, {
+  await showSettingsWindow('Stream');
+  await click('span=Add Destination');
+
+  const { fillForm } = useForm();
+  await fillForm({
     name: 'MyCustomDest',
     url: 'rtmp://live.twitch.tv/app/',
     streamKey: user.streamKey,
   });
-  await click(t, 'button=Save');
-  t.true(await (await client.$('span=MyCustomDest')).isExisting(), 'New destination is created');
+  await clickButton('Save');
+  t.true(await isDisplayed('span=MyCustomDest'), 'New destination should be created');
 
   // update destinations
-  await click(t, 'i.fa-pen');
-  await fillForm(t, null, {
+  await click('i.fa-pen');
+  await fillForm({
     name: 'MyCustomDestUpdated',
   });
-  await click(t, 'button=Save');
-  await t.true(
-    await (await client.$('span=MyCustomDestUpdated')).isExisting(),
-    'Destination is updated',
-  );
+  await clickButton('Save');
+
+  t.true(await isDisplayed('span=MyCustomDestUpdated'), 'Destination should be updated');
 
   // add one more destination
-  await click(t, 'span=Add Destination');
-  await fillForm(t, null, {
+  await click('span=Add Destination');
+  await fillForm({
     name: 'MyCustomDest',
     url: 'rtmp://live.twitch.tv/app/',
     streamKey: user.streamKey,
   });
-  await click(t, 'button=Save');
-  await t.false(
-    await (await client.$('span=Add Destination')).isExisting(),
-    'Do not allow more than 2 custom dest',
-  );
+  await clickButton('Save');
+
+  await t.false(await isDisplayed('span=Add Destination'), 'Do not allow more than 2 custom dest');
 
   // open the GoLiveWindow and check destinations
-  await prepareToGoLive(t);
-  await clickGoLive(t);
-  await t.true(
-    await (await client.$('span=MyCustomDest')).isExisting(),
-    'Destination is available',
-  );
-  await click(t, 'span=MyCustomDest'); // switch the destination on
-  await tryToGoLive(t);
-  await (await client.$('span=Configure the Multistream service')).waitForExist(); // the multistream should be started
-  await stopStream(t);
+  await prepareToGoLive();
+  await clickGoLive();
+  await waitForSettingsWindowLoaded();
+  await t.true(await isDisplayed('span=MyCustomDest'), 'Destination is available');
+  await click('span=MyCustomDest'); // switch the destination on
+
+  // try to stream
+  await submit();
+  await waitForDisplayed('span=Configure the Multistream service');
+  await waitForDisplayed("h1=You're live!", { timeout: 60000 });
+  await stopStream();
   await releaseUserInPool(user);
 
   // delete existing destinations
-  await showSettings(t, 'Stream');
-  await click(t, 'i.fa-trash');
-  await click(t, 'i.fa-trash');
-  t.false(await (await client.$('i.fa-trash')).isExisting(), 'Destinations should be removed');
+  await showSettingsWindow('Stream');
+  await click('i.fa-trash');
+  await click('i.fa-trash');
+  t.false(await isDisplayed('i.fa-trash'), 'Destinations should be removed');
 });

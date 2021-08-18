@@ -16,9 +16,10 @@
       <bool-input v-model="wData.settings.show_franker_emotes" :metadata="metadata.show_franker_emotes"/>
     </v-form-group>
     <v-form-group v-model="wData.settings.background_color" :metadata="metadata.background_color" />
-    <v-form-group title="Hide Message after">
+    <v-form-group>
       <bool-input v-model="wData.settings.always_show_messages" :metadata="metadata.always_show_messages"/>
       <slider-input v-model="wData.settings.message_hide_delay" :metadata="metadata.message_hide_delay"/>
+      <bool-input title="Disable Message Animations" v-model="wData.settings.disable_message_animations" :metadata="metadata.disable_message_animations"/>
     </v-form-group>
   </validated-form>
 

@@ -44,7 +44,6 @@
   "Follower Goal": "팔로워 목표",
   "Twitch Follows": "Twitch 팔로우",
   "YouTube Follows": "YouTube 팔로우",
-  "Mixer Follows": "Mixer 팔로우",
   "Bit Goal": "비트 목표",
   "Twitch Bits": "Twitch 비트",
   "Subscription Goal": "구독 목표",
@@ -145,7 +144,6 @@
   "Cloud Backup: All media and sources are backed up in the cloud": "클라우드 백업: 모든 미디어 및 소스가 클라우드에 백업됩니다",
   "Cloud Backup: Your media and sources are being synced with the cloud": "클라우드 백업: 모든 미디어 및 소스가 클라우드와 동기화됩니다",
   "The streamer manually adds images of sponsors.": "스트리머가 수동으로 스폰서의 이미지를 추가합니다.",
-  "Mixer chat": "믹서 채팅",
   "Edit Transform": "변형 편집",
   "There are no existing sources of this type.": "해당 유형의 소스가 없습니다.",
   "Instant Replay": "즉시 리플레이",
@@ -185,5 +183,8 @@
   "JACK Input Client": "JACK 입력 클라이언트",
   "Motion": "Motion",
   "Twitch Soundtrack": "Twitch Soundtrack",
-  "Audio source working with the Twitch Soundtrack music application. Add this source to be able to filter out the music from your Twitch VODs.": "Audio source working with the Twitch Soundtrack music application. Add this source to be able to filter out the music from your Twitch VODs."
+  "Audio source working with the Twitch Soundtrack music application. Add this source to be able to filter out the music from your Twitch VODs.": "Audio source working with the Twitch Soundtrack music application. Add this source to be able to filter out the music from your Twitch VODs.",
+  "Custom Icon": "Custom Icon",
+  "Displays an icon from one of many selections": "Displays an icon from one of many selections",
+  "An error has occured, please try re-opening this window": "An error has occured, please try re-opening this window"
 }

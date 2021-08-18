@@ -56,7 +56,6 @@ export class TwitterService extends PersistentStatefulService<ITwitterServiceSta
   SET_TWITTER_STATUS(status: ITwitterStatusResponse) {
     this.state.linked = status.linked;
     this.state.prime = status.prime;
-    this.state.creatorSiteOnboardingComplete = status.cs_onboarding_complete;
     this.state.creatorSiteUrl = status.cs_url;
     this.state.screenName = status.screen_name;
   }
@@ -64,6 +63,11 @@ export class TwitterService extends PersistentStatefulService<ITwitterServiceSta
   @mutation()
   SET_TWEET_PREFERENCE(preference: boolean) {
     this.state.tweetWhenGoingLive = preference;
+  }
+
+  @mutation()
+  SET_STREAMLABS_URL(value: boolean) {
+    this.state.creatorSiteOnboardingComplete = value;
   }
 
   @mutation()
@@ -101,6 +105,10 @@ export class TwitterService extends PersistentStatefulService<ITwitterServiceSta
     return jfetch(request).catch(() => {
       console.warn('Error unlinking Twitter');
     });
+  }
+
+  setStreamlabsUrl(value: boolean) {
+    this.SET_STREAMLABS_URL(value);
   }
 
   async fetchTwitterStatus() {

@@ -16,6 +16,7 @@ import fs from 'fs';
 import path from 'path';
 import { ObsImporterService } from 'services/obs-importer';
 import { StreamSettingsService } from 'services/settings/streaming';
+import rimraf from 'rimraf';
 
 @Component({
   components: { BoolInput },
@@ -148,5 +149,33 @@ export default class ExtraSettings extends Vue {
 
   get disableHAFilePath() {
     return path.join(this.appService.appDataDirectory, 'HADisable');
+  }
+
+  enableCU: boolean = null;
+
+  get enableCrashDumpUpload() {
+    if (this.enableCU == null) {
+      this.enableCU = fs.existsSync(this.enableCUFilePath);
+    }
+
+    return this.enableCU;
+  }
+
+  set enableCrashDumpUpload(val: boolean) {
+    try {
+      if (val) {
+        fs.mkdirSync(this.enableCUFilePath);
+        this.enableCU = true;
+      } else {
+        rimraf.sync(this.enableCUFilePath);
+        this.enableCU = false;
+      }
+    } catch (e: unknown) {
+      console.error('Error setting crash upload option', e);
+    }
+  }
+
+  get enableCUFilePath() {
+    return path.join(this.appService.appDataDirectory, 'CrashMemoryDump');
   }
 }

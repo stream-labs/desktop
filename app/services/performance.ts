@@ -83,6 +83,24 @@ class PerformanceServiceViews extends ViewHandler<IPerformanceState> {
   get bandwidth() {
     return this.state.streamingBandwidth.toFixed(0);
   }
+
+  get streamQuality() {
+    if (
+      this.state.percentageDroppedFrames > 50 ||
+      this.state.percentageLaggedFrames > 50 ||
+      this.state.percentageSkippedFrames > 50
+    ) {
+      return EStreamQuality.POOR;
+    }
+    if (
+      this.state.percentageDroppedFrames > 30 ||
+      this.state.percentageLaggedFrames > 30 ||
+      this.state.percentageSkippedFrames > 30
+    ) {
+      return EStreamQuality.FAIR;
+    }
+    return EStreamQuality.GOOD;
+  }
 }
 
 // Keeps a store of up-to-date performance metrics
@@ -359,24 +377,6 @@ export class PerformanceService extends StatefulService<IPerformanceState> {
         code,
       ),
     });
-  }
-
-  get streamQuality() {
-    if (
-      this.state.percentageDroppedFrames > 50 ||
-      this.state.percentageLaggedFrames > 50 ||
-      this.state.percentageSkippedFrames > 50
-    ) {
-      return EStreamQuality.POOR;
-    }
-    if (
-      this.state.percentageDroppedFrames > 30 ||
-      this.state.percentageLaggedFrames > 30 ||
-      this.state.percentageSkippedFrames > 30
-    ) {
-      return EStreamQuality.FAIR;
-    }
-    return EStreamQuality.GOOD;
   }
 
   stop() {

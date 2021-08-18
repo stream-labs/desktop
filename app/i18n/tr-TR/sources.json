@@ -44,7 +44,6 @@
   "Follower Goal": "Takipçi Hedefi",
   "Twitch Follows": "Twitch Takipleri",
   "YouTube Follows": "YouTube Takipleri",
-  "Mixer Follows": "Mixer Takipleri",
   "Bit Goal": "Bit Hedefi",
   "Twitch Bits": "Twitch Bitleri",
   "Subscription Goal": "Abone Hedefi",
@@ -145,7 +144,6 @@
   "Cloud Backup: All media and sources are backed up in the cloud": "Bulut Yedek: Tüm medya ve kaynaklar bulutta yedekleniyor",
   "Cloud Backup: Your media and sources are being synced with the cloud": "Bulut Yedek: Medya ve kaynaklarınız bulutla senkronize ediliyor",
   "The streamer manually adds images of sponsors.": "Yayıncı, sponsorların görüntülerini manuel olarak ekler.",
-  "Mixer chat": "Mixer sohbeti",
   "Edit Transform": "Dönüştürmeyi Düzenle",
   "There are no existing sources of this type.": "Bu türden bir kaynak yok.",
   "Instant Replay": "Anında Tekrar",
@@ -185,5 +183,8 @@
   "JACK Input Client": "JACK Giriş İstemcisi",
   "Motion": "Motion",
   "Twitch Soundtrack": "Twitch Soundtrack",
-  "Audio source working with the Twitch Soundtrack music application. Add this source to be able to filter out the music from your Twitch VODs.": "Audio source working with the Twitch Soundtrack music application. Add this source to be able to filter out the music from your Twitch VODs."
+  "Audio source working with the Twitch Soundtrack music application. Add this source to be able to filter out the music from your Twitch VODs.": "Audio source working with the Twitch Soundtrack music application. Add this source to be able to filter out the music from your Twitch VODs.",
+  "Custom Icon": "Custom Icon",
+  "Displays an icon from one of many selections": "Displays an icon from one of many selections",
+  "An error has occured, please try re-opening this window": "An error has occured, please try re-opening this window"
 }

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef, useContext } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import debounce from 'lodash/debounce';
 import { StatefulService } from '../services/core';
 import { createBinding, TBindings } from './shared/inputs';
@@ -8,13 +8,7 @@ import { FormInstance } from 'antd/lib/form/hooks/useForm';
 /**
  * Creates a reactive state for a React component based on Vuex store
  */
-export function useVuex<TReturnValue>(selector: () => TReturnValue): TReturnValue;
-export function useVuex<T, TReturnValue>(
-  target: T,
-  selector: (state: T) => TReturnValue,
-): TReturnValue;
-export function useVuex(...args: any[]) {
-  const selector = args.length === 1 ? args[0] : () => args[1](args[0]);
+export function useVuex<TReturnValue>(selector: () => TReturnValue, deep = true): TReturnValue {
   const [state, setState] = useState(selector);
   useEffect(() => {
     const unsubscribe = StatefulService.store.watch(
@@ -22,6 +16,7 @@ export function useVuex(...args: any[]) {
       newState => {
         setState(newState);
       },
+      { deep },
     );
     return () => {
       unsubscribe();
@@ -94,10 +89,17 @@ export function useFormState<T extends object>(initializer: T | (() => T)): TUse
   // create a reference to the last actual state
   const stateRef = useRef(s);
 
+  // use isDestroyed flag to prevent updating state on destroyed components
+  const isDestroyedRef = useRef(false);
+  useOnDestroy(() => {
+    isDestroyedRef.current = true;
+  });
+
   // create a reference to AntForm
   const form = useForm();
 
   function setState(newState: T) {
+    if (isDestroyedRef.current) return;
     // keep the reference in sync when we update the state
     stateRef.current = newState;
     setStateRaw(newState);
@@ -154,4 +156,20 @@ type TUseFormStateResult<TState extends object> = {
 export function useForceUpdate() {
   const [, forceUpdate] = React.useReducer(x => x + 1, 0);
   return forceUpdate;
+}
+
+/**
+ * Sets a function that guarantees a re-render and fresh state on every tick of the delay
+ */
+export function useRenderInterval(callback: () => void, delay: number) {
+  const [tick, setTick] = useState(0);
+
+  useEffect(() => {
+    const timeout = window.setTimeout(() => {
+      callback();
+      setTick(tick + 1);
+    }, delay);
+
+    return () => clearTimeout(timeout);
+  }, [tick]);
 }

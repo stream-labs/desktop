@@ -44,7 +44,6 @@
   "Follower Goal": "Follower-Ziel",
   "Twitch Follows": "Twitch-Follower",
   "YouTube Follows": "YouTube-Follower",
-  "Mixer Follows": "Mixer-Follower",
   "Bit Goal": "Bit-Ziel",
   "Twitch Bits": "Twitch-Bits",
   "Subscription Goal": "Abonnentenziel",
@@ -145,7 +144,6 @@
   "Cloud Backup: All media and sources are backed up in the cloud": "Cloud-Backup: Alle Medien und Quellen werden in der Cloud gesichert",
   "Cloud Backup: Your media and sources are being synced with the cloud": "Cloud-Backup: Ihre Medien und Quellen werden mit der Cloud synchronisiert",
   "The streamer manually adds images of sponsors.": "Der Streamer fügt manuell Bilder der Sponsoren hinzu.",
-  "Mixer chat": "Mixer-Chat",
   "Edit Transform": "Transformation bearbeiten",
   "There are no existing sources of this type.": "Es gibt keine Quellen dieser Art.",
   "Instant Replay": "Sofortige Wiederholung",
@@ -185,5 +183,8 @@
   "JACK Input Client": "JACK Eingabe-Client",
   "Motion": "Motion",
   "Twitch Soundtrack": "Twitch Soundtrack",
-  "Audio source working with the Twitch Soundtrack music application. Add this source to be able to filter out the music from your Twitch VODs.": "Audio source working with the Twitch Soundtrack music application. Add this source to be able to filter out the music from your Twitch VODs."
+  "Audio source working with the Twitch Soundtrack music application. Add this source to be able to filter out the music from your Twitch VODs.": "Audio source working with the Twitch Soundtrack music application. Add this source to be able to filter out the music from your Twitch VODs.",
+  "Custom Icon": "Custom Icon",
+  "Displays an icon from one of many selections": "Displays an icon from one of many selections",
+  "An error has occured, please try re-opening this window": "An error has occured, please try re-opening this window"
 }

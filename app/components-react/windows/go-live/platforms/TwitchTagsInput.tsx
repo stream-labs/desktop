@@ -1,5 +1,5 @@
 import { TagsInput, TSlobsInputProps } from '../../../shared/inputs';
-import { useOnCreate, useVuex } from '../../../hooks';
+import { useOnCreate } from '../../../hooks';
 import { Services } from '../../../service-provider';
 import { prepareOptions, TTwitchTag } from '../../../../services/platforms/twitch/tags';
 import React from 'react';
@@ -30,6 +30,7 @@ export function TwitchTagsInput(p: TTwitchTagsInputProps) {
   function render() {
     return (
       <TagsInput
+        name="twitchTags"
         label={p.label}
         value={p.value && p.value.map(tag => tag.tag_id)}
         max={5}

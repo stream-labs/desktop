@@ -1,6 +1,5 @@
 /// <reference path="../vendor/toasted.d.ts" />
 /// <reference path="../vendor/urijs.d.ts" />
-///<reference path="./jsx.d.ts"/>
 
 // all global interfaces here
 
@@ -44,6 +43,8 @@ interface IRGBColor {
   b: number;
 }
 
+type DeepPartial<T> = Partial<{ [P in keyof T]: DeepPartial<T[P]> }>;
+
 /**
  * This is a much more typesafe type for json to return,
  * as it requires declaring its type before use.
@@ -85,6 +86,11 @@ declare module 'vuejs-datepicker';
 declare module 'vuejs-datepicker/dist/locale';
 declare module 'color-picker';
 declare module 'overlayscrollbars-vue';
+declare module 'gl-transitions';
+
+// React modules
+declare module 'rc-animate';
+declare module 'react-dom';
 
 // uncomment to allow TS to import components without type definitions
 // webpack still checks the module existence

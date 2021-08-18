@@ -11,6 +11,7 @@
   "Settings": "Settings",
   "That name is already taken": "That name is already taken",
   "Search": "Search",
+  "Searching...": "Searching...",
   "Create New": "Create New",
   "Language": "Language",
   "Name is required": "Name is required",
@@ -129,5 +130,6 @@
   "Height": "Height",
   "Use Custom": "Use Custom",
   "Apply": "Apply",
-  "Do not show this message again": "Do not show this message again"
+  "Do not show this message again": "Do not show this message again",
+  "You can only select up to %{max} items": "You can only select up to %{max} items"
 }

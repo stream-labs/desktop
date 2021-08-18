@@ -1,4 +1,4 @@
-import { mutation, StatefulService } from 'services/core/stateful-service';
+import { mutation, StatefulService, ViewHandler } from 'services/core/stateful-service';
 import path from 'path';
 import fs from 'fs';
 import { Inject } from 'services/core/injector';
@@ -43,6 +43,21 @@ interface IMediaFileDataResponse {
 
 const ONE_MEGABYTE = 1_048_576;
 
+class MediaBackupViews extends ViewHandler<IMediaBackupState> {
+  /**
+   * Fetches the global sync status.
+   * Will be "synced" if all files are synced
+   * Will be "syncing" if at least 1 file is syncing
+   */
+  get globalSyncStatus(): EGlobalSyncStatus {
+    const syncing = this.state.files.find(file => file.status !== EMediaFileStatus.Synced);
+
+    if (syncing) return EGlobalSyncStatus.Syncing;
+
+    return EGlobalSyncStatus.Synced;
+  }
+}
+
 export class MediaBackupService extends StatefulService<IMediaBackupState> {
   @Inject() hostsService: HostsService;
   @Inject() userService: UserService;
@@ -57,17 +72,8 @@ export class MediaBackupService extends StatefulService<IMediaBackupState> {
     return uuid();
   }
 
-  /**
-   * Fetches the global sync status.
-   * Will be "synced" if all files are synced
-   * Will be "syncing" if at least 1 file is syncing
-   */
-  get globalSyncStatus(): EGlobalSyncStatus {
-    const syncing = this.state.files.find(file => file.status !== EMediaFileStatus.Synced);
-
-    if (syncing) return EGlobalSyncStatus.Syncing;
-
-    return EGlobalSyncStatus.Synced;
+  get views() {
+    return new MediaBackupViews(this.state);
   }
 
   /**

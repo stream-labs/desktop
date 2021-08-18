@@ -11,6 +11,7 @@
   "Settings": "设置",
   "That name is already taken": "该名称已被使用",
   "Search": "搜索",
+  "Searching...": "Searching...",
   "Create New": "新建",
   "Language": "语言",
   "Name is required": "名称为必填项",
@@ -32,7 +33,7 @@
   "Submit": "提交",
   "Save": "保存",
   "Edit": "编辑",
-  "Log In": "Log In",
+  "Log In": "登录",
   "Yes": "是",
   "No": "否",
   "OK": "好",
@@ -129,5 +130,6 @@
   "Height": "高度",
   "Use Custom": "Use Custom",
   "Apply": "申请",
-  "Do not show this message again": "Do not show this message again"
+  "Do not show this message again": "Do not show this message again",
+  "You can only select up to %{max} items": "You can only select up to %{max} items"
 }

@@ -46,6 +46,13 @@ interface ILatestVersionInfo {
   version: string;
 
   /**
+   * The most recent generally available verison that is 100%
+   * rollout out. If set, this will be used as the update target for
+   * users who are not eligible for the latest version.
+   */
+  fallbackVersion?: string;
+
+  /**
    * A random string chosen at release time that is added to the
    * update id before hashing into a release bucket to ensure we
    * rollout to a different sample of people with each release.
@@ -257,7 +264,17 @@ async function getLatestVersionInfo(info: IUpdateInfo): Promise<ILatestVersionIn
   return response.json();
 }
 
-async function shouldUpdate(latestVersion: ILatestVersionInfo, info: IUpdateInfo) {
+/**
+ * Determines if the app should be updated. If the app shouldn't update,
+ * this function returns false. If it should be updated, this function
+ * will return a string indicating the version we should update to.
+ * @param latestVersion The latest version info object
+ * @param info Info about the currently running version
+ */
+async function shouldUpdate(
+  latestVersion: ILatestVersionInfo,
+  info: IUpdateInfo,
+): Promise<string | false> {
   if (!latestVersion) {
     console.log('Failed to fetch latest version.');
     return false;
@@ -275,11 +292,25 @@ async function shouldUpdate(latestVersion: ILatestVersionInfo, info: IUpdateInfo
   }
 
   if (!(await isInRolloutGroup(info, latestVersion))) {
-    console.log('User is not in rollout group. Update will not be applied.');
+    console.log('User is not in rollout group. Checking for fallback version.');
+
+    // Check if there is a fallback version we can update to
+    if (latestVersion.fallbackVersion) {
+      if (semver.gte(info.version, latestVersion.fallbackVersion)) {
+        console.log('Already on fallback version.');
+
+        return false;
+      }
+
+      return latestVersion.fallbackVersion;
+    }
+
+    console.log('No fallback is available. Update will not be applied.');
+
     return false;
   }
 
-  return true;
+  return latestVersion.version;
 }
 
 /**
@@ -297,7 +328,9 @@ async function entry(info: IUpdateInfo) {
     return false;
   }
 
-  if (!(await shouldUpdate(latestVersion, info))) return false;
+  const updateVersion = await shouldUpdate(latestVersion, info);
+
+  if (!updateVersion) return false;
 
   /* App directory is required to be present!
    * The temporary directory may not exist though. */
@@ -317,7 +350,7 @@ async function entry(info: IUpdateInfo) {
     '--base-url',
     `"${info.baseUrl}"`,
     '--version',
-    `"${latestVersion.version}"`,
+    `"${updateVersion}"`,
     '--exec',
     `"${info.exec.join(' ')}"`,
     '--cwd',

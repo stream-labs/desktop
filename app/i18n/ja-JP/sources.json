@@ -44,7 +44,6 @@
   "Follower Goal": "フォロワー目標",
   "Twitch Follows": "Twitch フォロー",
   "YouTube Follows": "YouTube フォロー",
-  "Mixer Follows": "Mixer フォロー",
   "Bit Goal": "ビット目標",
   "Twitch Bits": "Twitch ビット",
   "Subscription Goal": "サブスクリプション目標",
@@ -145,7 +144,6 @@
   "Cloud Backup: All media and sources are backed up in the cloud": "クラウド バックアップ：すべてのメディアとソースがクラウドにバックアップされます",
   "Cloud Backup: Your media and sources are being synced with the cloud": "クラウド バックアップ：メディアとソースはクラウドと同期されています",
   "The streamer manually adds images of sponsors.": "ストリーマーはスポンサーの画像を手動で追加します。",
-  "Mixer chat": "Mixer チャット",
   "Edit Transform": "変換を編集",
   "There are no existing sources of this type.": "このタイプの既存のソースがありません。",
   "Instant Replay": "インスタントリプレイ",
@@ -185,5 +183,8 @@
   "JACK Input Client": "JACK 入力クライアント",
   "Motion": "Motion",
   "Twitch Soundtrack": "Twitch Soundtrack",
-  "Audio source working with the Twitch Soundtrack music application. Add this source to be able to filter out the music from your Twitch VODs.": "Audio source working with the Twitch Soundtrack music application. Add this source to be able to filter out the music from your Twitch VODs."
+  "Audio source working with the Twitch Soundtrack music application. Add this source to be able to filter out the music from your Twitch VODs.": "Audio source working with the Twitch Soundtrack music application. Add this source to be able to filter out the music from your Twitch VODs.",
+  "Custom Icon": "Custom Icon",
+  "Displays an icon from one of many selections": "Displays an icon from one of many selections",
+  "An error has occured, please try re-opening this window": "An error has occured, please try re-opening this window"
 }

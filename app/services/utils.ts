@@ -235,6 +235,17 @@ export default class Utils {
     } while (fileSizeInBytes > 1024);
     return Math.max(fileSizeInBytes, 0.1).toFixed(1) + byteUnits[i];
   }
+
+  /**
+   * Returns a type predicate that makes prop from TObj a required property.
+   * This function is primarily meant to be used with `filter`
+   * @param prop The property to make required
+   * @example
+   * a.filter(propertyExists('foo')).forEach(v => v.foo + 5);
+   */
+  static propertyExists<TObj, TProp extends keyof TObj>(prop: TProp) {
+    return (obj: TObj): obj is Required<Pick<TObj, TProp>> & TObj => obj[prop] != null;
+  }
 }
 
 /**
@@ -244,4 +255,18 @@ export default class Utils {
  */
 export function keys<T>(target: T) {
   return Object.keys(target) as (keyof T)[];
+}
+
+/**
+ * A fallback-safe method of fetching images
+ * from either our local storage or the CDN
+ * @param path The path structure to retrieve the image from the media folders
+ */
+export function $i(path: string) {
+  try {
+    const localMediaPath = require(`../../media/${path}`);
+    return localMediaPath;
+  } catch (e: unknown) {
+    return `https://slobs-cdn.streamlabs.com/media/${path}`;
+  }
 }

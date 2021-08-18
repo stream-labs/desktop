@@ -39,6 +39,19 @@ export default React.memo(function Form(p: FormProps & { disabled?: boolean }) {
     'data-name': p.name,
   };
 
+  /* eslint-disable no-template-curly-in-string */
+  const validateMessages = {
+    required: '${label} is required',
+    types: { number: '${label} is not a valid number' },
+    string: {
+      max: '${label} cannot be more than ${max} characters',
+    },
+    number: {
+      range: '${label} must be between ${min} and ${max}',
+    },
+  };
+  /* eslint-enable no-template-curly-in-string */
+
   return (
     <FormContext.Provider value={contextValue}>
       {context ? (
@@ -48,7 +61,7 @@ export default React.memo(function Form(p: FormProps & { disabled?: boolean }) {
       ) : (
         // there is no AntForm in ancestor, this is a root form
         // create the AntForm container for children
-        <AntForm {...dataAttrs} {...p} form={antForm}>
+        <AntForm {...dataAttrs} validateMessages={validateMessages} {...p} form={antForm}>
           {p.children}
         </AntForm>
       )}

@@ -11,6 +11,7 @@
   "Settings": "Ayarlar",
   "That name is already taken": "Bu isim zaten alınmış",
   "Search": "Ara",
+  "Searching...": "Searching...",
   "Create New": "Yeni Oluştur",
   "Language": "Dil",
   "Name is required": "İsim zorunludur",
@@ -32,7 +33,7 @@
   "Submit": "Gönder",
   "Save": "Kaydet",
   "Edit": "Düzenle",
-  "Log In": "Log In",
+  "Log In": "Giriş Yap",
   "Yes": "Evet",
   "No": "Hayır",
   "OK": "Tamam",
@@ -129,5 +130,6 @@
   "Height": "Yükseklik",
   "Use Custom": "Use Custom",
   "Apply": "Uygula",
-  "Do not show this message again": "Do not show this message again"
+  "Do not show this message again": "Do not show this message again",
+  "You can only select up to %{max} items": "You can only select up to %{max} items"
 }

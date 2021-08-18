@@ -32,7 +32,11 @@ type TAnalyticsEvent =
   | 'ReplayBufferStatus'
   | 'Click'
   | 'Session'
-  | 'Shown';
+  | 'Shown'
+  | 'AppStart'
+  | 'Highlighter'
+  | 'Hardware'
+  | 'WebcamUse';
 
 interface IAnalyticsEvent {
   product: string;
@@ -224,10 +228,8 @@ export class UsageStatisticsService extends Service {
     await this.sendAnalytics();
   }
 
-  private session: ISessionInfo = {
-    startTime: new Date(),
-    features: {},
-    sysInfo: {
+  getSysInfo() {
+    return {
       os: {
         platform: os.platform(),
         release: os.release(),
@@ -236,7 +238,13 @@ export class UsageStatisticsService extends Service {
       cpu: os.cpus()[0].model,
       cores: os.cpus().length,
       mem: os.totalmem(),
-    },
+    };
+  }
+
+  private session: ISessionInfo = {
+    startTime: new Date(),
+    features: {},
+    sysInfo: this.getSysInfo(),
   };
 
   recordFeatureUsage(feature: string) {

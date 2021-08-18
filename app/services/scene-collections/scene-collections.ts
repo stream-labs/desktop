@@ -38,6 +38,8 @@ import { StreamingService, EStreamingState } from 'services/streaming';
 import { DefaultHardwareService } from 'services/hardware';
 import { byOS, OS, getOS } from 'util/operating-systems';
 import Utils from 'services/utils';
+import { getPlatformService, IPlatformCapabilityResolutionPreset } from '../platforms';
+import { OutputSettingsService } from '../settings';
 
 const uuid = window['require']('uuid/v4');
 
@@ -84,6 +86,7 @@ export class SceneCollectionsService extends Service implements ISceneCollection
   @Inject() transitionsService: TransitionsService;
   @Inject() streamingService: StreamingService;
   @Inject() private defaultHardwareService: DefaultHardwareService;
+  @Inject() private outputSettingsService: OutputSettingsService;
 
   collectionAdded = new Subject<ISceneCollectionsManifestEntry>();
   collectionRemoved = new Subject<ISceneCollectionsManifestEntry>();

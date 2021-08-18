@@ -10,6 +10,35 @@ import { InitAfter } from './core';
 import Utils from './utils';
 import { StreamingService } from './streaming';
 
+export function enableBTTVEmotesScript(isDarkTheme: boolean) {
+  /*eslint-disable */
+return `
+localStorage.setItem('bttv_clickTwitchEmotes', true);
+localStorage.setItem('bttv_darkenedMode', ${
+  isDarkTheme ? 'true' : 'false'
+});
+
+var bttvscript = document.createElement('script');
+bttvscript.setAttribute('src','https://cdn.betterttv.net/betterttv.js');
+document.head.appendChild(bttvscript);
+
+function loadLazyEmotes() {
+  var els = document.getElementsByClassName('lazy-emote');
+
+  Array.prototype.forEach.call(els, el => {
+    const src = el.getAttribute('data-src');
+    if (el.src !== 'https:' + src) el.src = src;
+  });
+
+  setTimeout(loadLazyEmotes, 1000);
+}
+
+loadLazyEmotes();
+0;
+`
+  /*eslint-enable */
+}
+
 @InitAfter('StreamingService')
 export class ChatService extends Service {
   @Inject() userService: UserService;
@@ -55,7 +84,7 @@ export class ChatService extends Service {
     if (!this.chatView) this.initChat();
     this.electronWindowId = electronWindowId;
     const win = electron.remote.BrowserWindow.fromId(electronWindowId);
-    if (this.chatView) win.addBrowserView(this.chatView);
+    if (this.chatView && win) win.addBrowserView(this.chatView);
   }
 
   setChatBounds(position: IVec2, size: IVec2) {
@@ -72,7 +101,7 @@ export class ChatService extends Service {
   unmountChat() {
     if (!this.electronWindowId) return; // already unmounted
     const win = electron.remote.BrowserWindow.fromId(this.electronWindowId);
-    if (this.chatView) win.removeBrowserView(this.chatView);
+    if (this.chatView && win) win.removeBrowserView(this.chatView);
     this.electronWindowId = null;
   }
 
@@ -199,31 +228,7 @@ export class ChatService extends Service {
 
       if (settings.enableBTTVEmotes && this.userService.platform?.type === 'twitch') {
         this.chatView.webContents.executeJavaScript(
-          /*eslint-disable */
-          `
-          localStorage.setItem('bttv_clickTwitchEmotes', true);
-          localStorage.setItem('bttv_darkenedMode', ${
-            this.customizationService.isDarkTheme ? 'true' : 'false'
-          });
-
-          var bttvscript = document.createElement('script');
-          bttvscript.setAttribute('src','https://cdn.betterttv.net/betterttv.js');
-          document.head.appendChild(bttvscript);
-
-          function loadLazyEmotes() {
-            var els = document.getElementsByClassName('lazy-emote');
-
-            Array.prototype.forEach.call(els, el => {
-              const src = el.getAttribute('data-src');
-              if (el.src !== 'https:' + src) el.src = src;
-            });
-
-            setTimeout(loadLazyEmotes, 1000);
-          }
-
-          loadLazyEmotes();
-          0;
-        ` /*eslint-enable */,
+          enableBTTVEmotesScript(this.customizationService.isDarkTheme),
           true,
         );
       }

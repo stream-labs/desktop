@@ -7,7 +7,7 @@
   >
     <div slot="content" class="settings">
       <NavMenu v-model="categoryName" class="settings-nav">
-        <scrollable style="height: 100%;" :isResizable="false">
+        <scrollable style="height: 100%" :isResizable="false">
           <form-input
             :value="searchStr"
             @input="str => onSearchInput(str)"
@@ -54,7 +54,10 @@
           >
             <i :class="userService.isLoggedIn ? 'fas fa-sign-out-alt' : 'fas fa-sign-in-alt'" />
             <strong>{{ userService.isLoggedIn ? $t('Log Out') : $t('Log In') }}</strong>
-            <platform-logo v-if="userService.isLoggedIn" :platform="userService.platform.type" />
+            <platform-logo
+              v-if="userService.isLoggedIn"
+              :componentProps="{ platform: userService.platform.type, size: 14 }"
+            />
             <span v-if="userService.isLoggedIn">{{ userService.username }}</span>
           </button>
         </scrollable>
@@ -90,7 +93,6 @@
           <remote-control-settings v-if="page === 'Remote Control'" />
           <game-overlay-settings v-if="page === 'Game Overlay'" />
           <virtual-webcam-settings v-if="page === 'Virtual Webcam'" />
-          <facemask-settings v-if="page === 'Face Masks'" />
           <GenericFormGroups
             v-if="
               ![
@@ -190,7 +192,8 @@
     overflow: hidden;
   }
 
-  i {
+  i,
+  .react {
     margin-right: 8px;
   }
   strong {

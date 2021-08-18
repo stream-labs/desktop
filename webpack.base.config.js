@@ -8,10 +8,7 @@ const fs = require('fs');
 
 const plugins = [];
 
-const commit = cp
-  .execSync('git rev-parse --short HEAD')
-  .toString()
-  .replace('\n', '');
+const commit = cp.execSync('git rev-parse --short HEAD').toString().replace('\n', '');
 
 plugins.push(
   new webpack.DefinePlugin({
@@ -30,6 +27,8 @@ plugins.push(
 
 plugins.push(new CleanWebpackPlugin());
 plugins.push(new VueLoaderPlugin());
+
+const OUTPUT_DIR = path.join(__dirname, 'bundles');
 
 const tsFiles = [];
 const tsxFiles = [];
@@ -56,7 +55,7 @@ module.exports = {
   },
 
   output: {
-    path: __dirname + '/bundles',
+    path: OUTPUT_DIR,
     filename: '[name].js',
     publicPath: '',
   },

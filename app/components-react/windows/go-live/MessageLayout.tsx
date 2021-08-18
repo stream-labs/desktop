@@ -1,6 +1,6 @@
 import styles from './GoLiveError.m.less';
 import React, { useState, HTMLAttributes } from 'react';
-import { IStreamError } from '../../../services/streaming/stream-error';
+import { errorTypes, IStreamError } from '../../../services/streaming/stream-error';
 import { $t } from '../../../services/i18n';
 import { Alert } from 'antd';
 
@@ -19,13 +19,13 @@ interface IMessageLayoutProps {
 export default function MessageLayout(p: IMessageLayoutProps & HTMLAttributes<unknown>) {
   const [isErrorDetailsShown, setDetailsShown] = useState(false);
   const error = p.error;
-  const message = p.message || error?.message;
   const details = error?.details;
   const type = error ? 'error' : p.type;
+  const message = p.message || error?.message || (p.error && errorTypes[p.error.type]?.message);
 
   function render() {
     return (
-      <div>
+      <div className={styles.container}>
         <Alert type={type} message={message} showIcon description={renderDescription()} />
       </div>
     );

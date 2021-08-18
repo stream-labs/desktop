@@ -51,6 +51,14 @@ export class CrashReporterService extends Service {
   beginStartup() {
     this.appState = this.readStateFile();
 
+    // Report whether we clean exited to mongo
+    // Note we report this every time whether it was or
+    // wasn't a clean exit, for easier querying
+    this.usageStatisticsService.recordAnalyticsEvent('AppStart', {
+      exitState: this.appState,
+      sysInfo: this.usageStatisticsService.getSysInfo(),
+    });
+
     // Report any crash that happened last time
     if (this.appState.code !== EAppState.CleanExit) {
       this.usageStatisticsService.recordEvent('crash', {

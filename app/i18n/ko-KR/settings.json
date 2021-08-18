@@ -25,6 +25,7 @@
   "Configure Default Devices": "기본 디바이스 구성",
   "OBS Import": "OBS 가져오기",
   "Confirm stream title and game before going live": "라이브 하기 전에 스트리밍 제목 및 게임 확인하기",
+  "Enable reporting additional information on a crash (requires restart)": "Enable reporting additional information on a crash (requires restart)",
   "WARNING! You will lose all scenes, sources, and settings. This cannot be undone!": "경고! 모든 장면, 소스, 설정을 잃게 됩니다. 이 작업은 취소할 수 없습니다!",
   "Your cache directory has been successfully uploaded.  The file name %{file} has been copied to your clipboard.": "캐시 디렉터리가 성공적으로 업로드되었습니다. 파일 이름(%{file})이 클립보드에 복사되었습니다.",
   "Stream Labels session has been successfully restarted!": "Stream Labels session has been successfully restarted!",
@@ -138,5 +139,6 @@
   "Virtual Webcam allows you to display your scenes from Streamlabs OBS in video conferencing software. Streamlabs OBS will appear as a Webcam that can be selected in most video conferencing apps.": "Virtual Webcam allows you to display your scenes from Streamlabs OBS in video conferencing software. Streamlabs OBS will appear as a Webcam that can be selected in most video conferencing apps.",
   "Uninstalling Virtual Webcam will remove it as a device option in other applications.": "Uninstalling Virtual Webcam will remove it as a device option in other applications.",
   "Uninstall Virtual Webcam": "Uninstall Virtual Webcam",
-  "Use custom resolution": "Use custom resolution"
+  "Use custom resolution": "Use custom resolution",
+  "Enable Designer Mode": "Enable Designer Mode"
 }

@@ -23,9 +23,9 @@ export function DestinationSwitchers() {
     switchPlatforms,
     switchCustomDestination,
     checkPrimaryPlatform,
-  } = useGoLiveSettings();
-
+  } = useGoLiveSettings().select();
   const enabledPlatformsRef = useRef(enabledPlatforms);
+  enabledPlatformsRef.current = enabledPlatforms;
 
   const emitSwitch = useDebounce(500, () => {
     switchPlatforms(enabledPlatformsRef.current);
@@ -78,6 +78,7 @@ function DestinationSwitcher(p: IDestinationSwitcherProps) {
   const switchInputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const platform = typeof p.destination === 'string' ? (p.destination as TPlatform) : null;
+  const { RestreamService, MagicLinkService } = Services;
 
   function onClickHandler(ev: MouseEvent) {
     if (p.isPrimary) {
@@ -88,16 +89,20 @@ function DestinationSwitcher(p: IDestinationSwitcherProps) {
       );
       return;
     }
-    const enable = !p.enabled;
-    p.onChange(enable);
-    // always proxy the click to the SwitchInput
-    // so it can play a transition animation
-    switchInputRef.current?.click();
-    // switch the container class without re-rendering to not stop the animation
-    if (enable) {
-      containerRef.current?.classList.remove(styles.platformDisabled);
+    if (RestreamService.views.canEnableRestream) {
+      const enable = !p.enabled;
+      p.onChange(enable);
+      // always proxy the click to the SwitchInput
+      // so it can play a transition animation
+      switchInputRef.current?.click();
+      // switch the container class without re-rendering to not stop the animation
+      if (enable) {
+        containerRef.current?.classList.remove(styles.platformDisabled);
+      } else {
+        containerRef.current?.classList.add(styles.platformDisabled);
+      }
     } else {
-      containerRef.current?.classList.add(styles.platformDisabled);
+      MagicLinkService.actions.linkToPrime('slobs-multistream');
     }
   }
 

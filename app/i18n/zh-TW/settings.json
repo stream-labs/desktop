@@ -25,6 +25,7 @@
   "Configure Default Devices": "設定預設裝置",
   "OBS Import": "OBS 匯入",
   "Confirm stream title and game before going live": "在開始直播前確認直播標題與遊戲",
+  "Enable reporting additional information on a crash (requires restart)": "Enable reporting additional information on a crash (requires restart)",
   "WARNING! You will lose all scenes, sources, and settings. This cannot be undone!": "警告！您會失去所有場景、來源與設定。此動作無法復原！",
   "Your cache directory has been successfully uploaded.  The file name %{file} has been copied to your clipboard.": "您的快取目錄已成功上傳。檔案名稱 %{file} 已複製到您的剪貼簿。",
   "Stream Labels session has been successfully restarted!": "Stream Labels session has been successfully restarted!",
@@ -138,5 +139,6 @@
   "Virtual Webcam allows you to display your scenes from Streamlabs OBS in video conferencing software. Streamlabs OBS will appear as a Webcam that can be selected in most video conferencing apps.": "Virtual Webcam allows you to display your scenes from Streamlabs OBS in video conferencing software. Streamlabs OBS will appear as a Webcam that can be selected in most video conferencing apps.",
   "Uninstalling Virtual Webcam will remove it as a device option in other applications.": "Uninstalling Virtual Webcam will remove it as a device option in other applications.",
   "Uninstall Virtual Webcam": "Uninstall Virtual Webcam",
-  "Use custom resolution": "Use custom resolution"
+  "Use custom resolution": "Use custom resolution",
+  "Enable Designer Mode": "Enable Designer Mode"
 }

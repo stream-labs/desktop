@@ -32,7 +32,6 @@ export interface IEventSocketEvent {
   type:
     | 'merch'
     | 'donation'
-    | 'facemaskdonation'
     | 'follow'
     | 'subscription'
     | 'bits'
@@ -71,7 +70,6 @@ interface IFmExtEnabledSocketEvent {
 export interface IAlertPlayingSocketEvent {
   type: 'alertPlaying';
   message: {
-    facemask?: string;
     type: string;
     amount?: string;
   };

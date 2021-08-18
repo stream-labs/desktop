@@ -31,6 +31,8 @@ export enum WidgetType {
   StarsGoal = 16,
   SupporterGoal = 17,
   CharityGoal = 18,
+  Poll = 19,
+  EmoteWall = 20,
 }
 
 export const WidgetTesters: IWidgetTester[] = [
@@ -67,7 +69,7 @@ export const WidgetTesters: IWidgetTester[] = [
     url(host) {
       return `https://${host}/api/v5/slobs/test/streamlabs/donation`;
     },
-    platforms: ['twitch', 'youtube', 'facebook'],
+    platforms: ['twitch', 'youtube', 'facebook', 'tiktok'],
   },
   {
     name: 'Bits',
@@ -405,6 +407,34 @@ export const WidgetDefinitions: { [x: number]: IWidget } = {
 
     anchor: AnchorPoint.North,
   },
+  [WidgetType.Poll]: {
+    name: 'Poll',
+    url(host, token) {
+      return `https://${host}/widgets/poll/${token}`;
+    },
+
+    width: 800,
+    height: 400,
+
+    x: 0.5,
+    y: 0.5,
+
+    anchor: AnchorPoint.Center,
+  },
+  [WidgetType.EmoteWall]: {
+    name: 'Emote Wall',
+    url(host, token) {
+      return `https://${host}/widgets/emote-wall?token=${token}`;
+    },
+
+    width: 1280,
+    height: 720,
+
+    x: 0.5,
+    y: 0.5,
+
+    anchor: AnchorPoint.Center,
+  },
 };
 
 export const WidgetDisplayData = (platform?: string): { [x: number]: IWidgetDisplayData } => ({
@@ -561,5 +591,22 @@ export const WidgetDisplayData = (platform?: string): { [x: number]: IWidgetDisp
     demoVideo: false,
     demoFilename: 'source-sponsor-banner.png',
     supportList: [],
+  },
+  [WidgetType.Poll]: {
+    name: $t('Poll'),
+    description: $t('Let your viewers vote on a result'),
+    demoVideo: false,
+    demoFilename: 'poll.png',
+    supportList: [],
+  },
+  [WidgetType.EmoteWall]: {
+    name: $t('Emote Wall'),
+    description: $t(
+      'Display and animate emotes that are seen in chat, improving chat participation via positive feedback.',
+    ),
+    demoVideo: false,
+    demoFilename: 'emote-wall.gif',
+    supportList: [],
+    platforms: new Set(['twitch']),
   },
 });

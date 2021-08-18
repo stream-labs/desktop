@@ -37,6 +37,7 @@ import { assertIsDefined } from 'util/properties-type-guards';
 import { UsageStatisticsService } from 'services/usage-statistics';
 import { SourceFiltersService } from 'services/source-filters';
 import { FileReturnWrapper } from 'util/guest-api-handler';
+import { VideoService } from 'services/video';
 
 const AudioFlag = obs.ESourceOutputFlags.Audio;
 const VideoFlag = obs.ESourceOutputFlags.Video;
@@ -166,6 +167,7 @@ export class SourcesService extends StatefulService<ISourcesState> {
   @Inject() private defaultHardwareService: DefaultHardwareService;
   @Inject() private usageStatisticsService: UsageStatisticsService;
   @Inject() private sourceFiltersService: SourceFiltersService;
+  @Inject() private videoService: VideoService;
 
   get views() {
     return new SourcesViews(this.state);
@@ -262,6 +264,12 @@ export class SourcesService extends StatefulService<ISourcesState> {
   ): Source {
     const id: string = options.sourceId || `${type}_${uuid()}`;
     const obsInputSettings = this.getObsSourceCreateSettings(type, settings);
+
+    // Universally disabled for security reasons
+    if (obsInputSettings.is_media_flag) {
+      obsInputSettings.is_media_flag = false;
+    }
+
     const obsInput = obs.InputFactory.create(type, id, obsInputSettings);
 
     this.addSource(obsInput, name, options);
@@ -310,6 +318,16 @@ export class SourcesService extends StatefulService<ISourcesState> {
       this.usageStatisticsService.recordFeatureUsage('AudioInputSource');
     } else if (type === 'dshow_input') {
       this.usageStatisticsService.recordFeatureUsage('DShowInput');
+
+      const device = this.hardwareService.state.dshowDevices.find(
+        d => d.id === obsInput.settings.video_device_id,
+      );
+
+      if (device) {
+        this.usageStatisticsService.recordAnalyticsEvent('WebcamUse', {
+          device: device.description,
+        });
+      }
     } else if (type === 'window_capture') {
       this.usageStatisticsService.recordFeatureUsage('WindowCapture');
     } else if (type === 'monitor_capture') {
@@ -444,6 +462,14 @@ export class SourcesService extends StatefulService<ISourcesState> {
       this.defaultHardwareService.state.defaultVideoDevice
     ) {
       resolvedSettings.video_device_id = this.defaultHardwareService.state.defaultVideoDevice;
+    }
+
+    // TODO: Specifically for TikTok, we don't use auto mode on game capture
+    // for portrait resolutions, because auto mode will distort the game.
+    // We should remove this change when the backend team makes a change on their
+    // end to better scale the game capture in auto mode.
+    if (type === 'game_capture' && this.videoService.baseHeight > this.videoService.baseWidth) {
+      resolvedSettings.capture_mode = 'any_fullscreen';
     }
 
     return resolvedSettings;

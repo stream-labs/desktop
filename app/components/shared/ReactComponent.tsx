@@ -68,7 +68,7 @@ export class PatchNotes extends ReactComponent {}
 @Component({
   props: {
     name: { default: 'NavTools' },
-    wrapperStyles: { default: () => ({ marginTop: 'auto', marginBottom: '12px', flexShrink: 0 }) },
+    wrapperStyles: { default: () => ({ marginTop: 'auto', flexShrink: 0 }) },
   },
 })
 export class NavTools extends ReactComponent {}
@@ -117,6 +117,19 @@ export class TitleBar extends ReactComponent {}
   },
 })
 export class Chat extends ReactComponent {}
+@Component({
+  props: {
+    name: { default: 'Loader' },
+  },
+})
+export class Loader extends ReactComponent {}
+@Component({
+  props: {
+    name: { default: 'Highlighter' },
+    componentProps: { default: () => ({}) },
+  },
+})
+export class Highlighter extends ReactComponent {}
 
 @Component({
   props: {
@@ -125,7 +138,6 @@ export class Chat extends ReactComponent {}
   },
 })
 export class GoLiveWindow extends ReactComponent {}
-
 @Component({
   props: {
     name: { default: 'EditStreamWindow' },
@@ -133,3 +145,62 @@ export class GoLiveWindow extends ReactComponent {}
   },
 })
 export class EditStreamWindow extends ReactComponent {}
+@Component({
+  props: {
+    name: { default: 'Grow' },
+    wrapperStyles: { default: () => ({ gridRow: '1 / span 1' }) },
+  },
+})
+export class Grow extends ReactComponent {}
+@Component({
+  props: {
+    name: { default: 'PlatformLogo' },
+    wrapperStyles: { default: () => ({}) },
+  },
+})
+export class PlatformLogo extends ReactComponent<{
+  platform: string;
+  size?: 'medium' | number;
+  color?: string;
+  unwrapped?: boolean;
+}> {}
+
+@Component({
+  props: {
+    name: { default: 'SharedComponentsLibrary' },
+    wrapperStyles: { default: () => ({ height: '100%' }) },
+  },
+})
+export class SharedComponentsLibrary extends ReactComponent {}
+
+@Component({
+  props: {
+    name: { default: 'RenameSource' },
+    wrapperStyles: { default: () => ({ height: '100%' }) },
+  },
+})
+export class RenameSource extends ReactComponent {}
+@Component({
+  props: {
+    name: { default: 'AdvancedStatistics' },
+    wrapperStyles: { default: () => ({ height: '100%' }) },
+  },
+})
+export class AdvancedStatistics extends ReactComponent {}
+
+@Component({ props: { name: { default: 'StreamScheduler' } } })
+export class StreamScheduler extends ReactComponent {}
+
+@Component({ props: { name: { default: 'StartStreamingButton' } } })
+export class StartStreamingButton extends ReactComponent {}
+@Component({
+  props: {
+    name: { default: 'TestWidgets' },
+    componentProps: { default: () => ({ testers: null as string[] }) },
+  },
+})
+export class TestWidgets extends ReactComponent<{ testers: string[] }> {}
+@Component({ props: { name: { default: 'NotificationsArea' } } })
+export class NotificationsArea extends ReactComponent {}
+@Component({ props: { name: { default: 'StudioEditor' } } })
+export class StudioEditor extends ReactComponent {}

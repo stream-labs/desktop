@@ -480,6 +480,24 @@ export class HotkeysService extends StatefulService<IHotkeysServiceState> {
     return new Hotkey(obj);
   }
 
+  // Only works for general hotkeys for now
+  getGeneralHotkeyByName(name: string) {
+    return this.getHotkeysSet().general.find(hotkey => hotkey.actionName === name);
+  }
+
+  // Only works for general hotkeys for now
+  applyGeneralHotkey(hotkey: IHotkey) {
+    const set = this.getHotkeysSet();
+    console.log(set);
+    set.general.forEach(h => {
+      if (h.actionName === hotkey.actionName) {
+        h.bindings = hotkey.bindings;
+      }
+    });
+    this.applyHotkeySet(set);
+    console.log(set);
+  }
+
   getHotkeys(): Hotkey[] {
     if (!this.registeredHotkeys) this.updateRegisteredHotkeys();
     return (this.registeredHotkeys ?? []).filter(hotkey => hotkey.shouldApply);

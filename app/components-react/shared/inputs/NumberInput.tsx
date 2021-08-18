@@ -11,6 +11,7 @@ type TProps = TSlobsInputProps<{}, number, InputNumberProps, ValuesOf<typeof ANT
 
 export const NumberInput = React.memo((p: TProps) => {
   const { inputAttrs, wrapperAttrs, originalOnChange } = useTextInput<typeof p, number>(
+    'number',
     p,
     ANT_NUMBER_FEATURES,
   );
@@ -23,9 +24,11 @@ export const NumberInput = React.memo((p: TProps) => {
     originalOnChange(val);
   }
 
+  const rules = p.rules ? p.rules[0] : {};
+
   return (
-    <InputWrapper {...wrapperAttrs}>
-      <InputNumber {...inputAttrs} onChange={onChangeHandler} />
+    <InputWrapper {...wrapperAttrs} rules={[{ ...rules, type: 'number' }]}>
+      <InputNumber {...inputAttrs} onChange={onChangeHandler} defaultValue={p.defaultValue} />
     </InputWrapper>
   );
 });

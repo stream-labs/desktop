@@ -5,19 +5,21 @@ import ModalLayout from 'components/ModalLayout.vue';
 import { WindowsService } from 'services/windows';
 import AddSourceInfo from './AddSourceInfo.vue';
 import {
-  SourcesService,
-  TSourceType,
-  TPropertiesManager,
   SourceDisplayData,
+  SourcesService,
+  TPropertiesManager,
+  TSourceType,
 } from 'services/sources';
 import { ScenesService } from 'services/scenes';
 import { UserService } from 'services/user';
-import { WidgetsService, WidgetType, WidgetDisplayData } from 'services/widgets';
-import { PlatformAppsService, IAppSource } from 'services/platform-apps';
+import { WidgetDisplayData, WidgetsService, WidgetType } from 'services/widgets';
+import { IAppSource, PlatformAppsService } from 'services/platform-apps';
 import omit from 'lodash/omit';
 import { CustomizationService } from 'services/customization';
 import { byOS, OS } from 'util/operating-systems';
 import Scrollable from 'components/shared/Scrollable';
+import { getPlatformService } from '../../services/platforms';
+import { $i } from 'services/utils';
 
 type TInspectableSource = TSourceType | WidgetType | 'streamlabel' | 'app_source' | string;
 
@@ -44,7 +46,7 @@ interface ISourceDefinition {
 })
 export default class SourcesShowcase extends Vue {
   @Inject() sourcesService: SourcesService;
-  @Inject() userService: UserService;
+  @Inject() userService!: UserService;
   @Inject() widgetsService: WidgetsService;
   @Inject() scenesService: ScenesService;
   @Inject() windowsService: WindowsService;
@@ -53,9 +55,18 @@ export default class SourcesShowcase extends Vue {
 
   widgetTypes = WidgetType;
   essentialWidgetTypes = new Set([this.widgetTypes.AlertBox]);
+  private primaryPlatformService = this.userService.state.auth
+    ? getPlatformService(this.userService.state.auth.primaryPlatform)
+    : null;
 
   iterableWidgetTypes = Object.keys(this.widgetTypes)
     .filter((type: string) => isNaN(Number(type)))
+    .filter(type => {
+      // show only supported widgets
+      const whitelist = this.primaryPlatformService?.widgetsWhitelist;
+      if (!whitelist) return true;
+      return whitelist.includes(WidgetType[type]);
+    })
     .sort((a: string, b: string) => {
       return this.essentialWidgetTypes.has(this.widgetTypes[a]) ? -1 : 1;
     });
@@ -73,7 +84,7 @@ export default class SourcesShowcase extends Vue {
   getSrc(type: string) {
     const theme = this.demoMode;
     const dataSource = this.widgetData(type) ? this.widgetData : this.sourceData;
-    return require(`../../../media/source-demos/${theme}/${dataSource(type).demoFilename}`);
+    return $i(`source-demos/${theme}/${dataSource(type).demoFilename}`);
   }
 
   getLoginSrc() {
@@ -177,6 +188,10 @@ export default class SourcesShowcase extends Vue {
       });
 
     return sourcesList;
+  }
+
+  get hasStreamlabel() {
+    return this.primaryPlatformService?.hasCapability('streamlabels');
   }
 
   get inspectedSourceDefinition() {

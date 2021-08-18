@@ -1,13 +1,6 @@
-import {
-  startApp,
-  stopApp,
-  test,
-  useSpectron,
-  focusChild,
-  skipCheckingErrorsInLog,
-} from '../helpers/spectron';
+import { startApp, stopApp, test, useSpectron, skipCheckingErrorsInLog } from '../helpers/spectron';
 
-import { getClient } from '../helpers/api-client';
+import { getApiClient } from '../helpers/api-client';
 const path = require('path');
 import fse = require('fs-extra');
 import fs = require('fs');
@@ -15,6 +8,7 @@ import os = require('os');
 import { logIn } from '../helpers/spectron/user';
 import { SceneCollectionsService } from 'services/api/external-api/scene-collections';
 import { ScenesService } from '../../app/services/api/external-api/scenes';
+import { focusChild } from '../helpers/modules/core';
 
 useSpectron({ noSync: false });
 
@@ -44,7 +38,7 @@ test('Media backup', async t => {
   // media sync works only in log-in state
   await logIn(t);
 
-  const api = await getClient();
+  const api = await getApiClient();
   const collectionsService = api.getResource<SceneCollectionsService>('SceneCollectionsService');
 
   // create an new empty collection
@@ -71,8 +65,8 @@ test('Media backup', async t => {
     // media-backup sync should be started
     // wait for the sync-succeed icon
     await (await t.context.app.client.$('.metrics-icon')).click();
-    await focusChild(t);
-    await (await t.context.app.client.$('.icon-cloud-backup-2')).waitForDisplayed();
+    await focusChild();
+    await (await t.context.app.client.$("div[data-syncstatus='1']")).waitForDisplayed();
 
     // restart app and delete local images
     await stopApp(t, false);
@@ -94,7 +88,7 @@ test('Media backup', async t => {
     // Make sure the filenames contain the original filename
     t.not(image1DownloadedPath.indexOf(image1Filename), -1);
     t.not(image2DownloadedPath.indexOf(image2Filename), -1);
-  } catch (e) {
+  } catch (e: unknown) {
     await collectionsService.delete(collection.id);
     throw e;
   }

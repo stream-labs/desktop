@@ -11,6 +11,7 @@
   "Settings": "Ustawienia",
   "That name is already taken": "Ta nazwa jest już zajęta",
   "Search": "Szukaj",
+  "Searching...": "Searching...",
   "Create New": "Utwórz nowe",
   "Language": "Język",
   "Name is required": "Wymagana jest nazwa",
@@ -129,5 +130,6 @@
   "Height": "Wysokość",
   "Use Custom": "Use Custom",
   "Apply": "Apply",
-  "Do not show this message again": "Do not show this message again"
+  "Do not show this message again": "Do not show this message again",
+  "You can only select up to %{max} items": "You can only select up to %{max} items"
 }

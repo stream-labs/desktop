@@ -1,11 +1,11 @@
 /// <reference path="../../../app/index.d.ts" />
-import avaTest, { ExecutionContext, TestInterface } from 'ava';
+/// <reference path="../../../app/jsx.d.ts" />
+import avaTest, {afterEach, ExecutionContext} from 'ava';
 import { Application } from 'spectron';
-import { getClient } from '../api-client';
+import { getApiClient } from '../api-client';
 import { DismissablesService } from 'services/dismissables';
-import { getUser, logOut, releaseUserInPool } from './user';
+import { getUser, logOut } from './user';
 import { sleep } from '../sleep';
-import { installFetchMock } from './network';
 
 import {
   ITestStats,
@@ -14,6 +14,9 @@ import {
   saveTestStatsToFile,
   testFn,
 } from './runner-utils';
+import { skipOnboarding } from '../modules/onboarding';
+import { focusChild, focusMain, waitForLoader } from '../modules/core';
+import {clearCollections} from "../modules/api/scenes";
 export const test = testFn; // the overridden "test" function
 
 const path = require('path');
@@ -26,7 +29,6 @@ const ALMOST_INFINITY = Math.pow(2, 31) - 1; // max 32bit int
 const testStats: Record<string, ITestStats> = {};
 
 let testStartTime = 0;
-let activeWindow: string | RegExp;
 
 const afterStartCallbacks: ((t: TExecutionContext) => any)[] = [];
 export function afterAppStart(cb: (t: TExecutionContext) => any) {
@@ -37,61 +39,21 @@ export function afterAppStop(cb: (t: TExecutionContext) => any) {
   afterStopCallbacks.push(cb);
 }
 
-export async function focusWindow(t: TExecutionContext, regex: RegExp): Promise<boolean> {
-  const count = await t.context.app.client.getWindowCount();
-
-  for (let i = 0; i < count; i++) {
-    await t.context.app.client.windowByIndex(i);
-    const url = await t.context.app.client.getUrl();
-    if (url.match(regex)) {
-      activeWindow = regex;
-      return true;
-    }
-  }
-
-  return false;
+let testContext: TExecutionContext;
+export function setContext(t: TExecutionContext) {
+  testContext = t;
 }
-
-// Focuses the worker window
-// Should not usually be used
-export async function focusWorker(t: TExecutionContext) {
-  await focusWindow(t, /windowId=worker$/);
-}
-
-// Focuses the main window
-export async function focusMain(t: TExecutionContext) {
-  await focusWindow(t, /windowId=main$/);
-}
-
-// Focuses the child window
-export async function focusChild(t: TExecutionContext) {
-  await focusWindow(t, /windowId=child/);
-}
-
-// Focuses the Library webview
-export async function focusLibrary(t: TExecutionContext) {
-  // doesn't work without delay, probably need to wait until load
-  await sleep(2000);
-  await focusWindow(t, /streamlabs\.com\/library/);
-}
-
-// Close current focused window
-export async function closeWindow(t: TExecutionContext) {
-  await t.context.app.browserWindow.close();
-}
-
-export async function waitForLoader(t: TExecutionContext) {
-  await (await t.context.app.client.$('.main-loading')).waitForExist({
-    timeout: 20000,
-    reverse: true,
-  });
+export function getContext(): TExecutionContext {
+  return testContext;
 }
 
 interface ITestRunnerOptions {
   skipOnboarding?: boolean;
   restartAppAfterEachTest?: boolean;
+  clearCollectionAfterEachTest?: boolean;
   pauseIfFailed?: boolean;
   appArgs?: string;
+  implicitTimeout?: number;
 
   /**
    * disable synchronisation of scene-collections and media-backup
@@ -115,9 +77,11 @@ interface ITestRunnerOptions {
 const DEFAULT_OPTIONS: ITestRunnerOptions = {
   skipOnboarding: true,
   restartAppAfterEachTest: true,
+  clearCollectionAfterEachTest: false,
   noSync: true,
   networkLogging: false,
   pauseIfFailed: false,
+  implicitTimeout: 0,
 };
 
 export interface ITestContext {
@@ -176,6 +140,7 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
     const appArgs = options.appArgs ? options.appArgs.split(' ') : [];
     if (options.networkLogging) appArgs.push('--network-logging');
     if (options.noSync) appArgs.push('--nosync');
+
     app = t.context.app = new Application({
       path: path.join(__dirname, '..', '..', '..', '..', 'node_modules', '.bin', 'electron.cmd'),
       args: [
@@ -200,61 +165,35 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
     const disableTransitionsCode = `
       const disableAnimationsEl = document.createElement('style');
       disableAnimationsEl.textContent =
-        '*{ transition: none !important; transition-property: none !important; animation: none !important }';
+        '*{ transition: none !important; transition-property: none !important; animation-duration: 0 !important }';
       document.head.appendChild(disableAnimationsEl);
       0; // Prevent returning a value that cannot be serialized
     `;
-    await focusMain(t);
+    await focusMain();
     await t.context.app.webContents.executeJavaScript(disableTransitionsCode);
+    await focusMain();
 
-    // allow usage of fetch-mock library
-    await installFetchMock(t);
-    await focusMain(t);
-
-    // Wait up to 2 seconds before giving up looking for an element.
+    // Wait up to N seconds before giving up looking for an element.
     // This will slightly slow down negative assertions, but makes
     // the tests much more stable, especially on slow systems.
-    await t.context.app.client.setTimeout({ implicit: 2000 });
+    await t.context.app.client.setTimeout({ implicit: options.implicitTimeout });
 
     // Pretty much all tests except for onboarding-specific
     // tests will want to skip this flow, so we do it automatically.
-    await waitForLoader(t);
+    await waitForLoader();
 
-    const $skip = await t.context.app.client.$('span=Skip');
-
-    if (await $skip.isExisting()) {
-      if (options.skipOnboarding) {
-        await $skip.click();
-
-        const $chooseStarter = await t.context.app.client.$('div=Choose Starter');
-
-        if (await $chooseStarter.isDisplayed()) {
-          await $chooseStarter.click();
-        }
-
-        await (await t.context.app.client.$('h2=Start Fresh')).click();
-        await (await t.context.app.client.$('button=Skip')).click();
-        await (await t.context.app.client.$('button=Skip')).click();
-      } else {
-        // Wait for the connect screen before moving on
-        await (await t.context.app.client.$('button=Twitch')).isExisting();
-      }
-    }
+    if (options.skipOnboarding) await skipOnboarding();
 
     // disable the popups that prevents context menu to be shown
-    const client = await getClient();
+    const client = await getApiClient();
     const dismissablesService = client.getResource<DismissablesService>('DismissablesService');
     dismissablesService.dismissAll();
 
     // disable animations in the child window
-    await focusChild(t);
+    await focusChild();
     await t.context.app.webContents.executeJavaScript(disableTransitionsCode);
-    await focusMain(t);
+    await focusMain();
     appIsRunning = true;
-
-    for (const callback of afterStartCallbacks) {
-      await callback(t);
-    }
 
     return app;
   };
@@ -262,7 +201,7 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
   stopAppFn = async function stopApp(t: TExecutionContext, clearCache = true) {
     try {
       await app.stop();
-    } catch (e) {
+    } catch (e: unknown) {
       fail('Crash on shutdown');
       console.error(e);
     }
@@ -317,11 +256,15 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
     skipCheckingErrorsInLogFlag = false;
 
     t.context.app = app;
+    setContext(t);
     if (options.restartAppAfterEachTest || !appIsRunning) {
       await startAppFn(t);
     } else {
       // Set the cache dir to what it previously was, since we are re-using it
       t.context.cacheDir = lastCacheDir;
+    }
+    for (const callback of afterStartCallbacks) {
+      await callback(t);
     }
     testStartTime = Date.now();
   });
@@ -340,16 +283,17 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
     // wrap in try/catch for the situation when we have a crash
     // so we still can read the logs after the crash
     try {
+      if (appIsRunning && options.clearCollectionAfterEachTest) await clearCollections();
       await logOut(t, true);
       if (options.restartAppAfterEachTest) {
         if (appIsRunning) {
-          const client = await getClient();
+          const client = await getApiClient();
           await client.unsubscribeAll();
           client.disconnect();
           await stopAppFn(t);
         }
       }
-    } catch (e) {
+    } catch (e: unknown) {
       fail('Test finalization failed');
       console.error(e);
     }
@@ -393,18 +337,5 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
   function getSyncIPCCalls() {
     return lastLogs.split('\n').filter(line => line.match('Calling synchronous service method'))
       .length;
-  }
-}
-
-// the built-in 'click' method doesn't show selector in the error message
-// wrap this method to achieve this functionality
-
-export async function click(t: TExecutionContext, selector: string) {
-  try {
-    return await (await t.context.app.client.$(selector)).click();
-  } catch (e) {
-    const windowId = String(activeWindow);
-    const message = `click to "${selector}" failed in window ${windowId}: ${e.message} ${e.type}`;
-    throw new Error(message);
   }
 }

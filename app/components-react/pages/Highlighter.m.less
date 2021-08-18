@@ -1,0 +1,45 @@
+@import "../../styles/index";
+
+.clip-loader {
+  width: 400px;
+  font-size: 16px;
+  margin: auto;
+}
+
+.clips-view-root {
+  position: relative;
+
+  :global(.ant-modal-wrap), :global(.ant-modal-mask) {
+    position: absolute;
+  }
+
+  :global(.os-content-glue) {
+    width: 100% !important;
+    height: 100% !important;
+  }
+}
+
+.add-clip {
+  display: inline-block;
+  vertical-align: middle;
+  border-width: 2px;
+  border-color: var(--teal);
+  border-style: dashed;
+  border-radius: 10px;
+  background-color: var(--teal-semi);
+  color: var(--teal);
+  opacity: 0.8;
+  cursor: pointer;
+
+  &:hover {
+    opacity: 1.0;
+  }
+}
+
+.clip-action {
+  cursor: pointer;
+
+  &:hover {
+    color: var(--title);
+  }
+}

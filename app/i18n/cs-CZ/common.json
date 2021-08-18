@@ -11,6 +11,7 @@
   "Settings": "Nastavení",
   "That name is already taken": "Tento název se již používá",
   "Search": "Hledat",
+  "Searching...": "Searching...",
   "Create New": "Vytvořit nový",
   "Language": "Jazyk",
   "Name is required": "Je vyžadován název",
@@ -129,5 +130,6 @@
   "Height": "Výška",
   "Use Custom": "Use Custom",
   "Apply": "Apply",
-  "Do not show this message again": "Do not show this message again"
+  "Do not show this message again": "Do not show this message again",
+  "You can only select up to %{max} items": "You can only select up to %{max} items"
 }

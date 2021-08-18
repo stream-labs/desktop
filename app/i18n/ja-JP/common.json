@@ -11,6 +11,7 @@
   "Settings": "設定",
   "That name is already taken": "その名前は既に使用されています",
   "Search": "検索",
+  "Searching...": "Searching...",
   "Create New": "新規作成",
   "Language": "言語",
   "Name is required": "名前は必須です",
@@ -129,5 +130,6 @@
   "Height": "高さ",
   "Use Custom": "Use Custom",
   "Apply": "Apply",
-  "Do not show this message again": "Do not show this message again"
+  "Do not show this message again": "Do not show this message again",
+  "You can only select up to %{max} items": "You can only select up to %{max} items"
 }

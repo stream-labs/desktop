@@ -25,16 +25,21 @@
   flex-shrink: 0;
   font-size: 16px;
 
-  i {
+  i, svg {
     margin: auto;
+  }
+
+  svg {
+    fill: var(--paragraph);
   }
 
   &:hover {
     cursor: pointer;
 
-    i {
-      transition: all 0.2s;
+    i, svg {
+      transition: transform 0.2s;
       color: var(--title);
+      fill: var(--title);
       transform: scale(1.2, 1.2);
     }
   }
@@ -78,10 +83,16 @@
 .main-cell {
   .cell;
 
+  svg {
+    width: 16px;
+    height: 16px;
+  }
+
   &.active {
-    i {
+    i, svg {
       transform: scale(1.2, 1.2);
       color: var(--teal);
+      fill: var(--teal);
     }
   }
 

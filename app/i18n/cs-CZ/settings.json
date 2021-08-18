@@ -25,6 +25,7 @@
   "Configure Default Devices": "Konfigurovat výchozí zařízení",
   "OBS Import": "Import OBS",
   "Confirm stream title and game before going live": "Před spuštěním živého vysílání potvrďte název streamu a vaši hru",
+  "Enable reporting additional information on a crash (requires restart)": "Enable reporting additional information on a crash (requires restart)",
   "WARNING! You will lose all scenes, sources, and settings. This cannot be undone!": "VAROVÁNÍ! Ztratíte všechny scény, zdroje a nastavení. Tuto akci nelze vrátit zpět!",
   "Your cache directory has been successfully uploaded.  The file name %{file} has been copied to your clipboard.": "Váš adresář mezipaměti byl úspěšně odeslán. Soubor %{file} byl zkopírován do schránky.",
   "Stream Labels session has been successfully restarted!": "Stream Labels session has been successfully restarted!",
@@ -138,5 +139,6 @@
   "Virtual Webcam allows you to display your scenes from Streamlabs OBS in video conferencing software. Streamlabs OBS will appear as a Webcam that can be selected in most video conferencing apps.": "Virtual Webcam allows you to display your scenes from Streamlabs OBS in video conferencing software. Streamlabs OBS will appear as a Webcam that can be selected in most video conferencing apps.",
   "Uninstalling Virtual Webcam will remove it as a device option in other applications.": "Uninstalling Virtual Webcam will remove it as a device option in other applications.",
   "Uninstall Virtual Webcam": "Uninstall Virtual Webcam",
-  "Use custom resolution": "Use custom resolution"
+  "Use custom resolution": "Use custom resolution",
+  "Enable Designer Mode": "Enable Designer Mode"
 }

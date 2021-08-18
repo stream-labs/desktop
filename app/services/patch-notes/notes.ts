@@ -1,14 +1,15 @@
 import { IPatchNotes } from '.';
 
 export const notes: IPatchNotes = {
-  version: '1.0.0',
-  title: "It's About Time",
+  version: '1.3.0',
+  title: 'Grow Tab',
   showChest: false,
   notes: [
-    'Improve stability of many VST plugins',
-    'Fixed a bug when editing Slide Show file paths',
-    'Fixed a bug where platform specific streamlabels could break',
-    'Fixed issue where language names were being incorrectly translated to English',
+    'Added Grow tab to help new users in their journey through streaming',
+    'Integrated the Track Matte Stinger and new Display Capture API',
+    'Added option to use Twitch or Streamlabs URL in stream tweets',
+    'Fixed bug related to FFZ and BTTV emotes not appearing in the Game Overlay',
+    'Fixed various Alert Box variation conditions',
     'Minor bugfixes and stability improvements',
   ],
 };

@@ -9,7 +9,7 @@ import { Button } from 'antd';
 import { ModalProps } from 'antd/lib/modal';
 
 // use props of Modal from the antd lib
-type TProps = { children: ReactNode; fixedChild?: ReactNode } & Pick<
+type TProps = { children: ReactNode; fixedChild?: ReactNode; hideFooter?: boolean } & Pick<
   ModalProps,
   'footer' | 'onOk' | 'okText'
 >;
@@ -43,7 +43,7 @@ export function ModalLayout(p: TProps) {
   const { WindowsService, CustomizationService } = Services;
 
   // define a vuex state
-  const v = useVuex(() => ({ currentTheme: CustomizationService.currentTheme }));
+  const v = useVuex(() => ({ currentTheme: CustomizationService.currentTheme }), false);
 
   // define a close method for the modal
   function close() {
@@ -73,7 +73,7 @@ export function ModalLayout(p: TProps) {
       <div className="ant-modal-body" style={bodyStyles}>
         {p.children}
       </div>
-      <div className="ant-modal-footer">{p.footer || <DefaultFooter />}</div>
+      {!p.hideFooter && <div className="ant-modal-footer">{p.footer || <DefaultFooter />}</div>}
     </div>
   );
 }

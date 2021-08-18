@@ -14,6 +14,7 @@ class PlatformMergeProps {
     platform?: TPlatform;
     overlayUrl?: string;
     overlayName?: string;
+    highlighter?: boolean;
   } = {};
 }
 
@@ -46,6 +47,12 @@ export default class PlatformMerge extends TsxComponent<PlatformMergeProps> {
   private async mergePlatform(platform: TPlatform) {
     const mode = platform === 'youtube' ? 'external' : 'internal';
     await this.userService.startAuth(platform, mode, true);
+
+    if (this.props.params.highlighter) {
+      this.navigationService.navigate('Highlighter');
+      return;
+    }
+
     this.streamSettingsService.setSettings({ protectedModeEnabled: true });
 
     if (this.props.params.overlayUrl) {

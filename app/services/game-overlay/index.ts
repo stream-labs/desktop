@@ -1,8 +1,9 @@
 import electron, { ipcRenderer } from 'electron';
 import { Subscription } from 'rxjs';
 import { Inject, InitAfter } from 'services/core';
-import { LoginLifecycle, UserService } from 'services/user';
+import { UserService } from 'services/user';
 import { CustomizationService } from 'services/customization';
+import { enableBTTVEmotesScript } from 'services/chat';
 import { WindowsService } from '../windows';
 import { PersistentStatefulService } from 'services/core/persistent-stateful-service';
 import { mutation } from 'services/core/stateful-service';
@@ -381,6 +382,10 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
       this.overlay.setVisibility(overlayId, this.state.windowProperties[key].enabled);
 
       win.webContents.executeJavaScript(hideInteraction);
+      win.webContents.executeJavaScript(
+        enableBTTVEmotesScript(this.customizationService.isDarkTheme),
+        true,
+      );
 
       // We bind the paint callback in the main process to avoid a memory
       // leak in electron. This can be moved back to the renderer process

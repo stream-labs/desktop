@@ -31,6 +31,8 @@
   "Additional Settings": "Additional Settings",
   "Open Youtube Studio": "Open Youtube Studio",
   "360° video": "360° video",
+  "Enable Auto-start": "Enable Auto-start",
+  "Enable Auto-stop": "Enable Auto-stop",
   "latencyTooltip": "A low-latency stream can reduce the amount of time it takes for video to be visible to users watching a broadcast, though it can also affect the smoothness of playback.",
   "Enabling auto-start will automatically start the stream when you start sending data from your streaming software": "Enabling auto-start will automatically start the stream when you start sending data from your streaming software",
   "Enabling auto-stop will automatically stop the stream when you stop sending data from your streaming software": "Enabling auto-stop will automatically stop the stream when you stop sending data from your streaming software",

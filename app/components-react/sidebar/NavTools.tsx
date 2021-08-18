@@ -20,11 +20,14 @@ export default function SideNav() {
 
   const isDevMode = Utils.isDevMode();
 
-  const v = useVuex(() => ({
-    studioMode: TransitionsService.views.studioMode,
-    isLoggedIn: UserService.views.isLoggedIn,
-    isPrime: UserService.views.isPrime,
-  }));
+  const v = useVuex(
+    () => ({
+      studioMode: TransitionsService.views.studioMode,
+      isLoggedIn: UserService.views.isLoggedIn,
+      isPrime: UserService.views.isPrime,
+    }),
+    false,
+  );
 
   const [s, setState] = useState({ dashboardOpening: false });
 

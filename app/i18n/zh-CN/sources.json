@@ -44,7 +44,6 @@
   "Follower Goal": "关注者目标",
   "Twitch Follows": "Twitch 关注",
   "YouTube Follows": "YouTube 关注",
-  "Mixer Follows": "Mixer 关注",
   "Bit Goal": "Bit 目标",
   "Twitch Bits": "Twitch Bits",
   "Subscription Goal": "订阅目标",
@@ -145,7 +144,6 @@
   "Cloud Backup: All media and sources are backed up in the cloud": "云备份：所有媒体和源都备份在云中",
   "Cloud Backup: Your media and sources are being synced with the cloud": "云备份：您的媒体和源正在与云同步",
   "The streamer manually adds images of sponsors.": "主播手动添加赞助商图片。",
-  "Mixer chat": "Mixer 聊天",
   "Edit Transform": "编辑转换",
   "There are no existing sources of this type.": "没有此类型的现有源。",
   "Instant Replay": "即时重播",
@@ -185,5 +183,8 @@
   "JACK Input Client": "JACK 输入客户端",
   "Motion": "Motion",
   "Twitch Soundtrack": "Twitch Soundtrack",
-  "Audio source working with the Twitch Soundtrack music application. Add this source to be able to filter out the music from your Twitch VODs.": "Audio source working with the Twitch Soundtrack music application. Add this source to be able to filter out the music from your Twitch VODs."
+  "Audio source working with the Twitch Soundtrack music application. Add this source to be able to filter out the music from your Twitch VODs.": "Audio source working with the Twitch Soundtrack music application. Add this source to be able to filter out the music from your Twitch VODs.",
+  "Custom Icon": "Custom Icon",
+  "Displays an icon from one of many selections": "Displays an icon from one of many selections",
+  "An error has occured, please try re-opening this window": "An error has occured, please try re-opening this window"
 }

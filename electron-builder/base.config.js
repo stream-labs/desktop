@@ -36,6 +36,10 @@ const base = {
   },
   win: {
     extraFiles: ['LICENSE', 'AGREEMENT', 'shared-resources/**/*', '!shared-resources/README'],
+    extraResources: [
+      'node_modules/ffmpeg-ffprobe-static/ffmpeg.exe',
+      'node_modules/ffmpeg-ffprobe-static/ffprobe.exe',
+    ],
     rfc3161TimeStampServer: 'http://timestamp.digicert.com',
     timeStampServer: 'http://timestamp.digicert.com',
     async sign(config) {
@@ -60,7 +64,24 @@ const base = {
     },
   },
   mac: {
-    extraFiles: ['shared-resources/**/*', '!shared-resources/README'],
+    extraFiles: [
+      'shared-resources/**/*',
+      '!shared-resources/README',
+      // {
+      //   "from": "node_modulesdwadawd/obs-studio-node/Frameworks/*",
+      //   "to": "Frameworks/",
+      //   "filter": ["**/*"]
+      // },
+      // {
+      //   "from": "node_modules/obs-studio-node/Frameworks/*",
+      //   "to": "Resources/app.asar.unpacked/node_modules/",
+      //   "filter": ["**/*"]
+      // }
+    ],
+    extraResources: [
+      'node_modules/ffmpeg-ffprobe-static/ffmpeg',
+      'node_modules/ffmpeg-ffprobe-static/ffprobe',
+    ],
     icon: 'media/images/icon-mac.icns',
     hardenedRuntime: true,
     entitlements: 'electron-builder/entitlements.plist',

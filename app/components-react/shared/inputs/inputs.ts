@@ -10,18 +10,21 @@ import { CheckboxChangeEvent } from 'antd/lib/checkbox';
 import { $t } from '../../../services/i18n';
 import pick from 'lodash/pick';
 import isEqual from 'lodash/isEqual';
+import * as InputComponents from './index';
 
 type TInputType =
   | 'text'
   | 'textarea'
+  | 'number'
   | 'toggle'
   | 'checkbox'
   | 'list'
   | 'tags'
   | 'switch'
+  | 'date'
   | 'slider'
   | 'image'
-  | 'date';
+  | 'time';
 
 export type TInputLayout = 'horizontal' | 'vertical' | 'inline';
 
@@ -84,9 +87,7 @@ type TCreateSlobsInputProps<
   TAntProps,
   TFeatures extends keyof Partial<TAntProps> = never,
   // generate helper props:
-  TGeneratedProps = Pick<TAntProps, TFeatures> &
-    FormItemProps &
-    IInputCommonProps<TValue> & { inputRef?: React.Ref<HTMLInputElement> }
+  TGeneratedProps = Pick<TAntProps, TFeatures> & FormItemProps & IInputCommonProps<TValue>
 > = Omit<TGeneratedProps, keyof TCustomProps> & TCustomProps; // join generated props with custom props
 
 /**
@@ -99,6 +100,11 @@ export function useInput<
   TValue = TInputProps['value']
 >(type: TInputType, inputProps: TInputProps, antFeatures?: readonly string[]) {
   const { name, value, label } = inputProps;
+
+  // save input props to Ref
+  // so it will always be updated in `useCallback` calls
+  const inputPropsRef = useRef(inputProps);
+  inputPropsRef.current = inputProps;
 
   const uncontrolled = (() => {
     // inputs with debounce are always uncontrolled
@@ -141,7 +147,16 @@ export function useInput<
 
     // if the input is inside the form
     // then we need to setup it's value via Form API
-    if (form && value !== emptyVal) form.setFieldsValue({ [inputId]: value });
+    if (form && value !== emptyVal) {
+      // get the component class
+      const Component = getInputComponentByType(type);
+      // antd components may have another format than SLOBS wrapper components
+      // for example TimerInput requires dates to be in the Moment format
+      // meanwhile SLOBS services works with timestamps only
+      // call `Component.getAntdValue()` to make a conversion for this case
+      const newVal = Component.getAntdValue ? Component.getAntdValue(value) : value;
+      form.setFieldsValue({ [inputId]: newVal });
+    }
   }, [value]);
 
   const forceUpdate = useForceUpdate();
@@ -149,7 +164,7 @@ export function useInput<
   // create an `emitChange()` method and it's debounced version
   function emitChange(newVal: TValue) {
     if (uncontrolled) prevValueRef.current = newVal;
-    inputProps.onChange && inputProps.onChange(newVal);
+    inputPropsRef.current.onChange && inputPropsRef.current.onChange(newVal);
   }
   const emitChangeDebounced = useDebounce(inputProps.debounce, emitChange);
 
@@ -157,6 +172,7 @@ export function useInput<
   const onChange = useCallback((newVal: TValue) => {
     // if nothing changed then just ignore
     if (isEqual(newVal, localValueRef.current)) return;
+    const props = inputPropsRef.current;
 
     // call forceUpdate if component is uncontrolled
     // controlled components should be updated automatically via props changing
@@ -165,9 +181,9 @@ export function useInput<
       forceUpdate();
     }
 
-    inputProps.onInput && inputProps.onInput(newVal);
-    if (!inputProps.onChange) return;
-    if (inputProps.debounce) {
+    props.onInput && props.onInput(newVal);
+    if (!props.onChange) return;
+    if (props.debounce) {
       emitChangeDebounced(newVal);
     } else {
       emitChange(newVal);
@@ -199,6 +215,7 @@ export function useInput<
       'disabled',
       'nowrap',
       'layout',
+      'rules',
       'tooltip',
     ]),
     rules,
@@ -217,7 +234,6 @@ export function useInput<
     'data-role': 'input',
     name: inputId,
     value: localValueRef.current,
-    ref: inputProps.inputRef as any,
     onChange,
   };
 
@@ -235,7 +251,7 @@ export function useInput<
 }
 
 /**
- * Hook for text fields: input, textarea, password, number
+ * Hook for text fields: text, textarea, password, number
  */
 export function useTextInput<
   TProps extends TSlobsInputProps<
@@ -243,11 +259,11 @@ export function useTextInput<
     TValue
   >,
   TValue extends string | number = string
->(p: TProps, antFeatures?: Parameters<typeof useInput>[2]) {
+>(type: 'text' | 'textarea' | 'number', p: TProps, antFeatures?: Parameters<typeof useInput>[2]) {
   // Text inputs are uncontrolled by default for better performance
   const uncontrolled = p.uncontrolled === true || p.uncontrolled !== false;
   const { inputAttrs, wrapperAttrs, forceUpdate, setLocalValue, emitChange } = useInput(
-    'text',
+    type,
     { uncontrolled, ...p },
     antFeatures,
   );
@@ -307,6 +323,10 @@ export function useTextInput<
  *   </form>
  *  }
  * </pre>
+ *
+ * @param stateGetter an object or function to read the field value from
+ * @param stateSetter a function that changes the field given field
+ * @param extraPropsGenerator a function that returns extra attributes for the input element (like disabled, placeholder,...)
  */
 export function createBinding<
   TState extends object,
@@ -328,9 +348,6 @@ export function createBinding<
     _binding: {
       id: `binding__${uuid()}`,
       dependencies: {} as Record<string, unknown>,
-      clone() {
-        return createBinding(stateGetter, stateSetter);
-      },
     },
   };
 
@@ -338,6 +355,8 @@ export function createBinding<
     get(t, fieldName: string) {
       if (fieldName in metadata) return metadata[fieldName];
       const fieldValue = getState()[fieldName];
+      // register the fieldName in the dependencies list
+      // that helps keep this binding up to date when use it inside ReduxModules
       metadata._binding.dependencies[fieldName] = fieldValue;
       const extraProps = extraPropsGenerator ? extraPropsGenerator(fieldName as keyof TState) : {};
       return {
@@ -345,6 +364,7 @@ export function createBinding<
         value: fieldValue,
         onChange(newVal: unknown) {
           const state = getState();
+          // if the state object has a defined setter than use the local setter
           if (Object.getOwnPropertyDescriptor(state, fieldName)?.set) {
             state[fieldName] = newVal;
           } else {
@@ -358,9 +378,9 @@ export function createBinding<
 }
 
 export type TBindings<
-  TState extends object,
+  TState extends Object,
   TFieldName extends keyof TState,
-  TExtraProps extends object = {}
+  TExtraProps extends Object = {}
 > = {
   [K in TFieldName]: {
     name: K;
@@ -395,7 +415,6 @@ function createValidationRules(type: TInputType, inputProps: IInputCommonProps<u
 
 /**
  * Function for creating new input components
- * For performance optimization ignores changing of all function props like onChange and onInput
  * Use the deep comparison algorithm for the `value` prop
  */
 export function InputComponent<T extends Function>(f: T): T {
@@ -403,9 +422,6 @@ export function InputComponent<T extends Function>(f: T): T {
     const keys = Object.keys(newProps);
     if (keys.length !== Object.keys(prevProps).length) return false;
     for (const key of keys) {
-      // skip functions comparison
-      if (typeof newProps[key] === 'function') continue;
-
       // use deep comparison for the `value` prop
       // because it could have an array type (For example TagsInput.value)
       if (key === 'value' && !isEqual(newProps[key], prevProps[key])) return false;
@@ -415,4 +431,13 @@ export function InputComponent<T extends Function>(f: T): T {
     }
     return true;
   }) as any) as T;
+}
+
+export function getInputComponentByType(
+  type: TInputType,
+): JSX.Element & { getAntdValue?: (value: unknown) => unknown } {
+  const name = Object.keys(InputComponents).find(componentName => {
+    return componentName.split('Input')[0].toLowerCase() === type;
+  });
+  return name ? InputComponents[name] : null;
 }

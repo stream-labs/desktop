@@ -329,7 +329,7 @@
         :metadata="metadata.minRecentEvents"
         v-if="['donations', 'hosts'].includes(selectedAlert)"
       />
-      <div v-if="selectedId !== 'default'">
+      <div v-if="!selectedId.includes('default')">
         <v-form-group v-model="selectedVariation.condition" :metadata="metadata.conditions" />
         <v-form-group v-model="selectedVariation.conditionData" :metadata="metadata.variations" />
       </div>

@@ -8,6 +8,9 @@ import TsxComponent from 'components/tsx-component';
 import { OS } from 'util/operating-systems';
 import { $t } from './i18n';
 import { handleResponse } from 'util/requests';
+import { getPlatformService, IPlatformCapabilityResolutionPreset } from './platforms';
+import { OutputSettingsService } from './settings';
+import { ObsImporterService } from './obs-importer';
 
 enum EOnboardingSteps {
   MacPermissions = 'MacPermissions',
@@ -135,6 +138,7 @@ class OnboardingViews extends ViewHandler<IOnboardingServiceState> {
   get steps() {
     const steps: IOnboardingStep[] = [];
     const userViews = this.getServiceViews(UserService);
+    const isOBSinstalled = this.getServiceViews(ObsImporterService).isOBSinstalled();
 
     if (process.platform === OS.Mac) {
       steps.push(ONBOARDING_STEPS()[EOnboardingSteps.MacPermissions]);
@@ -146,15 +150,23 @@ class OnboardingViews extends ViewHandler<IOnboardingServiceState> {
       steps.push(ONBOARDING_STEPS()[EOnboardingSteps.Prime]);
     }
 
-    steps.push(ONBOARDING_STEPS()[EOnboardingSteps.ChooseYourAdventure]);
+    if (isOBSinstalled) {
+      steps.push(ONBOARDING_STEPS()[EOnboardingSteps.ChooseYourAdventure]);
+    }
 
-    if (this.state.importedFromObs) {
+    if (this.state.importedFromObs && isOBSinstalled) {
       steps.push(ONBOARDING_STEPS()[EOnboardingSteps.ObsImport]);
     } else {
       steps.push(ONBOARDING_STEPS()[EOnboardingSteps.HardwareSetup]);
     }
 
-    if (!this.state.existingSceneCollections && !this.state.importedFromObs) {
+    if (
+      !this.state.existingSceneCollections &&
+      !this.state.importedFromObs &&
+      ((userViews.isLoggedIn &&
+        getPlatformService(userViews.platform.type).hasCapability('themes')) ||
+        !userViews.isLoggedIn)
+    ) {
       steps.push(ONBOARDING_STEPS()[EOnboardingSteps.ThemeSelector]);
     }
 
@@ -185,6 +197,7 @@ export class OnboardingService extends StatefulService<IOnboardingServiceState> 
   @Inject() navigationService: NavigationService;
   @Inject() userService: UserService;
   @Inject() sceneCollectionsService: SceneCollectionsService;
+  @Inject() outputSettingsService: OutputSettingsService;
 
   @mutation()
   SET_OPTIONS(options: Partial<IOnboardingOptions>) {
@@ -257,6 +270,18 @@ export class OnboardingService extends StatefulService<IOnboardingServiceState> 
   // Ends the onboarding process
   finish() {
     localStorage.setItem(this.localStorageKey, 'true');
+
+    // setup a custom resolution if the platform requires that
+    const platformService = getPlatformService(this.userService.views.platform?.type);
+    if (platformService && platformService.hasCapability('resolutionPreset')) {
+      const { inputResolution, outputResolution } = platformService;
+      this.outputSettingsService.setSettings({
+        mode: 'Advanced',
+        inputResolution,
+        streaming: { outputResolution },
+      });
+    }
+
     this.navigationService.navigate('Studio');
   }
 

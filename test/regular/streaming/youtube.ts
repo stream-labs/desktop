@@ -1,91 +1,62 @@
-import { focusChild, skipCheckingErrorsInLog, test, useSpectron } from '../../helpers/spectron';
-import { logIn } from '../../helpers/spectron/user';
+import { logIn } from '../../helpers/modules/user';
+import { skipCheckingErrorsInLog, test, useSpectron } from '../../helpers/spectron';
 import {
   chatIsVisible,
   clickGoLive,
   goLive,
   prepareToGoLive,
-  scheduleStream,
   stopStream,
-  submit,
-  waitForStreamStart,
-} from '../../helpers/spectron/streaming';
-import { FormMonkey, selectTitle } from '../../helpers/form-monkey';
-import moment = require('moment');
-import { sleep } from '../../helpers/sleep';
+} from '../../helpers/modules/streaming';
+
+import { focusChild, isDisplayed, waitForDisplayed } from '../../helpers/modules/core';
 
 useSpectron();
 
 test('Streaming to Youtube', async t => {
-  await logIn(t, 'youtube');
+  await logIn('youtube', { multistream: false });
+  t.false(await chatIsVisible(), 'Chat should not be visible for YT before stream starts');
 
-  t.false(await chatIsVisible(t), 'Chat is not visible for YT before stream starts');
-
-  await goLive(t, {
+  await goLive({
     title: 'SLOBS Test Stream',
     description: 'SLOBS Test Stream Description',
   });
 
-  t.true(await chatIsVisible(t), 'Chat should be visible');
-  await stopStream(t);
+  t.true(await chatIsVisible(), 'Chat should be visible');
+  await stopStream();
 });
 
-test('Streaming to the scheduled event on Youtube', async t => {
-  await logIn(t, 'youtube', { multistream: false });
-
-  // create event via scheduling form
-  const tomorrow = Date.now() + 1000 * 60 * 60 * 24;
-  const formattedTomorrow = moment(tomorrow).format(moment.localeData().longDateFormat('ll'));
-  await scheduleStream(t, tomorrow, {
-    title: 'Youtube Test Stream',
-    description: 'SLOBS Test Stream Description',
-  });
-
-  // select event and go live
-  await prepareToGoLive(t);
-  await clickGoLive(t);
-  const form = new FormMonkey(t);
-  await form.fill({
-    event: await form.getOptionByTitle('event', `Youtube Test Stream (${formattedTomorrow})`),
-  });
-  await submit(t);
-  await waitForStreamStart(t);
-  await stopStream(t);
-  t.pass();
-});
+// TODO
+test.skip('Streaming to the scheduled event on Youtube', async t => {});
 
 test('Start stream twice to the same YT event', async t => {
-  await logIn(t, 'youtube', { multistream: false });
+  await logIn('youtube', { multistream: false });
 
   // create event via scheduling form
   const now = Date.now();
-  await goLive(t, {
+  await goLive({
     title: `Youtube Test Stream ${now}`,
     description: 'SLOBS Test Stream Description',
     enableAutoStop: false,
   });
-  await stopStream(t);
+  await stopStream();
 
-  await goLive(t, {
-    event: selectTitle(`Youtube Test Stream ${now}`),
+  await goLive({
+    broadcastId: `Youtube Test Stream ${now}`,
     enableAutoStop: true,
   });
-  await stopStream(t);
+  await stopStream();
   t.pass();
 });
 
 test('Youtube streaming is disabled', async t => {
   skipCheckingErrorsInLog();
-  const client = t.context.app.client;
-  await logIn(t, 'youtube', { streamingIsDisabled: true, notStreamable: true });
+  await logIn('youtube', { streamingIsDisabled: true, notStreamable: true });
   t.true(
-    await (await client.$('span=YouTube account not enabled for live streaming')).isExisting(),
+    await isDisplayed('span=YouTube account not enabled for live streaming'),
     'The streaming-disabled message should be visible',
   );
-  await prepareToGoLive(t);
-  await clickGoLive(t);
-  t.true(
-    await (await client.$('button=Enable Live Streaming')).isDisplayed(),
-    'The enable livestreaming button should be visible',
-  );
+  await prepareToGoLive();
+  await clickGoLive();
+  await focusChild();
+  await waitForDisplayed('button=Enable Live Streaming');
 });

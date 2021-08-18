@@ -4,7 +4,7 @@ import { $t } from 'services/i18n';
 import { Services } from '../../components-react/service-provider';
 import { platform } from 'os';
 
-const errorTypes = {
+export const errorTypes = {
   PLATFORM_REQUEST_FAILED: {
     get message() {
       return $t('The request to the platform failed');

@@ -238,13 +238,13 @@ export class TouchBarService extends Service {
 
     this.perfPopover = new TB.TouchBarPopover({ items: this.perfBar, icon: goodIcon });
 
-    let status = this.performanceService.streamQuality;
+    let status = this.performanceService.views.streamQuality;
 
     setInterval(() => {
-      if (status !== this.performanceService.streamQuality) {
+      if (status !== this.performanceService.views.streamQuality) {
         // Update this as infrequently as possible, as electron is changing references underneath
         // and our stats stop updating until the popover is re-opened.
-        status = this.performanceService.streamQuality;
+        status = this.performanceService.views.streamQuality;
 
         if (status === EStreamQuality.POOR) {
           this.perfPopover.icon = poorIcon;
@@ -257,8 +257,12 @@ export class TouchBarService extends Service {
 
       this.cpuLabel.label = `CPU: ${this.performanceService.state.CPU.toFixed(1)}%`;
       this.fpsLabel.label = `FPS: ${this.performanceService.state.frameRate.toFixed(2)}`;
-      this.dfLabel.label = `Dropped Frames: ${this.performanceService.state.numberDroppedFrames}`;
-      this.brLabel.label = `Bitrate: ${this.performanceService.state.streamingBandwidth} kbps`;
+      this.dfLabel.label = `Dropped Frames: ${this.performanceService.state.numberDroppedFrames.toFixed(
+        0,
+      )}`;
+      this.brLabel.label = `Bitrate: ${this.performanceService.state.streamingBandwidth.toFixed(
+        0,
+      )} kbps`;
     }, 2000);
   }
 
