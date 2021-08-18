@@ -53,6 +53,19 @@ export class ChatHighlightService extends WidgetSettingsService<IChatHighlightDa
     };
   }
 
+  async pinMessage(messageData: IChatHighlightMessage) {
+    console.log(messageData);
+    // const headers = this.authorizedHeaders(this.getWidgetToken());
+    // headers.append('Content-Type', 'application/json');
+    // const url = `https://${this.getHost()}/api/v5/slobs/widget/chat-highlight/pin`;
+    // const request = new Request(url, {
+    //   headers,
+    //   method: 'POST',
+    //   body: JSON.stringify(messageData),
+    // });
+    // fetch(request);
+  }
+
   patchAfterFetch(data: IChatHighlightData) {
     data.settings.highlight_duration = data.settings.highlight_duration / 1000;
     return data;

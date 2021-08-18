@@ -1,19 +1,5 @@
-import { Services } from 'components-react/service-provider';
-import uuid from 'uuid/v4';
-import { authorizedHeaders } from '../../../util/requests';
-
 function sendPinRequest(messageData) {
-  const { UserService, HostsService } = Services;
-  const headers = authorizedHeaders(UserService.widgetToken);
-  headers.append('Content-Type', 'application/json');
-  const url = `https://${HostsService.streamlabs}/api/v5/slobs/widget/chat-highlight/pin`;
-  const request = new Request(url, {
-    headers,
-    method: 'POST',
-    body: JSON.stringify(messageData),
-  });
-
-  fetch(request);
+  // streamlabsOBS.pinMessage(messageData);
 }
 
 function extractProperties(el) {
@@ -29,7 +15,7 @@ function extractProperties(el) {
         color: userColor,
         'display-name': el.attributes['data-user'],
         emotes: '',
-        id: uuid(),
+        id: '',
         'user-type': '',
       },
       prefix: '',
@@ -62,6 +48,7 @@ function addHighlightButton(el) {
 function addExistingHighlightButtons() {
   const els = document.getElementsByClassName('chat-line__message');
   Array.prototype.forEach.call(els, addHighlightButton);
+  console.log(els);
 }
 
 function addNewHighlightButton(mutationsList) {
@@ -72,10 +59,10 @@ function addNewHighlightButton(mutationsList) {
   });
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-  addExistingHighlightButtons();
-  const targetNode = document.getElementsByClassName('chat-scrollable-area__message-container')[0];
+addExistingHighlightButtons();
+const targetNode = document.getElementsByClassName('chat-scrollable-area__message-container')[0];
+console.log(targetNode);
 
-  const observer = new MutationObserver(addNewHighlightButton);
-  observer.observe(targetNode, { childList: true });
-});
+const observer = new MutationObserver(addNewHighlightButton);
+observer.observe(targetNode, { childList: true });
+0;

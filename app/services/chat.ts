@@ -1,3 +1,4 @@
+import path from 'path';
 import { Service } from 'services/core/service';
 import { Inject } from 'services/core/injector';
 import { UserService } from 'services/user';
@@ -9,6 +10,8 @@ import { $t } from 'services/i18n';
 import { InitAfter } from './core';
 import Utils from './utils';
 import { StreamingService } from './streaming';
+import { GuestApiHandler } from 'util/guest-api-handler';
+import { ChatHighlightService } from './widgets/settings/chat-highlight';
 
 export function enableBTTVEmotesScript(isDarkTheme: boolean) {
   /*eslint-disable */
@@ -39,20 +42,13 @@ loadLazyEmotes();
   /*eslint-enable */
 }
 
-function addHighlightScript() {
-  return `
-    var chatHighlightScript = document.createElement('script');
-    chatHighlightScript.setAttribute('src', ${require('./widgets/settings/chat-highlight-script.js')});
-    document.head.appendChild(chatHighlightScript);
-  `;
-}
-
 @InitAfter('StreamingService')
 export class ChatService extends Service {
   @Inject() userService: UserService;
   @Inject() customizationService: CustomizationService;
   @Inject() windowsService: WindowsService;
   @Inject() streamingService: StreamingService;
+  @Inject() chatHighlightService: ChatHighlightService;
 
   private chatView: Electron.BrowserView | null;
   private chatUrl = '';
@@ -124,6 +120,9 @@ export class ChatService extends Service {
       webPreferences: {
         partition,
         nodeIntegration: false,
+        enableRemoteModule: true,
+        contextIsolation: true,
+        preload: path.resolve(electron.remote.app.getAppPath(), 'bundles', 'guest-api'),
       },
     });
 
@@ -230,6 +229,10 @@ export class ChatService extends Service {
 
     const settings = this.customizationService.state;
 
+    new GuestApiHandler().exposeApi(this.chatView.webContents.id, {
+      pinMessage: this.chatHighlightService.pinMessage,
+    });
+
     this.chatView.webContents.on('dom-ready', () => {
       if (!this.chatView) return; // chat was already deinitialized
 
@@ -254,7 +257,10 @@ export class ChatService extends Service {
         );
       }
 
-      this.chatView.webContents.executeJavaScript(addHighlightScript(), true);
+      this.chatView.webContents.executeJavaScript(
+        require('!!raw-loader!./widgets/settings/chat-highlight-script.js'),
+        true,
+      );
 
       // facebook chat doesn't fit our layout by default
       // inject a script that removes scrollbars and sets auto width for the chat
