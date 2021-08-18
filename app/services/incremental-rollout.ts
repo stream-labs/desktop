@@ -17,6 +17,7 @@ export enum EAvailableFeatures {
   tiktok = 'slobs--tiktok',
   highlighter = 'slobs--highlighter',
   growTab = 'slobs--grow-tab',
+  themeAudit = 'slobs--theme-audit',
 }
 
 interface IIncrementalRolloutServiceState {
