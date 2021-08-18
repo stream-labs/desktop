@@ -4,7 +4,6 @@
 // Set Up Environment Variables
 ////////////////////////////////////////////////////////////////////////////////
 const pjson = require('./package.json');
-
 if (pjson.env === 'production') {
   process.env.NODE_ENV = 'production';
 }
@@ -48,7 +47,7 @@ if (process.argv.includes('--clearCacheDir')) {
   rimraf.sync(rmPath);
 }
 
-// Window// This ensures that only one copy of our app can run at once.
+// This ensures that only one copy of our app can run at once.
 const gotTheLock = app.requestSingleInstanceLock();
 
 if (!gotTheLock) {
@@ -172,7 +171,7 @@ if (!gotTheLock) {
   }
 
   console.log('=================================');
-  console.log(`N Air `);
+  console.log(`N Air`);
   console.log(`Version: ${process.env.NAIR_VERSION}`);
   console.log(`OS: ${os.platform()} ${os.release()}`);
   console.log(`Arch: ${process.arch}`);
@@ -231,7 +230,7 @@ if (!gotTheLock) {
     crashHandler.startCrashHandler(app.getAppPath(), process.env.NAIR_VERSION, isDevMode.toString(), crashHandlerLogPath);
     crashHandler.registerProcess(pid, false);
 
-    const Raven = require('raven-js');
+    const Raven = require('raven');
 
     function handleFinishedReport() {
       dialog.showErrorBox(`予期せぬエラー`,
@@ -259,8 +258,8 @@ if (!gotTheLock) {
           `https://o170115.ingest.sentry.io/api/${params.project}/minidump/` +
           `?sentry_key=${params.key}`,
         extra: {
-          version: pjson.version,
-          processType: 'main'
+          'sentry[release]': pjson.version,
+          processType: 'main',
         }
       });
     }

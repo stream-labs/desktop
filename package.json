@@ -67,6 +67,8 @@
     ]
   },
   "dependencies": {
+    "@sentry/browser": "^6.11.0",
+    "@sentry/integrations": "^6.11.0",
     "archiver": "^3.0.0",
     "aws-sdk": "^2.344.0",
     "base64-js": "^1.3.0",
@@ -84,7 +86,7 @@
     "node-libuiohook": "https://github.com/stream-labs/node-libuiohook/releases/download/v0.0.14/iojs-v6.0.3-node-libuiohook.tar.gz",
     "obs-studio-node": "https://obsstudionodes3.streamlabs.com/obs-studio-node-0.6.36-iojs-v6.0.3-release.tar.gz",
     "progress": "^2.0.0",
-    "raven-js": "^3.20.1",
+    "raven": "2.6.4",
     "recursive-readdir": "^2.2.2",
     "reflect-metadata": "^0.1.13",
     "request": "^2.85.0",

@@ -13,9 +13,8 @@ import { WindowsService } from './services/windows';
 import { AppService } from './services/app';
 import Utils from './services/utils';
 import electron from 'electron';
-import Raven from 'raven-js';
-import RavenVue from 'raven-js/plugins/vue';
-import RavenConsole from 'raven-js/plugins/console';
+import * as Sentry from '@sentry/browser';
+import * as Integrations from '@sentry/integrations';
 import VTooltip from 'v-tooltip';
 import Toasted from 'vue-toasted';
 import VueI18n from 'vue-i18n';
@@ -107,9 +106,13 @@ window.addEventListener('unhandledrejection', e => {
 });
 
 if ((isProduction || process.env.NAIR_REPORT_TO_SENTRY) && !electron.remote.process.env.NAIR_IPC) {
-  Raven.config(getSentryDsn(sentryParam), {
+  const sentryDsn = getSentryDsn(sentryParam);
+  console.log(`Sentry DSN: ${sentryDsn}`);
+  Sentry.init({
+    dsn: sentryDsn,
     release: nAirVersion,
-    dataCallback: data => {
+    sampleRate: /* isPreview ? */ 1.0 /* : 0.1 */,
+    beforeSend: event => {
       // Because our URLs are local files and not publicly
       // accessible URLs, we simply truncate and send only
       // the filename.  Unfortunately sentry's electron support
@@ -120,20 +123,35 @@ if ((isProduction || process.env.NAIR_REPORT_TO_SENTRY) && !electron.remote.proc
         return splitArray[splitArray.length - 1];
       };
 
-      if (data.exception) {
-        data.exception.values[0].stacktrace.frames.forEach((frame: any) => {
-          frame.filename = 'app:///' + normalize(frame.filename);
+      if (event.exception && event.exception.values[0].stacktrace) {
+        event.exception.values[0].stacktrace.frames.forEach(frame => {
+          frame.filename = /* 'app:///' + */ normalize(frame.filename);
         });
-
-        data.culprit = data.exception.values[0].stacktrace.frames[0].filename;
       }
 
-      return data;
+      if (event.request) {
+        event.request.url = normalize(event.request.url);
+      }
+
+      return event;
     },
-  })
-    .addPlugin(RavenVue, Vue)
-    .addPlugin(RavenConsole, console, { levels: ['error'] })
-    .install();
+    integrations: [new Integrations.Vue({ Vue })],
+  });
+
+  const oldConsoleError = console.error;
+
+  console.error = (msg: string, ...params: any[]) => {
+    oldConsoleError(msg, ...params);
+
+    Sentry.withScope(scope => {
+      if (params[0] instanceof Error) {
+        scope.setExtra('exception', params[0].stack);
+      }
+
+      scope.setExtra('console-args', JSON.stringify(params, null, 2));
+      Sentry.captureMessage(msg, Sentry.Severity.Error);
+    });
+  };
 }
 
 require('./app.less');
