@@ -7,12 +7,10 @@ window['eval'] = global.eval = () => {
 
 import 'reflect-metadata';
 import Vue from 'vue';
-import URI from 'urijs';
 
 import { createStore } from './store';
-import { IWindowOptions, WindowsService } from './services/windows';
+import { WindowsService } from './services/windows';
 import { AppService } from './services/app';
-import { ServicesManager } from './services-manager';
 import Utils from './services/utils';
 import electron from 'electron';
 import Raven from 'raven-js';
@@ -27,7 +25,7 @@ import VModal from 'vue-js-modal';
 import VeeValidate from 'vee-validate';
 import ChildWindow from 'components/windows/ChildWindow.vue';
 import OneOffWindow from 'components/windows/OneOffWindow.vue';
-import electronLog from 'electron-log';
+import util from 'util';
 
 const { ipcRenderer, remote } = electron;
 
@@ -72,6 +70,41 @@ if (isProduction) {
     },
   });
 }
+
+const windowId = Utils.getWindowId();
+
+function wrapLogFn(fn: string) {
+  const old: Function = console[fn];
+  console[fn] = (...args: any[]) => {
+    old.apply(console, args);
+
+    const level = fn === 'log' ? 'info' : fn;
+
+    sendLogMsg(level, ...args);
+  };
+}
+
+function sendLogMsg(level: string, ...args: any[]) {
+  const serialized = args
+    .map(arg => {
+      if (typeof arg === 'string') return arg;
+
+      return util.inspect(arg);
+    })
+    .join(' ');
+
+  ipcRenderer.send('logmsg', { level, sender: windowId, message: serialized });
+}
+
+['log', 'info', 'warn', 'error'].forEach(wrapLogFn);
+
+window.addEventListener('error', e => {
+  sendLogMsg('error', e.error);
+});
+
+window.addEventListener('unhandledrejection', e => {
+  sendLogMsg('error', e.reason);
+});
 
 if ((isProduction || process.env.NAIR_REPORT_TO_SENTRY) && !electron.remote.process.env.NAIR_IPC) {
   Raven.config(getSentryDsn(sentryParam), {
@@ -198,48 +231,4 @@ if (Utils.isDevMode()) {
   window.addEventListener('keyup', ev => {
     if (ev.key === 'F12') electron.ipcRenderer.send('openDevTools');
   });
-}
-
-// ERRORS LOGGING
-
-// catch and log unhandled errors/rejected promises:
-electronLog.catchErrors({ onError: e => electronLog.log(`from ${Utils.getWindowId()}`, e) });
-
-// override console.error
-const consoleError = console.error;
-console.error = function (...args: any[]) {
-  // TODO: Suppress N-API error until we upgrade electron to v4.x
-  if (/N\-API is an experimental feature/.test(args[0])) return;
-
-  if (Utils.isDevMode()) ipcRenderer.send('showErrorAlert');
-  writeErrorToLog(...args);
-  consoleError.call(console, ...args);
-};
-
-/**
- * Try to serialize error arguments and stack and write them to the log file
- */
-function writeErrorToLog(...errors: (Error | string)[]) {
-  let message = '';
-
-  // format error arguments depending on the type
-  const formattedErrors = errors.map(error => {
-    if (error instanceof Error) {
-      message = error.stack;
-    } else if (typeof error === 'string') {
-      message = error;
-    } else {
-      try {
-        message = JSON.stringify(error);
-      } catch (e) {
-        message = 'UNSERIALIZABLE';
-      }
-    }
-    return message;
-  });
-
-  // send error to the main process via IPC
-  electronLog.error(`Error from ${Utils.getWindowId()} window:
-    ${formattedErrors.join('\n')}
-  `);
 }
