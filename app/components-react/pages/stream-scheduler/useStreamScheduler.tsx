@@ -210,7 +210,7 @@ class StreamSchedulerModule {
   private recordFeatureUsage(
     featureName: 'StreamSchedulerView' | 'StreamSchedulerEdit' | 'StreamSchedulerGoLive',
   ) {
-    this.recordFeatureUsage('StreamSchedulerView');
+    Services.UsageStatisticsService.actions.recordFeatureUsage(featureName);
   }
 
   /**
