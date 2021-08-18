@@ -2,11 +2,11 @@ import { Select, Row, Col } from 'antd';
 import React, { ReactNode, useRef } from 'react';
 import { InputComponent, TSlobsInputProps, useInput, ValuesOf } from './inputs';
 import InputWrapper from './InputWrapper';
-import {RefSelectProps, SelectProps} from 'antd/lib/select';
+import { RefSelectProps, SelectProps } from 'antd/lib/select';
 import { useDebounce } from '../../hooks';
 import omit from 'lodash/omit';
 import { getDefined } from '../../../util/properties-type-guards';
-import {findDOMNode} from "react-dom";
+import { findDOMNode } from 'react-dom';
 
 // select what features from the antd lib we are going to use
 const ANT_SELECT_FEATURES = [
