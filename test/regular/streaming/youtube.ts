@@ -25,6 +25,9 @@ test('Streaming to Youtube', async t => {
   await stopStream();
 });
 
+// TODO
+test.skip('Streaming to the scheduled event on Youtube', async t => {});
+
 test('Start stream twice to the same YT event', async t => {
   await logIn('youtube', { multistream: false });
 

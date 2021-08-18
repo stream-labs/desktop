@@ -26,8 +26,6 @@ import {
   AdvancedStatistics,
 } from 'components/shared/ReactComponent';
 
-import GoLiveWindowDeprecated from 'components/windows/go-live/GoLiveWindow';
-import EditStreamWindowDeprecated from 'components/windows/go-live/EditStreamWindow';
 import SourceProperties from 'components/windows/SourceProperties.vue';
 import SourceFilters from 'components/windows/SourceFilters.vue';
 import AddSourceFilter from 'components/windows/AddSourceFilter';
@@ -46,7 +44,6 @@ import EventFilterMenu from 'components/windows/EventFilterMenu';
 import OverlayPlaceholder from 'components/windows/OverlayPlaceholder';
 import BrowserSourceInteraction from 'components/windows/BrowserSourceInteraction';
 import WelcomeToPrime from 'components/windows/WelcomeToPrime';
-import ScheduleStreamWindow from 'components/windows/go-live/ScheduleStreamWindow';
 
 import BitGoal from 'components/widgets/goal/BitGoal';
 import DonationGoal from 'components/widgets/goal/DonationGoal';
@@ -68,6 +65,7 @@ import MediaShare from 'components/widgets/MediaShare';
 import AlertBox from 'components/widgets/AlertBox.vue';
 import SpinWheel from 'components/widgets/SpinWheel.vue';
 import Poll from 'components/widgets/Poll';
+import EmoteWall from 'components/widgets/EmoteWall';
 
 import { byOS, OS } from 'util/operating-systems';
 import { UsageStatisticsService } from './usage-statistics';
@@ -130,12 +128,10 @@ export function getComponents() {
     AlertBox,
     SpinWheel,
     Poll,
+    EmoteWall,
     WelcomeToPrime,
     GoLiveWindow,
     EditStreamWindow,
-    GoLiveWindowDeprecated,
-    EditStreamWindowDeprecated,
-    ScheduleStreamWindow,
     IconLibraryProperties,
     SharedComponentsLibrary,
   };

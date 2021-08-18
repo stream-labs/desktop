@@ -24,7 +24,13 @@ import { AppService } from 'services/app';
 import { UserService } from 'services/user';
 import { IModalOptions, WindowsService } from 'services/windows';
 import LiveDock from '../LiveDock.vue';
-import { PatchNotes, Loader, Highlighter, StudioFooter } from '../shared/ReactComponent';
+import {
+  PatchNotes,
+  Loader,
+  StreamScheduler,
+  Highlighter,
+  StudioFooter,
+} from '../shared/ReactComponent';
 import PlatformAppMainPage from '../pages/PlatformAppMainPage.vue';
 import electron from 'electron';
 import ResizeBar from 'components/shared/ResizeBar.vue';
@@ -59,6 +65,7 @@ const loadedTheme = () => {
     LayoutEditor,
     AlertboxLibrary,
     ModalWrapper,
+    StreamScheduler,
     Highlighter,
     Grow,
   },
@@ -115,7 +122,7 @@ export default class Main extends Vue {
     window.removeEventListener('resize', this.windowSizeHandler);
   }
 
-  minEditorWidth = 750;
+  minEditorWidth = 500;
 
   get title() {
     return this.windowsService.state.main.title;
@@ -291,7 +298,6 @@ export default class Main extends Vue {
   }
 
   handleEditorWidth(width: number) {
-    if (width < 750) return;
     this.minEditorWidth = width;
   }
 

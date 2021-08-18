@@ -108,11 +108,13 @@ export { MediaShareService } from 'services/widgets/settings/media-share';
 export { AlertBoxService } from 'services/widgets/settings/alert-box';
 export { SpinWheelService } from 'services/widgets/settings/spin-wheel';
 export { PollService } from 'services/widgets/settings/poll';
+export { EmoteWallService } from 'services/widgets/settings/emote-wall';
 
 import { WindowsService } from './services/windows';
 import { CustomizationService } from './services/customization';
 import { ScenesService } from './services/scenes';
 import { EditorCommandsService } from './services/editor-commands';
+import { EditorService } from 'services/editor';
 import { PerformanceService } from './services/performance';
 import { SourcesService } from './services/sources';
 import { StreamingService } from './services/streaming';
@@ -151,6 +153,7 @@ export const AppServices = {
   SettingsService,
   CustomizationService,
   EditorCommandsService,
+  EditorService,
   PerformanceService,
   SourcesService,
   PatchNotesService,

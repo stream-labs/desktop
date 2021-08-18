@@ -32,6 +32,7 @@ export enum WidgetType {
   SupporterGoal = 17,
   CharityGoal = 18,
   Poll = 19,
+  EmoteWall = 20,
 }
 
 export const WidgetTesters: IWidgetTester[] = [
@@ -420,6 +421,20 @@ export const WidgetDefinitions: { [x: number]: IWidget } = {
 
     anchor: AnchorPoint.Center,
   },
+  [WidgetType.EmoteWall]: {
+    name: 'Emote Wall',
+    url(host, token) {
+      return `https://${host}/widgets/emote-wall?token=${token}`;
+    },
+
+    width: 1280,
+    height: 720,
+
+    x: 0.5,
+    y: 0.5,
+
+    anchor: AnchorPoint.Center,
+  },
 };
 
 export const WidgetDisplayData = (platform?: string): { [x: number]: IWidgetDisplayData } => ({
@@ -583,5 +598,15 @@ export const WidgetDisplayData = (platform?: string): { [x: number]: IWidgetDisp
     demoVideo: false,
     demoFilename: 'poll.png',
     supportList: [],
+  },
+  [WidgetType.EmoteWall]: {
+    name: $t('Emote Wall'),
+    description: $t(
+      'Display and animate emotes that are seen in chat, improving chat participation via positive feedback.',
+    ),
+    demoVideo: false,
+    demoFilename: 'emote-wall.gif',
+    supportList: [],
+    platforms: new Set(['twitch']),
   },
 });

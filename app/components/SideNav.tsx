@@ -131,11 +131,7 @@ export default class SideNav extends Vue {
       });
     }
 
-    if (
-      getOS() === OS.Windows &&
-      this.userService.isLoggedIn &&
-      this.incrementalRolloutService.views.featureIsEnabled(EAvailableFeatures.highlighter)
-    ) {
+    if (this.userService.isLoggedIn) {
       pageData.push({
         target: 'Highlighter',
         svgIcon: <HighlighterIcon />,

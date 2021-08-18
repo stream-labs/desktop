@@ -12,7 +12,12 @@
   background-color: var(--section);
   max-width: none;
   flex: 0 0 auto;
-  overflow-x: hidden;
+  overflow-x: auto;
+  overflow-y: hidden;
+
+  .footer--left {
+    overflow-x: auto;
+  }
 }
 
 .nav-right {
@@ -153,4 +158,5 @@
   position: relative;
   display: inline-flex;
   background: var(--section) !important;
+  overflow-x: auto;
 }

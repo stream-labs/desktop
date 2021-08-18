@@ -21,6 +21,7 @@ export default function StudioFooterComponent(p: { locked?: boolean }) {
     PerformanceService,
     YoutubeService,
     UsageStatisticsService,
+    NavigationService,
   } = Services;
 
   const [recordingTime, setRecordingTime] = useState('');
@@ -89,11 +90,7 @@ export default function StudioFooterComponent(p: { locked?: boolean }) {
   }
 
   function openScheduleStream() {
-    WindowsService.showWindow({
-      componentName: 'ScheduleStreamWindow',
-      title: $t('Schedule Stream'),
-      size: { width: 800, height: 670 },
-    });
+    NavigationService.navigate('StreamScheduler');
   }
 
   function openMetricsWindow() {
@@ -123,7 +120,7 @@ export default function StudioFooterComponent(p: { locked?: boolean }) {
 
   return (
     <div className={styles.footer}>
-      <div className="flex flex--center flex--grow flex--justify-start">
+      <div className={cx('flex flex--center flex--grow flex--justify-start', styles.footerLeft)}>
         {isLoggedIn && platform === 'youtube' && !youtubeEnabled && (
           <div className={styles.errorWrapper}>
             <div className={styles.platformError}>
