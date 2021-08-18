@@ -148,8 +148,12 @@ if (!gotTheLock) {
 
   function startApp() {
     const isDevMode = (process.env.NODE_ENV !== 'production') && (process.env.NODE_ENV !== 'test');
+    let crashHandlerLogPath = "";
+    if (process.env.NODE_ENV !== 'production' || !!process.env.SLOBS_PREVIEW) {
+      crashHandlerLogPath = app.getPath('userData');
+    }
 
-    crashHandler.startCrashHandler(app.getAppPath(), process.env.NAIR_VERSION, isDevMode.toString());
+    crashHandler.startCrashHandler(app.getAppPath(), process.env.NAIR_VERSION, isDevMode.toString(), crashHandlerLogPath);
     crashHandler.registerProcess(pid, false);
 
     const Raven = require('raven-js');

@@ -119,12 +119,20 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
 
   @mutation()
   private REMOVE_SOURCE(id: string) {
-    Vue.delete(this.state.sources, id);
+    if (this.state.sources[id]) {
+      Vue.delete(this.state.sources, id);
+    } else {
+      Vue.delete(this.state.temporarySources, id);
+    }
   }
 
   @mutation()
   private UPDATE_SOURCE(sourcePatch: TPatch<ISource>) {
-    Object.assign(this.state.sources[sourcePatch.id], sourcePatch);
+    if (this.state.sources[sourcePatch.id]) {
+      Object.assign(this.state.sources[sourcePatch.id], sourcePatch);
+    } else {
+      Object.assign(this.state.temporarySources[sourcePatch.id], sourcePatch);
+    }
   }
 
   createSource(
