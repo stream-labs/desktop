@@ -8,6 +8,8 @@ import Scrollable from 'components-react/shared/Scrollable';
 import styles from './ThemeAudit.m.less';
 import groupBy from 'lodash/groupBy';
 import { Tabs, Modal } from 'antd';
+import Display from 'components-react/shared/Display';
+import { useVuex } from 'components-react/hooks';
 
 class MediaFileReader {
   constructor(public readonly filePath: string) {}
@@ -75,12 +77,32 @@ async function readMediaInfo(): Promise<IMediaSourceInfo[]> {
 type TWarningLevel = 'OK' | 'WARN' | 'CRITICAL';
 
 export default function ThemeAudit() {
-  const { SceneCollectionsService, ScenesService, SourcesService } = Services;
+  const {
+    SceneCollectionsService,
+    ScenesService,
+    SourcesService,
+    TransitionsService,
+    PerformanceService,
+    SettingsService,
+  } = Services;
   const [mediaInfo, setMediaInfo] = useState<IMediaSourceInfo[] | null>(null);
   const [inspectedSource, setInspectedSource] = useState<string | null>(null);
+  const v = useVuex(() => ({
+    cpu: PerformanceService.views.cpuPercent,
+  }));
 
   useEffect(() => {
     readMediaInfo().then(info => setMediaInfo(info));
+  }, []);
+
+  // Force off media caching, as it skews results
+  useEffect(() => {
+    const currentValue = SettingsService.views.values.Advanced.fileCaching;
+    SettingsService.actions.setSettingsPatch({ Advanced: { fileCaching: false } });
+
+    return () => {
+      SettingsService.actions.setSettingsPatch({ Advanced: { fileCaching: currentValue } });
+    };
   }, []);
 
   const grouped = groupBy(mediaInfo ?? [], s => s.scene);
@@ -121,7 +143,11 @@ export default function ThemeAudit() {
 
   function inspect(sourceId: string | null) {
     setInspectedSource(sourceId);
-    console.log('inspect', sourceId);
+    if (sourceId) {
+      TransitionsService.inspectSource(sourceId);
+    } else {
+      TransitionsService.cancelInspectSource();
+    }
   }
 
   return (
@@ -196,8 +222,17 @@ export default function ThemeAudit() {
           destroyOnClose={true}
           closable={false}
           onCancel={() => inspect(null)}
+          onOk={() => inspect(null)}
+          width={780}
         >
-          {inspectedSource}
+          {inspectedSource && (
+            <div>
+              <div style={{ height: 400 }}>
+                <Display sourceId={inspectedSource} />
+              </div>
+              <div style={{ fontSize: 48 }}>CPU: {v.cpu}%</div>
+            </div>
+          )}
         </Modal>
       </Scrollable>
     </div>
