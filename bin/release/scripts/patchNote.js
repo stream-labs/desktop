@@ -184,8 +184,8 @@ export const notes: IPatchNotes = {
 ${notes
       .trim()
       .split('\n')
-      .map(s => `    '${s}'`)
-      .join(',\n')}
+      .map(s => `    '${s}',`)
+      .join('\n')}
   ]
 };
 `;
