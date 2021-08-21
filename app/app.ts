@@ -116,6 +116,7 @@ Vue.use(VModal);
 document.addEventListener('dragover', event => event.preventDefault());
 document.addEventListener('dragenter', event => event.preventDefault());
 document.addEventListener('drop', event => event.preventDefault());
+document.addEventListener('auxclick', event => event.preventDefault());
 
 document.addEventListener('DOMContentLoaded', () => {
   createStore().then(async store => {
