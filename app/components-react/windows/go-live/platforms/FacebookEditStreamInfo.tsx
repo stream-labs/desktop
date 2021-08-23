@@ -192,9 +192,16 @@ export default function FacebookEditStreamInfo(p: IPlatformComponentParams<'face
 
   async function onEventChange(liveVideoId: string) {
     if (!liveVideoId) {
-      updateSettings({ liveVideoId });
+      // reset destination settings if event has been unselected
+      const { groupId, pageId } = FacebookService.state.settings;
+      updateSettings({
+        liveVideoId,
+        pageId,
+        groupId,
+      });
       return;
     }
+
     const liveVideo = s.scheduledVideos.find(vid => vid.id === liveVideoId);
     assertIsDefined(liveVideo);
     const newSettings = await FacebookService.actions.return.fetchStartStreamOptionsForVideo(
