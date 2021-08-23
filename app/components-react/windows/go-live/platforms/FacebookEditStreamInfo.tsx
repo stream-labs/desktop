@@ -10,7 +10,7 @@ import { $t } from '../../../../services/i18n';
 import { createBinding, ListInput } from '../../../shared/inputs';
 import GameSelector from '../GameSelector';
 import {
-  IFacebookLiveVideo, IFacebookLiveVideoExtended,
+  IFacebookLiveVideoExtended,
   IFacebookStartStreamOptions,
   TDestinationType,
   TFacebookStreamPrivacy,
