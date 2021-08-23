@@ -145,6 +145,10 @@ class PlatformAppsViews extends ViewHandler<IPlatformAppServiceState> {
 
     return getAssetUrl(app, asset);
   }
+
+  get enabledApps() {
+    return this.state.loadedApps.filter(app => app.enabled);
+  }
 }
 
 @InitAfter('UserService')
