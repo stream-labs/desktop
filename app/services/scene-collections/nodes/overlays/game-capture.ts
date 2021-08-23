@@ -3,9 +3,13 @@ import { SceneItem } from '../../../scenes';
 import uniqueId from 'lodash/uniqueId';
 import path from 'path';
 import fs from 'fs';
+import { Inject } from 'services/core';
+import { VideoService } from 'services/video';
 
 interface ISchema {
   placeholderFile: string;
+  width: number; // Exported base resolution width
+  height: number; // Exported base resolution height
 }
 
 interface IContext {
@@ -14,7 +18,9 @@ interface IContext {
 }
 
 export class GameCaptureNode extends Node<ISchema, IContext> {
-  schemaVersion = 1;
+  schemaVersion = 2;
+
+  @Inject() videoService: VideoService;
 
   async save(context: IContext) {
     let placeholderFile: string;
@@ -28,7 +34,11 @@ export class GameCaptureNode extends Node<ISchema, IContext> {
       fs.writeFileSync(destination, fs.readFileSync(settings.user_placeholder_image));
     }
 
-    this.data = { placeholderFile };
+    this.data = {
+      placeholderFile,
+      width: this.videoService.baseWidth,
+      height: this.videoService.baseHeight,
+    };
   }
 
   async load(context: IContext) {
@@ -45,5 +55,13 @@ export class GameCaptureNode extends Node<ISchema, IContext> {
     // NOTE: This is not a new hack, this is the same as other theme
     // sources. We can probably clean this up at some point.
     context.sceneItem.getSource().replacePropertiesManager('default', {});
+  }
+
+  migrate(version: number) {
+    if (version === 1) {
+      // Assume 1080p as that will almost always be right
+      this.data.width = 1920;
+      this.data.height = 1080;
+    }
   }
 }

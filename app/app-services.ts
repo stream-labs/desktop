@@ -114,6 +114,7 @@ import { WindowsService } from './services/windows';
 import { CustomizationService } from './services/customization';
 import { ScenesService } from './services/scenes';
 import { EditorCommandsService } from './services/editor-commands';
+import { EditorService } from 'services/editor';
 import { PerformanceService } from './services/performance';
 import { SourcesService } from './services/sources';
 import { StreamingService } from './services/streaming';
@@ -143,6 +144,7 @@ import { HotkeysService } from './services/hotkeys';
 import { WidgetsService } from './services/widgets';
 import { HostsService } from './services/hosts';
 import { OnboardingService } from './services/onboarding';
+import { PlatformAppsService } from './services/platform-apps';
 
 export const AppServices = {
   WindowsService,
@@ -152,6 +154,7 @@ export const AppServices = {
   SettingsService,
   CustomizationService,
   EditorCommandsService,
+  EditorService,
   PerformanceService,
   SourcesService,
   PatchNotesService,
@@ -178,4 +181,5 @@ export const AppServices = {
   WidgetsService,
   HostsService,
   OnboardingService,
+  PlatformAppsService,
 };
