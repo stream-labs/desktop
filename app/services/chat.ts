@@ -258,7 +258,7 @@ export class ChatService extends Service {
       }
 
       this.chatView.webContents.executeJavaScript(
-        require('!!raw-loader!./widgets/settings/chat-highlight-script.js'),
+        require('!!raw-loader!./widgets/settings/chat-highlight-script.js').default,
         true,
       );
 

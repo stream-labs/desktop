@@ -59,10 +59,11 @@ function addNewHighlightButton(mutationsList) {
   });
 }
 
+console.log('initiating script');
 addExistingHighlightButtons();
-const targetNode = document.getElementsByClassName('chat-scrollable-area__message-container')[0];
-console.log(targetNode);
+// const targetNode = document.getElementsByClassName('chat-scrollable-area__message-container')[0];
+// console.log(targetNode);
 
-const observer = new MutationObserver(addNewHighlightButton);
-observer.observe(targetNode, { childList: true });
+// const observer = new MutationObserver(addNewHighlightButton);
+// observer.observe(targetNode, { childList: true });
 0;
