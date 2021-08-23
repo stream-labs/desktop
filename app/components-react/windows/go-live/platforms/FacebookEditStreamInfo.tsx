@@ -353,7 +353,7 @@ export default function FacebookEditStreamInfo(p: IPlatformComponentParams<'face
       >
         {isPrimary && (
           <div>
-            <p>{$t('Please log-out and log-in again to get these new features')}</p>
+            <div>{$t('Please log-out and log-in again to get these new features')}</div>
             <button className="button button--facebook" onClick={reLogin}>
               {$t('Re-login now')}
             </button>
@@ -364,7 +364,7 @@ export default function FacebookEditStreamInfo(p: IPlatformComponentParams<'face
         )}
         {!isPrimary && (
           <div>
-            <p>{$t('Please reconnect Facebook to get these new features')}</p>
+            <div>{$t('Please reconnect Facebook to get these new features')}</div>
             <button className="button button--facebook" onClick={reconnectFB}>
               {$t('Reconnect now')}
             </button>
