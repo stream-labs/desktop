@@ -254,6 +254,11 @@ export class SlotsNode extends ArrayNode<TSlotSchema, IContext, TSceneNode> {
           {},
           { id, select: false },
         );
+
+        // Adjust scales by the ratio of the exported base resolution to
+        // the users current base resolution
+        obj.scaleX *= obj.content.data.width / this.videoService.baseWidth;
+        obj.scaleY *= obj.content.data.height / this.videoService.baseHeight;
       } else {
         // We will not load this source at all on mac
         return;
@@ -312,6 +317,11 @@ export class SlotsNode extends ArrayNode<TSlotSchema, IContext, TSceneNode> {
     } else if (obj.content instanceof SceneSourceNode) {
       const sceneId = obj.content.data.sceneId;
       sceneItem = context.scene.addSource(sceneId, { select: false });
+
+      // Adjust scales by the ratio of the exported base resolution to
+      // the users current base resolution
+      obj.scaleX *= obj.content.data.width / this.videoService.baseWidth;
+      obj.scaleY *= obj.content.data.height / this.videoService.baseHeight;
     }
 
     this.adjustTransform(sceneItem, obj);
