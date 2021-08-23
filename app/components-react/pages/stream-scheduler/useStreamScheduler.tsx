@@ -21,6 +21,7 @@ import { message } from 'antd';
 import { $t } from '../../../services/i18n';
 import { IStreamError } from '../../../services/streaming/stream-error';
 import { useModule } from '../../hooks/useModule';
+import { IGoLiveSettings } from '../../../services/streaming';
 
 /**
  * Represents a single stream event
@@ -200,6 +201,10 @@ class StreamSchedulerModule {
     return getDefined(this.state.platformSettings.youtube);
   }
 
+  get primaryPlatform() {
+    return getDefined(Services.UserService.platform).type;
+  }
+
   getPlatformDisplayName = this.streamingView.getPlatformDisplayName;
 
   /**
@@ -243,21 +248,22 @@ class StreamSchedulerModule {
   /**
    * Validates and submits the event editor form
    */
-  async submit() {
+  async submit(): Promise<boolean> {
     // validate form
     try {
       await this.form.validateFields();
     } catch (e: unknown) {
       message.error($t('Invalid settings. Please check the form'));
-      return;
+      return false;
     }
 
     this.showLoader();
     if (this.isUpdateMode) {
-      this.saveExistingEvent();
+      await this.saveExistingEvent();
     } else {
-      this.saveNewEvent();
+      await this.saveNewEvent();
     }
+    return true;
   }
 
   /**
@@ -342,6 +348,22 @@ class StreamSchedulerModule {
       message.error($t('Can not schedule the stream for the given date/time'));
     }
     this.hideLoader();
+  }
+
+  /**
+   * Start stream to a selected event
+   */
+  async goLive() {
+    const event = getDefined(this.selectedEvent);
+    const prepopulateOptions = {
+      [event.platform]: this.state.platformSettings[event.platform],
+    } as IGoLiveSettings['prepopulateOptions'];
+
+    // save the form
+    if (!(await this.submit())) return;
+
+    // open the GoLiveWindow
+    await Services.StreamingService.actions.showGoLiveWindow(prepopulateOptions);
   }
 
   /**
