@@ -10,7 +10,7 @@ import { $t } from '../../../../services/i18n';
 import { createBinding, ListInput } from '../../../shared/inputs';
 import GameSelector from '../GameSelector';
 import {
-  IFacebookLiveVideo,
+  IFacebookLiveVideoExtended,
   IFacebookStartStreamOptions,
   TDestinationType,
   TFacebookStreamPrivacy,
@@ -21,6 +21,7 @@ import { IListOption } from '../../../shared/inputs/ListInput';
 import MessageLayout from '../MessageLayout';
 import PlatformSettingsLayout, { IPlatformComponentParams } from './PlatformSettingsLayout';
 import { useSelector } from '../../../store';
+import { assertIsDefined } from '../../../../util/properties-type-guards';
 
 export default function FacebookEditStreamInfo(p: IPlatformComponentParams<'facebook'>) {
   const fbSettings = p.value;
@@ -64,8 +65,11 @@ export default function FacebookEditStreamInfo(p: IPlatformComponentParams<'face
     };
   });
 
-  const shouldShowGroups = fbSettings.destinationType === 'group' && !isUpdateMode;
-  const shouldShowPages = fbSettings.destinationType === 'page' && !isUpdateMode;
+  const shouldShowDestinationType = !fbSettings.liveVideoId;
+  const shouldShowGroups =
+    fbSettings.destinationType === 'group' && !isUpdateMode && !fbSettings.liveVideoId;
+  const shouldShowPages =
+    fbSettings.destinationType === 'page' && !isUpdateMode && !fbSettings.liveVideoId;
   const shouldShowEvents = !isUpdateMode && !isScheduleMode;
   const shouldShowPrivacy = fbSettings.destinationType === 'me';
   const shouldShowPrivacyWarn =
@@ -82,7 +86,7 @@ export default function FacebookEditStreamInfo(p: IPlatformComponentParams<'face
   // define the local state
   const { s, setItem, updateState } = useFormState({
     pictures: {} as Record<string, string>,
-    scheduledVideos: [] as IFacebookLiveVideo[],
+    scheduledVideos: [] as IFacebookLiveVideoExtended[],
     scheduledVideosLoaded: false,
   });
 
@@ -106,12 +110,23 @@ export default function FacebookEditStreamInfo(p: IPlatformComponentParams<'face
       fbSettings.destinationType === 'group' ? 'me' : fbSettings.destinationType;
     if (destinationType === 'me') destinationId = 'me';
 
-    updateState({
-      scheduledVideos: await FacebookService.actions.return.fetchScheduledVideos(
+    const scheduledVideos = await FacebookService.actions.return.fetchAllVideos(true);
+    const selectedVideoId = fbSettings.liveVideoId;
+    const shouldFetchSelectedVideo =
+      selectedVideoId && !scheduledVideos.find(v => v.id === selectedVideoId);
+
+    if (shouldFetchSelectedVideo) {
+      assertIsDefined(selectedVideoId);
+      const selectedVideo = await FacebookService.actions.return.fetchVideo(
+        selectedVideoId,
         destinationType,
         destinationId,
-        true,
-      ),
+      );
+      scheduledVideos.push(selectedVideo);
+    }
+
+    updateState({
+      scheduledVideos,
       scheduledVideosLoaded: true,
     });
   }
@@ -175,6 +190,28 @@ export default function FacebookEditStreamInfo(p: IPlatformComponentParams<'face
     StreamingService.actions.showGoLiveWindow();
   }
 
+  async function onEventChange(liveVideoId: string) {
+    if (!liveVideoId) {
+      // reset destination settings if event has been unselected
+      const { groupId, pageId } = FacebookService.state.settings;
+      updateSettings({
+        liveVideoId,
+        pageId,
+        groupId,
+      });
+      return;
+    }
+
+    const liveVideo = s.scheduledVideos.find(vid => vid.id === liveVideoId);
+    assertIsDefined(liveVideo);
+    const newSettings = await FacebookService.actions.return.fetchStartStreamOptionsForVideo(
+      liveVideoId,
+      liveVideo.destinationType,
+      liveVideo.destinationId,
+    );
+    updateSettings(newSettings);
+  }
+
   function renderCommonFields() {
     return (
       <CommonPlatformFields
@@ -192,14 +229,15 @@ export default function FacebookEditStreamInfo(p: IPlatformComponentParams<'face
       <div key="required">
         {!isUpdateMode && (
           <>
-            <ListInput
-              label={$t('Facebook Destination')}
-              {...bind.destinationType}
-              hasImage
-              imageSize={{ width: 35, height: 35 }}
-              onSelect={loadScheduledBroadcasts}
-              options={getDestinationOptions()}
-            />
+            {shouldShowDestinationType && (
+              <ListInput
+                label={$t('Facebook Destination')}
+                {...bind.destinationType}
+                hasImage
+                imageSize={{ width: 35, height: 35 }}
+                options={getDestinationOptions()}
+              />
+            )}
             {shouldShowPages && (
               <ListInput
                 {...bind.pageId}
@@ -207,7 +245,6 @@ export default function FacebookEditStreamInfo(p: IPlatformComponentParams<'face
                 hasImage
                 imageSize={{ width: 44, height: 44 }}
                 onDropdownVisibleChange={shown => shown && loadPictures('page')}
-                onSelect={loadScheduledBroadcasts}
                 options={pages.map(page => ({
                   value: page.id,
                   label: `${page.name} | ${page.category}`,
@@ -244,12 +281,13 @@ export default function FacebookEditStreamInfo(p: IPlatformComponentParams<'face
     );
   }
 
-  function renderOptionalFields() {
+  function renderEvents() {
     return (
-      <div key="optional">
+      <div key="events">
         {shouldShowEvents && (
           <ListInput
             {...bind.liveVideoId}
+            onChange={onEventChange}
             label={$t('Scheduled Video')}
             loading={!s.scheduledVideosLoaded}
             allowClear
@@ -264,7 +302,13 @@ export default function FacebookEditStreamInfo(p: IPlatformComponentParams<'face
             ]}
           />
         )}
+      </div>
+    );
+  }
 
+  function renderOptionalFields() {
+    return (
+      <div key="optional">
         {shouldShowPrivacy && (
           <ListInput
             label={$t('Privacy')}
@@ -374,6 +418,7 @@ export default function FacebookEditStreamInfo(p: IPlatformComponentParams<'face
         commonFields={renderCommonFields()}
         requiredFields={renderRequiredFields()}
         optionalFields={renderOptionalFields()}
+        essentialOptionalFields={renderEvents()}
       />
     </Form>
   );

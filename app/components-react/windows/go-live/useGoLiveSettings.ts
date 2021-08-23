@@ -9,6 +9,7 @@ import { mutation } from '../../store';
 import { useModule } from '../../hooks/useModule';
 import { useForm } from '../../shared/inputs/Form';
 import { getDefined } from '../../../util/properties-type-guards';
+import { isEqual } from 'lodash';
 
 type TCommonFieldName = 'title' | 'description';
 
@@ -32,12 +33,19 @@ export class GoLiveSettingsModule extends StreamInfoView<IGoLiveSettingsState> {
     optimizedProfile: undefined,
     advancedMode: false,
     needPrepopulate: true,
+    prepopulateOptions: undefined,
   };
 
   // initial setup
   init(params: { isUpdateMode: boolean; form: FormInstance }) {
     this.form = params.form;
     this.state.isUpdateMode = params.isUpdateMode;
+
+    // take prefill options from the windows' `queryParams`
+    const windowParams = Services.WindowsService.state.child.queryParams as unknown;
+    if (!isEqual(windowParams, {})) {
+      this.state.prepopulateOptions = windowParams as IGoLiveSettingsState['prepopulateOptions'];
+    }
     this.prepopulate();
   }
 
@@ -45,7 +53,9 @@ export class GoLiveSettingsModule extends StreamInfoView<IGoLiveSettingsState> {
    * Fetch settings for each platform
    */
   async prepopulate() {
-    await Services.StreamingService.actions.return.prepopulateInfo();
+    const { StreamingService } = Services;
+    await StreamingService.actions.return.prepopulateInfo();
+    const prepopulateOptions = this.state.prepopulateOptions;
     const view = new StreamInfoView({});
     const settings = {
       ...view.savedSettings, // copy saved stream settings
@@ -59,6 +69,19 @@ export class GoLiveSettingsModule extends StreamInfoView<IGoLiveSettingsState> {
         if (!this.checkPrimaryPlatform(platform)) delete settings.platforms[platform];
       });
     }
+
+    // prefill the form if `prepopulateOptions` provided
+    if (prepopulateOptions) {
+      Object.keys(prepopulateOptions).forEach(platform => {
+        Object.assign(settings.platforms[platform], prepopulateOptions[platform]);
+      });
+
+      // disable non-primary platforms
+      Object.keys(settings.platforms).forEach((platform: TPlatform) => {
+        if (!view.checkPrimaryPlatform(platform)) settings.platforms[platform]!.enabled = false;
+      });
+    }
+
     this.updateSettings(settings);
   }
 

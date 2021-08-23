@@ -77,7 +77,7 @@ export const ListInput = InputComponent(<T extends any>(p: TListInputProps<T>) =
         optionFilterProp="label"
         optionLabelProp="labelrender"
         onSearch={p.showSearch ? onSearchHandler : undefined}
-        onSelect={val => p.onChange && p.onChange(val as T)}
+        onChange={val => p.onChange && p.onChange(val as T)}
         defaultValue={p.defaultValue as string}
         data-value={inputAttrs.value}
         data-selected-option-label={selectedOption?.label}
