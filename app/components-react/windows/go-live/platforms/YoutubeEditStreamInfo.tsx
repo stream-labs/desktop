@@ -16,6 +16,7 @@ import Form from '../../../shared/inputs/Form';
 import electron from 'electron';
 import { IYoutubeStartStreamOptions } from '../../../../services/platforms/youtube';
 import PlatformSettingsLayout, { IPlatformComponentParams } from './PlatformSettingsLayout';
+import { assertIsDefined } from '../../../../util/properties-type-guards';
 
 /***
  * Stream Settings for YT
@@ -42,9 +43,19 @@ export const YoutubeEditStreamInfo = InputComponent((p: IPlatformComponentParams
   const [{ broadcastLoading, broadcasts }] = useAsyncState(
     { broadcastLoading: true, broadcasts: [] },
     async () => {
+      const broadcasts = await YoutubeService.actions.return.fetchEligibleBroadcasts();
+      const shouldFetchSelectedBroadcast =
+        broadcastId && !broadcasts.find(b => b.id === broadcastId);
+
+      if (shouldFetchSelectedBroadcast) {
+        assertIsDefined(broadcastId);
+        const selectedBroadcast = await YoutubeService.actions.return.fetchBroadcast(broadcastId);
+        broadcasts.push(selectedBroadcast);
+      }
+
       return {
         broadcastLoading: false,
-        broadcasts: await YoutubeService.actions.return.fetchEligibleBroadcasts(),
+        broadcasts,
       };
     },
   );

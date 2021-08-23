@@ -93,6 +93,8 @@ export function setSentryContext(ctx: ISentryContext) {
   if (Utils.isWorkerWindow()) {
     obs.NodeObs.SetUsername(ctx.username);
   }
+  electron.crashReporter.addExtraParameter('sentry[user][username]', ctx.username);
+  electron.crashReporter.addExtraParameter('platform', ctx.platform);
 }
 
 class UserViews extends ViewHandler<IUserServiceState> {
