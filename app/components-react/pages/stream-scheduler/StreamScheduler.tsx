@@ -12,6 +12,7 @@ import { confirmAsync } from '../../modals';
 import { IStreamEvent, useStreamScheduler } from './useStreamScheduler';
 import { Services } from '../../service-provider';
 import { getDefined } from '../../../util/properties-type-guards';
+import Scrollable from '../../shared/Scrollable';
 
 /**
  * StreamScheduler page layout
@@ -19,12 +20,12 @@ import { getDefined } from '../../../util/properties-type-guards';
 export default function StreamScheduler() {
   const { isEventsLoaded } = useStreamScheduler();
   return (
-    <div className={cx(css.streamSchedulerPage)}>
+    <Scrollable className={cx(css.streamSchedulerPage)}>
       <Spin tip="Loading..." spinning={!isEventsLoaded}>
         <SchedulerCalendar />
       </Spin>
       <EventSettingsModal />
-    </div>
+    </Scrollable>
   );
 }
 
@@ -62,6 +63,7 @@ function SchedulerCalendar() {
     return (
       <p
         key={event.id}
+        title={event.title}
         className={cx({
           [css.event]: true,
           [css.eventFacebook]: event.platform === 'facebook',
