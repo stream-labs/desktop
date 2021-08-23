@@ -115,6 +115,7 @@ import { WindowsService } from './services/windows';
 import { CustomizationService } from './services/customization';
 import { ScenesService } from './services/scenes';
 import { EditorCommandsService } from './services/editor-commands';
+import { EditorService } from 'services/editor';
 import { PerformanceService } from './services/performance';
 import { SourcesService } from './services/sources';
 import { StreamingService } from './services/streaming';
@@ -157,6 +158,7 @@ export const AppServices = {
   SettingsService,
   CustomizationService,
   EditorCommandsService,
+  EditorService,
   PerformanceService,
   SourcesService,
   PatchNotesService,

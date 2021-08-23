@@ -1,4 +1,4 @@
-import StudioEditor from 'components/StudioEditor.vue';
+import { StudioEditor } from 'components/shared/ReactComponent';
 import { Component } from 'vue-property-decorator';
 import BaseElement from './BaseElement';
 
