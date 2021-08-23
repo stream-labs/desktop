@@ -159,8 +159,8 @@ export class StreamingService
   /**
    * sync the settings from platforms with the local state
    */
-  async prepopulateInfo(platforms?: TPlatform[]) {
-    platforms = platforms || this.views.enabledPlatforms;
+  async prepopulateInfo() {
+    const platforms = this.views.enabledPlatforms;
     this.UPDATE_STREAM_INFO({ lifecycle: 'prepopulate', error: null });
 
     // prepopulate settings for all platforms in parallel mode
@@ -753,7 +753,11 @@ export class StreamingService
     }
   }
 
-  showGoLiveWindow() {
+  /**
+   * Show the GoLiveWindow
+   * Prefill fields with data if `prepopulateOptions` provided
+   */
+  showGoLiveWindow(prepopulateOptions?: IGoLiveSettings['prepopulateOptions']) {
     const height = this.views.linkedPlatforms.length > 1 ? 750 : 650;
     const width = 900;
 
@@ -764,6 +768,7 @@ export class StreamingService
         height,
         width,
       },
+      queryParams: prepopulateOptions,
     });
   }
 
