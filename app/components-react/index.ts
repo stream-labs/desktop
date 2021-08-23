@@ -20,6 +20,7 @@ import StartStreamingButton from './root/StartStreamingButton';
 import TestWidgets from './root/TestWidgets';
 import RenameSource from './windows/RenameSource';
 import NotificationsArea from './root/NotificationsArea';
+import AppsNav from './sidebar/AppsNav';
 import StudioEditor from './root/StudioEditor';
 import SharedComponentsLibrary from './windows/sharedComponentsLibrary/SharedComponentsLibrary';
 
@@ -47,5 +48,6 @@ export const components = {
   TestWidgets,
   RenameSource,
   NotificationsArea,
+  AppsNav,
   StudioEditor,
 };
