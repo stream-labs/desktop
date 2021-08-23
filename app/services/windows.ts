@@ -27,8 +27,6 @@ import {
   AdvancedStatistics,
 } from 'components/shared/ReactComponent';
 
-import GoLiveWindowDeprecated from 'components/windows/go-live/GoLiveWindow';
-import EditStreamWindowDeprecated from 'components/windows/go-live/EditStreamWindow';
 import SourceProperties from 'components/windows/SourceProperties.vue';
 import SourceFilters from 'components/windows/SourceFilters.vue';
 import AddSourceFilter from 'components/windows/AddSourceFilter';
@@ -138,8 +136,6 @@ export function getComponents() {
     WelcomeToPrime,
     GoLiveWindow,
     EditStreamWindow,
-    GoLiveWindowDeprecated,
-    EditStreamWindowDeprecated,
     IconLibraryProperties,
     SharedComponentsLibrary,
   };
