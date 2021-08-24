@@ -55,6 +55,7 @@ export const conditions = () => ({
     { value: 'MIN_DONATION_AMOUNT', title: $t('Donation amount is at least <amount>') },
     { value: 'EXACT_DONATION_AMOUNT', title: $t('Donation amount is exactly <amount>') },
     { value: 'LARGEST_OF_STREAM', title: $t('Donation is the largest this stream') },
+    { value: 'RECURRING_DONATION', title: $t('Donation is recurring') },
   ],
   subs: [
     { value: 'MIN_MONTHS_SUBSCRIBED', title: $t('Months subscribed is at least <months>') },
@@ -151,6 +152,7 @@ export const conditionData = () => ({
   LARGEST_OF_STREAM: {},
   MERCH_PRODUCT: {},
   MERCH_PREORDER: {},
+  RECURRING_DONATION: {},
   LOYALTY_STORE_REDEMPTION_ITEM_TYPE: metadata.list({
     title: $t('Item Type'),
     options: [
