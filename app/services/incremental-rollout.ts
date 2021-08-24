@@ -13,7 +13,6 @@ export enum EAvailableFeatures {
   facebookOnboarding = 'slobs--facebook-onboarding',
   twitter = 'slobs--twitter',
   restream = 'slobs--restream',
-  reactGoLive = 'slobs--react-golive',
   tiktok = 'slobs--tiktok',
   highlighter = 'slobs--highlighter',
   growTab = 'slobs--grow-tab',

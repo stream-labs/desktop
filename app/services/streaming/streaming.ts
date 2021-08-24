@@ -31,7 +31,6 @@ import {
 } from 'services/notifications';
 import { VideoEncodingOptimizationService } from 'services/video-encoding-optimizations';
 import { CustomizationService } from 'services/customization';
-import { EAvailableFeatures, IncrementalRolloutService } from 'services/incremental-rollout';
 import { StreamSettingsService } from '../settings/streaming';
 import { RestreamService } from 'services/restream';
 import Utils from 'services/utils';
@@ -78,7 +77,6 @@ export class StreamingService
   @Inject() private usageStatisticsService: UsageStatisticsService;
   @Inject() private notificationsService: NotificationsService;
   @Inject() private userService: UserService;
-  @Inject() private incrementalRolloutService: IncrementalRolloutService;
   @Inject() private videoEncodingOptimizationService: VideoEncodingOptimizationService;
   @Inject() private customizationService: CustomizationService;
   @Inject() private restreamService: RestreamService;
@@ -161,8 +159,8 @@ export class StreamingService
   /**
    * sync the settings from platforms with the local state
    */
-  async prepopulateInfo(platforms?: TPlatform[]) {
-    platforms = platforms || this.views.enabledPlatforms;
+  async prepopulateInfo() {
+    const platforms = this.views.enabledPlatforms;
     this.UPDATE_STREAM_INFO({ lifecycle: 'prepopulate', error: null });
 
     // prepopulate settings for all platforms in parallel mode
@@ -755,23 +753,22 @@ export class StreamingService
     }
   }
 
-  showGoLiveWindow() {
+  /**
+   * Show the GoLiveWindow
+   * Prefill fields with data if `prepopulateOptions` provided
+   */
+  showGoLiveWindow(prepopulateOptions?: IGoLiveSettings['prepopulateOptions']) {
     const height = this.views.linkedPlatforms.length > 1 ? 750 : 650;
     const width = 900;
 
-    const isLegacy =
-      !this.incrementalRolloutService.views.featureIsEnabled(EAvailableFeatures.reactGoLive) ||
-      this.customizationService.state.experimental?.legacyGoLive;
-
-    const componentName = isLegacy ? 'GoLiveWindowDeprecated' : 'GoLiveWindow';
-
     this.windowsService.showWindow({
-      componentName,
+      componentName: 'GoLiveWindow',
       title: $t('Go Live'),
       size: {
         height,
         width,
       },
+      queryParams: prepopulateOptions,
     });
   }
 
@@ -779,14 +776,8 @@ export class StreamingService
     const height = 750;
     const width = 900;
 
-    const isLegacy =
-      !this.incrementalRolloutService.views.featureIsEnabled(EAvailableFeatures.reactGoLive) ||
-      this.customizationService.state.experimental?.legacyGoLive;
-
-    const componentName = isLegacy ? 'EditStreamWindowDeprecated' : 'EditStreamWindow';
-
     this.windowsService.showWindow({
-      componentName,
+      componentName: 'EditStreamWindow',
       title: $t('Update Stream Info'),
       size: {
         height,

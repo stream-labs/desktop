@@ -6,7 +6,7 @@ import {
   InputComponent,
   ListInput,
 } from '../../../shared/inputs';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Services } from '../../../service-provider';
 import { $t } from '../../../../services/i18n';
 import BroadcastInput from './BroadcastInput';
@@ -16,6 +16,7 @@ import Form from '../../../shared/inputs/Form';
 import electron from 'electron';
 import { IYoutubeStartStreamOptions } from '../../../../services/platforms/youtube';
 import PlatformSettingsLayout, { IPlatformComponentParams } from './PlatformSettingsLayout';
+import { assertIsDefined } from '../../../../util/properties-type-guards';
 
 /***
  * Stream Settings for YT
@@ -42,13 +43,24 @@ export const YoutubeEditStreamInfo = InputComponent((p: IPlatformComponentParams
   const [{ broadcastLoading, broadcasts }] = useAsyncState(
     { broadcastLoading: true, broadcasts: [] },
     async () => {
+      const broadcasts = await YoutubeService.actions.return.fetchEligibleBroadcasts();
+      const shouldFetchSelectedBroadcast =
+        broadcastId && !broadcasts.find(b => b.id === broadcastId);
+
+      if (shouldFetchSelectedBroadcast) {
+        assertIsDefined(broadcastId);
+        const selectedBroadcast = await YoutubeService.actions.return.fetchBroadcast(broadcastId);
+        broadcasts.push(selectedBroadcast);
+      }
+
       return {
         broadcastLoading: false,
-        broadcasts: await YoutubeService.actions.return.fetchEligibleBroadcasts(),
+        broadcasts,
       };
     },
   );
 
+  // re-fill form when the broadcastId selected
   useEffect(() => {
     if (!broadcastId) return;
     YoutubeService.actions.return
