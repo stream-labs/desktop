@@ -9,6 +9,7 @@ import {
   NicoliveFailure,
   openErrorDialogFromFailure,
 } from 'services/nicolive-program/NicoliveFailure';
+import { Subscription } from 'rxjs';
 
 @Component({})
 export default class ProgramInfo extends Vue {
@@ -18,6 +19,25 @@ export default class ProgramInfo extends Vue {
 
   // TODO: 後でまとめる
   programIsMemberOnlyTooltip = 'コミュニティ限定放送';
+
+  private subscription: Subscription = null;
+
+  mounted() {
+    this.subscription = this.nicoliveProgramService.stateChange.subscribe(state => {
+      if (state.status === 'end') {
+        if (this.streamingService.isStreaming) {
+          this.streamingService.toggleStreamingAsync();
+        }
+      }
+    });
+  }
+
+  destroyed() {
+    if (this.subscription) {
+      this.subscription.unsubscribe();
+      this.subscription = null;
+    }
+  }
 
   isCreating: boolean = false;
   async createProgram() {
