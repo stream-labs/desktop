@@ -131,5 +131,6 @@
   "Use Custom": "カスタムを使用",
   "Apply": "適用",
   "Do not show this message again": "このメッセージを今後表示しない",
-  "You can only select up to %{max} items": "選択できるアイテムは最大 %{max} 個のみです"
+  "You can only select up to %{max} items": "選択できるアイテムは最大 %{max} 個のみです",
+  "Time": "時間"
 }
