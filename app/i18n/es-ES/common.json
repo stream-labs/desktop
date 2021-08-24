@@ -131,5 +131,6 @@
   "Use Custom": "Usar personalizado",
   "Apply": "Aplicar",
   "Do not show this message again": "No volver a mostrar este mensaje",
-  "You can only select up to %{max} items": "Solo puede seleccionar hasta %{max} elementos"
+  "You can only select up to %{max} items": "Solo puede seleccionar hasta %{max} elementos",
+  "Time": "Tiempo"
 }
