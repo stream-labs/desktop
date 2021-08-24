@@ -155,6 +155,7 @@ function EventSettingsModal() {
           {canChangePlatform && (
             <ListInput
               label={$t('Platform')}
+              name="platform"
               value={selectedPlatform}
               options={platforms.map(platform => ({
                 value: platform,
