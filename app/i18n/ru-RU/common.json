@@ -131,5 +131,6 @@
   "Use Custom": "Пользовательский",
   "Apply": "Применить",
   "Do not show this message again": "Больше не показывать это сообщение",
-  "You can only select up to %{max} items": "Можно выбрать не более %{max} эл."
+  "You can only select up to %{max} items": "Можно выбрать не более %{max} эл.",
+  "Time": "Время"
 }
