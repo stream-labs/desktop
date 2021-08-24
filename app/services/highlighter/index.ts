@@ -519,6 +519,10 @@ export class HighlighterService extends StatefulService<IHighligherState> {
                 'notificationAction',
               ),
             });
+
+            this.usageStatisticsService.recordAnalyticsEvent('Highlighter', {
+              type: 'NotificationShow',
+            });
           }
 
           streamStarted = false;
@@ -530,6 +534,9 @@ export class HighlighterService extends StatefulService<IHighligherState> {
   notificationAction() {
     this.navigationService.navigate('Highlighter');
     this.dismissablesService.dismiss(EDismissable.HighlighterNotification);
+    this.usageStatisticsService.recordAnalyticsEvent('Highlighter', {
+      type: 'NotificationClick',
+    });
   }
 
   addClips(paths: string[]) {
