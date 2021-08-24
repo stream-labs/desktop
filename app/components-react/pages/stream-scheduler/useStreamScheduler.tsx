@@ -207,6 +207,12 @@ class StreamSchedulerModule {
 
   getPlatformDisplayName = this.streamingView.getPlatformDisplayName;
 
+  private recordFeatureUsage(
+    featureName: 'StreamSchedulerView' | 'StreamSchedulerEdit' | 'StreamSchedulerGoLive',
+  ) {
+    Services.UsageStatisticsService.actions.recordFeatureUsage(featureName);
+  }
+
   /**
    * Shows a modal for creating a new event
    */
@@ -228,6 +234,7 @@ class StreamSchedulerModule {
    * Shows a modal for editing an existing event
    */
   async showEditEventModal(eventId: string) {
+    this.recordFeatureUsage('StreamSchedulerView');
     const event = getDefined(this.state.events.find(ev => eventId === ev.id));
     if (event.platform === 'youtube') {
       const ytSettings = await Services.YoutubeService.actions.return.fetchStartStreamOptionsForBroadcast(
@@ -249,6 +256,7 @@ class StreamSchedulerModule {
    * Validates and submits the event editor form
    */
   async submit(): Promise<boolean> {
+    this.recordFeatureUsage('StreamSchedulerEdit');
     // validate form
     try {
       await this.form.validateFields();
@@ -354,6 +362,7 @@ class StreamSchedulerModule {
    * Start stream to a selected event
    */
   async goLive() {
+    this.recordFeatureUsage('StreamSchedulerGoLive');
     const event = getDefined(this.selectedEvent);
     const prepopulateOptions = {
       [event.platform]: this.state.platformSettings[event.platform],

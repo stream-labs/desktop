@@ -140,6 +140,17 @@ export default class SideNav extends Vue {
       });
     }
 
+    // Will only ever be enabled on individual accounts or enabled
+    // via command line flag. Not for general use.
+    if (this.featureIsEnabled(EAvailableFeatures.themeAudit)) {
+      pageData.push({
+        target: 'ThemeAudit',
+        icon: 'fas fa-exclamation-triangle',
+        title: 'Theme Audit',
+        trackingTarget: 'themeaudit',
+      });
+    }
+
     return pageData;
   }
 
