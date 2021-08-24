@@ -137,6 +137,12 @@ export function useForm(name?: string) {
     return controllers;
   }
 
+  async function getInput<T extends BaseInputController<unknown>>(name: string) {
+    const inputs = await getInputControllers();
+    const input = inputs.find(input => input.name === name) as T;
+    return input;
+  }
+
   /**
    * Check if form contains expected data
    * Throws an exception if not
@@ -172,7 +178,7 @@ export function useForm(name?: string) {
     return String(value);
   }
 
-  return { readForm, fillForm, assertFormContains };
+  return { readForm, fillForm, assertFormContains, getInput };
 }
 
 /**

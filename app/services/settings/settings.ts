@@ -59,6 +59,7 @@ export interface ISettingsValues {
   Advanced: {
     DelayEnable: boolean;
     DelaySec: number;
+    fileCaching: boolean;
   };
 }
 

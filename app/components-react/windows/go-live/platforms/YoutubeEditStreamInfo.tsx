@@ -6,7 +6,7 @@ import {
   InputComponent,
   ListInput,
 } from '../../../shared/inputs';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Services } from '../../../service-provider';
 import { $t } from '../../../../services/i18n';
 import BroadcastInput from './BroadcastInput';
@@ -60,6 +60,7 @@ export const YoutubeEditStreamInfo = InputComponent((p: IPlatformComponentParams
     },
   );
 
+  // re-fill form when the broadcastId selected
   useEffect(() => {
     if (!broadcastId) return;
     YoutubeService.actions.return

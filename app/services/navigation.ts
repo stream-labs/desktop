@@ -14,7 +14,8 @@ export type TAppPage =
   | 'AlertboxLibrary'
   | 'StreamScheduler'
   | 'Highlighter'
-  | 'Grow';
+  | 'Grow'
+  | 'ThemeAudit';
 
 interface INavigationState {
   currentPage: TAppPage;
