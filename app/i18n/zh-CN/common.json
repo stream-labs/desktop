@@ -131,5 +131,6 @@
   "Use Custom": "使用自定义",
   "Apply": "应用",
   "Do not show this message again": "不再显示此消息",
-  "You can only select up to %{max} items": "您最多只能选择 %{max} 个项目"
+  "You can only select up to %{max} items": "您最多只能选择 %{max} 个项目",
+  "Time": "时间"
 }
