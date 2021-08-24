@@ -144,6 +144,7 @@ import { HotkeysService } from './services/hotkeys';
 import { WidgetsService } from './services/widgets';
 import { HostsService } from './services/hosts';
 import { OnboardingService } from './services/onboarding';
+import { SceneCollectionsService } from './services/scene-collections';
 import { PlatformAppsService } from './services/platform-apps';
 
 export const AppServices = {
@@ -181,5 +182,6 @@ export const AppServices = {
   WidgetsService,
   HostsService,
   OnboardingService,
+  SceneCollectionsService,
   PlatformAppsService,
 };
