@@ -131,5 +131,6 @@
   "Use Custom": "Özel Kullan",
   "Apply": "Uygula",
   "Do not show this message again": "Bu mesajı tekrar gösterme",
-  "You can only select up to %{max} items": "En fazla %{max} öğeye kadar seçebilirsiniz"
+  "You can only select up to %{max} items": "En fazla %{max} öğeye kadar seçebilirsiniz",
+  "Time": "Zaman"
 }
