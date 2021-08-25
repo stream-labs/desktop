@@ -147,7 +147,8 @@ import { HostsService } from './services/hosts';
 import { OnboardingService } from './services/onboarding';
 import { CacheUploaderService } from './services/cache-uploader';
 import { StreamlabelsService } from './services/streamlabels';
-import { TroubleshooterService } from './services/troubleshooter';
+import { SceneCollectionsService } from './services/scene-collections';
+import { PlatformAppsService } from './services/platform-apps';
 
 export const AppServices = {
   AppService,
@@ -187,5 +188,6 @@ export const AppServices = {
   OnboardingService,
   CacheUploaderService,
   StreamlabelsService,
-  TroubleshooterService,
+  SceneCollectionsService,
+  PlatformAppsService,
 };

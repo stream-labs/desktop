@@ -515,7 +515,7 @@ export class FacebookService
   /**
    * Fetch all scheduled videos from the timeline pages and groups
    */
-  async fetchAllVideos(): Promise<IFacebookLiveVideoExtended[]> {
+  async fetchAllVideos(onlyUpcoming = false): Promise<IFacebookLiveVideoExtended[]> {
     // perform all requests simultaneously
     const requests: Promise<IFacebookLiveVideoExtended[]>[] = [];
 
@@ -524,7 +524,7 @@ export class FacebookService
       const destinationType = 'me';
       const destinationId = 'me';
       requests.push(
-        this.fetchScheduledVideos(destinationType, destinationId).then(videos =>
+        this.fetchScheduledVideos(destinationType, destinationId, onlyUpcoming).then(videos =>
           videos.map(video => ({
             ...video,
             destinationType,
@@ -540,7 +540,7 @@ export class FacebookService
       this.state.facebookGroups.forEach(group => {
         const destinationId = group.id;
         requests.push(
-          this.fetchScheduledVideos(destinationType, destinationId).then(videos =>
+          this.fetchScheduledVideos(destinationType, destinationId, onlyUpcoming).then(videos =>
             videos.map(video => ({
               ...video,
               destinationType,
@@ -556,7 +556,7 @@ export class FacebookService
       const destinationType = 'page';
       const destinationId = page.id;
       requests.push(
-        this.fetchScheduledVideos(destinationType, destinationId).then(videos =>
+        this.fetchScheduledVideos(destinationType, destinationId, onlyUpcoming).then(videos =>
           videos.map(video => ({
             ...video,
             destinationType,
@@ -576,7 +576,7 @@ export class FacebookService
   /**
    * fetch a single LiveVideo object
    */
-  private async fetchVideo(
+  async fetchVideo(
     id: string,
     destinationType: TDestinationType,
     destinationId: string,

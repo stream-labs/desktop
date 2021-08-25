@@ -318,6 +318,16 @@ export class SourcesService extends StatefulService<ISourcesState> {
       this.usageStatisticsService.recordFeatureUsage('AudioInputSource');
     } else if (type === 'dshow_input') {
       this.usageStatisticsService.recordFeatureUsage('DShowInput');
+
+      const device = this.hardwareService.state.dshowDevices.find(
+        d => d.id === obsInput.settings.video_device_id,
+      );
+
+      if (device) {
+        this.usageStatisticsService.recordAnalyticsEvent('WebcamUse', {
+          device: device.description,
+        });
+      }
     } else if (type === 'window_capture') {
       this.usageStatisticsService.recordFeatureUsage('WindowCapture');
     } else if (type === 'monitor_capture') {

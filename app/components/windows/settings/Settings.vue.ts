@@ -12,6 +12,7 @@ import DeveloperSettings from './DeveloperSettings';
 import InstalledApps from 'components/InstalledApps.vue';
 import Hotkeys from './Hotkeys.vue';
 import OverlaySettings from './OverlaySettings';
+import NotificationsSettings from './NotificationsSettings.vue';
 import AppearanceSettings from './AppearanceSettings';
 import ExperimentalSettings from './ExperimentalSettings.vue';
 import RemoteControlSettings from './RemoteControlSettings.vue';
@@ -37,6 +38,7 @@ import { debounce } from 'lodash-decorators';
     Hotkeys,
     DeveloperSettings,
     OverlaySettings,
+    NotificationsSettings,
     AppearanceSettings,
     RemoteControlSettings,
     ExperimentalSettings,
@@ -126,7 +128,7 @@ export default class Settings extends Vue {
    * returns the list of the pages ported to React
    */
   get reactPages() {
-    return ['General', 'Notifications'];
+    return ['General', 'Appearance'];
   }
 
   get shouldShowReactPage() {
