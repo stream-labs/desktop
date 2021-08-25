@@ -8,6 +8,7 @@ export enum EDismissable {
   SceneCollectionsHelpTip = 'scene_collections_help_tip',
   RecentEventsHelpTip = 'recent_events_help_tip',
   FacebookNeedPermissionsTip = 'facebook_need_permissions_tip',
+  HighlighterNotification = 'highlighter_notification',
 }
 
 interface IDismissablesServiceState {
@@ -51,8 +52,21 @@ export class DismissablesService extends PersistentStatefulService<IDismissables
     Object.keys(EDismissable).forEach(key => this.dismiss(EDismissable[key]));
   }
 
+  /**
+   * Resets all dismissables. Useful for testing.
+   * @deprecated For testing use only
+   */
+  reset() {
+    this.RESET();
+  }
+
   @mutation()
   DISMISS(key: EDismissable) {
     Vue.set(this.state, key, true);
+  }
+
+  @mutation()
+  RESET() {
+    this.state = {};
   }
 }
