@@ -50,8 +50,8 @@ export const components = {
   TestWidgets,
   RenameSource,
   NotificationsArea,
+  ObsSettings: createRoot(ObsSettings),
   ThemeAudit,
   AppsNav,
-  ObsSettings: createRoot(ObsSettings),
   StudioEditor,
 };
