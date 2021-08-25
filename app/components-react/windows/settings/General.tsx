@@ -1,4 +1,4 @@
-import React, {useRef, useState} from 'react';
+import React, { useRef, useState } from 'react';
 import { ObsGenericSettingsForm, ObsSettingsSection } from './ObsSettings';
 import { $t, I18nService } from '../../../services/i18n';
 import { alertAsync, confirmAsync } from '../../modals';
@@ -8,7 +8,7 @@ import { Services } from '../../service-provider';
 import fs from 'fs';
 import rimraf from 'rimraf';
 import path from 'path';
-import {useFormState, useOnCreate} from '../../hooks';
+import { useOnCreate } from '../../hooks';
 import { useBinding } from '../../store';
 import { getDefined } from '../../../util/properties-type-guards';
 
