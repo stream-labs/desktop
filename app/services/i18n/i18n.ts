@@ -14,6 +14,7 @@ import fallback from '../../i18n/fallback';
 
 interface II18nState {
   locale: string;
+  localeList: { value: string; label: string }[];
 }
 
 /**
@@ -81,6 +82,7 @@ export const WHITE_LIST = [
 export class I18nService extends PersistentStatefulService<II18nState> implements I18nServiceApi {
   static defaultState: II18nState = {
     locale: '',
+    localeList: [],
   };
 
   static vueI18nInstance: VueI18n;
@@ -173,6 +175,14 @@ export class I18nService extends PersistentStatefulService<II18nState> implement
 
     this.SET_LOCALE(locale);
 
+    const localeList = Object.keys(this.availableLocales).map(locale => {
+      return {
+        value: locale,
+        label: this.availableLocales[locale],
+      };
+    });
+    this.SET_LOCALE_LIST(localeList);
+
     I18nService.uploadTranslationsToVueI18n();
     this.isLoaded = true;
   }
@@ -189,27 +199,6 @@ export class I18nService extends PersistentStatefulService<II18nState> implement
     this.SET_LOCALE(locale);
     electron.remote.app.relaunch({ args: [] });
     electron.remote.app.quit();
-  }
-
-  getLocaleFormData(): TObsFormData {
-    const options = Object.keys(this.availableLocales).map(locale => {
-      return {
-        value: locale,
-        description: this.availableLocales[locale],
-      };
-    });
-
-    return [
-      <IObsListInput<string>>{
-        options,
-        type: 'OBS_PROPERTY_LIST',
-        name: 'locale',
-        description: $t('Language'),
-        value: this.state.locale,
-        enabled: true,
-        visible: true,
-      },
-    ];
   }
 
   private getI18nPath() {
@@ -255,5 +244,10 @@ export class I18nService extends PersistentStatefulService<II18nState> implement
   @mutation()
   private SET_LOCALE(locale: string) {
     this.state.locale = locale;
+  }
+
+  @mutation()
+  private SET_LOCALE_LIST(list: II18nState['localeList']) {
+    this.state.localeList = list;
   }
 }
