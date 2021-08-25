@@ -101,8 +101,13 @@ export const ListInput = InputComponent(<T extends any>(p: TListInputProps<T>) =
   );
 });
 
-export function renderOption<T>(opt: IListOption<T>, ind: number, inputProps: ICustomListProps<T>) {
+export function renderOption<T>(
+  opt: IListOption<T>,
+  ind: number,
+  inputProps: ICustomListProps<T> & { name?: string },
+) {
   const attrs = {
+    'data-option-list': inputProps.name,
     'data-option-label': opt.label,
     'data-option-value': opt.value,
     label: opt.label,

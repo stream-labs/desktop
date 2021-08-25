@@ -68,3 +68,7 @@ export async function setInputValue(selectorOrEl: TSelectorOrEl, value: string |
   await $el.click(); // click again if it's a list input
   await ((client.keys(String(value)) as any) as Promise<any>); // type text
 }
+
+export type TFiledSetterFn<TControllerType extends BaseInputController<any>> = (
+  input: TControllerType,
+) => Promise<unknown>;
