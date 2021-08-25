@@ -230,13 +230,5 @@ export class ThemeAudit extends ReactComponent {}
   },
 })
 export class AppsNav extends ReactComponent {}
-
-@Component({
-  props: {
-    name: { default: 'ObsSettings' },
-    componentProps: { default: () => ({ page: 'General' }) },
-  },
-})
-export class ObsSettings extends ReactComponent {}
 @Component({ props: { name: { default: 'StudioEditor' } } })
 export class StudioEditor extends ReactComponent {}
