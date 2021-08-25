@@ -35,12 +35,6 @@ const config = {
     rfc3161TimeStampServer: 'http://timestamp.digicert.com/?alg=sha1',
     timeStampServer: 'http://timestamp.digicert.com',
   },
-  protocols: [
-    {
-      name: 'N Air',
-      schemes: ['n-air-app'],
-    },
-  ],
   extraMetadata: {
     env: 'production',
   },
