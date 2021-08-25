@@ -1,9 +1,9 @@
-import { mutation, StatefulService, ViewHandler, Inject, InitAfter } from 'services/core';
+import { mutation, StatefulService, ViewHandler, Inject, InitAfter, Service } from 'services/core';
 import path from 'path';
 import Vue from 'vue';
 import fs from 'fs-extra';
 import url from 'url';
-import { StreamingService } from 'services/streaming';
+import { EStreamingState, StreamingService } from 'services/streaming';
 import electron from 'electron';
 import { getPlatformService } from 'services/platforms';
 import { UserService } from 'services/user';
@@ -26,6 +26,10 @@ import { AudioMixer } from './audio-mixer';
 import { UsageStatisticsService } from 'services/usage-statistics';
 import * as Sentry from '@sentry/browser';
 import { $t } from 'services/i18n';
+import { DismissablesService, EDismissable } from 'services/dismissables';
+import { ENotificationType, NotificationsService } from 'services/notifications';
+import { JsonrpcService } from 'services/api/jsonrpc';
+import { NavigationService } from 'services/navigation';
 
 export interface IClip {
   path: string;
@@ -328,6 +332,10 @@ export class HighlighterService extends StatefulService<IHighligherState> {
   @Inject() streamingService: StreamingService;
   @Inject() userService: UserService;
   @Inject() usageStatisticsService: UsageStatisticsService;
+  @Inject() dismissablesService: DismissablesService;
+  @Inject() notificationsService: NotificationsService;
+  @Inject() jsonrpcService: JsonrpcService;
+  @Inject() navigationService: NavigationService;
 
   /**
    * A dictionary of actual clip classes.
@@ -486,7 +494,49 @@ export class HighlighterService extends StatefulService<IHighligherState> {
           source: 'ReplayBuffer',
         });
       });
+
+      let streamStarted = false;
+
+      this.streamingService.streamingStatusChange.subscribe(status => {
+        if (status === EStreamingState.Live) {
+          streamStarted = true;
+        }
+
+        if (status === EStreamingState.Offline) {
+          if (
+            streamStarted &&
+            this.views.clips.length > 0 &&
+            this.dismissablesService.views.shouldShow(EDismissable.HighlighterNotification)
+          ) {
+            this.notificationsService.push({
+              type: ENotificationType.SUCCESS,
+              lifeTime: -1,
+              message: $t(
+                'Edit your replays with Highlighter, a free editor built in to Streamlabs OBS.',
+              ),
+              action: this.jsonrpcService.createRequest(
+                Service.getResourceId(this),
+                'notificationAction',
+              ),
+            });
+
+            this.usageStatisticsService.recordAnalyticsEvent('Highlighter', {
+              type: 'NotificationShow',
+            });
+          }
+
+          streamStarted = false;
+        }
+      });
     }
+  }
+
+  notificationAction() {
+    this.navigationService.navigate('Highlighter');
+    this.dismissablesService.dismiss(EDismissable.HighlighterNotification);
+    this.usageStatisticsService.recordAnalyticsEvent('Highlighter', {
+      type: 'NotificationClick',
+    });
   }
 
   addClips(paths: string[]) {

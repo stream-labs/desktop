@@ -77,6 +77,13 @@ export async function waitForDisplayed(
   await (await select(selectorOrEl)).waitForDisplayed(options);
 }
 
+export async function waitForClickable(
+  selectorOrEl: TSelectorOrEl,
+  options?: WebdriverIO.WaitForOptions,
+) {
+  await (await select(selectorOrEl)).waitForClickable(options);
+}
+
 export function waitForText(text: string) {
   return waitForDisplayed(`*="${text}"`);
 }
