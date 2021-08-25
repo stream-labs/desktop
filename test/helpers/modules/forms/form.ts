@@ -1,12 +1,12 @@
 import * as inputControllers from './inputs';
-import { BaseInputController } from './base';
+import { BaseInputController, TFiledSetterFn } from './base';
 import { pascalize } from 'humps';
 import { difference, keyBy, isEqual, mapValues } from 'lodash';
 import { getClient, waitForDisplayed } from '../core';
 import { sleep } from '../../sleep';
 
 const DEFAULT_FORM_SELECTOR = 'body';
-export type TFormData = Record<string, unknown>;
+export type TFormData = Record<string, unknown | TFiledSetterFn<unknown>>;
 
 /**
  * A helper utility for filling and reading web forms
@@ -60,7 +60,14 @@ export function useForm(name?: string) {
       if (!(name in formData)) return;
       const value = formData[name];
       try {
-        await input.setDisplayValue(formData[name]);
+        if (typeof formData[name] === 'function') {
+          // if function provided as a value than call it as a FieldSetter function
+          const fieldSetter = formData[name] as TFiledSetterFn<any>;
+          await fieldSetter(input);
+        } else {
+          // otherwise set the given value
+          await input.setDisplayValue(formData[name]);
+        }
       } catch (e: unknown) {
         console.log(
           `Input element found but failed to set the value "${value}" for the field "${name}"`,

@@ -185,6 +185,6 @@ export async function scheduleStream(date: Date, formData: TFormData) {
     await fillForm(formData);
 
     await clickButton('Schedule');
-    await waitForClickable('.ant-picker-calendar-month-select');
+    await waitForClickable('.ant-picker-calendar-month-select', { timeout: 10000 });
   });
 }
