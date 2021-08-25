@@ -95,6 +95,18 @@ body {
   }
 }
 
+// fix list input label wrapping with long names
+.ant-select-selection-item {
+  .ant-row {
+    flex-flow: nowrap;
+    overflow: hidden;
+  }
+
+  .ant-col:first-of-type {
+    flex-shrink: 0;
+  }
+}
+
 .ant-btn {
   border: 0;
 }

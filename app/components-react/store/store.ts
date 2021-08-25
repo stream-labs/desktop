@@ -1,12 +1,11 @@
 import { combineReducers, createAction, createReducer, createStore, Store } from '@reduxjs/toolkit';
 import { batch, useSelector as useReduxSelector } from 'react-redux';
 import { StatefulService } from '../../services';
-import { pick } from 'lodash';
 import { useOnCreate } from '../hooks';
 import { useEffect, useRef } from 'react';
 import { isSimilar } from '../../util/isDeepEqual';
 import { createBinding, TBindings } from '../shared/inputs';
-import {getDefined} from "../../util/properties-type-guards";
+import { getDefined } from '../../util/properties-type-guards';
 
 /*
  * This file provides Redux integration in a modular way
@@ -466,7 +465,33 @@ export function createDependencyWatcher<T extends object>(watchedObject: T) {
   return { watcherProxy, getDependentFields, getDependentValues };
 }
 
-// replacement for get/set pattern
+/**
+ * Returns a reactive binding for inputs
+ *
+ * @example 1 usage with getter and setter
+ *
+ * const bind = useBinding({
+ *   get theme() {
+ *     return this.customizationService.state.theme
+ *   },
+ *   set theme(val: string) {
+ *     this.customizationService.actions.setSettings({ theme: val });
+ *   }
+ * })
+ *
+ * return <ListInput {...bind.theme} />
+ *
+ *
+ * @example 2 usage with a setter function
+ *
+ * const bind = useBinding(
+ *   () => this.customizationService.state,
+ *   newState => this.customizationService.setSettings(newState)
+ * )
+ *
+ * return <ListInput {...bind.theme} />
+ *
+ */
 export function useBinding<
   TState extends object,
   TFieldName extends keyof TState,
