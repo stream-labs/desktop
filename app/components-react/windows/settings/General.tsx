@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { ObsGenericSettingsForm, ObsSettingsSection } from './ObsSettings';
 import { $t, I18nService } from '../../../services/i18n';
 import { alertAsync, confirmAsync } from '../../modals';
@@ -176,31 +176,27 @@ function ExtraSettings() {
     WindowsService.actions.closeChildWindow();
   }
 
+  function disableHardwareAcceleration(val: boolean) {
+    try {
+      if (val) {
+        // Touch the file
+        fs.closeSync(fs.openSync(disableHAFilePath, 'w'));
+        setDisableHA(true);
+      } else {
+        fs.unlinkSync(disableHAFilePath);
+        setDisableHA(false);
+      }
+    } catch (e: unknown) {
+      console.error('Error setting hardware acceleration', e);
+    }
+  }
+
   const bind = useBinding({
     get streamInfoUpdate() {
       return CustomizationService.state.updateStreamInfoOnLive;
     },
     set streamInfoUpdate(value) {
       CustomizationService.setUpdateStreamInfoOnLive(value);
-    },
-
-    get disableHardwareAcceleration() {
-      return disableHA;
-    },
-
-    set disableHardwareAcceleration(val: boolean) {
-      try {
-        if (val) {
-          // Touch the file
-          fs.closeSync(fs.openSync(disableHAFilePath, 'w'));
-          setDisableHA(true);
-        } else {
-          fs.unlinkSync(disableHAFilePath);
-          setDisableHA(false);
-        }
-      } catch (e: unknown) {
-        console.error('Error setting hardware acceleration', e);
-      }
     },
   });
 
@@ -216,7 +212,8 @@ function ExtraSettings() {
         )}
         <CheckboxInput
           label={$t('Disable hardware acceleration (requires restart)')}
-          {...bind.disableHardwareAcceleration}
+          value={disableHA}
+          onChange={disableHardwareAcceleration}
           name="disable_ha"
         />
 
