@@ -11,19 +11,15 @@ const config = {
     'updater/Updater.js',
     'index.html',
     'main.js',
-    'obs-api'
+    'obs-api',
   ],
-  extraFiles: [
-    'scene-presets',
-    'LICENSE',
-    'AGREEMENT.sjis'
-  ],
+  extraFiles: ['scene-presets', 'LICENSE', 'AGREEMENT.sjis'],
   detectUpdateChannel: false,
   publish: {
     provider: 'generic',
     useMultipleRangeRequest: false,
     channel: 'latest',
-    url: 'https://n-air-app.nicovideo.jp/download/windows'
+    url: 'https://n-air-app.nicovideo.jp/download/windows',
   },
   nsis: {
     license: 'AGREEMENT.sjis',
@@ -32,18 +28,16 @@ const config = {
     allowToChangeInstallationDirectory: true,
     // eslint-disable-next-line no-template-curly-in-string
     artifactName: 'n-air-app-setup.${version}.${ext}',
-    include: 'installer.nsh'
+    include: 'installer.nsh',
   },
   win: {
-    publisherName: [
-      'DWANGO Co.,Ltd.'
-    ],
+    publisherName: ['DWANGO Co.,Ltd.'],
     rfc3161TimeStampServer: 'http://timestamp.digicert.com/?alg=sha1',
-    timeStampServer: 'http://timestamp.digicert.com'
+    timeStampServer: 'http://timestamp.digicert.com',
   },
   extraMetadata: {
-    env: 'production'
-  }
+    env: 'production',
+  },
 };
 
 if (process.env.NAIR_LICENSE_API_KEY) {
