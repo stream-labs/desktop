@@ -20,9 +20,11 @@ import StartStreamingButton from './root/StartStreamingButton';
 import TestWidgets from './root/TestWidgets';
 import RenameSource from './windows/RenameSource';
 import NotificationsArea from './root/NotificationsArea';
+import AppsNav from './sidebar/AppsNav';
 import StudioEditor from './root/StudioEditor';
 import SharedComponentsLibrary from './windows/sharedComponentsLibrary/SharedComponentsLibrary';
 import { ObsSettings } from './windows/settings/ObsSettings';
+import ThemeAudit from './pages/ThemeAudit';
 
 // list of React components to be used inside Vue components
 export const components = {
@@ -49,5 +51,7 @@ export const components = {
   RenameSource,
   NotificationsArea,
   ObsSettings: createRoot(ObsSettings),
+  ThemeAudit,
+  AppsNav,
   StudioEditor,
 };

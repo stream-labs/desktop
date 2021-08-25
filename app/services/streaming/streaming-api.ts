@@ -67,6 +67,10 @@ export interface IStreamSettings {
 export interface IGoLiveSettings extends IStreamSettings {
   optimizedProfile?: IEncoderProfile;
   tweetText?: string;
+  prepopulateOptions?: {
+    youtube?: Partial<IYoutubeStartStreamOptions>;
+    facebook?: Partial<IFacebookStartStreamOptions>;
+  };
 }
 
 export interface IPlatformFlags {

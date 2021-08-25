@@ -41,6 +41,14 @@ export abstract class BaseInputController<TValue> {
   async getDisplayValue(): Promise<string> {
     return (this.getValue() as unknown) as Promise<string>;
   }
+
+  async waitForLoading() {
+    const $el = await this.getElement();
+    return $el.waitUntil(async () => {
+      const loading = await $el.getAttribute('data-loading');
+      return loading === 'false';
+    });
+  }
 }
 
 /**
