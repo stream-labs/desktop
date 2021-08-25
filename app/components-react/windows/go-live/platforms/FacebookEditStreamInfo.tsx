@@ -241,6 +241,7 @@ export default function FacebookEditStreamInfo(p: IPlatformComponentParams<'face
             {shouldShowPages && (
               <ListInput
                 {...bind.pageId}
+                required={true}
                 label={$t('Facebook Page')}
                 hasImage
                 imageSize={{ width: 44, height: 44 }}
@@ -256,6 +257,7 @@ export default function FacebookEditStreamInfo(p: IPlatformComponentParams<'face
               <>
                 <ListInput
                   {...bind.groupId}
+                  required={true}
                   label={$t('Facebook Group')}
                   hasImage
                   imageSize={{ width: 44, height: 44 }}
