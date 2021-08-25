@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {useRef, useState} from 'react';
 import { ObsGenericSettingsForm, ObsSettingsSection } from './ObsSettings';
 import { $t, I18nService } from '../../../services/i18n';
 import { alertAsync, confirmAsync } from '../../modals';
@@ -8,7 +8,7 @@ import { Services } from '../../service-provider';
 import fs from 'fs';
 import rimraf from 'rimraf';
 import path from 'path';
-import { useOnCreate } from '../../hooks';
+import {useFormState, useOnCreate} from '../../hooks';
 import { useBinding } from '../../store';
 import { getDefined } from '../../../util/properties-type-guards';
 
@@ -152,6 +152,8 @@ function ExtraSettings() {
   const canRunOptimizer = isTwitch && !isRecordingOrStreaming && protectedMode;
   const disableHAFilePath = path.join(AppService.appDataDirectory, 'HADisable');
   const [disableHA, setDisableHA] = useState(() => fs.existsSync(disableHAFilePath));
+  const disableHARef = useRef(false);
+  disableHARef.current = disableHA;
 
   function restartStreamlabelsSession() {
     StreamlabelsService.restartSession().then(result => {
@@ -185,7 +187,7 @@ function ExtraSettings() {
     },
 
     get disableHardwareAcceleration() {
-      return disableHA;
+      return disableHARef.current;
     },
 
     set disableHardwareAcceleration(val: boolean) {
