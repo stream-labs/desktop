@@ -6,7 +6,7 @@ import { getClient, waitForDisplayed } from '../core';
 import { sleep } from '../../sleep';
 
 const DEFAULT_FORM_SELECTOR = 'body';
-export type TFormData = Record<string, unknown | TFiledSetterFn<unknown>>;
+export type TFormData = Record<string, unknown>;
 
 /**
  * A helper utility for filling and reading web forms
@@ -61,7 +61,7 @@ export function useForm(name?: string) {
       const value = formData[name];
       try {
         if (typeof formData[name] === 'function') {
-          // if function provided as a value than call it as a FieldSetter function
+          // if function provided as a value then call it as a FieldSetter function
           const fieldSetter = formData[name] as TFiledSetterFn<any>;
           await fieldSetter(input);
         } else {
