@@ -75,8 +75,6 @@
           @scanCompleted="onScanCompletedHandler"
           v-slot:default="{ page, scanning }"
         >
-          <extra-settings v-if="page === 'General'" />
-          <language-settings v-if="page === 'General'" />
           <hotkeys
             v-if="page === 'Hotkeys'"
             :globalSearchStr="scanning ? '' : searchStr"
@@ -93,22 +91,9 @@
           <remote-control-settings v-if="page === 'Remote Control'" />
           <game-overlay-settings v-if="page === 'Game Overlay'" />
           <virtual-webcam-settings v-if="page === 'Virtual Webcam'" />
+          <ObsSettings v-if="shouldShowReactPage" :componentProps="{ page: page }" />
           <GenericFormGroups
-            v-if="
-              ![
-                'Hotkeys',
-                'Stream',
-                'API',
-                'Overlays',
-                'Notifications',
-                'Appearance',
-                'Experimental',
-                'Remote Control',
-                'Installed Apps',
-                'Virtual Webcam',
-                'Developer',
-              ].includes(page)
-            "
+            v-if="shouldShowVuePage"
             :key="page"
             :categoryName="page"
             :value="settingsData"
