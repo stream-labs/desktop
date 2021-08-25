@@ -152,8 +152,6 @@ function ExtraSettings() {
   const canRunOptimizer = isTwitch && !isRecordingOrStreaming && protectedMode;
   const disableHAFilePath = path.join(AppService.appDataDirectory, 'HADisable');
   const [disableHA, setDisableHA] = useState(() => fs.existsSync(disableHAFilePath));
-  const disableHARef = useRef(false);
-  disableHARef.current = disableHA;
 
   function restartStreamlabelsSession() {
     StreamlabelsService.restartSession().then(result => {
@@ -178,31 +176,27 @@ function ExtraSettings() {
     WindowsService.actions.closeChildWindow();
   }
 
+  function disableHardwareAcceleration(val: boolean) {
+    try {
+      if (val) {
+        // Touch the file
+        fs.closeSync(fs.openSync(disableHAFilePath, 'w'));
+        setDisableHA(true);
+      } else {
+        fs.unlinkSync(disableHAFilePath);
+        setDisableHA(false);
+      }
+    } catch (e: unknown) {
+      console.error('Error setting hardware acceleration', e);
+    }
+  }
+
   const bind = useBinding({
     get streamInfoUpdate() {
       return CustomizationService.state.updateStreamInfoOnLive;
     },
     set streamInfoUpdate(value) {
       CustomizationService.setUpdateStreamInfoOnLive(value);
-    },
-
-    get disableHardwareAcceleration() {
-      return disableHARef.current;
-    },
-
-    set disableHardwareAcceleration(val: boolean) {
-      try {
-        if (val) {
-          // Touch the file
-          fs.closeSync(fs.openSync(disableHAFilePath, 'w'));
-          setDisableHA(true);
-        } else {
-          fs.unlinkSync(disableHAFilePath);
-          setDisableHA(false);
-        }
-      } catch (e: unknown) {
-        console.error('Error setting hardware acceleration', e);
-      }
     },
   });
 
@@ -218,7 +212,8 @@ function ExtraSettings() {
         )}
         <CheckboxInput
           label={$t('Disable hardware acceleration (requires restart)')}
-          {...bind.disableHardwareAcceleration}
+          value={disableHA}
+          onChange={disableHardwareAcceleration}
           name="disable_ha"
         />
 
