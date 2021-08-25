@@ -6,6 +6,7 @@ import {
   CheckboxInput,
   createBinding,
   DateInput,
+  FileInput,
   ImageInput,
   ListInput,
   NumberInput,
@@ -71,6 +72,7 @@ function Examples() {
     numberVal: 0,
     sliderVal: 5,
     imageVal: '',
+    saveFilePathVal: '',
     checkboxVal: false,
     dateVal: undefined as Date | undefined,
     listVal: 1,
@@ -229,6 +231,10 @@ function Examples() {
 
       <Example title="Image Input">
         <ImageInput label="Basic" maxFileSize={3000000} {...globalProps} {...bind.imageVal} />
+      </Example>
+
+      <Example title="File Input">
+        <FileInput label="Save As" save={true} {...globalProps} {...bind.saveFilePathVal} />
       </Example>
 
       <Example title="Buttons">

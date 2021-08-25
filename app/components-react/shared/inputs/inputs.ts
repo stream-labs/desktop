@@ -24,7 +24,8 @@ type TInputType =
   | 'date'
   | 'slider'
   | 'image'
-  | 'time';
+  | 'time'
+  | 'file';
 
 export type TInputLayout = 'horizontal' | 'vertical' | 'inline';
 
