@@ -33,6 +33,7 @@
   "Disable clip": "Disable clip",
   "Enable clip": "Enable clip",
   "Trim clip": "Trim clip",
+  "Trim Clip": "Trim Clip",
   "Remove clip": "Remove clip",
   "Video Name": "Video Name",
   "Export Location": "Export Location",
@@ -56,11 +57,11 @@
   "Title": "Başlık",
   "Description": "Açıklama",
   "Privacy Status": "Privacy Status",
-  "Private": "Private",
+  "Private": "Gizli",
   "Only you and people you choose can watch your video": "Only you and people you choose can watch your video",
-  "Unlisted": "Unlisted",
+  "Unlisted": "Liste dışı",
   "Anyone with the video link can watch your video": "Anyone with the video link can watch your video",
-  "Public": "Public",
+  "Public": "Herkese Açık",
   "Everyone can watch your video": "Everyone can watch your video",
   "Please connect your YouTube account to upload your video to YouTube.": "Please connect your YouTube account to upload your video to YouTube.",
   "Connect": "Bağlan",
@@ -88,5 +89,6 @@
   "An error occurred while writing the video file": "An error occurred while writing the video file",
   "An error occurred while reading %{file}": "An error occurred while reading %{file}",
   "An error occurred while reading audio from %{file}": "An error occurred while reading audio from %{file}",
-  "An error occurred while mixing audio": "An error occurred while mixing audio"
+  "An error occurred while mixing audio": "An error occurred while mixing audio",
+  "Edit your replays with Highlighter, a free editor built in to Streamlabs OBS.": "Edit your replays with Highlighter, a free editor built in to Streamlabs OBS."
 }
