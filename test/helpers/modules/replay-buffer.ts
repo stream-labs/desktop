@@ -3,6 +3,7 @@ import { click, useMainWindow, waitForDisplayed } from './core';
 export async function startReplayBuffer() {
   await useMainWindow(async () => {
     await click('button .icon-replay-buffer');
+    await waitForDisplayed('button .fa.fa-stop');
   });
 }
 
