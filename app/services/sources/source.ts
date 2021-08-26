@@ -12,7 +12,7 @@ import { ScenesService } from 'services/scenes';
 import { TObsFormData } from 'components/obs/inputs/ObsInput';
 import Utils from 'services/utils';
 import * as obs from '../../../obs-api';
-import { isEqual } from 'lodash';
+import { cloneDeep, isEqual } from 'lodash';
 
 @ServiceHelper()
 export class Source implements ISourceApi {
@@ -80,7 +80,7 @@ export class Source implements ISourceApi {
   }
 
   getPropertiesManagerSettings(): Dictionary<any> {
-    return this.sourcesService.propertiesManagers[this.sourceId].manager.settings;
+    return cloneDeep(this.sourcesService.propertiesManagers[this.sourceId].manager.settings);
   }
 
   getPropertiesManagerUI(): string {

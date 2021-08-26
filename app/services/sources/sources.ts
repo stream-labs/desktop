@@ -177,7 +177,9 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
     };
 
     this.sourceAdded.next(source.state);
-    if (options.audioSettings) this.audioService.getSource(id).setSettings(options.audioSettings);
+    if (options.audioSettings) {
+      this.audioService.getSource(id).setSettings(options.audioSettings);
+    }
   }
 
   removeSource(id: string) {
@@ -193,14 +195,14 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
       obs.Global.setOutputSource(source.channel, null);
     }
 
-    this.REMOVE_SOURCE(id);
+    source.getObsInput().release();
     this.propertiesManagers[id].manager.destroy();
     delete this.propertiesManagers[id];
+    this.REMOVE_SOURCE(id);
     this.sourceRemoved.next(source.state);
-    source.getObsInput().release();
   }
 
-  addFile(path: string): Source {
+  addFile(path: string): Source | null {
     const SUPPORTED_EXT = {
       image_source: ['png', 'jpg', 'jpeg', 'tga', 'bmp'],
       ffmpeg_source: [
@@ -245,7 +247,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
       } else if (type === 'text_gdiplus') {
         settings = { text: fs.readFileSync(path).toString() };
       }
-      return this.createSource(filename, type as TSourceType, settings);
+      if (settings) return this.createSource(filename, type as TSourceType, settings);
     }
     return null;
   }
@@ -257,6 +259,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
   private onSceneItemRemovedHandler(sceneItemState: ISceneItem) {
     // remove source if it has been removed from the all scenes
     const source = this.getSource(sceneItemState.sourceId);
+    if (!source) return;
 
     if (source.type === 'scene') return;
 
@@ -410,6 +413,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
 
   setMuted(id: string, muted: boolean) {
     const source = this.getSource(id);
+    if (!source) return;
     source.getObsInput().muted = muted;
     this.UPDATE_SOURCE({ id, muted });
     this.sourceUpdated.next(source.state);
