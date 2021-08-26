@@ -86,7 +86,6 @@
           <installed-apps v-if="page === 'Installed Apps'" />
           <overlay-settings v-if="page === 'Scene Collections'" />
           <notifications-settings v-if="page === 'Notifications'" />
-          <appearance-settings v-if="page === 'Appearance'" />
           <experimental-settings v-if="page === 'Experimental'" />
           <remote-control-settings v-if="page === 'Remote Control'" />
           <game-overlay-settings v-if="page === 'Game Overlay'" />
