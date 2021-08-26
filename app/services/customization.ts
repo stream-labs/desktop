@@ -71,75 +71,6 @@ export interface ICustomizationServiceState {
 }
 
 class CustomizationViews extends ViewHandler<ICustomizationServiceState> {
-  get settingsFormData(): TObsFormData {
-    const settings = this.state;
-
-    const formData: TObsFormData = [
-      <IObsListInput<boolean>>{
-        value: settings.folderSelection,
-        name: 'folderSelection',
-        description: $t('Scene item selection mode'),
-        type: 'OBS_PROPERTY_LIST',
-        options: [
-          { value: true, description: $t('Single click selects group. Double click selects item') },
-          {
-            value: false,
-            description: $t('Double click selects group. Single click selects item'),
-          },
-        ],
-        visible: true,
-        enabled: true,
-      },
-
-      <IObsInput<boolean>>{
-        value: settings.leftDock,
-        name: 'leftDock',
-        description: $t('Show the live dock (chat) on the left side'),
-        type: 'OBS_PROPERTY_BOOL',
-        visible: true,
-        enabled: true,
-      },
-
-      <IObsNumberInputValue>{
-        value: settings.chatZoomFactor,
-        name: 'chatZoomFactor',
-        description: $t('Chat Text Size'),
-        type: 'OBS_PROPERTY_SLIDER',
-        minVal: 0.25,
-        maxVal: 2,
-        stepVal: 0.25,
-        visible: true,
-        enabled: true,
-        usePercentages: true,
-      },
-    ];
-
-    if (
-      this.getServiceViews(UserService).isLoggedIn &&
-      this.getServiceViews(UserService).platform.type === 'twitch'
-    ) {
-      formData.push(<IObsInput<boolean>>{
-        value: settings.enableBTTVEmotes,
-        name: 'enableBTTVEmotes',
-        description: $t('Enable BetterTTV emotes for Twitch'),
-        type: 'OBS_PROPERTY_BOOL',
-        visible: true,
-        enabled: true,
-      });
-
-      formData.push(<IObsInput<boolean>>{
-        value: settings.enableFFZEmotes,
-        name: 'enableFFZEmotes',
-        description: $t('Enable FrankerFaceZ emotes for Twitch'),
-        type: 'OBS_PROPERTY_BOOL',
-        visible: true,
-        enabled: true,
-      });
-    }
-
-    return formData;
-  }
-
   get experimentalSettingsFormData(): TObsFormData {
     return [];
   }
@@ -290,14 +221,14 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
 
   get themeOptions() {
     const options = [
-      { value: 'night-theme', title: $t('Night') },
-      { value: 'day-theme', title: $t('Day') },
+      { value: 'night-theme', label: $t('Night') },
+      { value: 'day-theme', label: $t('Day') },
     ];
 
     if (this.userService.isPrime) {
       options.push(
-        { value: 'prime-dark', title: $t('Obsidian Prime') },
-        { value: 'prime-light', title: $t('Alabaster Prime') },
+        { value: 'prime-dark', label: $t('Obsidian Prime') },
+        { value: 'prime-light', label: $t('Alabaster Prime') },
       );
     }
     return options;

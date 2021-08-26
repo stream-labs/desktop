@@ -112,7 +112,7 @@ export function ObsFormGroup(p: IObsFormGroupProps) {
       {sections.map((sectionProps, ind) => (
         <div className="section" key={ind}>
           {sectionProps.nameSubCategory !== 'Untitled' && (
-            <h2 className="section-title">{sectionProps.nameSubCategory}</h2>
+            <h2 className="section-title">{$t(sectionProps.nameSubCategory)}</h2>
           )}
           <div className="section-content">
             <ObsForm
