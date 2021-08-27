@@ -634,14 +634,13 @@ export class FacebookService
       .catch(() => 0);
   }
 
-  async fetchFollowers(): Promise<number> | undefined {
-    const pageId = this.state.settings.pageId;
-    if (!pageId) {
+  async fetchFollowers(): Promise<number> {
+    if (!this.state.settings.pageId) {
       await this.prepopulateInfo();
     }
     try {
       const resp = await this.requestFacebook<{ followers_count: number }>(
-        `${this.apiBase}/${pageId}?fields=followers_count`,
+        `${this.apiBase}/${this.state.settings.pageId}?fields=followers_count`,
       );
       return resp.followers_count;
     } catch (e: unknown) {
