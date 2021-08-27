@@ -635,9 +635,7 @@ export class FacebookService
   }
 
   async fetchFollowers(): Promise<number> {
-    if (!this.state.settings.pageId) {
-      await this.prepopulateInfo();
-    }
+    if (this.state.isPrepopulated === false) await this.prepopulateInfo();
     try {
       const resp = await this.requestFacebook<{ followers_count: number }>(
         `${this.apiBase}/${this.state.settings.pageId}?fields=followers_count`,
