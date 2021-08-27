@@ -256,11 +256,12 @@ export class ChatService extends Service {
           true,
         );
       }
-
-      this.chatView.webContents.executeJavaScript(
-        require('!!raw-loader!./widgets/settings/chat-highlight-script.js').default,
-        true,
-      );
+      setTimeout(() => {
+        this.chatView.webContents.executeJavaScript(
+          require('!!raw-loader!./widgets/settings/chat-highlight-script.js').default,
+          true,
+        );
+      }, 10000);
 
       // facebook chat doesn't fit our layout by default
       // inject a script that removes scrollbars and sets auto width for the chat

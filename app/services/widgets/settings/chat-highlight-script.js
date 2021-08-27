@@ -3,7 +3,7 @@ function sendPinRequest(messageData) {
 }
 
 function extractProperties(el) {
-  const userColor = el.children.item(1).attributes.getNamedItem('style').value;
+  // const userColor = el.children.item(1).attributes.getNamedItem('style').value;
   const msgText = el.children.item(2).children.item(0).innerHTML;
   const badges = Array.prototype.map
     .call(el.children.item(0).children, child => child.attributes['data-badge'])
@@ -12,7 +12,7 @@ function extractProperties(el) {
     messageToPin: {
       tags: {
         badges,
-        color: userColor,
+        // color: userColor,
         'display-name': el.attributes['data-user'],
         emotes: '',
         id: '',
@@ -26,19 +26,18 @@ function extractProperties(el) {
   };
 }
 
-const chatHightlightStyle = `
-  position: absolute;
-  background-color: red;
-  width: 16px;
-  height: 16px;
-  top: 0;
-  right: 0;
-`;
-
 function addHighlightButton(el) {
+  const slobsChatHightlightStyle = `
+    position: absolute;
+    background-color: red;
+    width: 16px;
+    height: 16px;
+    top: 4px;
+    right: 4px;
+  `;
   const chatHighlight = document.createElement('i');
-  chatHighlight.className = 'chat-highlight-icon';
-  chatHighlight.setAttribute('style', chatHightlightStyle);
+  chatHighlight.className = 'slobs-chat-highlight-icon';
+  chatHighlight.setAttribute('style', slobsChatHightlightStyle);
   chatHighlight.addEventListener('click', e => {
     sendPinRequest(extractProperties(el));
   });
