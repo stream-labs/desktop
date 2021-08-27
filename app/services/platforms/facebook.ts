@@ -634,9 +634,11 @@ export class FacebookService
       .catch(() => 0);
   }
 
-  fetchFollowers(): Promise<number> | undefined {
+  async fetchFollowers(): Promise<number> | undefined {
     const pageId = this.state.settings.pageId;
-    if (!pageId) return;
+    if (!pageId) {
+      await this.prepopulateInfo();
+    }
     return this.requestFacebook<{ followers_count: number }>(
       `${this.apiBase}/${pageId}?fields=followers_count`,
     )
