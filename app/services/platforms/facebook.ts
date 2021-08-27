@@ -634,14 +634,16 @@ export class FacebookService
       .catch(() => 0);
   }
 
-  fetchFollowers(): Promise<number> | undefined {
-    const pageId = this.state.settings.pageId;
-    if (!pageId) return;
-    return this.requestFacebook<{ followers_count: number }>(
-      `${this.apiBase}/${pageId}?fields=followers_count`,
-    )
-      .then(json => json.followers_count)
-      .catch(() => 0);
+  async fetchFollowers(): Promise<number> {
+    if (this.state.isPrepopulated === false) await this.prepopulateInfo();
+    try {
+      const resp = await this.requestFacebook<{ followers_count: number }>(
+        `${this.apiBase}/${this.state.settings.pageId}?fields=followers_count`,
+      );
+      return resp.followers_count;
+    } catch (e: unknown) {
+      return 0;
+    }
   }
 
   async searchGames(searchString: string): Promise<IGame[]> {
