@@ -639,11 +639,14 @@ export class FacebookService
     if (!pageId) {
       await this.prepopulateInfo();
     }
-    return this.requestFacebook<{ followers_count: number }>(
-      `${this.apiBase}/${pageId}?fields=followers_count`,
-    )
-      .then(json => json.followers_count)
-      .catch(() => 0);
+    try {
+      const resp = await this.requestFacebook<{ followers_count: number }>(
+        `${this.apiBase}/${pageId}?fields=followers_count`,
+      );
+      return resp.followers_count;
+    } catch (e: unknown) {
+      return 0;
+    }
   }
 
   async searchGames(searchString: string): Promise<IGame[]> {
