@@ -24,7 +24,7 @@
   "Remove a connection": "Remove a connection",
   "Remove %{filterName}": "Remove %{filterName}",
   "Remove %{folderName}": "Remove %{folderName}",
-  "Remove %{sourceName}": "Remove %{sourceName}",
+  "Remove %{sourceName}": "%{sourceName} eltávolítása",
   "Remove %{sceneName}": "Remove %{sceneName}",
   "Remove %{transitionName}": "Remove %{transitionName}",
   "Rename %{folderName}": "Rename %{folderName}",
