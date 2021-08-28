@@ -1,5 +1,5 @@
 {
-  "Scene Transitions": "Scene Transitions",
+  "Scene Transitions": "Jelenet átmenetek",
   "Cut": "Vágás",
   "Fade": "Áttűnés",
   "Swipe": "Lapozás",
@@ -9,7 +9,7 @@
   "Stinger": "Saját Animáció",
   "Transition": "Átmenet",
   "Duration": "Időtartam",
-  "Add Transition": "Add Transition",
+  "Add Transition": "Átmenet hozzáadása",
   "You need at least 1 transition.": "You need at least 1 transition.",
   "Add Connection": "Add Connection",
   "Beginning Scene": "Beginning Scene",
@@ -25,6 +25,6 @@
   "You need at least 2 scenes to edit transitions.": "You need at least 2 scenes to edit transitions.",
   "This scene transition is managed by an App and cannot be edited.": "This scene transition is managed by an App and cannot be edited.",
   "Global Transition": "Global Transition",
-  "Edit": "Edit",
+  "Edit": "Szerkesztés",
   "Live": "Live"
 }
