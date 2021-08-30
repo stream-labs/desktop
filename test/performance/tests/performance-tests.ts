@@ -160,6 +160,7 @@ test('Create sources', async t => {
     'decklink-input',
     'ndi_source',
     'openvr_capture',
+    'slobs_capture',
     'liv_capture',
     'ovrstream_dc_source',
     'vlc_source',

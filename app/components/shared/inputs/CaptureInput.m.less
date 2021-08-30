@@ -1,0 +1,105 @@
+@import "../../../styles/index";
+
+.captureSource {
+  position: relative;
+  width: 220px;
+
+  @media (max-width: 1024px) {
+    width: auto;
+  }
+
+  .captureSource__input {
+    cursor: pointer !important;
+    background: var(--dropdown-bg);
+    border-color: var(--button);
+
+    &:focus,
+    &:visited,
+    &:active {
+      background: var(--dropdown-bg);
+      border-color: var(--button);
+    }
+  }
+
+  .captureSource__text {
+    position: relative;
+    cursor: pointer;
+
+    i {
+      position: absolute;
+      top: 9px;
+      right: 36px;
+
+      &:hover {
+        color: var(--title);
+        cursor: pointer;
+      }
+    }
+  }
+
+  .captureSource__swatch {
+    .radius();
+
+    position: absolute;
+    top: 6px;
+    right: @spacing;
+    border: 1px solid #ccc;
+    width: 20px;
+    height: 20px;
+  }
+
+  .captureSource-container {
+    position: relative;
+    top: -4px;
+    z-index: 10;
+    border-radius: 0 0 4px 4px;
+    background: var(--dropdown-bg);
+    border: 1px solid var(--button);
+    border-top: none;
+    box-shadow: 0 8px 16px var(--shadow) !important;
+    width: auto;
+
+    &.hidden-alpha {
+      :global(.vc-alpha) { display: none; }
+      :global(.vc-sketch-field) > div:last-child { display: none; }
+    }
+  }
+
+  .captureSource-menu {
+    width: auto;
+    max-width: 200px;
+    margin: 0 auto;
+    background: var(--dropdown-bg);
+    box-shadow: none;
+  }
+
+  :global(.vc-sketch-presets) {
+    margin-right: -8px;
+    margin-left: -8px;
+    padding-left: 8px;
+    padding-top: 8px;
+    border-top: 1px solid var(--border);
+  }
+
+  :global(.vc-sketch-field) :global(.vc-input__label) {
+    color: var(--icon);
+  }
+
+  :global(.vc-checkerboard) {
+    display: none;
+  }
+}
+
+:global(.captureSource-slide-enter),
+:global(.captureSource-slide-leave-to) {
+  transform: translateY(-50%) scaleY(0);
+}
+
+:global(.captureSource-slide-enter-to) {
+  transform: translateY(0) scaleY(100%);
+}
+
+:global(.captureSource-slide-enter-active),
+:global(.captureSource-slide-leave-active) {
+  transition: all 0.2s linear;
+}
