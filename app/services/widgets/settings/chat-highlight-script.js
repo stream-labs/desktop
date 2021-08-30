@@ -1,5 +1,5 @@
 function sendPinRequest(messageData) {
-  // streamlabsOBS.pinMessage(messageData);
+  streamlabsOBS.pinMessage(messageData);
 }
 
 function extractProperties(el) {
@@ -24,6 +24,12 @@ function extractProperties(el) {
       crlf: msgText,
     },
   };
+}
+
+function addStyle(styleString) {
+  const style = document.createElement('style');
+  document.head.append(style);
+  style.textContent = styleString;
 }
 
 function addHighlightButton(el) {
