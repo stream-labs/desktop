@@ -4,8 +4,8 @@ import electron from 'electron';
 import { getOS, OS } from 'util/operating-systems';
 
 export const FFMPEG_DIR = Utils.isDevMode()
-  ? path.resolve('node_modules', 'ffmpeg-ffprobe-static')
-  : path.resolve(process.resourcesPath, 'node_modules', 'ffmpeg-ffprobe-static');
+  ? path.resolve('node_modules', 'obs-studio-node')
+  : path.resolve(process.resourcesPath, 'node_modules', 'obs-studio-node');
 
 export const FFMPEG_EXE = path.join(FFMPEG_DIR, getOS() === OS.Mac ? 'ffmpeg' : 'ffmpeg.exe');
 export const FFPROBE_EXE = path.join(FFMPEG_DIR, getOS() === OS.Mac ? 'ffprobe' : 'ffprobe.exe');
