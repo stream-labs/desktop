@@ -27,6 +27,7 @@ function extractProperties(el) {
 }
 
 function addHighlightButton(el) {
+  if (el.lastElementChild.className === 'slobs-chat-highlight-icon') return;
   const slobsChatHightlightStyle = `
     position: absolute;
     background-color: red;
@@ -47,22 +48,16 @@ function addHighlightButton(el) {
 function addExistingHighlightButtons() {
   const els = document.getElementsByClassName('chat-line__message');
   Array.prototype.forEach.call(els, addHighlightButton);
-  console.log(els);
 }
 
-function addNewHighlightButton(mutationsList) {
-  mutationsList.forEach(mutation => {
-    if (mutation.type === 'childList' && mutation.addedNodes.length) {
-      addHighlightButton(mutation.target);
-    }
-  });
+function setupObserver() {
+  const interval = setInterval(addExistingHighlightButtons, 1000);
+
+  window.addEventListener('unload', () => clearInterval(interval));
 }
 
 console.log('initiating script');
 addExistingHighlightButtons();
-// const targetNode = document.getElementsByClassName('chat-scrollable-area__message-container')[0];
-// console.log(targetNode);
+setupObserver();
 
-// const observer = new MutationObserver(addNewHighlightButton);
-// observer.observe(targetNode, { childList: true });
 0;
