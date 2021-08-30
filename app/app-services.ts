@@ -111,10 +111,12 @@ export { PollService } from 'services/widgets/settings/poll';
 export { EmoteWallService } from 'services/widgets/settings/emote-wall';
 export { ChatHighlightService } from 'services/widgets/settings/chat-highlight';
 
+import { AppService } from './services/app';
 import { WindowsService } from './services/windows';
 import { CustomizationService } from './services/customization';
 import { ScenesService } from './services/scenes';
 import { EditorCommandsService } from './services/editor-commands';
+import { EditorService } from 'services/editor';
 import { PerformanceService } from './services/performance';
 import { SourcesService } from './services/sources';
 import { StreamingService } from './services/streaming';
@@ -144,8 +146,13 @@ import { HotkeysService } from './services/hotkeys';
 import { WidgetsService } from './services/widgets';
 import { HostsService } from './services/hosts';
 import { OnboardingService } from './services/onboarding';
+import { CacheUploaderService } from './services/cache-uploader';
+import { StreamlabelsService } from './services/streamlabels';
+import { SceneCollectionsService } from './services/scene-collections';
+import { PlatformAppsService } from './services/platform-apps';
 
 export const AppServices = {
+  AppService,
   WindowsService,
   ScenesService,
   NavigationService,
@@ -153,6 +160,7 @@ export const AppServices = {
   SettingsService,
   CustomizationService,
   EditorCommandsService,
+  EditorService,
   PerformanceService,
   SourcesService,
   PatchNotesService,
@@ -179,4 +187,8 @@ export const AppServices = {
   WidgetsService,
   HostsService,
   OnboardingService,
+  CacheUploaderService,
+  StreamlabelsService,
+  SceneCollectionsService,
+  PlatformAppsService,
 };

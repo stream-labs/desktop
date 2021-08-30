@@ -7,9 +7,9 @@ import { QuestionCircleOutlined } from '@ant-design/icons';
 export type TCheckboxInputProps = TSlobsInputProps<{}, boolean, CheckboxProps>;
 
 export const CheckboxInput = InputComponent((p: TCheckboxInputProps) => {
-  const { inputAttrs } = useInput('checkbox', p);
+  const { inputAttrs, wrapperAttrs } = useInput('checkbox', p);
   return (
-    <div>
+    <div style={wrapperAttrs.style} className={wrapperAttrs.className}>
       <Checkbox
         {...inputAttrs}
         checked={inputAttrs.value}

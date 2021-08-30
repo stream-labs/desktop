@@ -37,18 +37,10 @@ import process from 'process';
 import { MetricsService } from 'services/metrics';
 import { UsageStatisticsService } from 'services/usage-statistics';
 
-const crashHandler = window['require']('crash-handler');
-
 const { ipcRenderer, remote, app, contentTracing } = electron;
 const slobsVersion = Utils.env.SLOBS_VERSION;
 const isProduction = Utils.env.NODE_ENV === 'production';
 const isPreview = !!Utils.env.SLOBS_PREVIEW;
-
-// Used by Eddy for debugging on mac.
-if (!isProduction) {
-  const windowId = Utils.getWindowId();
-  process.title = `SLOBS Renderer ${windowId}`;
-}
 
 // This is the development DSN
 let sentryDsn = 'https://8f444a81edd446b69ce75421d5e91d4d@sentry.io/252950';
@@ -115,6 +107,13 @@ window.addEventListener('unhandledrejection', e => {
 if (window['_startupErrorHandler']) {
   window.removeEventListener('error', window['_startupErrorHandler']);
   delete window['_startupErrorHandler'];
+}
+
+// Used by Eddy for debugging on mac.
+if (!isProduction) {
+  const windowId = Utils.getWindowId();
+  process.title = `SLOBS Renderer ${windowId}`;
+  console.log(`${windowId} - PID: ${process.pid}`);
 }
 
 if (isProduction || process.env.SLOBS_REPORT_TO_SENTRY) {
@@ -268,7 +267,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   I18nService.setVuei18nInstance(i18n);
 
   if (!Utils.isOneOffWindow()) {
-    crashHandler.registerProcess(process.pid, false);
+    ipcRenderer.send('register-in-crash-handler', { pid: process.pid, critical: false });
   }
 
   // The worker window can safely access services immediately
@@ -283,7 +282,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     window['obs'] = obs;
 
     // Host a new OBS server instance
-    obs.IPC.host(`slobs-${uuid()}`);
+    obs.IPC.host(electron.remote.process.env.IPC_UUID);
     obs.NodeObs.SetWorkingDirectory(
       path.join(
         electron.remote.app.getAppPath().replace('app.asar', 'app.asar.unpacked'),
@@ -305,7 +304,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       const message = apiInitErrorResultToMessage(apiResult);
       showDialog(message);
 
-      crashHandler.unregisterProcess(process.pid);
+      ipcRenderer.send('unregister-in-crash-handler', { pid: process.pid });
 
       obs.NodeObs.InitShutdownSequence();
       obs.IPC.disconnect();

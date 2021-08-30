@@ -515,7 +515,7 @@ export class FacebookService
   /**
    * Fetch all scheduled videos from the timeline pages and groups
    */
-  async fetchAllVideos(): Promise<IFacebookLiveVideoExtended[]> {
+  async fetchAllVideos(onlyUpcoming = false): Promise<IFacebookLiveVideoExtended[]> {
     // perform all requests simultaneously
     const requests: Promise<IFacebookLiveVideoExtended[]>[] = [];
 
@@ -524,7 +524,7 @@ export class FacebookService
       const destinationType = 'me';
       const destinationId = 'me';
       requests.push(
-        this.fetchScheduledVideos(destinationType, destinationId).then(videos =>
+        this.fetchScheduledVideos(destinationType, destinationId, onlyUpcoming).then(videos =>
           videos.map(video => ({
             ...video,
             destinationType,
@@ -540,7 +540,7 @@ export class FacebookService
       this.state.facebookGroups.forEach(group => {
         const destinationId = group.id;
         requests.push(
-          this.fetchScheduledVideos(destinationType, destinationId).then(videos =>
+          this.fetchScheduledVideos(destinationType, destinationId, onlyUpcoming).then(videos =>
             videos.map(video => ({
               ...video,
               destinationType,
@@ -556,7 +556,7 @@ export class FacebookService
       const destinationType = 'page';
       const destinationId = page.id;
       requests.push(
-        this.fetchScheduledVideos(destinationType, destinationId).then(videos =>
+        this.fetchScheduledVideos(destinationType, destinationId, onlyUpcoming).then(videos =>
           videos.map(video => ({
             ...video,
             destinationType,
@@ -576,7 +576,7 @@ export class FacebookService
   /**
    * fetch a single LiveVideo object
    */
-  private async fetchVideo(
+  async fetchVideo(
     id: string,
     destinationType: TDestinationType,
     destinationId: string,
@@ -634,14 +634,16 @@ export class FacebookService
       .catch(() => 0);
   }
 
-  fetchFollowers(): Promise<number> | undefined {
-    const pageId = this.state.settings.pageId;
-    if (!pageId) return;
-    return this.requestFacebook<{ followers_count: number }>(
-      `${this.apiBase}/${pageId}?fields=followers_count`,
-    )
-      .then(json => json.followers_count)
-      .catch(() => 0);
+  async fetchFollowers(): Promise<number> {
+    if (this.state.isPrepopulated === false) await this.prepopulateInfo();
+    try {
+      const resp = await this.requestFacebook<{ followers_count: number }>(
+        `${this.apiBase}/${this.state.settings.pageId}?fields=followers_count`,
+      );
+      return resp.followers_count;
+    } catch (e: unknown) {
+      return 0;
+    }
   }
 
   async searchGames(searchString: string): Promise<IGame[]> {

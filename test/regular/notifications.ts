@@ -31,7 +31,7 @@ test('Clicking notifications', async t => {
 
   performanceMonitor.pushLaggedFramesNotify(0.5);
 
-  await click('.fa-exclamation-triangle');
+  await click('.footer .fa-exclamation-triangle');
   await focusChild();
   await click('.has-action');
 

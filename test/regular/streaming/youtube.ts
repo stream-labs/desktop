@@ -4,11 +4,25 @@ import {
   chatIsVisible,
   clickGoLive,
   goLive,
+  openScheduler,
   prepareToGoLive,
+  scheduleStream,
   stopStream,
+  submit,
+  waitForStreamStart,
 } from '../../helpers/modules/streaming';
 
-import { focusChild, isDisplayed, waitForDisplayed } from '../../helpers/modules/core';
+import {
+  click,
+  focusChild, focusMain,
+  isDisplayed,
+  select,
+  waitForDisplayed,
+} from '../../helpers/modules/core';
+import * as moment from 'moment';
+import { useForm } from '../../helpers/modules/forms';
+import { ListInputController } from '../../helpers/modules/forms/list';
+import { sleep } from '../../helpers/sleep';
 
 useSpectron();
 
@@ -25,8 +39,48 @@ test('Streaming to Youtube', async t => {
   await stopStream();
 });
 
-// TODO
-test.skip('Streaming to the scheduled event on Youtube', async t => {});
+test('Streaming to the scheduled event on Youtube', async t => {
+  await logIn('youtube', { multistream: false });
+  const tomorrow = moment().add(1, 'day').toDate();
+  await scheduleStream(tomorrow, { platform: 'YouTube', title: 'Test YT Scheduler' });
+  await prepareToGoLive();
+  await clickGoLive();
+  await focusChild();
+  const { getInput } = useForm('youtube-settings');
+  const broadcastIdInput = await getInput<ListInputController<string>>('broadcastId');
+  t.true(
+    await broadcastIdInput.hasOption('Test YT Scheduler'),
+    'Scheduled event should be visible in the broadcast selector',
+  );
+
+  await goLive({
+    broadcastId: 'Test YT Scheduler',
+  });
+});
+
+test('GoLive from StreamScheduler', async t => {
+  await logIn('youtube', { multistream: false });
+  await prepareToGoLive();
+
+  // schedule stream
+  const tomorrow = moment().add(1, 'day').toDate();
+  await scheduleStream(tomorrow, { platform: 'YouTube', title: 'Test YT Scheduler' });
+
+  // open the modal
+  await focusMain();
+  await click('span=Test YT Scheduler');
+
+  // click GoLive
+  const $modal = await select('.ant-modal-content');
+  const $goLiveBtn = await $modal.$('button=Go Live');
+  await click($goLiveBtn);
+
+  // confirm settings
+  await focusChild();
+  await submit();
+  await waitForStreamStart();
+  t.pass();
+});
 
 test('Start stream twice to the same YT event', async t => {
   await logIn('youtube', { multistream: false });

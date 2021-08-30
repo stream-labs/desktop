@@ -25,7 +25,13 @@ import { UserService } from 'services/user';
 import { IModalOptions, WindowsService } from 'services/windows';
 import LiveDock from '../LiveDock.vue';
 import StudioFooter from '../StudioFooter.vue';
-import { PatchNotes, Loader, StreamScheduler, Highlighter } from '../shared/ReactComponent';
+import {
+  PatchNotes,
+  Loader,
+  StreamScheduler,
+  Highlighter,
+  ThemeAudit,
+} from '../shared/ReactComponent';
 import PlatformAppMainPage from '../pages/PlatformAppMainPage.vue';
 import electron from 'electron';
 import ResizeBar from 'components/shared/ResizeBar.vue';
@@ -63,6 +69,7 @@ const loadedTheme = () => {
     StreamScheduler,
     Highlighter,
     Grow,
+    ThemeAudit,
   },
 })
 export default class Main extends Vue {
@@ -88,7 +95,6 @@ export default class Main extends Vue {
     WindowsService.modalChanged.subscribe(modalOptions => {
       this.modalOptions = { ...this.modalOptions, ...modalOptions };
     });
-    this.windowWidth = window.innerWidth;
     this.updateLiveDockContraints();
   }
 
@@ -118,7 +124,7 @@ export default class Main extends Vue {
     window.removeEventListener('resize', this.windowSizeHandler);
   }
 
-  minEditorWidth = 730;
+  minEditorWidth = 500;
 
   get title() {
     return this.windowsService.state.main.title;
@@ -261,12 +267,13 @@ export default class Main extends Vue {
 
   windowResizeTimeout: number;
 
-  minDockWidth = 266;
+  minDockWidth = 290;
   maxDockWidth = this.minDockWidth;
 
   updateLiveDockContraints() {
-    const paddedArea = this.compactView ? 84 : 84 + 32;
-    this.maxDockWidth = this.windowWidth - (this.minEditorWidth + paddedArea);
+    const appRect = this.$root.$el.getBoundingClientRect();
+    this.maxDockWidth = Math.min(appRect.width - this.minEditorWidth, appRect.width / 2);
+    this.minDockWidth = Math.min(290, this.maxDockWidth);
   }
 
   windowSizeHandler() {
@@ -279,7 +286,7 @@ export default class Main extends Vue {
 
     this.hasLiveDock = this.windowWidth >= 1070;
     if (this.page === 'Studio') {
-      this.hasLiveDock = this.windowWidth >= this.minEditorWidth + this.minDockWidth + 84;
+      this.hasLiveDock = this.windowWidth >= this.minEditorWidth + 100;
     }
     this.windowResizeTimeout = window.setTimeout(() => {
       this.windowsService.actions.updateStyleBlockers('main', false);
@@ -293,7 +300,6 @@ export default class Main extends Vue {
   }
 
   handleEditorWidth(width: number) {
-    if (width < 730) return;
     this.minEditorWidth = width;
   }
 
