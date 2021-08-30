@@ -28,6 +28,7 @@ function extractProperties(el) {
 
 function addHighlightButton(el) {
   if (el.lastElementChild.className === 'slobs-chat-highlight-icon') return;
+  console.log('SLOBS - Adding Highlight Button');
   const slobsChatHightlightStyle = `
     position: absolute;
     background-color: red;
@@ -56,7 +57,7 @@ function setupObserver() {
   window.addEventListener('unload', () => clearInterval(interval));
 }
 
-console.log('initiating script');
+console.log('SLOBS - Initiating Chat Highlight Script');
 addExistingHighlightButtons();
 setupObserver();
 
