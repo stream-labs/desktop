@@ -24,6 +24,7 @@ export declare type TObsType =
   | 'OBS_PROPERTY_TEXT'
   | 'OBS_PROPERTY_UINT'
   | 'OBS_PROPERTY_COLOR'
+  | 'OBS_PROPERTY_CAPTURE'
   | 'OBS_PROPERTY_DOUBLE'
   | 'OBS_PROPERTY_FLOAT'
   | 'OBS_PROPERTY_SLIDER'
@@ -328,6 +329,9 @@ export function getPropertiesFormData(obsSource: obs.ISource): TObsFormData {
         break;
       case obs.EPropertyType.Color:
         obsType = 'OBS_PROPERTY_COLOR';
+        break;
+      case obs.EPropertyType.Capture:
+        obsType = 'OBS_PROPERTY_CAPTURE';
         break;
       case obs.EPropertyType.Font:
         obsType = 'OBS_PROPERTY_FONT';

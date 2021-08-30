@@ -12,6 +12,7 @@ export enum EInputType {
   date = 'date',
   slider = 'slider',
   color = 'color',
+  capture = 'capture',
   list = 'list',
   textArea = 'textArea',
   fontSize = 'fontSize',
@@ -92,6 +93,9 @@ export interface IColorMetadata extends IInputMetadata {
   includeAlpha?: boolean;
   fullWidth?: boolean;
 }
+export interface ICaptureSourceMetadata extends IInputMetadata {
+  fullWidth?: boolean;
+}
 
 export interface ISliderMetadata extends IInputMetadata {
   min?: number;
@@ -147,6 +151,7 @@ export class InputMetadata {
     return { type: EInputType.list, ...options } as IListMetadata<string, TOptionData>;
   }
   color = (options: IColorMetadata) => ({ type: EInputType.color, ...options } as IInputMetadata);
+  capture = (options: ICaptureSourceMetadata) => ({ type: EInputType.capture, ...options } as IInputMetadata);
   slider = (options: ISliderMetadata) =>
     ({ type: EInputType.slider, ...options } as ISliderMetadata);
   textArea = (options: ITextMetadata) =>

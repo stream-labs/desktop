@@ -80,6 +80,7 @@ export const windowsSources: TSourceType[] = [
   'scene',
   'ndi_source',
   'openvr_capture',
+  'slobs_capture',
   'liv_capture',
   'ovrstream_dc_source',
   'vlc_source',
@@ -310,6 +311,8 @@ export class SourcesService extends StatefulService<ISourcesState> {
       this.usageStatisticsService.recordFeatureUsage('NDI');
     } else if (type === 'openvr_capture') {
       this.usageStatisticsService.recordFeatureUsage('OpenVR');
+    } else if (type === 'slobs_capture') {
+      this.usageStatisticsService.recordFeatureUsage('SlobsCapture');
     } else if (type === 'vlc_source') {
       this.usageStatisticsService.recordFeatureUsage('VLC');
     } else if (type === 'soundtrack_source') {
@@ -494,6 +497,7 @@ export class SourcesService extends StatefulService<ISourcesState> {
       { description: 'Blackmagic Device', value: 'decklink-input' },
       { description: 'NDI Source', value: 'ndi_source' },
       { description: 'OpenVR Capture', value: 'openvr_capture' },
+      { description: 'Slobs Capture', value: 'slobs_capture' },
       { description: 'LIV Client Capture', value: 'liv_capture' },
       { description: 'OvrStream', value: 'ovrstream_dc_source' },
       { description: 'VLC Source', value: 'vlc_source' },
