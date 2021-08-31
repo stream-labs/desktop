@@ -713,6 +713,24 @@ describe('refreshProgramStatusTimer', () => {
       result: 'REFRESH',
     },
     {
+      name: '予約状態なら毎回タイマーを更新する(30分前境界超え対策)',
+      prev: {
+        status: 'reserved',
+        programID: 'lv1',
+        testStartTime: 100,
+        startTime: 30 * 60 - 1,
+        endTime: 300,
+      },
+      next: {
+        status: 'reserved',
+        programID: 'lv1',
+        testStartTime: 100,
+        startTime: 30 * 60 - 1,
+        endTime: 300,
+      },
+      result: 'REFRESH',
+    },
+    {
       name: '予約状態から放送中状態になったらタイマーを更新する',
       prev: {
         status: 'reserved',
