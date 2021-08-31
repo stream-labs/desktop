@@ -1,5 +1,5 @@
 function sendPinRequest(messageData) {
-  streamlabsOBS.pinMessage(messageData);
+  // streamlabsOBS.pinMessage(messageData);
 }
 
 function extractProperties(el) {
@@ -26,13 +26,8 @@ function extractProperties(el) {
   };
 }
 
-function addStyle(styleString) {
-  const style = document.createElement('style');
-  document.head.append(style);
-  style.textContent = styleString;
-}
-
 function addHighlightButton(el) {
+  if (el.firstElementChild.className.includes('live-message-separator-line__hr')) return;
   if (el.lastElementChild.className === 'slobs-chat-highlight-icon') return;
   console.log('SLOBS - Adding Highlight Button');
   const slobsChatHightlightStyle = `
@@ -61,6 +56,12 @@ function setupObserver() {
   const interval = setInterval(addExistingHighlightButtons, 1000);
 
   window.addEventListener('unload', () => clearInterval(interval));
+}
+
+function addStyle(styleString) {
+  const style = document.createElement('style');
+  document.head.append(style);
+  style.textContent = styleString;
 }
 
 console.log('SLOBS - Initiating Chat Highlight Script');
