@@ -34,6 +34,8 @@ export enum E_AUDIO_CHANNELS {
   INPUT_1 = 3,
   INPUT_2 = 4,
   INPUT_3 = 5,
+  INPUT_4 = 6,
+  INPUT_5 = 7,
 }
 
 interface IAudioSourceData {
