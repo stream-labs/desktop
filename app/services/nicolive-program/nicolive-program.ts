@@ -406,7 +406,7 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
         programUpdated ||
         statusUpdated ||
         targetTimeUpdated ||
-        nextState.status === 'reserved') // 予約中は30分前境界を越えたときにタイマーを再設定できていなかったので雑に予約中なら毎回設定する
+        nextState.status === 'reserved') // 予約中は30分前境界を越えたときに status が 'reserved' のまま変わらないためタイマーを再設定できていなかったので雑に予約中なら毎回設定する
     ) {
       const now = Date.now();
       const waitTime = (nextTargetTime + NicoliveProgramService.TIMER_PADDING_SECONDS) * 1000 - now;
