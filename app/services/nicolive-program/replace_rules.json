@@ -102,17 +102,25 @@
       "replacement": "びっくりはてな"
     },
     {
-      "note": "最後に長さチェック40文字を超える場合は41文字以降をリャク",
-      "regularExpression": "(.{40,40}).+",
-      "replacement": "$1リャク"
-    },
-    {
       "regularExpression": "初見",
       "replacement": "しょけん"
     },
     {
       "regularExpression": "古参",
       "replacement": "こさん"
+    },
+    {
+      "regularExpression": "生主",
+      "replacement": "なまぬし"
+    },
+    {
+      "regularExpression": "放送主",
+      "replacement": "ほうそうぬし"
+    },
+    {
+      "note": "最後に長さチェック40文字を超える場合は41文字以降をリャク",
+      "regularExpression": "(.{40,40}).+",
+      "replacement": "$1リャク"
     }
   ]
 }
