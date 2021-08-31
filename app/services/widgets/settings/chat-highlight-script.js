@@ -1,26 +1,27 @@
 function sendPinRequest(messageData) {
-  // streamlabsOBS.pinMessage(messageData);
+  console.log('SLOBS - Sending Pin Request', messageData);
+  streamlabsOBS.pinMessage(messageData);
 }
 
 function extractProperties(el) {
-  // const userColor = el.children.item(1).attributes.getNamedItem('style').value;
-  const msgText = el.children.item(2).children.item(0).innerHTML;
+  const color = el.children.item(2).attributes['style'].value;
+  const msgText = el.children.item(4).children.item(0).innerHTML;
   const badges = Array.prototype.map
-    .call(el.children.item(0).children, child => child.attributes['data-badge'])
+    .call(el.children.item(1).children, child => child.attributes['data-badge'].value)
     .join('/');
   return {
     messageToPin: {
       tags: {
         badges,
-        // color: userColor,
-        'display-name': el.attributes['data-user'],
+        color,
+        'display-name': el.attributes['data-user'].value,
         emotes: '',
         id: '',
         'user-type': '',
       },
       prefix: '',
       command: 'PRIVMSG',
-      params: [`#${el.attributes['data-user']}`],
+      params: [`#${el.attributes['data-user'].value}`],
       crlf: msgText,
     },
   };
@@ -68,8 +69,8 @@ addStyle(`
   .slobs-chat-highlight-icon {
     position: absolute;
     background-color: #128079;
-    width: 16px;
-    height: 16px;
+    width: 18px;
+    height: 18px;
     top: 8px;
     right: 4px;
     opacity: 0;
