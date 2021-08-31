@@ -355,7 +355,7 @@ export class SettingsService extends StatefulService<ISettingsServiceState> {
     }
 
     // collect input channels info
-    for (let channel = E_AUDIO_CHANNELS.INPUT_1; channel <= E_AUDIO_CHANNELS.INPUT_3; channel++) {
+    for (let channel = E_AUDIO_CHANNELS.INPUT_1; channel <= E_AUDIO_CHANNELS.INPUT_5; channel++) {
       const source = sourcesInChannels.find(source => source.channel === channel);
       const deviceInd = channel - 2;
 
