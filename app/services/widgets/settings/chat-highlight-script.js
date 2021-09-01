@@ -1,8 +1,10 @@
+// Sends relevant data to the SLOBS ChatHighlightService
 function sendPinRequest(messageData) {
   console.log('SLOBS - Sending Pin Request', messageData);
   streamlabsOBS.pinMessage(messageData); // eslint-disable-line no-undef
 }
 
+// Reshapes DOM elements into JSON-friendly structure for the SL API to ingest
 function extractProperties(el) {
   const userName = Array.prototype.find.call(el.children, child =>
     child.className.includes('chat-line__username'),
@@ -32,6 +34,7 @@ function extractProperties(el) {
   };
 }
 
+// Replicates emote id and position information gathered from Twitch IRC API
 function parseEmoteString(child, startPos) {
   const emoteText = child.attributes['alt'].value;
   const emoteId = child.attributes['data-id'].value;
@@ -40,6 +43,8 @@ function parseEmoteString(child, startPos) {
   return { emoteText, parsedString: `${emoteId}:${startPos}-${endPos}` };
 }
 
+// Extracts emotes from message text and returns emote information as well as the entire text string
+// including emotes
 function parseMessage(children) {
   const emoteArray = [];
   let currentMessageLength = 0;
@@ -69,6 +74,7 @@ function parseMessage(children) {
   return { crlf: rawTextArray.join(''), emotes: emoteArray.join('/') };
 }
 
+// Adds a highlight button to relevant chat messages if one doesn't exist
 function addHighlightButton(el) {
   if (el.firstElementChild.className.includes('live-message-separator-line__hr')) return;
   if (el.lastElementChild.className === 'slobs-chat-highlight-icon') return;
@@ -82,13 +88,14 @@ function addHighlightButton(el) {
   el.append(chatHighlight);
 }
 
-function addExistingHighlightButtons() {
+// Adds a highlight button to all chat messages
+function addHighlightButtons() {
   const els = document.getElementsByClassName('chat-line__message');
   Array.prototype.forEach.call(els, addHighlightButton);
 }
 
 function setupObserver() {
-  const interval = setInterval(addExistingHighlightButtons, 1000);
+  const interval = setInterval(addHighlightButtons, 1000);
 
   window.addEventListener('unload', () => clearInterval(interval));
 }
@@ -133,7 +140,7 @@ addStyle(`
 `);
 
 console.log('SLOBS - Initiating Chat Highlight Script');
-addExistingHighlightButtons();
+addHighlightButtons();
 setupObserver();
 
 0;
