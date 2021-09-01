@@ -1,11 +1,16 @@
 function sendPinRequest(messageData) {
   console.log('SLOBS - Sending Pin Request', messageData);
-  streamlabsOBS.pinMessage(messageData);
+  streamlabsOBS.pinMessage(messageData); // eslint-disable-line no-undef
 }
 
 function extractProperties(el) {
-  const color = el.children.item(2).attributes['style'].value;
-  const msgText = el.children.item(4).children.item(0).innerHTML;
+  const userName = Array.prototype.find.call(el.children, child =>
+    child.className.includes('chat-line__username'),
+  );
+  const color = userName.attributes['style'].value;
+  const message = Array.prototype.find.call(el.children, child => child.className === 'message  ')
+    .children;
+  const { crlf, emotes } = parseMessage(message);
   const badges = Array.prototype.map
     .call(el.children.item(1).children, child => child.attributes['data-badge'].value)
     .join('/');
@@ -14,17 +19,54 @@ function extractProperties(el) {
       tags: {
         badges,
         color,
+        emotes,
         'display-name': el.attributes['data-user'].value,
-        emotes: '',
         id: '',
         'user-type': '',
       },
+      crlf,
       prefix: '',
       command: 'PRIVMSG',
       params: [`#${el.attributes['data-user'].value}`],
-      crlf: msgText,
     },
   };
+}
+
+function parseEmoteString(child, startPos) {
+  const emoteText = child.attributes['alt'].value;
+  const emoteId = child.attributes['data-id'].value;
+  const endPos = startPos + emoteText.length - 1;
+
+  return { emoteText, parsedString: `${emoteId}:${startPos}-${endPos}` };
+}
+
+function parseMessage(children) {
+  const emoteArray = [];
+  let currentMessageLength = 0;
+
+  const rawTextArray = Array.prototype.map.call(children, (child, i) => {
+    if (child.className === 'text-fragment') {
+      currentMessageLength += child.innerHTML.length;
+      return child.innerHTML;
+    }
+    if (child.className.includes('chat-image')) {
+      const { emoteText, parsedString } = parseEmoteString(child, currentMessageLength + 1);
+      emoteArray.push(parsedString);
+      currentMessageLength += emoteText.length;
+      return emoteText;
+    }
+    if (child.className === 'ffz--inline') {
+      const { emoteText, parsedString } = parseEmoteString(
+        child.children[0],
+        currentMessageLength + 1,
+      );
+      emoteArray.push(parsedString);
+      currentMessageLength += emoteText.length;
+      return emoteText;
+    }
+  });
+
+  return { crlf: rawTextArray.join(''), emotes: emoteArray.join('/') };
 }
 
 function addHighlightButton(el) {

@@ -8,6 +8,7 @@ import {
 import { WIDGET_INITIAL_STATE } from './widget-settings';
 import { InheritMutations } from 'services/core/stateful-service';
 import { formMetadata, metadata } from 'components/shared/inputs';
+import { authorizedHeaders } from 'util/requests';
 import { $t } from 'services/i18n';
 
 export interface IChatHighlightMessage {
@@ -54,16 +55,15 @@ export class ChatHighlightService extends WidgetSettingsService<IChatHighlightDa
   }
 
   async pinMessage(messageData: IChatHighlightMessage) {
-    console.log(messageData);
-    // const headers = this.authorizedHeaders(this.getWidgetToken());
-    // headers.append('Content-Type', 'application/json');
-    // const url = `https://${this.getHost()}/api/v5/slobs/widget/chat-highlight/pin`;
-    // const request = new Request(url, {
-    //   headers,
-    //   method: 'POST',
-    //   body: JSON.stringify(messageData),
-    // });
-    // fetch(request);
+    const headers = authorizedHeaders(this.getWidgetToken());
+    headers.append('Content-Type', 'application/json');
+    const url = `https://${this.getHost()}/api/v5/slobs/widget/chat-highlight/pin`;
+    const request = new Request(url, {
+      headers,
+      method: 'POST',
+      body: JSON.stringify(messageData),
+    });
+    fetch(request);
   }
 
   patchAfterFetch(data: IChatHighlightData) {
