@@ -31,7 +31,6 @@ import {
 } from 'services/notifications';
 import { VideoEncodingOptimizationService } from 'services/video-encoding-optimizations';
 import { CustomizationService } from 'services/customization';
-import { EAvailableFeatures, IncrementalRolloutService } from 'services/incremental-rollout';
 import { StreamSettingsService } from '../settings/streaming';
 import { RestreamService } from 'services/restream';
 import Utils from 'services/utils';
@@ -41,7 +40,7 @@ import { createStreamError, IStreamError, StreamError, TStreamErrorType } from '
 import { authorizedHeaders } from 'util/requests';
 import { HostsService } from '../hosts';
 import { TwitterService } from '../integrations/twitter';
-import { assertIsDefined } from 'util/properties-type-guards';
+import { assertIsDefined, getDefined } from 'util/properties-type-guards';
 import { StreamInfoView } from './streaming-view';
 import { GrowService } from 'services/grow/grow';
 
@@ -78,7 +77,6 @@ export class StreamingService
   @Inject() private usageStatisticsService: UsageStatisticsService;
   @Inject() private notificationsService: NotificationsService;
   @Inject() private userService: UserService;
-  @Inject() private incrementalRolloutService: IncrementalRolloutService;
   @Inject() private videoEncodingOptimizationService: VideoEncodingOptimizationService;
   @Inject() private customizationService: CustomizationService;
   @Inject() private restreamService: RestreamService;
@@ -90,7 +88,7 @@ export class StreamingService
   recordingStatusChange = new Subject<ERecordingState>();
   replayBufferStatusChange = new Subject<EReplayBufferState>();
   replayBufferFileWrite = new Subject<string>();
-  streamInfoChanged = new Subject<StreamInfoView>();
+  streamInfoChanged = new Subject<StreamInfoView<any>>();
 
   // Dummy subscription for stream deck
   streamingStateChange = new Subject<void>();
@@ -161,8 +159,8 @@ export class StreamingService
   /**
    * sync the settings from platforms with the local state
    */
-  async prepopulateInfo(platforms?: TPlatform[]) {
-    platforms = platforms || this.views.enabledPlatforms;
+  async prepopulateInfo() {
+    const platforms = this.views.enabledPlatforms;
     this.UPDATE_STREAM_INFO({ lifecycle: 'prepopulate', error: null });
 
     // prepopulate settings for all platforms in parallel mode
@@ -422,7 +420,7 @@ export class StreamingService
 
     for (const platform of platforms) {
       const service = getPlatformService(platform);
-      const newSettings = settings.platforms[platform];
+      const newSettings = getDefined(settings.platforms[platform]);
       try {
         await this.runCheck(platform, () => service.putChannelInfo(newSettings));
       } catch (e: unknown) {
@@ -451,15 +449,15 @@ export class StreamingService
   /**
    * Schedule stream for eligible platforms
    */
-  async scheduleStream(settings: IStreamSettings, time: string) {
+  async scheduleStream(settings: IStreamSettings, time: number) {
     const destinations = settings.platforms;
     const platforms = (Object.keys(destinations) as TPlatform[]).filter(
-      dest => destinations[dest].enabled && this.views.supports('stream-schedule', [dest]),
+      dest => destinations[dest]?.enabled && this.views.supports('stream-schedule', [dest]),
     ) as ('facebook' | 'youtube')[];
     for (const platform of platforms) {
       const service = getPlatformService(platform);
       assertIsDefined(service.scheduleStream);
-      await service.scheduleStream(time, destinations[platform]);
+      await service.scheduleStream(time, getDefined(destinations[platform]));
     }
   }
 
@@ -755,23 +753,22 @@ export class StreamingService
     }
   }
 
-  showGoLiveWindow() {
+  /**
+   * Show the GoLiveWindow
+   * Prefill fields with data if `prepopulateOptions` provided
+   */
+  showGoLiveWindow(prepopulateOptions?: IGoLiveSettings['prepopulateOptions']) {
     const height = this.views.linkedPlatforms.length > 1 ? 750 : 650;
     const width = 900;
 
-    const isLegacy =
-      !this.incrementalRolloutService.views.featureIsEnabled(EAvailableFeatures.reactGoLive) ||
-      this.customizationService.state.experimental?.legacyGoLive;
-
-    const componentName = isLegacy ? 'GoLiveWindowDeprecated' : 'GoLiveWindow';
-
     this.windowsService.showWindow({
-      componentName,
+      componentName: 'GoLiveWindow',
       title: $t('Go Live'),
       size: {
         height,
         width,
       },
+      queryParams: prepopulateOptions,
     });
   }
 
@@ -779,14 +776,8 @@ export class StreamingService
     const height = 750;
     const width = 900;
 
-    const isLegacy =
-      !this.incrementalRolloutService.views.featureIsEnabled(EAvailableFeatures.reactGoLive) ||
-      this.customizationService.state.experimental?.legacyGoLive;
-
-    const componentName = isLegacy ? 'EditStreamWindowDeprecated' : 'EditStreamWindow';
-
     this.windowsService.showWindow({
-      componentName,
+      componentName: 'EditStreamWindow',
       title: $t('Update Stream Info'),
       size: {
         height,

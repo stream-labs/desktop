@@ -1,5 +1,5 @@
 import { useSpectron, test, afterAppStart } from '../../helpers/spectron';
-import { getClient } from '../../helpers/api-client';
+import { getApiClient } from '../../helpers/api-client';
 import { SceneBuilder } from '../../helpers/scene-builder';
 import { SelectionService } from 'services/api/external-api/selection';
 import { ClipboardService } from 'services/clipboard';
@@ -7,6 +7,8 @@ import { ISceneCollectionsServiceApi } from 'services/scene-collections';
 import { ISourcesServiceApi } from 'services/sources';
 import { SourceFiltersService } from 'services/source-filters';
 import { SceneItem, SceneNode, ScenesService } from '../../../app/services/api/external-api/scenes';
+import {sleep} from "../../helpers/sleep";
+import {focusMain} from "../../helpers/modules/core";
 
 useSpectron({ restartAppAfterEachTest: false });
 
@@ -21,7 +23,7 @@ let sourcesService: ISourcesServiceApi;
 let scenesService: ScenesService;
 
 afterAppStart(async t => {
-  const client = await getClient();
+  const client = await getApiClient();
   scenesService = client.getResource('ScenesService');
   sourcesService = client.getResource('SourcesService');
   selectionService = client.getResource('SelectionService');
@@ -56,6 +58,7 @@ test('Simple copy/paste', async t => {
 });
 
 test('Copy/paste folder with items', async t => {
+  await focusMain();
   sceneBuilder.build(`
     Folder1
     Folder2

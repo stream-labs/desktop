@@ -5,13 +5,12 @@ import { Inject } from 'services/core/injector';
 import { CustomizationService } from 'services/customization';
 import { NavigationService, TAppPage } from 'services/navigation';
 import { UserService } from 'services/user';
-import AppsNav from 'components/AppsNav';
 import { WindowsService } from 'services/windows';
 import { PlatformAppsService } from 'services/platform-apps';
 import { IncrementalRolloutService, EAvailableFeatures } from 'services/incremental-rollout';
 import { AppService } from '../services/app';
 import { $t } from 'services/i18n';
-import { NavTools } from 'components/shared/ReactComponent';
+import { NavTools, AppsNav } from 'components/shared/ReactComponent';
 import styles from './SideNav.m.less';
 import { LayoutService } from 'services/layout';
 import { getPlatformService } from '../services/platforms';
@@ -131,17 +130,24 @@ export default class SideNav extends Vue {
       });
     }
 
-    if (
-      getOS() === OS.Windows &&
-      this.userService.isLoggedIn &&
-      this.incrementalRolloutService.views.featureIsEnabled(EAvailableFeatures.highlighter)
-    ) {
+    if (this.userService.isLoggedIn) {
       pageData.push({
         target: 'Highlighter',
         svgIcon: <HighlighterIcon />,
         title: 'Highlighter',
         trackingTarget: 'highlighter',
         newBadge: true,
+      });
+    }
+
+    // Will only ever be enabled on individual accounts or enabled
+    // via command line flag. Not for general use.
+    if (this.featureIsEnabled(EAvailableFeatures.themeAudit)) {
+      pageData.push({
+        target: 'ThemeAudit',
+        icon: 'fas fa-exclamation-triangle',
+        title: 'Theme Audit',
+        trackingTarget: 'themeaudit',
       });
     }
 
@@ -161,7 +167,7 @@ export default class SideNav extends Vue {
           })}
         >
           {this.studioTab(this.studioTabs[0])}
-          {this.studioTabs.length > 1 && this.userService.isPrime && (
+          {this.studioTabs.length > 1 && (
             <i
               class={cx('icon-down', styles.studioDropdown, {
                 [styles.studioDropdownActive]: this.layoutService.state.currentTab !== 'default',

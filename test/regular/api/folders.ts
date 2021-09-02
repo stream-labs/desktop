@@ -1,5 +1,5 @@
 import { useSpectron, test, afterAppStart } from '../../helpers/spectron';
-import { getClient } from '../../helpers/api-client';
+import { getApiClient } from '../../helpers/api-client';
 import { SceneBuilder } from '../../helpers/scene-builder';
 import { Scene, SceneNode } from 'services/api/external-api/scenes';
 
@@ -11,7 +11,7 @@ let getNode: (name: string) => SceneNode;
 let getNodeId: (name: string) => string;
 
 afterAppStart(async t => {
-  const client = await getClient();
+  const client = await getApiClient();
   sceneBuilder = new SceneBuilder(client);
   scene = sceneBuilder.scene;
   getNode = name => scene.getNodeByName(name);

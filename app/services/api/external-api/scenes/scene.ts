@@ -142,7 +142,9 @@ export class Scene implements ISceneModel, ISerializable {
    * @returns A list of all scene items of this scene and all nested scenes
    */
   getNestedItems(): SceneItem[] {
-    return this.scene.getNestedItems().map(item => this.getItem(item.id));
+    return this.scene
+      .getNestedItems()
+      .map(item => this.scenesService.getScene(item.sceneId).getItem(item.id));
   }
 
   /**

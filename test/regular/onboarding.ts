@@ -1,14 +1,13 @@
-import { focusMain, test, useSpectron } from '../helpers/spectron';
+import { test, useSpectron } from '../helpers/spectron';
 import { logIn } from '../helpers/spectron/user';
 import { sleep } from '../helpers/sleep';
-
-const path = require('path');
+import { focusMain } from '../helpers/modules/core';
 
 useSpectron({ skipOnboarding: false });
 
 test('Go through the onboarding and autoconfig', async t => {
   const app = t.context.app;
-  await focusMain(t);
+  await focusMain();
 
   // Wait for the auth screen to appear
   await (await app.client.$('button=Twitch')).isExisting();

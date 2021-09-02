@@ -5,7 +5,7 @@
  * @example
  * node cmd-client.js ScenesService getScenes
  */
-import { getClient } from './api-client';
+import { getApiClient } from './api-client';
 
 // prevents logs from other parts of code to be sent in stdout
 console.log = () => {};
@@ -24,7 +24,7 @@ console.log = () => {};
     }
   });
 
-  const client = await getClient();
+  const client = await getApiClient();
   client
     .request(resource, method, ...args)
     .then(response => {

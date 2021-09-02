@@ -61,6 +61,8 @@ export const TagsInput = InputComponent(<T extends any[]>(p: TTagsInputProps<T>)
     inputAttrs.onChange(values);
   }
 
+  const displayValue = inputAttrs.value.map((val: string) => tagsMap[val].label);
+
   return (
     <InputWrapper {...wrapperAttrs}>
       <Select
@@ -73,6 +75,9 @@ export const TagsInput = InputComponent(<T extends any[]>(p: TTagsInputProps<T>)
         tagRender={renderTag}
         placeholder={$t('Start typing to search')}
         dropdownRender={dropdownRender}
+        data-value={JSON.stringify(inputAttrs.value)}
+        data-display-value={JSON.stringify(displayValue)}
+        data-show-search={inputAttrs['showSearch']}
       >
         {options && options.map((opt, ind) => renderOption(opt, ind, p))}
       </Select>

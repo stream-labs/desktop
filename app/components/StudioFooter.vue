@@ -1,6 +1,6 @@
 <template>
   <div class="footer">
-    <div class="flex flex--center flex--grow flex--justify-start">
+    <div class="flex flex--center flex--grow flex--justify-start footer--left">
       <div class="error-wrapper" v-if="loggedIn && !youtubeEnabled">
         <div class="platform-error">
           <i class="fa fa-exclamation-triangle" />
@@ -96,6 +96,12 @@
   background-color: var(--section);
   max-width: none;
   flex: 0 0 auto;
+  overflow-x: auto;
+  overflow-y: hidden;
+
+  .footer--left {
+    overflow-x: auto;
+  }
 }
 
 .nav-right {
@@ -236,5 +242,6 @@
   position: relative;
   display: inline-flex;
   background: var(--section) !important;
+  overflow-x: auto;
 }
 </style>

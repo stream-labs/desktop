@@ -61,6 +61,7 @@ interface ITwitchOAuthValidateResponse {
 
 interface ITwitchServiceState extends IPlatformState {
   hasUpdateTagsPermission: boolean;
+  hasPollsPermission: boolean;
   availableTags: TTwitchTag[];
   settings: ITwitchStartStreamOptions;
 }
@@ -76,6 +77,7 @@ export class TwitchService
   static initialState: ITwitchServiceState = {
     ...BasePlatformService.initialState,
     hasUpdateTagsPermission: false,
+    hasPollsPermission: false,
     availableTags: [],
     settings: {
       title: '',
@@ -112,7 +114,12 @@ export class TwitchService
   init() {
     // prepopulate data to make chat available after app start
     this.userService.userLogin.subscribe(_ => {
-      if (this.userService.platform?.type === 'twitch') this.prepopulateInfo();
+      if (this.userService.platform?.type === 'twitch') {
+        this.prepopulateInfo();
+
+        // Check for updated polls scopes
+        this.validatePollsScope();
+      }
     });
   }
 
@@ -275,6 +282,11 @@ export class TwitchService
     this.state.hasUpdateTagsPermission = true;
   }
 
+  @mutation()
+  private SET_HAS_POLLS_PERMISSION(hasPollsPermission: boolean) {
+    this.state.hasPollsPermission = hasPollsPermission;
+  }
+
   fetchUserInfo() {
     return platformAuthorizedRequest<{ login: string }[]>(
       'twitch',
@@ -364,6 +376,11 @@ export class TwitchService
     }
     assertIsDefined(this.twitchId);
     return updateTags()(tags)(this.twitchId);
+  }
+
+  async validatePollsScope() {
+    const hasPollsPermission = await this.hasScope('channel:manage:polls');
+    this.SET_HAS_POLLS_PERMISSION(hasPollsPermission);
   }
 
   hasScope(scope: TTwitchOAuthScope): Promise<boolean> {

@@ -1,9 +1,9 @@
-import { mutation, StatefulService, ViewHandler, Inject, InitAfter } from 'services/core';
+import { mutation, StatefulService, ViewHandler, Inject, InitAfter, Service } from 'services/core';
 import path from 'path';
 import Vue from 'vue';
 import fs from 'fs-extra';
 import url from 'url';
-import { StreamingService } from 'services/streaming';
+import { EStreamingState, StreamingService } from 'services/streaming';
 import electron from 'electron';
 import { getPlatformService } from 'services/platforms';
 import { UserService } from 'services/user';
@@ -25,6 +25,11 @@ import { HighlighterError } from './errors';
 import { AudioMixer } from './audio-mixer';
 import { UsageStatisticsService } from 'services/usage-statistics';
 import * as Sentry from '@sentry/browser';
+import { $t } from 'services/i18n';
+import { DismissablesService, EDismissable } from 'services/dismissables';
+import { ENotificationType, NotificationsService } from 'services/notifications';
+import { JsonrpcService } from 'services/api/jsonrpc';
+import { NavigationService } from 'services/navigation';
 
 export interface IClip {
   path: string;
@@ -35,6 +40,7 @@ export interface IClip {
   endTrim: number;
   duration?: number;
   deleted: boolean;
+  source: 'ReplayBuffer' | 'Manual';
 }
 
 export enum EExportStep {
@@ -124,53 +130,77 @@ export interface IAvailableTransition {
 
 const availableTransitions: IAvailableTransition[] = [
   {
-    displayName: 'None',
+    get displayName() {
+      return $t('None');
+    },
     type: 'None',
   },
   {
-    displayName: 'Random',
+    get displayName() {
+      return $t('Random');
+    },
     type: 'Random',
   },
   {
-    displayName: 'Fade',
+    get displayName() {
+      return $t('Fade');
+    },
     type: 'fade',
   },
   {
-    displayName: 'Slide',
+    get displayName() {
+      return $t('Slide');
+    },
     type: 'Directional',
     params: { direction: [1, 0] },
   },
   {
-    displayName: 'Cube',
+    get displayName() {
+      return $t('Cube');
+    },
     type: 'cube',
   },
   {
-    displayName: 'Warp',
+    get displayName() {
+      return $t('Warp');
+    },
     type: 'crosswarp',
   },
   {
-    displayName: 'Wind',
+    get displayName() {
+      return $t('Wind');
+    },
     type: 'wind',
   },
   {
-    displayName: "90's Game",
+    get displayName() {
+      return $t("90's Game");
+    },
     type: 'DoomScreenTransition',
     params: { bars: 100 },
   },
   {
-    displayName: 'Grid Flip',
+    get displayName() {
+      return $t('Grid Flip');
+    },
     type: 'GridFlip',
   },
   {
-    displayName: 'Dreamy',
+    get displayName() {
+      return $t('Dreamy');
+    },
     type: 'Dreamy',
   },
   {
-    displayName: 'Zoom',
+    get displayName() {
+      return $t('Zoom');
+    },
     type: 'SimpleZoom',
   },
   {
-    displayName: 'Pixelize',
+    get displayName() {
+      return $t('Pixelize');
+    },
     type: 'pixelize',
   },
 ];
@@ -302,6 +332,10 @@ export class HighlighterService extends StatefulService<IHighligherState> {
   @Inject() streamingService: StreamingService;
   @Inject() userService: UserService;
   @Inject() usageStatisticsService: UsageStatisticsService;
+  @Inject() dismissablesService: DismissablesService;
+  @Inject() notificationsService: NotificationsService;
+  @Inject() jsonrpcService: JsonrpcService;
+  @Inject() navigationService: NavigationService;
 
   /**
    * A dictionary of actual clip classes.
@@ -445,6 +479,7 @@ export class HighlighterService extends StatefulService<IHighligherState> {
           startTrim: 0,
           endTrim: 0,
           deleted: false,
+          source: 'Manual',
         });
       });
     } else {
@@ -456,9 +491,52 @@ export class HighlighterService extends StatefulService<IHighligherState> {
           startTrim: 0,
           endTrim: 0,
           deleted: false,
+          source: 'ReplayBuffer',
         });
       });
+
+      let streamStarted = false;
+
+      this.streamingService.streamingStatusChange.subscribe(status => {
+        if (status === EStreamingState.Live) {
+          streamStarted = true;
+        }
+
+        if (status === EStreamingState.Offline) {
+          if (
+            streamStarted &&
+            this.views.clips.length > 0 &&
+            this.dismissablesService.views.shouldShow(EDismissable.HighlighterNotification)
+          ) {
+            this.notificationsService.push({
+              type: ENotificationType.SUCCESS,
+              lifeTime: -1,
+              message: $t(
+                'Edit your replays with Highlighter, a free editor built in to Streamlabs OBS.',
+              ),
+              action: this.jsonrpcService.createRequest(
+                Service.getResourceId(this),
+                'notificationAction',
+              ),
+            });
+
+            this.usageStatisticsService.recordAnalyticsEvent('Highlighter', {
+              type: 'NotificationShow',
+            });
+          }
+
+          streamStarted = false;
+        }
+      });
     }
+  }
+
+  notificationAction() {
+    this.navigationService.navigate('Highlighter');
+    this.dismissablesService.dismiss(EDismissable.HighlighterNotification);
+    this.usageStatisticsService.recordAnalyticsEvent('Highlighter', {
+      type: 'NotificationClick',
+    });
   }
 
   addClips(paths: string[]) {
@@ -473,6 +551,7 @@ export class HighlighterService extends StatefulService<IHighligherState> {
         startTrim: 0,
         endTrim: 0,
         deleted: false,
+        source: 'Manual',
       });
     });
   }
@@ -553,7 +632,9 @@ export class HighlighterService extends StatefulService<IHighligherState> {
       if (!SUPPORTED_FILE_TYPES.map(e => `.${e}`).includes(path.parse(c.path).ext)) {
         this.REMOVE_CLIP(c.path);
         this.SET_ERROR(
-          'One or more clips could not be imported because they were not recorded in a supported file format.',
+          $t(
+            'One or more clips could not be imported because they were not recorded in a supported file format.',
+          ),
         );
       }
 
@@ -564,8 +645,13 @@ export class HighlighterService extends StatefulService<IHighligherState> {
       this.views.clips.filter(c => !c.loaded),
       c => this.clips[c.path].init(),
       {
-        concurrency: 5, // TODO
+        concurrency: os.cpus().length,
         onProgress: completed => {
+          this.usageStatisticsService.recordAnalyticsEvent('Highlighter', {
+            type: 'ClipImport',
+            source: completed.source,
+          });
+
           this.UPDATE_CLIP({
             path: completed.path,
             loaded: true,
@@ -821,7 +907,7 @@ export class HighlighterService extends StatefulService<IHighligherState> {
           error: e.constructor.name,
         });
       } else {
-        this.SET_EXPORT_INFO({ error: 'An error occurred while exporting the video' });
+        this.SET_EXPORT_INFO({ error: $t('An error occurred while exporting the video') });
         this.usageStatisticsService.recordAnalyticsEvent('Highlighter', {
           type: 'ExportError',
           error: 'Unknown',

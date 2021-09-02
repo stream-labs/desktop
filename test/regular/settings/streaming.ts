@@ -1,9 +1,9 @@
-import { focusChild, focusMain, test, useSpectron } from '../../helpers/spectron';
+import { test, useSpectron } from '../../helpers/spectron';
 import { logIn } from '../../helpers/spectron/user';
 import { getFormInput } from '../../helpers/spectron/forms';
-import { goLive, stopStream } from '../../helpers/spectron/streaming';
-import { showSettings } from '../../helpers/spectron/settings';
+import { goLive, stopStream } from '../../helpers/modules/streaming';
 import { FormMonkey } from '../../helpers/form-monkey';
+import { showSettingsWindow } from '../../helpers/modules/settings/settings';
 
 useSpectron();
 
@@ -11,9 +11,9 @@ test('Populates stream settings after go live', async t => {
   const { app } = t.context;
 
   await logIn(t);
-  await goLive(t);
-  await stopStream(t);
-  await showSettings(t, 'Stream');
+  await goLive();
+  await stopStream();
+  await showSettingsWindow('Stream');
   await (await app.client.$('a=Stream to custom ingest')).click();
   const form = new FormMonkey(t);
   t.true(
@@ -29,9 +29,9 @@ test('Populates stream key after go live', async t => {
   const { app } = t.context;
 
   await logIn(t);
-  await goLive(t);
-  await stopStream(t);
-  await showSettings(t, 'Stream');
+  await goLive();
+  await stopStream();
+  await showSettingsWindow('Stream');
   await (await app.client.$('a=Stream to custom ingest')).click();
 
   // Test that we can toggle show stream key, also helps us fetch the value

@@ -1,17 +1,20 @@
 import { MetricsService } from '../../../app/services/metrics';
 import { test, stopApp, startApp, TExecutionContext } from '../../helpers/spectron';
-import { ApiClient, getClient } from '../../helpers/api-client';
+import { ApiClient, getApiClient } from '../../helpers/api-client';
 import { TSourceType } from '../../../app/services/sources/sources-api';
 import { ScenesService } from '../../../app/services/api/external-api/scenes';
 import { getMeter } from '../meter';
 import { spawnSync } from 'child_process';
 import { sleep } from '../../helpers/sleep';
-import { setOutputResolution, setTemporaryRecordingPath } from '../../helpers/spectron/output';
-import { startRecording, stopRecording } from '../../helpers/spectron/streaming';
+import { startRecording, stopRecording } from '../../helpers/modules/streaming';
 import { getCPUUsage, getMemoryUsage, logTiming, usePerformanceTest } from '../tools';
 import { logIn } from '../../helpers/spectron/user';
 import { ExecutionContext } from 'ava';
 import { CustomizationService } from '../../../app/services/customization';
+import {
+  setOutputResolution,
+  setTemporaryRecordingPath,
+} from '../../helpers/modules/settings/settings';
 const fs = require('fs-extra');
 const _7z = require('7zip')['7z'];
 const path = require('path');
@@ -81,7 +84,7 @@ test('Empty collection', async t => {
   let attempts = RELOAD_ATTEMPTS;
   while (attempts--) {
     await startApp(t, true);
-    const api = await getClient();
+    const api = await getApiClient();
     measureStartupTime(api);
     await stopApp(t, false);
   }
@@ -102,7 +105,7 @@ test('Large collection', async t => {
   let i = RELOAD_ATTEMPTS;
   while (i--) {
     await startApp(t, true);
-    const api = await getClient();
+    const api = await getApiClient();
     measureStartupTime(api);
     await stopApp(t, false);
   }
@@ -123,7 +126,7 @@ test('Empty collection (logged-in twitch)', async t => {
   let attempts = RELOAD_ATTEMPTS;
   while (attempts--) {
     await startApp(t, true);
-    const api = await getClient();
+    const api = await getApiClient();
     measureStartupTime(api);
     await stopApp(t, false);
   }
@@ -131,15 +134,15 @@ test('Empty collection (logged-in twitch)', async t => {
 });
 
 test('Recording', async t => {
-  await setTemporaryRecordingPath(t);
-  await setOutputResolution(t, '100x100');
-  const api = await getClient();
+  await setTemporaryRecordingPath();
+  await setOutputResolution('100x100');
+  const api = await getApiClient();
   const scenesService = api.getResource<ScenesService>('ScenesService');
   scenesService.activeScene.createAndAddSource('Color', 'color_source');
 
-  await startRecording(t);
+  await startRecording();
   await measureMemoryAndCPU(t);
-  await stopRecording(t);
+  await stopRecording();
 
   t.pass();
 });
@@ -167,7 +170,7 @@ test('Create sources', async t => {
     'dshow_input',
   ];
 
-  const api = await getClient();
+  const api = await getApiClient();
   const scenesService = api.getResource<ScenesService>('ScenesService');
   const cs = api.getResource<CustomizationService>('CustomizationService');
   cs.setSettings({ performanceMode: false });
@@ -196,7 +199,7 @@ test('Create sources', async t => {
 });
 
 test('Add and remove items and folders', async t => {
-  const api = await getClient();
+  const api = await getApiClient();
   const scenesService = api.getResource<ScenesService>('ScenesService');
   const meter = getMeter();
 

@@ -1,40 +1,40 @@
 import { readdir } from 'fs-extra';
-import { focusChild, focusMain, test, useSpectron } from '../helpers/spectron';
-import { setFormDropdown } from '../helpers/spectron/forms';
+import { test, useSpectron } from '../helpers/spectron';
 import { sleep } from '../helpers/sleep';
-import { startRecording, stopRecording } from '../helpers/spectron/streaming';
-import { setOutputResolution, setTemporaryRecordingPath } from '../helpers/spectron/output';
+import { startRecording, stopRecording } from '../helpers/modules/streaming';
 import { FormMonkey } from '../helpers/form-monkey';
+import {
+  setOutputResolution,
+  setTemporaryRecordingPath,
+  showSettingsWindow,
+} from '../helpers/modules/settings/settings';
+import { clickButton, focusMain } from '../helpers/modules/core';
 
 useSpectron();
 
 test('Recording', async t => {
-  const { app } = t.context;
-  const tmpDir = await setTemporaryRecordingPath(t);
+  const tmpDir = await setTemporaryRecordingPath();
 
   // low resolution reduces CPU usage
-  await setOutputResolution(t, '100x100');
+  await setOutputResolution('100x100');
 
   const formats = ['flv', 'mp4', 'mov', 'mkv', 'ts', 'm3u8'];
 
-  // Record 2s video in every format
+  // Record 0.5s video in every format
   for (const format of formats) {
-    await focusMain(t);
-    await (await app.client.$('.side-nav .icon-settings')).click();
+    await showSettingsWindow('Output', async () => {
+      const form = new FormMonkey(t);
+      await form.setInputValue(await form.getInputSelectorByTitle('Recording Format'), format);
+      await clickButton('Done');
+    });
 
-    await focusChild(t);
-    await (await app.client.$('li=Output')).click();
-    const form = new FormMonkey(t);
-    await form.setInputValue(await form.getInputSelectorByTitle('Recording Format'), format);
-    await (await app.client.$('button=Done')).click();
-    await focusMain(t);
-
-    await startRecording(t);
-    await sleep(2000);
-    await stopRecording(t);
+    await focusMain();
+    await startRecording();
+    await sleep(500);
+    await stopRecording();
 
     // Wait to ensure that output setting are editable
-    await sleep(2000);
+    await sleep(500);
   }
 
   // Check that every file was created

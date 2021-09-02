@@ -1,111 +1,106 @@
-import { useSpectron, focusMain, test, TExecutionContext } from '../helpers/spectron';
-import { addSource, sourceIsExisting } from '../helpers/spectron/sources';
+import { useSpectron, test } from '../helpers/spectron';
+import { addSource, sourceIsExisting } from '../helpers/modules/sources';
 import {
   addScene,
   clickRemoveScene,
   selectScene,
   openRenameWindow,
   openDuplicateWindow,
-} from '../helpers/spectron/scenes';
-import { getClient } from '../helpers/api-client';
+} from '../helpers/modules/scenes';
+import { getApiClient } from '../helpers/api-client';
 import { SceneCollectionsService } from 'app-services';
+import { clickButton, focusMain, select, waitForDisplayed } from '../helpers/modules/core';
 
 useSpectron();
 
 // Checks for the default audio sources
-async function checkDefaultSources(t: TExecutionContext) {
-  const app = t.context.app;
-  await focusMain(t);
-  t.true(await (await app.client.$('div=Mic/Aux')).isExisting());
-  t.true(await (await app.client.$('div=Desktop Audio')).isExisting());
+async function checkDefaultSources() {
+  await focusMain();
+  await waitForDisplayed('div=Mic/Aux');
+  await waitForDisplayed('div=Desktop Audio');
 }
 
 test('The default scene', async t => {
-  const app = t.context.app;
-  await focusMain(t);
-  t.true(await (await app.client.$('div=Scene')).isExisting());
-  await checkDefaultSources(t);
+  await focusMain();
+  await waitForDisplayed('div=Scene');
+  await checkDefaultSources();
+  t.pass();
 });
 
 test('Adding and removing a scene', async t => {
-  const app = t.context.app;
   const sceneName = 'Coolest Scene Ever';
 
-  await addScene(t, sceneName);
+  await addScene(sceneName);
 
-  await focusMain(t);
-  t.true(await (await app.client.$(`div=${sceneName}`)).isExisting());
+  await focusMain();
+  await waitForDisplayed(`div=${sceneName}`);
 
-  await selectScene(t, sceneName);
-  await checkDefaultSources(t);
-  await clickRemoveScene(t);
+  await selectScene(sceneName);
+  await checkDefaultSources();
+  await clickRemoveScene();
 
-  t.false(await (await app.client.$(`div=${sceneName}`)).isExisting());
+  t.false(await (await select(`div=${sceneName}`)).isExisting());
 });
 
 test('Scene switching with sources', async t => {
-  const app = t.context.app;
   const sceneName = 'Coolest Scene Ever';
   const sourceName = 'Awesome Source';
 
-  await addSource(t, 'Color Source', sourceName);
+  await addSource('Color Source', sourceName);
 
-  await focusMain(t);
-  t.true(await sourceIsExisting(t, sourceName));
+  await focusMain();
+  t.true(await sourceIsExisting(sourceName));
 
   // Adding a new scene will make that scene active, so we can't see
   // the source we just added.
-  await addScene(t, sceneName);
-  await focusMain(t);
-  t.false(await sourceIsExisting(t, sourceName));
+  await addScene(sceneName);
+  await focusMain();
+  t.false(await sourceIsExisting(sourceName));
 
   // Switch back to the default scene
-  await selectScene(t, 'Scene');
-  t.true(await sourceIsExisting(t, sourceName));
+  await selectScene('Scene');
+  t.true(await sourceIsExisting(sourceName));
 });
 
 test('Restarting the app preserves the default sources', async t => {
-  const client = await getClient();
-  const app = t.context.app;
+  const client = await getApiClient();
   const sceneName = 'Coolest Scene Ever';
   const sceneCollectionsService = client.getResource<SceneCollectionsService>(
     'SceneCollectionsService',
   );
 
-  await addScene(t, sceneName);
+  await addScene(sceneName);
 
-  await focusMain(t);
-  t.true(await (await app.client.$(`div=${sceneName}`)).isExisting());
+  await focusMain();
+  await waitForDisplayed(`div=${sceneName}`);
 
   // reload config
   await sceneCollectionsService.load(sceneCollectionsService.collections[0].id);
 
-  await focusMain(t);
-  await selectScene(t, sceneName);
-  await checkDefaultSources(t);
+  await focusMain();
+  await selectScene(sceneName);
+  await checkDefaultSources();
+  t.pass();
 });
 
 test('Rename scene', async t => {
-  const app = t.context.app;
   const newSceneName = 'Scene2';
-
-  await openRenameWindow(t, 'Scene');
-  await (await app.client.$('input')).setValue(newSceneName);
-  await (await app.client.$('button=Done')).click();
-
-  await focusMain(t);
-
-  t.true(await (await app.client.$(`div=${newSceneName}`)).isExisting());
+  await openRenameWindow('Scene');
+  await (await select('input')).setValue(newSceneName);
+  await clickButton('Done');
+  await focusMain();
+  await waitForDisplayed(`div=${newSceneName}`);
+  t.pass();
 });
 
 test('Duplicate scene', async t => {
-  const app = t.context.app;
   const sceneName = 'My Scene';
-  await addScene(t, sceneName);
-  await focusMain(t);
-  t.true(await (await app.client.$(`div=${sceneName}`)).isExisting());
-  await openDuplicateWindow(t, sceneName);
-  await (await app.client.$('button=Done')).click();
-  await focusMain(t);
-  t.true(await (await app.client.$(`div=${sceneName} (1)`)).isExisting());
+  await addScene(sceneName);
+  await focusMain();
+  await waitForDisplayed(`div=${sceneName}`);
+  await openDuplicateWindow(sceneName);
+  await clickButton('Done');
+  await focusMain();
+  await waitForDisplayed(`div=${sceneName} (1)`);
+  t.pass();
 });

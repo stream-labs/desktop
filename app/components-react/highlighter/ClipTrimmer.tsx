@@ -5,6 +5,7 @@ import { Services } from 'components-react/service-provider';
 import times from 'lodash/times';
 import styles from './ClipTrimmer.m.less';
 import cx from 'classnames';
+import { $t } from 'services/i18n';
 
 type TDragType = 'start' | 'end';
 
@@ -27,7 +28,7 @@ function useStateRef<T>(initialValue: T): [RefObject<T>, (newValue: T) => void] 
 }
 
 export default function ClipTrimmer(props: { clip: IClip }) {
-  const { HighlighterService } = Services;
+  const { HighlighterService, UsageStatisticsService } = Services;
   const videoRef = useRef<HTMLVideoElement>(null);
   const timelineRef = useRef<HTMLDivElement>(null);
   const startDragRef = useRef<HTMLDivElement>(null);
@@ -150,8 +151,10 @@ export default function ClipTrimmer(props: { clip: IClip }) {
   function stopDragging() {
     if (isDragging.current === 'start') {
       HighlighterService.actions.setStartTrim(props.clip.path, localStartTrim);
+      UsageStatisticsService.actions.recordAnalyticsEvent('Highlighter', { type: 'Trim' });
     } else if (isDragging.current === 'end') {
       HighlighterService.actions.setEndTrim(props.clip.path, localEndTrim);
+      UsageStatisticsService.actions.recordAnalyticsEvent('Highlighter', { type: 'Trim' });
     }
 
     isDragging.current = null;
@@ -188,7 +191,7 @@ export default function ClipTrimmer(props: { clip: IClip }) {
         }}
         onClick={togglePlayPause}
       />
-      <h3 style={{ margin: '6px 0 10px' }}>Trim Clip</h3>
+      <h3 style={{ margin: '6px 0 10px' }}>{$t('Trim Clip')}</h3>
       <div
         ref={timelineRef}
         style={{

@@ -1,13 +1,13 @@
-import { focusChild, focusMain, test, useSpectron } from '../../helpers/spectron';
+import { test, useSpectron } from '../../helpers/spectron';
 import { FormMonkey } from '../../helpers/form-monkey';
 import { assertOptions } from '../../helpers/spectron/assertions';
 import { getFormCheckbox, getFormInput } from '../../helpers/spectron/forms';
-import { showSettings } from '../../helpers/spectron/settings';
+import { showSettingsWindow } from '../../helpers/modules/settings/settings';
 
 useSpectron();
 
 test('Populates advanced settings', async t => {
-  await showSettings(t, 'Advanced');
+  await showSettingsWindow('Advanced');
 
   // Process Priority
   await assertOptions(t, 'ProcessPriority', 'Normal', [

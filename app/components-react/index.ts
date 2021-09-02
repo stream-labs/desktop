@@ -14,15 +14,23 @@ import Loader from './pages/Loader';
 import NavTools from './sidebar/NavTools';
 import PlatformLogo from './shared/PlatformLogo';
 import AdvancedStatistics from './windows/AdvancedStatistics';
+import StreamScheduler from './pages/stream-scheduler/StreamScheduler';
+import { createRoot } from './root/ReactRoot';
 import StartStreamingButton from './root/StartStreamingButton';
 import TestWidgets from './root/TestWidgets';
 import RenameSource from './windows/RenameSource';
+import NotificationsArea from './root/NotificationsArea';
+import AppsNav from './sidebar/AppsNav';
+import StudioEditor from './root/StudioEditor';
+import SharedComponentsLibrary from './windows/sharedComponentsLibrary/SharedComponentsLibrary';
+import { ObsSettings } from './windows/settings/ObsSettings';
+import ThemeAudit from './pages/ThemeAudit';
 
-// list of React components for usage inside Vue components
+// list of React components to be used inside Vue components
 export const components = {
   NameFolder,
-  GoLiveWindow,
-  EditStreamWindow,
+  GoLiveWindow: createRoot(GoLiveWindow),
+  EditStreamWindow: createRoot(EditStreamWindow),
   IconLibraryProperties,
   NewsBanner,
   PerformanceMetrics,
@@ -35,8 +43,15 @@ export const components = {
   Loader,
   NavTools,
   PlatformLogo,
+  StreamScheduler: createRoot(StreamScheduler),
   AdvancedStatistics,
+  SharedComponentsLibrary: createRoot(SharedComponentsLibrary),
   StartStreamingButton,
   TestWidgets,
   RenameSource,
+  NotificationsArea,
+  ObsSettings: createRoot(ObsSettings),
+  ThemeAudit,
+  AppsNav,
+  StudioEditor,
 };

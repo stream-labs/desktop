@@ -25,7 +25,13 @@ import { UserService } from 'services/user';
 import { IModalOptions, WindowsService } from 'services/windows';
 import LiveDock from '../LiveDock.vue';
 import StudioFooter from '../StudioFooter.vue';
-import { PatchNotes, Loader, Highlighter } from '../shared/ReactComponent';
+import {
+  PatchNotes,
+  Loader,
+  StreamScheduler,
+  Highlighter,
+  ThemeAudit,
+} from '../shared/ReactComponent';
 import PlatformAppMainPage from '../pages/PlatformAppMainPage.vue';
 import electron from 'electron';
 import ResizeBar from 'components/shared/ResizeBar.vue';
@@ -60,8 +66,10 @@ const loadedTheme = () => {
     LayoutEditor,
     AlertboxLibrary,
     ModalWrapper,
+    StreamScheduler,
     Highlighter,
     Grow,
+    ThemeAudit,
   },
 })
 export default class Main extends Vue {

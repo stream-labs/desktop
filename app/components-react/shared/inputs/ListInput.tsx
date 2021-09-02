@@ -1,10 +1,12 @@
 import { Select, Row, Col } from 'antd';
-import React, { ReactNode } from 'react';
+import React, { ReactNode, useRef } from 'react';
 import { InputComponent, TSlobsInputProps, useInput, ValuesOf } from './inputs';
 import InputWrapper from './InputWrapper';
-import { SelectProps } from 'antd/lib/select';
+import { RefSelectProps, SelectProps } from 'antd/lib/select';
 import { useDebounce } from '../../hooks';
 import omit from 'lodash/omit';
+import { getDefined } from '../../../util/properties-type-guards';
+import { findDOMNode } from 'react-dom';
 
 // select what features from the antd lib we are going to use
 const ANT_SELECT_FEATURES = [
@@ -16,6 +18,7 @@ const ANT_SELECT_FEATURES = [
   'onSearch',
   'onSelect',
   'allowClear',
+  'defaultActiveFirstOption',
 ] as const;
 
 // define custom props
@@ -50,6 +53,7 @@ export const ListInput = InputComponent(<T extends any>(p: TListInputProps<T>) =
   const { inputAttrs, wrapperAttrs } = useInput('list', p, ANT_SELECT_FEATURES);
   const options = p.options;
   const debouncedSearch = useDebounce(p.debounce, startSearch);
+  const $inputRef = useRef<RefSelectProps>(null);
 
   function startSearch(searchStr: string) {
     p.onSearch && p.onSearch(searchStr);
@@ -65,19 +69,31 @@ export const ListInput = InputComponent(<T extends any>(p: TListInputProps<T>) =
     }
   }
 
+  function getPopupContainer() {
+    // stick the selector popup to the closest Scrollable content
+    const $el: Element = getDefined(findDOMNode($inputRef.current));
+    return $el.closest('.os-content, body')! as HTMLElement;
+  }
+
   const selectedOption = options.find(opt => opt.value === p.value);
 
   return (
     <InputWrapper {...wrapperAttrs} extra={selectedOption?.description}>
       <Select
+        ref={$inputRef}
         {...omit(inputAttrs, 'onChange')}
         // search by label instead value
         value={inputAttrs.value as string}
         optionFilterProp="label"
         optionLabelProp="labelrender"
         onSearch={p.showSearch ? onSearchHandler : undefined}
-        onSelect={val => p.onChange && p.onChange(val as T)}
+        onChange={val => p.onChange && p.onChange(val as T)}
         defaultValue={p.defaultValue as string}
+        getPopupContainer={getPopupContainer}
+        data-value={inputAttrs.value}
+        data-selected-option-label={selectedOption?.label}
+        data-show-search={!!inputAttrs['showSearch']}
+        data-loading={!!inputAttrs['loading']}
       >
         {options && options.map((opt, ind) => renderOption(opt, ind, p))}
       </Select>
@@ -85,8 +101,13 @@ export const ListInput = InputComponent(<T extends any>(p: TListInputProps<T>) =
   );
 });
 
-export function renderOption<T>(opt: IListOption<T>, ind: number, inputProps: ICustomListProps<T>) {
+export function renderOption<T>(
+  opt: IListOption<T>,
+  ind: number,
+  inputProps: ICustomListProps<T> & { name?: string },
+) {
   const attrs = {
+    'data-option-list': inputProps.name,
     'data-option-label': opt.label,
     'data-option-value': opt.value,
     label: opt.label,
