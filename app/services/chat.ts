@@ -240,6 +240,7 @@ export class ChatService extends Service {
     new GuestApiHandler().exposeApi(this.chatView.webContents.id, {
       pinMessage: (messageData: IChatHighlightMessage) =>
         this.chatHighlightService.pinMessage(messageData),
+      unpinMessage: () => this.chatHighlightService.unpinMessage(),
     });
 
     this.chatView.webContents.on('dom-ready', () => {

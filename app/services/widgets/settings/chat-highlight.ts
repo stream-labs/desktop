@@ -1,3 +1,4 @@
+import uuid from 'uuid/v4';
 import {
   IWidgetData,
   IWidgetSettings,
@@ -67,10 +68,22 @@ export class ChatHighlightService extends WidgetSettingsService<IChatHighlightDa
     const headers = authorizedHeaders(this.getWidgetToken());
     headers.append('Content-Type', 'application/json');
     const url = `https://${this.getHost()}/api/v5/slobs/widget/chat-highlight/pin`;
+    messageData.messageToPin.tags.id = uuid();
     const request = new Request(url, {
       headers,
       method: 'POST',
       body: JSON.stringify(messageData),
+    });
+    fetch(request);
+  }
+
+  async unpinMessage() {
+    const headers = authorizedHeaders(this.getWidgetToken());
+    headers.append('Content-Type', 'application/json');
+    const url = `https://${this.getHost()}/api/v5/slobs/widget/chat-highlight/clear-pin`;
+    const request = new Request(url, {
+      headers,
+      method: 'POST',
     });
     fetch(request);
   }
