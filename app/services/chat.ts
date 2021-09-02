@@ -7,6 +7,7 @@ import electron, { ipcRenderer } from 'electron';
 import url from 'url';
 import { WindowsService } from 'services/windows';
 import { $t } from 'services/i18n';
+import { WidgetsService, WidgetType } from 'services/widgets';
 import { InitAfter } from './core';
 import Utils from './utils';
 import { StreamingService } from './streaming';
@@ -49,6 +50,7 @@ export class ChatService extends Service {
   @Inject() windowsService: WindowsService;
   @Inject() streamingService: StreamingService;
   @Inject() chatHighlightService: ChatHighlightService;
+  @Inject() widgetsService: WidgetsService;
 
   private chatView: Electron.BrowserView | null;
   private chatUrl = '';
@@ -82,6 +84,12 @@ export class ChatService extends Service {
 
   refreshChat() {
     this.loadUrl();
+  }
+
+  hasChatHighlightWidget(): boolean {
+    return !!this.widgetsService
+      .getWidgetSources()
+      .find(source => source.type === WidgetType.ChatHighlight);
   }
 
   async mountChat(electronWindowId: number) {
@@ -257,12 +265,14 @@ export class ChatService extends Service {
           true,
         );
       }
-      setTimeout(() => {
-        this.chatView.webContents.executeJavaScript(
-          require('!!raw-loader!./widgets/settings/chat-highlight-script.js').default,
-          true,
-        );
-      }, 10000);
+      if (this.hasChatHighlightWidget() && this.userService.platform?.type === 'twitch') {
+        setTimeout(() => {
+          this.chatView.webContents.executeJavaScript(
+            require('!!raw-loader!./widgets/settings/chat-highlight-script.js').default,
+            true,
+          );
+        }, 10000);
+      }
 
       // facebook chat doesn't fit our layout by default
       // inject a script that removes scrollbars and sets auto width for the chat
