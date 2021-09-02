@@ -11,7 +11,7 @@ import { InitAfter } from './core';
 import Utils from './utils';
 import { StreamingService } from './streaming';
 import { GuestApiHandler } from 'util/guest-api-handler';
-import { ChatHighlightService } from './widgets/settings/chat-highlight';
+import { ChatHighlightService, IChatHighlightMessage } from './widgets/settings/chat-highlight';
 
 export function enableBTTVEmotesScript(isDarkTheme: boolean) {
   /*eslint-disable */
@@ -230,7 +230,8 @@ export class ChatService extends Service {
     const settings = this.customizationService.state;
 
     new GuestApiHandler().exposeApi(this.chatView.webContents.id, {
-      pinMessage: this.chatHighlightService.pinMessage,
+      pinMessage: (messageData: IChatHighlightMessage) =>
+        this.chatHighlightService.pinMessage(messageData),
     });
 
     this.chatView.webContents.on('dom-ready', () => {

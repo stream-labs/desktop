@@ -31,6 +31,15 @@ export interface IChatHighlightMessage {
 export interface IChatHighlightSettings extends IWidgetSettings {
   enabled: boolean;
   highlight_duration: number; // milliseconds
+  font_family: string;
+  message_font_size: number;
+  message_font_weight: number;
+  message_text_color: string;
+  message_background_color: string;
+  name_font_size: number;
+  name_font_weight: number;
+  name_text_color: string;
+  name_background_color: string;
 }
 
 export interface IChatHighlightData extends IWidgetData {
@@ -80,6 +89,35 @@ export class ChatHighlightService extends WidgetSettingsService<IChatHighlightDa
     return formMetadata({
       enabled: metadata.toggle({ title: $t('Enabled') }),
       duration: metadata.slider({ title: $t('Duration') }),
+      fontFamily: metadata.fontFamily({ title: $t('Font Family') }),
+      messageFontSize: metadata.slider({
+        title: $t('Message Font Size'),
+        min: 12,
+        max: 48,
+        interval: 2,
+      }),
+      messageFontWeight: metadata.slider({
+        title: $t('Message Font Weight'),
+        interval: 100,
+        min: 300,
+        max: 900,
+      }),
+      messageTextColor: metadata.color({ title: $t('Message Text Color') }),
+      messageBackgroundColor: metadata.color({ title: $t('Message Background Color') }),
+      nameFontSize: metadata.slider({
+        title: $t('Name Font Size'),
+        min: 12,
+        max: 48,
+        interval: 2,
+      }),
+      nameFontWeight: metadata.slider({
+        title: $t('Name Font Weight'),
+        interval: 100,
+        min: 300,
+        max: 900,
+      }),
+      nameTextColor: metadata.color({ title: $t('Name Text Color') }),
+      nameBackgroundColor: metadata.color({ title: $t('Name Background Color') }),
     });
   }
 }
