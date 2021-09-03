@@ -16,7 +16,7 @@ import {
   TextInput,
   TInputLayout,
 } from '../../shared/inputs';
-import { Alert, Button, Col, Row, Space, Tag, Timeline, Tabs } from 'antd';
+import { Alert, Button, Col, Row, Space, Tag, Timeline, Tabs, Menu } from 'antd';
 import { Services } from '../../service-provider';
 import InputWrapper from '../../shared/inputs/InputWrapper';
 import Scrollable from '../../shared/Scrollable';
@@ -281,6 +281,20 @@ function Examples() {
             Link Danger
           </Button>
         </Space>
+      </Example>
+
+      <Example title="Menu">
+        <Menu theme="light">
+          <Menu.Item key="1">Item 1</Menu.Item>
+          <Menu.Item key="2">Item 2</Menu.Item>
+          <Menu.Item key="3">Item 4</Menu.Item>
+        </Menu>
+
+        <Menu theme="dark">
+          <Menu.Item key="1">Item 1</Menu.Item>
+          <Menu.Item key="2">Item 2</Menu.Item>
+          <Menu.Item key="3">Item 4</Menu.Item>
+        </Menu>
       </Example>
 
       <Example title="Modals">

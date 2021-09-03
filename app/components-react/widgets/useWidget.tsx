@@ -31,6 +31,7 @@ export const DEFAULT_WIDGET_STATE = {
   selectedTab: '',
   type: '',
   settings: {} as Record<string, unknown>,
+  layout: 'side',
 };
 
 export class WidgetModule {
@@ -78,6 +79,11 @@ export class WidgetModule {
     this.setPreviewVisibility(false);
     await Utils.sleep(300);
     this.setPreviewVisibility(true);
+  }
+
+  @mutation()
+  setLayout(layout: string) {
+    this.state.layout = layout;
   }
 
   @mutation()

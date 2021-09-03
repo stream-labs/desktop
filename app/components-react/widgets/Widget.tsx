@@ -3,8 +3,10 @@ import { useOnCreate } from '../hooks';
 import { ModalLayout } from '../shared/ModalLayout';
 import { Services } from '../service-provider';
 import { AlertBox, AlertBoxModule } from './alertbox/AlertBox';
-import { useWidgetRoot } from './useWidget';
+import { useWidget, useWidgetRoot } from './useWidget';
 import { getDefined } from '../../util/properties-type-guards';
+import { ListInput } from '../shared/inputs';
+import { Form } from 'antd';
 
 export const components = {
   AlertBox: [AlertBox, AlertBoxModule],
@@ -22,8 +24,25 @@ export function WidgetWindow() {
   useWidgetRoot(WidgetModule, sourceId);
 
   return (
-    <ModalLayout bodyStyle={{ padding: '0px' }} footer={null}>
+    <ModalLayout bodyStyle={{ padding: '0px' }} footer={<Footer />}>
       <WidgetSettingsComponent />
     </ModalLayout>
+  );
+}
+
+function Footer() {
+  const { layout, setLayout } = useWidget();
+  return (
+    <Form>
+      SelectedLayout {layout}
+      <ListInput
+        options={[
+          { label: 'side', value: 'side' },
+          { label: 'bottom', value: 'bottom' },
+        ]}
+        value={layout}
+        onChange={setLayout}
+      />
+    </Form>
   );
 }
