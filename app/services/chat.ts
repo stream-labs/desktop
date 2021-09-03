@@ -266,12 +266,11 @@ export class ChatService extends Service {
           true,
         );
       }
-      if (this.hasChatHighlightWidget() && this.userService.platform?.type === 'twitch') {
+      if (this.userService.platform?.type === 'twitch' && this.hasChatHighlightWidget()) {
         setTimeout(() => {
-          this.chatView.webContents.executeJavaScript(
-            require('!!raw-loader!./widgets/settings/chat-highlight-script.js').default,
-            true,
-          );
+          const chatHighlightScript = require('!!raw-loader!./widgets/settings/chat-highlight-script.js');
+          if (!chatHighlightScript && !chatHighlightScript.default) return;
+          this.chatView.webContents.executeJavaScript(chatHighlightScript.default, true);
         }, 10000);
       }
 
