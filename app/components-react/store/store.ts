@@ -1,4 +1,11 @@
-import { combineReducers, createAction, createReducer, createStore, Store } from '@reduxjs/toolkit';
+import {
+  CaseReducer,
+  combineReducers,
+  createAction,
+  createReducer,
+  createStore,
+  Store
+} from '@reduxjs/toolkit';
 import { batch, useSelector as useReduxSelector } from 'react-redux';
 import { StatefulService } from '../../services';
 import { useOnCreate } from '../hooks';
@@ -6,6 +13,8 @@ import { useEffect, useRef } from 'react';
 import { isSimilar } from '../../util/isDeepEqual';
 import { createBinding, TBindings } from '../shared/inputs';
 import { getDefined } from '../../util/properties-type-guards';
+import { unstable_batchedUpdates } from 'react-dom';
+import webpack from 'webpack';
 
 /*
  * This file provides Redux integration in a modular way
@@ -129,47 +138,45 @@ class ReduxModuleManager {
   registerModule<TInitParams, TModule extends IReduxModule<any, any>>(
     module: TModule,
     initParams?: TInitParams,
+    moduleName = '',
   ): TModule {
-    // use constructor name as a module name
-    const moduleName = module.constructor.name;
+    // use constructor name as a module name if other name not provided
+    moduleName = moduleName || module.constructor.name;
 
-    // collect mutations from the module's prototype
-    const mutations = Object.getPrototypeOf(module).mutations;
 
     // call `init()` method of module if exist
-    module.init && module.init(initParams as TInitParams);
-    const initialState = module.state;
+    unstable_batchedUpdates(() => {
+      module.name = moduleName;
+      module.init && module.init(initParams as TInitParams);
+      const initialState = module.state;
 
-    // Use Redux API to create Redux reducers from our mutation functions
-    // this step is adding the support of `Immer` library in reducers
-    // https://redux-toolkit.js.org/usage/immer-reducers
-    const reducer = createReducer(initialState, builder => {
-      Object.keys(mutations).forEach(mutationName => {
-        const action = createAction(`${moduleName}/${mutationName}`);
-        builder.addCase(action, mutations[mutationName]);
+      // Use Redux API to create Redux reducers from our mutation functions
+      // this step is adding the support of `Immer` library in reducers
+      // https://redux-toolkit.js.org/usage/immer-reducers
+      const reducer = initReducerForModule(module, initialState);
+
+      // Re-define the `state` variable of the module
+      // It should be linked to the global Redux sate after module initialization
+      // But when mutation is running it should be linked to a special Proxy from the Immer library
+      Object.defineProperty(module, 'state', {
+        get: () => {
+          if (this.immerState) return this.immerState;
+          const globalState = store.getState() as any;
+          return globalState[moduleName];
+        },
       });
+
+      // register reducer in Redux
+      store.reducerManager.add(moduleName, reducer);
+      // call the `initState` mutation to initialize the module's initial state
+      store.dispatch({ type: 'initState', payload: { moduleName, initialState } });
+      // create a record in `registeredModules` with the newly created module
+      this.registeredModules[moduleName] = {
+        componentIds: [],
+        module,
+      };
     });
 
-    // Re-define the `state` variable of the module
-    // It should be linked to the global Redux sate after module initialization
-    // But when mutation is running it should be linked to a special Proxy from the Immer library
-    Object.defineProperty(module, 'state', {
-      get: () => {
-        if (this.immerState) return this.immerState;
-        const globalState = store.getState() as any;
-        return globalState[moduleName];
-      },
-    });
-
-    // register reducer in Redux
-    store.reducerManager.add(moduleName, reducer);
-    // call the `initState` mutation to initialize the module's initial state
-    store.dispatch({ type: 'initState', payload: { moduleName, initialState } });
-    // create a record in `registeredModules` with the newly created module
-    this.registeredModules[moduleName] = {
-      componentIds: [],
-      module,
-    };
     return module;
   }
 
@@ -177,6 +184,8 @@ class ReduxModuleManager {
    * Unregister the module and erase its state from Redux
    */
   unregisterModule(moduleName: string) {
+    const module = this.getModule(moduleName);
+    module.destroy && module.destroy();
     store.reducerManager.remove(moduleName);
     delete this.registeredModules[moduleName];
   }
@@ -305,41 +314,32 @@ class VuexModule {
  * A decorator that registers the object method as an mutation
  */
 export function mutation() {
-  return function (target: any, methodName: string, descriptor: PropertyDescriptor) {
-    return registerMutation(target, methodName, descriptor.value);
+  return function (target: any, methodName: string) {
+    target.mutations = target.mutations || [];
+    // mark the method as an mutation
+    target.mutations.push(methodName);
   };
 }
 
-/**
- * Register function as an mutation for a ReduxModule
- */
-function registerMutation(target: any, mutationName: string, fn: Function) {
-  // use the constructor name as a moduleName
-  const moduleName = target.constructor.name;
+function initReducerForModule(module: IReduxModule<unknown, unknown>, initialState: unknown) {
+  const moduleName = getDefined(module.name);
+  const mutationNames: string[] = Object.getPrototypeOf(module).mutations || [];
+  const mutations: Record<string, CaseReducer<unknown, { payload: unknown; type: string; }>> = {};
 
-  // create helper objects if they have not been created yet
-  target.mutations = target.mutations || {};
-  target.originalMethods = target.originalMethods || {};
+  mutationNames.forEach(mutationName => {
+    const originalMethod = module[mutationName];
 
-  // save the original method
-  target.originalMethods[mutationName] = fn;
-  const originalMethod = fn;
-
-  // Transform the original function into the Redux Action handler
-  // So we can use this method in the Redux's `createReducer()` call
-  target.mutations[mutationName] = (state: unknown, action: { payload: unknown[] }) => {
-    const module = moduleManager.getModule(moduleName);
-    moduleManager.setImmerState(state);
-    originalMethod.apply(module, action.payload);
-    moduleManager.setImmerState(null);
-  };
-
-  // Redirect the call of original method to the Redux`s reducer
-  Object.defineProperty(target, mutationName, {
-    configurable: true,
-    value(...args: any[]) {
+    // Transform the original function into the Redux Action handler
+    // So we can use this method in the Redux's `createReducer()` call
+    mutations[mutationName] = (state: unknown, action: { payload: unknown }) => {
       const module = moduleManager.getModule(moduleName);
+      moduleManager.setImmerState(state);
+      originalMethod.apply(module, action.payload);
+      moduleManager.setImmerState(null);
+    };
 
+    // override the original Module method to dispatch mutations
+    module[mutationName] = function (...args: any[]) {
       // if this method was called from another mutation
       // we don't need to dispatch a new mutation again
       // just call the original method
@@ -356,11 +356,76 @@ function registerMutation(target: any, mutationName: string, fn: Function) {
         if (moduleName !== 'BatchedUpdatesModule') batchedUpdatesModule.temporaryDisableRendering();
         store.dispatch({ type: `${moduleName}/${mutationName}`, payload: args });
       });
-    },
+    };
   });
 
-  return Object.getOwnPropertyDescriptor(target, mutationName);
+  return createReducer(initialState, builder => {
+    Object.keys(mutations).forEach(mutationName => {
+      const action = createAction(`${moduleName}/${mutationName}`);
+      builder.addCase(action, mutations[mutationName]);
+    });
+  });
 }
+
+// /**
+//  * Register function as an mutation for a ReduxModule
+//  */
+// function registerMutation(target: any, mutationName: string, fn: Function) {
+//   target.mutations = target.mutations || [];
+//   target.mutations.push(mutationName);
+// }
+
+// /**
+//  * Register function as an mutation for a ReduxModule
+//  */
+// function registerMutation(target: any, mutationName: string, fn: Function) {
+//   // use the constructor name as a moduleName
+//   const moduleName = target.constructor.name;
+//
+//   // create helper objects if they have not been created yet
+//   target.mutations = target.mutations || {};
+//   target.originalMethods = target.originalMethods || {};
+//
+//   // save the original method
+//   target.originalMethods[mutationName] = fn;
+//   const originalMethod = fn;
+//
+//   // Transform the original function into the Redux Action handler
+//   // So we can use this method in the Redux's `createReducer()` call
+//   target.mutations[mutationName] = (state: unknown, action: { payload: unknown[] }) => {
+//     const module = moduleManager.getModule(moduleName);
+//     moduleManager.setImmerState(state);
+//     originalMethod.apply(module, action.payload);
+//     moduleManager.setImmerState(null);
+//   };
+//
+//   // Redirect the call of original method to the Redux`s reducer
+//   Object.defineProperty(target, mutationName, {
+//     configurable: true,
+//     value(...args: any[]) {
+//       const module = moduleManager.getModule(moduleName);
+//
+//       // if this method was called from another mutation
+//       // we don't need to dispatch a new mutation again
+//       // just call the original method
+//       const mutationIsRunning = !!moduleManager.immerState;
+//       if (mutationIsRunning) return originalMethod.apply(module, args);
+//
+//       const batchedUpdatesModule = moduleManager.getModule<BatchedUpdatesModule>(
+//         'BatchedUpdatesModule',
+//       );
+//
+//       // dispatch reducer and call `temporaryDisableRendering()`
+//       // so next mutation in the javascript queue will not cause redundant re-renderings in components
+//       batch(() => {
+//         if (moduleName !== 'BatchedUpdatesModule') batchedUpdatesModule.temporaryDisableRendering();
+//         store.dispatch({ type: `${moduleName}/${mutationName}`, payload: args });
+//       });
+//     },
+//   });
+//
+//   return Object.getOwnPropertyDescriptor(target, mutationName);
+// }
 
 /**
  * This `useSelector` is a wrapper for the original `useSelector` method from Redux
@@ -524,7 +589,9 @@ export function useBinding<
 
 export interface IReduxModule<TInitParams, TState> {
   state: TState;
+  name?: string;
   init?: (initParams: TInitParams) => unknown;
+  destroy?: () => unknown;
 }
 
 interface IReduxModuleMetadata {

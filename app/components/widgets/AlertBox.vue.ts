@@ -3,43 +3,13 @@ import WidgetEditor from 'components/windows/WidgetEditor.vue';
 import WidgetSettings from './WidgetSettings.vue';
 import { inputComponents } from 'components/widgets/inputs';
 import VFormGroup from 'components/shared/inputs/VFormGroup.vue';
-import { IAlertBoxData, AlertBoxService } from 'services/widgets/settings/alert-box';
+import { IAlertBoxData, AlertBoxDeprecatedService } from 'services/widgets/settings/alert-box';
 import { $t } from 'services/i18n';
 
 import ValidatedForm from 'components/shared/inputs/ValidatedForm';
 import { Inject } from 'services/core/injector';
 import { IAlertBoxVariation } from 'services/widgets/settings/alert-box/alert-box-api';
-
-const alertNameMap = () => ({
-  bits: $t('Bits'),
-  donations: $t('Donations'),
-  donordrive: $t('Charity Streaming Donations'),
-  patreon: $t('Patreon Pledges'),
-  extraLife: $t('Extra Life Donations'),
-  justGiving: $t('JustGiving Donations'),
-  merch: $t('Merch'),
-  resubs: $t('Resubs'),
-  gamewisp: $t('Gamewisp Subscriptions'),
-  subs: $t('Subscriptions'),
-  tiltify: $t('Tiltify Donations'),
-  treat: $t('TreatStream'),
-  follows: $t('Follows'),
-  hosts: $t('Hosts'),
-  raids: $t('Raids'),
-  superhearts: $t('Super Hearts'),
-  fanfunding: $t('Super Chat'),
-  sponsors: $t('Members'),
-  subscribers: $t('Subscribers'), // YouTube
-  stars: $t('Stars'),
-  support: $t('Support'),
-  giftSupport: $t('Gifted Support'),
-  likes: $t('Likes'),
-  shares: $t('Shares'),
-  fbfollows: $t('Follows'),
-  loyaltystore: $t('Cloudbot Store'),
-  stickers: $t('Stickers'),
-  effects: $t('Effects/Rallies'),
-});
+import { alertNameMap } from '../../services/widgets/settings/alert-box/alert-box-data';
 
 const triggerAmountMap = {
   bits: 'bits_alert_min_amount',
@@ -71,8 +41,8 @@ const HAS_DONOR_MESSAGE = [
     ...inputComponents,
   },
 })
-export default class AlertBox extends WidgetSettings<IAlertBoxData, AlertBoxService> {
-  @Inject() alertBoxService!: AlertBoxService;
+export default class AlertBox extends WidgetSettings<IAlertBoxData, AlertBoxDeprecatedService> {
+  @Inject() alertBoxService!: AlertBoxDeprecatedService;
 
   $refs: { [key: string]: HTMLElement };
 

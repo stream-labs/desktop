@@ -32,6 +32,39 @@ export const API_NAME_MAP = {
   loyalty_store_redemption: 'loyaltystore',
 };
 
+export const alertNameMap = () => ({
+  bits: $t('Bits'),
+  donations: $t('Donations'),
+  donordrive: $t('Charity Streaming Donations'),
+  patreon: $t('Patreon Pledges'),
+  extraLife: $t('Extra Life Donations'),
+  justGiving: $t('JustGiving Donations'),
+  merch: $t('Merch'),
+  resubs: $t('Resubs'),
+  gamewisp: $t('Gamewisp Subscriptions'),
+  subs: $t('Subscriptions'),
+  tiltify: $t('Tiltify Donations'),
+  treat: $t('TreatStream'),
+  follows: $t('Follows'),
+  hosts: $t('Hosts'),
+  raids: $t('Raids'),
+  superhearts: $t('Super Hearts'),
+  fanfunding: $t('Super Chat'),
+  sponsors: $t('Members'),
+  subscribers: $t('Subscribers'), // YouTube
+  stars: $t('Stars'),
+  support: $t('Support'),
+  giftSupport: $t('Gifted Support'),
+  likes: $t('Likes'),
+  shares: $t('Shares'),
+  fbfollows: $t('Follows'),
+  loyaltystore: $t('Cloudbot Store'),
+  stickers: $t('Stickers'),
+  effects: $t('Effects/Rallies'),
+});
+
+export type TAlertType = keyof ReturnType<typeof alertNameMap>;
+
 // different tests are required due to api idiosyncracies
 const determineTester = (key: string) => {
   switch (key) {

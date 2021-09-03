@@ -105,7 +105,8 @@ export { TipJarService } from 'services/widgets/settings/tip-jar';
 export { SponsorBannerService } from 'services/widgets/settings/sponsor-banner';
 export { SubGoalService } from 'services/widgets/settings/sub-goal';
 export { MediaShareService } from 'services/widgets/settings/media-share';
-export { AlertBoxService } from 'services/widgets/settings/alert-box';
+export { AlertBoxDeprecatedService } from 'services/widgets/settings/alert-box';
+export { AlertBoxService } from 'services/widgets/settings/alert-box/alert-box';
 export { SpinWheelService } from 'services/widgets/settings/spin-wheel';
 export { PollService } from 'services/widgets/settings/poll';
 export { EmoteWallService } from 'services/widgets/settings/emote-wall';
@@ -143,6 +144,7 @@ import { NotificationsService } from './services/notifications';
 import { MediaBackupService } from './services/media-backup';
 import { HotkeysService } from './services/hotkeys';
 import { WidgetsService } from './services/widgets';
+import { AlertBoxService } from 'services/widgets/settings/alert-box/alert-box';
 import { HostsService } from './services/hosts';
 import { OnboardingService } from './services/onboarding';
 import { CacheUploaderService } from './services/cache-uploader';
@@ -184,6 +186,7 @@ export const AppServices = {
   MediaBackupService,
   HotkeysService,
   WidgetsService,
+  AlertBoxService,
   HostsService,
   OnboardingService,
   CacheUploaderService,

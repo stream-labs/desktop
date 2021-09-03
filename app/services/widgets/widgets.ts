@@ -8,7 +8,6 @@ import { HostsService } from '../hosts';
 import { ScalableRectangle } from 'util/ScalableRectangle';
 import namingHelpers from 'util/NamingHelpers';
 import fs from 'fs';
-import { WidgetSettingsService } from './settings/widget-settings';
 import { ServicesManager } from 'services-manager';
 import { authorizedHeaders } from 'util/requests';
 import { ISerializableWidget, IWidgetSource, IWidgetsServiceApi } from './widgets-api';
@@ -136,9 +135,12 @@ export class WidgetsService
     return WidgetType[type] as TWindowComponentName;
   }
 
-  getWidgetSettingsService(type: WidgetType): WidgetSettingsService<any> {
-    const serviceName = `${this.getWidgetComponent(type)}Service`;
+  getWidgetSettingsService(type: WidgetType): any {
     const servicesManager: ServicesManager = ServicesManager.instance;
+    if (type === WidgetType.AlertBox) {
+      return servicesManager.getResource('AlertBoxService');
+    }
+    const serviceName = `${this.getWidgetComponent(type)}Service`;
     return servicesManager.getResource(serviceName);
   }
 

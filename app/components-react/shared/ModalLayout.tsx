@@ -11,7 +11,7 @@ import { ModalProps } from 'antd/lib/modal';
 // use props of Modal from the antd lib
 type TProps = { children: ReactNode; fixedChild?: ReactNode; hideFooter?: boolean } & Pick<
   ModalProps,
-  'footer' | 'onOk' | 'okText'
+  'footer' | 'onOk' | 'okText' | 'bodyStyle'
 >;
 
 // calculate OS dependent styles
@@ -37,6 +37,7 @@ export function ModalLayout(p: TProps) {
     height: p.fixedChild
       ? `calc(100% - ${footerHeight + 200}px)`
       : `calc(100% - ${footerHeight}px)`,
+    ...(p.bodyStyle || {}),
   };
 
   // inject services

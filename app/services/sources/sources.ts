@@ -596,14 +596,19 @@ export class SourcesService extends StatefulService<ISourcesState> {
     const platform = this.userService.views.platform;
     assertIsDefined(platform);
     const widgetType = source.getPropertiesManagerSettings().widgetType;
-    const componentName = this.widgetsService.getWidgetComponent(widgetType);
+    let componentName = this.widgetsService.getWidgetComponent(widgetType);
+
+    // React widgets are in the WidgetsWindow component
+    const reactWidgets = ['AlertBox'];
+    if (reactWidgets.includes(componentName)) componentName = 'WidgetWindow';
+
     if (componentName) {
       this.windowsService.showWindow({
         componentName,
         title: $t('Settings for %{sourceName}', {
           sourceName: WidgetDisplayData(platform.type)[widgetType].name,
         }),
-        queryParams: { sourceId: source.sourceId },
+        queryParams: { sourceId: source.sourceId, widgetType: WidgetType[widgetType] },
         size: {
           width: 920,
           height: 1024,

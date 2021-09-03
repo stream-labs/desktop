@@ -31,7 +31,7 @@ export interface IAlertBoxData extends IWidgetData {
 }
 
 @InheritMutations()
-export class AlertBoxService extends WidgetSettingsService<IAlertBoxData> {
+export class AlertBoxDeprecatedService extends WidgetSettingsService<IAlertBoxData> {
   static initialState = WIDGET_INITIAL_STATE;
 
   apiNames() {

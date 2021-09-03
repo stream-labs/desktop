@@ -7,6 +7,7 @@ import { store } from '../store';
  */
 export function createRoot(ChildComponent: (props: any) => JSX.Element) {
   return function ReactRoot(childProps: Object) {
+    console.log('re-render Root', childProps);
     return (
       <Provider store={store}>
         <ChildComponent {...childProps} />

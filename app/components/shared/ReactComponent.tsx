@@ -232,3 +232,10 @@ export class ThemeAudit extends ReactComponent {}
 export class AppsNav extends ReactComponent {}
 @Component({ props: { name: { default: 'StudioEditor' } } })
 export class StudioEditor extends ReactComponent {}
+@Component({
+  props: {
+    name: { default: 'WidgetWindow' },
+    wrapperStyles: { default: () => ({ height: '100%' }) },
+  },
+})
+export class WidgetWindow extends ReactComponent {}

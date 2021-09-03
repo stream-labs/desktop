@@ -25,6 +25,7 @@ import {
   PerformanceMetrics,
   RenameSource,
   AdvancedStatistics,
+  WidgetWindow,
 } from 'components/shared/ReactComponent';
 
 import SourceProperties from 'components/windows/SourceProperties.vue';
@@ -138,6 +139,7 @@ export function getComponents() {
     EditStreamWindow,
     IconLibraryProperties,
     SharedComponentsLibrary,
+    WidgetWindow,
   };
 }
 
