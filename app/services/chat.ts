@@ -13,6 +13,7 @@ import Utils from './utils';
 import { StreamingService } from './streaming';
 import { GuestApiHandler } from 'util/guest-api-handler';
 import { ChatHighlightService, IChatHighlightMessage } from './widgets/settings/chat-highlight';
+import { assertIsDefined } from 'util/properties-type-guards';
 
 export function enableBTTVEmotesScript(isDarkTheme: boolean) {
   /*eslint-disable */
@@ -269,7 +270,7 @@ export class ChatService extends Service {
       if (this.userService.platform?.type === 'twitch' && this.hasChatHighlightWidget()) {
         setTimeout(() => {
           const chatHighlightScript = require('!!raw-loader!./widgets/settings/chat-highlight-script.js');
-          if (!chatHighlightScript || !chatHighlightScript.default) return;
+          assertIsDefined(chatHighlightScript.default);
           this.chatView.webContents.executeJavaScript(chatHighlightScript.default, true);
         }, 10000);
       }
