@@ -31,7 +31,7 @@ export default class ChatHighlight extends WidgetSettings<
     return (
       this.wData && (
         <WidgetEditor navItems={this.navItems}>
-          <ValidatedForm slot="highlight-properties" onInput={() => this.save()}>
+          <ValidatedForm slot="highlight-properties" key="highlight" onInput={() => this.save()}>
             <VFormGroup vModel={this.wData.settings.enabled} metadata={this.metadata.enabled} />
             <VFormGroup
               vModel={this.wData.settings.highlight_duration}
@@ -42,7 +42,7 @@ export default class ChatHighlight extends WidgetSettings<
               metadata={this.metadata.fontFamily}
             />
           </ValidatedForm>
-          <ValidatedForm slot="message-properties" onInput={() => this.save()}>
+          <ValidatedForm slot="message-properties" key="message" onInput={() => this.save()}>
             <VFormGroup
               vModel={this.wData.settings.message_font_size}
               metadata={this.metadata.messageFontSize}
@@ -60,7 +60,7 @@ export default class ChatHighlight extends WidgetSettings<
               metadata={this.metadata.messageBackgroundColor}
             />
           </ValidatedForm>
-          <ValidatedForm slot="name-properties" onInput={() => this.save()}>
+          <ValidatedForm slot="name-properties" key="name" onInput={() => this.save()}>
             <VFormGroup
               vModel={this.wData.settings.name_font_size}
               metadata={this.metadata.nameFontSize}
