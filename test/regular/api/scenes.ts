@@ -272,3 +272,15 @@ test('Scene.getNestedItems()', async t => {
   t.is(nestedItems.length, 3);
   t.deepEqual(nestedItemIds, expectedItemIds);
 });
+
+test('SceneNode.getNextNode()', async t => {
+  const client = await getApiClient();
+  const scenesService = client.getResource<ScenesService>('ScenesService');
+  const scene = scenesService.createScene('Scene1');
+  const sceneNode1 = scene.createAndAddSource('Item1', 'color_source');
+  const sceneNode2 = scene.createAndAddSource('Item2', 'color_source');
+  const sceneNode3 = scene.createAndAddSource('Item3', 'color_source');
+  const nextSceneNode = sceneNode2.getNextNode();
+
+  t.is(nextSceneNode.nodeId, sceneNode1.nodeId);
+});
