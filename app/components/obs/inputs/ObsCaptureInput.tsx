@@ -6,80 +6,53 @@ import HFormGroup from 'components/shared/inputs/HFormGroup.vue';
 import { metadata } from 'components/shared/inputs';
 
 interface ICapture {
-  r: number;
-  g: number;
-  b: number;
-  a: number;
+  window: string;
 }
 
 @Component({})
-class ObsCaptureInput extends ObsInput<IObsInput<number>> {
+class ObsCaptureInput extends ObsInput<IObsInput<string>> {
   static obsType: TObsType;
 
   @Prop()
-  value: IObsInput<number>;
+  value: IObsInput<string>;
 
   @debounce(500)
-  setValue(hex: string) {
-    const rgba = this.hexToRGB(hex);
-    if (!Object.keys(rgba).every(key => rgba[key] === this.obsCapture[key])) {
-      const intColor = Utils.rgbaToInt(rgba.r, rgba.g, rgba.b, rgba.a);
-      this.emitInput({ ...this.value, value: intColor });
-    }
+  setValue(window: string) {
+    console.log("setValue called with window " + JSON.stringify(window) + " , " + JSON.stringify(this.value));
+    this.emitInput({ ...this.value, value: window });
   }
 
   mounted() {
-    this.setValue(this.hexColor);
+    console.log("mounted from obscaptureinput");
+    this.setValue(this.window);
   }
 
-  get hexColor() {
-    const rgba = Utils.intToRgba(this.value.value);
-    return `#${
-      this.intTo2hexDigit(rgba.r) +
-      this.intTo2hexDigit(rgba.g) +
-      this.intTo2hexDigit(rgba.b) +
-      this.intTo2hexDigit(rgba.a)
-    }`;
+  get window() {
+    console.log("get window from obscaptureinput");
+    return `#${this.value.value}`;
   }
 
   get obsCapture(): ICapture {
-    const rgba = Utils.intToRgba(this.value.value);
-    return {
-      r: rgba.r,
-      g: rgba.g,
-      b: rgba.b,
-      a: rgba.a,
-    };
-  }
-
-  private intTo2hexDigit(int: number) {
-    let result = int.toString(16);
-    if (result.length === 1) result = `0${result}`;
-    return result;
-  }
-
-  hexToRGB(hex: string) {
-    const r = parseInt(hex.slice(1, 3), 16);
-    const g = parseInt(hex.slice(3, 5), 16);
-    const b = parseInt(hex.slice(5, 7), 16);
-    let a = 255;
-
-    if (hex[8]) {
-      a = parseInt(hex.slice(7, 9), 16);
-    }
-
-    return { r, g, b, a };
+    console.log("get obsCapture from obscaptureinput");
+    return { window: this.value.value };
   }
 
   get metadata() {
-    return metadata.capture({ title: this.value.description, fullWidth: true });
+    console.log("get metadate from obscaptureinput");
+
+    return metadata.capture({ title: this.value.description, options: [
+      ] });
   }
 
   render() {
+    console.log("render from obscaptureinput");
     return (
       <HFormGroup
-        value={this.hexColor}
-        onInput={(hex: string) => this.setValue(hex)}
+        value={this.window}
+        onInput={(window: string) => {
+          console.log("HFormGroup onInput " + window);
+          this.setValue(window); 
+        }}
         metadata={this.metadata}
       />
     );

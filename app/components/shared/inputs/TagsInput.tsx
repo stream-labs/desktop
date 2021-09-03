@@ -135,6 +135,7 @@ export default class TagsInput extends BaseInput<
           disabled={this.options.disabled}
           onInput={(tags: IListOption[]) => this.onInputHandler(tags)}
           onSelect={(option: IListOption) => this.props.handleOnSelect(option)}
+
           onClose={() => this.onCloseHandler()}
           onOpen={() => this.onOpenHandler()}
           scopedSlots={{
