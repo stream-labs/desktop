@@ -269,6 +269,7 @@ export class ChatService extends Service {
       }
       if (this.userService.platform?.type === 'twitch' && this.hasChatHighlightWidget()) {
         setTimeout(() => {
+          if (!this.chatView) return;
           const chatHighlightScript = require('!!raw-loader!./widgets/settings/chat-highlight-script.js');
           assertIsDefined(chatHighlightScript.default);
           this.chatView.webContents.executeJavaScript(chatHighlightScript.default, true);
