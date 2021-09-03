@@ -171,7 +171,7 @@ export class DefaultManager extends PropertiesManager {
   }
 
   private setupAutomaticGameCapture() {
-    if (this.obsSource.id !== 'game_capture') return;
+    if (this.obsSource.id !== 'game_capture' && this.obsSource.id !== 'slobs_capture') return;
 
     this.obsSource.update({
       auto_capture_rules_path: path.join(

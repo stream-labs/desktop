@@ -1,14 +1,15 @@
 @import "../../../styles/index";
 
-.captureSource {
+.capturesource {
   position: relative;
   width: 220px;
+
 
   @media (max-width: 1024px) {
     width: auto;
   }
 
-  .captureSource__input {
+  .capturesource__input {
     cursor: pointer !important;
     background: var(--dropdown-bg);
     border-color: var(--button);
@@ -21,7 +22,7 @@
     }
   }
 
-  .captureSource__text {
+  .capturesource__text {
     position: relative;
     cursor: pointer;
 
@@ -35,20 +36,28 @@
         cursor: pointer;
       }
     }
-  }
+  } 
+ 
+.capturesource__source {
+  padding: 5px;
+  background-color: gainsboro;
+}
 
-  .captureSource__swatch {
-    .radius();
+.capturesource__source:hover {
+  background-color: gray;
+}
 
-    position: absolute;
-    top: 6px;
-    right: @spacing;
-    border: 1px solid #ccc;
-    width: 20px;
-    height: 20px;
-  }
+.capturesource__thumbnail {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
 
-  .captureSource-container {
+.capturesource__title {
+  text-align: center;
+}
+
+  .capturesource-container {
     position: relative;
     top: -4px;
     z-index: 10;
@@ -58,14 +67,14 @@
     border-top: none;
     box-shadow: 0 8px 16px var(--shadow) !important;
     width: auto;
-
+    
     &.hidden-alpha {
       :global(.vc-alpha) { display: none; }
       :global(.vc-sketch-field) > div:last-child { display: none; }
     }
   }
 
-  .captureSource-menu {
+  .capturesource-menu {
     width: auto;
     max-width: 200px;
     margin: 0 auto;
@@ -90,16 +99,16 @@
   }
 }
 
-:global(.captureSource-slide-enter),
-:global(.captureSource-slide-leave-to) {
+:global(.capturesource-slide-enter),
+:global(.capturesource-slide-leave-to) {
   transform: translateY(-50%) scaleY(0);
 }
 
-:global(.captureSource-slide-enter-to) {
+:global(.capturesource-slide-enter-to) {
   transform: translateY(0) scaleY(100%);
 }
 
-:global(.captureSource-slide-enter-active),
-:global(.captureSource-slide-leave-active) {
+:global(.capturesource-slide-enter-active),
+:global(.capturesource-slide-leave-active) {
   transition: all 0.2s linear;
 }
