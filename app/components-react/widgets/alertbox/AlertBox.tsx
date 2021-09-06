@@ -14,7 +14,7 @@ import {
   alertNameMap,
   TAlertType,
 } from '../../../services/widgets/settings/alert-box/alert-box-data';
-import { Button, Col, Collapse, Layout, Menu, Row, Tooltip } from 'antd';
+import { Alert, Button, Col, Collapse, Layout, Menu, Row, Tooltip } from 'antd';
 import { DEFAULT_WIDGET_STATE, useWidget, WidgetModule } from '../useWidget';
 import Form from '../../shared/inputs/Form';
 import { WidgetLayout } from '../WidgetLayout';
@@ -181,9 +181,33 @@ function AlertSettings(p: { type: TAlertType }) {
 
   return (
     <Form layout={formLayout}>
+      {p.type === 'donations' && (
+        <div style={{ marginBottom: '32px' }}>
+          <Alert
+            message={
+              <span>
+                Setup donations settings <a>Click here</a>
+              </span>
+            }
+            type="info"
+            showIcon
+            style={{ border: 'none', marginBottom: '16px' }}
+          />
+          <Alert
+            message={
+              <span>
+                Customize your tip page where viewers can send you donations <a>Click here</a>
+              </span>
+            }
+            type="info"
+            showIcon
+            style={{ border: 'none', marginBottom: '16px' }}
+          />
+        </div>
+      )}
       <MediaGalleryInput label={$t('Image')} value={imageUrl} />
       <FileInput label={$t('Sound')} />
-      <SliderInput label={$t('Sound Volume')} min={0} max={100} />
+      <SliderInput label={$t('Sound Volume')} min={0} max={100} value={90} />
       <TextInput label={$t('Message Template')} />
     </Form>
   );
