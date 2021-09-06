@@ -27,7 +27,7 @@
     border: none !important;
   }
   :global(.ant-menu-item-selected) {
-    border-right: 2px solid var(--primary);
+    border-right: 2px solid var(--primary) !important;
   }
   :global(.ant-menu-item:hover) {
     background-color: var(--dropdown-alt-bg);
@@ -39,15 +39,20 @@
       transition: none;
       opacity: 0;
     }
-    button:hover {
-      opacity: 1;
-    }
     &:hover button {
       opacity: 0.5;
     }
-    &.ant-menu-item-selected {
+
+    button:hover {
+      opacity: 1;
+    }
+
+    &:global(.ant-menu-item-selected) {
       button {
         opacity: 0.5;
+      }
+      button:hover {
+        opacity: 1;
       }
     }
   }

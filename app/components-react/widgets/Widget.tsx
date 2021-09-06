@@ -34,7 +34,6 @@ function Footer() {
   const { layout, setLayout } = useWidget();
   return (
     <Form>
-      SelectedLayout {layout}
       <ListInput
         options={[
           { label: 'side', value: 'side' },

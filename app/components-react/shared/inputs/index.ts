@@ -5,6 +5,7 @@ export { NumberInput } from './NumberInput';
 export { SwitchInput } from './SwitchInput';
 export { CheckboxInput } from './CheckboxInput';
 export { ListInput } from './ListInput';
+export { MediaGalleryInput } from './MediaGalleryInput';
 export { TagsInput } from './TagsInput';
 export { SliderInput } from './SliderInput';
 export { ImageInput } from './ImageInput';

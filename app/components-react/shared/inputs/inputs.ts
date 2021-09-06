@@ -19,6 +19,7 @@ type TInputType =
   | 'toggle'
   | 'checkbox'
   | 'list'
+  | 'mediagallery'
   | 'tags'
   | 'switch'
   | 'date'

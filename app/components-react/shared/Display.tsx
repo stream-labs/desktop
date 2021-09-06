@@ -13,6 +13,7 @@ interface DisplayProps {
   onOutputResize?: (region: IRectangle) => void;
   clickHandler?: (event: React.MouseEvent) => void;
   isVisible?: boolean;
+  hasFakeDisplay?: boolean;
 }
 
 export default function Display(props: DisplayProps) {
@@ -113,24 +114,26 @@ export default function Display(props: DisplayProps) {
         />
       )}
 
-      <div
-        className="display"
-        style={{
-          position: 'absolute',
-          top: '0',
-          right: '0',
-          bottom: '0',
-          left: '0',
-          backgroundColor: 'var(--section)',
-          display: 'flex',
-          flexDirection: 'column',
-          flexGrow: 1,
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}
-      >
-        <div style={fakeDisplayStyle} />
-      </div>
+      {p.hasFakeDisplay && (
+        <div
+          className="display"
+          style={{
+            position: 'absolute',
+            top: '0',
+            right: '0',
+            bottom: '0',
+            left: '0',
+            backgroundColor: 'var(--section)',
+            display: 'flex',
+            flexDirection: 'column',
+            flexGrow: 1,
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+        >
+          <div style={fakeDisplayStyle} />
+        </div>
+      )}
     </div>
   );
 }

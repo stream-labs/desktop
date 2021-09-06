@@ -1,10 +1,11 @@
 import { useModule, useModuleByName, useModuleRoot } from '../hooks/useModule';
-import { WidgetType } from '../../services/widgets';
+import {WidgetTesters, WidgetType} from '../../services/widgets';
 import { WidgetSettingsBaseService } from '../../services/widgets/settings/widget-settings-base';
 import { Services } from '../service-provider';
 import { mutation } from '../store';
 import { components } from './Widget';
 import Utils from '../../services/utils';
+import {TAlertType} from "../../services/widgets/settings/alert-box/alert-box-data";
 
 // export function useWidget<T extends typeof WidgetModule>(Module: T, sourceId?: string) {
 //   return useModule(Module, { sourceId }).select();
@@ -31,7 +32,7 @@ export const DEFAULT_WIDGET_STATE = {
   selectedTab: '',
   type: '',
   settings: {} as Record<string, unknown>,
-  layout: 'side',
+  layout: 'bottom',
 };
 
 export class WidgetModule {
@@ -53,6 +54,8 @@ export class WidgetModule {
   destroy() {
     this.widget.destroyPreviewSource();
   }
+
+  private actions = Services.WidgetsService.actions;
 
   public get WidgetComponent() {
     return components[this.state.type];
@@ -79,6 +82,16 @@ export class WidgetModule {
     this.setPreviewVisibility(false);
     await Utils.sleep(300);
     this.setPreviewVisibility(true);
+  }
+
+  public onMenuClickHandler(e: { key: string }) {
+    this.toggleTab(e.key);
+  }
+
+  public playAlert(type: TAlertType) {
+    const tester = WidgetTesters.find(t => t.type === type);
+    if (!tester) throw new Error(`Tester not found ${type}`);
+    this.actions.test(tester.name);
   }
 
   @mutation()

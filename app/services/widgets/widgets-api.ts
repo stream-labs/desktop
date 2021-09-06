@@ -3,6 +3,7 @@ import { AnchorPoint } from 'util/ScalableRectangle';
 import { WidgetType } from './widgets-data';
 import { ISourceApi } from 'services/sources';
 import { IAlertBoxVariation } from './settings/alert-box/alert-box-api';
+import {TAlertType} from "./settings/alert-box/alert-box-data";
 
 export interface ISerializableWidget {
   name: string;
@@ -17,6 +18,7 @@ export interface ISerializableWidget {
 type TUrlGenerator = (host: string, token: string) => string;
 
 export interface IWidgetTester {
+  type?: TAlertType; // TODO: make required
   name: string;
   url: (host: string, platform: TPlatform) => string;
 
