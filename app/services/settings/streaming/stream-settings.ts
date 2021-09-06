@@ -84,6 +84,7 @@ const platformToServiceNameMap: { [key in TPlatform]: string } = {
   youtube: 'YouTube / YouTube Gaming',
   facebook: 'Facebook Live',
   tiktok: 'Custom',
+  flextv: 'Custom'
 };
 
 /**

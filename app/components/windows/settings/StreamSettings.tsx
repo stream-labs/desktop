@@ -227,6 +227,7 @@ export default class StreamSettings extends TsxComponent {
       youtube: 'button--youtube',
       twitch: 'button--twitch',
       tiktok: 'button--tiktok',
+      flextv: 'button--flextv',
     }[platform];
     const isPrimary = this.streamingView.checkPrimaryPlatform(platform);
     const shouldShowPrimaryBtn = isPrimary;

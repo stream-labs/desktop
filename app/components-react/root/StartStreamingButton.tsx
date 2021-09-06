@@ -138,6 +138,13 @@ export default function StartStreamingButton(p: { disabled?: boolean }) {
         StreamSettingsService.isSafeToModifyStreamKey()
       );
     }
+
+    if (primaryPlatform === 'flextv') {
+      return (
+        StreamSettingsService.state.protectedModeEnabled &&
+        StreamSettingsService.isSafeToModifyStreamKey()
+      );
+    }
   }
 
   return (

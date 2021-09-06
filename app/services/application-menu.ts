@@ -34,7 +34,7 @@ export class ApplicationMenuService extends Service {
     // TODO: i18n
     return electron.remote.Menu.buildFromTemplate([
       {
-        label: 'Streamlabs OBS',
+        label: 'FlexTV Broadcaster',
         submenu: [
           { role: 'about' },
           {

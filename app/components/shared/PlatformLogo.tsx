@@ -17,6 +17,7 @@ export default class PlatformLogo extends TsxComponent<LogoProps> {
       youtube: 'fab fa-youtube',
       facebook: 'fab fa-facebook',
       tiktok: 'fab fa-tiktok',
+      flextv: 'icon-streamlabs',
       dlive: 'dlive',
       nimotv: 'nimotv',
       streamlabs: 'icon-streamlabs',
