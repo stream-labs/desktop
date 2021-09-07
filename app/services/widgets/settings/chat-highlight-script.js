@@ -179,9 +179,14 @@ addStyle(`
     left: 50%;
     font-family: Roboto, sans-serif;
     text-align: center;
-    font-weight: 500;
+    font-weight: 600;
     transform: translate(-50%, -50%);
     border-radius: 4px;
+    font-size: 14px;
+    transition: 0.1s linear background-color;
+  }
+  .slobs-chat-highlight-unpin:hover {
+    background-color: #31C3A2;
   }
 `);
 
