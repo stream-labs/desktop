@@ -86,6 +86,7 @@ function addUnpinButton() {
   const parentEl = document.getElementsByClassName('stream-chat-header')[0];
   const unpinButton = document.createElement('button');
   unpinButton.className = 'slobs-chat-highlight-unpin';
+  unpinButton.style = 'opacity: 0;';
   unpinButton.innerText = 'Unpin Message';
   unpinButton.addEventListener('click', sendUnpinRequest);
   parentEl.append(unpinButton);
@@ -111,8 +112,22 @@ function addHighlightButtons() {
   Array.prototype.forEach.call(els, addHighlightButton);
 }
 
+// Sets interval to add pin button to new chat messages and toggle visibility of the Unpin button
 function setupObserver() {
-  const interval = setInterval(addHighlightButtons, 1000);
+  const interval = setInterval(() => {
+    addHighlightButtons();
+
+    const unpinButton = document.getElementsByClassName('slobs-chat-highlight-unpin')[0];
+    /* eslint-disable no-undef */
+    streamlabsOBS.showUnpinButton().then(showUnpinButton => {
+      /* eslint-enable no-undef */
+      if (showUnpinButton) {
+        unpinButton.style = 'opacity: 1;';
+      } else {
+        unpinButton.style = 'opacity: 0;';
+      }
+    });
+  }, 1000);
 
   window.addEventListener('unload', () => clearInterval(interval));
 }
@@ -169,6 +184,7 @@ addStyle(`
 
 console.log('SLOBS - Initiating Chat Highlight Script');
 addHighlightButtons();
+addUnpinButton();
 setupObserver();
 
 0;

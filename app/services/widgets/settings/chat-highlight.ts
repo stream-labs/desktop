@@ -1,4 +1,5 @@
 import uuid from 'uuid/v4';
+import { BehaviorSubject } from 'rxjs';
 import {
   IWidgetData,
   IWidgetSettings,
@@ -9,7 +10,7 @@ import {
 import { WIDGET_INITIAL_STATE } from './widget-settings';
 import { InheritMutations } from 'services/core/stateful-service';
 import { formMetadata, metadata } from 'components/shared/inputs';
-import { authorizedHeaders } from 'util/requests';
+import { authorizedHeaders, jfetch } from 'util/requests';
 import { $t } from 'services/i18n';
 
 export interface IChatHighlightMessage {
@@ -51,6 +52,9 @@ export interface IChatHighlightData extends IWidgetData {
 export class ChatHighlightService extends WidgetSettingsService<IChatHighlightData> {
   static initialState = WIDGET_INITIAL_STATE;
 
+  // Hack to introduce arbitrary state value to WidgetSettings
+  hasPinnedMessage = new BehaviorSubject(false);
+
   getApiSettings() {
     return {
       type: WidgetType.ChatHighlight,
@@ -74,7 +78,11 @@ export class ChatHighlightService extends WidgetSettingsService<IChatHighlightDa
       method: 'POST',
       body: JSON.stringify(messageData),
     });
-    fetch(request);
+    fetch(request).then(resp => {
+      if (resp.ok && this.state.data.settings.highlight_duration === 0) {
+        this.hasPinnedMessage.next(true);
+      }
+    });
   }
 
   async unpinMessage() {
@@ -85,7 +93,9 @@ export class ChatHighlightService extends WidgetSettingsService<IChatHighlightDa
       headers,
       method: 'POST',
     });
-    fetch(request);
+    fetch(request).then(resp => {
+      if (resp.ok) this.hasPinnedMessage.next(false);
+    });
   }
 
   async getCurrentPin() {
@@ -95,7 +105,11 @@ export class ChatHighlightService extends WidgetSettingsService<IChatHighlightDa
     const request = new Request(url, {
       headers,
     });
-    fetch(request);
+    jfetch<IChatHighlightMessage>(request).then(message => {
+      if (message && this.state.data.settings.highlight_duration === 0) {
+        this.hasPinnedMessage.next(true);
+      }
+    });
   }
 
   patchAfterFetch(data: IChatHighlightData) {
