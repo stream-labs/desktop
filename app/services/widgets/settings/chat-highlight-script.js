@@ -87,7 +87,7 @@ function addUnpinButton() {
   const unpinButton = document.createElement('button');
   unpinButton.className = 'slobs-chat-highlight-unpin';
   unpinButton.style = 'opacity: 0;';
-  unpinButton.innerText = 'Unpin Message';
+  unpinButton.innerHTML = 'Unpin Message';
   unpinButton.addEventListener('click', sendUnpinRequest);
   parentEl.append(unpinButton);
 }
@@ -175,8 +175,11 @@ addStyle(`
     background-color: #128079;
     color: white;
     position: absolute;
-    top: 50%;
+    top: 20px;
     left: 50%;
+    font-family: Roboto, sans-serif;
+    text-align: center;
+    font-weight: 500;
     transform: translate(-50%, -50%);
     border-radius: 4px;
   }

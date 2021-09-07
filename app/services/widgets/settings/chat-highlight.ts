@@ -52,7 +52,7 @@ export interface IChatHighlightData extends IWidgetData {
 export class ChatHighlightService extends WidgetSettingsService<IChatHighlightData> {
   static initialState = WIDGET_INITIAL_STATE;
 
-  // Hack to introduce arbitrary state value to WidgetSettings
+  // Hack to introduce arbitrary stateful value to WidgetSettings
   hasPinnedMessage = new BehaviorSubject(false);
 
   getApiSettings() {
