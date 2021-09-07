@@ -264,6 +264,9 @@ export function keys<T>(target: T) {
  */
 export function $i(path: string) {
   try {
+    // Useful for testing media fetches properly from the CDN
+    if (process.env.SLOBS_USE_CDN_MEDIA) throw new Error('Using CDN');
+
     const localMediaPath = require(`../../media/${path}`);
     return localMediaPath;
   } catch (e: unknown) {
