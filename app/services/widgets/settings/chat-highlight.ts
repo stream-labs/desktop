@@ -88,6 +88,16 @@ export class ChatHighlightService extends WidgetSettingsService<IChatHighlightDa
     fetch(request);
   }
 
+  async getCurrentPin() {
+    const headers = authorizedHeaders(this.getWidgetToken());
+    headers.append('Content-Type', 'application/json');
+    const url = `https://${this.getHost()}/api/v5/slobs/widget/chat-highlight/get-existing-pin`;
+    const request = new Request(url, {
+      headers,
+    });
+    fetch(request);
+  }
+
   patchAfterFetch(data: IChatHighlightData) {
     data.settings.highlight_duration = data.settings.highlight_duration / 1000;
     return data;

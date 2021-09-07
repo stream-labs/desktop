@@ -4,6 +4,12 @@ function sendPinRequest(messageData) {
   streamlabsOBS.pinMessage(messageData); // eslint-disable-line no-undef
 }
 
+// Sends relevant data to the SLOBS ChatHighlightService
+function sendUnpinRequest() {
+  console.log('SLOBS - Sending Unpin Request');
+  streamlabsOBS.unpinMessage(); // eslint-disable-line no-undef
+}
+
 // Reshapes DOM elements into JSON-friendly structure for the SL API to ingest
 function extractProperties(el) {
   const userName = Array.prototype.find.call(el.children, child =>
@@ -74,6 +80,17 @@ function parseMessage(children) {
   return { crlf: rawTextArray.join(''), emotes: emoteArray.join('/') };
 }
 
+// Adds an Unpin button to the header when there is a pinned chat message
+function addUnpinButton() {
+  console.log('SLOBS - Adding Unpin Button');
+  const parentEl = document.getElementsByClassName('stream-chat-header')[0];
+  const unpinButton = document.createElement('button');
+  unpinButton.className = 'slobs-chat-highlight-unpin';
+  unpinButton.innerText = 'Unpin Message';
+  unpinButton.addEventListener('click', sendUnpinRequest);
+  parentEl.append(unpinButton);
+}
+
 // Adds a highlight button to relevant chat messages if one doesn't exist
 function addHighlightButton(el) {
   if (el.firstElementChild.className.includes('live-message-separator-line__hr')) return;
@@ -136,6 +153,17 @@ addStyle(`
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+  }
+  .slobs-chat-highlight-unpin {
+    width: 80%;
+    height: 40px;
+    background-color: #128079;
+    color: white;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border-radius: 4px;
   }
 `);
 
