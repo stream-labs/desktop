@@ -114,20 +114,18 @@ function addHighlightButtons() {
 
 // Sets interval to add pin button to new chat messages and toggle visibility of the Unpin button
 function setupObserver() {
-  const interval = setInterval(() => {
-    addHighlightButtons();
+  const interval = setInterval(() => addHighlightButtons, 1000);
 
-    const unpinButton = document.getElementsByClassName('slobs-chat-highlight-unpin')[0];
-    /* eslint-disable no-undef */
-    streamlabsOBS.showUnpinButton().then(showUnpinButton => {
-      /* eslint-enable no-undef */
-      if (showUnpinButton) {
-        unpinButton.style = 'opacity: 1;';
-      } else {
-        unpinButton.style = 'opacity: 0;';
-      }
-    });
-  }, 1000);
+  const unpinButton = document.getElementsByClassName('slobs-chat-highlight-unpin')[0];
+  /* eslint-disable no-undef */
+  streamlabsOBS.showUnpinButton(showUnpinButton => {
+    /* eslint-enable no-undef */
+    if (showUnpinButton) {
+      unpinButton.style = 'opacity: 1;';
+    } else {
+      unpinButton.style = 'opacity: 0;';
+    }
+  });
 
   window.addEventListener('unload', () => clearInterval(interval));
 }

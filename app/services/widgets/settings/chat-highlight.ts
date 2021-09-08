@@ -1,5 +1,5 @@
 import uuid from 'uuid/v4';
-import { BehaviorSubject } from 'rxjs';
+import { Subject } from 'rxjs';
 import {
   IWidgetData,
   IWidgetSettings,
@@ -53,7 +53,7 @@ export class ChatHighlightService extends WidgetSettingsService<IChatHighlightDa
   static initialState = WIDGET_INITIAL_STATE;
 
   // Hack to introduce arbitrary stateful value to WidgetSettings
-  hasPinnedMessage = new BehaviorSubject(false);
+  hasPinnedMessage = new Subject<boolean>();
 
   getApiSettings() {
     return {

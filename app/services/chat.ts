@@ -242,8 +242,7 @@ export class ChatService extends Service {
         pinMessage: (messageData: IChatHighlightMessage) =>
           this.chatHighlightService.pinMessage(messageData),
         unpinMessage: () => this.chatHighlightService.unpinMessage(),
-        showUnpinButton: () =>
-          Promise.resolve(this.chatHighlightService.hasPinnedMessage.getValue()),
+        showUnpinButton: this.chatHighlightService.hasPinnedMessage,
       });
     }
 
