@@ -177,9 +177,7 @@ export async function scheduleStream(date: Date, formData: TFormData) {
     await click(`.rc-virtual-list-holder-inner div:nth-child(${month + 1})`);
 
     // click the date
-    const $calendar = await select('.ant-picker-calendar');
-    const $cell = await $calendar.$(`div=${day}`);
-    await click($cell);
+    await click(`.ant-picker-calendar-date-value=${day}`);
 
     // select the platform
     await fillForm(formData);
