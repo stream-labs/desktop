@@ -98,7 +98,6 @@ export class ChatService extends Service {
     this.electronWindowId = electronWindowId;
     const win = electron.remote.BrowserWindow.fromId(electronWindowId);
     if (this.chatView && win) win.addBrowserView(this.chatView);
-    if (this.chatView) this.chatView.webContents.openDevTools({ mode: 'detach' });
   }
 
   setChatBounds(position: IVec2, size: IVec2) {
@@ -238,12 +237,15 @@ export class ChatService extends Service {
 
     const settings = this.customizationService.state;
 
-    new GuestApiHandler().exposeApi(this.chatView.webContents.id, {
-      pinMessage: (messageData: IChatHighlightMessage) =>
-        this.chatHighlightService.pinMessage(messageData),
-      unpinMessage: () => this.chatHighlightService.unpinMessage(),
-      showUnpinButton: () => Promise.resolve(this.chatHighlightService.hasPinnedMessage.getValue()),
-    });
+    if (this.hasChatHighlightWidget()) {
+      new GuestApiHandler().exposeApi(this.chatView.webContents.id, {
+        pinMessage: (messageData: IChatHighlightMessage) =>
+          this.chatHighlightService.pinMessage(messageData),
+        unpinMessage: () => this.chatHighlightService.unpinMessage(),
+        showUnpinButton: () =>
+          Promise.resolve(this.chatHighlightService.hasPinnedMessage.getValue()),
+      });
+    }
 
     this.chatView.webContents.on('dom-ready', () => {
       if (!this.chatView) return; // chat was already deinitialized

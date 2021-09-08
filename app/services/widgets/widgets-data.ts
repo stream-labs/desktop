@@ -626,9 +626,9 @@ export const WidgetDisplayData = (platform?: string): { [x: number]: IWidgetDisp
   },
   [WidgetType.ChatHighlight]: {
     name: $t('Chat Highlight'),
-    description: $t(''),
+    description: $t('Highlight chat messages from your viewers on your stream.'),
     demoVideo: false,
-    demoFilename: '',
+    demoFilename: 'chat-highlight.png',
     supportList: [],
     platforms: new Set(['twitch']),
   },
