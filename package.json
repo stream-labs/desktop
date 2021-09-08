@@ -189,7 +189,7 @@
     "sockjs": "0.3.20",
     "sockjs-client": "1.1.5",
     "sortablejs": "^1.13.0",
-    "spectron": "13.0.0",
+    "spectron": "14.0.0",
     "streamlabs-beaker": "0.9.4",
     "style-loader": "2.0.0",
     "stylelint": "10.0.1",
