@@ -52,15 +52,16 @@ export default function StudioFooterComponent(p: { locked?: boolean }) {
     youtubeEnabled: YoutubeService.state.liveStreamingEnabled,
   }));
 
-  useRenderInterval(() => {
-    if (!isRecording) return;
-    setRecordingTime(StreamingService.formattedDurationInCurrentRecordingState);
-  }, 1000);
+  useRenderInterval(
+    () => setRecordingTime(StreamingService.formattedDurationInCurrentRecordingState),
+    1000,
+    isRecording,
+  );
 
   useEffect(confirmYoutubeEnabled, [platform]);
 
   function toggleRecording() {
-    StreamingService.toggleRecording();
+    StreamingService.actions.toggleRecording();
   }
 
   function performanceIconClassName() {
@@ -81,7 +82,7 @@ export default function StudioFooterComponent(p: { locked?: boolean }) {
 
   function confirmYoutubeEnabled() {
     if (platform === 'youtube') {
-      YoutubeService.prepopulateInfo();
+      YoutubeService.actions.prepopulateInfo();
     }
   }
 
@@ -90,11 +91,11 @@ export default function StudioFooterComponent(p: { locked?: boolean }) {
   }
 
   function openScheduleStream() {
-    NavigationService.navigate('StreamScheduler');
+    NavigationService.actions.navigate('StreamScheduler');
   }
 
   function openMetricsWindow() {
-    WindowsService.showWindow({
+    WindowsService.actions.showWindow({
       componentName: 'AdvancedStatistics',
       title: $t('Performance Metrics'),
       size: { width: 700, height: 550 },
@@ -103,19 +104,19 @@ export default function StudioFooterComponent(p: { locked?: boolean }) {
       minWidth: 500,
       minHeight: 400,
     });
-    UsageStatisticsService.recordFeatureUsage('PerformanceStatistics');
+    UsageStatisticsService.actions.recordFeatureUsage('PerformanceStatistics');
   }
 
   function toggleReplayBuffer() {
     if (StreamingService.state.replayBufferStatus === EReplayBufferState.Offline) {
-      StreamingService.startReplayBuffer();
+      StreamingService.actions.startReplayBuffer();
     } else {
-      StreamingService.stopReplayBuffer();
+      StreamingService.actions.stopReplayBuffer();
     }
   }
 
   function saveReplay() {
-    StreamingService.saveReplay();
+    StreamingService.actions.saveReplay();
   }
 
   return (
@@ -161,7 +162,7 @@ export default function StudioFooterComponent(p: { locked?: boolean }) {
         </div>
         {replayBufferEnabled && replayBufferOffline && (
           <div className={styles.navItem}>
-            <Tooltip placement="left" title={$t('Start Replay Buffer')}>
+            <Tooltip placement="top" title={$t('Start Replay Buffer')}>
               <button className="circle-button" onClick={toggleReplayBuffer}>
                 <i className="icon-replay-buffer" />
               </button>
@@ -170,7 +171,7 @@ export default function StudioFooterComponent(p: { locked?: boolean }) {
         )}
         {!replayBufferOffline && (
           <div className={cx(styles.navItem, styles.replayButtonGroup)}>
-            <Tooltip placement="left" title={$t('Stop')}>
+            <Tooltip placement="top" title={$t('Stop')}>
               <button
                 className={cx('circle-button', styles.leftReplay, 'button--soft-warning')}
                 onClick={toggleReplayBuffer}
@@ -178,7 +179,7 @@ export default function StudioFooterComponent(p: { locked?: boolean }) {
                 <i className="fa fa-stop" />
               </button>
             </Tooltip>
-            <Tooltip placement="left" title={$t('Save Replay')}>
+            <Tooltip placement="top" title={$t('Save Replay')}>
               <button
                 className={cx('circle-button', styles.rightReplay)}
                 onClick={saveReplay}
@@ -191,7 +192,7 @@ export default function StudioFooterComponent(p: { locked?: boolean }) {
         )}
         {canSchedule && (
           <div className={styles.navItem}>
-            <Tooltip placement="left" title={$t('Schedule Stream')}>
+            <Tooltip placement="top" title={$t('Schedule Stream')}>
               <button className="circle-button" onClick={openScheduleStream}>
                 <i className="icon-date" />
               </button>

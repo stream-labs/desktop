@@ -161,15 +161,18 @@ export function useForceUpdate() {
 /**
  * Sets a function that guarantees a re-render and fresh state on every tick of the delay
  */
-export function useRenderInterval(callback: () => void, delay: number) {
+export function useRenderInterval(callback: () => void, delay: number, condition?: boolean) {
   const [tick, setTick] = useState(0);
 
   useEffect(() => {
-    const timeout = window.setTimeout(() => {
-      callback();
-      setTick(tick + 1);
-    }, delay);
+    let timeout: number;
+    if (condition) {
+      timeout = window.setTimeout(() => {
+        callback();
+        setTick(tick + 1);
+      }, delay);
+    }
 
     return () => clearTimeout(timeout);
-  }, [tick]);
+  }, [tick, condition]);
 }
