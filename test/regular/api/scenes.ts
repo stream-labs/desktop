@@ -251,3 +251,36 @@ test('Try to make a not existing scene active', async t => {
   const sceneHasBeenSwitched = scenesService.makeSceneActive('This id does not exist');
   t.false(sceneHasBeenSwitched);
 });
+
+test('Scene.getNestedItems()', async t => {
+  const client = await getApiClient();
+  const scenesService = client.getResource<ScenesService>('ScenesService');
+  const scene1 = scenesService.createScene('Scene1');
+  const scene2 = scenesService.createScene('Scene2');
+
+  const scene1Item1 = scene1.createAndAddSource('Item1', 'color_source');
+  const scene1Item2 = scene1.addSource(scene2.getSource().id);
+  const scene2Item1 = scene2.createAndAddSource('Item1', 'color_source');
+
+  const nestedItems = scene1.getNestedItems();
+  const nestedItemIds = nestedItems.map(item => item.id).sort();
+  const expectedItemIds = [scene1Item1, scene1Item2, scene2Item1].map(item => item.id).sort();
+
+  scene1.remove();
+  scene2.remove();
+
+  t.is(nestedItems.length, 3);
+  t.deepEqual(nestedItemIds, expectedItemIds);
+});
+
+test('SceneNode.getNextNode()', async t => {
+  const client = await getApiClient();
+  const scenesService = client.getResource<ScenesService>('ScenesService');
+  const scene = scenesService.createScene('Scene1');
+  const sceneNode1 = scene.createAndAddSource('Item1', 'color_source');
+  const sceneNode2 = scene.createAndAddSource('Item2', 'color_source');
+  const sceneNode3 = scene.createAndAddSource('Item3', 'color_source');
+  const nextSceneNode = sceneNode2.getNextNode();
+
+  t.is(nextSceneNode.nodeId, sceneNode1.nodeId);
+});

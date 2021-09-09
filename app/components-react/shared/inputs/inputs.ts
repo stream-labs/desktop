@@ -334,7 +334,7 @@ export function createBinding<
   TExtraProps extends object = {}
 >(
   stateGetter: TState | (() => TState),
-  stateSetter: (newTarget: Partial<TState>) => unknown,
+  stateSetter?: (newTarget: Partial<TState>) => unknown,
   extraPropsGenerator?: (fieldName: keyof TState) => TExtraProps,
 ): TBindings<TState, TFieldName, TExtraProps> {
   function getState(): TState {
@@ -367,7 +367,7 @@ export function createBinding<
           // if the state object has a defined setter than use the local setter
           if (Object.getOwnPropertyDescriptor(state, fieldName)?.set) {
             state[fieldName] = newVal;
-          } else {
+          } else if (stateSetter) {
             stateSetter({ ...state, [fieldName]: newVal });
           }
         },

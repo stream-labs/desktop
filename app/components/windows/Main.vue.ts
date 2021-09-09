@@ -30,6 +30,7 @@ import {
   StreamScheduler,
   Highlighter,
   StudioFooter,
+  ThemeAudit,
 } from '../shared/ReactComponent';
 import PlatformAppMainPage from '../pages/PlatformAppMainPage.vue';
 import electron from 'electron';
@@ -68,6 +69,7 @@ const loadedTheme = () => {
     StreamScheduler,
     Highlighter,
     Grow,
+    ThemeAudit,
   },
 })
 export default class Main extends Vue {

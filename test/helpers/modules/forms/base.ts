@@ -41,6 +41,14 @@ export abstract class BaseInputController<TValue> {
   async getDisplayValue(): Promise<string> {
     return (this.getValue() as unknown) as Promise<string>;
   }
+
+  async waitForLoading() {
+    const $el = await this.getElement();
+    return $el.waitUntil(async () => {
+      const loading = await $el.getAttribute('data-loading');
+      return loading === 'false';
+    });
+  }
 }
 
 /**
@@ -60,3 +68,7 @@ export async function setInputValue(selectorOrEl: TSelectorOrEl, value: string |
   await $el.click(); // click again if it's a list input
   await ((client.keys(String(value)) as any) as Promise<any>); // type text
 }
+
+export type TFiledSetterFn<TControllerType extends BaseInputController<any>> = (
+  input: TControllerType,
+) => Promise<unknown>;
