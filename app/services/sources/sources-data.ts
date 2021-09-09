@@ -101,8 +101,8 @@ export const SourceDisplayData = (): { [key: string]: ISourceDisplayData } => ({
     demoFilename: 'vr-capture.png',
     supportList: ['OpenVR', 'SteamVR'],
   },
-  slobs_capture: {
-    name: $t('Slobs Capture'),
+  screen_capture: {
+    name: $t('Screen Capture'),
     description: $t('Capture from screen in a way you need'),
     demoFilename: 'vr-capture.png',
     supportList: [$t('Most games, apps, displays')],
