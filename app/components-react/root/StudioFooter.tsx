@@ -154,7 +154,7 @@ export default function StudioFooterComponent(p: { locked?: boolean }) {
         <div className={styles.navItem}>
           <button
             disabled={p.locked}
-            className={cx(styles.recordButton, 'record-button', { [styles.active]: isRecording })}
+            className={cx(styles.recordButton, 'record-button', { active: isRecording })}
             onClick={toggleRecording}
           >
             <span>REC</span>
