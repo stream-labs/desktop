@@ -49,17 +49,7 @@ if (isProduction) {
   // This is the production DSN
   sentryDsn = 'https://6971fa187bb64f58ab29ac514aa0eb3d@sentry.io/251674';
 
-  electron.crashReporter.start({
-    productName: 'streamlabs-obs',
-    companyName: 'streamlabs',
-    ignoreSystemCrashHandler: true,
-    submitURL:
-      'https://sentry.io/api/1283430/minidump/?sentry_key=01fc20f909124c8499b4972e9a5253f2',
-    extra: {
-      'sentry[release]': slobsVersion,
-      windowId: Utils.getWindowId(),
-    },
-  });
+  electron.crashReporter.addExtraParameter('windowId', Utils.getWindowId());
 }
 
 let usingSentry = false;
