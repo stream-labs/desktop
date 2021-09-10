@@ -133,7 +133,9 @@ export default class RecentEvents extends TsxComponent<RecentEventsProps> {
             muted={this.muted}
             mediaShareEnabled={this.mediaShareEnabled}
             safeModeEnabled={this.recentEventsService.state.safeMode.enabled}
-            isTwitch={this.userService.views.platform.type === 'twitch'}
+            isTwitch={
+              this.userService.views.isLoggedIn && this.userService.views.platform.type === 'twitch'
+            }
           />
         )}
         {this.renderNativeEvents}
