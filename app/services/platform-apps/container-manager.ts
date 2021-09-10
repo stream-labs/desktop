@@ -322,6 +322,7 @@ export class PlatformContainerManager {
             'www.google-analytics.com',
             'widget.intercom.io',
             'js.intercomcdn.com',
+            'cdn.heapanalytics.com',
           ];
 
           const parsed = url.parse(details.url);
