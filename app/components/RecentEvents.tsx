@@ -133,6 +133,7 @@ export default class RecentEvents extends TsxComponent<RecentEventsProps> {
             muted={this.muted}
             mediaShareEnabled={this.mediaShareEnabled}
             safeModeEnabled={this.recentEventsService.state.safeMode.enabled}
+            isTwitch={this.userService.views.platform.type === 'twitch'}
           />
         )}
         {this.renderNativeEvents}
@@ -167,6 +168,7 @@ class ToolbarProps {
   muted: boolean = false;
   mediaShareEnabled: boolean = false;
   safeModeEnabled: boolean = false;
+  isTwitch: boolean = false;
 }
 
 // TODO: Refactor into stateless functional component
@@ -179,11 +181,15 @@ class Toolbar extends TsxComponent<ToolbarProps> {
     return (
       <div class={styles.topBar}>
         <h2 class="studio-controls__label">{$t('Mini Feed')}</h2>
-        <i
-          class={cx('fa fa-shield-alt action-icon', { [styles.teal]: this.props.safeModeEnabled })}
-          onClick={this.props.showSafeMode}
-          v-tooltip={{ content: $t('Safe Mode'), placement: 'bottom' }}
-        />
+        {this.props.isTwitch && (
+          <i
+            class={cx('fa fa-shield-alt action-icon', {
+              [styles.teal]: this.props.safeModeEnabled,
+            })}
+            onClick={this.props.showSafeMode}
+            v-tooltip={{ content: $t('Safe Mode'), placement: 'bottom' }}
+          />
+        )}
         <i
           class="icon-filter action-icon"
           onClick={this.props.popoutFilterMenu}
