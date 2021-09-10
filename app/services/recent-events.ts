@@ -373,8 +373,6 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
       destroy: () => Promise.resolve(this.onLogout()),
       context: this,
     });
-
-    this.fetchSafeModeStatus();
   }
 
   async syncEventsState() {
@@ -383,6 +381,7 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
     this.formEventsArray();
     this.fetchMediaShareState();
     this.subscribeToSocketConnection();
+    this.fetchSafeModeStatus();
   }
 
   subscribeToSocketConnection() {
