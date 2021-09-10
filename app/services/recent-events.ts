@@ -772,6 +772,10 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
   }
 
   isAllowed(event: IRecentEvent) {
+    if (this.state.safeMode.enabled) {
+      if (['follow', 'host'].includes(event.type)) return false;
+    }
+
     if (event.type === 'subscription' && this.userService.platform.type !== 'youtube') {
       if (event.months > 1) {
         return this.shouldFilterResub(event);
@@ -932,6 +936,9 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
 
     return this.toggleSafeMode().then(() => {
       this.setSafeModeTimeout(this.state.safeMode.timeInMinutes * 60 * 1000);
+      if (this.state.safeMode.clearRecentEvents) {
+        this.SET_RECENT_EVENTS([]);
+      }
     });
   }
 

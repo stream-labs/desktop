@@ -86,11 +86,12 @@ export default function SafeMode() {
                 'Safe Mode will automatically be disabled after this many minutes, or until you click the button again.',
               )}
               value={v.timeInMinutes}
-              onChange={val =>
+              onInput={val =>
                 RecentEventsService.actions.setSafeModeSettings({ timeInMinutes: val })
               }
               min={1}
-              max={9999}
+              max={200}
+              uncontrolled
             />
           </div>
         </Form>
