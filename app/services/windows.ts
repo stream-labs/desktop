@@ -25,6 +25,7 @@ import {
   PerformanceMetrics,
   RenameSource,
   AdvancedStatistics,
+  SafeMode,
 } from 'components/shared/ReactComponent';
 
 import SourceProperties from 'components/windows/SourceProperties.vue';
@@ -92,6 +93,7 @@ export function getComponents() {
     AddSource,
     NameScene,
     NameFolder,
+    SafeMode,
     SourceProperties,
     SourceFilters,
     AddSourceFilter,

@@ -149,11 +149,13 @@ import { CacheUploaderService } from './services/cache-uploader';
 import { StreamlabelsService } from './services/streamlabels';
 import { SceneCollectionsService } from './services/scene-collections';
 import { PlatformAppsService } from './services/platform-apps';
+import { RecentEventsService } from 'services/recent-events';
 
 export const AppServices = {
   AppService,
   WindowsService,
   ScenesService,
+  RecentEventsService,
   NavigationService,
   AnnouncementsService,
   SettingsService,

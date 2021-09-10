@@ -93,6 +93,10 @@ export default class RecentEvents extends TsxComponent<RecentEventsProps> {
     return this.recentEventsService.toggleQueue();
   }
 
+  showSafeMode() {
+    this.recentEventsService.actions.showSafeModeWindow();
+  }
+
   get renderNativeEvents() {
     return (
       <Scrollable className={cx(styles.eventContainer, this.props.isOverlay ? styles.overlay : '')}>
@@ -124,9 +128,11 @@ export default class RecentEvents extends TsxComponent<RecentEventsProps> {
             muteEvents={() => this.muteEvents()}
             skipAlert={() => this.skipAlert()}
             toggleQueue={() => this.toggleQueue()}
+            showSafeMode={() => this.showSafeMode()}
             queuePaused={this.queuePaused}
             muted={this.muted}
             mediaShareEnabled={this.mediaShareEnabled}
+            safeModeEnabled={this.recentEventsService.state.safeMode.enabled}
           />
         )}
         {this.renderNativeEvents}
@@ -156,9 +162,11 @@ class ToolbarProps {
   muteEvents: () => void = () => {};
   skipAlert: () => void = () => {};
   toggleQueue: () => void = () => {};
+  showSafeMode: () => void = () => {};
   queuePaused: boolean = false;
   muted: boolean = false;
   mediaShareEnabled: boolean = false;
+  safeModeEnabled: boolean = false;
 }
 
 // TODO: Refactor into stateless functional component
@@ -171,6 +179,11 @@ class Toolbar extends TsxComponent<ToolbarProps> {
     return (
       <div class={styles.topBar}>
         <h2 class="studio-controls__label">{$t('Mini Feed')}</h2>
+        <i
+          class={cx('fa fa-shield-alt action-icon', { [styles.teal]: this.props.safeModeEnabled })}
+          onClick={this.props.showSafeMode}
+          v-tooltip={{ content: $t('Safe Mode'), placement: 'bottom' }}
+        />
         <i
           class="icon-filter action-icon"
           onClick={this.props.popoutFilterMenu}
