@@ -69,7 +69,7 @@ export class ChatHighlightService extends WidgetSettingsService<IChatHighlightDa
   }
 
   async pinMessage(messageData: IChatHighlightMessage) {
-    const headers = authorizedHeaders(this.getWidgetToken());
+    const headers = authorizedHeaders(this.getApiToken());
     headers.append('Content-Type', 'application/json');
     const url = `https://${this.getHost()}/api/v5/slobs/widget/chat-highlight/pin`;
     messageData.messageToPin.tags.id = uuid();
@@ -86,7 +86,7 @@ export class ChatHighlightService extends WidgetSettingsService<IChatHighlightDa
   }
 
   async unpinMessage() {
-    const headers = authorizedHeaders(this.getWidgetToken());
+    const headers = authorizedHeaders(this.getApiToken());
     headers.append('Content-Type', 'application/json');
     const url = `https://${this.getHost()}/api/v5/slobs/widget/chat-highlight/clear-pin`;
     const request = new Request(url, {
@@ -99,7 +99,7 @@ export class ChatHighlightService extends WidgetSettingsService<IChatHighlightDa
   }
 
   async getCurrentPin() {
-    const headers = authorizedHeaders(this.getWidgetToken());
+    const headers = authorizedHeaders(this.getApiToken());
     headers.append('Content-Type', 'application/json');
     const url = `https://${this.getHost()}/api/v5/slobs/widget/chat-highlight/get-existing-pin`;
     const request = new Request(url, {
