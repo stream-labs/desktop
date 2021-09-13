@@ -33,11 +33,11 @@
   "Add a new Scene.": "Add a new Scene.",
   "Remove Scene.": "Remove Scene.",
   "Edit Scene Transitions.": "Edit Scene Transitions.",
-  "Rename Scene": "Rename Scene",
+  "Rename Scene": "Jelenet átnevezése",
   "Name Scene": "Name Scene",
   "Rename Folder": "Könyvtár Átnevezése",
   "Name Folder": "Könyvtár Elnevezése",
   "Switch Scenes": "Switch Scenes",
   "Failed to load scene collection.  A new one will be created instead.": "Failed to load scene collection.  A new one will be created instead.",
-  "New Scene": "New Scene"
+  "New Scene": "Új jelenet"
 }

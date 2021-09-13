@@ -1,11 +1,11 @@
 {
-  "Enable Events": "Enable Events",
+  "Enable Events": "Események engedélyezése",
   "Min. Bits": "Min. Bits",
   "Max Events": "Max Events",
   "Text Color": "Text Color",
   "Font": "Font",
   "Font Size": "Font Size",
-  "Theme": "Theme",
+  "Theme": "Téma",
   "Theme Color": "Theme Color",
   "Background Color": "Background Color",
   "Show Animation": "Show Animation",
@@ -19,7 +19,7 @@
   "Manage List": "Manage List",
   "Show Resubs": "Show Resubs",
   "Show Sub Tiers": "Show Sub Tiers",
-  "Raids": "Raids",
-  "Members": "Members",
+  "Raids": "Raidek",
+  "Members": "Tagok",
   "Super Chats": "Super Chats"
 }
