@@ -5,7 +5,7 @@
   "Streamer Dashboard": "Streamer Dashboard",
   "Share": "Share",
   "Like": "Like",
-  "Step": "Step",
+  "Step": "Lépés",
   "Create a Facebook Gaming page to get started.": "Create a Facebook Gaming page to get started.",
   "Create a Gaming Page": "Create a Gaming Page",
   "All of your scenes, sources, and settings will be preserved.": "All of your scenes, sources, and settings will be preserved.",
@@ -19,7 +19,7 @@
   "Share to Your Timeline": "Share to Your Timeline",
   "Share to a Page You Manage": "Share to a Page You Manage",
   "Share in a Group": "Share in a Group",
-  "Facebook Group": "Facebook Group",
+  "Facebook Group": "Facebook csoport",
   "Scheduled Video": "Scheduled Video",
   "Make sure the Streamlabs app is added to your Group.": "Make sure the Streamlabs app is added to your Group.",
   "Click here to verify.": "Click here to verify.",
@@ -31,6 +31,6 @@
   "Reconnect now": "Reconnect now",
   "Privacy": "Adatvédelem",
   "FBPrivacyWarning": "The granted privacy level may be limited for your Facebook account. Check the \"Who can see you use this business integration\" section for the Streamlabs integration <link>here</link>",
-  "Only Me": "Only Me",
+  "Only Me": "Csak én",
   "Do not change privacy settings": "Do not change privacy settings"
 }

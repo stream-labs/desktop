@@ -15,5 +15,5 @@
   "Include Resubs": "Wiederholte Abos einschließen",
   "Preview": "Vorschau",
   "Tokens: %{tokenList}": "Tokens: %{tokenList}",
-  "Note: Actual label text may take up to 60 seconds to update": "Note: Actual label text may take up to 60 seconds to update"
+  "Note: Actual label text may take up to 60 seconds to update": "Hinweis: Es kann bis zu 60 Sekunden dauern, bis der Label-Text aktualisiert wird"
 }
