@@ -2,6 +2,7 @@ import * as inputs from './inputs';
 import { Validator } from 'vee-validate';
 import { $t } from 'services/i18n';
 import cloneDeep from 'lodash/cloneDeep';
+import { nativeImage } from 'electron';
 
 export const inputComponents = inputs;
 
@@ -12,6 +13,7 @@ export enum EInputType {
   date = 'date',
   slider = 'slider',
   color = 'color',
+  capture = 'capture',
   list = 'list',
   textArea = 'textArea',
   fontSize = 'fontSize',
@@ -92,6 +94,9 @@ export interface IColorMetadata extends IInputMetadata {
   includeAlpha?: boolean;
   fullWidth?: boolean;
 }
+export interface ICaptureSourceMetadata<TValueType, TOptionData = unknown> extends IInputMetadata {
+  options: IWindowsListOption<TValueType, TOptionData>[];
+}
 
 export interface ISliderMetadata extends IInputMetadata {
   min?: number;
@@ -107,6 +112,14 @@ export interface IListOption<TValue = string, TOptionData = undefined> {
   title: string;
   description?: string;
   icon?: string;
+  options?: { label: string; value: string }[];
+  data?: TOptionData;
+}
+export interface IWindowsListOption<TValue = string, TOptionData = undefined> {
+  value: TValue;
+  title: string;
+  description?: string;
+  thumbnail?: string;
   options?: { label: string; value: string }[];
   data?: TOptionData;
 }
@@ -147,6 +160,7 @@ export class InputMetadata {
     return { type: EInputType.list, ...options } as IListMetadata<string, TOptionData>;
   }
   color = (options: IColorMetadata) => ({ type: EInputType.color, ...options } as IInputMetadata);
+  capture = (options: ICaptureSourceMetadata<string>) => ({ type: EInputType.capture, ...options } as IInputMetadata);
   slider = (options: ISliderMetadata) =>
     ({ type: EInputType.slider, ...options } as ISliderMetadata);
   textArea = (options: ITextMetadata) =>
