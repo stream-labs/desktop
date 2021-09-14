@@ -19,8 +19,12 @@ function extractProperties(el) {
   const message = Array.prototype.find.call(el.children, child => child.className === 'message  ')
     .children;
   const { crlf, emotes } = parseMessage(message);
+  const badgesEl = Array.prototype.find.call(
+    el.children,
+    child => child.className === 'chat-line__message--badges',
+  );
   const badges = Array.prototype.map
-    .call(el.children.item(1).children, child => child.attributes['data-badge'].value)
+    .call(badgesEl.children, child => child.attributes['data-badge'].value)
     .join('/');
   return {
     messageToPin: {
@@ -157,10 +161,6 @@ addStyle(`
     transition: 0.1s linear opacity;
     border-radius: 2px;
   }
-  .slobs-chat-highlight-icon:hover {
-    opacity: 1;
-    cursor: pointer;
-  }
   .fa-thumbtack {
     height: 80%;
     position: absolute;
@@ -189,6 +189,10 @@ addStyle(`
   }
   .chat-line__message {
     position: relative;
+  }
+  .chat-line__message:hover .slobs-chat-highlight-icon {
+    opacity: 1;
+    cursor: pointer;
   }
 `);
 
