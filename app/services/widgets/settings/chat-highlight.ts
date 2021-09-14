@@ -122,14 +122,17 @@ export class ChatHighlightService extends WidgetSettingsService<IChatHighlightDa
   }
 
   patchBeforeSend(settings: IChatHighlightSettings) {
+    settings.enabled = true;
     settings.highlight_duration = settings.highlight_duration * 1000;
     return settings;
   }
 
   getMetadata() {
     return formMetadata({
-      enabled: metadata.toggle({ title: $t('Enabled') }),
-      duration: metadata.slider({ title: $t('Duration') }),
+      duration: metadata.slider({
+        title: $t('Duration'),
+        tooltip: $t('A duration of 0 is indefinite'),
+      }),
       fontFamily: metadata.fontFamily({ title: $t('Font Family') }),
       messageFontSize: metadata.slider({
         title: $t('Message Font Size'),
@@ -140,7 +143,7 @@ export class ChatHighlightService extends WidgetSettingsService<IChatHighlightDa
       messageFontWeight: metadata.slider({
         title: $t('Message Font Weight'),
         interval: 100,
-        min: 300,
+        min: 100,
         max: 900,
       }),
       messageTextColor: metadata.color({ title: $t('Message Text Color') }),
@@ -154,7 +157,7 @@ export class ChatHighlightService extends WidgetSettingsService<IChatHighlightDa
       nameFontWeight: metadata.slider({
         title: $t('Name Font Weight'),
         interval: 100,
-        min: 300,
+        min: 100,
         max: 900,
       }),
       nameTextColor: metadata.color({ title: $t('Name Text Color') }),

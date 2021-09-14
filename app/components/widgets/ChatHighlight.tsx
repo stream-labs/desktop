@@ -32,7 +32,11 @@ export default class ChatHighlight extends WidgetSettings<
       this.wData && (
         <WidgetEditor navItems={this.navItems}>
           <ValidatedForm slot="highlight-properties" key="highlight" onInput={() => this.save()}>
-            <VFormGroup vModel={this.wData.settings.enabled} metadata={this.metadata.enabled} />
+            <span style="margin-bottom: 16px; display: block;">
+              {$t(
+                'Use this widget by hovering over the right side of a chat message to see a thumbtack icon. Clicking the icon will pin the message to the widget for its duration, or until you click the unpin button.',
+              )}
+            </span>
             <VFormGroup
               vModel={this.wData.settings.highlight_duration}
               metadata={this.metadata.duration}

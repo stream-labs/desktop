@@ -114,7 +114,8 @@ function addHighlightButtons() {
 
 // Sets interval to add pin button to new chat messages and toggle visibility of the Unpin button
 function setupObserver() {
-  const interval = setInterval(() => addHighlightButtons, 1000);
+  console.log('SLOBS - Initializing Observer');
+  const interval = setInterval(addHighlightButtons, 1000);
 
   const unpinButton = document.getElementsByClassName('slobs-chat-highlight-unpin')[0];
   /* eslint-disable no-undef */
