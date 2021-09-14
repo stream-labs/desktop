@@ -187,6 +187,9 @@ addStyle(`
   .slobs-chat-highlight-unpin:hover {
     background-color: #31C3A2;
   }
+  .chat-line__message {
+    position: relative;
+  }
 `);
 
 console.log('SLOBS - Initiating Chat Highlight Script');
