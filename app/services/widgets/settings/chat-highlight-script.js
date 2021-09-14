@@ -12,10 +12,6 @@ function sendUnpinRequest() {
 
 // Reshapes DOM elements into JSON-friendly structure for the SL API to ingest
 function extractProperties(el) {
-  const userName = Array.prototype.find.call(el.children, child =>
-    child.className.includes('chat-line__username'),
-  );
-  const color = userName.attributes['style'].value;
   const message = Array.prototype.find.call(el.children, child => child.className === 'message  ')
     .children;
   const { crlf, emotes } = parseMessage(message);
@@ -24,17 +20,17 @@ function extractProperties(el) {
     child => child.className === 'chat-line__message--badges',
   );
   const badges = Array.prototype.map
-    .call(badgesEl.children, child => child.attributes['data-badge'].value)
+    .call(badgesEl.children, child => child?.attributes['data-badge']?.value)
     .join('/');
   return {
     messageToPin: {
       tags: {
         badges,
-        color,
         emotes,
         'display-name': el.attributes['data-user'].value,
         id: '',
         'user-type': '',
+        color: '',
       },
       crlf,
       prefix: '',
@@ -153,16 +149,17 @@ addStyle(`
   .slobs-chat-highlight-icon {
     position: absolute;
     background-color: #128079;
-    width: 20px;
-    height: 20px;
+    width: 22px;
+    height: 22px;
     top: 0px;
     right: 40px;
     opacity: 0;
+    padding: 4px;
     transition: 0.1s linear opacity;
     border-radius: 2px;
   }
   .fa-thumbtack {
-    height: 80%;
+    height: 70%;
     position: absolute;
     top: 50%;
     left: 50%;
