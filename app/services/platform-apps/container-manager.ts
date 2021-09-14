@@ -323,6 +323,8 @@ export class PlatformContainerManager {
             'widget.intercom.io',
             'js.intercomcdn.com',
             'cdn.heapanalytics.com',
+            'edge.fullstory.com',
+            'www.youtube.com',
           ];
 
           const parsed = url.parse(details.url);
