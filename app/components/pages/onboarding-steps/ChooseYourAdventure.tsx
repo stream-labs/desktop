@@ -8,6 +8,7 @@ import styles from './ChooseYourAdventure.m.less';
 import KevinSvg from 'components/shared/KevinSvg';
 import ObsSvg from './ObsSvg';
 import { OnboardingStepProps } from '../Onboarding';
+import { $i } from 'services/utils';
 
 @Component({ props: createProps(OnboardingStepProps) })
 export default class ChooseYourAdventure extends TsxComponent<OnboardingStepProps> {
@@ -46,7 +47,7 @@ export default class ChooseYourAdventure extends TsxComponent<OnboardingStepProp
       <div styles="position: relative;">
         <div class={styles.footer}>
           <SvgBackground />
-          <img src={require('../../../../media/images/onboarding/splash.png')} />
+          <img src={$i('images/onboarding/splash.png')} />
         </div>
         <h1 class={styles.title}>{$t('Welcome to Streamlabs OBS')}</h1>
         <div class={styles.optionContainer}>

@@ -91,12 +91,12 @@ const ONBOARDING_STEPS = () => ({
 });
 
 const THEME_METADATA = {
-  1246: 'https://cdn.streamlabs.com/marketplace/overlays/7684923/ea91062/ea91062.overlay',
-  1248: 'https://cdn.streamlabs.com/marketplace/overlays/7684923/3205db0/3205db0.overlay',
-  668: 'https://cdn.streamlabs.com/marketplace/overlays/2116872/17f7cb5/17f7cb5.overlay',
-  1144: 'https://cdn.streamlabs.com/marketplace/overlays/7684923/dd96270/dd96270.overlay',
-  1100: 'https://cdn.streamlabs.com/marketplace/overlays/7684923/0d2e611/0d2e611.overlay',
-  1190: 'https://cdn.streamlabs.com/marketplace/overlays/8062844/4a0582e/4a0582e.overlay',
+  2560: 'https://cdn.streamlabs.com/marketplace/overlays/7684923/0a2acb8/0a2acb8.overlay',
+  2561: 'https://cdn.streamlabs.com/marketplace/overlays/7684923/e9fc680/e9fc680.overlay',
+  2563: 'https://cdn.streamlabs.com/marketplace/overlays/7684923/c6426ae/c6426ae.overlay',
+  2559: 'https://cdn.streamlabs.com/marketplace/overlays/7684923/6dcbf5f/6dcbf5f.overlay',
+  2592: 'https://cdn.streamlabs.com/marketplace/overlays/7684923/30de9bf/30de9bf.overlay',
+  2574: 'https://cdn.streamlabs.com/marketplace/overlays/7684923/7b333b8/7b333b8.overlay',
 };
 
 interface IOnboardingStep {
