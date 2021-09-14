@@ -74,18 +74,17 @@ export class ChatHighlightService extends WidgetSettingsService<IChatHighlightDa
     headers.append('Content-Type', 'application/json');
     const url = `https://${this.getHost()}/api/v5/slobs/widget/chat-highlight/pin`;
     messageData.messageToPin.tags.id = uuid();
+    const highlightDuration = this.state.data.settings.highlight_duration;
     const request = new Request(url, {
       headers,
       method: 'POST',
       body: JSON.stringify({
         ...messageData,
-        highlightDuration: this.state.data.settings.highlight_duration,
+        highlightDuration: highlightDuration > 0 ? highlightDuration * 1000 : 0,
       }),
     });
     fetch(request).then(resp => {
-      if (resp.ok && this.state.data.settings.highlight_duration === 0) {
-        this.hasPinnedMessage.next(true);
-      }
+      if (resp.ok && highlightDuration === 0) this.hasPinnedMessage.next(true);
     });
   }
 
@@ -123,7 +122,8 @@ export class ChatHighlightService extends WidgetSettingsService<IChatHighlightDa
 
   patchBeforeSend(settings: IChatHighlightSettings) {
     settings.enabled = true;
-    settings.highlight_duration = settings.highlight_duration * 1000;
+    settings.highlight_duration =
+      settings.highlight_duration > 0 ? settings.highlight_duration * 1000 : 0;
     return settings;
   }
 
