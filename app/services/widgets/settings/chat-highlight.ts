@@ -69,6 +69,7 @@ export class ChatHighlightService extends WidgetSettingsService<IChatHighlightDa
   }
 
   async pinMessage(messageData: IChatHighlightMessage) {
+    if (!this.state.data) await this.loadData();
     const headers = authorizedHeaders(this.getApiToken());
     headers.append('Content-Type', 'application/json');
     const url = `https://${this.getHost()}/api/v5/slobs/widget/chat-highlight/pin`;
@@ -76,7 +77,10 @@ export class ChatHighlightService extends WidgetSettingsService<IChatHighlightDa
     const request = new Request(url, {
       headers,
       method: 'POST',
-      body: JSON.stringify(messageData),
+      body: JSON.stringify({
+        ...messageData,
+        highlightDuration: this.state.data.settings.highlight_duration,
+      }),
     });
     fetch(request).then(resp => {
       if (resp.ok && this.state.data.settings.highlight_duration === 0) {
