@@ -5,7 +5,7 @@ import { HostsService } from 'services/hosts';
 import { authorizedHeaders, jfetch } from 'util/requests';
 import { Subject } from 'rxjs';
 import { AppService } from 'services/app';
-import { IRecentEvent } from 'services/recent-events';
+import { IRecentEvent, ISafeModeServerSettings } from 'services/recent-events';
 import { importSocketIOClient } from '../util/slow-imports';
 import { SceneCollectionsService } from 'services/scene-collections';
 
@@ -107,18 +107,7 @@ interface IMediaSharingSettingsUpdateSocketEvent {
 
 export interface ISafeModeEnabledSocketEvent {
   type: 'safeModeEnabled';
-  message: {
-    clear_chat: boolean;
-    clear_queued_alerts: boolean;
-    clear_recent_events: boolean;
-    disable_chat_alerts: boolean;
-    disable_follower_alerts: boolean;
-    emote_only: boolean;
-    follower_only: boolean;
-    sub_only: boolean;
-    ends_at: number;
-    time_in_minutes: number;
-  };
+  message: ISafeModeServerSettings & { ends_at: number };
 }
 
 interface ISafeModeDisabledSocketEvent {

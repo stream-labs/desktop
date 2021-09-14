@@ -130,7 +130,7 @@ interface IRecentEventsState {
   safeMode: ISafeModeSettings;
 }
 
-interface ISafeModeServerSettings {
+export interface ISafeModeServerSettings {
   clear_chat: boolean;
   clear_queued_alerts: boolean;
   clear_recent_events: boolean;
