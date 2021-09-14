@@ -19,7 +19,9 @@ export type TSocketEvent =
   | IMediaSharingSettingsUpdateSocketEvent
   | IPauseEventQueueSocketEvent
   | IUnpauseEventQueueSocketEvent
-  | IPrimeSubEvent;
+  | IPrimeSubEvent
+  | ISafeModeEnabledSocketEvent
+  | ISafeModeDisabledSocketEvent;
 
 interface IStreamlabelsSocketEvent {
   type: 'streamlabels';
@@ -101,6 +103,27 @@ interface IMediaSharingSettingsUpdateSocketEvent {
       enabled?: boolean;
     };
   };
+}
+
+export interface ISafeModeEnabledSocketEvent {
+  type: 'safeModeEnabled';
+  message: {
+    clear_chat: boolean;
+    clear_queued_alerts: boolean;
+    clear_recent_events: boolean;
+    disable_chat_alerts: boolean;
+    disable_follower_alerts: boolean;
+    emote_only: boolean;
+    follower_only: boolean;
+    sub_only: boolean;
+    ends_at: number;
+    time_in_minutes: number;
+  };
+}
+
+interface ISafeModeDisabledSocketEvent {
+  type: 'safeModeDisabled';
+  message: {};
 }
 
 export class WebsocketService extends Service {
