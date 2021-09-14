@@ -462,7 +462,9 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
       !events ||
       !events.data ||
       (this.state.safeMode.enabled && this.state.safeMode.clearRecentEvents)
-    ) return;
+    ) {
+      return;
+    }
     Object.keys(events.data).forEach(key => {
       const fortifiedEvents = events.data[key].map(event => {
         event.hash = getHashForRecentEvent(event);
