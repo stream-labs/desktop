@@ -9,7 +9,7 @@ import { ScalableRectangle } from 'util/ScalableRectangle';
 import namingHelpers from 'util/NamingHelpers';
 import fs from 'fs';
 import { ServicesManager } from 'services-manager';
-import { authorizedHeaders } from 'util/requests';
+import {authorizedHeaders, handleResponse} from 'util/requests';
 import { ISerializableWidget, IWidgetSource, IWidgetsServiceApi } from './widgets-api';
 import { WidgetType, WidgetDefinitions, WidgetTesters } from './widgets-data';
 import { mutation, StatefulService } from '../core/stateful-service';
@@ -21,6 +21,8 @@ import { Subscription } from 'rxjs';
 import { Throttle } from 'lodash-decorators';
 import { EditorCommandsService } from 'services/editor-commands';
 import { TWindowComponentName } from '../windows';
+import {THttpMethod} from "./settings/widget-settings";
+import {getEventsInfo, getWidgetsInfo} from "./widget-settings";
 
 export interface IWidgetSourcesState {
   widgetSources: Dictionary<IWidgetSource>;
@@ -137,9 +139,6 @@ export class WidgetsService
 
   getWidgetSettingsService(type: WidgetType): any {
     const servicesManager: ServicesManager = ServicesManager.instance;
-    if (type === WidgetType.AlertBox) {
-      return servicesManager.getResource('AlertBoxService');
-    }
     const serviceName = `${this.getWidgetComponent(type)}Service`;
     return servicesManager.getResource(serviceName);
   }
@@ -333,6 +332,33 @@ export class WidgetsService
         y: widget.scaleY * this.videoService.baseHeight,
       },
     });
+  }
+
+  get widgetsInfo() {
+    return getWidgetsInfo(this.hostsService.streamlabs, this.userService.widgetToken);
+  }
+
+  get eventsInfo() {
+    return getEventsInfo(this.hostsService.streamlabs);
+  }
+
+  // make a request to widgets API
+  async request(req: { url: string; method?: THttpMethod; body?: any }): Promise<any> {
+    const method = req.method || 'GET';
+    const headers = authorizedHeaders(this.userService.apiToken);
+    headers.append('Content-Type', 'application/json');
+
+    const request = new Request(req.url, {
+      headers,
+      method,
+      body: req.body ? JSON.stringify(req.body) : void 0,
+    });
+
+    return fetch(request)
+      .then(res => {
+        return Promise.resolve(res);
+      })
+      .then(handleResponse);
   }
 
   @mutation()

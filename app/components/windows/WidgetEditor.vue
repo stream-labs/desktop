@@ -3,6 +3,12 @@
     <div class="container" slot="content">
       <div class="top-settings" v-if="properties">
         <generic-form :value="topProperties" @input="onPropsInputHandler" />
+        <div class="ant-alert ant-alert-info" role="alert">
+          <div class="ant-alert-content">
+            <div class="ant-alert-message"
+                 @click="switchToNewAlertboxUI()">{{ $t('Try new AlertBox UI') }}</div>
+          </div>
+        </div>
         <div v-if="apiSettings.testers" class="button button--action test-button">
           <test-widgets :componentProps="{ testers: apiSettings.testers }" />
         </div>

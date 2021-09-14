@@ -20,6 +20,8 @@ import { IAlertBoxVariation } from 'services/widgets/settings/alert-box/alert-bo
 import { ERenderingMode } from '../../../obs-api';
 import TsxComponent, { createProps } from 'components/tsx-component';
 import Scrollable from 'components/shared/Scrollable';
+import { CustomizationService } from '../../services/customization';
+import { SourcesService } from '../../services/sources';
 
 class WidgetEditorProps {
   isAlertBox?: boolean = false;
@@ -55,6 +57,8 @@ class WidgetEditorProps {
 export default class WidgetEditor extends TsxComponent<WidgetEditorProps> {
   @Inject() private widgetsService!: IWidgetsServiceApi;
   @Inject() private windowsService!: WindowsService;
+  @Inject() private customizationService!: CustomizationService;
+  @Inject() private sourcesService!: SourcesService;
   @Inject() private projectorService: ProjectorService;
 
   $refs: { content: HTMLElement; sidebar: HTMLElement; code: HTMLElement };
@@ -203,5 +207,10 @@ export default class WidgetEditor extends TsxComponent<WidgetEditorProps> {
     this.widget
       .getSettingsService()
       .toggleCustomCode(enabled, this.wData.settings, this.selectedVariation);
+  }
+
+  switchToNewAlertboxUI() {
+    this.customizationService.actions.setSettings({ legacyAlertbox: false });
+    this.sourcesService.actions.showSourceProperties(this.widget.sourceId);
   }
 }

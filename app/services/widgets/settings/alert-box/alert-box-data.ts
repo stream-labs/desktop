@@ -63,8 +63,6 @@ export const alertNameMap = () => ({
   effects: $t('Effects/Rallies'),
 });
 
-export type TAlertType = keyof ReturnType<typeof alertNameMap>;
-
 // different tests are required due to api idiosyncracies
 const determineTester = (key: string) => {
   switch (key) {

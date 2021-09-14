@@ -52,6 +52,7 @@ export interface ICustomizationServiceState {
   leftDock: boolean;
   hideViewerCount: boolean;
   folderSelection: boolean;
+  legacyAlertbox: boolean;
   livedockCollapsed: boolean;
   livedockSize: number;
   eventsSize: number;
@@ -135,6 +136,7 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
       droppedFrames: false,
       bandwidth: false,
     },
+    legacyAlertbox: false,
     experimental: {
       // put experimental features here
     },

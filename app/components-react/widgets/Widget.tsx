@@ -24,24 +24,24 @@ export function WidgetWindow() {
   useWidgetRoot(WidgetModule, sourceId);
 
   return (
-    <ModalLayout bodyStyle={{ padding: '0px' }} footer={<Footer />}>
+    <ModalLayout bodyStyle={{ padding: '0px' }} footer={null}>
       <WidgetSettingsComponent />
     </ModalLayout>
   );
 }
 
-function Footer() {
-  const { layout, setLayout } = useWidget();
-  return (
-    <Form>
-      <ListInput
-        options={[
-          { label: 'side', value: 'side' },
-          { label: 'bottom', value: 'bottom' },
-        ]}
-        value={layout}
-        onChange={setLayout}
-      />
-    </Form>
-  );
-}
+// function Footer() {
+//   const { layout, setLayout } = useWidget();
+//   return (
+//     <Form>
+//       <ListInput
+//         options={[
+//           { label: 'side', value: 'side' },
+//           { label: 'bottom', value: 'bottom' },
+//         ]}
+//         value={layout}
+//         onChange={setLayout}
+//       />
+//     </Form>
+//   );
+// }

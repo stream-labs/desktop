@@ -3,7 +3,7 @@ import WidgetEditor from 'components/windows/WidgetEditor.vue';
 import WidgetSettings from './WidgetSettings.vue';
 import { inputComponents } from 'components/widgets/inputs';
 import VFormGroup from 'components/shared/inputs/VFormGroup.vue';
-import { IAlertBoxData, AlertBoxDeprecatedService } from 'services/widgets/settings/alert-box';
+import { IAlertBoxData, AlertBoxService } from 'services/widgets/settings/alert-box';
 import { $t } from 'services/i18n';
 
 import ValidatedForm from 'components/shared/inputs/ValidatedForm';
@@ -41,8 +41,8 @@ const HAS_DONOR_MESSAGE = [
     ...inputComponents,
   },
 })
-export default class AlertBox extends WidgetSettings<IAlertBoxData, AlertBoxDeprecatedService> {
-  @Inject() alertBoxService!: AlertBoxDeprecatedService;
+export default class AlertBox extends WidgetSettings<IAlertBoxData, AlertBoxService> {
+  @Inject() alertBoxService!: AlertBoxService;
 
   $refs: { [key: string]: HTMLElement };
 

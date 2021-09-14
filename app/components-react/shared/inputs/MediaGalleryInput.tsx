@@ -4,10 +4,15 @@ import { InputComponent, TSlobsInputProps, useInput } from './inputs';
 import InputWrapper from './InputWrapper';
 import { $t } from '../../../services/i18n';
 import { UploadFile } from 'antd/lib/upload/interface';
+import { Services } from '../../service-provider';
 
 export const MediaGalleryInput = InputComponent((p: TSlobsInputProps<{}, string>) => {
   const { wrapperAttrs, inputAttrs } = useInput('mediagallery', p);
   const value = inputAttrs.value;
+
+  function showMediaGallery() {
+    Services.MediaGalleryService.actions.return.pickFile();
+  }
 
   const defaultImageMetadata: UploadFile = {
     uid: '-1',
@@ -38,6 +43,7 @@ export const MediaGalleryInput = InputComponent((p: TSlobsInputProps<{}, string>
           height: '120px',
           backgroundColor: 'var(--section)',
         }}
+        onClick={showMediaGallery}
       >
         {isVideo && (
           <video loop muted autoPlay style={mediaStyle}>

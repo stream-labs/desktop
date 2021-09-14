@@ -38,6 +38,7 @@ import { UsageStatisticsService } from 'services/usage-statistics';
 import { SourceFiltersService } from 'services/source-filters';
 import { FileReturnWrapper } from 'util/guest-api-handler';
 import { VideoService } from 'services/video';
+import {CustomizationService} from "../customization";
 
 const AudioFlag = obs.ESourceOutputFlags.Audio;
 const VideoFlag = obs.ESourceOutputFlags.Video;
@@ -168,6 +169,7 @@ export class SourcesService extends StatefulService<ISourcesState> {
   @Inject() private usageStatisticsService: UsageStatisticsService;
   @Inject() private sourceFiltersService: SourceFiltersService;
   @Inject() private videoService: VideoService;
+  @Inject() private customizationService: CustomizationService;
 
   get views() {
     return new SourcesViews(this.state);
@@ -599,7 +601,13 @@ export class SourcesService extends StatefulService<ISourcesState> {
     let componentName = this.widgetsService.getWidgetComponent(widgetType);
 
     // React widgets are in the WidgetsWindow component
-    const reactWidgets = ['AlertBox'];
+    let reactWidgets = [
+      'AlertBox',
+      // 'TipJar',
+      // 'ViewersCount',
+    ];
+    const isLegacyAlertbox = this.customizationService.state.legacyAlertbox;
+    if (isLegacyAlertbox) reactWidgets = reactWidgets.filter(w => w !== 'AlertBox');
     if (reactWidgets.includes(componentName)) componentName = 'WidgetWindow';
 
     if (componentName) {
