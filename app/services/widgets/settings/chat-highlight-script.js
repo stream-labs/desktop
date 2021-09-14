@@ -153,10 +153,10 @@ addStyle(`
   .slobs-chat-highlight-icon {
     position: absolute;
     background-color: #128079;
-    width: 18px;
-    height: 18px;
-    top: 8px;
-    right: 4px;
+    width: 20px;
+    height: 20px;
+    top: 0px;
+    right: 40px;
     opacity: 0;
     transition: 0.1s linear opacity;
     border-radius: 2px;
