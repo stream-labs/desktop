@@ -21,7 +21,6 @@ test('Replay Buffer', async t => {
 
   // record a fragment
   await startReplayBuffer();
-  await sleep(2000);
   await saveReplayBuffer();
   await stopReplayBuffer();
 
