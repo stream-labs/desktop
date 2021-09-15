@@ -12,22 +12,13 @@ function sendUnpinRequest() {
 
 // Reshapes DOM elements into JSON-friendly structure for the SL API to ingest
 function extractProperties(el) {
-  const message = Array.prototype.find.call(el.children, child => child.className === 'message  ')
-    .children;
-  const { crlf, emotes } = parseMessage(message);
-  const badgesEl = Array.prototype.find.call(
-    el.children,
-    child => child.className === 'chat-line__message--badges',
-  );
-  const badges = Array.prototype.map
-    .call(badgesEl.children, child => child?.attributes['data-badge']?.value)
-    .join('/');
+  const { crlf, emotes, badges, username } = findDataElements(el);
   return {
     messageToPin: {
       tags: {
         badges,
         emotes,
-        'display-name': el.attributes['data-user'].value,
+        'display-name': username,
         id: '',
         'user-type': '',
         color: '',
@@ -35,15 +26,76 @@ function extractProperties(el) {
       crlf,
       prefix: '',
       command: 'PRIVMSG',
-      params: [`#${el.attributes['data-user'].value}`],
+      params: [`#${username}`],
     },
   };
+}
+
+function findDataElements(el) {
+  const ffzMessageEl = Array.prototype.find.call(
+    el.children,
+    child => child.className === 'message  ',
+  );
+
+  if (ffzMessageEl) {
+    const username = el.attributes['data-user'].value;
+    const { crlf, emotes } = parseMessage(ffzMessageEl.children);
+    const badgesEl = Array.prototype.find.call(
+      el.children,
+      child => child.className === 'chat-line__message--badges',
+    );
+    const badges = Array.prototype.map
+      .call(badgesEl.children, child => child?.attributes['data-badge']?.value)
+      .join('/');
+    return { badges, crlf, emotes, username };
+  } else {
+    return vanillaChatCrawl(el);
+  }
+}
+
+function vanillaChatCrawl(el) {
+  const baseContainer = el.children[0].children[0].children[0].children[0];
+
+  // Grab user's display name
+  const usernameContainer = Array.prototype.find.call(baseContainer.children, child =>
+    child.className.includes('chat-line__username-container'),
+  );
+  const usernameEl = Array.prototype.find.call(
+    usernameContainer.children,
+    child => child.className === 'chat-line__username',
+  ).children[0].children[0];
+  const username = usernameEl.attributes['data-a-user'].value;
+
+  // Grab badges from username section
+  const badgesContainer = usernameContainer.children[0];
+  const badges = Array.prototype.map
+    .call(badgesContainer.children, child => {
+      const badgeEl = child.children[0].children[0];
+      return badgeEl.attributes['alt'].value.toLowerCase();
+    })
+    .join('/');
+
+  // Get and parse message content
+  const messageContainer = Array.prototype.find.call(
+    baseContainer.children,
+    child => child.attributes['data-test-selector']?.value === 'chat-line-message-body',
+  );
+  const { crlf, emotes } = parseMessage(messageContainer.children);
+
+  return { username, badges, crlf, emotes };
 }
 
 // Replicates emote id and position information gathered from Twitch IRC API
 function parseEmoteString(child, startPos) {
   const emoteText = child.attributes['alt'].value;
-  const emoteId = child.attributes['data-id'].value;
+  let emoteId;
+  if (child.attributes['data-id']) {
+    emoteId = child.attributes['data-id'].value;
+  } else {
+    const idRegex = /^https:\/\/static-cdn.jtvnw.net\/emoticons\/v2\/(\d+)/;
+    const match = child.attributes['src'].value.match(idRegex);
+    emoteId = match[1];
+  }
   const endPos = startPos + emoteText.length - 1;
 
   return { emoteText, parsedString: `${emoteId}:${startPos}-${endPos}` };
@@ -61,16 +113,20 @@ function parseMessage(children) {
       return child.innerHTML;
     }
     if (child.className.includes('chat-image')) {
-      const { emoteText, parsedString } = parseEmoteString(child, currentMessageLength + 1);
+      const { emoteText, parsedString } = parseEmoteString(child, currentMessageLength);
       emoteArray.push(parsedString);
       currentMessageLength += emoteText.length;
       return emoteText;
     }
     if (child.className === 'ffz--inline') {
-      const { emoteText, parsedString } = parseEmoteString(
-        child.children[0],
-        currentMessageLength + 1,
-      );
+      const { emoteText, parsedString } = parseEmoteString(child.children[0], currentMessageLength);
+      emoteArray.push(parsedString);
+      currentMessageLength += emoteText.length;
+      return emoteText;
+    }
+    if (child.className === 'chat-line__message--emote-button') {
+      const emoteEl = child.children[0].children[0].children[0].children[0];
+      const { emoteText, parsedString } = parseEmoteString(emoteEl, currentMessageLength);
       emoteArray.push(parsedString);
       currentMessageLength += emoteText.length;
       return emoteText;

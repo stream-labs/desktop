@@ -144,10 +144,7 @@ export default class AddSource extends Vue {
       if (this.sourceAddOptions.propertiesManager === 'widget') {
         const widget = this.widgetsService.createWidget(this.widgetType, this.name);
         source = widget.getSource();
-        if (this.widgetType === WidgetType.ChatHighlight) {
-          this.customizationService.setSettings({ enableFFZEmotes: true });
-          this.chatService.refreshChat();
-        }
+        if (this.widgetType === WidgetType.ChatHighlight) this.chatService.refreshChat();
       } else {
         const settings: Dictionary<any> = {};
 
