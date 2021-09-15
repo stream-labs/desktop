@@ -93,8 +93,14 @@ function parseMessage(children) {
 
   const rawTextArray = Array.prototype.map.call(children, (child, i) => {
     if (child.className === 'text-fragment') {
-      currentMessageLength += child.innerText.length;
-      return child.innerText;
+      const bttvEmote = child.querySelector('.bttv-emote-image');
+      if (bttvEmote) {
+        currentMessageLength += bttvEmote.attributes['alt'].value.length;
+        return bttvEmote.attributes['alt'].value;
+      } else {
+        currentMessageLength += child.innerText.length;
+        return child.innerText;
+      }
     }
     if (child.className.includes('chat-image')) {
       const { emoteText, parsedString } = parseEmoteString(child, currentMessageLength);
@@ -103,10 +109,20 @@ function parseMessage(children) {
       return emoteText;
     }
     if (child.className === 'ffz--inline') {
-      const { emoteText, parsedString } = parseEmoteString(child.children[0], currentMessageLength);
-      emoteArray.push(parsedString);
-      currentMessageLength += emoteText.length;
-      return emoteText;
+      const ffzEmote = child.querySelector('.ffz-emote');
+      console.log(ffzEmote);
+      if (ffzEmote) {
+        currentMessageLength += ffzEmote.attributes['alt'].value.length;
+        return ffzEmote.attributes['alt'].value;
+      } else {
+        const { emoteText, parsedString } = parseEmoteString(
+          child.children[0],
+          currentMessageLength,
+        );
+        emoteArray.push(parsedString);
+        currentMessageLength += emoteText.length;
+        return emoteText;
+      }
     }
     if (child.className === 'chat-line__message--emote-button') {
       const emoteEl = child.querySelector('.chat-line__message--emote');
