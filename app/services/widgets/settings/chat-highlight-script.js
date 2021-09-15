@@ -32,18 +32,12 @@ function extractProperties(el) {
 }
 
 function findDataElements(el) {
-  const ffzMessageEl = Array.prototype.find.call(
-    el.children,
-    child => child.className === 'message  ',
-  );
+  const ffzMessageEl = el.querySelector('.message');
 
   if (ffzMessageEl) {
     const username = el.attributes['data-user'].value;
     const { crlf, emotes } = parseMessage(ffzMessageEl.children);
-    const badgesEl = Array.prototype.find.call(
-      el.children,
-      child => child.className === 'chat-line__message--badges',
-    );
+    const badgesEl = el.querySelector('.chat-line__message--badges');
     const badges = Array.prototype.map
       .call(badgesEl.children, child => child?.attributes['data-badge']?.value)
       .join('/');
@@ -54,32 +48,22 @@ function findDataElements(el) {
 }
 
 function vanillaChatCrawl(el) {
-  const baseContainer = el.children[0].children[0].children[0].children[0];
-
   // Grab user's display name
-  const usernameContainer = Array.prototype.find.call(baseContainer.children, child =>
-    child.className.includes('chat-line__username-container'),
-  );
-  const usernameEl = Array.prototype.find.call(
-    usernameContainer.children,
-    child => child.className === 'chat-line__username',
-  ).children[0].children[0];
+  const usernameContainer = el.querySelector('.chat-line__username-container');
+  const usernameEl = usernameContainer.querySelector('.chat-author__display-name');
   const username = usernameEl.attributes['data-a-user'].value;
 
   // Grab badges from username section
   const badgesContainer = usernameContainer.children[0];
   const badges = Array.prototype.map
     .call(badgesContainer.children, child => {
-      const badgeEl = child.children[0].children[0];
+      const badgeEl = child.querySelector('.chat-badge');
       return badgeEl.attributes['alt'].value.toLowerCase();
     })
     .join('/');
 
   // Get and parse message content
-  const messageContainer = Array.prototype.find.call(
-    baseContainer.children,
-    child => child.attributes['data-test-selector']?.value === 'chat-line-message-body',
-  );
+  const messageContainer = el.querySelector("span[data-test-selector='chat-line-message-body']");
   const { crlf, emotes } = parseMessage(messageContainer.children);
 
   return { username, badges, crlf, emotes };
@@ -125,7 +109,7 @@ function parseMessage(children) {
       return emoteText;
     }
     if (child.className === 'chat-line__message--emote-button') {
-      const emoteEl = child.children[0].children[0].children[0].children[0];
+      const emoteEl = child.querySelector('.chat-line__message--emote');
       const { emoteText, parsedString } = parseEmoteString(emoteEl, currentMessageLength);
       emoteArray.push(parsedString);
       currentMessageLength += emoteText.length;
