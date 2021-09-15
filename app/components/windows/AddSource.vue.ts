@@ -7,13 +7,15 @@ import { TSourceType, ISourceApi, ISourceAddOptions, SourcesService } from 'serv
 import ModalLayout from 'components/ModalLayout.vue';
 import Selector from 'components/Selector.vue';
 import { Display } from 'components/shared/ReactComponent';
-import { WidgetsService, WidgetDisplayData } from 'services/widgets';
+import { WidgetsService, WidgetDisplayData, WidgetType } from 'services/widgets';
 import { $t } from 'services/i18n';
 import { PlatformAppsService } from 'services/platform-apps';
 import { EditorCommandsService } from 'services/editor-commands';
 import HFormGroup from 'components/shared/inputs/HFormGroup.vue';
 import electron from 'electron';
 import { UserService } from 'services/user';
+import { ChatService } from 'services/chat';
+import { CustomizationService } from 'app-services';
 
 @Component({
   components: { ModalLayout, Selector, Display, HFormGroup },
@@ -26,6 +28,8 @@ export default class AddSource extends Vue {
   @Inject() platformAppsService: PlatformAppsService;
   @Inject() private editorCommandsService: EditorCommandsService;
   @Inject() userService: UserService;
+  @Inject() chatService: ChatService;
+  @Inject() customizationService: CustomizationService;
 
   name = '';
   error = '';
@@ -140,6 +144,7 @@ export default class AddSource extends Vue {
       if (this.sourceAddOptions.propertiesManager === 'widget') {
         const widget = this.widgetsService.createWidget(this.widgetType, this.name);
         source = widget.getSource();
+        if (this.widgetType === WidgetType.ChatHighlight) this.chatService.refreshChat();
       } else {
         const settings: Dictionary<any> = {};
 

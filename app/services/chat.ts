@@ -1,3 +1,4 @@
+import path from 'path';
 import { Service } from 'services/core/service';
 import { Inject } from 'services/core/injector';
 import { UserService } from 'services/user';
@@ -6,9 +7,13 @@ import electron, { ipcRenderer } from 'electron';
 import url from 'url';
 import { WindowsService } from 'services/windows';
 import { $t } from 'services/i18n';
+import { WidgetsService, WidgetType } from 'services/widgets';
 import { InitAfter } from './core';
 import Utils from './utils';
 import { StreamingService } from './streaming';
+import { GuestApiHandler } from 'util/guest-api-handler';
+import { ChatHighlightService, IChatHighlightMessage } from './widgets/settings/chat-highlight';
+import { assertIsDefined } from 'util/properties-type-guards';
 
 export function enableBTTVEmotesScript(isDarkTheme: boolean) {
   /*eslint-disable */
@@ -45,6 +50,8 @@ export class ChatService extends Service {
   @Inject() customizationService: CustomizationService;
   @Inject() windowsService: WindowsService;
   @Inject() streamingService: StreamingService;
+  @Inject() chatHighlightService: ChatHighlightService;
+  @Inject() widgetsService: WidgetsService;
 
   private chatView: Electron.BrowserView | null;
   private chatUrl = '';
@@ -78,6 +85,12 @@ export class ChatService extends Service {
 
   refreshChat() {
     this.loadUrl();
+  }
+
+  hasChatHighlightWidget(): boolean {
+    return !!this.widgetsService
+      .getWidgetSources()
+      .find(source => source.type === WidgetType.ChatHighlight);
   }
 
   async mountChat(electronWindowId: number) {
@@ -115,6 +128,9 @@ export class ChatService extends Service {
       webPreferences: {
         partition,
         nodeIntegration: false,
+        enableRemoteModule: true,
+        contextIsolation: true,
+        preload: path.resolve(electron.remote.app.getAppPath(), 'bundles', 'guest-api'),
       },
     });
 
@@ -126,6 +142,7 @@ export class ChatService extends Service {
     });
 
     if (this.chatUrl) this.loadUrl();
+    this.chatView.webContents.openDevTools();
   }
 
   private deinitChat() {
@@ -221,6 +238,15 @@ export class ChatService extends Service {
 
     const settings = this.customizationService.state;
 
+    if (this.hasChatHighlightWidget()) {
+      new GuestApiHandler().exposeApi(this.chatView.webContents.id, {
+        pinMessage: (messageData: IChatHighlightMessage) =>
+          this.chatHighlightService.pinMessage(messageData),
+        unpinMessage: () => this.chatHighlightService.unpinMessage(),
+        showUnpinButton: this.chatHighlightService.hasPinnedMessage,
+      });
+    }
+
     this.chatView.webContents.on('dom-ready', () => {
       if (!this.chatView) return; // chat was already deinitialized
 
@@ -243,6 +269,14 @@ export class ChatService extends Service {
         `,
           true,
         );
+      }
+      if (this.userService.platform?.type === 'twitch' && this.hasChatHighlightWidget()) {
+        setTimeout(() => {
+          if (!this.chatView) return;
+          const chatHighlightScript = require('!!raw-loader!./widgets/settings/chat-highlight-script.js');
+          assertIsDefined(chatHighlightScript.default);
+          this.chatView.webContents.executeJavaScript(chatHighlightScript.default, true);
+        }, 10000);
       }
 
       // facebook chat doesn't fit our layout by default
