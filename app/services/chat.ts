@@ -142,6 +142,7 @@ export class ChatService extends Service {
     });
 
     if (this.chatUrl) this.loadUrl();
+    this.chatView.webContents.openDevTools();
   }
 
   private deinitChat() {
