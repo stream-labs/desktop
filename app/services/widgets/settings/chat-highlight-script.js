@@ -93,8 +93,8 @@ function parseMessage(children) {
 
   const rawTextArray = Array.prototype.map.call(children, (child, i) => {
     if (child.className === 'text-fragment') {
-      currentMessageLength += child.innerHTML.length;
-      return child.innerHTML;
+      currentMessageLength += child.innerText.length;
+      return child.innerText;
     }
     if (child.className.includes('chat-image')) {
       const { emoteText, parsedString } = parseEmoteString(child, currentMessageLength);
