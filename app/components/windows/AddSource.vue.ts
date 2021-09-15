@@ -15,6 +15,7 @@ import HFormGroup from 'components/shared/inputs/HFormGroup.vue';
 import electron from 'electron';
 import { UserService } from 'services/user';
 import { ChatService } from 'services/chat';
+import { CustomizationService } from 'app-services';
 
 @Component({
   components: { ModalLayout, Selector, Display, HFormGroup },
@@ -28,6 +29,7 @@ export default class AddSource extends Vue {
   @Inject() private editorCommandsService: EditorCommandsService;
   @Inject() userService: UserService;
   @Inject() chatService: ChatService;
+  @Inject() customizationService: CustomizationService;
 
   name = '';
   error = '';
@@ -143,6 +145,7 @@ export default class AddSource extends Vue {
         const widget = this.widgetsService.createWidget(this.widgetType, this.name);
         source = widget.getSource();
         if (this.widgetType === WidgetType.ChatHighlight) {
+          this.customizationService.setSettings({ enableFFZEmotes: true });
           this.chatService.refreshChat();
         }
       } else {

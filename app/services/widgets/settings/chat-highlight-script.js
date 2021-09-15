@@ -152,7 +152,7 @@ addStyle(`
     width: 22px;
     height: 22px;
     top: 0px;
-    right: 40px;
+    right: 44px;
     opacity: 0;
     padding: 4px;
     transition: 0.1s linear opacity;
