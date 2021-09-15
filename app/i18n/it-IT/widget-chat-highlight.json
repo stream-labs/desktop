@@ -1,0 +1,17 @@
+{
+  "Chat Highlight": "Chat Highlight",
+  "Highlight Settings": "Highlight Settings",
+  "Message Settings": "Message Settings",
+  "Message Font Size": "Message Font Size",
+  "Message Font Weight": "Message Font Weight",
+  "Message Text Color": "Message Text Color",
+  "Message Background Color": "Message Background Color",
+  "Name Settings": "Name Settings",
+  "Name Font Size": "Name Font Size",
+  "Name Font Weight": "Name Font Weight",
+  "Name Text Color": "Colore testo nome",
+  "Name Background Color": "Name Background Color",
+  "Highlight chat messages from your viewers on your stream.": "Highlight chat messages from your viewers on your stream.",
+  "A duration of 0 is indefinite": "A duration of 0 is indefinite",
+  "Use this widget by hovering over the right side of a chat message to see a thumbtack icon. Clicking the icon will pin the message to the widget for its duration, or until you click the unpin button.": "Use this widget by hovering over the right side of a chat message to see a thumbtack icon. Clicking the icon will pin the message to the widget for its duration, or until you click the unpin button."
+}
