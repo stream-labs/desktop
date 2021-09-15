@@ -442,8 +442,8 @@ export const WidgetDefinitions: { [x: number]: IWidget } = {
       return `https://${host}/widgets/chat-highlight?token=${token}`;
     },
 
-    width: 400,
-    height: 200,
+    width: 600,
+    height: 300,
 
     x: 0.5,
     y: 0.5,
