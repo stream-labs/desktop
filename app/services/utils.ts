@@ -260,15 +260,32 @@ export function keys<T>(target: T) {
   return Object.keys(target) as (keyof T)[];
 }
 
+let appPath: string;
+
+/**
+ * Memoized function for getting the app path
+ */
+export function getAppPath() {
+  appPath = appPath ?? electron.remote.app.getAppPath();
+  return appPath;
+}
+
 /**
  * A fallback-safe method of fetching images
  * from either our local storage or the CDN
- * @param filePath The path structure to retrieve the image from the media folders
+ * @param mediaPath The path structure to retrieve the image from the media folders
  */
-export function $i(filePath: string) {
-  if (fs.existsSync(path.resolve('media', filePath)) && !Utils.env.SLOBS_USE_CDN_MEDIA) {
-    return require(`../../media/${filePath}`);
-  } else {
-    return `https://slobs-cdn.streamlabs.com/media/${filePath}`;
+export function $i(mediaPath: string) {
+  try {
+    // Useful for testing media fetches properly from the CDN
+    if (Utils.env.SLOBS_USE_CDN_MEDIA) throw new Error('Using CDN');
+
+    const localMediaPath = require(`../../media/${mediaPath}`);
+
+    if (!fs.existsSync(path.resolve(getAppPath(), localMediaPath))) throw new Error('Using CDN');
+
+    return localMediaPath;
+  } catch (e: unknown) {
+    return `https://slobs-cdn.streamlabs.com/media/${mediaPath}`;
   }
 }
