@@ -24,7 +24,7 @@ function extractProperties(el) {
         color: '',
       },
       crlf,
-      prefix: '',
+      prefix: `${username}!${username}@${username}.tmi.twitch.tv`,
       command: 'PRIVMSG',
       params: [`#${username}`],
     },
