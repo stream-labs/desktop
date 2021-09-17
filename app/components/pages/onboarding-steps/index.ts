@@ -1,4 +1,5 @@
 export { default as Connect } from './Connect';
+export { default as ConnectFlex } from './flex/ConnectFlex';
 export { default as ObsImport } from './ObsImport';
 export { default as Optimize } from './Optimize';
 export { default as ThemeSelector } from './ThemeSelector';

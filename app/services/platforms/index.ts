@@ -257,7 +257,7 @@ export function getPlatformService(platform: TPlatform): IPlatformService {
     youtube: YoutubeService.instance,
     facebook: FacebookService.instance,
     tiktok: TiktokService.instance,
-    flextv: FlextvService.instance
+    flextv: FlextvService.instance,
   }[platform];
 }
 
