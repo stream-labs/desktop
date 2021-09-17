@@ -33,6 +33,7 @@ export enum WidgetType {
   CharityGoal = 18,
   Poll = 19,
   EmoteWall = 20,
+  ChatHighlight = 21,
 }
 
 export const WidgetTesters: IWidgetTester[] = [
@@ -439,6 +440,20 @@ export const WidgetDefinitions: { [x: number]: IWidget } = {
 
     anchor: AnchorPoint.Center,
   },
+  [WidgetType.ChatHighlight]: {
+    name: 'Chat Highlight',
+    url(host, token) {
+      return `https://${host}/widgets/chat-highlight?token=${token}`;
+    },
+
+    width: 600,
+    height: 300,
+
+    x: 0.5,
+    y: 0.5,
+
+    anchor: AnchorPoint.Center,
+  },
 };
 
 export const WidgetDisplayData = (platform?: string): { [x: number]: IWidgetDisplayData } => ({
@@ -610,6 +625,14 @@ export const WidgetDisplayData = (platform?: string): { [x: number]: IWidgetDisp
     ),
     demoVideo: false,
     demoFilename: 'emote-wall.gif',
+    supportList: [],
+    platforms: new Set(['twitch']),
+  },
+  [WidgetType.ChatHighlight]: {
+    name: $t('Chat Highlight'),
+    description: $t('Highlight chat messages from your viewers on your stream.'),
+    demoVideo: false,
+    demoFilename: 'chat-highlight.png',
     supportList: [],
     platforms: new Set(['twitch']),
   },

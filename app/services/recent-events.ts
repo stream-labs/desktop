@@ -4,7 +4,12 @@ import { UserService, LoginLifecycle } from 'services/user';
 import { authorizedHeaders, handleResponse, jfetch } from 'util/requests';
 import { $t } from 'services/i18n';
 import { WindowsService } from 'services/windows';
-import { WebsocketService, TSocketEvent, IEventSocketEvent } from 'services/websocket';
+import {
+  WebsocketService,
+  TSocketEvent,
+  IEventSocketEvent,
+  ISafeModeEnabledSocketEvent,
+} from 'services/websocket';
 import cloneDeep from 'lodash/cloneDeep';
 import pick from 'lodash/pick';
 import uuid from 'uuid/v4';
@@ -102,12 +107,39 @@ interface IRecentEventFilterConfig {
   facebook_stars?: boolean;
 }
 
+interface ISafeModeSettings {
+  enabled: boolean;
+  loading: boolean;
+  clearChat: boolean;
+  clearQueuedAlerts: boolean;
+  clearRecentEvents: boolean;
+  disableChatAlerts: boolean;
+  disableFollowerAlerts: boolean;
+  emoteOnly: boolean;
+  followerOnly: boolean;
+  subOnly: boolean;
+  timeInMinutes: number;
+}
+
 interface IRecentEventsState {
   recentEvents: IRecentEvent[];
   muted: boolean;
   mediaShareEnabled: boolean;
   filterConfig: IRecentEventFilterConfig;
   queuePaused: boolean;
+  safeMode: ISafeModeSettings;
+}
+
+export interface ISafeModeServerSettings {
+  clear_chat: boolean;
+  clear_queued_alerts: boolean;
+  clear_recent_events: boolean;
+  disable_chat_alerts: boolean;
+  disable_follower_alerts: boolean;
+  emote_only: boolean;
+  follower_only: boolean;
+  sub_only: boolean;
+  time_in_minutes: number;
 }
 
 const subscriptionMap = (subPlan: string) => {
@@ -330,6 +362,19 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
       merch: false,
     },
     queuePaused: false,
+    safeMode: {
+      enabled: false,
+      loading: false,
+      clearChat: true,
+      clearQueuedAlerts: true,
+      clearRecentEvents: true,
+      disableChatAlerts: true,
+      disableFollowerAlerts: true,
+      emoteOnly: true,
+      followerOnly: true,
+      subOnly: true,
+      timeInMinutes: 60,
+    },
   };
 
   get views() {
@@ -353,6 +398,7 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
     this.formEventsArray();
     this.fetchMediaShareState();
     this.subscribeToSocketConnection();
+    this.fetchSafeModeStatus();
   }
 
   subscribeToSocketConnection() {
@@ -412,7 +458,13 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
   private async formEventsArray() {
     const events = await this.fetchRecentEvents();
     let eventArray: IRecentEvent[] = [];
-    if (!events || !events.data) return;
+    if (
+      !events ||
+      !events.data ||
+      (this.state.safeMode.enabled && this.state.safeMode.clearRecentEvents)
+    ) {
+      return;
+    }
     Object.keys(events.data).forEach(key => {
       const fortifiedEvents = events.data[key].map(event => {
         event.hash = getHashForRecentEvent(event);
@@ -673,6 +725,14 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
       }
     }
 
+    if (e.type === 'safeModeEnabled') {
+      this.onSafeModeEnabled(e.message, e.message.ends_at);
+    }
+
+    if (e.type === 'safeModeDisabled') {
+      this.onSafeModeDisabled();
+    }
+
     if (SUPPORTED_EVENTS.includes(e.type)) {
       this.onEventSocket(e as IEventSocketEvent);
     }
@@ -742,6 +802,10 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
   }
 
   isAllowed(event: IRecentEvent) {
+    if (this.state.safeMode.enabled) {
+      if (['follow', 'host'].includes(event.type)) return false;
+    }
+
     if (event.type === 'subscription' && this.userService.platform.type !== 'youtube') {
       if (event.months > 1) {
         return this.shouldFilterResub(event);
@@ -830,6 +894,112 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
     });
   }
 
+  showSafeModeWindow() {
+    this.windowsService.showWindow({
+      componentName: 'SafeMode',
+      title: $t('Safe Mode'),
+      queryParams: {},
+      size: {
+        width: 450,
+        height: 700,
+      },
+    });
+  }
+
+  fetchSafeModeStatus() {
+    const url = `https://${this.hostsService.streamlabs}/api/v5/slobs/widget/checksafemode`;
+    const headers = authorizedHeaders(this.userService.apiToken);
+    return jfetch<{
+      status: 'enabled' | 'disabled';
+      safeModeSettings: { ends_at: number; data: ISafeModeServerSettings };
+    }>(url, {
+      headers,
+    }).then(data => {
+      if (data.status === 'enabled') {
+        this.onSafeModeEnabled(data.safeModeSettings.data, data.safeModeSettings.ends_at);
+      } else {
+        this.onSafeModeDisabled();
+      }
+    });
+  }
+
+  safeModeTimeout: number = null;
+
+  setSafeModeTimeout(ms: number) {
+    if (this.safeModeTimeout) clearTimeout(this.safeModeTimeout);
+
+    this.safeModeTimeout = window.setTimeout(() => this.disableSafeMode(), ms);
+  }
+
+  setSafeModeSettings(patch: Partial<ISafeModeSettings>) {
+    this.SET_SAFE_MODE_SETTINGS(patch);
+  }
+
+  toggleSafeMode() {
+    const headers = authorizedHeaders(
+      this.userService.apiToken,
+      new Headers({ 'Content-Type': 'application/json' }),
+    );
+    const url = `https://${this.hostsService.streamlabs}/api/v5/slobs/widget/safemode`;
+    const sm = this.state.safeMode;
+    const body = JSON.stringify(
+      this.state.safeMode.enabled
+        ? {}
+        : {
+            clear_chat: sm.clearChat,
+            clear_queued_alerts: sm.clearQueuedAlerts,
+            clear_recent_events: sm.clearRecentEvents,
+            disable_chat_alerts: sm.disableChatAlerts,
+            disable_follower_alerts: sm.disableFollowerAlerts,
+            emote_only: sm.emoteOnly,
+            follower_only: sm.followerOnly,
+            sub_only: sm.subOnly,
+            time_in_minutes: sm.timeInMinutes,
+          },
+    );
+    this.SET_SAFE_MODE_SETTINGS({ loading: true });
+    const promise = jfetch(new Request(url, { headers, body, method: 'POST' }));
+
+    promise.finally(() => this.SET_SAFE_MODE_SETTINGS({ loading: false }));
+
+    return promise;
+  }
+
+  activateSafeMode() {
+    if (this.state.safeMode.enabled) return;
+
+    return this.toggleSafeMode();
+  }
+
+  disableSafeMode() {
+    if (!this.state.safeMode.enabled) return;
+
+    return this.toggleSafeMode();
+  }
+
+  onSafeModeEnabled(serverSettings: ISafeModeServerSettings, endsAt: number) {
+    this.SET_SAFE_MODE_SETTINGS({
+      enabled: true,
+      clearChat: serverSettings.clear_chat,
+      clearQueuedAlerts: serverSettings.clear_queued_alerts,
+      clearRecentEvents: serverSettings.clear_recent_events,
+      disableChatAlerts: serverSettings.disable_chat_alerts,
+      disableFollowerAlerts: serverSettings.disable_follower_alerts,
+      emoteOnly: serverSettings.emote_only,
+      followerOnly: serverSettings.follower_only,
+      subOnly: serverSettings.sub_only,
+      timeInMinutes: serverSettings.time_in_minutes,
+    });
+    this.setSafeModeTimeout(Math.max(endsAt - Date.now(), 0));
+    if (this.state.safeMode.clearRecentEvents) {
+      this.SET_RECENT_EVENTS([]);
+    }
+  }
+
+  onSafeModeDisabled() {
+    this.SET_SAFE_MODE_SETTINGS({ enabled: false });
+  }
+
   @mutation()
   private ADD_RECENT_EVENT(events: IRecentEvent[]) {
     this.state.recentEvents = events.concat(this.state.recentEvents);
@@ -872,5 +1042,10 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
   @mutation()
   private SET_PAUSED(queuePaused: boolean) {
     this.state.queuePaused = queuePaused;
+  }
+
+  @mutation()
+  private SET_SAFE_MODE_SETTINGS(patch: Partial<ISafeModeSettings>) {
+    this.state.safeMode = { ...this.state.safeMode, ...patch };
   }
 }

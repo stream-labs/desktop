@@ -223,7 +223,7 @@ export abstract class SceneNode implements ISerializable {
    * @returns The node with the next node index
    */
   getNextNode(): SceneNode {
-    const node = this.sceneNode.getPrevNode();
+    const node = this.sceneNode.getNextNode();
     return this.getScene().getNode(node.id);
   }
 

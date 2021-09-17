@@ -1,4 +1,4 @@
-import React, { MouseEvent } from 'react';
+import React, { MouseEvent, useEffect } from 'react';
 import moment, { Moment } from 'moment';
 import css from './StreamScheduler.m.less';
 import cx from 'classnames';
@@ -93,6 +93,12 @@ function SchedulerCalendar() {
   // define the date boundaries
   const minDate = moment().subtract(12, 'month');
   const maxDate = moment().add(1, 'month');
+
+  // replace the "DD" cells format to a "D" format
+  useEffect(() => {
+    const $dayCells = document.querySelectorAll('.ant-picker-calendar-date-value');
+    $dayCells.forEach(($cell: HTMLElement) => ($cell.innerText = String(Number($cell.innerText))));
+  });
 
   return (
     <div onClick={onCalendarClick}>

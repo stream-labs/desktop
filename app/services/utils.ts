@@ -2,6 +2,8 @@ import URI from 'urijs';
 import isEqual from 'lodash/isEqual';
 import electron from 'electron';
 import cloneDeep from 'lodash/cloneDeep';
+import fs from 'fs';
+import path from 'path';
 
 export const enum EBit {
   ZERO,
@@ -15,6 +17,7 @@ export interface IEnv {
   SLOBS_USE_LOCAL_HOST: boolean;
   SLOBS_VERSION: string;
   SLOBS_TRACE_SYNC_IPC: boolean;
+  SLOBS_USE_CDN_MEDIA: boolean;
   CI: boolean;
 }
 
@@ -260,13 +263,12 @@ export function keys<T>(target: T) {
 /**
  * A fallback-safe method of fetching images
  * from either our local storage or the CDN
- * @param path The path structure to retrieve the image from the media folders
+ * @param filePath The path structure to retrieve the image from the media folders
  */
-export function $i(path: string) {
-  try {
-    const localMediaPath = require(`../../media/${path}`);
-    return localMediaPath;
-  } catch (e: unknown) {
-    return `https://slobs-cdn.streamlabs.com/media/${path}`;
+export function $i(filePath: string) {
+  if (fs.existsSync(path.resolve('media', filePath)) && !Utils.env.SLOBS_USE_CDN_MEDIA) {
+    return require(`../../media/${filePath}`);
+  } else {
+    return `https://slobs-cdn.streamlabs.com/media/${filePath}`;
   }
 }

@@ -26,6 +26,7 @@ import {
   RenameSource,
   AdvancedStatistics,
   WidgetWindow,
+  SafeMode,
 } from 'components/shared/ReactComponent';
 
 import SourceProperties from 'components/windows/SourceProperties.vue';
@@ -69,6 +70,7 @@ import AlertBox from 'components/widgets/AlertBox.vue';
 import SpinWheel from 'components/widgets/SpinWheel.vue';
 import Poll from 'components/widgets/Poll';
 import EmoteWall from 'components/widgets/EmoteWall';
+import ChatHighlight from 'components/widgets/ChatHighlight';
 
 import { byOS, OS } from 'util/operating-systems';
 import { UsageStatisticsService } from './usage-statistics';
@@ -93,6 +95,7 @@ export function getComponents() {
     AddSource,
     NameScene,
     NameFolder,
+    SafeMode,
     SourceProperties,
     SourceFilters,
     AddSourceFilter,
@@ -134,6 +137,7 @@ export function getComponents() {
     SpinWheel,
     Poll,
     EmoteWall,
+    ChatHighlight,
     WelcomeToPrime,
     GoLiveWindow,
     EditStreamWindow,

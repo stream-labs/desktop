@@ -40,3 +40,7 @@ export function WidgetLayout(p: { children: [React.ReactNode, React.ReactNode] }
     </Layout>
   );
 }
+
+function BrowserSettings() {
+
+}
