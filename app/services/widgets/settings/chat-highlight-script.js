@@ -45,9 +45,9 @@ function findDataElements(el) {
       .call(badgesEl.children, child => child?.attributes['data-badge']?.value)
       .join('/0,')
       .concat('/0');
-    const sub = badges.includes('subscriber') ? '1' : '0';
+    const subscriber = badges.includes('subscriber') ? '1' : '0';
     const mod = badges.includes('mod') ? '1' : '0';
-    return { badges, crlf, emotes, username, sub, mod };
+    return { badges, crlf, emotes, username, subscriber, mod };
   } else {
     return vanillaChatCrawl(el);
   }
