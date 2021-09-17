@@ -12,16 +12,19 @@ function sendUnpinRequest() {
 
 // Reshapes DOM elements into JSON-friendly structure for the SL API to ingest
 function extractProperties(el) {
-  const { crlf, emotes, badges, username } = findDataElements(el);
+  const { crlf, emotes, badges, username, subscriber, mod } = findDataElements(el);
   return {
     messageToPin: {
       tags: {
         badges,
         emotes,
+        subscriber,
+        mod,
         'display-name': username,
         id: '',
         'user-type': '',
         color: '',
+        flags: '',
       },
       crlf,
       prefix: `${username}!${username}@${username}.tmi.twitch.tv`,
@@ -40,8 +43,11 @@ function findDataElements(el) {
     const badgesEl = el.querySelector('.chat-line__message--badges');
     const badges = Array.prototype.map
       .call(badgesEl.children, child => child?.attributes['data-badge']?.value)
-      .join('/');
-    return { badges, crlf, emotes, username };
+      .join('/0,')
+      .concat('/0');
+    const sub = badges.includes('subscriber') ? '1' : '0';
+    const mod = badges.includes('mod') ? '1' : '0';
+    return { badges, crlf, emotes, username, sub, mod };
   } else {
     return vanillaChatCrawl(el);
   }
@@ -60,13 +66,16 @@ function vanillaChatCrawl(el) {
       const badgeEl = child.querySelector('.chat-badge');
       return badgeEl.attributes['alt'].value.toLowerCase();
     })
-    .join('/');
+    .join('/0,')
+    .concat('/0');
+  const subscriber = badges.includes('subscriber') ? '1' : '0';
+  const mod = badges.includes('mod') ? '1' : '0';
 
   // Get and parse message content
   const messageContainer = el.querySelector("span[data-test-selector='chat-line-message-body']");
   const { crlf, emotes } = parseMessage(messageContainer.children);
 
-  return { username, badges, crlf, emotes };
+  return { username, badges, crlf, emotes, subscriber, mod };
 }
 
 // Replicates emote id and position information gathered from Twitch IRC API
