@@ -1,7 +1,7 @@
 {
   "Mini Feed": "Mini Feed",
-  "has donated": "has tipped",
-  "has donated with %{itemName}": "has tipped with %{itemName}",
+  "has tipped": "has tipped",
+  "has tipped with %{itemName}": "has tipped with %{itemName}",
   "has tipped %{months} months in a row": "has tipped %{months} months in a row",
   "has set up a monthly tip": "has set up a monthly tip",
   "has followed": "has followed",
