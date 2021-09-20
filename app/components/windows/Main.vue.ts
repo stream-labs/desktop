@@ -224,6 +224,7 @@ export default class Main extends Vue {
     if (files.length > 1 || isDirectory) {
       electron.remote.dialog
         .showMessageBox(electron.remote.getCurrentWindow(), {
+          title: 'Streamlabs OBS',
           message: $t('Are you sure you want to import multiple files?'),
           type: 'warning',
           buttons: [$t('Cancel'), $t('OK')],
