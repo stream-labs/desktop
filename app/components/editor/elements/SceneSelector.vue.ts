@@ -107,7 +107,7 @@ export default class SceneSelector extends TsxComponent {
         if (!response) return;
         if (!this.scenesService.canRemoveScene()) {
           electron.remote.dialog.showMessageBox({
-            title: 'Streamlabs OBS'
+            title: 'Streamlabs OBS',
             message: $t('There needs to be at least one scene.'),
           });
           return;
