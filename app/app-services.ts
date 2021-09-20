@@ -151,6 +151,7 @@ import { StreamlabelsService } from './services/streamlabels';
 import { SceneCollectionsService } from './services/scene-collections';
 import { PlatformAppsService } from './services/platform-apps';
 import { RecentEventsService } from 'services/recent-events';
+import { AudioService } from './services/audio';
 
 export const AppServices = {
   AppService,
@@ -193,4 +194,5 @@ export const AppServices = {
   StreamlabelsService,
   SceneCollectionsService,
   PlatformAppsService,
+  AudioService,
 };

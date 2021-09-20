@@ -26,6 +26,7 @@ import SharedComponentsLibrary from './windows/sharedComponentsLibrary/SharedCom
 import { ObsSettings } from './windows/settings/ObsSettings';
 import ThemeAudit from './pages/ThemeAudit';
 import SafeMode from './windows/SafeMode';
+import AdvancedAudio from './windows/AdvancedAudio';
 
 // list of React components to be used inside Vue components
 export const components = {
@@ -56,4 +57,5 @@ export const components = {
   AppsNav,
   StudioEditor,
   SafeMode,
+  AdvancedAudio,
 };
