@@ -1,15 +1,18 @@
 import React from 'react';
-import { AudioSource } from '../../services/audio';
-import { propertyComponentForType } from 'components/obs/inputs/Components';
-import { TObsValue } from 'components/obs/inputs/ObsInput';
+import { Collapse } from 'antd';
 import { ModalLayout } from '../shared/ModalLayout';
+import { SliderInput } from '../shared/inputs';
+import { TObsValue } from '../../components/obs/inputs/ObsInput';
 import { Services } from '../service-provider';
+import { AudioSource } from '../../services/audio';
 import { $t } from '../../services/i18n';
 import styles from './AdvancedAudio.m.less';
 import { useVuex } from '../hooks';
 
+const { Panel } = Collapse;
+
 export default function AdvancedAudio() {
-  const { AudioService, WindowsService, EditorCommandsService } = Services;
+  const { AudioService, EditorCommandsService } = Services;
 
   const { audioSources } = useVuex(() => ({
     audioSources: AudioService.views.sourcesForCurrentScene,
@@ -31,36 +34,27 @@ export default function AdvancedAudio() {
 
   return (
     <ModalLayout hideFooter>
-      <form slot="content">
-        <table>
-          {audioSources.map(audioSource => (
-            <tr key={audioSource.name} className={styles.audioSettingsRow}>
-              <td className={styles.nameCell}>
-                <div className={styles.audioSourceName}>{audioSource.name}</div>
-              </td>
-              {audioSource.getSettingsForm().map(formInput => {
-                if (!formInput.type) return;
-                const Component = propertyComponentForType(formInput.type) as any;
-                return (
-                  <td
-                    key={`${audioSource.name}${formInput.name}`}
-                    className={styles['column-' + formInput.name]}
-                  >
-                    <div className={styles.advancedAudioInput}>
-                      <Component
-                        value={formInput}
-                        onInput={(value: { value: TObsValue }) =>
-                          onInputHandler(audioSource, formInput.name, value.value)
-                        }
-                      />
-                    </div>
-                  </td>
-                );
-              })}
-            </tr>
-          ))}
-        </table>
-      </form>
+      <Collapse
+        bordered={false}
+        expandIcon={({ isActive }) => <i className={isActive ? 'icon-subtract' : 'icon-add'} />}
+      >
+        {audioSources.map(audioSource => (
+          <Panel key={audioSource.name} header={<PanelHeader source={audioSource} />}></Panel>
+        ))}
+      </Collapse>
     </ModalLayout>
+  );
+}
+
+function PanelHeader(p: { source: AudioSource }) {
+  return (
+    <div className={styles.audioSettingsRow}>
+      <div className={styles.audioSourceName}>{p.source.name}</div>
+      <i className={p.source.muted ? 'icon-mute' : 'icon-audio'} />
+      <SliderInput />
+      <i className={p.source.mixerHidden ? 'icon-hide' : 'icon-view'} />
+      <div>{$t('Stream Tracks')}</div>
+      <div>{$t('Red Tracks')}</div>
+    </div>
   );
 }
