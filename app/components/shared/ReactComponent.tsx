@@ -88,6 +88,13 @@ export class NavTools extends ReactComponent {}
 export class IconLibraryProperties extends ReactComponent {}
 @Component({
   props: {
+    name: { default: 'ScreenCaptureProperties' },
+    wrapperStyles: { default: () => ({ height: '100%' }) },
+  },
+})
+export class ScreenCaptureProperties extends ReactComponent {}
+@Component({
+  props: {
     name: { default: 'Display' },
     wrapperStyles: { default: () => ({ height: '100%' }) },
     componentProps: {
