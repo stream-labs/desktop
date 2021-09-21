@@ -7,13 +7,23 @@ import {
   TObsValue,
 } from '../../components/obs/inputs/ObsInput';
 import Form from '../shared/inputs/Form';
-import { CheckboxInput, ListInput, NumberInput } from '../shared/inputs';
+import {
+  CheckboxInput,
+  ListInput,
+  NumberInput,
+  TextAreaInput,
+  TextInput,
+  TInputLayout,
+} from '../shared/inputs';
 import { cloneDeep } from 'lodash';
 import { $t } from '../../services/i18n';
+import { Button } from 'antd';
+import InputWrapper from '../shared/inputs/InputWrapper';
 
 interface IObsFormProps {
   value: IObsInput<TObsValue>[];
   onChange: (newValue: IObsInput<TObsValue>[]) => unknown;
+  layout?: TInputLayout;
 }
 
 /**
@@ -28,7 +38,7 @@ export function ObsForm(p: IObsFormProps) {
   }
 
   return (
-    <Form layout="vertical">
+    <Form layout={p.layout || 'vertical'}>
       {p.value.map((inputData, inputIndex) => (
         <ObsInput
           value={inputData}
@@ -65,13 +75,20 @@ function ObsInput(p: IObsInputProps) {
     onChange: onChangeHandler,
     name: p.value.name,
     label: p.value.description,
+    uncontrolled: false,
   };
 
   switch (type) {
-    case 'OBS_PROPERTY_BOOL':
-      return <CheckboxInput {...inputProps} />;
     case 'OBS_PROPERTY_DOUBLE':
       return <NumberInput {...inputProps} />;
+    case 'OBS_PROPERTY_INT':
+      return <NumberInput {...inputProps} step={1} min={p.value.minVal} max={p.value.maxVal} />;
+    case 'OBS_PROPERTY_TEXT':
+      if (p.value.multiline) {
+        return <TextAreaInput {...inputProps} />;
+      } else {
+        return <TextInput {...inputProps} />;
+      }
     case 'OBS_PROPERTY_LIST':
       // eslint-disable-next-line no-case-declarations
       const options = (p.value as IObsListInput<unknown>).options.map(opt => {
@@ -85,6 +102,20 @@ function ObsInput(p: IObsInputProps) {
         };
       });
       return <ListInput {...inputProps} options={options} />;
+
+    case 'OBS_PROPERTY_BUTTON':
+      return (
+        <InputWrapper>
+          <Button onClick={() => inputProps.onChange(true)}>{inputProps.label}</Button>
+        </InputWrapper>
+      );
+
+    case 'OBS_PROPERTY_BOOL':
+      return (
+        <InputWrapper style={{ marginBottom: '8px' }}>
+          <CheckboxInput {...inputProps} />
+        </InputWrapper>
+      );
     default:
       return <span style={{ color: 'red' }}>Unknown input type {type}</span>;
   }

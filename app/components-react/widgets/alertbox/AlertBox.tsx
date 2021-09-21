@@ -5,9 +5,7 @@ import {
   FileInput,
   ListInput,
   MediaGalleryInput,
-  NumberInput,
   SliderInput,
-  SwitchInput,
   TextInput,
 } from '../../shared/inputs';
 import { $t } from '../../../services/i18n';
@@ -23,9 +21,6 @@ import { IAlertInfo, TAlertType } from '../../../services/widgets/widget-setting
 import { getDefined } from '../../../util/properties-type-guards';
 import { mutation, useSelector } from '../../store';
 
-const { Sider } = Layout;
-const { Panel } = Collapse;
-
 export function AlertBox() {
   return (
     <WidgetLayout>
@@ -37,17 +32,12 @@ export function AlertBox() {
 
 function MainPanel() {
   const { onMenuClickHandler, selectedTab } = useAlertBox();
-
-  const tab = selectedTab || 'general';
   return (
     <>
-      <Menu onClick={onMenuClickHandler} selectedKeys={[tab]} theme={'dark'}>
+      <Menu onClick={onMenuClickHandler} selectedKeys={[selectedTab]} theme={'dark'}>
         <Menu.Item key={'general'}>{$t('General Settings')}</Menu.Item>
       </Menu>
       <AlertsList />
-      <Menu onClick={onMenuClickHandler} selectedKeys={[tab]} theme={'dark'}>
-        <Menu.Item key={'advanced'}>{$t('Advanced Settings')}</Menu.Item>
-      </Menu>
     </>
   );
 }
@@ -89,7 +79,7 @@ function GeneralSettings() {
       <Alert
         message={
           <span>
-            Looking for an old UI <a>Click here</a>
+            Looking for an legacy AlertBox Settings? <a>Click here</a>
           </span>
         }
         onClick={switchToLegacyAlertbox}
@@ -143,7 +133,7 @@ function VariationSettings(p: { type: TAlertType }) {
           <Alert
             message={
               <span>
-                Setup donations settings <a>Click here</a>
+                Add a payment method? <a>Click here</a>
               </span>
             }
             type="info"

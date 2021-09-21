@@ -7,7 +7,7 @@ import { StatefulService, mutation, ViewHandler } from 'services/core/stateful-s
 import * as obs from '../../../obs-api';
 import { Inject } from 'services/core/injector';
 import namingHelpers from 'util/NamingHelpers';
-import { WindowsService } from 'services/windows';
+import { TWindowComponentName, WindowsService } from 'services/windows';
 import { WidgetsService, WidgetType, WidgetDisplayData } from 'services/widgets';
 import { DefaultManager } from './properties-managers/default-manager';
 import { WidgetManager } from './properties-managers/widget-manager';
@@ -38,7 +38,7 @@ import { UsageStatisticsService } from 'services/usage-statistics';
 import { SourceFiltersService } from 'services/source-filters';
 import { FileReturnWrapper } from 'util/guest-api-handler';
 import { VideoService } from 'services/video';
-import {CustomizationService} from "../customization";
+import { CustomizationService } from '../customization';
 
 const AudioFlag = obs.ESourceOutputFlags.Audio;
 const VideoFlag = obs.ESourceOutputFlags.Video;
@@ -598,28 +598,38 @@ export class SourcesService extends StatefulService<ISourcesState> {
     const platform = this.userService.views.platform;
     assertIsDefined(platform);
     const widgetType = source.getPropertiesManagerSettings().widgetType;
-    let componentName = this.widgetsService.getWidgetComponent(widgetType);
+    const componentName = this.widgetsService.getWidgetComponent(widgetType);
 
     // React widgets are in the WidgetsWindow component
     let reactWidgets = [
       'AlertBox',
       // 'TipJar',
-      // 'ViewersCount',
+      'ViewerCount',
     ];
     const isLegacyAlertbox = this.customizationService.state.legacyAlertbox;
     if (isLegacyAlertbox) reactWidgets = reactWidgets.filter(w => w !== 'AlertBox');
-    if (reactWidgets.includes(componentName)) componentName = 'WidgetWindow';
+    const isReactComponent = reactWidgets.includes(componentName);
+    const windowComponentName = isReactComponent
+      ? 'WidgetWindow'
+      : componentName;
+
+    const defaultVueWindowSize = { width: 920, height: 1024 };
+    const defaultReactWindowSize = { width: 600, height: 800 };
+    const widgetInfo = this.widgetsService.widgetsInfo[componentName];
+    const { width, height } = isReactComponent
+      ? widgetInfo.settingsWindowSize || defaultReactWindowSize
+      : defaultVueWindowSize;
 
     if (componentName) {
       this.windowsService.showWindow({
-        componentName,
+        componentName: windowComponentName,
         title: $t('Settings for %{sourceName}', {
           sourceName: WidgetDisplayData(platform.type)[widgetType].name,
         }),
         queryParams: { sourceId: source.sourceId, widgetType: WidgetType[widgetType] },
         size: {
-          width: 920,
-          height: 1024,
+          width,
+          height,
         },
       });
     }

@@ -1,13 +1,12 @@
 import { useModuleByName, useModuleRoot } from '../hooks/useModule';
-import { IWidgetSettings, WidgetTesters, WidgetType } from '../../services/widgets';
+import { WidgetTesters, WidgetType } from '../../services/widgets';
 import { Services } from '../service-provider';
 import { mutation } from '../store';
 import { components } from './Widget';
 import { throttle } from 'lodash-decorators';
 import { assertIsDefined, getDefined } from '../../util/properties-type-guards';
-import { createBinding, TBindings } from '../shared/inputs';
-import { pick } from 'lodash';
 import { TAlertType, TWidgetType } from '../../services/widgets/widget-settings';
+import { TObsFormData } from '../../components/obs/inputs/ObsInput';
 
 export function useWidgetRoot<T extends typeof WidgetModule>(Module: T, sourceId?: string) {
   return useModuleRoot(Module, { sourceId }, 'WidgetModule').select();
@@ -23,6 +22,7 @@ export interface IWidgetState {
   previewSourceId: string;
   selectedTab: string;
   type: TWidgetType;
+  browserSourceProps: TObsFormData;
   data: {
     settings: Record<string, any>;
   };
@@ -33,9 +33,10 @@ export const DEFAULT_WIDGET_STATE = ({
   sourceId: '',
   previewSourceId: '',
   isPreviewVisible: false,
-  selectedTab: '',
+  selectedTab: 'general',
   type: '',
   data: {},
+  browserSourceProps: null,
 } as unknown) as IWidgetState;
 
 export class WidgetModule<TWidgetState extends IWidgetState = IWidgetState> {
@@ -49,6 +50,7 @@ export class WidgetModule<TWidgetState extends IWidgetState = IWidgetState> {
   async init(params: { sourceId: string }) {
     this.state.sourceId = params.sourceId;
     const widget = this.widget;
+    this.setBrowserSourceProps(widget.getSource()!.getPropertiesFormData());
 
     // create a temporary preview-source for the Display component
     const previewSource = widget.createPreviewSource();
@@ -162,6 +164,13 @@ export class WidgetModule<TWidgetState extends IWidgetState = IWidgetState> {
     return settings;
   }
 
+  updateBrowserSourceProps(formData: TObsFormData) {
+    const source = getDefined(this.widget.getSource());
+    source.setPropertiesFormData(formData);
+    const updatedProps = source.getPropertiesFormData();
+    this.setBrowserSourceProps(updatedProps);
+  }
+
   @mutation()
   private setIsLoading(isLoading: boolean) {
     this.state.isLoading = isLoading;
@@ -182,5 +191,22 @@ export class WidgetModule<TWidgetState extends IWidgetState = IWidgetState> {
   private setSettings(settings: TWidgetState['data']['settings']) {
     assertIsDefined(this.state.data);
     this.state.data.settings = settings;
+  }
+
+  @mutation()
+  private setBrowserSourceProps(props: TObsFormData) {
+    const propsOrder = [
+      'width',
+      'height',
+      'css',
+      'refreshnocache',
+      'reroute_audio',
+      'restart_when_active',
+      'shutdown',
+      'fps_custom',
+      'fps',
+    ];
+    const sortedProps = propsOrder.map(propName => props.find(p => p.name === propName)!);
+    this.state.browserSourceProps = sortedProps;
   }
 }

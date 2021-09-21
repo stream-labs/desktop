@@ -16,7 +16,6 @@ type TProps = { children: ReactNode; fixedChild?: ReactNode; hideFooter?: boolea
 
 // calculate OS dependent styles
 const titleHeight = getOS() === OS.Mac ? 22 : 30;
-const footerHeight = 53;
 const wrapperStyles: CSSProperties = {
   height: `calc(100% - ${titleHeight}px)`,
 };
@@ -33,6 +32,7 @@ const fixedStyles: CSSProperties = {
  * Wraps content for the child windows
  */
 export function ModalLayout(p: TProps) {
+  const footerHeight = p.hideFooter ? 0 : 53;
   const bodyStyles: CSSProperties = {
     height: p.fixedChild
       ? `calc(100% - ${footerHeight + 200}px)`

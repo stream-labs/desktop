@@ -3,20 +3,32 @@
 .widget-layout {
 
   // collapse
+
   :global(.ant-collapse-header) {
-    background: fade(#09161D, 65%);
-    padding: 4px 16px !important;
-    color: var(--text) !important;
+    background-color: var(--section-alt);
   }
 
   :global(.ant-collapse-content),
   :global(.ant-collapse-item){
-    border: none !important;
+    background-color: var(--section-alt);
   }
 
-  :global(.ant-collapse-content-box) {
-    padding-top: 16px !important;
-  }
+
+  //// collapse
+  //:global(.ant-collapse-header) {
+  //  background: fade(#09161D, 65%);
+  //  padding: 4px 16px !important;
+  //  color: var(--text) !important;
+  //}
+  //
+  //:global(.ant-collapse-content),
+  //:global(.ant-collapse-item){
+  //  border: none !important;
+  //}
+  //
+  //:global(.ant-collapse-content-box) {
+  //  padding-top: 16px !important;
+  //}
 
   // menu
   :global(.ant-collapse-content-box .ant-menu-root) {

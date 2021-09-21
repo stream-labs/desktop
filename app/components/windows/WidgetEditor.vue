@@ -5,8 +5,9 @@
         <generic-form :value="topProperties" @input="onPropsInputHandler" />
         <div class="ant-alert ant-alert-info" role="alert">
           <div class="ant-alert-content">
-            <div class="ant-alert-message"
-                 @click="switchToNewAlertboxUI()">{{ $t('Try new AlertBox UI') }}</div>
+            <div class="ant-alert-message" v-if="props.isAlertBox" @click="switchToNewAlertboxUI()">
+              {{ $t('Try new AlertBox UI') }}
+            </div>
           </div>
         </div>
         <div v-if="apiSettings.testers" class="button button--action test-button">

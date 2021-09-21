@@ -2,14 +2,14 @@ import { AnchorPoint } from '../../util/ScalableRectangle';
 import { $t } from '../i18n';
 import { TPlatform } from '../platforms';
 
-export type TWidgetType = 'AlertBox';
+export type TWidgetType = 'AlertBox' | 'ViewerCount';
 export type TAlertType = 'donation' | 'follow' | 'subscription' | 'cheer' | 'host';
 
 export interface IWidgetTypeInfo {
   type: TWidgetType;
   name: string;
   description: string;
-  demoVideo: true;
+  demoVideo: boolean;
   demoFilename: string;
   supportList: string[];
 
@@ -35,14 +35,14 @@ export interface IWidgetTypeInfo {
   testers?: TAlertType[];
   customCodeAllowed?: boolean;
   customFieldsAllowed?: boolean;
-}
 
-// export interface IAlertTypeInfo {
-//   type: TAlertType;
-//   name: string;
-//   testerUrl: string;
-//   platforms: TPlatform[];
-// }
+  // the settings window size
+  // the default size is 600x800
+  settingsWindowSize?: {
+    width: number;
+    height: number;
+  };
+}
 
 export function getWidgetsInfo(host: string, token: string): Record<TWidgetType, IWidgetTypeInfo> {
   return {
@@ -62,11 +62,41 @@ export function getWidgetsInfo(host: string, token: string): Record<TWidgetType,
         anchor: AnchorPoint.North,
       },
 
+      settingsWindowSize: {
+        width: 920,
+        height: 1024,
+      },
+
       url: `https://${host}/alert-box/v3/${token}`,
       previewUrl: `https://${host}}/alert-box/v3/${token}`,
       dataFetchUrl: `https://${host}/api/v5/slobs/widget/alertbox?include_linked_integrations_only=true&primary_only=false`,
       settingsSaveUrl: `https://${host}/api/v5/slobs/widget/alertbox`,
       settingsUpdateEvent: 'filteredAlertBoxSettingsUpdate',
+      customCodeAllowed: true,
+      customFieldsAllowed: true,
+    },
+
+    ViewerCount: {
+      type: 'ViewerCount',
+      name: $t('Viewer Count'),
+      description: $t('Show off your viewers from multiple platforms.'),
+      demoVideo: false,
+      demoFilename: 'source-viewer-count.png',
+      supportList: ['YouTube', 'Twitch', 'Facebook'],
+      url: `https://${host}/widgets/viewer-count?token=${token}`,
+
+      defaultTransform: {
+        width: 600,
+        height: 200,
+        x: 0,
+        y: 1,
+        anchor: AnchorPoint.SouthWest,
+      },
+
+      previewUrl: `https://${host}/widgets/viewer-count?token=${token}&simulate=1`,
+      dataFetchUrl: `https://${host}/api/v5/slobs/widget/viewercount`,
+      settingsSaveUrl: `https://${host}/api/v5/slobs/widget/viewercount`,
+      settingsUpdateEvent: 'viewerCountSettingsUpdate',
       customCodeAllowed: true,
       customFieldsAllowed: true,
     },
@@ -127,4 +157,4 @@ export interface IAlertInfo {
   name: string;
   url(platform: TPlatform): string;
   platforms: TPlatform[];
-};
+}

@@ -12,3 +12,6 @@ export { ImageInput } from './ImageInput';
 export { FileInput } from './FileInput';
 export { DateInput } from './DateInput';
 export { TimeInput } from './TimeInput';
+export { FontFamilyInput } from './FontFamilyInput';
+export { FontSizeInput } from './FontSizeInput';
+export { ColorInput } from './ColorInput';

@@ -13,6 +13,7 @@ import isEqual from 'lodash/isEqual';
 import * as InputComponents from './index';
 
 type TInputType =
+  | 'color'
   | 'text'
   | 'textarea'
   | 'number'
@@ -286,7 +287,7 @@ export function useTextInput<
 
   const onBlur = useCallback((ev: FocusEvent<any>) => {
     // for uncontrolled components call the `onChange()` handler on blur
-    const newVal = ev.target.value;
+    const newVal = type === 'number' ? Number(ev.target.value) : ev.target.value;
     if (uncontrolled && p.value !== newVal) {
       emitChange(newVal);
     }
