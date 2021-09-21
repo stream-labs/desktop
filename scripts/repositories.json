@@ -37,7 +37,6 @@
             "url": "https://slobs-crash-handler.s3-us-west-2.amazonaws.com/",
             "archive": "crash-handler-[VERSION]-[OS].tar.gz",
             "version": "1.1.16",
-            "mac_version": "1.1.8",
             "win64": true,
             "osx": true
         },
