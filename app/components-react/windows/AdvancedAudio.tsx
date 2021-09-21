@@ -1,18 +1,21 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Collapse } from 'antd';
-import { ModalLayout } from '../shared/ModalLayout';
-import { SliderInput } from '../shared/inputs';
-import { TObsValue } from '../../components/obs/inputs/ObsInput';
-import { Services } from '../service-provider';
-import { AudioSource } from '../../services/audio';
-import { $t } from '../../services/i18n';
+import { ModalLayout } from 'components-react/shared/ModalLayout';
+import { SliderInput, BoolButtonInput } from 'components-react/shared/inputs';
+import Form from 'components-react/shared/inputs/Form';
+import { TObsValue } from 'components/obs/inputs/ObsInput';
+import { Services } from 'components-react/service-provider';
+import { AudioSource } from 'services/audio';
+import { $t } from 'services/i18n';
 import styles from './AdvancedAudio.m.less';
-import { useVuex } from '../hooks';
+import { useVuex } from 'components-react/hooks';
 
 const { Panel } = Collapse;
 
 export default function AdvancedAudio() {
   const { AudioService, EditorCommandsService } = Services;
+
+  const [expandedSource, setExpandedSource] = useState('');
 
   const { audioSources } = useVuex(() => ({
     audioSources: AudioService.views.sourcesForCurrentScene,
@@ -35,11 +38,16 @@ export default function AdvancedAudio() {
   return (
     <ModalLayout hideFooter>
       <Collapse
+        accordion
+        activeKey={expandedSource}
+        onChange={(key: string) => setExpandedSource(key)}
         bordered={false}
         expandIcon={({ isActive }) => <i className={isActive ? 'icon-subtract' : 'icon-add'} />}
       >
         {audioSources.map(audioSource => (
-          <Panel key={audioSource.name} header={<PanelHeader source={audioSource} />}></Panel>
+          <Panel key={audioSource.name} header={<PanelHeader source={audioSource} />}>
+            <Form></Form>
+          </Panel>
         ))}
       </Collapse>
     </ModalLayout>
@@ -47,14 +55,18 @@ export default function AdvancedAudio() {
 }
 
 function PanelHeader(p: { source: AudioSource }) {
+  const { name, mixerHidden, muted, fader } = p.source;
   return (
     <div className={styles.audioSettingsRow}>
-      <div className={styles.audioSourceName}>{p.source.name}</div>
-      <i className={p.source.muted ? 'icon-mute' : 'icon-audio'} />
-      <SliderInput />
-      <i className={p.source.mixerHidden ? 'icon-hide' : 'icon-view'} />
-      <div>{$t('Stream Tracks')}</div>
-      <div>{$t('Red Tracks')}</div>
+      <div className={styles.audioSourceName}>{name}</div>
+      <i className={muted ? 'icon-mute' : 'icon-audio'} />
+      <SliderInput value={fader.deflection} hasNumberInput />
+      <i className={mixerHidden ? 'icon-hide' : 'icon-view'} />
+      <div>
+        {$t('Stream Track')}
+        <BoolButtonInput label="1" />
+      </div>
+      <div>{$t('Rec. Tracks')}</div>
     </div>
   );
 }
