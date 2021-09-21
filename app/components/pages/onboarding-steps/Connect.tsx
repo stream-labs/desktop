@@ -14,7 +14,7 @@ import ExtraPlatformConnect, { TExtraPlatform } from './ExtraPlatformConnect';
 import { IListOption } from '../../shared/inputs';
 import { UsageStatisticsService } from 'services/usage-statistics';
 import { StreamingService } from '../../../services/streaming';
-import { PlatformLogo } from '../../shared/ReactComponent';
+import { PlatformLogo } from '../../shared/ReactComponentList';
 import {
   EAvailableFeatures,
   IncrementalRolloutService,

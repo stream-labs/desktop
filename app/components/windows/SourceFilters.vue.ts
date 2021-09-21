@@ -10,7 +10,7 @@ import { EditorCommandsService } from 'services/editor-commands';
 import ModalLayout from 'components/ModalLayout.vue';
 import NavMenu from 'components/shared/NavMenu.vue';
 import NavItem from 'components/shared/NavItem.vue';
-import { Display } from 'components/shared/ReactComponent';
+import { Display } from 'components/shared/ReactComponentList';
 import VFormGroup from 'components/shared/inputs/VFormGroup.vue';
 import GenericForm from 'components/obs/inputs/GenericForm';
 import { Subscription } from 'rxjs';
