@@ -30,8 +30,6 @@ export const BoolButtonInput = InputComponent((p: TBoolButtonInputProps) => {
     if (p.onChange) p.onChange(!p.value);
   }
 
-  const icon = p.label ?? <i className="fa fa-check" />;
-
   return (
     <Tooltip title={p.tooltip} placement={p.tooltipPlacement}>
       <div
@@ -46,7 +44,7 @@ export const BoolButtonInput = InputComponent((p: TBoolButtonInputProps) => {
           style={customStyles}
           onClick={handleClick}
         >
-          {p.value && icon}
+          {p.label || (p.value && <i className="fa fa-check" />)}
         </div>
       </div>
     </Tooltip>

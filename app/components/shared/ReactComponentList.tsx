@@ -3,6 +3,14 @@ import ReactComponent from './ReactComponent';
 
 @Component({
   props: {
+    name: { default: 'AdvancedAudio' },
+    wrapperStyles: { default: () => ({ height: '100%' }) },
+  },
+})
+export class AdvancedAudio extends ReactComponent {}
+
+@Component({
+  props: {
     name: { default: 'AdvancedStatistics' },
     wrapperStyles: { default: () => ({ height: '100%' }) },
   },

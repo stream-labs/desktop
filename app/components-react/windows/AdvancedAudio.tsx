@@ -77,23 +77,28 @@ function PanelHeader(p: { source: AudioSource }) {
   }
 
   return (
-    <div className={styles.audioSettingsRow}>
+    <div className={styles.audioSettingsRow} onClick={(e: React.MouseEvent) => e.stopPropagation()}>
       <div className={styles.audioSourceName}>{name}</div>
       <i
         className={muted ? 'icon-mute' : 'icon-audio'}
         onClick={() => onInputHandler('muted')(!muted)}
       />
-      <SliderInput value={fader.deflection} hasNumberInput onInput={onInputHandler('deflection')} />
+      <SliderInput
+        style={{ width: '200px', marginBottom: 0 }}
+        value={fader.deflection}
+        hasNumberInput
+        onInput={onInputHandler('deflection')}
+      />
       <i
         className={mixerHidden ? 'icon-hide' : 'icon-view'}
         onClick={() => onInputHandler('mixerHidden')(!mixerHidden)}
       />
-      <div>
-        {$t('Stream Track')}
+      <div className={styles.audioSettingsTracks}>
+        <div className={styles.trackLabel}>{$t('Stream Track')}</div>
         <BoolButtonInput label="1" />
       </div>
-      <div>
-        {$t('Rec. Tracks')}
+      <div className={styles.audioSettingsTracks}>
+        <div className={styles.trackLabel}>{$t('Rec. Tracks')}</div>
         <BoolButtonInput label="5" />
         <BoolButtonInput label="6" />
       </div>
