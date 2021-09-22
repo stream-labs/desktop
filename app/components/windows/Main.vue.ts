@@ -1,7 +1,16 @@
 import Vue from 'vue';
 import { Component, Watch } from 'vue-property-decorator';
 import SideNav from '../SideNav';
-import { NewsBanner, TitleBar, Grow } from 'components/shared/ReactComponent';
+import {
+  NewsBanner,
+  TitleBar,
+  Grow,
+  PatchNotes,
+  Loader,
+  StreamScheduler,
+  Highlighter,
+  ThemeAudit,
+} from 'components/shared/ReactComponentList';
 import { ScenesService } from 'services/scenes';
 import { PlatformAppsService } from 'services/platform-apps';
 import { EditorCommandsService } from '../../app-services';
@@ -25,13 +34,6 @@ import { UserService } from 'services/user';
 import { IModalOptions, WindowsService } from 'services/windows';
 import LiveDock from '../LiveDock.vue';
 import StudioFooter from '../StudioFooter.vue';
-import {
-  PatchNotes,
-  Loader,
-  StreamScheduler,
-  Highlighter,
-  ThemeAudit,
-} from '../shared/ReactComponent';
 import PlatformAppMainPage from '../pages/PlatformAppMainPage.vue';
 import electron from 'electron';
 import ResizeBar from 'components/shared/ResizeBar.vue';
