@@ -5,7 +5,7 @@ import { TObsFormData } from 'components/obs/inputs/ObsInput';
 import { WindowsService } from 'services/windows';
 import { SourcesService } from 'services/sources';
 import ModalLayout from 'components/ModalLayout.vue';
-import { Display } from 'components/shared/ReactComponent';
+import { Display } from 'components/shared/ReactComponentList';
 import GenericForm from 'components/obs/inputs/GenericForm';
 import WidgetProperties from 'components/custom-source-properties/WidgetProperties.vue';
 import StreamlabelProperties from 'components/custom-source-properties/StreamlabelProperties';
