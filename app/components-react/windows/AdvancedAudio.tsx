@@ -59,7 +59,14 @@ export default function AdvancedAudio() {
 
 function PanelHeader(p: { source: AudioSource }) {
   const { name, mixerHidden, muted, fader, sourceId } = p.source;
-  const { EditorCommandsService } = Services;
+  const { EditorCommandsService, SettingsService } = Services;
+  const { isAdvancedOutput, recordingTracks, streamTrack } = useVuex(() => ({
+    isAdvancedOutput: SettingsService.views.isAdvancedOutput,
+    streamTrack: SettingsService.views.streamTrack,
+    recordingTracks: SettingsService.views.recordingTracks,
+  }));
+
+  console.log(streamTrack);
 
   function onInputHandler(name: string) {
     return (value: TObsValue) => {
@@ -86,7 +93,7 @@ function PanelHeader(p: { source: AudioSource }) {
       />
       <SliderInput
         style={{ width: '200px', marginBottom: 0 }}
-        value={fader.deflection}
+        value={fader.deflection * 100}
         hasNumberInput
         onInput={onInputHandler('deflection')}
       />
@@ -94,15 +101,16 @@ function PanelHeader(p: { source: AudioSource }) {
         className={mixerHidden ? 'icon-hide' : 'icon-view'}
         onClick={() => onInputHandler('mixerHidden')(!mixerHidden)}
       />
-      <div className={styles.audioSettingsTracks}>
-        <div className={styles.trackLabel}>{$t('Stream Track')}</div>
-        <BoolButtonInput label="1" />
-      </div>
-      <div className={styles.audioSettingsTracks}>
-        <div className={styles.trackLabel}>{$t('Rec. Tracks')}</div>
-        <BoolButtonInput label="5" />
-        <BoolButtonInput label="6" />
-      </div>
+      {isAdvancedOutput && (
+        <div className={styles.audioSettingsTracks}>
+          <div className={styles.trackLabel}>{$t('Stream Track')}</div>
+          <BoolButtonInput label={streamTrack} />
+          <div className={styles.trackLabel}>{$t('Rec. Tracks')}</div>
+          {recordingTracks?.map(track => (
+            <BoolButtonInput label={track} key={track} />
+          ))}
+        </div>
+      )}
     </div>
   );
 }

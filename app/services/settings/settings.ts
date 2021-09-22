@@ -7,6 +7,7 @@ import {
   IObsListInput,
   IObsInput,
   TObsValue,
+  IObsBitmaskInput,
 } from 'components/obs/inputs/ObsInput';
 import * as obs from '../../../obs-api';
 import { SourcesService } from 'services/sources';
@@ -99,6 +100,28 @@ class SettingsViews extends ViewHandler<ISettingsServiceState> {
     }
 
     return settingsValues as ISettingsValues;
+  }
+
+  get isAdvancedOutput() {
+    return this.state.Output.type === 1;
+  }
+
+  get streamTrack() {
+    if (!this.isAdvancedOutput) return;
+    return this.state.Output.formData[1].parameters[0].value as string;
+  }
+
+  get recordingTracks() {
+    if (!this.isAdvancedOutput) return;
+    const input = this.state.Output.formData[2].parameters[4] as IObsBitmaskInput;
+    const bitArray = Utils.numberToBinnaryArray(input.value, input.size).reverse();
+    const trackLabels: string[] = [];
+    bitArray.forEach((bit, i) => {
+      if (bit === 1) {
+        trackLabels.push(String(i + 1));
+      }
+    });
+    return trackLabels;
   }
 }
 
