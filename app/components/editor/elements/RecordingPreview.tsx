@@ -1,4 +1,4 @@
-import { Display } from 'components/shared/ReactComponent';
+import { Display } from 'components/shared/ReactComponentList';
 import { Component } from 'vue-property-decorator';
 import { Inject } from 'services/core/injector';
 import Util from 'services/utils';

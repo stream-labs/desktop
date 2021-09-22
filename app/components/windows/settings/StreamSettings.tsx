@@ -22,7 +22,7 @@ import { formMetadata, metadata } from 'components/shared/inputs';
 import VFormGroup from '../../shared/inputs/VFormGroup.vue';
 import cloneDeep from 'lodash/cloneDeep';
 import namingHelpers from '../../../util/NamingHelpers';
-import { PlatformLogo } from '../../shared/ReactComponent';
+import { PlatformLogo } from '../../shared/ReactComponentList';
 import { MagicLinkService } from 'services/magic-link';
 
 @Component({ components: { GenericFormGroups, PlatformLogo, BrowserView } })
