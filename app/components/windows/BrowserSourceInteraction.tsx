@@ -1,7 +1,7 @@
 import TsxComponent from 'components/tsx-component';
 import { Component } from 'vue-property-decorator';
 import ModalLayout from '../ModalLayout.vue';
-import { Display } from 'components/shared/ReactComponent';
+import { Display } from 'components/shared/ReactComponentList';
 import { WindowsService } from 'services/windows';
 import { Inject } from 'services';
 import Utils from 'services/utils';
