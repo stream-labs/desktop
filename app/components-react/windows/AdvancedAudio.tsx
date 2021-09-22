@@ -18,9 +18,10 @@ import { useVuex } from 'components-react/hooks';
 const { Panel } = Collapse;
 
 export default function AdvancedAudio() {
-  const { AudioService, EditorCommandsService } = Services;
+  const { AudioService, EditorCommandsService, WindowsService } = Services;
+  const initialSource = WindowsService.getChildWindowQueryParams().sourceId || '';
 
-  const [expandedSource, setExpandedSource] = useState('');
+  const [expandedSource, setExpandedSource] = useState(initialSource);
 
   const { audioSources } = useVuex(() => ({
     audioSources: AudioService.views.sourcesForCurrentScene,
@@ -41,7 +42,7 @@ export default function AdvancedAudio() {
         expandIcon={({ isActive }) => <i className={isActive ? 'icon-subtract' : 'icon-add'} />}
       >
         {audioSources.map(audioSource => (
-          <Panel key={audioSource.name} header={<PanelHeader source={audioSource} />}>
+          <Panel key={audioSource.sourceId} header={<PanelHeader source={audioSource} />}>
             <Form>
               <ListInput label={$t('Device')} options={[]} />
               <SwitchInput label={$t('Use Device Timestamps')} />

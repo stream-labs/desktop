@@ -200,7 +200,7 @@ export class AudioService extends StatefulService<IAudioSourcesState> {
       .filter(device => [EDeviceType.audioOutput, EDeviceType.audioInput].includes(device.type));
   }
 
-  showAdvancedSettings() {
+  showAdvancedSettings(sourceId?: string) {
     this.windowsService.showWindow({
       componentName: 'AdvancedAudio',
       title: $t('Advanced Audio Settings'),
@@ -208,6 +208,7 @@ export class AudioService extends StatefulService<IAudioSourcesState> {
         width: 915,
         height: 600,
       },
+      queryParams: { sourceId },
     });
   }
 
