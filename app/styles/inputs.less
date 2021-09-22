@@ -77,48 +77,55 @@
   font-style: italic;
 }
 
-input[type=text],
-input[type=number],
-input[type=password],
-textarea,
-textarea[type=text] {
-  .radius();
+span[data-role="input"],
+.ModalLayout-fixed {
 
-  border: 1px solid var(--button);
-  background: var(--input-bg);
-  margin-bottom: 0;
-  font-size: 14px;
-  color: var(--paragraph);
-  box-shadow: none;
-  height: 32px;
-  padding: 0 @spacing;
 
-  &:focus {
-    box-shadow: none;
+  input[type=text],
+  input[type=number],
+  input[type=password],
+  textarea,
+  textarea[type=text] {
+    .radius();
+
+    border: 1px solid var(--button);
     background: var(--input-bg);
+    margin-bottom: 0;
+    font-size: 14px;
+    color: var(--paragraph);
+    box-shadow: none;
+    height: 32px;
+    padding: 0 @spacing;
+
+    &:focus {
+      box-shadow: none;
+      background: var(--input-bg);
+    }
+
+    &:disabled:not('.ant-input'),
+    .is-disabled {
+      background-color: var(--button);
+      border-color: var(--button);
+    }
+
+    &.input--transparent {
+      border: 0;
+      border-bottom: 1px dashed var(--midtone);
+      padding: 0;
+      height: 20px;
+      background: transparent;
+      border-radius: 0;
+    }
   }
 
-  &:disabled:not('.ant-input'),
-  .is-disabled {
-    background-color: var(--button);
-    border-color: var(--button);
+  textarea,
+  textarea[type=text] {
+    .padding();
+    line-height: 20px;
   }
 
-  &.input--transparent {
-    border: 0;
-    border-bottom: 1px dashed var(--midtone);
-    padding: 0;
-    height: 20px;
-    background: transparent;
-    border-radius: 0;
-  }
 }
 
-textarea,
-textarea[type=text] {
-  .padding();
-  line-height: 20px;
-}
 
 .list-input .multiselect {
   input[type=text] {
