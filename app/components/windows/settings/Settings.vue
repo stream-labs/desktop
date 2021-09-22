@@ -15,6 +15,7 @@
               type: 'text',
               placeholder: 'Search',
               icon: 'search',
+              fullWidth: true,
             }"
             class="search"
           />
@@ -124,6 +125,12 @@
   .search {
     .margin-left(2);
     .margin-bottom(2);
+    input {
+      width: 100%;
+    }
+    i {
+      right: 16px;
+    }
   }
 
   .clear-search-button {

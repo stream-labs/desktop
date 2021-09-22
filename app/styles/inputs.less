@@ -69,6 +69,7 @@
 
 .input--search {
   padding: 0 30px 0 8px;
+  width: 100%;
 }
 
 .input-description {
@@ -77,47 +78,62 @@
   font-style: italic;
 }
 
-input[type=text],
-input[type=number],
-input[type=password],
-textarea,
-textarea[type=text] {
-  .radius();
+// assume only Vue components have these containers
+span[data-role="input"],
+.ModalLayout-fixed,
+.Hotkey-bindings,
+.row,
+.input-wrapper--search,
+.manage-scene-collections__header,
+[data-vv-scope] {
 
-  border: 1px solid var(--button);
-  background: var(--input-bg);
-  margin-bottom: 0;
-  font-size: 14px;
-  color: var(--paragraph);
-  box-shadow: none;
-  height: 32px;
-  padding: 0 @spacing;
+  // add styles for Vue inputs
 
-  &:focus {
-    box-shadow: none;
+  input[type=text],
+  input[type=number],
+  input[type=password],
+  textarea,
+  textarea[type=text] {
+    .radius();
+
+    border: 1px solid var(--button);
     background: var(--input-bg);
+    margin-bottom: 0;
+    font-size: 14px;
+    color: var(--paragraph);
+    box-shadow: none;
+    outline: none;
+    height: 32px;
+    padding: 0 @spacing;
+
+    &:focus {
+      box-shadow: none;
+      background: var(--input-bg);
+      border-color: var(--primary);
+    }
+
+    &:disabled:not('.ant-input'),
+    .is-disabled {
+      background-color: var(--button);
+      border-color: var(--button);
+    }
+
+    &.input--transparent {
+      border: 0;
+      border-bottom: 1px dashed var(--midtone);
+      padding: 0;
+      height: 20px;
+      background: transparent;
+      border-radius: 0;
+    }
   }
 
-  &:disabled:not('.ant-input'),
-  .is-disabled {
-    background-color: var(--button);
-    border-color: var(--button);
+  textarea,
+  textarea[type=text] {
+    .padding();
+    line-height: 20px;
   }
 
-  &.input--transparent {
-    border: 0;
-    border-bottom: 1px dashed var(--midtone);
-    padding: 0;
-    height: 20px;
-    background: transparent;
-    border-radius: 0;
-  }
-}
-
-textarea,
-textarea[type=text] {
-  .padding();
-  line-height: 20px;
 }
 
 .list-input .multiselect {
