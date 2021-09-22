@@ -1,7 +1,9 @@
 {
   "Mini Feed": "Mini Feed",
-  "has donated": "a fait un don",
-  " with %{name}": " avec %{name}",
+  "has tipped": "has tipped",
+  "has tipped with %{itemName}": "has tipped with %{itemName}",
+  "has tipped %{months} months in a row": "has tipped %{months} months in a row",
+  "has set up a monthly tip": "has set up a monthly tip",
   "has followed": "a suivi",
   "has resubscribed (%{tier}) for %{streak} months in a row! (%{months} total)": "s'est réabonné à (%{tier}) pendant %{streak} mois de suite! (%{months} au total)",
   "has gifted a sub (%{tier}) to": "a offert un abonnement (%{tier}) à",
