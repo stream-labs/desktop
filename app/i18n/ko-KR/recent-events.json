@@ -1,7 +1,9 @@
 {
   "Mini Feed": "미니 피드",
-  "has donated": "님의 후원",
-  " with %{name}": "%{name}",
+  "has tipped": "has tipped",
+  "has tipped with %{itemName}": "has tipped with %{itemName}",
+  "has tipped %{months} months in a row": "has tipped %{months} months in a row",
+  "has set up a monthly tip": "has set up a monthly tip",
   "has followed": "님의 팔로우",
   "has resubscribed (%{tier}) for %{streak} months in a row! (%{months} total)": "님의 재구독(%{tier}), %{streak}개월 연속(총 %{months}개월)!",
   "has gifted a sub (%{tier}) to": "님의 구독 선물(%{tier}), 받는 사람:",
