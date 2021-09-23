@@ -27,10 +27,6 @@ interface ICaptureSourceApi {
   options: ICapturableOption[];
   captureCursor: boolean;
   setCaptureCursor: (val: boolean) => void;
-  customPlaceholder: boolean;
-  setCustomPlaceholder: (val: boolean) => void;
-  customPlaceholderPath: string;
-  setCustomPlaceholderPath: (val: string) => void;
 }
 
 /**
@@ -46,8 +42,6 @@ function useCaptureSource(sourceId: string): ICaptureSourceApi {
   const [options, setOptions] = useState<ICapturableOption[]>([]);
   const [selectedOption, setSelectedOption] = useState<string>(settings['capture_source_list']);
   const [captureCursor, setCaptureCursor] = useState(settings['capture_cursor']);
-  const [customPlaceholder, setCustomPlaceholder] = useState(settings['todo']);
-  const [customPlaceholderPath, setCustomPlaceholderPath] = useState(settings['todo']);
 
   function buildSetter<TVal>(
     source: Source,
@@ -114,10 +108,6 @@ function useCaptureSource(sourceId: string): ICaptureSourceApi {
     options,
     captureCursor,
     setCaptureCursor: buildSetter(source, 'capture_cursor', setCaptureCursor),
-    customPlaceholder,
-    setCustomPlaceholder: buildSetter(source, 'todo', setCustomPlaceholder),
-    customPlaceholderPath,
-    setCustomPlaceholderPath: buildSetter(source, 'todo', setCustomPlaceholderPath),
   };
 }
 
@@ -216,13 +206,6 @@ export default function ScreenCaptureProperties() {
             value={sourceApi.captureCursor}
             onChange={sourceApi.setCaptureCursor}
           />
-          {sourceApi.selectedOption === 'game:1' && (
-            <CheckboxInput
-              label={$t('Custom Placeholder')}
-              value={sourceApi.customPlaceholder}
-              onChange={sourceApi.setCustomPlaceholder}
-            />
-          )}
         </Form>
       </Modal>
     </ModalLayout>
