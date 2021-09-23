@@ -81,20 +81,14 @@ function PanelHeader(p: { source: AudioSource }) {
     };
   }
 
-  function onInputHandler(name: string) {
-    return (value: TObsValue) => {
-      if (name === 'deflection') {
-        EditorCommandsService.executeCommand(
-          'SetDeflectionCommand',
-          sourceId,
-          (value as number) / 100,
-        );
-      } else {
-        EditorCommandsService.executeCommand('SetAudioSettingsCommand', sourceId, {
-          [name]: value,
-        });
-      }
-    };
+  function onDeflectionInput(value: number) {
+    EditorCommandsService.executeCommand('SetDeflectionCommand', sourceId, (value as number) / 100);
+  }
+
+  function onInputHandler(name: string, value: TObsValue) {
+    EditorCommandsService.executeCommand('SetAudioSettingsCommand', sourceId, {
+      [name]: value,
+    });
   }
 
   return (
@@ -102,7 +96,7 @@ function PanelHeader(p: { source: AudioSource }) {
       <div className={styles.audioSourceName}>{name}</div>
       <i
         className={muted ? 'icon-mute' : 'icon-audio'}
-        onClick={() => onInputHandler('muted')(!muted)}
+        onClick={() => onInputHandler('muted', !muted)}
       />
       <SliderInput
         style={{ width: '200px', marginBottom: 0 }}
@@ -111,11 +105,11 @@ function PanelHeader(p: { source: AudioSource }) {
         slimNumberInput
         max={100}
         min={0}
-        onInput={onInputHandler('deflection')}
+        onInput={onDeflectionInput}
       />
       <i
         className={mixerHidden ? 'icon-hide' : 'icon-view'}
-        onClick={() => onInputHandler('mixerHidden')(!mixerHidden)}
+        onClick={() => onInputHandler('mixerHidden', !mixerHidden)}
       />
       {isAdvancedOutput && (
         <div className={styles.audioSettingsTracks}>
