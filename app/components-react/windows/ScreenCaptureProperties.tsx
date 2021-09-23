@@ -6,6 +6,9 @@ import { ModalLayout } from 'components-react/shared/ModalLayout';
 import Display from 'components-react/shared/Display';
 import cx from 'classnames';
 import { $t } from 'services/i18n';
+import { Modal, Button, Form, Tooltip } from 'antd';
+import { CheckboxInput } from 'components-react/shared/inputs';
+import { Source } from 'services/sources';
 
 interface ICapturableOption {
   description: string;
@@ -16,18 +19,48 @@ interface ICapturableOption {
 }
 
 /**
+ * API for the useCaptureSource hook
+ */
+interface ICaptureSourceApi {
+  selectedOption: string;
+  setSelectedOption: (val: string) => void;
+  options: ICapturableOption[];
+  captureCursor: boolean;
+  setCaptureCursor: (val: boolean) => void;
+  customPlaceholder: boolean;
+  setCustomPlaceholder: (val: boolean) => void;
+  customPlaceholderPath: string;
+  setCustomPlaceholderPath: (val: string) => void;
+}
+
+/**
  * Used for interacting with a capture source
  * @param sourceId The id of the source to manager
  * @example
  * const [captureOption, setCaptureOption, allCaptureOptions] = useCaptureSource(sourceId);
  */
-function useCaptureSource(
-  sourceId: string,
-): [string, (opt: ICapturableOption) => void, ICapturableOption[]] {
-  const { SourcesService } = Services;
-  const source = SourcesService.views.getSource(sourceId);
+function useCaptureSource(sourceId: string): ICaptureSourceApi {
+  const { SourcesService, EditorCommandsService } = Services;
+  const source = SourcesService.views.getSource(sourceId)!;
+  const settings = source.getSettings();
   const [options, setOptions] = useState<ICapturableOption[]>([]);
-  const [selected, setSelected] = useState<string>(source?.getSettings()['capture_source_list']);
+  const [selectedOption, setSelectedOption] = useState<string>(settings['capture_source_list']);
+  const [captureCursor, setCaptureCursor] = useState(settings['capture_cursor']);
+  const [customPlaceholder, setCustomPlaceholder] = useState(settings['todo']);
+  const [customPlaceholderPath, setCustomPlaceholderPath] = useState(settings['todo']);
+
+  function buildSetter<TVal>(
+    source: Source,
+    field: string,
+    stateSetter: (val: TVal) => void,
+  ): (val: TVal) => void {
+    return (val: TVal) => {
+      stateSetter(val);
+      EditorCommandsService.actions.executeCommand('EditSourceSettingsCommand', source.sourceId, {
+        [field]: val,
+      });
+    };
+  }
 
   useEffect(() => {
     (async () => {
@@ -63,63 +96,135 @@ function useCaptureSource(
         return opt;
       });
 
-      setOptions([...screenOptions, ...windowOptions]);
+      const gameOptions: ICapturableOption[] = [
+        {
+          description: $t('Automatic'),
+          value: 'game:1',
+          type: 'game',
+        },
+      ];
+
+      setOptions([...gameOptions, ...screenOptions, ...windowOptions]);
     })();
   }, []);
 
-  return [
-    selected,
-    (opt: ICapturableOption) => {
-      // TODO: This is sync?
-      source?.updateSettings({ capture_source_list: opt.value });
-      setSelected(opt.value);
-    },
+  return {
+    selectedOption,
+    setSelectedOption: buildSetter(source, 'capture_source_list', setSelectedOption),
     options,
-  ];
+    captureCursor,
+    setCaptureCursor: buildSetter(source, 'capture_cursor', setCaptureCursor),
+    customPlaceholder,
+    setCustomPlaceholder: buildSetter(source, 'todo', setCustomPlaceholder),
+    customPlaceholderPath,
+    setCustomPlaceholderPath: buildSetter(source, 'todo', setCustomPlaceholderPath),
+  };
 }
 
 export default function ScreenCaptureProperties() {
   const { WindowsService } = Services;
   const sourceId = useMemo(() => WindowsService.getChildWindowQueryParams().sourceId, []);
-  const [captureOption, setCaptureOption, allCaptureOptions] = useCaptureSource(sourceId);
+  const sourceApi = useCaptureSource(sourceId);
+  const [modal, setModal] = useState(false);
+
+  function renderThumbnail(opt: ICapturableOption) {
+    if (opt.thumbnail) return <img src={opt.thumbnail} />;
+    if (opt.type === 'game') {
+      return <i className={cx('fas fa-gamepad', styles.captureItemThumbnailIcon)} />;
+    }
+
+    return <i className={cx('fas fa-desktop', styles.captureItemThumbnailIcon)} />;
+  }
 
   function renderCaptureOption(opt: ICapturableOption) {
     return (
       <div
         className={cx(styles.captureItem, {
-          [styles.captureItemSelected]: captureOption === opt.value,
+          [styles.captureItemSelected]: sourceApi.selectedOption === opt.value,
         })}
         key={opt.value}
-        onClick={() => setCaptureOption(opt)}
+        onClick={() => sourceApi.setSelectedOption(opt.value)}
       >
-        <img src={opt.thumbnail} />
+        {renderThumbnail(opt)}
         <div className={styles.captureItemThumbnailOverlay} />
         <div className={styles.captureItemText}>
           {opt.type === 'screen' && <i className="fas fa-desktop" style={{ marginRight: 8 }} />}
+          {opt.type === 'game' && <i className="fas fa-gamepad" style={{ marginRight: 8 }} />}
           {opt.type === 'window' && <img src={opt.icon} />}
-          {opt.description}
+          <span className={styles.captureItemDescription}>{opt.description}</span>
+          {opt.value === 'game:1' && (
+            <Tooltip
+              title={$t(
+                'Automatic game capture will scan for running games and automatically capture them.',
+              )}
+            >
+              <i className="fas fa-question-circle" style={{ marginLeft: 8 }} />
+            </Tooltip>
+          )}
         </div>
       </div>
+    );
+  }
+
+  function renderFooter() {
+    return (
+      <>
+        <span className={styles.additionalSettings} onClick={() => setModal(true)}>
+          {$t('Show Additional Settings')}
+        </span>
+        <Button type="primary" onClick={() => WindowsService.actions.closeChildWindow()}>
+          {$t('Done')}
+        </Button>
+      </>
     );
   }
 
   return (
     <ModalLayout
       scrollable
-      fixedChild={<Display sourceId={sourceId} />}
-      onOk={() => WindowsService.closeChildWindow()}
+      fixedChild={modal ? <div /> : <Display sourceId={sourceId} />}
+      footer={renderFooter()}
     >
       <div>
-        <h2>{$t('Capture Game')}</h2>
-        <h2>{$t('Capture Entire Screen')}</h2>
-        <div className={styles.captureList}>
-          {allCaptureOptions.filter(opt => opt.type === 'screen').map(renderCaptureOption)}
-        </div>
-        <h2>{$t('Capture Window')}</h2>
-        <div className={styles.captureList}>
-          {allCaptureOptions.filter(opt => opt.type === 'window').map(renderCaptureOption)}
-        </div>
+        {sourceApi.options.length === 0 && (
+          <div className={styles.captureListLoading}>
+            <i className="fa fa-spinner fa-pulse" />
+          </div>
+        )}
+        {sourceApi.options.length > 0 && (
+          <>
+            <h2>{$t('Capture Game')}</h2>
+            <div className={styles.captureList}>
+              {sourceApi.options.filter(opt => opt.type === 'game').map(renderCaptureOption)}
+            </div>
+            <h2>{$t('Capture Entire Screen')}</h2>
+            <div className={styles.captureList}>
+              {sourceApi.options.filter(opt => opt.type === 'screen').map(renderCaptureOption)}
+            </div>
+            <h2>{$t('Capture Window')}</h2>
+            <div className={styles.captureList}>
+              {sourceApi.options.filter(opt => opt.type === 'window').map(renderCaptureOption)}
+            </div>
+          </>
+        )}
       </div>
+      <Modal footer={null} visible={modal} onCancel={() => setModal(false)} getContainer={false}>
+        <h2>Additional Settings</h2>
+        <Form>
+          <CheckboxInput
+            label={$t('Capture Cursor')}
+            value={sourceApi.captureCursor}
+            onChange={sourceApi.setCaptureCursor}
+          />
+          {sourceApi.selectedOption === 'game:1' && (
+            <CheckboxInput
+              label={$t('Custom Placeholder')}
+              value={sourceApi.customPlaceholder}
+              onChange={sourceApi.setCustomPlaceholder}
+            />
+          )}
+        </Form>
+      </Modal>
     </ModalLayout>
   );
 }

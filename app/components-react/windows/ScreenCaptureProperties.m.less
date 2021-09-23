@@ -1,6 +1,7 @@
 .capture-list {
   display: flex;
   flex-wrap: wrap;
+  margin-bottom: 8px;
 }
 
 .capture-item {
@@ -15,6 +16,14 @@
     width: 150px;
     height: 100px;
     object-fit: contain;
+  }
+
+  .capture-item-thumbnail-icon {
+    width: 150px;
+    height: 100px;
+    font-size: 75px;
+    text-align: center;
+    padding-top: 14px;
   }
 
   .capture-item-thumbnail-overlay {
@@ -47,6 +56,8 @@
   background: var(--section-alt);
   border-bottom-left-radius: 8px;
   border-bottom-right-radius: 8px;
+  display: flex;
+  align-items: center;
 
   img {
     width: 20px;
@@ -54,3 +65,24 @@
     margin-right: 4px;
   }
 }
+
+.capture-list-loading {
+  text-align: center;
+  margin-top: 200px;
+  font-size: 24px;
+}
+
+.capture-item-description {
+  flex-grow: 1;
+}
+
+.additional-settings {
+  margin-right: 16px;
+  cursor: pointer;
+
+  &:hover {
+    color: var(--title);
+  }
+}
+
+
