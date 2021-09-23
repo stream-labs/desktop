@@ -106,8 +106,11 @@ function PanelHeader(p: { source: AudioSource }) {
       />
       <SliderInput
         style={{ width: '200px', marginBottom: 0 }}
-        value={fader.deflection * 100}
+        value={Math.floor(fader.deflection * 100)}
         hasNumberInput
+        slimNumberInput
+        max={100}
+        min={0}
         onInput={onInputHandler('deflection')}
       />
       <i
@@ -121,6 +124,7 @@ function PanelHeader(p: { source: AudioSource }) {
             label={String(streamTrack + 1)}
             value={!!trackFlags[streamTrack]}
             onChange={onTrackInput(streamTrack)}
+            checkboxStyles={{ marginRight: '8px' }}
           />
           <div className={styles.trackLabel}>{$t('Rec. Tracks')}</div>
           {recordingTracks?.map(track => (
@@ -129,6 +133,7 @@ function PanelHeader(p: { source: AudioSource }) {
               key={track}
               value={!!trackFlags[track]}
               onChange={onTrackInput(track)}
+              checkboxStyles={{ marginRight: '4px' }}
             />
           ))}
         </div>
