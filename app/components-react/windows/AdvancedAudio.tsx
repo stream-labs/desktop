@@ -10,10 +10,11 @@ import {
 import Form from 'components-react/shared/inputs/Form';
 import { TObsValue } from 'components/obs/inputs/ObsInput';
 import { Services } from 'components-react/service-provider';
+import { useVuex } from 'components-react/hooks';
 import { AudioSource } from 'services/audio';
 import { $t } from 'services/i18n';
+import Utils from 'services/utils';
 import styles from './AdvancedAudio.m.less';
-import { useVuex } from 'components-react/hooks';
 
 const { Panel } = Collapse;
 
@@ -66,6 +67,20 @@ function PanelHeader(p: { source: AudioSource }) {
     recordingTracks: SettingsService.views.recordingTracks,
   }));
 
+  const trackValue = p.source.getSettingsForm()[5].value as number;
+  const [trackFlags, setTrackFlags] = useState(Utils.numberToBinnaryArray(trackValue, 6));
+
+  function onTrackInput(index: number | undefined) {
+    return (value: boolean) => {
+      const bitwise = value ? 1 : 0;
+      setTrackFlags(trackFlags.map((el, i) => (i === index ? bitwise : el)));
+      const newValue = Utils.binnaryArrayToNumber(trackFlags.reverse());
+      EditorCommandsService.executeCommand('SetAudioSettingsCommand', sourceId, {
+        audioMixers: newValue,
+      });
+    };
+  }
+
   function onInputHandler(name: string) {
     return (value: TObsValue) => {
       if (name === 'deflection') {
@@ -102,10 +117,19 @@ function PanelHeader(p: { source: AudioSource }) {
       {isAdvancedOutput && (
         <div className={styles.audioSettingsTracks}>
           <div className={styles.trackLabel}>{$t('Stream Track')}</div>
-          <BoolButtonInput label={streamTrack} />
+          <BoolButtonInput
+            label={String(streamTrack + 1)}
+            value={!!trackFlags[streamTrack]}
+            onChange={onTrackInput(streamTrack)}
+          />
           <div className={styles.trackLabel}>{$t('Rec. Tracks')}</div>
           {recordingTracks?.map(track => (
-            <BoolButtonInput label={track} key={track} />
+            <BoolButtonInput
+              label={String(track + 1)}
+              key={track}
+              value={!!trackFlags[track]}
+              onChange={onTrackInput(track)}
+            />
           ))}
         </div>
       )}

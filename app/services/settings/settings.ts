@@ -107,18 +107,18 @@ class SettingsViews extends ViewHandler<ISettingsServiceState> {
   }
 
   get streamTrack() {
-    if (!this.isAdvancedOutput) return;
-    return this.state.Output.formData[1].parameters[0].value as string;
+    if (!this.isAdvancedOutput) return 0;
+    return Number(this.state.Output.formData[1].parameters[0].value) - 1;
   }
 
   get recordingTracks() {
     if (!this.isAdvancedOutput) return;
     const input = this.state.Output.formData[2].parameters[4] as IObsBitmaskInput;
     const bitArray = Utils.numberToBinnaryArray(input.value, input.size).reverse();
-    const trackLabels: string[] = [];
+    const trackLabels: number[] = [];
     bitArray.forEach((bit, i) => {
       if (bit === 1) {
-        trackLabels.push(String(i + 1));
+        trackLabels.push(i);
       }
     });
     return trackLabels;
