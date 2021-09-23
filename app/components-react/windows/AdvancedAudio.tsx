@@ -8,7 +8,7 @@ import {
   SwitchInput,
 } from 'components-react/shared/inputs';
 import Form from 'components-react/shared/inputs/Form';
-import { TObsValue } from 'components/obs/inputs/ObsInput';
+import { TObsValue, IObsListInput, TObsFormData } from 'components/obs/inputs/ObsInput';
 import { Services } from 'components-react/service-provider';
 import { useVuex } from 'components-react/hooks';
 import { AudioSource } from 'services/audio';
@@ -19,7 +19,7 @@ import styles from './AdvancedAudio.m.less';
 const { Panel } = Collapse;
 
 export default function AdvancedAudio() {
-  const { AudioService, EditorCommandsService, WindowsService } = Services;
+  const { AudioService, WindowsService } = Services;
   const initialSource = WindowsService.getChildWindowQueryParams().sourceId || '';
 
   const [expandedSource, setExpandedSource] = useState(initialSource);
@@ -27,12 +27,6 @@ export default function AdvancedAudio() {
   const { audioSources } = useVuex(() => ({
     audioSources: AudioService.views.sourcesForCurrentScene,
   }));
-
-  function onInputHandler(sourceId: string, name: string, value: TObsValue) {
-    EditorCommandsService.executeCommand('SetAudioSettingsCommand', sourceId, {
-      [name]: value,
-    });
-  }
 
   return (
     <ModalLayout hideFooter>
@@ -44,13 +38,7 @@ export default function AdvancedAudio() {
       >
         {audioSources.map(audioSource => (
           <Panel key={audioSource.sourceId} header={<PanelHeader source={audioSource} />}>
-            <Form>
-              <ListInput label={$t('Device')} options={[]} />
-              <SwitchInput label={$t('Use Device Timestamps')} />
-              <SliderInput label={$t('Sync Offset')} hasNumberInput />
-              <SwitchInput label={$t('Downmix to Mono')} />
-              <ListInput label={$t('Monitoring')} options={[]} />
-            </Form>
+            <PanelForm source={audioSource} />
           </Panel>
         ))}
       </Collapse>
@@ -133,5 +121,54 @@ function PanelHeader(p: { source: AudioSource }) {
         </div>
       )}
     </div>
+  );
+}
+
+function PanelForm(p: { source: AudioSource }) {
+  const { sourceId, forceMono, syncOffset } = p.source;
+  const sourceProperties = p.source.source?.getPropertiesFormData();
+
+  const hasDevices = !p.source.source?.video;
+
+  const { EditorCommandsService } = Services;
+
+  function onSettingsHandler(name: string, value: TObsValue) {
+    EditorCommandsService.executeCommand('SetAudioSettingsCommand', sourceId, {
+      [name]: value,
+    });
+  }
+
+  return (
+    <Form>
+      {hasDevices && sourceProperties && <DeviceInputs sourceProperties={sourceProperties} />}
+      <SliderInput
+        label={$t('Sync Offset')}
+        hasNumberInput
+        value={syncOffset}
+        onInput={value => onSettingsHandler('syncOffset', value)}
+      />
+      <SwitchInput
+        label={$t('Downmix to Mono')}
+        value={forceMono}
+        onInput={value => onSettingsHandler('forceMono', value)}
+      />
+      <ListInput label={$t('Monitoring')} options={[]} />
+    </Form>
+  );
+}
+
+function DeviceInputs(p: { sourceProperties: TObsFormData }) {
+  const deviceInput = p.sourceProperties[0] as IObsListInput<TObsValue>;
+  const timestampsInput = p.sourceProperties[1];
+  const deviceOptions = deviceInput.options.map(option => ({
+    label: option.description,
+    value: option.value,
+  }));
+
+  return (
+    <>
+      <ListInput label={$t('Device')} options={deviceOptions} value={deviceInput.value} />
+      <SwitchInput label={$t('Use Device Timestamps')} value={timestampsInput.value as boolean} />
+    </>
   );
 }
