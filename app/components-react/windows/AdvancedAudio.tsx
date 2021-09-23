@@ -66,8 +66,6 @@ function PanelHeader(p: { source: AudioSource }) {
     recordingTracks: SettingsService.views.recordingTracks,
   }));
 
-  console.log(streamTrack);
-
   function onInputHandler(name: string) {
     return (value: TObsValue) => {
       if (name === 'deflection') {
