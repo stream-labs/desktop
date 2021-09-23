@@ -27,7 +27,7 @@ import {
   RenameSource,
   AdvancedStatistics,
   SafeMode,
-} from 'components/shared/ReactComponent';
+} from 'components/shared/ReactComponentList';
 
 import SourceProperties from 'components/windows/SourceProperties.vue';
 import SourceFilters from 'components/windows/SourceFilters.vue';

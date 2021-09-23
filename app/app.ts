@@ -32,7 +32,7 @@ import util from 'util';
 import uuid from 'uuid/v4';
 import Blank from 'components/windows/Blank.vue';
 import Main from 'components/windows/Main.vue';
-import { Loader } from 'components/shared/ReactComponent';
+import { Loader } from 'components/shared/ReactComponentList';
 import process from 'process';
 import { MetricsService } from 'services/metrics';
 import { UsageStatisticsService } from 'services/usage-statistics';

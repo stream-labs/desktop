@@ -4,7 +4,7 @@
   "description": "Streamlabs streaming software",
   "author": "General Workings, Inc.",
   "license": "GPL-3.0",
-  "version": "1.5.0-preview.5",
+  "version": "1.5.0-preview.8",
   "main": "main.js",
   "scripts": {
     "compile": "yarn clear && yarn compile:updater && yarn webpack-cli --progress --config ./webpack.dev.config.js",
@@ -142,7 +142,7 @@
     "css-element-queries": "1.2.3",
     "css-loader": "2.1.1",
     "dotenv": "8.2.0",
-    "electron": "13.3.0",
+    "electron": "13.4.0",
     "electron-builder": "22.7.0",
     "electron-devtools-installer": "3.1.1",
     "electron-notarize": "^1.0.0",

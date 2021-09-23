@@ -681,6 +681,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     if (!validateLoginResult) {
       this.logOut();
       electron.remote.dialog.showMessageBox({
+        title: 'Streamlabs OBS',
         message: $t('You have been logged out'),
       });
       return;
