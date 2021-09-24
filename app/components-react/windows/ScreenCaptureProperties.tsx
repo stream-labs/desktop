@@ -38,7 +38,7 @@ interface ICaptureSourceApi {
 function useCaptureSource(sourceId: string): ICaptureSourceApi {
   const { SourcesService, EditorCommandsService } = Services;
   const source = SourcesService.views.getSource(sourceId)!;
-  const settings = source.getSettings();
+  const settings = useMemo(() => source.getSettings(), []);
   const [options, setOptions] = useState<ICapturableOption[]>([]);
   const [selectedOption, setSelectedOption] = useState<string>(settings['capture_source_list']);
   const [captureCursor, setCaptureCursor] = useState(settings['capture_cursor']);
