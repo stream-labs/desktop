@@ -21,6 +21,7 @@ import {
   GoLiveWindow,
   EditStreamWindow,
   IconLibraryProperties,
+  ScreenCaptureProperties,
   SharedComponentsLibrary,
   PerformanceMetrics,
   RenameSource,
@@ -141,6 +142,7 @@ export function getComponents() {
     GoLiveWindow,
     EditStreamWindow,
     IconLibraryProperties,
+    ScreenCaptureProperties,
     SharedComponentsLibrary,
   };
 }
