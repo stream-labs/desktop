@@ -312,7 +312,7 @@ export class SourcesService extends StatefulService<ISourcesState> {
     } else if (type === 'openvr_capture') {
       this.usageStatisticsService.recordFeatureUsage('OpenVR');
     } else if (type === 'screen_capture') {
-      this.usageStatisticsService.recordFeatureUsage('SlobsCapture');
+      this.usageStatisticsService.recordFeatureUsage('SimpleCapture');
     } else if (type === 'vlc_source') {
       this.usageStatisticsService.recordFeatureUsage('VLC');
     } else if (type === 'soundtrack_source') {
