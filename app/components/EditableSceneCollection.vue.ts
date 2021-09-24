@@ -4,8 +4,8 @@ import { SceneCollectionsService } from 'services/scene-collections';
 import { Inject } from 'services/core/injector';
 import moment from 'moment';
 import { $t } from 'services/i18n';
-import electron from 'electron';
 import { getOS } from 'util/operating-systems';
+import remote from '@electron/remote';
 
 @Component({})
 export default class EditableSceneCollection extends Vue {
@@ -93,8 +93,8 @@ export default class EditableSceneCollection extends Vue {
   }
 
   remove() {
-    electron.remote.dialog
-      .showMessageBox(electron.remote.getCurrentWindow(), {
+    remote.dialog
+      .showMessageBox(remote.getCurrentWindow(), {
         title: 'Streamlabs OBS',
         type: 'warning',
         message: $t('Are you sure you want to remove %{collectionName}?', {

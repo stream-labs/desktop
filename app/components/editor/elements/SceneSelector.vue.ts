@@ -12,13 +12,13 @@ import Fuse from 'fuse.js';
 import { SourceFiltersService } from 'services/source-filters';
 import { ProjectorService } from 'services/projector';
 import { $t } from 'services/i18n';
-import electron from 'electron';
 import { EditorCommandsService } from 'services/editor-commands';
 import SlVueTree, { ISlTreeNode } from 'sl-vue-tree';
 import { ERenderingMode } from '../../../../obs-api';
 import TsxComponent from 'components/tsx-component';
 import { getOS } from 'util/operating-systems';
 import Scrollable from 'components/shared/Scrollable';
+import remote from '@electron/remote';
 
 @Component({
   components: { DropdownMenu, HelpTip, SlVueTree, Scrollable },
@@ -96,8 +96,8 @@ export default class SceneSelector extends TsxComponent {
 
   removeScene() {
     const name = this.scenesService.views.activeScene.name;
-    electron.remote.dialog
-      .showMessageBox(electron.remote.getCurrentWindow(), {
+    remote.dialog
+      .showMessageBox(remote.getCurrentWindow(), {
         title: 'Streamlabs OBS',
         type: 'warning',
         message: $t('Are you sure you want to remove %{sceneName}?', { sceneName: name }),
@@ -106,7 +106,7 @@ export default class SceneSelector extends TsxComponent {
       .then(({ response }) => {
         if (!response) return;
         if (!this.scenesService.canRemoveScene()) {
-          electron.remote.dialog.showMessageBox({
+          remote.dialog.showMessageBox({
             title: 'Streamlabs OBS',
             message: $t('There needs to be at least one scene.'),
           });

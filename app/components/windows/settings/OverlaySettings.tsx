@@ -4,13 +4,13 @@ import { Inject } from 'services/core/injector';
 import { SceneCollectionsService } from 'services/scene-collections/index';
 import { OverlaysPersistenceService } from 'services/scene-collections/overlays';
 import { CustomizationService } from 'services/customization';
-import electron from 'electron';
 import path from 'path';
 import { AppService } from 'services/app/index';
 import { WidgetsService } from 'services/widgets/index';
 import { ScenesService } from 'services/scenes/index';
 import { $t } from 'services/i18n/index';
 import { BoolInput } from 'components/shared/inputs/inputs';
+import remote from '@electron/remote';
 
 @Component({ components: { BoolInput } })
 export default class OverlaySettings extends Vue {
@@ -41,7 +41,7 @@ export default class OverlaySettings extends Vue {
   }
 
   async saveOverlay() {
-    const { filePath } = await electron.remote.dialog.showSaveDialog({
+    const { filePath } = await remote.dialog.showSaveDialog({
       filters: [{ name: 'Overlay File', extensions: ['overlay'] }],
     });
 
@@ -61,7 +61,7 @@ export default class OverlaySettings extends Vue {
 
   async loadOverlay() {
     const chosenPath = (
-      await electron.remote.dialog.showOpenDialog({
+      await remote.dialog.showOpenDialog({
         filters: [{ name: 'Overlay File', extensions: ['overlay'] }],
       })
     ).filePaths;
@@ -82,7 +82,7 @@ export default class OverlaySettings extends Vue {
 
   async loadWidget() {
     const chosenPath = (
-      await electron.remote.dialog.showOpenDialog({
+      await remote.dialog.showOpenDialog({
         filters: [{ name: 'Widget File', extensions: ['widget'] }],
       })
     ).filePaths;

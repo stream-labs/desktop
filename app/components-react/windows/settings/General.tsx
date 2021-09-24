@@ -3,7 +3,6 @@ import { ObsGenericSettingsForm, ObsSettingsSection } from './ObsSettings';
 import { $t, I18nService } from '../../../services/i18n';
 import { alertAsync, confirmAsync } from '../../modals';
 import { CheckboxInput, ListInput } from '../../shared/inputs';
-import electron from 'electron';
 import { Services } from '../../service-provider';
 import fs from 'fs';
 import rimraf from 'rimraf';
@@ -11,6 +10,7 @@ import path from 'path';
 import { useOnCreate } from '../../hooks';
 import { useBinding } from '../../store';
 import { getDefined } from '../../../util/properties-type-guards';
+import remote from '@electron/remote';
 
 export function GeneralSettings() {
   return (
@@ -34,7 +34,7 @@ function CacheSettings() {
   const [enableCU, setEnableCU] = useState(() => fs.existsSync(enableCUFilePath));
 
   async function showCacheDir() {
-    await electron.remote.shell.openPath(AppService.appDataDirectory);
+    await remote.shell.openPath(AppService.appDataDirectory);
   }
 
   async function deleteCacheDir() {
@@ -45,8 +45,8 @@ function CacheSettings() {
         ),
       )
     ) {
-      electron.remote.app.relaunch({ args: ['--clearCacheDir'] });
-      electron.remote.app.quit();
+      remote.app.relaunch({ args: ['--clearCacheDir'] });
+      remote.app.quit();
     }
   }
 
@@ -54,7 +54,7 @@ function CacheSettings() {
     if (cacheUploading) return;
     setCacheUploading(true);
     CacheUploaderService.uploadCache().then(file => {
-      electron.remote.clipboard.writeText(file);
+      remote.clipboard.writeText(file);
       alert(
         $t(
           'Your cache directory has been successfully uploaded.  ' +

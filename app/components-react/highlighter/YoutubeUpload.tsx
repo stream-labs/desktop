@@ -9,6 +9,7 @@ import { RadioInput } from 'components-react/shared/inputs/RadioInput';
 import { TPrivacyStatus } from 'services/platforms/youtube/uploader';
 import electron from 'electron';
 import { $t } from 'services/i18n';
+import remote from '@electron/remote';
 
 // Source: https://stackoverflow.com/questions/10420352/converting-file-size-in-bytes-to-human-readable-string/10420404
 function humanFileSize(bytes: number, si: boolean) {
@@ -134,7 +135,7 @@ export default function YoutubeUpload(props: { defaultTitle: string; close: () =
               <br />
               <a
                 onClick={() => {
-                  electron.remote.shell.showItemInFolder(v.exportInfo.file);
+                  remote.shell.showItemInFolder(v.exportInfo.file);
                 }}
               >
                 {$t('Open file location')}
@@ -218,7 +219,7 @@ export default function YoutubeUpload(props: { defaultTitle: string; close: () =
           )}
         </p>
         <br />
-        <a onClick={() => electron.remote.shell.openExternal(url)}>{url}</a>
+        <a onClick={() => remote.shell.openExternal(url)}>{url}</a>
         <Tooltip placement="right" title={urlCopied ? 'Copied!' : 'Copy URL'}>
           <i
             className="icon-copy link"

@@ -13,10 +13,10 @@ import BroadcastInput from './BroadcastInput';
 import { useAsyncState } from '../../../hooks';
 import InputWrapper from '../../../shared/inputs/InputWrapper';
 import Form from '../../../shared/inputs/Form';
-import electron from 'electron';
 import { IYoutubeStartStreamOptions } from '../../../../services/platforms/youtube';
 import PlatformSettingsLayout, { IPlatformComponentParams } from './PlatformSettingsLayout';
 import { assertIsDefined } from '../../../../util/properties-type-guards';
+import remote from '@electron/remote';
 
 /***
  * Stream Settings for YT
@@ -71,7 +71,7 @@ export const YoutubeEditStreamInfo = InputComponent((p: IPlatformComponentParams
   }, [broadcastId]);
 
   function openThumbnailsEditor() {
-    electron.remote.shell.openExternal(
+    remote.shell.openExternal(
       'https://streamlabs.com/dashboard#/prime/thumbnails?refl=slobs-thumbnail-editor',
     );
   }

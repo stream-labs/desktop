@@ -3,13 +3,13 @@ import { Component, Prop } from 'vue-property-decorator';
 import { UserService } from 'services/user';
 import { Inject } from 'services/core/injector';
 import { I18nService } from 'services/i18n';
-import electron from 'electron';
 import { PlatformAppsService } from 'services/platform-apps';
 import { PlatformAppStoreService } from 'services/platform-app-store';
 import { NavigationService } from 'services/navigation';
 import Utils from 'services/utils';
 import BrowserView from 'components/shared/BrowserView';
 import { GuestApiHandler } from 'util/guest-api-handler';
+import remote from '@electron/remote';
 
 @Component({
   components: { BrowserView },
@@ -45,7 +45,7 @@ export default class PlatformAppStore extends Vue {
   }
 
   async openLinkInBrowser(url: string) {
-    electron.remote.shell.openExternal(url);
+    remote.shell.openExternal(url);
   }
 
   async reloadProductionApps() {

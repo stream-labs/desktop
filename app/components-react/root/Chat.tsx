@@ -1,4 +1,4 @@
-import { remote } from 'electron';
+import remote from '@electron/remote';
 import React, { useEffect, useRef } from 'react';
 import { Services } from '../service-provider';
 import styles from './Chat.m.less';

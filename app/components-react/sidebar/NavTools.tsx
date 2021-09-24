@@ -7,6 +7,7 @@ import styles from '../../components/SideNav.m.less';
 import throttle from 'lodash/throttle';
 import { Services } from '../service-provider';
 import { useVuex } from '../hooks';
+import remote from '@electron/remote';
 
 export default function SideNav() {
   const {
@@ -61,7 +62,7 @@ export default function SideNav() {
 
     try {
       const link = await MagicLinkService.getDashboardMagicLink(page);
-      electron.remote.shell.openExternal(link);
+      remote.shell.openExternal(link);
     } catch (e: unknown) {
       console.error('Error generating dashboard magic link', e);
     }
@@ -73,7 +74,7 @@ export default function SideNav() {
 
   function openHelp() {
     UsageStatisticsService.actions.recordClick('NavTools', 'help');
-    electron.remote.shell.openExternal('https://howto.streamlabs.com/');
+    remote.shell.openExternal('https://howto.streamlabs.com/');
   }
 
   async function upgradeToPrime() {
@@ -83,7 +84,7 @@ export default function SideNav() {
         'prime-marketing',
         'slobs-side-nav',
       );
-      electron.remote.shell.openExternal(link);
+      remote.shell.openExternal(link);
     } catch (e: unknown) {
       console.error('Error generating dashboard magic link', e);
     }

@@ -5,7 +5,7 @@
 // a typed interface around it.
 
 import { Service } from './core/service';
-import electron from 'electron';
+import remote from '@electron/remote';
 
 export type TKeyEventType = 'registerKeydown' | 'registerKeyup';
 
@@ -41,7 +41,7 @@ export class KeyListenerService extends Service {
   hookStarted = false;
 
   init() {
-    this.libuiohook = electron.remote.require('node-libuiohook');
+    this.libuiohook = remote.require('node-libuiohook');
   }
 
   unregisterAll(namespace = 'global') {

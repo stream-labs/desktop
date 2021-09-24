@@ -36,8 +36,9 @@ import { Loader } from 'components/shared/ReactComponentList';
 import process from 'process';
 import { MetricsService } from 'services/metrics';
 import { UsageStatisticsService } from 'services/usage-statistics';
+import remote from '@electron/remote';
 
-const { ipcRenderer, remote, app, contentTracing } = electron;
+const { ipcRenderer } = electron;
 const slobsVersion = Utils.env.SLOBS_VERSION;
 const isProduction = Utils.env.NODE_ENV === 'production';
 const isPreview = !!Utils.env.SLOBS_PREVIEW;
@@ -235,7 +236,7 @@ export const apiInitErrorResultToMessage = (resultCode: obs.EVideoCodes) => {
 };
 
 const showDialog = (message: string): void => {
-  electron.remote.dialog.showErrorBox('Initialization Error', message);
+  remote.dialog.showErrorBox('Initialization Error', message);
 };
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -272,10 +273,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     window['obs'] = obs;
 
     // Host a new OBS server instance
-    obs.IPC.host(electron.remote.process.env.IPC_UUID);
+    obs.IPC.host(remote.process.env.IPC_UUID);
     obs.NodeObs.SetWorkingDirectory(
       path.join(
-        electron.remote.app.getAppPath().replace('app.asar', 'app.asar.unpacked'),
+        remote.app.getAppPath().replace('app.asar', 'app.asar.unpacked'),
         'node_modules',
         'obs-studio-node',
       ),
@@ -287,7 +288,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const apiResult = obs.NodeObs.OBS_API_initAPI(
       'en-US',
       appService.appDataDirectory,
-      electron.remote.process.env.SLOBS_VERSION,
+      remote.process.env.SLOBS_VERSION,
     );
 
     if (apiResult !== obs.EVideoCodes.Success) {
@@ -337,7 +338,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   let mainWindowShowTime = 0;
   if (Utils.isMainWindow()) {
-    electron.remote.getCurrentWindow().show();
+    remote.getCurrentWindow().show();
     mainWindowShowTime = Date.now();
   }
 

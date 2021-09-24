@@ -7,7 +7,7 @@ import { WindowsService } from 'services/windows';
 import { Inject } from 'services/core/injector';
 import { UserService } from 'services/user';
 import { MagicLinkService } from 'services/magic-link';
-import electron from 'electron';
+import remote from '@electron/remote';
 
 @Component({})
 export default class WidgetProperties extends Vue {
@@ -54,7 +54,7 @@ export default class WidgetProperties extends Vue {
 
     try {
       const link = await this.magicLinkService.getDashboardMagicLink(subPage);
-      electron.remote.shell.openExternal(link);
+      remote.shell.openExternal(link);
     } catch (e: unknown) {
       console.error('Error generating dashboard magic link', e);
     }

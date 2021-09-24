@@ -11,6 +11,7 @@ import { Subscription } from 'rxjs';
 import { AppService } from 'services/app';
 import cloneDeep from 'lodash/cloneDeep';
 import { CustomizationService } from 'services/customization';
+import remote from '@electron/remote';
 
 class BrowserViewProps {
   src: string = '';
@@ -50,20 +51,20 @@ export default class BrowserView extends TsxComponent<BrowserViewProps> {
       options.webPreferences.enableRemoteModule = true;
       options.webPreferences.contextIsolation = true;
       options.webPreferences.preload = path.resolve(
-        electron.remote.app.getAppPath(),
+        remote.app.getAppPath(),
         'bundles',
         'guest-api',
       );
     }
 
-    this.browserView = new electron.remote.BrowserView(options);
+    this.browserView = new remote.BrowserView(options);
 
     this.$emit('ready', this.browserView);
 
     if (this.props.setLocale) I18nService.setBrowserViewLocale(this.browserView);
 
     this.browserView.webContents.on('did-finish-load', () => (this.loading = false));
-    electron.remote.getCurrentWindow().addBrowserView(this.browserView);
+    remote.getCurrentWindow().addBrowserView(this.browserView);
 
     await this.loadUrl();
 
@@ -78,7 +79,7 @@ export default class BrowserView extends TsxComponent<BrowserViewProps> {
 
   destroyBrowserView() {
     if (this.browserView) {
-      electron.remote.getCurrentWindow().removeBrowserView(this.browserView);
+      remote.getCurrentWindow().removeBrowserView(this.browserView);
       // See: https://github.com/electron/electron/issues/26929
       // @ts-ignore
       this.browserView.webContents.destroy();

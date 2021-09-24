@@ -3,7 +3,7 @@ import { Inject } from 'services/core';
 import { UserService } from 'services/user';
 import { authorizedHeaders, jfetch } from 'util/requests';
 import { HostsService } from './hosts';
-import electron from 'electron';
+import remote from '@electron/remote';
 
 interface ILoginTokenResponse {
   login_token: string;
@@ -39,7 +39,7 @@ export class MagicLinkService extends Service {
   async linkToPrime(refl: string) {
     try {
       const link = await this.getDashboardMagicLink('prime', refl);
-      electron.remote.shell.openExternal(link);
+      remote.shell.openExternal(link);
     } catch (e: unknown) {
       console.error('Error generating dashboard magic link', e);
     }
@@ -48,7 +48,7 @@ export class MagicLinkService extends Service {
   async openWidgetThemesMagicLink() {
     try {
       const link = await this.getDashboardMagicLink('widgetthemes');
-      electron.remote.shell.openExternal(link);
+      remote.shell.openExternal(link);
     } catch (e: unknown) {
       console.error('Error generating dashboard magic link', e);
     }

@@ -17,6 +17,7 @@ import { AppService } from 'services/app';
 import { RunInLoadingMode } from 'services/app/app-decorators';
 import defaultTo from 'lodash/defaultTo';
 import { $t } from 'services/i18n';
+import remote from '@electron/remote';
 
 interface Source {
   name?: string;
@@ -81,7 +82,7 @@ interface IOBSConfigJSON {
 
 class ObsImporterViews extends ViewHandler<{ progress: number; total: number }> {
   get OBSconfigFileDirectory() {
-    return path.join(electron.remote.app.getPath('appData'), 'obs-studio');
+    return path.join(remote.app.getPath('appData'), 'obs-studio');
   }
 
   get sceneCollectionsDirectory() {

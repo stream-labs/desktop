@@ -1,5 +1,5 @@
 import React from 'react';
-import { remote } from 'electron';
+import remote from '@electron/remote';
 import { Input, Button } from 'antd';
 import { InputProps } from 'antd/lib/input';
 import { InputComponent, useInput, TSlobsInputProps } from './inputs';
