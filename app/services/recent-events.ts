@@ -58,6 +58,7 @@ export interface IRecentEvent {
   sender_name?: string;
   skill_currency?: string;
   skill_name?: string;
+  recurring_donation?: { id: string; months?: number };
 }
 
 interface IRecentEventsConfig {
@@ -274,9 +275,7 @@ const SUPPORTED_EVENTS = [
 class RecentEventsViews extends ViewHandler<IRecentEventsState> {
   getEventString(event: IRecentEvent) {
     return {
-      donation:
-        $t('has donated') +
-        (event.crate_item ? $t(' with %{name}', { name: event.crate_item.name }) : ''),
+      donation: this.getDonoString(event),
       merch: $t('has purchased %{product} from the store', { product: event.product }),
       streamlabscharitydonation: $t('has donated via Streamlabs Charity'),
       follow: event.platform === 'youtube_account' ? $t('has subscribed') : $t('has followed'),
@@ -303,6 +302,21 @@ class RecentEventsViews extends ViewHandler<IRecentEventsState> {
       justgivingdonation: $t('has donated to Just Giving'),
       treat: $t('has given a treat %{title}', { title: event.title }),
     }[event.type];
+  }
+
+  getDonoString(event: IRecentEvent) {
+    if (event.crate_item) {
+      return $t('has tipped with %{itemName}', { itemName: event.crate_item.name });
+    }
+    if (event.recurring_donation?.months > 1) {
+      return $t('has tipped %{months} months in a row', {
+        months: event.recurring_donation.months,
+      });
+    }
+    if (event.recurring_donation) {
+      return $t('has set up a monthly tip');
+    }
+    return $t('has tipped');
   }
 
   getSubString(event: IRecentEvent) {
