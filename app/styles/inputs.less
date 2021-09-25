@@ -69,6 +69,7 @@
 
 .input--search {
   padding: 0 30px 0 8px;
+  width: 100%;
 }
 
 .input-description {
@@ -77,9 +78,18 @@
   font-style: italic;
 }
 
+// assume only Vue components have these containers
 span[data-role="input"],
-.ModalLayout-fixed {
+.ModalLayout-fixed,
+.modal-layout-vue,
+.Hotkey-bindings,
+.row,
+.input-wrapper--search,
+.manage-scene-collections__header,
+.multiselect,
+[data-vv-scope] {
 
+  // add styles for Vue inputs
 
   input[type=text],
   input[type=number],
@@ -94,38 +104,40 @@ span[data-role="input"],
     font-size: 14px;
     color: var(--paragraph);
     box-shadow: none;
+    outline: none;
     height: 32px;
     padding: 0 @spacing;
 
     &:focus {
       box-shadow: none;
       background: var(--input-bg);
+      border-color: var(--primary);
     }
 
-    &:disabled:not('.ant-input'),
-    .is-disabled {
-      background-color: var(--button);
-      border-color: var(--button);
-    }
-
-    &.input--transparent {
-      border: 0;
-      border-bottom: 1px dashed var(--midtone);
-      padding: 0;
-      height: 20px;
-      background: transparent;
-      border-radius: 0;
-    }
+  &:disabled:not('.ant-input'),
+  .is-disabled {
+    background-color: var(--button);
+    border-color: var(--button);
   }
+
+  &.input--transparent {
+    border: 0;
+    border-bottom: 1px dashed var(--midtone);
+    padding: 0;
+    height: 20px;
+    background: transparent;
+    border-radius: 0;
+  }
+}
 
   textarea,
   textarea[type=text] {
     .padding();
     line-height: 20px;
+    min-height: 50px
   }
 
 }
-
 
 .list-input .multiselect {
   input[type=text] {

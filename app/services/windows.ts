@@ -27,7 +27,7 @@ import {
   AdvancedStatistics,
   WidgetWindow,
   SafeMode,
-} from 'components/shared/ReactComponent';
+} from 'components/shared/ReactComponentList';
 
 import SourceProperties from 'components/windows/SourceProperties.vue';
 import SourceFilters from 'components/windows/SourceFilters.vue';
@@ -76,7 +76,7 @@ import { byOS, OS } from 'util/operating-systems';
 import { UsageStatisticsService } from './usage-statistics';
 import { Inject } from 'services/core';
 import MessageBoxModal from 'components/shared/modals/MessageBoxModal';
-import Modal from 'components/shared/modals/modal';
+import Modal from 'components/shared/modals/Modal';
 
 const { ipcRenderer, remote } = electron;
 const BrowserWindow = remote.BrowserWindow;

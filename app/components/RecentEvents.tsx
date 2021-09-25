@@ -7,7 +7,7 @@ import { Component } from 'vue-property-decorator';
 import styles from './RecentEvents.m.less';
 import TsxComponent, { createProps } from './tsx-component';
 import Scrollable from 'components/shared/Scrollable';
-import { PlatformLogo } from 'components/shared/ReactComponent';
+import { PlatformLogo } from 'components/shared/ReactComponentList';
 import { UserService } from 'services/user';
 import { NavigationService } from 'services/navigation';
 import { CustomizationService } from 'services/customization';

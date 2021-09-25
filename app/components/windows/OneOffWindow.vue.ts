@@ -4,7 +4,7 @@ import { Inject } from 'services/core/injector';
 import { getComponents, WindowsService } from 'services/windows';
 import { CustomizationService } from 'services/customization';
 import Util from 'services/utils';
-import { TitleBar } from 'components/shared/ReactComponent';
+import { TitleBar } from 'components/shared/ReactComponentList';
 import antdThemes from 'styles/antd/index';
 
 @Component({

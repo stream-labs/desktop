@@ -32,7 +32,7 @@ import util from 'util';
 import uuid from 'uuid/v4';
 import Blank from 'components/windows/Blank.vue';
 import Main from 'components/windows/Main.vue';
-import { Loader } from 'components/shared/ReactComponent';
+import { Loader } from 'components/shared/ReactComponentList';
 import process from 'process';
 import { MetricsService } from 'services/metrics';
 import { UsageStatisticsService } from 'services/usage-statistics';
@@ -342,7 +342,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         ipcRenderer.send('unregister-in-crash-handler', { pid: process.pid });
 
         // give the window some time to finish unmounting before reload
-        Utils.sleep(300).then(() => {
+        Utils.sleep(100).then(() => {
           window.location.reload();
         });
       },

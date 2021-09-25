@@ -33,39 +33,10 @@ body {
     color: var(--primary);
   }
 
-  //// Use lighter color for input borders
-  //.ant-input,
-  //.ant-select-selector,
-  //.ant-checkbox-inner,
-  //.ant-input-number {
-  //  border: 1px solid var(--button);
-  //}
-  //.ant-input:hover,
-  //.ant-select-selector:hover,
-  //.ant-input-number:hover {
-  //  border: 1px solid var(--paragraph);
-  //}
-  //.ant-checkbox:hover {
-  //  .ant-checkbox-inner {
-  //    border: 1px solid var(--paragraph);
-  //  }
-  //}
-  //.ant-input:focus,
-  //.ant-select-focused .ant-select-selector,
-  //.ant-checkbox-inner:focus,
-  //.ant-input-number:focus {
-  //  border: 1px solid var(--teal-hover);
-  //}
-
   // remove transitions from hover states of inputs
   .ant-select-selector:hover,
   .ant-input:hover {
     transition: none;
-  }
-
-  // override foundation inputs
-  [type=color]:focus, [type=date]:focus, [type=datetime-local]:focus, [type=datetime]:focus, [type=email]:focus, [type=month]:focus, [type=number]:focus, [type=password]:focus, [type=search]:focus, [type=tel]:focus, [type=text]:focus, [type=time]:focus, [type=url]:focus, [type=week]:focus, textarea:focus {
-    box-shadow: none;
   }
 
   // allow buttons to be placed after inputs without jank
@@ -105,8 +76,4 @@ body {
   .ant-col:first-of-type {
     flex-shrink: 0;
   }
-}
-
-.ant-btn {
-  border: 0;
 }
