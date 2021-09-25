@@ -81,10 +81,12 @@
 // assume only Vue components have these containers
 span[data-role="input"],
 .ModalLayout-fixed,
+.modal-layout-vue,
 .Hotkey-bindings,
 .row,
 .input-wrapper--search,
 .manage-scene-collections__header,
+.multiselect,
 [data-vv-scope] {
 
   // add styles for Vue inputs
@@ -132,6 +134,7 @@ span[data-role="input"],
   textarea[type=text] {
     .padding();
     line-height: 20px;
+    min-height: 50px
   }
 
 }

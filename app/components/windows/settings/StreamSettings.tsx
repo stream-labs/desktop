@@ -203,7 +203,11 @@ export default class StreamSettings extends TsxComponent {
             <br />
 
             {this.canEditSettings && (
-              <button class="button button--warn" onClick={() => this.enableProtectedMode()}>
+              <button
+                class="button button--warn"
+                style={{ color: 'var(--paragraph)' }}
+                onClick={() => this.enableProtectedMode()}
+              >
                 {$t('Use recommended settings')}
               </button>
             )}

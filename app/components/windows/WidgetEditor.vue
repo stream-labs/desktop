@@ -442,7 +442,7 @@
   height: 6px;
   position: absolute;
   top: calc(~'50% - 3px');
-  left: 200px;
+  left: 210px;
   transform: translate(0, -50%);
   background-color: var(--button);
 }

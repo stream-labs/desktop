@@ -67,7 +67,7 @@ export class SelectionService extends StatefulService<ISelectionState> {
     this.windowsService.showWindow({
       componentName: 'EditTransform',
       title: $t('Edit Transform'),
-      size: { width: 500, height: windowHeight },
+      size: { width: 540, height: windowHeight },
     });
   }
 
