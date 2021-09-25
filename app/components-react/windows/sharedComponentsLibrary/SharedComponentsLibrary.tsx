@@ -354,6 +354,7 @@ function Container(p: { title: string; background: string } & HTMLAttributes<unk
     <div>
       {p.background === 'none' && <div>{p.children}</div>}
       {p.background === 'section' && <div className="section">{p.children}</div>}
+      {p.background === 'section-alt' && <div className="section section-alt">{p.children}</div>}
       {p.background === 'error' && (
         <Alert
           type="error"
@@ -402,7 +403,7 @@ function SettingsPanel() {
       />
       <ListInput
         label="Background"
-        options={createOptions(['none', 'section', 'error'])}
+        options={createOptions(['none', 'section', 'section-alt', 'error'])}
         {...bind.background}
       />
       <ListInput
@@ -482,6 +483,6 @@ interface ISharedComponentsState {
   required: boolean;
   disabled: boolean;
   size: 'middle' | 'large' | 'small';
-  background: 'none' | 'section' | 'error';
+  background: 'none' | 'section' | 'section-alt' | 'error';
   locales: string[];
 }
