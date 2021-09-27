@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Collapse } from 'antd';
 import { ModalLayout } from 'components-react/shared/ModalLayout';
 import {
@@ -20,9 +20,10 @@ const { Panel } = Collapse;
 
 export default function AdvancedAudio() {
   const { AudioService, WindowsService } = Services;
-  const initialSource = WindowsService.getChildWindowQueryParams().sourceId || '';
 
-  const [expandedSource, setExpandedSource] = useState(initialSource);
+  const [expandedSource, setExpandedSource] = useState(
+    WindowsService.getChildWindowQueryParams().sourceId || '',
+  );
 
   const { audioSources } = useVuex(() => ({
     audioSources: AudioService.views.sourcesForCurrentScene,
@@ -125,7 +126,7 @@ function PanelHeader(p: { source: AudioSource }) {
 
 function PanelForm(p: { source: AudioSource }) {
   const { sourceId, forceMono, syncOffset, source, monitoringType } = p.source;
-  const sourceProperties = source?.getPropertiesFormData();
+  const sourceProperties = useRef(source?.getPropertiesFormData());
 
   const hasDevices = source ? !source.video : false;
 
@@ -139,8 +140,8 @@ function PanelForm(p: { source: AudioSource }) {
 
   return (
     <Form>
-      {hasDevices && sourceProperties && (
-        <DeviceInputs sourceProperties={sourceProperties} sourceId={sourceId} />
+      {hasDevices && sourceProperties.current && (
+        <DeviceInputs sourceProperties={sourceProperties.current} sourceId={sourceId} />
       )}
       <SliderInput
         label={$t('Sync Offset (ms)')}
