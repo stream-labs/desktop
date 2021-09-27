@@ -422,6 +422,7 @@ export class WindowsService extends StatefulService<IWindowsState> {
       height: 400,
       title: 'New Window',
       backgroundColor: '#17242D',
+      show: false,
       webPreferences: {
         nodeIntegration: true,
         webviewTag: true,
@@ -447,6 +448,8 @@ export class WindowsService extends StatefulService<IWindowsState> {
 
     const indexUrl = remote.getGlobal('indexUrl');
     newWindow.loadURL(`${indexUrl}?windowId=${windowId}`);
+
+    newWindow.show();
 
     return windowId;
   }
