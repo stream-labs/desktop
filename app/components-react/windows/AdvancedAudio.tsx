@@ -124,7 +124,7 @@ function PanelHeader(p: { source: AudioSource }) {
 }
 
 function PanelForm(p: { source: AudioSource }) {
-  const { sourceId, forceMono, syncOffset, source } = p.source;
+  const { sourceId, forceMono, syncOffset, source, monitoringType } = p.source;
   const sourceProperties = source?.getPropertiesFormData();
 
   const hasDevices = source ? !source.video : false;
@@ -156,6 +156,7 @@ function PanelForm(p: { source: AudioSource }) {
       <ListInput
         label={$t('Audio Monitoring')}
         options={p.source.monitoringOptions}
+        value={monitoringType}
         onInput={value => onSettingsHandler('monitoringType', value)}
       />
     </Form>
