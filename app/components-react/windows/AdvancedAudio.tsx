@@ -12,6 +12,7 @@ import { TObsValue, IObsListInput, TObsFormData } from 'components/obs/inputs/Ob
 import { Services } from 'components-react/service-provider';
 import { useVuex } from 'components-react/hooks';
 import { AudioSource } from 'services/audio';
+import { Source } from 'services/sources';
 import { $t } from 'services/i18n';
 import Utils from 'services/utils';
 import styles from './AdvancedAudio.m.less';
@@ -21,7 +22,7 @@ const { Panel } = Collapse;
 export default function AdvancedAudio() {
   const { AudioService, WindowsService } = Services;
 
-  const initialSource = useMemo(
+  const initialSource = useMemo<string>(
     () => WindowsService.getChildWindowQueryParams().sourceId || '',
     [],
   );
@@ -65,18 +66,22 @@ function PanelHeader(p: { source: AudioSource }) {
       const bitwise = value ? 1 : 0;
       setTrackFlags(trackFlags.map((el, i) => (i === index ? bitwise : el)));
       const newValue = Utils.binnaryArrayToNumber(trackFlags.reverse());
-      EditorCommandsService.executeCommand('SetAudioSettingsCommand', sourceId, {
+      EditorCommandsService.actions.executeCommand('SetAudioSettingsCommand', sourceId, {
         audioMixers: newValue,
       });
     };
   }
 
   function onDeflectionInput(value: number) {
-    EditorCommandsService.executeCommand('SetDeflectionCommand', sourceId, (value as number) / 100);
+    EditorCommandsService.actions.executeCommand(
+      'SetDeflectionCommand',
+      sourceId,
+      (value as number) / 100,
+    );
   }
 
   function onInputHandler(name: string, value: TObsValue) {
-    EditorCommandsService.executeCommand('SetAudioSettingsCommand', sourceId, {
+    EditorCommandsService.actions.executeCommand('SetAudioSettingsCommand', sourceId, {
       [name]: value,
     });
   }
@@ -128,23 +133,20 @@ function PanelHeader(p: { source: AudioSource }) {
 
 function PanelForm(p: { source: AudioSource }) {
   const { sourceId, forceMono, syncOffset, source, monitoringType } = p.source;
-  const sourceProperties = useRef(source?.getPropertiesFormData());
 
   const hasDevices = source ? !source.video : false;
 
   const { EditorCommandsService } = Services;
 
   function onSettingsHandler(name: string, value: TObsValue) {
-    EditorCommandsService.executeCommand('SetAudioSettingsCommand', sourceId, {
+    EditorCommandsService.actions.executeCommand('SetAudioSettingsCommand', sourceId, {
       [name]: value,
     });
   }
 
   return (
     <Form>
-      {hasDevices && sourceProperties.current && (
-        <DeviceInputs sourceProperties={sourceProperties.current} sourceId={sourceId} />
-      )}
+      {hasDevices && source && <DeviceInputs source={source} />}
       <SliderInput
         label={$t('Sync Offset (ms)')}
         hasNumberInput
@@ -166,20 +168,23 @@ function PanelForm(p: { source: AudioSource }) {
   );
 }
 
-function DeviceInputs(p: { sourceProperties: TObsFormData; sourceId: string }) {
+function DeviceInputs(p: { source: Source }) {
   const { EditorCommandsService } = Services;
 
-  const deviceInput = p.sourceProperties[0] as IObsListInput<TObsValue>;
-  const timestampsInput = p.sourceProperties[1];
-  const deviceOptions = deviceInput.options.map(option => ({
+  const sourceProperties = useMemo<TObsFormData>(() => p.source.getPropertiesFormData(), []);
+  const settings = useMemo(() => p.source.getSettings(), []);
+  const [statefulSettings, setStatefulSettings] = useState(settings);
+
+  const deviceOptions = (sourceProperties[0] as IObsListInput<TObsValue>).options.map(option => ({
     label: option.description,
     value: option.value,
   }));
 
-  function handleInput(changedIndex: number) {
-    EditorCommandsService.executeCommand('EditSourcePropertiesCommand', p.sourceId, [
-      p.sourceProperties[changedIndex],
-    ]);
+  function handleInput(name: string, value: TObsValue) {
+    setStatefulSettings({ ...statefulSettings, [name]: value });
+    EditorCommandsService.actions.executeCommand('EditSourceSettingsCommand', p.source.sourceId, {
+      [name]: value,
+    });
   }
 
   return (
@@ -187,13 +192,13 @@ function DeviceInputs(p: { sourceProperties: TObsFormData; sourceId: string }) {
       <ListInput
         label={$t('Device')}
         options={deviceOptions}
-        value={deviceInput.value}
-        onInput={() => handleInput(0)}
+        value={statefulSettings.device_id}
+        onInput={value => handleInput('device_id', value)}
       />
       <SwitchInput
         label={$t('Use Device Timestamps')}
-        value={timestampsInput.value as boolean}
-        onInput={() => handleInput(1)}
+        value={statefulSettings.use_device_timing}
+        onInput={value => handleInput('use_device_timing', value)}
       />
     </>
   );
