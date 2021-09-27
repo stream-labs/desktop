@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useMemo } from 'react';
 import { Collapse } from 'antd';
 import { ModalLayout } from 'components-react/shared/ModalLayout';
 import {
@@ -21,9 +21,11 @@ const { Panel } = Collapse;
 export default function AdvancedAudio() {
   const { AudioService, WindowsService } = Services;
 
-  const [expandedSource, setExpandedSource] = useState(
-    WindowsService.getChildWindowQueryParams().sourceId || '',
+  const initialSource = useMemo(
+    () => WindowsService.getChildWindowQueryParams().sourceId || '',
+    [],
   );
+  const [expandedSource, setExpandedSource] = useState(initialSource);
 
   const { audioSources } = useVuex(() => ({
     audioSources: AudioService.views.sourcesForCurrentScene,
