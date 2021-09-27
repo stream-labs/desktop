@@ -385,9 +385,9 @@ export class EditMenu extends Menu {
 
   private showProperties() {
     if (this.options.showAudioMixerMenu) {
-      this.audioService.showAdvancedSettings(this.source.sourceId);
+      this.audioService.actions.showAdvancedSettings(this.source.sourceId);
     } else {
-      this.sourcesService.showSourceProperties(this.source.sourceId);
+      this.sourcesService.actions.showSourceProperties(this.source.sourceId);
     }
   }
 

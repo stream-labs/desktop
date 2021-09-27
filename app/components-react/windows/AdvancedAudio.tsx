@@ -47,7 +47,7 @@ export default function AdvancedAudio() {
 }
 
 function PanelHeader(p: { source: AudioSource }) {
-  const { name, mixerHidden, muted, fader, sourceId } = p.source;
+  const { name, mixerHidden, muted, fader, sourceId, audioMixers } = p.source;
   const { EditorCommandsService, SettingsService } = Services;
   const { isAdvancedOutput, recordingTracks, streamTrack } = useVuex(() => ({
     isAdvancedOutput: SettingsService.views.isAdvancedOutput,
@@ -55,8 +55,7 @@ function PanelHeader(p: { source: AudioSource }) {
     recordingTracks: SettingsService.views.recordingTracks,
   }));
 
-  const trackValue = p.source.getSettingsForm()[5].value as number;
-  const [trackFlags, setTrackFlags] = useState(Utils.numberToBinnaryArray(trackValue, 6));
+  const [trackFlags, setTrackFlags] = useState(Utils.numberToBinnaryArray(audioMixers, 6));
 
   function onTrackInput(index: number | undefined) {
     return (value: boolean) => {
@@ -125,10 +124,10 @@ function PanelHeader(p: { source: AudioSource }) {
 }
 
 function PanelForm(p: { source: AudioSource }) {
-  const { sourceId, forceMono, syncOffset } = p.source;
-  const sourceProperties = p.source.source?.getPropertiesFormData();
+  const { sourceId, forceMono, syncOffset, source } = p.source;
+  const sourceProperties = source?.getPropertiesFormData();
 
-  const hasDevices = !p.source.source?.video;
+  const hasDevices = source ? !source.video : false;
 
   const { EditorCommandsService } = Services;
 
@@ -140,9 +139,11 @@ function PanelForm(p: { source: AudioSource }) {
 
   return (
     <Form>
-      {hasDevices && sourceProperties && <DeviceInputs sourceProperties={sourceProperties} />}
+      {hasDevices && sourceProperties && (
+        <DeviceInputs sourceProperties={sourceProperties} sourceId={sourceId} />
+      )}
       <SliderInput
-        label={$t('Sync Offset')}
+        label={$t('Sync Offset (ms)')}
         hasNumberInput
         value={syncOffset}
         onInput={value => onSettingsHandler('syncOffset', value)}
@@ -152,12 +153,18 @@ function PanelForm(p: { source: AudioSource }) {
         value={forceMono}
         onInput={value => onSettingsHandler('forceMono', value)}
       />
-      <ListInput label={$t('Monitoring')} options={[]} />
+      <ListInput
+        label={$t('Audio Monitoring')}
+        options={p.source.monitoringOptions}
+        onInput={value => onSettingsHandler('monitoringType', value)}
+      />
     </Form>
   );
 }
 
-function DeviceInputs(p: { sourceProperties: TObsFormData }) {
+function DeviceInputs(p: { sourceProperties: TObsFormData; sourceId: string }) {
+  const { EditorCommandsService } = Services;
+
   const deviceInput = p.sourceProperties[0] as IObsListInput<TObsValue>;
   const timestampsInput = p.sourceProperties[1];
   const deviceOptions = deviceInput.options.map(option => ({
@@ -165,10 +172,25 @@ function DeviceInputs(p: { sourceProperties: TObsFormData }) {
     value: option.value,
   }));
 
+  function handleInput(changedIndex: number) {
+    EditorCommandsService.executeCommand('EditSourcePropertiesCommand', p.sourceId, [
+      p.sourceProperties[changedIndex],
+    ]);
+  }
+
   return (
     <>
-      <ListInput label={$t('Device')} options={deviceOptions} value={deviceInput.value} />
-      <SwitchInput label={$t('Use Device Timestamps')} value={timestampsInput.value as boolean} />
+      <ListInput
+        label={$t('Device')}
+        options={deviceOptions}
+        value={deviceInput.value}
+        onInput={() => handleInput(0)}
+      />
+      <SwitchInput
+        label={$t('Use Device Timestamps')}
+        value={timestampsInput.value as boolean}
+        onInput={() => handleInput(1)}
+      />
     </>
   );
 }
