@@ -427,6 +427,7 @@ export class WindowsService extends StatefulService<IWindowsState> {
         webviewTag: true,
         enableRemoteModule: true,
         contextIsolation: false,
+        backgroundThrottling: false,
       },
       ...options,
       ...options.size,
