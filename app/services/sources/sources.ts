@@ -592,7 +592,7 @@ export class SourcesService extends StatefulService<ISourcesState> {
       title: $t('Settings for %{sourceName}', { sourceName: propertiesName }),
       queryParams: { sourceId },
       size: {
-        width: 800,
+        width: 600,
         height: 800,
       },
     });
