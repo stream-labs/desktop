@@ -1,7 +1,13 @@
 import { useSpectron, test } from '../helpers/spectron';
 import { logIn } from '../helpers/spectron/user';
 import { sleep } from '../helpers/sleep';
-import { focusChild, focusMain } from '../helpers/modules/core';
+import {
+  focusChild,
+  focusMain,
+  getClient,
+  waitForDisplayed,
+  waitForLoader,
+} from '../helpers/modules/core';
 
 useSpectron();
 
@@ -20,4 +26,11 @@ test.skip('Twitch 2FA is disabled', async t => {
 
   // Login did not work, we should still be logged out
   t.true(await (await t.context.app.client.$('h1=Connect')).isDisplayed());
+});
+
+test('Window refresh should work', async t => {
+  await getClient().keys('F5');
+  await waitForDisplayed('.main-loading');
+  await waitForLoader();
+  t.pass();
 });

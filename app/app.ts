@@ -321,7 +321,24 @@ document.addEventListener('DOMContentLoaded', async () => {
     i18n,
     store,
     el: '#app',
-    render: h => {
+    data: { isRefreshing: false },
+    methods: {
+      // refresh current window
+      startWindowRefresh() {
+        // set isRefreshing to true to unmount all components and destroy Displays
+        this.isRefreshing = true;
+
+        // unregister current window from the crash handler
+        ipcRenderer.send('unregister-in-crash-handler', { pid: process.pid });
+
+        // give the window some time to finish unmounting before reload
+        Utils.sleep(100).then(() => {
+          window.location.reload();
+        });
+      },
+    },
+    render(h) {
+      if (this.isRefreshing) return h(Blank);
       if (windowId === 'worker') return h(Blank);
       if (windowId === 'child') {
         if (store.state.bulkLoadFinished && store.state.i18nReady) {
@@ -360,6 +377,13 @@ document.addEventListener('DOMContentLoaded', async () => {
       const ctx = userService.getSentryContext();
       if (ctx) setSentryContext(ctx);
       userService.sentryContext.subscribe(setSentryContext);
+    }
+
+    // allow to refresh the window by pressing `F5` in the DevMode
+    if (Utils.isDevMode()) {
+      window.addEventListener('keyup', ev => {
+        if (ev.key === 'F5') vm.startWindowRefresh();
+      });
     }
   });
 });
