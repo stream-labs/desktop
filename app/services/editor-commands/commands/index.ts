@@ -51,6 +51,7 @@ export { UnhideMixerSourcesCommand } from './unhide-mixer-sources';
 export { SetAudioSettingsCommand } from './set-audio-settings';
 export { RenameSourceCommand } from './rename-source';
 export { RemoveSourceCommand } from './remove-source';
+export { EditSourceSettingsCommand } from './edit-source-settings';
 
 // Transitions
 export { CreateTransitionCommand } from './create-transition';
