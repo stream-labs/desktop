@@ -163,5 +163,6 @@
   "Invalid settings. Please check the form": "Pengaturan tidak valid. Harap periksa formulir",
   "Common Stream Settings": "Pengaturan Streaming yang Umum",
   "Schedule Stream for %{formattedDate}": "Schedule Stream for %{formattedDate}",
-  "Update Scheduled Stream for %{formattedDate}": "Update Scheduled Stream for %{formattedDate}"
+  "Update Scheduled Stream for %{formattedDate}": "Update Scheduled Stream for %{formattedDate}",
+  "You can not schedule to a past date": "You can not schedule to a past date"
 }
