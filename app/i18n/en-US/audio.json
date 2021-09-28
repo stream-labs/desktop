@@ -11,7 +11,7 @@
   "Rec. Tracks": "Rec. Tracks",
   "Advanced Audio Settings": "Advanced Audio Settings",
   "Volume ( % )": "Volume ( % )",
-  "Sync Offset ( ms )": "Sync Offset ( ms )",
+  "Sync Offset": "Sync Offset",
   "Mixer": "Mixer",
   "Monitor audio levels. If the bars are moving you are outputting audio.": "Monitor audio levels. If the bars are moving you are outputting audio.",
   "Muted": "Muted",
