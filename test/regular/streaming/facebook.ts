@@ -26,7 +26,7 @@ test('Streaming to a Facebook Page', async t => {
   t.pass();
 });
 
-test('Streaming to the scheduled event on Facebook page', async t => {
+test.skip('Streaming to the scheduled event on Facebook page', async t => {
   await logIn('facebook', { multistream: false });
   const tomorrow = moment().add(1, 'day').toDate();
 
@@ -44,7 +44,7 @@ test('Streaming to the scheduled event on Facebook page', async t => {
   t.pass();
 });
 
-test('GoLive to a FB page from StreamScheduler', async t => {
+test.skip('GoLive to a FB page from StreamScheduler', async t => {
   await logIn('facebook', { multistream: false });
   const tomorrow = moment().add(1, 'day').toDate();
 
