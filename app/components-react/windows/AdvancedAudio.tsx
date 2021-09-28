@@ -6,6 +6,7 @@ import {
   BoolButtonInput,
   ListInput,
   SwitchInput,
+  NumberInput,
 } from 'components-react/shared/inputs';
 import Form from 'components-react/shared/inputs/Form';
 import { TObsValue, IObsListInput, TObsFormData } from 'components/obs/inputs/ObsInput';
@@ -87,21 +88,29 @@ function PanelHeader(p: { source: AudioSource }) {
   }
 
   return (
-    <div className={styles.audioSettingsRow} onClick={(e: React.MouseEvent) => e.stopPropagation()}>
+    <Form
+      className={styles.audioSettingsRow}
+      onClick={(e: React.MouseEvent) => e.stopPropagation()}
+      data-role="form"
+      data-name="advanced-audio-header"
+    >
       <div className={styles.audioSourceName}>{name}</div>
       <i
         className={muted ? 'icon-mute' : 'icon-audio'}
         onClick={() => onInputHandler('muted', !muted)}
       />
-      <SliderInput
-        style={{ width: '200px', marginBottom: 0 }}
-        value={Math.floor(fader.deflection * 100)}
-        hasNumberInput
-        slimNumberInput
-        max={100}
-        min={0}
-        onInput={onDeflectionInput}
-      />
+      <div style={{ width: '200px' }}>
+        <SliderInput
+          value={Math.floor(fader.deflection * 100)}
+          max={100}
+          min={0}
+          name="deflection"
+          onInput={onDeflectionInput}
+          hasNumberInput
+          slimNumberInput
+          nowrap
+        />
+      </div>
       <i
         className={mixerHidden ? 'icon-hide' : 'icon-view'}
         onClick={() => onInputHandler('mixerHidden', !mixerHidden)}
@@ -114,6 +123,7 @@ function PanelHeader(p: { source: AudioSource }) {
             value={!!trackFlags[streamTrack]}
             onChange={onTrackInput(streamTrack)}
             checkboxStyles={{ marginRight: '8px' }}
+            name="streamTrack"
           />
           <div className={styles.trackLabel}>{$t('Rec. Tracks')}</div>
           {recordingTracks?.map(track => (
@@ -123,11 +133,12 @@ function PanelHeader(p: { source: AudioSource }) {
               value={!!trackFlags[track]}
               onChange={onTrackInput(track)}
               checkboxStyles={{ marginRight: '4px' }}
+              name={`flag${track}`}
             />
           ))}
         </div>
       )}
-    </div>
+    </Form>
   );
 }
 
@@ -145,24 +156,31 @@ function PanelForm(p: { source: AudioSource }) {
   }
 
   return (
-    <Form>
+    <Form data-role="form" data-name="advanced-audio-detail">
       {hasDevices && source && <DeviceInputs source={source} />}
-      <SliderInput
-        label={$t('Sync Offset (ms)')}
-        hasNumberInput
+      <NumberInput
+        label={$t('Sync Offset')}
         value={syncOffset}
+        name="syncOffset"
         onInput={value => onSettingsHandler('syncOffset', value)}
+        tooltip={$t('Time it takes between sound occuring and being broadcast (ms)')}
       />
       <SwitchInput
         label={$t('Downmix to Mono')}
         value={forceMono}
+        name="forceMono"
         onInput={value => onSettingsHandler('forceMono', value)}
+        tooltip={$t('Route audio to the central channel instead of left or right stereo channels')}
       />
       <ListInput
         label={$t('Audio Monitoring')}
         options={p.source.monitoringOptions}
         value={monitoringType}
+        name="monitoringType"
         onInput={value => onSettingsHandler('monitoringType', value)}
+        tooltip={$t(
+          'Generally, enabling monitoring sends the audio through the Desktop Audio channel',
+        )}
       />
     </Form>
   );

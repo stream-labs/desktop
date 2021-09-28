@@ -17,5 +17,8 @@
   "Muted": "Muted",
   "Hide in Mixer": "Hide in Mixer",
   "Device": "Device",
-  "Use Device Timestamps": "Use Device Timestamps"
+  "Use Device Timestamps": "Use Device Timestamps",
+  "Time it takes between sound occuring and being broadcast (ms)": "Time it takes between sound occuring and being broadcast (ms)",
+  "Route audio to the central channel instead of left or right stereo channels": "Route audio to the central channel instead of left or right stereo channels",
+  "Generally, enabling monitoring sends the audio through the Desktop Audio channel": "Generally, enabling monitoring sends the audio through the Desktop Audio channel"
 }
