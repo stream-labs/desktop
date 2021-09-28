@@ -163,5 +163,6 @@
   "Invalid settings. Please check the form": "Paramètres non valides. Veuillez vérifier le formulaire",
   "Common Stream Settings": "Paramètres de stream courants",
   "Schedule Stream for %{formattedDate}": "Schedule Stream for %{formattedDate}",
-  "Update Scheduled Stream for %{formattedDate}": "Update Scheduled Stream for %{formattedDate}"
+  "Update Scheduled Stream for %{formattedDate}": "Update Scheduled Stream for %{formattedDate}",
+  "You can not schedule to a past date": "You can not schedule to a past date"
 }
