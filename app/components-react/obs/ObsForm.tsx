@@ -9,7 +9,7 @@ import {
 import Form from '../shared/inputs/Form';
 import { CheckboxInput, ListInput, NumberInput } from '../shared/inputs';
 import { cloneDeep } from 'lodash';
-import {$t, $translateIfExist} from '../../services/i18n';
+import { $t, $translateIfExist } from '../../services/i18n';
 
 interface IObsFormProps {
   value: IObsInput<TObsValue>[];
