@@ -163,5 +163,6 @@
   "Invalid settings. Please check the form": "Impostazioni non valide. Controlla il modulo.",
   "Common Stream Settings": "Impostazioni streaming comuni",
   "Schedule Stream for %{formattedDate}": "Schedule Stream for %{formattedDate}",
-  "Update Scheduled Stream for %{formattedDate}": "Update Scheduled Stream for %{formattedDate}"
+  "Update Scheduled Stream for %{formattedDate}": "Update Scheduled Stream for %{formattedDate}",
+  "You can not schedule to a past date": "You can not schedule to a past date"
 }
