@@ -163,5 +163,6 @@
   "Invalid settings. Please check the form": "유효하지 않은 설정입니다. 양식을 확인하세요",
   "Common Stream Settings": "일반 스트리밍 설정",
   "Schedule Stream for %{formattedDate}": "Schedule Stream for %{formattedDate}",
-  "Update Scheduled Stream for %{formattedDate}": "Update Scheduled Stream for %{formattedDate}"
+  "Update Scheduled Stream for %{formattedDate}": "Update Scheduled Stream for %{formattedDate}",
+  "You can not schedule to a past date": "You can not schedule to a past date"
 }
