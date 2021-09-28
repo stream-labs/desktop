@@ -163,5 +163,6 @@
   "Invalid settings. Please check the form": "無效的設定。請檢查表單",
   "Common Stream Settings": "一般直播設定",
   "Schedule Stream for %{formattedDate}": "Schedule Stream for %{formattedDate}",
-  "Update Scheduled Stream for %{formattedDate}": "Update Scheduled Stream for %{formattedDate}"
+  "Update Scheduled Stream for %{formattedDate}": "Update Scheduled Stream for %{formattedDate}",
+  "You can not schedule to a past date": "You can not schedule to a past date"
 }
