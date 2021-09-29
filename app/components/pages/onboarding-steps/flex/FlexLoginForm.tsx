@@ -18,6 +18,7 @@ export class ConnectProps {
 }
 
 interface FlexAuthResult {
+  id: number;
   nickname: string;
   token: string;
 }
@@ -37,24 +38,33 @@ export default class FlexLoginForm extends TsxComponent<ConnectProps> {
   async next() {
     const headers = new Headers();
     headers.append('Content-Type', 'application/json');
-    const request = new Request('https://www.flextv.co.kr/api/auth/signin', {
+    const request = new Request('https://www.hotaetv.com/api/auth/signin', {
       headers,
       method: 'POST',
       body: JSON.stringify({ loginId: this.id, password: this.password }),
     });
     const data: FlexAuthResult = await jfetch(request);
     console.log(data);
-    const auth = this.parseAuthFromToken(data.token);
+    const auth = this.parseAuthFromToken(String(data.id), data.nickname, data.token);
 
-    return this.userService.startFlexAuth(auth);
+    this.props.continue()
+
+    return this.userService.startFlexAuth(auth);  
   }
 
-  private parseAuthFromToken(token: string): IUserAuth {
+  private parseAuthFromToken(id: string, nickname: string, token: string): IUserAuth {
     return {
       widgetToken: token,
       apiToken: token,
       primaryPlatform: 'flextv' as TPlatform,
-      platforms: {},
+      platforms: {
+        flextv: {
+          type: 'flextv',
+          username: nickname,
+          token: token,
+          id,
+        },
+      },
       hasRelogged: true,
     };
   }
@@ -78,8 +88,8 @@ export default class FlexLoginForm extends TsxComponent<ConnectProps> {
           </div>
 
           <p>
-            <button className={'button button-flex'} onClick={() => this.next()}>
-              {$t('Finish')}
+            <button className={'button button-flex'} onClick={() => this.next()} style={{marginRight: 10}}>
+              {$t('OK')}
             </button>
             <a class={styles['link-button']} onClick={() => this.props.continue()}>
               {$t('Back')}

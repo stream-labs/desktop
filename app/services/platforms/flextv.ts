@@ -1,7 +1,9 @@
+import {EPlatformCallResult, IPlatformRequest} from '.'
 import { InheritMutations } from '../core';
 import { BasePlatformService } from './base-platform';
 import { IPlatformCapabilityResolutionPreset, IPlatformState, TPlatformCapability } from './index';
 import { IGoLiveSettings } from '../streaming';
+import { platformAuthorizedRequest, platformRequest } from './utils';
 import { WidgetType } from '../widgets';
 import { getDefined } from '../../util/properties-type-guards';
 
@@ -45,20 +47,56 @@ export class FlextvService
     return `https://${host}/slobs/login?${query}`;
   }
 
-  private get oauthToken() {
-    return this.userService.views.state.auth?.platforms?.facebook?.token;
+  private get apiToken() {
+    return this.userService.views.state.auth?.platforms?.flextv?.token;
   }
 
-  async beforeGoLive(goLiveSettings: IGoLiveSettings) {
-    const ttSettings = getDefined(goLiveSettings.platforms.flextv);
-    if (!this.streamingService.views.isMultiplatformMode) {
-      this.streamSettingsService.setSettings({
-        streamType: 'rtmp_custom',
-        key: ttSettings.streamKey,
-        server: ttSettings.serverUrl,
-      });
+  async beforeGoLive(goLiveSettings?: IGoLiveSettings) {
+    if (
+      this.streamSettingsService.protectedModeEnabled &&
+      this.streamSettingsService.isSafeToModifyStreamKey()
+    ) {
+      const data = await this.fetchStreamPair();      
+      this.SET_STREAM_KEY(data.streamKey);
+      if (!this.streamingService.views.isMultiplatformMode) {
+        this.streamSettingsService.setSettings({
+          key: data.streamKey,
+          platform: 'flextv',
+          streamType: 'rtmp_common',
+          server: data.url,
+        });
+      }
     }
-    this.SET_STREAM_SETTINGS(ttSettings);
+
+    if (goLiveSettings) {
+      const channelInfo = goLiveSettings?.platforms.flextv;
+      // if (channelInfo) await this.putChannelInfo(channelInfo);
+    }
+  }
+
+  async afterGoLive () {
+    await platformAuthorizedRequest<{ url: string, streamKey: string }>('flextv',
+      `https://www.hotaetv.com/api/my/channel/start-stream`,
+    )
+  }
+
+  fetchStreamPair(): Promise<{ url: string, streamKey: string }> {
+    return platformAuthorizedRequest<{ url: string, streamKey: string }>('flextv',
+      `https://www.hotaetv.com/api/my/channel/stream-key`,
+    )
+  }  
+
+
+  getHeaders(req: IPlatformRequest, useToken: boolean | string) {
+    const token = typeof useToken === 'string' ? useToken : useToken && this.apiToken;
+    return {
+      'Content-Type': 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    };
+  }
+
+  async validatePlatform() {
+    return EPlatformCallResult.Success;
   }
 
   /**
