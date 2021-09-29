@@ -3,6 +3,8 @@ import { ISceneCollectionsServiceApi } from '../../../app/services/scene-collect
 import { getApiClient } from '../../helpers/api-client';
 import { click, closeWindow, focusChild, focusMain } from '../../helpers/modules/core';
 import { useForm } from '../../helpers/modules/forms';
+import { showSettingsWindow } from '../../helpers/modules/settings/settings';
+import { setFormDropdown } from '../../helpers/spectron/forms';
 
 useSpectron();
 
@@ -12,17 +14,11 @@ async function clickAdvancedAudio(t: TExecutionContext) {
   await $settings.click();
 }
 
-// TODO: Fix form recognition of PanelHeader form
-// const DEFAULT_AUDIO_SETTINGS = {
-//   deflection: 100,
-//   streamTrack: true,
-//   flag0: true,
-//   flag1: true,
-//   flag2: true,
-//   flag3: true,
-//   flag4: true,
-//   flag5: true,
-// };
+const DEFAULT_AUDIO_SETTINGS = {
+  // TODO: Fix slider inputs for form
+  // deflection: 100,
+  streamTrack: true,
+};
 
 const DEFAULT_DETAIL_SETTINGS = {
   forceMono: false,
@@ -32,6 +28,11 @@ const DEFAULT_DETAIL_SETTINGS = {
 };
 
 test('Change Advanced Audio Settings', async t => {
+  await showSettingsWindow('Output');
+  await setFormDropdown('Output Mode', 'Advanced');
+  await closeWindow('child');
+  await focusMain();
+
   await clickAdvancedAudio(t);
   await focusChild();
   await click('.icon-add');
@@ -39,24 +40,16 @@ test('Change Advanced Audio Settings', async t => {
   // check default settings
   const headerForm = useForm('advanced-audio-header');
   const detailForm = useForm('advanced-audio-detail');
-  // await headerForm.assertFormContains(DEFAULT_AUDIO_SETTINGS);
+  await headerForm.assertFormContains(DEFAULT_AUDIO_SETTINGS);
   await detailForm.assertFormContains(DEFAULT_DETAIL_SETTINGS);
 
-  console.log(await headerForm.readForm());
-
   // update settings
-  // const updatedAudioSettings = {
-  //   deflection: 50,
-  //   streamTrack: false,
-  //   flag0: false,
-  //   flag1: false,
-  //   flag2: false,
-  //   flag3: false,
-  //   flag4: false,
-  //   flag5: false,
-  // };
-  // await headerForm.fillForm(updatedAudioSettings);
-  // await headerForm.assertFormContains(updatedAudioSettings);
+  const updatedAudioSettings = {
+    // deflection: 50,
+    streamTrack: false,
+  };
+  await headerForm.fillForm(updatedAudioSettings);
+  await headerForm.assertFormContains(updatedAudioSettings);
 
   const updatedDetailSettings = {
     forceMono: true,
@@ -73,7 +66,7 @@ test('Change Advanced Audio Settings', async t => {
   await focusChild();
   await click('.icon-add');
 
-  // await headerForm.assertFormContains(updatedAudioSettings);
+  await headerForm.assertFormContains(updatedAudioSettings);
   await detailForm.assertFormContains(updatedDetailSettings);
 
   // reload config
@@ -89,7 +82,7 @@ test('Change Advanced Audio Settings', async t => {
   await focusChild();
   await click('.icon-add');
 
-  // await headerForm.assertFormContains(updatedAudioSettings);
+  await headerForm.assertFormContains(updatedAudioSettings);
   await detailForm.assertFormContains(updatedDetailSettings);
 
   t.pass();

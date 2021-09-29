@@ -60,17 +60,18 @@ function PanelHeader(p: { source: AudioSource }) {
     recordingTracks: SettingsService.views.recordingTracks,
   }));
 
-  const [trackFlags, setTrackFlags] = useState(Utils.numberToBinnaryArray(audioMixers, 6));
+  const [trackFlags, setTrackFlags] = useState(
+    Utils.numberToBinnaryArray(audioMixers, 6).reverse(),
+  );
 
-  function onTrackInput(index: number | undefined) {
-    return (value: boolean) => {
-      const bitwise = value ? 1 : 0;
-      setTrackFlags(trackFlags.map((el, i) => (i === index ? bitwise : el)));
-      const newValue = Utils.binnaryArrayToNumber(trackFlags.reverse());
-      EditorCommandsService.actions.executeCommand('SetAudioSettingsCommand', sourceId, {
-        audioMixers: newValue,
-      });
-    };
+  function onTrackInput(index: number, value: boolean) {
+    const newArray = [...trackFlags];
+    newArray[index] = Number(value);
+    setTrackFlags(newArray);
+    const newValue = Utils.binnaryArrayToNumber([...newArray].reverse());
+    EditorCommandsService.actions.executeCommand('SetAudioSettingsCommand', sourceId, {
+      audioMixers: newValue,
+    });
   }
 
   function onDeflectionInput(value: number) {
@@ -121,7 +122,7 @@ function PanelHeader(p: { source: AudioSource }) {
           <BoolButtonInput
             label={String(streamTrack + 1)}
             value={!!trackFlags[streamTrack]}
-            onChange={onTrackInput(streamTrack)}
+            onChange={value => onTrackInput(streamTrack, value)}
             checkboxStyles={{ marginRight: '8px' }}
             name="streamTrack"
           />
@@ -131,7 +132,7 @@ function PanelHeader(p: { source: AudioSource }) {
               label={String(track + 1)}
               key={track}
               value={!!trackFlags[track]}
-              onChange={onTrackInput(track)}
+              onChange={value => onTrackInput(track, value)}
               checkboxStyles={{ marginRight: '4px' }}
               name={`flag${track}`}
             />
