@@ -35,7 +35,7 @@ export const BoolButtonInput = InputComponent((p: TBoolButtonInputProps) => {
       <div
         className={cx('input-wrapper', { disabled: p.disabled })}
         data-role="input"
-        data-type="toggle"
+        data-type="bool-button"
         data-value={!!p.value}
         data-name={p.name}
       >

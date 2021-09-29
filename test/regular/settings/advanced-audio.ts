@@ -42,6 +42,8 @@ test('Change Advanced Audio Settings', async t => {
   // await headerForm.assertFormContains(DEFAULT_AUDIO_SETTINGS);
   await detailForm.assertFormContains(DEFAULT_DETAIL_SETTINGS);
 
+  console.log(await headerForm.readForm());
+
   // update settings
   // const updatedAudioSettings = {
   //   deflection: 50,
