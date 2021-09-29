@@ -4,7 +4,12 @@ import { UserService, LoginLifecycle } from 'services/user';
 import { authorizedHeaders, handleResponse, jfetch } from 'util/requests';
 import { $t } from 'services/i18n';
 import { WindowsService } from 'services/windows';
-import { WebsocketService, TSocketEvent, IEventSocketEvent } from 'services/websocket';
+import {
+  WebsocketService,
+  TSocketEvent,
+  IEventSocketEvent,
+  ISafeModeEnabledSocketEvent,
+} from 'services/websocket';
 import cloneDeep from 'lodash/cloneDeep';
 import pick from 'lodash/pick';
 import uuid from 'uuid/v4';
@@ -53,6 +58,7 @@ export interface IRecentEvent {
   sender_name?: string;
   skill_currency?: string;
   skill_name?: string;
+  recurring_donation?: { id: string; months?: number };
 }
 
 interface IRecentEventsConfig {
@@ -123,6 +129,18 @@ interface IRecentEventsState {
   filterConfig: IRecentEventFilterConfig;
   queuePaused: boolean;
   safeMode: ISafeModeSettings;
+}
+
+export interface ISafeModeServerSettings {
+  clear_chat: boolean;
+  clear_queued_alerts: boolean;
+  clear_recent_events: boolean;
+  disable_chat_alerts: boolean;
+  disable_follower_alerts: boolean;
+  emote_only: boolean;
+  follower_only: boolean;
+  sub_only: boolean;
+  time_in_minutes: number;
 }
 
 const subscriptionMap = (subPlan: string) => {
@@ -257,9 +275,7 @@ const SUPPORTED_EVENTS = [
 class RecentEventsViews extends ViewHandler<IRecentEventsState> {
   getEventString(event: IRecentEvent) {
     return {
-      donation:
-        $t('has donated') +
-        (event.crate_item ? $t(' with %{name}', { name: event.crate_item.name }) : ''),
+      donation: this.getDonoString(event),
       merch: $t('has purchased %{product} from the store', { product: event.product }),
       streamlabscharitydonation: $t('has donated via Streamlabs Charity'),
       follow: event.platform === 'youtube_account' ? $t('has subscribed') : $t('has followed'),
@@ -286,6 +302,21 @@ class RecentEventsViews extends ViewHandler<IRecentEventsState> {
       justgivingdonation: $t('has donated to Just Giving'),
       treat: $t('has given a treat %{title}', { title: event.title }),
     }[event.type];
+  }
+
+  getDonoString(event: IRecentEvent) {
+    if (event.crate_item) {
+      return $t('has tipped with %{itemName}', { itemName: event.crate_item.name });
+    }
+    if (event.recurring_donation?.months > 1) {
+      return $t('has tipped %{months} months in a row', {
+        months: event.recurring_donation.months,
+      });
+    }
+    if (event.recurring_donation) {
+      return $t('has set up a monthly tip');
+    }
+    return $t('has tipped');
   }
 
   getSubString(event: IRecentEvent) {
@@ -441,7 +472,13 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
   private async formEventsArray() {
     const events = await this.fetchRecentEvents();
     let eventArray: IRecentEvent[] = [];
-    if (!events || !events.data) return;
+    if (
+      !events ||
+      !events.data ||
+      (this.state.safeMode.enabled && this.state.safeMode.clearRecentEvents)
+    ) {
+      return;
+    }
     Object.keys(events.data).forEach(key => {
       const fortifiedEvents = events.data[key].map(event => {
         event.hash = getHashForRecentEvent(event);
@@ -702,6 +739,14 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
       }
     }
 
+    if (e.type === 'safeModeEnabled') {
+      this.onSafeModeEnabled(e.message, e.message.ends_at);
+    }
+
+    if (e.type === 'safeModeDisabled') {
+      this.onSafeModeDisabled();
+    }
+
     if (SUPPORTED_EVENTS.includes(e.type)) {
       this.onEventSocket(e as IEventSocketEvent);
     }
@@ -878,14 +923,16 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
   fetchSafeModeStatus() {
     const url = `https://${this.hostsService.streamlabs}/api/v5/slobs/widget/checksafemode`;
     const headers = authorizedHeaders(this.userService.apiToken);
-    return jfetch<{ status: 'enabled' | 'disabled'; safeModeSettings: { ends_at: number } }>(url, {
+    return jfetch<{
+      status: 'enabled' | 'disabled';
+      safeModeSettings: { ends_at: number; data: ISafeModeServerSettings };
+    }>(url, {
       headers,
     }).then(data => {
       if (data.status === 'enabled') {
-        this.SET_SAFE_MODE_SETTINGS({ enabled: true });
-        this.setSafeModeTimeout(Math.max(data.safeModeSettings.ends_at - Date.now(), 0));
+        this.onSafeModeEnabled(data.safeModeSettings.data, data.safeModeSettings.ends_at);
       } else {
-        this.SET_SAFE_MODE_SETTINGS({ enabled: false });
+        this.onSafeModeDisabled();
       }
     });
   }
@@ -909,23 +956,25 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
     );
     const url = `https://${this.hostsService.streamlabs}/api/v5/slobs/widget/safemode`;
     const sm = this.state.safeMode;
-    const body = JSON.stringify({
-      clear_chat: sm.clearChat,
-      clear_queued_alerts: sm.clearQueuedAlerts,
-      clear_recent_events: sm.clearRecentEvents,
-      disable_chat_alerts: sm.disableChatAlerts,
-      disable_follower_alerts: sm.disableFollowerAlerts,
-      emote_only: sm.emoteOnly,
-      follower_only: sm.followerOnly,
-      sub_only: sm.subOnly,
-      time_in_minutes: sm.timeInMinutes,
-    });
+    const body = JSON.stringify(
+      this.state.safeMode.enabled
+        ? {}
+        : {
+            clear_chat: sm.clearChat,
+            clear_queued_alerts: sm.clearQueuedAlerts,
+            clear_recent_events: sm.clearRecentEvents,
+            disable_chat_alerts: sm.disableChatAlerts,
+            disable_follower_alerts: sm.disableFollowerAlerts,
+            emote_only: sm.emoteOnly,
+            follower_only: sm.followerOnly,
+            sub_only: sm.subOnly,
+            time_in_minutes: sm.timeInMinutes,
+          },
+    );
     this.SET_SAFE_MODE_SETTINGS({ loading: true });
     const promise = jfetch(new Request(url, { headers, body, method: 'POST' }));
 
-    promise
-      .then(() => this.SET_SAFE_MODE_SETTINGS({ enabled: !this.state.safeMode.enabled }))
-      .finally(() => this.SET_SAFE_MODE_SETTINGS({ loading: false }));
+    promise.finally(() => this.SET_SAFE_MODE_SETTINGS({ loading: false }));
 
     return promise;
   }
@@ -933,18 +982,36 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
   activateSafeMode() {
     if (this.state.safeMode.enabled) return;
 
-    return this.toggleSafeMode().then(() => {
-      this.setSafeModeTimeout(this.state.safeMode.timeInMinutes * 60 * 1000);
-      if (this.state.safeMode.clearRecentEvents) {
-        this.SET_RECENT_EVENTS([]);
-      }
-    });
+    return this.toggleSafeMode();
   }
 
   disableSafeMode() {
     if (!this.state.safeMode.enabled) return;
 
     return this.toggleSafeMode();
+  }
+
+  onSafeModeEnabled(serverSettings: ISafeModeServerSettings, endsAt: number) {
+    this.SET_SAFE_MODE_SETTINGS({
+      enabled: true,
+      clearChat: serverSettings.clear_chat,
+      clearQueuedAlerts: serverSettings.clear_queued_alerts,
+      clearRecentEvents: serverSettings.clear_recent_events,
+      disableChatAlerts: serverSettings.disable_chat_alerts,
+      disableFollowerAlerts: serverSettings.disable_follower_alerts,
+      emoteOnly: serverSettings.emote_only,
+      followerOnly: serverSettings.follower_only,
+      subOnly: serverSettings.sub_only,
+      timeInMinutes: serverSettings.time_in_minutes,
+    });
+    this.setSafeModeTimeout(Math.max(endsAt - Date.now(), 0));
+    if (this.state.safeMode.clearRecentEvents) {
+      this.SET_RECENT_EVENTS([]);
+    }
+  }
+
+  onSafeModeDisabled() {
+    this.SET_SAFE_MODE_SETTINGS({ enabled: false });
   }
 
   @mutation()

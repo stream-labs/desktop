@@ -36,6 +36,7 @@ const widgetIconMap = {
   [WidgetType.MediaShare]: 'icon-share',
   [WidgetType.Poll]: 'icon-text-align-left',
   [WidgetType.EmoteWall]: 'icon-smile',
+  [WidgetType.ChatHighlight]: 'icon-community',
 };
 
 const sourceIconMap = {
