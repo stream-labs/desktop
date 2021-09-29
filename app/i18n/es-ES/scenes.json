@@ -11,7 +11,7 @@
   "Are you sure you want to remove %{collectionName}?": "¿Confirma que desea quitar %{collectionName}?",
   "Create Scene Projector": "Crear proyector de escenas",
   "Preview is disabled in performance mode": "La vista previa está desactivada en modo rendimiento",
-  "Your preview is currently disabled": "La vista previa está desactivada",
+  "Your preview is currently disabled": "Su vista previa está actualmente deshabilitada",
   "Are you sure you want to remove %sceneName%?": "¿Confirma que desea quitar %sceneName%?",
   "Performance Mode": "Modo Rendimiento",
   "Create Output Projector": "Crear proyector de salidas",
