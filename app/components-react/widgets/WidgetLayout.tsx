@@ -11,7 +11,7 @@ import { $t } from '../../services/i18n';
 const { Content, Header } = Layout;
 
 export function WidgetLayout(p: { children: ReactNode | [ReactNode, ReactNode] }) {
-  const { previewSourceId, isLoading } = useWidget();
+  const { previewSourceId, isLoading, selectedTab } = useWidget();
   let MenuPanel: ReactNode;
   let ContentPanel: ReactNode;
   if (Array.isArray(p.children)) {
@@ -46,7 +46,7 @@ export function WidgetLayout(p: { children: ReactNode | [ReactNode, ReactNode] }
             <Form form={form} layout="horizontal">
               <Spin spinning={isLoading}>{!isLoading && ContentPanel}</Spin>
             </Form>
-            <BrowserSourceSettings />
+            {selectedTab === 'general' && <BrowserSourceSettings />}
           </Col>
         </Row>
       </Content>

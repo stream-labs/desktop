@@ -4,7 +4,7 @@ import {
   createBinding,
   FileInput,
   ListInput,
-  MediaGalleryInput,
+  MediaGalleryInput, metadata,
   SliderInput,
   TextInput,
 } from '../../shared/inputs';
@@ -14,23 +14,22 @@ import { Alert, Button, Collapse, Layout, Menu, Tooltip } from 'antd';
 import { DEFAULT_WIDGET_STATE, IWidgetState, useWidget, WidgetModule } from '../useWidget';
 import Form from '../../shared/inputs/Form';
 import { WidgetLayout } from '../WidgetLayout';
-import { CaretRightOutlined, CloseOutlined, QuestionCircleOutlined } from '@ant-design/icons';
+import { CaretRightOutlined } from '@ant-design/icons';
 import { Services } from '../../service-provider';
 import { values } from 'lodash';
 import { IAlertInfo, TAlertType } from '../../../services/widgets/widget-settings';
-import { getDefined } from '../../../util/properties-type-guards';
 import { mutation, useSelector } from '../../store';
 
 export function AlertBox() {
   return (
     <WidgetLayout>
-      <MainPanel />
-      <SubPanel />
+      <TabsList />
+      <TabContent />
     </WidgetLayout>
   );
 }
 
-function MainPanel() {
+function TabsList() {
   const { onMenuClickHandler, selectedTab } = useAlertBox();
   return (
     <>
@@ -42,20 +41,17 @@ function MainPanel() {
   );
 }
 
-function SubPanel() {
+function TabContent() {
   const { selectedTab } = useAlertBox();
-  const tab = selectedTab || 'general';
-  if (tab === 'general') {
-    return <GeneralSettings />;
-  } else if (tab === 'advanced') {
-    return <AdvancedSettings />;
-  } else {
-    return <VariationSettings type={tab as TAlertType} />;
-  }
+  return selectedTab === 'general' ? (
+    <GeneralSettings />
+  ) : (
+    <VariationSettings type={selectedTab as TAlertType} />
+  );
 }
 
 function GeneralSettings() {
-  const { switchToLegacyAlertbox, bind } = useAlertBox();
+  const { bind } = useAlertBox();
   return (
     <Form layout={'horizontal'}>
       <SliderInput
@@ -76,18 +72,25 @@ function GeneralSettings() {
           { label: 'Top', value: 'top' },
         ]}
       />
-      <Alert
-        message={
-          <span>
-            Looking for an legacy AlertBox Settings? <a>Click here</a>
-          </span>
-        }
-        onClick={switchToLegacyAlertbox}
-        type="info"
-        showIcon
-        style={{ marginBottom: '16px' }}
-      />
+      <LegacyLink />
     </Form>
+  );
+}
+
+function LegacyLink() {
+  const { switchToLegacyAlertbox } = useAlertBox();
+  return (
+    <Alert
+      message={
+        <span>
+          Looking for an legacy AlertBox Settings? <a>Click here</a>
+        </span>
+      }
+      onClick={switchToLegacyAlertbox}
+      type="info"
+      showIcon
+      style={{ marginBottom: '16px' }}
+    />
   );
 }
 
@@ -128,34 +131,38 @@ function VariationSettings(p: { type: TAlertType }) {
 
   return (
     <div>
-      {p.type === 'donation' && (
-        <div style={{ marginBottom: '32px' }}>
-          <Alert
-            message={
-              <span>
-                Add a payment method? <a>Click here</a>
-              </span>
-            }
-            type="info"
-            showIcon
-            style={{ marginBottom: '16px' }}
-          />
-          <Alert
-            message={
-              <span>
-                Customize your tip page where viewers can send you donations <a>Click here</a>
-              </span>
-            }
-            type="info"
-            showIcon
-            style={{ marginBottom: '16px' }}
-          />
-        </div>
-      )}
-      <MediaGalleryInput label={$t('Image')} value={imageUrl} />
-      <FileInput label={$t('Sound')} />
+      <MediaGalleryInput label={$t('Image')} {...bind.image_href} />
+      <MediaGalleryInput label={$t('Sound')} isAudio {...bind.sound_href} />
       <SliderInput label={$t('Sound Volume')} {...bind.sound_volume} min={0} max={100} />
       <TextInput label={$t('Message Template')} {...bind.message_template} />
+      {p.type === 'donation' && <DonationHelperLinks />}
+    </div>
+  );
+}
+
+function DonationHelperLinks() {
+  return (
+    <div style={{ marginBottom: '32px' }}>
+      <Alert
+        message={
+          <span>
+            Add a payment method? <a>Click here</a>
+          </span>
+        }
+        type="info"
+        showIcon
+        style={{ marginBottom: '16px' }}
+      />
+      <Alert
+        message={
+          <span>
+            Customize your tip page where viewers can send you donations <a>Click here</a>
+          </span>
+        }
+        type="info"
+        showIcon
+        style={{ marginBottom: '16px' }}
+      />
     </div>
   );
 }
@@ -213,15 +220,30 @@ export class AlertBoxModule extends WidgetModule<IAlertBoxState> {
   protected patchAfterFetch(data: any): any {
     const settings = data.settings;
     const alertEvents = values(this.eventsInfo) as IAlertInfo[];
+    const variationMetadata = getVariationMetadata();
     alertEvents.map(alertEvent => {
-      const alertType = alertEvent.type;
-      const alertFields = Object.keys(settings).filter(key => key.startsWith(`${alertType}_`));
+      const apiKey = alertEvent.apiKey || alertEvent.type;
+      const alertFields = Object.keys(settings).filter(key => key.startsWith(`${apiKey}_`));
       const variationSettings = {} as any;
       alertFields.forEach(key => {
-        const targetKey = key.replace(`${alertType}_`, '');
-        variationSettings[targetKey] = settings[key];
+        let value = settings[key];
+        const targetKey = key.replace(`${apiKey}_`, '');
+
+        // sanitize settings
+        const fieldMetadata = variationMetadata[targetKey];
+        if (fieldMetadata) {
+          if (fieldMetadata.min !== undefined && value < fieldMetadata.min) {
+            value = fieldMetadata.min;
+          }
+          if (fieldMetadata.max !== undefined && value > fieldMetadata.max) {
+            value = fieldMetadata.max;
+          }
+        }
+
+        settings[key] = value;
+        variationSettings[targetKey] = value;
       });
-      this.setVariationSettings(alertType, variationSettings as IVariationSettings);
+      this.setVariationSettings(alertEvent.type, variationSettings as IVariationSettings);
     });
     return data;
   }
@@ -233,7 +255,7 @@ export class AlertBoxModule extends WidgetModule<IAlertBoxState> {
     const keys = Object.keys(settings);
     const newSettings = { ...settings };
     keys.forEach(key => {
-      if (['alert_delay', 'moderation_delay'].includes(key)) {
+      if (['alert_delay', 'moderation_delay', 'text_delay'].includes(key)) {
         newSettings[key] = Math.floor(settings[key] / 1000);
       }
     });
@@ -241,11 +263,13 @@ export class AlertBoxModule extends WidgetModule<IAlertBoxState> {
   }
 
   public updateVariationSettings(type: TAlertType, variationPatch: Partial<IVariationSettings>) {
+    const event = this.eventsInfo[type];
+    const apiKey = event.apiKey || event.type;
     const currentVariationSettings = this.state.variations[type].default;
     this.setVariationSettings(type, { ...currentVariationSettings, ...variationPatch });
     const settingsPatch = {} as any;
     Object.keys(variationPatch).forEach(key => {
-      settingsPatch[`${type}_${key}`] = variationPatch[key];
+      settingsPatch[`${apiKey}_${key}`] = variationPatch[key];
     });
     this.updateSettings({ ...this.state.data.settings, ...settingsPatch });
   }
@@ -261,6 +285,18 @@ export class AlertBoxModule extends WidgetModule<IAlertBoxState> {
 
 function useAlertBox() {
   return useWidget<AlertBoxModule>();
+}
+
+function getVariationMetadata() {
+  return {
+    // alert_delay: metadata.slider({ label: $t('Global Alert Delay'), min: 0, max: 30 }),
+    alert_duration: metadata.slider({ label: $t('Global Alert Delay'), min: 0, max: 30 }),
+    image_href: metadata.text({ label: $t('Image') }),
+    sound_href: metadata.text({ label: $t('Sound') }),
+    sound_volume: metadata.slider({ label: $t('Sound Volume'), min: 0, max: 100 }),
+    message_template: metadata.text({ label: $t('Message Template') }),
+    text_delay: metadata.slider({ label: $t('Text Delay'), min: 0, max: 30 }),
+  };
 }
 
 interface IVariationSettings {

@@ -443,3 +443,28 @@ export function getInputComponentByType(
   });
   return name ? InputComponents[name] : null;
 }
+
+export const metadata = {
+  text: createMetadata(),
+  number: createMetadata<{
+    min?: number;
+    max?: number;
+  }>(),
+  slider: createMetadata<{
+    min?: number;
+    max?: number;
+    step?: number;
+  }>(),
+};
+
+interface TBaseFieldMetadata {
+  label?: string;
+  tooltip?: string;
+  required?: boolean;
+}
+
+function createMetadata<TMetadata = {}, TReturnType = TMetadata & TBaseFieldMetadata>(): (
+  options: TReturnType,
+) => TReturnType {
+  return (options: TReturnType) => options;
+}

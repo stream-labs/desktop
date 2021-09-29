@@ -8,6 +8,7 @@ import {
   DateInput,
   ImageInput,
   ListInput,
+  MediaGalleryInput,
   NumberInput,
   SliderInput,
   SwitchInput,
@@ -72,6 +73,8 @@ function Examples() {
     numberVal: 0,
     sliderVal: 5,
     imageVal: '',
+    galleryImage: '',
+    galleryAudio: '',
     checkboxVal: false,
     dateVal: undefined as Date | undefined,
     listVal: 1,
@@ -230,6 +233,11 @@ function Examples() {
 
       <Example title="Image Input">
         <ImageInput label="Basic" maxFileSize={3000000} {...globalProps} {...bind.imageVal} />
+      </Example>
+
+      <Example title="Media Gallery">
+        <MediaGalleryInput label="Image" {...globalProps} {...bind.galleryImage} />
+        <MediaGalleryInput label="Audio" {...globalProps} isAudio {...bind.galleryAudio} />
       </Example>
 
       <Example title="Buttons">
