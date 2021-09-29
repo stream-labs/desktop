@@ -4,7 +4,7 @@ import { Inject } from 'services/core/injector';
 import { $t } from 'services/i18n';
 import { DefaultHardwareService } from 'services/hardware';
 import MixerVolmeter from 'components/MixerVolmeter.vue';
-import { Display } from 'components/shared/ReactComponent';
+import { Display } from 'components/shared/ReactComponentList';
 import { ERenderingMode } from '../../../../obs-api';
 import VFormGroup from 'components/shared/inputs/VFormGroup.vue';
 import { metadata } from 'components/widgets/inputs';

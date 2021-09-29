@@ -110,6 +110,7 @@ export { AlertBoxService } from 'services/widgets/settings/alert-box';
 export { SpinWheelService } from 'services/widgets/settings/spin-wheel';
 export { PollService } from 'services/widgets/settings/poll';
 export { EmoteWallService } from 'services/widgets/settings/emote-wall';
+export { ChatHighlightService } from 'services/widgets/settings/chat-highlight';
 
 import { AppService } from './services/app';
 import { WindowsService } from './services/windows';

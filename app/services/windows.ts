@@ -26,7 +26,7 @@ import {
   RenameSource,
   AdvancedStatistics,
   SafeMode,
-} from 'components/shared/ReactComponent';
+} from 'components/shared/ReactComponentList';
 
 import SourceProperties from 'components/windows/SourceProperties.vue';
 import SourceFilters from 'components/windows/SourceFilters.vue';
@@ -69,12 +69,13 @@ import AlertBox from 'components/widgets/AlertBox.vue';
 import SpinWheel from 'components/widgets/SpinWheel.vue';
 import Poll from 'components/widgets/Poll';
 import EmoteWall from 'components/widgets/EmoteWall';
+import ChatHighlight from 'components/widgets/ChatHighlight';
 
 import { byOS, OS } from 'util/operating-systems';
 import { UsageStatisticsService } from './usage-statistics';
 import { Inject } from 'services/core';
 import MessageBoxModal from 'components/shared/modals/MessageBoxModal';
-import Modal from 'components/shared/modals/modal';
+import Modal from 'components/shared/modals/Modal';
 
 const { ipcRenderer, remote } = electron;
 const BrowserWindow = remote.BrowserWindow;
@@ -135,6 +136,7 @@ export function getComponents() {
     SpinWheel,
     Poll,
     EmoteWall,
+    ChatHighlight,
     WelcomeToPrime,
     GoLiveWindow,
     EditStreamWindow,
