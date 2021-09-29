@@ -2,8 +2,8 @@ const signtool = require('signtool');
 
 const base = {
   appId: 'com.streamlabs.slobs',
-  productName: 'Streamlabs OBS',
-  icon: 'media/images/icon.ico',
+  productName: 'FlexTV Broadcaster',
+  icon: 'media/images/flextv.ico',
   files: [
     'bundles',
     '!bundles/*.js.map',
