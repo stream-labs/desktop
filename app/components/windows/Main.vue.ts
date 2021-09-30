@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import { Component, Watch } from 'vue-property-decorator';
 import SideNav from '../SideNav';
+import FlexTvSideNav from '../flextv/FlexTvSideNav';
 import {
   NewsBanner,
   TitleBar,
@@ -53,6 +54,7 @@ const loadedTheme = () => {
   components: {
     TitleBar,
     SideNav,
+    FlexTvSideNav,
     Studio,
     BrowseOverlays,
     Onboarding,

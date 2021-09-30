@@ -21,9 +21,6 @@
     </div>
 
     <div class="nav-right">
-      <div class="nav-item">
-        <test-widgets v-if="loggedIn" />
-      </div>
       <div v-if="streamingService.isRecording" class="nav-item record-time">
         {{ recordingTime }}
       </div>

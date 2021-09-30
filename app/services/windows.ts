@@ -12,6 +12,7 @@ import { throttle } from 'lodash-decorators';
 import Main from 'components/windows/Main.vue';
 import Settings from 'components/windows/settings/Settings.vue';
 import FFZSettings from 'components/windows/FFZSettings.vue';
+import FlexTvSettings from 'components/windows/flextv/settings/FlexTvSettings.vue';
 import SourcesShowcase from 'components/windows/SourcesShowcase.vue';
 import SceneTransitions from 'components/windows/SceneTransitions.vue';
 import AddSource from 'components/windows/AddSource.vue';
@@ -88,6 +89,7 @@ export function getComponents() {
     Main,
     Settings,
     FFZSettings,
+    FlexTvSettings,
     SceneTransitions,
     SourcesShowcase,
     RenameSource,

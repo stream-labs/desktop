@@ -12,6 +12,7 @@ import Highlighter from './pages/Highlighter';
 import Grow from './pages/grow/Grow';
 import Loader from './pages/Loader';
 import NavTools from './sidebar/NavTools';
+import FlexTvNavTools from './sidebar/FlexTvNavTools';
 import PlatformLogo from './shared/PlatformLogo';
 import AdvancedStatistics from './windows/AdvancedStatistics';
 import StreamScheduler from './pages/stream-scheduler/StreamScheduler';
@@ -43,6 +44,7 @@ export const components = {
   Grow,
   Loader,
   NavTools,
+  FlexTvNavTools,
   PlatformLogo,
   StreamScheduler: createRoot(StreamScheduler),
   AdvancedStatistics,

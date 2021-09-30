@@ -1,4 +1,4 @@
-import {EPlatformCallResult, IPlatformRequest} from '.'
+import { EPlatformCallResult, IPlatformRequest } from '.';
 import { InheritMutations } from '../core';
 import { BasePlatformService } from './base-platform';
 import { IPlatformCapabilityResolutionPreset, IPlatformState, TPlatformCapability } from './index';
@@ -56,7 +56,7 @@ export class FlextvService
       this.streamSettingsService.protectedModeEnabled &&
       this.streamSettingsService.isSafeToModifyStreamKey()
     ) {
-      const data = await this.fetchStreamPair();      
+      const data = await this.fetchStreamPair();
       this.SET_STREAM_KEY(data.streamKey);
       if (!this.streamingService.views.isMultiplatformMode) {
         this.streamSettingsService.setSettings({
@@ -74,17 +74,17 @@ export class FlextvService
     }
   }
 
-  async afterGoLive () {
+  async afterGoLive() {
     await platformAuthorizedRequest<{ url: string, streamKey: string }>('flextv',
       `https://www.hotaetv.com/api/my/channel/start-stream`,
-    )
+    );
   }
 
   fetchStreamPair(): Promise<{ url: string, streamKey: string }> {
     return platformAuthorizedRequest<{ url: string, streamKey: string }>('flextv',
       `https://www.hotaetv.com/api/my/channel/stream-key`,
-    )
-  }  
+    );
+  }
 
 
   getHeaders(req: IPlatformRequest, useToken: boolean | string) {

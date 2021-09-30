@@ -116,6 +116,14 @@ export class NameFolder extends ReactComponent {}
 })
 export class NavTools extends ReactComponent {}
 
+@Component({
+  props: {
+    name: { default: 'FlexTvNavTools' },
+    wrapperStyles: { default: () => ({ marginTop: 'auto', flexShrink: 0 }) },
+  },
+})
+export class FlexTvNavTools extends ReactComponent {}
+
 @Component({ props: { name: { default: 'NewsBanner' } } })
 export class NewsBanner extends ReactComponent {}
 
