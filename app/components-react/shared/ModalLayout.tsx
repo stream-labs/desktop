@@ -11,7 +11,7 @@ import { ModalProps } from 'antd/lib/modal';
 // use props of Modal from the antd lib
 type TProps = { children: ReactNode; fixedChild?: ReactNode; hideFooter?: boolean } & Pick<
   ModalProps,
-  'footer' | 'onOk' | 'okText'
+  'footer' | 'onOk' | 'okText' | 'confirmLoading'
 >;
 
 // calculate OS dependent styles
@@ -59,7 +59,10 @@ export function ModalLayout(p: TProps) {
       <>
         <Button onClick={close}>{$t('Close')}</Button>
         {p.onOk && (
-          <Button onClick={p.onOk} type="primary">
+          <Button onClick={p.onOk} type="primary" disabled={p.confirmLoading}>
+            {p.confirmLoading && (
+              <i className="fa fa-pulse fa-spinner" style={{ marginRight: 8 }} />
+            )}
             {okText}
           </Button>
         )}

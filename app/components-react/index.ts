@@ -8,7 +8,7 @@ import Display from './shared/Display';
 import TitleBar from './shared/TitleBar';
 import Chat from './root/Chat';
 import Highlighter from './pages/Highlighter';
-import Grow from './pages/Grow/Grow';
+import Grow from './pages/grow/Grow';
 import Loader from './pages/Loader';
 import NavTools from './sidebar/NavTools';
 import PlatformLogo from './shared/PlatformLogo';
@@ -25,6 +25,7 @@ import StudioEditor from './root/StudioEditor';
 import SharedComponentsLibrary from './windows/sharedComponentsLibrary/SharedComponentsLibrary';
 import { ObsSettings } from './windows/settings/ObsSettings';
 import ThemeAudit from './pages/ThemeAudit';
+import SafeMode from './windows/SafeMode';
 
 // list of React components to be used inside Vue components
 export const components = {
@@ -54,4 +55,5 @@ export const components = {
   ThemeAudit,
   AppsNav,
   StudioEditor,
+  SafeMode,
 };
