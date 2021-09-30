@@ -1,3 +1,4 @@
+import cx from 'classnames';
 import { Component } from 'vue-property-decorator';
 import { Inject } from 'services/core/injector';
 import { OnboardingService } from 'services/onboarding';
@@ -43,13 +44,20 @@ export default class FlexLoginForm extends TsxComponent<ConnectProps> {
       method: 'POST',
       body: JSON.stringify({ loginId: this.id, password: this.password }),
     });
-    const data: FlexAuthResult = await jfetch(request);
-    console.log(data);
-    const auth = this.parseAuthFromToken(String(data.id), data.nickname, data.token);
+    try {
+      const data: FlexAuthResult = await jfetch(request);
+      const auth = this.parseAuthFromToken(String(data.id), data.nickname, data.token);
 
-    this.props.continue()
+      this.props.continue();
 
-    return this.userService.startFlexAuth(auth);  
+      return this.userService.startFlexAuth(auth);
+    } catch (e: unknown) {
+      return electron.remote.dialog.showMessageBox({
+        title: '계정정보 불일치',
+        type: 'warning',
+        message: '계정정보가 일치하지 않습니다.',
+      });
+    }
   }
 
   private parseAuthFromToken(id: string, nickname: string, token: string): IUserAuth {
@@ -88,8 +96,11 @@ export default class FlexLoginForm extends TsxComponent<ConnectProps> {
           </div>
 
           <p>
-            <button className={'button button-flex'} onClick={() => this.next()} style={{marginRight: 10}}>
-              {$t('OK')}
+            <button
+              class={cx('button button--action', styles.flexLoginButton)}
+              onClick={() => this.next()}
+            >
+              {$t('Log In')}
             </button>
             <a class={styles['link-button']} onClick={() => this.props.continue()}>
               {$t('Back')}

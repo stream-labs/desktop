@@ -69,7 +69,7 @@
           <i class="icon-date" />
         </button>
       </div>
-      <div class="nav-item">
+      <div class="nav-item" v-if="loggedIn">
         <start-streaming-button :disabled="locked" />
       </div>
     </div>
