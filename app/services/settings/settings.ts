@@ -455,13 +455,14 @@ export class SettingsService extends StatefulService<ISettingsServiceState> {
   }
 
   private ensureValidEncoder() {
-    const mode: string = this.findSettingValue(this.state.Output.formData, 'Untitled', 'Mode');
     const encoderSetting: IObsListInput<string> =
       this.findSetting(this.state.Output.formData, 'Streaming', 'Encoder') ??
       this.findSetting(this.state.Output.formData, 'Streaming', 'StreamEncoder');
     const encoderIsValid = !!encoderSetting.options.find(opt => opt.value === encoderSetting.value);
 
     if (!encoderIsValid) {
+      const mode: string = this.findSettingValue(this.state.Output.formData, 'Untitled', 'Mode');
+
       if (mode === 'Advanced') {
         this.setSettingValue('Output', 'Encoder', 'obs_x264');
       } else {
