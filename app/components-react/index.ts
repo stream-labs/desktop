@@ -1,5 +1,6 @@
 import NameFolder from './windows/NameFolder';
 import GoLiveWindow from './windows/go-live/GoLiveWindow';
+import FlexTvGoLiveWindow from './windows/flextv/FlexTvGoLiveWindow';
 import EditStreamWindow from './windows/go-live/EditStreamWindow';
 import IconLibraryProperties from './windows/IconLibraryProperties';
 import NewsBanner from './root/NewsBanner';
@@ -32,6 +33,7 @@ import SafeMode from './windows/SafeMode';
 export const components = {
   NameFolder,
   GoLiveWindow: createRoot(GoLiveWindow),
+  FlexTvGoLiveWindow: createRoot(FlexTvGoLiveWindow),
   EditStreamWindow: createRoot(EditStreamWindow),
   IconLibraryProperties,
   NewsBanner,

@@ -20,6 +20,7 @@ import NameScene from 'components/windows/NameScene.vue';
 import {
   NameFolder,
   GoLiveWindow,
+  FlexTvGoLiveWindow,
   EditStreamWindow,
   IconLibraryProperties,
   SharedComponentsLibrary,
@@ -141,6 +142,7 @@ export function getComponents() {
     ChatHighlight,
     WelcomeToPrime,
     GoLiveWindow,
+    FlexTvGoLiveWindow,
     EditStreamWindow,
     IconLibraryProperties,
     SharedComponentsLibrary,

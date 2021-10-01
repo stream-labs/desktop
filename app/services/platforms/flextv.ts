@@ -75,13 +75,15 @@ export class FlextvService
   }
 
   async afterGoLive() {
-    await platformAuthorizedRequest<{ url: string, streamKey: string }>('flextv',
+    await platformAuthorizedRequest<{ url: string; streamKey: string }>(
+      'flextv',
       `https://www.hotaetv.com/api/my/channel/start-stream`,
     );
   }
 
-  fetchStreamPair(): Promise<{ url: string, streamKey: string }> {
-    return platformAuthorizedRequest<{ url: string, streamKey: string }>('flextv',
+  fetchStreamPair(): Promise<{ url: string; streamKey: string }> {
+    return platformAuthorizedRequest<{ url: string; streamKey: string }>(
+      'flextv',
       `https://www.hotaetv.com/api/my/channel/stream-key`,
     );
   }
