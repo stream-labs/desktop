@@ -38,6 +38,7 @@ import { UsageStatisticsService } from 'services/usage-statistics';
 import { StreamingService } from 'services/streaming';
 import { NotificationsService, ENotificationType } from 'services/notifications';
 import { JsonrpcService } from 'services/api/jsonrpc';
+import remote from '@electron/remote';
 
 export enum EAuthProcessState {
   Idle = 'idle',
@@ -277,8 +278,8 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     if (!this.state.auth) return;
 
     if (!this.state.auth.hasRelogged) {
-      await electron.remote.session.defaultSession.clearCache();
-      await electron.remote.session.defaultSession.clearStorageData({
+      await remote.session.defaultSession.clearCache();
+      await remote.session.defaultSession.clearStorageData({
         storages: ['appcache, cookies', 'cachestorage', 'filesystem'],
       });
       this.streamSettingsService.resetStreamSettings();
@@ -489,7 +490,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
    */
   flushUserSession(): Promise<void> {
     if (this.isLoggedIn && this.state.auth.partition) {
-      const session = electron.remote.session.fromPartition(this.state.auth.partition);
+      const session = remote.session.fromPartition(this.state.auth.partition);
       session.flushStorageData();
       return session.cookies.flushStore();
     }
@@ -680,7 +681,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
 
     if (!validateLoginResult) {
       this.logOut();
-      electron.remote.dialog.showMessageBox({
+      remote.dialog.showMessageBox({
         title: 'Streamlabs OBS',
         message: $t('You have been logged out'),
       });
@@ -697,7 +698,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
       await this.logOut();
       this.showLogin();
 
-      electron.remote.dialog.showMessageBox(electron.remote.getCurrentWindow(), {
+      remote.dialog.showMessageBox(remote.getCurrentWindow(), {
         type: 'warning',
         title: 'Twitch Error',
         message: $t(
@@ -719,8 +720,8 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     this.navigationService.navigate('Studio');
 
     const session = this.state.auth.partition
-      ? electron.remote.session.fromPartition(this.state.auth.partition)
-      : electron.remote.session.defaultSession;
+      ? remote.session.fromPartition(this.state.auth.partition)
+      : remote.session.defaultSession;
 
     session.clearStorageData({ storages: ['cookies'] });
     this.settingsService.setSettingValue('Stream', 'key', '');

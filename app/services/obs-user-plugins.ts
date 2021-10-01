@@ -1,9 +1,8 @@
 import { Service } from './core/service';
 import fs from 'fs';
 import path from 'path';
-import electron from 'electron';
 import * as obs from '../../obs-api';
-import Utils from './utils';
+import remote from '@electron/remote';
 
 // WARNING: This service is initialized extremely early
 // and should not import any other services.
@@ -42,7 +41,7 @@ export class ObsUserPluginsService extends Service {
   }
 
   private get appData() {
-    return electron.remote.app.getPath('appData');
+    return remote.app.getPath('appData');
   }
 
   private get pluginsBaseDir() {

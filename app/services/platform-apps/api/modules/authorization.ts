@@ -1,7 +1,8 @@
 import { Module, EApiPermissions, apiMethod, IApiContext } from './module';
-import electron, { BrowserWindow } from 'electron';
+import { BrowserWindow } from 'electron';
 import url from 'url';
 import uuid from 'uuid/v4';
+import remote from '@electron/remote';
 
 enum EAuthWindowEventType {
   AuthRedirect = 'auth_redirect',
@@ -50,7 +51,7 @@ export class AuthorizationModule extends Module {
       throw new Error('Authorization URL is not allowlisted in the application manifest!');
     }
 
-    const win = new electron.remote.BrowserWindow({
+    const win = new remote.BrowserWindow({
       width: options.width || 600,
       height: options.height || 600,
       title: options.title,

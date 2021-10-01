@@ -7,7 +7,6 @@ import padStart from 'lodash/padStart';
 import { IOutputSettings, OutputSettingsService } from 'services/settings';
 import { WindowsService } from 'services/windows';
 import { Subject } from 'rxjs';
-import electron from 'electron';
 import {
   ERecordingState,
   EReplayBufferState,
@@ -43,6 +42,7 @@ import { TwitterService } from '../integrations/twitter';
 import { assertIsDefined, getDefined } from 'util/properties-type-guards';
 import { StreamInfoView } from './streaming-view';
 import { GrowService } from 'services/grow/grow';
+import remote from '@electron/remote';
 
 enum EOBSOutputType {
   Streaming = 'streaming',
@@ -595,7 +595,7 @@ export class StreamingService
     const shouldConfirm = this.streamSettingsService.settings.warnBeforeStartingStream;
 
     if (shouldConfirm) {
-      const goLive = await electron.remote.dialog.showMessageBox(Utils.getMainWindow(), {
+      const goLive = await remote.dialog.showMessageBox(Utils.getMainWindow(), {
         title: $t('Go Live'),
         type: 'warning',
         message: $t('Are you sure you want to start streaming?'),
@@ -607,7 +607,7 @@ export class StreamingService
       }
     }
 
-    this.powerSaveId = electron.remote.powerSaveBlocker.start('prevent-display-sleep');
+    this.powerSaveId = remote.powerSaveBlocker.start('prevent-display-sleep');
 
     obs.NodeObs.OBS_service_startStreaming();
 
@@ -664,7 +664,7 @@ export class StreamingService
       const shouldConfirm = this.streamSettingsService.settings.warnBeforeStoppingStream;
 
       if (shouldConfirm) {
-        const endStream = await electron.remote.dialog.showMessageBox(Utils.getMainWindow(), {
+        const endStream = await remote.dialog.showMessageBox(Utils.getMainWindow(), {
           title: $t('End Stream'),
           type: 'warning',
           message: $t('Are you sure you want to stop streaming?'),
@@ -675,7 +675,7 @@ export class StreamingService
       }
 
       if (this.powerSaveId) {
-        electron.remote.powerSaveBlocker.stop(this.powerSaveId);
+        remote.powerSaveBlocker.stop(this.powerSaveId);
       }
 
       obs.NodeObs.OBS_service_stopStreaming(false);
@@ -1048,7 +1048,7 @@ export class StreamingService
 
       this.outputErrorOpen = true;
       const errorType = 'error';
-      electron.remote.dialog
+      remote.dialog
         .showMessageBox(Utils.getMainWindow(), {
           buttons,
           title,
@@ -1058,7 +1058,7 @@ export class StreamingService
         .then(({ response }) => {
           if (linkToDriverInfo && response === 1) {
             this.outputErrorOpen = false;
-            electron.remote.shell.openExternal(
+            remote.shell.openExternal(
               'https://howto.streamlabs.com/streamlabs-obs-19/nvidia-graphics-driver-clean-install-tutorial-7000',
             );
           } else {
@@ -1068,7 +1068,7 @@ export class StreamingService
             }
             if (showNativeErrorMessage && response === expectedResponse) {
               const buttons = [$t('OK')];
-              electron.remote.dialog
+              remote.dialog
                 .showMessageBox({
                   buttons,
                   title,

@@ -1,8 +1,8 @@
 import { apiMethod, EApiPermissions, IApiContext, Module, IBrowserViewTransform } from './module';
 import { Display } from 'services/video';
 import uuid from 'uuid/v4';
-import electron from 'electron';
 import { Subscription } from 'rxjs';
+import remote from '@electron/remote';
 
 interface IDisplayCreateOptions {
   position: IVec2;
@@ -40,7 +40,7 @@ export class DisplayModule extends Module {
       this.updateDisplay(this.displays[displayId], transform);
     });
 
-    electron.remote.webContents.fromId(ctx.webContentsId).on('destroyed', () => {
+    remote.webContents.fromId(ctx.webContentsId).on('destroyed', () => {
       this.destroyDisplay(displayId);
     });
 

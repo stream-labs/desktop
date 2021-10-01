@@ -8,10 +8,10 @@ import { platformAuthorizedRequest, platformRequest } from './utils';
 import { IGoLiveSettings } from 'services/streaming';
 import { throwStreamError } from 'services/streaming/stream-error';
 import { BasePlatformService } from './base-platform';
-import electron from 'electron';
 import { WindowsService } from '../windows';
 import { assertIsDefined, getDefined } from '../../util/properties-type-guards';
 import { flatten } from 'lodash';
+import remote from '@electron/remote';
 
 interface IFacebookPage {
   access_token: string;
@@ -686,9 +686,7 @@ export class FacebookService
   }
 
   createFBPage() {
-    electron.remote.shell.openExternal(
-      'https://www.facebook.com/gaming/pages/create?ref=streamlabs',
-    );
+    remote.shell.openExternal('https://www.facebook.com/gaming/pages/create?ref=streamlabs');
     this.windowsService.actions.closeChildWindow();
   }
 

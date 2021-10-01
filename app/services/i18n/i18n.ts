@@ -1,4 +1,3 @@
-import electron from 'electron';
 import VueI18n from 'vue-i18n';
 import { PersistentStatefulService } from '../core/persistent-stateful-service';
 import { mutation } from 'services/core/stateful-service';
@@ -11,6 +10,7 @@ import * as fs from 'fs';
 import path from 'path';
 import Utils from '../utils';
 import fallback from '../../i18n/fallback';
+import remote from '@electron/remote';
 
 interface II18nState {
   locale: string;
@@ -151,7 +151,7 @@ export class I18nService extends PersistentStatefulService<II18nState> implement
     // if locale is not set than use electron's one
     let locale = this.state.locale;
     if (!locale) {
-      const electronLocale = electron.remote.app.getLocale();
+      const electronLocale = remote.app.getLocale();
       const langDescription = LANG_CODE_MAP[electronLocale];
       locale = langDescription ? langDescription.locale : 'en-US';
     }
@@ -197,12 +197,12 @@ export class I18nService extends PersistentStatefulService<II18nState> implement
 
   setLocale(locale: string) {
     this.SET_LOCALE(locale);
-    electron.remote.app.relaunch({ args: [] });
-    electron.remote.app.quit();
+    remote.app.relaunch({ args: [] });
+    remote.app.quit();
   }
 
   private getI18nPath() {
-    return path.join(electron.remote.app.getAppPath(), 'app/i18n');
+    return path.join(remote.app.getAppPath(), 'app/i18n');
   }
 
   private loadDictionary(locale: string): Dictionary<string> {

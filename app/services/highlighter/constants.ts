@@ -1,7 +1,7 @@
 import path from 'path';
 import Utils from 'services/utils';
-import electron from 'electron';
 import { getOS, OS } from 'util/operating-systems';
+import remote from '@electron/remote';
 
 export const FFMPEG_DIR = Utils.isDevMode()
   ? path.resolve('node_modules', 'ffmpeg-ffprobe-static')
@@ -22,10 +22,7 @@ export const TEST_MODE = false;
 export const SCRUB_WIDTH = 320;
 export const SCRUB_HEIGHT = 180;
 export const SCRUB_FRAMES = 20;
-export const SCRUB_SPRITE_DIRECTORY = path.join(
-  electron.remote.app.getPath('userData'),
-  'highlighter',
-);
+export const SCRUB_SPRITE_DIRECTORY = path.join(remote.app.getPath('userData'), 'highlighter');
 
 export const FADE_OUT_DURATION = 1;
 

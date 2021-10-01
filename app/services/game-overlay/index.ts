@@ -11,8 +11,9 @@ import { $t } from 'services/i18n';
 import { getOS, OS } from 'util/operating-systems';
 import { StreamingService } from '../streaming';
 import { UsageStatisticsService } from 'services/usage-statistics';
+import remote from '@electron/remote';
 
-const { BrowserWindow } = electron.remote;
+const { BrowserWindow } = remote;
 
 interface IWindowProperties {
   chat: { position: IVec2; id: number; enabled: boolean };
@@ -97,7 +98,7 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
 
   initializeOverlay() {
     if (!this.state.isEnabled) return;
-    this.overlay = electron.remote.require('game-overlay');
+    this.overlay = remote.require('game-overlay');
 
     if (this.overlayRunning) return;
     this.overlayRunning = true;
@@ -105,7 +106,7 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
     let crashHandlerLogPath = '';
     if (process.env.NODE_ENV !== 'production' || !!process.env.SLOBS_PREVIEW) {
       const overlayLogFile = '\\game-overlays.log';
-      crashHandlerLogPath = electron.remote.app.getPath('userData') + overlayLogFile;
+      crashHandlerLogPath = remote.app.getPath('userData') + overlayLogFile;
     }
 
     this.overlay.start(crashHandlerLogPath);
@@ -214,7 +215,7 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
   determineStartPosition(window: string) {
     const pos = this.state.windowProperties[window].position;
     if (pos) {
-      const display = electron.remote.screen.getAllDisplays().find(display => {
+      const display = remote.screen.getAllDisplays().find(display => {
         const bounds = display.bounds;
         const intBounds = pos.x >= bounds.x && pos.y >= bounds.y;
         const extBounds = pos.x < bounds.x + bounds.width && pos.y < bounds.y + bounds.height;

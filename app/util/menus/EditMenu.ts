@@ -10,13 +10,12 @@ import { WidgetsService } from 'services/widgets';
 import { CustomizationService } from 'services/customization';
 import { SelectionService } from 'services/selection';
 import { ProjectorService } from 'services/projector';
-import { AudioService } from 'services/audio';
-import electron from 'electron';
 import { $t } from 'services/i18n';
 import { EditorCommandsService } from 'services/editor-commands';
 import { ERenderingMode } from '../../../obs-api';
 import { StreamingService } from 'services/streaming';
 import Utils from 'services/utils';
+import remote from '@electron/remote';
 
 interface IEditMenuOptions {
   selectedSourceId?: string;
@@ -175,7 +174,7 @@ export class EditMenu extends Menu {
           this.append({
             label: $t('Export Widget'),
             click: () => {
-              electron.remote.dialog
+              remote.dialog
                 .showSaveDialog({
                   filters: [{ name: 'Widget File', extensions: ['widget'] }],
                 })
@@ -225,8 +224,8 @@ export class EditMenu extends Menu {
               );
             } else {
               // remove a global source
-              electron.remote.dialog
-                .showMessageBox(electron.remote.getCurrentWindow(), {
+              remote.dialog
+                .showMessageBox(remote.getCurrentWindow(), {
                   title: 'Streamlabs OBS',
                   message: $t('This source will be removed from all of your scenes'),
                   type: 'warning',

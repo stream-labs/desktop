@@ -1,6 +1,6 @@
 import { Module, EApiPermissions, apiMethod, IApiContext } from './module';
-import electron from 'electron';
 import url from 'url';
+import remote from '@electron/remote';
 
 export class ExternalModule extends Module {
   readonly moduleName = 'External';
@@ -17,6 +17,6 @@ export class ExternalModule extends Module {
       );
     }
 
-    electron.remote.shell.openExternal(urlStr);
+    remote.shell.openExternal(urlStr);
   }
 }
