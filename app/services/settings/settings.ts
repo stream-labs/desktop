@@ -26,6 +26,7 @@ import path from 'path';
 import fs from 'fs';
 import { UsageStatisticsService } from 'services/usage-statistics';
 import { SceneCollectionsService } from 'services/scene-collections';
+import electron from 'electron';
 
 export interface ISettingsValues {
   General: {
@@ -124,16 +125,7 @@ export class SettingsService extends StatefulService<ISettingsServiceState> {
 
   init() {
     this.loadSettingsIntoStore();
-
-    // TODO: Remove this once we know rough numbers to avoid excess file I/O
-    try {
-      if (fs.existsSync(path.join(this.appService.appDataDirectory, 'HADisable'))) {
-        this.usageStatisticsService.recordFeatureUsage('HardwareAccelDisabled');
-      }
-    } catch (e: unknown) {
-      console.error('Error fetching hardware acceleration state', e);
-    }
-
+    this.ensureValidEncoder();
     this.sceneCollectionsService.collectionSwitched.subscribe(() => this.refreshAudioSettings());
   }
 
@@ -460,6 +452,28 @@ export class SettingsService extends StatefulService<ISettingsServiceState> {
         source.setName(displayName);
       }
     });
+  }
+
+  private ensureValidEncoder() {
+    const mode: string = this.findSettingValue(this.state.Output.formData, 'Untitled', 'Mode');
+    const encoderSetting: IObsListInput<string> =
+      this.findSetting(this.state.Output.formData, 'Streaming', 'Encoder') ??
+      this.findSetting(this.state.Output.formData, 'Streaming', 'StreamEncoder');
+    const encoderIsValid = !!encoderSetting.options.find(opt => opt.value === encoderSetting.value);
+
+    if (!encoderIsValid) {
+      if (mode === 'Advanced') {
+        this.setSettingValue('Output', 'Encoder', 'obs_x264');
+      } else {
+        this.setSettingValue('Output', 'StreamEncoder', 'x264');
+      }
+
+      electron.remote.dialog.showMessageBox(electron.remote.getCurrentWindow(), {
+        type: 'error',
+        message:
+          'Your stream encoder has been reset to Software (x264). This can be caused by out of date graphics drivers. Please update your graphics drivers to continue using hardware encoding.',
+      });
+    }
   }
 
   @mutation()
