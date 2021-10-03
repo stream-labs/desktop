@@ -6,6 +6,8 @@ import { throttle } from 'lodash-decorators';
 import { assertIsDefined, getDefined } from '../../../util/properties-type-guards';
 import { TAlertType, TWidgetType } from '../../../services/widgets/widget-config';
 import { TObsFormData } from '../../../components/obs/inputs/ObsInput';
+import { pick } from 'lodash';
+import { $t } from '../../../services/i18n';
 
 /**
  * Common state for all widgets
@@ -13,6 +15,7 @@ import { TObsFormData } from '../../../components/obs/inputs/ObsInput';
 export interface IWidgetState {
   isLoading: boolean;
   sourceId: string;
+  shouldCreatePreviewSource: boolean;
   previewSourceId: string;
   selectedTab: string;
   type: TWidgetType;
@@ -28,6 +31,7 @@ export interface IWidgetState {
 export const DEFAULT_WIDGET_STATE = ({
   isLoading: true,
   sourceId: '',
+  shouldCreatePreviewSource: true,
   previewSourceId: '',
   isPreviewVisible: false,
   selectedTab: 'general',
@@ -50,16 +54,19 @@ export class WidgetModule<TWidgetState extends IWidgetState = IWidgetState> {
   public eventsConfig = this.widgetsService.eventsConfig;
 
   // init module
-  async init(params: { sourceId: string }) {
+  async init(params: { sourceId: string; shouldCreatePreviewSource?: boolean }) {
     this.state.sourceId = params.sourceId;
+    this.state.shouldCreatePreviewSource = !!params.shouldCreatePreviewSource;
 
     // save browser source settings into store
     const widget = this.widget;
     this.setBrowserSourceProps(widget.getSource()!.getPropertiesFormData());
 
     // create a temporary preview-source for the Display component
-    const previewSource = widget.createPreviewSource();
-    this.state.previewSourceId = previewSource.sourceId;
+    if (this.state.shouldCreatePreviewSource) {
+      const previewSource = widget.createPreviewSource();
+      this.state.previewSourceId = previewSource.sourceId;
+    }
 
     // load settings from the server to the store
     this.state.type = WidgetType[widget.type] as TWidgetType;
@@ -73,7 +80,7 @@ export class WidgetModule<TWidgetState extends IWidgetState = IWidgetState> {
 
   // de-init module
   destroy() {
-    this.widget.destroyPreviewSource();
+    if (this.state.previewSourceId) this.widget.destroyPreviewSource();
   }
 
   /**
@@ -85,6 +92,38 @@ export class WidgetModule<TWidgetState extends IWidgetState = IWidgetState> {
 
   get availableAlerts(): TAlertType[] {
     return Object.keys(this.eventsConfig) as TAlertType[];
+  }
+
+  get customCode(): ICustomCode {
+    return pick(
+      this.settings,
+      'custom_enabled',
+      'custom_html',
+      'custom_css',
+      'custom_js',
+      'custom_json',
+    );
+  }
+
+  updateCustomCode(patch: Partial<ICustomCode>) {
+    this.updateSettings(patch);
+  }
+
+  openCustomCodeEditor() {
+    const sourceId = this.state.sourceId;
+    const windowId = `${sourceId}-code_editor`;
+    Services.WindowsService.actions.createOneOffWindow(
+      {
+        componentName: 'CustomCodeWindow',
+        title: $t('Custom Code'),
+        queryParams: { sourceId },
+        size: {
+          width: 800,
+          height: 800,
+        },
+      },
+      windowId,
+    );
   }
 
   private get widgetsService() {
@@ -134,10 +173,11 @@ export class WidgetModule<TWidgetState extends IWidgetState = IWidgetState> {
    */
   public updateSettings(formValues: any) {
     console.log('settingsUpdated', formValues);
+    const newSettings = { ...this.settings, ...formValues };
     // save setting to the store
-    this.setSettings(formValues);
+    this.setSettings(newSettings);
     // send setting to the server
-    this.saveSettings(formValues);
+    this.saveSettings(newSettings);
   }
 
   /**
@@ -243,8 +283,11 @@ export class WidgetModule<TWidgetState extends IWidgetState = IWidgetState> {
  * Have to be called in the root widget component
  * all widget components can access the initialized module via `useWidget` hook
  */
-export function useWidgetRoot<T extends typeof WidgetModule>(Module: T, sourceId?: string) {
-  return useModuleRoot(Module, { sourceId }, 'WidgetModule').select();
+export function useWidgetRoot<T extends typeof WidgetModule>(
+  Module: T,
+  params: { sourceId?: string; shouldCreatePreviewSource?: boolean },
+) {
+  return useModuleRoot(Module, params, 'WidgetModule').select();
 }
 
 /**
@@ -260,4 +303,23 @@ export function useWidget<TModule extends WidgetModule>() {
  */
 export function createAlertsMap<T extends { [key in TAlertType]: any }>(obj: T) {
   return obj;
+}
+
+export interface ICustomCode {
+  custom_enabled: boolean;
+  custom_html: string;
+  custom_css: string;
+  custom_js: string;
+  custom_json: Record<string, ICustomField>;
+}
+
+export interface ICustomField {
+  label: string;
+  type: string;
+  value: any;
+
+  options?: Record<string, string>;
+  max?: number;
+  min?: number;
+  steps?: number;
 }

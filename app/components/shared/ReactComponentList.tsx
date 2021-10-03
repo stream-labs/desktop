@@ -213,3 +213,11 @@ export class TitleBar extends ReactComponent {}
   },
 })
 export class WidgetWindow extends ReactComponent {}
+
+@Component({
+  props: {
+    name: { default: 'CustomCodeWindow' },
+    wrapperStyles: { default: () => ({ height: '100%' }) },
+  },
+})
+export class CustomCodeWindow extends ReactComponent {}

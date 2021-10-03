@@ -52,16 +52,22 @@ export function WidgetLayout(p: { children: ReactNode | [ReactNode, ReactNode] }
             flex="auto"
             style={{ padding: '16px', paddingTop: '32px', height: '100%', overflow: 'auto' }}
           >
-            {/* SETTINGS FORM  */}
             <Form form={form} layout="horizontal">
-              <Spin spinning={isLoading}>{!isLoading && ContentPanel}</Spin>
+              <Spin spinning={isLoading}>
+                {!isLoading && (
+                  <>
+                    {/* SETTINGS FORM  */}
+                    {ContentPanel}
+
+                    {/* CUSTOM CODE  */}
+                    {config.customCodeAllowed && <CustomCode />}
+
+                    {/* BROWSER SOURCE SETTINGS  */}
+                    {selectedTab === 'general' && <BrowserSourceSettings />}
+                  </>
+                )}
+              </Spin>
             </Form>
-
-            {/* CUSTOM CODE  */}
-            {config.customCodeAllowed && <CustomCode />}
-
-            {/* BROWSER SOURCE SETTINGS  */}
-            {selectedTab === 'general' && <BrowserSourceSettings />}
           </Col>
         </Row>
       </Content>

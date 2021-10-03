@@ -26,6 +26,7 @@ import {
   RenameSource,
   AdvancedStatistics,
   WidgetWindow,
+  CustomCodeWindow,
   SafeMode,
 } from 'components/shared/ReactComponentList';
 
@@ -144,6 +145,7 @@ export function getComponents() {
     IconLibraryProperties,
     SharedComponentsLibrary,
     WidgetWindow,
+    CustomCodeWindow,
   };
 }
 

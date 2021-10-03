@@ -68,7 +68,7 @@ export function WidgetWindow() {
 
   // initialize the Redux module for the widget
   // so all children components can use it via `useWidget()` call
-  useWidgetRoot(WidgetModule, sourceId);
+  useWidgetRoot(WidgetModule, { sourceId });
 
   return (
     <ModalLayout bodyStyle={{ padding: '0px' }} hideFooter={true}>
