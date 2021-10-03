@@ -22,7 +22,7 @@ import { Throttle } from 'lodash-decorators';
 import { EditorCommandsService } from 'services/editor-commands';
 import { TWindowComponentName } from '../windows';
 import {THttpMethod} from "./settings/widget-settings";
-import {getEventsInfo, getWidgetsInfo} from "./widget-settings";
+import {getEventsConfig, getWidgetsConfig} from "./widget-config";
 
 export interface IWidgetSourcesState {
   widgetSources: Dictionary<IWidgetSource>;
@@ -334,12 +334,12 @@ export class WidgetsService
     });
   }
 
-  get widgetsInfo() {
-    return getWidgetsInfo(this.hostsService.streamlabs, this.userService.widgetToken);
+  get widgetsConfig() {
+    return getWidgetsConfig(this.hostsService.streamlabs, this.userService.widgetToken);
   }
 
-  get eventsInfo() {
-    return getEventsInfo(this.hostsService.streamlabs);
+  get eventsConfig() {
+    return getEventsConfig(this.hostsService.streamlabs);
   }
 
   // make a request to widgets API

@@ -31,4 +31,10 @@ export const metadata = {
   number: (options: INumberMetadata) => options,
   slider: (options: ISliderMetadata) => options,
   bool: (options: ITextBoolMetadata) => options,
+  seconds: (options: ISliderMetadata) => ({
+    min: 0,
+    step: 1000,
+    tipFormatter: (ms: number) => `${ms / 1000}s`,
+    ...options,
+  }),
 };

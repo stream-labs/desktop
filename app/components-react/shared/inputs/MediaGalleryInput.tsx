@@ -21,6 +21,7 @@ export const MediaGalleryInput = InputComponent(
 
     async function pickFromGallery() {
       const file = await Services.MediaGalleryService.actions.return.pickFile();
+      console.log('File picked', file.href);
       inputAttrs.onChange(file.href);
     }
 
@@ -47,8 +48,6 @@ export const MediaGalleryInput = InputComponent(
     const isVideo = !isAudio && /\.webm/.test(inputAttrs.value);
     const isImage = !isAudio && !isVideo;
     const fileName = value ? value.split(/(\\|\/)/g).pop() : '';
-
-    if (isVideo) console.log('value', value);
 
     function renderButtons() {
       return (

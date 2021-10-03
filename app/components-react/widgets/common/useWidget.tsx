@@ -1,11 +1,11 @@
-import { useModuleByName, useModuleRoot } from '../hooks/useModule';
-import { WidgetTesters, WidgetType } from '../../services/widgets';
-import { Services } from '../service-provider';
-import { mutation } from '../store';
+import { useModuleByName, useModuleRoot } from '../../hooks/useModule';
+import { WidgetTesters, WidgetType } from '../../../services/widgets';
+import { Services } from '../../service-provider';
+import { mutation } from '../../store';
 import { throttle } from 'lodash-decorators';
-import { assertIsDefined, getDefined } from '../../util/properties-type-guards';
-import { TAlertType, TWidgetType } from '../../services/widgets/widget-settings';
-import { TObsFormData } from '../../components/obs/inputs/ObsInput';
+import { assertIsDefined, getDefined } from '../../../util/properties-type-guards';
+import { TAlertType, TWidgetType } from '../../../services/widgets/widget-config';
+import { TObsFormData } from '../../../components/obs/inputs/ObsInput';
 
 /**
  * Common state for all widgets
@@ -45,9 +45,9 @@ export class WidgetModule<TWidgetState extends IWidgetState = IWidgetState> {
     ...((DEFAULT_WIDGET_STATE as unknown) as TWidgetState),
   };
 
-  // create shortcuts for widgetsInfo and eventsInfo
-  public widgetsInfo = this.widgetsService.widgetsInfo;
-  public eventsInfo = this.widgetsService.eventsInfo;
+  // create shortcuts for widgetsConfig and eventsInfo
+  public widgetsConfig = this.widgetsService.widgetsConfig;
+  public eventsConfig = this.widgetsService.eventsConfig;
 
   // init module
   async init(params: { sourceId: string }) {
@@ -84,7 +84,7 @@ export class WidgetModule<TWidgetState extends IWidgetState = IWidgetState> {
   }
 
   get availableAlerts(): TAlertType[] {
-    return Object.keys(this.eventsInfo) as TAlertType[];
+    return Object.keys(this.eventsConfig) as TAlertType[];
   }
 
   private get widgetsService() {
@@ -103,8 +103,8 @@ export class WidgetModule<TWidgetState extends IWidgetState = IWidgetState> {
     return this.widgetsService.getWidgetSource(this.state.sourceId);
   }
 
-  private get widgetTypeInfo() {
-    return this.widgetsInfo[this.state.type];
+  get config() {
+    return this.widgetsConfig[this.state.type];
   }
 
   public onMenuClickHandler(e: { key: string }) {
@@ -148,7 +148,7 @@ export class WidgetModule<TWidgetState extends IWidgetState = IWidgetState> {
     let rawData: any;
     try {
       rawData = await this.actions.return.request({
-        url: this.widgetTypeInfo.dataFetchUrl,
+        url: this.config.dataFetchUrl,
         method: 'GET',
       });
     } catch (e: unknown) {
@@ -165,7 +165,7 @@ export class WidgetModule<TWidgetState extends IWidgetState = IWidgetState> {
     const body = this.patchBeforeSend(settings);
     return await this.actions.return.request({
       body,
-      url: this.widgetTypeInfo.settingsSaveUrl,
+      url: this.config.settingsSaveUrl,
       method: 'POST',
     });
   }

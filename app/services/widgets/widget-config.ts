@@ -9,12 +9,13 @@ export type TAlertType =
   | 'subscription'
   | 'cheer'
   | 'host'
+  // TODO:
   // | 'superchat'
   // | 'support'
   // | 'stars'
   | 'raid';
 
-export interface IWidgetTypeInfo {
+export interface IWidgetConfig {
   type: TWidgetType;
   name: string;
   description: string;
@@ -53,7 +54,7 @@ export interface IWidgetTypeInfo {
   };
 }
 
-export function getWidgetsInfo(host: string, token: string): Record<TWidgetType, IWidgetTypeInfo> {
+export function getWidgetsConfig(host: string, token: string): Record<TWidgetType, IWidgetConfig> {
   return {
     AlertBox: {
       type: 'AlertBox',
@@ -81,8 +82,8 @@ export function getWidgetsInfo(host: string, token: string): Record<TWidgetType,
       dataFetchUrl: `https://${host}/api/v5/slobs/widget/alertbox?include_linked_integrations_only=true&primary_only=false`,
       settingsSaveUrl: `https://${host}/api/v5/slobs/widget/alertbox`,
       settingsUpdateEvent: 'filteredAlertBoxSettingsUpdate',
-      customCodeAllowed: true,
-      customFieldsAllowed: true,
+      customCodeAllowed: false,
+      customFieldsAllowed: false,
     },
 
     ViewerCount: {
@@ -109,10 +110,86 @@ export function getWidgetsInfo(host: string, token: string): Record<TWidgetType,
       customCodeAllowed: true,
       customFieldsAllowed: true,
     },
+    // TODO:
+    // BitGoal: {
+    //
+    // },
+
+    // DonationGoal: {
+    //
+    // },
+
+    // CharityGoal: {
+    //
+    // },
+
+    // FollowerGoal: {
+    //
+    // },
+
+    // StarsGoal: {
+    //
+    // },
+
+    // SubGoal: {
+    //
+    // },
+
+    // SubscriberGoal: {
+    //
+    // },
+
+    // ChatBox: {
+    //
+    // },
+
+    // ChatHighlight: {
+    //
+    // },
+
+    // Credits: {
+    //
+    // },
+
+    // DonationTicker: {
+    //
+    //  },
+
+    // EmoteWall: {
+    //
+    // },
+
+    // EventList: {
+    //
+    // },
+
+    // MediaShare: {
+    //
+    //  },
+
+    // Poll: {
+    //
+    //  },
+
+    // SpinWheel: {
+    //
+    // },
+
+    // SponsorBanner: {
+    //
+    // },
+
+    // StreamBoss: {
+    //
+    //  },
+
+    // TipJar: {
+    //
+    // },
   };
 }
 
-export function getEventsInfo(host: string): Record<TAlertType, IAlertInfo> {
+export function getEventsConfig(host: string): Record<TAlertType, IAlertConfig> {
   return {
     donation: {
       type: 'donation',
@@ -170,6 +247,7 @@ export function getEventsInfo(host: string): Record<TAlertType, IAlertInfo> {
       platforms: ['twitch'],
     },
 
+    // TODO:
     // superchat: {
     //   name: $t('YouTube Super Chat'),
     //   type: 'superchat',
@@ -199,7 +277,7 @@ export function getEventsInfo(host: string): Record<TAlertType, IAlertInfo> {
   };
 }
 
-export interface IAlertInfo {
+export interface IAlertConfig {
   type: TAlertType;
   apiKey?: string;
   name: string;

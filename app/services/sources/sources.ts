@@ -603,19 +603,36 @@ export class SourcesService extends StatefulService<ISourcesState> {
     // React widgets are in the WidgetsWindow component
     let reactWidgets = [
       'AlertBox',
-      // 'TipJar',
+      // TODO:
+      // BitGoal
+      // DonationGoal
+      // CharityGoal
+      // FollowerGoal
+      // StarsGoal
+      // SubGoal
+      // SubscriberGoal
+      // ChatBox
+      // ChatHighlight
+      // Credits
+      // DonationTicker
+      // EmoteWall
+      // EventList
+      // MediaShare
+      // Poll
+      // SpinWheel
+      // SponsorBanner
+      // StreamBoss
+      // TipJar
       'ViewerCount',
     ];
     const isLegacyAlertbox = this.customizationService.state.legacyAlertbox;
     if (isLegacyAlertbox) reactWidgets = reactWidgets.filter(w => w !== 'AlertBox');
     const isReactComponent = reactWidgets.includes(componentName);
-    const windowComponentName = isReactComponent
-      ? 'WidgetWindow'
-      : componentName;
+    const windowComponentName = isReactComponent ? 'WidgetWindow' : componentName;
 
     const defaultVueWindowSize = { width: 920, height: 1024 };
     const defaultReactWindowSize = { width: 600, height: 800 };
-    const widgetInfo = this.widgetsService.widgetsInfo[componentName];
+    const widgetInfo = this.widgetsService.widgetsConfig[componentName];
     const { width, height } = isReactComponent
       ? widgetInfo.settingsWindowSize || defaultReactWindowSize
       : defaultVueWindowSize;

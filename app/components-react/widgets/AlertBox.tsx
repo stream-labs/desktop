@@ -9,14 +9,15 @@ import {
   NumberInput,
   SliderInput,
   TextInput,
-} from '../../shared/inputs';
-import { $t } from '../../../services/i18n';
+} from '../shared/inputs';
+import { $t } from '../../services/i18n';
 import { Alert, Button, Menu, Tooltip } from 'antd';
-import Form from '../../shared/inputs/Form';
-import { WidgetLayout } from '../WidgetLayout';
+import Form from '../shared/inputs/Form';
+import { WidgetLayout } from './common/WidgetLayout';
 import { CaretRightOutlined } from '@ant-design/icons';
-import { TAlertType } from '../../../services/widgets/widget-settings';
+import { TAlertType } from '../../services/widgets/widget-config';
 import { useAlertBox } from './useAlertBox';
+import { useForceUpdate } from '../hooks';
 
 /**
  * Root component
@@ -109,7 +110,7 @@ function AlertsList() {
     selectedTab,
     playAlert,
     setEnabled,
-    isEnabled,
+    enabledAlerts,
   } = useAlertBox();
 
   return (
@@ -118,7 +119,7 @@ function AlertsList() {
         <Menu.Item key={alertEvent.type}>
           {/* ON/OF CHECKBOX */}
           <CheckboxInput
-            value={isEnabled(alertEvent.type)}
+            value={enabledAlerts.includes(alertEvent.type)}
             onChange={val => setEnabled(alertEvent.type, val)}
             style={{ display: 'inline-block' }}
           />
@@ -148,7 +149,7 @@ function AlertsList() {
  */
 function VariationSettings(p: { type: TAlertType }) {
   const { createVariationBinding } = useAlertBox();
-  const bind = createVariationBinding(p.type, 'default');
+  const bind = createVariationBinding(p.type, 'default', useForceUpdate());
   return (
     <div>
       <MediaGalleryInput {...bind.image_href} />
@@ -166,7 +167,7 @@ function VariationSettings(p: { type: TAlertType }) {
  */
 function DonationSettings() {
   const { createVariationBinding } = useAlertBox();
-  const bind = createVariationBinding('donation', 'default');
+  const bind = createVariationBinding('donation', 'default', useForceUpdate());
   return (
     <>
       <NumberInput {...bind.alert_message_min_amount} />

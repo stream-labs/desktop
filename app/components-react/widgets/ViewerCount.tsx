@@ -1,6 +1,6 @@
 import React from 'react';
-import { IWidgetState, useWidget, WidgetModule } from './useWidget';
-import { WidgetLayout } from './WidgetLayout';
+import { IWidgetState, useWidget, WidgetModule } from './common/useWidget';
+import { WidgetLayout } from './common/WidgetLayout';
 import InputWrapper from '../shared/inputs/InputWrapper';
 import { $t } from '../../services/i18n';
 import {

@@ -1,4 +1,4 @@
-@import "../../styles/index.less";
+@import "../../../styles/index.less";
 
 .widget-layout {
 
@@ -12,23 +12,6 @@
   :global(.ant-collapse-item){
     background-color: var(--section-alt);
   }
-
-
-  //// collapse
-  //:global(.ant-collapse-header) {
-  //  background: fade(#09161D, 65%);
-  //  padding: 4px 16px !important;
-  //  color: var(--text) !important;
-  //}
-  //
-  //:global(.ant-collapse-content),
-  //:global(.ant-collapse-item){
-  //  border: none !important;
-  //}
-  //
-  //:global(.ant-collapse-content-box) {
-  //  padding-top: 16px !important;
-  //}
 
   :global(.ant-collapse-borderless > .ant-collapse-item:last-child) {
     border: none;
@@ -47,10 +30,10 @@
   }
   :global(.ant-menu-item:hover) {
     background-color: var(--dropdown-alt-bg);
-    transition: none;
   }
 
   :global(.ant-menu-item) {
+    transition: none;
     button {
       transition: none;
       opacity: 0;

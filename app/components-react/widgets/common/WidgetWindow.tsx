@@ -1,11 +1,11 @@
 import React from 'react';
-import { useOnCreate } from '../hooks';
-import { ModalLayout } from '../shared/ModalLayout';
-import { Services } from '../service-provider';
-import { AlertBox } from './alertbox/AlertBox';
-import { AlertBoxModule } from './alertbox/useAlertBox';
+import { useOnCreate } from '../../hooks';
+import { ModalLayout } from '../../shared/ModalLayout';
+import { Services } from '../../service-provider';
+import { AlertBox } from '../AlertBox';
+import { AlertBoxModule } from '../useAlertBox';
 import { useWidgetRoot } from './useWidget';
-import { getDefined } from '../../util/properties-type-guards';
+import { getDefined } from '../../../util/properties-type-guards';
 // TODO: import other widgets here to avoid merge conflicts
 // BitGoal
 // DonationGoal
@@ -26,7 +26,7 @@ import { getDefined } from '../../util/properties-type-guards';
 // SponsorBanner
 // StreamBoss
 // TipJar
-import { ViewerCount, ViewerCountModule } from './ViewerCount';
+import { ViewerCount, ViewerCountModule } from '../ViewerCount';
 
 // define list of Widget components and modules
 export const components = {

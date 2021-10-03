@@ -1,11 +1,12 @@
 import { Col, Collapse, Layout, Row, Spin } from 'antd';
 import React, { ReactNode } from 'react';
 import { useWidget } from './useWidget';
-import Display from '../shared/Display';
+import Display from '../../shared/Display';
 import css from './WidgetLayout.m.less';
-import Form, { useForm } from '../shared/inputs/Form';
-import { ObsForm } from '../obs/ObsForm';
-import { $t } from '../../services/i18n';
+import Form, { useForm } from '../../shared/inputs/Form';
+import { ObsForm } from '../../obs/ObsForm';
+import { $t } from '../../../services/i18n';
+import { CustomCode } from './CustomCode';
 const { Content, Header } = Layout;
 
 /**
@@ -13,7 +14,7 @@ const { Content, Header } = Layout;
  * Can display 1 column or 2 columns depending on how many children have been provided to props
  */
 export function WidgetLayout(p: { children: ReactNode | [ReactNode, ReactNode] }) {
-  const { previewSourceId, isLoading, selectedTab } = useWidget();
+  const { previewSourceId, isLoading, selectedTab, config } = useWidget();
   let MenuPanel: ReactNode;
   let ContentPanel: ReactNode;
 
@@ -55,6 +56,9 @@ export function WidgetLayout(p: { children: ReactNode | [ReactNode, ReactNode] }
             <Form form={form} layout="horizontal">
               <Spin spinning={isLoading}>{!isLoading && ContentPanel}</Spin>
             </Form>
+
+            {/* CUSTOM CODE  */}
+            {config.customCodeAllowed && <CustomCode />}
 
             {/* BROWSER SOURCE SETTINGS  */}
             {selectedTab === 'general' && <BrowserSourceSettings />}
