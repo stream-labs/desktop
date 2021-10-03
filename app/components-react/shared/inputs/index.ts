@@ -1,4 +1,5 @@
 export * from './inputs';
+export { CodeInput } from './CodeInput';
 export { TextInput } from './TextInput';
 export { TextAreaInput } from './TextAreaInput';
 export { NumberInput } from './NumberInput';

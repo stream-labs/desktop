@@ -13,6 +13,7 @@ import isEqual from 'lodash/isEqual';
 import * as InputComponents from './index';
 
 type TInputType =
+  | 'code'
   | 'color'
   | 'text'
   | 'textarea'
@@ -152,6 +153,11 @@ export function useInput<
     if (form && value !== emptyVal) {
       // get the component class
       const Component = getInputComponentByType(type);
+
+      if (!Component) {
+        throw new Error(`Component "${type}" not found.`);
+      }
+
       // antd components may have another format than SLOBS wrapper components
       // for example TimerInput requires dates to be in the Moment format
       // meanwhile SLOBS services works with timestamps only
@@ -261,7 +267,7 @@ export function useTextInput<
     TValue
   >,
   TValue extends string | number = string
->(type: 'text' | 'textarea' | 'number', p: TProps, antFeatures?: Parameters<typeof useInput>[2]) {
+>(type: TInputType, p: TProps, antFeatures?: Parameters<typeof useInput>[2]) {
   // Text inputs are uncontrolled by default for better performance
   const uncontrolled = p.uncontrolled === true || p.uncontrolled !== false;
   const { inputAttrs, wrapperAttrs, forceUpdate, setLocalValue, emitChange } = useInput(
