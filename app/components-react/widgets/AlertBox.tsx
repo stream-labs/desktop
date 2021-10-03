@@ -18,6 +18,8 @@ import { CaretRightOutlined } from '@ant-design/icons';
 import { TAlertType } from '../../services/widgets/widget-config';
 import { useAlertBox } from './useAlertBox';
 import { useForceUpdate } from '../hooks';
+import electron from 'electron';
+import { Services } from '../service-provider';
 
 /**
  * Root component
@@ -168,6 +170,25 @@ function VariationSettings(p: { type: TAlertType }) {
 function DonationSettings() {
   const { createVariationBinding } = useAlertBox();
   const bind = createVariationBinding('donation', 'default', useForceUpdate());
+  const { HostsService, UsageStatisticsService, UserService } = Services;
+  const host = HostsService.streamlabs;
+  const tipPageUrl = `${host}/${UserService.username}`;
+
+  function openDonationSettings() {
+    electron.shell.openExternal(`${host}/dashboard#/settings/donation-settings?ref=slobs`);
+    UsageStatisticsService.recordFeatureUsage('openDonationSettings');
+  }
+
+  function openTipPage() {
+    electron.shell.openExternal(tipPageUrl);
+    UsageStatisticsService.recordFeatureUsage('openDonationSettings');
+  }
+
+  function openTipPageSettings() {
+    electron.shell.openExternal(`${host}/editor?ref=slobs`);
+    UsageStatisticsService.recordFeatureUsage('openDonationSettings');
+  }
+
   return (
     <>
       <NumberInput {...bind.alert_message_min_amount} />
@@ -181,12 +202,13 @@ function DonationSettings() {
           type="info"
           showIcon
           style={{ marginBottom: '16px' }}
+          onClick={openDonationSettings}
         />
         <Alert
           message={
             <span>
               {$t('Customize your tip page where viewers can send you donations')}
-              <a>{$t('Click here')}</a>
+              <a onClick={openTipPageSettings}> {$t('Click here')}</a>
             </span>
           }
           type="info"

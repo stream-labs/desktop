@@ -27,6 +27,7 @@ interface IViewerCountState extends IWidgetState {
 
 export function ViewerCount() {
   const { isLoading, bind } = useViewerCount();
+  // use 1 column layout
   return (
     <WidgetLayout>
       {!isLoading && (
