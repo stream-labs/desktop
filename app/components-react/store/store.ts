@@ -14,7 +14,6 @@ import { isSimilar } from '../../util/isDeepEqual';
 import { createBinding, TBindings } from '../shared/inputs';
 import { getDefined } from '../../util/properties-type-guards';
 import { unstable_batchedUpdates } from 'react-dom';
-import webpack from 'webpack';
 
 /*
  * This file provides Redux integration in a modular way
@@ -365,66 +364,6 @@ function initReducerForModule(module: IReduxModule<unknown, unknown>, initialSta
     });
   });
 }
-
-// /**
-//  * Register function as an mutation for a ReduxModule
-//  */
-// function registerMutation(target: any, mutationName: string, fn: Function) {
-//   target.mutations = target.mutations || [];
-//   target.mutations.push(mutationName);
-// }
-
-// /**
-//  * Register function as an mutation for a ReduxModule
-//  */
-// function registerMutation(target: any, mutationName: string, fn: Function) {
-//   // use the constructor name as a moduleName
-//   const moduleName = target.constructor.name;
-//
-//   // create helper objects if they have not been created yet
-//   target.mutations = target.mutations || {};
-//   target.originalMethods = target.originalMethods || {};
-//
-//   // save the original method
-//   target.originalMethods[mutationName] = fn;
-//   const originalMethod = fn;
-//
-//   // Transform the original function into the Redux Action handler
-//   // So we can use this method in the Redux's `createReducer()` call
-//   target.mutations[mutationName] = (state: unknown, action: { payload: unknown[] }) => {
-//     const module = moduleManager.getModule(moduleName);
-//     moduleManager.setImmerState(state);
-//     originalMethod.apply(module, action.payload);
-//     moduleManager.setImmerState(null);
-//   };
-//
-//   // Redirect the call of original method to the Redux`s reducer
-//   Object.defineProperty(target, mutationName, {
-//     configurable: true,
-//     value(...args: any[]) {
-//       const module = moduleManager.getModule(moduleName);
-//
-//       // if this method was called from another mutation
-//       // we don't need to dispatch a new mutation again
-//       // just call the original method
-//       const mutationIsRunning = !!moduleManager.immerState;
-//       if (mutationIsRunning) return originalMethod.apply(module, args);
-//
-//       const batchedUpdatesModule = moduleManager.getModule<BatchedUpdatesModule>(
-//         'BatchedUpdatesModule',
-//       );
-//
-//       // dispatch reducer and call `temporaryDisableRendering()`
-//       // so next mutation in the javascript queue will not cause redundant re-renderings in components
-//       batch(() => {
-//         if (moduleName !== 'BatchedUpdatesModule') batchedUpdatesModule.temporaryDisableRendering();
-//         store.dispatch({ type: `${moduleName}/${mutationName}`, payload: args });
-//       });
-//     },
-//   });
-//
-//   return Object.getOwnPropertyDescriptor(target, mutationName);
-// }
 
 /**
  * This `useSelector` is a wrapper for the original `useSelector` method from Redux
