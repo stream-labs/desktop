@@ -4,7 +4,7 @@ import {
   createAction,
   createReducer,
   createStore,
-  Store
+  Store,
 } from '@reduxjs/toolkit';
 import { batch, useSelector as useReduxSelector } from 'react-redux';
 import { StatefulService } from '../../services';
@@ -142,7 +142,6 @@ class ReduxModuleManager {
   ): TModule {
     // use constructor name as a module name if other name not provided
     moduleName = moduleName || module.constructor.name;
-
 
     // call `init()` method of module if exist
     unstable_batchedUpdates(() => {
@@ -324,7 +323,7 @@ export function mutation() {
 function initReducerForModule(module: IReduxModule<unknown, unknown>, initialState: unknown) {
   const moduleName = getDefined(module.name);
   const mutationNames: string[] = Object.getPrototypeOf(module).mutations || [];
-  const mutations: Record<string, CaseReducer<unknown, { payload: unknown; type: string; }>> = {};
+  const mutations: Record<string, CaseReducer<unknown, { payload: unknown; type: string }>> = {};
 
   mutationNames.forEach(mutationName => {
     const originalMethod = module[mutationName];
@@ -440,6 +439,11 @@ export function useSelector<T extends Object>(fn: () => T): T {
   const cachedSelectedResult = useRef<any>(null);
   const isMountedRef = useRef(false);
 
+  // save the selector function and update it each component re-rendering
+  // this prevents having staled closure variables in the selector
+  const selectorFnRef = useRef(fn);
+  selectorFnRef.current = fn;
+
   // create the selector function
   const selector = useOnCreate(() => {
     return () => {
@@ -449,7 +453,7 @@ export function useSelector<T extends Object>(fn: () => T): T {
       }
 
       // otherwise execute the selector
-      cachedSelectedResult.current = fn();
+      cachedSelectedResult.current = selectorFnRef.current();
       return cachedSelectedResult.current;
     };
   });
@@ -557,16 +561,12 @@ export function createDependencyWatcher<T extends object>(watchedObject: T) {
  * return <ListInput {...bind.theme} />
  *
  */
-export function useBinding<
-  TState extends object,
-  TFieldName extends keyof TState,
-  TExtraProps extends object = {}
->(
+export function useBinding<TState extends object, TExtraProps extends object = {}>(
   stateGetter: TState | (() => TState),
   stateSetter?: (newTarget: Partial<TState>) => unknown,
   extraPropsGenerator?: (fieldName: keyof TState) => TExtraProps,
-): TBindings<TState, TFieldName, TExtraProps> {
-  const bindingRef = useRef<TBindings<TState, TFieldName, TExtraProps>>();
+): TBindings<TState, TExtraProps> {
+  const bindingRef = useRef<TBindings<TState, TExtraProps>>();
 
   if (!bindingRef.current) {
     // create binding

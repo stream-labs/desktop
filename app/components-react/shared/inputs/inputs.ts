@@ -330,15 +330,11 @@ export function useTextInput<
  * @param stateSetter a function that changes the field given field
  * @param extraPropsGenerator a function that returns extra attributes for the input element (like disabled, placeholder,...)
  */
-export function createBinding<
-  TState extends object,
-  TFieldName extends keyof TState,
-  TExtraProps extends object = {}
->(
+export function createBinding<TState extends object, TExtraProps extends object = {}>(
   stateGetter: TState | (() => TState),
   stateSetter?: (newTarget: Partial<TState>) => unknown,
   extraPropsGenerator?: (fieldName: keyof TState) => TExtraProps,
-): TBindings<TState, TFieldName, TExtraProps> {
+): TBindings<TState, TExtraProps> {
   function getState(): TState {
     return typeof stateGetter === 'function'
       ? (stateGetter as Function)()
@@ -376,15 +372,11 @@ export function createBinding<
         ...extraProps,
       };
     },
-  }) as unknown) as TBindings<TState, TFieldName, TExtraProps>;
+  }) as unknown) as TBindings<TState, TExtraProps>;
 }
 
-export type TBindings<
-  TState extends Object,
-  TFieldName extends keyof TState,
-  TExtraProps extends Object = {}
-> = {
-  [K in TFieldName]: {
+export type TBindings<TState extends Object, TExtraProps extends Object = {}> = {
+  [K in keyof TState]: {
     name: K;
     value: TState[K];
     onChange: (newVal: TState[K]) => unknown;
@@ -394,8 +386,8 @@ export type TBindings<
     _proxyName: 'Binding';
     _binding: {
       id: string;
-      dependencies: Record<TFieldName, unknown>;
-      clone: () => TBindings<TState, TFieldName, TExtraProps>;
+      dependencies: Record<keyof TState, unknown>;
+      clone: () => TBindings<TState, TExtraProps>;
     };
   };
 
@@ -442,29 +434,4 @@ export function getInputComponentByType(
     return componentName.split('Input')[0].toLowerCase() === type;
   });
   return name ? InputComponents[name] : null;
-}
-
-export const metadata = {
-  text: createMetadata(),
-  number: createMetadata<{
-    min?: number;
-    max?: number;
-  }>(),
-  slider: createMetadata<{
-    min?: number;
-    max?: number;
-    step?: number;
-  }>(),
-};
-
-interface TBaseFieldMetadata {
-  label?: string;
-  tooltip?: string;
-  required?: boolean;
-}
-
-function createMetadata<TMetadata = {}, TReturnType = TMetadata & TBaseFieldMetadata>(): (
-  options: TReturnType,
-) => TReturnType {
-  return (options: TReturnType) => options;
 }

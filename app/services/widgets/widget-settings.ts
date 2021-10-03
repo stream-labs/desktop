@@ -9,9 +9,9 @@ export type TAlertType =
   | 'subscription'
   | 'cheer'
   | 'host'
-  | 'superchat'
-  | 'support'
-  | 'stars'
+  // | 'superchat'
+  // | 'support'
+  // | 'stars'
   | 'raid';
 
 export interface IWidgetTypeInfo {
@@ -170,70 +170,34 @@ export function getEventsInfo(host: string): Record<TAlertType, IAlertInfo> {
       platforms: ['twitch'],
     },
 
-    superchat: {
-      name: $t('YouTube Super Chat'),
-      type: 'superchat',
-      url() {
-        return `https://${host}/api/v5/slobs/test/youtube_account/superchat`;
-      },
-      platforms: ['youtube'],
-    },
-
-    support: {
-      name: $t('Facebook Support'),
-      type: 'support',
-      url() {
-        return `https://${host}/api/v5/slobs/test/facebook_account/support`;
-      },
-      platforms: ['facebook'],
-    },
-
-    stars: {
-      name: $t('Facebook Stars'),
-      type: 'stars',
-      url() {
-        return `https://${host}/api/v5/slobs/test/facebook_account/stars`;
-      },
-      platforms: ['facebook'],
-    },
+    // superchat: {
+    //   name: $t('YouTube Super Chat'),
+    //   type: 'superchat',
+    //   url() {
+    //     return `https://${host}/api/v5/slobs/test/youtube_account/superchat`;
+    //   },
+    //   platforms: ['youtube'],
+    // },
+    //
+    // support: {
+    //   name: $t('Facebook Support'),
+    //   type: 'support',
+    //   url() {
+    //     return `https://${host}/api/v5/slobs/test/facebook_account/support`;
+    //   },
+    //   platforms: ['facebook'],
+    // },
+    //
+    // stars: {
+    //   name: $t('Facebook Stars'),
+    //   type: 'stars',
+    //   url() {
+    //     return `https://${host}/api/v5/slobs/test/facebook_account/stars`;
+    //   },
+    //   platforms: ['facebook'],
+    // },
   };
 }
-
-// {
-//   name: 'Super Chat',
-//       url(host, platform) {
-//   return `https://${host}/api/v5/slobs/test/${platform}_account/superchat`;
-// },
-//   platforms: ['youtube'],
-// },
-// {
-//   name: 'Share',
-//       url(host, platform) {
-//   return `https://${host}/api/v5/slobs/test/${platform}_account/share`;
-// },
-//   platforms: ['facebook'],
-// },
-// {
-//   name: 'Support',
-//       url(host, platform) {
-//   return `https://${host}/api/v5/slobs/test/${platform}_account/support`;
-// },
-//   platforms: ['facebook'],
-// },
-// {
-//   name: 'Stars',
-//       url(host, platform) {
-//   return `https://${host}/api/v5/slobs/test/${platform}_account/stars`;
-// },
-//   platforms: ['facebook'],
-// },
-// {
-//   name: 'Like',
-//       url(host, platform) {
-//   return `https://${host}/api/v5/slobs/test/${platform}_account/like`;
-// },
-//   platforms: ['facebook'],
-// },
 
 export interface IAlertInfo {
   type: TAlertType;

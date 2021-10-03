@@ -48,6 +48,8 @@ export const MediaGalleryInput = InputComponent(
     const isImage = !isAudio && !isVideo;
     const fileName = value ? value.split(/(\\|\/)/g).pop() : '';
 
+    if (isVideo) console.log('value', value);
+
     function renderButtons() {
       return (
         <span>
@@ -83,7 +85,7 @@ export const MediaGalleryInput = InputComponent(
         >
           {isVideo && (
             <div>
-              <video loop muted autoPlay className={css.media}>
+              <video loop muted autoPlay className={css.media} key={value}>
                 <source src={value} type="video/webm" />
               </video>
             </div>
