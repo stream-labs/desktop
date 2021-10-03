@@ -131,6 +131,20 @@ function useModuleContext<
   return (mergeResult as unknown) as TReturnType;
 }
 
+/**
+ * Get the Redux module instance from the current React context
+ * Creates a new module instance if no instances exist
+ */
+export function useModule<
+  TState,
+  TModuleClass extends new (...args: any[]) => IReduxModule<unknown, TState>
+>(ModuleClass: TModuleClass) {
+  return useModuleContext(ModuleClass);
+}
+
+/**
+ * Create a Redux module instance with given params
+ */
 export function useModuleRoot<
   TInitParams,
   TState,
@@ -139,13 +153,9 @@ export function useModuleRoot<
   return useModuleContext(ModuleClass, initParams, moduleName);
 }
 
-export function useModule<
-  TState,
-  TModuleClass extends new (...args: any[]) => IReduxModule<unknown, TState>
->(ModuleClass: TModuleClass) {
-  return useModuleContext(ModuleClass);
-}
-
+/**
+ * same as useModule but locates a module by name instead of a class
+ */
 export function useModuleByName<TModule extends IReduxModule<any, any>>(
   moduleName: string,
 ): TUseModuleReturnType<TModule> {
