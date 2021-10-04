@@ -95,6 +95,7 @@ export function setSentryContext(ctx: ISentryContext) {
   }
   electron.crashReporter.addExtraParameter('sentry[user][username]', ctx.username);
   electron.crashReporter.addExtraParameter('platform', ctx.platform);
+  electron.ipcRenderer.send('setSentryContext', ctx);
 }
 
 class UserViews extends ViewHandler<IUserServiceState> {

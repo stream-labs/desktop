@@ -759,6 +759,11 @@ ipcMain.on('gameOverlayPaintCallback', (e, { contentsId, overlayId }) => {
   });
 });
 
+ipcMain.on('setSentryContext', (e, { username, platform }) => {
+  crashReporter.addExtraParameter('sentry[user][username]', username);
+  crashReporter.addExtraParameter('platform', platform);
+});
+
 ipcMain.on('getWindowIds', e => {
   e.returnValue = {
     worker: workerWindow.id,
