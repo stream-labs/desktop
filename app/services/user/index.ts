@@ -355,7 +355,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
    */
   writeUserIdFile(userId?: number) {
     const filePath = path.join(this.appService.appDataDirectory, 'userId');
-    fs.writeFile(filePath, userId ?? '', err => {
+    fs.writeFile(filePath, userId?.toString() ?? '', err => {
       if (err) {
         console.error('Error writing user id file', err);
       }
@@ -681,6 +681,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     if (!validateLoginResult) {
       this.logOut();
       electron.remote.dialog.showMessageBox({
+        title: 'Streamlabs OBS',
         message: $t('You have been logged out'),
       });
       return;

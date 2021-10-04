@@ -14,6 +14,6 @@
   "Always, show last person when inactive": "Selalu tampilkan orang terakhir ketika tidak aktif",
   "Include Resubs": "Sertakan Berlangganan Ulang",
   "Preview": "Pratinjau",
-  "Tokens: %{tokenList}": "Tokens: %{tokenList}",
-  "Note: Actual label text may take up to 60 seconds to update": "Note: Actual label text may take up to 60 seconds to update"
+  "Tokens: %{tokenList}": "Token: %{tokenList}",
+  "Note: Actual label text may take up to 60 seconds to update": "Catatan: Pembaruan aktual teks label dapat membutuhkan waktu 60 detik"
 }

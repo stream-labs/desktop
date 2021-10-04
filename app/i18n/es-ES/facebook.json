@@ -33,4 +33,23 @@
   "FBPrivacyWarning": "El nivel de privacidad otorgado puede estar limitado para su cuenta de Facebook. Comprobar \"quién puede verte usa esta integración empresarial\" sección para la integración de Streamlabs <link>aqui</link>",
   "Only Me": "Solo yo",
   "Do not change privacy settings": "No cambie la configuración de privacidad"
+  "facebookGamingWarning": "Para la plena experiencia de Facebook Gaming, <create-page-link>cree una página de creador de vídeos de juegos</create-page-link>",
+  "Facebook Destination": "Destino de Facebook",
+  "Share to Your Timeline": "Compartir su línea de tiempo",
+  "Share to a Page You Manage": "Compartir en una página que gestione",
+  "Share in a Group": "Compartir en un grupo",
+  "Facebook Group": "Grupo de Facebook",
+  "Scheduled Video": "Vídeo programado",
+  "Make sure the Streamlabs app is added to your Group.": "Asegúrese de que la aplicación de Streamlabs se haya agregado a su grupo.",
+  "Click here to verify.": "Haga clic aquí para verificar.",
+  "Facebook Game": "Juego de Facebook",
+  "You can stream to your timeline and groups now": "Puede transmitir su línea de tiempo y grupos ahora",
+  "Please log-out and log-in again to get these new features": "Cierre sesión y vuelva a iniciarla para obtener estas nuevas características",
+  "Re-login now": "Reiniciar sesión ahora",
+  "Please reconnect Facebook to get these new features": "Reconecte Facebook para obtener estas nuevas características",
+  "Reconnect now": "Reconectar ahora",
+  "Privacy": "Privacidad",
+  "FBPrivacyWarning": "El nivel de privacidad concedido puede estar limitado para su cuenta de Facebook. Compruebe la sección \"¿Quién puede ver que usa esta integración de negocios\" para la integración de Streamlabs<link>aquí</link>",
+  "Only Me": "Solo yo",
+  "Do not change privacy settings": "No cambiar ajustes de privacidad"
 }

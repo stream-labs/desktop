@@ -34,6 +34,7 @@ export default class ExperimentalSettings extends Vue {
   repairSceneCollection() {
     this.scenesService.repair();
     electron.remote.dialog.showMessageBox(electron.remote.getCurrentWindow(), {
+      title: 'Streamlabs OBS',
       message: 'Repair finished. See details in the log file',
     });
   }

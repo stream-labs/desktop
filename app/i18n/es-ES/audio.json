@@ -5,7 +5,7 @@
   "Sync Offset (ms)": "Desplazamiento de sincronización (ms)",
   "Audio Monitoring": "Supervisión de audio",
   "Monitor Off": "Supervisión desactivada",
-  "Monitor Only (mute output)": "Sólo supervisión (silenciar salida)",
+  "Monitor Only (mute output)": "Solo supervisión (silenciar salida)",
   "Monitor and Output": "Supervisión y salida",
   "Tracks": "Pistas",
   "Advanced Audio Settings": "Ajustes de audio avanzados",
@@ -15,4 +15,8 @@
   "Monitor audio levels. If the bars are moving you are outputting audio.": "Supervisar niveles de audio. Si las barras se mueven, está emitiendo audio.",
   "Muted": "Silenciado",
   "Hide in Mixer": "Ocultar en Mezclador"
+  "Mixer": "Mixer",
+  "Monitor audio levels. If the bars are moving you are outputting audio.": "Supervisar niveles de audio. Si las barras se mueven está saliendo el audio.",
+  "Muted": "Silenciado",
+  "Hide in Mixer": "Ocultar en mezclador"
 }
