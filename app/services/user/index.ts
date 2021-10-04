@@ -92,6 +92,10 @@ export function setSentryContext(ctx: ISentryContext) {
 
   if (Utils.isWorkerWindow()) {
     obs.NodeObs.SetUsername(ctx.username);
+
+    // Sets main process sentry context. Only need to do this once.
+    electron.remote.crashReporter.addExtraParameter('sentry[user][username]', ctx.username);
+    electron.remote.crashReporter.addExtraParameter('platform', ctx.platform);
   }
   electron.crashReporter.addExtraParameter('sentry[user][username]', ctx.username);
   electron.crashReporter.addExtraParameter('platform', ctx.platform);
