@@ -382,7 +382,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // allow to refresh the window by pressing `F5` in the DevMode
     if (Utils.isDevMode()) {
       window.addEventListener('keyup', ev => {
-        if (ev.key === 'F5') vm.startWindowRefresh();
+        if (ev.ctrlKey && ev.key === 'r') vm.startWindowRefresh();
       });
     }
   });

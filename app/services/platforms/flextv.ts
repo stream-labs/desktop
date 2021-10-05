@@ -8,8 +8,10 @@ import { WidgetType } from '../widgets';
 import { getDefined } from '../../util/properties-type-guards';
 
 export interface IFlextvStartStreamOptions {
-  serverUrl: string;
-  streamKey: string;
+  title: string;
+  category?: string;
+  resolution?: string;
+  useMinFanLevel?: boolean;
 }
 
 interface IFlextvServiceState extends IPlatformState {
@@ -70,6 +72,8 @@ export class FlextvService
 
     if (goLiveSettings) {
       const channelInfo = goLiveSettings?.platforms.flextv;
+      console.log(channelInfo, 'settings');
+      // ToDo - 채널 셋팅 API 호출
       // if (channelInfo) await this.putChannelInfo(channelInfo);
     }
   }
@@ -87,7 +91,6 @@ export class FlextvService
       `https://www.hotaetv.com/api/my/channel/stream-key`,
     );
   }
-
 
   getHeaders(req: IPlatformRequest, useToken: boolean | string) {
     const token = typeof useToken === 'string' ? useToken : useToken && this.apiToken;
