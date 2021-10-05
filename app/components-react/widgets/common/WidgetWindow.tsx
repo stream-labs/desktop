@@ -71,7 +71,7 @@ export function WidgetWindow() {
   useWidgetRoot(WidgetModule, { sourceId });
 
   return (
-    <ModalLayout bodyStyle={{ padding: '0px' }} hideFooter={true}>
+    <ModalLayout bodyStyle={{ padding: '0px' }} >
       <WidgetSettingsComponent />
     </ModalLayout>
   );
