@@ -13,6 +13,6 @@
   "Sync Offset ( ms )": "Atraso de sincronização ( ms )",
   "Mixer": "Mixer",
   "Monitor audio levels. If the bars are moving you are outputting audio.": "Monitora o nível de áudio. Caso as barras estejam se movendo você está enviando áudio.",
-  "Muted": "Muted",
-  "Hide in Mixer": "Hide in Mixer"
+  "Muted": "Sem áudio",
+  "Hide in Mixer": "Ocultar no Mixer"
 }

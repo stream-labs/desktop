@@ -118,7 +118,12 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
       width: 600,
       componentName: 'GameOverlayEventFeed',
       queryParams: { gameOverlay: true },
-      webPreferences: { offscreen: true, nodeIntegration: true, enableRemoteModule: true },
+      webPreferences: {
+        offscreen: true,
+        nodeIntegration: true,
+        enableRemoteModule: true,
+        contextIsolation: false,
+      },
       isFullScreen: true,
     });
     this.windows.chat = new BrowserWindow({
@@ -155,7 +160,12 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
       ...this.commonWindowOptions,
       width: 600,
       transparent: true,
-      webPreferences: { offscreen: false, nodeIntegration: true, enableRemoteModule: true },
+      webPreferences: {
+        offscreen: false,
+        nodeIntegration: true,
+        enableRemoteModule: true,
+        contextIsolation: false,
+      },
       isFullScreen: true,
       alwaysOnTop: true,
       componentName: 'OverlayPlaceholder',
@@ -166,7 +176,12 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
       ...this.commonWindowOptions,
       height: 600,
       transparent: true,
-      webPreferences: { offscreen: false, nodeIntegration: true, enableRemoteModule: true },
+      webPreferences: {
+        offscreen: false,
+        nodeIntegration: true,
+        enableRemoteModule: true,
+        contextIsolation: false,
+      },
       isFullScreen: true,
       alwaysOnTop: true,
       componentName: 'OverlayPlaceholder',

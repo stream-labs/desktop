@@ -13,6 +13,6 @@
   "Sync Offset ( ms )": "Posun v synchronizaci (ms)",
   "Mixer": "Mixer",
   "Monitor audio levels. If the bars are moving you are outputting audio.": "Sledování úrovně zvuku. Pokud jsou pruhy v pohybu, dochází k výstupu zvuku.",
-  "Muted": "Muted",
-  "Hide in Mixer": "Hide in Mixer"
+  "Muted": "Ztlumeno",
+  "Hide in Mixer": "Skrýt ve Směšovači"
 }

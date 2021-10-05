@@ -92,6 +92,10 @@ export function setSentryContext(ctx: ISentryContext) {
 
   if (Utils.isWorkerWindow()) {
     obs.NodeObs.SetUsername(ctx.username);
+
+    // Sets main process sentry context. Only need to do this once.
+    electron.remote.crashReporter.addExtraParameter('sentry[user][username]', ctx.username);
+    electron.remote.crashReporter.addExtraParameter('platform', ctx.platform);
   }
   electron.crashReporter.addExtraParameter('sentry[user][username]', ctx.username);
   electron.crashReporter.addExtraParameter('platform', ctx.platform);
@@ -355,7 +359,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
    */
   writeUserIdFile(userId?: number) {
     const filePath = path.join(this.appService.appDataDirectory, 'userId');
-    fs.writeFile(filePath, userId ?? '', err => {
+    fs.writeFile(filePath, userId?.toString() ?? '', err => {
       if (err) {
         console.error('Error writing user id file', err);
       }
@@ -681,6 +685,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     if (!validateLoginResult) {
       this.logOut();
       electron.remote.dialog.showMessageBox({
+        title: 'Streamlabs OBS',
         message: $t('You have been logged out'),
       });
       return;

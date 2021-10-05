@@ -185,7 +185,13 @@ export class RenameSource extends ReactComponent {}
   },
 })
 export class SafeMode extends ReactComponent {}
-
+@Component({
+  props: {
+    name: { default: 'ScreenCaptureProperties' },
+    wrapperStyles: { default: () => ({ height: '100%' }) },
+  },
+})
+export class ScreenCaptureProperties extends ReactComponent {}
 @Component({
   props: {
     name: { default: 'SharedComponentsLibrary' },

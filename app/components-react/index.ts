@@ -3,6 +3,7 @@ import GoLiveWindow from './windows/go-live/GoLiveWindow';
 import FlexTvGoLiveWindow from './windows/flextv/FlexTvGoLiveWindow';
 import EditStreamWindow from './windows/go-live/EditStreamWindow';
 import IconLibraryProperties from './windows/IconLibraryProperties';
+import ScreenCaptureProperties from './windows/ScreenCaptureProperties';
 import NewsBanner from './root/NewsBanner';
 import PerformanceMetrics from './shared/PerformanceMetrics';
 import PatchNotes from './pages/PatchNotes';
@@ -36,6 +37,7 @@ export const components = {
   FlexTvGoLiveWindow: createRoot(FlexTvGoLiveWindow),
   EditStreamWindow: createRoot(EditStreamWindow),
   IconLibraryProperties,
+  ScreenCaptureProperties,
   NewsBanner,
   PerformanceMetrics,
   PatchNotes,

@@ -315,7 +315,7 @@ async function startApp() {
 
   workerWindow = new BrowserWindow({
     show: false,
-    webPreferences: { nodeIntegration: true, enableRemoteModule: true },
+    webPreferences: { nodeIntegration: true, enableRemoteModule: true, contextIsolation: false },
   });
 
   // setTimeout(() => {
@@ -351,6 +351,7 @@ async function startApp() {
       nodeIntegration: true,
       webviewTag: true,
       enableRemoteModule: true,
+      contextIsolation: false,
     },
   });
 
@@ -423,6 +424,7 @@ async function startApp() {
       nodeIntegration: true,
       enableRemoteModule: true,
       backgroundThrottling: false,
+      contextIsolation: false,
     },
   });
 
