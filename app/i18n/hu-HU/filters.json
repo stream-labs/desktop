@@ -20,7 +20,7 @@
   "Filter name": "Szűrő neve",
   "Add source filter": "Forrás szűrő hozzáadása",
   "No filters applied": "Nincsenek alkalmazott szűrők",
-  "Source filters": "Forrás szűrők",
+  "Filters for %{sourceName}": "Filters for %{sourceName}",
   "Invert Polarity": "Invert Polarity",
   "Limiter": "Limiter",
   "Expander": "Expander",

@@ -80,6 +80,7 @@ export const windowsSources: TSourceType[] = [
   'scene',
   'ndi_source',
   'openvr_capture',
+  'screen_capture',
   'liv_capture',
   'ovrstream_dc_source',
   'vlc_source',
@@ -310,6 +311,8 @@ export class SourcesService extends StatefulService<ISourcesState> {
       this.usageStatisticsService.recordFeatureUsage('NDI');
     } else if (type === 'openvr_capture') {
       this.usageStatisticsService.recordFeatureUsage('OpenVR');
+    } else if (type === 'screen_capture') {
+      this.usageStatisticsService.recordFeatureUsage('SimpleCapture');
     } else if (type === 'vlc_source') {
       this.usageStatisticsService.recordFeatureUsage('VLC');
     } else if (type === 'soundtrack_source') {
@@ -494,6 +497,7 @@ export class SourcesService extends StatefulService<ISourcesState> {
       { description: 'Blackmagic Device', value: 'decklink-input' },
       { description: 'NDI Source', value: 'ndi_source' },
       { description: 'OpenVR Capture', value: 'openvr_capture' },
+      { description: 'Screen Capture', value: 'screen_capture' },
       { description: 'LIV Client Capture', value: 'liv_capture' },
       { description: 'OvrStream', value: 'ovrstream_dc_source' },
       { description: 'VLC Source', value: 'vlc_source' },
@@ -570,6 +574,9 @@ export class SourcesService extends StatefulService<ISourcesState> {
   showSourceProperties(sourceId: string) {
     const source = this.views.getSource(sourceId);
     if (!source) return;
+
+    if (source.type === 'screen_capture') return this.showScreenCaptureProperties(source);
+
     const propertiesManagerType = source.getPropertiesManagerType();
 
     if (propertiesManagerType === 'widget') return this.showWidgetProperties(source);
@@ -655,6 +662,19 @@ export class SourcesService extends StatefulService<ISourcesState> {
       size: {
         width: 400,
         height: 600,
+      },
+    });
+  }
+
+  showScreenCaptureProperties(source: Source) {
+    const propertiesName = SourceDisplayData()[source.type].name;
+    this.windowsService.showWindow({
+      componentName: 'ScreenCaptureProperties',
+      title: $t('Settings for %{sourceName}', { sourceName: propertiesName }),
+      queryParams: { sourceId: source.sourceId },
+      size: {
+        width: 690,
+        height: 800,
       },
     });
   }

@@ -14,6 +14,6 @@
   "Always, show last person when inactive": "Vždy, v případě neaktivity zobrazit poslední osobu",
   "Include Resubs": "Zahrnout prodloužení odběru",
   "Preview": "Náhled",
-  "Tokens: %{tokenList}": "Tokens: %{tokenList}",
-  "Note: Actual label text may take up to 60 seconds to update": "Note: Actual label text may take up to 60 seconds to update"
+  "Tokens: %{tokenList}": "Tokeny: %{tokenList}",
+  "Note: Actual label text may take up to 60 seconds to update": "Poznámka: Aktualizace současného textu štítku může trvat až 60 sekund"
 }
