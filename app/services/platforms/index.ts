@@ -2,6 +2,8 @@ import { ITwitchStartStreamOptions, TwitchService } from './twitch';
 import { IYoutubeStartStreamOptions, YoutubeService } from './youtube';
 import { FacebookService, IFacebookStartStreamOptions } from './facebook';
 import { ITiktokStartStreamOptions, TiktokService } from './tiktok';
+import { IFlextvStartStreamOptions, FlextvService } from './flextv';
+import {} from './flextv'
 import { TTwitchTag } from './twitch/tags';
 import { TTwitchOAuthScope } from './twitch/scopes';
 import { IGoLiveSettings } from 'services/streaming';
@@ -247,7 +249,7 @@ export interface IUserInfo {
   username?: string;
 }
 
-export type TPlatform = 'twitch' | 'youtube' | 'facebook' | 'tiktok';
+export type TPlatform = 'twitch' | 'youtube' | 'facebook' | 'tiktok' | 'flextv';
 
 export function getPlatformService(platform: TPlatform): IPlatformService {
   return {
@@ -255,6 +257,7 @@ export function getPlatformService(platform: TPlatform): IPlatformService {
     youtube: YoutubeService.instance,
     facebook: FacebookService.instance,
     tiktok: TiktokService.instance,
+    flextv: FlextvService.instance,
   }[platform];
 }
 

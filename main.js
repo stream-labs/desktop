@@ -209,7 +209,7 @@ app.on('ready', () => {
       // This error code indicates a read only file system
       if (e.code === 'EROFS') {
         dialog.showErrorBox(
-          'Streamlabs OBS',
+          'FlexTV Broadcaster',
           'Please run Streamlabs OBS from your Applications folder. Streamlabs OBS cannot run directly from this disk image.',
         );
         app.exit();
@@ -345,7 +345,7 @@ async function startApp() {
     show: false,
     frame: false,
     titleBarStyle: 'hidden',
-    title: 'Streamlabs OBS',
+    title: 'FlexTV Broadcaster',
     backgroundColor: '#17242D',
     webPreferences: {
       nodeIntegration: true,
@@ -567,6 +567,7 @@ ipcMain.on('protocolLinkReady', () => {
 });
 
 app.on('ready', () => {
+  /*
   if (
     !process.argv.includes('--skip-update') &&
     (process.env.NODE_ENV === 'production' || process.env.SLOBS_FORCE_AUTO_UPDATE)
@@ -591,7 +592,8 @@ app.on('ready', () => {
     }
   } else {
     startApp();
-  }
+  }*/
+  startApp();
 });
 
 ipcMain.on('openDevTools', () => {

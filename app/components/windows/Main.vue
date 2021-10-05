@@ -15,7 +15,10 @@
         'main-contents--onboarding': page === 'Onboarding',
       }"
     >
-      <side-nav v-if="page !== 'Onboarding' && !showLoadingSpinner" :locked="applicationLoading" />
+      <flex-tv-side-nav
+        v-if="page !== 'Onboarding' && !showLoadingSpinner"
+        :locked="applicationLoading"
+      />
       <div class="live-dock-wrapper" v-if="renderDock && leftDock">
         <live-dock :onLeft="true" />
         <resize-bar

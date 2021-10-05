@@ -176,14 +176,6 @@ export default class StreamSettings extends TsxComponent {
           <div>
             <h2>{$t('Stream Destinations')}</h2>
             {this.platforms.map(platform => this.renderPlatform(platform))}
-
-            {<div>{this.renderCustomDestinations()}</div>}
-
-            {this.canEditSettings && (
-              <div>
-                <a onClick={this.disableProtectedMode}>{$t('Stream to custom ingest')}</a>
-              </div>
-            )}
           </div>
         )}
 
@@ -227,6 +219,7 @@ export default class StreamSettings extends TsxComponent {
       youtube: 'button--youtube',
       twitch: 'button--twitch',
       tiktok: 'button--tiktok',
+      flextv: 'button--flextv',
     }[platform];
     const isPrimary = this.streamingView.checkPrimaryPlatform(platform);
     const shouldShowPrimaryBtn = isPrimary;

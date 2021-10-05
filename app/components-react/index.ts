@@ -1,5 +1,6 @@
 import NameFolder from './windows/NameFolder';
 import GoLiveWindow from './windows/go-live/GoLiveWindow';
+import FlexTvGoLiveWindow from './windows/flextv/FlexTvGoLiveWindow';
 import EditStreamWindow from './windows/go-live/EditStreamWindow';
 import IconLibraryProperties from './windows/IconLibraryProperties';
 import ScreenCaptureProperties from './windows/ScreenCaptureProperties';
@@ -13,6 +14,7 @@ import Highlighter from './pages/Highlighter';
 import Grow from './pages/grow/Grow';
 import Loader from './pages/Loader';
 import NavTools from './sidebar/NavTools';
+import FlexTvNavTools from './sidebar/FlexTvNavTools';
 import PlatformLogo from './shared/PlatformLogo';
 import AdvancedStatistics from './windows/AdvancedStatistics';
 import StreamScheduler from './pages/stream-scheduler/StreamScheduler';
@@ -32,6 +34,7 @@ import SafeMode from './windows/SafeMode';
 export const components = {
   NameFolder,
   GoLiveWindow: createRoot(GoLiveWindow),
+  FlexTvGoLiveWindow: createRoot(FlexTvGoLiveWindow),
   EditStreamWindow: createRoot(EditStreamWindow),
   IconLibraryProperties,
   ScreenCaptureProperties,
@@ -45,6 +48,7 @@ export const components = {
   Grow,
   Loader,
   NavTools,
+  FlexTvNavTools,
   PlatformLogo,
   StreamScheduler: createRoot(StreamScheduler),
   AdvancedStatistics,

@@ -71,6 +71,14 @@ export class GoLiveWindow extends ReactComponent {}
 
 @Component({
   props: {
+    name: { default: 'FlexTvGoLiveWindow' },
+    wrapperStyles: { default: () => ({ height: '100%' }) },
+  },
+})
+export class FlexTvGoLiveWindow extends ReactComponent {}
+
+@Component({
+  props: {
     name: { default: 'Grow' },
     wrapperStyles: { default: () => ({ gridRow: '1 / span 1' }) },
   },
@@ -115,6 +123,14 @@ export class NameFolder extends ReactComponent {}
   },
 })
 export class NavTools extends ReactComponent {}
+
+@Component({
+  props: {
+    name: { default: 'FlexTvNavTools' },
+    wrapperStyles: { default: () => ({ marginTop: 'auto', flexShrink: 0 }) },
+  },
+})
+export class FlexTvNavTools extends ReactComponent {}
 
 @Component({ props: { name: { default: 'NewsBanner' } } })
 export class NewsBanner extends ReactComponent {}

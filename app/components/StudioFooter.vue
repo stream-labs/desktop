@@ -21,9 +21,6 @@
     </div>
 
     <div class="nav-right">
-      <div class="nav-item">
-        <test-widgets v-if="loggedIn" />
-      </div>
       <div v-if="streamingService.isRecording" class="nav-item record-time">
         {{ recordingTime }}
       </div>
@@ -72,7 +69,7 @@
           <i class="icon-date" />
         </button>
       </div>
-      <div class="nav-item">
+      <div class="nav-item" v-if="loggedIn">
         <start-streaming-button :disabled="locked" />
       </div>
     </div>

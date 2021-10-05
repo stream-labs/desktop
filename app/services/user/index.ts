@@ -868,4 +868,14 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
       },
     } as LoginLifecycle;
   }
+
+  /**
+   * FlexTV only
+   */
+  async startFlexAuth(auth: IUserAuth): Promise<EPlatformCallResult> {
+    const service = getPlatformService('flextv');
+    this.streamSettingsService.resetStreamSettings();
+
+    return this.login(service, auth);
+  }
 }

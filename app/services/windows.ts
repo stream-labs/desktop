@@ -12,6 +12,7 @@ import { throttle } from 'lodash-decorators';
 import Main from 'components/windows/Main.vue';
 import Settings from 'components/windows/settings/Settings.vue';
 import FFZSettings from 'components/windows/FFZSettings.vue';
+import FlexTvSettings from 'components/windows/flextv/settings/FlexTvSettings.vue';
 import SourcesShowcase from 'components/windows/SourcesShowcase.vue';
 import SceneTransitions from 'components/windows/SceneTransitions.vue';
 import AddSource from 'components/windows/AddSource.vue';
@@ -19,6 +20,7 @@ import NameScene from 'components/windows/NameScene.vue';
 import {
   NameFolder,
   GoLiveWindow,
+  FlexTvGoLiveWindow,
   EditStreamWindow,
   IconLibraryProperties,
   ScreenCaptureProperties,
@@ -89,6 +91,7 @@ export function getComponents() {
     Main,
     Settings,
     FFZSettings,
+    FlexTvSettings,
     SceneTransitions,
     SourcesShowcase,
     RenameSource,
@@ -140,6 +143,7 @@ export function getComponents() {
     ChatHighlight,
     WelcomeToPrime,
     GoLiveWindow,
+    FlexTvGoLiveWindow,
     EditStreamWindow,
     IconLibraryProperties,
     ScreenCaptureProperties,
@@ -202,7 +206,7 @@ export class WindowsService extends StatefulService<IWindowsState> {
       scaleFactor: 1,
       isShown: true,
       hideStyleBlockers: true,
-      title: `Streamlabs OBS - ${Utils.env.SLOBS_VERSION}`,
+      title: `FlexTV Broadcaster - ${Utils.env.SLOBS_VERSION}`,
     },
     child: {
       componentName: '',

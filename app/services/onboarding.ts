@@ -15,6 +15,7 @@ import { ObsImporterService } from './obs-importer';
 enum EOnboardingSteps {
   MacPermissions = 'MacPermissions',
   Connect = 'Connect',
+  ConnectFlex = 'ConnectFlex',
   ChooseYourAdventure = 'ChooseYourAdventure',
   ObsImport = 'ObsImport',
   HardwareSetup = 'HardwareSetup',
@@ -34,6 +35,13 @@ const ONBOARDING_STEPS = () => ({
   },
   [EOnboardingSteps.Connect]: {
     element: onboardingSteps.Connect,
+    disableControls: false,
+    hideSkip: true,
+    hideButton: true,
+    isPreboarding: true,
+  },
+  [EOnboardingSteps.ConnectFlex]: {
+    element: onboardingSteps.ConnectFlex,
     disableControls: false,
     hideSkip: true,
     hideButton: true,
@@ -126,7 +134,7 @@ interface IOnboardingServiceState {
 
 class OnboardingViews extends ViewHandler<IOnboardingServiceState> {
   get singletonStep(): IOnboardingStep {
-    if (this.state.options.isLogin) return ONBOARDING_STEPS()[EOnboardingSteps.Connect];
+    if (this.state.options.isLogin) return ONBOARDING_STEPS()[EOnboardingSteps.ConnectFlex];
     if (this.state.options.isOptimize) return ONBOARDING_STEPS()[EOnboardingSteps.Optimize];
     if (this.state.options.isHardware) return ONBOARDING_STEPS()[EOnboardingSteps.HardwareSetup];
     if (this.state.options.isImport) return ONBOARDING_STEPS()[EOnboardingSteps.ObsImport];
@@ -144,7 +152,7 @@ class OnboardingViews extends ViewHandler<IOnboardingServiceState> {
       steps.push(ONBOARDING_STEPS()[EOnboardingSteps.MacPermissions]);
     }
 
-    steps.push(ONBOARDING_STEPS()[EOnboardingSteps.Connect]);
+    steps.push(ONBOARDING_STEPS()[EOnboardingSteps.ConnectFlex]);
 
     if (userViews.isLoggedIn && !userViews.isPrime) {
       steps.push(ONBOARDING_STEPS()[EOnboardingSteps.Prime]);

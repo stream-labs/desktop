@@ -22,6 +22,7 @@ export default function PlatformLogo(p: IProps & HTMLAttributes<unknown>) {
       youtube: 'fab fa-youtube',
       facebook: 'fab fa-facebook',
       tiktok: 'fab fa-tiktok',
+      flextv: 'flextv',
       dlive: 'dlive',
       nimotv: 'nimotv',
       streamlabs: 'icon-streamlabs',

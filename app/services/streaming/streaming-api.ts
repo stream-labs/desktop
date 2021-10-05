@@ -6,6 +6,7 @@ import { IFacebookStartStreamOptions } from '../platforms/facebook';
 import { IStreamError } from './stream-error';
 import { ICustomStreamDestination } from '../settings/streaming';
 import { ITiktokStartStreamOptions } from '../platforms/tiktok';
+import { IFlextvStartStreamOptions } from '../platforms/flextv';
 
 export enum EStreamingState {
   Offline = 'offline',
@@ -45,6 +46,7 @@ export interface IStreamInfo {
     youtube: TGoLiveChecklistItemState;
     facebook: TGoLiveChecklistItemState;
     tiktok: TGoLiveChecklistItemState;
+    flextv: TGoLiveChecklistItemState;
     setupMultistream: TGoLiveChecklistItemState;
     startVideoTransmission: TGoLiveChecklistItemState;
     postTweet: TGoLiveChecklistItemState;
@@ -59,6 +61,7 @@ export interface IStreamSettings {
     youtube?: IPlatformFlags & IYoutubeStartStreamOptions;
     facebook?: IPlatformFlags & IFacebookStartStreamOptions;
     tiktok?: IPlatformFlags & ITiktokStartStreamOptions;
+    flextv?: IPlatformFlags & IFlextvStartStreamOptions;
   };
   customDestinations: ICustomStreamDestination[];
   advancedMode: boolean;

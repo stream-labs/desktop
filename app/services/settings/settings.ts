@@ -213,7 +213,7 @@ export class SettingsService extends StatefulService<ISettingsServiceState> {
 
   showSettings(categoryName?: string) {
     this.windowsService.showWindow({
-      componentName: 'Settings',
+      componentName: 'FlexTvSettings',
       title: $t('Settings'),
       queryParams: { categoryName },
       size: {
