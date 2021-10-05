@@ -5,7 +5,7 @@ import { Inject } from 'services/core/injector';
 import Utils from 'services/utils';
 import { Subscription } from 'rxjs';
 import { WindowsService } from 'services/windows';
-import remote from '@electron/remote';
+import * as remote from '@electron/remote';
 
 @Component({})
 export default class PlatformAppPageView extends Vue {

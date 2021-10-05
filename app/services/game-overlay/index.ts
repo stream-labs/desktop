@@ -11,7 +11,7 @@ import { $t } from 'services/i18n';
 import { getOS, OS } from 'util/operating-systems';
 import { StreamingService } from '../streaming';
 import { UsageStatisticsService } from 'services/usage-statistics';
-import remote from '@electron/remote';
+import * as remote from '@electron/remote';
 
 const { BrowserWindow } = remote;
 
@@ -119,7 +119,7 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
       width: 600,
       componentName: 'GameOverlayEventFeed',
       queryParams: { gameOverlay: true },
-      webPreferences: { offscreen: true, nodeIntegration: true, enableRemoteModule: true },
+      webPreferences: { offscreen: true, nodeIntegration: true },
       isFullScreen: true,
     });
     this.windows.chat = new BrowserWindow({
@@ -156,7 +156,7 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
       ...this.commonWindowOptions,
       width: 600,
       transparent: true,
-      webPreferences: { offscreen: false, nodeIntegration: true, enableRemoteModule: true },
+      webPreferences: { offscreen: false, nodeIntegration: true },
       isFullScreen: true,
       alwaysOnTop: true,
       componentName: 'OverlayPlaceholder',
@@ -167,7 +167,7 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
       ...this.commonWindowOptions,
       height: 600,
       transparent: true,
-      webPreferences: { offscreen: false, nodeIntegration: true, enableRemoteModule: true },
+      webPreferences: { offscreen: false, nodeIntegration: true },
       isFullScreen: true,
       alwaysOnTop: true,
       componentName: 'OverlayPlaceholder',

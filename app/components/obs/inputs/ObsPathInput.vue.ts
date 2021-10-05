@@ -4,7 +4,7 @@ import { IObsPathInputValue, TObsType, ObsInput } from './ObsInput';
 import OpenDialogOptions = Electron.OpenDialogOptions;
 import HFormGroup from 'components/shared/inputs/HFormGroup.vue';
 import { TextInput } from 'components/shared/inputs/inputs';
-import remote from '@electron/remote';
+import * as remote from '@electron/remote';
 
 @Component({ components: { HFormGroup, TextInput } })
 class ObsPathInput extends ObsInput<IObsPathInputValue> {

@@ -9,7 +9,7 @@ import { NavigationService } from 'services/navigation';
 import Utils from 'services/utils';
 import BrowserView from 'components/shared/BrowserView';
 import { GuestApiHandler } from 'util/guest-api-handler';
-import remote from '@electron/remote';
+import * as remote from '@electron/remote';
 
 @Component({
   components: { BrowserView },

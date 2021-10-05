@@ -1,7 +1,7 @@
 import { BaseInput } from './BaseInput';
 import { Component, Prop } from 'vue-property-decorator';
 import { IFileMetadata } from './index';
-import remote from '@electron/remote';
+import * as remote from '@electron/remote';
 
 @Component({})
 export default class FileInput extends BaseInput<string, IFileMetadata> {

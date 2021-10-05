@@ -2,7 +2,7 @@ import { apiMethod, EApiPermissions, IApiContext, Module, IBrowserViewTransform 
 import { Display } from 'services/video';
 import uuid from 'uuid/v4';
 import { Subscription } from 'rxjs';
-import remote from '@electron/remote';
+import * as remote from '@electron/remote';
 
 interface IDisplayCreateOptions {
   position: IVec2;

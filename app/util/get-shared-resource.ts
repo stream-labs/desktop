@@ -1,6 +1,6 @@
 import Utils from 'services/utils';
 import path from 'path';
-import remote from '@electron/remote';
+import * as remote from '@electron/remote';
 
 /**
  * Returns a fully qualified path to an asset in the shared-resources

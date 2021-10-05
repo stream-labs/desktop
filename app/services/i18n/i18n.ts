@@ -10,7 +10,7 @@ import * as fs from 'fs';
 import path from 'path';
 import Utils from '../utils';
 import fallback from '../../i18n/fallback';
-import remote from '@electron/remote';
+import * as remote from '@electron/remote';
 
 interface II18nState {
   locale: string;

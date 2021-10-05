@@ -9,7 +9,7 @@ import electron from 'electron';
 import Util from 'services/utils';
 import { Subscription } from 'rxjs';
 import Scrollable from 'components/shared/Scrollable';
-import remote from '@electron/remote';
+import * as remote from '@electron/remote';
 
 @Component({
   components: {

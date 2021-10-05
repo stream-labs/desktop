@@ -8,7 +8,7 @@ import Vue, { Component } from 'vue';
 import Utils from 'services/utils';
 import { Subject } from 'rxjs';
 import { throttle } from 'lodash-decorators';
-import remote from '@electron/remote';
+import * as remote from '@electron/remote';
 
 import Main from 'components/windows/Main.vue';
 import Settings from 'components/windows/settings/Settings.vue';
@@ -423,12 +423,13 @@ export class WindowsService extends StatefulService<IWindowsState> {
       webPreferences: {
         nodeIntegration: true,
         webviewTag: true,
-        enableRemoteModule: true,
         contextIsolation: false,
       },
       ...options,
       ...options.size,
     }));
+
+    electron.ipcRenderer.sendSync('webContents-enableRemote', newWindow.webContents.id);
 
     newWindow.removeMenu();
     newWindow.on('closed', () => {
@@ -458,6 +459,8 @@ export class WindowsService extends StatefulService<IWindowsState> {
     this.CREATE_ONE_OFF_WINDOW(windowId, options);
 
     const newWindow = (this.windows[windowId] = new BrowserWindow(options));
+
+    electron.ipcRenderer.sendSync('webContents-enableRemote', newWindow.webContents.id);
 
     const indexUrl = remote.getGlobal('indexUrl');
     newWindow.loadURL(`${indexUrl}?windowId=${windowId}`);

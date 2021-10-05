@@ -11,7 +11,7 @@ import electron from 'electron';
 import { StreamingService } from './streaming';
 import { FacebookService } from './platforms/facebook';
 import { TiktokService } from './platforms/tiktok';
-import remote from '@electron/remote';
+import * as remote from '@electron/remote';
 
 interface IRestreamTarget {
   id: number;

@@ -14,7 +14,7 @@ import { StreamingService } from './streaming';
 import { GuestApiHandler } from 'util/guest-api-handler';
 import { ChatHighlightService, IChatHighlightMessage } from './widgets/settings/chat-highlight';
 import { assertIsDefined } from 'util/properties-type-guards';
-import remote from '@electron/remote';
+import * as remote from '@electron/remote';
 
 export function enableBTTVEmotesScript(isDarkTheme: boolean) {
   /*eslint-disable */
@@ -129,11 +129,12 @@ export class ChatService extends Service {
       webPreferences: {
         partition,
         nodeIntegration: false,
-        enableRemoteModule: true,
         contextIsolation: true,
         preload: path.resolve(remote.app.getAppPath(), 'bundles', 'guest-api'),
       },
     });
+
+    electron.ipcRenderer.sendSync('webContents-enableRemote', this.chatView.webContents.id);
 
     this.bindWindowListener();
     this.bindDomReadyListener();

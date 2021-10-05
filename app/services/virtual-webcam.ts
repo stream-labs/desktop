@@ -7,7 +7,7 @@ import { getChecksum } from 'util/requests';
 import { byOS, OS } from 'util/operating-systems';
 import { Inject } from 'services/core/injector';
 import { UsageStatisticsService } from 'services/usage-statistics';
-import remote from '@electron/remote';
+import * as remote from '@electron/remote';
 
 const PLUGIN_PLIST_PATH =
   '/Library/CoreMediaIO/Plug-Ins/DAL/vcam-plugin.plugin/Contents/Info.plist';

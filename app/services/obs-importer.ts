@@ -17,7 +17,7 @@ import { AppService } from 'services/app';
 import { RunInLoadingMode } from 'services/app/app-decorators';
 import defaultTo from 'lodash/defaultTo';
 import { $t } from 'services/i18n';
-import remote from '@electron/remote';
+import * as remote from '@electron/remote';
 
 interface Source {
   name?: string;

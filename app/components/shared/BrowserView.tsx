@@ -11,7 +11,7 @@ import { Subscription } from 'rxjs';
 import { AppService } from 'services/app';
 import cloneDeep from 'lodash/cloneDeep';
 import { CustomizationService } from 'services/customization';
-import remote from '@electron/remote';
+import * as remote from '@electron/remote';
 
 class BrowserViewProps {
   src: string = '';
@@ -48,7 +48,6 @@ export default class BrowserView extends TsxComponent<BrowserViewProps> {
     options.webPreferences.nodeIntegration = false;
 
     if (this.props.enableGuestApi) {
-      options.webPreferences.enableRemoteModule = true;
       options.webPreferences.contextIsolation = true;
       options.webPreferences.preload = path.resolve(
         remote.app.getAppPath(),
@@ -58,6 +57,10 @@ export default class BrowserView extends TsxComponent<BrowserViewProps> {
     }
 
     this.browserView = new remote.BrowserView(options);
+
+    if (this.props.enableGuestApi) {
+      electron.ipcRenderer.sendSync('webContents-enableRemote', this.browserView.webContents.id);
+    }
 
     this.$emit('ready', this.browserView);
 

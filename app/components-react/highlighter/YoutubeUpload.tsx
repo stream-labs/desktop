@@ -9,7 +9,7 @@ import { RadioInput } from 'components-react/shared/inputs/RadioInput';
 import { TPrivacyStatus } from 'services/platforms/youtube/uploader';
 import electron from 'electron';
 import { $t } from 'services/i18n';
-import remote from '@electron/remote';
+import * as remote from '@electron/remote';
 
 // Source: https://stackoverflow.com/questions/10420352/converting-file-size-in-bytes-to-human-readable-string/10420404
 function humanFileSize(bytes: number, si: boolean) {

@@ -10,7 +10,7 @@ import path from 'path';
 import { useOnCreate } from '../../hooks';
 import { useBinding } from '../../store';
 import { getDefined } from '../../../util/properties-type-guards';
-import remote from '@electron/remote';
+import * as remote from '@electron/remote';
 
 export function GeneralSettings() {
   return (

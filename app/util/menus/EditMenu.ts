@@ -15,7 +15,7 @@ import { EditorCommandsService } from 'services/editor-commands';
 import { ERenderingMode } from '../../../obs-api';
 import { StreamingService } from 'services/streaming';
 import Utils from 'services/utils';
-import remote from '@electron/remote';
+import * as remote from '@electron/remote';
 
 interface IEditMenuOptions {
   selectedSourceId?: string;

@@ -17,7 +17,7 @@ import BrowserView from 'components/shared/BrowserView';
 import { RestreamService } from 'services/restream';
 import { GuestApiHandler } from 'util/guest-api-handler';
 import { IDownloadProgress } from 'util/requests';
-import remote from '@electron/remote';
+import * as remote from '@electron/remote';
 
 @Component({ components: { BrowserView } })
 export default class BrowseOverlays extends Vue {

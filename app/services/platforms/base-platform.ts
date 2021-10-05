@@ -12,7 +12,7 @@ import { UserService } from 'services/user';
 import { HostsService } from 'services/hosts';
 import { IFacebookStartStreamOptions } from './facebook';
 import { StreamSettingsService } from '../settings/streaming';
-import remote from '@electron/remote';
+import * as remote from '@electron/remote';
 
 const VIEWER_COUNT_UPDATE_INTERVAL = 60 * 1000;
 

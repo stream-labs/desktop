@@ -8,7 +8,7 @@ import { AppService } from 'services/app';
 import styles from './ChildWindow.m.less';
 import ModalWrapper from '../shared/modals/ModalWrapper';
 import antdThemes from 'styles/antd/index';
-import remote from '@electron/remote';
+import * as remote from '@electron/remote';
 
 @Component({})
 export default class ChildWindow extends Vue {

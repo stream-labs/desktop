@@ -9,7 +9,7 @@ import VFormGroup from 'components/shared/inputs/VFormGroup.vue';
 import { metadata } from 'components/shared/inputs';
 import { StreamSettingsService } from 'services/settings/streaming';
 import PlatformLogo from 'components/shared/PlatformLogo';
-import remote from '@electron/remote';
+import * as remote from '@electron/remote';
 
 export type TExtraPlatform = 'nimotv' | 'dlive';
 

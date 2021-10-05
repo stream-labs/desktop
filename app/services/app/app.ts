@@ -40,7 +40,7 @@ import { KeyListenerService } from 'services/key-listener';
 import { MetricsService } from '../metrics';
 import { SettingsService } from '../settings';
 import { OS, getOS } from 'util/operating-systems';
-import remote from '@electron/remote';
+import * as remote from '@electron/remote';
 
 interface IAppState {
   loading: boolean;

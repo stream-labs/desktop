@@ -12,7 +12,7 @@ import ConnectionSettings from 'components/ConnectionSettings';
 import VModal from 'vue-js-modal';
 import { EditorCommandsService } from 'services/editor-commands';
 import Scrollable from 'components/shared/Scrollable';
-import remote from '@electron/remote';
+import * as remote from '@electron/remote';
 
 Vue.use(VModal);
 

@@ -10,7 +10,7 @@ import { SceneCollectionsService } from 'services/scene-collections';
 import Utils from 'services/utils';
 import { BehaviorSubject } from 'rxjs';
 import { UsageStatisticsService } from 'services/usage-statistics';
-import remote from '@electron/remote';
+import * as remote from '@electron/remote';
 
 const COMMANDS = { ...commands };
 

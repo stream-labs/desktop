@@ -8,7 +8,7 @@ import { MagicLinkService } from 'services/magic-link';
 import { Inject } from 'services/core';
 import BaseElement from './BaseElement';
 import { $t } from 'services/i18n';
-import remote from '@electron/remote';
+import * as remote from '@electron/remote';
 
 @Component({})
 export default class LegacyEvents extends BaseElement {

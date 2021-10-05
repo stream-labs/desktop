@@ -16,7 +16,7 @@ import { ErrorField } from 'vee-validate';
 import { CustomizationService } from 'services/customization';
 import { EditorCommandsService } from 'services/editor-commands';
 import { UsageStatisticsService } from 'services/usage-statistics';
-import remote from '@electron/remote';
+import * as remote from '@electron/remote';
 
 @Component({
   components: {

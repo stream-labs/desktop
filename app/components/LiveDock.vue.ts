@@ -15,7 +15,7 @@ import { ChatService } from 'services/chat';
 import { WindowsService } from 'services/windows';
 import { FacebookService, RestreamService, YoutubeService } from 'app-services';
 import { getPlatformService } from 'services/platforms';
-import remote from '@electron/remote';
+import * as remote from '@electron/remote';
 
 @Component({
   components: {

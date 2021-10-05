@@ -16,7 +16,7 @@ import without from 'lodash/without';
 import { PlatformContainerManager, getPageUrl, getAssetUrl } from './container-manager';
 import { NavigationService } from 'services/navigation';
 import { InitAfter } from '../core';
-import remote from '@electron/remote';
+import * as remote from '@electron/remote';
 
 const DEV_PORT = 8081;
 

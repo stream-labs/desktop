@@ -6,7 +6,7 @@ import { TObsFormData, TObsValue } from 'components/obs/inputs/ObsInput';
 import { CustomizationService } from 'services/customization';
 import { ScenesService } from 'services/scenes';
 import { WindowsService } from '../../../services/windows';
-import remote from '@electron/remote';
+import * as remote from '@electron/remote';
 
 @Component({
   components: { GenericForm },

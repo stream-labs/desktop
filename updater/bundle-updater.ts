@@ -483,7 +483,7 @@ module.exports = async (basePath: string) => {
     electron.BrowserWindow.getAllWindows().forEach(w => {
       if (!w.isDestroyed()) {
         console.log('Force closing window', w.id);
-        w.destroy();
+        // w.destroy();
       }
     });
 

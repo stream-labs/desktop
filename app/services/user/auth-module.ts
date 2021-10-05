@@ -5,7 +5,7 @@ import defer from 'lodash/defer';
 import URI from 'urijs';
 import http from 'http';
 import Utils from 'services/utils';
-import remote from '@electron/remote';
+import * as remote from '@electron/remote';
 
 /**
  * Responsible for secure handling of platform OAuth flows.

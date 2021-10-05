@@ -2,7 +2,7 @@ import { Module, EApiPermissions, apiMethod, IApiContext } from './module';
 import { BrowserWindow } from 'electron';
 import url from 'url';
 import uuid from 'uuid/v4';
-import remote from '@electron/remote';
+import * as remote from '@electron/remote';
 
 enum EAuthWindowEventType {
   AuthRedirect = 'auth_redirect',

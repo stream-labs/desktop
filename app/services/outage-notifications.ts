@@ -6,7 +6,7 @@ import { UserService } from 'services/user';
 import { TPlatform } from 'services/platforms';
 import { InitAfter } from './core';
 import { jfetch } from 'util/requests';
-import remote from '@electron/remote';
+import * as remote from '@electron/remote';
 
 interface IOutageNotification {
   /**

@@ -3,7 +3,7 @@ import { Inject } from 'services/core';
 import { UserService } from 'services/user';
 import { authorizedHeaders, jfetch } from 'util/requests';
 import { HostsService } from './hosts';
-import remote from '@electron/remote';
+import * as remote from '@electron/remote';
 
 interface ILoginTokenResponse {
   login_token: string;

@@ -10,7 +10,7 @@ import { WidgetsService } from 'services/widgets/index';
 import { ScenesService } from 'services/scenes/index';
 import { $t } from 'services/i18n/index';
 import { BoolInput } from 'components/shared/inputs/inputs';
-import remote from '@electron/remote';
+import * as remote from '@electron/remote';
 
 @Component({ components: { BoolInput } })
 export default class OverlaySettings extends Vue {

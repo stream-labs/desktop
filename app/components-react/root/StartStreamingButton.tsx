@@ -5,7 +5,7 @@ import { EGlobalSyncStatus } from 'services/media-backup';
 import { $t } from 'services/i18n';
 import { useVuex } from '../hooks';
 import { Services } from '../service-provider';
-import remote from '@electron/remote';
+import * as remote from '@electron/remote';
 
 export default function StartStreamingButton(p: { disabled?: boolean }) {
   const {

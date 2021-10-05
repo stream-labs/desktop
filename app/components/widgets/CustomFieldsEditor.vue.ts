@@ -10,7 +10,7 @@ import HFormGroup from 'components/shared/inputs/HFormGroup.vue';
 import { debounce } from 'lodash-decorators';
 import { IAlertBoxVariation } from 'services/widgets/settings/alert-box/alert-box-api';
 import Scrollable from 'components/shared/Scrollable';
-import remote from '@electron/remote';
+import * as remote from '@electron/remote';
 
 const { ToggleInput } = inputComponents;
 

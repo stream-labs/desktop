@@ -18,7 +18,7 @@ import { ERenderingMode } from '../../../../obs-api';
 import TsxComponent from 'components/tsx-component';
 import { getOS } from 'util/operating-systems';
 import Scrollable from 'components/shared/Scrollable';
-import remote from '@electron/remote';
+import * as remote from '@electron/remote';
 
 @Component({
   components: { DropdownMenu, HelpTip, SlVueTree, Scrollable },

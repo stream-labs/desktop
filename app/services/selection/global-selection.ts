@@ -5,7 +5,7 @@ import { $t } from 'services/i18n';
 import Utils from 'services/utils';
 import { EditorCommandsService } from 'services/editor-commands';
 import cloneDeep from 'lodash/cloneDeep';
-import remote from '@electron/remote';
+import * as remote from '@electron/remote';
 
 /**
  * A specific case of a selection that represents what

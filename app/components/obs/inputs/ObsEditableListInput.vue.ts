@@ -3,7 +3,7 @@ import Selector from '../../Selector.vue';
 import { Component, Prop } from 'vue-property-decorator';
 import { IObsEditableListInputValue, ObsInput, TObsType } from './ObsInput';
 import { Menu } from '../../../util/menus/Menu';
-import remote from '@electron/remote';
+import * as remote from '@electron/remote';
 
 interface ISelectorSortEventData {
   change: any;

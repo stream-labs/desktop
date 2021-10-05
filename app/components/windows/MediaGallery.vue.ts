@@ -11,7 +11,7 @@ import { UserService } from 'services/user';
 import { MagicLinkService } from 'services/magic-link';
 import { WebsocketService, TSocketEvent } from 'services/websocket';
 import { Subscription } from 'rxjs';
-import remote from '@electron/remote';
+import * as remote from '@electron/remote';
 
 const getTypeMap = () => ({
   title: {

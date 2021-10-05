@@ -7,7 +7,7 @@ import { Services } from '../../../service-provider';
 import { Button } from 'antd';
 import InputWrapper from '../../../shared/inputs/InputWrapper';
 import { IPlatformComponentParams } from './PlatformSettingsLayout';
-import remote from '@electron/remote';
+import * as remote from '@electron/remote';
 
 export function TiktokEditStreamInfo(p: IPlatformComponentParams<'tiktok'>) {
   const bind = createBinding(p.value, updatedSettings =>

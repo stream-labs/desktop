@@ -21,7 +21,7 @@ import { getBindingString } from 'components-react/shared/HotkeyBinding';
 import Animate from 'rc-animate';
 import TransitionSelector from 'components-react/highlighter/TransitionSelector';
 import { $t } from 'services/i18n';
-import remote from '@electron/remote';
+import * as remote from '@electron/remote';
 
 type TModal = 'trim' | 'export' | 'preview' | 'remove';
 

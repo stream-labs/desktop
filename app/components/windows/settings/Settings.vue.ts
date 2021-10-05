@@ -25,7 +25,7 @@ import Scrollable from 'components/shared/Scrollable';
 import { ObsSettings, PlatformLogo } from 'components/shared/ReactComponentList';
 import { $t } from 'services/i18n';
 import { debounce } from 'lodash-decorators';
-import remote from '@electron/remote';
+import * as remote from '@electron/remote';
 
 @Component({
   components: {

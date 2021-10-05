@@ -36,7 +36,7 @@ import { Loader } from 'components/shared/ReactComponentList';
 import process from 'process';
 import { MetricsService } from 'services/metrics';
 import { UsageStatisticsService } from 'services/usage-statistics';
-import remote from '@electron/remote';
+import * as remote from '@electron/remote';
 
 const { ipcRenderer } = electron;
 const slobsVersion = Utils.env.SLOBS_VERSION;

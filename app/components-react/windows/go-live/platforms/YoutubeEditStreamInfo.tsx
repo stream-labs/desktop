@@ -16,7 +16,7 @@ import Form from '../../../shared/inputs/Form';
 import { IYoutubeStartStreamOptions } from '../../../../services/platforms/youtube';
 import PlatformSettingsLayout, { IPlatformComponentParams } from './PlatformSettingsLayout';
 import { assertIsDefined } from '../../../../util/properties-type-guards';
-import remote from '@electron/remote';
+import * as remote from '@electron/remote';
 
 /***
  * Stream Settings for YT

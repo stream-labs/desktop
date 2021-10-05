@@ -1,7 +1,7 @@
 import electron from 'electron';
 import { Subscription, Observable } from 'rxjs';
 import uuid from 'uuid/v4';
-import remote from '@electron/remote';
+import * as remote from '@electron/remote';
 
 /**
  * Shared message interchange format

@@ -8,7 +8,7 @@ import { AppService } from './app';
 import { WindowsService } from './windows';
 import { NavigationService } from './navigation';
 import { SettingsService } from './settings';
-import remote from '@electron/remote';
+import * as remote from '@electron/remote';
 
 /**
  * Manages the application menu and shortcuts on Mac OS

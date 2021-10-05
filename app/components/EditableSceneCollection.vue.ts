@@ -5,7 +5,7 @@ import { Inject } from 'services/core/injector';
 import moment from 'moment';
 import { $t } from 'services/i18n';
 import { getOS } from 'util/operating-systems';
-import remote from '@electron/remote';
+import * as remote from '@electron/remote';
 
 @Component({})
 export default class EditableSceneCollection extends Vue {

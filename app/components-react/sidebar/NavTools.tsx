@@ -7,7 +7,7 @@ import styles from '../../components/SideNav.m.less';
 import throttle from 'lodash/throttle';
 import { Services } from '../service-provider';
 import { useVuex } from '../hooks';
-import remote from '@electron/remote';
+import * as remote from '@electron/remote';
 
 export default function SideNav() {
   const {

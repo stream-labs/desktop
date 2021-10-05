@@ -19,7 +19,7 @@ import {
   EAvailableFeatures,
   IncrementalRolloutService,
 } from '../../../services/incremental-rollout';
-import remote from '@electron/remote';
+import * as remote from '@electron/remote';
 
 class ConnectProps {
   continue: () => void = () => {};

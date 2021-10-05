@@ -42,7 +42,7 @@ import { TwitterService } from '../integrations/twitter';
 import { assertIsDefined, getDefined } from 'util/properties-type-guards';
 import { StreamInfoView } from './streaming-view';
 import { GrowService } from 'services/grow/grow';
-import remote from '@electron/remote';
+import * as remote from '@electron/remote';
 
 enum EOBSOutputType {
   Streaming = 'streaming',

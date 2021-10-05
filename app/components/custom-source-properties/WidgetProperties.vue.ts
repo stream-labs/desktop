@@ -7,7 +7,7 @@ import { WindowsService } from 'services/windows';
 import { Inject } from 'services/core/injector';
 import { UserService } from 'services/user';
 import { MagicLinkService } from 'services/magic-link';
-import remote from '@electron/remote';
+import * as remote from '@electron/remote';
 
 @Component({})
 export default class WidgetProperties extends Vue {

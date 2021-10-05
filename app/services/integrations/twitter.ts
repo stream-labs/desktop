@@ -8,7 +8,7 @@ import { UserService } from 'services/user';
 import { $t, I18nService } from 'services/i18n';
 import uuid from 'uuid/v4';
 import { throwStreamError } from '../streaming/stream-error';
-import remote from '@electron/remote';
+import * as remote from '@electron/remote';
 
 interface ITwitterServiceState {
   linked: boolean;

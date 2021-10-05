@@ -19,7 +19,7 @@ import { assertIsDefined, getDefined } from 'util/properties-type-guards';
 import Utils from '../utils';
 import { YoutubeUploader } from './youtube/uploader';
 import { lazyModule } from 'util/lazy-module';
-import remote from '@electron/remote';
+import * as remote from '@electron/remote';
 
 interface IYoutubeServiceState extends IPlatformState {
   liveStreamingEnabled: boolean;

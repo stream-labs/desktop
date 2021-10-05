@@ -8,7 +8,7 @@ import { ScalableRectangle } from '../util/ScalableRectangle';
 import { Subscription } from 'rxjs';
 import { SelectionService } from 'services/selection';
 import { byOS, OS, getOS } from 'util/operating-systems';
-import remote from '@electron/remote';
+import * as remote from '@electron/remote';
 
 // TODO: There are no typings for nwr
 let nwr: any;

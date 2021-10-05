@@ -38,7 +38,7 @@ import { UsageStatisticsService } from 'services/usage-statistics';
 import { StreamingService } from 'services/streaming';
 import { NotificationsService, ENotificationType } from 'services/notifications';
 import { JsonrpcService } from 'services/api/jsonrpc';
-import remote from '@electron/remote';
+import * as remote from '@electron/remote';
 
 export enum EAuthProcessState {
   Idle = 'idle',

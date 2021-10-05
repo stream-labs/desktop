@@ -1,6 +1,6 @@
 import { Module, EApiPermissions, apiMethod, IApiContext } from './module';
 import url from 'url';
-import remote from '@electron/remote';
+import * as remote from '@electron/remote';
 
 export class ExternalModule extends Module {
   readonly moduleName = 'External';

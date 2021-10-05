@@ -9,7 +9,7 @@ import { EditorCommandsService } from 'services/editor-commands';
 import { E_AUDIO_CHANNELS, AudioService } from 'services/audio';
 import { getSharedResource } from 'util/get-shared-resource';
 import { PerformanceService, EStreamQuality } from './performance';
-import remote from '@electron/remote';
+import * as remote from '@electron/remote';
 
 const TB = remote.TouchBar;
 

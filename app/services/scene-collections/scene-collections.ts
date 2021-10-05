@@ -37,7 +37,7 @@ import { DefaultHardwareService } from 'services/hardware';
 import { byOS, OS, getOS } from 'util/operating-systems';
 import Utils from 'services/utils';
 import { OutputSettingsService } from '../settings';
-import remote from '@electron/remote';
+import * as remote from '@electron/remote';
 
 const uuid = window['require']('uuid/v4');
 

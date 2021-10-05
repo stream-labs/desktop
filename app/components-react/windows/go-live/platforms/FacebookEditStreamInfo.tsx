@@ -21,7 +21,7 @@ import MessageLayout from '../MessageLayout';
 import PlatformSettingsLayout, { IPlatformComponentParams } from './PlatformSettingsLayout';
 import { useSelector } from '../../../store';
 import { assertIsDefined } from '../../../../util/properties-type-guards';
-import remote from '@electron/remote';
+import * as remote from '@electron/remote';
 
 export default function FacebookEditStreamInfo(p: IPlatformComponentParams<'facebook'>) {
   const fbSettings = p.value;

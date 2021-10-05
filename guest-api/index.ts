@@ -9,7 +9,7 @@ import fs from 'fs';
 import util from 'util';
 import mime from 'mime';
 import path from 'path';
-import remote from '@electron/remote';
+import * as remote from '@electron/remote';
 
 interface IGuestApiRequest {
   id: string;

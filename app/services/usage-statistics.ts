@@ -10,7 +10,7 @@ import throttle from 'lodash/throttle';
 import { Service } from './core/service';
 import Utils from './utils';
 import os from 'os';
-import remote from '@electron/remote';
+import * as remote from '@electron/remote';
 
 export type TUsageEvent = 'stream_start' | 'stream_end' | 'app_start' | 'app_close' | 'crash';
 

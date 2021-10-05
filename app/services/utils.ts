@@ -4,7 +4,7 @@ import electron from 'electron';
 import cloneDeep from 'lodash/cloneDeep';
 import fs from 'fs';
 import path from 'path';
-import remote from '@electron/remote';
+import * as remote from '@electron/remote';
 
 export const enum EBit {
   ZERO,
@@ -267,7 +267,7 @@ let appPath: string;
  * Memoized function for getting the app path
  */
 export function getAppPath() {
-  appPath = appPath ?? electron.remote.app.getAppPath();
+  appPath = appPath ?? remote.app.getAppPath();
   return appPath;
 }
 

@@ -18,7 +18,7 @@ import { RestreamService } from 'services/restream';
 import { GuestApiHandler } from 'util/guest-api-handler';
 import TsxComponent, { createProps } from 'components/tsx-component';
 import { IDownloadProgress } from 'util/requests';
-import remote from '@electron/remote';
+import * as remote from '@electron/remote';
 
 class AlertboxLibraryProps {
   params: { id?: string } = {};

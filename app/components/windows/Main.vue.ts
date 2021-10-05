@@ -17,7 +17,7 @@ import { EditorCommandsService } from '../../app-services';
 import VueResize from 'vue-resize';
 import { $t } from 'services/i18n';
 import fs from 'fs';
-import remote from '@electron/remote';
+import * as remote from '@electron/remote';
 Vue.use(VueResize);
 
 // Pages

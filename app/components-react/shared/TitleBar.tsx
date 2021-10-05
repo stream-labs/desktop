@@ -8,7 +8,7 @@ import { ipcRenderer } from 'electron';
 import Utils from '../../services/utils';
 import KevinSvg from './KevinSvg';
 import styles from './TitleBar.m.less';
-import remote from '@electron/remote';
+import * as remote from '@electron/remote';
 
 export default function TitleBar(props: { windowId: string }) {
   const { CustomizationService, StreamingService, WindowsService } = Services;

@@ -11,7 +11,7 @@ import { BasePlatformService } from './base-platform';
 import { WindowsService } from '../windows';
 import { assertIsDefined, getDefined } from '../../util/properties-type-guards';
 import { flatten } from 'lodash';
-import remote from '@electron/remote';
+import * as remote from '@electron/remote';
 
 interface IFacebookPage {
   access_token: string;

@@ -13,7 +13,7 @@ import { GuestApiHandler } from 'util/guest-api-handler';
 import { BehaviorSubject } from 'rxjs';
 import { IBrowserViewTransform } from './api/modules/module';
 import uuid from 'uuid/v4';
-import remote from '@electron/remote';
+import * as remote from '@electron/remote';
 
 interface IContainerInfo {
   id: string;
@@ -195,12 +195,13 @@ export class PlatformContainerManager {
     const view = new remote.BrowserView({
       webPreferences: {
         contextIsolation: true,
-        enableRemoteModule: true,
         nodeIntegration: false,
         partition: this.getAppPartition(app),
         preload: path.resolve(remote.app.getAppPath(), 'bundles', 'guest-api'),
       },
     });
+
+    electron.ipcRenderer.sendSync('webContents-enableRemote', view.webContents.id);
 
     const info: IContainerInfo = {
       id: uuid(),

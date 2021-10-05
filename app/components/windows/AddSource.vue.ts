@@ -16,7 +16,7 @@ import electron from 'electron';
 import { UserService } from 'services/user';
 import { ChatService } from 'services/chat';
 import { CustomizationService } from 'app-services';
-import remote from '@electron/remote';
+import * as remote from '@electron/remote';
 
 @Component({
   components: { ModalLayout, Selector, Display, HFormGroup },

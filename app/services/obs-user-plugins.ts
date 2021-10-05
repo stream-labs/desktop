@@ -2,7 +2,7 @@ import { Service } from './core/service';
 import fs from 'fs';
 import path from 'path';
 import * as obs from '../../obs-api';
-import remote from '@electron/remote';
+import * as remote from '@electron/remote';
 
 // WARNING: This service is initialized extremely early
 // and should not import any other services.

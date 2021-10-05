@@ -12,7 +12,7 @@ import { TObsValue } from 'components/obs/inputs/ObsInput';
 import electron from 'electron';
 import { $t } from 'services/i18n';
 import { getSharedResource } from 'util/get-shared-resource';
-import remote from '@electron/remote';
+import * as remote from '@electron/remote';
 
 export interface IDefaultManagerSettings {
   mediaBackup?: {

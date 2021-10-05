@@ -728,6 +728,14 @@ ipcMain.on('webContents-bindYTChat', (e, id) => {
   });
 });
 
+ipcMain.on('webContents-enableRemote', (e, id) => {
+  const contents = webContents.fromId(id);
+
+  if (contents.isDestroyed()) return;
+
+  remote.enable(contents);
+});
+
 ipcMain.on('getMainWindowWebContentsId', e => {
   e.returnValue = mainWindow.webContents.id;
 });
