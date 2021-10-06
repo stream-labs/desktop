@@ -1,6 +1,4 @@
 import React, { useState, useRef, useMemo } from 'react';
-import { Collapse } from 'antd';
-import { ModalLayout } from 'components-react/shared/ModalLayout';
 import {
   SliderInput,
   BoolButtonInput,
@@ -18,20 +16,6 @@ import { $t } from 'services/i18n';
 import Utils from 'services/utils';
 import styles from './AdvancedAudio.m.less';
 
-const { Panel } = Collapse;
-
 export default function GlobalSettings() {
-  const { AudioService, WindowsService } = Services;
-
-  const initialSource = useMemo<string>(
-    () => WindowsService.getChildWindowQueryParams().sourceId || '',
-    [],
-  );
-  const [expandedSource, setExpandedSource] = useState(initialSource);
-
-  const { audioSources } = useVuex(() => ({
-    audioSources: AudioService.views.sourcesForCurrentScene,
-  }));
-
-  return <div></div>;
+  return <div>hello world</div>;
 }
