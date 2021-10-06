@@ -734,6 +734,9 @@ ipcMain.on('webContents-enableRemote', (e, id) => {
   if (contents.isDestroyed()) return;
 
   remote.enable(contents);
+
+  // Needed otherwise the renderer will lock up
+  e.returnValue = null;
 });
 
 ipcMain.on('getMainWindowWebContentsId', e => {
