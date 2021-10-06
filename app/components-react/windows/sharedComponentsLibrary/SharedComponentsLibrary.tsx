@@ -30,7 +30,7 @@ import { pick } from 'lodash';
 import { useModule } from '../../hooks/useModule';
 import { merge } from '../../../util/merge';
 import { DemoForm } from './DemoForm';
-import {CodeInput} from "../../shared/inputs/CodeInput";
+import { CodeInput } from '../../shared/inputs/CodeInput';
 
 const { TabPane } = Tabs;
 
