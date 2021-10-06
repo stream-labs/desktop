@@ -1,5 +1,5 @@
 import React from 'react';
-import {Button, Collapse, Spin, Tabs} from 'antd';
+import { Alert, Button, Collapse, message, Space, Spin, Tabs } from 'antd';
 import { $t } from '../../../services/i18n';
 import {
   CodeInput,
@@ -11,19 +11,213 @@ import {
   TextInput,
 } from '../../shared/inputs';
 import { TCodeInputProps } from '../../shared/inputs/CodeInput';
-import { ICustomField, useWidget, useWidgetRoot } from './useWidget';
+import { ICustomField, useWidget, useWidgetRoot, WidgetModule } from './useWidget';
 import Form from '../../shared/inputs/Form';
 import { useOnCreate } from '../../hooks';
 import { Services } from '../../service-provider';
 import { getDefined } from '../../../util/properties-type-guards';
 import { ModalLayout } from '../../shared/ModalLayout';
 import { components } from './WidgetWindow';
-import { clone } from 'lodash';
+import { Buttons } from '../../shared/Buttons';
+import { getModuleManager, mutation, watch } from '../../store';
+import { useModule } from '../../hooks/useModule';
+import Utils from '../../../services/utils';
+import InputWrapper from '../../shared/inputs/InputWrapper';
 const { TabPane } = Tabs;
 
-export function CustomCode() {
+export function CustomCodeWindow() {
+  // take the source id and widget's component from the window's params
+  const { sourceId, WidgetModule } = useOnCreate(() => {
+    const { WindowsService } = Services;
+    const { sourceId, widgetType } = getDefined(WindowsService.state.child.queryParams);
+    const [, WidgetModule] = components[widgetType];
+    return { sourceId, WidgetModule };
+  });
+
+  // initialize the Redux module for the widget
+  // so all children components can use it via `useWidget()` call
+  useWidgetRoot(WidgetModule, { sourceId, shouldCreatePreviewSource: false });
+  const { selectedTab, selectTab, tabs, isLoading } = useEditor();
+
+  return (
+    <ModalLayout footer={<EditorFooter />}>
+      {isLoading && <Spin spinning={true} />}
+
+      {!isLoading && (
+        <Tabs activeKey={selectedTab} onChange={selectTab}>
+          {tabs.map(tab => (
+            <TabPane tab={tab.label} key={tab.key}>
+              <Editor />
+            </TabPane>
+          ))}
+        </Tabs>
+      )}
+    </ModalLayout>
+  );
+}
+
+function EditorFooter() {
+  const { canSave, saveCode, reset } = useEditor();
+  return (
+    <>
+      {canSave && (
+        <>
+          <Button danger onClick={reset}>
+            {$t('Undo Changes')}
+          </Button>
+          <Button type="primary" onClick={saveCode}>
+            {$t('Save')}
+          </Button>
+        </>
+      )}
+      {!canSave && <Button onClick={close}>{$t('Close')}</Button>}
+    </>
+  );
+}
+
+function Editor() {
+  const { setCode, code, selectedTab } = useEditor();
+  if (selectedTab === 'json') {
+    return <JsonEditor />;
+  }
+  return <CodeInput lang={selectedTab} value={code} onChange={setCode} height={590} nowrap />;
+}
+
+function JsonEditor() {
+  const { setCode, code, addCustomFields, removeCustomFields } = useEditor();
+  return (
+    <>
+      <Buttons>
+        {!code && <Button onClick={addCustomFields}>Generate Custom Fields</Button>}
+        {code && (
+          <Button danger onClick={removeCustomFields}>
+            Remove Custom Fields
+          </Button>
+        )}
+      </Buttons>
+
+      <CodeInput lang="json" value={code} onChange={setCode} height={570} nowrap />
+    </>
+  );
+}
+
+type TLang = TCodeInputProps['lang'];
+
+export class CodeEditorModule {
+  tabs = [
+    { label: 'Custom Fields', key: 'json' },
+    { label: 'HTML', key: 'html' },
+    { label: 'CSS', key: 'css' },
+    { label: 'JS', key: 'js' },
+  ];
+
+  private widgetModule: WidgetModule = getModuleManager().getModule('WidgetModule');
+
+  init() {
+    watch(
+      this,
+      () => this.widgetModule.state.isLoading,
+      () => this.reset(),
+    );
+  }
+
+  state = {
+    selectedTab: 'json' as TLang,
+    canSave: false,
+    isLoading: true,
+    customCode: {
+      custom_enabled: true,
+      custom_json: '',
+      custom_html: '',
+      custom_css: '',
+      custom_js: '',
+    },
+  };
+
+  saveCode() {
+    if (!this.hasValidJson) {
+      message.error('Invalid JSON');
+      return;
+    }
+    const newCustomCode = this.state.customCode;
+    const custom_json = newCustomCode.custom_json && JSON.parse(newCustomCode.custom_json);
+    this.widgetModule.updateCustomCode({
+      ...newCustomCode,
+      custom_json,
+    });
+    this.disableSave();
+    Utils.sleep(1000).then(() => Services.WidgetsService.actions.invalidateSettingsWindow());
+  }
+
+  get code() {
+    const { customCode, selectedTab } = this.state;
+    return customCode[`custom_${selectedTab}`];
+  }
+
+  get hasValidJson() {
+    const json = this.state.customCode.custom_json;
+    if (!json) return true;
+    try {
+      JSON.parse(json);
+      return true;
+    } catch (e: unknown) {
+      return false;
+    }
+  }
+
+  @mutation()
+  setCode(code: string) {
+    this.state.customCode[`custom_${this.state.selectedTab}`] = code;
+    this.state.canSave = true;
+  }
+
+  close() {
+    Services.WindowsService.actions.closeOneOffWindow(Utils.getWindowId());
+  }
+
+  @mutation()
+  reset() {
+    const customCode = this.widgetModule.customCode;
+    this.state = {
+      ...this.state,
+      isLoading: false,
+      customCode: {
+        ...customCode,
+        custom_json: customCode.custom_json ? JSON.stringify(customCode.custom_json, null, 2) : '',
+      },
+      canSave: false,
+    };
+  }
+
+  @mutation()
+  selectTab(tab: TLang) {
+    this.state.selectedTab = tab;
+  }
+
+  @mutation()
+  private disableSave() {
+    this.state.canSave = false;
+  }
+
+  @mutation()
+  addCustomFields() {
+    this.setCode(JSON.stringify(DEFAULT_CUSTOM_FIELDS, null, 2));
+  }
+
+  @mutation()
+  removeCustomFields() {
+    this.setCode('');
+  }
+}
+
+function useEditor() {
+  return useModule(CodeEditorModule).select();
+}
+
+export function CustomCodeSection() {
   const { customCode, updateCustomCode, openCustomCodeEditor } = useWidget();
   const isEnabled = customCode.custom_enabled;
+
   return (
     <Collapse bordered={false}>
       <Collapse.Panel header={$t('Custom Code')} key={1}>
@@ -34,73 +228,31 @@ export function CustomCode() {
             onChange={custom_enabled => updateCustomCode({ custom_enabled })}
           />
           {isEnabled && (
-            <>
-              <CustomFields />
-              <Button onClick={openCustomCodeEditor}>{'Edit Custom Code '}</Button>
-            </>
+            <Buttons>
+              <Button onClick={openCustomCodeEditor}>{'Edit Custom Code'}</Button>
+            </Buttons>
           )}
         </Form>
-
-        {/*<Tabs defaultActiveKey="fields">*/}
-        {/*  <TabPane tab="Custom Fields" key="fields">*/}
-        {/*    <Editor lang="json" />*/}
-        {/*  </TabPane>*/}
-        {/*  <TabPane tab="HTML" key="html">*/}
-        {/*    <Editor lang="html" />*/}
-        {/*  </TabPane>*/}
-        {/*  <TabPane tab="CSS" key="css">*/}
-        {/*    <Editor lang="css" />*/}
-        {/*  </TabPane>*/}
-        {/*  <TabPane tab="JS" key="js">*/}
-        {/*    <Editor lang="js" />*/}
-        {/*  </TabPane>*/}
-        {/*</Tabs>*/}
       </Collapse.Panel>
     </Collapse>
   );
 }
 
-function Editor(p: { lang: TCodeInputProps['lang'] }) {
-  const { customCode, updateCustomCode, isLoading } = useWidget();
-
-  if (isLoading) {
-    return <Spin spinning={true} />;
-  }
-
-  if (p.lang === 'json') {
-    return <JsonEditor />;
-  }
-
-  const value = customCode[`custom_${p.lang}`];
-
-  function onChange(newVal: string) {
-    updateCustomCode({ [`custom_${p.lang}`]: newVal });
-  }
-
-  return <CodeInput lang={p.lang} value={value} onChange={onChange} height={590} nowrap />;
-}
-
-function JsonEditor() {
-  const { customCode, updateCustomCode } = useWidget();
-  const value = JSON.stringify(customCode['custom_json'], null, 2);
-
-  function onChange(newVal: string) {
-    updateCustomCode({ ['custom_json']: JSON.parse(newVal) });
-  }
-
-  function addCustomFields() {
-    updateCustomCode({ ['custom_json']: clone(DEFAULT_CUSTOM_FIELDS) });
-  }
-
+export function CustomFieldsSection() {
+  const { openCustomCodeEditor } = useWidget();
   return (
-    <>
-      <CodeInput lang="json" value={value} onChange={onChange} height={590} nowrap />
-      <Button onClick={addCustomFields}>{$t('Add Custom Fields')}</Button>
-    </>
+    <Collapse bordered={false}>
+      <Collapse.Panel header={$t('Custom Fields')} key={1}>
+        <CustomFields />
+        <InputWrapper>
+          <Button onClick={openCustomCodeEditor}>Add or Remove Fields</Button>
+        </InputWrapper>
+      </Collapse.Panel>
+    </Collapse>
   );
 }
 
-function CustomFields() {
+export function CustomFields() {
   const { customCode, updateCustomCode } = useWidget();
   const json = customCode.custom_json || {};
 
@@ -118,11 +270,11 @@ function CustomFields() {
   }));
 
   return (
-    <>
+    <Form layout="horizontal">
       {fieldsProps.map(props => (
-        <CustomField {...props} />
+        <CustomField {...props} key={props.name} />
       ))}
-    </>
+    </Form>
   );
 }
 
@@ -154,40 +306,6 @@ function CustomField(p: ICustomField & { name: string; onChange: (val: any) => u
     default:
       return <></>;
   }
-}
-
-export function CustomCodeWindow() {
-
-  // take the source id and widget's component from the window's params
-  const { sourceId, WidgetModule } = useOnCreate(() => {
-    const { WindowsService } = Services;
-    const { sourceId, widgetType } = getDefined(WindowsService.state.child.queryParams);
-    const [WidgetSettingsComponent, WidgetModule] = components[widgetType];
-    return { sourceId, WidgetModule };
-  });
-
-  // initialize the Redux module for the widget
-  // so all children components can use it via `useWidget()` call
-  useWidgetRoot(WidgetModule, { sourceId, shouldCreatePreviewSource: false });
-
-  return (
-    <ModalLayout>
-      <Tabs defaultActiveKey="fields">
-        <TabPane tab="Custom Fields" key="fields">
-          <Editor lang="json" />
-        </TabPane>
-        <TabPane tab="HTML" key="html">
-          <Editor lang="html" />
-        </TabPane>
-        <TabPane tab="CSS" key="css">
-          <Editor lang="css" />
-        </TabPane>
-        <TabPane tab="JS" key="js">
-          <Editor lang="js" />
-        </TabPane>
-      </Tabs>
-    </ModalLayout>
-  );
 }
 
 const DEFAULT_CUSTOM_FIELDS: Record<string, ICustomField> = {
@@ -241,9 +359,3 @@ const DEFAULT_CUSTOM_FIELDS: Record<string, ICustomField> = {
     value: null,
   },
 };
-
-export class EditorModule {
-
-
-
-}

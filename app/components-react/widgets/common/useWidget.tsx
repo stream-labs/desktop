@@ -1,13 +1,14 @@
 import { useModuleByName, useModuleRoot } from '../../hooks/useModule';
 import { WidgetTesters, WidgetType } from '../../../services/widgets';
 import { Services } from '../../service-provider';
-import { mutation } from '../../store';
+import {mutation, watch} from '../../store';
 import { throttle } from 'lodash-decorators';
 import { assertIsDefined, getDefined } from '../../../util/properties-type-guards';
 import { TAlertType, TWidgetType } from '../../../services/widgets/widget-config';
 import { TObsFormData } from '../../../components/obs/inputs/ObsInput';
 import { pick } from 'lodash';
 import { $t } from '../../../services/i18n';
+import Utils from '../../../services/utils';
 
 /**
  * Common state for all widgets
@@ -83,6 +84,12 @@ export class WidgetModule<TWidgetState extends IWidgetState = IWidgetState> {
     if (this.state.previewSourceId) this.widget.destroyPreviewSource();
   }
 
+  async reload() {
+    this.setIsLoading(true);
+    this.setData(await this.fetchData());
+    this.setIsLoading(false);
+  }
+
   /**
    * returns widget's settings from the store
    */
@@ -109,10 +116,21 @@ export class WidgetModule<TWidgetState extends IWidgetState = IWidgetState> {
     this.updateSettings(patch);
   }
 
-  openCustomCodeEditor() {
+  get hasCustomFields() {
+    const { custom_enabled, custom_json } = this.customCode;
+    return custom_enabled && custom_json;
+  }
+
+  async openCustomCodeEditor() {
     const sourceId = this.state.sourceId;
     const windowId = `${sourceId}-code_editor`;
-    Services.WindowsService.actions.createOneOffWindow(
+    const widgetWindowBounds = Utils.getChildWindow().getBounds();
+    const position = {
+      x: widgetWindowBounds.x + widgetWindowBounds.width,
+      y: widgetWindowBounds.y,
+    };
+
+    const winId = await Services.WindowsService.actions.return.createOneOffWindow(
       {
         componentName: 'CustomCodeWindow',
         title: $t('Custom Code'),
@@ -121,6 +139,7 @@ export class WidgetModule<TWidgetState extends IWidgetState = IWidgetState> {
           width: 800,
           height: 800,
         },
+        position,
       },
       windowId,
     );

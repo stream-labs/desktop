@@ -27,6 +27,7 @@ import { getDefined } from '../../../util/properties-type-guards';
 // StreamBoss
 // TipJar
 import { ViewerCount, ViewerCountModule } from '../ViewerCount';
+import { useSubscription } from '../../hooks/useSubscription';
 
 // define list of Widget components and modules
 export const components = {
@@ -58,9 +59,10 @@ export const components = {
  * Renders a widget window by given sourceId from window's query params
  */
 export function WidgetWindow() {
+  const { WindowsService, WidgetsService } = Services;
+
   // take the source id and widget's component from the window's params
   const { sourceId, WidgetModule, WidgetSettingsComponent } = useOnCreate(() => {
-    const { WindowsService } = Services;
     const { sourceId, widgetType } = getDefined(WindowsService.state.child.queryParams);
     const [WidgetSettingsComponent, WidgetModule] = components[widgetType];
     return { sourceId, WidgetModule, WidgetSettingsComponent };
@@ -68,10 +70,12 @@ export function WidgetWindow() {
 
   // initialize the Redux module for the widget
   // so all children components can use it via `useWidget()` call
-  useWidgetRoot(WidgetModule, { sourceId });
+  const { reload } = useWidgetRoot(WidgetModule, { sourceId });
+
+  useSubscription(WidgetsService.settingsInvalidated, reload);
 
   return (
-    <ModalLayout bodyStyle={{ padding: '0px' }} >
+    <ModalLayout bodyStyle={{ padding: '0px' }}>
       <WidgetSettingsComponent />
     </ModalLayout>
   );

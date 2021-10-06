@@ -1,11 +1,4 @@
-import {
-  CaseReducer,
-  combineReducers,
-  createAction,
-  createReducer,
-  createStore,
-  Store,
-} from '@reduxjs/toolkit';
+import { configureStore, createSlice, PayloadAction, Store } from '@reduxjs/toolkit';
 import { batch, useSelector as useReduxSelector } from 'react-redux';
 import { StatefulService } from '../../services';
 import { useOnCreate } from '../hooks';
@@ -14,89 +7,44 @@ import { isSimilar } from '../../util/isDeepEqual';
 import { createBinding, TBindings } from '../shared/inputs';
 import { getDefined } from '../../util/properties-type-guards';
 import { unstable_batchedUpdates } from 'react-dom';
+import Utils from '../../services/utils';
 
 /*
  * This file provides Redux integration in a modular way
  */
 
-/**
- * Creates reducer manager that allows using dynamic reducers
- * Code example from https://redux.js.org/recipes/code-splitting#using-a-reducer-manager
- */
-function createReducerManager() {
-  // Create an object which maps keys to reducers
-  const reducers = {
-    global: createReducer({}, {}),
-  };
+// INITIALIZE REDUX STORE
 
-  // Create the initial combinedReducer
-  let combinedReducer = combineReducers(reducers);
-
-  // An array which is used to delete state keys when reducers are removed
-  let keysToRemove: string[] = [];
-
-  return {
-    getReducerMap: () => reducers,
-
-    // The root reducer function exposed by this object
-    // This will be passed to the store
-    reduce: (state: any, action: any) => {
-      // If any reducers have been removed, clean up their state first
-      if (keysToRemove.length > 0) {
-        state = { ...state };
-        for (const key of keysToRemove) {
-          delete state[key];
-        }
-        keysToRemove = [];
-      }
-
-      // Delegate to the combined reducer
-      return combinedReducer(state, action);
+export const modulesSlice = createSlice({
+  name: 'modules',
+  initialState: {},
+  reducers: {
+    initModule: (state, action) => {
+      const { moduleName, initialState } = action.payload;
+      state[moduleName] = initialState;
     },
-
-    // Adds a new reducer with the specified key
-    add: (key: string, reducer: any) => {
-      if (!key || reducers[key]) {
-        return;
-      }
-
-      // Add the reducer to the reducer mapping
-      reducers[key] = reducer;
-
-      // Generate a new combined reducer
-      combinedReducer = combineReducers(reducers);
+    destroyModule: (state, action: PayloadAction<string>) => {
+      const moduleName = action.payload;
+      delete state[moduleName];
     },
-
-    // Removes a reducer with the specified key
-    remove: (key: string) => {
-      if (!key || !reducers[key]) {
-        return;
-      }
-
-      // Remove it from the reducer mapping
-      delete reducers[key];
-
-      // Add the key to the list of keys to clean up
-      keysToRemove.push(key);
-
-      // Generate a new combined reducer
-      combinedReducer = combineReducers(reducers);
+    mutateModule: (state, action) => {
+      const { moduleName, methodName, args } = action.payload;
+      const moduleManager = getModuleManager();
+      const module = getModuleManager().getModule(moduleName);
+      moduleManager.setImmerState(state);
+      module[methodName](...args);
+      moduleManager.setImmerState(null);
     },
-  };
-}
+  },
+});
 
-function configureStore() {
-  const reducerManager = createReducerManager();
+export const store = configureStore({
+  reducer: {
+    modules: modulesSlice.reducer,
+  },
+});
 
-  // Create a store with the root reducer function being the one exposed by the manager.
-  const store = createStore(reducerManager.reduce, {}) as TStore;
-
-  // Optional: Put the reducer manager on the store so it is easily accessible
-  store.reducerManager = reducerManager;
-  return store;
-}
-
-export const store = configureStore();
+const actions = modulesSlice.actions;
 
 /**
  * ReduxModuleManager helps to organize code splitting with help of Redux Modules
@@ -126,8 +74,8 @@ export const store = configureStore();
  *  of ReduxModules because they use similar concepts
  */
 class ReduxModuleManager {
-  public immerState: unknown;
-  private registeredModules: Record<string, IReduxModuleMetadata> = {};
+  public immerState: any;
+  registeredModules: Record<string, IReduxModuleMetadata> = {};
 
   /**
    * Register a new Redux Module and initialize it
@@ -145,34 +93,37 @@ class ReduxModuleManager {
     // call `init()` method of module if exist
     unstable_batchedUpdates(() => {
       module.name = moduleName;
+      // create a record in `registeredModules` with the newly created module
+      this.registeredModules[moduleName] = {
+        componentIds: [],
+        module,
+        watchers: [],
+      };
+
       module.init && module.init(initParams as TInitParams);
       const initialState = module.state;
 
-      // Use Redux API to create Redux reducers from our mutation functions
-      // this step is adding the support of `Immer` library in reducers
-      // https://redux-toolkit.js.org/usage/immer-reducers
-      const reducer = initReducerForModule(module, initialState);
+      // replace module methods with mutation calls
+      replaceMethodsWithMutations(module);
 
       // Re-define the `state` variable of the module
       // It should be linked to the global Redux sate after module initialization
       // But when mutation is running it should be linked to a special Proxy from the Immer library
       Object.defineProperty(module, 'state', {
         get: () => {
-          if (this.immerState) return this.immerState;
+          if (this.immerState) return this.immerState[moduleName];
           const globalState = store.getState() as any;
-          return globalState[moduleName];
+          return globalState.modules[moduleName];
+        },
+        set: (newState: unknown) => {
+          const isMutationRunning = !!this.immerState;
+          if (!isMutationRunning) throw new Error('Can not change the state outside of mutation');
+          this.immerState[moduleName] = newState;
         },
       });
 
-      // register reducer in Redux
-      store.reducerManager.add(moduleName, reducer);
-      // call the `initState` mutation to initialize the module's initial state
-      store.dispatch({ type: 'initState', payload: { moduleName, initialState } });
-      // create a record in `registeredModules` with the newly created module
-      this.registeredModules[moduleName] = {
-        componentIds: [],
-        module,
-      };
+      // call the `initModule` mutation to initialize the module's initial state
+      store.dispatch(modulesSlice.actions.initModule({ moduleName, initialState }));
     });
 
     return module;
@@ -184,7 +135,7 @@ class ReduxModuleManager {
   unregisterModule(moduleName: string) {
     const module = this.getModule(moduleName);
     module.destroy && module.destroy();
-    store.reducerManager.remove(moduleName);
+    store.dispatch(actions.destroyModule(moduleName));
     delete this.registeredModules[moduleName];
   }
 
@@ -219,6 +170,20 @@ class ReduxModuleManager {
   setImmerState(immerState: unknown) {
     this.immerState = immerState;
   }
+
+  runWatchers() {
+    Object.keys(this.registeredModules).map(moduleName => {
+      const watchers = this.registeredModules[moduleName].watchers;
+      watchers.forEach(watcher => {
+        const newVal = watcher.selector();
+        const prevVal = watcher.prevValue;
+        watcher.prevValue = newVal;
+        if (newVal !== prevVal) {
+          watcher.onChange(newVal, prevVal);
+        }
+      });
+    });
+  }
 }
 
 let moduleManager: ReduxModuleManager;
@@ -237,6 +202,9 @@ export function getModuleManager() {
 
     // add a VuexModule for Vuex support
     moduleManager.registerModule(new VuexModule());
+
+    // save module manager in the global namespace for debugging
+    if (Utils.isDevMode()) window['mm'] = moduleManager;
   }
   return moduleManager;
 }
@@ -268,6 +236,7 @@ class BatchedUpdatesModule {
     // enable rendering again when Javascript processes the current queue of tasks
     setTimeout(() => {
       this.setIsRenderingDisabled(false);
+      moduleManager.runWatchers();
     });
   }
 
@@ -319,22 +288,12 @@ export function mutation() {
   };
 }
 
-function initReducerForModule(module: IReduxModule<unknown, unknown>, initialState: unknown) {
+function replaceMethodsWithMutations(module: IReduxModule<unknown, unknown>) {
   const moduleName = getDefined(module.name);
   const mutationNames: string[] = Object.getPrototypeOf(module).mutations || [];
-  const mutations: Record<string, CaseReducer<unknown, { payload: unknown; type: string }>> = {};
 
   mutationNames.forEach(mutationName => {
     const originalMethod = module[mutationName];
-
-    // Transform the original function into the Redux Action handler
-    // So we can use this method in the Redux's `createReducer()` call
-    mutations[mutationName] = (state: unknown, action: { payload: unknown }) => {
-      const module = moduleManager.getModule(moduleName);
-      moduleManager.setImmerState(state);
-      originalMethod.apply(module, action.payload);
-      moduleManager.setImmerState(null);
-    };
 
     // override the original Module method to dispatch mutations
     module[mutationName] = function (...args: any[]) {
@@ -348,20 +307,20 @@ function initReducerForModule(module: IReduxModule<unknown, unknown>, initialSta
         'BatchedUpdatesModule',
       );
 
+      // clear unserializable events from arguments
+      args = args.map(arg => {
+        const isReactEvent = arg._reactName;
+        if (isReactEvent) return { _reactName: arg._reactName };
+        return arg;
+      });
+
       // dispatch reducer and call `temporaryDisableRendering()`
       // so next mutation in the javascript queue will not cause redundant re-renderings in components
       batch(() => {
         if (moduleName !== 'BatchedUpdatesModule') batchedUpdatesModule.temporaryDisableRendering();
-        store.dispatch({ type: `${moduleName}/${mutationName}`, payload: args });
+        store.dispatch(actions.mutateModule({ moduleName, methodName: mutationName, args }));
       });
     };
-  });
-
-  return createReducer(initialState, builder => {
-    Object.keys(mutations).forEach(mutationName => {
-      const action = createAction(`${moduleName}/${mutationName}`);
-      builder.addCase(action, mutations[mutationName]);
-    });
   });
 }
 
@@ -473,6 +432,26 @@ export function createDependencyWatcher<T extends object>(watchedObject: T) {
   return { watcherProxy, getDependentFields, getDependentValues };
 }
 
+interface IWatcher<T> {
+  selector: () => T;
+  onChange: (newVal: T, prevVal: T) => unknown;
+  prevValue: T;
+}
+
+export function watch<T>(
+  module: IReduxModule<any, any>,
+  selector: () => T,
+  onChange: (newVal: T, prevVal: T) => unknown,
+) {
+  const moduleName = getDefined(module.name);
+  const moduleMetadata = moduleManager.registeredModules[moduleName];
+  moduleMetadata.watchers.push({
+    selector,
+    onChange,
+    prevValue: selector(),
+  });
+}
+
 /**
  * Returns a reactive binding for inputs
  *
@@ -536,11 +515,5 @@ export interface IReduxModule<TInitParams, TState> {
 interface IReduxModuleMetadata {
   componentIds: string[];
   module: IReduxModule<any, any>;
+  watchers: IWatcher<unknown>[];
 }
-
-type TStore = Store & {
-  reducerManager: {
-    add: (key: string, reducer: any) => unknown;
-    remove: (key: string) => unknown;
-  };
-};

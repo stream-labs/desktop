@@ -103,6 +103,11 @@ export function getWidgetsConfig(host: string, token: string): Record<TWidgetTyp
         anchor: AnchorPoint.SouthWest,
       },
 
+      settingsWindowSize: {
+        width: 600,
+        height: 900,
+      },
+
       previewUrl: `https://${host}/widgets/viewer-count?token=${token}&simulate=1`,
       dataFetchUrl: `https://${host}/api/v5/slobs/widget/viewercount`,
       settingsSaveUrl: `https://${host}/api/v5/slobs/widget/viewercount`,

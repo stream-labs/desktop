@@ -164,6 +164,10 @@ export interface IWindowOptions extends Electron.BrowserWindowConstructorOptions
   isShown: boolean;
   title?: string;
   center?: boolean;
+  position?: {
+    x: number;
+    y: number;
+  };
   isPreserved?: boolean;
   preservePrevWindow?: boolean;
   prevWindowOptions?: IWindowOptions;
@@ -427,6 +431,7 @@ export class WindowsService extends StatefulService<IWindowsState> {
       webPreferences: { nodeIntegration: true, webviewTag: true, enableRemoteModule: true },
       ...options,
       ...options.size,
+      ...(options.position || {}),
     }));
 
     newWindow.removeMenu();

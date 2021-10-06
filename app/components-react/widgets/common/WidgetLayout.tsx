@@ -6,7 +6,7 @@ import css from './WidgetLayout.m.less';
 import Form, { useForm } from '../../shared/inputs/Form';
 import { ObsForm } from '../../obs/ObsForm';
 import { $t } from '../../../services/i18n';
-import { CustomCode } from './CustomCode';
+import { CustomCodeSection, CustomFields, CustomFieldsSection } from './CustomCode';
 const { Content, Header } = Layout;
 
 /**
@@ -14,7 +14,7 @@ const { Content, Header } = Layout;
  * Can display 1 column or 2 columns depending on how many children have been provided to props
  */
 export function WidgetLayout(p: { children: ReactNode | [ReactNode, ReactNode] }) {
-  const { previewSourceId, isLoading, selectedTab, config } = useWidget();
+  const { previewSourceId, isLoading, selectedTab, config, hasCustomFields } = useWidget();
   let MenuPanel: ReactNode;
   let ContentPanel: ReactNode;
 
@@ -59,11 +59,14 @@ export function WidgetLayout(p: { children: ReactNode | [ReactNode, ReactNode] }
                     {/* SETTINGS FORM  */}
                     {ContentPanel}
 
-                    {/* CUSTOM CODE  */}
-                    {config.customCodeAllowed && <CustomCode />}
-
                     {/* BROWSER SOURCE SETTINGS  */}
                     {selectedTab === 'general' && <BrowserSourceSettings />}
+
+                    {/* CUSTOM CODE  */}
+                    {config.customCodeAllowed && <CustomCodeSection />}
+
+                    {/* CUSTOM FIELDS  */}
+                    {hasCustomFields && <CustomFieldsSection />}
                   </>
                 )}
               </Spin>
