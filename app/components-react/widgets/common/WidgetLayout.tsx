@@ -6,7 +6,8 @@ import css from './WidgetLayout.m.less';
 import Form, { useForm } from '../../shared/inputs/Form';
 import { ObsForm } from '../../obs/ObsForm';
 import { $t } from '../../../services/i18n';
-import { CustomCodeSection, CustomFields, CustomFieldsSection } from './CustomCode';
+import { CustomCodeSection } from './CustomCode';
+import { CustomFieldsSection } from './CustomFields';
 const { Content, Header } = Layout;
 
 /**
