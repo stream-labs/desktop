@@ -119,6 +119,7 @@ interface ISafeModeSettings {
   emoteOnly: boolean;
   followerOnly: boolean;
   subOnly: boolean;
+  enableTimer: boolean;
   timeInMinutes: number;
 }
 
@@ -140,6 +141,7 @@ export interface ISafeModeServerSettings {
   emote_only: boolean;
   follower_only: boolean;
   sub_only: boolean;
+  enable_timer: boolean;
   time_in_minutes: number;
 }
 
@@ -387,6 +389,7 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
       emoteOnly: true,
       followerOnly: true,
       subOnly: true,
+      enableTimer: false,
       timeInMinutes: 60,
     },
   };
@@ -740,7 +743,8 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
     }
 
     if (e.type === 'safeModeEnabled') {
-      this.onSafeModeEnabled(e.message, e.message.ends_at);
+      this.updateSafeModeSettingsFromServer(e.message);
+      this.onSafeModeEnabled(e.message.ends_at);
     }
 
     if (e.type === 'safeModeDisabled') {
@@ -921,19 +925,35 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
   }
 
   fetchSafeModeStatus() {
-    const url = `https://${this.hostsService.streamlabs}/api/v5/slobs/widget/checksafemode`;
+    const url = `https://${this.hostsService.streamlabs}/api/v5/slobs/safemode`;
     const headers = authorizedHeaders(this.userService.apiToken);
     return jfetch<{
-      status: 'enabled' | 'disabled';
-      safeModeSettings: { ends_at: number; data: ISafeModeServerSettings };
+      safe_mode_settings: { active: boolean; data: ISafeModeServerSettings; ends_at: number };
     }>(url, {
       headers,
     }).then(data => {
-      if (data.status === 'enabled') {
-        this.onSafeModeEnabled(data.safeModeSettings.data, data.safeModeSettings.ends_at);
+      this.updateSafeModeSettingsFromServer(data.safe_mode_settings.data);
+
+      if (data.safe_mode_settings.active) {
+        this.onSafeModeEnabled(data.safe_mode_settings.ends_at);
       } else {
         this.onSafeModeDisabled();
       }
+    });
+  }
+
+  updateSafeModeSettingsFromServer(data: ISafeModeServerSettings) {
+    this.SET_SAFE_MODE_SETTINGS({
+      clearChat: data.clear_chat,
+      clearQueuedAlerts: data.clear_queued_alerts,
+      clearRecentEvents: data.clear_recent_events,
+      disableChatAlerts: data.disable_chat_alerts,
+      disableFollowerAlerts: data.disable_follower_alerts,
+      emoteOnly: data.emote_only,
+      followerOnly: data.follower_only,
+      subOnly: data.sub_only,
+      enableTimer: data.enable_timer,
+      timeInMinutes: data.time_in_minutes,
     });
   }
 
@@ -982,29 +1002,48 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
   activateSafeMode() {
     if (this.state.safeMode.enabled) return;
 
-    return this.toggleSafeMode();
+    const headers = authorizedHeaders(
+      this.userService.apiToken,
+      new Headers({ 'Content-Type': 'application/json' }),
+    );
+    const url = `https://${this.hostsService.streamlabs}/api/v5/slobs/safemode`;
+    const sm = this.state.safeMode;
+    const body = JSON.stringify({
+      clear_chat: sm.clearChat,
+      clear_queued_alerts: sm.clearQueuedAlerts,
+      clear_recent_events: sm.clearRecentEvents,
+      disable_chat_alerts: sm.disableChatAlerts,
+      disable_follower_alerts: sm.disableFollowerAlerts,
+      emote_only: sm.emoteOnly,
+      follower_only: sm.followerOnly,
+      sub_only: sm.subOnly,
+      enable_timer: sm.enableTimer,
+      time_in_minutes: sm.timeInMinutes,
+    });
+    this.SET_SAFE_MODE_SETTINGS({ loading: true });
+    const promise = jfetch(new Request(url, { headers, body, method: 'POST' }));
+
+    promise.finally(() => this.SET_SAFE_MODE_SETTINGS({ loading: false }));
+
+    return promise;
   }
 
   disableSafeMode() {
     if (!this.state.safeMode.enabled) return;
 
-    return this.toggleSafeMode();
+    const headers = authorizedHeaders(this.userService.apiToken);
+    const url = `https://${this.hostsService.streamlabs}/api/v5/slobs/safemode`;
+    this.SET_SAFE_MODE_SETTINGS({ loading: true });
+    const promise = jfetch(new Request(url, { headers, method: 'DELETE' }));
+
+    promise.finally(() => this.SET_SAFE_MODE_SETTINGS({ loading: false }));
+
+    return promise;
   }
 
-  onSafeModeEnabled(serverSettings: ISafeModeServerSettings, endsAt: number) {
-    this.SET_SAFE_MODE_SETTINGS({
-      enabled: true,
-      clearChat: serverSettings.clear_chat,
-      clearQueuedAlerts: serverSettings.clear_queued_alerts,
-      clearRecentEvents: serverSettings.clear_recent_events,
-      disableChatAlerts: serverSettings.disable_chat_alerts,
-      disableFollowerAlerts: serverSettings.disable_follower_alerts,
-      emoteOnly: serverSettings.emote_only,
-      followerOnly: serverSettings.follower_only,
-      subOnly: serverSettings.sub_only,
-      timeInMinutes: serverSettings.time_in_minutes,
-    });
-    this.setSafeModeTimeout(Math.max(endsAt - Date.now(), 0));
+  onSafeModeEnabled(endsAt?: number) {
+    this.SET_SAFE_MODE_SETTINGS({ enabled: true });
+    if (endsAt) this.setSafeModeTimeout(Math.max(endsAt - Date.now(), 0));
     if (this.state.safeMode.clearRecentEvents) {
       this.SET_RECENT_EVENTS([]);
     }
