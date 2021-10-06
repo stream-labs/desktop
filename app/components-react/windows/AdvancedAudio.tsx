@@ -1,5 +1,5 @@
-import React, { useState, useRef, useMemo } from 'react';
-import { Collapse } from 'antd';
+import React, { useState, useRef, useMemo, useEffect } from 'react';
+import { Button, Collapse } from 'antd';
 import { ModalLayout } from 'components-react/shared/ModalLayout';
 import {
   SliderInput,
@@ -147,10 +147,18 @@ function PanelForm(p: { source: AudioSource }) {
   const { sourceId, forceMono, syncOffset, source, monitoringType } = p.source;
 
   const hasDevices = source ? !source.video : false;
+  const isMic = source
+    ? [
+        'wasapi_input_capture',
+        'coreaudio_input_capture',
+        'dshow_input',
+        'av_capture_input',
+      ].includes(source.type)
+    : false;
 
   const { EditorCommandsService } = Services;
 
-  function onSettingsHandler(name: string, value: TObsValue) {
+  function handleSettingsChange(name: string, value: TObsValue) {
     EditorCommandsService.actions.executeCommand('SetAudioSettingsCommand', sourceId, {
       [name]: value,
     });
@@ -163,14 +171,14 @@ function PanelForm(p: { source: AudioSource }) {
         label={$t('Sync Offset')}
         value={syncOffset}
         name="syncOffset"
-        onInput={value => onSettingsHandler('syncOffset', value)}
+        onInput={value => handleSettingsChange('syncOffset', value)}
         tooltip={$t('Time it takes between sound occuring and being broadcast (ms)')}
       />
       <SwitchInput
         label={$t('Downmix to Mono')}
         value={forceMono}
         name="forceMono"
-        onInput={value => onSettingsHandler('forceMono', value)}
+        onInput={value => handleSettingsChange('forceMono', value)}
         tooltip={$t('Route audio to the central channel instead of left or right stereo channels')}
       />
       <ListInput
@@ -178,11 +186,12 @@ function PanelForm(p: { source: AudioSource }) {
         options={p.source.monitoringOptions}
         value={monitoringType}
         name="monitoringType"
-        onInput={value => onSettingsHandler('monitoringType', value)}
+        onInput={value => handleSettingsChange('monitoringType', value)}
         tooltip={$t(
           'Generally, enabling monitoring sends the audio through the Desktop Audio channel',
         )}
       />
+      {isMic && <AudioTestButton source={p.source} handleSettingsChange={handleSettingsChange} />}
     </Form>
   );
 }
@@ -220,5 +229,42 @@ function DeviceInputs(p: { source: Source }) {
         onInput={value => handleInput('use_device_timing', value)}
       />
     </>
+  );
+}
+
+function AudioTestButton(p: {
+  source: AudioSource;
+  handleSettingsChange: (name: string, value: number) => void;
+}) {
+  const [savedMonitoring, setSavedMonitoring] = useState(p.source.monitoringType);
+  const [testing, setTesting] = useState(false);
+  const [ignoreMonitoringUpdate, setIgnoreMonitoringUpdate] = useState(false);
+
+  useEffect(() => {
+    if (!ignoreMonitoringUpdate) {
+      setSavedMonitoring(p.source.monitoringType);
+    }
+    // Ensure monitoring type is returned to normal upon destroy
+    return () => {
+      p.handleSettingsChange('monitoringType', savedMonitoring);
+    };
+  }, [p.source.monitoringType, ignoreMonitoringUpdate]);
+
+  function handleButtonClick() {
+    if (!testing) {
+      setIgnoreMonitoringUpdate(true);
+      p.handleSettingsChange('monitoringType', 1);
+      setIgnoreMonitoringUpdate(false);
+      setTesting(true);
+    } else {
+      p.handleSettingsChange('monitoringType', savedMonitoring);
+      setTesting(false);
+    }
+  }
+
+  return (
+    <div>
+      <Button onClick={handleButtonClick}>{$t('Test Audio')}</Button>
+    </div>
   );
 }
