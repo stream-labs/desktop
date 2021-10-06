@@ -20,13 +20,14 @@ import styles from './AdvancedAudio.m.less';
 
 const { Panel } = Collapse;
 
-export default function AdvancedAudio() {
+export default function SourceSettings() {
   const { AudioService, WindowsService } = Services;
 
   const initialSource = useMemo<string>(
     () => WindowsService.getChildWindowQueryParams().sourceId || '',
     [],
   );
+
   const [expandedSource, setExpandedSource] = useState(initialSource);
 
   const { audioSources } = useVuex(() => ({
@@ -34,20 +35,18 @@ export default function AdvancedAudio() {
   }));
 
   return (
-    <ModalLayout hideFooter>
-      <Collapse
-        accordion
-        activeKey={expandedSource}
-        onChange={(key: string) => setExpandedSource(key)}
-        expandIcon={({ isActive }) => <i className={isActive ? 'icon-subtract' : 'icon-add'} />}
-      >
-        {audioSources.map(audioSource => (
-          <Panel key={audioSource.sourceId} header={<PanelHeader source={audioSource} />}>
-            <PanelForm source={audioSource} />
-          </Panel>
-        ))}
-      </Collapse>
-    </ModalLayout>
+    <Collapse
+      accordion
+      activeKey={expandedSource}
+      onChange={(key: string) => setExpandedSource(key)}
+      expandIcon={({ isActive }) => <i className={isActive ? 'icon-subtract' : 'icon-add'} />}
+    >
+      {audioSources.map(audioSource => (
+        <Panel key={audioSource.sourceId} header={<PanelHeader source={audioSource} />}>
+          <PanelForm source={audioSource} />
+        </Panel>
+      ))}
+    </Collapse>
   );
 }
 
