@@ -243,6 +243,8 @@ function AudioTestButton(p: {
   useEffect(() => {
     if (!ignoreMonitoringUpdate) {
       setSavedMonitoring(p.source.monitoringType);
+    } else {
+      setIgnoreMonitoringUpdate(false);
     }
     // Ensure monitoring type is returned to normal upon destroy
     return () => {
@@ -254,7 +256,6 @@ function AudioTestButton(p: {
     if (!testing) {
       setIgnoreMonitoringUpdate(true);
       p.handleSettingsChange('monitoringType', 1);
-      setIgnoreMonitoringUpdate(false);
       setTesting(true);
     } else {
       p.handleSettingsChange('monitoringType', savedMonitoring);
@@ -264,7 +265,9 @@ function AudioTestButton(p: {
 
   return (
     <div>
-      <Button onClick={handleButtonClick}>{$t('Test Audio')}</Button>
+      <Button onClick={handleButtonClick} type={testing ? 'default' : 'primary'}>
+        {testing ? $t('Testing...') : $t('Test Audio')}
+      </Button>
     </div>
   );
 }
