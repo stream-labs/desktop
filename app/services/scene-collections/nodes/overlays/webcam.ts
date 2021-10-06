@@ -179,7 +179,7 @@ export class WebcamNode extends Node<ISchema, IContext> {
     });
 
     // Otherwise, pick the biggest width
-    if (!bestResolution) bestResolution = sorted.reverse()[0];
+    bestResolution ||= sorted.reverse()[0];
 
     this.applyResolution(item, bestResolution.value);
 

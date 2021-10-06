@@ -65,9 +65,7 @@ export default class SceneTransitions extends Vue {
    * @param id ID of the scene transition
    */
   isEditable(id: string) {
-    if (!this.lockStates) {
-      this.lockStates = this.transitionsService.getLockedStates();
-    }
+    this.lockStates ||= this.transitionsService.getLockedStates();
 
     return !this.lockStates[id];
   }

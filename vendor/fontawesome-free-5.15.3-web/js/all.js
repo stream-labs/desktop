@@ -4192,9 +4192,8 @@
       var iconDefinition = (maybeIconDefinition || {}).icon ? maybeIconDefinition : findIconDefinition(maybeIconDefinition || {});
       var mask = params.mask;
 
-      if (mask) {
-        mask = (mask || {}).icon ? mask : findIconDefinition(mask || {});
-      }
+      mask &&= (mask || {}).icon ? mask : findIconDefinition(mask || {});
+
 
       return next(iconDefinition, _objectSpread({}, params, {
         mask: mask
@@ -4431,9 +4430,8 @@
 
   function bootstrap() {
     if (IS_BROWSER) {
-      if (!WINDOW.FontAwesome) {
-        WINDOW.FontAwesome = api;
-      }
+      WINDOW.FontAwesome ||= api;
+
 
       domready(function () {
         autoReplace();

@@ -306,14 +306,13 @@ export class SlotsNode extends ArrayNode<TSlotSchema, IContext, TSceneNode> {
         }
       });
 
-      if (!sceneItem) {
-        sceneItem = context.scene.createAndAddSource(
-          obj.name,
-          'browser_source',
-          {},
-          { id, select: false },
-        );
-      }
+      sceneItem ||= context.scene.createAndAddSource(
+        obj.name,
+        'browser_source',
+        {},
+        { id, select: false },
+      );
+
     } else if (obj.content instanceof SceneSourceNode) {
       const sceneId = obj.content.data.sceneId;
       sceneItem = context.scene.addSource(sceneId, { select: false });

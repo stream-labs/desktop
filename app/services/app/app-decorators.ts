@@ -31,7 +31,7 @@ export function SyncWithValue() {
   return createDecorator((options, key) => {
     // create watchers and props.value if don't exist
     (options.props || (options.props = {}))['value'] = null;
-    if (!options.watch) options.watch = {};
+    options.watch ||= {};
 
     // make property reactive
     options.data = () => ({ [key]: null });

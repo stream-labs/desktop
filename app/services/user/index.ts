@@ -666,7 +666,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
 
   @RunInLoadingMode()
   private async login(service: IPlatformService, auth?: IUserAuth) {
-    if (!auth) auth = this.state.auth;
+    auth ||= this.state.auth;
     this.LOGIN(auth);
     this.VALIDATE_LOGIN(true);
     this.setSentryContext();

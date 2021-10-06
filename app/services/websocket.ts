@@ -139,9 +139,8 @@ export class WebsocketService extends Service {
     }
 
     // dynamically import socket.io because it takes to much time to import it on startup
-    if (!this.io) {
-      this.io = (await importSocketIOClient()).default;
-    }
+    this.io ||= (await importSocketIOClient()).default;
+
 
     if (this.socket) {
       this.socket.disconnect();

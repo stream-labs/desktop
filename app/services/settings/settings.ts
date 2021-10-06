@@ -132,7 +132,7 @@ export class SettingsService extends StatefulService<ISettingsServiceState> {
   private fetchSettingsFromObs(categoryName: string): ISettingsCategory {
     const settingsMetadata = obs.NodeObs.OBS_settings_getSettings(categoryName);
     let settings = settingsMetadata.data;
-    if (!settings) settings = [];
+    settings ||= [];
 
     // Names of settings that are disabled because we
     // have not implemented them yet.

@@ -777,7 +777,7 @@ ipcMain.on('measure-time', (e, msg, time) => {
 
 // Measure time between events
 function measure(msg, time) {
-  if (!time) time = Date.now();
+  time ||= Date.now();
   const delta = lastEventTime ? time - lastEventTime : 0;
   lastEventTime = time;
   if (delta > 2000) console.log('------------------');

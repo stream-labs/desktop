@@ -257,7 +257,7 @@ export class ApiClient {
         // tslint:disable-next-line:no-else-after-return
       } else if (result && result._type === 'SUBSCRIPTION' && result.emitter === 'STREAM') {
         let subject = this.subscriptions[result.resourceId];
-        if (!subject) subject = this.subscriptions[result.resourceId] = new Subject();
+        subject ||= this.subscriptions[result.resourceId] = new Subject();
         return subject;
       } else if (result && (result._type === 'HELPER' || result._type === 'SERVICE')) {
         return this.getResource(result.resourceId, result);
@@ -325,7 +325,7 @@ export class ApiClient {
 }
 
 export async function getApiClient() {
-  if (!clientInstance) clientInstance = new ApiClient();
+  clientInstance ||= new ApiClient();
 
   if (clientInstance.getConnectionStatus() === 'disconnected') {
     await clientInstance.connect();

@@ -312,9 +312,8 @@ export class WidgetsService
     });
 
     // Otherwise, create a new one
-    if (!widgetItem) {
-      widgetItem = scene.createAndAddSource(scene.name, 'browser_source');
-    }
+    widgetItem ||= scene.createAndAddSource(scene.name, 'browser_source');
+
 
     const source = widgetItem.getSource();
 

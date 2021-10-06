@@ -22,11 +22,9 @@ export default class SectionedMultiselectInput extends BaseInput<
   get displayValue() {
     let val: { value: string; label: string } = null;
     this.options.options.forEach(category => {
-      if (!val) {
-        val = category.options.find(
+      val ||= category.options.find(
           (opt: { value: string; label: string }) => opt.value === this.value,
-        );
-      }
+      );
     });
     return val;
   }

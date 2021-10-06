@@ -249,7 +249,7 @@ export class YoutubeService
       return await platformAuthorizedRequest<T>('youtube', reqInfo);
     } catch (e: unknown) {
       let details = (e as any).result?.error?.message;
-      if (!details) details = 'connection failed';
+      details ||= 'connection failed';
 
       // if the rate limit exceeded then repeat request after 3s delay
       if (details === 'User requests exceed the rate limit.' && repeatRequestIfRateLimitExceed) {
@@ -777,10 +777,7 @@ export class YoutubeService
       );
     } catch (e: unknown) {
       const error = await (e as any).json();
-      let details = error.result?.error?.message;
-      if (!details) details = 'connection failed';
-      const errorType = 'YOUTUBE_THUMBNAIL_UPLOAD_FAILED';
-      throw throwStreamError(errorType, e as any, details);
+      throw throwStreamError('YOUTUBE_THUMBNAIL_UPLOAD_FAILED', e as any, error.result?.error?.message ?? 'connection failed');
     }
   }
 

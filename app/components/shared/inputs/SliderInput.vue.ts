@@ -34,7 +34,7 @@ export default class SliderInput extends BaseInput<number, ISliderMetadata> {
    * @param value The value that will be displayed on the interface.
    */
   updateLocalValue(value: number | string) {
-    if (this.timeout) this.timeout = window.clearTimeout(this.timeout);
+    this.timeout &&= window.clearTimeout(this.timeout);
 
     const parsedValue = Number(value);
 

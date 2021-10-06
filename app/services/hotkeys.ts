@@ -747,8 +747,8 @@ export class Hotkey implements IHotkey {
     const { up, down } = action;
 
     // Fill in optional functions with some defaults
-    if (!action.isActive) action.isActive = () => false;
-    if (!action.shouldApply) action.shouldApply = () => true;
+    action.isActive ||= () => false;
+    action.shouldApply ||= () => true;
 
     // We defer the actions until after we've decided whether
     // or not to execute each action.

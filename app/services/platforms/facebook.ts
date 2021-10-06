@@ -740,7 +740,7 @@ export class FacebookView extends ViewHandler<IFacebookServiceState> {
   }
 
   getDestinationId(options?: IFacebookStartStreamOptions): string {
-    if (!options) options = this.state.settings;
+    options ||= this.state.settings;
     switch (options.destinationType) {
       case 'me':
         return 'me';

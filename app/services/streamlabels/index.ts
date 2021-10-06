@@ -228,17 +228,13 @@ export class StreamlabelsService extends StatefulService<IStreamlabelsServiceSta
   getSettingsForStat(statname: string) {
     const settings = { ...this.settings[statname] };
 
-    if (settings.item_separator) {
-      settings.item_separator = settings.item_separator.replace(/\n/gi, '\\n');
-    }
+    settings.item_separator &&= settings.item_separator.replace(/\n/gi, '\\n');
 
     return settings;
   }
 
   setSettingsForStat(statname: string, settings: IStreamlabelSettings): Promise<boolean> {
-    if (settings.item_separator) {
-      settings.item_separator = settings.item_separator.replace(/\\n/gi, '\n');
-    }
+    settings.item_separator &&= settings.item_separator.replace(/\\n/gi, '\n');
 
     this.settings[statname] = {
       ...this.settings[statname],

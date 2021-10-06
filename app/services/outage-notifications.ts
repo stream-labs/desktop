@@ -111,7 +111,7 @@ export class OutageNotificationsService extends Service {
   }
 
   private clearNotification() {
-    if (this.currentMessageId) this.currentMessageId = null;
+    this.currentMessageId &&= null;
     if (this.currentNotificationId) {
       this.notificationsService.markAsRead(this.currentNotificationId);
       this.currentNotificationId = null;

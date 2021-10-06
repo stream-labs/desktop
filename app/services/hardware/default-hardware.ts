@@ -86,13 +86,12 @@ export class DefaultHardwareService extends PersistentStatefulService<IDefaultHa
         source.getSettings()[deviceProperty] === deviceId,
     );
 
-    if (!found) {
-      found = this.sourcesService.views.temporarySources.find(
-        source =>
-          source.type === byOS({ [OS.Windows]: 'dshow_input', [OS.Mac]: 'av_capture_input' }) &&
-          source.getSettings()[deviceProperty] === deviceId,
-      );
-    }
+    found ||= this.sourcesService.views.temporarySources.find(
+      source =>
+        source.type === byOS({ [OS.Windows]: 'dshow_input', [OS.Mac]: 'av_capture_input' }) &&
+        source.getSettings()[deviceProperty] === deviceId,
+    );
+
 
     return found;
   }

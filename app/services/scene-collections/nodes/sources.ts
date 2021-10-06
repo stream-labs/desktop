@@ -191,9 +191,7 @@ export class SourcesNode extends Node<ISchema, {}> {
     // This shit is complicated, IPC sucks
     const sourceCreateData = supportedSources.map(source => {
       // Universally disabled for security reasons
-      if (source.settings.is_media_flag) {
-        source.settings.is_media_flag = false;
-      }
+      source.settings.is_media_flag &&= false;
 
       return {
         name: source.id,

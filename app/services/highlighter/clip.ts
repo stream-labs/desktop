@@ -30,11 +30,9 @@ export class Clip {
    * - Generate scrubbing sprite on disk
    */
   init() {
-    if (!this.initPromise) {
-      this.initPromise = new Promise<void>((resolve, reject) => {
-        this.doInit().then(resolve).catch(reject);
-      });
-    }
+    this.initPromise ||= new Promise<void>((resolve, reject) => {
+      this.doInit().then(resolve).catch(reject);
+    });
 
     return this.initPromise;
   }

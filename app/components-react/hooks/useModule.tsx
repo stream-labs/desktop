@@ -48,9 +48,7 @@ export function useModule<
     // get existing module's instance or create a new one
     const moduleManager = getModuleManager();
     let module = moduleManager.getModule(moduleName);
-    if (!module) {
-      module = moduleManager.registerModule(new ModuleClass(), initParams);
-    }
+    module ||= moduleManager.registerModule(new ModuleClass(), initParams);
     // register the component in the module
     moduleManager.registerComponent(moduleName, componentId);
 
