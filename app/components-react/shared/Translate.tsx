@@ -1,7 +1,6 @@
 import { camelize } from 'humps';
 import React, { useEffect, useState, ReactElement, createElement } from 'react';
 import keyBy from 'lodash/keyBy';
-import mapValues from 'lodash/mapValues';
 
 /**
  * Convert xml message from i18n dictionary into a React component
