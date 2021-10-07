@@ -1,6 +1,7 @@
 import { camelize } from 'humps';
 import React, { useEffect, useState, ReactElement, createElement } from 'react';
 import keyBy from 'lodash/keyBy';
+import mapValues from 'lodash/mapValues';
 
 /**
  * Convert xml message from i18n dictionary into a React component
@@ -17,6 +18,11 @@ import keyBy from 'lodash/keyBy';
 export default function Translate(p: {
   message: string;
   children?: ReactElement[] | ReactElement;
+
+  /**
+   * Optional: pass individual render functions for each slot
+   */
+  renderSlots?: Dictionary<(text: string) => ReactElement>;
 }) {
   let children: ReactElement[] = [];
   if (p.children) {
@@ -74,6 +80,9 @@ export default function Translate(p: {
         { ...namedReactNode.props, key: ind },
         xmlNode.textContent,
       );
+    } else if (p.renderSlots && p.renderSlots[slotName]) {
+      // A custom render function was passed for this slot
+      return p.renderSlots[slotName](xmlNode.textContent ?? '');
     } else {
       // render simple html tags like <a><b><i><strong>
       // attributes are not supported

@@ -545,6 +545,8 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
       return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
     });
 
+    if (this.state.safeMode.enabled && this.state.safeMode.clearRecentEvents) return;
+
     this.SET_RECENT_EVENTS(eventArray);
   }
 
@@ -967,36 +969,6 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
 
   setSafeModeSettings(patch: Partial<ISafeModeSettings>) {
     this.SET_SAFE_MODE_SETTINGS(patch);
-  }
-
-  toggleSafeMode() {
-    const headers = authorizedHeaders(
-      this.userService.apiToken,
-      new Headers({ 'Content-Type': 'application/json' }),
-    );
-    const url = `https://${this.hostsService.streamlabs}/api/v5/slobs/widget/safemode`;
-    const sm = this.state.safeMode;
-    const body = JSON.stringify(
-      this.state.safeMode.enabled
-        ? {}
-        : {
-            clear_chat: sm.clearChat,
-            clear_queued_alerts: sm.clearQueuedAlerts,
-            clear_recent_events: sm.clearRecentEvents,
-            disable_chat_alerts: sm.disableChatAlerts,
-            disable_follower_alerts: sm.disableFollowerAlerts,
-            emote_only: sm.emoteOnly,
-            follower_only: sm.followerOnly,
-            sub_only: sm.subOnly,
-            time_in_minutes: sm.timeInMinutes,
-          },
-    );
-    this.SET_SAFE_MODE_SETTINGS({ loading: true });
-    const promise = jfetch(new Request(url, { headers, body, method: 'POST' }));
-
-    promise.finally(() => this.SET_SAFE_MODE_SETTINGS({ loading: false }));
-
-    return promise;
   }
 
   activateSafeMode() {
