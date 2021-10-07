@@ -190,6 +190,7 @@ export class SceneCollectionsService extends Service implements ISceneCollection
       } else {
         console.warn(`Unsuccessful recovery of scene collection ${id} attempted`);
         electron.remote.dialog.showMessageBox(Utils.getMainWindow(), {
+          title: 'Streamlabs OBS',
           message: $t('Failed to load scene collection.  A new one will be created instead.'),
         });
         await this.create();
