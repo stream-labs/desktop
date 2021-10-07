@@ -126,6 +126,7 @@ import { VideoEncodingOptimizationService } from './services/video-encoding-opti
 import { TwitterService } from './services/integrations/twitter';
 import { SettingsService } from './services/settings';
 import { UserService } from './services/user';
+import { TroubleshooterService } from './services/troubleshooter';
 import { TwitchService } from './services/platforms/twitch';
 import { YoutubeService } from './services/platforms/youtube';
 import { FacebookService } from './services/platforms/facebook';
@@ -176,6 +177,7 @@ export const AppServices = {
   YoutubeService,
   FacebookService,
   UserService,
+  TroubleshooterService,
   TwitchService,
   DismissablesService,
   HighlighterService,

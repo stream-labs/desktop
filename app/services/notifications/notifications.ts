@@ -42,29 +42,6 @@ class NotificationsViews extends ViewHandler<INotificationsState> {
   getSettings(): INotificationsSettings {
     return this.state.settings;
   }
-
-  getSettingsFormData(): TObsFormData {
-    const settings = this.state.settings;
-    return [
-      <IObsInput<boolean>>{
-        value: settings.enabled,
-        name: 'enabled',
-        description: $t('Enable notifications'),
-        type: 'OBS_PROPERTY_BOOL',
-        visible: true,
-        enabled: true,
-      },
-
-      <IObsInput<boolean>>{
-        value: settings.playSound,
-        name: 'playSound',
-        description: $t('Enable sound'),
-        type: 'OBS_PROPERTY_BOOL',
-        visible: true,
-        enabled: settings.enabled,
-      },
-    ];
-  }
 }
 
 export class NotificationsService
