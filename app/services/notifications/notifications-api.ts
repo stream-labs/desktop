@@ -59,6 +59,8 @@ export interface INotificationsServiceApi {
     getAll(type?: ENotificationType): INotification[];
     getUnread(type?: ENotificationType): INotification[];
     getRead(type?: ENotificationType): INotification[];
+    getSettings(): INotificationsSettings;
+    getSettingsFormData(): TObsFormData;
   };
 
   setSettings(patch: Partial<INotificationsSettings>): void;
