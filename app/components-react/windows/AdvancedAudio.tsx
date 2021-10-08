@@ -146,6 +146,9 @@ function PanelHeader(p: { source: AudioSource }) {
 function PanelForm(p: { source: AudioSource }) {
   const { sourceId, forceMono, syncOffset, source, monitoringType } = p.source;
 
+  const [testing, setTesting] = useState(false);
+  const [savedMonitoring, setSavedMonitoring] = useState(monitoringType);
+
   const hasDevices = source ? !source.video : false;
   const isMic = source
     ? [
@@ -159,9 +162,31 @@ function PanelForm(p: { source: AudioSource }) {
   const { EditorCommandsService } = Services;
 
   function handleSettingsChange(name: string, value: TObsValue) {
+    console.log(value);
     EditorCommandsService.actions.executeCommand('SetAudioSettingsCommand', sourceId, {
       [name]: value,
     });
+  }
+
+  useEffect(() => {
+    if (testing) return;
+    setSavedMonitoring(monitoringType);
+  }, [monitoringType, testing]);
+  useEffect(() => {
+    // Ensure monitoring type is returned to normal upon destroy
+    return () => {
+      handleSettingsChange('monitoringType', savedMonitoring);
+    };
+  }, []);
+
+  function handleTestButtonClick() {
+    if (!testing) {
+      setTesting(true);
+      handleSettingsChange('monitoringType', 1);
+    } else {
+      handleSettingsChange('monitoringType', savedMonitoring);
+      setTesting(false);
+    }
   }
 
   return (
@@ -178,20 +203,25 @@ function PanelForm(p: { source: AudioSource }) {
         label={$t('Downmix to Mono')}
         value={forceMono}
         name="forceMono"
-        onInput={value => handleSettingsChange('forceMono', value)}
+        onChange={value => handleSettingsChange('forceMono', value)}
         tooltip={$t('Route audio to the central channel instead of left or right stereo channels')}
       />
       <ListInput
         label={$t('Audio Monitoring')}
         options={p.source.monitoringOptions}
         value={monitoringType}
+        disabled={testing}
         name="monitoringType"
-        onInput={value => handleSettingsChange('monitoringType', value)}
+        onChange={value => handleSettingsChange('monitoringType', value)}
         tooltip={$t(
           'Generally, enabling monitoring sends the audio through the Desktop Audio channel',
         )}
       />
-      {isMic && <AudioTestButton source={p.source} handleSettingsChange={handleSettingsChange} />}
+      {isMic && (
+        <Button onClick={handleTestButtonClick} type={testing ? 'default' : 'primary'}>
+          {testing ? $t('Testing...') : $t('Test Audio')}
+        </Button>
+      )}
     </Form>
   );
 }
@@ -229,45 +259,5 @@ function DeviceInputs(p: { source: Source }) {
         onInput={value => handleInput('use_device_timing', value)}
       />
     </>
-  );
-}
-
-function AudioTestButton(p: {
-  source: AudioSource;
-  handleSettingsChange: (name: string, value: number) => void;
-}) {
-  const [savedMonitoring, setSavedMonitoring] = useState(p.source.monitoringType);
-  const [testing, setTesting] = useState(false);
-  const [ignoreMonitoringUpdate, setIgnoreMonitoringUpdate] = useState(false);
-
-  useEffect(() => {
-    if (!ignoreMonitoringUpdate) {
-      setSavedMonitoring(p.source.monitoringType);
-    } else {
-      setIgnoreMonitoringUpdate(false);
-    }
-    // Ensure monitoring type is returned to normal upon destroy
-    return () => {
-      p.handleSettingsChange('monitoringType', savedMonitoring);
-    };
-  }, [p.source.monitoringType, ignoreMonitoringUpdate]);
-
-  function handleButtonClick() {
-    if (!testing) {
-      setIgnoreMonitoringUpdate(true);
-      p.handleSettingsChange('monitoringType', 1);
-      setTesting(true);
-    } else {
-      p.handleSettingsChange('monitoringType', savedMonitoring);
-      setTesting(false);
-    }
-  }
-
-  return (
-    <div>
-      <Button onClick={handleButtonClick} type={testing ? 'default' : 'primary'}>
-        {testing ? $t('Testing...') : $t('Test Audio')}
-      </Button>
-    </div>
   );
 }
