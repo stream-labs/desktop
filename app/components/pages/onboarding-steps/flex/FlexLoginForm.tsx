@@ -69,7 +69,7 @@ export default class FlexLoginForm extends TsxComponent<ConnectProps> {
         flextv: {
           type: 'flextv',
           username: nickname,
-          token: token,
+          token,
           id,
         },
       },

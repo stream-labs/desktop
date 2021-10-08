@@ -27,7 +27,7 @@ export class FlextvService
     settings: { title: '' },
   };
 
-  readonly apiBase = '';
+  readonly apiBase = 'https://www.hotaetv.com';
   readonly platform = 'flextv';
   readonly displayName = 'FlexTV';
   readonly capabilities = new Set<TPlatformCapability>(['resolutionPreset']);
@@ -72,7 +72,7 @@ export class FlextvService
       const { title, theme, resolution } = streamConfigs;
 
       await platformAuthorizedRequest<{ url: string; streamKey: string }>('flextv', {
-        url: 'https://www.hotaetv.com/api/m/channel/config',
+        url: `${this.apiBase}/api/m/channel/config`,
         method: 'PUT',
         body: JSON.stringify({
           title,
@@ -99,7 +99,7 @@ export class FlextvService
     }
     const { title, theme, resolution } = this.state.settings;
     await platformAuthorizedRequest<{ url: string; streamKey: string }>('flextv', {
-      url: 'https://www.hotaetv.com/api/my/channel/start-stream',
+      url: `${this.apiBase}/api/my/channel/start-stream`,
       method: 'POST',
       body: JSON.stringify({
         title,
@@ -111,7 +111,7 @@ export class FlextvService
 
   async afterStopStream() {
     return platformAuthorizedRequest<{ url: string; streamKey: string }>('flextv', {
-      url: 'https://www.hotaetv.com/api/my/channel/stop-stream',
+      url: `${this.apiBase}/api/my/channel/stop-stream`,
       method: 'POST',
     });
   }
@@ -119,7 +119,7 @@ export class FlextvService
   fetchStreamPair(): Promise<{ url: string; streamKey: string }> {
     return platformAuthorizedRequest<{ url: string; streamKey: string }>(
       'flextv',
-      `https://www.hotaetv.com/api/my/channel/stream-key`,
+      `${this.apiBase}/api/my/channel/stream-key`,
     );
   }
 
@@ -150,9 +150,22 @@ export class FlextvService
         minRatingLevel: 2;
         maxViewerCount: number;
       };
-    }>('flextv', 'https://www.hotaetv.com/api/m/channel/config');
+    }>('flextv', `${this.apiBase}/api/m/channel/config`);
     this.SET_PREPOPULATED(true);
     this.SET_STREAM_SETTINGS({ ...config.data });
+  }
+
+  async fetchUserInfo() {
+    const userInfo = await platformAuthorizedRequest<{
+      profile: {
+        nickname: string;
+      };
+    }>('flextv', `${this.apiBase}/api/my/profile`).catch(() => null);
+    if (!userInfo) return null
+
+    return {
+      username: userInfo.profile.nickname,
+    };
   }
 
   async putChannelInfo(): Promise<void> {
