@@ -25,8 +25,8 @@ class ObsResolutionInput extends ObsInput<IObsListInput<TObsValue>> {
   private customWidth = 0;
   private customHeight = 0;
   private customFieldsMetadata = formMetadata({
-    width: metadata.number({ title: $t('Width'), min: 1 }),
-    height: metadata.number({ title: $t('Height'), min: 1 }),
+    width: metadata.number({ title: $t('Width'), min: 8, max: 32 * 1024 }),
+    height: metadata.number({ title: $t('Height'), min: 8, max: 32 * 1024 }),
   });
 
   switchToCustomMode() {

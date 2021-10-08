@@ -21,6 +21,7 @@ import {
   GoLiveWindow,
   EditStreamWindow,
   IconLibraryProperties,
+  ScreenCaptureProperties,
   SharedComponentsLibrary,
   PerformanceMetrics,
   RenameSource,
@@ -142,6 +143,7 @@ export function getComponents() {
     GoLiveWindow,
     EditStreamWindow,
     IconLibraryProperties,
+    ScreenCaptureProperties,
     SharedComponentsLibrary,
     WidgetWindow,
   };
@@ -422,7 +424,14 @@ export class WindowsService extends StatefulService<IWindowsState> {
       height: 400,
       title: 'New Window',
       backgroundColor: '#17242D',
-      webPreferences: { nodeIntegration: true, webviewTag: true, enableRemoteModule: true },
+      show: false,
+      webPreferences: {
+        nodeIntegration: true,
+        webviewTag: true,
+        enableRemoteModule: true,
+        contextIsolation: false,
+        backgroundThrottling: false,
+      },
       ...options,
       ...options.size,
     }));
@@ -441,6 +450,8 @@ export class WindowsService extends StatefulService<IWindowsState> {
 
     const indexUrl = remote.getGlobal('indexUrl');
     newWindow.loadURL(`${indexUrl}?windowId=${windowId}`);
+
+    newWindow.show();
 
     return windowId;
   }

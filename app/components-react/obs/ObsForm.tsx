@@ -19,6 +19,7 @@ import { cloneDeep } from 'lodash';
 import { $t } from '../../services/i18n';
 import { Button } from 'antd';
 import InputWrapper from '../shared/inputs/InputWrapper';
+import { $t, $translateIfExist } from '../../services/i18n';
 
 interface IObsFormProps {
   value: IObsInput<TObsValue>[];
@@ -74,7 +75,7 @@ function ObsInput(p: IObsInputProps) {
     value: p.value.value as any,
     onChange: onChangeHandler,
     name: p.value.name,
-    label: p.value.description,
+    label: $translateIfExist(p.value.description),
     uncontrolled: false,
   };
 
@@ -98,7 +99,7 @@ function ObsInput(p: IObsInputProps) {
         }
         return {
           value: opt.value,
-          label: opt.description,
+          label: $translateIfExist(opt.description),
         };
       });
       return <ListInput {...inputProps} options={options} />;
