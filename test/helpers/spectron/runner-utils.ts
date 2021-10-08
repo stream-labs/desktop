@@ -6,9 +6,11 @@
 import avaTest, { TestInterface } from 'ava';
 import { ITestContext } from './index';
 import { uniq } from 'lodash';
+import * as tasklist from 'tasklist';
 const fs = require('fs');
 const fetch = require('node-fetch');
 const request = require('request');
+const kill = require('tree-kill');
 
 export interface ITestStats {
   duration: number;
@@ -153,4 +155,9 @@ export function requestUtilsServer(path: string, method = 'get', body?: unknown)
       })
       .catch((e: any) => reject(`Utility server is not available ${e}`));
   });
+}
+
+export async function killElectronInstances() {
+  const tasks = await tasklist();
+  tasks.filter(task => task.imageName === 'electron.exe').forEach(task => kill(task.pid));
 }
