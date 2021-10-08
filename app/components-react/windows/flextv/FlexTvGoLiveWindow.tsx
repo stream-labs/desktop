@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ModalLayout } from '../../shared/ModalLayout';
 import { Button } from 'antd';
-import { useOnDestroy } from '../../hooks';
+import { useOnCreate, useOnDestroy } from '../../hooks';
 import { Services } from '../../service-provider';
 import { $t } from '../../../services/i18n';
 import Form from '../../shared/inputs/Form';
@@ -17,12 +17,13 @@ export default function FlexTvGoLiveWindow() {
     goLive,
     isLoading,
     getSettings,
+    prepopulate,
     updateSettings,
     form,
-  } = useGoLiveSettings().select();
+  } = useGoLiveSettings({ isUpdateMode: true }).select();
 
   const [title, setTitle] = useState('');
-  const [category, setCategory] = useState('5');
+  const [theme, setTheme] = useState('5');
   const [resolution, useResolution] = useState('720');
   const [useMinFanLevel, setUseMinFanLevel] = useState('false');
   const [minFanLevel, setMinFanLevel] = useState('1');
@@ -39,6 +40,10 @@ export default function FlexTvGoLiveWindow() {
     }
   });
 
+  useOnCreate(() => {
+    prepopulate();
+  });
+
   useEffect(() => {
     console.log(getSettings(), 'gg');
   }, []);
@@ -47,7 +52,7 @@ export default function FlexTvGoLiveWindow() {
     WindowsService.actions.closeChildWindow();
   }
 
-  function handleConfirm() {
+  async function handleConfirm() {
     if (!title) {
       return;
     }
@@ -57,12 +62,13 @@ export default function FlexTvGoLiveWindow() {
           enabled: true,
           useCustomFields: true,
           title,
-          category,
+          theme,
           resolution,
         },
       },
     });
-    return goLive();
+    await goLive();
+    close();
   }
 
   function renderFooter() {
@@ -107,8 +113,8 @@ export default function FlexTvGoLiveWindow() {
                 label: '19+',
               },
             ]}
-            value={category}
-            onChange={setCategory}
+            value={theme}
+            onChange={setTheme}
           />
         </div>
         <div className="section thin">

@@ -3,13 +3,13 @@ import { InheritMutations } from '../core';
 import { BasePlatformService } from './base-platform';
 import { IPlatformCapabilityResolutionPreset, IPlatformState, TPlatformCapability } from './index';
 import { IGoLiveSettings } from '../streaming';
-import { platformAuthorizedRequest, platformRequest } from './utils';
+import { platformAuthorizedRequest } from './utils';
 import { WidgetType } from '../widgets';
-import { getDefined } from '../../util/properties-type-guards';
+import electron from 'electron';
 
 export interface IFlextvStartStreamOptions {
   title: string;
-  category?: string;
+  theme?: string;
   resolution?: string;
   useMinFanLevel?: boolean;
 }
@@ -22,18 +22,15 @@ interface IFlextvServiceState extends IPlatformState {
 export class FlextvService
   extends BasePlatformService<IFlextvServiceState>
   implements IPlatformCapabilityResolutionPreset {
+  static initialState: IFlextvServiceState = {
+    ...BasePlatformService.initialState,
+    settings: { title: '' },
+  };
+
   readonly apiBase = '';
   readonly platform = 'flextv';
   readonly displayName = 'FlexTV';
   readonly capabilities = new Set<TPlatformCapability>(['resolutionPreset']);
-
-  // support only donation widgets for now
-  readonly widgetsWhitelist = [
-    WidgetType.AlertBox,
-    WidgetType.DonationGoal,
-    WidgetType.DonationTicker,
-    WidgetType.TipJar,
-  ];
 
   readonly inputResolution = '720x1280';
   readonly outputResolution = '720x1280';
@@ -69,20 +66,54 @@ export class FlextvService
         });
       }
     }
-
     if (goLiveSettings) {
-      const channelInfo = goLiveSettings?.platforms.flextv;
-      console.log(channelInfo, 'settings');
-      // ToDo - 채널 셋팅 API 호출
-      // if (channelInfo) await this.putChannelInfo(channelInfo);
+      const streamConfigs = goLiveSettings?.platforms.flextv;
+      if (!streamConfigs) return;
+      const { title, theme, resolution } = streamConfigs;
+
+      await platformAuthorizedRequest<{ url: string; streamKey: string }>('flextv', {
+        url: 'https://www.hotaetv.com/api/m/channel/config',
+        method: 'PUT',
+        body: JSON.stringify({
+          title,
+          theme,
+          resolution,
+        }),
+      });
+      this.state.settings = {
+        title,
+        theme,
+        resolution,
+      };
     }
   }
 
   async afterGoLive() {
-    await platformAuthorizedRequest<{ url: string; streamKey: string }>(
-      'flextv',
-      `https://www.hotaetv.com/api/my/channel/start-stream`,
-    );
+    if (!this.state.settings) {
+      electron.remote.dialog.showMessageBox({
+        type: 'error',
+        message: '방송 설정이 없습니다.',
+        title: '송출 오류',
+      });
+      return;
+    }
+    const { title, theme, resolution } = this.state.settings;
+    await platformAuthorizedRequest<{ url: string; streamKey: string }>('flextv', {
+      url: 'https://www.hotaetv.com/api/my/channel/start-stream',
+      method: 'POST',
+      body: JSON.stringify({
+        title,
+        theme,
+        resolution,
+      }),
+    });
+  }
+
+  async afterStopStream() {
+    return platformAuthorizedRequest<{ url: string; streamKey: string }>('flextv', {
+      url: 'https://www.hotaetv.com/api/my/channel/stop-stream',
+      method: 'POST',
+    });
   }
 
   fetchStreamPair(): Promise<{ url: string; streamKey: string }> {
@@ -108,7 +139,20 @@ export class FlextvService
    * prepopulate channel info and save it to the store
    */
   async prepopulateInfo(): Promise<void> {
+    const config = await platformAuthorizedRequest<{
+      data: {
+        channelId: number;
+        themeId: number;
+        title: string;
+        resolution: number;
+        isForAdult: number;
+        password: string;
+        minRatingLevel: 2;
+        maxViewerCount: number;
+      };
+    }>('flextv', 'https://www.hotaetv.com/api/m/channel/config');
     this.SET_PREPOPULATED(true);
+    this.SET_STREAM_SETTINGS({ ...config.data });
   }
 
   async putChannelInfo(): Promise<void> {
