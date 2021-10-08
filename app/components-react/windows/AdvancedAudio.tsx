@@ -218,7 +218,11 @@ function PanelForm(p: { source: AudioSource }) {
         )}
       />
       {isMic && (
-        <Button onClick={handleTestButtonClick} type={testing ? 'default' : 'primary'}>
+        <Button
+          onClick={handleTestButtonClick}
+          type={testing ? 'default' : 'primary'}
+          style={{ marginLeft: '278px' }}
+        >
           {testing ? $t('Testing...') : $t('Test Audio')}
         </Button>
       )}
