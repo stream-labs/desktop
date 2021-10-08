@@ -6,10 +6,10 @@
 import avaTest, { TestInterface } from 'ava';
 import { ITestContext } from './index';
 import { uniq } from 'lodash';
-import * as tasklist from 'tasklist';
 const fs = require('fs');
 const fetch = require('node-fetch');
 const request = require('request');
+const tasklist = require('tasklist');
 const kill = require('tree-kill');
 
 export interface ITestStats {
@@ -159,5 +159,7 @@ export function requestUtilsServer(path: string, method = 'get', body?: unknown)
 
 export async function killElectronInstances() {
   const tasks = await tasklist();
-  tasks.filter(task => task.imageName === 'electron.exe').forEach(task => kill(task.pid));
+  tasks
+    .filter((task: any) => task.imageName === 'electron.exe')
+    .forEach((task: any) => kill(task.pid));
 }
