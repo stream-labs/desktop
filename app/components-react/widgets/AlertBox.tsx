@@ -166,7 +166,7 @@ function VariationSettings(p: { type: TAlertType }) {
 }
 
 /**
- * Additional settings for a Donation alerts
+ * Additional settings for donation alerts
  */
 function DonationSettings() {
   const { createVariationBinding } = useAlertBox();
