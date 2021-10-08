@@ -141,15 +141,10 @@ export class WidgetModule<TWidgetState extends IWidgetState = IWidgetState> {
    */
   private async fetchData(): Promise<TWidgetState['data']> {
     // load widget settings data into state
-    let rawData: any;
-    try {
-      rawData = await this.actions.return.request({
-        url: this.config.dataFetchUrl,
-        method: 'GET',
-      });
-    } catch (e: unknown) {
-      throw e;
-    }
+    const rawData = await this.actions.return.request({
+      url: this.config.dataFetchUrl,
+      method: 'GET',
+    });
     return this.patchAfterFetch(rawData);
   }
 

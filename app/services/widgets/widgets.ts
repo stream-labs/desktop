@@ -1,4 +1,3 @@
-import throttle from 'lodash/throttle';
 import { Inject } from 'services/core/injector';
 import { UserService } from '../user';
 import { ScenesService, SceneItem, Scene } from '../scenes';
@@ -9,7 +8,7 @@ import { ScalableRectangle } from 'util/ScalableRectangle';
 import namingHelpers from 'util/NamingHelpers';
 import fs from 'fs';
 import { ServicesManager } from 'services-manager';
-import {authorizedHeaders, handleResponse} from 'util/requests';
+import { authorizedHeaders, handleResponse } from 'util/requests';
 import { ISerializableWidget, IWidgetSource, IWidgetsServiceApi } from './widgets-api';
 import { WidgetType, WidgetDefinitions, WidgetTesters } from './widgets-data';
 import { mutation, StatefulService } from '../core/stateful-service';
@@ -21,8 +20,8 @@ import { Subscription } from 'rxjs';
 import { Throttle } from 'lodash-decorators';
 import { EditorCommandsService } from 'services/editor-commands';
 import { TWindowComponentName } from '../windows';
-import {THttpMethod} from "./settings/widget-settings";
-import {getEventsConfig, getWidgetsConfig} from "./widget-config";
+import { THttpMethod } from './settings/widget-settings';
+import { getEventsConfig, getWidgetsConfig } from './widget-config';
 
 export interface IWidgetSourcesState {
   widgetSources: Dictionary<IWidgetSource>;
