@@ -2,7 +2,7 @@
   "elements": [
     {
       "note": "最初に改行あるかどうかを優先してチェック",
-      "regularExpression": ".*[\n\r].*",
+      "regularExpression": "(.*[\n\r])+.*",
       "replacement": ""
     },
     {
@@ -26,7 +26,7 @@
       "replacement": "$1、ワラ$2"
     },
     {
-      "regularExpression": "㌧",
+      "text": "㌧",
       "replacement": "トン"
     },
     {
@@ -38,23 +38,19 @@
       "replacement": "ウプ"
     },
     {
-      "regularExpression": "厨",
+      "text": "厨",
       "replacement": "チュウ"
     },
     {
-      "regularExpression": "CH",
+      "text": "CH",
       "replacement": "チャンネル"
     },
     {
-      "regularExpression": "行って",
-      "replacement": "イッテ"
-    },
-    {
-      "regularExpression": "行った",
+      "text": "行った",
       "replacement": "イッタ"
     },
     {
-      "regularExpression": "ニコ生",
+      "text": "ニコ生",
       "replacement": "ニコナマ"
     },
     {
@@ -71,10 +67,6 @@
     },
     {
       "regularExpression": "&(APOS|LT|GT|QUOT);",
-      "replacement": ""
-    },
-    {
-      "regularExpression": "[＾Ω∞☠♭〇㈲＃#＄$＊\\*＾≧≦･＞＜．.×\"'<>^°]+",
       "replacement": ""
     },
     {
@@ -102,20 +94,108 @@
       "replacement": "びっくりはてな"
     },
     {
-      "regularExpression": "初見",
+      "text": "初見",
       "replacement": "しょけん"
     },
     {
-      "regularExpression": "古参",
+      "text": "古参",
       "replacement": "こさん"
     },
     {
-      "regularExpression": "生主",
+      "text": "(´・ω・｀)",
+      "replacement": "しょぼん"
+    },
+    {
+      "text": "新垣結衣",
+      "replacement": "あらがきゆい"
+    },
+    {
+      "text": "流行っている",
+      "replacement": "はやっている"
+    },
+    {
+      "text": "行って",
+      "replacement": "イッテ"
+    },
+    {
+      "text": "音々愛",
+      "replacement": "メメメ"
+    },
+    {
+      "text": "route",
+      "replacement": "るうと"
+    },
+    {
+      "text": "ニコ生ゲーム",
+      "replacement": "ニコナマゲーム"
+    },
+    {
+      "text": "生ゲーム",
+      "replacement": "ナマゲーム"
+    },
+    {
+      "text": "NAIR",
+      "replacement": "えぬえあー"
+    },
+    {
+      "text": "生放送主",
+      "replacement": "なまほうそうぬし"
+    },
+    {
+      "text": "生主",
       "replacement": "なまぬし"
     },
     {
-      "regularExpression": "放送主",
+      "text": "放送主",
       "replacement": "ほうそうぬし"
+    },
+    {
+      "text": "一途",
+      "replacement": "いちず"
+    },
+    {
+      "text": "⛵",
+      "replacement": "ヨット"
+    },
+    {
+      "text": "初戦",
+      "replacement": "しょせん"
+    },
+    {
+      "text": "筋トレ",
+      "replacement": "きんとれ"
+    },
+    {
+      "text": "一巡",
+      "replacement": "いちじゅん"
+    },
+    {
+      "text": "経験値",
+      "replacement": "けいけんち"
+    },
+    {
+      "text": "魔導士",
+      "replacement": "まどうし"
+    },
+    {
+      "text": "暴れた",
+      "replacement": "あばれた"
+    },
+    {
+      "text": "巡目",
+      "replacement": "じゅんめ"
+    },
+    {
+      "text": "間に合う",
+      "replacement": "まにあう"
+    },
+    {
+      "text": "相変わらず",
+      "replacement": "あいかわらず"
+    },
+    {
+      "regularExpression": "[＾Ω∞☠♭〇㈲＃#＄$＊\\*＾≧≦･＞＜．.×\"'<>^°]+",
+      "replacement": ""
     },
     {
       "note": "最後に長さチェック40文字を超える場合は41文字以降をリャク",
