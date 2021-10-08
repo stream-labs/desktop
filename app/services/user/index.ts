@@ -569,7 +569,10 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     this.windowsService.showWindow({
       componentName: 'WelcomeToPrime',
       title: '',
-      size: { width: 1000, height: 720 },
+      size: {
+        width: 1000,
+        height: 720,
+      },
     });
   }
 
@@ -604,9 +607,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     const i18nService = I18nService.instance as I18nService; // TODO: replace with getResource('I18nService')
     const locale = i18nService.state.locale;
     // eslint-disable-next-line
-    return `https://${
-      this.hostsService.streamlabs
-    }/slobs/dashboard?oauth_token=${token}&mode=${nightMode}&r=${subPage}&l=${locale}&hidenav=${hideNav}`;
+    return `https://${this.hostsService.streamlabs}/slobs/dashboard?oauth_token=${token}&mode=${nightMode}&r=${subPage}&l=${locale}&hidenav=${hideNav}`;
   }
 
   appStoreUrl(appId?: string) {
@@ -666,6 +667,9 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
 
   @RunInLoadingMode()
   private async login(service: IPlatformService, auth?: IUserAuth) {
+    if (service && service.platform === 'flextv') {
+      return this.loginFlexTV(service, auth);
+    }
     if (!auth) auth = this.state.auth;
     this.LOGIN(auth);
     this.VALIDATE_LOGIN(true);
@@ -762,15 +766,15 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
 
     const auth =
       mode === 'internal'
-        /* eslint-disable */
-        ? await this.authModule.startInternalAuth(
-          authUrl,
-          service.authWindowOptions,
-          onWindowShow,
-          merge,
-        )
+        ? /* eslint-disable */
+          await this.authModule.startInternalAuth(
+            authUrl,
+            service.authWindowOptions,
+            onWindowShow,
+            merge,
+          )
         : await this.authModule.startExternalAuth(authUrl, onWindowShow, merge);
-        /* eslint-enable */
+    /* eslint-enable */
 
     this.SET_AUTH_STATE(EAuthProcessState.Busy);
     this.SET_IS_RELOG(false);
@@ -869,6 +873,31 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     } as LoginLifecycle;
   }
 
+  @RunInLoadingMode()
+  private async loginFlexTV(service: IPlatformService, auth?: IUserAuth) {
+    if (!auth) auth = this.state.auth;
+    this.LOGIN(auth);
+    this.VALIDATE_LOGIN(true);
+
+    this.userLogin.next(auth);
+
+    if (!service) {
+      service = getPlatformService(this.platform.type);
+    }
+    const userInfo = await service.fetchUserInfo();
+    if (!userInfo) {
+      this.logOut();
+      electron.remote.dialog.showMessageBox({
+        title: 'FlexTV Broadcaster',
+        message: $t('You have been logged out'),
+      });
+      return;
+    }
+    await Promise.all([this.refreshUserInfo(), this.sceneCollectionsService.setupNewUser()]);
+
+    return EPlatformCallResult.Success;
+  }
+
   /**
    * FlexTV only
    */
@@ -876,6 +905,6 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     const service = getPlatformService('flextv');
     this.streamSettingsService.resetStreamSettings();
 
-    return this.login(service, auth);
+    return this.loginFlexTV(service, auth);
   }
 }
