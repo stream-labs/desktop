@@ -1,7 +1,6 @@
 import React, { ChangeEvent, RefObject, useEffect, useRef, useState } from 'react';
 import { TSlobsInputProps, useInput } from './inputs';
-import { Button, Col, Collapse, Input, Popover, Row, Select, Tooltip } from 'antd';
-import { SketchPicker } from 'react-color';
+import { Button, Input, Popover } from 'antd';
 import InputWrapper from './InputWrapper';
 import { omit } from 'lodash';
 import { getOS, OS } from '../../../util/operating-systems';
@@ -13,18 +12,9 @@ import { findDOMNode } from 'react-dom';
 import { getDefined } from '../../../util/properties-type-guards';
 
 export function ColorInput(p: TSlobsInputProps<{}, string>) {
-  // const [color, setColor] = useState('#ff0000');
-  // return (
-  //   <SketchPicker
-  //     color={color}
-  //     onChange={color => setColor(color.hex)}
-  //   />
-  // );
-
   // set default debounce to 500
   const debounce = p.debounce === undefined ? 500 : p.debounce;
   const { wrapperAttrs, inputAttrs } = useInput('color', { ...p, debounce });
-  const color = inputAttrs.value;
   const divAttrs = omit(inputAttrs, 'onChange');
   const [textInputVal, setTextInputVal] = useState(inputAttrs.value);
 
@@ -62,8 +52,11 @@ export function ColorInput(p: TSlobsInputProps<{}, string>) {
   }
 
   function onTextInputChange(ev: ChangeEvent<any>) {
+    // update textInput state
     const color = ev.target.value;
     setTextInputVal(color);
+
+    // emit onChange if textInput contains a valid color
     const isValidColor = color.match(/^#(?:[0-9a-fA-F]{3}){1,2}$/);
     if (!isValidColor) return;
     inputAttrs.onChange(color.toLowerCase());
@@ -90,11 +83,12 @@ export function ColorInput(p: TSlobsInputProps<{}, string>) {
           onChange={onTextInputChange}
           onBlur={onTextInputBlur}
           ref={ref}
+          // render color box
           prefix={
             <span style={{ width: '22px' }}>
               <div
                 style={{
-                  backgroundColor: color,
+                  backgroundColor: inputAttrs.value,
                   position: 'absolute',
                   borderRadius: '2px',
                   left: '2px',
@@ -105,6 +99,7 @@ export function ColorInput(p: TSlobsInputProps<{}, string>) {
               />
             </span>
           }
+          // render eyedropper button
           addonAfter={
             getOS() === OS.Windows ? (
               <Button title={$t('Pick Screen Color')} style={{ padding: '4px 9px' }}>

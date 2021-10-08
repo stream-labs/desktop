@@ -731,5 +731,7 @@ const fonts = [
 ];
 
 export function FontFamilyInput(p: TSlobsInputProps<{}, string>) {
-  return <ListInput {...p} options={fonts.map(font => ({ label: font, value: font }))} />;
+  return (
+    <ListInput {...p} showSearch options={fonts.map(font => ({ label: font, value: font }))} />
+  );
 }

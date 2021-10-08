@@ -63,8 +63,6 @@
   },
   "dependencies": {
     "@reduxjs/toolkit": "^1.5.1",
-    "@types/react-color": "^3.0.5",
-    "@types/webpack-env": "^1.16.2",
     "abort-controller": "^3.0.0",
     "archiver": "2.1.1",
     "aws-sdk": "^2.344.0",
@@ -84,7 +82,6 @@
     "obs-studio-node": "https://s3-us-west-2.amazonaws.com/obsstudionodes3.streamlabs.com/osn-0.0.0-release.tar.gz",
     "overlayscrollbars-react": "^0.2.2",
     "raven": "^2.6.4",
-    "react-color": "^2.19.3",
     "react-colorful": "^5.5.0",
     "react-devtools-electron": "^4.7.0",
     "react-redux": "^7.2.4",

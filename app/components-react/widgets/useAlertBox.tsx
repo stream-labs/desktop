@@ -344,26 +344,3 @@ type PickValue<T> = T extends { value?: infer TValue } ? TValue : never;
 type PickValues<T> = {
   [fieldName in keyof T]: PickValue<T[fieldName]>;
 };
-
-// type TVariationsSettings = {
-//   [variationName in keyof TVariationMetadata]: TVariationSettings
-// };
-
-// const md = (null as unknown) as TVariationsMetadata;
-// const settings = (null as unknown) as TVariationsSettings;
-//
-// function getVariationSettings<T extends TAlertType>(alertType: T) {
-//   return settings[alertType];
-// }
-//
-// function getVariationMetadata<T extends TAlertType>(alertType: T) {
-//   return md[alertType];
-// }
-// const donationMetadata = getVariationMetadata('donation');
-// const md_min_amount = donationMetadata.alert_message_min_amount;
-// const md_commonProp = donationMetadata.testCommonProp;
-//
-// const donationSettings = getVariationSettings('donation');
-// const alert_duration = donationSettings.alert_duration;
-// const min_amount = donationSettings.alert_message_min_amount;
-// const commonProp = donationSettings.testCommonProp;
