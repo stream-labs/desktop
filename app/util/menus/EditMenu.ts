@@ -228,6 +228,7 @@ export class EditMenu extends Menu {
               // remove a global source
               electron.remote.dialog
                 .showMessageBox(electron.remote.getCurrentWindow(), {
+                  title: 'Streamlabs OBS',
                   message: $t('This source will be removed from all of your scenes'),
                   type: 'warning',
                   buttons: [$t('Cancel'), $t('OK')],

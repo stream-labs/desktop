@@ -13,6 +13,6 @@
   "Sync Offset ( ms )": "Szinkron Eltolás ( ms )",
   "Mixer": "Keverő",
   "Monitor audio levels. If the bars are moving you are outputting audio.": "Hangszintek Figyelése. Ha a sávok mozognak, van hangkimenet.",
-  "Muted": "Muted",
-  "Hide in Mixer": "Hide in Mixer"
+  "Muted": "Némítva",
+  "Hide in Mixer": "Elrejtés a keverőben"
 }

@@ -21,6 +21,7 @@ import {
   GoLiveWindow,
   EditStreamWindow,
   IconLibraryProperties,
+  ScreenCaptureProperties,
   SharedComponentsLibrary,
   PerformanceMetrics,
   RenameSource,
@@ -75,7 +76,7 @@ import { byOS, OS } from 'util/operating-systems';
 import { UsageStatisticsService } from './usage-statistics';
 import { Inject } from 'services/core';
 import MessageBoxModal from 'components/shared/modals/MessageBoxModal';
-import Modal from 'components/shared/modals/modal';
+import Modal from 'components/shared/modals/Modal';
 
 const { ipcRenderer, remote } = electron;
 const BrowserWindow = remote.BrowserWindow;
@@ -141,6 +142,7 @@ export function getComponents() {
     GoLiveWindow,
     EditStreamWindow,
     IconLibraryProperties,
+    ScreenCaptureProperties,
     SharedComponentsLibrary,
   };
 }
@@ -420,7 +422,14 @@ export class WindowsService extends StatefulService<IWindowsState> {
       height: 400,
       title: 'New Window',
       backgroundColor: '#17242D',
-      webPreferences: { nodeIntegration: true, webviewTag: true, enableRemoteModule: true },
+      show: false,
+      webPreferences: {
+        nodeIntegration: true,
+        webviewTag: true,
+        enableRemoteModule: true,
+        contextIsolation: false,
+        backgroundThrottling: false,
+      },
       ...options,
       ...options.size,
     }));
@@ -439,6 +448,8 @@ export class WindowsService extends StatefulService<IWindowsState> {
 
     const indexUrl = remote.getGlobal('indexUrl');
     newWindow.loadURL(`${indexUrl}?windowId=${windowId}`);
+
+    newWindow.show();
 
     return windowId;
   }

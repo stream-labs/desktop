@@ -13,6 +13,6 @@
   "Sync Offset ( ms )": "同步偏移 ( ms )",
   "Mixer": "混音器",
   "Monitor audio levels. If the bars are moving you are outputting audio.": "監控音訊音量。如果橫條移動表示您正在輸出音訊。",
-  "Muted": "Muted",
-  "Hide in Mixer": "Hide in Mixer"
+  "Muted": "已靜音",
+  "Hide in Mixer": "隱藏在混音器中"
 }

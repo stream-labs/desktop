@@ -46,6 +46,7 @@ export { ToggleFilterCommand } from './toggle-filter';
 export { MuteSourceCommand } from './mute-source';
 export { SetDeflectionCommand } from './set-deflection';
 export { EditSourcePropertiesCommand } from './edit-source-properties';
+export { EditSourceSettingsCommand } from './edit-source-settings';
 export { HideMixerSourceCommand } from './hide-mixer-source';
 export { UnhideMixerSourcesCommand } from './unhide-mixer-sources';
 export { SetAudioSettingsCommand } from './set-audio-settings';
