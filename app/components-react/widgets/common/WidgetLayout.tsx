@@ -76,7 +76,7 @@ function BrowserSourceSettings() {
   const { browserSourceProps, updateBrowserSourceProps } = useWidget();
   return (
     <Collapse bordered={false}>
-      <Collapse.Panel header={$t('Browser Source Settings')} key={1}>
+      <Collapse.Panel header={$t('Browser Settings')} key={1}>
         <ObsForm
           value={browserSourceProps}
           onChange={updateBrowserSourceProps}

@@ -8,7 +8,7 @@ import {
   DateInput,
   ImageInput,
   ListInput,
-  MediaGalleryInput,
+  MediaUrlInput,
   NumberInput,
   SliderInput,
   SwitchInput,
@@ -236,8 +236,7 @@ function Examples() {
       </Example>
 
       <Example title="Media Gallery">
-        <MediaGalleryInput label="Image" {...globalProps} {...bind.galleryImage} />
-        <MediaGalleryInput label="Audio" {...globalProps} isAudio {...bind.galleryAudio} />
+        <MediaUrlInput label="Image" {...globalProps} {...bind.galleryImage} />
       </Example>
 
       <Example title="Buttons">
