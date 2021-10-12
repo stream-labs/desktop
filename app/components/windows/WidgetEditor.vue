@@ -418,7 +418,7 @@
   position: absolute;
   display: flex;
   top: 0;
-  left: 215px;
+  left: 225px;
   align-items: center;
   height: 24px;
   border-left: 1px solid var(--border);

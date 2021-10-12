@@ -39,6 +39,23 @@ body {
     transition: none;
   }
 
+  // remove primary color from focused buttons
+  .ant-btn:hover:not(.ant-btn-primary),
+  .ant-btn:focus:not(.ant-btn-primary) {
+    border-color: var(--button);
+  }
+
+  // change colors of dangerous button
+  .ant-btn-dangerous {
+    color: var(--paragraph);
+    background-color: var(--red);
+    &:hover,
+    &:focus {
+      background-color: var(--red-semi);
+      border-color: var(--red);
+    }
+  }
+
   // allow buttons to be placed after inputs without jank
   .ant-input-group-addon {
     border: 0;
