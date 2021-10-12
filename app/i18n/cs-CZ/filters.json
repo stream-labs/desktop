@@ -20,7 +20,7 @@
   "Filter name": "Název filtru",
   "Add source filter": "Přidat filtrování zdroje",
   "No filters applied": "Nebyly použity žádné filtry",
-  "Filters for %{sourceName}": "Filters for %{sourceName}",
+  "Filters for %{sourceName}": "Filtry pro %{sourceName}",
   "Invert Polarity": "Obrátit polaritu",
   "Limiter": "Limiter",
   "Expander": "Expander",
