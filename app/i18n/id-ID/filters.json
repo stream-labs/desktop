@@ -20,7 +20,7 @@
   "Filter name": "Nama filter",
   "Add source filter": "Tambahkan filter sumber",
   "No filters applied": "Tidak ada filter yang diterapkan",
-  "Filters for %{sourceName}": "Filters for %{sourceName}",
+  "Filters for %{sourceName}": "Filter untuk %{sourceName}",
   "Invert Polarity": "Invert Polarity",
   "Limiter": "Limiter",
   "Expander": "Expander",
