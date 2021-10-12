@@ -1,10 +1,10 @@
 {
-  "Emote Wall": "Emote Wall",
-  "Display and animate emotes that are seen in chat, improving chat participation via positive feedback.": "Display and animate emotes that are seen in chat, improving chat participation via positive feedback.",
-  "Wall Settings": "Wall Settings",
-  "Emote Scale": "Emote Scale",
-  "Combo Required": "Combo Required",
-  "Combo Count": "Combo Count",
-  "Combo Timeframe": "Combo Timeframe",
-  "Ignore Duplicates": "Ignore Duplicates"
+  "Emote Wall": "Стена эмодзи",
+  "Display and animate emotes that are seen in chat, improving chat participation via positive feedback.": "Показывайте и анимируйте эмодзи в чате, которые, добавляя положительных эмоций, побуждают зрителей более активно участвовать в разговоре.",
+  "Wall Settings": "Настройки стены",
+  "Emote Scale": "Размер эмодзи",
+  "Combo Required": "Требуется комбинация",
+  "Combo Count": "Счетчик комбинации",
+  "Combo Timeframe": "Время сброса комбинации",
+  "Ignore Duplicates": "Игнорировать повторы"
 }
