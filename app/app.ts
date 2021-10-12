@@ -55,6 +55,17 @@ if (isProduction) {
 let usingSentry = false;
 const windowId = Utils.getWindowId();
 
+// TODO: Remove after 1.6.0
+const styleSheets = document.styleSheets;
+
+for (let i = 0; i < styleSheets.length; i++) {
+  const sheet = styleSheets[i];
+  if (sheet.href?.match(/foundation\.min\.css/)) {
+    sheet.disabled = true;
+    break;
+  }
+}
+
 function wrapLogFn(fn: string) {
   const old: Function = console[fn];
   console[fn] = (...args: any[]) => {
