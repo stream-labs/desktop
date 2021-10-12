@@ -190,7 +190,7 @@ function DonationSettings() {
         <Alert
           message={
             <span>
-              {$t('Add a payment method?')} <a>{$t('Click here')}</a>
+              {$t('Need to set up tipping?')} <a>{$t('Click here')}</a>
             </span>
           }
           type="info"
