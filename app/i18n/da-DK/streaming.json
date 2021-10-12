@@ -157,12 +157,12 @@
   "canNotDisablePrimaryPlatform": "Du kan ikke deaktivere den platform som du brugte til at logge ind med.<br/> Vil du <switch-account-link>logge ind på en anden konto</switch-account-link> i stedet?",
   "Your stream title or description contain banned words": "Titlen på eller beskrivelsen af din stream indeholder forbudte ord",
   "Platform": "Platform",
-  "Update scheduled event": "Update scheduled event",
-  "Schedule new stream": "Schedule new stream",
-  "Stream scheduled": "Stream scheduled",
+  "Update scheduled event": "Opdater planlagt begivenhed",
+  "Schedule new stream": "Planlæg ny stream",
+  "Stream scheduled": "Stream planlagt",
   "Invalid settings. Please check the form": "Ugyldige indstillinger. Kontrollér formularen",
   "Common Stream Settings": "Hyppigt brugte streamindstillinger",
-  "Schedule Stream for %{formattedDate}": "Schedule Stream for %{formattedDate}",
-  "Update Scheduled Stream for %{formattedDate}": "Update Scheduled Stream for %{formattedDate}",
+  "Schedule Stream for %{formattedDate}": "Planlæg stream til %{formattedDate}",
+  "Update Scheduled Stream for %{formattedDate}": "Upload planlagt stream til %{formattedDate}",
   "You can not schedule to a past date": "You can not schedule to a past date"
 }
