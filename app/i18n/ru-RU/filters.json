@@ -20,7 +20,7 @@
   "Filter name": "Название фильтра",
   "Add source filter": "Добавить фильтр источника",
   "No filters applied": "Фильтры не применены",
-  "Filters for %{sourceName}": "Filters for %{sourceName}",
+  "Filters for %{sourceName}": "Фильтры %{sourceName}",
   "Invert Polarity": "Инвертировать полярность",
   "Limiter": "Ограничитель",
   "Expander": "Расширитель",
