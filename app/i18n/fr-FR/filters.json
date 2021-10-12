@@ -20,7 +20,7 @@
   "Filter name": "Nom du filtre",
   "Add source filter": "Ajouter le filtre source",
   "No filters applied": "Aucun filtre appliqué",
-  "Filters for %{sourceName}": "Filters for %{sourceName}",
+  "Filters for %{sourceName}": "Filtres pour %{sourceName}",
   "Invert Polarity": "Inverser la polarité",
   "Limiter": "Limiter",
   "Expander": "Expandeur",
