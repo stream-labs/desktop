@@ -92,7 +92,7 @@ function LegacyLink() {
     <Alert
       message={
         <span>
-          {$t('Looking for legacy AlertBox Settings?')} <a>{$t('Click here')}</a>
+          {$t('Looking for the old AlertBox settings?')} <a>{$t('Click here')}</a>
         </span>
       }
       onClick={switchToLegacyAlertbox}
@@ -171,14 +171,11 @@ function VariationSettings(p: { type: TAlertType }) {
 function DonationSettings() {
   const { createVariationBinding } = useAlertBox();
   const bind = createVariationBinding('donation', 'default', useForceUpdate());
-  const { HostsService, UsageStatisticsService } = Services;
+  const { HostsService, UsageStatisticsService, MagicLinkService } = Services;
   const host = HostsService.streamlabs;
 
   function openDonationSettings() {
-    electron.remote.shell.openExternal(
-      `https://${host}/dashboard#/settings/donation-settings?ref=slobs`,
-    );
-    UsageStatisticsService.actions.recordFeatureUsage('openDonationSettings');
+    MagicLinkService.actions.openDonationSettings();
   }
 
   function openTipPageSettings() {
