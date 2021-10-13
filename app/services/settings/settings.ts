@@ -460,6 +460,10 @@ export class SettingsService extends StatefulService<ISettingsServiceState> {
       this.findSetting(this.state.Output.formData, 'Streaming', 'StreamEncoder');
     const encoderIsValid = !!encoderSetting.options.find(opt => opt.value === encoderSetting.value);
 
+    // The backend incorrectly defaults to obs_x264 in Simple mode rather x264.
+    // In this case we shouldn't do anything here.
+    if (encoderSetting.value === 'obs_x264') return;
+
     if (!encoderIsValid) {
       const mode: string = this.findSettingValue(this.state.Output.formData, 'Untitled', 'Mode');
 

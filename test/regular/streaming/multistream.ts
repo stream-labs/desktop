@@ -12,6 +12,7 @@ import { logIn } from '../../helpers/modules/user';
 import { releaseUserInPool, reserveUserFromPool } from '../../helpers/spectron/user';
 import { showSettingsWindow } from '../../helpers/modules/settings/settings';
 import { test, useSpectron } from '../../helpers/spectron';
+import {sleep} from "../../helpers/sleep";
 
 useSpectron();
 
