@@ -146,8 +146,8 @@
           </div>
         </div>
       </div>
-
-      <div class="sources" :class="{ 'sources--has-platform-apps': showAppSources }">
+      
+      <div class="sources" :class="{ 'sources--has-platform-apps': showAppSources }" style='display: block'>
         <div class="source-group">
           <h3>{{ $t('Standard') }}</h3>
           <scrollable className="source-list">
@@ -182,7 +182,7 @@
           </button>
         </div>
 
-        <div class="source-group" v-if="loggedIn">
+        <div class="source-group" v-if="false">
           <h3>{{ $t('Widgets') }}</h3>
           <scrollable className="source-list">
             <div
