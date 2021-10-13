@@ -88,7 +88,7 @@ export function MediaInputButtons(p: {
           </Button>
         </Tooltip>
 
-        <Tooltip title={$t('Change media')}>
+        <Tooltip title={$t('Change Media')}>
           <Button type="link" onClick={pickFromGallery}>
             <CloudDownloadOutlined />
           </Button>
