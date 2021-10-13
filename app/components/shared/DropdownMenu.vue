@@ -33,6 +33,8 @@
   align-items: center;
   font-size: 14px;
   color: var(--title);
+  background-color: transparent;
+  border: none;
 
   span {
     max-width: 300px;

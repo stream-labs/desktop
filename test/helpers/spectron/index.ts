@@ -8,7 +8,7 @@ import { getUser, logOut } from './user';
 import { sleep } from '../sleep';
 
 import {
-  ITestStats,
+  ITestStats, killElectronInstances,
   removeFailedTestFromFile,
   saveFailedTestsToFile,
   saveTestStatsToFile,
@@ -141,6 +141,7 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
     if (options.networkLogging) appArgs.push('--network-logging');
     if (options.noSync) appArgs.push('--nosync');
 
+    await killElectronInstances();
     app = t.context.app = new Application({
       path: path.join(__dirname, '..', '..', '..', '..', 'node_modules', '.bin', 'electron.cmd'),
       args: [
@@ -205,6 +206,7 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
       fail('Crash on shutdown');
       console.error(e);
     }
+    await killElectronInstances();
     appIsRunning = false;
     await checkErrorsInLogFile(t);
     logFileLastReadingPos = 0;

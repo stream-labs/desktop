@@ -52,12 +52,7 @@ export const FileInput = InputComponent((p: TFileInputProps) => {
       <Input
         disabled
         value={p.value}
-        style={{ marginRight: '16px' }}
-        addonAfter={
-          <Button onClick={showFileDialog} style={{ margin: '0 -11px' }}>
-            {$t('Browse')}
-          </Button>
-        }
+        addonAfter={<Button onClick={showFileDialog}>{$t('Browse')}</Button>}
       />
     </InputWrapper>
   );

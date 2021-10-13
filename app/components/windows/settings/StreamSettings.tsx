@@ -46,9 +46,9 @@ export default class StreamSettings extends TsxComponent {
     enabled: false,
   };
   private customDestMetadata = formMetadata({
-    name: metadata.text({ title: $t('Name'), required: true }),
-    url: metadata.text({ title: 'URL', required: true }),
-    streamKey: metadata.text({ title: $t('Stream Key'), masked: true }),
+    name: metadata.text({ title: $t('Name'), required: true, fullWidth: true }),
+    url: metadata.text({ title: 'URL', required: true, fullWidth: true }),
+    streamKey: metadata.text({ title: $t('Stream Key'), masked: true, fullWidth: true }),
   });
 
   private editCustomDestMode: boolean | number = false;
@@ -195,7 +195,11 @@ export default class StreamSettings extends TsxComponent {
             <br />
 
             {this.canEditSettings && (
-              <button class="button button--warn" onClick={() => this.enableProtectedMode()}>
+              <button
+                class="button button--warn"
+                style={{ color: 'var(--paragraph)' }}
+                onClick={() => this.enableProtectedMode()}
+              >
                 {$t('Use recommended settings')}
               </button>
             )}

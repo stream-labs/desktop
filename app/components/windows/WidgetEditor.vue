@@ -418,7 +418,7 @@
   position: absolute;
   display: flex;
   top: 0;
-  left: 215px;
+  left: 225px;
   align-items: center;
   height: 24px;
   border-left: 1px solid var(--border);
@@ -442,7 +442,7 @@
   height: 6px;
   position: absolute;
   top: calc(~'50% - 3px');
-  left: 200px;
+  left: 210px;
   transform: translate(0, -50%);
   background-color: var(--button);
 }

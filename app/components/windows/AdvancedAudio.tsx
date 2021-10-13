@@ -56,7 +56,7 @@ export default class AdvancedAudio extends Vue {
     return (
       <ModalLayout showControls={false}>
         <form slot="content">
-          <table>
+          <table style={{ width: '100%' }}>
             {this.tableHeaders}
 
             {this.audioSources.map(audioSource => (
