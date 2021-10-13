@@ -6,6 +6,7 @@ import { CheckboxInput, NumberInput } from 'components-react/shared/inputs';
 import { Services } from 'components-react/service-provider';
 import { useVuex } from 'components-react/hooks';
 import { Button, message } from 'antd';
+import Translate from 'components-react/shared/Translate';
 
 export default function SafeMode() {
   const { RecentEventsService, WindowsService } = Services;
@@ -80,19 +81,43 @@ export default function SafeMode() {
             />
           </div>
           <div className="section">
-            <NumberInput
-              label={$t('Duration in minutes')}
+            <CheckboxInput
+              label={$t('Automatically disable Safe Mode')}
               tooltip={$t(
                 'Safe Mode will automatically be disabled after this many minutes, or until you click the button again.',
               )}
-              value={v.timeInMinutes}
-              onInput={val =>
-                RecentEventsService.actions.setSafeModeSettings({ timeInMinutes: val })
+              value={v.enableTimer}
+              onChange={val =>
+                RecentEventsService.actions.setSafeModeSettings({ enableTimer: val })
               }
-              min={1}
-              max={200}
-              uncontrolled
             />
+            {v.enableTimer && (
+              <div style={{ marginTop: 8 }}>
+                <Translate
+                  message={$t('Disable after <duration></duration> minutes')}
+                  renderSlots={{
+                    duration: () => {
+                      return (
+                        <span style={{ margin: '0 8px' }} key="duration">
+                          <NumberInput
+                            value={v.timeInMinutes}
+                            onInput={val =>
+                              RecentEventsService.actions.setSafeModeSettings({
+                                timeInMinutes: val,
+                              })
+                            }
+                            min={1}
+                            max={200}
+                            uncontrolled
+                            nowrap
+                          />
+                        </span>
+                      );
+                    },
+                  }}
+                />
+              </div>
+            )}
           </div>
         </Form>
       </>

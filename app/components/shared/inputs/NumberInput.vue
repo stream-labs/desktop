@@ -76,6 +76,9 @@
 
 .number-input.full-width {
   width: 100%;
+  input {
+    width: 100%;
+  }
 }
 
 .number-input.disabled {

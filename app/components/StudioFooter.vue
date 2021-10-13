@@ -173,8 +173,9 @@
   align-items: center;
   justify-content: center;
   border-radius: 100%;
-  box-sizing: content-box;
+  box-sizing: border-box;
   letter-spacing: 0.2px;
+  border: none;
 
   span {
     font-size: 10px;
