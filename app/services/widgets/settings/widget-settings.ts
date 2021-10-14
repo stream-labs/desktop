@@ -34,6 +34,7 @@ interface ISocketEvent {
 
 /**
  * base class for widget settings
+ * @deprecated
  */
 export abstract class WidgetSettingsService<TWidgetData extends IWidgetData>
   extends StatefulService<IWidgetSettingsState<TWidgetData>>
