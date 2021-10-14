@@ -21,7 +21,7 @@ import { VideoEncodingOptimizationService } from 'services/video-encoding-optimi
 import { PlatformAppsService } from 'services/platform-apps';
 import { EDeviceType, HardwareService } from 'services/hardware';
 import { StreamingService } from 'services/streaming';
-import { byOS, getOS, OS } from 'util/operating-systems';
+import { byOS, OS } from 'util/operating-systems';
 import path from 'path';
 import fs from 'fs';
 import { UsageStatisticsService } from 'services/usage-statistics';
@@ -455,8 +455,6 @@ export class SettingsService extends StatefulService<ISettingsServiceState> {
   }
 
   private ensureValidEncoder() {
-    if (getOS() === OS.Mac) return;
-
     const encoderSetting: IObsListInput<string> =
       this.findSetting(this.state.Output.formData, 'Streaming', 'Encoder') ??
       this.findSetting(this.state.Output.formData, 'Streaming', 'StreamEncoder');
@@ -475,7 +473,7 @@ export class SettingsService extends StatefulService<ISettingsServiceState> {
         this.setSettingValue('Output', 'StreamEncoder', 'x264');
       }
 
-      electron.remote.dialog.showMessageBox(this.windowsService.windows.main, {
+      electron.remote.dialog.showMessageBox(electron.remote.getCurrentWindow(), {
         type: 'error',
         message:
           'Your stream encoder has been reset to Software (x264). This can be caused by out of date graphics drivers. Please update your graphics drivers to continue using hardware encoding.',
