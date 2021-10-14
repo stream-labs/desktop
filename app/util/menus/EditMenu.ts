@@ -252,8 +252,10 @@ export class EditMenu extends Menu {
         click: () => this.sourcesService.showRenameSource(this.source.sourceId),
       });
 
+      const filtersCount = this.sourceFiltersService.getFilters(this.source.sourceId).length;
+
       this.append({
-        label: $t('Filters'),
+        label: $t('Filters') + (filtersCount > 0 ? ` (${filtersCount})` : ''),
         submenu: new FiltersMenu(this.source.sourceId).menu,
       });
 
@@ -325,10 +327,6 @@ export class EditMenu extends Menu {
         click: () => this.editorCommandsService.executeCommand('UnhideMixerSourcesCommand'),
       });
     }
-  }
-
-  private showFilters() {
-    this.sourceFiltersService.showSourceFilters(this.source.sourceId);
   }
 
   private showProperties() {
