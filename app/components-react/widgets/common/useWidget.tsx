@@ -1,7 +1,7 @@
 import { useModuleByName, useModuleRoot } from '../../hooks/useModule';
 import { WidgetTesters, WidgetType } from '../../../services/widgets';
 import { Services } from '../../service-provider';
-import {mutation, watch} from '../../store';
+import { mutation } from '../../store';
 import { throttle } from 'lodash-decorators';
 import { assertIsDefined, getDefined } from '../../../util/properties-type-guards';
 import { TAlertType, TWidgetType } from '../../../services/widgets/widget-config';
