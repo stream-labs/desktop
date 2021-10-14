@@ -3,7 +3,8 @@ import Form from '../../shared/inputs/Form';
 import {
   ColorInput,
   ListInput,
-  MediaGalleryInput,
+  MediaUrlInput,
+  AudioUrlInput,
   SliderInput,
   TextInput,
 } from '../../shared/inputs';
@@ -83,9 +84,9 @@ function CustomField(p: ICustomField & { name: string; onChange: (val: any) => u
       );
 
     case 'sound-input':
-      return <MediaGalleryInput {...commonProps} isAudio />;
+      return <AudioUrlInput {...commonProps} />;
     case 'image-input':
-      return <MediaGalleryInput {...commonProps} />;
+      return <MediaUrlInput {...commonProps} />;
     default:
       return <></>;
   }
