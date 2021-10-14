@@ -171,6 +171,9 @@ class ReduxModuleManager {
     this.immerState = immerState;
   }
 
+  /**
+   * Run watcher functions registered in modules
+   */
   runWatchers() {
     Object.keys(this.registeredModules).map(moduleName => {
       const watchers = this.registeredModules[moduleName].watchers;
@@ -432,12 +435,9 @@ export function createDependencyWatcher<T extends object>(watchedObject: T) {
   return { watcherProxy, getDependentFields, getDependentValues };
 }
 
-interface IWatcher<T> {
-  selector: () => T;
-  onChange: (newVal: T, prevVal: T) => unknown;
-  prevValue: T;
-}
-
+/**
+ * Watch changes on a reactive state in the module
+ */
 export function watch<T>(
   module: IReduxModule<any, any>,
   selector: () => T,
@@ -450,6 +450,12 @@ export function watch<T>(
     onChange,
     prevValue: selector(),
   });
+}
+
+interface IWatcher<T> {
+  selector: () => T;
+  onChange: (newVal: T, prevVal: T) => unknown;
+  prevValue: T;
 }
 
 /**

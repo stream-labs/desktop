@@ -74,9 +74,6 @@ export class WidgetModule<TWidgetState extends IWidgetState = IWidgetState> {
     const data = await this.fetchData();
     this.setData(data);
     this.setIsLoading(false);
-
-    console.log('data fetched', data);
-    console.log('widget state', this.state);
   }
 
   // de-init module
@@ -191,7 +188,6 @@ export class WidgetModule<TWidgetState extends IWidgetState = IWidgetState> {
    * Update settings and save on the server
    */
   public updateSettings(formValues: any) {
-    console.log('settingsUpdated', formValues);
     const newSettings = { ...this.settings, ...formValues };
     // save setting to the store
     this.setSettings(newSettings);
@@ -204,15 +200,10 @@ export class WidgetModule<TWidgetState extends IWidgetState = IWidgetState> {
    */
   private async fetchData(): Promise<TWidgetState['data']> {
     // load widget settings data into state
-    let rawData: any;
-    try {
-      rawData = await this.actions.return.request({
-        url: this.config.dataFetchUrl,
-        method: 'GET',
-      });
-    } catch (e: unknown) {
-      throw e;
-    }
+    const rawData = await this.actions.return.request({
+      url: this.config.dataFetchUrl,
+      method: 'GET',
+    });
     return this.patchAfterFetch(rawData);
   }
 
@@ -269,7 +260,6 @@ export class WidgetModule<TWidgetState extends IWidgetState = IWidgetState> {
 
   @mutation()
   private setData(data: TWidgetState['data']) {
-    console.log('widget data fetched', data);
     this.state.data = data;
   }
 

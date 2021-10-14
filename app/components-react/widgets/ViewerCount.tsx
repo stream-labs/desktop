@@ -40,7 +40,7 @@ export function ViewerCount() {
 
           <FontFamilyInput label={$t('Font')} {...bind.font} />
           <ColorInput label={$t('Font Color')} {...bind.font_color} />
-          <FontSizeInput label={$t('Font Size')} {...bind.font_size} />
+          <FontSizeInput label={$t('Font Size')} {...bind.font_size} debounce={500} />
         </>
       )}
     </WidgetLayout>

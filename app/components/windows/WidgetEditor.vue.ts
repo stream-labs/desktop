@@ -1,5 +1,4 @@
-import Vue from 'vue';
-import { Component, Prop, Watch } from 'vue-property-decorator';
+import { Component, Watch } from 'vue-property-decorator';
 import { Inject } from 'services/core/injector';
 import { $t } from 'services/i18n';
 import { TObsFormData } from 'components/obs/inputs/ObsInput';
@@ -9,7 +8,7 @@ import ModalLayout from 'components/ModalLayout.vue';
 import Tabs from 'components/Tabs.vue';
 import { Display, TestWidgets } from 'components/shared/ReactComponentList';
 import VFormGroup from 'components/shared/inputs/VFormGroup.vue';
-import { ToggleInput, NumberInput } from 'components/shared/inputs/inputs';
+import { NumberInput, ToggleInput } from 'components/shared/inputs/inputs';
 import { IWidgetData, IWidgetsServiceApi } from 'services/widgets';
 import cloneDeep from 'lodash/cloneDeep';
 import { IWidgetNavItem } from 'components/widgets/WidgetSettings.vue';
@@ -22,6 +21,7 @@ import TsxComponent, { createProps } from 'components/tsx-component';
 import Scrollable from 'components/shared/Scrollable';
 import { CustomizationService } from '../../services/customization';
 import { SourcesService } from '../../services/sources';
+import { EAvailableFeatures, IncrementalRolloutService } from '../../services/incremental-rollout';
 
 class WidgetEditorProps {
   isAlertBox?: boolean = false;
@@ -60,6 +60,7 @@ export default class WidgetEditor extends TsxComponent<WidgetEditorProps> {
   @Inject() private customizationService!: CustomizationService;
   @Inject() private sourcesService!: SourcesService;
   @Inject() private projectorService: ProjectorService;
+  @Inject() private incrementalRolloutService: IncrementalRolloutService;
 
   $refs: { content: HTMLElement; sidebar: HTMLElement; code: HTMLElement };
 
@@ -177,6 +178,13 @@ export default class WidgetEditor extends TsxComponent<WidgetEditorProps> {
     return this.apiSettings.customCodeAllowed
       ? firstTab.concat([{ value: 'code', name: $t('HTML CSS') }])
       : firstTab;
+  }
+
+  get shouldShowAlertboxSwitcher() {
+    return (
+      this.props.isAlertBox &&
+      this.incrementalRolloutService.views.featureIsEnabled(EAvailableFeatures.reactWidgets)
+    );
   }
 
   updateTopTab(value: string) {

@@ -92,11 +92,11 @@ const ONBOARDING_STEPS = () => ({
 
 const THEME_METADATA = {
   2560: 'https://cdn.streamlabs.com/marketplace/overlays/7684923/0a2acb8/0a2acb8.overlay',
-  2561: 'https://cdn.streamlabs.com/marketplace/overlays/7684923/e9fc680/e9fc680.overlay',
-  2563: 'https://cdn.streamlabs.com/marketplace/overlays/7684923/c6426ae/c6426ae.overlay',
   2559: 'https://cdn.streamlabs.com/marketplace/overlays/7684923/6dcbf5f/6dcbf5f.overlay',
-  2592: 'https://cdn.streamlabs.com/marketplace/overlays/7684923/30de9bf/30de9bf.overlay',
-  2574: 'https://cdn.streamlabs.com/marketplace/overlays/7684923/7b333b8/7b333b8.overlay',
+  2624: 'https://cdn.streamlabs.com/marketplace/overlays/7684923/eeeb9e1/eeeb9e1.overlay',
+  2657: 'https://cdn.streamlabs.com/marketplace/overlays/7684923/0697cee/0697cee.overlay',
+  2656: 'https://cdn.streamlabs.com/marketplace/overlays/7684923/59acc9a/59acc9a.overlay',
+  2639: 'https://cdn.streamlabs.com/marketplace/overlays/7684923/a1a4ab0/a1a4ab0.overlay',
 };
 
 interface IOnboardingStep {

@@ -14,6 +14,6 @@
   "Always, show last person when inactive": "Всегда показывать последнего человека во время простоя",
   "Include Resubs": "Включить переподписки",
   "Preview": "Предварительный просмотр",
-  "Tokens: %{tokenList}": "Tokens: %{tokenList}",
-  "Note: Actual label text may take up to 60 seconds to update": "Note: Actual label text may take up to 60 seconds to update"
+  "Tokens: %{tokenList}": "Токены: %{tokenList}",
+  "Note: Actual label text may take up to 60 seconds to update": "Примечание. Фактический текст метки может обновляться до 60 секунд"
 }

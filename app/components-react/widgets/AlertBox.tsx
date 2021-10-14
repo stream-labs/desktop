@@ -5,10 +5,11 @@
 import React from 'react';
 import {
   CheckboxInput,
-  MediaGalleryInput,
+  MediaUrlInput,
   NumberInput,
   SliderInput,
   TextInput,
+  AudioUrlInput,
 } from '../shared/inputs';
 import { $t } from '../../services/i18n';
 import { Alert, Button, Menu, Tooltip } from 'antd';
@@ -91,7 +92,7 @@ function LegacyLink() {
     <Alert
       message={
         <span>
-          {$t('Looking for legacy AlertBox Settings?')} <a>{$t('Click here')}</a>
+          {$t('Looking for the old AlertBox settings?')} <a>{$t('Click here')}</a>
         </span>
       }
       onClick={switchToLegacyAlertbox}
@@ -154,8 +155,8 @@ function VariationSettings(p: { type: TAlertType }) {
   const bind = createVariationBinding(p.type, 'default', useForceUpdate());
   return (
     <div>
-      <MediaGalleryInput {...bind.image_href} />
-      <MediaGalleryInput isAudio {...bind.sound_href} />
+      <MediaUrlInput {...bind.image_href} />
+      <AudioUrlInput {...bind.sound_href} />
       <SliderInput debounce={500} {...bind.sound_volume} />
       <TextInput {...bind.message_template} />
       <SliderInput {...bind.alert_duration} />
@@ -165,28 +166,21 @@ function VariationSettings(p: { type: TAlertType }) {
 }
 
 /**
- * Additional settings for a Donation alerts
+ * Additional settings for donation alerts
  */
 function DonationSettings() {
   const { createVariationBinding } = useAlertBox();
   const bind = createVariationBinding('donation', 'default', useForceUpdate());
-  const { HostsService, UsageStatisticsService, UserService } = Services;
+  const { HostsService, UsageStatisticsService, MagicLinkService } = Services;
   const host = HostsService.streamlabs;
-  const tipPageUrl = `${host}/${UserService.username}`;
 
   function openDonationSettings() {
-    electron.shell.openExternal(`${host}/dashboard#/settings/donation-settings?ref=slobs`);
-    UsageStatisticsService.recordFeatureUsage('openDonationSettings');
-  }
-
-  function openTipPage() {
-    electron.shell.openExternal(tipPageUrl);
-    UsageStatisticsService.recordFeatureUsage('openDonationSettings');
+    MagicLinkService.actions.openDonationSettings();
   }
 
   function openTipPageSettings() {
-    electron.shell.openExternal(`${host}/editor?ref=slobs`);
-    UsageStatisticsService.recordFeatureUsage('openDonationSettings');
+    electron.remote.shell.openExternal(`https://${host}/editor?ref=slobs`);
+    UsageStatisticsService.actions.recordFeatureUsage('openDonationSettings');
   }
 
   return (
@@ -196,7 +190,7 @@ function DonationSettings() {
         <Alert
           message={
             <span>
-              {$t('Add a payment method?')} <a>{$t('Click here')}</a>
+              {$t('Need to set up tipping?')} <a>{$t('Click here')}</a>
             </span>
           }
           type="info"

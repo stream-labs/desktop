@@ -1,3 +1,20 @@
+/**
+ * Metadata generator for inputs
+ * Provides some presets and helps with typechecking
+ */
+export const metadata = {
+  text: (options: ITextMetadata) => options,
+  number: (options: INumberMetadata) => options,
+  slider: (options: ISliderMetadata) => options,
+  bool: (options: ITextBoolMetadata) => options,
+  seconds: (options: ISliderMetadata) => ({
+    min: 0,
+    step: 1000,
+    tipFormatter: (ms: number) => `${ms / 1000}s`,
+    ...options,
+  }),
+};
+
 interface IBaseMetadata {
   label?: string;
   tooltip?: string;
@@ -25,16 +42,3 @@ interface ISliderMetadata extends IBaseMetadata {
 interface ITextBoolMetadata extends IBaseMetadata {
   value?: boolean;
 }
-
-export const metadata = {
-  text: (options: ITextMetadata) => options,
-  number: (options: INumberMetadata) => options,
-  slider: (options: ISliderMetadata) => options,
-  bool: (options: ITextBoolMetadata) => options,
-  seconds: (options: ISliderMetadata) => ({
-    min: 0,
-    step: 1000,
-    tipFormatter: (ms: number) => `${ms / 1000}s`,
-    ...options,
-  }),
-};

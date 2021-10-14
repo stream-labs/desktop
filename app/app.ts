@@ -49,21 +49,22 @@ if (isProduction) {
   // This is the production DSN
   sentryDsn = 'https://6971fa187bb64f58ab29ac514aa0eb3d@sentry.io/251674';
 
-  electron.crashReporter.start({
-    productName: 'streamlabs-obs',
-    companyName: 'streamlabs',
-    ignoreSystemCrashHandler: true,
-    submitURL:
-      'https://sentry.io/api/1283430/minidump/?sentry_key=01fc20f909124c8499b4972e9a5253f2',
-    extra: {
-      'sentry[release]': slobsVersion,
-      windowId: Utils.getWindowId(),
-    },
-  });
+  electron.crashReporter.addExtraParameter('windowId', Utils.getWindowId());
 }
 
 let usingSentry = false;
 const windowId = Utils.getWindowId();
+
+// TODO: Remove after 1.6.0
+const styleSheets = document.styleSheets;
+
+for (let i = 0; i < styleSheets.length; i++) {
+  const sheet = styleSheets[i];
+  if (sheet.href?.match(/foundation\.min\.css/)) {
+    sheet.disabled = true;
+    break;
+  }
+}
 
 function wrapLogFn(fn: string) {
   const old: Function = console[fn];
@@ -267,8 +268,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   I18nService.setVuei18nInstance(i18n);
 
   if (!Utils.isOneOffWindow()) {
-    // TODO: uncomment
-    // ipcRenderer.send('register-in-crash-handler', { pid: process.pid, critical: false });
+    ipcRenderer.send('register-in-crash-handler', { pid: process.pid, critical: false });
   }
 
   // The worker window can safely access services immediately
@@ -305,8 +305,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       const message = apiInitErrorResultToMessage(apiResult);
       showDialog(message);
 
-      // TODO: uncomment
-      // ipcRenderer.send('unregister-in-crash-handler', { pid: process.pid });
+      ipcRenderer.send('unregister-in-crash-handler', { pid: process.pid });
 
       obs.NodeObs.InitShutdownSequence();
       obs.IPC.disconnect();
@@ -341,8 +340,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         this.isRefreshing = true;
 
         // unregister current window from the crash handler
-        // TODO: uncomment
-        // ipcRenderer.send('unregister-in-crash-handler', { pid: process.pid });
+        ipcRenderer.send('unregister-in-crash-handler', { pid: process.pid });
 
         // give the window some time to finish unmounting before reload
         Utils.sleep(100).then(() => {

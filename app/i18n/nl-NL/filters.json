@@ -20,7 +20,7 @@
   "Filter name": "Filter naam",
   "Add source filter": "Bron filter toevoegen",
   "No filters applied": "Geen filters toegepast",
-  "Source filters": "Bron filters",
+  "Filters for %{sourceName}": "Filters for %{sourceName}",
   "Invert Polarity": "Invert Polarity",
   "Limiter": "Limiter",
   "Expander": "Expander",

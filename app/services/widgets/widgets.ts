@@ -1,4 +1,3 @@
-import throttle from 'lodash/throttle';
 import { Inject } from 'services/core/injector';
 import { UserService } from '../user';
 import { ScenesService, SceneItem, Scene } from '../scenes';

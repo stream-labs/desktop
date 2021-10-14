@@ -30,7 +30,7 @@ export function WidgetLayout(p: { children: ReactNode | [ReactNode, ReactNode] }
   return (
     <Layout className={css.widgetLayout} style={{ height: '100%' }}>
       {/* DISPLAY */}
-      <Header style={{ height: '350px', padding: 0 }}>
+      <Header style={{ height: '250px', padding: 0 }}>
         <Display sourceId={previewSourceId} />
       </Header>
       <Content>
@@ -86,7 +86,7 @@ function BrowserSourceSettings() {
   const { browserSourceProps, updateBrowserSourceProps } = useWidget();
   return (
     <Collapse bordered={false}>
-      <Collapse.Panel header={$t('Browser Source Settings')} key={1}>
+      <Collapse.Panel header={$t('Browser Settings')} key={1}>
         <ObsForm
           value={browserSourceProps}
           onChange={updateBrowserSourceProps}
