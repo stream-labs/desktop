@@ -473,7 +473,7 @@ export class SettingsService extends StatefulService<ISettingsServiceState> {
         this.setSettingValue('Output', 'StreamEncoder', 'x264');
       }
 
-      electron.remote.dialog.showMessageBox(electron.remote.getCurrentWindow(), {
+      electron.remote.dialog.showMessageBox(this.windowsService.windows.main, {
         type: 'error',
         message:
           'Your stream encoder has been reset to Software (x264). This can be caused by out of date graphics drivers. Please update your graphics drivers to continue using hardware encoding.',
