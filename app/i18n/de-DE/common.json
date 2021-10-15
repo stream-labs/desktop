@@ -132,8 +132,5 @@
   "Apply": "Anwenden",
   "Do not show this message again": "Diese Meldung nicht mehr anzeigen",
   "You can only select up to %{max} items": "Sie können nur bis zu %{max} Elemente auswählen",
-  "Time": "Zeit",
-  "Sound Volume": "Lautstärke",
-  "Sound": "Ton",
-  "Play Audio": "Play Audio"
+  "Time": "Zeit"
 }
