@@ -132,8 +132,5 @@
   "Apply": "Daftar",
   "Do not show this message again": "Jangan menampilkan pesan ini kembali",
   "You can only select up to %{max} items": "Anda hanya bisa memilih hingga %{max} item",
-  "Time": "Waktu",
-  "Sound Volume": "Volume Suara",
-  "Sound": "Suara",
-  "Play Audio": "Play Audio"
+  "Time": "Waktu"
 }
