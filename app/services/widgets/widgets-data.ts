@@ -38,6 +38,7 @@ export enum WidgetType {
 
 export const WidgetTesters: IWidgetTester[] = [
   {
+    type: 'follows',
     name: 'Follow',
     url(host, platform) {
       return `https://${host}/api/v5/slobs/test/${platform}_account/follow`;
@@ -66,6 +67,7 @@ export const WidgetTesters: IWidgetTester[] = [
     platforms: ['youtube'],
   },
   {
+    type: 'donations',
     name: 'Donation',
     url(host) {
       return `https://${host}/api/v5/slobs/test/streamlabs/donation`;
@@ -73,6 +75,7 @@ export const WidgetTesters: IWidgetTester[] = [
     platforms: ['twitch', 'youtube', 'facebook', 'tiktok'],
   },
   {
+    type: 'bits',
     name: 'Bits',
     url(host, platform) {
       return `https://${host}/api/v5/slobs/test/${platform}_account/bits`;
@@ -81,6 +84,7 @@ export const WidgetTesters: IWidgetTester[] = [
   },
   {
     name: 'Host',
+    type: 'hosts',
     url(host, platform) {
       return `https://${host}/api/v5/slobs/test/${platform}_account/host`;
     },
