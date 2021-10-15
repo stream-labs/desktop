@@ -132,8 +132,5 @@
   "Apply": "应用",
   "Do not show this message again": "不再显示此消息",
   "You can only select up to %{max} items": "您最多只能选择 %{max} 个项目",
-  "Time": "时间",
-  "Sound Volume": "声音音量",
-  "Sound": "声音",
-  "Play Audio": "Play Audio"
+  "Time": "时间"
 }
