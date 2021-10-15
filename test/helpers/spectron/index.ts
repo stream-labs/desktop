@@ -1,6 +1,6 @@
 /// <reference path="../../../app/index.d.ts" />
 /// <reference path="../../../app/jsx.d.ts" />
-import avaTest, {afterEach, ExecutionContext} from 'ava';
+import avaTest, { afterEach, ExecutionContext } from 'ava';
 import { Application } from 'spectron';
 import { getApiClient } from '../api-client';
 import { DismissablesService } from 'services/dismissables';
@@ -15,9 +15,8 @@ import {
   testFn,
 } from './runner-utils';
 import { skipOnboarding } from '../modules/onboarding';
-import {closeWindow, focusChild, focusMain, waitForLoader} from '../modules/core';
-import {clearCollections} from "../modules/api/scenes";
-import {WindowsService} from "../../../app/services/windows";
+import { closeWindow, focusChild, focusMain, waitForLoader } from '../modules/core';
+import { clearCollections } from '../modules/api/scenes';
 export const test = testFn; // the overridden "test" function
 
 const path = require('path');
