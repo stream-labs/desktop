@@ -132,8 +132,5 @@
   "Apply": "Anvend",
   "Do not show this message again": "Vis ikke denne meddelelse igen",
   "You can only select up to %{max} items": "Du kan vælge op til %{max} elementer",
-  "Time": "Tid",
-  "Sound Volume": "Lydstyrke",
-  "Sound": "Lyd",
-  "Play Audio": "Play Audio"
+  "Time": "Tid"
 }
