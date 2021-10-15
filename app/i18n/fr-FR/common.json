@@ -132,5 +132,8 @@
   "Apply": "Appliquer",
   "Do not show this message again": "Ne plus afficher ce message",
   "You can only select up to %{max} items": "Vous pouvez sélectionner jusqu'à %{max} éléments",
-  "Time": "Temps"
+  "Time": "Temps",
+  "Sound Volume": "Volume sonore",
+  "Sound": "Son",
+  "Play Audio": "Play Audio"
 }
