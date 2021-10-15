@@ -132,8 +132,5 @@
   "Apply": "適用",
   "Do not show this message again": "このメッセージを今後表示しない",
   "You can only select up to %{max} items": "選択できるアイテムは最大 %{max} 個のみです",
-  "Time": "時間",
-  "Sound Volume": "音量",
-  "Sound": "サウンド",
-  "Play Audio": "Play Audio"
+  "Time": "時間"
 }
