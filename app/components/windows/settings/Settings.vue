@@ -125,11 +125,11 @@
     width: 177px;
     .margin-left(2);
     .margin-bottom(2);
-    input {
-      width: 100%;
+    & /deep/ input {
+      padding-left: 30px;
     }
-    i {
-      right: 16px;
+    & /deep/ .fa {
+      left: 0;
     }
   }
 
