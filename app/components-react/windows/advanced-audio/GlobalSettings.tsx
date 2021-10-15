@@ -1,4 +1,5 @@
 import React, { useState, useRef, useMemo } from 'react';
+import { Provider } from 'react-redux';
 import {
   SliderInput,
   BoolButtonInput,
@@ -15,7 +16,13 @@ import { Source } from 'services/sources';
 import { $t } from 'services/i18n';
 import Utils from 'services/utils';
 import styles from './AdvancedAudio.m.less';
+import { ObsSettings } from '../../windows/settings/ObsSettings';
+import { store } from '../../store';
 
 export default function GlobalSettings() {
-  return <div>hello world</div>;
+  return (
+    <Provider store={store}>
+      <ObsSettings page="Audio" />
+    </Provider>
+  );
 }
