@@ -130,6 +130,7 @@
     }
     & /deep/ .fa {
       left: 0;
+      right: auto;
     }
   }
 
