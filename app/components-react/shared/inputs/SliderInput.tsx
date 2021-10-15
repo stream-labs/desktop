@@ -17,7 +17,7 @@ export type TSliderInputProps = TSlobsInputProps<
 export const SliderInput = InputComponent((partialProps: TSliderInputProps) => {
   // apply default props
   const p = {
-    hasNumberInput: false,
+    hasNumberInput: true,
     ...partialProps,
   };
   const { inputAttrs, wrapperAttrs } = useInput('slider', p, ANT_SLIDER_FEATURES);

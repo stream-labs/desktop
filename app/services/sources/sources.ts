@@ -7,7 +7,7 @@ import { StatefulService, mutation, ViewHandler } from 'services/core/stateful-s
 import * as obs from '../../../obs-api';
 import { Inject } from 'services/core/injector';
 import namingHelpers from 'util/NamingHelpers';
-import { TWindowComponentName, WindowsService } from 'services/windows';
+import { WindowsService } from 'services/windows';
 import { WidgetsService, WidgetType, WidgetDisplayData } from 'services/widgets';
 import { DefaultManager } from './properties-managers/default-manager';
 import { WidgetManager } from './properties-managers/widget-manager';
@@ -38,7 +38,6 @@ import { UsageStatisticsService } from 'services/usage-statistics';
 import { SourceFiltersService } from 'services/source-filters';
 import { FileReturnWrapper } from 'util/guest-api-handler';
 import { VideoService } from 'services/video';
-import { CustomizationService } from '../customization';
 
 const AudioFlag = obs.ESourceOutputFlags.Audio;
 const VideoFlag = obs.ESourceOutputFlags.Video;
@@ -170,7 +169,6 @@ export class SourcesService extends StatefulService<ISourcesState> {
   @Inject() private usageStatisticsService: UsageStatisticsService;
   @Inject() private sourceFiltersService: SourceFiltersService;
   @Inject() private videoService: VideoService;
-  @Inject() private customizationService: CustomizationService;
 
   get views() {
     return new SourcesViews(this.state);
@@ -606,54 +604,16 @@ export class SourcesService extends StatefulService<ISourcesState> {
     assertIsDefined(platform);
     const widgetType = source.getPropertiesManagerSettings().widgetType;
     const componentName = this.widgetsService.getWidgetComponent(widgetType);
-
-    // React widgets are in the WidgetsWindow component
-    let reactWidgets = [
-      'AlertBox',
-      // TODO:
-      // BitGoal
-      // DonationGoal
-      // CharityGoal
-      // FollowerGoal
-      // StarsGoal
-      // SubGoal
-      // SubscriberGoal
-      // ChatBox
-      // ChatHighlight
-      // Credits
-      // DonationTicker
-      // EmoteWall
-      // EventList
-      // MediaShare
-      // Poll
-      // SpinWheel
-      // SponsorBanner
-      // StreamBoss
-      // TipJar
-      'ViewerCount',
-    ];
-    const isLegacyAlertbox = this.customizationService.state.legacyAlertbox;
-    if (isLegacyAlertbox) reactWidgets = reactWidgets.filter(w => w !== 'AlertBox');
-    const isReactComponent = reactWidgets.includes(componentName);
-    const windowComponentName = isReactComponent ? 'WidgetWindow' : componentName;
-
-    const defaultVueWindowSize = { width: 920, height: 1024 };
-    const defaultReactWindowSize = { width: 600, height: 800 };
-    const widgetInfo = this.widgetsService.widgetsConfig[componentName];
-    const { width, height } = isReactComponent
-      ? widgetInfo.settingsWindowSize || defaultReactWindowSize
-      : defaultVueWindowSize;
-
     if (componentName) {
       this.windowsService.showWindow({
-        componentName: windowComponentName,
+        componentName,
         title: $t('Settings for %{sourceName}', {
           sourceName: WidgetDisplayData(platform.type)[widgetType].name,
         }),
-        queryParams: { sourceId: source.sourceId, widgetType: WidgetType[widgetType] },
+        queryParams: { sourceId: source.sourceId },
         size: {
-          width,
-          height,
+          width: 920,
+          height: 1024,
         },
       });
     }

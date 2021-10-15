@@ -15,10 +15,11 @@ type TProps = {
   fixedChild?: ReactNode;
   hideFooter?: boolean;
   scrollable?: boolean;
-} & Pick<ModalProps, 'footer' | 'onOk' | 'okText' | 'bodyStyle' | 'confirmLoading'>;
+} & Pick<ModalProps, 'footer' | 'onOk' | 'okText' | 'confirmLoading'>;
 
 // calculate OS dependent styles
 const titleHeight = getOS() === OS.Mac ? 22 : 30;
+const footerHeight = 53;
 const wrapperStyles: CSSProperties = {
   height: `calc(100% - ${titleHeight}px)`,
 };
@@ -35,12 +36,10 @@ const fixedStyles: CSSProperties = {
  * Wraps content for the child windows
  */
 export function ModalLayout(p: TProps) {
-  const footerHeight = p.hideFooter ? 0 : 53;
   const bodyStyles: CSSProperties = {
     height: p.fixedChild
       ? `calc(100% - ${footerHeight + 200}px)`
       : `calc(100% - ${footerHeight}px)`,
-    ...(p.bodyStyle || {}),
   };
 
   // inject services
@@ -53,8 +52,6 @@ export function ModalLayout(p: TProps) {
   function close() {
     WindowsService.actions.closeChildWindow();
   }
-
-  // pick variables for the template
 
   // render a default footer with action buttons
   function DefaultFooter() {
