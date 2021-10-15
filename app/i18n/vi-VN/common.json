@@ -132,8 +132,5 @@
   "Apply": "Apply",
   "Do not show this message again": "Do not show this message again",
   "You can only select up to %{max} items": "You can only select up to %{max} items",
-  "Time": "Thời gian",
-  "Sound Volume": "Âm lượng",
-  "Sound": "Âm thanh",
-  "Play Audio": "Play Audio"
+  "Time": "Thời gian"
 }
