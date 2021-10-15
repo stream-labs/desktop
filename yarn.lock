@@ -4086,6 +4086,14 @@ electron-chromedriver@^13.0.0:
     "@electron/get" "^1.12.4"
     extract-zip "^2.0.0"
 
+electron-chromedriver@^14.0.0:
+  version "14.0.0"
+  resolved "https://registry.yarnpkg.com/electron-chromedriver/-/electron-chromedriver-14.0.0.tgz#ee9307d7909dc77496e6b01a81468794fe4fb864"
+  integrity sha512-5JnlzNcKDByi/SXcwbGI+PNnX70YODuTZoFViNWcnp+VyAy9SeZU8lIVChdOp/16PvGthPk61Mb0CH91PHdNUA==
+  dependencies:
+    "@electron/get" "^1.12.4"
+    extract-zip "^2.0.0"
+
 electron-devtools-installer@3.1.1:
   version "3.1.1"
   resolved "https://registry.yarnpkg.com/electron-devtools-installer/-/electron-devtools-installer-3.1.1.tgz#7b56c8c86475c5e4e10de6917d150c53c9ceb55e"
