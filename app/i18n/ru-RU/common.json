@@ -132,8 +132,5 @@
   "Apply": "Применить",
   "Do not show this message again": "Больше не показывать это сообщение",
   "You can only select up to %{max} items": "Можно выбрать не более %{max} эл.",
-  "Time": "Время",
-  "Sound Volume": "Громкость звука",
-  "Sound": "Звук",
-  "Play Audio": "Play Audio"
+  "Time": "Время"
 }
