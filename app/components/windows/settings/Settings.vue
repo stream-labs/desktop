@@ -44,7 +44,7 @@
           >
             Prime
           </NavItem>
-          <button
+          <div
             class="settings-auth"
             @click="handleAuth()"
             v-track-click="{
@@ -59,7 +59,7 @@
               :componentProps="{ platform: userService.platform.type, size: 14 }"
             />
             <span v-if="userService.isLoggedIn">{{ userService.username }}</span>
-          </button>
+          </div>
         </scrollable>
       </NavMenu>
 
@@ -122,8 +122,15 @@
   height: 100%;
 
   .search {
+    width: 177px;
     .margin-left(2);
     .margin-bottom(2);
+    input {
+      width: 100%;
+    }
+    i {
+      right: 16px;
+    }
   }
 
   .clear-search-button {

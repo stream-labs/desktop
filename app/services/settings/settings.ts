@@ -22,11 +22,12 @@ import { VideoEncodingOptimizationService } from 'services/video-encoding-optimi
 import { PlatformAppsService } from 'services/platform-apps';
 import { EDeviceType, HardwareService } from 'services/hardware';
 import { StreamingService } from 'services/streaming';
-import { byOS, OS } from 'util/operating-systems';
+import { byOS, getOS, OS } from 'util/operating-systems';
 import path from 'path';
 import fs from 'fs';
 import { UsageStatisticsService } from 'services/usage-statistics';
 import { SceneCollectionsService } from 'services/scene-collections';
+import electron from 'electron';
 
 export interface ISettingsValues {
   General: {
@@ -147,16 +148,7 @@ export class SettingsService extends StatefulService<ISettingsServiceState> {
 
   init() {
     this.loadSettingsIntoStore();
-
-    // TODO: Remove this once we know rough numbers to avoid excess file I/O
-    try {
-      if (fs.existsSync(path.join(this.appService.appDataDirectory, 'HADisable'))) {
-        this.usageStatisticsService.recordFeatureUsage('HardwareAccelDisabled');
-      }
-    } catch (e: unknown) {
-      console.error('Error fetching hardware acceleration state', e);
-    }
-
+    this.ensureValidEncoder();
     this.sceneCollectionsService.collectionSwitched.subscribe(() => this.refreshAudioSettings());
   }
 
@@ -483,6 +475,35 @@ export class SettingsService extends StatefulService<ISettingsServiceState> {
         source.setName(displayName);
       }
     });
+  }
+
+  private ensureValidEncoder() {
+    if (getOS() === OS.Mac) return;
+
+    const encoderSetting: IObsListInput<string> =
+      this.findSetting(this.state.Output.formData, 'Streaming', 'Encoder') ??
+      this.findSetting(this.state.Output.formData, 'Streaming', 'StreamEncoder');
+    const encoderIsValid = !!encoderSetting.options.find(opt => opt.value === encoderSetting.value);
+
+    // The backend incorrectly defaults to obs_x264 in Simple mode rather x264.
+    // In this case we shouldn't do anything here.
+    if (encoderSetting.value === 'obs_x264') return;
+
+    if (!encoderIsValid) {
+      const mode: string = this.findSettingValue(this.state.Output.formData, 'Untitled', 'Mode');
+
+      if (mode === 'Advanced') {
+        this.setSettingValue('Output', 'Encoder', 'obs_x264');
+      } else {
+        this.setSettingValue('Output', 'StreamEncoder', 'x264');
+      }
+
+      electron.remote.dialog.showMessageBox(this.windowsService.windows.main, {
+        type: 'error',
+        message:
+          'Your stream encoder has been reset to Software (x264). This can be caused by out of date graphics drivers. Please update your graphics drivers to continue using hardware encoding.',
+      });
+    }
   }
 
   @mutation()

@@ -4,6 +4,6 @@
   "This element requires Selective Recording to be enabled": "This element requires Selective Recording to be enabled",
   "Grant Permissions": "Grant Permissions",
   "Streamlabs OBS needs additional permissions. Grant permissions in the pop-up dialogs to continue.": "Streamlabs OBS needs additional permissions. Grant permissions in the pop-up dialogs to continue.",
-  "Microphone": "Microphone",
-  "Webcam": "Webcam"
+  "Microphone": "Mikrofon",
+  "Webcam": "Webkamera"
 }

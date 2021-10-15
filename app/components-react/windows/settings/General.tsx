@@ -104,12 +104,14 @@ function CacheSettings() {
           {cacheUploading && <i className="fa fa-spinner fa-spin" />}
         </a>
       </div>
-      <CheckboxInput
-        name="enable_dump_upload"
-        label={$t('Enable reporting additional information on a crash (requires restart)')}
-        value={enableCU}
-        onChange={setEnableCrashDumpUpload}
-      />
+      {process.platform === 'win32' && (
+        <CheckboxInput
+          name="enable_dump_upload"
+          label={$t('Enable reporting additional information on a crash (requires restart)')}
+          value={enableCU}
+          onChange={setEnableCrashDumpUpload}
+        />
+      )}
     </ObsSettingsSection>
   );
 }

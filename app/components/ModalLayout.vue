@@ -1,5 +1,5 @@
 <template>
-  <div class="modal-layout" :class="wrapperClassNames">
+  <div class="modal-layout modal-layout-vue" :class="wrapperClassNames">
     <div class="ModalLayout-fixed" :style="fixedStyle"><slot name="fixed" /></div>
     <scrollable
       :className="containsTabs ? 'modal-layout-tab-content' : 'modal-layout-content'"

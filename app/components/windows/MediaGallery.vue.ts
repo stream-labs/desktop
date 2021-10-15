@@ -219,6 +219,7 @@ export default class MediaGallery extends Vue {
     if (this.selectedFile) {
       electron.remote.dialog
         .showMessageBox(electron.remote.getCurrentWindow(), {
+          title: 'Streamlabs OBS',
           type: 'warning',
           message: $t('Are you sure you want to delete this file? This action is irreversable.'),
           buttons: [$t('Cancel'), $t('OK')],

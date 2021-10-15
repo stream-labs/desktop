@@ -38,7 +38,7 @@ test('Installing a theme', async (t: TExecutionContext) => {
 
   // install overlay
   await sleep(2000); // wait for the scroll animation
-  await click('button=Install Overlay');
+  await click('button=Install Theme');
 
   // wait for installation complete
   await focusMain();
