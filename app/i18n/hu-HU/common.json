@@ -132,8 +132,5 @@
   "Apply": "Alkalmaz",
   "Do not show this message again": "Do not show this message again",
   "You can only select up to %{max} items": "You can only select up to %{max} items",
-  "Time": "Idő",
-  "Sound Volume": "Hangerő",
-  "Sound": "Hang",
-  "Play Audio": "Play Audio"
+  "Time": "Idő"
 }
