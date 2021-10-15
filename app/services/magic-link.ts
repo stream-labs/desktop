@@ -4,7 +4,6 @@ import { UserService } from 'services/user';
 import { authorizedHeaders, jfetch } from 'util/requests';
 import { HostsService } from './hosts';
 import electron from 'electron';
-import { UsageStatisticsService } from './usage-statistics';
 
 interface ILoginTokenResponse {
   login_token: string;
@@ -14,7 +13,6 @@ interface ILoginTokenResponse {
 export class MagicLinkService extends Service {
   @Inject() userService: UserService;
   @Inject() hostsService: HostsService;
-  @Inject() usageStatisticsService: UsageStatisticsService;
 
   async getDashboardMagicLink(subPage = '', source?: string) {
     const token = (await this.fetchNewToken()).login_token;
@@ -55,30 +53,4 @@ export class MagicLinkService extends Service {
       console.error('Error generating dashboard magic link', e);
     }
   }
-
-  async openDonationSettings() {
-    try {
-      const link = await this.getDashboardMagicLink('settings/donation-settings');
-      electron.remote.shell.openExternal(link);
-      this.usageStatisticsService.recordFeatureUsage('openDonationSettings');
-    } catch (e: unknown) {
-      console.error('Error generating dashboard magic link', e);
-    }
-  }
-
-  // async openTipPageSettings() {
-  //
-  //   const token = (await this.fetchNewToken()).login_token;
-  //   return `https://${this.hostsService.streamlabs}/slobs/magic/dashboard?login_token=${token}&r=${
-  //     subPage ?? ''
-  //   }`;
-  //
-  //   try {
-  //     const link = await this.getDashboardMagicLink('settings/donation-settings');
-  //     electron.remote.shell.openExternal(link);
-  //     this.usageStatisticsService.recordFeatureUsage('openDonationSettings');
-  //   } catch (e: unknown) {
-  //     console.error('Error generating dashboard magic link', e);
-  //   }
-  // }
 }

@@ -26,7 +26,6 @@ import {
   PerformanceMetrics,
   RenameSource,
   AdvancedStatistics,
-  WidgetWindow,
   SafeMode,
 } from 'components/shared/ReactComponentList';
 
@@ -145,7 +144,6 @@ export function getComponents() {
     IconLibraryProperties,
     ScreenCaptureProperties,
     SharedComponentsLibrary,
-    WidgetWindow,
   };
 }
 

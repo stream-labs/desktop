@@ -13,15 +13,12 @@ import isEqual from 'lodash/isEqual';
 import * as InputComponents from './index';
 
 type TInputType =
-  | 'color'
   | 'text'
   | 'textarea'
   | 'number'
   | 'toggle'
   | 'checkbox'
   | 'list'
-  | 'mediaurl'
-  | 'audiourl'
   | 'tags'
   | 'switch'
   | 'date'
@@ -288,7 +285,7 @@ export function useTextInput<
 
   const onBlur = useCallback((ev: FocusEvent<any>) => {
     // for uncontrolled components call the `onChange()` handler on blur
-    const newVal = type === 'number' ? Number(ev.target.value) : ev.target.value;
+    const newVal = ev.target.value;
     if (uncontrolled && p.value !== newVal) {
       emitChange(newVal);
     }
@@ -331,11 +328,15 @@ export function useTextInput<
  * @param stateSetter a function that changes the field given field
  * @param extraPropsGenerator a function that returns extra attributes for the input element (like disabled, placeholder,...)
  */
-export function createBinding<TState extends object, TExtraProps extends object = {}>(
+export function createBinding<
+  TState extends object,
+  TFieldName extends keyof TState,
+  TExtraProps extends object = {}
+>(
   stateGetter: TState | (() => TState),
   stateSetter?: (newTarget: Partial<TState>) => unknown,
   extraPropsGenerator?: (fieldName: keyof TState) => TExtraProps,
-): TBindings<TState, TExtraProps> {
+): TBindings<TState, TFieldName, TExtraProps> {
   function getState(): TState {
     return typeof stateGetter === 'function'
       ? (stateGetter as Function)()
@@ -373,11 +374,15 @@ export function createBinding<TState extends object, TExtraProps extends object 
         ...extraProps,
       };
     },
-  }) as unknown) as TBindings<TState, TExtraProps>;
+  }) as unknown) as TBindings<TState, TFieldName, TExtraProps>;
 }
 
-export type TBindings<TState extends Object, TExtraProps extends Object = {}> = {
-  [K in keyof TState]: {
+export type TBindings<
+  TState extends Object,
+  TFieldName extends keyof TState,
+  TExtraProps extends Object = {}
+> = {
+  [K in TFieldName]: {
     name: K;
     value: TState[K];
     onChange: (newVal: TState[K]) => unknown;
@@ -387,8 +392,8 @@ export type TBindings<TState extends Object, TExtraProps extends Object = {}> = 
     _proxyName: 'Binding';
     _binding: {
       id: string;
-      dependencies: Record<keyof TState, unknown>;
-      clone: () => TBindings<TState, TExtraProps>;
+      dependencies: Record<TFieldName, unknown>;
+      clone: () => TBindings<TState, TFieldName, TExtraProps>;
     };
   };
 

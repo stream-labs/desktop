@@ -9,7 +9,7 @@ import GoLiveChecklist from './GoLiveChecklist';
 import Form, { useForm } from '../../shared/inputs/Form';
 import Animation from 'rc-animate';
 import { SwitchInput } from '../../shared/inputs';
-import { useGoLiveSettingsRoot } from './useGoLiveSettings';
+import { useGoLiveSettings } from './useGoLiveSettings';
 import PlatformSettings from './PlatformSettings';
 import Scrollable from '../../shared/Scrollable';
 import Spinner from '../../shared/Spinner';
@@ -27,7 +27,7 @@ export default function EditStreamWindow() {
     prepopulate,
     isLoading,
     form,
-  } = useGoLiveSettingsRoot({ isUpdateMode: true }).select();
+  } = useGoLiveSettings({ isUpdateMode: true }).select();
 
   const shouldShowChecklist = lifecycle === 'runChecklist';
   const shouldShowSettings = !shouldShowChecklist;
