@@ -6,8 +6,8 @@
   "Drag & Drop Upload": "Drag & Drop Upload",
   "Copy URL": "Copy URL",
   "Browse the Gallery": "Browse the Gallery",
-  "Cancel": "Cancel",
-  "OK": "OK",
+  "Cancel": "Avbryt",
+  "OK": "Okej",
   "Select": "Select",
   "You don't have any uploaded files!": "You don't have any uploaded files!",
   "You don't have any uploaded images!": "You don't have any uploaded images!",
@@ -26,5 +26,8 @@
   "Image URL": "Image URL",
   "Example": "Exempel",
   "Change Media": "Change Media",
-  "No Sound": "No Sound"
+  "No Sound": "No Sound",
+  "No Media": "No Media",
+  "Change Link": "Change Link",
+  "Pick From Gallery": "Pick From Gallery"
 }
