@@ -132,8 +132,5 @@
   "Apply": "Uygula",
   "Do not show this message again": "Bu mesajı tekrar gösterme",
   "You can only select up to %{max} items": "En fazla %{max} öğeye kadar seçebilirsiniz",
-  "Time": "Zaman",
-  "Sound Volume": "Ses Düzeyi",
-  "Sound": "Ses",
-  "Play Audio": "Play Audio"
+  "Time": "Zaman"
 }
