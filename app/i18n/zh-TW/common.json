@@ -132,5 +132,8 @@
   "Apply": "套用",
   "Do not show this message again": "不再顯示此訊息",
   "You can only select up to %{max} items": "您最多只可以選擇 %{max} 個項目",
-  "Time": "時間"
+  "Time": "時間",
+  "Sound Volume": "聲音音量",
+  "Sound": "聲音",
+  "Play Audio": "Play Audio"
 }
