@@ -17,7 +17,6 @@ export enum EAvailableFeatures {
   highlighter = 'slobs--highlighter',
   growTab = 'slobs--grow-tab',
   themeAudit = 'slobs--theme-audit',
-  reactWidgets = 'slobs--react-widgets',
 }
 
 interface IIncrementalRolloutServiceState {

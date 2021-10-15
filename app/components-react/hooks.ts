@@ -141,7 +141,7 @@ type TUseFormStateResult<TState extends object> = {
     key: TKey,
     value: TState[TDict][TKey],
   ) => unknown;
-  bind: TBindings<TState>;
+  bind: TBindings<TState, keyof TState>;
   stateRef: { current: TState };
   form: FormInstance<TState>;
 };

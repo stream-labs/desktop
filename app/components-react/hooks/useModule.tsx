@@ -24,7 +24,7 @@ import { lockThis } from '../../util/lockThis';
  * const { foo, fooBar } = useModule(MyModule)
  *  .selectExtra(module => { fooBar: module.foo + module.bar  }))
  */
-function useModuleContext<
+export function useModule<
   TInitParams,
   TState,
   TModuleClass extends new (...args: any[]) => IReduxModule<TInitParams, TState>,
@@ -36,12 +36,12 @@ function useModuleContext<
       fn: (module: InstanceType<TModuleClass>) => TComputedProps,
     ) => InstanceType<TModuleClass> & TComputedProps & { module: InstanceType<TModuleClass> };
   }
->(ModuleClass: TModuleClass, initParams?: TInitParams, moduleName = ''): TReturnType {
+>(ModuleClass: TModuleClass, initParams?: TInitParams): TReturnType {
   const computedPropsFnRef = useRef<null | Function>(null);
   const computedPropsRef = useRef<any>({});
   const dependencyWatcherRef = useRef<any>(null);
+  const moduleName = ModuleClass.name;
   const componentId = useComponentId();
-  moduleName = moduleName || ModuleClass.name;
 
   // register the component in the ModuleManager upon component creation
   const { module, select, selector } = useOnCreate(() => {
@@ -49,7 +49,7 @@ function useModuleContext<
     const moduleManager = getModuleManager();
     let module = moduleManager.getModule(moduleName);
     if (!module) {
-      module = moduleManager.registerModule(new ModuleClass(), initParams, moduleName);
+      module = moduleManager.registerModule(new ModuleClass(), initParams);
     }
     // register the component in the module
     moduleManager.registerComponent(moduleName, componentId);
@@ -130,45 +130,3 @@ function useModuleContext<
   );
   return (mergeResult as unknown) as TReturnType;
 }
-
-/**
- * Get the Redux module instance from the current React context
- * Creates a new module instance if no instances exist
- */
-export function useModule<
-  TState,
-  TModuleClass extends new (...args: any[]) => IReduxModule<unknown, TState>
->(ModuleClass: TModuleClass) {
-  return useModuleContext(ModuleClass);
-}
-
-/**
- * Create a Redux module instance with given params
- */
-export function useModuleRoot<
-  TInitParams,
-  TState,
-  TModuleClass extends new (...args: any[]) => IReduxModule<TInitParams, TState>
->(ModuleClass: TModuleClass, initParams?: TInitParams, moduleName = '') {
-  return useModuleContext(ModuleClass, initParams, moduleName);
-}
-
-/**
- * same as useModule but locates a module by name instead of a class
- */
-export function useModuleByName<TModule extends IReduxModule<any, any>>(
-  moduleName: string,
-): TUseModuleReturnType<TModule> {
-  const moduleManager = getModuleManager();
-  const module = moduleManager.getModule(moduleName);
-  if (!module) throw new Error(`Can not find module with name "${moduleName}" `);
-  return (useModuleContext(
-    module.constructor as new (...args: any[]) => IReduxModule<null, unknown>,
-    null,
-    moduleName,
-  ) as unknown) as TUseModuleReturnType<TModule>;
-}
-
-type TUseModuleReturnType<TModule extends IReduxModule<any, any>> = TModule & {
-  select: () => TModule & TModule['state'] & { module: TModule };
-};
