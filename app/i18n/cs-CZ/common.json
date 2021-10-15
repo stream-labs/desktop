@@ -132,8 +132,5 @@
   "Apply": "Použít",
   "Do not show this message again": "Tuto zprávu již nezobrazovat",
   "You can only select up to %{max} items": "Můžete vybrat max. %{max} položek",
-  "Time": "Čas",
-  "Sound Volume": "Hlasitost",
-  "Sound": "Zvuk",
-  "Play Audio": "Play Audio"
+  "Time": "Čas"
 }
