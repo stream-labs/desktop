@@ -7,7 +7,7 @@ import { click, clickButton, focusChild, focusMain } from './core';
 export async function openFiltersWindow(sourceName: string) {
   await focusMain();
   await rightClickSource(sourceName);
-  await contextMenuClick('Filters');
+  await contextMenuClick(['Filters', 'Edit Filters']);
   await focusChild();
 }
 
