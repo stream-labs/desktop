@@ -8,6 +8,7 @@ import {
   PatchNotes,
   Loader,
   StreamScheduler,
+  StudioFooter,
   Highlighter,
   ThemeAudit,
   StudioFooter,
