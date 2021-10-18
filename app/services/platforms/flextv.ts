@@ -41,13 +41,15 @@ export class FlextvService
   };
 
   get authUrl() {
-    const host = this.hostsService.streamlabs;
-    const query = `_=${Date.now()}&skip_splash=true&external=electron&flextv&force_verify&origin=slobs`;
-    return `https://${host}/slobs/login?${query}`;
+    return `${this.apiBase}/login`;
   }
 
   private get apiToken() {
     return this.userService.views.state.auth?.platforms?.flextv?.token;
+  }
+
+  private get channelId() {
+    return this.userService.views.state.auth?.platforms?.flextv?.channelId;
   }
 
   async beforeGoLive(goLiveSettings?: IGoLiveSettings) {
@@ -161,7 +163,7 @@ export class FlextvService
         nickname: string;
       };
     }>('flextv', `${this.apiBase}/api/my/profile`).catch(() => null);
-    if (!userInfo) return null
+    if (!userInfo) return null;
 
     return {
       username: userInfo.profile.nickname,
@@ -173,8 +175,7 @@ export class FlextvService
   }
 
   get chatUrl(): string {
-    // no API
-    return '';
+    return `${this.apiBase}/redirects/signin?token=${this.apiToken}&redirectTo=/popup/chat/${this.channelId}`;
   }
 
   get liveDockEnabled(): boolean {

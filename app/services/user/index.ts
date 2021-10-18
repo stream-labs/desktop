@@ -204,7 +204,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
 
   @mutation()
   private SET_USERNAME(platform: TPlatform, name: string) {
-    this.state.auth.platforms[platform].channelId = name;
+    this.state.auth.platforms[platform].username = name;
   }
 
   @mutation()
