@@ -3,13 +3,15 @@ import { InheritMutations } from '../core';
 import { BasePlatformService } from './base-platform';
 import { IPlatformCapabilityResolutionPreset, IPlatformState, TPlatformCapability } from './index';
 import { IGoLiveSettings } from '../streaming';
-import { platformAuthorizedRequest, platformRequest } from './utils';
+import { platformAuthorizedRequest } from './utils';
 import { WidgetType } from '../widgets';
-import { getDefined } from '../../util/properties-type-guards';
+import electron from 'electron';
 
 export interface IFlextvStartStreamOptions {
-  serverUrl: string;
-  streamKey: string;
+  title: string;
+  theme?: string;
+  resolution?: string;
+  useMinFanLevel?: boolean;
 }
 
 interface IFlextvServiceState extends IPlatformState {
@@ -20,18 +22,15 @@ interface IFlextvServiceState extends IPlatformState {
 export class FlextvService
   extends BasePlatformService<IFlextvServiceState>
   implements IPlatformCapabilityResolutionPreset {
-  readonly apiBase = '';
+  static initialState: IFlextvServiceState = {
+    ...BasePlatformService.initialState,
+    settings: { title: '' },
+  };
+
+  readonly apiBase = 'https://www.hotaetv.com';
   readonly platform = 'flextv';
   readonly displayName = 'FlexTV';
   readonly capabilities = new Set<TPlatformCapability>(['resolutionPreset']);
-
-  // support only donation widgets for now
-  readonly widgetsWhitelist = [
-    WidgetType.AlertBox,
-    WidgetType.DonationGoal,
-    WidgetType.DonationTicker,
-    WidgetType.TipJar,
-  ];
 
   readonly inputResolution = '720x1280';
   readonly outputResolution = '720x1280';
@@ -42,13 +41,15 @@ export class FlextvService
   };
 
   get authUrl() {
-    const host = this.hostsService.streamlabs;
-    const query = `_=${Date.now()}&skip_splash=true&external=electron&flextv&force_verify&origin=slobs`;
-    return `https://${host}/slobs/login?${query}`;
+    return `${this.apiBase}/login`;
   }
 
   private get apiToken() {
     return this.userService.views.state.auth?.platforms?.flextv?.token;
+  }
+
+  private get channelId() {
+    return this.userService.views.state.auth?.platforms?.flextv?.channelId;
   }
 
   async beforeGoLive(goLiveSettings?: IGoLiveSettings) {
@@ -67,27 +68,62 @@ export class FlextvService
         });
       }
     }
-
     if (goLiveSettings) {
-      const channelInfo = goLiveSettings?.platforms.flextv;
-      // if (channelInfo) await this.putChannelInfo(channelInfo);
+      const streamConfigs = goLiveSettings?.platforms.flextv;
+      if (!streamConfigs) return;
+      const { title, theme, resolution } = streamConfigs;
+
+      await platformAuthorizedRequest<{ url: string; streamKey: string }>('flextv', {
+        url: `${this.apiBase}/api/m/channel/config`,
+        method: 'PUT',
+        body: JSON.stringify({
+          title,
+          theme,
+          resolution,
+        }),
+      });
+      this.state.settings = {
+        title,
+        theme,
+        resolution,
+      };
     }
   }
 
   async afterGoLive() {
-    await platformAuthorizedRequest<{ url: string; streamKey: string }>(
-      'flextv',
-      `https://www.hotaetv.com/api/my/channel/start-stream`,
-    );
+    if (!this.state.settings) {
+      electron.remote.dialog.showMessageBox({
+        type: 'error',
+        message: '방송 설정이 없습니다.',
+        title: '송출 오류',
+      });
+      return;
+    }
+    const { title, theme, resolution } = this.state.settings;
+    await platformAuthorizedRequest<{ url: string; streamKey: string }>('flextv', {
+      url: `${this.apiBase}/api/my/channel/start-stream`,
+      method: 'POST',
+      body: JSON.stringify({
+        title,
+        theme,
+        resolution,
+      }),
+    });
+  }
+
+  async afterStopStream() {
+    return platformAuthorizedRequest<{ url: string; streamKey: string }>('flextv', {
+      url: `${this.apiBase}/api/my/channel/stop-stream`,
+      method: 'POST',
+    });
   }
 
   fetchStreamPair(): Promise<{ url: string; streamKey: string }> {
     return platformAuthorizedRequest<{ url: string; streamKey: string }>(
       'flextv',
-      `https://www.hotaetv.com/api/my/channel/stream-key`,
+      `${this.apiBase}/api/my/channel/stream-key`,
     );
   }
-
 
   getHeaders(req: IPlatformRequest, useToken: boolean | string) {
     const token = typeof useToken === 'string' ? useToken : useToken && this.apiToken;
@@ -105,7 +141,33 @@ export class FlextvService
    * prepopulate channel info and save it to the store
    */
   async prepopulateInfo(): Promise<void> {
+    const config = await platformAuthorizedRequest<{
+      data: {
+        channelId: number;
+        themeId: number;
+        title: string;
+        resolution: number;
+        isForAdult: number;
+        password: string;
+        minRatingLevel: 2;
+        maxViewerCount: number;
+      };
+    }>('flextv', `${this.apiBase}/api/m/channel/config`);
     this.SET_PREPOPULATED(true);
+    this.SET_STREAM_SETTINGS({ ...config.data });
+  }
+
+  async fetchUserInfo() {
+    const userInfo = await platformAuthorizedRequest<{
+      profile: {
+        nickname: string;
+      };
+    }>('flextv', `${this.apiBase}/api/my/profile`).catch(() => null);
+    if (!userInfo) return null;
+
+    return {
+      username: userInfo.profile.nickname,
+    };
   }
 
   async putChannelInfo(): Promise<void> {
@@ -113,8 +175,7 @@ export class FlextvService
   }
 
   get chatUrl(): string {
-    // no API
-    return '';
+    return `${this.apiBase}/redirects/signin?token=${this.apiToken}&redirectTo=/popup/chat/${this.channelId}`;
   }
 
   get liveDockEnabled(): boolean {

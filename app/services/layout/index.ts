@@ -104,10 +104,10 @@ export class LayoutService extends PersistentStatefulService<ILayoutServiceState
       default: {
         name: null,
         icon: 'icon-studio',
-        currentLayout: ELayout.Default,
+        currentLayout: ELayout.OnePaneR,
         slottedElements: {
           [ELayoutElement.Display]: { slot: '1' },
-          [ELayoutElement.Minifeed]: { slot: '2' },
+          // [ELayoutElement.Minifeed]: { slot: '2' },
           [ELayoutElement.Scenes]: { slot: '3' },
           [ELayoutElement.Sources]: { slot: '4' },
           [ELayoutElement.Mixer]: { slot: '5' },
@@ -137,7 +137,7 @@ export class LayoutService extends PersistentStatefulService<ILayoutServiceState
     ) {
       this.setSlots({
         [ELayoutElement.Display]: { slot: '1' },
-        [ELayoutElement.LegacyEvents]: { slot: '2' },
+        // [ELayoutElement.LegacyEvents]: { slot: '2' },
         [ELayoutElement.Scenes]: { slot: '3' },
         [ELayoutElement.Sources]: { slot: '4' },
         [ELayoutElement.Mixer]: { slot: '5' },
@@ -152,7 +152,7 @@ export class LayoutService extends PersistentStatefulService<ILayoutServiceState
     if (Object.keys(this.state.tabs).length > 1) {
       this.usageStatisticsService.recordFeatureUsage('LayoutEditorTabs');
       this.usageStatisticsService.recordFeatureUsage('LayoutEditor');
-    } else if (this.state.tabs.default.currentLayout !== ELayout.Default) {
+    } else if (this.state.tabs.default.currentLayout !== ELayout.OnePaneR) {
       this.usageStatisticsService.recordFeatureUsage('LayoutEditor');
     }
   }
@@ -219,11 +219,7 @@ export class LayoutService extends PersistentStatefulService<ILayoutServiceState
 
   @mutation()
   SET_URL(url: string) {
-    Vue.set(
-      this.state.tabs[this.state.currentTab].slottedElements[ELayoutElement.Browser],
-      'src',
-      url,
-    );
+    console.warn('disabled setting url');
   }
 
   @mutation()
@@ -254,11 +250,11 @@ export class LayoutService extends PersistentStatefulService<ILayoutServiceState
     Vue.set(this.state.tabs, id, {
       name,
       icon,
-      currentLayout: ELayout.Default,
+      currentLayout: ELayout.OnePaneR,
 
       slottedElements: {
         [ELayoutElement.Display]: { slot: '1' },
-        [ELayoutElement.Minifeed]: { slot: '2' },
+        // [ELayoutElement.Minifeed]: { slot: '2' },
         [ELayoutElement.Scenes]: { slot: '3' },
         [ELayoutElement.Sources]: { slot: '4' },
         [ELayoutElement.Mixer]: { slot: '5' },
