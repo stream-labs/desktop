@@ -11,7 +11,6 @@ import {
   StudioFooter,
   Highlighter,
   ThemeAudit,
-  StudioFooter,
 } from 'components/shared/ReactComponentList';
 import { ScenesService } from 'services/scenes';
 import { PlatformAppsService } from 'services/platform-apps';
