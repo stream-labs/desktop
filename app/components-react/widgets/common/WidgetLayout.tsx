@@ -6,7 +6,8 @@ import css from './WidgetLayout.m.less';
 import Form, { useForm } from '../../shared/inputs/Form';
 import { ObsForm } from '../../obs/ObsForm';
 import { $t } from '../../../services/i18n';
-import { CustomCode } from './CustomCode';
+import { CustomCodeSection } from './CustomCode';
+import { CustomFieldsSection } from './CustomFields';
 const { Content, Header } = Layout;
 
 /**
@@ -14,7 +15,7 @@ const { Content, Header } = Layout;
  * Can display 1 column or 2 columns depending on how many children have been provided to props
  */
 export function WidgetLayout(p: { children: ReactNode | [ReactNode, ReactNode] }) {
-  const { previewSourceId, isLoading, selectedTab, config } = useWidget();
+  const { previewSourceId, isLoading, selectedTab, config, hasCustomFields } = useWidget();
   let MenuPanel: ReactNode;
   let ContentPanel: ReactNode;
 
@@ -52,16 +53,25 @@ export function WidgetLayout(p: { children: ReactNode | [ReactNode, ReactNode] }
             flex="auto"
             style={{ padding: '16px', paddingTop: '32px', height: '100%', overflow: 'auto' }}
           >
-            {/* SETTINGS FORM  */}
             <Form form={form} layout="horizontal">
-              <Spin spinning={isLoading}>{!isLoading && ContentPanel}</Spin>
+              <Spin spinning={isLoading}>
+                {!isLoading && (
+                  <>
+                    {/* SETTINGS FORM  */}
+                    {ContentPanel}
+
+                    {/* BROWSER SOURCE SETTINGS  */}
+                    {selectedTab === 'general' && <BrowserSourceSettings />}
+
+                    {/* CUSTOM CODE  */}
+                    {config.customCodeAllowed && <CustomCodeSection />}
+
+                    {/* CUSTOM FIELDS  */}
+                    {hasCustomFields && <CustomFieldsSection />}
+                  </>
+                )}
+              </Spin>
             </Form>
-
-            {/* CUSTOM CODE  */}
-            {config.customCodeAllowed && <CustomCode />}
-
-            {/* BROWSER SOURCE SETTINGS  */}
-            {selectedTab === 'general' && <BrowserSourceSettings />}
           </Col>
         </Row>
       </Content>

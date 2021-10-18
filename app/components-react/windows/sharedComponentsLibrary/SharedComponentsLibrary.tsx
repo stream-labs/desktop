@@ -30,6 +30,7 @@ import { pick } from 'lodash';
 import { useModule } from '../../hooks/useModule';
 import { merge } from '../../../util/merge';
 import { DemoForm } from './DemoForm';
+import { CodeInput } from '../../shared/inputs/CodeInput';
 
 const { TabPane } = Tabs;
 
@@ -75,6 +76,7 @@ function Examples() {
     imageVal: '',
     galleryImage: '',
     galleryAudio: '',
+    javascript: 'alert("Hello World!")',
     checkboxVal: false,
     dateVal: undefined as Date | undefined,
     listVal: 1,
@@ -237,6 +239,10 @@ function Examples() {
 
       <Example title="Media Gallery">
         <MediaUrlInput label="Image" {...globalProps} {...bind.galleryImage} />
+      </Example>
+
+      <Example title="Code Input">
+        <CodeInput label="javascript" lang="js" {...globalProps} {...bind.javascript} />
       </Example>
 
       <Example title="Buttons">

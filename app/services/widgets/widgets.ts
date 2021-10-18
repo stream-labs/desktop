@@ -16,7 +16,7 @@ import { WidgetSource } from './widget-source';
 import { InitAfter } from 'services/core/service-initialization-observer';
 import Vue from 'vue';
 import cloneDeep from 'lodash/cloneDeep';
-import { Subscription } from 'rxjs';
+import { Subject, Subscription } from 'rxjs';
 import { Throttle } from 'lodash-decorators';
 import { EditorCommandsService } from 'services/editor-commands';
 import { TWindowComponentName } from '../windows';
@@ -358,6 +358,15 @@ export class WidgetsService
         return Promise.resolve(res);
       })
       .then(handleResponse);
+  }
+
+  settingsInvalidated = new Subject();
+
+  /**
+   * Ask the WidgetSetting window to re-load data
+   */
+  invalidateSettingsWindow() {
+    this.settingsInvalidated.next();
   }
 
   @mutation()
