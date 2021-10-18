@@ -2,6 +2,8 @@ import URI from 'urijs';
 import isEqual from 'lodash/isEqual';
 import electron from 'electron';
 import cloneDeep from 'lodash/cloneDeep';
+import fs from 'fs';
+import path from 'path';
 
 export const enum EBit {
   ZERO,
@@ -15,6 +17,7 @@ export interface IEnv {
   SLOBS_USE_LOCAL_HOST: boolean;
   SLOBS_VERSION: string;
   SLOBS_TRACE_SYNC_IPC: boolean;
+  SLOBS_USE_CDN_MEDIA: boolean;
   CI: boolean;
 }
 
@@ -257,16 +260,32 @@ export function keys<T>(target: T) {
   return Object.keys(target) as (keyof T)[];
 }
 
+let appPath: string;
+
+/**
+ * Memoized function for getting the app path
+ */
+export function getAppPath() {
+  appPath = appPath ?? electron.remote.app.getAppPath();
+  return appPath;
+}
+
 /**
  * A fallback-safe method of fetching images
  * from either our local storage or the CDN
- * @param path The path structure to retrieve the image from the media folders
+ * @param mediaPath The path structure to retrieve the image from the media folders
  */
-export function $i(path: string) {
+export function $i(mediaPath: string) {
   try {
-    const localMediaPath = require(`../../media/${path}`);
+    // Useful for testing media fetches properly from the CDN
+    if (Utils.env.SLOBS_USE_CDN_MEDIA) throw new Error('Using CDN');
+
+    const localMediaPath = require(`../../media/${mediaPath}`);
+
+    if (!fs.existsSync(path.resolve(getAppPath(), localMediaPath))) throw new Error('Using CDN');
+
     return localMediaPath;
   } catch (e: unknown) {
-    return `https://slobs-cdn.streamlabs.com/media/${path}`;
+    return `https://slobs-cdn.streamlabs.com/media/${mediaPath}`;
   }
 }

@@ -21,10 +21,12 @@ import {
   GoLiveWindow,
   EditStreamWindow,
   IconLibraryProperties,
+  ScreenCaptureProperties,
   SharedComponentsLibrary,
   RenameSource,
   AdvancedStatistics,
-} from 'components/shared/ReactComponent';
+  SafeMode,
+} from 'components/shared/ReactComponentList';
 
 import SourceProperties from 'components/windows/SourceProperties.vue';
 import SourceFilters from 'components/windows/SourceFilters.vue';
@@ -66,12 +68,13 @@ import AlertBox from 'components/widgets/AlertBox.vue';
 import SpinWheel from 'components/widgets/SpinWheel.vue';
 import Poll from 'components/widgets/Poll';
 import EmoteWall from 'components/widgets/EmoteWall';
+import ChatHighlight from 'components/widgets/ChatHighlight';
 
 import { byOS, OS } from 'util/operating-systems';
 import { UsageStatisticsService } from './usage-statistics';
 import { Inject } from 'services/core';
 import MessageBoxModal from 'components/shared/modals/MessageBoxModal';
-import Modal from 'components/shared/modals/modal';
+import Modal from 'components/shared/modals/Modal';
 
 const { ipcRenderer, remote } = electron;
 const BrowserWindow = remote.BrowserWindow;
@@ -90,6 +93,7 @@ export function getComponents() {
     AddSource,
     NameScene,
     NameFolder,
+    SafeMode,
     SourceProperties,
     SourceFilters,
     AddSourceFilter,
@@ -129,10 +133,12 @@ export function getComponents() {
     SpinWheel,
     Poll,
     EmoteWall,
+    ChatHighlight,
     WelcomeToPrime,
     GoLiveWindow,
     EditStreamWindow,
     IconLibraryProperties,
+    ScreenCaptureProperties,
     SharedComponentsLibrary,
   };
 }
@@ -412,7 +418,14 @@ export class WindowsService extends StatefulService<IWindowsState> {
       height: 400,
       title: 'New Window',
       backgroundColor: '#17242D',
-      webPreferences: { nodeIntegration: true, webviewTag: true, enableRemoteModule: true },
+      show: false,
+      webPreferences: {
+        nodeIntegration: true,
+        webviewTag: true,
+        enableRemoteModule: true,
+        contextIsolation: false,
+        backgroundThrottling: false,
+      },
       ...options,
       ...options.size,
     }));
@@ -431,6 +444,8 @@ export class WindowsService extends StatefulService<IWindowsState> {
 
     const indexUrl = remote.getGlobal('indexUrl');
     newWindow.loadURL(`${indexUrl}?windowId=${windowId}`);
+
+    newWindow.show();
 
     return windowId;
   }

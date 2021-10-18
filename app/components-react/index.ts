@@ -2,13 +2,14 @@ import NameFolder from './windows/NameFolder';
 import GoLiveWindow from './windows/go-live/GoLiveWindow';
 import EditStreamWindow from './windows/go-live/EditStreamWindow';
 import IconLibraryProperties from './windows/IconLibraryProperties';
+import ScreenCaptureProperties from './windows/ScreenCaptureProperties';
 import NewsBanner from './root/NewsBanner';
 import PatchNotes from './pages/PatchNotes';
 import Display from './shared/Display';
 import TitleBar from './shared/TitleBar';
 import Chat from './root/Chat';
 import Highlighter from './pages/Highlighter';
-import Grow from './pages/Grow/Grow';
+import Grow from './pages/grow/Grow';
 import Loader from './pages/Loader';
 import NavTools from './sidebar/NavTools';
 import PlatformLogo from './shared/PlatformLogo';
@@ -25,6 +26,7 @@ import StudioEditor from './root/StudioEditor';
 import SharedComponentsLibrary from './windows/sharedComponentsLibrary/SharedComponentsLibrary';
 import { ObsSettings } from './windows/settings/ObsSettings';
 import ThemeAudit from './pages/ThemeAudit';
+import SafeMode from './windows/SafeMode';
 
 // list of React components to be used inside Vue components
 export const components = {
@@ -32,6 +34,7 @@ export const components = {
   GoLiveWindow: createRoot(GoLiveWindow),
   EditStreamWindow: createRoot(EditStreamWindow),
   IconLibraryProperties,
+  ScreenCaptureProperties,
   NewsBanner,
   PatchNotes,
   Display,
@@ -54,4 +57,5 @@ export const components = {
   ThemeAudit,
   AppsNav,
   StudioEditor,
+  SafeMode,
 };

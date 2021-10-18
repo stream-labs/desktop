@@ -36,6 +36,7 @@ const widgetIconMap = {
   [WidgetType.MediaShare]: 'icon-share',
   [WidgetType.Poll]: 'icon-text-align-left',
   [WidgetType.EmoteWall]: 'icon-smile',
+  [WidgetType.ChatHighlight]: 'icon-community',
 };
 
 const sourceIconMap = {
@@ -53,6 +54,7 @@ const sourceIconMap = {
   scene: 'far fa-object-group',
   color_source: 'fas fa-fill',
   openvr_capture: 'fab fa-simplybuilt fa-rotate-180',
+  screen_capture: 'fab fa-simplybuilt fa-rotate-180',
   liv_capture: 'fab fa-simplybuilt fa-rotate-180',
 };
 
@@ -177,9 +179,15 @@ export default class SourceSelector extends TsxComponent {
 
   showContextMenu(sceneNodeId?: string, event?: MouseEvent) {
     const sceneNode = this.scene.getNode(sceneNodeId);
+    let sourceId: string;
+
+    if (sceneNode) {
+      sourceId = sceneNode.isFolder() ? sceneNode.getItems()[0]?.sourceId : sceneNode.sourceId;
+    }
+
     if (sceneNode && !sceneNode.isSelected()) sceneNode.select();
     const menuOptions = sceneNode
-      ? { selectedSceneId: this.scene.id, showSceneItemMenu: true }
+      ? { selectedSceneId: this.scene.id, showSceneItemMenu: true, selectedSourceId: sourceId }
       : { selectedSceneId: this.scene.id };
 
     const menu = new EditMenu(menuOptions);

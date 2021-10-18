@@ -9,6 +9,8 @@ import { uniq } from 'lodash';
 const fs = require('fs');
 const fetch = require('node-fetch');
 const request = require('request');
+const tasklist = require('tasklist');
+const kill = require('tree-kill');
 
 export interface ITestStats {
   duration: number;
@@ -153,4 +155,11 @@ export function requestUtilsServer(path: string, method = 'get', body?: unknown)
       })
       .catch((e: any) => reject(`Utility server is not available ${e}`));
   });
+}
+
+export async function killElectronInstances() {
+  const tasks = await tasklist();
+  tasks
+    .filter((task: any) => task.imageName === 'electron.exe')
+    .forEach((task: any) => kill(task.pid));
 }

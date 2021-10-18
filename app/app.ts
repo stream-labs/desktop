@@ -32,7 +32,7 @@ import util from 'util';
 import uuid from 'uuid/v4';
 import Blank from 'components/windows/Blank.vue';
 import Main from 'components/windows/Main.vue';
-import { Loader } from 'components/shared/ReactComponent';
+import { Loader } from 'components/shared/ReactComponentList';
 import process from 'process';
 import { MetricsService } from 'services/metrics';
 import { UsageStatisticsService } from 'services/usage-statistics';
@@ -49,21 +49,22 @@ if (isProduction) {
   // This is the production DSN
   sentryDsn = 'https://6971fa187bb64f58ab29ac514aa0eb3d@sentry.io/251674';
 
-  electron.crashReporter.start({
-    productName: 'streamlabs-obs',
-    companyName: 'streamlabs',
-    ignoreSystemCrashHandler: true,
-    submitURL:
-      'https://sentry.io/api/1283430/minidump/?sentry_key=01fc20f909124c8499b4972e9a5253f2',
-    extra: {
-      'sentry[release]': slobsVersion,
-      windowId: Utils.getWindowId(),
-    },
-  });
+  electron.crashReporter.addExtraParameter('windowId', Utils.getWindowId());
 }
 
 let usingSentry = false;
 const windowId = Utils.getWindowId();
+
+// TODO: Remove after 1.6.0
+const styleSheets = document.styleSheets;
+
+for (let i = 0; i < styleSheets.length; i++) {
+  const sheet = styleSheets[i];
+  if (sheet.href?.match(/foundation\.min\.css/)) {
+    sheet.disabled = true;
+    break;
+  }
+}
 
 function wrapLogFn(fn: string) {
   const old: Function = console[fn];
@@ -230,6 +231,15 @@ document.addEventListener('dragover', event => event.preventDefault());
 document.addEventListener('dragenter', event => event.preventDefault());
 document.addEventListener('drop', event => event.preventDefault());
 
+const ctxMenu = electron.remote.Menu.buildFromTemplate([
+  { role: 'copy', accelerator: 'CommandOrControl+C' },
+  { role: 'paste', accelerator: 'CommandOrControl+V' },
+]);
+
+document.addEventListener('contextmenu', () => {
+  ctxMenu.popup();
+});
+
 export const apiInitErrorResultToMessage = (resultCode: obs.EVideoCodes) => {
   switch (resultCode) {
     case obs.EVideoCodes.NotSupported: {
@@ -331,7 +341,24 @@ document.addEventListener('DOMContentLoaded', async () => {
     i18n,
     store,
     el: '#app',
-    render: h => {
+    data: { isRefreshing: false },
+    methods: {
+      // refresh current window
+      startWindowRefresh() {
+        // set isRefreshing to true to unmount all components and destroy Displays
+        this.isRefreshing = true;
+
+        // unregister current window from the crash handler
+        ipcRenderer.send('unregister-in-crash-handler', { pid: process.pid });
+
+        // give the window some time to finish unmounting before reload
+        Utils.sleep(100).then(() => {
+          window.location.reload();
+        });
+      },
+    },
+    render(h) {
+      if (this.isRefreshing) return h(Blank);
       if (windowId === 'worker') return h(Blank);
       if (windowId === 'child') {
         if (store.state.bulkLoadFinished && store.state.i18nReady) {
@@ -370,6 +397,13 @@ document.addEventListener('DOMContentLoaded', async () => {
       const ctx = userService.getSentryContext();
       if (ctx) setSentryContext(ctx);
       userService.sentryContext.subscribe(setSentryContext);
+    }
+
+    // allow to refresh the window by pressing `F5` in the DevMode
+    if (Utils.isDevMode()) {
+      window.addEventListener('keyup', ev => {
+        if (ev.key === 'F5') vm.startWindowRefresh();
+      });
     }
   });
 });

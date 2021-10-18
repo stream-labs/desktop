@@ -1,29 +1,28 @@
 <template>
-<span class="file-input">
-  <div class="flex">
-    <input
-      type="text"
-      readonly
-      :value="value"
-      :name="options.uuid"
-      class="file-input__input"
-      v-validate="validate">
-    <button
-      @click="showFileDialog"
-      class="file-input__browse-button button button--default">
-      {{ $t('Browse') }}
-    </button>
-  </div>
-  <span class="input-error" v-show="errors.first(uuid)">
-    {{ errors.first(uuid) }}
+  <span class="file-input">
+    <div class="flex">
+      <input
+        type="text"
+        readonly
+        :value="value"
+        :name="options.uuid"
+        class="file-input__input"
+        v-validate="validate"
+      />
+      <button @click="showFileDialog" class="file-input__browse-button button button--default">
+        {{ $t('Browse') }}
+      </button>
+    </div>
+    <span class="input-error" v-show="errors.first(uuid)">
+      {{ errors.first(uuid) }}
+    </span>
   </span>
-</span>
 </template>
 
 <script lang="ts" src="./FileInput.vue.ts"></script>
 
 <style lang="less" scoped>
-@import "../../../styles/index";
+@import '../../../styles/index';
 
 .file-input {
   flex-grow: 1;
@@ -40,6 +39,7 @@
   flex-grow: 1;
   border-top-right-radius: 0;
   border-bottom-right-radius: 0;
+  width: 100%;
 }
 
 .file-input__browse-button {
