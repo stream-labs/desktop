@@ -61,7 +61,7 @@ export const TagsInput = InputComponent(<T extends any[]>(p: TTagsInputProps<T>)
     inputAttrs.onChange(values);
   }
 
-  const displayValue = inputAttrs.value.map((val: string) => tagsMap[val].label);
+  const displayValue = (inputAttrs.value || []).map((val: string) => tagsMap[val].label);
 
   return (
     <InputWrapper {...wrapperAttrs}>

@@ -211,3 +211,11 @@ export class ThemeAudit extends ReactComponent {}
   },
 })
 export class TitleBar extends ReactComponent {}
+
+@Component({
+  props: {
+    name: { default: 'WidgetWindow' },
+    wrapperStyles: { default: () => ({ height: '100%' }) },
+  },
+})
+export class WidgetWindow extends ReactComponent {}

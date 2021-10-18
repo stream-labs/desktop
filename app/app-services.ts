@@ -150,6 +150,7 @@ import { CacheUploaderService } from './services/cache-uploader';
 import { StreamlabelsService } from './services/streamlabels';
 import { SceneCollectionsService } from './services/scene-collections';
 import { PlatformAppsService } from './services/platform-apps';
+import { MediaGalleryService } from './services/media-gallery';
 import { RecentEventsService } from 'services/recent-events';
 
 export const AppServices = {
@@ -182,6 +183,7 @@ export const AppServices = {
   GrowService,
   TransitionsService,
   MagicLinkService,
+  MediaGalleryService,
   UsageStatisticsService,
   NotificationsService,
   MediaBackupService,
