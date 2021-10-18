@@ -1,5 +1,5 @@
 import React, { useState, useRef, useMemo, useEffect } from 'react';
-import { Button, Collapse } from 'antd';
+import { Button, Collapse, Tooltip } from 'antd';
 import { ModalLayout } from 'components-react/shared/ModalLayout';
 import {
   SliderInput,
@@ -8,6 +8,7 @@ import {
   SwitchInput,
   NumberInput,
 } from 'components-react/shared/inputs';
+import InputWrapper from 'components-react/shared/inputs/InputWrapper';
 import Form from 'components-react/shared/inputs/Form';
 import { TObsValue, IObsListInput, TObsFormData } from 'components/obs/inputs/ObsInput';
 import { Services } from 'components-react/service-provider';
@@ -39,7 +40,6 @@ export default function AdvancedAudio() {
         accordion
         activeKey={expandedSource}
         onChange={(key: string) => setExpandedSource(key)}
-        expandIcon={({ isActive }) => <i className={isActive ? 'icon-subtract' : 'icon-add'} />}
       >
         {audioSources.map(audioSource => (
           <Panel key={audioSource.sourceId} header={<PanelHeader source={audioSource} />}>
@@ -96,10 +96,12 @@ function PanelHeader(p: { source: AudioSource }) {
       data-name="advanced-audio-header"
     >
       <div className={styles.audioSourceName}>{name}</div>
-      <i
-        className={muted ? 'icon-mute' : 'icon-audio'}
-        onClick={() => onInputHandler('muted', !muted)}
-      />
+      <Tooltip title={muted ? $t('Unmute') : $t('Mute')}>
+        <i
+          className={muted ? 'icon-mute' : 'icon-audio'}
+          onClick={() => onInputHandler('muted', !muted)}
+        />
+      </Tooltip>
       <div style={{ width: '200px' }}>
         <SliderInput
           value={Math.floor(fader.deflection * 100)}
@@ -112,31 +114,43 @@ function PanelHeader(p: { source: AudioSource }) {
           nowrap
         />
       </div>
-      <i
-        className={mixerHidden ? 'icon-hide' : 'icon-view'}
-        onClick={() => onInputHandler('mixerHidden', !mixerHidden)}
-      />
+      <Tooltip title={mixerHidden ? $t('Show in Mixer') : $t('Hide in Mixer')}>
+        <i
+          className={mixerHidden ? 'icon-hide' : 'icon-view'}
+          onClick={() => onInputHandler('mixerHidden', !mixerHidden)}
+        />
+      </Tooltip>
       {isAdvancedOutput && (
         <div className={styles.audioSettingsTracks}>
-          <div className={styles.trackLabel}>{$t('Stream Track')}</div>
-          <BoolButtonInput
-            label={String(streamTrack + 1)}
-            value={!!trackFlags[streamTrack]}
-            onChange={value => onTrackInput(streamTrack, value)}
-            checkboxStyles={{ marginRight: '8px' }}
-            name="streamTrack"
-          />
-          <div className={styles.trackLabel}>{$t('Rec. Tracks')}</div>
-          {recordingTracks?.map(track => (
+          <InputWrapper
+            label={$t('Stream Track')}
+            tooltip={$t('Designates if this source is audible in your live broadcast')}
+            layout="horizontal"
+          >
             <BoolButtonInput
-              label={String(track + 1)}
-              key={track}
-              value={!!trackFlags[track]}
-              onChange={value => onTrackInput(track, value)}
-              checkboxStyles={{ marginRight: '4px' }}
-              name={`flag${track}`}
+              label={String(streamTrack + 1)}
+              value={!!trackFlags[streamTrack]}
+              onChange={value => onTrackInput(streamTrack, value)}
+              checkboxStyles={{ marginRight: '8px' }}
+              name="streamTrack"
             />
-          ))}
+          </InputWrapper>
+          <InputWrapper
+            label={$t('Rec. Tracks')}
+            tooltip={$t('Designates if this source is audible in your recorded track(s)')}
+            layout="horizontal"
+          >
+            {recordingTracks?.map(track => (
+              <BoolButtonInput
+                label={String(track + 1)}
+                key={track}
+                value={!!trackFlags[track]}
+                onChange={value => onTrackInput(track, value)}
+                checkboxStyles={{ marginRight: '4px' }}
+                name={`flag${track}`}
+              />
+            ))}
+          </InputWrapper>
         </div>
       )}
     </Form>

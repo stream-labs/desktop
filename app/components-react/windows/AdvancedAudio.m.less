@@ -19,9 +19,14 @@
 
 .audio-settings-tracks {
   display: flex;
-}
 
-.track-label {
-  white-space: nowrap;
-  margin-right: 8px;
+  :global(.ant-form-item) {
+    margin-bottom: 0;
+  }
+
+  :global(.ant-form-item-label) {
+    overflow: visible;
+    flex-grow: 1 !important;
+    max-width: 100% !important;
+  }
 }
