@@ -14,7 +14,6 @@ import { ObsImporterService } from './obs-importer';
 
 enum EOnboardingSteps {
   MacPermissions = 'MacPermissions',
-  Connect = 'Connect',
   ConnectFlex = 'ConnectFlex',
   ChooseYourAdventure = 'ChooseYourAdventure',
   ObsImport = 'ObsImport',
@@ -28,13 +27,6 @@ enum EOnboardingSteps {
 const ONBOARDING_STEPS = () => ({
   [EOnboardingSteps.MacPermissions]: {
     element: onboardingSteps.MacPermissions,
-    disableControls: false,
-    hideSkip: true,
-    hideButton: true,
-    isPreboarding: true,
-  },
-  [EOnboardingSteps.Connect]: {
-    element: onboardingSteps.Connect,
     disableControls: false,
     hideSkip: true,
     hideButton: true,
@@ -153,10 +145,6 @@ class OnboardingViews extends ViewHandler<IOnboardingServiceState> {
     }
 
     steps.push(ONBOARDING_STEPS()[EOnboardingSteps.ConnectFlex]);
-
-    if (userViews.isLoggedIn && !userViews.isPrime) {
-      steps.push(ONBOARDING_STEPS()[EOnboardingSteps.Prime]);
-    }
 
     if (isOBSinstalled) {
       steps.push(ONBOARDING_STEPS()[EOnboardingSteps.ChooseYourAdventure]);
