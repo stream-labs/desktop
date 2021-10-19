@@ -26,5 +26,8 @@
   "Image URL": "URL immagine",
   "Example": "Esempio",
   "Change Media": "Cambia contenuti multimediali",
-  "No Sound": "Nessun suono"
+  "No Sound": "Nessun suono",
+  "No Media": "No Media",
+  "Change Link": "Change Link",
+  "Pick From Gallery": "Pick From Gallery"
 }
