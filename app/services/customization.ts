@@ -111,7 +111,7 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
   }
 
   static defaultState: ICustomizationServiceState = {
-    theme: 'night-theme',
+    theme: 'day-theme',
     updateStreamInfoOnLive: true,
     livePreviewEnabled: true,
     leftDock: false,
