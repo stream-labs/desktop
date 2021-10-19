@@ -259,10 +259,10 @@ function DeviceInputs(p: { source: Source }) {
   }));
 
   function handleInput(name: string, value: TObsValue) {
-    setStatefulSettings({ ...statefulSettings, [name]: value });
     EditorCommandsService.actions.executeCommand('EditSourceSettingsCommand', p.source.sourceId, {
       [name]: value,
     });
+    setStatefulSettings({ ...statefulSettings, [name]: value });
   }
 
   return (
@@ -271,12 +271,12 @@ function DeviceInputs(p: { source: Source }) {
         label={$t('Device')}
         options={deviceOptions}
         value={statefulSettings.device_id}
-        onInput={value => handleInput('device_id', value)}
+        onChange={value => handleInput('device_id', value)}
       />
       <SwitchInput
         label={$t('Use Device Timestamps')}
         value={statefulSettings.use_device_timing}
-        onInput={value => handleInput('use_device_timing', value)}
+        onChange={value => handleInput('use_device_timing', value)}
       />
     </>
   );
