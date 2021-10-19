@@ -18,6 +18,7 @@ import { Source } from 'services/sources';
 import { $t } from 'services/i18n';
 import Utils from 'services/utils';
 import styles from './AdvancedAudio.m.less';
+import Scrollable from 'components-react/shared/Scrollable';
 
 const { Panel } = Collapse;
 
@@ -36,17 +37,19 @@ export default function AdvancedAudio() {
 
   return (
     <ModalLayout hideFooter>
-      <Collapse
-        accordion
-        activeKey={expandedSource}
-        onChange={(key: string) => setExpandedSource(key)}
-      >
-        {audioSources.map(audioSource => (
-          <Panel key={audioSource.sourceId} header={<PanelHeader source={audioSource} />}>
-            <PanelForm source={audioSource} />
-          </Panel>
-        ))}
-      </Collapse>
+      <Scrollable style={{ height: '100%' }} snapToWindowEdge>
+        <Collapse
+          accordion
+          activeKey={expandedSource}
+          onChange={(key: string) => setExpandedSource(key)}
+        >
+          {audioSources.map(audioSource => (
+            <Panel key={audioSource.sourceId} header={<PanelHeader source={audioSource} />}>
+              <PanelForm source={audioSource} />
+            </Panel>
+          ))}
+        </Collapse>
+      </Scrollable>
     </ModalLayout>
   );
 }
