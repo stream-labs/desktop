@@ -26,6 +26,8 @@ import {
   PerformanceMetrics,
   RenameSource,
   AdvancedStatistics,
+  WidgetWindow,
+  CustomCodeWindow,
   SafeMode,
 } from 'components/shared/ReactComponentList';
 
@@ -144,6 +146,8 @@ export function getComponents() {
     IconLibraryProperties,
     ScreenCaptureProperties,
     SharedComponentsLibrary,
+    WidgetWindow,
+    CustomCodeWindow,
   };
 }
 
@@ -162,6 +166,10 @@ export interface IWindowOptions extends Electron.BrowserWindowConstructorOptions
   isShown: boolean;
   title?: string;
   center?: boolean;
+  position?: {
+    x: number;
+    y: number;
+  };
   isPreserved?: boolean;
   preservePrevWindow?: boolean;
   prevWindowOptions?: IWindowOptions;
@@ -432,6 +440,7 @@ export class WindowsService extends StatefulService<IWindowsState> {
       },
       ...options,
       ...options.size,
+      ...(options.position || {}),
     }));
 
     newWindow.removeMenu();

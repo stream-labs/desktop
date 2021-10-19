@@ -10,7 +10,7 @@ import GoLiveChecklist from './GoLiveChecklist';
 import Form from '../../shared/inputs/Form';
 import Animation from 'rc-animate';
 import { SwitchInput } from '../../shared/inputs';
-import { useGoLiveSettings } from './useGoLiveSettings';
+import { useGoLiveSettingsRoot } from './useGoLiveSettings';
 
 export default function GoLiveWindow() {
   const { StreamingService, WindowsService } = Services;
@@ -25,7 +25,7 @@ export default function GoLiveWindow() {
     prepopulate,
     isLoading,
     form,
-  } = useGoLiveSettings().select();
+  } = useGoLiveSettingsRoot().select();
 
   const shouldShowConfirm = ['prepopulate', 'waitForNewSettings'].includes(lifecycle);
   const shouldShowSettings = ['empty', 'prepopulate', 'waitForNewSettings'].includes(lifecycle);

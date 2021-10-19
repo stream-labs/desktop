@@ -52,6 +52,7 @@ export interface ICustomizationServiceState {
   leftDock: boolean;
   hideViewerCount: boolean;
   folderSelection: boolean;
+  legacyAlertbox: boolean | null;
   livedockCollapsed: boolean;
   livedockSize: number;
   eventsSize: number;
@@ -135,6 +136,7 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
       droppedFrames: false,
       bandwidth: false,
     },
+    legacyAlertbox: null,
     experimental: {
       // put experimental features here
     },
@@ -150,6 +152,13 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
     super.init();
     this.setSettings(this.runMigrations(this.state, CustomizationService.migrations));
     this.setLiveDockCollapsed(true); // livedock is always collapsed on app start
+
+    // switch all new users to the new alertbox by default
+    if (this.state.legacyAlertbox === null) {
+      const registrationDate = this.userService.state.createdAt;
+      const legacyAlertbox = registrationDate < new Date('October 14, 2021').valueOf();
+      this.setSettings({ legacyAlertbox });
+    }
 
     if (
       this.state.pinnedStatistics.cpu ||
