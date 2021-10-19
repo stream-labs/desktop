@@ -53,6 +53,8 @@ export interface ISettingsValues {
     RecRB?: boolean;
     RecRBTime?: number;
     RecFormat: string;
+    RecTracks?: number;
+    TrackIndex?: string;
   };
   Video: {
     Base: string;
@@ -109,18 +111,15 @@ class SettingsViews extends ViewHandler<ISettingsServiceState> {
 
   get streamTrack() {
     if (!this.isAdvancedOutput) return 0;
-    return Number(this.state.Output.formData[1].parameters[0].value) - 1;
+    return Number(this.values.Output.TrackIndex) - 1;
   }
 
   get recordingTracks() {
     if (!this.isAdvancedOutput) return;
-    const input = this.state.Output.formData[2].parameters[4] as IObsBitmaskInput;
-    const bitArray = Utils.numberToBinnaryArray(input.value, input.size).reverse();
+    const bitArray = Utils.numberToBinnaryArray(this.values.Output.RecTracks, 6).reverse();
     const trackLabels: number[] = [];
     bitArray.forEach((bit, i) => {
-      if (bit === 1) {
-        trackLabels.push(i);
-      }
+      if (bit === 1) trackLabels.push(i);
     });
     return trackLabels;
   }

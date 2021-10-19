@@ -142,16 +142,18 @@ function PanelHeader(p: { source: AudioSource }) {
             tooltip={$t('Designates if this source is audible in your recorded track(s)')}
             layout="horizontal"
           >
-            {recordingTracks?.map(track => (
-              <BoolButtonInput
-                label={String(track + 1)}
-                key={track}
-                value={!!trackFlags[track]}
-                onChange={value => onTrackInput(track, value)}
-                checkboxStyles={{ marginRight: '4px' }}
-                name={`flag${track}`}
-              />
-            ))}
+            <div style={{ display: 'flex' }}>
+              {recordingTracks?.map(track => (
+                <BoolButtonInput
+                  label={String(track + 1)}
+                  key={track}
+                  value={!!trackFlags[track]}
+                  onChange={value => onTrackInput(track, value)}
+                  checkboxStyles={{ marginRight: '4px' }}
+                  name={`flag${track}`}
+                />
+              ))}
+            </div>
           </InputWrapper>
         </div>
       )}
@@ -250,7 +252,7 @@ function DeviceInputs(p: { source: Source }) {
   const { EditorCommandsService } = Services;
 
   const sourceProperties = useMemo<TObsFormData>(() => p.source.getPropertiesFormData(), []);
-  const settings = useMemo(() => p.source.getSettings(), []);
+  const settings = useMemo(() => p.source.getSettings(), [p.source.sourceId]);
   const [statefulSettings, setStatefulSettings] = useState(settings);
 
   const deviceOptions = (sourceProperties[0] as IObsListInput<TObsValue>).options.map(option => ({
