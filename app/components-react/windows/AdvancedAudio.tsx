@@ -82,27 +82,23 @@ function PanelHeader(p: { source: AudioSource }) {
     );
   }
 
-  function onInputHandler(name: string, value: TObsValue) {
+  function onInputHandler(name: string, value: TObsValue, e: React.MouseEvent) {
+    e.stopPropagation();
     EditorCommandsService.actions.executeCommand('SetAudioSettingsCommand', sourceId, {
       [name]: value,
     });
   }
 
   return (
-    <Form
-      className={styles.audioSettingsRow}
-      onClick={(e: React.MouseEvent) => e.stopPropagation()}
-      data-role="form"
-      data-name="advanced-audio-header"
-    >
+    <Form className={styles.audioSettingsRow} data-role="form" data-name="advanced-audio-header">
       <div className={styles.audioSourceName}>{name}</div>
       <Tooltip title={muted ? $t('Unmute') : $t('Mute')}>
         <i
           className={muted ? 'icon-mute' : 'icon-audio'}
-          onClick={() => onInputHandler('muted', !muted)}
+          onClick={(e: React.MouseEvent) => onInputHandler('muted', !muted, e)}
         />
       </Tooltip>
-      <div style={{ width: '200px' }}>
+      <div style={{ width: '200px' }} onClick={(e: React.MouseEvent) => e.stopPropagation()}>
         <SliderInput
           value={Math.floor(fader.deflection * 100)}
           max={100}
@@ -117,11 +113,14 @@ function PanelHeader(p: { source: AudioSource }) {
       <Tooltip title={mixerHidden ? $t('Show in Mixer') : $t('Hide in Mixer')}>
         <i
           className={mixerHidden ? 'icon-hide' : 'icon-view'}
-          onClick={() => onInputHandler('mixerHidden', !mixerHidden)}
+          onClick={(e: React.MouseEvent) => onInputHandler('mixerHidden', !mixerHidden, e)}
         />
       </Tooltip>
       {isAdvancedOutput && (
-        <div className={styles.audioSettingsTracks}>
+        <div
+          className={styles.audioSettingsTracks}
+          onClick={(e: React.MouseEvent) => e.stopPropagation()}
+        >
           <InputWrapper
             label={$t('Stream Track')}
             tooltip={$t('Designates if this source is audible in your live broadcast')}

@@ -43,7 +43,7 @@ export const SliderInput = InputComponent((partialProps: TSliderInputProps) => {
             <InputNumber
               {...inputAttrs}
               onChange={onChangeHandler}
-              style={{ width: numberInputHeight }}
+              style={{ width: numberInputHeight, marginLeft: '8px' }}
             />
           </Col>
         )}
