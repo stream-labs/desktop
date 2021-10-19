@@ -132,5 +132,8 @@
   "Apply": "적용",
   "Do not show this message again": "이 메시지를 다시 표시 안 함",
   "You can only select up to %{max} items": "최대 %{max}개의 항목만 선택 가능",
-  "Time": "시간"
+  "Time": "시간",
+  "Sound Volume": "사운드 볼륨",
+  "Sound": "사운드",
+  "Play Audio": "Play Audio"
 }
