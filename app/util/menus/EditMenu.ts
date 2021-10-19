@@ -17,6 +17,8 @@ import { EditorCommandsService } from 'services/editor-commands';
 import { ERenderingMode } from '../../../obs-api';
 import { StreamingService } from 'services/streaming';
 import Utils from 'services/utils';
+import { ProjectorMenu } from './ProjectorMenu';
+import { FiltersMenu } from './FiltersMenu';
 
 interface IEditMenuOptions {
   selectedSourceId?: string;
@@ -126,29 +128,21 @@ export class EditMenu extends Menu {
               );
             },
           });
-          this.append({
-            label: streamVisLabel,
-            click: () => {
-              selectedItem.setStreamVisible(!selectedItem.streamVisible);
-            },
-            enabled: this.streamingService.state.selectiveRecording,
-          });
-          this.append({
-            label: recordingVisLabel,
-            click: () => {
-              selectedItem.setRecordingVisible(!selectedItem.recordingVisible);
-            },
-            enabled: this.streamingService.state.selectiveRecording,
-          });
-          this.append({
-            label: $t('Create Source Projector'),
-            click: () => {
-              this.projectorService.createProjector(
-                ERenderingMode.OBS_MAIN_RENDERING,
-                selectedItem.sourceId,
-              );
-            },
-          });
+
+          if (this.streamingService.state.selectiveRecording) {
+            this.append({
+              label: streamVisLabel,
+              click: () => {
+                selectedItem.setStreamVisible(!selectedItem.streamVisible);
+              },
+            });
+            this.append({
+              label: recordingVisLabel,
+              click: () => {
+                selectedItem.setRecordingVisible(!selectedItem.recordingVisible);
+              },
+            });
+          }
         } else {
           this.append({
             label: $t('Show'),
@@ -259,41 +253,12 @@ export class EditMenu extends Menu {
         click: () => this.sourcesService.showRenameSource(this.source.sourceId),
       });
 
-      this.append({ type: 'separator' });
-
-      this.append({
-        label: $t('Performance Mode'),
-        type: 'checkbox',
-        checked: this.customizationService.state.performanceMode,
-        click: () =>
-          this.customizationService.setSettings({
-            performanceMode: !this.customizationService.state.performanceMode,
-          }),
-      });
-
-      this.append({ type: 'separator' });
-
       const filtersCount = this.sourceFiltersService.getFilters(this.source.sourceId).length;
 
       this.append({
         label: $t('Filters') + (filtersCount > 0 ? ` (${filtersCount})` : ''),
-        click: () => {
-          this.showFilters();
-        },
+        submenu: new FiltersMenu(this.source.sourceId).menu,
       });
-
-      this.append({
-        label: $t('Copy Filters'),
-        click: () => this.clipboardService.copyFilters(this.source.sourceId),
-      });
-
-      this.append({
-        label: $t('Paste Filters'),
-        click: () => this.clipboardService.pasteFilters(this.source.sourceId),
-        enabled: this.clipboardService.views.hasFilters(),
-      });
-
-      this.append({ type: 'separator' });
 
       this.append({
         label: $t('Properties'),
@@ -316,35 +281,20 @@ export class EditMenu extends Menu {
         label: $t('Unlock Sources'),
         click: () => this.scenesService.setLockOnAllScenes(false),
       });
-
-      this.append({
-        label: $t('Performance Mode'),
-        type: 'checkbox',
-        checked: this.customizationService.state.performanceMode,
-        click: () =>
-          this.customizationService.setSettings({
-            performanceMode: !this.customizationService.state.performanceMode,
-          }),
-      });
     }
 
     this.append({ type: 'separator' });
 
-    this.append({
-      label: $t('Create Output Projector'),
-      click: () => this.projectorService.createProjector(ERenderingMode.OBS_MAIN_RENDERING),
-    });
+    this.append({ label: $t('Projector'), submenu: this.projectorSubmenu().menu });
 
     this.append({
-      label: $t('Create Stream Output Projector'),
-      click: () => this.projectorService.createProjector(ERenderingMode.OBS_STREAMING_RENDERING),
-      enabled: this.streamingService.state.selectiveRecording || Utils.isDevMode(),
-    });
-
-    this.append({
-      label: $t('Create Recording Output Projector'),
-      click: () => this.projectorService.createProjector(ERenderingMode.OBS_RECORDING_RENDERING),
-      enabled: this.streamingService.state.selectiveRecording || Utils.isDevMode(),
+      label: $t('Performance Mode'),
+      type: 'checkbox',
+      checked: this.customizationService.state.performanceMode,
+      click: () =>
+        this.customizationService.setSettings({
+          performanceMode: !this.customizationService.state.performanceMode,
+        }),
     });
 
     this.append({ type: 'separator' });
@@ -380,10 +330,6 @@ export class EditMenu extends Menu {
     }
   }
 
-  private showFilters() {
-    this.sourceFiltersService.showSourceFilters(this.source.sourceId);
-  }
-
   private showProperties() {
     if (this.options.showAudioMixerMenu) {
       this.audioService.actions.showAdvancedSettings(this.source.sourceId);
@@ -398,5 +344,9 @@ export class EditMenu extends Menu {
 
   private groupSubmenu() {
     return new GroupMenu();
+  }
+
+  private projectorSubmenu() {
+    return new ProjectorMenu();
   }
 }

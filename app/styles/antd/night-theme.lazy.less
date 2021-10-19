@@ -41,7 +41,7 @@
 @link-hover-color: @light-1; // var(--title)
 @link-active-color: @light-1; // var(--title)
 
-@border-color-base: @dark-4; // var(--border)
+@border-color-base:  @dark-5; // var(--button)
 @border-color-split: @dark-4; // var(--border)
 @border-color-inverse: @dark-4; // var(--border)
 
@@ -121,7 +121,7 @@
 @alert-success-border-color: @teal-dark; // var(--teal)
 @alert-success-bg-color: fade(@teal-dark, 8%); // var(--teal-semi)
 @alert-success-icon-color: @teal-dark; // var(--teal)
-@alert-info-border-color: @yellow-dark; // var(--info)
+@alert-info-border-color: fade(@yellow-dark, 15%); // var(--info-semi)
 @alert-info-bg-color: fade(@yellow-dark, 8%); // var(--info-semi)
 @alert-info-icon-color: @yellow-dark; // var(--info)
 @alert-warning-border-color: @red-dark; // var(--warning)
@@ -137,6 +137,47 @@
 
 @border-radius-base: 4px;
 @font-family: 'Roboto', sans-serif;
+
+
+// Menu
+// ---
+//@menu-inline-toplevel-item-height: 40px;
+@menu-item-height: 48px;
+//@menu-item-group-height: @line-height-base;
+//@menu-collapsed-width: 80px;
+//@menu-bg: @component-background;
+//@menu-popup-bg: @component-background;
+//@menu-item-color: @text-color;
+//@menu-inline-submenu-bg: @background-color-light;
+@menu-highlight-color: @white;
+//@menu-highlight-danger-color: @error-color;
+@menu-item-active-bg: fade(@primary-1, 25%);
+//@menu-item-active-danger-bg: @red-1;
+@menu-item-active-border-width: 3px;
+//@menu-item-group-title-color: @text-color-secondary;
+@menu-item-vertical-margin: 0;
+//@menu-item-font-size: @font-size-base;
+@menu-item-boundary-margin: 0;
+//@menu-item-padding-horizontal: 20px;
+//@menu-item-padding: 0 @menu-item-padding-horizontal;
+//@menu-horizontal-line-height: 46px;
+//@menu-icon-margin-right: 10px;
+//@menu-icon-size: @menu-item-font-size;
+//@menu-icon-size-lg: @font-size-lg;
+//@menu-item-group-title-font-size: @menu-item-font-size;
+
+// dark theme menu
+//@menu-dark-color: @text-color-secondary-dark;
+//@menu-dark-danger-color: @error-color;
+@menu-dark-bg: @dark-2; // var(--section);;
+//@menu-dark-arrow-color: #fff;
+//@menu-dark-inline-submenu-bg: #000c17;
+//@menu-dark-highlight-color: #fff;
+@menu-dark-item-active-bg: fade(@primary-1, 25%);
+//@menu-dark-item-active-danger-bg: @error-color;
+//@menu-dark-selected-item-icon-color: @white;
+//@menu-dark-selected-item-text-color: @white;
+@menu-dark-item-hover-bg: darken(@dark-4, 4%); // var(--dropdown-alt-bg);
 
 // ADDITIONAL STYLES
 .ant-modal-footer {

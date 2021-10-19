@@ -1,7 +1,7 @@
 <template>
 <h-form-group :title="value.description">
   <div class="path-input__row">
-    <text-input :value="value.value" @input="handleChange" :metadata="{ disabled: value.enabled === false, name: value.name }" />
+    <text-input :value="value.value" @input="handleChange" :metadata="{ disabled: value.enabled === false, name: value.name, fullWidth: true }" />
     <button @click="showFileDialog" class="button button--default" :disabled="value.enabled === false">
       {{ $t('Browse') }}
     </button>
@@ -22,7 +22,8 @@
     }
 
     button {
-      margin-left: 12px;
+      margin: 0;
+      margin-left: -5px;
     }
   }
 </style>

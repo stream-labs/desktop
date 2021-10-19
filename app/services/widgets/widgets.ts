@@ -1,4 +1,3 @@
-import throttle from 'lodash/throttle';
 import { Inject } from 'services/core/injector';
 import { UserService } from '../user';
 import { ScenesService, SceneItem, Scene } from '../scenes';
@@ -8,9 +7,8 @@ import { HostsService } from '../hosts';
 import { ScalableRectangle } from 'util/ScalableRectangle';
 import namingHelpers from 'util/NamingHelpers';
 import fs from 'fs';
-import { WidgetSettingsService } from './settings/widget-settings';
 import { ServicesManager } from 'services-manager';
-import { authorizedHeaders } from 'util/requests';
+import { authorizedHeaders, handleResponse } from 'util/requests';
 import { ISerializableWidget, IWidgetSource, IWidgetsServiceApi } from './widgets-api';
 import { WidgetType, WidgetDefinitions, WidgetTesters } from './widgets-data';
 import { mutation, StatefulService } from '../core/stateful-service';
@@ -18,10 +16,12 @@ import { WidgetSource } from './widget-source';
 import { InitAfter } from 'services/core/service-initialization-observer';
 import Vue from 'vue';
 import cloneDeep from 'lodash/cloneDeep';
-import { Subscription } from 'rxjs';
+import { Subject, Subscription } from 'rxjs';
 import { Throttle } from 'lodash-decorators';
 import { EditorCommandsService } from 'services/editor-commands';
 import { TWindowComponentName } from '../windows';
+import { THttpMethod } from './settings/widget-settings';
+import { getEventsConfig, getWidgetsConfig } from './widget-config';
 
 export interface IWidgetSourcesState {
   widgetSources: Dictionary<IWidgetSource>;
@@ -136,9 +136,9 @@ export class WidgetsService
     return WidgetType[type] as TWindowComponentName;
   }
 
-  getWidgetSettingsService(type: WidgetType): WidgetSettingsService<any> {
-    const serviceName = `${this.getWidgetComponent(type)}Service`;
+  getWidgetSettingsService(type: WidgetType): any {
     const servicesManager: ServicesManager = ServicesManager.instance;
+    const serviceName = `${this.getWidgetComponent(type)}Service`;
     return servicesManager.getResource(serviceName);
   }
 
@@ -331,6 +331,42 @@ export class WidgetsService
         y: widget.scaleY * this.videoService.baseHeight,
       },
     });
+  }
+
+  get widgetsConfig() {
+    return getWidgetsConfig(this.hostsService.streamlabs, this.userService.widgetToken);
+  }
+
+  get eventsConfig() {
+    return getEventsConfig(this.hostsService.streamlabs);
+  }
+
+  // make a request to widgets API
+  async request(req: { url: string; method?: THttpMethod; body?: any }): Promise<any> {
+    const method = req.method || 'GET';
+    const headers = authorizedHeaders(this.userService.apiToken);
+    headers.append('Content-Type', 'application/json');
+
+    const request = new Request(req.url, {
+      headers,
+      method,
+      body: req.body ? JSON.stringify(req.body) : void 0,
+    });
+
+    return fetch(request)
+      .then(res => {
+        return Promise.resolve(res);
+      })
+      .then(handleResponse);
+  }
+
+  settingsInvalidated = new Subject();
+
+  /**
+   * Ask the WidgetSetting window to re-load data
+   */
+  invalidateSettingsWindow() {
+    this.settingsInvalidated.next();
   }
 
   @mutation()

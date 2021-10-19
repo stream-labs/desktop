@@ -12,10 +12,12 @@ import { logIn } from '../../helpers/modules/user';
 import { releaseUserInPool, reserveUserFromPool } from '../../helpers/spectron/user';
 import { showSettingsWindow } from '../../helpers/modules/settings/settings';
 import { test, useSpectron } from '../../helpers/spectron';
+import {sleep} from "../../helpers/sleep";
 
 useSpectron();
 
-test('Multistream default mode', async t => {
+// TODO: flaky
+test.skip('Multistream default mode', async t => {
   await logIn(null, { multistream: true });
   await prepareToGoLive();
   await clickGoLive();
@@ -43,6 +45,8 @@ test('Multistream default mode', async t => {
   await t.pass();
 });
 
+
+// TODO: flaky
 test('Multistream advanced mode', async t => {
   await logIn(null, { multistream: true });
   await prepareToGoLive();

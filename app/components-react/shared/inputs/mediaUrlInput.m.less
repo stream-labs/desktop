@@ -1,0 +1,60 @@
+@import '../../../styles/index';
+
+.media-input-wrapper() {
+  width: 100%;
+  max-width: 300px;
+  background-color: var(--section);
+  .radius();
+}
+
+.media-input {
+  .media-input-wrapper();
+  position: relative;
+  overflow: hidden;
+  height: 120px;
+  .media-buttons {
+    opacity: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    position: absolute;
+    bottom: 0;
+  }
+
+  &:hover {
+    .media-buttons {opacity: 1;}
+  }
+}
+
+.audio-input {
+  .media-input-wrapper();
+  .media-buttons button { opacity: 0;}
+  &:hover .media-buttons button { opacity: 1;}
+}
+
+.preview {
+  max-height: 110px;
+  width: auto;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.filename {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  direction: rtl;
+  text-align: left;
+  padding: 4px 11px;
+}
+
+.filename-empty {
+  opacity: 0.5;
+}
+
+.media-buttons {
+  width: 100%;
+  :global(button:hover .anticon) {
+    color: var(--primary);
+  }
+}
