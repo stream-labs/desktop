@@ -15,7 +15,7 @@ import { metadata } from '../shared/inputs/metadata';
 import { $t } from '../../services/i18n';
 import * as electron from 'electron';
 import { getDefined } from '../../util/properties-type-guards';
-import {TPlatform} from "../../services/platforms";
+import { TPlatform } from '../../services/platforms';
 
 interface IAlertBoxState extends IWidgetState {
   data: {
