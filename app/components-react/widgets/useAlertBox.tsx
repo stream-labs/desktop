@@ -118,7 +118,6 @@ export class AlertBoxModule extends WidgetModule<IAlertBoxState> {
   protected patchAfterFetch(data: any): any {
     const settings = data.settings;
 
-
     // sanitize general settings
     Object.keys(settings).forEach(key => {
       settings[key] = this.sanitizeValue(settings[key], this.generalMetadata[key]);

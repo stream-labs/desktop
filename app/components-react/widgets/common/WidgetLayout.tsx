@@ -9,7 +9,7 @@ import { $t } from '../../../services/i18n';
 import { CustomCodeSection } from './CustomCode';
 import { CustomFieldsSection } from './CustomFields';
 import { ButtonGroup } from '../../shared/ButtonGroup';
-import {RollbackOutlined} from "@ant-design/icons";
+import { RollbackOutlined } from '@ant-design/icons';
 const { Content, Header, Footer } = Layout;
 
 /**

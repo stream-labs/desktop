@@ -21,8 +21,8 @@ import { Throttle } from 'lodash-decorators';
 import { EditorCommandsService } from 'services/editor-commands';
 import { TWindowComponentName } from '../windows';
 import { THttpMethod } from './settings/widget-settings';
-import {getEventsConfig, getWidgetsConfig, TAlertType} from './widget-config';
-import {TPlatform} from "../platforms";
+import { getEventsConfig, getWidgetsConfig, TAlertType } from './widget-config';
+import { TPlatform } from '../platforms';
 
 export interface IWidgetSourcesState {
   widgetSources: Dictionary<IWidgetSource>;

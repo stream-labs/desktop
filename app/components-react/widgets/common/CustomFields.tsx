@@ -12,7 +12,7 @@ import React from 'react';
 import { Button, Collapse } from 'antd';
 import { $t } from '../../../services/i18n';
 import InputWrapper from '../../shared/inputs/InputWrapper';
-import {assertIsDefined} from "../../../util/properties-type-guards";
+import { assertIsDefined } from '../../../util/properties-type-guards';
 
 /**
  * Renders a collapsable section with custom fields controls
