@@ -1,4 +1,4 @@
-import { Col, Collapse, Layout, Row, Spin } from 'antd';
+import { Button, Col, Collapse, Layout, Row, Spin } from 'antd';
 import React, { ReactNode } from 'react';
 import { useWidget } from './useWidget';
 import Display from '../../shared/Display';
@@ -8,14 +8,25 @@ import { ObsForm } from '../../obs/ObsForm';
 import { $t } from '../../../services/i18n';
 import { CustomCodeSection } from './CustomCode';
 import { CustomFieldsSection } from './CustomFields';
-const { Content, Header } = Layout;
+import { ButtonGroup } from '../../shared/ButtonGroup';
+import { RollbackOutlined } from '@ant-design/icons';
+const { Content, Header, Footer } = Layout;
 
 /**
  * A layout component for all widgets
  * Can display 1 column or 2 columns depending on how many children have been provided to props
  */
 export function WidgetLayout(p: { children: ReactNode | [ReactNode, ReactNode] }) {
-  const { previewSourceId, isLoading, selectedTab, config, hasCustomFields } = useWidget();
+  const {
+    previewSourceId,
+    isLoading,
+    selectedTab,
+    config,
+    hasCustomFields,
+    close,
+    canRevert,
+    revertChanges,
+  } = useWidget();
   let MenuPanel: ReactNode;
   let ContentPanel: ReactNode;
 
@@ -75,6 +86,21 @@ export function WidgetLayout(p: { children: ReactNode | [ReactNode, ReactNode] }
           </Col>
         </Row>
       </Content>
+
+      {/* FOOTER BUTTONS  */}
+      <div className="ant-modal-footer">
+        {canRevert && (
+          <Button
+            onClick={revertChanges}
+            type="ghost"
+            style={{ position: 'absolute', left: '16px' }}
+          >
+            <RollbackOutlined />
+            {$t('Revert Changes')}
+          </Button>
+        )}
+        <Button onClick={close}>{$t('Close')}</Button>
+      </div>
     </Layout>
   );
 }

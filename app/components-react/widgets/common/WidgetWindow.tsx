@@ -75,7 +75,7 @@ export function WidgetWindow() {
   useSubscription(WidgetsService.settingsInvalidated, reload);
 
   return (
-    <ModalLayout bodyStyle={{ padding: '0px' }}>
+    <ModalLayout bodyStyle={{ padding: '0px' }} hideFooter={true}>
       <WidgetSettingsComponent />
     </ModalLayout>
   );

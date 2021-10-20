@@ -1,19 +1,30 @@
-import { createAlertsMap, IWidgetState, useWidget, WidgetModule } from './common/useWidget';
-import { values } from 'lodash';
+import {
+  createAlertsMap,
+  ICustomCode,
+  ICustomField,
+  IWidgetState,
+  useWidget,
+  WidgetModule,
+} from './common/useWidget';
+import { values, cloneDeep, pick } from 'lodash';
 import { IAlertConfig, TAlertType } from '../../services/widgets/widget-config';
 import { createBinding } from '../shared/inputs';
 import { Services } from '../service-provider';
 import { mutation } from '../store';
 import { metadata } from '../shared/inputs/metadata';
 import { $t } from '../../services/i18n';
+import * as electron from 'electron';
+import { getDefined } from '../../util/properties-type-guards';
 
 interface IAlertBoxState extends IWidgetState {
   data: {
     settings: {
       alert_delay: 0;
+      bit_variations: any;
     };
+    variations: TVariationsState;
   };
-  variations: TVariationsState;
+  availableAlerts: TAlertType[];
 }
 
 /**
@@ -21,9 +32,11 @@ interface IAlertBoxState extends IWidgetState {
  */
 export class AlertBoxModule extends WidgetModule<IAlertBoxState> {
   /**
-   * list of all events supported by users' platforms
+   * config for all events supported by users' platforms
    */
-  alertEvents = values(this.eventsConfig) as IAlertConfig[];
+  get alerts() {
+    return this.state.availableAlerts.map(alertType => this.eventsConfig[alertType]);
+  }
 
   /**
    * metadata for the general settings form
@@ -39,7 +52,7 @@ export class AlertBoxModule extends WidgetModule<IAlertBoxState> {
    * returns settings for a given variation from the state
    */
   getVariationSettings<T extends TAlertType>(alertType: T, variationId = 'default') {
-    return this.state.variations[alertType][variationId];
+    return this.state.data.variations[alertType][variationId];
   }
 
   /**
@@ -84,8 +97,8 @@ export class AlertBoxModule extends WidgetModule<IAlertBoxState> {
    * list of enabled alerts
    */
   get enabledAlerts() {
-    return Object.keys(this.state.variations).filter(
-      alertType => this.state.variations[alertType].default.enabled,
+    return Object.keys(this.state.data.variations).filter(
+      alertType => this.state.data.variations[alertType].default.enabled,
     );
   }
 
@@ -104,15 +117,26 @@ export class AlertBoxModule extends WidgetModule<IAlertBoxState> {
    */
   protected patchAfterFetch(data: any): any {
     const settings = data.settings;
-    const alertEvents = this.alertEvents;
 
     // sanitize general settings
     Object.keys(settings).forEach(key => {
       settings[key] = this.sanitizeValue(settings[key], this.generalMetadata[key]);
     });
 
-    // group alertbox settings by alert types and store them in `state.variations`
-    alertEvents.map(alertEvent => {
+    return data;
+  }
+
+  /**
+   * @override
+   */
+  setData(data: IAlertBoxState['data']) {
+    // save widget data instate and calculate additional state variables
+    super.setData(data);
+    const settings = data.settings;
+    const allAlerts = values(this.eventsConfig) as IAlertConfig[];
+
+    // group alertbox settings by alert types and store them in `state.data.variations`
+    allAlerts.map(alertEvent => {
       const apiKey = alertEvent.apiKey || alertEvent.type;
       const alertFields = Object.keys(settings).filter(key => key.startsWith(`${apiKey}_`));
       const variationSettings = {} as any;
@@ -128,7 +152,12 @@ export class AlertBoxModule extends WidgetModule<IAlertBoxState> {
       });
       this.setVariationSettings(alertEvent.type, 'default', variationSettings as any);
     });
-    return data;
+
+    // define available alerts
+    const availableAlerts = allAlerts
+      .filter(alertConfig => this.state.data.variations[alertConfig.type])
+      .map(alertConfig => alertConfig.type);
+    this.setAvailableAlerts(availableAlerts);
   }
 
   /**
@@ -169,13 +198,14 @@ export class AlertBoxModule extends WidgetModule<IAlertBoxState> {
   ) {
     const event = this.eventsConfig[type];
     const apiKey = event.apiKey || event.type;
-    const currentVariationSettings = this.state.variations[type].default;
+    const currentVariationSettings = this.getVariationSettings(type);
 
     // save current settings to the state
-    this.setVariationSettings(type, variationId, {
+    const newVariationSettings = {
       ...currentVariationSettings,
       ...variationPatch,
-    });
+    };
+    this.setVariationSettings(type, variationId, newVariationSettings);
 
     // flatten settings by adding prefixes
     const settingsPatch = {} as any;
@@ -183,8 +213,68 @@ export class AlertBoxModule extends WidgetModule<IAlertBoxState> {
       settingsPatch[`${apiKey}_${key}`] = variationPatch[key];
     });
 
+    // set the same message template for all Cheer variations
+    if (type === 'cheer') {
+      const newBitsVariations = this.state.data.settings.bit_variations.map((variation: any) => {
+        const newVariation = cloneDeep(variation);
+        newVariation.settings.text.format = newVariationSettings.message_template;
+        return newVariation;
+      });
+      settingsPatch.bit_variations = newBitsVariations;
+    }
+
     // save flatten setting in store and save them on the server
     this.updateSettings({ ...this.state.data.settings, ...settingsPatch });
+  }
+
+  openAlertInfo(alertType: TAlertType) {
+    const url = getDefined(this.eventsConfig[alertType].tooltipLink);
+    electron.remote.shell.openExternal(url);
+  }
+
+  get selectedAlert(): TAlertType | null {
+    const selectedTab = this.state.selectedTab;
+    if (this.eventsConfig[selectedTab]) {
+      return selectedTab as TAlertType;
+    }
+    return null;
+  }
+
+  /**
+   * @override
+   */
+  get customCode() {
+    // get custom code from the selected variation
+    if (!this.selectedAlert) return null;
+    const variationSettings = this.getVariationSettings(this.selectedAlert);
+    const {
+      custom_html_enabled,
+      custom_html,
+      custom_css,
+      custom_js,
+      custom_json,
+    } = variationSettings;
+    return {
+      custom_enabled: custom_html_enabled,
+      custom_css,
+      custom_js,
+      custom_html,
+      custom_json,
+    };
+  }
+
+  /**
+   * @override
+   */
+  updateCustomCode(patch: Partial<ICustomCode>) {
+    // save custom code from the selected variation
+    const selectedAlert = getDefined(this.selectedAlert);
+    const newPatch = cloneDeep(patch) as Partial<ICustomCode> & { custom_html_enabled?: boolean };
+    if (newPatch.custom_enabled !== undefined) {
+      newPatch.custom_html_enabled = patch.custom_enabled;
+      delete newPatch.custom_enabled;
+    }
+    this.updateVariationSettings(selectedAlert, 'default', newPatch);
   }
 
   /**
@@ -197,9 +287,14 @@ export class AlertBoxModule extends WidgetModule<IAlertBoxState> {
     settings: TVariationsSettings[TAlertType],
   ) {
     const state = this.state;
-    if (!state.variations) state.variations = {} as any;
-    if (!state.variations[type]) state.variations[type] = {} as any;
-    state.variations[type][variationId] = settings;
+    if (!state.data.variations) state.data.variations = {} as any;
+    if (!state.data.variations[type]) state.data.variations[type] = {} as any;
+    state.data.variations[type][variationId] = settings;
+  }
+
+  @mutation()
+  private setAvailableAlerts(alerts: TAlertType[]) {
+    this.state.availableAlerts = alerts;
   }
 }
 
@@ -241,6 +336,7 @@ function getVariationsMetadata() {
     sound_href: metadata.text({ label: $t('Sound') }),
     sound_volume: metadata.slider({ label: $t('Sound Volume'), min: 0, max: 100 }),
     message_template: metadata.text({ label: $t('Message Template') }),
+    layout: metadata.list<'banner' | 'above' | 'side'>({ label: $t('Layout') }),
     text_delay: metadata.seconds({
       label: $t('Text Delay'),
       max: 60000,
@@ -249,6 +345,11 @@ function getVariationsMetadata() {
       ),
     }),
     enabled: metadata.bool({}),
+    custom_html_enabled: metadata.bool({}),
+    custom_html: metadata.text({}),
+    custom_css: metadata.text({}),
+    custom_js: metadata.text({}),
+    custom_json: metadata.any({}),
   };
 
   // define unique metadata for each variation
@@ -276,9 +377,10 @@ function getVariationsMetadata() {
     host: {},
     subscription: {},
     cheer: {},
-    superchat: {},
-    stars: {},
-    support: {},
+    ytSuperchat: {},
+    fbStars: {},
+    fbSupport: {},
+    fbLike: {},
   });
 
   // mix common and specific metadata and return it
