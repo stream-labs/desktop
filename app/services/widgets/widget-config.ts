@@ -308,7 +308,7 @@ export function getEventsConfig(
         return `https://${host}/api/v5/slobs/test/facebook_account/like`;
       },
       platforms: ['facebook'],
-      tooltip: $t('Triggers when user liked your stream'),
+      tooltip: $t('Triggers when somebody liked your stream'),
     },
   };
 }
