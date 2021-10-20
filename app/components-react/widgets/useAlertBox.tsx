@@ -6,7 +6,7 @@ import {
   useWidget,
   WidgetModule,
 } from './common/useWidget';
-import { values, cloneDeep, pick } from 'lodash';
+import { values, cloneDeep, intersection } from 'lodash';
 import { IAlertConfig, TAlertType } from '../../services/widgets/widget-config';
 import { createBinding } from '../shared/inputs';
 import { Services } from '../service-provider';
@@ -15,6 +15,7 @@ import { metadata } from '../shared/inputs/metadata';
 import { $t } from '../../services/i18n';
 import * as electron from 'electron';
 import { getDefined } from '../../util/properties-type-guards';
+import {TPlatform} from "../../services/platforms";
 
 interface IAlertBoxState extends IWidgetState {
   data: {
@@ -154,8 +155,14 @@ export class AlertBoxModule extends WidgetModule<IAlertBoxState> {
     });
 
     // define available alerts
+    const userPlatforms = Object.keys(Services.UserService.views.platforms!) as TPlatform[];
     const availableAlerts = allAlerts
-      .filter(alertConfig => this.state.data.variations[alertConfig.type])
+      .filter(alertConfig => {
+        if (alertConfig.platforms && !intersection(alertConfig.platforms, userPlatforms).length) {
+          return false;
+        }
+        return !!this.state.data.variations[alertConfig.type];
+      })
       .map(alertConfig => alertConfig.type);
     this.setAvailableAlerts(availableAlerts);
   }
