@@ -105,9 +105,8 @@ function JsonEditor() {
  * Renders a collapsable section with the custom code switcher
  */
 export function CustomCodeSection() {
-  const { customCode, updateCustomCode, openCustomCodeEditor } = useWidget();
+  const { isCustomCodeEnabled, customCode, updateCustomCode, openCustomCodeEditor } = useWidget();
   if (!customCode) return <></>;
-  const isEnabled = customCode.custom_enabled;
 
   return (
     <Collapse bordered={false}>
@@ -115,10 +114,10 @@ export function CustomCodeSection() {
         <Form layout="horizontal">
           <SwitchInput
             label={$t('Enable Custom Code')}
-            value={isEnabled}
+            value={isCustomCodeEnabled}
             onChange={custom_enabled => updateCustomCode({ custom_enabled })}
           />
-          {isEnabled && (
+          {isCustomCodeEnabled && (
             <ButtonGroup>
               <Button onClick={openCustomCodeEditor}>{'Edit Custom Code'}</Button>
             </ButtonGroup>

@@ -21,6 +21,8 @@ export interface IWidgetState {
   selectedTab: string;
   type: TWidgetType;
   browserSourceProps: TObsFormData;
+  prevSettings: any;
+  canRevert: boolean;
   data: {
     settings: Record<string, any>;
   };
@@ -38,6 +40,8 @@ export const DEFAULT_WIDGET_STATE = ({
   selectedTab: 'general',
   type: '',
   data: {},
+  prevSettings: {},
+  canRevert: false,
   browserSourceProps: null,
 } as unknown) as IWidgetState;
 
@@ -83,6 +87,7 @@ export class WidgetModule<TWidgetState extends IWidgetState = IWidgetState> {
     this.state.type = WidgetType[widget.type] as TWidgetType;
     const data = await this.fetchData();
     this.setData(data);
+    this.setPrevSettings(data);
     this.setIsLoading(false);
   }
 
@@ -173,6 +178,10 @@ export class WidgetModule<TWidgetState extends IWidgetState = IWidgetState> {
     return this.widgetsConfig[this.state.type];
   }
 
+  get isCustomCodeEnabled() {
+    return this.customCode?.custom_enabled;
+  }
+
   public onMenuClickHandler(e: { key: string }) {
     this.setSelectedTab(e.key);
   }
@@ -261,9 +270,15 @@ export class WidgetModule<TWidgetState extends IWidgetState = IWidgetState> {
   }
 
   @mutation()
+  private setPrevSettings(data: TWidgetState['data']) {
+    this.state.prevSettings = data;
+  }
+
+  @mutation()
   private setSettings(settings: TWidgetState['data']['settings']) {
     assertIsDefined(this.state.data);
     this.state.data.settings = settings;
+    this.state.canRevert = true;
   }
 
   @mutation()

@@ -74,7 +74,7 @@ export function getWidgetsConfig(host: string, token: string): Record<TWidgetTyp
 
       settingsWindowSize: {
         width: 850,
-        height: 850,
+        height: 870,
       },
 
       url: `https://${host}/alert-box/v3/${token}`,

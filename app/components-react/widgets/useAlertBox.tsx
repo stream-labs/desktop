@@ -326,6 +326,7 @@ function getVariationsMetadata() {
     sound_href: metadata.text({ label: $t('Sound') }),
     sound_volume: metadata.slider({ label: $t('Sound Volume'), min: 0, max: 100 }),
     message_template: metadata.text({ label: $t('Message Template') }),
+    layout: metadata.list<'banner' | 'above' | 'side'>({ label: $t('Layout') }),
     text_delay: metadata.seconds({
       label: $t('Text Delay'),
       max: 60000,

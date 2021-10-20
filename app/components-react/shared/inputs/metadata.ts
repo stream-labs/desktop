@@ -7,6 +7,7 @@ export const metadata = {
   number: (options: INumberMetadata) => options,
   slider: (options: ISliderMetadata) => options,
   bool: (options: ITextBoolMetadata) => options,
+  list: <T>(options: IListMetadata<T>) => options,
   any: (options: IAnyMetadata) => options,
   seconds: (options: ISliderMetadata) => ({
     min: 0,
@@ -46,4 +47,8 @@ interface ITextBoolMetadata extends IBaseMetadata {
 
 interface IAnyMetadata extends IBaseMetadata {
   value?: any;
+}
+
+interface IListMetadata<T = string> extends IBaseMetadata {
+  value?: T;
 }

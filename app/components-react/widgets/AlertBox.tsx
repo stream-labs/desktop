@@ -24,6 +24,7 @@ import { Services } from '../service-provider';
 import { ButtonGroup } from '../shared/ButtonGroup';
 import { CustomCodeSection } from './common/CustomCode';
 import { CustomFieldsSection } from './common/CustomFields';
+import {LayoutInput} from "./common/LayoutInput";
 
 /**
  * Root component
@@ -174,12 +175,13 @@ function AlertsList() {
  * Settings for a selected Alert
  */
 function VariationSettings(p: { type: TAlertType }) {
-  const { createVariationBinding } = useAlertBox();
+  const { createVariationBinding, isCustomCodeEnabled } = useAlertBox();
   const bind = createVariationBinding(p.type, 'default', useForceUpdate());
   return (
     <div>
       {/* ALERT SETTINGS  */}
       <MediaUrlInput {...bind.image_href} />
+      {!isCustomCodeEnabled && <LayoutInput {...bind.layout} />}
       <AudioUrlInput {...bind.sound_href} />
       <SliderInput debounce={500} {...bind.sound_volume} />
       <TextInput {...bind.message_template} />

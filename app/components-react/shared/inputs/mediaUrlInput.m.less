@@ -24,6 +24,20 @@
   }
 }
 
+:global(.day-theme),
+:global(.prime-light) {
+  // add border for day themes
+  .media-input,
+  .audio-input {
+    border: 1px solid var(--border);
+  }
+
+  // set darker buttons background for day themes
+  .media-input .media-buttons {
+    background-color: rgba(0, 0, 0, 0.8);
+  }
+}
+
 .audio-input {
   .media-input-wrapper();
   .media-buttons button { opacity: 0;}
@@ -46,6 +60,7 @@
   direction: rtl;
   text-align: left;
   padding: 4px 11px;
+  color: var(--midtone);
 }
 
 .filename-empty {
@@ -54,6 +69,12 @@
 
 .media-buttons {
   width: 100%;
+  :global(button) {
+    border: none;
+    &:hover {
+      border: none;
+    }
+  }
   :global(button:hover .anticon) {
     color: var(--primary);
   }
