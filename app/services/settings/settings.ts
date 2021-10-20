@@ -7,6 +7,7 @@ import {
   IObsListInput,
   IObsInput,
   TObsValue,
+  IObsBitmaskInput,
 } from 'components/obs/inputs/ObsInput';
 import * as obs from '../../../obs-api';
 import { SourcesService } from 'services/sources';
@@ -52,6 +53,10 @@ export interface ISettingsValues {
     RecRB?: boolean;
     RecRBTime?: number;
     RecFormat: string;
+    RecTracks?: number;
+    TrackIndex?: string;
+    VodTrackEnabled?: boolean;
+    VodTrackIndex?: string;
   };
   Video: {
     Base: string;
@@ -100,6 +105,35 @@ class SettingsViews extends ViewHandler<ISettingsServiceState> {
     }
 
     return settingsValues as ISettingsValues;
+  }
+
+  get isAdvancedOutput() {
+    return this.state.Output.type === 1;
+  }
+
+  get streamTrack() {
+    if (!this.isAdvancedOutput) return 0;
+    return Number(this.values.Output.TrackIndex) - 1;
+  }
+
+  get recordingTracks() {
+    if (!this.isAdvancedOutput) return;
+    const bitArray = Utils.numberToBinnaryArray(this.values.Output.RecTracks, 6).reverse();
+    const trackLabels: number[] = [];
+    bitArray.forEach((bit, i) => {
+      if (bit === 1) trackLabels.push(i);
+    });
+    return trackLabels;
+  }
+
+  get vodTrackEnabled() {
+    return this.values.Output.VodTrackEnabled;
+  }
+
+  get vodTrack() {
+    if (!this.vodTrackEnabled) return 0;
+    if (!this.isAdvancedOutput) return 1;
+    return Number(this.values.Output.VodTrackIndex) - 1;
   }
 }
 

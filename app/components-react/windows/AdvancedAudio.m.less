@@ -1,0 +1,36 @@
+@import '../../styles/index';
+
+.audio-settings-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 90%;
+  position: absolute;
+  top: 8px;
+  left: 50px;
+
+  i:hover {
+    color: var(--icon-active);
+  }
+}
+
+.audio-source-name {
+  width: 120px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.audio-settings-tracks {
+  display: flex;
+
+  :global(.ant-form-item) {
+    margin-bottom: 0;
+  }
+
+  :global(.ant-form-item-label) {
+    overflow: visible;
+    flex-grow: 1 !important;
+    max-width: 100% !important;
+  }
+}
