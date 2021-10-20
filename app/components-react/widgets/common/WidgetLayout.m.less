@@ -30,11 +30,21 @@
   :global(.ant-menu-vertical) {
     border: none !important;
   }
+
   :global(.ant-menu-item-selected) {
     border-right: 2px solid var(--primary) !important;
   }
+
   :global(.ant-menu-item:hover) {
     background-color: var(--dropdown-alt-bg);
+  }
+
+  // show and hide alert tooltip
+  :global(.ant-menu-item .anticon-question-circle) {
+    visibility: hidden;
+  }
+  :global(.ant-menu-item-selected .anticon-question-circle){
+    visibility: visible;
   }
 
   :global(.ant-menu-item) {

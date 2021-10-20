@@ -38,6 +38,7 @@ export class EditMenu extends Menu {
   @Inject() private projectorService: ProjectorService;
   @Inject() private editorCommandsService: EditorCommandsService;
   @Inject() private streamingService: StreamingService;
+  @Inject() private audioService: AudioService;
 
   private scene = this.scenesService.views.getScene(this.options.selectedSceneId);
 
@@ -330,7 +331,11 @@ export class EditMenu extends Menu {
   }
 
   private showProperties() {
-    this.sourcesService.showSourceProperties(this.source.sourceId);
+    if (this.options.showAudioMixerMenu) {
+      this.audioService.actions.showAdvancedSettings(this.source.sourceId);
+    } else {
+      this.sourcesService.actions.showSourceProperties(this.source.sourceId);
+    }
   }
 
   private transformSubmenu() {
