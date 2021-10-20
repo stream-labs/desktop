@@ -131,10 +131,11 @@ export class AlertBoxModule extends WidgetModule<IAlertBoxState> {
    * @override
    */
   setData(data: IAlertBoxState['data']) {
+    // save widget data instate and calculate additional state variables
     super.setData(data);
     const settings = data.settings;
-
     const allAlerts = values(this.eventsConfig) as IAlertConfig[];
+
     // group alertbox settings by alert types and store them in `state.data.variations`
     allAlerts.map(alertEvent => {
       const apiKey = alertEvent.apiKey || alertEvent.type;
@@ -244,6 +245,7 @@ export class AlertBoxModule extends WidgetModule<IAlertBoxState> {
    * @override
    */
   get customCode() {
+    // get custom code from the selected variation
     if (!this.selectedAlert) return null;
     const variationSettings = this.getVariationSettings(this.selectedAlert);
     const {
@@ -266,6 +268,7 @@ export class AlertBoxModule extends WidgetModule<IAlertBoxState> {
    * @override
    */
   updateCustomCode(patch: Partial<ICustomCode>) {
+    // save custom code from the selected variation
     const selectedAlert = getDefined(this.selectedAlert);
     const newPatch = cloneDeep(patch) as Partial<ICustomCode> & { custom_html_enabled?: boolean };
     if (newPatch.custom_enabled !== undefined) {

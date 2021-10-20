@@ -9,6 +9,9 @@ export type TCardInputProps<TValue> = TSlobsInputProps<
   TValue
 >;
 
+/**
+ * Allows to pick image cards
+ */
 export const CardInput = InputComponent((props: TCardInputProps<string>) => {
   const defaultProps = { itemWidth: 64, itemHeight: 64 };
   const p = { ...defaultProps, ...props };
