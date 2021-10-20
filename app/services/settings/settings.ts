@@ -131,8 +131,8 @@ class SettingsViews extends ViewHandler<ISettingsServiceState> {
   }
 
   get vodTrack() {
-    console.log(this.values.Output.VodTrackIndex);
     if (!this.vodTrackEnabled) return 0;
+    if (!this.isAdvancedOutput) return 1;
     return Number(this.values.Output.VodTrackIndex) - 1;
   }
 }
