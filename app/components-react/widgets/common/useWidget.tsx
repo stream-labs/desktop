@@ -1,12 +1,12 @@
 import { useModuleByName, useModuleRoot } from '../../hooks/useModule';
-import { WidgetTesters, WidgetType } from '../../../services/widgets';
+import { WidgetType } from '../../../services/widgets';
 import { Services } from '../../service-provider';
 import { mutation } from '../../store';
 import { throttle } from 'lodash-decorators';
 import { assertIsDefined, getDefined } from '../../../util/properties-type-guards';
 import { TAlertType, TWidgetType } from '../../../services/widgets/widget-config';
 import { TObsFormData } from '../../../components/obs/inputs/ObsInput';
-import { pick } from 'lodash';
+import { pick, cloneDeep } from 'lodash';
 import { $t } from '../../../services/i18n';
 import Utils from '../../../services/utils';
 
@@ -21,6 +21,8 @@ export interface IWidgetState {
   selectedTab: string;
   type: TWidgetType;
   browserSourceProps: TObsFormData;
+  prevSettings: any;
+  canRevert: boolean;
   data: {
     settings: Record<string, any>;
   };
@@ -38,6 +40,8 @@ export const DEFAULT_WIDGET_STATE = ({
   selectedTab: 'general',
   type: '',
   data: {},
+  prevSettings: {},
+  canRevert: false,
   browserSourceProps: null,
 } as unknown) as IWidgetState;
 
@@ -55,9 +59,19 @@ export class WidgetModule<TWidgetState extends IWidgetState = IWidgetState> {
   public eventsConfig = this.widgetsService.eventsConfig;
 
   // init module
-  async init(params: { sourceId: string; shouldCreatePreviewSource?: boolean }) {
+  async init(params: {
+    sourceId: string;
+    shouldCreatePreviewSource?: boolean;
+    selectedTab?: string;
+  }) {
+    // init state from params
     this.state.sourceId = params.sourceId;
-    this.state.shouldCreatePreviewSource = !!params.shouldCreatePreviewSource;
+    if (params.shouldCreatePreviewSource === false) {
+      this.state.shouldCreatePreviewSource = false;
+    }
+    if (params.selectedTab) {
+      this.state.selectedTab = params.selectedTab;
+    }
 
     // save browser source settings into store
     const widget = this.widget;
@@ -73,6 +87,7 @@ export class WidgetModule<TWidgetState extends IWidgetState = IWidgetState> {
     this.state.type = WidgetType[widget.type] as TWidgetType;
     const data = await this.fetchData();
     this.setData(data);
+    this.setPrevSettings(data);
     this.setIsLoading(false);
   }
 
@@ -87,6 +102,10 @@ export class WidgetModule<TWidgetState extends IWidgetState = IWidgetState> {
     this.setIsLoading(false);
   }
 
+  close() {
+    Services.WindowsService.actions.closeChildWindow();
+  }
+
   /**
    * returns widget's settings from the store
    */
@@ -98,7 +117,7 @@ export class WidgetModule<TWidgetState extends IWidgetState = IWidgetState> {
     return Object.keys(this.eventsConfig) as TAlertType[];
   }
 
-  get customCode(): ICustomCode {
+  get customCode(): ICustomCode | null {
     return pick(
       this.settings,
       'custom_enabled',
@@ -114,12 +133,13 @@ export class WidgetModule<TWidgetState extends IWidgetState = IWidgetState> {
   }
 
   get hasCustomFields() {
+    if (!this.customCode) return false;
     const { custom_enabled, custom_json } = this.customCode;
     return custom_enabled && custom_json;
   }
 
   async openCustomCodeEditor() {
-    const sourceId = this.state.sourceId;
+    const { sourceId, selectedTab } = this.state;
     const windowId = `${sourceId}-code_editor`;
     const widgetWindowBounds = Utils.getChildWindow().getBounds();
     const position = {
@@ -131,7 +151,7 @@ export class WidgetModule<TWidgetState extends IWidgetState = IWidgetState> {
       {
         componentName: 'CustomCodeWindow',
         title: $t('Custom Code'),
-        queryParams: { sourceId },
+        queryParams: { sourceId, selectedTab },
         size: {
           width: 800,
           height: 800,
@@ -162,37 +182,27 @@ export class WidgetModule<TWidgetState extends IWidgetState = IWidgetState> {
     return this.widgetsConfig[this.state.type];
   }
 
+  get isCustomCodeEnabled() {
+    return this.customCode?.custom_enabled;
+  }
+
   public onMenuClickHandler(e: { key: string }) {
     this.setSelectedTab(e.key);
   }
 
   public playAlert(type: TAlertType) {
-    const testersMap = createAlertsMap({
-      donation: 'Donation',
-      follow: 'Follow',
-      raid: 'Raid',
-      host: 'Host',
-      subscription: 'Subscriber',
-      cheer: 'Bits',
-      superchat: 'Super Chat',
-      stars: 'Star',
-      support: 'Support',
-    });
-    const testerName = testersMap[type];
-    const tester = WidgetTesters.find(t => t.name === testerName);
-    if (!tester) throw new Error(`Tester not found ${type}`);
-    this.actions.test(tester.name);
+    this.actions.playAlert(type);
   }
 
   /**
    * Update settings and save on the server
    */
-  public updateSettings(formValues: any) {
+  public async updateSettings(formValues: any) {
     const newSettings = { ...this.settings, ...formValues };
     // save setting to the store
     this.setSettings(newSettings);
     // send setting to the server
-    this.saveSettings(newSettings);
+    await this.saveSettings(newSettings);
   }
 
   /**
@@ -246,6 +256,13 @@ export class WidgetModule<TWidgetState extends IWidgetState = IWidgetState> {
     this.setBrowserSourceProps(updatedProps);
   }
 
+  async revertChanges() {
+    this.setIsLoading(true);
+    await this.updateSettings(this.state.prevSettings);
+    this.setCanRevert(false);
+    await this.reload();
+  }
+
   // DEFINE MUTATIONS
 
   @mutation()
@@ -259,14 +276,25 @@ export class WidgetModule<TWidgetState extends IWidgetState = IWidgetState> {
   }
 
   @mutation()
-  private setData(data: TWidgetState['data']) {
+  protected setData(data: TWidgetState['data']) {
     this.state.data = data;
+  }
+
+  @mutation()
+  private setPrevSettings(data: TWidgetState['data']) {
+    this.state.prevSettings = cloneDeep(data.settings);
+  }
+
+  @mutation()
+  private setCanRevert(canRevert: boolean) {
+    this.state.canRevert = canRevert;
   }
 
   @mutation()
   private setSettings(settings: TWidgetState['data']['settings']) {
     assertIsDefined(this.state.data);
     this.state.data.settings = settings;
+    this.state.canRevert = true;
   }
 
   @mutation()
@@ -294,7 +322,7 @@ export class WidgetModule<TWidgetState extends IWidgetState = IWidgetState> {
  */
 export function useWidgetRoot<T extends typeof WidgetModule>(
   Module: T,
-  params: { sourceId?: string; shouldCreatePreviewSource?: boolean },
+  params: { sourceId?: string; shouldCreatePreviewSource?: boolean; selectedTab?: string },
 ) {
   return useModuleRoot(Module, params, 'WidgetModule').select();
 }

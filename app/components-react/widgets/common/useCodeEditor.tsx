@@ -5,6 +5,7 @@ import Utils from '../../../services/utils';
 import { Services } from '../../service-provider';
 import { DEFAULT_CUSTOM_FIELDS } from './CustomFields';
 import { useModule } from '../../hooks/useModule';
+import { getDefined } from '../../../util/properties-type-guards';
 
 type TLang = 'json' | 'js' | 'css' | 'html';
 
@@ -109,7 +110,7 @@ class CodeEditorModule {
    */
   @mutation()
   reset() {
-    const customCode = this.widgetModule.customCode;
+    const customCode = getDefined(this.widgetModule.customCode);
     this.state = {
       ...this.state,
       isLoading: false,

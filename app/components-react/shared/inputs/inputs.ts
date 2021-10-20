@@ -15,6 +15,7 @@ import * as InputComponents from './index';
 type TInputType =
   | 'code'
   | 'color'
+  | 'card'
   | 'text'
   | 'textarea'
   | 'number'

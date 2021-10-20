@@ -11,6 +11,7 @@ import { ModalLayout } from '../../shared/ModalLayout';
 import { components } from './WidgetWindow';
 import { ButtonGroup } from '../../shared/ButtonGroup';
 import { useCodeEditor } from './useCodeEditor';
+import Utils from '../../../services/utils';
 const { TabPane } = Tabs;
 
 /**
@@ -18,14 +19,19 @@ const { TabPane } = Tabs;
  */
 export function CustomCodeWindow() {
   // take the source id from the window's params
-  const { sourceId, WidgetModule } = useOnCreate(() => {
+  const { sourceId, WidgetModule, widgetSelectedTab } = useOnCreate(() => {
     const { WindowsService } = Services;
     const { sourceId, widgetType } = getDefined(WindowsService.state.child.queryParams);
+    const { selectedTab } = getDefined(WindowsService.state[Utils.getWindowId()].queryParams);
     const [, WidgetModule] = components[widgetType];
-    return { sourceId, WidgetModule };
+    return { sourceId, WidgetModule, widgetSelectedTab: selectedTab };
   });
 
-  useWidgetRoot(WidgetModule, { sourceId, shouldCreatePreviewSource: false });
+  useWidgetRoot(WidgetModule, {
+    sourceId,
+    shouldCreatePreviewSource: false,
+    selectedTab: widgetSelectedTab,
+  });
   const { selectedTab, selectTab, tabs, isLoading } = useCodeEditor();
 
   return (
@@ -53,7 +59,7 @@ function EditorFooter() {
       {canSave && (
         <>
           <Button danger onClick={reset}>
-            {$t('Undo Changes')}
+            {$t('Revert Changes')}
           </Button>
           <Button type="primary" onClick={saveCode}>
             {$t('Save')}
@@ -99,8 +105,8 @@ function JsonEditor() {
  * Renders a collapsable section with the custom code switcher
  */
 export function CustomCodeSection() {
-  const { customCode, updateCustomCode, openCustomCodeEditor } = useWidget();
-  const isEnabled = customCode.custom_enabled;
+  const { isCustomCodeEnabled, customCode, updateCustomCode, openCustomCodeEditor } = useWidget();
+  if (!customCode) return <></>;
 
   return (
     <Collapse bordered={false}>
@@ -108,10 +114,10 @@ export function CustomCodeSection() {
         <Form layout="horizontal">
           <SwitchInput
             label={$t('Enable Custom Code')}
-            value={isEnabled}
+            value={isCustomCodeEnabled}
             onChange={custom_enabled => updateCustomCode({ custom_enabled })}
           />
-          {isEnabled && (
+          {isCustomCodeEnabled && (
             <ButtonGroup>
               <Button onClick={openCustomCodeEditor}>{'Edit Custom Code'}</Button>
             </ButtonGroup>

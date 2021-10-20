@@ -12,6 +12,7 @@ import React from 'react';
 import { Button, Collapse } from 'antd';
 import { $t } from '../../../services/i18n';
 import InputWrapper from '../../shared/inputs/InputWrapper';
+import { assertIsDefined } from '../../../util/properties-type-guards';
 
 /**
  * Renders a collapsable section with custom fields controls
@@ -35,6 +36,7 @@ export function CustomFieldsSection() {
  */
 export function CustomFields() {
   const { customCode, updateCustomCode } = useWidget();
+  assertIsDefined(customCode);
   const json = customCode.custom_json || {};
 
   function onFieldChange(fieldName: string, value: any) {

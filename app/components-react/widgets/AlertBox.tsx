@@ -15,12 +15,14 @@ import { $t } from '../../services/i18n';
 import { Alert, Button, Menu, Tooltip } from 'antd';
 import Form from '../shared/inputs/Form';
 import { WidgetLayout } from './common/WidgetLayout';
-import { CaretRightOutlined } from '@ant-design/icons';
+import { CaretRightOutlined, QuestionCircleOutlined } from '@ant-design/icons';
 import { TAlertType } from '../../services/widgets/widget-config';
 import { useAlertBox } from './useAlertBox';
 import { useForceUpdate } from '../hooks';
 import electron from 'electron';
 import { Services } from '../service-provider';
+import { ButtonGroup } from '../shared/ButtonGroup';
+import { LayoutInput } from './common/LayoutInput';
 
 /**
  * Root component
@@ -109,16 +111,17 @@ function LegacyLink() {
 function AlertsList() {
   const {
     onMenuClickHandler,
-    alertEvents,
+    alerts,
     selectedTab,
     playAlert,
     setEnabled,
     enabledAlerts,
+    openAlertInfo,
   } = useAlertBox();
 
   return (
     <Menu onClick={onMenuClickHandler} selectedKeys={[selectedTab]} theme={'dark'}>
-      {alertEvents.map(alertEvent => (
+      {alerts.map(alertEvent => (
         <Menu.Item key={alertEvent.type}>
           {/* ON/OF CHECKBOX */}
           <CheckboxInput
@@ -127,7 +130,26 @@ function AlertsList() {
             style={{ display: 'inline-block' }}
           />
 
+          {/* NAME AND TOOLTIP */}
           {alertEvent.name}
+          {alertEvent.tooltip && (
+            <Tooltip
+              title={
+                <span>
+                  {alertEvent.tooltip}
+                  {alertEvent.tooltipLink && (
+                    <ButtonGroup>
+                      <Button type="link" onClick={() => openAlertInfo(alertEvent.type)}>
+                        {$t('More Info')}
+                      </Button>
+                    </ButtonGroup>
+                  )}
+                </span>
+              }
+            >
+              <QuestionCircleOutlined style={{ marginLeft: '7px' }} />
+            </Tooltip>
+          )}
 
           {/* "PLAY ALERT" BUTTON */}
           <Tooltip title={$t('Play Alert')} placement="left">
@@ -151,11 +173,13 @@ function AlertsList() {
  * Settings for a selected Alert
  */
 function VariationSettings(p: { type: TAlertType }) {
-  const { createVariationBinding } = useAlertBox();
+  const { createVariationBinding, isCustomCodeEnabled } = useAlertBox();
   const bind = createVariationBinding(p.type, 'default', useForceUpdate());
   return (
     <div>
+      {/* ALERT SETTINGS  */}
       <MediaUrlInput {...bind.image_href} />
+      {!isCustomCodeEnabled && <LayoutInput {...bind.layout} />}
       <AudioUrlInput {...bind.sound_href} />
       <SliderInput debounce={500} {...bind.sound_volume} />
       <TextInput {...bind.message_template} />
