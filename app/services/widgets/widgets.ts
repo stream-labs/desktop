@@ -349,7 +349,7 @@ export class WidgetsService
   }
 
   get eventsConfig() {
-    const platforms = Object.keys(this.userService.views.platforms) as TPlatform[];
+    const platforms = Object.keys(this.userService.views.platforms || []) as TPlatform[];
     return getEventsConfig(this.hostsService.streamlabs, platforms);
   }
 

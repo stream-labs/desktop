@@ -196,7 +196,7 @@ export function getWidgetsConfig(host: string, token: string): Record<TWidgetTyp
 
 export function getEventsConfig(
   host: string,
-  platforms: TPlatform[],
+  platforms: TPlatform[] = [],
 ): Record<TAlertType, IAlertConfig> {
   return {
     donation: {
