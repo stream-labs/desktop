@@ -184,7 +184,7 @@ function PanelForm(p: { source: AudioSource }) {
   const { sourceId, forceMono, syncOffset, source, monitoringType } = p.source;
 
   const [testing, setTesting] = useState(false);
-  const [savedMonitoring, setSavedMonitoring] = useState(monitoringType);
+  const savedMonitoring = useRef(monitoringType);
 
   const hasDevices = source ? !source.video : false;
   const isMic = source
@@ -199,7 +199,6 @@ function PanelForm(p: { source: AudioSource }) {
   const { EditorCommandsService } = Services;
 
   function handleSettingsChange(name: string, value: TObsValue) {
-    console.log(value);
     EditorCommandsService.actions.executeCommand('SetAudioSettingsCommand', sourceId, {
       [name]: value,
     });
@@ -207,12 +206,12 @@ function PanelForm(p: { source: AudioSource }) {
 
   useEffect(() => {
     if (testing) return;
-    setSavedMonitoring(monitoringType);
+    savedMonitoring.current = monitoringType;
   }, [monitoringType, testing]);
   useEffect(() => {
     // Ensure monitoring type is returned to normal upon destroy
     return () => {
-      handleSettingsChange('monitoringType', savedMonitoring);
+      handleSettingsChange('monitoringType', savedMonitoring.current);
     };
   }, []);
 
@@ -221,7 +220,7 @@ function PanelForm(p: { source: AudioSource }) {
       setTesting(true);
       handleSettingsChange('monitoringType', 1);
     } else {
-      handleSettingsChange('monitoringType', savedMonitoring);
+      handleSettingsChange('monitoringType', savedMonitoring.current);
       setTesting(false);
     }
   }
