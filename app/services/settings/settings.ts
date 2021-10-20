@@ -55,6 +55,8 @@ export interface ISettingsValues {
     RecFormat: string;
     RecTracks?: number;
     TrackIndex?: string;
+    VodTrackEnabled?: boolean;
+    VodTrackIndex?: string;
   };
   Video: {
     Base: string;
@@ -122,6 +124,16 @@ class SettingsViews extends ViewHandler<ISettingsServiceState> {
       if (bit === 1) trackLabels.push(i);
     });
     return trackLabels;
+  }
+
+  get vodTrackEnabled() {
+    return this.values.Output.VodTrackEnabled;
+  }
+
+  get vodTrack() {
+    console.log(this.values.Output.VodTrackIndex);
+    if (!this.vodTrackEnabled) return 0;
+    return Number(this.values.Output.VodTrackIndex) - 1;
   }
 }
 

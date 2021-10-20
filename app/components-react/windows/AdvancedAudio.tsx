@@ -57,11 +57,15 @@ export default function AdvancedAudio() {
 function PanelHeader(p: { source: AudioSource }) {
   const { name, mixerHidden, muted, fader, sourceId, audioMixers } = p.source;
   const { EditorCommandsService, SettingsService } = Services;
-  const { isAdvancedOutput, recordingTracks, streamTrack } = useVuex(() => ({
-    isAdvancedOutput: SettingsService.views.isAdvancedOutput,
-    streamTrack: SettingsService.views.streamTrack,
-    recordingTracks: SettingsService.views.recordingTracks,
-  }));
+  const { isAdvancedOutput, recordingTracks, streamTrack, vodTrackEnabled, vodTrack } = useVuex(
+    () => ({
+      isAdvancedOutput: SettingsService.views.isAdvancedOutput,
+      streamTrack: SettingsService.views.streamTrack,
+      recordingTracks: SettingsService.views.recordingTracks,
+      vodTrackEnabled: SettingsService.views.vodTrackEnabled,
+      vodTrack: SettingsService.views.vodTrack,
+    }),
+  );
 
   const [trackFlags, setTrackFlags] = useState(
     Utils.numberToBinnaryArray(audioMixers, 6).reverse(),
@@ -119,42 +123,57 @@ function PanelHeader(p: { source: AudioSource }) {
           onClick={(e: React.MouseEvent) => onInputHandler('mixerHidden', !mixerHidden, e)}
         />
       </Tooltip>
-      {isAdvancedOutput && (
+      {(isAdvancedOutput || vodTrackEnabled) && (
         <div
           className={styles.audioSettingsTracks}
           onClick={(e: React.MouseEvent) => e.stopPropagation()}
         >
-          <InputWrapper
-            label={$t('Stream Track')}
-            tooltip={$t('Designates if this source is audible in your live broadcast')}
-            layout="horizontal"
-          >
-            <BoolButtonInput
-              label={String(streamTrack + 1)}
-              value={!!trackFlags[streamTrack]}
-              onChange={value => onTrackInput(streamTrack, value)}
-              checkboxStyles={{ marginRight: '8px' }}
-              name="streamTrack"
-            />
-          </InputWrapper>
-          <InputWrapper
-            label={$t('Rec. Tracks')}
-            tooltip={$t('Designates if this source is audible in your recorded track(s)')}
-            layout="horizontal"
-          >
-            <div style={{ display: 'flex' }}>
-              {recordingTracks?.map(track => (
+          {(isAdvancedOutput || vodTrackEnabled) && (
+            <InputWrapper
+              label={vodTrackEnabled ? $t('Stream Tracks') : $t('Stream Track')}
+              tooltip={$t('Designates if this source is audible in your live broadcast')}
+              layout="horizontal"
+            >
+              <div style={{ display: 'flex' }}>
                 <BoolButtonInput
-                  label={String(track + 1)}
-                  key={track}
-                  value={!!trackFlags[track]}
-                  onChange={value => onTrackInput(track, value)}
-                  checkboxStyles={{ marginRight: '4px' }}
-                  name={`flag${track}`}
+                  label={String(streamTrack + 1)}
+                  value={!!trackFlags[streamTrack]}
+                  onChange={value => onTrackInput(streamTrack, value)}
+                  checkboxStyles={{ marginRight: vodTrackEnabled ? '4px' : '8px' }}
+                  name="streamTrack"
                 />
-              ))}
-            </div>
-          </InputWrapper>
+                {vodTrackEnabled && (
+                  <BoolButtonInput
+                    label={String(vodTrack + 1)}
+                    value={!!trackFlags[vodTrack]}
+                    onChange={value => onTrackInput(vodTrack, value)}
+                    checkboxStyles={{ marginRight: '8px' }}
+                    name="vodTrack"
+                  />
+                )}
+              </div>
+            </InputWrapper>
+          )}
+          {isAdvancedOutput && (
+            <InputWrapper
+              label={$t('Rec. Tracks')}
+              tooltip={$t('Designates if this source is audible in your recorded track(s)')}
+              layout="horizontal"
+            >
+              <div style={{ display: 'flex' }}>
+                {recordingTracks?.map(track => (
+                  <BoolButtonInput
+                    label={String(track + 1)}
+                    key={track}
+                    value={!!trackFlags[track]}
+                    onChange={value => onTrackInput(track, value)}
+                    checkboxStyles={{ marginRight: '4px' }}
+                    name={`flag${track}`}
+                  />
+                ))}
+              </div>
+            </InputWrapper>
+          )}
         </div>
       )}
     </Form>
@@ -251,7 +270,9 @@ function PanelForm(p: { source: AudioSource }) {
 function DeviceInputs(p: { source: Source }) {
   const { EditorCommandsService } = Services;
 
-  const sourceProperties = useMemo<TObsFormData>(() => p.source.getPropertiesFormData(), []);
+  const sourceProperties = useMemo<TObsFormData>(() => p.source.getPropertiesFormData(), [
+    p.source.sourceId,
+  ]);
   const settings = useMemo(() => p.source.getSettings(), [p.source.sourceId]);
   const [statefulSettings, setStatefulSettings] = useState(settings);
 
