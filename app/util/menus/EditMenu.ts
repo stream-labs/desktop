@@ -248,10 +248,12 @@ export class EditMenu extends Menu {
     }
 
     if (this.source && !isMultipleSelection) {
-      this.append({
-        label: $t('Rename'),
-        click: () => this.sourcesService.showRenameSource(this.source.sourceId),
-      });
+      if (this.source.type !== 'scene') {
+        this.append({
+          label: $t('Rename'),
+          click: () => this.sourcesService.showRenameSource(this.source.sourceId),
+        });
+      }
 
       const filtersCount = this.sourceFiltersService.getFilters(this.source.sourceId).length;
 
