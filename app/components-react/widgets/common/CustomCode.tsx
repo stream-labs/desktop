@@ -11,6 +11,7 @@ import { ModalLayout } from '../../shared/ModalLayout';
 import { components } from './WidgetWindow';
 import { ButtonGroup } from '../../shared/ButtonGroup';
 import { useCodeEditor } from './useCodeEditor';
+import Utils from '../../../services/utils';
 const { TabPane } = Tabs;
 
 /**
@@ -18,14 +19,19 @@ const { TabPane } = Tabs;
  */
 export function CustomCodeWindow() {
   // take the source id from the window's params
-  const { sourceId, WidgetModule } = useOnCreate(() => {
+  const { sourceId, WidgetModule, widgetSelectedTab } = useOnCreate(() => {
     const { WindowsService } = Services;
     const { sourceId, widgetType } = getDefined(WindowsService.state.child.queryParams);
+    const { selectedTab } = getDefined(WindowsService.state[Utils.getWindowId()].queryParams);
     const [, WidgetModule] = components[widgetType];
-    return { sourceId, WidgetModule };
+    return { sourceId, WidgetModule, widgetSelectedTab: selectedTab };
   });
 
-  useWidgetRoot(WidgetModule, { sourceId, shouldCreatePreviewSource: false });
+  useWidgetRoot(WidgetModule, {
+    sourceId,
+    shouldCreatePreviewSource: false,
+    selectedTab: widgetSelectedTab,
+  });
   const { selectedTab, selectTab, tabs, isLoading } = useCodeEditor();
 
   return (
@@ -100,6 +106,7 @@ function JsonEditor() {
  */
 export function CustomCodeSection() {
   const { customCode, updateCustomCode, openCustomCodeEditor } = useWidget();
+  if (!customCode) return <></>;
   const isEnabled = customCode.custom_enabled;
 
   return (

@@ -55,9 +55,19 @@ export class WidgetModule<TWidgetState extends IWidgetState = IWidgetState> {
   public eventsConfig = this.widgetsService.eventsConfig;
 
   // init module
-  async init(params: { sourceId: string; shouldCreatePreviewSource?: boolean }) {
+  async init(params: {
+    sourceId: string;
+    shouldCreatePreviewSource?: boolean;
+    selectedTab?: string;
+  }) {
+    // init state from params
     this.state.sourceId = params.sourceId;
-    this.state.shouldCreatePreviewSource = !!params.shouldCreatePreviewSource;
+    if (params.shouldCreatePreviewSource === false) {
+      this.state.shouldCreatePreviewSource = false;
+    }
+    if (params.selectedTab) {
+      this.state.selectedTab = params.selectedTab;
+    }
 
     // save browser source settings into store
     const widget = this.widget;
@@ -98,7 +108,7 @@ export class WidgetModule<TWidgetState extends IWidgetState = IWidgetState> {
     return Object.keys(this.eventsConfig) as TAlertType[];
   }
 
-  get customCode(): ICustomCode {
+  get customCode(): ICustomCode | null {
     return pick(
       this.settings,
       'custom_enabled',
@@ -114,12 +124,13 @@ export class WidgetModule<TWidgetState extends IWidgetState = IWidgetState> {
   }
 
   get hasCustomFields() {
+    if (!this.customCode) return false;
     const { custom_enabled, custom_json } = this.customCode;
     return custom_enabled && custom_json;
   }
 
   async openCustomCodeEditor() {
-    const sourceId = this.state.sourceId;
+    const { sourceId, selectedTab } = this.state;
     const windowId = `${sourceId}-code_editor`;
     const widgetWindowBounds = Utils.getChildWindow().getBounds();
     const position = {
@@ -131,7 +142,7 @@ export class WidgetModule<TWidgetState extends IWidgetState = IWidgetState> {
       {
         componentName: 'CustomCodeWindow',
         title: $t('Custom Code'),
-        queryParams: { sourceId },
+        queryParams: { sourceId, selectedTab },
         size: {
           width: 800,
           height: 800,
@@ -167,21 +178,7 @@ export class WidgetModule<TWidgetState extends IWidgetState = IWidgetState> {
   }
 
   public playAlert(type: TAlertType) {
-    const testersMap = createAlertsMap({
-      donation: 'Donation',
-      follow: 'Follow',
-      raid: 'Raid',
-      host: 'Host',
-      subscription: 'Subscriber',
-      cheer: 'Bits',
-      superchat: 'Super Chat',
-      stars: 'Star',
-      support: 'Support',
-    });
-    const testerName = testersMap[type];
-    const tester = WidgetTesters.find(t => t.name === testerName);
-    if (!tester) throw new Error(`Tester not found ${type}`);
-    this.actions.test(tester.name);
+    this.actions.playAlert(type);
   }
 
   /**
@@ -294,7 +291,7 @@ export class WidgetModule<TWidgetState extends IWidgetState = IWidgetState> {
  */
 export function useWidgetRoot<T extends typeof WidgetModule>(
   Module: T,
-  params: { sourceId?: string; shouldCreatePreviewSource?: boolean },
+  params: { sourceId?: string; shouldCreatePreviewSource?: boolean; selectedTab?: string },
 ) {
   return useModuleRoot(Module, params, 'WidgetModule').select();
 }

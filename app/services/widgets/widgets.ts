@@ -21,7 +21,8 @@ import { Throttle } from 'lodash-decorators';
 import { EditorCommandsService } from 'services/editor-commands';
 import { TWindowComponentName } from '../windows';
 import { THttpMethod } from './settings/widget-settings';
-import { getEventsConfig, getWidgetsConfig } from './widget-config';
+import {getEventsConfig, getWidgetsConfig, TAlertType} from './widget-config';
+import {TPlatform} from "../platforms";
 
 export interface IWidgetSourcesState {
   widgetSources: Dictionary<IWidgetSource>;
@@ -154,11 +155,21 @@ export class WidgetsService
     });
   }
 
+  /**
+   * @deprecated use .playAlert() instead
+   */
   @Throttle(1000)
   test(testerName: string) {
     const tester = this.getTesters().find(tester => tester.name === testerName);
     const headers = authorizedHeaders(this.userService.apiToken);
     fetch(new Request(tester.url, { headers }));
+  }
+
+  @Throttle(1000)
+  playAlert(alertType: TAlertType) {
+    const config = this.eventsConfig[alertType];
+    const headers = authorizedHeaders(this.userService.apiToken);
+    fetch(new Request(config.url(), { headers }));
   }
 
   private previewSourceWatchers: Dictionary<Subscription> = {};
@@ -338,7 +349,8 @@ export class WidgetsService
   }
 
   get eventsConfig() {
-    return getEventsConfig(this.hostsService.streamlabs);
+    const platforms = Object.keys(this.userService.views.platforms) as TPlatform[];
+    return getEventsConfig(this.hostsService.streamlabs, platforms);
   }
 
   // make a request to widgets API

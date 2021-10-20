@@ -9,10 +9,10 @@ export type TAlertType =
   | 'subscription'
   | 'cheer'
   | 'host'
-  // TODO:
-  // | 'superchat'
-  // | 'support'
-  // | 'stars'
+  | 'ytSuperchat'
+  | 'fbSupport'
+  | 'fbStars'
+  | 'fbLike'
   | 'raid';
 
 export interface IWidgetConfig {
@@ -82,7 +82,7 @@ export function getWidgetsConfig(host: string, token: string): Record<TWidgetTyp
       dataFetchUrl: `https://${host}/api/v5/slobs/widget/alertbox?include_linked_integrations_only=true&primary_only=false`,
       settingsSaveUrl: `https://${host}/api/v5/slobs/widget/alertbox`,
       settingsUpdateEvent: 'filteredAlertBoxSettingsUpdate',
-      customCodeAllowed: false,
+      customCodeAllowed: true,
       customFieldsAllowed: false,
     },
 
@@ -194,7 +194,10 @@ export function getWidgetsConfig(host: string, token: string): Record<TWidgetTyp
   };
 }
 
-export function getEventsConfig(host: string): Record<TAlertType, IAlertConfig> {
+export function getEventsConfig(
+  host: string,
+  platforms: TPlatform[],
+): Record<TAlertType, IAlertConfig> {
   return {
     donation: {
       type: 'donation',
@@ -207,31 +210,37 @@ export function getEventsConfig(host: string): Record<TAlertType, IAlertConfig> 
     follow: {
       type: 'follow',
       name: $t('Follow'),
-      url(platform: TPlatform) {
+      url(platform: TPlatform = 'twitch') {
         return `https://${host}/api/v5/slobs/test/${platform}_account/follow`;
       },
       platforms: ['twitch', 'facebook'],
+      tooltip: $t('Triggers for new Twitch and Facebook followers'),
     },
 
     cheer: {
       type: 'cheer',
       apiKey: 'bits',
-      name: $t('Cheer'),
+      name: $t('Cheer (Bits)'),
       url() {
         return `https://${host}/api/v5/slobs/test/twitch_account/bits`;
       },
       platforms: ['twitch'],
+      tooltip: $t('Bits are used to Cheer, which is a way viewers can show you support.'),
+      tooltipLink: 'https://help.twitch.tv/s/article/guide-to-cheering-with-bits',
     },
 
     subscription: {
       type: 'subscription',
       apiKey: 'sub',
-      name: $t('Subscription'),
-      url(platform: TPlatform) {
+      name:
+        platforms.includes('youtube') && !platforms.includes('twitch')
+          ? $t('Membership')
+          : $t('Subscription'),
+      url(platform: TPlatform = 'twitch') {
         return `https://${host}/api/v5/slobs/test/${platform}_account/subscription`;
       },
-      names: [$t('Subscription'), $t('Membership')],
       platforms: ['twitch', 'youtube'],
+      tooltip: $t('Triggers for new Twitch subscriptions and Youtube memberships'),
     },
 
     host: {
@@ -250,35 +259,57 @@ export function getEventsConfig(host: string): Record<TAlertType, IAlertConfig> 
         return `https://${host}/api/v5/slobs/test/twitch_account/raid`;
       },
       platforms: ['twitch'],
+      tooltip: $t('Using Raids, you can send viewers over to another channel after a stream'),
+      tooltipLink: 'https://help.twitch.tv/s/article/how-to-use-raids',
     },
 
-    // TODO:
-    // superchat: {
-    //   name: $t('YouTube Super Chat'),
-    //   type: 'superchat',
-    //   url() {
-    //     return `https://${host}/api/v5/slobs/test/youtube_account/superchat`;
-    //   },
-    //   platforms: ['youtube'],
-    // },
-    //
-    // support: {
-    //   name: $t('Facebook Support'),
-    //   type: 'support',
-    //   url() {
-    //     return `https://${host}/api/v5/slobs/test/facebook_account/support`;
-    //   },
-    //   platforms: ['facebook'],
-    // },
-    //
-    // stars: {
-    //   name: $t('Facebook Stars'),
-    //   type: 'stars',
-    //   url() {
-    //     return `https://${host}/api/v5/slobs/test/facebook_account/stars`;
-    //   },
-    //   platforms: ['facebook'],
-    // },
+    ytSuperchat: {
+      name: $t('YouTube Super Chat'),
+      type: 'ytSuperchat',
+      apiKey: 'fanfunding',
+      url() {
+        return `https://${host}/api/v5/slobs/test/youtube_account/superchat`;
+      },
+      platforms: ['youtube'],
+      tooltip: $t(
+        'Super Chat is a way to monetize your channel through the YouTube Partner Program',
+      ),
+      tooltipLink:
+        'https://creatoracademy.youtube.com/page/lesson/superchat-and-superstickers_what-is-superchat_video',
+    },
+
+    fbSupport: {
+      name: $t('Facebook Support'),
+      type: 'fbSupport',
+      apiKey: 'facebook_support',
+      url() {
+        return `https://${host}/api/v5/slobs/test/facebook_account/support`;
+      },
+      platforms: ['facebook'],
+    },
+
+    fbStars: {
+      name: $t('Facebook Stars'),
+      apiKey: 'facebook_stars',
+      type: 'fbStars',
+      url() {
+        return `https://${host}/api/v5/slobs/test/facebook_account/stars`;
+      },
+      platforms: ['facebook'],
+      tooltip: $t('Facebook Stars is a feature that allows you to monetize your stream'),
+      tooltipLink: 'https://www.facebook.com/business/help/903272529876480?id=648321075955172',
+    },
+
+    fbLike: {
+      name: $t('Facebook Like'),
+      apiKey: 'facebook_like',
+      type: 'fbLike',
+      url() {
+        return `https://${host}/api/v5/slobs/test/facebook_account/like`;
+      },
+      platforms: ['facebook'],
+      tooltip: $t('Triggers when user liked your stream'),
+    },
   };
 }
 
@@ -289,4 +320,6 @@ export interface IAlertConfig {
   url(platform?: TPlatform): string;
   platforms?: TPlatform[];
   names?: string[];
+  tooltip?: string;
+  tooltipLink?: string;
 }
