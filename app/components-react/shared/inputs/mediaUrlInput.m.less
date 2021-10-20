@@ -24,20 +24,6 @@
   }
 }
 
-:global(.day-theme),
-:global(.prime-light) {
-  // add border for day themes
-  .media-input,
-  .audio-input {
-    border: 1px solid var(--border);
-  }
-
-  // set darker buttons background for day themes
-  .media-input .media-buttons {
-    background-color: rgba(0, 0, 0, 0.8);
-  }
-}
-
 .audio-input {
   .media-input-wrapper();
   .media-buttons button { opacity: 0;}
@@ -60,7 +46,6 @@
   direction: rtl;
   text-align: left;
   padding: 4px 11px;
-  color: var(--midtone);
 }
 
 .filename-empty {
@@ -77,5 +62,26 @@
   }
   :global(button:hover .anticon) {
     color: var(--primary);
+  }
+}
+
+// THEME SPECIFIC STYLES
+
+:global(.day-theme),
+:global(.prime-light) {
+  // add border for day themes
+  .media-input,
+  .audio-input {
+    border: 1px solid var(--border);
+  }
+
+  // set darker buttons background for day themes
+  .media-input .media-buttons {
+    background-color: rgba(0, 0, 0, 0.8);
+  }
+
+  // make lighter filename
+  .media-input .filename {
+    color: var(--midtone);
   }
 }

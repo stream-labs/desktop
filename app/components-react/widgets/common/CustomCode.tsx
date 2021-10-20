@@ -59,7 +59,7 @@ function EditorFooter() {
       {canSave && (
         <>
           <Button danger onClick={reset}>
-            {$t('Undo Changes')}
+            {$t('Revert Changes')}
           </Button>
           <Button type="primary" onClick={saveCode}>
             {$t('Save')}

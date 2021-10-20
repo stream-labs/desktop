@@ -22,9 +22,7 @@ import { useForceUpdate } from '../hooks';
 import electron from 'electron';
 import { Services } from '../service-provider';
 import { ButtonGroup } from '../shared/ButtonGroup';
-import { CustomCodeSection } from './common/CustomCode';
-import { CustomFieldsSection } from './common/CustomFields';
-import {LayoutInput} from "./common/LayoutInput";
+import { LayoutInput } from './common/LayoutInput';
 
 /**
  * Root component

@@ -1,12 +1,12 @@
 import { useModuleByName, useModuleRoot } from '../../hooks/useModule';
-import { WidgetTesters, WidgetType } from '../../../services/widgets';
+import { WidgetType } from '../../../services/widgets';
 import { Services } from '../../service-provider';
 import { mutation } from '../../store';
 import { throttle } from 'lodash-decorators';
 import { assertIsDefined, getDefined } from '../../../util/properties-type-guards';
 import { TAlertType, TWidgetType } from '../../../services/widgets/widget-config';
 import { TObsFormData } from '../../../components/obs/inputs/ObsInput';
-import { pick } from 'lodash';
+import { pick, cloneDeep } from 'lodash';
 import { $t } from '../../../services/i18n';
 import Utils from '../../../services/utils';
 
@@ -102,6 +102,10 @@ export class WidgetModule<TWidgetState extends IWidgetState = IWidgetState> {
     this.setIsLoading(false);
   }
 
+  close() {
+    Services.WindowsService.actions.closeChildWindow();
+  }
+
   /**
    * returns widget's settings from the store
    */
@@ -193,12 +197,12 @@ export class WidgetModule<TWidgetState extends IWidgetState = IWidgetState> {
   /**
    * Update settings and save on the server
    */
-  public updateSettings(formValues: any) {
+  public async updateSettings(formValues: any) {
     const newSettings = { ...this.settings, ...formValues };
     // save setting to the store
     this.setSettings(newSettings);
     // send setting to the server
-    this.saveSettings(newSettings);
+    await this.saveSettings(newSettings);
   }
 
   /**
@@ -252,6 +256,13 @@ export class WidgetModule<TWidgetState extends IWidgetState = IWidgetState> {
     this.setBrowserSourceProps(updatedProps);
   }
 
+  async revertChanges() {
+    this.setIsLoading(true);
+    await this.updateSettings(this.state.prevSettings);
+    this.setCanRevert(false);
+    await this.reload();
+  }
+
   // DEFINE MUTATIONS
 
   @mutation()
@@ -265,13 +276,18 @@ export class WidgetModule<TWidgetState extends IWidgetState = IWidgetState> {
   }
 
   @mutation()
-  private setData(data: TWidgetState['data']) {
+  protected setData(data: TWidgetState['data']) {
     this.state.data = data;
   }
 
   @mutation()
   private setPrevSettings(data: TWidgetState['data']) {
-    this.state.prevSettings = data;
+    this.state.prevSettings = cloneDeep(data.settings);
+  }
+
+  @mutation()
+  private setCanRevert(canRevert: boolean) {
+    this.state.canRevert = canRevert;
   }
 
   @mutation()

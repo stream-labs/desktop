@@ -22,8 +22,8 @@ interface IAlertBoxState extends IWidgetState {
       alert_delay: 0;
       bit_variations: any;
     };
+    variations: TVariationsState;
   };
-  variations: TVariationsState;
   availableAlerts: TAlertType[];
 }
 
@@ -52,7 +52,7 @@ export class AlertBoxModule extends WidgetModule<IAlertBoxState> {
    * returns settings for a given variation from the state
    */
   getVariationSettings<T extends TAlertType>(alertType: T, variationId = 'default') {
-    return this.state.variations[alertType][variationId];
+    return this.state.data.variations[alertType][variationId];
   }
 
   /**
@@ -97,8 +97,8 @@ export class AlertBoxModule extends WidgetModule<IAlertBoxState> {
    * list of enabled alerts
    */
   get enabledAlerts() {
-    return Object.keys(this.state.variations).filter(
-      alertType => this.state.variations[alertType].default.enabled,
+    return Object.keys(this.state.data.variations).filter(
+      alertType => this.state.data.variations[alertType].default.enabled,
     );
   }
 
@@ -118,14 +118,24 @@ export class AlertBoxModule extends WidgetModule<IAlertBoxState> {
   protected patchAfterFetch(data: any): any {
     const settings = data.settings;
 
-    const allAlerts = values(this.eventsConfig) as IAlertConfig[];
 
     // sanitize general settings
     Object.keys(settings).forEach(key => {
       settings[key] = this.sanitizeValue(settings[key], this.generalMetadata[key]);
     });
 
-    // group alertbox settings by alert types and store them in `state.variations`
+    return data;
+  }
+
+  /**
+   * @override
+   */
+  setData(data: IAlertBoxState['data']) {
+    super.setData(data);
+    const settings = data.settings;
+
+    const allAlerts = values(this.eventsConfig) as IAlertConfig[];
+    // group alertbox settings by alert types and store them in `state.data.variations`
     allAlerts.map(alertEvent => {
       const apiKey = alertEvent.apiKey || alertEvent.type;
       const alertFields = Object.keys(settings).filter(key => key.startsWith(`${apiKey}_`));
@@ -145,11 +155,9 @@ export class AlertBoxModule extends WidgetModule<IAlertBoxState> {
 
     // define available alerts
     const availableAlerts = allAlerts
-      .filter(alertConfig => this.state.variations[alertConfig.type])
+      .filter(alertConfig => this.state.data.variations[alertConfig.type])
       .map(alertConfig => alertConfig.type);
     this.setAvailableAlerts(availableAlerts);
-
-    return data;
   }
 
   /**
@@ -190,7 +198,7 @@ export class AlertBoxModule extends WidgetModule<IAlertBoxState> {
   ) {
     const event = this.eventsConfig[type];
     const apiKey = event.apiKey || event.type;
-    const currentVariationSettings = this.state.variations[type].default;
+    const currentVariationSettings = this.getVariationSettings(type);
 
     // save current settings to the state
     const newVariationSettings = {
@@ -237,7 +245,7 @@ export class AlertBoxModule extends WidgetModule<IAlertBoxState> {
    */
   get customCode() {
     if (!this.selectedAlert) return null;
-    const variationSettings = this.state.variations[this.selectedAlert].default;
+    const variationSettings = this.getVariationSettings(this.selectedAlert);
     const {
       custom_html_enabled,
       custom_html,
@@ -277,9 +285,9 @@ export class AlertBoxModule extends WidgetModule<IAlertBoxState> {
     settings: TVariationsSettings[TAlertType],
   ) {
     const state = this.state;
-    if (!state.variations) state.variations = {} as any;
-    if (!state.variations[type]) state.variations[type] = {} as any;
-    state.variations[type][variationId] = settings;
+    if (!state.data.variations) state.data.variations = {} as any;
+    if (!state.data.variations[type]) state.data.variations[type] = {} as any;
+    state.data.variations[type][variationId] = settings;
   }
 
   @mutation()
