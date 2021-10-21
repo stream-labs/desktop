@@ -22,6 +22,15 @@ const { uploadS3File, uploadToGithub, uploadToSentry } = require('./scripts/uplo
 const pjson = JSON.parse(fs.readFileSync(path.resolve('./package.json'), 'utf-8'));
 
 /**
+ * @param {string} filename
+ */
+function eslintFix(filename) {
+  const gitRootDir = executeCmd('git rev-parse --show-toplevel', { silent: true }).stdout.trim();
+  const eslint = path.resolve(gitRootDir, 'node_modules/.bin/eslint');
+  executeCmd(`${eslint} --fix ${filename}`);
+}
+
+/**
  * This is the main function of the script
  * @param {object} param0
  * @param {'public' | 'internal'} param0.releaseEnvironment
@@ -142,6 +151,7 @@ async function runScript({
     title: newVersion,
     ...patchNote,
   });
+  eslintFix(noteFilename);
   info(`generated patch-note file: ${noteFilename}.`);
 
   // update package.json with newVersion and git tag
