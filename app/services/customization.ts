@@ -153,7 +153,7 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
     this.setSettings(this.runMigrations(this.state, CustomizationService.migrations));
     this.setLiveDockCollapsed(true); // livedock is always collapsed on app start
 
-    this.userService.userLogin.subscribe(() => this.setInitialLegacyAlertboxState());
+    this.userService.userLoginFinished.subscribe(() => this.setInitialLegacyAlertboxState());
 
     if (
       this.state.pinnedStatistics.cpu ||
