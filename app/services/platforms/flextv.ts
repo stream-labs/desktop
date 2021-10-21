@@ -175,7 +175,7 @@ export class FlextvService
   }
 
   get chatUrl(): string {
-    return `${this.apiBase}/redirects/signin?token=${this.apiToken}&redirectTo=/popup/chat/${this.channelId}`;
+    return `${this.apiBase}/redirects/signin?token=${this.apiToken}&redirectTo=/popup/chat/${this.channelId}?darkTheme=true`;
   }
 
   get liveDockEnabled(): boolean {

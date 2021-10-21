@@ -168,6 +168,10 @@ export default class StudioFooterComponent extends Vue {
     }
   }
 
+  openLoginWindow() {
+    this.userService.showLogin();
+  }
+
   saveReplay() {
     this.streamingService.saveReplay();
   }

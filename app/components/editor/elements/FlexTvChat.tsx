@@ -5,10 +5,12 @@ import { Inject } from 'services/core';
 import Scrollable from 'components/shared/Scrollable';
 import styles from './BaseElement.m.less';
 import { StreamingService } from '../../../services/streaming';
+import { UserService } from '../../../services/user';
 
 @Component({})
 export default class Display extends BaseElement {
   @Inject() streamingService: StreamingService;
+  @Inject() userService: UserService;
 
   view: any = null;
 
@@ -32,16 +34,20 @@ export default class Display extends BaseElement {
           </div>
         </div>
         <Scrollable className="studio-controls-selector">
-          <div style="height: 100%;">
-            <BrowserView
-              class={styles.container}
-              src={this.url}
-              options={{ webPreferences: { contextIsolation: true } }}
-              onReady={view => {
-                this.view = view;
-              }}
-            />
-          </div>
+          {this.userService.isLoggedIn ? (
+            <div style="height: 100%;">
+              <BrowserView
+                class={styles.container}
+                src={this.url}
+                options={{ webPreferences: { contextIsolation: true } }}
+                onReady={view => {
+                  this.view = view;
+                }}
+              />
+            </div>
+          ) : (
+            <div style="height: 100%;" />
+          )}
         </Scrollable>
       </div>
     );

@@ -5,6 +5,7 @@ import { useOnCreate, useOnDestroy } from '../../hooks';
 import { Services } from '../../service-provider';
 import { $t } from '../../../services/i18n';
 import Form from '../../shared/inputs/Form';
+import { alertAsync } from '../../modals';
 import { NumberInput, TextInput, RadioInput, CheckboxInput, ListInput } from '../../shared/inputs';
 import { useGoLiveSettings } from '../go-live/useGoLiveSettings';
 
@@ -54,7 +55,7 @@ export default function FlexTvGoLiveWindow() {
 
   async function handleConfirm() {
     if (!title) {
-      return;
+      return alertAsync('방속제목을 입력해 주세요');
     }
     updateSettings({
       platforms: {
@@ -77,7 +78,7 @@ export default function FlexTvGoLiveWindow() {
         {/* CLOSE BUTTON */}
         <Button onClick={close}>{$t('Close')}</Button>
         {/* GO LIVE BUTTON */}
-        {title && shouldShowConfirm && (
+        {shouldShowConfirm && (
           <Button type="primary" onClick={handleConfirm} disabled={isLoading || !!error}>
             {$t('Confirm & Go Live')}
           </Button>
