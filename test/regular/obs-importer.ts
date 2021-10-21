@@ -7,6 +7,7 @@ import { EWidgetType } from '../helpers/widget-helpers';
 import { FormMonkey } from '../helpers/form-monkey';
 import { ExecutionContext } from 'ava';
 import { click, focusChild, focusMain, waitForDisplayed } from '../helpers/modules/core';
+import { logIn } from '../helpers/spectron/user';
 
 const path = require('path');
 
@@ -33,6 +34,8 @@ async function installOBSCache(t: ExecutionContext) {
 
 test('OBS Importer', async t => {
   const client = t.context.app.client;
+
+  await logIn(t);
 
   // skip auth
   await click('span=Skip');
