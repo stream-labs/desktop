@@ -37,9 +37,6 @@ test('OBS Importer', async t => {
 
   await logIn(t);
 
-  // skip auth
-  await click('span=Skip');
-
   // import from OBS
   await click('div=Import from OBS');
   await click('div=Start');
