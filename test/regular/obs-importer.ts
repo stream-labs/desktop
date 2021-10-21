@@ -35,7 +35,7 @@ async function installOBSCache(t: ExecutionContext) {
 test('OBS Importer', async t => {
   const client = t.context.app.client;
 
-  await logIn(t);
+  await logIn(t, 'twitch', null, true, true);
 
   // import from OBS
   await click('div=Import from OBS');
