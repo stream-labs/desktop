@@ -6,7 +6,7 @@ import {
   TObsFormData,
   TObsValue,
 } from '../../components/obs/inputs/ObsInput';
-import Form from '../shared/inputs/Form';
+import Form, {useForm, useFormContext} from '../shared/inputs/Form';
 import {
   CheckboxInput,
   ListInput,
@@ -61,6 +61,8 @@ interface IObsInputProps {
  * Renders a single OBS input
  */
 function ObsInput(p: IObsInputProps) {
+  const formContext = useFormContext();
+  const layout = formContext?.layout;
   if (!p.value.visible) return <></>;
   const type = p.value.type;
 
@@ -112,7 +114,7 @@ function ObsInput(p: IObsInputProps) {
 
     case 'OBS_PROPERTY_BOOL':
       return (
-        <InputWrapper style={{ marginBottom: '8px' }}>
+        <InputWrapper style={{ marginBottom: '8px' }} nowrap={layout === 'vertical'}>
           <CheckboxInput {...inputProps} />
         </InputWrapper>
       );
