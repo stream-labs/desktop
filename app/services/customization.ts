@@ -153,12 +153,7 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
     this.setSettings(this.runMigrations(this.state, CustomizationService.migrations));
     this.setLiveDockCollapsed(true); // livedock is always collapsed on app start
 
-    // switch all new users to the new alertbox by default
-    if (this.state.legacyAlertbox === null) {
-      const registrationDate = this.userService.state.createdAt;
-      const legacyAlertbox = registrationDate < new Date('October 14, 2021').valueOf();
-      this.setSettings({ legacyAlertbox });
-    }
+    this.userService.userLogin.subscribe(() => this.setInitialLegacyAlertboxState());
 
     if (
       this.state.pinnedStatistics.cpu ||
@@ -167,6 +162,17 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
       this.state.pinnedStatistics.bandwidth
     ) {
       this.usageStatisticsService.recordFeatureUsage('PinnedPerformanceStatistics');
+    }
+  }
+
+  setInitialLegacyAlertboxState() {
+    if (!this.userService.views.isLoggedIn) return;
+
+    // switch all new users to the new alertbox by default
+    if (this.state.legacyAlertbox === null) {
+      const registrationDate = this.userService.state.createdAt;
+      const legacyAlertbox = registrationDate < new Date('October 14, 2021').valueOf();
+      this.setSettings({ legacyAlertbox });
     }
   }
 
