@@ -105,7 +105,10 @@ function PanelHeader(p: { source: AudioSource }) {
           onClick={(e: React.MouseEvent) => onInputHandler('muted', !muted, e)}
         />
       </Tooltip>
-      <div style={{ width: '200px' }} onClick={(e: React.MouseEvent) => e.stopPropagation()}>
+      <div
+        style={{ width: '200px', flexShrink: 0 }}
+        onClick={(e: React.MouseEvent) => e.stopPropagation()}
+      >
         <SliderInput
           value={Math.floor(fader.deflection * 100)}
           max={100}
@@ -133,6 +136,7 @@ function PanelHeader(p: { source: AudioSource }) {
               label={vodTrackEnabled ? $t('Stream Tracks') : $t('Stream Track')}
               tooltip={$t('Designates if this source is audible in your live broadcast')}
               layout="horizontal"
+              style={{ flexWrap: 'nowrap' }}
             >
               <div style={{ display: 'flex' }}>
                 <BoolButtonInput
@@ -159,6 +163,7 @@ function PanelHeader(p: { source: AudioSource }) {
               label={$t('Rec. Tracks')}
               tooltip={$t('Designates if this source is audible in your recorded track(s)')}
               layout="horizontal"
+              style={{ flexWrap: 'nowrap' }}
             >
               <div style={{ display: 'flex' }}>
                 {recordingTracks?.map(track => (
