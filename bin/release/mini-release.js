@@ -9,30 +9,26 @@ const OctoKit = require('@octokit/rest');
 const sh = require('shelljs');
 const colors = require('colors/safe');
 const yaml = require('js-yaml');
-const {
-  log,
-  info,
-  error,
-  executeCmd,
-  confirm,
-} = require('./scripts/prompt');
-const {
-  checkEnv,
-  getTagCommitId,
-} = require('./scripts/util');
+const { log, info, error, executeCmd, confirm } = require('./scripts/prompt');
+const { checkEnv, getTagCommitId } = require('./scripts/util');
 const {
   getVersionContext,
   isSameVersionContext,
   updateNotesTs,
   readPatchNote,
 } = require('./scripts/patchNote');
-const {
-  uploadS3File,
-  uploadToGithub,
-  uploadToSentry,
-} = require('./scripts/uploadArtifacts');
+const { uploadS3File, uploadToGithub, uploadToSentry } = require('./scripts/uploadArtifacts');
 
 const pjson = JSON.parse(fs.readFileSync(path.resolve('./package.json'), 'utf-8'));
+
+/**
+ * @param {string} filename
+ */
+function eslintFix(filename) {
+  const gitRootDir = executeCmd('git rev-parse --show-toplevel', { silent: true }).stdout.trim();
+  const eslint = path.resolve(gitRootDir, 'node_modules/.bin/eslint');
+  executeCmd(`${eslint} --fix ${filename}`);
+}
 
 /**
  * This is the main function of the script
@@ -81,7 +77,10 @@ async function runScript({
 
   info('Release summary:');
   log('version:', colors.cyan(patchNote.version));
-  log('environment: ', (releaseEnvironment === 'public' ? colors.red : colors.cyan)(releaseEnvironment));
+  log(
+    'environment: ',
+    (releaseEnvironment === 'public' ? colors.red : colors.cyan)(releaseEnvironment),
+  );
   log('channel: ', (releaseChannel === 'stable' ? colors.red : colors.cyan)(releaseChannel));
   log('---- ---- ---- ----');
   log('notes:', colors.cyan(patchNote.notes));
@@ -103,7 +102,10 @@ async function runScript({
   log('---- ---- ---- ----');
   info('repeat again');
   log('version:', colors.cyan(patchNote.version));
-  log('environment: ', (releaseEnvironment === 'public' ? colors.red : colors.cyan)(releaseEnvironment));
+  log(
+    'environment: ',
+    (releaseEnvironment === 'public' ? colors.red : colors.cyan)(releaseEnvironment),
+  );
   log('channel: ', (releaseChannel === 'stable' ? colors.red : colors.cyan)(releaseChannel));
   log('---- ---- ---- ----\n');
 
@@ -114,12 +116,17 @@ async function runScript({
       throw new Error(`branch mismatch: '${currentBranch}' is not '${target.branch}'`);
     }
 
-    if (!(await confirm(`current branch '${currentBranch}' is not '${target.branch}'. continue?`, false))) {
+    if (
+      !(await confirm(
+        `current branch '${currentBranch}' is not '${target.branch}'. continue?`,
+        false,
+      ))
+    ) {
       sh.exit(1);
     }
   }
 
-  if (!await confirm('Are you sure to release with these configs?', false)) {
+  if (!(await confirm('Are you sure to release with these configs?', false))) {
     sh.exit(1);
   }
 
@@ -144,6 +151,7 @@ async function runScript({
     title: newVersion,
     ...patchNote,
   });
+  eslintFix(noteFilename);
   info(`generated patch-note file: ${noteFilename}.`);
 
   // update package.json with newVersion and git tag
@@ -331,7 +339,9 @@ async function releaseRoutine() {
       await confirm(`${msg} Are you sure?`, false);
     } else {
       error(msg);
-      log('if you wish to release the first release of a new channel or environment, set "NAIR_IGNORE_VERSION_CONTEXT_CHECK".');
+      log(
+        'if you wish to release the first release of a new channel or environment, set "NAIR_IGNORE_VERSION_CONTEXT_CHECK".',
+      );
       throw new Error(msg);
     }
   }
