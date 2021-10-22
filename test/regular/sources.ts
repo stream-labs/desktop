@@ -295,7 +295,7 @@ test('Create/Remove Video Capture Device and view Source Properties', async t =>
 test('Create/Remove Audio Input Capture and view Source Properties', async t => {
   const sourceName = 'Audio Input Capture';
 
-  await addSource('Audio Input Capture', sourceName);
+  await addSource('Audio Input Capture', sourceName, true, true);
   await focusMain();
 
   await selectSource(sourceName);
@@ -314,7 +314,7 @@ test('Create/Remove Audio Input Capture and view Source Properties', async t => 
 test('Create/Remove Audio Output Capture and view Source Properties', async t => {
   const sourceName = 'Audio Output Capture';
 
-  await addSource('Audio Output Capture', sourceName);
+  await addSource('Audio Output Capture', sourceName, true, true);
   await focusMain();
 
   await selectSource(sourceName);
