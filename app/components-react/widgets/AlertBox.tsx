@@ -2,7 +2,7 @@
  * Components for AlertBox widget
  */
 
-import React from 'react';
+import React, { useRef } from 'react';
 import {
   CheckboxInput,
   MediaUrlInput,
@@ -16,13 +16,14 @@ import { Alert, Button, Menu, Tooltip } from 'antd';
 import Form from '../shared/inputs/Form';
 import { WidgetLayout } from './common/WidgetLayout';
 import { CaretRightOutlined, QuestionCircleOutlined } from '@ant-design/icons';
-import { TAlertType } from '../../services/widgets/widget-config';
+import { TAlertType } from '../../services/widgets/alerts-config';
 import { useAlertBox } from './useAlertBox';
 import { useForceUpdate } from '../hooks';
 import electron from 'electron';
 import { Services } from '../service-provider';
 import { ButtonGroup } from '../shared/ButtonGroup';
 import { LayoutInput } from './common/LayoutInput';
+import InputWrapper from '../shared/inputs/InputWrapper';
 
 /**
  * Root component
@@ -68,7 +69,12 @@ function TabContent() {
  * Renders general settings
  */
 function GeneralSettings() {
-  const { bind } = useAlertBox();
+  const { bind, switchToLegacyAlertbox } = useAlertBox();
+
+  function openAdvancedAlertTesting() {
+    Services.MagicLinkService.actions.openAdvancedAlertTesting();
+  }
+
   return (
     <Form layout={'horizontal'}>
       <SliderInput
@@ -80,28 +86,16 @@ function GeneralSettings() {
         tipFormatter={(ms: number) => `${ms / 1000}s`}
         debounce={500}
       />
-      <LegacyLink />
-    </Form>
-  );
-}
 
-/**
- * Shows a link for switching to legacy components
- */
-function LegacyLink() {
-  const { switchToLegacyAlertbox } = useAlertBox();
-  return (
-    <Alert
-      message={
-        <span>
-          {$t('Looking for the old AlertBox settings?')} <a>{$t('Click here')}</a>
-        </span>
-      }
-      onClick={switchToLegacyAlertbox}
-      type="info"
-      showIcon
-      style={{ marginBottom: '16px' }}
-    />
+      <Info
+        message={$t('Looking for the old AlertBox settings?')}
+        onClick={switchToLegacyAlertbox}
+      />
+      <Info
+        message={$t('Need to test your alerts with different scenarios?')}
+        onClick={openAdvancedAlertTesting}
+      />
+    </Form>
   );
 }
 
@@ -173,18 +167,32 @@ function AlertsList() {
  * Settings for a selected Alert
  */
 function VariationSettings(p: { type: TAlertType }) {
-  const { createVariationBinding, isCustomCodeEnabled } = useAlertBox();
-  const bind = createVariationBinding(p.type, 'default', useForceUpdate());
+  switch (p.type) {
+    case 'donation':
+      return <DonationSettings />;
+    case 'merch':
+      return <MerchSettings />;
+    default:
+      return <CommonAlertSettings type={p.type} />;
+  }
+}
+
+/**
+ * Common settings for a selected Alert
+ */
+function CommonAlertSettings(p: { type: TAlertType; hiddenFields?: string[] }) {
+  const { createVariationBinding, isCustomCodeEnabled, selectedTab } = useAlertBox();
+  const bind = createVariationBinding(p.type, 'default', useForceUpdate(), p.hiddenFields);
+  const containerRef = useRef<HTMLDivElement>(null);
+
   return (
-    <div>
-      {/* ALERT SETTINGS  */}
+    <div key={selectedTab} ref={containerRef}>
       <MediaUrlInput {...bind.image_href} />
       {!isCustomCodeEnabled && <LayoutInput {...bind.layout} />}
       <AudioUrlInput {...bind.sound_href} />
       <SliderInput debounce={500} {...bind.sound_volume} />
       <TextInput {...bind.message_template} />
       <SliderInput {...bind.alert_duration} />
-      {p.type === 'donation' && <DonationSettings />}
     </div>
   );
 }
@@ -209,31 +217,51 @@ function DonationSettings() {
 
   return (
     <>
+      <CommonAlertSettings type="donation" />
       <NumberInput {...bind.alert_message_min_amount} />
-      <div style={{ marginBottom: '32px' }}>
-        <Alert
-          message={
-            <span>
-              {$t('Need to set up tipping?')} <a>{$t('Click here')}</a>
-            </span>
-          }
-          type="info"
-          showIcon
-          style={{ marginBottom: '16px' }}
-          onClick={openDonationSettings}
-        />
-        <Alert
-          message={
-            <span>
-              {$t('Customize your tip page where viewers can send you donations')}
-              <a onClick={openTipPageSettings}> {$t('Click here')}</a>
-            </span>
-          }
-          type="info"
-          showIcon
-          style={{ marginBottom: '16px' }}
-        />
-      </div>
+
+      <Info message={$t('Need to set up tipping?')} onClick={openDonationSettings} />
+      <Info
+        message={$t('Customize your tip page where viewers can send you donations')}
+        onClick={openTipPageSettings}
+      />
     </>
+  );
+}
+
+/**
+ * Additional settings for merch
+ */
+function MerchSettings() {
+  const { createVariationBinding } = useAlertBox();
+  const bind = createVariationBinding('merch', 'default', useForceUpdate());
+  const hiddenFields = bind.use_custom_image.value ? [] : ['image_href'];
+
+  return (
+    <>
+      <InputWrapper>
+        <CheckboxInput {...bind.use_custom_image} />
+      </InputWrapper>
+      <CommonAlertSettings type="merch" hiddenFields={hiddenFields} />
+    </>
+  );
+}
+
+/**
+ * A shortcut for Alert.info from antd lib
+ */
+function Info(p: { message: string; onClick: Function }) {
+  return (
+    <Alert
+      message={
+        <span>
+          {p.message}
+          <a onClick={() => p.onClick()}> {$t('Click here')}</a>
+        </span>
+      }
+      type="info"
+      showIcon
+      style={{ marginBottom: '16px' }}
+    />
   );
 }

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, Collapse, Spin, Tabs } from 'antd';
+import { Alert, Button, Collapse, Spin, Tabs } from 'antd';
 import { $t } from '../../../services/i18n';
 import { CodeInput, SwitchInput } from '../../shared/inputs';
 import { useWidget, useWidgetRoot } from './useWidget';
@@ -77,7 +77,19 @@ function EditorFooter() {
 function Editor() {
   const { setCode, code, selectedTab } = useCodeEditor();
   if (selectedTab === 'json') return <JsonEditor />;
-  return <CodeInput lang={selectedTab} value={code} onChange={setCode} height={590} nowrap />;
+  return (
+    <>
+      <CodeInput lang={selectedTab} value={code} onChange={setCode} height={570} nowrap />
+      <Alert
+        style={{ marginTop: '7px' }}
+        message={$t(
+          'Saving custom code can have potential security risks, make sure you trust the code you are about to apply.',
+        )}
+        type="warning"
+        showIcon
+      />
+    </>
+  );
 }
 
 /**

@@ -49,7 +49,7 @@ export function WidgetLayout(p: { children: ReactNode | [ReactNode, ReactNode] }
           {/* MENU  */}
           {MenuPanel && (
             <Col
-              flex="250px"
+              flex="270px"
               style={{
                 borderRight: '1px solid var(--border)',
                 backgroundColor: 'var(--section)',

@@ -10,14 +10,14 @@ import { promptAsync } from '../../modals';
 import cx from 'classnames';
 
 export const MediaUrlInput = InputComponent((p: TSlobsInputProps<{}, string>) => {
-  const { wrapperAttrs, inputAttrs } = useInput('mediaurl', p);
+  const { wrapperAttrs, inputAttrs, dataAttrs } = useInput('mediaurl', p);
   const value = inputAttrs.value;
   const isVideo = /\.webm/.test(inputAttrs.value);
   const isImage = !isVideo;
 
   return (
     <InputWrapper {...wrapperAttrs}>
-      <div className={css.mediaInput}>
+      <div className={css.mediaInput} {...dataAttrs}>
         {/* VIDEO PREVIEW */}
         {isVideo && (
           <div>

@@ -5,11 +5,11 @@ import React from 'react';
 import { MediaInputButtons } from './MediaUrlInput';
 
 export const AudioUrlInput = InputComponent((p: TSlobsInputProps<{}, string>) => {
-  const { wrapperAttrs, inputAttrs } = useInput('audiourl', p);
+  const { wrapperAttrs, inputAttrs, dataAttrs } = useInput('audiourl', p);
 
   return (
     <InputWrapper {...wrapperAttrs}>
-      <div className={css.audioInput}>
+      <div className={css.audioInput} {...dataAttrs}>
         <MediaInputButtons value={inputAttrs.value} onChange={inputAttrs.onChange} isAudio />
       </div>
     </InputWrapper>
