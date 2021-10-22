@@ -245,6 +245,14 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
 
   userLogin = new Subject<IUserAuth>();
   userLogout = new Subject();
+
+  /**
+   * Will fire on every login, similar to userLogin, but will
+   * fire after all normal on-login operations have finished.
+   * Useful when you need to check the state of a user after
+   * everything has finished updating.
+   */
+  userLoginFinished = new Subject();
   private socketConnection: Subscription = null;
 
   /**
@@ -715,6 +723,8 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
 
       return validatePlatformResult;
     }
+
+    this.userLoginFinished.next();
   }
 
   @RunInLoadingMode()
