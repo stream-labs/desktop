@@ -9,7 +9,7 @@ import { WidgetType } from 'services/widgets';
 import { $t } from 'services/i18n';
 import { EditorCommandsService } from 'services/editor-commands';
 import { EPlaceType } from 'services/editor-commands/commands/reorder-nodes';
-import { CustomizationService } from 'services/customization';
+import { AudioService } from 'services/audio';
 import { StreamingService } from 'services/streaming';
 import TsxComponent from 'components/tsx-component';
 import Scrollable from 'components/shared/Scrollable';
@@ -72,6 +72,7 @@ export default class SourceSelector extends TsxComponent {
   @Inject() private selectionService: SelectionService;
   @Inject() private editorCommandsService: EditorCommandsService;
   @Inject() private streamingService: StreamingService;
+  @Inject() private audioService: AudioService;
 
   sourcesTooltip = $t('The building blocks of your scene. Also contains widgets.');
   addSourceTooltip = $t('Add a new Source to your Scene. Includes widgets.');
@@ -212,6 +213,11 @@ export default class SourceSelector extends TsxComponent {
 
     if (item.type === 'scene') {
       this.scenesService.actions.makeSceneActive(item.sourceId);
+      return;
+    }
+
+    if (!item.video) {
+      this.audioService.actions.showAdvancedSettings(item.sourceId);
       return;
     }
 

@@ -35,7 +35,7 @@ test('Change Advanced Audio Settings', async t => {
 
   await clickAdvancedAudio(t);
   await focusChild();
-  await click('.icon-add');
+  await click('.ant-collapse-arrow');
 
   // check default settings
   const headerForm = useForm('advanced-audio-header');
@@ -64,7 +64,7 @@ test('Change Advanced Audio Settings', async t => {
   await focusMain();
   await clickAdvancedAudio(t);
   await focusChild();
-  await click('.icon-add');
+  await click('.ant-collapse-arrow');
 
   await headerForm.assertFormContains(updatedAudioSettings);
   await detailForm.assertFormContains(updatedDetailSettings);
@@ -80,7 +80,7 @@ test('Change Advanced Audio Settings', async t => {
   await focusMain();
   await clickAdvancedAudio(t);
   await focusChild();
-  await click('.icon-add');
+  await click('.ant-collapse-arrow');
 
   await headerForm.assertFormContains(updatedAudioSettings);
   await detailForm.assertFormContains(updatedDetailSettings);

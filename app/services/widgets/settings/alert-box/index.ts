@@ -30,6 +30,9 @@ export interface IAlertBoxData extends IWidgetData {
   tts_languages?: any[];
 }
 
+/**
+ * @deprecated
+ */
 @InheritMutations()
 export class AlertBoxService extends WidgetSettingsService<IAlertBoxData> {
   static initialState = WIDGET_INITIAL_STATE;

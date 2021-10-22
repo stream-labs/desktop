@@ -17,7 +17,7 @@ export type TSliderInputProps = TSlobsInputProps<
 export const SliderInput = InputComponent((partialProps: TSliderInputProps) => {
   // apply default props
   const p = {
-    hasNumberInput: true,
+    hasNumberInput: false,
     ...partialProps,
   };
   const { inputAttrs, wrapperAttrs } = useInput('slider', p, ANT_SLIDER_FEATURES);
@@ -43,7 +43,7 @@ export const SliderInput = InputComponent((partialProps: TSliderInputProps) => {
             <InputNumber
               {...inputAttrs}
               onChange={onChangeHandler}
-              style={{ width: numberInputHeight }}
+              style={{ width: numberInputHeight, marginLeft: '8px' }}
             />
           </Col>
         )}

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useState, useMemo } from 'react';
 import Form, { useForm } from '../shared/inputs/Form';
 import { TextInput } from 'components-react/shared/inputs';
 import { Services } from '../service-provider';
@@ -10,26 +10,26 @@ export default function RenameSource() {
 
   const form = useForm();
 
-  const options = useRef(WindowsService.getChildWindowQueryParams());
+  const options = useMemo(() => WindowsService.getChildWindowQueryParams(), []);
 
   const [name, setName] = useState(
-    () => SourcesService.views.getSource(options.current.sourceId)?.name || '',
+    () => SourcesService.views.getSource(options.sourceId)?.name || '',
   );
 
-  async function submit(e: React.MouseEvent<HTMLElement, MouseEvent>) {
-    e.preventDefault();
+  async function submit(e?: React.MouseEvent<HTMLElement, MouseEvent>) {
+    if (e) e.preventDefault();
     try {
       await form.validateFields();
     } catch (err: unknown) {
       return;
     }
-    EditorCommandsService.executeCommand('RenameSourceCommand', options.current.sourceId, name);
+    EditorCommandsService.executeCommand('RenameSourceCommand', options.sourceId, name);
     WindowsService.closeChildWindow();
   }
 
   return (
     <ModalLayout onOk={submit} okText={$t('Done')}>
-      <Form layout="vertical" form={form} name="renameSourceForm">
+      <Form layout="vertical" form={form} name="renameSourceForm" onFinish={() => submit()}>
         <TextInput
           label={$t('Please enter the name of the source')}
           name="sourceName"
@@ -39,6 +39,7 @@ export default function RenameSource() {
           onInput={setName}
           uncontrolled={false}
           required
+          autoFocus
         />
       </Form>
     </ModalLayout>

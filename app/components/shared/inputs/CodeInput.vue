@@ -1,11 +1,6 @@
 <template>
   <div>
-    <codemirror
-        :value="value"
-        :options="editorOptions[metadata.type]"
-        @input="value => emitInput(value)"
-        :viewportMargin="Infinity"
-    />
+    <Textarea></Textarea>
   </div>
 </template>
 

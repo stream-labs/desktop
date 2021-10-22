@@ -398,7 +398,6 @@ h2 {
 
 .source--login {
   .radius();
-  border: none;
 
   cursor: pointer;
   padding: 4px 8px;
