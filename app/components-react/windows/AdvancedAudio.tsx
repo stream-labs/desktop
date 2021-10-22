@@ -216,16 +216,16 @@ function PanelForm(p: { source: AudioSource }) {
   useEffect(() => {
     // Ensure monitoring type is returned to normal upon destroy
     return () => {
-      handleSettingsChange('monitoringType', savedMonitoring.current);
+      p.source.setSettings({ monitoringType: savedMonitoring.current });
     };
   }, []);
 
   function handleTestButtonClick() {
     if (!testing) {
       setTesting(true);
-      handleSettingsChange('monitoringType', 1);
+      p.source.setSettings({ monitoringType: 1 });
     } else {
-      handleSettingsChange('monitoringType', savedMonitoring.current);
+      p.source.setSettings({ monitoringType: savedMonitoring.current });
       setTesting(false);
     }
   }
