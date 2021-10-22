@@ -72,7 +72,7 @@ export function getAlertsConfig(
     twCheer: {
       type: 'twCheer',
       apiKey: 'bits',
-      name: $t('Twitch Cheer (Bits)'),
+      name: $t('Cheer (Bits)'),
       url() {
         return `https://${host}/api/v5/slobs/test/twitch_account/bits`;
       },
@@ -82,7 +82,7 @@ export function getAlertsConfig(
     },
 
     twHost: {
-      name: $t('Twitch Host'),
+      name: $t('Host'),
       type: 'twHost',
       apiKey: 'host',
       url() {
@@ -92,7 +92,7 @@ export function getAlertsConfig(
     },
 
     twRaid: {
-      name: $t('Twitch Raid'),
+      name: $t('Raid'),
       type: 'twRaid',
       apiKey: 'raid',
       url() {
@@ -182,12 +182,13 @@ export function getAlertsConfig(
     },
 
     ytSubscriber: {
-      name: $t('Youtube Subscribers'),
+      name: $t('YouTube Subscribers'),
       type: 'ytSubscriber',
       apiKey: 'subscriber',
       url() {
         return `https://${host}/api/v5/slobs/test/youtube_account/subscriber`;
       },
+      platforms: ['youtube'],
     },
   };
 }
