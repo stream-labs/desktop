@@ -28,5 +28,6 @@
   "Mute": "Mute",
   "Unmute": "Unmute",
   "Designates if this source is audible in your live broadcast": "Designates if this source is audible in your live broadcast",
-  "Designates if this source is audible in your recorded track(s)": "Designates if this source is audible in your recorded track(s)"
+  "Designates if this source is audible in your recorded track(s)": "Designates if this source is audible in your recorded track(s)",
+  "Source Settings": "Source Settings"
 }
