@@ -147,5 +147,8 @@
   "The name of the streamer raiding you": "The name of the streamer raiding you",
   "The number of viewers who joined the raid": "The number of viewers who joined the raid",
   "Need to test your alerts with different scenarios?": "Need to test your alerts with different scenarios?",
-  "Try the new simplified AlertBox settings": "Try the new simplified AlertBox settings"
+  "Try the new simplified AlertBox settings": "Try the new simplified AlertBox settings",
+  "Use unlimited delay": "Use unlimited delay",
+  "When enabled new alerts will interrupt the on screen alert": "When enabled new alerts will interrupt the on screen alert",
+  "This applies to all alerts. If enabled all alerts need to be approved manually.": "This applies to all alerts. If enabled all alerts need to be approved manually."
 }
