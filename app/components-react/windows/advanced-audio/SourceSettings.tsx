@@ -1,6 +1,5 @@
-import React, { useState, useRef, useMemo } from 'react';
-import { Collapse } from 'antd';
-import { ModalLayout } from 'components-react/shared/ModalLayout';
+import React, { useState, useRef, useMemo, useEffect } from 'react';
+import { Button, Collapse, Tooltip } from 'antd';
 import {
   SliderInput,
   BoolButtonInput,
@@ -8,6 +7,7 @@ import {
   SwitchInput,
   NumberInput,
 } from 'components-react/shared/inputs';
+import InputWrapper from 'components-react/shared/inputs/InputWrapper';
 import Form from 'components-react/shared/inputs/Form';
 import { TObsValue, IObsListInput, TObsFormData } from 'components/obs/inputs/ObsInput';
 import { Services } from 'components-react/service-provider';
@@ -17,17 +17,17 @@ import { Source } from 'services/sources';
 import { $t } from 'services/i18n';
 import Utils from 'services/utils';
 import styles from './AdvancedAudio.m.less';
+import Scrollable from 'components-react/shared/Scrollable';
 
 const { Panel } = Collapse;
 
-export default function SourceSettings() {
+export default function AdvancedAudio() {
   const { AudioService, WindowsService } = Services;
 
   const initialSource = useMemo<string>(
     () => WindowsService.getChildWindowQueryParams().sourceId || '',
     [],
   );
-
   const [expandedSource, setExpandedSource] = useState(initialSource);
 
   const { audioSources } = useVuex(() => ({
@@ -39,7 +39,6 @@ export default function SourceSettings() {
       accordion
       activeKey={expandedSource}
       onChange={(key: string) => setExpandedSource(key)}
-      expandIcon={({ isActive }) => <i className={isActive ? 'icon-subtract' : 'icon-add'} />}
     >
       {audioSources.map(audioSource => (
         <Panel key={audioSource.sourceId} header={<PanelHeader source={audioSource} />}>
@@ -53,11 +52,15 @@ export default function SourceSettings() {
 function PanelHeader(p: { source: AudioSource }) {
   const { name, mixerHidden, muted, fader, sourceId, audioMixers } = p.source;
   const { EditorCommandsService, SettingsService } = Services;
-  const { isAdvancedOutput, recordingTracks, streamTrack } = useVuex(() => ({
-    isAdvancedOutput: SettingsService.views.isAdvancedOutput,
-    streamTrack: SettingsService.views.streamTrack,
-    recordingTracks: SettingsService.views.recordingTracks,
-  }));
+  const { isAdvancedOutput, recordingTracks, streamTrack, vodTrackEnabled, vodTrack } = useVuex(
+    () => ({
+      isAdvancedOutput: SettingsService.views.isAdvancedOutput,
+      streamTrack: SettingsService.views.streamTrack,
+      recordingTracks: SettingsService.views.recordingTracks,
+      vodTrackEnabled: SettingsService.views.vodTrackEnabled,
+      vodTrack: SettingsService.views.vodTrack,
+    }),
+  );
 
   const [trackFlags, setTrackFlags] = useState(
     Utils.numberToBinnaryArray(audioMixers, 6).reverse(),
@@ -81,25 +84,26 @@ function PanelHeader(p: { source: AudioSource }) {
     );
   }
 
-  function onInputHandler(name: string, value: TObsValue) {
+  function onInputHandler(name: string, value: TObsValue, e: React.MouseEvent) {
+    e.stopPropagation();
     EditorCommandsService.actions.executeCommand('SetAudioSettingsCommand', sourceId, {
       [name]: value,
     });
   }
 
   return (
-    <Form
-      className={styles.audioSettingsRow}
-      onClick={(e: React.MouseEvent) => e.stopPropagation()}
-      data-role="form"
-      data-name="advanced-audio-header"
-    >
+    <Form className={styles.audioSettingsRow} data-role="form" data-name="advanced-audio-header">
       <div className={styles.audioSourceName}>{name}</div>
-      <i
-        className={muted ? 'icon-mute' : 'icon-audio'}
-        onClick={() => onInputHandler('muted', !muted)}
-      />
-      <div style={{ width: '200px' }}>
+      <Tooltip title={muted ? $t('Unmute') : $t('Mute')}>
+        <i
+          className={muted ? 'icon-mute' : 'icon-audio'}
+          onClick={(e: React.MouseEvent) => onInputHandler('muted', !muted, e)}
+        />
+      </Tooltip>
+      <div
+        style={{ width: '200px', flexShrink: 0 }}
+        onClick={(e: React.MouseEvent) => e.stopPropagation()}
+      >
         <SliderInput
           value={Math.floor(fader.deflection * 100)}
           max={100}
@@ -111,31 +115,65 @@ function PanelHeader(p: { source: AudioSource }) {
           nowrap
         />
       </div>
-      <i
-        className={mixerHidden ? 'icon-hide' : 'icon-view'}
-        onClick={() => onInputHandler('mixerHidden', !mixerHidden)}
-      />
-      {isAdvancedOutput && (
-        <div className={styles.audioSettingsTracks}>
-          <div className={styles.trackLabel}>{$t('Stream Track')}</div>
-          <BoolButtonInput
-            label={String(streamTrack + 1)}
-            value={!!trackFlags[streamTrack]}
-            onChange={value => onTrackInput(streamTrack, value)}
-            checkboxStyles={{ marginRight: '8px' }}
-            name="streamTrack"
-          />
-          <div className={styles.trackLabel}>{$t('Rec. Tracks')}</div>
-          {recordingTracks?.map(track => (
-            <BoolButtonInput
-              label={String(track + 1)}
-              key={track}
-              value={!!trackFlags[track]}
-              onChange={value => onTrackInput(track, value)}
-              checkboxStyles={{ marginRight: '4px' }}
-              name={`flag${track}`}
-            />
-          ))}
+      <Tooltip title={mixerHidden ? $t('Show in Mixer') : $t('Hide in Mixer')}>
+        <i
+          className={mixerHidden ? 'icon-hide' : 'icon-view'}
+          onClick={(e: React.MouseEvent) => onInputHandler('mixerHidden', !mixerHidden, e)}
+        />
+      </Tooltip>
+      {(isAdvancedOutput || vodTrackEnabled) && (
+        <div
+          className={styles.audioSettingsTracks}
+          onClick={(e: React.MouseEvent) => e.stopPropagation()}
+        >
+          {(isAdvancedOutput || vodTrackEnabled) && (
+            <InputWrapper
+              label={vodTrackEnabled ? $t('Stream Tracks') : $t('Stream Track')}
+              tooltip={$t('Designates if this source is audible in your live broadcast')}
+              layout="horizontal"
+              style={{ flexWrap: 'nowrap' }}
+            >
+              <div style={{ display: 'flex' }}>
+                <BoolButtonInput
+                  label={String(streamTrack + 1)}
+                  value={!!trackFlags[streamTrack]}
+                  onChange={value => onTrackInput(streamTrack, value)}
+                  checkboxStyles={{ marginRight: vodTrackEnabled ? '4px' : '8px' }}
+                  name="streamTrack"
+                />
+                {vodTrackEnabled && (
+                  <BoolButtonInput
+                    label={String(vodTrack + 1)}
+                    value={!!trackFlags[vodTrack]}
+                    onChange={value => onTrackInput(vodTrack, value)}
+                    checkboxStyles={{ marginRight: '8px' }}
+                    name="vodTrack"
+                  />
+                )}
+              </div>
+            </InputWrapper>
+          )}
+          {isAdvancedOutput && (
+            <InputWrapper
+              label={$t('Rec. Tracks')}
+              tooltip={$t('Designates if this source is audible in your recorded track(s)')}
+              layout="horizontal"
+              style={{ flexWrap: 'nowrap' }}
+            >
+              <div style={{ display: 'flex' }}>
+                {recordingTracks?.map(track => (
+                  <BoolButtonInput
+                    label={String(track + 1)}
+                    key={track}
+                    value={!!trackFlags[track]}
+                    onChange={value => onTrackInput(track, value)}
+                    checkboxStyles={{ marginRight: '4px' }}
+                    name={`flag${track}`}
+                  />
+                ))}
+              </div>
+            </InputWrapper>
+          )}
         </div>
       )}
     </Form>
@@ -145,14 +183,48 @@ function PanelHeader(p: { source: AudioSource }) {
 function PanelForm(p: { source: AudioSource }) {
   const { sourceId, forceMono, syncOffset, source, monitoringType } = p.source;
 
+  const [testing, setTesting] = useState(false);
+  const savedMonitoring = useRef(monitoringType);
+
   const hasDevices = source ? !source.video : false;
+  const isMic = source
+    ? [
+        'wasapi_input_capture',
+        'coreaudio_input_capture',
+        'dshow_input',
+        'av_capture_input',
+      ].includes(source.type)
+    : false;
 
   const { EditorCommandsService } = Services;
 
-  function onSettingsHandler(name: string, value: TObsValue) {
+  function handleSettingsChange(name: string, value: TObsValue) {
     EditorCommandsService.actions.executeCommand('SetAudioSettingsCommand', sourceId, {
       [name]: value,
     });
+  }
+
+  useEffect(() => {
+    if (testing) return;
+    savedMonitoring.current = monitoringType;
+  }, [monitoringType, testing]);
+  useEffect(() => {
+    // Ensure monitoring type is returned to normal upon destroy
+    return () => {
+      if (p.source.isDestroyed()) return;
+
+      p.source.setSettings({ monitoringType: savedMonitoring.current });
+    };
+  }, []);
+
+  function handleTestButtonClick() {
+    if (!testing) {
+      setTesting(true);
+      p.source.setSettings({ monitoringType: 1 });
+    } else {
+      p.source.setSettings({ monitoringType: savedMonitoring.current });
+      setTesting(false);
+    }
   }
 
   return (
@@ -162,26 +234,36 @@ function PanelForm(p: { source: AudioSource }) {
         label={$t('Sync Offset')}
         value={syncOffset}
         name="syncOffset"
-        onInput={value => onSettingsHandler('syncOffset', value)}
+        onInput={value => handleSettingsChange('syncOffset', value)}
         tooltip={$t('Time it takes between sound occuring and being broadcast (ms)')}
       />
       <SwitchInput
         label={$t('Downmix to Mono')}
         value={forceMono}
         name="forceMono"
-        onInput={value => onSettingsHandler('forceMono', value)}
+        onChange={value => handleSettingsChange('forceMono', value)}
         tooltip={$t('Route audio to the central channel instead of left or right stereo channels')}
       />
       <ListInput
         label={$t('Audio Monitoring')}
         options={p.source.monitoringOptions}
         value={monitoringType}
+        disabled={testing}
         name="monitoringType"
-        onInput={value => onSettingsHandler('monitoringType', value)}
+        onChange={value => handleSettingsChange('monitoringType', value)}
         tooltip={$t(
           'Generally, enabling monitoring sends the audio through the Desktop Audio channel',
         )}
       />
+      {isMic && (
+        <Button
+          onClick={handleTestButtonClick}
+          type={testing ? 'default' : 'primary'}
+          style={{ marginLeft: '278px' }}
+        >
+          {testing ? $t('Testing...') : $t('Test Audio')}
+        </Button>
+      )}
     </Form>
   );
 }
@@ -189,8 +271,10 @@ function PanelForm(p: { source: AudioSource }) {
 function DeviceInputs(p: { source: Source }) {
   const { EditorCommandsService } = Services;
 
-  const sourceProperties = useMemo<TObsFormData>(() => p.source.getPropertiesFormData(), []);
-  const settings = useMemo(() => p.source.getSettings(), []);
+  const sourceProperties = useMemo<TObsFormData>(() => p.source.getPropertiesFormData(), [
+    p.source.sourceId,
+  ]);
+  const settings = useMemo(() => p.source.getSettings(), [p.source.sourceId]);
   const [statefulSettings, setStatefulSettings] = useState(settings);
 
   const deviceOptions = (sourceProperties[0] as IObsListInput<TObsValue>).options.map(option => ({
@@ -199,10 +283,10 @@ function DeviceInputs(p: { source: Source }) {
   }));
 
   function handleInput(name: string, value: TObsValue) {
-    setStatefulSettings({ ...statefulSettings, [name]: value });
     EditorCommandsService.actions.executeCommand('EditSourceSettingsCommand', p.source.sourceId, {
       [name]: value,
     });
+    setStatefulSettings({ ...statefulSettings, [name]: value });
   }
 
   return (
@@ -211,12 +295,12 @@ function DeviceInputs(p: { source: Source }) {
         label={$t('Device')}
         options={deviceOptions}
         value={statefulSettings.device_id}
-        onInput={value => handleInput('device_id', value)}
+        onChange={value => handleInput('device_id', value)}
       />
       <SwitchInput
         label={$t('Use Device Timestamps')}
         value={statefulSettings.use_device_timing}
-        onInput={value => handleInput('use_device_timing', value)}
+        onChange={value => handleInput('use_device_timing', value)}
       />
     </>
   );

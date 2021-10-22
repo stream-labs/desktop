@@ -20,7 +20,7 @@ export default function AdvancedAudio() {
         <Menu.Item key="source">{$t('Source Settings')}</Menu.Item>
         <Menu.Item key="global">{$t('Global Settings')}</Menu.Item>
       </Menu>
-      <Scrollable style={{ height: '100%' }}>
+      <Scrollable style={{ height: '100%' }} snapToWindowEdge>
         {activeTab === 'source' && <SourceSettings />}
         {activeTab === 'global' && <GlobalSettings />}
       </Scrollable>
