@@ -216,6 +216,8 @@ function PanelForm(p: { source: AudioSource }) {
   useEffect(() => {
     // Ensure monitoring type is returned to normal upon destroy
     return () => {
+      if (p.source.isDestroyed()) return;
+
       p.source.setSettings({ monitoringType: savedMonitoring.current });
     };
   }, []);
