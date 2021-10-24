@@ -44,6 +44,7 @@ export function getAlertsConfig(
     twFollow: {
       type: 'twFollow',
       name: $t('Follow'),
+      apiKey: 'follow',
       url() {
         return `https://${host}/api/v5/slobs/test/twitch_account/follow`;
       },
@@ -53,6 +54,7 @@ export function getAlertsConfig(
 
     fbFollow: {
       type: 'fbFollow',
+      apiKey: 'facebook_follow',
       name: $t('Facebook Follow'),
       url(platform: TPlatform = 'twitch') {
         return `https://${host}/api/v5/slobs/test/facebook_account/follow`;
