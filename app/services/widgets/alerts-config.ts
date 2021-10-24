@@ -2,9 +2,10 @@ import { $t } from '../i18n';
 import { TPlatform } from '../platforms';
 export type TAlertType =
   | 'donation'
-  | 'subscription'
-  | 'follow'
+  | 'twSubscription'
+  | 'twFollow'
   | 'twCheer'
+  | 'fbFollow'
   | 'fbSupport'
   | 'fbStars'
   | 'fbLike'
@@ -31,14 +32,6 @@ export function getAlertsConfig(
   host: string,
   platforms: TPlatform[] = [],
 ): Record<TAlertType, IAlertConfig> {
-  // define the Subscription alert name based on connected platforms
-  let subscriptionName = $t('Subscription');
-  if (platforms.includes('youtube') && platforms.includes('twitch')) {
-    subscriptionName = $t('Subs / Members');
-  } else if (platforms.includes('youtube')) {
-    subscriptionName = $t('Membership');
-  }
-
   return {
     donation: {
       type: 'donation',
@@ -48,25 +41,35 @@ export function getAlertsConfig(
       },
     },
 
-    follow: {
-      type: 'follow',
+    twFollow: {
+      type: 'twFollow',
       name: $t('Follow'),
-      url(platform: TPlatform = 'twitch') {
-        return `https://${host}/api/v5/slobs/test/${platform}_account/follow`;
+      url() {
+        return `https://${host}/api/v5/slobs/test/twitch_account/follow`;
       },
-      platforms: ['twitch', 'facebook'],
-      tooltip: $t('Triggers for new Twitch and Facebook followers'),
+      platforms: ['twitch'],
+      tooltip: $t('Triggers for new Twitch followers'),
     },
 
-    subscription: {
-      type: 'subscription',
-      apiKey: 'sub',
-      name: subscriptionName,
+    fbFollow: {
+      type: 'fbFollow',
+      name: $t('Facebook Follow'),
       url(platform: TPlatform = 'twitch') {
-        return `https://${host}/api/v5/slobs/test/${platform}_account/subscription`;
+        return `https://${host}/api/v5/slobs/test/facebook_account/follow`;
       },
-      platforms: ['twitch', 'youtube'],
-      tooltip: $t('Triggers for new Twitch subscriptions and Youtube memberships'),
+      platforms: ['twitch'],
+      tooltip: $t('Triggers for new Facebook followers'),
+    },
+
+    twSubscription: {
+      type: 'twSubscription',
+      apiKey: 'sub',
+      name: $t('Subscription'),
+      url() {
+        return `https://${host}/api/v5/slobs/test/twitch_account/subscription`;
+      },
+      platforms: ['twitch'],
+      tooltip: $t('Triggers for new Twitch subscriptions'),
     },
 
     twCheer: {

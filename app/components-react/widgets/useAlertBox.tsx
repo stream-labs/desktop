@@ -315,7 +315,7 @@ export class AlertBoxModule extends WidgetModule<IAlertBoxState> {
     // sort alerts
 
     // these alerts always go first
-    const topAlerts: TAlertType[] = ['donation', 'follow', 'subscription'];
+    const topAlerts: TAlertType[] = ['donation'];
 
     // the rest alerts have an alphabetic order
     alerts = topAlerts.concat(alerts.sort().filter(alert => !topAlerts.includes(alert)));
@@ -389,12 +389,13 @@ function getVariationsMetadata() {
         min: 0,
       }),
     },
-    follow: {},
+    twFollow: {},
+    fbFollow: {},
     twRaid: {
       message_template: getMessageTemplateMetadata('twRaid'),
     },
     twHost: {},
-    subscription: {},
+    twSubscription: {},
     twCheer: {
       message_template: getMessageTemplateMetadata('twCheer'),
     },

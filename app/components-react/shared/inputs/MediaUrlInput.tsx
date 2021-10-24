@@ -14,6 +14,10 @@ export const MediaUrlInput = InputComponent((p: TSlobsInputProps<{}, string>) =>
   const value = inputAttrs.value;
   const isVideo = /\.webm/.test(inputAttrs.value);
   const isImage = !isVideo;
+  const previewValue =
+    value === '/images/gallery/default.gif'
+      ? 'http://uploads.twitchalerts.com/image-defaults/1n9bK4w.gif'
+      : value;
 
   return (
     <InputWrapper {...wrapperAttrs}>
@@ -22,13 +26,13 @@ export const MediaUrlInput = InputComponent((p: TSlobsInputProps<{}, string>) =>
         {isVideo && (
           <div>
             <video loop muted autoPlay className={css.preview} key={value}>
-              <source src={value} type="video/webm" />
+              <source src={previewValue} type="video/webm" />
             </video>
           </div>
         )}
 
         {/* IMAGE PREVIEW */}
-        {isImage && <img src={value} className={css.preview} />}
+        {isImage && <img src={previewValue} className={css.preview} />}
 
         {/* CONTROL BUTTONS */}
         <MediaInputButtons value={inputAttrs.value} onChange={inputAttrs.onChange} />

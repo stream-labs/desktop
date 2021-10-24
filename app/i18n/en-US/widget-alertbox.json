@@ -132,7 +132,6 @@
   "Customize your tip page where viewers can send you donations": "Customize your tip page where viewers can send you donations",
   "Super Chat is a way to monetize your channel through the YouTube Partner Program": "Super Chat is a way to monetize your channel through the YouTube Partner Program",
   "How many seconds after your image/video/audios to show the alert text. This is useful if you want to wait a few seconds for an animation to finish before your alert text appears.": "How many seconds after your image/video/audios to show the alert text. This is useful if you want to wait a few seconds for an animation to finish before your alert text appears.",
-  "Subs / Members": "Subs / Members",
   "Facebook Gifted Support": "Facebook Gifted Support",
   "Facebook Share": "Facebook Share",
   "Triggers when somebody share your stream": "Triggers when somebody share your stream",
@@ -144,5 +143,9 @@
   "The name of the streamer raiding you": "The name of the streamer raiding you",
   "The number of viewers who joined the raid": "The number of viewers who joined the raid",
   "Need to test your alerts with different scenarios?": "Need to test your alerts with different scenarios?",
-  "Try the new simplified AlertBox settings": "Try the new simplified AlertBox settings"
+  "Try the new simplified AlertBox settings": "Try the new simplified AlertBox settings",
+  "Triggers for new Twitch followers": "Triggers for new Twitch followers",
+  "Facebook Follow": "Facebook Follow",
+  "Triggers for new Facebook followers": "Triggers for new Facebook followers",
+  "Triggers for new Twitch subscriptions": "Triggers for new Twitch subscriptions"
 }
