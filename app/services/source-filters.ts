@@ -257,7 +257,13 @@ export class SourceFiltersService extends Service {
     const preset = this.presetFilter(sourceId);
     if (preset) {
       this.setPropertiesFormData(sourceId, '__PRESET', [
-        { name: 'image_path', value: getSharedResource(path), options: null, description: null },
+        {
+          name: 'image_path',
+          value: getSharedResource(path),
+          options: null,
+          description: null,
+          type: 'OBS_PROPERTY_PATH',
+        },
       ]);
     } else {
       // Funky name to attempt avoiding namespace collisions with user-set filters
