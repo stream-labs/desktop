@@ -5,7 +5,7 @@ import InputWrapper from './InputWrapper';
 import { InputProps } from 'antd/lib/input';
 
 // select which features from the antd lib we are going to use
-const ANT_INPUT_FEATURES = ['addonBefore', 'addonAfter'] as const;
+const ANT_INPUT_FEATURES = ['addonBefore', 'addonAfter', 'autoFocus'] as const;
 
 export type TTextInputProps = TSlobsInputProps<
   {

@@ -3,15 +3,15 @@ import Vue from 'vue';
 import { Subject } from 'rxjs';
 import cloneDeep from 'lodash/cloneDeep';
 import { IObsListOption, TObsValue } from 'components/obs/inputs/ObsInput';
-import { StatefulService, mutation, ViewHandler } from 'services/core/stateful-service';
+import { mutation, StatefulService, ViewHandler } from 'services/core/stateful-service';
 import * as obs from '../../../obs-api';
 import { Inject } from 'services/core/injector';
 import namingHelpers from 'util/NamingHelpers';
 import { WindowsService } from 'services/windows';
-import { WidgetsService, WidgetType, WidgetDisplayData } from 'services/widgets';
+import { WidgetDisplayData, WidgetsService, WidgetType } from 'services/widgets';
 import { DefaultManager } from './properties-managers/default-manager';
 import { WidgetManager } from './properties-managers/widget-manager';
-import { ScenesService, ISceneItem, Scene } from 'services/scenes';
+import { ISceneItem, Scene, ScenesService } from 'services/scenes';
 import { StreamlabelsManager } from './properties-managers/streamlabels-manager';
 import { PlatformAppManager } from './properties-managers/platform-app-manager';
 import { UserService } from 'services/user';
@@ -20,9 +20,9 @@ import {
   ISource,
   ISourceAddOptions,
   ISourcesState,
-  TSourceType,
   Source,
   TPropertiesManager,
+  TSourceType,
 } from './index';
 import uuid from 'uuid/v4';
 import { $t } from 'services/i18n';
@@ -36,8 +36,9 @@ import { IconLibraryManager } from './properties-managers/icon-library-manager';
 import { assertIsDefined } from 'util/properties-type-guards';
 import { UsageStatisticsService } from 'services/usage-statistics';
 import { SourceFiltersService } from 'services/source-filters';
-import { FileReturnWrapper } from 'util/guest-api-handler';
 import { VideoService } from 'services/video';
+import { CustomizationService } from '../customization';
+import { EAvailableFeatures, IncrementalRolloutService } from '../incremental-rollout';
 
 const AudioFlag = obs.ESourceOutputFlags.Audio;
 const VideoFlag = obs.ESourceOutputFlags.Video;
@@ -169,6 +170,8 @@ export class SourcesService extends StatefulService<ISourcesState> {
   @Inject() private usageStatisticsService: UsageStatisticsService;
   @Inject() private sourceFiltersService: SourceFiltersService;
   @Inject() private videoService: VideoService;
+  @Inject() private customizationService: CustomizationService;
+  @Inject() private incrementalRolloutService: IncrementalRolloutService;
 
   get views() {
     return new SourcesViews(this.state);
@@ -604,16 +607,56 @@ export class SourcesService extends StatefulService<ISourcesState> {
     assertIsDefined(platform);
     const widgetType = source.getPropertiesManagerSettings().widgetType;
     const componentName = this.widgetsService.getWidgetComponent(widgetType);
+
+    // React widgets are in the WidgetsWindow component
+    let reactWidgets = [
+      'AlertBox',
+      // TODO:
+      // BitGoal
+      // DonationGoal
+      // CharityGoal
+      // FollowerGoal
+      // StarsGoal
+      // SubGoal
+      // SubscriberGoal
+      // ChatBox
+      // ChatHighlight
+      // Credits
+      // DonationTicker
+      // EmoteWall
+      // EventList
+      // MediaShare
+      // Poll
+      // SpinWheel
+      // SponsorBanner
+      // StreamBoss
+      // TipJar
+      'ViewerCount',
+    ];
+    const isLegacyAlertbox = this.customizationService.state.legacyAlertbox;
+    if (isLegacyAlertbox) reactWidgets = reactWidgets.filter(w => w !== 'AlertBox');
+    const isReactComponent =
+      this.incrementalRolloutService.views.featureIsEnabled(EAvailableFeatures.reactWidgets) &&
+      reactWidgets.includes(componentName);
+    const windowComponentName = isReactComponent ? 'WidgetWindow' : componentName;
+
+    const defaultVueWindowSize = { width: 920, height: 1024 };
+    const defaultReactWindowSize = { width: 600, height: 800 };
+    const widgetInfo = this.widgetsService.widgetsConfig[componentName];
+    const { width, height } = isReactComponent
+      ? widgetInfo.settingsWindowSize || defaultReactWindowSize
+      : defaultVueWindowSize;
+
     if (componentName) {
       this.windowsService.showWindow({
-        componentName,
+        componentName: windowComponentName,
         title: $t('Settings for %{sourceName}', {
           sourceName: WidgetDisplayData(platform.type)[widgetType].name,
         }),
-        queryParams: { sourceId: source.sourceId },
+        queryParams: { sourceId: source.sourceId, widgetType: WidgetType[widgetType] },
         size: {
-          width: 920,
-          height: 1024,
+          width,
+          height,
         },
       });
     }
@@ -685,7 +728,7 @@ export class SourcesService extends StatefulService<ISourcesState> {
       title: $t('Add Source'),
       size: {
         width: 1200,
-        height: 650,
+        height: 665,
       },
     });
   }

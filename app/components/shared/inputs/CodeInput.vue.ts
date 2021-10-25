@@ -1,5 +1,4 @@
 import { Component, Prop } from 'vue-property-decorator';
-import { codemirror } from 'vue-codemirror';
 import { BaseInput } from './BaseInput';
 import 'codemirror/mode/javascript/javascript.js';
 import 'codemirror/mode/css/css.js';
@@ -8,10 +7,9 @@ import 'codemirror/keymap/sublime';
 import { IInputMetadata } from './index';
 import { Inject } from 'services';
 import { CustomizationService } from 'services/customization';
+import CodeMirror from 'codemirror';
 
-@Component({
-  components: { codemirror },
-})
+@Component({})
 export default class CodeInput extends BaseInput<string, IInputMetadata> {
   @Prop({ default: '' })
   readonly value: string;
@@ -20,10 +18,31 @@ export default class CodeInput extends BaseInput<string, IInputMetadata> {
   @Prop({ default: () => ({ type: 'html' }) })
   readonly metadata: IInputMetadata;
 
+  private codemirror: any;
+
   @Inject() customizationService: CustomizationService;
 
   get theme() {
     return this.customizationService.isDarkTheme ? 'material' : 'xq-light';
+  }
+
+  mounted() {
+    const $textarea = this.$el.querySelector('textarea');
+    const options = {
+      ...this.editorOptions[this.metadata.type],
+      theme: this.theme,
+    };
+
+    const codemirror = CodeMirror.fromTextArea($textarea, options);
+    codemirror.setSize('100%', '100%');
+    codemirror.on('changes', (cm, changeObj) => {
+      this.emitInput(cm.getValue());
+    });
+    codemirror.setValue(this.value);
+  }
+
+  unmounted() {
+    this.codemirror.getWrapperElement().remove();
   }
 
   // codemirror options

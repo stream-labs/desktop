@@ -6,10 +6,11 @@ import { Tooltip } from 'antd';
 import { TooltipPlacement } from 'antd/lib/tooltip';
 
 interface IBoolButtonInputCustomProps {
-  checkboxStyles: React.CSSProperties;
-  checkboxActiveStyles: React.CSSProperties;
-  tooltip: string;
-  tooltipPlacement: TooltipPlacement;
+  checkboxStyles?: React.CSSProperties;
+  checkboxActiveStyles?: React.CSSProperties;
+  tooltip?: string;
+  tooltipPlacement?: TooltipPlacement;
+  label?: string;
 }
 
 export type TBoolButtonInputProps = TSlobsInputProps<IBoolButtonInputCustomProps, boolean>;
@@ -34,7 +35,7 @@ export const BoolButtonInput = InputComponent((p: TBoolButtonInputProps) => {
       <div
         className={cx('input-wrapper', { disabled: p.disabled })}
         data-role="input"
-        data-type="toggle"
+        data-type="bool-button"
         data-value={!!p.value}
         data-name={p.name}
       >
@@ -43,7 +44,7 @@ export const BoolButtonInput = InputComponent((p: TBoolButtonInputProps) => {
           style={customStyles}
           onClick={handleClick}
         >
-          {p.value && <i className="fa fa-check"></i>}
+          {p.label || (p.value && <i className="fa fa-check" />)}
         </div>
       </div>
     </Tooltip>
