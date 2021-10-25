@@ -185,7 +185,7 @@ export class AlertBoxModule extends WidgetModule<IAlertBoxState> {
           'sponsor_text_delay',
           'text_delay',
           'alert_duration',
-        ].includes(key)
+        ].find(keyToPatch => key.includes(keyToPatch))
       ) {
         newSettings[key] = Math.floor(settings[key] / 1000);
       }
