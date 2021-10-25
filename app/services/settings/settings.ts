@@ -66,6 +66,7 @@ export interface ISettingsValues {
     DelayEnable: boolean;
     DelaySec: number;
     fileCaching: boolean;
+    MonitoringDeviceName: string;
   };
 }
 
@@ -134,6 +135,10 @@ class SettingsViews extends ViewHandler<ISettingsServiceState> {
     if (!this.vodTrackEnabled) return 0;
     if (!this.isAdvancedOutput) return 1;
     return Number(this.values.Output.VodTrackIndex) - 1;
+  }
+
+  get advancedAudioSettings() {
+    return this.state.Advanced.formData.find(data => data.nameSubCategory === 'Audio');
   }
 }
 

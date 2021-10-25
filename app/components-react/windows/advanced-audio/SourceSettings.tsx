@@ -17,7 +17,6 @@ import { Source } from 'services/sources';
 import { $t } from 'services/i18n';
 import Utils from 'services/utils';
 import styles from './AdvancedAudio.m.less';
-import Scrollable from 'components-react/shared/Scrollable';
 
 const { Panel } = Collapse;
 
