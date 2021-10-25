@@ -416,6 +416,7 @@ function getVariationsMetadata() {
       }),
     },
     ytSubscriber: {},
+    ytMembership: {},
   });
 
   // mix common and specific metadata and return it

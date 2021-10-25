@@ -14,6 +14,7 @@ export type TAlertType =
   | 'twHost'
   | 'merch'
   | 'twRaid'
+  | 'ytMembership'
   | 'ytSubscriber'
   | 'ytSuperchat';
 
@@ -59,7 +60,7 @@ export function getAlertsConfig(
       url(platform: TPlatform = 'twitch') {
         return `https://${host}/api/v5/slobs/test/facebook_account/follow`;
       },
-      platforms: ['twitch'],
+      platforms: ['facebook'],
       tooltip: $t('Triggers for new Facebook followers'),
     },
 
@@ -106,6 +107,16 @@ export function getAlertsConfig(
       platforms: ['twitch'],
       tooltip: $t('Using Raids, you can send viewers over to another channel after a stream'),
       tooltipLink: 'https://help.twitch.tv/s/article/how-to-use-raids',
+    },
+
+    ytMembership: {
+      name: $t('YouTube Membership'),
+      type: 'ytMembership',
+      apiKey: 'sponsor',
+      url() {
+        return `https://${host}/api/v5/slobs/test/youtube_account/subscription`;
+      },
+      platforms: ['youtube'],
     },
 
     ytSuperchat: {
@@ -191,7 +202,7 @@ export function getAlertsConfig(
       type: 'ytSubscriber',
       apiKey: 'subscriber',
       url() {
-        return `https://${host}/api/v5/slobs/test/youtube_account/subscriber`;
+        return `https://${host}/api/v5/slobs/test/youtube_account/follow`;
       },
       platforms: ['youtube'],
     },

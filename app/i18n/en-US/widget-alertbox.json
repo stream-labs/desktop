@@ -116,7 +116,6 @@
   "Triggers for new Twitch and Facebook followers": "Triggers for new Twitch and Facebook followers",
   "Cheer (Bits)": "Cheer (Bits)",
   "Bits are used to Cheer, which is a way viewers can show you support.": "Bits are used to Cheer, which is a way viewers can show you support.",
-  "Triggers for new Twitch subscriptions and Youtube memberships": "Triggers for new Twitch subscriptions and Youtube memberships",
   "Using Raids, you can send viewers over to another channel after a stream": "Using Raids, you can send viewers over to another channel after a stream",
   "YouTube Super Chat": "YouTube Super Chat",
   "Facebook Support": "Facebook Support",
@@ -147,5 +146,6 @@
   "Triggers for new Twitch followers": "Triggers for new Twitch followers",
   "Facebook Follow": "Facebook Follow",
   "Triggers for new Facebook followers": "Triggers for new Facebook followers",
-  "Triggers for new Twitch subscriptions": "Triggers for new Twitch subscriptions"
+  "Triggers for new Twitch subscriptions": "Triggers for new Twitch subscriptions",
+  "YouTube Membership": "YouTube Membership"
 }
