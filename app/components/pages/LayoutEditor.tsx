@@ -19,7 +19,7 @@ export default class LayoutEditor extends TsxComponent {
   @Inject() private navigationService: NavigationService;
   @Inject() private customizationService: CustomizationService;
 
-  currentLayout = this.layoutService.views.currentTab.currentLayout || ELayout.Default;
+  currentLayout = this.layoutService.views.currentTab.currentLayout || ELayout.OnePaneR;
   slottedElements = cloneDeep(this.layoutService.views.currentTab.slottedElements) || {};
   browserUrl: string = '';
 
@@ -28,9 +28,6 @@ export default class LayoutEditor extends TsxComponent {
   canDragSlot = true;
 
   mounted() {
-    if (this.slottedElements[ELayoutElement.Browser]) {
-      this.browserUrl = this.slottedElements[ELayoutElement.Browser].src || '';
-    }
   }
 
   elementInSlot(slot: LayoutSlot) {
@@ -88,9 +85,9 @@ export default class LayoutEditor extends TsxComponent {
       await this.layoutService.actions.return.changeLayout(this.currentLayout);
     }
     await this.layoutService.actions.return.setSlots(this.slottedElements);
-    if (this.browserUrl && this.slottedElements[ELayoutElement.Browser]) {
-      await this.layoutService.actions.return.setUrl(this.browserUrl);
-    }
+    // if (this.browserUrl && this.slottedElements[ELayoutElement.Browser]) {
+    //   await this.layoutService.actions.return.setUrl(this.browserUrl);
+    // }
     this.navigationService.actions.navigate('Studio');
   }
 
@@ -217,15 +214,6 @@ export default class LayoutEditor extends TsxComponent {
         }
       >
         <span>{this.layoutService.views.elementTitle(this.elementInSlot(slot))}</span>
-        {this.elementInSlot(slot) === ELayoutElement.Browser && (
-          <TextInput
-            class={styles.urlTextBox}
-            vModel={this.browserUrl}
-            onFocus={() => (this.canDragSlot = false)}
-            onBlur={() => (this.canDragSlot = true)}
-            metadata={{ placeholder: $t('Enter Target URL') }}
-          />
-        )}
       </div>
     ));
   }

@@ -7,3 +7,4 @@ export { default as StreamPreview } from './StreamPreview';
 export { default as RecordingPreview } from './RecordingPreview';
 export { default as MiniFeed } from './MiniFeed';
 export { default as Browser } from './Browser';
+export { default as FlexTvChat } from './FlexTvChat';

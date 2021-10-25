@@ -19,8 +19,9 @@ export class ConnectProps {
 }
 
 interface FlexAuthResult {
-  id: number;
+  id: string;
   nickname: string;
+  channelId: string;
   token: string;
 }
 
@@ -46,7 +47,12 @@ export default class FlexLoginForm extends TsxComponent<ConnectProps> {
     });
     try {
       const data: FlexAuthResult = await jfetch(request);
-      const auth = this.parseAuthFromToken(String(data.id), data.nickname, data.token);
+      const auth = this.parseAuthFromToken(
+        String(data.id),
+        data.nickname,
+        String(data.channelId),
+        data.token,
+      );
 
       this.props.continue();
 
@@ -60,7 +66,12 @@ export default class FlexLoginForm extends TsxComponent<ConnectProps> {
     }
   }
 
-  private parseAuthFromToken(id: string, nickname: string, token: string): IUserAuth {
+  private parseAuthFromToken(
+    id: string,
+    nickname: string,
+    channelId: string,
+    token: string,
+  ): IUserAuth {
     return {
       widgetToken: token,
       apiToken: token,
@@ -69,7 +80,8 @@ export default class FlexLoginForm extends TsxComponent<ConnectProps> {
         flextv: {
           type: 'flextv',
           username: nickname,
-          token: token,
+          token,
+          channelId,
           id,
         },
       },

@@ -3,7 +3,6 @@ import { IYoutubeStartStreamOptions, YoutubeService } from './youtube';
 import { FacebookService, IFacebookStartStreamOptions } from './facebook';
 import { ITiktokStartStreamOptions, TiktokService } from './tiktok';
 import { IFlextvStartStreamOptions, FlextvService } from './flextv';
-import {} from './flextv'
 import { TTwitchTag } from './twitch/tags';
 import { TTwitchOAuthScope } from './twitch/scopes';
 import { IGoLiveSettings } from 'services/streaming';
@@ -136,7 +135,8 @@ export type TStartStreamOptions =
   | ITwitchStartStreamOptions
   | IYoutubeStartStreamOptions
   | Partial<IFacebookStartStreamOptions>
-  | Partial<ITiktokStartStreamOptions>;
+  | Partial<ITiktokStartStreamOptions>
+  | Partial<IFlextvStartStreamOptions>;
 
 // state applicable for all platforms
 export interface IPlatformState {
