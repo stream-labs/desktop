@@ -1,0 +1,77 @@
+@import "../../../styles/index.less";
+
+.widget-layout {
+
+  // collapse
+
+  // add space between collapsed items
+  :global(.ant-collapse:not(:last-child)) {
+    .margin-bottom(1);
+  }
+
+  :global(.ant-collapse-header) {
+    background-color: var(--section-alt);
+  }
+
+  :global(.ant-collapse-content),
+  :global(.ant-collapse-item){
+    background-color: var(--section-alt);
+  }
+
+  :global(.ant-collapse-borderless > .ant-collapse-item:last-child) {
+    border: none;
+  }
+
+  // menu
+  :global(.ant-collapse-content-box .ant-menu-root) {
+    margin-left: -16px;
+    margin-right: -16px;
+  }
+  :global(.ant-menu-vertical) {
+    border: none !important;
+  }
+
+  :global(.ant-menu-item-selected) {
+    border-right: 2px solid var(--primary) !important;
+  }
+
+  :global(.ant-menu-item:hover) {
+    background-color: var(--dropdown-alt-bg);
+  }
+
+  // show and hide alert tooltip
+  :global(.ant-menu-item .anticon-question-circle) {
+    visibility: hidden;
+  }
+  :global(.ant-menu-item-selected .anticon-question-circle){
+    visibility: visible;
+  }
+
+  :global(.ant-menu-item) {
+    transition: none;
+    button {
+      transition: none;
+      opacity: 0;
+    }
+    &:hover button {
+      opacity: 0.5;
+    }
+
+    button:hover {
+      opacity: 1;
+      &:active {
+        color: var(--primary);
+      }
+    }
+
+    &:global(.ant-menu-item-selected) {
+      button {
+        opacity: 0.5;
+      }
+      button:hover {
+        opacity: 1;
+      }
+    }
+  }
+}
+

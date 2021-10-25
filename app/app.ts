@@ -231,6 +231,15 @@ document.addEventListener('dragover', event => event.preventDefault());
 document.addEventListener('dragenter', event => event.preventDefault());
 document.addEventListener('drop', event => event.preventDefault());
 
+const ctxMenu = electron.remote.Menu.buildFromTemplate([
+  { role: 'copy', accelerator: 'CommandOrControl+C' },
+  { role: 'paste', accelerator: 'CommandOrControl+V' },
+]);
+
+document.addEventListener('contextmenu', () => {
+  ctxMenu.popup();
+});
+
 export const apiInitErrorResultToMessage = (resultCode: obs.EVideoCodes) => {
   switch (resultCode) {
     case obs.EVideoCodes.NotSupported: {

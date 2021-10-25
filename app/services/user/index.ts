@@ -52,6 +52,7 @@ interface IUserServiceState {
   isPrime: boolean;
   expires?: string;
   userId?: number;
+  createdAt?: number;
   isRelog?: boolean;
 }
 
@@ -67,6 +68,7 @@ interface ILinkedPlatformsResponse {
   youtube_account?: ILinkedPlatform;
   tiktok_account?: ILinkedPlatform;
   user_id: number;
+  created_at: string;
 }
 
 export type LoginLifecycleOptions = {
@@ -188,8 +190,9 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   }
 
   @mutation()
-  SET_USER_ID(userId: number) {
+  SET_USER(userId: number, createdAt: string) {
     this.state.userId = userId;
+    this.state.createdAt = new Date(createdAt).valueOf();
   }
 
   @mutation()
@@ -242,6 +245,14 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
 
   userLogin = new Subject<IUserAuth>();
   userLogout = new Subject();
+
+  /**
+   * Will fire on every login, similar to userLogin, but will
+   * fire after all normal on-login operations have finished.
+   * Useful when you need to check the state of a user after
+   * everything has finished updating.
+   */
+  userLoginFinished = new Subject();
   private socketConnection: Subscription = null;
 
   /**
@@ -373,7 +384,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
 
     if (linkedPlatforms.user_id) {
       this.writeUserIdFile(linkedPlatforms.user_id);
-      this.SET_USER_ID(linkedPlatforms.user_id);
+      this.SET_USER(linkedPlatforms.user_id, linkedPlatforms.created_at);
     }
 
     // TODO: Could metaprogram this a bit more
@@ -712,6 +723,8 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
 
       return validatePlatformResult;
     }
+
+    this.userLoginFinished.next();
   }
 
   @RunInLoadingMode()

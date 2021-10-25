@@ -136,6 +136,10 @@ export default function StudioEditor() {
       enablePreview() {
         CustomizationService.actions.setSettings({ performanceMode: false });
       },
+
+      onContextMenu(event: React.MouseEvent) {
+        event.stopPropagation();
+      },
     };
   }, []);
 
@@ -155,6 +159,7 @@ export default function StudioEditor() {
               onMouseEnter={eventHandlers.onMouseEnter}
               onMouseMove={eventHandlers.onMouseMove}
               onDoubleClick={eventHandlers.onMouseDblClick}
+              onContextMenu={eventHandlers.onContextMenu}
             >
               <Display
                 drawUI={true}

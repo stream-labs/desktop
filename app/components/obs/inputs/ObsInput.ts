@@ -49,7 +49,10 @@ export interface IObsInput<TValueType> {
   enabled?: boolean;
   visible?: boolean;
   masked?: boolean;
-  type?: TObsType;
+  type: TObsType;
+  maxVal?: number;
+  minVal?: number;
+  multiline?: boolean;
 }
 
 export declare type TObsFormData = (IObsInput<TObsValue> | IObsListInput<TObsValue>)[];
