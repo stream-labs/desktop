@@ -8,6 +8,7 @@ import {
   PatchNotes,
   Loader,
   StreamScheduler,
+  StudioFooter,
   Highlighter,
   ThemeAudit,
 } from 'components/shared/ReactComponentList';
@@ -33,7 +34,6 @@ import { AppService } from 'services/app';
 import { UserService } from 'services/user';
 import { IModalOptions, WindowsService } from 'services/windows';
 import LiveDock from '../LiveDock.vue';
-import StudioFooter from '../StudioFooter.vue';
 import PlatformAppMainPage from '../pages/PlatformAppMainPage.vue';
 import electron from 'electron';
 import ResizeBar from 'components/shared/ResizeBar.vue';
