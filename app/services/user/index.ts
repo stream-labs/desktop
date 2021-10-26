@@ -897,6 +897,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     if (!service) {
       service = getPlatformService(this.platform.type);
     }
+    await this.sceneCollectionsService.setupNewUser();
     const userInfo = await service.fetchUserInfo();
     if (!userInfo) {
       this.logOut();
@@ -906,7 +907,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
       });
       return;
     }
-    await Promise.all([this.refreshUserInfo(), this.sceneCollectionsService.setupNewUser()]);
+    await this.refreshUserInfo();
 
     return EPlatformCallResult.Success;
   }
@@ -916,8 +917,6 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
    */
   async startFlexAuth(auth: IUserAuth): Promise<EPlatformCallResult> {
     const service = getPlatformService('flextv');
-    this.streamSettingsService.resetStreamSettings();
-
     return this.loginFlexTV(service, auth);
   }
 }

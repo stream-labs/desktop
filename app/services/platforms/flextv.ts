@@ -6,6 +6,7 @@ import { IGoLiveSettings } from '../streaming';
 import { platformAuthorizedRequest } from './utils';
 import { WidgetType } from '../widgets';
 import electron from 'electron';
+import { authorizedHeaders, jfetch } from '../../util/requests';
 
 export interface IFlextvStartStreamOptions {
   title: string;
@@ -168,6 +169,14 @@ export class FlextvService
     return {
       username: userInfo.profile.nickname,
     };
+  }
+
+  fetchNewToken(): Promise<void> {
+    return platformAuthorizedRequest<{
+      token: string;
+    }>('flextv', `${this.apiBase}/api/auth/refresh`)
+      .then(response => this.userService.updatePlatformToken('flextv', response.token))
+      .catch(() => null);
   }
 
   async putChannelInfo(): Promise<void> {
