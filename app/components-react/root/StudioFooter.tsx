@@ -44,7 +44,10 @@ export default function StudioFooterComponent(p: { locked?: boolean }) {
     streamQuality: PerformanceService.views.streamQuality,
     isRecording: StreamingService.views.isRecording,
     isLoggedIn: UserService.views.isLoggedIn,
-    canSchedule: StreamingService.views.supports('stream-schedule'),
+    canSchedule: StreamingService.views.supports(
+      'stream-schedule',
+      StreamingService.views.linkedPlatforms,
+    ),
     replayBufferEnabled: SettingsService.views.values.Output.RecRB,
     replayBufferOffline: StreamingService.state.replayBufferStatus === EReplayBufferState.Offline,
     replayBufferStopping: StreamingService.state.replayBufferStatus === EReplayBufferState.Stopping,
