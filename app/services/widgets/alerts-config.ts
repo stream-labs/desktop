@@ -40,6 +40,7 @@ export function getAlertsConfig(
       url() {
         return `https://${host}/api/v5/slobs/test/streamlabs/donation`;
       },
+      tooltip: $t('Plays an alert when a viewer sends a tip/donation')
     },
 
     twFollow: {
@@ -50,7 +51,7 @@ export function getAlertsConfig(
         return `https://${host}/api/v5/slobs/test/twitch_account/follow`;
       },
       platforms: ['twitch'],
-      tooltip: $t('Triggers for new Twitch followers'),
+      tooltip: $t('Plays an alert for new Twitch followers'),
     },
 
     fbFollow: {
@@ -61,7 +62,7 @@ export function getAlertsConfig(
         return `https://${host}/api/v5/slobs/test/facebook_account/follow`;
       },
       platforms: ['facebook'],
-      tooltip: $t('Triggers for new Facebook followers'),
+      tooltip: $t('Plays an alert for new Facebook followers'),
     },
 
     twSubscription: {
@@ -72,7 +73,8 @@ export function getAlertsConfig(
         return `https://${host}/api/v5/slobs/test/twitch_account/subscription`;
       },
       platforms: ['twitch'],
-      tooltip: $t('Triggers for new Twitch subscriptions'),
+      tooltip: $t('Plays an alert for new Twitch subscriptions'),
+      tooltipLink: 'https://help.twitch.tv/s/article/how-to-subscribe',
     },
 
     twCheer: {
@@ -83,7 +85,7 @@ export function getAlertsConfig(
         return `https://${host}/api/v5/slobs/test/twitch_account/bits`;
       },
       platforms: ['twitch'],
-      tooltip: $t('Bits are used to Cheer, which is a way viewers can show you support.'),
+      tooltip: $t('Plays an alert when a viewer sends a Cheer'),
       tooltipLink: 'https://help.twitch.tv/s/article/guide-to-cheering-with-bits',
     },
 
@@ -95,6 +97,8 @@ export function getAlertsConfig(
         return `https://${host}/api/v5/slobs/test/twitch_account/host`;
       },
       platforms: ['twitch'],
+      tooltip: $t('Plays an alert when another streamer hosts your channel'),
+      tooltipLink: 'https://help.twitch.tv/s/article/how-to-use-host-mode',
     },
 
     twRaid: {
@@ -105,7 +109,7 @@ export function getAlertsConfig(
         return `https://${host}/api/v5/slobs/test/twitch_account/raid`;
       },
       platforms: ['twitch'],
-      tooltip: $t('Using Raids, you can send viewers over to another channel after a stream'),
+      tooltip: $t('Plays an alert when another streamer raids your channel'),
       tooltipLink: 'https://help.twitch.tv/s/article/how-to-use-raids',
     },
 
@@ -117,6 +121,8 @@ export function getAlertsConfig(
         return `https://${host}/api/v5/slobs/test/youtube_account/subscription`;
       },
       platforms: ['youtube'],
+      tooltip: $t('Plays an alert for new YouTube Memberships'),
+      tooltipLink: 'https://creatoracademy.youtube.com/page/course/channel-memberships',
     },
 
     ytSuperchat: {
@@ -128,7 +134,7 @@ export function getAlertsConfig(
       },
       platforms: ['youtube'],
       tooltip: $t(
-        'Super Chat is a way to monetize your channel through the YouTube Partner Program',
+        'Plays an alert when a viewer sends a Super Chat',
       ),
       tooltipLink:
         'https://creatoracademy.youtube.com/page/lesson/superchat-and-superstickers_what-is-superchat_video',
@@ -142,6 +148,8 @@ export function getAlertsConfig(
         return `https://${host}/api/v5/slobs/test/facebook_account/support`;
       },
       platforms: ['facebook'],
+      tooltip: $t('Plays an alert for new Facebook Supporters'),
+      tooltipLink: 'https://www.facebook.com/business/help/316098022481499',
     },
 
     fbSupportGift: {
@@ -161,8 +169,8 @@ export function getAlertsConfig(
         return `https://${host}/api/v5/slobs/test/facebook_account/stars`;
       },
       platforms: ['facebook'],
-      tooltip: $t('Facebook Stars is a feature that allows you to monetize your stream'),
-      tooltipLink: 'https://www.facebook.com/business/help/903272529876480?id=648321075955172',
+      tooltip: $t('Plays an alert when a viewer sends Stars'),
+      tooltipLink: 'https://www.facebook.com/business/help/903272529876480',
     },
 
     fbLike: {
@@ -173,7 +181,7 @@ export function getAlertsConfig(
         return `https://${host}/api/v5/slobs/test/facebook_account/like`;
       },
       platforms: ['facebook'],
-      tooltip: $t('Triggers when somebody liked your stream'),
+      tooltip: $t('Plays an alert when a viewer likes your stream'),
     },
 
     fbShare: {
@@ -184,7 +192,7 @@ export function getAlertsConfig(
         return `https://${host}/api/v5/slobs/test/facebook_account/share`;
       },
       platforms: ['facebook'],
-      tooltip: $t('Triggers when somebody share your stream'),
+      tooltip: $t('Plays an alert when a viewer shares your stream'),
     },
 
     merch: {
@@ -193,7 +201,7 @@ export function getAlertsConfig(
       url() {
         return `https://${host}/api/v5/slobs/test/streamlabs/merch`;
       },
-      tooltip: $t('Triggers when somebody bought your merch'),
+      tooltip: $t('Plays an alert when a viewer buys your merch'),
       tooltipLink: 'https://streamlabs.com/dashboard#/merchadmin',
     },
 
@@ -205,6 +213,7 @@ export function getAlertsConfig(
         return `https://${host}/api/v5/slobs/test/youtube_account/follow`;
       },
       platforms: ['youtube'],
+      tooltip: $t('Plays an alert when a viewer subscribes to your YouTube channel')
     },
   };
 }
