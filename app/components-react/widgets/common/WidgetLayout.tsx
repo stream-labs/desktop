@@ -49,7 +49,7 @@ export function WidgetLayout(p: { children: ReactNode | [ReactNode, ReactNode] }
           {/* MENU  */}
           {MenuPanel && (
             <Col
-              flex="250px"
+              flex="270px"
               style={{
                 borderRight: '1px solid var(--border)',
                 backgroundColor: 'var(--section)',
@@ -111,14 +111,16 @@ export function WidgetLayout(p: { children: ReactNode | [ReactNode, ReactNode] }
 function BrowserSourceSettings() {
   const { browserSourceProps, updateBrowserSourceProps } = useWidget();
   return (
-    <Collapse bordered={false}>
-      <Collapse.Panel header={$t('Browser Settings')} key={1}>
-        <ObsForm
-          value={browserSourceProps}
-          onChange={updateBrowserSourceProps}
-          layout="horizontal"
-        />
-      </Collapse.Panel>
-    </Collapse>
+    <>
+      <Collapse bordered={false}>
+        <Collapse.Panel header={$t('Browser Settings')} key={1}>
+          <ObsForm
+            value={browserSourceProps}
+            onChange={updateBrowserSourceProps}
+            layout="horizontal"
+          />
+        </Collapse.Panel>
+      </Collapse>
+    </>
   );
 }
