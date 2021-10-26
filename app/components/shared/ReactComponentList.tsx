@@ -201,9 +201,6 @@ export class StreamScheduler extends ReactComponent {}
 @Component({ props: { name: { default: 'StudioEditor' } } })
 export class StudioEditor extends ReactComponent {}
 
-@Component({ props: { name: { default: 'StudioFooter' } } })
-export class StudioFooter extends ReactComponent {}
-
 @Component({
   props: {
     name: { default: 'TestWidgets' },

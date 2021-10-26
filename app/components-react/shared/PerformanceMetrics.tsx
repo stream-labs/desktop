@@ -9,10 +9,7 @@ import { $t } from '../../services/i18n';
 
 type TPerformanceMetricsMode = 'full' | 'limited';
 
-export default function PerformanceMetrics(props: {
-  mode: TPerformanceMetricsMode;
-  className?: string;
-}) {
+export default function PerformanceMetrics(props: { mode: TPerformanceMetricsMode }) {
   const { CustomizationService, PerformanceService } = Services;
 
   const v = useVuex(
@@ -68,14 +65,7 @@ export default function PerformanceMetrics(props: {
   }
 
   return (
-    <div
-      className={cx(
-        styles.performanceMetrics,
-        'performance-metrics',
-        'flex flex--center',
-        props.className,
-      )}
-    >
+    <div className={cx(styles.performanceMetrics, 'performance-metrics', 'flex flex--center')}>
       {shownCells.map(attribute => {
         const data = metadata[attribute];
         return (

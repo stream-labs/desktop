@@ -151,10 +151,10 @@ export default function NotificationsArea() {
     });
   }
 
-  if (!settings.enabled) return <></>;
+  if (!settings.enabled) return;
 
   return (
-    <div className={cx(styles.notificationsArea, 'flex--grow')}>
+    <div className={styles.notificationsArea}>
       {unreadCount > 0 && (
         <Tooltip placement="right" title={showUnreadNotificationsTooltip}>
           <div
