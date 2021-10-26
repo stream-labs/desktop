@@ -4,7 +4,6 @@ import EditStreamWindow from './windows/go-live/EditStreamWindow';
 import IconLibraryProperties from './windows/IconLibraryProperties';
 import ScreenCaptureProperties from './windows/ScreenCaptureProperties';
 import NewsBanner from './root/NewsBanner';
-import PerformanceMetrics from './shared/PerformanceMetrics';
 import PatchNotes from './pages/PatchNotes';
 import Display from './shared/Display';
 import TitleBar from './shared/TitleBar';
@@ -15,6 +14,7 @@ import Loader from './pages/Loader';
 import NavTools from './sidebar/NavTools';
 import PlatformLogo from './shared/PlatformLogo';
 import AdvancedStatistics from './windows/AdvancedStatistics';
+import StudioFooter from './root/StudioFooter';
 import StreamScheduler from './pages/stream-scheduler/StreamScheduler';
 import { createRoot } from './root/ReactRoot';
 import StartStreamingButton from './root/StartStreamingButton';
@@ -39,7 +39,6 @@ export const components = {
   IconLibraryProperties,
   ScreenCaptureProperties,
   NewsBanner,
-  PerformanceMetrics,
   PatchNotes,
   Display,
   TitleBar,
@@ -52,9 +51,10 @@ export const components = {
   StreamScheduler: createRoot(StreamScheduler),
   AdvancedStatistics,
   SharedComponentsLibrary: createRoot(SharedComponentsLibrary),
-  StartStreamingButton,
   TestWidgets,
   RenameSource,
+  StudioFooter,
+  StartStreamingButton,
   NotificationsArea,
   ObsSettings: createRoot(ObsSettings),
   ThemeAudit,

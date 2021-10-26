@@ -29,9 +29,7 @@ export const RadioInput = InputComponent((p: TRadioInputProps) => {
                 <Radio key={option.value} value={option.value}>
                   {option.label}
                   {option.description && <br />}
-                  {option.description && (
-                    <span style={{ marginLeft: 24, fontSize: 12 }}>{option.description}</span>
-                  )}
+                  {option.description && <span style={{ fontSize: 12 }}>{option.description}</span>}
                 </Radio>
               );
             })}
