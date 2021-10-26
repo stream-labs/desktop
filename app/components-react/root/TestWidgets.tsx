@@ -1,20 +1,20 @@
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import Animation from 'rc-animate';
 import { Services } from '../service-provider';
 import { $t } from '../../services/i18n';
 
-export default function TestWidgets(p: { testers?: string[] }) {
+export default function TestWidgets(p: { testers: string[] }) {
   const { WidgetsService } = Services;
 
   const [slideOpen, setSlideOpen] = useState(false);
 
-  const allTesters = useRef(WidgetsService.getTesters());
+  const allTesters = WidgetsService.getTesters();
   const widgetTesters = p.testers
-    ? allTesters.current.filter(tester => p.testers?.includes(tester.name))
-    : allTesters.current;
+    ? allTesters.filter(tester => p.testers.includes(tester.name))
+    : allTesters;
 
   function test(testerName: string) {
-    WidgetsService.actions.test(testerName);
+    WidgetsService.test(testerName);
   }
 
   return (
