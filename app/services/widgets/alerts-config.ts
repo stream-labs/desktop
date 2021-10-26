@@ -40,7 +40,7 @@ export function getAlertsConfig(
       url() {
         return `https://${host}/api/v5/slobs/test/streamlabs/donation`;
       },
-      tooltip: $t('Plays an alert when a viewer sends a tip/donation')
+      tooltip: $t('Plays an alert when a viewer sends a tip/donation'),
     },
 
     twFollow: {
@@ -133,7 +133,7 @@ export function getAlertsConfig(
         return `https://${host}/api/v5/slobs/test/youtube_account/superchat`;
       },
       platforms: ['youtube'],
-      tooltip: $t('Plays an alert when a viewer sends a Super Chat',),
+      tooltip: $t('Plays an alert when a viewer sends a Super Chat'),
       tooltipLink:
         'https://creatoracademy.youtube.com/page/lesson/superchat-and-superstickers_what-is-superchat_video',
     },
@@ -211,7 +211,7 @@ export function getAlertsConfig(
         return `https://${host}/api/v5/slobs/test/youtube_account/follow`;
       },
       platforms: ['youtube'],
-      tooltip: $t('Plays an alert when a viewer subscribes to your YouTube channel')
+      tooltip: $t('Plays an alert when a viewer subscribes to your YouTube channel'),
     },
   };
 }
