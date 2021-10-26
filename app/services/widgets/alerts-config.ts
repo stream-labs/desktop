@@ -133,9 +133,7 @@ export function getAlertsConfig(
         return `https://${host}/api/v5/slobs/test/youtube_account/superchat`;
       },
       platforms: ['youtube'],
-      tooltip: $t(
-        'Plays an alert when a viewer sends a Super Chat',
-      ),
+      tooltip: $t('Plays an alert when a viewer sends a Super Chat',),
       tooltipLink:
         'https://creatoracademy.youtube.com/page/lesson/superchat-and-superstickers_what-is-superchat_video',
     },
