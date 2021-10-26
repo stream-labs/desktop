@@ -1,6 +1,6 @@
 <template>
   <div class="section">
-    <table>
+    <table style="width: 100%">
       <thead>
         <tr>
           <th> {{ $t('Icon') }} </th>
