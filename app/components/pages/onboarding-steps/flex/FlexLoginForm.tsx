@@ -30,9 +30,8 @@ export default class FlexLoginForm extends TsxComponent<ConnectProps> {
   @Inject() private onboardingService: OnboardingService;
   @Inject() private userService: UserService;
   @Inject() private streamSettingsService: StreamSettingsService;
-  keyMetadata = metadata.text({ title: $t('Stream Key'), name: 'key', masked: true });
-  idMetadata = metadata.text({ title: '아이디', name: 'id' });
-  pwdMetadata = metadata.text({ title: '비밀번호', name: 'password', masked: true });
+  idMetadata = metadata.text({ title: '아이디', name: 'id', fullWidth: true });
+  pwdMetadata = metadata.text({ title: '비밀번호', name: 'password', masked: true, fullWidth: true });
   key = '';
   id = '';
   password = '';
