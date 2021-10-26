@@ -142,8 +142,10 @@
   white-space: nowrap;
   display: flex;
 
-  > button {
+  button {
     font-size: 12px;
+    background-color: transparent;
+    border: none;
   }
 
   > .left-replay {
@@ -152,12 +154,13 @@
 
   > .right-replay {
     border-radius: 0 100% 100% 0;
+    display: flex !important;
   }
 }
 
 .performance-metrics {
   position: relative;
-  display: inline-flex;
+  display: inline-flex !important;
   background: var(--section) !important;
   overflow-x: auto;
 }

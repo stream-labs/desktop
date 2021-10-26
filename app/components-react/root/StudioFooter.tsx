@@ -150,7 +150,7 @@ export default function StudioFooterComponent(p: { locked?: boolean }) {
             onClick={openMetricsWindow}
           />
         </Tooltip>
-        <PerformanceMetrics mode="limited" className="performance-metrics" />
+        <PerformanceMetrics mode="limited" className={styles.performanceMetrics} />
         <NotificationsArea />
       </div>
 
