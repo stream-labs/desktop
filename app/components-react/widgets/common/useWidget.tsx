@@ -4,11 +4,12 @@ import { Services } from '../../service-provider';
 import { mutation } from '../../store';
 import { throttle } from 'lodash-decorators';
 import { assertIsDefined, getDefined } from '../../../util/properties-type-guards';
-import { TAlertType, TWidgetType } from '../../../services/widgets/widget-config';
+import { TWidgetType } from '../../../services/widgets/widgets-config';
 import { TObsFormData } from '../../../components/obs/inputs/ObsInput';
 import { pick, cloneDeep } from 'lodash';
 import { $t } from '../../../services/i18n';
 import Utils from '../../../services/utils';
+import { TAlertType } from '../../../services/widgets/alerts-config';
 
 /**
  * Common state for all widgets
@@ -56,7 +57,7 @@ export class WidgetModule<TWidgetState extends IWidgetState = IWidgetState> {
 
   // create shortcuts for widgetsConfig and eventsInfo
   public widgetsConfig = this.widgetsService.widgetsConfig;
-  public eventsConfig = this.widgetsService.eventsConfig;
+  public eventsConfig = this.widgetsService.alertsConfig;
 
   // init module
   async init(params: {

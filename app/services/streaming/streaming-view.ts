@@ -1,5 +1,11 @@
 import { ViewHandler } from '../core';
-import { IGoLiveSettings, IStreamSettings } from './streaming-api';
+import {
+  IGoLiveSettings,
+  IStreamSettings,
+  EStreamingState,
+  ERecordingState,
+  EReplayBufferState,
+} from './streaming-api';
 import { StreamSettingsService } from '../settings/streaming';
 import { UserService } from '../user';
 import { RestreamService } from '../restream';
@@ -364,5 +370,21 @@ export class StreamInfoView<T extends Object> extends ViewHandler<T> {
 
   get delaySeconds() {
     return this.streamSettingsView.settings.delaySec;
+  }
+
+  get isStreaming() {
+    return this.streamingState.streamingStatus !== EStreamingState.Offline;
+  }
+
+  get isRecording() {
+    return this.streamingState.recordingStatus !== ERecordingState.Offline;
+  }
+
+  get isReplayBufferActive() {
+    return this.streamingState.replayBufferStatus !== EReplayBufferState.Offline;
+  }
+
+  get isIdle(): boolean {
+    return !this.isStreaming && !this.isRecording;
   }
 }
