@@ -14,18 +14,16 @@ useSpectron({
 
 test('AlertBox for Twitch', t => testAlertbox(t, 'twitch'));
 test('AlertBox for YouTube', t => testAlertbox(t, 'youtube'));
-
-// TODO: something is wrong with FB test
-// test('AlertBox for Facebook', t => testAlert(t, 'facebook'));
+test('AlertBox for Facebook', t => testAlertbox(t, 'facebook'));
 
 const commonAlerts = ['Donation', 'Merch'];
 
 const platformAlerts = {
-  twitch: [...commonAlerts, 'Follow', 'Twitch Cheer (Bits)', 'Twitch Host', 'Twitch Raid'],
-  youtube: [...commonAlerts, 'Youtube Subscribers', 'YouTube Super Chat'],
+  twitch: [...commonAlerts, 'Follow', 'Cheer (Bits)', 'Host', 'Raid'],
+  youtube: [...commonAlerts, 'YouTube Subscribers', 'YouTube Membership', 'YouTube Super Chat'],
   facebook: [
     ...commonAlerts,
-    'Follow',
+    'Facebook Follow',
     'Facebook Support',
     'Facebook Like',
     'Facebook Stars',
