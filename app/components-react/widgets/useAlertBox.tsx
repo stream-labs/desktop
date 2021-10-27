@@ -398,10 +398,23 @@ function getVariationsMetadata() {
     twSubscription: {},
     twCheer: {
       message_template: getMessageTemplateMetadata('twCheer'),
+      alert_message_min_amount: metadata.number({
+        label: $t('Min. Amount to Trigger Alert'),
+        min: 0,
+      }),
     },
-    ytSuperchat: {},
+    ytSuperchat: {
+      alert_message_min_amount: metadata.number({
+        label: $t('Min. Amount to Trigger Alert'),
+        min: 0,
+      }),
+    },
     fbStars: {
       message_template: getMessageTemplateMetadata('fbStars'),
+      alert_message_min_amount: metadata.number({
+        label: $t('Min. Amount to Trigger Alert'),
+        min: 0,
+      }),
     },
     fbSupport: {
       message_template: getMessageTemplateMetadata('fbSupport'),
