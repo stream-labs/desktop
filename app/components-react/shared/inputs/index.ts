@@ -17,5 +17,6 @@ export { TimeInput } from './TimeInput';
 export { BoolButtonInput } from './BoolButtonInput';
 export { FontFamilyInput } from './FontFamilyInput';
 export { FontSizeInput } from './FontSizeInput';
+export { FontWeightInput } from './FontWeightInput';
 export { ColorInput } from './ColorInput';
 export { CardInput } from './CardInput';
