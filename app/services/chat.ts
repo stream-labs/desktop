@@ -91,15 +91,7 @@ export class ChatService extends Service {
         source.propertiesManagerSettings?.widgetType === WidgetType.ChatHighlight
       ) {
         this.exposeHighlightApi();
-        await this.refreshChat();
-      }
-    });
-    this.sourcesService.sourceRemoved.subscribe(source => {
-      if (
-        source.propertiesManagerType === 'widget' &&
-        source.propertiesManagerSettings?.widgetType === WidgetType.ChatHighlight
-      ) {
-        this.exposedHighlightApi = false;
+        this.refreshChat();
       }
     });
   }
@@ -270,6 +262,7 @@ export class ChatService extends Service {
 
   private bindDomReadyListener() {
     if (!this.chatView) return; // chat was already deinitialized
+    this.chatView.webContents.openDevTools();
 
     const settings = this.customizationService.state;
     this.exposeHighlightApi();
