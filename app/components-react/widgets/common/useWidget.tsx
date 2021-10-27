@@ -233,7 +233,7 @@ export class WidgetModule<TWidgetState extends IWidgetState = IWidgetState> {
       });
     } catch (e: unknown) {
       await alertAsync({
-        title: $t('Something went wrong with applying new settings'),
+        title: $t('Something went wrong while applying settings'),
         style: { marginTop: '300px' },
         okText: $t('Reload'),
       });
