@@ -231,5 +231,6 @@
   },
   "optionalDependencies": {
     "node-win32-np": "1.0.6"
-  }
+  },
+  "packageManager": "yarn@3.1.0"
 }
