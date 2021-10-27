@@ -85,18 +85,19 @@ export class ChatService extends Service {
       this.deinitChat();
     });
 
-    this.sourcesService.sourceAdded.subscribe(source => {
+    this.sourcesService.sourceAdded.subscribe(async source => {
       if (
         source.propertiesManagerType === 'widget' &&
         source.propertiesManagerSettings?.widgetType === WidgetType.ChatHighlight
       ) {
+        await this.refreshChat();
         this.exposeHighlightApi();
       }
     });
   }
 
-  refreshChat() {
-    this.loadUrl();
+  async refreshChat() {
+    await this.loadUrl();
   }
 
   hasChatHighlightWidget(): boolean {
