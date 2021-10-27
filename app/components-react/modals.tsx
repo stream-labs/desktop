@@ -50,10 +50,10 @@ export function alertAsync(p: Omit<ModalFuncProps, 'afterClose'> | string): Prom
   WindowsService.updateStyleBlockers(Utils.getWindowId(), true);
   return new Promise(resolve => {
     Modal.confirm({
-      ...modalProps,
+      okText: $t('Close'),
       cancelButtonProps: { style: { display: 'none' } },
       okButtonProps: { type: 'default' },
-      okText: $t('Close'),
+      ...modalProps,
       afterClose: () => {
         WindowsService.updateStyleBlockers(Utils.getWindowId(), false);
         resolve();
