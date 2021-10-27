@@ -2,9 +2,10 @@ import { $t } from '../i18n';
 import { TPlatform } from '../platforms';
 export type TAlertType =
   | 'donation'
-  | 'subscription'
-  | 'follow'
+  | 'twSubscription'
+  | 'twFollow'
   | 'twCheer'
+  | 'fbFollow'
   | 'fbSupport'
   | 'fbStars'
   | 'fbLike'
@@ -13,6 +14,7 @@ export type TAlertType =
   | 'twHost'
   | 'merch'
   | 'twRaid'
+  | 'ytMembership'
   | 'ytSubscriber'
   | 'ytSuperchat';
 
@@ -31,14 +33,6 @@ export function getAlertsConfig(
   host: string,
   platforms: TPlatform[] = [],
 ): Record<TAlertType, IAlertConfig> {
-  // define the Subscription alert name based on connected platforms
-  let subscriptionName = $t('Subscription');
-  if (platforms.includes('youtube') && platforms.includes('twitch')) {
-    subscriptionName = $t('Subs / Members');
-  } else if (platforms.includes('youtube')) {
-    subscriptionName = $t('Membership');
-  }
-
   return {
     donation: {
       type: 'donation',
@@ -48,31 +42,43 @@ export function getAlertsConfig(
       },
     },
 
-    follow: {
-      type: 'follow',
+    twFollow: {
+      type: 'twFollow',
       name: $t('Follow'),
-      url(platform: TPlatform = 'twitch') {
-        return `https://${host}/api/v5/slobs/test/${platform}_account/follow`;
+      apiKey: 'follow',
+      url() {
+        return `https://${host}/api/v5/slobs/test/twitch_account/follow`;
       },
-      platforms: ['twitch', 'facebook'],
-      tooltip: $t('Triggers for new Twitch and Facebook followers'),
+      platforms: ['twitch'],
+      tooltip: $t('Triggers for new Twitch followers'),
     },
 
-    subscription: {
-      type: 'subscription',
-      apiKey: 'sub',
-      name: subscriptionName,
+    fbFollow: {
+      type: 'fbFollow',
+      apiKey: 'facebook_follow',
+      name: $t('Facebook Follow'),
       url(platform: TPlatform = 'twitch') {
-        return `https://${host}/api/v5/slobs/test/${platform}_account/subscription`;
+        return `https://${host}/api/v5/slobs/test/facebook_account/follow`;
       },
-      platforms: ['twitch', 'youtube'],
-      tooltip: $t('Triggers for new Twitch subscriptions and Youtube memberships'),
+      platforms: ['facebook'],
+      tooltip: $t('Triggers for new Facebook followers'),
+    },
+
+    twSubscription: {
+      type: 'twSubscription',
+      apiKey: 'sub',
+      name: $t('Subscription'),
+      url() {
+        return `https://${host}/api/v5/slobs/test/twitch_account/subscription`;
+      },
+      platforms: ['twitch'],
+      tooltip: $t('Triggers for new Twitch subscriptions'),
     },
 
     twCheer: {
       type: 'twCheer',
       apiKey: 'bits',
-      name: $t('Twitch Cheer (Bits)'),
+      name: $t('Cheer (Bits)'),
       url() {
         return `https://${host}/api/v5/slobs/test/twitch_account/bits`;
       },
@@ -82,7 +88,7 @@ export function getAlertsConfig(
     },
 
     twHost: {
-      name: $t('Twitch Host'),
+      name: $t('Host'),
       type: 'twHost',
       apiKey: 'host',
       url() {
@@ -92,7 +98,7 @@ export function getAlertsConfig(
     },
 
     twRaid: {
-      name: $t('Twitch Raid'),
+      name: $t('Raid'),
       type: 'twRaid',
       apiKey: 'raid',
       url() {
@@ -101,6 +107,16 @@ export function getAlertsConfig(
       platforms: ['twitch'],
       tooltip: $t('Using Raids, you can send viewers over to another channel after a stream'),
       tooltipLink: 'https://help.twitch.tv/s/article/how-to-use-raids',
+    },
+
+    ytMembership: {
+      name: $t('YouTube Membership'),
+      type: 'ytMembership',
+      apiKey: 'sponsor',
+      url() {
+        return `https://${host}/api/v5/slobs/test/youtube_account/subscription`;
+      },
+      platforms: ['youtube'],
     },
 
     ytSuperchat: {
@@ -182,12 +198,13 @@ export function getAlertsConfig(
     },
 
     ytSubscriber: {
-      name: $t('Youtube Subscribers'),
+      name: $t('YouTube Subscribers'),
       type: 'ytSubscriber',
       apiKey: 'subscriber',
       url() {
-        return `https://${host}/api/v5/slobs/test/youtube_account/subscriber`;
+        return `https://${host}/api/v5/slobs/test/youtube_account/follow`;
       },
+      platforms: ['youtube'],
     },
   };
 }

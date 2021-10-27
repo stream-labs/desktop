@@ -91,10 +91,11 @@ function GeneralSettings() {
         message={$t('Looking for the old AlertBox settings?')}
         onClick={switchToLegacyAlertbox}
       />
-      <Info
-        message={$t('Need to test your alerts with different scenarios?')}
-        onClick={openAdvancedAlertTesting}
-      />
+      {/* TODO: check this feature is working for prime and non-prime users */}
+      {/*<Info*/}
+      {/*  message={$t('Need to test your alerts with different scenarios?')}*/}
+      {/*  onClick={openAdvancedAlertTesting}*/}
+      {/*/>*/}
     </Form>
   );
 }

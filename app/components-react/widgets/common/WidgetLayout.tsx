@@ -111,14 +111,16 @@ export function WidgetLayout(p: { children: ReactNode | [ReactNode, ReactNode] }
 function BrowserSourceSettings() {
   const { browserSourceProps, updateBrowserSourceProps } = useWidget();
   return (
-    <Collapse bordered={false}>
-      <Collapse.Panel header={$t('Browser Settings')} key={1}>
-        <ObsForm
-          value={browserSourceProps}
-          onChange={updateBrowserSourceProps}
-          layout="horizontal"
-        />
-      </Collapse.Panel>
-    </Collapse>
+    <>
+      <Collapse bordered={false}>
+        <Collapse.Panel header={$t('Browser Settings')} key={1}>
+          <ObsForm
+            value={browserSourceProps}
+            onChange={updateBrowserSourceProps}
+            layout="horizontal"
+          />
+        </Collapse.Panel>
+      </Collapse>
+    </>
   );
 }

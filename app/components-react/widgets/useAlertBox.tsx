@@ -185,7 +185,7 @@ export class AlertBoxModule extends WidgetModule<IAlertBoxState> {
           'sponsor_text_delay',
           'text_delay',
           'alert_duration',
-        ].includes(key)
+        ].find(keyToPatch => key.includes(keyToPatch))
       ) {
         newSettings[key] = Math.floor(settings[key] / 1000);
       }
@@ -315,7 +315,7 @@ export class AlertBoxModule extends WidgetModule<IAlertBoxState> {
     // sort alerts
 
     // these alerts always go first
-    const topAlerts: TAlertType[] = ['donation', 'follow', 'subscription'];
+    const topAlerts: TAlertType[] = ['donation'];
 
     // the rest alerts have an alphabetic order
     alerts = topAlerts.concat(alerts.sort().filter(alert => !topAlerts.includes(alert)));
@@ -389,12 +389,13 @@ function getVariationsMetadata() {
         min: 0,
       }),
     },
-    follow: {},
+    twFollow: {},
+    fbFollow: {},
     twRaid: {
       message_template: getMessageTemplateMetadata('twRaid'),
     },
     twHost: {},
-    subscription: {},
+    twSubscription: {},
     twCheer: {
       message_template: getMessageTemplateMetadata('twCheer'),
     },
@@ -415,6 +416,7 @@ function getVariationsMetadata() {
       }),
     },
     ytSubscriber: {},
+    ytMembership: {},
   });
 
   // mix common and specific metadata and return it

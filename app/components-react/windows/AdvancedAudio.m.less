@@ -9,13 +9,23 @@
   top: 8px;
   left: 50px;
 
+  i {
+    margin-left: 8px;
+    margin-right: 8px;
+  }
+
   i:hover {
     color: var(--icon-active);
+  }
+
+  :global(.icon-mute) {
+    color: var(--red);
   }
 }
 
 .audio-source-name {
-  width: 120px;
+  min-width: 0;
+  flex-grow: 1;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
