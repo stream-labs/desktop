@@ -94,6 +94,14 @@ export class ChatService extends Service {
         this.exposeHighlightApi();
       }
     });
+    this.sourcesService.sourceRemoved.subscribe(source => {
+      if (
+        source.propertiesManagerType === 'widget' &&
+        source.propertiesManagerSettings?.widgetType === WidgetType.ChatHighlight
+      ) {
+        this.exposedHighlightApi = false;
+      }
+    });
   }
 
   async refreshChat() {
