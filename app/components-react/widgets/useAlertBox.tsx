@@ -15,6 +15,7 @@ import { $t } from '../../services/i18n';
 import * as electron from 'electron';
 import { getDefined } from '../../util/properties-type-guards';
 import { TPlatform } from '../../services/platforms';
+import { IListOption } from '../shared/inputs/ListInput';
 
 interface IAlertBoxState extends IWidgetState {
   data: {
@@ -23,6 +24,11 @@ interface IAlertBoxState extends IWidgetState {
       bit_variations: any;
     };
     variations: TVariationsState;
+    animationOptions: {
+      show: IListOption<string>[];
+      hide: IListOption<string>[];
+      text: IListOption<string>[];
+    };
   };
   availableAlerts: TAlertType[];
 }
@@ -107,6 +113,13 @@ export class AlertBoxModule extends WidgetModule<IAlertBoxState> {
   }
 
   /**
+   * available animations
+   */
+  get animationOptions() {
+    return this.state.data.animationOptions;
+  }
+
+  /**
    * Switch UI to a legacy alertbox
    */
   public switchToLegacyAlertbox() {
@@ -125,6 +138,31 @@ export class AlertBoxModule extends WidgetModule<IAlertBoxState> {
     // sanitize general settings
     Object.keys(settings).forEach(key => {
       settings[key] = this.sanitizeValue(settings[key], key, this.generalMetadata[key]);
+    });
+
+    // create animations
+    data.animationOptions = {};
+
+    // create show-animation options
+    data.animationOptions.show = [] as IListOption<string>[];
+    Object.keys(data.show_animations).forEach(groupName => {
+      Object.keys(data.show_animations[groupName]).forEach(value => {
+        data.animationOptions.show.push({ value, label: data.show_animations[groupName][value] });
+      });
+    });
+
+    // create hide-animation options
+    data.animationOptions.hide = [] as IListOption<string>[];
+    Object.keys(data.hide_animations).forEach(groupName => {
+      Object.keys(data.hide_animations[groupName]).forEach(value => {
+        data.animationOptions.hide.push({ value, label: data.hide_animations[groupName][value] });
+      });
+    });
+
+    // create text-animation options
+    data.animationOptions.text = [] as IListOption<string>[];
+    Object.keys(data.text_animations).forEach(value => {
+      data.animationOptions.text.push({ value, label: data.text_animations[value] });
     });
 
     return data;
@@ -401,6 +439,9 @@ function getVariationsMetadata() {
     font_weight: metadata.number({ label: $t('Font Weight') }),
     font_color: metadata.text({ label: $t('Text Color') }),
     font_color2: metadata.text({ label: $t('Text Highlight Color') }),
+    show_animation: metadata.text({ label: $t('Show Animation') }),
+    hide_animation: metadata.text({ label: $t('Hide Animation') }),
+    text_animation: metadata.text({ label: $t('Text Animation') }),
     enabled: metadata.bool({}),
     custom_html_enabled: metadata.bool({}),
     custom_html: metadata.text({}),

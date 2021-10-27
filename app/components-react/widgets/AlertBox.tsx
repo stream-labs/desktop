@@ -11,7 +11,10 @@ import {
   TextInput,
   AudioUrlInput,
   FontFamilyInput,
-  ColorInput, FontWeightInput, FontSizeInput,
+  ColorInput,
+  FontWeightInput,
+  FontSizeInput,
+  ListInput,
 } from '../shared/inputs';
 import { $t } from '../../services/i18n';
 import { Alert, Button, Collapse, Menu, Tooltip } from 'antd';
@@ -28,7 +31,7 @@ import { LayoutInput } from './common/LayoutInput';
 import InputWrapper from '../shared/inputs/InputWrapper';
 import { useWidget } from './common/useWidget';
 import { ObsForm } from '../obs/ObsForm';
-import {assertIsDefined} from "../../util/properties-type-guards";
+import { assertIsDefined } from '../../util/properties-type-guards';
 
 /**
  * Root component
@@ -188,7 +191,9 @@ function VariationSettings(p: { type: TAlertType }) {
 
   return (
     <>
-      {SettingsComponent} <FontSettingsPanel />
+      {SettingsComponent}
+      <AnimationSettingsPanel />
+      <FontSettingsPanel />
     </>
   );
 }
@@ -208,7 +213,7 @@ function CommonAlertSettings(p: { type: TAlertType; hiddenFields?: string[] }) {
       <AudioUrlInput {...bind.sound_href} />
       <SliderInput debounce={500} {...bind.sound_volume} />
       <TextInput {...bind.message_template} />
-      <SliderInput {...bind.alert_duration} />
+      {isCustomCodeEnabled && <SliderInput {...bind.alert_duration} />}
     </div>
   );
 }
@@ -233,6 +238,37 @@ function FontSettingsPanel() {
           <FontWeightInput {...bind.font_weight} />
           <ColorInput {...bind.font_color} />
           <ColorInput {...bind.font_color2} />
+        </Collapse.Panel>
+      </Collapse>
+    </>
+  );
+}
+
+/**
+ * Renders AnimationsSetting panel for a selected variation
+ */
+function AnimationSettingsPanel() {
+  const {
+    createVariationBinding,
+    selectedAlert,
+    isCustomCodeEnabled,
+    animationOptions,
+  } = useAlertBox();
+  assertIsDefined(selectedAlert);
+  const bind = createVariationBinding(selectedAlert, 'default', useForceUpdate());
+
+  // do not show animations if CustomCode is enabled
+  if (isCustomCodeEnabled) return <></>;
+
+  return (
+    <>
+      <Collapse bordered={false}>
+        <Collapse.Panel header={$t('Animations')} key={1}>
+          <SliderInput {...bind.alert_duration} />
+          <ListInput {...bind.show_animation} options={animationOptions.show} />
+          <ListInput {...bind.hide_animation} options={animationOptions.hide} />
+          <SliderInput {...bind.text_delay} />
+          <ListInput {...bind.text_animation} options={animationOptions.text} />
         </Collapse.Panel>
       </Collapse>
     </>
