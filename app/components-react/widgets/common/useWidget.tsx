@@ -10,6 +10,7 @@ import { pick, cloneDeep } from 'lodash';
 import { $t } from '../../../services/i18n';
 import Utils from '../../../services/utils';
 import { TAlertType } from '../../../services/widgets/alerts-config';
+import { alertAsync } from '../../modals';
 
 /**
  * Common state for all widgets
@@ -224,11 +225,20 @@ export class WidgetModule<TWidgetState extends IWidgetState = IWidgetState> {
   @throttle(500)
   private async saveSettings(settings: TWidgetState['data']['settings']) {
     const body = this.patchBeforeSend(settings);
-    return await this.actions.return.request({
-      body,
-      url: this.config.settingsSaveUrl,
-      method: 'POST',
-    });
+    try {
+      return await this.actions.return.request({
+        body,
+        url: this.config.settingsSaveUrl,
+        method: 'POST',
+      });
+    } catch (e: unknown) {
+      await alertAsync({
+        title: $t('Something went wrong while applying settings'),
+        style: { marginTop: '300px' },
+        okText: $t('Reload'),
+      });
+      await this.reload();
+    }
   }
 
   /**
