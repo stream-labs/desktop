@@ -90,8 +90,8 @@ export class ChatService extends Service {
         source.propertiesManagerType === 'widget' &&
         source.propertiesManagerSettings?.widgetType === WidgetType.ChatHighlight
       ) {
-        await this.refreshChat();
         this.exposeHighlightApi();
+        await this.refreshChat();
       }
     });
     this.sourcesService.sourceRemoved.subscribe(source => {
