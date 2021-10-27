@@ -262,7 +262,6 @@ export class ChatService extends Service {
 
   private bindDomReadyListener() {
     if (!this.chatView) return; // chat was already deinitialized
-    this.chatView.webContents.openDevTools();
 
     const settings = this.customizationService.state;
     this.exposeHighlightApi();
