@@ -3,7 +3,7 @@ import { Service } from 'services/core/service';
 import { Inject } from 'services/core/injector';
 import { UserService } from 'services/user';
 import { CustomizationService, ICustomizationServiceState } from 'services/customization';
-import electron, { ipcRenderer, TouchBarSlider } from 'electron';
+import electron, { ipcRenderer } from 'electron';
 import url from 'url';
 import { WindowsService } from 'services/windows';
 import { $t } from 'services/i18n';
