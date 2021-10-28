@@ -90,9 +90,6 @@ export class SliderInputController extends BaseInputController<number> {
         },
       ]);
 
-      // // wait for transitions
-      // await sleep(10);
-
       moveOffset = moveOffset / 2;
       if (moveOffset < 0.3) {
         await client.releaseActions();
