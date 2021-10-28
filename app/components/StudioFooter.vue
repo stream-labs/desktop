@@ -34,6 +34,17 @@
         </button>
       </div>
       <div class="nav-item" v-if="loggedIn">
+        <form
+          target="_blank"
+          action="https://api.stage.flexhp.kro.kr/member/exlogin"
+          method="POST"
+        >
+          <input name="branch" type="hidden" value="flex" />
+          <input name="authdata" type="hidden" value="" />
+          <button class="ui button" type="submit">도우미 관리</button>
+        </form>
+      </div>
+      <div class="nav-item" v-if="loggedIn">
         <start-streaming-button :disabled="locked" />
       </div>
       <div class="nav-item" v-if="!loggedIn">
