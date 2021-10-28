@@ -381,6 +381,7 @@ function getVariationsMetadata() {
   const commonMetadata = {
     alert_duration: metadata.seconds({
       label: $t('Alert Duration'),
+      min: 2000,
       max: 30000,
       tooltip: $t('How many seconds to show this alert before hiding it'),
     }),
