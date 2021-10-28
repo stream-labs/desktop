@@ -127,6 +127,11 @@ class SettingsViews extends ViewHandler<ISettingsServiceState> {
     return trackLabels;
   }
 
+  get audioTracks() {
+    if (!this.isAdvancedOutput) return [];
+    return Utils.numberToBinnaryArray(this.values.Output.RecTracks, 6).reverse();
+  }
+
   get vodTrackEnabled() {
     return this.values.Output.VodTrackEnabled;
   }
