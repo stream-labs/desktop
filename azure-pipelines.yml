@@ -23,7 +23,7 @@ jobs:
       - powershell: Set-DisplayResolution -Width 1920 -Height 1080 -Force
         displayName: 'Setup Screen Resolution'
 
-      - script: yarn install --frozen-lockfile --check-files 2>&1
+      - script: yarn install --immutable 2>&1
         displayName: 'Install Dependencies'
 
       - script: node node_modules/electron/install.js
@@ -56,7 +56,7 @@ jobs:
       - powershell: Set-DisplayResolution -Width 1920 -Height 1080 -Force
         displayName: 'Setup Screen Resolution'
 
-      - script: yarn install --frozen-lockfile --check-files 2>&1
+      - script: yarn install --immutable 2>&1
         displayName: 'Install Dependencies'
 
       - script: 'yarn eslint'
@@ -74,7 +74,7 @@ jobs:
       clean: resources
 
     steps:
-      - script: yarn install --frozen-lockfile --network-timeout 1000000 --check-files 2>&1
+      - script: yarn install --immutable --network-timeout 1000000 2>&1
         displayName: 'Install Dependencies'
 
       - script: node node_modules/electron/install.js
