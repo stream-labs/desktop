@@ -735,7 +735,6 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   async logOut() {
     // Attempt to sync scense before logging out
     await this.sceneCollectionsService.save();
-    await this.sceneCollectionsService.safeSync();
     // Navigate away from disabled tabs on logout
     this.navigationService.navigate('Studio');
 
@@ -888,28 +887,32 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
 
   @RunInLoadingMode()
   private async loginFlexTV(service: IPlatformService, auth?: IUserAuth) {
-    if (!auth) auth = this.state.auth;
-    this.LOGIN(auth);
-    this.VALIDATE_LOGIN(true);
+    try {
+      if (!auth) auth = this.state.auth;
+      this.LOGIN(auth);
+      this.VALIDATE_LOGIN(true);
 
-    this.userLogin.next(auth);
+      this.userLogin.next(auth);
 
-    if (!service) {
-      service = getPlatformService(this.platform.type);
+      if (!service) {
+        service = getPlatformService(this.platform.type);
+      }
+      await this.sceneCollectionsService.setupNewUser();
+      const userInfo = await service.fetchUserInfo();
+      if (!userInfo) {
+        this.logOut();
+        electron.remote.dialog.showMessageBox({
+          title: 'FlexTV Broadcaster',
+          message: $t('You have been logged out'),
+        });
+        return;
+      }
+      await this.refreshUserInfo();
+
+      return EPlatformCallResult.Success;
+    } catch (e: unknown) {
+      return EPlatformCallResult.Error;
     }
-    await this.sceneCollectionsService.setupNewUser();
-    const userInfo = await service.fetchUserInfo();
-    if (!userInfo) {
-      this.logOut();
-      electron.remote.dialog.showMessageBox({
-        title: 'FlexTV Broadcaster',
-        message: $t('You have been logged out'),
-      });
-      return;
-    }
-    await this.refreshUserInfo();
-
-    return EPlatformCallResult.Success;
   }
 
   /**

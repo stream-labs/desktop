@@ -61,7 +61,7 @@ export { YoutubeService } from 'services/platforms/youtube';
 export { TwitchService } from 'services/platforms/twitch';
 export { FacebookService } from 'services/platforms/facebook';
 export { TiktokService } from 'services/platforms/tiktok';
-export { FlextvService } from 'services/platforms/flextv';
+export { FlexTvService } from 'services/platforms/flextv';
 export { RestreamService } from 'services/restream';
 export { TwitterService } from 'services/integrations/twitter';
 export { UsageStatisticsService } from './services/usage-statistics';
@@ -129,6 +129,7 @@ import { SettingsService } from './services/settings';
 import { UserService } from './services/user';
 import { TwitchService } from './services/platforms/twitch';
 import { YoutubeService } from './services/platforms/youtube';
+import { FlexTvService } from './services/platforms/flextv';
 import { FacebookService } from './services/platforms/facebook';
 import { DismissablesService } from './services/dismissables';
 import { NavigationService } from './services/navigation';
@@ -177,6 +178,7 @@ export const AppServices = {
   VideoEncodingOptimizationService,
   TwitterService,
   YoutubeService,
+  FlexTvService,
   FacebookService,
   UserService,
   TwitchService,

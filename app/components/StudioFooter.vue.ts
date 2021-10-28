@@ -11,6 +11,7 @@ import {
 import { UserService } from '../services/user';
 import { getPlatformService } from 'services/platforms';
 import { YoutubeService } from 'services/platforms/youtube';
+import { FlexTvService } from 'services/platforms/flextv';
 import { PerformanceService, EStreamQuality } from 'services/performance';
 import { CustomizationService } from 'services/customization';
 import { WindowsService } from 'services/windows';
@@ -35,6 +36,7 @@ export default class StudioFooterComponent extends Vue {
   @Inject() settingsService: SettingsService;
   @Inject() performanceService: PerformanceService;
   @Inject() youtubeService: YoutubeService;
+  @Inject() flexTvService: FlexTvService;
   @Inject() usageStatisticsService: UsageStatisticsService;
   @Inject() navigationService: NavigationService;
 
@@ -43,6 +45,7 @@ export default class StudioFooterComponent extends Vue {
   metricsShown = false;
   recordingTime = '';
   private recordingTimeIntervalId: number;
+  flexTvHpToken = '';
 
   mounted() {
     this.confirmYoutubeEnabled();
@@ -52,6 +55,18 @@ export default class StudioFooterComponent extends Vue {
       if (!this.streamingService.isRecording) return;
       this.recordingTime = this.streamingService.formattedDurationInCurrentRecordingState;
     }, 1000);
+
+    if (this.userService.isLoggedIn) {
+      this.flexTvService
+        .fetchHelperToken()
+        .then(token => {
+          console.log(token);
+          this.flexTvHpToken = token;
+        })
+        .catch((e: unknown) => {
+          console.log(e);
+        });
+    }
   }
 
   destroyed() {
