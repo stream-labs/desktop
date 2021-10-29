@@ -37,7 +37,6 @@ export class IncrementalRolloutService extends StatefulService<IIncrementalRollo
   init() {
     this.setCommandLineFeatures();
 
-    this.userService.userLogin.subscribe(() => this.fetchAvailableFeatures());
     this.userService.userLogout.subscribe(() => this.resetAvailableFeatures());
   }
 
@@ -48,19 +47,6 @@ export class IncrementalRolloutService extends StatefulService<IIncrementalRollo
   @mutation()
   private SET_AVAILABLE_FEATURES(features: string[]) {
     this.state.availableFeatures = features;
-  }
-
-  fetchAvailableFeatures() {
-    if (this.userService.isLoggedIn) {
-      const host = this.hostsService.streamlabs;
-      const url = `https://${host}/api/v5/slobs/available-features`;
-      const headers = authorizedHeaders(this.userService.apiToken);
-      const request = new Request(url, { headers });
-
-      return jfetch<{ features: string[] }>(request).then(response => {
-        this.SET_AVAILABLE_FEATURES([...this.state.availableFeatures, ...response.features]);
-      });
-    }
   }
 
   setCommandLineFeatures() {

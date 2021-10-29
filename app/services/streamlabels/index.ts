@@ -209,7 +209,6 @@ export class StreamlabelsService extends StatefulService<IStreamlabelsServiceSta
   }
 
   async init() {
-    this.initSocketConnection();
     this.initTrainClockInterval();
 
     this.userService.userLogin.subscribe(() => {
@@ -383,10 +382,6 @@ export class StreamlabelsService extends StatefulService<IStreamlabelsServiceSta
 
     if (fileName !== 'train_tips') return baseFiles;
     return baseFiles.concat(donationFiles);
-  }
-
-  private initSocketConnection(): void {
-    this.websocketService.socketEvent.subscribe(e => this.onSocketEvent(e));
   }
 
   private initTrainClockInterval() {
