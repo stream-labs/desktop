@@ -8,7 +8,7 @@ import { Services } from '../../service-provider';
 import fs from 'fs';
 import rimraf from 'rimraf';
 import path from 'path';
-import { useOnCreate } from '../../hooks';
+import { useOnCreate, useVuex } from '../../hooks';
 import { useBinding } from '../../store';
 import { getDefined } from '../../../util/properties-type-guards';
 
@@ -26,12 +26,11 @@ export function GeneralSettings() {
 GeneralSettings.page = 'General';
 
 function CacheSettings() {
-  const { AppService, CacheUploaderService } = Services;
-  const enableCUFilePath = useOnCreate(() =>
-    path.join(AppService.appDataDirectory, 'CrashMemoryDump'),
-  );
+  const { AppService, CacheUploaderService, CustomizationService } = Services;
   const [cacheUploading, setCacheUploading] = useState(false);
-  const [enableCU, setEnableCU] = useState(() => fs.existsSync(enableCUFilePath));
+  const { enableCrashDumps } = useVuex(() => {
+    return { enableCrashDumps: CustomizationService.state.enableCrashDumps };
+  });
 
   async function showCacheDir() {
     await electron.remote.shell.openPath(AppService.appDataDirectory);
@@ -66,20 +65,6 @@ function CacheSettings() {
     });
   }
 
-  function setEnableCrashDumpUpload(val: boolean) {
-    try {
-      if (val) {
-        fs.mkdirSync(enableCUFilePath);
-        setEnableCU(true);
-      } else {
-        rimraf.sync(enableCUFilePath);
-        setEnableCU(false);
-      }
-    } catch (e: unknown) {
-      console.error('Error setting crash upload option', e);
-    }
-  }
-
   return (
     <ObsSettingsSection>
       <p>
@@ -108,8 +93,8 @@ function CacheSettings() {
         <CheckboxInput
           name="enable_dump_upload"
           label={$t('Enable reporting additional information on a crash (requires restart)')}
-          value={enableCU}
-          onChange={setEnableCrashDumpUpload}
+          value={enableCrashDumps}
+          onChange={val => CustomizationService.actions.setSettings({ enableCrashDumps: val })}
         />
       )}
     </ObsSettingsSection>
