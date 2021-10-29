@@ -29,8 +29,6 @@ import { Services } from '../service-provider';
 import { ButtonGroup } from '../shared/ButtonGroup';
 import { LayoutInput } from './common/LayoutInput';
 import InputWrapper from '../shared/inputs/InputWrapper';
-import { useWidget } from './common/useWidget';
-import { ObsForm } from '../obs/ObsForm';
 import { assertIsDefined } from '../../util/properties-type-guards';
 
 /**
