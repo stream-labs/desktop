@@ -205,13 +205,6 @@ function ExtraSettings() {
   return (
     <>
       <ObsSettingsSection>
-        {isLoggedIn && !isFacebook && (
-          <CheckboxInput
-            {...bind.streamInfoUpdate}
-            label={$t('Confirm stream title and game before going live')}
-            name="stream_info_udpate"
-          />
-        )}
         <CheckboxInput
           label={$t('Disable hardware acceleration (requires restart)')}
           value={disableHA}
@@ -222,7 +215,7 @@ function ExtraSettings() {
         <div className="actions">
           <div className="input-container">
             <button className="button button--default" onClick={restartStreamlabelsSession}>
-              {$t('Restart Stream Labels')}
+              다시 시작
             </button>
           </div>
         </div>
