@@ -73,8 +73,7 @@ function CacheSettings() {
     try {
       if (val) {
         rimraf.sync(enableCDUFlagPath);
-        if (!fs.existsSync(setCDUFolderPath))
-          fs.mkdirSync(setCDUFolderPath);
+        if (!fs.existsSync(setCDUFolderPath)) fs.mkdirSync(setCDUFolderPath);
         setEnableCU(true);
       } else {
         fs.closeSync(fs.openSync(enableCDUFlagPath, 'w'));
