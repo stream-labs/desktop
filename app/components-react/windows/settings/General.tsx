@@ -27,11 +27,14 @@ GeneralSettings.page = 'General';
 
 function CacheSettings() {
   const { AppService, CacheUploaderService } = Services;
-  const enableCUFilePath = useOnCreate(() =>
+  const  setCDUFolderPath = useOnCreate(() =>
     path.join(AppService.appDataDirectory, 'CrashMemoryDump'),
   );
+  const enableCDUFlagPath = useOnCreate(() =>
+    path.join(AppService.appDataDirectory, 'CDUploadDisable'),
+  );
   const [cacheUploading, setCacheUploading] = useState(false);
-  const [enableCU, setEnableCU] = useState(() => fs.existsSync(enableCUFilePath));
+  const [enableCU, setEnableCU] = useState(() => {return !fs.existsSync(enableCDUFlagPath);});
 
   async function showCacheDir() {
     await electron.remote.shell.openPath(AppService.appDataDirectory);
@@ -69,10 +72,13 @@ function CacheSettings() {
   function setEnableCrashDumpUpload(val: boolean) {
     try {
       if (val) {
-        fs.mkdirSync(enableCUFilePath);
+        rimraf.sync(enableCDUFlagPath);
+        if (!fs.existsSync(setCDUFolderPath))
+          fs.mkdirSync(setCDUFolderPath);
         setEnableCU(true);
       } else {
-        rimraf.sync(enableCUFilePath);
+        fs.closeSync(fs.openSync(enableCDUFlagPath, 'w'));
+        rimraf.sync(setCDUFolderPath);
         setEnableCU(false);
       }
     } catch (e: unknown) {

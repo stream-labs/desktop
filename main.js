@@ -526,6 +526,16 @@ async function startApp() {
 const haDisableFile = path.join(app.getPath('userData'), 'HADisable');
 if (fs.existsSync(haDisableFile)) app.disableHardwareAcceleration();
 
+const cduFolderPath = path.join(app.getPath('userData'), 'CrashMemoryDump');
+const cduDisableFile = path.join(app.getPath('userData'), 'CDUploadDisable');
+if (fs.existsSync(cduDisableFile)) {
+  if (fs.existsSync(cduFolderPath))
+    rimraf.sync(cduFolderPath);
+} else {
+  if (!fs.existsSync(cduFolderPath))
+    fs.mkdirSync(cduFolderPath);
+}
+
 app.setAsDefaultProtocolClient('slobs');
 
 app.on('second-instance', (event, argv, cwd) => {
