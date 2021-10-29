@@ -11,7 +11,9 @@ import {
   TextInput,
   AudioUrlInput,
   FontFamilyInput,
-  ColorInput, FontWeightInput, FontSizeInput,
+  ColorInput,
+  FontWeightInput,
+  FontSizeInput,
 } from '../shared/inputs';
 import { $t } from '../../services/i18n';
 import { Alert, Button, Collapse, Menu, Tooltip } from 'antd';
@@ -28,7 +30,7 @@ import { LayoutInput } from './common/LayoutInput';
 import InputWrapper from '../shared/inputs/InputWrapper';
 import { useWidget } from './common/useWidget';
 import { ObsForm } from '../obs/ObsForm';
-import {assertIsDefined} from "../../util/properties-type-guards";
+import { assertIsDefined } from '../../util/properties-type-guards';
 
 /**
  * Root component
