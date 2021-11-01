@@ -28,6 +28,8 @@ export class ProjectorService extends Service {
       size: {
         width: 640,
         height: 400,
+        minWidth: 640,
+        minHeight: 400,
       },
     });
   }
