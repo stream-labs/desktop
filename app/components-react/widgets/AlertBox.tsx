@@ -129,6 +129,7 @@ function AlertsList() {
           {alertEvent.name}
           {alertEvent.tooltip && (
             <Tooltip
+              placement="rightBottom"
               title={
                 <span>
                   {alertEvent.tooltip}
