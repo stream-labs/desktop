@@ -28,5 +28,8 @@
   "Mute": "음소거",
   "Unmute": "음소거 해제 ",
   "Designates if this source is audible in your live broadcast": "Designates if this source is audible in your live broadcast",
-  "Designates if this source is audible in your recorded track(s)": "Designates if this source is audible in your recorded track(s)"
+  "Designates if this source is audible in your recorded track(s)": "Designates if this source is audible in your recorded track(s)",
+  "Source Settings": "Source Settings",
+  "Audio Tracks": "Audio Tracks",
+  "Designates which tracks are available for recording or stream": "Designates which tracks are available for recording or stream"
 }
