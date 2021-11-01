@@ -23,3 +23,10 @@ yarn-error.log
 .awcache/
 AGREEMENT
 license_en.txt
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions

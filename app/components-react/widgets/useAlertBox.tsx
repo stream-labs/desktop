@@ -120,6 +120,14 @@ export class AlertBoxModule extends WidgetModule<IAlertBoxState> {
   }
 
   /**
+   * Returns a layout for the AlertBox
+   */
+  get layout() {
+    // more linked platforms require more space for the widget menu
+    return Services.StreamingService.views.linkedPlatforms.length < 3 ? 'basic' : 'long-menu';
+  }
+
+  /**
    * Switch UI to a legacy alertbox
    */
   public switchToLegacyAlertbox() {
@@ -469,10 +477,23 @@ function getVariationsMetadata() {
     twSubscription: {},
     twCheer: {
       message_template: getMessageTemplateMetadata('twCheer'),
+      alert_message_min_amount: metadata.number({
+        label: $t('Min. Amount to Trigger Alert'),
+        min: 0,
+      }),
     },
-    ytSuperchat: {},
+    ytSuperchat: {
+      alert_message_min_amount: metadata.number({
+        label: $t('Min. Amount to Trigger Alert'),
+        min: 0,
+      }),
+    },
     fbStars: {
       message_template: getMessageTemplateMetadata('fbStars'),
+      alert_message_min_amount: metadata.number({
+        label: $t('Min. Amount to Trigger Alert'),
+        min: 0,
+      }),
     },
     fbSupport: {
       message_template: getMessageTemplateMetadata('fbSupport'),
