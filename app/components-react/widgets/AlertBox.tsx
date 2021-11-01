@@ -24,14 +24,13 @@ import { Services } from '../service-provider';
 import { ButtonGroup } from '../shared/ButtonGroup';
 import { LayoutInput } from './common/LayoutInput';
 import InputWrapper from '../shared/inputs/InputWrapper';
-
 /**
  * Root component
  */
 export function AlertBox() {
-  // use 2 columns layout
+  const { layout } = useAlertBox();
   return (
-    <WidgetLayout>
+    <WidgetLayout layout={layout}>
       <TabsList />
       <TabContent />
     </WidgetLayout>

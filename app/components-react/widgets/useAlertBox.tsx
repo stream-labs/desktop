@@ -107,6 +107,14 @@ export class AlertBoxModule extends WidgetModule<IAlertBoxState> {
   }
 
   /**
+   * Returns a layout for the AlertBox
+   */
+  get layout() {
+    // more linked platforms require more space for the widget menu
+    return Services.StreamingService.views.linkedPlatforms.length < 3 ? 'basic' : 'long-menu';
+  }
+
+  /**
    * Switch UI to a legacy alertbox
    */
   public switchToLegacyAlertbox() {
