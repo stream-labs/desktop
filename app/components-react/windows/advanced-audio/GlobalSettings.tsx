@@ -20,10 +20,12 @@ export default function GlobalSettings() {
     audioTracks: SettingsService.views.audioTracks,
   }));
 
-  const monitoringDevice = advancedAudioSettings?.parameters[0] as IObsListInput<TObsValue>;
-  const audioDucking = advancedAudioSettings?.parameters[1] as IObsInput<boolean>;
-
-  console.log(advancedAudioSettings);
+  const monitoringDevice = advancedAudioSettings?.parameters.find(
+    param => param.name === 'MonitoringDeviceName',
+  ) as IObsListInput<TObsValue>;
+  const audioDucking = advancedAudioSettings?.parameters.find(
+    param => param.name === 'DisableAudioDucking',
+  ) as IObsInput<boolean>;
 
   function handleAdvancedSettingsChange(name: string, value: TObsValue) {
     SettingsService.actions.setSettingValue('Advanced', name, value);
