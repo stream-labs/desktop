@@ -66,7 +66,7 @@ export default function GlobalSettings() {
         {isAdvancedOutput && (
           <InputWrapper
             label={$t('Audio Tracks')}
-            tooltip={$t('Designates which tracks are available for recording or stream')}
+            tooltip={$t('Designates which tracks are being recorded')}
             layout="horizontal"
             style={{ flexWrap: 'nowrap' }}
           >
