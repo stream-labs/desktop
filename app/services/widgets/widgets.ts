@@ -230,6 +230,8 @@ export class WidgetsService
    * returns -1 if it's no type detected
    */
   getWidgetTypeByUrl(url: string): WidgetType {
+    if (!this.userService.views.isLoggedIn) return -1;
+
     const type = Number(
       Object.keys(WidgetDefinitions).find(WidgetType => {
         let regExpStr = WidgetDefinitions[WidgetType].url(this.hostsService.streamlabs, '')

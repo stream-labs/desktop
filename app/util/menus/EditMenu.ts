@@ -337,7 +337,7 @@ export class EditMenu extends Menu {
   }
 
   private showProperties() {
-    if (this.options.showAudioMixerMenu) {
+    if (this.options.showAudioMixerMenu || !this.source.video) {
       this.audioService.actions.showAdvancedSettings(this.source.sourceId);
     } else {
       this.sourcesService.actions.showSourceProperties(this.source.sourceId);

@@ -1,6 +1,5 @@
 import React, { useState, useRef, useMemo, useEffect } from 'react';
 import { Button, Collapse, Tooltip } from 'antd';
-import { ModalLayout } from 'components-react/shared/ModalLayout';
 import {
   SliderInput,
   BoolButtonInput,
@@ -18,7 +17,6 @@ import { Source } from 'services/sources';
 import { $t } from 'services/i18n';
 import Utils from 'services/utils';
 import styles from './AdvancedAudio.m.less';
-import Scrollable from 'components-react/shared/Scrollable';
 
 const { Panel } = Collapse;
 
@@ -36,21 +34,17 @@ export default function AdvancedAudio() {
   }));
 
   return (
-    <ModalLayout hideFooter>
-      <Scrollable style={{ height: '100%' }} snapToWindowEdge>
-        <Collapse
-          accordion
-          activeKey={expandedSource}
-          onChange={(key: string) => setExpandedSource(key)}
-        >
-          {audioSources.map(audioSource => (
-            <Panel key={audioSource.sourceId} header={<PanelHeader source={audioSource} />}>
-              <PanelForm source={audioSource} />
-            </Panel>
-          ))}
-        </Collapse>
-      </Scrollable>
-    </ModalLayout>
+    <Collapse
+      accordion
+      activeKey={expandedSource}
+      onChange={(key: string) => setExpandedSource(key)}
+    >
+      {audioSources.map(audioSource => (
+        <Panel key={audioSource.sourceId} header={<PanelHeader source={audioSource} />}>
+          <PanelForm source={audioSource} />
+        </Panel>
+      ))}
+    </Collapse>
   );
 }
 
@@ -105,7 +99,10 @@ function PanelHeader(p: { source: AudioSource }) {
           onClick={(e: React.MouseEvent) => onInputHandler('muted', !muted, e)}
         />
       </Tooltip>
-      <div style={{ width: '200px' }} onClick={(e: React.MouseEvent) => e.stopPropagation()}>
+      <div
+        style={{ width: '200px', flexShrink: 0 }}
+        onClick={(e: React.MouseEvent) => e.stopPropagation()}
+      >
         <SliderInput
           value={Math.floor(fader.deflection * 100)}
           max={100}
@@ -133,6 +130,7 @@ function PanelHeader(p: { source: AudioSource }) {
               label={vodTrackEnabled ? $t('Stream Tracks') : $t('Stream Track')}
               tooltip={$t('Designates if this source is audible in your live broadcast')}
               layout="horizontal"
+              style={{ flexWrap: 'nowrap' }}
             >
               <div style={{ display: 'flex' }}>
                 <BoolButtonInput
@@ -159,6 +157,7 @@ function PanelHeader(p: { source: AudioSource }) {
               label={$t('Rec. Tracks')}
               tooltip={$t('Designates if this source is audible in your recorded track(s)')}
               layout="horizontal"
+              style={{ flexWrap: 'nowrap' }}
             >
               <div style={{ display: 'flex' }}>
                 {recordingTracks?.map(track => (
@@ -211,16 +210,18 @@ function PanelForm(p: { source: AudioSource }) {
   useEffect(() => {
     // Ensure monitoring type is returned to normal upon destroy
     return () => {
-      handleSettingsChange('monitoringType', savedMonitoring.current);
+      if (p.source.isDestroyed()) return;
+
+      p.source.setSettings({ monitoringType: savedMonitoring.current });
     };
   }, []);
 
   function handleTestButtonClick() {
     if (!testing) {
       setTesting(true);
-      handleSettingsChange('monitoringType', 1);
+      p.source.setSettings({ monitoringType: 1 });
     } else {
-      handleSettingsChange('monitoringType', savedMonitoring.current);
+      p.source.setSettings({ monitoringType: savedMonitoring.current });
       setTesting(false);
     }
   }

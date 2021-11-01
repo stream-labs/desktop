@@ -25,14 +25,13 @@ import { Services } from '../service-provider';
 import { ButtonGroup } from '../shared/ButtonGroup';
 import { LayoutInput } from './common/LayoutInput';
 import InputWrapper from '../shared/inputs/InputWrapper';
-
 /**
  * Root component
  */
 export function AlertBox() {
-  // use 2 columns layout
+  const { layout } = useAlertBox();
   return (
-    <WidgetLayout>
+    <WidgetLayout layout={layout}>
       <TabsList />
       <TabContent />
     </WidgetLayout>
@@ -92,11 +91,11 @@ function GeneralSettings() {
         message={$t('Looking for the old AlertBox settings?')}
         onClick={switchToLegacyAlertbox}
       />
-      <Info
-        message={$t('Need to test your alerts with different scenarios?')}
-        onClick={openAdvancedAlertTesting}
-      />
-
+      {/* TODO: check this feature is working for prime and non-prime users */}
+      {/*<Info*/}
+      {/*  message={$t('Need to test your alerts with different scenarios?')}*/}
+      {/*  onClick={openAdvancedAlertTesting}*/}
+      {/*/>*/}
       <AdvancedSettingsPanel />
     </Form>
   );
@@ -131,6 +130,7 @@ function AlertsList() {
           {alertEvent.name}
           {alertEvent.tooltip && (
             <Tooltip
+              placement="rightBottom"
               title={
                 <span>
                   {alertEvent.tooltip}
@@ -187,6 +187,8 @@ function CommonAlertSettings(p: { type: TAlertType; hiddenFields?: string[] }) {
   const { createVariationBinding, isCustomCodeEnabled, selectedTab } = useAlertBox();
   const bind = createVariationBinding(p.type, 'default', useForceUpdate(), p.hiddenFields);
   const containerRef = useRef<HTMLDivElement>(null);
+  const bindMinAmount =
+    bind['alert_message_min_amount'].value !== undefined ? bind['alert_message_min_amount'] : null;
 
   return (
     <div key={selectedTab} ref={containerRef}>
@@ -195,6 +197,7 @@ function CommonAlertSettings(p: { type: TAlertType; hiddenFields?: string[] }) {
       <AudioUrlInput {...bind.sound_href} />
       <SliderInput debounce={500} {...bind.sound_volume} />
       <TextInput {...bind.message_template} />
+      {bindMinAmount && <NumberInput {...bindMinAmount} />}
       <SliderInput {...bind.alert_duration} />
     </div>
   );
@@ -221,7 +224,6 @@ function DonationSettings() {
   return (
     <>
       <CommonAlertSettings type="donation" />
-      <NumberInput {...bind.alert_message_min_amount} />
 
       <Info message={$t('Need to set up tipping?')} onClick={openDonationSettings} />
       <Info

@@ -63,7 +63,7 @@ export function WidgetWindow() {
 
   // take the source id and widget's component from the window's params
   const { sourceId, WidgetModule, WidgetSettingsComponent } = useOnCreate(() => {
-    const { sourceId, widgetType } = getDefined(WindowsService.state.child.queryParams);
+    const { sourceId, widgetType } = WindowsService.getChildWindowQueryParams();
     const [WidgetSettingsComponent, WidgetModule] = components[widgetType];
     return { sourceId, WidgetModule, WidgetSettingsComponent };
   });

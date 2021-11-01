@@ -1,4 +1,4 @@
-@import '../../styles/index';
+@import '../../../styles/index';
 
 .audio-settings-row {
   display: flex;
@@ -9,13 +9,23 @@
   top: 8px;
   left: 50px;
 
+  i {
+    margin-left: 8px;
+    margin-right: 8px;
+  }
+
   i:hover {
     color: var(--icon-active);
+  }
+
+  :global(.icon-mute) {
+    color: var(--red);
   }
 }
 
 .audio-source-name {
-  width: 120px;
+  min-width: 0;
+  flex-grow: 1;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -32,5 +42,13 @@
     overflow: visible;
     flex-grow: 1 !important;
     max-width: 100% !important;
+  }
+}
+
+.global-audio-tracks {
+  display: flex;
+
+  :global(.input-wrapper) {
+    width: auto;
   }
 }

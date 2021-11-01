@@ -44,7 +44,7 @@ export class AlertBoxModule extends WidgetModule<IAlertBoxState> {
   /**
    * metadata for the general settings form
    */
-  generalMetadata = getGeneralSettingsMetadata();
+  private generalMetadata = getGeneralSettingsMetadata();
 
   /**
    * metadata for the variation settings form
@@ -109,6 +109,14 @@ export class AlertBoxModule extends WidgetModule<IAlertBoxState> {
     return Object.keys(this.state.data.variations).filter(
       alertType => this.state.data.variations[alertType].default.enabled,
     );
+  }
+
+  /**
+   * Returns a layout for the AlertBox
+   */
+  get layout() {
+    // more linked platforms require more space for the widget menu
+    return Services.StreamingService.views.linkedPlatforms.length < 3 ? 'basic' : 'long-menu';
   }
 
   /**
@@ -190,7 +198,7 @@ export class AlertBoxModule extends WidgetModule<IAlertBoxState> {
           'sponsor_text_delay',
           'text_delay',
           'alert_duration',
-        ].includes(key)
+        ].find(keyToPatch => key.includes(keyToPatch))
       ) {
         newSettings[key] = Math.floor(settings[key] / 1000);
       }
@@ -320,7 +328,7 @@ export class AlertBoxModule extends WidgetModule<IAlertBoxState> {
     // sort alerts
 
     // these alerts always go first
-    const topAlerts: TAlertType[] = ['donation', 'follow', 'subscription'];
+    const topAlerts: TAlertType[] = ['donation'];
 
     // the rest alerts have an alphabetic order
     alerts = topAlerts.concat(alerts.sort().filter(alert => !topAlerts.includes(alert)));
@@ -372,6 +380,7 @@ function getVariationsMetadata() {
   const commonMetadata = {
     alert_duration: metadata.seconds({
       label: $t('Alert Duration'),
+      min: 2000,
       max: 30000,
       tooltip: $t('How many seconds to show this alert before hiding it'),
     }),
@@ -404,18 +413,32 @@ function getVariationsMetadata() {
         min: 0,
       }),
     },
-    follow: {},
+    twFollow: {},
+    fbFollow: {},
     twRaid: {
       message_template: getMessageTemplateMetadata('twRaid'),
     },
     twHost: {},
-    subscription: {},
+    twSubscription: {},
     twCheer: {
       message_template: getMessageTemplateMetadata('twCheer'),
+      alert_message_min_amount: metadata.number({
+        label: $t('Min. Amount to Trigger Alert'),
+        min: 0,
+      }),
     },
-    ytSuperchat: {},
+    ytSuperchat: {
+      alert_message_min_amount: metadata.number({
+        label: $t('Min. Amount to Trigger Alert'),
+        min: 0,
+      }),
+    },
     fbStars: {
       message_template: getMessageTemplateMetadata('fbStars'),
+      alert_message_min_amount: metadata.number({
+        label: $t('Min. Amount to Trigger Alert'),
+        min: 0,
+      }),
     },
     fbSupport: {
       message_template: getMessageTemplateMetadata('fbSupport'),
@@ -430,6 +453,7 @@ function getVariationsMetadata() {
       }),
     },
     ytSubscriber: {},
+    ytMembership: {},
   });
 
   // mix common and specific metadata and return it
