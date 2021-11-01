@@ -1,13 +1,12 @@
 import {
   createAlertsMap,
   ICustomCode,
-  ICustomField,
   IWidgetState,
   useWidget,
   WidgetModule,
 } from './common/useWidget';
 import { values, cloneDeep, intersection } from 'lodash';
-import { IAlertConfig, TAlertType } from '../../services/widgets/widget-config';
+import { IAlertConfig, TAlertType } from '../../services/widgets/alerts-config';
 import { createBinding } from '../shared/inputs';
 import { Services } from '../service-provider';
 import { mutation } from '../store';
@@ -73,6 +72,7 @@ export class AlertBoxModule extends WidgetModule<IAlertBoxState> {
     alertType: T,
     variationId = 'default',
     forceUpdate: () => unknown,
+    hiddenFields: string[] = [],
   ) {
     return createBinding<TVariationsSettings[T]>(
       // define source of values
@@ -83,7 +83,10 @@ export class AlertBoxModule extends WidgetModule<IAlertBoxState> {
         forceUpdate();
       },
       // pull additional metadata like tooltip, label, min, max, etc...
-      fieldName => this.variationsMetadata[alertType as any][fieldName],
+      fieldName => ({
+        ...this.variationsMetadata[alertType as any][fieldName],
+        hidden: hiddenFields.includes(fieldName as string),
+      }),
     );
   }
 
@@ -175,7 +178,15 @@ export class AlertBoxModule extends WidgetModule<IAlertBoxState> {
     const keys = Object.keys(settings);
     const newSettings = { ...settings };
     keys.forEach(key => {
-      if (['alert_delay', 'moderation_delay', 'text_delay', 'alert_duration'].includes(key)) {
+      if (
+        [
+          'alert_delay',
+          'moderation_delay',
+          'sponsor_text_delay',
+          'text_delay',
+          'alert_duration',
+        ].find(keyToPatch => key.includes(keyToPatch))
+      ) {
         newSettings[key] = Math.floor(settings[key] / 1000);
       }
     });
@@ -221,7 +232,7 @@ export class AlertBoxModule extends WidgetModule<IAlertBoxState> {
     });
 
     // set the same message template for all Cheer variations
-    if (type === 'cheer') {
+    if (type === 'twCheer') {
       const newBitsVariations = this.state.data.settings.bit_variations.map((variation: any) => {
         const newVariation = cloneDeep(variation);
         newVariation.settings.text.format = newVariationSettings.message_template;
@@ -301,6 +312,16 @@ export class AlertBoxModule extends WidgetModule<IAlertBoxState> {
 
   @mutation()
   private setAvailableAlerts(alerts: TAlertType[]) {
+    // sort alerts
+
+    // these alerts always go first
+    const topAlerts: TAlertType[] = ['donation'];
+
+    // the rest alerts have an alphabetic order
+    alerts = topAlerts.concat(alerts.sort().filter(alert => !topAlerts.includes(alert)));
+
+    // TODO: fbSupportGift is impossible to enable on backend
+    alerts = alerts.filter(alert => alert !== 'fbSupportGift');
     this.state.availableAlerts = alerts;
   }
 }
@@ -336,13 +357,14 @@ function getVariationsMetadata() {
   const commonMetadata = {
     alert_duration: metadata.seconds({
       label: $t('Alert Duration'),
+      min: 2000,
       max: 30000,
       tooltip: $t('How many seconds to show this alert before hiding it'),
     }),
     image_href: metadata.text({ label: $t('Image') }),
     sound_href: metadata.text({ label: $t('Sound') }),
     sound_volume: metadata.slider({ label: $t('Sound Volume'), min: 0, max: 100 }),
-    message_template: metadata.text({ label: $t('Message Template') }),
+    message_template: getMessageTemplateMetadata(),
     layout: metadata.list<'banner' | 'above' | 'side'>({ label: $t('Layout') }),
     text_delay: metadata.seconds({
       label: $t('Text Delay'),
@@ -362,32 +384,40 @@ function getVariationsMetadata() {
   // define unique metadata for each variation
   const specificMetadata = createAlertsMap({
     donation: {
-      message_template: metadata.text({
-        label: $t('Message Template'),
-        tooltip:
-          $t('When a donation alert shows up, this will be the format of the message.') +
-          '\n' +
-          $t('Available Tokens: ') +
-          ' {name} ' +
-          $t('The name of the donator') +
-          ' {amount} ' +
-          $t('The amount that was donated'),
-      }),
-
+      message_template: getMessageTemplateMetadata('donation'),
       alert_message_min_amount: metadata.number({
         label: $t('Min. Amount to Trigger Alert'),
         min: 0,
       }),
     },
-    follow: {},
-    raid: {},
-    host: {},
-    subscription: {},
-    cheer: {},
+    twFollow: {},
+    fbFollow: {},
+    twRaid: {
+      message_template: getMessageTemplateMetadata('twRaid'),
+    },
+    twHost: {},
+    twSubscription: {},
+    twCheer: {
+      message_template: getMessageTemplateMetadata('twCheer'),
+    },
     ytSuperchat: {},
-    fbStars: {},
-    fbSupport: {},
+    fbStars: {
+      message_template: getMessageTemplateMetadata('fbStars'),
+    },
+    fbSupport: {
+      message_template: getMessageTemplateMetadata('fbSupport'),
+    },
+    fbSupportGift: {},
+    fbShare: {},
     fbLike: {},
+    merch: {
+      message_template: getMessageTemplateMetadata('merch'),
+      use_custom_image: metadata.bool({
+        label: $t('Replace product image with custom image'),
+      }),
+    },
+    ytSubscriber: {},
+    ytMembership: {},
   });
 
   // mix common and specific metadata and return it
@@ -397,6 +427,49 @@ function getVariationsMetadata() {
   return specificMetadata as {
     [key in keyof typeof specificMetadata]: typeof specificMetadata[key] & typeof commonMetadata;
   };
+}
+
+/**
+ * Returns metadata for the message_template field
+ * @param alert
+ */
+function getMessageTemplateMetadata(alert?: TAlertType) {
+  const tooltipTextHeader =
+    $t('When an alert shows up, this will be the format of the message.') +
+    '\n' +
+    $t('Available Tokens: ') +
+    '\n';
+  let tooltipTokens = ' {name} ';
+
+  switch (alert) {
+    case 'donation':
+    case 'twCheer':
+    case 'fbStars':
+    case 'fbSupport':
+      tooltipTokens =
+        ' {name} ' +
+        $t('The name of the donator') +
+        ', {amount} ' +
+        $t('The amount that was donated');
+      break;
+    case 'twRaid':
+      tooltipTokens =
+        ' {name} ' +
+        $t('The name of the streamer raiding you') +
+        ', {amount} ' +
+        $t('The number of viewers who joined the raid');
+      break;
+    case 'merch':
+      tooltipTokens = '{name}, {product}';
+      break;
+  }
+
+  const tooltip = tooltipTextHeader + tooltipTokens;
+
+  return metadata.text({
+    label: $t('Message Template'),
+    tooltip,
+  });
 }
 
 // DEFINE HELPER TYPES
