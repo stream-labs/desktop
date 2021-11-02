@@ -32,7 +32,7 @@ export function useForm(name?: string) {
    * Returns an array of input values in the order as they appear in the form
    */
   async function readForm(): Promise<
-    { name: string; value: any; displayValue: boolean | string | string[] }[]
+    { name: string; value: any; displayValue: boolean | number | string | string[] }[]
   > {
     return traverseForm(async input => ({
       name: input.name,
