@@ -7,6 +7,7 @@ import Form from '../../shared/inputs/Form';
 import {
   CheckboxInput,
   NumberInput,
+  SliderInput,
   SwitchInput,
   TagsInput,
   TextAreaInput,
@@ -26,6 +27,7 @@ export function DemoForm() {
     age: 0,
     colors: [] as number[],
     city: '',
+    weight: 65,
     addIntroduction: false,
     introduction: '',
     plusOneName: '',
@@ -73,6 +75,7 @@ export function DemoForm() {
           onSearch={onCitySearch}
           loading={isSearching}
         />
+        <SliderInput {...bind.weight} label={'Weight'} min={1} max={300} />
         <TagsInput label="Pick your favorite colors" {...bind.colors} options={colorOptions} />
         <SwitchInput {...bind.addIntroduction} label={'Add Introduction'} />
         {s.addIntroduction && <TextAreaInput {...bind.introduction} label={'Introduction'} />}

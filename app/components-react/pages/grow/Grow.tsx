@@ -33,7 +33,7 @@ export default function Grow() {
   function fetchApiData() {
     GrowService.actions.fetchGoals();
     GrowService.actions.fetchAnalytics();
-    // GrowService.actions.fetchUniversityProgress();
+    GrowService.actions.fetchUniversityProgress();
     GrowService.actions.fetchPlatformFollowers();
   }
 
@@ -242,7 +242,7 @@ function ResourceFooter(p: { universityProgress: IUniversityProgress }) {
       <span>{$t('')}</span>
 
       <div className={styles.resourcesContainer}>
-        {/* <UniversityCard progress={p.universityProgress} /> */}
+        <UniversityCard progress={p.universityProgress} />
         <ContentHubCard />
       </div>
     </div>

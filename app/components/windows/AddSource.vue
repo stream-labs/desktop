@@ -47,7 +47,7 @@
             <p v-if="error" class="NameSource-label NameSource-label__error">
               {{ error }}
             </p>
-            <input autofocus type="text" v-model="name" />
+            <input autofocus type="text" style="width: 100%" v-model="name" />
           </div>
         </div>
       </div>

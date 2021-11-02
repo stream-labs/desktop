@@ -8,7 +8,7 @@ import InputWrapper from './InputWrapper';
 const ANT_SLIDER_FEATURES = ['min', 'max', 'step', 'tooltipPlacement', 'tipFormatter'] as const;
 
 export type TSliderInputProps = TSlobsInputProps<
-  { hasNumberInput?: boolean },
+  { hasNumberInput?: boolean; slimNumberInput?: boolean },
   number,
   SliderSingleProps,
   ValuesOf<typeof ANT_SLIDER_FEATURES>
@@ -17,11 +17,11 @@ export type TSliderInputProps = TSlobsInputProps<
 export const SliderInput = InputComponent((partialProps: TSliderInputProps) => {
   // apply default props
   const p = {
-    hasNumberInput: true,
+    hasNumberInput: false,
     ...partialProps,
   };
-  const { inputAttrs, wrapperAttrs } = useInput('slider', p, ANT_SLIDER_FEATURES);
-  const numberInputHeight = '70px';
+  const { inputAttrs, wrapperAttrs, dataAttrs } = useInput('slider', p, ANT_SLIDER_FEATURES);
+  const numberInputHeight = p.slimNumberInput ? '50px' : '70px';
 
   function onChangeHandler(val: number) {
     // don't emit onChange if the value is out of range
@@ -34,7 +34,7 @@ export const SliderInput = InputComponent((partialProps: TSliderInputProps) => {
   return (
     <InputWrapper {...wrapperAttrs}>
       <Row>
-        <Col flex="auto">
+        <Col flex="auto" {...dataAttrs} data-role="input" data-value={inputAttrs.value}>
           <Slider {...inputAttrs} />
         </Col>
 
@@ -43,7 +43,7 @@ export const SliderInput = InputComponent((partialProps: TSliderInputProps) => {
             <InputNumber
               {...inputAttrs}
               onChange={onChangeHandler}
-              style={{ width: numberInputHeight }}
+              style={{ width: numberInputHeight, marginLeft: '8px' }}
             />
           </Col>
         )}

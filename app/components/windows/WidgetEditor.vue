@@ -3,6 +3,19 @@
     <div class="container" slot="content">
       <div class="top-settings" v-if="properties">
         <generic-form :value="topProperties" @input="onPropsInputHandler" />
+
+        <div class="ant-alert ant-alert-info" role="alert" v-if="shouldShowAlertboxSwitcher">
+          <div class="ant-alert-content">
+            <div
+              class="ant-alert-message"
+              v-if="props.isAlertBox"
+              style="cursor: pointer"
+              @click="switchToNewAlertboxUI()"
+            >
+              {{ $t('Try the new simplified AlertBox settings') }}
+            </div>
+          </div>
+        </div>
         <div v-if="apiSettings.testers" class="button button--action test-button">
           <test-widgets :componentProps="{ testers: apiSettings.testers }" />
         </div>
@@ -418,7 +431,7 @@
   position: absolute;
   display: flex;
   top: 0;
-  left: 215px;
+  left: 225px;
   align-items: center;
   height: 24px;
   border-left: 1px solid var(--border);
@@ -442,7 +455,7 @@
   height: 6px;
   position: absolute;
   top: calc(~'50% - 3px');
-  left: 200px;
+  left: 210px;
   transform: translate(0, -50%);
   background-color: var(--button);
 }

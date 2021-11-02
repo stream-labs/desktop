@@ -119,7 +119,7 @@ async function createProjector(t: TExecutionContext) {
   const sourceName = await selectRandomSource(t);
   if (!sourceName) return;
   await rightClickSource(sourceName);
-  await contextMenuClick('Create Source Projector');
+  await contextMenuClick(['Projector', 'Create Source Projector']);
 }
 
 async function destroyProjector(t: TExecutionContext) {

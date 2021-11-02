@@ -104,7 +104,7 @@ export const SourceDisplayData = (): { [key: string]: ISourceDisplayData } => ({
   screen_capture: {
     name: $t('Screen Capture'),
     description: $t('Capture your game, other applications, or your entire monitor'),
-    demoFilename: 'vr-capture.png',
+    demoFilename: 'window-capture.png',
     supportList: [$t('Most games, apps, displays')],
   },
   liv_capture: {

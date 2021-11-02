@@ -200,7 +200,7 @@ export class AudioService extends StatefulService<IAudioSourcesState> {
       .filter(device => [EDeviceType.audioOutput, EDeviceType.audioInput].includes(device.type));
   }
 
-  showAdvancedSettings() {
+  showAdvancedSettings(sourceId?: string) {
     this.windowsService.showWindow({
       componentName: 'AdvancedAudio',
       title: $t('Advanced Audio Settings'),
@@ -208,6 +208,7 @@ export class AudioService extends StatefulService<IAudioSourcesState> {
         width: 915,
         height: 600,
       },
+      queryParams: { sourceId },
     });
   }
 
@@ -377,80 +378,14 @@ export class AudioSource implements IAudioSourceApi {
     return { ...this.source.state, ...this.audioSourceState };
   }
 
-  getSettingsForm(): TObsFormData {
+  get monitoringOptions() {
     return [
-      <IObsNumberInputValue>{
-        name: 'deflection',
-        value: Math.round(this.fader.deflection * 100),
-        description: $t('Volume (%)'),
-        showDescription: false,
-        visible: true,
-        enabled: true,
-        minVal: 0,
-        maxVal: 100,
-        type: 'OBS_PROPERTY_INT',
+      { value: obs.EMonitoringType.None, label: $t('Monitor Off') },
+      {
+        value: obs.EMonitoringType.MonitoringOnly,
+        label: $t('Monitor Only (mute output)'),
       },
-
-      <IObsInput<boolean>>{
-        value: this.mixerHidden,
-        name: 'mixerHidden',
-        description: $t('Hide in Mixer'),
-        showDescription: false,
-        type: 'OBS_PROPERTY_BOOL',
-        visible: true,
-        enabled: true,
-      },
-
-      <IObsInput<boolean>>{
-        value: this.forceMono,
-        name: 'forceMono',
-        description: $t('Downmix to Mono'),
-        showDescription: false,
-        type: 'OBS_PROPERTY_BOOL',
-        visible: true,
-        enabled: true,
-      },
-
-      <IObsInput<number>>{
-        value: this.syncOffset,
-        name: 'syncOffset',
-        description: $t('Sync Offset (ms)'),
-        showDescription: false,
-        type: 'OBS_PROPERTY_INT',
-        visible: true,
-        enabled: true,
-        minVal: -950,
-        maxVal: 20000,
-      },
-
-      <IObsListInput<obs.EMonitoringType>>{
-        value: this.monitoringType,
-        name: 'monitoringType',
-        description: $t('Audio Monitoring'),
-        showDescription: false,
-        type: 'OBS_PROPERTY_LIST',
-        visible: true,
-        enabled: true,
-        options: [
-          { value: obs.EMonitoringType.None, description: $t('Monitor Off') },
-          {
-            value: obs.EMonitoringType.MonitoringOnly,
-            description: $t('Monitor Only (mute output)'),
-          },
-          { value: obs.EMonitoringType.MonitoringAndOutput, description: $t('Monitor and Output') },
-        ],
-      },
-
-      <IObsBitmaskInput>{
-        value: this.audioMixers,
-        name: 'audioMixers',
-        description: $t('Tracks'),
-        showDescription: false,
-        type: 'OBS_PROPERTY_BITMASK',
-        visible: true,
-        enabled: true,
-        size: 6,
-      },
+      { value: obs.EMonitoringType.MonitoringAndOutput, label: $t('Monitor and Output') },
     ];
   }
 
