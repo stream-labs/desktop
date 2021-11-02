@@ -1,10 +1,12 @@
 // Helpers for ineracting with context menus
 
-import { getClient } from '../modules/core';
+import { getClient } from './index';
 
-export async function contextMenuClick(label: string) {
+export async function contextMenuClick(label: string | string[]) {
   // There's probably a simpler way to handle this
-  getClient().execute(
-    `(() => { var _elec = require('electron'); _elec.ipcRenderer.send('__SPECTRON_FAKE_CONTEXT_MENU', '${label}'); })();`,
+  await getClient().execute(
+    `(() => { var _elec = require('electron'); _elec.ipcRenderer.send('__SPECTRON_FAKE_CONTEXT_MENU', ${JSON.stringify(
+      label,
+    )}); })();`,
   );
 }

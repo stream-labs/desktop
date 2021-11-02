@@ -36,7 +36,11 @@ export default class Connect extends TsxComponent<ConnectProps> {
   selectedExtraPlatform: TExtraPlatform | '' = '';
 
   get loading() {
-    return this.userService.state.authProcessState === EAuthProcessState.Busy;
+    return this.userService.state.authProcessState === EAuthProcessState.Loading;
+  }
+
+  get authInProgress() {
+    return this.userService.state.authProcessState === EAuthProcessState.InProgress;
   }
 
   get isRelog() {
@@ -92,7 +96,7 @@ export default class Connect extends TsxComponent<ConnectProps> {
   }
 
   onSkip() {
-    if (this.loading) return;
+    if (this.loading || this.authInProgress) return;
     this.props.continue();
   }
 
@@ -141,7 +145,7 @@ export default class Connect extends TsxComponent<ConnectProps> {
             {platforms.map((platform: TPlatform) => (
               <button
                 class={cx(`button button--${platform}`, styles.loginButton)}
-                disabled={this.loading}
+                disabled={this.loading || this.authInProgress}
                 onClick={() => this.authPlatform(platform)}
               >
                 {this.loading && <i class="fas fa-spinner fa-spin" />}

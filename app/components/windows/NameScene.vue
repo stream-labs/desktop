@@ -16,6 +16,7 @@
     <input
       autofocus
       type="text"
+      style="width: 100%"
       v-model="name"/>
   </form>
 </modal-layout>

@@ -26,7 +26,10 @@ import StudioEditor from './root/StudioEditor';
 import SharedComponentsLibrary from './windows/sharedComponentsLibrary/SharedComponentsLibrary';
 import { ObsSettings } from './windows/settings/ObsSettings';
 import ThemeAudit from './pages/ThemeAudit';
+import { WidgetWindow } from './widgets/common/WidgetWindow';
 import SafeMode from './windows/SafeMode';
+import AdvancedAudio from './windows/advanced-audio';
+import { CustomCodeWindow } from './widgets/common/CustomCode';
 
 // list of React components to be used inside Vue components
 export const components = {
@@ -57,5 +60,8 @@ export const components = {
   ThemeAudit,
   AppsNav,
   StudioEditor,
+  WidgetWindow: createRoot(WidgetWindow),
+  CustomCodeWindow: createRoot(CustomCodeWindow),
   SafeMode,
+  AdvancedAudio,
 };

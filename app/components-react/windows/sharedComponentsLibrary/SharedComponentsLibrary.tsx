@@ -8,6 +8,7 @@ import {
   DateInput,
   ImageInput,
   ListInput,
+  MediaUrlInput,
   NumberInput,
   SliderInput,
   SwitchInput,
@@ -16,7 +17,7 @@ import {
   TextInput,
   TInputLayout,
 } from '../../shared/inputs';
-import { Alert, Button, Col, Row, Space, Tag, Timeline, Tabs } from 'antd';
+import { Alert, Button, Col, Row, Space, Tag, Timeline, Tabs, Menu } from 'antd';
 import { Services } from '../../service-provider';
 import InputWrapper from '../../shared/inputs/InputWrapper';
 import Scrollable from '../../shared/Scrollable';
@@ -29,6 +30,8 @@ import { pick } from 'lodash';
 import { useModule } from '../../hooks/useModule';
 import { merge } from '../../../util/merge';
 import { DemoForm } from './DemoForm';
+import { CodeInput } from '../../shared/inputs/CodeInput';
+
 const { TabPane } = Tabs;
 
 export default function SharedComponentsLibrary() {
@@ -71,6 +74,9 @@ function Examples() {
     numberVal: 0,
     sliderVal: 5,
     imageVal: '',
+    galleryImage: '',
+    galleryAudio: '',
+    javascript: 'alert("Hello World!")',
     checkboxVal: false,
     dateVal: undefined as Date | undefined,
     listVal: 1,
@@ -231,6 +237,14 @@ function Examples() {
         <ImageInput label="Basic" maxFileSize={3000000} {...globalProps} {...bind.imageVal} />
       </Example>
 
+      <Example title="Media Gallery">
+        <MediaUrlInput label="Image" {...globalProps} {...bind.galleryImage} />
+      </Example>
+
+      <Example title="Code Input">
+        <CodeInput label="javascript" lang="js" {...globalProps} {...bind.javascript} />
+      </Example>
+
       <Example title="Buttons">
         <Space direction="vertical">
           <Button type="primary" size={size}>
@@ -281,6 +295,20 @@ function Examples() {
             Link Danger
           </Button>
         </Space>
+      </Example>
+
+      <Example title="Menu">
+        <Menu theme="light">
+          <Menu.Item key="1">Item 1</Menu.Item>
+          <Menu.Item key="2">Item 2</Menu.Item>
+          <Menu.Item key="3">Item 4</Menu.Item>
+        </Menu>
+
+        <Menu theme="dark">
+          <Menu.Item key="1">Item 1</Menu.Item>
+          <Menu.Item key="2">Item 2</Menu.Item>
+          <Menu.Item key="3">Item 4</Menu.Item>
+        </Menu>
       </Example>
 
       <Example title="Modals">
@@ -339,6 +367,7 @@ function Container(p: { title: string; background: string } & HTMLAttributes<unk
     <div>
       {p.background === 'none' && <div>{p.children}</div>}
       {p.background === 'section' && <div className="section">{p.children}</div>}
+      {p.background === 'section-alt' && <div className="section section-alt">{p.children}</div>}
       {p.background === 'error' && (
         <Alert
           type="error"
@@ -387,7 +416,7 @@ function SettingsPanel() {
       />
       <ListInput
         label="Background"
-        options={createOptions(['none', 'section', 'error'])}
+        options={createOptions(['none', 'section', 'section-alt', 'error'])}
         {...bind.background}
       />
       <ListInput
@@ -467,6 +496,6 @@ interface ISharedComponentsState {
   required: boolean;
   disabled: boolean;
   size: 'middle' | 'large' | 'small';
-  background: 'none' | 'section' | 'error';
+  background: 'none' | 'section' | 'section-alt' | 'error';
   locales: string[];
 }

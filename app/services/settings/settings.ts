@@ -7,6 +7,7 @@ import {
   IObsListInput,
   IObsInput,
   TObsValue,
+  IObsBitmaskInput,
 } from 'components/obs/inputs/ObsInput';
 import * as obs from '../../../obs-api';
 import { SourcesService } from 'services/sources';
@@ -21,7 +22,7 @@ import { VideoEncodingOptimizationService } from 'services/video-encoding-optimi
 import { PlatformAppsService } from 'services/platform-apps';
 import { EDeviceType, HardwareService } from 'services/hardware';
 import { StreamingService } from 'services/streaming';
-import { byOS, OS } from 'util/operating-systems';
+import { byOS, getOS, OS } from 'util/operating-systems';
 import path from 'path';
 import fs from 'fs';
 import { UsageStatisticsService } from 'services/usage-statistics';
@@ -52,6 +53,10 @@ export interface ISettingsValues {
     RecRB?: boolean;
     RecRBTime?: number;
     RecFormat: string;
+    RecTracks?: number;
+    TrackIndex?: string;
+    VodTrackEnabled?: boolean;
+    VodTrackIndex?: string;
   };
   Video: {
     Base: string;
@@ -61,6 +66,7 @@ export interface ISettingsValues {
     DelayEnable: boolean;
     DelaySec: number;
     fileCaching: boolean;
+    MonitoringDeviceName: string;
   };
 }
 
@@ -100,6 +106,44 @@ class SettingsViews extends ViewHandler<ISettingsServiceState> {
     }
 
     return settingsValues as ISettingsValues;
+  }
+
+  get isAdvancedOutput() {
+    return this.state.Output.type === 1;
+  }
+
+  get streamTrack() {
+    if (!this.isAdvancedOutput) return 0;
+    return Number(this.values.Output.TrackIndex) - 1;
+  }
+
+  get recordingTracks() {
+    if (!this.isAdvancedOutput) return;
+    const bitArray = Utils.numberToBinnaryArray(this.values.Output.RecTracks, 6).reverse();
+    const trackLabels: number[] = [];
+    bitArray.forEach((bit, i) => {
+      if (bit === 1) trackLabels.push(i);
+    });
+    return trackLabels;
+  }
+
+  get audioTracks() {
+    if (!this.isAdvancedOutput) return [];
+    return Utils.numberToBinnaryArray(this.values.Output.RecTracks, 6).reverse();
+  }
+
+  get vodTrackEnabled() {
+    return this.values.Output.VodTrackEnabled;
+  }
+
+  get vodTrack() {
+    if (!this.vodTrackEnabled) return 0;
+    if (!this.isAdvancedOutput) return 1;
+    return Number(this.values.Output.VodTrackIndex) - 1;
+  }
+
+  get advancedAudioSettings() {
+    return this.state.Advanced.formData.find(data => data.nameSubCategory === 'Audio');
   }
 }
 
@@ -455,6 +499,8 @@ export class SettingsService extends StatefulService<ISettingsServiceState> {
   }
 
   private ensureValidEncoder() {
+    if (getOS() === OS.Mac) return;
+
     const encoderSetting: IObsListInput<string> =
       this.findSetting(this.state.Output.formData, 'Streaming', 'Encoder') ??
       this.findSetting(this.state.Output.formData, 'Streaming', 'StreamEncoder');

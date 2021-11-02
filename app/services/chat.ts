@@ -15,6 +15,7 @@ import { GuestApiHandler } from 'util/guest-api-handler';
 import { ChatHighlightService, IChatHighlightMessage } from './widgets/settings/chat-highlight';
 import { assertIsDefined } from 'util/properties-type-guards';
 import * as remote from '@electron/remote';
+import { SourcesService } from 'app-services';
 
 export function enableBTTVEmotesScript(isDarkTheme: boolean) {
   /*eslint-disable */
@@ -53,10 +54,12 @@ export class ChatService extends Service {
   @Inject() streamingService: StreamingService;
   @Inject() chatHighlightService: ChatHighlightService;
   @Inject() widgetsService: WidgetsService;
+  @Inject() sourcesService: SourcesService;
 
   private chatView: Electron.BrowserView | null;
   private chatUrl = '';
   private electronWindowId: number | null;
+  private exposedHighlightApi = false;
 
   init() {
     this.chatUrl = this.streamingService.views.chatUrl;
@@ -82,10 +85,20 @@ export class ChatService extends Service {
     this.userService.userLogout.subscribe(() => {
       this.deinitChat();
     });
+
+    this.sourcesService.sourceAdded.subscribe(async source => {
+      if (
+        source.propertiesManagerType === 'widget' &&
+        source.propertiesManagerSettings?.widgetType === WidgetType.ChatHighlight
+      ) {
+        this.exposeHighlightApi();
+        this.refreshChat();
+      }
+    });
   }
 
-  refreshChat() {
-    this.loadUrl();
+  async refreshChat() {
+    await this.loadUrl();
   }
 
   hasChatHighlightWidget(): boolean {
@@ -149,6 +162,7 @@ export class ChatService extends Service {
   private deinitChat() {
     // @ts-ignore: typings are incorrect
     this.unmountChat();
+    this.exposedHighlightApi = false;
     this.chatView = null;
   }
 
@@ -234,19 +248,25 @@ export class ChatService extends Service {
     });
   }
 
+  private exposeHighlightApi() {
+    if (!this.chatView) return;
+    if (!this.hasChatHighlightWidget() || this.exposedHighlightApi) return;
+
+    new GuestApiHandler().exposeApi(this.chatView.webContents.id, {
+      pinMessage: (messageData: IChatHighlightMessage) =>
+        this.chatHighlightService.pinMessage(messageData),
+      unpinMessage: () => this.chatHighlightService.unpinMessage(),
+      showUnpinButton: this.chatHighlightService.hasPinnedMessage,
+    });
+
+    this.exposedHighlightApi = true;
+  }
+
   private bindDomReadyListener() {
     if (!this.chatView) return; // chat was already deinitialized
 
     const settings = this.customizationService.state;
-
-    if (this.hasChatHighlightWidget()) {
-      new GuestApiHandler().exposeApi(this.chatView.webContents.id, {
-        pinMessage: (messageData: IChatHighlightMessage) =>
-          this.chatHighlightService.pinMessage(messageData),
-        unpinMessage: () => this.chatHighlightService.unpinMessage(),
-        showUnpinButton: this.chatHighlightService.hasPinnedMessage,
-      });
-    }
+    this.exposeHighlightApi();
 
     this.chatView.webContents.on('dom-ready', () => {
       if (!this.chatView) return; // chat was already deinitialized

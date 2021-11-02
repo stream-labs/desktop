@@ -7,7 +7,12 @@
       className="code-input"
       v-if="value.settings.custom_enabled || selectedVariation.settings.customHtmlEnabled"
     >
-      <code-input @input="save()" :metadata="{ type: metadata.type }" v-model="editorInputValue" />
+      <code-input
+        @input="save()"
+        :metadata="{ type: metadata.type }"
+        v-model="editorInputValue"
+        :key="metadata.type"
+      />
     </scrollable>
   </div>
 </template>
