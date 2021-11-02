@@ -21,6 +21,9 @@ interface IAlertBoxState extends IWidgetState {
   data: {
     settings: {
       alert_delay: 0;
+      interrupt_mode: boolean;
+      interrupt_mode_delay: number;
+      moderation_delay: number;
       bit_variations: any;
     };
     variations: TVariationsState;
@@ -69,6 +72,8 @@ export class AlertBoxModule extends WidgetModule<IAlertBoxState> {
     () => this.settings,
     // define onChange handler
     statePatch => this.updateSettings(statePatch),
+    // pull additional metadata like tooltip, label, min, max, etc...
+    fieldName => this.generalMetadata[fieldName],
   );
 
   /**
@@ -412,10 +417,20 @@ function getGeneralSettingsMetadata() {
       label: $t('Global Alert Delay'),
       max: 30000,
     }),
-    interrupt_mode_delay: {
+    interrupt_mode: metadata.bool({
+      label: $t('Alert Parries'),
+      tooltip: $t('When enabled new alerts will interrupt the on screen alert'),
+    }),
+    interrupt_mode_delay: metadata.seconds({
+      label: $t('Parry Alert Delay'),
       min: 0,
       max: 20000,
-    },
+    }),
+    moderation_delay: metadata.seconds({
+      label: $t('Alert Moderation delay'),
+      min: -1,
+      max: 600000,
+    }),
   };
 }
 

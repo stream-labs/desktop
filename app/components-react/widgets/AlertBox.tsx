@@ -10,6 +10,7 @@ import {
   SliderInput,
   TextInput,
   AudioUrlInput,
+  SwitchInput,
   FontFamilyInput,
   ColorInput,
   FontWeightInput,
@@ -102,6 +103,7 @@ function GeneralSettings() {
       {/*  message={$t('Need to test your alerts with different scenarios?')}*/}
       {/*  onClick={openAdvancedAlertTesting}*/}
       {/*/>*/}
+      <AdvancedSettingsPanel />
     </Form>
   );
 }
@@ -342,5 +344,39 @@ function Info(p: { message: string; onClick: Function }) {
       showIcon
       style={{ marginBottom: '16px' }}
     />
+  );
+}
+
+/**
+ * Advanced panel in the General Settings tab
+ */
+function AdvancedSettingsPanel() {
+  const { bind, updateSettings } = useAlertBox();
+  const isUnlimitedModerationDelay = bind.moderation_delay.value === -1;
+
+  function switchUnlimitedModeration(enabled: boolean) {
+    updateSettings({ moderation_delay: enabled ? -1 : 0 });
+  }
+
+  return (
+    <Collapse bordered={false} style={{ marginBottom: '8px' }}>
+      <Collapse.Panel header={$t('Advanced')} key={1}>
+        <SwitchInput {...bind.interrupt_mode} />
+        {bind.interrupt_mode.value && <SliderInput {...bind.interrupt_mode_delay} debounce={500} />}
+        <InputWrapper label={$t('Alert Moderation delay')}>
+          {!isUnlimitedModerationDelay && (
+            <SliderInput {...bind.moderation_delay} min={0} debounce={500} nowrap />
+          )}
+          <CheckboxInput
+            label={$t('Use unlimited delay')}
+            value={isUnlimitedModerationDelay}
+            onChange={switchUnlimitedModeration}
+            tooltip={$t(
+              'This applies to all alerts. If enabled all alerts need to be approved manually.',
+            )}
+          />
+        </InputWrapper>
+      </Collapse.Panel>
+    </Collapse>
   );
 }
