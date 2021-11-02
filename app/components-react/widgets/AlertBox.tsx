@@ -11,6 +11,10 @@ import {
   TextInput,
   AudioUrlInput,
   SwitchInput,
+  FontFamilyInput,
+  ColorInput,
+  FontWeightInput,
+  FontSizeInput,
 } from '../shared/inputs';
 import { $t } from '../../services/i18n';
 import { Alert, Button, Collapse, Menu, Tooltip } from 'antd';
@@ -25,6 +29,8 @@ import { Services } from '../service-provider';
 import { ButtonGroup } from '../shared/ButtonGroup';
 import { LayoutInput } from './common/LayoutInput';
 import InputWrapper from '../shared/inputs/InputWrapper';
+import { assertIsDefined } from '../../util/properties-type-guards';
+
 /**
  * Root component
  */
@@ -170,14 +176,24 @@ function AlertsList() {
  * Settings for a selected Alert
  */
 function VariationSettings(p: { type: TAlertType }) {
+  let SettingsComponent: JSX.Element;
   switch (p.type) {
     case 'donation':
-      return <DonationSettings />;
+      SettingsComponent = <DonationSettings />;
+      break;
     case 'merch':
-      return <MerchSettings />;
+      SettingsComponent = <MerchSettings />;
+      break;
     default:
-      return <CommonAlertSettings type={p.type} />;
+      SettingsComponent = <CommonAlertSettings type={p.type} />;
+      break;
   }
+
+  return (
+    <>
+      {SettingsComponent} <FontSettingsPanel />
+    </>
+  );
 }
 
 /**
@@ -200,6 +216,32 @@ function CommonAlertSettings(p: { type: TAlertType; hiddenFields?: string[] }) {
       {bindMinAmount && <NumberInput {...bindMinAmount} />}
       <SliderInput {...bind.alert_duration} />
     </div>
+  );
+}
+
+/**
+ * Renders FontSettings panel for a selected variation
+ */
+function FontSettingsPanel() {
+  const { createVariationBinding, selectedAlert, isCustomCodeEnabled } = useAlertBox();
+  assertIsDefined(selectedAlert);
+  const bind = createVariationBinding(selectedAlert, 'default', useForceUpdate());
+
+  // do not show font settings if CustomCode is enabled
+  if (isCustomCodeEnabled) return <></>;
+
+  return (
+    <>
+      <Collapse bordered={false}>
+        <Collapse.Panel header={$t('Font Settings')} key={1}>
+          <FontFamilyInput {...bind.font} />
+          <FontSizeInput {...bind.font_size} />
+          <FontWeightInput {...bind.font_weight} />
+          <ColorInput {...bind.font_color} />
+          <ColorInput {...bind.font_color2} />
+        </Collapse.Panel>
+      </Collapse>
+    </>
   );
 }
 

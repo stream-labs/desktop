@@ -137,7 +137,7 @@ export class AlertBoxModule extends WidgetModule<IAlertBoxState> {
 
     // sanitize general settings
     Object.keys(settings).forEach(key => {
-      settings[key] = this.sanitizeValue(settings[key], this.generalMetadata[key]);
+      settings[key] = this.sanitizeValue(settings[key], key, this.generalMetadata[key]);
     });
 
     return data;
@@ -162,7 +162,11 @@ export class AlertBoxModule extends WidgetModule<IAlertBoxState> {
         const targetKey = key.replace(`${apiKey}_`, '');
 
         // sanitize the variation value
-        value = this.sanitizeValue(value, this.variationsMetadata[alertEvent.type][targetKey]);
+        value = this.sanitizeValue(
+          value,
+          targetKey,
+          this.variationsMetadata[alertEvent.type][targetKey],
+        );
 
         settings[key] = value;
         variationSettings[targetKey] = value;
@@ -202,11 +206,21 @@ export class AlertBoxModule extends WidgetModule<IAlertBoxState> {
       ) {
         newSettings[key] = Math.floor(settings[key] / 1000);
       }
+
+      // stringify font weight
+      if (key.endsWith('font_weight')) {
+        newSettings[key] = String(settings[key]);
+      }
+
+      // stringify font size
+      if (key.endsWith('font_size')) {
+        newSettings[key] = `${settings[key]}px`;
+      }
     });
     return newSettings;
   }
 
-  sanitizeValue(value: any, fieldMetadata: Record<string, any>) {
+  sanitizeValue(value: any, name: string, fieldMetadata: Record<string, any>) {
     if (fieldMetadata) {
       // fix Min and Max values
       if (fieldMetadata.min !== undefined && value < fieldMetadata.min) {
@@ -214,6 +228,16 @@ export class AlertBoxModule extends WidgetModule<IAlertBoxState> {
       }
       if (fieldMetadata.max !== undefined && value > fieldMetadata.max) {
         return fieldMetadata.max;
+      }
+
+      // fix font weight type
+      if (name === 'font_weight') {
+        return Number(value);
+      }
+
+      // get rid of `px` postfix for font_size
+      if (name === 'font_size') {
+        return parseInt(value, 10);
       }
     }
     return value;
@@ -396,6 +420,11 @@ function getVariationsMetadata() {
         'How many seconds after your image/video/audios to show the alert text. This is useful if you want to wait a few seconds for an animation to finish before your alert text appears.',
       ),
     }),
+    font: metadata.text({ label: $t('Font Family') }),
+    font_size: metadata.number({ label: $t('Font Size') }),
+    font_weight: metadata.number({ label: $t('Font Weight') }),
+    font_color: metadata.text({ label: $t('Text Color') }),
+    font_color2: metadata.text({ label: $t('Text Highlight Color') }),
     enabled: metadata.bool({}),
     custom_html_enabled: metadata.bool({}),
     custom_html: metadata.text({}),
