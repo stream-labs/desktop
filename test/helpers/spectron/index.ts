@@ -209,6 +209,10 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
   stopAppFn = async function stopApp(t: TExecutionContext, clearCache = true) {
     try {
       await closeWindow('main');
+
+      // wait for saving the scene-collection
+      if (!clearCache) await sleep(5000);
+
       await app.chromeDriver.stop();
     } catch (e: unknown) {
       fail('Crash on shutdown');
