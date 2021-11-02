@@ -1,6 +1,6 @@
 // Helpers for ineracting with context menus
 
-import { getClient } from './index';
+import { getClient } from '../modules/core';
 
 export async function contextMenuClick(label: string | string[]) {
   // There's probably a simpler way to handle this
