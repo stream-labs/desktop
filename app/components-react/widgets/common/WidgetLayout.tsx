@@ -8,100 +8,127 @@ import { ObsForm } from '../../obs/ObsForm';
 import { $t } from '../../../services/i18n';
 import { CustomCodeSection } from './CustomCode';
 import { CustomFieldsSection } from './CustomFields';
-import { ButtonGroup } from '../../shared/ButtonGroup';
 import { RollbackOutlined } from '@ant-design/icons';
-const { Content, Header, Footer } = Layout;
+import { assertIsDefined } from '../../../util/properties-type-guards';
+const { Content, Header, Sider } = Layout;
+
+type TWidgetLayoutType = 'basic' | 'long-menu';
+type TLayoutChildren = ReactNode | [ReactNode, ReactNode];
+
+const MENU_WIDTH = 270;
+const PREVIEW_HEIGHT = 250;
 
 /**
  * A layout component for all widgets
- * Can display 1 column or 2 columns depending on how many children have been provided to props
+ * If "basic" layout selected then display 1 column or 2 columns depending
+ * on how many children have been provided to props
  */
-export function WidgetLayout(p: { children: ReactNode | [ReactNode, ReactNode] }) {
-  const {
-    previewSourceId,
-    isLoading,
-    selectedTab,
-    config,
-    hasCustomFields,
-    close,
-    canRevert,
-    revertChanges,
-  } = useWidget();
-  let MenuPanel: ReactNode;
-  let ContentPanel: ReactNode;
-
-  // check if MenuPanel is defined
-  if (Array.isArray(p.children)) {
-    [MenuPanel, ContentPanel] = p.children;
-  } else {
-    ContentPanel = p.children;
+export function WidgetLayout(p: { layout?: TWidgetLayoutType; children: TLayoutChildren }) {
+  const layout = p.layout || 'basic';
+  switch (layout) {
+    case 'basic':
+      return <BasicLayout>{p.children}</BasicLayout>;
+    case 'long-menu':
+      return <LongMenuLayout>{p.children}</LongMenuLayout>;
   }
+}
 
-  const form = useForm();
+function BasicLayout(p: { children: TLayoutChildren }) {
+  const { isLoading } = useWidget();
+  const { MenuPanel, ContentPanel } = getLayoutPanels(p.children);
   return (
-    <Layout className={css.widgetLayout} style={{ height: '100%' }}>
-      {/* DISPLAY */}
-      <Header style={{ height: '250px', padding: 0 }}>
-        <Display sourceId={previewSourceId} />
+    <Layout className={css.widgetLayout}>
+      <Header style={{ padding: 0, height: `${PREVIEW_HEIGHT}px` }}>
+        <ModalDisplay />
       </Header>
       <Content>
         <Row style={{ height: '100%', borderTop: '1px solid var(--border)' }}>
-          {/* MENU  */}
-          {MenuPanel && (
-            <Col
-              flex="270px"
-              style={{
-                borderRight: '1px solid var(--border)',
-                backgroundColor: 'var(--section)',
-              }}
-            >
-              {!isLoading && MenuPanel}
-            </Col>
-          )}
-
-          {/* TAB CONTENT  */}
-          <Col
-            flex="auto"
-            style={{ padding: '16px', paddingTop: '32px', height: '100%', overflow: 'auto' }}
-          >
-            <Form form={form} layout="horizontal">
-              <Spin spinning={isLoading}>
-                {!isLoading && (
-                  <>
-                    {/* SETTINGS FORM  */}
-                    {ContentPanel}
-
-                    {/* BROWSER SOURCE SETTINGS  */}
-                    {selectedTab === 'general' && <BrowserSourceSettings />}
-
-                    {/* CUSTOM CODE  */}
-                    {config.customCodeAllowed && <CustomCodeSection />}
-
-                    {/* CUSTOM FIELDS  */}
-                    {hasCustomFields && <CustomFieldsSection />}
-                  </>
-                )}
-              </Spin>
-            </Form>
+          <Col className={css.menuWrapper}>{!isLoading && MenuPanel}</Col>
+          <Col flex="auto" className={css.contentWrapper}>
+            <ModalContent>{ContentPanel}</ModalContent>
           </Col>
         </Row>
       </Content>
-
-      {/* FOOTER BUTTONS  */}
-      <div className="ant-modal-footer">
-        {canRevert && (
-          <Button
-            onClick={revertChanges}
-            type="ghost"
-            style={{ position: 'absolute', left: '16px' }}
-          >
-            <RollbackOutlined />
-            {$t('Revert Changes')}
-          </Button>
-        )}
-        <Button onClick={close}>{$t('Close')}</Button>
-      </div>
+      <ModalFooter />
     </Layout>
+  );
+}
+
+function LongMenuLayout(p: { children: TLayoutChildren }) {
+  const { isLoading } = useWidget();
+  const { MenuPanel, ContentPanel } = getLayoutPanels(p.children);
+  const wrapperStyle = {
+    height: `calc(100% - ${PREVIEW_HEIGHT}px)`,
+    borderTop: '1px solid var(--border)',
+  };
+  assertIsDefined(MenuPanel);
+
+  return (
+    <Layout className={css.widgetLayout}>
+      <Layout>
+        <Sider className={css.menuWrapper} width={MENU_WIDTH}>
+          {!isLoading && MenuPanel}
+        </Sider>
+        <Content>
+          <ModalDisplay />
+          <div className={css.contentWrapper} style={wrapperStyle}>
+            <ModalContent>{ContentPanel}</ModalContent>
+          </div>
+        </Content>
+      </Layout>
+      <ModalFooter />
+    </Layout>
+  );
+}
+
+function ModalContent(p: { children: ReactNode }) {
+  const ContentPanel = p.children;
+  const { isLoading, selectedTab, config, hasCustomFields } = useWidget();
+  const form = useForm();
+  return (
+    <Form form={form} layout="horizontal">
+      <Spin spinning={isLoading}>
+        {!isLoading && (
+          <>
+            {/* SETTINGS FORM  */}
+            {ContentPanel}
+
+            {/* BROWSER SOURCE SETTINGS  */}
+            {selectedTab === 'general' && <BrowserSourceSettings />}
+
+            {/* CUSTOM CODE  */}
+            {config.customCodeAllowed && <CustomCodeSection />}
+
+            {/* CUSTOM FIELDS  */}
+            {hasCustomFields && <CustomFieldsSection />}
+          </>
+        )}
+      </Spin>
+    </Form>
+  );
+}
+
+function ModalFooter() {
+  const { canRevert, revertChanges, close } = useWidget();
+  return (
+    <div className="ant-modal-footer">
+      {canRevert && (
+        <Button onClick={revertChanges} type="ghost" style={{ position: 'absolute', left: '16px' }}>
+          <RollbackOutlined />
+          {$t('Revert Changes')}
+        </Button>
+      )}
+      <Button onClick={close}>{$t('Close')}</Button>
+    </div>
+  );
+}
+
+function ModalDisplay() {
+  const { previewSourceId, isLoading } = useWidget();
+  return (
+    <div style={{ height: `${PREVIEW_HEIGHT}px`, backgroundColor: 'var(--section)' }}>
+      {!isLoading && <Display sourceId={previewSourceId} />}
+    </div>
   );
 }
 
@@ -123,4 +150,17 @@ function BrowserSourceSettings() {
       </Collapse>
     </>
   );
+}
+
+function getLayoutPanels(layoutChildren: TLayoutChildren) {
+  let MenuPanel: ReactNode | null;
+  let ContentPanel: ReactNode;
+
+  // check if MenuPanel is defined
+  if (Array.isArray(layoutChildren)) {
+    [MenuPanel, ContentPanel] = layoutChildren;
+  } else {
+    [MenuPanel, ContentPanel] = [null, layoutChildren];
+  }
+  return { MenuPanel, ContentPanel };
 }

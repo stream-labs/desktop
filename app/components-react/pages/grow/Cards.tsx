@@ -99,7 +99,7 @@ export function UniversityCard(p: { progress: IUniversityProgress }) {
         <span>{content}</span>
         <Button onClick={openLink}>{buttonText}</Button>
       </div>
-      <img src={imageUrl} />
+      <img style={{ borderRadius: '8px' }} src={imageUrl} />
     </div>
   );
 }

@@ -15,14 +15,23 @@ import { $t } from '../../services/i18n';
 import * as electron from 'electron';
 import { getDefined } from '../../util/properties-type-guards';
 import { TPlatform } from '../../services/platforms';
+import { IListOption } from '../shared/inputs/ListInput';
 
 interface IAlertBoxState extends IWidgetState {
   data: {
     settings: {
       alert_delay: 0;
+      interrupt_mode: boolean;
+      interrupt_mode_delay: number;
+      moderation_delay: number;
       bit_variations: any;
     };
     variations: TVariationsState;
+    animationOptions: {
+      show: IListOption<string>[];
+      hide: IListOption<string>[];
+      text: IListOption<string>[];
+    };
   };
   availableAlerts: TAlertType[];
 }
@@ -63,6 +72,8 @@ export class AlertBoxModule extends WidgetModule<IAlertBoxState> {
     () => this.settings,
     // define onChange handler
     statePatch => this.updateSettings(statePatch),
+    // pull additional metadata like tooltip, label, min, max, etc...
+    fieldName => this.generalMetadata[fieldName],
   );
 
   /**
@@ -107,6 +118,21 @@ export class AlertBoxModule extends WidgetModule<IAlertBoxState> {
   }
 
   /**
+   * available animations
+   */
+  get animationOptions() {
+    return this.state.data.animationOptions;
+  }
+
+  /**
+   * Returns a layout for the AlertBox
+   */
+  get layout() {
+    // more linked platforms require more space for the widget menu
+    return Services.StreamingService.views.linkedPlatforms.length < 3 ? 'basic' : 'long-menu';
+  }
+
+  /**
    * Switch UI to a legacy alertbox
    */
   public switchToLegacyAlertbox() {
@@ -124,7 +150,32 @@ export class AlertBoxModule extends WidgetModule<IAlertBoxState> {
 
     // sanitize general settings
     Object.keys(settings).forEach(key => {
-      settings[key] = this.sanitizeValue(settings[key], this.generalMetadata[key]);
+      settings[key] = this.sanitizeValue(settings[key], key, this.generalMetadata[key]);
+    });
+
+    // create animations
+    data.animationOptions = {};
+
+    // create show-animation options
+    data.animationOptions.show = [] as IListOption<string>[];
+    Object.keys(data.show_animations).forEach(groupName => {
+      Object.keys(data.show_animations[groupName]).forEach(value => {
+        data.animationOptions.show.push({ value, label: data.show_animations[groupName][value] });
+      });
+    });
+
+    // create hide-animation options
+    data.animationOptions.hide = [] as IListOption<string>[];
+    Object.keys(data.hide_animations).forEach(groupName => {
+      Object.keys(data.hide_animations[groupName]).forEach(value => {
+        data.animationOptions.hide.push({ value, label: data.hide_animations[groupName][value] });
+      });
+    });
+
+    // create text-animation options
+    data.animationOptions.text = [] as IListOption<string>[];
+    Object.keys(data.text_animations).forEach(value => {
+      data.animationOptions.text.push({ value, label: data.text_animations[value] });
     });
 
     return data;
@@ -149,7 +200,11 @@ export class AlertBoxModule extends WidgetModule<IAlertBoxState> {
         const targetKey = key.replace(`${apiKey}_`, '');
 
         // sanitize the variation value
-        value = this.sanitizeValue(value, this.variationsMetadata[alertEvent.type][targetKey]);
+        value = this.sanitizeValue(
+          value,
+          targetKey,
+          this.variationsMetadata[alertEvent.type][targetKey],
+        );
 
         settings[key] = value;
         variationSettings[targetKey] = value;
@@ -189,11 +244,21 @@ export class AlertBoxModule extends WidgetModule<IAlertBoxState> {
       ) {
         newSettings[key] = Math.floor(settings[key] / 1000);
       }
+
+      // stringify font weight
+      if (key.endsWith('font_weight')) {
+        newSettings[key] = String(settings[key]);
+      }
+
+      // stringify font size
+      if (key.endsWith('font_size')) {
+        newSettings[key] = `${settings[key]}px`;
+      }
     });
     return newSettings;
   }
 
-  sanitizeValue(value: any, fieldMetadata: Record<string, any>) {
+  sanitizeValue(value: any, name: string, fieldMetadata: Record<string, any>) {
     if (fieldMetadata) {
       // fix Min and Max values
       if (fieldMetadata.min !== undefined && value < fieldMetadata.min) {
@@ -201,6 +266,16 @@ export class AlertBoxModule extends WidgetModule<IAlertBoxState> {
       }
       if (fieldMetadata.max !== undefined && value > fieldMetadata.max) {
         return fieldMetadata.max;
+      }
+
+      // fix font weight type
+      if (name === 'font_weight') {
+        return Number(value);
+      }
+
+      // get rid of `px` postfix for font_size
+      if (name === 'font_size') {
+        return parseInt(value, 10);
       }
     }
     return value;
@@ -342,10 +417,20 @@ function getGeneralSettingsMetadata() {
       label: $t('Global Alert Delay'),
       max: 30000,
     }),
-    interrupt_mode_delay: {
+    interrupt_mode: metadata.bool({
+      label: $t('Alert Parries'),
+      tooltip: $t('When enabled new alerts will interrupt the on screen alert'),
+    }),
+    interrupt_mode_delay: metadata.seconds({
+      label: $t('Parry Alert Delay'),
       min: 0,
       max: 20000,
-    },
+    }),
+    moderation_delay: metadata.seconds({
+      label: $t('Alert Moderation delay'),
+      min: -1,
+      max: 600000,
+    }),
   };
 }
 
@@ -373,6 +458,14 @@ function getVariationsMetadata() {
         'How many seconds after your image/video/audios to show the alert text. This is useful if you want to wait a few seconds for an animation to finish before your alert text appears.',
       ),
     }),
+    font: metadata.text({ label: $t('Font Family') }),
+    font_size: metadata.number({ label: $t('Font Size') }),
+    font_weight: metadata.number({ label: $t('Font Weight') }),
+    font_color: metadata.text({ label: $t('Text Color') }),
+    font_color2: metadata.text({ label: $t('Text Highlight Color') }),
+    show_animation: metadata.text({ label: $t('Show Animation') }),
+    hide_animation: metadata.text({ label: $t('Hide Animation') }),
+    text_animation: metadata.text({ label: $t('Text Animation') }),
     enabled: metadata.bool({}),
     custom_html_enabled: metadata.bool({}),
     custom_html: metadata.text({}),
@@ -399,10 +492,23 @@ function getVariationsMetadata() {
     twSubscription: {},
     twCheer: {
       message_template: getMessageTemplateMetadata('twCheer'),
+      alert_message_min_amount: metadata.number({
+        label: $t('Min. Amount to Trigger Alert'),
+        min: 0,
+      }),
     },
-    ytSuperchat: {},
+    ytSuperchat: {
+      alert_message_min_amount: metadata.number({
+        label: $t('Min. Amount to Trigger Alert'),
+        min: 0,
+      }),
+    },
     fbStars: {
       message_template: getMessageTemplateMetadata('fbStars'),
+      alert_message_min_amount: metadata.number({
+        label: $t('Min. Amount to Trigger Alert'),
+        min: 0,
+      }),
     },
     fbSupport: {
       message_template: getMessageTemplateMetadata('fbSupport'),
