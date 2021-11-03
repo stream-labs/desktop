@@ -5594,6 +5594,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"electron-chromedriver@npm:^14.0.0":
+  version: 14.0.0
+  resolution: "electron-chromedriver@npm:14.0.0"
+  dependencies:
+    "@electron/get": ^1.12.4
+    extract-zip: ^2.0.0
+  bin:
+    chromedriver: chromedriver.js
+  checksum: 3a29b6e3b359ffc12f1b580516631df584a5367c1231843a331009ce40f0a5ef98f897f8b74bdb9899494be89262b63b7a4205ccc2ea0d1424004ec975349046
+  languageName: node
+  linkType: hard
+
 "electron-devtools-installer@npm:3.1.1":
   version: 3.1.1
   resolution: "electron-devtools-installer@npm:3.1.1"
@@ -13170,6 +13182,7 @@ __metadata:
     dotenv: 8.2.0
     electron: 14.1.0
     electron-builder: 22.7.0
+    electron-chromedriver: ^14.0.0
     electron-devtools-installer: 3.1.1
     electron-notarize: ^1.0.0
     electron-react-devtools: ^0.5.3
