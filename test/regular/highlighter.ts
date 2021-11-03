@@ -29,6 +29,6 @@ test('Highlighter save and export', async t => {
   await fillForm({ exportLocation });
   const $exportBtn = await (await select('.ant-modal-content')).$('span=Export');
   await click($exportBtn);
-  await waitForDisplayed('h2=Upload to YouTube', { timeout: 20000 });
+  await waitForDisplayed('h2=Upload to YouTube', { timeout: 60000 });
   t.true(fs.existsSync(exportLocation), 'The video file should exist');
 });
