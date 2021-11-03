@@ -19,6 +19,7 @@ import { $t } from 'services/i18n';
 import { SettingsService } from 'services/settings';
 import { UsageStatisticsService } from 'services/usage-statistics';
 import { NavigationService } from '../services/navigation';
+import electron from 'electron';
 
 @Component({
   components: {
@@ -45,7 +46,6 @@ export default class StudioFooterComponent extends Vue {
   metricsShown = false;
   recordingTime = '';
   private recordingTimeIntervalId: number;
-  flexTvHpToken = '';
 
   mounted() {
     this.confirmYoutubeEnabled();
@@ -55,18 +55,6 @@ export default class StudioFooterComponent extends Vue {
       if (!this.streamingService.isRecording) return;
       this.recordingTime = this.streamingService.formattedDurationInCurrentRecordingState;
     }, 1000);
-
-    if (this.userService.isLoggedIn) {
-      this.flexTvService
-        .fetchHelperToken()
-        .then(token => {
-          console.log(token);
-          this.flexTvHpToken = token;
-        })
-        .catch((e: unknown) => {
-          console.log(e);
-        });
-    }
   }
 
   destroyed() {
@@ -181,6 +169,24 @@ export default class StudioFooterComponent extends Vue {
     } else {
       this.streamingService.stopReplayBuffer();
     }
+  }
+
+  openFlexTvHelperWindow() {
+    this.flexTvService
+      .fetchHelperToken()
+      .then(token => {
+        const url = `https://api.stage.flexhp.kro.kr/member/getlogin?branch=flex&authdata=${encodeURIComponent(
+          token,
+        )}`;
+        electron.remote.shell.openExternal(url);
+      })
+      .catch((e: unknown) => {
+        electron.remote.dialog.showMessageBox({
+          title: '도우미 관리 열기 실패',
+          type: 'warning',
+          message: '일시적인 문제가 발생하였습니다.',
+        });
+      });
   }
 
   openLoginWindow() {

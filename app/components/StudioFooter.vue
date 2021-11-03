@@ -34,11 +34,9 @@
         </button>
       </div>
       <div class="nav-item" v-if="loggedIn">
-        <form target="_blank" enctype="application/x-www-form-urlencoded" action="https://api.stage.flexhp.kro.kr/member/exlogin" method="POST">
-          <input name="branch" type="hidden" value="flex" />
-          <input name="authdata" type="hidden" v-model="flexTvHpToken" />
-          <button class="ui button" type="submit">도우미 관리</button>
-        </form>
+        <button class="ui button" @click="openFlexTvHelperWindow">
+          도우미 관리
+        </button>
       </div>
       <div class="nav-item" v-if="loggedIn">
         <start-streaming-button :disabled="locked" />
