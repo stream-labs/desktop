@@ -60,7 +60,7 @@ export class MagicLinkService extends Service {
   async openDonationSettings() {
     try {
       const link = await this.getDashboardMagicLink('settings/donation-settings');
-      electron.remote.shell.openExternal(link);
+      remote.shell.openExternal(link);
       this.usageStatisticsService.recordFeatureUsage('openDonationSettings');
     } catch (e: unknown) {
       console.error('Error generating dashboard magic link', e);
@@ -70,7 +70,7 @@ export class MagicLinkService extends Service {
   async openAdvancedAlertTesting() {
     try {
       const link = await this.getDashboardMagicLink('advancedtesting');
-      electron.remote.shell.openExternal(link);
+      remote.shell.openExternal(link);
       this.usageStatisticsService.recordFeatureUsage('openAdvancedAlertTesting');
     } catch (e: unknown) {
       console.error('Error generating dashboard magic link', e);
