@@ -171,7 +171,7 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
     // switch all new users to the new alertbox by default
     if (this.state.legacyAlertbox === null) {
       const registrationDate = this.userService.state.createdAt;
-      const legacyAlertbox = registrationDate < new Date('October 14, 2021').valueOf();
+      const legacyAlertbox = registrationDate < new Date('October 26, 2021').valueOf();
       this.setSettings({ legacyAlertbox });
     }
   }

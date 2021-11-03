@@ -1,4 +1,4 @@
-@import '../../styles/index';
+@import '../../../styles/index';
 
 .audio-settings-row {
   display: flex;
@@ -42,5 +42,13 @@
     overflow: visible;
     flex-grow: 1 !important;
     max-width: 100% !important;
+  }
+}
+
+.global-audio-tracks {
+  display: flex;
+
+  :global(.input-wrapper) {
+    width: auto;
   }
 }

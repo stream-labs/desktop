@@ -41,7 +41,8 @@ import { JsonrpcService } from 'services/api/jsonrpc';
 
 export enum EAuthProcessState {
   Idle = 'idle',
-  Busy = 'busy',
+  Loading = 'loading',
+  InProgress = 'progress',
 }
 
 // Eventually we will support authing multiple platforms at once
@@ -774,22 +775,27 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
       throw new Error('Account merging can only be performed while logged in');
     }
 
-    this.SET_AUTH_STATE(EAuthProcessState.Busy);
-    const onWindowShow = () => this.SET_AUTH_STATE(EAuthProcessState.Idle);
+    this.SET_AUTH_STATE(EAuthProcessState.Loading);
+    const onWindowShow = () =>
+      this.SET_AUTH_STATE(
+        mode === 'internal' ? EAuthProcessState.InProgress : EAuthProcessState.Idle,
+      );
+    const onWindowClose = () => this.SET_AUTH_STATE(EAuthProcessState.Idle);
 
     const auth =
       mode === 'internal'
-        ? /* eslint-disable */
-          await this.authModule.startInternalAuth(
-            authUrl,
-            service.authWindowOptions,
-            onWindowShow,
-            merge,
-          )
+        /* eslint-disable */
+        ? await this.authModule.startInternalAuth(
+          authUrl,
+          service.authWindowOptions,
+          onWindowShow,
+          onWindowClose,
+          merge,
+        )
         : await this.authModule.startExternalAuth(authUrl, onWindowShow, merge);
     /* eslint-enable */
 
-    this.SET_AUTH_STATE(EAuthProcessState.Busy);
+    this.SET_AUTH_STATE(EAuthProcessState.Loading);
     this.SET_IS_RELOG(false);
 
     let result: EPlatformCallResult;

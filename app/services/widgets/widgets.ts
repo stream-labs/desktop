@@ -21,8 +21,9 @@ import { Throttle } from 'lodash-decorators';
 import { EditorCommandsService } from 'services/editor-commands';
 import { TWindowComponentName } from '../windows';
 import { THttpMethod } from './settings/widget-settings';
-import { getEventsConfig, getWidgetsConfig, TAlertType } from './widget-config';
 import { TPlatform } from '../platforms';
+import { getAlertsConfig, TAlertType } from './alerts-config';
+import { getWidgetsConfig } from './widgets-config';
 
 export interface IWidgetSourcesState {
   widgetSources: Dictionary<IWidgetSource>;
@@ -167,7 +168,7 @@ export class WidgetsService
 
   @Throttle(1000)
   playAlert(alertType: TAlertType) {
-    const config = this.eventsConfig[alertType];
+    const config = this.alertsConfig[alertType];
     const headers = authorizedHeaders(this.userService.apiToken);
     fetch(new Request(config.url(), { headers }));
   }
@@ -229,6 +230,8 @@ export class WidgetsService
    * returns -1 if it's no type detected
    */
   getWidgetTypeByUrl(url: string): WidgetType {
+    if (!this.userService.views.isLoggedIn) return -1;
+
     const type = Number(
       Object.keys(WidgetDefinitions).find(WidgetType => {
         let regExpStr = WidgetDefinitions[WidgetType].url(this.hostsService.streamlabs, '')
@@ -348,9 +351,9 @@ export class WidgetsService
     return getWidgetsConfig(this.hostsService.streamlabs, this.userService.widgetToken);
   }
 
-  get eventsConfig() {
+  get alertsConfig() {
     const platforms = Object.keys(this.userService.views.platforms || []) as TPlatform[];
-    return getEventsConfig(this.hostsService.streamlabs, platforms);
+    return getAlertsConfig(this.hostsService.streamlabs, platforms);
   }
 
   // make a request to widgets API

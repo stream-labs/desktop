@@ -34,6 +34,11 @@ export async function rightClickSource(name: string) {
   await (await select(`.item-title=${name}`)).click({ button: 'right' });
 }
 
+export async function openSourceProperties(name: string) {
+  await selectSource(name);
+  await clickSourceProperties();
+}
+
 export async function addSource(
   type: string,
   name: string,

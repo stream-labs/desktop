@@ -6,7 +6,7 @@ import { Services } from '../../service-provider';
 import { $t } from '../../../services/i18n';
 import Form from '../../shared/inputs/Form';
 import { NumberInput, TextInput, RadioInput, CheckboxInput, ListInput } from '../../shared/inputs';
-import { useGoLiveSettings } from '../go-live/useGoLiveSettings';
+import { useGoLiveSettingsRoot } from '../go-live/useGoLiveSettings';
 
 export default function FlexTvGoLiveWindow() {
   const { StreamingService, WindowsService } = Services;
@@ -20,7 +20,7 @@ export default function FlexTvGoLiveWindow() {
     prepopulate,
     updateSettings,
     form,
-  } = useGoLiveSettings({ isUpdateMode: true }).select();
+  } = useGoLiveSettingsRoot({ isUpdateMode: true }).select();
 
   const [title, setTitle] = useState('');
   const [theme, setTheme] = useState('5');
