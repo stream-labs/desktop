@@ -1,5 +1,5 @@
 import * as inputControllers from './inputs';
-import { BaseInputController } from './base';
+import { BaseInputController, TFiledSetterFn } from './base';
 import { pascalize } from 'humps';
 import { difference, keyBy, isEqual, mapValues } from 'lodash';
 import { getClient, waitForDisplayed } from '../core';
@@ -32,7 +32,7 @@ export function useForm(name?: string) {
    * Returns an array of input values in the order as they appear in the form
    */
   async function readForm(): Promise<
-    { name: string; value: any; displayValue: boolean | string | string[] }[]
+    { name: string; value: any; displayValue: boolean | number | string | string[] }[]
   > {
     return traverseForm(async input => ({
       name: input.name,
@@ -60,7 +60,14 @@ export function useForm(name?: string) {
       if (!(name in formData)) return;
       const value = formData[name];
       try {
-        await input.setDisplayValue(formData[name]);
+        if (typeof formData[name] === 'function') {
+          // if function provided as a value then call it as a FieldSetter function
+          const fieldSetter = formData[name] as TFiledSetterFn<any>;
+          await fieldSetter(input);
+        } else {
+          // otherwise set the given value
+          await input.setDisplayValue(formData[name]);
+        }
       } catch (e: unknown) {
         console.log(
           `Input element found but failed to set the value "${value}" for the field "${name}"`,
@@ -137,6 +144,12 @@ export function useForm(name?: string) {
     return controllers;
   }
 
+  async function getInput<T extends BaseInputController<unknown>>(name: string) {
+    const inputs = await getInputControllers();
+    const input = inputs.find(input => input.name === name) as T;
+    return input;
+  }
+
   /**
    * Check if form contains expected data
    * Throws an exception if not
@@ -172,7 +185,7 @@ export function useForm(name?: string) {
     return String(value);
   }
 
-  return { readForm, fillForm, assertFormContains };
+  return { readForm, fillForm, assertFormContains, getInput };
 }
 
 /**

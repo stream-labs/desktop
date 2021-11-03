@@ -37,6 +37,13 @@ export class HardwareService extends StatefulService<IHardwareServiceState> {
 
   init() {
     this.refreshDevices();
+
+    this.usageStatisticsService.recordAnalyticsEvent('Hardware', {
+      webcams: this.state.dshowDevices.map(d => d.description),
+      microphones: this.state.devices
+        .filter(d => d.type === 'audioInput' && d.id !== 'default')
+        .map(d => d.description),
+    });
   }
 
   getDevices() {

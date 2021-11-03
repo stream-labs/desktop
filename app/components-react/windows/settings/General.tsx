@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { ObsGenericSettingsForm, ObsSettingsSection } from './ObsSettings';
 import { $t, I18nService } from '../../../services/i18n';
 import { alertAsync, confirmAsync } from '../../modals';
@@ -104,12 +104,14 @@ function CacheSettings() {
           {cacheUploading && <i className="fa fa-spinner fa-spin" />}
         </a>
       </div>
-      <CheckboxInput
-        name="enable_dump_upload"
-        label={$t('Enable reporting additional information on a crash (requires restart)')}
-        value={enableCU}
-        onChange={setEnableCrashDumpUpload}
-      />
+      {process.platform === 'win32' && (
+        <CheckboxInput
+          name="enable_dump_upload"
+          label={$t('Enable reporting additional information on a crash (requires restart)')}
+          value={enableCU}
+          onChange={setEnableCrashDumpUpload}
+        />
+      )}
     </ObsSettingsSection>
   );
 }
@@ -147,6 +149,7 @@ function ExtraSettings() {
   const isLoggedIn = UserService.isLoggedIn;
   const isTwitch = isLoggedIn && getDefined(UserService.platform).type === 'twitch';
   const isFacebook = isLoggedIn && getDefined(UserService.platform).type === 'facebook';
+  const isYoutube = isLoggedIn && getDefined(UserService.platform).type === 'youtube';
   const isRecordingOrStreaming = StreamingService.isStreaming || StreamingService.isRecording;
   const protectedMode = StreamSettingsService.state.protectedModeEnabled;
   const canRunOptimizer = isTwitch && !isRecordingOrStreaming && protectedMode;
@@ -176,6 +179,21 @@ function ExtraSettings() {
     WindowsService.actions.closeChildWindow();
   }
 
+  function disableHardwareAcceleration(val: boolean) {
+    try {
+      if (val) {
+        // Touch the file
+        fs.closeSync(fs.openSync(disableHAFilePath, 'w'));
+        setDisableHA(true);
+      } else {
+        fs.unlinkSync(disableHAFilePath);
+        setDisableHA(false);
+      }
+    } catch (e: unknown) {
+      console.error('Error setting hardware acceleration', e);
+    }
+  }
+
   const bind = useBinding({
     get streamInfoUpdate() {
       return CustomizationService.state.updateStreamInfoOnLive;
@@ -183,31 +201,12 @@ function ExtraSettings() {
     set streamInfoUpdate(value) {
       CustomizationService.setUpdateStreamInfoOnLive(value);
     },
-
-    get disableHardwareAcceleration() {
-      return disableHA;
-    },
-
-    set disableHardwareAcceleration(val: boolean) {
-      try {
-        if (val) {
-          // Touch the file
-          fs.closeSync(fs.openSync(disableHAFilePath, 'w'));
-          setDisableHA(true);
-        } else {
-          fs.unlinkSync(disableHAFilePath);
-          setDisableHA(false);
-        }
-      } catch (e: unknown) {
-        console.error('Error setting hardware acceleration', e);
-      }
-    },
   });
 
   return (
     <>
       <ObsSettingsSection>
-        {isLoggedIn && !isFacebook && (
+        {isLoggedIn && !isFacebook && !isYoutube && (
           <CheckboxInput
             {...bind.streamInfoUpdate}
             label={$t('Confirm stream title and game before going live')}
@@ -216,7 +215,8 @@ function ExtraSettings() {
         )}
         <CheckboxInput
           label={$t('Disable hardware acceleration (requires restart)')}
-          {...bind.disableHardwareAcceleration}
+          value={disableHA}
+          onChange={disableHardwareAcceleration}
           name="disable_ha"
         />
 

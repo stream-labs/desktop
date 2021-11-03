@@ -32,6 +32,37 @@ export const API_NAME_MAP = {
   loyalty_store_redemption: 'loyaltystore',
 };
 
+export const alertNameMap = () => ({
+  bits: $t('Bits'),
+  donations: $t('Donations'),
+  donordrive: $t('Charity Streaming Donations'),
+  patreon: $t('Patreon Pledges'),
+  extraLife: $t('Extra Life Donations'),
+  justGiving: $t('JustGiving Donations'),
+  merch: $t('Merch'),
+  resubs: $t('Resubs'),
+  gamewisp: $t('Gamewisp Subscriptions'),
+  subs: $t('Subscriptions'),
+  tiltify: $t('Tiltify Donations'),
+  treat: $t('TreatStream'),
+  follows: $t('Follows'),
+  hosts: $t('Hosts'),
+  raids: $t('Raids'),
+  superhearts: $t('Super Hearts'),
+  fanfunding: $t('Super Chat'),
+  sponsors: $t('Members'),
+  subscribers: $t('Subscribers'), // YouTube
+  stars: $t('Stars'),
+  support: $t('Support'),
+  giftSupport: $t('Gifted Support'),
+  likes: $t('Likes'),
+  shares: $t('Shares'),
+  fbfollows: $t('Follows'),
+  loyaltystore: $t('Cloudbot Store'),
+  stickers: $t('Stickers'),
+  effects: $t('Effects/Rallies'),
+});
+
 // different tests are required due to api idiosyncracies
 const determineTester = (key: string) => {
   switch (key) {
@@ -55,6 +86,7 @@ export const conditions = () => ({
     { value: 'MIN_DONATION_AMOUNT', title: $t('Donation amount is at least <amount>') },
     { value: 'EXACT_DONATION_AMOUNT', title: $t('Donation amount is exactly <amount>') },
     { value: 'LARGEST_OF_STREAM', title: $t('Donation is the largest this stream') },
+    { value: 'RECURRING_DONATION', title: $t('Donation is recurring') },
   ],
   subs: [
     { value: 'MIN_MONTHS_SUBSCRIBED', title: $t('Months subscribed is at least <months>') },
@@ -151,6 +183,7 @@ export const conditionData = () => ({
   LARGEST_OF_STREAM: {},
   MERCH_PRODUCT: {},
   MERCH_PREORDER: {},
+  RECURRING_DONATION: {},
   LOYALTY_STORE_REDEMPTION_ITEM_TYPE: metadata.list({
     title: $t('Item Type'),
     options: [

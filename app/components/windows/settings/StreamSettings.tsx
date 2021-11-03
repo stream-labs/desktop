@@ -22,7 +22,7 @@ import { formMetadata, metadata } from 'components/shared/inputs';
 import VFormGroup from '../../shared/inputs/VFormGroup.vue';
 import cloneDeep from 'lodash/cloneDeep';
 import namingHelpers from '../../../util/NamingHelpers';
-import { PlatformLogo } from '../../shared/ReactComponent';
+import { PlatformLogo } from '../../shared/ReactComponentList';
 import { MagicLinkService } from 'services/magic-link';
 
 @Component({ components: { GenericFormGroups, PlatformLogo, BrowserView } })
@@ -46,9 +46,9 @@ export default class StreamSettings extends TsxComponent {
     enabled: false,
   };
   private customDestMetadata = formMetadata({
-    name: metadata.text({ title: $t('Name'), required: true }),
-    url: metadata.text({ title: 'URL', required: true }),
-    streamKey: metadata.text({ title: $t('Stream Key'), masked: true }),
+    name: metadata.text({ title: $t('Name'), required: true, fullWidth: true }),
+    url: metadata.text({ title: 'URL', required: true, fullWidth: true }),
+    streamKey: metadata.text({ title: $t('Stream Key'), masked: true, fullWidth: true }),
   });
 
   private editCustomDestMode: boolean | number = false;

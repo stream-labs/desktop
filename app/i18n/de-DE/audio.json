@@ -13,6 +13,6 @@
   "Sync Offset ( ms )": "Sync-Offset (ms)",
   "Mixer": "Mixer",
   "Monitor audio levels. If the bars are moving you are outputting audio.": "Audio-Pegel überwachen. Wenn sich die Balken bewegen, wird Audio ausgegeben.",
-  "Muted": "Muted",
-  "Hide in Mixer": "Hide in Mixer"
+  "Muted": "Stummgeschaltet",
+  "Hide in Mixer": "Im Mixer ausblenden"
 }

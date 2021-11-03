@@ -72,6 +72,8 @@ app.commandLine.appendSwitch(
   'streamlabs.com,youtube.com,twitch.tv,facebook.com,mixer.com',
 );
 
+process.env.IPC_UUID = `slobs-${uuid()}`;
+
 // Remove this when all backend module are on NAPI
 app.allowRendererProcessReuse = false;
 
@@ -267,8 +269,17 @@ async function startApp() {
     process.env.SLOBS_VERSION,
     isDevMode.toString(),
     crashHandlerLogPath,
+    process.env.IPC_UUID,
   );
   crashHandler.registerProcess(pid, false);
+
+  ipcMain.on('register-in-crash-handler', (event, arg) => {
+    crashHandler.registerProcess(arg.pid, arg.critical);
+  });
+
+  ipcMain.on('unregister-in-crash-handler', (event, arg) => {
+    crashHandler.unregisterProcess(arg.pid);
+  });
 
   const Raven = require('raven');
 
@@ -304,7 +315,7 @@ async function startApp() {
 
   workerWindow = new BrowserWindow({
     show: false,
-    webPreferences: { nodeIntegration: true, enableRemoteModule: true },
+    webPreferences: { nodeIntegration: true, enableRemoteModule: true, contextIsolation: false },
   });
 
   // setTimeout(() => {
@@ -340,6 +351,7 @@ async function startApp() {
       nodeIntegration: true,
       webviewTag: true,
       enableRemoteModule: true,
+      contextIsolation: false,
     },
   });
 
@@ -412,6 +424,7 @@ async function startApp() {
       nodeIntegration: true,
       enableRemoteModule: true,
       backgroundThrottling: false,
+      contextIsolation: false,
     },
   });
 

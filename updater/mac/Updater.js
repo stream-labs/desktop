@@ -84,7 +84,7 @@ class Updater {
       frame: false,
       resizable: false,
       show: false,
-      webPreferences: { nodeIntegration: true },
+      webPreferences: { nodeIntegration: true, enableRemoteModule: true, contextIsolation: false },
     });
 
     browserWindow.on('ready-to-show', () => {

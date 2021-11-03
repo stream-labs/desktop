@@ -93,6 +93,14 @@ export const GROWTH_TIPS = () => [
     description:
       'Clear, easy to follow chat rules for your community can help establish a good rapport with your regulars and prevent internet negativity from leaking into your stream.',
   },
+  {
+    title: 'Get Sick Merch',
+    icon: 'icon-cart',
+    link: encodeURIComponent('merchadmin'),
+    cta: 'Set Up a Merch Store Now',
+    description:
+      'Design and sell branded merch. We handle printing, shipping, alerts, and customer service.',
+  },
 ];
 
 export const GOAL_OPTIONS = () => [

@@ -186,7 +186,7 @@ test('Adding and removing a Invert Polarity filter', async t => {
   const sourceName = 'Audio Input Capture';
   const filterName = 'Invert Polarity';
 
-  await addSource('Audio Input Capture', sourceName);
+  await addSource('Audio Input Capture', sourceName, true, true);
   await addFilter(sourceName, filterName, filterName);
   await openFiltersWindow(sourceName);
   await focusChild();
@@ -201,7 +201,7 @@ test('Adding and removing a Gain filter', async t => {
   const sourceName = 'Audio Input Capture 1';
   const filterName = 'Gain';
 
-  await addSource('Audio Input Capture', sourceName);
+  await addSource('Audio Input Capture', sourceName, true, true);
   await addFilter(sourceName, filterName, filterName);
   await openFiltersWindow(sourceName);
   await focusChild();
@@ -216,7 +216,7 @@ test('Adding and removing a Noise Suppression filter', async t => {
   const sourceName = 'Audio Input Capture 2';
   const filterName = 'Noise Suppression';
 
-  await addSource('Audio Input Capture', sourceName);
+  await addSource('Audio Input Capture', sourceName, true, true);
   await addFilter(sourceName, filterName, filterName);
   await openFiltersWindow(sourceName);
   await focusChild();
@@ -232,7 +232,7 @@ test('Adding and removing a Noise Gate filter', async t => {
   const sourceName = 'Audio Input Capture 3';
   const filterName = 'Noise Gate';
 
-  await addSource('Audio Input Capture', sourceName);
+  await addSource('Audio Input Capture', sourceName, true, true);
   await addFilter(sourceName, filterName, filterName);
   await openFiltersWindow(sourceName);
   await focusChild();
@@ -251,7 +251,7 @@ test('Adding and removing a Compressor filter', async t => {
   const sourceName = 'Audio Input Capture 4';
   const filterName = 'Compressor';
 
-  await addSource('Audio Input Capture', sourceName);
+  await addSource('Audio Input Capture', sourceName, true, true);
   await addFilter(sourceName, filterName, filterName);
   await openFiltersWindow(sourceName);
   await focusChild();
@@ -271,7 +271,7 @@ test('Adding and removing a Limiter filter', async t => {
   const sourceName = 'Audio Input Capture 5';
   const filterName = 'Limiter';
 
-  await addSource('Audio Input Capture', sourceName);
+  await addSource('Audio Input Capture', sourceName, true, true);
   await addFilter(sourceName, filterName, filterName);
   await openFiltersWindow(sourceName);
   await focusChild();
@@ -288,7 +288,7 @@ test('Adding and removing an Expander filter', async t => {
   const sourceName = 'Audio Input Capture 6';
   const filterName = 'Expander';
 
-  await addSource('Audio Input Capture', sourceName);
+  await addSource('Audio Input Capture', sourceName, true, true);
   await addFilter(sourceName, filterName, filterName);
   await openFiltersWindow(sourceName);
   await focusChild();
