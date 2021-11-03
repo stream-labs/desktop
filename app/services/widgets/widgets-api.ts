@@ -17,6 +17,7 @@ export interface ISerializableWidget {
 type TUrlGenerator = (host: string, token: string) => string;
 
 export interface IWidgetTester {
+  type?: string; // TODO: make required
   name: string;
   url: (host: string, platform: TPlatform) => string;
 

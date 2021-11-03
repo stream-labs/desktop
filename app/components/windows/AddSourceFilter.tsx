@@ -84,7 +84,7 @@ export default class AddSourceFilter extends Vue {
           <VFormGroup
             value={this.form.name}
             onInput={(value: string) => (this.form.name = value)}
-            metadata={metadata.text({ title: $t('Filter name'), name: 'name' })}
+            metadata={metadata.text({ title: $t('Filter name'), name: 'name', fullWidth: true })}
           />
           {this.error && <p style="color: red;">{this.error}</p>}
         </div>

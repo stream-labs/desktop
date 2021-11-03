@@ -63,7 +63,7 @@
         ref="slVueTree"
         @select="makeActive"
         @input="handleSort"
-        @contextmenu.native="showContextMenu()"
+        @contextmenu.native.stop="showContextMenu()"
       >
         <template slot="title" slot-scope="{ node }">
           <div>{{ node.title }}</div>

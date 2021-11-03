@@ -7,7 +7,7 @@ import {
   StartStreamingButton,
   TestWidgets,
   NotificationsArea,
-} from 'components/shared/ReactComponent';
+} from 'components/shared/ReactComponentList';
 import { UserService } from '../services/user';
 import { getPlatformService } from 'services/platforms';
 import { YoutubeService } from 'services/platforms/youtube';

@@ -8,16 +8,13 @@ import NavItem from 'components/shared/NavItem.vue';
 import GenericFormGroups from 'components/obs/inputs/GenericFormGroups.vue';
 import { WindowsService } from 'services/windows';
 import { ISettingsSubCategory, SettingsService } from 'services/settings/index';
-import ExtraSettings from './ExtraSettings.vue';
 import DeveloperSettings from './DeveloperSettings';
 import InstalledApps from 'components/InstalledApps.vue';
 import Hotkeys from './Hotkeys.vue';
 import OverlaySettings from './OverlaySettings';
 import NotificationsSettings from './NotificationsSettings.vue';
-import AppearanceSettings from './AppearanceSettings';
 import ExperimentalSettings from './ExperimentalSettings.vue';
 import RemoteControlSettings from './RemoteControlSettings.vue';
-import LanguageSettings from './LanguageSettings.vue';
 import GameOverlaySettings from './GameOverlaySettings';
 import SearchablePages from 'components/shared/SearchablePages';
 import FormInput from 'components/shared/inputs/FormInput.vue';
@@ -26,7 +23,7 @@ import VirtualWebcamSettings from './VirtualWebcamSettings';
 import { MagicLinkService } from 'services/magic-link';
 import { UserService } from 'services/user';
 import Scrollable from 'components/shared/Scrollable';
-import { PlatformLogo } from 'components/shared/ReactComponent';
+import { ObsSettings, PlatformLogo } from 'components/shared/ReactComponentList';
 import { $t } from 'services/i18n';
 import { debounce } from 'lodash-decorators';
 
@@ -37,15 +34,12 @@ import { debounce } from 'lodash-decorators';
     GenericFormGroups,
     NavMenu,
     NavItem,
-    ExtraSettings,
     Hotkeys,
     DeveloperSettings,
     OverlaySettings,
     NotificationsSettings,
-    AppearanceSettings,
     RemoteControlSettings,
     ExperimentalSettings,
-    LanguageSettings,
     InstalledApps,
     GameOverlaySettings,
     FormInput,
@@ -53,6 +47,7 @@ import { debounce } from 'lodash-decorators';
     VirtualWebcamSettings,
     Scrollable,
     PlatformLogo,
+    ObsSettings,
   },
 })
 export default class Settings extends Vue {
@@ -125,6 +120,34 @@ export default class Settings extends Vue {
 
   get isLoggedIn() {
     return this.userService.views.isLoggedIn;
+  }
+
+  /**
+   * returns the list of the pages ported to React
+   */
+  get reactPages() {
+    return ['General', 'Appearance'];
+  }
+
+  get shouldShowReactPage() {
+    return this.reactPages.includes(this.categoryName);
+  }
+
+  get shouldShowVuePage() {
+    if (this.reactPages.includes(this.categoryName)) return false;
+    return ![
+      'Hotkeys',
+      'Stream',
+      'API',
+      'Overlays',
+      'Notifications',
+      'Appearance',
+      'Experimental',
+      'Remote Control',
+      'Installed Apps',
+      'Virtual Webcam',
+      'Developer',
+    ].includes(this.categoryName);
   }
 
   getInitialCategoryName() {

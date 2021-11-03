@@ -14,6 +14,6 @@
   "Always, show last person when inactive": "常に、非アクティブの時は最後の人を表示",
   "Include Resubs": "リサブを含める",
   "Preview": "プレビュー",
-  "Tokens: %{tokenList}": "Tokens: %{tokenList}",
-  "Note: Actual label text may take up to 60 seconds to update": "Note: Actual label text may take up to 60 seconds to update"
+  "Tokens: %{tokenList}": "トークン：%{tokenList}",
+  "Note: Actual label text may take up to 60 seconds to update": "注：実際のラベルテキストは、更新に最長 60 秒かかる場合があります"
 }

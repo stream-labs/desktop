@@ -56,6 +56,10 @@ export class Scene {
     return !this.scenesService.state.scenes[this.id];
   }
 
+  isActive() {
+    return this.scenesService.views.activeSceneId === this.id;
+  }
+
   // getter for backward compatibility with previous version of API
   get items(): ISceneItem[] {
     return this.nodes.filter(node => node.sceneNodeType === 'item') as ISceneItem[];

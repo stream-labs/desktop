@@ -72,3 +72,7 @@ export default React.memo(function Form(p: FormProps & { disabled?: boolean }) {
 export function useForm() {
   return AntForm.useForm()[0];
 }
+
+export function useFormContext() {
+  return useContext(FormContext);
+}

@@ -223,6 +223,7 @@ export default function ClipTrimmer(props: { clip: IClip }) {
                   objectFit: 'cover',
                   objectPosition: `-${frame * SCRUB_WIDTH * (scrubHeight / SCRUB_HEIGHT)}px`,
                   pointerEvents: 'none',
+                  maxWidth: '100%',
                 }}
               ></img>
             );

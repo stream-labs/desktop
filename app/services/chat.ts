@@ -1,3 +1,4 @@
+import path from 'path';
 import { Service } from 'services/core/service';
 import { Inject } from 'services/core/injector';
 import { UserService } from 'services/user';
@@ -6,9 +7,14 @@ import electron, { ipcRenderer } from 'electron';
 import url from 'url';
 import { WindowsService } from 'services/windows';
 import { $t } from 'services/i18n';
+import { WidgetsService, WidgetType } from 'services/widgets';
 import { InitAfter } from './core';
 import Utils from './utils';
 import { StreamingService } from './streaming';
+import { GuestApiHandler } from 'util/guest-api-handler';
+import { ChatHighlightService, IChatHighlightMessage } from './widgets/settings/chat-highlight';
+import { assertIsDefined } from 'util/properties-type-guards';
+import { SourcesService } from 'app-services';
 
 export function enableBTTVEmotesScript(isDarkTheme: boolean) {
   /*eslint-disable */
@@ -45,10 +51,14 @@ export class ChatService extends Service {
   @Inject() customizationService: CustomizationService;
   @Inject() windowsService: WindowsService;
   @Inject() streamingService: StreamingService;
+  @Inject() chatHighlightService: ChatHighlightService;
+  @Inject() widgetsService: WidgetsService;
+  @Inject() sourcesService: SourcesService;
 
   private chatView: Electron.BrowserView | null;
   private chatUrl = '';
   private electronWindowId: number | null;
+  private exposedHighlightApi = false;
 
   init() {
     this.chatUrl = this.streamingService.views.chatUrl;
@@ -74,10 +84,26 @@ export class ChatService extends Service {
     this.userService.userLogout.subscribe(() => {
       this.deinitChat();
     });
+
+    this.sourcesService.sourceAdded.subscribe(async source => {
+      if (
+        source.propertiesManagerType === 'widget' &&
+        source.propertiesManagerSettings?.widgetType === WidgetType.ChatHighlight
+      ) {
+        this.exposeHighlightApi();
+        this.refreshChat();
+      }
+    });
   }
 
-  refreshChat() {
-    this.loadUrl();
+  async refreshChat() {
+    await this.loadUrl();
+  }
+
+  hasChatHighlightWidget(): boolean {
+    return !!this.widgetsService
+      .getWidgetSources()
+      .find(source => source.type === WidgetType.ChatHighlight);
   }
 
   async mountChat(electronWindowId: number) {
@@ -115,6 +141,9 @@ export class ChatService extends Service {
       webPreferences: {
         partition,
         nodeIntegration: false,
+        enableRemoteModule: true,
+        contextIsolation: true,
+        preload: path.resolve(electron.remote.app.getAppPath(), 'bundles', 'guest-api'),
       },
     });
 
@@ -131,6 +160,7 @@ export class ChatService extends Service {
   private deinitChat() {
     // @ts-ignore: typings are incorrect
     this.unmountChat();
+    this.exposedHighlightApi = false;
     this.chatView = null;
   }
 
@@ -216,10 +246,25 @@ export class ChatService extends Service {
     });
   }
 
+  private exposeHighlightApi() {
+    if (!this.chatView) return;
+    if (!this.hasChatHighlightWidget() || this.exposedHighlightApi) return;
+
+    new GuestApiHandler().exposeApi(this.chatView.webContents.id, {
+      pinMessage: (messageData: IChatHighlightMessage) =>
+        this.chatHighlightService.pinMessage(messageData),
+      unpinMessage: () => this.chatHighlightService.unpinMessage(),
+      showUnpinButton: this.chatHighlightService.hasPinnedMessage,
+    });
+
+    this.exposedHighlightApi = true;
+  }
+
   private bindDomReadyListener() {
     if (!this.chatView) return; // chat was already deinitialized
 
     const settings = this.customizationService.state;
+    this.exposeHighlightApi();
 
     this.chatView.webContents.on('dom-ready', () => {
       if (!this.chatView) return; // chat was already deinitialized
@@ -243,6 +288,14 @@ export class ChatService extends Service {
         `,
           true,
         );
+      }
+      if (this.userService.platform?.type === 'twitch' && this.hasChatHighlightWidget()) {
+        setTimeout(() => {
+          if (!this.chatView) return;
+          const chatHighlightScript = require('!!raw-loader!./widgets/settings/chat-highlight-script.js');
+          assertIsDefined(chatHighlightScript.default);
+          this.chatView.webContents.executeJavaScript(chatHighlightScript.default, true);
+        }, 10000);
       }
 
       // facebook chat doesn't fit our layout by default

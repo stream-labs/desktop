@@ -241,6 +241,7 @@ export default function FacebookEditStreamInfo(p: IPlatformComponentParams<'face
             {shouldShowPages && (
               <ListInput
                 {...bind.pageId}
+                required={true}
                 label={$t('Facebook Page')}
                 hasImage
                 imageSize={{ width: 44, height: 44 }}
@@ -256,6 +257,7 @@ export default function FacebookEditStreamInfo(p: IPlatformComponentParams<'face
               <>
                 <ListInput
                   {...bind.groupId}
+                  required={true}
                   label={$t('Facebook Group')}
                   hasImage
                   imageSize={{ width: 44, height: 44 }}
@@ -360,7 +362,7 @@ export default function FacebookEditStreamInfo(p: IPlatformComponentParams<'face
       >
         {isPrimary && (
           <div>
-            <p>{$t('Please log-out and log-in again to get these new features')}</p>
+            <div>{$t('Please log-out and log-in again to get these new features')}</div>
             <button className="button button--facebook" onClick={reLogin}>
               {$t('Re-login now')}
             </button>
@@ -371,7 +373,7 @@ export default function FacebookEditStreamInfo(p: IPlatformComponentParams<'face
         )}
         {!isPrimary && (
           <div>
-            <p>{$t('Please reconnect Facebook to get these new features')}</p>
+            <div>{$t('Please reconnect Facebook to get these new features')}</div>
             <button className="button button--facebook" onClick={reconnectFB}>
               {$t('Reconnect now')}
             </button>

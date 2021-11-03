@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import ModalLayout from 'components/ModalLayout.vue';
-import { Display } from 'components/shared/ReactComponent';
+import { Display } from 'components/shared/ReactComponentList';
 import { Inject } from 'services/core/injector';
 import { WindowsService } from 'services/windows';
 import { SourcesService } from 'services/sources';
