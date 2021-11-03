@@ -2,6 +2,8 @@
 
 .widget-layout {
 
+  height: 100%;
+
   // collapse
 
   // add space between collapsed items
@@ -23,6 +25,13 @@
   }
 
   // menu
+
+  .menu-wrapper {
+    width: 270px;
+    border-right: 1px solid var(--border);
+    background-color: var(--section);
+  }
+
   :global(.ant-collapse-content-box .ant-menu-root) {
     margin-left: -16px;
     margin-right: -16px;
@@ -72,6 +81,15 @@
         opacity: 1;
       }
     }
+  }
+
+
+  // content
+  .content-wrapper {
+    padding: 16px;
+    padding-top: 32px;
+    height: 100%;
+    overflow: auto;
   }
 }
 

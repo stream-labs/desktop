@@ -4,11 +4,13 @@ import { Services } from '../../service-provider';
 import { mutation } from '../../store';
 import { throttle } from 'lodash-decorators';
 import { assertIsDefined, getDefined } from '../../../util/properties-type-guards';
-import { TAlertType, TWidgetType } from '../../../services/widgets/widget-config';
+import { TWidgetType } from '../../../services/widgets/widgets-config';
 import { TObsFormData } from '../../../components/obs/inputs/ObsInput';
 import { pick, cloneDeep } from 'lodash';
 import { $t } from '../../../services/i18n';
 import Utils from '../../../services/utils';
+import { TAlertType } from '../../../services/widgets/alerts-config';
+import { alertAsync } from '../../modals';
 
 /**
  * Common state for all widgets
@@ -56,7 +58,7 @@ export class WidgetModule<TWidgetState extends IWidgetState = IWidgetState> {
 
   // create shortcuts for widgetsConfig and eventsInfo
   public widgetsConfig = this.widgetsService.widgetsConfig;
-  public eventsConfig = this.widgetsService.eventsConfig;
+  public eventsConfig = this.widgetsService.alertsConfig;
 
   // init module
   async init(params: {
@@ -223,11 +225,20 @@ export class WidgetModule<TWidgetState extends IWidgetState = IWidgetState> {
   @throttle(500)
   private async saveSettings(settings: TWidgetState['data']['settings']) {
     const body = this.patchBeforeSend(settings);
-    return await this.actions.return.request({
-      body,
-      url: this.config.settingsSaveUrl,
-      method: 'POST',
-    });
+    try {
+      return await this.actions.return.request({
+        body,
+        url: this.config.settingsSaveUrl,
+        method: 'POST',
+      });
+    } catch (e: unknown) {
+      await alertAsync({
+        title: $t('Something went wrong while applying settings'),
+        style: { marginTop: '300px' },
+        okText: $t('Reload'),
+      });
+      await this.reload();
+    }
   }
 
   /**

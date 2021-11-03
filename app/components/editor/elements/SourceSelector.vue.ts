@@ -54,7 +54,7 @@ const sourceIconMap = {
   scene: 'far fa-object-group',
   color_source: 'fas fa-fill',
   openvr_capture: 'fab fa-simplybuilt fa-rotate-180',
-  screen_capture: 'fab fa-simplybuilt fa-rotate-180',
+  screen_capture: 'icon-group',
   liv_capture: 'fab fa-simplybuilt fa-rotate-180',
 };
 

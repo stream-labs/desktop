@@ -149,6 +149,7 @@ function ExtraSettings() {
   const isLoggedIn = UserService.isLoggedIn;
   const isTwitch = isLoggedIn && getDefined(UserService.platform).type === 'twitch';
   const isFacebook = isLoggedIn && getDefined(UserService.platform).type === 'facebook';
+  const isYoutube = isLoggedIn && getDefined(UserService.platform).type === 'youtube';
   const isRecordingOrStreaming = StreamingService.isStreaming || StreamingService.isRecording;
   const protectedMode = StreamSettingsService.state.protectedModeEnabled;
   const canRunOptimizer = isTwitch && !isRecordingOrStreaming && protectedMode;

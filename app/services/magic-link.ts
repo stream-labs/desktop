@@ -66,19 +66,13 @@ export class MagicLinkService extends Service {
     }
   }
 
-  // async openTipPageSettings() {
-  //
-  //   const token = (await this.fetchNewToken()).login_token;
-  //   return `https://${this.hostsService.streamlabs}/slobs/magic/dashboard?login_token=${token}&r=${
-  //     subPage ?? ''
-  //   }`;
-  //
-  //   try {
-  //     const link = await this.getDashboardMagicLink('settings/donation-settings');
-  //     electron.remote.shell.openExternal(link);
-  //     this.usageStatisticsService.recordFeatureUsage('openDonationSettings');
-  //   } catch (e: unknown) {
-  //     console.error('Error generating dashboard magic link', e);
-  //   }
-  // }
+  async openAdvancedAlertTesting() {
+    try {
+      const link = await this.getDashboardMagicLink('advancedtesting');
+      electron.remote.shell.openExternal(link);
+      this.usageStatisticsService.recordFeatureUsage('openAdvancedAlertTesting');
+    } catch (e: unknown) {
+      console.error('Error generating dashboard magic link', e);
+    }
+  }
 }

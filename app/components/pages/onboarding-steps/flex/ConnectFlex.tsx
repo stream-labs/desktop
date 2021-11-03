@@ -26,7 +26,7 @@ export default class ConnectFlex extends TsxComponent<ConnectProps> {
   selectedExtraPlatform = '';
 
   get loading() {
-    return this.userService.state.authProcessState === EAuthProcessState.Busy;
+    return this.userService.state.authProcessState === EAuthProcessState.Loading;
   }
 
   get isRelog() {
