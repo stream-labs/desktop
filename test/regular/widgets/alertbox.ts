@@ -3,13 +3,12 @@ import { addSource, openSourceProperties } from '../../helpers/modules/sources';
 import { logIn } from '../../helpers/modules/user';
 import {
   click,
-  clickButton, closeWindow,
+  clickButton,
   focusChild,
   focusMain,
   waitForDisplayed,
 } from '../../helpers/modules/core';
 import { TPlatform } from '../../../app/services/platforms';
-import { logOut } from '../../helpers/spectron/user';
 import { getApiClient } from '../../helpers/api-client';
 import { CustomizationService } from '../../../app/services/customization';
 import { assertFormContains, fillForm } from '../../helpers/modules/forms';
@@ -62,7 +61,6 @@ async function testDonationAlert() {
   const formData1 = {
     message_template: 'Test {name} donated {amount}!',
     sound_volume: 30,
-    alert_duration: 5000,
   };
   await fillForm(formData1);
 
@@ -82,7 +80,6 @@ async function testDonationAlert() {
   const formData2 = {
     message_template: '{name} donated {amount}',
     sound_volume: 50,
-    alert_duration: 10000,
   };
   await fillForm(formData2);
   await sleep(3000);
