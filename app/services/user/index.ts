@@ -275,19 +275,16 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     return new UserViews(this.state);
   }
 
-  mounted() {
-    // This is used for faking authentication in tests.  We have
-    // to do this because Twitch adds a captcha when we try to
-    // actually log in from integration tests.
-    electron.ipcRenderer.on(
-      'testing-fakeAuth',
-      async (e: Electron.Event, auth: IUserAuth, isOnboardingTest: boolean) => {
-        const service = getPlatformService(auth.primaryPlatform);
-        this.streamSettingsService.resetStreamSettings();
-        await this.login(service, auth);
-        if (!isOnboardingTest) this.onboardingService.finish();
-      },
-    );
+  /**
+   * This is used for faking authentication in tests.  We have
+   * to do this because Twitch adds a captcha when we try to
+   * actually log in from integration tests.
+   */
+  async testingFakeAuth(auth: IUserAuth, isOnboardingTest: boolean) {
+    const service = getPlatformService(auth.primaryPlatform);
+    this.streamSettingsService.resetStreamSettings();
+    await this.login(service, auth);
+    if (!isOnboardingTest) this.onboardingService.finish();
   }
 
   async autoLogin() {

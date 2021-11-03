@@ -9,6 +9,7 @@ import { logIn } from '../helpers/spectron/user';
 import { SceneCollectionsService } from 'services/api/external-api/scene-collections';
 import { ScenesService } from '../../app/services/api/external-api/scenes';
 import { focusChild } from '../helpers/modules/core';
+import {sleep} from "../helpers/sleep";
 
 useSpectron({ noSync: false });
 
@@ -72,6 +73,8 @@ test('Media backup', async t => {
     await stopApp(t, false);
     fse.removeSync(tmpDir);
     await startApp(t, true);
+    // wait for sync
+    await sleep(5000);
 
     // images should be downloaded from the media-backup server
     const image1DownloadedPath: string = item1.getSource().getSettings().file;
