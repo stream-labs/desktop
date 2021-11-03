@@ -35,9 +35,10 @@
   color: var(--title);
   background-color: transparent;
   border: none;
+  min-width: 0;
 
   span {
-    max-width: 300px;
+    flex: 1;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;

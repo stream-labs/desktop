@@ -38,7 +38,7 @@
         </DropdownMenu>
       </div>
 
-      <div style="display: flex;">
+      <div style="display: flex">
         <i
           class="icon-add icon-button icon-button--lg"
           @click="addScene"
@@ -95,7 +95,14 @@
   position: relative;
   display: flex;
   align-items: center;
-  width: 50%;
+  flex: 1;
+
+  &,
+  & > * {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 }
 
 .input-wrapper--search {
@@ -104,6 +111,8 @@
 }
 
 .scene-collections__dropdown {
+  display: flex;
+
   & /deep/ .popper {
     text-align: left;
   }
