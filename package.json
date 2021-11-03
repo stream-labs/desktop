@@ -4,7 +4,7 @@
   "description": "Streamlabs streaming software",
   "author": "General Workings, Inc.",
   "license": "GPL-3.0",
-  "version": "1.5.1",
+  "version": "1.6.0-preview.6",
   "main": "main.js",
   "scripts": {
     "compile": "yarn clear && yarn compile:updater && yarn webpack-cli --progress --config ./webpack.dev.config.js",
@@ -21,7 +21,7 @@
     "package": "yarn generate-agreement && rimraf dist && electron-builder build -w --x64 --config electron-builder/base.config.js",
     "package:mac": "yarn generate-agreement:mac && rimraf dist && electron-builder build -m --x64 --config electron-builder/base.config.js",
     "package:preview": "yarn generate-agreement && rimraf dist && electron-builder build -w --x64 --config electron-builder/preview.config.js",
-    "eslint": "eslint {app,guest-api,obs-api,updater}/**/*.ts app/**/*.tsx main.js",
+    "eslint": "eslint \"{app,guest-api,obs-api,updater}/**/*.ts\" main.js",
     "test": "tsc -p test && ava -v --timeout=3m ./test-dist/test/regular/**/*.js",
     "test:file": "tsc -p test && ava -v --timeout=60m",
     "test:stress": "yarn test test-dist/test/stress/index.js",
@@ -37,9 +37,9 @@
     "ci:performance": "node test/performance/performance-test-runner.js",
     "commit": "commit",
     "postinstall": "node ./scripts/postinstall.js",
-    "tail-obs-logs": "yarn install --cwd bin && node bin/tail-obs-logs.js",
-    "generate-agreement": "cat BASEAGREEMENT > AGREEMENT && yarn licenses generate-disclaimer --ignore-platform >> AGREEMENT",
-    "generate-agreement:mac": "cat BASEAGREEMENT > license_en.txt && yarn licenses generate-disclaimer --ignore-platform >> license_en.txt"
+    "tail-obs-logs": "node bin/tail-obs-logs.js",
+    "generate-agreement": "cat BASEAGREEMENT > AGREEMENT && yarn licenses generate-disclaimer >> AGREEMENT",
+    "generate-agreement:mac": "cat BASEAGREEMENT > license_en.txt && yarn licenses generate-disclaimer >> license_en.txt"
   },
   "prettier": {
     "singleQuote": true,
@@ -83,6 +83,7 @@
     "obs-studio-node": "https://s3-us-west-2.amazonaws.com/obsstudionodes3.streamlabs.com/osn-0.0.0-release.tar.gz",
     "overlayscrollbars-react": "^0.2.2",
     "raven": "^2.6.4",
+    "react-colorful": "^5.5.0",
     "react-devtools-electron": "^4.7.0",
     "react-redux": "^7.2.4",
     "react-transition-group": "^4.4.1",
@@ -108,6 +109,7 @@
     "@sentry/integrations": "5.21.4",
     "@types/archiver": "2.1.3",
     "@types/classnames": "2.2.11",
+    "@types/codemirror": "^5.60.4",
     "@types/extract-zip": "1.6.2",
     "@types/fs-extra": "8.1.1",
     "@types/humps": "1.1.3",
@@ -139,6 +141,7 @@
     "classnames": "2.2.6",
     "clean-webpack-plugin": "3.0.0",
     "cli-table": "0.3.1",
+    "codemirror": "^5.63.1",
     "cross-env": "7.0.3",
     "css-element-queries": "1.2.3",
     "css-loader": "2.1.1",
@@ -199,6 +202,7 @@
     "stylelint-config-standard": "18.2.0",
     "terser-webpack-plugin": "5.0.3",
     "traverse": "0.6.6",
+    "tree-kill": "^1.2.2",
     "ts-loader": "8.0.11",
     "ts-node": "7.0.1",
     "typescript": "4.0.7",
@@ -207,7 +211,6 @@
     "v-tooltip": "v2.0.3",
     "vee-validate": "2.2.0",
     "vue": "2.6.9",
-    "vue-codemirror": "4.0.5",
     "vue-color": "2.7.0",
     "vue-i18n": "7.6.0",
     "vue-js-modal": "1.3.28",
@@ -229,5 +232,6 @@
   },
   "optionalDependencies": {
     "node-win32-np": "1.0.6"
-  }
+  },
+  "packageManager": "yarn@3.1.0"
 }

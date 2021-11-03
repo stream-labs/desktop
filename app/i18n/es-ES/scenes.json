@@ -39,5 +39,6 @@
   "Name Folder": "Asignar nombrar a carpeta",
   "Switch Scenes": "Cambiar de escena",
   "Failed to load scene collection.  A new one will be created instead.": "No se pudo cargar la colección de escenas. Se creará una nueva.",
-  "New Scene": "Escena nueva"
+  "New Scene": "Escena nueva",
+  "Projector": "Proyector"
 }

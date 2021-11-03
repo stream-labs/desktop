@@ -12,6 +12,9 @@ import { $t } from 'services/i18n';
 import { Inject } from 'services/core';
 import { UserService } from 'services/user';
 import { UsageStatisticsService } from 'services/usage-statistics';
+import fs from 'fs-extra';
+import path from 'path';
+import { AppService } from './app';
 
 // Maps to --background
 const THEME_BACKGROUNDS = {
@@ -52,6 +55,7 @@ export interface ICustomizationServiceState {
   leftDock: boolean;
   hideViewerCount: boolean;
   folderSelection: boolean;
+  legacyAlertbox: boolean | null;
   livedockCollapsed: boolean;
   livedockSize: number;
   eventsSize: number;
@@ -68,6 +72,7 @@ export interface ICustomizationServiceState {
   designerMode: boolean;
   legacyEvents: boolean;
   pinnedStatistics: IPinnedStatistics;
+  enableCrashDumps: boolean;
 }
 
 class CustomizationViews extends ViewHandler<ICustomizationServiceState> {
@@ -99,6 +104,7 @@ class CustomizationViews extends ViewHandler<ICustomizationServiceState> {
 export class CustomizationService extends PersistentStatefulService<ICustomizationServiceState> {
   @Inject() userService: UserService;
   @Inject() usageStatisticsService: UsageStatisticsService;
+  @Inject() appService: AppService;
 
   static get migrations() {
     return [
@@ -135,9 +141,11 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
       droppedFrames: false,
       bandwidth: false,
     },
+    legacyAlertbox: null,
     experimental: {
       // put experimental features here
     },
+    enableCrashDumps: true,
   };
 
   settingsChanged = new Subject<Partial<ICustomizationServiceState>>();
@@ -150,6 +158,9 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
     super.init();
     this.setSettings(this.runMigrations(this.state, CustomizationService.migrations));
     this.setLiveDockCollapsed(true); // livedock is always collapsed on app start
+    this.ensureCrashDumpFolder();
+
+    this.userService.userLoginFinished.subscribe(() => this.setInitialLegacyAlertboxState());
 
     if (
       this.state.pinnedStatistics.cpu ||
@@ -161,9 +172,23 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
     }
   }
 
+  setInitialLegacyAlertboxState() {
+    if (!this.userService.views.isLoggedIn) return;
+
+    // switch all new users to the new alertbox by default
+    if (this.state.legacyAlertbox === null) {
+      const registrationDate = this.userService.state.createdAt;
+      const legacyAlertbox = registrationDate < new Date('October 26, 2021').valueOf();
+      this.setSettings({ legacyAlertbox });
+    }
+  }
+
   setSettings(settingsPatch: Partial<ICustomizationServiceState>) {
     const changedSettings = Utils.getChangedParams(this.state, settingsPatch);
     this.SET_SETTINGS(changedSettings);
+
+    if (changedSettings.enableCrashDumps != null) this.ensureCrashDumpFolder();
+
     this.settingsChanged.next(changedSettings);
   }
 
@@ -236,6 +261,20 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
 
   restoreDefaults() {
     this.setSettings(CustomizationService.defaultState);
+  }
+
+  /**
+   * Ensures that the existence of the crash dump folder matches the setting
+   */
+  ensureCrashDumpFolder() {
+    const crashDumpDirectory = path.join(this.appService.appDataDirectory, 'CrashMemoryDump');
+
+    // We do not care about the result of these calls;
+    if (this.state.enableCrashDumps) {
+      fs.ensureDir(crashDumpDirectory);
+    } else {
+      fs.remove(crashDumpDirectory);
+    }
   }
 
   @mutation()

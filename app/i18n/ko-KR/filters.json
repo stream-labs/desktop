@@ -20,7 +20,7 @@
   "Filter name": "필터 이름",
   "Add source filter": "소스 필터 추가",
   "No filters applied": "적용된 필터 없음",
-  "Filters for %{sourceName}": "Filters for %{sourceName}",
+  "Filters for %{sourceName}": "%{sourceName}에 대한 필터",
   "Invert Polarity": "양극 전환",
   "Limiter": "리미터",
   "Expander": "익스팬더",
@@ -37,5 +37,6 @@
   "Heat Map": "적외선 열지도",
   "Cel Shade": "셀 셰이드",
   "Dramatic": "드라마틱",
-  "Wintergreen": "윈터그린"
+  "Wintergreen": "윈터그린",
+  "Edit Filters": "Edit Filters"
 }

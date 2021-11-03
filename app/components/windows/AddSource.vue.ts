@@ -15,8 +15,8 @@ import HFormGroup from 'components/shared/inputs/HFormGroup.vue';
 import electron from 'electron';
 import { UserService } from 'services/user';
 import { ChatService } from 'services/chat';
-import { CustomizationService } from 'app-services';
 import * as remote from '@electron/remote';
+import { AudioService, CustomizationService } from 'app-services';
 
 @Component({
   components: { ModalLayout, Selector, Display, HFormGroup },
@@ -31,6 +31,7 @@ export default class AddSource extends Vue {
   @Inject() userService: UserService;
   @Inject() chatService: ChatService;
   @Inject() customizationService: CustomizationService;
+  @Inject() audioService: AudioService;
 
   name = '';
   error = '';
@@ -145,7 +146,6 @@ export default class AddSource extends Vue {
       if (this.sourceAddOptions.propertiesManager === 'widget') {
         const widget = this.widgetsService.createWidget(this.widgetType, this.name);
         source = widget.getSource();
-        if (this.widgetType === WidgetType.ChatHighlight) this.chatService.refreshChat();
       } else {
         const settings: Dictionary<any> = {};
 
@@ -173,6 +173,11 @@ export default class AddSource extends Vue {
         );
 
         source = item.source;
+      }
+
+      if (!source.video && source.hasProps()) {
+        this.audioService.showAdvancedSettings(source.sourceId);
+        return;
       }
 
       if (source.hasProps()) {

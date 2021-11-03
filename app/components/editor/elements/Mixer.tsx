@@ -33,7 +33,7 @@ export default class Mixer extends BaseElement {
   }
 
   showAdvancedSettings() {
-    this.audioService.showAdvancedSettings();
+    this.audioService.actions.showAdvancedSettings();
   }
 
   handleRightClick() {

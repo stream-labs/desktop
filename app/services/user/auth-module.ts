@@ -21,9 +21,11 @@ export class AuthModule {
     authUrl: string,
     windowOptions: electron.BrowserWindowConstructorOptions,
     onWindowShow: () => void,
+    onWindowClose: () => void,
     merge = false,
   ): Promise<IUserAuth> {
     return new Promise<IUserAuth>(resolve => {
+      let completed = false;
       const partition = `persist:${uuid()}`;
       const authWindow = new remote.BrowserWindow({
         ...windowOptions,
@@ -41,6 +43,7 @@ export class AuthModule {
 
         if (parsed) {
           parsed.partition = partition;
+          completed = true;
           authWindow.close();
           resolve(parsed);
         }
@@ -49,6 +52,10 @@ export class AuthModule {
       authWindow.once('ready-to-show', () => {
         authWindow.show();
         defer(onWindowShow);
+      });
+
+      authWindow.on('close', () => {
+        if (!completed) onWindowClose();
       });
 
       authWindow.removeMenu();
