@@ -227,6 +227,7 @@ export function useInput<
       'layout',
       'rules',
       'tooltip',
+      'hidden',
     ]),
     rules,
     'data-role': 'input-wrapper',
@@ -254,6 +255,7 @@ export function useInput<
   return {
     inputAttrs: inputAttrsRef.current,
     wrapperAttrs: wrapperAttrsRef.current,
+    dataAttrs,
     forceUpdate,
     setLocalValue,
     emitChange,

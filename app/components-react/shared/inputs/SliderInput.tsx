@@ -20,7 +20,7 @@ export const SliderInput = InputComponent((partialProps: TSliderInputProps) => {
     hasNumberInput: false,
     ...partialProps,
   };
-  const { inputAttrs, wrapperAttrs } = useInput('slider', p, ANT_SLIDER_FEATURES);
+  const { inputAttrs, wrapperAttrs, dataAttrs } = useInput('slider', p, ANT_SLIDER_FEATURES);
   const numberInputHeight = p.slimNumberInput ? '50px' : '70px';
 
   function onChangeHandler(val: number) {
@@ -34,7 +34,7 @@ export const SliderInput = InputComponent((partialProps: TSliderInputProps) => {
   return (
     <InputWrapper {...wrapperAttrs}>
       <Row>
-        <Col flex="auto">
+        <Col flex="auto" {...dataAttrs} data-role="input" data-value={inputAttrs.value}>
           <Slider {...inputAttrs} />
         </Col>
 
