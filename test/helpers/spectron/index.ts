@@ -12,7 +12,7 @@ import {
   removeFailedTestFromFile,
   saveFailedTestsToFile,
   saveTestStatsToFile,
-  testFn,
+  testFn, waitForElectronInstancesExist,
 } from './runner-utils';
 import { skipOnboarding } from '../modules/onboarding';
 import { closeWindow, focusChild, focusMain, waitForLoader } from '../modules/core';
@@ -209,9 +209,8 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
   stopAppFn = async function stopApp(t: TExecutionContext, clearCache = true) {
     try {
       await closeWindow('main');
+      await waitForElectronInstancesExist();
 
-      // wait for saving the scene-collection
-      if (!clearCache) await sleep(5000);
 
       await app.chromeDriver.stop();
     } catch (e: unknown) {
