@@ -179,5 +179,9 @@
   "Slide Out Left": "向左滑出",
   "Slide Out Right": "向右滑出",
   "Slide Out Up": "向上滑出",
-  "Pick Screen Color": "选择屏幕颜色"
+  "Pick Screen Color": "选择屏幕颜色",
+  "Play Alert": "Play Alert",
+  "Browser Settings": "Browser Settings",
+  "Custom Code": "Custom Code",
+  "Something went wrong while applying settings": "Something went wrong while applying settings"
 }

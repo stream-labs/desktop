@@ -26,5 +26,10 @@
   "Image URL": "Adresa URL obrázku",
   "Example": "Příklad",
   "Change Media": "Změnit médium",
-  "No Sound": "Bez zvuku"
+  "No Sound": "Bez zvuku",
+  "No Media": "No Media",
+  "Change Link": "Change Link",
+  "Pick From Gallery": "Pick From Gallery",
+  "Clear Link": "Clear Link",
+  "Media URL": "Media URL"
 }

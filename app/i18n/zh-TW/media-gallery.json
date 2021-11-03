@@ -26,5 +26,10 @@
   "Image URL": "影像 URL",
   "Example": "範例",
   "Change Media": "變更媒體",
-  "No Sound": "沒有聲音"
+  "No Sound": "沒有聲音",
+  "No Media": "No Media",
+  "Change Link": "Change Link",
+  "Pick From Gallery": "Pick From Gallery",
+  "Clear Link": "Clear Link",
+  "Media URL": "Media URL"
 }

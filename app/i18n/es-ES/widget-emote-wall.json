@@ -1,10 +1,10 @@
 {
   "Emote Wall": "Emote Wall",
-  "Display and animate emotes that are seen in chat, improving chat participation via positive feedback.": "Display and animate emotes that are seen in chat, improving chat participation via positive feedback.",
-  "Wall Settings": "Wall Settings",
-  "Emote Scale": "Emote Scale",
-  "Combo Required": "Combo Required",
-  "Combo Count": "Combo Count",
-  "Combo Timeframe": "Combo Timeframe",
-  "Ignore Duplicates": "Ignore Duplicates"
+  "Display and animate emotes that are seen in chat, improving chat participation via positive feedback.": "Muestre y anime emoticonos visibles en chats, para mejorar la participación en chats mediante feedback positivo.",
+  "Wall Settings": "Ajustes de Wall",
+  "Emote Scale": "Escala de emoticonos",
+  "Combo Required": "Combo requerido",
+  "Combo Count": "Recuento de combos",
+  "Combo Timeframe": "Tiempo de combos",
+  "Ignore Duplicates": "Ignorar duplicados"
 }

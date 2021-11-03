@@ -1,4 +1,8 @@
 {
   "Manage Viewer Count": "Spravovat počet diváků",
-  "Font Settings": "Font Settings"
+  "Font Settings": "Font Settings",
+  "Enabled Streams": "Povolené Streams",
+  "Twitch Viewers": "Twitch Viewers",
+  "YouTube Viewers": "YouTube Viewers",
+  "Facebook Viewers": "Facebook Viewers"
 }

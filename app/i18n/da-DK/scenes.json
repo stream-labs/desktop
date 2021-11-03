@@ -39,5 +39,6 @@
   "Name Folder": "Navngiv mappe",
   "Switch Scenes": "Skift scener",
   "Failed to load scene collection.  A new one will be created instead.": "Scenesamlingen kunne ikke indlæses. I stedet oprettes en ny.",
-  "New Scene": "Ny scene"
+  "New Scene": "Ny scene",
+  "Projector": "Projektør"
 }
