@@ -24,6 +24,8 @@ import { Services } from '../service-provider';
 import { ButtonGroup } from '../shared/ButtonGroup';
 import { LayoutInput } from './common/LayoutInput';
 import InputWrapper from '../shared/inputs/InputWrapper';
+import * as remote from '@electron/remote';
+
 /**
  * Root component
  */
@@ -215,7 +217,7 @@ function DonationSettings() {
   }
 
   function openTipPageSettings() {
-    electron.remote.shell.openExternal(`https://${host}/editor?ref=slobs`);
+    remote.shell.openExternal(`https://${host}/editor?ref=slobs`);
     UsageStatisticsService.actions.recordFeatureUsage('openDonationSettings');
   }
 
