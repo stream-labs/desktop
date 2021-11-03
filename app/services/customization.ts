@@ -88,6 +88,10 @@ class CustomizationViews extends ViewHandler<ICustomizationServiceState> {
     return this.state.theme;
   }
 
+  get isDarkTheme() {
+    return ['night-theme', 'prime-dark'].includes(this.currentTheme);
+  }
+
   get designerMode() {
     return this.state.designerMode;
   }
