@@ -19,4 +19,5 @@ export { FontFamilyInput } from './FontFamilyInput';
 export { FontSizeInput } from './FontSizeInput';
 export { FontWeightInput } from './FontWeightInput';
 export { ColorInput } from './ColorInput';
+export { ObsColorInput } from './ObsColorInput';
 export { CardInput } from './CardInput';

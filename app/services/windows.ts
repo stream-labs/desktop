@@ -23,6 +23,7 @@ import {
   IconLibraryProperties,
   ScreenCaptureProperties,
   SharedComponentsLibrary,
+  SourceProperties,
   PerformanceMetrics,
   RenameSource,
   AdvancedStatistics,
@@ -32,7 +33,7 @@ import {
   AdvancedAudio,
 } from 'components/shared/ReactComponentList';
 
-import SourceProperties from 'components/windows/SourceProperties.vue';
+import SourcePropertiesDeprecated from 'components/windows/SourceProperties.vue';
 import SourceFilters from 'components/windows/SourceFilters.vue';
 import AddSourceFilter from 'components/windows/AddSourceFilter';
 import Notifications from 'components/windows/Notifications.vue';
@@ -99,6 +100,7 @@ export function getComponents() {
     NameFolder,
     SafeMode,
     SourceProperties,
+    SourcePropertiesDeprecated,
     SourceFilters,
     AddSourceFilter,
     Blank,

@@ -52,6 +52,7 @@ export interface IObsInput<TValueType> {
   type: TObsType;
   maxVal?: number;
   minVal?: number;
+  stepVal?: number;
   multiline?: boolean;
 }
 

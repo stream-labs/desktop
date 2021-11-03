@@ -7,16 +7,20 @@ import { getOS, OS } from '../../../util/operating-systems';
 import { $t } from '../../../services/i18n';
 import { loadColorPicker } from '../../../util/slow-imports';
 import { Services } from '../../service-provider';
-import { HexColorPicker } from 'react-colorful';
+import { HexColorPicker, RgbaColor, RgbaColorPicker } from 'react-colorful';
 import { findDOMNode } from 'react-dom';
 import { getDefined } from '../../../util/properties-type-guards';
+import Utils from '../../../services/utils';
 
-export function ColorInput(p: TSlobsInputProps<{}, string>) {
+export type TColorInputProps = TSlobsInputProps<{ hasAlpha?: boolean }, string>;
+
+export function ColorInput(p: TColorInputProps) {
   // set default debounce to 500
   const debounce = p.debounce === undefined ? 500 : p.debounce;
   const { wrapperAttrs, inputAttrs } = useInput('color', { ...p, debounce });
   const divAttrs = omit(inputAttrs, 'onChange');
   const [textInputVal, setTextInputVal] = useState(inputAttrs.value);
+  const Picker = p.hasAlpha ? RgbaColorPicker : HexColorPicker;
 
   useEffect(() => {
     setTextInputVal(inputAttrs.value);
@@ -57,9 +61,11 @@ export function ColorInput(p: TSlobsInputProps<{}, string>) {
     setTextInputVal(color);
 
     // emit onChange if textInput contains a valid color
-    const isValidColor = color.match(/^#(?:[0-9a-fA-F]{3}){1,2}$/);
+    const isValidColor = p.hasAlpha
+      ? color.match(/^#(?:[0-9a-fA-F]{4}){1,2}$/)
+      : color.match(/^#(?:[0-9a-fA-F]{3}){1,2}$/);
     if (!isValidColor) return;
-    inputAttrs.onChange(color.toLowerCase());
+    onChangeHandler(color.toLowerCase());
   }
 
   function onTextInputBlur() {
@@ -68,10 +74,23 @@ export function ColorInput(p: TSlobsInputProps<{}, string>) {
     if (textInputVal !== validColor) setTextInputVal(validColor);
   }
 
+  function onChangeHandler(value: string | RgbaColor) {
+    if (typeof value === 'string') {
+      inputAttrs.onChange(value);
+    } else {
+      inputAttrs.onChange(rgbaToHexStr(value));
+    }
+  }
+
   return (
     <InputWrapper {...wrapperAttrs}>
       <Popover
-        content={<HexColorPicker color={inputAttrs.value} onChange={inputAttrs.onChange} />}
+        content={
+          <Picker
+            color={p.hasAlpha ? hexStrToRgba(inputAttrs.value) : inputAttrs.value}
+            onChange={onChangeHandler}
+          />
+        }
         trigger="click"
         placement="bottomLeft"
         getPopupContainer={getPopupContainer}
@@ -113,4 +132,52 @@ export function ColorInput(p: TSlobsInputProps<{}, string>) {
       </Popover>
     </InputWrapper>
   );
+}
+
+export function hexStrToRgba(hexStrVal: string): RgbaColor {
+  const r = parseInt(hexStrVal.slice(1, 3), 16);
+  const g = parseInt(hexStrVal.slice(3, 5), 16);
+  const b = parseInt(hexStrVal.slice(5, 7), 16);
+  let a = 255;
+
+  if (hexStrVal[8]) {
+    a = parseInt(hexStrVal.slice(7, 9), 16);
+  }
+
+  return { r, g, b, a: a / 255 };
+}
+
+export function intToRgba(intVal: number): RgbaColor {
+  const rgba = Utils.intToRgba(intVal);
+  return {
+    ...rgba,
+    a: rgba.a / 255,
+  };
+}
+
+export function rgbaToHexStr(rgba: RgbaColor): string {
+  return `#${
+    intTo2hexDigit(rgba.r) +
+    intTo2hexDigit(rgba.g) +
+    intTo2hexDigit(rgba.b) +
+    intTo2hexDigit(Math.ceil(rgba.a * 255))
+  }`;
+}
+
+export function rgbaToInt(rgba: RgbaColor): number {
+  return Utils.rgbaToInt(rgba.r, rgba.g, rgba.b, Math.ceil(rgba.a * 255));
+}
+
+export function intToHexStr(intVal: number): string {
+  return rgbaToHexStr(intToRgba(intVal));
+}
+
+export function hexStrToInt(hexStrVal: string): number {
+  return rgbaToInt(hexStrToRgba(hexStrVal));
+}
+
+export function intTo2hexDigit(int: number): string {
+  let result = int.toString(16);
+  if (result.length === 1) result = `0${result}`;
+  return result;
 }

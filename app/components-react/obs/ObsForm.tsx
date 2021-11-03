@@ -11,6 +11,8 @@ import {
   CheckboxInput,
   ListInput,
   NumberInput,
+  ObsColorInput,
+  SliderInput,
   TextAreaInput,
   TextInput,
   TInputLayout,
@@ -81,10 +83,23 @@ function ObsInput(p: IObsInputProps) {
   };
 
   switch (type) {
+    case 'OBS_PROPERTY_COLOR':
+      return <ObsColorInput {...inputProps} />;
     case 'OBS_PROPERTY_DOUBLE':
       return <NumberInput {...inputProps} />;
     case 'OBS_PROPERTY_INT':
       return <NumberInput {...inputProps} step={1} min={p.value.minVal} max={p.value.maxVal} />;
+    case 'OBS_PROPERTY_SLIDER':
+      return (
+        <SliderInput
+          {...inputProps}
+          step={p.value.stepVal}
+          min={p.value.minVal}
+          max={p.value.maxVal}
+          debounce={500}
+          hasNumberInput={typeof p.value.stepVal === 'number' && p.value.stepVal < 1}
+        />
+      );
     case 'OBS_PROPERTY_TEXT':
       if (p.value.multiline) {
         return <TextAreaInput {...inputProps} />;
