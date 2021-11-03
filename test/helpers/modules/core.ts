@@ -23,10 +23,7 @@ export async function select(selectorOrEl: TSelectorOrEl): Promise<WebdriverIO.E
 }
 
 export function selectButton(buttonText: string) {
-  return Promise.race([
-    waitForDisplayed(`button=${buttonText}`),
-    waitForDisplayed(`span=${buttonText}`),
-  ]);
+  return select(`button=${buttonText}`);
 }
 
 // CLICK SHORTCUTS
@@ -77,9 +74,7 @@ export async function waitForDisplayed(
   selectorOrEl: TSelectorOrEl,
   options?: WebdriverIO.WaitForOptions,
 ) {
-  const $el = await select(selectorOrEl);
-  await $el.waitForDisplayed(options);
-  return $el;
+  await (await select(selectorOrEl)).waitForDisplayed(options);
 }
 
 export async function waitForClickable(
@@ -146,11 +141,11 @@ export async function useWindow<TCallbackResult>(
   targetWinId: string,
   cb: () => Promise<TCallbackResult>,
 ): Promise<TCallbackResult> {
-  const winIdBefore = await getFocusedWindowId();
-  if (winIdBefore !== targetWinId) await focusWindow(targetWinId);
+  const currentWinId = await getFocusedWindowId();
+  const shouldChangeFocus = currentWinId !== targetWinId;
+  if (shouldChangeFocus) await focusWindow(targetWinId);
   const result = await cb();
-  const winIdAfter = await getFocusedWindowId();
-  if (winIdBefore !== winIdAfter) await focusWindow(winIdBefore);
+  if (shouldChangeFocus) await focusWindow(currentWinId);
   return result;
 }
 
