@@ -113,7 +113,6 @@ export class SceneCollectionsService extends Service implements ISceneCollection
   async initialize() {
     await this.stateService.loadManifestFile();
     await this.migrateOS();
-    await this.safeSync();
     if (this.activeCollection && this.activeCollection.operatingSystem === getOS()) {
       await this.load(this.activeCollection.id, true);
     } else if (this.loadableCollections.length > 0) {
@@ -151,7 +150,6 @@ export class SceneCollectionsService extends Service implements ISceneCollection
     await this.disableAutoSave();
     await this.save();
     await this.deloadCurrentApplicationState();
-    await this.safeSync();
     await this.stateService.flushManifestFile();
   }
 
@@ -267,35 +265,8 @@ export class SceneCollectionsService extends Service implements ISceneCollection
     if (!collId) return;
 
     this.stateService.RENAME_COLLECTION(collId, name, new Date().toISOString());
-    await this.safeSync();
     const coll = this.getCollection(collId);
     if (coll) this.collectionUpdated.next(coll);
-  }
-
-  /**
-   * Calls sync, but will never cause a rejected promise.
-   * Instead, it will log an error and continue.
-   */
-  async safeSync(retries = 2) {
-    if (!this.canSync()) return;
-
-    if (this.syncPending) {
-      console.error(
-        'Unable to start the scenes-collection sync process while prev process is not finished',
-      );
-      return;
-    }
-
-    this.syncPending = true;
-    try {
-      await this.sync();
-      this.syncPending = false;
-    } catch (e: unknown) {
-      this.syncPending = false;
-
-      console.error(`Scene collection sync failed (Attempt ${3 - retries}/3)`, e);
-      if (retries > 0) await this.safeSync(retries - 1);
-    }
   }
 
   /**
@@ -568,7 +539,6 @@ export class SceneCollectionsService extends Service implements ISceneCollection
         // A local hard delete without notifying the server
         // will force a fresh download from the server on next sync
         this.stateService.HARD_DELETE_COLLECTION(id);
-        await this.safeSync();
 
         // Find the newly downloaded collection and load it
         const newCollection = this.collections.find(coll => coll.serverId === collection.serverId);
@@ -669,7 +639,6 @@ export class SceneCollectionsService extends Service implements ISceneCollection
     }
 
     this.stateService.ADD_COLLECTION(id, name, new Date().toISOString(), os, auto);
-    await this.safeSync();
     const collection = this.getCollection(id)!;
     this.collectionAdded.next(collection);
 
@@ -682,7 +651,6 @@ export class SceneCollectionsService extends Service implements ISceneCollection
   private async removeCollection(id: string) {
     this.collectionRemoved.next(this.collections.find(coll => coll.id === id));
     this.stateService.DELETE_COLLECTION(id);
-    await this.safeSync();
 
     // Currently we don't remove files on disk in case we need to recover them
     // manually at a later point in time.  Once we are more comfortable with

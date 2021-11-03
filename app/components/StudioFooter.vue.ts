@@ -11,6 +11,7 @@ import {
 import { UserService } from '../services/user';
 import { getPlatformService } from 'services/platforms';
 import { YoutubeService } from 'services/platforms/youtube';
+import { FlexTvService } from 'services/platforms/flextv';
 import { PerformanceService, EStreamQuality } from 'services/performance';
 import { CustomizationService } from 'services/customization';
 import { WindowsService } from 'services/windows';
@@ -18,6 +19,7 @@ import { $t } from 'services/i18n';
 import { SettingsService } from 'services/settings';
 import { UsageStatisticsService } from 'services/usage-statistics';
 import { NavigationService } from '../services/navigation';
+import electron from 'electron';
 
 @Component({
   components: {
@@ -35,6 +37,7 @@ export default class StudioFooterComponent extends Vue {
   @Inject() settingsService: SettingsService;
   @Inject() performanceService: PerformanceService;
   @Inject() youtubeService: YoutubeService;
+  @Inject() flexTvService: FlexTvService;
   @Inject() usageStatisticsService: UsageStatisticsService;
   @Inject() navigationService: NavigationService;
 
@@ -166,6 +169,28 @@ export default class StudioFooterComponent extends Vue {
     } else {
       this.streamingService.stopReplayBuffer();
     }
+  }
+
+  openFlexTvHelperWindow() {
+    this.flexTvService
+      .fetchHelperToken()
+      .then(token => {
+        const url = `https://api.stage.flexhp.kro.kr/member/getlogin?branch=flex&authdata=${encodeURIComponent(
+          token,
+        )}`;
+        electron.remote.shell.openExternal(url);
+      })
+      .catch((e: unknown) => {
+        electron.remote.dialog.showMessageBox({
+          title: '도우미 관리 열기 실패',
+          type: 'warning',
+          message: '일시적인 문제가 발생하였습니다.',
+        });
+      });
+  }
+
+  openLoginWindow() {
+    this.userService.showLogin();
   }
 
   saveReplay() {

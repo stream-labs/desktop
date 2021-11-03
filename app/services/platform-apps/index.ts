@@ -189,8 +189,8 @@ export class PlatformAppsService extends StatefulService<IPlatformAppServiceStat
     this.userService.userLogin.subscribe(async () => {
       this.unloadAllApps();
       this.loadProductionApps();
-      this.SET_APP_STORE_VISIBILITY(await this.fetchAppStoreVisibility());
-      this.SET_DEV_MODE(await this.getIsDevMode());
+      this.SET_APP_STORE_VISIBILITY(false);
+      this.SET_DEV_MODE(false);
 
       if (this.state.devMode && localStorage.getItem(this.unpackedLocalStorageKey)) {
         const data = JSON.parse(localStorage.getItem(this.unpackedLocalStorageKey));
@@ -206,18 +206,6 @@ export class PlatformAppsService extends StatefulService<IPlatformAppServiceStat
     });
   }
 
-  /**
-   * Get production apps
-   */
-  async fetchProductionApps(): Promise<IProductionAppResponse[]> {
-    const headers = authorizedHeaders(this.userService.apiToken);
-    const request = new Request(`https://${this.hostsService.platform}/api/v1/sdk/installed_apps`, {
-      headers,
-    });
-
-    return jfetch<IProductionAppResponse[]>(request).catch(() => []);
-  }
-
   getDisabledAppsFromStorage(): string[] {
     const disabledAppsStr = localStorage.getItem(this.disabledLocalStorageKey);
     return disabledAppsStr ? JSON.parse(disabledAppsStr) : [];
@@ -227,40 +215,6 @@ export class PlatformAppsService extends StatefulService<IPlatformAppServiceStat
    * Load production apps
    */
   async loadProductionApps() {
-    const productionApps = await this.fetchProductionApps();
-    const disabledApps = this.getDisabledAppsFromStorage();
-
-    productionApps.forEach(app => {
-      if (app.is_beta && !app.manifest) return;
-
-      const unpackedVersionLoaded = this.state.loadedApps.find(
-        loadedApp => loadedApp.id === app.id_hash && loadedApp.unpacked,
-      );
-
-      this.loadApp({
-        id: app.id_hash,
-        manifest: app.manifest,
-        unpacked: false,
-        beta: app.is_beta,
-        appUrl: app.cdn_url,
-        appToken: app.app_token,
-        poppedOutSlots: [],
-        icon: app.icon,
-        enabled: !(unpackedVersionLoaded || disabledApps.includes(app.id_hash)),
-      });
-    });
-  }
-
-  fetchAppStoreVisibility(): Promise<boolean> {
-    const headers = authorizedHeaders(this.userService.apiToken);
-    const request = new Request(
-      `https://${this.hostsService.platform}/api/v1/sdk/is_app_store_visible`,
-      { headers },
-    );
-
-    return jfetch<{ is_app_store_visible: boolean }>(request)
-      .then(json => json.is_app_store_visible)
-      .catch(() => false);
   }
 
   /**
@@ -490,17 +444,6 @@ export class PlatformAppsService extends StatefulService<IPlatformAppServiceStat
     );
 
     return jfetch<{ id_hash: string }>(request).then(json => json.id_hash);
-  }
-
-  private getIsDevMode(): Promise<boolean> {
-    const headers = authorizedHeaders(this.userService.apiToken);
-    const request = new Request(`https://${this.hostsService.platform}/api/v1/sdk/dev_mode`, {
-      headers,
-    });
-
-    return jfetch<{ dev_mode: boolean }>(request)
-      .then(json => json.dev_mode)
-      .catch(() => false);
   }
 
   private loadManifestFromDisk(manifestPath: string): Promise<string> {

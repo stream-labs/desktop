@@ -75,11 +75,7 @@ export class DefaultManager extends PropertiesManager {
 
     if (this.settings.mediaBackup.serverId && this.settings.mediaBackup.originalPath) {
       this.mediaBackupService
-        .syncFile(
-          this.settings.mediaBackup.localId,
-          this.settings.mediaBackup.serverId,
-          this.settings.mediaBackup.originalPath,
-        )
+        .syncFile(this.settings.mediaBackup.localId, this.settings.mediaBackup.originalPath)
         .then(file => {
           if (file && !this.destroyed) {
             this.currentMediaPath = file.filePath;

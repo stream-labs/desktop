@@ -120,18 +120,10 @@ export class AppService extends StatefulService<IAppState> {
       // exceptions raised while loading the configuration are
       // associated with the user in sentry.
       this.userService.autoLogin(),
-
-      // this config should be downloaded before any game-capture source has been added to the scene
-      this.downloadAutoGameCaptureConfig(),
     ]).catch(e => {
       // probably the internet is disconnected
       console.error('Auto login failed', e);
     });
-
-    // Second, we want to start the crash reporter service.  We do this
-    // after the user service because we want crashes to be associated
-    // with a particular user if possible.
-    this.crashReporterService.beginStartup();
 
     if (!this.userService.isLoggedIn) {
       // If this user is logged in, this would have already happened as part of login

@@ -1,10 +1,9 @@
-import { EPlatformCallResult, IPlatformRequest } from '.';
+import { EPlatformCallResult, IPlatformRequest, IPlatformService } from '.';
 import { InheritMutations } from '../core';
 import { BasePlatformService } from './base-platform';
-import { IPlatformCapabilityResolutionPreset, IPlatformState, TPlatformCapability } from './index';
+import { IPlatformState, TPlatformCapability } from './index';
 import { IGoLiveSettings } from '../streaming';
 import { platformAuthorizedRequest } from './utils';
-import { WidgetType } from '../widgets';
 import electron from 'electron';
 
 export interface IFlextvStartStreamOptions {
@@ -14,15 +13,15 @@ export interface IFlextvStartStreamOptions {
   useMinFanLevel?: boolean;
 }
 
-interface IFlextvServiceState extends IPlatformState {
+interface IFlexTvServiceState extends IPlatformState {
   settings: IFlextvStartStreamOptions;
 }
 
 @InheritMutations()
-export class FlextvService
-  extends BasePlatformService<IFlextvServiceState>
-  implements IPlatformCapabilityResolutionPreset {
-  static initialState: IFlextvServiceState = {
+export class FlexTvService
+  extends BasePlatformService<IFlexTvServiceState>
+  implements IPlatformService {
+  static initialState: IFlexTvServiceState = {
     ...BasePlatformService.initialState,
     settings: { title: '' },
   };
@@ -42,6 +41,10 @@ export class FlextvService
 
   get authUrl() {
     return `${this.apiBase}/login`;
+  }
+
+  get streamPageUrl() {
+    return `${this.apiBase}/channels/${this.channelId}/live`;
   }
 
   private get apiToken() {
@@ -112,10 +115,13 @@ export class FlextvService
   }
 
   async afterStopStream() {
-    return platformAuthorizedRequest<{ url: string; streamKey: string }>('flextv', {
+    await platformAuthorizedRequest<{ url: string; streamKey: string }>('flextv', {
       url: `${this.apiBase}/api/my/channel/stop-stream`,
       method: 'POST',
     });
+  }
+
+  async fetchNewToken(): Promise<void> {
   }
 
   fetchStreamPair(): Promise<{ url: string; streamKey: string }> {
@@ -157,7 +163,7 @@ export class FlextvService
     this.SET_STREAM_SETTINGS({ ...config.data });
   }
 
-  async fetchUserInfo() {
+  async fetchUserInfo(): Promise<any> {
     const userInfo = await platformAuthorizedRequest<{
       profile: {
         nickname: string;
@@ -175,10 +181,17 @@ export class FlextvService
   }
 
   get chatUrl(): string {
-    return `${this.apiBase}/redirects/signin?token=${this.apiToken}&redirectTo=/popup/chat/${this.channelId}`;
+    return `${this.apiBase}/redirects/signin?token=${this.apiToken}&redirectTo=/popup/chat/${this.channelId}?darkTheme=true`;
   }
 
   get liveDockEnabled(): boolean {
     return false;
+  }
+
+  async fetchHelperToken(): Promise<string> {
+    return platformAuthorizedRequest<string>(
+      'flextv',
+      `${this.apiBase}/api/my/channel/hp/access-key`,
+    ).catch(() => '');
   }
 }

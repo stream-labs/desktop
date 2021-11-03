@@ -24,42 +24,6 @@
       <div v-if="streamingService.isRecording" class="nav-item record-time">
         {{ recordingTime }}
       </div>
-      <div class="nav-item">
-        <button
-          :disabled="locked"
-          class="record-button"
-          @click="toggleRecording"
-          :class="{ active: streamingService.isRecording }"
-        >
-          <span>REC</span>
-        </button>
-      </div>
-      <div class="nav-item" v-if="replayBufferEnabled && replayBufferOffline">
-        <button
-          class="circle-button"
-          @click="toggleReplayBuffer"
-          v-tooltip.left="$t('Start Replay Buffer')"
-        >
-          <i class="icon-replay-buffer" />
-        </button>
-      </div>
-      <div class="nav-item replay-button-group" v-if="!replayBufferOffline">
-        <button
-          class="circle-button left-replay button--soft-warning"
-          @click="toggleReplayBuffer"
-          v-tooltip.left="$t('Stop')"
-        >
-          <i class="fa fa-stop" />
-        </button>
-        <button
-          class="circle-button right-replay"
-          @click="saveReplay"
-          :disabled="replayBufferSaving || replayBufferStopping"
-          v-tooltip.left="$t('Save Replay')"
-        >
-          <i class="icon-save" />
-        </button>
-      </div>
       <div class="nav-item" v-if="canSchedule">
         <button
           class="circle-button"
@@ -70,7 +34,18 @@
         </button>
       </div>
       <div class="nav-item" v-if="loggedIn">
+        <button class="ui button" @click="openFlexTvHelperWindow">
+          도우미 관리
+        </button>
+      </div>
+      <div class="nav-item" v-if="loggedIn">
         <start-streaming-button :disabled="locked" />
+      </div>
+      <div class="nav-item" v-if="!loggedIn">
+        <button class="button button--action" @click="openLoginWindow">
+          <i class="fas fa-sign-in-alt" />
+          <strong>로그인</strong>
+        </button>
       </div>
     </div>
   </div>

@@ -132,23 +132,7 @@ export class MediaBackupService extends StatefulService<IMediaBackupState> {
 
     this.INSERT_FILE(file);
 
-    let data: { id: number };
-
-    try {
-      data = await this.withRetry(() => this.uploadFile(file));
-    } catch (e: unknown) {
-      console.error('[Media Backup] Error uploading file:', e);
-
-      // We don't surface errors to the user currently
-      if (this.validateSyncLock(localId, syncLock)) {
-        this.UPDATE_FILE(localId, { status: EMediaFileStatus.Synced });
-      }
-
-      return null;
-    }
-
     if (this.validateSyncLock(localId, syncLock)) {
-      file.serverId = data.id;
       file.status = EMediaFileStatus.Synced;
       this.UPDATE_FILE(localId, file);
       return file;
@@ -160,20 +144,18 @@ export class MediaBackupService extends StatefulService<IMediaBackupState> {
   /**
    * Checks the file for integrity and downloads a new copy if necessary
    * @param localId the local id of the file
-   * @param serverId the server id of the file
    * @param originalFilePath the original path of the file when it was
    * uploaded.  This is an optimization to prevent having a duplicate of
    * the media in the users cache on the PC that the originally uploaded
    * the media from.
    */
-  async syncFile(localId: string, serverId: number, originalFilePath: string): Promise<IMediaFile> {
+  async syncFile(localId: string, originalFilePath: string): Promise<IMediaFile> {
     const name = path.parse(originalFilePath).base;
 
     const syncLock = uuid();
 
     const file: IMediaFile = {
       name,
-      serverId,
       syncLock,
       id: localId,
       filePath: originalFilePath,
@@ -182,66 +164,13 @@ export class MediaBackupService extends StatefulService<IMediaBackupState> {
 
     this.INSERT_FILE(file);
 
-    let data: IMediaFileDataResponse;
-
-    try {
-      data = await this.withRetry(() => this.getFileData(serverId));
-    } catch (e: unknown) {
-      // At the moment, we don't surface sync errors to the user
-      if (this.validateSyncLock(localId, syncLock)) {
-        if (e['status'] !== 404) {
-          // Don't log 404s, these are somewhat expected.
-          console.error(`[Media Backup] Ran out of retries fetching data ${e['body']}`);
-        }
-        this.UPDATE_FILE(localId, { status: EMediaFileStatus.Synced });
-      }
-      return null;
-    }
-
-    // These are the 2 locations that will be checked for valid media files
-    const filesToCheck = [originalFilePath, this.getMediaFilePath(serverId, data.filename)];
-
-    for (const fileToCheck of filesToCheck) {
-      if (fs.existsSync(fileToCheck)) {
-        let checksum: string;
-
-        try {
-          checksum = await this.withRetry(() => getChecksum(fileToCheck));
-        } catch (e: unknown) {
-          // This is not a fatal error, we can download a new copy
-          console.warn(`[Media Backup] Error calculating checksum: ${e}`);
-        }
-
-        if (checksum && checksum === data.checksum) {
-          if (this.validateSyncLock(localId, syncLock)) {
-            file.filePath = fileToCheck;
-            file.status = EMediaFileStatus.Synced;
-            this.UPDATE_FILE(localId, file);
-            return file;
-          }
-        }
-
-        console.debug(`[Media Backup] Got checksum mismatch: ${checksum} =/= ${data.checksum}`);
-      }
-    }
-
     // We need to download a new copy of this file from the server
     if (!this.validateSyncLock(localId, syncLock)) return null;
     this.UPDATE_FILE(localId, { status: EMediaFileStatus.Downloading });
     let downloadedPath: string;
 
-    try {
-      downloadedPath = await this.withRetry(() =>
-        this.downloadFile(data.url, serverId, data.filename),
-      );
-    } catch (e: unknown) {
-      console.error(`[Media Backup] Error downloading file: ${e['body']}`);
-
-      // At the moment, we don't surface sync errors to the user
-      if (this.validateSyncLock(localId, syncLock)) {
-        this.UPDATE_FILE(localId, { status: EMediaFileStatus.Synced });
-      }
-      return null;
+    if (this.validateSyncLock(localId, syncLock)) {
+      this.UPDATE_FILE(localId, { status: EMediaFileStatus.Synced });
     }
 
     if (this.validateSyncLock(localId, syncLock)) {
