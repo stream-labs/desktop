@@ -46,6 +46,9 @@ export function setContext(t: TExecutionContext) {
 export function getContext(): TExecutionContext {
   return testContext;
 }
+export function getApp() {
+  return getContext().context.app;
+}
 
 interface ITestRunnerOptions {
   skipOnboarding?: boolean;

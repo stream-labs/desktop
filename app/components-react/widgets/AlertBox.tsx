@@ -10,9 +10,15 @@ import {
   SliderInput,
   TextInput,
   AudioUrlInput,
+  SwitchInput,
+  FontFamilyInput,
+  ColorInput,
+  FontWeightInput,
+  FontSizeInput,
+  ListInput,
 } from '../shared/inputs';
 import { $t } from '../../services/i18n';
-import { Alert, Button, Menu, Tooltip } from 'antd';
+import { Alert, Button, Collapse, Menu, Tooltip } from 'antd';
 import Form from '../shared/inputs/Form';
 import { WidgetLayout } from './common/WidgetLayout';
 import { CaretRightOutlined, QuestionCircleOutlined } from '@ant-design/icons';
@@ -24,6 +30,8 @@ import { Services } from '../service-provider';
 import { ButtonGroup } from '../shared/ButtonGroup';
 import { LayoutInput } from './common/LayoutInput';
 import InputWrapper from '../shared/inputs/InputWrapper';
+import { assertIsDefined } from '../../util/properties-type-guards';
+
 /**
  * Root component
  */
@@ -95,6 +103,7 @@ function GeneralSettings() {
       {/*  message={$t('Need to test your alerts with different scenarios?')}*/}
       {/*  onClick={openAdvancedAlertTesting}*/}
       {/*/>*/}
+      <AdvancedSettingsPanel />
     </Form>
   );
 }
@@ -168,14 +177,26 @@ function AlertsList() {
  * Settings for a selected Alert
  */
 function VariationSettings(p: { type: TAlertType }) {
+  let SettingsComponent: JSX.Element;
   switch (p.type) {
     case 'donation':
-      return <DonationSettings />;
+      SettingsComponent = <DonationSettings />;
+      break;
     case 'merch':
-      return <MerchSettings />;
+      SettingsComponent = <MerchSettings />;
+      break;
     default:
-      return <CommonAlertSettings type={p.type} />;
+      SettingsComponent = <CommonAlertSettings type={p.type} />;
+      break;
   }
+
+  return (
+    <>
+      {SettingsComponent}
+      <AnimationSettingsPanel />
+      <FontSettingsPanel />
+    </>
+  );
 }
 
 /**
@@ -195,9 +216,66 @@ function CommonAlertSettings(p: { type: TAlertType; hiddenFields?: string[] }) {
       <AudioUrlInput {...bind.sound_href} />
       <SliderInput debounce={500} {...bind.sound_volume} />
       <TextInput {...bind.message_template} />
+      {isCustomCodeEnabled && <SliderInput {...bind.alert_duration} />}
       {bindMinAmount && <NumberInput {...bindMinAmount} />}
-      <SliderInput {...bind.alert_duration} />
     </div>
+  );
+}
+
+/**
+ * Renders FontSettings panel for a selected variation
+ */
+function FontSettingsPanel() {
+  const { createVariationBinding, selectedAlert, isCustomCodeEnabled } = useAlertBox();
+  assertIsDefined(selectedAlert);
+  const bind = createVariationBinding(selectedAlert, 'default', useForceUpdate());
+
+  // do not show font settings if CustomCode is enabled
+  if (isCustomCodeEnabled) return <></>;
+
+  return (
+    <>
+      <Collapse bordered={false}>
+        <Collapse.Panel header={$t('Font Settings')} key={1}>
+          <FontFamilyInput {...bind.font} />
+          <FontSizeInput {...bind.font_size} />
+          <FontWeightInput {...bind.font_weight} />
+          <ColorInput {...bind.font_color} />
+          <ColorInput {...bind.font_color2} />
+        </Collapse.Panel>
+      </Collapse>
+    </>
+  );
+}
+
+/**
+ * Renders AnimationsSetting panel for a selected variation
+ */
+function AnimationSettingsPanel() {
+  const {
+    createVariationBinding,
+    selectedAlert,
+    isCustomCodeEnabled,
+    animationOptions,
+  } = useAlertBox();
+  assertIsDefined(selectedAlert);
+  const bind = createVariationBinding(selectedAlert, 'default', useForceUpdate());
+
+  // do not show animations if CustomCode is enabled
+  if (isCustomCodeEnabled) return <></>;
+
+  return (
+    <>
+      <Collapse bordered={false}>
+        <Collapse.Panel header={$t('Animations')} key={1}>
+          <SliderInput {...bind.alert_duration} />
+          <ListInput {...bind.show_animation} options={animationOptions.show} />
+          <ListInput {...bind.hide_animation} options={animationOptions.hide} />
+          <SliderInput {...bind.text_delay} />
+          <ListInput {...bind.text_animation} options={animationOptions.text} />
+        </Collapse.Panel>
+      </Collapse>
+    </>
   );
 }
 
@@ -266,5 +344,39 @@ function Info(p: { message: string; onClick: Function }) {
       showIcon
       style={{ marginBottom: '16px' }}
     />
+  );
+}
+
+/**
+ * Advanced panel in the General Settings tab
+ */
+function AdvancedSettingsPanel() {
+  const { bind, updateSettings } = useAlertBox();
+  const isUnlimitedModerationDelay = bind.moderation_delay.value === -1;
+
+  function switchUnlimitedModeration(enabled: boolean) {
+    updateSettings({ moderation_delay: enabled ? -1 : 0 });
+  }
+
+  return (
+    <Collapse bordered={false} style={{ marginBottom: '8px' }}>
+      <Collapse.Panel header={$t('Advanced')} key={1}>
+        <SwitchInput {...bind.interrupt_mode} />
+        {bind.interrupt_mode.value && <SliderInput {...bind.interrupt_mode_delay} debounce={500} />}
+        <InputWrapper label={$t('Alert Moderation delay')}>
+          {!isUnlimitedModerationDelay && (
+            <SliderInput {...bind.moderation_delay} min={0} debounce={500} nowrap />
+          )}
+          <CheckboxInput
+            label={$t('Use unlimited delay')}
+            value={isUnlimitedModerationDelay}
+            onChange={switchUnlimitedModeration}
+            tooltip={$t(
+              'This applies to all alerts. If enabled all alerts need to be approved manually.',
+            )}
+          />
+        </InputWrapper>
+      </Collapse.Panel>
+    </Collapse>
   );
 }

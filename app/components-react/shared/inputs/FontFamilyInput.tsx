@@ -1,6 +1,7 @@
 import React from 'react';
 import { ListInput } from './ListInput';
 import { TSlobsInputProps } from './inputs';
+import { $t } from '../../../services/i18n';
 
 const fonts = [
   'ABeeZee',
@@ -731,7 +732,13 @@ const fonts = [
 ];
 
 export function FontFamilyInput(p: TSlobsInputProps<{}, string>) {
+  const tooltip = p.tooltip || $t('font_family_tooltip');
   return (
-    <ListInput {...p} showSearch options={fonts.map(font => ({ label: font, value: font }))} />
+    <ListInput
+      {...p}
+      tooltip={tooltip}
+      showSearch
+      options={fonts.map(font => ({ label: font, value: font }))}
+    />
   );
 }
