@@ -183,5 +183,6 @@
   "Play Alert": "Play Alert",
   "Browser Settings": "Browser Settings",
   "Custom Code": "Custom Code",
+  "font_family_tooltip": "使用Google的字體。如需要，請訪問 https://fonts.google.com！常用字體︰ Open Sans, Roboto, Oswald, Lato, Droid Sans.",
   "Something went wrong while applying settings": "Something went wrong while applying settings"
 }
