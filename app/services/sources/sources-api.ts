@@ -140,4 +140,5 @@ export interface ISourceDisplayData {
   description: string;
   demoFilename?: string;
   supportList?: string[];
+  demoVideo?: boolean;
 }

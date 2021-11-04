@@ -40,14 +40,13 @@ export default function SourcesShowcase() {
     CustomizationService,
   } = Services;
 
-  const widgetTypes = WidgetType;
-  const essentialWidgetTypes = new Set([widgetTypes.AlertBox]);
+  const essentialWidgetTypes = new Set([WidgetType.AlertBox]);
   const primaryPlatformService = UserService.state.auth
     ? getPlatformService(UserService.state.auth.primaryPlatform)
     : null;
   const hasStreamlabel = primaryPlatformService?.hasCapability('streamlabels');
 
-  const iterableWidgetTypes = Object.keys(widgetTypes)
+  const iterableWidgetTypes = Object.keys(WidgetType)
     .filter((type: string) => isNaN(Number(type)))
     .filter(type => {
       // show only supported widgets
@@ -56,7 +55,7 @@ export default function SourcesShowcase() {
       return whitelist.includes(WidgetType[type]);
     })
     .sort((a: string, b: string) => {
-      return essentialWidgetTypes.has(widgetTypes[a]) ? -1 : 1;
+      return essentialWidgetTypes.has(WidgetType[a]) ? -1 : 1;
     });
 
   const { demoMode, designerMode, platform, isLoggedIn, enabledApps } = useVuex(() => ({
@@ -67,10 +66,6 @@ export default function SourcesShowcase() {
     enabledApps: PlatformAppsService.views.enabledApps,
   }));
 
-  function widgetData(type: string) {
-    return WidgetDisplayData(platform)[widgetTypes[type]];
-  }
-
   function selectSource(sourceType: TSourceType, options: ISelectSourceOptions = {}) {
     const managerType = options.propertiesManager || 'default';
     const propertiesManagerSettings: Dictionary<any> = { ...omit(options, 'propertiesManager') };
@@ -79,11 +74,6 @@ export default function SourcesShowcase() {
       propertiesManagerSettings,
       propertiesManager: managerType,
     });
-  }
-
-  function getSrc(type: string) {
-    const dataSource = widgetData(type) ? widgetData : sourceData;
-    return $i(`source-demos/${demoMode}/${dataSource(type).demoFilename}`);
   }
 
   function getLoginSrc() {
@@ -139,8 +129,9 @@ export default function SourcesShowcase() {
       propertiesManager: 'streamlabels',
     });
   }
-  function availableSources(): ISourceDefinition[] {
-    const sourcesList: ISourceDefinition[] = SourcesService.getAvailableSourcesTypesList()
+
+  function availableSources() {
+    return SourcesService.getAvailableSourcesTypesList()
       .filter(type => {
         // Freetype on windows is hidden
         if (type.value === 'text_ft2_source' && byOS({ [OS.Windows]: true, [OS.Mac]: false })) {
@@ -148,20 +139,11 @@ export default function SourcesShowcase() {
         }
         return !(type.value === 'scene' && ScenesService.views.scenes.length <= 1);
       })
-      .map(listItem => {
-        return {
-          id: listItem.value,
-          type: listItem.value,
-          name: sourceData(listItem.value).name,
-          description: sourceData(listItem.value).description,
-        };
-      });
-
-    return sourcesList;
+      .map(listItem => listItem.value);
   }
 
   function inspectedSourceDefinition() {
-    return availableSources().find(source => source.id === inspectedSource);
+    return availableSources().find(source => source === inspectedSource);
   }
 
   function availableAppSources(): {
@@ -204,19 +186,34 @@ export default function SourcesShowcase() {
 }
 
 function SideBar(p: { inspectedSourceType: string | WidgetType }) {
-  const sourceData = SourceDisplayData()[p.inspectedSourceType];
+  const { UserService, CustomizationService } = Services;
+
+  const { demoMode, platform } = useVuex(() => ({
+    demoMode: CustomizationService.views.isDarkTheme ? 'night' : 'day',
+    platform: UserService.views.platform?.type,
+  }));
+
+  const displayData = widgetData(p.inspectedSourceType)
+    ? widgetData(p.inspectedSourceType)
+    : SourceDisplayData()[p.inspectedSourceType];
+
+  function widgetData(type: string | WidgetType) {
+    return WidgetDisplayData(platform)[WidgetType[type]];
+  }
+
+  function getSrc() {
+    return $i(`source-demos/${demoMode}/${displayData.demoFilename}`);
+  }
 
   return (
     <Sider>
-      <h2>{{ name }}</h2>
-      <div class="desc">{{ description }}</div>
-
-      <div class="source-support" v-if="showSupport">
-        <slot name="support-list"></slot>
-      </div>
-
-      <div class="source-info__media">
-        <slot name="media"></slot>
+      <div>
+        {displayData?.demoVideo && (
+          <video autoPlay loop>
+            <source src={getSrc()} />
+          </video>
+        )}
+        {!displayData?.demoVideo && <img src={getSrc()} />}
       </div>
     </Sider>
   );
