@@ -23,6 +23,7 @@ const { Updater } = require('./updater/mac/Updater.js');
 ////////////////////////////////////////////////////////////////////////////////
 const {
   app,
+  autoUpdater,
   BrowserWindow,
   ipcMain,
   session,
@@ -593,6 +594,35 @@ app.on('ready', () => {
   } else {
     startApp();
   }*/
+
+  /*
+  const platform = os.platform() + '_' + os.arch();
+  const version = app.getVersion();
+
+  const url = 'http://caster.hotaetv.com/update/' + platform + '/' + version;
+  console.log(url, 'url')
+
+  autoUpdater.setFeedURL({ url })
+
+  setInterval(() => {
+    autoUpdater.checkForUpdates()
+  }, 60000);
+
+  autoUpdater.on('update-downloaded', (event, releaseNotes, releaseName) => {
+    const dialogOpts = {
+      type: 'info',
+      buttons: ['Restart', 'Later'],
+      title: 'Application Update',
+      message: process.platform === 'win32' ? releaseNotes : releaseName,
+      detail: 'A new version has been downloaded. Restart the application to apply the updates.'
+    }
+
+    dialog.showMessageBox(dialogOpts).then((returnValue) => {
+      if (returnValue.response === 0) autoUpdater.quitAndInstall()
+    })
+  })
+   */
+
   startApp();
 });
 

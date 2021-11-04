@@ -43,7 +43,7 @@ const base = {
     rfc3161TimeStampServer: 'http://timestamp.digicert.com',
     timeStampServer: 'http://timestamp.digicert.com',
     async sign(config) {
-      if (process.env.SLOBS_NO_SIGN) return;
+      if (!process.env.SLOBS_NO_SIGN) return;
 
       if (
         config.path.indexOf('node_modules\\obs-studio-node\\data\\obs-plugins\\win-capture') !== -1
@@ -54,8 +54,8 @@ const base = {
 
       console.log(`Signing ${config.hash} ${config.path}`);
       await signtool.sign(config.path, {
-        subject: 'Streamlabs (General Workings, Inc.)',
-        rfcTimestamp: 'http://timestamp.digicert.com',
+        subject: 'FlexTv (Flex ENM, Inc.)',
+        rfcTimestamp: 'http://timestamp.globalsign.com/tsa/r6advanced1',
         algorithm: config.hash,
         append: config.isNest,
         description: config.name,
