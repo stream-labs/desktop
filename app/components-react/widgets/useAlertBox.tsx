@@ -239,6 +239,7 @@ export class AlertBoxModule extends WidgetModule<IAlertBoxState> {
           'moderation_delay',
           'sponsor_text_delay',
           'text_delay',
+          'interrupt_mode_delay',
           'alert_duration',
         ].find(keyToPatch => key.includes(keyToPatch))
       ) {
