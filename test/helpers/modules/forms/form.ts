@@ -32,7 +32,7 @@ export function useForm(name?: string) {
    * Returns an array of input values in the order as they appear in the form
    */
   async function readForm(): Promise<
-    { name: string; value: any; displayValue: boolean | string | string[] }[]
+    { name: string; value: any; displayValue: boolean | number | string | string[] }[]
   > {
     return traverseForm(async input => ({
       name: input.name,
@@ -185,7 +185,7 @@ export function useForm(name?: string) {
     return String(value);
   }
 
-  return { readForm, fillForm, assertFormContains, getInput };
+  return { readForm, readFields, fillForm, assertFormContains, getInput };
 }
 
 /**
@@ -201,6 +201,22 @@ export async function fillForm(...args: unknown[]): Promise<unknown> {
   } else {
     const formData = args[0] as TFormData;
     return useForm().fillForm(formData);
+  }
+}
+
+/**
+ * A shortcut for useForm().readFields()
+ */
+export async function readFields(): Promise<unknown>;
+export async function readFields(formName: string): Promise<TFormData>;
+export async function readFields(...args: unknown[]): Promise<TFormData> {
+  if (typeof args[0] === 'string') {
+    const formName = args[0];
+    const formData = args[1] as TFormData;
+    return useForm(formName).readFields();
+  } else {
+    const formData = args[0] as TFormData;
+    return useForm().readFields();
   }
 }
 

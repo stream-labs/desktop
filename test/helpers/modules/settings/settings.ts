@@ -1,4 +1,11 @@
-import { click, clickButton, focusChild, useChildWindow, useMainWindow } from '../core';
+import {
+  click,
+  clickButton,
+  focusChild,
+  getFocusedWindowId,
+  useChildWindow,
+  useMainWindow
+} from '../core';
 import { mkdtemp } from 'fs-extra';
 import { tmpdir } from 'os';
 import * as path from 'path';
