@@ -249,8 +249,9 @@ export const YoutubeEditStreamInfo = InputComponent((p: IPlatformComponentParams
  * Validate maximum characters for tags
  * @see https://developers.google.com/youtube/v3/docs/videos#snippet.tags[]
  */
-function tagsValidator(rule: unknown, tags: string[], showError: (msg: string) => unknown) {
+function tagsValidator(rule: unknown, tags?: string[], showError: (msg: string) => unknown) {
   const maxChars = 500;
+  if (!tags) return;
   const charsCount = tags.reduce(
     (acc, tag) => acc + (tag.includes(' ') ? tag.length + 2 : tag.length),
     0,
