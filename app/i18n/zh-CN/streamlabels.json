@@ -14,6 +14,6 @@
   "Always, show last person when inactive": "始终，不活动时显示最后人员",
   "Include Resubs": "包括再订阅",
   "Preview": "预览",
-  "Tokens: %{tokenList}": "Tokens: %{tokenList}",
-  "Note: Actual label text may take up to 60 seconds to update": "Note: Actual label text may take up to 60 seconds to update"
+  "Tokens: %{tokenList}": "标记：%{tokenList}",
+  "Note: Actual label text may take up to 60 seconds to update": "注意：实际标签文字最多可能需要 60 秒才能更新"
 }

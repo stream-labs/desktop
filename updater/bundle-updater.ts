@@ -454,8 +454,7 @@ module.exports = async (basePath: string) => {
 
     // Unregister the main process from the crash handler
     try {
-      const crashHandler = require('crash-handler');
-      crashHandler.unregisterProcess(process.pid);
+      electron.ipcRenderer.send('unregister-in-crash-handler', { pid: process.pid });
     } catch (e: unknown) {
       console.log('Error unregistering main process from crash handler');
     }

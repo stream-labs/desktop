@@ -13,6 +13,7 @@ type TFileInputProps = TSlobsInputProps<
 >;
 
 export const FileInput = InputComponent((p: TFileInputProps) => {
+  const { wrapperAttrs, inputAttrs } = useInput('file', p);
   async function showFileDialog() {
     if (p.save) {
       const options: Electron.SaveDialogOptions = {
@@ -48,16 +49,13 @@ export const FileInput = InputComponent((p: TFileInputProps) => {
   }
 
   return (
-    <InputWrapper label={p.label}>
+    <InputWrapper {...wrapperAttrs}>
       <Input
+        {...inputAttrs}
+        onChange={val => inputAttrs?.onChange(val.target.value)}
         disabled
         value={p.value}
-        style={{ marginRight: '16px' }}
-        addonAfter={
-          <Button onClick={showFileDialog} style={{ margin: '0 -11px' }}>
-            {$t('Browse')}
-          </Button>
-        }
+        addonAfter={<Button onClick={showFileDialog}>{$t('Browse')}</Button>}
       />
     </InputWrapper>
   );

@@ -7,7 +7,7 @@ import {
   ListInput,
   TagsInput,
 } from '../../../shared/inputs';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Services } from '../../../service-provider';
 import { $t } from '../../../../services/i18n';
 import BroadcastInput from './BroadcastInput';
@@ -18,6 +18,7 @@ import electron from 'electron';
 import { IYoutubeStartStreamOptions } from '../../../../services/platforms/youtube';
 import PlatformSettingsLayout, { IPlatformComponentParams } from './PlatformSettingsLayout';
 import { Tag } from 'antd';
+import { assertIsDefined } from '../../../../util/properties-type-guards';
 
 /***
  * Stream Settings for YT
@@ -44,13 +45,24 @@ export const YoutubeEditStreamInfo = InputComponent((p: IPlatformComponentParams
   const [{ broadcastLoading, broadcasts }] = useAsyncState(
     { broadcastLoading: true, broadcasts: [] },
     async () => {
+      const broadcasts = await YoutubeService.actions.return.fetchEligibleBroadcasts();
+      const shouldFetchSelectedBroadcast =
+        broadcastId && !broadcasts.find(b => b.id === broadcastId);
+
+      if (shouldFetchSelectedBroadcast) {
+        assertIsDefined(broadcastId);
+        const selectedBroadcast = await YoutubeService.actions.return.fetchBroadcast(broadcastId);
+        broadcasts.push(selectedBroadcast);
+      }
+
       return {
         broadcastLoading: false,
-        broadcasts: await YoutubeService.actions.return.fetchBroadcasts(),
+        broadcasts,
       };
     },
   );
 
+  // re-fill form when the broadcastId selected
   useEffect(() => {
     if (!broadcastId) return;
     YoutubeService.actions.return
@@ -168,6 +180,7 @@ export const YoutubeEditStreamInfo = InputComponent((p: IPlatformComponentParams
             'Tags can be useful if content in your video is commonly misspelled. Otherwise, tags play a minimal role in helping viewers find your video',
           )}
           {...bind.tags}
+          rules={[{ validator: tagsValidator }]}
           tagRender={(tagProps, tag) => (
             <Tag {...tagProps} color="#D22222">
               {tag.label}
@@ -231,3 +244,18 @@ export const YoutubeEditStreamInfo = InputComponent((p: IPlatformComponentParams
     </Form>
   );
 });
+
+/**
+ * Validate maximum characters for tags
+ * @see https://developers.google.com/youtube/v3/docs/videos#snippet.tags[]
+ */
+function tagsValidator(rule: unknown, tags: string[], showError: (msg: string) => unknown) {
+  const maxChars = 500;
+  const charsCount = tags.reduce(
+    (acc, tag) => acc + (tag.includes(' ') ? tag.length + 2 : tag.length),
+    0,
+  );
+  if (charsCount > maxChars) {
+    showError($t('Maximum characters exceeded'));
+  }
+}

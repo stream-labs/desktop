@@ -24,6 +24,8 @@ export function pmap<TVal, TRet>(
     ...options,
   };
 
+  if (items.length === 0) return Promise.resolve([]);
+
   return new Promise<TRet[]>((resolve, reject) => {
     // Store each item with its index for ordering of
     // return values later.

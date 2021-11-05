@@ -1,6 +1,6 @@
 import { test, useSpectron } from '../../helpers/spectron';
 import { showSettingsWindow } from '../../helpers/modules/settings/settings';
-import { clickButton, clickTab } from '../../helpers/modules/core';
+import { clickButton, clickTab, focusChild } from '../../helpers/modules/core';
 import { useForm } from '../../helpers/modules/forms';
 useSpectron();
 
@@ -12,6 +12,7 @@ test('Form inputs', async t => {
 
   // open demo-form
   await showSettingsWindow('Experimental');
+  await focusChild();
   await clickButton('Show Shared Components Library');
   await clickTab('Demo Form');
 
@@ -23,8 +24,10 @@ test('Form inputs', async t => {
     { name: 'gender', value: '', displayValue: null },
     { name: 'age', value: '0', displayValue: '0' },
     { name: 'city', value: '', displayValue: null },
+    { name: 'weight', value: 65, displayValue: 65 },
     { name: 'colors', value: [], displayValue: [] },
     { name: 'addIntroduction', value: false, displayValue: false },
+    { name: 'saveFilePath', value: '', displayValue: '' },
     { name: 'confirm1', value: false, displayValue: false },
     { name: 'confirm2', value: false, displayValue: false },
   ]);
@@ -35,9 +38,11 @@ test('Form inputs', async t => {
     gender: 'Male',
     colors: ['Red', 'Orange'],
     age: 20,
+    weight: 100,
     city: 'Cairo',
     addIntroduction: true,
     introduction: 'Hello World!',
+    saveFilePath: 'C:\\myreport.txt',
     confirm1: true,
     confirm2: true,
   });
@@ -50,6 +55,7 @@ test('Form inputs', async t => {
     { name: 'gender', value: 'male', displayValue: 'Male' },
     { name: 'age', value: '20', displayValue: '20' },
     { name: 'city', value: 'C', displayValue: 'Cairo' },
+    { name: 'weight', value: 100, displayValue: 100 },
     {
       name: 'colors',
       value: [1, 4],
@@ -61,6 +67,7 @@ test('Form inputs', async t => {
       value: 'Hello World!',
       displayValue: 'Hello World!',
     },
+    { name: 'saveFilePath', value: 'C:\\myreport.txt', displayValue: 'C:\\myreport.txt' },
     { name: 'confirm1', value: true, displayValue: true },
     { name: 'confirm2', value: true, displayValue: true },
   ]);
@@ -72,8 +79,10 @@ test('Form inputs', async t => {
     colors: ['Red', 'Orange'],
     age: 20,
     city: 'Cairo',
+    weight: 100,
     addIntroduction: true,
     introduction: 'Hello World!',
+    saveFilePath: 'C:\\myreport.txt',
     confirm1: true,
     confirm2: true,
   });

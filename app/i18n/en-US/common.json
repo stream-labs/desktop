@@ -73,6 +73,7 @@
   "The date must be in %{format} format": "The date must be in %{format} format",
   "This field must be at least %{value} characters.": "This field must be at least %{value} characters.",
   "This field may not be greater than %{value} characters.": "This field may not be greater than %{value} characters.",
+  "Maximum characters exceeded": "Maximum characters exceeded",
   "OBSInit.ErrorTitle": "Initialization Error",
   "Please enter a valid date": "Please enter a valid date",
   "Hr": "Hr",
@@ -131,5 +132,13 @@
   "Use Custom": "Use Custom",
   "Apply": "Apply",
   "Do not show this message again": "Do not show this message again",
-  "You can only select up to %{max} items": "You can only select up to %{max} items"
+  "You can only select up to %{max} items": "You can only select up to %{max} items",
+  "Time": "Time",
+  "Sound Volume": "Sound Volume",
+  "Sound": "Sound",
+  "Play Audio": "Play Audio",
+  "Click here": "Click here",
+  "More Info": "More Info",
+  "Revert Changes": "Revert Changes",
+  "Animations": "Animations"
 }

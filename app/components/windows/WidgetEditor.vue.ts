@@ -1,5 +1,4 @@
-import Vue from 'vue';
-import { Component, Prop, Watch } from 'vue-property-decorator';
+import { Component, Watch } from 'vue-property-decorator';
 import { Inject } from 'services/core/injector';
 import { $t } from 'services/i18n';
 import { TObsFormData } from 'components/obs/inputs/ObsInput';
@@ -7,9 +6,9 @@ import GenericForm from 'components/obs/inputs/GenericForm';
 import { ProjectorService } from 'services/projector';
 import ModalLayout from 'components/ModalLayout.vue';
 import Tabs from 'components/Tabs.vue';
-import { Display, TestWidgets } from 'components/shared/ReactComponent';
+import { Display, TestWidgets } from 'components/shared/ReactComponentList';
 import VFormGroup from 'components/shared/inputs/VFormGroup.vue';
-import { ToggleInput, NumberInput } from 'components/shared/inputs/inputs';
+import { NumberInput, ToggleInput } from 'components/shared/inputs/inputs';
 import { IWidgetData, IWidgetsServiceApi } from 'services/widgets';
 import cloneDeep from 'lodash/cloneDeep';
 import { IWidgetNavItem } from 'components/widgets/WidgetSettings.vue';
@@ -20,6 +19,9 @@ import { IAlertBoxVariation } from 'services/widgets/settings/alert-box/alert-bo
 import { ERenderingMode } from '../../../obs-api';
 import TsxComponent, { createProps } from 'components/tsx-component';
 import Scrollable from 'components/shared/Scrollable';
+import { CustomizationService } from '../../services/customization';
+import { SourcesService } from '../../services/sources';
+import { EAvailableFeatures, IncrementalRolloutService } from '../../services/incremental-rollout';
 
 class WidgetEditorProps {
   isAlertBox?: boolean = false;
@@ -55,7 +57,10 @@ class WidgetEditorProps {
 export default class WidgetEditor extends TsxComponent<WidgetEditorProps> {
   @Inject() private widgetsService!: IWidgetsServiceApi;
   @Inject() private windowsService!: WindowsService;
+  @Inject() private customizationService!: CustomizationService;
+  @Inject() private sourcesService!: SourcesService;
   @Inject() private projectorService: ProjectorService;
+  @Inject() private incrementalRolloutService: IncrementalRolloutService;
 
   $refs: { content: HTMLElement; sidebar: HTMLElement; code: HTMLElement };
 
@@ -175,6 +180,13 @@ export default class WidgetEditor extends TsxComponent<WidgetEditorProps> {
       : firstTab;
   }
 
+  get shouldShowAlertboxSwitcher() {
+    return (
+      this.props.isAlertBox &&
+      this.incrementalRolloutService.views.featureIsEnabled(EAvailableFeatures.reactWidgets)
+    );
+  }
+
   updateTopTab(value: string) {
     if (value === this.currentTopTab) return;
     this.animating = true;
@@ -203,5 +215,10 @@ export default class WidgetEditor extends TsxComponent<WidgetEditorProps> {
     this.widget
       .getSettingsService()
       .toggleCustomCode(enabled, this.wData.settings, this.selectedVariation);
+  }
+
+  switchToNewAlertboxUI() {
+    this.customizationService.actions.setSettings({ legacyAlertbox: false });
+    this.sourcesService.actions.showSourceProperties(this.widget.sourceId);
   }
 }

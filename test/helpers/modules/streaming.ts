@@ -7,16 +7,18 @@ import { getApiClient } from '../api-client';
 import {
   click,
   clickButton,
-  focusChild,
+  focusChild, getFocusedWindowId,
   isDisplayed,
+  select,
   selectButton,
   useChildWindow,
   useMainWindow,
+  waitForClickable,
   waitForDisplayed,
   waitForEnabled,
 } from './core';
 import { sleep } from '../sleep';
-import {fillForm, TFormData, useForm} from './forms';
+import { fillForm, TFormData, useForm } from './forms';
 import { setOutputResolution } from './settings/settings';
 import { StreamSettingsService } from '../../../app/services/settings/streaming';
 
@@ -61,7 +63,10 @@ export async function tryToGoLive(prefillData?: Record<string, unknown>) {
 
   await useChildWindow(async () => {
     await waitForSettingsWindowLoaded();
-    if (prefillData) await fillForm(prefillData);
+    if (prefillData) {
+      await fillForm(prefillData);
+      await sleep(500);
+    }
     await submit();
   });
 }
@@ -145,5 +150,39 @@ export async function updateChannelSettings(prefillData: TFormData) {
     if (prefillData) await fillForm('editStreamForm', prefillData);
     await clickButton('Update');
     await waitForDisplayed('div=Successfully updated');
+  });
+}
+
+export async function openScheduler() {
+  await useMainWindow(async () => {
+    await click('.icon-date'); // open the StreamScheduler
+    await waitForClickable('.ant-picker-calendar-month-select'); // wait for loading
+  });
+}
+
+export async function scheduleStream(date: Date, formData: TFormData) {
+  const year = date.getFullYear();
+  const month = date.getMonth();
+  const day = date.getDate();
+
+  await useMainWindow(async () => {
+    await openScheduler();
+
+    // select the year
+    await click('.ant-picker-calendar-year-select');
+    await click(`.ant-select-item-option[title="${year}"]`);
+
+    // select the month
+    await click('.ant-picker-calendar-month-select');
+    await click(`.rc-virtual-list-holder-inner div:nth-child(${month + 1})`);
+
+    // click the date
+    await click(`.ant-picker-calendar-date-value=${day}`);
+
+    // select the platform
+    await fillForm(formData);
+
+    await clickButton('Schedule');
+    await waitForClickable('.ant-picker-calendar-month-select', { timeout: 10000 });
   });
 }
