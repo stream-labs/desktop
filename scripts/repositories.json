@@ -52,7 +52,7 @@
             "name": "game-overlay",
             "url": "https://obs-studio-deployment.s3-us-west-2.amazonaws.com/",
             "archive": "game-overlay-[VERSION]-[OS].tar.gz",
-            "version": "0.0.53",
+            "version": "0.0.44",
             "win64": true,
             "osx": false
         },
