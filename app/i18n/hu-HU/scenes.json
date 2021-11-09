@@ -39,5 +39,6 @@
   "Name Folder": "Könyvtár Elnevezése",
   "Switch Scenes": "Switch Scenes",
   "Failed to load scene collection.  A new one will be created instead.": "Failed to load scene collection.  A new one will be created instead.",
-  "New Scene": "Új jelenet"
+  "New Scene": "Új jelenet",
+  "Projector": "Kivetítő"
 }

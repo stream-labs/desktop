@@ -186,5 +186,16 @@
   "Audio source working with the Twitch Soundtrack music application. Add this source to be able to filter out the music from your Twitch VODs.": "Fuente de audio que funciona con la aplicación de música Twitch Soundtrack. Agregue esta fuente para poder filtrar la música de sus VBD de Twitch.",
   "Custom Icon": "Icono personalizado",
   "Displays an icon from one of many selections": "Muestra un icono de una de muchas selecciones",
-  "An error has occured, please try re-opening this window": "Se ha producido un error, intente volver a abrir esta ventana"
+  "An error has occured, please try re-opening this window": "Se ha producido un error, intente volver a abrir esta ventana",
+  "Screen Capture": "Screen Capture",
+  "Capture your game, other applications, or your entire monitor": "Capture your game, other applications, or your entire monitor",
+  "Most games, apps, displays": "Most games, apps, displays",
+  "Show Additional Settings": "Show Additional Settings",
+  "Capture Cursor": "Capture Cursor",
+  "Custom Placeholder": "Custom Placeholder",
+  "Automatic": "Automatic",
+  "Capture Game": "Capture Game",
+  "Automatic game capture will scan for running games and automatically capture them.": "Automatic game capture will scan for running games and automatically capture them.",
+  "Capture Entire Screen": "Capture Entire Screen",
+  "Capture Window": "Capture Window"
 }

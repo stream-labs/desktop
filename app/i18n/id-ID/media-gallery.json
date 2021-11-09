@@ -26,5 +26,10 @@
   "Image URL": "URL Gambar",
   "Example": "Contoh",
   "Change Media": "Ganti Media",
-  "No Sound": "Tidak Ada Suara"
+  "No Sound": "Tidak Ada Suara",
+  "No Media": "No Media",
+  "Change Link": "Change Link",
+  "Pick From Gallery": "Pick From Gallery",
+  "Clear Link": "Clear Link",
+  "Media URL": "Media URL"
 }

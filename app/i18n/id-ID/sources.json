@@ -186,5 +186,16 @@
   "Audio source working with the Twitch Soundtrack music application. Add this source to be able to filter out the music from your Twitch VODs.": "Sumber audio kompatibel dengan aplikasi musik Twitch Soundtrack. Tambahkan sumber ini agar bisa menyaring musik dari Twitch VOD Anda.",
   "Custom Icon": "Ikon Khusus",
   "Displays an icon from one of many selections": "Tampilkan sebuah ikon dari salah satu dari sekian banyak pilihan",
-  "An error has occured, please try re-opening this window": "Terjadi kesalahan, cobalah membuka kembali jendela ini"
+  "An error has occured, please try re-opening this window": "Terjadi kesalahan, cobalah membuka kembali jendela ini",
+  "Screen Capture": "Screen Capture",
+  "Capture your game, other applications, or your entire monitor": "Capture your game, other applications, or your entire monitor",
+  "Most games, apps, displays": "Most games, apps, displays",
+  "Show Additional Settings": "Show Additional Settings",
+  "Capture Cursor": "Capture Cursor",
+  "Custom Placeholder": "Custom Placeholder",
+  "Automatic": "Automatic",
+  "Capture Game": "Capture Game",
+  "Automatic game capture will scan for running games and automatically capture them.": "Automatic game capture will scan for running games and automatically capture them.",
+  "Capture Entire Screen": "Capture Entire Screen",
+  "Capture Window": "Capture Window"
 }
