@@ -15,6 +15,7 @@ export default function StartStreamingButton(p: { disabled?: boolean }) {
     CustomizationService,
     MediaBackupService,
     SourcesService,
+    FlexTvService,
   } = Services;
 
   const { streamingStatus, delayEnabled, delaySeconds } = useVuex(() => ({
@@ -61,6 +62,23 @@ export default function StartStreamingButton(p: { disabled?: boolean }) {
           .then(({ response }) => !!response);
 
         if (!goLive) return;
+      }
+
+      const streamStatus = await FlexTvService.checkReadyToStream();
+      if (!streamStatus.success) {
+        await electron.remote.dialog
+          .showMessageBox(electron.remote.getCurrentWindow(), {
+            title: '안내',
+            type: 'warning',
+            message: '방송은 본인인증후 이용이 가능합니다.',
+            buttons: [$t('Cancel'), '본인 인증하러 가기'],
+          })
+          .then(({ response: isOk }) => {
+            if (isOk) {
+              electron.remote.shell.openExternal(FlexTvService.apiBase);
+            }
+          });
+        return;
       }
 
       const needToShowNoSourcesWarning =

@@ -13,6 +13,14 @@ export interface IFlextvStartStreamOptions {
   useMinFanLevel?: boolean;
 }
 
+export interface IFlexTvCommonResponse {
+  success: boolean;
+  error?: {
+    message?: string;
+    code: string;
+  };
+}
+
 interface IFlexTvServiceState extends IPlatformState {
   settings: IFlextvStartStreamOptions;
 }
@@ -186,6 +194,27 @@ export class FlexTvService
 
   get liveDockEnabled(): boolean {
     return false;
+  }
+
+  async checkReadyToStream(): Promise<IFlexTvCommonResponse> {
+    const resp = await platformAuthorizedRequest<any>(
+      'flextv',
+      `${this.apiBase}/api/my/chennel-register`,
+    ).catch(error => {
+      console.log('error', error);
+      return null;
+    });
+    if (!resp) {
+      return {
+        success: false,
+        error: {
+          code: 'NO_AUTH',
+        },
+      };
+    }
+    return {
+      success: true,
+    };
   }
 
   async fetchHelperToken(): Promise<string> {
