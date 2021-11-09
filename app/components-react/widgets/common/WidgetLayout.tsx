@@ -43,7 +43,7 @@ function BasicLayout(p: { children: TLayoutChildren }) {
       </Header>
       <Content>
         <Row style={{ height: '100%', borderTop: '1px solid var(--border)' }}>
-          <Col className={css.menuWrapper}>{!isLoading && MenuPanel}</Col>
+          {MenuPanel && <Col className={css.menuWrapper}>{!isLoading && MenuPanel}</Col>}
           <Col flex="auto" className={css.contentWrapper}>
             <ModalContent>{ContentPanel}</ModalContent>
           </Col>
