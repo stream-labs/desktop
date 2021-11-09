@@ -30,6 +30,7 @@ import {
   CustomCodeWindow,
   SafeMode,
   AdvancedAudio,
+  SourceShowcase,
 } from 'components/shared/ReactComponentList';
 
 import SourceProperties from 'components/windows/SourceProperties.vue';
@@ -148,6 +149,7 @@ export function getComponents() {
     SharedComponentsLibrary,
     WidgetWindow,
     CustomCodeWindow,
+    SourceShowcase,
   };
 }
 

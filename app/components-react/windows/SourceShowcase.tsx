@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Layout, Menu, Card, Empty } from 'antd';
+import { Layout, Menu, Empty, Row, Col, PageHeader } from 'antd';
 import omit from 'lodash/omit';
 import { Services } from 'components-react/service-provider';
 import Scrollable from 'components-react/shared/Scrollable';
@@ -173,7 +173,7 @@ export default function SourcesShowcase() {
 
   return (
     <ModalLayout>
-      <Layout>
+      <Layout style={{ height: 'calc(100% - 53px)' }}>
         <Content>
           <Menu
             onClick={e => setActiveTab(e.key)}
@@ -186,27 +186,58 @@ export default function SourcesShowcase() {
             <Menu.Item key="widgets">{$t('Widgets')}</Menu.Item>
             <Menu.Item key="apps">{$t('Apps')}</Menu.Item>
           </Menu>
-          <Scrollable>
-            {showContent('general') &&
-              availableSources.map(source => (
-                <Card onClick={() => inspectSource(source.value)}>{source.description}</Card>
-              ))}
-            {showContent('widgets') &&
-              (isLoggedIn ? (
-                <Empty image={require(`../../../media/images/sleeping-kevin-${demoMode}.png`)} />
-              ) : (
-                iterableWidgetTypes.map(widgetType => (
-                  <Card onClick={() => inspectSource(widgetType)}>
-                    {WidgetDisplayData()[widgetType].name}
-                  </Card>
-                ))
-              ))}
-            {showContent('apps') &&
-              availableAppSources.map(app => (
-                <Card onClick={() => inspectSource(app.source.type, app.appId)}>
-                  {app.source.name}
-                </Card>
-              ))}
+          <Scrollable style={{ height: '100%' }}>
+            <Row gutter={[8, 8]}>
+              {showContent('general') && (
+                <>
+                  <Col span={24}>
+                    <PageHeader title={$t('General Sources')} />
+                  </Col>
+                  {availableSources.map(source => (
+                    <SourceTag
+                      key={source.value}
+                      name={source.description}
+                      onClick={() => inspectSource(source.value)}
+                    />
+                  ))}
+                </>
+              )}
+
+              {showContent('widgets') && (
+                <>
+                  <Col span={24}>
+                    <PageHeader title={$t('Widgets')} />
+                  </Col>
+                  {!isLoggedIn ? (
+                    <Empty
+                      image={require(`../../../media/images/sleeping-kevin-${demoMode}.png`)}
+                    />
+                  ) : (
+                    iterableWidgetTypes.map(widgetType => (
+                      <SourceTag
+                        key={widgetType}
+                        name={WidgetDisplayData()[WidgetType[widgetType]].name}
+                        onClick={() => inspectSource(widgetType)}
+                      />
+                    ))
+                  )}
+                </>
+              )}
+              {showContent('apps') && (
+                <>
+                  <Col span={24}>
+                    <PageHeader title={$t('Apps')} />
+                  </Col>
+                  {availableAppSources.map(app => (
+                    <SourceTag
+                      key={app.appId}
+                      name={app.source.name}
+                      onClick={() => inspectSource(app.source.type, app.appId)}
+                    />
+                  ))}
+                </>
+              )}
+            </Row>
           </Scrollable>
         </Content>
         <SideBar inspectedSource={inspectedSource} />
@@ -232,11 +263,11 @@ function SideBar(p: { inspectedSource: string | WidgetType }) {
   }
 
   function getSrc() {
-    return $i(`source-demos/${demoMode}/${displayData.demoFilename}`);
+    return $i(`source-demos/${demoMode}/${displayData?.demoFilename}`);
   }
 
   return (
-    <Sider>
+    <Sider width={300}>
       <div>
         {displayData?.demoVideo && (
           <video autoPlay loop>
@@ -246,5 +277,26 @@ function SideBar(p: { inspectedSource: string | WidgetType }) {
         {!displayData?.demoVideo && <img src={getSrc()} />}
       </div>
     </Sider>
+  );
+}
+
+function SourceTag(p: { name: string; onClick: () => void }) {
+  const tagStyle: React.CSSProperties = {
+    background: 'var(--section-alt)',
+    borderRadius: '4px',
+    height: '32px',
+    paddingTop: '6px',
+    paddingLeft: '16px',
+    paddingRight: '8px',
+    overflow: 'hidden',
+    whiteSpace: 'nowrap',
+    textOverflow: 'ellipsis',
+  };
+  return (
+    <Col span={8}>
+      <div style={tagStyle} onClick={p.onClick}>
+        {p.name}
+      </div>
+    </Col>
   );
 }
