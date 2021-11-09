@@ -1,0 +1,17 @@
+{
+  "Chat Highlight": "Evidenziazione chat",
+  "Highlight Settings": "Impostazioni evidenziazione",
+  "Message Settings": "Impostazioni messaggi",
+  "Message Font Size": "Dimensione font messaggio",
+  "Message Font Weight": "Spessore font messaggio",
+  "Message Text Color": "Colore testo messaggio",
+  "Message Background Color": "Colore sfondo messaggio",
+  "Name Settings": "Impostazioni nome",
+  "Name Font Size": "Dimensione font nome",
+  "Name Font Weight": "Spessore font nome",
+  "Name Text Color": "Colore testo nome",
+  "Name Background Color": "Colore sfondo nome",
+  "Highlight chat messages from your viewers on your stream.": "Evidenzia i messaggi della chat dei tuoi spettatori nel tuo stream.",
+  "A duration of 0 is indefinite": "Una durata di 0 non è definita",
+  "Use this widget by hovering over the right side of a chat message to see a thumbtack icon. Clicking the icon will pin the message to the widget for its duration, or until you click the unpin button.": "Utilizza questo widget per passare il mouse sopra il lato destro di un messaggio della chat per visualizzare l’icona di una puntina. Facendo clic sull’icona puoi bloccare il messaggio al widget per la sua durata o fino a che non fai di nuovo clic sul pulsante di sblocco."
+}

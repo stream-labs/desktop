@@ -1,0 +1,17 @@
+{
+  "Chat Highlight": "Destaque do Chat",
+  "Highlight Settings": "Configurações do Destaque do Chat",
+  "Message Settings": "Configurações de Mensagens",
+  "Message Font Size": "Tamanho da Fonte de Mensagens",
+  "Message Font Weight": "Espessura da Fonte de Mensagens",
+  "Message Text Color": "Cor do Texto de Mensagens",
+  "Message Background Color": "Cor do Fundo de Mensagens",
+  "Name Settings": "Configurações de Nome",
+  "Name Font Size": "Tamanho da Fonte de Nome",
+  "Name Font Weight": "Espessura da Fonte de Nome",
+  "Name Text Color": "Cor do Texto de Nome",
+  "Name Background Color": "Cor do Fundo da Barra",
+  "Highlight chat messages from your viewers on your stream.": "Destaque mensagens do chat para os espectadores da sua stream.",
+  "A duration of 0 is indefinite": "Uma duração de 0 é indefinida.",
+  "Use this widget by hovering over the right side of a chat message to see a thumbtack icon. Clicking the icon will pin the message to the widget for its duration, or until you click the unpin button.": "Use esse widget passando o mouse por cima do lado direito de uma mensagem do chat para ver um ícone de tachinha. Clique o ícone para fixar a mensagem na sua widget durante a duração, ou até que você clique no botão de desafixar."
+}

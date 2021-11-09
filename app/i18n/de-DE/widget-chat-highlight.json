@@ -1,0 +1,17 @@
+{
+  "Chat Highlight": "Chat-Highlight",
+  "Highlight Settings": "Highlight-Einstellungen",
+  "Message Settings": "Nachrichten-Einstellungen",
+  "Message Font Size": "Schriftgröße für Nachrichten",
+  "Message Font Weight": "Schriftstärke für Nachrichten",
+  "Message Text Color": "Textfarbe für Nachrichten",
+  "Message Background Color": "Hintergrundfarbe für Nachrichten",
+  "Name Settings": "Einstellungen für Namen",
+  "Name Font Size": "Schriftgröße für Namen",
+  "Name Font Weight": "Schriftstärke für Namen",
+  "Name Text Color": "Textfarbe für Namen",
+  "Name Background Color": "Hintergrundfarbe für Namen",
+  "Highlight chat messages from your viewers on your stream.": "Heben Sie Chat-Nachrichten Ihrer Zuschauer im Stream hervor.",
+  "A duration of 0 is indefinite": "Die Dauer „0“ bedeutet unbegrenzt.",
+  "Use this widget by hovering over the right side of a chat message to see a thumbtack icon. Clicking the icon will pin the message to the widget for its duration, or until you click the unpin button.": "Um dieses Widget zu verwenden, setzen Sie den Cursor auf die rechte Seite einer Chat-Nachricht. Ein Reißzweckensymbol wird angezeigt. Durch Klicken auf das Symbol wir die Nachricht an das Widget für die angegebene Dauer oder bis Sie auf das Symbol „Lösen“ klicken an das Widget angehängt."
+}

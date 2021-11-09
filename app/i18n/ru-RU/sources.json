@@ -186,5 +186,16 @@
   "Audio source working with the Twitch Soundtrack music application. Add this source to be able to filter out the music from your Twitch VODs.": "Источник звука, работающий с музыкальным приложением Twitch Soundtrack. Добавьте этот источник, чтобы отфильтровывать музыку из своих видео по запросу на Twitch.",
   "Custom Icon": "Пользовательский значок",
   "Displays an icon from one of many selections": "Отображает значок из одного из множества вариантов",
-  "An error has occured, please try re-opening this window": "Произошла ошибка, попробуйте снова открыть это окно"
+  "An error has occured, please try re-opening this window": "Произошла ошибка, попробуйте снова открыть это окно",
+  "Screen Capture": "Screen Capture",
+  "Capture your game, other applications, or your entire monitor": "Capture your game, other applications, or your entire monitor",
+  "Most games, apps, displays": "Most games, apps, displays",
+  "Show Additional Settings": "Show Additional Settings",
+  "Capture Cursor": "Capture Cursor",
+  "Custom Placeholder": "Custom Placeholder",
+  "Automatic": "Automatic",
+  "Capture Game": "Capture Game",
+  "Automatic game capture will scan for running games and automatically capture them.": "Automatic game capture will scan for running games and automatically capture them.",
+  "Capture Entire Screen": "Capture Entire Screen",
+  "Capture Window": "Capture Window"
 }

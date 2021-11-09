@@ -35,9 +35,6 @@ const rimraf = require('rimraf');
 
 // Game overlay is Windows only
 let overlay;
-if (process.platform === 'win32') {
-  overlay = require('game-overlay');
-}
 
 // We use a special cache directory for running tests
 if (process.env.SLOBS_CACHE_DIR) {
@@ -261,6 +258,10 @@ async function startApp() {
   const crashHandler = require('crash-handler');
   const isDevMode = process.env.NODE_ENV !== 'production' && process.env.NODE_ENV !== 'test';
   const crashHandlerLogPath = app.getPath('userData');
+
+  if (process.platform === 'win32') {
+    overlay = require('game-overlay');
+  }
 
   await bundleUpdater(__dirname);
 

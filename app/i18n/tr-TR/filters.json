@@ -20,7 +20,7 @@
   "Filter name": "Filtre ismi",
   "Add source filter": "Kaynak filtresi ekle",
   "No filters applied": "Herhangi bir filtre uygulanmadı",
-  "Filters for %{sourceName}": "Filters for %{sourceName}",
+  "Filters for %{sourceName}": "%{sourceName} filtreleri",
   "Invert Polarity": "Polariteyi Tersine Çevir",
   "Limiter": "Sınırlandırıcı",
   "Expander": "Genişletici",
@@ -37,5 +37,6 @@
   "Heat Map": "Sıcaklık Haritası",
   "Cel Shade": "Cel Shade",
   "Dramatic": "Dramatik",
-  "Wintergreen": "Wintergreen"
+  "Wintergreen": "Wintergreen",
+  "Edit Filters": "Edit Filters"
 }

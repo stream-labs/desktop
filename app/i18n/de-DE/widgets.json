@@ -179,5 +179,9 @@
   "Slide Out Left": "Links hinausschieben",
   "Slide Out Right": "Rechts hinausschieben",
   "Slide Out Up": "Oben hinausschieben",
-  "Pick Screen Color": "Bildschirmfarbe auswählen"
+  "Pick Screen Color": "Bildschirmfarbe auswählen",
+  "Play Alert": "Play Alert",
+  "Browser Settings": "Browser Settings",
+  "Custom Code": "Custom Code",
+  "Something went wrong while applying settings": "Something went wrong while applying settings"
 }

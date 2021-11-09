@@ -7,7 +7,7 @@ import { getApiClient } from '../api-client';
 import {
   click,
   clickButton,
-  focusChild,
+  focusChild, getFocusedWindowId,
   isDisplayed,
   select,
   selectButton,

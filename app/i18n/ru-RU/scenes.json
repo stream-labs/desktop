@@ -39,5 +39,6 @@
   "Name Folder": "Назвать папку",
   "Switch Scenes": "Переключить сцены",
   "Failed to load scene collection.  A new one will be created instead.": "Не удалось загрузить коллекцию сцен. Будет создана новая.",
-  "New Scene": "Новая сцена"
+  "New Scene": "Новая сцена",
+  "Projector": "Проектор"
 }
