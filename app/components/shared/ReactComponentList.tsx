@@ -192,6 +192,9 @@ export class ScreenCaptureProperties extends ReactComponent {}
 })
 export class SharedComponentsLibrary extends ReactComponent {}
 
+@Component({ props: { name: { default: 'SourceShowcase' } } })
+export class SourceShowcase extends ReactComponent {}
+
 @Component({ props: { name: { default: 'StartStreamingButton' } } })
 export class StartStreamingButton extends ReactComponent {}
 

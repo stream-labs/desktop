@@ -1,15 +1,17 @@
-import React, { useState } from 'react';
-import { Services } from 'components-react/service-provider';
-import { SourceDisplayData, TPropertiesManager, TSourceType } from 'services/sources';
-import { WidgetDisplayData, WidgetsService, WidgetType } from 'services/widgets';
-import { IAppSource, PlatformAppsService } from 'services/platform-apps';
+import React, { useState, useMemo } from 'react';
+import { Layout, Menu, Card, Empty } from 'antd';
 import omit from 'lodash/omit';
-import { byOS, OS } from 'util/operating-systems';
+import { Services } from 'components-react/service-provider';
 import Scrollable from 'components-react/shared/Scrollable';
-import { getPlatformService } from '../../services/platforms';
-import { $i } from 'services/utils';
 import { useVuex } from 'components-react/hooks';
-import { Layout } from 'antd';
+import { SourceDisplayData, TPropertiesManager, TSourceType } from 'services/sources';
+import { WidgetDisplayData, WidgetType } from 'services/widgets';
+import { IAppSource } from 'services/platform-apps';
+import { getPlatformService } from 'services/platforms';
+import { $i } from 'services/utils';
+import { byOS, OS } from 'util/operating-systems';
+import { $t } from 'services/i18n';
+import { ModalLayout } from 'components-react/shared/ModalLayout';
 
 const { Content, Sider } = Layout;
 
@@ -33,30 +35,32 @@ export default function SourcesShowcase() {
   const {
     SourcesService,
     UserService,
-    WidgetsService,
     ScenesService,
     WindowsService,
     PlatformAppsService,
     CustomizationService,
   } = Services;
 
-  const essentialWidgetTypes = new Set([WidgetType.AlertBox]);
+  const essentialSources = new Set([WidgetType.AlertBox]);
   const primaryPlatformService = UserService.state.auth
     ? getPlatformService(UserService.state.auth.primaryPlatform)
     : null;
   const hasStreamlabel = primaryPlatformService?.hasCapability('streamlabels');
 
-  const iterableWidgetTypes = Object.keys(WidgetType)
-    .filter((type: string) => isNaN(Number(type)))
-    .filter(type => {
-      // show only supported widgets
-      const whitelist = primaryPlatformService?.widgetsWhitelist;
-      if (!whitelist) return true;
-      return whitelist.includes(WidgetType[type]);
-    })
-    .sort((a: string, b: string) => {
-      return essentialWidgetTypes.has(WidgetType[a]) ? -1 : 1;
-    });
+  const iterableWidgetTypes = useMemo(
+    () =>
+      Object.keys(WidgetType)
+        .filter((type: string) => isNaN(Number(type)))
+        .filter(type => {
+          // show only supported widgets
+          const whitelist = primaryPlatformService?.widgetsWhitelist;
+          if (!whitelist) return true;
+          return whitelist.includes(WidgetType[type]);
+        }),
+    [],
+  );
+
+  const [activeTab, setActiveTab] = useState('all');
 
   const { demoMode, designerMode, platform, isLoggedIn, enabledApps } = useVuex(() => ({
     demoMode: CustomizationService.views.isDarkTheme ? 'night' : 'day',
@@ -76,10 +80,6 @@ export default function SourcesShowcase() {
     });
   }
 
-  function getLoginSrc() {
-    return require(`../../../media/images/sleeping-kevin-${demoMode}.png`);
-  }
-
   function selectWidget(type: WidgetType) {
     selectSource('browser_source', {
       propertiesManager: 'widget',
@@ -96,13 +96,11 @@ export default function SourcesShowcase() {
     });
   }
 
-  const [inspectedSource, setInspectedSource] = useState('');
-  const [inspectedSourceType, setInspectedSourceType] = useState('' as TInspectableSource);
+  const [inspectedSource, setInspectedSource] = useState('' as TInspectableSource);
   const [inspectedAppId, setInspectedAppId] = useState('');
   const [inspectedAppSourceId, setInspectedAppSourceId] = useState('');
 
   function inspectSource(source: string, appId?: string, appSourceId?: string) {
-    setInspectedSourceType(source);
     setInspectedSource(source);
     if (appId) setInspectedAppId(appId);
     if (appSourceId) setInspectedAppSourceId(appSourceId);
@@ -120,7 +118,7 @@ export default function SourcesShowcase() {
     } else if (inspectedSource === 'app_source') {
       selectAppSource(inspectedAppId, inspectedAppSourceId);
     } else {
-      selectWidget(inspectedSourceType as WidgetType);
+      selectWidget(inspectedSource as WidgetType);
     }
   }
 
@@ -130,42 +128,38 @@ export default function SourcesShowcase() {
     });
   }
 
-  function availableSources() {
-    return SourcesService.getAvailableSourcesTypesList()
-      .filter(type => {
+  const availableSources = useMemo(
+    () =>
+      SourcesService.getAvailableSourcesTypesList().filter(type => {
         // Freetype on windows is hidden
         if (type.value === 'text_ft2_source' && byOS({ [OS.Windows]: true, [OS.Mac]: false })) {
           return;
         }
         return !(type.value === 'scene' && ScenesService.views.scenes.length <= 1);
-      })
-      .map(listItem => listItem.value);
-  }
+      }),
+    [],
+  );
 
-  function inspectedSourceDefinition() {
-    return availableSources().find(source => source === inspectedSource);
-  }
-
-  function availableAppSources(): {
-    appId: string;
-    source: IAppSource;
-  }[] {
-    return enabledApps.reduce((sources, app) => {
-      if (app.manifest.sources) {
-        app.manifest.sources.forEach(source => {
-          sources.push({
-            source,
-            appId: app.id,
+  const availableAppSources = useMemo(
+    () =>
+      enabledApps.reduce<{ source: IAppSource; appId: string }[]>((sources, app) => {
+        if (app.manifest.sources) {
+          app.manifest.sources.forEach(source => {
+            sources.push({ source, appId: app.id });
           });
-        });
-      }
+        }
 
-      return sources;
-    }, []);
-  }
+        return sources;
+      }, []),
+    [],
+  );
 
-  function showAppSources() {
-    return availableAppSources().length > 0;
+  function showContent(key: string) {
+    const correctKey = ['all', key].includes(activeTab);
+    if (key === 'apps') {
+      return correctKey && availableAppSources.length > 0;
+    }
+    return correctKey;
   }
 
   function getAppAssetUrl(appId: string, asset: string) {
@@ -178,14 +172,50 @@ export default function SourcesShowcase() {
   }
 
   return (
-    <Layout>
-      <Content></Content>
-      <SideBar inspectedSourceType={inspectedSourceType} />
-    </Layout>
+    <ModalLayout>
+      <Layout>
+        <Content>
+          <Menu
+            onClick={e => setActiveTab(e.key)}
+            selectedKeys={[activeTab]}
+            mode="horizontal"
+            style={{ marginBottom: '16px' }}
+          >
+            <Menu.Item key="all">{$t('All')}</Menu.Item>
+            <Menu.Item key="general">{$t('General')}</Menu.Item>
+            <Menu.Item key="widgets">{$t('Widgets')}</Menu.Item>
+            <Menu.Item key="apps">{$t('Apps')}</Menu.Item>
+          </Menu>
+          <Scrollable>
+            {showContent('general') &&
+              availableSources.map(source => (
+                <Card onClick={() => inspectSource(source.value)}>{source.description}</Card>
+              ))}
+            {showContent('widgets') &&
+              (isLoggedIn ? (
+                <Empty image={require(`../../../media/images/sleeping-kevin-${demoMode}.png`)} />
+              ) : (
+                iterableWidgetTypes.map(widgetType => (
+                  <Card onClick={() => inspectSource(widgetType)}>
+                    {WidgetDisplayData()[widgetType].name}
+                  </Card>
+                ))
+              ))}
+            {showContent('apps') &&
+              availableAppSources.map(app => (
+                <Card onClick={() => inspectSource(app.source.type, app.appId)}>
+                  {app.source.name}
+                </Card>
+              ))}
+          </Scrollable>
+        </Content>
+        <SideBar inspectedSource={inspectedSource} />
+      </Layout>
+    </ModalLayout>
   );
 }
 
-function SideBar(p: { inspectedSourceType: string | WidgetType }) {
+function SideBar(p: { inspectedSource: string | WidgetType }) {
   const { UserService, CustomizationService } = Services;
 
   const { demoMode, platform } = useVuex(() => ({
@@ -193,9 +223,9 @@ function SideBar(p: { inspectedSourceType: string | WidgetType }) {
     platform: UserService.views.platform?.type,
   }));
 
-  const displayData = widgetData(p.inspectedSourceType)
-    ? widgetData(p.inspectedSourceType)
-    : SourceDisplayData()[p.inspectedSourceType];
+  const displayData = widgetData(p.inspectedSource)
+    ? widgetData(p.inspectedSource)
+    : SourceDisplayData()[p.inspectedSource];
 
   function widgetData(type: string | WidgetType) {
     return WidgetDisplayData(platform)[WidgetType[type]];
