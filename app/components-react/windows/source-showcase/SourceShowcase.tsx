@@ -1,101 +1,28 @@
 import React, { useState, useMemo } from 'react';
-import { Layout, Menu, Empty, Row, Col, PageHeader } from 'antd';
-import omit from 'lodash/omit';
-import { Services } from 'components-react/service-provider';
+import { Layout, Menu, Empty, Row, Col, PageHeader, Button } from 'antd';
 import Scrollable from 'components-react/shared/Scrollable';
+import { ModalLayout } from 'components-react/shared/ModalLayout';
+import { Services } from 'components-react/service-provider';
 import { useVuex } from 'components-react/hooks';
-import { SourceDisplayData, TPropertiesManager, TSourceType } from 'services/sources';
+import { SourceDisplayData, TSourceType } from 'services/sources';
 import { WidgetDisplayData, WidgetType } from 'services/widgets';
 import { IAppSource } from 'services/platform-apps';
 import { getPlatformService } from 'services/platforms';
 import { $i } from 'services/utils';
 import { byOS, OS } from 'util/operating-systems';
 import { $t } from 'services/i18n';
-import { ModalLayout } from 'components-react/shared/ModalLayout';
+import { useSourceShowcaseSettings } from './useSourceShowcase';
+import styles from './SourceShowcase.m.less';
 
 const { Content, Sider } = Layout;
 
-type TInspectableSource = TSourceType | WidgetType | 'streamlabel' | 'app_source' | string;
-
-interface ISelectSourceOptions {
-  propertiesManager?: TPropertiesManager;
-  widgetType?: WidgetType;
-  appId?: string;
-  appSourceId?: string;
-}
-
-interface ISourceDefinition {
-  id: string;
-  type: TInspectableSource;
-  name: string;
-  description: string;
-}
-
 export default function SourcesShowcase() {
-  const { SourcesService } = Services;
+  const { inspectedSource, selectInspectedSource } = useSourceShowcaseSettings();
 
   const [activeTab, setActiveTab] = useState('all');
 
-  function selectSource(sourceType: TSourceType, options: ISelectSourceOptions = {}) {
-    const managerType = options.propertiesManager || 'default';
-    const propertiesManagerSettings: Dictionary<any> = { ...omit(options, 'propertiesManager') };
-
-    SourcesService.showAddSource(sourceType, {
-      propertiesManagerSettings,
-      propertiesManager: managerType,
-    });
-  }
-
-  function selectWidget(type: WidgetType) {
-    selectSource('browser_source', {
-      propertiesManager: 'widget',
-      widgetType: type,
-    });
-  }
-
-  function selectAppSource(appId: string, appSourceId: string) {
-    // TODO: Could be other source type
-    selectSource('browser_source', {
-      appId,
-      appSourceId,
-      propertiesManager: 'platformApp',
-    });
-  }
-
-  const [inspectedSource, setInspectedSource] = useState('' as TInspectableSource);
-  const [inspectedAppId, setInspectedAppId] = useState('');
-  const [inspectedAppSourceId, setInspectedAppSourceId] = useState('');
-
-  function inspectSource(source: string, appId?: string, appSourceId?: string) {
-    setInspectedSource(source);
-    if (appId) setInspectedAppId(appId);
-    if (appSourceId) setInspectedAppSourceId(appSourceId);
-  }
-
-  function selectInspectedSource() {
-    if (SourcesService.getAvailableSourcesTypes().includes(inspectedSource as TSourceType)) {
-      selectSource(inspectedSource as TSourceType);
-    } else if (inspectedSource === 'streamlabel') {
-      selectStreamlabel();
-    } else if (inspectedSource === 'replay') {
-      selectSource('ffmpeg_source', { propertiesManager: 'replay' });
-    } else if (inspectedSource === 'icon_library') {
-      selectSource('image_source', { propertiesManager: 'iconLibrary' });
-    } else if (inspectedSource === 'app_source') {
-      selectAppSource(inspectedAppId, inspectedAppSourceId);
-    } else {
-      selectWidget(inspectedSource as WidgetType);
-    }
-  }
-
-  function selectStreamlabel() {
-    selectSource(byOS({ [OS.Windows]: 'text_gdiplus', [OS.Mac]: 'text_ft2_source' }), {
-      propertiesManager: 'streamlabels',
-    });
-  }
-
   return (
-    <ModalLayout>
+    <ModalLayout onOk={selectInspectedSource}>
       <Layout style={{ height: 'calc(100% - 53px)' }}>
         <Content>
           <Menu
@@ -109,33 +36,41 @@ export default function SourcesShowcase() {
             <Menu.Item key="widgets">{$t('Widgets')}</Menu.Item>
             <Menu.Item key="apps">{$t('Apps')}</Menu.Item>
           </Menu>
-          <SourceGrid activeTab={activeTab} inspectSource={inspectSource} />
+          <SourceGrid activeTab={activeTab} />
         </Content>
-        <SideBar inspectedSource={inspectedSource} />
+        <SideBar />
       </Layout>
     </ModalLayout>
   );
 }
 
-function SideBar(p: { inspectedSource: string | WidgetType }) {
+function SideBar() {
   const { UserService, CustomizationService, PlatformAppsService } = Services;
+  const { inspectedSource, inspectedAppId, inspectedAppSourceId } = useSourceShowcaseSettings();
 
   const { demoMode, platform } = useVuex(() => ({
     demoMode: CustomizationService.views.isDarkTheme ? 'night' : 'day',
     platform: UserService.views.platform?.type,
   }));
 
-  const displayData = widgetData(p.inspectedSource)
-    ? widgetData(p.inspectedSource)
-    : SourceDisplayData()[p.inspectedSource];
+  const displayData = widgetData(inspectedSource)
+    ? widgetData(inspectedSource)
+    : SourceDisplayData()[inspectedSource];
 
   function widgetData(type: string | WidgetType) {
     return WidgetDisplayData(platform)[WidgetType[type]];
   }
 
   function getSrc() {
-    if (p.inspectedSource === '') {
-      // return PlatformAppsService.views.getAssetUrl(appId, asset);
+    if (inspectedAppId) {
+      const appManifest = PlatformAppsService.views.getApp(inspectedAppId).manifest;
+      const source = appManifest.sources.find(source => source.id === inspectedAppSourceId);
+      if (source) {
+        return PlatformAppsService.views.getAssetUrl(
+          inspectedAppId,
+          source.about?.bannerImage || '',
+        );
+      }
     }
     return $i(`source-demos/${demoMode}/${displayData?.demoFilename}`);
   }
@@ -154,10 +89,15 @@ function SideBar(p: { inspectedSource: string | WidgetType }) {
   );
 }
 
-function SourceGrid(p: {
-  activeTab: string;
-  inspectSource: (type: string, appId?: string) => void;
-}) {
+function SourceGrid(p: { activeTab: string }) {
+  const {
+    inspectSource,
+    selectSource,
+    selectWidget,
+    selectStreamlabel,
+    selectAppSource,
+  } = useSourceShowcaseSettings();
+
   const essentialSources = new Set([WidgetType.AlertBox]);
 
   const {
@@ -169,10 +109,9 @@ function SourceGrid(p: {
     CustomizationService,
   } = Services;
 
-  const { demoMode, designerMode, platform, isLoggedIn, enabledApps } = useVuex(() => ({
+  const { demoMode, designerMode, isLoggedIn, enabledApps } = useVuex(() => ({
     demoMode: CustomizationService.views.isDarkTheme ? 'night' : 'day',
     designerMode: CustomizationService.views.designerMode,
-    platform: UserService.views.platform?.type,
     isLoggedIn: UserService.views.isLoggedIn,
     enabledApps: PlatformAppsService.views.enabledApps,
   }));
@@ -246,9 +185,20 @@ function SourceGrid(p: {
               <SourceTag
                 key={source.value}
                 name={source.description}
-                onClick={() => p.inspectSource(source.value)}
+                onClick={() => inspectSource(source.value)}
+                onDoubleClick={() => selectSource(source.value)}
               />
             ))}
+            {designerMode && (
+              <SourceTag
+                key="icon_library"
+                name={$t('Custom Icon')}
+                onClick={() => inspectSource('icon_library')}
+                onDoubleClick={() =>
+                  selectSource('image_source', { propertiesManager: 'iconLibrary' })
+                }
+              />
+            )}
           </>
         )}
 
@@ -258,15 +208,31 @@ function SourceGrid(p: {
               <PageHeader title={$t('Widgets')} />
             </Col>
             {!isLoggedIn ? (
-              <Empty image={require(`../../../media/images/sleeping-kevin-${demoMode}.png`)} />
+              <Empty
+                description={$t('You must be logged in to use Widgets')}
+                image={require(`../../../media/images/sleeping-kevin-${demoMode}.png`)}
+              >
+                <Button onClick={handleAuth}>{$t('Click here to log in')}</Button>
+              </Empty>
             ) : (
-              iterableWidgetTypes.map(widgetType => (
-                <SourceTag
-                  key={widgetType}
-                  name={WidgetDisplayData()[WidgetType[widgetType]].name}
-                  onClick={() => p.inspectSource(widgetType)}
-                />
-              ))
+              <>
+                {iterableWidgetTypes.map(widgetType => (
+                  <SourceTag
+                    key={widgetType}
+                    name={WidgetDisplayData()[WidgetType[widgetType]].name}
+                    onClick={() => inspectSource(widgetType)}
+                    onDoubleClick={() => selectWidget(WidgetType[widgetType])}
+                  />
+                ))}
+                {hasStreamlabel && (
+                  <SourceTag
+                    key="streamlabels"
+                    name={$t('Streamlabel')}
+                    onClick={() => inspectSource('streamlabels')}
+                    onDoubleClick={() => selectStreamlabel()}
+                  />
+                )}
+              </>
             )}
           </>
         )}
@@ -279,7 +245,8 @@ function SourceGrid(p: {
               <SourceTag
                 key={app.appId}
                 name={app.source.name}
-                onClick={() => p.inspectSource(app.source.type, app.appId)}
+                onClick={() => inspectSource(app.source.type, app.appId)}
+                onDoubleClick={() => selectAppSource(app.appId, app.source.id)}
               />
             ))}
           </>
@@ -289,21 +256,10 @@ function SourceGrid(p: {
   );
 }
 
-function SourceTag(p: { name: string; onClick: () => void }) {
-  const tagStyle: React.CSSProperties = {
-    background: 'var(--section-alt)',
-    borderRadius: '4px',
-    height: '32px',
-    paddingTop: '6px',
-    paddingLeft: '16px',
-    paddingRight: '8px',
-    overflow: 'hidden',
-    whiteSpace: 'nowrap',
-    textOverflow: 'ellipsis',
-  };
+function SourceTag(p: { name: string; onClick: () => void; onDoubleClick: () => void }) {
   return (
     <Col span={8}>
-      <div style={tagStyle} onClick={p.onClick}>
+      <div className={styles.sourceTag} onClick={p.onClick} onDoubleClick={p.onDoubleClick}>
         {p.name}
       </div>
     </Col>
