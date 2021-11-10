@@ -210,7 +210,7 @@ function SourceGrid(p: { activeTab: string }) {
             {!isLoggedIn ? (
               <Empty
                 description={$t('You must be logged in to use Widgets')}
-                image={require(`../../../media/images/sleeping-kevin-${demoMode}.png`)}
+                image={$i(`images/sleeping-kevin-${demoMode}.png`)}
               >
                 <Button onClick={handleAuth}>{$t('Click here to log in')}</Button>
               </Empty>
