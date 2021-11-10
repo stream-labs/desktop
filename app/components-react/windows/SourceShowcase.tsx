@@ -32,43 +32,9 @@ interface ISourceDefinition {
 }
 
 export default function SourcesShowcase() {
-  const {
-    SourcesService,
-    UserService,
-    ScenesService,
-    WindowsService,
-    PlatformAppsService,
-    CustomizationService,
-  } = Services;
-
-  const essentialSources = new Set([WidgetType.AlertBox]);
-  const primaryPlatformService = UserService.state.auth
-    ? getPlatformService(UserService.state.auth.primaryPlatform)
-    : null;
-  const hasStreamlabel = primaryPlatformService?.hasCapability('streamlabels');
-
-  const iterableWidgetTypes = useMemo(
-    () =>
-      Object.keys(WidgetType)
-        .filter((type: string) => isNaN(Number(type)))
-        .filter(type => {
-          // show only supported widgets
-          const whitelist = primaryPlatformService?.widgetsWhitelist;
-          if (!whitelist) return true;
-          return whitelist.includes(WidgetType[type]);
-        }),
-    [],
-  );
+  const { SourcesService } = Services;
 
   const [activeTab, setActiveTab] = useState('all');
-
-  const { demoMode, designerMode, platform, isLoggedIn, enabledApps } = useVuex(() => ({
-    demoMode: CustomizationService.views.isDarkTheme ? 'night' : 'day',
-    designerMode: CustomizationService.views.designerMode,
-    platform: UserService.views.platform?.type,
-    isLoggedIn: UserService.views.isLoggedIn,
-    enabledApps: PlatformAppsService.views.enabledApps,
-  }));
 
   function selectSource(sourceType: TSourceType, options: ISelectSourceOptions = {}) {
     const managerType = options.propertiesManager || 'default';
@@ -128,6 +94,107 @@ export default function SourcesShowcase() {
     });
   }
 
+  return (
+    <ModalLayout>
+      <Layout style={{ height: 'calc(100% - 53px)' }}>
+        <Content>
+          <Menu
+            onClick={e => setActiveTab(e.key)}
+            selectedKeys={[activeTab]}
+            mode="horizontal"
+            style={{ marginBottom: '16px' }}
+          >
+            <Menu.Item key="all">{$t('All')}</Menu.Item>
+            <Menu.Item key="general">{$t('General')}</Menu.Item>
+            <Menu.Item key="widgets">{$t('Widgets')}</Menu.Item>
+            <Menu.Item key="apps">{$t('Apps')}</Menu.Item>
+          </Menu>
+          <SourceGrid activeTab={activeTab} inspectSource={inspectSource} />
+        </Content>
+        <SideBar inspectedSource={inspectedSource} />
+      </Layout>
+    </ModalLayout>
+  );
+}
+
+function SideBar(p: { inspectedSource: string | WidgetType }) {
+  const { UserService, CustomizationService, PlatformAppsService } = Services;
+
+  const { demoMode, platform } = useVuex(() => ({
+    demoMode: CustomizationService.views.isDarkTheme ? 'night' : 'day',
+    platform: UserService.views.platform?.type,
+  }));
+
+  const displayData = widgetData(p.inspectedSource)
+    ? widgetData(p.inspectedSource)
+    : SourceDisplayData()[p.inspectedSource];
+
+  function widgetData(type: string | WidgetType) {
+    return WidgetDisplayData(platform)[WidgetType[type]];
+  }
+
+  function getSrc() {
+    if (p.inspectedSource === '') {
+      // return PlatformAppsService.views.getAssetUrl(appId, asset);
+    }
+    return $i(`source-demos/${demoMode}/${displayData?.demoFilename}`);
+  }
+
+  return (
+    <Sider width={300}>
+      <div>
+        {displayData?.demoVideo && (
+          <video autoPlay loop>
+            <source src={getSrc()} />
+          </video>
+        )}
+        {!displayData?.demoVideo && <img src={getSrc()} />}
+      </div>
+    </Sider>
+  );
+}
+
+function SourceGrid(p: {
+  activeTab: string;
+  inspectSource: (type: string, appId?: string) => void;
+}) {
+  const essentialSources = new Set([WidgetType.AlertBox]);
+
+  const {
+    SourcesService,
+    UserService,
+    ScenesService,
+    WindowsService,
+    PlatformAppsService,
+    CustomizationService,
+  } = Services;
+
+  const { demoMode, designerMode, platform, isLoggedIn, enabledApps } = useVuex(() => ({
+    demoMode: CustomizationService.views.isDarkTheme ? 'night' : 'day',
+    designerMode: CustomizationService.views.designerMode,
+    platform: UserService.views.platform?.type,
+    isLoggedIn: UserService.views.isLoggedIn,
+    enabledApps: PlatformAppsService.views.enabledApps,
+  }));
+
+  const primaryPlatformService = UserService.state.auth
+    ? getPlatformService(UserService.state.auth.primaryPlatform)
+    : null;
+  const hasStreamlabel = primaryPlatformService?.hasCapability('streamlabels');
+
+  const iterableWidgetTypes = useMemo(
+    () =>
+      Object.keys(WidgetType)
+        .filter((type: string) => isNaN(Number(type)))
+        .filter(type => {
+          // show only supported widgets
+          const whitelist = primaryPlatformService?.widgetsWhitelist;
+          if (!whitelist) return true;
+          return whitelist.includes(WidgetType[type]);
+        }),
+    [],
+  );
+
   const availableSources = useMemo(
     () =>
       SourcesService.getAvailableSourcesTypesList().filter(type => {
@@ -155,15 +222,11 @@ export default function SourcesShowcase() {
   );
 
   function showContent(key: string) {
-    const correctKey = ['all', key].includes(activeTab);
+    const correctKey = ['all', key].includes(p.activeTab);
     if (key === 'apps') {
       return correctKey && availableAppSources.length > 0;
     }
     return correctKey;
-  }
-
-  function getAppAssetUrl(appId: string, asset: string) {
-    return PlatformAppsService.views.getAssetUrl(appId, asset);
   }
 
   function handleAuth() {
@@ -172,111 +235,57 @@ export default function SourcesShowcase() {
   }
 
   return (
-    <ModalLayout>
-      <Layout style={{ height: 'calc(100% - 53px)' }}>
-        <Content>
-          <Menu
-            onClick={e => setActiveTab(e.key)}
-            selectedKeys={[activeTab]}
-            mode="horizontal"
-            style={{ marginBottom: '16px' }}
-          >
-            <Menu.Item key="all">{$t('All')}</Menu.Item>
-            <Menu.Item key="general">{$t('General')}</Menu.Item>
-            <Menu.Item key="widgets">{$t('Widgets')}</Menu.Item>
-            <Menu.Item key="apps">{$t('Apps')}</Menu.Item>
-          </Menu>
-          <Scrollable style={{ height: '100%' }}>
-            <Row gutter={[8, 8]}>
-              {showContent('general') && (
-                <>
-                  <Col span={24}>
-                    <PageHeader title={$t('General Sources')} />
-                  </Col>
-                  {availableSources.map(source => (
-                    <SourceTag
-                      key={source.value}
-                      name={source.description}
-                      onClick={() => inspectSource(source.value)}
-                    />
-                  ))}
-                </>
-              )}
-
-              {showContent('widgets') && (
-                <>
-                  <Col span={24}>
-                    <PageHeader title={$t('Widgets')} />
-                  </Col>
-                  {!isLoggedIn ? (
-                    <Empty
-                      image={require(`../../../media/images/sleeping-kevin-${demoMode}.png`)}
-                    />
-                  ) : (
-                    iterableWidgetTypes.map(widgetType => (
-                      <SourceTag
-                        key={widgetType}
-                        name={WidgetDisplayData()[WidgetType[widgetType]].name}
-                        onClick={() => inspectSource(widgetType)}
-                      />
-                    ))
-                  )}
-                </>
-              )}
-              {showContent('apps') && (
-                <>
-                  <Col span={24}>
-                    <PageHeader title={$t('Apps')} />
-                  </Col>
-                  {availableAppSources.map(app => (
-                    <SourceTag
-                      key={app.appId}
-                      name={app.source.name}
-                      onClick={() => inspectSource(app.source.type, app.appId)}
-                    />
-                  ))}
-                </>
-              )}
-            </Row>
-          </Scrollable>
-        </Content>
-        <SideBar inspectedSource={inspectedSource} />
-      </Layout>
-    </ModalLayout>
-  );
-}
-
-function SideBar(p: { inspectedSource: string | WidgetType }) {
-  const { UserService, CustomizationService } = Services;
-
-  const { demoMode, platform } = useVuex(() => ({
-    demoMode: CustomizationService.views.isDarkTheme ? 'night' : 'day',
-    platform: UserService.views.platform?.type,
-  }));
-
-  const displayData = widgetData(p.inspectedSource)
-    ? widgetData(p.inspectedSource)
-    : SourceDisplayData()[p.inspectedSource];
-
-  function widgetData(type: string | WidgetType) {
-    return WidgetDisplayData(platform)[WidgetType[type]];
-  }
-
-  function getSrc() {
-    return $i(`source-demos/${demoMode}/${displayData?.demoFilename}`);
-  }
-
-  return (
-    <Sider width={300}>
-      <div>
-        {displayData?.demoVideo && (
-          <video autoPlay loop>
-            <source src={getSrc()} />
-          </video>
+    <Scrollable style={{ height: '100%' }}>
+      <Row gutter={[8, 8]}>
+        {showContent('general') && (
+          <>
+            <Col span={24}>
+              <PageHeader title={$t('General Sources')} />
+            </Col>
+            {availableSources.map(source => (
+              <SourceTag
+                key={source.value}
+                name={source.description}
+                onClick={() => p.inspectSource(source.value)}
+              />
+            ))}
+          </>
         )}
-        {!displayData?.demoVideo && <img src={getSrc()} />}
-      </div>
-    </Sider>
+
+        {showContent('widgets') && (
+          <>
+            <Col span={24}>
+              <PageHeader title={$t('Widgets')} />
+            </Col>
+            {!isLoggedIn ? (
+              <Empty image={require(`../../../media/images/sleeping-kevin-${demoMode}.png`)} />
+            ) : (
+              iterableWidgetTypes.map(widgetType => (
+                <SourceTag
+                  key={widgetType}
+                  name={WidgetDisplayData()[WidgetType[widgetType]].name}
+                  onClick={() => p.inspectSource(widgetType)}
+                />
+              ))
+            )}
+          </>
+        )}
+        {showContent('apps') && (
+          <>
+            <Col span={24}>
+              <PageHeader title={$t('Apps')} />
+            </Col>
+            {availableAppSources.map(app => (
+              <SourceTag
+                key={app.appId}
+                name={app.source.name}
+                onClick={() => p.inspectSource(app.source.type, app.appId)}
+              />
+            ))}
+          </>
+        )}
+      </Row>
+    </Scrollable>
   );
 }
 
