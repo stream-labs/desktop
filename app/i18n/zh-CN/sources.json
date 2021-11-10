@@ -186,5 +186,16 @@
   "Audio source working with the Twitch Soundtrack music application. Add this source to be able to filter out the music from your Twitch VODs.": "与 Twitch Soundtrack 音乐应用程序配合使用的音频源。添加此源以便能够从您的 Twitch VOD 中过滤掉音乐。",
   "Custom Icon": "自定义图标",
   "Displays an icon from one of many selections": "显示多个选项之一的图标",
-  "An error has occured, please try re-opening this window": "发生错误，请尝试重新打开此窗口"
+  "An error has occured, please try re-opening this window": "发生错误，请尝试重新打开此窗口",
+  "Screen Capture": "Screen Capture",
+  "Capture your game, other applications, or your entire monitor": "Capture your game, other applications, or your entire monitor",
+  "Most games, apps, displays": "Most games, apps, displays",
+  "Show Additional Settings": "Show Additional Settings",
+  "Capture Cursor": "Capture Cursor",
+  "Custom Placeholder": "Custom Placeholder",
+  "Automatic": "Automatic",
+  "Capture Game": "Capture Game",
+  "Automatic game capture will scan for running games and automatically capture them.": "Automatic game capture will scan for running games and automatically capture them.",
+  "Capture Entire Screen": "Capture Entire Screen",
+  "Capture Window": "Capture Window"
 }

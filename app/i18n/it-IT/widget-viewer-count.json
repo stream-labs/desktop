@@ -1,4 +1,8 @@
 {
   "Manage Viewer Count": "Gestisci conteggio spettatori",
-  "Font Settings": "Impostazioni font"
+  "Font Settings": "Impostazioni font",
+  "Enabled Streams": "Stream abilitati",
+  "Twitch Viewers": "Twitch Viewers",
+  "YouTube Viewers": "YouTube Viewers",
+  "Facebook Viewers": "Facebook Viewers"
 }

@@ -39,5 +39,6 @@
   "Name Folder": "폴더 이름 짓기",
   "Switch Scenes": "장면 전환",
   "Failed to load scene collection.  A new one will be created instead.": "장면 컬렉션 로드에 실패했습니다. 새로운 장면 컬렉션이 생성됩니다.",
-  "New Scene": "새로운 장면"
+  "New Scene": "새로운 장면",
+  "Projector": "프로젝터"
 }

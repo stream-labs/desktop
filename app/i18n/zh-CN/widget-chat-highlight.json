@@ -1,0 +1,17 @@
+{
+  "Chat Highlight": "聊天亮点",
+  "Highlight Settings": "高亮设置",
+  "Message Settings": "消息设置",
+  "Message Font Size": "消息字号",
+  "Message Font Weight": "消息字重",
+  "Message Text Color": "消息文字颜色",
+  "Message Background Color": "消息背景颜色",
+  "Name Settings": "名称设置",
+  "Name Font Size": "名称字号",
+  "Name Font Weight": "名称字重",
+  "Name Text Color": "名称文字颜色",
+  "Name Background Color": "名称背景颜色",
+  "Highlight chat messages from your viewers on your stream.": "在您的信息流中突出显示观众的聊天消息。",
+  "A duration of 0 is indefinite": "0 持续时间代表不确定",
+  "Use this widget by hovering over the right side of a chat message to see a thumbtack icon. Clicking the icon will pin the message to the widget for its duration, or until you click the unpin button.": "将鼠标悬停在聊天消息的右侧可看到图钉图标以使用此小工具。点击该图标会将消息在其持续时间内固定到小工具中，或者直到您点击取消固定按钮。"
+}

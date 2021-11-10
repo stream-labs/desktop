@@ -26,5 +26,10 @@
   "Image URL": "Bild-URL",
   "Example": "Beispiel",
   "Change Media": "Datenträger wechseln",
-  "No Sound": "Kein Ton"
+  "No Sound": "Kein Ton",
+  "No Media": "No Media",
+  "Change Link": "Change Link",
+  "Pick From Gallery": "Pick From Gallery",
+  "Clear Link": "Clear Link",
+  "Media URL": "Media URL"
 }

@@ -163,5 +163,6 @@
   "Invalid settings. Please check the form": "Geçersiz ayarlar. Lütfen formu kontrol edin",
   "Common Stream Settings": "Yaygın Yayın Ayarları",
   "Schedule Stream for %{formattedDate}": "Schedule Stream for %{formattedDate}",
-  "Update Scheduled Stream for %{formattedDate}": "Update Scheduled Stream for %{formattedDate}"
+  "Update Scheduled Stream for %{formattedDate}": "Update Scheduled Stream for %{formattedDate}",
+  "You can not schedule to a past date": "You can not schedule to a past date"
 }
