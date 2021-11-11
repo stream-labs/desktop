@@ -1,10 +1,11 @@
 import React, { useState, useMemo } from 'react';
 import { Layout, Menu, Empty, Row, Col, PageHeader, Button } from 'antd';
+import cx from 'classnames';
 import Scrollable from 'components-react/shared/Scrollable';
 import { ModalLayout } from 'components-react/shared/ModalLayout';
 import { Services } from 'components-react/service-provider';
 import { useVuex } from 'components-react/hooks';
-import { SourceDisplayData, TSourceType } from 'services/sources';
+import { SourceDisplayData } from 'services/sources';
 import { WidgetDisplayData, WidgetType } from 'services/widgets';
 import { IAppSource } from 'services/platform-apps';
 import { getPlatformService } from 'services/platforms';
@@ -96,6 +97,8 @@ function SourceGrid(p: { activeTab: string }) {
     selectWidget,
     selectStreamlabel,
     selectAppSource,
+    inspectedSource,
+    inspectedAppSourceId,
   } = useSourceShowcaseSettings();
 
   const essentialSources = new Set([WidgetType.AlertBox]);
@@ -182,22 +185,10 @@ function SourceGrid(p: { activeTab: string }) {
               <PageHeader title={$t('General Sources')} />
             </Col>
             {availableSources.map(source => (
-              <SourceTag
-                key={source.value}
-                name={source.description}
-                onClick={() => inspectSource(source.value)}
-                onDoubleClick={() => selectSource(source.value)}
-              />
+              <SourceTag key={source.value} name={source.description} type={source.value} />
             ))}
             {designerMode && (
-              <SourceTag
-                key="icon_library"
-                name={$t('Custom Icon')}
-                onClick={() => inspectSource('icon_library')}
-                onDoubleClick={() =>
-                  selectSource('image_source', { propertiesManager: 'iconLibrary' })
-                }
-              />
+              <SourceTag key="icon_library" name={$t('Custom Icon')} type={'icon_library'} />
             )}
           </>
         )}
@@ -220,17 +211,11 @@ function SourceGrid(p: { activeTab: string }) {
                   <SourceTag
                     key={widgetType}
                     name={WidgetDisplayData()[WidgetType[widgetType]].name}
-                    onClick={() => inspectSource(widgetType)}
-                    onDoubleClick={() => selectWidget(WidgetType[widgetType])}
+                    type={widgetType}
                   />
                 ))}
                 {hasStreamlabel && (
-                  <SourceTag
-                    key="streamlabels"
-                    name={$t('Streamlabel')}
-                    onClick={() => inspectSource('streamlabels')}
-                    onDoubleClick={() => selectStreamlabel()}
-                  />
+                  <SourceTag key="streamlabels" name={$t('Streamlabel')} type="streamlabels" />
                 )}
               </>
             )}
@@ -245,8 +230,8 @@ function SourceGrid(p: { activeTab: string }) {
               <SourceTag
                 key={app.appId}
                 name={app.source.name}
-                onClick={() => inspectSource(app.source.type, app.appId)}
-                onDoubleClick={() => selectAppSource(app.appId, app.source.id)}
+                type={app.source.type}
+                appId={app.appId}
               />
             ))}
           </>
@@ -256,10 +241,31 @@ function SourceGrid(p: { activeTab: string }) {
   );
 }
 
-function SourceTag(p: { name: string; onClick: () => void; onDoubleClick: () => void }) {
+function SourceTag(p: { name: string; type: string; appId?: string }) {
+  const { PlatformAppsService } = Services;
+
+  const {
+    inspectSource,
+    selectInspectedSource,
+    inspectedSource,
+    inspectedAppId,
+    inspectedAppSourceId,
+  } = useSourceShowcaseSettings();
+
+  function active() {
+    if (!p.appId) return inspectedSource === p.type;
+    if (inspectedAppId !== p.appId) return false;
+    const appManifest = PlatformAppsService.views.getApp(p.appId).manifest;
+    return appManifest.sources.find(source => source.id === inspectedAppSourceId);
+  }
+
   return (
     <Col span={8}>
-      <div className={styles.sourceTag} onClick={p.onClick} onDoubleClick={p.onDoubleClick}>
+      <div
+        className={cx(styles.sourceTag, { [styles.active]: active() })}
+        onClick={() => inspectSource(p.type)}
+        onDoubleClick={() => selectInspectedSource()}
+      >
         {p.name}
       </div>
     </Col>
