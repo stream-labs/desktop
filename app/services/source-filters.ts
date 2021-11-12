@@ -231,31 +231,6 @@ export class SourceFiltersService extends StatefulService<IFiltersServiceState> 
     });
   }
 
-  getTypesForSource(sourceId: string): ISourceFilterType[] {
-    const source = this.sourcesService.views.getSource(sourceId);
-    return this.getTypes().filter(filterType => {
-      if (filterType.type === 'face_mask_filter') return false;
-
-      /* Audio filters can be applied to audio sources. */
-      if (source.audio && filterType.audio) {
-        return true;
-      }
-
-      /* We have either a video filter or source */
-      /* Can't apply asynchronous video filters to non-asynchronous video sources. */
-      if (!source.async && filterType.async) {
-        return false;
-      }
-
-      /* Video filters can be applied to video sources. */
-      if (source.video && filterType.video) {
-        return true;
-      }
-
-      return false;
-    });
-  }
-
   add(
     sourceId: string,
     filterType: TSourceFilterType,
@@ -293,7 +268,7 @@ export class SourceFiltersService extends StatefulService<IFiltersServiceState> 
       ]);
     }
 
-    if (this.presetFilter(sourceId)) {
+    if (this.views.presetFilterBySourceId(sourceId)) {
       this.usageStatisticsService.recordFeatureUsage('PresetFilter');
       this.setOrder(sourceId, '__PRESET', 1);
     }
@@ -358,12 +333,8 @@ export class SourceFiltersService extends StatefulService<IFiltersServiceState> 
     if (preset) this.SET_PRESET_FILTER(sourceId, preset);
   }
 
-  presetFilter(sourceId: string): ISourceFilter {
-    return this.state.presets[sourceId];
-  }
-
   addPresetFilter(sourceId: string, path: string) {
-    const preset = this.presetFilter(sourceId);
+    const preset = this.views.presetFilterBySourceId(sourceId);
     if (preset) {
       this.setPropertiesFormData(sourceId, '__PRESET', [
         {
@@ -384,17 +355,6 @@ export class SourceFiltersService extends StatefulService<IFiltersServiceState> 
     this.getObsFilter(sourceId, filterName).enabled = visible;
     this.UPDATE_FILTER(sourceId, { name: filterName, visible });
     this.filterUpdated.next({ sourceId, name: filterName });
-  }
-
-  getAddNewFormData(sourceId: string) {
-    const availableTypesList = this.getTypesForSource(sourceId).map(filterType => {
-      return { description: filterType.description, value: filterType.type };
-    });
-
-    return {
-      type: availableTypesList[0].value,
-      name: $t('New filter'),
-    };
   }
 
   getPropertiesFormData(sourceId: string, filterName: string): TObsFormData {
@@ -444,18 +404,6 @@ export class SourceFiltersService extends StatefulService<IFiltersServiceState> 
       size: {
         width: 800,
         height: 800,
-      },
-    });
-  }
-
-  showAddSourceFilter(sourceId: string) {
-    this.windowsService.showWindow({
-      componentName: 'AddSourceFilter',
-      title: $t('Add source filter'),
-      queryParams: { sourceId },
-      size: {
-        width: 600,
-        height: 500,
       },
     });
   }
