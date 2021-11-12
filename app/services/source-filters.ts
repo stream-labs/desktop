@@ -111,7 +111,7 @@ class SourceFiltersViews extends ViewHandler<IFiltersServiceState> {
   }
 
   parsePresetValue(path: string) {
-    return path.match(/luts\\[a-z_]+.png$/)[0];
+    return path.match(/luts[\\\/][a-z_]+.png$/)[0];
   }
 
   filtersBySourceId(sourceId: string) {
