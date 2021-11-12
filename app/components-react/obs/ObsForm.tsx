@@ -50,7 +50,7 @@ export function ObsForm(p: IObsFormProps) {
       {p.value.map((inputData, inputIndex) => (
         <ObsInput
           value={inputData}
-          key={inputIndex}
+          key={inputData.name}
           inputIndex={inputIndex}
           onChange={onInputHandler}
         />
@@ -193,7 +193,7 @@ export function ObsFormGroup(p: IObsFormGroupProps) {
   return (
     <div className="form-groups">
       {sections.map((sectionProps, ind) => (
-        <div className="section" key={ind}>
+        <div className="section" key={`${sectionProps.nameSubCategory}${ind}`}>
           {sectionProps.nameSubCategory !== 'Untitled' && (
             <h2 className="section-title">{$t(sectionProps.nameSubCategory)}</h2>
           )}
