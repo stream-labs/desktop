@@ -211,6 +211,9 @@ export default function SourceFilters() {
                 layout="horizontal"
               />
             )}
+            {selectedFilter && !formData?.length && (
+              <div>{$t('No settings are available for this filter')}</div>
+            )}
           </Scrollable>
         </div>
       </div>
