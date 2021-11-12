@@ -22,6 +22,7 @@ import { getSharedResource } from 'util/get-shared-resource';
 import { mutation, StatefulService, ViewHandler } from 'services/core/stateful-service';
 import { byOS, OS } from 'util/operating-systems';
 import Vue from 'vue';
+import { InitAfter } from 'services';
 
 export type TSourceFilterType =
   | 'mask_filter'
@@ -155,6 +156,7 @@ class SourceFiltersViews extends ViewHandler<IFiltersServiceState> {
   }
 }
 
+@InitAfter('SourcesService')
 export class SourceFiltersService extends StatefulService<IFiltersServiceState> {
   @Inject() private sourcesService: SourcesService;
   @Inject() private windowsService: WindowsService;
