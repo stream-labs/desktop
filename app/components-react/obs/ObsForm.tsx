@@ -153,7 +153,7 @@ function ObsInput(p: IObsInputProps) {
 
     case 'OBS_PROPERTY_SLIDER':
       // eslint-disable-next-line no-case-declarations
-      const sliderVal = inputProps.value as IObsSliderInputValue;
+      const sliderVal = p.value as IObsSliderInputValue;
 
       // TODO: usePercentages is not hooked up yet
       return (
