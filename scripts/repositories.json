@@ -4,7 +4,7 @@
             "name": "obs-studio-node",
             "url": "https://s3-us-west-2.amazonaws.com/obsstudionodes3.streamlabs.com/",
             "archive": "osn-[VERSION]-release-[OS].tar.gz",
-            "version": "0.19.7",
+            "version": "0.19.9",
             "win64": true,
             "osx": true
         },
@@ -51,8 +51,8 @@
         {
             "name": "game-overlay",
             "url": "https://obs-studio-deployment.s3-us-west-2.amazonaws.com/",
-            "archive": "game-overlay-[VERSION]-[OS].tar.gz",
-            "version": "0.0.53",
+            "archive": "game-overlay-[VERSION].tar.gz",
+            "version": "0.0.44",
             "win64": true,
             "osx": false
         },
