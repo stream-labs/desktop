@@ -30,6 +30,7 @@ import { WidgetWindow } from './widgets/common/WidgetWindow';
 import SafeMode from './windows/SafeMode';
 import AdvancedAudio from './windows/AdvancedAudio';
 import { CustomCodeWindow } from './widgets/common/CustomCode';
+import SourceFilters from './windows/SourceFilters';
 
 // list of React components to be used inside Vue components
 export const components = {
@@ -64,4 +65,5 @@ export const components = {
   CustomCodeWindow: createRoot(CustomCodeWindow),
   SafeMode,
   AdvancedAudio,
+  SourceFilters,
 };

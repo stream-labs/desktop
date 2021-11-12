@@ -5,12 +5,19 @@ import {
   IObsListInput,
   TObsFormData,
   TObsValue,
+  IObsPathInputValue,
+  IObsSliderInputValue,
+  IObsTextInputValue,
+  IObsNumberInputValue,
 } from '../../components/obs/inputs/ObsInput';
 import Form, { useFormContext } from '../shared/inputs/Form';
 import {
   CheckboxInput,
+  ColorInput,
+  FileInput,
   ListInput,
   NumberInput,
+  SliderInput,
   TextAreaInput,
   TextInput,
   TInputLayout,
@@ -19,6 +26,7 @@ import { cloneDeep } from 'lodash';
 import { Button } from 'antd';
 import InputWrapper from '../shared/inputs/InputWrapper';
 import { $t, $translateIfExist } from '../../services/i18n';
+import Utils from 'services/utils';
 
 interface IObsFormProps {
   value: IObsInput<TObsValue>[];
@@ -84,9 +92,15 @@ function ObsInput(p: IObsInputProps) {
     case 'OBS_PROPERTY_DOUBLE':
       return <NumberInput {...inputProps} />;
     case 'OBS_PROPERTY_INT':
-      return <NumberInput {...inputProps} step={1} min={p.value.minVal} max={p.value.maxVal} />;
+      // eslint-disable-next-line no-case-declarations
+      const intVal = inputProps.value as IObsNumberInputValue;
+
+      return <NumberInput {...inputProps} step={1} min={intVal.minVal} max={intVal.maxVal} />;
     case 'OBS_PROPERTY_TEXT':
-      if (p.value.multiline) {
+      // eslint-disable-next-line no-case-declarations
+      const textVal = inputProps.value as IObsTextInputValue;
+
+      if (textVal.multiline) {
         return <TextAreaInput {...inputProps} />;
       } else {
         return <TextInput {...inputProps} />;
@@ -118,6 +132,42 @@ function ObsInput(p: IObsInputProps) {
           <CheckboxInput {...inputProps} />
         </InputWrapper>
       );
+
+    case 'OBS_PROPERTY_FILE':
+      return <FileInput {...inputProps} filters={(p.value as IObsPathInputValue).filters} />;
+
+    case 'OBS_PROPERTY_COLOR':
+      // eslint-disable-next-line no-case-declarations
+      const rgba = Utils.intToRgba(p.value.value as number);
+      rgba.a = rgba.a / 255;
+
+      return (
+        <ColorInput
+          {...inputProps}
+          value={rgba}
+          onChange={(v: any) => {
+            inputProps.onChange(Utils.rgbaToInt(v.r, v.g, v.b, Math.round(v.a * 255)));
+          }}
+        />
+      );
+
+    case 'OBS_PROPERTY_SLIDER':
+      // eslint-disable-next-line no-case-declarations
+      const sliderVal = inputProps.value as IObsSliderInputValue;
+
+      // TODO: usePercentages is not hooked up yet
+      return (
+        <SliderInput
+          {...inputProps}
+          step={sliderVal.stepVal}
+          min={sliderVal.minVal}
+          max={sliderVal.maxVal}
+          hasNumberInput={true}
+          debounce={500}
+          tooltipPlacement="right"
+        />
+      );
+
     default:
       return <span style={{ color: 'red' }}>Unknown input type {type}</span>;
   }

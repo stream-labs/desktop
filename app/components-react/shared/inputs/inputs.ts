@@ -102,7 +102,7 @@ type TCreateSlobsInputProps<
  */
 export function useInput<
   TInputProps extends TSlobsInputProps<{}, any>,
-  TValue = TInputProps['value']
+  TValue = NonNullable<TInputProps['value']>
 >(type: TInputType, inputProps: TInputProps, antFeatures?: readonly string[]) {
   const { name, value, label } = inputProps;
 
@@ -244,7 +244,7 @@ export function useInput<
     ...dataAttrs,
     'data-role': 'input',
     name: inputId,
-    value: localValueRef.current,
+    value: localValueRef.current as TValue,
     onChange,
   };
 

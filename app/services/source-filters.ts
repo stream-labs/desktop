@@ -19,8 +19,9 @@ import { EOrderMovement } from 'obs-studio-node';
 import { Subject } from 'rxjs';
 import { UsageStatisticsService } from './usage-statistics';
 import { getSharedResource } from 'util/get-shared-resource';
-import { ViewHandler } from 'services/core/stateful-service';
+import { mutation, StatefulService, ViewHandler } from 'services/core/stateful-service';
 import { byOS, OS } from 'util/operating-systems';
+import Vue from 'vue';
 
 export type TSourceFilterType =
   | 'mask_filter'
@@ -65,7 +66,17 @@ export interface ISourceFilterIdentifier {
   name: string;
 }
 
-class SourceFiltersViews extends ViewHandler<{}> {
+interface IFiltersServiceState {
+  filters: {
+    [sourceId: string]: ISourceFilter[] | undefined;
+  };
+  presets: {
+    [sourceId: string]: ISourceFilter | undefined;
+  };
+  types: ISourceFilterType[];
+}
+
+class SourceFiltersViews extends ViewHandler<IFiltersServiceState> {
   get presetFilterOptions() {
     return [
       { title: $t('None'), value: '' },
@@ -82,6 +93,15 @@ class SourceFiltersViews extends ViewHandler<{}> {
     ];
   }
 
+  get presetFilterOptionsReact() {
+    return this.presetFilterOptions.map(opt => ({
+      label: opt.title,
+      // Empty string doesn't play nicely with our react list input
+      // due to it being a falsey value in JS.
+      value: opt.value === '' ? 'none' : opt.value,
+    }));
+  }
+
   get presetFilterMetadata() {
     return metadata.list({
       options: this.presetFilterOptions,
@@ -93,23 +113,81 @@ class SourceFiltersViews extends ViewHandler<{}> {
   parsePresetValue(path: string) {
     return path.match(/luts\\[a-z_]+.png$/)[0];
   }
+
+  filtersBySourceId(sourceId: string) {
+    return this.state.filters[sourceId];
+  }
+
+  presetFilterBySourceId(sourceId: string) {
+    return this.state.presets[sourceId];
+  }
+
+  getTypesForSource(sourceId: string): ISourceFilterType[] {
+    const source = this.getServiceViews(SourcesService).getSource(sourceId);
+    return this.state.types.filter(filterType => {
+      if (filterType.type === 'face_mask_filter') return false;
+
+      /* Audio filters can be applied to audio sources. */
+      if (source.audio && filterType.audio) {
+        return true;
+      }
+
+      /* We have either a video filter or source */
+      /* Can't apply asynchronous video filters to non-asynchronous video sources. */
+      if (!source.async && filterType.async) {
+        return false;
+      }
+
+      /* Video filters can be applied to video sources. */
+      if (source.video && filterType.video) {
+        return true;
+      }
+
+      return false;
+    });
+  }
+
+  suggestName(sourceId: string, filterName: string): string {
+    return namingHelpers.suggestName(
+      filterName,
+      (name: string) => !!this.state.filters[sourceId].find(f => f.name === name),
+    );
+  }
 }
 
-export class SourceFiltersService extends Service {
+export class SourceFiltersService extends StatefulService<IFiltersServiceState> {
   @Inject() private sourcesService: SourcesService;
   @Inject() private windowsService: WindowsService;
   @Inject() private usageStatisticsService: UsageStatisticsService;
+
+  static initialState: IFiltersServiceState = { filters: {}, presets: {}, types: [] };
 
   filterAdded = new Subject<ISourceFilterIdentifier>();
   filterRemoved = new Subject<ISourceFilterIdentifier>();
   filterUpdated = new Subject<ISourceFilterIdentifier>();
   filtersReordered = new Subject<void>();
 
-  get views() {
-    return new SourceFiltersViews({});
+  init() {
+    this.sourcesService.sourceAdded.subscribe(s => {
+      if (!this.state.filters[s.sourceId]) this.SET_FILTERS(s.sourceId, []);
+    });
+
+    this.sourcesService.sourceRemoved.subscribe(s => {
+      this.SET_FILTERS(s.sourceId, null);
+    });
+
+    this.SET_TYPES(this.getTypes());
   }
 
-  getTypesList(): IObsListOption<TSourceFilterType>[] {
+  get views() {
+    return new SourceFiltersViews(this.state);
+  }
+
+  /**
+   * Called once at startup to load available types from OBS.
+   * External code should access type list via the Vuex store.
+   */
+  private getTypes() {
     const obsAvailableTypes = obs.FilterFactory.types();
     const allowlistedTypes: IObsListOption<TSourceFilterType>[] = [
       { description: $t('Image Mask/Blend'), value: 'mask_filter' },
@@ -134,32 +212,21 @@ export class SourceFiltersService extends Service {
       { description: $t('Expander'), value: 'expander_filter' },
       { description: $t('Shader'), value: 'shader_filter' },
     ];
+    const allowedAvailableTypes = allowlistedTypes.filter(type =>
+      obsAvailableTypes.includes(type.value),
+    );
 
-    return allowlistedTypes.filter(type => obsAvailableTypes.includes(type.value));
-  }
+    return allowedAvailableTypes.map(type => {
+      const flags = obs.Global.getOutputFlagsFromId(type.value);
 
-  getTypes(): ISourceFilterType[] {
-    const typesList = this.getTypesList();
-    const types: ISourceFilterType[] = [];
-
-    obs.FilterFactory.types().forEach((type: TSourceFilterType) => {
-      const listItem = typesList.find(item => item.value === type);
-      if (!listItem) {
-        console.warn(`filter ${type} is not found in available types`);
-        return;
-      }
-      const description = listItem.description;
-      const flags = obs.Global.getOutputFlagsFromId(type);
-      types.push({
-        type,
-        description,
+      return {
+        type: type.value,
+        description: type.description,
         audio: !!(obs.ESourceOutputFlags.Audio & flags),
         video: !!(obs.ESourceOutputFlags.Video & flags),
         async: !!(obs.ESourceOutputFlags.Async & flags),
-      });
+      };
     });
-
-    return types;
   }
 
   getTypesForSource(sourceId: string): ISourceFilterType[] {
@@ -205,6 +272,25 @@ export class SourceFiltersService extends Service {
     // We need to release one
     obsFilter.release();
 
+    if (filterName === '__PRESET') {
+      this.SET_PRESET_FILTER(sourceId, {
+        name: filterName,
+        type: filterType,
+        visible: true,
+        settings: filterReference.settings,
+      });
+    } else {
+      this.SET_FILTERS(sourceId, [
+        ...(this.state.filters[sourceId] ?? []),
+        {
+          name: filterName,
+          type: filterType,
+          visible: true,
+          settings: filterReference.settings,
+        },
+      ]);
+    }
+
     if (this.presetFilter(sourceId)) {
       this.usageStatisticsService.recordFeatureUsage('PresetFilter');
       this.setOrder(sourceId, '__PRESET', 1);
@@ -227,30 +313,51 @@ export class SourceFiltersService extends Service {
   remove(sourceId: string, filterName: string) {
     const obsFilter = this.getObsFilter(sourceId, filterName);
     const source = this.sourcesService.views.getSource(sourceId);
+
+    if (filterName === '__PRESET') {
+      this.REMOVE_PRESET_FILTER(sourceId);
+    } else {
+      this.SET_FILTERS(
+        sourceId,
+        this.state.filters[sourceId].filter(f => f.name !== filterName),
+      );
+    }
+
     source.getObsInput().removeFilter(obsFilter);
     this.filterRemoved.next({ sourceId, name: filterName });
   }
 
   setPropertiesFormData(sourceId: string, filterName: string, properties: TObsFormData) {
     if (!filterName) return;
-    setPropertiesFormData(this.getObsFilter(sourceId, filterName), properties);
+    const obsFilter = this.getObsFilter(sourceId, filterName);
+
+    setPropertiesFormData(obsFilter, properties);
+    this.UPDATE_FILTER(sourceId, { name: filterName, settings: obsFilter.settings });
     this.filterUpdated.next({ sourceId, name: filterName });
   }
 
   getFilters(sourceId: string): ISourceFilter[] {
-    return this.sourcesService.views
-      .getSource(sourceId)
-      .getObsInput()
-      .filters.map(obsFilter => ({
-        visible: obsFilter.enabled,
-        name: obsFilter.name,
-        type: obsFilter.id as TSourceFilterType,
-        settings: obsFilter.settings,
-      }));
+    return this.state.filters[sourceId];
+  }
+
+  /**
+   * Loads the provided filter data into the store. This is only
+   * really called when loading a scene collection.
+   * @param sourceId The id of the source to load
+   * @param filters The filter data
+   */
+  loadFilterData(sourceId: string, filters: ISourceFilter[]): void {
+    this.SET_FILTERS(
+      sourceId,
+      filters.filter(f => f.name !== '__PRESET'),
+    );
+
+    const preset = filters.find(f => f.name === '__PRESET');
+    if (preset) this.SET_PRESET_FILTER(sourceId, preset);
   }
 
   presetFilter(sourceId: string): ISourceFilter {
-    return this.getFilters(sourceId).find((filter: ISourceFilter) => filter.name === '__PRESET');
+    return this.state.presets[sourceId];
   }
 
   addPresetFilter(sourceId: string, path: string) {
@@ -273,6 +380,7 @@ export class SourceFiltersService extends Service {
 
   setVisibility(sourceId: string, filterName: string, visible: boolean) {
     this.getObsFilter(sourceId, filterName).enabled = visible;
+    this.UPDATE_FILTER(sourceId, { name: filterName, visible });
     this.filterUpdated.next({ sourceId, name: filterName });
   }
 
@@ -308,6 +416,13 @@ export class SourceFiltersService extends Service {
   }
 
   setOrder(sourceId: string, filterName: string, delta: number) {
+    // Reorder in the store
+    if (filterName !== '__PRESET') {
+      const from = this.state.filters[sourceId].findIndex(f => f.name === filterName);
+      const to = from + delta;
+      this.REORDER_FILTERS(sourceId, from, to);
+    }
+
     const obsFilter = this.getObsFilter(sourceId, filterName);
     const obsInput = this.sourcesService.views.getSource(sourceId).getObsInput();
     const movement = delta > 0 ? EOrderMovement.Down : EOrderMovement.Up;
@@ -345,5 +460,42 @@ export class SourceFiltersService extends Service {
 
   private getObsFilter(sourceId: string, filterName: string): obs.IFilter {
     return this.sourcesService.views.getSource(sourceId).getObsInput().findFilter(filterName);
+  }
+
+  @mutation()
+  SET_FILTERS(sourceId: string, filters: ISourceFilter[]) {
+    Vue.set(this.state.filters, sourceId, filters);
+  }
+
+  @mutation()
+  UPDATE_FILTER(sourceId: string, patch: Partial<ISourceFilter>) {
+    const filter =
+      patch.name === '__PRESET'
+        ? this.state.presets[sourceId]
+        : this.state.filters[sourceId].find(f => f.name === patch.name);
+
+    Object.assign(filter, patch);
+  }
+
+  @mutation()
+  SET_PRESET_FILTER(sourceId: string, filter: ISourceFilter) {
+    Vue.set(this.state.presets, sourceId, filter);
+  }
+
+  @mutation()
+  REMOVE_PRESET_FILTER(sourceId: string) {
+    Vue.delete(this.state.presets, sourceId);
+  }
+
+  @mutation()
+  REORDER_FILTERS(sourceId: string, from: number, to: number) {
+    const filter = this.state.filters[sourceId][from];
+    this.state.filters[sourceId].splice(from, 1);
+    this.state.filters[sourceId].splice(to, 0, filter);
+  }
+
+  @mutation()
+  SET_TYPES(types: ISourceFilterType[]) {
+    this.state.types = types;
   }
 }
