@@ -272,12 +272,13 @@ function CreateFilterForm(p: { sourceId: string; onSubmit: (filterName: string) 
   return (
     <>
       <h2>Add New Filter</h2>
-      <Form onFinish={submit} form={form}>
+      <Form onFinish={submit} form={form} name="addFilterForm">
         <ListInput
           value={type}
           onChange={v => setType(v)}
           options={types}
           label={$t('Filter type')}
+          name="filterType"
         />
         <TextInput
           value={name}
@@ -289,6 +290,7 @@ function CreateFilterForm(p: { sourceId: string; onSubmit: (filterName: string) 
             { validator: uniqueNameValidator },
           ]}
           uncontrolled={false}
+          name="filterName"
         />
         <div style={{ textAlign: 'right' }}>
           <Button type="primary" htmlType="submit">
