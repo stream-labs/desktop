@@ -117,7 +117,7 @@
   "Very High": "Very High",
   "Apps": "Apps",
   "Finish": "Befejezés",
-  "Get Prime": "Get Prime",
+  "Get Prime": "Prime beszerzése",
   "System error message:": "Rendszerhiba üzenet:",
   "List is empty": "A lista üres",
   "Not selected": "Nincs kiválasztva",
@@ -137,7 +137,7 @@
   "Sound": "Hang",
   "Play Audio": "Play Audio",
   "Click here": "Kattints ide",
-  "More Info": "More Info",
+  "More Info": "További információk",
   "Revert Changes": "Revert Changes",
-  "Animations": "Animations"
+  "Animations": "Animációk"
 }
