@@ -135,7 +135,7 @@ function NotificationsArea(p: {
 }) {
   return (
     <div className={styles.section}>
-      <h2>Performance Notifications</h2>
+      <h2>{$t('Performance Notifications')}</h2>
       <Scrollable className={styles.notificationContainer} isResizable={false}>
         {p.notifications.map(notification => (
           <div

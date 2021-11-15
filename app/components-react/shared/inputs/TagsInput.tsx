@@ -46,7 +46,7 @@ export const TagsInput = InputComponent(<T extends any[]>(props: TTagsInputProps
   }
 
   function dropdownRender(menu: JSX.Element) {
-    const maxTagsReached = p.max && inputAttrs.value?.length >= p.max;
+    const maxTagsReached = p.max && (inputAttrs.value?.length ?? 0) >= p.max;
     return (
       <div>
         {maxTagsReached && (
@@ -63,7 +63,7 @@ export const TagsInput = InputComponent(<T extends any[]>(props: TTagsInputProps
     const max = p.max;
     const count = values.length;
     if (max && count > max) values.pop();
-    inputAttrs.onChange(values);
+    inputAttrs.onChange(values as any);
   }
 
   const displayValue =

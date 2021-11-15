@@ -26,5 +26,10 @@
   "Image URL": "Adres URL obrazu",
   "Example": "Przykład",
   "Change Media": "Zmień media",
-  "No Sound": "Brak dźwięku"
+  "No Sound": "Brak dźwięku",
+  "No Media": "No Media",
+  "Change Link": "Change Link",
+  "Pick From Gallery": "Pick From Gallery",
+  "Clear Link": "Clear Link",
+  "Media URL": "Media URL"
 }
