@@ -34,7 +34,7 @@ export default class Display extends BaseElement {
           </div>
         </div>
         <Scrollable className="studio-controls-selector">
-          {this.userService.isLoggedIn ? (
+          {this.userService.isLoggedIn && this.streamingService.isStreaming ? (
             <div style="height: 100%;">
               <BrowserView
                 class={styles.container}

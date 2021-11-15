@@ -13,6 +13,7 @@ import { metadata } from 'components/shared/inputs';
 import { StreamSettingsService } from 'services/settings/streaming';
 import electron from 'electron';
 import PlatformLogo from 'components/shared/PlatformLogo';
+import { FlexTvService } from 'services/platforms/flextv';
 
 export class ConnectProps {
   continue: () => void = () => {};
@@ -30,6 +31,8 @@ export default class FlexLoginForm extends TsxComponent<ConnectProps> {
   @Inject() private onboardingService: OnboardingService;
   @Inject() private userService: UserService;
   @Inject() private streamSettingsService: StreamSettingsService;
+  @Inject() private flexTvService: FlexTvService;
+
   idMetadata = metadata.text({ title: '아이디', name: 'id', fullWidth: true });
   pwdMetadata = metadata.text({ title: '비밀번호', name: 'password', masked: true, fullWidth: true });
   key = '';
@@ -39,7 +42,7 @@ export default class FlexLoginForm extends TsxComponent<ConnectProps> {
   async next() {
     const headers = new Headers();
     headers.append('Content-Type', 'application/json');
-    const request = new Request('https://www.hotaetv.com/api/auth/signin', {
+    const request = new Request(`${this.flexTvService.apiBase}/api/auth/signin`, {
       headers,
       method: 'POST',
       body: JSON.stringify({ loginId: this.id, password: this.password }),
@@ -89,7 +92,15 @@ export default class FlexLoginForm extends TsxComponent<ConnectProps> {
   }
 
   openHelp() {
-    electron.remote.shell.openExternal('https://www.flextv.co.kr/cs/guide');
+    electron.remote.shell.openExternal(`${this.flexTvService.baseUrl}/cs/guide`);
+  }
+
+  openSignup() {
+    electron.remote.shell.openExternal(`${this.flexTvService.baseUrl}/signup`);
+  }
+
+  openFindMember() {
+    electron.remote.shell.openExternal(`${this.flexTvService.baseUrl}/member/find/findId`);
   }
 
   render() {
@@ -104,6 +115,9 @@ export default class FlexLoginForm extends TsxComponent<ConnectProps> {
           <div class="section">
             <VFormGroup vModel={this.id} metadata={this.idMetadata} />
             <VFormGroup vModel={this.password} metadata={this.pwdMetadata} />
+            <a className={styles['link-button']} onClick={() => this.openFindMember()}>
+              아이디 찾기 & 비밀번호 찾기
+            </a>
           </div>
 
           <p>
@@ -112,6 +126,12 @@ export default class FlexLoginForm extends TsxComponent<ConnectProps> {
               onClick={() => this.next()}
             >
               {$t('Log In')}
+            </button>
+            <button
+              class={cx('button button--prime', styles.flexSignUpButton)}
+              onClick={() => this.openSignup()}
+            >
+              회원 가입 하기!
             </button>
             <a class={styles['link-button']} onClick={() => this.props.continue()}>
               {$t('Back')}

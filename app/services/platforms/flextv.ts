@@ -34,6 +34,7 @@ export class FlexTvService
     settings: { title: '' },
   };
 
+  readonly baseUrl = 'https://www.hotaetv.com';
   readonly apiBase = 'https://www.hotaetv.com';
   readonly platform = 'flextv';
   readonly displayName = 'FlexTV';

@@ -8,6 +8,7 @@ import { $t } from 'services/i18n';
 
 import FlexLoginForm from './FlexLoginForm';
 import { UsageStatisticsService } from 'services/usage-statistics';
+import { FlexTvService } from 'services/platforms/flextv';
 import { StreamingService } from '../../../../services/streaming';
 import { IncrementalRolloutService } from '../../../../services/incremental-rollout';
 
@@ -22,6 +23,7 @@ export default class ConnectFlex extends TsxComponent<ConnectProps> {
   @Inject() usageStatisticsService: UsageStatisticsService;
   @Inject() streamingService!: StreamingService;
   @Inject() incrementalRolloutService: IncrementalRolloutService;
+  @Inject() flexTvService: FlexTvService;
 
   selectedExtraPlatform = '';
 
@@ -49,7 +51,7 @@ export default class ConnectFlex extends TsxComponent<ConnectProps> {
   }
 
   contactSupport() {
-    electron.remote.shell.openExternal('https://www.flextv.co.kr/cs/guide');
+    electron.remote.shell.openExternal(`${this.flexTvService.baseUrl}/cs/guide`);
   }
 
   onSkip() {
