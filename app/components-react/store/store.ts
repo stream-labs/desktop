@@ -353,9 +353,9 @@ function catchDestroyedModuleCalls(module: any) {
     module[propName] = (...args: unknown[]) => {
       try {
         return originalMethod.apply(module, args);
-      } catch (e: any) {
+      } catch (e: unknown) {
         // silently stop execution if module is destroyed
-        if (e.message !== 'ReduxModule_is_destroyed') throw e;
+        if (e['message'] !== 'ReduxModule_is_destroyed') throw e;
       }
     };
   });
