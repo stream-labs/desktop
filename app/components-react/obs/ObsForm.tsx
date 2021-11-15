@@ -32,6 +32,7 @@ interface IObsFormProps {
   value: IObsInput<TObsValue>[];
   onChange: (newValue: IObsInput<TObsValue>[]) => unknown;
   layout?: TInputLayout;
+  style?: React.CSSProperties;
 }
 
 /**
@@ -46,7 +47,7 @@ export function ObsForm(p: IObsFormProps) {
   }
 
   return (
-    <Form layout={p.layout || 'vertical'}>
+    <Form layout={p.layout || 'vertical'} style={p.style}>
       {p.value.map((inputData, inputIndex) => (
         <ObsInput
           value={inputData}
