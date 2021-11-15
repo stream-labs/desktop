@@ -208,7 +208,7 @@ export default function SourceFilters() {
         </div>
         <div style={{ flexGrow: 1 }}>
           <Scrollable style={{ height: '100%' }}>
-            {selectedFilter && formData && (
+            {selectedFilter && formData && !!formData.length && (
               <ObsForm
                 value={formData}
                 onChange={newData => {
@@ -224,7 +224,7 @@ export default function SourceFilters() {
               />
             )}
             {selectedFilter && !formData?.length && (
-              <div>{$t('No settings are available for this filter')}</div>
+              <div style={{ padding: 20 }}>{$t('No settings are available for this filter')}</div>
             )}
           </Scrollable>
         </div>
