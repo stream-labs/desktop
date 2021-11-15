@@ -26,5 +26,10 @@
   "Image URL": "图片网址",
   "Example": "示例",
   "Change Media": "更换媒体",
-  "No Sound": "无声音"
+  "No Sound": "无声音",
+  "No Media": "No Media",
+  "Change Link": "Change Link",
+  "Pick From Gallery": "Pick From Gallery",
+  "Clear Link": "Clear Link",
+  "Media URL": "Media URL"
 }

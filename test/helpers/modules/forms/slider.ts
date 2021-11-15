@@ -39,6 +39,14 @@ export class SliderInputController extends BaseInputController<number> {
       },
     ]);
 
+    // check the goal value is not out of bounds
+    const currentValue = await this.getValue();
+    if (goalValue < currentValue) {
+      throw new Error(
+        `Attempted to set slider value to "${goalValue}", but the minimum value is "${currentValue}"`,
+      );
+    }
+
     // Get new dot position
     handlePos = await getHandleCenter($el);
 

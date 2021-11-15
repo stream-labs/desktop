@@ -1,6 +1,6 @@
 import { test, useSpectron } from '../../helpers/spectron';
 import { showSettingsWindow } from '../../helpers/modules/settings/settings';
-import { clickButton, clickTab } from '../../helpers/modules/core';
+import { clickButton, clickTab, focusChild } from '../../helpers/modules/core';
 import { useForm } from '../../helpers/modules/forms';
 useSpectron();
 
@@ -25,6 +25,7 @@ test('Form inputs', async t => {
     { name: 'city', title: 'City', value: '', displayValue: null },
     { name: 'weight', title: 'Weight', value: 65, displayValue: 65 },
     { name: 'colors', title: 'Pick your favorite colors', value: [], displayValue: [] },
+    { name: 'saveFilePath', value: '', displayValue: '' },
     { name: 'addIntroduction', title: 'Add Introduction', value: false, displayValue: false },
     {
       name: 'confirm1',
@@ -50,6 +51,7 @@ test('Form inputs', async t => {
     city: 'Cairo',
     addIntroduction: true,
     introduction: 'Hello World!',
+    saveFilePath: 'C:\\myreport.txt',
     confirm1: true,
     confirm2: true,
   });
@@ -77,6 +79,7 @@ test('Form inputs', async t => {
       value: 'Hello World!',
       displayValue: 'Hello World!',
     },
+    { name: 'saveFilePath', value: 'C:\\myreport.txt', displayValue: 'C:\\myreport.txt' },
     {
       name: 'confirm1',
       title: 'Confirm you allow processing your data',
@@ -96,6 +99,7 @@ test('Form inputs', async t => {
     weight: 100,
     addIntroduction: true,
     introduction: 'Hello World!',
+    saveFilePath: 'C:\\myreport.txt',
     confirm1: true,
     confirm2: true,
   });

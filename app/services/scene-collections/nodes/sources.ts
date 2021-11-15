@@ -14,7 +14,7 @@ import { ScenesService } from 'services/scenes';
 import defaultTo from 'lodash/defaultTo';
 import { byOS, OS } from 'util/operating-systems';
 import { UsageStatisticsService } from 'services/usage-statistics';
-import { TSourceFilterType } from 'services/source-filters';
+import { SourceFiltersService, TSourceFilterType } from 'services/source-filters';
 
 interface ISchema {
   items: ISourceInfo[];
@@ -58,6 +58,7 @@ export class SourcesNode extends Node<ISchema, {}> {
   @Inject() private audioService: AudioService;
   @Inject() private scenesService: ScenesService;
   @Inject() private usageStatisticsService: UsageStatisticsService;
+  @Inject() private sourceFiltersService: SourceFiltersService;
 
   getItems() {
     const linkedSourcesIds = this.scenesService.views
@@ -261,6 +262,18 @@ export class SourcesNode extends Node<ISchema, {}> {
       if (sourceInfo.hotkeys) {
         promises.push(supportedSources[index].hotkeys.load({ sourceId: sourceInfo.id }));
       }
+
+      this.sourceFiltersService.loadFilterData(
+        sourceInfo.id,
+        sourceInfo.filters.items.map(f => {
+          return {
+            name: f.name,
+            type: f.type,
+            visible: f.enabled,
+            settings: f.settings,
+          };
+        }),
+      );
     });
 
     return new Promise(resolve => {

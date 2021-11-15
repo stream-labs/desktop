@@ -39,5 +39,6 @@
   "Name Folder": "Klasörü Adlandır",
   "Switch Scenes": "Sahneleri Değiştir",
   "Failed to load scene collection.  A new one will be created instead.": "Sahne koleksiyonu yüklenemedi. Bunun yerine yeni bir tane oluşturun.",
-  "New Scene": "Yeni Sahne"
+  "New Scene": "Yeni Sahne",
+  "Projector": "Projektör"
 }

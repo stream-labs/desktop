@@ -23,3 +23,17 @@ const electron = require('electron');
     });
   });
 })();
+
+(() => {
+  let currentCb;
+
+  electron.dialog.showSaveDialog = function showSaveDialog(win, opts) {
+    return new Promise(resolve => {
+      currentCb = resolve;
+    });
+  };
+
+  electron.ipcMain.on('__SPECTRON_FAKE_SAVE_DIALOG', (e, filePath) => {
+    currentCb({ filePath });
+  });
+})();

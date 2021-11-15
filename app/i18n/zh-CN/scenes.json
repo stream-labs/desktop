@@ -39,5 +39,6 @@
   "Name Folder": "命名文件夹",
   "Switch Scenes": "切换场景",
   "Failed to load scene collection.  A new one will be created instead.": "无法加载场景集。将创建新场景集。",
-  "New Scene": "新建场景"
+  "New Scene": "新建场景",
+  "Projector": "Projector"
 }

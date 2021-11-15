@@ -185,7 +185,7 @@ function PanelForm(p: { source: AudioSource }) {
   const [testing, setTesting] = useState(false);
   const savedMonitoring = useRef(monitoringType);
 
-  const hasDevices = source ? !source.video : false;
+  const hasDevices = !source?.video && !(source?.type === 'soundtrack_source');
   const isMic = source
     ? [
         'wasapi_input_capture',
