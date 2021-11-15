@@ -82,6 +82,17 @@ export default function SourceFilters() {
     return () => subscription.unsubscribe();
   }, [sourceId, selectedFilter]);
 
+  // Close the window when the source is removed
+  useEffect(() => {
+    const subscription = SourcesService.sourceRemoved.subscribe(s => {
+      if (s.sourceId === sourceId) {
+        WindowsService.actions.closeChildWindow();
+      }
+    });
+
+    return subscription.unsubscribe;
+  }, [sourceId]);
+
   const addFilterKey = '__AddNewFilter';
 
   return (
