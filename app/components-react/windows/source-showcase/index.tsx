@@ -70,18 +70,29 @@ function SideBar() {
         );
       }
     }
-    return $i(`source-demos/${demoMode}/${displayData?.demoFilename}`);
+    return $i(`source-demos/${demoMode}/${displayData.demoFilename}`);
   }
 
+  if (!displayData) return null;
+
   return (
-    <Sider width={300}>
-      <div>
-        {displayData?.demoVideo && (
-          <video autoPlay loop>
-            <source src={getSrc()} />
-          </video>
-        )}
-        {!displayData?.demoVideo && <img src={getSrc()} />}
+    <Sider width={300} style={{ marginRight: '-24px' }}>
+      <div className={styles.preview}>
+        <div className={styles.imageContainer}>
+          {displayData.demoVideo && (
+            <video autoPlay loop>
+              <source src={getSrc()} />
+            </video>
+          )}
+          {!displayData.demoVideo && <img src={getSrc()} />}
+        </div>
+        <div>{displayData.description}</div>
+        <div className={styles.supportHeader}>{$t('Supports:')}</div>
+        <ul>
+          {displayData.supportList?.map(support => (
+            <li key={support}>{support}</li>
+          ))}
+        </ul>
       </div>
     </Sider>
   );
