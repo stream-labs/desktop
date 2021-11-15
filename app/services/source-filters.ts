@@ -175,7 +175,7 @@ export class SourceFiltersService extends StatefulService<IFiltersServiceState> 
     });
 
     this.sourcesService.sourceRemoved.subscribe(s => {
-      this.SET_FILTERS(s.sourceId, null);
+      this.REMOVE_FILTERS(s.sourceId);
     });
 
     this.SET_TYPES(this.getTypes());
@@ -425,6 +425,12 @@ export class SourceFiltersService extends StatefulService<IFiltersServiceState> 
         : this.state.filters[sourceId].find(f => f.name === patch.name);
 
     Object.assign(filter, patch);
+  }
+
+  @mutation()
+  REMOVE_FILTERS(sourceId: string) {
+    Vue.delete(this.state.filters, sourceId);
+    Vue.delete(this.state.presets, sourceId);
   }
 
   @mutation()
