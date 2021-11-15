@@ -355,7 +355,7 @@ function catchDestroyedModuleCalls(module: any) {
         return originalMethod.apply(module, args);
       } catch (e: unknown) {
         // silently stop execution if module is destroyed
-        if (e['message'] !== 'ReduxModule_is_destroyed') throw e;
+        if ((e as any).message !== 'ReduxModule_is_destroyed') throw e;
       }
     };
   });
