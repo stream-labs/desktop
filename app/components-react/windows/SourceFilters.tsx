@@ -90,7 +90,7 @@ export default function SourceFilters() {
       }
     });
 
-    return subscription.unsubscribe;
+    return () => subscription.unsubscribe();
   }, [sourceId]);
 
   const addFilterKey = '__AddNewFilter';
