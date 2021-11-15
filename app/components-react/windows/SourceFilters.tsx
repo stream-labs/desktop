@@ -206,7 +206,7 @@ export default function SourceFilters() {
             </ReactSortable>
           </Scrollable>
         </div>
-        <div style={{ flexGrow: 1, padding: 20 }}>
+        <div style={{ flexGrow: 1 }}>
           <Scrollable style={{ height: '100%' }}>
             {selectedFilter && formData && (
               <ObsForm
@@ -220,6 +220,7 @@ export default function SourceFilters() {
                   );
                 }}
                 layout="horizontal"
+                style={{ padding: 20 }}
               />
             )}
             {selectedFilter && !formData?.length && (
