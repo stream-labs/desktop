@@ -25,7 +25,7 @@ test('Form inputs', async t => {
     { name: 'city', title: 'City', value: '', displayValue: null },
     { name: 'weight', title: 'Weight', value: 65, displayValue: 65 },
     { name: 'colors', title: 'Pick your favorite colors', value: [], displayValue: [] },
-    { name: 'saveFilePath', value: '', displayValue: '' },
+    { name: 'saveFilePath', title: 'Save to File', value: '', displayValue: '' },
     { name: 'addIntroduction', title: 'Add Introduction', value: false, displayValue: false },
     {
       name: 'confirm1',
@@ -79,7 +79,12 @@ test('Form inputs', async t => {
       value: 'Hello World!',
       displayValue: 'Hello World!',
     },
-    { name: 'saveFilePath', value: 'C:\\myreport.txt', displayValue: 'C:\\myreport.txt' },
+    {
+      name: 'saveFilePath',
+      title: 'Save to File',
+      value: 'C:\\myreport.txt',
+      displayValue: 'C:\\myreport.txt',
+    },
     {
       name: 'confirm1',
       title: 'Confirm you allow processing your data',
