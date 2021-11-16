@@ -50,7 +50,7 @@ class SourceShowcaseModule {
     } else if (inspectedSource === 'app_source') {
       this.selectAppSource(this.state.inspectedAppId, this.state.inspectedAppSourceId);
     } else if (WidgetType[inspectedSource]) {
-      this.selectWidget(inspectedSource as WidgetType);
+      this.selectWidget(WidgetType[inspectedSource] as WidgetType);
     }
   }
 
