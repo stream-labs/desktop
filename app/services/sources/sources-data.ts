@@ -197,4 +197,31 @@ export const SourceDisplayData = (): { [key: string]: ISourceDisplayData } => ({
       'Audio source working with the Twitch Soundtrack music application. Add this source to be able to filter out the music from your Twitch VODs.',
     ),
   },
+  replay: {
+    name: $t('Instant Replay'),
+    description: $t('Automatically plays your most recently captured replay in your stream.'),
+    demoFilename: 'media.png',
+  },
+  icon_library: {
+    name: $t('Custom Icon'),
+    description: $t('Displays an icon from one of many selections'),
+    demoFilename: 'image.png',
+  },
+  streamlabel: {
+    name: $t('Stream Label'),
+    description: $t(
+      'Include text into your stream, such as follower count, last donation, and many others.',
+    ),
+    demoFilename: 'source-stream-labels.png',
+    supportList: [
+      $t('New Followers'),
+      $t('New Subscribers'),
+      $t('New Cheers'),
+      $t('New Donations'),
+      $t('All-Time Top Donator'),
+      $t('Weekly Top Donator'),
+      $t('Monthly Follows'),
+      $t('Many more'),
+    ],
+  },
 });

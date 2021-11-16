@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Layout, Menu } from 'antd';
 import cx from 'classnames';
 import { ModalLayout } from 'components-react/shared/ModalLayout';
@@ -51,41 +51,50 @@ function SideBar() {
     platform: UserService.views.platform?.type,
   }));
 
-  const displayData = widgetData(inspectedSource)
-    ? widgetData(inspectedSource)
-    : SourceDisplayData()[inspectedSource];
+  const appData = useMemo(() => {
+    if (!inspectedAppId) return;
+    const appManifest = PlatformAppsService.views.getApp(inspectedAppId).manifest;
+    const source = appManifest.sources.find(source => source.id === inspectedAppSourceId);
+    if (source) {
+      return {
+        supportList: source.about.bullets,
+        description: source.about.description,
+        demoFilename: PlatformAppsService.views.getAssetUrl(
+          inspectedAppId,
+          source.about?.bannerImage || '',
+        ),
+        demoVideo: false,
+      };
+    }
+  }, [inspectedAppId]);
 
   function widgetData(type: string | WidgetType) {
     return WidgetDisplayData(platform)[WidgetType[type]];
   }
 
-  function getSrc() {
-    if (inspectedAppId) {
-      const appManifest = PlatformAppsService.views.getApp(inspectedAppId).manifest;
-      const source = appManifest.sources.find(source => source.id === inspectedAppSourceId);
-      if (source) {
-        return PlatformAppsService.views.getAssetUrl(
-          inspectedAppId,
-          source.about?.bannerImage || '',
-        );
-      }
-    }
-    return $i(`source-demos/${demoMode}/${displayData.demoFilename}`);
-  }
+  const displayData =
+    appData || widgetData(inspectedSource) || SourceDisplayData()[inspectedSource];
+
+  const previewSrc = useMemo(() => $i(`source-demos/${demoMode}/${displayData?.demoFilename}`), [
+    demoMode,
+    displayData?.demoFilename,
+  ]);
 
   if (!displayData) return null;
 
   return (
     <Sider width={300} style={{ marginRight: '-24px' }}>
       <div className={styles.preview}>
-        <div className={styles.imageContainer}>
-          {displayData.demoVideo && (
-            <video autoPlay loop>
-              <source src={getSrc()} />
-            </video>
-          )}
-          {!displayData.demoVideo && <img src={getSrc()} />}
-        </div>
+        {displayData.demoFilename && (
+          <div className={styles.imageContainer}>
+            {displayData.demoVideo && (
+              <video autoPlay loop key={previewSrc}>
+                <source src={previewSrc} />
+              </video>
+            )}
+            {!displayData.demoVideo && <img src={previewSrc} />}
+          </div>
+        )}
         <div>{displayData.description}</div>
         {displayData.supportList && <div className={styles.supportHeader}>{$t('Supports:')}</div>}
         <ul>
