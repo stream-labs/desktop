@@ -72,18 +72,18 @@ test('Form inputs', async t => {
       value: [1, 4],
       displayValue: ['Red', 'Orange'],
     },
+    {
+      name: 'saveFilePath',
+      title: 'Save to File',
+      value: 'C:\\myreport.txt',
+      displayValue: 'C:\\myreport.txt',
+    },
     { name: 'addIntroduction', title: 'Add Introduction', value: true, displayValue: true },
     {
       name: 'introduction',
       title: 'Introduction',
       value: 'Hello World!',
       displayValue: 'Hello World!',
-    },
-    {
-      name: 'saveFilePath',
-      title: 'Save to File',
-      value: 'C:\\myreport.txt',
-      displayValue: 'C:\\myreport.txt',
     },
     {
       name: 'confirm1',
