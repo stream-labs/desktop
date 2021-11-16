@@ -87,7 +87,7 @@ function SideBar() {
           {!displayData.demoVideo && <img src={getSrc()} />}
         </div>
         <div>{displayData.description}</div>
-        <div className={styles.supportHeader}>{$t('Supports:')}</div>
+        {displayData.supportList && <div className={styles.supportHeader}>{$t('Supports:')}</div>}
         <ul>
           {displayData.supportList?.map(support => (
             <li key={support}>{support}</li>

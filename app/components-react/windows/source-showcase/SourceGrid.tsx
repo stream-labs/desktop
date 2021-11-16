@@ -12,8 +12,6 @@ import { $t } from 'services/i18n';
 import SourceTag from './SourceTag';
 
 export default function SourceGrid(p: { activeTab: string }) {
-  const essentialSources = new Set([WidgetType.AlertBox]);
-
   const {
     SourcesService,
     UserService,
@@ -33,7 +31,6 @@ export default function SourceGrid(p: { activeTab: string }) {
   const primaryPlatformService = UserService.state.auth
     ? getPlatformService(UserService.state.auth.primaryPlatform)
     : null;
-  const hasStreamlabel = primaryPlatformService?.hasCapability('streamlabels');
 
   const iterableWidgetTypes = useMemo(
     () =>
@@ -60,6 +57,18 @@ export default function SourceGrid(p: { activeTab: string }) {
     [],
   );
 
+  const essentialSources = useMemo(() => {
+    const essentialDefaults = availableSources.filter(source =>
+      ['dshow_input', byOS({ [OS.Windows]: 'screen_capture', [OS.Mac]: 'ffmpeg_source' })].includes(
+        source.value,
+      ),
+    );
+    const essentialWidgets = iterableWidgetTypes.filter(type =>
+      [WidgetType.AlertBox, WidgetType.EventList].includes(WidgetType[type]),
+    );
+    return { essentialDefaults, essentialWidgets };
+  }, []);
+
   const availableAppSources = useMemo(
     () =>
       enabledApps.reduce<{ source: IAppSource; appId: string }[]>((sources, app) => {
@@ -76,6 +85,7 @@ export default function SourceGrid(p: { activeTab: string }) {
 
   function showContent(key: string) {
     const correctKey = ['all', key].includes(p.activeTab);
+    if (UserService.state.auth?.primaryPlatform === 'tiktok' && key === 'widgets') return false;
     if (key === 'apps') {
       return correctKey && availableAppSources.length > 0;
     }
@@ -90,6 +100,24 @@ export default function SourceGrid(p: { activeTab: string }) {
   return (
     <Scrollable style={{ height: '100%' }}>
       <Row gutter={[8, 8]}>
+        {showContent('all') && (
+          <>
+            <Col span={24}>
+              <PageHeader title={$t('Essential Sources')} />
+            </Col>
+            {essentialSources.essentialDefaults.map(source => (
+              <SourceTag key={source.value} name={source.description} type={source.value} />
+            ))}
+            {essentialSources.essentialWidgets.map(widgetType => (
+              <SourceTag
+                key={widgetType}
+                name={WidgetDisplayData()[WidgetType[widgetType]].name}
+                type={widgetType}
+              />
+            ))}
+            <SourceTag key="streamlabels" name={$t('Streamlabel')} type="streamlabels" />
+          </>
+        )}
         {showContent('general') && (
           <>
             <Col span={24}>
@@ -125,9 +153,7 @@ export default function SourceGrid(p: { activeTab: string }) {
                     type={widgetType}
                   />
                 ))}
-                {hasStreamlabel && (
-                  <SourceTag key="streamlabels" name={$t('Streamlabel')} type="streamlabels" />
-                )}
+                <SourceTag key="streamlabels" name={$t('Streamlabel')} type="streamlabels" />
               </>
             )}
           </>
