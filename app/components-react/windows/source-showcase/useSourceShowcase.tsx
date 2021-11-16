@@ -39,8 +39,8 @@ class SourceShowcaseModule {
 
   selectInspectedSource() {
     const inspectedSource = this.state.inspectedSource;
-    if (this.sourcesService.getAvailableSourcesTypes().includes(inspectedSource as TSourceType)) {
-      this.selectSource(inspectedSource as TSourceType);
+    if (WidgetType[inspectedSource] != null) {
+      this.selectWidget(WidgetType[inspectedSource] as WidgetType);
     } else if (inspectedSource === 'streamlabel') {
       this.selectStreamlabel();
     } else if (inspectedSource === 'replay') {
@@ -49,8 +49,10 @@ class SourceShowcaseModule {
       this.selectSource('image_source', { propertiesManager: 'iconLibrary' });
     } else if (inspectedSource === 'app_source') {
       this.selectAppSource(this.state.inspectedAppId, this.state.inspectedAppSourceId);
-    } else if (WidgetType[inspectedSource]) {
-      this.selectWidget(WidgetType[inspectedSource] as WidgetType);
+    } else if (
+      this.sourcesService.getAvailableSourcesTypes().includes(inspectedSource as TSourceType)
+    ) {
+      this.selectSource(inspectedSource as TSourceType);
     }
   }
 

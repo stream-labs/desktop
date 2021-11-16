@@ -136,7 +136,11 @@ function NotificationsArea(p: {
   return (
     <div className={styles.section}>
       <h2>{$t('Performance Notifications')}</h2>
-      <Scrollable className={styles.notificationContainer} isResizable={false}>
+      <Scrollable
+        className={styles.notificationContainer}
+        style={{ height: '100%' }}
+        isResizable={false}
+      >
         {p.notifications.map(notification => (
           <div
             className={cx(styles.notification, styles.hasAction)}
