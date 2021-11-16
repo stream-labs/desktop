@@ -115,7 +115,7 @@ export default function SourceGrid(p: { activeTab: string }) {
                 type={widgetType}
               />
             ))}
-            <SourceTag key="streamlabel" name={$t('Streamlabel')} type="streamlabel" />
+            <SourceTag key="streamlabel" name={$t('Stream Label')} type="streamlabel" />
           </>
         )}
         {showContent('general') && (
@@ -153,7 +153,7 @@ export default function SourceGrid(p: { activeTab: string }) {
                     type={widgetType}
                   />
                 ))}
-                <SourceTag key="streamlabel" name={$t('Streamlabel')} type="streamlabel" />
+                <SourceTag key="streamlabel" name={$t('Stream Label')} type="streamlabel" />
               </>
             )}
           </>

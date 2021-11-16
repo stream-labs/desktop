@@ -49,12 +49,8 @@ export async function addSource(
   await clickAddSource();
   await focusChild();
 
-  await waitForDisplayed('h2=Welcome to sources!');
-  if (await isDisplayed(`li=${type}`)) {
-    await click(`li=${type}`); // source
-  } else {
-    await click(`div=${type}`); // widget
-  }
+  await waitForDisplayed('span=Essential Sources');
+  await click(`div=${type}`);
 
   await clickButton('Add Source');
   const isInputVisible = await isDisplayed('input', { timeout: 200, interval: 100 });
@@ -83,7 +79,7 @@ export async function addExistingSource(type: string, name: string) {
   await clickAddSource();
 
   await focusChild();
-  await click(`li=${type}`);
+  await click(`div=${type}`);
   await clickButton('Add Source');
   await click(`div=${name}`);
   await clickButton('Add Source');

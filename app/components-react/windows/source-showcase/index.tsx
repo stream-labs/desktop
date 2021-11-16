@@ -20,7 +20,7 @@ export default function SourcesShowcase() {
   const [activeTab, setActiveTab] = useState('all');
 
   return (
-    <ModalLayout onOk={selectInspectedSource}>
+    <ModalLayout onOk={selectInspectedSource} okText={$t('Add Source')}>
       <Layout style={{ height: 'calc(100% - 53px)' }}>
         <Content>
           <Menu

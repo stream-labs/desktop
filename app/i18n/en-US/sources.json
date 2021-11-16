@@ -197,5 +197,8 @@
   "Capture Game": "Capture Game",
   "Automatic game capture will scan for running games and automatically capture them.": "Automatic game capture will scan for running games and automatically capture them.",
   "Capture Entire Screen": "Capture Entire Screen",
-  "Capture Window": "Capture Window"
+  "Capture Window": "Capture Window",
+  "Supports:": "Supports:",
+  "Essential Sources": "Essential Sources",
+  "General Sources": "General Sources"
 }

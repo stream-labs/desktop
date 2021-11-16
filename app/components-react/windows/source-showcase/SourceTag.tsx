@@ -11,8 +11,6 @@ export default function SourceTag(p: {
   appId?: string;
   appSourceId?: string;
 }) {
-  const { PlatformAppsService } = Services;
-
   const {
     inspectSource,
     selectInspectedSource,
@@ -23,9 +21,7 @@ export default function SourceTag(p: {
 
   function active() {
     if (!p.appId) return inspectedSource === p.type;
-    if (inspectedAppId !== p.appId) return false;
-    const appManifest = PlatformAppsService.views.getApp(p.appId).manifest;
-    return appManifest.sources.find(source => source.id === inspectedAppSourceId);
+    return p.appSourceId === inspectedAppSourceId && p.appId === inspectedAppId;
   }
 
   return (
