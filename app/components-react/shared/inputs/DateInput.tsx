@@ -17,6 +17,10 @@ export const DateInput = InputComponent((p: TTextAreaInputProps) => {
   const { inputAttrs, wrapperAttrs } = useInput('date', p, ANT_DATEPICKER_FEATURES);
   return (
     <InputWrapper {...wrapperAttrs}>
+      {/* TODO: DatePicker types indicate it requires a Moment, but we
+        * have been using it with a Date. I am avoiding changing the
+        * code logic here, and just disabling type checking for now.
+      // @ts-ignore */}
       <DatePicker
         picker="date"
         {...inputAttrs}

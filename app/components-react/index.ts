@@ -31,6 +31,7 @@ import SafeMode from './windows/SafeMode';
 import AdvancedAudio from './windows/advanced-audio';
 import { CustomCodeWindow } from './widgets/common/CustomCode';
 import SourceShowcase from './windows/source-showcase';
+import SourceFilters from './windows/SourceFilters';
 
 // list of React components to be used inside Vue components
 export const components = {
@@ -66,4 +67,5 @@ export const components = {
   SafeMode,
   AdvancedAudio,
   SourceShowcase: createRoot(SourceShowcase),
+  SourceFilters,
 };

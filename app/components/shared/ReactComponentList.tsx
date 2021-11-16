@@ -194,6 +194,13 @@ export class SharedComponentsLibrary extends ReactComponent {}
 
 @Component({
   props: {
+    name: { default: 'SourceFilters' },
+    wrapperStyles: { default: () => ({ height: '100%' }) },
+  },
+})
+export class SourceFilters extends ReactComponent {}
+@Component({
+  props: {
     name: { default: 'SourceShowcase' },
     wrapperStyles: { default: () => ({ height: '100%' }) },
   },

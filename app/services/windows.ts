@@ -31,11 +31,10 @@ import {
   SafeMode,
   AdvancedAudio,
   SourceShowcase,
+  SourceFilters,
 } from 'components/shared/ReactComponentList';
 
 import SourceProperties from 'components/windows/SourceProperties.vue';
-import SourceFilters from 'components/windows/SourceFilters.vue';
-import AddSourceFilter from 'components/windows/AddSourceFilter';
 import Notifications from 'components/windows/Notifications.vue';
 import Troubleshooter from 'components/windows/Troubleshooter.vue';
 import Blank from 'components/windows/Blank.vue';
@@ -101,7 +100,6 @@ export function getComponents() {
     SafeMode,
     SourceProperties,
     SourceFilters,
-    AddSourceFilter,
     Blank,
     AdvancedAudio,
     Notifications,
