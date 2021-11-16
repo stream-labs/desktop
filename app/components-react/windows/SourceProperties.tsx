@@ -6,20 +6,21 @@ import { useSelector } from '../store';
 import { ModalLayout } from '../shared/ModalLayout';
 import Display from '../shared/Display';
 import { assertIsDefined } from '../../util/properties-type-guards';
-import Scrollable from '../shared/Scrollable';
 
 export default function SourceProperties() {
   const { WindowsService, SourcesService } = Services;
 
+  // get source
   const source = useMemo(() => {
     const { sourceId } = WindowsService.getChildWindowQueryParams();
     return SourcesService.views.getSource(sourceId);
   }, []);
 
+  // define reactive variables
   const [properties, setProperties] = useState(source ? source.getPropertiesFormData() : []);
   const hideStyleBlockers = useSelector(() => WindowsService.state.child.hideStyleBlockers);
 
-  function updateProperties(formData: TObsFormData) {
+  function saveProperties(formData: TObsFormData) {
     assertIsDefined(source);
     // save source settings in OBS source
     source.setPropertiesFormData(formData);
@@ -33,10 +34,7 @@ export default function SourceProperties() {
       scrollable
       fixedChild={source && !hideStyleBlockers && <Display sourceId={source.sourceId} />}
     >
-      <ObsForm value={properties} onChange={updateProperties} layout="horizontal" />
-      {/*<Scrollable style={{ height: '100%' }} snapToWindowEdge>*/}
-      {/*  <ObsForm value={properties} onChange={updateProperties} layout="horizontal" />*/}
-      {/*</Scrollable>*/}
+      <ObsForm value={properties} onChange={saveProperties} layout="horizontal" />
     </ModalLayout>
   );
 }
