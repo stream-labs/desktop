@@ -94,7 +94,7 @@ export default function EditStreamWindow() {
         <Animation transitionName="fade">
           {/* STEP 1 - FILL OUT THE SETTINGS FORM */}
           {shouldShowSettings && (
-            <Scrollable key={'settings'} style={{ maxHeight: '100%' }} snapToWindowEdge>
+            <Scrollable key={'settings'} style={{ height: '100%' }} snapToWindowEdge>
               <GoLiveError />
               <PlatformSettings />
             </Scrollable>
