@@ -592,39 +592,40 @@ export class SourcesService extends StatefulService<ISourcesState> {
 
     // uncomment the source type to use it's React version
     const reactSourceProps = [
-      'image_source',
-      'color_source',
-      'browser_source',
-      'slideshow',
-      'ffmpeg_source',
-      'text_gdiplus',
-      'text_ft2_source',
-      'monitor_capture',
-      'window_capture',
-      'game_capture',
-      'dshow_input',
-      'wasapi_input_capture',
-      'wasapi_output_capture',
-      'decklink-input',
-      'scene',
-      'ndi_source',
-      'openvr_capture',
-      'screen_capture',
-      'liv_capture',
-      'ovrstream_dc_source',
-      'vlc_source',
-      'coreaudio_input_capture',
-      'coreaudio_output_capture',
-      'av_capture_input',
-      'display_capture',
-      'audio_line',
-      'syphon-input',
-      'soundtrack_source',
+      // 'image_source',
+      // 'color_source',
+      // 'browser_source',
+      // 'slideshow',
+      // 'ffmpeg_source',
+      // 'text_gdiplus',
+      // 'text_ft2_source',
+      // 'monitor_capture',
+      // 'window_capture',
+      // 'game_capture',
+      // 'dshow_input',
+      // 'wasapi_input_capture',
+      // 'wasapi_output_capture',
+      // 'decklink-input',
+      // 'scene',
+      // 'ndi_source',
+      // 'openvr_capture',
+      // 'screen_capture',
+      // 'liv_capture',
+      // 'ovrstream_dc_source',
+      // 'vlc_source',
+      // 'coreaudio_input_capture',
+      // 'coreaudio_output_capture',
+      // 'av_capture_input',
+      // 'display_capture',
+      // 'audio_line',
+      // 'syphon-input',
+      // 'soundtrack_source',
     ];
 
-    const componentName = reactSourceProps.includes(source.type)
-      ? 'SourceProperties'
-      : 'SourcePropertiesDeprecated';
+    const componentName =
+      reactSourceProps.includes(source.type) && propertiesManagerType === 'default'
+        ? 'SourceProperties'
+        : 'SourcePropertiesDeprecated';
 
     this.windowsService.showWindow({
       componentName,

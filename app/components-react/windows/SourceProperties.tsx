@@ -6,6 +6,7 @@ import { useSelector } from '../store';
 import { ModalLayout } from '../shared/ModalLayout';
 import Display from '../shared/Display';
 import { assertIsDefined } from '../../util/properties-type-guards';
+import Scrollable from '../shared/Scrollable';
 
 export default function SourceProperties() {
   const { WindowsService, SourcesService } = Services;
@@ -29,12 +30,13 @@ export default function SourceProperties() {
 
   return (
     <ModalLayout
+      scrollable
       fixedChild={source && !hideStyleBlockers && <Display sourceId={source.sourceId} />}
     >
-      {/*<div style={{ height: '200px' }}>*/}
-      {/*  {}*/}
-      {/*</div>*/}
       <ObsForm value={properties} onChange={updateProperties} layout="horizontal" />
+      {/*<Scrollable style={{ height: '100%' }} snapToWindowEdge>*/}
+      {/*  <ObsForm value={properties} onChange={updateProperties} layout="horizontal" />*/}
+      {/*</Scrollable>*/}
     </ModalLayout>
   );
 }
