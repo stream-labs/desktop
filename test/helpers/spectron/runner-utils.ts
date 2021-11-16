@@ -28,7 +28,7 @@ const {
 } = process.env;
 
 export const USER_POOL_TOKEN = process.env.SLOBS_TEST_USER_POOL_TOKEN;
-const USER_POOL_URL = 'https://slobs-users-pool.herokuapp.com';
+const USER_POOL_URL = 'http://localhost:5000'; // 'https://slobs-users-pool.herokuapp.com';
 const FAILED_TESTS_PATH = 'test-dist/failed-tests.json'; // failed will be written down to this file
 const TESTS_TIMINGS_PATH = 'test-dist/test-timings.json'; // a known timings for tests should be provided in this file
 const TEST_STATS_PATH = 'test-dist/test-stats.json'; // each successfully completed tests save stats like duration, syncIPCCalls in this file

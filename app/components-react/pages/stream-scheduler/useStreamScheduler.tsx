@@ -217,9 +217,9 @@ class StreamSchedulerModule {
    * Shows a modal for creating a new event
    */
   @mutation()
-  showNewEventModal(platform: TPlatform, selectedTime?: Moment) {
+  showNewEventModal(platform: TPlatform, selectedTime?: number) {
     const today = new Date().setHours(0, 0, 0, 0);
-    const time = selectedTime?.valueOf() || this.state.time;
+    const time = selectedTime || this.state.time;
     const isPastDate = time < today;
     if (isPastDate) {
       message.error($t('You can not schedule to a past date'));
