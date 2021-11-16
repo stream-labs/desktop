@@ -126,6 +126,7 @@ export default function SourceGrid(p: { activeTab: string }) {
             {availableSources.map(source => (
               <SourceTag key={source.value} name={source.description} type={source.value} />
             ))}
+            <SourceTag key="replay" name={$t('Instant Replay')} type="replay" />
             {designerMode && (
               <SourceTag key="icon_library" name={$t('Custom Icon')} type={'icon_library'} />
             )}
@@ -154,7 +155,6 @@ export default function SourceGrid(p: { activeTab: string }) {
                   />
                 ))}
                 <SourceTag key="streamlabel" name={$t('Stream Label')} type="streamlabel" />
-                <SourceTag key="replay" name={$t('Instant Replay')} type="replay" />
               </>
             )}
           </>
