@@ -52,6 +52,7 @@ export default function ExportModal(p: { close: () => void }) {
           />
           <FileInput
             label={$t('Export Location')}
+            name="exportLocation"
             save={true}
             filters={[{ name: $t('MP4 Video File'), extensions: ['mp4'] }]}
             value={exportFile}
