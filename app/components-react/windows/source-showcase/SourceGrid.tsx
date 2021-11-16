@@ -154,6 +154,7 @@ export default function SourceGrid(p: { activeTab: string }) {
                   />
                 ))}
                 <SourceTag key="streamlabel" name={$t('Stream Label')} type="streamlabel" />
+                <SourceTag key="replay" name={$t('Instant Replay')} type="replay" />
               </>
             )}
           </>
