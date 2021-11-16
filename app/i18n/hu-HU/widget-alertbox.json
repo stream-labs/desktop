@@ -19,8 +19,8 @@
   "Super Chat": "Super Chat",
   "Members": "Tagok",
   "Subscribers": "Felíratkozók",
-  "Stars": "Stars",
-  "Support": "Support",
+  "Stars": "Csillagok",
+  "Support": "Támogatás",
   "Gifted Support": "Gifted Support",
   "Likes": "Likes",
   "Shares": "Shares",
@@ -42,8 +42,8 @@
   "Subscription is Twitch Prime": "Subscription is Twitch Prime",
   "When subscription is a gift": "When subscription is a gift",
   "When user commits to continue their gift subscription": "When user commits to continue their gift subscription",
-  "Product": "Product",
-  "Preorder": "Preorder",
+  "Product": "Termék",
+  "Preorder": "Előrendelés",
   "Alert Moderation delay": "Értesítés moderálási késleltetés",
   "Global Alert Delay": "Global Alert Delay",
   "Alert Parries": "Alert Parries",
@@ -150,5 +150,9 @@
   "YouTube Membership": "YouTube Membership",
   "Plays an alert for new YouTube Memberships": "Plays an alert for new YouTube Memberships",
   "Plays an alert when another streamer hosts your channel": "Plays an alert when another streamer hosts your channel",
-  "Plays an alert when a viewer sends a tip/donation": "Plays an alert when a viewer sends a tip/donation"
+  "Plays an alert when a viewer sends a tip/donation": "Plays an alert when a viewer sends a tip/donation",
+  "This applies to all alerts. If enabled all alerts need to be approved manually.": "Ez vonatkozik minden értesítésre. Ha engedélyezve van, az összes értesítés manuálisan kell jóváhagyni.",
+  "Use unlimited delay": "Use unlimited delay",
+  "When enabled new alerts will interrupt the on screen alert": "When enabled new alerts will interrupt the on screen alert",
+  "Text Highlight Color": "Szövegkiemelő szín"
 }
