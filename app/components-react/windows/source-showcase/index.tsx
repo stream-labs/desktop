@@ -59,10 +59,7 @@ function SideBar() {
       return {
         supportList: source.about.bullets,
         description: source.about.description,
-        demoFilename: PlatformAppsService.views.getAssetUrl(
-          inspectedAppId,
-          source.about?.bannerImage || '',
-        ),
+        demoFilename: source.about.bannerImage,
         demoVideo: false,
       };
     }
@@ -75,10 +72,12 @@ function SideBar() {
   const displayData =
     appData || widgetData(inspectedSource) || SourceDisplayData()[inspectedSource];
 
-  const previewSrc = useMemo(() => $i(`source-demos/${demoMode}/${displayData?.demoFilename}`), [
-    demoMode,
-    displayData?.demoFilename,
-  ]);
+  const previewSrc = useMemo(() => {
+    if (appData) {
+      return PlatformAppsService.views.getAssetUrl(inspectedAppId, displayData?.demoFilename || '');
+    }
+    return $i(`source-demos/${demoMode}/${displayData?.demoFilename}`);
+  }, [demoMode, displayData?.demoFilename]);
 
   if (!displayData) return null;
 
