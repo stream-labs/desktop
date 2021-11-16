@@ -148,12 +148,9 @@ export function useInput<
   }
 
   useEffect(() => {
-    // set empty string as a default empty value
-    const emptyVal = typeof inputProps.emptyVal === 'undefined' ? '' : inputProps.emptyVal;
-
     // if the input is inside the form
     // then we need to setup it's value via Form API
-    if (form && value !== emptyVal) {
+    if (form) {
       // get the component class
       const Component = getInputComponentByType(type);
 
