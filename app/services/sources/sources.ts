@@ -591,7 +591,7 @@ export class SourcesService extends StatefulService<ISourcesState> {
     if (propertiesManagerType === 'streamlabels') propertiesName = $t('Stream Label');
 
     // uncomment the source type to use it's React version
-    const reactSourceProps = [
+    const reactSourceProps: TSourceType[] = [
       // 'image_source',
       // 'color_source',
       // 'browser_source',
