@@ -46,7 +46,6 @@ export interface IInputCommonProps<TValue> {
   placeholder?: string;
   disabled?: boolean;
   debounce?: number;
-  emptyVal?: string;
   /**
    * true if the input is in the uncontrolled mode
    * all input components except text inputs are controlled by default
