@@ -49,7 +49,7 @@ class SourceShowcaseModule {
       this.selectSource('image_source', { propertiesManager: 'iconLibrary' });
     } else if (inspectedSource === 'app_source') {
       this.selectAppSource(this.state.inspectedAppId, this.state.inspectedAppSourceId);
-    } else {
+    } else if (WidgetType[inspectedSource]) {
       this.selectWidget(inspectedSource as WidgetType);
     }
   }
