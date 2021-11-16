@@ -118,7 +118,7 @@ function ObsInput(p: IObsInputProps) {
           label: $translateIfExist(opt.description),
         };
       });
-      return <ListInput {...inputProps} options={options} />;
+      return <ListInput {...inputProps} options={options} emptyVal={null} allowClear={false} />;
 
     case 'OBS_PROPERTY_BUTTON':
       return (
