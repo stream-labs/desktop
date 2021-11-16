@@ -5,7 +5,12 @@ import { Services } from 'components-react/service-provider';
 import { useSourceShowcaseSettings } from './useSourceShowcase';
 import styles from './SourceShowcase.m.less';
 
-export default function SourceTag(p: { name: string; type: string; appId?: string }) {
+export default function SourceTag(p: {
+  name: string;
+  type: string;
+  appId?: string;
+  appSourceId?: string;
+}) {
   const { PlatformAppsService } = Services;
 
   const {
@@ -27,7 +32,7 @@ export default function SourceTag(p: { name: string; type: string; appId?: strin
     <Col span={8}>
       <div
         className={cx(styles.sourceTag, { [styles.active]: active() })}
-        onClick={() => inspectSource(p.type)}
+        onClick={() => inspectSource(p.type, p.appId, p.appSourceId)}
         onDoubleClick={() => selectInspectedSource()}
       >
         {p.name}

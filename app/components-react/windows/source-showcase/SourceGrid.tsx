@@ -169,6 +169,7 @@ export default function SourceGrid(p: { activeTab: string }) {
                 name={app.source.name}
                 type="app_source"
                 appId={app.appId}
+                appSourceId={app.source.id}
               />
             ))}
           </>
