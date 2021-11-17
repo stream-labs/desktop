@@ -138,7 +138,7 @@ function NotificationsArea(p: {
       <h2>{$t('Performance Notifications')}</h2>
       <Scrollable
         className={styles.notificationContainer}
-        style={{ height: '100%' }}
+        style={{ height: '100%', width: '100%' }}
         isResizable={false}
       >
         {p.notifications.map(notification => (
