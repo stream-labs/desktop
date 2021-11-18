@@ -90,5 +90,5 @@
   "An error occurred while reading %{file}": "Podczas odczytu pliku %{file} wystąpił błąd",
   "An error occurred while reading audio from %{file}": "Podczas odczytu dźwięku z pliku %{file} wystąpił błąd",
   "An error occurred while mixing audio": "Podczas miksowania dźwięku wystąpił błąd",
-  "Edit your replays with Highlighter, a free editor built in to Streamlabs OBS.": "Montuj swoje powtórki z użyciem Highlighter, bezpłatnego edytora wbudowanego w aplikację Streamlabs OBS."
+  "Edit your replays with Highlighter, a free editor built in to Streamlabs.": "Edit your replays with Highlighter, a free editor built in to Streamlabs."
 }
