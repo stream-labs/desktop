@@ -134,7 +134,7 @@ function NotificationsArea(p: {
   onNotificationClickHandler: Function;
 }) {
   return (
-    <div className={styles.section}>
+    <div className={styles.section} style={{ height: '100%' }}>
       <h2>{$t('Performance Notifications')}</h2>
       <Scrollable
         className={styles.notificationContainer}
@@ -157,7 +157,7 @@ function NotificationsArea(p: {
         ))}
         {p.notifications.length === 0 && (
           <div className={styles.notificationEmpty}>
-            <div className="message">{$t('You do not have any notifications')}</div>
+            <div className="message">{$t("You don't have any notifications")}</div>
           </div>
         )}
       </Scrollable>
