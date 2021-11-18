@@ -135,4 +135,4 @@ manual deploy.
 
 At its core, Streamlabs OBS is powered by the [OBS](https://obsproject.com/)
 engine. We want to thank all of the developers over at the OBS project for
-their years of tireless hard work, without which Streamlabs OBS wouldn't exist today.
+their years of tireless hard work, without which Streamlabs Desktop wouldn't exist today.
