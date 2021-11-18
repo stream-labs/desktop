@@ -90,5 +90,5 @@
   "An error occurred while reading %{file}": "%{file} の読み込み中にエラーが発生しました",
   "An error occurred while reading audio from %{file}": "%{file} からのオーディオ読み込み中にエラーが発生しました",
   "An error occurred while mixing audio": "オーディオのミキシング中にエラーが発生しました",
-  "Edit your replays with Highlighter, a free editor built in to Streamlabs OBS.": "Streamlabs OBS 内蔵の無料エディタ Highlighter でリプレイを編集しましょう。"
+  "Edit your replays with Highlighter, a free editor built in to Streamlabs.": "Edit your replays with Highlighter, a free editor built in to Streamlabs."
 }
