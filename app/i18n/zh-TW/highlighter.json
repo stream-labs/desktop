@@ -90,5 +90,5 @@
   "An error occurred while reading %{file}": "讀取 %{file} 時發生錯誤",
   "An error occurred while reading audio from %{file}": "從 %{file} 讀取音訊時發生錯誤",
   "An error occurred while mixing audio": "混音音訊時發生錯誤",
-  "Edit your replays with Highlighter, a free editor built in to Streamlabs OBS.": "使用精彩片段工具編輯您的重播，這是內建於 Streamlabs OBS 的免費編輯器。"
+  "Edit your replays with Highlighter, a free editor built in to Streamlabs.": "Edit your replays with Highlighter, a free editor built in to Streamlabs."
 }
