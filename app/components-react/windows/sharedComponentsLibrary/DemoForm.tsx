@@ -84,7 +84,7 @@ export function DemoForm() {
         <FileInput label="Save to File" save={true} {...bind.saveFilePath} />
         <InputWrapper>
           <CheckboxInput {...bind.confirm1} label={'Confirm you allow processing your data'} />
-          <CheckboxInput {...bind.confirm2} required label={'Confirm you love Streamlabs OBS'} />
+          <CheckboxInput {...bind.confirm2} required label={'Confirm you love Streamlabs'} />
         </InputWrapper>
       </Example>
     </Form>
