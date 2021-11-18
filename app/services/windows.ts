@@ -208,7 +208,7 @@ export class WindowsService extends StatefulService<IWindowsState> {
       scaleFactor: 1,
       isShown: true,
       hideStyleBlockers: true,
-      title: `Streamlabs OBS - ${Utils.env.SLOBS_VERSION}`,
+      title: `Streamlabs Desktop - ${Utils.env.SLOBS_VERSION}`,
     },
     child: {
       componentName: '',

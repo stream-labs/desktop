@@ -42,7 +42,7 @@ test('OBS Importer', async t => {
   await (await t.context.app.client.$('div=Choose Starter')).click();
 
   // import from OBS
-  await click('div=Import from OBS');
+  await click('div=Import from OBS Studio');
   await click('div=Start');
 
   await (await t.context.app.client.$('button=Skip')).click();
