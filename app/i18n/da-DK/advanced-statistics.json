@@ -6,7 +6,7 @@
   "Live Stats": "Live statistikker",
   "Click on a stat to add it to your footer": "Klik på en statistik for at tilføje den til din sidefod",
   "Click to add this info to your footer": "Klik for at tilføje denne info til din sidefod",
-  "When Streamlabs OBS detects performance issues with your stream, such as dropped frames, lagged frames, or a stream disconnection, troubleshooting notifications will be sent to you here.": "Når Streamlabs OBS registrerer ydeevneproblemer med din stream, såsom langsomme billeder, billeder der lagger eller en streamafbrydelse, sendes meddelelser om fejlfinding til dig her.",
+  "When Streamlabs detects performance issues with your stream, such as dropped frames, lagged frames, or a stream disconnection, troubleshooting notifications will be sent to you here.": "When Streamlabs detects performance issues with your stream, such as dropped frames, lagged frames, or a stream disconnection, troubleshooting notifications will be sent to you here.",
   "Click to add %{stat} info to your footer": "Klik for at tilføje %{stat}-info til din sidefod",
   "CPU": "CPU",
   "FPS": "FPS",
