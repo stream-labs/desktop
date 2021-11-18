@@ -90,5 +90,5 @@
   "An error occurred while reading %{file}": "%{file} okunurken bir hata oluştu",
   "An error occurred while reading audio from %{file}": "%{file} dosyasındaki ses okunurken bir hata oluştu",
   "An error occurred while mixing audio": "Ses mikslenirken bir hata oluştu",
-  "Edit your replays with Highlighter, a free editor built in to Streamlabs OBS.": "Streamlabs OBS’ye entegre edilmiş ücretsiz bir düzenleyici olan Highlighter ile tekrarlarınızı düzenleyin."
+  "Edit your replays with Highlighter, a free editor built in to Streamlabs.": "Edit your replays with Highlighter, a free editor built in to Streamlabs."
 }
