@@ -62,7 +62,7 @@ export class GlobalSelection extends Selection {
 
     electron.remote.dialog
       .showMessageBox(Utils.getMainWindow(), {
-        title: 'Streamlabs OBS',
+        title: 'Streamlabs Desktop',
         message,
         type: 'warning',
         buttons: [$t('Cancel'), $t('OK')],

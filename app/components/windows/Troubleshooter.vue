@@ -18,7 +18,7 @@
         {{ issue.message }}
       </h4>
       <p>
-        {{ $t(' Streamlabs OBS has detected dropped frames') }} {{ moment(issue.date) }}.<br/>
+        {{ $t(' Streamlabs has detected dropped frames') }} {{ moment(issue.date) }}.<br/>
       </p>
       <h4>{{ $t('What does this mean?') }}</h4>
       <p>
@@ -50,7 +50,7 @@
         {{ issue.message }}
       </h4>
       <p>
-        {{ $t('Streamlabs OBS has detected skipped frames') }} {{ moment(issue.date) }}.<br/>
+        {{ $t('Streamlabs has detected skipped frames') }} {{ moment(issue.date) }}.<br/>
       </p>
       <h4>
         {{ $t('What does this mean?') }}</h4>
@@ -77,13 +77,13 @@
         {{ issue.message }}
       </h4>
       <p>
-        {{ $t('Streamlabs OBS has detected lagged frames') }} {{ moment(issue.date) }}.<br/>
+        {{ $t('Streamlabs has detected lagged frames') }} {{ moment(issue.date) }}.<br/>
       </p>
       <h4>{{ $t('What does this mean?') }}</h4>
       <p>
         {{ $t('Some frames took too long to get rendered.') }}
         {{ $t('Usually the problem is related to your game using up too many GPU resources.') }}
-        {{ $t('When this happens, Streamlabs OBS does not have any resources left over to render frames.') }}
+        {{ $t('When this happens, Streamlabs does not have any resources left over to render frames.') }}
       </p>
       <h4>
         {{ $t('What can I do?') }}
