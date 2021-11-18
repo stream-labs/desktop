@@ -3,7 +3,7 @@
   "This element is too small to be displayed": "Этот элемент слишком мал для отображения",
   "This element requires Selective Recording to be enabled": "Для этого элемента должна быть включена выборочная запись",
   "Grant Permissions": "Предоставить разрешения",
-  "Streamlabs OBS needs additional permissions. Grant permissions in the pop-up dialogs to continue.": "Для Streamlabs OBS требуются дополнительные разрешения. Чтобы продолжить, предоставьте разрешения во всплывающих диалоговых окнах.",
+  "Streamlabs needs additional permissions. Grant permissions in the pop-up dialogs to continue.": "Streamlabs needs additional permissions. Grant permissions in the pop-up dialogs to continue.",
   "Microphone": "Микрофон",
   "Webcam": "Веб-камера"
 }
