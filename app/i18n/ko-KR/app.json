@@ -3,7 +3,7 @@
   "This element is too small to be displayed": "이 요소는 너무 작아 표시되지 않습니다.",
   "This element requires Selective Recording to be enabled": "선택 녹화를 활성화하려면 이 요소가 필요합니다.",
   "Grant Permissions": "허가",
-  "Streamlabs OBS needs additional permissions. Grant permissions in the pop-up dialogs to continue.": "Streamlabs OBS에 추가적인 허가가 필요합니다. 계속하시려면 팝업 대화창을 승인하세요.",
+  "Streamlabs needs additional permissions. Grant permissions in the pop-up dialogs to continue.": "Streamlabs needs additional permissions. Grant permissions in the pop-up dialogs to continue.",
   "Microphone": "마이크",
   "Webcam": "웹캠"
 }
