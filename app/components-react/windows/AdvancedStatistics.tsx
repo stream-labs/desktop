@@ -159,7 +159,7 @@ function NotificationsArea(p: {
       </Scrollable>
       <p className={styles.description}>
         {$t(
-          'When Streamlabs OBS detects performance issues with your stream, such as dropped frames, lagged frames, or a stream disconnection, troubleshooting notifications will be sent to you here.',
+          'When Streamlabs detects performance issues with your stream, such as dropped frames, lagged frames, or a stream disconnection, troubleshooting notifications will be sent to you here.',
         )}
       </p>
     </div>
