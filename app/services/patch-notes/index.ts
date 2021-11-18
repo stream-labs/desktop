@@ -74,7 +74,7 @@ export class PatchNotesService extends PersistentStatefulService<IPatchNotesStat
         lifeTime: 30000,
         showTime: false,
         playSound: false,
-        message: $t('Streamlabs OBS has updated! Click here to see what changed.'),
+        message: $t('Streamlabs Desktop has updated! Click here to see what changed.'),
         action: this.jsonrpcService.createRequest(
           Service.getResourceId(this.navigationService),
           'navigate',
