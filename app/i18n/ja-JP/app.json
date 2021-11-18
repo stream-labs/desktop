@@ -3,7 +3,7 @@
   "This element is too small to be displayed": "この要素は小さすぎるため、表示できません",
   "This element requires Selective Recording to be enabled": "この要素では、セレクティブレコーディングを有効にする必要があります",
   "Grant Permissions": "許可を付与する",
-  "Streamlabs OBS needs additional permissions. Grant permissions in the pop-up dialogs to continue.": "Streamlabs OBS は追加の許可が必要です。ポップアップダイアログで許可を付与して、続行してください。",
+  "Streamlabs needs additional permissions. Grant permissions in the pop-up dialogs to continue.": "Streamlabs needs additional permissions. Grant permissions in the pop-up dialogs to continue.",
   "Microphone": "マイク",
   "Webcam": "ウェブカメラ"
 }
