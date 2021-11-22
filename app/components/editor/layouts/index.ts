@@ -6,3 +6,4 @@ export { default as OnePane } from './OnePane';
 export { default as Triplets } from './Triplets';
 export { default as OnePaneR } from './OnePaneR';
 export { default as Pyramid } from './Pyramid';
+export { default as Preferred } from './Preferred';

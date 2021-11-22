@@ -10,7 +10,8 @@ export enum ELayout {
   // FourByFour = 'FourByFour',
   // Triplets = 'Triplets',
   OnePane = 'OnePane',
-  OnePaneR = 'OnePaneR',
+  // OnePaneR = 'OnePaneR',
+  Preferred = 'Preferred',
   Pyramid = 'Pyramid',
 }
 
@@ -46,10 +47,10 @@ export const LAYOUT_DATA: ILayoutData = {
     className: 'onePane',
     component: Layouts.OnePane,
   },
-  [ELayout.OnePaneR]: {
-    resizeDefaults: { bar1: 0.3 },
+  [ELayout.Preferred]: {
+    resizeDefaults: { bar1: 0.4 },
     className: 'onePaneR',
-    component: Layouts.OnePaneR,
+    component: Layouts.Preferred,
   },
   [ELayout.Pyramid]: {
     resizeDefaults: { bar1: 0.4 },

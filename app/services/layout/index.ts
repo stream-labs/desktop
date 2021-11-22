@@ -104,7 +104,7 @@ export class LayoutService extends PersistentStatefulService<ILayoutServiceState
       default: {
         name: null,
         icon: 'icon-studio',
-        currentLayout: ELayout.OnePaneR,
+        currentLayout: ELayout.Preferred,
         slottedElements: {
           [ELayoutElement.Display]: { slot: '1' },
           // [ELayoutElement.Minifeed]: { slot: '2' },
@@ -152,7 +152,7 @@ export class LayoutService extends PersistentStatefulService<ILayoutServiceState
     if (Object.keys(this.state.tabs).length > 1) {
       this.usageStatisticsService.recordFeatureUsage('LayoutEditorTabs');
       this.usageStatisticsService.recordFeatureUsage('LayoutEditor');
-    } else if (this.state.tabs.default.currentLayout !== ELayout.OnePaneR) {
+    } else if (this.state.tabs.default.currentLayout !== ELayout.Preferred) {
       this.usageStatisticsService.recordFeatureUsage('LayoutEditor');
     }
   }
@@ -250,7 +250,7 @@ export class LayoutService extends PersistentStatefulService<ILayoutServiceState
     Vue.set(this.state.tabs, id, {
       name,
       icon,
-      currentLayout: ELayout.OnePaneR,
+      currentLayout: ELayout.Preferred,
 
       slottedElements: {
         [ELayoutElement.Display]: { slot: '1' },
