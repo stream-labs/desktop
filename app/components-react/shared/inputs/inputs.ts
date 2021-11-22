@@ -46,7 +46,7 @@ export interface IInputCommonProps<TValue> {
   placeholder?: string;
   disabled?: boolean;
   debounce?: number;
-  emptyVal?: string;
+  emptyVal?: string | null;
   /**
    * true if the input is in the uncontrolled mode
    * all input components except text inputs are controlled by default
@@ -103,7 +103,7 @@ type TCreateSlobsInputProps<
  */
 export function useInput<
   TInputProps extends TSlobsInputProps<{}, any>,
-  TValue = TInputProps['value']
+  TValue = NonNullable<TInputProps['value']>
 >(type: TInputType, inputProps: TInputProps, antFeatures?: readonly string[]) {
   const { name, value, label } = inputProps;
 
@@ -245,7 +245,7 @@ export function useInput<
     ...dataAttrs,
     'data-role': 'input',
     name: inputId,
-    value: localValueRef.current,
+    value: localValueRef.current as TValue,
     onChange,
   };
 

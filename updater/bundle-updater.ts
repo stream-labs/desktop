@@ -489,7 +489,7 @@ module.exports = async (basePath: string) => {
 
     electron.dialog.showErrorBox(
       'FlexTV Broadcaster',
-      'Streamlabs OBS failed to start. Please try launching Streamlabs OBS again. If this issue persists, please visit support.streamlabs.com for help.',
+      'Streamlabs Desktop failed to start. Please try launching Streamlabs Desktop again. If this issue persists, please visit support.streamlabs.com for help.',
     );
   });
 };
