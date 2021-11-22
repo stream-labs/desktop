@@ -188,7 +188,7 @@ function humanFileSize(bytes, si) {
 }
 
 console.log('=================================');
-console.log('Streamlabs OBS');
+console.log('Streamlabs Desktop');
 console.log(`Version: ${process.env.SLOBS_VERSION}`);
 console.log(`OS: ${os.platform()} ${os.release()}`);
 console.log(`Arch: ${process.arch}`);
@@ -208,7 +208,7 @@ app.on('ready', () => {
       if (e.code === 'EROFS') {
         dialog.showErrorBox(
           'FlexTV Broadcaster',
-          'Please run Streamlabs OBS from your Applications folder. Streamlabs OBS cannot run directly from this disk image.',
+          'Please run Streamlabs Desktop from your Applications folder. Streamlabs Desktop cannot run directly from this disk image.',
         );
         app.exit();
       }
@@ -288,7 +288,7 @@ async function startApp() {
   function handleFinishedReport() {
     dialog.showErrorBox(
       'Something Went Wrong',
-      'An unexpected error occured and Streamlabs OBS must be shut down.\n' +
+      'An unexpected error occured and Streamlabs Desktop must be shut down.\n' +
         'Please restart the application.',
     );
 

@@ -7,19 +7,53 @@ import { getOS, OS } from '../../../util/operating-systems';
 import { $t } from '../../../services/i18n';
 import { loadColorPicker } from '../../../util/slow-imports';
 import { Services } from '../../service-provider';
-import { HexColorPicker } from 'react-colorful';
+import { HexColorPicker, RgbaColorPicker } from 'react-colorful';
 import { findDOMNode } from 'react-dom';
 import { getDefined } from '../../../util/properties-type-guards';
 
-export function ColorInput(p: TSlobsInputProps<{}, string>) {
+interface IRGBAColor {
+  r: number;
+  g: number;
+  b: number;
+  a: number;
+}
+
+function intTo2hexDigit(int: number) {
+  let result = int.toString(16);
+  if (result.length === 1) result = `0${result}`;
+  return result;
+}
+
+function rgbaToHex(color: IRGBAColor) {
+  return `#${intTo2hexDigit(color.r)}${intTo2hexDigit(color.g)}${intTo2hexDigit(
+    color.b,
+  )}${intTo2hexDigit(Math.round(color.a * 255))}`;
+}
+
+function hexToRGB(hex: string) {
+  const r = parseInt(hex.slice(1, 3), 16);
+  const g = parseInt(hex.slice(3, 5), 16);
+  const b = parseInt(hex.slice(5, 7), 16);
+
+  return { r, g, b };
+}
+
+function colorToHex(color: string | IRGBAColor) {
+  if (typeof color === 'string') return color;
+
+  return rgbaToHex(color);
+}
+
+export function ColorInput(p: TSlobsInputProps<{}, string | IRGBAColor>) {
   // set default debounce to 500
   const debounce = p.debounce === undefined ? 500 : p.debounce;
   const { wrapperAttrs, inputAttrs } = useInput('color', { ...p, debounce });
   const divAttrs = omit(inputAttrs, 'onChange');
-  const [textInputVal, setTextInputVal] = useState(inputAttrs.value);
+  const [textInputVal, setTextInputVal] = useState(colorToHex(inputAttrs.value));
+  const alphaMode = typeof inputAttrs.value !== 'string';
 
   useEffect(() => {
-    setTextInputVal(inputAttrs.value);
+    setTextInputVal(colorToHex(inputAttrs.value));
   }, [inputAttrs.value]);
 
   // open eydrop picker
@@ -30,7 +64,12 @@ export function ColorInput(p: TSlobsInputProps<{}, string>) {
     colorPicker.startColorPicker(
       (data: { event: string; hex: string }) => {
         if (data.event === 'mouseClick') {
-          inputAttrs.onChange(`#${data.hex}`);
+          if (typeof inputAttrs.value === 'string') {
+            inputAttrs.onChange(`#${data.hex}`);
+          } else {
+            const rgb = hexToRGB(`#${data.hex}`);
+            inputAttrs.onChange({ ...rgb, a: inputAttrs.value.a });
+          }
         }
       },
       () => {},
@@ -57,21 +96,30 @@ export function ColorInput(p: TSlobsInputProps<{}, string>) {
     setTextInputVal(color);
 
     // emit onChange if textInput contains a valid color
-    const isValidColor = color.match(/^#(?:[0-9a-fA-F]{3}){1,2}$/);
+    const isValidColor = alphaMode
+      ? color.match(/^#(?:[0-9a-fA-F]{8})$/)
+      : color.match(/^#(?:[0-9a-fA-F]{3}){1,2}$/);
     if (!isValidColor) return;
     inputAttrs.onChange(color.toLowerCase());
   }
 
   function onTextInputBlur() {
     // reset invalid color
-    const validColor = inputAttrs.value;
+    const validColor = colorToHex(inputAttrs.value);
     if (textInputVal !== validColor) setTextInputVal(validColor);
   }
+
+  const picker =
+    typeof inputAttrs.value === 'string' ? (
+      <HexColorPicker color={inputAttrs.value} onChange={inputAttrs.onChange} />
+    ) : (
+      <RgbaColorPicker color={inputAttrs.value} onChange={inputAttrs.onChange} />
+    );
 
   return (
     <InputWrapper {...wrapperAttrs}>
       <Popover
-        content={<HexColorPicker color={inputAttrs.value} onChange={inputAttrs.onChange} />}
+        content={picker}
         trigger="click"
         placement="bottomLeft"
         getPopupContainer={getPopupContainer}
@@ -88,7 +136,7 @@ export function ColorInput(p: TSlobsInputProps<{}, string>) {
             <span style={{ width: '22px' }}>
               <div
                 style={{
-                  backgroundColor: inputAttrs.value,
+                  backgroundColor: colorToHex(inputAttrs.value),
                   position: 'absolute',
                   borderRadius: '2px',
                   left: '2px',
@@ -102,8 +150,12 @@ export function ColorInput(p: TSlobsInputProps<{}, string>) {
           // render eyedropper button
           addonAfter={
             getOS() === OS.Windows ? (
-              <Button title={$t('Pick Screen Color')} style={{ padding: '4px 9px' }}>
-                <i className="fas fa-eye-dropper" onClick={eyedrop} />
+              <Button
+                title={$t('Pick Screen Color')}
+                style={{ padding: '4px 9px' }}
+                onClick={eyedrop}
+              >
+                <i className="fas fa-eye-dropper" />
               </Button>
             ) : (
               false

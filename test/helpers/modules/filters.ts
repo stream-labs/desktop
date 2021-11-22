@@ -1,8 +1,8 @@
 // Source helper functions
 import { rightClickSource } from './sources';
 import { contextMenuClick } from '../spectron/context-menu';
-import { setFormDropdown, setFormInput } from '../spectron/forms';
-import { click, clickButton, focusChild, focusMain } from './core';
+import { click, clickButton, focusChild, focusMain, select } from './core';
+import { useForm } from './forms';
 
 export async function openFiltersWindow(sourceName: string) {
   await focusMain();
@@ -18,23 +18,24 @@ export async function openFilterProperties(sourceName: string, filterName: strin
 
 export async function closeFilterProperties() {
   await focusChild();
-  await clickButton('Done');
+  await clickButton('Close');
 }
 
 export async function addFilter(sourceName: string, filterType: string, filterName: string) {
   await openFiltersWindow(sourceName);
   await click('.icon-add');
-  await setFormDropdown('Filter type', filterType);
-  if (filterType !== filterName) {
-    await setFormInput('Filter name', filterName);
-  }
-  await clickButton('Done');
-  await clickButton('Done');
+  const { fillForm } = useForm('addFilterForm');
+  await fillForm({
+    filterType,
+    filterName,
+  });
+  await clickButton('Add');
 }
 
 export async function removeFilter(sourceName: string, filterName: string) {
   await openFiltersWindow(sourceName);
-  await click(`span=${filterName}`);
-  await click('.nav-menu .icon-subtract');
-  await clickButton('Done');
+  const $navItem = await (await select(`span=${filterName}`)).$('..');
+  await $navItem.moveTo();
+  await (await $navItem.$('.icon-trash')).click();
+  await clickButton('Close');
 }
