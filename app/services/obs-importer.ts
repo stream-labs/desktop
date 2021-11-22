@@ -175,7 +175,7 @@ export class ObsImporterService extends StatefulService<{ progress: number; tota
   importFilters(filtersJSON: IOBSConfigFilter[], source: Source) {
     if (Array.isArray(filtersJSON)) {
       filtersJSON.forEach(filterJSON => {
-        const isFilterAvailable = this.filtersService.getTypes().find(availableFilter => {
+        const isFilterAvailable = this.filtersService.state.types.find(availableFilter => {
           return availableFilter.type === filterJSON.id;
         });
 

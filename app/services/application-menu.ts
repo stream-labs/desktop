@@ -197,7 +197,7 @@ export class ApplicationMenuService extends Service {
         role: 'help',
         submenu: [
           {
-            label: 'Streamlabs OBS Support',
+            label: 'Streamlabs Desktop Support',
             click: () => {
               electron.remote.shell.openExternal('https://support.streamlabs.com');
             },

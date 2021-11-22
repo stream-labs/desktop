@@ -50,7 +50,7 @@ export function AppearanceSettings() {
           <div style={{ marginBottom: '16px' }}>
             <a style={{ color: 'var(--prime)' }} onClick={upgradeToPrime}>
               <i style={{ color: 'var(--prime)' }} className="icon-prime" />
-              {$t('Change the look of Streamlabs OBS with Prime')}
+              {$t('Change the look of Streamlabs Desktop with Prime')}
             </a>
           </div>
         )}

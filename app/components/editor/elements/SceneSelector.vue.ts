@@ -98,7 +98,7 @@ export default class SceneSelector extends TsxComponent {
     const name = this.scenesService.views.activeScene.name;
     electron.remote.dialog
       .showMessageBox(electron.remote.getCurrentWindow(), {
-        title: 'Streamlabs OBS',
+        title: 'Streamlabs Desktop',
         type: 'warning',
         message: $t('Are you sure you want to remove %{sceneName}?', { sceneName: name }),
         buttons: [$t('Cancel'), $t('OK')],
@@ -107,7 +107,7 @@ export default class SceneSelector extends TsxComponent {
         if (!response) return;
         if (!this.scenesService.canRemoveScene()) {
           electron.remote.dialog.showMessageBox({
-            title: 'Streamlabs OBS',
+            title: 'Streamlabs Desktop',
             message: $t('There needs to be at least one scene.'),
           });
           return;

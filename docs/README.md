@@ -259,7 +259,7 @@ To disable that behavior, use the `compactMode` parameter in JSON-RPC request:
 ```
 
 # Remote connections
-Streamlabs OBS allows remote connection via websockets protocol powered by [Sockjs](https://github.com/sockjs).
+Streamlabs Desktop allows remote connection via websockets protocol powered by [Sockjs](https://github.com/sockjs).
 To enable remote connections go to `Settings->Remote Control` click on QR Code and click `show details`.
 Copy the token and close the settings window.
 SLOBS will start listening for new collections.
