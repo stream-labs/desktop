@@ -13,7 +13,7 @@ This application currently only supports OSX 10.14+ and 64-bit Windows.
 ### Node.js
 
 Node is required for installing npm packages and for running
-various scripts. We recommend the current LTS release, 14.x.x:
+various scripts. We recommend the latest LTS release.
 
 https://nodejs.org
 
