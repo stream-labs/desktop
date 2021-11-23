@@ -1,5 +1,6 @@
 const cp = require('child_process');
 const fs = require('fs');
+const fse = require('fs-extra');
 const path = require('path');
 
 function signAndCheck(filePath) {
@@ -49,8 +50,20 @@ function signBinaries(directory) {
   }
 }
 
+function placeLauncher(context) {
+  let new_file_path = path.join(context.appOutDir, 'Streamlabs OBS Launcher.exe');
+  if (context.packager.appInfo.productName.includes('Preview'))
+    new_file_path = path.join(context.appOutDir, 'Streamlabs OBS Preview Launcher.exe');
+
+  let old_file_path = path.join(context.appOutDir, "..", "..", 'node_modules', 'streamlabs-desktop-launcher', 'streamlabs-desktop-launcher.exe');
+  fse.copySync(old_file_path, new_file_path);
+}
+
 exports.default = async function(context) {
-  if (process.platform !== 'darwin') return;
+  if (process.platform !== 'darwin') {
+    placeLauncher(context);
+    return;
+  }
 
   console.log('Updating dependency paths');
   cp.execSync(

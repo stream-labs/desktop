@@ -13229,6 +13229,7 @@ __metadata:
     sortablejs: ^1.13.0
     spectron: 15.0.0
     streamlabs-beaker: 0.9.4
+    streamlabs-desktop-launcher: "https://obs-studio-deployment.s3-us-west-2.amazonaws.com/streamlabs-desktop-launcher-0.0.0.tar.gz"
     style-loader: 2.0.0
     stylelint: 10.0.1
     stylelint-config-css-modules: 1.3.0
@@ -13650,6 +13651,13 @@ __metadata:
     vue-slider-component: ^2.8
     vuejs-paginate: ^2.1.0
   checksum: c4be2c1a5fbc452fbb94e53e3187c6443b57bc99456f12c494133adfec49d01a8e6a28f443d5641c8dbab2b9176bcd989225c375dee6a24a7a8bfe72fb5138df
+  languageName: node
+  linkType: hard
+
+"streamlabs-desktop-launcher@https://obs-studio-deployment.s3-us-west-2.amazonaws.com/streamlabs-desktop-launcher-0.0.0.tar.gz":
+  version: 0.0.0
+  resolution: "streamlabs-desktop-launcher@https://obs-studio-deployment.s3-us-west-2.amazonaws.com/streamlabs-desktop-launcher-0.0.0.tar.gz"
+  checksum: 7f65bf7fa9125530ff87d4e972b49829243d061feba54649f46d8a1e4e0ac4db835775acd9647b1801dabbba6fa08cd975347e341ca4d52cdfcc91d6495e7acb
   languageName: node
   linkType: hard
 

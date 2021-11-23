@@ -194,6 +194,7 @@
     "sortablejs": "^1.13.0",
     "spectron": "15.0.0",
     "streamlabs-beaker": "0.9.4",
+    "streamlabs-desktop-launcher": "https://obs-studio-deployment.s3-us-west-2.amazonaws.com/streamlabs-desktop-launcher-0.0.0.tar.gz",
     "style-loader": "2.0.0",
     "stylelint": "10.0.1",
     "stylelint-config-css-modules": "1.3.0",
