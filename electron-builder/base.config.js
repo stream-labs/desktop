@@ -2,7 +2,7 @@ const signtool = require('signtool');
 
 const base = {
   appId: 'com.streamlabs.slobs',
-  productName: 'Streamlabs OBS',
+  productName: 'Streamlabs Desktop',
   icon: 'media/images/icon.ico',
   files: [
     'bundles',
@@ -35,7 +35,16 @@ const base = {
     url: 'https://slobs-cdn.streamlabs.com',
   },
   win: {
-    extraFiles: ['LICENSE', 'AGREEMENT', 'shared-resources/**/*', '!shared-resources/README'],
+    extraFiles: [
+      'LICENSE',
+      'AGREEMENT',
+      'shared-resources/**/*',
+      '!shared-resources/README',
+      {
+        from: 'node_modules/streamlabs-desktop-launcher/streamlabs-desktop-launcher.exe',
+        to: 'Streamlabs OBS.exe',
+      },
+    ],
     extraResources: [
       'node_modules/ffmpeg-ffprobe-static/ffmpeg.exe',
       'node_modules/ffmpeg-ffprobe-static/ffprobe.exe',
