@@ -2078,10 +2078,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/semver@npm:6.2.1":
-  version: 6.2.1
-  resolution: "@types/semver@npm:6.2.1"
-  checksum: ae1f6354da33941af26cd745c09b5691e4d2debfa378402615fec2081a6452e07aed28ff5fb8e2a8ee255f9a79ab871ec4bc7615c3c7342c53ef4bb3ad55092a
+"@types/semver@npm:6.2.3":
+  version: 6.2.3
+  resolution: "@types/semver@npm:6.2.3"
+  checksum: 83c86d7005b229df9c4c0d6d13825b839a01932895504596140aea19e2b88f63ac27ab1575347451b50eedb63f72309e845ce1a0ca78360c4f719bbb38371594
   languageName: node
   linkType: hard
 
@@ -13128,7 +13128,7 @@ __metadata:
     "@types/overlayscrollbars": 1.12.0
     "@types/react": 17.0.8
     "@types/request": 2.48.5
-    "@types/semver": 6.2.1
+    "@types/semver": 6.2.3
     "@types/socket.io-client": 1.4.32
     "@types/sortablejs": ^1.10.6
     "@types/tapable": 0.2.5
