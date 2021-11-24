@@ -1842,12 +1842,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/fs-extra@npm:8.1.1":
-  version: 8.1.1
-  resolution: "@types/fs-extra@npm:8.1.1"
+"@types/fs-extra@npm:8.1.2":
+  version: 8.1.2
+  resolution: "@types/fs-extra@npm:8.1.2"
   dependencies:
     "@types/node": "*"
-  checksum: d7d564b84b86e51241984c9bec16f683056d45510e2c63e1bfe9282026685bd14e5ca406ee809453f1e2fd8c9aa76c5712a3019492eb946dd46de327ccb0e1b1
+  checksum: 7277198ded9caea5750c82e569ba1e6fbac28cdb4a95e5d52d24e7c4c2ac90bf45fbe89e08fc21de8f9d3c9b302e30680566eb04e460c30ceac66ad24c161b37
   languageName: node
   linkType: hard
 
@@ -13118,7 +13118,7 @@ __metadata:
     "@types/classnames": 2.2.11
     "@types/codemirror": 5.60.4
     "@types/extract-zip": 1.6.2
-    "@types/fs-extra": 8.1.1
+    "@types/fs-extra": 8.1.2
     "@types/humps": 1.1.3
     "@types/lodash": 4.14.168
     "@types/mime": 2.0.1
