@@ -20,7 +20,7 @@ export class SceneFiltersNode extends ArrayNode<ISourceFilterSchema, IContext, I
   @Inject() private sourceFiltersService: SourceFiltersService;
 
   getItems(context: IContext): ISourceFilter[] {
-    const filters = this.sourceFiltersService.getFilters(context.sceneId);
+    const filters = [...this.sourceFiltersService.getFilters(context.sceneId)];
     const preset = this.sourceFiltersService.views.presetFilterBySourceId(context.sceneId);
 
     if (preset) filters.push(preset);
