@@ -74,7 +74,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@ant-design/icons@npm:^4.5.0, @ant-design/icons@npm:^4.6.2":
+"@ant-design/icons@npm:4.6.2, @ant-design/icons@npm:^4.6.2":
   version: 4.6.2
   resolution: "@ant-design/icons@npm:4.6.2"
   dependencies:
@@ -1637,7 +1637,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@reduxjs/toolkit@npm:^1.5.1":
+"@reduxjs/toolkit@npm:1.5.1":
   version: 1.5.1
   resolution: "@reduxjs/toolkit@npm:1.5.1"
   dependencies:
@@ -1805,7 +1805,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/codemirror@npm:^5.60.4":
+"@types/codemirror@npm:5.60.4":
   version: 5.60.4
   resolution: "@types/codemirror@npm:5.60.4"
   dependencies:
@@ -1993,7 +1993,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node-fetch@npm:^2.5.10":
+"@types/node-fetch@npm:2.5.10":
   version: 2.5.10
   resolution: "@types/node-fetch@npm:2.5.10"
   dependencies:
@@ -2154,7 +2154,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/sortablejs@npm:^1.10.6":
+"@types/sortablejs@npm:1.10.6":
   version: 1.10.6
   resolution: "@types/sortablejs@npm:1.10.6"
   checksum: 53ca23970f526f12f9a8f8b0b0a50f16e8913c473c6531aaed53e1be8b39754c840057ec98a89189f76a9a48a8d9f07169453af4e046e60cc9211aa75fa0169c
@@ -3004,7 +3004,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"antd@npm:^4.16.7":
+"antd@npm:4.16.7":
   version: 4.16.7
   resolution: "antd@npm:4.16.7"
   dependencies:
@@ -4664,7 +4664,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"codemirror@npm:^5.63.1":
+"codemirror@npm:5.63.1":
   version: 5.63.1
   resolution: "codemirror@npm:5.63.1"
   checksum: 30dcea4574652745b2b9424f2d6637d8f888eab575e2dc461f6d3590ced9c66e531c473fe7097cb5c8873ea2992777cdc01eb884aae37bdeaf731825d9c57139
@@ -5834,7 +5834,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"electron-notarize@npm:^1.0.0":
+"electron-notarize@npm:1.0.0":
   version: 1.0.0
   resolution: "electron-notarize@npm:1.0.0"
   dependencies:
@@ -6250,7 +6250,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-plugin-react-hooks@npm:^4.2.0":
+"eslint-plugin-react-hooks@npm:4.2.0":
   version: 4.2.0
   resolution: "eslint-plugin-react-hooks@npm:4.2.0"
   peerDependencies:
@@ -6499,6 +6499,23 @@ __metadata:
   languageName: node
   linkType: hard
 
+"execa@npm:5.0.0":
+  version: 5.0.0
+  resolution: "execa@npm:5.0.0"
+  dependencies:
+    cross-spawn: ^7.0.3
+    get-stream: ^6.0.0
+    human-signals: ^2.1.0
+    is-stream: ^2.0.0
+    merge-stream: ^2.0.0
+    npm-run-path: ^4.0.1
+    onetime: ^5.1.2
+    signal-exit: ^3.0.3
+    strip-final-newline: ^2.0.0
+  checksum: a044367ebdcc68ca019810cb134510fc77bbc55c799122258ee0e00e289c132941ab48c2a331a036699c42bc8d479d451ae67c105fce5ce5cc813e7dd92d642b
+  languageName: node
+  linkType: hard
+
 "execa@npm:^1.0.0":
   version: 1.0.0
   resolution: "execa@npm:1.0.0"
@@ -6528,23 +6545,6 @@ __metadata:
     signal-exit: ^3.0.2
     strip-final-newline: ^2.0.0
   checksum: e30d298934d9c52f90f3847704fd8224e849a081ab2b517bbc02f5f7732c24e56a21f14cb96a08256deffeb2d12b2b7cb7e2b014a12fb36f8d3357e06417ed55
-  languageName: node
-  linkType: hard
-
-"execa@npm:^5.0.0":
-  version: 5.0.0
-  resolution: "execa@npm:5.0.0"
-  dependencies:
-    cross-spawn: ^7.0.3
-    get-stream: ^6.0.0
-    human-signals: ^2.1.0
-    is-stream: ^2.0.0
-    merge-stream: ^2.0.0
-    npm-run-path: ^4.0.1
-    onetime: ^5.1.2
-    signal-exit: ^3.0.3
-    strip-final-newline: ^2.0.0
-  checksum: a044367ebdcc68ca019810cb134510fc77bbc55c799122258ee0e00e289c132941ab48c2a331a036699c42bc8d479d451ae67c105fce5ce5cc813e7dd92d642b
   languageName: node
   linkType: hard
 
@@ -6802,7 +6802,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ffmpeg-ffprobe-static@npm:^4.3.1-rc.6":
+"ffmpeg-ffprobe-static@npm:4.3.1-rc.6":
   version: 4.3.1-rc.6
   resolution: "ffmpeg-ffprobe-static@npm:4.3.1-rc.6"
   dependencies:
@@ -7300,7 +7300,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"gl-transitions@npm:^1.43.0":
+"gl-transitions@npm:1.43.0":
   version: 1.43.0
   resolution: "gl-transitions@npm:1.43.0"
   checksum: e13e336be76924eedc5863788cd0d9da2a75f27f13cfa13836704aaf9ffba2f45bb4e7ab3726eff243ac6eb1c2a3f3a01a1a4229fdc8ca3e7c91927e2f2a9a0f
@@ -10222,7 +10222,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"moment@npm:^2.24.0, moment@npm:^2.25.3":
+"moment@npm:2.29.1, moment@npm:^2.24.0, moment@npm:^2.25.3":
   version: 2.29.1
   resolution: "moment@npm:2.29.1"
   checksum: 1e14d5f422a2687996be11dd2d50c8de3bd577c4a4ca79ba5d02c397242a933e5b941655de6c8cb90ac18f01cc4127e55b4a12ae3c527a6c0a274e455979345e
@@ -11816,7 +11816,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"rc-animate@npm:^3.1.1":
+"rc-animate@npm:3.1.1":
   version: 3.1.1
   resolution: "rc-animate@npm:3.1.1"
   dependencies:
@@ -12398,7 +12398,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-redux@npm:^7.2.4":
+"react-redux@npm:7.2.4":
   version: 7.2.4
   resolution: "react-redux@npm:7.2.4"
   dependencies:
@@ -12419,7 +12419,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-sortablejs@npm:^6.0.0":
+"react-sortablejs@npm:6.0.0":
   version: 6.0.0
   resolution: "react-sortablejs@npm:6.0.0"
   dependencies:
@@ -13514,19 +13514,19 @@ __metadata:
   resolution: "slobs-client@workspace:."
   dependencies:
     7zip-bin: 2.4.1
-    "@ant-design/icons": ^4.5.0
+    "@ant-design/icons": 4.6.2
     "@babel/core": 7.12.17
     "@babel/plugin-proposal-decorators": 7.12.13
     "@babel/preset-env": 7.12.17
     "@octokit/app": 3.0.2
     "@octokit/request": 4.1.1
     "@octokit/rest": 16.43.2
-    "@reduxjs/toolkit": ^1.5.1
+    "@reduxjs/toolkit": 1.5.1
     "@sentry/browser": 5.21.4
     "@sentry/integrations": 5.21.4
     "@types/archiver": 2.1.3
     "@types/classnames": 2.2.11
-    "@types/codemirror": ^5.60.4
+    "@types/codemirror": 5.60.4
     "@types/extract-zip": 1.6.2
     "@types/fs-extra": 8.1.1
     "@types/humps": 1.1.3
@@ -13534,13 +13534,13 @@ __metadata:
     "@types/mime": 2.0.1
     "@types/mkdirp": 0.5.2
     "@types/node": 16.7.13
-    "@types/node-fetch": ^2.5.10
+    "@types/node-fetch": 2.5.10
     "@types/overlayscrollbars": 1.12.0
     "@types/react": 17.0.8
     "@types/request": 2.48.5
     "@types/semver": 6.2.1
     "@types/socket.io-client": 1.4.32
-    "@types/sortablejs": ^1.10.6
+    "@types/sortablejs": 1.10.6
     "@types/tapable": 0.2.5
     "@types/uuid": 3.4.9
     "@typescript-eslint/eslint-plugin": 3.10.1
@@ -13549,7 +13549,7 @@ __metadata:
     "@xkeshi/vue-qrcode": 0.3.0
     abort-controller: ^3.0.0
     amazon-s3-uri: 0.0.3
-    antd: ^4.16.7
+    antd: 4.16.7
     archiver: 2.1.1
     ava: 3.12.1
     aws-sdk: ^2.344.0
@@ -13561,7 +13561,7 @@ __metadata:
     classnames: 2.2.6
     clean-webpack-plugin: 3.0.0
     cli-table: 0.3.1
-    codemirror: ^5.63.1
+    codemirror: 5.63.1
     color-picker: "https://obs-studio-deployment.s3-us-west-2.amazonaws.com/color-picker-0.0.0.tar.gz"
     crash-handler: "https://slobs-crash-handler.s3-us-west-2.amazonaws.com/crash-handler-0.0.0.tar.gz"
     cross-env: 7.0.3
@@ -13571,7 +13571,7 @@ __metadata:
     electron: 13.4.0
     electron-builder: 22.14.5
     electron-devtools-installer: 3.1.1
-    electron-notarize: ^1.0.0
+    electron-notarize: 1.0.0
     electron-react-devtools: ^0.5.3
     electron-updater: ^4.2.0
     electron-window-state: 5.0.3
@@ -13579,18 +13579,18 @@ __metadata:
     eslint-config-airbnb-base: 14.1.0
     eslint-plugin-import: 2.20.2
     eslint-plugin-prettier: 3.4.0
-    eslint-plugin-react-hooks: ^4.2.0
+    eslint-plugin-react-hooks: 4.2.0
     eslint-plugin-vue: 6.1.2
-    execa: ^5.0.0
+    execa: 5.0.0
     extract-zip: ^1.6.7
     fetch-mock: 7.7.3
-    ffmpeg-ffprobe-static: ^4.3.1-rc.6
+    ffmpeg-ffprobe-static: 4.3.1-rc.6
     file-loader: 1.1.11
     font-manager: "https://slobs-font-manager.s3-us-west-2.amazonaws.com/font-manager-0.0.0.tar.gz"
     fs-extra: ^9.0.0
     fuse.js: 3.4.6
     game-overlay: "https://obs-studio-deployment.s3-us-west-2.amazonaws.com/game-overlay-v0.0.0.tar.gz"
-    gl-transitions: ^1.43.0
+    gl-transitions: 1.43.0
     humps: 2.0.1
     js-yaml: 3.13.1
     less: 4.1.0
@@ -13599,7 +13599,7 @@ __metadata:
     lodash-decorators: 4.5.0
     mark.js: 8.11.1
     mime: 2.4.3
-    moment: ^2.25.3
+    moment: 2.29.1
     node-fetch: ^2.6.1
     node-fontinfo: "https://slobs-node-fontinfo.s3-us-west-2.amazonaws.com/node-fontinfo-0.0.0.tar.gz"
     node-libuiohook: "https://slobs-node-libuiohook.s3-us-west-2.amazonaws.com/node-libuiohook-0.0.0.tar.gz"
@@ -13616,13 +13616,13 @@ __metadata:
     progress: 2.0.0
     raven: ^2.6.4
     raw-loader: 2.0.0
-    rc-animate: ^3.1.1
+    rc-animate: 3.1.1
     react: 17.0.1
     react-colorful: ^5.5.0
     react-devtools-electron: ^4.7.0
     react-dom: 17.0.1
-    react-redux: ^7.2.4
-    react-sortablejs: ^6.0.0
+    react-redux: 7.2.4
+    react-sortablejs: 6.0.0
     react-transition-group: ^4.4.1
     recursive-readdir: 2.2.2
     request: ^2.88.0
@@ -13636,7 +13636,7 @@ __metadata:
     socket.io-client: 2.1.1
     sockjs: 0.3.20
     sockjs-client: 1.1.5
-    sortablejs: ^1.13.0
+    sortablejs: 1.13.0
     spectron: 15.0.0
     streamlabs-beaker: 0.9.4
     style-loader: 2.0.0
@@ -13647,7 +13647,7 @@ __metadata:
     tasklist: ^3.1.1
     terser-webpack-plugin: 5.0.3
     traverse: 0.6.6
-    tree-kill: ^1.2.2
+    tree-kill: 1.2.2
     ts-loader: 8.0.11
     ts-node: 7.0.1
     typescript: 4.0.7
@@ -13811,7 +13811,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"sortablejs@npm:^1.13.0":
+"sortablejs@npm:1.13.0":
   version: 1.13.0
   resolution: "sortablejs@npm:1.13.0"
   checksum: 495bd54f679a2988c6aedb6b07d0b2cb7685af2734419b823e65a400c81a3aae17bf467169399d9cb38638af9cb6de36e6d07b342547027dd64392fd47c22d85
@@ -14816,7 +14816,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tree-kill@npm:^1.2.2":
+"tree-kill@npm:1.2.2":
   version: 1.2.2
   resolution: "tree-kill@npm:1.2.2"
   bin:
