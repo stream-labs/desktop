@@ -164,6 +164,15 @@ export class PlatformLogo extends ReactComponent<{
 
 @Component({
   props: {
+    name: { default: 'RecentEvents' },
+    wrapperStyles: { default: () => ({ height: '100%' }) },
+    componentProps: { default: () => ({ isOverlay: false }) },
+  },
+})
+export class RecentEvents extends ReactComponent<{ isOverlay?: boolean }> {}
+
+@Component({
+  props: {
     name: { default: 'RenameSource' },
     wrapperStyles: { default: () => ({ height: '100%' }) },
   },

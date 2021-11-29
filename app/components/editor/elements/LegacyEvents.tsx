@@ -1,7 +1,7 @@
 import electron from 'electron';
 import { Component } from 'vue-property-decorator';
 import BrowserView from 'components/shared/BrowserView';
-import styles from 'components/RecentEvents.m.less';
+import styles from 'components-react/editor/elements/RecentEvents.m.less';
 import { UserService } from 'services/user';
 import { RecentEventsService } from 'services/recent-events';
 import { MagicLinkService } from 'services/magic-link';
