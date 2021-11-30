@@ -294,10 +294,10 @@ export class OnboardingService extends StatefulService<IOnboardingServiceState> 
   }
 
   startOnboardingIfRequired() {
-    // if (localStorage.getItem(this.localStorageKey)) {
-    //   this.forceLoginForSecurityUpgradeIfRequired();
-    //   return false;
-    // }
+    if (localStorage.getItem(this.localStorageKey)) {
+      this.forceLoginForSecurityUpgradeIfRequired();
+      return false;
+    }
 
     this.start();
     return true;
