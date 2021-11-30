@@ -5,7 +5,7 @@ import { Inject } from 'services/core/injector';
 import { UserService } from 'services/user';
 import { I18nService } from 'services/i18n';
 import electron from 'electron';
-import BrowserView from 'components/shared/BrowserView';
+import { BrowserView } from 'components/shared/ReactComponentList';
 
 @Component({
   components: { ModalLayout, BrowserView },

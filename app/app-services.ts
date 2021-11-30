@@ -154,6 +154,7 @@ import { MediaGalleryService } from './services/media-gallery';
 import { RecentEventsService } from 'services/recent-events';
 import { AudioService } from './services/audio';
 import { SourceFiltersService } from './services/source-filters';
+import { I18nService } from './services/i18n';
 
 export const AppServices = {
   AppService,
@@ -199,4 +200,5 @@ export const AppServices = {
   PlatformAppsService,
   AudioService,
   SourceFiltersService,
+  I18nService,
 };

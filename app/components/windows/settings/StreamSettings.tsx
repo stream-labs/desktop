@@ -10,11 +10,9 @@ import {
 import GenericFormGroups from '../../obs/inputs/GenericFormGroups.vue';
 import { UserService } from 'services/user';
 import styles from './StreamSettings.m.less';
-import { RestreamService } from 'services/restream';
 import { NavigationService } from 'services/navigation';
 import { WindowsService } from 'services/windows';
 import { EStreamingState, StreamingService } from 'services/streaming';
-import BrowserView from 'components/shared/BrowserView';
 import { getPlatformService, TPlatform } from '../../../services/platforms';
 import cx from 'classnames';
 import ValidatedForm from '../../shared/inputs/ValidatedForm';
@@ -25,11 +23,10 @@ import namingHelpers from '../../../util/NamingHelpers';
 import { PlatformLogo } from '../../shared/ReactComponentList';
 import { MagicLinkService } from 'services/magic-link';
 
-@Component({ components: { GenericFormGroups, PlatformLogo, BrowserView } })
+@Component({ components: { GenericFormGroups, PlatformLogo } })
 export default class StreamSettings extends TsxComponent {
   @Inject() private streamSettingsService: StreamSettingsService;
   @Inject() private userService: UserService;
-  @Inject() private restreamService: RestreamService;
   @Inject() private navigationService: NavigationService;
   @Inject() private windowsService: WindowsService;
   @Inject() private streamingService: StreamingService;
