@@ -596,7 +596,7 @@ export class SourcesService extends StatefulService<ISourcesState> {
       // 'color_source',
       // 'browser_source',
       // 'slideshow',
-      // 'ffmpeg_source',
+      'ffmpeg_source',
       // 'text_gdiplus',
       // 'text_ft2_source',
       // 'monitor_capture',
