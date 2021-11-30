@@ -601,7 +601,7 @@ export class SourcesService extends StatefulService<ISourcesState> {
       // 'text_ft2_source',
       // 'monitor_capture',
       // 'window_capture',
-      // 'game_capture',
+      'game_capture',
       // 'dshow_input',
       // 'wasapi_input_capture',
       // 'wasapi_output_capture',
