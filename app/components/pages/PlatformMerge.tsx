@@ -82,7 +82,7 @@ export default class PlatformMerge extends TsxComponent<PlatformMergeProps> {
     return (
       <div>
         <div>
-          {$t('Connect %{platformName} to Streamlabs OBS.', { platformName })}
+          {$t('Connect %{platformName} to Streamlabs.', { platformName })}
           <br />
           {$t('All of your scenes, sources, and settings will be preserved.')}
         </div>
