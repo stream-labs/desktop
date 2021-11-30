@@ -608,7 +608,7 @@ export class SourcesService extends StatefulService<ISourcesState> {
       // 'decklink-input',
       // 'scene',
       // 'ndi_source',
-      // 'openvr_capture',
+      'openvr_capture',
       // 'screen_capture',
       // 'liv_capture',
       // 'ovrstream_dc_source',
