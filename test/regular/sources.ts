@@ -18,7 +18,8 @@ import {
 
 useSpectron({ restartAppAfterEachTest: false });
 
-test('Create/Remove Color Source and view Source Properties', async t => {
+// TODO: re-write test for the React version
+test.skip('Create/Remove Color Source and view Source Properties', async t => {
   const sourceName = 'Color Source';
 
   await addSource('Color Source', sourceName);
