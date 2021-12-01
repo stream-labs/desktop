@@ -602,7 +602,7 @@ export class SourcesService extends StatefulService<ISourcesState> {
       // 'monitor_capture',
       // 'window_capture',
       // 'game_capture',
-      // 'dshow_input',
+      'dshow_input',
       // 'wasapi_input_capture',
       // 'wasapi_output_capture',
       // 'decklink-input',
