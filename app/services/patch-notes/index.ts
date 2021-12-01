@@ -6,6 +6,9 @@ import { NavigationService } from 'services/navigation';
 import { $t } from 'services/i18n';
 import { NotificationsService, ENotificationType } from 'services/notifications';
 import { JsonrpcService } from 'services/api/jsonrpc/jsonrpc';
+import { getOS, OS } from 'util/operating-systems';
+import * as semver from 'semver';
+import { WindowsService } from 'services/windows';
 
 interface IPatchNotesState {
   lastVersionSeen: string;
@@ -23,6 +26,7 @@ export class PatchNotesService extends PersistentStatefulService<IPatchNotesStat
   @Inject() navigationService: NavigationService;
   @Inject() notificationsService: NotificationsService;
   @Inject() private jsonrpcService: JsonrpcService;
+  @Inject() windowsService: WindowsService;
 
   static defaultState: IPatchNotesState = {
     lastVersionSeen: null,
@@ -64,6 +68,19 @@ export class PatchNotesService extends PersistentStatefulService<IPatchNotesStat
 
     // The user has already seen the current patch notes
     if (lastMinorVersionSeen && lastMinorVersionSeen[1] === currentMinorVersion[1]) return;
+
+    if (
+      getOS() === OS.Mac &&
+      this.state.lastVersionSeen &&
+      semver.lt(this.state.lastVersionSeen, '1.6')
+    ) {
+      electron.remote.dialog.showMessageBox(this.windowsService.windows.main, {
+        title: 'Streamlabs Desktop',
+        message: 'Streamlabs OBS is now Streamlabs Desktop',
+        detail:
+          'Streamlabs OBS is being renamed to Streamlabs Desktop. If you had Streamlabs OBS pinned to your dock, your old dock icon will stop working and you will need to pin it again.',
+      });
+    }
 
     this.SET_LAST_VERSION_SEEN(Util.env.SLOBS_VERSION, new Date().toISOString());
 
