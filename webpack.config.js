@@ -1,13 +1,11 @@
+/* eslint-disable prettier/prettier */
 const CircularDependencyPlugin = require('circular-dependency-plugin');
-const VueLoaderPlugin = require('vue-loader/lib/plugin')
+const VueLoaderPlugin = require('vue-loader/lib/plugin');
 
 const path = require('path');
-const TerserPlugin = require('terser-webpack-plugin')
+const TerserPlugin = require('terser-webpack-plugin');
 
-const plugins = [
-  new VueLoaderPlugin()
-];
-
+const plugins = [new VueLoaderPlugin()];
 
 // uncomment to watch circular dependencies
 
@@ -18,15 +16,14 @@ const plugins = [
 //   //failOnError: true
 // }));
 
-
 module.exports = {
   entry: {
     renderer: './app/app.ts',
-    updater: './updater/ui.js'
+    updater: './updater/ui.js',
   },
   output: {
-    path: __dirname + '/bundles',
-    filename: '[name].js'
+    path: `${__dirname}/bundles`,
+    filename: '[name].js',
   },
 
   devtool: 'source-map',
@@ -35,7 +32,7 @@ module.exports = {
 
   resolve: {
     extensions: ['.js', '.ts'],
-    modules: [path.resolve(__dirname, 'app'), 'node_modules']
+    modules: [path.resolve(__dirname, 'app'), 'node_modules'],
   },
 
   // We want to dynamically require native addons
@@ -51,7 +48,7 @@ module.exports = {
     'socket.io-client': 'require("socket.io-client")',
     'rimraf': 'require("rimraf")',
     'backtrace-js': 'require("backtrace-js")',
-    'request': 'require("request")'
+    'request': 'require("request")',
   },
 
   module: {
@@ -63,19 +60,19 @@ module.exports = {
           esModule: true,
           transformToRequire: {
             video: 'src',
-            source: 'src'
-          }
-        }
+            source: 'src',
+          },
+        },
       },
       {
         test: /\.ts$/,
         loader: 'ts-loader',
-        exclude: /node_modules|vue\/src/
+        exclude: /node_modules|vue\/src/,
       },
       {
         test: /\.ts$/,
         enforce: 'pre',
-        loader: 'eslint-loader'
+        loader: 'eslint-loader',
       },
       {
         test: /\.js$/,
@@ -89,10 +86,10 @@ module.exports = {
           {
             loader: 'css-loader',
             options: {
-              importLoaders: 1
-            }
-          }
-        ]
+              importLoaders: 1,
+            },
+          },
+        ],
       },
       {
         test: /\.less$/,
@@ -101,11 +98,11 @@ module.exports = {
           {
             loader: 'css-loader',
             options: {
-              importLoaders: 1
-            }
+              importLoaders: 1,
+            },
           },
-          'less-loader'
-        ]
+          'less-loader',
+        ],
       },
       {
         test: /\.(png|jpe?g|gif|mp4|ico|wav|webm)(\?.*)?$/,
@@ -113,8 +110,8 @@ module.exports = {
         options: {
           name: '[name]-[hash].[ext]',
           outputPath: 'media/',
-          publicPath: 'bundles/media/'
-        }
+          publicPath: 'bundles/media/',
+        },
       },
       // Handles custom fonts. Currently used for icons.
       {
@@ -123,27 +120,23 @@ module.exports = {
         options: {
           name: '[name].[ext]',
           outputPath: 'fonts/',
-          publicPath: 'bundles/fonts/'
-        }
+          publicPath: 'bundles/fonts/',
+        },
       },
       {
         test: /\.svg$/,
-        use: [
-          'vue-svg-loader'
-        ]
-      }
-    ]
+        use: ['vue-svg-loader'],
+      },
+    ],
   },
 
   optimization: {
-    minimizer: [new TerserPlugin({ sourceMap: true, terserOptions: { mangle: false } })]
+    minimizer: [new TerserPlugin({ sourceMap: true, terserOptions: { mangle: false } })],
   },
 
   plugins,
 
   stats: {
-    warningsFilter: [
-      "Can't resolve 'osx-temperature-sensor'",
-    ]
-  }
+    warningsFilter: ["Can't resolve 'osx-temperature-sensor'"],
+  },
 };
