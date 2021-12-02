@@ -7,12 +7,12 @@ import { $t } from 'services/i18n';
 import { NotificationsService, ENotificationType } from 'services/notifications';
 import { JsonrpcService } from 'services/api/jsonrpc/jsonrpc';
 import { getOS, OS } from 'util/operating-systems';
-import * as semver from 'semver';
 import { WindowsService } from 'services/windows';
 
 interface IPatchNotesState {
   lastVersionSeen: string;
   updateTimestamp: string;
+  macMessageSeen: boolean;
 }
 
 export interface IPatchNotes {
@@ -31,6 +31,7 @@ export class PatchNotesService extends PersistentStatefulService<IPatchNotesStat
   static defaultState: IPatchNotesState = {
     lastVersionSeen: null,
     updateTimestamp: null,
+    macMessageSeen: false,
   };
 
   init() {
@@ -69,19 +70,6 @@ export class PatchNotesService extends PersistentStatefulService<IPatchNotesStat
     // The user has already seen the current patch notes
     if (lastMinorVersionSeen && lastMinorVersionSeen[1] === currentMinorVersion[1]) return;
 
-    if (
-      getOS() === OS.Mac &&
-      this.state.lastVersionSeen &&
-      semver.lt(this.state.lastVersionSeen, '1.6')
-    ) {
-      electron.remote.dialog.showMessageBox(this.windowsService.windows.main, {
-        title: 'Streamlabs Desktop',
-        message: 'Streamlabs OBS is now Streamlabs Desktop',
-        detail:
-          'Streamlabs OBS is being renamed to Streamlabs Desktop. If you had Streamlabs OBS pinned to your dock, your old dock icon will stop working and you will need to pin it again.',
-      });
-    }
-
     this.SET_LAST_VERSION_SEEN(Util.env.SLOBS_VERSION, new Date().toISOString());
 
     // Only show the actual patch notes if they weren't onboarded
@@ -101,6 +89,22 @@ export class PatchNotesService extends PersistentStatefulService<IPatchNotesStat
     }
   }
 
+  showMacNameChangeMessageIfRequired(onboarded: boolean) {
+    if (getOS() !== OS.Mac) return;
+    if (this.state.macMessageSeen) return;
+
+    this.SET_MAC_MESSAGE_SEEN();
+
+    if (!onboarded) {
+      electron.remote.dialog.showMessageBox(this.windowsService.windows.main, {
+        title: 'Streamlabs Desktop',
+        message: 'Streamlabs OBS is now Streamlabs Desktop',
+        detail:
+          'Streamlabs OBS is being renamed to Streamlabs Desktop. If you had Streamlabs OBS pinned to your dock, your old dock icon will stop working and you will need to pin it again.',
+      });
+    }
+  }
+
   get notes() {
     return notes;
   }
@@ -109,5 +113,10 @@ export class PatchNotesService extends PersistentStatefulService<IPatchNotesStat
   private SET_LAST_VERSION_SEEN(version: string, timestamp: string) {
     this.state.lastVersionSeen = version;
     this.state.updateTimestamp = timestamp;
+  }
+
+  @mutation()
+  private SET_MAC_MESSAGE_SEEN() {
+    this.state.macMessageSeen = true;
   }
 }
