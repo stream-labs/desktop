@@ -2,9 +2,9 @@ import React, { useState, useRef, useEffect, useMemo } from 'react';
 import electron from 'electron';
 import path from 'path';
 import cloneDeep from 'lodash/cloneDeep';
-import { Spinner } from 'streamlabs-beaker';
 import { I18nService } from 'services/i18n';
 import Utils from 'services/utils';
+import Spinner from 'components-react/shared/Spinner';
 import { Services } from 'components-react/service-provider';
 import { useVuex } from 'components-react/hooks';
 
@@ -28,8 +28,8 @@ export default function BrowserView(p: BrowserViewProps) {
     theme: CustomizationService.state.theme,
   }));
 
-  const [currentPosition, setCurrentPosition] = useState<IVec2>();
-  const [currentSize, setCurrentSize] = useState<IVec2>();
+  let currentPosition: IVec2;
+  let currentSize: IVec2;
 
   const options = useMemo(() => {
     const opts = p.options ? cloneDeep(p.options) : { webPreferences: {} };
@@ -68,7 +68,7 @@ export default function BrowserView(p: BrowserViewProps) {
       clearInterval(resizeInterval);
       shutdownSubscription.unsubscribe();
     };
-  }, []);
+  }, [browserView.current, loading]);
 
   useEffect(() => {
     loadUrl();
@@ -94,8 +94,8 @@ export default function BrowserView(p: BrowserViewProps) {
         : sizeContainer.current.getBoundingClientRect();
 
     if (currentPosition == null || currentSize == null || rectChanged(rect)) {
-      setCurrentPosition({ x: rect.left, y: rect.top });
-      setCurrentSize({ x: rect.width, y: rect.height });
+      currentPosition = { x: rect.left, y: rect.top };
+      currentSize = { x: rect.width, y: rect.height };
 
       if (currentPosition && currentSize && browserView.current) {
         browserView.current.setBounds({
@@ -136,10 +136,10 @@ export default function BrowserView(p: BrowserViewProps) {
   if (loading) {
     return (
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <Spinner size="large" />
+        <Spinner />
       </div>
     );
   }
 
-  return <div ref={sizeContainer} />;
+  return <div style={{ height: '100%' }} ref={sizeContainer} />;
 }
