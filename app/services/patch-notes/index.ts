@@ -6,10 +6,13 @@ import { NavigationService } from 'services/navigation';
 import { $t } from 'services/i18n';
 import { NotificationsService, ENotificationType } from 'services/notifications';
 import { JsonrpcService } from 'services/api/jsonrpc/jsonrpc';
+import { getOS, OS } from 'util/operating-systems';
+import { WindowsService } from 'services/windows';
 
 interface IPatchNotesState {
   lastVersionSeen: string;
   updateTimestamp: string;
+  macMessageSeen: boolean;
 }
 
 export interface IPatchNotes {
@@ -23,10 +26,12 @@ export class PatchNotesService extends PersistentStatefulService<IPatchNotesStat
   @Inject() navigationService: NavigationService;
   @Inject() notificationsService: NotificationsService;
   @Inject() private jsonrpcService: JsonrpcService;
+  @Inject() windowsService: WindowsService;
 
   static defaultState: IPatchNotesState = {
     lastVersionSeen: null,
     updateTimestamp: null,
+    macMessageSeen: false,
   };
 
   init() {
@@ -84,6 +89,22 @@ export class PatchNotesService extends PersistentStatefulService<IPatchNotesStat
     }
   }
 
+  showMacNameChangeMessageIfRequired(onboarded: boolean) {
+    if (getOS() !== OS.Mac) return;
+    if (this.state.macMessageSeen) return;
+
+    this.SET_MAC_MESSAGE_SEEN();
+
+    if (!onboarded) {
+      electron.remote.dialog.showMessageBox(this.windowsService.windows.main, {
+        title: 'Streamlabs Desktop',
+        message: 'Streamlabs OBS is now Streamlabs Desktop',
+        detail:
+          'Streamlabs OBS is being renamed to Streamlabs Desktop. If you had Streamlabs OBS pinned to your dock, your old dock icon will stop working and you will need to pin it again.',
+      });
+    }
+  }
+
   get notes() {
     return notes;
   }
@@ -92,5 +113,10 @@ export class PatchNotesService extends PersistentStatefulService<IPatchNotesStat
   private SET_LAST_VERSION_SEEN(version: string, timestamp: string) {
     this.state.lastVersionSeen = version;
     this.state.updateTimestamp = timestamp;
+  }
+
+  @mutation()
+  private SET_MAC_MESSAGE_SEEN() {
+    this.state.macMessageSeen = true;
   }
 }
