@@ -19,7 +19,7 @@ import { IncrementalRolloutService, EAvailableFeatures } from 'services/incremen
     StreamingStatus,
   },
 })
-export default class TopNav extends Vue {
+export default class SideNav extends Vue {
   @Inject() settingsService: SettingsService;
   @Inject() customizationService: CustomizationService;
   @Inject() navigationService: NavigationService;

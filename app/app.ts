@@ -7,7 +7,6 @@ window['eval'] = global.eval = () => {
 
 import 'reflect-metadata';
 import Vue from 'vue';
-import URI from 'urijs';
 
 import { createStore } from './store';
 import { IWindowOptions, WindowsService } from './services/windows';

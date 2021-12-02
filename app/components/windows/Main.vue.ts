@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
-import TopNav from '../TopNav.vue';
+import SideNav from '../SideNav.vue';
 import { ScenesService } from 'services/scenes';
 
 // Pages
@@ -22,7 +22,7 @@ import electron from 'electron';
 @Component({
   components: {
     TitleBar,
-    TopNav,
+    SideNav,
     Studio,
     Onboarding,
     StudioFooter,
