@@ -156,16 +156,25 @@ export class GoLiveSettingsModule extends StreamInfoView<IGoLiveSettingsState> {
   @mutation()
   switchAdvancedMode(enabled: boolean) {
     this.updateSettings({ advancedMode: enabled });
+
+    // reset common fields for all platforms in simple mode
+    if (!enabled) this.updateCommonFields(this.commonFields);
   }
   /**
    * Set a common field like title or description for all eligible platforms
    **/
 
   @mutation()
-  updateCommonFields(fields: { title: string; description: string }) {
+  updateCommonFields(
+    fields: { title: string; description: string },
+    shouldChangeAllPlatforms = false,
+  ) {
     Object.keys(fields).forEach((fieldName: TCommonFieldName) => {
       const value = fields[fieldName];
-      this.platformsWithoutCustomFields.forEach(platform => {
+      const platforms = shouldChangeAllPlatforms
+        ? this.platformsWithoutCustomFields
+        : this.enabledPlatforms;
+      platforms.forEach(platform => {
         if (!this.supports(fieldName, [platform])) return;
         const platformSettings = getDefined(this.state.platforms[platform]);
         platformSettings[fieldName] = value;
