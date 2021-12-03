@@ -159,9 +159,14 @@ class StreamSchedulerModule {
    */
   private async loadEvents() {
     this.reset();
-    // load fb and yt events simultaneously
-    const [fbEvents, ytEvents] = await Promise.all([this.fetchFbEvents(), this.fetchYTBEvents()]);
-    this.setEvents([...fbEvents, ...ytEvents]);
+    try {
+      // load fb and yt events simultaneously
+      const [fbEvents, ytEvents] = await Promise.all([this.fetchFbEvents(), this.fetchYTBEvents()]);
+      this.setEvents([...fbEvents, ...ytEvents]);
+    } catch (e: unknown) {
+      this.setEvents([]);
+      message.error($t('Failed to load events'));
+    }
   }
 
   private async fetchYTBEvents() {
