@@ -10,6 +10,7 @@ export interface IWidgetDisplayData {
   demoFilename: string;
   supportList: string[];
   icon: string;
+  shortDesc?: string;
 }
 // Do not alter the order of this enum, it is coupled to the user's local config
 export enum WidgetType {
@@ -465,6 +466,7 @@ export const WidgetDisplayData = (platform?: string): { [x: number]: IWidgetDisp
     demoFilename: 'source-alertbox.mp4',
     supportList: [$t('Donations'), $t('Subscriptions'), $t('Follows'), $t('Bits'), $t('Hosts')],
     icon: 'fas fa-bell',
+    shortDesc: $t('Dynamic, live alerts'),
   },
   [WidgetType.DonationGoal]: {
     name: $t('Donation Goal'),
@@ -567,6 +569,7 @@ export const WidgetDisplayData = (platform?: string): { [x: number]: IWidgetDisp
       $t('Redemptions'),
     ],
     icon: 'fas fa-th-list',
+    shortDesc: $t('Display recent events'),
   },
   [WidgetType.TipJar]: {
     name: $t('The Jar'),

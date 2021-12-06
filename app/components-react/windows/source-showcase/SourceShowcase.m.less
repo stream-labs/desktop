@@ -29,11 +29,15 @@
   border-radius: 4px;
   height: 32px;
   padding-top: 6px;
-  padding-left: 16px;
+  padding-left: 8px;
   padding-right: 8px;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
+
+  i {
+    margin-right: 8px;
+  }
 
   &:hover {
     cursor: pointer;
@@ -44,4 +48,8 @@
     color: var(--title);
     background: var(--button);
   }
+}
+
+.source-tag.essential {
+  height: 64px;
 }

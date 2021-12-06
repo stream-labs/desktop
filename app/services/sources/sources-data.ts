@@ -48,6 +48,7 @@ export const SourceDisplayData = (): { [key: string]: ISourceDisplayData } => ({
     demoFilename: 'media.png',
     supportList: mediaSupport,
     icon: 'far fa-file-video',
+    shortDesc: $t('Add media'),
   },
   slideshow: {
     name: $t('Image Slide Show'),
@@ -94,6 +95,7 @@ export const SourceDisplayData = (): { [key: string]: ISourceDisplayData } => ({
       $t('Capture cards (Elgato, Avermedia, BlackMagic)'),
     ],
     icon: 'icon-webcam',
+    shortDesc: $t('Your webcam device'),
   },
   ndi_source: {
     name: $t('NDI source'),
@@ -120,6 +122,7 @@ export const SourceDisplayData = (): { [key: string]: ISourceDisplayData } => ({
     demoFilename: 'window-capture.png',
     supportList: [$t('Most games, apps, displays')],
     icon: 'icon-group',
+    shortDesc: $t('Select what to display'),
   },
   liv_capture: {
     name: $t('LIV Client Capture'),
@@ -254,5 +257,6 @@ export const SourceDisplayData = (): { [key: string]: ISourceDisplayData } => ({
       $t('Many more'),
     ],
     icon: 'fas fa-file',
+    shortDesc: 'Viewer shoutouts',
   },
 });

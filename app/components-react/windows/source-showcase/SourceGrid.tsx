@@ -61,9 +61,11 @@ export default function SourceGrid(p: { activeTab: string }) {
 
   const essentialSources = useMemo(() => {
     const essentialDefaults = availableSources.filter(source =>
-      ['dshow_input', byOS({ [OS.Windows]: 'screen_capture', [OS.Mac]: 'ffmpeg_source' })].includes(
-        source.value,
-      ),
+      [
+        'dshow_input',
+        'ffmpeg_source',
+        byOS({ [OS.Windows]: 'screen_capture', [OS.Mac]: 'window_capture' }),
+      ].includes(source.value),
     );
     const essentialWidgets = iterableWidgetTypes.filter(type =>
       [WidgetType.AlertBox, WidgetType.EventList].includes(WidgetType[type]),
@@ -102,16 +104,22 @@ export default function SourceGrid(p: { activeTab: string }) {
               <PageHeader title={$t('Essential Sources')} />
             </Col>
             {essentialSources.essentialDefaults.map(source => (
-              <SourceTag key={source.value} name={source.description} type={source.value} />
+              <SourceTag
+                key={source.value}
+                name={source.description}
+                type={source.value}
+                essential
+              />
             ))}
             {essentialSources.essentialWidgets.map(widgetType => (
               <SourceTag
                 key={widgetType}
                 name={WidgetDisplayData()[WidgetType[widgetType]].name}
                 type={widgetType}
+                essential
               />
             ))}
-            <SourceTag key="streamlabel" name={$t('Stream Label')} type="streamlabel" />
+            <SourceTag key="streamlabel" name={$t('Stream Label')} type="streamlabel" essential />
           </>
         )}
         {showContent('general') && (

@@ -108,7 +108,7 @@ export default class SourceSelector extends TsxComponent {
       return WidgetDisplayData()[widgetType].icon || 'icon-error';
     }
 
-    return SourceDisplayData()[source.type];
+    return SourceDisplayData()[source.type].icon;
   }
 
   addSource() {

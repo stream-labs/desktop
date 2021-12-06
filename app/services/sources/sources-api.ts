@@ -142,4 +142,5 @@ export interface ISourceDisplayData {
   supportList?: string[];
   demoVideo?: boolean;
   icon: string;
+  shortDesc?: string;
 }

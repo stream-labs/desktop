@@ -1,7 +1,8 @@
 import React from 'react';
 import { Col } from 'antd';
 import cx from 'classnames';
-import { Services } from 'components-react/service-provider';
+import { WidgetDisplayData, WidgetType } from 'services/widgets';
+import { SourceDisplayData } from 'services/sources';
 import { useSourceShowcaseSettings } from './useSourceShowcase';
 import styles from './SourceShowcase.m.less';
 
@@ -10,6 +11,7 @@ export default function SourceTag(p: {
   type: string;
   appId?: string;
   appSourceId?: string;
+  essential?: boolean;
 }) {
   const {
     inspectSource,
@@ -19,6 +21,8 @@ export default function SourceTag(p: {
     inspectedAppSourceId,
   } = useSourceShowcaseSettings();
 
+  const displayData = WidgetDisplayData()[WidgetType[p.type]] || SourceDisplayData()[p.type];
+
   function active() {
     if (!p.appId) return inspectedSource === p.type;
     return p.appSourceId === inspectedAppSourceId && p.appId === inspectedAppId;
@@ -27,11 +31,16 @@ export default function SourceTag(p: {
   return (
     <Col span={8}>
       <div
-        className={cx(styles.sourceTag, { [styles.active]: active() })}
+        className={cx(styles.sourceTag, {
+          [styles.active]: active(),
+          [styles.essential]: p.essential,
+        })}
         onClick={() => inspectSource(p.type, p.appId, p.appSourceId)}
         onDoubleClick={() => selectInspectedSource()}
       >
+        <i className={displayData?.icon} />
         {p.name}
+        {p.essential && <div style={{ opacity: '0.5' }}>{displayData?.shortDesc}</div>}
       </div>
     </Col>
   );
