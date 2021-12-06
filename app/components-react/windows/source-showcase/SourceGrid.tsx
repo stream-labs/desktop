@@ -3,13 +3,15 @@ import { Empty, Row, Col, PageHeader, Button } from 'antd';
 import Scrollable from 'components-react/shared/Scrollable';
 import { Services } from 'components-react/service-provider';
 import { useVuex } from 'components-react/hooks';
+import { IObsListOption } from 'components/obs/inputs/ObsInput';
 import { WidgetDisplayData, WidgetType } from 'services/widgets';
-import { IAppSource } from 'services/platform-apps';
+import { TSourceType } from 'services/sources';
 import { getPlatformService } from 'services/platforms';
 import { $i } from 'services/utils';
 import { byOS, OS } from 'util/operating-systems';
 import { $t } from 'services/i18n';
 import SourceTag from './SourceTag';
+import { useSourceShowcaseSettings } from './useSourceShowcase';
 
 export default function SourceGrid(p: { activeTab: string }) {
   const {
@@ -17,16 +19,16 @@ export default function SourceGrid(p: { activeTab: string }) {
     UserService,
     ScenesService,
     WindowsService,
-    PlatformAppsService,
     CustomizationService,
   } = Services;
 
-  const { demoMode, designerMode, isLoggedIn, enabledApps } = useVuex(() => ({
+  const { demoMode, designerMode, isLoggedIn } = useVuex(() => ({
     demoMode: CustomizationService.views.isDarkTheme ? 'night' : 'day',
     designerMode: CustomizationService.views.designerMode,
     isLoggedIn: UserService.views.isLoggedIn,
-    enabledApps: PlatformAppsService.views.enabledApps,
   }));
+
+  const { availableAppSources } = useSourceShowcaseSettings();
 
   const primaryPlatformService = UserService.state.auth
     ? getPlatformService(UserService.state.auth.primaryPlatform)
@@ -69,20 +71,6 @@ export default function SourceGrid(p: { activeTab: string }) {
     return { essentialDefaults, essentialWidgets };
   }, []);
 
-  const availableAppSources = useMemo(
-    () =>
-      enabledApps.reduce<{ source: IAppSource; appId: string }[]>((sources, app) => {
-        if (app.manifest.sources) {
-          app.manifest.sources.forEach(source => {
-            sources.push({ source, appId: app.id });
-          });
-        }
-
-        return sources;
-      }, []),
-    [],
-  );
-
   function showContent(key: string) {
     const correctKey = ['all', key].includes(p.activeTab);
     if (UserService.state.auth?.primaryPlatform === 'tiktok' && key === 'widgets') return false;
@@ -97,9 +85,17 @@ export default function SourceGrid(p: { activeTab: string }) {
     UserService.showLogin();
   }
 
+  function filterEssential(source: IObsListOption<TSourceType> | string) {
+    if (p.activeTab !== 'all') return true;
+    if (typeof source === 'string') {
+      return !essentialSources.essentialWidgets.find(s => s === source);
+    }
+    return !essentialSources.essentialDefaults.find(s => s.value === source.value);
+  }
+
   return (
-    <Scrollable style={{ height: '100%' }}>
-      <Row gutter={[8, 8]}>
+    <Scrollable style={{ height: 'calc(100% - 64px)' }}>
+      <Row gutter={[8, 8]} style={{ marginLeft: '8px', marginRight: '8px' }}>
         {showContent('all') && (
           <>
             <Col span={24}>
@@ -123,7 +119,7 @@ export default function SourceGrid(p: { activeTab: string }) {
             <Col span={24}>
               <PageHeader title={$t('General Sources')} />
             </Col>
-            {availableSources.map(source => (
+            {availableSources.filter(filterEssential).map(source => (
               <SourceTag key={source.value} name={source.description} type={source.value} />
             ))}
             <SourceTag key="replay" name={$t('Instant Replay')} type="replay" />
@@ -147,7 +143,7 @@ export default function SourceGrid(p: { activeTab: string }) {
               </Empty>
             ) : (
               <>
-                {iterableWidgetTypes.map(widgetType => (
+                {iterableWidgetTypes.filter(filterEssential).map(widgetType => (
                   <SourceTag
                     key={widgetType}
                     name={WidgetDisplayData()[WidgetType[widgetType]].name}

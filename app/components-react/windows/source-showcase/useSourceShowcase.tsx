@@ -6,6 +6,7 @@ import { Services } from '../../service-provider';
 import { TPropertiesManager, TSourceType } from 'services/sources';
 import { WidgetType } from 'services/widgets';
 import { byOS, OS } from 'util/operating-systems';
+import { IAppSource } from 'services/platform-apps';
 
 interface ISelectSourceOptions {
   propertiesManager?: TPropertiesManager;
@@ -28,6 +29,24 @@ class SourceShowcaseModule {
 
   private get sourcesService() {
     return Services.SourcesService;
+  }
+
+  private get platformAppsService() {
+    return Services.PlatformAppsService;
+  }
+
+  get availableAppSources() {
+    return this.platformAppsService.views.enabledApps.reduce<
+      { source: IAppSource; appId: string }[]
+    >((sources, app) => {
+      if (app.manifest.sources) {
+        app.manifest.sources.forEach(source => {
+          sources.push({ source, appId: app.id });
+        });
+      }
+
+      return sources;
+    }, []);
   }
 
   @mutation()

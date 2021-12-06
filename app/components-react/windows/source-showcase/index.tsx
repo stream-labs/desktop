@@ -1,6 +1,5 @@
 import React, { useState, useMemo } from 'react';
 import { Layout, Menu } from 'antd';
-import cx from 'classnames';
 import { ModalLayout } from 'components-react/shared/ModalLayout';
 import { Services } from 'components-react/service-provider';
 import { useVuex } from 'components-react/hooks';
@@ -15,13 +14,17 @@ import SourceGrid from './SourceGrid';
 const { Content, Sider } = Layout;
 
 export default function SourcesShowcase() {
-  const { selectInspectedSource } = useSourceShowcaseSettings();
+  const { selectInspectedSource, availableAppSources } = useSourceShowcaseSettings();
 
   const [activeTab, setActiveTab] = useState('all');
 
   return (
-    <ModalLayout onOk={selectInspectedSource} okText={$t('Add Source')}>
-      <Layout style={{ height: 'calc(100% - 53px)' }}>
+    <ModalLayout
+      onOk={selectInspectedSource}
+      okText={$t('Add Source')}
+      bodyStyle={{ paddingBottom: 0, paddingTop: 0 }}
+    >
+      <Layout style={{ height: '100%' }}>
         <Content>
           <Menu
             onClick={e => setActiveTab(e.key)}
@@ -32,7 +35,7 @@ export default function SourcesShowcase() {
             <Menu.Item key="all">{$t('All')}</Menu.Item>
             <Menu.Item key="general">{$t('General')}</Menu.Item>
             <Menu.Item key="widgets">{$t('Widgets')}</Menu.Item>
-            <Menu.Item key="apps">{$t('Apps')}</Menu.Item>
+            {availableAppSources.length > 0 && <Menu.Item key="apps">{$t('Apps')}</Menu.Item>}
           </Menu>
           <SourceGrid activeTab={activeTab} />
         </Content>
@@ -79,25 +82,28 @@ function SideBar() {
     return $i(`source-demos/${demoMode}/${displayData?.demoFilename}`);
   }, [demoMode, displayData?.demoFilename]);
 
-  if (!displayData) return null;
-
   return (
-    <Sider width={300} style={{ marginRight: '-24px' }}>
+    <Sider
+      width={300}
+      style={{ marginRight: '-24px', height: '100%' }}
+      collapsed={!displayData}
+      collapsedWidth={0}
+    >
       <div className={styles.preview}>
-        {displayData.demoFilename && (
+        {displayData?.demoFilename && (
           <div className={styles.imageContainer}>
-            {displayData.demoVideo && (
+            {displayData?.demoVideo && (
               <video autoPlay loop key={previewSrc}>
                 <source src={previewSrc} />
               </video>
             )}
-            {!displayData.demoVideo && <img src={previewSrc} />}
+            {!displayData?.demoVideo && <img src={previewSrc} />}
           </div>
         )}
-        <div>{displayData.description}</div>
-        {displayData.supportList && <div className={styles.supportHeader}>{$t('Supports:')}</div>}
+        <div>{displayData?.description}</div>
+        {displayData?.supportList && <div className={styles.supportHeader}>{$t('Supports:')}</div>}
         <ul>
-          {displayData.supportList?.map(support => (
+          {displayData?.supportList?.map(support => (
             <li key={support}>{support}</li>
           ))}
         </ul>
