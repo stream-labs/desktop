@@ -213,6 +213,14 @@ export class FlexTvService
         },
       };
     }
+    if (resp !== 'ok') {
+      return {
+        success: false,
+        error: {
+          code: 'CREATING',
+        },
+      };
+    }
     return {
       success: true,
     };
