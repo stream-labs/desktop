@@ -159,30 +159,35 @@ class StreamSchedulerModule {
    */
   private async loadEvents() {
     this.reset();
-    try {
-      // load fb and yt events simultaneously
-      const [fbEvents, ytEvents] = await Promise.all([this.fetchFbEvents(), this.fetchYTBEvents()]);
-      this.setEvents([...fbEvents, ...ytEvents]);
-    } catch (e: unknown) {
-      this.setEvents([]);
-      message.error($t('Failed to load events'));
-    }
+    // load fb and yt events simultaneously
+    const [fbEvents, ytEvents] = await Promise.all([this.fetchFbEvents(), this.fetchYTBEvents()]);
+    this.setEvents([...fbEvents, ...ytEvents]);
   }
 
   private async fetchYTBEvents() {
     if (!this.platforms.includes('youtube')) return [];
     const ytActions = Services.YoutubeService.actions;
-    await ytActions.return.prepopulateInfo();
-    const broadcasts = await ytActions.return.fetchBroadcasts();
-    return broadcasts.map(broadcast => convertYTBroadcastToEvent(broadcast));
+    try {
+      await ytActions.return.prepopulateInfo();
+      const broadcasts = await ytActions.return.fetchBroadcasts();
+      return broadcasts.map(broadcast => convertYTBroadcastToEvent(broadcast));
+    } catch (e: unknown) {
+      message.error($t('Failed to load YouTube events'));
+      return [];
+    }
   }
 
   private async fetchFbEvents() {
     if (!this.platforms.includes('facebook')) return [];
     const fbActions = Services.FacebookService.actions;
-    await fbActions.return.prepopulateInfo();
-    const liveVideos = await fbActions.return.fetchAllVideos();
-    return liveVideos.map(video => convertFBLiveVideoToEvent(video));
+    try {
+      await fbActions.return.prepopulateInfo();
+      const liveVideos = await fbActions.return.fetchAllVideos();
+      return liveVideos.map(video => convertFBLiveVideoToEvent(video));
+    } catch (e: unknown) {
+      message.error($t('Failed to load Facebook events'));
+      return [];
+    }
   }
 
   /**
