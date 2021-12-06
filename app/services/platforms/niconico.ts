@@ -82,7 +82,7 @@ export class NiconicoService extends Service implements IPlatformService {
   isPremium(token: string): Promise<boolean> {
     const url = `${this.hostsService.niconicoOAuth}/v1/user/premium.json`;
     const headers = authorizedHeaders(token);
-    const request = new Request(url, { headers });
+    const request = new Request(this.hostsService.replaceHost(url), { headers });
     return fetch(request)
       .then(res => res.json())
       .then(({ data }) => {
@@ -92,10 +92,12 @@ export class NiconicoService extends Service implements IPlatformService {
 
   logout(): Promise<void> {
     const url = `${this.hostsService.niconicoAccount}/logout`;
-    const request = new Request(url, { credentials: 'same-origin' });
+    const request = new Request(this.hostsService.replaceHost(url), { credentials: 'same-origin' });
     return fetch(request)
       .then(handleErrors)
-      .then(() => {});
+      .then(() => {
+        // nothing to do
+      });
   }
 
   get authUrl() {

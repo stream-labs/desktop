@@ -1,20 +1,28 @@
 /* eslint-disable prettier/prettier */
-const CircularDependencyPlugin = require('circular-dependency-plugin');
-const VueLoaderPlugin = require('vue-loader/lib/plugin');
+const { VueLoaderPlugin } = require('vue-loader');
+const { WebpackManifestPlugin } = require('webpack-manifest-plugin');
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 
 const path = require('path');
 const TerserPlugin = require('terser-webpack-plugin');
 
-const plugins = [new VueLoaderPlugin()];
+const plugins = [];
 
-// uncomment to watch circular dependencies
+/*
+plugins.push(
+  new WebpackManifestPlugin({
+    basePath: 'bundles/',
+    filter: file =>
+      ['renderer.js', 'vendors~renderer.js', 'renderer.js.map', 'vendors~renderer.js.map'].includes(
+        file.name,
+      ),
+  }),
+);
+*/
 
-// plugins.push(new CircularDependencyPlugin({
-//   // exclude detection of files based on a RegExp
-//   exclude: /a\.js|node_modules/,
-//   // add errors to webpack instead of warnings
-//   //failOnError: true
-// }));
+// plugins.push(new CleanWebpackPlugin());
+
+plugins.push(new VueLoaderPlugin());
 
 module.exports = {
   entry: {
@@ -24,9 +32,29 @@ module.exports = {
   output: {
     path: `${__dirname}/bundles`,
     filename: '[name].js',
+    publicPath: '/bundles/',
   },
 
-  devtool: 'source-map',
+  devServer: {
+    static: {
+      directory: __dirname,
+      publicPath: '/',
+    },
+    proxy: {
+      '/account': {
+        target: 'https://account.nicovideo.jp',
+        changeOrigin: true,
+        pathRewrite: { '^/account': '' },
+      },
+      '/oauth': {
+        target: 'https://oauth.nicovideo.jp',
+        changeOrigin: true,
+        pathRewrite: { '^/oauth': '' },
+      },
+    },
+  },
+
+  devtool: 'cheap-module-source-map', // source-map',
 
   target: 'electron-renderer',
 
@@ -47,7 +75,6 @@ module.exports = {
     'node-fontinfo': 'require("node-fontinfo")',
     'socket.io-client': 'require("socket.io-client")',
     'rimraf': 'require("rimraf")',
-    'backtrace-js': 'require("backtrace-js")',
     'request': 'require("request")',
   },
 
@@ -131,6 +158,11 @@ module.exports = {
   },
 
   optimization: {
+    splitChunks: {
+      chunks: chunk => chunk.name === 'renderer',
+      name: 'vendors~renderer',
+    },
+    chunkIds: 'named',
     minimizer: [new TerserPlugin({ sourceMap: true, terserOptions: { mangle: false } })],
   },
 

@@ -5,6 +5,20 @@ import Util from 'services/utils';
 // we should allow overriding this value. But for now we
 // are just keeping the value in one place.
 export class HostsService extends Service {
+  useDevServer: boolean = !!process.env.DEV_SERVER;
+  replaceHost(url: string) {
+    if (this.useDevServer) {
+      if (url.startsWith(this.niconicoAccount)) {
+        return url.replace(this.niconicoAccount, 'http://localhost:8080/account');
+      }
+      if (url.startsWith(this.niconicoOAuth)) {
+        return url.replace(this.niconicoOAuth, 'http://localhost:8080/oauth');
+      }
+      return url;
+    } else {
+      return url;
+    }
+  }
   get niconicoAccount() {
     return 'https://account.nicovideo.jp';
   }

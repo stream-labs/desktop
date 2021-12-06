@@ -147,7 +147,7 @@ if (!gotTheLock) {
   let shutdownStarted = false;
   let appShutdownTimeout;
 
-  global.indexUrl = `file://${__dirname}/index.html`;
+  global.indexUrl = process.env.DEV_SERVER || `file://${__dirname}/index.html`;
 
   function openDevTools() {
     childWindow.webContents.openDevTools({ mode: 'undocked' });
@@ -157,12 +157,14 @@ if (!gotTheLock) {
   function startApp() {
     const isDevMode = process.env.NODE_ENV !== 'production' && process.env.NODE_ENV !== 'test';
 
-    crashHandler.startCrashHandler(
-      app.getAppPath(),
-      process.env.NAIR_VERSION,
-      isDevMode.toString(),
-    );
-    crashHandler.registerProcess(pid, false);
+    if (!process.env.DEV_SERVER) {
+      crashHandler.startCrashHandler(
+        app.getAppPath(),
+        process.env.NAIR_VERSION,
+        isDevMode.toString(),
+      );
+      crashHandler.registerProcess(pid, false);
+    }
 
     const Raven = require('raven-js');
 
@@ -304,6 +306,11 @@ if (!gotTheLock) {
         e.preventDefault();
       }
     });
+
+    const { default: installExtension, VUEJS_DEVTOOLS } = require('electron-devtools-installer');
+    installExtension(VUEJS_DEVTOOLS)
+      .then(name => console.log(name))
+      .catch(err => console.log(err));
 
     if (process.env.NAIR_PRODUCTION_DEBUG) openDevTools();
 
