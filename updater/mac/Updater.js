@@ -43,14 +43,6 @@ class Updater {
       this.updateState.version = info.version;
       this.updateState.percent = 0;
       this.pushState();
-
-      dialog.showMessageBoxSync(null, {
-        title: 'Streamlabs Desktop',
-        message: 'Streamlabs OBS is now Streamlabs Desktop',
-        detail:
-          'After the update, Streamlabs OBS will be renamed to Streamlabs Desktop. If you had Streamlabs OBS pinned to your dock, your old dock icon will stop working and you will need to pin it again. The app may need to be manually launched after the update.',
-        type: 'warning',
-      });
     });
 
     autoUpdater.on('update-not-available', () => {
