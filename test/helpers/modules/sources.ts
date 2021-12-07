@@ -50,7 +50,7 @@ export async function addSource(
   await focusChild();
 
   await waitForDisplayed('span=Essential Sources');
-  await click(`[data-name=${type}]`);
+  await click(`[data-name="${type}"]`);
 
   await clickButton('Add Source');
   const isInputVisible = await isDisplayed('input', { timeout: 200, interval: 100 });
