@@ -588,7 +588,7 @@ app.on('ready', () => {
 
       bootstrap(updateInfo, startApp, app.exit);
     } else {
-      new Updater(startApp).run();
+      new Updater(startApp, releaseChannel).run();
     }
   } else {
     startApp();

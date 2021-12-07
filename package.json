@@ -19,7 +19,7 @@
     "start": "electron .",
     "clear-plugins": "rimraf plugins",
     "package": "yarn generate-agreement && rimraf dist && electron-builder build -w --x64 --config electron-builder/base.config.js",
-    "package:mac": "yarn generate-agreement:mac && rimraf dist && electron-builder build -m --x64 --config electron-builder/base.config.js",
+    "package:mac": "yarn generate-agreement:mac && rimraf dist && electron-builder build -m --x64 --config electron-builder/mac.config.js",
     "package:preview": "yarn generate-agreement && rimraf dist && electron-builder build -w --x64 --config electron-builder/preview.config.js",
     "eslint": "eslint \"{app,guest-api,obs-api,updater}/**/*.ts\" main.js",
     "test": "tsc -p test && ava -v --timeout=3m ./test-dist/test/regular/**/*.js",
