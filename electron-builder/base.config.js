@@ -98,17 +98,17 @@ const base = {
   },
   dmg: {
     background: 'media/images/dmg-bg.png',
-    iconSize: 100,
+    iconSize: 85,
     contents: [
       {
-        x: 112,
-        y: 165,
+        x: 130,
+        y: 208,
       },
       {
         type: 'link',
         path: '/Applications',
-        x: 396,
-        y: 165,
+        x: 380,
+        y: 208,
       },
     ],
   },
