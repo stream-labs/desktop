@@ -105,10 +105,10 @@ export default class SourceSelector extends TsxComponent {
         .getSource(sourceId)
         .getPropertiesManagerSettings().widgetType;
 
-      return WidgetDisplayData()[widgetType].icon || 'icon-error';
+      return WidgetDisplayData()[widgetType]?.icon || 'icon-error';
     }
 
-    return SourceDisplayData()[source.type].icon;
+    return SourceDisplayData()[source.type]?.icon || 'fas fa-file';
   }
 
   addSource() {

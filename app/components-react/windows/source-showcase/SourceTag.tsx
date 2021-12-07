@@ -37,6 +37,7 @@ export default function SourceTag(p: {
         })}
         onClick={() => inspectSource(p.type, p.appId, p.appSourceId)}
         onDoubleClick={() => selectInspectedSource()}
+        data-name={p.name}
       >
         <i className={displayData?.icon} />
         {p.name}
