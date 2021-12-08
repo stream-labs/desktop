@@ -13,7 +13,6 @@ import InstalledApps from 'components/InstalledApps.vue';
 import Hotkeys from './Hotkeys.vue';
 import OverlaySettings from './OverlaySettings';
 import NotificationsSettings from './NotificationsSettings.vue';
-import ExperimentalSettings from './ExperimentalSettings.vue';
 import RemoteControlSettings from './RemoteControlSettings.vue';
 import GameOverlaySettings from './GameOverlaySettings';
 import SearchablePages from 'components/shared/SearchablePages';
@@ -39,7 +38,6 @@ import { debounce } from 'lodash-decorators';
     OverlaySettings,
     NotificationsSettings,
     RemoteControlSettings,
-    ExperimentalSettings,
     InstalledApps,
     GameOverlaySettings,
     FormInput,
@@ -140,6 +138,7 @@ export default class Settings extends Vue {
       // 'RemoteControl',
       // 'VirtualWebcam',
       // 'GameOverlay'
+      'Experimental',
     ];
   }
 

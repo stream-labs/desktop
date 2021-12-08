@@ -11,3 +11,4 @@ export * from './Appearance';
 // 'RemoteControl',
 // 'VirtualWebcam',
 // 'GameOverlay'
+export * from './Experimental';
