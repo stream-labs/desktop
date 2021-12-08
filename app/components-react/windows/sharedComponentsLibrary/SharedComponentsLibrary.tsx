@@ -115,6 +115,7 @@ function Examples() {
           {...bind.textVal}
         />
         <TextInput label="Debounced" debounce={500} {...globalProps} {...bind.textVal} />
+        <TextInput label="Password" isPassword {...globalProps} {...bind.textVal} />
         <TextInput
           label="With addons"
           addonBefore="http://"
