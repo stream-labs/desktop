@@ -18,7 +18,6 @@ import RemoteControlSettings from './RemoteControlSettings.vue';
 import GameOverlaySettings from './GameOverlaySettings';
 import SearchablePages from 'components/shared/SearchablePages';
 import FormInput from 'components/shared/inputs/FormInput.vue';
-import StreamSettings from './StreamSettings';
 import VirtualWebcamSettings from './VirtualWebcamSettings';
 import { MagicLinkService } from 'services/magic-link';
 import { UserService } from 'services/user';
@@ -43,7 +42,6 @@ import { debounce } from 'lodash-decorators';
     InstalledApps,
     GameOverlaySettings,
     FormInput,
-    StreamSettings,
     VirtualWebcamSettings,
     Scrollable,
     PlatformLogo,
