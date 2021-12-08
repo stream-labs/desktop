@@ -128,7 +128,7 @@ export default class Settings extends Vue {
   get reactPages() {
     return [
       'General',
-      // 'Stream',
+      'Stream',
       // 'Output',
       // 'Audio',
       // 'Video',

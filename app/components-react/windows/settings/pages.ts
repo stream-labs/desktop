@@ -1,5 +1,5 @@
 export * from './General';
-// 'Stream',
+export * from './Stream';
 // 'Output',
 // 'Audio',
 // 'Video',
