@@ -512,7 +512,7 @@ export class HighlighterService extends StatefulService<IHighligherState> {
               type: ENotificationType.SUCCESS,
               lifeTime: -1,
               message: $t(
-                'Edit your replays with Highlighter, a free editor built in to Streamlabs OBS.',
+                'Edit your replays with Highlighter, a free editor built in to Streamlabs.',
               ),
               action: this.jsonrpcService.createRequest(
                 Service.getResourceId(this),

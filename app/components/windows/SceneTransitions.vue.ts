@@ -115,7 +115,7 @@ export default class SceneTransitions extends Vue {
   deleteTransition(id: string) {
     if (this.transitionsService.state.transitions.length === 1) {
       remote.dialog.showMessageBox({
-        title: 'Streamlabs OBS',
+        title: 'Streamlabs Desktop',
         message: $t('You need at least 1 transition.'),
       });
       return;

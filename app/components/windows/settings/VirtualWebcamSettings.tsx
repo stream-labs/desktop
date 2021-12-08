@@ -162,7 +162,7 @@ export default class AppearanceSettings extends Vue {
             <b>{$t('This is an experimental feature.')}</b>
             <p>
               {$t(
-                'Virtual Webcam allows you to display your scenes from Streamlabs OBS in video conferencing software. Streamlabs OBS will appear as a Webcam that can be selected in most video conferencing apps.',
+                'Virtual Webcam allows you to display your scenes from Streamlabs Desktop in video conferencing software. Streamlabs Desktop will appear as a Webcam that can be selected in most video conferencing apps.',
               )}
             </p>
           </div>

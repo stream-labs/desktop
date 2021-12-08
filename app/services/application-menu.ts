@@ -35,7 +35,7 @@ export class ApplicationMenuService extends Service {
     // TODO: i18n
     return remote.Menu.buildFromTemplate([
       {
-        label: 'Streamlabs OBS',
+        label: 'Streamlabs Desktop',
         submenu: [
           { role: 'about' },
           {
@@ -198,7 +198,7 @@ export class ApplicationMenuService extends Service {
         role: 'help',
         submenu: [
           {
-            label: 'Streamlabs OBS Support',
+            label: 'Streamlabs Desktop Support',
             click: () => {
               remote.shell.openExternal('https://support.streamlabs.com');
             },

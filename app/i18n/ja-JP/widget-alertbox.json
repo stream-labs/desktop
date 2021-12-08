@@ -150,5 +150,9 @@
   "YouTube Membership": "YouTube Membership",
   "Plays an alert for new YouTube Memberships": "Plays an alert for new YouTube Memberships",
   "Plays an alert when another streamer hosts your channel": "Plays an alert when another streamer hosts your channel",
-  "Plays an alert when a viewer sends a tip/donation": "Plays an alert when a viewer sends a tip/donation"
+  "Plays an alert when a viewer sends a tip/donation": "Plays an alert when a viewer sends a tip/donation",
+  "This applies to all alerts. If enabled all alerts need to be approved manually.": "This applies to all alerts. If enabled all alerts need to be approved manually.",
+  "Use unlimited delay": "Use unlimited delay",
+  "When enabled new alerts will interrupt the on screen alert": "When enabled new alerts will interrupt the on screen alert",
+  "Text Highlight Color": "テキストハイライトカラー"
 }

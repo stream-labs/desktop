@@ -205,7 +205,7 @@ export class ChatService extends Service {
             .showMessageBox(Utils.getMainWindow(), {
               title: $t('YouTube Chat'),
               message: $t(
-                'This action cannot be performed inside Streamlabs OBS. To interact with chat, you can open this chat in a web browser.',
+                'This action cannot be performed inside Streamlabs Desktop. To interact with chat, you can open this chat in a web browser.',
               ),
               buttons: [$t('OK'), $t('Open In Web Browser')],
             })

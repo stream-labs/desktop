@@ -95,7 +95,7 @@ export default class EditableSceneCollection extends Vue {
   remove() {
     remote.dialog
       .showMessageBox(remote.getCurrentWindow(), {
-        title: 'Streamlabs OBS',
+        title: 'Streamlabs Desktop',
         type: 'warning',
         message: $t('Are you sure you want to remove %{collectionName}?', {
           collectionName: this.collection.name,

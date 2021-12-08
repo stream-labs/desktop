@@ -197,7 +197,7 @@ export default class StreamSettings extends TsxComponent {
           <div class="section section--warning">
             <b>{$t('Warning')}: </b>
             {$t(
-              'Streaming to a custom ingest is advanced functionality. Some features of Streamlabs OBS may stop working as expected',
+              'Streaming to a custom ingest is advanced functionality. Some features may stop working as expected',
             )}
             <br />
             <br />
@@ -265,7 +265,7 @@ export default class StreamSettings extends TsxComponent {
           {shouldShowPrimaryBtn && (
             <span
               vTooltip={$t(
-                'You cannot unlink the platform you used to sign in to Streamlabs OBS. If you want to unlink this platform, please sign in with a different platform.',
+                'You cannot unlink the platform you used to sign in to Streamlabs Desktop. If you want to unlink this platform, please sign in with a different platform.',
               )}
             >
               <button disabled={true} class={cx('button button--action', styles.platformButton)}>

@@ -2,7 +2,7 @@
 // be required by the main electron process.
 
 const { autoUpdater } = require('electron-updater');
-const { app, BrowserWindow, ipcMain } = require('electron');
+const { app, BrowserWindow, ipcMain, dialog } = require('electron');
 
 class Updater {
   // startApp is a callback that will start the app.  Ideally this
@@ -12,14 +12,18 @@ class Updater {
   // the auto updater.  Pre-initializing the mainWindow is now a
   // good option either, since then closing the auto updater will
   // orphan the main process in the background.
-  constructor(startApp) {
+  constructor(startApp, channel) {
     this.startApp = startApp;
+    this.channel = channel;
   }
 
   run() {
     this.updateState = {};
 
     this.bindListeners();
+
+    // Redirect to new channel for Streamlabs Desktop
+    autoUpdater.channel = `desktop-${this.channel}`;
 
     autoUpdater.checkForUpdates().catch(() => {
       // This usually means there is no internet connection.
@@ -39,6 +43,14 @@ class Updater {
       this.updateState.version = info.version;
       this.updateState.percent = 0;
       this.pushState();
+
+      dialog.showMessageBoxSync(null, {
+        title: 'Streamlabs Desktop',
+        message: 'Streamlabs OBS is now Streamlabs Desktop',
+        detail:
+          'After the update, Streamlabs OBS will be renamed to Streamlabs Desktop. If you had Streamlabs OBS pinned to your dock, your old dock icon will stop working and you will need to pin it again. The app may need to be manually launched after the update.',
+        type: 'warning',
+      });
     });
 
     autoUpdater.on('update-not-available', () => {
@@ -85,6 +97,7 @@ class Updater {
       resizable: false,
       show: false,
       webPreferences: { nodeIntegration: true, enableRemoteModule: true, contextIsolation: false },
+      backgroundColor: '#17242d',
     });
 
     browserWindow.on('ready-to-show', () => {
