@@ -14,6 +14,7 @@ import { StreamingService } from './streaming';
 import { GuestApiHandler } from 'util/guest-api-handler';
 import { ChatHighlightService, IChatHighlightMessage } from './widgets/settings/chat-highlight';
 import { assertIsDefined } from 'util/properties-type-guards';
+import * as remote from '@electron/remote';
 import { SourcesService } from 'app-services';
 
 export function enableBTTVEmotesScript(isDarkTheme: boolean) {
@@ -109,7 +110,7 @@ export class ChatService extends Service {
   async mountChat(electronWindowId: number) {
     if (!this.chatView) this.initChat();
     this.electronWindowId = electronWindowId;
-    const win = electron.remote.BrowserWindow.fromId(electronWindowId);
+    const win = remote.BrowserWindow.fromId(electronWindowId);
     if (this.chatView && win) win.addBrowserView(this.chatView);
   }
 
@@ -126,7 +127,7 @@ export class ChatService extends Service {
 
   unmountChat() {
     if (!this.electronWindowId) return; // already unmounted
-    const win = electron.remote.BrowserWindow.fromId(this.electronWindowId);
+    const win = remote.BrowserWindow.fromId(this.electronWindowId);
     if (this.chatView && win) win.removeBrowserView(this.chatView);
     this.electronWindowId = null;
   }
@@ -137,15 +138,16 @@ export class ChatService extends Service {
 
     const partition = this.userService.state.auth?.partition;
 
-    this.chatView = new electron.remote.BrowserView({
+    this.chatView = new remote.BrowserView({
       webPreferences: {
         partition,
         nodeIntegration: false,
-        enableRemoteModule: true,
         contextIsolation: true,
-        preload: path.resolve(electron.remote.app.getAppPath(), 'bundles', 'guest-api'),
+        preload: path.resolve(remote.app.getAppPath(), 'bundles', 'guest-api'),
       },
     });
+
+    electron.ipcRenderer.sendSync('webContents-enableRemote', this.chatView.webContents.id);
 
     this.bindWindowListener();
     this.bindDomReadyListener();
@@ -199,7 +201,7 @@ export class ChatService extends Service {
         const parsed = url.parse(targetUrl);
 
         if (parsed.hostname === 'accounts.google.com') {
-          electron.remote.dialog
+          remote.dialog
             .showMessageBox(Utils.getMainWindow(), {
               title: $t('YouTube Chat'),
               message: $t(
@@ -209,7 +211,7 @@ export class ChatService extends Service {
             })
             .then(({ response }) => {
               if (response === 1) {
-                electron.remote.shell.openExternal(this.chatUrl);
+                remote.shell.openExternal(this.chatUrl);
               }
             });
         }
@@ -240,7 +242,7 @@ export class ChatService extends Service {
             'ffz-settings',
           );
         } else {
-          electron.remote.shell.openExternal(targetUrl);
+          remote.shell.openExternal(targetUrl);
         }
       }
     });

@@ -1,7 +1,7 @@
 import { BaseInput } from './BaseInput';
 import { Component, Prop } from 'vue-property-decorator';
 import { IFileMetadata } from './index';
-import electron from 'electron';
+import * as remote from '@electron/remote';
 
 @Component({})
 export default class FileInput extends BaseInput<string, IFileMetadata> {
@@ -17,7 +17,7 @@ export default class FileInput extends BaseInput<string, IFileMetadata> {
         properties: [],
       };
 
-      const { filePath } = await electron.remote.dialog.showSaveDialog(options);
+      const { filePath } = await remote.dialog.showSaveDialog(options);
 
       if (filePath) this.emitInput(filePath);
     } else {
@@ -33,7 +33,7 @@ export default class FileInput extends BaseInput<string, IFileMetadata> {
         options.properties.push('openFile');
       }
 
-      const { filePaths } = await electron.remote.dialog.showOpenDialog(options);
+      const { filePaths } = await remote.dialog.showOpenDialog(options);
 
       if (filePaths[0]) {
         this.emitInput(filePaths[0]);

@@ -32,6 +32,7 @@ const {
 } = require('electron');
 const path = require('path');
 const rimraf = require('rimraf');
+const remote = require('@electron/remote/main');
 
 // Game overlay is Windows only
 let overlay;
@@ -70,9 +71,6 @@ app.commandLine.appendSwitch(
 );
 
 process.env.IPC_UUID = `slobs-${uuid()}`;
-
-// Remove this when all backend module are on NAPI
-app.allowRendererProcessReuse = false;
 
 /* Determine the current release channel we're
  * on based on name. The channel will always be
@@ -282,6 +280,8 @@ async function startApp() {
     crashHandler.unregisterProcess(arg.pid);
   });
 
+  remote.initialize();
+
   const Raven = require('raven');
 
   function handleFinishedReport() {
@@ -316,8 +316,10 @@ async function startApp() {
 
   workerWindow = new BrowserWindow({
     show: false,
-    webPreferences: { nodeIntegration: true, enableRemoteModule: true, contextIsolation: false },
+    webPreferences: { nodeIntegration: true, contextIsolation: false },
   });
+
+  remote.enable(workerWindow.webContents);
 
   // setTimeout(() => {
   workerWindow.loadURL(`${global.indexUrl}?windowId=worker`);
@@ -351,10 +353,11 @@ async function startApp() {
     webPreferences: {
       nodeIntegration: true,
       webviewTag: true,
-      enableRemoteModule: true,
       contextIsolation: false,
     },
   });
+
+  remote.enable(mainWindow.webContents);
 
   // setTimeout(() => {
   mainWindow.loadURL(`${global.indexUrl}?windowId=main`);
@@ -423,11 +426,12 @@ async function startApp() {
     backgroundColor: '#17242D',
     webPreferences: {
       nodeIntegration: true,
-      enableRemoteModule: true,
       backgroundThrottling: false,
       contextIsolation: false,
     },
   });
+
+  remote.enable(childWindow.webContents);
 
   childWindow.removeMenu();
 
@@ -723,6 +727,17 @@ ipcMain.on('webContents-bindYTChat', (e, id) => {
       e.preventDefault();
     }
   });
+});
+
+ipcMain.on('webContents-enableRemote', (e, id) => {
+  const contents = webContents.fromId(id);
+
+  if (contents.isDestroyed()) return;
+
+  remote.enable(contents);
+
+  // Needed otherwise the renderer will lock up
+  e.returnValue = null;
 });
 
 ipcMain.on('getMainWindowWebContentsId', e => {

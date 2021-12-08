@@ -4,10 +4,11 @@ import { useVuex } from '../hooks';
 import { Services } from '../service-provider';
 import { byOS, OS } from '../../util/operating-systems';
 import { $t } from '../../services/i18n';
-import { ipcRenderer, remote } from 'electron';
+import { ipcRenderer } from 'electron';
 import Utils from '../../services/utils';
 import KevinSvg from './KevinSvg';
 import styles from './TitleBar.m.less';
+import * as remote from '@electron/remote';
 
 export default function TitleBar(props: { windowId: string }) {
   const { CustomizationService, StreamingService, WindowsService } = Services;

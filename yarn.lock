@@ -1366,6 +1366,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@electron/remote@npm:^2.0.1":
+  version: 2.0.1
+  resolution: "@electron/remote@npm:2.0.1"
+  peerDependencies:
+    electron: ">= 10.0.0-beta.1"
+  checksum: 0d363d8c41d21041b0ba294f538bb7cabf6e7cc7719910634be4bc3318f090a0acdcf079c90199f2a739418ef72664bf97eb260ec81053f48464cb5dd1871e67
+  languageName: node
+  linkType: hard
+
 "@electron/universal@npm:1.0.5":
   version: 1.0.5
   resolution: "@electron/universal@npm:1.0.5"
@@ -5823,6 +5832,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"electron-chromedriver@npm:^14.0.0":
+  version: 14.0.0
+  resolution: "electron-chromedriver@npm:14.0.0"
+  dependencies:
+    "@electron/get": ^1.12.4
+    extract-zip: ^2.0.0
+  bin:
+    chromedriver: chromedriver.js
+  checksum: 3a29b6e3b359ffc12f1b580516631df584a5367c1231843a331009ce40f0a5ef98f897f8b74bdb9899494be89262b63b7a4205ccc2ea0d1424004ec975349046
+  languageName: node
+  linkType: hard
+
 "electron-devtools-installer@npm:3.1.1":
   version: 3.1.1
   resolution: "electron-devtools-installer@npm:3.1.1"
@@ -5915,16 +5936,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"electron@npm:13.4.0":
-  version: 13.4.0
-  resolution: "electron@npm:13.4.0"
+"electron@npm:14.2.1":
+  version: 14.2.1
+  resolution: "electron@npm:14.2.1"
   dependencies:
     "@electron/get": ^1.0.1
     "@types/node": ^14.6.2
     extract-zip: ^1.0.3
   bin:
     electron: cli.js
-  checksum: 49b3d6fa87cde088d84f1bb9089a7384aeb71e05ac6580adf827e43e642111db2087fa96814af42d7e03472a73b059caec0e51d37e90a4e3164e4db83f7558e4
+  checksum: 0fec7cade743e1f1d6a015d8d608ac685117068b772fff250310ed0b14fc194421a4e8d63dffd87a77af8ecd1cd645358de99e716c7f11b2c6bf1361a3e9d4bf
   languageName: node
   linkType: hard
 
@@ -13518,6 +13539,7 @@ __metadata:
     "@babel/core": 7.12.17
     "@babel/plugin-proposal-decorators": 7.12.13
     "@babel/preset-env": 7.12.17
+    "@electron/remote": ^2.0.1
     "@octokit/app": 3.0.2
     "@octokit/request": 4.1.1
     "@octokit/rest": 16.43.2
@@ -13568,8 +13590,9 @@ __metadata:
     css-element-queries: 1.2.3
     css-loader: 2.1.1
     dotenv: 8.2.0
-    electron: 13.4.0
+    electron: 14.2.1
     electron-builder: 22.14.5
+    electron-chromedriver: ^14.0.0
     electron-devtools-installer: 3.1.1
     electron-notarize: 1.0.0
     electron-react-devtools: ^0.5.3

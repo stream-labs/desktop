@@ -18,6 +18,7 @@ import { RestreamService } from 'services/restream';
 import { GuestApiHandler } from 'util/guest-api-handler';
 import TsxComponent, { createProps } from 'components/tsx-component';
 import { IDownloadProgress } from 'util/requests';
+import * as remote from '@electron/remote';
 
 class AlertboxLibraryProps {
   params: { id?: string } = {};
@@ -47,7 +48,7 @@ export default class AlertboxLibrary extends TsxComponent<AlertboxLibraryProps> 
       const protocol = urlLib.parse(url).protocol;
 
       if (protocol === 'http:' || protocol === 'https:') {
-        electron.remote.shell.openExternal(url);
+        remote.shell.openExternal(url);
       }
     });
   }

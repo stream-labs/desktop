@@ -1,6 +1,6 @@
 /// <reference path="../../../app/index.d.ts" />
 /// <reference path="../../../app/jsx.d.ts" />
-import avaTest, {afterEach, ExecutionContext} from 'ava';
+import avaTest, { afterEach, ExecutionContext } from 'ava';
 import { Application } from 'spectron';
 import { getApiClient } from '../api-client';
 import { DismissablesService } from 'services/dismissables';
@@ -12,11 +12,11 @@ import {
   removeFailedTestFromFile,
   saveFailedTestsToFile,
   saveTestStatsToFile,
-  testFn,
+  testFn, waitForElectronInstancesExist,
 } from './runner-utils';
 import { skipOnboarding } from '../modules/onboarding';
-import { focusChild, focusMain, waitForLoader } from '../modules/core';
-import {clearCollections} from "../modules/api/scenes";
+import { closeWindow, focusChild, focusMain, waitForLoader } from '../modules/core';
+import { clearCollections } from '../modules/api/scenes';
 export const test = testFn; // the overridden "test" function
 
 const path = require('path');
@@ -163,7 +163,10 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
     });
 
     if (options.beforeAppStartCb) await options.beforeAppStartCb(t);
-    await t.context.app.start();
+
+    // await t.context.app.start();
+    await app.startChromeDriver();
+    await app.createClient();
 
     // Disable CSS transitions while running tests to allow for eager test clicks
     const disableTransitionsCode = `
@@ -174,7 +177,9 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
       0; // Prevent returning a value that cannot be serialized
     `;
     await focusMain();
-    await t.context.app.webContents.executeJavaScript(disableTransitionsCode);
+
+    // await t.context.app.webContents.executeJavaScript(disableTransitionsCode);
+    app.client.execute(disableTransitionsCode);
     await focusMain();
 
     // Wait up to N seconds before giving up looking for an element.
@@ -195,7 +200,9 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
 
     // disable animations in the child window
     await focusChild();
-    await t.context.app.webContents.executeJavaScript(disableTransitionsCode);
+
+    // await t.context.app.webContents.executeJavaScript(disableTransitionsCode);
+    app.client.execute(disableTransitionsCode);
     await focusMain();
     appIsRunning = true;
 
@@ -204,7 +211,11 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
 
   stopAppFn = async function stopApp(t: TExecutionContext, clearCache = true) {
     try {
-      await app.stop();
+      await closeWindow('main');
+      await waitForElectronInstancesExist();
+
+
+      await app.chromeDriver.stop();
     } catch (e: unknown) {
       fail('Crash on shutdown');
       console.error(e);

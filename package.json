@@ -62,12 +62,14 @@
     "serial": true
   },
   "dependencies": {
+    "@electron/remote": "^2.0.1",
     "@reduxjs/toolkit": "^1.5.1",
     "abort-controller": "^3.0.0",
     "archiver": "2.1.1",
     "aws-sdk": "^2.344.0",
     "color-picker": "https://obs-studio-deployment.s3-us-west-2.amazonaws.com/color-picker-0.0.0.tar.gz",
     "crash-handler": "https://slobs-crash-handler.s3-us-west-2.amazonaws.com/crash-handler-0.0.0.tar.gz",
+    "electron-chromedriver": "^14.0.0",
     "electron-react-devtools": "^0.5.3",
     "electron-updater": "^4.2.0",
     "electron-window-state": "5.0.3",
@@ -145,7 +147,7 @@
     "css-element-queries": "1.2.3",
     "css-loader": "2.1.1",
     "dotenv": "8.2.0",
-    "electron": "13.4.0",
+    "electron": "14.2.1",
     "electron-builder": "22.14.5",
     "electron-devtools-installer": "3.1.1",
     "electron-notarize": "1.0.0",

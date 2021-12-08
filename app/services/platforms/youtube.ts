@@ -16,10 +16,10 @@ import { I18nService } from 'services/i18n';
 import { throwStreamError } from 'services/streaming/stream-error';
 import { BasePlatformService } from './base-platform';
 import { assertIsDefined, getDefined } from 'util/properties-type-guards';
-import electron from 'electron';
 import Utils from '../utils';
 import { YoutubeUploader } from './youtube/uploader';
 import { lazyModule } from 'util/lazy-module';
+import * as remote from '@electron/remote';
 
 interface IYoutubeServiceState extends IPlatformState {
   liveStreamingEnabled: boolean;
@@ -738,11 +738,11 @@ export class YoutubeService
   }
 
   openYoutubeEnable() {
-    electron.remote.shell.openExternal('https://youtube.com/live_dashboard_splash');
+    remote.shell.openExternal('https://youtube.com/live_dashboard_splash');
   }
 
   openDashboard() {
-    electron.remote.shell.openExternal(this.dashboardUrl);
+    remote.shell.openExternal(this.dashboardUrl);
   }
 
   get dashboardUrl(): string {

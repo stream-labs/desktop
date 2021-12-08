@@ -1,4 +1,3 @@
-import electron from 'electron';
 import Vue from 'vue';
 import { Component, Watch } from 'vue-property-decorator';
 import { Inject } from 'services/core/injector';
@@ -26,6 +25,7 @@ import Scrollable from 'components/shared/Scrollable';
 import { ObsSettings, PlatformLogo } from 'components/shared/ReactComponentList';
 import { $t } from 'services/i18n';
 import { debounce } from 'lodash-decorators';
+import * as remote from '@electron/remote';
 
 @Component({
   components: {
@@ -222,7 +222,7 @@ export default class Settings extends Vue {
 
   handleAuth() {
     if (this.userService.isLoggedIn) {
-      electron.remote.dialog
+      remote.dialog
         .showMessageBox({
           title: $t('Confirm'),
           message: $t('Are you sure you want to log out?'),

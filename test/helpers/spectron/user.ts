@@ -5,6 +5,8 @@ import { dialogDismiss } from './dialog';
 import { ExecutionContext } from 'ava';
 import { requestUtilsServer, USER_POOL_TOKEN } from './runner-utils';
 import {closeWindow, focusChild, focusMain, focusWindow} from '../modules/core';
+import {getApiClient} from "../api-client";
+import {UserService} from "../../../app/services/user";
 
 let user: ITestUser; // keep user's name if SLOBS is logged-in
 
@@ -129,7 +131,8 @@ export async function loginWithAuthInfo(
     hasRelogged: true,
   };
   await focusWindow('worker');
-  t.context.app.webContents.send('testing-fakeAuth', authInfo, isOnboardingTest);
+  const api = await getApiClient();
+  await api.getResource<UserService>('UserService').testingFakeAuth(authInfo, isOnboardingTest);
   await focusMain();
   if (!waitForUI) return true;
   return await isLoggedIn(t);
