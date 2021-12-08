@@ -7,23 +7,27 @@ import { mutation } from '../../store';
 
 class BaseElementModule {
   state = {
-    sizeWatcherCallbacks: [] as Function[],
     sizeWatcherInterval: 0,
   };
 
-  @mutation()
+  sizeWatcherCallbacks: Function[] = [];
+
   addSizeWatcher(cb: Function) {
-    this.state.sizeWatcherCallbacks = [...this.state.sizeWatcherCallbacks, cb];
+    this.sizeWatcherCallbacks.push(cb);
     if (this.state.sizeWatcherInterval) return;
-    this.state.sizeWatcherInterval = window.setInterval(() => {
-      this.state.sizeWatcherCallbacks.forEach(cb => cb());
-    }, 500);
+    this.setSizeWatcherInterval();
+  }
+
+  removeSizeWatcher(cb: Function) {
+    const idx = this.sizeWatcherCallbacks.findIndex(func => func === cb);
+    if (idx !== -1) this.sizeWatcherCallbacks.splice(idx, 1);
   }
 
   @mutation()
-  removeSizeWatcher(cb: Function) {
-    const idx = this.state.sizeWatcherCallbacks.findIndex(func => func === cb);
-    if (idx !== -1) this.state.sizeWatcherCallbacks.splice(idx, 1);
+  setSizeWatcherInterval() {
+    this.state.sizeWatcherInterval = window.setInterval(() => {
+      this.sizeWatcherCallbacks.forEach(cb => cb());
+    }, 500);
   }
 }
 

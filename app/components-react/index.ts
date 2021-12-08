@@ -32,6 +32,7 @@ import AdvancedAudio from './windows/advanced-audio';
 import { CustomCodeWindow } from './widgets/common/CustomCode';
 import SourceFilters from './windows/SourceFilters';
 import RecentEvents from './editor/elements/RecentEvents';
+import MiniFeed from './editor/elements/Minifeed';
 
 // list of React components to be used inside Vue components
 export const components = {
@@ -68,4 +69,5 @@ export const components = {
   AdvancedAudio,
   SourceFilters,
   RecentEvents,
+  MiniFeed: createRoot(MiniFeed),
 };
