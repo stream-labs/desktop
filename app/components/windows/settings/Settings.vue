@@ -81,7 +81,6 @@
             :highlightSearch="highlightSearch"
             :scanning="scanning"
           />
-          <stream-settings v-if="page === 'Stream'" />
           <developer-settings v-if="page === 'Developer'" />
           <installed-apps v-if="page === 'Installed Apps'" />
           <overlay-settings v-if="page === 'Scene Collections'" />

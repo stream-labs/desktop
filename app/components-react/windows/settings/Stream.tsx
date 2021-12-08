@@ -2,7 +2,6 @@ import React from 'react';
 import { useModule } from '../../hooks/useModule';
 import { $t } from '../../../services/i18n';
 import { ICustomStreamDestination } from '../../../services/settings/streaming';
-import { ISettingsSubCategory } from '../../../services/settings';
 import { EStreamingState } from '../../../services/streaming';
 import { getPlatformService, TPlatform } from '../../../services/platforms';
 import cloneDeep from 'lodash/cloneDeep';
@@ -12,12 +11,33 @@ import { ObsGenericSettingsForm } from './ObsSettings';
 import { mutation } from '../../store';
 import css from './Stream.m.less';
 import cx from 'classnames';
-import { Tooltip } from 'antd';
+import { Button, message, Tooltip } from 'antd';
 import PlatformLogo from '../../shared/PlatformLogo';
-import Form from '../../shared/inputs/Form';
+import Form, { useForm } from '../../shared/inputs/Form';
 import { createBinding, TextInput } from '../../shared/inputs';
+import { ButtonGroup } from '../../shared/ButtonGroup';
+import { FormInstance } from 'antd/lib/form';
 
+/**
+ * A Redux module for components in the StreamSetting window
+ */
 class StreamSettingsModule {
+  // DEFINE A STATE
+  state = {
+    // false = edit mode off
+    // true = add custom destination mode
+    // number = edit custom destination mode where number is the index of the destination
+    editCustomDestMode: false as boolean | number,
+
+    // form data
+    customDestForm: {
+      name: '',
+      url: '',
+      streamKey: '',
+      enabled: false,
+    } as ICustomStreamDestination,
+  };
+
   // INJECT SERVICES
 
   private get streamSettingsService() {
@@ -25,9 +45,6 @@ class StreamSettingsModule {
   }
   private get userService() {
     return Services.UserService;
-  }
-  private get restreamService() {
-    return Services.RestreamService;
   }
   private get navigationService() {
     return Services.NavigationService;
@@ -42,29 +59,47 @@ class StreamSettingsModule {
     return Services.MagicLinkService;
   }
 
-  // DEFINE A STATE
-  state = {
-    editCustomDestMode: false as boolean | number,
-    customDestForm: {
-      name: '',
-      url: '',
+  // DEFINE MUTATIONS
+
+  @mutation()
+  editCustomDest(ind: number) {
+    this.state.customDestForm = cloneDeep(this.customDestinations[ind]);
+    this.state.editCustomDestMode = ind;
+  }
+
+  @mutation()
+  addCustomDest() {
+    if (!this.userService.isPrime) {
+      this.magicLinkService.actions.linkToPrime('slobs-multistream');
+      return;
+    }
+    this.state.customDestForm = {
+      name: this.suggestCustomDestName(),
       streamKey: '',
+      url: '',
       enabled: false,
-    } as ICustomStreamDestination,
-  };
+    };
+    this.state.editCustomDestMode = true;
+  }
 
-  // private customDestModel: ICustomStreamDestination = {
-  //   name: '',
-  //   url: '',
-  //   streamKey: '',
-  //   enabled: false,
-  // };
+  @mutation()
+  removeCustomDest(ind: number) {
+    const destinations = cloneDeep(this.customDestinations);
+    destinations.splice(ind, 1);
+    this.streamSettingsService.setGoLiveSettings({ customDestinations: destinations });
+  }
 
-  // private customDestMetadata = formMetadata({
-  //   name: metadata.text({ title: $t('Name'), required: true, fullWidth: true }),
-  //   url: metadata.text({ title: 'URL', required: true, fullWidth: true }),
-  //   streamKey: metadata.text({ title: $t('Stream Key'), masked: true, fullWidth: true }),
-  // });
+  @mutation()
+  stopEditing() {
+    this.state.editCustomDestMode = false;
+  }
+
+  @mutation()
+  updateCustomDestForm(updatedFields: Partial<ICustomStreamDestination>) {
+    this.state.customDestForm = { ...this.state.customDestForm, ...updatedFields };
+  }
+
+  // DEFINE ACTIONS AND GETTERS
 
   get platforms() {
     return this.streamingView.allPlatforms.filter(platform => {
@@ -75,14 +110,6 @@ class StreamSettingsModule {
 
       return true;
     });
-  }
-
-  saveObsSettings(obsSettings: ISettingsSubCategory[]) {
-    this.streamSettingsService.setObsStreamSettings(obsSettings);
-  }
-
-  get obsSettings() {
-    return this.streamSettingsService.views.obsStreamSettings;
   }
 
   get isPrime() {
@@ -121,6 +148,11 @@ class StreamSettingsModule {
     return this.streamingView.savedSettings.customDestinations;
   }
 
+  private form: FormInstance;
+  setForm(form: FormInstance) {
+    this.form = form;
+  }
+
   platformMerge(platform: TPlatform) {
     this.navigationService.navigate('PlatformMerge', { platform });
     this.windowsService.actions.closeChildWindow();
@@ -130,30 +162,14 @@ class StreamSettingsModule {
     getPlatformService(platform).unlink();
   }
 
-  @mutation()
-  editCustomDest(ind: number) {
-    this.state.customDestForm = cloneDeep(this.customDestinations[ind]);
-    this.state.editCustomDestMode = ind;
-  }
-
-  addCustomDest() {
-    if (!this.userService.isPrime) {
-      this.magicLinkService.actions.linkToPrime('slobs-multistream');
+  async saveCustomDest() {
+    // validate form
+    try {
+      await this.form.validateFields();
+    } catch (e: unknown) {
+      message.error($t('Invalid settings. Please check the form'));
       return;
     }
-    this.state.customDestForm = {
-      name: this.suggestCustomDestName(),
-      streamKey: '',
-      url: '',
-      enabled: false,
-    };
-    this.state.editCustomDestMode = true;
-  }
-
-  @mutation()
-  private async saveCustomDest() {
-    // TODO: validate
-    // if (!(await this.$refs.customDestForm.validate())) return;
 
     // add "/" to the end of url string
     if (
@@ -172,7 +188,7 @@ class StreamSettingsModule {
       destinations.push(this.state.customDestForm);
     }
     this.streamSettingsService.setGoLiveSettings({ customDestinations: destinations });
-    this.state.editCustomDestMode = false;
+    this.stopEditing();
   }
 
   private suggestCustomDestName() {
@@ -181,18 +197,6 @@ class StreamSettingsModule {
       destinations.find(dest => dest.name === name),
     );
   }
-
-  @mutation()
-  removeCustomDest(ind: number) {
-    const destinations = cloneDeep(this.customDestinations);
-    destinations.splice(ind, 1);
-    this.streamSettingsService.setGoLiveSettings({ customDestinations: destinations });
-  }
-
-  @mutation()
-  cancelEditing() {
-    this.state.editCustomDestMode = false;
-  }
 }
 
 // wrap the module into a React hook
@@ -200,6 +204,9 @@ function useStreamSettings() {
   return useModule(StreamSettingsModule).select();
 }
 
+/**
+ * A root component for StreamSettings
+ */
 export function StreamSettings() {
   const {
     platforms,
@@ -261,6 +268,9 @@ export function StreamSettings() {
 
 StreamSettings.page = 'Stream';
 
+/**
+ * Renders a Platform placeholder
+ */
 function Platform(p: { platform: TPlatform }) {
   const platform = p.platform;
   const { UserService, StreamingService } = Services;
@@ -268,12 +278,6 @@ function Platform(p: { platform: TPlatform }) {
   const isMerged = StreamingService.views.checkPlatformLinked(platform);
   const username = UserService.state.auth!.platforms[platform]?.username;
   const platformName = getPlatformService(platform).displayName;
-  const buttonClass = {
-    facebook: 'button--facebook',
-    youtube: 'button--youtube',
-    twitch: 'button--twitch',
-    tiktok: 'button--tiktok',
-  }[platform];
   const isPrimary = StreamingService.views.checkPrimaryPlatform(platform);
   const shouldShowPrimaryBtn = isPrimary;
   const shouldShowConnectBtn = !isMerged && canEditSettings;
@@ -292,21 +296,18 @@ function Platform(p: { platform: TPlatform }) {
       <div style={{ marginLeft: 'auto' }}>
         {shouldShowConnectBtn && (
           <span>
-            <button
+            <Button
               onClick={() => platformMerge(platform)}
-              className={cx(`button ${buttonClass}`, css.platformButton)}
+              style={{ backgroundColor: `var(--${platform})`, borderColor: 'transparent' }}
             >
               {$t('Connect')}
-            </button>
+            </Button>
           </span>
         )}
         {shouldShowUnlinkBtn && (
-          <button
-            onClick={() => platformUnlink(platform)}
-            className={cx('button button--soft-warning', css.platformButton)}
-          >
+          <Button danger onClick={() => platformUnlink(platform)}>
             {$t('Unlink')}
-          </button>
+          </Button>
         )}
         {shouldShowPrimaryBtn && (
           <Tooltip
@@ -314,9 +315,9 @@ function Platform(p: { platform: TPlatform }) {
               'You cannot unlink the platform you used to sign in to Streamlabs OBS. If you want to unlink this platform, please sign in with a different platform.',
             )}
           >
-            <button disabled={true} className={cx('button button--action', css.platformButton)}>
+            <Button disabled={true} type="primary">
               {$t('Logged in')}
-            </button>
+            </Button>
           </Tooltip>
         )}
       </div>
@@ -324,6 +325,9 @@ function Platform(p: { platform: TPlatform }) {
   );
 }
 
+/**
+ * Renders a custom destinations list
+ */
 function CustomDestinationList() {
   const { isPrime, customDestinations, editCustomDestMode, addCustomDest } = useStreamSettings();
   const shouldShowPrimeLabel = !isPrime;
@@ -332,7 +336,7 @@ function CustomDestinationList() {
   const shouldShowAddForm = editCustomDestMode === true;
   const canAddMoreDestinations = destinations.length < 2;
   return (
-    <p>
+    <div>
       {destinations.map((dest, ind) => (
         <CustomDestination key={ind} ind={ind} destination={dest} />
       ))}
@@ -353,10 +357,13 @@ function CustomDestinationList() {
           <CustomDestForm />
         </div>
       )}
-    </p>
+    </div>
   );
 }
 
+/**
+ * Renders a single custom destination
+ */
 function CustomDestination(p: { destination: ICustomStreamDestination; ind: number }) {
   const { editCustomDestMode, removeCustomDest, editCustomDest } = useStreamSettings();
   const isEditMode = editCustomDestMode === p.ind;
@@ -392,23 +399,33 @@ function CustomDestination(p: { destination: ICustomStreamDestination; ind: numb
   );
 }
 
+/**
+ * Renders an ADD/EDIT form for the custom destination
+ */
 function CustomDestForm() {
-  const { saveCustomDest, cancelEditing } = useStreamSettings();
+  const {
+    saveCustomDest,
+    stopEditing,
+    customDestForm,
+    updateCustomDestForm,
+    setForm,
+  } = useStreamSettings();
+  const form = useForm();
+  setForm(form);
+  const bind = createBinding(customDestForm, updateCustomDestForm);
 
   return (
-    <Form ref="customDestForm">
-      <TextInput label={$t('Name')} required />
-      <TextInput label={$t('URL')} required />
-      <TextInput label={$t('Stream Key')} />
-
-      <p style={{ textAlign: 'right' }}>
-        <button className="button button--default" onClick={cancelEditing}>
-          {$t('Cancel')}
-        </button>
-        <button className="button button--action" onClick={saveCustomDest}>
+    <Form name="customDestForm">
+      <TextInput label={$t('Name')} required {...bind.name} />
+      <TextInput label={'URL'} required {...bind.url} />
+      {/* TODO: add masked input*/}
+      <TextInput label={$t('Stream Key')} {...bind.streamKey} />
+      <ButtonGroup>
+        <Button onClick={stopEditing}>{$t('Cancel')}</Button>
+        <Button type="primary" onClick={saveCustomDest}>
           {$t('Save')}
-        </button>
-      </p>
+        </Button>
+      </ButtonGroup>
     </Form>
   );
 }
