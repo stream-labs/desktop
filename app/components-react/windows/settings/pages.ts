@@ -8,6 +8,6 @@ export * from './Advanced';
 // 'SceneCollections',
 // 'Notifications',
 export * from './Appearance';
-// 'RemoteControl',
+export * from './RemoteControl';
 // 'VirtualWebcam',
 // 'GameOverlay'

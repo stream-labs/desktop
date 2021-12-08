@@ -87,7 +87,6 @@
           <overlay-settings v-if="page === 'Scene Collections'" />
           <notifications-settings v-if="page === 'Notifications'" />
           <experimental-settings v-if="page === 'Experimental'" />
-          <remote-control-settings v-if="page === 'Remote Control'" />
           <game-overlay-settings v-if="page === 'Game Overlay'" />
           <virtual-webcam-settings v-if="page === 'Virtual Webcam'" />
           <ObsSettings v-if="shouldShowReactPage" :componentProps="{ page: page }" />

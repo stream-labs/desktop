@@ -24,7 +24,7 @@ export const TextInput = InputComponent((p: TTextInputProps) => {
   const { inputAttrs, wrapperAttrs } = useTextInput('text', p, ANT_INPUT_FEATURES);
   return (
     <InputWrapper {...wrapperAttrs}>
-      <Input {...inputAttrs} onFocus={p.onFocus} onKeyDown={p.onKeyDown} ref={p.inputRef} />
+      <Input {...inputAttrs} readOnly onFocus={p.onFocus} onKeyDown={p.onKeyDown} ref={p.inputRef} />
     </InputWrapper>
   );
 });
