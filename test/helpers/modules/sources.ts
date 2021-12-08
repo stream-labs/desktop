@@ -68,11 +68,7 @@ export async function addSource(
 
   // Close source properties too
   if (closeProps) {
-    if (audioSource) {
-      await closeWindow('child');
-    } else {
-      await clickButton('Done');
-    }
+    await closeWindow('child');
   } else {
     await focusChild();
   }
