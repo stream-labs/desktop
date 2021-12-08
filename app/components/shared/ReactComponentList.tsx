@@ -110,6 +110,14 @@ export class IconLibraryProperties extends ReactComponent {}
 
 @Component({
   props: {
+    name: { default: 'MiniFeed' },
+    wrapperStyles: { default: () => ({ height: '100%' }) },
+  },
+})
+export class MiniFeed extends ReactComponent {}
+
+@Component({
+  props: {
     name: { default: 'NameFolder' },
     wrapperStyles: { default: () => ({ height: '100%' }) },
   },
@@ -161,26 +169,6 @@ export class PlatformLogo extends ReactComponent<{
   color?: string;
   unwrapped?: boolean;
 }> {}
-
-@Component({
-  props: {
-    name: { default: 'RecentEvents' },
-    wrapperStyles: {
-      default: () => ({
-        padding: '0 8px',
-        height: '100%',
-        flexShrink: 0,
-        position: 'relative',
-        display: 'flex',
-        flexDirection: 'column',
-        minWidth: 0,
-        flexGrow: 1,
-      }),
-    },
-    componentProps: { default: () => ({ isOverlay: false }) },
-  },
-})
-export class RecentEvents extends ReactComponent<{ isOverlay?: boolean }> {}
 
 @Component({
   props: {

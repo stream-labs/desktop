@@ -27,7 +27,11 @@ class BaseElementModule {
   }
 }
 
-export default function useBaseElement(element: React.ReactNode, mins: IVec2, ref: HTMLDivElement) {
+export default function useBaseElement(
+  element: React.ReactNode,
+  mins: IVec2,
+  ref: HTMLDivElement | null,
+) {
   const [belowMins, setBelowMins] = useState(false);
   const [height, setHeight] = useState(0);
   const [width, setWidth] = useState(0);
@@ -36,7 +40,7 @@ export default function useBaseElement(element: React.ReactNode, mins: IVec2, re
 
   useEffect(() => {
     const sizeWatcher = () => {
-      if (!ref.getBoundingClientRect) return;
+      if (!ref || !ref.getBoundingClientRect) return;
       setHeight(ref.getBoundingClientRect().height);
       setWidth(ref.getBoundingClientRect().width);
     };
@@ -57,7 +61,7 @@ export default function useBaseElement(element: React.ReactNode, mins: IVec2, re
     return belowMins ? <BelowMinWarning /> : element;
   }
 
-  return renderElement;
+  return { renderElement };
 }
 
 function BelowMinWarning() {
