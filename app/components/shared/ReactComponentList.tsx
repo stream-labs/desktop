@@ -165,7 +165,18 @@ export class PlatformLogo extends ReactComponent<{
 @Component({
   props: {
     name: { default: 'RecentEvents' },
-    wrapperStyles: { default: () => ({ height: '100%' }) },
+    wrapperStyles: {
+      default: () => ({
+        padding: '0 8px',
+        height: '100%',
+        flexShrink: 0,
+        position: 'relative',
+        display: 'flex',
+        flexDirection: 'column',
+        minWidth: 0,
+        flexGrow: 1,
+      }),
+    },
     componentProps: { default: () => ({ isOverlay: false }) },
   },
 })
