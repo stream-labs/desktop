@@ -49,26 +49,29 @@ export default function BrowserView(p: BrowserViewProps) {
     return opts;
   }, [p.options]);
 
-  const browserView = useRef<Electron.BrowserView | null>(new electron.remote.BrowserView(options));
+  const browserView = useRef<Electron.BrowserView>(new electron.remote.BrowserView(options));
 
   useEffect(() => {
-    if (browserView.current) {
-      p.onReady && p.onReady(browserView.current);
+    if (p.setLocale) I18nService.setBrowserViewLocale(browserView.current);
 
-      if (p.setLocale) I18nService.setBrowserViewLocale(browserView.current);
+    browserView.current.webContents.on('did-finish-load', () => setLoading(false));
+    electron.remote.getCurrentWindow().addBrowserView(browserView.current);
 
-      browserView.current.webContents.on('did-finish-load', () => setLoading(false));
-      electron.remote.getCurrentWindow().addBrowserView(browserView.current);
-    }
-    const resizeInterval = window.setInterval(checkResize, 100);
     const shutdownSubscription = AppService.shutdownStarted.subscribe(destroyBrowserView);
 
     return () => {
       destroyBrowserView();
-      clearInterval(resizeInterval);
       shutdownSubscription.unsubscribe();
     };
-  }, [browserView.current, loading]);
+  }, []);
+
+  useEffect(() => {
+    if (!loading && p.onReady) p.onReady(browserView.current);
+
+    const resizeInterval = window.setInterval(checkResize, 100);
+
+    return () => clearInterval(resizeInterval);
+  }, [loading]);
 
   useEffect(() => {
     loadUrl();
@@ -80,13 +83,13 @@ export default function BrowserView(p: BrowserViewProps) {
       // See: https://github.com/electron/electron/issues/26929
       // @ts-ignore
       browserView.current.webContents.destroy();
-      browserView.current = null;
     }
   }
 
   function checkResize() {
     if (loading) return;
     if (!sizeContainer.current) return;
+    if (!browserView.current) return;
 
     const rect: { left: number; top: number; width: number; height: number } =
       p.hidden || hideStyleBlockers
@@ -98,6 +101,7 @@ export default function BrowserView(p: BrowserViewProps) {
       currentSize = { x: rect.width, y: rect.height };
 
       if (currentPosition && currentSize && browserView.current) {
+        console.log('setting bounds');
         browserView.current.setBounds({
           x: Math.round(currentPosition.x),
           y: Math.round(currentPosition.y),
