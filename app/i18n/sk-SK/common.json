@@ -132,5 +132,12 @@
   "Apply": "Apply",
   "Do not show this message again": "Do not show this message again",
   "You can only select up to %{max} items": "You can only select up to %{max} items",
-  "Time": "Time"
+  "Time": "Time",
+  "Sound Volume": "Sound Volume",
+  "Sound": "Sound",
+  "Play Audio": "Play Audio",
+  "Click here": "Click here",
+  "More Info": "More Info",
+  "Revert Changes": "Revert Changes",
+  "Animations": "Animations"
 }

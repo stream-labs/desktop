@@ -18,7 +18,7 @@
   "Setup later": "Configurer plus tard",
   "Widget Theme installed & activated. Click here to manage your Widget Profiles.": "Thème de widget installé et activé. Cliquez ici pour gérer vos profils de widget.",
   "Alertbox Theme installed & activated. Click here to manage your Widget Profiles.": "Thème d’Alertbox installé et activé. Cliquez ici pour gérer vos profils de widget.",
-  "Follow": "Suivre",
+  "Follow": "Suivi",
   "Subscription": "Abonnement",
   "Donation": "Don",
   "Bits": "Bits",
@@ -179,5 +179,10 @@
   "Slide Out Left": "Glisser vers l’extérieur a gauche",
   "Slide Out Right": "Glisser vers l’extérieur a droite",
   "Slide Out Up": "Glisser vers l’extérieur en haut",
-  "Pick Screen Color": "Choisir la couleur de l'écran"
+  "Pick Screen Color": "Choisir la couleur de l'écran",
+  "Play Alert": "Play Alert",
+  "Browser Settings": "Browser Settings",
+  "Custom Code": "Custom Code",
+  "font_family_tooltip": "La police Google à utiliser pour le texte. Visitez https://fonts.google.com pour en trouver une ! Les polices populaires : Open Sans, Roboto, Oswald, Lato, Droid Sans.",
+  "Something went wrong while applying settings": "Something went wrong while applying settings"
 }

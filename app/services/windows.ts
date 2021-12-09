@@ -12,7 +12,6 @@ import { throttle } from 'lodash-decorators';
 import Main from 'components/windows/Main.vue';
 import Settings from 'components/windows/settings/Settings.vue';
 import FFZSettings from 'components/windows/FFZSettings.vue';
-import SourcesShowcase from 'components/windows/SourcesShowcase.vue';
 import SceneTransitions from 'components/windows/SceneTransitions.vue';
 import AddSource from 'components/windows/AddSource.vue';
 import NameScene from 'components/windows/NameScene.vue';
@@ -30,11 +29,11 @@ import {
   CustomCodeWindow,
   SafeMode,
   AdvancedAudio,
+  SourceShowcase,
+  SourceFilters,
 } from 'components/shared/ReactComponentList';
 
 import SourceProperties from 'components/windows/SourceProperties.vue';
-import SourceFilters from 'components/windows/SourceFilters.vue';
-import AddSourceFilter from 'components/windows/AddSourceFilter';
 import Notifications from 'components/windows/Notifications.vue';
 import Troubleshooter from 'components/windows/Troubleshooter.vue';
 import Blank from 'components/windows/Blank.vue';
@@ -92,7 +91,6 @@ export function getComponents() {
     Settings,
     FFZSettings,
     SceneTransitions,
-    SourcesShowcase,
     RenameSource,
     AddSource,
     NameScene,
@@ -100,7 +98,6 @@ export function getComponents() {
     SafeMode,
     SourceProperties,
     SourceFilters,
-    AddSourceFilter,
     Blank,
     AdvancedAudio,
     Notifications,
@@ -148,6 +145,7 @@ export function getComponents() {
     SharedComponentsLibrary,
     WidgetWindow,
     CustomCodeWindow,
+    SourceShowcase,
   };
 }
 
@@ -210,7 +208,7 @@ export class WindowsService extends StatefulService<IWindowsState> {
       scaleFactor: 1,
       isShown: true,
       hideStyleBlockers: true,
-      title: `Streamlabs OBS - ${Utils.env.SLOBS_VERSION}`,
+      title: `Streamlabs Desktop - ${Utils.env.SLOBS_VERSION}`,
     },
     child: {
       componentName: '',

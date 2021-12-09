@@ -35,9 +35,6 @@ const rimraf = require('rimraf');
 
 // Game overlay is Windows only
 let overlay;
-if (process.platform === 'win32') {
-  overlay = require('game-overlay');
-}
 
 // We use a special cache directory for running tests
 if (process.env.SLOBS_CACHE_DIR) {
@@ -190,7 +187,7 @@ function humanFileSize(bytes, si) {
 }
 
 console.log('=================================');
-console.log('Streamlabs OBS');
+console.log('Streamlabs Desktop');
 console.log(`Version: ${process.env.SLOBS_VERSION}`);
 console.log(`OS: ${os.platform()} ${os.release()}`);
 console.log(`Arch: ${process.arch}`);
@@ -209,8 +206,8 @@ app.on('ready', () => {
       // This error code indicates a read only file system
       if (e.code === 'EROFS') {
         dialog.showErrorBox(
-          'Streamlabs OBS',
-          'Please run Streamlabs OBS from your Applications folder. Streamlabs OBS cannot run directly from this disk image.',
+          'Streamlabs Desktop',
+          'Please run Streamlabs Desktop from your Applications folder. Streamlabs Desktop cannot run directly from this disk image.',
         );
         app.exit();
       }
@@ -262,6 +259,10 @@ async function startApp() {
   const isDevMode = process.env.NODE_ENV !== 'production' && process.env.NODE_ENV !== 'test';
   const crashHandlerLogPath = app.getPath('userData');
 
+  if (process.platform === 'win32') {
+    overlay = require('game-overlay');
+  }
+
   await bundleUpdater(__dirname);
 
   crashHandler.startCrashHandler(
@@ -286,7 +287,7 @@ async function startApp() {
   function handleFinishedReport() {
     dialog.showErrorBox(
       'Something Went Wrong',
-      'An unexpected error occured and Streamlabs OBS must be shut down.\n' +
+      'An unexpected error occured and Streamlabs Desktop must be shut down.\n' +
         'Please restart the application.',
     );
 
@@ -345,7 +346,7 @@ async function startApp() {
     show: false,
     frame: false,
     titleBarStyle: 'hidden',
-    title: 'Streamlabs OBS',
+    title: 'Streamlabs Desktop',
     backgroundColor: '#17242D',
     webPreferences: {
       nodeIntegration: true,

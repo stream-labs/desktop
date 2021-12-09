@@ -179,5 +179,10 @@
   "Slide Out Left": "向左滑出",
   "Slide Out Right": "向右滑出",
   "Slide Out Up": "向上滑出",
-  "Pick Screen Color": "选择屏幕颜色"
+  "Pick Screen Color": "选择屏幕颜色",
+  "Play Alert": "Play Alert",
+  "Browser Settings": "Browser Settings",
+  "Custom Code": "Custom Code",
+  "font_family_tooltip": "使用的谷歌字体。如需要，请访问 https://fonts.google.com！流行字体︰ Open Sans, Roboto, Oswald, Lato, Droid Sans.",
+  "Something went wrong while applying settings": "Something went wrong while applying settings"
 }

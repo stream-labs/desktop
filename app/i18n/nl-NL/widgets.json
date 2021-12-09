@@ -179,5 +179,10 @@
   "Slide Out Left": "Slide Out Left",
   "Slide Out Right": "Slide Out Right",
   "Slide Out Up": "Slide Out Up",
-  "Pick Screen Color": "Pick Screen Color"
+  "Pick Screen Color": "Pick Screen Color",
+  "Play Alert": "Play Alert",
+  "Browser Settings": "Browser Settings",
+  "Custom Code": "Custom Code",
+  "font_family_tooltip": "Het Google lettertype voor de tekst. Bezoek https://fonts.google.com om er een te vinden! Populaire lettertypes: Open Sans, Roboto, Oswald, Lato, Droid Sans.",
+  "Something went wrong while applying settings": "Something went wrong while applying settings"
 }

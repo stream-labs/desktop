@@ -179,5 +179,10 @@
   "Slide Out Left": "スライドアウトレフト",
   "Slide Out Right": "スライドアウトライト",
   "Slide Out Up": "スライドアウトアップ",
-  "Pick Screen Color": "画面の色を選択"
+  "Pick Screen Color": "画面の色を選択",
+  "Play Alert": "Play Alert",
+  "Browser Settings": "Browser Settings",
+  "Custom Code": "Custom Code",
+  "font_family_tooltip": "The Google Font to use for the text. Visit https://fonts.google.com to find one! Popular Fonts: Open Sans, Roboto, Oswald, Lato, Droid Sans.",
+  "Something went wrong while applying settings": "Something went wrong while applying settings"
 }

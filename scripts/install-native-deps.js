@@ -67,7 +67,7 @@ function downloadFile(srcUrl, dstPath) {
 }
 
 async function runScript() {
-  colors.blue('----Streamlabs OBS native dependecies installation----');
+  colors.blue('----Streamlabs Desktop native dependecies installation----');
 
   try {
     const jsonData = fs.readFileSync('./scripts/repositories.json');

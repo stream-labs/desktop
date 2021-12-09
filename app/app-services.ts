@@ -153,6 +153,7 @@ import { PlatformAppsService } from './services/platform-apps';
 import { MediaGalleryService } from './services/media-gallery';
 import { RecentEventsService } from 'services/recent-events';
 import { AudioService } from './services/audio';
+import { SourceFiltersService } from './services/source-filters';
 
 export const AppServices = {
   AppService,
@@ -197,4 +198,5 @@ export const AppServices = {
   SceneCollectionsService,
   PlatformAppsService,
   AudioService,
+  SourceFiltersService,
 };

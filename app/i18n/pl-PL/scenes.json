@@ -39,5 +39,6 @@
   "Name Folder": "Nazwij folder",
   "Switch Scenes": "Przełącz sceny",
   "Failed to load scene collection.  A new one will be created instead.": "Załadowanie kolekcji scen nie powiodło się. Zamiast niej zostanie utworzona nowa.",
-  "New Scene": "Nowa scena"
+  "New Scene": "Nowa scena",
+  "Projector": "Projektor"
 }

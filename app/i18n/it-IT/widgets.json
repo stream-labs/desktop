@@ -179,5 +179,10 @@
   "Slide Out Left": "Scorrimento indietro sinistra",
   "Slide Out Right": "Scorrimento indietro destra",
   "Slide Out Up": "Scorrimento indietro su",
-  "Pick Screen Color": "Scegli il colore dello schermo"
+  "Pick Screen Color": "Scegli il colore dello schermo",
+  "Play Alert": "Play Alert",
+  "Browser Settings": "Browser Settings",
+  "Custom Code": "Custom Code",
+  "font_family_tooltip": "Il Font di Google usato per il testo. Vai su https://fonts.google.com per trovarne uno! Font Popolari: Open Sans, Roboto, Oswald, Lato, Droid Sans.",
+  "Something went wrong while applying settings": "Something went wrong while applying settings"
 }

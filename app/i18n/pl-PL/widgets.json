@@ -179,5 +179,10 @@
   "Slide Out Left": "Wysuń w lewo",
   "Slide Out Right": "Wysuń w prawo",
   "Slide Out Up": "Wysuń w górę",
-  "Pick Screen Color": "Wybierz kolor ekranu"
+  "Pick Screen Color": "Wybierz kolor ekranu",
+  "Play Alert": "Play Alert",
+  "Browser Settings": "Browser Settings",
+  "Custom Code": "Custom Code",
+  "font_family_tooltip": "Czcionka Google do użycia w tekście. Odwiedź https://fonts.google.com aby jakąś znaleźć! Popularne czcionki: Open Sans, Roboto, Oswald, Lato, Droid Sans.",
+  "Something went wrong while applying settings": "Something went wrong while applying settings"
 }

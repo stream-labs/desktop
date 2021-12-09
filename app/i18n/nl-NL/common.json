@@ -132,5 +132,12 @@
   "Apply": "Apply",
   "Do not show this message again": "Do not show this message again",
   "You can only select up to %{max} items": "You can only select up to %{max} items",
-  "Time": "Tijd"
+  "Time": "Tijd",
+  "Sound Volume": "Geluidsvolume",
+  "Sound": "Geluid",
+  "Play Audio": "Play Audio",
+  "Click here": "Click here",
+  "More Info": "More Info",
+  "Revert Changes": "Revert Changes",
+  "Animations": "Animations"
 }

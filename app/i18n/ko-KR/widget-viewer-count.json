@@ -1,4 +1,8 @@
 {
   "Manage Viewer Count": "시청자 집계 관리",
-  "Font Settings": "폰트 설정"
+  "Font Settings": "폰트 설정",
+  "Enabled Streams": "활성화된 스트리밍",
+  "Twitch Viewers": "Twitch Viewers",
+  "YouTube Viewers": "YouTube Viewers",
+  "Facebook Viewers": "Facebook Viewers"
 }

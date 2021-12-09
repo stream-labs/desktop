@@ -179,5 +179,10 @@
   "Slide Out Left": "슬라이드 아웃 왼쪽",
   "Slide Out Right": "슬라이드 아웃 오른쪽",
   "Slide Out Up": "슬라이드 아웃 위쪽",
-  "Pick Screen Color": "화면 색상 선택"
+  "Pick Screen Color": "화면 색상 선택",
+  "Play Alert": "Play Alert",
+  "Browser Settings": "Browser Settings",
+  "Custom Code": "Custom Code",
+  "font_family_tooltip": "텍스트에 사용할 Google 폰트. https://fonts.google.com에 방문하여 찾아보세요! 인기 폰트: Open Sans, Roboto, Oswald, Lato, Droid Sans.",
+  "Something went wrong while applying settings": "Something went wrong while applying settings"
 }

@@ -179,5 +179,10 @@
   "Slide Out Left": "Salir deslizando izquierda",
   "Slide Out Right": "Salir deslizando derecha",
   "Slide Out Up": "Salir deslizando arriba",
-  "Pick Screen Color": "Seleccionar color de pantalla"
+  "Pick Screen Color": "Seleccionar color de pantalla",
+  "Play Alert": "Play Alert",
+  "Browser Settings": "Browser Settings",
+  "Custom Code": "Custom Code",
+  "font_family_tooltip": "La fuente de Google que se utilizará para el texto. ¡Visita https://fonts.google.com para encontrar una! Fuentes populares: Open Sans, Roboto, Oswald, Lato, Droid Sans.",
+  "Something went wrong while applying settings": "Something went wrong while applying settings"
 }

@@ -179,5 +179,10 @@
   "Slide Out Left": "Links hinausschieben",
   "Slide Out Right": "Rechts hinausschieben",
   "Slide Out Up": "Oben hinausschieben",
-  "Pick Screen Color": "Bildschirmfarbe auswählen"
+  "Pick Screen Color": "Bildschirmfarbe auswählen",
+  "Play Alert": "Play Alert",
+  "Browser Settings": "Browser Settings",
+  "Custom Code": "Custom Code",
+  "font_family_tooltip": "Der Google-Font, der für den Text verwendet wird. Besuchen Sie https://fonts.google.com um einen zu finden! Populäre Fonts: Open Sans, Roboto, Oswald, Lato, Droid Sans.",
+  "Something went wrong while applying settings": "Something went wrong while applying settings"
 }
