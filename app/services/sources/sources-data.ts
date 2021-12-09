@@ -122,7 +122,7 @@ export const SourceDisplayData = (): { [key: string]: ISourceDisplayData } => ({
     demoFilename: 'window-capture.png',
     supportList: [$t('Most games, apps, displays')],
     icon: 'icon-group',
-    shortDesc: $t('Select what to display'),
+    shortDesc: $t('Capture games and apps'),
   },
   liv_capture: {
     name: $t('LIV Client Capture'),

@@ -14,7 +14,11 @@ import SourceGrid from './SourceGrid';
 const { Content, Sider } = Layout;
 
 export default function SourcesShowcase() {
-  const { selectInspectedSource, availableAppSources } = useSourceShowcaseSettings();
+  const {
+    selectInspectedSource,
+    availableAppSources,
+    inspectedSource,
+  } = useSourceShowcaseSettings();
 
   const [activeTab, setActiveTab] = useState('all');
 
@@ -25,7 +29,7 @@ export default function SourcesShowcase() {
       bodyStyle={{ paddingBottom: 0, paddingTop: 0 }}
     >
       <Layout style={{ height: '100%' }}>
-        <Content>
+        <Content style={{ paddingRight: inspectedSource ? '0' : '24px' }}>
           <Menu
             onClick={e => setActiveTab(e.key)}
             selectedKeys={[activeTab]}
