@@ -22,10 +22,11 @@ export default function SourceGrid(p: { activeTab: string }) {
     CustomizationService,
   } = Services;
 
-  const { demoMode, designerMode, isLoggedIn } = useVuex(() => ({
+  const { demoMode, designerMode, isLoggedIn, linkedPlatforms } = useVuex(() => ({
     demoMode: CustomizationService.views.isDarkTheme ? 'night' : 'day',
     designerMode: CustomizationService.views.designerMode,
     isLoggedIn: UserService.views.isLoggedIn,
+    linkedPlatforms: UserService.views.linkedPlatforms,
   }));
 
   const { availableAppSources } = useSourceShowcaseSettings();
@@ -38,6 +39,13 @@ export default function SourceGrid(p: { activeTab: string }) {
     () =>
       Object.keys(WidgetType)
         .filter((type: string) => isNaN(Number(type)))
+        .filter((type: string) => {
+          const widgetPlatforms = WidgetDisplayData()[WidgetType[type]].platforms;
+          if (!widgetPlatforms) return true;
+          return linkedPlatforms?.some(
+            platform => widgetPlatforms && widgetPlatforms.has(platform),
+          );
+        })
         .filter(type => {
           // show only supported widgets
           const whitelist = primaryPlatformService?.widgetsWhitelist;
