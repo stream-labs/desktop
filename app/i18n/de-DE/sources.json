@@ -80,7 +80,7 @@
   "Click a source to get more details about it": "Klicken Sie auf eine Quelle, um weitere Informationen darüber zu erhalten",
   "Standard": "Standard",
   "Widgets": "Widgets",
-  "You must be logged in for Widgets": "Für Widgets müssen Sie angemeldet sein",
+  "You must be logged in to use Widgets": "You must be logged in to use Widgets",
   "Click here to log in": "Zum Anmelden hier klicken",
   "Alertbox": "Alert-Box",
   "Essential": "Essentials",
@@ -197,5 +197,14 @@
   "Capture Game": "Capture Game",
   "Automatic game capture will scan for running games and automatically capture them.": "Automatic game capture will scan for running games and automatically capture them.",
   "Capture Entire Screen": "Capture Entire Screen",
-  "Capture Window": "Capture Window"
+  "Capture Window": "Capture Window",
+  "Supports:": "Unterstützt:",
+  "Essential Sources": "Essential Sources",
+  "General Sources": "General Sources",
+  "Add media": "Add media",
+  "Your webcam device": "Your webcam device",
+  "Capture games and apps": "Capture games and apps",
+  "Dynamic, live alerts": "Dynamic, live alerts",
+  "Display recent events": "Display recent events",
+  "Viewer shoutouts": "Viewer shoutouts"
 }
