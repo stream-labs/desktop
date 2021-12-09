@@ -22,11 +22,12 @@ export default function SourceGrid(p: { activeTab: string }) {
     CustomizationService,
   } = Services;
 
-  const { demoMode, designerMode, isLoggedIn, linkedPlatforms } = useVuex(() => ({
+  const { demoMode, designerMode, isLoggedIn, linkedPlatforms, platform } = useVuex(() => ({
     demoMode: CustomizationService.views.isDarkTheme ? 'night' : 'day',
     designerMode: CustomizationService.views.designerMode,
     isLoggedIn: UserService.views.isLoggedIn,
     linkedPlatforms: UserService.views.linkedPlatforms,
+    platform: UserService.views.platform?.type,
   }));
 
   const { availableAppSources } = useSourceShowcaseSettings();
@@ -162,7 +163,7 @@ export default function SourceGrid(p: { activeTab: string }) {
                 {iterableWidgetTypes.filter(filterEssential).map(widgetType => (
                   <SourceTag
                     key={widgetType}
-                    name={WidgetDisplayData()[WidgetType[widgetType]].name}
+                    name={WidgetDisplayData(platform)[WidgetType[widgetType]].name}
                     type={widgetType}
                   />
                 ))}
