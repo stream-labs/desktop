@@ -13,7 +13,6 @@ import * as remote from '@electron/remote';
 import Main from 'components/windows/Main.vue';
 import Settings from 'components/windows/settings/Settings.vue';
 import FFZSettings from 'components/windows/FFZSettings.vue';
-import SourcesShowcase from 'components/windows/SourcesShowcase.vue';
 import SceneTransitions from 'components/windows/SceneTransitions.vue';
 import AddSource from 'components/windows/AddSource.vue';
 import NameScene from 'components/windows/NameScene.vue';
@@ -31,6 +30,7 @@ import {
   CustomCodeWindow,
   SafeMode,
   AdvancedAudio,
+  SourceShowcase,
   SourceFilters,
 } from 'components/shared/ReactComponentList';
 
@@ -92,7 +92,6 @@ export function getComponents() {
     Settings,
     FFZSettings,
     SceneTransitions,
-    SourcesShowcase,
     RenameSource,
     AddSource,
     NameScene,
@@ -147,6 +146,7 @@ export function getComponents() {
     SharedComponentsLibrary,
     WidgetWindow,
     CustomCodeWindow,
+    SourceShowcase,
   };
 }
 

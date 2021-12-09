@@ -312,7 +312,7 @@ function replaceMethodsWithMutations(module: IReduxModule<unknown, unknown>) {
 
       // clear unserializable events from arguments
       args = args.map(arg => {
-        const isReactEvent = arg._reactName;
+        const isReactEvent = arg?._reactName;
         if (isReactEvent) return { _reactName: arg._reactName };
         return arg;
       });
