@@ -97,7 +97,7 @@ export default function SourceGrid(p: { activeTab: string }) {
 
   return (
     <Scrollable style={{ height: 'calc(100% - 64px)' }}>
-      <Row gutter={[8, 8]} style={{ marginLeft: '8px', marginRight: '8px' }}>
+      <Row gutter={[8, 8]} style={{ marginLeft: '24px', marginRight: '24px' }}>
         {showContent('all') && (
           <>
             <Col span={24}>

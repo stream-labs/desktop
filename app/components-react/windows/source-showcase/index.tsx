@@ -26,10 +26,10 @@ export default function SourcesShowcase() {
     <ModalLayout
       onOk={selectInspectedSource}
       okText={$t('Add Source')}
-      bodyStyle={{ paddingBottom: 0, paddingTop: 0 }}
+      bodyStyle={{ paddingBottom: 0, paddingTop: 0, paddingLeft: 0 }}
     >
       <Layout style={{ height: '100%' }}>
-        <Content style={{ paddingRight: inspectedSource ? '0' : '24px' }}>
+        <Content style={{ paddingRight: 0, paddingLeft: 0 }}>
           <Menu
             onClick={e => setActiveTab(e.key)}
             selectedKeys={[activeTab]}
