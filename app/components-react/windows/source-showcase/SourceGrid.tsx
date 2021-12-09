@@ -22,10 +22,11 @@ export default function SourceGrid(p: { activeTab: string }) {
     CustomizationService,
   } = Services;
 
-  const { demoMode, designerMode, isLoggedIn } = useVuex(() => ({
+  const { demoMode, designerMode, isLoggedIn, linkedPlatforms } = useVuex(() => ({
     demoMode: CustomizationService.views.isDarkTheme ? 'night' : 'day',
     designerMode: CustomizationService.views.designerMode,
     isLoggedIn: UserService.views.isLoggedIn,
+    linkedPlatforms: UserService.views.linkedPlatforms,
   }));
 
   const { availableAppSources } = useSourceShowcaseSettings();
@@ -38,6 +39,13 @@ export default function SourceGrid(p: { activeTab: string }) {
     () =>
       Object.keys(WidgetType)
         .filter((type: string) => isNaN(Number(type)))
+        .filter((type: string) => {
+          const widgetPlatforms = WidgetDisplayData()[WidgetType[type]].platforms;
+          if (!widgetPlatforms) return true;
+          return linkedPlatforms?.some(
+            platform => widgetPlatforms && widgetPlatforms.has(platform),
+          );
+        })
         .filter(type => {
           // show only supported widgets
           const whitelist = primaryPlatformService?.widgetsWhitelist;
@@ -106,7 +114,6 @@ export default function SourceGrid(p: { activeTab: string }) {
             {essentialSources.essentialDefaults.map(source => (
               <SourceTag
                 key={source.value}
-                name={source.description}
                 type={source.value}
                 essential
               />
@@ -114,7 +121,6 @@ export default function SourceGrid(p: { activeTab: string }) {
             {essentialSources.essentialWidgets.map(widgetType => (
               <SourceTag
                 key={widgetType}
-                name={WidgetDisplayData()[WidgetType[widgetType]].name}
                 type={widgetType}
                 essential
               />
@@ -128,7 +134,7 @@ export default function SourceGrid(p: { activeTab: string }) {
               <PageHeader title={$t('General Sources')} />
             </Col>
             {availableSources.filter(filterEssential).map(source => (
-              <SourceTag key={source.value} name={source.description} type={source.value} />
+              <SourceTag key={source.value} type={source.value} />
             ))}
             <SourceTag key="replay" name={$t('Instant Replay')} type="replay" />
             {designerMode && (
@@ -154,11 +160,10 @@ export default function SourceGrid(p: { activeTab: string }) {
                 {iterableWidgetTypes.filter(filterEssential).map(widgetType => (
                   <SourceTag
                     key={widgetType}
-                    name={WidgetDisplayData()[WidgetType[widgetType]].name}
                     type={widgetType}
                   />
                 ))}
-                <SourceTag key="streamlabel" name={$t('Stream Label')} type="streamlabel" />
+                {p.activeTab !== 'all' && <SourceTag key="streamlabel" name={$t('Stream Label')} type="streamlabel" />}
               </>
             )}
           </>
