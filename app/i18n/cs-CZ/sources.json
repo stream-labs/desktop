@@ -80,7 +80,7 @@
   "Click a source to get more details about it": "Kliknutím na zdroj zobrazíte další související podrobnosti.",
   "Standard": "Standardní",
   "Widgets": "Widgety",
-  "You must be logged in for Widgets": "Pro widgety musíte být přihlášeni",
+  "You must be logged in to use Widgets": "You must be logged in to use Widgets",
   "Click here to log in": "Přihlaste se kliknutím sem",
   "Alertbox": "Pole s výstrahou",
   "Essential": "Základní",
@@ -197,5 +197,14 @@
   "Capture Game": "Capture Game",
   "Automatic game capture will scan for running games and automatically capture them.": "Automatic game capture will scan for running games and automatically capture them.",
   "Capture Entire Screen": "Capture Entire Screen",
-  "Capture Window": "Capture Window"
+  "Capture Window": "Capture Window",
+  "Supports:": "Podporuje:",
+  "Essential Sources": "Essential Sources",
+  "General Sources": "General Sources",
+  "Add media": "Add media",
+  "Your webcam device": "Your webcam device",
+  "Capture games and apps": "Capture games and apps",
+  "Dynamic, live alerts": "Dynamic, live alerts",
+  "Display recent events": "Display recent events",
+  "Viewer shoutouts": "Viewer shoutouts"
 }
