@@ -199,6 +199,13 @@ export class SharedComponentsLibrary extends ReactComponent {}
   },
 })
 export class SourceFilters extends ReactComponent {}
+@Component({
+  props: {
+    name: { default: 'SourceShowcase' },
+    wrapperStyles: { default: () => ({ height: '100%' }) },
+  },
+})
+export class SourceShowcase extends ReactComponent {}
 
 @Component({ props: { name: { default: 'StartStreamingButton' } } })
 export class StartStreamingButton extends ReactComponent {}
