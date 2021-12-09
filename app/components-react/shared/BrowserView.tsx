@@ -101,7 +101,6 @@ export default function BrowserView(p: BrowserViewProps) {
       currentSize = { x: rect.width, y: rect.height };
 
       if (currentPosition && currentSize && browserView.current) {
-        console.log('setting bounds');
         browserView.current.setBounds({
           x: Math.round(currentPosition.x),
           y: Math.round(currentPosition.y),
