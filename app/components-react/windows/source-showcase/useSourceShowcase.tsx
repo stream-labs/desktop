@@ -52,8 +52,8 @@ class SourceShowcaseModule {
   @mutation()
   inspectSource(source: string, appId?: string, appSourceId?: string) {
     this.state.inspectedSource = source;
-    if (appId) this.state.inspectedAppId = appId;
-    if (appSourceId) this.state.inspectedAppSourceId = appSourceId;
+    this.state.inspectedAppId = appId || '';
+    this.state.inspectedAppSourceId = appSourceId || '';
   }
 
   selectInspectedSource() {
