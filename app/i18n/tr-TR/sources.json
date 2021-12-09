@@ -80,7 +80,7 @@
   "Click a source to get more details about it": "Hakkında daha fazla bilgi edinmek için kaynağa tıklayın",
   "Standard": "Standart",
   "Widgets": "Pencere Ögeleri",
-  "You must be logged in for Widgets": "Pencere Öğeleri için oturum açmış olmanız gerekir.",
+  "You must be logged in to use Widgets": "You must be logged in to use Widgets",
   "Click here to log in": "Oturum açmak için buraya tıklayın.",
   "Alertbox": "Uyarı Kutusu",
   "Essential": "Önemli",
@@ -197,5 +197,14 @@
   "Capture Game": "Capture Game",
   "Automatic game capture will scan for running games and automatically capture them.": "Automatic game capture will scan for running games and automatically capture them.",
   "Capture Entire Screen": "Capture Entire Screen",
-  "Capture Window": "Capture Window"
+  "Capture Window": "Capture Window",
+  "Supports:": "Destekledikeri:",
+  "Essential Sources": "Essential Sources",
+  "General Sources": "General Sources",
+  "Add media": "Add media",
+  "Your webcam device": "Your webcam device",
+  "Capture games and apps": "Capture games and apps",
+  "Dynamic, live alerts": "Dynamic, live alerts",
+  "Display recent events": "Display recent events",
+  "Viewer shoutouts": "Viewer shoutouts"
 }
