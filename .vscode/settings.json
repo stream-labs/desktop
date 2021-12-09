@@ -44,5 +44,6 @@
     "webdriverio",
     "webfont",
     "xkeshi"
-  ]
+  ],
+  "files.eol": "\n"
 }
