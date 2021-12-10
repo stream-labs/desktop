@@ -75,6 +75,7 @@ export function AppearanceSettings() {
         <SliderInput
           {...bind.chatZoomFactor}
           label={$t('Chat Text Size')}
+          tipFormatter={(val: number) => `${val * 100}%`}
           min={0.25}
           max={2}
           step={0.25}
