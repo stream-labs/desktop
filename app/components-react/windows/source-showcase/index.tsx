@@ -107,8 +107,10 @@ function SideBar() {
         )}
         <h2>{displayData?.name}</h2>
         <div>{displayData?.description}</div>
-        {displayData?.supportList?.length > 0 && <div className={styles.supportHeader}>{$t('Supports:')}</div>}
-        <ul>
+        {displayData?.supportList?.length > 0 && (
+          <div className={styles.supportHeader}>{$t('Supports:')}</div>
+        )}
+        <ul style={{ fontSize: '13px' }}>
           {displayData?.supportList?.map(support => (
             <li key={support}>{support}</li>
           ))}
