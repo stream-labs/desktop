@@ -40,18 +40,15 @@ export default function BrowserView(p: BrowserViewProps) {
     if (p.enableGuestApi) {
       opts.webPreferences.enableRemoteModule = true;
       opts.webPreferences.contextIsolation = true;
-      opts.webPreferences.preload = path.resolve(
-        remote.app.getAppPath(),
-        'bundles',
-        'guest-api',
-      );
+      opts.webPreferences.preload = path.resolve(remote.app.getAppPath(), 'bundles', 'guest-api');
     }
     return opts;
   }, [p.options]);
 
-  const browserView = useRef<Electron.BrowserView>(new remote.BrowserView(options));
+  const browserView = useRef<Electron.BrowserView | null>(null);
 
   useEffect(() => {
+    browserView.current = new remote.BrowserView(options);
     if (p.setLocale) I18nService.setBrowserViewLocale(browserView.current);
 
     browserView.current.webContents.on('did-finish-load', () => setLoading(false));
@@ -83,6 +80,7 @@ export default function BrowserView(p: BrowserViewProps) {
       // See: https://github.com/electron/electron/issues/26929
       // @ts-ignore
       browserView.current.webContents.destroy();
+      browserView.current = null;
     }
   }
 
