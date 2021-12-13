@@ -22,6 +22,7 @@ import {
   IconLibraryProperties,
   ScreenCaptureProperties,
   SharedComponentsLibrary,
+  SourceProperties,
   PerformanceMetrics,
   RenameSource,
   AdvancedStatistics,
@@ -33,7 +34,7 @@ import {
   SourceFilters,
 } from 'components/shared/ReactComponentList';
 
-import SourceProperties from 'components/windows/SourceProperties.vue';
+import SourcePropertiesDeprecated from 'components/windows/SourceProperties.vue';
 import Notifications from 'components/windows/Notifications.vue';
 import Troubleshooter from 'components/windows/Troubleshooter.vue';
 import Blank from 'components/windows/Blank.vue';
@@ -97,6 +98,7 @@ export function getComponents() {
     NameFolder,
     SafeMode,
     SourceProperties,
+    SourcePropertiesDeprecated,
     SourceFilters,
     Blank,
     AdvancedAudio,
