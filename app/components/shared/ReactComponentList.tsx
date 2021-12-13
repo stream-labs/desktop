@@ -38,6 +38,15 @@ export class AppsNav extends ReactComponent {}
 
 @Component({
   props: {
+    name: { default: 'BrowserView' },
+    componentProps: { default: () => ({ src: '' }) },
+    wrapperStyles: { default: () => ({ height: '100%' }) },
+  },
+})
+export class BrowserView extends ReactComponent {}
+
+@Component({
+  props: {
     name: { default: 'Chat' },
     componentProps: { default: () => ({ restream: false }) },
     wrapperStyles: {
