@@ -35,7 +35,7 @@ test('Form inputs', async t => {
     },
     {
       name: 'confirm2',
-      title: 'Confirm you love Streamlabs OBS',
+      title: 'Confirm you love Streamlabs',
       value: false,
       displayValue: false,
     },
@@ -91,7 +91,7 @@ test('Form inputs', async t => {
       value: true,
       displayValue: true,
     },
-    { name: 'confirm2', title: 'Confirm you love Streamlabs OBS', value: true, displayValue: true },
+    { name: 'confirm2', title: 'Confirm you love Streamlabs', value: true, displayValue: true },
   ]);
 
   // test assertion
