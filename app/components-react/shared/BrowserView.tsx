@@ -49,9 +49,10 @@ export default function BrowserView(p: BrowserViewProps) {
     return opts;
   }, [p.options]);
 
-  const browserView = useRef<Electron.BrowserView>(new electron.remote.BrowserView(options));
+  const browserView = useRef<Electron.BrowserView | null>(null);
 
   useEffect(() => {
+    browserView.current = new electron.remote.BrowserView(options);
     if (p.setLocale) I18nService.setBrowserViewLocale(browserView.current);
 
     browserView.current.webContents.on('did-finish-load', () => setLoading(false));
@@ -83,6 +84,7 @@ export default function BrowserView(p: BrowserViewProps) {
       // See: https://github.com/electron/electron/issues/26929
       // @ts-ignore
       browserView.current.webContents.destroy();
+      browserView.current = null;
     }
   }
 
