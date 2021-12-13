@@ -1,8 +1,8 @@
 import React from 'react';
 import { ObsGenericSettingsForm } from './ObsSettings';
 
-export function AudioSettings() {
+export function AdvancedSettings() {
   return <ObsGenericSettingsForm />;
 }
 
-AudioSettings.page = 'Audio';
+AdvancedSettings.page = 'Advanced';

@@ -41,7 +41,7 @@
   "Font Size": "Betűméret",
   "Font Family": "Betűtípus család",
   "Font Style": "Font Style",
-  "Save failed, something went wrong.": "Save failed, something went wrong.",
+  "Save failed, something went wrong.": "A mentés nem sikerült, valami rosszul sikerült.",
   "This widget does not have defaults.": "This widget does not have defaults.",
   "Add Custom Fields": "Add Custom Fields",
   "Remove Custom Fields": "Remove Custom Fields",
@@ -183,5 +183,6 @@
   "Play Alert": "Play Alert",
   "Browser Settings": "Browser Settings",
   "Custom Code": "Custom Code",
+  "font_family_tooltip": "A szöveg betűtípusa. Látogass el a https://fonts.google.com címre, hogy válogass! Népszerű betűtípusok: Open Sans, Roboto, Oswald, Lato, Droid Sans.",
   "Something went wrong while applying settings": "Something went wrong while applying settings"
 }

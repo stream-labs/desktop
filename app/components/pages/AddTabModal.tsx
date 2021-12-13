@@ -2,7 +2,7 @@ import electron from 'electron';
 import TsxComponent, { createProps } from 'components/tsx-component';
 import { Component } from 'vue-property-decorator';
 import ModalLayout from 'components/ModalLayout.vue';
-import { EInputType } from 'components/shared/inputs/index';
+import { EInputType, metadata } from 'components/shared/inputs/index';
 import VFormGroup from 'components/shared/inputs/VFormGroup.vue';
 import { ImagePickerInput } from 'components/shared/inputs/inputs';
 import { Inject } from 'services/core/injector';
@@ -62,7 +62,10 @@ export default class AddTabModal extends TsxComponent<AddTabModalProps> {
           <VFormGroup metadata={{ title: $t('Icon') }}>
             <ImagePickerInput vModel={this.icon} metadata={{ options: ICONS, isIcons: true }} />
           </VFormGroup>
-          <VFormGroup vModel={this.name} metadata={{ title: $t('Name'), type: EInputType.text }} />
+          <VFormGroup
+            vModel={this.name}
+            metadata={metadata.text({ title: $t('Name'), fullWidth: true })}
+          />
         </div>
         <div slot="controls">
           <button class="button button--default" onClick={() => this.cancel()}>

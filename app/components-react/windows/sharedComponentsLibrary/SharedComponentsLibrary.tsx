@@ -40,7 +40,7 @@ export default function SharedComponentsLibrary() {
     <ModalLayout>
       <Row gutter={16} style={{ height: 'calc(100% + 24px)' }}>
         <Col flex="auto" style={{ height: '100%' }}>
-          <Scrollable style={{ maxHeight: '100%' }}>
+          <Scrollable style={{ height: '100%' }}>
             <Tabs defaultActiveKey="1">
               <TabPane tab="Shared Components" key="1">
                 <Examples />
@@ -121,6 +121,7 @@ function Examples() {
           {...bind.textVal}
         />
         <TextInput label="Debounced" debounce={500} {...globalProps} {...bind.textVal} />
+        <TextInput label="Password" isPassword {...globalProps} {...bind.textVal} />
         <TextInput
           label="With addons"
           addonBefore="http://"

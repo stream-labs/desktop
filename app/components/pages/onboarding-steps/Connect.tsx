@@ -132,12 +132,12 @@ export default class Connect extends TsxComponent<ConnectProps> {
             <p style="margin-bottom: 80px;">
               {this.isSecurityUpgrade
                 ? this.securityUpgradeLink
-                : $t('Sign in with your streaming account to get started with Streamlabs OBS')}
+                : $t('Sign in with your streaming account to get started with Streamlabs')}
             </p>
           )}
           {this.isRelog && (
             <h3 style={{ marginBottom: '16px' }}>
-              Your login has expired. Please re-login to continue using Streamlabs OBS
+              Your login has expired. Please re-login to continue using Streamlabs
             </h3>
           )}
           <div class={styles.signupButtons}>

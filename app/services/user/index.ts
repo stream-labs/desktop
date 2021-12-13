@@ -125,6 +125,12 @@ class UserViews extends ViewHandler<IUserServiceState> {
     }
   }
 
+  get linkedPlatforms() {
+    if (this.isLoggedIn) {
+      return Object.keys(this.state.auth.platforms);
+    }
+  }
+
   get isTwitchAuthed() {
     return this.isLoggedIn && this.platform.type === 'twitch';
   }
@@ -697,7 +703,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     if (!validateLoginResult) {
       this.logOut();
       electron.remote.dialog.showMessageBox({
-        title: 'Streamlabs OBS',
+        title: 'Streamlabs Desktop',
         message: $t('You have been logged out'),
       });
       return;
@@ -717,7 +723,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
         type: 'warning',
         title: 'Twitch Error',
         message: $t(
-          $t('Your Twitch login is expired. Please log in again to continue using Streamlabs OBS'),
+          $t('Your Twitch login is expired. Please log in again to continue using Streamlabs'),
         ),
         buttons: [$t('Refresh Login')],
       });

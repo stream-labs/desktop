@@ -84,7 +84,7 @@ function DestinationSwitcher(p: IDestinationSwitcherProps) {
     if (p.isPrimary) {
       alertAsync(
         $t(
-          'You cannot disable the platform you used to sign in to Streamlabs OBS. Please sign in with a different platform to disable streaming to this destination.',
+          'You cannot disable the platform you used to sign in to Streamlabs Desktop. Please sign in with a different platform to disable streaming to this destination.',
         ),
       );
       return;
