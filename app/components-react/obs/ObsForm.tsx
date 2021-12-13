@@ -97,6 +97,7 @@ function ObsInput(p: IObsInputProps) {
       const intVal = p.value as IObsNumberInputValue;
 
       return <NumberInput {...inputProps} step={1} min={intVal.minVal} max={intVal.maxVal} />;
+    case 'OBS_PROPERTY_EDIT_TEXT':
     case 'OBS_PROPERTY_TEXT':
       // eslint-disable-next-line no-case-declarations
       const textVal = p.value as IObsTextInputValue;
