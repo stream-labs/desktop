@@ -7,7 +7,7 @@ import { PlatformAppsService } from 'services/platform-apps';
 import { PlatformAppStoreService } from 'services/platform-app-store';
 import { NavigationService } from 'services/navigation';
 import Utils from 'services/utils';
-import BrowserView from 'components/shared/BrowserView';
+import { BrowserView } from 'components/shared/ReactComponentList';
 import { GuestApiHandler } from 'util/guest-api-handler';
 import * as remote from '@electron/remote';
 

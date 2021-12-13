@@ -1,6 +1,6 @@
 import electron from 'electron';
 import { Component } from 'vue-property-decorator';
-import BrowserView from 'components/shared/BrowserView';
+import { BrowserView } from 'components/shared/ReactComponentList';
 import styles from 'components/RecentEvents.m.less';
 import { UserService } from 'services/user';
 import { RecentEventsService } from 'services/recent-events';
@@ -65,9 +65,11 @@ export default class LegacyEvents extends BaseElement {
       <div style="height: 100%;">
         <BrowserView
           class={styles.eventContainer}
-          src={this.userService.recentEventsUrl()}
-          setLocale={true}
-          onReady={view => this.handleBrowserViewReady(view)}
+          componentProps={{
+            src: this.userService.recentEventsUrl(),
+            setLocale: true,
+            onReady: (view: Electron.BrowserView) => this.handleBrowserViewReady(view),
+          }}
         />
       </div>
     );

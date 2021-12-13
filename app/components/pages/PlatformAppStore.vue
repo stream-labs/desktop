@@ -1,11 +1,14 @@
 <template>
-<div>
-  <browser-view
-    class="app-store"
-    :src="appStoreUrl"
-    :enableGuestApi="true"
-    @ready="onBrowserViewReady" />
-</div>
+  <div>
+    <browser-view
+      class="app-store"
+      :componentProps="{
+        src: appStoreUrl,
+        enableGuestApi: true,
+        onReady: onBrowserViewReady,
+      }"
+    />
+  </div>
 </template>
 
 <script lang="ts" src="./PlatformAppStore.vue.ts"></script>
@@ -19,4 +22,3 @@
   left: 0;
 }
 </style>
-
