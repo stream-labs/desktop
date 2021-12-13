@@ -1,7 +1,7 @@
 export * from './General';
 // 'Stream',
 // 'Output',
-// 'Audio',
+export * from './Audio';
 // 'Video',
 // 'Hotkeys',
 export * from './Advanced';
