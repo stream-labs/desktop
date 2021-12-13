@@ -36,8 +36,6 @@ test('Changing transition options', async t => {
 
   await click('.icon-edit');
 
-  console.log('includesByTitles');
-
   t.true(
     await form.includesByTitles({
       Type: transitionType,
