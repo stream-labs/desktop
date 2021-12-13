@@ -1,5 +1,5 @@
 !macro customInstall
-  NSISdl::download https://s3-us-west-2.amazonaws.com/obsstudionodes3.streamlabs.com/VC_redist.x64.exe "$INSTDIR\vc_redist.x64.exe"  
+  NSISdl::download https://slobs-cdn.streamlabs.com/VC_redist.x64.exe "$INSTDIR\vc_redist.x64.exe"  
   
   ${If} ${FileExists} `$INSTDIR\vc_redist.x64.exe`
     ExecWait '$INSTDIR\vc_redist.x64.exe /passive /norestart' $1
