@@ -247,7 +247,7 @@ export function StreamSettings() {
         <div className="section section--warning">
           <b>{$t('Warning')}: </b>
           {$t(
-            'Streaming to a custom ingest is advanced functionality. Some features of Streamlabs OBS may stop working as expected',
+            'Streaming to a custom ingest is advanced functionality. Some features may stop working as expected',
           )}
           <br />
           <br />
@@ -312,7 +312,7 @@ function Platform(p: { platform: TPlatform }) {
         {shouldShowPrimaryBtn && (
           <Tooltip
             title={$t(
-              'You cannot unlink the platform you used to sign in to Streamlabs OBS. If you want to unlink this platform, please sign in with a different platform.',
+              'You cannot unlink the platform you used to sign in to Streamlabs Desktop. If you want to unlink this platform, please sign in with a different platform.',
             )}
           >
             <Button disabled={true} type="primary">
