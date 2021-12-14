@@ -49,10 +49,10 @@
             "osx": true
         },
         {
-            "name": "game-overlay",
+            "name": "game_overlay",
             "url": "https://obs-studio-deployment.s3-us-west-2.amazonaws.com/",
-            "archive": "game-overlay-[VERSION].tar.gz",
-            "version": "0.0.44",
+            "archive": "game-overlay-[VERSION]-[OS].tar.gz",
+            "version": "0.0.56",
             "win64": true,
             "osx": false
         },

@@ -7190,12 +7190,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"game-overlay@https://obs-studio-deployment.s3-us-west-2.amazonaws.com/game-overlay-v0.0.0.tar.gz":
+"game_overlay@https://obs-studio-deployment.s3-us-west-2.amazonaws.com/game-overlay-v0.0.0.tar.gz":
   version: 0.0.41
-  resolution: "game-overlay@https://obs-studio-deployment.s3-us-west-2.amazonaws.com/game-overlay-v0.0.0.tar.gz"
+  resolution: "game_overlay@https://obs-studio-deployment.s3-us-west-2.amazonaws.com/game-overlay-v0.0.0.tar.gz"
   dependencies:
     nan: ^2.14.0
-  checksum: e6080f5e9ee3086003752cd8e11b55aa18694a877042f225a4a11ba981818e6595a09fd3825a3bd7f0455b70ab1cb10a41ae970434060d6a9ce4c1c41e20d82a
+  checksum: 32d367d968d1a28ea32d30a4eaa1bd0c2af71ec1afa200595c8c11e0f2f9da89064ed30152e1b471a0c22807ae516c75cbacf8703255b08028341264b320bdcd
   languageName: node
   linkType: hard
 
@@ -13612,7 +13612,7 @@ __metadata:
     font-manager: "https://slobs-font-manager.s3-us-west-2.amazonaws.com/font-manager-0.0.0.tar.gz"
     fs-extra: ^9.0.0
     fuse.js: 3.4.6
-    game-overlay: "https://obs-studio-deployment.s3-us-west-2.amazonaws.com/game-overlay-v0.0.0.tar.gz"
+    game_overlay: "https://obs-studio-deployment.s3-us-west-2.amazonaws.com/game-overlay-v0.0.0.tar.gz"
     gl-transitions: 1.43.0
     humps: 2.0.1
     js-yaml: 3.13.1

@@ -258,7 +258,7 @@ async function startApp() {
   const crashHandlerLogPath = app.getPath('userData');
 
   if (process.platform === 'win32') {
-    overlay = require('game-overlay');
+    overlay = require('game_overlay');
   }
 
   await bundleUpdater(__dirname);
