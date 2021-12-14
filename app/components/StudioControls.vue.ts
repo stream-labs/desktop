@@ -22,6 +22,13 @@ export default class StudioControls extends Vue {
     return this.customizationService.studioControlsOpened;
   }
 
+  get compactMode() {
+    return this.customizationService.state.compactMode;
+  }
+  get compactModeStudioController() {
+    return this.customizationService.state.compactModeStudioController;
+  }
+
   onToggleControls() {
     this.customizationService.toggleStudioControls();
   }

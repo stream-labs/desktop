@@ -16,9 +16,13 @@ import { $t } from 'services/i18n';
  */
 export class CustomizationService
   extends PersistentStatefulService<ICustomizationServiceState>
-  implements ICustomizationServiceApi
-{
+  // eslint-disable-next-line prettier/prettier
+  implements ICustomizationServiceApi {
   static defaultState: ICustomizationServiceState = {
+    compactMode: false,
+    compactModeTab: 'studio',
+    compactModeStudioController: 'scenes',
+
     performanceMode: false,
     studioControlsOpened: true,
     optimizeForNiconico: true,
@@ -40,6 +44,18 @@ export class CustomizationService
 
   getSettings(): ICustomizationSettings {
     return this.state;
+  }
+
+  toggleCompactMode() {
+    this.setSettings({ compactMode: !this.state.compactMode });
+  }
+
+  setCompactModeTab(tab: 'studio' | 'niconico') {
+    if (tab === 'studio' || tab === 'niconico') {
+      this.setSettings({ compactModeTab: tab });
+    } else {
+      console.warn('Invalid compact mode tab:', tab);
+    }
   }
 
   get studioControlsOpened() {

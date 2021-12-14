@@ -1,30 +1,38 @@
 <template>
-<div class="studio-page" data-test="Studio">
-  <div v-if="previewEnabled" class="studio-mode-container" ref="studioModeContainer" :class="{ stacked }">
-    <studio-mode-controls v-if="studioMode" :stacked="stacked" />
-    <div
-      class="studio-display-container"
-      :class="{ stacked }">
-      <studio-editor class="studio-output-display" />
-      <div v-if="studioMode" class="studio-mode-display-container">
-        <display class="studio-mode-display" :paddingSize="10" />
+  <div class="studio-page" data-test="Studio">
+    <template v-if="!compactMode || compactModeTab === 'studio'">
+      <div
+        v-if="previewEnabled"
+        class="studio-mode-container"
+        ref="studioModeContainer"
+        :class="{ stacked, compactMode }"
+      >
+        <studio-mode-controls v-if="studioMode" :stacked="stacked" />
+        <div class="studio-display-container" :class="{ stacked }">
+          <studio-editor class="studio-output-display" />
+          <div v-if="studioMode" class="studio-mode-display-container">
+            <display class="studio-mode-display" :paddingSize="10" />
+          </div>
+        </div>
       </div>
-    </div>
+      <div v-else class="no-preview">
+        <div class="message">
+          {{ $t('scenes.previewIsDisabledInPerformanceMode') }}
+          <div class="button button--action button--sm" @click="enablePreview">
+            {{ $t('scenes.disablePerformanceMode') }}
+          </div>
+        </div>
+      </div>
+      <studio-controls />
+    </template>
+    <template v-if="compactMode && compactModeTab === 'niconico'"> TODO niconico </template>
   </div>
-  <div v-else class="no-preview">
-    <div class="message">
-      {{ $t('scenes.previewIsDisabledInPerformanceMode') }}
-      <div class="button button--action button--sm" @click="enablePreview">{{ $t('scenes.disablePerformanceMode') }}</div>
-    </div>
-  </div>
-  <studio-controls />
-</div>
 </template>
 
 <script lang="ts" src="./Studio.vue.ts"></script>
 
 <style lang="less" scoped>
-@import "../../styles/index";
+@import '../../styles/index';
 
 .studio-page {
   flex-direction: column;
@@ -34,6 +42,10 @@
   flex-grow: 1;
   display: flex;
   flex-direction: column;
+
+  &.compact-mode {
+    width: 448px;
+  }
 
   &.stacked {
     flex-direction: row;
@@ -72,7 +84,7 @@
     max-width: 50%;
     .button {
       margin-top: 20px;
-      display: block
+      display: block;
     }
   }
 }

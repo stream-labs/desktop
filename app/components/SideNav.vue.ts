@@ -1,17 +1,17 @@
-import Vue from 'vue';
-import { Component, Prop } from 'vue-property-decorator';
-import { Inject } from 'services/core/injector';
-import { CustomizationService } from 'services/customization';
-import { NavigationService } from 'services/navigation';
-import { UserService } from 'services/user';
-import electron from 'electron';
 import Login from 'components/Login.vue';
 import StreamingStatus from 'components/StreamingStatus.vue';
-import { SettingsService } from 'services/settings';
-import Utils from 'services/utils';
-import { TransitionsService } from 'services/transitions';
+import electron from 'electron';
+import { Inject } from 'services/core/injector';
+import { CustomizationService } from 'services/customization';
+import { EAvailableFeatures, IncrementalRolloutService } from 'services/incremental-rollout';
 import { InformationsService } from 'services/informations';
-import { IncrementalRolloutService, EAvailableFeatures } from 'services/incremental-rollout';
+import { NavigationService } from 'services/navigation';
+import { SettingsService } from 'services/settings';
+import { TransitionsService } from 'services/transitions';
+import { UserService } from 'services/user';
+import Utils from 'services/utils';
+import Vue from 'vue';
+import { Component, Prop, Watch } from 'vue-property-decorator';
 
 @Component({
   components: {
@@ -48,6 +48,19 @@ export default class SideNav extends Vue {
 
   featureIsEnabled(feature: EAvailableFeatures) {
     return this.incrementalRolloutService.featureIsEnabled(feature);
+  }
+
+  get compactMode(): boolean {
+    return this.customizationService.state.compactMode;
+  }
+  toggleCompactMode() {
+    this.customizationService.toggleCompactMode();
+  }
+  get compactModeTab(): 'studio' | 'niconico' {
+    return this.customizationService.state.compactModeTab;
+  }
+  set compactModeTab(tab: 'studio' | 'niconico') {
+    this.customizationService.setCompactModeTab(tab);
   }
 
   studioMode() {

@@ -43,6 +43,10 @@ export default class Main extends Vue {
     electron.remote.getCurrentWindow().show();
   }
 
+  get isCompactMode() {
+    return this.customizationService.state.compactMode;
+  }
+
   get title() {
     return this.windowsService.state.main.title;
   }

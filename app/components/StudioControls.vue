@@ -1,20 +1,29 @@
 <template>
-<div class="studio-controls row expanded" :class="{ opened }">
-  <button @click="onToggleControls" class="studio-controls-toggle-button" :class="{ 'studio-controls--opened': opened }">
-    <ControlsArrow />
-  </button>
-  <template v-if="opened">
-    <scene-selector class="studio-controls-panel small-4 columns" />
-    <source-selector class="studio-controls-panel small-4 columns" />
-    <mixer class="studio-controls-panel small-4 columns" />
-  </template>
-</div>
+  <div class="studio-controls row expanded" :class="{ opened }">
+    <button
+      @click="onToggleControls"
+      class="studio-controls-toggle-button"
+      :class="{ 'studio-controls--opened': opened }"
+    >
+      <ControlsArrow />
+    </button>
+    <template v-if="compactMode">
+      TODO: TABにする
+      <scene-selector class="studio-controls-panel small-4 columns" />
+      <mixer class="studio-controls-panel small-4 columns" />
+    </template>
+    <template v-else-if="opened">
+      <scene-selector class="studio-controls-panel small-4 columns" />
+      <source-selector class="studio-controls-panel small-4 columns" />
+      <mixer class="studio-controls-panel small-4 columns" />
+    </template>
+  </div>
 </template>
 
 <script lang="ts" src="./StudioControls.vue.ts"></script>
 
 <style lang="less" scoped>
-@import "../styles/index";
+@import '../styles/index';
 
 .studio-controls {
   position: relative;
@@ -26,11 +35,11 @@
   svg {
     width: 140px;
     height: 10px;
-    transition: .5s;
+    transition: 0.5s;
   }
   &:hover {
     svg {
-      transition: .5s;
+      transition: 0.5s;
       width: 160px;
     }
   }
@@ -57,12 +66,12 @@
   left: 0;
   right: 0;
 
-  >svg {
+  > svg {
     width: 140px;
     height: 10px;
     transform: rotate(180deg);
     fill: @text-primary;
-    transition: .5s;
+    transition: 0.5s;
   }
 
   .opened & {
@@ -71,7 +80,7 @@
 
   &:hover {
     background-color: @bg-secondary;
-    >svg {
+    > svg {
       transition: 0.5s;
       width: 160px;
       fill: @text-primary;
@@ -81,7 +90,7 @@
 </style>
 
 <style lang="less">
-@import "../styles/index";
+@import '../styles/index';
 
 .studio-controls-panel {
   display: flex;
@@ -113,5 +122,4 @@
   flex-grow: 1;
   overflow-y: auto;
 }
-
 </style>

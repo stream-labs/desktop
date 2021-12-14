@@ -1,6 +1,34 @@
 <template>
   <div class="top-nav">
     <div class="tabs">
+      <div class="top-nav-item">
+        <a @click="toggleCompactMode" class="link">
+          <i class="icon-feedback" :title="$t('common.compactMode')" />
+        </a>
+      </div>
+    </div>
+    <template v-if="compactMode">
+      <div class="top-nav-item">
+        <a @click="compactModeTab = 'studio'" class="link" data-test="compact-tab-studio">
+          <i
+            :class="{ 'icon-studio-mode': true, active: compactModeTab === 'studio' }"
+            :title="$t('common.compactModeTab.studio')"
+          />
+        </a>
+      </div>
+      <div class="top-nav-item">
+        <a @click="compactModeTab = 'niconico'" class="link" data-test="compact-tab-niconico">
+          <i
+            :class="{ 'icon-niconico': true, active: compactModeTab === 'niconico' }"
+            :title="$t('common.compactModeTab.niconico')"
+          />
+        </a>
+      </div>
+    </template>
+
+    <div class="filler"></div>
+
+    <template v-if="!compactMode">
       <div class="top-nav-item" :class="{ 'top-nav-item--active': studioModeEnabled }">
         <a @click="studioMode" class="link">
           <i class="icon-studio-mode" :title="$t('common.studioMode')" />
@@ -30,17 +58,14 @@
           />
         </a>
       </div>
+    </template>
+    <div class="top-nav-item" v-if="isDevMode">
+      <a @click="openDevTools" class="link">
+        <i class="icon-dev" title="開発者ツール" />
+      </a>
     </div>
-
-    <div class="top-nav-profile">
-      <div class="top-nav-item" v-if="isDevMode">
-        <a @click="openDevTools" class="link">
-          <i class="icon-dev" title="開発者ツール" />
-        </a>
-      </div>
-      <div class="top-nav-item" title="ログイン">
-        <login />
-      </div>
+    <div class="top-nav-item" title="ログイン">
+      <login />
     </div>
   </div>
 </template>
@@ -92,6 +117,10 @@
       }
     }
   }
+}
+
+.filler {
+  flex: 2;
 }
 
 .top-nav-profile {

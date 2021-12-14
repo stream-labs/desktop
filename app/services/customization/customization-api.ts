@@ -2,6 +2,10 @@ import { Observable } from 'rxjs';
 import { TObsFormData } from 'components/obs/inputs/ObsInput';
 
 export interface ICustomizationServiceState {
+  compactMode: boolean;
+  compactModeTab: 'studio' | 'niconico';
+  compactModeStudioController: 'scenes' | 'mixer';
+
   performanceMode: boolean;
   studioControlsOpened: boolean;
   optimizeForNiconico: boolean;
@@ -11,7 +15,8 @@ export interface ICustomizationServiceState {
   experimental: any;
 }
 
-export interface ICustomizationSettings extends ICustomizationServiceState {}
+// eslint-disable-next-line prettier/prettier
+export interface ICustomizationSettings extends ICustomizationServiceState { }
 
 export interface ICustomizationServiceApi {
   settingsChanged: Observable<Partial<ICustomizationSettings>>;
