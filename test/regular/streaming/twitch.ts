@@ -42,7 +42,7 @@ test('Streaming to Twitch without auth', async t => {
   await showSettingsWindow('Stream');
 
   // This is the twitch.tv/slobstest stream key
-  await setInputValue('input[type="password"]', userInfo.streamKey);
+  await fillForm({ key: userInfo.streamKey });
   await clickButton('Done');
 
   // go live
