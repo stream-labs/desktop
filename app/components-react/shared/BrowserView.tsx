@@ -53,6 +53,7 @@ export default function BrowserView(p: BrowserViewProps) {
 
   useEffect(() => {
     browserView.current = new electron.remote.BrowserView(options);
+    if (p.onReady) p.onReady(browserView.current);
     if (p.setLocale) I18nService.setBrowserViewLocale(browserView.current);
 
     browserView.current.webContents.on('did-finish-load', () => setLoading(false));
@@ -67,8 +68,6 @@ export default function BrowserView(p: BrowserViewProps) {
   }, []);
 
   useEffect(() => {
-    if (!loading && p.onReady) p.onReady(browserView.current);
-
     const resizeInterval = window.setInterval(checkResize, 100);
 
     return () => clearInterval(resizeInterval);
