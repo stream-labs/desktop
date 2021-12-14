@@ -100,7 +100,10 @@ export const conditions = () => ({
       value: 'MIN_SUBSCRIPTION_STREAK',
       title: $t('Streak shared with chat, and months subscribed in a streak is at least <months>'),
     },
-    { value: 'SUBSCRIPTION_PRIME_UPGRADE', title: $t('When a Prime Gaming sub is upgraded to a recurring <tier> sub')}
+    {
+      value: 'SUBSCRIPTION_PRIME_UPGRADE',
+      title: $t('When a Prime Gaming sub is upgraded to a recurring <tier> sub'),
+    },
   ],
   hosts: [{ value: 'MIN_VIEWERS_ACQUIRED', title: $t('Viewers gained is at least <viewers>') }],
   bits: [
