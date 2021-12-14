@@ -98,7 +98,7 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
 
   initializeOverlay() {
     if (!this.state.isEnabled) return;
-    this.overlay = remote.require('game-overlay');
+    this.overlay = remote.require('game_overlay');
 
     if (this.overlayRunning) return;
     this.overlayRunning = true;
