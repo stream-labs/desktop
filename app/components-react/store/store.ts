@@ -8,6 +8,7 @@ import { createBinding, TBindings } from '../shared/inputs';
 import { getDefined } from '../../util/properties-type-guards';
 import { unstable_batchedUpdates } from 'react-dom';
 import Utils from '../../services/utils';
+import { traverseClassInstance } from '../../util/traverseClassInstance';
 
 /*
  * This file provides Redux integration in a modular way
@@ -106,11 +107,18 @@ class ReduxModuleManager {
       // replace module methods with mutation calls
       replaceMethodsWithMutations(module);
 
+      // prevent usage of destroyed modules
+      catchDestroyedModuleCalls(module);
+
       // Re-define the `state` variable of the module
       // It should be linked to the global Redux sate after module initialization
       // But when mutation is running it should be linked to a special Proxy from the Immer library
       Object.defineProperty(module, 'state', {
         get: () => {
+          // prevent accessing state on destroyed module
+          if (!moduleManager.getModule(moduleName)) {
+            throw new Error('ReduxModule_is_destroyed');
+          }
           if (this.immerState) return this.immerState[moduleName];
           const globalState = store.getState() as any;
           return globalState.modules[moduleName];
@@ -306,13 +314,18 @@ function replaceMethodsWithMutations(module: IReduxModule<unknown, unknown>) {
       const mutationIsRunning = !!moduleManager.immerState;
       if (mutationIsRunning) return originalMethod.apply(module, args);
 
+      // prevent accessing state on deleted module
+      if (!moduleManager.getModule(moduleName)) {
+        throw new Error('ReduxModule_is_destroyed');
+      }
+
       const batchedUpdatesModule = moduleManager.getModule<BatchedUpdatesModule>(
         'BatchedUpdatesModule',
       );
 
       // clear unserializable events from arguments
       args = args.map(arg => {
-        const isReactEvent = arg?._reactName;
+        const isReactEvent = arg && arg._reactName;
         if (isReactEvent) return { _reactName: arg._reactName };
         return arg;
       });
@@ -323,6 +336,27 @@ function replaceMethodsWithMutations(module: IReduxModule<unknown, unknown>) {
         if (moduleName !== 'BatchedUpdatesModule') batchedUpdatesModule.temporaryDisableRendering();
         store.dispatch(actions.mutateModule({ moduleName, methodName: mutationName, args }));
       });
+    };
+  });
+}
+
+/**
+ * Add try/catch that silently stops all method calls for a destroyed module
+ */
+function catchDestroyedModuleCalls(module: any) {
+  // wrap each method in try/catch block
+  traverseClassInstance(module, (propName, descriptor) => {
+    // ignore getters
+    if (descriptor.get || typeof module[propName] !== 'function') return;
+
+    const originalMethod = module[propName];
+    module[propName] = (...args: unknown[]) => {
+      try {
+        return originalMethod.apply(module, args);
+      } catch (e: unknown) {
+        // silently stop execution if module is destroyed
+        if ((e as any).message !== 'ReduxModule_is_destroyed') throw e;
+      }
     };
   });
 }

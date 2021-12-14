@@ -126,7 +126,21 @@ export default class Settings extends Vue {
    * returns the list of the pages ported to React
    */
   get reactPages() {
-    return ['General', 'Appearance'];
+    return [
+      'General',
+      // 'Stream',
+      // 'Output',
+      // 'Audio',
+      // 'Video',
+      // 'Hotkeys',
+      'Advanced',
+      // 'SceneCollections',
+      // 'Notifications',
+      'Appearance',
+      // 'RemoteControl',
+      // 'VirtualWebcam',
+      // 'GameOverlay'
+    ];
   }
 
   get shouldShowReactPage() {

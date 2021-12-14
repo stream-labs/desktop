@@ -4,9 +4,9 @@ import { sleep } from '../sleep';
 import { dialogDismiss } from './dialog';
 import { ExecutionContext } from 'ava';
 import { requestUtilsServer, USER_POOL_TOKEN } from './runner-utils';
-import {closeWindow, focusChild, focusMain, focusWindow} from '../modules/core';
-import {getApiClient} from "../api-client";
-import {UserService} from "../../../app/services/user";
+import { getApiClient } from '../api-client';
+import { UserService } from '../../../app/services/user';
+import { closeWindow, focusChild, focusMain, focusWindow } from '../modules/core';
 
 let user: ITestUser; // keep user's name if SLOBS is logged-in
 
@@ -197,7 +197,7 @@ export async function reserveUserFromPool(
       if (getParams.length) urlPath = `${urlPath}?${getParams.join('&')}`;
       reservedUser = await requestUserPool(urlPath);
       break;
-    } catch (e) {
+    } catch (e: unknown) {
       t.log(e);
       if (attempts) {
         t.log('retrying in 20 sec...');

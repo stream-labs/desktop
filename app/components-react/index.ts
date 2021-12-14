@@ -18,6 +18,7 @@ import AdvancedStatistics from './windows/AdvancedStatistics';
 import StreamScheduler from './pages/stream-scheduler/StreamScheduler';
 import { createRoot } from './root/ReactRoot';
 import StartStreamingButton from './root/StartStreamingButton';
+import SourceProperties from './windows/SourceProperties';
 import TestWidgets from './root/TestWidgets';
 import RenameSource from './windows/RenameSource';
 import NotificationsArea from './root/NotificationsArea';
@@ -32,10 +33,12 @@ import AdvancedAudio from './windows/advanced-audio';
 import { CustomCodeWindow } from './widgets/common/CustomCode';
 import SourceShowcase from './windows/source-showcase';
 import SourceFilters from './windows/SourceFilters';
+import BrowserView from './shared/BrowserView';
 
 // list of React components to be used inside Vue components
 export const components = {
   NameFolder,
+  BrowserView,
   GoLiveWindow: createRoot(GoLiveWindow),
   EditStreamWindow: createRoot(EditStreamWindow),
   IconLibraryProperties,
@@ -53,6 +56,7 @@ export const components = {
   PlatformLogo,
   StreamScheduler: createRoot(StreamScheduler),
   AdvancedStatistics,
+  SourceProperties: createRoot(SourceProperties),
   SharedComponentsLibrary: createRoot(SharedComponentsLibrary),
   StartStreamingButton,
   TestWidgets,
