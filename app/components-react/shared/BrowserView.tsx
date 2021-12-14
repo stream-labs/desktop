@@ -7,6 +7,7 @@ import Utils from 'services/utils';
 import Spinner from 'components-react/shared/Spinner';
 import { Services } from 'components-react/service-provider';
 import { useVuex } from 'components-react/hooks';
+import electron from 'electron';
 
 interface BrowserViewProps {
   src: string;
@@ -38,7 +39,6 @@ export default function BrowserView(p: BrowserViewProps) {
     opts.webPreferences.nodeIntegration = false;
 
     if (p.enableGuestApi) {
-      opts.webPreferences.enableRemoteModule = true;
       opts.webPreferences.contextIsolation = true;
       opts.webPreferences.preload = path.resolve(remote.app.getAppPath(), 'bundles', 'guest-api');
     }
@@ -49,6 +49,12 @@ export default function BrowserView(p: BrowserViewProps) {
 
   useEffect(() => {
     browserView.current = new remote.BrowserView(options);
+
+    if (p.enableGuestApi) {
+      electron.ipcRenderer.sendSync('webContents-enableRemote', browserView.current.webContents.id);
+    }
+
+    if (p.onReady) p.onReady(browserView.current);
     if (p.setLocale) I18nService.setBrowserViewLocale(browserView.current);
 
     browserView.current.webContents.on('did-finish-load', () => setLoading(false));
@@ -63,8 +69,6 @@ export default function BrowserView(p: BrowserViewProps) {
   }, []);
 
   useEffect(() => {
-    if (!loading && p.onReady) p.onReady(browserView.current);
-
     const resizeInterval = window.setInterval(checkResize, 100);
 
     return () => clearInterval(resizeInterval);
