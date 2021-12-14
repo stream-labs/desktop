@@ -221,6 +221,7 @@ export default function SourceFilters() {
                 }}
                 layout="horizontal"
                 style={{ padding: 20 }}
+                key={selectedFilter}
               />
             )}
             {selectedFilter && !formData?.length && (

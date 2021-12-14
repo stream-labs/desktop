@@ -4,7 +4,7 @@ import { sleep } from '../sleep';
 import { dialogDismiss } from './dialog';
 import { ExecutionContext } from 'ava';
 import { requestUtilsServer, USER_POOL_TOKEN } from './runner-utils';
-import {closeWindow, focusChild, focusMain, focusWindow} from '../modules/core';
+import { closeWindow, focusChild, focusMain, focusWindow } from '../modules/core';
 
 let user: ITestUser; // keep user's name if SLOBS is logged-in
 

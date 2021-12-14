@@ -49,7 +49,7 @@ function SchedulerCalendar() {
       .sort((ev1, ev2) => ev1.date - ev2.date);
 
     return (
-      <div data-role="day" onClick={() => showNewEventModal(selectedPlatform, date)}>
+      <div data-role="day" onClick={() => showNewEventModal(selectedPlatform, date.valueOf())}>
         {dayEvents.map(renderEvent)}
       </div>
     );

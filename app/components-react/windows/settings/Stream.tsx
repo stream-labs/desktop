@@ -418,8 +418,7 @@ function CustomDestForm() {
     <Form name="customDestForm">
       <TextInput label={$t('Name')} required {...bind.name} />
       <TextInput label={'URL'} required {...bind.url} />
-      {/* TODO: add masked input*/}
-      <TextInput label={$t('Stream Key')} {...bind.streamKey} />
+      <TextInput label={$t('Stream Key')} {...bind.streamKey} isPassword />
       <ButtonGroup>
         <Button onClick={stopEditing}>{$t('Cancel')}</Button>
         <Button type="primary" onClick={saveCustomDest}>

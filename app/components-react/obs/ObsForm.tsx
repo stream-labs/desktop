@@ -94,13 +94,13 @@ function ObsInput(p: IObsInputProps) {
       return <NumberInput {...inputProps} />;
     case 'OBS_PROPERTY_INT':
       // eslint-disable-next-line no-case-declarations
-      const intVal = inputProps.value as IObsNumberInputValue;
+      const intVal = p.value as IObsNumberInputValue;
 
       return <NumberInput {...inputProps} step={1} min={intVal.minVal} max={intVal.maxVal} />;
     case 'OBS_PROPERTY_EDIT_TEXT':
     case 'OBS_PROPERTY_TEXT':
       // eslint-disable-next-line no-case-declarations
-      const textVal = inputProps.value as IObsTextInputValue;
+      const textVal = p.value as IObsTextInputValue;
 
       if (textVal.multiline) {
         return <TextAreaInput {...inputProps} />;
@@ -119,7 +119,7 @@ function ObsInput(p: IObsInputProps) {
           label: $translateIfExist(opt.description),
         };
       });
-      return <ListInput {...inputProps} options={options} />;
+      return <ListInput {...inputProps} options={options} allowClear={false} />;
 
     case 'OBS_PROPERTY_BUTTON':
       return (
