@@ -10,7 +10,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Install Dependencies
-        run: yarn install --frozen-lockfile --check-files 2>&1
+        run: yarn install --immutable
       - name: Compile Assets
         run: yarn compile:production
       - name: Run BundleMon
