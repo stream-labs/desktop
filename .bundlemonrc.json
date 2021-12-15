@@ -1,0 +1,19 @@
+{
+  "baseDir": "./bundles",
+  "files": [
+    {
+      "path": "renderer.<hash>.js"
+    },
+    {
+      "path": "vendors~renderer.<hash>.js"
+    },
+    {
+      "path": "guest-api.js"
+    },
+    {
+      "path": "updater.js"
+    }
+  ],
+  "defaultCompression": "none",
+  "reportOutput": ["github"]
+}
