@@ -110,6 +110,7 @@
   "Viewers gained is at least <viewers>": "획득한 시청자가 최소 <viewers>명입니다",
   "Streak shared with chat, and months subscribed in a streak is at least <months>": "채팅과 공유된 스트릭, 연속으로 구독한 개월 수가 최소 <months>개월입니다",
   "User gifted at least <amount> subs at once": "한 번에 최소 <amount> 구독을 선물한 사용자",
+  "When a Prime Gaming sub is upgraded to a recurring <tier> sub": "When a Prime Gaming sub is upgraded to a recurring <tier> sub",
   "Months subscribed is exactly <months>": "구독한 개월 수가 정확히 <months>개월입니다",
   "Months subscribed is at least <months>": "구독한 개월 수가 최소 <months>개월입니다",
   "This setting helps control text to speech spam, such as \"wwwwwwwwwww.\" By default this is turned off, but most users will want to set this to Low or Medium. The higher the security, the less spam, but also a higher chance of a legitimate message being flagged as spam and not being read.": "이 설정은 \"wwwwwwwwwww”와 같은 텍스트 음성 변환 스팸을 제어하는 데 도움이 됩니다. 기본값으로는 꺼져 있지만, 사용자 대부분은 이를 낮음 또는 중간으로 설정합니다. 보안 단계가 높을수록 스팸이 줄어들지만, 정상적인 메시지가 스팸으로 표시되어 읽히지 않을 가능성도 커집니다.",
