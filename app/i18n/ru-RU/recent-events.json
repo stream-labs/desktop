@@ -9,6 +9,7 @@
   "has gifted a sub (%{tier}) to": "дарит подписку (%{tier}) пользователю",
   "has resubscribed (%{tier}) for %{months} months": "возобновляет подписку (%{tier}) на %{months} мес.",
   "has subscribed (%{tier})": "подписывается (%{tier})",
+  "has converted from a Prime Gaming sub to a %{tier} sub": "has converted from a Prime Gaming sub to a %{tier} sub",
   "has subscribed": "подписывается",
   "has used": "использует",
   "has hosted you with %{viewers} viewers": "приводит %{viewers} зрителей",
