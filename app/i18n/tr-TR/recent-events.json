@@ -9,6 +9,7 @@
   "has gifted a sub (%{tier}) to": "şu kişiye bir abone (%{tier}) hediye etti:",
   "has resubscribed (%{tier}) for %{months} months": "%{months} ay boyunca yeniden abone oldu (%{tier})",
   "has subscribed (%{tier})": "abone oldu (%{tier})",
+  "has converted from a Prime Gaming sub to a %{tier} sub": "has converted from a Prime Gaming sub to a %{tier} sub",
   "has subscribed": "abone oldu",
   "has used": "şunu kullandı:",
   "has hosted you with %{viewers} viewers": "%{viewers} izleyici ile birlikte kanalınızı yayınladı",
