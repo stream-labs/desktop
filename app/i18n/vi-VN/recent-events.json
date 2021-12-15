@@ -9,6 +9,7 @@
   "has gifted a sub (%{tier}) to": "has gifted a sub (%{tier}) to",
   "has resubscribed (%{tier}) for %{months} months": "has resubscribed (%{tier}) for %{months} months",
   "has subscribed (%{tier})": "has subscribed (%{tier})",
+  "has converted from a Prime Gaming sub to a %{tier} sub": "has converted from a Prime Gaming sub to a %{tier} sub",
   "has subscribed": "has subscribed",
   "has used": "has used",
   "has hosted you with %{viewers} viewers": "has hosted you with %{viewers} viewers",
