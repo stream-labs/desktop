@@ -11,6 +11,7 @@ import { $t } from '../../../services/i18n';
 import Utils from '../../../services/utils';
 import { TAlertType } from '../../../services/widgets/alerts-config';
 import { alertAsync } from '../../modals';
+import { onUnload } from 'util/unload';
 
 /**
  * Common state for all widgets
@@ -60,6 +61,8 @@ export class WidgetModule<TWidgetState extends IWidgetState = IWidgetState> {
   public widgetsConfig = this.widgetsService.widgetsConfig;
   public eventsConfig = this.widgetsService.alertsConfig;
 
+  cancelUnload: () => void;
+
   // init module
   async init(params: {
     sourceId: string;
@@ -85,6 +88,8 @@ export class WidgetModule<TWidgetState extends IWidgetState = IWidgetState> {
       this.state.previewSourceId = previewSource.sourceId;
     }
 
+    this.cancelUnload = onUnload(() => this.widget.destroyPreviewSource());
+
     // load settings from the server to the store
     this.state.type = WidgetType[widget.type] as TWidgetType;
     const data = await this.fetchData();
@@ -96,6 +101,7 @@ export class WidgetModule<TWidgetState extends IWidgetState = IWidgetState> {
   // de-init module
   destroy() {
     if (this.state.previewSourceId) this.widget.destroyPreviewSource();
+    this.cancelUnload();
   }
 
   async reload() {

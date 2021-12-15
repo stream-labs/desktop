@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import cx from 'classnames';
 import { useVuex } from '../hooks';
 import { Services } from '../service-provider';
@@ -21,6 +21,8 @@ export default function TitleBar(props: { windowId: string }) {
     }),
     false,
   );
+
+  const isDev = useMemo(() => Utils.isDevMode(), []);
 
   const primeTheme = /prime/.test(v.theme);
   const [errorState, setErrorState] = useState(false);
@@ -71,6 +73,12 @@ export default function TitleBar(props: { windowId: string }) {
       </div>
       {!isMac && (
         <div className={styles.titlebarActions}>
+          {isDev && (
+            <i
+              className={cx('fas fa-sync', styles.titlebarAction)}
+              onClick={() => window.location.reload()}
+            />
+          )}
           <i className={cx('icon-subtract', styles.titlebarAction)} onClick={minimize} />
           {isMaximizable && (
             <i className={cx('icon-expand-1', styles.titlebarAction)} onClick={maximize} />
