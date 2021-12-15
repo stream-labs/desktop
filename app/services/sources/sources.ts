@@ -721,7 +721,7 @@ export class SourcesService extends StatefulService<ISourcesState> {
       }
     }
     this.windowsService.showWindow({
-      componentName: 'SourceProperties',
+      componentName: 'SourcePropertiesDeprecated',
       title: $t('Settings for %{sourceName}', {
         sourceName: SourceDisplayData()[source.type].name,
       }),
@@ -761,11 +761,11 @@ export class SourcesService extends StatefulService<ISourcesState> {
 
   showShowcase() {
     this.windowsService.showWindow({
-      componentName: 'SourcesShowcase',
+      componentName: 'SourceShowcase',
       title: $t('Add Source'),
       size: {
-        width: 1200,
-        height: 665,
+        width: 900,
+        height: 700,
       },
     });
   }

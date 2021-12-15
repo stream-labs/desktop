@@ -183,5 +183,6 @@
   "Play Alert": "Play Alert",
   "Browser Settings": "Browser Settings",
   "Custom Code": "Custom Code",
+  "font_family_tooltip": "Il Font di Google usato per il testo. Vai su https://fonts.google.com per trovarne uno! Font Popolari: Open Sans, Roboto, Oswald, Lato, Droid Sans.",
   "Something went wrong while applying settings": "Something went wrong while applying settings"
 }
