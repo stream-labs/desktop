@@ -183,5 +183,6 @@
   "Play Alert": "Play Alert",
   "Browser Settings": "Browser Settings",
   "Custom Code": "Custom Code",
+  "font_family_tooltip": "La fuente de Google que se utilizará para el texto. ¡Visita https://fonts.google.com para encontrar una! Fuentes populares: Open Sans, Roboto, Oswald, Lato, Droid Sans.",
   "Something went wrong while applying settings": "Something went wrong while applying settings"
 }

@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useState } from 'react';
 import { ObsGenericSettingsForm, ObsSettingsSection } from './ObsSettings';
 import { $t, I18nService } from '../../../services/i18n';
 import { alertAsync, confirmAsync } from '../../modals';
@@ -6,9 +6,8 @@ import { CheckboxInput, ListInput } from '../../shared/inputs';
 import electron from 'electron';
 import { Services } from '../../service-provider';
 import fs from 'fs';
-import rimraf from 'rimraf';
 import path from 'path';
-import { useOnCreate, useVuex } from '../../hooks';
+import { useVuex } from '../../hooks';
 import { useBinding } from '../../store';
 import { getDefined } from '../../../util/properties-type-guards';
 

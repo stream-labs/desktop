@@ -38,6 +38,15 @@ export class AppsNav extends ReactComponent {}
 
 @Component({
   props: {
+    name: { default: 'BrowserView' },
+    componentProps: { default: () => ({ src: '' }) },
+    wrapperStyles: { default: () => ({ height: '100%' }) },
+  },
+})
+export class BrowserView extends ReactComponent {}
+
+@Component({
+  props: {
     name: { default: 'Chat' },
     componentProps: { default: () => ({ restream: false }) },
     wrapperStyles: {
@@ -208,6 +217,13 @@ export class SharedComponentsLibrary extends ReactComponent {}
   },
 })
 export class SourceFilters extends ReactComponent {}
+@Component({
+  props: {
+    name: { default: 'SourceShowcase' },
+    wrapperStyles: { default: () => ({ height: '100%' }) },
+  },
+})
+export class SourceShowcase extends ReactComponent {}
 
 @Component({ props: { name: { default: 'StartStreamingButton' } } })
 export class StartStreamingButton extends ReactComponent {}

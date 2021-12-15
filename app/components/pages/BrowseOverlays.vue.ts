@@ -13,7 +13,7 @@ import { MagicLinkService } from 'services/magic-link';
 import urlLib from 'url';
 import electron from 'electron';
 import { $t, I18nService } from 'services/i18n';
-import BrowserView from 'components/shared/BrowserView';
+import { BrowserView } from 'components/shared/ReactComponentList';
 import { RestreamService } from 'services/restream';
 import { GuestApiHandler } from 'util/guest-api-handler';
 import { IDownloadProgress } from 'util/requests';

@@ -183,5 +183,6 @@
   "Play Alert": "Play Alert",
   "Browser Settings": "Browser Settings",
   "Custom Code": "Custom Code",
+  "font_family_tooltip": "텍스트에 사용할 Google 폰트. https://fonts.google.com에 방문하여 찾아보세요! 인기 폰트: Open Sans, Roboto, Oswald, Lato, Droid Sans.",
   "Something went wrong while applying settings": "Something went wrong while applying settings"
 }

@@ -183,5 +183,6 @@
   "Play Alert": "Play Alert",
   "Browser Settings": "Browser Settings",
   "Custom Code": "Custom Code",
+  "font_family_tooltip": "Písmo Google, které se má použít pro text. Navštivte stránku https://fonts.google.com a najděte ji! Populární písma: Open Sans, Roboto, Oswald, Lato, Droid Sans.",
   "Something went wrong while applying settings": "Something went wrong while applying settings"
 }
