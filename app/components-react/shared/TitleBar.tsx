@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import cx from 'classnames';
 import { useVuex } from '../hooks';
 import { Services } from '../service-provider';
@@ -23,13 +23,13 @@ export default function TitleBar(props: { windowId: string }) {
   );
 
   const primeTheme = /prime/.test(v.theme);
-  let errorState = false;
+  const [errorState, setErrorState] = useState(false);
 
   useEffect(lifecycle, []);
 
   function lifecycle() {
     if (Utils.isDevMode()) {
-      ipcRenderer.on('unhandledErrorState', () => (errorState = true));
+      ipcRenderer.on('unhandledErrorState', () => setErrorState(true));
     }
   }
 
