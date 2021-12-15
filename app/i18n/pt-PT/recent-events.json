@@ -9,6 +9,7 @@
   "has gifted a sub (%{tier}) to": "ofereceu uma subscrição (%{tier}) a",
   "has resubscribed (%{tier}) for %{months} months": "subscreveu (%{tier}) novamente durante %{months} meses",
   "has subscribed (%{tier})": "subscreveu (%{tier})",
+  "has converted from a Prime Gaming sub to a %{tier} sub": "has converted from a Prime Gaming sub to a %{tier} sub",
   "has subscribed": "subscreveu",
   "has used": "utilizou",
   "has hosted you with %{viewers} viewers": "alojou-o com %{viewers} espetadores",
