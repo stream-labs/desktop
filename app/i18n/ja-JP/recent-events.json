@@ -9,6 +9,7 @@
   "has gifted a sub (%{tier}) to": "がサブ (%{tier}) を次に贈りました",
   "has resubscribed (%{tier}) for %{months} months": "が (%{tier}) に %{months} ヵ月間再登録しました",
   "has subscribed (%{tier})": "が (%{tier}) に登録しました",
+  "has converted from a Prime Gaming sub to a %{tier} sub": "has converted from a Prime Gaming sub to a %{tier} sub",
   "has subscribed": "が登録しました",
   "has used": "が使用しました",
   "has hosted you with %{viewers} viewers": "が %{viewers} 人の視聴者と共に貴方をホストしました",
