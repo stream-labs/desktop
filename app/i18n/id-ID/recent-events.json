@@ -9,6 +9,7 @@
   "has gifted a sub (%{tier}) to": "telah menghadiahkan langganan (%{tier}) kepada",
   "has resubscribed (%{tier}) for %{months} months": "telah berlangganan ulang (%{tier}) untuk %{months} bulan",
   "has subscribed (%{tier})": "telah berlangganan (%{tier})",
+  "has converted from a Prime Gaming sub to a %{tier} sub": "has converted from a Prime Gaming sub to a %{tier} sub",
   "has subscribed": "telah berlangganan",
   "has used": "telah menggunakan",
   "has hosted you with %{viewers} viewers": "telah memandu Anda dengan %{viewers} pemirsa",
