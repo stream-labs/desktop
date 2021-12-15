@@ -110,6 +110,7 @@
   "Viewers gained is at least <viewers>": "Le nombre de spectateurs gagnés est d'au moins <viewers>",
   "Streak shared with chat, and months subscribed in a streak is at least <months>": "Streak est partagé avec le chat et le nombre minimum de mois d'abonnement est de <months>",
   "User gifted at least <amount> subs at once": "L'utilisateur a reçu au moins <amount> abonnés à la fois",
+  "When a Prime Gaming sub is upgraded to a recurring <tier> sub": "When a Prime Gaming sub is upgraded to a recurring <tier> sub",
   "Months subscribed is exactly <months>": "Le nombre de mois d'abonnement est d'exactement <months>",
   "Months subscribed is at least <months>": "Le nombre de mois d'abonnement est d'au moins <months>",
   "This setting helps control text to speech spam, such as \"wwwwwwwwwww.\" By default this is turned off, but most users will want to set this to Low or Medium. The higher the security, the less spam, but also a higher chance of a legitimate message being flagged as spam and not being read.": "Ce paramètre permet de contrôler le spam texte-parole, tel que \"wwwwwwwwwww\". Par défaut, cette option est désactivée, mais la plupart des utilisateurs souhaitent définir ce paramètre sur Faible ou Moyen. Plus la sécurité est élevée, moins on reçoit de spams, mais le risque est que des messages légitimes soient signalés comme spams et non lus.",
