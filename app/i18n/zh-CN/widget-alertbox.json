@@ -110,6 +110,7 @@
   "Viewers gained is at least <viewers>": "观众人数至少为 <viewers>",
   "Streak shared with chat, and months subscribed in a streak is at least <months>": "连续分享聊天，并且连续订阅至少 <months> 个月",
   "User gifted at least <amount> subs at once": "用户单次赠送至少 <amount> 订阅",
+  "When a Prime Gaming sub is upgraded to a recurring <tier> sub": "When a Prime Gaming sub is upgraded to a recurring <tier> sub",
   "Months subscribed is exactly <months>": "订阅恰好 <months> 个月",
   "Months subscribed is at least <months>": "订阅至少 <months> 个月",
   "This setting helps control text to speech spam, such as \"wwwwwwwwwww.\" By default this is turned off, but most users will want to set this to Low or Medium. The higher the security, the less spam, but also a higher chance of a legitimate message being flagged as spam and not being read.": "此设置有助于控制文字转换为语音垃圾信息，例如“wwwwwwwwwww”。默认情况下，此功能处于关闭状态，但大多数用户将其设置为“低”或“中”。安全性越高，垃圾信息越少，但合法信息被标记为垃圾信息且不被读取的机会也就更高。",
