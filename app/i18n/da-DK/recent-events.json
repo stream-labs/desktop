@@ -9,6 +9,7 @@
   "has gifted a sub (%{tier}) to": "har givet et abonnement (%{tier}) til",
   "has resubscribed (%{tier}) for %{months} months": "har abonneret igen (%{tier}) i %{months} måneder",
   "has subscribed (%{tier})": "har abonneret (%{tier})",
+  "has converted from a Prime Gaming sub to a %{tier} sub": "has converted from a Prime Gaming sub to a %{tier} sub",
   "has subscribed": "har abonneret",
   "has used": "har brugt",
   "has hosted you with %{viewers} viewers": "har været vært for dig med %{viewers} seere",
