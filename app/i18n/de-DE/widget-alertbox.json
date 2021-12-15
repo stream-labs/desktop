@@ -110,6 +110,7 @@
   "Viewers gained is at least <viewers>": "Hinzugewonnene Zuschauer: mindestens <viewers>",
   "Streak shared with chat, and months subscribed in a streak is at least <months>": "Streak mit Chat geteilt und Abonnementdauer (in Monaten) in Streak: mindestens <months>",
   "User gifted at least <amount> subs at once": "Benutzer hat mindestens <amount> Abos auf einmal geschenkt",
+  "When a Prime Gaming sub is upgraded to a recurring <tier> sub": "When a Prime Gaming sub is upgraded to a recurring <tier> sub",
   "Months subscribed is exactly <months>": "Abonnementdauer (Monate): genau <months>",
   "Months subscribed is at least <months>": "Abonnementdauer (Monate): mindestens <months>",
   "This setting helps control text to speech spam, such as \"wwwwwwwwwww.\" By default this is turned off, but most users will want to set this to Low or Medium. The higher the security, the less spam, but also a higher chance of a legitimate message being flagged as spam and not being read.": "Diese Einstellung hilft dabei, Text-zu-Sprache-Spam wie „wwwwwwwwwww“ abzuwehren. Dies ist standardmäßig deaktiviert, für die meisten Benutzer ist jedoch die Einstellung „Niedrig“ oder „Mittel“ empfehlenswert. Je höher die Sicherheitseinstellung, desto weniger Spam erhalten Sie, aber dabei steigt das Risiko, dass legitime Nachrichten als Spam markiert und daher nicht gelesen werden.",
