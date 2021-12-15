@@ -9,6 +9,7 @@
   "has gifted a sub (%{tier}) to": "已将一个订阅 (%{tier}) 赠予",
   "has resubscribed (%{tier}) for %{months} months": "已再订阅 (%{tier}) %{months} 个月",
   "has subscribed (%{tier})": "已订阅 (%{tier})",
+  "has converted from a Prime Gaming sub to a %{tier} sub": "has converted from a Prime Gaming sub to a %{tier} sub",
   "has subscribed": "已订阅",
   "has used": "已使用",
   "has hosted you with %{viewers} viewers": "已与 %{viewers} 名观众一同招待您",
