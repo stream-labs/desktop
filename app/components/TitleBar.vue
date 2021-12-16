@@ -18,39 +18,25 @@
 
 .titlebar {
   display: flex;
-  flex-direction: row;
-  align-items: end;
-  padding-top: 6px;
-  box-shadow: 0 1px 0 rgba(0,0,0,0.1);
-  vertical-align: top;
+  align-items: center;
   z-index: 1;
-  background-color: @bg-primary;
-
-  // 実験版用
-  &.isUnstable {
-    background-color: #e2c84d;
-
-    .titlebar-title {
-      color: @black;
-      font-weight: bold;
-    }
-
-    .link {
-      color: @black;
-    }
-  }
+  background-color: var(--color-titlebar);
+  height: 32px;
+  margin-bottom: 1px;
 }
 
 .titlebar-icon {
-  padding-left: 8px;
+  .padding-left();
+
   height: 20px;
 }
 
 .titlebar-title {
+  .padding-left();
+
   flex-grow: 1;
-  padding-left: 8px;
   -webkit-app-region: drag;
-  color: @text-secondary;
+  color: var(--color-titlebar-text);
 }
 
 .live-status {
@@ -75,14 +61,20 @@
 
 .titlebar-actions {
   -webkit-app-region: no-drag;
-  height: 20px;
+  height: 14px;
 }
 
 .titlebar-action {
+  .margin-right();
+
   cursor: pointer;
   font-size: 14px;
-  margin-right: 8px;
   display: inline-block;
+  color: var(--color-titlebar-action);
+
+  &:hover {
+    color: var(--color-titlebar-action-hover);
+  }
 }
 
 </style>

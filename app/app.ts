@@ -103,6 +103,7 @@ if ((isProduction || process.env.NAIR_REPORT_TO_SENTRY) && !electron.remote.proc
 }
 
 require('./app.less');
+require('./theme.less');
 
 // Initiates tooltips and sets their parent wrapper
 Vue.use(VTooltip);
