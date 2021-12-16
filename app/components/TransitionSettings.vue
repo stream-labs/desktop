@@ -15,7 +15,7 @@
       }"
     />
     <h-form-group
-      v-show="typeModel !== 'obs_stinger_transition'"
+      v-show="typeModel !== 'obs_stinger_transition' && typeModel !== 'cut_transition'"
       v-model="durationModel"
       :metadata="{
         type: 'number',
