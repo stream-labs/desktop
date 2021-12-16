@@ -1,70 +1,105 @@
 <template>
-  <div class="top-nav">
-    <div class="tabs">
-      <div class="top-nav-item">
+  <div class="side-nav">
+    <div class="primary-tab">
+      <div class="side-nav-item">
         <a @click="toggleCompactMode" class="link">
-          <i class="icon-feedback" :title="$t('common.compactMode')" />
+          <i v-if="compactMode" class="icon-full-mode" :title="$t('common.fullMode')" />
+          <i v-if="!compactMode" class="icon-compact-mode" :title="$t('common.compactMode')" />
         </a>
       </div>
-    </div>
-    <template v-if="compactMode">
-      <div class="top-nav-item">
-        <a @click="compactModeTab = 'studio'" class="link" data-test="compact-tab-studio">
-          <i
-            :class="{ 'icon-studio-mode': true, active: compactModeTab === 'studio' }"
-            :title="$t('common.compactModeTab.studio')"
-          />
+      <template v-if="compactMode && isUserLoggedIn">
+        <div class="secondary-tab">
+          <div class="side-nav-item">
+            <a
+              @click="compactModeTab = 'niconico'"
+              class="link"
+              :class="{ active: compactModeTab === 'niconico' }"
+              data-test="compact-tab-niconico"
+            >
+              <i
+                :class="{ 'icon-niconico': true }"
+                :title="$t('common.compactModeTab.niconico')"
+              />
+            </a>
+          </div>
+          <div class="side-nav-item">
+            <a 
+              @click="compactModeTab = 'studio'"
+              class="link"
+              :class="{ active: compactModeTab === 'studio' }"
+              data-test="compact-tab-studio"
+            >
+              <i
+                :class="{ 'icon-video': true }"
+                :title="$t('common.compactModeTab.studio')"
+              />
+            </a>
+          </div>
+        </div>
+      </template>
+      <div class="side-nav-item" v-if="isDevMode">
+        <a @click="openDevTools" class="link">
+          <i class="icon-dev" title="開発者ツール" />
         </a>
       </div>
-      <div class="top-nav-item">
-        <a @click="compactModeTab = 'niconico'" class="link" data-test="compact-tab-niconico">
-          <i
-            :class="{ 'icon-niconico': true, active: compactModeTab === 'niconico' }"
-            :title="$t('common.compactModeTab.niconico')"
-          />
-        </a>
-      </div>
-    </template>
+    </div>   
 
     <div class="filler"></div>
 
     <template v-if="!compactMode">
-      <div class="top-nav-item" :class="{ 'top-nav-item--active': studioModeEnabled }">
-        <a @click="studioMode" class="link">
-          <i class="icon-studio-mode" :title="$t('common.studioMode')" />
-        </a>
-      </div>
-      <div class="top-nav-item">
-        <a @click="openSettingsWindow" class="link" data-test="OpenSettings">
-          <i class="icon-settings" :title="$t('common.settings')" />
-        </a>
-      </div>
-      <div class="top-nav-item feedback-button">
-        <a @click="openFeedback" class="link">
-          <i class="icon-feedback" :title="$t('common.feedback')" />
-        </a>
-      </div>
-      <div class="top-nav-item help-button">
-        <a @click="openHelp" class="link">
-          <i class="icon-help" :title="$t('common.help')" />
-        </a>
-      </div>
-      <div class="top-nav-item information-button">
-        <a @click="openInformations" class="link">
-          <i
-            class="icon-notification"
-            :class="{ isUnseen: hasUnseenInformation }"
+      <div class="bottom-tools">
+        <div class="side-nav-item">
+          <a @click="studioMode" 
+            class="link" 
+            :class="{ 'active': studioModeEnabled }"
+            :title="$t('common.studioMode')"
+          >
+            <i class="icon-studio-mode" />
+          </a>
+        </div>
+        <div class="side-nav-item feedback-button">
+          <a
+            @click="openFeedback"
+            class="link"
+            :title="$t('common.feedback')"
+          >
+            <i class="icon-feedback" />
+          </a>
+        </div>
+        <div class="side-nav-item help-button">
+          <a
+            @click="openHelp"
+            class="link"
+            :title="$t('common.help')"
+          >
+            <i class="icon-help" />
+          </a>
+        </div>
+        <div class="side-nav-item information-button">
+          <a 
+            @click="openInformations"
+            class="link"
             :title="$t('informations.title')"
-          />
-        </a>
+          >
+            <i
+              class="icon-notification"
+              :class="{ isUnseen: hasUnseenInformation }"
+            />
+          </a>
+        </div>
+        <div class="side-nav-item">
+          <a
+            @click="openSettingsWindow"
+            class="link"
+            data-test="OpenSettings"
+            :title="$t('common.settings')"
+          >
+            <i class="icon-settings" />
+          </a>
+        </div>
       </div>
     </template>
-    <div class="top-nav-item" v-if="isDevMode">
-      <a @click="openDevTools" class="link">
-        <i class="icon-dev" title="開発者ツール" />
-      </a>
-    </div>
-    <div class="top-nav-item" title="ログイン">
+    <div class="side-nav-profile">
       <login />
     </div>
   </div>
@@ -74,48 +109,78 @@
 
 <style lang="less" scoped>
 @import '../styles/index';
-.top-nav {
+
+.side-nav {
   display: flex;
   flex-direction: column;
-  flex-wrap: nowrap;
   align-items: center;
-  font-size: 14px;
-  padding: 0 16px;
-  position: relative;
-  flex: 0 0 38px;
-  // min-width: 100%;
-  background-color: @bg-tertiary;
-  i {
-    font-size: 14px;
-    margin-right: 4px;
-    &.icon-dev {
-      font-size: 16px;
+  width: 48px;
+  background-color: var(--color-primary-light);
+}
+
+.link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 36px;
+
+  &.active {
+    color: var(--color-secondary);
+  }
+}
+
+.primary-tab {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+
+  .link {
+    height: 48px;
+
+    i {
+      font-size: @font-size6;
     }
   }
 }
-.tabs {
-  flex-grow: 1;
+
+.secondary-tab {
   display: flex;
-  text-align: left;
-  justify-content: flex-start;
   align-items: center;
   flex-direction: column;
 
-  .top-nav-item {
-    display: flex;
-    align-items: center;
-    margin-right: 12px;
-    margin-top: 12px;
-    margin-bottom: 12px;
+   &:before {
+    content: '';
+    width: 18px;
+    height: 1px;
+    background-color: var(--color-border-light);
+    margin: 8px 0;
+  }
 
-    &.top-nav-item--active {
-      > a {
-        > i,
-        > span {
-          color: @text-primary;
-        }
-      }
+  .link {
+    height: 48px;
+
+    i {
+      font-size: @font-size5;
     }
+  }
+}
+
+.bottom-tools {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  .link {
+    height: 36px;
+  }
+
+  &:after {
+    content: '';
+    width: 18px;
+    height: 1px;
+    background-color: var(--color-border-light);
+    margin: 8px 0;
   }
 }
 
@@ -123,41 +188,30 @@
   flex: 2;
 }
 
-.top-nav-profile {
-  flex-grow: 1;
+.side-nav-profile {
   display: flex;
-  text-align: right;
-  justify-content: flex-end;
   align-items: center;
   flex-direction: column;
-  .top-nav-item {
-    margin-left: 8px;
-    display: flex;
-    align-items: center;
-  }
-}
-
-.user__name {
-  &:hover {
-    color: @white;
-  }
+  width: 48px;
+  margin-bottom: 8px;
 }
 
 .icon-notification {
   position: relative;
 
+  // お知らせ通知
   &.isUnseen {
     &:after {
       content: '';
       display: block;
       position: absolute;
-      right: -2px;
-      bottom: -1px;
-      width: 9px;
-      height: 9px;
-      background-color: @accent-hover;
-      border-radius: 100%;
-      border: 1px solid @bg-tertiary;
+      right: -6px;
+      top: -6px;
+      width: 12px;
+      height: 12px;
+      background-color: var(--color-accent-variant);
+      border-radius: 50%;
+      border: 2px solid var(--color-primary-light);
     }
   }
 }

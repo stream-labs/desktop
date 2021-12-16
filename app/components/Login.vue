@@ -1,22 +1,20 @@
 <template>
-  <div>
-    <div class="login__status" v-if="loggedIn">
-      <a
-        @click="openUserpage"
-        class="link user__profile">
-          <img class="user__thumbnail" :src="userIcon">
-          <span class="user__name">{{ username }}</span>
-      </a>
-      <a class="link" @click="logout">
-        <i class="icon-log-out"/> {{ $t('common.logout') }}
-      </a>
-    </div>
-    <div
-      v-else>
-      <a class="link" @click="login">
-        <i class="icon-log-in" /> {{ $t('common.login') }}
-      </a>
-    </div>
+  <div class="login__status" v-if="loggedIn">
+    <a v-if="!compactMode" class="link" @click="logout" :title="$t('common.logout')">
+      <i class="icon-log-out" />
+    </a>
+    <a
+      @click="openUserpage"
+      class="user__profile"
+      :title="username">
+        <img class="user__thumbnail" :src="userIcon">
+    </a>
+  </div>
+  <div
+    v-else>
+    <a v-if="!compactMode" class="link" @click="login" :title="$t('common.login')">
+      <i class="icon-log-in" />
+    </a>
   </div>
 </template>
 
@@ -28,33 +26,32 @@
 .login__status {
   display: flex;
   align-items: center;
-
+  justify-content: center;
+  flex-direction: column;
 }
+
 .user__profile {
-  margin-right: 8px;
+  height: 40px;
+  width: 48px;
   display: flex;
   align-items: center;
+  justify-content: center;
 
   .user__thumbnail {
     display: flex;
     align-items: center;
-    width: 22px;
-    height: 22px;
+    width: 24px;
+    height: 24px;
     border-radius: 50%;
-    margin-right: 4px;
-    opacity: .8;
     background-color: @text-secondary;
   }
+}
 
-  .user__name {
-    display: inline-block;
-    max-width: 160px;
-    text-align: left;
-    text-decoration: none;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    .semibold;
-  }
+.link {  
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 36px;
 }
 </style>
