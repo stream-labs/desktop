@@ -312,7 +312,7 @@ if (!gotTheLock) {
       .then(name => console.log(name))
       .catch(err => console.log(err));
 
-    if (process.env.NAIR_PRODUCTION_DEBUG) openDevTools();
+    if (process.env.NAIR_PRODUCTION_DEBUG || process.env.DEV_SERVER) openDevTools();
 
     // simple messaging system for services between windows
     // WARNING! the child window use synchronous requests and will be frozen
