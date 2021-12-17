@@ -27,7 +27,7 @@
   "Replay Duration": "Czas trwania powtórki",
   "Set a hotkey to capture replays": "Ustaw klawisz szybkiego dostęp do przechwytywania powtórek",
   "Capture a replay": "Przechwyć powtórkę",
-  "highlighterHotkeyInstructions": "Rozpocznij transmisję i naciśnij klawisz <b>%{bindingStr}</b>, by przechwycić powtórkę. Po zakończeniu transmisji sprawdź ją tutaj.",
+  "highlighterHotkeyInstructions": "Rozpocznij transmisję i naciśnij klawisz &lt;b&gt;%{bindingStr}&lt;/b&gt;, by przechwycić powtórkę. Po zakończeniu transmisji sprawdź ją tutaj.",
   "Start streaming and capture a replay. Check back here after your stream.": "Rozpocznij transmisję i przechwyć powtórkę. Po zakończeniu transmisji sprawdź ją tutaj.",
   "Or, import a clip from your computer": "Bądź zaimportuj klip z komputera.",
   "Disable clip": "Wyłącz funkcję klipu",
@@ -90,5 +90,5 @@
   "An error occurred while reading %{file}": "Podczas odczytu pliku %{file} wystąpił błąd",
   "An error occurred while reading audio from %{file}": "Podczas odczytu dźwięku z pliku %{file} wystąpił błąd",
   "An error occurred while mixing audio": "Podczas miksowania dźwięku wystąpił błąd",
-  "Edit your replays with Highlighter, a free editor built in to Streamlabs.": "Edit your replays with Highlighter, a free editor built in to Streamlabs."
+  "Edit your replays with Highlighter, a free editor built in to Streamlabs.": "Montuj swoje powtórki z użyciem Highlighter, bezpłatnego edytora wbudowanego w aplikację Streamlabs."
 }
