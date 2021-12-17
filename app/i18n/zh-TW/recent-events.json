@@ -74,6 +74,6 @@
   "Safe Mode is Enabled": "安全模式已啟用",
   "Disable Safe Mode": "停用安全模式",
   "Something went wrong disabling Safe Mode": "停用安全模式時發生某些錯誤",
-  "Automatically disable Safe Mode": "Automatically disable Safe Mode",
-  "Disable after <duration></duration> minutes": "Disable after <duration></duration> minutes"
+  "Automatically disable Safe Mode": "自動停用安全模式",
+  "Disable after <duration></duration> minutes": "經過 &lt;duration&gt;&lt;/duration&gt; 分鐘後停用"
 }
