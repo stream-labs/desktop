@@ -88,9 +88,9 @@
   "here": "her",
   "Link": "Link",
   "Description": "Beskrivelse",
-  "OBSInit.UnknownError": "An unknown error was encountered while initializing Streamlabs.",
-  "OBSInit.ModuleNotFoundError": "DirectX er ikke installeret på computeren. Installer den seneste version af DirectX fra <https://www.microsoft.com/da-us/download/details.aspx?id=35?>, og prøv igen.",
-  "OBSInit.NotSupportedError": "Failed to initialize Streamlabs. Your video drivers may be out of date, or Streamlabs Desktop may not be supported on your system.",
+  "OBSInit.UnknownError": "Der opstod en ukendt fejl under start af Streamlabs.",
+  "OBSInit.ModuleNotFoundError": "DirectX er ikke installeret på computeren. Installer den seneste version af DirectX fra , og prøv igen.",
+  "OBSInit.NotSupportedError": "Streamlabs kunne ikke startes. Dine videoenheder er muligvis forældede, eller Streamlabs Desktop understøttes muligvis ikke på dit system.",
   "Log Out": "Log ud",
   "Layout Editor": "Layoutredigering",
   "Are you sure you want to import multiple files?": "Er du sikker på at du vil importere flere filer?",
@@ -135,9 +135,9 @@
   "Time": "Tid",
   "Sound Volume": "Lydstyrke",
   "Sound": "Lyd",
-  "Play Audio": "Play Audio",
-  "Click here": "Click here",
-  "More Info": "More Info",
-  "Revert Changes": "Revert Changes",
-  "Animations": "Animations"
+  "Play Audio": "Afspil lyd",
+  "Click here": "Klik her",
+  "More Info": "Flere oplysninger",
+  "Revert Changes": "Annuller ændringer",
+  "Animations": "Animationer"
 }
