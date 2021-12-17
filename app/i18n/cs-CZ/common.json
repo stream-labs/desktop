@@ -88,9 +88,9 @@
   "here": "zde",
   "Link": "Propojit",
   "Description": "Popis",
-  "OBSInit.UnknownError": "An unknown error was encountered while initializing Streamlabs.",
-  "OBSInit.ModuleNotFoundError": "Ve vašem počítači se nepodařilo najít rozhraní DirectX. Nejnovější verzi DirectX pro svůj počítač nainstalujte z adresy <https://www.microsoft.com/en-us/download/details.aspx?id=35?> a akci opakujte.",
-  "OBSInit.NotSupportedError": "Failed to initialize Streamlabs. Your video drivers may be out of date, or Streamlabs Desktop may not be supported on your system.",
+  "OBSInit.UnknownError": "Při inicializaci Streamlabs došlo k neznámé chybě.",
+  "OBSInit.ModuleNotFoundError": "Ve vašem počítači se nepodařilo najít rozhraní DirectX. Nejnovější verzi DirectX pro svůj počítač nainstalujte z adresy &lt;https://www.microsoft.com/en-us/download/details.aspx?id=35?&gt; a akci opakujte.",
+  "OBSInit.NotSupportedError": "Streamlabs se nepodařilo inicializovat. Vaše ovladače videa mohou být zastaralé nebo software Streamlabs Desktop nemusí být vaším systémem podporován.",
   "Log Out": "Odhlásit se",
   "Layout Editor": "Editor rozložení",
   "Are you sure you want to import multiple files?": "Opravdu chcete naimportovat více souborů?",
@@ -135,9 +135,9 @@
   "Time": "Čas",
   "Sound Volume": "Hlasitost",
   "Sound": "Zvuk",
-  "Play Audio": "Play Audio",
+  "Play Audio": "Přehrát zvuk",
   "Click here": "Klikněte zde",
-  "More Info": "More Info",
-  "Revert Changes": "Revert Changes",
-  "Animations": "Animations"
+  "More Info": "Další informace",
+  "Revert Changes": "Vrátit změny",
+  "Animations": "Animace"
 }
