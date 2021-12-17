@@ -244,6 +244,7 @@ if (!gotTheLock) {
     const LOAD_DELAY = 2000;
     setTimeout(
       () => {
+        if (process.env.NAIR_PRODUCTION_DEBUG || process.env.DEV_SERVER) openDevTools();
         mainWindow.loadURL(`${global.indexUrl}?windowId=main`);
       },
       isDevMode ? LOAD_DELAY : 0,
@@ -312,7 +313,7 @@ if (!gotTheLock) {
       .then(name => console.log(name))
       .catch(err => console.log(err));
 
-    if (process.env.NAIR_PRODUCTION_DEBUG || process.env.DEV_SERVER) openDevTools();
+    // if (process.env.NAIR_PRODUCTION_DEBUG || process.env.DEV_SERVER) openDevTools();
 
     // simple messaging system for services between windows
     // WARNING! the child window use synchronous requests and will be frozen

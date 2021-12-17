@@ -1,5 +1,15 @@
 <template>
-  <div class="footer">
+  <div v-if="compactMode">
+    <div class="footer">
+      <streaming-controller :locked="locked" />
+    </div>
+    <div class="footer">
+      <div class="flex flex--center flex--grow flex--justify-start">
+        <performance-metrics />
+      </div>
+    </div>
+  </div>
+  <div class="footer" v-else>
     <div class="flex flex--center flex--grow flex--justify-start">
       <performance-metrics />
     </div>

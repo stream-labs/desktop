@@ -1,16 +1,35 @@
 <template>
-  <div class="studio-controls row expanded" :class="{ opened }">
+  <div class="studio-controls row expanded" :class="{ opened: opened || compactMode }">
     <button
       @click="onToggleControls"
       class="studio-controls-toggle-button"
       :class="{ 'studio-controls--opened': opened }"
+      v-if="!compactMode"
     >
       <ControlsArrow />
     </button>
     <template v-if="compactMode">
-      TODO: TABにする
-      <scene-selector class="studio-controls-panel small-4 columns" />
-      <mixer class="studio-controls-panel small-4 columns" />
+      <div class="studio-controls-compact">
+        <div style="studio-controls-tabs">
+          <a
+            @click="compactModeStudioController = 'scenes'"
+            class="studio-controls-tab"
+            :class="{ active: compactModeStudioController === 'scenes' }"
+            >scenes</a
+          >
+          <a
+            @click="compactModeStudioController = 'mixer'"
+            class="studio-controls-tab"
+            :class="{ active: compactModeStudioController === 'mixer' }"
+            >mixer</a
+          >
+        </div>
+        <scene-selector
+          class="studio-controls-panel"
+          v-if="compactModeStudioController === 'scenes'"
+        />
+        <mixer class="studio-controls-panel" v-if="compactModeStudioController === 'mixer'" />
+      </div>
     </template>
     <template v-else-if="opened">
       <scene-selector class="studio-controls-panel small-4 columns" />
@@ -98,6 +117,25 @@
   height: 100%;
   padding: 0 4px;
   position: relative;
+}
+
+.studio-controls-compact {
+  display: flex;
+  flex-direction: column;
+}
+
+.studio-controls-tabs {
+  display: flex;
+  flex-direction: row;
+}
+
+.studio-controls-tab {
+  padding: 0 4px;
+
+  &.active {
+    .bold;
+    color: white;
+  }
 }
 
 .studio-controls-top {

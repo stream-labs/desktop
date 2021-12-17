@@ -58,6 +58,10 @@ export class CustomizationService
     }
   }
 
+  setCompactModeStudioController(controller: 'scenes' | 'mixer') {
+    this.setSettings({ compactModeStudioController: controller });
+  }
+
   get studioControlsOpened() {
     return this.state.studioControlsOpened;
   }

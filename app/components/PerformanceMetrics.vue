@@ -1,37 +1,40 @@
 <template>
   <div class="performance-metrics flex">
     <span class="performance-metric-wrapper resolution">
-      <i class="performance-metric-icon icon-display"/>
+      <i class="performance-metric-icon icon-display" />
       <span class="performance-metric">
         <span class="performance-metric__value">{{ outputResolution }}</span>
       </span>
     </span>
 
     <span class="performance-metric-wrapper cpu_percent">
-      <i class="performance-metric-icon icon-cpu"/>
+      <i class="performance-metric-icon icon-cpu" />
       <span class="performance-metric">
         <span class="performance-metric__value">{{ $t('common.cpu') }}{{ cpuPercent }}%</span>
       </span>
     </span>
 
     <span class="performance-metric-wrapper band_width">
-      <i class="performance-metric-icon icon-kbps"/>
+      <i class="performance-metric-icon icon-kbps" />
       <span class="performance-metric">
         <span class="performance-metric__value">{{ bandwidth }}</span> kbps
       </span>
     </span>
 
     <span class="performance-metric-wrapper frame_rate">
-      <i class="performance-metric-icon icon-fps"/>
+      <i class="performance-metric-icon icon-fps" />
       <span class="performance-metric">
-        <span class="performance-metric__value">{{ frameRate }}</span>&#47;<span class="performance-metric__value">{{ targetFrameRate }}FPS</span>
+        <span class="performance-metric__value">{{ frameRate }}</span
+        >&#47;<span class="performance-metric__value">{{ targetFrameRate }}FPS</span>
       </span>
     </span>
 
     <span class="performance-metric-wrapper dropped_frames">
-      <i class="performance-metric-icon icon-drop-fps"/>
+      <i class="performance-metric-icon icon-drop-fps" />
       <span class="performance-metric">
-        <span class="performance-metric__value">{{ $t('common.droppedFrames') }}{{ droppedFrames }} ({{ percentDropped }}%)</span>
+        <span class="performance-metric__value"
+          >{{ $t('common.droppedFrames') }}{{ droppedFrames }} ({{ percentDropped }}%)</span
+        >
       </span>
     </span>
   </div>
@@ -40,7 +43,7 @@
 <script lang="ts" src="./PerformanceMetrics.vue.ts"></script>
 
 <style lang="less" scoped>
-@import "../styles/index";
+@import '../styles/index';
 
 .performance-metrics {
   flex-wrap: wrap;
@@ -94,5 +97,4 @@
 .band_width {
   min-width: 108px;
 }
-
 </style>

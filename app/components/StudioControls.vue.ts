@@ -28,6 +28,9 @@ export default class StudioControls extends Vue {
   get compactModeStudioController() {
     return this.customizationService.state.compactModeStudioController;
   }
+  set compactModeStudioController(controller: 'scenes' | 'mixer') {
+    this.customizationService.setCompactModeStudioController(controller);
+  }
 
   onToggleControls() {
     this.customizationService.toggleStudioControls();

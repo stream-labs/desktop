@@ -1,10 +1,10 @@
-import Vue from 'vue';
-import { Component } from 'vue-property-decorator';
-import { UserService } from 'services/user';
+import electron from 'electron';
 import { Inject } from 'services/core/injector';
 import { CustomizationService } from 'services/customization';
 import { $t } from 'services/i18n';
-import electron from 'electron';
+import { UserService } from 'services/user';
+import Vue from 'vue';
+import { Component } from 'vue-property-decorator';
 
 @Component({})
 export default class Login extends Vue {
@@ -42,7 +42,7 @@ export default class Login extends Vue {
     this.userService.showLogin();
   }
 
-  openUserpage() {
+  openUserPage() {
     electron.remote.shell.openExternal(this.userPageURL);
   }
 }

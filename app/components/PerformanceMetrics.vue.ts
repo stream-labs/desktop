@@ -19,6 +19,10 @@ export default class PerformanceMetrics extends Vue {
   visitorTooltip = $t('common.numberOfVisitors');
   commentTooltip = $t('common.numberOfComments');
 
+  get compactMode() {
+    return this.customizationService.state.compactMode;
+  }
+
   get isLoggedIn() {
     return this.userService.isLoggedIn();
   }

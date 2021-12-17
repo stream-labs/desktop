@@ -3,15 +3,11 @@
     <a v-if="!compactMode" class="link" @click="logout" :title="$t('common.logout')">
       <i class="icon-log-out" />
     </a>
-    <a
-      @click="openUserpage"
-      class="user__profile"
-      :title="username">
-        <img class="user__thumbnail" :src="userIcon">
+    <a @click="openUserPage" class="user__profile" :title="username">
+      <img class="user__thumbnail" :src="userIcon" />
     </a>
   </div>
-  <div
-    v-else>
+  <div v-else>
     <a v-if="!compactMode" class="link" @click="login" :title="$t('common.login')">
       <i class="icon-log-in" />
     </a>
@@ -21,7 +17,7 @@
 <script lang="ts" src="./Login.vue.ts"></script>
 
 <style lang="less" scoped>
-@import "../styles/index";
+@import '../styles/index';
 
 .login__status {
   display: flex;
@@ -47,11 +43,11 @@
   }
 }
 
-.link {  
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 48px;
-    height: 36px;
+.link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 36px;
 }
 </style>

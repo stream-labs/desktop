@@ -3,7 +3,7 @@
     <title-bar class="main-title" :title="title" />
     <div class="main-contents">
       <side-nav v-if="page !== 'Onboarding'" :locked="applicationLoading"></side-nav>
-      <div class="main-middle">
+      <div class="main-middle" v-if="showMainMiddle">
         <div v-if="shouldLockContent" class="main-loading">
           <custom-loader></custom-loader>
         </div>

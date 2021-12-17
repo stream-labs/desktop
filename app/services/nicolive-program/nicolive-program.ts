@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { StatefulService, mutation } from 'services/core/stateful-service';
 import { NicoliveClient, CreateResult, EditResult, isOk } from './NicoliveClient';
 import { ProgramSchedules } from './ResponseTypes';
@@ -8,6 +9,12 @@ import { UserService } from 'services/user';
 import { BrowserWindow } from 'electron';
 import { BehaviorSubject } from 'rxjs';
 import { NicoliveFailure, openErrorDialogFromFailure } from './NicoliveFailure';
+import { CustomizationService } from 'services/customization';
+
+const STUDIO_WIDTH = 800;
+const SIDENAV_WIDTH = 48;
+const NICOLIVE_PANEL_WIDTH = 400;
+const PANEL_DIVIDER_WIDTH = 24;
 
 type Schedules = ProgramSchedules['data'];
 type Schedule = Schedules[0];
@@ -40,12 +47,14 @@ interface INicoliveProgramState extends ProgramState {
   autoExtensionEnabled: boolean;
   panelOpened: boolean | null; // 初期化前はnull、永続化された値の読み出し後に値が入る
   isLoggedIn: boolean | null; // 初期化前はnull、永続化された値の読み出し後に値が入る
+  isCompact: boolean | null;
 }
 
 export enum PanelState {
   INACTIVE = 'INACTIVE',
   OPENED = 'OPENED',
   CLOSED = 'CLOSED',
+  COMPACT = 'COMPACT',
 }
 
 export class NicoliveProgramService extends StatefulService<INicoliveProgramState> {
@@ -54,6 +63,7 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
   windowsService: WindowsService;
   @Inject()
   userService: UserService;
+  @Inject() customizationService: CustomizationService;
 
   private stateChangeSubject = new BehaviorSubject(this.state);
   stateChange = this.stateChangeSubject.asObservable();
@@ -85,6 +95,7 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
     autoExtensionEnabled: false,
     panelOpened: null,
     isLoggedIn: null,
+    isCompact: null,
   };
 
   init(): void {
@@ -101,6 +112,14 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
         this.setState({ isLoggedIn: Boolean(user) });
         if (!user) {
           this.setState(NicoliveProgramService.programInitialState);
+        }
+      },
+    });
+
+    this.customizationService.settingsChanged.subscribe({
+      next: customization => {
+        if ('compactMode' in customization) {
+          this.setState({ isCompact: customization.compactMode });
         }
       },
     });
@@ -389,7 +408,7 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
     /*: 予約番組で現在時刻が開始時刻より30分以上前なら、30分を切ったときに再取得するための補正項 */
     const readyTimeTermIfReserved =
       nextState.status === 'reserved' &&
-      nextState.startTime - Math.floor(Date.now() / 1000) > 30 * 60
+        nextState.startTime - Math.floor(Date.now() / 1000) > 30 * 60
         ? -30 * 60
         : 0;
     const nextTargetTime: number =
@@ -479,8 +498,13 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
     this.stateService.togglePanelOpened();
   }
 
-  static getPanelState(panelOpened: boolean, isLoggedIn: boolean): PanelState | null {
+  static getPanelState(
+    panelOpened: boolean,
+    isLoggedIn: boolean,
+    isCompact: boolean,
+  ): PanelState | null {
     if (panelOpened === null || isLoggedIn === null) return null;
+    if (isCompact) return PanelState.COMPACT;
     if (!isLoggedIn) return PanelState.INACTIVE;
     return panelOpened ? PanelState.OPENED : PanelState.CLOSED;
   }
@@ -489,7 +513,8 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
   refreshWindowSize(prevState: INicoliveProgramState, nextState: INicoliveProgramState): void {
     if (
       prevState.panelOpened === nextState.panelOpened &&
-      prevState.isLoggedIn === nextState.isLoggedIn
+      prevState.isLoggedIn === nextState.isLoggedIn &&
+      prevState.isCompact === nextState.isCompact
     ) {
       return;
     }
@@ -497,10 +522,12 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
     const prevPanelState = NicoliveProgramService.getPanelState(
       prevState.panelOpened,
       prevState.isLoggedIn,
+      prevState.isCompact,
     );
     const nextPanelState = NicoliveProgramService.getPanelState(
       nextState.panelOpened,
       nextState.isLoggedIn,
+      nextState.isCompact,
     );
     if (prevPanelState !== nextPanelState) {
       NicoliveProgramService.updateWindowSize(
@@ -512,9 +539,10 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
   }
 
   static WINDOW_MIN_WIDTH: { [key in PanelState]: number } = {
-    INACTIVE: 800, // 通常値
-    OPENED: 800 + 400 + 24, // +パネル幅+開閉ボタン幅
-    CLOSED: 800 + 24, // +開閉ボタン幅
+    INACTIVE: SIDENAV_WIDTH + STUDIO_WIDTH, // 通常値
+    OPENED: SIDENAV_WIDTH + STUDIO_WIDTH + NICOLIVE_PANEL_WIDTH + PANEL_DIVIDER_WIDTH, // +パネル幅+開閉ボタン幅
+    CLOSED: SIDENAV_WIDTH + STUDIO_WIDTH + PANEL_DIVIDER_WIDTH, // +開閉ボタン幅
+    COMPACT: SIDENAV_WIDTH + NICOLIVE_PANEL_WIDTH, // コンパクトモードはパネル幅+
   };
 
   /*
@@ -532,6 +560,11 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
 
     // 復元されたウィンドウ幅が復元されたパネル状態の最小幅を満たさない場合、最小幅まで広げる
     if (onInit && width < nextMinWidth) {
+      win.setSize(nextMinWidth, height);
+    }
+
+    // コンパクトモードになるときはパネルサイズを強制する
+    if (nextState === PanelState.COMPACT) {
       win.setSize(nextMinWidth, height);
     }
 

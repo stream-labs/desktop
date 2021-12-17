@@ -1,11 +1,16 @@
 <template>
   <div class="root">
-    <button @click="onToggle" class="nicolive-area-toggle-button" :class="{ 'nicolive-area--opened': opened }">
+    <button
+      @click="onToggle"
+      class="nicolive-area-toggle-button"
+      :class="{ 'nicolive-area--opened': opened }"
+      v-if="!compactMode"
+    >
       <ControlsArrow />
     </button>
-    <div class="nicolive-area-container" v-if="opened">
+    <div class="nicolive-area-container" v-if="opened || compactMode">
       <top-nav />
-      <div class="program-area" :class="{ 'isCreate': !hasProgram }">
+      <div class="program-area" :class="{ isCreate: !hasProgram }">
         <template v-if="hasProgram">
           <program-info class="program-area-item" />
           <tool-bar class="program-area-item" />
@@ -16,10 +21,25 @@
           </area-switcher>
         </template>
         <template v-else>
-          <p class="message"><i class="icon-niconico"></i>このエリアではニコニコ生放送を<br>配信するための機能が利用できます</p>
+          <p class="message">
+            <i class="icon-niconico"></i
+            >このエリアではニコニコ生放送を<br />配信するための機能が利用できます
+          </p>
           <div class="button-wrapper">
-            <button class="button button--create-program" @click="createProgram" :disabled="isCreating">新しく番組を作成する</button>
-            <button class="button button--fetch-program" @click="fetchProgram" :disabled="isFetching">作成済みの番組を取得する</button>
+            <button
+              class="button button--create-program"
+              @click="createProgram"
+              :disabled="isCreating"
+            >
+              新しく番組を作成する
+            </button>
+            <button
+              class="button button--fetch-program"
+              @click="fetchProgram"
+              :disabled="isFetching"
+            >
+              作成済みの番組を取得する
+            </button>
           </div>
         </template>
       </div>
@@ -29,7 +49,7 @@
 
 <script lang="ts" src="./NicoliveArea.vue.ts"></script>
 <style lang="less" scoped>
-@import "../../styles/index";
+@import '../../styles/index';
 
 .root {
   display: flex;
@@ -50,7 +70,7 @@
     width: 10px;
     height: 140px;
     fill: @text-primary;
-    transition: .5s;
+    transition: 0.5s;
     transform: rotate(0deg);
   }
 
@@ -131,7 +151,6 @@
   flex-grow: 1;
   flex-basis: 0;
 }
-
 </style>
 
 

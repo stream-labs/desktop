@@ -46,6 +46,9 @@ export default class Main extends Vue {
   get isCompactMode() {
     return this.customizationService.state.compactMode;
   }
+  get compactModeTab() {
+    return this.customizationService.state.compactModeTab;
+  }
 
   get title() {
     return this.windowsService.state.main.title;
@@ -71,7 +74,17 @@ export default class Main extends Vue {
     return this.navigationService.state.currentPage === 'Onboarding';
   }
 
+  get showMainMiddle() {
+    if (this.isCompactMode) {
+      return this.compactModeTab === 'studio';
+    }
+    return true;
+  }
+
   get showNicoliveArea() {
+    if (this.isCompactMode) {
+      return this.compactModeTab === 'niconico';
+    }
     return this.page === 'Studio' && this.isLoggedIn;
   }
 

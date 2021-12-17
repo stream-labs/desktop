@@ -57,6 +57,10 @@ export default class NicolivePanelRoot extends Vue {
     this.nicoliveProgramService.togglePanelOpened();
   }
 
+  get compactMode(): boolean {
+    return this.nicoliveProgramService.state.isCompact;
+  }
+
   isCreating: boolean = false;
   async createProgram(): Promise<void> {
     if (this.isCreating) throw new Error('createProgram is running');

@@ -16,23 +16,17 @@
               :class="{ active: compactModeTab === 'niconico' }"
               data-test="compact-tab-niconico"
             >
-              <i
-                :class="{ 'icon-niconico': true }"
-                :title="$t('common.compactModeTab.niconico')"
-              />
+              <i :class="{ 'icon-niconico': true }" :title="$t('common.compactModeTab.niconico')" />
             </a>
           </div>
           <div class="side-nav-item">
-            <a 
+            <a
               @click="compactModeTab = 'studio'"
               class="link"
               :class="{ active: compactModeTab === 'studio' }"
               data-test="compact-tab-studio"
             >
-              <i
-                :class="{ 'icon-video': true }"
-                :title="$t('common.compactModeTab.studio')"
-              />
+              <i :class="{ 'icon-video': true }" :title="$t('common.compactModeTab.studio')" />
             </a>
           </div>
         </div>
@@ -42,49 +36,35 @@
           <i class="icon-dev" title="開発者ツール" />
         </a>
       </div>
-    </div>   
+    </div>
 
     <div class="filler"></div>
 
     <template v-if="!compactMode">
       <div class="bottom-tools">
         <div class="side-nav-item">
-          <a @click="studioMode" 
-            class="link" 
-            :class="{ 'active': studioModeEnabled }"
+          <a
+            @click="studioMode"
+            class="link"
+            :class="{ active: studioModeEnabled }"
             :title="$t('common.studioMode')"
           >
             <i class="icon-studio-mode" />
           </a>
         </div>
         <div class="side-nav-item feedback-button">
-          <a
-            @click="openFeedback"
-            class="link"
-            :title="$t('common.feedback')"
-          >
+          <a @click="openFeedback" class="link" :title="$t('common.feedback')">
             <i class="icon-feedback" />
           </a>
         </div>
         <div class="side-nav-item help-button">
-          <a
-            @click="openHelp"
-            class="link"
-            :title="$t('common.help')"
-          >
+          <a @click="openHelp" class="link" :title="$t('common.help')">
             <i class="icon-help" />
           </a>
         </div>
         <div class="side-nav-item information-button">
-          <a 
-            @click="openInformations"
-            class="link"
-            :title="$t('informations.title')"
-          >
-            <i
-              class="icon-notification"
-              :class="{ isUnseen: hasUnseenInformation }"
-            />
+          <a @click="openInformations" class="link" :title="$t('informations.title')">
+            <i class="icon-notification" :class="{ isUnseen: hasUnseenInformation }" />
           </a>
         </div>
         <div class="side-nav-item">
@@ -149,7 +129,7 @@
   align-items: center;
   flex-direction: column;
 
-   &:before {
+  &:before {
     content: '';
     width: 18px;
     height: 1px;
