@@ -27,7 +27,7 @@
   "Replay Duration": "リプレイの所要時間",
   "Set a hotkey to capture replays": "ホットキーを設定してリプレイをキャプチャ",
   "Capture a replay": "リプレイをキャプチャ",
-  "highlighterHotkeyInstructions": "ストリーミングを開始し、<b>%{bindingStr}</b> を押してリプレイをキャプチャします。ストリームの後でここに戻って確認してください。",
+  "highlighterHotkeyInstructions": "ストリーミングを開始し、&lt;b&gt;%{bindingStr}&lt;/b&gt; を押してリプレイをキャプチャします。ストリームの後でここに戻って確認してください。",
   "Start streaming and capture a replay. Check back here after your stream.": "ストリーミングを開始してリプレイをキャプチャします。ストリームの後でここに戻って確認してください。",
   "Or, import a clip from your computer": "またはコンピュータからクリップをインポートします",
   "Disable clip": "クリップを無効にする",
@@ -90,5 +90,5 @@
   "An error occurred while reading %{file}": "%{file} の読み込み中にエラーが発生しました",
   "An error occurred while reading audio from %{file}": "%{file} からのオーディオ読み込み中にエラーが発生しました",
   "An error occurred while mixing audio": "オーディオのミキシング中にエラーが発生しました",
-  "Edit your replays with Highlighter, a free editor built in to Streamlabs.": "Edit your replays with Highlighter, a free editor built in to Streamlabs."
+  "Edit your replays with Highlighter, a free editor built in to Streamlabs.": "Streamlabs 内蔵の無料エディタ Highlighter でリプレイを編集しましょう。"
 }
