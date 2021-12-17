@@ -74,6 +74,6 @@
   "Safe Mode is Enabled": "Güvenli Mod Etkin",
   "Disable Safe Mode": "Güvenli Modu Devre Dışı Bırak",
   "Something went wrong disabling Safe Mode": "Güvenli Mod devre dışı bırakılırken bir hata oluştu",
-  "Automatically disable Safe Mode": "Automatically disable Safe Mode",
-  "Disable after <duration></duration> minutes": "Disable after <duration></duration> minutes"
+  "Automatically disable Safe Mode": "Güvenli Modu otomatik olarak devre dışı bırak",
+  "Disable after <duration></duration> minutes": "&lt;duration&gt;&lt;/duration&gt; dakika sonra devre dışı bırak"
 }
