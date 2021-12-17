@@ -74,6 +74,6 @@
   "Safe Mode is Enabled": "안전 모드 활성화됨",
   "Disable Safe Mode": "안전 모드 비활성화",
   "Something went wrong disabling Safe Mode": "안전 모드 비활성화 중 뭔가 잘못되었습니다",
-  "Automatically disable Safe Mode": "Automatically disable Safe Mode",
-  "Disable after <duration></duration> minutes": "Disable after <duration></duration> minutes"
+  "Automatically disable Safe Mode": "안전 모드 자동 비활성화",
+  "Disable after <duration></duration> minutes": "&lt;duration&gt;&lt;/duration&gt; 분 후 비활성화"
 }
