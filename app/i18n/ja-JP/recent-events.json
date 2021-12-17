@@ -74,6 +74,6 @@
   "Safe Mode is Enabled": "セーフモードが有効になりました",
   "Disable Safe Mode": "セーフモードを無効にする",
   "Something went wrong disabling Safe Mode": "セーフモードの無効化に何らかの問題が発生しました",
-  "Automatically disable Safe Mode": "Automatically disable Safe Mode",
-  "Disable after <duration></duration> minutes": "Disable after <duration></duration> minutes"
+  "Automatically disable Safe Mode": "セーフモードを自動的に無効にする",
+  "Disable after <duration></duration> minutes": "&lt;duration&gt;&lt;/duration&gt; 分後に無効にする"
 }
