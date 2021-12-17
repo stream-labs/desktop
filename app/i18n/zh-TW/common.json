@@ -88,9 +88,9 @@
   "here": "這裡",
   "Link": "連結",
   "Description": "描述",
-  "OBSInit.UnknownError": "An unknown error was encountered while initializing Streamlabs.",
-  "OBSInit.ModuleNotFoundError": "在您的系統上找不到 DirectX。請到這裡<https://www.microsoft.com/en-us/download/details.aspx?id=35?>在您的電腦上安裝最新版本的 DirectX，然後再試一次。",
-  "OBSInit.NotSupportedError": "Failed to initialize Streamlabs. Your video drivers may be out of date, or Streamlabs Desktop may not be supported on your system.",
+  "OBSInit.UnknownError": "初始化 Streamlabs 時發生不明錯誤。",
+  "OBSInit.ModuleNotFoundError": "在您的系統上找不到 DirectX。請到這裡&lt;https://www.microsoft.com/en-us/download/details.aspx?id=35?&gt;在您的電腦上安裝最新版本的 DirectX，然後再試一次。",
+  "OBSInit.NotSupportedError": "無法初始化 Streamlabs。您的視訊驅動程式可能非最新版本，或您的系統可能不支援 Streamlabs Desktop。",
   "Log Out": "登出",
   "Layout Editor": "版面編輯器",
   "Are you sure you want to import multiple files?": "您確定要匯入多個檔案嗎？",
@@ -135,9 +135,9 @@
   "Time": "時間",
   "Sound Volume": "聲音音量",
   "Sound": "聲音",
-  "Play Audio": "Play Audio",
+  "Play Audio": "播放音訊",
   "Click here": "點這",
-  "More Info": "More Info",
-  "Revert Changes": "Revert Changes",
-  "Animations": "Animations"
+  "More Info": "更多資訊",
+  "Revert Changes": "恢復變更",
+  "Animations": "動畫"
 }
