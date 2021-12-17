@@ -142,7 +142,7 @@ export class NiconicoService extends Service implements IPlatformService {
       if (this.streamingStatus === EStreamingState.Reconnecting) {
         console.log('reconnecting - checking stream key');
         this.client.fetchBroadcastStream(this.channelId).catch(() => {
-          console.log('niconico programas has ended! stopping streaming.');
+          console.log('niconico program has ended! stopping streaming.');
           this.streamingService.stopStreaming();
         });
       }
