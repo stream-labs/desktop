@@ -1,12 +1,12 @@
 {
   "Mini Feed": "Mini feed",
   "has tipped": "deu gorjeta",
-  "has tipped with %{itemName}": "deu gorjeta com % {itemName}",
+  "has tipped with %{itemName}": "deu gorjeta com %{itemName}",
   "has tipped %{months} months in a row": "deu gorjeta %{months} meses seguidos",
   "has set up a monthly tip": "agendou uma gorjeta mensal",
   "has followed": "seguiu",
   "has resubscribed (%{tier}) for %{streak} months in a row! (%{months} total)": "se inscreveu novamente (%{tier}) por %{streak} meses seguidos! (%{months} no total)",
-  "has gifted a sub (%{tier}) to": "presenteou uma inscrição (% {tier}) para",
+  "has gifted a sub (%{tier}) to": "presenteou uma inscrição (%{tier}) para",
   "has resubscribed (%{tier}) for %{months} months": "se inscreveu novamente (%{tier}) por %{months} meses",
   "has subscribed (%{tier})": "se inscreveu (%{tier})",
   "has converted from a Prime Gaming sub to a %{tier} sub": "has converted from a Prime Gaming sub to a %{tier} sub",
@@ -74,6 +74,6 @@
   "Safe Mode is Enabled": "Modo seguro está habilitado",
   "Disable Safe Mode": "Desabilitar modo seguro",
   "Something went wrong disabling Safe Mode": "Alguma coisa deu errado quando o modo seguro estava sendo desabilitado",
-  "Automatically disable Safe Mode": "Automatically disable Safe Mode",
-  "Disable after <duration></duration> minutes": "Disable after <duration></duration> minutes"
+  "Automatically disable Safe Mode": "Desabilitar automaticamente o Modo Seguro",
+  "Disable after <duration></duration> minutes": "Desabilitar após &lt;duration&gt;&lt;/duration&gt; minutos"
 }
