@@ -74,6 +74,6 @@
   "Safe Mode is Enabled": "Nouzový režim je aktivován",
   "Disable Safe Mode": "Deaktivovat nouzový režim",
   "Something went wrong disabling Safe Mode": "Při deaktivaci nouzového režimu došlo k chybě",
-  "Automatically disable Safe Mode": "Automatically disable Safe Mode",
-  "Disable after <duration></duration> minutes": "Disable after <duration></duration> minutes"
+  "Automatically disable Safe Mode": "Automaticky deaktivovat nouzový režim",
+  "Disable after <duration></duration> minutes": "Deaktivovat po &lt;duration&gt;&lt;/duration&gt; minutách"
 }
