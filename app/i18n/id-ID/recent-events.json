@@ -74,6 +74,6 @@
   "Safe Mode is Enabled": "Safe Mode Diaktifkan",
   "Disable Safe Mode": "Nonaktifkan Safe Mode",
   "Something went wrong disabling Safe Mode": "Ada yang salah saat menonaktifkan Safe Mode",
-  "Automatically disable Safe Mode": "Automatically disable Safe Mode",
-  "Disable after <duration></duration> minutes": "Disable after <duration></duration> minutes"
+  "Automatically disable Safe Mode": "Secara otomatis nonaktifkan Safe Mode",
+  "Disable after <duration></duration> minutes": "Nonaktif setelah &lt;duration&gt;&lt;/duration&gt; menit"
 }
