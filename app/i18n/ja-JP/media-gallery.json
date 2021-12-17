@@ -27,9 +27,9 @@
   "Example": "例",
   "Change Media": "メディアの変更",
   "No Sound": "サウンドがありません",
-  "No Media": "No Media",
-  "Change Link": "Change Link",
-  "Pick From Gallery": "Pick From Gallery",
-  "Clear Link": "Clear Link",
-  "Media URL": "Media URL"
+  "No Media": "メディアがありません",
+  "Change Link": "リンクを変更",
+  "Pick From Gallery": "ギャラリーから選択",
+  "Clear Link": "リンクをクリア",
+  "Media URL": "メディア URL"
 }
