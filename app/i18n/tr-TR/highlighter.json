@@ -27,7 +27,7 @@
   "Replay Duration": "Tekrar Süresi",
   "Set a hotkey to capture replays": "Tekrarları yakalamak için bir kısayol belirleyin",
   "Capture a replay": "Bir tekrar yakalayın",
-  "highlighterHotkeyInstructions": "Akışa başlayın ve bir tekrar yakalamak için <b>%{bindingStr}</b> düğmesine basın. Akıştan sonra burayı tekrar kontrol edin.",
+  "highlighterHotkeyInstructions": "Akışa başlayın ve bir tekrar yakalamak için &lt;b&gt;%{bindingStr}&lt;/b&gt; düğmesine basın. Akıştan sonra burayı tekrar kontrol edin.",
   "Start streaming and capture a replay. Check back here after your stream.": "Akışa başlayın ve bir tekrar yakalayın. Akıştan sonra burayı tekrar kontrol edin.",
   "Or, import a clip from your computer": "Ya da bilgisayarınızdan bir klip içe aktarın",
   "Disable clip": "Klibi devre dışı bırak",
@@ -74,8 +74,8 @@
   "Upload to YouTube": "YouTube’a Yükle",
   "None": "Hiçbiri",
   "Random": "Rastgele",
-  "Fade": "Soldurma",
-  "Slide": "Hızlı Kaydır",
+  "Fade": "Soluklaşma",
+  "Slide": "Hızlı Kayma",
   "Cube": "Küp",
   "Warp": "Eğrilik",
   "Wind": "Rüzgâr",
@@ -90,5 +90,5 @@
   "An error occurred while reading %{file}": "%{file} okunurken bir hata oluştu",
   "An error occurred while reading audio from %{file}": "%{file} dosyasındaki ses okunurken bir hata oluştu",
   "An error occurred while mixing audio": "Ses mikslenirken bir hata oluştu",
-  "Edit your replays with Highlighter, a free editor built in to Streamlabs.": "Edit your replays with Highlighter, a free editor built in to Streamlabs."
+  "Edit your replays with Highlighter, a free editor built in to Streamlabs.": "Streamlabs’e entegre edilmiş ücretsiz bir düzenleyici olan Highlighter ile tekrarlarınızı düzenleyin."
 }
