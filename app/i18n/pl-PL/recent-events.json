@@ -74,6 +74,6 @@
   "Safe Mode is Enabled": "Tryb bezpieczny jest włączony",
   "Disable Safe Mode": "Wyłącz tryb bezpieczny",
   "Something went wrong disabling Safe Mode": "Coś poszło nie tak podczas wyłączania trybu bezpiecznego",
-  "Automatically disable Safe Mode": "Automatically disable Safe Mode",
-  "Disable after <duration></duration> minutes": "Disable after <duration></duration> minutes"
+  "Automatically disable Safe Mode": "Automatycznie wyłączaj tryb bezpieczny",
+  "Disable after <duration></duration> minutes": "Wyłącz po &lt;duration&gt;&lt;/duration&gt; minutach"
 }
