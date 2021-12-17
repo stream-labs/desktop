@@ -4,9 +4,10 @@
             "name": "obs-studio-node",
             "url": "https://s3-us-west-2.amazonaws.com/obsstudionodes3.streamlabs.com/",
             "archive": "osn-[VERSION]-release-[OS].tar.gz",
-            "version": "0.19.9",
+            "version": "0.19.12",
             "win64": true,
-            "osx": true
+            "osx": true,
+            "mac_version": "0.19.13"
         },
         {
             "name": "node-libuiohook",
@@ -36,7 +37,7 @@
             "name": "crash-handler",
             "url": "https://slobs-crash-handler.s3-us-west-2.amazonaws.com/",
             "archive": "crash-handler-[VERSION]-[OS].tar.gz",
-            "version": "1.2.2",
+            "version": "1.2.3",
             "win64": true,
             "osx": true
         },
