@@ -88,9 +88,9 @@
   "here": "aqui",
   "Link": "Link",
   "Description": "Descrição",
-  "OBSInit.UnknownError": "An unknown error was encountered while initializing Streamlabs.",
-  "OBSInit.ModuleNotFoundError": "Não encontramos o DirectX no seu sistema. Instale a última versão do DirectX disponível na sua máquina através desse link <https://www.microsoft.com/en-us/download/details.aspx?id=35?> e tente novamente.",
-  "OBSInit.NotSupportedError": "Failed to initialize Streamlabs. Your video drivers may be out of date, or Streamlabs Desktop may not be supported on your system.",
+  "OBSInit.UnknownError": "Foi encontrado um erro desconhecido ao iniciar o Streamlabs.",
+  "OBSInit.ModuleNotFoundError": "Não encontramos o DirectX no seu sistema. Instale a última versão do DirectX disponível na sua máquina através desse link &lt;https://www.microsoft.com/en-us/download/details.aspx?id=35?&gt; e tente novamente.",
+  "OBSInit.NotSupportedError": "Falha ao iniciar o Streamlabs. Seus drivers de vídeo podem estar desatualizados ou seu sistema não suporta o Streamlabs Desktop.",
   "Log Out": "Sair",
   "Layout Editor": "Editor de Layout",
   "Are you sure you want to import multiple files?": "Tem certeza que quer importar vários arquivos?",
@@ -135,9 +135,9 @@
   "Time": "Hora",
   "Sound Volume": "Volume do som",
   "Sound": "Som",
-  "Play Audio": "Play Audio",
+  "Play Audio": "Reproduzir áudio",
   "Click here": "Clique aqui",
-  "More Info": "More Info",
-  "Revert Changes": "Revert Changes",
-  "Animations": "Animations"
+  "More Info": "Mais informações",
+  "Revert Changes": "Reverter mudanças",
+  "Animations": "Animações"
 }
