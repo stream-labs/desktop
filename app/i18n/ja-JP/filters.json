@@ -27,7 +27,7 @@
   "Shader": "シェーダー",
   "No settings are available for this filter": "このフィルターに対して利用可能な設定はありません",
   "Visual Presets": "ビジュアルプリセット",
-  "None": "何もありません",
+  "None": "なし",
   "Grayscale": "グレイスケール",
   "Sepiatone": "セピアトーン",
   "Action Movie": "アクション映画",
@@ -38,5 +38,5 @@
   "Cel Shade": "トゥーンレンダリング",
   "Dramatic": "ドラマティック",
   "Wintergreen": "ウィンターグリーン",
-  "Edit Filters": "Edit Filters"
+  "Edit Filters": "フィルターを編集"
 }
