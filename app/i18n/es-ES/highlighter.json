@@ -16,7 +16,7 @@
   "Remove the clip?": "¿Quitar el clip?",
   "Are you sure you want to remove the clip? You will need to manually import it again to reverse this action.": "¿Confirma que quiere quitar el clip? Para revertir esta acción tendrá que importar el clip manualmente.",
   "Cancel": "Cancelar",
-  "Remove": "Eliminar",
+  "Remove": "Quitar",
   "The highlighter allows you to clip the best moments from your livestream and edit them together into an exciting highlight video you can upload directly to YouTube.": "El marcador de resaltado permite crear clips de los mejores momentos de sus streams en directo y editarlos para crear un vídeo que puede cargar directamente a YouTube.",
   "Get Started": "Empezar",
   "Configure the replay buffer": "Configurar el búfer de repetición",
@@ -27,7 +27,7 @@
   "Replay Duration": "Duración de repetición",
   "Set a hotkey to capture replays": "Configure una tecla de acceso rápido para capturar repeticiones",
   "Capture a replay": "Capturar una repetición",
-  "highlighterHotkeyInstructions": "Empiece a hacer streaming y pulse <b>%{bindingStr}</b> para capturar una repetición. Luego haga una comprobación.",
+  "highlighterHotkeyInstructions": "Empiece a hacer streaming y pulse &lt;b&gt;%{bindingStr}&lt;/b&gt; para capturar una repetición. Luego haga una comprobación.",
   "Start streaming and capture a replay. Check back here after your stream.": "Empiece a hacer streaming y capture una repetición. Luego haga una comprobación.",
   "Or, import a clip from your computer": "O importe un clip desde su ordenador",
   "Disable clip": "Desactivar clip",
@@ -74,8 +74,8 @@
   "Upload to YouTube": "Cargar a YouTube",
   "None": "Ninguno",
   "Random": "Aleatorio",
-  "Fade": "Desvanecer",
-  "Slide": "Diapositiva",
+  "Fade": "Fundir",
+  "Slide": "Deslizar",
   "Cube": "Cube",
   "Warp": "Warp",
   "Wind": "Wind",
@@ -90,5 +90,5 @@
   "An error occurred while reading %{file}": "Se produjo un error al leer %{file}",
   "An error occurred while reading audio from %{file}": "Se produjo un error al leer audio desde %{file}",
   "An error occurred while mixing audio": "Se produjo un error al mezclar audio",
-  "Edit your replays with Highlighter, a free editor built in to Streamlabs.": "Edit your replays with Highlighter, a free editor built in to Streamlabs."
+  "Edit your replays with Highlighter, a free editor built in to Streamlabs.": "Edite sus repeticiones con el marcador de resaltado, un editor gratis integrado en Streamlabs."
 }
