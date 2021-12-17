@@ -88,9 +88,9 @@
   "here": "di sini",
   "Link": "Tautan",
   "Description": "Deskripsi",
-  "OBSInit.UnknownError": "An unknown error was encountered while initializing Streamlabs.",
-  "OBSInit.ModuleNotFoundError": "DirectX tidak bisa ditemukan di sistem Anda. Instal versi DirectX terbaru di mesin Anda di sini <https://www.microsoft.com/en-us/download/details.aspx?id=35?> dan coba lagi.",
-  "OBSInit.NotSupportedError": "Failed to initialize Streamlabs. Your video drivers may be out of date, or Streamlabs Desktop may not be supported on your system.",
+  "OBSInit.UnknownError": "Ditemui kesalahan yang tidak diketahui saat menginisialisasi Streamlabs.",
+  "OBSInit.ModuleNotFoundError": "DirectX tidak bisa ditemukan di sistem Anda. Instal versi DirectX terbaru di mesin Anda di sini &lt;https://www.microsoft.com/en-us/download/details.aspx?id=35?&gt; dan coba lagi.",
+  "OBSInit.NotSupportedError": "Gagal menginisialisasi Streamlabs. Driver video Anda mungkin sudah kedaluwarsa atau Streamlabs Desktop mungkin tidak didukung pada sistem Anda.",
   "Log Out": "Log Out",
   "Layout Editor": "Editor Tata Letak",
   "Are you sure you want to import multiple files?": "Anda yakin ingin mengimpor beberapa file?",
@@ -135,9 +135,9 @@
   "Time": "Waktu",
   "Sound Volume": "Volume Suara",
   "Sound": "Suara",
-  "Play Audio": "Play Audio",
-  "Click here": "Click here",
-  "More Info": "More Info",
-  "Revert Changes": "Revert Changes",
-  "Animations": "Animations"
+  "Play Audio": "Mainkan Audio",
+  "Click here": "Klik di sini",
+  "More Info": "Info Selengkapnya",
+  "Revert Changes": "Membalikkan Perubahan",
+  "Animations": "Animasi"
 }
