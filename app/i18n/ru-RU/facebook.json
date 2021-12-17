@@ -14,7 +14,7 @@
   "Connect": "Подключиться",
   "Install Your Theme": "Установите свою тему",
   "Install": "Установить",
-  "facebookGamingWarning": "Для максимально удобной трансляции игр на Facebook <create-page-link>создайте страницу Gaming Video Creator</create-page-link>",
+  "facebookGamingWarning": "Для максимально удобной трансляции игр на Facebook &lt;create-page-link&gt;создайте страницу Gaming Video Creator&lt;/create-page-link&gt;",
   "Facebook Destination": "Назначение Facebook",
   "Share to Your Timeline": "Добавить на временную шкалу",
   "Share to a Page You Manage": "Добавить на страницу, которой вы управляете",
@@ -30,7 +30,7 @@
   "Please reconnect Facebook to get these new features": "Подключитесь к Facebook снова для доступа к этим новым функциям",
   "Reconnect now": "Переподключиться",
   "Privacy": "Конфиденциальность",
-  "FBPrivacyWarning": "Предоставленный уровень конфиденциальности может быть ограничен для вашего аккаунта Facebook. Проверьте раздел Who can see you use this business integration (Кто может видеть, что вы используете эту бизнес-интеграцию) для интеграции Streamlabs <link>здесь</link>.",
+  "FBPrivacyWarning": "Предоставленный уровень конфиденциальности может быть ограничен для вашего аккаунта Facebook. Проверьте раздел Who can see you use this business integration (Кто может видеть, что вы используете эту бизнес-интеграцию) для интеграции Streamlabs &lt;link&gt;здесь&lt;/link&gt;.",
   "Only Me": "Только для меня",
   "Do not change privacy settings": "Не изменять настройки конфиденциальности"
 }
