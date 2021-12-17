@@ -74,6 +74,6 @@
   "Safe Mode is Enabled": "Sikker tilstand er aktiveret",
   "Disable Safe Mode": "Deaktiver fejlsikret tilstand",
   "Something went wrong disabling Safe Mode": "Noget gik galt med at aktivere sikker tilstand",
-  "Automatically disable Safe Mode": "Automatically disable Safe Mode",
-  "Disable after <duration></duration> minutes": "Disable after <duration></duration> minutes"
+  "Automatically disable Safe Mode": "Deaktiver fejlsikret tilstand automatisk",
+  "Disable after <duration></duration> minutes": "Deaktiver efter &lt;duration&gt;&lt;/duration&gt; minutter"
 }
