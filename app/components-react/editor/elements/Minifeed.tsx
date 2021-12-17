@@ -10,5 +10,9 @@ export default function MiniFeed() {
     containerRef.current,
   );
 
-  return <div ref={containerRef}>{renderElement()}</div>;
+  return (
+    <div ref={containerRef} style={{ height: '100%' }}>
+      {renderElement()}
+    </div>
+  );
 }

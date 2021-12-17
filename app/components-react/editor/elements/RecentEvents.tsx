@@ -49,13 +49,13 @@ function Toolbar() {
           className={cx('fa fa-shield-alt action-icon', {
             [styles.teal]: safeModeEnabled,
           })}
-          onClick={RecentEventsService.actions.showSafeModeWindow}
+          onClick={() => RecentEventsService.actions.showSafeModeWindow()}
           v-tooltip={{ content: $t('Safe Mode'), placement: 'bottom' }}
         />
       )}
       <i
         className="icon-filter action-icon"
-        onClick={RecentEventsService.actions.showFilterMenu}
+        onClick={() => RecentEventsService.actions.showFilterMenu()}
         v-tooltip={{ content: $t('Popout Event Filtering Options'), placement: 'bottom' }}
       />
       {mediaShareEnabled && (
@@ -67,12 +67,12 @@ function Toolbar() {
       )}
       <i
         className={`${queuePaused ? 'icon-media-share-2' : 'icon-pause'} action-icon`}
-        onClick={RecentEventsService.actions.toggleQueue}
+        onClick={() => RecentEventsService.actions.toggleQueue()}
         v-tooltip={{ content: pauseTooltip, placement: 'left' }}
       />
       <i
         className="icon-skip action-icon"
-        onClick={RecentEventsService.actions.skipAlert}
+        onClick={() => RecentEventsService.actions.skipAlert()}
         v-tooltip={{ content: $t('Skip Alert'), placement: 'left' }}
       />
       <i
@@ -82,7 +82,7 @@ function Toolbar() {
           'fa-volume-up': !muted,
           'icon-mute': muted,
         })}
-        onClick={RecentEventsService.actions.toggleMuteEvents}
+        onClick={() => RecentEventsService.actions.toggleMuteEvents()}
         v-tooltip={{ content: $t('Mute Event Sounds'), placement: 'left' }}
       />
     </div>
