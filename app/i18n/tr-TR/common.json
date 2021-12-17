@@ -88,9 +88,9 @@
   "here": "buraya",
   "Link": "Bağlantı",
   "Description": "Açıklama",
-  "OBSInit.UnknownError": "An unknown error was encountered while initializing Streamlabs.",
-  "OBSInit.ModuleNotFoundError": "Sisteminizde DirectX bulunamadı. Lütfen <https://www.microsoft.com/en-us/download/details.aspx?id=35?> adresinden makineniz için en son DirectX sürümünü yükleyin ve tekrar deneyin.",
-  "OBSInit.NotSupportedError": "Failed to initialize Streamlabs. Your video drivers may be out of date, or Streamlabs Desktop may not be supported on your system.",
+  "OBSInit.UnknownError": "Streamlabs başlatılırken bilinmeyen bir hatayla karşılaşıldı.",
+  "OBSInit.ModuleNotFoundError": "Sisteminizde DirectX bulunamadı. Lütfen &lt;https://www.microsoft.com/en-us/download/details.aspx?id=35?&gt; adresinden makineniz için en son DirectX sürümünü yükleyin ve tekrar deneyin.",
+  "OBSInit.NotSupportedError": "Streamlabs başlatılamadı. Video sürücüleriniz güncel olmayabilir veya Streamlabs Desktop sisteminizde desteklenmiyor olabilir.",
   "Log Out": "Çıkış Yap",
   "Layout Editor": "Düzen Editörü",
   "Are you sure you want to import multiple files?": "Birden fazla dosyayı aktarmak istediğinize emin misiniz?",
@@ -135,9 +135,9 @@
   "Time": "Zaman",
   "Sound Volume": "Ses Düzeyi",
   "Sound": "Ses",
-  "Play Audio": "Play Audio",
+  "Play Audio": "Sesi Çal",
   "Click here": "Buraya tıklayın",
-  "More Info": "More Info",
-  "Revert Changes": "Revert Changes",
-  "Animations": "Animations"
+  "More Info": "Daha Fazla Bilgi",
+  "Revert Changes": "Değişiklikleri Geri Al",
+  "Animations": "Animasyonlar"
 }
