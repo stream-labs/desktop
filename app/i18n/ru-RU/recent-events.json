@@ -74,6 +74,6 @@
   "Safe Mode is Enabled": "Безопасный режим включен",
   "Disable Safe Mode": "Отключить безопасный режим",
   "Something went wrong disabling Safe Mode": "При отключении безопасного режима произошла ошибка",
-  "Automatically disable Safe Mode": "Automatically disable Safe Mode",
-  "Disable after <duration></duration> minutes": "Disable after <duration></duration> minutes"
+  "Automatically disable Safe Mode": "Автоматически отключать безопасный режим",
+  "Disable after <duration></duration> minutes": "Отключать через &lt;duration&gt;&lt;/duration&gt; минут"
 }
