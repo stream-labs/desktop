@@ -3,7 +3,7 @@
   "This element is too small to be displayed": "Dette element er for småt til at blive vist",
   "This element requires Selective Recording to be enabled": "Dette element kræver at selektiv optagelse er aktiveret",
   "Grant Permissions": "Giv tilladelser",
-  "Streamlabs needs additional permissions. Grant permissions in the pop-up dialogs to continue.": "Streamlabs needs additional permissions. Grant permissions in the pop-up dialogs to continue.",
+  "Streamlabs needs additional permissions. Grant permissions in the pop-up dialogs to continue.": "Streamlabs har brug for yderligere tilladelser. Giv tilladelser i pop op-vinduerne for at fortsætte.",
   "Microphone": "Mikrofon",
   "Webcam": "Webcam"
 }
