@@ -27,9 +27,9 @@
   "Example": "Příklad",
   "Change Media": "Změnit médium",
   "No Sound": "Bez zvuku",
-  "No Media": "No Media",
-  "Change Link": "Change Link",
-  "Pick From Gallery": "Pick From Gallery",
-  "Clear Link": "Clear Link",
-  "Media URL": "Media URL"
+  "No Media": "Žádné médium",
+  "Change Link": "Změnit odkaz",
+  "Pick From Gallery": "Vybrat z galerie",
+  "Clear Link": "Vymazat odkaz",
+  "Media URL": "Adresa URL média"
 }
