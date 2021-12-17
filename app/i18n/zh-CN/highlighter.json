@@ -27,7 +27,7 @@
   "Replay Duration": "回放持续时间",
   "Set a hotkey to capture replays": "设置热键以录制回放",
   "Capture a replay": "录制回放",
-  "highlighterHotkeyInstructions": "开始直播并按下 <b>%{bindingStr}</b> 录制回放。在直播后回来查看。",
+  "highlighterHotkeyInstructions": "开始直播并按下 &lt;b&gt;%{bindingStr}&lt;/b&gt;录制回放。在直播后回来查看。",
   "Start streaming and capture a replay. Check back here after your stream.": "开始直播并录制回放。在直播后回来查看。",
   "Or, import a clip from your computer": "或者，从您的电脑导入剪辑",
   "Disable clip": "禁用剪辑",
@@ -46,7 +46,7 @@
   "Smaller File": "更小文件",
   "Close": "关闭",
   "Overwite File?": "覆盖文件？",
-  "%{filename} already exists. Would you like to overwrite it?": "%{filename} 已存在。是否覆盖？",
+  "%{filename} already exists. Would you like to overwrite it?": "%{filename}已存在。是否覆盖？",
   "Overwrite": "覆盖",
   "Export Progress": "导出进度",
   "Rendering Frames: %{currentFrame}/%{totalFrames}": "渲染帧数：%{currentFrame}/%{totalFrames}",
@@ -87,8 +87,8 @@
   "One or more clips could not be imported because they were not recorded in a supported file format.": "无法导入一个或多个剪辑，因为它们不是以支持的文件格式录制的。",
   "An error occurred while exporting the video": "导出视频时发生错误",
   "An error occurred while writing the video file": "写入视频文件时发生错误",
-  "An error occurred while reading %{file}": "读取 %{file} 时发生错误",
-  "An error occurred while reading audio from %{file}": "从 %{file} 读取音频时发生错误",
+  "An error occurred while reading %{file}": "读取 %{file}时发生错误",
+  "An error occurred while reading audio from %{file}": "从 %{file}读取音频时发生错误",
   "An error occurred while mixing audio": "混合音频时发生错误",
-  "Edit your replays with Highlighter, a free editor built in to Streamlabs.": "Edit your replays with Highlighter, a free editor built in to Streamlabs."
+  "Edit your replays with Highlighter, a free editor built in to Streamlabs.": "使用亮点选择器编辑您的回放视频，这是 Streamlabs 内置的免费编辑器。"
 }
