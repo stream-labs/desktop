@@ -6,7 +6,7 @@
   "Live Stats": "Canlı İstatistikler",
   "Click on a stat to add it to your footer": "Alt bilginize eklemek istediğiniz bir istatistiğe tıklayın",
   "Click to add this info to your footer": "Bu bilgiyi alt bilginize eklemek için tıklayın",
-  "When Streamlabs detects performance issues with your stream, such as dropped frames, lagged frames, or a stream disconnection, troubleshooting notifications will be sent to you here.": "When Streamlabs detects performance issues with your stream, such as dropped frames, lagged frames, or a stream disconnection, troubleshooting notifications will be sent to you here.",
+  "When Streamlabs detects performance issues with your stream, such as dropped frames, lagged frames, or a stream disconnection, troubleshooting notifications will be sent to you here.": "Streamlabs; atlanan kareler, geciken kareler veya yayın bağlantısının kopması gibi yayınınızla ilgili bir performans sorunu tespit ederse burada size sorun giderme bildirimleri gönderilir.",
   "Click to add %{stat} info to your footer": "Alt bilginize %{stat} eklemek için tıklayın",
   "CPU": "CPU",
   "FPS": "FPS",
