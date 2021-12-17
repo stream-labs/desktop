@@ -3,7 +3,7 @@
   "This element is too small to be displayed": "元素过小无法显示",
   "This element requires Selective Recording to be enabled": "此元素需要启用选择性录制",
   "Grant Permissions": "授予权限",
-  "Streamlabs needs additional permissions. Grant permissions in the pop-up dialogs to continue.": "Streamlabs needs additional permissions. Grant permissions in the pop-up dialogs to continue.",
+  "Streamlabs needs additional permissions. Grant permissions in the pop-up dialogs to continue.": "Streamlabs 需要额外的权限。请在弹出对话框中授予权限以继续。",
   "Microphone": "麦克风",
   "Webcam": "网络摄像头"
 }
