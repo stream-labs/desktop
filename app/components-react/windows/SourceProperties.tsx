@@ -6,7 +6,6 @@ import { useSelector } from '../store';
 import { ModalLayout } from '../shared/ModalLayout';
 import Display from '../shared/Display';
 import { assertIsDefined } from '../../util/properties-type-guards';
-import electron from 'electron';
 import { useSubscription } from '../hooks/useSubscription';
 
 export default function SourceProperties() {
