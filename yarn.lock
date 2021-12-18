@@ -7475,6 +7475,20 @@ __metadata:
   languageName: node
   linkType: hard
 
+"glob@npm:^7.2.0":
+  version: 7.2.0
+  resolution: "glob@npm:7.2.0"
+  dependencies:
+    fs.realpath: ^1.0.0
+    inflight: ^1.0.4
+    inherits: 2
+    minimatch: ^3.0.4
+    once: ^1.3.0
+    path-is-absolute: ^1.0.0
+  checksum: 78a8ea942331f08ed2e055cb5b9e40fe6f46f579d7fd3d694f3412fe5db23223d29b7fee1575440202e9a7ff9a72ab106a39fee39934c7bedafe5e5f8ae20134
+  languageName: node
+  linkType: hard
+
 "global-agent@npm:^2.0.2":
   version: 2.1.12
   resolution: "global-agent@npm:2.1.12"
@@ -9151,6 +9165,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"jsonc-parser@npm:^3.0.0":
+  version: 3.0.0
+  resolution: "jsonc-parser@npm:3.0.0"
+  checksum: 1df2326f1f9688de30c70ff19c5b2a83ba3b89a1036160da79821d1361090775e9db502dc57a67c11b56e1186fc1ed70b887f25c5febf9a3ec4f91435836c99d
+  languageName: node
+  linkType: hard
+
 "jsonfile@npm:^4.0.0":
   version: 4.0.0
   resolution: "jsonfile@npm:4.0.0"
@@ -9847,6 +9868,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"lunr@npm:^2.3.9":
+  version: 2.3.9
+  resolution: "lunr@npm:2.3.9"
+  checksum: 176719e24fcce7d3cf1baccce9dd5633cd8bdc1f41ebe6a180112e5ee99d80373fe2454f5d4624d437e5a8319698ca6837b9950566e15d2cae5f2a543a3db4b8
+  languageName: node
+  linkType: hard
+
 "macos-release@npm:^2.2.0":
   version: 2.2.0
   resolution: "macos-release@npm:2.2.0"
@@ -9961,6 +9989,15 @@ __metadata:
   version: 1.1.2
   resolution: "markdown-table@npm:1.1.2"
   checksum: 193fee9353dd35d583b2cb21336e54b21e7e8bf4779d33decc85dc95a18c8a41a8927de9da3f403830f25e21d1d5608d7022b3eb3c6c88e75f5736892eb0a2d7
+  languageName: node
+  linkType: hard
+
+"marked@npm:^3.0.8":
+  version: 3.0.8
+  resolution: "marked@npm:3.0.8"
+  bin:
+    marked: bin/marked
+  checksum: 3cdeaa126bbeca5b1b8d2f91e9728018dcd63b250233f3607009a4d70bb6bd9df8c769f1bc52ce9856d1316c91c9dacb1d94d80696f76d094146b4fab126a4eb
   languageName: node
   linkType: hard
 
@@ -13600,6 +13637,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"shiki@npm:^0.9.12":
+  version: 0.9.15
+  resolution: "shiki@npm:0.9.15"
+  dependencies:
+    jsonc-parser: ^3.0.0
+    vscode-oniguruma: ^1.6.1
+    vscode-textmate: 5.2.0
+  checksum: 58d1e3e106320252b67c63dc1269c4b834152e9c675a06a4565ec41db1c93aea2dd94e22640d7ec99334cb47cd41b914642d936577143b689ef2a0db7d938c13
+  languageName: node
+  linkType: hard
+
 "signal-exit@npm:^3.0.0, signal-exit@npm:^3.0.2, signal-exit@npm:^3.0.3":
   version: 3.0.3
   resolution: "signal-exit@npm:3.0.3"
@@ -13819,6 +13867,7 @@ __metadata:
     tree-kill: 1.2.2
     ts-loader: 8.0.11
     ts-node: 7.0.1
+    typedoc: ^0.22.10
     typescript: 4.0.7
     urijs: 1.19.7
     uuid: ^3.0.1
@@ -15180,6 +15229,23 @@ __metadata:
   languageName: node
   linkType: hard
 
+"typedoc@npm:^0.22.10":
+  version: 0.22.10
+  resolution: "typedoc@npm:0.22.10"
+  dependencies:
+    glob: ^7.2.0
+    lunr: ^2.3.9
+    marked: ^3.0.8
+    minimatch: ^3.0.4
+    shiki: ^0.9.12
+  peerDependencies:
+    typescript: 4.0.x || 4.1.x || 4.2.x || 4.3.x || 4.4.x || 4.5.x
+  bin:
+    typedoc: bin/typedoc
+  checksum: 404932ae8e62d1507209d50b635d9d5cefead344e7e84e2d21fc84741fb739e011dcffcf335d6d4e2a31fe45910757b27f11678f6ae5b89514d2f291fe41884e
+  languageName: node
+  linkType: hard
+
 "typescript@npm:4.0.7":
   version: 4.0.7
   resolution: "typescript@npm:4.0.7"
@@ -15721,6 +15787,20 @@ __metadata:
     unist-util-stringify-position: ^1.0.0
     vfile-message: ^1.0.0
   checksum: d0a0caf7eca8478b2caa93e72bc3b37a2bf77916a195d8937b173d7fe0ded9a0146503de269afabf2a0465fa6b4c009d1486a4e5dd070f6d5fd225eb4ed25343
+  languageName: node
+  linkType: hard
+
+"vscode-oniguruma@npm:^1.6.1":
+  version: 1.6.1
+  resolution: "vscode-oniguruma@npm:1.6.1"
+  checksum: b019563a0d48b08c26b66c9f8729ed4ca2620b3b09c6957d5e622f0f104574bec48c7ba575bd157da40fb9a03c03495704894e3ed2d799d80a7180e3051b1f10
+  languageName: node
+  linkType: hard
+
+"vscode-textmate@npm:5.2.0":
+  version: 5.2.0
+  resolution: "vscode-textmate@npm:5.2.0"
+  checksum: 5449b42d451080f6f3649b66948f4b5ee4643c4e88cfe3558a3b31c84c78060cfdd288c4958c1690eaa5cd65d09992fa6b7c3bef9d4aa72b3651054a04624d20
   languageName: node
   linkType: hard
 
