@@ -18,6 +18,7 @@ import { getApiClient } from '../../helpers/api-client';
 import { StreamSettingsService } from '../../../app/services/settings/streaming';
 import { assertFormContains, fillForm } from '../../helpers/modules/forms';
 import { logIn } from '../../helpers/modules/user';
+import {sleep} from "../../helpers/sleep";
 
 useSpectron();
 
@@ -41,8 +42,8 @@ test('Streaming to Twitch without auth', async t => {
 
   await showSettingsWindow('Stream');
 
-  // This is the twitch.tv/slobstest stream key
-  await fillForm({ key: userInfo.streamKey });
+  const key = userInfo.streamKey;
+  await fillForm({ key });
   await clickButton('Done');
 
   // go live
