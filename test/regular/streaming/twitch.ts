@@ -5,20 +5,19 @@ import {
   prepareToGoLive,
   stopStream,
   submit,
-  tryToGoLive, waitForSettingsWindowLoaded,
+  tryToGoLive,
+  waitForSettingsWindowLoaded,
   waitForStreamStart,
   waitForStreamStop,
 } from '../../helpers/modules/streaming';
 import { showSettingsWindow } from '../../helpers/modules/settings/settings';
-import {clickButton, focusChild, isDisplayed, waitForDisplayed} from '../../helpers/modules/core';
+import { clickButton, focusChild, isDisplayed, waitForDisplayed } from '../../helpers/modules/core';
 import { restartApp, test, useSpectron } from '../../helpers/spectron';
 import { reserveUserFromPool } from '../../helpers/spectron/user';
-import { setInputValue } from '../../helpers/modules/forms/base';
 import { getApiClient } from '../../helpers/api-client';
 import { StreamSettingsService } from '../../../app/services/settings/streaming';
 import { assertFormContains, fillForm } from '../../helpers/modules/forms';
 import { logIn } from '../../helpers/modules/user';
-import {sleep} from "../../helpers/sleep";
 
 useSpectron();
 
@@ -40,8 +39,8 @@ test('Streaming to Twitch', async t => {
 test('Streaming to Twitch without auth', async t => {
   const userInfo = await reserveUserFromPool(t, 'twitch');
 
+  // type a new stream key in the Stream Settings Window
   await showSettingsWindow('Stream');
-
   const key = userInfo.streamKey;
   await fillForm({ key });
   await clickButton('Done');
