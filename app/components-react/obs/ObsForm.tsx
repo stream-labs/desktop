@@ -30,7 +30,7 @@ import Utils from 'services/utils';
 
 interface IObsFormProps {
   value: IObsInput<TObsValue>[];
-  onChange: (newValue: IObsInput<TObsValue>[]) => unknown;
+  onChange: (newValue: IObsInput<TObsValue>[], changedInd: number) => unknown;
   layout?: TInputLayout;
   style?: React.CSSProperties;
 }
@@ -43,7 +43,7 @@ export function ObsForm(p: IObsFormProps) {
     const newValue = cloneDeep(p.value);
     newValue.splice(index, 1, value);
 
-    p.onChange(newValue);
+    p.onChange(newValue, index);
   }
 
   return (
