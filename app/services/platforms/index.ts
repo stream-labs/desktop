@@ -6,6 +6,8 @@ import { TTwitchTag } from './twitch/tags';
 import { TTwitchOAuthScope } from './twitch/scopes';
 import { IGoLiveSettings } from 'services/streaming';
 import { WidgetType } from '../widgets';
+import {ITrovoStartStreamOptions, TrovoService} from './trovo';
+import {Partial} from "lodash-decorators";
 
 export type Tag = TTwitchTag;
 export interface IGame {
@@ -134,7 +136,8 @@ export type TStartStreamOptions =
   | ITwitchStartStreamOptions
   | IYoutubeStartStreamOptions
   | Partial<IFacebookStartStreamOptions>
-  | Partial<ITiktokStartStreamOptions>;
+  | Partial<ITiktokStartStreamOptions>
+  | Partial<ITrovoStartStreamOptions>;
 
 // state applicable for all platforms
 export interface IPlatformState {
@@ -247,7 +250,7 @@ export interface IUserInfo {
   username?: string;
 }
 
-export type TPlatform = 'twitch' | 'youtube' | 'facebook' | 'tiktok';
+export type TPlatform = 'twitch' | 'youtube' | 'facebook' | 'tiktok' | 'trovo';
 
 export function getPlatformService(platform: TPlatform): IPlatformService {
   return {
@@ -255,6 +258,7 @@ export function getPlatformService(platform: TPlatform): IPlatformService {
     youtube: YoutubeService.instance,
     facebook: FacebookService.instance,
     tiktok: TiktokService.instance,
+    trovo: TrovoService.instance,
   }[platform];
 }
 
