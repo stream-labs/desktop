@@ -319,7 +319,7 @@ export class YoutubeService
   async validatePlatform(): Promise<EPlatformCallResult> {
     try {
       const endpoint = 'liveStreams?part=id,snippet&mine=true';
-      const url = `${this.apiBase}/${endpoint}&access_token=${this.oauthToken}`;
+      const url = `${this.apiBase}/${endpoint}`;
       await platformAuthorizedRequest('youtube', url);
       this.SET_ENABLED_STATUS(true);
       return EPlatformCallResult.Success;
@@ -359,9 +359,7 @@ export class YoutubeService
     if (!this.state.settings.broadcastId) return 0; // activeChannel is not available when streaming to custom ingest
     const endpoint = 'videos?part=snippet,liveStreamingDetails';
     // eslint-disable-next-line prettier/prettier
-    const url = `${this.apiBase}/${endpoint}&id=${this.state.settings.broadcastId}&access_token=${
-      this.oauthToken
-    }`;
+    const url = `${this.apiBase}/${endpoint}&id=${this.state.settings.broadcastId}`;
     return this.requestYoutube<{
       items: { liveStreamingDetails: { concurrentViewers: string } }[];
     }>(url).then(
@@ -389,14 +387,14 @@ export class YoutubeService
         snippet: { categoryId, title, description, tags, defaultAudioLanguage, scheduledStartTime },
       }),
       method: 'PUT',
-      url: `${this.apiBase}/${endpoint}&access_token=${this.oauthToken}`,
+      url: `${this.apiBase}/${endpoint}`,
     });
   }
 
   async fetchVideo(id: string): Promise<IYoutubeVideo> {
     const endpoint = `videos?id=${id}&part=snippet`;
     const videoCollection = await this.requestYoutube<IYoutubeCollection<IYoutubeVideo>>(
-      `${this.apiBase}/${endpoint}&access_token=${this.oauthToken}`,
+      `${this.apiBase}/${endpoint}`,
     );
     return videoCollection.items[0];
   }
@@ -497,7 +495,7 @@ export class YoutubeService
     const broadcast = await this.requestYoutube<IYoutubeLiveBroadcast>({
       body: JSON.stringify(data),
       method: 'POST',
-      url: `${this.apiBase}/${endpoint}&access_token=${this.oauthToken}`,
+      url: `${this.apiBase}/${endpoint}`,
     });
 
     // upload thumbnail
@@ -562,7 +560,7 @@ export class YoutubeService
     broadcast = await this.requestYoutube<IYoutubeLiveBroadcast>({
       body: JSON.stringify(body),
       method: 'PUT',
-      url: `${this.apiBase}/${endpoint}&access_token=${this.oauthToken}`,
+      url: `${this.apiBase}/${endpoint}`,
     });
 
     await this.updateCategory(broadcast.id, params.categoryId!);
@@ -576,7 +574,7 @@ export class YoutubeService
     const endpoint = `liveBroadcasts?&id=${id}`;
     await this.requestYoutube<IYoutubeLiveBroadcast>({
       method: 'DELETE',
-      url: `${this.apiBase}/${endpoint}&access_token=${this.oauthToken}`,
+      url: `${this.apiBase}/${endpoint}`,
     });
   }
 
@@ -592,7 +590,7 @@ export class YoutubeService
     return this.requestYoutube<IYoutubeLiveBroadcast>({
       method: 'POST',
       // es-lint-disable-next-line prettier/prettier
-      url: `${this.apiBase}${endpoint}&id=${broadcastId}&streamId=${streamId}&access_token=${this.oauthToken}`,
+      url: `${this.apiBase}${endpoint}&id=${broadcastId}&streamId=${streamId}`,
     });
   }
 
@@ -603,7 +601,7 @@ export class YoutubeService
   private async createLiveStream(title: string): Promise<IYoutubeLiveStream> {
     const endpoint = 'liveStreams?part=cdn,snippet,contentDetails';
     return platformAuthorizedRequest<IYoutubeLiveStream>('youtube', {
-      url: `${this.apiBase}/${endpoint}&access_token=${this.oauthToken}`,
+      url: `${this.apiBase}/${endpoint}`,
       method: 'POST',
       body: JSON.stringify({
         snippet: { title },
@@ -626,7 +624,7 @@ export class YoutubeService
    */
   async fetchEligibleBroadcasts(apply24hFilter = true): Promise<IYoutubeLiveBroadcast[]> {
     const fields = ['snippet', 'contentDetails', 'status'];
-    const query = `part=${fields.join(',')}&maxResults=50&access_token=${this.oauthToken}`;
+    const query = `part=${fields.join(',')}&maxResults=50`;
 
     // fetch active and upcoming broadcasts simultaneously
     let [activeBroadcasts, upcomingBroadcasts] = await Promise.all([
@@ -670,9 +668,7 @@ export class YoutubeService
    */
   async fetchBroadcasts(): Promise<IYoutubeLiveBroadcast[]> {
     const fields = ['snippet', 'contentDetails', 'status'];
-    const query = `part=${fields.join(
-      ',',
-    )}&broadcastType=all&mine=true&maxResults=100&access_token=${this.oauthToken}`;
+    const query = `part=${fields.join(',')}&broadcastType=all&mine=true&maxResults=100`;
     const broadcasts = (
       await platformAuthorizedRequest<IYoutubeCollection<IYoutubeLiveBroadcast>>(
         'youtube',
@@ -693,7 +689,7 @@ export class YoutubeService
     fields = ['snippet', 'contentDetails', 'status'],
   ): Promise<IYoutubeLiveBroadcast> {
     const filter = `&id=${id}`;
-    const query = `part=${fields.join(',')}${filter}&maxResults=1&access_token=${this.oauthToken}`;
+    const query = `part=${fields.join(',')}${filter}&maxResults=1`;
     return (
       await platformAuthorizedRequest<IYoutubeCollection<IYoutubeLiveBroadcast>>(
         'youtube',
