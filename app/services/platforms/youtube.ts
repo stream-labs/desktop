@@ -563,7 +563,9 @@ export class YoutubeService
       url: `${this.apiBase}/${endpoint}`,
     });
 
-    await this.updateCategory(broadcast.id, params.categoryId!);
+    if (!isMidStreamMode) {
+      await this.updateCategory(broadcast.id, params.categoryId!);
+    }
 
     // upload thumbnail
     if (params.thumbnail) await this.uploadThumbnail(params.thumbnail, broadcast.id);
