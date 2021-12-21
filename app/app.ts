@@ -277,7 +277,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
   I18nService.setVuei18nInstance(i18n);
 
-  if (!Utils.isOneOffWindow()) {
+  // We don't register main/child windows in dev mode to allow refreshing
+  if (!Utils.isOneOffWindow() && !Utils.isDevMode()) {
     ipcRenderer.send('register-in-crash-handler', { pid: process.pid, critical: false });
   }
 

@@ -9,6 +9,7 @@ import { Subscription } from 'rxjs';
 import { SelectionService } from 'services/selection';
 import { byOS, OS, getOS } from 'util/operating-systems';
 import * as remote from '@electron/remote';
+import { onUnload } from 'util/unload';
 
 // TODO: There are no typings for nwr
 let nwr: any;
@@ -65,6 +66,8 @@ export class Display {
   movedListener: () => void;
   movedTimeout: number;
 
+  cancelUnload: () => void;
+
   constructor(public name: string, options: IDisplayOptions = {}) {
     this.sourceId = options.sourceId;
     this.electronWindowId = options.electronWindowId || remote.getCurrentWindow().id;
@@ -117,6 +120,8 @@ export class Display {
     this.boundClose = this.remoteClose.bind(this);
 
     electronWindow.on('close', this.boundClose);
+
+    this.cancelUnload = onUnload(() => this.boundClose());
   }
 
   trackingFun: () => void;
@@ -239,6 +244,8 @@ export class Display {
     if (win) {
       win.removeListener('close', this.boundClose);
     }
+    window.removeEventListener('beforeunload', this.boundClose);
+    this.cancelUnload();
     this.remoteClose();
   }
 
