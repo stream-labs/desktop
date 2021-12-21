@@ -8,6 +8,7 @@ import Spinner from 'components-react/shared/Spinner';
 import { Services } from 'components-react/service-provider';
 import { useVuex } from 'components-react/hooks';
 import electron from 'electron';
+import { onUnload } from 'util/unload';
 
 interface BrowserViewProps {
   src: string;
@@ -62,7 +63,10 @@ export default function BrowserView(p: BrowserViewProps) {
 
     const shutdownSubscription = AppService.shutdownStarted.subscribe(destroyBrowserView);
 
+    const cancelUnload = onUnload(() => destroyBrowserView());
+
     return () => {
+      cancelUnload();
       destroyBrowserView();
       shutdownSubscription.unsubscribe();
     };
