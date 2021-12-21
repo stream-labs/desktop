@@ -1,12 +1,13 @@
-import Vue from 'vue';
-import { StreamingService } from '../services/streaming';
-import { PerformanceService } from '../services/performance';
-import { UserService } from '../services/user';
-import { SettingsService } from '../services/settings';
-import { Inject } from '../services/core/injector';
-import { $t } from 'services/i18n';
-import { Component } from 'vue-property-decorator';
+import { CompactModeService } from 'services/compact-mode';
 import { CustomizationService } from 'services/customization';
+import { $t } from 'services/i18n';
+import Vue from 'vue';
+import { Component } from 'vue-property-decorator';
+import { Inject } from '../services/core/injector';
+import { PerformanceService } from '../services/performance';
+import { SettingsService } from '../services/settings';
+import { StreamingService } from '../services/streaming';
+import { UserService } from '../services/user';
 
 @Component({})
 export default class PerformanceMetrics extends Vue {
@@ -15,12 +16,13 @@ export default class PerformanceMetrics extends Vue {
   @Inject() userService: UserService;
   @Inject() settingsService: SettingsService;
   @Inject() customizationService: CustomizationService;
+  @Inject() compactModeService: CompactModeService;
 
   visitorTooltip = $t('common.numberOfVisitors');
   commentTooltip = $t('common.numberOfComments');
 
   get compactMode() {
-    return this.customizationService.state.compactMode;
+    return this.compactModeService.compactMode;
   }
 
   get isLoggedIn() {

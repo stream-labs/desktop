@@ -1,17 +1,19 @@
-import { Observable } from 'rxjs';
 import { TObsFormData } from 'components/obs/inputs/ObsInput';
+import { Observable } from 'rxjs';
+
+export type TCompactModeTab = 'studio' | 'niconico';
+export type TCompactModeStudioController = 'scenes' | 'mixer';
 
 export interface ICustomizationServiceState {
-  compactMode: boolean;
-  compactModeTab: 'studio' | 'niconico';
-  compactModeStudioController: 'scenes' | 'mixer';
-
   performanceMode: boolean;
   studioControlsOpened: boolean;
   optimizeForNiconico: boolean;
   showOptimizationDialogForNiconico: boolean;
   optimizeWithHardwareEncoder: boolean;
   pollingPerformanceStatistics: boolean;
+  compactMode: boolean;
+  compactModeTab: TCompactModeTab;
+  compactModeStudioController: TCompactModeStudioController;
   experimental: any;
 }
 

@@ -46,6 +46,7 @@ export { UserService } from './services/user';
 export { UsageStatisticsService } from './services/usage-statistics';
 
 // nicolive
+export { CompactModeService } from 'services/compact-mode';
 export { QuestionaireService } from 'services/questionaire';
 export { MonitorCaptureCroppingService } from 'services/sources/monitor-capture-cropping';
 export { InformationsService } from 'services/informations';

@@ -1,8 +1,8 @@
 import Login from 'components/Login.vue';
 import StreamingStatus from 'components/StreamingStatus.vue';
 import electron from 'electron';
+import { CompactModeService } from 'services/compact-mode';
 import { Inject } from 'services/core/injector';
-import { CustomizationService } from 'services/customization';
 import { EAvailableFeatures, IncrementalRolloutService } from 'services/incremental-rollout';
 import { InformationsService } from 'services/informations';
 import { NavigationService } from 'services/navigation';
@@ -21,7 +21,7 @@ import { Component, Prop, Watch } from 'vue-property-decorator';
 })
 export default class SideNav extends Vue {
   @Inject() settingsService: SettingsService;
-  @Inject() customizationService: CustomizationService;
+  @Inject() compactModeService: CompactModeService;
   @Inject() navigationService: NavigationService;
   @Inject() userService: UserService;
   @Inject() transitionsService: TransitionsService;
@@ -51,16 +51,16 @@ export default class SideNav extends Vue {
   }
 
   get compactMode(): boolean {
-    return this.customizationService.state.compactMode;
+    return this.compactModeService.compactMode;
   }
   toggleCompactMode() {
-    this.customizationService.toggleCompactMode();
+    this.compactModeService.toggleCompactMode();
   }
   get compactModeTab(): 'studio' | 'niconico' {
-    return this.customizationService.state.compactModeTab;
+    return this.compactModeService.compactModeTab;
   }
   set compactModeTab(tab: 'studio' | 'niconico') {
-    this.customizationService.setCompactModeTab(tab);
+    this.compactModeService.compactModeTab = tab;
   }
 
   studioMode() {

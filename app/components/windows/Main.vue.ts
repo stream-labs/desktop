@@ -8,7 +8,6 @@ import Studio from '../pages/Studio.vue';
 import Onboarding from '../pages/Onboarding.vue';
 import TitleBar from '../TitleBar.vue';
 import { Inject } from '../../services/core/injector';
-import { CustomizationService } from 'services/customization';
 import { NavigationService } from 'services/navigation';
 import { AppService } from 'services/app';
 import { UserService } from 'services/user';
@@ -18,6 +17,7 @@ import CustomLoader from '../CustomLoader.vue';
 import PatchNotes from '../pages/PatchNotes.vue';
 import NicoliveArea from '../nicolive-area/NicoliveArea.vue';
 import electron from 'electron';
+import { CompactModeService } from 'app-services';
 
 @Component({
   components: {
@@ -32,7 +32,7 @@ import electron from 'electron';
   },
 })
 export default class Main extends Vue {
-  @Inject() customizationService: CustomizationService;
+  @Inject() compactModeService: CompactModeService;
   @Inject() navigationService: NavigationService;
   @Inject() appService: AppService;
   @Inject() userService: UserService;
@@ -44,10 +44,10 @@ export default class Main extends Vue {
   }
 
   get isCompactMode() {
-    return this.customizationService.state.compactMode;
+    return this.compactModeService.compactMode;
   }
   get compactModeTab() {
-    return this.customizationService.state.compactModeTab;
+    return this.compactModeService.compactModeTab;
   }
 
   get title() {

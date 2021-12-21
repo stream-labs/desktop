@@ -1,15 +1,15 @@
 /* eslint-disable prettier/prettier */
-import { StatefulService, mutation } from 'services/core/stateful-service';
-import { NicoliveClient, CreateResult, EditResult, isOk } from './NicoliveClient';
-import { ProgramSchedules } from './ResponseTypes';
-import { Inject } from 'services/core/injector';
-import { NicoliveProgramStateService } from './state';
-import { WindowsService } from 'services/windows';
-import { UserService } from 'services/user';
+import { CustomizationService } from 'app-services';
 import { BrowserWindow } from 'electron';
 import { BehaviorSubject } from 'rxjs';
+import { Inject } from 'services/core/injector';
+import { mutation, StatefulService } from 'services/core/stateful-service';
+import { UserService } from 'services/user';
+import { WindowsService } from 'services/windows';
+import { CreateResult, EditResult, isOk, NicoliveClient } from './NicoliveClient';
 import { NicoliveFailure, openErrorDialogFromFailure } from './NicoliveFailure';
-import { CustomizationService } from 'services/customization';
+import { ProgramSchedules } from './ResponseTypes';
+import { NicoliveProgramStateService } from './state';
 
 const STUDIO_WIDTH = 800;
 const SIDENAV_WIDTH = 48;
@@ -117,9 +117,10 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
     });
 
     this.customizationService.settingsChanged.subscribe({
-      next: customization => {
-        if ('compactMode' in customization) {
-          this.setState({ isCompact: customization.compactMode });
+      next: compact => {
+        console.log('compact changed', compact); // DEBUG
+        if ('compactMode' in compact) {
+          this.setState({ isCompact: compact.compactMode });
         }
       },
     });

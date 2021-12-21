@@ -1,6 +1,6 @@
 import electron from 'electron';
+import { CompactModeService } from 'services/compact-mode';
 import { Inject } from 'services/core/injector';
-import { CustomizationService } from 'services/customization';
 import { $t } from 'services/i18n';
 import { UserService } from 'services/user';
 import Vue from 'vue';
@@ -9,7 +9,7 @@ import { Component } from 'vue-property-decorator';
 @Component({})
 export default class Login extends Vue {
   @Inject() userService: UserService;
-  @Inject() customizationService: CustomizationService;
+  @Inject() compactModeService: CompactModeService;
 
   get loggedIn() {
     return this.userService.isLoggedIn();
@@ -29,7 +29,7 @@ export default class Login extends Vue {
   }
 
   get compactMode(): boolean {
-    return this.customizationService.state.compactMode;
+    return this.compactModeService.compactMode;
   }
 
   logout() {

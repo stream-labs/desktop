@@ -8,6 +8,7 @@ import { TransitionsService } from 'services/transitions';
 import Display from 'components/shared/Display.vue';
 import StudioModeControls from 'components/StudioModeControls.vue';
 import { ScenesService } from 'services/scenes';
+import { CompactModeService } from 'services/compact-mode';
 
 @Component({
   components: {
@@ -19,6 +20,7 @@ import { ScenesService } from 'services/scenes';
 })
 export default class Studio extends Vue {
   @Inject() private customizationService: CustomizationService;
+  @Inject() private compactModeService: CompactModeService;
   @Inject() private transitionsService: TransitionsService;
   @Inject() private scenesService: ScenesService;
 
@@ -65,9 +67,9 @@ export default class Studio extends Vue {
   }
 
   get compactMode() {
-    return this.customizationService.state.compactMode;
+    return this.compactModeService.compactMode;
   }
   get compactModeTab() {
-    return this.customizationService.state.compactModeTab;
+    return this.compactModeService.compactModeTab;
   }
 }

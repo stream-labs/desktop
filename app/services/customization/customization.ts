@@ -1,14 +1,15 @@
+import { TObsFormData } from 'components/obs/inputs/ObsInput';
 import { Subject } from 'rxjs';
+import Utils from 'services/utils';
 import { PersistentStatefulService } from '../core/persistent-stateful-service';
 import { mutation } from '../core/stateful-service';
 import {
   ICustomizationServiceApi,
   ICustomizationServiceState,
   ICustomizationSettings,
+  TCompactModeStudioController,
+  TCompactModeTab,
 } from './customization-api';
-import { TObsFormData } from 'components/obs/inputs/ObsInput';
-import Utils from 'services/utils';
-import { $t } from 'services/i18n';
 
 /**
  * This class is used to store general UI behavior flags
@@ -19,16 +20,17 @@ export class CustomizationService
   // eslint-disable-next-line prettier/prettier
   implements ICustomizationServiceApi {
   static defaultState: ICustomizationServiceState = {
-    compactMode: false,
-    compactModeTab: 'studio',
-    compactModeStudioController: 'scenes',
-
     performanceMode: false,
     studioControlsOpened: true,
     optimizeForNiconico: true,
     showOptimizationDialogForNiconico: true,
     optimizeWithHardwareEncoder: true,
     pollingPerformanceStatistics: true,
+
+    compactMode: false,
+    compactModeTab: 'studio',
+    compactModeStudioController: 'scenes',
+
     experimental: {
       // put experimental features here
     },
@@ -44,22 +46,6 @@ export class CustomizationService
 
   getSettings(): ICustomizationSettings {
     return this.state;
-  }
-
-  toggleCompactMode() {
-    this.setSettings({ compactMode: !this.state.compactMode });
-  }
-
-  setCompactModeTab(tab: 'studio' | 'niconico') {
-    if (tab === 'studio' || tab === 'niconico') {
-      this.setSettings({ compactModeTab: tab });
-    } else {
-      console.warn('Invalid compact mode tab:', tab);
-    }
-  }
-
-  setCompactModeStudioController(controller: 'scenes' | 'mixer') {
-    this.setSettings({ compactModeStudioController: controller });
   }
 
   get studioControlsOpened() {
@@ -103,6 +89,25 @@ export class CustomizationService
 
   setPollingPerformanceStatistics(activate: boolean) {
     this.setSettings({ pollingPerformanceStatistics: activate });
+  }
+
+  toggleCompactMode() {
+    this.setSettings({ compactMode: !this.state.compactMode });
+  }
+  setCompactMode(value: boolean) {
+    this.setSettings({ compactMode: value });
+  }
+
+  setCompactModeTab(tab: TCompactModeTab) {
+    if (tab === 'studio' || tab === 'niconico') {
+      this.setSettings({ compactModeTab: tab });
+    } else {
+      console.warn('Invalid compact mode tab:', tab);
+    }
+  }
+
+  setCompactModeStudioController(controller: TCompactModeStudioController) {
+    this.setSettings({ compactModeStudioController: controller });
   }
 
   getSettingsFormData(): TObsFormData {

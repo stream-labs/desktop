@@ -1,9 +1,9 @@
+import { CompactModeService } from 'services/compact-mode';
+import { Inject } from 'services/core/injector';
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
-import StreamingController from './StreamingController.vue';
 import PerformanceMetrics from './PerformanceMetrics.vue';
-import { Inject } from 'services/core/injector';
-import { CustomizationService } from 'services/customization';
+import StreamingController from './StreamingController.vue';
 
 @Component({
   components: {
@@ -12,11 +12,11 @@ import { CustomizationService } from 'services/customization';
   },
 })
 export default class StudioFooterComponent extends Vue {
-  @Inject() customizationService: CustomizationService;
+  @Inject() private compactModeService: CompactModeService;
 
   @Prop() locked: boolean;
 
   get compactMode() {
-    return this.customizationService.state.compactMode;
+    return this.compactModeService.compactMode;
   }
 }
