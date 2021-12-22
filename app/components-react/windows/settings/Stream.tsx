@@ -99,6 +99,17 @@ class StreamSettingsModule {
     this.state.customDestForm = { ...this.state.customDestForm, ...updatedFields };
   }
 
+  @mutation()
+  private fixUrl() {
+    // add "/" to the end of url string
+    if (
+      this.state.customDestForm.streamKey &&
+      this.state.customDestForm.url.charAt(this.state.customDestForm.url.length - 1) !== '/'
+    ) {
+      this.state.customDestForm.url += '/';
+    }
+  }
+
   // DEFINE ACTIONS AND GETTERS
 
   get platforms() {
@@ -171,13 +182,7 @@ class StreamSettingsModule {
       return;
     }
 
-    // add "/" to the end of url string
-    if (
-      this.state.customDestForm.streamKey &&
-      this.state.customDestForm.url.charAt(this.state.customDestForm.url.length - 1) !== '/'
-    ) {
-      this.state.customDestForm.url += '/';
-    }
+    this.fixUrl();
 
     const destinations = cloneDeep(this.customDestinations);
     const isUpdateMode = typeof this.state.editCustomDestMode === 'number';
