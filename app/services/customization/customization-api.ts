@@ -14,6 +14,7 @@ export interface ICustomizationServiceState {
   compactMode: boolean;
   compactModeTab: TCompactModeTab;
   compactModeStudioController: TCompactModeStudioController;
+  fullModeWidthOffset: number;
   experimental: any;
 }
 

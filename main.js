@@ -218,7 +218,7 @@ if (!gotTheLock) {
       );
 
     mainWindow = new BrowserWindow({
-      minWidth: 800,
+      minWidth: 448,
       minHeight: 600,
       width: mainWindowState.width,
       height: mainWindowState.height,

@@ -30,7 +30,7 @@ export class CompactModeService extends StatefulService<ICompactModeServiceState
   }
   get compactModeTab(): TCompactModeTab {
     if (this.userService.isLoggedIn()) {
-      return this.customizationService.state.compactModeTab;
+      return this.customizationService.state.compactModeTab || 'studio';
     }
     return 'studio';
   }

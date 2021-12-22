@@ -118,7 +118,6 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
 
     this.customizationService.settingsChanged.subscribe({
       next: compact => {
-        console.log('compact changed', compact); // DEBUG
         if ('compactMode' in compact) {
           this.setState({ isCompact: compact.compactMode });
         }
@@ -126,7 +125,10 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
     });
 
     // UserServiceのSubjectをBehaviorに変更するのは影響が広すぎる
-    this.setState({ isLoggedIn: this.userService.isLoggedIn() });
+    this.setState({
+      isLoggedIn: this.userService.isLoggedIn(),
+      isCompact: this.customizationService.state.compactMode,
+    });
   }
 
   private setState(partialState: Partial<INicoliveProgramState>) {
@@ -500,9 +502,11 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
   }
 
   static getPanelState(
-    panelOpened: boolean,
-    isLoggedIn: boolean,
-    isCompact: boolean,
+    { panelOpened, isLoggedIn, isCompact }: {
+      panelOpened: boolean;
+      isLoggedIn: boolean;
+      isCompact: boolean;
+    },
   ): PanelState | null {
     if (panelOpened === null || isLoggedIn === null) return null;
     if (isCompact) return PanelState.COMPACT;
@@ -512,30 +516,17 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
 
   /** パネルが出る幅の分だけ画面の最小幅を拡張する */
   refreshWindowSize(prevState: INicoliveProgramState, nextState: INicoliveProgramState): void {
-    if (
-      prevState.panelOpened === nextState.panelOpened &&
-      prevState.isLoggedIn === nextState.isLoggedIn &&
-      prevState.isCompact === nextState.isCompact
-    ) {
-      return;
-    }
+    const prevPanelState = NicoliveProgramService.getPanelState(prevState);
 
-    const prevPanelState = NicoliveProgramService.getPanelState(
-      prevState.panelOpened,
-      prevState.isLoggedIn,
-      prevState.isCompact,
-    );
-    const nextPanelState = NicoliveProgramService.getPanelState(
-      nextState.panelOpened,
-      nextState.isLoggedIn,
-      nextState.isCompact,
-    );
-    if (prevPanelState !== nextPanelState) {
-      NicoliveProgramService.updateWindowSize(
+    const nextPanelState = NicoliveProgramService.getPanelState(nextState);
+    if (nextPanelState !== null && prevPanelState !== nextPanelState) {
+      const newWidthOffset = NicoliveProgramService.updateWindowSize(
         this.windowsService.getWindow('main'),
         prevPanelState,
         nextPanelState,
+        this.customizationService.state.fullModeWidthOffset,
       );
+      this.customizationService.setFullModeWidthOffset(newWidthOffset);
     }
   }
 
@@ -550,30 +541,41 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
    * NOTE: 似た処理を他所にも書きたくなったらウィンドウ幅を管理する存在を置くべきで、コピペは悪いことを言わないのでやめておけ
    * このコメントを書いている時点でメインウィンドウのウィンドウ幅を操作する存在は他にいない
    */
-  static updateWindowSize(win: BrowserWindow, prevState: PanelState, nextState: PanelState): void {
+  static updateWindowSize(win: BrowserWindow, prevState: PanelState, nextState: PanelState, widthOffset: number): number {
     if (nextState === null) throw new Error('nextState is null');
     const onInit = !prevState;
 
     const [, minHeight] = win.getMinimumSize();
     const [width, height] = win.getSize();
     const nextMinWidth = NicoliveProgramService.WINDOW_MIN_WIDTH[nextState];
-    win.setMinimumSize(nextMinWidth, minHeight);
 
-    // 復元されたウィンドウ幅が復元されたパネル状態の最小幅を満たさない場合、最小幅まで広げる
-    if (onInit && width < nextMinWidth) {
-      win.setSize(nextMinWidth, height);
+    if (onInit) {
+      // 復元されたウィンドウ幅が復元されたパネル状態の最小幅を満たさない場合、最小幅まで広げる
+      if (width < nextMinWidth) {
+        win.setSize(nextMinWidth, height);
+      }
+    } else {
+      win.setMinimumSize(nextMinWidth, minHeight);
+
+      // ウィンドウ幅とログイン状態・パネル開閉状態の永続化が別管理なので、初期化が終わって情報が揃ってから更新する
+      // 最大化されているときはウィンドウサイズを操作しない（画面外に飛び出したりして不自然なことになる）
+      if (!win.isMaximized()) {
+        // コンパクトモード以外だったときは現在の幅と最小幅の差を保存する
+        if (prevState !== PanelState.COMPACT) {
+          widthOffset = Math.max(0, width - NicoliveProgramService.WINDOW_MIN_WIDTH[prevState]);
+        }
+
+        // コンパクトモードになるときはパネルサイズを強制する
+        if (nextState === PanelState.COMPACT) {
+          win.setSize(nextMinWidth, height);
+          // win.setMaximumSize(nextMinWidth, undefined);
+        } else {
+          win.setSize(nextMinWidth + widthOffset, height);
+          // win.setMaximumSize(undefined, undefined);
+        }
+      }
     }
 
-    // コンパクトモードになるときはパネルサイズを強制する
-    if (nextState === PanelState.COMPACT) {
-      win.setSize(nextMinWidth, height);
-    }
-
-    // ウィンドウ幅とログイン状態・パネル開閉状態の永続化が別管理なので、初期化が終わって情報が揃ってから更新する
-    // 最大化されているときはウィンドウサイズを操作しない（画面外に飛び出したりして不自然なことになる）
-    if (!onInit && !win.isMaximized()) {
-      const prevMinWidth = NicoliveProgramService.WINDOW_MIN_WIDTH[prevState];
-      win.setSize(Math.max(width + nextMinWidth - prevMinWidth, nextMinWidth), height);
-    }
+    return widthOffset;
   }
 }

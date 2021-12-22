@@ -30,6 +30,7 @@ export class CustomizationService
     compactMode: false,
     compactModeTab: 'studio',
     compactModeStudioController: 'scenes',
+    fullModeWidthOffset: 0,
 
     experimental: {
       // put experimental features here
@@ -108,6 +109,10 @@ export class CustomizationService
 
   setCompactModeStudioController(controller: TCompactModeStudioController) {
     this.setSettings({ compactModeStudioController: controller });
+  }
+
+  setFullModeWidthOffset(newWidthOffset: number) {
+    this.setSettings({ fullModeWidthOffset: newWidthOffset });
   }
 
   getSettingsFormData(): TObsFormData {
