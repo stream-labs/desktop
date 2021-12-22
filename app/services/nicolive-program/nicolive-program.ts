@@ -517,7 +517,6 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
   /** パネルが出る幅の分だけ画面の最小幅を拡張する */
   refreshWindowSize(prevState: INicoliveProgramState, nextState: INicoliveProgramState): void {
     const prevPanelState = NicoliveProgramService.getPanelState(prevState);
-
     const nextPanelState = NicoliveProgramService.getPanelState(nextState);
     if (nextPanelState !== null && prevPanelState !== nextPanelState) {
       const newWidthOffset = NicoliveProgramService.updateWindowSize(
@@ -548,15 +547,16 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
     const [, minHeight] = win.getMinimumSize();
     const [width, height] = win.getSize();
     const nextMinWidth = NicoliveProgramService.WINDOW_MIN_WIDTH[nextState];
+    const INT32_MAX = Math.pow(2, 31) - 1; // BIG ENOUGH VALUE (0が指定したいが、一度0以外を指定すると0に再設定できないため)
+    const nextMaxWidth = nextState === PanelState.COMPACT ? nextMinWidth : INT32_MAX;
+    let nextWidth = 0;
 
     if (onInit) {
       // 復元されたウィンドウ幅が復元されたパネル状態の最小幅を満たさない場合、最小幅まで広げる
-      if (width < nextMinWidth) {
-        win.setSize(nextMinWidth, height);
+      if (width < nextMinWidth || nextState === PanelState.COMPACT) {
+        nextWidth = nextMinWidth;
       }
     } else {
-      win.setMinimumSize(nextMinWidth, minHeight);
-
       // ウィンドウ幅とログイン状態・パネル開閉状態の永続化が別管理なので、初期化が終わって情報が揃ってから更新する
       // 最大化されているときはウィンドウサイズを操作しない（画面外に飛び出したりして不自然なことになる）
       if (!win.isMaximized()) {
@@ -567,13 +567,17 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
 
         // コンパクトモードになるときはパネルサイズを強制する
         if (nextState === PanelState.COMPACT) {
-          win.setSize(nextMinWidth, height);
-          // win.setMaximumSize(nextMinWidth, undefined);
+          nextWidth = nextMinWidth;
         } else {
-          win.setSize(nextMinWidth + widthOffset, height);
-          // win.setMaximumSize(undefined, undefined);
+          nextWidth = nextMinWidth + widthOffset;
         }
       }
+    }
+
+    win.setMinimumSize(nextMinWidth, minHeight);
+    win.setMaximumSize(nextMaxWidth, 0);
+    if (nextWidth) {
+      win.setSize(nextWidth, height);
     }
 
     return widthOffset;
