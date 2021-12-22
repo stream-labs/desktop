@@ -399,7 +399,7 @@ export class YoutubeService
     await this.requestYoutube({
       body: JSON.stringify({
         id: broadcastId,
-        snippet: { snippet, categoryId },
+        snippet: { ...snippet, categoryId },
       }),
       method: 'PUT',
       url: `${this.apiBase}/${endpoint}`,
