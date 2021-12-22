@@ -150,7 +150,9 @@ if (!gotTheLock) {
   global.indexUrl = process.env.DEV_SERVER || `file://${__dirname}/index.html`;
 
   function openDevTools() {
-    childWindow.webContents.openDevTools({ mode: 'undocked' });
+    if (childWindow.isVisible()) {
+      childWindow.webContents.openDevTools({ mode: 'undocked' });
+    }
     mainWindow.webContents.openDevTools({ mode: 'undocked' });
   }
 
