@@ -14,10 +14,11 @@ export class HostsService extends Service {
       if (url.startsWith(this.niconicoOAuth)) {
         return url.replace(this.niconicoOAuth, 'http://localhost:8080/oauth');
       }
-      return url;
-    } else {
-      return url;
+      if (url.startsWith(this.blogNicovideo)) {
+        return url.replace(this.blogNicovideo, 'http://localhost:8080/blog');
+      }
     }
+    return url;
   }
   get niconicoAccount() {
     return 'https://account.nicovideo.jp';
@@ -42,7 +43,10 @@ export class HostsService extends Service {
     url.searchParams.set('scope', scopes.join(' '));
     return url.toString();
   }
+  get blogNicovideo() {
+    return 'https://blog.nicovideo.jp';
+  }
   get niconicoNAirInformationsFeed() {
-    return 'https://blog.nicovideo.jp/niconews/category/se_n-air/feed/index.xml';
+    return this.replaceHost('https://blog.nicovideo.jp/niconews/category/se_n-air/feed/index.xml');
   }
 }

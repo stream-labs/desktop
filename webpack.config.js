@@ -51,6 +51,11 @@ module.exports = {
         changeOrigin: true,
         pathRewrite: { '^/oauth': '' },
       },
+      '/blog': {
+        target: 'https://blog.nicovideo.jp',
+        changeOrigin: true,
+        pathRewrite: { '^/blog': '' },
+      },
     },
   },
 
