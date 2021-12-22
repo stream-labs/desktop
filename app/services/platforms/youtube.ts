@@ -396,12 +396,10 @@ export class YoutubeService
     // YouTube API doesn't allow us to set this code
     if (snippet.defaultAudioLanguage === 'zxx') delete snippet.defaultAudioLanguage;
 
-    snippet.categoryId = categoryId;
-
     await this.requestYoutube({
       body: JSON.stringify({
         id: broadcastId,
-        snippet,
+        snippet: { snippet, categoryId },
       }),
       method: 'PUT',
       url: `${this.apiBase}/${endpoint}`,
