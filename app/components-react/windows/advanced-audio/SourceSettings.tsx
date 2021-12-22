@@ -120,12 +120,10 @@ function PanelHeader(p: { source: AudioSource }) {
           onClick={(e: React.MouseEvent) => onInputHandler('mixerHidden', !mixerHidden, e)}
         />
       </Tooltip>
-      {(isAdvancedOutput || vodTrackEnabled) && (
         <div
           className={styles.audioSettingsTracks}
           onClick={(e: React.MouseEvent) => e.stopPropagation()}
         >
-          {(isAdvancedOutput || vodTrackEnabled) && (
             <InputWrapper
               label={vodTrackEnabled ? $t('Stream Tracks') : $t('Stream Track')}
               tooltip={$t('Designates if this source is audible in your live broadcast')}
@@ -151,7 +149,6 @@ function PanelHeader(p: { source: AudioSource }) {
                 )}
               </div>
             </InputWrapper>
-          )}
           {isAdvancedOutput && (
             <InputWrapper
               label={$t('Rec. Tracks')}
@@ -174,7 +171,6 @@ function PanelHeader(p: { source: AudioSource }) {
             </InputWrapper>
           )}
         </div>
-      )}
     </Form>
   );
 }
