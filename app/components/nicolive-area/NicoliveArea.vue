@@ -9,15 +9,17 @@
       <i class="icon-drop-down-arrow"></i>
     </button>
     <div class="nicolive-area-container" v-if="opened || compactMode">
+      <top-nav v-if="!compactMode" />
       <div class="program-area" :class="{ isCreate: !hasProgram }">
         <template v-if="hasProgram">
           <program-info class="program-area-item" />
-          <tool-bar class="program-area-item" />
+          <tool-bar class="program-area-item" v-if="!compactMode" />
           <program-statistics class="program-area-item" />
           <area-switcher class="switch-area" :contents="contents">
             <template v-slot:commentViewer><comment-viewer /></template>
             <template v-slot:description><program-description /></template>
           </area-switcher>
+          <tool-bar class="program-area-item" v-if="compactMode" />
         </template>
         <template v-else>
           <p class="message">
@@ -29,7 +31,7 @@
               class="button button--primary button--create-program"
               @click="createProgram"
               :disabled="isCreating"
-               v-if="!compactMode"
+              v-if="!compactMode"
             >
               新しく番組を作成する
             </button>
@@ -40,7 +42,7 @@
               class="button button--fetch-program"
               @click="fetchProgram"
               :disabled="isFetching"
-              :class="[ compactMode ? 'button--primary' : 'button--secondary']"
+              :class="[compactMode ? 'button--primary' : 'button--secondary']"
             >
               作成済みの番組を取得する
             </button>

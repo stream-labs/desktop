@@ -48,6 +48,11 @@ interface INicoliveProgramState extends ProgramState {
   panelOpened: boolean | null; // 初期化前はnull、永続化された値の読み出し後に値が入る
   isLoggedIn: boolean | null; // 初期化前はnull、永続化された値の読み出し後に値が入る
   isCompact: boolean | null;
+
+  isFetching: boolean;
+  isExtending: boolean;
+  isStarting: boolean;
+  isEnding: boolean;
 }
 
 export enum PanelState {
@@ -96,6 +101,10 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
     panelOpened: null,
     isLoggedIn: null,
     isCompact: null,
+    isFetching: false,
+    isExtending: false,
+    isStarting: false,
+    isEnding: false,
   };
 
   init(): void {
@@ -206,81 +215,90 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
   }
 
   async fetchProgram(): Promise<void> {
-    // DEBUG デザイン作業用
-    if (process.env.DEV_SERVER) {
-      const now = Math.floor(Date.now() / 1000);
-      this.setState({
-        programID: 'lv5963',
-        status: 'onAir',
-        title: '番組タイトル',
-        description: '番組説明',
-        startTime: now,
-        vposBaseTime: now,
-        endTime: now + 30 * 60,
-        isMemberOnly: false,
-        communityID: 'co12345',
-        communityName: '(コミュニティの取得に失敗しました)',
-        communitySymbol: '',
-        roomURL: '',
-        roomThreadID: '',
-      });
-      return;
-    }
-
-    const schedulesResponse = await this.client.fetchProgramSchedules();
-    if (!isOk(schedulesResponse)) {
-      throw NicoliveFailure.fromClientError('fetchProgramSchedules', schedulesResponse);
-    }
-
-    const programSchedule = NicoliveProgramService.findSuitableProgram(schedulesResponse.value);
-
-    if (!programSchedule) {
-      this.setState({ status: 'end' });
-      throw NicoliveFailure.fromConditionalError('fetchProgram', 'no_suitable_program');
-    }
-    const { nicoliveProgramId, socialGroupId } = programSchedule;
-
-    const [programResponse, communityResponse] = await Promise.all([
-      this.client.fetchProgram(nicoliveProgramId),
-      this.client.fetchCommunity(socialGroupId),
-    ]);
-    if (!isOk(programResponse)) {
-      throw NicoliveFailure.fromClientError('fetchProgram', programResponse);
-    }
-    if (!isOk(communityResponse)) {
-      // コミュニティ情報が取れなくても配信はできてよいはず
-      if (communityResponse.value instanceof Error) {
-        console.error('fetchCommunity', communityResponse.value);
-      } else {
-        console.error(
-          'fetchCommunity',
-          communityResponse.value.meta.status,
-          communityResponse.value.meta.errorMessage || '',
-        );
+    this.setState({ isFetching: true });
+    try {
+      // DEBUG デザイン作業用
+      if (process.env.DEV_SERVER) {
+        const now = Math.floor(Date.now() / 1000);
+        this.setState({
+          programID: 'lv5963',
+          status: 'onAir',
+          title: '番組タイトル',
+          description: '番組説明',
+          startTime: now,
+          vposBaseTime: now,
+          endTime: now + 30 * 60,
+          isMemberOnly: false,
+          communityID: 'co12345',
+          communityName: '(コミュニティの取得に失敗しました)',
+          communitySymbol: '',
+          roomURL: '',
+          roomThreadID: '',
+          viewers: 12,
+          comments: 34,
+          adPoint: 56,
+          giftPoint: 78,
+        });
+        return;
       }
+
+      const schedulesResponse = await this.client.fetchProgramSchedules();
+      if (!isOk(schedulesResponse)) {
+        throw NicoliveFailure.fromClientError('fetchProgramSchedules', schedulesResponse);
+      }
+
+      const programSchedule = NicoliveProgramService.findSuitableProgram(schedulesResponse.value);
+
+      if (!programSchedule) {
+        this.setState({ status: 'end' });
+        throw NicoliveFailure.fromConditionalError('fetchProgram', 'no_suitable_program');
+      }
+      const { nicoliveProgramId, socialGroupId } = programSchedule;
+
+      const [programResponse, communityResponse] = await Promise.all([
+        this.client.fetchProgram(nicoliveProgramId),
+        this.client.fetchCommunity(socialGroupId),
+      ]);
+      if (!isOk(programResponse)) {
+        throw NicoliveFailure.fromClientError('fetchProgram', programResponse);
+      }
+      if (!isOk(communityResponse)) {
+        // コミュニティ情報が取れなくても配信はできてよいはず
+        if (communityResponse.value instanceof Error) {
+          console.error('fetchCommunity', communityResponse.value);
+        } else {
+          console.error(
+            'fetchCommunity',
+            communityResponse.value.meta.status,
+            communityResponse.value.meta.errorMessage || '',
+          );
+        }
+      }
+
+      const community = isOk(communityResponse) && communityResponse.value;
+      const program = programResponse.value;
+
+      // アリーナのみ取得する
+      const room = program.rooms.find(r => r.id === 0);
+
+      this.setState({
+        programID: nicoliveProgramId,
+        status: program.status,
+        title: program.title,
+        description: program.description,
+        startTime: program.beginAt,
+        vposBaseTime: program.vposBaseAt,
+        endTime: program.endAt,
+        isMemberOnly: program.isMemberOnly,
+        communityID: socialGroupId,
+        communityName: community ? community.name : '(コミュニティの取得に失敗しました)',
+        communitySymbol: community ? community.thumbnailUrl.small : '',
+        roomURL: room ? room.webSocketUri : '',
+        roomThreadID: room ? room.threadId : '',
+      });
+    } finally {
+      this.setState({ isFetching: false });
     }
-
-    const community = isOk(communityResponse) && communityResponse.value;
-    const program = programResponse.value;
-
-    // アリーナのみ取得する
-    const room = program.rooms.find(r => r.id === 0);
-
-    this.setState({
-      programID: nicoliveProgramId,
-      status: program.status,
-      title: program.title,
-      description: program.description,
-      startTime: program.beginAt,
-      vposBaseTime: program.vposBaseAt,
-      endTime: program.endAt,
-      isMemberOnly: program.isMemberOnly,
-      communityID: socialGroupId,
-      communityName: community ? community.name : '(コミュニティの取得に失敗しました)',
-      communitySymbol: community ? community.thumbnailUrl.small : '',
-      roomURL: room ? room.webSocketUri : '',
-      roomThreadID: room ? room.threadId : '',
-    });
   }
 
   async refreshProgram(): Promise<void> {
@@ -313,31 +331,41 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
   }
 
   async startProgram(): Promise<void> {
-    const result = await this.client.startProgram(this.state.programID);
-    if (!isOk(result)) {
-      throw NicoliveFailure.fromClientError('startProgram', result);
-    }
+    this.setState({ isStarting: true });
+    try {
+      const result = await this.client.startProgram(this.state.programID);
+      if (!isOk(result)) {
+        throw NicoliveFailure.fromClientError('startProgram', result);
+      }
 
-    const endTime = result.value.end_time;
-    const startTime = result.value.start_time;
-    this.setState({ status: 'onAir', endTime, startTime });
+      const endTime = result.value.end_time;
+      const startTime = result.value.start_time;
+      this.setState({ status: 'onAir', endTime, startTime });
+    } finally {
+      this.setState({ isStarting: false });
+    }
   }
 
   async endProgram(): Promise<void> {
-    // DEBUG デザイン作業用
-    if (process.env.DEV_SERVER) {
-      const endTime = Math.floor(Date.now() / 1000);
+    this.setState({ isEnding: true });
+    try {
+      // DEBUG デザイン作業用
+      if (process.env.DEV_SERVER) {
+        const endTime = Math.floor(Date.now() / 1000);
+        this.setState({ status: 'end', endTime });
+        return;
+      }
+
+      const result = await this.client.endProgram(this.state.programID);
+      if (!isOk(result)) {
+        throw NicoliveFailure.fromClientError('endProgram', result);
+      }
+
+      const endTime = result.value.end_time;
       this.setState({ status: 'end', endTime });
-      return;
+    } finally {
+      this.setState({ isEnding: false });
     }
-
-    const result = await this.client.endProgram(this.state.programID);
-    if (!isOk(result)) {
-      throw NicoliveFailure.fromClientError('endProgram', result);
-    }
-
-    const endTime = result.value.end_time;
-    this.setState({ status: 'end', endTime });
   }
 
   toggleAutoExtension(): void {
@@ -345,7 +373,19 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
   }
 
   async extendProgram(): Promise<void> {
-    return this.internalExtendProgram(this.state);
+    this.setState({ isExtending: true });
+    try {
+      // DEBUG デザイン作業用
+      if (process.env.DEV_SERVER) {
+        const endTime = this.state.endTime + 30 * 60;
+        this.setState({ endTime });
+        return;
+      }
+
+      return this.internalExtendProgram(this.state);
+    } finally {
+      this.setState({ isExtending: false });
+    }
   }
 
   private async internalExtendProgram(state: INicoliveProgramState): Promise<void> {

@@ -49,6 +49,10 @@ export default class CommentViewer extends Vue {
   @Inject()
   private nicoliveCommentFilterService: NicoliveCommentFilterService;
 
+  get compactMode(): boolean {
+    return this.nicoliveProgramService.state.isCompact;
+  }
+
   // TODO: 後で言語ファイルに移動する
   commentReloadTooltip = 'コメント再取得';
   commentSynthesizerTooltip = 'コメント読み上げ';

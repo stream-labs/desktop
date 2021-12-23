@@ -17,11 +17,12 @@ export default class TopNav extends Vue {
     return this.nicoliveProgramService.hasProgram;
   }
 
-  isFetching: boolean = false;
+  get isFetching(): boolean {
+    return this.nicoliveProgramService.state.isFetching;
+  }
   async fetchProgram(): Promise<void> {
     if (this.isFetching) throw new Error('fetchProgram is running');
     try {
-      this.isFetching = true;
       await this.nicoliveProgramService.fetchProgram();
     } catch (caught) {
       if (caught instanceof NicoliveFailure) {
@@ -29,8 +30,6 @@ export default class TopNav extends Vue {
       } else {
         throw caught;
       }
-    } finally {
-      this.isFetching = false;
     }
   }
 

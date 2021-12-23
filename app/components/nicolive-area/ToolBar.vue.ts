@@ -15,15 +15,36 @@ export default class ToolBar extends Vue {
 
   manualExtentionTooltip = $t('common.manualExtendButton');
 
+  get compactMode(): boolean {
+    return this.nicoliveProgramService.state.isCompact;
+  }
+
   format(timeInSeconds: number): string {
     return NicoliveProgramService.format(timeInSeconds);
   }
 
-  isExtending: boolean = false;
+  get isFetching(): boolean {
+    return this.nicoliveProgramService.state.isFetching;
+  }
+  async fetchProgram(): Promise<void> {
+    if (this.isFetching) throw new Error('fetchProgram is running');
+    try {
+      await this.nicoliveProgramService.fetchProgram();
+    } catch (caught) {
+      if (caught instanceof NicoliveFailure) {
+        await openErrorDialogFromFailure(caught);
+      } else {
+        throw caught;
+      }
+    }
+  }
+
+  get isExtending(): boolean {
+    return this.nicoliveProgramService.state.isExtending;
+  }
   async extendProgram() {
     if (this.isExtending) throw new Error('extendProgram is running');
     try {
-      this.isExtending = true;
       return await this.nicoliveProgramService.extendProgram();
     } catch (caught) {
       if (caught instanceof NicoliveFailure) {
@@ -31,8 +52,6 @@ export default class ToolBar extends Vue {
       } else {
         throw caught;
       }
-    } finally {
-      this.isExtending = false;
     }
   }
 
@@ -63,7 +82,7 @@ export default class ToolBar extends Vue {
   }
 
   currentTime: number = NaN;
-  updateCurrrentTime() {
+  updateCurrentTime() {
     this.currentTime = Math.floor(Date.now() / 1000);
   }
 
@@ -87,7 +106,7 @@ export default class ToolBar extends Vue {
   }
 
   startTimer() {
-    this.timeTimer = setInterval(() => this.updateCurrrentTime(), 1000) as any as number;
+    this.timeTimer = setInterval(() => this.updateCurrentTime(), 1000) as any as number;
   }
 
   timeTimer: number = 0;
@@ -95,5 +114,18 @@ export default class ToolBar extends Vue {
     if (this.programStatus !== 'end') {
       this.startTimer();
     }
+  }
+
+  get isStarting(): boolean {
+    return this.nicoliveProgramService.state.isStarting;
+  }
+  async startProgram() {
+    // TODO
+  }
+  get isEnding(): boolean {
+    return this.nicoliveProgramService.state.isEnding;
+  }
+  async endProgram() {
+    // TODO
   }
 }

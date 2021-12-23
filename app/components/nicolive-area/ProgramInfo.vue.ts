@@ -10,8 +10,13 @@ import {
   openErrorDialogFromFailure,
 } from 'services/nicolive-program/NicoliveFailure';
 import { Subscription } from 'rxjs';
+import Popper from 'vue-popperjs';
 
-@Component({})
+@Component({
+  components: {
+    Popper,
+  },
+})
 export default class ProgramInfo extends Vue {
   @Inject()
   nicoliveProgramService: NicoliveProgramService;
@@ -21,6 +26,10 @@ export default class ProgramInfo extends Vue {
   programIsMemberOnlyTooltip = 'コミュニティ限定放送';
 
   private subscription: Subscription = null;
+
+  get compactMode(): boolean {
+    return this.nicoliveProgramService.state.isCompact;
+  }
 
   mounted() {
     this.subscription = this.nicoliveProgramService.stateChange.subscribe(state => {
@@ -56,11 +65,12 @@ export default class ProgramInfo extends Vue {
     }
   }
 
-  isFetching: boolean = false;
+  get isFetching(): boolean {
+    return this.nicoliveProgramService.state.isFetching;
+  }
   async fetchProgram(): Promise<void> {
     if (this.isFetching) throw new Error('fetchProgram is running');
     try {
-      this.isFetching = true;
       await this.nicoliveProgramService.fetchProgram();
     } catch (caught) {
       if (caught instanceof NicoliveFailure) {
@@ -68,16 +78,15 @@ export default class ProgramInfo extends Vue {
       } else {
         throw caught;
       }
-    } finally {
-      this.isFetching = false;
     }
   }
 
-  isStarting: boolean = false;
+  get isStarting(): boolean {
+    return this.nicoliveProgramService.state.isStarting;
+  }
   async startProgram() {
     if (this.isStarting) throw new Error('startProgram is running');
     try {
-      this.isStarting = true;
       await this.nicoliveProgramService.startProgram();
 
       // もし配信開始してなかったら確認する
@@ -106,16 +115,15 @@ export default class ProgramInfo extends Vue {
       } else {
         throw caught;
       }
-    } finally {
-      this.isStarting = false;
     }
   }
 
-  isEnding: boolean = false;
+  get isEnding(): boolean {
+    return this.nicoliveProgramService.state.isEnding;
+  }
   async endProgram() {
     if (this.isEnding) throw new Error('endProgram is running');
     try {
-      this.isEnding = true;
       const isOk = await new Promise(resolve => {
         // TODO: 翻訳
         remote.dialog.showMessageBox(
@@ -143,8 +151,6 @@ export default class ProgramInfo extends Vue {
       } else {
         throw caught;
       }
-    } finally {
-      this.isEnding = false;
     }
   }
 
@@ -186,6 +192,13 @@ export default class ProgramInfo extends Vue {
 
   get communitySymbol(): string {
     return this.nicoliveProgramService.state.communitySymbol;
+  }
+
+  get autoExtensionEnabled() {
+    return this.nicoliveProgramService.state.autoExtensionEnabled;
+  }
+  toggleAutoExtension() {
+    this.nicoliveProgramService.toggleAutoExtension();
   }
 
   openInDefaultBrowser(event: MouseEvent): void {
