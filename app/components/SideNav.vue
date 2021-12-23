@@ -16,7 +16,7 @@
               :class="{ active: compactModeTab === 'niconico' }"
               data-test="compact-tab-niconico"
             >
-              <i :class="{ 'icon-niconico': true }" :title="$t('common.compactModeTab.niconico')" />
+              <i :class="{ 'icon-namaco': true }" :title="$t('common.compactModeTab.niconico')" />
             </a>
           </div>
           <div class="side-nav-item">
@@ -140,8 +140,12 @@
   .link {
     height: 48px;
 
-    i {
+    .icon-video {
       font-size: @font-size5;
+    }
+
+    .icon-namaco {
+      font-size: @font-size8;
     }
   }
 }
