@@ -1,5 +1,5 @@
 <template>
-  <div class="main" id="mainWrapper" @drop="onDropHandler">
+  <div class="main" id="mainWrapper" @drop="onDropHandler" :class="{isCompactMode: isCompactMode}">
     <title-bar class="main-title" :title="title" />
     <div class="main-contents">
       <side-nav v-if="page !== 'Onboarding'" :locked="applicationLoading"></side-nav>
