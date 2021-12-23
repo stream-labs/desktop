@@ -6,10 +6,9 @@
       :class="{ 'nicolive-area--opened': opened }"
       v-if="!compactMode"
     >
-      <ControlsArrow />
+      <i class="icon-drop-down-arrow"></i>
     </button>
     <div class="nicolive-area-container" v-if="opened || compactMode">
-      <top-nav />
       <div class="program-area" :class="{ isCreate: !hasProgram }">
         <template v-if="hasProgram">
           <program-info class="program-area-item" />
@@ -22,21 +21,26 @@
         </template>
         <template v-else>
           <p class="message">
-            <i class="icon-niconico"></i
-            >このエリアではニコニコ生放送を<br />配信するための機能が利用できます
+            <i class="icon-namaco"></i>
+            このエリアではニコニコ生放送を<br />配信するための機能が利用できます
           </p>
           <div class="button-wrapper">
             <button
-              class="button button--create-program"
+              class="button button--primary button--create-program"
               @click="createProgram"
               :disabled="isCreating"
+               v-if="!compactMode"
             >
               新しく番組を作成する
             </button>
+            <div class="devider" v-if="!compactMode">
+              <span class="devider-label">または</span>
+            </div>
             <button
               class="button button--fetch-program"
               @click="fetchProgram"
               :disabled="isFetching"
+              :class="[ compactMode ? 'button--primary' : 'button--secondary']"
             >
               作成済みの番組を取得する
             </button>
@@ -54,49 +58,41 @@
 .root {
   display: flex;
   height: 100%;
-  border-left: 1px solid @bg-secondary;
 }
 
 .nicolive-area-toggle-button {
-  width: 16px;
-  height: 180px;
-  margin: auto 8px auto auto;
-  background-color: @bg-primary;
-  border-width: 1px 1px 1px 0;
-  border-style: solid;
-  border-color: @bg-secondary;
+  width: 24px;
+  background-color: var(--color-primary);
+  border: none;
 
-  > svg {
-    width: 10px;
-    height: 140px;
-    fill: @text-primary;
-    transition: 0.5s;
-    transform: rotate(0deg);
+  > i {
+    display: block;
+    font-size: @font-size2;
+    color: var(--color-icon);
+    transform: rotate(-90deg);
   }
 
   &:hover {
-    background-color: @bg-secondary;
-
-    > svg {
-      fill: @text-primary;
+    > i {
+      color: var(--color-icon-hover);
     }
   }
 
   &.nicolive-area--opened {
-    > svg {
-      transform: rotate(180deg);
+    > i {
+      transform: rotate(90deg);
     }
   }
 }
 
 .nicolive-area-container {
-  width: 400px;
+  width: @nicolive-area-width;
   display: flex;
   flex-direction: column;
   flex-grow: 1;
   align-items: center;
-  background-color: @bg-primary;
-  border-left: 1px solid @bg-tertiary;
+  border-left: 1px solid var(--color-border-dark);
+  background-color: var(--color-nicolive-background);
 }
 
 .program-area {
@@ -109,22 +105,24 @@
   &.isCreate {
     padding: 16px;
     align-items: center;
-    background-color: @bg-secondary;
+  }
+}
 
-    .message {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      color: @text-secondary;
-      text-align: center;
-      margin-bottom: 40px;
+.message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 
-      .icon-niconico {
-        color: @text-secondary;
-        font-size: 60px;
-        margin-bottom: 16px;
-      }
-    }
+  font-size: @font-size4;
+  color: var(--color-text-primary);
+  line-height: 24px;
+  text-align: center;
+  margin-bottom: 24px;
+
+  i {
+    color: var(--color-text-secondary);
+    font-size: 88px;
+    margin-bottom: 16px;
   }
 }
 
@@ -135,8 +133,8 @@
 .button-wrapper {
   display: flex;
   flex-direction: column;
-  min-width: 210px;
-  padding-bottom: 72px;
+  min-width: 216px;
+  padding-bottom: 80px;
 
   .button {
     width: 100%;
@@ -150,6 +148,25 @@
 .switch-area {
   flex-grow: 1;
   flex-basis: 0;
+}
+
+.devider {
+  display: flex;
+  align-items: center;
+  margin: 16px 0;
+
+  .devider-label {
+    padding: 0 8px;
+    color: var(--color-text-secondary);
+  }
+
+  &:before,
+  &:after {
+    content: '';
+    height: 1px;
+    flex-grow: 1;
+    background-color: var(--color-text-secondary);
+  }
 }
 </style>
 
