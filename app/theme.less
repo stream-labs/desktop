@@ -17,31 +17,36 @@
   --color-accent-variant: @accent-hover;
 
   // border
-  --color-border--dark: rgba(@black, .6);
+  --color-border-dark: rgba(@black, .6);
   --color-border-light: rgba(@grey, .3);
 
   // background
   --color-background: @bg-secondary;
+  --color-nicolive-background: @bg-quinary;
 
   // text
   --color-text-primary: @light-grey;
   --color-text-secondary: @grey;
   --color-text-hover: @white;
 
-   // button
-   --color-button-primary: @text-secondary;
-   --color-button-secondary: @grey;
+  // button
+  --color-button-label: @white;
+  --color-button-primary: @text-secondary;
+  --color-button-primary-hover: rgba(@text-secondary, .8);
+  --color-button-secondary: rgba(@white, .2);
+  --color-button-secondary-hover: rgba(@white, .3);
+  --color-button-accent: @accent;
 
   // link
   --color-link: @light-grey;
   --color-link-hover: @white;
-  --color-link-active: @text-active;
+  --color-link-active: @text-primary;
   --color-link-disabled: rgba(@light-grey, .3);
 
   // icon
   --color-icon: @light-grey;
   --color-icon-hover: @white;
-  --color-icon-active: @text-active;
+  --color-icon-active: @text-primary;
   --color-icon-disabled: rgba(@light-grey, .3);
 
   // titleBar
@@ -49,6 +54,10 @@
   --color-titlebar-text: @light-grey;
   --color-titlebar-action: @light-grey;
   --color-titlebar-action-hover: @white;
+
+  // live
+  --color-live: @red;
+  --color-live-secondary: @red;
 }
 
 // 実験版（ヘッダー）

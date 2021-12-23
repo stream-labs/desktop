@@ -1,10 +1,49 @@
-button,
+button {
+  &:focus,
+  &:visited {
+    outline: none;
+  }
+}
+
 .button {
   .transition;
-  text-decoration: none;
+  .radius();
 
-  &:focus, &:visited {
-    outline: none;
+  height: 36px;
+  font-size: @font-size4;
+  color: var(--color-button-label);
+  background-color: var(--color-button-primary);
+  padding: 0 8px;
+  letter-spacing: 0;
+
+  &:disabled {
+    opacity: .5;
+  }
+}
+
+.button--primary {
+  background-color: var(--color-button-primary);
+
+  &:hover {
+    background-color: var(--color-button-primary-hover);
+  }
+
+  &:disabled,
+  &:disabled:hover {
+    background-color: var(--color-button-primary);
+  }
+}
+
+.button--secondary {
+  background-color: var(--color-button-secondary);
+
+  &:hover {
+    background-color: var(--color-button-secondary-hover);
+  }
+
+  &:disabled,
+  &:disabled:hover {
+    background-color: var(--color-button-secondary);
   }
 }
 
@@ -68,11 +107,12 @@ button,
 }
 
 .icon-btn {
+  .icon-hover();
+
   font-size: 14px;
   cursor: pointer;
   margin-left: 10px;
-  .icon-hover();
-
+  
   &:first-child {
     margin-left: inherit;
   }
@@ -215,28 +255,6 @@ button,
   &:disabled {
     &:hover {
       background-color: @text-secondary;
-    }
-  }
-}
-
-.button--fetch-program {
-  font-size: 13px;
-  color:@text-secondary;
-  background-color: transparent;
-  border-width: 1px;
-  border-style: solid;
-  border-color: @text-secondary;
-
-   &:hover {
-    opacity: .5;
-    color: inherit;
-    background-color: transparent
-  }
-
-  &:disabled {
-    &:hover {
-      color:@text-secondary;
-      background-color: transparent;
     }
   }
 }
