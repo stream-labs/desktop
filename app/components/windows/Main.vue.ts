@@ -1,23 +1,22 @@
-import Vue from 'vue';
-import { Component } from 'vue-property-decorator';
-import SideNav from '../SideNav.vue';
-import { ScenesService } from 'services/scenes';
-
-// Pages
-import Studio from '../pages/Studio.vue';
-import Onboarding from '../pages/Onboarding.vue';
-import TitleBar from '../TitleBar.vue';
-import { Inject } from '../../services/core/injector';
-import { NavigationService } from 'services/navigation';
+import { CompactModeService } from 'app-services';
+import electron from 'electron';
 import { AppService } from 'services/app';
+import { Inject } from 'services/core/injector';
+import { NavigationService } from 'services/navigation';
+import { ScenesService } from 'services/scenes';
 import { UserService } from 'services/user';
 import { WindowsService } from 'services/windows';
-import StudioFooter from '../StudioFooter.vue';
+import Vue from 'vue';
+import { Component } from 'vue-property-decorator';
+import BottomLine from '../BottomLine.vue';
 import CustomLoader from '../CustomLoader.vue';
-import PatchNotes from '../pages/PatchNotes.vue';
 import NicoliveArea from '../nicolive-area/NicoliveArea.vue';
-import electron from 'electron';
-import { CompactModeService } from 'app-services';
+import Onboarding from '../pages/Onboarding.vue';
+import PatchNotes from '../pages/PatchNotes.vue';
+import Studio from '../pages/Studio.vue';
+import SideNav from '../SideNav.vue';
+import StudioFooter from '../StudioFooter.vue';
+import TitleBar from '../TitleBar.vue';
 
 @Component({
   components: {
@@ -29,6 +28,7 @@ import { CompactModeService } from 'app-services';
     CustomLoader,
     PatchNotes,
     NicoliveArea,
+    BottomLine,
   },
 })
 export default class Main extends Vue {
