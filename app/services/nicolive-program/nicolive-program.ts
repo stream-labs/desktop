@@ -403,6 +403,12 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
     prevState: INicoliveProgramState,
     nextState: INicoliveProgramState,
   ): void {
+    // DEBUG
+    if (process.env.DEV_SERVER) {
+      // yarn dev 時はスキップ
+      return;
+    }
+
     const programUpdated = prevState.programID !== nextState.programID;
 
     const prev = prevState.status === 'onAir';
