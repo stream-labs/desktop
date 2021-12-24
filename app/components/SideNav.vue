@@ -16,6 +16,7 @@
               :class="{ active: compactModeTab === 'niconico' }"
               data-test="compact-tab-niconico"
             >
+              <!-- TODO notifyNewComment を見てバッジを付ける-->
               <i :class="{ 'icon-namaco': true }" :title="$t('common.compactModeTab.niconico')" />
             </a>
           </div>

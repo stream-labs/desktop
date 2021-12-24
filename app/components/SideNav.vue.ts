@@ -62,6 +62,9 @@ export default class SideNav extends Vue {
   set compactModeTab(tab: 'studio' | 'niconico') {
     this.compactModeService.compactModeTab = tab;
   }
+  get notifyNewComment(): boolean {
+    return this.compactModeService.notifyNewComment;
+  }
 
   studioMode() {
     if (this.transitionsService.state.studioMode) {

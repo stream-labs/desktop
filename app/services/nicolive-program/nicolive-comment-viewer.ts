@@ -1,7 +1,7 @@
 import { Inject } from 'services/core/injector';
 import { NicoliveProgramService } from 'services/nicolive-program/nicolive-program';
 import { StatefulService, mutation } from 'services/core/stateful-service';
-import { Subscription, EMPTY, Observable, of } from 'rxjs';
+import { Subscription, EMPTY, Observable, of, interval } from 'rxjs';
 import {
   map,
   distinctUntilChanged,
@@ -19,6 +19,8 @@ import {
   MessageServerConfig,
   isChatMessage,
   isThreadMessage,
+  IMessageServerClient,
+  MessageResponse,
 } from './MessageServerClient';
 import { classify } from './ChatMessage/classifier';
 import { isOperatorCommand } from './ChatMessage/util';
@@ -27,6 +29,7 @@ import { NicoliveCommentSynthesizerService } from './nicolive-comment-synthesize
 import { AddComponent } from './ChatMessage/ChatComponentType';
 import { WrappedChat, WrappedChatWithComponent } from './WrappedChat';
 import { NicoliveCommentLocalFilterService } from './nicolive-comment-local-filter';
+import { CustomizationService } from 'services/customization';
 
 function makeEmulatedChat(
   content: string,
@@ -39,6 +42,20 @@ function makeEmulatedChat(
       date,
     },
   };
+}
+
+// yarn dev 用: ダミーでコメントを5秒ごとに出し続ける
+class DummyMessageServerClient implements IMessageServerClient {
+  connect(): Observable<MessageResponse> {
+    return interval(5000).pipe(
+      map(res => ({
+        chat: makeEmulatedChat(`${res}`).value,
+      })),
+    );
+  }
+  requestLatestMessages(): void {
+    // do nothing
+  }
 }
 
 interface INicoliveCommentViewerState {
@@ -54,12 +71,13 @@ interface INicoliveCommentViewerState {
 }
 
 export class NicoliveCommentViewerService extends StatefulService<INicoliveCommentViewerState> {
-  private client: MessageServerClient | null = null;
+  private client: IMessageServerClient | null = null;
 
   @Inject() private nicoliveProgramService: NicoliveProgramService;
   @Inject() private nicoliveCommentFilterService: NicoliveCommentFilterService;
   @Inject() private nicoliveCommentLocalFilterService: NicoliveCommentLocalFilterService;
   @Inject() private nicoliveCommentSynthesizerService: NicoliveCommentSynthesizerService;
+  @Inject() private customizationService: CustomizationService;
 
   static initialState: INicoliveCommentViewerState = {
     messages: [],
@@ -123,7 +141,12 @@ export class NicoliveCommentViewerService extends StatefulService<INicoliveComme
     // 予約番組は30分前にならないとURLが来ない
     if (!roomURL || !roomThreadID) return;
 
-    this.client = new MessageServerClient({ roomURL, roomThreadID });
+    if (process.env.DEV_SERVER) {
+      // yarn dev 時はダミーでコメントを5秒ごとに出し続ける
+      this.client = new DummyMessageServerClient();
+    } else {
+      this.client = new MessageServerClient({ roomURL, roomThreadID });
+    }
     this.connect();
   }
 
@@ -241,6 +264,9 @@ export class NicoliveCommentViewerService extends StatefulService<INicoliveComme
       messages: concatMessages.slice(-maxRetain),
       popoutMessages,
     });
+    if (!this.customizationService.state.compactModeNewComment) {
+      this.customizationService.setCompactModeNewComment(true);
+    }
   }
 
   private clearList() {

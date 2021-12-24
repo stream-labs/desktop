@@ -41,7 +41,12 @@ export type MessageServerConfig = {
   roomThreadID: string;
 };
 
-export class MessageServerClient {
+export interface IMessageServerClient {
+  connect(): Observable<MessageResponse>;
+  requestLatestMessages(): void;
+}
+
+export class MessageServerClient implements IMessageServerClient {
   private roomURL: string | null = null;
   private roomThreadID: string | null = null;
   private socket: WebSocketSubject<MessageResponse> | null = null;

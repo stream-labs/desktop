@@ -34,6 +34,12 @@ export class CompactModeService extends StatefulService<ICompactModeServiceState
     }
     return 'studio';
   }
+  // 新着コメント通知フラグ
+  get notifyNewComment(): boolean {
+    return (
+      this.compactModeTab !== 'niconico' && this.customizationService.state.compactModeNewComment
+    );
+  }
 
   set compactModeStudioController(controller: TCompactModeStudioController) {
     this.customizationService.setCompactModeStudioController(controller);

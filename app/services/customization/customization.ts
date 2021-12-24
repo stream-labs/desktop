@@ -30,6 +30,7 @@ export class CustomizationService
     compactMode: false,
     compactModeTab: 'studio',
     compactModeStudioController: 'scenes',
+    compactModeNewComment: false,
     fullModeWidthOffset: 0,
 
     experimental: {
@@ -101,10 +102,13 @@ export class CustomizationService
 
   setCompactModeTab(tab: TCompactModeTab) {
     if (tab === 'studio' || tab === 'niconico') {
-      this.setSettings({ compactModeTab: tab });
+      this.setSettings({ compactModeTab: tab, compactModeNewComment: false });
     } else {
       console.warn('Invalid compact mode tab:', tab);
     }
+  }
+  setCompactModeNewComment(value: boolean) {
+    this.setSettings({ compactModeNewComment: value });
   }
 
   setCompactModeStudioController(controller: TCompactModeStudioController) {
