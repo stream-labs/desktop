@@ -15,6 +15,7 @@
     </span>
 
     <span class="performance-metric-wrapper band_width">
+      <!-- TODO bandWidthAlert を見てバッジを付ける-->
       <i class="performance-metric-icon icon-kbps" />
       <span class="performance-metric">
         <span class="performance-metric__value">{{ bandwidth }}</span> kbps

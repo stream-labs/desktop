@@ -81,4 +81,9 @@ export default class PerformanceMetrics extends Vue {
     if (!this.customizationService.pollingPerformanceStatistics) return '--';
     return this.performanceService.state.bandwidth.toFixed(0);
   }
+
+  get bandWidthAlert(): boolean {
+    if (!this.customizationService.pollingPerformanceStatistics) return false;
+    return this.isStreaming && this.performanceService.state.bandwidth === 0;
+  }
 }
