@@ -43,6 +43,7 @@
   .semibold;
   letter-spacing: .7px;
   color: var(--color-text-primary);
+  overflow: hidden;
 
   i {
     margin-left: 8px;
@@ -58,10 +59,9 @@
   }
 
   > .scene-name {
+    .text-ellipsis;
+
     display: inline-block;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
     color: var(--color-text-hover);
     font-size: @font-size4;
   }

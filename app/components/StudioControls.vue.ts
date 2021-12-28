@@ -7,6 +7,7 @@ import ControlsArrow from '../../media/images/controls-arrow.svg';
 import Mixer from './Mixer.vue';
 import SceneSelector from './SceneSelector.vue';
 import SourceSelector from './SourceSelector.vue';
+import { SceneCollectionsService } from 'services/scene-collections';
 
 @Component({
   components: {
@@ -19,6 +20,7 @@ import SourceSelector from './SourceSelector.vue';
 export default class StudioControls extends Vue {
   @Inject() customizationService: CustomizationService;
   @Inject() compactModeService: CompactModeService;
+  @Inject() sceneCollectionsService: SceneCollectionsService;
 
   get opened() {
     return this.customizationService.studioControlsOpened;
@@ -32,6 +34,9 @@ export default class StudioControls extends Vue {
   }
   set compactModeStudioController(controller: 'scenes' | 'mixer') {
     this.compactModeService.compactModeStudioController = controller;
+  }
+  get activeCollection() {
+    return this.sceneCollectionsService.activeCollection;
   }
 
   onToggleControls() {

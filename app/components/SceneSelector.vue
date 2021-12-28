@@ -104,4 +104,11 @@
   right: 8px;
   display: inline-block;
 }
+
+.scene-collections__dropdown {
+  .text-ellipsis;
+
+  display: flex;
+  max-width: 240px;
+}
 </style>

@@ -21,7 +21,7 @@
             @click="compactModeStudioController = 'scenes'"
             class="studio-controls-tab"
             :class="{ active: compactModeStudioController === 'scenes' }"
-            >シーン</a
+            >{{ activeCollection.name }}</a
           >
         </div>
         <scene-selector
@@ -46,7 +46,7 @@
 
 .studio-controls {
   .deviding-border;
-  
+
   position: relative;
   height: 0;
   width: 100%;
@@ -118,16 +118,18 @@
 }
 
 .studio-controls-tab {
-  flex-grow: 1;
+  .text-ellipsis;
+
+  flex: 1 0 50%;
   text-align: center;
   height: 48px; 
   line-height: 48px;
   text-decoration: none;
   color: var(--color-text-primary);
   position: relative;
+  padding: 0 8px;
 
   &.active {
-    .semibold;
     color: var(--color-secondary);
 
     &:after {
