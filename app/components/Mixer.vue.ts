@@ -1,11 +1,11 @@
+import { CompactModeService } from 'services/compact-mode';
+import { $t } from 'services/i18n';
+import { Menu } from 'util/menus/Menu';
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import { AudioService } from '../services/audio';
 import { Inject } from '../services/core/injector';
-import { CompactModeService } from 'services/compact-mode';
 import MixerItem from './MixerItem.vue';
-import { $t } from 'services/i18n';
-import { Menu } from 'util/menus/Menu';
 
 @Component({
   components: { MixerItem },

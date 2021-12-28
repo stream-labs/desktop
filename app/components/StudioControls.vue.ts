@@ -1,13 +1,13 @@
 import { CompactModeService } from 'services/compact-mode';
 import { Inject } from 'services/core/injector';
 import { CustomizationService } from 'services/customization';
+import { SceneCollectionsService } from 'services/scene-collections';
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import ControlsArrow from '../../media/images/controls-arrow.svg';
 import Mixer from './Mixer.vue';
 import SceneSelector from './SceneSelector.vue';
 import SourceSelector from './SourceSelector.vue';
-import { SceneCollectionsService } from 'services/scene-collections';
 
 @Component({
   components: {

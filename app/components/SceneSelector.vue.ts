@@ -1,21 +1,21 @@
+import electron from 'electron';
+import Fuse from 'fuse.js';
+import { AppService } from 'services/app';
+import { CompactModeService } from 'services/compact-mode';
+import { EDismissable } from 'services/dismissables';
+import { $t } from 'services/i18n';
+import { ProjectorService } from 'services/projector';
+import { SceneCollectionsService } from 'services/scene-collections';
+import { ScenesService } from 'services/scenes';
+import { SourceFiltersService } from 'services/source-filters';
+import { TransitionsService } from 'services/transitions';
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import { Inject } from '../services/core/injector';
-import Selector from './Selector.vue';
-import { ScenesService } from 'services/scenes';
 import { Menu } from '../util/menus/Menu';
-import { TransitionsService } from 'services/transitions';
-import { SceneCollectionsService } from 'services/scene-collections';
-import { CompactModeService } from 'services/compact-mode';
-import { AppService } from 'services/app';
+import Selector from './Selector.vue';
 import DropdownMenu from './shared/DropdownMenu.vue';
 import HelpTip from './shared/HelpTip.vue';
-import { EDismissable } from 'services/dismissables';
-import Fuse from 'fuse.js';
-import { SourceFiltersService } from 'services/source-filters';
-import { ProjectorService } from 'services/projector';
-import { $t } from 'services/i18n';
-import electron from 'electron';
 
 @Component({
   components: { Selector, DropdownMenu, HelpTip },
