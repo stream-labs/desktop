@@ -6,6 +6,7 @@ import { ScenesService } from 'services/scenes';
 import { Menu } from '../util/menus/Menu';
 import { TransitionsService } from 'services/transitions';
 import { SceneCollectionsService } from 'services/scene-collections';
+import { CompactModeService } from 'services/compact-mode';
 import { AppService } from 'services/app';
 import DropdownMenu from './shared/DropdownMenu.vue';
 import HelpTip from './shared/HelpTip.vue';
@@ -26,6 +27,7 @@ export default class SceneSelector extends Vue {
   @Inject() transitionsService: TransitionsService;
   @Inject() sourceFiltersService: SourceFiltersService;
   @Inject() projectorService: ProjectorService;
+  @Inject() compactModeService: CompactModeService;
 
   searchQuery = '';
 
@@ -151,5 +153,9 @@ export default class SceneSelector extends Vue {
 
   get scenePresetHelpTipDismissable() {
     return EDismissable.ScenePresetHelpTip;
+  }
+
+  get compactMode(): boolean {
+    return this.compactModeService.compactMode;
   }
 }

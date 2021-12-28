@@ -23,44 +23,47 @@
 .popper.dropdown-menu {
   width: 124%;
   position: absolute;
-  background-color: @bg-secondary;
-  border-color: @bg-primary;
+  background-color: var(--color-popper-bg-dark);
+  border-color: var(--color-border-light);
   .border;
   .radius;
+  .shadow;
+  
   padding: 8px;
   max-height: 152px;
   overflow-y: auto;
-  z-index: 200000;
+  z-index: @popper;
 }
 
 .dropdown-menu__toggle {
   display: flex;
   text-align: left;
   align-items: center;
-  font-size: 12px;
+  font-size: @font-size4;
   .semibold;
   letter-spacing: .7px;
-  color: @text-primary;
+  color: var(--color-text-primary);
 
   i {
-    margin-left: 6px;
-    font-size: 10px;
-    color: @text-secondary;
-    &:hover {
-      color: @text-primary;
+    margin-left: 8px;
+    font-size: @font-size1;
+    .icon-hover();
+  }
+
+  &:hover {
+    i {
+      
+      color: var(--color-icon-hover);
     }
   }
 
   > .scene-name {
     display: inline-block;
-    width: 160px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    &:hover,
-    &.active {
-      color: @text-primary;
-    }
+    color: var(--color-text-hover);
+    font-size: @font-size4;
   }
 }
 
@@ -71,12 +74,11 @@
   overflow: hidden;
   text-overflow: ellipsis;
   cursor: pointer;
-  color: @text-secondary;
+  color: var(--color-text-primary);
 
   &:hover,
   &.active {
-    color: @text-primary;
-    background-color: @bg-primary;
+    color: var(--color-text-hover);
     &:before {
       content:"\003e";
     }

@@ -1,6 +1,6 @@
 <template>
 <div data-test="SceneSelector">
-  <div class="studio-controls-top">
+  <div class="studio-controls-top" v-if="!compactMode">
 
     <div class="scene-collections-wrapper">
 
@@ -24,17 +24,17 @@
 
     </div>
 
-    <div>
+    <div class="studio-controls-top-sidebar">
       <i
-        class="icon-add icon-btn icon-btn--lg"
+        class="icon-add icon-btn"
         @click="addScene"
         data-test="Add" />
       <i
-        class="icon-delete icon-btn icon-btn--lg"
+        class="icon-delete icon-btn"
         @click="removeScene"
         data-test="Remove" />
       <i
-        class="icon-settings icon-btn icon-btn--lg"
+        class="icon-settings icon-btn"
         @click="showTransitions"
         data-test="Edit" />
     </div>
@@ -81,27 +81,27 @@
 }
 
 .input-wrapper--search {
+  .radius;
+
   width: 89%;
-  margin-bottom: 4px;
-  border-radius: 25%;
+  margin-bottom: 8px;
   > input[type="text"] {
-    background-color: @bg-primary!important;
-    border:1px solid @text-secondary;
+    border:1px solid var(--color-border-light);
+
     &:focus {
-      background-color: #3a585f!important;
-      border:1px solid @text-primary;
+      border:1px solid var(--color-border-accent);
     }
   }
 
   &::after {
-    color: @text-primary;
+    color: var(--color-icon);
   }
 }
 
 .settings-link {
   position: absolute;
   top: 18px;
-  right: 0;
+  right: 8px;
   display: inline-block;
 }
 </style>
