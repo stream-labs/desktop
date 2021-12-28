@@ -6,22 +6,22 @@
       :class="{ 'studio-controls--opened': opened }"
       v-if="!compactMode"
     >
-      <ControlsArrow />
+      <i class="icon-drop-down-arrow"></i>
     </button>
     <template v-if="compactMode">
       <div class="studio-controls-compact">
-        <div style="studio-controls-tabs">
-          <a
-            @click="compactModeStudioController = 'scenes'"
-            class="studio-controls-tab"
-            :class="{ active: compactModeStudioController === 'scenes' }"
-            >scenes</a
-          >
+        <div class="studio-controls-tabs">
           <a
             @click="compactModeStudioController = 'mixer'"
             class="studio-controls-tab"
             :class="{ active: compactModeStudioController === 'mixer' }"
-            >mixer</a
+            >ミキサー</a
+          >
+          <a
+            @click="compactModeStudioController = 'scenes'"
+            class="studio-controls-tab"
+            :class="{ active: compactModeStudioController === 'scenes' }"
+            >シーン</a
           >
         </div>
         <scene-selector
@@ -45,64 +45,48 @@
 @import '../styles/index';
 
 .studio-controls {
+  .deviding-border;
+  
   position: relative;
   height: 0;
   width: 100%;
-  padding: 16px 8px 0 8px;
-  border-top: 1px solid @bg-tertiary;
+  padding: @toggle-button-size 8px 0 8px;
+  background-color: var(--color-bg-quinary);
 
-  svg {
-    width: 140px;
-    height: 10px;
-    transition: 0.5s;
-  }
-  &:hover {
-    svg {
-      transition: 0.5s;
-      width: 160px;
-    }
-  }
   &.opened {
-    height: 196px;
-    padding-top: 28px;
-    svg {
-      width: 140px;
-      height: 10px;
-      transform: rotate(0deg);
-    }
+    height: @studio-controls-opened-height;
+    padding-bottom: 16px;
+  }
+
+  .isCompactMode & {
+    display: flex;
+    padding-top: 0;
+    width: @nicolive-area-width;
   }
 }
 
 .studio-controls-toggle-button {
   position: absolute;
-  background-color: @bg-primary;
-  border: 1px solid @bg-secondary;
-  border-width: 0 1px 1px 1px;
-
   width: 180px;
-  height: 16px;
-  margin: -16px auto 0 auto;
+  height: @toggle-button-size;
+  margin: -@toggle-button-size auto 0 auto;
   left: 0;
   right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
-  > svg {
-    width: 140px;
-    height: 10px;
-    transform: rotate(180deg);
-    fill: @text-primary;
-    transition: 0.5s;
+  > i {
+    .icon-hover;
+    font-size: @font-size2;
+    color: var(--color-icon);
+    display: block;
+    transform: rotate(-180deg);
   }
 
   .opened & {
-    margin-top: -28px;
-  }
-
-  &:hover {
-    background-color: @bg-secondary;
-    > svg {
-      transition: 0.5s;
-      width: 160px;
-      fill: @text-primary;
+    i {
+      transform: rotate(0deg);
     }
   }
 }
@@ -115,26 +99,46 @@
   display: flex;
   flex-direction: column;
   height: 100%;
-  padding: 0 4px;
+  padding: 0 8px;
   position: relative;
+  flex-grow: 1;
+  overflow: auto;
 }
 
 .studio-controls-compact {
   display: flex;
   flex-direction: column;
+  flex-grow: 1;
+  .text-ellipsis;
 }
 
 .studio-controls-tabs {
   display: flex;
-  flex-direction: row;
+  padding: 0 8px;
 }
 
 .studio-controls-tab {
-  padding: 0 4px;
+  flex-grow: 1;
+  text-align: center;
+  height: 48px; 
+  line-height: 48px;
+  text-decoration: none;
+  color: var(--color-text-primary);
+  position: relative;
 
   &.active {
-    .bold;
-    color: white;
+    .semibold;
+    color: var(--color-secondary);
+
+    &:after {
+      content: '';
+      height: 2px;
+      width: 100%;
+      position: absolute;
+      left: 0;
+      bottom: 0;
+      background-color: var(--color-secondary);
+    }
   }
 }
 
@@ -144,18 +148,19 @@
   align-items: center;
   justify-content: space-between;
   flex: 0 0 16px;
-  margin: 4px 0;
+  height: 16px;
+  margin-bottom: 12px;
 }
 
 .studio-controls__label {
-  color: @text-primary;
+  color: var(--color-text-accent);
   margin-bottom: 0;
-  font-size: 12px;
+  font-size: @font-size4;
   .semibold;
 }
 
 .studio-controls-selector {
-  background: @bg-tertiary;
+  background: var(--color-bg-tertiary);
   .radius;
   flex-grow: 1;
   overflow-y: auto;

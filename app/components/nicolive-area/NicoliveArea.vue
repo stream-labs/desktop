@@ -63,9 +63,11 @@
 }
 
 .nicolive-area-toggle-button {
+  .deviding-border(left);
+  .deviding-border(right);
+
   width: 24px;
   background-color: var(--color-primary);
-  border: none;
 
   > i {
     display: block;
@@ -93,8 +95,7 @@
   flex-direction: column;
   flex-grow: 1;
   align-items: center;
-  border-left: 1px solid var(--color-border-dark);
-  background-color: var(--color-nicolive-background);
+  background-color: var(--color-bg-quinary);
 }
 
 .program-area {
@@ -158,6 +159,7 @@
   margin: 16px 0;
 
   .devider-label {
+    font-size: @font-size2;
     padding: 0 8px;
     color: var(--color-text-secondary);
   }

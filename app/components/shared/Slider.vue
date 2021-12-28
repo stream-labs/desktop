@@ -57,18 +57,14 @@
 }
 
 .vue-slider {
-  background-color: @bg-secondary !important;
-
-  .muted & {
-    background-color: darken(@bg-secondary, 10%) !important;
-  }
+  background-color: var(--color-border-light) !important;
 }
 
 .vue-slider-process {
-  background-color: @text-secondary !important;
+  background-color: var(--color-icon) !important;
 
   .muted & {
-    background-color: darken(@text-secondary, 40%) !important;
+    opacity: @opacity-disabled;
   }
 }
 
@@ -82,7 +78,7 @@
     width: 5px;
     height: 5px;
     border-radius: 50%;
-    background-color: @text-secondary;
+    background-color: var(--color-text-secondary);
   }
 }
 
