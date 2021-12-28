@@ -42,6 +42,7 @@
       <i
         class="icon-btn icon-settings"
         @click="showSourceMenu(audioSource.sourceId)"
+        v-if="!compactMode"
       >
       </i>
     </div>
@@ -57,11 +58,11 @@
 
 .mixer-item {
   position: relative;
-  padding: 4px 8px;
-  color: @text-secondary;
+  padding: 4px 12px 0;
+  color: var(--color-text-primary);
 
   .source-name {
-    flex: 1;
+    flex: 1; 
   }
 
   .db-value {
@@ -78,14 +79,18 @@
   }
 
   &.muted .icon-mute {
-    color: @text-active;
+    color: var(--color-text-secondary);
     opacity: 1;
+
+    &:hover {
+      color: var(--color-text-hover);
+    }
   }
 
   .controls {
-    width: 60px;
-    text-align: right;
-    flex: 0 0 60px;
+    display: flex;
+    align-items: center;
+    margin-left: 8px;
   }
 }
 

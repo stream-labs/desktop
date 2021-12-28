@@ -1,12 +1,12 @@
 <template>
 <div @contextmenu="handleRightClick" data-test="Mixer">
-  <div class="studio-controls-top">
+  <div class="studio-controls-top" v-if="!compactMode">
     <h4
       class="studio-controls__label"
       v-tooltip.bottom="mixerTooltip">
       {{ $t('audio.mixer') }}
     </h4>
-    <div>
+    <div class="studio-controls-top-sidebar">
       <i
         class="icon-settings icon-btn"
         @click="showAdvancedSettings()"

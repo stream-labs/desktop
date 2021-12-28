@@ -2,6 +2,7 @@ import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import { AudioService } from '../services/audio';
 import { Inject } from '../services/core/injector';
+import { CompactModeService } from 'services/compact-mode';
 import MixerItem from './MixerItem.vue';
 import { $t } from 'services/i18n';
 import { Menu } from 'util/menus/Menu';
@@ -11,6 +12,7 @@ import { Menu } from 'util/menus/Menu';
 })
 export default class Mixer extends Vue {
   @Inject() audioService: AudioService;
+  @Inject() compactModeService: CompactModeService;
 
   advancedSettingsTooltip = $t('audio.advancedSettingsTooltip');
   mixerTooltip = $t('audio.mixerTooltip');
@@ -33,5 +35,9 @@ export default class Mixer extends Vue {
     return this.audioService.getSourcesForCurrentScene().filter(source => {
       return !source.mixerHidden;
     });
+  }
+
+  get compactMode(): boolean {
+    return this.compactModeService.compactMode;
   }
 }
