@@ -16,18 +16,26 @@
   --color-accent: @accent;
   --color-accent-variant: @accent-hover;
 
+  // active
+  --color-active: rgba(@white, .2);
+
   // border
   --color-border-dark: rgba(@black, .6);
   --color-border-light: rgba(@grey, .3);
+  --color-border-accent:  @text-primary;
 
   // background
-  --color-background: @bg-secondary;
-  --color-nicolive-background: @bg-quinary;
+  --color-bg-primary: @bg-primary;
+  --color-bg-seconday: @bg-secondary;
+  --color-bg-tertiary: @bg-tertiary;
+  --color-bg-quaternary: @bg-quaternary;
+  --color-bg-quinary: @bg-quinary;
 
   // text
   --color-text-primary: @light-grey;
   --color-text-secondary: @grey;
   --color-text-hover: @white;
+  --color-text-accent: @white;
 
   // button
   --color-button-label: @white;
@@ -58,6 +66,14 @@
   // live
   --color-live: @red;
   --color-live-secondary: @red;
+
+  // popper
+  --color-popper-bg-light: @bg-quaternary;
+  --color-popper-bg-dark: @bg-secondary;
+
+  // bottom-line
+  --color-bottom-line: darken(@text-secondary, 40%);
+  --color-bottom-line-active: @text-primary;
 }
 
 // 実験版（ヘッダー）

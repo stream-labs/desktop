@@ -62,9 +62,14 @@ input[type=text],
 input[type=number],
 input[type=password],
 textarea {
+  font-size: @font-size4;
   border: 1px solid @grey;
   background: #2B2F3B;
   margin-bottom: 0;
+  
+  &::placeholder {
+    color: var(--color-text-secondary);
+  }
 
   &:focus {
     box-shadow: none;

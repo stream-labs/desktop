@@ -9,6 +9,7 @@
 
 body {
   color: var(--color-text-primary);
+  font-size: @font-size4;
   font-family: @font-family;
   font-weight: @font-weight-normal;
 }
@@ -21,7 +22,7 @@ body {
 }
 
 .main {
-  background: var(--color-background);
+  background: var(--color-primary-dark);
   color: var(--color-text-primary);
 }
 
@@ -162,12 +163,12 @@ h4 {
     background: transparent;
     border: none;
     padding: 0 32px 0 8px;
-    color: @text-primary;
+    font-size: @font-size4;
+    color: var(--color-text-primary);
     .radius;
     .transition;
 
     &:focus {
-      background: rgba(255,255,255,.14);
       outline: none;
       box-shadow: none;
     }

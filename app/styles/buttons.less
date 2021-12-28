@@ -91,10 +91,10 @@ button {
 }
 
 .button--semi-opac {
-  background: rgba(255, 255, 255, .1);
+  background: var(--color-button-seconday);
 
   &:hover {
-    background: rgba(255, 255, 255, .14);
+    background: var(--color-button-seconday-hover);
   }
 
   &:focus {
@@ -109,9 +109,9 @@ button {
 .icon-btn {
   .icon-hover();
 
-  font-size: 14px;
+  font-size: @font-size4;
   cursor: pointer;
-  margin-left: 10px;
+  margin-left: 12px;
   
   &:first-child {
     margin-left: inherit;
@@ -119,11 +119,11 @@ button {
 }
 
 .icon-btn--sm {
-  font-size: 13px;
+  font-size: @font-size3;
 }
 
 .icon-btn--lg {
-  font-size: 15px;
+  font-size: @font-size6;
 }
 
 .back-arrow {

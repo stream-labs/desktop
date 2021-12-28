@@ -63,7 +63,7 @@ export class Display {
     });
 
     // 映像部分以外の色
-    this.videoService.setOBSDisplayPaddingColor(name, 31, 34, 45);
+    this.videoService.setOBSDisplayPaddingColor(name, 5, 14, 24);
 
     // ソースの枠線の色
     // this.videoService.setOBSDisplayPaddingColor(name, 255, 105, 82);

@@ -86,6 +86,11 @@
   border: 1px solid @border;
 }
 
+// opacity
+.opacity() {
+  opacity: .26;
+}
+
 // Typography
 .normal() {
   font-weight: 400;
@@ -294,7 +299,7 @@
 
 // Shadows
 .shadow() {
-  box-shadow: 0 6px 14px 1px rgba(1, 2, 2, .3);
+  box-shadow: 0 6px 14px 1px rgba(0, 8, 16, .4);
 }
 
 // Transitiions
@@ -314,4 +319,8 @@
   text-overflow: ellipsis;
   white-space: nowrap;
   overflow: hidden;
+}
+
+.deviding-border(@direction: top) {
+  border-@{direction}: 1px solid var(--color-border-dark);
 }
