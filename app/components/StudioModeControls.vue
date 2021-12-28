@@ -22,11 +22,10 @@
 @import "../styles/index";
 
 .studio-mode-controls {
-  height: 60px;
+  padding-top: 16px;
   display: flex;
   align-items: center;
-  color: @text-primary;
-  background-color: @bg-secondary;
+  color: var(--color-text-accent);
 
   &.stacked {
     flex-direction: column;
