@@ -21,6 +21,7 @@ class BaseElementModule {
   removeSizeWatcher(cb: Function) {
     const idx = this.sizeWatcherCallbacks.findIndex(func => func === cb);
     if (idx !== -1) this.sizeWatcherCallbacks.splice(idx, 1);
+    if (this.sizeWatcherCallbacks.length < 1) this.clearSizeWatcherInterval();
   }
 
   @mutation()
@@ -28,6 +29,12 @@ class BaseElementModule {
     this.state.sizeWatcherInterval = window.setInterval(() => {
       this.sizeWatcherCallbacks.forEach(cb => cb());
     }, 500);
+  }
+
+  @mutation()
+  clearSizeWatcherInterval() {
+    clearInterval(this.state.sizeWatcherInterval);
+    this.state.sizeWatcherInterval = 0;
   }
 }
 
