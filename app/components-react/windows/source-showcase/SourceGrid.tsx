@@ -172,7 +172,7 @@ export default function SourceGrid(p: { activeTab: string }) {
             </Col>
             {availableAppSources.map(app => (
               <SourceTag
-                key={app.appId}
+                key={`${app.appId}${app.source.id}`}
                 name={app.source.name}
                 type="app_source"
                 appId={app.appId}
