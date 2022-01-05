@@ -16,6 +16,7 @@ interface BrowserViewProps {
   setLocale?: boolean;
   enableGuestApi?: boolean;
   onReady?: (view: any) => void;
+  className?: string;
 }
 
 export default function BrowserView(p: BrowserViewProps) {
@@ -149,5 +150,5 @@ export default function BrowserView(p: BrowserViewProps) {
     );
   }
 
-  return <div style={{ height: '100%' }} ref={sizeContainer} />;
+  return <div style={{ height: '100%' }} ref={sizeContainer} className={p.className} />;
 }
