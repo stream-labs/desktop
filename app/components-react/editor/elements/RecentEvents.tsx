@@ -36,7 +36,7 @@ function Toolbar() {
   const { muted, queuePaused, mediaShareEnabled, safeModeEnabled } = useVuex(() => ({
     muted: RecentEventsService.state.muted,
     queuePaused: RecentEventsService.state.queuePaused,
-    safeModeEnabled: RecentEventsService.state.safeMode,
+    safeModeEnabled: RecentEventsService.state.safeMode.enabled,
     mediaShareEnabled: RecentEventsService.state.mediaShareEnabled,
   }));
 
