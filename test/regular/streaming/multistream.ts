@@ -44,7 +44,6 @@ test('Multistream default mode', async t => {
   await t.pass();
 });
 
-
 test('Multistream advanced mode', async t => {
   // login to via Twitch because it doesn't have strict rate limits
   await logIn('twitch', { multistream: true });
@@ -80,7 +79,7 @@ test('Multistream advanced mode', async t => {
   const facebookForm = useForm('facebook-settings');
   await facebookForm.fillForm({
     customEnabled: true,
-    facebookGame: 'Doom',
+    facebookGame: 'DOOM',
     title: 'facebook title',
     description: 'facebook description',
   });
