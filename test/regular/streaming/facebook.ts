@@ -77,7 +77,7 @@ test.skip('Streaming to a Facebook User`s group', async t => {
   await logIn('facebook', { hasFBGroup: true });
   await goLive({
     title: 'SLOBS Test Stream',
-    facebookGame: 'Doom',
+    facebookGame: 'DOOM',
     description: 'SLOBS Test Stream Description',
     destinationType: 'group',
   });
@@ -90,7 +90,7 @@ test.skip('Streaming to a Facebook User`s timeline', async t => {
   await logIn('facebook', { allowStreamingToFBTimeline: true });
   await goLive({
     title: 'SLOBS Test Stream',
-    facebookGame: 'Doom',
+    facebookGame: 'DOOM',
     description: 'SLOBS Test Stream Description',
     destinationType: 'me',
   });
