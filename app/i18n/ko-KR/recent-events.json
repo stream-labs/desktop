@@ -9,6 +9,7 @@
   "has gifted a sub (%{tier}) to": "님의 구독 선물(%{tier}), 받는 사람:",
   "has resubscribed (%{tier}) for %{months} months": "님, %{months}개월 째 재구독(%{tier})",
   "has subscribed (%{tier})": "님의 구독(%{tier})",
+  "has converted from a Prime Gaming sub to a %{tier} sub": "has converted from a Prime Gaming sub to a %{tier} sub",
   "has subscribed": "님의 구독",
   "has used": "님의 사용:",
   "has hosted you with %{viewers} viewers": "님, %{viewers}명의 시청자와 함께 나를 호스트함",
@@ -73,6 +74,6 @@
   "Safe Mode is Enabled": "안전 모드 활성화됨",
   "Disable Safe Mode": "안전 모드 비활성화",
   "Something went wrong disabling Safe Mode": "안전 모드 비활성화 중 뭔가 잘못되었습니다",
-  "Automatically disable Safe Mode": "Automatically disable Safe Mode",
-  "Disable after <duration></duration> minutes": "Disable after <duration></duration> minutes"
+  "Automatically disable Safe Mode": "안전 모드 자동 비활성화",
+  "Disable after <duration></duration> minutes": "&lt;duration&gt;&lt;/duration&gt; 분 후 비활성화"
 }
