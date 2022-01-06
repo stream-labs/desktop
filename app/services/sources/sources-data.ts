@@ -157,10 +157,11 @@ export const SourceDisplayData = (): { [key: string]: ISourceDisplayData } => ({
     demoFilename: 'scene.png',
     icon: 'far fa-object-group',
   },
-  // vvv Not sure if this is still supported, there is no showcase data for it vvv
   text_ft2_source: {
     name: $t('Text (FreeType 2)'),
-    description: '',
+    description: $t('Add text to your scene and adjust its style.'),
+    demoFilename: 'text.png',
+    supportList: [...colorSupport, $t('System Fonts'), $t('System Sizes')],
     icon: 'fas fa-font',
   },
   ovrstream_dc_source: {
