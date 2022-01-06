@@ -349,9 +349,6 @@ export class OutputSettingsService extends Service {
   setSettings(settingsPatch: IOutputSettingsPatch) {
     if (settingsPatch.mode) {
       this.settingsService.setSettingValue('Output', 'Mode', settingsPatch.mode);
-      if (settingsPatch.mode === 'Simple') {
-        this.audioService.setSimpleTracks();
-      }
     }
     const currentSettings = this.getSettings();
 

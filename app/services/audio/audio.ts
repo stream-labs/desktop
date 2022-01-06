@@ -199,11 +199,9 @@ export class AudioService extends StatefulService<IAudioSourcesState> {
   }
 
   setSimpleTracks() {
-    this.views.getSources().forEach(audioSource => {
-      this.setSettings(audioSource.sourceId, {
-        audioMixers: Utils.binnaryArrayToNumber([0, 0, 0, 0, 0, 1]),
-      });
-    });
+    this.views
+      .getSources()
+      .forEach(audioSource => this.setSettings(audioSource.sourceId, { audioMixers: 1 }));
   }
 
   setSettings(sourceId: string, patch: Partial<IAudioSource>) {
