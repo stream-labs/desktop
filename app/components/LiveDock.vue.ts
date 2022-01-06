@@ -14,7 +14,7 @@ import { AppService } from 'services/app';
 import Tabs, { ITab } from 'components/Tabs.vue';
 import { ChatService } from 'services/chat';
 import { WindowsService } from 'services/windows';
-import { FacebookService, RestreamService, YoutubeService } from 'app-services';
+import { FacebookService, RestreamService, TrovoService, YoutubeService } from 'app-services';
 import { getPlatformService } from 'services/platforms';
 
 @Component({
@@ -29,6 +29,7 @@ export default class LiveDock extends Vue {
   @Inject() streamingService: StreamingService;
   @Inject() youtubeService: YoutubeService;
   @Inject() facebookService: FacebookService;
+  @Inject() trovoService: TrovoService;
   @Inject() userService: UserService;
   @Inject() customizationService: CustomizationService;
   @Inject() platformAppsService: PlatformAppsService;
@@ -163,6 +164,10 @@ export default class LiveDock extends Vue {
     electron.remote.shell.openExternal(this.facebookService.streamDashboardUrl);
   }
 
+  openTrovoStreamUrl() {
+    electron.remote.shell.openExternal(this.trovoService.streamPageUrl);
+  }
+
   get isTwitch() {
     return this.userService.platform.type === 'twitch';
   }
@@ -173,6 +178,10 @@ export default class LiveDock extends Vue {
 
   get isFacebook() {
     return this.userService.platform.type === 'facebook';
+  }
+
+  get isTrovo() {
+    return this.userService.platform.type === 'trovo';
   }
 
   get hideViewerCount() {

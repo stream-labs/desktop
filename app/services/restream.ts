@@ -11,6 +11,7 @@ import electron from 'electron';
 import { StreamingService } from './streaming';
 import { FacebookService } from './platforms/facebook';
 import { TiktokService } from './platforms/tiktok';
+import { TrovoService } from './platforms/trovo';
 
 interface IRestreamTarget {
   id: number;
@@ -45,6 +46,7 @@ export class RestreamService extends StatefulService<IRestreamState> {
   @Inject() incrementalRolloutService: IncrementalRolloutService;
   @Inject() facebookService: FacebookService;
   @Inject() tiktokService: TiktokService;
+  @Inject() trovoService: TrovoService;
 
   settings: IUserSettingsResponse;
 
@@ -194,6 +196,15 @@ export class RestreamService extends StatefulService<IRestreamState> {
       const ttSettings = this.tiktokService.state.settings;
       tikTokTarget.platform = 'relay';
       tikTokTarget.streamKey = `${ttSettings.serverUrl}/${ttSettings.streamKey}`;
+    }
+
+    // treat trovo as a custom destination
+    const trovoTarget = newTargets.find(t => t.platform === 'trovo');
+    if (trovoTarget) {
+      const serverUrl = this.trovoService.rtmpServer;
+      const streamKey = this.trovoService.state.streamKey;
+      trovoTarget.platform = 'relay';
+      trovoTarget.streamKey = `${serverUrl}${streamKey}`;
     }
 
     await this.createTargets(newTargets);

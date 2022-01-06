@@ -6,8 +6,8 @@ import { TTwitchTag } from './twitch/tags';
 import { TTwitchOAuthScope } from './twitch/scopes';
 import { IGoLiveSettings } from 'services/streaming';
 import { WidgetType } from '../widgets';
-import {ITrovoStartStreamOptions, TrovoService} from './trovo';
-import {Partial} from "lodash-decorators";
+import { ITrovoStartStreamOptions, TrovoService } from './trovo';
+import { Partial } from 'lodash-decorators';
 
 export type Tag = TTwitchTag;
 export interface IGame {
@@ -57,6 +57,8 @@ interface IPlatformCapabilityChat {
 
 export interface IPlatformCapabilityGame {
   searchGames: (searchString: string) => Promise<IGame[]>;
+  fetchGame: (id: string) => Promise<IGame>;
+  gameImageSize: { width: number; height: number };
   state: { settings: { game: string } };
 }
 
