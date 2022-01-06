@@ -441,7 +441,6 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
 
   fetchRecentEvents() {
     const typeString = this.getEventTypesString();
-    // eslint-disable-next-line
     const url = `https://${this.hostsService.streamlabs}/api/v5/slobs/recentevents/${this.userService.widgetToken}?types=${typeString}`;
     const headers = authorizedHeaders(this.userService.apiToken);
     const request = new Request(url, { headers });
@@ -451,7 +450,6 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
   }
 
   async fetchConfig() {
-    // eslint-disable-next-line
     const url = `https://${this.hostsService.streamlabs}/api/v5/slobs/widget/config?widget=recent_events`;
     const headers = authorizedHeaders(this.userService.apiToken);
     return jfetch<IRecentEventsConfig>(url, { headers }).catch(() => {
@@ -460,7 +458,6 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
   }
 
   fetchMediaShareState() {
-    // eslint-disable-next-line
     const url = `https://${this.hostsService.streamlabs}/api/v5/slobs/widget/config?widget=media-sharing`;
     const headers = authorizedHeaders(this.userService.apiToken);
     return jfetch<{ settings: { advanced_settings: { enabled: boolean } } }>(url, {
@@ -877,7 +874,6 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
       this.userService.apiToken,
       new Headers({ 'Content-Type': 'application/json' }),
     );
-    // eslint-disable-next-line
     const url = `https://${this.hostsService.streamlabs}/api/v5/slobs/widget/recentevents/eventspanel`;
     const body = JSON.stringify({ muted: !this.state.muted });
     return await fetch(new Request(url, { headers, body, method: 'POST' })).then(handleResponse);
@@ -946,18 +942,16 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
   updateSafeModeSettingsFromServer(data: ISafeModeServerSettings) {
     const sm = this.state.safeMode;
     this.SET_SAFE_MODE_SETTINGS({
-      clearChat: data.clear_chat ? data.clear_chat : sm.clearChat,
-      clearQueuedAlerts: data.clear_queued_alerts ? data.clear_queued_alerts : sm.clearQueuedAlerts,
-      clearRecentEvents: data.clear_recent_events ? data.clear_recent_events : sm.clearRecentEvents,
-      disableChatAlerts: data.disable_chat_alerts ? data.disable_chat_alerts : sm.disableChatAlerts,
-      disableFollowerAlerts: data.disable_follower_alerts
-        ? data.disable_follower_alerts
-        : sm.disableFollowerAlerts,
-      emoteOnly: data.emote_only ? data.emote_only : sm.emoteOnly,
-      followerOnly: data.follower_only ? data.follower_only : sm.followerOnly,
-      subOnly: data.sub_only ? data.sub_only : sm.subOnly,
-      enableTimer: data.enable_timer ? data.enable_timer : sm.enableTimer,
-      timeInMinutes: data.time_in_minutes ? data.time_in_minutes : sm.timeInMinutes,
+      clearChat: data.clear_chat ?? sm.clearChat,
+      clearQueuedAlerts: data.clear_queued_alerts ?? sm.clearQueuedAlerts,
+      clearRecentEvents: data.clear_recent_events ?? sm.clearRecentEvents,
+      disableChatAlerts: data.disable_chat_alerts ?? sm.disableChatAlerts,
+      disableFollowerAlerts: data.disable_follower_alerts ?? sm.disableFollowerAlerts,
+      emoteOnly: data.emote_only ?? sm.emoteOnly,
+      followerOnly: data.follower_only ?? sm.followerOnly,
+      subOnly: data.sub_only ?? sm.subOnly,
+      enableTimer: data.enable_timer ?? sm.enableTimer,
+      timeInMinutes: data.time_in_minutes ?? sm.timeInMinutes,
     });
   }
 
