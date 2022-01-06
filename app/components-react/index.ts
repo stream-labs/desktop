@@ -33,6 +33,8 @@ import AdvancedAudio from './windows/advanced-audio';
 import { CustomCodeWindow } from './widgets/common/CustomCode';
 import SourceShowcase from './windows/source-showcase';
 import SourceFilters from './windows/SourceFilters';
+import RecentEvents from './editor/elements/RecentEvents';
+import MiniFeed from './editor/elements/Minifeed';
 import BrowserView from './shared/BrowserView';
 
 // list of React components to be used inside Vue components
@@ -72,4 +74,6 @@ export const components = {
   AdvancedAudio,
   SourceShowcase: createRoot(SourceShowcase),
   SourceFilters,
+  RecentEvents,
+  MiniFeed: createRoot(MiniFeed),
 };

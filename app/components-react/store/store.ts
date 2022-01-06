@@ -111,7 +111,7 @@ class ReduxModuleManager {
       catchDestroyedModuleCalls(module);
 
       // Re-define the `state` variable of the module
-      // It should be linked to the global Redux sate after module initialization
+      // It should be linked to the global Redux state after module initialization
       // But when mutation is running it should be linked to a special Proxy from the Immer library
       Object.defineProperty(module, 'state', {
         get: () => {

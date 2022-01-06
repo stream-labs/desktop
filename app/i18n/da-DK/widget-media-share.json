@@ -5,7 +5,7 @@
   "Min. Amount to Share": "Minimumsbeløb der skal deles",
   "Max Duration": "Maksimal varighed",
   "Buffer Time": "Buffertid",
-  "Spam Security": "Spam sikkerhed",
+  "Spam Security": "Spamsikkerhed",
   "The time between videos the next video has to buffer.": "Tiden mellem videoer som den næste video skal gemme i buffer.",
   "Manage Media Settings": "Administrer medieindstillinger",
   "The maximum duration in seconds that media can be played, regardless of amount donated. The default value is 60 seconds.": "Den maksimale varighed i sekunder som medier kan afspilles uanset det donerede beløb. Standardværdien er 60 sekunder.",

@@ -87,6 +87,7 @@ function ObsInput(p: IObsInputProps) {
     name: p.value.name,
     label: $translateIfExist(p.value.description),
     uncontrolled: false,
+    masked: p.value.masked,
   };
 
   switch (type) {
@@ -105,7 +106,7 @@ function ObsInput(p: IObsInputProps) {
       if (textVal.multiline) {
         return <TextAreaInput {...inputProps} />;
       } else {
-        return <TextInput {...inputProps} />;
+        return <TextInput {...inputProps} isPassword={inputProps.masked} />;
       }
     case 'OBS_PROPERTY_LIST':
       // eslint-disable-next-line no-case-declarations

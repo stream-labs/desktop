@@ -27,7 +27,7 @@
   "Replay Duration": "Gentagelsesvarighed",
   "Set a hotkey to capture replays": "Indstil en genvejstast til at optage gentagelser",
   "Capture a replay": "Optag et gentagelse",
-  "highlighterHotkeyInstructions": "Start streaming, og tryk på <b>%bindingStr}</b> for at optage et gentagelse. Tjek tilbage her efter din stream.",
+  "highlighterHotkeyInstructions": "Start streaming, og tryk på &lt;b&gt;%bindingStr}&lt;/b&gt; for at optage et gentagelse. Tjek tilbage her efter din stream.",
   "Start streaming and capture a replay. Check back here after your stream.": "Begynd at streame og optag et replay. Tjek tilbage her efter din stream.",
   "Or, import a clip from your computer": "Eller importer et klip fra din computer",
   "Disable clip": "Deaktiver klip",
@@ -46,10 +46,10 @@
   "Smaller File": "Mindre fil",
   "Close": "Luk",
   "Overwite File?": "Overskriv fil?",
-  "%{filename} already exists. Would you like to overwrite it?": "%{filnavn} findes allerede. Vil du gerne overskrive den?",
+  "%{filename} already exists. Would you like to overwrite it?": " findes allerede. Vil du gerne overskrive den?",
   "Overwrite": "Overskriv",
   "Export Progress": "Eksportfremgang",
-  "Rendering Frames: %{currentFrame}/%{totalFrames}": "Gengivelse af billeder: {currentFrame}/%{totalFrames}",
+  "Rendering Frames: %{currentFrame}/%{totalFrames}": "Gengivelse af billeder: %{currentFrame}/%{totalFrames}",
   "Mixing Audio:": "Mixing af lyd:",
   "Canceling...": "Annullerer ...",
   "Render Preview": "Gengiv forhåndsvisning",
@@ -90,5 +90,5 @@
   "An error occurred while reading %{file}": "Der opstod en fejl under læsning af %{file}",
   "An error occurred while reading audio from %{file}": "Der opstod en fejl under læsning af lyd fra %{file}",
   "An error occurred while mixing audio": "Der opstod en fejl under mixing af lyd",
-  "Edit your replays with Highlighter, a free editor built in to Streamlabs OBS.": "Rediger dine afspilninger med Highlighter, et gratis redigeringsværktøj indbygget i Streamlabs OBS."
+  "Edit your replays with Highlighter, a free editor built in to Streamlabs.": "Rediger dine afspilninger med Highlighter, der er et gratis redigeringsværktøj indbygget i Streamlabs."
 }

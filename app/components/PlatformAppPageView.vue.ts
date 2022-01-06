@@ -2,10 +2,10 @@ import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 import { PlatformAppsService, EAppPageSlot } from 'services/platform-apps';
 import { Inject } from 'services/core/injector';
-import electron from 'electron';
 import Utils from 'services/utils';
 import { Subscription } from 'rxjs';
 import { WindowsService } from 'services/windows';
+import * as remote from '@electron/remote';
 
 @Component({})
 export default class PlatformAppPageView extends Vue {
@@ -47,7 +47,7 @@ export default class PlatformAppPageView extends Vue {
     this.containerId = this.platformAppsService.mountContainer(
       this.appId,
       this.pageSlot,
-      electron.remote.getCurrentWindow().id,
+      remote.getCurrentWindow().id,
       Utils.getWindowId(),
     );
     this.checkResize();
@@ -56,10 +56,7 @@ export default class PlatformAppPageView extends Vue {
   unmountContainer() {
     this.currentPosition = null;
     this.currentSize = null;
-    this.platformAppsService.unmountContainer(
-      this.containerId,
-      electron.remote.getCurrentWindow().id,
-    );
+    this.platformAppsService.unmountContainer(this.containerId, remote.getCurrentWindow().id);
   }
 
   destroyed() {
