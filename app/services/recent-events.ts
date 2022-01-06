@@ -952,17 +952,18 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
   }
 
   updateSafeModeSettingsFromServer(data: ISafeModeServerSettings) {
+    const sm = this.state.safeMode;
     this.SET_SAFE_MODE_SETTINGS({
-      clearChat: data.clear_chat,
-      clearQueuedAlerts: data.clear_queued_alerts,
-      clearRecentEvents: data.clear_recent_events,
-      disableChatAlerts: data.disable_chat_alerts,
-      disableFollowerAlerts: data.disable_follower_alerts,
-      emoteOnly: data.emote_only,
-      followerOnly: data.follower_only,
-      subOnly: data.sub_only,
-      enableTimer: data.enable_timer,
-      timeInMinutes: data.time_in_minutes,
+      clearChat: data.clear_chat ? data.clear_chat : sm.clearChat,
+      clearQueuedAlerts: data.clear_queued_alerts ? data.clear_queued_alerts : sm.clearQueuedAlerts,
+      clearRecentEvents: data.clear_recent_events ? data.clear_recent_events : sm.clearRecentEvents,
+      disableChatAlerts: data.disable_chat_alerts ? data.disable_chat_alerts : sm.disableChatAlerts,
+      disableFollowerAlerts: data.disable_follower_alerts ? data.disable_follower_alerts : sm.disableFollowerAlerts,
+      emoteOnly: data.emote_only ? data.emote_only : sm.emoteOnly,
+      followerOnly: data.follower_only ? data.follower_only : sm.followerOnly,
+      subOnly: data.sub_only ? data.sub_only : sm.subOnly,
+      enableTimer: data.enable_timer ? data.enable_timer : sm.enableTimer,
+      timeInMinutes: data.time_in_minutes ? data.time_in_minutes : sm.timeInMinutes,
     });
   }
 
