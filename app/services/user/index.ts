@@ -342,6 +342,8 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
       return res.text();
     });
 
+    console.log('validate login', valid);
+
     if (valid.match(/false/)) {
       return false;
     }
