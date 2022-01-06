@@ -17,7 +17,6 @@ import RemoteControlSettings from './RemoteControlSettings.vue';
 import GameOverlaySettings from './GameOverlaySettings';
 import SearchablePages from 'components/shared/SearchablePages';
 import FormInput from 'components/shared/inputs/FormInput.vue';
-import StreamSettings from './StreamSettings';
 import VirtualWebcamSettings from './VirtualWebcamSettings';
 import { MagicLinkService } from 'services/magic-link';
 import { UserService } from 'services/user';
@@ -43,7 +42,6 @@ import * as remote from '@electron/remote';
     InstalledApps,
     GameOverlaySettings,
     FormInput,
-    StreamSettings,
     VirtualWebcamSettings,
     Scrollable,
     PlatformLogo,
@@ -128,7 +126,7 @@ export default class Settings extends Vue {
   get reactPages() {
     return [
       'General',
-      // 'Stream',
+      'Stream',
       // 'Output',
       // 'Audio',
       // 'Video',
