@@ -442,9 +442,7 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
   fetchRecentEvents() {
     const typeString = this.getEventTypesString();
     // eslint-disable-next-line
-    const url = `https://${this.hostsService.streamlabs}/api/v5/slobs/recentevents/${
-      this.userService.widgetToken
-    }?types=${typeString}`;
+    const url = `https://${this.hostsService.streamlabs}/api/v5/slobs/recentevents/${this.userService.widgetToken}?types=${typeString}`;
     const headers = authorizedHeaders(this.userService.apiToken);
     const request = new Request(url, { headers });
     return jfetch<{ data: Dictionary<IRecentEvent[]> }>(request).catch(() => {
@@ -454,9 +452,7 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
 
   async fetchConfig() {
     // eslint-disable-next-line
-    const url = `https://${
-      this.hostsService.streamlabs
-    }/api/v5/slobs/widget/config?widget=recent_events`;
+    const url = `https://${this.hostsService.streamlabs}/api/v5/slobs/widget/config?widget=recent_events`;
     const headers = authorizedHeaders(this.userService.apiToken);
     return jfetch<IRecentEventsConfig>(url, { headers }).catch(() => {
       console.warn('Error fetching recent events config');
@@ -465,9 +461,7 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
 
   fetchMediaShareState() {
     // eslint-disable-next-line
-    const url = `https://${
-      this.hostsService.streamlabs
-    }/api/v5/slobs/widget/config?widget=media-sharing`;
+    const url = `https://${this.hostsService.streamlabs}/api/v5/slobs/widget/config?widget=media-sharing`;
     const headers = authorizedHeaders(this.userService.apiToken);
     return jfetch<{ settings: { advanced_settings: { enabled: boolean } } }>(url, {
       headers,
@@ -884,9 +878,7 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
       new Headers({ 'Content-Type': 'application/json' }),
     );
     // eslint-disable-next-line
-    const url = `https://${
-      this.hostsService.streamlabs
-    }/api/v5/slobs/widget/recentevents/eventspanel`;
+    const url = `https://${this.hostsService.streamlabs}/api/v5/slobs/widget/recentevents/eventspanel`;
     const body = JSON.stringify({ muted: !this.state.muted });
     return await fetch(new Request(url, { headers, body, method: 'POST' })).then(handleResponse);
   }
@@ -958,7 +950,9 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
       clearQueuedAlerts: data.clear_queued_alerts ? data.clear_queued_alerts : sm.clearQueuedAlerts,
       clearRecentEvents: data.clear_recent_events ? data.clear_recent_events : sm.clearRecentEvents,
       disableChatAlerts: data.disable_chat_alerts ? data.disable_chat_alerts : sm.disableChatAlerts,
-      disableFollowerAlerts: data.disable_follower_alerts ? data.disable_follower_alerts : sm.disableFollowerAlerts,
+      disableFollowerAlerts: data.disable_follower_alerts
+        ? data.disable_follower_alerts
+        : sm.disableFollowerAlerts,
       emoteOnly: data.emote_only ? data.emote_only : sm.emoteOnly,
       followerOnly: data.follower_only ? data.follower_only : sm.followerOnly,
       subOnly: data.sub_only ? data.sub_only : sm.subOnly,
