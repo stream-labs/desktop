@@ -14,7 +14,7 @@
   "Connect": "Conectar",
   "Install Your Theme": "Instale su tema",
   "Install": "Instalar",
-  "facebookGamingWarning": "Para la plena experiencia de Facebook Gaming, <create-page-link>cree una página de creador de vídeos de juegos</create-page-link>",
+  "facebookGamingWarning": "Para la plena experiencia de Facebook Gaming, &lt;create-page-link&gt;cree una página de creador de vídeos de juegos&lt;/create-page-link&gt;",
   "Facebook Destination": "Destino de Facebook",
   "Share to Your Timeline": "Compartir su línea de tiempo",
   "Share to a Page You Manage": "Compartir en una página que gestione",
@@ -30,7 +30,7 @@
   "Please reconnect Facebook to get these new features": "Reconecte Facebook para obtener estas nuevas características",
   "Reconnect now": "Reconectar ahora",
   "Privacy": "Privacidad",
-  "FBPrivacyWarning": "El nivel de privacidad concedido puede estar limitado para su cuenta de Facebook. Compruebe la sección \"¿Quién puede ver que usa esta integración de negocios\" para la integración de Streamlabs<link>aquí</link>",
+  "FBPrivacyWarning": "El nivel de privacidad concedido puede estar limitado para su cuenta de Facebook. Compruebe la sección \"¿Quién puede ver que usa esta integración de negocios\" para la integración de Streamlabs&lt;link&gt;aquí&lt;/link&gt;",
   "Only Me": "Solo yo",
   "Do not change privacy settings": "No cambiar ajustes de privacidad"
 }

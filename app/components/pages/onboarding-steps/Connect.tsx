@@ -19,6 +19,7 @@ import {
   EAvailableFeatures,
   IncrementalRolloutService,
 } from '../../../services/incremental-rollout';
+import * as remote from '@electron/remote';
 
 class ConnectProps {
   continue: () => void = () => {};
@@ -54,7 +55,7 @@ export default class Connect extends TsxComponent<ConnectProps> {
     );
 
     if (result === EPlatformCallResult.TwitchTwoFactor) {
-      electron.remote.dialog
+      remote.dialog
         .showMessageBox({
           type: 'error',
           message: $t(
@@ -66,7 +67,7 @@ export default class Connect extends TsxComponent<ConnectProps> {
         })
         .then(({ response }) => {
           if (response === 0) {
-            electron.remote.shell.openExternal('https://twitch.tv/settings/security');
+            remote.shell.openExternal('https://twitch.tv/settings/security');
           }
         });
     } else {
@@ -91,7 +92,7 @@ export default class Connect extends TsxComponent<ConnectProps> {
   }
 
   contactSupport() {
-    electron.remote.shell.openExternal('https://support.streamlabs.com');
+    remote.shell.openExternal('https://support.streamlabs.com');
   }
 
   onSkip() {

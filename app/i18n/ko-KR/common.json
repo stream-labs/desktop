@@ -88,9 +88,9 @@
   "here": "여기",
   "Link": "링크",
   "Description": "설명",
-  "OBSInit.UnknownError": "OBS 초기 설정 중 알 수 없는 오류가 발생했습니다.",
-  "OBSInit.ModuleNotFoundError": "시스템에서 DirectX를 찾을 수 없었습니다. <https://www.microsoft.com/en-us/download/details.aspx?id=35?>에서 DirectX 최신 버전을 설치한 다음 다시 시도하세요.",
-  "OBSInit.NotSupportedError": "OBS에 초기 설정을 하지 못했습니다. 비디오 드라이버가 최신 상태가 아니거나 시스템에서 Streamlabs OBS를 지원하지 않을 수 있습니다.",
+  "OBSInit.UnknownError": "Streamlabs 초기 설정 중 알 수 없는 오류가 발생했습니다.",
+  "OBSInit.ModuleNotFoundError": "시스템에서 DirectX를 찾을 수 없었습니다. &lt;https://www.microsoft.com/en-us/download/details.aspx?id=35?&gt;에서 DirectX 최신 버전을 설치한 다음 다시 시도하세요.",
+  "OBSInit.NotSupportedError": "Streamlabs에 초기 설정을 하지 못했습니다. 비디오 드라이버가 최신 상태가 아니거나 시스템에서 Streamlabs 데스크톱을 지원하지 않을 수 있습니다.",
   "Log Out": "로그아웃",
   "Layout Editor": "레이아웃 에디터",
   "Are you sure you want to import multiple files?": "여러 파일을 가져오시겠습니까?",
@@ -135,9 +135,9 @@
   "Time": "시간",
   "Sound Volume": "사운드 볼륨",
   "Sound": "사운드",
-  "Play Audio": "Play Audio",
-  "Click here": "Click here",
-  "More Info": "More Info",
-  "Revert Changes": "Revert Changes",
-  "Animations": "Animations"
+  "Play Audio": "오디오 재생",
+  "Click here": "여기를 클릭",
+  "More Info": "추가 정보",
+  "Revert Changes": "변경 취소",
+  "Animations": "애니메이션"
 }

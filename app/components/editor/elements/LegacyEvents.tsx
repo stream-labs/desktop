@@ -8,6 +8,7 @@ import { MagicLinkService } from 'services/magic-link';
 import { Inject } from 'services/core';
 import BaseElement from './BaseElement';
 import { $t } from 'services/i18n';
+import * as remote from '@electron/remote';
 
 @Component({})
 export default class LegacyEvents extends BaseElement {
@@ -39,14 +40,14 @@ export default class LegacyEvents extends BaseElement {
 
         try {
           const link = await this.magicLinkService.getDashboardMagicLink(match[1]);
-          electron.remote.shell.openExternal(link);
+          remote.shell.openExternal(link);
         } catch (e: unknown) {
           console.error('Error generating dashboard magic link', e);
         }
 
         this.magicLinkDisabled = false;
       } else {
-        electron.remote.shell.openExternal(url);
+        remote.shell.openExternal(url);
       }
     });
   }
