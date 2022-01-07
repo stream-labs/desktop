@@ -19,7 +19,7 @@ import { SourcesService } from 'app-services';
 
 /**
  * Enables the twitch's Better TTV emotes
- * @param isDarkTheme if the chat is in dark mode
+ * @param isDarkTheme if streamlabs is in dark mode
  * @return a javascript script
  */
 
