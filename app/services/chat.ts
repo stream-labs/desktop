@@ -18,7 +18,7 @@ import * as remote from '@electron/remote';
 import { SourcesService } from 'app-services';
 
 /**
- * Enables the twitch's Better TTV emotes
+ * Generates a script that can be injected to enable the twitch's Better TTV emotes.
  * @param isDarkTheme if streamlabs is in dark mode
  * @return a javascript script
  */
