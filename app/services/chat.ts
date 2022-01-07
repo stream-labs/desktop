@@ -17,6 +17,12 @@ import { assertIsDefined } from 'util/properties-type-guards';
 import * as remote from '@electron/remote';
 import { SourcesService } from 'app-services';
 
+/**
+ * Enables the twitch's Better TTV emotes
+ * @param isDarkTheme if the chat is in dark mode
+ * @return a javascript script
+ */
+
 export function enableBTTVEmotesScript(isDarkTheme: boolean) {
   /*eslint-disable */
 return `
@@ -273,31 +279,34 @@ export class ChatService extends Service {
 
       this.chatView.webContents.setZoomFactor(settings.chatZoomFactor);
 
-      if (settings.enableBTTVEmotes && this.userService.platform?.type === 'twitch') {
-        this.chatView.webContents.executeJavaScript(
-          enableBTTVEmotesScript(this.customizationService.isDarkTheme),
-          true,
-        );
-      }
-
-      if (settings.enableFFZEmotes && this.userService.platform?.type === 'twitch') {
-        this.chatView.webContents.executeJavaScript(
-          `
-          var ffzscript1 = document.createElement('script');
-          ffzscript1.setAttribute('src','https://cdn.frankerfacez.com/script/script.min.js');
-          document.head.appendChild(ffzscript1);
-          0;
-        `,
-          true,
-        );
-      }
-      if (this.userService.platform?.type === 'twitch' && this.hasChatHighlightWidget()) {
-        setTimeout(() => {
-          if (!this.chatView) return;
-          const chatHighlightScript = require('!!raw-loader!./widgets/settings/chat-highlight-script.js');
-          assertIsDefined(chatHighlightScript.default);
-          this.chatView.webContents.executeJavaScript(chatHighlightScript.default, true);
-        }, 10000);
+      if (this.userService.platform?.type === 'twitch') {
+        // loads bttv emotes if their are enabled
+        if (settings.enableBTTVEmotes) {
+          this.chatView.webContents.executeJavaScript(
+            enableBTTVEmotesScript(this.customizationService.isDarkTheme),
+            true,
+          );
+        }
+        // loads ffz emotes if their are enabled
+        if (settings.enableFFZEmotes) {
+          this.chatView.webContents.executeJavaScript(
+            `
+            var ffzscript1 = document.createElement('script');
+            ffzscript1.setAttribute('src','https://cdn.frankerfacez.com/script/script.min.js');
+            document.head.appendChild(ffzscript1);
+            0;
+          `,
+            true,
+          );
+        }
+        if (this.hasChatHighlightWidget()) {
+          setTimeout(() => {
+            if (!this.chatView) return;
+            const chatHighlightScript = require('!!raw-loader!./widgets/settings/chat-highlight-script.js');
+            assertIsDefined(chatHighlightScript.default);
+            this.chatView.webContents.executeJavaScript(chatHighlightScript.default, true);
+          }, 10000);
+        }
       }
 
       // facebook chat doesn't fit our layout by default
