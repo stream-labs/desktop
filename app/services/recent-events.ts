@@ -34,6 +34,7 @@ export interface IRecentEvent {
   formatted_amount?: string;
   formattedAmount?: string;
   sub_plan?: string;
+  sub_type?: string;
   months?: number;
   streak_months?: number;
   gifter?: string;
@@ -352,6 +353,11 @@ class RecentEventsViews extends ViewHandler<IRecentEventsState> {
         months: event.months,
       });
     }
+    if (event.sub_type === 'primepaidupgrade') {
+      return $t('has converted from a Prime Gaming sub to a %{tier} sub', {
+        tier: subscriptionMap(event.sub_plan),
+      });
+    }
     return $t('has subscribed (%{tier})', { tier: subscriptionMap(event.sub_plan) });
   }
 
@@ -509,6 +515,7 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
           'raiders',
           'formatted_amount',
           'sub_plan',
+          'sub_type',
           'months',
           'streak_months',
           'gifter',

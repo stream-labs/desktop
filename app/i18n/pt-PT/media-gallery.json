@@ -7,7 +7,7 @@
   "Copy URL": "Copiar URL",
   "Browse the Gallery": "Explorar a Galeria",
   "Cancel": "Cancelar",
-  "OK": "Ok",
+  "OK": "OK",
   "Select": "Selecionar",
   "You don't have any uploaded files!": "Não tem nenhum ficheiro carregado!",
   "You don't have any uploaded images!": "Não tem nenhuma imagem carregada!",
@@ -27,9 +27,9 @@
   "Example": "Exemplo",
   "Change Media": "Alterar multimédia",
   "No Sound": "Nenhum som",
-  "No Media": "No Media",
-  "Change Link": "Change Link",
-  "Pick From Gallery": "Pick From Gallery",
-  "Clear Link": "Clear Link",
-  "Media URL": "Media URL"
+  "No Media": "Sem multimédia",
+  "Change Link": "Alterar ligação",
+  "Pick From Gallery": "Escolher da galeria",
+  "Clear Link": "Limpar ligação",
+  "Media URL": "URL de multimédia"
 }

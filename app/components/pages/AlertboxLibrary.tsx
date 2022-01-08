@@ -13,17 +13,18 @@ import { MagicLinkService } from 'services/magic-link';
 import urlLib from 'url';
 import electron from 'electron';
 import { $t, I18nService } from 'services/i18n';
-import BrowserView from 'components/shared/BrowserView';
+import { BrowserView } from 'components/shared/ReactComponentList';
 import { RestreamService } from 'services/restream';
 import { GuestApiHandler } from 'util/guest-api-handler';
 import TsxComponent, { createProps } from 'components/tsx-component';
 import { IDownloadProgress } from 'util/requests';
+import * as remote from '@electron/remote';
 
 class AlertboxLibraryProps {
   params: { id?: string } = {};
 }
 
-@Component({ components: { BrowserView }, props: createProps(AlertboxLibraryProps) })
+@Component({ props: createProps(AlertboxLibraryProps) })
 export default class AlertboxLibrary extends TsxComponent<AlertboxLibraryProps> {
   @Inject() userService: UserService;
   @Inject() sceneCollectionsService: SceneCollectionsService;
@@ -47,7 +48,7 @@ export default class AlertboxLibrary extends TsxComponent<AlertboxLibraryProps> 
       const protocol = urlLib.parse(url).protocol;
 
       if (protocol === 'http:' || protocol === 'https:') {
-        electron.remote.shell.openExternal(url);
+        remote.shell.openExternal(url);
       }
     });
   }
@@ -89,12 +90,14 @@ export default class AlertboxLibrary extends TsxComponent<AlertboxLibraryProps> 
   render() {
     return (
       <div>
-        <browser-view
-          style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}
-          src={this.libraryUrl}
-          enableGuestApi={true}
-          setLocale={true}
-          onReady={this.onBrowserViewReady.bind(this)}
+        <BrowserView
+          style={{ position: 'absolute', top: '0', left: '0', right: '0', bottom: '0' }}
+          componentProps={{
+            src: this.libraryUrl,
+            enableGuestApi: true,
+            setLocale: true,
+            onReady: this.onBrowserViewReady.bind(this),
+          }}
         />
       </div>
     );

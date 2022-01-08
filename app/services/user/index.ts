@@ -38,6 +38,7 @@ import { UsageStatisticsService } from 'services/usage-statistics';
 import { StreamingService } from 'services/streaming';
 import { NotificationsService, ENotificationType } from 'services/notifications';
 import { JsonrpcService } from 'services/api/jsonrpc';
+import * as remote from '@electron/remote';
 
 export enum EAuthProcessState {
   Idle = 'idle',
@@ -97,8 +98,8 @@ export function setSentryContext(ctx: ISentryContext) {
     obs.NodeObs.SetUsername(ctx.username);
 
     // Sets main process sentry context. Only need to do this once.
-    electron.remote.crashReporter.addExtraParameter('sentry[user][username]', ctx.username);
-    electron.remote.crashReporter.addExtraParameter('platform', ctx.platform);
+    remote.crashReporter.addExtraParameter('sentry[user][username]', ctx.username);
+    remote.crashReporter.addExtraParameter('platform', ctx.platform);
   }
   electron.crashReporter.addExtraParameter('sentry[user][username]', ctx.username);
   electron.crashReporter.addExtraParameter('platform', ctx.platform);
@@ -122,6 +123,12 @@ class UserViews extends ViewHandler<IUserServiceState> {
   get platforms() {
     if (this.isLoggedIn) {
       return this.state.auth.platforms;
+    }
+  }
+
+  get linkedPlatforms() {
+    if (this.isLoggedIn) {
+      return Object.keys(this.state.auth.platforms);
     }
   }
 
@@ -274,27 +281,24 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     return new UserViews(this.state);
   }
 
-  mounted() {
-    // This is used for faking authentication in tests.  We have
-    // to do this because Twitch adds a captcha when we try to
-    // actually log in from integration tests.
-    electron.ipcRenderer.on(
-      'testing-fakeAuth',
-      async (e: Electron.Event, auth: IUserAuth, isOnboardingTest: boolean) => {
-        const service = getPlatformService(auth.primaryPlatform);
-        this.streamSettingsService.resetStreamSettings();
-        await this.login(service, auth);
-        if (!isOnboardingTest) this.onboardingService.finish();
-      },
-    );
+  /**
+   * This is used for faking authentication in tests.  We have
+   * to do this because Twitch adds a captcha when we try to
+   * actually log in from integration tests.
+   */
+  async testingFakeAuth(auth: IUserAuth, isOnboardingTest: boolean) {
+    const service = getPlatformService(auth.primaryPlatform);
+    this.streamSettingsService.resetStreamSettings();
+    await this.login(service, auth);
+    if (!isOnboardingTest) this.onboardingService.finish();
   }
 
   async autoLogin() {
     if (!this.state.auth) return;
 
     if (!this.state.auth.hasRelogged) {
-      await electron.remote.session.defaultSession.clearCache();
-      await electron.remote.session.defaultSession.clearStorageData({
+      await remote.session.defaultSession.clearCache();
+      await remote.session.defaultSession.clearStorageData({
         storages: ['appcache, cookies', 'cachestorage', 'filesystem'],
       });
       this.streamSettingsService.resetStreamSettings();
@@ -505,7 +509,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
    */
   flushUserSession(): Promise<void> {
     if (this.isLoggedIn && this.state.auth.partition) {
-      const session = electron.remote.session.fromPartition(this.state.auth.partition);
+      const session = remote.session.fromPartition(this.state.auth.partition);
       session.flushStorageData();
       return session.cookies.flushStore();
     }
@@ -696,7 +700,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
 
     if (!validateLoginResult) {
       this.logOut();
-      electron.remote.dialog.showMessageBox({
+      remote.dialog.showMessageBox({
         title: 'Streamlabs Desktop',
         message: $t('You have been logged out'),
       });
@@ -713,7 +717,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
       await this.logOut();
       this.showLogin();
 
-      electron.remote.dialog.showMessageBox(electron.remote.getCurrentWindow(), {
+      remote.dialog.showMessageBox(remote.getCurrentWindow(), {
         type: 'warning',
         title: 'Twitch Error',
         message: $t(
@@ -737,8 +741,8 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     this.navigationService.navigate('Studio');
 
     const session = this.state.auth.partition
-      ? electron.remote.session.fromPartition(this.state.auth.partition)
-      : electron.remote.session.defaultSession;
+      ? remote.session.fromPartition(this.state.auth.partition)
+      : remote.session.defaultSession;
 
     session.clearStorageData({ storages: ['cookies'] });
     this.settingsService.setSettingValue('Stream', 'key', '');

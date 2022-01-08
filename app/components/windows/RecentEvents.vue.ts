@@ -5,7 +5,8 @@ import { Inject } from 'services/core/injector';
 import { UserService } from 'services/user';
 import { I18nService } from 'services/i18n';
 import electron from 'electron';
-import BrowserView from 'components/shared/BrowserView';
+import * as remote from '@electron/remote';
+import { BrowserView } from 'components/shared/ReactComponentList';
 
 @Component({
   components: { ModalLayout, BrowserView },
@@ -22,7 +23,7 @@ export default class RecentEvents extends Vue {
     electron.ipcRenderer.send('webContents-preventPopup', view.webContents.id);
 
     view.webContents.on('new-window', (e, url) => {
-      electron.remote.shell.openExternal(url);
+      remote.shell.openExternal(url);
     });
   }
 

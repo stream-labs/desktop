@@ -13,6 +13,7 @@ import { GuestApiHandler } from 'util/guest-api-handler';
 import { BehaviorSubject } from 'rxjs';
 import { IBrowserViewTransform } from './api/modules/module';
 import uuid from 'uuid/v4';
+import * as remote from '@electron/remote';
 
 interface IContainerInfo {
   id: string;
@@ -106,7 +107,7 @@ export class PlatformContainerManager {
     slobsWindowId: string,
   ) {
     const containerInfo = this.getContainerInfoForSlot(app, slot);
-    const win = electron.remote.BrowserWindow.fromId(electronWindowId);
+    const win = remote.BrowserWindow.fromId(electronWindowId);
 
     win.addBrowserView(containerInfo.container);
 
@@ -148,7 +149,7 @@ export class PlatformContainerManager {
 
     const transform = info.transform.getValue();
 
-    const win = electron.remote.BrowserWindow.fromId(electronWindowId);
+    const win = remote.BrowserWindow.fromId(electronWindowId);
     win.removeBrowserView(info.container);
 
     info.mountedWindows = info.mountedWindows.filter(id => id !== electronWindowId);
@@ -191,15 +192,16 @@ export class PlatformContainerManager {
   }
 
   private createContainer(app: ILoadedApp, slot: EAppPageSlot, persistent = false): IContainerInfo {
-    const view = new electron.remote.BrowserView({
+    const view = new remote.BrowserView({
       webPreferences: {
         contextIsolation: true,
-        enableRemoteModule: true,
         nodeIntegration: false,
         partition: this.getAppPartition(app),
-        preload: path.resolve(electron.remote.app.getAppPath(), 'bundles', 'guest-api'),
+        preload: path.resolve(remote.app.getAppPath(), 'bundles', 'guest-api'),
       },
     });
+
+    electron.ipcRenderer.sendSync('webContents-enableRemote', view.webContents.id);
 
     const info: IContainerInfo = {
       id: uuid(),
@@ -253,7 +255,7 @@ export class PlatformContainerManager {
 
     // Unmount from all windows first (prevents crashes)
     info.mountedWindows.forEach(winId => {
-      const win = electron.remote.BrowserWindow.fromId(winId);
+      const win = remote.BrowserWindow.fromId(winId);
       if (win && !win.isDestroyed()) win.removeBrowserView(info.container);
     });
 
@@ -282,7 +284,7 @@ export class PlatformContainerManager {
     const partition = `platformApp-${app.id}-${userId}-${app.unpacked}`;
 
     if (!this.sessionsInitialized[partition]) {
-      const session = electron.remote.session.fromPartition(partition);
+      const session = remote.session.fromPartition(partition);
       const frameUrls: string[] = [];
       let mainFrame = '';
 

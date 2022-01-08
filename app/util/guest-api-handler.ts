@@ -1,6 +1,7 @@
 import electron from 'electron';
 import { Subscription, Observable } from 'rxjs';
 import uuid from 'uuid/v4';
+import * as remote from '@electron/remote';
 
 /**
  * Shared message interchange format
@@ -82,7 +83,7 @@ export class GuestApiHandler {
    */
   exposeApi(targetWebContentsId: number, api: IRequestHandler) {
     const ipcChannel = `guestApiRequest-${uuid()}`;
-    const webContents = electron.remote.webContents.fromId(targetWebContentsId);
+    const webContents = remote.webContents.fromId(targetWebContentsId);
 
     // Tracks rxjs subscriptions for this webview so they can be unsubscribed
     let subscriptions: Subscription[] = [];
@@ -124,7 +125,7 @@ export class GuestApiHandler {
     electron.ipcRenderer.send('guestApi-setInfo', {
       webContentsId: targetWebContentsId,
       schema: this.getSchema(api),
-      hostWebContentsId: electron.remote.getCurrentWebContents().id,
+      hostWebContentsId: remote.getCurrentWebContents().id,
       ipcChannel,
     });
   }

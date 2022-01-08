@@ -2,12 +2,12 @@ import { StatefulService, mutation } from 'services/core';
 import * as obs from '../../obs-api';
 import fs from 'fs';
 import util from 'util';
-import electron from 'electron';
 import path from 'path';
 import { getChecksum } from 'util/requests';
 import { byOS, OS } from 'util/operating-systems';
 import { Inject } from 'services/core/injector';
 import { UsageStatisticsService } from 'services/usage-statistics';
+import * as remote from '@electron/remote';
 
 const PLUGIN_PLIST_PATH =
   '/Library/CoreMediaIO/Plug-Ins/DAL/vcam-plugin.plugin/Contents/Info.plist';
@@ -99,7 +99,7 @@ export class VirtualWebcamService extends StatefulService<IVirtualWebcamServiceS
   }
 
   private getCurrentChecksum() {
-    const internalPlistPath = path.join(electron.remote.app.getAppPath(), INTERNAL_PLIST_PATH);
+    const internalPlistPath = path.join(remote.app.getAppPath(), INTERNAL_PLIST_PATH);
     return getChecksum(internalPlistPath);
   }
 
