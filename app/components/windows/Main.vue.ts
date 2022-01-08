@@ -17,6 +17,7 @@ import { EditorCommandsService } from '../../app-services';
 import VueResize from 'vue-resize';
 import { $t } from 'services/i18n';
 import fs from 'fs';
+import * as remote from '@electron/remote';
 Vue.use(VueResize);
 
 // Pages
@@ -35,7 +36,6 @@ import { IModalOptions, WindowsService } from 'services/windows';
 import LiveDock from '../LiveDock.vue';
 import StudioFooter from '../StudioFooter.vue';
 import PlatformAppMainPage from '../pages/PlatformAppMainPage.vue';
-import electron from 'electron';
 import ResizeBar from 'components/shared/ResizeBar.vue';
 import PlatformMerge from 'components/pages/PlatformMerge';
 import { getPlatformService } from 'services/platforms';
@@ -224,8 +224,8 @@ export default class Main extends Vue {
     });
 
     if (files.length > 1 || isDirectory) {
-      electron.remote.dialog
-        .showMessageBox(electron.remote.getCurrentWindow(), {
+      remote.dialog
+        .showMessageBox(remote.getCurrentWindow(), {
           title: 'Streamlabs Desktop',
           message: $t('Are you sure you want to import multiple files?'),
           type: 'warning',

@@ -12,6 +12,7 @@ import { StreamingService } from './streaming';
 import { FacebookService } from './platforms/facebook';
 import { TiktokService } from './platforms/tiktok';
 import { TrovoService } from './platforms/trovo';
+import * as remote from '@electron/remote';
 
 interface IRestreamTarget {
   id: number;
@@ -281,7 +282,7 @@ export class RestreamService extends StatefulService<IRestreamState> {
   mountChat(electronWindowId: number) {
     if (!this.chatView) this.initChat();
 
-    const win = electron.remote.BrowserWindow.fromId(electronWindowId);
+    const win = remote.BrowserWindow.fromId(electronWindowId);
 
     // This method was added in our fork
     (win as any).addBrowserView(this.chatView);
@@ -301,7 +302,7 @@ export class RestreamService extends StatefulService<IRestreamState> {
   unmountChat(electronWindowId: number) {
     if (!this.chatView) return;
 
-    const win = electron.remote.BrowserWindow.fromId(electronWindowId);
+    const win = remote.BrowserWindow.fromId(electronWindowId);
 
     // @ts-ignore: this method was added in our fork
     win.removeBrowserView(this.chatView);
@@ -315,7 +316,7 @@ export class RestreamService extends StatefulService<IRestreamState> {
 
     const partition = this.userService.state.auth.partition;
 
-    this.chatView = new electron.remote.BrowserView({
+    this.chatView = new remote.BrowserView({
       webPreferences: {
         partition,
         nodeIntegration: false,

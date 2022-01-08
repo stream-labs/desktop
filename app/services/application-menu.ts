@@ -8,6 +8,7 @@ import { AppService } from './app';
 import { WindowsService } from './windows';
 import { NavigationService } from './navigation';
 import { SettingsService } from './settings';
+import * as remote from '@electron/remote';
 
 /**
  * Manages the application menu and shortcuts on Mac OS
@@ -25,14 +26,14 @@ export class ApplicationMenuService extends Service {
     if (process.platform !== OS.Mac) return;
 
     const menu = this.buildMenu();
-    electron.remote.Menu.setApplicationMenu(menu);
+    remote.Menu.setApplicationMenu(menu);
 
     this.bindDynamicMenuItems();
   }
 
   private buildMenu(): electron.Menu {
     // TODO: i18n
-    return electron.remote.Menu.buildFromTemplate([
+    return remote.Menu.buildFromTemplate([
       {
         label: 'Streamlabs Desktop',
         submenu: [
@@ -69,7 +70,7 @@ export class ApplicationMenuService extends Service {
                 if (this.appService.state.loading) return;
                 this.editorCommandsService.undo();
               } else {
-                electron.remote.Menu.sendActionToFirstResponder('undo:');
+                remote.Menu.sendActionToFirstResponder('undo:');
               }
             },
           },
@@ -82,7 +83,7 @@ export class ApplicationMenuService extends Service {
                 if (this.appService.state.loading) return;
                 this.editorCommandsService.redo();
               } else {
-                electron.remote.Menu.sendActionToFirstResponder('redo:');
+                remote.Menu.sendActionToFirstResponder('redo:');
               }
             },
           },
@@ -96,7 +97,7 @@ export class ApplicationMenuService extends Service {
                 if (this.appService.state.loading) return;
                 this.clipboardService.copy();
               } else {
-                electron.remote.Menu.sendActionToFirstResponder('copy:');
+                remote.Menu.sendActionToFirstResponder('copy:');
               }
             },
           },
@@ -109,7 +110,7 @@ export class ApplicationMenuService extends Service {
                 if (this.appService.state.loading) return;
                 this.clipboardService.paste();
               } else {
-                electron.remote.Menu.sendActionToFirstResponder('paste:');
+                remote.Menu.sendActionToFirstResponder('paste:');
               }
             },
           },
@@ -131,7 +132,7 @@ export class ApplicationMenuService extends Service {
                 if (this.appService.state.loading) return;
                 this.selectionService.views.globalSelection.selectAll();
               } else {
-                electron.remote.Menu.sendActionToFirstResponder('selectAll:');
+                remote.Menu.sendActionToFirstResponder('selectAll:');
               }
             },
           },
@@ -199,7 +200,7 @@ export class ApplicationMenuService extends Service {
           {
             label: 'Streamlabs Desktop Support',
             click: () => {
-              electron.remote.shell.openExternal('https://support.streamlabs.com');
+              remote.shell.openExternal('https://support.streamlabs.com');
             },
           },
         ],
@@ -215,7 +216,7 @@ export class ApplicationMenuService extends Service {
   }
 
   private bindDynamicMenuItems() {
-    const appMenu = electron.remote.Menu.getApplicationMenu();
+    const appMenu = remote.Menu.getApplicationMenu();
 
     this.selectionService.updated.subscribe(state => {
       appMenu.getMenuItemById('nudgeUp').enabled = !!state.selectedIds.length;

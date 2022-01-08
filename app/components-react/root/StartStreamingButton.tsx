@@ -2,10 +2,10 @@ import React, { useEffect, useState } from 'react';
 import cx from 'classnames';
 import { EStreamingState } from 'services/streaming';
 import { EGlobalSyncStatus } from 'services/media-backup';
-import electron from 'electron';
 import { $t } from 'services/i18n';
 import { useVuex } from '../hooks';
 import { Services } from '../service-provider';
+import * as remote from '@electron/remote';
 
 export default function StartStreamingButton(p: { disabled?: boolean }) {
   const {
@@ -49,8 +49,8 @@ export default function StartStreamingButton(p: { disabled?: boolean }) {
       StreamingService.toggleStreaming();
     } else {
       if (MediaBackupService.views.globalSyncStatus === EGlobalSyncStatus.Syncing) {
-        const goLive = await electron.remote.dialog
-          .showMessageBox(electron.remote.getCurrentWindow(), {
+        const goLive = await remote.dialog
+          .showMessageBox(remote.getCurrentWindow(), {
             title: $t('Cloud Backup'),
             type: 'warning',
             message:
@@ -69,8 +69,8 @@ export default function StartStreamingButton(p: { disabled?: boolean }) {
           .length === 0;
 
       if (needToShowNoSourcesWarning) {
-        const goLive = await electron.remote.dialog
-          .showMessageBox(electron.remote.getCurrentWindow(), {
+        const goLive = await remote.dialog
+          .showMessageBox(remote.getCurrentWindow(), {
             title: $t('No Sources'),
             type: 'warning',
             message:

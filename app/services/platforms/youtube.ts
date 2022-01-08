@@ -16,10 +16,11 @@ import { I18nService } from 'services/i18n';
 import { throwStreamError } from 'services/streaming/stream-error';
 import { BasePlatformService } from './base-platform';
 import { assertIsDefined, getDefined } from 'util/properties-type-guards';
-import electron from 'electron';
 import Utils from '../utils';
 import { YoutubeUploader } from './youtube/uploader';
 import { lazyModule } from 'util/lazy-module';
+import * as remote from '@electron/remote';
+import pick from 'lodash/pick';
 
 interface IYoutubeServiceState extends IPlatformState {
   liveStreamingEnabled: boolean;
@@ -380,11 +381,25 @@ export class YoutubeService
   private async updateCategory(broadcastId: string, categoryId: string) {
     const video = await this.fetchVideo(broadcastId);
     const endpoint = 'videos?part=snippet';
-    const { title, description, tags, defaultAudioLanguage, scheduledStartTime } = video.snippet;
+
+    // we need to re-send snippet data when updating the `video` endpoint
+    // otherwise YT will reset all fields in the `snippet` section
+    const snippet: Partial<IYoutubeLiveBroadcast['snippet']> = pick(video.snippet, [
+      'title',
+      'description',
+      'tags',
+      'defaultAudioLanguage',
+      'scheduledStartTime',
+    ]);
+
+    // `zxx` is a `Not applicable` language code
+    // YouTube API doesn't allow us to set this code
+    if (snippet.defaultAudioLanguage === 'zxx') delete snippet.defaultAudioLanguage;
+
     await this.requestYoutube({
       body: JSON.stringify({
         id: broadcastId,
-        snippet: { categoryId, title, description, tags, defaultAudioLanguage, scheduledStartTime },
+        snippet: { ...snippet, categoryId },
       }),
       method: 'PUT',
       url: `${this.apiBase}/${endpoint}`,
@@ -736,11 +751,11 @@ export class YoutubeService
   }
 
   openYoutubeEnable() {
-    electron.remote.shell.openExternal('https://youtube.com/live_dashboard_splash');
+    remote.shell.openExternal('https://youtube.com/live_dashboard_splash');
   }
 
   openDashboard() {
-    electron.remote.shell.openExternal(this.dashboardUrl);
+    remote.shell.openExternal(this.dashboardUrl);
   }
 
   get dashboardUrl(): string {

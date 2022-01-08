@@ -2,11 +2,13 @@
  * The core module provides methods for the most frequent actions
  */
 
-import { getContext, TExecutionContext } from '../spectron';
+import { getContext } from '../spectron';
+import { getApiClient } from '../api-client';
+import { WindowsService } from '../../../app/services/windows';
 
 export type TSelectorOrEl = string | WebdriverIO.Element;
 
-export function getClient() {
+export function getClient(): WebdriverIO.BrowserObject {
   return getContext().context.app.client;
 }
 
@@ -104,9 +106,9 @@ export async function getFocusedWindowId(): Promise<string> {
 
 export async function focusWindow(winIdOrRegexp: string | RegExp): Promise<boolean> {
   const client = await getClient();
-  const count = await getClient().getWindowCount();
-  for (let i = 0; i < count; i++) {
-    await client.windowByIndex(i);
+  const handles = await client.getWindowHandles();
+  for (let ind = 0; ind < handles.length; ind++) {
+    await client.switchToWindow(handles[ind]);
     const url = await client.getUrl();
     if (typeof winIdOrRegexp === 'string') {
       const winId = winIdOrRegexp;
@@ -128,9 +130,19 @@ export async function focusMain() {
 }
 
 export async function closeWindow(winId: string) {
-  await useWindow(winId, async () => {
-    await getContext().context.app.browserWindow.close();
-  });
+  const api = await getApiClient();
+  const windowsService = api.getResource<WindowsService>('WindowsService');
+  switch (winId) {
+    case 'main':
+      await windowsService.closeMainWindow();
+      break;
+    case 'child':
+      await windowsService.closeChildWindow();
+      break;
+    default:
+      await windowsService.closeOneOffWindow(winId);
+      break;
+  }
 }
 
 /**

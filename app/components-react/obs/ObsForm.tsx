@@ -30,7 +30,7 @@ import Utils from 'services/utils';
 
 interface IObsFormProps {
   value: IObsInput<TObsValue>[];
-  onChange: (newValue: IObsInput<TObsValue>[]) => unknown;
+  onChange: (newValue: IObsInput<TObsValue>[], changedInd: number) => unknown;
   layout?: TInputLayout;
   style?: React.CSSProperties;
 }
@@ -43,7 +43,7 @@ export function ObsForm(p: IObsFormProps) {
     const newValue = cloneDeep(p.value);
     newValue.splice(index, 1, value);
 
-    p.onChange(newValue);
+    p.onChange(newValue, index);
   }
 
   return (
@@ -87,6 +87,7 @@ function ObsInput(p: IObsInputProps) {
     name: p.value.name,
     label: $translateIfExist(p.value.description),
     uncontrolled: false,
+    masked: p.value.masked,
   };
 
   switch (type) {
@@ -105,7 +106,7 @@ function ObsInput(p: IObsInputProps) {
       if (textVal.multiline) {
         return <TextAreaInput {...inputProps} />;
       } else {
-        return <TextInput {...inputProps} />;
+        return <TextInput {...inputProps} isPassword={inputProps.masked} />;
       }
     case 'OBS_PROPERTY_LIST':
       // eslint-disable-next-line no-case-declarations
