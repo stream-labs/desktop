@@ -9,6 +9,7 @@
   "has gifted a sub (%{tier}) to": "ofereceu uma subscrição (%{tier}) a",
   "has resubscribed (%{tier}) for %{months} months": "subscreveu (%{tier}) novamente durante %{months} meses",
   "has subscribed (%{tier})": "subscreveu (%{tier})",
+  "has converted from a Prime Gaming sub to a %{tier} sub": "has converted from a Prime Gaming sub to a %{tier} sub",
   "has subscribed": "subscreveu",
   "has used": "utilizou",
   "has hosted you with %{viewers} viewers": "alojou-o com %{viewers} espetadores",
@@ -73,6 +74,6 @@
   "Safe Mode is Enabled": "O Modo de segurança está activado",
   "Disable Safe Mode": "Desactivar o Modo de segurança",
   "Something went wrong disabling Safe Mode": "Ocorreu um erro ao desactivar o Modo de segurança",
-  "Automatically disable Safe Mode": "Automatically disable Safe Mode",
-  "Disable after <duration></duration> minutes": "Disable after <duration></duration> minutes"
+  "Automatically disable Safe Mode": "Desativar automaticamente o Modo de Segurança",
+  "Disable after <duration></duration> minutes": "Desativar após &lt;duration&gt;&lt;/duration&gt; minutos"
 }

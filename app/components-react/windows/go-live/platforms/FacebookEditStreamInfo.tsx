@@ -1,4 +1,3 @@
-import electron from 'electron';
 import css from './FacebookEditStreamInfo.m.less';
 import { CommonPlatformFields } from '../CommonPlatformFields';
 import React from 'react';
@@ -22,6 +21,7 @@ import MessageLayout from '../MessageLayout';
 import PlatformSettingsLayout, { IPlatformComponentParams } from './PlatformSettingsLayout';
 import { useSelector } from '../../../store';
 import { assertIsDefined } from '../../../../util/properties-type-guards';
+import * as remote from '@electron/remote';
 
 export default function FacebookEditStreamInfo(p: IPlatformComponentParams<'facebook'>) {
   const fbSettings = p.value;
@@ -146,7 +146,7 @@ export default function FacebookEditStreamInfo(p: IPlatformComponentParams<'face
 
   function verifyGroup() {
     const groupId = fbSettings.groupId;
-    electron.remote.shell.openExternal(`https://www.facebook.com/groups/${groupId}/edit`);
+    remote.shell.openExternal(`https://www.facebook.com/groups/${groupId}/edit`);
   }
 
   function dismissWarning() {
@@ -326,7 +326,7 @@ export default function FacebookEditStreamInfo(p: IPlatformComponentParams<'face
                   <a
                     slot="link"
                     onClick={() =>
-                      electron.remote.shell.openExternal(
+                      remote.shell.openExternal(
                         'https://www.facebook.com/settings?tab=business_tools',
                       )
                     }

@@ -27,9 +27,9 @@
   "Example": "示例",
   "Change Media": "更换媒体",
   "No Sound": "无声音",
-  "No Media": "No Media",
-  "Change Link": "Change Link",
-  "Pick From Gallery": "Pick From Gallery",
-  "Clear Link": "Clear Link",
-  "Media URL": "Media URL"
+  "No Media": "无媒体",
+  "Change Link": "更改链接",
+  "Pick From Gallery": "从图库中挑选",
+  "Clear Link": "清除链接",
+  "Media URL": "媒体 URL"
 }

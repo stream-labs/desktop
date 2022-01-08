@@ -4,7 +4,6 @@ import {
   chatIsVisible,
   clickGoLive,
   goLive,
-  openScheduler,
   prepareToGoLive,
   scheduleStream,
   stopStream,
@@ -14,7 +13,8 @@ import {
 
 import {
   click,
-  focusChild, focusMain,
+  focusChild,
+  focusMain,
   isDisplayed,
   select,
   waitForDisplayed,
@@ -22,7 +22,6 @@ import {
 import * as moment from 'moment';
 import { useForm } from '../../helpers/modules/forms';
 import { ListInputController } from '../../helpers/modules/forms/list';
-import { sleep } from '../../helpers/sleep';
 
 useSpectron();
 
@@ -39,6 +38,8 @@ test('Streaming to Youtube', async t => {
   await stopStream();
 });
 
+
+// TODO flaky
 test.skip('Streaming to the scheduled event on Youtube', async t => {
   await logIn('youtube', { multistream: false });
   const tomorrow = moment().add(1, 'day').toDate();
@@ -58,6 +59,7 @@ test.skip('Streaming to the scheduled event on Youtube', async t => {
   });
 });
 
+// TODO flaky
 test.skip('GoLive from StreamScheduler', async t => {
   await logIn('youtube', { multistream: false });
   await prepareToGoLive();

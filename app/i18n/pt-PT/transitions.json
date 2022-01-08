@@ -19,7 +19,7 @@
   "Transition Type": "Tipo de transição",
   "Name": "Nome",
   "Transition Name": "Nome da transição",
-  "Default": "Padrão",
+  "Default": "Predefinição",
   "Deleted": "Eliminada",
   "This connection is redundant because another connection already connects these scenes.": "Esta ligação é redundante porque já existe outra ligação entre estas cenas.",
   "You need at least 2 scenes to edit transitions.": "Precisa de, pelo menos, 2 cenas para editar transições.",

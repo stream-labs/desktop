@@ -1,13 +1,14 @@
 import electron from 'electron';
 import { Component } from 'vue-property-decorator';
-import BrowserView from 'components/shared/BrowserView';
-import styles from 'components/RecentEvents.m.less';
+import styles from 'components-react/editor/elements/RecentEvents.m.less';
+import { BrowserView } from 'components/shared/ReactComponentList';
 import { UserService } from 'services/user';
 import { RecentEventsService } from 'services/recent-events';
 import { MagicLinkService } from 'services/magic-link';
 import { Inject } from 'services/core';
 import BaseElement from './BaseElement';
 import { $t } from 'services/i18n';
+import * as remote from '@electron/remote';
 
 @Component({})
 export default class LegacyEvents extends BaseElement {
@@ -39,14 +40,14 @@ export default class LegacyEvents extends BaseElement {
 
         try {
           const link = await this.magicLinkService.getDashboardMagicLink(match[1]);
-          electron.remote.shell.openExternal(link);
+          remote.shell.openExternal(link);
         } catch (e: unknown) {
           console.error('Error generating dashboard magic link', e);
         }
 
         this.magicLinkDisabled = false;
       } else {
-        electron.remote.shell.openExternal(url);
+        remote.shell.openExternal(url);
       }
     });
   }
@@ -64,9 +65,11 @@ export default class LegacyEvents extends BaseElement {
       <div style="height: 100%;">
         <BrowserView
           class={styles.eventContainer}
-          src={this.userService.recentEventsUrl()}
-          setLocale={true}
-          onReady={view => this.handleBrowserViewReady(view)}
+          componentProps={{
+            src: this.userService.recentEventsUrl(),
+            setLocale: true,
+            onReady: (view: Electron.BrowserView) => this.handleBrowserViewReady(view),
+          }}
         />
       </div>
     );

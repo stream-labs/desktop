@@ -3,7 +3,7 @@
   "This element is too small to be displayed": "Tento prvek je příliš malý na to, aby byl zobrazen",
   "This element requires Selective Recording to be enabled": "Tento prvek vyžaduje, aby bylo povoleno selektivní nahrávání",
   "Grant Permissions": "Udělit oprávnění",
-  "Streamlabs OBS needs additional permissions. Grant permissions in the pop-up dialogs to continue.": "Streamlabs OBS potřebuje další oprávnění. Pokračujte udělením oprávnění v místním dialogovém okně.",
+  "Streamlabs needs additional permissions. Grant permissions in the pop-up dialogs to continue.": "Streamlabs potřebuje další oprávnění. Pokračujte udělením oprávnění v místním dialogovém okně.",
   "Microphone": "Mikrofon",
   "Webcam": "Webová kamera"
 }

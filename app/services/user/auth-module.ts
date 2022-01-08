@@ -5,6 +5,7 @@ import defer from 'lodash/defer';
 import URI from 'urijs';
 import http from 'http';
 import Utils from 'services/utils';
+import * as remote from '@electron/remote';
 
 /**
  * Responsible for secure handling of platform OAuth flows.
@@ -26,7 +27,7 @@ export class AuthModule {
     return new Promise<IUserAuth>(resolve => {
       let completed = false;
       const partition = `persist:${uuid()}`;
-      const authWindow = new electron.remote.BrowserWindow({
+      const authWindow = new remote.BrowserWindow({
         ...windowOptions,
         alwaysOnTop: false,
         show: false,

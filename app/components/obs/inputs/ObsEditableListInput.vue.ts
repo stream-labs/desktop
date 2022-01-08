@@ -1,9 +1,9 @@
-import electron from 'electron';
 import cloneDeep from 'lodash/cloneDeep';
 import Selector from '../../Selector.vue';
 import { Component, Prop } from 'vue-property-decorator';
 import { IObsEditableListInputValue, ObsInput, TObsType } from './ObsInput';
 import { Menu } from '../../../util/menus/Menu';
+import * as remote from '@electron/remote';
 
 interface ISelectorSortEventData {
   change: any;
@@ -55,7 +55,7 @@ class ObsEditableListProperty extends ObsInput<IObsEditableListInputValue> {
   }
 
   async showReplaceFileDialog() {
-    const { filePaths } = await electron.remote.dialog.showOpenDialog({
+    const { filePaths } = await remote.dialog.showOpenDialog({
       defaultPath: this.value.defaultPath,
       filters: this.value.filters,
       properties: ['openFile'],
@@ -73,7 +73,7 @@ class ObsEditableListProperty extends ObsInput<IObsEditableListInputValue> {
   }
 
   async showFileDialog() {
-    const { filePaths } = await electron.remote.dialog.showOpenDialog({
+    const { filePaths } = await remote.dialog.showOpenDialog({
       defaultPath: this.value.defaultPath,
       filters: this.value.filters,
       properties: ['openFile', 'multiSelections'],
@@ -85,7 +85,7 @@ class ObsEditableListProperty extends ObsInput<IObsEditableListInputValue> {
   }
 
   async showDirDialog() {
-    const { filePaths } = await electron.remote.dialog.showOpenDialog({
+    const { filePaths } = await remote.dialog.showOpenDialog({
       defaultPath: this.value.defaultPath,
       properties: ['openDirectory'],
     });

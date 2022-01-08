@@ -27,7 +27,7 @@
   "Shader": "Шейдер",
   "No settings are available for this filter": "Для этого фильтра нет доступных настроек",
   "Visual Presets": "Визуальные предустановки",
-  "None": "Ничего",
+  "None": "Нет",
   "Grayscale": "Полутоновое",
   "Sepiatone": "Сепия",
   "Action Movie": "Боевик",
@@ -38,5 +38,5 @@
   "Cel Shade": "Сел-шейдинг",
   "Dramatic": "Драма",
   "Wintergreen": "Вечнозеленое",
-  "Edit Filters": "Edit Filters"
+  "Edit Filters": "Редактировать фильтры"
 }

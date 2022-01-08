@@ -25,6 +25,7 @@ export default function PlatformSettings() {
     updateCommonFields,
     descriptionIsRequired,
     getPlatformSettings,
+    isUpdateMode,
   } = useGoLiveSettings().selectExtra(settings => {
     const fbSettings = settings.platforms['facebook'];
     const descriptionIsRequired = fbSettings && fbSettings.enabled && !fbSettings.useCustomFields;
@@ -42,6 +43,7 @@ export default function PlatformSettings() {
 
   function createPlatformBinding<T extends TPlatform>(platform: T): IPlatformComponentParams<T> {
     return {
+      isUpdateMode,
       layoutMode,
       get value() {
         return getDefined(getPlatformSettings(platform));

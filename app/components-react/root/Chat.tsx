@@ -1,8 +1,9 @@
-import { remote } from 'electron';
+import * as remote from '@electron/remote';
 import React, { useEffect, useRef } from 'react';
 import { Services } from '../service-provider';
 import styles from './Chat.m.less';
 import { OS, getOS } from '../../util/operating-systems';
+import { onUnload } from 'util/unload';
 
 export default function Chat(props: { restream: boolean }) {
   const { ChatService, RestreamService } = Services;
@@ -47,9 +48,11 @@ export default function Chat(props: { restream: boolean }) {
   // Mount/switch chat
   useEffect(() => {
     setupChat();
+    const cancelUnload = onUnload(() => service.actions.unmountChat(remote.getCurrentWindow().id));
 
     return () => {
       service.actions.unmountChat(remote.getCurrentWindow().id);
+      cancelUnload();
     };
   }, [props.restream]);
 
