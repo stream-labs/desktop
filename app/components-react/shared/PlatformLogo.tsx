@@ -2,9 +2,9 @@ import React, { HTMLAttributes } from 'react';
 import { TPlatform } from '../../services/platforms';
 import cx from 'classnames';
 import css from './PlatformLogo.m.less';
-import KevinSvg from './KevinSvg';
 
 const sizeMap = {
+  small: 14,
   medium: 40,
 };
 
@@ -29,7 +29,9 @@ export default function PlatformLogo(p: IProps & HTMLAttributes<unknown>) {
     }[p.platform];
   }
   const size = p.size && (sizeMap[p.size] ?? p.size);
-  const sizeStyle = size ? { fontSize: `${size}px` } : undefined;
+  const sizeStyle = size
+    ? { fontSize: `${size}px`, maxHeight: `${size}px`, maxWidth: `${size}px` }
+    : undefined;
   const colorStyle = p.color ? { color: p.color } : undefined;
   const style = { ...sizeStyle, ...colorStyle };
   return <i className={cx(iconForPlatform(), css[p.platform], p.className)} style={style} />;

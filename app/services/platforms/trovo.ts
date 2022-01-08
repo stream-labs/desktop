@@ -12,11 +12,13 @@ import { throwStreamError } from '../streaming/stream-error';
 import { platformAuthorizedRequest } from './utils';
 import { IGoLiveSettings } from '../streaming';
 import { getDefined } from '../../util/properties-type-guards';
+import {IYoutubeStartStreamOptions} from "./youtube";
+import Utils from "../utils";
 
 interface ITrovoServiceState extends IPlatformState {
   settings: ITrovoStartStreamOptions;
   userInfo: ITrovoUserInfo;
-  channelInfo: { category_name: string };
+  channelInfo: { gameId: string; gameName: string; gameImage: string };
 }
 
 export interface ITrovoStartStreamOptions {
@@ -45,16 +47,15 @@ export class TrovoService
     ...BasePlatformService.initialState,
     settings: { title: '', game: '' },
     userInfo: { userId: '', channelId: '' },
-    channelInfo: { category_name: '' },
+    channelInfo: { gameId: '', gameName: '', gameImage: '' },
   };
 
+  readonly capabilities = new Set<TPlatformCapability>(['title', 'chat']);
   readonly apiBase = 'https://open-api.trovo.live/openplatform';
   readonly rtmpServer = 'rtmp://livepush.trovo.live/live/';
   readonly platform = 'trovo';
   readonly displayName = 'Trovo';
   readonly gameImageSize = { width: 30, height: 40 };
-
-  readonly capabilities = new Set<TPlatformCapability>(['title', 'chat']);
 
   authWindowOptions: Electron.BrowserWindowConstructorOptions = {
     width: 600,
@@ -114,10 +115,18 @@ export class TrovoService
   async prepopulateInfo(): Promise<void> {
     const channelInfo = await this.fetchChannelInfo();
     const userInfo = await this.requestTrovo<ITrovoUserInfo>(`${this.apiBase}/getuserinfo`);
+    const gameInfo = await this.fetchGame(channelInfo.category_name);
     this.SET_STREAM_SETTINGS({ title: channelInfo.live_title, game: channelInfo.category_id });
     this.SET_USER_INFO(userInfo);
-    this.SET_CATEGORY_NAME(channelInfo.category_name);
     this.SET_STREAM_KEY(channelInfo.stream_key.replace('live/', ''));
+    this.SET_CHANNEL_INFO({
+      gameId: channelInfo.category_id,
+      gameName: channelInfo.category_name,
+      gameImage: gameInfo.image,
+    });
+    // TODO: the order of mutations is corrupted for the GoLive window
+    // adding a sleep() call here to ensure the "SET_PREPOPULATED" will come in the last place
+    await Utils.sleep(50);
     this.SET_PREPOPULATED(true);
   }
 
@@ -127,7 +136,11 @@ export class TrovoService
     await this.requestTrovo<ITrovoChannelInfo>({
       url: `${this.apiBase}/channels/update`,
       method: 'POST',
-      body: JSON.stringify({ channel_id, live_title: settings.title, category: settings.game }),
+      body: JSON.stringify({
+        channel_id,
+        live_title: settings.title,
+        category_id: settings.game,
+      }),
     });
   }
 
@@ -150,17 +163,7 @@ export class TrovoService
   }
 
   async fetchGame(name: string): Promise<IGame> {
-    const gamesResponse = await platformAuthorizedRequest<{
-      data: { id: string; name: string; box_art_url: string }[];
-    }>('twitch', `${this.apiBase}/helix/games?name=${encodeURIComponent(name)}`);
-    return gamesResponse.data.map(g => {
-      const imageTemplate = g.box_art_url;
-      const imageSize = this.gameImageSize;
-      const image = imageTemplate
-        .replace('{width}', imageSize.width.toString())
-        .replace('{height}', imageSize.height.toString());
-      return { id: g.id, name: g.name, image };
-    })[0];
+    return (await this.searchGames(name))[0];
   }
 
   getHeaders() {
@@ -195,7 +198,12 @@ export class TrovoService
   }
 
   @mutation()
-  private SET_CATEGORY_NAME(categoryName: string) {
-    this.state.channelInfo.category_name = categoryName;
+  private SET_CHANNEL_INFO(info: ITrovoServiceState['channelInfo']) {
+    this.state.channelInfo = info;
   }
+
+  // @mutation()
+  // private SET_CATEGORY_NAME(categoryName: string) {
+  //   this.state.channelInfo.category_name = categoryName;
+  // }
 }

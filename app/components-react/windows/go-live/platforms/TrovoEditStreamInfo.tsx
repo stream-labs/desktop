@@ -1,6 +1,6 @@
 import React from 'react';
 import PlatformSettingsLayout, { IPlatformComponentParams } from './PlatformSettingsLayout';
-import { ITrovoStartStreamOptions } from '../../../../services/platforms/trovo';
+import { ITrovoStartStreamOptions, TrovoService } from '../../../../services/platforms/trovo';
 import { createBinding } from '../../../shared/inputs';
 import Form from '../../../shared/inputs/Form';
 import { CommonPlatformFields } from '../CommonPlatformFields';
