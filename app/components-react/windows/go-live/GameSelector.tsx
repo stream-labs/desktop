@@ -42,6 +42,7 @@ export default function GameSelector(p: TProps) {
   }, []);
 
   async function loadImageForSelectedGame() {
+    // game images available for Twitch and Trovo only
     if (!['twitch', 'trovo'].includes(platform)) return;
     if (!selectedGameName) return;
     const game = await platformService.fetchGame(selectedGameName);
