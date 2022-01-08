@@ -147,6 +147,9 @@ export class ChatService extends Service {
       },
     });
 
+    // uncomment to show the dev-tools
+    // this.chatView.webContents.openDevTools({ mode: 'undocked' });
+
     electron.ipcRenderer.sendSync('webContents-enableRemote', this.chatView.webContents.id);
 
     this.bindWindowListener();
@@ -317,6 +320,27 @@ export class ChatService extends Service {
             )
             .catch(e => {});
         });
+      }
+
+      // hide the chat input for Trovo because we can not send messages in the logged-out mode
+      // TODO: find out how to keep Trovo chat in the logged-in state
+      if (this.userService.platform?.type === 'trovo') {
+        this.chatView.webContents
+          .executeJavaScript(
+            `
+                function hideChatInput() {
+                   var chatInput = document.querySelector('.input-container');
+                   if (!chatInput) {
+                      setTimeout(hideChatInput, 500);
+                      return;
+                   }
+                   chatInput.style.display = 'none';
+                }
+                hideChatInput()
+                `,
+            true,
+          )
+          .catch(e => {});
       }
     });
   }

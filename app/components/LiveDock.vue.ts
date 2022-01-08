@@ -165,7 +165,7 @@ export default class LiveDock extends Vue {
   }
 
   openTrovoStreamUrl() {
-    electron.remote.shell.openExternal(this.trovoService.streamPageUrl);
+    remote.shell.openExternal(this.trovoService.streamPageUrl);
   }
 
   get isTwitch() {
