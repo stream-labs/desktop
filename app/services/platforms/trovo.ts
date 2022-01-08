@@ -201,9 +201,4 @@ export class TrovoService
   private SET_CHANNEL_INFO(info: ITrovoServiceState['channelInfo']) {
     this.state.channelInfo = info;
   }
-
-  // @mutation()
-  // private SET_CATEGORY_NAME(categoryName: string) {
-  //   this.state.channelInfo.category_name = categoryName;
-  // }
 }
