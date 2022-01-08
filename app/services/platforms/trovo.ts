@@ -122,7 +122,7 @@ export class TrovoService
     this.SET_CHANNEL_INFO({
       gameId: channelInfo.category_id,
       gameName: channelInfo.category_name,
-      gameImage: gameInfo.image,
+      gameImage: gameInfo.image || '',
     });
     // TODO: the order of mutations is corrupted for the GoLive window
     // adding a sleep() call here to ensure the "SET_PREPOPULATED" will come in the last place
@@ -167,7 +167,7 @@ export class TrovoService
   }
 
   getHeaders() {
-    const token = this.userService.state.auth!.platforms.trovo.token;
+    const token = this.userService.state.auth!.platforms.trovo?.token;
     return {
       Accept: 'application/json',
       'Content-Type': 'application/json',
