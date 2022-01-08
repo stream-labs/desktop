@@ -25,11 +25,11 @@
   "Failed to copy URL": "Nem sikerült az URL másolása",
   "Image URL": "Kép URL",
   "Example": "Példa",
-  "Change Media": "Change Media",
+  "Change Media": "Média megváltoztatása",
   "No Sound": "Nincs hang",
-  "No Media": "No Media",
-  "Change Link": "Change Link",
+  "No Media": "Nincs média",
+  "Change Link": "Link megváltoztatása",
   "Pick From Gallery": "Pick From Gallery",
   "Clear Link": "Clear Link",
-  "Media URL": "Media URL"
+  "Media URL": "Média URL"
 }

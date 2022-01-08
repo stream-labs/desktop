@@ -38,6 +38,15 @@ export class AppsNav extends ReactComponent {}
 
 @Component({
   props: {
+    name: { default: 'BrowserView' },
+    componentProps: { default: () => ({ src: '' }) },
+    wrapperStyles: { default: () => ({ height: '100%' }) },
+  },
+})
+export class BrowserView extends ReactComponent {}
+
+@Component({
+  props: {
     name: { default: 'Chat' },
     componentProps: { default: () => ({ restream: false }) },
     wrapperStyles: {
@@ -110,6 +119,15 @@ export class IconLibraryProperties extends ReactComponent {}
 
 @Component({
   props: {
+    name: { default: 'MiniFeed' },
+    wrapperStyles: { default: () => ({ height: '100%' }) },
+    mins: { default: () => ({ x: 330, y: 90 }) },
+  },
+})
+export class MiniFeed extends ReactComponent {}
+
+@Component({
+  props: {
     name: { default: 'NameFolder' },
     wrapperStyles: { default: () => ({ height: '100%' }) },
   },
@@ -164,6 +182,17 @@ export class PlatformLogo extends ReactComponent<{
 
 @Component({
   props: {
+    name: { default: 'RecentEvents' },
+    wrapperStyles: {
+      default: () => ({ height: '100%' }),
+    },
+    componentProps: { default: () => ({ isOverlay: false }) },
+  },
+})
+export class RecentEvents extends ReactComponent<{ isOverlay?: boolean }> {}
+
+@Component({
+  props: {
     name: { default: 'RenameSource' },
     wrapperStyles: { default: () => ({ height: '100%' }) },
   },
@@ -208,6 +237,13 @@ export class SharedComponentsLibrary extends ReactComponent {}
   },
 })
 export class SourceFilters extends ReactComponent {}
+@Component({
+  props: {
+    name: { default: 'SourceShowcase' },
+    wrapperStyles: { default: () => ({ height: '100%' }) },
+  },
+})
+export class SourceShowcase extends ReactComponent {}
 
 @Component({ props: { name: { default: 'StartStreamingButton' } } })
 export class StartStreamingButton extends ReactComponent {}

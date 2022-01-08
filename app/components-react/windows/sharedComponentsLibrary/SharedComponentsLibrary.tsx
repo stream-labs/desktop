@@ -40,7 +40,7 @@ export default function SharedComponentsLibrary() {
     <ModalLayout>
       <Row gutter={16} style={{ height: 'calc(100% + 24px)' }}>
         <Col flex="auto" style={{ height: '100%' }}>
-          <Scrollable style={{ maxHeight: '100%' }}>
+          <Scrollable style={{ height: '100%' }}>
             <Tabs defaultActiveKey="1">
               <TabPane tab="Shared Components" key="1">
                 <Examples />
@@ -88,6 +88,12 @@ function Examples() {
       { value: 3, label: 'Blue' },
       { value: 4, label: 'Orange' },
     ],
+    listVal2: '',
+    listOptions2: [
+      { value: '', label: 'Please Select the option' },
+      { value: 'foo', label: 'Foo' },
+      { value: 'bar', label: 'Bar' },
+    ],
     tagsVal: [1, 2, 3],
     tagsOptions: [
       { value: 1, label: 'Red' },
@@ -115,6 +121,8 @@ function Examples() {
           {...bind.textVal}
         />
         <TextInput label="Debounced" debounce={500} {...globalProps} {...bind.textVal} />
+        <TextInput label="Read Only" readOnly {...globalProps} {...bind.textVal} />
+        <TextInput label="Password" isPassword {...globalProps} {...bind.textVal} />
         <TextInput
           label="With addons"
           addonBefore="http://"
@@ -162,6 +170,12 @@ function Examples() {
           {...bind.listVal}
           options={s.listOptions}
           allowClear
+        />
+        <ListInput
+          label="Custom Empty"
+          {...globalProps}
+          {...bind.listVal2}
+          options={s.listOptions2}
         />
       </Example>
 

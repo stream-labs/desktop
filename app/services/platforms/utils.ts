@@ -89,6 +89,7 @@ export async function platformRequest<T = unknown>(
         return requestFn();
       });
     }
+    console.log('Failed platform request', req);
     return Promise.reject(error);
   });
 }

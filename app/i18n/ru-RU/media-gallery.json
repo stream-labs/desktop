@@ -27,9 +27,9 @@
   "Example": "Пример",
   "Change Media": "Изменить медиафайл",
   "No Sound": "Нет звука",
-  "No Media": "No Media",
-  "Change Link": "Change Link",
-  "Pick From Gallery": "Pick From Gallery",
-  "Clear Link": "Clear Link",
-  "Media URL": "Media URL"
+  "No Media": "Нет медиафайлов",
+  "Change Link": "Изменить ссылку",
+  "Pick From Gallery": "Выбрать из галереи",
+  "Clear Link": "Очистить ссылку",
+  "Media URL": "URL-адрес медиафайла"
 }

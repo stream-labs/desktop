@@ -27,7 +27,7 @@ import path from 'path';
 import fs from 'fs';
 import { UsageStatisticsService } from 'services/usage-statistics';
 import { SceneCollectionsService } from 'services/scene-collections';
-import electron from 'electron';
+import * as remote from '@electron/remote';
 
 export interface ISettingsValues {
   General: {
@@ -519,7 +519,7 @@ export class SettingsService extends StatefulService<ISettingsServiceState> {
         this.setSettingValue('Output', 'StreamEncoder', 'x264');
       }
 
-      electron.remote.dialog.showMessageBox(this.windowsService.windows.main, {
+      remote.dialog.showMessageBox(this.windowsService.windows.main, {
         type: 'error',
         message:
           'Your stream encoder has been reset to Software (x264). This can be caused by out of date graphics drivers. Please update your graphics drivers to continue using hardware encoding.',

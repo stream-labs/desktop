@@ -14,7 +14,7 @@
   "Connect": "Tilslut",
   "Install Your Theme": "Installer dit tema",
   "Install": "Installer",
-  "facebookGamingWarning": "For at få den bedste oplevelse med Facebook Gaming skal du <create-page-link>oprette en Gaming Video Creator-side</create-page-link>",
+  "facebookGamingWarning": "For at få den bedste oplevelse med Facebook Gaming skal du &lt;create-page-link&gt;oprette en Gaming Video Creator-side&lt;/create-page-link&gt;",
   "Facebook Destination": "Facebook-destination",
   "Share to Your Timeline": "Del på din tidslinje",
   "Share to a Page You Manage": "Del til en side du administrerer",
@@ -30,7 +30,7 @@
   "Please reconnect Facebook to get these new features": "Tilslut til Facebook igen for at kunne bruge de nye funktioner",
   "Reconnect now": "Tilslut igen nu",
   "Privacy": "Beskyttelse af personlige oplysninger",
-  "FBPrivacyWarning": "Det tilladte niveau for beskyttelse af personlige oplysninger kan være begrænset for din Facebook-konto. Du kan læse om Streamlabs-integrationen under \"Hvem kan se at du bruger denne integration\" <link>her</link>",
+  "FBPrivacyWarning": "Det tilladte niveau for beskyttelse af personlige oplysninger kan være begrænset for din Facebook-konto. Du kan læse om Streamlabs-integrationen under \"Hvem kan se at du bruger denne integration\" &lt;link&gt;her&lt;/link&gt;",
   "Only Me": "Kun mig",
   "Do not change privacy settings": "Ændr ikke indstillinger for beskyttelse af personlige oplysninger"
 }

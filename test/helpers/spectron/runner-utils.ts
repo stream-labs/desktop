@@ -28,7 +28,7 @@ const {
 } = process.env;
 
 export const USER_POOL_TOKEN = process.env.SLOBS_TEST_USER_POOL_TOKEN;
-const USER_POOL_URL = 'https://slobs-users-pool.herokuapp.com';
+const USER_POOL_URL = 'https://slobs-users-pool.herokuapp.com'; // 'http://localhost:5000'
 const FAILED_TESTS_PATH = 'test-dist/failed-tests.json'; // failed will be written down to this file
 const TESTS_TIMINGS_PATH = 'test-dist/test-timings.json'; // a known timings for tests should be provided in this file
 const TEST_STATS_PATH = 'test-dist/test-stats.json'; // each successfully completed tests save stats like duration, syncIPCCalls in this file
@@ -157,9 +157,27 @@ export function requestUtilsServer(path: string, method = 'get', body?: unknown)
   });
 }
 
-export async function killElectronInstances() {
+async function getElectronInstances() {
   const tasks = await tasklist();
-  tasks
-    .filter((task: any) => task.imageName === 'electron.exe')
-    .forEach((task: any) => kill(task.pid));
+  return tasks.filter((task: any) => task.imageName === 'electron.exe');
+}
+
+export async function killElectronInstances() {
+  const tasks = await getElectronInstances();
+  tasks.forEach((task: any) => kill(task.pid));
+}
+
+export async function waitForElectronInstancesExist() {
+  const interval = 1000;
+  const timeout = 10000;
+
+  let timeleft = timeout;
+  return new Promise(async resolve => {
+    let tasks: any[] = [];
+    do {
+      tasks = await getElectronInstances();
+      timeleft -= interval;
+    } while (tasks.length || timeleft < 0);
+    resolve();
+  });
 }
