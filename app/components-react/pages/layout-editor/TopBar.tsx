@@ -48,13 +48,14 @@ export default function TopBar() {
         {$t('Add Tab')}
       </button>
       <ListInput
-        style={{ zIndex: 1, margin: '8px 16px 0 0' }}
+        label=""
+        style={{ width: '150px', marginBottom: 0 }}
         value={currentTab}
         onInput={(tab: string) => LayoutService.actions.setCurrentTab(tab)}
         options={tabOptions}
-        tooltip={{ content: $t('Current Tab'), placement: 'bottom' }}
+        tooltip={{ title: $t('Current Tab'), placement: 'bottom' }}
       />
-      {LayoutService.state.currentTab !== 'default' && (
+      {currentTab !== 'default' && (
         <Tooltip title={$t('Delete Current Tab')} placement="bottom">
           <button
             className={cx('button button--warn', styles.removeButton)}

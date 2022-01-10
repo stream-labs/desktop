@@ -22,8 +22,8 @@ export const ImagePickerInput = InputComponent((p: IImagePickerProps) => {
           })}
           onClick={() => p.onInput(option.value)}
         >
-          {!p.isIcons && <img src={option.description} />}
-          {p.isIcons && <i className={option.description} />}
+          {!p.isIcons && <img src={option.label} />}
+          {p.isIcons && <i className={option.label} />}
         </div>
       ))}
     </div>

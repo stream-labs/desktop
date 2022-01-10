@@ -36,21 +36,26 @@ export default function AddTabModal() {
 
   function Footer() {
     return (
-      <div>
+      <>
         <button className="button button--default" onClick={() => setShowModal(false)}>
           {$t('Cancel')}
         </button>
-        <button className="button button--action" onClick={createTab} disabled={!canSave}>
+        <button
+          className="button button--action"
+          onClick={createTab}
+          disabled={!canSave}
+          style={{ marginLeft: '8px' }}
+        >
           {$t('Save New Tab')}
         </button>
-      </div>
+      </>
     );
   }
 
   return (
-    <ModalLayout footer={<Footer />} style={{ width: '400px', height: '350px' }}>
+    <ModalLayout footer={<Footer />} wrapperStyle={{ width: '410px', height: '350px' }}>
       <ImagePickerInput value={icon} onInput={setIcon} options={ICONS} isIcons={true} />
-      <TextInput label={$t('Name')} value={name} onInput={setName} />
+      <TextInput label={$t('Name')} value={name} onInput={setName} style={{ marginTop: '8px' }} />
     </ModalLayout>
   );
 }

@@ -21,10 +21,10 @@ export default function SideBar() {
     <div className={styles.sideBar}>
       <div>
         <div className={styles.title}>{$t('Layouts')}</div>
-        <div className={styles.subtitle} />
-        <Scrollable className={styles.layouts} autoSizeCapable={true}>
+        <Scrollable className={styles.layouts}>
           {Object.keys(ELayout).map(layout => (
             <img
+              key={layout}
               className={currentLayout === layout ? styles.active : ''}
               onClick={() => setCurrentLayout(ELayout[layout])}
               src={layoutImage(ELayout[layout])}
@@ -49,6 +49,7 @@ function ElementList() {
         {Object.keys(ELayoutElement).map((element: ELayoutElement) => (
           <div
             draggable
+            key={element}
             className={styles.elementCell}
             onDragEnd={(e: React.DragEvent<HTMLDivElement>) =>
               handleElementDrag(e, ELayoutElement[element])

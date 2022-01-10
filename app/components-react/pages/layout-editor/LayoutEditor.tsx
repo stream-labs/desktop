@@ -40,7 +40,7 @@ export default function LayoutEditor() {
   }, [currentTab]);
 
   return (
-    <div style={{ flexDirection: 'column' }}>
+    <div style={{ flexDirection: 'column', width: '100%' }}>
       <TopBar />
       <div className={styles.editorContainer}>
         <SideBar />
@@ -95,6 +95,7 @@ function DisplayedLayout() {
         <div
           className={classForSlot(slot)}
           id={slot}
+          key={slot}
           draggable={elementInSlot(slot) && canDragSlot}
           onDragEnter={(): unknown => setHighlightedSlot(slot)}
           onDragExit={(): unknown => setHighlightedSlot(null)}
