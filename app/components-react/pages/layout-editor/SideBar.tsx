@@ -14,7 +14,7 @@ export default function SideBar() {
     const mode = CustomizationService.isDarkTheme ? 'night' : 'day';
     const active = currentLayout === layout ? '-active' : '';
     const className = LayoutService.views.className(layout);
-    return require(`../../../media/images/layouts/${mode}-${className}${active}.png`);
+    return require(`../../../../media/images/layouts/${mode}-${className}${active}.png`);
   }
 
   return (

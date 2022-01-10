@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import cx from 'classnames';
 import { Tooltip } from 'antd';
 import { Services } from 'components-react/service-provider';
@@ -39,7 +39,7 @@ export default function TopBar() {
 
   return (
     <div className={styles.topBar}>
-      <img className={styles.arrow} src={require('../../../media/images/chalk-arrow.png')} />
+      <img className={styles.arrow} src={require('../../../../media/images/chalk-arrow.png')} />
       <button
         className="button button--action"
         style={{ margin: '0 16px' }}
