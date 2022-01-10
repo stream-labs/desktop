@@ -12,8 +12,7 @@ import { throwStreamError } from '../streaming/stream-error';
 import { platformAuthorizedRequest } from './utils';
 import { IGoLiveSettings } from '../streaming';
 import { getDefined } from '../../util/properties-type-guards';
-import {IYoutubeStartStreamOptions} from "./youtube";
-import Utils from "../utils";
+import Utils from '../utils';
 
 interface ITrovoServiceState extends IPlatformState {
   settings: ITrovoStartStreamOptions;
