@@ -20,3 +20,4 @@ export { FontSizeInput } from './FontSizeInput';
 export { FontWeightInput } from './FontWeightInput';
 export { ColorInput } from './ColorInput';
 export { CardInput } from './CardInput';
+export { ImagePickerInput } from './ImagePickerInput';

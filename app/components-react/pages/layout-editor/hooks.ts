@@ -38,7 +38,7 @@ class LayoutEditorModule {
     this.state.showModal = bool;
   }
 
-  handleElementDrag(event: MouseEvent, el: ELayoutElement) {
+  handleElementDrag(event: React.DragEvent<HTMLDivElement>, el: ELayoutElement) {
     const htmlElement = document.elementFromPoint(event.clientX, event.clientY);
     if (!el) return;
     if (!htmlElement) {

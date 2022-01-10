@@ -2,16 +2,18 @@ import React, { useEffect, useState } from 'react';
 import cx from 'classnames';
 import cloneDeep from 'lodash/cloneDeep';
 import styles from './LayoutEditor.m.less';
-import { ELayoutElement, ELayout, LayoutSlot } from 'services/layout';
+import { ELayoutElement, LayoutSlot } from 'services/layout';
 import { $t } from 'services/i18n';
-import Scrollable from 'components-react/shared/Scrollable';
 import { Services } from 'components-react/service-provider';
+import { TextInput } from 'components-react/shared/inputs';
 import { useVuex } from 'components-react/hooks';
 import { useLayoutEditor } from './hooks';
 import TopBar from './TopBar';
+import SideBar from './SideBar';
+import AddTabModal from './AddTabModal';
 
 export default function LayoutEditor() {
-  const { LayoutService, CustomizationService } = Services;
+  const { LayoutService } = Services;
 
   const {
     slottedElements,
@@ -20,7 +22,6 @@ export default function LayoutEditor() {
     currentLayout,
     setCurrentLayout,
     showModal,
-    setShowModal,
   } = useLayoutEditor();
 
   const { currentTab } = useVuex(() => ({
@@ -54,73 +55,22 @@ export default function LayoutEditor() {
       </div>
       {showModal && (
         <div className={styles.modalBackdrop}>
-          <AddTabModal onClose={() => setShowModal(false)} />
+          <AddTabModal />
         </div>
       )}
     </div>
   );
 }
 
-function SideBar() {
-  const { LayoutService, CustomizationService } = Services;
-  const { currentLayout, setCurrentLayout } = useLayoutEditor();
-
-  function layoutImage(layout: ELayout) {
-    const mode = CustomizationService.isDarkTheme ? 'night' : 'day';
-    const active = currentLayout === layout ? '-active' : '';
-    const className = LayoutService.views.className(layout);
-    return require(`../../../media/images/layouts/${mode}-${className}${active}.png`);
-  }
-
-  return (
-    <div className={styles.sideBar}>
-      <div>
-        <div className={styles.title}>{$t('Layouts')}</div>
-        <div className={styles.subtitle} />
-        <Scrollable className={styles.layouts} autoSizeCapable={true}>
-          {Object.keys(ELayout).map(layout => (
-            <img
-              className={currentLayout === layout ? styles.active : ''}
-              onClick={() => setCurrentLayout(ELayout[layout])}
-              src={layoutImage(ELayout[layout])}
-            />
-          ))}
-        </Scrollable>
-      </div>
-      <ElementList />
-    </div>
-  );
-}
-
-function ElementList() {
-  const { LayoutService } = Services;
-  const { slottedElements, setSlottedElements, handleElementDrag } = useLayoutEditor();
-
-  return (
-    <div className={styles.elementList}>
-      <div className={styles.title}>{$t('Elements')}</div>
-      <div className={styles.subtitle}>{$t('Drag and drop to edit.')}</div>
-      <Scrollable className={styles.elementContainer}>
-        {Object.keys(ELayoutElement).map((element: ELayoutElement) => (
-          <div
-            draggable
-            className={styles.elementCell}
-            onDragEnd={(e: DragEvent<HTMLDivElement>) =>
-              handleElementDrag(e, ELayoutElement[element])
-            }
-          >
-            <i className="fas fa-ellipsis-v" />
-            {LayoutService.views.elementTitle(element)}
-          </div>
-        ))}
-      </Scrollable>
-    </div>
-  );
-}
-
 function DisplayedLayout() {
   const { LayoutService } = Services;
-  const { slottedElements, currentLayout, browserUrl, handleElementDrag } = useLayoutEditor();
+  const {
+    slottedElements,
+    currentLayout,
+    browserUrl,
+    setBrowserUrl,
+    handleElementDrag,
+  } = useLayoutEditor();
 
   const [canDragSlot, setCanDragSlot] = useState(true);
   const [highlightedSlot, setHighlightedSlot] = useState<LayoutSlot | null>(null);
@@ -148,16 +98,19 @@ function DisplayedLayout() {
           draggable={elementInSlot(slot) && canDragSlot}
           onDragEnter={(): unknown => setHighlightedSlot(slot)}
           onDragExit={(): unknown => setHighlightedSlot(null)}
-          onDragEnd={(e: MouseEvent) => handleElementDrag(e, ELayoutElement[elementInSlot(slot)])}
+          onDragEnd={(e: React.DragEvent<HTMLDivElement>) =>
+            handleElementDrag(e, ELayoutElement[elementInSlot(slot)])
+          }
         >
           <span>{LayoutService.views.elementTitle(elementInSlot(slot))}</span>
           {elementInSlot(slot) === ELayoutElement.Browser && (
             <TextInput
-              class={styles.urlTextBox}
-              vModel={browserUrl}
+              className={styles.urlTextBox}
+              value={browserUrl}
+              onInput={setBrowserUrl}
               onFocus={() => setCanDragSlot(false)}
               onBlur={() => setCanDragSlot(true)}
-              metadata={{ placeholder: $t('Enter Target URL') }}
+              placeholder={$t('Enter Target URL')}
             />
           )}
         </div>

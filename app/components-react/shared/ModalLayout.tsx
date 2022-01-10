@@ -15,6 +15,7 @@ type TProps = {
   fixedChild?: ReactNode;
   hideFooter?: boolean;
   scrollable?: boolean;
+  style?: React.CSSProperties;
 } & Pick<ModalProps, 'footer' | 'onOk' | 'okText' | 'bodyStyle' | 'confirmLoading'>;
 
 // calculate OS dependent styles
