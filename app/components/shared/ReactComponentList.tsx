@@ -180,6 +180,9 @@ export class PlatformLogo extends ReactComponent<{
   unwrapped?: boolean;
 }> {}
 
+@Component({ props: { name: { default: 'Projector' } } })
+export class Projector extends ReactComponent {}
+
 @Component({
   props: {
     name: { default: 'RecentEvents' },
