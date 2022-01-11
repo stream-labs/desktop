@@ -51,7 +51,8 @@ export default function TopBar() {
         label=""
         style={{ width: '150px', marginBottom: 0 }}
         value={currentTab}
-        onInput={(tab: string) => LayoutService.actions.setCurrentTab(tab)}
+        defaultValue="default"
+        onChange={(tab: string) => LayoutService.actions.setCurrentTab(tab)}
         options={tabOptions}
         tooltip={{ title: $t('Current Tab'), placement: 'bottom' }}
       />

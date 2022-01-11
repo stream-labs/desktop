@@ -32,8 +32,6 @@ export default function AddTabModal() {
     setShowModal(false);
   }
 
-  const canSave = !!icon && !!name;
-
   function Footer() {
     return (
       <>
@@ -43,7 +41,7 @@ export default function AddTabModal() {
         <button
           className="button button--action"
           onClick={createTab}
-          disabled={!canSave}
+          disabled={!icon || !name}
           style={{ marginLeft: '8px' }}
         >
           {$t('Save New Tab')}
@@ -55,7 +53,7 @@ export default function AddTabModal() {
   return (
     <ModalLayout footer={<Footer />} wrapperStyle={{ width: '410px', height: '350px' }}>
       <ImagePickerInput value={icon} onInput={setIcon} options={ICONS} isIcons={true} />
-      <TextInput label={$t('Name')} value={name} onInput={setName} style={{ marginTop: '8px' }} />
+      <TextInput label={$t('Name')} value={name} onChange={setName} style={{ marginTop: '8px' }} />
     </ModalLayout>
   );
 }
