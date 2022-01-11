@@ -167,12 +167,7 @@ export class PatchNotes extends ReactComponent {}
 })
 export class PerformanceMetrics extends ReactComponent<{ mode: 'full' | 'limited' }> {}
 
-@Component({
-  props: {
-    name: { default: 'PlatformLogo' },
-    wrapperStyles: { default: () => ({}) },
-  },
-})
+@Component({ props: { name: { default: 'PlatformLogo' } } })
 export class PlatformLogo extends ReactComponent<{
   platform: string;
   size?: 'medium' | number;
@@ -180,7 +175,9 @@ export class PlatformLogo extends ReactComponent<{
   unwrapped?: boolean;
 }> {}
 
-@Component({ props: { name: { default: 'Projector' } } })
+@Component({
+  props: { name: { default: 'Projector' }, wrapperStyles: { default: () => ({ height: '100%' }) } },
+})
 export class Projector extends ReactComponent {}
 
 @Component({
