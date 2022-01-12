@@ -4,6 +4,7 @@ import { Services } from 'components-react/service-provider';
 import { $t } from 'services/i18n';
 import { TextInput, ImagePickerInput } from 'components-react/shared/inputs';
 import { useLayoutEditor } from './hooks';
+import Form from 'components-react/shared/inputs/Form';
 
 const ICONS = [
   { value: 'icon-studio', label: 'icon-studio' },
@@ -52,8 +53,15 @@ export default function AddTabModal() {
 
   return (
     <ModalLayout footer={<Footer />} wrapperStyle={{ width: '410px', height: '350px' }}>
-      <ImagePickerInput value={icon} onInput={setIcon} options={ICONS} isIcons={true} />
-      <TextInput label={$t('Name')} value={name} onChange={setName} style={{ marginTop: '8px' }} />
+      <Form>
+        <ImagePickerInput value={icon} onInput={setIcon} options={ICONS} isIcons={true} />
+        <TextInput
+          label={$t('Name')}
+          value={name}
+          onChange={setName}
+          style={{ marginTop: '8px' }}
+        />
+      </Form>
     </ModalLayout>
   );
 }
