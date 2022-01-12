@@ -32,6 +32,8 @@ export class CustomizationService
     compactModeStudioController: 'scenes',
     compactModeNewComment: false,
     fullModeWidthOffset: 0,
+    compactBackupPositionX: undefined,
+    compactBackupPositionY: undefined,
 
     experimental: {
       // put experimental features here
@@ -115,8 +117,12 @@ export class CustomizationService
     this.setSettings({ compactModeStudioController: controller });
   }
 
-  setFullModeWidthOffset(newWidthOffset: number) {
-    this.setSettings({ fullModeWidthOffset: newWidthOffset });
+  setFullModeWidthOffset(state: {
+    fullModeWidthOffset: number;
+    compactBackupPositionX: number;
+    compactBackupPositionY: number;
+  }) {
+    this.setSettings(state);
   }
 
   getSettingsFormData(): TObsFormData {

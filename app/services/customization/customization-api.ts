@@ -16,6 +16,8 @@ export interface ICustomizationServiceState {
   compactModeStudioController: TCompactModeStudioController;
   compactModeNewComment: boolean;
   fullModeWidthOffset: number;
+  compactBackupPositionX: number;
+  compactBackupPositionY: number;
   experimental: any;
 }
 
