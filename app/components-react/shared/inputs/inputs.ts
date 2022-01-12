@@ -125,6 +125,11 @@ export function useInput<
   const formContext = useContext(FormContext);
   const form = formContext?.antForm;
 
+  if (!form) {
+    // TODO: allow to add components without wrapping in Form
+    console.error('Input components should be wrapped in Form');
+  }
+
   const inputId = useOnCreate(() => {
     // generate an unique id
     const id = `${name}-${uuid()}`;
