@@ -16,6 +16,16 @@ class LayoutEditorModule {
     return Services.LayoutService;
   }
 
+  get currentTab() {
+    return this.layoutService.state.currentTab;
+  }
+
+  setCurrentTab(tab: string) {
+    this.layoutService.actions.setCurrentTab(tab);
+    this.setCurrentLayout(this.layoutService.state.tabs[tab].currentLayout);
+    this.setSlottedElements(cloneDeep(this.layoutService.state.tabs[tab].slottedElements));
+  }
+
   @mutation()
   setCurrentLayout(layout: ELayout) {
     this.state.currentLayout = layout;

@@ -11,14 +11,20 @@ import { useLayoutEditor } from './hooks';
 
 export default function TopBar() {
   const { LayoutService, NavigationService } = Services;
-  const { slottedElements, browserUrl, currentLayout, setShowModal } = useLayoutEditor();
+  const {
+    slottedElements,
+    browserUrl,
+    currentLayout,
+    setShowModal,
+    setCurrentTab,
+    currentTab,
+  } = useLayoutEditor();
 
-  const { tabOptions, currentTab } = useVuex(() => ({
+  const { tabOptions } = useVuex(() => ({
     tabOptions: Object.keys(LayoutService.state.tabs).map(tab => ({
       value: tab,
       label: LayoutService.state.tabs[tab].name,
     })),
-    currentTab: LayoutService.state.currentTab,
   }));
 
   function removeCurrentTab() {
@@ -52,7 +58,7 @@ export default function TopBar() {
         style={{ width: '150px', marginBottom: 0 }}
         value={currentTab}
         defaultValue="default"
-        onChange={(tab: string) => LayoutService.actions.setCurrentTab(tab)}
+        onChange={setCurrentTab}
         options={tabOptions}
         tooltip={{ title: $t('Current Tab'), placement: 'bottom' }}
       />

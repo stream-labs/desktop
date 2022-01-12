@@ -15,29 +15,13 @@ import AddTabModal from './AddTabModal';
 export default function LayoutEditor() {
   const { LayoutService } = Services;
 
-  const {
-    slottedElements,
-    setSlottedElements,
-    setBrowserUrl,
-    currentLayout,
-    setCurrentLayout,
-    showModal,
-  } = useLayoutEditor();
-
-  const { currentTab } = useVuex(() => ({
-    currentTab: LayoutService.state.currentTab,
-  }));
+  const { slottedElements, setBrowserUrl, currentLayout, showModal } = useLayoutEditor();
 
   useEffect(() => {
     if (slottedElements[ELayoutElement.Browser]) {
       setBrowserUrl(slottedElements[ELayoutElement.Browser]?.src || '');
     }
   }, []);
-
-  useEffect(() => {
-    setCurrentLayout(LayoutService.views.currentTab.currentLayout);
-    setSlottedElements(cloneDeep(LayoutService.views.currentTab.slottedElements));
-  }, [currentTab]);
 
   return (
     <div style={{ flexDirection: 'column', width: '100%' }}>
