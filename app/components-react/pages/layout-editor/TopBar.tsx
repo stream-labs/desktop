@@ -8,6 +8,7 @@ import { ELayoutElement } from 'services/layout';
 import { $t } from 'services/i18n';
 import styles from './LayoutEditor.m.less';
 import { useLayoutEditor } from './hooks';
+import Form from '../../shared/inputs/Form';
 
 export default function TopBar() {
   const { LayoutService, NavigationService } = Services;
@@ -44,7 +45,7 @@ export default function TopBar() {
   }
 
   return (
-    <div className={styles.topBar}>
+    <Form className={styles.topBar}>
       <img className={styles.arrow} src={require('../../../../media/images/chalk-arrow.png')} />
       <button
         className="button button--action"
@@ -57,7 +58,7 @@ export default function TopBar() {
         label=""
         style={{ width: '150px', marginBottom: 0 }}
         value={currentTab}
-        defaultValue="default"
+        // defaultValue="default"
         onChange={setCurrentTab}
         options={tabOptions}
         tooltip={{ title: $t('Current Tab'), placement: 'bottom' }}
@@ -75,6 +76,6 @@ export default function TopBar() {
       <button className="button button--action" onClick={save}>
         {$t('Save Changes')}
       </button>
-    </div>
+    </Form>
   );
 }
