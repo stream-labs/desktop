@@ -481,8 +481,8 @@ export const WidgetDisplayData = (platform?: string): { [x: number]: IWidgetDisp
     description: $t('Set a goal for your viewers to help you reach.'),
     demoVideo: false,
     demoFilename: 'source-follower-goal.png',
-    platforms: new Set(['twitch', 'facebook']),
-    supportList: [$t('Twitch Follows'), $t('Facebook Follows')],
+    platforms: new Set(['twitch', 'facebook', 'trovo']),
+    supportList: [$t('Twitch Follows'), $t('Facebook Follows'), $t('Trovo Follows')],
     icon: 'fas fa-calendar',
   },
   [WidgetType.SubscriberGoal]: {
@@ -536,7 +536,6 @@ export const WidgetDisplayData = (platform?: string): { [x: number]: IWidgetDisp
     demoVideo: true,
     demoFilename: 'source-donation-goal.mp4',
     supportList: [$t('Streamlabs Charity Donations')],
-    platforms: new Set(['twitch', 'youtube', 'facebook']),
     icon: 'fas fa-calendar',
   },
   [WidgetType.DonationTicker]: {

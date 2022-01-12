@@ -49,7 +49,7 @@ export class TrovoService
     channelInfo: { gameId: '', gameName: '', gameImage: '' },
   };
 
-  readonly capabilities = new Set<TPlatformCapability>(['title', 'chat']);
+  readonly capabilities = new Set<TPlatformCapability>(['title', 'chat', 'themes']);
   readonly apiBase = 'https://open-api.trovo.live/openplatform';
   readonly rtmpServer = 'rtmp://livepush.trovo.live/live/';
   readonly platform = 'trovo';
