@@ -2,6 +2,9 @@ import { $t } from '../i18n';
 import { TPlatform } from '../platforms';
 export type TAlertType =
   | 'donation'
+  | 'trSubscription'
+  | 'trFollow'
+  | 'trRaid'
   | 'twSubscription'
   | 'twFollow'
   | 'twCheer'
@@ -58,11 +61,22 @@ export function getAlertsConfig(
       type: 'fbFollow',
       apiKey: 'facebook_follow',
       name: $t('Facebook Follow'),
-      url(platform: TPlatform = 'twitch') {
+      url() {
         return `https://${host}/api/v5/slobs/test/facebook_account/follow`;
       },
       platforms: ['facebook'],
       tooltip: $t('Plays an alert for new Facebook followers'),
+    },
+
+    trFollow: {
+      type: 'trFollow',
+      name: $t('Trovo Follow'),
+      apiKey: 'trovo_follow',
+      url() {
+        return `https://${host}/api/v5/slobs/test/trovo_account/follow`;
+      },
+      platforms: ['trovo'],
+      tooltip: $t('Plays an alert for new Trovo followers'),
     },
 
     twSubscription: {
@@ -75,6 +89,17 @@ export function getAlertsConfig(
       platforms: ['twitch'],
       tooltip: $t('Plays an alert for new Twitch subscriptions'),
       tooltipLink: 'https://help.twitch.tv/s/article/how-to-subscribe',
+    },
+
+    trSubscription: {
+      type: 'trSubscription',
+      apiKey: 'sub',
+      name: $t('Trovo Subscription'),
+      url() {
+        return `https://${host}/api/v5/slobs/test/trovo_account/subscription`;
+      },
+      platforms: ['trovo'],
+      tooltip: $t('Plays an alert for new Trovo subscriptions'),
     },
 
     twCheer: {
@@ -111,6 +136,17 @@ export function getAlertsConfig(
       platforms: ['twitch'],
       tooltip: $t('Plays an alert when another streamer raids your channel'),
       tooltipLink: 'https://help.twitch.tv/s/article/how-to-use-raids',
+    },
+
+    trRaid: {
+      name: $t('Trovo Raid'),
+      type: 'trRaid',
+      apiKey: 'raid',
+      url() {
+        return `https://${host}/api/v5/slobs/test/trovo_account/raid`;
+      },
+      platforms: ['trovo'],
+      tooltip: $t('Plays an alert when another streamer raids your channel'),
     },
 
     ytMembership: {
