@@ -87,12 +87,12 @@
             </div>
             <div class="variation-tile__toolbar">
               <i
-                v-if="variation.id.indexOf('default')"
+                v-if="variation.id.indexOf('default') === -1"
                 class="icon-trash"
                 @click.stop="removeVariation(variation.id)"
               />
               <i
-                v-if="variation.id.indexOf('default')"
+                v-if="variation.id.indexOf('default') === -1"
                 class="icon-edit"
                 @click.stop="editName(variation.id)"
               />
