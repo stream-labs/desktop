@@ -113,7 +113,7 @@ export class TwitchService
 
   // TODO: remove before merge
   // Streamlabs Staging Twitch OAuth Client ID
-  clientId = 'plrbx3k6f2blvm6mo0mllnixnopf2v';
+  clientId = '3eoucd9qwxqh7pu3l0e3rttomgrov2';
 
   init() {
     // prepopulate data to make chat available after app start
