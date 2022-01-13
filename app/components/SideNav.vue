@@ -12,18 +12,17 @@
           <div class="side-nav-item">
             <a
               @click="compactModeTab = 'niconico'"
-              class="link"
-              :class="{ active: compactModeTab === 'niconico' }"
+              class="link niconico-tab"
+              :class="{ active: compactModeTab === 'niconico', 'notify-new-comment': notifyNewComment }"
               data-test="compact-tab-niconico"
             >
-              <!-- TODO notifyNewComment を見てバッジを付ける-->
               <i :class="{ 'icon-namaco': true }" :title="$t('common.compactModeTab.niconico')" />
             </a>
           </div>
           <div class="side-nav-item">
             <a
               @click="compactModeTab = 'studio'"
-              class="link"
+              class="link studio-tab"
               :class="{ active: compactModeTab === 'studio' }"
               data-test="compact-tab-studio"
             >
@@ -38,8 +37,6 @@
         </a>
       </div>
     </div>
-
-    <div class="filler"></div>
 
     <template v-if="!compactMode">
       <div class="bottom-tools">
@@ -92,11 +89,13 @@
 @import '../styles/index';
 
 .side-nav {
+  .dividing-border(right);
+
   display: flex;
   flex-direction: column;
   align-items: center;
   width: 48px;
-  background-color: var(--color-primary-light);
+  background-color: var(--color-bg-quaternary);
 }
 
 .link {
@@ -105,9 +104,10 @@
   justify-content: center;
   width: 48px;
   height: 36px;
+  position: relative;
 
   &.active {
-    color: var(--color-secondary);
+    color: var(--color-icon-active);
   }
 }
 
@@ -118,6 +118,7 @@
 
   .link {
     height: 48px;
+    position: relative;
 
     i {
       font-size: @font-size6;
@@ -140,6 +141,7 @@
 
   .link {
     height: 48px;
+    position: relative;
 
     .icon-video {
       font-size: @font-size5;
@@ -147,6 +149,30 @@
 
     .icon-namaco {
       font-size: @font-size8;
+    }
+  }
+
+  .niconico-tab {
+    // 新着バッジ
+    &:after {
+      content: '';
+      display: block;
+      position: absolute;
+      right: 8px;
+      top: 8px;
+      background-color: var(--color-accent-variant);
+      border-radius: 50%;
+      border: 2px solid var(--color-bg-quaternary);
+      width: 12px;
+      height: 12px;
+      transform: scale(0);
+      .transition;
+    }
+
+    &.notify-new-comment {
+      &:after {
+        transform: scale(1);
+      }
     }
   }
 }
@@ -167,10 +193,6 @@
     background-color: var(--color-border-light);
     margin: 8px 0;
   }
-}
-
-.filler {
-  flex: 2;
 }
 
 .side-nav-profile {
@@ -196,7 +218,7 @@
       height: 12px;
       background-color: var(--color-accent-variant);
       border-radius: 50%;
-      border: 2px solid var(--color-primary-light);
+      border: 2px solid var(--color-bg-quaternary);
     }
   }
 }
