@@ -6,6 +6,7 @@ import { $t } from 'services/i18n';
 import ModalLayout from 'components-react/shared/ModalLayout';
 import Scrollable from 'components-react/shared/Scrollable';
 import { Services } from 'components-react/service-provider';
+import { useSubscription } from 'components-react/hooks/useSubscription';
 
 const getTypeMap = () => ({
   title: {
@@ -58,22 +59,22 @@ export default function MediaGallery() {
   const typeMap = getTypeMap();
 
   useEffect(() => {
-    const socketConnection = WebsocketService.socketEvent.subscribe(ev => {
-      if (ev.type !== 'streamlabs_prime_subscribe') return;
-      fetchGalleryInfo();
-    });
     const filter = WindowsService.state.child.queryParams?.filter;
     if (filter) setType(filter);
     fetchGalleryInfo();
 
     return () => {
-      socketConnection.unsubscribe();
       if (audio) {
         audio.pause();
         setAudio(null);
       }
     };
   }, []);
+
+  useSubscription(WebsocketService.socketEvent, ev => {
+    if (ev.type !== 'streamlabs_prime_subscribe') return;
+    fetchGalleryInfo();
+  });
 
   async function fetchGalleryInfo() {
     setGalleryInfo(await MediaGalleryService.fetchGalleryInfo());
