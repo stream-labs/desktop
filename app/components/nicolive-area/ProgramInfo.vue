@@ -1,6 +1,6 @@
 <template>
   <div class="program-info">
-    <div class="community-icon" :class="{ 'is-live': programStatus === 'onAir' }">
+    <div class="community-icon" :class="{ 'is-onAir': isOnAir }">
       <img :src="communitySymbol" class="community-thumbnail" :alt="communityName" />
     </div>
     <div class="program-info-description">
@@ -126,7 +126,7 @@
     z-index: @z-index-default-content;
   }
 
-  &.is-live {
+  &.is-onAir {
     border-color: var(--color-live);
 
     &:before, &:after {

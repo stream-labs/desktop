@@ -6,7 +6,7 @@ export default class BottomLine extends Vue {
   @Inject()
   nicoliveProgramService: NicoliveProgramService;
 
-  get programStatus(): string {
-    return this.nicoliveProgramService.state.status;
+  get isOnAir(): boolean {
+    return this.nicoliveProgramService.state.status === 'onAir';
   }
 }

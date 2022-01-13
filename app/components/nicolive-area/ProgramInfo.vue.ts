@@ -34,6 +34,10 @@ export default class ProgramInfo extends Vue {
     return this.nicoliveProgramService.state.isCompact;
   }
 
+  get isOnAir(): boolean {
+    return this.nicoliveProgramService.state.status === 'onAir';
+  }
+
   mounted() {
     this.subscription = this.nicoliveProgramService.stateChange.subscribe(state => {
       if (state.status === 'end') {

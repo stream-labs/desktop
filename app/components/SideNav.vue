@@ -115,6 +115,7 @@
   display: flex;
   align-items: center;
   flex-direction: column;
+  margin-bottom: auto;
 
   .link {
     height: 48px;

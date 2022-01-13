@@ -1,5 +1,5 @@
 <template>
-  <div class="bottom-line" :class="{ 'is-live': programStatus === 'onAir' }"></div>
+  <div class="bottom-line" :class="{ 'is-onAir': isOnAir }"></div>
 </template>
 
 <script lang="ts" src="./BottomLine.vue.ts"></script>
@@ -15,7 +15,7 @@
   background-color: var(--color-bottom-line);
   overflow: hidden;
 
-  &.is-live {
+  &.is-onAir {
     position: relative;
 
     &:after {
