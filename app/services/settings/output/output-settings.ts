@@ -2,6 +2,7 @@ import { Service } from 'services/core/service';
 import { ISettingsSubCategory, SettingsService } from 'services/settings';
 import { Inject } from 'services/core/injector';
 import { Dictionary } from 'vuex';
+import { AudioService } from 'app-services';
 
 /**
  * list of encoders for simple mode
@@ -176,6 +177,7 @@ export function obsEncoderToEncoderFamily(
 
 export class OutputSettingsService extends Service {
   @Inject() private settingsService: SettingsService;
+  @Inject() private audioService: AudioService;
 
   /**
    * returns unified settings for the Streaming and Recording encoder
