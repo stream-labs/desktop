@@ -45,7 +45,7 @@
 @import '../styles/index';
 
 .studio-controls {
-  .deviding-border;
+  .dividing-border;
 
   position: relative;
   height: 0;

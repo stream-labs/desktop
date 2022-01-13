@@ -17,12 +17,13 @@
 @import "../styles/index";
 
 .titlebar {
+  .dividing-border(bottom);
+  
   display: flex;
   align-items: center;
   z-index: 1;
   background-color: var(--color-titlebar);
   height: 32px;
-  margin-bottom: 1px;
 }
 
 .titlebar-icon {

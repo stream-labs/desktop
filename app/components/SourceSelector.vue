@@ -102,7 +102,7 @@
   border: none;
 
   .sl-vue-tree-selected > & {
-    background-color: var(--color-active);
+    background-color: var(--color-bg-active);
   }
 }
 
@@ -128,7 +128,7 @@
 }
 
 .sl-vue-tree-gap {
-  width: 20px;
+  width: 24px;
 }
 
 .title-container {
@@ -192,10 +192,11 @@ i.disabled {
 .sl-vue-tree-toggle {
   display: inline-block;
   flex-shrink: 0;
+  margin-right: 4px;
 
   i {
     font-size: 8px;
-    width: 8px;
+    width: 12px;
     color: var(--color-icon);
     text-align: center;
     display: block;

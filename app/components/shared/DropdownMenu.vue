@@ -32,7 +32,7 @@
   padding: 8px;
   max-height: 152px;
   overflow-y: auto;
-  z-index: @popper;
+  z-index: @z-index-popper;
 }
 
 .dropdown-menu__toggle {

@@ -32,17 +32,17 @@
 .sortable-ghost {
   opacity: .7;
   background-image: none;
-  background-color: var(--color-active);
+  background-color: var(--color-bg-active);
 }
 
 .sortable-chosen {
   opacity: .7;
   background-image: none;
-  background-color: var(--color-active);
+  background-color: var(--color-bg-active);
 }
 .sortable-drag {
   border: 1px solid var(--color-border-light);
-  background-color: var(--color-active);
+  background-color: var(--color-bg-active);
 }
 
 .selector-list {
@@ -67,7 +67,7 @@
     color: var(--color-text-hover);
   }
   &.selector-item--active {
-    background-color: var(--color-active);
+    background-color: var(--color-bg-active);
     color: var(--color-text-hover);
   }
 
