@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import electron from 'electron';
 import * as remote from '@electron/remote';
 import { ModalLayout } from 'components-react/shared/ModalLayout';
@@ -7,12 +7,13 @@ import Util from 'services/utils';
 import Scrollable from 'components-react/shared/Scrollable';
 import { Services } from 'components-react/service-provider';
 import { useVuex } from 'components-react/hooks';
+import { useSubscription } from 'components-react/hooks/useSubscription';
 import styles from './Projector.m.less';
 
 export default function Projector() {
   const { WindowsService, SourcesService } = Services;
 
-  const [oldBounds, setOldBounds] = useState<electron.Rectangle | null>(null);
+  const oldBounds = useRef<electron.Rectangle | null>(null);
 
   const windowId = Util.getCurrentUrlParams().windowId;
   const { hideStyleBlockers, fullscreen, sourceId, renderingMode } = useVuex(() => {
@@ -24,20 +25,16 @@ export default function Projector() {
     };
   });
 
-  useEffect(() => {
-    const sourcesSub = SourcesService.sourceRemoved.subscribe(source => {
-      if (source.sourceId === sourceId) {
-        remote.getCurrentWindow().close();
-      }
-    });
-
-    return sourcesSub.unsubscribe;
-  }, []);
+  useSubscription(SourcesService.sourceRemoved, source => {
+    if (source.sourceId === sourceId) {
+      remote.getCurrentWindow().close();
+    }
+  });
 
   function enterFullscreen(display: electron.Display) {
     const currentWindow = remote.getCurrentWindow();
     WindowsService.actions.setOneOffFullscreen(windowId, true);
-    setOldBounds(currentWindow.getBounds());
+    oldBounds.current = currentWindow.getBounds();
     currentWindow.setPosition(display.bounds.x, display.bounds.y);
     currentWindow.setFullScreen(true);
     document.addEventListener('keydown', exitFullscreen);
@@ -49,8 +46,8 @@ export default function Projector() {
     WindowsService.actions.setOneOffFullscreen(windowId, false);
     const currentWindow = remote.getCurrentWindow();
     currentWindow.setFullScreen(false);
-    if (oldBounds) {
-      currentWindow.setBounds(oldBounds);
+    if (oldBounds.current) {
+      currentWindow.setBounds(oldBounds.current);
     }
   }
 
