@@ -9,17 +9,15 @@
       <i class="icon-drop-down-arrow"></i>
     </button>
     <div class="nicolive-area-container" v-if="opened || compactMode">
-      <top-nav v-if="!compactMode" />
       <div class="program-area" :class="{ isCreate: !hasProgram }">
         <template v-if="hasProgram">
           <program-info class="program-area-item" />
-          <tool-bar class="program-area-item" v-if="!compactMode" />
           <program-statistics class="program-area-item" />
           <area-switcher class="switch-area" :contents="contents">
             <template v-slot:commentViewer><comment-viewer /></template>
             <template v-slot:description><program-description /></template>
           </area-switcher>
-          <tool-bar class="program-area-item" v-if="compactMode" />
+          <tool-bar class="program-area-item" />
         </template>
         <template v-else>
           <p class="message">
@@ -63,8 +61,8 @@
 }
 
 .nicolive-area-toggle-button {
-  .deviding-border(left);
-  .deviding-border(right);
+  .dividing-border(left);
+  .dividing-border(right);
 
   width: 24px;
   background-color: var(--color-primary);

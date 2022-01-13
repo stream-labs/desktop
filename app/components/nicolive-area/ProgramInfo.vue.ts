@@ -11,6 +11,7 @@ import {
 } from 'services/nicolive-program/NicoliveFailure';
 import { Subscription } from 'rxjs';
 import Popper from 'vue-popperjs';
+import * as moment from 'moment';
 
 @Component({
   components: {
@@ -26,6 +27,8 @@ export default class ProgramInfo extends Vue {
   programIsMemberOnlyTooltip = 'コミュニティ限定放送';
 
   private subscription: Subscription = null;
+
+  showPopupMenu: boolean = false;
 
   get compactMode(): boolean {
     return this.nicoliveProgramService.state.isCompact;
@@ -215,5 +218,64 @@ export default class ProgramInfo extends Vue {
 
   get communityPageURL(): string {
     return `https://com.nicovideo.jp/community/${this.communityID}`;
+  }
+
+  // TODO: ProgramStatistics.vue.ts から移植しただけなので後で整理する
+  isEditing: boolean = false;
+  async editProgram() {
+    if (this.isEditing) throw new Error('editProgram is running');
+    try {
+      this.isEditing = true;
+      return await this.nicoliveProgramService.editProgram();
+    } catch (e) {
+      // TODO
+      console.warn(e);
+    } finally {
+      this.isEditing = false;
+    }
+  }
+
+  get contentTreeURL(): string {
+    return `https://commons.nicovideo.jp/tree/${this.programID}`;
+  }
+
+  get creatorsProgramURL(): string {
+    return `https://commons.nicovideo.jp/cpp/application/?site_id=nicolive&creation_id=${this.programID}`;
+  }
+
+  get twitterShareURL(): string {
+    const content = this.twitterShareContent();
+    const url = new URL('https://twitter.com/intent/tweet');
+    url.searchParams.append('text', content.text);
+    url.searchParams.append('url', content.url);
+    return url.toString();
+  }
+
+  private twitterShareContent(): { text: string; url: string } {
+    const title = this.nicoliveProgramService.state.title;
+    const url = `https://live.nicovideo.jp/watch/${this.programID}?ref=sharetw`;
+    const time = this.nicoliveProgramService.state.startTime;
+    const formattedTime = moment.unix(time).format('YYYY/MM/DD HH:mm');
+
+    if (this.programStatus === 'reserved' || this.programStatus === 'test') {
+      return {
+        text: `【ニコ生(${formattedTime}開始)】${title}`,
+        url,
+      };
+    }
+
+    if (this.programStatus === 'onAir') {
+      return {
+        text: `【ニコ生配信中】${title}`,
+        url,
+      };
+    }
+
+    if (this.programStatus === 'end') {
+      return {
+        text: `【ニコ生タイムシフト視聴中(${formattedTime}放送)】${title}`,
+        url,
+      };
+    }
   }
 }

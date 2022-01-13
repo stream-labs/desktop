@@ -1,14 +1,15 @@
 <template>
   <div class="program-info">
-    <div class="community-icon">
+    <div class="community-icon" :class="{ 'is-live': programStatus === 'onAir' }">
       <img :src="communitySymbol" class="community-thumbnail" :alt="communityName" />
     </div>
     <div class="program-info-description">
-      <h1 class="program-title" v-tooltip.bottom="programTitle">
+      <h1 class="program-title">
         <a
           :href="watchPageURL"
           @click.prevent="openInDefaultBrowser($event)"
-          class="program-title-link"
+          class="program-title-link link"
+          v-tooltip.bottom="programTitle"
         >
           {{ programTitle }}
         </a>
@@ -22,49 +23,38 @@
         <a
           :href="communityPageURL"
           @click.prevent="openInDefaultBrowser($event)"
-          class="community-name-link"
+          class="community-name-link link"
           v-tooltip.bottom="communityName"
         >
           {{ communityName }}
         </a>
       </h2>
     </div>
-    <popper trigger="hover" :options="{ placement: 'bottom-start' }" v-if="compactMode">
+    <popper 
+      trigger="click"
+      :options="{ placement: 'bottom-end' }"
+      @show="showPopupMenu = true"
+      @hide="showPopupMenu = false"
+    >
       <div class="popper">
-        <ul>
-          <li>TODO</li>
+        <div class="popup-menu-head">{{ programTitle }}</div>
+        <ul class="popup-menu-list">
+          <li class="popup-menu-item"><a @click.prevent="openInDefaultBrowser($event)" :href="watchPageURL" class="link"><i class="icon-browser"></i>番組ページを開く</a></li>
+          <li class="popup-menu-item"><a @click="/*copyProgramURL*/" class="link"><i class="icon-clipboard-copy"></i>番組URLをコピーする</a></li>
+        </ul>
+        <ul class="popup-menu-list">
+          <li class="popup-menu-item"><a @click="editProgram" :disabled="isEditing" class="link"><i class="icon-edit"></i>番組を編集する</a></li>
+        </ul>
+        <ul class="popup-menu-list">
+          <li class="popup-menu-item"><a @click.prevent="openInDefaultBrowser($event)" :href="twitterShareURL" class="link"><i class="icon-twitter"></i>ツイートする</a></li>
+          <li class="popup-menu-item"><a @click.prevent="openInDefaultBrowser($event)" :href="contentTreeURL" class="link"><i class="icon-contents-tree"></i>コンテンツツリーを見る</a></li>
+          <li class="popup-menu-item"><a @click.prevent="openInDefaultBrowser($event)" :href="creatorsProgramURL" class="link"><i class="icon-creator-promotion-program"></i>奨励プログラムに登録する</a></li>
         </ul>
       </div>
-      <div class="indicator" slot="reference">
+      <div class="indicator" :class="{ 'is-show': showPopupMenu }" slot="reference">
         <i class="icon-drop-down-arrow"></i>
       </div>
     </popper>
-    <div class="program-button" v-if="!compactMode">
-      <button
-        v-if="programStatus === 'onAir' || programStatus === 'reserved'"
-        @click="endProgram"
-        :disabled="isEnding || programStatus === 'reserved'"
-        class="button button--end-program button--soft-warning"
-      >
-        番組終了
-      </button>
-      <button
-        v-else-if="programStatus === 'end'"
-        @click="createProgram"
-        :disabled="isCreating"
-        class="button button--create-program"
-      >
-        番組作成
-      </button>
-      <button
-        v-else
-        @click="startProgram"
-        :disabled="isStarting"
-        class="button button--start-program"
-      >
-        番組開始
-      </button>
-    </div>
   </div>
 </template>
 
@@ -81,26 +71,20 @@
 
 .program-info-description {
   min-width: 0;
-  margin-right: auto;
+  flex-grow: 1;
 }
 
 .program-title {
+  display: flex;
+  align-items: center;
   margin-bottom: 4px;
 }
 
 .program-title-link {
-  display: block;
-  color: @white;
+  .text-ellipsis;
+  color: var(--color-text-accent);
   font-size: 14px;
-  font-weight: bold;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  overflow: hidden;
-  text-decoration: none;
-
-  &:hover {
-    color: @text-primary;
-  }
+  font-weight: @font-weight-bold;
 }
 
 .program-button {
@@ -113,45 +97,131 @@
   margin: 0;
 
   .icon-lock {
-    color: @light-grey;
-    font-size: 10px;
-    margin-right: 6px;
+    color: var(--color-icon-primary);
+    font-size: @font-size1;
+    margin-right: 8px;
   }
 }
 
 .community-name-link {
-  color: @light-grey;
-  font-size: 12px;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  overflow: hidden;
-  text-decoration: none;
-
-  &:hover {
-    color: @text-primary;
-  }
+  .text-ellipsis;
+  font-size: @font-size2;
 }
 
 .community-icon {
   margin-right: 16px;
   flex-shrink: 0;
+  position: relative;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 2px solid var(--color-secondary-dark);
 
   .community-thumbnail {
-    width: 48px;
-    height: 48px;
     border-radius: 50%;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    z-index: @z-index-default-content;
+  }
+
+  &.is-live {
+    border-color: var(--color-live);
+
+    &:before, &:after {
+      content: '';
+      display: block;
+      position: absolute;
+      border-radius: 50%;
+      background-color: var(--color-live);
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      
+      animation-duration: 6s;
+      animation-iteration-count: infinite;
+    }
+
+    &::after {
+      animation-name: thumbnail-live-effect1;
+    }
+
+    &::before {
+      animation-name: thumbnail-live-effect2;
+    }
   }
 }
 
-.button--start-program {
-  font-size: 12px;
+.popper {
+  .popper-styling();
+  width: 260px;
 }
 
-.button--end-program {
-  font-size: 12px;
+.indicator {
+  cursor: pointer;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 16px;
+
+  i {
+    font-size: @font-size1;
+  }
+
+  &:hover {
+    background-color: var(--color-bg-active);
+
+    i {
+      color: var(--color-icon-hover);
+    }
+  }
+
+  &.is-show {
+    background-color: var(--color-bg-active);
+
+    i {
+      color: var(--color-icon-active);
+    }
+  }
 }
 
-.button--create-program {
-  font-size: 12px;
+@keyframes thumbnail-live-effect1 {
+    0% {
+        opacity: .8;
+        width: 40px;
+        height: 40px;
+    }
+
+    40% {
+        opacity: 0;
+        width: 50px;
+        height: 50px;
+    }
+
+    100% {
+        opacity: 0;
+    }
+}
+
+@keyframes thumbnail-live-effect2 {
+    0% {
+        opacity: .8;
+        width: 40px;
+        height: 40px;
+    }
+
+    40% {
+        opacity: 0;
+        width: 60px;
+        height: 60px;
+    }
+
+    100% {
+        opacity: 0;
+    }
 }
 </style>

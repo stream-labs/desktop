@@ -78,13 +78,14 @@ h4 {
   display: flex;
   align-items: center;
 
-  &:hover {
+  &:not(:disabled):hover {
     color: var(--color-link-hover);
   }
 
-  &.disabled {
+  &.disabled,
+  &:disabled {
     color: var(--color-link-disabled);
-    cursor: default;
+    cursor: not-allowed;
   }
 
   i {

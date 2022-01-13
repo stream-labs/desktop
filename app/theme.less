@@ -16,12 +16,9 @@
   --color-accent: @accent;
   --color-accent-variant: @accent-hover;
 
-  // active
-  --color-active: rgba(@white, .2);
-
   // border
   --color-border-dark: rgba(@black, .6);
-  --color-border-light: rgba(@grey, .3);
+  --color-border-light: rgba(@grey, .2);
   --color-border-accent:  @text-primary;
 
   // background
@@ -30,6 +27,7 @@
   --color-bg-tertiary: @bg-tertiary;
   --color-bg-quaternary: @bg-quaternary;
   --color-bg-quinary: @bg-quinary;
+  --color-bg-active: rgba(@white, .15);
 
   // text
   --color-text-primary: @light-grey;
@@ -44,6 +42,7 @@
   --color-button-secondary: rgba(@white, .2);
   --color-button-secondary-hover: rgba(@white, .3);
   --color-button-accent: @accent;
+  --color-button-active: @text-primary;
 
   // link
   --color-link: @light-grey;
@@ -55,7 +54,8 @@
   --color-icon: @light-grey;
   --color-icon-hover: @white;
   --color-icon-active: @text-primary;
-  --color-icon-disabled: rgba(@light-grey, .3);
+  --color-icon-disabled: rgba(@grey, .3);
+  --color-icon-alert: @yellow;
 
   // titleBar
   --color-titlebar: @bg-primary;
@@ -65,15 +65,19 @@
 
   // live
   --color-live: @red;
-  --color-live-secondary: @red;
+  --color-live-dark: darken(@red, 20%);
 
   // popper
   --color-popper-bg-light: @bg-quaternary;
-  --color-popper-bg-dark: @bg-secondary;
+  --color-popper-bg-dark: @bg-primary;
 
   // bottom-line
   --color-bottom-line: darken(@text-secondary, 40%);
   --color-bottom-line-active: @text-primary;
+
+  // generic color
+  --color-black: @black;
+  --color-white: @white;
 }
 
 // 実験版（ヘッダー）
