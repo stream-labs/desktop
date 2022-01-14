@@ -237,7 +237,7 @@ export default class MediaGallery extends Vue {
       defaultPath: this.selectedFile.filename,
     });
 
-    if (!this.selectedFile) return;
+    if (!filePath) return;
     this.setBusy($t('Downloading...'));
     await this.mediaGalleryService.downloadFile(filePath, this.selectedFile);
     this.setNotBusy();
