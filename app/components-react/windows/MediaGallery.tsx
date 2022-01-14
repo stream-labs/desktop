@@ -136,9 +136,10 @@ export default function MediaGallery() {
     });
   }
 
-  const title = typeMap.title[type] || $t('All Files');
-  const noFilesCopy = typeMap.noFilesCopy[type] || $t("You don't have any uploaded files!");
-  const noFilesBtn = typeMap.noFilesBtn[type] || $t('Upload A File');
+  const title = (type && typeMap.title[type]) || $t('All Files');
+  const noFilesCopy =
+    (type && typeMap.noFilesCopy[type]) || $t("You don't have any uploaded files!");
+  const noFilesBtn = (type && typeMap.noFilesBtn[type]) || $t('Upload A File');
   const totalUsage = galleryInfo?.totalUsage ?? 0;
   const maxUsage = galleryInfo?.maxUsage ?? 0;
   const usagePct = galleryInfo ? totalUsage / maxUsage : 0;
@@ -162,12 +163,13 @@ export default function MediaGallery() {
     setDragOver(false);
   }
 
-  function handleTypeFilter(t: 'audio' | 'image', c: 'stock' | 'uploads') {
+  function handleTypeFilter(t: 'audio' | 'image' | null, c: 'stock' | 'uploads' | null) {
     if (t !== type) setType(t);
     if (c !== category) setCategory(c);
   }
 
-  function selectFile(file: IMediaGalleryFile, shouldSelect: boolean = false) {
+  function selectFile(file: IMediaGalleryFile, shouldSelect: boolean = false, e: React.MouseEvent) {
+    e.preventDefault();
     if (filter && file.type !== filter) {
       // return this.$toasted.show($t('Not a supported file type'), {
       //   duration: 1000,
@@ -253,7 +255,7 @@ export default function MediaGallery() {
               <i className="icon-cloud-backup" />
               {$t('Drag & Drop Upload')}
             </div>
-            {['uploads', 'stock'].map(cat => (
+            {['uploads', 'stock'].map((cat: 'uploads' | 'stock') => (
               <ul key={cat} className={styles.navList}>
                 <div className={styles.listTitle}>
                   {cat === 'stock' ? $t('Stock Files') : $t('My Uploads')}
@@ -335,20 +337,20 @@ export default function MediaGallery() {
                   >
                     {file.type === 'image' && /\.webm$/.test(file.href) && (
                       <video
-                        autoplay
+                        autoPlay
                         muted
                         loop
                         src={file.href}
                         style={{ height: '100%', width: '100%' }}
                       />
                     )}
-                    {file.type == 'image' && !/\.webm$/.test(file.href) && (
+                    {file.type === 'image' && !/\.webm$/.test(file.href) && (
                       <div
                         className={styles.imagePreview}
                         style={{ backgroundImage: `url(${file.href})` }}
                       />
                     )}
-                    {file.type == 'audio' && (
+                    {file.type === 'audio' && (
                       <i
                         className="icon-music"
                         style={{
