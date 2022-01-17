@@ -1,12 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import cx from 'classnames';
-import cloneDeep from 'lodash/cloneDeep';
 import styles from './LayoutEditor.m.less';
 import { ELayoutElement, LayoutSlot } from 'services/layout';
 import { $t } from 'services/i18n';
 import { Services } from 'components-react/service-provider';
 import { TextInput } from 'components-react/shared/inputs';
-import { useVuex } from 'components-react/hooks';
 import { useLayoutEditor } from './hooks';
 import TopBar from './TopBar';
 import SideBar from './SideBar';
@@ -15,13 +13,7 @@ import AddTabModal from './AddTabModal';
 export default function LayoutEditor() {
   const { LayoutService } = Services;
 
-  const { slottedElements, setBrowserUrl, currentLayout, showModal } = useLayoutEditor();
-
-  useEffect(() => {
-    if (slottedElements[ELayoutElement.Browser]) {
-      setBrowserUrl(slottedElements[ELayoutElement.Browser]?.src || '');
-    }
-  }, []);
+  const { currentLayout, showModal } = useLayoutEditor();
 
   return (
     <div style={{ flexDirection: 'column', width: '100%' }}>

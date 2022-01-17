@@ -41,6 +41,8 @@ class LayoutEditorModule {
     elements: { [Element in ELayoutElement]?: { slot: LayoutSlot; src?: string } },
   ) {
     this.state.slottedElements = elements;
+    if (!elements[ELayoutElement.Browser]) return;
+    this.setBrowserUrl(elements[ELayoutElement.Browser]?.src || '');
   }
 
   @mutation()

@@ -5,7 +5,7 @@ import { IListOption } from './ListInput';
 import InputWrapper from './InputWrapper';
 
 export type TCardInputProps<TValue> = TSlobsInputProps<
-  { options: IListOption<TValue>[]; itemWidth?: number; itemHeight?: number },
+  { options: IListOption<TValue>[]; itemWidth?: number; itemHeight?: number; isIcons?: boolean },
   TValue
 >;
 
@@ -29,7 +29,8 @@ export const CardInput = InputComponent((props: TCardInputProps<string>) => {
 
     return (
       <Col onClick={() => inputAttrs.onChange(opt.value)} style={style} key={opt.value}>
-        <img src={opt.image} style={{ width, height }} />
+        {!props.isIcons && <img src={opt.label} style={{ width, height }} />}
+        {props.isIcons && <i className={opt.label} />}
       </Col>
     );
   }
