@@ -106,14 +106,11 @@ export default function MediaGallery() {
     message.warning($t('You must have Streamlabs Prime to use this media'), 5);
   }
 
-  function files() {
-    if (!galleryInfo) return [];
-    return galleryInfo.files.filter(file => {
-      if (category !== 'stock' && file.isStock !== false) return false;
-      if (category === 'stock' && file.isStock === false) return false;
-      return !(type && file.type !== type);
-    });
-  }
+  const filteredGallery = galleryInfo?.files.filter(file => {
+    if (category !== 'stock' && file.isStock !== false) return false;
+    if (category === 'stock' && file.isStock === false) return false;
+    return !(type && file.type !== type);
+  });
 
   const title = (type && typeMap.title[type]) || $t('All Files');
   const noFilesCopy =
@@ -276,9 +273,9 @@ export default function MediaGallery() {
               />
             )}
             {busy && <div className={styles.busyOverlay} />}
-            {files().length > 0 && (
+            {filteredGallery && (
               <Scrollable className={styles.uploadsManagerList}>
-                {files().map(file => (
+                {filteredGallery.map(file => (
                   <li
                     key={file.href}
                     className={cx(styles.uploadManagerItem, 'radius', {
@@ -338,7 +335,7 @@ export default function MediaGallery() {
               </Scrollable>
             )}
 
-            {files().length < 1 && (
+            {!filteredGallery && (
               <div className={styles.emptyBox}>
                 <div>{noFilesCopy}</div>
                 <div>
