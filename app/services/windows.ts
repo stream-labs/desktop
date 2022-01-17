@@ -33,6 +33,7 @@ import {
   AdvancedAudio,
   SourceShowcase,
   SourceFilters,
+  MediaGallery,
 } from 'components/shared/ReactComponentList';
 
 import SourcePropertiesDeprecated from 'components/windows/SourceProperties.vue';
@@ -43,7 +44,6 @@ import ManageSceneCollections from 'components/windows/ManageSceneCollections.vu
 import RecentEvents from 'components/windows/RecentEvents.vue';
 import GameOverlayEventFeed from 'components/windows/GameOverlayEventFeed';
 import Projector from 'components/windows/Projector.vue';
-import MediaGallery from 'components/windows/MediaGallery.vue';
 import PlatformAppPopOut from 'components/windows/PlatformAppPopOut.vue';
 import EditTransform from 'components/windows/EditTransform';
 import EventFilterMenu from 'components/windows/EventFilterMenu';

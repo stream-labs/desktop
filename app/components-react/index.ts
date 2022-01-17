@@ -36,6 +36,7 @@ import SourceFilters from './windows/SourceFilters';
 import RecentEvents from './editor/elements/RecentEvents';
 import MiniFeed from './editor/elements/Minifeed';
 import BrowserView from './shared/BrowserView';
+import MediaGallery from './windows/MediaGallery';
 
 // list of React components to be used inside Vue components
 export const components = {
@@ -76,4 +77,5 @@ export const components = {
   SourceFilters,
   RecentEvents,
   MiniFeed: createRoot(MiniFeed),
+  MediaGallery,
 };

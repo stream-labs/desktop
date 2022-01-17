@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import electron, { clipboard } from 'electron';
+import { clipboard } from 'electron';
 import * as remote from '@electron/remote';
 import cx from 'classnames';
 import { IMediaGalleryFile, IMediaGalleryInfo } from 'services/media-gallery';
@@ -35,12 +35,6 @@ function formatBytes(bytes: number, argPlaces: number = 1) {
   const base = Math.log(bytes) / Math.log(1024);
   const suffix = ['', 'KB', 'MB', 'GB', 'TB'][Math.floor(base)];
   return Math.round(Math.pow(1024, base - Math.floor(base)) * divisor) / divisor + suffix;
-}
-
-interface IToast {
-  el: HTMLElement;
-  text: Function;
-  goAway: Function;
 }
 
 export default function MediaGallery() {
