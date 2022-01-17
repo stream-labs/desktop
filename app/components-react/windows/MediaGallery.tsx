@@ -10,6 +10,7 @@ import { Services } from 'components-react/service-provider';
 import { useSubscription } from 'components-react/hooks/useSubscription';
 import { useVuex } from 'components-react/hooks';
 import styles from './MediaGallery.m.less';
+import { Tooltip, message } from 'antd';
 
 const getTypeMap = () => ({
   title: {
@@ -56,7 +57,7 @@ export default function MediaGallery() {
   const [type, setType] = useState<'image' | 'audio' | null>(null);
   const [category, setCategory] = useState<'stock' | 'uploads' | null>(null);
   const [galleryInfo, setGalleryInfo] = useState<IMediaGalleryInfo | null>(null);
-  const [busy, setBusy] = useState<IToast | null>(null);
+  const [busy, setBusy] = useState(false);
   const [audio, setAudio] = useState<HTMLAudioElement | null>(null);
 
   const typeMap = getTypeMap();
@@ -99,32 +100,16 @@ export default function MediaGallery() {
 
   async function upload(filepaths: string[]) {
     if (!filepaths || !filepaths.length) return;
-    setToast($t('Uploading...'));
+    setBusy(true);
+    message.loading($t('Uploading...'), 0);
     setGalleryInfo(await MediaGalleryService.upload(filepaths));
-    clearToast();
-  }
-
-  function setToast(text: string) {
-    // this.busy = this.$toasted.show(text, {
-    //   position: 'top-center',
-    //   className: 'toast-busy',
-    // });
-  }
-
-  function clearToast() {
-    // if (!this.busy) return;
-    // this.busy.goAway();
-    // this.busy = null;
+    setBusy(false);
+    message.destroy();
   }
 
   function upgradeToPrime() {
     MagicLinkService.linkToPrime('slobs-media-gallery');
-    setToast;
-    // this.$toasted.show($t('You must have Streamlabs Prime to use this media'), {
-    //   duration: 5000,
-    //   position: 'top-right',
-    //   className: 'toast-prime',
-    // });
+    message.warning($t('You must have Streamlabs Prime to use this media'), 5);
   }
 
   function files() {
@@ -171,11 +156,7 @@ export default function MediaGallery() {
   function selectFile(file: IMediaGalleryFile, shouldSelect: boolean = false, e: React.MouseEvent) {
     e.preventDefault();
     if (filter && file.type !== filter) {
-      // return this.$toasted.show($t('Not a supported file type'), {
-      //   duration: 1000,
-      //   position: 'top-right',
-      //   className: 'toast-alert',
-      // });
+      message.error($t('Not a supported file type'), 1);
     }
     setSelectedFile(file);
     if (file.type === 'audio' && !shouldSelect) {
@@ -213,31 +194,12 @@ export default function MediaGallery() {
     }
   }
 
-  async function handleDownload() {
-    if (!selectedFile) return;
-    const { filePath } = await remote.dialog.showSaveDialog(remote.getCurrentWindow(), {
-      defaultPath: selectedFile.filename,
-    });
-    if (!filePath) return;
-    // setBusy($t('Downloading...'));
-    await MediaGalleryService.actions.return.downloadFile(filePath, selectedFile);
-    // this.setNotBusy();
-  }
-
   async function handleCopy(href: string) {
     try {
       await clipboard.writeText(href);
-      // this.$toasted.show($t('URL Copied'), {
-      //   duration: 1000,
-      //   position: 'top-right',
-      //   className: 'toast-success',
-      // });
+      message.success($t('URL Copied'), 1);
     } catch (e: unknown) {
-      // this.$toasted.show($t('Failed to copy URL'), {
-      //   duration: 1000,
-      //   position: 'top-right',
-      //   className: 'toast-alert',
-      // });
+      message.error($t('Failed to copy URL'), 1);
     }
   }
 
@@ -311,10 +273,6 @@ export default function MediaGallery() {
                 })}
                 onClick={handleDelete}
               />
-              <i
-                className={cx('fa fa-download', { [styles.disabled]: !selectFile })}
-                onClick={handleDownload}
-              ></i>
             </div>
             {dragOver && (
               <div
@@ -363,11 +321,9 @@ export default function MediaGallery() {
                       />
                     )}
                     {!file.prime && (
-                      <i
-                        className="icon-copy"
-                        // v-tooltip.left="$t('Copy URL')"
-                        onClick={() => handleCopy(file.href)}
-                      />
+                      <Tooltip title={$t('Copy URL')} placement="left">
+                        <i className="icon-copy" onClick={() => handleCopy(file.href)} />
+                      </Tooltip>
                     )}
                     <div
                       className={cx(styles.uploadFooter, { [styles.image]: file.type === 'image' })}
