@@ -20,12 +20,6 @@ test('Go through the onboarding and autoconfig', async t => {
     await sleep(1000);
   }
 
-  // Skip purchasing prime
-  if (await (await t.context.app.client.$('div=Choose Starter')).isExisting()) {
-    await (await t.context.app.client.$('div=Choose Starter')).click();
-    await sleep(1000);
-  }
-
   // Don't Import from OBS
   if (await (await t.context.app.client.$('div=Start Fresh')).isExisting()) {
     await (await t.context.app.client.$('div=Start Fresh')).click();
@@ -49,6 +43,11 @@ test('Go through the onboarding and autoconfig', async t => {
   await (await app.client.$('button=Start')).click();
   await (await app.client.$('h2=Sources')).waitForDisplayed({ timeout: 60000 });
 
+  // Skip purchasing prime
+  if (await (await t.context.app.client.$('div=Choose Free')).isExisting()) {
+    await (await t.context.app.client.$('div=Choose Free')).click();
+    await sleep(1000);
+  }
   // success?
   t.true(await (await app.client.$('h2=Sources')).isDisplayed(), 'Sources selector is visible');
 });
