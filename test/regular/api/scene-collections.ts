@@ -1,8 +1,8 @@
-import { useSpectron, test } from '../../helpers/spectron';
+import { runWithSpectron, test } from '../../helpers/spectron';
 import { getApiClient } from '../../helpers/api-client';
 import { SceneCollectionsService } from 'services/scene-collections';
 
-useSpectron({ restartAppAfterEachTest: false });
+runWithSpectron({ restartAppAfterEachTest: false });
 
 test('SceneCollection events', async t => {
   const client = await getApiClient();

@@ -1,12 +1,12 @@
-import { useSpectron, test } from '../../helpers/spectron';
+import { runWithSpectron, test } from '../../helpers/spectron';
 import { getApiClient } from '../../helpers/api-client';
 import { ISourcesServiceApi } from '../../../app/services/sources/sources-api';
-import { useScreentest } from '../screenshoter';
+import { runScreentest } from '../screenshoter';
 import { ScenesService } from 'services/api/external-api/scenes';
 import { focusChild } from '../../helpers/modules/core';
 
-useSpectron({ restartAppAfterEachTest: false });
-useScreentest();
+runWithSpectron({ restartAppAfterEachTest: false });
+runScreentest();
 
 test('Sources showcase window', async t => {
   const client = await getApiClient();

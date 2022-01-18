@@ -1,4 +1,4 @@
-import { test, TExecutionContext, useSpectron } from '../../helpers/spectron';
+import { test, TExecutionContext, runWithSpectron } from '../../helpers/spectron';
 import { ISceneCollectionsServiceApi } from '../../../app/services/scene-collections';
 import { getApiClient } from '../../helpers/api-client';
 import { click, closeWindow, focusChild, focusMain } from '../../helpers/modules/core';
@@ -6,7 +6,7 @@ import { useForm } from '../../helpers/modules/forms';
 import { showSettingsWindow } from '../../helpers/modules/settings/settings';
 import { setFormDropdown } from '../../helpers/spectron/forms';
 
-useSpectron();
+runWithSpectron();
 
 async function clickAdvancedAudio(t: TExecutionContext) {
   const $mixer = await t.context.app.client.$('h2=Mixer');

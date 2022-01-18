@@ -1,8 +1,8 @@
-import { useSpectron, test } from '../../helpers/spectron';
+import { runWithSpectron, test } from '../../helpers/spectron';
 import { getApiClient } from '../../helpers/api-client';
 import { TransitionsService } from 'services/api/external-api/transitions';
 
-useSpectron({ restartAppAfterEachTest: false });
+runWithSpectron({ restartAppAfterEachTest: false });
 
 test('Transitions', async t => {
   const api = await getApiClient();

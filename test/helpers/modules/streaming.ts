@@ -12,7 +12,7 @@ import {
   select,
   selectButton,
   useChildWindow,
-  useMainWindow,
+  runInMainWindow,
   waitForClickable,
   waitForDisplayed,
   waitForEnabled,
@@ -48,7 +48,7 @@ export async function prepareToGoLive() {
  * It opens the EditStreamInfo window or start stream if the conformation dialog has been disabled
  */
 export async function clickGoLive() {
-  await useMainWindow(async () => {
+  await runInMainWindow(async () => {
     await clickButton('Go Live');
   });
 }
@@ -82,7 +82,7 @@ export async function submit() {
 
 export async function waitForStreamStart() {
   // check we're streaming
-  await useMainWindow(async () => {
+  await runInMainWindow(async () => {
     await (await selectButton('End Stream')).waitForExist({ timeout: 20 * 1000 });
   });
 }
@@ -91,7 +91,7 @@ export async function waitForStreamStart() {
  * Click the "End Stream" button and wait until stream stops
  */
 export async function stopStream() {
-  await useMainWindow(async () => {
+  await runInMainWindow(async () => {
     await clickButton('End Stream');
     await waitForStreamStop();
   });
@@ -101,7 +101,7 @@ export async function waitForStreamStop() {
   await sleep(2000); // the stream often starts with delay so we have the "Go Live" button visible for a second even we clicked "Start Stream"
   const ms = 40 * 1000; // we may wait for a long time if the stream key is not valid
 
-  await useMainWindow(async () => {
+  await runInMainWindow(async () => {
     try {
       await waitForDisplayed('button=Go Live', { timeout: ms });
     } catch (e) {
@@ -111,7 +111,7 @@ export async function waitForStreamStop() {
 }
 
 export async function chatIsVisible() {
-  return await useMainWindow(async () => {
+  return await runInMainWindow(async () => {
     return await isDisplayed('a=Refresh Chat');
   });
 }
@@ -143,7 +143,7 @@ export async function switchAdvancedMode() {
  * Open liveDock and edit stream settings
  */
 export async function updateChannelSettings(prefillData: TFormData) {
-  await useMainWindow(async () => {
+  await runInMainWindow(async () => {
     await click('.live-dock'); // open LiveDock
     await click('.icon-edit'); // click Edit
     await focusChild();
@@ -154,7 +154,7 @@ export async function updateChannelSettings(prefillData: TFormData) {
 }
 
 export async function openScheduler() {
-  await useMainWindow(async () => {
+  await runInMainWindow(async () => {
     await click('.icon-date'); // open the StreamScheduler
     await waitForClickable('.ant-picker-calendar-month-select'); // wait for loading
   });
@@ -165,7 +165,7 @@ export async function scheduleStream(date: Date, formData: TFormData) {
   const month = date.toLocaleString('default', { month: 'short' });
   const day = date.getDate();
 
-  await useMainWindow(async () => {
+  await runInMainWindow(async () => {
     await openScheduler();
 
     // select the year

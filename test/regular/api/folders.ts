@@ -1,9 +1,9 @@
-import { useSpectron, test, afterAppStart } from '../../helpers/spectron';
+import { runWithSpectron, test, afterAppStart } from '../../helpers/spectron';
 import { getApiClient } from '../../helpers/api-client';
 import { SceneBuilder } from '../../helpers/scene-builder';
 import { Scene, SceneNode } from 'services/api/external-api/scenes';
 
-useSpectron({ restartAppAfterEachTest: false });
+runWithSpectron({ restartAppAfterEachTest: false });
 
 let sceneBuilder: SceneBuilder;
 let scene: Scene;

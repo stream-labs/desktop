@@ -1,4 +1,4 @@
-import { useSpectron, test } from '../helpers/spectron';
+import { runWithSpectron, test } from '../helpers/spectron';
 import {
   addSource,
   selectSource,
@@ -8,7 +8,7 @@ import {
 import { addScene } from '../helpers/modules/scenes';
 import { focusMain } from '../helpers/modules/core';
 
-useSpectron();
+runWithSpectron();
 
 test('Adding and removing a AudioSource', async t => {
   const app = t.context.app;

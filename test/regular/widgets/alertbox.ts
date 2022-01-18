@@ -1,4 +1,4 @@
-import { test, TExecutionContext, useSpectron } from '../../helpers/spectron';
+import { test, TExecutionContext, runWithSpectron } from '../../helpers/spectron';
 import { addSource, openSourceProperties } from '../../helpers/modules/sources';
 import { logIn } from '../../helpers/modules/user';
 import {
@@ -14,7 +14,7 @@ import { CustomizationService } from '../../../app/services/customization';
 import { assertFormContains, fillForm } from '../../helpers/modules/forms';
 import { sleep } from '../../helpers/sleep';
 
-useSpectron();
+runWithSpectron();
 
 test('AlertBox for Twitch', t => testAlertbox(t, 'twitch'));
 test('AlertBox for YouTube', t => testAlertbox(t, 'youtube'));

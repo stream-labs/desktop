@@ -1,4 +1,4 @@
-import { useSpectron, test, afterAppStart } from '../../helpers/spectron';
+import { runWithSpectron, test, afterAppStart } from '../../helpers/spectron';
 import { getApiClient } from '../../helpers/api-client';
 import { SceneBuilder } from '../../helpers/scene-builder';
 import { SelectionService } from 'services/api/external-api/selection';
@@ -7,10 +7,9 @@ import { ISceneCollectionsServiceApi } from 'services/scene-collections';
 import { ISourcesServiceApi } from 'services/sources';
 import { SourceFiltersService } from 'services/source-filters';
 import { SceneItem, SceneNode, ScenesService } from '../../../app/services/api/external-api/scenes';
-import {sleep} from "../../helpers/sleep";
-import {focusMain} from "../../helpers/modules/core";
+import { focusMain } from '../../helpers/modules/core';
 
-useSpectron({ restartAppAfterEachTest: false });
+runWithSpectron({ restartAppAfterEachTest: false });
 
 let sceneBuilder: SceneBuilder;
 let getNode: (name: string) => SceneNode;

@@ -161,7 +161,7 @@ export async function useWindow<TCallbackResult>(
   return result;
 }
 
-export async function useMainWindow<TCallbackResult>(cb: () => Promise<TCallbackResult>) {
+export async function runInMainWindow<TCallbackResult>(cb: () => Promise<TCallbackResult>) {
   return useWindow('main', cb);
 }
 

@@ -1,10 +1,10 @@
-import { startApp, stopApp, test, useSpectron } from '../../../helpers/spectron';
+import { startApp, stopApp, test, runWithSpectron } from '../../../helpers/spectron';
 import { SceneBuilder } from '../../../helpers/scene-builder';
 import { getApiClient } from '../../../helpers/api-client';
 import { logIn, loginWithAuthInfo } from '../../../helpers/spectron/user';
 import { SceneCollectionsService } from '../../../../app/services/api/external-api/scene-collections';
 
-useSpectron({ noSync: false });
+runWithSpectron({ noSync: false });
 
 test('Scene-collections cloud-backup', async t => {
   // log-in and save the credentials

@@ -4,7 +4,7 @@ import {
   focusChild,
   getFocusedWindowId,
   useChildWindow,
-  useMainWindow
+  runInMainWindow
 } from '../core';
 import { mkdtemp } from 'fs-extra';
 import { tmpdir } from 'os';
@@ -18,7 +18,7 @@ import { getContext } from '../../spectron';
  * If callback provided then focus the child window and execute the callback
  */
 export async function showSettingsWindow(category: string, cb?: () => Promise<unknown>) {
-  await useMainWindow(async () => {
+  await runInMainWindow(async () => {
     await click('.side-nav .icon-settings');
 
     if (category) {

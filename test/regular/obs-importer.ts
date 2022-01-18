@@ -1,4 +1,4 @@
-import { test, useSpectron } from '../helpers/spectron';
+import { test, runWithSpectron } from '../helpers/spectron';
 import { sceneExisting, switchCollection } from '../helpers/modules/scenes';
 import { sourceIsExisting } from '../helpers/modules/sources';
 import { getApiClient } from '../helpers/api-client';
@@ -12,7 +12,7 @@ import { sleep } from '../helpers/sleep';
 
 const path = require('path');
 
-useSpectron({ skipOnboarding: false, beforeAppStartCb: installOBSCache });
+runWithSpectron({ skipOnboarding: false, beforeAppStartCb: installOBSCache });
 
 async function installOBSCache(t: ExecutionContext) {
   // extract OBS config to the cache dir

@@ -1,5 +1,5 @@
 import { readdir } from 'fs-extra';
-import { test, useSpectron } from '../helpers/spectron';
+import { test, runWithSpectron } from '../helpers/spectron';
 import { addSource } from '../helpers/modules/sources';
 import {
   setOutputResolution,
@@ -7,7 +7,7 @@ import {
 } from '../helpers/modules/settings/settings';
 import { focusMain } from '../helpers/modules/core';
 
-useSpectron();
+runWithSpectron();
 
 test('Selective Recording', async t => {
   const sourceType = 'Browser Source';

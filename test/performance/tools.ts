@@ -1,5 +1,10 @@
 let lastEventTime = 0;
-import { afterAppStart, afterAppStop, TExecutionContext, useSpectron } from '../helpers/spectron';
+import {
+  afterAppStart,
+  afterAppStop,
+  TExecutionContext,
+  runWithSpectron,
+} from '../helpers/spectron';
 import test, { ExecutionContext } from 'ava';
 import { getApiClient } from '../helpers/api-client';
 import { PerformanceService } from '../../app/services/performance';
@@ -9,7 +14,7 @@ const path = require('path');
 const fs = require('fs-extra');
 const CONFIG = fs.readJsonSync('test/performance/config.json');
 
-useSpectron({});
+runWithSpectron({});
 
 export function usePerformanceTest() {
   let testName = '';

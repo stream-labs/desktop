@@ -1,4 +1,4 @@
-import { useSpectron, test } from '../../helpers/spectron';
+import { runWithSpectron, test } from '../../helpers/spectron';
 import { getApiClient } from '../../helpers/api-client';
 import { SceneBuilder } from '../../helpers/scene-builder';
 import { sleep } from '../../helpers/sleep';
@@ -6,7 +6,7 @@ import { ScenesService } from '../../../app/services/api/external-api/scenes';
 
 const path = require('path');
 
-useSpectron({ restartAppAfterEachTest: false });
+runWithSpectron({ restartAppAfterEachTest: false });
 
 test('The default scene exists', async t => {
   const client = await getApiClient();
@@ -39,7 +39,7 @@ test('Creating, fetching and removing scenes', async t => {
   let gotError = false;
   try {
     scene2.remove();
-  } catch (e) {
+  } catch (e: unknown) {
     gotError = true;
   }
   t.true(gotError);
@@ -150,7 +150,7 @@ test('Creating nested scenes', async t => {
   let errorIsThrew = false;
   try {
     sceneA.addSource(sceneC.id);
-  } catch (e) {
+  } catch (e: unknown) {
     errorIsThrew = true;
   }
   t.true(errorIsThrew);

@@ -1,4 +1,4 @@
-import { useSpectron, test } from '../helpers/spectron';
+import { runWithSpectron, test } from '../helpers/spectron';
 import { logIn } from '../helpers/spectron/user';
 import { sleep } from '../helpers/sleep';
 import {
@@ -9,7 +9,7 @@ import {
   waitForLoader,
 } from '../helpers/modules/core';
 
-useSpectron();
+runWithSpectron();
 
 // TODO: Enable this test
 test.skip('Twitch 2FA is disabled', async t => {

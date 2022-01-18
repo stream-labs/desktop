@@ -1,9 +1,9 @@
-import { useSpectron, test, skipCheckingErrorsInLog } from '../helpers/spectron';
+import { runWithSpectron, test, skipCheckingErrorsInLog } from '../helpers/spectron';
 import { getApiClient } from '../helpers/api-client';
 import { PerformanceService } from 'app-services';
 import { click, focusChild, waitForDisplayed, waitForText } from '../helpers/modules/core';
 
-useSpectron();
+runWithSpectron();
 
 test('Receiving notifications', async t => {
   const client = await getApiClient();

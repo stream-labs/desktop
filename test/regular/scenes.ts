@@ -1,4 +1,4 @@
-import { useSpectron, test } from '../helpers/spectron';
+import { runWithSpectron, test } from '../helpers/spectron';
 import { addSource, sourceIsExisting } from '../helpers/modules/sources';
 import {
   addScene,
@@ -11,7 +11,7 @@ import { getApiClient } from '../helpers/api-client';
 import { SceneCollectionsService } from 'app-services';
 import { clickButton, focusMain, select, waitForDisplayed } from '../helpers/modules/core';
 
-useSpectron();
+runWithSpectron();
 
 // Checks for the default audio sources
 async function checkDefaultSources() {

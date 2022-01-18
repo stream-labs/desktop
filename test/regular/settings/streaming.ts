@@ -1,4 +1,4 @@
-import { test, useSpectron } from '../../helpers/spectron';
+import { test, runWithSpectron } from '../../helpers/spectron';
 import { logIn } from '../../helpers/spectron/user';
 import { getFormInput } from '../../helpers/spectron/forms';
 import { goLive, stopStream } from '../../helpers/modules/streaming';
@@ -7,7 +7,7 @@ import { showSettingsWindow } from '../../helpers/modules/settings/settings';
 import { click } from '../../helpers/modules/core';
 import { assertFormContains, readFields, useForm } from '../../helpers/modules/forms';
 
-useSpectron();
+runWithSpectron();
 
 test('Populates stream settings after go live', async t => {
   await logIn(t);

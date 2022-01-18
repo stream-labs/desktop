@@ -11,9 +11,9 @@ import { click, clickButton, isDisplayed, waitForDisplayed } from '../../helpers
 import { logIn } from '../../helpers/modules/user';
 import { releaseUserInPool, reserveUserFromPool } from '../../helpers/spectron/user';
 import { showSettingsWindow } from '../../helpers/modules/settings/settings';
-import { test, useSpectron } from '../../helpers/spectron';
+import { test, runWithSpectron } from '../../helpers/spectron';
 
-useSpectron();
+runWithSpectron();
 
 test('Multistream default mode', async t => {
   // login to via Twitch because it doesn't have strict rate limits

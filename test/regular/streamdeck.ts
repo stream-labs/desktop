@@ -1,9 +1,9 @@
-import { test, TExecutionContext, useSpectron } from '../helpers/spectron';
+import { test, TExecutionContext, runWithSpectron } from '../helpers/spectron';
 import { ApiClient, getApiClient } from '../helpers/api-client';
 import { IJsonRpcResponse } from '../../app/services/api/jsonrpc';
 import { cloneDeep } from 'lodash';
 
-useSpectron();
+runWithSpectron();
 
 // Test all API requests that streamdeck device does right after connection
 // tested on Streamdeck v4.5.0

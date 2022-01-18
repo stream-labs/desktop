@@ -1,8 +1,8 @@
-import { test, useSpectron } from '../../helpers/spectron';
+import { test, runWithSpectron } from '../../helpers/spectron';
 import { showSettingsWindow } from '../../helpers/modules/settings/settings';
 import { assertFormContains } from '../../helpers/modules/forms';
 
-useSpectron();
+runWithSpectron();
 
 test('Populates advanced settings', async t => {
   await showSettingsWindow('Advanced');

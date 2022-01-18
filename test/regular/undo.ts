@@ -1,4 +1,4 @@
-import { useSpectron, test, TExecutionContext } from '../helpers/spectron';
+import { runWithSpectron, test, TExecutionContext } from '../helpers/spectron';
 import { addSource, sourceIsExisting } from '../helpers/modules/sources';
 import { SceneBuilder } from '../helpers/scene-builder';
 import {
@@ -8,23 +8,23 @@ import {
   duplicateScene,
   sceneExisting,
 } from '../helpers/modules/scenes';
-import { focusMain, getClient, useMainWindow } from '../helpers/modules/core';
+import { focusMain, getClient, runInMainWindow } from '../helpers/modules/core';
 import { getApiClient } from '../helpers/api-client';
 
-useSpectron({
+runWithSpectron({
   clearCollectionAfterEachTest: true,
   restartAppAfterEachTest: false,
 });
 
 async function undo() {
-  await useMainWindow(async () => {
+  await runInMainWindow(async () => {
     await ((getClient().keys(['Control', 'z']) as any) as Promise<any>);
     await ((getClient().keys('Control') as any) as Promise<any>);
   });
 }
 
 async function redo() {
-  await useMainWindow(async () => {
+  await runInMainWindow(async () => {
     await ((getClient().keys(['Control', 'y']) as any) as Promise<any>);
     await ((getClient().keys('Control') as any) as Promise<any>);
   });

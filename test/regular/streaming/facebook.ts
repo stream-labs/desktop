@@ -7,12 +7,12 @@ import {
   submit,
   waitForStreamStart,
 } from '../../helpers/modules/streaming';
-import { test, useSpectron } from '../../helpers/spectron';
+import { test, runWithSpectron } from '../../helpers/spectron';
 import * as moment from 'moment';
 import { selectFirst, selectMatch } from '../../helpers/modules/forms/list';
 import { click, focusChild, focusMain, select } from '../../helpers/modules/core';
 
-useSpectron();
+runWithSpectron();
 
 test('Streaming to a Facebook Page', async t => {
   await logIn('facebook', { multistream: false });

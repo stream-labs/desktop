@@ -1,7 +1,7 @@
-import { useSpectron, test, afterAppStart } from '../../helpers/spectron';
+import { runWithSpectron, test, afterAppStart } from '../../helpers/spectron';
 import { getApiClient } from '../../helpers/api-client';
 import { ISourcesServiceApi, TSourceType } from '../../../app/services/sources/sources-api';
-import { useScreentest } from '../screenshoter';
+import { runScreentest } from '../screenshoter';
 import { sleep } from '../../helpers/sleep';
 import { ScenesService } from '../../../app/services/api/external-api/scenes';
 import { CustomizationService } from '../../../app/services/customization';
@@ -9,8 +9,8 @@ import { focusChild } from '../../helpers/modules/core';
 
 let showSourceProps: (name: string) => void;
 
-useSpectron({ restartAppAfterEachTest: false });
-useScreentest();
+runWithSpectron({ restartAppAfterEachTest: false });
+runScreentest();
 afterAppStart(async t => {
   const types: TSourceType[] = [
     'image_source',

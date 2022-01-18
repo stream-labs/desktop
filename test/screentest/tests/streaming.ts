@@ -1,7 +1,7 @@
-import { skipCheckingErrorsInLog, test, useSpectron } from '../../helpers/spectron';
+import { skipCheckingErrorsInLog, test, runWithSpectron } from '../../helpers/spectron';
 import { logIn } from '../../helpers/spectron/user';
 import { fillForm, selectTitle } from '../../helpers/form-monkey';
-import { makeScreenshots, useScreentest } from '../screenshoter';
+import { makeScreenshots, runScreentest } from '../screenshoter';
 import { TPlatform } from '../../../app/services/platforms';
 import { fetchMock, installFetchMock, resetFetchMock } from '../../helpers/spectron/network';
 import { getApiClient } from '../../helpers/api-client';
@@ -10,8 +10,8 @@ import { sleep } from '../../helpers/sleep';
 import { prepareToGoLive } from '../../helpers/modules/streaming';
 import { focusChild, focusMain } from '../../helpers/modules/core';
 
-useSpectron();
-useScreentest();
+runWithSpectron();
+runScreentest();
 
 async function addColorSource() {
   const api = await getApiClient();

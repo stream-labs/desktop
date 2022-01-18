@@ -1,9 +1,9 @@
-import { test, useSpectron } from '../helpers/spectron';
+import { test, runWithSpectron } from '../helpers/spectron';
 import { logIn } from '../helpers/spectron/user';
 import { sleep } from '../helpers/sleep';
 import { focusMain } from '../helpers/modules/core';
 
-useSpectron({ skipOnboarding: false });
+runWithSpectron({ skipOnboarding: false });
 
 test('Go through the onboarding and autoconfig', async t => {
   const app = t.context.app;

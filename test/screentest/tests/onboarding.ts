@@ -1,14 +1,14 @@
-import { useSpectron, test } from '../../helpers/spectron';
-import { disableGifAnimations, makeScreenshots, useScreentest } from '../screenshoter';
+import { runWithSpectron, test } from '../../helpers/spectron';
+import { disableGifAnimations, makeScreenshots, runScreentest } from '../screenshoter';
 import { logIn } from '../../helpers/spectron/user';
 import { spawnSync } from 'child_process';
 import { sleep } from '../../helpers/sleep';
-import {focusMain} from "../../helpers/modules/core";
+import { focusMain } from '../../helpers/modules/core';
 const path = require('path');
 const _7z = require('7zip')['7z'];
 
-useSpectron({ skipOnboarding: false });
-useScreentest();
+runWithSpectron({ skipOnboarding: false });
+runScreentest();
 
 test('Onboarding steps', async t => {
   const app = t.context.app;

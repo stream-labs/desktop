@@ -1,4 +1,4 @@
-import { test, TExecutionContext, useSpectron } from '../helpers/spectron';
+import { test, TExecutionContext, runWithSpectron } from '../helpers/spectron';
 import { logIn } from '../helpers/spectron/user';
 import { sleep } from '../helpers/sleep';
 import { FormMonkey } from '../helpers/form-monkey';
@@ -11,7 +11,7 @@ import {
   waitForDisplayed,
 } from '../helpers/modules/core';
 
-useSpectron();
+runWithSpectron();
 
 const OVERLAY_NAME = 'Portals';
 const OVERLAY_SCENES = ['Live Scene', 'Starting Soon', 'Be Right Back', 'Offline'];

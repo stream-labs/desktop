@@ -1,4 +1,10 @@
-import { startApp, stopApp, test, useSpectron, skipCheckingErrorsInLog } from '../helpers/spectron';
+import {
+  startApp,
+  stopApp,
+  test,
+  runWithSpectron,
+  skipCheckingErrorsInLog,
+} from '../helpers/spectron';
 
 import { getApiClient } from '../helpers/api-client';
 const path = require('path');
@@ -9,9 +15,9 @@ import { logIn } from '../helpers/spectron/user';
 import { SceneCollectionsService } from 'services/api/external-api/scene-collections';
 import { ScenesService } from '../../app/services/api/external-api/scenes';
 import { focusChild } from '../helpers/modules/core';
-import {sleep} from "../helpers/sleep";
+import { sleep } from '../helpers/sleep';
 
-useSpectron({ noSync: false });
+runWithSpectron({ noSync: false });
 
 test('Media backup', async t => {
   // sometimes this test causes a console error from Electron's code that is difficult to catch

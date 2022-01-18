@@ -79,7 +79,7 @@ export async function makeScreenshots(t: TExecutionContext, title = '') {
   }
 }
 
-export function useScreentest() {
+export function runScreentest() {
   // detect current branch name
   const currentBranchFile = `${CONFIG.dist}/current-branch.txt`;
   if (fs.existsSync(currentBranchFile)) {

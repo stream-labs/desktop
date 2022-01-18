@@ -1,9 +1,9 @@
-import { test, useSpectron } from '../../helpers/spectron';
+import { test, runWithSpectron } from '../../helpers/spectron';
 import { assertOptions } from '../../helpers/spectron/assertions';
 import { showSettingsWindow } from '../../helpers/modules/settings/settings';
 import { focusMain } from '../../helpers/modules/core';
 
-useSpectron();
+runWithSpectron();
 
 test('Populates audio settings', async t => {
   await showSettingsWindow('Audio');

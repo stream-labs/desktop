@@ -1,12 +1,12 @@
-import { useSpectron, test, TExecutionContext } from '../../helpers/spectron';
+import { runWithSpectron, test, TExecutionContext } from '../../helpers/spectron';
 import { getApiClient } from '../../helpers/api-client';
-import { makeScreenshots, useScreentest } from '../screenshoter';
+import { makeScreenshots, runScreentest } from '../screenshoter';
 import { ScenesService } from 'services/api/external-api/scenes';
 import { TransitionsService } from 'services/transitions';
 import { focusChild } from '../../helpers/modules/core';
 
-useSpectron({ restartAppAfterEachTest: false });
-useScreentest();
+runWithSpectron({ restartAppAfterEachTest: false });
+runScreentest();
 
 test('Transitions', async (t: TExecutionContext) => {
   const client = await getApiClient();

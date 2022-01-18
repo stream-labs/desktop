@@ -1,7 +1,7 @@
-import { restartApp, test, TExecutionContext, useSpectron } from '../../helpers/spectron';
+import { restartApp, test, TExecutionContext, runWithSpectron } from '../../helpers/spectron';
 import { focusChild, focusMain } from '../../helpers/modules/core';
 
-useSpectron();
+runWithSpectron();
 
 test('Populates essential hotkeys for them to be bound', async t => {
   const { app } = t.context;

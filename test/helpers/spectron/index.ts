@@ -8,11 +8,13 @@ import { getUser, logOut } from './user';
 import { sleep } from '../sleep';
 
 import {
-  ITestStats, killElectronInstances,
+  ITestStats,
+  killElectronInstances,
   removeFailedTestFromFile,
   saveFailedTestsToFile,
   saveTestStatsToFile,
-  testFn, waitForElectronInstancesExist,
+  testFn,
+  waitForElectronInstancesExist,
 } from './runner-utils';
 import { skipOnboarding } from '../modules/onboarding';
 import { closeWindow, focusChild, focusMain, waitForLoader } from '../modules/core';
@@ -119,7 +121,7 @@ export function skipCheckingErrorsInLog() {
   skipCheckingErrorsInLogFlag = true;
 }
 
-export function useSpectron(options: ITestRunnerOptions = {}) {
+export function runWithSpectron(options: ITestRunnerOptions = {}) {
   // tslint:disable-next-line:no-parameter-reassignment TODO
   options = Object.assign({}, DEFAULT_OPTIONS, options);
   let appIsRunning = false;
@@ -213,7 +215,6 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
     try {
       await closeWindow('main');
       await waitForElectronInstancesExist();
-
 
       await app.chromeDriver.stop();
     } catch (e: unknown) {

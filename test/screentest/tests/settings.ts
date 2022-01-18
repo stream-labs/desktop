@@ -1,14 +1,13 @@
-import { useSpectron, test, TExecutionContext } from '../../helpers/spectron';
+import { runWithSpectron, test, TExecutionContext } from '../../helpers/spectron';
 import { getApiClient } from '../../helpers/api-client';
-import { makeScreenshots, useScreentest } from '../screenshoter';
+import { makeScreenshots, runScreentest } from '../screenshoter';
 import { SettingsService } from '../../../app/services/settings';
 import { logIn, logOut } from '../../helpers/spectron/user';
 import { sleep } from '../../helpers/sleep';
-import {closeWindow, focusChild} from "../../helpers/modules/core";
+import { closeWindow, focusChild } from '../../helpers/modules/core';
 
-
-useSpectron({ restartAppAfterEachTest: false });
-useScreentest();
+runWithSpectron({ restartAppAfterEachTest: false });
+runScreentest();
 
 test('Settings General', async t => {
   const client = await getApiClient();

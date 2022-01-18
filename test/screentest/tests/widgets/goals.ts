@@ -1,12 +1,12 @@
-import { TExecutionContext, test, useSpectron } from '../../../helpers/spectron/index';
+import { TExecutionContext, test, runWithSpectron } from '../../../helpers/spectron/index';
 import { logIn, logOut } from '../../../helpers/spectron/user';
-import { makeScreenshots, useScreentest } from '../../screenshoter';
+import { makeScreenshots, runScreentest } from '../../screenshoter';
 import { FormMonkey } from '../../../helpers/form-monkey';
 import { addWidget, EWidgetType, waitForWidgetSettingsSync } from '../../../helpers/widget-helpers';
 import { closeWindow } from '../../../helpers/modules/core';
 
-useSpectron({ restartAppAfterEachTest: false });
-useScreentest();
+runWithSpectron({ restartAppAfterEachTest: false });
+runScreentest();
 
 testGoal('Donation Goal', EWidgetType.DonationGoal);
 testGoal('Follower Goal', EWidgetType.FollowerGoal);

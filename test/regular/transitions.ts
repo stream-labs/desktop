@@ -1,11 +1,11 @@
-import { useSpectron, test } from '../helpers/spectron';
+import { runWithSpectron, test } from '../helpers/spectron';
 import { clickSceneTransitions, addScene } from '../helpers/modules/scenes';
 import { getFormInput } from '../helpers/spectron/forms';
 import { dismissModal } from '../helpers/spectron/modals';
 import { FormMonkey } from '../helpers/form-monkey';
 import { click, clickButton, focusChild, focusMain } from '../helpers/modules/core';
 
-useSpectron({
+runWithSpectron({
   restartAppAfterEachTest: false,
   clearCollectionAfterEachTest: true,
 });

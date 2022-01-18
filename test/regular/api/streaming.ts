@@ -1,4 +1,4 @@
-import { TExecutionContext, useSpectron, test } from '../../helpers/spectron';
+import { TExecutionContext, runWithSpectron, test } from '../../helpers/spectron';
 import { getApiClient } from '../../helpers/api-client';
 import {
   IStreamingServiceApi,
@@ -8,7 +8,7 @@ import {
 import { SettingsService } from '../../../app/services/settings';
 import { reserveUserFromPool } from '../../helpers/spectron/user';
 
-useSpectron({ restartAppAfterEachTest: true });
+runWithSpectron({ restartAppAfterEachTest: true });
 
 test('Streaming to Twitch via API', async t => {
   const streamKey = (await reserveUserFromPool(t, 'twitch')).streamKey;

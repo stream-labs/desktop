@@ -1,5 +1,5 @@
 import { readdir } from 'fs-extra';
-import { test, useSpectron } from '../helpers/spectron';
+import { test, runWithSpectron } from '../helpers/spectron';
 import { sleep } from '../helpers/sleep';
 import { startRecording, stopRecording } from '../helpers/modules/streaming';
 import { FormMonkey } from '../helpers/form-monkey';
@@ -10,7 +10,7 @@ import {
 } from '../helpers/modules/settings/settings';
 import { clickButton, focusMain } from '../helpers/modules/core';
 
-useSpectron();
+runWithSpectron();
 
 test('Recording', async t => {
   const tmpDir = await setTemporaryRecordingPath();

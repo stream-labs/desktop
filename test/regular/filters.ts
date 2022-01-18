@@ -1,9 +1,9 @@
-import { useSpectron, test } from '../helpers/spectron';
+import { runWithSpectron, test } from '../helpers/spectron';
 import { addFilter, openFiltersWindow, removeFilter } from '../helpers/modules/filters';
 import { addSource } from '../helpers/modules/sources';
 import { focusChild, isDisplayed, waitForDisplayed } from '../helpers/modules/core';
 
-useSpectron({
+runWithSpectron({
   restartAppAfterEachTest: false,
   clearCollectionAfterEachTest: true,
 });

@@ -1,11 +1,11 @@
-import { afterAppStart, test, useSpectron } from '../../../helpers/spectron';
+import { afterAppStart, test, runWithSpectron } from '../../../helpers/spectron';
 import { logIn } from '../../../helpers/spectron/user';
 import { fillForm } from '../../../helpers/form-monkey';
 import { addWidget, EWidgetType, waitForWidgetSettingsSync } from '../../../helpers/widget-helpers';
-import { useScreentest } from '../../screenshoter';
+import { runScreentest } from '../../screenshoter';
 
-useSpectron({ restartAppAfterEachTest: false });
-useScreentest();
+runWithSpectron({ restartAppAfterEachTest: false });
+runScreentest();
 afterAppStart(async t => {
   await logIn(t);
   await addWidget(t, EWidgetType.ChatBox, 'chatbox');

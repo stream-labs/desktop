@@ -1,10 +1,10 @@
-import { test, useSpectron } from '../../helpers/spectron';
+import { test, runWithSpectron } from '../../helpers/spectron';
 import { addSource } from '../../helpers/modules/sources';
 import { logIn } from '../../helpers/spectron/user';
 import { FormMonkey } from '../../helpers/form-monkey';
 import { waitForWidgetSettingsSync } from '../../helpers/widget-helpers';
 
-useSpectron();
+runWithSpectron();
 
 testGoal('Donation Goal');
 testGoal('Follower Goal');

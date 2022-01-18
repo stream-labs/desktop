@@ -1,5 +1,5 @@
 import { logIn } from '../../helpers/modules/user';
-import { skipCheckingErrorsInLog, test, useSpectron } from '../../helpers/spectron';
+import { skipCheckingErrorsInLog, test, runWithSpectron } from '../../helpers/spectron';
 import {
   chatIsVisible,
   clickGoLive,
@@ -23,7 +23,7 @@ import * as moment from 'moment';
 import { useForm } from '../../helpers/modules/forms';
 import { ListInputController } from '../../helpers/modules/forms/list';
 
-useSpectron();
+runWithSpectron();
 
 test('Streaming to Youtube', async t => {
   await logIn('youtube', { multistream: false });
@@ -37,7 +37,6 @@ test('Streaming to Youtube', async t => {
   t.true(await chatIsVisible(), 'Chat should be visible');
   await stopStream();
 });
-
 
 // TODO flaky
 test.skip('Streaming to the scheduled event on Youtube', async t => {

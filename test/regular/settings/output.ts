@@ -1,8 +1,8 @@
-import { test, useSpectron } from '../../helpers/spectron';
+import { test, runWithSpectron } from '../../helpers/spectron';
 import { setFormDropdown } from '../../helpers/spectron/forms';
 import { focusChild, focusMain } from '../../helpers/modules/core';
 
-useSpectron();
+runWithSpectron();
 
 test('Populates simple output mode settings', async t => {
   const { app } = t.context;
