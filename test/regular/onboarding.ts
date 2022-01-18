@@ -41,13 +41,14 @@ test('Go through the onboarding and autoconfig', async t => {
   // Start auto config
   t.true(await (await app.client.$('button=Start')).isExisting());
   await (await app.client.$('button=Start')).click();
-  await (await app.client.$('h2=Sources')).waitForDisplayed({ timeout: 60000 });
 
   // Skip purchasing prime
   if (await (await t.context.app.client.$('div=Choose Free')).isExisting()) {
     await (await t.context.app.client.$('div=Choose Free')).click();
     await sleep(1000);
   }
+
+  await (await app.client.$('h2=Sources')).waitForDisplayed({ timeout: 60000 });
   // success?
   t.true(await (await app.client.$('h2=Sources')).isDisplayed(), 'Sources selector is visible');
 });
