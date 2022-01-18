@@ -3,7 +3,7 @@ import { disableGifAnimations, makeScreenshots, useScreentest } from '../screens
 import { logIn } from '../../helpers/spectron/user';
 import { spawnSync } from 'child_process';
 import { sleep } from '../../helpers/sleep';
-import {focusMain} from "../../helpers/modules/core";
+import { focusMain } from '../../helpers/modules/core';
 const path = require('path');
 const _7z = require('7zip')['7z'];
 
@@ -20,10 +20,6 @@ test('Onboarding steps', async t => {
   await logIn(t, 'twitch', { prime: false }, false, true);
   await sleep(1000);
   await (await t.context.app.client.$('span=Skip')).click();
-
-  await (await app.client.$('h1=Choose your Streamlabs plan')).waitForDisplayed({ timeout: 15000 });
-  await makeScreenshots(t, 'Prime');
-  await (await app.client.$('div=Choose Starter')).click();
 
   await (await app.client.$('h2=Start Fresh')).waitForDisplayed();
   await makeScreenshots(t, 'Start fresh or import from OBS');
@@ -42,6 +38,10 @@ test('Onboarding steps', async t => {
   await (await app.client.$('button=Start')).click();
   await (await app.client.$('h1=Optimizing... 33%')).waitForDisplayed();
   await makeScreenshots(t, 'Optimization progress');
+
+  await (await app.client.$('h1=Choose your Streamlabs plan')).waitForDisplayed({ timeout: 15000 });
+  await makeScreenshots(t, 'Prime');
+  await (await app.client.$('div=Choose Free')).click();
 
   // success?
   await (await app.client.$('h2=Sources')).waitForDisplayed({ timeout: 60000 });
