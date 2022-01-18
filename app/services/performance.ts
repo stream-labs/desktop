@@ -138,6 +138,8 @@ export class PerformanceService extends StatefulService<IPerformanceState> {
   private streamStartEncodedFrames = 0;
   private streamStartTime: Date;
 
+  statisticsUpdated = new Subject<IPerformanceState>();
+
   @mutation()
   private SET_PERFORMANCE_STATS(stats: Partial<IPerformanceState>) {
     Object.keys(stats).forEach(stat => {
@@ -184,6 +186,7 @@ export class PerformanceService extends StatefulService<IPerformanceState> {
 
         this.SET_PERFORMANCE_STATS(stats);
         this.monitorAndUpdateStats();
+        this.statisticsUpdated.next(this.state);
         this.statsRequestInProgress = false;
       },
     );

@@ -60,6 +60,13 @@ export interface ISettingsValues {
   };
   Video: {
     Base: string;
+    Output: string;
+    ScaleType: string;
+    FPSType: string;
+    FPSCommon: string;
+    FPSInt: number;
+    FPSNum: number;
+    FPSDen: number;
   };
   Audio: Dictionary<TObsValue>;
   Advanced: {
@@ -376,7 +383,7 @@ export class SettingsService extends StatefulService<ISettingsServiceState> {
       parameters.push({
         value: source ? source.getObsInput().settings['device_id'] : null,
         description: `${$t('Desktop Audio Device')} ${deviceInd}`,
-        name: `Desktop Audio ${deviceInd > 1 ? deviceInd : ''}`,
+        name: `Desktop Audio ${deviceInd > 1 ? deviceInd : ''}`.trim(),
         type: 'OBS_PROPERTY_LIST',
         enabled: true,
         visible: true,
@@ -398,7 +405,7 @@ export class SettingsService extends StatefulService<ISettingsServiceState> {
       parameters.push({
         value: source ? source.getObsInput().settings['device_id'] : null,
         description: `${$t('Mic/Auxiliary Device')} ${deviceInd}`,
-        name: `Mic/Aux ${deviceInd > 1 ? deviceInd : ''}`,
+        name: `Mic/Aux ${deviceInd > 1 ? deviceInd : ''}`.trim(),
         type: 'OBS_PROPERTY_LIST',
         enabled: true,
         visible: true,
