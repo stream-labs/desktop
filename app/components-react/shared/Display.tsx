@@ -11,6 +11,7 @@ interface DisplayProps {
   renderingMode?: number;
   onOutputResize?: (region: IRectangle) => void;
   clickHandler?: (event: React.MouseEvent) => void;
+  style?: React.CSSProperties;
 }
 
 export default function Display(props: DisplayProps) {
@@ -77,7 +78,7 @@ export default function Display(props: DisplayProps) {
     <div
       className="display"
       ref={displayEl}
-      style={{ height: '100%', backgroundColor: 'var(--section)', flexGrow: 1 }}
+      style={{ height: '100%', backgroundColor: 'var(--section)', flexGrow: 1, ...p.style }}
       onClick={onClickHandler}
     />
   );
