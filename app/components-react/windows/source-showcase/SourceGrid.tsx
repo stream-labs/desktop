@@ -112,7 +112,7 @@ export default function SourceGrid(p: { activeTab: string }) {
         {showContent('all') && (
           <>
             <Col span={24}>
-              <PageHeader title={$t('Essential Sources')} />
+              <PageHeader style={{ paddingLeft: 0 }} title={$t('Essential Sources')} />
             </Col>
             {essentialSources.essentialDefaults.map(source => (
               <SourceTag key={source.value} type={source.value} essential />
@@ -129,7 +129,7 @@ export default function SourceGrid(p: { activeTab: string }) {
         {showContent('general') && (
           <>
             <Col span={24}>
-              <PageHeader title={$t('General Sources')} />
+              <PageHeader style={{ paddingLeft: 0 }} title={$t('General Sources')} />
             </Col>
             {availableSources.filter(filterEssential).map(source => (
               <SourceTag key={source.value} type={source.value} />
@@ -144,7 +144,7 @@ export default function SourceGrid(p: { activeTab: string }) {
         {showContent('widgets') && (
           <>
             <Col span={24}>
-              <PageHeader title={$t('Widgets')} />
+              <PageHeader style={{ paddingLeft: 0 }} title={$t('Widgets')} />
             </Col>
             {!isLoggedIn ? (
               <Empty
@@ -168,7 +168,7 @@ export default function SourceGrid(p: { activeTab: string }) {
         {showContent('apps') && (
           <>
             <Col span={24}>
-              <PageHeader title={$t('Apps')} />
+              <PageHeader style={{ paddingLeft: 0 }} title={$t('Apps')} />
             </Col>
             {availableAppSources.map(app => (
               <SourceTag
