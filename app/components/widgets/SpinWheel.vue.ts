@@ -73,7 +73,18 @@ export default class SpinWheel extends WidgetSettings<ISpinWheelData, SpinWheelS
     return this.wData.settings.categories.map((cat, i) => ({ title: cat.prize, value: i }));
   }
 
+  clearSections() {
+    this.wData.settings.sections = [];
+    this.save();
+  }
+
+  addSection() {
+    this.wData.settings.sections.push({ category: 0, weight: 1, key: uuid() });
+    this.save();
+  }
+
   editSection(key: string, patch: Partial<ISpinWheelSettings['sections']>) {
+    console.log('section data', this.wData.settings.sections);
     this.wData.settings.sections = this.wData.settings.sections.map(sect => {
       if (sect.key === key) return { ...sect, ...patch };
       return sect;
