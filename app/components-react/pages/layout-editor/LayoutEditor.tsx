@@ -81,14 +81,16 @@ function DisplayedLayout() {
         >
           <span>{LayoutService.views.elementTitle(elementInSlot(slot))}</span>
           {elementInSlot(slot) === ELayoutElement.Browser && (
-            <TextInput
-              className={styles.urlTextBox}
-              value={browserUrl}
-              onInput={setBrowserUrl}
-              onFocus={() => setCanDragSlot(false)}
-              onBlur={() => setCanDragSlot(true)}
-              placeholder={$t('Enter Target URL')}
-            />
+            <div className={styles.urlInput}>
+              <TextInput
+                value={browserUrl}
+                onChange={setBrowserUrl}
+                onFocus={() => setCanDragSlot(false)}
+                onBlur={() => setCanDragSlot(true)}
+                placeholder={$t('Enter Target URL')}
+                nowrap
+              />
+            </div>
           )}
         </div>
       ))}

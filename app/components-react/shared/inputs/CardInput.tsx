@@ -48,7 +48,7 @@ export const CardInput = InputComponent((props: TCardInputProps<string>) => {
   }
   return (
     <InputWrapper {...wrapperAttrs}>
-      <Row justify="start">{p.options.map(renderOption)}</Row>
+      <Row justify={p.isIcons ? 'end' : 'start'}>{p.options.map(renderOption)}</Row>
     </InputWrapper>
   );
 });
