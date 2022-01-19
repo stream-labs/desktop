@@ -422,6 +422,7 @@ export class ObsImporterService extends StatefulService<{ progress: number; tota
     if (
       configJSON.transitions &&
       configJSON.transitions.length > 0 &&
+      // only import if it's a supported transition type
       Object.values<string>(ETransitionType).includes(configJSON.transitions[0].id)
     ) {
       this.transitionsService.deleteAllTransitions();
