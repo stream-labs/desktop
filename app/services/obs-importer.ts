@@ -423,7 +423,10 @@ export class ObsImporterService extends StatefulService<{ progress: number; tota
       configJSON.transitions &&
       configJSON.transitions.length > 0 &&
       // only import if it's a supported transition type
-      this.transitionsService.views.getTypes().map(t => t.value).includes(configJSON.transitions[0].id as ETransitionType)
+      this.transitionsService.views
+        .getTypes()
+        .map(t => t.value)
+        .includes(configJSON.transitions[0].id as ETransitionType)
     ) {
       this.transitionsService.deleteAllTransitions();
       this.transitionsService.createTransition(
