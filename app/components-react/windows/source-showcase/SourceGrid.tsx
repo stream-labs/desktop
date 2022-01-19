@@ -39,9 +39,9 @@ export default function SourceGrid(p: { activeTab: string }) {
   const iterableWidgetTypes = useMemo(
     () =>
       Object.keys(WidgetType)
-        .filter((type: string) => isNaN(Number(type)) || type === 'SubscriberGoal')
+        .filter((type: string) => isNaN(Number(type)) && type !== 'SubscriberGoal')
         .filter((type: string) => {
-          const widgetPlatforms = WidgetDisplayData(primaryPlatform)[WidgetType[type]].platforms;
+          const widgetPlatforms = WidgetDisplayData(primaryPlatform)[WidgetType[type]]?.platforms;
           if (!widgetPlatforms) return true;
           return linkedPlatforms?.some(
             platform => widgetPlatforms && widgetPlatforms.has(platform),
