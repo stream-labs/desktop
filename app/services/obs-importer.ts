@@ -419,7 +419,11 @@ export class ObsImporterService extends StatefulService<{ progress: number; tota
   importTransitions(configJSON: IOBSConfigJSON) {
     // Only import a single transition from OBS for now.
     // Eventually we should import all transitions
-    if (configJSON.transitions && configJSON.transitions.length > 0) {
+    if (
+      configJSON.transitions &&
+      configJSON.transitions.length > 0 &&
+      Object.values<string>(ETransitionType).includes(configJSON.transitions[0].id)
+    ) {
       this.transitionsService.deleteAllTransitions();
       this.transitionsService.createTransition(
         configJSON.transitions[0].id as ETransitionType,
