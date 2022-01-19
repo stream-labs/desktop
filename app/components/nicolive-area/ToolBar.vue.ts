@@ -7,16 +7,27 @@ import {
   NicoliveFailure,
   openErrorDialogFromFailure,
 } from 'services/nicolive-program/NicoliveFailure';
+import Popper from 'vue-popperjs';
 
-@Component({})
+@Component({
+  components: { Popper },
+})
 export default class ToolBar extends Vue {
   @Inject()
   nicoliveProgramService: NicoliveProgramService;
 
-  manualExtentionTooltip = $t('common.manualExtendButton');
+  // TODO: 後で言語ファイルに移動する
+  fetchTooltip = '番組再取得';
+  extentionTooltip = '延長設定';
+
+  showPopupMenu: boolean = false;
 
   get compactMode(): boolean {
     return this.nicoliveProgramService.state.isCompact;
+  }
+
+  get isOnAir(): boolean {
+    return this.nicoliveProgramService.state.status === 'onAir';
   }
 
   format(timeInSeconds: number): string {
