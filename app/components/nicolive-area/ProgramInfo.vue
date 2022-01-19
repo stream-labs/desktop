@@ -30,7 +30,7 @@
         </a>
       </h2>
     </div>
-    <popper 
+    <popper
       trigger="click"
       :options="{ placement: 'bottom-end' }"
       @show="showPopupMenu = true"
@@ -39,16 +39,40 @@
       <div class="popper">
         <div class="popup-menu-head">{{ programTitle }}</div>
         <ul class="popup-menu-list">
-          <li class="popup-menu-item"><a @click.prevent="openInDefaultBrowser($event)" :href="watchPageURL" class="link"><i class="icon-browser"></i>番組ページを開く</a></li>
-          <li class="popup-menu-item"><a @click="/*copyProgramURL*/" class="link"><i class="icon-clipboard-copy"></i>番組URLをコピーする</a></li>
+          <li class="popup-menu-item">
+            <a @click.prevent="openInDefaultBrowser($event)" :href="watchPageURL" class="link"
+              ><i class="icon-browser"></i>番組ページを開く</a
+            >
+          </li>
+          <li class="popup-menu-item">
+            <a @click="/*copyProgramURL*/" class="link"
+              ><i class="icon-clipboard-copy"></i>番組URLをコピーする</a
+            >
+          </li>
         </ul>
         <ul class="popup-menu-list">
-          <li class="popup-menu-item"><a @click="editProgram" :disabled="isEditing" class="link"><i class="icon-edit"></i>番組を編集する</a></li>
+          <li class="popup-menu-item">
+            <a @click="editProgram" :disabled="isEditing" class="link"
+              ><i class="icon-edit"></i>番組を編集する</a
+            >
+          </li>
         </ul>
         <ul class="popup-menu-list">
-          <li class="popup-menu-item"><a @click.prevent="openInDefaultBrowser($event)" :href="twitterShareURL" class="link"><i class="icon-twitter"></i>ツイートする</a></li>
-          <li class="popup-menu-item"><a @click.prevent="openInDefaultBrowser($event)" :href="contentTreeURL" class="link"><i class="icon-contents-tree"></i>コンテンツツリーを見る</a></li>
-          <li class="popup-menu-item"><a @click.prevent="openInDefaultBrowser($event)" :href="creatorsProgramURL" class="link"><i class="icon-creator-promotion-program"></i>奨励プログラムに登録する</a></li>
+          <li class="popup-menu-item">
+            <a @click.prevent="openInDefaultBrowser($event)" :href="twitterShareURL" class="link"
+              ><i class="icon-twitter"></i>ツイートする</a
+            >
+          </li>
+          <li class="popup-menu-item">
+            <a @click.prevent="openInDefaultBrowser($event)" :href="contentTreeURL" class="link"
+              ><i class="icon-contents-tree"></i>コンテンツツリーを見る</a
+            >
+          </li>
+          <li class="popup-menu-item">
+            <a @click.prevent="openInDefaultBrowser($event)" :href="creatorsProgramURL" class="link"
+              ><i class="icon-creator-promotion-program"></i>奨励プログラムに登録する</a
+            >
+          </li>
         </ul>
       </div>
       <div class="indicator" :class="{ 'is-show': showPopupMenu }" slot="reference">
@@ -129,7 +153,8 @@
   &.is-onAir {
     border-color: var(--color-live);
 
-    &:before, &:after {
+    &:before,
+    &:after {
       content: '';
       display: block;
       position: absolute;
@@ -138,7 +163,7 @@
       left: 50%;
       top: 50%;
       transform: translate(-50%, -50%);
-      
+
       animation-duration: 6s;
       animation-iteration-count: infinite;
     }
@@ -191,38 +216,38 @@
 }
 
 @keyframes thumbnail-live-effect1 {
-    0% {
-        opacity: .8;
-        width: 40px;
-        height: 40px;
-    }
+  0% {
+    opacity: 0.8;
+    width: 40px;
+    height: 40px;
+  }
 
-    40% {
-        opacity: 0;
-        width: 50px;
-        height: 50px;
-    }
+  40% {
+    opacity: 0;
+    width: 50px;
+    height: 50px;
+  }
 
-    100% {
-        opacity: 0;
-    }
+  100% {
+    opacity: 0;
+  }
 }
 
 @keyframes thumbnail-live-effect2 {
-    0% {
-        opacity: .8;
-        width: 40px;
-        height: 40px;
-    }
+  0% {
+    opacity: 0.8;
+    width: 40px;
+    height: 40px;
+  }
 
-    40% {
-        opacity: 0;
-        width: 60px;
-        height: 60px;
-    }
+  40% {
+    opacity: 0;
+    width: 60px;
+    height: 60px;
+  }
 
-    100% {
-        opacity: 0;
-    }
+  100% {
+    opacity: 0;
+  }
 }
 </style>

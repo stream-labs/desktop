@@ -12,6 +12,7 @@ import {
 import { Subscription } from 'rxjs';
 import Popper from 'vue-popperjs';
 import * as moment from 'moment';
+import { HostsService } from 'app-services';
 
 @Component({
   components: {
@@ -22,6 +23,7 @@ export default class ProgramInfo extends Vue {
   @Inject()
   nicoliveProgramService: NicoliveProgramService;
   @Inject() streamingService: StreamingService;
+  @Inject() hostsService: HostsService;
 
   // TODO: 後でまとめる
   programIsMemberOnlyTooltip = 'コミュニティ限定放送';
@@ -217,14 +219,13 @@ export default class ProgramInfo extends Vue {
   }
 
   get watchPageURL(): string {
-    return `https://live.nicovideo.jp/watch/${this.programID}`;
+    return this.hostsService.getWatchPageURL(this.programID);
   }
 
   get communityPageURL(): string {
-    return `https://com.nicovideo.jp/community/${this.communityID}`;
+    return this.hostsService.getCommunityPageURL(this.communityID);
   }
 
-  // TODO: ProgramStatistics.vue.ts から移植しただけなので後で整理する
   isEditing: boolean = false;
   async editProgram() {
     if (this.isEditing) throw new Error('editProgram is running');
@@ -240,11 +241,11 @@ export default class ProgramInfo extends Vue {
   }
 
   get contentTreeURL(): string {
-    return `https://commons.nicovideo.jp/tree/${this.programID}`;
+    return this.hostsService.getContentTreeURL(this.programID);
   }
 
   get creatorsProgramURL(): string {
-    return `https://commons.nicovideo.jp/cpp/application/?site_id=nicolive&creation_id=${this.programID}`;
+    return this.hostsService.getCreatorsProgramURL(this.programID);
   }
 
   get twitterShareURL(): string {

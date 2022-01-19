@@ -49,4 +49,20 @@ export class HostsService extends Service {
   get niconicoNAirInformationsFeed() {
     return this.replaceHost('https://blog.nicovideo.jp/niconews/category/se_n-air/feed/index.xml');
   }
+
+  getWatchPageURL(programID: string): string {
+    return `https://live.nicovideo.jp/watch/${programID}`;
+  }
+
+  getCommunityPageURL(communityID: string): string {
+    return `https://com.nicovideo.jp/community/${communityID}`;
+  }
+
+  getContentTreeURL(programID: string): string {
+    return `https://commons.nicovideo.jp/tree/${programID}`;
+  }
+
+  getCreatorsProgramURL(programID: string): string {
+    return `https://commons.nicovideo.jp/cpp/application/?site_id=nicolive&creation_id=${programID}`;
+  }
 }
