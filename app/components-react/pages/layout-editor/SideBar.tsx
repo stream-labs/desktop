@@ -4,14 +4,17 @@ import { ELayoutElement, ELayout } from 'services/layout';
 import { $t } from 'services/i18n';
 import Scrollable from 'components-react/shared/Scrollable';
 import { Services } from 'components-react/service-provider';
+import { useVuex } from 'components-react/hooks';
 import { useLayoutEditor } from './hooks';
 
 export default function SideBar() {
   const { LayoutService, CustomizationService } = Services;
   const { currentLayout, setCurrentLayout } = useLayoutEditor();
+  const { mode } = useVuex(() => ({
+    mode: CustomizationService.views.isDarkTheme ? 'night' : 'day',
+  }));
 
   function layoutImage(layout: ELayout) {
-    const mode = CustomizationService.isDarkTheme ? 'night' : 'day';
     const active = currentLayout === layout ? '-active' : '';
     const className = LayoutService.views.className(layout);
     return require(`../../../../media/images/layouts/${mode}-${className}${active}.png`);
