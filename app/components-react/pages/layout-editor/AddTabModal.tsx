@@ -54,12 +54,22 @@ export default function AddTabModal() {
   return (
     <ModalLayout footer={<Footer />} wrapperStyle={{ width: '410px', height: '350px' }}>
       <Form>
-        <CardInput value={icon} onInput={setIcon} options={ICONS} isIcons={true} />
+        <CardInput
+          value={icon}
+          onInput={setIcon}
+          options={ICONS}
+          isIcons={true}
+          style={{ borderRadius: 4, margin: 4 }}
+          itemWidth={48}
+          itemHeight={48}
+          nowrap
+        />
         <TextInput
           label={$t('Name')}
           value={name}
           onChange={setName}
           style={{ marginTop: '8px' }}
+          uncontrolled={false}
         />
       </Form>
     </ModalLayout>

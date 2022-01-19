@@ -22,6 +22,9 @@ export const CardInput = InputComponent((props: TCardInputProps<string>) => {
     const style = {
       backgroundColor: isSelected ? 'var(--link-active)' : 'var(--solid-input)',
       cursor: 'pointer',
+      width: p.isIcons ? p.itemWidth : undefined,
+      height: p.isIcons ? p.itemHeight : undefined,
+      ...p.style,
     };
 
     const width = `${p.itemWidth}px`;
@@ -29,8 +32,17 @@ export const CardInput = InputComponent((props: TCardInputProps<string>) => {
 
     return (
       <Col onClick={() => inputAttrs.onChange(opt.value)} style={style} key={opt.value}>
-        {!props.isIcons && <img src={opt.label} style={{ width, height }} />}
-        {props.isIcons && <i className={opt.label} />}
+        {!p.isIcons && <img src={opt.label} style={{ width, height }} />}
+        {p.isIcons && (
+          <i
+            className={opt.label}
+            style={{
+              fontSize: Math.round(p.itemWidth * 0.6),
+              padding: Math.round(p.itemWidth * 0.2),
+              display: 'block',
+            }}
+          />
+        )}
       </Col>
     );
   }
