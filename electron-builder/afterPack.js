@@ -65,6 +65,8 @@ exports.default = async function(context) {
     `cp -R ./node_modules/obs-studio-node/Frameworks \"${context.appOutDir}/${context.packager.appInfo.productName}.app/Contents/Resources/app.asar.unpacked/node_modules/\"`,
   );
 
+  if (process.env.SLOBS_NO_SIGN) return;
+
   signBinaries(
     `${context.appOutDir}/${context.packager.appInfo.productName}.app/Contents/Resources/app.asar.unpacked`,
   );
