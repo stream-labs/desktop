@@ -23,13 +23,14 @@ const ICONS = [
 
 export default function AddTabModal() {
   const { LayoutService } = Services;
-  const { setShowModal } = useLayoutEditor();
+  const { setShowModal, setCurrentTab } = useLayoutEditor();
 
   const [name, setName] = useState('');
   const [icon, setIcon] = useState('');
 
-  function createTab() {
-    LayoutService.addTab(name, icon);
+  async function createTab() {
+    const newTabId = await LayoutService.actions.return.addTab(name, icon);
+    setCurrentTab(newTabId);
     setShowModal(false);
   }
 

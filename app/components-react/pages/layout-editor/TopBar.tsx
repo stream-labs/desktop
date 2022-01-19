@@ -28,9 +28,10 @@ export default function TopBar() {
     })),
   }));
 
-  function removeCurrentTab() {
+  async function removeCurrentTab() {
     if (currentTab === 'default') return;
-    LayoutService.actions.removeCurrentTab();
+    await LayoutService.actions.return.removeCurrentTab();
+    setCurrentTab('default');
   }
 
   async function save() {
