@@ -23,7 +23,7 @@
 .popper.dropdown-menu {
   width: 124%;
   position: absolute;
-  background-color: var(--color-popper-bg-dark);
+  background-color: var(--color-popper-bg-light);
   border-color: var(--color-border-light);
   .border;
   .radius;
@@ -42,7 +42,7 @@
   font-size: @font-size4;
   .semibold;
   letter-spacing: .7px;
-  color: var(--color-text-primary);
+  color: var(--color-text);
   overflow: hidden;
 
   i {
@@ -62,7 +62,7 @@
     .text-ellipsis;
 
     display: inline-block;
-    color: var(--color-text-hover);
+    color: var(--color-text-light);
     font-size: @font-size4;
   }
 }
@@ -74,11 +74,11 @@
   overflow: hidden;
   text-overflow: ellipsis;
   cursor: pointer;
-  color: var(--color-text-primary);
+  color: var(--color-text);
 
   &:hover,
   &.active {
-    color: var(--color-text-hover);
+    color: var(--color-text-light);
     &:before {
       content:"\003e";
     }

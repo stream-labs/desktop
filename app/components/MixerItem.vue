@@ -6,7 +6,7 @@
   :data-test-source-type="audioSource.source.type"
 >
 
-  <div class="flex">
+  <div class="title-container">
     <div class="source-name">{{ audioSource.source.name }}</div>
     <div class="db-value">
       <div v-if="audioSource.fader.deflection == 0">-Inf dB</div>
@@ -58,14 +58,16 @@
 
 .mixer-item {
   position: relative;
-  padding: 4px 12px 0;
-  color: var(--color-text-primary);
+  padding: 8px 12px 0;
+  color: var(--color-text);
 
   .source-name {
-    flex: 1; 
+    flex: 1;
+    font-size: @font-size2;
   }
 
   .db-value {
+    font-size: @font-size2;
     width: 60px;
     text-align: right;
   }
@@ -79,11 +81,11 @@
   }
 
   &.muted .icon-mute {
-    color: var(--color-text-secondary);
+    color: var(--color-text-dark);
     opacity: 1;
 
     &:hover {
-      color: var(--color-text-hover);
+      color: var(--color-text-light);
     }
   }
 

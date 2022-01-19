@@ -43,14 +43,14 @@
 .program-statistics-icon {
     font-size: @font-size2;
     margin-right: 8px;
-    color: var(--color-text-secondary);
+    color: var(--color-text-dark);
 }
 
 .program-statistics-value {
     font-size: @font-size2;
     flex-grow: 1;
     text-align: center;
-    color: var(--color-text-primary);
+    color: var(--color-text);
 }
 
 </style>

@@ -8,7 +8,7 @@
 @import '~codemirror/lib/codemirror.css';
 
 body {
-  color: var(--color-text-primary);
+  color: var(--color-text);
   font-size: @font-size4;
   font-family: @font-family;
   font-weight: @font-weight-normal;
@@ -23,7 +23,7 @@ body {
 
 .main {
   background: var(--color-primary-dark);
-  color: var(--color-text-primary);
+  color: var(--color-text);
 }
 
 a {
@@ -89,7 +89,7 @@ h4 {
   }
 
   i {
-    font-size: 14px;
+    font-size: @font-size4;
   }
 }
 
@@ -165,7 +165,7 @@ h4 {
     border: none;
     padding: 0 32px 0 8px;
     font-size: @font-size4;
-    color: var(--color-text-primary);
+    color: var(--color-text);
     .radius;
     .transition;
 
@@ -179,7 +179,7 @@ h4 {
     position: absolute;
     top: 8px;
     right: 8px;
-    font-size: 16px;
+    font-size: @font-size5;
   }
 }
 
@@ -325,19 +325,18 @@ th {
 
 // Scrolls
 ::-webkit-scrollbar {
-  width: 10px;
+  width: 8px;
   height: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: @black;
+  background: transparent;
   border-radius: 0 3px 3px 0;
 }
 
 ::-webkit-scrollbar-thumb {
-  background-color: @accent-light;
-  border: 2px solid @black;
-  border-radius: 10px;
+  background-color: var(--color-scroll-bar);
+  border-radius: 8px;
 }
 
 // Vue transitions

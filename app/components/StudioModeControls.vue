@@ -25,7 +25,7 @@
   padding-top: 16px;
   display: flex;
   align-items: center;
-  color: var(--color-text-accent);
+  color: var(--color-text-light);
 
   &.stacked {
     flex-direction: column;

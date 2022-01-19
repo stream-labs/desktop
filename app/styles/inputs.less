@@ -68,7 +68,7 @@ textarea {
   margin-bottom: 0;
   
   &::placeholder {
-    color: var(--color-text-secondary);
+    color: var(--color-text-dark);
   }
 
   &:focus {
@@ -122,8 +122,7 @@ textarea {
 }
 
 .toggle-label {
-  color: @light-grey;
-  font-size: 12px;
+  color: var(--color-text);
   margin-right: 16px;
 }
 
@@ -151,25 +150,25 @@ textarea {
     width: 32px;
     height: 16px;;
     margin: auto;
-    background-color: @bg-quaternary;
+    background-color: var(--color-border-light);
     border-radius: 8px;
   }
 
   &:after {
     width: 20px;
     height: 20px;
-    background-color: @light-grey;
+    background-color: var(--color-icon);
     border-radius: 100%;
   }
 
   &:checked {
     &:before {
-        background-color: @text-secondary;
+        background-color: var(--color-secondary-dark);
     }
 
     &:after {
       left: 12px;
-      background-color: @text-active;
+      background-color: var(--color-secondary);
     }
   }
 }

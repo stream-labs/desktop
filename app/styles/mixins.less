@@ -307,8 +307,9 @@
   transition: all 275ms;
 }
 
-.bg-hover(@color: @white) {
-  background-color: rgba(@color, .06);
+.bg-hover {
+  .transition;
+  background-color: var(--color-bg-active);
 }
 
 .bg-active(@color: @black) {
@@ -330,14 +331,14 @@
   font-size: @font-size2;
   white-space: nowrap;
   letter-spacing: .1em;
-  color: var(--color-text-accent);
+  color: var(--color-text-light);
 }
 
 .popper-styling() {
-  .shadow();
+  .shadow;
   z-index: @z-index-popper;
   border-radius: 4px;
-  background-color: var(--color-popper-bg-dark);
+  background-color: var(--color-popper-bg-light);
   border: 1px solid var(--color-border-light);
   padding: 0;
 
@@ -356,7 +357,7 @@
   }
 
   .popup-menu-head {
-    color: var(--color-text-accent);
+    color: var(--color-text-light);
     font-size: @font-size4;
     font-weight: @font-weight-bold;
     text-align: left;
@@ -368,11 +369,12 @@
       width: 100%;
       line-height: 32px;
       padding: 0 16px;
+      font-size: @font-size2;
     }
 
     a, button {
       &:not(:disabled):hover {
-        color: var(--color-text-hover);
+        color: var(--color-text-light);
         background-color: var(--color-bg-active);
       }
     }

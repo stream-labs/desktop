@@ -19,7 +19,7 @@
   // border
   --color-border-dark: rgba(@black, .6);
   --color-border-light: rgba(@grey, .2);
-  --color-border-accent:  @text-primary;
+  --color-border-accent:  @text-secondary;
 
   // background
   --color-bg-primary: @bg-primary;
@@ -27,13 +27,13 @@
   --color-bg-tertiary: @bg-tertiary;
   --color-bg-quaternary: @bg-quaternary;
   --color-bg-quinary: @bg-quinary;
-  --color-bg-active: rgba(@white, .15);
+  --color-bg-active: rgba(@white, .2);
 
   // text
-  --color-text-primary: @light-grey;
-  --color-text-secondary: @grey;
-  --color-text-hover: @white;
-  --color-text-accent: @white;
+  --color-text: @light-grey;
+  --color-text-light: @white;
+  --color-text-dark: @grey;
+  --color-text-active: @text-primary;
 
   // button
   --color-button-label: @white;
@@ -68,16 +68,24 @@
   --color-live-dark: darken(@red, 20%);
 
   // popper
-  --color-popper-bg-light: @bg-quaternary;
-  --color-popper-bg-dark: @bg-primary;
+  --color-popper-bg-light: rgba(@bg-primary, .98);
+  --color-popper-bg-dark: rgba(@bg-secondary, .98);
 
   // bottom-line
   --color-bottom-line: darken(@text-secondary, 40%);
   --color-bottom-line-active: @text-primary;
 
+  // scroll 
+  --color-scroll-bar: rgba(@grey, .4);
+
   // generic color
   --color-black: @black;
   --color-white: @white;
+
+  // brand color
+  --color-brand-nicoad: @nicoad-brand-color;
+  --color-brand-emotion: @emotion-brand-color;
+  --color-brand-gift: @gift-brand-color;
 }
 
 // 実験版（ヘッダー）

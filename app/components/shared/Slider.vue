@@ -78,7 +78,7 @@
     width: 5px;
     height: 5px;
     border-radius: 50%;
-    background-color: var(--color-text-secondary);
+    background-color: var(--color-text-dark);
   }
 }
 

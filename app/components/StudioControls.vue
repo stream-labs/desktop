@@ -125,7 +125,7 @@
   height: 48px;
   line-height: 48px;
   text-decoration: none;
-  color: var(--color-text-primary);
+  color: var(--color-text);
   position: relative;
   padding: 0 8px;
 
@@ -155,7 +155,7 @@
 }
 
 .studio-controls__label {
-  color: var(--color-text-accent);
+  color: var(--color-text-light);
   margin-bottom: 0;
   font-size: @font-size4;
   .semibold;

@@ -115,13 +115,13 @@
   align-items: center;
 
   font-size: @font-size4;
-  color: var(--color-text-primary);
+  color: var(--color-text);
   line-height: 24px;
   text-align: center;
   margin-bottom: 24px;
 
   i {
-    color: var(--color-text-secondary);
+    color: var(--color-text-dark);
     font-size: 88px;
     margin-bottom: 16px;
   }
@@ -159,7 +159,7 @@
   .devider-label {
     font-size: @font-size2;
     padding: 0 8px;
-    color: var(--color-text-secondary);
+    color: var(--color-text-dark);
   }
 
   &:before,
@@ -167,7 +167,7 @@
     content: '';
     height: 1px;
     flex-grow: 1;
-    background-color: var(--color-text-secondary);
+    background-color: var(--color-text-dark);
   }
 }
 </style>

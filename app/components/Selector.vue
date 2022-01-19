@@ -60,15 +60,15 @@
   cursor: pointer;
   justify-content: space-between;
 
-  .text-ellipsis();
+  .text-ellipsis;
   .transition;
 
   &:hover {
-    color: var(--color-text-hover);
+    color: var(--color-text-light);
   }
   &.selector-item--active {
     background-color: var(--color-bg-active);
-    color: var(--color-text-hover);
+    color: var(--color-text-light);
   }
 
   &:hover {
@@ -87,8 +87,9 @@
   }
 }
 .selector-item-text {
-  .text-ellipsis();
+  .text-ellipsis;
   display: flex;
+  align-items: center;
 }
 
 .selector-actions {
@@ -100,7 +101,7 @@
 
 .selector-drag-handle {
   cursor: move;
-  .icon-hover();
+  .icon-hover;
 }
 
 </style>

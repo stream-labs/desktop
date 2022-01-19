@@ -82,7 +82,7 @@
 
 .program-title-link {
   .text-ellipsis;
-  color: var(--color-text-accent);
+  color: var(--color-text-light);
   font-size: 14px;
   font-weight: @font-weight-bold;
 }
@@ -159,6 +159,7 @@
 }
 
 .indicator {
+  .transition;
   cursor: pointer;
   border-radius: 50%;
   width: 24px;

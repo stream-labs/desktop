@@ -73,7 +73,7 @@
   display: inline-block;
   color: var(--color-titlebar-action);
 
-  &:hover {
+  &:not(:disabled):hover {
     color: var(--color-titlebar-action-hover);
   }
 }

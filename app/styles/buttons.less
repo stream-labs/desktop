@@ -13,7 +13,7 @@ button {
   font-size: @font-size4;
   color: var(--color-button-label);
   background-color: var(--color-button-primary);
-  padding: 0 8px;
+  padding: 0 16px;
   letter-spacing: 0;
 
   &:disabled {
@@ -48,15 +48,15 @@ button {
 }
 
 .button--action {
-  background-color: @accent;
+  background-color: var(--color-button-accent);
   color: @white;
 
   &:hover {
-    background-color: lighten(@accent, 4%);
+    background-color: var(--color-button-accent);
   }
 
   &:focus {
-    background-color: @accent;
+    background-color: var(--color-button-accent);
   }
 }
 
@@ -68,6 +68,23 @@ button {
   &:hover, &:focus {
     background-color: @grey;
     cursor: default;
+  }
+}
+
+// live中の赤ボタン
+.button--live {
+  background-color: var(--color-live);
+  border: 1px solid var(--color-live);
+
+  &:focus,
+  &:hover {
+    background-color: var(--color-live-dark);
+  }
+
+  &:disabled,
+  &:disabled:hover {
+    background-color: var(--color-live-dark);
+    border: none;
   }
 }
 
@@ -91,14 +108,14 @@ button {
 }
 
 .button--semi-opac {
-  background: var(--color-button-seconday);
+  background: var(--color-button-secondary);
 
   &:hover {
     background: var(--color-button-seconday-hover);
   }
 
   &:focus {
-    background: rgba(255, 255, 255, .1);
+    background: var(--color-button-seconday-hover);
   }
 }
 
@@ -286,4 +303,28 @@ button {
   align-items: center;
   justify-content: center;
   .transition;
+}
+
+.button--circle {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  cursor: pointer;
+  .transition;
+
+  i {
+    font-size: @font-size5;
+    color: var(--color-button-label);
+  }
+
+  &.active {
+    background-color: var(--color-button-active);
+
+    i {
+      color: var(--color-primary-dark);
+    }
+  }
 }
