@@ -1,8 +1,10 @@
 import Vue from 'vue';
+import { Component } from 'vue-property-decorator';
 import { $t } from 'services/i18n';
 import { Inject } from 'services/core/injector';
 import { NicoliveProgramService } from 'services/nicolive-program/nicolive-program';
 
+@Component({})
 export default class ProgramStatistics extends Vue {
   @Inject()
   nicoliveProgramService: NicoliveProgramService;
