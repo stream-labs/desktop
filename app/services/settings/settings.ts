@@ -305,6 +305,8 @@ export class SettingsService extends StatefulService<ISettingsServiceState> {
       categories = categories.concat('Installed Apps');
     }
 
+    categories.push('Get Support');
+
     return categories;
   }
 

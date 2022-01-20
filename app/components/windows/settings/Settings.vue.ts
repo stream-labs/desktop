@@ -76,6 +76,7 @@ export default class Settings extends Vue {
     'Remote Control': 'fas fa-play-circle',
     Experimental: 'fas fa-flask',
     'Installed Apps': 'icon-store',
+    'Get Support': 'icon-question',
   };
 
   internalCategoryName: string = null;
@@ -138,6 +139,7 @@ export default class Settings extends Vue {
       // 'RemoteControl',
       // 'VirtualWebcam',
       // 'GameOverlay'
+      'Get Support',
     ];
   }
 
