@@ -44,6 +44,11 @@ function Toolbar() {
   return (
     <div className={styles.topBar}>
       <h2 className="studio-controls__label">{$t('Mini Feed')}</h2>
+      <i
+        className="fas fa-chart-pie action-icon"
+        onClick={() => RecentEventsService.actions.spinWheel()}
+        v-tooltip={{ content: $t('Spin Wheel'), placement: 'bottom' }}
+      />
       {UserService.views.isTwitchAuthed && (
         <i
           className={cx('fa fa-shield-alt action-icon', {
