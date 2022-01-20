@@ -143,7 +143,7 @@
 .section-weight-box {
   display: flex;
   align-items: center;
-  position: relative;
+  // position: relative;
 
   i {
     margin-left: 4px;
@@ -156,7 +156,7 @@
   div {
     width: 140px;
     margin-right: auto;
-    position: relative;
+    // position: relative;
   }
 
   .multiselect__select {
