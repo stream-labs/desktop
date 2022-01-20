@@ -155,6 +155,7 @@ import { RecentEventsService } from 'services/recent-events';
 import { AudioService } from './services/audio';
 import { SourceFiltersService } from './services/source-filters';
 import { WebsocketService } from './services/websocket';
+import { LayoutService } from './services/layout';
 
 export const AppServices = {
   AppService,
@@ -201,4 +202,5 @@ export const AppServices = {
   AudioService,
   SourceFiltersService,
   WebsocketService,
+  LayoutService,
 };

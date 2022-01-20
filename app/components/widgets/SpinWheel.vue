@@ -37,6 +37,12 @@
     </validated-form>
 
     <validated-form slot="section-properties" @input="save()" v-if="loaded">
+      <button class="button button--action" @click="addSection()">
+        {{ $t('Add Section') }}
+      </button>
+      <button class="button button--default" @click="clearSections()">
+        {{ $t('Clear All') }}
+      </button>
       <v-form-group v-for="(section, i) in wData.settings.sections" :key="section.key">
         <div class="section-weight-box">
           <list-input
@@ -137,7 +143,6 @@
 .section-weight-box {
   display: flex;
   align-items: center;
-  position: relative;
 
   i {
     margin-left: 4px;
@@ -150,7 +155,6 @@
   div {
     width: 140px;
     margin-right: auto;
-    position: relative;
   }
 
   .multiselect__select {

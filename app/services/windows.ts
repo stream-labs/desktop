@@ -34,6 +34,7 @@ import {
   SourceShowcase,
   SourceFilters,
   MediaGallery,
+  Projector,
 } from 'components/shared/ReactComponentList';
 
 import SourcePropertiesDeprecated from 'components/windows/SourceProperties.vue';
@@ -43,7 +44,6 @@ import Blank from 'components/windows/Blank.vue';
 import ManageSceneCollections from 'components/windows/ManageSceneCollections.vue';
 import RecentEvents from 'components/windows/RecentEvents.vue';
 import GameOverlayEventFeed from 'components/windows/GameOverlayEventFeed';
-import Projector from 'components/windows/Projector.vue';
 import PlatformAppPopOut from 'components/windows/PlatformAppPopOut.vue';
 import EditTransform from 'components/windows/EditTransform';
 import EventFilterMenu from 'components/windows/EventFilterMenu';
@@ -313,14 +313,8 @@ export class WindowsService extends StatefulService<IWindowsState> {
         this.windows.main.getBounds(),
       ).workAreaSize;
 
-      const SCREEN_PERCENT = 0.75;
-
-      if (options.size.width > screenWidth || options.size.height > screenHeight) {
-        options.size = {
-          width: Math.round(screenWidth * SCREEN_PERCENT),
-          height: Math.round(screenHeight * SCREEN_PERCENT),
-        };
-      }
+      options.size.width = Math.min(options.size.width, screenWidth);
+      options.size.height = Math.min(options.size.height, screenHeight);
     }
 
     this.centerChildWindow(options);
