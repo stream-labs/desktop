@@ -84,7 +84,6 @@ export default class SpinWheel extends WidgetSettings<ISpinWheelData, SpinWheelS
   }
 
   editSection(key: string, patch: Partial<ISpinWheelSettings['sections']>) {
-    console.log('section data', this.wData.settings.sections);
     this.wData.settings.sections = this.wData.settings.sections.map(sect => {
       if (sect.key === key) return { ...sect, ...patch };
       return sect;
