@@ -18,6 +18,11 @@
             <template v-slot:description><program-description /></template>
           </area-switcher>
           <tool-bar class="program-area-item" />
+          <div class="footer performance-metrics" v-if="compactMode">
+            <div class="flex flex--center flex--grow flex--justify-start">
+              <performance-metrics />
+            </div>
+          </div>
         </template>
         <template v-else>
           <p class="message">
@@ -169,5 +174,19 @@
     flex-grow: 1;
     background-color: var(--color-text-dark);
   }
+}
+
+.footer {
+  .dividing-border;
+  display: flex;
+  justify-content: space-between;
+  flex-direction: row;
+  align-items: center;
+  position: relative;
+  padding: 0 16px;
+  max-width: none;
+  height: 32px;
+  flex: 0 0 auto;
+  background-color: var(--color-bg-secondary);
 }
 </style>

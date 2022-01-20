@@ -6,7 +6,7 @@
     <div class="nav-item">
       <button
         :disabled="locked"
-        class="record-button"
+        class="button--circle button--secondary record-button"
         @click="toggleRecording"
         :class="{ active: streamingService.isRecording }"
         v-tooltip.left="recordTooltip"
@@ -21,21 +21,21 @@
       v-if="replayBufferEnabled"
     >
       <button
-        class="button--replay-buffer button--replay-start"
+        class="button--circle button--secondary button--replay-start"
         @click="toggleReplayBuffer"
         v-tooltip.left="startReplayBufferTooltip"
       >
         <i class="icon-replay-buffer-start" />
       </button>
       <button
-        class="button--replay-buffer button--replay-stop"
+        class="button--circle button--replay-stop"
         @click="toggleReplayBuffer"
         v-tooltip.left="stopReplayBufferTooltip"
       >
         <i class="icon-replay-buffer-stop" />
       </button>
       <button
-        class="button--replay-buffer button--replay-save"
+        class="button--circle button--secondary button--replay-save"
         @click="saveReplay"
         :disabled="replayBufferSaving || replayBufferStopping"
         v-tooltip.left="saveReplayTooltip"
@@ -62,11 +62,6 @@
 
 .nav-item {
   margin-left: 20px;
-
-  @media (max-width: 1200px) {
-    font-size: 12px;
-    margin-left: 12px;
-  }
 }
 
 .error-wrapper {
@@ -101,49 +96,34 @@
 }
 
 .elapsed-time {
-  white-space: nowrap;
+  .time-styling;
+  margin-right: auto;
 }
 
 .record-button {
-  position: relative;
-  width: 32px;
-  height: 32px;
-  background-color: @text-secondary;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 100%;
-  .transition;
   .bold;
-  box-sizing: content-box;
   letter-spacing: 0.2px;
 
   span {
-    font-size: 12px;
+    color: var(--color-button-label);
   }
 
   &:hover {
-    background: @red;
-    span {
-      color: @white;
-    }
+    background: var(--color-red);
   }
 
   &.active {
     opacity: 1;
     animation: pulse 2.5s infinite;
-    border: 1px solid @red;
+    border: 1px solid var(--color-red);
     background: @red;
     span {
       color: @white;
     }
     &:hover {
       opacity: 1;
-      background: rgba(204, 0, 41, 0.3);
-      border: 1px solid @red;
-      span {
-        color: @red;
-      }
+      background: var(--color-red-dark);
+      border: 1px solid var(--color-red);
     }
   }
 }
@@ -163,7 +143,6 @@
 }
 
 .button--replay-start {
-  background-color: @text-secondary;
   position: absolute;
   top: 0;
   right: 0;
@@ -171,51 +150,30 @@
   .is-replay-start & {
     display: none;
   }
-
-  i {
-    color: @white;
-    font-size: 16px;
-  }
-
-  &:hover {
-    background: @text-tertiary;
-  }
 }
 
 .button--replay-stop {
-  background: rgba(204, 0, 41, 0.3);
+  background: var(--color-red-dark);
   position: absolute;
   top: 0;
   right: 32px;
+  border-radius: 0;
 
   i {
-    font-size: 12px;
-    color: @red;
-  }
-
-  &:hover {
-    background: rgba(204, 0, 41, 0.2);
+    font-size: @font-size2;
+    color: var(--color-red);
   }
 }
 
 .button--replay-save {
   display: none;
-  background-color: @text-secondary;
   position: absolute;
   top: 0;
   right: 0;
+  border-radius: 0;
 
   .is-replay-start & {
     display: flex;
-  }
-
-  i {
-    font-size: 16px;
-    color: @white;
-  }
-
-  &:hover {
-    background: @text-tertiary;
   }
 }
 

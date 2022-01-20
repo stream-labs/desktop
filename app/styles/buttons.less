@@ -19,12 +19,17 @@ button {
   &:disabled {
     opacity: .5;
   }
+
+  i {
+    margin-right: 8px;
+  }
 }
 
 .button--primary {
   background-color: var(--color-button-primary);
 
-  &:hover {
+  &:hover,
+  &:focus {
     background-color: var(--color-button-primary-hover);
   }
 
@@ -37,7 +42,8 @@ button {
 .button--secondary {
   background-color: var(--color-button-secondary);
 
-  &:hover {
+  &:hover,
+  &:focus {
     background-color: var(--color-button-secondary-hover);
   }
 
@@ -51,11 +57,13 @@ button {
   background-color: var(--color-button-accent);
   color: @white;
 
-  &:hover {
-    background-color: var(--color-button-accent);
+  &:hover,
+  &:focus {
+    background-color: var(--color-button-accent-hover);
   }
 
-  &:focus {
+  &:disabled,
+  &:disabled:hover {
     background-color: var(--color-button-accent);
   }
 }
@@ -73,17 +81,17 @@ button {
 
 // live中の赤ボタン
 .button--live {
-  background-color: var(--color-live);
-  border: 1px solid var(--color-live);
+  background-color: var(--color-red);
+  border: 1px solid var(--color-red);
 
   &:focus,
   &:hover {
-    background-color: var(--color-live-dark);
+    background-color: var(--color-red-dark);
   }
 
   &:disabled,
   &:disabled:hover {
-    background-color: var(--color-live-dark);
+    background-color: var(--color-red-dark);
     border: none;
   }
 }
@@ -213,34 +221,38 @@ button {
 
 .button--go-live,
 .button--start-program {
-  color: @white;
-  background: @accent;
-  font-size: 20px;
+  color: var(--color-button-label);
+  background-color: var(--color-button-accent);
 
-  &:focus,
-  &:hover {
-    background: @accent-hover;
+  &:hover,
+  &:focus {
+    background-color: var(--color-button-accent-hover);
+  }
+
+  &:disabled,
+  &:disabled:hover {
+    background-color: var(--color-button-accent);
   }
 }
 
 .button--soft-warning {
-  color: @white;
-  background: @red;
-  border: 1px solid @red;
+  color: var(--color-button-label);
+  background: var(--color-red);
+  border: 1px solid var(--color-red);
   font-size: 20px;
 
   &:focus,
   &:hover {
-    background: rgba(204, 0, 41, .3);
-    border: 1px solid @red;
+    background: var(--color-red-dark);
+    border: 1px solid var(--color-red);
   }
 
   &:disabled {
-    background-color: @black;
-    border-color: @black;
+    background-color: var(--color-red-dark);
+    border-color: var(--color-red-dark);
 
     &:hover {
-      background-color: @black;
+      background-color: var(--color-red-dark);
     }
   }
 }
@@ -294,15 +306,6 @@ button {
 .button-nicolive--default {
   color: @white;
   background-color: @grey;
-}
-
-.button--replay-buffer {
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  .transition;
 }
 
 .button--circle {

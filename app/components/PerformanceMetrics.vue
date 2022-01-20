@@ -1,6 +1,6 @@
 <template>
   <div class="performance-metrics flex">
-    <span class="performance-metric-wrapper resolution">
+    <span class="performance-metric-wrapper resolution" v-if="!compactMode">
       <i class="performance-metric-icon icon-display" />
       <span class="performance-metric">
         <span class="performance-metric__value">{{ outputResolution }}</span>
@@ -15,8 +15,8 @@
     </span>
 
     <span class="performance-metric-wrapper band_width">
-      <!-- TODO bandWidthAlert を見てバッジを付ける-->
       <i class="performance-metric-icon icon-kbps" />
+      <i class="icon-warning" v-if="bandWidthAlert" />
       <span class="performance-metric">
         <span class="performance-metric__value">{{ bandwidth }}</span> kbps
       </span>
@@ -30,7 +30,7 @@
       </span>
     </span>
 
-    <span class="performance-metric-wrapper dropped_frames">
+    <span class="performance-metric-wrapper dropped_frames" v-if="!compactMode">
       <i class="performance-metric-icon icon-drop-fps" />
       <span class="performance-metric">
         <span class="performance-metric__value"
@@ -59,9 +59,17 @@
 }
 
 .performance-metric-wrapper {
-  padding-right: 12px;
-  color: @text-secondary;
+  padding-right: 16px;
   white-space: nowrap;
+  position: relative;
+
+  &.band_width {
+    .icon-warning {
+      top: 4px;
+      left: 16px;
+      font-size: @font-size4;
+    }
+  }
 }
 
 .performance-metric {
@@ -69,33 +77,20 @@
 }
 
 .performance-metric-icon {
-  font-size: 14px;
   width: auto;
   vertical-align: middle;
-  margin-right: 4px;
+  margin-right: 8px;
+  font-size: @font-size4;
+  color: var(--color-text-dark);
 }
 
 .performance-metric__value {
-  font-size: 14px;
+  font-size: @font-size2;
+  color: var(--color-text);
 }
 
-.viewer_count,
-.comment_count {
-  min-width: 88px;
-}
-.resolution {
-  min-width: 120px;
-}
-.cpu_percent {
-  min-width: 168px;
-}
-.frame_rate {
-  min-width: 136px;
-}
-.dropped_frames {
-  min-width: 224px;
-}
-.band_width {
-  min-width: 108px;
+.icon-warning {
+  color: var(--color-icon-alert);
+  position: absolute;
 }
 </style>

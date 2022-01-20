@@ -12,6 +12,7 @@ import ToolBar from './ToolBar.vue';
 import TopNav from './TopNav.vue';
 import ControlsArrow from '../../../media/images/controls-arrow-vertical.svg';
 import AreaSwitcher from './AreaSwitcher.vue';
+import PerformanceMetrics from '../PerformanceMetrics.vue';
 import {
   NicoliveFailure,
   openErrorDialogFromFailure,
@@ -28,6 +29,7 @@ import {
     ProgramStatistics,
     ToolBar,
     ControlsArrow,
+    PerformanceMetrics,
   },
 })
 export default class NicolivePanelRoot extends Vue {

@@ -15,11 +15,14 @@
 <script lang="ts" src="./StartStreamingButton.vue.ts"></script>
 
 <style lang="less" scoped>
+@import '../styles/index';
+
 .button--go-live {
   min-width: 120px;
-  font-size: 14px;
+  font-size: @font-size4;
 }
-.svg-live {
+
+/deep/ .svg-live {
   margin-right: 4px;
   margin-bottom: 2px;
   width: 18px;

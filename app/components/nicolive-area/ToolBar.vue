@@ -103,7 +103,7 @@
   margin-right: 8px;
 
   &.is-onAir {
-    color: var(--color-live);
+    color: var(--color-red);
   }
 }
 

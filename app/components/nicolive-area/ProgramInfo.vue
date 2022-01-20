@@ -151,7 +151,7 @@
   }
 
   &.is-onAir {
-    border-color: var(--color-live);
+    border-color: var(--color-red);
 
     &:before,
     &:after {
@@ -159,7 +159,7 @@
       display: block;
       position: absolute;
       border-radius: 50%;
-      background-color: var(--color-live);
+      background-color: var(--color-red);
       left: 50%;
       top: 50%;
       transform: translate(-50%, -50%);
