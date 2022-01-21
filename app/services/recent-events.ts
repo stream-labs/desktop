@@ -584,16 +584,6 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
     return await fetch(new Request(url, { headers, body, method: 'POST' })).then(handleResponse);
   }
 
-  async spinWheel() {
-    // eslint-disable-next-line
-    const url = `https://${
-      this.hostsService.streamlabs
-    }/api/v5/slobs/widget/wheel/spin/${this.userService.widgetToken}`;
-    const headers = authorizedHeaders(this.userService.apiToken);
-    const request = new Request(url, { headers, method: 'POST' });
-    return fetch(request).then(handleResponse);
-  }
-
   async readAlert(event: IRecentEvent) {
     this.TOGGLE_RECENT_EVENT_READ(event.uuid);
     const newEvent = this.views.getEvent(event.uuid);

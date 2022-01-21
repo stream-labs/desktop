@@ -31,7 +31,7 @@ export default function RecentEvents(p: { isOverlay?: boolean }) {
 }
 
 function Toolbar() {
-  const { RecentEventsService, UserService } = Services;
+  const { RecentEventsService, UserService, SpinWheelService } = Services;
 
   const { muted, queuePaused, mediaShareEnabled, safeModeEnabled } = useVuex(() => ({
     muted: RecentEventsService.state.muted,
@@ -46,7 +46,7 @@ function Toolbar() {
       <h2 className="studio-controls__label">{$t('Mini Feed')}</h2>
       <i
         className="fas fa-chart-pie action-icon"
-        onClick={() => RecentEventsService.actions.spinWheel()}
+        onClick={() => SpinWheelService.actions.spinWheel()}
         v-tooltip={{ content: $t('Spin Wheel'), placement: 'bottom' }}
       />
       {UserService.views.isTwitchAuthed && (
