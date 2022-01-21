@@ -57,9 +57,11 @@ function DiagnosticReport() {
         alertAsync({
           type: 'success',
           width: 500,
+          getContainer: '#mainWrapper',
           content: (
             <div>
-              This is a test<TextInput value={r.report_code}></TextInput>
+              This is a test
+              <TextInput value={r.report_code} addonAfter={<Button>{$t('Copy')}</Button>} />
             </div>
           ),
         });
