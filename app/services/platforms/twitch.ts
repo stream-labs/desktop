@@ -109,11 +109,9 @@ export class TwitchService
   };
 
   // Streamlabs Production Twitch OAuth Client ID
-  // clientId = '8bmp6j83z5w4mepq0dn0q1a7g186azi';
-
-  // TODO: remove before merge
-  // Streamlabs Staging Twitch OAuth Client ID
-  clientId = '3eoucd9qwxqh7pu3l0e3rttomgrov2';
+  clientId = Utils.shouldUseBeta()
+    ? '3eoucd9qwxqh7pu3l0e3rttomgrov2'
+    : '8bmp6j83z5w4mepq0dn0q1a7g186azi';
 
   init() {
     // prepopulate data to make chat available after app start

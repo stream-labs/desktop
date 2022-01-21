@@ -9,8 +9,11 @@ export class HostsService extends Service {
   get streamlabs() {
     if (Util.shouldUseLocalHost()) {
       return 'streamlabs.site';
+    } else if (Util.shouldUseBeta()) {
+      return 'beta.streamlabs.com';
     }
-    return 'beta.streamlabs.com';
+
+    return 'streamlabs.com';
   }
 
   get overlays() {
@@ -24,8 +27,11 @@ export class HostsService extends Service {
   get io() {
     if (Util.shouldUseLocalHost()) {
       return 'http://io.streamlabs.site:4567';
+    } else if (Util.shouldUseBeta()) {
+      return 'https://beta.streamlabs.com';
     }
-    return 'https://beta.streamlabs.com';
+
+    return 'https://aws-io.streamlabs.com';
   }
 
   get cdn() {
