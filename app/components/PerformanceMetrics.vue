@@ -16,7 +16,7 @@
 
     <span class="performance-metric-wrapper band_width">
       <i class="performance-metric-icon icon-kbps" />
-      <i class="icon-warning-circle" v-if="bandWidthAlert" />
+      <i class="icon-warning-circle" v-if="bandwidthAlert" />
       <span class="performance-metric">
         <span class="performance-metric__value">{{ bandwidth }}</span> kbps
       </span>
