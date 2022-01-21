@@ -2,12 +2,13 @@ import React, { useState } from 'react';
 import * as remote from '@electron/remote';
 import { useVuex } from '../../hooks';
 import { Services } from '../../service-provider';
-import { confirmAsync } from '../../modals';
+import { alertAsync, confirmAsync } from '../../modals';
 import { $t } from '../../../services/i18n';
 import { ObsSettingsSection } from './ObsSettings';
-import { CheckboxInput } from '../../shared/inputs';
+import { CheckboxInput, TextInput } from '../../shared/inputs';
 import { getOS, OS } from 'util/operating-systems';
 import { Button } from 'antd';
+import cx from 'classnames';
 
 export function Support() {
   return (
@@ -44,13 +45,38 @@ function SupportLinks() {
 }
 
 function DiagnosticReport() {
+  const { DiagnosticsService } = Services;
+  const [uploading, setUploading] = useState(false);
+
+  function uploadReport() {
+    // alertAsync({ content: <div>Hello</div> });
+    setUploading(true);
+    DiagnosticsService.actions.return
+      .uploadReport()
+      .then(r => {
+        alertAsync({
+          type: 'success',
+          width: 500,
+          content: (
+            <div>
+              This is a test<TextInput value={r.report_code}></TextInput>
+            </div>
+          ),
+        });
+      })
+      .finally(() => setUploading(false));
+  }
+
   return (
     <ObsSettingsSection title={$t('Diagnostic Report')}>
       {$t(
         'The diagnostic report is an automatically generated report that contains information about your system and configuration. Clicking the upload button below will generate and securely transmit a diagnostic report to the Streamlabs team.',
       )}
-      <Button style={{ margin: '20px 0' }}>
-        <i className="fa fa-upload" style={{ marginRight: 8 }} />
+      <Button style={{ margin: '20px 0' }} onClick={uploadReport} disabled={uploading}>
+        <i
+          className={cx('fa', { 'fa-upload': !uploading, 'fa-spinner fa-pulse': uploading })}
+          style={{ marginRight: 8 }}
+        />
         {$t('Upload Diagnostic Report')}
       </Button>
     </ObsSettingsSection>

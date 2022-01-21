@@ -14,6 +14,7 @@ import { StreamingService } from './api/external-api/streaming';
 import { EStreamingState } from './streaming';
 import Vue from 'vue';
 import { PerformanceService } from './performance';
+import { jfetch } from 'util/requests';
 
 interface IStreamDiagnosticInfo {
   startTime: number;
@@ -151,6 +152,22 @@ export class DiagnosticsService extends PersistentStatefulService<IDiagnosticsSe
     this.generateStreamsSection();
     this.generateProblemsSection();
     return this.report;
+  }
+
+  uploadReport() {
+    const formData = new FormData();
+    formData.append('content', this.generateReport());
+
+    return jfetch<{ success: boolean; report_code: string }>(
+      'https://streamlabs.com/api/v6/desktop/reports',
+      {
+        method: 'POST',
+        body: formData,
+      },
+    ).then(r => {
+      console.log(r);
+      return r;
+    });
   }
 
   private logProblem(problem: string) {
