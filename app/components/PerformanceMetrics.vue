@@ -16,7 +16,7 @@
 
     <span class="performance-metric-wrapper band_width">
       <i class="performance-metric-icon icon-kbps" />
-      <i class="icon-warning" v-if="bandWidthAlert" />
+      <i class="icon-warning-circle" v-if="bandWidthAlert" />
       <span class="performance-metric">
         <span class="performance-metric__value">{{ bandwidth }}</span> kbps
       </span>
@@ -64,10 +64,10 @@
   position: relative;
 
   &.band_width {
-    .icon-warning {
+    .icon-warning-circle {
       top: 4px;
-      left: 16px;
-      font-size: @font-size4;
+      left: 12px;
+      font-size: @font-size2;
     }
   }
 }
@@ -89,8 +89,31 @@
   color: var(--color-text);
 }
 
-.icon-warning {
+.icon-warning-circle {
+  width: 16px;
+  height: 16px;
   color: var(--color-icon-alert);
   position: absolute;
+
+  &:before, &:after {
+    position: absolute;
+    top: 0;
+    left: 0;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  &:before {
+    z-index: @z-index-expand-content;
+  }
+
+  &:after {
+    content: '';
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background-color: var(--color-bg-primary);
+  }
 }
 </style>
