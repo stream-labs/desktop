@@ -141,7 +141,7 @@ export function getAlertsConfig(
     trRaid: {
       name: $t('Trovo Raid'),
       type: 'trRaid',
-      apiKey: 'raid',
+      apiKey: 'trovo_raid',
       url() {
         return `https://${host}/api/v5/slobs/test/trovo_account/raid`;
       },
