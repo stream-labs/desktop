@@ -25,7 +25,7 @@ export class HostsService extends Service {
     if (Util.shouldUseLocalHost()) {
       return 'http://io.streamlabs.site:4567';
     }
-    return 'https://aws-io.streamlabs.com';
+    return 'https://beta.streamlabs.com';
   }
 
   get cdn() {
