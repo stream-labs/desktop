@@ -86,6 +86,13 @@ export default function TwitterInput() {
             label={$t('Use Streamlabs URL')}
           />
         )}
+        {platform === 'trovo' && (
+          <CheckboxInput
+            value={useStreamlabsUrl}
+            onInput={setUseStreamlabsUrl}
+            label={$t('Use Streamlabs URL')}
+          />
+        )}
         <div style={{ marginTop: '30px', textAlign: 'right' }}>
           <Button onClick={unlink}>{$t('Unlink Twitter')}</Button>
         </div>
