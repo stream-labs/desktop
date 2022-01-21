@@ -79,14 +79,7 @@ export default function TwitterInput() {
           rows={5}
           disabled={!tweetWhenGoingLive}
         />
-        {platform === 'twitch' && (
-          <CheckboxInput
-            value={useStreamlabsUrl}
-            onInput={setUseStreamlabsUrl}
-            label={$t('Use Streamlabs URL')}
-          />
-        )}
-        {platform === 'trovo' && (
+        {['twitch', 'trovo'].includes(platform!) && (
           <CheckboxInput
             value={useStreamlabsUrl}
             onInput={setUseStreamlabsUrl}
