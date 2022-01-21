@@ -34,5 +34,13 @@ export default function PlatformLogo(p: IProps & HTMLAttributes<unknown>) {
     : undefined;
   const colorStyle = p.color ? { color: p.color } : undefined;
   const style = { ...sizeStyle, ...colorStyle };
-  return <i className={cx(iconForPlatform(), css[p.platform], p.className)} style={style} />;
+  return (
+    <i
+      className={cx(iconForPlatform(), css[p.platform], p.className, {
+        // Trovo doesn't provide an SVG, so just use different colored PNGs
+        [css['trovo--black']]: p.platform === 'trovo' && p.color === 'black',
+      })}
+      style={style}
+    />
+  );
 }
