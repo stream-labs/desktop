@@ -1,5 +1,6 @@
 import { SpectronClient } from 'spectron';
 import { getClient, select, TSelectorOrEl } from '../core';
+import {sleep} from "../../sleep";
 
 /**
  * A base class for all input controllers
@@ -70,8 +71,17 @@ export async function setInputValue(selectorOrEl: TSelectorOrEl, value: string |
   await ((client.keys(['Control', 'a']) as any) as Promise<any>); // select all
   await ((client.keys('Control') as any) as Promise<any>); // release ctrl key
   await ((client.keys('Backspace') as any) as Promise<any>); // clear
+
   await $el.click(); // click again if it's a list input
-  await ((client.keys(String(value)) as any) as Promise<any>); // type text
+  await sendKeys(String(value)); // type text
+}
+
+async function sendKeys(keys: string) {
+  const client = getClient();
+  const keyList = keys.split('');
+  for (const key of keyList) {
+    await ((client.keys(key) as any) as Promise<any>);
+  }
 }
 
 export type TFiledSetterFn<TControllerType extends BaseInputController<any>> = (

@@ -27,9 +27,9 @@
   "Example": "Esempio",
   "Change Media": "Cambia contenuti multimediali",
   "No Sound": "Nessun suono",
-  "No Media": "No Media",
-  "Change Link": "Change Link",
-  "Pick From Gallery": "Pick From Gallery",
-  "Clear Link": "Clear Link",
-  "Media URL": "Media URL"
+  "No Media": "Nessun contenuto multimediale",
+  "Change Link": "Modifica collegamento",
+  "Pick From Gallery": "Scegli dalla galleria",
+  "Clear Link": "Cancella collegamento",
+  "Media URL": "URL elementi multimediali"
 }

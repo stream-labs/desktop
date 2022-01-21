@@ -65,10 +65,10 @@
   "Banned by %{user}": "%{user}에게 금지됨",
   "No banned media found": "금지된 미디어가 발견되지 않음",
   "Effects/Rallies": "효과/랠리",
-  "Sparks sent are at least <amount>": "전송된 스파크는 최소 <amount>입니다",
-  "Sparks sent are exactly <amount>": "전송된 스파크는 정확히 <amount>입니다",
-  "Ember amount is at least <amount>": "엠버 수량은 최소 <amount>입니다",
-  "Ember amount is exactly <amopunt>": "엠버 수량은 정확히 <amount>입니다",
+  "Sparks sent are at least <amount>": "전송된 스파크는 최소 &lt;amount&gt;입니다",
+  "Sparks sent are exactly <amount>": "전송된 스파크는 정확히 &lt;amount&gt;입니다",
+  "Ember amount is at least <amount>": "엠버 수량은 최소 &lt;amount&gt;입니다",
+  "Ember amount is exactly <amopunt>": "엠버 수량은 정확히 입니다",
   "Please note that when advanced media share is enabled, media will no longer play through your alert box widget. Media will only play through this media share widget.": "고급 미디어 공유가 활성화되면 알림창 위젯을 통해 더는 미디어가 재생되지 않습니다. 미디어는 이 미디어 공유 위젯을 통해서만 재생됩니다.",
   "Twitch Subscribers": "Twitch 구독자",
   "YouTube Members": "YouTube 멤버",
@@ -180,9 +180,9 @@
   "Slide Out Right": "슬라이드 아웃 오른쪽",
   "Slide Out Up": "슬라이드 아웃 위쪽",
   "Pick Screen Color": "화면 색상 선택",
-  "Play Alert": "Play Alert",
-  "Browser Settings": "Browser Settings",
-  "Custom Code": "Custom Code",
+  "Play Alert": "알림 재생",
+  "Browser Settings": "브라우저 설정",
+  "Custom Code": "사용자 지정 코드",
   "font_family_tooltip": "텍스트에 사용할 Google 폰트. https://fonts.google.com에 방문하여 찾아보세요! 인기 폰트: Open Sans, Roboto, Oswald, Lato, Droid Sans.",
-  "Something went wrong while applying settings": "Something went wrong while applying settings"
+  "Something went wrong while applying settings": "설정 적용 중 오류 발생"
 }

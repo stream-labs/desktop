@@ -14,7 +14,7 @@
   "Connect": "Hubungkan",
   "Install Your Theme": "Instal Tema Anda",
   "Install": "Instal",
-  "facebookGamingWarning": "Untuk pengalaman lengkap Facebook Gaming <create-page-link>buat Halaman Kreator Video Gaming</create-page-link>",
+  "facebookGamingWarning": "Untuk pengalaman lengkap Facebook Gaming &lt;create-page-link&gt;buat Halaman Kreator Video Gaming&lt;/create-page-link&gt;",
   "Facebook Destination": "Tujuan Facebook",
   "Share to Your Timeline": "Bagi ke Linimasa Anda",
   "Share to a Page You Manage": "Bagi ke Halaman yang Anda Kelola",
@@ -30,7 +30,7 @@
   "Please reconnect Facebook to get these new features": "Harap hubungkan kembali Facebook untuk mendapatkan fitur baru ini",
   "Reconnect now": "Hubungkan kembali sekarang",
   "Privacy": "Privasi",
-  "FBPrivacyWarning": "Level privasi yang diberikan mungkin terbatas bagi akun Facebook Anda. Periksa bagian \"Siapa yang dapat melihat Anda menggunakan integrasi bisnis ini\" untuk integrasi Streamlabs <link>di sini</link>",
+  "FBPrivacyWarning": "Level privasi yang diberikan mungkin terbatas bagi akun Facebook Anda. Periksa bagian \"Siapa yang dapat melihat Anda menggunakan integrasi bisnis ini\" untuk integrasi Streamlabs &lt;link&gt;di sini&lt;/link&gt;",
   "Only Me": "Hanya Saya",
   "Do not change privacy settings": "Jangan mengganti pengaturan privasi"
 }

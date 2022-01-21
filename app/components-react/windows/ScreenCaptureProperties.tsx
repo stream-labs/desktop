@@ -9,6 +9,7 @@ import { $t } from 'services/i18n';
 import { Modal, Button, Form, Tooltip } from 'antd';
 import { CheckboxInput } from 'components-react/shared/inputs';
 import { Source } from 'services/sources';
+import * as remote from '@electron/remote';
 
 interface ICapturableOption {
   description: string;
@@ -77,7 +78,7 @@ function useCaptureSource(sourceId: string): ICaptureSourceApi {
       // Attempt to get thumbnails for screens
       const screenData = await electron.desktopCapturer.getSources({ types: ['screen'] });
 
-      const screenOptions = electron.remote.screen.getAllDisplays().map((screen, index) => {
+      const screenOptions = remote.screen.getAllDisplays().map((screen, index) => {
         const opt: ICapturableOption = {
           description: `Screen ${index + 1}`,
           value: `monitor:${index}`,

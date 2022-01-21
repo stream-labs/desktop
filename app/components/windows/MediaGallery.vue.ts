@@ -11,6 +11,7 @@ import { UserService } from 'services/user';
 import { MagicLinkService } from 'services/magic-link';
 import { WebsocketService, TSocketEvent } from 'services/websocket';
 import { Subscription } from 'rxjs';
+import * as remote from '@electron/remote';
 
 const getTypeMap = () => ({
   title: {
@@ -150,10 +151,9 @@ export default class MediaGallery extends Vue {
   }
 
   async openFilePicker() {
-    const choices = await electron.remote.dialog.showOpenDialog(
-      electron.remote.getCurrentWindow(),
-      { properties: ['openFile', 'multiSelections'] },
-    );
+    const choices = await remote.dialog.showOpenDialog(remote.getCurrentWindow(), {
+      properties: ['openFile', 'multiSelections'],
+    });
 
     if (choices && choices.filePaths) {
       this.upload(choices.filePaths);
@@ -217,8 +217,8 @@ export default class MediaGallery extends Vue {
 
   async handleDelete() {
     if (this.selectedFile) {
-      electron.remote.dialog
-        .showMessageBox(electron.remote.getCurrentWindow(), {
+      remote.dialog
+        .showMessageBox(remote.getCurrentWindow(), {
           title: 'Streamlabs Desktop',
           type: 'warning',
           message: $t('Are you sure you want to delete this file? This action is irreversable.'),
@@ -233,12 +233,9 @@ export default class MediaGallery extends Vue {
   }
 
   async handleDownload() {
-    const { filePath } = await electron.remote.dialog.showSaveDialog(
-      electron.remote.getCurrentWindow(),
-      {
-        defaultPath: this.selectedFile.filename,
-      },
-    );
+    const { filePath } = await remote.dialog.showSaveDialog(remote.getCurrentWindow(), {
+      defaultPath: this.selectedFile.filename,
+    });
 
     if (!this.selectedFile) return;
     this.setBusy($t('Downloading...'));

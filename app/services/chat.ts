@@ -14,7 +14,14 @@ import { StreamingService } from './streaming';
 import { GuestApiHandler } from 'util/guest-api-handler';
 import { ChatHighlightService, IChatHighlightMessage } from './widgets/settings/chat-highlight';
 import { assertIsDefined } from 'util/properties-type-guards';
+import * as remote from '@electron/remote';
 import { SourcesService } from 'app-services';
+
+/**
+ * Generates a script that can be injected to enable the twitch's Better TTV emotes.
+ * @param isDarkTheme if streamlabs is in dark mode
+ * @return a javascript script
+ */
 
 export function enableBTTVEmotesScript(isDarkTheme: boolean) {
   /*eslint-disable */
@@ -109,7 +116,7 @@ export class ChatService extends Service {
   async mountChat(electronWindowId: number) {
     if (!this.chatView) this.initChat();
     this.electronWindowId = electronWindowId;
-    const win = electron.remote.BrowserWindow.fromId(electronWindowId);
+    const win = remote.BrowserWindow.fromId(electronWindowId);
     if (this.chatView && win) win.addBrowserView(this.chatView);
   }
 
@@ -126,7 +133,7 @@ export class ChatService extends Service {
 
   unmountChat() {
     if (!this.electronWindowId) return; // already unmounted
-    const win = electron.remote.BrowserWindow.fromId(this.electronWindowId);
+    const win = remote.BrowserWindow.fromId(this.electronWindowId);
     if (this.chatView && win) win.removeBrowserView(this.chatView);
     this.electronWindowId = null;
   }
@@ -137,15 +144,16 @@ export class ChatService extends Service {
 
     const partition = this.userService.state.auth?.partition;
 
-    this.chatView = new electron.remote.BrowserView({
+    this.chatView = new remote.BrowserView({
       webPreferences: {
         partition,
         nodeIntegration: false,
-        enableRemoteModule: true,
         contextIsolation: true,
-        preload: path.resolve(electron.remote.app.getAppPath(), 'bundles', 'guest-api'),
+        preload: path.resolve(remote.app.getAppPath(), 'bundles', 'guest-api'),
       },
     });
+
+    electron.ipcRenderer.sendSync('webContents-enableRemote', this.chatView.webContents.id);
 
     this.bindWindowListener();
     this.bindDomReadyListener();
@@ -199,7 +207,7 @@ export class ChatService extends Service {
         const parsed = url.parse(targetUrl);
 
         if (parsed.hostname === 'accounts.google.com') {
-          electron.remote.dialog
+          remote.dialog
             .showMessageBox(Utils.getMainWindow(), {
               title: $t('YouTube Chat'),
               message: $t(
@@ -209,7 +217,7 @@ export class ChatService extends Service {
             })
             .then(({ response }) => {
               if (response === 1) {
-                electron.remote.shell.openExternal(this.chatUrl);
+                remote.shell.openExternal(this.chatUrl);
               }
             });
         }
@@ -240,7 +248,7 @@ export class ChatService extends Service {
             'ffz-settings',
           );
         } else {
-          electron.remote.shell.openExternal(targetUrl);
+          remote.shell.openExternal(targetUrl);
         }
       }
     });
@@ -271,31 +279,34 @@ export class ChatService extends Service {
 
       this.chatView.webContents.setZoomFactor(settings.chatZoomFactor);
 
-      if (settings.enableBTTVEmotes && this.userService.platform?.type === 'twitch') {
-        this.chatView.webContents.executeJavaScript(
-          enableBTTVEmotesScript(this.customizationService.isDarkTheme),
-          true,
-        );
-      }
-
-      if (settings.enableFFZEmotes && this.userService.platform?.type === 'twitch') {
-        this.chatView.webContents.executeJavaScript(
-          `
-          var ffzscript1 = document.createElement('script');
-          ffzscript1.setAttribute('src','https://cdn.frankerfacez.com/script/script.min.js');
-          document.head.appendChild(ffzscript1);
-          0;
-        `,
-          true,
-        );
-      }
-      if (this.userService.platform?.type === 'twitch' && this.hasChatHighlightWidget()) {
-        setTimeout(() => {
-          if (!this.chatView) return;
-          const chatHighlightScript = require('!!raw-loader!./widgets/settings/chat-highlight-script.js');
-          assertIsDefined(chatHighlightScript.default);
-          this.chatView.webContents.executeJavaScript(chatHighlightScript.default, true);
-        }, 10000);
+      if (this.userService.platform?.type === 'twitch') {
+        // loads bttv emotes if their are enabled
+        if (settings.enableBTTVEmotes) {
+          this.chatView.webContents.executeJavaScript(
+            enableBTTVEmotesScript(this.customizationService.isDarkTheme),
+            true,
+          );
+        }
+        // loads ffz emotes if their are enabled
+        if (settings.enableFFZEmotes) {
+          this.chatView.webContents.executeJavaScript(
+            `
+            var ffzscript1 = document.createElement('script');
+            ffzscript1.setAttribute('src','https://cdn.frankerfacez.com/script/script.min.js');
+            document.head.appendChild(ffzscript1);
+            0;
+          `,
+            true,
+          );
+        }
+        if (this.hasChatHighlightWidget()) {
+          setTimeout(() => {
+            if (!this.chatView) return;
+            const chatHighlightScript = require('!!raw-loader!./widgets/settings/chat-highlight-script.js');
+            assertIsDefined(chatHighlightScript.default);
+            this.chatView.webContents.executeJavaScript(chatHighlightScript.default, true);
+          }, 10000);
+        }
       }
 
       // facebook chat doesn't fit our layout by default

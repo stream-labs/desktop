@@ -27,7 +27,7 @@
   "Replay Duration": "Doba opakovaného záznamu",
   "Set a hotkey to capture replays": "Nastavte aktivační klávesu pro zaznamenání opakovaných záznamů",
   "Capture a replay": "Zaznamenat opakovaný záznam",
-  "highlighterHotkeyInstructions": "Začněte streamovat a stisknutím <b>%{bindingStr}</b> zaznamenejte opakovaný záznam. Po dokončení streamu se sem vraťte.",
+  "highlighterHotkeyInstructions": "Začněte streamovat a stisknutím &lt;b&gt;%{bindingStr}&lt;/b&gt; zaznamenejte opakovaný záznam. Po dokončení streamu se sem vraťte.",
   "Start streaming and capture a replay. Check back here after your stream.": "Začněte streamovat a zaznamenejte opakovaný záznam. Po dokončení streamu se sem vraťte.",
   "Or, import a clip from your computer": "Nebo naimportujte klip z počítače",
   "Disable clip": "Zakázat klip",
@@ -57,11 +57,11 @@
   "Title": "Označení",
   "Description": "Description",
   "Privacy Status": "Stav soukromí",
-  "Private": "Soukromé",
+  "Private": "Soukromý",
   "Only you and people you choose can watch your video": "Video můžete sledovat pouze vy a lidé, které si vyberete",
   "Unlisted": "Neuvedeno",
   "Anyone with the video link can watch your video": "Sledovat video může každý, kdo má jeho odkaz",
-  "Public": "Veřejné",
+  "Public": "Veřejný",
   "Everyone can watch your video": "Sledovat vaše video může každý",
   "Please connect your YouTube account to upload your video to YouTube.": "Chcete-li nahrát své video na YouTube, připojte svůj účet YouTube.",
   "Connect": "Připojit",
@@ -90,5 +90,5 @@
   "An error occurred while reading %{file}": "Při čtení souboru %{file} došlo k chybě",
   "An error occurred while reading audio from %{file}": "Při čtení zvuku ze souboru %{file} došlo k chybě",
   "An error occurred while mixing audio": "Při směšování zvuku došlo k chybě",
-  "Edit your replays with Highlighter, a free editor built in to Streamlabs OBS.": "Upravte své opakované záznamy pomocí aplikace Highlighter, bezplatného editoru integrovaného v systému Streamlabs OBS."
+  "Edit your replays with Highlighter, a free editor built in to Streamlabs.": "Upravte své opakované záznamy pomocí aplikace Highlighter, bezplatného editoru integrovaného v systému Streamlabs."
 }

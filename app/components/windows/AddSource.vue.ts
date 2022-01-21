@@ -15,6 +15,7 @@ import HFormGroup from 'components/shared/inputs/HFormGroup.vue';
 import electron from 'electron';
 import { UserService } from 'services/user';
 import { ChatService } from 'services/chat';
+import * as remote from '@electron/remote';
 import { AudioService, CustomizationService } from 'app-services';
 
 @Component({
@@ -114,7 +115,7 @@ export default class AddSource extends Vue {
     if (!scene.canAddSource(this.selectedSourceId)) {
       // for now only a scene-source can be a problem
 
-      electron.remote.dialog.showErrorBox(
+      remote.dialog.showErrorBox(
         $t('Error'),
         $t(
           'Unable to add a source: the scene you are trying to add already contains your current scene',

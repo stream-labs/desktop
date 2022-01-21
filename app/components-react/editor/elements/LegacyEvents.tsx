@@ -1,4 +1,5 @@
 import electron from 'electron';
+import remote from '@electron/remote';
 import React, { useState, useRef } from 'react';
 import { $t } from 'services/i18n';
 import useBaseElement from './hooks';
@@ -32,14 +33,14 @@ export default function LegacyEvents(p: { onPopout: () => void }) {
 
         try {
           const link = await MagicLinkService.actions.return.getDashboardMagicLink(match[1]);
-          electron.remote.shell.openExternal(link);
+          remote.shell.openExternal(link);
         } catch (e: unknown) {
           console.error('Error generating dashboard magic link', e);
         }
 
         setMagicLinkDisabled(false);
       } else {
-        electron.remote.shell.openExternal(url);
+        remote.shell.openExternal(url);
       }
     });
   }

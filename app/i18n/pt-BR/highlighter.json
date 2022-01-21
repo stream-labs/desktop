@@ -27,7 +27,7 @@
   "Replay Duration": "Duração do replay",
   "Set a hotkey to capture replays": "Escolha uma tecla de atalho para capturar replays",
   "Capture a replay": "Capturar um replay",
-  "highlighterHotkeyInstructions": "Comece o streaming e aperte <b>%{bindingStr}</b> para capturar um replay. Verifique aqui depois após sua stream.",
+  "highlighterHotkeyInstructions": "Comece o streaming e aperte &lt;b&gt;%{bindingStr}&lt;/b&gt; para capturar um replay. Verifique aqui depois após sua stream.",
   "Start streaming and capture a replay. Check back here after your stream.": "Comece o streaming e capture um replay. Verifique aqui depois da sua stream.",
   "Or, import a clip from your computer": "Ou, importe um clipe do seu computador.",
   "Disable clip": "Desabilitar clipe",
@@ -90,5 +90,5 @@
   "An error occurred while reading %{file}": "Um erro ocorreu durante a leitura do arquivo %{file}",
   "An error occurred while reading audio from %{file}": "Um erro ocorreu durante a leitura do áudio de %{file}",
   "An error occurred while mixing audio": "Um erro ocorreu enquanto o áudio era mixado.",
-  "Edit your replays with Highlighter, a free editor built in to Streamlabs OBS.": "Edite seus replays com Highlighter, um editor grátis incluído no Streamlabs OBS."
+  "Edit your replays with Highlighter, a free editor built in to Streamlabs.": "Edite suas reprises com Highlighter, um editor gratuito incluído no Streamlabs."
 }

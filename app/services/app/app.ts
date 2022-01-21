@@ -40,6 +40,7 @@ import { KeyListenerService } from 'services/key-listener';
 import { MetricsService } from '../metrics';
 import { SettingsService } from '../settings';
 import { OS, getOS } from 'util/operating-systems';
+import * as remote from '@electron/remote';
 
 interface IAppState {
   loading: boolean;
@@ -92,12 +93,12 @@ export class AppService extends StatefulService<IAppState> {
 
   static initialState: IAppState = {
     loading: true,
-    argv: electron.remote.process.argv,
+    argv: remote.process.argv,
     errorAlert: false,
     onboarded: false,
   };
 
-  readonly appDataDirectory = electron.remote.app.getPath('userData');
+  readonly appDataDirectory = remote.app.getPath('userData');
 
   loadingChanged = new Subject<boolean>();
 

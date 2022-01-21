@@ -1,12 +1,12 @@
 import React from 'react';
 import { Services } from '../../service-provider';
 import { $t } from '../../../services/i18n';
-import electron from 'electron';
 import { useBinding } from '../../store';
 import { CheckboxInput, ListInput, SliderInput } from '../../shared/inputs';
 import { getDefined } from '../../../util/properties-type-guards';
 import { ObsSettingsSection } from './ObsSettings';
 import { cloneDeep } from 'lodash';
+import * as remote from '@electron/remote';
 
 export function AppearanceSettings() {
   const { CustomizationService, WindowsService, UserService, MagicLinkService } = Services;
@@ -35,7 +35,7 @@ export function AppearanceSettings() {
 
   async function upgradeToPrime() {
     const link = await MagicLinkService.getDashboardMagicLink('prime-marketing', 'slobs-ui-themes');
-    electron.remote.shell.openExternal(link);
+    remote.shell.openExternal(link);
   }
 
   const shouldShowPrime = UserService.views.isLoggedIn && !UserService.views.isPrime;
