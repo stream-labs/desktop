@@ -15,6 +15,7 @@ import pick from 'lodash/pick';
 import uuid from 'uuid/v4';
 import { Subscription } from 'rxjs';
 import mapValues from 'lodash/mapValues';
+import { WidgetsService, WidgetType } from './widgets';
 
 export interface IRecentEvent {
   name?: string;
@@ -276,6 +277,7 @@ const SUPPORTED_EVENTS = [
 ];
 
 class RecentEventsViews extends ViewHandler<IRecentEventsState> {
+  @Inject() private widgetsService: WidgetsService;
   getEventString(event: IRecentEvent) {
     return {
       donation: this.getDonoString(event),
@@ -365,6 +367,12 @@ class RecentEventsViews extends ViewHandler<IRecentEventsState> {
     return this.state.recentEvents.find(event => {
       return event.uuid === uuid;
     });
+  }
+
+  spinWheelExists(): boolean {
+    return !!this.widgetsService
+      .getWidgetSources()
+      .find(source => source.type === WidgetType.SpinWheel);
   }
 }
 
