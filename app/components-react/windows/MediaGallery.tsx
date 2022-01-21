@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { clipboard } from 'electron';
 import * as remote from '@electron/remote';
+import { Layout, message, Card, Menu, Progress, PageHeader } from 'antd';
 import cx from 'classnames';
 import { IMediaGalleryFile, IMediaGalleryInfo } from 'services/media-gallery';
 import { $t } from 'services/i18n';
@@ -9,8 +10,8 @@ import Scrollable from 'components-react/shared/Scrollable';
 import { Services } from 'components-react/service-provider';
 import { useSubscription } from 'components-react/hooks/useSubscription';
 import { useVuex } from 'components-react/hooks';
+import { confirmAsync } from 'components-react/modals';
 import styles from './MediaGallery.m.less';
-import { Layout, Tooltip, message, Card, Menu, Progress, PageHeader } from 'antd';
 
 const getTypeMap = () => ({
   title: {
@@ -78,7 +79,7 @@ export default function MediaGallery() {
   }));
 
   async function fetchGalleryInfo() {
-    setGalleryInfo(await MediaGalleryService.fetchGalleryInfo());
+    setGalleryInfo(await MediaGalleryService.actions.return.fetchGalleryInfo());
   }
 
   async function openFilePicker() {
@@ -91,10 +92,11 @@ export default function MediaGallery() {
   }
 
   async function upload(filepaths: string[]) {
+    console.log('uploading', filepaths);
     if (!filepaths || !filepaths.length) return;
     setBusy(true);
     message.loading($t('Uploading...'), 0);
-    setGalleryInfo(await MediaGalleryService.upload(filepaths));
+    setGalleryInfo(await MediaGalleryService.actions.return.upload(filepaths));
     setBusy(false);
     message.destroy();
   }
@@ -133,6 +135,7 @@ export default function MediaGallery() {
 
   function handleFileDrop(e: React.DragEvent) {
     e.preventDefault();
+    console.log(e);
     if (!e.dataTransfer?.files) return;
     const mappedFiles = Array.from(e.dataTransfer.files).map(file => file.path);
     upload(mappedFiles);
@@ -169,18 +172,13 @@ export default function MediaGallery() {
 
   async function handleDelete() {
     if (selectedFile) {
-      remote.dialog
-        .showMessageBox(remote.getCurrentWindow(), {
-          title: 'Streamlabs Desktop',
-          type: 'warning',
-          message: $t('Are you sure you want to delete this file? This action is irreversable.'),
-          buttons: [$t('Cancel'), $t('OK')],
-        })
-        .then(async ({ response }) => {
-          if (!response || !selectedFile) return;
-          setGalleryInfo(await MediaGalleryService.actions.return.deleteFile(selectedFile));
-          setSelectedFile(null);
-        });
+      confirmAsync(
+        $t('Are you sure you want to delete this file? This action is irreversable.'),
+      ).then(async response => {
+        if (!response || !selectedFile) return;
+        setGalleryInfo(await MediaGalleryService.actions.return.deleteFile(selectedFile));
+        setSelectedFile(null);
+      });
     }
   }
 
@@ -195,12 +193,7 @@ export default function MediaGallery() {
 
   return (
     <ModalLayout onOk={handleSelect}>
-      <Layout
-        className={styles.container}
-        onDragEnter={onDragEnter}
-        onDragOver={onDragEnter}
-        onDrop={handleFileDrop}
-      >
+      <Layout className={styles.container} onDragEnter={onDragEnter} onDragOver={onDragEnter}>
         <Layout.Sider>
           <div className={styles.dropzone} onClick={openFilePicker}>
             <i className="icon-cloud-backup" />
@@ -287,6 +280,7 @@ export default function MediaGallery() {
         <div
           onDragOver={onDragEnter}
           onDragLeave={onDragLeave}
+          onDrop={handleFileDrop}
           className={cx(styles.dragOverlay, 'radius')}
         />
       )}
