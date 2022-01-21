@@ -17,18 +17,19 @@
 }
 
 .comment-header {
-  .common__comment-header();
+  .common__comment-header;
+
   > i {
-    color: @emotion-brand-color;
+    color: var(--color-brand-emotion);
   }
 }
 
 .comment-body {
-  .common__comment-body();
-  color: @light-grey;
+  .common__comment-body;
+  color: var(--color-text);
 
   [speaking=true] & {
-    color: @text-primary;
+    color: var(--color-text-active);
   }
 }
 </style>

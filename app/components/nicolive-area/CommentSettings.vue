@@ -1,8 +1,8 @@
 <template>
   <div class="container">
     <div class="header">
-      <div class="header-item-center">コメント設定</div>
-      <div class="header-item-right"><i class="icon-close icon-btn" @click="close"></i></div>
+      <p class="header-title">コメント設定</p>
+      <i class="icon-close icon-btn" @click="close"></i>
     </div>
     <div class="content">
       <comment-local-filter />
@@ -13,8 +13,7 @@
 
 <script lang="ts" src="./CommentSettings.vue.ts"></script>
 <style lang="less" scoped>
-@import "../../styles/_colors";
-@import "../../styles/mixins";
+@import "../../styles/index";
 
 .container {
   display: flex;
@@ -32,16 +31,16 @@
   flex-shrink: 0;
   height: 48px;
   padding: 4px 16px;
-  background-color: rgba(@black,.5);
-  border-bottom: 1px solid rgba(@black,.5);
+  border-bottom: 1px solid var(--color-border-light);
 
-  > .header-item-center {
-    font-size: 12px;
-    color: @white;
+  > .header-title {
+    font-size: @font-size4;
+    color: var(--color-text-light);
     text-align: center;
+    margin: 0;
   }
 
-  > .header-item-right {
+  > .icon-close {
     display: flex;
     align-items: center;
     position: absolute;
@@ -53,7 +52,6 @@
   flex-grow: 1;
   overflow-y: auto;
   overflow-x: hidden;
-  background-color: rgba(@black,.5);
 }
 
 .row {
@@ -66,8 +64,8 @@
 }
 
 .name {
-  font-size: 12px;
-  color: @light-grey;
+  font-size: @font-size4;
+  color: var(--color-text);
   flex-grow: 1;
 }
 
@@ -77,7 +75,7 @@
 }
 
 .nl-select {
-  font-size: 12px;
+  font-size: @font-size2;
   color: @white;
   min-width: 80px;
   height: 32px;

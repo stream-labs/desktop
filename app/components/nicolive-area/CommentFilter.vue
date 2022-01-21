@@ -1,8 +1,8 @@
 <template>
   <div class="container">
     <div class="header">
-      <div class="header-item-center">放送者NG設定</div>
-      <div class="header-item-right"><i class="icon-close icon-btn" @click="close"></i></div>
+      <p class="header-title">放送者NG設定</p>
+      <i class="icon-close icon-btn" @click="close"></i>
     </div>
     <div class="content">
       <div class="content-header">
@@ -13,7 +13,7 @@
       </div>
       <form class="add-form" @submit.prevent="onAdd">
         <input type="text" ref="input" v-model="newFilterValue" :placeholder="`NGに登録する${FILTER_VALUE[currentType]}を入力`" :disabled="adding" :readonly="adding" />
-        <button type="submit" :disabled="adding" class="button button--dark">追加</button>
+        <button type="submit" :disabled="adding" class="button button--secondary">追加</button>
       </form>
       <div class="list">
         <div class="row" v-for="item of currentTypeFilters" :key="item.id">
@@ -27,8 +27,7 @@
 
 <script lang="ts" src="./CommentFilter.vue.ts"></script>
 <style lang="less" scoped>
-@import "../../styles/_colors";
-@import "../../styles/mixins";
+@import "../../styles/index";
 
 .container {
   display: flex;
@@ -46,16 +45,16 @@
   justify-content: center;
   height: 48px;
   padding: 4px 16px;
-  background-color: rgba(@black,.5);
-  border-bottom: 1px solid rgba(@black,.5);
+  border-bottom: 1px solid var(--color-border-light);
 
-  > .header-item-center {
-    font-size: 12px;
-    color: @white;
+  > .header-title {
+    font-size: @font-size4;
+    color: var(--color-text-light);
     text-align: center;
+    margin: 0;
   }
 
-  > .header-item-right {
+  > .icon-close {
     display: flex;
     align-items: center;
     position: absolute;
@@ -67,7 +66,6 @@
   flex-grow: 1;
   display: flex;
   flex-direction: column;
-  background-color: rgba(@black,.5);
 }
 
 .content-header {
@@ -81,7 +79,7 @@
 
   > button {
     font-size: 12px;
-    color: @grey;
+    color: var(--color-text);
     margin-right: 8px;
     padding: 16px 8px;
     position: relative;
@@ -98,14 +96,14 @@
     }
 
     &:hover {
-      color: @text-secondary;
+      color: var(--color-text-light);
     }
 
     &.active {
-      color: @text-secondary;
+      color: var(--color-text-active);
 
       &:after {
-        background-color: @text-secondary;
+        background-color: var(--color-text-active);
       }
     }
   }
@@ -124,32 +122,20 @@
   flex-shrink: 0;
 
   > input {
-    font-size: 12px;
     flex-grow: 1;
     width: auto;
-    background-color: @bg-secondary;
     padding-right: 36px;
     box-sizing: border-box;
-    border-radius: 2px 0 0 2px;
-
-    &:focus {
-      background-color: @bg-tertiary;
-
-      &::placeholder {
-        opacity: .5;
-      }
-    }
+    border-radius: 4px 0 0 4px;
 
     &::placeholder {
-      color: @white;
-      opacity: .5;
+      color: var(--color-text-dark);
     }
   }
 
   > button {
     flex-shrink: 0;
-    border-radius: 0 2px 2px 0;
-    margin-left: -2px;
+    border-radius: 0 4px 4px 0;
   }
 }
 
@@ -159,7 +145,7 @@
 }
 
 .row {
-  font-size: 12px;
+  font-size: @font-size4;
   height: 40px;
   line-height: 40px;
 
@@ -176,12 +162,10 @@
 }
 
 .item-body {
+  .text-ellipsis;
   margin-left: 16px;
-  overflow-x: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
   flex-grow: 1;
-  color: @light-grey;
+  color: var(--color-text);
 }
 
 .item-misc {

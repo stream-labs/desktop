@@ -1,9 +1,6 @@
 <template>
   <div class="container">
-    <div class="header">
-      <i class="icon-reload icon-btn" v-tooltip.bottom="commentReloadTooltip" @click="refreshConnection"></i>
-      <i :class="['icon-btn', speakingEnabled ? 'icon-speaker' : 'icon-mute']" v-tooltip.bottom="commentSynthesizerTooltip" @click="speakingEnabled = !speakingEnabled"></i>
-      <div class="icon-border"></div>
+    <div class="header" v-if="!compactMode">
       <i class="icon-ng icon-btn" v-tooltip.bottom="filterTooltip" @click="isFilterOpened = true"></i>
       <i class="icon-settings icon-btn" v-tooltip.bottom="settingsTooltip" @click="isSettingsOpened = true"></i>
     </div>
@@ -30,24 +27,27 @@
         </div>
         <div class="close"><i class="icon-close icon-btn" @click="pin(null)"></i></div>
       </div>
-      <button type="button" @click="scrollToLatest" class="scroll-to-latest" v-if="!isLatestVisible && items.length > 0">最新のコメントへ移動<i class="icon-down-arrow"></i></button>
+      <div class="floating-wrapper">
+        <button type="button" @click="scrollToLatest" class="scroll-to-latest button--secondary" v-if="!isLatestVisible && items.length > 0"><i class="icon-down-arrow"></i>最新のコメントへ移動</button>
+        <button class="button--circle button--secondary" v-tooltip.bottom="commentReloadTooltip" @click="refreshConnection"><i class="icon-reload"></i></button>
+        <button class="button--circle button--secondary" v-tooltip.bottom="speakingEnabled ? commentSynthesizerOnTooltip : commentSynthesizerOffTooltip" @click="speakingEnabled = !speakingEnabled"><i :class="speakingEnabled ? 'icon-speaker' : 'icon-mute'"></i></button>
+      </div>
     </div>
     <comment-form class="comment-form" />
-    <comment-filter class="overlay" @close="isFilterOpened = false" v-if="isFilterOpened"/>
-    <comment-settings class="overlay" @close="isSettingsOpened = false" v-if="isSettingsOpened" />
+    <comment-filter class="overlay" @close="isFilterOpened = false" v-if="isFilterOpened && !compactMode"/>
+    <comment-settings class="overlay" @close="isSettingsOpened = false" v-if="isSettingsOpened && !compactMode" />
   </div>
 </template>
 
 <script lang="ts" src="./CommentViewer.vue.ts"></script>
 <style lang="less" scoped>
-@import "../../styles/_colors";
-@import "../../styles/mixins";
+@import "../../styles/index";
 
 .container {
   width: 100%;
   flex-grow: 1;
-
   display: flex;
+  background-color: var(--color-bg-tertiary);
 }
 
 .header {
@@ -57,8 +57,7 @@
   width: 100%;
   height: 48px;
   padding: 4px 16px;
-  background-color: @bg-secondary;
-  border-bottom: 1px solid @bg-primary;
+  border-bottom: 1px solid var(--color-border-light);
 
   > .icon-btn {
      margin-left: 16px;
@@ -74,18 +73,18 @@
   position: relative;
   display: flex;
   flex-direction: column;
-  background-color: @bg-secondary;
 }
 
 .list {
   flex-grow: 1;
   overflow-y: auto;
+  overflow-x: hidden;
   height: 100%;
   padding-top: 8px;
 }
 
 .row {
-  font-size: 12px;
+  font-size: @font-size2;
   height: 32px;
   line-height: 32px;
   width: 100%;
@@ -98,23 +97,26 @@
 }
 
 .pinned {
-  font-size: 12px;
+  font-size: @font-size2;
   position: absolute;
   top: 8px;
   left: 8px;
   right: 8px;
-  border: 1px solid @text-secondary;
-  background-color: rgba(@border, .9);
+  border: 1px solid var(--color-border-light);
+  background-color: var(--color-popper-bg-dark);
   border-radius: 4px;
   display: flex;
   padding: 12px 16px;
+  z-index: @z-index-default-content;
 
   & > .comment-number {
+    font-weight: @font-weight-bold;
     color: @light-grey;
     flex-shrink: 0;
   }
 
   & > .comment-body {
+    font-weight: @font-weight-bold;
     color: @white;
     margin-left: 16px;
     flex-grow: 1;
@@ -136,26 +138,22 @@
 }
 
 .scroll-to-latest {
+  .transition;
+
   display: flex;
   align-items: center;
-  font-size: 12px;
-  transform: translateX(-50%);
-  position: absolute;
-  left: 50%;
-  bottom: 16px;
+  font-size: @font-size2;
+  color: var(--color-button-label);
   height: 32px;
   line-height: 32px;
   padding: 0 16px;
   text-align: center;
-  background-color: @text-secondary;
-  color: @white;
   border-radius: 16px;
-  box-shadow: 0 0 4px rgba(@black, .5);
   cursor: pointer;
 
   > i {
-    font-size: 10px;
-    margin-left: 8px;
+    font-size: @font-size1;
+    margin-right: 8px;
   }
 }
 
@@ -164,17 +162,28 @@
 }
 
 .overlay {
-  z-index: 2; // AreaSwitcherのheaderより大きく
+  z-index: @z-index-expand-content; // AreaSwitcherのheaderより大きく
   position: absolute;
   height: 100%;
   width: 100%;
-  background-color: @bg-primary;
+  background-color: var(--color-bg-tertiary);
 }
 
-.icon-border {
-  width: 1px;
-  height: 60%;
-  background-color: @bg-primary;
-  margin-left: 16px;
+.floating-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  z-index: @z-index-default-content;
+  pointer-events: none;
+
+  button {
+    margin: 0 8px;
+    pointer-events: auto;
+  }
 }
 </style>
