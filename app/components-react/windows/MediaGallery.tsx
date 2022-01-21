@@ -10,7 +10,7 @@ import { Services } from 'components-react/service-provider';
 import { useSubscription } from 'components-react/hooks/useSubscription';
 import { useVuex } from 'components-react/hooks';
 import styles from './MediaGallery.m.less';
-import { Tooltip, message } from 'antd';
+import { Layout, Tooltip, message, Card, Menu, Progress, PageHeader } from 'antd';
 
 const getTypeMap = () => ({
   title: {
@@ -48,8 +48,7 @@ export default function MediaGallery() {
 
   const [dragOver, setDragOver] = useState(false);
   const [selectedFile, setSelectedFile] = useState<IMediaGalleryFile | null>(null);
-  const [type, setType] = useState<'image' | 'audio' | null>(null);
-  const [category, setCategory] = useState<'stock' | 'uploads' | null>(null);
+  const [category, setCategory] = useState<'stock' | 'uploads'>('uploads');
   const [galleryInfo, setGalleryInfo] = useState<IMediaGalleryInfo | null>(null);
   const [busy, setBusy] = useState(false);
   const [audio, setAudio] = useState<HTMLAudioElement | null>(null);
@@ -59,7 +58,6 @@ export default function MediaGallery() {
   const filter = WindowsService.state.child.queryParams?.filter;
 
   useEffect(() => {
-    if (filter) setType(filter);
     fetchGalleryInfo();
 
     return () => {
@@ -109,18 +107,20 @@ export default function MediaGallery() {
   const filteredGallery = galleryInfo?.files.filter(file => {
     if (category !== 'stock' && file.isStock !== false) return false;
     if (category === 'stock' && file.isStock === false) return false;
-    return !(type && file.type !== type);
+    return !(filter && file.type !== filter);
   });
 
-  const title = (type && typeMap.title[type]) || $t('All Files');
+  const title = filter && typeMap.title[filter];
   const noFilesCopy =
-    (type && typeMap.noFilesCopy[type]) || $t("You don't have any uploaded files!");
-  const noFilesBtn = (type && typeMap.noFilesBtn[type]) || $t('Upload A File');
+    (filter && typeMap.noFilesCopy[filter]) || $t("You don't have any uploaded files!");
+  const noFilesBtn = (filter && typeMap.noFilesBtn[filter]) || $t('Upload A File');
   const totalUsage = galleryInfo?.totalUsage ?? 0;
   const maxUsage = galleryInfo?.maxUsage ?? 0;
   const usagePct = galleryInfo ? totalUsage / maxUsage : 0;
-  const totalUsageLabel = formatBytes(totalUsage, 2);
-  const maxUsageLabel = formatBytes(maxUsage, 2);
+
+  function displaySpaceRemaining() {
+    return `${formatBytes(totalUsage, 2)}/${formatBytes(maxUsage, 2)}`;
+  }
 
   function onDragEnter(e: React.DragEvent) {
     e.preventDefault();
@@ -139,9 +139,8 @@ export default function MediaGallery() {
     setDragOver(false);
   }
 
-  function handleTypeFilter(t: 'audio' | 'image' | null, c: 'stock' | 'uploads' | null) {
-    if (t !== type) setType(t);
-    if (c !== category) setCategory(c);
+  function handleCategory(e: { key: string }) {
+    if (e.key !== category) setCategory(e.key as 'stock' | 'uploads');
   }
 
   function selectFile(file: IMediaGalleryFile, shouldSelect: boolean = false, e: React.MouseEvent) {
@@ -196,161 +195,142 @@ export default function MediaGallery() {
 
   return (
     <ModalLayout onOk={handleSelect}>
-      <div
+      <Layout
         className={styles.container}
         onDragEnter={onDragEnter}
         onDragOver={onDragEnter}
         onDrop={handleFileDrop}
       >
-        <div className="flex" style={{ height: '100%' }}>
-          <div className={styles.leftPanel}>
-            <div className={styles.dropzone} onClick={openFilePicker}>
-              <i className="icon-cloud-backup" />
-              {$t('Drag & Drop Upload')}
-            </div>
-            {['uploads', 'stock'].map((cat: 'uploads' | 'stock') => (
-              <ul key={cat} className={styles.navList}>
-                <div className={styles.listTitle}>
-                  {cat === 'stock' ? $t('Stock Files') : $t('My Uploads')}
-                </div>
-                <li
-                  className={cx(styles.listItem, {
-                    [styles.active]: type === null && cat === category,
-                  })}
-                  onClick={() => handleTypeFilter(null, cat)}
-                >
-                  <i className="fa fa-file" />
-                  {$t('All Files')}
-                </li>
-                <li
-                  className={cx(styles.listItem, {
-                    [styles.active]: type === 'image' && cat === category,
-                  })}
-                  onClick={() => handleTypeFilter('image', cat)}
-                >
-                  <i className="icon-image" />
-                  {$t('Images')}
-                </li>
-                <li
-                  className={cx(styles.listItem, {
-                    [styles.active]: type === 'audio' && cat === category,
-                  })}
-                  onClick={() => handleTypeFilter('audio', cat)}
-                >
-                  <i className="icon-music" />
-                  {$t('Sounds')}
-                </li>
-              </ul>
-            ))}
-            <div>
-              <div>
-                {totalUsageLabel} / {maxUsageLabel}
-              </div>
-              <div className={cx(styles.progressSlider, 'radius')}>
-                <div
-                  style={{ width: `${usagePct * 100}%` }}
-                  className={cx(styles.progressSliderFill, 'radius')}
-                />
-              </div>
-            </div>
+        <Layout.Sider>
+          <div className={styles.dropzone} onClick={openFilePicker}>
+            <i className="icon-cloud-backup" />
+            {$t('Drag & Drop Upload')}
           </div>
-          <div className={styles.rightPanel}>
-            <h4>{title}</h4>
-            <div className={styles.toolbar}>
-              <i className="icon-cloud-backup" onClick={openFilePicker} />
+          <Menu mode="inline" onClick={handleCategory} defaultSelectedKeys={['uploads']}>
+            {['uploads', 'stock'].map((cat: 'uploads' | 'stock') => (
+              <Menu.Item key={cat}>
+                {cat === 'stock' ? $t('Stock Files') : $t('My Uploads')}
+              </Menu.Item>
+            ))}
+          </Menu>
+        </Layout.Sider>
+        <Layout.Content>
+          <PageHeader
+            title={title}
+            subTitle={
+              <Progress
+                percent={Math.round(usagePct * 100)}
+                style={{ width: '200px', display: 'flex', alignItems: 'center' }}
+                trailColor={'var(--section-alt)'}
+                format={displaySpaceRemaining}
+              />
+            }
+            extra={[
               <i
-                className={cx('icon-trash', {
+                className={cx(styles.toolbarIcon, 'icon-cloud-backup')}
+                onClick={openFilePicker}
+                key="backup"
+              />,
+              <i
+                className={cx(styles.toolbarIcon, 'icon-trash', {
                   [styles.disabled]: !selectedFile || (selectedFile && selectedFile.isStock),
                 })}
                 onClick={handleDelete}
-              />
-            </div>
-            {dragOver && (
-              <div
-                onDragOver={onDragEnter}
-                onDragLeave={onDragLeave}
-                className={cx(styles.dragOverlay, 'radius')}
-              />
-            )}
-            {busy && <div className={styles.busyOverlay} />}
-            {filteredGallery && (
-              <Scrollable className={styles.uploadsManagerList}>
-                {filteredGallery.map(file => (
-                  <li
-                    key={file.href}
-                    className={cx(styles.uploadManagerItem, 'radius', {
-                      [styles.selected]: selectedFile && selectedFile.href === file.href,
-                    })}
-                    onClick={e => selectFile(file, false, e)}
-                    onDoubleClick={e => selectFile(file, true, e)}
-                  >
-                    {file.type === 'image' && /\.webm$/.test(file.href) && (
-                      <video
-                        autoPlay
-                        muted
-                        loop
-                        src={file.href}
-                        style={{ height: '100%', width: '100%' }}
-                      />
-                    )}
-                    {file.type === 'image' && !/\.webm$/.test(file.href) && (
-                      <div
-                        className={styles.imagePreview}
-                        style={{ backgroundImage: `url(${file.href})` }}
-                      />
-                    )}
-                    {file.type === 'audio' && (
-                      <i
-                        className="icon-music"
-                        style={{
-                          height: '132px',
-                          lineHeight: '132px',
-                          fontSize: '28px',
-                          textAlign: 'center',
-                          display: 'block',
-                        }}
-                      />
-                    )}
-                    {!file.prime && (
-                      <Tooltip title={$t('Copy URL')} placement="left">
-                        <i className="icon-copy" onClick={() => handleCopy(file.href)} />
-                      </Tooltip>
-                    )}
-                    <div
-                      className={cx(styles.uploadFooter, { [styles.image]: file.type === 'image' })}
-                    >
-                      <div className={styles.uploadSize}>
-                        {file.size ? formatBytes(file.size) : ' '}
-                      </div>
-                      <div className={styles.uploadTitle}>{file.filename}</div>
-                      {file.prime && (
-                        <div className={styles.uploadPrime}>
-                          {$t('Prime')}
-                          <i className="icon-prime" />
-                        </div>
-                      )}
-                    </div>
-                  </li>
-                ))}
-              </Scrollable>
-            )}
+                key="trash"
+              />,
+            ]}
+          />
+          <Scrollable style={{ height: 'calc(100% - 18px)' }}>
+            {filteredGallery &&
+              filteredGallery.map(file => (
+                <Card
+                  key={file.href}
+                  hoverable
+                  onClick={e => selectFile(file, false, e)}
+                  onDoubleClick={e => selectFile(file, true, e)}
+                  cover={<CardContent file={file} />}
+                  style={{
+                    borderColor: selectedFile?.href === file.href ? 'var(--teal)' : undefined,
+                  }}
+                  bodyStyle={{ fontSize: 10, padding: '8px' }}
+                  headStyle={{ position: 'absolute', padding: 0, border: 'none', right: '8px' }}
+                  extra={[
+                    file.prime ? (
+                      <i className="icon-prime" key="prime" />
+                    ) : (
+                      <i className="icon-copy" onClick={() => handleCopy(file.href)} key="copy" />
+                    ),
+                  ]}
+                >
+                  <Card.Meta
+                    title={file.filename}
+                    description={file.size && formatBytes(file.size)}
+                  />
+                </Card>
+              ))}
+          </Scrollable>
 
-            {!filteredGallery && (
-              <div className={styles.emptyBox}>
-                <div>{noFilesCopy}</div>
-                <div>
-                  <button onClick={openFilePicker} className="button">
-                    {noFilesBtn}
-                  </button>
-                  <button onClick={() => setCategory('stock')} className="button">
-                    {$t('Browse the Gallery')}
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
+          {!filteredGallery && (
+            <div className={styles.emptyBox}>
+              <span>{noFilesCopy}</span>
+              <button onClick={openFilePicker} className="button">
+                {noFilesBtn}
+              </button>
+              <button onClick={() => setCategory('stock')} className="button">
+                {$t('Browse the Gallery')}
+              </button>
+            </div>
+          )}
+        </Layout.Content>
+      </Layout>
+      {dragOver && (
+        <div
+          onDragOver={onDragEnter}
+          onDragLeave={onDragLeave}
+          className={cx(styles.dragOverlay, 'radius')}
+        />
+      )}
+      {busy && <div className={styles.busyOverlay} />}
     </ModalLayout>
+  );
+}
+
+function CardContent(p: { file: IMediaGalleryFile }) {
+  const { type, href } = p.file;
+  let FilePreview = () => <div />;
+  if (type === 'image' && /\.webm$/.test(href)) {
+    FilePreview = () => (
+      <video autoPlay muted loop src={href} style={{ maxHeight: '148px', maxWidth: '148px' }} />
+    );
+  }
+  if (type === 'image' && !/\.webm$/.test(href)) {
+    FilePreview = () => <img src={href} style={{ maxHeight: '148px', maxWidth: '148px' }} />;
+  }
+  if (type === 'audio') {
+    FilePreview = () => (
+      <i
+        className="icon-music"
+        style={{
+          height: '132px',
+          lineHeight: '132px',
+          fontSize: '28px',
+          textAlign: 'center',
+          display: 'block',
+        }}
+      />
+    );
+  }
+  return (
+    <div
+      style={{
+        height: '150px',
+        width: '150px',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+      }}
+    >
+      <FilePreview />
+    </div>
   );
 }

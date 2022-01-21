@@ -116,7 +116,12 @@ export class Loader extends ReactComponent {}
 })
 export class IconLibraryProperties extends ReactComponent {}
 
-@Component({ props: { name: { default: 'MediaGallery' } } })
+@Component({
+  props: {
+    name: { default: 'MediaGallery' },
+    wrapperStyles: { default: () => ({ height: '100%' }) },
+  },
+})
 export class MediaGallery extends ReactComponent {}
 
 @Component({
