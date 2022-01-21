@@ -93,7 +93,7 @@ export function getAlertsConfig(
 
     trSubscription: {
       type: 'trSubscription',
-      apiKey: 'trovo_subscription',
+      apiKey: 'trovo_sub',
       name: $t('Trovo Subscription'),
       url() {
         return `https://${host}/api/v5/slobs/test/trovo_account/subscription`;
