@@ -10,11 +10,15 @@ button {
   .radius();
 
   height: 36px;
+  line-height: normal;
   font-size: @font-size4;
   color: var(--color-button-label);
   background-color: var(--color-button-primary);
   padding: 0 16px;
   letter-spacing: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
   &:disabled {
     opacity: .5;
@@ -53,9 +57,10 @@ button {
   }
 }
 
-.button--action {
+.button--action,
+.button--accent {
   background-color: var(--color-button-accent);
-  color: @white;
+  color: var(--color-button-label);
 
   &:hover,
   &:focus {
@@ -171,12 +176,6 @@ button {
   align-content: center;
 }
 
-.button--niconico,
-.button--skip {
-  width: 56%;
-  border-radius: 25px;
-}
-
 .square-button {
   .radius();
   .transition();
@@ -189,28 +188,16 @@ button {
   font-size: 16px;
 }
 
-.square-button--niconico,
-.button--niconico {
-  color: @white;
-  background: @accent;
-  font-size: 16px;
-
-  &:focus,
-  &:hover {
-    background: @red;
-  }
-}
-
 .square-button--skip,
 .button--skip {
   background: transparent;
-  border: 1px solid @text-primary;
-  color: @text-primary;
-  text-decoration: none;
+  border: none;
+  color: var(--color-text);
+  text-decoration: underline;
 
   &:hover {
-    background: @text-primary;
-    color: @bg-primary;
+    text-decoration: none;
+    background: transparent;
   }
 
   &:focus {
