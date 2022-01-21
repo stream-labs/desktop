@@ -313,14 +313,8 @@ export class WindowsService extends StatefulService<IWindowsState> {
         this.windows.main.getBounds(),
       ).workAreaSize;
 
-      const SCREEN_PERCENT = 0.75;
-
-      if (options.size.width > screenWidth || options.size.height > screenHeight) {
-        options.size = {
-          width: Math.round(screenWidth * SCREEN_PERCENT),
-          height: Math.round(screenHeight * SCREEN_PERCENT),
-        };
-      }
+      options.size.width = Math.min(options.size.width, screenWidth);
+      options.size.height = Math.min(options.size.height, screenHeight);
     }
 
     this.centerChildWindow(options);

@@ -102,11 +102,10 @@ export class Grow extends ReactComponent {}
 })
 export class Highlighter extends ReactComponent {}
 
-@Component({
-  props: {
-    name: { default: 'Loader' },
-  },
-})
+@Component({ props: { name: { default: 'LayoutEditor' } } })
+export class LayoutEditor extends ReactComponent {}
+
+@Component({ props: { name: { default: 'Loader' } } })
 export class Loader extends ReactComponent {}
 
 @Component({
