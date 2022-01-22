@@ -77,7 +77,7 @@
     "font-manager": "https://slobs-font-manager.s3-us-west-2.amazonaws.com/font-manager-0.0.0.tar.gz",
     "fs-extra": "^9.0.0",
     "game_overlay": "https://obs-studio-deployment.s3-us-west-2.amazonaws.com/game-overlay-v0.0.0.tar.gz",
-    "node-fetch": "^2.6.1",
+    "node-fetch": "^3.0.0",
     "node-fontinfo": "https://slobs-node-fontinfo.s3-us-west-2.amazonaws.com/node-fontinfo-0.0.0.tar.gz",
     "node-libuiohook": "https://slobs-node-libuiohook.s3-us-west-2.amazonaws.com/node-libuiohook-0.0.0.tar.gz",
     "node-window-rendering": "https://slobs-node-window-rendering.s3-us-west-2.amazonaws.com/node-window-rendering-0.0.0.tar.gz",
