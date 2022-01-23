@@ -15,6 +15,7 @@ import { EStreamingState } from './streaming';
 import Vue from 'vue';
 import { PerformanceService } from './performance';
 import { jfetch } from 'util/requests';
+import { CacheUploaderService } from './cache-uploader';
 
 interface IStreamDiagnosticInfo {
   startTime: number;
@@ -65,6 +66,7 @@ export class DiagnosticsService extends PersistentStatefulService<IDiagnosticsSe
   @Inject() sourceFiltersService: SourceFiltersService;
   @Inject() streamingService: StreamingService;
   @Inject() performanceService: PerformanceService;
+  @Inject() cacheUploaderService: CacheUploaderService;
 
   static defaultState: IDiagnosticsServiceState = {
     streams: [],
@@ -84,6 +86,8 @@ export class DiagnosticsService extends PersistentStatefulService<IDiagnosticsSe
   streaming = false;
 
   init() {
+    super.init();
+
     this.streamingService.streamingStatusChange.subscribe(state => {
       if (state === EStreamingState.Live) {
         if (this.streaming) return;
@@ -137,11 +141,10 @@ export class DiagnosticsService extends PersistentStatefulService<IDiagnosticsSe
     });
   }
 
-  generateReport() {
+  async generateReport() {
     this.report = '';
     this.problems = [];
-    console.log(this.outputSettingsService.getSettings());
-    this.generateTopSection();
+    await this.generateTopSection();
     this.generateUserSection();
     this.generateSystemSection();
     this.generateVideoSection();
@@ -154,9 +157,9 @@ export class DiagnosticsService extends PersistentStatefulService<IDiagnosticsSe
     return this.report;
   }
 
-  uploadReport() {
+  async uploadReport() {
     const formData = new FormData();
-    formData.append('content', this.generateReport());
+    formData.append('content', await this.generateReport());
 
     return jfetch<{ success: boolean; report_code: string }>(
       'https://streamlabs.com/api/v6/desktop/reports',
@@ -224,11 +227,15 @@ export class DiagnosticsService extends PersistentStatefulService<IDiagnosticsSe
     });
   }
 
-  private generateTopSection() {
+  private async generateTopSection() {
+    // All diagnostic reports include a cache upload
+    const cacheId = await this.cacheUploaderService.uploadCache();
+
     this.generateSection('Streamlabs Desktop Diagnostic Report', {
       Version: Utils.env.SLOBS_VERSION,
       Bundle: SLOBS_BUNDLE_ID,
       Date: new Date().toString(),
+      Cache: cacheId,
     });
   }
 
@@ -520,8 +527,13 @@ export class DiagnosticsService extends PersistentStatefulService<IDiagnosticsSe
       'Streams',
       this.state.streams.map(s => {
         return {
-          'Start Time': new Date(s.startTime),
-          'End Time': s.endTime ? new Date(s.endTime) : 'Stream did not end cleanly',
+          'Start Time': new Date(s.startTime).toString(),
+          'End Time': s.endTime ? new Date(s.endTime).toString() : 'Stream did not end cleanly',
+          'Skipped Frames': `${s.pctSkipped.toFixed(2)}%`,
+          'Lagged Frames': `${s.pctLagged.toFixed(2)}%`,
+          'Dropped Frames': `${s.pctDropped.toFixed(2)}%`,
+          'Average CPU': `${s.avgCpu.toFixed(2)}%`,
+          'Average FPS': s.avgFps.toFixed(2),
         };
       }),
     );

@@ -9,6 +9,7 @@ import { CheckboxInput, TextInput } from '../../shared/inputs';
 import { getOS, OS } from 'util/operating-systems';
 import { Button } from 'antd';
 import cx from 'classnames';
+import { CheckCircleOutlined } from '@ant-design/icons';
 
 export function Support() {
   return (
@@ -49,19 +50,31 @@ function DiagnosticReport() {
   const [uploading, setUploading] = useState(false);
 
   function uploadReport() {
-    // alertAsync({ content: <div>Hello</div> });
     setUploading(true);
     DiagnosticsService.actions.return
       .uploadReport()
       .then(r => {
+        remote.clipboard.writeText(r.report_code);
         alertAsync({
-          type: 'success',
-          width: 500,
+          icon: <CheckCircleOutlined style={{ color: 'var(--teal)' }} />,
+          width: 550,
           getContainer: '#mainWrapper',
+          title: $t('Diagnostic Report Uploaded Successfully'),
           content: (
             <div>
-              This is a test
-              <TextInput value={r.report_code} addonAfter={<Button>{$t('Copy')}</Button>} />
+              {$t(
+                'The diagnostic report was securely uploaded, and the Report ID below has been copied to your clipboard. Please provide the Report ID to the Streamlabs Streamer Success Team.',
+              )}
+              <TextInput
+                readOnly
+                style={{ marginTop: 20, marginLeft: -10 }}
+                value={r.report_code}
+                addonAfter={
+                  <Button onClick={() => remote.clipboard.writeText(r.report_code)}>
+                    {$t('Copy')}
+                  </Button>
+                }
+              />
             </div>
           ),
         });
