@@ -92,13 +92,17 @@ export default function MediaGallery() {
   }
 
   async function upload(filepaths: string[]) {
-    console.log('uploading', filepaths);
     if (!filepaths || !filepaths.length) return;
     setBusy(true);
-    message.loading($t('Uploading...'), 0);
-    setGalleryInfo(await MediaGalleryService.actions.return.upload(filepaths));
-    setBusy(false);
-    message.destroy();
+    message.loading({ content: $t('Uploading...'), duration: 0, key: 'uploadingMsg' });
+    try {
+      setGalleryInfo(await MediaGalleryService.actions.return.upload(filepaths));
+    } catch (e: unknown) {
+      message.error($t('This file could not be uploaded'), 2);
+    } finally {
+      message.destroy('uploadingMsg');
+      setBusy(false);
+    }
   }
 
   function upgradeToPrime() {
@@ -135,7 +139,6 @@ export default function MediaGallery() {
 
   function handleFileDrop(e: React.DragEvent) {
     e.preventDefault();
-    console.log(e);
     if (!e.dataTransfer?.files) return;
     const mappedFiles = Array.from(e.dataTransfer.files).map(file => file.path);
     upload(mappedFiles);

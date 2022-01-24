@@ -101,7 +101,7 @@ export class MediaGalleryService extends Service {
       method: 'POST',
     });
 
-    await fetch(req);
+    await jfetch(req);
     return this.fetchGalleryInfo();
   }
 
