@@ -6,7 +6,7 @@ import { IFacebookStartStreamOptions } from '../platforms/facebook';
 import { IStreamError } from './stream-error';
 import { ICustomStreamDestination } from '../settings/streaming';
 import { ITiktokStartStreamOptions } from '../platforms/tiktok';
-import {ITrovoStartStreamOptions} from "../platforms/trovo";
+import { ITrovoStartStreamOptions } from '../platforms/trovo';
 
 export enum EStreamingState {
   Offline = 'offline',
