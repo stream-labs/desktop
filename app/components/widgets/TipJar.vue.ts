@@ -32,7 +32,7 @@ const nameMap = () => ({
   facebook_support_gifters: $t('Facebook Support Gifters'),
   trovo_follows: $t('Trovo Follows'),
   trovo_resubs: $t('Trovo Resubs'),
-  trovo_subs: $t('Trovo Subs'),
+  trovo_subscriptions: $t('Trovo Subs'),
 });
 
 const mediaGalleryInputs = {
