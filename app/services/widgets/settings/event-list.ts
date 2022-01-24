@@ -118,12 +118,12 @@ export class EventListService extends WidgetSettingsService<IEventListData> {
         { key: 'show_fanfundings', title: $t('Super Chats') },
       ],
       trovo: [
-        { key: 'show_trovo_follows', title: $t('Follows') },
-        { key: 'show_trovo_raids', title: $t('Raids') },
-        { key: 'show_trovo_subscriptions', title: $t('Subscriptions') },
-        { key: 'show_trovo_resubs', title: $t('Show Resubs') },
-        { key: 'show_trovo_sub_gifts', title: $t('Show Gift Subs') },
-        { key: 'show_trovo_sub_tiers', title: $t('Show Sub Tiers') },
+        { key: 'show_follows', title: $t('Follows') },
+        { key: 'show_raids', title: $t('Raids') },
+        { key: 'show_subscriptions', title: $t('Subscriptions') },
+        { key: 'show_resubs', title: $t('Show Resubs') },
+        { key: 'show_sub_gifts', title: $t('Show Gift Subs') },
+        { key: 'show_sub_tiers', title: $t('Show Sub Tiers') },
       ],
     }[platform];
   }
