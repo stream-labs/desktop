@@ -526,11 +526,11 @@ export class StreamlabelsService extends StatefulService<IStreamlabelsServiceSta
 
         this.outputTrainInfo('youtube_subscriber');
       } else if (event.for === 'trovo_account') {
-        this.trains.facebook_follow.mostRecentEventAt = Date.now();
-        this.trains.facebook_follow.counter += event.message.length;
+        this.trains.trovo_follow.mostRecentEventAt = Date.now();
+        this.trains.trovo_follow.counter += event.message.length;
 
         const latest = event.message[event.message.length - 1];
-        this.trains.facebook_follow.mostRecentName = latest.name;
+        this.trains.trovo_follow.mostRecentName = latest.name;
 
         this.outputTrainInfo('trovo_follow');
       }
@@ -552,11 +552,11 @@ export class StreamlabelsService extends StatefulService<IStreamlabelsServiceSta
 
         this.outputTrainInfo('sponsor');
       } else if (event.for === 'trovo_account') {
-        this.trains.subscription.mostRecentEventAt = Date.now();
-        this.trains.subscription.counter += event.message.length;
+        this.trains.trovo_subscription.mostRecentEventAt = Date.now();
+        this.trains.trovo_subscription.counter += event.message.length;
 
         const latest = event.message[event.message.length - 1];
-        this.trains.subscription.mostRecentName = latest.name;
+        this.trains.trovo_subscription.mostRecentName = latest.name;
 
         this.outputTrainInfo('trovo_subscription');
       }
