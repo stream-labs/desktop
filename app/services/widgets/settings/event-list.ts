@@ -44,6 +44,7 @@ export interface IEventListSettings extends IWidgetSettings {
   show_smfredemptions: boolean;
   show_sub_tiers: boolean;
   show_subscriptions: boolean;
+  show_subscribers: boolean;
   show_tiltifydonations: boolean;
   show_treats: boolean;
   text_color: string;
@@ -113,7 +114,7 @@ export class EventListService extends WidgetSettingsService<IEventListData> {
         { key: 'show_shares', title: $t('Shares') },
       ],
       youtube: [
-        { key: 'show_subscriptions', title: $t('Subscriptions') },
+        { key: 'show_subscribers', title: $t('Subscriptions') },
         { key: 'show_sponsors', title: $t('Members') },
         { key: 'show_fanfundings', title: $t('Super Chats') },
       ],
