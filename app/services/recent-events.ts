@@ -770,6 +770,8 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
       return false;
     }
 
+    if (this.userService.platform.type !== 'trovo') return true;
+
     if (!this.state.filterConfig.subscription_tier_1 && event.sub_plan.toString() === '1000') {
       return false;
     }
@@ -797,6 +799,8 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
     if (!this.state.filterConfig.resub) {
       return false;
     }
+
+    if (this.userService.platform.type !== 'trovo') return true;
 
     if (!this.state.filterConfig.resub_tier_1 && event.sub_plan.toString() === '1000') {
       return false;
