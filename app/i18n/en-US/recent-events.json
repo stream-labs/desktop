@@ -75,5 +75,6 @@
   "Disable Safe Mode": "Disable Safe Mode",
   "Something went wrong disabling Safe Mode": "Something went wrong disabling Safe Mode",
   "Automatically disable Safe Mode": "Automatically disable Safe Mode",
-  "Disable after <duration></duration> minutes": "Disable after <duration></duration> minutes"
+  "Disable after <duration></duration> minutes": "Disable after <duration></duration> minutes",
+  "has resubscribed": "has resubscribed"
 }

@@ -335,6 +335,12 @@ class RecentEventsViews extends ViewHandler<IRecentEventsState> {
       }
       return $t('has become a member');
     }
+    if (event.platform === 'trovo_account') {
+      if (event.months > 1) {
+        return $t('has resubscribed');
+      }
+      return $t('has subscribed');
+    }
     if (event.gifter) {
       return $t('has gifted a sub (%{tier}) to', {
         tier: subscriptionMap(event.sub_plan),
