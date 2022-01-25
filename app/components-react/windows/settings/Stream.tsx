@@ -303,7 +303,11 @@ function Platform(p: { platform: TPlatform }) {
           <span>
             <Button
               onClick={() => platformMerge(platform)}
-              style={{ backgroundColor: `var(--${platform})`, borderColor: 'transparent' }}
+              style={{
+                backgroundColor: `var(--${platform})`,
+                borderColor: 'transparent',
+                color: platform === 'trovo' ? 'black' : 'inherit',
+              }}
             >
               {$t('Connect')}
             </Button>

@@ -69,6 +69,7 @@ interface ILinkedPlatformsResponse {
   facebook_account?: ILinkedPlatform;
   youtube_account?: ILinkedPlatform;
   tiktok_account?: ILinkedPlatform;
+  trovo_account?: ILinkedPlatform;
   user_id: number;
   created_at: string;
 }
@@ -435,6 +436,17 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
       });
     } else if (this.state.auth.primaryPlatform !== 'tiktok') {
       this.UNLINK_PLATFORM('tiktok');
+    }
+
+    if (linkedPlatforms.trovo_account) {
+      this.UPDATE_PLATFORM({
+        type: 'trovo',
+        username: linkedPlatforms.trovo_account.platform_name,
+        id: linkedPlatforms.trovo_account.platform_id,
+        token: linkedPlatforms.trovo_account.access_token,
+      });
+    } else if (this.state.auth.primaryPlatform !== 'trovo') {
+      this.UNLINK_PLATFORM('trovo');
     }
   }
 
