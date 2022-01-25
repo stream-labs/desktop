@@ -254,7 +254,7 @@ export const WidgetDefinitions: { [x: number]: IWidget } = {
   [WidgetType.SuperchatGoal]: {
     name: 'Superchat Goal',
     url(host, token) {
-      return `https://${host}/widgets/superchat-goal?token=${token}`;
+      return `https://${host}/widgets/super-chat-goal?token=${token}`;
     },
 
     width: 600,

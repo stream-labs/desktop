@@ -11,7 +11,7 @@ export class SuperchatGoalService extends GenericGoalService {
     return {
       type: WidgetType.SuperchatGoal,
       url: WidgetDefinitions[WidgetType.SuperchatGoal].url(this.getHost(), this.getWidgetToken()),
-      previewUrl: `https://${this.getHost()}/widgets/superchat-goal?token=${this.getWidgetToken()}`,
+      previewUrl: `https://${this.getHost()}/widgets/super-chat-goal?token=${this.getWidgetToken()}`,
       dataFetchUrl: `https://${this.getHost()}/api/v5/slobs/widget/superchatgoal/settings`,
       settingsSaveUrl: `https://${this.getHost()}/api/v5/slobs/widget/superchatgoal/settings`,
       goalUrl: `https://${this.getHost()}/api/v5/slobs/widget/superchatgoal`,
