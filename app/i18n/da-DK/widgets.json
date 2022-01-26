@@ -65,10 +65,10 @@
   "Banned by %{user}": "Forbudt af %{user}",
   "No banned media found": "Der blev ikke fundet nogen forbudte medier",
   "Effects/Rallies": "Effekter/Rallies",
-  "Sparks sent are at least <amount>": "Sparks sendt er mindst <amount>",
-  "Sparks sent are exactly <amount>": "Sparks sendt er nøjagtigt <amount>",
-  "Ember amount is at least <amount>": "Ember-beløb er mindst <amount>",
-  "Ember amount is exactly <amopunt>": "Ember-beløb er nøjagtigt <amopunt>",
+  "Sparks sent are at least <amount>": "Sparks sendt er mindst &lt;amount&gt;",
+  "Sparks sent are exactly <amount>": "Sparks sendt er nøjagtigt &lt;amount&gt;",
+  "Ember amount is at least <amount>": "Ember-beløb er mindst &lt;amount&gt;",
+  "Ember amount is exactly <amopunt>": "Ember-beløb er nøjagtigt &lt;amopunt&gt;",
   "Please note that when advanced media share is enabled, media will no longer play through your alert box widget. Media will only play through this media share widget.": "Bemærk at når avanceret mediedeling er aktiveret, vil medier ikke længere afspille via din alarmboks-widget. Medier afspilles kun via denne mediedeling-widget.",
   "Twitch Subscribers": "Twitch-abonnenter",
   "YouTube Members": "YouTube-medlemmer",
@@ -180,8 +180,9 @@
   "Slide Out Right": "Glid ud til højre",
   "Slide Out Up": "Glid ud opad",
   "Pick Screen Color": "Vælg skærmfarve",
-  "Play Alert": "Play Alert",
-  "Browser Settings": "Browser Settings",
-  "Custom Code": "Custom Code",
-  "Something went wrong while applying settings": "Something went wrong while applying settings"
+  "Play Alert": "Vis notifikation",
+  "Browser Settings": "Browserindstillinger",
+  "Custom Code": "Brugerdefineret kode",
+  "font_family_tooltip": "Den Google-skrifttype der skal bruges til teksten. Find en, du kan lide, på https://fonts.google.com. Populære skrifttyper: Open Sans, Roboto, Oswald, Lato, Droid Sans.",
+  "Something went wrong while applying settings": "Der opstod en fejl under anvendelsen af indstillingerne"
 }

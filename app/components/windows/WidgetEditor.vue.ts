@@ -22,6 +22,7 @@ import Scrollable from 'components/shared/Scrollable';
 import { CustomizationService } from '../../services/customization';
 import { SourcesService } from '../../services/sources';
 import { EAvailableFeatures, IncrementalRolloutService } from '../../services/incremental-rollout';
+import { onUnload } from 'util/unload';
 
 class WidgetEditorProps {
   isAlertBox?: boolean = false;
@@ -121,6 +122,8 @@ export default class WidgetEditor extends TsxComponent<WidgetEditorProps> {
     return this.settingsState.pendingRequests > 0;
   }
 
+  cancelUnload: () => void;
+
   mounted() {
     const source = this.widget.getSource();
     this.currentSetting = this.props.navItems[0].value;
@@ -128,6 +131,8 @@ export default class WidgetEditor extends TsxComponent<WidgetEditorProps> {
 
     // create a temporary previewSource while current window is shown
     this.widget.createPreviewSource();
+
+    this.cancelUnload = onUnload(() => this.widget.destroyPreviewSource());
 
     // some widgets have CustomFieldsEditor
     if (this.apiSettings.customFieldsAllowed) {
@@ -137,6 +142,7 @@ export default class WidgetEditor extends TsxComponent<WidgetEditorProps> {
 
   destroyed() {
     this.widget.destroyPreviewSource();
+    this.cancelUnload();
   }
 
   get windowTitle() {

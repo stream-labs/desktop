@@ -167,17 +167,27 @@ class StreamSchedulerModule {
   private async fetchYTBEvents() {
     if (!this.platforms.includes('youtube')) return [];
     const ytActions = Services.YoutubeService.actions;
-    await ytActions.return.prepopulateInfo();
-    const broadcasts = await ytActions.return.fetchBroadcasts();
-    return broadcasts.map(broadcast => convertYTBroadcastToEvent(broadcast));
+    try {
+      await ytActions.return.prepopulateInfo();
+      const broadcasts = await ytActions.return.fetchBroadcasts();
+      return broadcasts.map(broadcast => convertYTBroadcastToEvent(broadcast));
+    } catch (e: unknown) {
+      message.error($t('Failed to load YouTube events'));
+      return [];
+    }
   }
 
   private async fetchFbEvents() {
     if (!this.platforms.includes('facebook')) return [];
     const fbActions = Services.FacebookService.actions;
-    await fbActions.return.prepopulateInfo();
-    const liveVideos = await fbActions.return.fetchAllVideos();
-    return liveVideos.map(video => convertFBLiveVideoToEvent(video));
+    try {
+      await fbActions.return.prepopulateInfo();
+      const liveVideos = await fbActions.return.fetchAllVideos();
+      return liveVideos.map(video => convertFBLiveVideoToEvent(video));
+    } catch (e: unknown) {
+      message.error($t('Failed to load Facebook events'));
+      return [];
+    }
   }
 
   /**
@@ -217,9 +227,9 @@ class StreamSchedulerModule {
    * Shows a modal for creating a new event
    */
   @mutation()
-  showNewEventModal(platform: TPlatform, selectedTime?: Moment) {
+  showNewEventModal(platform: TPlatform, selectedTime?: number) {
     const today = new Date().setHours(0, 0, 0, 0);
-    const time = selectedTime?.valueOf() || this.state.time;
+    const time = selectedTime || this.state.time;
     const isPastDate = time < today;
     if (isPastDate) {
       message.error($t('You can not schedule to a past date'));

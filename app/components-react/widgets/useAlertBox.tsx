@@ -15,6 +15,7 @@ import { $t } from '../../services/i18n';
 import * as electron from 'electron';
 import { getDefined } from '../../util/properties-type-guards';
 import { TPlatform } from '../../services/platforms';
+import * as remote from '@electron/remote';
 import { IListOption } from '../shared/inputs/ListInput';
 
 interface IAlertBoxState extends IWidgetState {
@@ -323,7 +324,7 @@ export class AlertBoxModule extends WidgetModule<IAlertBoxState> {
 
   openAlertInfo(alertType: TAlertType) {
     const url = getDefined(this.eventsConfig[alertType].tooltipLink);
-    electron.remote.shell.openExternal(url);
+    remote.shell.openExternal(url);
   }
 
   get selectedAlert(): TAlertType | null {
@@ -525,6 +526,9 @@ function getVariationsMetadata() {
     },
     ytSubscriber: {},
     ytMembership: {},
+    trFollow: {},
+    trSubscription: {},
+    trRaid: {},
   });
 
   // mix common and specific metadata and return it

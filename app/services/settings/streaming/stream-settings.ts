@@ -83,6 +83,7 @@ const platformToServiceNameMap: { [key in TPlatform]: string } = {
   twitch: 'Twitch',
   youtube: 'YouTube / YouTube Gaming',
   facebook: 'Facebook Live',
+  trovo: 'Trovo',
   tiktok: 'Custom',
 };
 

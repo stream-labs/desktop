@@ -65,10 +65,10 @@
   "Banned by %{user}": "Prohibido por %{user}",
   "No banned media found": "No se encontraron medios prohibidos",
   "Effects/Rallies": "Efectos/Mejoras",
-  "Sparks sent are at least <amount>": "Las chispas enviadas son al menos <amount>",
-  "Sparks sent are exactly <amount>": "Las chispas enviadas son exactamente <amount>",
-  "Ember amount is at least <amount>": "La cantidad de brasas es al menos <amount>",
-  "Ember amount is exactly <amopunt>": "La cantidad de brasas es exactamente <amopunt>",
+  "Sparks sent are at least <amount>": "Las chispas enviadas son al menos &lt;amount&gt;",
+  "Sparks sent are exactly <amount>": "Las chispas enviadas son exactamente &lt;amount&gt;",
+  "Ember amount is at least <amount>": "La cantidad de brasas es al menos &lt;amount&gt;",
+  "Ember amount is exactly <amopunt>": "La cantidad de brasas es exactamente &lt;amopunt&gt;",
   "Please note that when advanced media share is enabled, media will no longer play through your alert box widget. Media will only play through this media share widget.": "Al activar el uso compartido avanzado de medios, los medios no se reproducirán a través de su widget de cuadro de alerta, sino solo a través de este widget para compartir medios.",
   "Twitch Subscribers": "Suscriptores de Twitch",
   "YouTube Members": "Miembros de YouTube",
@@ -180,8 +180,9 @@
   "Slide Out Right": "Salir deslizando derecha",
   "Slide Out Up": "Salir deslizando arriba",
   "Pick Screen Color": "Seleccionar color de pantalla",
-  "Play Alert": "Play Alert",
-  "Browser Settings": "Browser Settings",
-  "Custom Code": "Custom Code",
-  "Something went wrong while applying settings": "Something went wrong while applying settings"
+  "Play Alert": "Reproducir alerta",
+  "Browser Settings": "Configuración de navegador",
+  "Custom Code": "Código personalizado",
+  "font_family_tooltip": "La fuente de Google que se utilizará para el texto. Visite https://fonts.google.com para encontrar una. Entre las más populares están: Open Sans, Roboto, Oswald, Lato y Droid Sans.",
+  "Something went wrong while applying settings": "Algo ha salido mal al aplicar la configuración."
 }

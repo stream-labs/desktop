@@ -66,7 +66,7 @@
         @contextmenu.native.stop="showContextMenu()"
       >
         <template slot="title" slot-scope="{ node }">
-          <div>{{ node.title }}</div>
+          <span class="item-title">{{ node.title }}</span>
         </template>
       </sl-vue-tree>
     </scrollable>
@@ -110,6 +110,16 @@
 
   & /deep/ .popper.dropdown-menu {
     min-width: 200px;
+  }
+}
+
+.sl-vue-tree-title {
+  min-width: 0;
+
+  .item-title {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 }
 </style>

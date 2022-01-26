@@ -7,7 +7,6 @@ import {
   IObsListInput,
   IObsInput,
   TObsValue,
-  IObsBitmaskInput,
 } from 'components/obs/inputs/ObsInput';
 import * as obs from '../../../obs-api';
 import { SourcesService } from 'services/sources';
@@ -23,11 +22,9 @@ import { PlatformAppsService } from 'services/platform-apps';
 import { EDeviceType, HardwareService } from 'services/hardware';
 import { StreamingService } from 'services/streaming';
 import { byOS, getOS, OS } from 'util/operating-systems';
-import path from 'path';
-import fs from 'fs';
 import { UsageStatisticsService } from 'services/usage-statistics';
 import { SceneCollectionsService } from 'services/scene-collections';
-import electron from 'electron';
+import * as remote from '@electron/remote';
 
 export interface ISettingsValues {
   General: {
@@ -433,6 +430,14 @@ export class SettingsService extends StatefulService<ISettingsServiceState> {
           valueToCurrentValue: true,
         }),
       });
+
+      if (
+        categoryName === 'Output' &&
+        subGroup.nameSubCategory === 'Untitled' &&
+        subGroup.parameters[0].value === 'Simple'
+      ) {
+        this.audioService.setSimpleTracks();
+      }
     }
 
     obs.NodeObs.OBS_settings_saveSettings(categoryName, dataToSave);
@@ -519,7 +524,7 @@ export class SettingsService extends StatefulService<ISettingsServiceState> {
         this.setSettingValue('Output', 'StreamEncoder', 'x264');
       }
 
-      electron.remote.dialog.showMessageBox(this.windowsService.windows.main, {
+      remote.dialog.showMessageBox(this.windowsService.windows.main, {
         type: 'error',
         message:
           'Your stream encoder has been reset to Software (x264). This can be caused by out of date graphics drivers. Please update your graphics drivers to continue using hardware encoding.',

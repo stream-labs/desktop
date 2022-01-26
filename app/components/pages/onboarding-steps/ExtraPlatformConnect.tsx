@@ -8,8 +8,8 @@ import { UserService } from 'services/user';
 import VFormGroup from 'components/shared/inputs/VFormGroup.vue';
 import { metadata } from 'components/shared/inputs';
 import { StreamSettingsService } from 'services/settings/streaming';
-import electron from 'electron';
 import PlatformLogo from 'components/shared/PlatformLogo';
+import * as remote from '@electron/remote';
 
 export type TExtraPlatform = 'nimotv' | 'dlive';
 
@@ -55,7 +55,7 @@ export default class ExtraPlatformConnect extends TsxComponent<ConnectProps> {
   }
 
   openHelp() {
-    electron.remote.shell.openExternal(this.platformDefinition.helpUrl);
+    remote.shell.openExternal(this.platformDefinition.helpUrl);
   }
 
   render() {

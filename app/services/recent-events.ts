@@ -34,6 +34,7 @@ export interface IRecentEvent {
   formatted_amount?: string;
   formattedAmount?: string;
   sub_plan?: string;
+  sub_type?: string;
   months?: number;
   streak_months?: number;
   gifter?: string;
@@ -334,6 +335,25 @@ class RecentEventsViews extends ViewHandler<IRecentEventsState> {
       }
       return $t('has become a member');
     }
+
+    if (event.platform === 'trovo_account') {
+      if (event.gifter) {
+        return $t('has gifted a sub to');
+      }
+      if (event.months > 1 && event.streak_months && event.streak_months > 1) {
+        return $t('has resubscribed for %{streak} months in a row! (%{months} total)', {
+          streak: event.streak_months,
+          months: event.months,
+        });
+      }
+      if (event.months > 1) {
+        return $t('has resubscribed for %{months} months', {
+          months: event.months,
+        });
+      }
+      return $t('has subscribed');
+    }
+
     if (event.gifter) {
       return $t('has gifted a sub (%{tier}) to', {
         tier: subscriptionMap(event.sub_plan),
@@ -350,6 +370,11 @@ class RecentEventsViews extends ViewHandler<IRecentEventsState> {
       return $t('has resubscribed (%{tier}) for %{months} months', {
         tier: subscriptionMap(event.sub_plan),
         months: event.months,
+      });
+    }
+    if (event.sub_type === 'primepaidupgrade') {
+      return $t('has converted from a Prime Gaming sub to a %{tier} sub', {
+        tier: subscriptionMap(event.sub_plan),
       });
     }
     return $t('has subscribed (%{tier})', { tier: subscriptionMap(event.sub_plan) });
@@ -509,6 +534,7 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
           'raiders',
           'formatted_amount',
           'sub_plan',
+          'sub_type',
           'months',
           'streak_months',
           'gifter',
@@ -763,6 +789,8 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
       return false;
     }
 
+    if (this.userService.platform.type === 'trovo') return true;
+
     if (!this.state.filterConfig.subscription_tier_1 && event.sub_plan.toString() === '1000') {
       return false;
     }
@@ -790,6 +818,8 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
     if (!this.state.filterConfig.resub) {
       return false;
     }
+
+    if (this.userService.platform.type === 'trovo') return true;
 
     if (!this.state.filterConfig.resub_tier_1 && event.sub_plan.toString() === '1000') {
       return false;

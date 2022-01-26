@@ -31,11 +31,18 @@ import { WidgetWindow } from './widgets/common/WidgetWindow';
 import SafeMode from './windows/SafeMode';
 import AdvancedAudio from './windows/advanced-audio';
 import { CustomCodeWindow } from './widgets/common/CustomCode';
+import SourceShowcase from './windows/source-showcase';
 import SourceFilters from './windows/SourceFilters';
+import RecentEvents from './editor/elements/RecentEvents';
+import MiniFeed from './editor/elements/Minifeed';
+import BrowserView from './shared/BrowserView';
+import LayoutEditor from './pages/layout-editor/LayoutEditor';
+import Projector from './windows/Projector';
 
 // list of React components to be used inside Vue components
 export const components = {
   NameFolder,
+  BrowserView,
   GoLiveWindow: createRoot(GoLiveWindow),
   EditStreamWindow: createRoot(EditStreamWindow),
   IconLibraryProperties,
@@ -51,6 +58,7 @@ export const components = {
   Loader,
   NavTools,
   PlatformLogo,
+  Projector,
   StreamScheduler: createRoot(StreamScheduler),
   AdvancedStatistics,
   SourceProperties: createRoot(SourceProperties),
@@ -67,5 +75,9 @@ export const components = {
   CustomCodeWindow: createRoot(CustomCodeWindow),
   SafeMode,
   AdvancedAudio,
+  SourceShowcase: createRoot(SourceShowcase),
   SourceFilters,
+  RecentEvents,
+  MiniFeed: createRoot(MiniFeed),
+  LayoutEditor: createRoot(LayoutEditor),
 };

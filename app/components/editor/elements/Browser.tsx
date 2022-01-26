@@ -1,6 +1,6 @@
 import { Component } from 'vue-property-decorator';
 import BaseElement from './BaseElement';
-import BrowserView from 'components/shared/BrowserView';
+import { BrowserView } from 'components/shared/ReactComponentList';
 import { LayoutService, ELayoutElement } from 'services/layout';
 import { Inject } from 'services/core';
 import { UserService } from 'services/user';
@@ -27,8 +27,10 @@ export default class Display extends BaseElement {
   get element() {
     return (
       <BrowserView
-        src={this.url}
-        options={{ webPreferences: { partition: this.partition, contextIsolation: true } }}
+        componentProps={{
+          src: this.url,
+          options: { webPreferences: { partition: this.partition, contextIsolation: true } },
+        }}
       />
     );
   }

@@ -27,7 +27,7 @@
   "Replay Duration": "리플레이 시간",
   "Set a hotkey to capture replays": "리플레이 캡처 핫키 설정",
   "Capture a replay": "리플레이 캡처",
-  "highlighterHotkeyInstructions": "스트리밍을 시작하고 <b>%{bindingStr}</b> 키로 리플레이를 캡처하세요. 스트리밍이 끝난 뒤 다시 여기로 돌아오세요.",
+  "highlighterHotkeyInstructions": "스트리밍을 시작하고 &lt;b&gt;%{bindingStr}&lt;/b&gt; 키로 리플레이를 캡처하세요. 스트리밍이 끝난 뒤 다시 여기로 돌아오세요.",
   "Start streaming and capture a replay. Check back here after your stream.": "스트리밍을 시작하고 리플레이를 캡처하세요. 스트리밍이 끝난 뒤 다시 여기로 돌아오세요.",
   "Or, import a clip from your computer": "또는 컴퓨터에서 클립을 가져오세요.",
   "Disable clip": "클립 비활성화",
@@ -90,5 +90,5 @@
   "An error occurred while reading %{file}": "%{file} 파일을 읽는 중 오류가 발생했습니다.",
   "An error occurred while reading audio from %{file}": "%{file}에서 오디오를 읽는 중 오류가 발생했습니다.",
   "An error occurred while mixing audio": "오디오 믹싱 중 오류가 발생했습니다.",
-  "Edit your replays with Highlighter, a free editor built in to Streamlabs OBS.": "Streamlabs OBS에 내장된 무료 에디터인 하이라이터로 리플레이를 편집해보세요."
+  "Edit your replays with Highlighter, a free editor built in to Streamlabs.": "Streamlabs에 내장된 무료 에디터인 하이라이터로 리플레이를 편집해보세요."
 }

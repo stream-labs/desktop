@@ -23,7 +23,8 @@ export async function focusLibrary() {
   await focusWindow(/streamlabs\.com\/library/);
 }
 
-test('Installing a theme', async (t: TExecutionContext) => {
+// TODO: flaky
+test.skip('Installing a theme', async (t: TExecutionContext) => {
   const formMonkey = new FormMonkey(t);
 
   await logIn(t);

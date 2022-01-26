@@ -30,7 +30,7 @@ export default function OptimizedProfileSwitcher() {
   }
 
   const label =
-    optimizedProfile?.game !== 'DEFAULT'
+    optimizedProfile?.game && optimizedProfile.game !== 'DEFAULT'
       ? $t('Use optimized encoder settings for %{game}', { game })
       : $t('Use optimized encoder settings');
   const tooltip = $t(
