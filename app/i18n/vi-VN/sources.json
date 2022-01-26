@@ -80,7 +80,7 @@
   "Click a source to get more details about it": "Click a source to get more details about it",
   "Standard": "Tiêu chuẩn",
   "Widgets": "Widgets",
-  "You must be logged in for Widgets": "You must be logged in for Widgets",
+  "You must be logged in to use Widgets": "You must be logged in to use Widgets",
   "Click here to log in": "Click here to log in",
   "Alertbox": "Alertbox",
   "Essential": "Essential",
@@ -197,5 +197,14 @@
   "Capture Game": "Capture Game",
   "Automatic game capture will scan for running games and automatically capture them.": "Automatic game capture will scan for running games and automatically capture them.",
   "Capture Entire Screen": "Capture Entire Screen",
-  "Capture Window": "Capture Window"
+  "Capture Window": "Capture Window",
+  "Supports:": "Supports:",
+  "Essential Sources": "Essential Sources",
+  "General Sources": "General Sources",
+  "Add media": "Add media",
+  "Your webcam device": "Your webcam device",
+  "Capture games and apps": "Capture games and apps",
+  "Dynamic, live alerts": "Dynamic, live alerts",
+  "Display recent events": "Display recent events",
+  "Viewer shoutouts": "Viewer shoutouts"
 }

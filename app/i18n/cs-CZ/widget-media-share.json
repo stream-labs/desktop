@@ -5,7 +5,7 @@
   "Min. Amount to Share": "Min. částka, která se bude sdílet",
   "Max Duration": "Maximální doba trvání",
   "Buffer Time": "Čas bufferu",
-  "Spam Security": "Spam Security",
+  "Spam Security": "Ochrana proti spamu",
   "The time between videos the next video has to buffer.": "Čas mezi videi, během kterého se bude načítat následující video.",
   "Manage Media Settings": "Spravovat nastavení médií",
   "The maximum duration in seconds that media can be played, regardless of amount donated. The default value is 60 seconds.": "Maximální doba (v sekundách), po kterou lze média přehrávat bez ohledu na darovanou částku. Výchozí hodnota je 60 sekund.",

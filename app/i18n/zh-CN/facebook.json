@@ -14,7 +14,7 @@
   "Connect": "连接",
   "Install Your Theme": "安装您的主题",
   "Install": "安装",
-  "facebookGamingWarning": "获得完整的 Facebook 游戏体验<create-page-link>创建游戏视频创作者页面</create-page-link>",
+  "facebookGamingWarning": "获得完整的 Facebook 游戏体验&lt;create-page-link&gt;创建游戏视频创作者页面&lt;/create-page-link&gt;",
   "Facebook Destination": "Facebook 目的地",
   "Share to Your Timeline": "分享到您的时间线",
   "Share to a Page You Manage": "分享到您管理的主页",
@@ -30,7 +30,7 @@
   "Please reconnect Facebook to get these new features": "请重新连接 Facebook 以获取这些新功能",
   "Reconnect now": "立即重新连接",
   "Privacy": "隐私",
-  "FBPrivacyWarning": "授予的隐私级别可能会限制您的 Facebook 帐户。请在<link>此处</link>检查“谁可以看到您使用此业务集成”部分以了解 Streamlabs 集成",
+  "FBPrivacyWarning": "授予的隐私级别可能会限制您的 Facebook 帐户。请在&lt;link&gt;此处&lt;/link&gt;检查“谁可以看到您使用此业务集成”部分以了解 Streamlabs 集成",
   "Only Me": "只有我",
   "Do not change privacy settings": "不要更改隐私设置"
 }

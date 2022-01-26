@@ -65,10 +65,10 @@
   "Banned by %{user}": "%{user} によって禁止されています",
   "No banned media found": "禁止されたメディアは見つかりません",
   "Effects/Rallies": "エフェクト/ラリー",
-  "Sparks sent are at least <amount>": "送信されたスパークは最低 <amount> です",
-  "Sparks sent are exactly <amount>": "送信されたスパークはちょうど <amount> です",
-  "Ember amount is at least <amount>": "エンバー量は最低 <amount> です",
-  "Ember amount is exactly <amopunt>": "エンバー量はちょうど <amopunt> です",
+  "Sparks sent are at least <amount>": "送信されたスパークは最低 &lt;amount&gt; です",
+  "Sparks sent are exactly <amount>": "送信されたスパークはちょうど &lt;amount&gt; です",
+  "Ember amount is at least <amount>": "エンバー量は最低 &lt;amount&gt; です",
+  "Ember amount is exactly <amopunt>": "エンバー量はちょうど &lt;amopunt&gt; です",
   "Please note that when advanced media share is enabled, media will no longer play through your alert box widget. Media will only play through this media share widget.": "高度なメディア共有を有効化すると、メディアはアラートボックスウィジェットを通して再生されなくなり、メディアはこのメディア共有ウィジェットを通してのみ再生されます。",
   "Twitch Subscribers": "Twitch サブスクライバー",
   "YouTube Members": "YouTube メンバー",
@@ -180,8 +180,9 @@
   "Slide Out Right": "スライドアウトライト",
   "Slide Out Up": "スライドアウトアップ",
   "Pick Screen Color": "画面の色を選択",
-  "Play Alert": "Play Alert",
-  "Browser Settings": "Browser Settings",
-  "Custom Code": "Custom Code",
-  "Something went wrong while applying settings": "Something went wrong while applying settings"
+  "Play Alert": "アラートを再生",
+  "Browser Settings": "ブラウザ設定",
+  "Custom Code": "カスタムコード",
+  "font_family_tooltip": "テキストに使用する Google フォント。https://fonts.google.com にアクセスしてフォントを検索しましょう！人気のあるフォント：Open Sans、Roboto、Oswald、Lato、Droid Sans。",
+  "Something went wrong while applying settings": "設定の適用中に、問題が発生しました"
 }

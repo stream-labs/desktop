@@ -1,4 +1,3 @@
-import { remote } from 'electron';
 import { Component } from 'vue-property-decorator';
 import TsxComponent, { createProps } from 'components/tsx-component';
 import { $t } from 'services/i18n';

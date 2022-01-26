@@ -27,7 +27,7 @@
   "Replay Duration": "Длительность повтора",
   "Set a hotkey to capture replays": "Назначить горячую клавишу для захвата повторов",
   "Capture a replay": "Записать повтор",
-  "highlighterHotkeyInstructions": "Начните трансляцию и нажмите <b>%{bindingStr}</b>, чтобы активировать запись повтора. После окончания трансляции вы найдете его здесь.",
+  "highlighterHotkeyInstructions": "Начните трансляцию и нажмите &lt;b&gt;%{bindingStr}&lt;/b&gt;, чтобы активировать запись повтора. После окончания трансляции вы найдете его здесь.",
   "Start streaming and capture a replay. Check back here after your stream.": "Начните трансляцию и активируйте запись повтора. После окончания трансляции вы найдете его здесь.",
   "Or, import a clip from your computer": "Вы также можете загрузить клип со своего компьютера.",
   "Disable clip": "Отключить клип",
@@ -90,5 +90,5 @@
   "An error occurred while reading %{file}": "Ошибка при чтении файла %{file}",
   "An error occurred while reading audio from %{file}": "Ошибка при чтении аудио из файла %{file}",
   "An error occurred while mixing audio": "Ошибка при сведении аудио",
-  "Edit your replays with Highlighter, a free editor built in to Streamlabs OBS.": "Редактируйте ваши повторы при помощи Highlighter, бесплатного встроенного редактора Streamlabs OBS."
+  "Edit your replays with Highlighter, a free editor built in to Streamlabs.": "Редактируйте повторы при помощи Highlighter — бесплатного встроенного редактора Streamlabs."
 }

@@ -4,25 +4,28 @@ import { getFormInput } from '../../helpers/spectron/forms';
 import { goLive, stopStream } from '../../helpers/modules/streaming';
 import { FormMonkey } from '../../helpers/form-monkey';
 import { showSettingsWindow } from '../../helpers/modules/settings/settings';
+import { click } from '../../helpers/modules/core';
+import { assertFormContains, readFields, useForm } from '../../helpers/modules/forms';
 
 useSpectron();
 
 test('Populates stream settings after go live', async t => {
-  const { app } = t.context;
-
   await logIn(t);
   await goLive();
   await stopStream();
   await showSettingsWindow('Stream');
-  await (await app.client.$('a=Stream to custom ingest')).click();
-  const form = new FormMonkey(t);
-  t.true(
-    await form.includesByTitles({
+  await click('a=Stream to custom ingest');
+
+  await assertFormContains(
+    {
       'Stream Type': 'Streaming Services',
       Service: 'Twitch',
       Server: 'Auto (Recommended)',
-    }),
+    },
+    'title',
   );
+
+  t.pass();
 });
 
 test('Populates stream key after go live', async t => {
@@ -32,18 +35,11 @@ test('Populates stream key after go live', async t => {
   await goLive();
   await stopStream();
   await showSettingsWindow('Stream');
-  await (await app.client.$('a=Stream to custom ingest')).click();
-
-  // Test that we can toggle show stream key, also helps us fetch the value
-  await (await app.client.$('button=Show')).click();
-  t.false(await (await app.client.$('input[type=password]')).isExisting());
+  await click('a=Stream to custom ingest');
 
   // Check that is a somewhat valid Twitch stream key
-  const streamKey = await getFormInput(t, 'Stream key');
+  const formData = (await readFields()) as { key: string };
+  const streamKey = formData.key;
   t.true(streamKey.startsWith('live_'));
   t.true(streamKey.length > 40);
-
-  // Test that we can hide back the stream key
-  await (await app.client.$('button=Hide')).click();
-  t.true(await (await app.client.$('input[type=password]')).isExisting());
 });

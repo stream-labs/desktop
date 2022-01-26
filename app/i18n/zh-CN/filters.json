@@ -20,14 +20,14 @@
   "Filter name": "滤镜名称",
   "Add source filter": "添加源滤镜",
   "No filters applied": "未应用滤镜",
-  "Filters for %{sourceName}": "%{sourceName} 的滤镜",
+  "Filters for %{sourceName}": "%{sourceName}的滤镜",
   "Invert Polarity": "反转极性",
   "Limiter": "限幅器",
   "Expander": "扩展器",
   "Shader": "着色器",
   "No settings are available for this filter": "此滤镜没有可用的设置",
   "Visual Presets": "视觉预设",
-  "None": "無",
+  "None": "无",
   "Grayscale": "灰度",
   "Sepiatone": "棕褐色调",
   "Action Movie": "动作片",
@@ -38,5 +38,5 @@
   "Cel Shade": "卡通渲染",
   "Dramatic": "戏剧",
   "Wintergreen": "冬青",
-  "Edit Filters": "Edit Filters"
+  "Edit Filters": "编辑滤镜"
 }
