@@ -184,5 +184,7 @@
   "Browser Settings": "浏览器设置",
   "Custom Code": "自定义代码",
   "font_family_tooltip": "用于文本的 Google 字体。访问 https://fonts.google.com 找到自己的字体！流行的字体有：Open Sans、Roboto、Oswald、Lato、Droid Sans。",
-  "Something went wrong while applying settings": "应用设置时出错"
+  "Something went wrong while applying settings": "应用设置时出错",
+  "Superchat Goal": "Superchat Goal",
+  "YouTube Superchats": "YouTube Superchats"
 }
