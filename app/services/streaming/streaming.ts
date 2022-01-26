@@ -117,6 +117,7 @@ export class StreamingService
         youtube: 'not-started',
         facebook: 'not-started',
         tiktok: 'not-started',
+        trovo: 'not-started',
         setupMultistream: 'not-started',
         startVideoTransmission: 'not-started',
         postTweet: 'not-started',
