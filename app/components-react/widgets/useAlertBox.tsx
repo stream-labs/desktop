@@ -526,6 +526,9 @@ function getVariationsMetadata() {
     },
     ytSubscriber: {},
     ytMembership: {},
+    trFollow: {},
+    trSubscription: {},
+    trRaid: {},
   });
 
   // mix common and specific metadata and return it

@@ -196,8 +196,13 @@ export class TwitterView extends ViewHandler<ITwitterServiceState> {
 
   get url() {
     let url = `${this.state.creatorSiteUrl}/home`;
-    if (!this.state.creatorSiteOnboardingComplete && this.userView.platform.type === 'twitch') {
-      url = `https://twitch.tv/${this.userView.platform.username}`;
+    if (!this.state.creatorSiteOnboardingComplete) {
+      if (this.userView.platform.type === 'twitch') {
+        url = `https://twitch.tv/${this.userView.platform.username}`;
+      }
+      if (this.userView.platform.type === 'trovo') {
+        url = `https://trovo.live/${this.userView.platform.username}`;
+      }
     }
     return url;
   }
