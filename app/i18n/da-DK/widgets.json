@@ -184,5 +184,7 @@
   "Browser Settings": "Browserindstillinger",
   "Custom Code": "Brugerdefineret kode",
   "font_family_tooltip": "Den Google-skrifttype der skal bruges til teksten. Find en, du kan lide, på https://fonts.google.com. Populære skrifttyper: Open Sans, Roboto, Oswald, Lato, Droid Sans.",
-  "Something went wrong while applying settings": "Der opstod en fejl under anvendelsen af indstillingerne"
+  "Something went wrong while applying settings": "Der opstod en fejl under anvendelsen af indstillingerne",
+  "Superchat Goal": "Superchat Goal",
+  "YouTube Superchats": "YouTube Superchats"
 }
