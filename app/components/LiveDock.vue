@@ -75,16 +75,23 @@
             >
               <i class="icon-settings" />
             </a>
+            <a
+              @click="openTrovoStreamUrl"
+              v-if="isTrovo"
+              v-tooltip.right="viewStreamTooltip"
+            >
+              <i class="icon-studio" />
+            </a>
           </div>
           <div class="flex">
-            <a @click="refreshChat" v-if="isTwitch || (isYoutube && isStreaming) || isFacebook">
+            <a @click="refreshChat" v-if="isTwitch || isTrovo || (isYoutube && isStreaming) || isFacebook">
               {{ $t('Refresh Chat') }}
             </a>
           </div>
         </div>
         <div
           class="live-dock-chat"
-          v-if="!hideStyleBlockers && (isTwitch || (isYoutube && isStreaming) || (isFacebook && isStreaming))"
+          v-if="!hideStyleBlockers && (isTwitch || isTrovo || (isYoutube && isStreaming) || (isFacebook && isStreaming))"
         >
           <div v-if="hasChatTabs" class="flex">
             <tabs :tabs="chatTabs" v-model="selectedChat" :hideContent="true" />

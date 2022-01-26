@@ -56,7 +56,7 @@
             <strong>{{ userService.isLoggedIn ? $t('Log Out') : $t('Log In') }}</strong>
             <platform-logo
               v-if="userService.isLoggedIn"
-              :componentProps="{ platform: userService.platform.type, size: 14 }"
+              :componentProps="{ platform: userService.platform.type, size: 'small' }"
             />
             <span v-if="userService.isLoggedIn">{{ userService.username }}</span>
           </div>

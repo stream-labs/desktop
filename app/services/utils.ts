@@ -19,6 +19,7 @@ export interface IEnv {
   SLOBS_VERSION: string;
   SLOBS_TRACE_SYNC_IPC: boolean;
   SLOBS_USE_CDN_MEDIA: boolean;
+  SLD_USE_BETA: boolean;
   CI: boolean;
 }
 
@@ -107,6 +108,10 @@ export default class Utils {
 
   static shouldUseLocalHost(): boolean {
     return Utils.env.SLOBS_USE_LOCAL_HOST as boolean;
+  }
+
+  static shouldUseBeta(): boolean {
+    return Utils.env.SLD_USE_BETA as boolean;
   }
 
   /**
