@@ -70,18 +70,18 @@
   .dividing-border(right);
 
   width: 24px;
-  background-color: var(--color-primary);
+  background-color: var(--color-bg-primary);
 
   > i {
     display: block;
     font-size: @font-size2;
-    color: var(--color-icon);
+    color: var(--color-text);
     transform: rotate(-90deg);
   }
 
   &:hover {
     > i {
-      color: var(--color-icon-hover);
+      color: var(--color-text-light);
     }
   }
 

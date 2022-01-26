@@ -27,13 +27,11 @@
 
 .tabs {
   display: flex;
-  background-color: @bg-primary;
   box-sizing: border-box;
   position: relative;
   width: 100%;
-  padding: 0 15px;
+  padding: 0 16px;
   height: 54px;
-  border-bottom: 1px solid @border;
 }
 
 .tab-content {

@@ -55,8 +55,8 @@
   display: flex;
   flex-direction: row;
   align-items: center;
-  min-height: 30px;
-  padding: 4px 12px;
+  min-height: 32px;
+  padding: 0 12px;
   cursor: pointer;
   justify-content: space-between;
 

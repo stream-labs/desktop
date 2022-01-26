@@ -61,7 +61,7 @@
 }
 
 .vue-slider-process {
-  background-color: var(--color-icon) !important;
+  background-color: var(--color-text) !important;
 
   .muted & {
     opacity: @opacity-disabled;

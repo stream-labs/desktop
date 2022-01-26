@@ -2,25 +2,9 @@
 
 // デフォルトのスタイルセット
 :root {
-  // primary
-  --color-primary: @bg-primary;
-  --color-primary-light: @bg-quaternary;
-  --color-primary-dark: @bg-secondary;
-
-  // secondary
-  --color-secondary: @text-primary;
-  --color-secondary-light: @text-active;
-  --color-secondary-dark: @text-secondary;
-
-  // accent
-  --color-accent: @accent;
-  --color-accent-variant: @accent-hover;
-
-  // border
-  --color-border-dark: rgba(@black, .4);
-  --color-border-light: rgba(@white, .1);
-  --color-border-accent:  @text-secondary;
-  --color-border-active: @white;
+  // generic color
+  --color-black: @black;
+  --color-white: @white;
 
   // background
   --color-bg-primary: @bg-primary;
@@ -30,38 +14,49 @@
   --color-bg-quinary: @bg-quinary;
   --color-bg-active: rgba(@white, .1);
 
+  // primary
+  --color-primary: @text-primary;
+  --color-primary-light: @text-active;
+  --color-primary-dark: @text-secondary;
+
+  // accent
+  --color-accent: @accent;
+  --color-accent-variant: @accent-hover;
+
+  // border
+  --color-border-dark: rgba(@black, .4);
+  --color-border-light: rgba(@white, .1);
+  --color-border-accent:  @white;
+
   // text
   --color-text: @light-grey;
   --color-text-light: @white;
   --color-text-dark: @grey;
   --color-text-active: @text-primary;
+  --color-text-disabled: rgba(@light-grey, .3);
+
+  // icon
+  // TODO: textにマージする
+  --color-icon: @light-grey;
+  --color-icon-hover: @white;
+  --color-icon-active: @text-primary;
+  --color-icon-disabled: rgba(@light-grey, .3);
+  --color-icon-alert: @yellow;
 
   // button
   --color-button-label: @white;
   --color-button-primary: @text-secondary;
   --color-button-primary-hover: rgba(@text-secondary, .8);
-  --color-button-secondary: rgba(@white, .3);
-  --color-button-secondary-hover: rgba(@white, .4);
+  --color-button-secondary: darken(@grey, 5%);
+  --color-button-secondary-hover: darken(@grey, 10%);
   --color-button-accent: @accent;
   --color-button-accent-hover: @accent-hover;
+  --color-button-active-label: @black;
   --color-button-active: @text-primary;
-
-  // link
-  --color-link: @light-grey;
-  --color-link-hover: @white;
-  --color-link-active: @text-primary;
-  --color-link-disabled: rgba(@light-grey, .3);
-
-  // icon
-  --color-icon: @light-grey;
-  --color-icon-hover: @white;
-  --color-icon-active: @text-primary;
-  --color-icon-disabled: rgba(@grey, .3);
-  --color-icon-alert: @yellow;
 
   // titleBar
   --color-titlebar: @bg-primary;
-  --color-titlebar-text: @light-grey;
+  --color-titlebar-text: @grey;
   --color-titlebar-action: @light-grey;
   --color-titlebar-action-hover: @white;
 
@@ -75,10 +70,6 @@
 
   // scroll 
   --color-scroll-bar: rgba(@grey, .4);
-
-  // generic color
-  --color-black: @black;
-  --color-white: @white;
 
   // brand color
   --color-brand-nicoad: @nicoad-brand-color;

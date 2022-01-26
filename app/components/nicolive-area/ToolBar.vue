@@ -99,7 +99,7 @@
 
 .icon-live {
   font-size: @font-size5;
-  color: var(--color-icon-disabled);
+  color: var(--color-text-disabled);
   margin-right: 8px;
 
   &.is-onAir {

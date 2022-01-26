@@ -8,7 +8,7 @@
         <input class="input--search" type="text" :placeholder="$t('common.search')" v-model="searchQuery" />
       </div>
 
-      <button class="button button--action" @click="create">
+      <button class="button button--primary" @click="create">
         <i class="icon-plus" />
         {{ $t('common.createNew') }}
       </button>
