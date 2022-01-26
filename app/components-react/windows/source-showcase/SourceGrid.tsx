@@ -105,27 +105,25 @@ export default function SourceGrid(p: { activeTab: string }) {
 
   return (
     <Scrollable style={{ height: 'calc(100% - 64px)' }}>
-      <Row gutter={[8, 8]} style={{ marginLeft: '24px', marginRight: '24px' }}>
+      <Row
+        gutter={[8, 8]}
+        style={{ marginLeft: '24px', marginRight: '24px', paddingBottom: '24px' }}
+      >
         {showContent('all') && (
           <>
             <Col span={24}>
               <PageHeader title={$t('Essential Sources')} />
             </Col>
             {essentialSources.essentialDefaults.map(source => (
-              <SourceTag
-                key={source.value}
-                type={source.value}
-                essential
-              />
+              <SourceTag key={source.value} type={source.value} essential />
             ))}
-            {essentialSources.essentialWidgets.map(widgetType => (
-              <SourceTag
-                key={widgetType}
-                type={widgetType}
-                essential
-              />
-            ))}
-            <SourceTag key="streamlabel" name={$t('Stream Label')} type="streamlabel" essential />
+            {isLoggedIn &&
+              essentialSources.essentialWidgets.map(widgetType => (
+                <SourceTag key={widgetType} type={widgetType} essential />
+              ))}
+            {isLoggedIn && (
+              <SourceTag key="streamlabel" name={$t('Stream Label')} type="streamlabel" essential />
+            )}
           </>
         )}
         {showContent('general') && (
@@ -158,12 +156,11 @@ export default function SourceGrid(p: { activeTab: string }) {
             ) : (
               <>
                 {iterableWidgetTypes.filter(filterEssential).map(widgetType => (
-                  <SourceTag
-                    key={widgetType}
-                    type={widgetType}
-                  />
+                  <SourceTag key={widgetType} type={widgetType} />
                 ))}
-                {p.activeTab !== 'all' && <SourceTag key="streamlabel" name={$t('Stream Label')} type="streamlabel" />}
+                {p.activeTab !== 'all' && (
+                  <SourceTag key="streamlabel" name={$t('Stream Label')} type="streamlabel" />
+                )}
               </>
             )}
           </>
@@ -175,7 +172,7 @@ export default function SourceGrid(p: { activeTab: string }) {
             </Col>
             {availableAppSources.map(app => (
               <SourceTag
-                key={app.appId}
+                key={`${app.appId}${app.source.id}`}
                 name={app.source.name}
                 type="app_source"
                 appId={app.appId}

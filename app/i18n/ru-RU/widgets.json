@@ -65,10 +65,10 @@
   "Banned by %{user}": "Запрещено пользователем %{user}",
   "No banned media found": "Запрещенные медиафайлы не найдены",
   "Effects/Rallies": "Эффекты/тусовки",
-  "Sparks sent are at least <amount>": "Отправлено искр: не менее <amount>",
-  "Sparks sent are exactly <amount>": "Отправлено искр: ровно <amount>",
-  "Ember amount is at least <amount>": "Количество угольков: не менее <amount>",
-  "Ember amount is exactly <amopunt>": "Количество угольков: ровно <amount>",
+  "Sparks sent are at least <amount>": "Отправлено искр: не менее &lt;amount&gt;",
+  "Sparks sent are exactly <amount>": "Отправлено искр: ровно &lt;amount&gt;",
+  "Ember amount is at least <amount>": "Количество угольков: не менее &lt;amount&gt;",
+  "Ember amount is exactly <amopunt>": "Количество угольков: ровно ",
   "Please note that when advanced media share is enabled, media will no longer play through your alert box widget. Media will only play through this media share widget.": "Обратите внимание, что, если включен расширенный режим обмена медиафайлами, мультимедиа больше не будет воспроизводиться через виджет окна оповещения и будет доступно только через этот виджет обмена медиафайлами.",
   "Twitch Subscribers": "Подписчики Twitch",
   "YouTube Members": "Спонсоры YouTube",
@@ -180,9 +180,9 @@
   "Slide Out Right": "Slide Out Right",
   "Slide Out Up": "Slide Out Up",
   "Pick Screen Color": "Выбрать цвет на экране",
-  "Play Alert": "Play Alert",
-  "Browser Settings": "Browser Settings",
-  "Custom Code": "Custom Code",
+  "Play Alert": "Воспроизвести оповещение",
+  "Browser Settings": "Настройки браузера",
+  "Custom Code": "Пользовательский код",
   "font_family_tooltip": "Шрифт Google, используемый для текста. Посетите https://fonts.google.com, чтобы найти нужный! Популярные шрифты: Open Sans, Roboto, Oswald, Lato, Droid Sans.",
-  "Something went wrong while applying settings": "Something went wrong while applying settings"
+  "Something went wrong while applying settings": "При применении настроек что-то пошло не так"
 }

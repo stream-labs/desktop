@@ -9,6 +9,7 @@ import fs from 'fs';
 import util from 'util';
 import mime from 'mime';
 import path from 'path';
+import * as remote from '@electron/remote';
 
 interface IGuestApiRequest {
   id: string;
@@ -68,7 +69,7 @@ export interface IRequestHandler {
     [requestId: string]: IRequest;
   } = {};
 
-  const webContentsId = electron.remote.getCurrentWebContents().id;
+  const webContentsId = remote.getCurrentWebContents().id;
 
   const {
     schema,
@@ -80,7 +81,7 @@ export interface IRequestHandler {
     ipcChannel: string;
   } = electron.ipcRenderer.sendSync('guestApi-getInfo');
 
-  const hostWebContents = electron.remote.webContents.fromId(hostWebContentsId);
+  const hostWebContents = remote.webContents.fromId(hostWebContentsId);
 
   electron.ipcRenderer.on('guestApiCallback', (event: any, response: IGuestApiCallback) => {
     // This window was likely reloaded and no longer cares about this callback.

@@ -3,7 +3,7 @@
   "This element is too small to be displayed": "Bu öge, görüntülenemeyecek kadar küçük",
   "This element requires Selective Recording to be enabled": "Bu ögenin etkinleştirilebilmesi için Seçilebilir Kayıt gerekli",
   "Grant Permissions": "İzin Ver",
-  "Streamlabs OBS needs additional permissions. Grant permissions in the pop-up dialogs to continue.": "Streamlabs OBS için ek izin gerekiyor. Devam etmek için açılan iletişim kutusunda izinleri sağlayın.",
+  "Streamlabs needs additional permissions. Grant permissions in the pop-up dialogs to continue.": "Streamlabs için ek izin gerekiyor. Devam etmek için açılan iletişim kutusunda izinleri sağlayın.",
   "Microphone": "Mikrofon",
   "Webcam": "Kamera"
 }

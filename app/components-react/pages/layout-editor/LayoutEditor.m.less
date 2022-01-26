@@ -1,4 +1,4 @@
-@import "../../styles/index.less";
+@import "../../../styles/index.less";
 
 .top-bar {
   position: relative;
@@ -11,6 +11,7 @@
 
   button {
     margin-left: auto;
+    margin-right: 16px;
   }
 
   .arrow {
@@ -29,7 +30,7 @@
 }
 
 .editor-container {
-  height: 100%;
+  height: calc(100% - 64px);
   display: flex;
 }
 
@@ -87,6 +88,7 @@
   display: flex;
   justify-content: space-around;
   flex-wrap: wrap;
+  height: 220px;
 
   img {
     margin: 8px;
@@ -109,6 +111,7 @@
   width: 100%;
   position: absolute;
   z-index: 10;
+  top: 0;
 
   & > div {
     .center();
@@ -140,8 +143,11 @@
     color: var(--border);
   }
 
-  .url-text-box {
-    margin-top: 2rem;
+  .url-input {
+    position: absolute;
+    width: 100%;
+    padding: 20px 10%;
+    top: 50%;
   }
 }
 

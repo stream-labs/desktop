@@ -1,4 +1,3 @@
-import electron from 'electron';
 import { mutation, StatefulService, ViewHandler } from 'services/core/stateful-service';
 import { lazyModule } from 'util/lazy-module';
 import path from 'path';
@@ -17,6 +16,7 @@ import without from 'lodash/without';
 import { PlatformContainerManager, getPageUrl, getAssetUrl } from './container-manager';
 import { NavigationService } from 'services/navigation';
 import { InitAfter } from '../core';
+import * as remote from '@electron/remote';
 
 const DEV_PORT = 8081;
 
@@ -601,7 +601,7 @@ export class PlatformAppsService extends StatefulService<IPlatformAppServiceStat
     if (!app || !app.enabled) return;
 
     const windowId = `${appId}-${pageSlot}`;
-    const mousePos = electron.remote.screen.getCursorScreenPoint();
+    const mousePos = remote.screen.getCursorScreenPoint();
 
     // We use a generated window Id to prevent someobody popping out the
     // same winow multiple times.
