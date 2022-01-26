@@ -22,7 +22,7 @@ body {
 }
 
 .main {
-  background: var(--color-primary-dark);
+  background: var(--color-bg-secondary);
   color: var(--color-text);
 }
 
@@ -45,16 +45,23 @@ a {
 
 // Type
 h3 {
-  font-size: 14px;
-  color: @text-primary;
+  font-size: @font-size4;
+  color: var(--color-text-light);
   .semibold;
 }
 
 h4 {
-  font-size: 13px;
+  font-size: @font-size4;
+  color: var(--color-text-light);
   .letter-spacing;
   .semibold;
   margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+
+  i {
+    margin-right: 8px;
+  }
 }
 
 .label--essential {
@@ -73,18 +80,18 @@ h4 {
 .link {
   .semibold;
   .transition;
-  color: var(--color-link);
+  color: var(--color-text);
   text-decoration: none;
   display: flex;
   align-items: center;
 
   &:not(:disabled):hover {
-    color: var(--color-link-hover);
+    color: var(--color-text-light);
   }
 
   &.disabled,
   &:disabled {
-    color: var(--color-link-disabled);
+    color: var(--color-text-disabled);
     cursor: not-allowed;
   }
 
@@ -226,15 +233,26 @@ h4 {
 }
 
 .tab-button {
-  border-bottom: 1px solid transparent;
   height: 54px;
   margin-right: 20px;
   text-transform: uppercase;
-  font-size: 12px;
+  font-size: @font-size2;
   .semibold;
   letter-spacing: .7px;
-  color: @text-primary;
+  color: var(--color-text);
+  position: relative;
   .transition;
+
+  &:after {
+    display: block;
+    content: '';
+    width: 100%;
+    height: 2px;
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    background-color: transparent;
+  }
 
   i {
     margin-right: 4px;
@@ -242,42 +260,25 @@ h4 {
     vertical-align: middle;
   }
 
-  &.active,
   &:hover {
-    border-color: @white;
-    color: @white;
+    color: var(--color-text-light);
     i {
-      color: @white;
+      color: var(--color-text-light);
+    }
+  }
+
+  &.active {
+    color: var(--color-text-active);
+
+    &:after {
+      background-color: var(--color-text-active);
+    }
+
+    i {
+      color: var(--color-text-active);
     }
   }
 }
-
-.input {
-  &.disabled {
-    opacity: .5;
-
-    &.checkbox input:checked~label,
-
-    &.checkbox input~label {
-      color: @white;
-      &:before {
-        border-color: gray;
-        background: transparent;
-      }
-
-      &:after {color: gray}
-    }
-  }
-}
-
-.checkbox {
-  label {
-    text-transform: none;
-    background: transparent;
-    border-color: @accent-hover;
-  }
-}
-
 
 select {
   .radius;
@@ -315,12 +316,12 @@ th {
 }
 
 th {
-  color: @text-primary;
+  color: var(--color-text-dark);
   text-transform: uppercase;
   .semibold;
   letter-spacing: 1.5px;
-  font-size: 11px;
-  padding-bottom: 10px;
+  font-size: @font-size2;
+  padding-bottom: 8px;
 }
 
 // Scrolls

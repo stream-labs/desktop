@@ -73,8 +73,20 @@ button {
   }
 }
 
-.button--disabled {
+.button--border {
+  color: var(--colorbutton-secondary);
+  border: 1px solid var(--color-button-secondary);
+  background-color: transparent;
+  
+  &:hover,
+  &:focus,
+  &.active {
+    color: var(--color-button-label);
+    background-color: var(--color-button-secondary);
+  }
+}
 
+.button--disabled {
   background-color: @grey;
   cursor: default;
 
@@ -314,7 +326,7 @@ button {
     background-color: var(--color-button-active);
 
     i {
-      color: var(--color-primary-dark);
+      color: var(--color-bg-secondary);
     }
   }
 }

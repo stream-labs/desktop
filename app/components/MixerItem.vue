@@ -80,15 +80,6 @@
     opacity: 0.4;
   }
 
-  &.muted .icon-mute {
-    color: var(--color-text-dark);
-    opacity: 1;
-
-    &:hover {
-      color: var(--color-text-light);
-    }
-  }
-
   .controls {
     display: flex;
     align-items: center;

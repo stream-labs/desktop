@@ -50,19 +50,19 @@
   padding: 0 16px 0 16px;
 
   > i {
-    color: var(--color-icon);
+    color: var(--color-text);
     .transition;
   }
 
   &:hover {
     > i {
-      color: var(--color-icon-hover);
+      color: var(--color-text-light);
     }
   }
 
   &:disabled {
     > i {
-      color: var(--color-icon-disabled);
+      color: var(--color-text-disabled);
     }
   }
 }

@@ -139,7 +139,7 @@
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  border: 2px solid var(--color-secondary-dark);
+  border: 2px solid var(--color-primary-dark);
 
   .community-thumbnail {
     border-radius: 50%;
@@ -202,7 +202,7 @@
     background-color: var(--color-bg-active);
 
     i {
-      color: var(--color-icon-hover);
+      color: var(--color-text-light);
     }
   }
 
@@ -210,7 +210,7 @@
     background-color: var(--color-bg-active);
 
     i {
-      color: var(--color-icon-active);
+      color: var(--color-text-active);
     }
   }
 }

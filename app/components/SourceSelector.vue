@@ -96,7 +96,8 @@
 
 .sl-vue-tree-node-item {
   padding: 0 12px;
-  min-height: 28px;
+  min-height: 32px;
+  line-height: 32px;
   cursor: pointer;
   border: none;
 
@@ -197,7 +198,7 @@ i.disabled {
   i {
     font-size: 8px;
     width: 12px;
-    color: var(--color-icon);
+    color: var(--color-text);
     text-align: center;
     display: block;
 

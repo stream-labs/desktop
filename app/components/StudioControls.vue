@@ -79,7 +79,7 @@
   > i {
     .icon-hover;
     font-size: @font-size2;
-    color: var(--color-icon);
+    color: var(--color-text);
     display: block;
     transform: rotate(-180deg);
   }
@@ -130,7 +130,7 @@
   padding: 0 8px;
 
   &.active {
-    color: var(--color-secondary);
+    color: var(--color-primary);
 
     &:after {
       content: '';
@@ -139,7 +139,7 @@
       position: absolute;
       left: 0;
       bottom: 0;
-      background-color: var(--color-secondary);
+      background-color: var(--color-primary);
     }
   }
 }
