@@ -36,6 +36,7 @@ export enum WidgetType {
   Poll = 19,
   EmoteWall = 20,
   ChatHighlight = 21,
+  SuperchatGoal = 22,
 }
 
 export const WidgetTesters: IWidgetTester[] = [
@@ -239,6 +240,21 @@ export const WidgetDefinitions: { [x: number]: IWidget } = {
     name: 'Supporter Goal',
     url(host, token) {
       return `https://${host}/widgets/supporter-goal?token=${token}`;
+    },
+
+    width: 600,
+    height: 200,
+
+    x: 0,
+    y: 1,
+
+    anchor: AnchorPoint.SouthWest,
+  },
+
+  [WidgetType.SuperchatGoal]: {
+    name: 'Superchat Goal',
+    url(host, token) {
+      return `https://${host}/widgets/super-chat-goal?token=${token}`;
     },
 
     width: 600,
@@ -536,6 +552,15 @@ export const WidgetDisplayData = (platform?: string): { [x: number]: IWidgetDisp
     demoVideo: true,
     demoFilename: 'source-donation-goal.mp4',
     supportList: [$t('Streamlabs Charity Donations')],
+    icon: 'fas fa-calendar',
+  },
+  [WidgetType.SuperchatGoal]: {
+    name: $t('Superchat Goal'),
+    description: $t('Set a goal for your viewers to help you reach.'),
+    demoVideo: false,
+    demoFilename: 'source-follower-goal.png',
+    supportList: [$t('YouTube Superchats')],
+    platforms: new Set(['youtube']),
     icon: 'fas fa-calendar',
   },
   [WidgetType.DonationTicker]: {
