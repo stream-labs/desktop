@@ -86,7 +86,8 @@ export class StreamInfoView<T extends Object> extends ViewHandler<T> {
    * Returns a sorted list of all platforms (linked and unlinked)
    */
   get allPlatforms(): TPlatform[] {
-    const allPlatforms: TPlatform[] = ['twitch', 'facebook', 'youtube', 'tiktok', 'trovo'];
+    // TODO add trovo
+    const allPlatforms: TPlatform[] = ['twitch', 'facebook', 'youtube', 'tiktok'];
     return this.sortPlatforms(allPlatforms);
   }
 

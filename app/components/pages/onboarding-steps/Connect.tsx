@@ -121,7 +121,8 @@ export default class Connect extends TsxComponent<ConnectProps> {
       );
     }
 
-    const platforms = ['twitch', 'youtube', 'facebook', 'trovo'];
+    // TODO: add Trovo
+    const platforms = ['twitch', 'youtube', 'facebook'];
 
     return (
       <div class={styles.pageContainer}>
