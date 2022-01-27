@@ -1,7 +1,7 @@
 // TOOLTIPS
 
 .tooltip-trigger {
-  color: @text-primary;
+  color: var(--color-text);
   margin: 0 10px;
   opacity: .6;
 }
@@ -19,25 +19,17 @@
 }
 
 .tooltip .tooltip-inner {
-  .border;
   .shadow;
   .radius;
-  .shadow;
-  padding: 8px 10px 7px;
-  font-size: 12px;
-  background-color: @accent-light;
-  border-color: @accent-light;
-  color: @white;
-  .shadow;
+  padding: 8px 12px;
+  font-size: @font-size2;
+  background-color: var(--color-tooltip-bg);
+  border: 1px solid var(--color-tooltip-border);
+  color: var(--color-tooltip-text);
 }
 
 .tooltip .tooltip-arrow {
-  width: 0;
-  height: 0;
-  border-style: solid;
-  position: absolute;
-  margin: 5px;
-  border-color: @accent-light;
+  display: none;
 }
 
 .tooltip[x-placement^="top"] {

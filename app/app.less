@@ -30,7 +30,7 @@ a {
   .transition;
   text-decoration: underline;
   &:hover {
-    color: @white;
+    color: var(--color-text-light);
   }
 }
 
@@ -70,7 +70,7 @@ h4 {
   .semibold;
   text-transform: uppercase;
   font-size: 9px;
-  color: white;
+  color: var(--color-text-light);
   letter-spacing: .5px;
   padding: 0px 4px;
   margin-left: 10px;
@@ -103,7 +103,7 @@ h4 {
 .link--underlined {
   span {
     text-decoration: underline;
-    font-weight: 400;
+    font-weight:@font-weight-normal;
   }
 }
 
@@ -114,7 +114,7 @@ h4 {
 .link--uppercase {
   text-transform: uppercase;
   letter-spacing: .7px;
-  font-size: 12px;
+  font-size: @font-size2;
 }
 
 .label--icon {
@@ -125,7 +125,7 @@ h4 {
   position: relative;
 
   select {
-    font-size: 13px;
+    font-size: @font-size4;
     margin: 0;
     padding: 0 32px 0 8px;
 
@@ -139,8 +139,8 @@ h4 {
   position: absolute;
   right: 8px;
   top: 10px;
-  font-size: 10px;
-  color: @white;
+  font-size: @font-size1;
+  color: var(--color-text-light);
 }
 
 .select--onboarding {
@@ -153,9 +153,9 @@ h4 {
   }
 
   .multiselect__input {
-    background: #45535a;
+    background: #45535a; // TODO: 該当箇所がわかったら差し替える
     border-color: transparent;
-    color: white;
+    color: var(--color-text-light);
   }
 
   .multiselect__content {
@@ -206,7 +206,7 @@ h4 {
   &:focus,
   &:active,
   &:hover {
-    color: @white;
+    color: var(--color-text-light);
   }
 }
 
@@ -217,7 +217,7 @@ h4 {
 
 .slide-open__menu {
   position: absolute;
-  background-color: @bg-secondary;
+  background-color: var(--color-bg-secondary);
   right: calc(~'100% + 20px');
   bottom: -10px;
   padding: 0 12px;
@@ -256,7 +256,7 @@ h4 {
 
   i {
     margin-right: 4px;
-    font-size: 15px;
+    font-size: @font-size4;
     vertical-align: middle;
   }
 
@@ -371,6 +371,5 @@ th {
 }
 
 .v--modal {
-  background-color: @bg-primary;
+  background-color: var(--color-bg-primary);
 }
-
