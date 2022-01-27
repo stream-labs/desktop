@@ -21,18 +21,10 @@
 
 // 詳細度でライブラリ側の指定を上書きする
 .popper.dropdown-menu {
-  width: 124%;
-  position: absolute;
-  background-color: var(--color-popper-bg-light);
-  border-color: var(--color-border-light);
-  .border;
-  .radius;
-  .shadow;
-  
-  padding: 8px;
+  .popper-styling;
   max-height: 152px;
   overflow-y: auto;
-  z-index: @z-index-popper;
+  max-width: 400px;
 }
 
 .dropdown-menu__toggle {
@@ -54,7 +46,7 @@
   &:hover {
     i {
       
-      color: var(--color-icon-hover);
+      color: var(--color-text-light);
     }
   }
 
@@ -68,20 +60,26 @@
 }
 
 .dropdown-menu__item {
-  text-align: left;
-  white-space: nowrap;
-  max-width: 300px;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  .text-ellipsis;
+  width: 100%;
+  line-height: 32px;
+  padding: 0 8px;
+  font-size: @font-size2;
   cursor: pointer;
-  color: var(--color-text);
 
   &:hover,
   &.active {
     color: var(--color-text-light);
-    &:before {
-      content:"\003e";
-    }
+    background-color: var(--color-bg-active);
+  }
+
+  &:last-child,
+  &:last-of-type {
+    margin-bottom: 8px;
+  }
+
+  .setting-link + & {
+    border-top: 1px solid var(--color-border-light);
   }
 }
 

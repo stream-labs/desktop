@@ -5,6 +5,7 @@
   // generic color
   --color-black: @black;
   --color-white: @white;
+  --color-yellow: @yellow;
 
   // background
   --color-bg-primary: @bg-primary;
@@ -25,8 +26,8 @@
 
   // border
   --color-border-dark: rgba(@black, .4);
-  --color-border-light: rgba(@white, .1);
-  --color-border-accent:  @white;
+  --color-border-light: rgba(@white, .15);
+  --color-border-accent:  @light-grey;
 
   // text
   --color-text: @light-grey;
@@ -35,20 +36,12 @@
   --color-text-active: @text-primary;
   --color-text-disabled: rgba(@light-grey, .3);
 
-  // icon
-  // TODO: textにマージする
-  --color-icon: @light-grey;
-  --color-icon-hover: @white;
-  --color-icon-active: @text-primary;
-  --color-icon-disabled: rgba(@light-grey, .3);
-  --color-icon-alert: @yellow;
-
   // button
   --color-button-label: @white;
   --color-button-primary: @text-secondary;
   --color-button-primary-hover: rgba(@text-secondary, .8);
-  --color-button-secondary: darken(@grey, 5%);
-  --color-button-secondary-hover: darken(@grey, 10%);
+  --color-button-secondary: darken(@grey, 10%);
+  --color-button-secondary-hover: darken(@grey, 15%);
   --color-button-accent: @accent;
   --color-button-accent-hover: @accent-hover;
   --color-button-active-label: @black;
@@ -80,6 +73,11 @@
   --color-input: @grey;
   --color-input-active: @text-primary;
   --color-input-bg: rgba(@bg-primary, .6);
+
+  // tooltip
+  --color-tooltip-bg: @bg-tertiary;
+  --color-tooltip-text: @white;
+  --color-tooltip-border: rgba(@white, .2);
 
   // red
   --color-red: @red;

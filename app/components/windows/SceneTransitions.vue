@@ -11,7 +11,7 @@
     </div>
     <tabs :tabs="tabs" v-model="selectedTab" v-else>
       <div slot="transitions" class="transition-tab">
-        <button class="button button--action" @click="addTransition">
+        <button class="button button--せ" @click="addTransition">
           {{$t('transitions.addTransition')}}
         </button>
         <table>
@@ -43,7 +43,7 @@
         </table>
       </div>
       <div slot="connections" class="transition-tab">
-        <button class="button button--action" @click="addConnection">
+        <button class="button button--primary" @click="addConnection">
           {{$t('transitions.addConnection')}}
         </button>
         <table>
@@ -121,11 +121,12 @@
 }
 
 .transition-tab {
-  padding: 20px;
+  padding: 16px;
 }
 
 .transition-default {
-  color: @text-primary;
+  color: var(--color-text-active);
+  vertical-align: middle;
 }
 
 .transition-default-selector {
@@ -140,8 +141,9 @@
 }
 
 .transition-control {
-  margin-left: 10px;
+  margin-left: 8px;
   cursor: pointer;
+  vertical-align: middle;
   .icon-hover();
 }
 
@@ -150,8 +152,8 @@
 }
 
 .button {
-  line-height: 26px;
-  height: 26px;
+  line-height: 32px;
+  height: 32px;
   float: right;
 }
 
@@ -167,6 +169,6 @@ th, td {
 }
 
 tr:nth-child(even) {
-  background-color: @bg-secondary;
+  background-color: var(--color-bg-active);
 }
 </style>

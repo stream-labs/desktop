@@ -1,10 +1,10 @@
 <template>
-  <div class="step">
-   <div class="section-header">
-     <h3 class="section-title">{{ title }}</h3>
-     <p class="section-description">{{ description }} </p>
+  <div class="step section">
+   <div class="step-header">
+     <h3 class="step-title">{{ title }}</h3>
+     <p class="step-description">{{ description }} </p>
    </div>
-   <div class="section">
+   <div class="step-body">
      <slot />
    </div>
   </div>
@@ -13,20 +13,20 @@
 <script lang="ts" src="./Step.vue.ts"></script>
 
 <style lang="less" scoped>
-@import "../../styles/_colors";
+@import "../../styles/index";
 
 .step {
-  display: flex;
-  flex-direction: column;
   height: 100%;
+  margin: 0;
+  padding: 0;
 }
 
-.section-header {
+.step-header {
   padding: 16px;
-  border-bottom: 1px solid @bg-quinary;
+  border-bottom: 1px solid var(--color-bg-quinary);
 }
 
-.section {
+.step-body {
   padding: 0;
   border: none;
   display: flex;
@@ -34,16 +34,16 @@
   flex-grow: 1;
 };
 
-.section-title {
+.step-title {
   font-size: 16px;
-  margin-bottom: 8px;
-  color: @white;
+  margin-bottom: 4px;
+  color: var(--color-text-light);
 }
 
-.section-description {
-  font-size: 12px;
+.step-description {
+  font-size: @font-size4;
   margin: 0;
-  color: @grey;
+  color: var(--color-text-dark);
 }
 
 </style>

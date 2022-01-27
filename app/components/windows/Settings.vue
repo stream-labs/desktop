@@ -67,8 +67,9 @@
 .settings-container {
   flex-grow: 1;
   margin: 0;
-  overflow-y: auto;
-  background-color: @bg-tertiary;
+  padding: 16px 8px 0 0;
+  overflow-y: scroll;
+  overflow-x: auto;
 }
 </style>
 
@@ -106,7 +107,7 @@
 
     .input-label {
       label {
-        margin-bottom: 8px;
+        margin-bottom: 16px;
       }
     }
   }

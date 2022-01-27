@@ -34,22 +34,21 @@
 }
 
 .Hotkey-description {
-  width: 200px;
-  padding-right: 10px;
+  flex-grow: 1;
+  padding-right: 16px;
 }
 
 .Hotkey-input {
   display: inline-block;
-  width: 150px;
+  width: 160px;
 }
 
 .Hotkey-control {
-  margin-left: 15px;
+  margin-left: 16px;
   cursor: pointer;
-  opacity: 0.6;
 
   &:hover {
-    opacity: 1.0;
+    color: var(--color-text-light);
   }
 }
 
@@ -61,5 +60,12 @@
 .bindings-enter, .bindings-leave-to {
   opacity: 0;
   transform: scale(1, 0);
+}
+
+.hotkey-bindings__binding {
+  width: 220px;
+  display: flex;
+  align-items: center;
+  margin-bottom: 16px;
 }
 </style>

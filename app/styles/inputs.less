@@ -1,8 +1,63 @@
+input[type=text],
+input[type=number],
+input[type=password],
+textarea {
+  color: var(--color-text);
+  font-size: @font-size4;
+  border: 1px solid var(--color-border-light);
+  border-radius: 4px;
+  background: var(--color-input-bg);
+  margin-bottom: 0;
+  
+  &::placeholder {
+    color: var(--color-text-dark);
+  }
+
+  &:hover {
+    border-color: var(--color-border-accent);
+  }
+
+  &:focus {
+    box-shadow: none;
+    background: var(--color-input-bg);
+    border-color: var(--color-border-accent);
+  }
+
+  &.input--transparent {
+    border: 0;
+    border-bottom: 1px dashed var(--color-text-dark);
+    padding: 0;
+    height: 20px;
+    background: transparent;
+    border-radius: 0;
+  }
+
+  &::selection {
+    color: var(--color-bg-primary);
+    background-color: var(--color-primary);
+  }
+}
+
+.input {
+  &.disabled {
+    opacity: .5;
+  }
+}
+
 .input-container {
-  margin-bottom: 12px;
   position: relative;
   display: flex;
   align-items: flex-start;
+
+  &:last-of-type {
+    label {
+      margin-bottom: 0;
+    }
+  }
+
+  .input-label {
+    margin-bottom: 0;
+  }
 
   &.input-container--no-label {
     width: 100%;
@@ -22,21 +77,25 @@
 }
 
 .input-label {
-  width: 35%;
-  padding-right: 15px;
-  margin-bottom: 8px;
+  width: 45%;
+  padding-right: 16px;
+  margin-bottom: 16px;
+  font-size: @font-size4;
+  font-weight: @font-weight-bold;
+
+  label {
+    line-height: inherit;
+    color: var(--color-text-light);
+  }
 }
 
 .input-wrapper {
   width: 65%;
-
-  .checkbox {
-    &:last-child {
-      margin-right: 0;
-    }
-  }
+  margin-bottom: 16px;
 
   .button {
+    flex-shrink: 0;
+    
     &:last-child {
       margin-right: 0;
     }
@@ -58,46 +117,50 @@
   padding: 0 30px 0 8px;
 }
 
-input[type=text],
-input[type=number],
-input[type=password],
-textarea {
-  font-size: @font-size4;
-  border: 1px solid @grey;
-  background: #2B2F3B;
-  margin-bottom: 0;
-  
-  &::placeholder {
-    color: var(--color-text-dark);
-  }
-
-  &:focus {
-    box-shadow: none;
-    background: @input-bg;
-    border-color: @text-secondary;
-  }
-
-  &.input--transparent {
-    border: 0;
-    border-bottom: 1px dashed @grey;
-    padding: 0;
-    height: 20px;
-    background: transparent;
-    border-radius: 0;
-  }
-}
-
 .checkbox {
+  display: block;
   margin-bottom: 0;
+
+  input[type=checkbox] {
+    top: 2px;
+    margin: 0;
+    width: 16px;
+    height: 16px;
+
+    & ~ label {
+      &:before {
+        top: 2px;
+        width: 16px;
+        height: 16px;
+        border-color: var(--color-input);
+        background-color: transparent;
+      }
+    }
+
+    &:checked ~ label {
+      &:before {
+        border-color: var(--color-input-active);
+        background-color: var(--color-input-active);
+      }
+
+      &:after {
+        top: 4px;
+        left: 2px;
+        color: var(--color-bg-secondary)
+      }
+    }
+  }
 
   label {
+    font-size: @font-size4;
+    color: var(--color-text);
     line-height: 20px;
+    padding-left: 24px;
     cursor: pointer;
+  }
 
-    &:before {
-      background: transparent;
-      border-color: @grey;
-    }
+  &:last-child {
+    margin-right: 0;
   }
 }
 
@@ -157,18 +220,18 @@ textarea {
   &:after {
     width: 20px;
     height: 20px;
-    background-color: var(--color-icon);
+    background-color: var(--color-text);
     border-radius: 100%;
   }
 
   &:checked {
     &:before {
-        background-color: var(--color-secondary-dark);
+        background-color: var(--color-primary-dark);
     }
 
     &:after {
       left: 12px;
-      background-color: var(--color-secondary);
+      background-color: var(--color-primary);
     }
   }
 }
@@ -191,9 +254,9 @@ textarea {
     font-family: n-air;
     content: @n-air--codepoint--drop-down-arrow;
     border: none;
-    font-size: 9px;
+    font-size: @font-size1;
     position: absolute;
-    right: 0;
+    right: 4px;
     top: 2px;
   }
 }
@@ -203,7 +266,7 @@ textarea {
   border: none;
   height: 0;
   min-height: 0;
-  .radius();
+  .radius;
 
   input[type="text"] {
     cursor: pointer;
@@ -213,8 +276,7 @@ textarea {
 .multiselect__input,
 .multiselect__single {
   &:hover, &:focus {
-    background: @input-bg;
-    border-color: @text-secondary;
+    border-color: var(--color-border-hover);
   }
 }
 
@@ -223,22 +285,21 @@ textarea {
 }
 
 .multiselect__content {
-  border-bottom-left-radius: 3px;
-  border-bottom-right-radius: 3px;
-  border: 1px solid @text-secondary;
-  top: 35px;
-  background: @input-bg;
-  list-style-type: none;
-  margin: 0;
+  .shadow;
   width: 100%;
-  z-index: 100;
+  max-height: 264px;
+  margin: 0;
+  list-style-type: none;
+  border-radius: 4px;
+  background-color: var(--color-popper-bg-light);
+  z-index: @z-index-expand-content;
   position: absolute;
-  max-height: 300px;
+  top: 40px;
   overflow-y: auto;
 }
 
 .multiselect__element {
-  font-size: 13px;
+  font-size: @font-size4;
   white-space: nowrap;
   display: inline-block;
   min-width: 100%;
@@ -259,8 +320,8 @@ textarea {
 }
 
 .multiselect__option--highlight {
-  background: @hover;
-  color: @navy;
+  color: var(--color-text-light);
+  background: var(--color-bg-active);
 
   &:after {
     display: none;
@@ -268,16 +329,9 @@ textarea {
 }
 
 .multiselect__option--selected {
-  background: @accent;
-  color: @white;
-
-  &.multiselect__option--highlight {
-    background: @accent;
-
-    &:after {
-      display: none;
-    }
-  }
+  font-weight: @font-weight-bold;
+  background: var(--color-primary);
+  color: var(--color-black);
 
   &:after {
     display: none;
@@ -285,7 +339,7 @@ textarea {
 }
 
 .multiselect__option--disabled {
-  opacity: 0.5;
+  opacity: .5;
 }
 
 .multiselect--disabled {
@@ -300,30 +354,6 @@ textarea {
       cursor: not-allowed;
     }
   }
-}
-
-input[type="text"],
-input[type="password"],
-input[type="number"],
-textarea {
-  background: @bg-secondary;
-  color: @white;
-  border-color: transparent;
-
-  &.input--transparent {
-    border-bottom: 1px dashed @grey;
-  }
-}
-
-.multiselect__content {
-  background: @bg-secondary;
-  border-color: @bg-secondary;
-  color: @white;
-}
-
-.multiselect__option--highlight {
-  background: @hover;
-  color: @white;
 }
 
 .input-wrapper--inverted {

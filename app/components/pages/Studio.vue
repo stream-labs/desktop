@@ -55,6 +55,7 @@
 .studio-display-container {
   flex-grow: 1;
   display: flex;
+  padding: @studio-display-padding;
 
   &.stacked {
     flex-direction: column;

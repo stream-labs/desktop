@@ -14,13 +14,13 @@
   <div v-if="showControls" class="modal-layout-controls">
     <button
       v-if="showCancel"
-      class="button button--default"
+      class="button button--secondary"
       @click="cancel"
       data-test="Cancel">
       {{ $t('common.cancel') }}
     </button>
     <button
-      class="button button--action"
+      class="button button--primary"
       @click="done"
       data-test="Done">
       {{ $t('common.done') }}
@@ -41,9 +41,7 @@
   height: 100%;
   display: flex;
   flex-direction: column;
-  padding: 0 2px 2px;
-  color: @text-primary;
-  background-color: @bg-primary;
+  background-color: var(--color-bg-quinary);
 }
 
 .ModalLayout-fixed {
@@ -55,12 +53,11 @@
   flex-grow: 1;
   height: 100%;
   padding: 16px;
-  overflow: auto;
-  background-color: @bg-tertiary;
-  border-top: 1px solid @bg-tertiary;
+  overflow-y: scroll;
 
   &.bareContent {
     padding: 0;
+    overflow-y: hidden;
   }
 }
 
@@ -79,11 +76,13 @@
 }
 
 .modal-layout-controls {
-  background-color: @bg-primary;
-  box-shadow: 0 -1px 0 rgba(0,0,0,0.1);
+  .dividing-border(top);
+  display: flex;
+  justify-content: flex-end;
+  background-color: var(--color-bg-primary);
   text-align: right;
   flex-shrink: 0;
-  z-index: 10;
+  z-index: @z-index-default-content;
 
   &:not(:empty) {
     padding: 8px 16px;

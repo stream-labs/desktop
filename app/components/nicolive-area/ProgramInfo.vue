@@ -121,7 +121,7 @@
   margin: 0;
 
   .icon-lock {
-    color: var(--color-icon-primary);
+    color: var(--color-text);
     font-size: @font-size1;
     margin-right: 8px;
   }

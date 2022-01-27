@@ -14,7 +14,7 @@
         <div
           v-for="sceneCollection in sceneCollections"
           :key="sceneCollection.id"
-          class="dropdown-menu__item"
+          class="dropdown-menu__item link"
           :class="{ active: activeId === sceneCollection.id }"
           @click="loadCollection(sceneCollection.id)"
         >
@@ -78,23 +78,16 @@
   position: relative;
   display: flex;
   align-items: center;
+  flex-grow: 1;
 }
 
 .input-wrapper--search {
   .radius;
-
-  width: 89%;
-  margin-bottom: 8px;
-  > input[type="text"] {
-    border:1px solid var(--color-border-light);
-
-    &:focus {
-      border:1px solid var(--color-border-accent);
-    }
-  }
+  width: calc(100% - 38px); // .settings-link + 余白のサイズを引く
+  margin: 8px;
 
   &::after {
-    color: var(--color-icon);
+    color: var(--color-text);
   }
 }
 
@@ -107,8 +100,6 @@
 
 .scene-collections__dropdown {
   .text-ellipsis;
-
   display: flex;
-  max-width: 240px;
 }
 </style>
