@@ -10,14 +10,16 @@ import { $t } from 'services/i18n';
 
 export default function AdvancedAudio() {
   const [activeTab, setActiveTab] = useState('source');
-  const { SettingsService } = Services;
+  const { SettingsService, UserService } = Services;
 
-  const { streamTrack, vodTrack } = useVuex(() => ({
+  const { streamTrack, vodTrack, vodTrackEnabled } = useVuex(() => ({
     streamTrack: SettingsService.views.streamTrack,
     vodTrack: SettingsService.views.vodTrack,
+    vodTrackEnabled: SettingsService.views.vodTrackEnabled,
   }));
 
   useEffect(() => {
+    if (!vodTrackEnabled) return;
     if (streamTrack === vodTrack) {
       message.error(
         $t(
