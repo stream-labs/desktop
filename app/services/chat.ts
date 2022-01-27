@@ -250,6 +250,34 @@ export class ChatService extends Service {
             },
             'ffz-settings',
           );
+          // Recognize trovo login and perform in an embedded window
+        } else if (targetUrl === 'https://trovo.live/?openLogin=1') {
+          const loginWindow = new remote.BrowserWindow({
+            width: 600,
+            height: 800,
+            webPreferences: {
+              partition: this.userService.views.auth?.partition,
+              nodeIntegration: false,
+              // Prevent trovo from playing streams in the background
+              autoplayPolicy: 'document-user-activation-required',
+            },
+          });
+          loginWindow.webContents.setAudioMuted(true);
+
+          // This is pretty hacky, but Trovo just reloads the page after login,
+          // so on second load, just close the window.
+          let loadedOnce = false;
+
+          loginWindow.webContents.on('did-navigate', () => {
+            if (loadedOnce) {
+              loginWindow.close();
+            } else {
+              loadedOnce = true;
+            }
+          });
+
+          loginWindow.removeMenu();
+          loginWindow.loadURL(targetUrl);
         } else {
           remote.shell.openExternal(targetUrl);
         }
@@ -329,27 +357,6 @@ export class ChatService extends Service {
             )
             .catch(e => {});
         });
-      }
-
-      // hide the chat input for Trovo because we can not send messages in the logged-out mode
-      // TODO: find out how to keep Trovo chat in the logged-in state
-      if (this.userService.platform?.type === 'trovo') {
-        this.chatView.webContents
-          .executeJavaScript(
-            `
-                function hideChatInput() {
-                   var chatInput = document.querySelector('.input-container');
-                   if (!chatInput) {
-                      setTimeout(hideChatInput, 500);
-                      return;
-                   }
-                   chatInput.style.display = 'none';
-                }
-                hideChatInput()
-                `,
-            true,
-          )
-          .catch(e => {});
       }
     });
   }
