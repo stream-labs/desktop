@@ -70,7 +70,11 @@ export class StreamInfoView<T extends Object> extends ViewHandler<T> {
   }
 
   get game() {
-    return this.commonFields.game;
+    return (
+      (this.platforms.twitch?.enabled && this.platforms.twitch.game) ||
+      (this.platforms.facebook?.enabled && this.platforms.facebook.game) ||
+      (this.platforms.trovo?.enabled && this.platforms.trovo.game)
+    );
   }
 
   getPlatformDisplayName(platform: TPlatform): string {
@@ -201,7 +205,6 @@ export class StreamInfoView<T extends Object> extends ViewHandler<T> {
     const commonFields = {
       title: '',
       description: '',
-      game: '',
     };
     const destinations = Object.keys(platforms) as TPlatform[];
     const enabledDestinations = destinations.filter(dest => platforms[dest]?.enabled);
@@ -247,7 +250,7 @@ export class StreamInfoView<T extends Object> extends ViewHandler<T> {
   /**
    * return common fields for the stream such title, description, game
    */
-  get commonFields(): { title: string; description: string; game: string } {
+  get commonFields(): { title: string; description: string } {
     return this.getCommonFields(this.settings.platforms);
   }
 
