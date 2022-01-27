@@ -50,6 +50,68 @@ class Accumulator {
 const STREAM_HISTORY_LENGTH = 5;
 const STATS_FLUSH_INTERVAL = 60 * 1000;
 
+class Section {
+  str = '';
+
+  constructor(title: string, data: object | string) {
+    this.wl('-'.repeat(title.length + 4));
+    this.wl(`| ${title} |`);
+    this.wl('-'.repeat(title.length + 4));
+    this.wl();
+
+    if (typeof data === 'object') {
+      this.printObj(data);
+    } else {
+      this.wl(data);
+    }
+
+    this.wl();
+  }
+
+  private printObj(data: object, indent = 0, itemInd?: number) {
+    if (Array.isArray(data)) {
+      data.forEach((item, i) => {
+        if (typeof item === 'object' && item != null) {
+          this.printObj(item, indent, i + 1);
+        } else {
+          this.wl(`${' '.repeat(indent)}${i + 1}. ${item ?? ''}`);
+        }
+      });
+
+      return;
+    }
+
+    Object.keys(data).forEach((key, i) => {
+      let prefix = ' '.repeat(indent);
+
+      if (itemInd != null) {
+        if (i === 0) {
+          prefix += `${itemInd}. `;
+        } else {
+          prefix += '   ';
+        }
+      }
+
+      const value = data[key] as unknown;
+
+      if (typeof value === 'object' && value != null) {
+        this.wl(`${prefix}${key}:`);
+        this.printObj(value, indent + (itemInd != null ? 5 : 2));
+      } else {
+        this.wl(`${prefix}${key}: ${value ?? ''}`);
+      }
+    });
+  }
+
+  wl(line = '') {
+    this.str += `${line}\n`;
+  }
+
+  toString() {
+    return this.str;
+  }
+}
+
 /**
  * Responsible for generating a diagnostic report that can be used
  * to diagnose issues such as common misconfigurations. This report
@@ -72,7 +134,6 @@ export class DiagnosticsService extends PersistentStatefulService<IDiagnosticsSe
     streams: [],
   };
 
-  report: string;
   problems: string[];
 
   accumulators: {
@@ -142,19 +203,24 @@ export class DiagnosticsService extends PersistentStatefulService<IDiagnosticsSe
   }
 
   async generateReport() {
-    this.report = '';
     this.problems = [];
-    await this.generateTopSection();
-    this.generateUserSection();
-    this.generateSystemSection();
-    this.generateVideoSection();
-    this.generateOutputSection();
-    this.generateAudioSection();
-    this.generateDevicesSection();
-    this.generateScenesSection();
-    this.generateStreamsSection();
-    this.generateProblemsSection();
-    return this.report;
+    const top = await this.generateTopSection();
+    const user = this.generateUserSection();
+    const system = this.generateSystemSection();
+    const video = this.generateVideoSection();
+    const output = this.generateOutputSection();
+    const audio = this.generateAudioSection();
+    const devices = this.generateDevicesSection();
+    const scenes = this.generateScenesSection();
+    const streams = this.generateStreamsSection();
+
+    // Problems section needs to be generated last, because it relies on the
+    // problems array that all other sections add to.
+    const problems = this.generateProblemsSection();
+
+    const report = [top, problems, user, system, streams, video, output, audio, devices, scenes];
+
+    return report.join('');
   }
 
   async uploadReport() {
@@ -177,61 +243,12 @@ export class DiagnosticsService extends PersistentStatefulService<IDiagnosticsSe
     this.problems.push(problem);
   }
 
-  private generateSection(title: string, data: object | string) {
-    this.wl('-'.repeat(title.length + 4));
-    this.wl(`| ${title} |`);
-    this.wl('-'.repeat(title.length + 4));
-    this.wl();
-
-    if (typeof data === 'object') {
-      this.printObj(data);
-    } else {
-      this.wl(data);
-    }
-
-    this.wl();
-  }
-
-  private printObj(data: object, indent = 0, itemInd?: number) {
-    if (Array.isArray(data)) {
-      data.forEach((item, i) => {
-        if (typeof item === 'object' && item != null) {
-          this.printObj(item, indent, i + 1);
-        } else {
-          this.wl(`${' '.repeat(indent)}${i + 1}. ${item ?? ''}`);
-        }
-      });
-
-      return;
-    }
-
-    Object.keys(data).forEach((key, i) => {
-      let prefix = ' '.repeat(indent);
-
-      if (itemInd != null) {
-        if (i === 0) {
-          prefix += `${itemInd}. `;
-        } else {
-          prefix += '   ';
-        }
-      }
-
-      const value = data[key] as unknown;
-
-      if (typeof value === 'object' && value != null) {
-        this.wl(`${prefix}${key}:`);
-        this.printObj(value, indent + (itemInd != null ? 5 : 2));
-      } else {
-        this.wl(`${prefix}${key}: ${value ?? ''}`);
-      }
-    });
-  }
 
   private async generateTopSection() {
     // All diagnostic reports include a cache upload
     const cacheId = await this.cacheUploaderService.uploadCache();
 
-    this.generateSection('Streamlabs Desktop Diagnostic Report', {
+    return new Section('Streamlabs Desktop Diagnostic Report', {
       Version: Utils.env.SLOBS_VERSION,
       Bundle: SLOBS_BUNDLE_ID,
       Date: new Date().toString(),
@@ -243,7 +260,7 @@ export class DiagnosticsService extends PersistentStatefulService<IDiagnosticsSe
     const title = 'User';
 
     if (this.userService.views.isLoggedIn) {
-      this.generateSection(title, {
+      return new Section(title, {
         'Logged-In Platform': {
           Username: this.userService.views.platform.username,
           Platform: this.userService.views.platform.type,
@@ -256,7 +273,7 @@ export class DiagnosticsService extends PersistentStatefulService<IDiagnosticsSe
         }),
       });
     } else {
-      this.generateSection(title, 'User is not logged in');
+      return new Section(title, 'User is not logged in');
     }
   }
 
@@ -311,7 +328,7 @@ export class DiagnosticsService extends PersistentStatefulService<IDiagnosticsSe
       this.logProblem(`Low Base resolution: ${baseRes.x}x${baseRes.y}`);
     }
 
-    this.generateSection('Video', {
+    return new Section('Video', {
       'Base Resolution': settings.Video.Base,
       'Output Resolution': settings.Video.Output,
       'Downscale Filter': settings.Video.ScaleType,
@@ -335,7 +352,7 @@ export class DiagnosticsService extends PersistentStatefulService<IDiagnosticsSe
       this.logProblem(`Low recording bitrate: ${settings.recording.bitrate}`);
     }
 
-    this.generateSection('Output', {
+    return new Section('Output', {
       Mode: settings.mode,
       Streaming: {
         Encoder:
@@ -378,7 +395,7 @@ export class DiagnosticsService extends PersistentStatefulService<IDiagnosticsSe
       };
     });
 
-    this.generateSection('System', {
+    return new Section('System', {
       'Operating System': `${os.platform()} ${os.release()}`,
       Architecture: process.arch,
       CPU: {
@@ -408,7 +425,7 @@ export class DiagnosticsService extends PersistentStatefulService<IDiagnosticsSe
       };
     }
 
-    this.generateSection('Audio', {
+    return new Section('Audio', {
       'Sample Rate': settings.Audio.SampleRate,
       Channels: settings.Audio.ChannelSetup,
       'Global Sources': {
@@ -432,7 +449,7 @@ export class DiagnosticsService extends PersistentStatefulService<IDiagnosticsSe
       };
     }
 
-    this.generateSection('Available Devices', {
+    return new Section('Available Devices', {
       Audio: {
         Output: devices.filter(d => d.type === EDeviceType.audioOutput).map(mapDevice),
         Input: devices.filter(d => d.type === EDeviceType.audioInput).map(mapDevice),
@@ -519,11 +536,11 @@ export class DiagnosticsService extends PersistentStatefulService<IDiagnosticsSe
       });
     });
 
-    this.generateSection('Scenes', sceneData);
+    return new Section('Scenes', sceneData);
   }
 
   private generateStreamsSection() {
-    this.generateSection(
+    return new Section(
       'Streams',
       this.state.streams.map(s => {
         return {
@@ -540,7 +557,7 @@ export class DiagnosticsService extends PersistentStatefulService<IDiagnosticsSe
   }
 
   private generateProblemsSection() {
-    this.generateSection(
+    return new Section(
       'Potential Issues',
       this.problems.length ? this.problems : 'No issues detected',
     );
@@ -583,14 +600,6 @@ export class DiagnosticsService extends PersistentStatefulService<IDiagnosticsSe
     });
 
     return wmiObject;
-  }
-
-  /**
-   * Writes a line to the current report
-   * @param str The line to write
-   */
-  private wl(str = '') {
-    this.report += `${str}\n`;
   }
 
   @mutation({ sync: false })
