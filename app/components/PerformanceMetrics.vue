@@ -92,7 +92,7 @@
 .icon-warning-circle {
   width: 16px;
   height: 16px;
-  color: var(--color-icon-alert);
+  color: var(--color-yellow);
   position: absolute;
 
   &:before, &:after {

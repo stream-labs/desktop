@@ -57,6 +57,7 @@
 
   &.bareContent {
     padding: 0;
+    overflow-y: hidden;
   }
 }
 
