@@ -107,7 +107,7 @@
   position: relative;
 
   &.active {
-    color: var(--color-icon-active);
+    color: var(--color-text-active);
   }
 }
 

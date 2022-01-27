@@ -23,7 +23,7 @@
   align-items: center;
   z-index: 1;
   background-color: var(--color-titlebar);
-  height: 32px;
+  height: @titlebar-height;
 }
 
 .titlebar-icon {
@@ -62,14 +62,14 @@
 
 .titlebar-actions {
   -webkit-app-region: no-drag;
-  height: 14px;
+  height: 16px;
 }
 
 .titlebar-action {
   .margin-right();
 
   cursor: pointer;
-  font-size: 14px;
+  font-size: @font-size4;
   display: inline-block;
   color: var(--color-titlebar-action);
 

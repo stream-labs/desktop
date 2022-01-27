@@ -27,7 +27,7 @@
   flex-direction: column;
 
   position: absolute;
-  height: calc(~"100% - 26px"); // TitleBarぶんの高さを引く
+  height: calc(100% - @titlebar-height); // TitleBarぶんの高さを引く
   width: 100%;
   z-index: -1;
 
@@ -41,7 +41,7 @@
 }
 
 .child-window-content {
-  height: calc(~"100% - 26px"); // TitleBarぶんの高さを引く
+  height: calc(100% - @titlebar-height); // TitleBarぶんの高さを引く
 }
 
 .spinner-spacer {
