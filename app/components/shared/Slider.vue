@@ -83,13 +83,14 @@
 }
 
 .vue-slider-tooltip {
-  background-color: @input-bg !important;
-  border-radius: 2px !important;
-  border: none !important;
-  color: @white !important;
-  font-size: 13px !important;
+  background-color: var(--color-tooltip-bg) !important;
+  border-radius: 4px !important;
+  border: 1px solid var(--color-tooltip-border) !important;
+  color: var(--color-tooltip-text) !important;
+  font-size: @font-size4 !important;
   top: 40px !important;
   .transition;
+  .shadow;
 
   &:before {
     display: none;
