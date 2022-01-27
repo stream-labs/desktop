@@ -363,7 +363,7 @@ export class StreamingService
     // all done
     if (this.state.streamingStatus === EStreamingState.Live) {
       this.UPDATE_STREAM_INFO({ lifecycle: 'live' });
-      this.createGameAssociation(this.views.commonFields.game);
+      this.createGameAssociation(this.views.game);
       this.recordAfterStreamStartAnalytics(settings);
     }
   }
@@ -893,7 +893,7 @@ export class StreamingService
 
         try {
           streamEncoderInfo = this.outputSettingsService.getSettings();
-          game = this.views.commonFields.game;
+          game = this.views.game;
         } catch (e: unknown) {
           console.error('Error fetching stream encoder info: ', e);
         }
