@@ -5,7 +5,6 @@ import { StreamingService, EStreamingState } from '../services/streaming';
 import { Inject } from 'services/core/injector';
 import { UserService } from '../services/user';
 import { CustomizationService } from 'services/customization';
-import electron from 'electron';
 import { $t } from 'services/i18n';
 import PlatformAppPageView from 'components/PlatformAppPageView.vue';
 import { PlatformAppsService, EAppPageSlot, ILoadedApp } from 'services/platform-apps';
@@ -14,8 +13,9 @@ import { AppService } from 'services/app';
 import Tabs, { ITab } from 'components/Tabs.vue';
 import { ChatService } from 'services/chat';
 import { WindowsService } from 'services/windows';
-import { FacebookService, RestreamService, YoutubeService } from 'app-services';
+import { FacebookService, RestreamService, TrovoService, YoutubeService } from 'app-services';
 import { getPlatformService } from 'services/platforms';
+import * as remote from '@electron/remote';
 
 @Component({
   components: {
@@ -29,6 +29,7 @@ export default class LiveDock extends Vue {
   @Inject() streamingService: StreamingService;
   @Inject() youtubeService: YoutubeService;
   @Inject() facebookService: FacebookService;
+  @Inject() trovoService: TrovoService;
   @Inject() userService: UserService;
   @Inject() customizationService: CustomizationService;
   @Inject() platformAppsService: PlatformAppsService;
@@ -148,19 +149,23 @@ export default class LiveDock extends Vue {
   }
 
   openYoutubeStreamUrl() {
-    electron.remote.shell.openExternal(this.youtubeService.streamPageUrl);
+    remote.shell.openExternal(this.youtubeService.streamPageUrl);
   }
 
   openYoutubeControlRoom() {
-    electron.remote.shell.openExternal(this.youtubeService.dashboardUrl);
+    remote.shell.openExternal(this.youtubeService.dashboardUrl);
   }
 
   openFBStreamUrl() {
-    electron.remote.shell.openExternal(this.facebookService.streamPageUrl);
+    remote.shell.openExternal(this.facebookService.streamPageUrl);
   }
 
   openFBStreamDashboardUrl() {
-    electron.remote.shell.openExternal(this.facebookService.streamDashboardUrl);
+    remote.shell.openExternal(this.facebookService.streamDashboardUrl);
+  }
+
+  openTrovoStreamUrl() {
+    remote.shell.openExternal(this.trovoService.streamPageUrl);
   }
 
   get isTwitch() {
@@ -173,6 +178,10 @@ export default class LiveDock extends Vue {
 
   get isFacebook() {
     return this.userService.platform.type === 'facebook';
+  }
+
+  get isTrovo() {
+    return this.userService.platform.type === 'trovo';
   }
 
   get hideViewerCount() {

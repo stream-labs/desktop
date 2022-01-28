@@ -12,11 +12,11 @@ import StreamlabelProperties from 'components/custom-source-properties/Streamlab
 import PlatformAppProperties from 'components/custom-source-properties/PlatformAppProperties.vue';
 import { $t } from 'services/i18n';
 import { Subscription } from 'rxjs';
-import electron from 'electron';
 import { ErrorField } from 'vee-validate';
 import { CustomizationService } from 'services/customization';
 import { EditorCommandsService } from 'services/editor-commands';
 import { UsageStatisticsService } from 'services/usage-statistics';
+import * as remote from '@electron/remote';
 
 @Component({
   components: {
@@ -48,7 +48,7 @@ export default class SourceProperties extends Vue {
     this.sourceRemovedSub = this.sourcesService.sourceRemoved.subscribe(source => {
       if (source.sourceId === this.sourceId) {
         this.source = null;
-        electron.remote.getCurrentWindow().close();
+        remote.getCurrentWindow().close();
       }
     });
     this.sourceUpdatedSub = this.sourcesService.sourceUpdated.subscribe(source => {

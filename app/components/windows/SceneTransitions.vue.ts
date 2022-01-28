@@ -11,8 +11,8 @@ import { ScenesService } from 'services/scenes';
 import ConnectionSettings from 'components/ConnectionSettings';
 import VModal from 'vue-js-modal';
 import { EditorCommandsService } from 'services/editor-commands';
-import electron from 'electron';
 import Scrollable from 'components/shared/Scrollable';
+import * as remote from '@electron/remote';
 
 Vue.use(VModal);
 
@@ -114,7 +114,7 @@ export default class SceneTransitions extends Vue {
 
   deleteTransition(id: string) {
     if (this.transitionsService.state.transitions.length === 1) {
-      electron.remote.dialog.showMessageBox({
+      remote.dialog.showMessageBox({
         title: 'Streamlabs Desktop',
         message: $t('You need at least 1 transition.'),
       });

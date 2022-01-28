@@ -1,4 +1,3 @@
-import electron from 'electron';
 import Vue from 'vue';
 import { Component, Watch } from 'vue-property-decorator';
 import { Inject } from 'services/core/injector';
@@ -18,7 +17,6 @@ import RemoteControlSettings from './RemoteControlSettings.vue';
 import GameOverlaySettings from './GameOverlaySettings';
 import SearchablePages from 'components/shared/SearchablePages';
 import FormInput from 'components/shared/inputs/FormInput.vue';
-import StreamSettings from './StreamSettings';
 import VirtualWebcamSettings from './VirtualWebcamSettings';
 import { MagicLinkService } from 'services/magic-link';
 import { UserService } from 'services/user';
@@ -26,6 +24,7 @@ import Scrollable from 'components/shared/Scrollable';
 import { ObsSettings, PlatformLogo } from 'components/shared/ReactComponentList';
 import { $t } from 'services/i18n';
 import { debounce } from 'lodash-decorators';
+import * as remote from '@electron/remote';
 
 @Component({
   components: {
@@ -43,7 +42,6 @@ import { debounce } from 'lodash-decorators';
     InstalledApps,
     GameOverlaySettings,
     FormInput,
-    StreamSettings,
     VirtualWebcamSettings,
     Scrollable,
     PlatformLogo,
@@ -128,7 +126,7 @@ export default class Settings extends Vue {
   get reactPages() {
     return [
       'General',
-      // 'Stream',
+      'Stream',
       // 'Output',
       // 'Audio',
       // 'Video',
@@ -236,7 +234,7 @@ export default class Settings extends Vue {
 
   handleAuth() {
     if (this.userService.isLoggedIn) {
-      electron.remote.dialog
+      remote.dialog
         .showMessageBox({
           title: $t('Confirm'),
           message: $t('Are you sure you want to log out?'),

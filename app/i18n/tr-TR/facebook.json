@@ -14,7 +14,7 @@
   "Connect": "Bağlan",
   "Install Your Theme": "Temanızı Yükleyin",
   "Install": "Yükle",
-  "facebookGamingWarning": "Tam bir Facebook Oyun deneyimi için <create-page-link>bir Oyun Videosu Oluşturucu Sayfası oluşturun</create-page-link>",
+  "facebookGamingWarning": "Tam bir Facebook Oyun deneyimi için &lt;create-page-link&gt;bir Oyun Videosu Oluşturucu Sayfası oluşturun&lt;/create-page-link&gt;",
   "Facebook Destination": "Facebook Hedefi",
   "Share to Your Timeline": "Zaman Tünelinizde Paylaşın",
   "Share to a Page You Manage": "Yönettiğiniz Bir Sayfada Paylaşın",
@@ -30,7 +30,7 @@
   "Please reconnect Facebook to get these new features": "Bu yeni özellikleri edinmek için lütfen Facebook’a yeniden bağlanın",
   "Reconnect now": "Şimdi yeniden bağlan",
   "Privacy": "Gizlilik",
-  "FBPrivacyWarning": "Facebook hesabınız için verilen gizlilik düzeyi sınırlı olabilir. Streamlabs entegrasyonu için <link>buradan</link> \"Bu işletme entegrasyonunu kullandığınızı kimler görebilir\" bölümüne bakın.",
+  "FBPrivacyWarning": "Facebook hesabınız için verilen gizlilik düzeyi sınırlı olabilir. Streamlabs entegrasyonu için &lt;link&gt;buradan&lt;/link&gt; \"Bu işletme entegrasyonunu kullandığınızı kimler görebilir\" bölümüne bakın.",
   "Only Me": "Yalnızca Ben",
   "Do not change privacy settings": "Gizlilik ayarlarını değiştirme"
 }

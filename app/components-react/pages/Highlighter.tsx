@@ -14,7 +14,6 @@ import ExportModal from 'components-react/highlighter/ExportModal';
 import PreviewModal from 'components-react/highlighter/PreviewModal';
 import BlankSlate from 'components-react/highlighter/BlankSlate';
 import { SCRUB_HEIGHT, SCRUB_WIDTH, SUPPORTED_FILE_TYPES } from 'services/highlighter/constants';
-import electron from 'electron';
 import path from 'path';
 import Scrollable from 'components-react/shared/Scrollable';
 import { IHotkey } from 'services/hotkeys';
@@ -22,6 +21,7 @@ import { getBindingString } from 'components-react/shared/HotkeyBinding';
 import Animate from 'rc-animate';
 import TransitionSelector from 'components-react/highlighter/TransitionSelector';
 import { $t } from 'services/i18n';
+import * as remote from '@electron/remote';
 
 type TModal = 'trim' | 'export' | 'preview' | 'remove';
 
@@ -329,13 +329,10 @@ function AddClip() {
   const { HighlighterService } = Services;
 
   async function openClips() {
-    const selections = await electron.remote.dialog.showOpenDialog(
-      electron.remote.getCurrentWindow(),
-      {
-        properties: ['openFile', 'multiSelections'],
-        filters: [{ name: $t('Video Files'), extensions: SUPPORTED_FILE_TYPES }],
-      },
-    );
+    const selections = await remote.dialog.showOpenDialog(remote.getCurrentWindow(), {
+      properties: ['openFile', 'multiSelections'],
+      filters: [{ name: $t('Video Files'), extensions: SUPPORTED_FILE_TYPES }],
+    });
 
     if (selections && selections.filePaths) {
       HighlighterService.actions.addClips(selections.filePaths);

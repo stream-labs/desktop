@@ -1,4 +1,4 @@
-import { remote } from 'electron';
+import * as remote from '@electron/remote';
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import qrcode from '@xkeshi/vue-qrcode';

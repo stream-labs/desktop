@@ -1,4 +1,4 @@
-import { remote } from 'electron';
+import * as remote from '@electron/remote';
 import React from 'react';
 import cx from 'classnames';
 import { Progress, Button } from 'antd';
