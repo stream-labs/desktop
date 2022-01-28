@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Fuse from 'fuse.js';
 import cx from 'classnames';
-import { Dropdown, Tooltip } from 'antd';
+import { Dropdown, Tooltip, Tree } from 'antd';
 import { Menu } from 'util/menus/Menu';
 import { EDismissable } from 'services/dismissables';
 import { $t } from 'services/i18n';
@@ -12,6 +12,8 @@ import { useVuex } from 'components-react/hooks';
 import { ERenderingMode } from '../../../../obs-api';
 import { TextInput } from 'components-react/shared/inputs';
 import Scrollable from 'components-react/shared/Scrollable';
+import { DataNode } from 'antd/lib/tree';
+import { useTree, IOnDropInfo } from 'components-react/hooks/useTree';
 
 export default function SceneSelector() {
   const {
@@ -24,14 +26,14 @@ export default function SceneSelector() {
     EditorCommandsService,
   } = Services;
 
-  const [searchQuery, setSearchQuery] = useState('');
+  const { treeSort } = useTree();
 
+  const [searchQuery, setSearchQuery] = useState('');
   const { scenes, activeSceneId, collections, activeCollection } = useVuex(() => ({
     scenes: ScenesService.views.scenes.map(scene => ({
       title: scene.name,
-      isLeaf: true,
-      isSelected: scene.id === ScenesService.views.activeSceneId,
-      data: { id: scene.id },
+      key: scene.id,
+      selectable: true,
     })),
     activeSceneId: ScenesService.views.activeSceneId,
     activeCollection: SceneCollectionsService.activeCollection,
@@ -68,8 +70,9 @@ export default function SceneSelector() {
     ScenesService.actions.makeSceneActive(selectedNodes[0].data.id);
   }
 
-  function handleSort(nodes: any) {
-    ScenesService.actions.setSceneOrder(nodes.map(node => node.data.id));
+  function handleSort(info: IOnDropInfo) {
+    const newState = treeSort(info, scenes);
+    ScenesService.actions.setSceneOrder(newState.map(node => node.key as string));
   }
 
   function addScene() {
@@ -144,8 +147,8 @@ export default function SceneSelector() {
 
   return (
     <>
-      <div className="studio-controls-top">
-        <Dropdown className="scene-collections__dropdown" overlay={DropdownMenu}>
+      <div style={{ display: 'flex' }}>
+        <Dropdown overlay={DropdownMenu}>
           <span>{activeCollection?.name}</span>
         </Dropdown>
         <div style={{ display: 'flex' }}>
@@ -160,19 +163,8 @@ export default function SceneSelector() {
           </Tooltip>
         </div>
       </div>
-      <Scrollable className="vue-tree-container">
-        {/* <sl-vue-tree
-        data-name="scene-selector"
-        :value="scenes"
-        ref="slVueTree"
-        @select="makeActive"
-        @input="handleSort"
-        @contextmenu.native.stop="showContextMenu()"
-      >
-        <template slot="title" slot-scope="{ node }">
-          <span class="item-title">{{ node.title }}</span>
-        </template>
-      </sl-vue-tree> */}
+      <Scrollable>
+        <Tree draggable treeData={scenes} onDrop={handleSort} onSelect={makeActive} />
       </Scrollable>
 
       {/* <help-tip :dismissable-key="helpTipDismissable" :position="{ top: '-8px', left: '102px' }">

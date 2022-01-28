@@ -38,6 +38,7 @@ import MiniFeed from './editor/elements/Minifeed';
 import BrowserView from './shared/BrowserView';
 import LayoutEditor from './pages/layout-editor/LayoutEditor';
 import Projector from './windows/Projector';
+import SceneSelector from './editor/elements/SceneSelector';
 
 // list of React components to be used inside Vue components
 export const components = {
@@ -80,4 +81,5 @@ export const components = {
   RecentEvents,
   MiniFeed: createRoot(MiniFeed),
   LayoutEditor: createRoot(LayoutEditor),
+  SceneSelector,
 };

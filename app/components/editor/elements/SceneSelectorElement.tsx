@@ -1,4 +1,4 @@
-import SceneSelector from './SceneSelector.vue';
+import { SceneSelector } from 'components/shared/ReactComponentList';
 import { Component } from 'vue-property-decorator';
 import BaseElement from './BaseElement';
 

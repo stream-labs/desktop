@@ -208,6 +208,14 @@ export class SafeMode extends ReactComponent {}
 
 @Component({
   props: {
+    name: { default: 'SceneSelector' },
+    wrapperStyles: { default: () => ({ height: '100%' }) },
+  },
+})
+export class SceneSelector extends ReactComponent {}
+
+@Component({
+  props: {
     name: { default: 'SourceProperties' },
     wrapperStyles: { default: () => ({ height: '100%' }) },
   },
