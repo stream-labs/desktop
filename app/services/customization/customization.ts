@@ -34,6 +34,8 @@ export class CustomizationService
     fullModeWidthOffset: 0,
     compactBackupPositionX: undefined,
     compactBackupPositionY: undefined,
+    autoCompactMode: false,
+    showAutoCompactDialog: true,
 
     experimental: {
       // put experimental features here
@@ -115,6 +117,22 @@ export class CustomizationService
 
   setCompactModeStudioController(controller: TCompactModeStudioController) {
     this.setSettings({ compactModeStudioController: controller });
+  }
+
+  get autoCompactMode(): boolean {
+    return this.state.autoCompactMode;
+  }
+
+  setAutoCompatMode(auto: boolean) {
+    this.setSettings({ autoCompactMode: auto });
+  }
+
+  get showAutoCompactDialog(): boolean {
+    return this.state.showAutoCompactDialog;
+  }
+
+  setShowAutoCompactDialog(show: boolean) {
+    this.setSettings({ showAutoCompactDialog: show });
   }
 
   setFullModeWidthOffset(state: {

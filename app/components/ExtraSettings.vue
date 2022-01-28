@@ -17,6 +17,9 @@
         @input="setOptimizeWithHardwareEncoder"
         class="optional-item"
       />
+
+      <ObsBoolInput :value="autoCompactModel" @input="setAutoCompact" />
+      <ObsBoolInput :value="showAutoCompactDialogModel" @input="setShowAutoCompactDialog" />
     </div>
 
     <div class="section">
@@ -120,7 +123,6 @@
           display: none;
         }
       }
-
       &:checked ~ .view-button {
         .on {
           display: none;
@@ -182,7 +184,6 @@
       padding: 4px 8px;
       border-radius: 3px;
     }
-
     &:active {
       &:before {
         transform: scale(1.2) translateY(-8px);
