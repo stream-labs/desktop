@@ -158,6 +158,7 @@ import { RecentEventsService } from 'services/recent-events';
 import { AudioService } from './services/audio';
 import { SourceFiltersService } from './services/source-filters';
 import { LayoutService } from './services/layout';
+import { ProjectorService } from './services/projector';
 
 export const AppServices = {
   AppService,
@@ -205,4 +206,5 @@ export const AppServices = {
   AudioService,
   SourceFiltersService,
   LayoutService,
+  ProjectorService,
 };

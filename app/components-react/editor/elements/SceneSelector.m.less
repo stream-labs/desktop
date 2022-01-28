@@ -1,0 +1,33 @@
+@import '../../../styles/index';
+
+.scene-collections-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 50%;
+}
+
+.input-wrapper--search {
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+.scene-collections__dropdown {
+  & /deep/ .popper {
+    text-align: left;
+  }
+
+  & /deep/ .popper.dropdown-menu {
+    min-width: 200px;
+  }
+}
+
+.sl-vue-tree-title {
+  min-width: 0;
+
+  .item-title {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
