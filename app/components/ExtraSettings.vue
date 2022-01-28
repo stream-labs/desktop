@@ -1,69 +1,70 @@
 <template>
-<div>
-  <div class="section" v-if="isNiconicoLoggedIn()">
-    <div class="input-label">
-      <label>{{ $t('settings.optimizationForNiconicoLiveService')}}</label>
+  <div>
+    <div class="section" v-if="isNiconicoLoggedIn()">
+      <div class="input-label">
+        <label>{{ $t('settings.optimizationForNiconicoLiveService') }}</label>
+      </div>
+      <ObsBoolInput :value="optimizeForNiconicoModel" @input="setOptimizeForNiconico" />
+      <ObsBoolInput
+        :value="showOptimizationDialogForNiconicoModel"
+        v-show="optimizeForNiconicoModel.value"
+        @input="setShowOptimizationDialogForNiconico"
+        class="optional-item"
+      />
+      <ObsBoolInput
+        :value="optimizeWithHardwareEncoderModel"
+        v-show="optimizeForNiconicoModel.value"
+        @input="setOptimizeWithHardwareEncoder"
+        class="optional-item"
+      />
     </div>
-    <ObsBoolInput
-      :value="optimizeForNiconicoModel"
-      @input="setOptimizeForNiconico" />
-    <ObsBoolInput
-      :value="showOptimizationDialogForNiconicoModel"
-      v-show="optimizeForNiconicoModel.value"
-      @input="setShowOptimizationDialogForNiconico"
-      class="optional-item" />
-    <ObsBoolInput
-      :value="optimizeWithHardwareEncoderModel"
-      v-show="optimizeForNiconicoModel.value"
-      @input="setOptimizeWithHardwareEncoder"
-      class="optional-item" />
+
+    <div class="section">
+      <div class="input-label">
+        <label>{{ $t('settings.cacheManagement') }}</label>
+      </div>
+      <p>{{ $t('settings.cacheClearDescription') }}</p>
+
+      <div class="flex">
+        <a class="button button--secondary" @click="showCacheDir">
+          {{ $t('settings.showCacheDirectory') }}
+        </a>
+        <a class="button button--secondary" @click="deleteCacheDir">
+          {{ $t('settings.deleteCacheAndRestart') }}
+        </a>
+      </div>
+
+      <div class="input-label">
+        <label for="cacheId">{{ $t('settings.cacheId') }}</label>
+      </div>
+      <p>{{ $t('settings.cacheIdDescription') }}</p>
+
+      <div class="cacheid-view">
+        <label>
+          <input type="checkbox" v-model="showCacheId" />
+          <div class="view-button"><i class="icon-unhide off" /><i class="icon-hide on" /></div>
+          <input :type="showCacheId ? 'text' : 'password'" id="cacheId" :value="cacheId" readonly />
+        </label>
+        <button class="cacheid-copy button button--secondary" @click="copyToClipboard(cacheId)">
+          {{ $t('settings.cacheIdCopy') }}
+        </button>
+      </div>
+    </div>
+
+    <div class="section">
+      <ObsBoolInput
+        :value="pollingPerformanceStatisticsModel"
+        @input="setPollingPerformanceStatistics"
+      />
+      <p>{{ $t('settings.pollingPerformanceStatisticsDescription') }}</p>
+    </div>
   </div>
-
-  <div class="section">
-    <div class="input-label">
-      <label>{{ $t('settings.cacheManagement')}}</label>
-    </div>
-    <p>{{ $t('settings.cacheClearDescription')}}</p>
-
-    <div class="flex">
-      <a class="button button--secondary" @click="showCacheDir">
-        {{ $t('settings.showCacheDirectory')}}
-      </a>
-      <a class="button button--secondary" @click="deleteCacheDir">
-        {{ $t('settings.deleteCacheAndRestart') }}
-      </a>
-    </div>
-
-    <div class="input-label">
-      <label for="cacheId">{{ $t('settings.cacheId')}}</label>
-    </div>
-    <p>{{ $t('settings.cacheIdDescription')}}</p>
-
-    <div class="cacheid-view">
-      <label>
-        <input type="checkbox" v-model="showCacheId" />
-        <div class="view-button">
-          <i class="icon-unhide off"/><i class="icon-hide on"/>
-        </div>
-        <input :type="showCacheId ? 'text' : 'password'" id="cacheId" :value="cacheId" readonly />
-      </label>
-      <button class="cacheid-copy button button--secondary" @click="copyToClipboard(cacheId);">{{ $t('settings.cacheIdCopy')}}</button>
-    </div>
-  </div>
-
-  <div class="section">
-    <ObsBoolInput
-      :value="pollingPerformanceStatisticsModel"
-      @input="setPollingPerformanceStatistics" />
-    <p>{{ $t('settings.pollingPerformanceStatisticsDescription') }}</p>
-  </div>
-</div>
 </template>
 
 <script lang="ts" src="./ExtraSettings.vue.ts"></script>
 
 <style lang="less">
-@import "../styles/index";
+@import '../styles/index';
 
 .optional-item {
   margin-left: 24px;
@@ -74,7 +75,7 @@
   justify-content: start;
   align-items: center;
   font-size: @font-size4;
-    
+
   label {
     cursor: pointer;
     display: flex;
@@ -88,14 +89,14 @@
     border-radius: 4px;
     margin-bottom: 16px;
 
-    input[type="password"] {
-        font-family: 'Verdana',sans-serif;
-        font-size: 0;
-        width: 332px;
-        color: var(--color-text-light);
+    input[type='password'] {
+      font-family: 'Verdana', sans-serif;
+      font-size: 0;
+      width: 332px;
+      color: var(--color-text-light);
     }
 
-    input[type="checkbox"] {
+    input[type='checkbox'] {
       display: none;
 
       & ~ .view-button {
@@ -109,24 +110,30 @@
         padding: 0 8px;
 
         &:hover {
-            color: @white;
+          color: @white;
         }
 
-        .on {display: inline-block;}
-        .off {display: none;}
+        .on {
+          display: inline-block;
+        }
+        .off {
+          display: none;
+        }
       }
 
       &:checked ~ .view-button {
-        .on {display: none;}
+        .on {
+          display: none;
+        }
         .off {
-            display: inline-block;
-            color: var(--color-text-active);
+          display: inline-block;
+          color: var(--color-text-active);
         }
       }
 
       & ~ input {
         cursor: default;
-        font-family: 'Verdana',sans-serif;
+        font-family: 'Verdana', sans-serif;
         background: none;
         border: none;
         border-radius: 0;
@@ -145,8 +152,8 @@
       }
 
       &:checked ~ input {
-          font-size: 14px;
-          color: @text-primary;
+        font-size: 14px;
+        color: @text-primary;
       }
     }
   }
@@ -169,7 +176,7 @@
       left: 16px;
       transition: all 0s;
       opacity: 0;
-      content: "Copied!";
+      content: 'Copied!';
       background-color: @text-primary;
       color: @bg-secondary;
       padding: 4px 8px;
@@ -179,7 +186,7 @@
     &:active {
       &:before {
         transform: scale(1.2) translateY(-8px);
-        transition: all .3s;
+        transition: all 0.3s;
         opacity: 1;
       }
     }
@@ -191,5 +198,4 @@
     margin-left: 16px;
   }
 }
-
 </style>
