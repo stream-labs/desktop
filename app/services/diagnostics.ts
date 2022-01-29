@@ -233,16 +233,12 @@ export class DiagnosticsService extends PersistentStatefulService<IDiagnosticsSe
         method: 'POST',
         body: formData,
       },
-    ).then(r => {
-      console.log(r);
-      return r;
-    });
+    );
   }
 
   private logProblem(problem: string) {
     this.problems.push(problem);
   }
-
 
   private async generateTopSection() {
     // All diagnostic reports include a cache upload
@@ -261,6 +257,7 @@ export class DiagnosticsService extends PersistentStatefulService<IDiagnosticsSe
 
     if (this.userService.views.isLoggedIn) {
       return new Section(title, {
+        'User Id': this.userService.state.userId,
         'Logged-In Platform': {
           Username: this.userService.views.platform.username,
           Platform: this.userService.views.platform.type,
@@ -536,7 +533,10 @@ export class DiagnosticsService extends PersistentStatefulService<IDiagnosticsSe
       });
     });
 
-    return new Section('Scenes', sceneData);
+    return new Section('Scenes', {
+      'Active Scene': this.scenesService.views.activeScene.name,
+      Scenes: sceneData,
+    });
   }
 
   private generateStreamsSection() {
