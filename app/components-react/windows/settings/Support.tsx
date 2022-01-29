@@ -9,7 +9,7 @@ import { CheckboxInput, TextInput } from '../../shared/inputs';
 import { getOS, OS } from 'util/operating-systems';
 import { Button } from 'antd';
 import cx from 'classnames';
-import { CheckCircleOutlined } from '@ant-design/icons';
+import { CheckCircleOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 
 export function Support() {
   return (
@@ -77,6 +77,17 @@ function DiagnosticReport() {
                 }
               />
             </div>
+          ),
+        });
+      })
+      .catch(() => {
+        alertAsync({
+          icon: <ExclamationCircleOutlined style={{ color: 'var(--red)' }} />,
+          getContainer: '#mainWrapper',
+          className: 'react',
+          title: $t('Error Uploading Diagnostic Report'),
+          content: $t(
+            'There was an error uploading the diagnostic report. Please try again, and let the Streamlabs Streamer Success Team know if the issue persists.',
           ),
         });
       })
