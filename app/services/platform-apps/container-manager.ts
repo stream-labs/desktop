@@ -327,6 +327,7 @@ export class PlatformContainerManager {
             'cdn.heapanalytics.com',
             'edge.fullstory.com',
             'www.youtube.com',
+            'cdn.segment.com',
           ];
 
           const parsed = url.parse(details.url);

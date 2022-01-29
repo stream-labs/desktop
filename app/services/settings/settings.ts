@@ -7,7 +7,6 @@ import {
   IObsListInput,
   IObsInput,
   TObsValue,
-  IObsBitmaskInput,
 } from 'components/obs/inputs/ObsInput';
 import * as obs from '../../../obs-api';
 import { SourcesService } from 'services/sources';
@@ -23,8 +22,6 @@ import { PlatformAppsService } from 'services/platform-apps';
 import { EDeviceType, HardwareService } from 'services/hardware';
 import { StreamingService } from 'services/streaming';
 import { byOS, getOS, OS } from 'util/operating-systems';
-import path from 'path';
-import fs from 'fs';
 import { UsageStatisticsService } from 'services/usage-statistics';
 import { SceneCollectionsService } from 'services/scene-collections';
 import * as remote from '@electron/remote';
@@ -442,6 +439,14 @@ export class SettingsService extends StatefulService<ISettingsServiceState> {
           valueToCurrentValue: true,
         }),
       });
+
+      if (
+        categoryName === 'Output' &&
+        subGroup.nameSubCategory === 'Untitled' &&
+        subGroup.parameters[0].value === 'Simple'
+      ) {
+        this.audioService.setSimpleTracks();
+      }
     }
 
     obs.NodeObs.OBS_settings_saveSettings(categoryName, dataToSave);

@@ -62,6 +62,7 @@ export { YoutubeService } from 'services/platforms/youtube';
 export { TwitchService } from 'services/platforms/twitch';
 export { FacebookService } from 'services/platforms/facebook';
 export { TiktokService } from 'services/platforms/tiktok';
+export { TrovoService } from 'services/platforms/trovo';
 export { RestreamService } from 'services/restream';
 export { TwitterService } from 'services/integrations/twitter';
 export { UsageStatisticsService } from './services/usage-statistics';
@@ -111,6 +112,7 @@ export { SpinWheelService } from 'services/widgets/settings/spin-wheel';
 export { PollService } from 'services/widgets/settings/poll';
 export { EmoteWallService } from 'services/widgets/settings/emote-wall';
 export { ChatHighlightService } from 'services/widgets/settings/chat-highlight';
+export { SuperchatGoalService } from 'services/widgets/settings/superchat-goal';
 
 import { AppService } from './services/app';
 import { WindowsService } from './services/windows';
@@ -128,6 +130,7 @@ import { TwitterService } from './services/integrations/twitter';
 import { SettingsService } from './services/settings';
 import { UserService } from './services/user';
 import { TwitchService } from './services/platforms/twitch';
+import { TrovoService } from './services/platforms/trovo';
 import { YoutubeService } from './services/platforms/youtube';
 import { FacebookService } from './services/platforms/facebook';
 import { DismissablesService } from './services/dismissables';
@@ -156,6 +159,7 @@ import { RecentEventsService } from 'services/recent-events';
 import { AudioService } from './services/audio';
 import { SourceFiltersService } from './services/source-filters';
 import { DiagnosticsService } from './services/diagnostics';
+import { LayoutService } from './services/layout';
 
 export const AppServices = {
   AppService,
@@ -182,6 +186,7 @@ export const AppServices = {
   FacebookService,
   UserService,
   TwitchService,
+  TrovoService,
   DismissablesService,
   HighlighterService,
   GrowService,
@@ -202,4 +207,5 @@ export const AppServices = {
   AudioService,
   SourceFiltersService,
   DiagnosticsService,
+  LayoutService,
 };
