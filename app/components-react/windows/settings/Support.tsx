@@ -59,6 +59,7 @@ function DiagnosticReport() {
           icon: <CheckCircleOutlined style={{ color: 'var(--teal)' }} />,
           width: 550,
           getContainer: '#mainWrapper',
+          className: 'react',
           title: $t('Diagnostic Report Uploaded Successfully'),
           content: (
             <div>
