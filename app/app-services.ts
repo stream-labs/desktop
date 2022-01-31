@@ -159,6 +159,8 @@ import { RecentEventsService } from 'services/recent-events';
 import { AudioService } from './services/audio';
 import { SourceFiltersService } from './services/source-filters';
 import { DiagnosticsService } from './services/diagnostics';
+import { WebsocketService } from './services/websocket';
+import { SpinWheelService } from 'services/widgets/settings/spin-wheel';
 import { LayoutService } from './services/layout';
 
 export const AppServices = {
@@ -207,5 +209,7 @@ export const AppServices = {
   AudioService,
   SourceFiltersService,
   DiagnosticsService,
+  WebsocketService,
+  SpinWheelService,
   LayoutService,
 };
