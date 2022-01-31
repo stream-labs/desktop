@@ -80,7 +80,7 @@ function DiagnosticReport() {
           ),
         });
       })
-      .catch(e => {
+      .catch(() => {
         alertAsync({
           icon: <ExclamationCircleOutlined style={{ color: 'var(--red)' }} />,
           getContainer: '#mainWrapper',
