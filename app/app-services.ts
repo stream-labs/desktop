@@ -54,6 +54,7 @@ export { MacPermissionsService } from 'services/mac-permissions';
 export { VirtualWebcamService } from 'services/virtual-webcam';
 export { MetricsService } from 'services/metrics';
 export { HighlighterService } from 'services/highlighter';
+export { DiagnosticsService } from 'services/diagnostics';
 
 // ONLINE SERVICES
 export { UserService } from './services/user';
@@ -157,6 +158,7 @@ import { MediaGalleryService } from './services/media-gallery';
 import { RecentEventsService } from 'services/recent-events';
 import { AudioService } from './services/audio';
 import { SourceFiltersService } from './services/source-filters';
+import { DiagnosticsService } from './services/diagnostics';
 import { WebsocketService } from './services/websocket';
 import { SpinWheelService } from 'services/widgets/settings/spin-wheel';
 import { LayoutService } from './services/layout';
@@ -206,6 +208,7 @@ export const AppServices = {
   PlatformAppsService,
   AudioService,
   SourceFiltersService,
+  DiagnosticsService,
   WebsocketService,
   SpinWheelService,
   LayoutService,
