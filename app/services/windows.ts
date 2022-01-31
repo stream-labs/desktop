@@ -74,6 +74,7 @@ import SpinWheel from 'components/widgets/SpinWheel.vue';
 import Poll from 'components/widgets/Poll';
 import EmoteWall from 'components/widgets/EmoteWall';
 import ChatHighlight from 'components/widgets/ChatHighlight';
+import SuperchatGoal from 'components/widgets/goal/SuperchatGoal';
 
 import { byOS, OS } from 'util/operating-systems';
 import { UsageStatisticsService } from './usage-statistics';
@@ -124,6 +125,7 @@ export function getComponents() {
     StarsGoal,
     SupporterGoal,
     SubscriberGoal,
+    SuperchatGoal,
     CharityGoal,
     ChatBox,
     ViewerCount,

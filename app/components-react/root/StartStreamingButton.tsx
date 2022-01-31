@@ -112,27 +112,13 @@ export default function StartStreamingButton(p: { disabled?: boolean }) {
     const primaryPlatform = UserService.state.auth?.primaryPlatform;
     const updateStreamInfoOnLive = CustomizationService.state.updateStreamInfoOnLive;
 
+    if (!primaryPlatform) return false;
+
     if (primaryPlatform === 'twitch') {
       // For Twitch, we can show the Go Live window even with protected mode off
       // This is mainly for legacy reasons.
       return StreamingService.views.isMultiplatformMode || updateStreamInfoOnLive;
-    }
-
-    if (primaryPlatform === 'facebook') {
-      return (
-        StreamSettingsService.state.protectedModeEnabled &&
-        StreamSettingsService.isSafeToModifyStreamKey()
-      );
-    }
-
-    if (primaryPlatform === 'youtube') {
-      return (
-        StreamSettingsService.state.protectedModeEnabled &&
-        StreamSettingsService.isSafeToModifyStreamKey()
-      );
-    }
-
-    if (primaryPlatform === 'tiktok') {
+    } else {
       return (
         StreamSettingsService.state.protectedModeEnabled &&
         StreamSettingsService.isSafeToModifyStreamKey()

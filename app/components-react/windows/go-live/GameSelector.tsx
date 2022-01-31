@@ -1,25 +1,36 @@
 import React, { useEffect, useState } from 'react';
-import { TPlatform } from '../../../services/platforms';
+import {
+  getPlatformService,
+  IGame,
+  IPlatformCapabilityGame,
+  TPlatform,
+} from '../../../services/platforms';
 import { ListInput, TSlobsInputProps } from '../../shared/inputs';
 import { $t } from '../../../services/i18n';
-import { useOnCreate, useFormState } from '../../hooks';
-import { Services } from '../../service-provider';
+import { useFormState } from '../../hooks';
 import { IListOption } from '../../shared/inputs/ListInput';
+import { Services } from '../../service-provider';
 
 type TProps = TSlobsInputProps<{ platform: TPlatform }, string>;
 
 export default function GameSelector(p: TProps) {
   const { platform } = p;
-  const { TwitchService, FacebookService } = Services;
-  const selectedGame: string =
-    (platform === 'twitch'
-      ? TwitchService.state.settings.game
-      : FacebookService.state.settings.game) || '';
+  const platformService = (getPlatformService(platform) as unknown) as IPlatformCapabilityGame;
+  const selectedGameId = platformService.state.settings.game;
+  let selectedGameName = selectedGameId;
+
+  if (platform === 'trovo') {
+    selectedGameName = Services.TrovoService.state.channelInfo.gameName;
+  }
+
+  function fetchGames(query: string): Promise<IGame[]> {
+    return platformService.searchGames(query);
+  }
 
   const { s, updateState } = useFormState(() => {
     return {
-      games: selectedGame
-        ? [{ label: selectedGame, value: selectedGame }]
+      games: selectedGameId
+        ? [{ label: selectedGameName, value: selectedGameId }]
         : ([] as IListOption<string>[]),
     };
   });
@@ -31,21 +42,25 @@ export default function GameSelector(p: TProps) {
   }, []);
 
   async function loadImageForSelectedGame() {
-    if (platform !== 'twitch') return;
-    if (!selectedGame) return;
-    const game = await TwitchService.actions.return.fetchGame(selectedGame);
-    if (!game || game.name !== selectedGame) return;
+    // game images available for Twitch and Trovo only
+    if (!['twitch', 'trovo'].includes(platform)) return;
+    if (!selectedGameName) return;
+    const game = await platformService.fetchGame(selectedGameName);
+    if (!game || game.name !== selectedGameName) return;
     updateState({
-      games: s.games.map(opt => (opt.value === selectedGame ? { ...opt, image: game.image } : opt)),
+      games: s.games.map(opt =>
+        opt.value === selectedGameId ? { ...opt, image: game.image } : opt,
+      ),
     });
   }
 
   async function onSearch(searchString: string) {
     if (searchString.length < 2) return;
-    const games = (platform === 'twitch'
-      ? await TwitchService.actions.return.searchGames(searchString)
-      : await FacebookService.actions.return.searchGames(searchString)
-    ).map(g => ({ value: g.name, label: g.name, image: g.image }));
+    const games = (await fetchGames(searchString)).map(g => ({
+      value: platform === 'trovo' ? g.id : g.name,
+      label: g.name,
+      image: g.image,
+    }));
     updateState({ games });
     setIsSearching(false);
   }
@@ -56,12 +71,19 @@ export default function GameSelector(p: TProps) {
   }
 
   const isTwitch = platform === 'twitch';
+  const isTrovo = platform === 'trovo';
+
+  const label = {
+    twitch: $t('Twitch Game'),
+    facebook: $t('Facebook Game'),
+    trovo: $t('Trovo Category'),
+  }[platform];
 
   return (
     <ListInput
-      label={platform === 'twitch' ? $t('Twitch Game') : $t('Facebook Game')}
+      label={label}
       name={`${p.platform}Game`}
-      value={selectedGame}
+      value={selectedGameId}
       extra={p.extra}
       onChange={p.onChange}
       placeholder={$t('Start typing to search')}
@@ -69,10 +91,10 @@ export default function GameSelector(p: TProps) {
       showSearch
       onSearch={onSearch}
       debounce={500}
-      required={isTwitch}
-      hasImage={isTwitch}
+      required={isTwitch || isTrovo}
+      hasImage={isTwitch || isTrovo}
       onBeforeSearch={onBeforeSearchHandler}
-      imageSize={TwitchService.gameImageSize}
+      imageSize={platformService.gameImageSize}
       loading={isSearching}
       notFoundContent={isSearching ? $t('Searching...') : $t('No matching game(s) found.')}
       allowClear
