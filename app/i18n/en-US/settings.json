@@ -152,5 +152,6 @@
   "Crash Reporting": "Crash Reporting",
   "Diagnostic Report Uploaded Successfully": "Diagnostic Report Uploaded Successfully",
   "Error Uploading Diagnostic Report": "Error Uploading Diagnostic Report",
-  "There was an error uploading the diagnostic report. Please try again, and let the Streamlabs Streamer Success team know if the issue persists.": "There was an error uploading the diagnostic report. Please try again, and let the Streamlabs Streamer Success team know if the issue persists."
+  "There was an error uploading the diagnostic report. Please try again, and let the Streamlabs Streamer Success team know if the issue persists.": "There was an error uploading the diagnostic report. Please try again, and let the Streamlabs Streamer Success team know if the issue persists.",
+  "The diagnostic report was securely uploaded, and the Report ID below has been copied to your clipboard. Please provide the Report ID to the Streamlabs Streamer Success Team.": "The diagnostic report was securely uploaded, and the Report ID below has been copied to your clipboard. Please provide the Report ID to the Streamlabs Streamer Success Team."
 }

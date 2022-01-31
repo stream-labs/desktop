@@ -16,6 +16,7 @@ import Vue from 'vue';
 import { PerformanceService } from './performance';
 import { jfetch } from 'util/requests';
 import { CacheUploaderService } from './cache-uploader';
+import { AudioService } from './audio';
 
 interface IStreamDiagnosticInfo {
   startTime: number;
@@ -129,6 +130,7 @@ export class DiagnosticsService extends PersistentStatefulService<IDiagnosticsSe
   @Inject() streamingService: StreamingService;
   @Inject() performanceService: PerformanceService;
   @Inject() cacheUploaderService: CacheUploaderService;
+  @Inject() audioService: AudioService;
 
   static defaultState: IDiagnosticsServiceState = {
     streams: [],
@@ -362,6 +364,9 @@ export class DiagnosticsService extends PersistentStatefulService<IDiagnosticsSe
         'Encoder Preset': settings.streaming.preset,
         'Encoder Options': settings.streaming.encoderOptions,
         'Rescale Output': settings.streaming.rescaleOutput,
+        'Audio Track': this.settingsService.views.streamTrack + 1,
+        'VOD Track': this.settingsService.views.vodTrack + 1,
+        'VOD Track Enabled': !!this.settingsService.views.vodTrackEnabled,
       },
       Recording: {
         Encoder:
@@ -370,6 +375,7 @@ export class DiagnosticsService extends PersistentStatefulService<IDiagnosticsSe
             : settings.recording.encoder,
         Bitrate: settings.recording.bitrate,
         'Output Resolution': settings.recording.outputResolution,
+        'Audio Tracks': this.settingsService.views.recordingTracks.map(t => t + 1).join(', '),
       },
     });
   }
@@ -514,6 +520,22 @@ export class DiagnosticsService extends PersistentStatefulService<IDiagnosticsSe
 
           sourceData['Selected Device Id'] = deviceId;
           sourceData['Selected Device Name'] = device?.description ?? '<DEVICE NOT FOUND>';
+        }
+
+        if (source.audio && this.settingsService.state.Output.type === 1) {
+          const tracks = Utils.numberToBinnaryArray(
+            this.audioService.views.getSource(source.sourceId).audioMixers,
+            6,
+          ).reverse();
+          const enabledTracks = tracks.reduce((arr, val, idx) => {
+            if (val) {
+              return [...arr, idx + 1];
+            }
+
+            return arr;
+          }, []);
+
+          sourceData['Enabled Audio Tracks'] = enabledTracks.join(', ');
         }
 
         sourceData['Filters'] = this.sourceFiltersService.views
