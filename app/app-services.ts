@@ -157,6 +157,8 @@ import { MediaGalleryService } from './services/media-gallery';
 import { RecentEventsService } from 'services/recent-events';
 import { AudioService } from './services/audio';
 import { SourceFiltersService } from './services/source-filters';
+import { WebsocketService } from './services/websocket';
+import { SpinWheelService } from 'services/widgets/settings/spin-wheel';
 import { LayoutService } from './services/layout';
 
 export const AppServices = {
@@ -204,5 +206,7 @@ export const AppServices = {
   PlatformAppsService,
   AudioService,
   SourceFiltersService,
+  WebsocketService,
+  SpinWheelService,
   LayoutService,
 };
