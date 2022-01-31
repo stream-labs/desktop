@@ -122,7 +122,7 @@ class SettingsViews extends ViewHandler<ISettingsServiceState> {
   }
 
   get recordingTracks() {
-    if (!this.isAdvancedOutput) return;
+    if (!this.isAdvancedOutput) return [0];
     const bitArray = Utils.numberToBinnaryArray(this.values.Output.RecTracks, 6).reverse();
     const trackLabels: number[] = [];
     bitArray.forEach((bit, i) => {

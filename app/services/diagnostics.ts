@@ -17,6 +17,7 @@ import { PerformanceService } from './performance';
 import { jfetch } from 'util/requests';
 import { CacheUploaderService } from './cache-uploader';
 import { AudioService } from './audio';
+import { getOS, OS } from 'util/operating-systems';
 
 interface IStreamDiagnosticInfo {
   startTime: number;
@@ -381,22 +382,25 @@ export class DiagnosticsService extends PersistentStatefulService<IDiagnosticsSe
   }
 
   private generateSystemSection() {
-    const gpuInfo = this.getWmiClass('Win32_VideoController', [
-      'Name',
-      'DriverVersion',
-      'DriverDate',
-    ]);
     const cpus = os.cpus();
-    const gpuSection = {};
+    let gpuSection: Object;
 
-    // Ensures we are working with an array
-    [].concat(gpuInfo).forEach((gpu, index) => {
-      gpuSection[`GPU ${index + 1}`] = {
-        Name: gpu.Name,
-        'Driver Version': gpu.DriverVersion,
-        'Driver Date': gpu.DriverDate,
-      };
-    });
+    if (getOS() === OS.Windows) {
+      const gpuInfo = this.getWmiClass('Win32_VideoController', [
+        'Name',
+        'DriverVersion',
+        'DriverDate',
+      ]);
+
+      // Ensures we are working with an array
+      [].concat(gpuInfo).forEach((gpu, index) => {
+        gpuSection[`GPU ${index + 1}`] = {
+          Name: gpu.Name,
+          'Driver Version': gpu.DriverVersion,
+          'Driver Date': gpu.DriverDate,
+        };
+      });
+    }
 
     return new Section('System', {
       'Operating System': `${os.platform()} ${os.release()}`,
@@ -409,7 +413,7 @@ export class DiagnosticsService extends PersistentStatefulService<IDiagnosticsSe
         Total: prettyBytes(os.totalmem()),
         Free: prettyBytes(os.freemem()),
       },
-      Graphics: gpuSection,
+      Graphics: gpuSection ?? 'This information is not available on macOS reports',
     });
   }
 
