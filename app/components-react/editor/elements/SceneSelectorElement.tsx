@@ -11,7 +11,11 @@ export default function SceneSelectorElement() {
   );
 
   return (
-    <div ref={containerRef} style={{ height: '100%' }}>
+    <div
+      ref={containerRef}
+      data-name="SceneSelector"
+      style={{ height: '100%', display: 'flex', flexDirection: 'column' }}
+    >
       {renderElement()}
     </div>
   );

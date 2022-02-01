@@ -140,7 +140,7 @@ export default function SceneSelector() {
       <div className="link link--pointer" onClick={manageCollections}>
         {$t('Manage All')}
       </div>
-      <div className="dropdown-menu__separator" />
+      <hr style={{ borderColor: 'var(--border)' }} />
       {filteredCollections().map(collection => (
         <div
           key={collection.id}
@@ -170,7 +170,7 @@ export default function SceneSelector() {
           visible={showDropdown}
           onVisibleChange={setShowDropdown}
         >
-          <span className={styles.activeScene}>
+          <span className={styles.activeScene} data-name="SceneSelectorDropdown">
             {activeCollection?.name}
             <DownOutlined style={{ marginLeft: '4px' }} />
           </span>
