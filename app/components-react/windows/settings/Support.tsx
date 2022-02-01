@@ -87,7 +87,7 @@ function DiagnosticReport() {
           className: 'react',
           title: $t('Error Uploading Diagnostic Report'),
           content: $t(
-            'There was an error uploading the diagnostic report. Please try again, and let the Streamlabs Streamer Success Team know if the issue persists.',
+            'There was an error uploading the diagnostic report. Please try again, and let the Streamlabs Streamer Success team know if the issue persists.',
           ),
         });
       })
