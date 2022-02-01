@@ -30,6 +30,7 @@ export default function SceneSelector() {
   const { treeSort } = useTree(true);
 
   const [searchQuery, setSearchQuery] = useState('');
+  const [showDropdown, setShowDropdown] = useState(false);
   const { scenes, activeSceneId, collections, activeCollection } = useVuex(() => ({
     scenes: ScenesService.views.scenes.map(scene => ({
       title: scene.name,
@@ -118,16 +119,13 @@ export default function SceneSelector() {
     if (SceneCollectionsService.getCollection(id)?.operatingSystem !== getOS()) return;
 
     SceneCollectionsService.actions.load(id);
+    setShowDropdown(false);
   }
 
   function filteredCollections() {
     if (!searchQuery) return collections;
     const fuse = new Fuse(collections, { shouldSort: true, keys: ['name'] });
     return fuse.search(searchQuery);
-  }
-
-  function preventDropdownClose(e: React.FocusEvent) {
-    e.stopPropagation();
   }
 
   const DropdownMenu = (
@@ -137,7 +135,6 @@ export default function SceneSelector() {
         value={searchQuery}
         onChange={setSearchQuery}
         nowrap
-        onFocus={preventDropdownClose}
         uncontrolled={false}
       />
       <div className="link link--pointer" onClick={manageCollections}>
@@ -169,6 +166,8 @@ export default function SceneSelector() {
           overlay={DropdownMenu}
           trigger={['click']}
           getPopupContainer={() => document.getElementById('mainWrapper')!}
+          visible={showDropdown}
+          onVisibleChange={setShowDropdown}
         >
           <span className={styles.activeScene}>
             {activeCollection?.name}
