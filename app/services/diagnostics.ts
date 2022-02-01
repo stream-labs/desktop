@@ -392,6 +392,8 @@ export class DiagnosticsService extends PersistentStatefulService<IDiagnosticsSe
         'DriverDate',
       ]);
 
+      gpuSection = {};
+
       // Ensures we are working with an array
       [].concat(gpuInfo).forEach((gpu, index) => {
         gpuSection[`GPU ${index + 1}`] = {
