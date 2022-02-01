@@ -2,24 +2,25 @@ import React, { useState } from 'react';
 import Fuse from 'fuse.js';
 import cx from 'classnames';
 import { Dropdown, Tooltip, Tree } from 'antd';
-import { Menu } from 'util/menus/Menu';
-import { EDismissable } from 'services/dismissables';
-import { $t } from 'services/i18n';
-import { getOS } from 'util/operating-systems';
 import * as remote from '@electron/remote';
+import { Menu } from 'util/menus/Menu';
+import { getOS } from 'util/operating-systems';
 import { Services } from 'components-react/service-provider';
 import { useVuex } from 'components-react/hooks';
-import { ERenderingMode } from '../../../../obs-api';
 import { TextInput } from 'components-react/shared/inputs';
+import HelpTip from 'components-react/shared/HelpTip';
 import Scrollable from 'components-react/shared/Scrollable';
 import { useTree, IOnDropInfo } from 'components-react/hooks/useTree';
-import HelpTip from 'components-react/shared/HelpTip';
+import { $t } from 'services/i18n';
+import { EDismissable } from 'services/dismissables';
+import { ERenderingMode } from '../../../../obs-api';
+import styles from './SceneSelector.m.less';
+import { DownOutlined } from '@ant-design/icons';
 
 export default function SceneSelector() {
   const {
     ScenesService,
     SceneCollectionsService,
-    AppService,
     TransitionsService,
     SourceFiltersService,
     ProjectorService,
@@ -40,7 +41,9 @@ export default function SceneSelector() {
     collections: SceneCollectionsService.collections,
   }));
 
-  function showContextMenu() {
+  function showContextMenu(info: { event: React.MouseEvent }) {
+    info.event.preventDefault();
+    info.event.stopPropagation();
     const menu = new Menu();
     menu.append({
       label: $t('Duplicate'),
@@ -66,8 +69,8 @@ export default function SceneSelector() {
     menu.popup();
   }
 
-  function makeActive(selectedNodes: any) {
-    ScenesService.actions.makeSceneActive(selectedNodes[0].data.id);
+  function makeActive(selectedKeys: string[]) {
+    ScenesService.actions.makeSceneActive(selectedKeys[0]);
   }
 
   function handleSort(info: IOnDropInfo) {
@@ -122,17 +125,30 @@ export default function SceneSelector() {
     return fuse.search(searchQuery);
   }
 
-  const helpTipDismissable = EDismissable.SceneCollectionsHelpTip;
+  function preventDropdownClose(e: React.FocusEvent) {
+    e.stopPropagation();
+  }
 
   const DropdownMenu = (
-    <>
-      <TextInput placeholder={$t('Search')} value={searchQuery} onChange={setSearchQuery} />
+    <div className={styles.dropdownContainer}>
+      <TextInput
+        placeholder={$t('Search')}
+        value={searchQuery}
+        onChange={setSearchQuery}
+        nowrap
+        onFocus={preventDropdownClose}
+        uncontrolled={false}
+      />
       <div className="link link--pointer" onClick={manageCollections}>
         {$t('Manage All')}
       </div>
       <div className="dropdown-menu__separator" />
       {filteredCollections().map(collection => (
-        <div key={collection.id} onClick={() => loadCollection(collection.id)}>
+        <div
+          key={collection.id}
+          onClick={() => loadCollection(collection.id)}
+          className={styles.dropdownItem}
+        >
           <i
             className={cx(
               'fab',
@@ -142,29 +158,40 @@ export default function SceneSelector() {
           {collection.name}
         </div>
       ))}
-    </>
+    </div>
   );
 
   return (
     <>
-      <div style={{ display: 'flex' }}>
-        <Dropdown overlay={DropdownMenu}>
-          <span>{activeCollection?.name}</span>
+      <div className={styles.topContainer}>
+        <Dropdown
+          overlay={DropdownMenu}
+          trigger={['click']}
+          getPopupContainer={() => document.getElementById('mainWrapper')!}
+        >
+          <span className={styles.activeScene}>
+            {activeCollection?.name}
+            <DownOutlined style={{ marginLeft: '4px' }} />
+          </span>
         </Dropdown>
-        <div style={{ display: 'flex' }}>
-          <Tooltip title={$t('Add a new Scene.')} placement="bottom">
-            <i className="icon-add icon-button icon-button--lg" onClick={addScene} />
-          </Tooltip>
-          <Tooltip title={$t('Remove Scene.')} placement="bottom">
-            <i className="icon-subtract icon-button icon-button--lg" onClick={removeScene} />
-          </Tooltip>
-          <Tooltip title={$t('Edit Scene Transitions.')} placement="bottom">
-            <i className="icon-settings icon-button icon-button--lg" onClick={showTransitions} />
-          </Tooltip>
-        </div>
+        <Tooltip title={$t('Add a new Scene.')} placement="bottom">
+          <i className="icon-add icon-button icon-button--lg" onClick={addScene} />
+        </Tooltip>
+        <Tooltip title={$t('Remove Scene.')} placement="bottom">
+          <i className="icon-subtract icon-button icon-button--lg" onClick={removeScene} />
+        </Tooltip>
+        <Tooltip title={$t('Edit Scene Transitions.')} placement="bottom">
+          <i className="icon-settings icon-button icon-button--lg" onClick={showTransitions} />
+        </Tooltip>
       </div>
-      <Scrollable style={{ height: '100%' }}>
-        <Tree draggable treeData={scenes} onDrop={handleSort} onSelect={makeActive} />
+      <Scrollable style={{ height: '100%' }} className={styles.scenesContainer}>
+        <Tree
+          draggable
+          treeData={scenes}
+          onDrop={handleSort}
+          onSelect={makeActive}
+          onRightClick={showContextMenu}
+        />
       </Scrollable>
       <HelpTip
         title={$t('Scene Collections')}

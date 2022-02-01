@@ -1,33 +1,48 @@
 @import '../../../styles/index';
 
-.scene-collections-wrapper {
-  position: relative;
+.top-container {
   display: flex;
+  margin-bottom: 8px;
   align-items: center;
-  width: 50%;
+  justify-content: flex-end;
 }
 
-.input-wrapper--search {
-  width: 100%;
-  margin-bottom: 10px;
+.active-scene {
+  width: 200px;
+  display: block;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  margin-right: auto;
+  font-weight: 500;
+  font-size: 14px;
+  color: var(--title);
+
+  &:hover {
+    cursor: pointer;
+  }
 }
 
-.scene-collections__dropdown {
-  & /deep/ .popper {
-    text-align: left;
+.scenes-container {
+  background: var(--section);
+}
+
+.dropdown-container {
+  background: var(--section);
+  border: 1px solid var(--border);
+  padding: 8px;
+  border-radius: 4px;
+}
+
+.dropdown-item {
+  margin: 4px;
+
+  i {
+    margin-right: 4px;
   }
 
-  & /deep/ .popper.dropdown-menu {
-    min-width: 200px;
-  }
-}
-
-.sl-vue-tree-title {
-  min-width: 0;
-
-  .item-title {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+  &:hover {
+    color: var(--title);
+    cursor: pointer;
   }
 }
