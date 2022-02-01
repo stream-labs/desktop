@@ -7,7 +7,7 @@ export interface IOnDropInfo {
   dropToGap: boolean;
 }
 
-export function useTree() {
+export function useTree(onlyLeaves?: boolean) {
   function treeSort(info: IOnDropInfo, state: DataNode[]) {
     const dropKey = info.node.key;
     const dragKey = info.dragNode.key;
@@ -32,7 +32,7 @@ export function useTree() {
       dragObj = item;
     });
 
-    if (!info.dropToGap) {
+    if (!info.dropToGap && !onlyLeaves) {
       // Drop on the content
       loop(data, dropKey, (item: DataNode) => {
         item.children = item.children || [];
@@ -41,7 +41,8 @@ export function useTree() {
     } else if (
       (info.node.children || []).length > 0 && // Has children
       info.node.expanded && // Is expanded
-      dropPosition === 1 // On the bottom gap
+      dropPosition === 1 && // On the bottom gap
+      !onlyLeaves
     ) {
       loop(data, dropKey, (item: DataNode) => {
         item.children = item.children || [];

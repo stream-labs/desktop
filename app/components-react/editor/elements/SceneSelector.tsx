@@ -27,7 +27,7 @@ export default function SceneSelector() {
     EditorCommandsService,
   } = Services;
 
-  const { treeSort } = useTree();
+  const { treeSort } = useTree(true);
 
   const [searchQuery, setSearchQuery] = useState('');
   const { scenes, activeSceneId, collections, activeCollection } = useVuex(() => ({
@@ -35,6 +35,7 @@ export default function SceneSelector() {
       title: scene.name,
       key: scene.id,
       selectable: true,
+      isLeaf: true,
     })),
     activeSceneId: ScenesService.views.activeSceneId,
     activeCollection: SceneCollectionsService.activeCollection,

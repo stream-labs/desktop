@@ -25,6 +25,16 @@
 
 .scenes-container {
   background: var(--section);
+
+  :global(.ant-tree-treenode), :global(.ant-tree-node-content-wrapper) {
+    width: 100%;
+  }
+
+  :global(.ant-tree-node-selected) {
+    :global(.ant-tree-title) {
+      color: var(--title);
+    }
+  }
 }
 
 .dropdown-container {
