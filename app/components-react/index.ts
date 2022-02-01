@@ -81,5 +81,5 @@ export const components = {
   RecentEvents,
   MiniFeed: createRoot(MiniFeed),
   LayoutEditor: createRoot(LayoutEditor),
-  SceneSelector,
+  SceneSelector: createRoot(SceneSelector),
 };
