@@ -146,6 +146,7 @@ export default function SceneSelector() {
           key={collection.id}
           onClick={() => loadCollection(collection.id)}
           className={styles.dropdownItem}
+          data-name={collection.name}
         >
           <i
             className={cx(
