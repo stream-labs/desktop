@@ -12,8 +12,8 @@ import { useVuex } from 'components-react/hooks';
 import { ERenderingMode } from '../../../../obs-api';
 import { TextInput } from 'components-react/shared/inputs';
 import Scrollable from 'components-react/shared/Scrollable';
-import { DataNode } from 'antd/lib/tree';
 import { useTree, IOnDropInfo } from 'components-react/hooks/useTree';
+import HelpTip from 'components-react/shared/HelpTip';
 
 export default function SceneSelector() {
   const {
@@ -163,22 +163,20 @@ export default function SceneSelector() {
           </Tooltip>
         </div>
       </div>
-      <Scrollable>
+      <Scrollable style={{ height: '100%' }}>
         <Tree draggable treeData={scenes} onDrop={handleSort} onSelect={makeActive} />
       </Scrollable>
-
-      {/* <help-tip :dismissable-key="helpTipDismissable" :position="{ top: '-8px', left: '102px' }">
-      <div slot="title">
-        {{ $t('Scene Collections') }}
-      </div>
-      <div slot="content">
-        {{
-          $t(
+      <HelpTip
+        title={$t('Scene Collections')}
+        dismissableKey={EDismissable.SceneCollectionsHelpTip}
+        position={{ top: '-8px', left: '102px' }}
+      >
+        <div>
+          {$t(
             'This is where your Scene Collections live. Clicking the title will dropdown a menu where you can view & manage.',
-          )
-        }}
-      </div>
-    </help-tip> */}
+          )}
+        </div>
+      </HelpTip>
     </>
   );
 }
