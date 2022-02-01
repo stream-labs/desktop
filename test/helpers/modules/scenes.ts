@@ -61,7 +61,7 @@ export async function openDuplicateWindow(sceneName: string) {
 export async function switchCollection(collectionName: string) {
   await focusMain();
   await click('[data-name=SceneSelectorDropdown]');
-  await (await (await select('.ant-dropdown')).$(`[data-name=${collectionName}]`)).click();
+  await (await (await select('.ant-dropdown')).$(`[data-name="${collectionName}"]`)).click();
   await waitForLoader();
 }
 
