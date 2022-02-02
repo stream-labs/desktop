@@ -31,6 +31,7 @@ export default function GlobalSettings() {
     vodTrack,
     vodTrackEnabled,
     isTwitchAuthed,
+    recFormat,
   } = useVuex(() => ({
     advancedAudioSettings: SettingsService.views.advancedAudioSettings,
     isAdvancedOutput: SettingsService.views.isAdvancedOutput,
@@ -39,6 +40,7 @@ export default function GlobalSettings() {
     vodTrack: SettingsService.views.vodTrack,
     vodTrackEnabled: SettingsService.views.vodTrackEnabled,
     isTwitchAuthed: UserService.views.isTwitchAuthed,
+    recFormat: SettingsService.views.recFormat,
   }));
 
   const monitoringDevice = advancedAudioSettings?.parameters.find(
@@ -127,6 +129,7 @@ export default function GlobalSettings() {
                   checkboxStyles={{ marginRight: '4px' }}
                   name={`flag${track}`}
                   onChange={(value: boolean) => handleTracksChange(i, value)}
+                  disabled={recFormat === 'flv'}
                 />
               ))}
             </div>

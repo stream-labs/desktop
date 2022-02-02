@@ -114,6 +114,11 @@ class SettingsViews extends ViewHandler<ISettingsServiceState> {
     return Number(this.values.Output.TrackIndex) - 1;
   }
 
+  get recFormat() {
+    if (!this.isAdvancedOutput) return;
+    return this.values.Output.RecFormat;
+  }
+
   get recordingTracks() {
     if (!this.isAdvancedOutput) return;
     const bitArray = Utils.numberToBinnaryArray(this.values.Output.RecTracks, 6).reverse();
