@@ -16,6 +16,10 @@ interface IScrollableProps {
    * snap the scrollbar to the window's edge
    */
   snapToWindowEdge?: boolean;
+  /**
+   * Pass inline styles
+   */
+  style?: React.CSSProperties;
 }
 
 export default function Scrollable(initialProps: IScrollableProps & HTMLAttributes<unknown>) {
@@ -39,7 +43,7 @@ export default function Scrollable(initialProps: IScrollableProps & HTMLAttribut
 
   return (
     <OverlayScrollbarsComponent
-      style={{ ...p.style, ...wrapperStyles }}
+      style={{ ...p.style, ...wrapperStyles, ...(p.style ?? {}) }}
       options={{
         autoUpdate: true,
         autoUpdateInterval: 200,
