@@ -8,7 +8,8 @@ class LayoutEditorModule {
   state = {
     currentLayout: this.layoutService.views.currentTab.currentLayout || ELayout.Default,
     slottedElements: cloneDeep(this.layoutService.views.currentTab.slottedElements) || {},
-    browserUrl: '',
+    browserUrl:
+      this.layoutService.views.currentTab.slottedElements[ELayoutElement.Browser]?.src || '',
     showModal: false,
   };
 
