@@ -1,6 +1,6 @@
 import electron from 'electron';
 import remote from '@electron/remote';
-import React, { useState, useRef } from 'react';
+import React, { useRef } from 'react';
 import { $t } from 'services/i18n';
 import useBaseElement from './hooks';
 import { Services } from 'components-react/service-provider';
@@ -11,7 +11,7 @@ export default function LegacyEvents(p: { onPopout: () => void }) {
   const { UserService, RecentEventsService, MagicLinkService } = Services;
 
   const containerRef = useRef<HTMLDivElement>(null);
-  const [magicLinkDisabled, setMagicLinkDisabled] = useState(false);
+  const magicLinkDisabled = useRef(false);
 
   function popoutRecentEvents() {
     p.onPopout();
@@ -28,8 +28,8 @@ export default function LegacyEvents(p: { onPopout: () => void }) {
         popoutRecentEvents();
       } else if (match) {
         // Prevent spamming our API
-        if (magicLinkDisabled) return;
-        setMagicLinkDisabled(true);
+        if (magicLinkDisabled.current) return;
+        magicLinkDisabled.current = true;
 
         try {
           const link = await MagicLinkService.actions.return.getDashboardMagicLink(match[1]);
@@ -38,7 +38,7 @@ export default function LegacyEvents(p: { onPopout: () => void }) {
           console.error('Error generating dashboard magic link', e);
         }
 
-        setMagicLinkDisabled(false);
+        magicLinkDisabled.current = false;
       } else {
         remote.shell.openExternal(url);
       }
