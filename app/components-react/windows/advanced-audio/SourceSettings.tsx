@@ -40,7 +40,7 @@ export default function AdvancedAudio() {
       onChange={(key: string) => setExpandedSource(key)}
     >
       {audioSources.map(audioSource => (
-        <Panel key={audioSource.sourceId} header={<PanelHeader sourceId={audioSource.sourceId} />}>
+        <Panel key={audioSource.sourceId} header={<PanelHeader source={audioSource} />}>
           <PanelForm source={audioSource} />
         </Panel>
       ))}
@@ -48,26 +48,20 @@ export default function AdvancedAudio() {
   );
 }
 
-function PanelHeader(p: { sourceId: string }) {
-  const { AudioService, EditorCommandsService, SettingsService } = Services;
+function PanelHeader(p: { source: AudioSource }) {
+  const { EditorCommandsService, SettingsService } = Services;
 
-  const {
-    source,
-    isAdvancedOutput,
-    recordingTracks,
-    streamTrack,
-    vodTrackEnabled,
-    vodTrack,
-  } = useVuex(() => ({
-    source: AudioService.views.getSource(p.sourceId),
-    isAdvancedOutput: SettingsService.views.isAdvancedOutput,
-    streamTrack: SettingsService.views.streamTrack,
-    recordingTracks: SettingsService.views.recordingTracks,
-    vodTrackEnabled: SettingsService.views.vodTrackEnabled,
-    vodTrack: SettingsService.views.vodTrack,
-  }));
+  const { isAdvancedOutput, recordingTracks, streamTrack, vodTrackEnabled, vodTrack } = useVuex(
+    () => ({
+      isAdvancedOutput: SettingsService.views.isAdvancedOutput,
+      streamTrack: SettingsService.views.streamTrack,
+      recordingTracks: SettingsService.views.recordingTracks,
+      vodTrackEnabled: SettingsService.views.vodTrackEnabled,
+      vodTrack: SettingsService.views.vodTrack,
+    }),
+  );
 
-  const { name, mixerHidden, muted, fader, audioMixers } = source;
+  const { name, mixerHidden, muted, fader, audioMixers, sourceId } = p.source;
 
   const [trackFlags, setTrackFlags] = useState(
     Utils.numberToBinnaryArray(audioMixers, 6).reverse(),
@@ -78,7 +72,7 @@ function PanelHeader(p: { sourceId: string }) {
     newArray[index] = Number(value);
     setTrackFlags(newArray);
     const newValue = Utils.binnaryArrayToNumber([...newArray].reverse());
-    EditorCommandsService.actions.executeCommand('SetAudioSettingsCommand', p.sourceId, {
+    EditorCommandsService.actions.executeCommand('SetAudioSettingsCommand', sourceId, {
       audioMixers: newValue,
     });
   }
@@ -86,7 +80,7 @@ function PanelHeader(p: { sourceId: string }) {
   function onDeflectionInput(value: number) {
     EditorCommandsService.actions.executeCommand(
       'SetDeflectionCommand',
-      p.sourceId,
+      sourceId,
       (value as number) / 100,
     );
   }
@@ -94,7 +88,7 @@ function PanelHeader(p: { sourceId: string }) {
   function onInputHandler(name: string, value: TObsValue, e: React.MouseEvent) {
     e.stopPropagation();
     console.log(name, value);
-    EditorCommandsService.actions.executeCommand('SetAudioSettingsCommand', p.sourceId, {
+    EditorCommandsService.actions.executeCommand('SetAudioSettingsCommand', sourceId, {
       [name]: value,
     });
   }
