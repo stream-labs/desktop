@@ -134,7 +134,7 @@ export default class Settings extends Vue {
       // 'SceneCollections',
       // 'Notifications',
       'Appearance',
-      // 'RemoteControl',
+      'Remote Control',
       // 'VirtualWebcam',
       // 'GameOverlay'
       'Get Support',

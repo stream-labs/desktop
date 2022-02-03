@@ -104,7 +104,7 @@ export function RemoteControlSettings() {
   return (
     <ObsSettingsSection>
       <div>
-        {$t('You can now control Streamlabs OBS from your phone.')} <br />
+        {$t('You can now control Streamlabs Desktop from your phone.')} <br />
         {$t('To begin, scan this QR code with your phone.')}
         <br />
         {$t(
@@ -137,6 +137,7 @@ export function RemoteControlSettings() {
           <TextInput
             label={$t('API token')}
             readOnly
+            isPassword
             value={qrCodeData.token}
             addonAfter={<Button onClick={generateToken}>{$t('Generate new')}</Button>}
           />
