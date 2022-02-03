@@ -7,16 +7,17 @@
       <div class="input-wrapper input-wrapper--search">
         <input class="input--search" type="text" :placeholder="$t('common.search')" v-model="searchQuery" />
       </div>
-
       <button class="button button--primary" @click="create">
         <i class="icon-plus" />
         {{ $t('common.createNew') }}
       </button>
     </div>
-    <editable-scene-collection
-      v-for="collection in collections"
-      :key="collection.id"
-      :collection-id="collection.id"/>
+    <div class="manage-scene-collections__body">
+      <editable-scene-collection
+        v-for="collection in collections"
+        :key="collection.id"
+        :collection-id="collection.id"/>
+    </div>
   </div>
 </modal-layout>
 </template>
@@ -27,7 +28,6 @@
 @import "../../styles/index";
 
 .manage-scene-collections__header {
-  margin-bottom: 20px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -37,10 +37,24 @@
   width: 50%;
 }
 
+button {
+  .input-wrapper--search + & {
+    margin-bottom: 16px;
+  }
+}
+
 .manage-scene-collections--new {
   &:hover {
     background: @hover;
   }
+}
+
+.manage-scene-collections__body {
+  .radius;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--color-bg-secondary);
+  overflow-y: auto;
 }
 
 </style>

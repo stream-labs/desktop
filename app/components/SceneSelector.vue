@@ -14,7 +14,7 @@
         <div
           v-for="sceneCollection in sceneCollections"
           :key="sceneCollection.id"
-          class="dropdown-menu__item link"
+          class="dropdown-menu__item"
           :class="{ active: activeId === sceneCollection.id }"
           @click="loadCollection(sceneCollection.id)"
         >
@@ -78,7 +78,7 @@
   position: relative;
   display: flex;
   align-items: center;
-  flex-grow: 1;
+  max-width: calc(100% - 80px); // sidebarのサイズを引く
 }
 
 .input-wrapper--search {
