@@ -3,7 +3,7 @@
   <div class="section-content">
     <div class="input-container">
       <div class="fader" @click="showQrcode">
-        <qrcode :value="qrcodeVal" :options="{ size: 250 }" :class="{ blur: !qrcodeIsVisible }"></qrcode>
+        <qrcode :value="qrcodeVal" :options="{ size: 350 }" :class="{ blur: !qrcodeIsVisible }"></qrcode>
         <span v-if="!qrcodeIsVisible">{{ $t('Don\'t show this code on stream. Click to reveal')}}</span>
       </div>
 
