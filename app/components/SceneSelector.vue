@@ -78,7 +78,8 @@
   position: relative;
   display: flex;
   align-items: center;
-  max-width: calc(100% - 80px); // sidebarのサイズを引く
+  flex-grow: 1;
+  width: 160px;
 }
 
 .input-wrapper--search {
