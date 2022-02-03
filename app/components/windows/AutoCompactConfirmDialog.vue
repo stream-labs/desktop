@@ -1,17 +1,18 @@
 <template>
   <modal-layout :show-controls="false" :customControls="true">
     <div slot="content">
-      <p class="confirm-title">{{ $t('settings.autoCompact.title') }}</p>
       <ul class="confirm-list">
-        <p class="confirm-title">{{ $t('settings.autoCompact.message') }}</p>
-      </ul>
-      <BoolInput :value="doNotShowAgain" @input="setDoNotShowAgain" />
+        <li class="confirm-list-item">
+          <p class="confirm-message">{{ $t('settings.autoCompact.message') }}</p>
+          <BoolInput :value="doNotShowAgain" @input="setDoNotShowAgain" />
+        </li>
+      </ul>  
     </div>
     <div slot="controls">
-      <button class="button button--default" @click="skip">
+      <button class="button button--secondary" @click="skip">
         {{ $t('settings.autoCompact.later') }}
       </button>
-      <button class="button button--action" @click="activate">
+      <button class="button button--primary" @click="activate">
         {{ $t('settings.autoCompact.activate') }}
       </button>
     </div>
@@ -26,11 +27,21 @@
 .input-container {
   flex-direction: column;
 }
+.confirm-message {
+  color: var(--color-text);
+  margin-bottom: 24px;
+  white-space: pre-line;
+}
 .confirm-list {
   list-style: none;
-  background: @bg-tertiary;
-  .radius;
   margin: 0;
-  padding: 8px;
+}
+.confirm-list-item {
+  .radius;
+  color: var(--color-text);
+  margin-bottom: 16px;
+  padding: 16px 16px 0;
+  list-style: none;
+  background: var(--color-bg-secondary);
 }
 </style>

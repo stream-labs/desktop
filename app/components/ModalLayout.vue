@@ -53,11 +53,10 @@
   flex-grow: 1;
   height: 100%;
   padding: 16px;
-  overflow-y: scroll;
+  overflow-y: hidden;
 
   &.bareContent {
     padding: 0;
-    overflow-y: hidden;
   }
 }
 
@@ -83,6 +82,11 @@
   text-align: right;
   flex-shrink: 0;
   z-index: @z-index-default-content;
+
+  div {
+    display: flex;
+    justify-content: flex-end;
+  }
 
   &:not(:empty) {
     padding: 8px 16px;

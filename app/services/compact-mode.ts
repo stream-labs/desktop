@@ -74,7 +74,7 @@ export class CompactModeService extends StatefulService<ICompactModeServiceState
             componentName: 'AutoCompactConfirmDialog',
             size: {
               width: 500,
-              height: 500,
+              height: 264,
             },
           });
         }
