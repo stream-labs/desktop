@@ -77,8 +77,8 @@
     position: absolute;
     left: 5px;
     top: 5px;
-    width: 5px;
-    height: 5px;
+    width: 6px;
+    height: 6px;
     border-radius: 50%;
     background-color: @slider-progress-color;
   }
