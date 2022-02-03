@@ -121,7 +121,7 @@ export default class Connect extends TsxComponent<ConnectProps> {
       );
     }
 
-    const platforms = ['twitch', 'youtube', 'facebook'];
+    const platforms = ['twitch', 'youtube', 'facebook', 'trovo'];
 
     return (
       <div class={styles.pageContainer}>
@@ -154,7 +154,7 @@ export default class Connect extends TsxComponent<ConnectProps> {
                     componentProps={{
                       platform,
                       size: 'medium',
-                      color: platform === 'tiktok' ? 'var(--tiktok-inverse)' : 'white',
+                      color: platform === 'trovo' ? 'black' : 'white',
                     }}
                   />
                 )}

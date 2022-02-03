@@ -33,6 +33,7 @@ import {
   AdvancedAudio,
   SourceShowcase,
   SourceFilters,
+  MediaGallery,
   Projector,
 } from 'components/shared/ReactComponentList';
 
@@ -43,7 +44,6 @@ import Blank from 'components/windows/Blank.vue';
 import ManageSceneCollections from 'components/windows/ManageSceneCollections.vue';
 import RecentEvents from 'components/windows/RecentEvents.vue';
 import GameOverlayEventFeed from 'components/windows/GameOverlayEventFeed';
-import MediaGallery from 'components/windows/MediaGallery.vue';
 import PlatformAppPopOut from 'components/windows/PlatformAppPopOut.vue';
 import EditTransform from 'components/windows/EditTransform';
 import EventFilterMenu from 'components/windows/EventFilterMenu';
@@ -74,6 +74,7 @@ import SpinWheel from 'components/widgets/SpinWheel.vue';
 import Poll from 'components/widgets/Poll';
 import EmoteWall from 'components/widgets/EmoteWall';
 import ChatHighlight from 'components/widgets/ChatHighlight';
+import SuperchatGoal from 'components/widgets/goal/SuperchatGoal';
 
 import { byOS, OS } from 'util/operating-systems';
 import { UsageStatisticsService } from './usage-statistics';
@@ -124,6 +125,7 @@ export function getComponents() {
     StarsGoal,
     SupporterGoal,
     SubscriberGoal,
+    SuperchatGoal,
     CharityGoal,
     ChatBox,
     ViewerCount,
