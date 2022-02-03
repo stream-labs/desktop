@@ -1,7 +1,7 @@
 {
   "Grow": "Růst",
   "My Goals": "Moje cíle",
-  "Community Reach: %{reachableFollowing}/%{totalFollowing} followers": "Oslovení komunity: %{reachableFollowing}/%{totFollowing} sledujících",
+  "Community Reach: %{reachableFollowing}/%{totalFollowing} followers": "Oslovení komunity: %{reachableFollowing}/ sledujících",
   "Streamer Resources": "Zdroje pro streamery",
   "You can reach %{percentage}% of your community across all platforms. Multistream to more platforms to increase this number": "Můžete oslovit %{percentage} % vaší komunity na všech platformách. Multistreamujte na více platforem pro zvýšení tohoto počtu",
   "Streamlabs University": "Univerzita Streamlabs",

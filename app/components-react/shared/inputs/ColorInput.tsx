@@ -150,8 +150,12 @@ export function ColorInput(p: TSlobsInputProps<{}, string | IRGBAColor>) {
           // render eyedropper button
           addonAfter={
             getOS() === OS.Windows ? (
-              <Button title={$t('Pick Screen Color')} style={{ padding: '4px 9px' }}>
-                <i className="fas fa-eye-dropper" onClick={eyedrop} />
+              <Button
+                title={$t('Pick Screen Color')}
+                style={{ padding: '4px 9px' }}
+                onClick={eyedrop}
+              >
+                <i className="fas fa-eye-dropper" />
               </Button>
             ) : (
               false

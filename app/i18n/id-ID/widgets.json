@@ -65,10 +65,10 @@
   "Banned by %{user}": "Dilarang oleh %{user}",
   "No banned media found": "Tidak ditemukan media yang dilarang",
   "Effects/Rallies": "Efek/Rally",
-  "Sparks sent are at least <amount>": "Spark yang dikirimkan setidaknya <amount>",
-  "Sparks sent are exactly <amount>": "Spark yang dikirimkan adalah <amount>",
-  "Ember amount is at least <amount>": "Jumlah Ember setidaknya <amount>",
-  "Ember amount is exactly <amopunt>": "Jumlah Ember adalah <amount>",
+  "Sparks sent are at least <amount>": "Spark yang dikirimkan setidaknya &lt;amount&gt;",
+  "Sparks sent are exactly <amount>": "Spark yang dikirimkan adalah &lt;amount&gt;",
+  "Ember amount is at least <amount>": "Jumlah Ember setidaknya &lt;amount&gt;",
+  "Ember amount is exactly <amopunt>": "Jumlah Ember adalah ",
   "Please note that when advanced media share is enabled, media will no longer play through your alert box widget. Media will only play through this media share widget.": "Harap dicatat ketika berbagi media terbaik diaktifkan, media tidak akan lagi dimainkan melalui alert box widget Anda. Media hanya akan dimainkan melalui widget berbagi media ini.",
   "Twitch Subscribers": "Pelanggan Twitch",
   "YouTube Members": "Anggota YouTube",
@@ -180,8 +180,9 @@
   "Slide Out Right": "Geser Keluar Kanan",
   "Slide Out Up": "Geser Keluar Atas",
   "Pick Screen Color": "Pilih Warna Layar",
-  "Play Alert": "Play Alert",
-  "Browser Settings": "Browser Settings",
-  "Custom Code": "Custom Code",
-  "Something went wrong while applying settings": "Something went wrong while applying settings"
+  "Play Alert": "Mainkan Peringatan",
+  "Browser Settings": "Pengaturan Browser",
+  "Custom Code": "Kode Khusus",
+  "font_family_tooltip": "Google Font yang digunakan untuk teks. Buka https://fonts.google.com untuk menemukan one! Font Populer: Open Sans, Roboto, Oswald, Lato, Droid Sans.",
+  "Something went wrong while applying settings": "Ada yang salah ketika menerapkan pengaturan"
 }

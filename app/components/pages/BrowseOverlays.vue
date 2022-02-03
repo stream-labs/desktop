@@ -1,12 +1,15 @@
 <template>
-<div>
-  <browser-view
-    class="overlays"
-    :src="overlaysUrl"
-    :enableGuestApi="true"
-    :setLocale="true"
-    @ready="onBrowserViewReady" />
-</div>
+  <div>
+    <browser-view
+      class="overlays"
+      :componentProps="{
+        src: overlaysUrl,
+        enableGuestApi: true,
+        setLocale: true,
+        onReady: onBrowserViewReady,
+      }"
+    />
+  </div>
 </template>
 
 <script lang="ts" src="./BrowseOverlays.vue.ts"></script>

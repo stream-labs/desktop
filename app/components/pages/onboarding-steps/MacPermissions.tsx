@@ -36,7 +36,7 @@ export default class MacPermissions extends TsxComponent<MacPermissionsProps> {
         <h1 class={commonStyles.titleContainer}>{$t('Grant Permissions')}</h1>
         <div>
           {$t(
-            'Streamlabs OBS needs additional permissions. Grant permissions in the pop-up dialogs to continue.',
+            'Streamlabs needs additional permissions. Grant permissions in the pop-up dialogs to continue.',
           )}
         </div>
         <div style={{ fontSize: '16px', marginTop: '16px' }}>

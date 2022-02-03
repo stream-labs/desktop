@@ -58,7 +58,8 @@ export class ShortcutsService extends Service {
     if (event.ctrlKey) keys.push('Ctrl');
     if (event.shiftKey) keys.push('Shift');
     if (event.altKey) keys.push('Alt');
-    keys.push(event.key);
+    const keyCode = event.code.replace('Key', '');
+    keys.push(keyCode);
     return keys.join('+').toUpperCase();
   }
 }

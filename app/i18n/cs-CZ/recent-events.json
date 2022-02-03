@@ -9,6 +9,7 @@
   "has gifted a sub (%{tier}) to": "daroval(a) předplatné (%{tier}) uživateli",
   "has resubscribed (%{tier}) for %{months} months": "prodloužil(a) své předplatné (%{tier}) již %{months}. měsíc",
   "has subscribed (%{tier})": "se přihlásil(a) k odběru (%{tier})",
+  "has converted from a Prime Gaming sub to a %{tier} sub": "has converted from a Prime Gaming sub to a %{tier} sub",
   "has subscribed": "se přihlásil(a) k odběru",
   "has used": "použil(a)",
   "has hosted you with %{viewers} viewers": "vás hostuje s %{viewers} diváky",
@@ -73,6 +74,6 @@
   "Safe Mode is Enabled": "Nouzový režim je aktivován",
   "Disable Safe Mode": "Deaktivovat nouzový režim",
   "Something went wrong disabling Safe Mode": "Při deaktivaci nouzového režimu došlo k chybě",
-  "Automatically disable Safe Mode": "Automatically disable Safe Mode",
-  "Disable after <duration></duration> minutes": "Disable after <duration></duration> minutes"
+  "Automatically disable Safe Mode": "Automaticky deaktivovat nouzový režim",
+  "Disable after <duration></duration> minutes": "Deaktivovat po &lt;duration&gt;&lt;/duration&gt; minutách"
 }

@@ -9,6 +9,7 @@
   "has gifted a sub (%{tier}) to": "şu kişiye bir abone (%{tier}) hediye etti:",
   "has resubscribed (%{tier}) for %{months} months": "%{months} ay boyunca yeniden abone oldu (%{tier})",
   "has subscribed (%{tier})": "abone oldu (%{tier})",
+  "has converted from a Prime Gaming sub to a %{tier} sub": "has converted from a Prime Gaming sub to a %{tier} sub",
   "has subscribed": "abone oldu",
   "has used": "şunu kullandı:",
   "has hosted you with %{viewers} viewers": "%{viewers} izleyici ile birlikte kanalınızı yayınladı",
@@ -73,6 +74,6 @@
   "Safe Mode is Enabled": "Güvenli Mod Etkin",
   "Disable Safe Mode": "Güvenli Modu Devre Dışı Bırak",
   "Something went wrong disabling Safe Mode": "Güvenli Mod devre dışı bırakılırken bir hata oluştu",
-  "Automatically disable Safe Mode": "Automatically disable Safe Mode",
-  "Disable after <duration></duration> minutes": "Disable after <duration></duration> minutes"
+  "Automatically disable Safe Mode": "Güvenli Modu otomatik olarak devre dışı bırak",
+  "Disable after <duration></duration> minutes": "&lt;duration&gt;&lt;/duration&gt; dakika sonra devre dışı bırak"
 }

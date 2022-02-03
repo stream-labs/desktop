@@ -88,9 +88,9 @@
   "here": "here",
   "Link": "Liên kết",
   "Description": "Mô tả",
-  "OBSInit.UnknownError": "An unknown error was encountered while initializing OBS.",
+  "OBSInit.UnknownError": "An unknown error was encountered while initializing Streamlabs.",
   "OBSInit.ModuleNotFoundError": "DirectX could not be found on your system. Please install the latest version of DirectX for your machine here <https://www.microsoft.com/en-us/download/details.aspx?id=35?> and try again.",
-  "OBSInit.NotSupportedError": "Failed to initialize OBS. Your video drivers may be out of date, or Streamlabs OBS may not be supported on your system.",
+  "OBSInit.NotSupportedError": "Failed to initialize Streamlabs. Your video drivers may be out of date, or Streamlabs Desktop may not be supported on your system.",
   "Log Out": "Log Out",
   "Layout Editor": "Layout Editor",
   "Are you sure you want to import multiple files?": "Are you sure you want to import multiple files?",
@@ -138,5 +138,6 @@
   "Play Audio": "Play Audio",
   "Click here": "Click here",
   "More Info": "More Info",
-  "Revert Changes": "Revert Changes"
+  "Revert Changes": "Revert Changes",
+  "Animations": "Animations"
 }

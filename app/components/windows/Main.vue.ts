@@ -10,6 +10,7 @@ import {
   StreamScheduler,
   Highlighter,
   ThemeAudit,
+  LayoutEditor,
 } from 'components/shared/ReactComponentList';
 import { ScenesService } from 'services/scenes';
 import { PlatformAppsService } from 'services/platform-apps';
@@ -17,6 +18,7 @@ import { EditorCommandsService } from '../../app-services';
 import VueResize from 'vue-resize';
 import { $t } from 'services/i18n';
 import fs from 'fs';
+import * as remote from '@electron/remote';
 Vue.use(VueResize);
 
 // Pages
@@ -25,7 +27,6 @@ import PlatformAppStore from '../pages/PlatformAppStore.vue';
 import BrowseOverlays from 'components/pages/BrowseOverlays.vue';
 import AlertboxLibrary from 'components/pages/AlertboxLibrary';
 import Onboarding from '../pages/Onboarding';
-import LayoutEditor from '../pages/LayoutEditor';
 import { Inject } from '../../services/core/injector';
 import { CustomizationService } from 'services/customization';
 import { NavigationService } from 'services/navigation';
@@ -35,7 +36,6 @@ import { IModalOptions, WindowsService } from 'services/windows';
 import LiveDock from '../LiveDock.vue';
 import StudioFooter from '../StudioFooter.vue';
 import PlatformAppMainPage from '../pages/PlatformAppMainPage.vue';
-import electron from 'electron';
 import ResizeBar from 'components/shared/ResizeBar.vue';
 import PlatformMerge from 'components/pages/PlatformMerge';
 import { getPlatformService } from 'services/platforms';
@@ -224,9 +224,9 @@ export default class Main extends Vue {
     });
 
     if (files.length > 1 || isDirectory) {
-      electron.remote.dialog
-        .showMessageBox(electron.remote.getCurrentWindow(), {
-          title: 'Streamlabs OBS',
+      remote.dialog
+        .showMessageBox(remote.getCurrentWindow(), {
+          title: 'Streamlabs Desktop',
           message: $t('Are you sure you want to import multiple files?'),
           type: 'warning',
           buttons: [$t('Cancel'), $t('OK')],

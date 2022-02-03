@@ -88,9 +88,9 @@
   "here": "qui",
   "Link": "Collega",
   "Description": "Descrizione",
-  "OBSInit.UnknownError": "Si è verificato un errore sconosciuto durante l'inizializzazione di OBS.",
-  "OBSInit.ModuleNotFoundError": "Impossibile trovare DirectX sul sistema. Installa sul computer l'ultima versione di DirectX facendo clic qui <https://www.microsoft.com/en-us/download/details.aspx?id=35?> e riprova.",
-  "OBSInit.NotSupportedError": "Impossibile inizializzare OBS. I driver video potrebbero non essere aggiornati o Streamlabs OBS potrebbe non essere supportato sul tuo sistema.",
+  "OBSInit.UnknownError": "Si è verificato un errore sconosciuto durante l'inizializzazione di Streamlabs.",
+  "OBSInit.ModuleNotFoundError": "Impossibile trovare DirectX sul sistema. Installa sul computer l'ultima versione di DirectX facendo clic qui &lt;https://www.microsoft.com/en-us/download/details.aspx?id=35?&gt; e riprova.",
+  "OBSInit.NotSupportedError": "Impossibile inizializzare Streamlabs. I driver video potrebbero non essere aggiornati o Streamlabs Desktop potrebbe non essere supportato sul tuo sistema.",
   "Log Out": "Esci",
   "Layout Editor": "Editor layout",
   "Are you sure you want to import multiple files?": "Importare più file?",
@@ -135,8 +135,9 @@
   "Time": "Tempo",
   "Sound Volume": "Volume del suono",
   "Sound": "Suono",
-  "Play Audio": "Play Audio",
-  "Click here": "Click here",
-  "More Info": "More Info",
-  "Revert Changes": "Revert Changes"
+  "Play Audio": "Riproduci audio",
+  "Click here": "Fai clic qui",
+  "More Info": "Ulteriori informazioni",
+  "Revert Changes": "Annulla modifiche",
+  "Animations": "Animazioni"
 }

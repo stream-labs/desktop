@@ -1,0 +1,56 @@
+.preview {
+  width: 100%;
+  height: 100%;
+  padding: 24px;
+  padding-top: 64px;
+  background: var(--section);
+
+  .image-container {
+    min-height: 200px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  img, video {
+    width: 100%;
+    height: auto;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+}
+
+.support-header {
+  margin-top: 24px;
+}
+
+.source-tag {
+  background: var(--section-alt);
+  border-radius: 4px;
+  height: 32px;
+  padding-top: 6px;
+  padding-left: 8px;
+  padding-right: 8px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+
+  i {
+    margin-right: 8px;
+  }
+
+  &:hover {
+    cursor: pointer;
+    color: var(--title);
+  }
+
+  &.active {
+    color: var(--title);
+    background: var(--midtone);
+  }
+}
+
+.source-tag.essential {
+  height: 64px;
+}

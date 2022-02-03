@@ -76,7 +76,7 @@ export default function GoLiveSettings() {
         <Spinner visible={isLoading} />
         <GoLiveError />
         {shouldShowSettings && (
-          <Scrollable style={{ maxHeight: '100%' }} snapToWindowEdge>
+          <Scrollable style={{ height: '100%' }} snapToWindowEdge>
             {/*PLATFORM SETTINGS*/}
             <PlatformSettings />
             {/*ADD SOME SPACE IN ADVANCED MODE*/}

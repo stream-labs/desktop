@@ -1,7 +1,7 @@
 export * from './General';
-// 'Stream',
+export * from './Stream';
 // 'Output',
-// 'Audio',
+export * from './Audio';
 // 'Video',
 // 'Hotkeys',
 export * from './Advanced';
@@ -11,3 +11,4 @@ export * from './Appearance';
 export * from './RemoteControl';
 // 'VirtualWebcam',
 // 'GameOverlay'
+export * from './Support';

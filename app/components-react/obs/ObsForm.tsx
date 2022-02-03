@@ -30,7 +30,7 @@ import Utils from 'services/utils';
 
 interface IObsFormProps {
   value: IObsInput<TObsValue>[];
-  onChange: (newValue: IObsInput<TObsValue>[]) => unknown;
+  onChange: (newValue: IObsInput<TObsValue>[], changedInd: number) => unknown;
   layout?: TInputLayout;
   style?: React.CSSProperties;
 }
@@ -43,7 +43,7 @@ export function ObsForm(p: IObsFormProps) {
     const newValue = cloneDeep(p.value);
     newValue.splice(index, 1, value);
 
-    p.onChange(newValue);
+    p.onChange(newValue, index);
   }
 
   return (
@@ -87,6 +87,8 @@ function ObsInput(p: IObsInputProps) {
     name: p.value.name,
     label: $translateIfExist(p.value.description),
     uncontrolled: false,
+    masked: p.value.masked,
+    disabled: !p.value.enabled,
   };
 
   switch (type) {
@@ -94,18 +96,18 @@ function ObsInput(p: IObsInputProps) {
       return <NumberInput {...inputProps} />;
     case 'OBS_PROPERTY_INT':
       // eslint-disable-next-line no-case-declarations
-      const intVal = inputProps.value as IObsNumberInputValue;
+      const intVal = p.value as IObsNumberInputValue;
 
       return <NumberInput {...inputProps} step={1} min={intVal.minVal} max={intVal.maxVal} />;
     case 'OBS_PROPERTY_EDIT_TEXT':
     case 'OBS_PROPERTY_TEXT':
       // eslint-disable-next-line no-case-declarations
-      const textVal = inputProps.value as IObsTextInputValue;
+      const textVal = p.value as IObsTextInputValue;
 
       if (textVal.multiline) {
         return <TextAreaInput {...inputProps} />;
       } else {
-        return <TextInput {...inputProps} />;
+        return <TextInput {...inputProps} isPassword={inputProps.masked} />;
       }
     case 'OBS_PROPERTY_LIST':
       // eslint-disable-next-line no-case-declarations
@@ -119,7 +121,7 @@ function ObsInput(p: IObsInputProps) {
           label: $translateIfExist(opt.description),
         };
       });
-      return <ListInput {...inputProps} options={options} />;
+      return <ListInput {...inputProps} options={options} allowClear={false} />;
 
     case 'OBS_PROPERTY_BUTTON':
       return (

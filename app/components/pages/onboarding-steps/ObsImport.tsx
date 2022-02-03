@@ -148,7 +148,7 @@ export default class ObsImport extends TsxComponent<ObsImportProps> {
           <KevinSvg />
           <div>
             {$t(
-              'While we import your settings and scenes from OBS Studio, check out these great features unique to Streamlabs OBS',
+              'While we import your settings and scenes from OBS Studio, check out these great features unique to Streamlabs',
             )}
           </div>
         </div>

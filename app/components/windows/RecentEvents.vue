@@ -1,13 +1,15 @@
 <template>
-<modal-layout
-  :show-controls="false">
-  <browser-view
-    slot="content"
-    class="recent-events"
-    :src="recentEventsUrl"
-    :setLocale="true"
-    @ready="onBrowserViewReady" />
-</modal-layout>
+  <modal-layout :show-controls="false">
+    <browser-view
+      slot="content"
+      class="recent-events"
+      :componentProps="{
+        src: recentEventsUrl,
+        setLocale: true,
+        onReady: onBrowserViewReady,
+      }"
+    />
+  </modal-layout>
 </template>
 
 <script lang="ts" src="./RecentEvents.vue.ts"></script>

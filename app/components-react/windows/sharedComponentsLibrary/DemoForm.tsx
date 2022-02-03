@@ -84,7 +84,7 @@ export function DemoForm() {
         {s.addIntroduction && <TextAreaInput {...bind.introduction} label={'Introduction'} />}
         <InputWrapper>
           <CheckboxInput {...bind.confirm1} label={'Confirm you allow processing your data'} />
-          <CheckboxInput {...bind.confirm2} required label={'Confirm you love Streamlabs OBS'} />
+          <CheckboxInput {...bind.confirm2} required label={'Confirm you love Streamlabs'} />
         </InputWrapper>
       </Example>
     </Form>

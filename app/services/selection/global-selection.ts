@@ -2,10 +2,10 @@ import { Selection } from './selection';
 import { Inject, ServiceHelper } from 'services/core';
 import { SelectionService, ISelectionState, TNodesList } from 'services/selection';
 import { $t } from 'services/i18n';
-import electron from 'electron';
 import Utils from 'services/utils';
 import { EditorCommandsService } from 'services/editor-commands';
 import cloneDeep from 'lodash/cloneDeep';
+import * as remote from '@electron/remote';
 
 /**
  * A specific case of a selection that represents what
@@ -60,9 +60,9 @@ export class GlobalSelection extends Selection {
         ? $t('Are you sure you want to remove these %{count} items?', { count: selectionLength })
         : $t('Are you sure you want to remove %{sceneName}?', { sceneName: name });
 
-    electron.remote.dialog
+    remote.dialog
       .showMessageBox(Utils.getMainWindow(), {
-        title: 'Streamlabs OBS',
+        title: 'Streamlabs Desktop',
         message,
         type: 'warning',
         buttons: [$t('Cancel'), $t('OK')],

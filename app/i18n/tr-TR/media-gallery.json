@@ -27,9 +27,9 @@
   "Example": "Örnek",
   "Change Media": "Medyayı Değiştir",
   "No Sound": "Ses Yok",
-  "No Media": "No Media",
-  "Change Link": "Change Link",
-  "Pick From Gallery": "Pick From Gallery",
-  "Clear Link": "Clear Link",
-  "Media URL": "Media URL"
+  "No Media": "Medya Yok",
+  "Change Link": "Bağlantıyı Değiştir",
+  "Pick From Gallery": "Galeriden Seç",
+  "Clear Link": "Bağlantıyı Temizle",
+  "Media URL": "Medya URL’si"
 }

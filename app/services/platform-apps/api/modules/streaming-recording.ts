@@ -56,7 +56,7 @@ export class StreamingRecordingModule extends Module {
     const commonFields = info.commonFields;
     return {
       title: commonFields.title,
-      game: commonFields.game,
+      game: info.game,
       viewerCount: info.viewerCount,
     };
   }

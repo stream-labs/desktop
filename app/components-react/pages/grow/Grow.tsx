@@ -1,4 +1,4 @@
-import { remote } from 'electron';
+import * as remote from '@electron/remote';
 import React, { useEffect, useState, useRef } from 'react';
 import shuffle from 'lodash/shuffle';
 import { Button, Modal } from 'antd';

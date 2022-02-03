@@ -21,13 +21,13 @@
   "Get Started": "Inizia",
   "Configure the replay buffer": "Configura il buffer di riproduzione",
   "The replay buffer is correctly configured": "Il buffer di riproduzione è correttamente configurato",
-  "Configure": "Configura",
+  "Configure": "Configurazione",
   "Adjust replay duration": "Regola durata riproduzione",
   "Set the duration of captured replays. You can always trim them down later.": "Imposta la durata delle riproduzioni acquisite. Puoi sempre abbreviarle in un secondo momento.",
   "Replay Duration": "Durata riproduzione",
   "Set a hotkey to capture replays": "Imposta un tasto di scelta rapida per acquisire le riproduzioni",
   "Capture a replay": "Acquisisci una riproduzione",
-  "highlighterHotkeyInstructions": "Avvia lo streaming e premi <b>%{bindingStr}</b> per acquisire una riproduzione. Controlla qui dopo il tuo stream.",
+  "highlighterHotkeyInstructions": "Avvia lo streaming e premi &lt;b&gt;%{bindingStr}&lt;/b&gt; per acquisire una riproduzione. Controlla qui dopo il tuo stream.",
   "Start streaming and capture a replay. Check back here after your stream.": "Avvia lo streaming e acquisisci una riproduzione. Controlla qui dopo il tuo stream.",
   "Or, import a clip from your computer": "Oppure importa una clip dal tuo computer",
   "Disable clip": "Disattiva clip",
@@ -74,8 +74,8 @@
   "Upload to YouTube": "Carica su YouTube",
   "None": "Nessuno",
   "Random": "Casuale",
-  "Fade": "Dissolvenza",
-  "Slide": "Scivolamento",
+  "Fade": "Dissolvi",
+  "Slide": "Slitta",
   "Cube": "Cubo",
   "Warp": "Distorsione",
   "Wind": "Vento",
@@ -90,5 +90,5 @@
   "An error occurred while reading %{file}": "Si è verificato un errore durante la lettura %{file}",
   "An error occurred while reading audio from %{file}": "Si è verificato un errore durante la lettura dell’audio da %{file}",
   "An error occurred while mixing audio": "Si è verificato un errore durante il mix dell’audio",
-  "Edit your replays with Highlighter, a free editor built in to Streamlabs OBS.": "Modifica le tue riproduzioni con Highlighter, lo strumento di modifica gratuito integrato a Streamlabs OBS."
+  "Edit your replays with Highlighter, a free editor built in to Streamlabs.": "Modifica le tue riproduzioni con Highlighter, lo strumento di modifica gratuito integrato a Streamlabs."
 }

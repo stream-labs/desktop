@@ -54,7 +54,7 @@ exports.default = async function(context) {
 
   console.log('Updating dependency paths');
   cp.execSync(
-    `install_name_tool -change ./node_modules/node-libuiohook/libuiohook.1.dylib @executable_path/../Resources/app.asar.unpacked/node_modules/node-libuiohook/libuiohook.1.dylib ${context.appOutDir}/Streamlabs\\ OBS.app/Contents/Resources/app.asar.unpacked/node_modules/node-libuiohook/node_libuiohook.node`,
+    `install_name_tool -change ./node_modules/node-libuiohook/libuiohook.1.dylib @executable_path/../Resources/app.asar.unpacked/node_modules/node-libuiohook/libuiohook.1.dylib \"${context.appOutDir}/${context.packager.appInfo.productName}.app/Contents/Resources/app.asar.unpacked/node_modules/node-libuiohook/node_libuiohook.node\"`,
   );
 
   cp.execSync(
@@ -64,6 +64,8 @@ exports.default = async function(context) {
   cp.execSync(
     `cp -R ./node_modules/obs-studio-node/Frameworks \"${context.appOutDir}/${context.packager.appInfo.productName}.app/Contents/Resources/app.asar.unpacked/node_modules/\"`,
   );
+
+  if (process.env.SLOBS_NO_SIGN) return;
 
   signBinaries(
     `${context.appOutDir}/${context.packager.appInfo.productName}.app/Contents/Resources/app.asar.unpacked`,

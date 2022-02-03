@@ -590,8 +590,45 @@ export class SourcesService extends StatefulService<ISourcesState> {
     if (propertiesManagerType === 'replay') propertiesName = $t('Instant Replay');
     if (propertiesManagerType === 'streamlabels') propertiesName = $t('Stream Label');
 
+    // uncomment the source type to use it's React version
+    const reactSourceProps: TSourceType[] = [
+      // 'image_source',
+      // 'color_source',
+      // 'browser_source',
+      // 'slideshow',
+      'ffmpeg_source',
+      // 'text_gdiplus',
+      // 'text_ft2_source',
+      // 'monitor_capture',
+      // 'window_capture',
+      // 'game_capture',
+      'dshow_input',
+      // 'wasapi_input_capture',
+      // 'wasapi_output_capture',
+      // 'decklink-input',
+      // 'scene',
+      // 'ndi_source',
+      'openvr_capture',
+      // 'screen_capture',
+      // 'liv_capture',
+      // 'ovrstream_dc_source',
+      // 'vlc_source',
+      // 'coreaudio_input_capture',
+      // 'coreaudio_output_capture',
+      // 'av_capture_input',
+      // 'display_capture',
+      // 'audio_line',
+      // 'syphon-input',
+      // 'soundtrack_source',
+    ];
+
+    const componentName =
+      reactSourceProps.includes(source.type) && propertiesManagerType === 'default'
+        ? 'SourceProperties'
+        : 'SourcePropertiesDeprecated';
+
     this.windowsService.showWindow({
-      componentName: 'SourceProperties',
+      componentName,
       title: $t('Settings for %{sourceName}', { sourceName: propertiesName }),
       queryParams: { sourceId },
       size: {
@@ -684,7 +721,7 @@ export class SourcesService extends StatefulService<ISourcesState> {
       }
     }
     this.windowsService.showWindow({
-      componentName: 'SourceProperties',
+      componentName: 'SourcePropertiesDeprecated',
       title: $t('Settings for %{sourceName}', {
         sourceName: SourceDisplayData()[source.type].name,
       }),
@@ -724,11 +761,11 @@ export class SourcesService extends StatefulService<ISourcesState> {
 
   showShowcase() {
     this.windowsService.showWindow({
-      componentName: 'SourcesShowcase',
+      componentName: 'SourceShowcase',
       title: $t('Add Source'),
       size: {
-        width: 1200,
-        height: 665,
+        width: 900,
+        height: 700,
       },
     });
   }

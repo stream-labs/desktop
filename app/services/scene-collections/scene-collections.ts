@@ -9,8 +9,6 @@ import { TransitionsNode } from './nodes/transitions';
 import { HotkeysNode } from './nodes/hotkeys';
 import { SceneFiltersNode } from './nodes/scene-filters';
 import path from 'path';
-import electron from 'electron';
-import fs from 'fs';
 import { parse } from './parse';
 import { ScenesService } from 'services/scenes';
 import { SourcesService } from 'services/sources';
@@ -38,8 +36,8 @@ import { StreamingService, EStreamingState } from 'services/streaming';
 import { DefaultHardwareService } from 'services/hardware';
 import { byOS, OS, getOS } from 'util/operating-systems';
 import Utils from 'services/utils';
-import { getPlatformService, IPlatformCapabilityResolutionPreset } from '../platforms';
 import { OutputSettingsService } from '../settings';
+import * as remote from '@electron/remote';
 
 const uuid = window['require']('uuid/v4');
 
@@ -189,8 +187,8 @@ export class SceneCollectionsService extends Service implements ISceneCollection
         await this.attemptRecovery(id);
       } else {
         console.warn(`Unsuccessful recovery of scene collection ${id} attempted`);
-        electron.remote.dialog.showMessageBox(Utils.getMainWindow(), {
-          title: 'Streamlabs OBS',
+        remote.dialog.showMessageBox(Utils.getMainWindow(), {
+          title: 'Streamlabs Desktop',
           message: $t('Failed to load scene collection.  A new one will be created instead.'),
         });
         await this.create();
@@ -528,7 +526,7 @@ export class SceneCollectionsService extends Service implements ISceneCollection
       const backupName = `${this.activeCollection?.name} - Backup`;
 
       await this.duplicate(backupName);
-      await electron.remote.dialog.showMessageBox(Utils.getMainWindow(), {
+      await remote.dialog.showMessageBox(Utils.getMainWindow(), {
         title: 'Unsupported Sources',
         type: 'warning',
         message: `The scene collection you are loading has sources that are not supported by your current operating system. These sources will be removed before loading the scene collection. A backup of this collection with the original sources preserved has been created with the name: ${backupName}`,
