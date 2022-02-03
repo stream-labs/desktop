@@ -22,9 +22,9 @@
 // 詳細度でライブラリ側の指定を上書きする
 .popper.dropdown-menu {
   .popper-styling;
+  max-width: 240px;
   max-height: 152px;
   overflow-y: auto;
-  max-width: 400px;
 }
 
 .dropdown-menu__toggle {
@@ -64,7 +64,9 @@
   width: 100%;
   line-height: 32px;
   padding: 0 8px;
+  color: var(--color-text);
   font-size: @font-size2;
+  text-align: left;
   cursor: pointer;
 
   &:hover,
