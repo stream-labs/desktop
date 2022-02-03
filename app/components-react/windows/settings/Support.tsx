@@ -80,7 +80,9 @@ function DiagnosticReport() {
           ),
         });
       })
-      .catch(() => {
+      .catch(e => {
+        console.error('Error generating diagnostic report', e);
+
         alertAsync({
           icon: <ExclamationCircleOutlined style={{ color: 'var(--red)' }} />,
           getContainer: '#mainWrapper',
