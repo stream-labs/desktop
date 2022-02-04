@@ -18,6 +18,7 @@ export interface ICustomizationServiceState {
   fullModeWidthOffset: number;
   compactBackupPositionX: number;
   compactBackupPositionY: number;
+  compactBackupHeight: number;
   autoCompactMode: boolean;
   showAutoCompactDialog: boolean;
   experimental: any;

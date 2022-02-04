@@ -601,12 +601,14 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
           widthOffset: this.customizationService.state.fullModeWidthOffset,
           backupX: this.customizationService.state.compactBackupPositionX,
           backupY: this.customizationService.state.compactBackupPositionY,
+          backupHeight: this.customizationService.state.compactBackupHeight,
         },
       );
       this.customizationService.setFullModeWidthOffset({
         fullModeWidthOffset: newSize.widthOffset,
         compactBackupPositionX: newSize.backupX,
         compactBackupPositionY: newSize.backupY,
+        compactBackupHeight: newSize.backupHeight,
       });
     }
   }
@@ -622,16 +624,26 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
    * NOTE: 似た処理を他所にも書きたくなったらウィンドウ幅を管理する存在を置くべきで、コピペは悪いことを言わないのでやめておけ
    * このコメントを書いている時点でメインウィンドウのウィンドウ幅を操作する存在は他にいない
    */
-  static updateWindowSize(win: BrowserWindow, prevState: PanelState, nextState: PanelState, sizeState: { widthOffset: number; backupX: number; backupY: number }): { widthOffset: number; backupX: number; backupY: number } {
+  static updateWindowSize(
+    win: BrowserWindow,
+    prevState: PanelState,
+    nextState: PanelState,
+    sizeState: {
+      widthOffset: number;
+      backupX: number;
+      backupY: number;
+      backupHeight: number;
+    }): { widthOffset: number; backupX: number; backupY: number; backupHeight: number } {
     if (nextState === null) throw new Error('nextState is null');
     const onInit = !prevState;
 
     const [, minHeight] = win.getMinimumSize();
     const [width, height] = win.getSize();
+    let nextHeight = height;
     const nextMinWidth = NicoliveProgramService.WINDOW_MIN_WIDTH[nextState];
     const INT32_MAX = Math.pow(2, 31) - 1; // BIG ENOUGH VALUE (0が指定したいが、一度0以外を指定すると0に再設定できないため)
     const nextMaxWidth = nextState === PanelState.COMPACT ? nextMinWidth : INT32_MAX;
-    let nextWidth = 0;
+    let nextWidth = width;
     console.log('panelState', prevState, nextState); // DEBUG
     console.log('sizeState', sizeState); // DEBUG
 
@@ -663,15 +675,19 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
       if (sizeState.backupX !== undefined && sizeState.backupY !== undefined) {
         win.setPosition(sizeState.backupX, sizeState.backupY);
       }
+      if (sizeState.backupHeight !== undefined) {
+        nextHeight = sizeState.backupHeight;
+      }
       sizeState.backupX = x;
       sizeState.backupY = y;
+      sizeState.backupHeight = height;
     }
     console.log(' -> sizeState', sizeState); // DEBUG
 
     win.setMinimumSize(nextMinWidth, minHeight);
     win.setMaximumSize(nextMaxWidth, 0);
-    if (nextWidth) {
-      win.setSize(nextWidth, height);
+    if (nextWidth !== width || nextHeight !== height) {
+      win.setSize(nextWidth, nextHeight);
     }
 
     return sizeState;

@@ -34,6 +34,7 @@ export class CustomizationService
     fullModeWidthOffset: 0,
     compactBackupPositionX: undefined,
     compactBackupPositionY: undefined,
+    compactBackupHeight: undefined,
     autoCompactMode: false,
     showAutoCompactDialog: true,
 
@@ -139,6 +140,7 @@ export class CustomizationService
     fullModeWidthOffset: number;
     compactBackupPositionX: number;
     compactBackupPositionY: number;
+    compactBackupHeight: number;
   }) {
     this.setSettings(state);
   }
