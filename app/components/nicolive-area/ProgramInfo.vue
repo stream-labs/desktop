@@ -109,6 +109,7 @@
   color: var(--color-text-light);
   font-size: 14px;
   font-weight: @font-weight-bold;
+  display: inline-block;
 }
 
 .program-button {
@@ -130,6 +131,7 @@
 .community-name-link {
   .text-ellipsis;
   font-size: @font-size2;
+  display: inline-block;
 }
 
 .community-icon {

@@ -14,7 +14,7 @@
         <div
           v-for="sceneCollection in sceneCollections"
           :key="sceneCollection.id"
-          class="dropdown-menu__item link"
+          class="dropdown-menu__item"
           :class="{ active: activeId === sceneCollection.id }"
           @click="loadCollection(sceneCollection.id)"
         >
@@ -79,6 +79,7 @@
   display: flex;
   align-items: center;
   flex-grow: 1;
+  width: 160px;
 }
 
 .input-wrapper--search {

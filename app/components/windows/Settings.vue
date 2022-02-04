@@ -81,14 +81,11 @@
 子コンポーネントのclassを直接参照しているのでscopedにできない
 */
 .notice-section {
-  padding-top: 16px;
-
   .notice-message {
-    color: @accent;
-    font-size: 18px;
-    font-weight: bold;
+    color: var(--color-accent);
+    font-size: @font-size5;
+    font-weight: @font-weight-bold;
     text-align: center;
-    padding-top: 12px;
   }
 
   .icon-warning {

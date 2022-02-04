@@ -55,8 +55,8 @@ export default class CommentViewer extends Vue {
 
   // TODO: 後で言語ファイルに移動する
   commentReloadTooltip = 'コメント再取得';
-  commentSynthesizerOnTooltip = 'コメント読み上げ : ON';
-  commentSynthesizerOffTooltip = 'コメント読み上げ : OFF';
+  commentSynthesizerOnTooltip = 'コメント読み上げ：クリックしてOFFにする';
+  commentSynthesizerOffTooltip = 'コメント読み上げ：クリックしてONにする';
   filterTooltip = 'NG設定';
   settingsTooltip = 'コメント設定';
 
