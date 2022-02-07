@@ -594,7 +594,7 @@ export class SourcesService extends StatefulService<ISourcesState> {
     const reactSourceProps: TSourceType[] = [
       // 'image_source',
       // 'color_source',
-      // 'browser_source',
+      'browser_source',
       // 'slideshow',
       'ffmpeg_source',
       // 'text_gdiplus',
