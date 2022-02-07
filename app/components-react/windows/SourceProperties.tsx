@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { Services } from '../service-provider';
-import { ObsForm } from '../obs/ObsForm';
+import { IObsFormProps, ObsForm } from '../obs/ObsForm';
 import { TObsFormData } from '../../components/obs/inputs/ObsInput';
 import { useSelector } from '../store';
 import { ModalLayout } from '../shared/ModalLayout';
@@ -53,12 +53,23 @@ export default function SourceProperties() {
     ]);
   }
 
+  // make the URL field debounced for the browser_source
+  const extraProps: IObsFormProps['extraProps'] = {};
+  if (source && source.type === 'browser_source') {
+    extraProps['url'] = { debounce: 1000 };
+  }
+
   return (
     <ModalLayout
       scrollable
       fixedChild={source && !hideStyleBlockers && <Display sourceId={source.sourceId} />}
     >
-      <ObsForm value={properties} onChange={onChangeHandler} layout="horizontal" />
+      <ObsForm
+        value={properties}
+        onChange={onChangeHandler}
+        extraProps={extraProps}
+        layout="horizontal"
+      />
     </ModalLayout>
   );
 }

@@ -50,7 +50,11 @@ export interface IListOption<TValue> {
 }
 
 export const ListInput = InputComponent(<T extends any>(p: TListInputProps<T>) => {
-  const { inputAttrs, wrapperAttrs } = useInput('list', p, ANT_SELECT_FEATURES);
+  const { inputAttrs, wrapperAttrs, form } = useInput('list', p, ANT_SELECT_FEATURES);
+
+  // TODO: allow to use this component outside a Form
+  if (!form) console.error('ListInput component should be wrapped in Form');
+
   const options = p.options;
   const debouncedSearch = useDebounce(p.debounce, startSearch);
   const $inputRef = useRef<RefSelectProps>(null);
