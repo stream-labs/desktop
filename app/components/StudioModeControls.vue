@@ -4,7 +4,7 @@
     {{ $t('common.studioModeButtons.preview') }}
   </span>
   <button
-    class="button button--semi-opac"
+    class="button button--secondary button--semi-opac"
     @click="studioModeTransition">
     {{ $t('common.studioModeButtons.transition') }}
     <i class="icon-arrow rotate-r90" v-if="stacked" />

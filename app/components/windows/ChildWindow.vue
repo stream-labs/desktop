@@ -42,6 +42,8 @@
 
 .child-window-content {
   height: calc(100% - @titlebar-height); // TitleBarぶんの高さを引く
+  display: flex;
+  flex-direction: column;
 }
 
 .spinner-spacer {

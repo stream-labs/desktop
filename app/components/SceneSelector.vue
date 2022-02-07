@@ -80,6 +80,7 @@
   align-items: center;
   flex-grow: 1;
   width: 160px;
+  margin-right: 16px;
 }
 
 .input-wrapper--search {

@@ -1,5 +1,5 @@
 <template>
-<div class="editable-scene-collection flex flex--center flex--justify-start" @dblclick="makeActive">
+<div class="editable-scene-collection flex flex--center flex--justify-start" @dblclick="makeActive" :class="{ active: isActive }">
   <span class="editable-scene-collection--name">
     <div v-if="renaming" class="flex flex--center flex--justify-start">
       <input
@@ -8,7 +8,7 @@
         type="text"
         @keypress="handleKeypress"
         v-model="editableName" />
-      <i class="icon-check" @click.stop="submitRename" />
+      <i class="icon-check link" @click.stop="submitRename" />
       <i class="icon-times" @click.stop="cancelRename" v-if="!needsRename" />
     </div>
     <div v-else>
@@ -42,11 +42,9 @@
 @import "../styles/index";
 
 .editable-scene-collection {
-  height: 35px;
-  padding: 5px;
-
-  .radius;
-  font-size: 14px;
+  height: 40px;
+  padding: 8px;
+  font-size: @font-size4;
   cursor: pointer;
 
   span, a, input, i {
@@ -54,11 +52,16 @@
   }
 
   &:hover {
-    background: @hover;
+    color: var(--color-text-light);
+    background-color: var(--color-bg-active);
 
     .editable-scene-collection--action {
       display: inline;
     }
+  }
+
+  &.active {
+    color: var(--color-text-light);
   }
 }
 
@@ -72,12 +75,12 @@
 }
 
 .editable-scene-collection--action-delete {
-  color: @red;
+  color:var(--color-red);
 }
 
 .editable-scene-collection--name {
   max-width: 230px;
-  color: @white;
+  color: var(--color-text);
 
   >div {
     white-space: nowrap;
@@ -86,14 +89,15 @@
   }
 
   input {
-    font-size: 14px;
+    font-size: @font-size4;
     width: 250px;
     background: transparent;
   }
 }
 
 .editable-scene-collection--modified {
-  font-size: 12px;
+  font-size: @font-size2;
+  color: var(--color-text-dark);
 }
 
 .icon-spin {

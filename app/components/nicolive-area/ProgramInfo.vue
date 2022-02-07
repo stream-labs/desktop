@@ -107,7 +107,7 @@
 .program-title-link {
   .text-ellipsis;
   color: var(--color-text-light);
-  font-size: 14px;
+  font-size: @font-size4;
   font-weight: @font-weight-bold;
   display: inline-block;
 }
@@ -141,7 +141,7 @@
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  border: 2px solid var(--color-primary-dark);
+  border: 2px solid var(--color-border-accent);
 
   .community-thumbnail {
     border-radius: 50%;

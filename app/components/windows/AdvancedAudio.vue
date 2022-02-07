@@ -1,9 +1,10 @@
 <template>
 <modal-layout
   :show-controls="false"
+  no-scroll
 >
 
-  <div slot="content">
+  <div slot="content" class="table-wrapper">
     <table>
       <thead>
         <tr>
@@ -15,7 +16,6 @@
           <th class="track">{{ $t('audio.tracks') }}</th>
         </tr>
       </thead>
-
       <tr v-for="audioSource in audioSources" :key="audioSource.sourceId">
         <td>{{ audioSource.name }}</td>
         <td
@@ -31,7 +31,6 @@
           />
         </td>
       </tr>
-
     </table>
 
   </div>
@@ -44,8 +43,31 @@
 <style lang="less" scoped>
 @import "../../styles/index";
 
+.table-wrapper {
+  .radius;
+  overflow: auto;
+  background-color: var(--color-bg-secondary);
+}
+
 table {
   min-width: 1060px;
+  margin: 0;
+
+  // reset
+  tr {
+    background-color: transparent;
+    border-color: transparent;
+    border-radius: 0;
+
+    td {
+      border: none;
+      padding: 16px;
+
+      &:last-child {
+        padding-right: 16px;
+      }
+    }
+  }
 }
 
 .volume {}
@@ -65,16 +87,8 @@ table {
 .syncOffset,
 .audioMonitor,
 .track {
-  color: @text-secondary;
+  color: var(--color-text-dark);
   text-align: center;
-}
-
-tr {
-  td {
-    &:nth-child(1) {
-      white-space: nowrap;
-    }
-  }
 }
 
 th,
@@ -83,12 +97,18 @@ td {
 }
 
 .column-deflection {
-  width: 80px;
+  width: 104px;
 }
 .column-syncOffset {
   width: 100px;
 }
 .column-monitoringType {
-  width: 260px;
+  width: 320px;
+}
+
+// TODO: 暫定対応
+& /deep/ .input-wrapper {
+  display: flex;
+  margin-bottom: 0;
 }
 </style>
