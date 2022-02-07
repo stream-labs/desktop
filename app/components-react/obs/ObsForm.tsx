@@ -97,6 +97,7 @@ function ObsInput(p: IObsInputProps) {
     label: $translateIfExist(p.value.description),
     uncontrolled: false,
     masked: p.value.masked,
+    disabled: !p.value.enabled,
     ...extraProps,
   };
 

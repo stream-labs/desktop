@@ -31,19 +31,29 @@ export default function RecentEvents(p: { isOverlay?: boolean }) {
 }
 
 function Toolbar() {
-  const { RecentEventsService, UserService } = Services;
+  const { RecentEventsService, UserService, SpinWheelService } = Services;
 
-  const { muted, queuePaused, mediaShareEnabled, safeModeEnabled } = useVuex(() => ({
-    muted: RecentEventsService.state.muted,
-    queuePaused: RecentEventsService.state.queuePaused,
-    safeModeEnabled: RecentEventsService.state.safeMode.enabled,
-    mediaShareEnabled: RecentEventsService.state.mediaShareEnabled,
-  }));
+  const { muted, queuePaused, mediaShareEnabled, safeModeEnabled, spinWheelExists } = useVuex(
+    () => ({
+      muted: RecentEventsService.state.muted,
+      queuePaused: RecentEventsService.state.queuePaused,
+      safeModeEnabled: RecentEventsService.state.safeMode.enabled,
+      mediaShareEnabled: RecentEventsService.state.mediaShareEnabled,
+      spinWheelExists: RecentEventsService.views.spinWheelExists,
+    }),
+  );
 
   const pauseTooltip = queuePaused ? $t('Unpause Alert Queue') : $t('Pause Alert Queue');
   return (
     <div className={styles.topBar}>
       <h2 className="studio-controls__label">{$t('Mini Feed')}</h2>
+      {spinWheelExists && (
+        <i
+          className="fas fa-chart-pie action-icon"
+          onClick={() => SpinWheelService.actions.spinWheel()}
+          v-tooltip={{ content: $t('Spin Wheel'), placement: 'bottom' }}
+        />
+      )}
       {UserService.views.isTwitchAuthed && (
         <i
           className={cx('fa fa-shield-alt action-icon', {
@@ -112,7 +122,7 @@ function EventCell(p: { event: IRecentEvent }) {
       twitch_account: <PlatformLogo platform="twitch" />,
       youtube_account: <PlatformLogo platform="youtube" />,
       facebook_account: <PlatformLogo platform="facebook" />,
-      trovo_account: <PlatformLogo platform="trovo" size={16}/>,
+      trovo_account: <PlatformLogo platform="trovo" size={16} />,
       streamlabs: <PlatformLogo platform="streamlabs" size={16} />,
       streamlabscharity: <PlatformLogo platform="streamlabs" size={16} />,
     }[platform];
