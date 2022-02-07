@@ -43,5 +43,9 @@
     ]
   },
   "include": ["./app/**/*"],
-  "exclude": ["./app/components-react/**/*"]
+  "exclude": ["./app/components-react/**/*"],
+  "typedocOptions": {
+    "entryPoints": ["src/index.ts"],
+    "out": "docs"
+  }
 }

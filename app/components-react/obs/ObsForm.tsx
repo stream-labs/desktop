@@ -28,11 +28,16 @@ import InputWrapper from '../shared/inputs/InputWrapper';
 import { $t, $translateIfExist } from '../../services/i18n';
 import Utils from 'services/utils';
 
-interface IObsFormProps {
+interface IExtraInputProps {
+  debounce?: number;
+}
+
+export interface IObsFormProps {
   value: IObsInput<TObsValue>[];
   onChange: (newValue: IObsInput<TObsValue>[], changedInd: number) => unknown;
   layout?: TInputLayout;
   style?: React.CSSProperties;
+  extraProps?: Record<string, IExtraInputProps>;
 }
 
 /**
@@ -54,6 +59,7 @@ export function ObsForm(p: IObsFormProps) {
           key={inputData.name}
           inputIndex={inputIndex}
           onChange={onInputHandler}
+          extraProps={p.extraProps?.[inputData.name]}
         />
       ))}
     </Form>
@@ -64,6 +70,7 @@ interface IObsInputProps {
   value: IObsInput<TObsValue>;
   inputIndex: number;
   onChange: (newValue: IObsInput<TObsValue>, inputInd: number) => unknown;
+  extraProps?: IExtraInputProps;
 }
 
 /**
@@ -81,6 +88,8 @@ function ObsInput(p: IObsInputProps) {
     p.onChange(newVal, p.inputIndex);
   }
 
+  const extraProps = p.extraProps || {};
+
   const inputProps = {
     value: p.value.value as any,
     onChange: onChangeHandler,
@@ -89,6 +98,7 @@ function ObsInput(p: IObsInputProps) {
     uncontrolled: false,
     masked: p.value.masked,
     disabled: !p.value.enabled,
+    ...extraProps,
   };
 
   switch (type) {
