@@ -184,5 +184,7 @@
   "Browser Settings": "Configuración de navegador",
   "Custom Code": "Código personalizado",
   "font_family_tooltip": "La fuente de Google que se utilizará para el texto. Visite https://fonts.google.com para encontrar una. Entre las más populares están: Open Sans, Roboto, Oswald, Lato y Droid Sans.",
-  "Something went wrong while applying settings": "Algo ha salido mal al aplicar la configuración."
+  "Something went wrong while applying settings": "Algo ha salido mal al aplicar la configuración.",
+  "Superchat Goal": "Superchat Goal",
+  "YouTube Superchats": "YouTube Superchats"
 }

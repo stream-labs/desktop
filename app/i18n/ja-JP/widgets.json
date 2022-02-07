@@ -184,5 +184,7 @@
   "Browser Settings": "ブラウザ設定",
   "Custom Code": "カスタムコード",
   "font_family_tooltip": "テキストに使用する Google フォント。https://fonts.google.com にアクセスしてフォントを検索しましょう！人気のあるフォント：Open Sans、Roboto、Oswald、Lato、Droid Sans。",
-  "Something went wrong while applying settings": "設定の適用中に、問題が発生しました"
+  "Something went wrong while applying settings": "設定の適用中に、問題が発生しました",
+  "Superchat Goal": "Superchat Goal",
+  "YouTube Superchats": "YouTube Superchats"
 }

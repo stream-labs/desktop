@@ -184,5 +184,7 @@
   "Browser Settings": "Настройки браузера",
   "Custom Code": "Пользовательский код",
   "font_family_tooltip": "Шрифт Google, используемый для текста. Посетите https://fonts.google.com, чтобы найти нужный! Популярные шрифты: Open Sans, Roboto, Oswald, Lato, Droid Sans.",
-  "Something went wrong while applying settings": "При применении настроек что-то пошло не так"
+  "Something went wrong while applying settings": "При применении настроек что-то пошло не так",
+  "Superchat Goal": "Superchat Goal",
+  "YouTube Superchats": "YouTube Superchats"
 }

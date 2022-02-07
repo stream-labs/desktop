@@ -140,5 +140,18 @@
   "Uninstalling Virtual Webcam will remove it as a device option in other applications.": "解除安裝虛擬網路攝影機會移除其在其他應用程式作為裝置的選項。",
   "Uninstall Virtual Webcam": "解除安裝虛擬網路攝影機",
   "Use custom resolution": "使用自訂解析度",
-  "Enable Designer Mode": "啟用設計師模式"
+  "Enable Designer Mode": "啟用設計師模式",
+  "Get Support": "取得支援",
+  "Support Links": "Support Links",
+  "Streamlabs Support": "Streamlabs Support",
+  "Community Discord": "Community Discord",
+  "Diagnostic Report": "Diagnostic Report",
+  "The diagnostic report is an automatically generated report that contains information about your system and configuration. Clicking the upload button below will generate and securely transmit a diagnostic report to the Streamlabs team.": "The diagnostic report is an automatically generated report that contains information about your system and configuration. Clicking the upload button below will generate and securely transmit a diagnostic report to the Streamlabs team.",
+  "Upload Diagnostic Report": "Upload Diagnostic Report",
+  "Cache Directory": "Cache Directory",
+  "Crash Reporting": "Crash Reporting",
+  "Diagnostic Report Uploaded Successfully": "Diagnostic Report Uploaded Successfully",
+  "Error Uploading Diagnostic Report": "Error Uploading Diagnostic Report",
+  "There was an error uploading the diagnostic report. Please try again, and let the Streamlabs Streamer Success team know if the issue persists.": "There was an error uploading the diagnostic report. Please try again, and let the Streamlabs Streamer Success team know if the issue persists.",
+  "The diagnostic report was securely uploaded, and the Report ID below has been copied to your clipboard. Please provide the Report ID to the Streamlabs Streamer Success Team.": "The diagnostic report was securely uploaded, and the Report ID below has been copied to your clipboard. Please provide the Report ID to the Streamlabs Streamer Success Team."
 }
