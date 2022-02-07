@@ -22,7 +22,8 @@
 @import "../styles/index";
 
 .tabs__container {
-  height: 100%;
+  .flex__column;
+  flex-grow: 1;
 }
 
 .tabs {
@@ -35,7 +36,8 @@
 }
 
 .tab-content {
-  height: calc(~'100% - 54px');
+  .flex__column;
+  flex-grow: 1;
   position: relative;
   overflow-y: auto;
 }

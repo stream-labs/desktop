@@ -34,6 +34,10 @@
 .int-input {
   position: relative;
 
+  input {
+    padding-right: 32px;
+  }
+
   .arrows {
     .absolute(0, 8px, 0, auto);
     width: 30px;
