@@ -312,22 +312,45 @@ export abstract class RpcApi extends Service {
    * Send this conformation back to the client
    */
   private sendPromiseMessage(info: { isRejected: boolean; promiseId: string; data: any }) {
-    if (info.data instanceof Error || info.data instanceof Response) {
-      info.data = JSON.parse(JSON.stringify(info.data));
+    let serializedDataPromise: Promise<any>;
+
+    if (info.data instanceof Response) {
+      const contentType = info.data.headers.get('content-type');
+      const isJson = contentType && contentType.includes('application/json');
+      const serialized: any = { url: info.data.url, status: info.data.status };
+
+      if (isJson) {
+        serializedDataPromise = info.data
+          .json()
+          .then(j => {
+            return { ...serialized, body: j };
+          })
+          .catch(e => {
+            return { ...serialized, body: e };
+          });
+      } else {
+        serializedDataPromise = info.data.text().then(b => {
+          return { ...serialized, body: b };
+        });
+      }
+    } else if (info.data instanceof Error) {
+      serializedDataPromise = Promise.resolve({
+        error: `${info.data.name}: ${info.data.message}`,
+        stack: info.data.stack,
+      });
+    } else {
+      serializedDataPromise = Promise.resolve(info.data);
     }
 
-    // serialize errors
-    const serializedData = info.isRejected
-      ? { message: info.data?.message, ...info.data }
-      : info.data;
-
-    this.serviceEvent.next(
-      this.jsonrpc.createEvent({
-        emitter: 'PROMISE',
-        data: serializedData,
-        resourceId: info.promiseId,
-        isRejected: info.isRejected,
-      }),
-    );
+    serializedDataPromise.then(d => {
+      this.serviceEvent.next(
+        this.jsonrpc.createEvent({
+          emitter: 'PROMISE',
+          data: d,
+          resourceId: info.promiseId,
+          isRejected: info.isRejected,
+        }),
+      );
+    });
   }
 }
