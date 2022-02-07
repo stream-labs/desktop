@@ -87,7 +87,6 @@ function PanelHeader(p: { source: AudioSource }) {
 
   function onInputHandler(name: string, value: TObsValue, e: React.MouseEvent) {
     e.stopPropagation();
-    console.log(name, value);
     EditorCommandsService.actions.executeCommand('SetAudioSettingsCommand', sourceId, {
       [name]: value,
     });
