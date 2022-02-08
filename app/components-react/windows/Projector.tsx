@@ -36,6 +36,7 @@ export default function Projector() {
     WindowsService.actions.setOneOffFullscreen(windowId, true);
     oldBounds.current = currentWindow.getBounds();
     currentWindow.setPosition(display.bounds.x, display.bounds.y);
+    currentWindow.fullScreenable = true;
     currentWindow.setFullScreen(true);
     document.addEventListener('keydown', exitFullscreen);
   }
