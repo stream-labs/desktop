@@ -21,15 +21,17 @@ export default function AdvancedAudio() {
   useEffect(() => {
     if (!vodTrackEnabled) return;
     if (streamTrack === vodTrack) {
-      message.error(
-        $t(
+      message.error({
+        content: $t(
           'Your Stream and VOD Track are the same. This may result in unexpected audio behavior, go to Global Settings to change.',
         ),
-        0,
-      );
+        duration: 0,
+        key: 'vodTrackError',
+      });
     } else {
       message.destroy();
     }
+    return message.destroy;
   }, [streamTrack, vodTrack]);
 
   return (
