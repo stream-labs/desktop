@@ -235,10 +235,11 @@ function PanelForm(p: { source: AudioSource }) {
         label={$t('Sync Offset')}
         value={syncOffset}
         name="syncOffset"
-        onInput={value => handleSettingsChange('syncOffset', value)}
+        onChange={value => handleSettingsChange('syncOffset', value)}
         tooltip={$t('Time it takes between sound occuring and being broadcast (ms)')}
         min={-950}
-        max={20000}
+        max={5000}
+        uncontrolled={false}
       />
       <SwitchInput
         label={$t('Downmix to Mono')}
