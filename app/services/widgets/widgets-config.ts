@@ -2,7 +2,7 @@ import { AnchorPoint } from '../../util/ScalableRectangle';
 import { $t } from '../i18n';
 import { TAlertType } from './alerts-config';
 
-export type TWidgetType = 'AlertBox' | 'ViewerCount';
+export type TWidgetType = 'AlertBox' | 'ViewerCount' | 'GameWidget';
 
 export interface IWidgetConfig {
   type: TWidgetType;
@@ -10,7 +10,7 @@ export interface IWidgetConfig {
   description: string;
   demoVideo: boolean;
   demoFilename: string;
-  supportList: string[];
+  supportList?: string[];
 
   // Default transform for the widget
   defaultTransform: {
@@ -101,6 +101,30 @@ export function getWidgetsConfig(host: string, token: string): Record<TWidgetTyp
       dataFetchUrl: `https://${host}/api/v5/slobs/widget/viewercount`,
       settingsSaveUrl: `https://${host}/api/v5/slobs/widget/viewercount`,
       settingsUpdateEvent: 'viewerCountSettingsUpdate',
+      customCodeAllowed: true,
+      customFieldsAllowed: true,
+    },
+
+    GameWidget: {
+      type: 'GameWidget',
+      name: $t('Game Widget'),
+      description: $t('Let your viewers play a game in chat'),
+      demoVideo: false,
+      demoFilename: '',
+      url: `https://${host}/widgets/game-widget?token=${token}`,
+
+      defaultTransform: {
+        width: 400,
+        height: 400,
+        x: 0,
+        y: 0,
+        anchor: AnchorPoint.NorthEast,
+      },
+
+      previewUrl: `https://${host}/widgets/game-widget?token=${token}&simulate=1`,
+      dataFetchUrl: `https://${host}/api/v5/slobs/widget/gamewidget`,
+      settingsSaveUrl: `https://${host}/api/v5/slobs/widget/gamewidget`,
+      settingsUpdateEvent: 'gameWidgetSettingsUpdate',
       customCodeAllowed: true,
       customFieldsAllowed: true,
     },
