@@ -9,6 +9,7 @@
   "has gifted a sub (%{tier}) to": "telah menghadiahkan langganan (%{tier}) kepada",
   "has resubscribed (%{tier}) for %{months} months": "telah berlangganan ulang (%{tier}) untuk %{months} bulan",
   "has subscribed (%{tier})": "telah berlangganan (%{tier})",
+  "has converted from a Prime Gaming sub to a %{tier} sub": "has converted from a Prime Gaming sub to a %{tier} sub",
   "has subscribed": "telah berlangganan",
   "has used": "telah menggunakan",
   "has hosted you with %{viewers} viewers": "telah memandu Anda dengan %{viewers} pemirsa",
@@ -73,6 +74,6 @@
   "Safe Mode is Enabled": "Safe Mode Diaktifkan",
   "Disable Safe Mode": "Nonaktifkan Safe Mode",
   "Something went wrong disabling Safe Mode": "Ada yang salah saat menonaktifkan Safe Mode",
-  "Automatically disable Safe Mode": "Automatically disable Safe Mode",
-  "Disable after <duration></duration> minutes": "Disable after <duration></duration> minutes"
+  "Automatically disable Safe Mode": "Secara otomatis nonaktifkan Safe Mode",
+  "Disable after <duration></duration> minutes": "Nonaktif setelah &lt;duration&gt;&lt;/duration&gt; menit"
 }

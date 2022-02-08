@@ -2,12 +2,12 @@ import { useGoLiveSettings } from '../useGoLiveSettings';
 import React from 'react';
 import { createBinding, TextInput } from '../../../shared/inputs';
 import Form from '../../../shared/inputs/Form';
-import electron from 'electron';
 import { $t } from '../../../../services/i18n';
 import { Services } from '../../../service-provider';
 import { Button } from 'antd';
 import InputWrapper from '../../../shared/inputs/InputWrapper';
 import { IPlatformComponentParams } from './PlatformSettingsLayout';
+import * as remote from '@electron/remote';
 
 export function TiktokEditStreamInfo(p: IPlatformComponentParams<'tiktok'>) {
   const bind = createBinding(p.value, updatedSettings =>
@@ -35,11 +35,11 @@ export function TiktokEditStreamInfo(p: IPlatformComponentParams<'tiktok'>) {
 
 function openStreamPage() {
   const username = Services.UserService.state.auth?.platforms.tiktok?.username;
-  electron.remote.shell.openExternal(`https://www.tiktok.com/@${username}/live`);
+  remote.shell.openExternal(`https://www.tiktok.com/@${username}/live`);
 }
 
 function openInfoPage() {
-  electron.remote.shell.openExternal(
+  remote.shell.openExternal(
     'https://streamlabs.com/content-hub/post/how-to-livestream-from-your-tiktok-account-using-streamlabs-from-web',
   );
 }

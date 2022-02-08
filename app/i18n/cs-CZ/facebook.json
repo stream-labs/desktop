@@ -14,7 +14,7 @@
   "Connect": "Connect",
   "Install Your Theme": "Nainstalujte svůj motiv",
   "Install": "Instalovat",
-  "facebookGamingWarning": "Chcete-li službu Facebook Gaming využít naplno, <create-page-link>vytvořte si stránku Tvůrce herních videí</create-page-link>",
+  "facebookGamingWarning": "Chcete-li službu Facebook Gaming využít naplno, &lt;create-page-link&gt;vytvořte si stránku Tvůrce herních videí&lt;/create-page-link&gt;",
   "Facebook Destination": "Cíl Facebooku",
   "Share to Your Timeline": "Sdílet na Moje historie",
   "Share to a Page You Manage": "Sdílet na stránce, kterou spravujete",
@@ -30,7 +30,7 @@
   "Please reconnect Facebook to get these new features": "Chcete-li získat tyto nové funkce, znovu se připojte k Facebooku",
   "Reconnect now": "Připojit se znovu",
   "Privacy": "Soukromí",
-  "FBPrivacyWarning": "Poskytnutá úroveň ochrany soukromí může být omezena pro váš účet na Facebooku. Podívejte se do části „Kdo vidí, že používáte tuto firemní integraci“ pro integraci Streamlabs <link>zde</link>",
+  "FBPrivacyWarning": "Poskytnutá úroveň ochrany soukromí může být omezena pro váš účet na Facebooku. Podívejte se do části „Kdo vidí, že používáte tuto firemní integraci“ pro integraci Streamlabs &lt;link&gt;zde&lt;/link&gt;",
   "Only Me": "Jen já",
   "Do not change privacy settings": "Neměnit nastavení ochrany soukromí"
 }

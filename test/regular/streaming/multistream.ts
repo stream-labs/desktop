@@ -12,13 +12,12 @@ import { logIn } from '../../helpers/modules/user';
 import { releaseUserInPool, reserveUserFromPool } from '../../helpers/spectron/user';
 import { showSettingsWindow } from '../../helpers/modules/settings/settings';
 import { test, useSpectron } from '../../helpers/spectron';
-import {sleep} from "../../helpers/sleep";
 
 useSpectron();
 
-// TODO: flaky
-test.skip('Multistream default mode', async t => {
-  await logIn(null, { multistream: true });
+test('Multistream default mode', async t => {
+  // login to via Twitch because it doesn't have strict rate limits
+  await logIn('twitch', { multistream: true });
   await prepareToGoLive();
   await clickGoLive();
   await waitForSettingsWindowLoaded();
@@ -45,10 +44,9 @@ test.skip('Multistream default mode', async t => {
   await t.pass();
 });
 
-
-// TODO: flaky
 test('Multistream advanced mode', async t => {
-  await logIn(null, { multistream: true });
+  // login to via Twitch because it doesn't have strict rate limits
+  await logIn('twitch', { multistream: true });
   await prepareToGoLive();
   await clickGoLive();
   await waitForSettingsWindowLoaded();
@@ -81,7 +79,7 @@ test('Multistream advanced mode', async t => {
   const facebookForm = useForm('facebook-settings');
   await facebookForm.fillForm({
     customEnabled: true,
-    facebookGame: 'Doom',
+    facebookGame: 'DOOM',
     title: 'facebook title',
     description: 'facebook description',
   });

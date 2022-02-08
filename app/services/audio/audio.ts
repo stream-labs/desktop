@@ -7,21 +7,7 @@ import { ScenesService } from 'services/scenes';
 import * as obs from '../../../obs-api';
 import Utils from 'services/utils';
 import { WindowsService } from 'services/windows';
-import {
-  IObsBitmaskInput,
-  IObsInput,
-  IObsListInput,
-  IObsNumberInputValue,
-  TObsFormData,
-} from 'components/obs/inputs/ObsInput';
-import {
-  IAudioServiceApi,
-  IAudioSource,
-  IAudioSourceApi,
-  IAudioSourcesState,
-  IFader,
-  IVolmeter,
-} from './audio-api';
+import { IAudioSource, IAudioSourceApi, IAudioSourcesState, IFader, IVolmeter } from './audio-api';
 import { EDeviceType, HardwareService, IDevice } from 'services/hardware';
 import { $t } from 'services/i18n';
 import { ipcRenderer } from 'electron';
@@ -210,6 +196,12 @@ export class AudioService extends StatefulService<IAudioSourcesState> {
       },
       queryParams: { sourceId },
     });
+  }
+
+  setSimpleTracks() {
+    this.views
+      .getSources()
+      .forEach(audioSource => this.setSettings(audioSource.sourceId, { audioMixers: 1 }));
   }
 
   setSettings(sourceId: string, patch: Partial<IAudioSource>) {

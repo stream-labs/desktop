@@ -1,4 +1,4 @@
-import { remote } from 'electron';
+import * as remote from '@electron/remote';
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import qrcode from '@xkeshi/vue-qrcode';
@@ -58,7 +58,8 @@ export default class RemoteControlQRCodeVue extends Vue {
 
   get qrcodeVal(): string {
     if (!this.qrcodeIsVisible) return 'nothing to show yet';
-    const encodedUser = encodeURIComponent(`user=${this.userService.widgetToken}`);
+    // TODO: Remove when the deck app is no longer expecting this field
+    const encodedUser = encodeURIComponent('user=A');
     const encodedData = encodeURIComponent(
       `&data=${encodeURIComponent(JSON.stringify(this.qrcodeData))}`,
     );

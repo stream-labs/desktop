@@ -594,21 +594,22 @@ export class SourcesService extends StatefulService<ISourcesState> {
     const reactSourceProps: TSourceType[] = [
       // 'image_source',
       'color_source',
-      // 'browser_source',
+      'browser_source',
       // 'slideshow',
-      // 'ffmpeg_source',
+      'ffmpeg_source',
       // 'text_gdiplus',
       // 'text_ft2_source',
       // 'monitor_capture',
       // 'window_capture',
-      // 'game_capture',
+      'game_capture',
       // 'dshow_input',
+      'dshow_input',
       // 'wasapi_input_capture',
       // 'wasapi_output_capture',
       // 'decklink-input',
       // 'scene',
       // 'ndi_source',
-      // 'openvr_capture',
+      'openvr_capture',
       // 'screen_capture',
       // 'liv_capture',
       // 'ovrstream_dc_source',
@@ -721,7 +722,7 @@ export class SourcesService extends StatefulService<ISourcesState> {
       }
     }
     this.windowsService.showWindow({
-      componentName: 'SourceProperties',
+      componentName: 'SourcePropertiesDeprecated',
       title: $t('Settings for %{sourceName}', {
         sourceName: SourceDisplayData()[source.type].name,
       }),
@@ -761,11 +762,11 @@ export class SourcesService extends StatefulService<ISourcesState> {
 
   showShowcase() {
     this.windowsService.showWindow({
-      componentName: 'SourcesShowcase',
+      componentName: 'SourceShowcase',
       title: $t('Add Source'),
       size: {
-        width: 1200,
-        height: 665,
+        width: 900,
+        height: 700,
       },
     });
   }

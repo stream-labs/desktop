@@ -13,10 +13,11 @@ import { MagicLinkService } from 'services/magic-link';
 import urlLib from 'url';
 import electron from 'electron';
 import { $t, I18nService } from 'services/i18n';
-import BrowserView from 'components/shared/BrowserView';
+import { BrowserView } from 'components/shared/ReactComponentList';
 import { RestreamService } from 'services/restream';
 import { GuestApiHandler } from 'util/guest-api-handler';
 import { IDownloadProgress } from 'util/requests';
+import * as remote from '@electron/remote';
 
 @Component({ components: { BrowserView } })
 export default class BrowseOverlays extends Vue {
@@ -54,7 +55,7 @@ export default class BrowseOverlays extends Vue {
       const protocol = urlLib.parse(url).protocol;
 
       if (protocol === 'http:' || protocol === 'https:') {
-        electron.remote.shell.openExternal(url);
+        remote.shell.openExternal(url);
       }
     });
   }

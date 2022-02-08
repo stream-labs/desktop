@@ -9,7 +9,7 @@
   "Push to Show %{sourcename}": "プッシュして %{sourcename} を表示",
   "Push to Hide %{sourcename}": "プッシュして %{sourcename} を非表示",
   "Mute": "ミュート",
-  "Unmute": "ミュート解除",
+  "Unmute": "ミュート解除します。",
   "Push to Mute": "プッシュしてミュート",
   "Push to Talk": "プッシュ・ツー・トーク",
   "Enable Studio Mode": "スタジオモードを有効化",

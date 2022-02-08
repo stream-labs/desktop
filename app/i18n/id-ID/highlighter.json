@@ -27,7 +27,7 @@
   "Replay Duration": "Durasi Replay",
   "Set a hotkey to capture replays": "Tetapkan hotkey untuk menangkap replay",
   "Capture a replay": "Tangkap sebuah replay",
-  "highlighterHotkeyInstructions": "Mulai streaming dan tekan <b>%{bindingStr}</b> untuk menangkap sebuah replay. Segera kembali ke sini setelah streaming.",
+  "highlighterHotkeyInstructions": "Mulai streaming dan tekan &lt;b&gt;%{bindingStr}&lt;/b&gt; untuk menangkap sebuah replay. Segera kembali ke sini setelah streaming.",
   "Start streaming and capture a replay. Check back here after your stream.": "Mulai streaming dan tangkap sebuah replay. Segera kembali ke sini setelah streaming.",
   "Or, import a clip from your computer": "Atau impor sebuah klip dari komputer Anda",
   "Disable clip": "Nonaktifkan klip",
@@ -90,5 +90,5 @@
   "An error occurred while reading %{file}": "Terjadi kesalahan saat membaca %{file}",
   "An error occurred while reading audio from %{file}": "Terjadi kesalahan saat membaca audio dari %{file}",
   "An error occurred while mixing audio": "Terjadi kesalahan saat mencampur audio",
-  "Edit your replays with Highlighter, a free editor built in to Streamlabs OBS.": "Edit replay Anda dengan Alat Penyorot, free editor yang berada di Streamlabs OBS."
+  "Edit your replays with Highlighter, a free editor built in to Streamlabs.": "Edit replay Anda dengan Highlighter, free editor yang ada di Streamlabs."
 }

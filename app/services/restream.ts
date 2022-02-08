@@ -11,6 +11,8 @@ import electron from 'electron';
 import { StreamingService } from './streaming';
 import { FacebookService } from './platforms/facebook';
 import { TiktokService } from './platforms/tiktok';
+import { TrovoService } from './platforms/trovo';
+import * as remote from '@electron/remote';
 
 interface IRestreamTarget {
   id: number;
@@ -45,6 +47,7 @@ export class RestreamService extends StatefulService<IRestreamState> {
   @Inject() incrementalRolloutService: IncrementalRolloutService;
   @Inject() facebookService: FacebookService;
   @Inject() tiktokService: TiktokService;
+  @Inject() trovoService: TrovoService;
 
   settings: IUserSettingsResponse;
 
@@ -196,6 +199,15 @@ export class RestreamService extends StatefulService<IRestreamState> {
       tikTokTarget.streamKey = `${ttSettings.serverUrl}/${ttSettings.streamKey}`;
     }
 
+    // treat trovo as a custom destination
+    const trovoTarget = newTargets.find(t => t.platform === 'trovo');
+    if (trovoTarget) {
+      const serverUrl = this.trovoService.rtmpServer;
+      const streamKey = this.trovoService.state.streamKey;
+      trovoTarget.platform = 'relay';
+      trovoTarget.streamKey = `${serverUrl}${streamKey}`;
+    }
+
     await this.createTargets(newTargets);
   }
 
@@ -270,7 +282,7 @@ export class RestreamService extends StatefulService<IRestreamState> {
   mountChat(electronWindowId: number) {
     if (!this.chatView) this.initChat();
 
-    const win = electron.remote.BrowserWindow.fromId(electronWindowId);
+    const win = remote.BrowserWindow.fromId(electronWindowId);
 
     // This method was added in our fork
     (win as any).addBrowserView(this.chatView);
@@ -290,7 +302,7 @@ export class RestreamService extends StatefulService<IRestreamState> {
   unmountChat(electronWindowId: number) {
     if (!this.chatView) return;
 
-    const win = electron.remote.BrowserWindow.fromId(electronWindowId);
+    const win = remote.BrowserWindow.fromId(electronWindowId);
 
     // @ts-ignore: this method was added in our fork
     win.removeBrowserView(this.chatView);
@@ -304,7 +316,7 @@ export class RestreamService extends StatefulService<IRestreamState> {
 
     const partition = this.userService.state.auth.partition;
 
-    this.chatView = new electron.remote.BrowserView({
+    this.chatView = new remote.BrowserView({
       webPreferences: {
         partition,
         nodeIntegration: false,

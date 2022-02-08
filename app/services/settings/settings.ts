@@ -7,7 +7,6 @@ import {
   IObsListInput,
   IObsInput,
   TObsValue,
-  IObsBitmaskInput,
 } from 'components/obs/inputs/ObsInput';
 import * as obs from '../../../obs-api';
 import { SourcesService } from 'services/sources';
@@ -23,11 +22,9 @@ import { PlatformAppsService } from 'services/platform-apps';
 import { EDeviceType, HardwareService } from 'services/hardware';
 import { StreamingService } from 'services/streaming';
 import { byOS, getOS, OS } from 'util/operating-systems';
-import path from 'path';
-import fs from 'fs';
 import { UsageStatisticsService } from 'services/usage-statistics';
 import { SceneCollectionsService } from 'services/scene-collections';
-import electron from 'electron';
+import * as remote from '@electron/remote';
 
 export interface ISettingsValues {
   General: {
@@ -60,6 +57,13 @@ export interface ISettingsValues {
   };
   Video: {
     Base: string;
+    Output: string;
+    ScaleType: string;
+    FPSType: string;
+    FPSCommon: string;
+    FPSInt: number;
+    FPSNum: number;
+    FPSDen: number;
   };
   Audio: Dictionary<TObsValue>;
   Advanced: {
@@ -117,8 +121,13 @@ class SettingsViews extends ViewHandler<ISettingsServiceState> {
     return Number(this.values.Output.TrackIndex) - 1;
   }
 
-  get recordingTracks() {
+  get recFormat() {
     if (!this.isAdvancedOutput) return;
+    return this.values.Output.RecFormat;
+  }
+
+  get recordingTracks() {
+    if (!this.isAdvancedOutput) return [0];
     const bitArray = Utils.numberToBinnaryArray(this.values.Output.RecTracks, 6).reverse();
     const trackLabels: number[] = [];
     bitArray.forEach((bit, i) => {
@@ -298,6 +307,8 @@ export class SettingsService extends StatefulService<ISettingsServiceState> {
       categories = categories.concat('Installed Apps');
     }
 
+    categories.push('Get Support');
+
     return categories;
   }
 
@@ -376,7 +387,7 @@ export class SettingsService extends StatefulService<ISettingsServiceState> {
       parameters.push({
         value: source ? source.getObsInput().settings['device_id'] : null,
         description: `${$t('Desktop Audio Device')} ${deviceInd}`,
-        name: `Desktop Audio ${deviceInd > 1 ? deviceInd : ''}`,
+        name: `Desktop Audio ${deviceInd > 1 ? deviceInd : ''}`.trim(),
         type: 'OBS_PROPERTY_LIST',
         enabled: true,
         visible: true,
@@ -398,7 +409,7 @@ export class SettingsService extends StatefulService<ISettingsServiceState> {
       parameters.push({
         value: source ? source.getObsInput().settings['device_id'] : null,
         description: `${$t('Mic/Auxiliary Device')} ${deviceInd}`,
-        name: `Mic/Aux ${deviceInd > 1 ? deviceInd : ''}`,
+        name: `Mic/Aux ${deviceInd > 1 ? deviceInd : ''}`.trim(),
         type: 'OBS_PROPERTY_LIST',
         enabled: true,
         visible: true,
@@ -433,6 +444,14 @@ export class SettingsService extends StatefulService<ISettingsServiceState> {
           valueToCurrentValue: true,
         }),
       });
+
+      if (
+        categoryName === 'Output' &&
+        subGroup.nameSubCategory === 'Untitled' &&
+        subGroup.parameters[0].value === 'Simple'
+      ) {
+        this.audioService.setSimpleTracks();
+      }
     }
 
     obs.NodeObs.OBS_settings_saveSettings(categoryName, dataToSave);
@@ -519,7 +538,7 @@ export class SettingsService extends StatefulService<ISettingsServiceState> {
         this.setSettingValue('Output', 'StreamEncoder', 'x264');
       }
 
-      electron.remote.dialog.showMessageBox(this.windowsService.windows.main, {
+      remote.dialog.showMessageBox(this.windowsService.windows.main, {
         type: 'error',
         message:
           'Your stream encoder has been reset to Software (x264). This can be caused by out of date graphics drivers. Please update your graphics drivers to continue using hardware encoding.',

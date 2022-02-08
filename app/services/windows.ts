@@ -8,11 +8,11 @@ import Vue, { Component } from 'vue';
 import Utils from 'services/utils';
 import { Subject } from 'rxjs';
 import { throttle } from 'lodash-decorators';
+import * as remote from '@electron/remote';
 
 import Main from 'components/windows/Main.vue';
 import Settings from 'components/windows/settings/Settings.vue';
 import FFZSettings from 'components/windows/FFZSettings.vue';
-import SourcesShowcase from 'components/windows/SourcesShowcase.vue';
 import SceneTransitions from 'components/windows/SceneTransitions.vue';
 import AddSource from 'components/windows/AddSource.vue';
 import NameScene from 'components/windows/NameScene.vue';
@@ -31,7 +31,10 @@ import {
   CustomCodeWindow,
   SafeMode,
   AdvancedAudio,
+  SourceShowcase,
   SourceFilters,
+  MediaGallery,
+  Projector,
 } from 'components/shared/ReactComponentList';
 
 import SourcePropertiesDeprecated from 'components/windows/SourceProperties.vue';
@@ -41,8 +44,6 @@ import Blank from 'components/windows/Blank.vue';
 import ManageSceneCollections from 'components/windows/ManageSceneCollections.vue';
 import RecentEvents from 'components/windows/RecentEvents.vue';
 import GameOverlayEventFeed from 'components/windows/GameOverlayEventFeed';
-import Projector from 'components/windows/Projector.vue';
-import MediaGallery from 'components/windows/MediaGallery.vue';
 import PlatformAppPopOut from 'components/windows/PlatformAppPopOut.vue';
 import EditTransform from 'components/windows/EditTransform';
 import EventFilterMenu from 'components/windows/EventFilterMenu';
@@ -73,6 +74,7 @@ import SpinWheel from 'components/widgets/SpinWheel.vue';
 import Poll from 'components/widgets/Poll';
 import EmoteWall from 'components/widgets/EmoteWall';
 import ChatHighlight from 'components/widgets/ChatHighlight';
+import SuperchatGoal from 'components/widgets/goal/SuperchatGoal';
 
 import { byOS, OS } from 'util/operating-systems';
 import { UsageStatisticsService } from './usage-statistics';
@@ -80,7 +82,7 @@ import { Inject } from 'services/core';
 import MessageBoxModal from 'components/shared/modals/MessageBoxModal';
 import Modal from 'components/shared/modals/Modal';
 
-const { ipcRenderer, remote } = electron;
+const { ipcRenderer } = electron;
 const BrowserWindow = remote.BrowserWindow;
 const uuid = window['require']('uuid/v4');
 
@@ -92,7 +94,6 @@ export function getComponents() {
     Settings,
     FFZSettings,
     SceneTransitions,
-    SourcesShowcase,
     RenameSource,
     AddSource,
     NameScene,
@@ -124,6 +125,7 @@ export function getComponents() {
     StarsGoal,
     SupporterGoal,
     SubscriberGoal,
+    SuperchatGoal,
     CharityGoal,
     ChatBox,
     ViewerCount,
@@ -148,6 +150,7 @@ export function getComponents() {
     SharedComponentsLibrary,
     WidgetWindow,
     CustomCodeWindow,
+    SourceShowcase,
   };
 }
 
@@ -273,7 +276,7 @@ export class WindowsService extends StatefulService<IWindowsState> {
     this.windows.main.on('move', () => this.updateScaleFactor('main'));
     this.windows.child.on('move', () => this.updateScaleFactor('child'));
 
-    if (electron.remote.screen.getAllDisplays().length > 1) {
+    if (remote.screen.getAllDisplays().length > 1) {
       this.usageStatisticsService.recordFeatureUsage('MultipleDisplays');
     }
   }
@@ -283,10 +286,10 @@ export class WindowsService extends StatefulService<IWindowsState> {
     const window = this.windows[windowId];
     if (window && !window.isDestroyed()) {
       const bounds = byOS({
-        [OS.Windows]: () => electron.remote.screen.dipToScreenRect(window, window.getBounds()),
+        [OS.Windows]: () => remote.screen.dipToScreenRect(window, window.getBounds()),
         [OS.Mac]: () => window.getBounds(),
       });
-      const currentDisplay = electron.remote.screen.getDisplayMatching(bounds);
+      const currentDisplay = remote.screen.getDisplayMatching(bounds);
       this.UPDATE_SCALE_FACTOR(windowId, currentDisplay.scaleFactor);
     }
   }
@@ -308,19 +311,12 @@ export class WindowsService extends StatefulService<IWindowsState> {
      * to workaround.
      */
     if (options.size && !Utils.env.CI) {
-      const {
-        width: screenWidth,
-        height: screenHeight,
-      } = electron.remote.screen.getDisplayMatching(this.windows.main.getBounds()).workAreaSize;
+      const { width: screenWidth, height: screenHeight } = remote.screen.getDisplayMatching(
+        this.windows.main.getBounds(),
+      ).workAreaSize;
 
-      const SCREEN_PERCENT = 0.75;
-
-      if (options.size.width > screenWidth || options.size.height > screenHeight) {
-        options.size = {
-          width: Math.round(screenWidth * SCREEN_PERCENT),
-          height: Math.round(screenHeight * SCREEN_PERCENT),
-        };
-      }
+      options.size.width = Math.min(options.size.width, screenWidth);
+      options.size.height = Math.min(options.size.height, screenHeight);
     }
 
     this.centerChildWindow(options);
@@ -363,7 +359,7 @@ export class WindowsService extends StatefulService<IWindowsState> {
   getMainWindowDisplay() {
     const window = this.windows.main;
     const bounds = window.getBounds();
-    return electron.remote.screen.getDisplayMatching(bounds);
+    return remote.screen.getDisplayMatching(bounds);
   }
 
   async closeChildWindow() {
@@ -434,7 +430,6 @@ export class WindowsService extends StatefulService<IWindowsState> {
       webPreferences: {
         nodeIntegration: true,
         webviewTag: true,
-        enableRemoteModule: true,
         contextIsolation: false,
         backgroundThrottling: false,
       },
@@ -442,6 +437,8 @@ export class WindowsService extends StatefulService<IWindowsState> {
       ...options.size,
       ...(options.position || {}),
     }));
+
+    electron.ipcRenderer.sendSync('webContents-enableRemote', newWindow.webContents.id);
 
     newWindow.removeMenu();
     newWindow.on('closed', () => {
@@ -473,6 +470,8 @@ export class WindowsService extends StatefulService<IWindowsState> {
     this.CREATE_ONE_OFF_WINDOW(windowId, options);
 
     const newWindow = (this.windows[windowId] = new BrowserWindow(options));
+
+    electron.ipcRenderer.sendSync('webContents-enableRemote', newWindow.webContents.id);
 
     const indexUrl = remote.getGlobal('indexUrl');
     newWindow.loadURL(`${indexUrl}?windowId=${windowId}`);
