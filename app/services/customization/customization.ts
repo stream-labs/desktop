@@ -28,7 +28,7 @@ export class CustomizationService
     pollingPerformanceStatistics: true,
 
     compactMode: false,
-    compactModeTab: 'studio',
+    compactModeTab: 'niconico',
     compactModeStudioController: 'scenes',
     compactModeNewComment: false,
     fullModeWidthOffset: 0,
