@@ -76,7 +76,8 @@ export const SourceDisplayData = (): { [key: string]: ISourceDisplayData } => ({
     description: $t("Capture a specific window that's open on your computer."),
     demoFilename: 'window-capture.png',
     supportList: [$t('Compatible with most modern browsers and programs')],
-    icon: 'fas fa-file',
+    icon: 'icon-editor-9',
+    shortDesc: $t('Capture an application window'),
   },
   game_capture: {
     name: $t('Game Capture'),
@@ -258,6 +259,6 @@ export const SourceDisplayData = (): { [key: string]: ISourceDisplayData } => ({
       $t('Many more'),
     ],
     icon: 'fas fa-file',
-    shortDesc: 'Viewer shoutouts',
+    shortDesc: $t('Viewer shoutouts'),
   },
 });
