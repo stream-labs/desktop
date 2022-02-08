@@ -200,7 +200,6 @@ function PanelForm(p: { source: AudioSource }) {
   const { EditorCommandsService } = Services;
 
   function handleSettingsChange(name: string, value: TObsValue) {
-    console.log('changing settings', name, value);
     EditorCommandsService.actions.executeCommand('SetAudioSettingsCommand', sourceId, {
       [name]: value,
     });

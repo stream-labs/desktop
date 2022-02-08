@@ -22,7 +22,6 @@ export const NumberInput = React.memo((p: TProps) => {
     if (typeof p.max === 'number' && val > p.max) return;
     if (typeof p.min === 'number' && val < p.min) return;
     console.log('emitting value', val);
-    originalOnChange(val);
   }
 
   const rules = p.rules ? p.rules[0] : {};
