@@ -10,7 +10,7 @@ const plugins = [];
 plugins.push(
   new webpack.SourceMapDevToolPlugin({
     filename: '[file].map',
-    publicPath: 'http://localhost:9000/',
+    publicPath: 'http://localhost:9000/bundles/',
   }),
 );
 

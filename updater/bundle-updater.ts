@@ -419,7 +419,8 @@ module.exports = async (basePath: string) => {
       }
 
       console.log(`Using local bundle for ${bundleName}`);
-      cb({ redirectURL: `${localBase}${localManifest[bundleName]}` });
+      // cb({ redirectURL: `${localBase}${localManifest[bundleName]}` });
+      cb({ redirectURL: `http://localhost:9000/bundles/${bundleName}` });
     },
   );
 
@@ -431,7 +432,7 @@ module.exports = async (basePath: string) => {
 
     const server = http.createServer((request, response) => {
       handler(request, response, {
-        public: path.resolve(__dirname, '..', '..', 'bundles'),
+        public: path.resolve(__dirname, '..', '..'),
         headers: [
           {
             source: '**',

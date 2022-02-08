@@ -239,7 +239,7 @@ let allowMainWindowClose = false;
 let shutdownStarted = false;
 let appShutdownTimeout;
 
-global.indexUrl = `file://${__dirname}/index.html`;
+global.indexUrl = 'http://localhost:9000/';
 
 function openDevTools() {
   childWindow.webContents.openDevTools({ mode: 'undocked' });
@@ -316,7 +316,7 @@ async function startApp() {
 
   workerWindow = new BrowserWindow({
     show: false,
-    webPreferences: { nodeIntegration: true, contextIsolation: false },
+    webPreferences: { nodeIntegration: true, contextIsolation: false, webSecurity: false },
   });
 
   remote.enable(workerWindow.webContents);
@@ -354,6 +354,7 @@ async function startApp() {
       nodeIntegration: true,
       webviewTag: true,
       contextIsolation: false,
+      webSecurity: false,
     },
   });
 
@@ -428,6 +429,7 @@ async function startApp() {
       nodeIntegration: true,
       backgroundThrottling: false,
       contextIsolation: false,
+      webSecurity: false,
     },
   });
 
