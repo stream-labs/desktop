@@ -10,7 +10,7 @@ import { TextInput } from '../../shared/inputs';
 import { Button, Col, Row, Space } from 'antd';
 import Utils from '../../../services/utils';
 
-const QRCODE_SIZE = 300;
+const QRCODE_SIZE = 350;
 
 class RemoteControlModule {
   state = {
@@ -36,12 +36,9 @@ class RemoteControlModule {
   }
 
   get qrCodeValue() {
-    if (!this.state.qrcodeIsVisible) return '';
-    const encodedUser = encodeURIComponent(`user=${Services.UserService.widgetToken}`);
-    const encodedData = encodeURIComponent(
-      `&data=${encodeURIComponent(JSON.stringify(this.state.qrCodeData))}`,
-    );
-    return `https://streamlabs.page.link/?link=https://streamlabs.com/mobile-app?${encodedUser}${encodedData}&apn=com.streamlabs.slobsrc&isi=1476615877&ibi=com.streamlabs.slobsrc&utm_source=slobs`;
+    if (!this.state.qrcodeIsVisible) return 'This is totally fake data';
+    const encodedData = encodeURIComponent(JSON.stringify(this.state.qrCodeData));
+    return `https://streamlabs.page.link/?link=https://streamlabs.com/mobile-app&data=${encodedData}&apn=com.streamlabs.slobsrc&isi=1476615877&ibi=com.streamlabs.slobsrc&utm_source=slobs`;
   }
 
   private get TcpServerService() {
@@ -101,14 +98,15 @@ export function RemoteControlSettings() {
     marginBottom: '16px',
   };
 
+  const qrStyles: React.CSSProperties = qrcodeIsVisible
+    ? {}
+    : { filter: 'blur(10px)', position: 'absolute', clip: 'rect(5px, 345px, 345px, 5px)' };
+
   return (
     <ObsSettingsSection>
       <div>
-        {$t('You can now control Streamlabs Desktop from your phone.')} <br />
-        {$t('To begin, scan this QR code with your phone.')}
-        <br />
         {$t(
-          'This feature will only work with the most recent version of the Streamlabs mobile app.',
+          'The free Streamlabs Deck app allows you to control Streamlabs Desktop from your iOS or Android device. Scan the QR code below to begin.',
         )}
         <br />
         <br />
@@ -116,9 +114,9 @@ export function RemoteControlSettings() {
 
       <Row justify="space-around" align="middle">
         <Col style={colStyle}>
-          {qrcodeIsVisible && <QRCode value={qrCodeValue} size={QRCODE_SIZE} />}
+          <QRCode value={qrCodeValue} size={QRCODE_SIZE} style={qrStyles} />
           {!qrcodeIsVisible && (
-            <a style={{ backgroundColor: 'black' }} onClick={showQrCode}>
+            <a style={{ backgroundColor: 'black', position: 'absolute' }} onClick={showQrCode}>
               {$t("Don't show this code on stream. Click to reveal")}
             </a>
           )}
