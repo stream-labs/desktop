@@ -31,6 +31,7 @@ export default function AdvancedAudio() {
     } else {
       message.destroy();
     }
+    return message.destroy;
   }, [streamTrack, vodTrack]);
 
   return (
