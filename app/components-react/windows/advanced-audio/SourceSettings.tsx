@@ -200,6 +200,7 @@ function PanelForm(p: { source: AudioSource }) {
   const { EditorCommandsService } = Services;
 
   function handleSettingsChange(name: string, value: TObsValue) {
+    console.log('changing settings', name, value);
     EditorCommandsService.actions.executeCommand('SetAudioSettingsCommand', sourceId, {
       [name]: value,
     });
@@ -239,6 +240,7 @@ function PanelForm(p: { source: AudioSource }) {
         tooltip={$t('Time it takes between sound occuring and being broadcast (ms)')}
         min={-950}
         max={20000}
+        uncontrolled={false}
       />
       <SwitchInput
         label={$t('Downmix to Mono')}
