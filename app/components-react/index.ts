@@ -36,6 +36,10 @@ import SourceFilters from './windows/SourceFilters';
 import RecentEvents from './editor/elements/RecentEvents';
 import MiniFeed from './editor/elements/Minifeed';
 import BrowserView from './shared/BrowserView';
+import LegacyEvents from './editor/elements/LegacyEvents';
+import MediaGallery from './windows/MediaGallery';
+import LayoutEditor from './pages/layout-editor/LayoutEditor';
+import Projector from './windows/Projector';
 
 // list of React components to be used inside Vue components
 export const components = {
@@ -56,6 +60,7 @@ export const components = {
   Loader,
   NavTools,
   PlatformLogo,
+  Projector,
   StreamScheduler: createRoot(StreamScheduler),
   AdvancedStatistics,
   SourceProperties: createRoot(SourceProperties),
@@ -76,4 +81,7 @@ export const components = {
   SourceFilters,
   RecentEvents,
   MiniFeed: createRoot(MiniFeed),
+  LegacyEvents: createRoot(LegacyEvents),
+  MediaGallery,
+  LayoutEditor: createRoot(LayoutEditor),
 };

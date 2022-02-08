@@ -36,6 +36,7 @@ export enum WidgetType {
   Poll = 19,
   EmoteWall = 20,
   ChatHighlight = 21,
+  SuperchatGoal = 22,
 }
 
 export const WidgetTesters: IWidgetTester[] = [
@@ -45,7 +46,7 @@ export const WidgetTesters: IWidgetTester[] = [
     url(host, platform) {
       return `https://${host}/api/v5/slobs/test/${platform}_account/follow`;
     },
-    platforms: ['twitch', 'facebook'],
+    platforms: ['twitch', 'facebook', 'trovo'],
   },
   {
     name: 'Subscriber',
@@ -59,7 +60,7 @@ export const WidgetTesters: IWidgetTester[] = [
     url(host, platform) {
       return `https://${host}/api/v5/slobs/test/${platform}_account/subscription`;
     },
-    platforms: ['twitch'],
+    platforms: ['twitch', 'trovo'],
   },
   {
     name: 'Membership',
@@ -74,7 +75,7 @@ export const WidgetTesters: IWidgetTester[] = [
     url(host) {
       return `https://${host}/api/v5/slobs/test/streamlabs/donation`;
     },
-    platforms: ['twitch', 'youtube', 'facebook', 'tiktok'],
+    platforms: ['twitch', 'youtube', 'facebook', 'tiktok', 'trovo'],
   },
   {
     type: 'bits',
@@ -239,6 +240,21 @@ export const WidgetDefinitions: { [x: number]: IWidget } = {
     name: 'Supporter Goal',
     url(host, token) {
       return `https://${host}/widgets/supporter-goal?token=${token}`;
+    },
+
+    width: 600,
+    height: 200,
+
+    x: 0,
+    y: 1,
+
+    anchor: AnchorPoint.SouthWest,
+  },
+
+  [WidgetType.SuperchatGoal]: {
+    name: 'Superchat Goal',
+    url(host, token) {
+      return `https://${host}/widgets/super-chat-goal?token=${token}`;
     },
 
     width: 600,
@@ -527,7 +543,15 @@ export const WidgetDisplayData = (platform?: string): { [x: number]: IWidgetDisp
     demoVideo: true,
     demoFilename: 'source-donation-goal.mp4',
     supportList: [$t('Streamlabs Charity Donations')],
-    platforms: new Set(['twitch', 'youtube', 'facebook']),
+    icon: 'fas fa-calendar',
+  },
+  [WidgetType.SuperchatGoal]: {
+    name: $t('Superchat Goal'),
+    description: $t('Set a goal for your viewers to help you reach.'),
+    demoVideo: false,
+    demoFilename: 'source-follower-goal.png',
+    supportList: [$t('YouTube Superchats')],
+    platforms: new Set(['youtube']),
     icon: 'fas fa-calendar',
   },
   [WidgetType.DonationTicker]: {

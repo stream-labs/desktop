@@ -11,6 +11,7 @@ import { $t } from 'services/i18n';
 import { formMetadata, IListOption } from 'components/shared/inputs';
 import { metadata } from 'components/widgets/inputs';
 import uuid from 'uuid/v4';
+import { authorizedHeaders, handleResponse } from 'util/requests';
 
 export interface ISpinWheelSettings extends IWidgetSettings {
   resultColor: string;
@@ -90,6 +91,17 @@ export class SpinWheelService extends WidgetSettingsService<ISpinWheelData> {
         max: 15,
       }),
     });
+  }
+
+  async spinWheel() {
+    // eslint-disable-next-line
+    const url = `https://${
+      this.getHost()
+    }/api/v5/slobs/widget/wheel/spin/${this.getWidgetToken()}`;
+    const headers = authorizedHeaders(this.userService.apiToken);
+    const request = new Request(url, { headers, method: 'POST' });
+    const response = await fetch(request);
+    return handleResponse(response);
   }
 
   protected patchAfterFetch(data: any): ISpinWheelData {

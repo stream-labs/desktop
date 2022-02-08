@@ -15,6 +15,7 @@ import pick from 'lodash/pick';
 import uuid from 'uuid/v4';
 import { Subscription } from 'rxjs';
 import mapValues from 'lodash/mapValues';
+import { WidgetsService, WidgetType } from './widgets';
 
 export interface IRecentEvent {
   name?: string;
@@ -276,6 +277,7 @@ const SUPPORTED_EVENTS = [
 ];
 
 class RecentEventsViews extends ViewHandler<IRecentEventsState> {
+  @Inject() private widgetsService: WidgetsService;
   getEventString(event: IRecentEvent) {
     return {
       donation: this.getDonoString(event),
@@ -335,6 +337,25 @@ class RecentEventsViews extends ViewHandler<IRecentEventsState> {
       }
       return $t('has become a member');
     }
+
+    if (event.platform === 'trovo_account') {
+      if (event.gifter) {
+        return $t('has gifted a sub to');
+      }
+      if (event.months > 1 && event.streak_months && event.streak_months > 1) {
+        return $t('has resubscribed for %{streak} months in a row! (%{months} total)', {
+          streak: event.streak_months,
+          months: event.months,
+        });
+      }
+      if (event.months > 1) {
+        return $t('has resubscribed for %{months} months', {
+          months: event.months,
+        });
+      }
+      return $t('has subscribed');
+    }
+
     if (event.gifter) {
       return $t('has gifted a sub (%{tier}) to', {
         tier: subscriptionMap(event.sub_plan),
@@ -365,6 +386,12 @@ class RecentEventsViews extends ViewHandler<IRecentEventsState> {
     return this.state.recentEvents.find(event => {
       return event.uuid === uuid;
     });
+  }
+
+  get spinWheelExists(): boolean {
+    return !!this.widgetsService
+      .getWidgetSources()
+      .find(source => source.type === WidgetType.SpinWheel);
   }
 }
 
@@ -770,6 +797,8 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
       return false;
     }
 
+    if (this.userService.platform.type === 'trovo') return true;
+
     if (!this.state.filterConfig.subscription_tier_1 && event.sub_plan.toString() === '1000') {
       return false;
     }
@@ -797,6 +826,8 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
     if (!this.state.filterConfig.resub) {
       return false;
     }
+
+    if (this.userService.platform.type === 'trovo') return true;
 
     if (!this.state.filterConfig.resub_tier_1 && event.sub_plan.toString() === '1000') {
       return false;

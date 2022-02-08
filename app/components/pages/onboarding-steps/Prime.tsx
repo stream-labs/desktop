@@ -27,16 +27,22 @@ export default class Prime extends TsxComponent<OnboardingStepProps> {
   get primeMetadata() {
     return {
       standard: [
-        { text: $t('Go Live to a single platform'), icon: 'icon-desktop' },
-        { text: $t('Alerts & Tipping'), icon: 'icon-alert-box' },
+        { text: $t('Go live to one platform'), icon: 'icon-broadcast' },
+        { text: $t('Tipping (no Streamlabs fee)'), icon: 'icon-balance' },
+        { text: $t('Alerts & other Widgets'), icon: 'icon-widgets' },
+        { text: $t('Recording'), icon: 'icon-record' },
+        { text: $t('Selective Recording'), icon: 'icon-smart-record' },
+        { text: $t('Game Overlay'), icon: 'icon-editor-7' },
+        { text: $t('And many more free features'), icon: 'icon-more' },
       ],
       prime: [
-        { text: $t('Unlimited Themes & Overlays'), icon: 'icon-themes' },
-        { text: $t('Go Live to one or more platforms'), icon: 'icon-multistream' },
-        { text: $t('Custom Tip Page'), icon: 'icon-creator-site' },
-        { text: $t('Custom Alerts & Tipping'), icon: 'icon-alert-box' },
-        { text: $t('App Store Apps are FREE'), icon: 'icon-store' },
-        { text: $t('Premium Merch'), icon: 'icon-upperwear' },
+        { text: $t('All free features'), icon: 'icon-streamlabs' },
+        { text: $t('Multistream to multiple platforms'), icon: 'icon-multistream' },
+        { text: $t('Premium Stream Overlays'), icon: 'icon-design' },
+        { text: $t('Alert Box and Widget Themes'), icon: 'icon-themes' },
+        { text: $t('Access to all App Store Apps'), icon: 'icon-store' },
+        { text: $t('Prime Mobile Streaming'), icon: 'icon-phone' },
+        { text: $t('Prime Web Suite'), icon: 'icon-desktop' },
       ],
     };
   }
@@ -49,20 +55,22 @@ export default class Prime extends TsxComponent<OnboardingStepProps> {
     return (
       <div style="width: 100%;">
         <h1 class={commonStyles.titleContainer}>{$t('Choose your Streamlabs plan')}</h1>
-        <p style="text-align: center; width: 100%;">
-          {$t('Choose Prime to enjoy everything from Starter plus themes and much more.')}
-        </p>
         <div style="display: flex; align-items: center; justify-content: center;">
           <div class={styles.cardContainer} onClick={() => this.props.continue()}>
-            <h1>{$t('Starter')}</h1>
-            <strong>{$t('Free')}</strong>
+            <h1>
+              <i class="icon-streamlabs" />
+              {$t('Free')}
+            </h1>
+            <span style="margin-bottom: 8px">
+              {$t('Everything you need to go live. Always and forever free.')}
+            </span>
             {this.primeMetadata.standard.map(data => (
               <div class={styles.primeRow}>
                 <i class={data.icon} />
                 <span>{data.text}</span>
               </div>
             ))}
-            <div class={styles.primeButton}>{$t('Choose Starter')}</div>
+            <div class={cx(styles.primeButton, styles.freeButton)}>{$t('Choose Free')}</div>
           </div>
           <div
             class={cx(styles.cardContainer, styles.primeCardContainer)}
@@ -72,7 +80,9 @@ export default class Prime extends TsxComponent<OnboardingStepProps> {
               <i class="icon-prime" />
               {$t('Prime')}
             </h1>
-            <strong>{$t('From $12/mo, billed annually')}</strong>
+            <span style="margin-bottom: 8px">
+              {$t('Pro features to take your stream and channel to the next level.')}
+            </span>
             {this.primeMetadata.prime.map(data => (
               <div class={styles.primeRow}>
                 <i class={data.icon} />

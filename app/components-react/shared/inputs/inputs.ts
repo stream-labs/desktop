@@ -258,6 +258,7 @@ export function useInput<
     forceUpdate,
     setLocalValue,
     emitChange,
+    form,
   };
 }
 
