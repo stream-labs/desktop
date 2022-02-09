@@ -61,7 +61,7 @@
 }
 
 .nav-item {
-  margin-left: 20px;
+  margin-left: 16px;
 }
 
 .error-wrapper {
@@ -70,7 +70,7 @@
 }
 
 .platform-error {
-  background: rgba(251, 72, 76, 0.28);
+  background: var(--color-red-dark);
   padding: 4px;
   border-radius: 3px;
 
@@ -88,7 +88,7 @@
   .alert-button {
     height: 18px;
     line-height: 12px;
-    background: rgba(251, 72, 76, 0.36);
+    background: var(--color-red-dark);
     margin: 0 5px;
     padding: 0 8px;
     font-size: 10px;
@@ -108,37 +108,29 @@
     color: var(--color-button-label);
   }
 
-  &:hover {
-    background: var(--color-red);
-  }
-
   &.active {
     opacity: 1;
-    animation: pulse 2.5s infinite;
-    border: 1px solid var(--color-red);
-    background: @red;
-    span {
-      color: @white;
-    }
+    // animation: pulse 2.5s infinite;
+    background: var(--color-red);
+  
     &:hover {
       opacity: 1;
-      background: var(--color-red-dark);
-      border: 1px solid var(--color-red);
+      background: var(--color-red-hover);
     }
   }
 }
 
 .replay-button-group {
   display: flex;
-  width: 32px;
-  height: 32px;
+  width: @item-generic-size;
+  height: @item-generic-size;
   border-radius: 16px;
   overflow: hidden;
   position: relative;
   .transition;
 
   &.is-replay-start {
-    width: 64px;
+    width: @item-generic-size*2;
   }
 }
 
@@ -156,7 +148,7 @@
   background: var(--color-red-dark);
   position: absolute;
   top: 0;
-  right: 32px;
+  right: @item-generic-size;
   border-radius: 0;
 
   i {

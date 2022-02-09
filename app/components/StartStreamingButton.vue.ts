@@ -7,6 +7,7 @@ import { SettingsService } from 'services/settings';
 import { WindowsService } from '../services/windows';
 import { $t } from 'services/i18n';
 import StartStreamingIcon from '../../media/images/start-streaming-icon.svg';
+import { CompactModeService } from 'services/compact-mode';
 
 @Component({
   components: {
@@ -18,6 +19,7 @@ export default class StartStreamingButton extends Vue {
   @Inject() navigationService: NavigationService;
   @Inject() settingsService: SettingsService;
   @Inject() windowsService: WindowsService;
+  @Inject() compactModeService: CompactModeService;
 
   @Prop() disabled: boolean;
 
@@ -28,6 +30,10 @@ export default class StartStreamingButton extends Vue {
     }
 
     this.streamingService.toggleStreamingAsync();
+  }
+
+  get compactMode() {
+    return this.compactModeService.compactMode;
   }
 
   get streamingStatus() {
