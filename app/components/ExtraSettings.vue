@@ -82,7 +82,7 @@
   label {
     cursor: pointer;
     display: flex;
-    height: 36px;
+    height: @item-generic-size;
     margin: 0;
     padding: 0;
     justify-content: start;

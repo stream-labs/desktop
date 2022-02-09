@@ -28,9 +28,9 @@
         <div class="close"><i class="icon-close icon-btn" @click="pin(null)"></i></div>
       </div>
       <div class="floating-wrapper">
-        <button type="button" @click="scrollToLatest" class="scroll-to-latest button--secondary" v-if="!isLatestVisible && items.length > 0"><i class="icon-down-arrow"></i>最新のコメントへ移動</button>
-        <button class="button--circle button--secondary" v-tooltip.bottom="commentReloadTooltip" @click="refreshConnection"><i class="icon-reload"></i></button>
-        <button class="button--circle button--secondary" v-tooltip.bottom="speakingEnabled ? commentSynthesizerOnTooltip : commentSynthesizerOffTooltip" @click="speakingEnabled = !speakingEnabled"><i :class="speakingEnabled ? 'icon-speaker' : 'icon-mute'"></i></button>
+        <button type="button" @click="scrollToLatest" class="scroll-to-latest button--tertiary" v-if="!isLatestVisible && items.length > 0"><i class="icon-down-arrow"></i>最新のコメントへ移動</button>
+        <button class="button--circle button--tertiary" v-tooltip.bottom="commentReloadTooltip" @click="refreshConnection"><i class="icon-reload"></i></button>
+        <button class="button--circle button--tertiary" v-tooltip.bottom="speakingEnabled ? commentSynthesizerOnTooltip : commentSynthesizerOffTooltip" @click="speakingEnabled = !speakingEnabled"><i :class="speakingEnabled ? 'icon-speaker' : 'icon-mute'"></i></button>
       </div>
     </div>
     <comment-form class="comment-form" />

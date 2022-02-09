@@ -96,8 +96,8 @@
 
 .sl-vue-tree-node-item {
   padding: 0 12px;
-  min-height: 32px;
-  line-height: 32px;
+  min-height: @item-generic-size;
+  line-height: @item-generic-size;
   cursor: pointer;
   border: none;
 

@@ -35,6 +35,7 @@
 
 .Hotkey-description {
   flex-grow: 1;
+  padding-bottom: 16px;
   padding-right: 16px;
 }
 

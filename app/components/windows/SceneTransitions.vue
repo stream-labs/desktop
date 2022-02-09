@@ -164,8 +164,8 @@
 }
 
 .button {
-  line-height: 32px;
-  height: 32px;
+  height: @item-generic-size;
+  line-height: @item-generic-size;
   margin-left: auto;
   margin-bottom: 16px;
 }

@@ -1,5 +1,5 @@
 <template>
-  <modal-layout :show-controls="false" :customControls="true">
+  <modal-layout :show-controls="false" :customControls="true" no-scroll>
     <div slot="content">
       <ul class="confirm-list">
         <li class="confirm-list-item">

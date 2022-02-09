@@ -139,7 +139,7 @@
 .button-wrapper {
   display: flex;
   flex-direction: column;
-  min-width: 216px;
+  min-width: 200px;
   padding-bottom: 80px;
 
   .button {

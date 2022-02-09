@@ -127,7 +127,7 @@
   text-decoration: none;
   color: var(--color-text);
   position: relative;
-  padding: 0 8px;
+  padding: 0 24px;
 
   &.active {
     color: var(--color-primary);

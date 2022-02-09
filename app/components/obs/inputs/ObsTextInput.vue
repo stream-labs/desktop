@@ -18,7 +18,7 @@
       @change="onInputHandler"
     />
     <button
-      class="button button--default button--input"
+      class="button button--secondary button--input"
       v-if="value.masked"
       @click="toggleVisible">
       {{ textVisible ? 'Hide' : 'Show' }}

@@ -53,16 +53,20 @@
         font-size: @font-size1;
       }
 
+      &:hover {
+        color: var(--color-text-light);
+      }
+
       &:active {
         color: var(--color-text-active);
       }
 
       &.arrow-up {
-        .absolute(8px, 4px, auto, auto);
+        .absolute(6px, 4px, auto, auto);
       }
 
       &.arrow-down {
-        .absolute(auto, 4px, 8px, auto);
+        .absolute(auto, 4px, 6px, auto);
       }
     }
   }
