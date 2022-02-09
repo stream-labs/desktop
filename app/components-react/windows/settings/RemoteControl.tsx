@@ -114,9 +114,12 @@ export function RemoteControlSettings() {
 
       <Row justify="space-around" align="middle">
         <Col style={colStyle}>
-          <QRCode value={qrCodeValue} size={QRCODE_SIZE} style={qrStyles} />
+          <QRCode value={qrCodeValue} size={QRCODE_SIZE} style={qrStyles} includeMargin={true} />
           {!qrcodeIsVisible && (
-            <a style={{ backgroundColor: 'black', position: 'absolute' }} onClick={showQrCode}>
+            <a
+              style={{ backgroundColor: 'black', position: 'absolute', color: 'white' }}
+              onClick={showQrCode}
+            >
               {$t("Don't show this code on stream. Click to reveal")}
             </a>
           )}
