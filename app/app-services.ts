@@ -142,6 +142,7 @@ import { ChatService } from './services/chat';
 import { HighlighterService } from './services/highlighter';
 import { GrowService } from './services/grow/grow';
 import { TransitionsService } from './services/transitions';
+import { TcpServerService } from './services/api/tcp-server';
 import { MagicLinkService } from './services/magic-link';
 import { UsageStatisticsService } from './services/usage-statistics';
 import { NotificationsService } from './services/notifications';
@@ -193,6 +194,7 @@ export const AppServices = {
   HighlighterService,
   GrowService,
   TransitionsService,
+  TcpServerService,
   MagicLinkService,
   MediaGalleryService,
   UsageStatisticsService,
