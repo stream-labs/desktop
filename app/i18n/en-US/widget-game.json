@@ -1,4 +1,20 @@
 {
   "Game Widget": "Game Widget",
-  "Let your viewers play a game in chat": "Let your viewers play a game in chat"
+  "Let your viewers play a game in chat": "Let your viewers play a game in chat",
+  "Chat Decision Time": "Chat Decision Time",
+  "Trigger Command": "Trigger Command",
+  "Chat Response Timer": "Chat Response Timer",
+  "No Input Recieved": "No Input Recieved",
+  "Restarting Game": "Restarting Game",
+  "Chat's Turn": "Chat's Turn",
+  "Chat Marker Color": "Chat Marker Color",
+  "Chat Win Color": "Chat Win Color",
+  "AI's Turn": "AI's Turn",
+  "AI Marker Color": "AI Marker Color",
+  "AI Win Color": "AI Win Color",
+  "Chat Won": "Chat Won",
+  "Chat Lost": "Chat Lost",
+  "Draw Game": "Draw Game",
+  "Cannot Play Here": "Cannot Play Here",
+  "Game Ended Message Duration": "Game Ended Message Duration"
 }
