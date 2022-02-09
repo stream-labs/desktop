@@ -592,7 +592,6 @@ export class SourcesService extends StatefulService<ISourcesState> {
 
     // uncomment the source type to use it's React version
     const reactSourceProps: TSourceType[] = [
-
       'color_source',
       'image_source',
       'browser_source',
