@@ -592,8 +592,9 @@ export class SourcesService extends StatefulService<ISourcesState> {
 
     // uncomment the source type to use it's React version
     const reactSourceProps: TSourceType[] = [
-      // 'image_source',
+
       'color_source',
+      'image_source',
       'browser_source',
       // 'slideshow',
       'ffmpeg_source',
@@ -689,7 +690,7 @@ export class SourcesService extends StatefulService<ISourcesState> {
       this.windowsService.showWindow({
         componentName: windowComponentName,
         title: $t('Settings for %{sourceName}', {
-          sourceName: WidgetDisplayData(platform.type)[widgetType].name,
+          sourceName: WidgetDisplayData(platform.type)[widgetType]?.name || componentName,
         }),
         queryParams: { sourceId: source.sourceId, widgetType: WidgetType[widgetType] },
         size: {
