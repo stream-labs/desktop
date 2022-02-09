@@ -6,6 +6,7 @@ import {
   TCompactModeTab,
 } from './customization';
 import { $t } from './i18n';
+import { NavigationService } from './navigation';
 import { NicoliveProgramService } from './nicolive-program/nicolive-program';
 import { StreamingService } from './streaming';
 import { UserService } from './user';
@@ -16,6 +17,7 @@ export interface ICompactModeServiceState {
   streaming: boolean;
   programStarted: boolean;
   autoCompactMode: boolean;
+  navigating: boolean;
 }
 
 function shouldBeCompact(state: ICompactModeServiceState): boolean {
@@ -28,11 +30,13 @@ export class CompactModeService extends StatefulService<ICompactModeServiceState
   @Inject() streamingService: StreamingService;
   @Inject() nicoliveProgramService: NicoliveProgramService;
   @Inject() windowsService: WindowsService;
+  @Inject() navigationService: NavigationService;
 
   static defaultState: ICompactModeServiceState = {
     streaming: false,
     programStarted: false,
     autoCompactMode: false,
+    navigating: false,
   };
 
   init(): void {
@@ -41,6 +45,7 @@ export class CompactModeService extends StatefulService<ICompactModeServiceState
       autoCompactMode: this.customizationService.state.autoCompactMode,
       streaming: this.streamingService.state.streamingStatus !== 'offline',
       programStarted: this.nicoliveProgramService.state.status === 'onAir',
+      navigating: this.navigationService.state.currentPage !== 'Studio',
     });
     this.customizationService.settingsChanged.subscribe(state => {
       if ('autoCompactMode' in state) {
@@ -53,6 +58,9 @@ export class CompactModeService extends StatefulService<ICompactModeServiceState
     this.nicoliveProgramService.stateChange.subscribe(state => {
       this.setState({ programStarted: state.status === 'onAir' });
     });
+    this.navigationService.navigated.subscribe(state => {
+      this.setState({ navigating: state.currentPage !== 'Studio' });
+    });
   }
 
   private setState(statePatch: Partial<ICompactModeServiceState>) {
@@ -62,7 +70,9 @@ export class CompactModeService extends StatefulService<ICompactModeServiceState
     this.SET_STATE(statePatch);
     const newCompact = shouldBeCompact(this.state);
 
-    if (this.state.autoCompactMode) {
+    if (this.state.navigating && this.customizationService.state.compactMode) {
+      this.customizationService.setCompactMode(false);
+    } else if (this.state.autoCompactMode) {
       if (prevCompact !== newCompact || !prevAutoCompact) {
         this.customizationService.setCompactMode(newCompact);
       }
