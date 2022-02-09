@@ -25,9 +25,9 @@
   --color-accent-variant: @accent-hover;
 
   // border
-  --color-border-dark: rgba(@black, .6);
+  --color-border-dark: rgba(@black, .5);
   --color-border-light: rgba(@white, .15);
-  --color-border-accent:  @light-grey;
+  --color-border-accent:  @grey;
 
   // text
   --color-text: @light-grey;
@@ -40,8 +40,10 @@
   --color-button-label: @white;
   --color-button-primary: @text-secondary;
   --color-button-primary-hover: rgba(@text-secondary, .8);
-  --color-button-secondary: rgba(@grey, .6);
-  --color-button-secondary-hover: rgba(@grey, .4);
+  --color-button-secondary: rgba(@grey, .8);
+  --color-button-secondary-hover: rgba(@grey, .6);
+  --color-button-tertiary: rgba(@grey, .5);
+  --color-button-tertiary-hover: rgba(@grey, .4);
   --color-button-accent: @accent;
   --color-button-accent-hover: @accent-hover;
   --color-button-active-label: @black;
@@ -54,8 +56,8 @@
   --color-titlebar-action-hover: @white;
 
   // popper
-  --color-popper-bg-light: rgba(@bg-primary, .98);
-  --color-popper-bg-dark: rgba(@bg-secondary, .98);
+  --color-popper-bg-light: @bg-primary;
+  --color-popper-bg-dark: @bg-secondary;
 
   // bottom-line
   --color-bottom-line: darken(@text-secondary, 40%);
@@ -75,13 +77,14 @@
   --color-input-bg: rgba(@bg-primary, .6);
 
   // tooltip
-  --color-tooltip-bg: @bg-tertiary;
+  --color-tooltip-bg: @bg-secondary;
   --color-tooltip-text: @white;
-  --color-tooltip-border: rgba(@white, .2);
+  --color-tooltip-border: rgba(@light-grey, .2);
 
   // red
   --color-red: @red;
-  --color-red-dark: darken(@red, 20%);
+  --color-red-hover: darken(@red, 15%);
+  --color-red-dark: darken(@red, 40%);
 
   // error
   --color-error: @red;

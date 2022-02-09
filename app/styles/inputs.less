@@ -4,6 +4,7 @@ input[type=password],
 textarea {
   color: var(--color-text);
   font-size: @font-size4;
+  height: @item-generic-size;
   border: 1px solid var(--color-border-light);
   border-radius: 4px;
   background: var(--color-input-bg);
@@ -40,7 +41,7 @@ textarea {
 
 .input {
   &.disabled {
-    opacity: .5;
+    opacity: @opacity-disabled;
   }
 }
 
@@ -109,7 +110,7 @@ textarea {
     content: @n-air--codepoint--search;
     font-family: n-air;
     .absolute(@top: 0, @right: 8px, @bottom: 0);
-    line-height: 36px;
+    line-height: @item-generic-size;
   }
 }
 
@@ -132,7 +133,7 @@ textarea {
         top: 2px;
         width: 16px;
         height: 16px;
-        border-color: var(--color-input);
+        border: 2px solid var(--color-input);
         background-color: transparent;
       }
     }
@@ -144,19 +145,26 @@ textarea {
       }
 
       &:after {
+        content: @n-air--codepoint--check;
         top: 4px;
         left: 2px;
-        color: var(--color-bg-secondary)
+        color: var(--color-bg-secondary);
+        background-color: transparent;
       }
     }
-  }
 
-  label {
-    font-size: @font-size4;
-    color: var(--color-text);
-    line-height: 20px;
-    padding-left: 24px;
-    cursor: pointer;
+    label {
+      font-size: @font-size4;
+      color: var(--color-text);
+      line-height: 20px;
+      padding-left: 24px;
+      cursor: pointer;
+    }
+
+    &:disabled + label {
+      opacity: @opacity-disabled;
+      cursor: not-allowed;
+    }
   }
 
   &:last-child {
@@ -237,7 +245,7 @@ textarea {
 }
 
 .multiselect {
-  min-height: 36px;
+  min-height: @item-generic-size;
   width: 100%;
 }
 
@@ -246,9 +254,9 @@ textarea {
   padding: 0;
   width: auto;
   height: auto;
-  right: 8px;
+  right: 0;
   top: 0px;
-  line-height: 32px;
+  line-height: @item-generic-size;
   position: relative;
 
   &:before {
@@ -257,8 +265,8 @@ textarea {
     border: none;
     font-size: @font-size1;
     position: absolute;
-    right: 4px;
-    top: 2px;
+    right: 12px;
+    pointer-events: none;
   }
 }
 
@@ -279,7 +287,7 @@ textarea {
 .multiselect__input,
 .multiselect__single {
   &:hover, &:focus {
-    border-color: var(--color-border-hover);
+    border-color: var(--color-border-accent);
   }
 }
 
@@ -310,9 +318,9 @@ textarea {
 
 .multiselect__option {
   padding: 0px 8px;
-  height: 36px;
+  height: @item-generic-size;
   min-height: 0;
-  line-height: 36px;
+  line-height: @item-generic-size;
   .transition;
   display: block;
   cursor: pointer;
@@ -342,11 +350,11 @@ textarea {
 }
 
 .multiselect__option--disabled {
-  opacity: .5;
+  opacity: @opacity-disabled;
 }
 
 .multiselect--disabled {
-  opacity: .5;
+  opacity: @opacity-disabled;
 
   &:focus {
     outline: none;
@@ -361,10 +369,14 @@ textarea {
 
 .input-wrapper--inverted {
   input[type="text"] {
-    background: @input-bg;
+    background: var(--color-input-bg);
   }
 
   .multiselect__content {
-    background: @input-bg;
+    background: var(--color-input-bg);
   }
+}
+
+.custom-select-trigger:after {
+  content: @n-air--codepoint--drop-down-arrow;
 }

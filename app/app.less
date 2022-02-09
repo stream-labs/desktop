@@ -4,7 +4,6 @@
 @import "./styles/custom-icons";
 @import "./styles/inputs";
 @import "./styles/tooltips";
-@import "./styles/twitchalertsCustom";
 @import '~codemirror/lib/codemirror.css';
 
 body {
@@ -154,13 +153,13 @@ h4 {
   }
 
   .multiselect__input {
-    background: #45535a; // TODO: 該当箇所がわかったら差し替える
+    background: var(--color-input-bg);
     border-color: transparent;
     color: var(--color-text-light);
   }
 
   .multiselect__content {
-    background: #45535a;
+    background: var(--color-input-bg);
     border-color: transparent;
   }
 }
@@ -283,7 +282,7 @@ h4 {
 
 select {
   .radius;
-  height: 36px;
+  height: @item-generic-size;
 }
 
 table {

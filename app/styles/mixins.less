@@ -88,7 +88,7 @@
 
 // opacity
 .opacity() {
-  opacity: .26;
+  opacity: @opacity-disabled;
 }
 
 // Typography
@@ -314,7 +314,7 @@
   background-color: rgba(@color, .25);
 }
 
-.text-ellipsis() {
+.text-ellipsis {
   text-overflow: ellipsis;
   white-space: nowrap;
   overflow: hidden;
@@ -324,15 +324,15 @@
   border-@{direction}: 1px solid var(--color-border-dark);
 }
 
-.time-styling() {
+.time-styling {
   .semibold;
   font-size: @font-size2;
   white-space: nowrap;
-  letter-spacing: .1em;
+  letter-spacing: .08em;
   color: var(--color-text-light);
 }
 
-.popper-styling() {
+.popper-styling {
   .shadow;
   z-index: @z-index-popper;
   border-radius: 4px;

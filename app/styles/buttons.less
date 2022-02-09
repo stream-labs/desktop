@@ -9,7 +9,7 @@ button {
   .transition;
   .radius();
 
-  height: 36px;
+  height: @item-generic-size;
   line-height: normal;
   font-size: @font-size4;
   color: var(--color-button-label);
@@ -57,6 +57,20 @@ button {
   }
 }
 
+.button--tertiary {
+  background-color: var(--color-button-tertiary);
+
+  &:hover,
+  &:focus {
+    background-color: var(--color-button-tertiary-hover);
+  }
+
+  &:disabled,
+  &:disabled:hover {
+    background-color: var(--color-button-tertiary);
+  }
+}
+
 .button--action,
 .button--accent {
   background-color: var(--color-button-accent);
@@ -99,17 +113,15 @@ button {
 // live中の赤ボタン
 .button--live {
   background-color: var(--color-red);
-  border: 1px solid var(--color-red);
 
   &:focus,
   &:hover {
-    background-color: var(--color-red-dark);
+    background-color: var(--color-red-hover);
   }
 
   &:disabled,
   &:disabled:hover {
-    background-color: var(--color-red-dark);
-    border: none;
+    opacity: @opacity-disabled;
   }
 }
 
@@ -215,38 +227,32 @@ button {
 .button--go-live,
 .button--start-program {
   color: var(--color-button-label);
-  background-color: var(--color-button-accent);
+  background-color: var(--color-button-secondary);
+  border-radius: 20px;
 
   &:hover,
   &:focus {
-    background-color: var(--color-button-accent-hover);
+    background-color: var(--color-button-secondary-hover);
+    border-radius: 20px;
   }
 
   &:disabled,
   &:disabled:hover {
-    background-color: var(--color-button-accent);
+    background-color: var(--color-button-secondary);
   }
 }
 
 .button--soft-warning {
   color: var(--color-button-label);
   background: var(--color-red);
-  border: 1px solid var(--color-red);
-  font-size: 20px;
 
   &:focus,
   &:hover {
-    background: var(--color-red-dark);
-    border: 1px solid var(--color-red);
+    background: var(--color-red-hover);
   }
 
   &:disabled {
-    background-color: var(--color-red-dark);
-    border-color: var(--color-red-dark);
-
-    &:hover {
-      background-color: var(--color-red-dark);
-    }
+    opacity: @opacity-disabled;
   }
 }
 
@@ -302,8 +308,8 @@ button {
 }
 
 .button--circle {
-  width: 32px;
-  height: 32px;
+  width: @item-generic-size;
+  height: @item-generic-size;
   display: flex;
   align-items: center;
   justify-content: center;
