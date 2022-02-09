@@ -191,7 +191,7 @@
     "recursive-readdir": "2.2.2",
     "rxjs": "6.3.3",
     "serve-handler": "5.0.7",
-    "shelljs": "0.8.4",
+    "shelljs": "0.8.5",
     "signtool": "1.0.0",
     "sl-vue-tree": "https://github.com/stream-labs/sl-vue-tree.git",
     "sockjs": "0.3.20",
