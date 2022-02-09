@@ -6,11 +6,6 @@ export type TWidgetType = 'AlertBox' | 'ViewerCount' | 'GameWidget';
 
 export interface IWidgetConfig {
   type: TWidgetType;
-  name: string;
-  description: string;
-  demoVideo: boolean;
-  demoFilename: string;
-  supportList?: string[];
 
   // Default transform for the widget
   defaultTransform: {
@@ -47,11 +42,6 @@ export function getWidgetsConfig(host: string, token: string): Record<TWidgetTyp
   return {
     AlertBox: {
       type: 'AlertBox',
-      name: $t('Alertbox'),
-      description: $t('Thanks viewers with notification popups.'),
-      demoVideo: true,
-      demoFilename: 'source-alertbox.mp4',
-      supportList: [$t('Donations'), $t('Subscriptions'), $t('Follows'), $t('Bits'), $t('Hosts')],
 
       defaultTransform: {
         width: 800,
@@ -77,12 +67,6 @@ export function getWidgetsConfig(host: string, token: string): Record<TWidgetTyp
 
     ViewerCount: {
       type: 'ViewerCount',
-      name: $t('Viewer Count'),
-      description: $t('Show off your viewers from multiple platforms.'),
-      demoVideo: false,
-      demoFilename: 'source-viewer-count.png',
-      supportList: ['YouTube', 'Twitch', 'Facebook'],
-      url: `https://${host}/widgets/viewer-count?token=${token}`,
 
       defaultTransform: {
         width: 600,
@@ -97,6 +81,7 @@ export function getWidgetsConfig(host: string, token: string): Record<TWidgetTyp
         height: 900,
       },
 
+      url: `https://${host}/widgets/viewer-count?token=${token}`,
       previewUrl: `https://${host}/widgets/viewer-count?token=${token}&simulate=1`,
       dataFetchUrl: `https://${host}/api/v5/slobs/widget/viewercount`,
       settingsSaveUrl: `https://${host}/api/v5/slobs/widget/viewercount`,
@@ -107,11 +92,6 @@ export function getWidgetsConfig(host: string, token: string): Record<TWidgetTyp
 
     GameWidget: {
       type: 'GameWidget',
-      name: $t('Game Widget'),
-      description: $t('Let your viewers play a game in chat'),
-      demoVideo: false,
-      demoFilename: '',
-      url: `https://${host}/widgets/game-widget?token=${token}`,
 
       defaultTransform: {
         width: 400,
@@ -121,6 +101,7 @@ export function getWidgetsConfig(host: string, token: string): Record<TWidgetTyp
         anchor: AnchorPoint.NorthEast,
       },
 
+      url: `https://${host}/widgets/game-widget?token=${token}`,
       previewUrl: `https://${host}/widgets/game-widget?token=${token}&simulate=1`,
       dataFetchUrl: `https://${host}/api/v5/slobs/widget/gamewidget`,
       settingsSaveUrl: `https://${host}/api/v5/slobs/widget/gamewidget`,
