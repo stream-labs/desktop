@@ -670,7 +670,7 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
       }
     }
 
-    if (prevState !== nextState && (prevState === PanelState.COMPACT || nextState === PanelState.COMPACT)) {
+    if (prevState !== null && (prevState === PanelState.COMPACT) !== (nextState === PanelState.COMPACT)) {
       const [x, y] = win.getPosition();
       if (sizeState.backupX !== undefined && sizeState.backupY !== undefined) {
         win.setPosition(sizeState.backupX, sizeState.backupY);
