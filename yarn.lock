@@ -2112,6 +2112,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/qrcode.react@npm:^1.0.2":
+  version: 1.0.2
+  resolution: "@types/qrcode.react@npm:1.0.2"
+  dependencies:
+    "@types/react": "*"
+  checksum: be256f0192366b4c0822da43c732bf3e29beb954c89d739aa770f09e5160842a3ca4d6814cb57bbcbbf8997cf7af0b998de318dab957f0820f267bb746c9a329
+  languageName: node
+  linkType: hard
+
 "@types/react-redux@npm:^7.1.16":
   version: 7.1.16
   resolution: "@types/react-redux@npm:7.1.16"
@@ -2772,17 +2781,6 @@ __metadata:
     webpack-dev-server:
       optional: true
   checksum: 1e2797dcd0e62e74c33a335d08a2a45af496a29653daff917f21abf412ab669b74b5020b9983124053ba9ec04698a2bcce6b4f87f65ac62b4fa543a10f31a678
-  languageName: node
-  linkType: hard
-
-"@xkeshi/vue-qrcode@npm:0.3.0":
-  version: 0.3.0
-  resolution: "@xkeshi/vue-qrcode@npm:0.3.0"
-  dependencies:
-    qrious: ^4.0.2
-  peerDependencies:
-    vue: ^2.2.0
-  checksum: 999f2f09a079abb14a28e85b0bd26c24bec9886e9c16f6ef18333c6e5de8c361233f1724c4ab7fe58bebfa579b27b6d5469c1308d5fdd550fea4e05831556cd1
   languageName: node
   linkType: hard
 
@@ -11817,7 +11815,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"prop-types@npm:^15.5.10, prop-types@npm:^15.6.2, prop-types@npm:^15.7.2":
+"prop-types@npm:^15.5.10, prop-types@npm:^15.6.0, prop-types@npm:^15.6.2, prop-types@npm:^15.7.2":
   version: 15.7.2
   resolution: "prop-types@npm:15.7.2"
   dependencies:
@@ -11939,10 +11937,23 @@ __metadata:
   languageName: node
   linkType: hard
 
-"qrious@npm:^4.0.2":
-  version: 4.0.2
-  resolution: "qrious@npm:4.0.2"
-  checksum: 13c72ca7d2738cb73bcda25fb98b32004e136bfbfb154355ebbccac396fa3e2d46ecf6b298abd745c8cbc60e839868a8ec3aef1995c65983ad74bdbde43bc56c
+"qr.js@npm:0.0.0":
+  version: 0.0.0
+  resolution: "qr.js@npm:0.0.0"
+  checksum: 5ac6c393967bdeaa660e7fd3a501a25eb538c1f6008a4d30ab2b97bbe520e5c236530090773f1578aa0a523cdaa6923c866615e21143f9e7cd22abd41c789b69
+  languageName: node
+  linkType: hard
+
+"qrcode.react@npm:^1.0.1":
+  version: 1.0.1
+  resolution: "qrcode.react@npm:1.0.1"
+  dependencies:
+    loose-envify: ^1.4.0
+    prop-types: ^15.6.0
+    qr.js: 0.0.0
+  peerDependencies:
+    react: ^15.5.3 || ^16.0.0 || ^17.0.0
+  checksum: 154a9557d103fa776cd99bc0d2600b862be74872ff965052533bc38ea0606c4d0965b4dd6df93e53f1db86699517a25db2718bbbc08c5d535a90c0d335552e9a
   languageName: node
   linkType: hard
 
@@ -13781,6 +13792,7 @@ __metadata:
     "@types/node": 16.7.13
     "@types/node-fetch": 2.5.10
     "@types/overlayscrollbars": 1.12.0
+    "@types/qrcode.react": ^1.0.2
     "@types/react": 17.0.8
     "@types/request": 2.48.5
     "@types/semver": 6.2.1
@@ -13791,7 +13803,6 @@ __metadata:
     "@typescript-eslint/eslint-plugin": 3.10.1
     "@typescript-eslint/parser": 3.10.1
     "@vue/babel-preset-jsx": 1.2.4
-    "@xkeshi/vue-qrcode": 0.3.0
     abort-controller: ^3.0.0
     amazon-s3-uri: 0.0.3
     antd: 4.16.7
@@ -13862,6 +13873,7 @@ __metadata:
     prettier-eslint: 12.0.0
     pretty-bytes: ^5.6.0
     progress: 2.0.0
+    qrcode.react: ^1.0.1
     raven: ^2.6.4
     raw-loader: 2.0.0
     rc-animate: 3.1.1
