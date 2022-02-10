@@ -70,24 +70,32 @@ export class CompactModeService extends StatefulService<ICompactModeServiceState
     this.SET_STATE(statePatch);
     const newCompact = shouldBeCompact(this.state);
 
-    if (this.state.navigating && this.customizationService.state.compactMode) {
-      this.customizationService.setCompactMode(false);
+    if (this.state.navigating) {
+      if (this.customizationService.state.compactMode) {
+        this.customizationService.setCompactMode(false);
+      }
     } else if (this.state.autoCompactMode) {
       if (prevCompact !== newCompact || !prevAutoCompact) {
         this.customizationService.setCompactMode(newCompact);
       }
     } else {
-      if (this.customizationService.state.showAutoCompactDialog) {
-        if (!prevCompact && newCompact && !this.customizationService.state.compactMode) {
-          this.windowsService.showWindow({
-            title: $t('settings.autoCompact.title'),
-            componentName: 'AutoCompactConfirmDialog',
-            size: {
-              width: 500,
-              height: 264,
-            },
-          });
-        }
+      // 放送終了時、自動コンパクトモードでなく、コンパクトモードになっていた場合
+      // 自動コンパクトモードダイアログを出す
+      if (
+        'programStarted' in statePatch &&
+        !statePatch.programStarted &&
+        !this.customizationService.state.autoCompactMode &&
+        this.customizationService.state.showAutoCompactDialog &&
+        this.customizationService.state.compactMode
+      ) {
+        this.windowsService.showWindow({
+          title: $t('settings.autoCompact.title'),
+          componentName: 'AutoCompactConfirmDialog',
+          size: {
+            width: 500,
+            height: 264,
+          },
+        });
       }
     }
   }
