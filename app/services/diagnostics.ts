@@ -7,7 +7,7 @@ import prettyBytes from 'pretty-bytes';
 import Utils from './utils';
 import os from 'os';
 import { EDeviceType, HardwareService, IDevice } from './hardware';
-import { ScenesService } from './scenes';
+import { SceneItem, ScenesService } from './scenes';
 import { UserService } from './user';
 import { SourceFiltersService } from './source-filters';
 import { StreamingService } from './api/external-api/streaming';
@@ -16,8 +16,9 @@ import Vue from 'vue';
 import { PerformanceService } from './performance';
 import { jfetch } from 'util/requests';
 import { CacheUploaderService } from './cache-uploader';
-import { AudioService } from './audio';
+import { AudioService, AudioSource, E_AUDIO_CHANNELS } from './audio';
 import { getOS, OS } from 'util/operating-systems';
+import { Source, SourcesService } from './sources';
 
 interface IStreamDiagnosticInfo {
   startTime: number;
@@ -132,6 +133,7 @@ export class DiagnosticsService extends PersistentStatefulService<IDiagnosticsSe
   @Inject() performanceService: PerformanceService;
   @Inject() cacheUploaderService: CacheUploaderService;
   @Inject() audioService: AudioService;
+  @Inject() sourcesService: SourcesService;
 
   static defaultState: IDiagnosticsServiceState = {
     streams: [],
@@ -216,12 +218,25 @@ export class DiagnosticsService extends PersistentStatefulService<IDiagnosticsSe
     const devices = this.generateDevicesSection();
     const scenes = this.generateScenesSection();
     const streams = this.generateStreamsSection();
+    const network = this.generateNetworkSection();
 
     // Problems section needs to be generated last, because it relies on the
     // problems array that all other sections add to.
     const problems = this.generateProblemsSection();
 
-    const report = [top, problems, user, system, streams, video, output, audio, devices, scenes];
+    const report = [
+      top,
+      problems,
+      user,
+      system,
+      streams,
+      video,
+      output,
+      network,
+      audio,
+      devices,
+      scenes,
+    ];
 
     return report.join('');
   }
@@ -387,6 +402,7 @@ export class DiagnosticsService extends PersistentStatefulService<IDiagnosticsSe
   private generateSystemSection() {
     const cpus = os.cpus();
     let gpuSection: Object;
+    let isAdmin: string | boolean = 'N/A';
 
     if (getOS() === OS.Windows) {
       const gpuInfo = this.getWmiClass('Win32_VideoController', [
@@ -405,6 +421,10 @@ export class DiagnosticsService extends PersistentStatefulService<IDiagnosticsSe
           'Driver Date': gpu.DriverDate,
         };
       });
+
+      isAdmin = this.isRunningAsAdmin();
+
+      if (!isAdmin) this.logProblem('Not running as admin');
     }
 
     return new Section('System', {
@@ -419,6 +439,18 @@ export class DiagnosticsService extends PersistentStatefulService<IDiagnosticsSe
         Free: prettyBytes(os.freemem()),
       },
       Graphics: gpuSection ?? 'This information is not available on macOS reports',
+      'Running as Admin': isAdmin,
+    });
+  }
+
+  private generateNetworkSection() {
+    const settings = this.settingsService.views.values;
+
+    return new Section('Network', {
+      'Bind to IP': settings.Advanced.BindIP,
+      'Dynamic Bitrate': settings.Advanced.DynamicBitrate,
+      'New Networking Code': settings.Advanced.NewSocketLoopEnable,
+      'Low Latency Mode': settings.Advanced.LowLatencyEnable,
     });
   }
 
@@ -427,7 +459,7 @@ export class DiagnosticsService extends PersistentStatefulService<IDiagnosticsSe
     const devices = this.hardwareService.getDevices();
 
     function audioDeviceObj(deviceId: string) {
-      if (deviceId == null) return 'Disabled';
+      if (deviceId == null) return {};
 
       const deviceObj = devices.find(device => deviceId === device.id);
 
@@ -437,16 +469,29 @@ export class DiagnosticsService extends PersistentStatefulService<IDiagnosticsSe
       };
     }
 
+    const globalSources = {};
+
+    [1, 2, 3, 4, 5].forEach(channel => {
+      const source = this.sourcesService.views.getSourceByChannel(channel);
+      const name = ['', 'Desktop Audio', 'Desktop Audio 2', 'Mic/Aux', 'Mic/Aux 2', 'Mix/Aux 3'][
+        channel
+      ];
+
+      if (source) {
+        globalSources[name] = {
+          ...audioDeviceObj(settings.Audio[name] as string),
+          ...this.generateSourceData(source),
+        };
+      } else {
+        globalSources[name] = 'Disabled';
+      }
+    });
+
     return new Section('Audio', {
       'Sample Rate': settings.Audio.SampleRate,
       Channels: settings.Audio.ChannelSetup,
-      'Global Sources': {
-        'Desktop Audio': audioDeviceObj(settings.Audio['Desktop Audio'] as string),
-        'Desktop Audio 2': audioDeviceObj(settings.Audio['Desktop Audio 2'] as string),
-        'Mic/Aux': audioDeviceObj(settings.Audio['Mic/Aux'] as string),
-        'Mic/Aux 2': audioDeviceObj(settings.Audio['Mic/Aux 2'] as string),
-        'Mic/Aux 3': audioDeviceObj(settings.Audio['Mic/Aux 3'] as string),
-      },
+      'Global Sources': globalSources,
+      'Monitoring Device': settings.Advanced.MonitoringDeviceName,
     });
   }
 
@@ -473,6 +518,19 @@ export class DiagnosticsService extends PersistentStatefulService<IDiagnosticsSe
   private generateScenesSection() {
     const sceneData = {};
 
+    this.scenesService.views.scenes.map(s => {
+      sceneData[s.name] = s.getItems().map(si => {
+        return this.generateSourceData(si.getSource(), si);
+      });
+    });
+
+    return new Section('Scenes', {
+      'Active Scene': this.scenesService.views.activeScene.name,
+      Scenes: sceneData,
+    });
+  }
+
+  private generateSourceData(source: Source, sceneItem?: SceneItem) {
     // Non-translated plain names for widget types
     const widgetLookup = [
       'AlertBox',
@@ -499,75 +557,84 @@ export class DiagnosticsService extends PersistentStatefulService<IDiagnosticsSe
       'ChatHighlight',
     ];
 
-    this.scenesService.views.scenes.map(s => {
-      sceneData[s.name] = s.getItems().map(si => {
-        const source = si.getSource();
-        const propertiesManagerType = source.getPropertiesManagerType();
-        const propertiesManagerSettings = source.getPropertiesManagerSettings();
+    const propertiesManagerType = source.getPropertiesManagerType();
+    const propertiesManagerSettings = source.getPropertiesManagerSettings();
 
-        const sourceData = {
-          Name: source.name,
-          Type: source.type,
+    let sourceData = {
+      Name: source.name,
+      Type: source.type,
+    };
+
+    if (propertiesManagerType === 'widget') {
+      sourceData['Widget Type'] = widgetLookup[propertiesManagerSettings.widgetType];
+    } else if (propertiesManagerType === 'streamlabels') {
+      sourceData['Streamlabel Type'] = propertiesManagerSettings.statname;
+    }
+
+    // TODO: Handle macOS
+    if (source.type === 'dshow_input') {
+      const deviceId = source.getObsInput().settings['video_device_id'];
+      const device = this.hardwareService.getDshowDevices().find(d => d.id === deviceId);
+
+      if (device == null) {
+        this.logProblem(
+          `Source ${source.name} references device ${deviceId} which could not be found on the system.`,
+        );
+      }
+
+      sourceData['Selected Device Id'] = deviceId;
+      sourceData['Selected Device Name'] = device?.description ?? '<DEVICE NOT FOUND>';
+    }
+
+    if (source.audio) {
+      sourceData = { ...sourceData, ...this.generateAudioSourceData(source.sourceId) };
+    }
+
+    if (sceneItem) {
+      sourceData['Visible'] = sceneItem.visible;
+    }
+
+    sourceData['Filters'] = this.sourceFiltersService.views
+      .filtersBySourceId(source.sourceId)
+      .map(f => {
+        return {
+          Name: f.name,
+          Type: f.type,
+          Enabled: f.visible,
+
+          // TODO: Decide if settings are needed - it adds a lot of noise
+          // Settings: f.settings,
         };
-
-        if (propertiesManagerType === 'widget') {
-          sourceData['Widget Type'] = widgetLookup[propertiesManagerSettings.widgetType];
-        } else if (propertiesManagerType === 'streamlabels') {
-          sourceData['Streamlabel Type'] = propertiesManagerSettings.statname;
-        }
-
-        // TODO: Handle macOS
-        if (source.type === 'dshow_input') {
-          const deviceId = source.getObsInput().settings['video_device_id'];
-          const device = this.hardwareService.getDshowDevices().find(d => d.id === deviceId);
-
-          if (device == null) {
-            this.logProblem(
-              `Source ${source.name} references device ${deviceId} which could not be found on the system.`,
-            );
-          }
-
-          sourceData['Selected Device Id'] = deviceId;
-          sourceData['Selected Device Name'] = device?.description ?? '<DEVICE NOT FOUND>';
-        }
-
-        if (source.audio && this.settingsService.state.Output.type === 1) {
-          const tracks = Utils.numberToBinnaryArray(
-            this.audioService.views.getSource(source.sourceId).audioMixers,
-            6,
-          ).reverse();
-          const enabledTracks = tracks.reduce((arr, val, idx) => {
-            if (val) {
-              return [...arr, idx + 1];
-            }
-
-            return arr;
-          }, []);
-
-          sourceData['Enabled Audio Tracks'] = enabledTracks.join(', ');
-        }
-
-        sourceData['Filters'] = this.sourceFiltersService.views
-          .filtersBySourceId(source.sourceId)
-          .map(f => {
-            return {
-              Name: f.name,
-              Type: f.type,
-              Enabled: f.visible,
-
-              // TODO: Decide if settings are needed - it adds a lot of noise
-              // Settings: f.settings,
-            };
-          });
-
-        return sourceData;
       });
-    });
 
-    return new Section('Scenes', {
-      'Active Scene': this.scenesService.views.activeScene.name,
-      Scenes: sceneData,
-    });
+    return sourceData;
+  }
+
+  private generateAudioSourceData(sourceId: string) {
+    const sourceData = {};
+    const audioSource = this.audioService.views.getSource(sourceId);
+
+    if (this.settingsService.state.Output.type === 1) {
+      const tracks = Utils.numberToBinnaryArray(audioSource.audioMixers, 6).reverse();
+      const enabledTracks = tracks.reduce((arr, val, idx) => {
+        if (val) {
+          return [...arr, idx + 1];
+        }
+
+        return arr;
+      }, []);
+
+      sourceData['Enabled Audio Tracks'] = enabledTracks.join(', ');
+    }
+
+    sourceData['Muted'] = audioSource.muted;
+    sourceData['Volume'] = audioSource.fader.deflection * 100;
+    sourceData['Monitoring'] = ['Monitor Off', 'Monitor Only (mute output)', 'Monitor and Output'][
+      audioSource.monitoringType
+    ];
+    sourceData['Sync Offset'] = audioSource.syncOffset;
+
+    return sourceData;
   }
 
   private generateStreamsSection() {
@@ -631,6 +698,15 @@ export class DiagnosticsService extends PersistentStatefulService<IDiagnosticsSe
     });
 
     return wmiObject;
+  }
+
+  private isRunningAsAdmin() {
+    try {
+      cp.execSync('net session > nul 2>&1');
+      return true;
+    } catch (e: unknown) {
+      return false;
+    }
   }
 
   @mutation({ sync: false })
