@@ -41,7 +41,7 @@ export function EmoteWall() {
             onChange={combo_required => updateComboRequired({ combo_required })} 
           />          
           {isComboRequired && (
-            <InputWrapper>
+            <InputWrapper nowrap={true}>
               <SliderInput label={$t('Combo Count')} min={2} max={100} {...bind.combo_count} />
               <SliderInput label={$t('Combo Timeframe')} min={1} max={60} {...bind.combo_timeframe} />
             </InputWrapper>
