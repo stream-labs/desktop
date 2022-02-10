@@ -5,7 +5,6 @@ import InputWrapper from '../shared/inputs/InputWrapper';
 import { $t } from '../../services/i18n';
 import {
   createBinding,
-  NumberInput,
   SliderInput,
   SwitchInput,
 } from '../shared/inputs';
