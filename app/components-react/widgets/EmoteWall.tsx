@@ -5,6 +5,7 @@ import InputWrapper from '../shared/inputs/InputWrapper';
 import { $t } from '../../services/i18n';
 import { createBinding, SliderInput, SwitchInput } from '../shared/inputs';
 import { IEmoteWallSettings } from 'services/widgets/settings/emote-wall';
+import {metadata} from "../shared/inputs/metadata";
 
 interface IEmoteWallState extends IWidgetState {
   data: {
@@ -22,6 +23,8 @@ interface IEmoteWallState extends IWidgetState {
 
 export function EmoteWall() {
   const { isLoading, bind, isComboRequired, updateComboRequired } = useEmoteWall();
+  const secondsFormatter = metadata.seconds({ min: 1000, max: 6000 });
+
   // use 1 column layout
   return (
     <WidgetLayout>
@@ -30,10 +33,7 @@ export function EmoteWall() {
           <SwitchInput label={$t('Enabled')} {...bind.enabled} />
           <SliderInput
             label={$t('Duration')}
-            min={1000}
-            max={60000}
-            step={1000}
-            tipFormatter={(ms: number) => `${ms / 1000}s`}
+            {...secondsFormatter}
             {...bind.emote_animation_duration}
           />
           <SliderInput label={$t('Emote Scale')} min={1} max={10} {...bind.emote_scale} />
@@ -48,10 +48,7 @@ export function EmoteWall() {
               <SliderInput label={$t('Combo Count')} min={2} max={100} {...bind.combo_count} />
               <SliderInput
                 label={$t('Combo Timeframe')}
-                min={1000}
-                max={60000}
-                step={1000}
-                tipFormatter={(ms: number) => `${ms / 1000}s`}
+                {...secondsFormatter}
                 {...bind.combo_timeframe}
               />
             </InputWrapper>
