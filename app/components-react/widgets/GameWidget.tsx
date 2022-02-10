@@ -3,15 +3,13 @@ import { IWidgetState, useWidget, WidgetModule } from './common/useWidget';
 import { WidgetLayout } from './common/WidgetLayout';
 import { $t } from '../../services/i18n';
 import { TextInput, ColorInput, createBinding, SliderInput } from '../shared/inputs';
-
 interface IGameWidgetState extends IWidgetState {
   data: {
     settings: {
       decision_poll_timer: number;
       trigger_command: string;
       current_game: 'tic-tac-toe';
-      chat_response_timer: string;
-      no_input_recieved_message: string;
+      no_input_received_message: string;
       restarting_game_message: string;
       available_games: 'tic-tac-toe'[];
       game_options: {
@@ -37,6 +35,10 @@ interface IGameWidgetState extends IWidgetState {
   };
 }
 
+function msToS(ms: number) {
+  return `${Math.floor(ms / 1000)}s`;
+}
+
 export function GameWidget() {
   const { isLoading, bind } = useGameWidget();
 
@@ -47,13 +49,13 @@ export function GameWidget() {
           <SliderInput
             label={$t('Chat Decision Time')}
             {...bind.decision_poll_timer}
-            min={0}
-            max={10}
-            divisor={1000}
+            min={1000}
+            max={10000}
+            step={1000}
+            tipFormatter={msToS}
           />
           <TextInput label={$t('Trigger Command')} {...bind.trigger_command} />
-          <TextInput label={$t('Chat Response Timer')} {...bind.chat_response_timer} />
-          <TextInput label={$t('No Input Recieved')} {...bind.no_input_recieved_message} />
+          <TextInput label={$t('No Input Recieved')} {...bind.no_input_received_message} />
           <TextInput label={$t('Restarting Game')} {...bind.restarting_game_message} />
           <GameOptions game="tic-tac-toe" />
         </>
@@ -137,13 +139,13 @@ function GameOptions(p: { game: string }) {
       />
       <TextInput
         label={$t('Chat Won')}
-        value={settings.game_options[game].chat_won_message}
-        onChange={updateGameOption('chat_won_message')}
+        value={settings.game_options[game].chat_won_game_message}
+        onChange={updateGameOption('chat_won_game_message')}
       />
       <TextInput
         label={$t('Chat Lost')}
-        value={settings.game_options[game].chat_lost_message}
-        onChange={updateGameOption('chat_lost_message')}
+        value={settings.game_options[game].chat_lost_game_message}
+        onChange={updateGameOption('chat_lost_game_message')}
       />
       <TextInput
         label={$t('Draw Game')}
@@ -156,12 +158,13 @@ function GameOptions(p: { game: string }) {
         onChange={updateGameOption('cannot_play_here')}
       />
       <SliderInput
-        label={$t('Game Ended Message Duration')}
+        label={$t('Game End Message Duration')}
         value={settings.game_options[game].game_ended_message_duration}
         onChange={updateGameOption('game_ended_message_duration')}
-        min={0}
-        max={10}
-        divisor={1000}
+        min={1000}
+        max={10000}
+        step={1000}
+        tipFormatter={msToS}
       />
     </>
   );

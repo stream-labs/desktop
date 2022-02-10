@@ -11,6 +11,7 @@ import Utils from '../../../services/utils';
 import { TAlertType } from '../../../services/widgets/alerts-config';
 import { alertAsync } from '../../modals';
 import { onUnload } from 'util/unload';
+import merge from 'lodash/merge';
 
 /**
  * Common state for all widgets
@@ -205,7 +206,9 @@ export class WidgetModule<TWidgetState extends IWidgetState = IWidgetState> {
    * Update settings and save on the server
    */
   public async updateSettings(formValues: any) {
-    const newSettings = { ...this.settings, ...formValues };
+    console.log(formValues);
+    const newSettings = merge(cloneDeep(this.settings), formValues);
+    console.log(newSettings);
     // save setting to the store
     this.setSettings(newSettings);
     // send setting to the server

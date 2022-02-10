@@ -9,7 +9,7 @@ import omit from 'lodash/omit';
 const ANT_SLIDER_FEATURES = ['min', 'max', 'step', 'tooltipPlacement', 'tipFormatter'] as const;
 
 export type TSliderInputProps = TSlobsInputProps<
-  { hasNumberInput?: boolean; slimNumberInput?: boolean; divisor?: number },
+  { hasNumberInput?: boolean; slimNumberInput?: boolean },
   number,
   SliderSingleProps,
   ValuesOf<typeof ANT_SLIDER_FEATURES>
@@ -29,7 +29,6 @@ export const SliderInput = InputComponent((partialProps: TSliderInputProps) => {
     if (typeof val !== 'number') return;
     if (typeof p.max === 'number' && val > p.max) return;
     if (typeof p.min === 'number' && val < p.min) return;
-    if (p.divisor) return inputAttrs.onChange(val * p.divisor);
     inputAttrs.onChange(val);
   }
 
@@ -37,11 +36,7 @@ export const SliderInput = InputComponent((partialProps: TSliderInputProps) => {
     <InputWrapper {...wrapperAttrs}>
       <Row>
         <Col flex="auto" {...dataAttrs} data-role="input" data-value={inputAttrs.value}>
-          <Slider
-            {...inputAttrs}
-            onChange={onChangeHandler}
-            value={p.divisor ? Math.floor(inputAttrs.value / p.divisor) : inputAttrs.value}
-          />
+          <Slider {...inputAttrs} onChange={onChangeHandler} />
         </Col>
 
         {p.hasNumberInput && (
@@ -52,7 +47,6 @@ export const SliderInput = InputComponent((partialProps: TSliderInputProps) => {
               // valid prop for InputNumber anyway, so we just omit it.
               {...omit(inputAttrs, 'tooltipPlacement')}
               onChange={onChangeHandler}
-              value={p.divisor ? Math.floor(inputAttrs.value / p.divisor) : inputAttrs.value}
               style={{ width: numberInputHeight, marginLeft: '8px' }}
             />
           </Col>

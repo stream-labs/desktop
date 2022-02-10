@@ -107,8 +107,8 @@ export function getWidgetsConfig(host: string, token: string): Record<TWidgetTyp
       dataFetchUrl: `https://${host}/api/v5/slobs/widget/game-widget`,
       settingsSaveUrl: `https://${host}/api/v5/slobs/widget/game-widget`,
       settingsUpdateEvent: 'gameWidgetSettingsUpdate',
-      customCodeAllowed: true,
-      customFieldsAllowed: true,
+      customCodeAllowed: false,
+      customFieldsAllowed: false,
     },
     // TODO:
     // BitGoal: {
