@@ -23,7 +23,7 @@ interface IEmoteWallState extends IWidgetState {
 
 export function EmoteWall() {
   const { isLoading, bind, isComboRequired, updateComboRequired } = useEmoteWall();
-  const secondsFormatter = metadata.seconds({ min: 1000, max: 6000 });
+  const secondsFormatter = metadata.seconds({ min: 1000, max: 60000 });
 
   // use 1 column layout
   return (
