@@ -22,7 +22,7 @@ interface IEmoteWallState extends IWidgetState {
 }
 
 export function EmoteWall() {
-  const { isLoading, bind, isComboRequired, updateComboRequired } = useEmoteWall();
+  const { isLoading, bind, isComboRequired } = useEmoteWall();
   const secondsFormatter = metadata.seconds({ min: 1000, max: 60000 });
 
   // use 1 column layout
@@ -38,11 +38,7 @@ export function EmoteWall() {
           />
           <SliderInput label={$t('Emote Scale')} min={1} max={10} {...bind.emote_scale} />
 
-          <SwitchInput
-            label={$t('Combo Required')}
-            value={isComboRequired}
-            onChange={combo_required => updateComboRequired(combo_required)}
-          />
+          <SwitchInput label={$t('Combo Required')} {...bind.combo_required} />
           {isComboRequired && (
             <InputWrapper nowrap={true}>
               <SliderInput label={$t('Combo Count')} min={2} max={100} {...bind.combo_count} />
@@ -69,10 +65,6 @@ export class EmoteWallModule extends WidgetModule<IEmoteWallState> {
 
   get isComboRequired() {
     return this.settings?.combo_required;
-  }
-
-  updateComboRequired(combo_required: boolean) {
-    this.updateSettings({ combo_required });
   }
 }
 
