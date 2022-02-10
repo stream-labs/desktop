@@ -153,7 +153,9 @@ export function getWidgetsConfig(host: string, token: string): Record<TWidgetTyp
     EmoteWall: {
       type: 'EmoteWall',
       name: $t('Emote Wall'),
-      description: $t('Display and animate emotes that are seen in chat, improving chat participation via positive feedback.'),
+      description: $t(
+        'Display and animate emotes that are seen in chat, improving chat participation via positive feedback.',
+      ),
       demoVideo: false,
       demoFilename: 'emote-wall.gif',
       supportList: ['Twitch'],
@@ -179,7 +181,7 @@ export function getWidgetsConfig(host: string, token: string): Record<TWidgetTyp
       customCodeAllowed: true,
       customFieldsAllowed: true,
     },
-    
+
     // EventList: {
     //
     // },
