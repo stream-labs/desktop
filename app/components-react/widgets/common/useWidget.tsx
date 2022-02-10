@@ -4,7 +4,6 @@ import { Services } from '../../service-provider';
 import { mutation } from '../../store';
 import { throttle } from 'lodash-decorators';
 import { assertIsDefined, getDefined } from '../../../util/properties-type-guards';
-import { TWidgetType } from '../../../services/widgets/widgets-config';
 import { TObsFormData } from '../../../components/obs/inputs/ObsInput';
 import { pick, cloneDeep } from 'lodash';
 import { $t } from '../../../services/i18n';
@@ -22,7 +21,7 @@ export interface IWidgetState {
   shouldCreatePreviewSource: boolean;
   previewSourceId: string;
   selectedTab: string;
-  type: TWidgetType;
+  type: WidgetType;
   browserSourceProps: TObsFormData;
   prevSettings: any;
   canRevert: boolean;
@@ -91,7 +90,7 @@ export class WidgetModule<TWidgetState extends IWidgetState = IWidgetState> {
     this.cancelUnload = onUnload(() => this.widget.destroyPreviewSource());
 
     // load settings from the server to the store
-    this.state.type = WidgetType[widget.type] as TWidgetType;
+    this.state.type = widget.type;
     const data = await this.fetchData();
     this.setData(data);
     this.setPrevSettings(data);

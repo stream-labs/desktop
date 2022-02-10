@@ -1,8 +1,9 @@
 import { AnchorPoint } from '../../util/ScalableRectangle';
 import { $t } from '../i18n';
 import { TAlertType } from './alerts-config';
+import { WidgetType } from './widgets-data';
 
-export type TWidgetType = 'AlertBox' | 'ViewerCount' | 'GameWidget';
+export type TWidgetType = WidgetType.AlertBox | WidgetType.ViewerCount | WidgetType.GameWidget;
 
 export interface IWidgetConfig {
   type: TWidgetType;
@@ -40,8 +41,8 @@ export interface IWidgetConfig {
 
 export function getWidgetsConfig(host: string, token: string): Record<TWidgetType, IWidgetConfig> {
   return {
-    AlertBox: {
-      type: 'AlertBox',
+    [WidgetType.AlertBox]: {
+      type: WidgetType.AlertBox,
 
       defaultTransform: {
         width: 800,
@@ -65,8 +66,8 @@ export function getWidgetsConfig(host: string, token: string): Record<TWidgetTyp
       customFieldsAllowed: false,
     },
 
-    ViewerCount: {
-      type: 'ViewerCount',
+    [WidgetType.ViewerCount]: {
+      type: WidgetType.ViewerCount,
 
       defaultTransform: {
         width: 600,
@@ -90,8 +91,8 @@ export function getWidgetsConfig(host: string, token: string): Record<TWidgetTyp
       customFieldsAllowed: true,
     },
 
-    GameWidget: {
-      type: 'GameWidget',
+    [WidgetType.GameWidget]: {
+      type: WidgetType.GameWidget,
 
       defaultTransform: {
         width: 400,

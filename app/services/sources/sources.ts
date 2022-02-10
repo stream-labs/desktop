@@ -681,7 +681,7 @@ export class SourcesService extends StatefulService<ISourcesState> {
 
     const defaultVueWindowSize = { width: 920, height: 1024 };
     const defaultReactWindowSize = { width: 600, height: 800 };
-    const widgetInfo = this.widgetsService.widgetsConfig[componentName];
+    const widgetInfo = this.widgetsService.widgetsConfig[WidgetType[componentName]];
     const { width, height } = isReactComponent
       ? widgetInfo.settingsWindowSize || defaultReactWindowSize
       : defaultVueWindowSize;

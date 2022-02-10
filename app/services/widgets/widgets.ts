@@ -24,6 +24,7 @@ import { THttpMethod } from './settings/widget-settings';
 import { TPlatform } from '../platforms';
 import { getAlertsConfig, TAlertType } from './alerts-config';
 import { getWidgetsConfig } from './widgets-config';
+import { WidgetDisplayData } from '.';
 
 export interface IWidgetSourcesState {
   widgetSources: Dictionary<IWidgetSource>;
@@ -75,21 +76,26 @@ export class WidgetsService
   createWidget(type: WidgetType, name?: string): SceneItem {
     if (!this.userService.isLoggedIn) return;
 
-    const scene = this.scenesService.views.activeScene;
-    const widget = WidgetDefinitions[type];
+    const widget = this.widgetsConfig[type] || WidgetDefinitions[type];
+    const widgetTransform = this.widgetsConfig[type]?.defaultTransform || WidgetDefinitions[type];
 
     const suggestedName =
       name ||
-      namingHelpers.suggestName(name || widget.name, (name: string) => {
+      namingHelpers.suggestName(name || WidgetDisplayData()[type]?.name, (name: string) => {
         return this.sourcesService.views.getSourcesByName(name).length;
       });
 
     // Calculate initial position
-    const rect = new ScalableRectangle({ x: 0, y: 0, width: widget.width, height: widget.height });
+    const rect = new ScalableRectangle({
+      x: 0,
+      y: 0,
+      width: widgetTransform.width,
+      height: widgetTransform.height,
+    });
 
-    rect.withAnchor(widget.anchor, () => {
-      rect.x = widget.x * this.videoService.baseWidth;
-      rect.y = widget.y * this.videoService.baseHeight;
+    rect.withAnchor(widgetTransform.anchor, () => {
+      rect.x = widgetTransform.x * this.videoService.baseWidth;
+      rect.y = widgetTransform.y * this.videoService.baseHeight;
     });
 
     const item = this.editorCommandsService.executeCommand(
@@ -98,9 +104,11 @@ export class WidgetsService
       suggestedName,
       'browser_source',
       {
-        url: widget.url(this.hostsService.streamlabs, this.userService.widgetToken),
-        width: widget.width,
-        height: widget.height,
+        url: this.widgetsConfig[type]
+          ? widget.url
+          : widget.url(this.hostsService.streamlabs, this.userService.widgetToken),
+        width: widgetTransform.width,
+        height: widgetTransform.height,
       },
       {
         sourceAddOptions: {
