@@ -661,7 +661,7 @@ export class SourcesService extends StatefulService<ISourcesState> {
       // ChatHighlight
       // Credits
       // DonationTicker
-      // EmoteWall
+      'EmoteWall',
       // EventList
       // MediaShare
       // Poll
