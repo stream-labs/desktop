@@ -39,6 +39,7 @@ interface IGameWidgetState extends IWidgetState {
 
 export function GameWidget() {
   const { isLoading, bind } = useGameWidget();
+
   return (
     <WidgetLayout>
       {!isLoading && (
@@ -54,63 +55,7 @@ export function GameWidget() {
           <TextInput label={$t('Chat Response Timer')} {...bind.chat_response_timer} />
           <TextInput label={$t('No Input Recieved')} {...bind.no_input_recieved_message} />
           <TextInput label={$t('Restarting Game')} {...bind.restarting_game_message} />
-          <ColorInput
-            label={$t('Background Color')}
-            {...bind.game_options['tic-tac-toe'].background_color}
-          />
-          <ColorInput
-            label={$t('Border Color')}
-            {...bind.game_options['tic-tac-toe'].border_color}
-          />
-          <TextInput label={$t('Chat Marker')} {...bind.game_options['tic-tac-toe'].chat_marker} />
-          <TextInput
-            label={$t("Chat's Turn")}
-            {...bind.game_options['tic-tac-toe'].chat_turn_message}
-          />
-          <ColorInput
-            label={$t('Chat Marker Color')}
-            {...bind.game_options['tic-tac-toe'].chat_marker_color}
-          />
-          <ColorInput
-            label={$t('Chat Win Color')}
-            {...bind.game_options['tic-tac-toe'].chat_win_marker_color}
-          />
-          <TextInput label={$t('AI Marker')} {...bind.game_options['tic-tac-toe'].ai_marker} />
-          <TextInput
-            label={$t("AI's Turn")}
-            {...bind.game_options['tic-tac-toe'].ai_turn_message}
-          />
-          <ColorInput
-            label={$t('AI Marker Color')}
-            {...bind.game_options['tic-tac-toe'].ai_marker_color}
-          />
-          <ColorInput
-            label={$t('AI Win Color')}
-            {...bind.game_options['tic-tac-toe'].ai_win_marker_color}
-          />
-          <TextInput
-            label={$t('Chat Won')}
-            {...bind.game_options['tic-tac-toe'].chat_won_message}
-          />
-          <TextInput
-            label={$t('Chat Lost')}
-            {...bind.game_options['tic-tac-toe'].chat_lost_message}
-          />
-          <TextInput
-            label={$t('Draw Game')}
-            {...bind.game_options['tic-tac-toe'].draw_game_message}
-          />
-          <TextInput
-            label={$t('Cannot Play Here')}
-            {...bind.game_options['tic-tac-toe'].cannot_play_here}
-          />
-          <SliderInput
-            label={$t('Game Ended Message Duration')}
-            {...bind.game_options['tic-tac-toe'].game_ended_message_duration}
-            min={0}
-            max={10}
-            divisor={1000}
-          />
+          <GameOptions game="tic-tac-toe" />
         </>
       )}
     </WidgetLayout>
@@ -122,16 +67,102 @@ export class GameWidgetModule extends WidgetModule<IGameWidgetState> {
     () => this.settings,
     statePatch => this.updateSettings(statePatch),
   );
-
-  patchAfterFetch(data: any): IGameWidgetState {
-    return { ...data };
-  }
-
-  patchBeforeSend(settings: IGameWidgetState['data']['settings']): any {
-    return { ...settings };
-  }
 }
 
 function useGameWidget() {
   return useWidget<GameWidgetModule>();
+}
+
+function GameOptions(p: { game: string }) {
+  const { settings, updateSettings } = useGameWidget();
+  const game = p.game;
+
+  function updateGameOption(key: string) {
+    return (value: any) => {
+      updateSettings({ game_options: { [game]: { [key]: value } } });
+    };
+  }
+
+  return (
+    <>
+      <ColorInput
+        label={$t('Background Color')}
+        value={settings.game_options[game].background_color}
+        onChange={updateGameOption('background_color')}
+      />
+      <ColorInput
+        label={$t('Border Color')}
+        value={settings.game_options[game].border_color}
+        onChange={updateGameOption('border_color')}
+      />
+      <TextInput
+        label={$t('Chat Marker')}
+        value={settings.game_options[game].chat_marker}
+        onChange={updateGameOption('chat_marker')}
+      />
+      <TextInput
+        label={$t("Chat's Turn")}
+        value={settings.game_options[game].chat_turn_message}
+        onChange={updateGameOption('chat_turn_message')}
+      />
+      <ColorInput
+        label={$t('Chat Marker Color')}
+        value={settings.game_options[game].chat_marker_color}
+        onChange={updateGameOption('chat_marker_color')}
+      />
+      <ColorInput
+        label={$t('Chat Win Color')}
+        value={settings.game_options[game].chat_win_marker_color}
+        onChange={updateGameOption('chat_win_marker_color')}
+      />
+      <TextInput
+        label={$t('AI Marker')}
+        value={settings.game_options[game].ai_marker}
+        onChange={updateGameOption('ai_marker')}
+      />
+      <TextInput
+        label={$t("AI's Turn")}
+        value={settings.game_options[game].ai_turn_message}
+        onChange={updateGameOption('ai_turn_message')}
+      />
+      <ColorInput
+        label={$t('AI Marker Color')}
+        value={settings.game_options[game].ai_marker_color}
+        onChange={updateGameOption('ai_marker_color')}
+      />
+      <ColorInput
+        label={$t('AI Win Color')}
+        value={settings.game_options[game].ai_win_marker_color}
+        onChange={updateGameOption('ai_win_color')}
+      />
+      <TextInput
+        label={$t('Chat Won')}
+        value={settings.game_options[game].chat_won_message}
+        onChange={updateGameOption('chat_won_message')}
+      />
+      <TextInput
+        label={$t('Chat Lost')}
+        value={settings.game_options[game].chat_lost_message}
+        onChange={updateGameOption('chat_lost_message')}
+      />
+      <TextInput
+        label={$t('Draw Game')}
+        value={settings.game_options[game].draw_game_message}
+        onChange={updateGameOption('draw_game_message')}
+      />
+      <TextInput
+        label={$t('Cannot Play Here')}
+        value={settings.game_options[game].cannot_play_here}
+        onChange={updateGameOption('cannot_play_here')}
+      />
+      <SliderInput
+        label={$t('Game Ended Message Duration')}
+        value={settings.game_options[game].game_ended_message_duration}
+        onChange={updateGameOption('game_ended_message_duration')}
+        min={0}
+        max={10}
+        divisor={1000}
+      />
+    </>
+  );
 }

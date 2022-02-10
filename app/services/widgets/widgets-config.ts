@@ -104,8 +104,8 @@ export function getWidgetsConfig(host: string, token: string): Record<TWidgetTyp
 
       url: `https://${host}/widgets/game-widget?token=${token}`,
       previewUrl: `https://${host}/widgets/game-widget?token=${token}&simulate=1`,
-      dataFetchUrl: `https://${host}/api/v5/slobs/widget/gamewidget`,
-      settingsSaveUrl: `https://${host}/api/v5/slobs/widget/gamewidget`,
+      dataFetchUrl: `https://${host}/api/v5/slobs/widget/game-widget`,
+      settingsSaveUrl: `https://${host}/api/v5/slobs/widget/game-widget`,
       settingsUpdateEvent: 'gameWidgetSettingsUpdate',
       customCodeAllowed: true,
       customFieldsAllowed: true,
