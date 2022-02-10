@@ -28,7 +28,14 @@ export function EmoteWall() {
       {!isLoading && (
         <>
           <SwitchInput label={$t('Enabled')} {...bind.enabled} />
-          <SliderInput label={$t('Duration')} min={1} max={60} {...bind.emote_animation_duration} />
+          <SliderInput
+            label={$t('Duration')}
+            min={1000}
+            max={60000}
+            step={1000}
+            tipFormatter={(ms: number) => `${ms / 1000}s`}
+            {...bind.emote_animation_duration}
+          />
           <SliderInput label={$t('Emote Scale')} min={1} max={10} {...bind.emote_scale} />
 
           <SwitchInput
@@ -41,8 +48,10 @@ export function EmoteWall() {
               <SliderInput label={$t('Combo Count')} min={2} max={100} {...bind.combo_count} />
               <SliderInput
                 label={$t('Combo Timeframe')}
-                min={1}
-                max={60}
+                min={1000}
+                max={60000}
+                step={1000}
+                tipFormatter={(ms: number) => `${ms / 1000}s`}
                 {...bind.combo_timeframe}
               />
             </InputWrapper>
@@ -67,27 +76,6 @@ export class EmoteWallModule extends WidgetModule<IEmoteWallState> {
 
   updateComboRequired(statePatch: Partial<IEmoteWallSettings>) {
     this.updateSettings(statePatch);
-  }
-
-  patchAfterFetch(data: any): IEmoteWallState {
-    // convert from milliseconds
-    return {
-      ...data,
-      settings: {
-        ...data.settings,
-        combo_timeframe: data.settings.combo_timeframe / 1000,
-        emote_animation_duration: data.settings.emote_animation_duration / 1000,
-      },
-    };
-  }
-
-  patchBeforeSend(settings: IEmoteWallState['data']['settings']): any {
-    // convert to milliseconds
-    return {
-      ...settings,
-      combo_timeframe: settings.combo_timeframe * 1000,
-      emote_animation_duration: settings.emote_animation_duration * 1000,
-    };
   }
 }
 
