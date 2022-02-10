@@ -1,14 +1,21 @@
 import Vue from 'vue';
+import { CompactModeService } from 'services/compact-mode';
 import { Inject } from 'services/core/injector';
-import { NicoliveProgramService } from 'services/nicolive-program/nicolive-program';
+import { StreamingService } from 'services/streaming';
 import { Component } from 'vue-property-decorator';
 
 @Component({})
 export default class BottomLine extends Vue {
   @Inject()
-  nicoliveProgramService: NicoliveProgramService;
+  streamingService: StreamingService;
+  @Inject()
+  compactModeService: CompactModeService;
 
-  get isOnAir(): boolean {
-    return this.nicoliveProgramService.state.status === 'onAir';
+  get isStreaming(): boolean {
+    return this.streamingService.state.streamingStatus === 'live';
+  }
+
+  get compactMode(): boolean {
+    return this.compactModeService.compactMode;
   }
 }
