@@ -50,6 +50,7 @@
 }
 
 .indicator {
+  .transition;
   display: flex;
   align-items: center;
   font-size: @font-size4;
@@ -61,8 +62,9 @@
   border-radius: 4px;
   cursor: pointer;
 
+
   &:hover {
-     .bg-hover;
+     background-color: var(--color-button-tertiary-hover);
   }
 
   > i {
