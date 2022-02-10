@@ -359,6 +359,7 @@ export class DiagnosticsService extends PersistentStatefulService<IDiagnosticsSe
           settings.streaming.encoder === EEncoderFamily.jim_nvenc
             ? 'NVENC (New)'
             : settings.streaming.encoder,
+        'Rate Control': settings.streaming.rateControl,
         Bitrate: settings.streaming.bitrate,
         'Use Custom Resolution': settings.streaming.hasCustomResolution,
         'Output Resolution': settings.streaming.outputResolution,
@@ -370,10 +371,12 @@ export class DiagnosticsService extends PersistentStatefulService<IDiagnosticsSe
         'VOD Track Enabled': !!this.settingsService.views.vodTrackEnabled,
       },
       Recording: {
+        'Using Stream Encoder': settings.recording.isSameAsStream,
         Encoder:
           settings.recording.encoder === EEncoderFamily.jim_nvenc
             ? 'NVENC (New)'
             : settings.recording.encoder,
+        'Rate Control': settings.recording.rateControl,
         Bitrate: settings.recording.bitrate,
         'Output Resolution': settings.recording.outputResolution,
         'Audio Tracks': this.settingsService.views.recordingTracks.map(t => t + 1).join(', '),
