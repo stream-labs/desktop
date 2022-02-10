@@ -2112,7 +2112,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/qrcode.react@npm:^1.0.2":
+"@types/qrcode.react@npm:1.0.2":
   version: 1.0.2
   resolution: "@types/qrcode.react@npm:1.0.2"
   dependencies:
@@ -4159,7 +4159,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"bundlemon@npm:^1.2.0":
+"bundlemon@npm:1.2.0":
   version: 1.2.0
   resolution: "bundlemon@npm:1.2.0"
   dependencies:
@@ -11735,7 +11735,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"pretty-bytes@npm:^5.6.0":
+"pretty-bytes@npm:5.6.0":
   version: 5.6.0
   resolution: "pretty-bytes@npm:5.6.0"
   checksum: 9c082500d1e93434b5b291bd651662936b8bd6204ec9fa17d563116a192d6d86b98f6d328526b4e8d783c07d5499e2614a807520249692da9ec81564b2f439cd
@@ -11944,7 +11944,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"qrcode.react@npm:^1.0.1":
+"qrcode.react@npm:1.0.1":
   version: 1.0.1
   resolution: "qrcode.react@npm:1.0.1"
   dependencies:
@@ -13792,7 +13792,7 @@ __metadata:
     "@types/node": 16.7.13
     "@types/node-fetch": 2.5.10
     "@types/overlayscrollbars": 1.12.0
-    "@types/qrcode.react": ^1.0.2
+    "@types/qrcode.react": 1.0.2
     "@types/react": 17.0.8
     "@types/request": 2.48.5
     "@types/semver": 6.2.1
@@ -13814,7 +13814,7 @@ __metadata:
     babel-plugin-syntax-jsx: 6.18.0
     babel-plugin-transform-class-properties: 6.24.1
     babel-plugin-transform-vue-jsx: 3.7.0
-    bundlemon: ^1.2.0
+    bundlemon: 1.2.0
     classnames: 2.2.6
     clean-webpack-plugin: 3.0.0
     cli-table: 0.3.1
@@ -13871,9 +13871,9 @@ __metadata:
     pngjs: 3.3.3
     prettier: 2.2.1
     prettier-eslint: 12.0.0
-    pretty-bytes: ^5.6.0
+    pretty-bytes: 5.6.0
     progress: 2.0.0
-    qrcode.react: ^1.0.1
+    qrcode.react: 1.0.1
     raven: ^2.6.4
     raw-loader: 2.0.0
     rc-animate: 3.1.1
@@ -13910,7 +13910,7 @@ __metadata:
     tree-kill: 1.2.2
     ts-loader: 8.0.11
     ts-node: 7.0.1
-    typedoc: ^0.22.10
+    typedoc: 0.22.10
     typescript: 4.0.7
     urijs: 1.19.7
     uuid: ^3.0.1
@@ -15272,7 +15272,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typedoc@npm:^0.22.10":
+"typedoc@npm:0.22.10":
   version: 0.22.10
   resolution: "typedoc@npm:0.22.10"
   dependencies:
