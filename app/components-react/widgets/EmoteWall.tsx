@@ -41,7 +41,7 @@ export function EmoteWall() {
           <SwitchInput
             label={$t('Combo Required')}
             value={isComboRequired}
-            onChange={combo_required => updateComboRequired({ combo_required })}
+            onChange={combo_required => updateComboRequired(combo_required)}
           />
           {isComboRequired && (
             <InputWrapper nowrap={true}>
@@ -71,8 +71,8 @@ export class EmoteWallModule extends WidgetModule<IEmoteWallState> {
     return this.settings?.combo_required;
   }
 
-  updateComboRequired(statePatch: Partial<IEmoteWallSettings>) {
-    this.updateSettings(statePatch);
+  updateComboRequired(combo_required: boolean) {
+    this.updateSettings({ combo_required });
   }
 }
 
