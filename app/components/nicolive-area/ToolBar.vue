@@ -5,7 +5,6 @@
       番組開始まで {{ format(-programCurrentTime) }}
     </div>
     <div class="elapsed-time" v-else>
-      <span class="live-indicator" :class="{ 'is-onAir': isOnAir }"></span>
       <div class="program-time">
         <time>{{ format(programCurrentTime) }}</time> / 
         <time>{{ format(programTotalTime) }}</time>
@@ -95,18 +94,6 @@
 .elapsed-time {
   display: flex;
   align-items: center;
-}
-
-.live-indicator {
-    width: 8px;
-    height: 8px;
-    margin-right: 8px;
-    border-radius: 50%;
-    background-color: var(--color-text-disabled);
-
-    &.is-onAir {
-      background-color: var(--color-red);
-    }
 }
 
 .program-time,
