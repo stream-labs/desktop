@@ -130,7 +130,7 @@ export class AlertBoxModule extends WidgetModule<IAlertBoxState> {
    */
   get layout() {
     // more linked platforms require more space for the widget menu
-    return Services.StreamingService.views.linkedPlatforms.length < 3 ? 'basic' : 'long-menu';
+    return Services.UserService.views.linkedPlatforms.length < 3 ? 'basic' : 'long-menu';
   }
 
   /**

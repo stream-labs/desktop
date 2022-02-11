@@ -131,6 +131,8 @@ class UserViews extends ViewHandler<IUserServiceState> {
     if (this.isLoggedIn) {
       return Object.keys(this.state.auth.platforms);
     }
+
+    return [];
   }
 
   get isTwitchAuthed() {
