@@ -198,7 +198,9 @@ export class WidgetsService
         const source = widget.getSource();
         const newPreviewSettings = cloneDeep(source.getSettings());
         delete newPreviewSettings.shutdown;
-        newPreviewSettings.url = widget.getSettingsService().getApiSettings().previewUrl;
+        const config = this.widgetsConfig[widget.type];
+        newPreviewSettings.url =
+          config?.previewUrl || widget.getSettingsService().getApiSettings().previewUrl;
         const previewSource = widget.getPreviewSource();
         previewSource.updateSettings(newPreviewSettings);
         previewSource.refresh();
