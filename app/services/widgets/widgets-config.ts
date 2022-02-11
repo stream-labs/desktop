@@ -102,6 +102,11 @@ export function getWidgetsConfig(host: string, token: string): Record<TWidgetTyp
         anchor: AnchorPoint.North,
       },
 
+      settingsWindowSize: {
+        width: 850,
+        height: 700,
+      },
+
       url: `https://${host}/widgets/game-widget?token=${token}`,
       previewUrl: `https://${host}/widgets/game-widget?token=${token}&simulate=1`,
       dataFetchUrl: `https://${host}/api/v5/slobs/widget/game-widget`,

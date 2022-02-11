@@ -1,9 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { IWidgetState, useWidget, WidgetModule } from './common/useWidget';
 import { WidgetLayout } from './common/WidgetLayout';
-import { $t } from '../../services/i18n';
-import { TextInput, ColorInput, createBinding, SliderInput } from '../shared/inputs';
+import { $t } from 'services/i18n';
 import { metadata } from 'components-react/shared/inputs/metadata';
+import { TextInput, ColorInput, createBinding, SliderInput } from 'components-react/shared/inputs';
+import Form from 'components-react/shared/inputs/Form';
+import { Menu } from 'antd';
 
 type TGameType = 'tic-tac-toe';
 
@@ -44,36 +46,44 @@ interface IGameWidgetState extends IWidgetState {
 export function GameWidget() {
   const { isLoading, bind } = useGameWidget();
 
+  const [activeTab, setActiveTab] = useState('general');
+
   return (
     <WidgetLayout>
-      {!isLoading && (
-        <>
-          <SliderInput
-            label={$t('Chat Decision Time')}
-            tooltip={$t(
-              "The duration in seconds to collect chat's responses before processing passing them to the game.",
-            )}
-            {...bind.decision_poll_timer}
-            {...metadata.seconds({ min: 3000, max: 15000 })}
-          />
-          <TextInput
-            label={$t('Trigger Command')}
-            tooltip={$t('Command used by the chat to provide their response.')}
-            {...bind.trigger_command}
-          />
-          <TextInput
-            label={$t('No Input Recieved')}
-            tooltip={$t("Message displayed to let the chat know they didn't provide any input.")}
-            {...bind.no_input_received_message}
-          />
-          <TextInput
-            label={$t('Restarting Game')}
-            tooltip={$t('Message displayed to let the chat know the game is restarting.')}
-            {...bind.restarting_game_message}
-          />
-          <GameOptions game="tic-tac-toe" />
-        </>
-      )}
+      <Menu onClick={e => setActiveTab(e.key)} selectedKeys={[activeTab]}>
+        <Menu.Item key="general">{$t('General Settings')}</Menu.Item>
+        <Menu.Item key="game">{$t('Game Settings')}</Menu.Item>
+      </Menu>
+      <Form>
+        {!isLoading && activeTab === 'general' && (
+          <>
+            <SliderInput
+              label={$t('Chat Decision Time')}
+              tooltip={$t(
+                "The duration in seconds to collect chat's responses before processing passing them to the game.",
+              )}
+              {...bind.decision_poll_timer}
+              {...metadata.seconds({ min: 3000, max: 15000 })}
+            />
+            <TextInput
+              label={$t('Trigger Command')}
+              tooltip={$t('Command used by the chat to provide their response.')}
+              {...bind.trigger_command}
+            />
+            <TextInput
+              label={$t('No Input Recieved')}
+              tooltip={$t("Message displayed to let the chat know they didn't provide any input.")}
+              {...bind.no_input_received_message}
+            />
+            <TextInput
+              label={$t('Restarting Game')}
+              tooltip={$t('Message displayed to let the chat know the game is restarting.')}
+              {...bind.restarting_game_message}
+            />
+          </>
+        )}
+        {!isLoading && activeTab === 'game' && <GameOptions game="tic-tac-toe" />}
+      </Form>
     </WidgetLayout>
   );
 }

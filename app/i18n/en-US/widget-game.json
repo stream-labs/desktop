@@ -31,5 +31,7 @@
   "Message displayed to let everyone know, chat lost.": "Message displayed to let everyone know, chat lost.",
   "Message displayed to let everyone know the game was a draw.": "Message displayed to let everyone know the game was a draw.",
   "Message to let chat know that they cannot play the current move.": "Message to let chat know that they cannot play the current move.",
-  "Display the game ended message for these many seconds.": "Display the game ended message for these many seconds."
+  "Display the game ended message for these many seconds.": "Display the game ended message for these many seconds.",
+  "General Settings": "General Settings",
+  "Game Settings": "Game Settings"
 }
