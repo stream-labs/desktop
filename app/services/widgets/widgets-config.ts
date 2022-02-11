@@ -96,10 +96,10 @@ export function getWidgetsConfig(host: string, token: string): Record<TWidgetTyp
 
       defaultTransform: {
         width: 400,
-        height: 400,
-        x: 0,
+        height: 450,
+        x: 0.5,
         y: 0,
-        anchor: AnchorPoint.NorthEast,
+        anchor: AnchorPoint.North,
       },
 
       url: `https://${host}/widgets/game-widget?token=${token}`,

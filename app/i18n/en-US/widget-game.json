@@ -18,5 +18,18 @@
   "Cannot Play Here": "Cannot Play Here",
   "Game End Message Duration": "Game End Message Duration",
   "Chat Marker": "Chat Marker",
-  "AI Marker": "AI Marker"
+  "AI Marker": "AI Marker",
+  "The duration in seconds to collect chat's responses before processing passing them to the game.": "The duration in seconds to collect chat's responses before processing passing them to the game.",
+  "Command used by the chat to provide their response.": "Command used by the chat to provide their response.",
+  "Message displayed to let the chat know they didn't provide any input.": "Message displayed to let the chat know they didn't provide any input.",
+  "Message displayed to let the chat know the game is restarting.": "Message displayed to let the chat know the game is restarting.",
+  "Marker used to display where chat played their turn. Please make sure it's not more than 1 character.": "Marker used to display where chat played their turn. Please make sure it's not more than 1 character.",
+  "Message to let everyone know that it's chat's turn to play.": "Message to let everyone know that it's chat's turn to play.",
+  "Marker used to display where AI played it's turn. Please make sure it's not more than 1 character.": "Marker used to display where AI played it's turn. Please make sure it's not more than 1 character.",
+  "Message to let everyone know that it's AI's turn to play.": "Message to let everyone know that it's AI's turn to play.",
+  "Message displayed to let everyone know, chat won.": "Message displayed to let everyone know, chat won.",
+  "Message displayed to let everyone know, chat lost.": "Message displayed to let everyone know, chat lost.",
+  "Message displayed to let everyone know the game was a draw.": "Message displayed to let everyone know the game was a draw.",
+  "Message to let chat know that they cannot play the current move.": "Message to let chat know that they cannot play the current move.",
+  "Display the game ended message for these many seconds.": "Display the game ended message for these many seconds."
 }

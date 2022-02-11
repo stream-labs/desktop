@@ -50,12 +50,27 @@ export function GameWidget() {
         <>
           <SliderInput
             label={$t('Chat Decision Time')}
+            tooltip={$t(
+              "The duration in seconds to collect chat's responses before processing passing them to the game.",
+            )}
             {...bind.decision_poll_timer}
-            {...metadata.seconds({ min: 1000, max: 10000 })}
+            {...metadata.seconds({ min: 3000, max: 15000 })}
           />
-          <TextInput label={$t('Trigger Command')} {...bind.trigger_command} />
-          <TextInput label={$t('No Input Recieved')} {...bind.no_input_received_message} />
-          <TextInput label={$t('Restarting Game')} {...bind.restarting_game_message} />
+          <TextInput
+            label={$t('Trigger Command')}
+            tooltip={$t('Command used by the chat to provide their response.')}
+            {...bind.trigger_command}
+          />
+          <TextInput
+            label={$t('No Input Recieved')}
+            tooltip={$t("Message displayed to let the chat know they didn't provide any input.")}
+            {...bind.no_input_received_message}
+          />
+          <TextInput
+            label={$t('Restarting Game')}
+            tooltip={$t('Message displayed to let the chat know the game is restarting.')}
+            {...bind.restarting_game_message}
+          />
           <GameOptions game="tic-tac-toe" />
         </>
       )}
@@ -98,11 +113,15 @@ function GameOptions(p: { game: TGameType }) {
       />
       <TextInput
         label={$t('Chat Marker')}
+        tooltip={$t(
+          "Marker used to display where chat played their turn. Please make sure it's not more than 1 character.",
+        )}
         value={settings.game_options[game].chat_marker}
         onChange={updateGameOption('chat_marker')}
       />
       <TextInput
         label={$t("Chat's Turn")}
+        tooltip={$t("Message to let everyone know that it's chat's turn to play.")}
         value={settings.game_options[game].chat_turn_message}
         onChange={updateGameOption('chat_turn_message')}
       />
@@ -118,11 +137,15 @@ function GameOptions(p: { game: TGameType }) {
       />
       <TextInput
         label={$t('AI Marker')}
+        tooltip={$t(
+          "Marker used to display where AI played it's turn. Please make sure it's not more than 1 character.",
+        )}
         value={settings.game_options[game].ai_marker}
         onChange={updateGameOption('ai_marker')}
       />
       <TextInput
         label={$t("AI's Turn")}
+        tooltip={$t("Message to let everyone know that it's AI's turn to play.")}
         value={settings.game_options[game].ai_turn_message}
         onChange={updateGameOption('ai_turn_message')}
       />
@@ -138,29 +161,34 @@ function GameOptions(p: { game: TGameType }) {
       />
       <TextInput
         label={$t('Chat Won')}
+        tooltip={$t('Message displayed to let everyone know, chat won.')}
         value={settings.game_options[game].chat_won_game_message}
         onChange={updateGameOption('chat_won_game_message')}
       />
       <TextInput
         label={$t('Chat Lost')}
+        tooltip={$t('Message displayed to let everyone know, chat lost.')}
         value={settings.game_options[game].chat_lost_game_message}
         onChange={updateGameOption('chat_lost_game_message')}
       />
       <TextInput
         label={$t('Draw Game')}
+        tooltip={$t('Message displayed to let everyone know the game was a draw.')}
         value={settings.game_options[game].draw_game_message}
         onChange={updateGameOption('draw_game_message')}
       />
       <TextInput
         label={$t('Cannot Play Here')}
+        tooltip={$t('Message to let chat know that they cannot play the current move.')}
         value={settings.game_options[game].cannot_play_here}
         onChange={updateGameOption('cannot_play_here')}
       />
       <SliderInput
         label={$t('Game End Message Duration')}
+        tooltip={$t('Display the game ended message for these many seconds.')}
         value={settings.game_options[game].game_ended_message_duration}
         onChange={updateGameOption('game_ended_message_duration')}
-        {...metadata.seconds({ min: 1000, max: 10000 })}
+        {...metadata.seconds({ min: 3000, max: 5000 })}
       />
     </>
   );
