@@ -59,9 +59,12 @@ export function GameWidget() {
           <>
             <SliderInput
               label={$t('Chat Decision Time')}
-              tooltip={$t(
-                "The duration in seconds to collect chat's responses before processing passing them to the game.",
-              )}
+              tooltip={{
+                title: $t(
+                  "The duration in seconds to collect chat's responses before processing passing them to the game.",
+                ),
+                placement: 'bottom',
+              }}
               {...bind.decision_poll_timer}
               {...metadata.seconds({ min: 3000, max: 15000 })}
             />
