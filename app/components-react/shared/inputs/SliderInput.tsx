@@ -36,7 +36,7 @@ export const SliderInput = InputComponent((partialProps: TSliderInputProps) => {
     <InputWrapper {...wrapperAttrs}>
       <Row>
         <Col flex="auto" {...dataAttrs} data-role="input" data-value={inputAttrs.value}>
-          <Slider {...inputAttrs} onChange={onChangeHandler} />
+          <Slider {...inputAttrs} />
         </Col>
 
         {p.hasNumberInput && (

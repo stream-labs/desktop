@@ -206,9 +206,7 @@ export class WidgetModule<TWidgetState extends IWidgetState = IWidgetState> {
    * Update settings and save on the server
    */
   public async updateSettings(formValues: any) {
-    console.log(formValues);
     const newSettings = merge(cloneDeep(this.settings), formValues);
-    console.log(newSettings);
     // save setting to the store
     this.setSettings(newSettings);
     // send setting to the server

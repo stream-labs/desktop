@@ -3,40 +3,42 @@ import { IWidgetState, useWidget, WidgetModule } from './common/useWidget';
 import { WidgetLayout } from './common/WidgetLayout';
 import { $t } from '../../services/i18n';
 import { TextInput, ColorInput, createBinding, SliderInput } from '../shared/inputs';
+import { metadata } from 'components-react/shared/inputs/metadata';
+
+type TGameType = 'tic-tac-toe';
+
+interface ITicTacToeOptions {
+  background_color: string;
+  border_color: string;
+  chat_marker_color: string;
+  ai_marker_color: string;
+  chat_win_marker_color: string;
+  ai_win_marker_color: string;
+  chat_won_game_message: string;
+  chat_lost_game_message: string;
+  draw_game_message: string;
+  chat_marker: string;
+  ai_marker: string;
+  game_ended_message_duration: number;
+  chat_turn_message: string;
+  ai_turn_message: string;
+  cannot_play_here: string;
+}
+
 interface IGameWidgetState extends IWidgetState {
   data: {
     settings: {
       decision_poll_timer: number;
       trigger_command: string;
-      current_game: 'tic-tac-toe';
+      current_game: TGameType;
       no_input_received_message: string;
       restarting_game_message: string;
-      available_games: 'tic-tac-toe'[];
+      available_games: TGameType[];
       game_options: {
-        'tic-tac-toe': {
-          background_color: string;
-          border_color: string;
-          chat_marker_color: string;
-          ai_marker_color: string;
-          chat_win_marker_color: string;
-          ai_win_marker_color: string;
-          chat_won_game_message: string;
-          chat_lost_game_message: string;
-          draw_game_message: string;
-          chat_marker: string;
-          ai_marker: string;
-          game_ended_message_duration: number;
-          chat_turn_message: string;
-          ai_turn_message: string;
-          cannot_play_here: string;
-        };
+        'tic-tac-toe': ITicTacToeOptions;
       };
     };
   };
-}
-
-function msToS(ms: number) {
-  return `${Math.floor(ms / 1000)}s`;
 }
 
 export function GameWidget() {
@@ -49,10 +51,7 @@ export function GameWidget() {
           <SliderInput
             label={$t('Chat Decision Time')}
             {...bind.decision_poll_timer}
-            min={1000}
-            max={10000}
-            step={1000}
-            tipFormatter={msToS}
+            {...metadata.seconds({ min: 1000, max: 10000 })}
           />
           <TextInput label={$t('Trigger Command')} {...bind.trigger_command} />
           <TextInput label={$t('No Input Recieved')} {...bind.no_input_received_message} />
@@ -75,12 +74,12 @@ function useGameWidget() {
   return useWidget<GameWidgetModule>();
 }
 
-function GameOptions(p: { game: string }) {
+function GameOptions(p: { game: TGameType }) {
   const { settings, updateSettings } = useGameWidget();
   const game = p.game;
 
-  function updateGameOption(key: string) {
-    return (value: any) => {
+  function updateGameOption(key: keyof ITicTacToeOptions) {
+    return (value: unknown) => {
       updateSettings({ game_options: { [game]: { [key]: value } } });
     };
   }
@@ -135,7 +134,7 @@ function GameOptions(p: { game: string }) {
       <ColorInput
         label={$t('AI Win Color')}
         value={settings.game_options[game].ai_win_marker_color}
-        onChange={updateGameOption('ai_win_color')}
+        onChange={updateGameOption('ai_win_marker_color')}
       />
       <TextInput
         label={$t('Chat Won')}
@@ -161,10 +160,7 @@ function GameOptions(p: { game: string }) {
         label={$t('Game End Message Duration')}
         value={settings.game_options[game].game_ended_message_duration}
         onChange={updateGameOption('game_ended_message_duration')}
-        min={1000}
-        max={10000}
-        step={1000}
-        tipFormatter={msToS}
+        {...metadata.seconds({ min: 1000, max: 10000 })}
       />
     </>
   );
