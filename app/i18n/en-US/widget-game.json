@@ -19,7 +19,7 @@
   "Game End Message Duration": "Game End Message Duration",
   "Chat Marker": "Chat Marker",
   "AI Marker": "AI Marker",
-  "The duration in seconds to collect chat's responses before processing passing them to the game.": "The duration in seconds to collect chat's responses before processing passing them to the game.",
+  "The duration in seconds to collect chat's responses before passing them to the game.": "The duration in seconds to collect chat's responses before passing them to the game.",
   "Command used by the chat to provide their response.": "Command used by the chat to provide their response.",
   "Message displayed to let the chat know they didn't provide any input.": "Message displayed to let the chat know they didn't provide any input.",
   "Message displayed to let the chat know the game is restarting.": "Message displayed to let the chat know the game is restarting.",

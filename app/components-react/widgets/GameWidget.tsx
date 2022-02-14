@@ -61,7 +61,7 @@ export function GameWidget() {
               label={$t('Chat Decision Time')}
               tooltip={{
                 title: $t(
-                  "The duration in seconds to collect chat's responses before processing passing them to the game.",
+                  "The duration in seconds to collect chat's responses before passing them to the game.",
                 ),
                 placement: 'bottom',
               }}
