@@ -31,5 +31,9 @@
   "Designates if this source is audible in your recorded track(s)": "Angiver, om denne lydkilde kan høres i de spor, du optager",
   "Source Settings": "Kildeindstillinger",
   "Audio Tracks": "Lydspor",
-  "Designates which tracks are being recorded": "Angiver, hvilke spor der bliver optaget"
+  "Designates which tracks are being recorded": "Angiver, hvilke spor der bliver optaget",
+  "Your Stream and VOD Track are the same. This may result in unexpected audio behavior, go to Global Settings to change.": "Your Stream and VOD Track are the same. This may result in unexpected audio behavior, go to Global Settings to change.",
+  "Streaming Track": "Streaming Track",
+  "Enable Twitch VOD Track": "Enable Twitch VOD Track",
+  "Twitch VOD Track": "Twitch VOD Track"
 }
