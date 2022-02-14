@@ -5,8 +5,6 @@
   "Generate new": "生成新令牌",
   "Port": "端口",
   "IP addresses": "IP 地址",
-  "You can now control Streamlabs from your phone.": "您现在可以通过手机控制 Streamlabs。",
-  "To begin, scan this QR code with your phone.": "首先，请使用手机扫描此 QR 码。",
-  "This feature will only work with the most recent version of the Streamlabs mobile app.": "此功能仅适用于最新版本的 Streamlabs 移动应用程序。",
-  "Click to show": "点击显示"
+  "Click to show": "点击显示",
+  "The free Streamlabs Deck app allows you to control Streamlabs Desktop from your iOS or Android device. Scan the QR code below to begin.": "The free Streamlabs Deck app allows you to control Streamlabs Desktop from your iOS or Android device. Scan the QR code below to begin."
 }
