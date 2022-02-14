@@ -174,13 +174,13 @@ function GameOptions(p: { game: TGameType }) {
       />
       <TextInput
         label={$t('Chat Won')}
-        tooltip={$t('Message displayed to let everyone know, chat won.')}
+        tooltip={$t('Message displayed to let everyone know chat won.')}
         value={settings.game_options[game].chat_won_game_message}
         onChange={updateGameOption('chat_won_game_message')}
       />
       <TextInput
         label={$t('Chat Lost')}
-        tooltip={$t('Message displayed to let everyone know, chat lost.')}
+        tooltip={$t('Message displayed to let everyone know chat lost.')}
         value={settings.game_options[game].chat_lost_game_message}
         onChange={updateGameOption('chat_lost_game_message')}
       />
