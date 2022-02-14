@@ -64,11 +64,11 @@
   "Hr": "Hr",
   "Min": "Min",
   "Sec": "Sec",
-  "fullMode": "未翻訳:クリックしてフルモードに切り替える",
-  "compactMode": "未翻訳:クリックしてコンパクトモードに切り替える",
+  "fullMode": "Click to switch to full mode",
+  "compactMode": "Click to switch to compact mode",
   "compactModeTab": {
-    "niconico": "未翻訳:ニコニコ生放送番組関連タブ",
-    "studio": "未翻訳:配信関連タブ"
+    "niconico": "Tab related to niconico program",
+    "studio": "Tab related to streaming"
   },
   "fieldIsRequired": "The field is required",
   "fieldMustBeLarger": "The field value must be %{value} or larger",
