@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import { CustomizationService } from 'app-services';
+import { CustomizationService } from 'services/customization';
 import { BrowserWindow } from 'electron';
 import { BehaviorSubject } from 'rxjs';
 import { Inject } from 'services/core/injector';
@@ -604,12 +604,14 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
           backupHeight: this.customizationService.state.compactBackupHeight,
         },
       );
-      this.customizationService.setFullModeWidthOffset({
-        fullModeWidthOffset: newSize.widthOffset,
-        compactBackupPositionX: newSize.backupX,
-        compactBackupPositionY: newSize.backupY,
-        compactBackupHeight: newSize.backupHeight,
-      });
+      if (newSize !== undefined) {
+        this.customizationService.setFullModeWidthOffset({
+          fullModeWidthOffset: newSize.widthOffset,
+          compactBackupPositionX: newSize.backupX,
+          compactBackupPositionY: newSize.backupY,
+          compactBackupHeight: newSize.backupHeight,
+        });
+      }
     }
   }
 
@@ -633,7 +635,7 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
       backupX: number;
       backupY: number;
       backupHeight: number;
-    }): { widthOffset: number; backupX: number; backupY: number; backupHeight: number } {
+    } | undefined): { widthOffset: number; backupX: number; backupY: number; backupHeight: number } {
     if (nextState === null) throw new Error('nextState is null');
     const onInit = !prevState;
 
@@ -645,6 +647,12 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
     const nextMaxWidth = nextState === PanelState.COMPACT ? nextMinWidth : INT32_MAX;
     let nextWidth = width;
     console.log('panelState', prevState, nextState); // DEBUG
+    const newSize = {
+      widthOffset: sizeState?.widthOffset,
+      backupX: sizeState?.backupX,
+      backupY: sizeState?.backupY,
+      backupHeight: sizeState?.backupHeight,
+    };
     console.log('sizeState', sizeState); // DEBUG
 
     if (onInit) {
@@ -658,31 +666,31 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
       if (!win.isMaximized()) {
         // コンパクトモード以外だったときは現在の幅と最小幅の差を保存する
         if (prevState !== PanelState.COMPACT) {
-          sizeState.widthOffset = Math.max(0, width - NicoliveProgramService.WINDOW_MIN_WIDTH[prevState]);
+          newSize.widthOffset = Math.max(0, width - NicoliveProgramService.WINDOW_MIN_WIDTH[prevState]);
         }
 
         // コンパクトモードになるときはパネルサイズを強制する
         if (nextState === PanelState.COMPACT) {
           nextWidth = nextMinWidth;
         } else {
-          nextWidth = nextMinWidth + sizeState.widthOffset;
+          nextWidth = nextMinWidth + newSize.widthOffset;
         }
       }
     }
 
     if (prevState !== null && (prevState === PanelState.COMPACT) !== (nextState === PanelState.COMPACT)) {
       const [x, y] = win.getPosition();
-      if (sizeState.backupX !== undefined && sizeState.backupY !== undefined) {
-        win.setPosition(sizeState.backupX, sizeState.backupY);
+      if (newSize.backupX !== undefined && newSize.backupY !== undefined) {
+        win.setPosition(newSize.backupX, newSize.backupY);
       }
-      if (sizeState.backupHeight !== undefined) {
-        nextHeight = sizeState.backupHeight;
+      if (newSize.backupHeight !== undefined) {
+        nextHeight = newSize.backupHeight;
       }
-      sizeState.backupX = x;
-      sizeState.backupY = y;
-      sizeState.backupHeight = height;
+      newSize.backupX = x;
+      newSize.backupY = y;
+      newSize.backupHeight = height;
     }
-    console.log(' -> sizeState', sizeState); // DEBUG
+    console.log(' -> sizeState', newSize); // DEBUG
 
     win.setMinimumSize(nextMinWidth, minHeight);
     win.setMaximumSize(nextMaxWidth, 0);
@@ -690,6 +698,6 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
       win.setSize(nextWidth, nextHeight);
     }
 
-    return sizeState;
+    return newSize;
   }
 }

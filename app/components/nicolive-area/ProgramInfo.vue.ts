@@ -7,7 +7,7 @@ import { StreamingService } from 'services/streaming';
 import { Subscription } from 'rxjs';
 import Popper from 'vue-popperjs';
 import * as moment from 'moment';
-import { HostsService } from 'app-services';
+import { HostsService } from 'services/hosts';
 
 @Component({
   components: {

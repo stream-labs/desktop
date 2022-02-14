@@ -1,6 +1,6 @@
-import { CompactModeService } from 'app-services';
 import electron from 'electron';
 import { AppService } from 'services/app';
+import { CompactModeService } from 'services/compact-mode';
 import { Inject } from 'services/core/injector';
 import { NavigationService } from 'services/navigation';
 import { ScenesService } from 'services/scenes';

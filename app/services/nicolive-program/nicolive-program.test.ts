@@ -3,6 +3,7 @@ import { Subject, BehaviorSubject } from 'rxjs';
 
 type NicoliveProgramService = import('./nicolive-program').NicoliveProgramService;
 type PanelState = import('./nicolive-program').PanelState;
+type TNicoliveProgramService = import('./nicolive-program').NicoliveProgramService;
 
 const rooms = [{ id: 0, name: 'arena', webSocketUri: 'https://example.com/lv1', threadId: 'hoge' }];
 
@@ -93,6 +94,7 @@ const setup = createSetupFunction({
         return {
           getMinimumSize: () => [800, 600],
           setMinimumSize: () => {},
+          setMaximumSize: () => {},
           getSize: () => [800, 600],
           setSize: () => {},
           isMaximized: () => false,
@@ -104,6 +106,13 @@ const setup = createSetupFunction({
         subscribe() {},
       },
       isLoggedIn: () => true,
+    },
+    CustomizationService: {
+      settingsChanged: {
+        subscribe() {},
+      },
+      state: {},
+      setFullModeWidthOffset() {},
     },
   },
 });
@@ -215,12 +224,24 @@ test('fetchProgramで結果が空ならエラー', async () => {
                               }
                         `);
   expect(instance.client.fetchProgramSchedules).toHaveBeenCalledTimes(1);
-  expect((instance as any).setState).toHaveBeenCalledTimes(1);
-  expect((instance as any).setState.mock.calls[0]).toMatchInlineSnapshot(`
+  expect((instance as any).setState).toHaveBeenCalledTimes(3);
+  expect((instance as any).setState.mock.calls).toMatchInlineSnapshot(`
             Array [
-              Object {
-                "status": "end",
-              },
+              Array [
+                Object {
+                  "isFetching": true,
+                },
+              ],
+              Array [
+                Object {
+                  "status": "end",
+                },
+              ],
+              Array [
+                Object {
+                  "isFetching": false,
+                },
+              ],
             ]
       `);
 });
@@ -246,23 +267,35 @@ test('fetchProgram:成功', async () => {
   expect(instance.client.fetchProgramSchedules).toHaveBeenCalledTimes(1);
   expect(instance.client.fetchProgram).toHaveBeenCalledTimes(1);
   expect(instance.client.fetchCommunity).toHaveBeenCalledTimes(1);
-  expect((instance as any).setState.mock.calls[0]).toMatchInlineSnapshot(`
+  expect((instance as any).setState.mock.calls).toMatchInlineSnapshot(`
     Array [
-      Object {
-        "communityID": "co1",
-        "communityName": "comunity.name",
-        "communitySymbol": "symbol url",
-        "description": "番組詳細情報",
-        "endTime": 150,
-        "isMemberOnly": true,
-        "programID": "lv1",
-        "roomThreadID": "hoge",
-        "roomURL": "https://example.com/lv1",
-        "startTime": 100,
-        "status": "onAir",
-        "title": "番組タイトル",
-        "vposBaseTime": 50,
-      },
+      Array [
+        Object {
+          "isFetching": true,
+        },
+      ],
+      Array [
+        Object {
+          "communityID": "co1",
+          "communityName": "comunity.name",
+          "communitySymbol": "symbol url",
+          "description": "番組詳細情報",
+          "endTime": 150,
+          "isMemberOnly": true,
+          "programID": "lv1",
+          "roomThreadID": "hoge",
+          "roomURL": "https://example.com/lv1",
+          "startTime": 100,
+          "status": "onAir",
+          "title": "番組タイトル",
+          "vposBaseTime": 50,
+        },
+      ],
+      Array [
+        Object {
+          "isFetching": false,
+        },
+      ],
     ]
   `);
 });
@@ -298,7 +331,7 @@ test('fetchProgramで番組があったが取りに行ったらエラー', async
   expect(instance.client.fetchProgramSchedules).toHaveBeenCalledTimes(1);
   expect(instance.client.fetchProgram).toHaveBeenCalledTimes(1);
   expect(instance.client.fetchCommunity).toHaveBeenCalledTimes(1);
-  expect((instance as any).setState).not.toHaveBeenCalled();
+  expect((instance as any).setState).toHaveBeenCalledTimes(2);
 });
 
 test('fetchProgramでコミュ情報がエラーでも番組があったら先に進む', async () => {
@@ -322,23 +355,35 @@ test('fetchProgramでコミュ情報がエラーでも番組があったら先�
   expect(instance.client.fetchProgramSchedules).toHaveBeenCalledTimes(1);
   expect(instance.client.fetchProgram).toHaveBeenCalledTimes(1);
   expect(instance.client.fetchCommunity).toHaveBeenCalledTimes(1);
-  expect((instance as any).setState.mock.calls[0]).toMatchInlineSnapshot(`
+  expect((instance as any).setState.mock.calls).toMatchInlineSnapshot(`
     Array [
-      Object {
-        "communityID": "co1",
-        "communityName": "(コミュニティの取得に失敗しました)",
-        "communitySymbol": "",
-        "description": "番組詳細情報",
-        "endTime": 150,
-        "isMemberOnly": true,
-        "programID": "lv1",
-        "roomThreadID": "hoge",
-        "roomURL": "https://example.com/lv1",
-        "startTime": 100,
-        "status": "onAir",
-        "title": "番組タイトル",
-        "vposBaseTime": 50,
-      },
+      Array [
+        Object {
+          "isFetching": true,
+        },
+      ],
+      Array [
+        Object {
+          "communityID": "co1",
+          "communityName": "(コミュニティの取得に失敗しました)",
+          "communitySymbol": "",
+          "description": "番組詳細情報",
+          "endTime": 150,
+          "isMemberOnly": true,
+          "programID": "lv1",
+          "roomThreadID": "hoge",
+          "roomURL": "https://example.com/lv1",
+          "startTime": 100,
+          "status": "onAir",
+          "title": "番組タイトル",
+          "vposBaseTime": 50,
+        },
+      ],
+      Array [
+        Object {
+          "isFetching": false,
+        },
+      ],
     ]
   `);
 });
@@ -406,13 +451,25 @@ test('endProgram:成功', async () => {
   await expect(instance.endProgram()).resolves.toBeUndefined();
   expect(instance.client.endProgram).toHaveBeenCalledTimes(1);
   expect(instance.client.endProgram).toHaveBeenCalledWith('lv1');
-  expect((instance as any).setState).toHaveBeenCalledTimes(1);
-  expect((instance as any).setState.mock.calls[0]).toMatchInlineSnapshot(`
+  expect((instance as any).setState).toHaveBeenCalledTimes(3);
+  expect((instance as any).setState.mock.calls).toMatchInlineSnapshot(`
             Array [
-              Object {
-                "endTime": 125,
-                "status": "end",
-              },
+              Array [
+                Object {
+                  "isEnding": true,
+                },
+              ],
+              Array [
+                Object {
+                  "endTime": 125,
+                  "status": "end",
+                },
+              ],
+              Array [
+                Object {
+                  "isEnding": false,
+                },
+              ],
             ]
       `);
 });
@@ -436,7 +493,7 @@ test('endProgram:失敗', async () => {
                         `);
   expect(instance.client.endProgram).toHaveBeenCalledTimes(1);
   expect(instance.client.endProgram).toHaveBeenCalledWith('lv1');
-  expect((instance as any).setState).not.toHaveBeenCalled();
+  expect((instance as any).setState).toHaveBeenCalledTimes(2);
 });
 
 test('extendProgram:成功', async () => {
@@ -452,12 +509,24 @@ test('extendProgram:成功', async () => {
   await expect(instance.extendProgram()).resolves.toBeUndefined();
   expect(instance.client.extendProgram).toHaveBeenCalledTimes(1);
   expect(instance.client.extendProgram).toHaveBeenCalledWith('lv1');
-  expect((instance as any).setState).toHaveBeenCalledTimes(1);
-  expect((instance as any).setState.mock.calls[0]).toMatchInlineSnapshot(`
+  expect((instance as any).setState).toHaveBeenCalledTimes(3);
+  expect((instance as any).setState.mock.calls).toMatchInlineSnapshot(`
             Array [
-              Object {
-                "endTime": 125,
-              },
+              Array [
+                Object {
+                  "isExtending": true,
+                },
+              ],
+              Array [
+                Object {
+                  "isExtending": false,
+                },
+              ],
+              Array [
+                Object {
+                  "endTime": 125,
+                },
+              ],
             ]
       `);
 });
@@ -481,7 +550,7 @@ test('extendProgram:失敗', async () => {
                         `);
   expect(instance.client.extendProgram).toHaveBeenCalledTimes(1);
   expect(instance.client.extendProgram).toHaveBeenCalledWith('lv1');
-  expect((instance as any).setState).not.toHaveBeenCalled();
+  expect((instance as any).setState).toHaveBeenCalledTimes(2);
 });
 
 describe('refreshStatisticsPolling', () => {
@@ -1088,23 +1157,29 @@ describe('refreshAutoExtensionTimer', () => {
 
 describe('static getPanelState', () => {
   const suites = [
-    { panelOpened: null, isLoggedIn: null, result: null },
-    { panelOpened: null, isLoggedIn: true, result: null },
-    { panelOpened: null, isLoggedIn: false, result: null },
-    { panelOpened: true, isLoggedIn: null, result: null },
-    { panelOpened: false, isLoggedIn: null, result: null },
-    { panelOpened: true, isLoggedIn: false, result: 'INACTIVE' },
-    { panelOpened: false, isLoggedIn: false, result: 'INACTIVE' },
-    { panelOpened: true, isLoggedIn: true, result: 'OPENED' },
-    { panelOpened: false, isLoggedIn: true, result: 'CLOSED' },
+    { panelOpened: null, isLoggedIn: null, isCompact: null, result: null },
+    { panelOpened: null, isLoggedIn: true, isCompact: null, result: null },
+    { panelOpened: null, isLoggedIn: false, isCompact: null, result: null },
+    { panelOpened: true, isLoggedIn: null, isCompact: null, result: null },
+    { panelOpened: false, isLoggedIn: null, isCompact: null, result: null },
+    { panelOpened: true, isLoggedIn: false, isCompact: false, result: 'INACTIVE' },
+    { panelOpened: false, isLoggedIn: false, isCompact: false, result: 'INACTIVE' },
+    { panelOpened: true, isLoggedIn: true, isCompact: false, result: 'OPENED' },
+    { panelOpened: false, isLoggedIn: true, isCompact: false, result: 'CLOSED' },
+    { panelOpened: true, isLoggedIn: false, isCompact: true, result: 'COMPACT' },
+    { panelOpened: false, isLoggedIn: false, isCompact: true, result: 'COMPACT' },
+    { panelOpened: true, isLoggedIn: true, isCompact: true, result: 'COMPACT' },
+    { panelOpened: false, isLoggedIn: true, isCompact: true, result: 'COMPACT' },
   ];
 
-  for (const { panelOpened, isLoggedIn, result } of suites) {
+  for (const { panelOpened, isLoggedIn, isCompact, result } of suites) {
     test(`panelOpened: ${panelOpened}, isLoggedIn: ${isLoggedIn}`, () => {
       setup();
       const { NicoliveProgramService } = require('./nicolive-program');
 
-      expect(NicoliveProgramService.getPanelState(panelOpened, isLoggedIn)).toBe(result);
+      expect(NicoliveProgramService.getPanelState({ panelOpened, isLoggedIn, isCompact })).toBe(
+        result,
+      );
     });
   }
 });
@@ -1162,6 +1237,7 @@ describe('refreshWindowSize', () => {
         panelOpened: suite.persistentPanelOpened,
       });
       const setMinimumSize = jest.fn();
+      const setMaximumSize = jest.fn();
       const setSize = jest.fn();
       setup({
         injectee: {
@@ -1177,6 +1253,7 @@ describe('refreshWindowSize', () => {
               return {
                 getMinimumSize: () => [800, 600],
                 setMinimumSize,
+                setMaximumSize,
                 getSize: () => [800, 600],
                 setSize,
                 isMaximized: () => false,
@@ -1202,6 +1279,12 @@ describe('refreshWindowSize', () => {
           expect.anything(),
           arr[index - 1] || null,
           item,
+          {
+            backupHeight: undefined,
+            backupX: undefined,
+            backupY: undefined,
+            widthOffset: undefined,
+          },
         );
       });
       expect(updateWindowSize).toHaveBeenCalledTimes(suite.states.length);
@@ -1253,6 +1336,7 @@ describe('updateWindowSize', () => {
         getMinimumSize: () => [WINDOW_MIN_WIDTH[suite.prev], BASE_HEIGHT],
         getSize: () => [WIDTH, BASE_HEIGHT],
         setMinimumSize: jest.fn(),
+        setMaximumSize: jest.fn(),
         setSize: jest.fn(),
         isMaximized: () => false,
       };
@@ -1306,6 +1390,7 @@ describe('updateWindowSize', () => {
         getMinimumSize: () => [WINDOW_MIN_WIDTH[suite.prev], BASE_HEIGHT],
         getSize: () => [WINDOW_MIN_WIDTH[suite.prev] + WIDTH_DIFF, BASE_HEIGHT],
         setMinimumSize: jest.fn(),
+        setMaximumSize: jest.fn(),
         setSize: jest.fn(),
         isMaximized: () => suite.isMaximized,
       };
