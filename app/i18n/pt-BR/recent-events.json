@@ -75,5 +75,9 @@
   "Disable Safe Mode": "Desabilitar modo seguro",
   "Something went wrong disabling Safe Mode": "Alguma coisa deu errado quando o modo seguro estava sendo desabilitado",
   "Automatically disable Safe Mode": "Desabilitar automaticamente o Modo Seguro",
-  "Disable after <duration></duration> minutes": "Desabilitar após &lt;duration&gt;&lt;/duration&gt; minutos"
+  "Disable after <duration></duration> minutes": "Desabilitar após &lt;duration&gt;&lt;/duration&gt; minutos",
+  "has resubscribed": "has resubscribed",
+  "has gifted a sub to": "has gifted a sub to",
+  "has resubscribed for %{streak} months in a row! (%{months} total)": "has resubscribed for %{streak} months in a row! (%{months} total)",
+  "has resubscribed for %{months} months": "has resubscribed for %{months} months"
 }

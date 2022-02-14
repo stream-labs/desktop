@@ -184,5 +184,7 @@
   "Browser Settings": "Tarayıcı Ayarları",
   "Custom Code": "Özel Kod",
   "font_family_tooltip": "Mesaj için kullanılan Google Yazı Tipi. Bunu bulmak için https://fonts.google.com bağlantısını ziyaret edin! Popüler yazı tipleri: Açık Sans, Roboto, Oswald, Lato, Droid Sans.",
-  "Something went wrong while applying settings": "Ayarlar uygulanırken bir hata oluştu"
+  "Something went wrong while applying settings": "Ayarlar uygulanırken bir hata oluştu",
+  "Superchat Goal": "Superchat Goal",
+  "YouTube Superchats": "YouTube Superchats"
 }
