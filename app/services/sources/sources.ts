@@ -592,8 +592,8 @@ export class SourcesService extends StatefulService<ISourcesState> {
 
     // uncomment the source type to use it's React version
     const reactSourceProps: TSourceType[] = [
+      'color_source',
       'image_source',
-      // 'color_source',
       'browser_source',
       // 'slideshow',
       'ffmpeg_source',
@@ -670,6 +670,7 @@ export class SourcesService extends StatefulService<ISourcesState> {
       // StreamBoss
       // TipJar
       'ViewerCount',
+      'GameWidget',
     ];
     const isLegacyAlertbox = this.customizationService.state.legacyAlertbox;
     if (isLegacyAlertbox) reactWidgets = reactWidgets.filter(w => w !== 'AlertBox');
@@ -680,7 +681,7 @@ export class SourcesService extends StatefulService<ISourcesState> {
 
     const defaultVueWindowSize = { width: 920, height: 1024 };
     const defaultReactWindowSize = { width: 600, height: 800 };
-    const widgetInfo = this.widgetsService.widgetsConfig[componentName];
+    const widgetInfo = this.widgetsService.widgetsConfig[WidgetType[componentName]];
     const { width, height } = isReactComponent
       ? widgetInfo.settingsWindowSize || defaultReactWindowSize
       : defaultVueWindowSize;
