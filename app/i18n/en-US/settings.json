@@ -637,12 +637,12 @@
   "pollingPerformanceStatistics": "Activate performance statistics(bitrate, FPS, dropped frames)",
   "pollingPerformanceStatisticsDescription": "If the streaming is unstable, try disabling this option.",
   "autoCompact": {
-    "title": "要翻訳:コンパクトモード自動化設定",
-    "message": "要翻訳:番組開始時に自動的にコンパクトモードになり、番組終了時に自動で解除されるように設定できます。\n※設定をOFFにしたい場合は[設定]>[一般]から変更できます",
-    "doNotShowAgain": "要翻訳:今後、このダイアログを表示しない",
-    "later": "要翻訳:今は設定しない",
-    "activate": "要翻訳:コンパクトモード自動化設定をONにする",
-    "setting": "要翻訳:コンパクトモードに自動で切り替える",
-    "showDialog": "要翻訳:コンパクトモード自動化設定ダイアログを表示する"
+    "title": "Compact Mode Automation Settings",
+    "message": "Do you allow N Air to automatically switch to compact mode at the start of streaming and back to full mode at the end of it?\nYou can turn off the setting anytime from Settings> General.",
+    "doNotShowAgain": "Do not show the dialog again.",
+    "later": "Not change now",
+    "activate": "Turn on",
+    "setting": "Automatically switch to the compact mode in streaming",
+    "showDialog": "Show the Compact Mode Automation Settings dialog."
   }
 }
