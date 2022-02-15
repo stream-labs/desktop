@@ -1,6 +1,4 @@
-import { url } from 'inspector';
 import { AnchorPoint } from '../../util/ScalableRectangle';
-import { $t } from '../i18n';
 import { TAlertType } from './alerts-config';
 import { WidgetType } from './widgets-data';
 
