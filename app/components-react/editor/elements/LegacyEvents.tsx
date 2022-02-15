@@ -1,5 +1,5 @@
 import electron from 'electron';
-import remote from '@electron/remote';
+import * as remote from '@electron/remote';
 import React, { useRef } from 'react';
 import { $t } from 'services/i18n';
 import useBaseElement from './hooks';
