@@ -7,7 +7,6 @@ import {
 } from './customization';
 import { $t } from './i18n';
 import { NavigationService } from './navigation';
-import { NicoliveProgramService } from './nicolive-program/nicolive-program';
 import { StreamingService } from './streaming';
 import { UserService } from './user';
 import Utils from './utils';
@@ -15,26 +14,23 @@ import { WindowsService } from './windows';
 
 export interface ICompactModeServiceState {
   streaming: boolean;
-  programStarted: boolean;
   autoCompactMode: boolean;
-  navigating: boolean;
+  navigating: boolean; // true if studio screen is onboarding or patch-note
 }
 
 function shouldBeCompact(state: ICompactModeServiceState): boolean {
-  return state.streaming && state.programStarted;
+  return state.streaming;
 }
 
 export class CompactModeService extends StatefulService<ICompactModeServiceState> {
   @Inject() customizationService: CustomizationService;
   @Inject() userService: UserService;
   @Inject() streamingService: StreamingService;
-  @Inject() nicoliveProgramService: NicoliveProgramService;
   @Inject() windowsService: WindowsService;
   @Inject() navigationService: NavigationService;
 
   static defaultState: ICompactModeServiceState = {
     streaming: false,
-    programStarted: false,
     autoCompactMode: false,
     navigating: false,
   };
@@ -44,7 +40,6 @@ export class CompactModeService extends StatefulService<ICompactModeServiceState
     this.setState({
       autoCompactMode: this.customizationService.state.autoCompactMode,
       streaming: this.streamingService.state.streamingStatus !== 'offline',
-      programStarted: this.nicoliveProgramService.state.status === 'onAir',
       navigating: this.navigationService.state.currentPage !== 'Studio',
     });
     this.customizationService.settingsChanged.subscribe(state => {
@@ -54,9 +49,6 @@ export class CompactModeService extends StatefulService<ICompactModeServiceState
     });
     this.streamingService.streamingStatusChange.subscribe(state => {
       this.setState({ streaming: state !== 'offline' });
-    });
-    this.nicoliveProgramService.stateChange.subscribe(state => {
-      this.setState({ programStarted: state.status === 'onAir' });
     });
     this.navigationService.navigated.subscribe(state => {
       this.setState({ navigating: state.currentPage !== 'Studio' });
@@ -79,11 +71,11 @@ export class CompactModeService extends StatefulService<ICompactModeServiceState
         this.customizationService.setCompactMode(newCompact);
       }
     } else {
-      // 放送終了時、自動コンパクトモードでなく、コンパクトモードになっていた場合
-      // 自動コンパクトモードダイアログを出す
+      // 配信停止時、自動コンパクトモードでなく、コンパクトモードになっていた場合
+      // 自動コンパクトモード設定ダイアログを出す
       if (
-        'programStarted' in statePatch &&
-        !statePatch.programStarted &&
+        prevCompact &&
+        !newCompact &&
         !this.customizationService.state.autoCompactMode &&
         this.customizationService.state.showAutoCompactDialog &&
         this.customizationService.state.compactMode
