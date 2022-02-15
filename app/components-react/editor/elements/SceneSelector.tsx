@@ -129,7 +129,7 @@ export default function SceneSelector() {
   }
 
   const DropdownMenu = (
-    <div className={styles.dropdownContainer}>
+    <div className={cx(styles.dropdownContainer, 'react')}>
       <TextInput
         placeholder={$t('Search')}
         value={searchQuery}
@@ -141,22 +141,24 @@ export default function SceneSelector() {
         {$t('Manage All')}
       </div>
       <hr style={{ borderColor: 'var(--border)' }} />
-      {filteredCollections().map(collection => (
-        <div
-          key={collection.id}
-          onClick={() => loadCollection(collection.id)}
-          className={styles.dropdownItem}
-          data-name={collection.name}
-        >
-          <i
-            className={cx(
-              'fab',
-              collection.operatingSystem === 'win32' ? 'fa-windows' : 'fa-apple',
-            )}
-          />
-          {collection.name}
-        </div>
-      ))}
+      <Scrollable style={{ height: '150px' }}>
+        {filteredCollections().map(collection => (
+          <div
+            key={collection.id}
+            onClick={() => loadCollection(collection.id)}
+            className={styles.dropdownItem}
+            data-name={collection.name}
+          >
+            <i
+              className={cx(
+                'fab',
+                collection.operatingSystem === 'win32' ? 'fa-windows' : 'fa-apple',
+              )}
+            />
+            {collection.name}
+          </div>
+        ))}
+      </Scrollable>
     </div>
   );
 
@@ -169,9 +171,10 @@ export default function SceneSelector() {
           getPopupContainer={() => document.getElementById('mainWrapper')!}
           visible={showDropdown}
           onVisibleChange={setShowDropdown}
+          placement="bottomLeft"
         >
-          <span className={styles.activeScene} data-name="SceneSelectorDropdown">
-            {activeCollection?.name}
+          <span className={styles.activeSceneContainer} data-name="SceneSelectorDropdown">
+            <span className={styles.activeScene}>{activeCollection?.name}</span>
             <DownOutlined style={{ marginLeft: '4px' }} />
           </span>
         </Dropdown>

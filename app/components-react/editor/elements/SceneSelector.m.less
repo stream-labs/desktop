@@ -7,20 +7,25 @@
   justify-content: flex-end;
 }
 
-.active-scene {
-  width: 200px;
-  display: block;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
+.active-scene-container {
   margin-right: auto;
   font-weight: 500;
   font-size: 16px;
   color: var(--title);
+  display: flex;
+  align-items: center;
+  min-width: 0;
 
   &:hover {
     cursor: pointer;
   }
+}
+
+.active-scene {
+  display: block;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .scenes-container {
@@ -42,10 +47,15 @@
   border: 1px solid var(--border);
   padding: 8px;
   border-radius: 4px;
+  height: 230px;
 }
 
 .dropdown-item {
   margin: 4px;
+  display: block;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 
   i {
     margin-right: 4px;
