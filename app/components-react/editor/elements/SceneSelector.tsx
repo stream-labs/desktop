@@ -146,7 +146,9 @@ export default function SceneSelector() {
           <div
             key={collection.id}
             onClick={() => loadCollection(collection.id)}
-            className={styles.dropdownItem}
+            className={cx(styles.dropdownItem, {
+              [styles.osMismatch]: getOS() !== collection.operatingSystem,
+            })}
             data-name={collection.name}
           >
             <i
