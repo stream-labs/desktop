@@ -2,7 +2,11 @@ import { AnchorPoint } from '../../util/ScalableRectangle';
 import { TAlertType } from './alerts-config';
 import { WidgetType } from './widgets-data';
 
-export type TWidgetType = WidgetType.AlertBox | WidgetType.ViewerCount | WidgetType.GameWidget | WidgetType.EmoteWall;
+export type TWidgetType =
+  | WidgetType.AlertBox
+  | WidgetType.ViewerCount
+  | WidgetType.GameWidget
+  | WidgetType.EmoteWall;
 
 export interface IWidgetConfig {
   type: TWidgetType;
