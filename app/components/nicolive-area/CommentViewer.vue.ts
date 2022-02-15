@@ -175,10 +175,12 @@ export default class CommentViewer extends Vue {
     menu.popup();
   }
 
+  private cleanup: () => void = undefined;
+
   mounted() {
     const sentinelEl = this.$refs.sentinel as HTMLElement;
     const ioCallback: IntersectionObserverCallback = entries => {
-      this.isLatestVisible = entries[0].isIntersecting;
+      this.isLatestVisible = entries[entries.length - 1].isIntersecting;
     };
     const ioOptions = {
       rootMargin: '0px',
@@ -186,6 +188,16 @@ export default class CommentViewer extends Vue {
     };
     const io = new IntersectionObserver(ioCallback, ioOptions);
     io.observe(sentinelEl);
+    this.cleanup = () => {
+      io.unobserve(sentinelEl);
+    };
+  }
+
+  beforeDestroy() {
+    if (this.cleanup) {
+      this.cleanup();
+      this.cleanup = undefined;
+    }
   }
 
   updated() {
