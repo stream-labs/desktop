@@ -46,8 +46,9 @@ export class WidgetSource implements IWidgetSource {
       throw new Error('Only one preview source is allowed for widget');
     }
 
+    const config = this.widgetsService.widgetsConfig[this.type];
     const source = this.getSource();
-    const apiSettings = this.getSettingsService().getApiSettings();
+    const apiSettings = config || this.getSettingsService().getApiSettings();
     const previewSourceSettings = {
       ...source.getSettings(),
       shutdown: false,

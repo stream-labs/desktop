@@ -26,6 +26,7 @@ import { EmoteWall, EmoteWallModule } from '../EmoteWall';
 // SponsorBanner
 // StreamBoss
 // TipJar
+import { GameWidget, GameWidgetModule } from '../GameWidget';
 import { ViewerCount, ViewerCountModule } from '../ViewerCount';
 import { useSubscription } from '../../hooks/useSubscription';
 
@@ -53,6 +54,7 @@ export const components = {
   // StreamBoss
   // TipJar
   ViewerCount: [ViewerCount, ViewerCountModule],
+  GameWidget: [GameWidget, GameWidgetModule],
 };
 
 /**

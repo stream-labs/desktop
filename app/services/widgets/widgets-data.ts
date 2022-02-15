@@ -37,6 +37,7 @@ export enum WidgetType {
   EmoteWall = 20,
   ChatHighlight = 21,
   SuperchatGoal = 22,
+  GameWidget = 23,
 }
 
 export const WidgetTesters: IWidgetTester[] = [
@@ -339,21 +340,6 @@ export const WidgetDefinitions: { [x: number]: IWidget } = {
     y: 0.5,
 
     anchor: AnchorPoint.East,
-  },
-
-  [WidgetType.ViewerCount]: {
-    name: 'Viewer Count',
-    url(host, token) {
-      return `https://${host}/widgets/viewer-count?token=${token}`;
-    },
-
-    width: 600,
-    height: 200,
-
-    x: 0,
-    y: 1,
-
-    anchor: AnchorPoint.SouthWest,
   },
 
   [WidgetType.StreamBoss]: {
@@ -681,5 +667,14 @@ export const WidgetDisplayData = (platform?: string): { [x: number]: IWidgetDisp
     supportList: [],
     platforms: new Set(['twitch']),
     icon: 'icon-community',
+  },
+  [WidgetType.GameWidget]: {
+    name: $t('Game Widget'),
+    description: $t('Let your viewers play a game in chat'),
+    demoVideo: false,
+    demoFilename: 'game-widget.png',
+    supportList: [],
+    platforms: new Set(['twitch']),
+    icon: 'icon-face-masks',
   },
 });

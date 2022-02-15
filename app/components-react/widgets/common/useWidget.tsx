@@ -4,7 +4,6 @@ import { Services } from '../../service-provider';
 import { mutation } from '../../store';
 import { throttle } from 'lodash-decorators';
 import { assertIsDefined, getDefined } from '../../../util/properties-type-guards';
-import { TWidgetType } from '../../../services/widgets/widgets-config';
 import { TObsFormData } from '../../../components/obs/inputs/ObsInput';
 import { pick, cloneDeep } from 'lodash';
 import { $t } from '../../../services/i18n';
@@ -12,6 +11,7 @@ import Utils from '../../../services/utils';
 import { TAlertType } from '../../../services/widgets/alerts-config';
 import { alertAsync } from '../../modals';
 import { onUnload } from 'util/unload';
+import merge from 'lodash/merge';
 
 /**
  * Common state for all widgets
@@ -22,7 +22,7 @@ export interface IWidgetState {
   shouldCreatePreviewSource: boolean;
   previewSourceId: string;
   selectedTab: string;
-  type: TWidgetType;
+  type: WidgetType;
   browserSourceProps: TObsFormData;
   prevSettings: any;
   canRevert: boolean;
@@ -91,7 +91,7 @@ export class WidgetModule<TWidgetState extends IWidgetState = IWidgetState> {
     this.cancelUnload = onUnload(() => this.widget.destroyPreviewSource());
 
     // load settings from the server to the store
-    this.state.type = WidgetType[widget.type] as TWidgetType;
+    this.state.type = widget.type;
     const data = await this.fetchData();
     this.setData(data);
     this.setPrevSettings(data);
@@ -206,7 +206,7 @@ export class WidgetModule<TWidgetState extends IWidgetState = IWidgetState> {
    * Update settings and save on the server
    */
   public async updateSettings(formValues: any) {
-    const newSettings = { ...this.settings, ...formValues };
+    const newSettings = merge(cloneDeep(this.settings), formValues);
     // save setting to the store
     this.setSettings(newSettings);
     // send setting to the server
