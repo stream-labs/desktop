@@ -93,6 +93,7 @@ export default class StudioFooterComponent extends Vue {
 
     this.streamingElapsedTime = this.streamingService.formattedDurationInCurrentStreamingState;
 
+    this.clearTimeoutHandle();
     this.timeoutHandle = setTimeout(() => this.updateStreamingElapsedTime(), 200);
   }
 
