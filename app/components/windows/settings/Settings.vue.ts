@@ -13,7 +13,6 @@ import Hotkeys from './Hotkeys.vue';
 import OverlaySettings from './OverlaySettings';
 import NotificationsSettings from './NotificationsSettings.vue';
 import ExperimentalSettings from './ExperimentalSettings.vue';
-import RemoteControlSettings from './RemoteControlSettings.vue';
 import GameOverlaySettings from './GameOverlaySettings';
 import SearchablePages from 'components/shared/SearchablePages';
 import FormInput from 'components/shared/inputs/FormInput.vue';
@@ -37,7 +36,6 @@ import * as remote from '@electron/remote';
     DeveloperSettings,
     OverlaySettings,
     NotificationsSettings,
-    RemoteControlSettings,
     ExperimentalSettings,
     InstalledApps,
     GameOverlaySettings,
@@ -76,6 +74,7 @@ export default class Settings extends Vue {
     'Remote Control': 'fas fa-play-circle',
     Experimental: 'fas fa-flask',
     'Installed Apps': 'icon-store',
+    'Get Support': 'icon-question',
   };
 
   internalCategoryName: string = null;
@@ -135,9 +134,10 @@ export default class Settings extends Vue {
       // 'SceneCollections',
       // 'Notifications',
       'Appearance',
-      // 'RemoteControl',
+      'Remote Control',
       // 'VirtualWebcam',
       // 'GameOverlay'
+      'Get Support',
     ];
   }
 

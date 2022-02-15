@@ -54,6 +54,7 @@ export { MacPermissionsService } from 'services/mac-permissions';
 export { VirtualWebcamService } from 'services/virtual-webcam';
 export { MetricsService } from 'services/metrics';
 export { HighlighterService } from 'services/highlighter';
+export { DiagnosticsService } from 'services/diagnostics';
 
 // ONLINE SERVICES
 export { UserService } from './services/user';
@@ -141,6 +142,7 @@ import { ChatService } from './services/chat';
 import { HighlighterService } from './services/highlighter';
 import { GrowService } from './services/grow/grow';
 import { TransitionsService } from './services/transitions';
+import { TcpServerService } from './services/api/tcp-server';
 import { MagicLinkService } from './services/magic-link';
 import { UsageStatisticsService } from './services/usage-statistics';
 import { NotificationsService } from './services/notifications';
@@ -157,6 +159,9 @@ import { MediaGalleryService } from './services/media-gallery';
 import { RecentEventsService } from 'services/recent-events';
 import { AudioService } from './services/audio';
 import { SourceFiltersService } from './services/source-filters';
+import { DiagnosticsService } from './services/diagnostics';
+import { WebsocketService } from './services/websocket';
+import { SpinWheelService } from 'services/widgets/settings/spin-wheel';
 import { LayoutService } from './services/layout';
 import { ProjectorService } from './services/projector';
 
@@ -190,6 +195,7 @@ export const AppServices = {
   HighlighterService,
   GrowService,
   TransitionsService,
+  TcpServerService,
   MagicLinkService,
   MediaGalleryService,
   UsageStatisticsService,
@@ -205,6 +211,9 @@ export const AppServices = {
   PlatformAppsService,
   AudioService,
   SourceFiltersService,
+  DiagnosticsService,
+  WebsocketService,
+  SpinWheelService,
   LayoutService,
   ProjectorService,
 };

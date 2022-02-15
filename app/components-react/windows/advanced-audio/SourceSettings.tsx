@@ -49,8 +49,8 @@ export default function AdvancedAudio() {
 }
 
 function PanelHeader(p: { source: AudioSource }) {
-  const { name, mixerHidden, muted, fader, sourceId, audioMixers } = p.source;
   const { EditorCommandsService, SettingsService } = Services;
+
   const { isAdvancedOutput, recordingTracks, streamTrack, vodTrackEnabled, vodTrack } = useVuex(
     () => ({
       isAdvancedOutput: SettingsService.views.isAdvancedOutput,
@@ -60,6 +60,8 @@ function PanelHeader(p: { source: AudioSource }) {
       vodTrack: SettingsService.views.vodTrack,
     }),
   );
+
+  const { name, mixerHidden, muted, fader, audioMixers, sourceId } = p.source;
 
   const [trackFlags, setTrackFlags] = useState(
     Utils.numberToBinnaryArray(audioMixers, 6).reverse(),
@@ -233,8 +235,11 @@ function PanelForm(p: { source: AudioSource }) {
         label={$t('Sync Offset')}
         value={syncOffset}
         name="syncOffset"
-        onInput={value => handleSettingsChange('syncOffset', value)}
+        onChange={value => handleSettingsChange('syncOffset', value)}
         tooltip={$t('Time it takes between sound occuring and being broadcast (ms)')}
+        min={-950}
+        max={5000}
+        uncontrolled={false}
       />
       <SwitchInput
         label={$t('Downmix to Mono')}

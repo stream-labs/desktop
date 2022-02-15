@@ -592,23 +592,24 @@ export class SourcesService extends StatefulService<ISourcesState> {
 
     // uncomment the source type to use it's React version
     const reactSourceProps: TSourceType[] = [
-      // 'image_source',
-      // 'color_source',
-      // 'browser_source',
+      'color_source',
+      'image_source',
+      'browser_source',
       // 'slideshow',
-      // 'ffmpeg_source',
+      'ffmpeg_source',
       // 'text_gdiplus',
       // 'text_ft2_source',
       // 'monitor_capture',
       // 'window_capture',
-      // 'game_capture',
+      'game_capture',
       // 'dshow_input',
+      'dshow_input',
       // 'wasapi_input_capture',
       // 'wasapi_output_capture',
       // 'decklink-input',
       // 'scene',
       // 'ndi_source',
-      // 'openvr_capture',
+      'openvr_capture',
       // 'screen_capture',
       // 'liv_capture',
       // 'ovrstream_dc_source',
@@ -669,6 +670,7 @@ export class SourcesService extends StatefulService<ISourcesState> {
       // StreamBoss
       // TipJar
       'ViewerCount',
+      'GameWidget',
     ];
     const isLegacyAlertbox = this.customizationService.state.legacyAlertbox;
     if (isLegacyAlertbox) reactWidgets = reactWidgets.filter(w => w !== 'AlertBox');
@@ -679,7 +681,7 @@ export class SourcesService extends StatefulService<ISourcesState> {
 
     const defaultVueWindowSize = { width: 920, height: 1024 };
     const defaultReactWindowSize = { width: 600, height: 800 };
-    const widgetInfo = this.widgetsService.widgetsConfig[componentName];
+    const widgetInfo = this.widgetsService.widgetsConfig[WidgetType[componentName]];
     const { width, height } = isReactComponent
       ? widgetInfo.settingsWindowSize || defaultReactWindowSize
       : defaultVueWindowSize;
@@ -688,7 +690,7 @@ export class SourcesService extends StatefulService<ISourcesState> {
       this.windowsService.showWindow({
         componentName: windowComponentName,
         title: $t('Settings for %{sourceName}', {
-          sourceName: WidgetDisplayData(platform.type)[widgetType].name,
+          sourceName: WidgetDisplayData(platform.type)[widgetType]?.name || componentName,
         }),
         queryParams: { sourceId: source.sourceId, widgetType: WidgetType[widgetType] },
         size: {

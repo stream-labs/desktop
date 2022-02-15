@@ -3,7 +3,12 @@ import { Store, Module } from 'vuex';
 import { Service } from './service';
 import Utils from 'services/utils';
 
-export function mutation(options = { unsafe: false }) {
+interface IMutationOptions {
+  unsafe?: boolean;
+  sync?: boolean;
+}
+
+export function mutation(options: IMutationOptions = {}) {
   return function (target: any, methodName: string, descriptor: PropertyDescriptor) {
     return registerMutation(target, methodName, descriptor, options);
   };
@@ -13,15 +18,16 @@ function registerMutation(
   target: any,
   methodName: string,
   descriptor: PropertyDescriptor,
-  options = { unsafe: false },
+  options: IMutationOptions = {},
 ) {
   const serviceName = target.constructor.name;
   const mutationName = `${serviceName}.${methodName}`;
+  const opts: IMutationOptions = { unsafe: false, sync: true, ...options };
 
   target.originalMethods = target.originalMethods || {};
   target.originalMethods[methodName] = target[methodName];
   target.mutationOptions = target.mutationOptions || {};
-  target.mutationOptions[methodName] = options;
+  target.mutationOptions[methodName] = opts;
   target.mutations = target.mutations || {};
   target.mutations[mutationName] = function (
     localState: any,
@@ -38,7 +44,7 @@ function registerMutation(
 
     let contextProxy = context;
 
-    if (Utils.isDevMode() && !options.unsafe) {
+    if (Utils.isDevMode() && !opts.unsafe) {
       const errorMsg = (key: string) =>
         `Mutation ${mutationName} attempted to access this.${key}. ` +
         'To ensure mutations can safely execute in any context, mutations are restricted ' +
@@ -78,6 +84,7 @@ function registerMutation(
       store.commit(mutationName, {
         args,
         constructorArgs,
+        __vuexSyncIgnore: opts.sync ? undefined : true,
       });
     },
   });

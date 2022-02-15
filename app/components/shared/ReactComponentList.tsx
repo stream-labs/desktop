@@ -118,6 +118,24 @@ export class IconLibraryProperties extends ReactComponent {}
 
 @Component({
   props: {
+    name: { default: 'LegacyEvents' },
+    wrapperStyles: { default: () => ({ height: '100%' }) },
+    componentProps: { default: () => ({ onPopout: () => {} }) },
+    mins: { default: () => ({ x: 360, y: 150 }) },
+  },
+})
+export class LegacyEvents extends ReactComponent {}
+
+@Component({
+  props: {
+    name: { default: 'MediaGallery' },
+    wrapperStyles: { default: () => ({ height: '100%' }) },
+  },
+})
+export class MediaGallery extends ReactComponent {}
+
+@Component({
+  props: {
     name: { default: 'MiniFeed' },
     wrapperStyles: { default: () => ({ height: '100%' }) },
     mins: { default: () => ({ x: 330, y: 90 }) },

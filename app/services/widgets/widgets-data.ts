@@ -37,6 +37,7 @@ export enum WidgetType {
   EmoteWall = 20,
   ChatHighlight = 21,
   SuperchatGoal = 22,
+  GameWidget = 23,
 }
 
 export const WidgetTesters: IWidgetTester[] = [
@@ -341,21 +342,6 @@ export const WidgetDefinitions: { [x: number]: IWidget } = {
     anchor: AnchorPoint.East,
   },
 
-  [WidgetType.ViewerCount]: {
-    name: 'Viewer Count',
-    url(host, token) {
-      return `https://${host}/widgets/viewer-count?token=${token}`;
-    },
-
-    width: 600,
-    height: 200,
-
-    x: 0,
-    y: 1,
-
-    anchor: AnchorPoint.SouthWest,
-  },
-
   [WidgetType.StreamBoss]: {
     name: 'Stream Boss',
     url(host, token) {
@@ -493,21 +479,17 @@ export const WidgetDisplayData = (platform?: string): { [x: number]: IWidgetDisp
     icon: 'fas fa-calendar',
   },
   [WidgetType.FollowerGoal]: {
-    name: $t('Follower Goal'),
+    name: platform === 'youtube' ? $t('Subscription Goal') : $t('Follower Goal'),
     description: $t('Set a goal for your viewers to help you reach.'),
     demoVideo: false,
     demoFilename: 'source-follower-goal.png',
-    platforms: new Set(['twitch', 'facebook', 'trovo']),
-    supportList: [$t('Twitch Follows'), $t('Facebook Follows'), $t('Trovo Follows')],
-    icon: 'fas fa-calendar',
-  },
-  [WidgetType.SubscriberGoal]: {
-    name: $t('Subscription Goal'),
-    description: $t('Set a goal for your viewers to help you reach.'),
-    demoVideo: false,
-    demoFilename: 'source-follower-goal.png',
-    supportList: [$t('YouTube Subscribers')],
-    platforms: new Set(['youtube']),
+    platforms: new Set(['twitch', 'facebook', 'youtube', 'trovo']),
+    supportList: [
+      $t('Twitch Follows'),
+      $t('Facebook Follows'),
+      $t('YouTube Subscribers'),
+      $t('Trovo Follows'),
+    ],
     icon: 'fas fa-calendar',
   },
   [WidgetType.SubGoal]: {
@@ -685,5 +667,14 @@ export const WidgetDisplayData = (platform?: string): { [x: number]: IWidgetDisp
     supportList: [],
     platforms: new Set(['twitch']),
     icon: 'icon-community',
+  },
+  [WidgetType.GameWidget]: {
+    name: $t('Game Widget'),
+    description: $t('Let your viewers play a game in chat'),
+    demoVideo: false,
+    demoFilename: 'game-widget.png',
+    supportList: [],
+    platforms: new Set(['twitch']),
+    icon: 'icon-face-masks',
   },
 });

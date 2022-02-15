@@ -36,6 +36,7 @@ export default function Projector() {
     WindowsService.actions.setOneOffFullscreen(windowId, true);
     oldBounds.current = currentWindow.getBounds();
     currentWindow.setPosition(display.bounds.x, display.bounds.y);
+    currentWindow.fullScreenable = true;
     currentWindow.setFullScreen(true);
     document.addEventListener('keydown', exitFullscreen);
   }
@@ -61,7 +62,7 @@ export default function Projector() {
       {!fullscreen && (
         <ModalLayout bodyStyle={{ padding: 0 }} hideFooter>
           <div className={styles.projectorWindowed}>
-            <Scrollable className={styles.buttonContainer}>
+            <Scrollable className={styles.buttonContainer} style={{ height: 40 }}>
               <div className={styles.projectorButtons}>
                 {remote.screen.getAllDisplays().map((display, idx) => (
                   <button

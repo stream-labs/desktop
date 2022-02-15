@@ -131,6 +131,8 @@ class UserViews extends ViewHandler<IUserServiceState> {
     if (this.isLoggedIn) {
       return Object.keys(this.state.auth.platforms);
     }
+
+    return [];
   }
 
   get isTwitchAuthed() {
@@ -611,18 +613,17 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   }
 
   recentEventsUrl() {
-    if (this.isLoggedIn) {
-      const host = this.hostsService.streamlabs;
-      const token = this.widgetToken;
-      const nightMode = this.customizationService.isDarkTheme ? 'night' : 'day';
-      const isMediaShare =
-        this.windowsService.state.RecentEvents &&
-        this.windowsService.state.RecentEvents.queryParams.isMediaShare
-          ? '&view=media-share'
-          : '';
+    if (!this.isLoggedIn) return '';
+    const host = this.hostsService.streamlabs;
+    const token = this.widgetToken;
+    const nightMode = this.customizationService.isDarkTheme ? 'night' : 'day';
+    const isMediaShare =
+      this.windowsService.state.RecentEvents &&
+      this.windowsService.state.RecentEvents.queryParams.isMediaShare
+        ? '&view=media-share'
+        : '';
 
-      return `https://${host}/dashboard/recent-events?token=${token}&mode=${nightMode}&electron${isMediaShare}`;
-    }
+    return `https://${host}/dashboard/recent-events?token=${token}&mode=${nightMode}&electron${isMediaShare}`;
   }
 
   dashboardUrl(subPage: string, hidenav: boolean = false) {
