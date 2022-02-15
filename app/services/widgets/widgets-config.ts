@@ -122,8 +122,8 @@ export function getWidgetsConfig(host: string, token: string): Record<TWidgetTyp
         width: 1280,
         height: 720,
         x: 0,
-        y: 1,
-        anchor: AnchorPoint.Center,
+        y: 0,
+        anchor: AnchorPoint.NorthWest,
       },
 
       settingsWindowSize: {
