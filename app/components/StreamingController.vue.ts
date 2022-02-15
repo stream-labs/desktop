@@ -66,17 +66,34 @@ export default class StudioFooterComponent extends Vue {
     this.streamingService.saveReplay();
   }
 
+  mounted() {
+    this.updateStreamingElapsedTime();
+  }
+
+  beforeDestroy() {
+    this.clearTimeoutHandle();
+  }
+
+  private timeoutHandle: NodeJS.Timeout = undefined;
+  private clearTimeoutHandle() {
+    if (this.timeoutHandle) {
+      clearTimeout(this.timeoutHandle);
+      this.timeoutHandle = undefined;
+    }
+  }
+
   streamingElapsedTime: string = '--:--:--';
   @Watch('streamingStatus')
   updateStreamingElapsedTime(): void {
     if (this.streamingService.state.streamingStatus !== EStreamingState.Live) {
       this.streamingElapsedTime = '--:--:--';
+      this.clearTimeoutHandle();
       return;
     }
 
     this.streamingElapsedTime = this.streamingService.formattedDurationInCurrentStreamingState;
 
-    setTimeout(() => this.updateStreamingElapsedTime(), 200);
+    this.timeoutHandle = setTimeout(() => this.updateStreamingElapsedTime(), 200);
   }
 
   recordTooltip = $t('streaming.recordTooltip');
