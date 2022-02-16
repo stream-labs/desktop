@@ -519,12 +519,12 @@ test('extendProgram:成功', async () => {
               ],
               Array [
                 Object {
-                  "isExtending": false,
+                  "endTime": 125,
                 },
               ],
               Array [
                 Object {
-                  "endTime": 125,
+                  "isExtending": false,
                 },
               ],
             ]

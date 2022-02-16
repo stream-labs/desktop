@@ -374,6 +374,7 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
 
   async extendProgram(): Promise<void> {
     this.setState({ isExtending: true });
+    console.log('extend start'); // DEBUG
     try {
       // DEBUG デザイン作業用
       if (process.env.DEV_SERVER) {
@@ -382,9 +383,10 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
         return;
       }
 
-      return this.internalExtendProgram(this.state);
+      return await this.internalExtendProgram(this.state);
     } finally {
       this.setState({ isExtending: false });
+      console.log('extend end'); // DEBUG
     }
   }
 
