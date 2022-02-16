@@ -103,4 +103,7 @@ export default class StartStreamingButton extends Vue {
       setTimeout(() => this.setDelayUpdate(), 100);
     }
   }
+
+  goLiveTooltip = $t('streaming.goLiveTooltip');
+  endStreamTooltip = $t('streaming.endStreamTooltip');
 }

@@ -1,15 +1,17 @@
 <template>
-<button
-  class="button button--go-live"
-  :class="{ 'button--soft-warning': isStreaming, 'is-compactMode': compactMode}"
-  :disabled="isDisabled"
-  @click="toggleStreaming"
-  data-test="StartStreamingButton"
-  :data-test-status="streamingStatus">
-  <StartStreamingIcon v-if="isStreaming" />
-  <i v-if="!isStreaming" class="icon-live"/>
-  <span class="button-label" v-if="!compactMode">{{getStreamButtonLabel()}}</span>
-</button>
+  <button
+    class="button button--go-live"
+    :class="{ 'button--soft-warning': isStreaming, 'is-compactMode': compactMode }"
+    :disabled="isDisabled"
+    @click="toggleStreaming"
+    v-tooltip.left="isStreaming ? endStreamTooltip : goLiveTooltip"
+    data-test="StartStreamingButton"
+    :data-test-status="streamingStatus"
+  >
+    <StartStreamingIcon v-if="isStreaming" />
+    <i v-if="!isStreaming" class="icon-live" />
+    <span class="button-label" v-if="!compactMode">{{ getStreamButtonLabel() }}</span>
+  </button>
 </template>
 
 <script lang="ts" src="./StartStreamingButton.vue.ts"></script>
