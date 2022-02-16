@@ -197,7 +197,7 @@ export default function SceneSelector() {
           onDrop={handleSort}
           onSelect={makeActive}
           onRightClick={showContextMenu}
-          defaultSelectedKeys={[activeSceneId]}
+          selectedKeys={[activeSceneId]}
         />
       </Scrollable>
       <HelpTip
