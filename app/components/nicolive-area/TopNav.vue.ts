@@ -2,7 +2,6 @@ import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import { Inject } from 'services/core/injector';
 import { NicoliveProgramService } from 'services/nicolive-program/nicolive-program';
-import { clipboard } from 'electron';
 import {
   NicoliveFailure,
   openErrorDialogFromFailure,
@@ -45,21 +44,5 @@ export default class TopNav extends Vue {
     } finally {
       this.isEditing = false;
     }
-  }
-
-  hasProgramUrlCopied: boolean = false;
-  clearTimer: number = 0;
-  copyProgramURL() {
-    if (this.isFetching) throw new Error('fetchProgram is running');
-    clipboard.writeText(
-      `https://live.nicovideo.jp/watch/${this.nicoliveProgramService.state.programID}`,
-    );
-    this.hasProgramUrlCopied = true;
-    window.clearTimeout(this.clearTimer);
-
-    this.clearTimer = window.setTimeout(() => {
-      this.hasProgramUrlCopied = false;
-      this.clearTimer = null;
-    }, 1000);
   }
 }

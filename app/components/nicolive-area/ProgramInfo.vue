@@ -45,8 +45,9 @@
             >
           </li>
           <li class="popup-menu-item">
-            <a @click="/*copyProgramURL*/" class="link"
-              ><i class="icon-clipboard-copy"></i>番組URLをコピーする</a
+            <a @click="copyProgramURL" class="link"
+              ><i :class="hasProgramUrlCopied ? 'icon-check' : 'icon-clipboard-copy'"></i
+              >番組URLをコピーする</a
             >
           </li>
         </ul>
