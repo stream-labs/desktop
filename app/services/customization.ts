@@ -73,6 +73,7 @@ export interface ICustomizationServiceState {
   legacyEvents: boolean;
   pinnedStatistics: IPinnedStatistics;
   enableCrashDumps: boolean;
+  enableAnnouncements: boolean;
 }
 
 class CustomizationViews extends ViewHandler<ICustomizationServiceState> {
@@ -150,6 +151,7 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
       // put experimental features here
     },
     enableCrashDumps: true,
+    enableAnnouncements: true,
   };
 
   settingsChanged = new Subject<Partial<ICustomizationServiceState>>();
