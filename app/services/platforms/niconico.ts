@@ -123,7 +123,7 @@ export class NiconicoService extends Service implements IPlatformService {
     return this.userService.channelId;
   }
   getUserPageURL(): string {
-    return `http://www.nicovideo.jp/user/${this.niconicoUserId}`;
+    return 'http://live.nicovideo.jp/my';
   }
 
   getHeaders(authorized = false): Headers {
