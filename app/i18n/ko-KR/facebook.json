@@ -14,7 +14,7 @@
   "Connect": "연결",
   "Install Your Theme": "테마 설치",
   "Install": "설치",
-  "facebookGamingWarning": "완전한 Facebook 게이밍 경험을 원한다면 <create-page-link>게이밍 비디오 크리에이터 페이지를 생성</create-page-link>하세요",
+  "facebookGamingWarning": "완전한 Facebook 게이밍 경험을 원한다면 &lt;create-page-link&gt;게이밍 비디오 크리에이터 페이지를 생성&lt;/create-page-link&gt;하세요",
   "Facebook Destination": "Facebook 목적지",
   "Share to Your Timeline": "타임라인에 공유",
   "Share to a Page You Manage": "관리하는 페이지에 공유",
@@ -30,7 +30,7 @@
   "Please reconnect Facebook to get these new features": "새 기능을 이용하려면 Facebook에 다시 연결하세요",
   "Reconnect now": "지금 다시 연결하기",
   "Privacy": "개인정보",
-  "FBPrivacyWarning": "승인된 프라이버시 수준이 Facebook 계정에 제한될 수 있습니다. <link>여기</link>의 \"비즈니스 통합 내용을 확인할 수 있는 사람\" 섹션에서 Streamlabs 통합 내용을 확인하세요.",
+  "FBPrivacyWarning": "승인된 프라이버시 수준이 Facebook 계정에 제한될 수 있습니다. &lt;link&gt;여기&lt;/link&gt;의 \"비즈니스 통합 내용을 확인할 수 있는 사람\" 섹션에서 Streamlabs 통합 내용을 확인하세요.",
   "Only Me": "나만",
   "Do not change privacy settings": "개인정보 설정을 변경하지 않음"
 }

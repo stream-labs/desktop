@@ -4,7 +4,6 @@ import Vue from 'vue';
 import fs from 'fs-extra';
 import url from 'url';
 import { EStreamingState, StreamingService } from 'services/streaming';
-import electron from 'electron';
 import { getPlatformService } from 'services/platforms';
 import { UserService } from 'services/user';
 import {
@@ -30,6 +29,7 @@ import { DismissablesService, EDismissable } from 'services/dismissables';
 import { ENotificationType, NotificationsService } from 'services/notifications';
 import { JsonrpcService } from 'services/api/jsonrpc';
 import { NavigationService } from 'services/navigation';
+import * as remote from '@electron/remote';
 
 export interface IClip {
   path: string;
@@ -429,7 +429,7 @@ export class HighlighterService extends StatefulService<IHighligherState> {
       // the videos path from the system.
       // TODO: Add a fallback directory?
       this.SET_EXPORT_INFO({
-        file: path.join(electron.remote.app.getPath('videos'), 'Output.mp4'),
+        file: path.join(remote.app.getPath('videos'), 'Output.mp4'),
       });
     } catch (e: unknown) {
       console.error('Got error fetching videos directory', e);
@@ -512,7 +512,7 @@ export class HighlighterService extends StatefulService<IHighligherState> {
               type: ENotificationType.SUCCESS,
               lifeTime: -1,
               message: $t(
-                'Edit your replays with Highlighter, a free editor built in to Streamlabs OBS.',
+                'Edit your replays with Highlighter, a free editor built in to Streamlabs.',
               ),
               action: this.jsonrpcService.createRequest(
                 Service.getResourceId(this),

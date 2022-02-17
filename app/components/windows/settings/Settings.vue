@@ -56,7 +56,7 @@
             <strong>{{ userService.isLoggedIn ? $t('Log Out') : $t('Log In') }}</strong>
             <platform-logo
               v-if="userService.isLoggedIn"
-              :componentProps="{ platform: userService.platform.type, size: 14 }"
+              :componentProps="{ platform: userService.platform.type, size: 'small' }"
             />
             <span v-if="userService.isLoggedIn">{{ userService.username }}</span>
           </div>
@@ -81,12 +81,10 @@
             :highlightSearch="highlightSearch"
             :scanning="scanning"
           />
-          <stream-settings v-if="page === 'Stream'" />
           <developer-settings v-if="page === 'Developer'" />
           <installed-apps v-if="page === 'Installed Apps'" />
           <overlay-settings v-if="page === 'Scene Collections'" />
           <notifications-settings v-if="page === 'Notifications'" />
-          <remote-control-settings v-if="page === 'Remote Control'" />
           <game-overlay-settings v-if="page === 'Game Overlay'" />
           <virtual-webcam-settings v-if="page === 'Virtual Webcam'" />
           <ObsSettings v-if="shouldShowReactPage" :componentProps="{ page: page }" />

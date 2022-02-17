@@ -19,7 +19,7 @@
   "Transition Type": "Typ přechodu",
   "Name": "Name",
   "Transition Name": "Název přechodu",
-  "Default": "Default",
+  "Default": "Výchozí",
   "Deleted": "Odstraněno",
   "This connection is redundant because another connection already connects these scenes.": "Toto spojení je nadbytečné, protože tyto scény jsou již propojeny pomocí jiného spojení.",
   "You need at least 2 scenes to edit transitions.": "K úpravě přechodů potřebujete alespoň 2 scény.",

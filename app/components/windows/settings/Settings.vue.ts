@@ -1,4 +1,3 @@
-import electron from 'electron';
 import Vue from 'vue';
 import { Component, Watch } from 'vue-property-decorator';
 import { Inject } from 'services/core/injector';
@@ -13,11 +12,9 @@ import InstalledApps from 'components/InstalledApps.vue';
 import Hotkeys from './Hotkeys.vue';
 import OverlaySettings from './OverlaySettings';
 import NotificationsSettings from './NotificationsSettings.vue';
-import RemoteControlSettings from './RemoteControlSettings.vue';
 import GameOverlaySettings from './GameOverlaySettings';
 import SearchablePages from 'components/shared/SearchablePages';
 import FormInput from 'components/shared/inputs/FormInput.vue';
-import StreamSettings from './StreamSettings';
 import VirtualWebcamSettings from './VirtualWebcamSettings';
 import { MagicLinkService } from 'services/magic-link';
 import { UserService } from 'services/user';
@@ -25,6 +22,8 @@ import Scrollable from 'components/shared/Scrollable';
 import { ObsSettings, PlatformLogo } from 'components/shared/ReactComponentList';
 import { $t } from 'services/i18n';
 import { debounce } from 'lodash-decorators';
+import * as remote from '@electron/remote';
+import Utils from '../../../services/utils';
 
 @Component({
   components: {
@@ -37,11 +36,9 @@ import { debounce } from 'lodash-decorators';
     DeveloperSettings,
     OverlaySettings,
     NotificationsSettings,
-    RemoteControlSettings,
     InstalledApps,
     GameOverlaySettings,
     FormInput,
-    StreamSettings,
     VirtualWebcamSettings,
     Scrollable,
     PlatformLogo,
@@ -76,6 +73,7 @@ export default class Settings extends Vue {
     'Remote Control': 'fas fa-play-circle',
     Experimental: 'fas fa-flask',
     'Installed Apps': 'icon-store',
+    'Get Support': 'icon-question',
   };
 
   internalCategoryName: string = null;
@@ -124,9 +122,9 @@ export default class Settings extends Vue {
    * returns the list of the pages ported to React
    */
   get reactPages() {
-    return [
+    const pages = [
       'General',
-      // 'Stream',
+      'Stream',
       // 'Output',
       // 'Audio',
       // 'Video',
@@ -135,11 +133,13 @@ export default class Settings extends Vue {
       // 'SceneCollections',
       // 'Notifications',
       'Appearance',
-      // 'RemoteControl',
+      'Remote Control',
       // 'VirtualWebcam',
       // 'GameOverlay'
-      'Experimental',
+      'Get Support',
     ];
+    if (Utils.isDevMode()) pages.push('Experimental');
+    return pages;
   }
 
   get shouldShowReactPage() {
@@ -235,7 +235,7 @@ export default class Settings extends Vue {
 
   handleAuth() {
     if (this.userService.isLoggedIn) {
-      electron.remote.dialog
+      remote.dialog
         .showMessageBox({
           title: $t('Confirm'),
           message: $t('Are you sure you want to log out?'),

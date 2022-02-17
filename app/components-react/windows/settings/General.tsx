@@ -1,21 +1,17 @@
-import React, { useRef, useState } from 'react';
+import React, { useState } from 'react';
 import { ObsGenericSettingsForm, ObsSettingsSection } from './ObsSettings';
 import { $t, I18nService } from '../../../services/i18n';
 import { alertAsync, confirmAsync } from '../../modals';
 import { CheckboxInput, ListInput } from '../../shared/inputs';
-import electron from 'electron';
 import { Services } from '../../service-provider';
 import fs from 'fs';
-import rimraf from 'rimraf';
 import path from 'path';
-import { useOnCreate, useVuex } from '../../hooks';
 import { useBinding } from '../../store';
 import { getDefined } from '../../../util/properties-type-guards';
 
 export function GeneralSettings() {
   return (
     <div>
-      <CacheSettings />
       <LanguageSettings />
       <ExtraSettings />
       <ObsGenericSettingsForm />
@@ -24,82 +20,6 @@ export function GeneralSettings() {
 }
 
 GeneralSettings.page = 'General';
-
-function CacheSettings() {
-  const { AppService, CacheUploaderService, CustomizationService } = Services;
-  const [cacheUploading, setCacheUploading] = useState(false);
-  const { enableCrashDumps } = useVuex(() => {
-    return { enableCrashDumps: CustomizationService.state.enableCrashDumps };
-  });
-
-  async function showCacheDir() {
-    await electron.remote.shell.openPath(AppService.appDataDirectory);
-  }
-
-  async function deleteCacheDir() {
-    if (
-      await confirmAsync(
-        $t(
-          'WARNING! You will lose all stream and encoder settings. If you are logged in, your scenes and sources will be restored from the cloud. This cannot be undone.',
-        ),
-      )
-    ) {
-      electron.remote.app.relaunch({ args: ['--clearCacheDir'] });
-      electron.remote.app.quit();
-    }
-  }
-
-  function uploadCacheDir() {
-    if (cacheUploading) return;
-    setCacheUploading(true);
-    CacheUploaderService.uploadCache().then(file => {
-      electron.remote.clipboard.writeText(file);
-      alert(
-        $t(
-          'Your cache directory has been successfully uploaded.  ' +
-            'The file name %{file} has been copied to your clipboard.',
-          { file },
-        ),
-      );
-      setCacheUploading(false);
-    });
-  }
-
-  return (
-    <ObsSettingsSection>
-      <p>
-        {$t(
-          'Deleting your cache directory will cause you to lose some settings. Do not delete your cache directory unless instructed to do so by a Streamlabs staff member.',
-        )}
-      </p>
-      <div className="input-container">
-        <a className="link" onClick={showCacheDir}>
-          <i className="icon-view" /> <span>{$t('Show Cache Directory')}</span>
-        </a>
-      </div>
-      <div className="input-container">
-        <a className="link" onClick={deleteCacheDir}>
-          <i className="icon-trash" />
-          <span>{$t('Delete Cache and Restart')}</span>
-        </a>
-      </div>
-      <div className="input-container">
-        <a className="link" onClick={uploadCacheDir}>
-          <i className="fa fa-upload" /> <span>{$t('Upload Cache to Developers')}</span>
-          {cacheUploading && <i className="fa fa-spinner fa-spin" />}
-        </a>
-      </div>
-      {process.platform === 'win32' && (
-        <CheckboxInput
-          name="enable_dump_upload"
-          label={$t('Enable reporting additional information on a crash (requires restart)')}
-          value={enableCrashDumps}
-          onChange={val => CustomizationService.actions.setSettings({ enableCrashDumps: val })}
-        />
-      )}
-    </ObsSettingsSection>
-  );
-}
 
 function LanguageSettings() {
   const i18nService = I18nService.instance as I18nService;

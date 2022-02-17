@@ -18,6 +18,7 @@ import AdvancedStatistics from './windows/AdvancedStatistics';
 import StreamScheduler from './pages/stream-scheduler/StreamScheduler';
 import { createRoot } from './root/ReactRoot';
 import StartStreamingButton from './root/StartStreamingButton';
+import SourceProperties from './windows/SourceProperties';
 import TestWidgets from './root/TestWidgets';
 import RenameSource from './windows/RenameSource';
 import NotificationsArea from './root/NotificationsArea';
@@ -30,11 +31,20 @@ import { WidgetWindow } from './widgets/common/WidgetWindow';
 import SafeMode from './windows/SafeMode';
 import AdvancedAudio from './windows/advanced-audio';
 import { CustomCodeWindow } from './widgets/common/CustomCode';
+import SourceShowcase from './windows/source-showcase';
 import SourceFilters from './windows/SourceFilters';
+import RecentEvents from './editor/elements/RecentEvents';
+import MiniFeed from './editor/elements/Minifeed';
+import BrowserView from './shared/BrowserView';
+import LegacyEvents from './editor/elements/LegacyEvents';
+import MediaGallery from './windows/MediaGallery';
+import LayoutEditor from './pages/layout-editor/LayoutEditor';
+import Projector from './windows/Projector';
 
 // list of React components to be used inside Vue components
 export const components = {
   NameFolder,
+  BrowserView,
   GoLiveWindow: createRoot(GoLiveWindow),
   EditStreamWindow: createRoot(EditStreamWindow),
   IconLibraryProperties,
@@ -50,8 +60,10 @@ export const components = {
   Loader,
   NavTools,
   PlatformLogo,
+  Projector,
   StreamScheduler: createRoot(StreamScheduler),
   AdvancedStatistics,
+  SourceProperties: createRoot(SourceProperties),
   SharedComponentsLibrary: createRoot(SharedComponentsLibrary),
   StartStreamingButton,
   TestWidgets,
@@ -65,5 +77,11 @@ export const components = {
   CustomCodeWindow: createRoot(CustomCodeWindow),
   SafeMode,
   AdvancedAudio,
+  SourceShowcase: createRoot(SourceShowcase),
   SourceFilters,
+  RecentEvents,
+  MiniFeed: createRoot(MiniFeed),
+  LegacyEvents: createRoot(LegacyEvents),
+  MediaGallery,
+  LayoutEditor: createRoot(LayoutEditor),
 };

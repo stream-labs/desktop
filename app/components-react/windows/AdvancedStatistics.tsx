@@ -134,9 +134,13 @@ function NotificationsArea(p: {
   onNotificationClickHandler: Function;
 }) {
   return (
-    <div className={styles.section}>
+    <div className={styles.section} style={{ height: '100%' }}>
       <h2>{$t('Performance Notifications')}</h2>
-      <Scrollable className={styles.notificationContainer} isResizable={false}>
+      <Scrollable
+        className={styles.notificationContainer}
+        style={{ height: '100%', width: '100%' }}
+        isResizable={false}
+      >
         {p.notifications.map(notification => (
           <div
             className={cx(styles.notification, styles.hasAction)}
@@ -153,13 +157,13 @@ function NotificationsArea(p: {
         ))}
         {p.notifications.length === 0 && (
           <div className={styles.notificationEmpty}>
-            <div className="message">{$t('You do not have any notifications')}</div>
+            <div className="message">{$t("You don't have any notifications")}</div>
           </div>
         )}
       </Scrollable>
       <p className={styles.description}>
         {$t(
-          'When Streamlabs OBS detects performance issues with your stream, such as dropped frames, lagged frames, or a stream disconnection, troubleshooting notifications will be sent to you here.',
+          'When Streamlabs detects performance issues with your stream, such as dropped frames, lagged frames, or a stream disconnection, troubleshooting notifications will be sent to you here.',
         )}
       </p>
     </div>

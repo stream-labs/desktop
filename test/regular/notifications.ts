@@ -14,7 +14,7 @@ test('Receiving notifications', async t => {
 
   await click('.metrics-icon');
   await focusChild();
-  await waitForDisplayed('div=You do not have any notifications');
+  await waitForDisplayed("div=You don't have any notifications");
 
   performanceMonitor.pushLaggedFramesNotify(0.5);
 

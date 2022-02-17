@@ -21,7 +21,7 @@
   "Add source filter": "Forrás szűrő hozzáadása",
   "No filters applied": "Nincsenek alkalmazott szűrők",
   "Filters for %{sourceName}": "Filters for %{sourceName}",
-  "Invert Polarity": "Invert Polarity",
+  "Invert Polarity": "Polaritás megfordítása",
   "Limiter": "Limiter",
   "Expander": "Expander",
   "Shader": "Shader",
@@ -38,5 +38,5 @@
   "Cel Shade": "Cel Shade",
   "Dramatic": "Dramatic",
   "Wintergreen": "Wintergreen",
-  "Edit Filters": "Edit Filters"
+  "Edit Filters": "Szűrők szerkesztése"
 }

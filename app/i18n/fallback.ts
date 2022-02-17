@@ -61,6 +61,8 @@ const fallbackDictionary = {
   ...require('./en-US/grow.json'),
   ...require('./en-US/tiktok.json'),
   ...require('./en-US/highlighter.json'),
+  ...require('./en-US/trovo.json'),
+  ...require('./en-US/widget-game.json'),
 };
 
 export default fallbackDictionary;
