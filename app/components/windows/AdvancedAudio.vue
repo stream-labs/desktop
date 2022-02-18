@@ -4,7 +4,7 @@
   no-scroll
 >
 
-  <div slot="content" class="table-wrapper">
+  <div slot="content" class="table-wrapper section">
     <table>
       <thead>
         <tr>
@@ -46,11 +46,13 @@
 .table-wrapper {
   .radius;
   overflow: auto;
-  background-color: var(--color-bg-secondary);
+  flex-grow: 1;
+  margin: 0;
+  padding: 0;
 }
 
 table {
-  min-width: 1060px;
+  min-width: 1170px;
   margin: 0;
 
   // reset
@@ -100,10 +102,10 @@ td {
   width: 104px;
 }
 .column-syncOffset {
-  width: 100px;
+  width: 120px;
 }
 .column-monitoringType {
-  width: 320px;
+  width: 350px;
 }
 
 // TODO: 暫定対応
