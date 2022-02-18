@@ -9,7 +9,6 @@ import CommentFilter from './CommentFilter.vue';
 import ProgramInfo from './ProgramInfo.vue';
 import ProgramStatistics from './ProgramStatistics.vue';
 import ToolBar from './ToolBar.vue';
-import TopNav from './TopNav.vue';
 import ControlsArrow from '../../../media/images/controls-arrow-vertical.svg';
 import AreaSwitcher from './AreaSwitcher.vue';
 import PerformanceMetrics from '../PerformanceMetrics.vue';
@@ -21,7 +20,6 @@ import {
 @Component({
   components: {
     AreaSwitcher,
-    TopNav,
     ProgramInfo,
     ProgramDescription,
     CommentViewer,
