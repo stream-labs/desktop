@@ -636,6 +636,7 @@
   "encoderPreset": "Encoder Preset",
   "pollingPerformanceStatistics": "Activate performance statistics(bitrate, FPS, dropped frames)",
   "pollingPerformanceStatisticsDescription": "If the streaming is unstable, try disabling this option.",
+  "compactMode": "Compact Mode",
   "autoCompact": {
     "title": "Compact Mode Automation Settings",
     "message": "Do you allow N Air to automatically switch to compact mode at the start of streaming and back to full mode at the end of it?\nYou can turn off the setting anytime from Settings> General.",

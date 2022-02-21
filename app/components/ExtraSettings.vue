@@ -17,7 +17,12 @@
         @input="setOptimizeWithHardwareEncoder"
         class="optional-item"
       />
+    </div>
 
+    <div class="section">
+      <div class="input-label">
+        <label>{{ $t('settings.compactMode') }}</label>
+      </div>
       <ObsBoolInput :value="autoCompactModel" @input="setAutoCompact" />
       <ObsBoolInput :value="showAutoCompactDialogModel" @input="setShowAutoCompactDialog" />
     </div>
