@@ -35,6 +35,7 @@ export class CustomizationService
     compactBackupPositionX: undefined,
     compactBackupPositionY: undefined,
     compactBackupHeight: undefined,
+    compactMaximized: false,
     autoCompactMode: false,
     showAutoCompactDialog: true,
 
@@ -141,6 +142,7 @@ export class CustomizationService
     compactBackupPositionX: number;
     compactBackupPositionY: number;
     compactBackupHeight: number;
+    compactMaximized: boolean;
   }) {
     this.setSettings(state);
   }

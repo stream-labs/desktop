@@ -19,6 +19,7 @@ export interface ICustomizationServiceState {
   compactBackupPositionX: number;
   compactBackupPositionY: number;
   compactBackupHeight: number;
+  compactMaximized: boolean;
   autoCompactMode: boolean;
   showAutoCompactDialog: boolean;
   experimental: any;

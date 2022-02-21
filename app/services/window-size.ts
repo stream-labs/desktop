@@ -30,6 +30,7 @@ type BackupSizeInfo = {
   backupX: number;
   backupY: number;
   backupHeight: number;
+  maximized: boolean;
 };
 
 export class WindowSizeService extends StatefulService<IWindowSizeState> {
@@ -120,6 +121,7 @@ export class WindowSizeService extends StatefulService<IWindowSizeState> {
           backupX: this.customizationService.state.compactBackupPositionX,
           backupY: this.customizationService.state.compactBackupPositionY,
           backupHeight: this.customizationService.state.compactBackupHeight,
+          maximized: this.customizationService.state.compactMaximized,
         },
       );
       if (prevPanelState && newSize !== undefined) {
@@ -128,6 +130,7 @@ export class WindowSizeService extends StatefulService<IWindowSizeState> {
           compactBackupPositionX: newSize.backupX,
           compactBackupPositionY: newSize.backupY,
           compactBackupHeight: newSize.backupHeight,
+          compactMaximized: newSize.maximized,
         });
       }
     }
@@ -140,10 +143,6 @@ export class WindowSizeService extends StatefulService<IWindowSizeState> {
     COMPACT: SIDENAV_WIDTH + NICOLIVE_PANEL_WIDTH, // コンパクトモードはパネル幅+
   };
 
-  /*
-   * NOTE: 似た処理を他所にも書きたくなったらウィンドウ幅を管理する存在を置くべきで、コピペは悪いことを言わないのでやめておけ
-   * このコメントを書いている時点でメインウィンドウのウィンドウ幅を操作する存在は他にいない
-   */
   static updateWindowSize(
     win: BrowserWindow,
     prevState: PanelState,
@@ -153,6 +152,10 @@ export class WindowSizeService extends StatefulService<IWindowSizeState> {
     if (nextState === null) throw new Error('nextState is null');
     const onInit = !prevState;
 
+    const lastMaximized = win.isMaximized();
+    if (lastMaximized && nextState === PanelState.COMPACT) {
+      win.unmaximize();
+    }
     const [, minHeight] = win.getMinimumSize();
     const [width, height] = win.getSize();
     let nextHeight = height;
@@ -160,11 +163,13 @@ export class WindowSizeService extends StatefulService<IWindowSizeState> {
     const INT32_MAX = Math.pow(2, 31) - 1; // BIG ENOUGH VALUE (0が指定したいが、一度0以外を指定すると0に再設定できないため)
     const nextMaxWidth = nextState === PanelState.COMPACT ? nextMinWidth : INT32_MAX;
     let nextWidth = width;
-    const newSize = {
+    let nextMaximize = lastMaximized;
+    const nextBackupSize: BackupSizeInfo = {
       widthOffset: sizeState?.widthOffset,
       backupX: sizeState?.backupX,
       backupY: sizeState?.backupY,
       backupHeight: sizeState?.backupHeight,
+      maximized: sizeState?.maximized,
     };
 
     if (onInit) {
@@ -178,14 +183,19 @@ export class WindowSizeService extends StatefulService<IWindowSizeState> {
       if (!win.isMaximized()) {
         // コンパクトモード以外だったときは現在の幅と最小幅の差を保存する
         if (prevState !== PanelState.COMPACT) {
-          newSize.widthOffset = Math.max(0, width - WindowSizeService.WINDOW_MIN_WIDTH[prevState]);
+          nextBackupSize.widthOffset = Math.max(
+            0,
+            width - WindowSizeService.WINDOW_MIN_WIDTH[prevState],
+          );
         }
 
         // コンパクトモードになるときはパネルサイズを強制する
         if (nextState === PanelState.COMPACT) {
           nextWidth = nextMinWidth;
+          nextMaximize = false;
         } else {
-          nextWidth = nextMinWidth + newSize.widthOffset;
+          nextWidth = nextMinWidth + nextBackupSize.widthOffset;
+          nextMaximize = nextBackupSize.maximized;
         }
       }
     }
@@ -195,15 +205,16 @@ export class WindowSizeService extends StatefulService<IWindowSizeState> {
       (prevState === PanelState.COMPACT) !== (nextState === PanelState.COMPACT)
     ) {
       const [x, y] = win.getPosition();
-      if (newSize.backupX !== undefined && newSize.backupY !== undefined) {
-        win.setPosition(newSize.backupX, newSize.backupY);
+      if (nextBackupSize.backupX !== undefined && nextBackupSize.backupY !== undefined) {
+        win.setPosition(nextBackupSize.backupX, nextBackupSize.backupY);
       }
-      if (newSize.backupHeight !== undefined) {
-        nextHeight = newSize.backupHeight;
+      if (nextBackupSize.backupHeight !== undefined) {
+        nextHeight = nextBackupSize.backupHeight;
       }
-      newSize.backupX = x;
-      newSize.backupY = y;
-      newSize.backupHeight = height;
+      nextBackupSize.backupX = x;
+      nextBackupSize.backupY = y;
+      nextBackupSize.backupHeight = height;
+      nextBackupSize.maximized = lastMaximized;
     }
 
     win.setMinimumSize(nextMinWidth, minHeight);
@@ -211,7 +222,10 @@ export class WindowSizeService extends StatefulService<IWindowSizeState> {
     if (nextWidth !== width || nextHeight !== height) {
       win.setSize(nextWidth, nextHeight);
     }
+    if (nextMaximize && !win.isMaximized()) {
+      win.maximize();
+    }
 
-    return newSize;
+    return nextBackupSize;
   }
 }

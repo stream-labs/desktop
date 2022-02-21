@@ -215,6 +215,7 @@ describe('updateWindowSize', () => {
     INACTIVE: '未ログイン',
     OPENED: 'パネル展開',
     CLOSED: 'パネル収納',
+    COMPACT: 'コンパクトモード',
   };
   const BASE_HEIGHT = 600;
   const BASE_WIDTH = 800;
@@ -330,6 +331,68 @@ describe('updateWindowSize', () => {
           BASE_HEIGHT,
         );
       }
+    });
+  }
+
+  const compactSuites = [
+    ['INACTIVE', 'COMPACT', true, false, true, false],
+    ['CLOSED', 'COMPACT', true, false, true, false],
+    ['OPENED', 'COMPACT', true, false, true, false],
+    ['COMPACT', 'INACTIVE', false, true, false, true],
+    ['COMPACT', 'CLOSED', false, true, false, true],
+    ['COMPACT', 'OPENED', false, true, false, true],
+    ['INACTIVE', 'COMPACT', false, false, false, false],
+    ['CLOSED', 'COMPACT', false, false, false, false],
+    ['OPENED', 'COMPACT', false, false, false, false],
+    ['COMPACT', 'INACTIVE', false, false, false, false],
+    ['COMPACT', 'CLOSED', false, false, false, false],
+    ['COMPACT', 'OPENED', false, false, false, false],
+  ].map(
+    ([prev, next, isMaximized, maximize, unmaximize, backupMaximized]: [
+      PanelState,
+      PanelState,
+      boolean,
+      boolean,
+      boolean,
+      boolean,
+    ]) => ({
+      prev,
+      next,
+      isMaximized,
+      maximize,
+      unmaximize,
+      backupMaximized,
+    }),
+  );
+
+  for (const suite of compactSuites) {
+    test(`${stateName[suite.prev]}${suite.isMaximized ? '(最大化状態)' : ''}→${
+      stateName[suite.next]
+    }${suite.backupMaximized ? '(最大化保存状態)' : ''} 最大化切り替え管理`, () => {
+      setup();
+      const { WindowSizeService } = require('./window-size');
+      const { WINDOW_MIN_WIDTH } = WindowSizeService;
+
+      const win = {
+        getMinimumSize: () => [WINDOW_MIN_WIDTH[suite.prev], BASE_HEIGHT],
+        getPosition: () => [0, 0],
+        getSize: () => [WINDOW_MIN_WIDTH[suite.prev] + WIDTH_DIFF, BASE_HEIGHT],
+        setMinimumSize: jest.fn(),
+        setMaximumSize: jest.fn(),
+        setSize: jest.fn(),
+        isMaximized: () => suite.isMaximized,
+        maximize: jest.fn(),
+        unmaximize: jest.fn(),
+      };
+
+      const nextSize = WindowSizeService.updateWindowSize(win, suite.prev, suite.next, {
+        maximized: suite.backupMaximized,
+      });
+
+      expect(nextSize.maximized).toEqual(suite.isMaximized);
+
+      expect(win.maximize).toHaveBeenCalledTimes(suite.maximize ? 1 : 0);
+      expect(win.unmaximize).toHaveBeenCalledTimes(suite.unmaximize ? 1 : 0);
     });
   }
 });
