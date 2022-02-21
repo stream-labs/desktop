@@ -23,6 +23,7 @@ export { PerformanceService } from 'services/performance';
 export { PerformanceMonitorService } from 'services/performance-monitor';
 export { SettingsService, OutputSettingsService } from 'services/settings';
 export { VideoService } from 'services/video';
+export { WindowSizeService } from 'services/window-size';
 export { WindowsService } from 'services/windows';
 export { TransitionsService } from 'services/transitions';
 export { FontLibraryService } from 'services/font-library';

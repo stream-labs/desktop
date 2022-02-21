@@ -1,24 +1,24 @@
 <template>
-<div class="titlebar" :class="{isUnstable}">
-  <div class="titlebar-title">
-    {{ title }}
+  <div class="titlebar" :class="{ isUnstable }">
+    <div class="titlebar-title">
+      {{ title }}
+    </div>
+    <div class="titlebar-actions">
+      <i v-if="isMinimizable" class="link icon-minimize titlebar-action" @click="minimize" />
+      <i class="link icon-maximize titlebar-action" @click="maximize" v-if="!compactMode" />
+      <i class="link icon-close-square titlebar-action" @click="close" />
+    </div>
   </div>
-  <div class="titlebar-actions">
-    <i v-if="isMinimizable" class="link icon-minimize titlebar-action" @click="minimize" />
-    <i class="link icon-maximize titlebar-action" @click="maximize" />
-    <i class="link icon-close-square titlebar-action" @click="close" />
-  </div>
-</div>
 </template>
 
 <script lang="ts" src="./TitleBar.vue.ts"></script>
 
 <style lang="less" scoped>
-@import "../styles/index";
+@import '../styles/index';
 
 .titlebar {
   .dividing-border(bottom);
-  
+
   display: flex;
   align-items: center;
   z-index: 1;
@@ -46,18 +46,29 @@
   animation: live-shadow 3s infinite;
   rect {
     animation: live-color 3s infinite;
-
   }
 }
 @keyframes live-color {
- 0% { fill: @red;}
- 50% { fill: #a50000;}
- 100% { fill: @red;}
+  0% {
+    fill: @red;
+  }
+  50% {
+    fill: #a50000;
+  }
+  100% {
+    fill: @red;
+  }
 }
 @keyframes live-shadow {
- 0% { box-shadow: 0 0 3px 3px rgba(255,0,0,.4);}
- 50% { box-shadow: 0 0 0 0 rgba(255,0,0,0);}
- 100% { box-shadow: 0 0 3px 3px rgba(255,0,0,.4);}
+  0% {
+    box-shadow: 0 0 3px 3px rgba(255, 0, 0, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 0 rgba(255, 0, 0, 0);
+  }
+  100% {
+    box-shadow: 0 0 3px 3px rgba(255, 0, 0, 0.4);
+  }
 }
 
 .titlebar-actions {
@@ -77,5 +88,4 @@
     color: var(--color-titlebar-action-hover);
   }
 }
-
 </style>

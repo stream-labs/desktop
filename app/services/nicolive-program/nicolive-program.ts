@@ -1,20 +1,12 @@
 /* eslint-disable prettier/prettier */
-import { CustomizationService } from 'services/customization';
-import { BrowserWindow } from 'electron';
 import { BehaviorSubject } from 'rxjs';
 import { Inject } from 'services/core/injector';
 import { mutation, StatefulService } from 'services/core/stateful-service';
 import { UserService } from 'services/user';
-import { WindowsService } from 'services/windows';
 import { CreateResult, EditResult, isOk, NicoliveClient } from './NicoliveClient';
 import { NicoliveFailure, openErrorDialogFromFailure } from './NicoliveFailure';
 import { ProgramSchedules } from './ResponseTypes';
 import { NicoliveProgramStateService } from './state';
-
-const STUDIO_WIDTH = 800;
-const SIDENAV_WIDTH = 48;
-const NICOLIVE_PANEL_WIDTH = 400;
-const PANEL_DIVIDER_WIDTH = 24;
 
 type Schedules = ProgramSchedules['data'];
 type Schedule = Schedules[0];
@@ -47,7 +39,6 @@ interface INicoliveProgramState extends ProgramState {
   autoExtensionEnabled: boolean;
   panelOpened: boolean | null; // 初期化前はnull、永続化された値の読み出し後に値が入る
   isLoggedIn: boolean | null; // 初期化前はnull、永続化された値の読み出し後に値が入る
-  isCompact: boolean | null;
 
   isFetching: boolean;
   isExtending: boolean;
@@ -65,10 +56,7 @@ export enum PanelState {
 export class NicoliveProgramService extends StatefulService<INicoliveProgramState> {
   @Inject('NicoliveProgramStateService') stateService: NicoliveProgramStateService;
   @Inject()
-  windowsService: WindowsService;
-  @Inject()
   userService: UserService;
-  @Inject() customizationService: CustomizationService;
 
   private stateChangeSubject = new BehaviorSubject(this.state);
   stateChange = this.stateChangeSubject.asObservable();
@@ -100,7 +88,6 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
     autoExtensionEnabled: false,
     panelOpened: null,
     isLoggedIn: null,
-    isCompact: null,
     isFetching: false,
     isExtending: false,
     isStarting: false,
@@ -125,18 +112,9 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
       },
     });
 
-    this.customizationService.settingsChanged.subscribe({
-      next: compact => {
-        if ('compactMode' in compact) {
-          this.setState({ isCompact: compact.compactMode });
-        }
-      },
-    });
-
     // UserServiceのSubjectをBehaviorに変更するのは影響が広すぎる
     this.setState({
       isLoggedIn: this.userService.isLoggedIn(),
-      isCompact: this.customizationService.state.compactMode,
     });
   }
 
@@ -145,7 +123,6 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
     this.refreshStatisticsPolling(this.state, nextState);
     this.refreshProgramStatusTimer(this.state, nextState);
     this.refreshAutoExtensionTimer(this.state, nextState);
-    this.refreshWindowSize(this.state, nextState);
     this.SET_STATE(nextState);
     this.stateChangeSubject.next(nextState);
   }
@@ -374,7 +351,6 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
 
   async extendProgram(): Promise<void> {
     this.setState({ isExtending: true });
-    console.log('extend start'); // DEBUG
     try {
       // DEBUG デザイン作業用
       if (process.env.DEV_SERVER) {
@@ -386,7 +362,6 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
       return await this.internalExtendProgram(this.state);
     } finally {
       this.setState({ isExtending: false });
-      console.log('extend end'); // DEBUG
     }
   }
 
@@ -575,131 +550,5 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
 
   togglePanelOpened(): void {
     this.stateService.togglePanelOpened();
-  }
-
-  static getPanelState(
-    { panelOpened, isLoggedIn, isCompact }: {
-      panelOpened: boolean;
-      isLoggedIn: boolean;
-      isCompact: boolean;
-    },
-  ): PanelState | null {
-    if (panelOpened === null || isLoggedIn === null) return null;
-    if (isCompact) return PanelState.COMPACT;
-    if (!isLoggedIn) return PanelState.INACTIVE;
-    return panelOpened ? PanelState.OPENED : PanelState.CLOSED;
-  }
-
-  /** パネルが出る幅の分だけ画面の最小幅を拡張する */
-  refreshWindowSize(prevState: INicoliveProgramState, nextState: INicoliveProgramState): void {
-    const prevPanelState = NicoliveProgramService.getPanelState(prevState);
-    const nextPanelState = NicoliveProgramService.getPanelState(nextState);
-    if (nextPanelState !== null && prevPanelState !== nextPanelState) {
-      const newSize = NicoliveProgramService.updateWindowSize(
-        this.windowsService.getWindow('main'),
-        prevPanelState,
-        nextPanelState,
-        {
-          widthOffset: this.customizationService.state.fullModeWidthOffset,
-          backupX: this.customizationService.state.compactBackupPositionX,
-          backupY: this.customizationService.state.compactBackupPositionY,
-          backupHeight: this.customizationService.state.compactBackupHeight,
-        },
-      );
-      if (newSize !== undefined) {
-        this.customizationService.setFullModeWidthOffset({
-          fullModeWidthOffset: newSize.widthOffset,
-          compactBackupPositionX: newSize.backupX,
-          compactBackupPositionY: newSize.backupY,
-          compactBackupHeight: newSize.backupHeight,
-        });
-      }
-    }
-  }
-
-  static WINDOW_MIN_WIDTH: { [key in PanelState]: number } = {
-    INACTIVE: SIDENAV_WIDTH + STUDIO_WIDTH, // 通常値
-    OPENED: SIDENAV_WIDTH + STUDIO_WIDTH + NICOLIVE_PANEL_WIDTH + PANEL_DIVIDER_WIDTH, // +パネル幅+開閉ボタン幅
-    CLOSED: SIDENAV_WIDTH + STUDIO_WIDTH + PANEL_DIVIDER_WIDTH, // +開閉ボタン幅
-    COMPACT: SIDENAV_WIDTH + NICOLIVE_PANEL_WIDTH, // コンパクトモードはパネル幅+
-  };
-
-  /*
-   * NOTE: 似た処理を他所にも書きたくなったらウィンドウ幅を管理する存在を置くべきで、コピペは悪いことを言わないのでやめておけ
-   * このコメントを書いている時点でメインウィンドウのウィンドウ幅を操作する存在は他にいない
-   */
-  static updateWindowSize(
-    win: BrowserWindow,
-    prevState: PanelState,
-    nextState: PanelState,
-    sizeState: {
-      widthOffset: number;
-      backupX: number;
-      backupY: number;
-      backupHeight: number;
-    } | undefined): { widthOffset: number; backupX: number; backupY: number; backupHeight: number } {
-    if (nextState === null) throw new Error('nextState is null');
-    const onInit = !prevState;
-
-    const [, minHeight] = win.getMinimumSize();
-    const [width, height] = win.getSize();
-    let nextHeight = height;
-    const nextMinWidth = NicoliveProgramService.WINDOW_MIN_WIDTH[nextState];
-    const INT32_MAX = Math.pow(2, 31) - 1; // BIG ENOUGH VALUE (0が指定したいが、一度0以外を指定すると0に再設定できないため)
-    const nextMaxWidth = nextState === PanelState.COMPACT ? nextMinWidth : INT32_MAX;
-    let nextWidth = width;
-    console.log('panelState', prevState, nextState); // DEBUG
-    const newSize = {
-      widthOffset: sizeState?.widthOffset,
-      backupX: sizeState?.backupX,
-      backupY: sizeState?.backupY,
-      backupHeight: sizeState?.backupHeight,
-    };
-    console.log('sizeState', sizeState); // DEBUG
-
-    if (onInit) {
-      // 復元されたウィンドウ幅が復元されたパネル状態の最小幅を満たさない場合、最小幅まで広げる
-      if (width < nextMinWidth || nextState === PanelState.COMPACT) {
-        nextWidth = nextMinWidth;
-      }
-    } else {
-      // ウィンドウ幅とログイン状態・パネル開閉状態の永続化が別管理なので、初期化が終わって情報が揃ってから更新する
-      // 最大化されているときはウィンドウサイズを操作しない（画面外に飛び出したりして不自然なことになる）
-      if (!win.isMaximized()) {
-        // コンパクトモード以外だったときは現在の幅と最小幅の差を保存する
-        if (prevState !== PanelState.COMPACT) {
-          newSize.widthOffset = Math.max(0, width - NicoliveProgramService.WINDOW_MIN_WIDTH[prevState]);
-        }
-
-        // コンパクトモードになるときはパネルサイズを強制する
-        if (nextState === PanelState.COMPACT) {
-          nextWidth = nextMinWidth;
-        } else {
-          nextWidth = nextMinWidth + newSize.widthOffset;
-        }
-      }
-    }
-
-    if (prevState !== null && (prevState === PanelState.COMPACT) !== (nextState === PanelState.COMPACT)) {
-      const [x, y] = win.getPosition();
-      if (newSize.backupX !== undefined && newSize.backupY !== undefined) {
-        win.setPosition(newSize.backupX, newSize.backupY);
-      }
-      if (newSize.backupHeight !== undefined) {
-        nextHeight = newSize.backupHeight;
-      }
-      newSize.backupX = x;
-      newSize.backupY = y;
-      newSize.backupHeight = height;
-    }
-    console.log(' -> sizeState', newSize); // DEBUG
-
-    win.setMinimumSize(nextMinWidth, minHeight);
-    win.setMaximumSize(nextMaxWidth, 0);
-    if (nextWidth !== width || nextHeight !== height) {
-      win.setSize(nextWidth, nextHeight);
-    }
-
-    return newSize;
   }
 }

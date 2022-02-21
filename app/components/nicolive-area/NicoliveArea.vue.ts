@@ -16,6 +16,7 @@ import {
   NicoliveFailure,
   openErrorDialogFromFailure,
 } from 'services/nicolive-program/NicoliveFailure';
+import { CustomizationService } from 'services/customization';
 
 @Component({
   components: {
@@ -33,6 +34,7 @@ import {
 export default class NicolivePanelRoot extends Vue {
   @Inject()
   nicoliveProgramService: NicoliveProgramService;
+  @Inject() private customizationService: CustomizationService;
 
   get contents() {
     return [
@@ -58,7 +60,7 @@ export default class NicolivePanelRoot extends Vue {
   }
 
   get compactMode(): boolean {
-    return this.nicoliveProgramService.state.isCompact;
+    return this.customizationService.state.compactMode;
   }
 
   isCreating: boolean = false;

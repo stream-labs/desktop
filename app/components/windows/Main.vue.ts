@@ -5,6 +5,7 @@ import { Inject } from 'services/core/injector';
 import { NavigationService } from 'services/navigation';
 import { ScenesService } from 'services/scenes';
 import { UserService } from 'services/user';
+import { WindowSizeService } from 'services/window-size';
 import { WindowsService } from 'services/windows';
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
@@ -41,6 +42,7 @@ export default class Main extends Vue {
 
   mounted() {
     electron.remote.getCurrentWindow().show();
+    WindowSizeService.instance; // manage compact mode
   }
 
   get isCompactMode() {

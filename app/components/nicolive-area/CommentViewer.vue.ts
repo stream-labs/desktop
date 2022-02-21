@@ -18,6 +18,7 @@ import GiftComment from './comment/GiftComment.vue';
 import NicoadComment from './comment/NicoadComment.vue';
 import EmotionComment from './comment/EmotionComment.vue';
 import { ChatComponentType } from 'services/nicolive-program/ChatMessage/ChatComponentType';
+import { CustomizationService } from 'services/customization';
 
 const componentMap: { [type in ChatComponentType]: Vue.Component } = {
   common: CommonComment,
@@ -49,8 +50,10 @@ export default class CommentViewer extends Vue {
   @Inject()
   private nicoliveCommentFilterService: NicoliveCommentFilterService;
 
+  @Inject() private customizationService: CustomizationService;
+
   get compactMode(): boolean {
-    return this.nicoliveProgramService.state.isCompact;
+    return this.customizationService.state.compactMode;
   }
 
   // TODO: 後で言語ファイルに移動する
