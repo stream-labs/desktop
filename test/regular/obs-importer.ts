@@ -47,7 +47,7 @@ test('OBS Importer', async t => {
   await (await t.context.app.client.$('button=Skip')).click();
   await (await t.context.app.client.$('div=Choose Free')).click();
 
-  await waitForDisplayed('.scene-collections-wrapper');
+  await waitForDisplayed('[data-name=SceneSelector]');
 
   // check collection 1 and sources
   await switchCollection('Collection 1');

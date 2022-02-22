@@ -163,6 +163,7 @@ import { DiagnosticsService } from './services/diagnostics';
 import { WebsocketService } from './services/websocket';
 import { SpinWheelService } from 'services/widgets/settings/spin-wheel';
 import { LayoutService } from './services/layout';
+import { ProjectorService } from './services/projector';
 
 export const AppServices = {
   AppService,
@@ -214,4 +215,5 @@ export const AppServices = {
   WebsocketService,
   SpinWheelService,
   LayoutService,
+  ProjectorService,
 };

@@ -2,10 +2,10 @@
 import { contextMenuClick } from '../spectron/context-menu';
 import { dialogDismiss } from '../spectron/dialog';
 import { click, clickButton, focusChild, focusMain, select, waitForLoader } from './core';
-import {sleep} from "../sleep";
+import { sleep } from '../sleep';
 
 async function clickSceneAction(selector: string) {
-  await click(`[rel=SceneSelector] ${selector}`);
+  await click(`[data-name=SceneSelector] ${selector}`);
 }
 
 export async function clickAddScene() {
@@ -23,11 +23,11 @@ export async function clickSceneTransitions() {
 }
 
 export async function selectScene(name: string) {
-  await click(`div=${name}`);
+  await click(`span=${name}`);
 }
 
 export async function rightClickScene(name: string) {
-  await click(`div=${name}`, { button: 'right' });
+  await click(`span=${name}`, { button: 'right' });
 }
 
 export async function duplicateScene(sceneName: string, targetName: string) {
@@ -60,11 +60,11 @@ export async function openDuplicateWindow(sceneName: string) {
 
 export async function switchCollection(collectionName: string) {
   await focusMain();
-  await click('.scene-collections-wrapper .dropdown-menu__toggle');
-  await (await (await select('.scene-collections-wrapper')).$(`div=${collectionName}`)).click();
+  await click('[data-name=SceneSelectorDropdown]');
+  await (await (await select('.ant-dropdown')).$(`[data-name="${collectionName}"]`)).click();
   await waitForLoader();
 }
 
 export async function sceneExisting(name: string) {
-  return (await (await select('[data-name=scene-selector]')).$(`div=${name}`)).isExisting();
+  return (await (await select('[data-name=SceneSelector]')).$(`span=${name}`)).isExisting();
 }

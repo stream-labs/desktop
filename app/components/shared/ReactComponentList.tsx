@@ -226,6 +226,15 @@ export class SafeMode extends ReactComponent {}
 
 @Component({
   props: {
+    name: { default: 'SceneSelector' },
+    wrapperStyles: { default: () => ({ height: '100%' }) },
+    mins: { default: () => ({ x: 200, y: 120 }) },
+  },
+})
+export class SceneSelector extends ReactComponent {}
+
+@Component({
+  props: {
     name: { default: 'SourceProperties' },
     wrapperStyles: { default: () => ({ height: '100%' }) },
   },

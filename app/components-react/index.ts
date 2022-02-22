@@ -40,6 +40,7 @@ import LegacyEvents from './editor/elements/LegacyEvents';
 import MediaGallery from './windows/MediaGallery';
 import LayoutEditor from './pages/layout-editor/LayoutEditor';
 import Projector from './windows/Projector';
+import SceneSelector from './editor/elements/SceneSelectorElement';
 
 // list of React components to be used inside Vue components
 export const components = {
@@ -84,4 +85,5 @@ export const components = {
   LegacyEvents: createRoot(LegacyEvents),
   MediaGallery,
   LayoutEditor: createRoot(LayoutEditor),
+  SceneSelector: createRoot(SceneSelector),
 };
