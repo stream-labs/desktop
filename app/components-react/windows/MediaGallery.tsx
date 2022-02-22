@@ -52,7 +52,7 @@ export default function MediaGallery() {
   const [category, setCategory] = useState<'stock' | 'uploads'>('uploads');
   const [galleryInfo, setGalleryInfo] = useState<IMediaGalleryInfo | null>(null);
   const [busy, setBusy] = useState(false);
-  const audio = useRef<HTMLAudioElement | null>(null);
+  const audio = useRef<HTMLAudioElement | null>(new Audio());
 
   const typeMap = getTypeMap();
   const promiseId = WindowsService.state.child.queryParams?.promiseId;
@@ -157,7 +157,7 @@ export default function MediaGallery() {
     setSelectedFile(file);
     if (file.type === 'audio' && !shouldSelect) {
       if (audio.current) audio.current.pause();
-      audio.current = new Audio(file.href);
+      audio.current?.setAttribute('src', file.href);
       audio.current?.play();
     }
     if (shouldSelect) handleSelect();
