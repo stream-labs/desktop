@@ -102,7 +102,6 @@
   padding: 0 8px;
   position: relative;
   flex-grow: 1;
-  overflow: auto;
 }
 
 .studio-controls-compact {

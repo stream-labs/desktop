@@ -27,6 +27,7 @@
   padding: 8px;
   font-size: 14px;
   z-index: 100000;
+  white-space: initial;
 }
 
 .help-tip__arrow {
