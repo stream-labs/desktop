@@ -18,7 +18,7 @@ import { getDefined } from '../../../util/properties-type-guards';
 // ChatHighlight
 // Credits
 // DonationTicker
-// EmoteWall
+import { EmoteWall, EmoteWallModule } from '../EmoteWall';
 // EventList
 // MediaShare
 // Poll
@@ -45,7 +45,7 @@ export const components = {
   // ChatHighlight
   // Credits
   // DonationTicker
-  // EmoteWall
+  EmoteWall: [EmoteWall, EmoteWallModule],
   // EventList
   // MediaShare
   // Poll
