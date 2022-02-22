@@ -1,9 +1,12 @@
 import { AnchorPoint } from '../../util/ScalableRectangle';
-import { $t } from '../i18n';
 import { TAlertType } from './alerts-config';
 import { WidgetType } from './widgets-data';
 
-export type TWidgetType = WidgetType.AlertBox | WidgetType.ViewerCount | WidgetType.GameWidget;
+export type TWidgetType =
+  | WidgetType.AlertBox
+  | WidgetType.ViewerCount
+  | WidgetType.GameWidget
+  | WidgetType.EmoteWall;
 
 export interface IWidgetConfig {
   type: TWidgetType;
@@ -115,6 +118,32 @@ export function getWidgetsConfig(host: string, token: string): Record<TWidgetTyp
       customCodeAllowed: false,
       customFieldsAllowed: false,
     },
+
+    [WidgetType.EmoteWall]: {
+      type: WidgetType.EmoteWall,
+
+      defaultTransform: {
+        width: 1280,
+        height: 720,
+        x: 0,
+        y: 0,
+        anchor: AnchorPoint.NorthWest,
+      },
+
+      settingsWindowSize: {
+        width: 600,
+        height: 900,
+      },
+
+      url: `https://${host}/widgets/emote-wall?token=${token}`,
+      previewUrl: `https://${host}/widgets/emote-wall?token=${token}&simulate=1`,
+      dataFetchUrl: `https://${host}/api/v5/slobs/widget/emote-wall`,
+      settingsSaveUrl: `https://${host}/api/v5/slobs/widget/emote-wall`,
+      settingsUpdateEvent: 'emoteWallSettingsUpdate',
+      customCodeAllowed: true,
+      customFieldsAllowed: true,
+    },
+
     // TODO:
     // BitGoal: {
     //
@@ -159,10 +188,6 @@ export function getWidgetsConfig(host: string, token: string): Record<TWidgetTyp
     // DonationTicker: {
     //
     //  },
-
-    // EmoteWall: {
-    //
-    // },
 
     // EventList: {
     //
