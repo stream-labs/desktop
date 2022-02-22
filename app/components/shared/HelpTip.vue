@@ -1,5 +1,5 @@
 <template>
-  <div class="help-tip" v-if="shouldShow">
+  <div class="help-tip" v-if="shouldShow && !compactMode">
     <div class="help-tip__arrow"></div>
     <i @click="closeHelpTip" class="help-tip__close icon-close" />
     <div class="help-tip__title">
