@@ -11994,7 +11994,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"popper.js@npm:^1.14.3, popper.js@npm:^1.16.0":
+"popper.js@npm:^1.16.0":
   version: 1.16.1
   resolution: "popper.js@npm:1.16.1"
   checksum: c56ae5001ec50a77ee297a8061a0221d99d25c7348d2e6bcd3e45a0d0f32a1fd81bca29d46cb0d4bdf13efb77685bd6a0ce93f9eb3c608311a461f945fffedbe
@@ -14521,7 +14521,6 @@ __metadata:
     vue-js-modal: 1.3.28
     vue-loader: 15.9.5
     vue-multiselect: 2.1.6
-    vue-popperjs: 1.6.3
     vue-property-decorator: 7.3.0
     vue-resize: 0.4.4
     vue-spinner: 1.0.3
@@ -16566,15 +16565,6 @@ __metadata:
   version: 2.1.6
   resolution: "vue-multiselect@npm:2.1.6"
   checksum: 582ba3df035e6d22cb58307233917b9d1564196b397f62bd352e0431b0448f578eedd480157ba5df7d699cc6983d999e39ab5aa77335db5d0f1bb1d4213529f9
-  languageName: node
-  linkType: hard
-
-"vue-popperjs@npm:1.6.3":
-  version: 1.6.3
-  resolution: "vue-popperjs@npm:1.6.3"
-  dependencies:
-    popper.js: ^1.14.3
-  checksum: d6a70ac460e556718f9eead4e8b8ebf331d75d73342fac9fa030f7264dfe760da46954ca00d7fb5ad64275f9b847ad693883ec62a438a89a2f31fc0edb26ccd6
   languageName: node
   linkType: hard
 
