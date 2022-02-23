@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useVuex } from 'components-react/hooks';
 import { SourceDisplayData } from 'services/sources';
 import { TSceneNode, ISceneItemFolder, ISceneItem } from 'services/scenes';
@@ -32,7 +32,7 @@ export default function SourceSelector() {
 
   // private expandedFoldersIds: string[] = [];
 
-  const [expandedFolders, setExpandedFolders] = useState([]);
+  const [expandedFolders, setExpandedFolders] = useState<string[]>([]);
 
   const treeContainer = useRef<HTMLDivElement | null>(null);
 
@@ -46,55 +46,56 @@ export default function SourceSelector() {
     activeItemIds,
     lastSelectedId,
     selectiveRecordingEnabled,
+    activeScene,
   } = useVuex(() => ({
     scene: ScenesService.views.activeScene,
     activeItemIds: SelectionService.state.selectedIds,
     lastSelectedId: SelectionService.state.lastSelectedId,
     isSelected: (nodeId: string) => SelectionService.state.selectedIds.includes(nodeId),
     sceneNode: (nodeId: string) => ScenesService.views.getSceneNode(nodeId),
+    activeScene: ScenesService.views.activeScene,
     globalSelection: SelectionService.views.globalSelection,
     selectiveRecordingEnabled: StreamingService.state.selectiveRecording,
   }));
 
-  // get nodes(): ISlTreeNodeModel<ISceneNodeData>[] {
-  //   // recursive function for transform SceneNode[] to ISlTreeNodeModel[]
-  //   const getSlVueTreeNodes = (
-  //     sceneNodes: (ISceneItem | ISceneItemFolder)[],
-  //   ): ISlTreeNodeModel<ISceneNodeData>[] => {
-  //     return sceneNodes.map(sceneNode => {
-  //       return {
-  //         title: this.getNameForNode(sceneNode),
-  //         isSelected: this.isSelected(sceneNode),
-  //         isLeaf: sceneNode.sceneNodeType === 'item',
-  //         isExpanded: this.expandedFoldersIds.indexOf(sceneNode.id) !== -1,
-  //         data: {
-  //           id: sceneNode.id,
-  //           sourceId: sceneNode.sceneNodeType === 'item' ? sceneNode.sourceId : null,
-  //         },
-  //         children:
-  //           sceneNode.sceneNodeType === 'folder'
-  //             ? getSlVueTreeNodes(this.getChildren(sceneNode))
-  //             : null,
-  //       };
-  //     });
-  //   };
+  useEffect(expandSelectedFolders, [lastSelectedId]);
 
-  //   const nodes = this.scene.state.nodes.filter(n => !n.parentId);
-  //   return getSlVueTreeNodes(nodes);
-  // }
+  function nodes(): any[] {
+    // recursive function for transform SceneNode[] to ISlTreeNodeModel[]
+    const getSlVueTreeNodes = (sceneNodes: (ISceneItem | ISceneItemFolder)[]): any => {
+      return sceneNodes.map(sceneNode => {
+        return {
+          title: getNameForNode(sceneNode),
+          isSelected: isSelected(sceneNode.id),
+          isLeaf: sceneNode.sceneNodeType === 'item',
+          isExpanded: !!expandedFolders.find(nodeId => nodeId === sceneNode.id),
+          data: {
+            id: sceneNode.id,
+            sourceId: sceneNode.sceneNodeType === 'item' ? sceneNode.sourceId : null,
+          },
+          children:
+            sceneNode.sceneNodeType === 'folder' ? getSlVueTreeNodes(getChildren(sceneNode)) : null,
+        };
+      });
+    };
+
+    const nodes = scene?.state.nodes.filter(n => !n.parentId);
+    if (!nodes) return [];
+    return getSlVueTreeNodes(nodes);
+  }
 
   // // TODO: Clean this up.  These only access state, no helpers
-  // getNameForNode(node: ISceneItem | ISceneItemFolder) {
-  //   if (node.sceneNodeType === 'item') {
-  //     return this.sourcesService.state.sources[node.sourceId].name;
-  //   }
+  function getNameForNode(node: ISceneItem | ISceneItemFolder) {
+    if (node.sceneNodeType === 'item') {
+      return SourcesService.state.sources[node.sourceId].name;
+    }
 
-  //   return node.name;
-  // }
+    return node.name;
+  }
 
-  // getChildren(node: ISceneItemFolder) {
-  //   return this.scene.state.nodes.filter(n => n.parentId === node.id);
-  // }
+  function getChildren(node: ISceneItemFolder) {
+    return scene?.state.nodes.filter(n => n.parentId === node.id);
+  }
 
   function determineIcon(isLeaf: boolean, sourceId: string) {
     if (!isLeaf) {
@@ -162,8 +163,8 @@ export default function SourceSelector() {
     globalSelection.remove();
   }
 
-  function sourceProperties(nodeId: string) {
-    const node = sceneNode(nodeId) || globalSelection.getNodes()[0];
+  function sourceProperties(nodeId?: string) {
+    const node = nodeId ? sceneNode(nodeId) : globalSelection.getNodes()[0];
 
     if (!node) return;
 
@@ -199,24 +200,21 @@ export default function SourceSelector() {
     }
   }
 
-  // canShowActions(sceneNodeId: string) {
-  //   return this.getItemsForNode(sceneNodeId).length > 0;
-  // }
+  function canShowActions(sceneNodeId: string) {
+    return getItemsForNode(sceneNodeId).length > 0;
+  }
 
-  // @Watch('lastSelectedId')
-  // async expandSelectedFolders() {
-  //   if (this.callCameFromInsideTheHouse) {
-  //     this.callCameFromInsideTheHouse = false;
-  //     return;
-  //   }
-  //   const node = this.scenesService.views.activeScene.getNode(this.lastSelectedId);
-  //   if (!node || this.selectionService.state.selectedIds.length > 1) return;
-  //   this.expandedFoldersIds = this.expandedFoldersIds.concat(node.getPath().slice(0, -1));
+  function expandSelectedFolders() {
+    if (callCameFromInsideTheHouse) {
+      setInsideHouseCall(false);
+      return;
+    }
+    const node = activeScene?.getNode(lastSelectedId);
+    if (!node || SelectionService.state.selectedIds.length > 1) return;
+    setExpandedFolders(expandedFolders.concat(node.getPath().slice(0, -1)));
 
-  //   await this.$nextTick();
-
-  //   this.$refs[this.lastSelectedId].scrollIntoView({ behavior: 'smooth' });
-  // }
+    // this.$refs[this.lastSelectedId].scrollIntoView({ behavior: 'smooth' });
+  }
 
   function toggleVisibility(sceneNodeId: string) {
     if (!scene) return;
@@ -289,4 +287,45 @@ export default function SourceSelector() {
   function isLocked(sceneNodeId: string) {
     return scene?.getSelection(sceneNodeId).isLocked();
   }
+
+  return (
+    <div className="studio-controls-top">
+      <h2 className="studio-controls__label" bottom="sourcesTooltip">
+        {$t('Sources')}
+      </h2>
+      <div>
+        <i
+          className="[
+            { 'icon--active': selectiveRecordingEnabled },
+            { disabled: selectiveRecordingLocked },
+            'icon-smart-record icon-button icon-button--lg',
+          ]"
+          onClick={toggleSelectiveRecording}
+          bottom="$t('Toggle Selective Recording')"
+        />
+        <i
+          className="icon-add-folder icon-button icon-button--lg"
+          onClick={addFolder}
+          bottom="addGroupTooltip"
+        />
+        <i
+          className="icon-add icon-button icon-button--lg"
+          onClick={addSource}
+          bottom="addSourceTooltip"
+        />
+        <i
+          className="icon-subtract icon-button icon-button--lg"
+          // :class="{ disabled: activeItemIds.length === 0 }"
+          onClick={removeItems}
+          bottom="removeSourcesTooltip"
+        />
+        <i
+          // class="{ disabled: !canShowProperties() }"
+          className="icon-settings icon-button"
+          onClick={() => sourceProperties()}
+          bottom="openSourcePropertiesTooltip"
+        />
+      </div>
+    </div>
+  );
 }
