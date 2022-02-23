@@ -418,12 +418,15 @@ export class TcpServerService
 
       // these events will be sent to the client even if isRequestsHandlingStopped = true
       // this allows to send this event even if the app is in the loading state
-      const allowlistedEvents: (keyof SceneCollectionsService)[] = [
+      // TODO: This is pretty brittle - we should probably consider moving to filtering out
+      // specific events, rather than filtering out all events by default.
+      const allowlistedEvents = [
         'collectionWillSwitch',
         'collectionAdded',
         'collectionRemoved',
         'collectionSwitched',
         'collectionUpdated',
+        'studioModeChanged',
       ];
       const force = (allowlistedEvents as string[]).includes(eventName);
 
