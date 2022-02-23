@@ -31,5 +31,9 @@
   "Designates if this source is audible in your recorded track(s)": "이 소스를 녹음한 트랙에 출력할 지 여부를 지정",
   "Source Settings": "소스 설정",
   "Audio Tracks": "오디오 트랙",
-  "Designates which tracks are being recorded": "어떤 트랙을 녹음할 지 지정"
+  "Designates which tracks are being recorded": "어떤 트랙을 녹음할 지 지정",
+  "Your Stream and VOD Track are the same. This may result in unexpected audio behavior, go to Global Settings to change.": "Your Stream and VOD Track are the same. This may result in unexpected audio behavior, go to Global Settings to change.",
+  "Streaming Track": "Streaming Track",
+  "Enable Twitch VOD Track": "Enable Twitch VOD Track",
+  "Twitch VOD Track": "Twitch VOD Track"
 }

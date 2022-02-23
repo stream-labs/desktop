@@ -31,5 +31,9 @@
   "Designates if this source is audible in your recorded track(s)": "Označuje, zda je tento zdroj slyšitelný ve vaší zaznamenané stopě (stopách)",
   "Source Settings": "Nastavení zdroje",
   "Audio Tracks": "Zvukové stopy",
-  "Designates which tracks are being recorded": "Označuje, které stopy se zaznamenávají"
+  "Designates which tracks are being recorded": "Označuje, které stopy se zaznamenávají",
+  "Your Stream and VOD Track are the same. This may result in unexpected audio behavior, go to Global Settings to change.": "Your Stream and VOD Track are the same. This may result in unexpected audio behavior, go to Global Settings to change.",
+  "Streaming Track": "Streaming Track",
+  "Enable Twitch VOD Track": "Enable Twitch VOD Track",
+  "Twitch VOD Track": "Twitch VOD Track"
 }

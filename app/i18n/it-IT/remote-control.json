@@ -5,8 +5,6 @@
   "Generate new": "Genera nuovo",
   "Port": "Porta",
   "IP addresses": "Indirizzi IP",
-  "You can now control Streamlabs from your phone.": "Ora puoi controllare Streamlabs dal tuo telefono.",
-  "To begin, scan this QR code with your phone.": "Per iniziare, scansiona questo codice QR col tuo telefono.",
-  "This feature will only work with the most recent version of the Streamlabs mobile app.": "Questa funzionalità è disponibile solamente con la versione più recente dell'applicazione mobile di Streamlabs.",
-  "Click to show": "Fai clic per visualizzare"
+  "Click to show": "Fai clic per visualizzare",
+  "The free Streamlabs Deck app allows you to control Streamlabs Desktop from your iOS or Android device. Scan the QR code below to begin.": "The free Streamlabs Deck app allows you to control Streamlabs Desktop from your iOS or Android device. Scan the QR code below to begin."
 }
