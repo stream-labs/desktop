@@ -87,7 +87,7 @@ export function AppearanceSettings() {
       <ObsSettingsSection>
         <CheckboxInput
           {...bind.enableAnnouncements}
-          label={$t('Show announcements for new Stramlabs features and products')}
+          label={$t('Show announcements for new Streamlabs features and products')}
         />
       </ObsSettingsSection>
 
