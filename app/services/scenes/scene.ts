@@ -73,7 +73,7 @@ export class Scene {
     return obs.SceneFactory.fromName(this.id);
   }
 
-  getNode(sceneNodeId: string): TSceneNode | null {
+  getNode(sceneNodeId?: string): TSceneNode | null {
     const nodeModel = this.state.nodes.find(
       sceneItemModel => sceneItemModel.id === sceneNodeId,
     ) as ISceneItem;
