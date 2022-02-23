@@ -12,7 +12,6 @@ import InstalledApps from 'components/InstalledApps.vue';
 import Hotkeys from './Hotkeys.vue';
 import OverlaySettings from './OverlaySettings';
 import NotificationsSettings from './NotificationsSettings.vue';
-import ExperimentalSettings from './ExperimentalSettings.vue';
 import GameOverlaySettings from './GameOverlaySettings';
 import SearchablePages from 'components/shared/SearchablePages';
 import FormInput from 'components/shared/inputs/FormInput.vue';
@@ -24,6 +23,7 @@ import { ObsSettings, PlatformLogo } from 'components/shared/ReactComponentList'
 import { $t } from 'services/i18n';
 import { debounce } from 'lodash-decorators';
 import * as remote from '@electron/remote';
+import Utils from '../../../services/utils';
 
 @Component({
   components: {
@@ -36,7 +36,6 @@ import * as remote from '@electron/remote';
     DeveloperSettings,
     OverlaySettings,
     NotificationsSettings,
-    ExperimentalSettings,
     InstalledApps,
     GameOverlaySettings,
     FormInput,
@@ -123,7 +122,7 @@ export default class Settings extends Vue {
    * returns the list of the pages ported to React
    */
   get reactPages() {
-    return [
+    const pages = [
       'General',
       'Stream',
       // 'Output',
@@ -139,6 +138,8 @@ export default class Settings extends Vue {
       // 'GameOverlay'
       'Get Support',
     ];
+    if (Utils.isDevMode()) pages.push('Experimental');
+    return pages;
   }
 
   get shouldShowReactPage() {
