@@ -8,6 +8,7 @@ import path from 'path';
 import fs from 'fs';
 import { PatchNotesService } from 'services/patch-notes';
 import { I18nService } from 'services/i18n';
+import { CustomizationService } from './customization';
 
 interface IAnnouncementsInfo {
   id: number;
@@ -27,6 +28,7 @@ export class AnnouncementsService extends StatefulService<IAnnouncementsInfo> {
   @Inject() private appService: AppService;
   @Inject() private patchNotesService: PatchNotesService;
   @Inject() private i18nService: I18nService;
+  @Inject() private customizationService: CustomizationService;
 
   static initialState: IAnnouncementsInfo = {
     id: null,
@@ -108,7 +110,12 @@ export class AnnouncementsService extends StatefulService<IAnnouncementsInfo> {
   private async fetchBanner() {
     const recentlyInstalled = await this.recentlyInstalled();
 
-    if (!this.userService.isLoggedIn || recentlyInstalled || this.recentlyUpdatedTo017) {
+    if (
+      !this.userService.isLoggedIn ||
+      recentlyInstalled ||
+      this.recentlyUpdatedTo017 ||
+      !this.customizationService.state.enableAnnouncements
+    ) {
       return this.state;
     }
     const endpoint = `api/v5/slobs/announcement/get?clientId=${this.userService.getLocalUserId()}&locale=${
