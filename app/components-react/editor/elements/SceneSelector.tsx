@@ -141,7 +141,7 @@ export default function SceneSelector() {
         {$t('Manage All')}
       </div>
       <hr style={{ borderColor: 'var(--border)' }} />
-      <Scrollable style={{ height: '150px' }}>
+      <Scrollable style={{ height: 'calc(100% - 60px)' }}>
         {filteredCollections().map(collection => (
           <div
             key={collection.id}
@@ -166,11 +166,11 @@ export default function SceneSelector() {
 
   return (
     <>
-      <div className={styles.topContainer}>
+      <div className={styles.topContainer} id="sceneSelector">
         <Dropdown
           overlay={DropdownMenu}
           trigger={['click']}
-          getPopupContainer={() => document.getElementById('mainWrapper')!}
+          getPopupContainer={() => document.getElementById('sceneSelector')!}
           visible={showDropdown}
           onVisibleChange={setShowDropdown}
           placement="bottomLeft"
