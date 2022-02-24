@@ -106,7 +106,7 @@ export default class ProgramInfo extends Vue {
       this.isEditing = true;
       return await this.nicoliveProgramService.editProgram();
     } catch (e) {
-      // TODO
+      // TODO 失敗時にはユーザーに伝えるべき
       console.warn(e);
     } finally {
       this.isEditing = false;

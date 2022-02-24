@@ -46,12 +46,6 @@ const setup = createSetupFunction({
 jest.mock('services/windows', () => ({ WindowsService: {} }));
 jest.mock('services/user', () => ({ UserService: {} }));
 jest.mock('services/nicolive-program/state', () => ({ NicoliveProgramStateService: {} }));
-/*
-jest.mock('services/i18n', () => ({
-  $t: (x: any) => x,
-}));
-jest.mock('util/menus/Menu', () => ({}));
-*/
 
 beforeEach(() => {
   jest.doMock('services/core/stateful-service');
