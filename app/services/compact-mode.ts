@@ -92,8 +92,24 @@ export class CompactModeService extends StatefulService<ICompactModeServiceState
     }
   }
 
+  allowToggleCompactMode(): boolean {
+    if (this.compactMode) {
+      // compact -> full
+      return true;
+    } else {
+      // full -> compact
+      if (this.state.navigating) {
+        // navigating中はコンパクトモードにできない
+        return false;
+      }
+      return true;
+    }
+  }
+
   toggleCompactMode() {
-    this.customizationService.toggleCompactMode();
+    if (this.allowToggleCompactMode()) {
+      this.customizationService.toggleCompactMode();
+    }
   }
   set compactMode(value: boolean) {
     this.customizationService.setCompactMode(value);
