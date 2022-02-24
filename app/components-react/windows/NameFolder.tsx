@@ -73,8 +73,8 @@ export default function NameFolder() {
   }
 
   return (
-    <ModalLayout onOk={submit} okText={$t('Submit')}>
-      <Form layout="vertical" form={form}>
+    <ModalLayout onOk={submit}>
+      <Form layout="vertical" form={form} onFinish={submit}>
         <TextInput
           name="name"
           value={name}
@@ -82,6 +82,7 @@ export default function NameFolder() {
           label={$t('Please enter the name of the folder')}
           required={true}
           uncontrolled={false}
+          autoFocus
         />
       </Form>
     </ModalLayout>
