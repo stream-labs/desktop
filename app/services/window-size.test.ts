@@ -23,6 +23,7 @@ const setup = createSetupFunction({
           getSize: () => [800, 600],
           setSize: () => {},
           isMaximized: () => false,
+          setMaximizable: () => {},
         };
       },
     },
@@ -173,6 +174,7 @@ describe('refreshWindowSize', () => {
                 getSize: () => [800, 600],
                 setSize,
                 isMaximized: () => false,
+                setMaximizable: () => {},
               };
             },
           },
@@ -256,6 +258,7 @@ describe('updateWindowSize', () => {
         setMaximumSize: jest.fn(),
         setSize: jest.fn(),
         isMaximized: () => false,
+        setMaximizable: () => {},
       };
 
       WindowSizeService.updateWindowSize(win, suite.prev, suite.next);
@@ -310,6 +313,7 @@ describe('updateWindowSize', () => {
         setMaximumSize: jest.fn(),
         setSize: jest.fn(),
         isMaximized: () => suite.isMaximized,
+        setMaximizable: jest.fn(),
       };
 
       WindowSizeService.updateWindowSize(win, suite.prev, suite.next);
@@ -383,6 +387,7 @@ describe('updateWindowSize', () => {
         isMaximized: () => suite.isMaximized,
         maximize: jest.fn(),
         unmaximize: jest.fn(),
+        setMaximizable: jest.fn(),
       };
 
       const nextSize = WindowSizeService.updateWindowSize(win, suite.prev, suite.next, {
@@ -393,6 +398,7 @@ describe('updateWindowSize', () => {
 
       expect(win.maximize).toHaveBeenCalledTimes(suite.maximize ? 1 : 0);
       expect(win.unmaximize).toHaveBeenCalledTimes(suite.unmaximize ? 1 : 0);
+      expect(win.setMaximizable).toHaveBeenCalledWith(suite.next !== 'COMPACT');
     });
   }
 });

@@ -20,6 +20,7 @@
     "keylistener",
     "libuiohook",
     "linebreak",
+    "Maximizable",
     "minimizable",
     "multiselect",
     "namaco",

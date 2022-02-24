@@ -156,6 +156,12 @@ export class WindowSizeService extends StatefulService<IWindowSizeState> {
     if (lastMaximized && nextState === PanelState.COMPACT) {
       win.unmaximize();
     }
+    if (nextState === PanelState.COMPACT) {
+      win.setMaximizable(false);
+    } else {
+      win.setMaximizable(true);
+    }
+
     const [, minHeight] = win.getMinimumSize();
     const [width, height] = win.getSize();
     let nextHeight = height;
