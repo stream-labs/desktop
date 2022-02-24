@@ -1,7 +1,7 @@
 <template>
   <button
     class="button button--go-live"
-    :class="{ 'button--soft-warning': isStreaming, 'is-compactMode': compactMode }"
+    :class="{ 'button--soft-warning': isStreaming, 'is-compactMode': isCompactMode }"
     :disabled="isDisabled"
     @click="toggleStreaming"
     v-tooltip.left="isStreaming ? endStreamTooltip : goLiveTooltip"
@@ -10,7 +10,7 @@
   >
     <StartStreamingIcon v-if="isStreaming" />
     <i v-if="!isStreaming" class="icon-live" />
-    <span class="button-label" v-if="!compactMode">{{ getStreamButtonLabel() }}</span>
+    <span class="button-label" v-if="!isCompactMode">{{ getStreamButtonLabel() }}</span>
   </button>
 </template>
 

@@ -1,11 +1,11 @@
 <template>
   <div class="studio-page" data-test="Studio">
-    <template v-if="!compactMode || compactModeTab === 'studio'">
+    <template v-if="!isCompactMode || compactModeTab === 'studio'">
       <div
         v-if="previewEnabled"
         class="studio-mode-container"
         ref="studioModeContainer"
-        :class="{ stacked, compactMode }"
+        :class="{ stacked, isCompactMode }"
       >
         <studio-mode-controls v-if="studioMode" :stacked="stacked" />
         <div class="studio-display-container" :class="{ stacked }">
@@ -25,7 +25,7 @@
       </div>
       <studio-controls />
     </template>
-    <template v-if="compactMode && compactModeTab === 'niconico'"> TODO niconico </template>
+    <template v-if="isCompactMode && compactModeTab === 'niconico'"> TODO niconico </template>
   </div>
 </template>
 

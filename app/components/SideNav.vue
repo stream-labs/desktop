@@ -3,17 +3,20 @@
     <div class="primary-tab">
       <div class="side-nav-item">
         <a @click="toggleCompactMode" class="link">
-          <i v-if="compactMode" class="icon-full-mode" :title="$t('common.fullMode')" />
-          <i v-if="!compactMode" class="icon-compact-mode" :title="$t('common.compactMode')" />
+          <i v-if="isCompactMode" class="icon-full-mode" :title="$t('common.fullMode')" />
+          <i v-if="!isCompactMode" class="icon-compact-mode" :title="$t('common.compactMode')" />
         </a>
       </div>
-      <template v-if="compactMode && isUserLoggedIn">
+      <template v-if="isCompactMode && isUserLoggedIn">
         <div class="secondary-tab">
           <div class="side-nav-item">
             <a
               @click="compactModeTab = 'niconico'"
               class="link niconico-tab"
-              :class="{ active: compactModeTab === 'niconico', 'notify-new-comment': notifyNewComment }"
+              :class="{
+                active: compactModeTab === 'niconico',
+                'notify-new-comment': notifyNewComment,
+              }"
               data-test="compact-tab-niconico"
             >
               <i :class="{ 'icon-namaco': true }" :title="$t('common.compactModeTab.niconico')" />
@@ -38,7 +41,7 @@
       </div>
     </div>
 
-    <template v-if="!compactMode">
+    <template v-if="!isCompactMode">
       <div class="bottom-tools">
         <div class="side-nav-item">
           <a

@@ -5,7 +5,7 @@
     </div>
     <div class="titlebar-actions">
       <i v-if="isMinimizable" class="link icon-minimize titlebar-action" @click="minimize" />
-      <i class="link icon-maximize titlebar-action" @click="maximize" v-if="!compactMode" />
+      <i class="link icon-maximize titlebar-action" @click="maximize" v-if="!isCompactMode" />
       <i class="link icon-close-square titlebar-action" @click="close" />
     </div>
   </div>

@@ -1,14 +1,14 @@
 <template>
-  <div class="studio-controls row expanded" :class="{ opened: opened || compactMode }">
+  <div class="studio-controls row expanded" :class="{ opened: opened || isCompactMode }">
     <button
       @click="onToggleControls"
       class="studio-controls-toggle-button"
       :class="{ 'studio-controls--opened': opened }"
-      v-if="!compactMode"
+      v-if="!isCompactMode"
     >
       <i class="icon-drop-down-arrow"></i>
     </button>
-    <template v-if="compactMode">
+    <template v-if="isCompactMode">
       <div class="studio-controls-compact">
         <div class="studio-controls-tabs">
           <a

@@ -1,8 +1,16 @@
 <template>
   <div class="container">
-    <div class="header" v-if="!compactMode">
-      <i class="icon-ng icon-btn" v-tooltip.bottom="filterTooltip" @click="isFilterOpened = true"></i>
-      <i class="icon-settings icon-btn" v-tooltip.bottom="settingsTooltip" @click="isSettingsOpened = true"></i>
+    <div class="header" v-if="!isCompactMode">
+      <i
+        class="icon-ng icon-btn"
+        v-tooltip.bottom="filterTooltip"
+        @click="isFilterOpened = true"
+      ></i>
+      <i
+        class="icon-settings icon-btn"
+        v-tooltip.bottom="settingsTooltip"
+        @click="isSettingsOpened = true"
+      ></i>
     </div>
     <div class="content">
       <div class="list" ref="scroll">
@@ -28,20 +36,49 @@
         <div class="close"><i class="icon-close icon-btn" @click="pin(null)"></i></div>
       </div>
       <div class="floating-wrapper">
-        <button type="button" @click="scrollToLatest" class="scroll-to-latest button--tertiary" v-if="!isLatestVisible && items.length > 0"><i class="icon-down-arrow"></i>最新のコメントへ移動</button>
-        <button class="button--circle button--tertiary" v-tooltip.bottom="commentReloadTooltip" @click="refreshConnection"><i class="icon-reload"></i></button>
-        <button class="button--circle button--tertiary" v-tooltip.bottom="speakingEnabled ? commentSynthesizerOnTooltip : commentSynthesizerOffTooltip" @click="speakingEnabled = !speakingEnabled"><i :class="speakingEnabled ? 'icon-speaker' : 'icon-mute'"></i></button>
+        <button
+          type="button"
+          @click="scrollToLatest"
+          class="scroll-to-latest button--tertiary"
+          v-if="!isLatestVisible && items.length > 0"
+        >
+          <i class="icon-down-arrow"></i>最新のコメントへ移動
+        </button>
+        <button
+          class="button--circle button--tertiary"
+          v-tooltip.bottom="commentReloadTooltip"
+          @click="refreshConnection"
+        >
+          <i class="icon-reload"></i>
+        </button>
+        <button
+          class="button--circle button--tertiary"
+          v-tooltip.bottom="
+            speakingEnabled ? commentSynthesizerOnTooltip : commentSynthesizerOffTooltip
+          "
+          @click="speakingEnabled = !speakingEnabled"
+        >
+          <i :class="speakingEnabled ? 'icon-speaker' : 'icon-mute'"></i>
+        </button>
       </div>
     </div>
     <comment-form class="comment-form" />
-    <comment-filter class="overlay" @close="isFilterOpened = false" v-if="isFilterOpened && !compactMode"/>
-    <comment-settings class="overlay" @close="isSettingsOpened = false" v-if="isSettingsOpened && !compactMode" />
+    <comment-filter
+      class="overlay"
+      @close="isFilterOpened = false"
+      v-if="isFilterOpened && !isCompactMode"
+    />
+    <comment-settings
+      class="overlay"
+      @close="isSettingsOpened = false"
+      v-if="isSettingsOpened && !isCompactMode"
+    />
   </div>
 </template>
 
 <script lang="ts" src="./CommentViewer.vue.ts"></script>
 <style lang="less" scoped>
-@import "../../styles/index";
+@import '../../styles/index';
 
 .container {
   width: 100%;
@@ -60,7 +97,7 @@
   border-bottom: 1px solid var(--color-border-light);
 
   > .icon-btn {
-     margin-left: 16px;
+    margin-left: 16px;
 
     &:first-child {
       margin-left: auto;

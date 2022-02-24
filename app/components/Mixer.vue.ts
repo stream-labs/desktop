@@ -37,7 +37,7 @@ export default class Mixer extends Vue {
     });
   }
 
-  get compactMode(): boolean {
+  get isCompactMode(): boolean {
     return this.compactModeService.compactMode;
   }
 }

@@ -66,7 +66,7 @@ export default class Studio extends Vue {
     this.customizationService.setSettings({ performanceMode: false });
   }
 
-  get compactMode() {
+  get isCompactMode() {
     return this.compactModeService.compactMode;
   }
   get compactModeTab() {

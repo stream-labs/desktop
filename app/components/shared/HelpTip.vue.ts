@@ -18,7 +18,7 @@ export default class HelpTip extends Vue {
     this.dismissablesService.dismiss(this.dismissableKey);
   }
 
-  get compactMode(): boolean {
+  get isCompactMode(): boolean {
     return this.compactModeService.compactMode;
   }
 }

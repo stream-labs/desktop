@@ -52,7 +52,7 @@ export default class CommentViewer extends Vue {
 
   @Inject() private customizationService: CustomizationService;
 
-  get compactMode(): boolean {
+  get isCompactMode(): boolean {
     return this.customizationService.state.compactMode;
   }
 

@@ -20,14 +20,14 @@ export default class AreaSwitcher extends Vue {
   @Inject()
   private customizationService: CustomizationService;
 
-  get compactMode(): boolean {
+  get isCompactMode(): boolean {
     return this.customizationService.state.compactMode;
   }
 
   private selectedContent: IArea = this.contents.find(c => c.defaultSelected) ?? this.contents[0];
 
   get activeContent(): IArea {
-    return this.compactMode ? this.contents[0] : this.selectedContent;
+    return this.isCompactMode ? this.contents[0] : this.selectedContent;
   }
 
   select(slotName: string) {

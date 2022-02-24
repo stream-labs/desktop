@@ -32,7 +32,7 @@ export default class StartStreamingButton extends Vue {
     this.streamingService.toggleStreamingAsync();
   }
 
-  get compactMode() {
+  get isCompactMode() {
     return this.compactModeService.compactMode;
   }
 

@@ -50,7 +50,7 @@ export default class SideNav extends Vue {
     return this.incrementalRolloutService.featureIsEnabled(feature);
   }
 
-  get compactMode(): boolean {
+  get isCompactMode(): boolean {
     return this.compactModeService.compactMode;
   }
   toggleCompactMode() {

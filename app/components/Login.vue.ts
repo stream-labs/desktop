@@ -28,7 +28,7 @@ export default class Login extends Vue {
     return this.userService.platformUserPageURL;
   }
 
-  get compactMode(): boolean {
+  get isCompactMode(): boolean {
     return this.compactModeService.compactMode;
   }
 

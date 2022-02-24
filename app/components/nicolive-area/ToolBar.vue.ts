@@ -10,7 +10,6 @@ import {
 } from 'services/nicolive-program/NicoliveFailure';
 import Popper from 'vue-popperjs';
 import { StreamingService } from 'services/streaming';
-import { CustomizationService } from 'services/customization';
 
 @Component({
   components: { Popper },
@@ -19,17 +18,12 @@ export default class ToolBar extends Vue {
   @Inject()
   nicoliveProgramService: NicoliveProgramService;
   @Inject() streamingService: StreamingService;
-  @Inject() private customizationService: CustomizationService;
 
   // TODO: 後で言語ファイルに移動する
   fetchTooltip = '番組再取得';
   extentionTooltip = '延長設定';
 
   showPopupMenu: boolean = false;
-
-  get compactMode(): boolean {
-    return this.customizationService.state.compactMode;
-  }
 
   get isOnAir(): boolean {
     return this.nicoliveProgramService.state.status === 'onAir';

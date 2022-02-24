@@ -8,7 +8,6 @@ import { Subscription } from 'rxjs';
 import Popper from 'vue-popperjs';
 import * as moment from 'moment';
 import { HostsService } from 'services/hosts';
-import { CustomizationService } from 'services/customization';
 
 @Component({
   components: {
@@ -20,7 +19,6 @@ export default class ProgramInfo extends Vue {
   nicoliveProgramService: NicoliveProgramService;
   @Inject() streamingService: StreamingService;
   @Inject() hostsService: HostsService;
-  @Inject() private customizationService: CustomizationService;
 
   // TODO: 後でまとめる
   programIsMemberOnlyTooltip = 'コミュニティ限定放送';
@@ -28,10 +26,6 @@ export default class ProgramInfo extends Vue {
   private subscription: Subscription = null;
 
   showPopupMenu: boolean = false;
-
-  get compactMode(): boolean {
-    return this.customizationService.state.compactMode;
-  }
 
   get isOnAir(): boolean {
     return this.nicoliveProgramService.state.status === 'onAir';

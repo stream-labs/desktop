@@ -1,5 +1,5 @@
 <template>
-  <div v-if="compactMode">
+  <div v-if="isCompactMode">
     <div class="footer streaming-controller">
       <streaming-controller :locked="locked" />
     </div>

@@ -59,7 +59,7 @@ export default class NicolivePanelRoot extends Vue {
     this.nicoliveProgramService.togglePanelOpened();
   }
 
-  get compactMode(): boolean {
+  get isCompactMode(): boolean {
     return this.customizationService.state.compactMode;
   }
 

@@ -1,6 +1,6 @@
 <template>
   <div class="performance-metrics flex">
-    <span class="performance-metric-wrapper resolution" v-if="!compactMode">
+    <span class="performance-metric-wrapper resolution" v-if="!isCompactMode">
       <i class="performance-metric-icon icon-display" />
       <span class="performance-metric">
         <span class="performance-metric__value">{{ outputResolution }}</span>
@@ -30,7 +30,7 @@
       </span>
     </span>
 
-    <span class="performance-metric-wrapper dropped_frames" v-if="!compactMode">
+    <span class="performance-metric-wrapper dropped_frames" v-if="!isCompactMode">
       <i class="performance-metric-icon icon-drop-fps" />
       <span class="performance-metric">
         <span class="performance-metric__value"
@@ -95,7 +95,8 @@
   color: var(--color-yellow);
   position: absolute;
 
-  &:before, &:after {
+  &:before,
+  &:after {
     position: absolute;
     top: 0;
     left: 0;

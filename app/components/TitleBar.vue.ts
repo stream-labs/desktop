@@ -26,7 +26,7 @@ export default class TitleBar extends Vue {
     return Utils.isMainWindow() && Utils.isUnstable();
   }
 
-  get compactMode() {
+  get isCompactMode() {
     return this.compactModeService.compactMode;
   }
 

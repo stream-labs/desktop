@@ -1,6 +1,6 @@
 <template>
   <div class="login__status" v-if="loggedIn">
-    <a v-if="!compactMode" class="link" @click="logout" :title="$t('common.logout')">
+    <a v-if="!isCompactMode" class="link" @click="logout" :title="$t('common.logout')">
       <i class="icon-log-out" />
     </a>
     <a @click="openUserPage" class="user__profile" :title="username">
@@ -8,7 +8,7 @@
     </a>
   </div>
   <div v-else>
-    <a v-if="!compactMode" class="link" @click="login" :title="$t('common.login')">
+    <a v-if="!isCompactMode" class="link" @click="login" :title="$t('common.login')">
       <i class="icon-log-in" />
     </a>
   </div>

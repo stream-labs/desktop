@@ -3,7 +3,7 @@
     <div class="contentContainer">
       <slot :name="activeContent.slotName" />
     </div>
-    <div class="header" v-if="!compactMode">
+    <div class="header" v-if="!isCompactMode">
       <popper trigger="click" :options="{ placement: 'bottom-start' }">
         <div class="popper">
           <ul class="popup-menu-list">
@@ -32,7 +32,7 @@
 <script lang="ts" src="./AreaSwitcher.vue.ts"></script>
 
 <style lang="less" scoped>
-@import "../../styles/index";
+@import '../../styles/index';
 
 .container {
   position: relative;
@@ -62,9 +62,8 @@
   border-radius: 4px;
   cursor: pointer;
 
-
   &:hover {
-     background-color: var(--color-button-tertiary-hover);
+    background-color: var(--color-button-tertiary-hover);
   }
 
   > i {

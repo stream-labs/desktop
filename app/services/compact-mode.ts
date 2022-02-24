@@ -92,7 +92,7 @@ export class CompactModeService extends StatefulService<ICompactModeServiceState
     }
   }
 
-  allowToggleCompactMode(): boolean {
+  canToggleCompactMode(): boolean {
     if (this.compactMode) {
       // compact -> full
       return true;
@@ -107,7 +107,7 @@ export class CompactModeService extends StatefulService<ICompactModeServiceState
   }
 
   toggleCompactMode() {
-    if (this.allowToggleCompactMode()) {
+    if (this.canToggleCompactMode()) {
       this.customizationService.toggleCompactMode();
     }
   }

@@ -16,7 +16,7 @@ export default class StudioFooterComponent extends Vue {
 
   @Prop() locked: boolean;
 
-  get compactMode() {
+  get isCompactMode() {
     return this.compactModeService.compactMode;
   }
 }

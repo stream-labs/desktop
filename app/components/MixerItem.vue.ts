@@ -21,7 +21,7 @@ export default class MixerItem extends Vue {
     return !this.customizationService.state.performanceMode;
   }
 
-  get compactMode(): boolean {
+  get isCompactMode(): boolean {
     return this.compactModeService.compactMode;
   }
 

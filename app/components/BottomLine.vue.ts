@@ -15,7 +15,7 @@ export default class BottomLine extends Vue {
     return this.streamingService.state.streamingStatus === 'live';
   }
 
-  get compactMode(): boolean {
+  get isCompactMode(): boolean {
     return this.compactModeService.compactMode;
   }
 }

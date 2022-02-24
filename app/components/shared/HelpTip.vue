@@ -1,20 +1,19 @@
 <template>
-  <div class="help-tip" v-if="shouldShow && !compactMode">
+  <div class="help-tip" v-if="shouldShow && !isCompactMode">
     <div class="help-tip__arrow"></div>
     <i @click="closeHelpTip" class="help-tip__close icon-close" />
     <div class="help-tip__title">
       <i class="icon-notification" />
       <slot name="title"></slot>
     </div>
-    <div class="help-tip__body"><slot name="content"></slot>
-    </div>
+    <div class="help-tip__body"><slot name="content"></slot></div>
   </div>
 </template>
 
 <script lang="ts" src="./HelpTip.vue.ts"></script>
 
 <style lang="less" scoped>
-@import "../../styles/index";
+@import '../../styles/index';
 
 .help-tip {
   position: absolute;
@@ -45,7 +44,7 @@
   right: 10px;
   font-size: 20px;
   cursor: pointer;
-  opacity: .6;
+  opacity: 0.6;
   .transition();
 
   &:hover {
@@ -67,5 +66,4 @@
     font-size: 16px;
   }
 }
-
 </style>

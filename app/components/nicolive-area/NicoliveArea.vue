@@ -4,11 +4,11 @@
       @click="onToggle"
       class="nicolive-area-toggle-button"
       :class="{ 'nicolive-area--opened': opened }"
-      v-if="!compactMode"
+      v-if="!isCompactMode"
     >
       <i class="icon-drop-down-arrow"></i>
     </button>
-    <div class="nicolive-area-container" v-if="opened || compactMode">
+    <div class="nicolive-area-container" v-if="opened || isCompactMode">
       <div class="program-area" :class="{ isCreate: !hasProgram }">
         <template v-if="hasProgram">
           <program-info class="program-area-item" />
@@ -18,7 +18,7 @@
             <template v-slot:description><program-description /></template>
           </area-switcher>
           <tool-bar class="program-area-item" />
-          <div class="footer performance-metrics" v-if="compactMode">
+          <div class="footer performance-metrics" v-if="isCompactMode">
             <div class="flex flex--center flex--grow flex--justify-start">
               <performance-metrics />
             </div>
@@ -34,18 +34,18 @@
               class="button button--primary button--create-program"
               @click="createProgram"
               :disabled="isCreating"
-              v-if="!compactMode"
+              v-if="!isCompactMode"
             >
               新しく番組を作成する
             </button>
-            <div class="devider" v-if="!compactMode">
+            <div class="devider" v-if="!isCompactMode">
               <span class="devider-label">または</span>
             </div>
             <button
               class="button button--fetch-program"
               @click="fetchProgram"
               :disabled="isFetching"
-              :class="[compactMode ? 'button--primary' : 'button--secondary']"
+              :class="[isCompactMode ? 'button--primary' : 'button--secondary']"
             >
               作成済みの番組を取得する
             </button>

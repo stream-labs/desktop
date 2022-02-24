@@ -21,7 +21,7 @@ export default class PerformanceMetrics extends Vue {
   visitorTooltip = $t('common.numberOfVisitors');
   commentTooltip = $t('common.numberOfComments');
 
-  get compactMode() {
+  get isCompactMode() {
     return this.compactModeService.compactMode;
   }
 
