@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import cx from 'classnames';
 import { useVuex } from 'components-react/hooks';
 import { SourceDisplayData } from 'services/sources';
 import { TSceneNode, ISceneItemFolder, ISceneItem } from 'services/scenes';
@@ -8,11 +9,8 @@ import { $t } from 'services/i18n';
 import { EPlaceType } from 'services/editor-commands/commands/reorder-nodes';
 import Scrollable from 'components-react/shared/Scrollable';
 import { Services } from 'components-react/service-provider';
-
-interface ISceneNodeData {
-  id: string;
-  sourceId: string;
-}
+import styles from './SceneSelector.m.less';
+import { Tooltip } from 'antd';
 
 export default function SourceSelector() {
   const {
@@ -290,42 +288,43 @@ export default function SourceSelector() {
 
   return (
     <div className="studio-controls-top">
-      <h2 className="studio-controls__label" bottom="sourcesTooltip">
-        {$t('Sources')}
-      </h2>
-      <div>
-        <i
-          className="[
+      <Tooltip
+        title={$t('The building blocks of your scene. Also contains widgets.')}
+        placement="bottom"
+      >
+        <span className={styles.activeScene}>{$t('Sources')}</span>
+      </Tooltip>
+      <i
+        className="[
             { 'icon--active': selectiveRecordingEnabled },
             { disabled: selectiveRecordingLocked },
             'icon-smart-record icon-button icon-button--lg',
           ]"
-          onClick={toggleSelectiveRecording}
-          bottom="$t('Toggle Selective Recording')"
-        />
-        <i
-          className="icon-add-folder icon-button icon-button--lg"
-          onClick={addFolder}
-          bottom="addGroupTooltip"
-        />
-        <i
-          className="icon-add icon-button icon-button--lg"
-          onClick={addSource}
-          bottom="addSourceTooltip"
-        />
-        <i
-          className="icon-subtract icon-button icon-button--lg"
-          // :class="{ disabled: activeItemIds.length === 0 }"
-          onClick={removeItems}
-          bottom="removeSourcesTooltip"
-        />
-        <i
-          // class="{ disabled: !canShowProperties() }"
-          className="icon-settings icon-button"
-          onClick={() => sourceProperties()}
-          bottom="openSourcePropertiesTooltip"
-        />
-      </div>
+        onClick={toggleSelectiveRecording}
+        bottom="$t('Toggle Selective Recording')"
+      />
+      <i
+        className="icon-add-folder icon-button icon-button--lg"
+        onClick={addFolder}
+        bottom="addGroupTooltip"
+      />
+      <i
+        className="icon-add icon-button icon-button--lg"
+        onClick={addSource}
+        bottom="addSourceTooltip"
+      />
+      <i
+        className="icon-subtract icon-button icon-button--lg"
+        // :class="{ disabled: activeItemIds.length === 0 }"
+        onClick={removeItems}
+        bottom="removeSourcesTooltip"
+      />
+      <i
+        // class="{ disabled: !canShowProperties() }"
+        className="icon-settings icon-button"
+        onClick={() => sourceProperties()}
+        bottom="openSourcePropertiesTooltip"
+      />
     </div>
   );
 }
