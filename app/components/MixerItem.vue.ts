@@ -22,7 +22,7 @@ export default class MixerItem extends Vue {
   }
 
   get isCompactMode(): boolean {
-    return this.compactModeService.compactMode;
+    return this.compactModeService.isCompactMode;
   }
 
   setMuted(muted: boolean) {

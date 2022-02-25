@@ -22,7 +22,7 @@ export default class PerformanceMetrics extends Vue {
   commentTooltip = $t('common.numberOfComments');
 
   get isCompactMode() {
-    return this.compactModeService.compactMode;
+    return this.compactModeService.isCompactMode;
   }
 
   get isLoggedIn() {

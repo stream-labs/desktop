@@ -33,7 +33,7 @@ export default class StartStreamingButton extends Vue {
   }
 
   get isCompactMode() {
-    return this.compactModeService.compactMode;
+    return this.compactModeService.isCompactMode;
   }
 
   get streamingStatus() {

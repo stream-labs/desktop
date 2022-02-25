@@ -29,7 +29,7 @@ export default class Login extends Vue {
   }
 
   get isCompactMode(): boolean {
-    return this.compactModeService.compactMode;
+    return this.compactModeService.isCompactMode;
   }
 
   logout() {

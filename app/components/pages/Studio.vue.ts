@@ -67,7 +67,7 @@ export default class Studio extends Vue {
   }
 
   get isCompactMode() {
-    return this.compactModeService.compactMode;
+    return this.compactModeService.isCompactMode;
   }
   get compactModeTab() {
     return this.compactModeService.compactModeTab;

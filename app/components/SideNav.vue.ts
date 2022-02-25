@@ -51,7 +51,7 @@ export default class SideNav extends Vue {
   }
 
   get isCompactMode(): boolean {
-    return this.compactModeService.compactMode;
+    return this.compactModeService.isCompactMode;
   }
   toggleCompactMode() {
     this.compactModeService.toggleCompactMode();
