@@ -1,4 +1,5 @@
 /*global SLOBS_BUNDLE_ID*/
+/*global SLD_SENTRY_BACKEND_SERVER_DSN, SLD_SENTRY_FRONTEND_DSN*/
 
 import { I18nService, $t } from 'services/i18n';
 
@@ -43,13 +44,7 @@ const slobsVersion = Utils.env.SLOBS_VERSION;
 const isProduction = Utils.env.NODE_ENV === 'production';
 const isPreview = !!Utils.env.SLOBS_PREVIEW;
 
-// This is the development DSN
-let sentryDsn = 'https://8f444a81edd446b69ce75421d5e91d4d@sentry.io/252950';
-
 if (isProduction) {
-  // This is the production DSN
-  sentryDsn = 'https://6971fa187bb64f58ab29ac514aa0eb3d@sentry.io/251674';
-
   electron.crashReporter.addExtraParameter('windowId', Utils.getWindowId());
 }
 
@@ -132,7 +127,7 @@ if (isProduction || process.env.SLOBS_REPORT_TO_SENTRY) {
   const bundleNames = electron.ipcRenderer.sendSync('getBundleNames', bundles);
 
   Sentry.init({
-    dsn: sentryDsn,
+    dsn: SLD_SENTRY_FRONTEND_DSN,
     release: `${slobsVersion}-${SLOBS_BUNDLE_ID}`,
     beforeSend: (event, hint) => {
       // Because our URLs are local files and not publicly
@@ -310,6 +305,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       'en-US',
       appService.appDataDirectory,
       remote.process.env.SLOBS_VERSION,
+      SLD_SENTRY_BACKEND_SERVER_DSN,
     );
 
     if (apiResult !== obs.EVideoCodes.Success) {

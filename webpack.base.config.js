@@ -13,6 +13,8 @@ const commit = cp.execSync('git rev-parse --short HEAD').toString().replace('\n'
 plugins.push(
   new webpack.DefinePlugin({
     SLOBS_BUNDLE_ID: JSON.stringify(commit),
+    SLD_SENTRY_FRONTEND_DSN: JSON.stringify(process.env.SLD_SENTRY_FRONTEND_DSN ?? ''),
+    SLD_SENTRY_BACKEND_SERVER_DSN: JSON.stringify(process.env.SLD_SENTRY_BACKEND_SERVER_DSN ?? ''),
   }),
 );
 

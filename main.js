@@ -295,7 +295,7 @@ async function startApp() {
   }
 
   if (pjson.env === 'production') {
-    Raven.config('https://6971fa187bb64f58ab29ac514aa0eb3d@sentry.io/251674', {
+    Raven.config(pjson.sentryFrontendDSN, {
       release: process.env.SLOBS_VERSION,
     }).install((err, initialErr, eventId) => {
       handleFinishedReport();
@@ -305,8 +305,7 @@ async function startApp() {
       productName: 'streamlabs-obs',
       companyName: 'streamlabs',
       ignoreSystemCrashHandler: true,
-      submitURL:
-        'https://sentry.io/api/1283430/minidump/?sentry_key=01fc20f909124c8499b4972e9a5253f2',
+      submitURL: pjson.sentryBackendClientDSN,
       extra: {
         'sentry[release]': pjson.version,
         processType: 'main',
