@@ -17,6 +17,7 @@ plugins.push(
     SLD_SENTRY_BACKEND_SERVER_DSN: JSON.stringify(process.env.SLD_SENTRY_BACKEND_SERVER_DSN ?? ''),
   }),
 );
+
 plugins.push(
   new WebpackManifestPlugin({
     filter: file =>
