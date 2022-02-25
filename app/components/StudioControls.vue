@@ -99,6 +99,7 @@
   display: flex;
   flex-direction: column;
   height: 100%;
+  min-height: 0;
   padding: 0 8px;
   position: relative;
   flex-grow: 1;
@@ -126,7 +127,7 @@
   text-decoration: none;
   color: var(--color-text);
   position: relative;
-  padding: 0 24px;
+  padding: 0 8px;
 
   &.active {
     color: var(--color-primary);
