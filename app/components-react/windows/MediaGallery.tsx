@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { clipboard } from 'electron';
 import * as remote from '@electron/remote';
 import { Layout, message, Card, Menu, Progress, PageHeader } from 'antd';
@@ -52,7 +52,7 @@ export default function MediaGallery() {
   const [category, setCategory] = useState<'stock' | 'uploads'>('uploads');
   const [galleryInfo, setGalleryInfo] = useState<IMediaGalleryInfo | null>(null);
   const [busy, setBusy] = useState(false);
-  const [audio, setAudio] = useState<HTMLAudioElement | null>(null);
+  const audio = useRef(new Audio());
 
   const typeMap = getTypeMap();
   const promiseId = WindowsService.state.child.queryParams?.promiseId;
@@ -61,12 +61,7 @@ export default function MediaGallery() {
   useEffect(() => {
     fetchGalleryInfo();
 
-    return () => {
-      if (audio) {
-        audio.pause();
-        setAudio(null);
-      }
-    };
+    return audio.current.pause;
   }, []);
 
   useSubscription(WebsocketService.socketEvent, ev => {
@@ -156,9 +151,9 @@ export default function MediaGallery() {
     }
     setSelectedFile(file);
     if (file.type === 'audio' && !shouldSelect) {
-      if (audio) audio.pause();
-      setAudio(new Audio(file.href));
-      audio?.play();
+      audio.current.pause();
+      audio.current.setAttribute('src', file.href);
+      audio.current.play();
     }
     if (shouldSelect) handleSelect();
   }

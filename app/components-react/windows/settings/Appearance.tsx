@@ -56,25 +56,14 @@ export function AppearanceSettings() {
         )}
       </ObsSettingsSection>
 
-      <ObsSettingsSection>
-        <ListInput
-          {...bind.folderSelection}
-          label={$t('Scene item selection mode')}
-          options={[
-            { value: true, label: $t('Single click selects group. Double click selects item') },
-            {
-              value: false,
-              label: $t('Double click selects group. Single click selects item'),
-            },
-          ]}
-        />
+      <ObsSettingsSection title={$t('Chat Settings')}>
         <CheckboxInput
           {...bind.leftDock}
           label={$t('Show the live dock (chat) on the left side')}
         />
         <SliderInput
           {...bind.chatZoomFactor}
-          label={$t('Chat Text Size')}
+          label={$t('Text Size')}
           tipFormatter={(val: number) => `${val * 100}%`}
           min={0.25}
           max={2}
@@ -93,6 +82,27 @@ export function AppearanceSettings() {
             />
           </div>
         )}
+      </ObsSettingsSection>
+
+      <ObsSettingsSection>
+        <CheckboxInput
+          {...bind.enableAnnouncements}
+          label={$t('Show announcements for new Streamlabs features and products')}
+        />
+      </ObsSettingsSection>
+
+      <ObsSettingsSection>
+        <ListInput
+          {...bind.folderSelection}
+          label={$t('Scene item selection mode')}
+          options={[
+            { value: true, label: $t('Single click selects group. Double click selects item') },
+            {
+              value: false,
+              label: $t('Double click selects group. Single click selects item'),
+            },
+          ]}
+        />
       </ObsSettingsSection>
 
       {bind.enableFFZEmotes.value && (

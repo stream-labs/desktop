@@ -12,3 +12,4 @@ export * from './RemoteControl';
 // 'VirtualWebcam',
 // 'GameOverlay'
 export * from './Support';
+export * from './Experimental';
