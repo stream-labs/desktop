@@ -67,11 +67,6 @@ export class NicoliveCommentFilterService extends StatefulService<INicoliveComme
   }
 
   async fetchFilters() {
-    // DEBUG
-    if (process.env.DEV_SERVER) {
-      // yarn dev 時は省略
-      return;
-    }
     const result = await this.client.fetchFilters(this.programID);
     if (!isOk(result)) {
       throw NicoliveFailure.fromClientError('fetchFilters', result);

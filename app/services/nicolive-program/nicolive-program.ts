@@ -194,31 +194,6 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
   async fetchProgram(): Promise<void> {
     this.setState({ isFetching: true });
     try {
-      // DEBUG デザイン作業用
-      if (process.env.DEV_SERVER) {
-        const now = Math.floor(Date.now() / 1000);
-        this.setState({
-          programID: 'lv5963',
-          status: 'onAir',
-          title: '番組タイトル',
-          description: '番組説明',
-          startTime: now,
-          vposBaseTime: now,
-          endTime: now + 30 * 60,
-          isMemberOnly: false,
-          communityID: 'co12345',
-          communityName: '(コミュニティの取得に失敗しました)',
-          communitySymbol: '',
-          roomURL: 'roomURL',
-          roomThreadID: 'roomThreadID',
-          viewers: 12,
-          comments: 34,
-          adPoint: 56,
-          giftPoint: 78,
-        });
-        return;
-      }
-
       const schedulesResponse = await this.client.fetchProgramSchedules();
       if (!isOk(schedulesResponse)) {
         throw NicoliveFailure.fromClientError('fetchProgramSchedules', schedulesResponse);
@@ -326,13 +301,6 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
   async endProgram(): Promise<void> {
     this.setState({ isEnding: true });
     try {
-      // DEBUG デザイン作業用
-      if (process.env.DEV_SERVER) {
-        const endTime = Math.floor(Date.now() / 1000);
-        this.setState({ status: 'end', endTime });
-        return;
-      }
-
       const result = await this.client.endProgram(this.state.programID);
       if (!isOk(result)) {
         throw NicoliveFailure.fromClientError('endProgram', result);
@@ -352,7 +320,6 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
   async extendProgram(): Promise<void> {
     this.setState({ isExtending: true });
     try {
-      // DEBUG デザイン作業用
       if (process.env.DEV_SERVER) {
         const endTime = this.state.endTime + 30 * 60;
         this.setState({ endTime });
@@ -380,12 +347,6 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
     prevState: INicoliveProgramState,
     nextState: INicoliveProgramState,
   ): void {
-    // DEBUG
-    if (process.env.DEV_SERVER) {
-      // yarn dev 時はスキップ
-      return;
-    }
-
     const programUpdated = prevState.programID !== nextState.programID;
 
     const prev = prevState.status === 'onAir';
