@@ -40,7 +40,7 @@ export default class Pyramid extends BaseLayout {
           style={{ height: `${this.resizes.bar1 * 100}%`, padding: '0 8px' }}
         >
           {['2', '3'].map(slot => (
-            <div class={cx(styles.cell, styles.noTopPadding)}>{this.$slots[slot]}</div>
+            <div class={cx(styles.cell, 'no-top-padding')}>{this.$slots[slot]}</div>
           ))}
         </div>
       </div>
