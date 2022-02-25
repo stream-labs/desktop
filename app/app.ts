@@ -127,7 +127,7 @@ if (isProduction || process.env.SLOBS_REPORT_TO_SENTRY) {
   const bundleNames = electron.ipcRenderer.sendSync('getBundleNames', bundles);
 
   Sentry.init({
-    dsn: SLD_SENTRY_URL_FE_DSN,
+    dsn: SLD_SENTRY_FRONTEND_DSN,
     release: `${slobsVersion}-${SLOBS_BUNDLE_ID}`,
     beforeSend: (event, hint) => {
       // Because our URLs are local files and not publicly
@@ -304,7 +304,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       'en-US',
       appService.appDataDirectory,
       remote.process.env.SLOBS_VERSION,
-      SLD_SENTRY_URL_BE_SERVER,
+      SLD_SENTRY_BACKEND_SERVER_DSN,
     );
 
     if (apiResult !== obs.EVideoCodes.Success) {
