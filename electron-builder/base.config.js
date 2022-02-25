@@ -114,6 +114,8 @@ const base = {
   },
   extraMetadata: {
     env: 'production',
+    sentryFrontendDSN: process.env.SLD_SENTRY_FRONTEND_DSN,
+    sentryBackendClientDSN: process.env.SLD_SENTRY_BACKEND_CLIENT_DSN,
   },
   afterPack: './electron-builder/afterPack.js',
   afterSign: './electron-builder/notarize.js',
