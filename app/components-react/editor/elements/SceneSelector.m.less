@@ -5,6 +5,16 @@
   margin-bottom: 8px;
   align-items: center;
   justify-content: flex-end;
+
+  > div:last-child {
+    top: 32px !important;
+    height: calc(100% - 32px);
+  }
+
+  :global(.ant-dropdown) {
+    top: 0 !important;
+    height: 100%;
+  }
 }
 
 .active-scene-container {
@@ -57,7 +67,7 @@
   border: 1px solid var(--border);
   padding: 8px;
   border-radius: 4px;
-  height: 230px;
+  height: 100%;
 }
 
 .dropdown-item {
