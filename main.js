@@ -305,7 +305,9 @@ async function startApp() {
       productName: 'streamlabs-obs',
       companyName: 'streamlabs',
       ignoreSystemCrashHandler: true,
-      submitURL: pjson.sentryBackendClientDSN,
+      submitURL: process.env.SLOBS_PREVIEW
+        ? pjson.sentryBackendClientPreviewDSN
+        : pjson.sentryBackendClientDSN,
       extra: {
         'sentry[release]': pjson.version,
         processType: 'main',
