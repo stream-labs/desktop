@@ -3,6 +3,7 @@ import { BehaviorSubject } from 'rxjs';
 import { Inject } from './core/injector';
 import { mutation, StatefulService } from './core/stateful-service';
 import { CustomizationService } from './customization/customization';
+import { NavigationService } from './navigation';
 import { NicoliveProgramStateService } from './nicolive-program/state';
 import { UserService } from './user';
 import { WindowsService } from './windows';
@@ -11,6 +12,7 @@ interface IWindowSizeState {
   panelOpened: boolean | null; // 初期化前はnull、永続化された値の読み出し後に値が入る
   isLoggedIn: boolean | null; // 初期化前はnull、永続化された値の読み出し後に値が入る
   isCompact: boolean | null;
+  isNavigating: boolean;
 }
 
 const STUDIO_WIDTH = 800;
@@ -38,11 +40,13 @@ export class WindowSizeService extends StatefulService<IWindowSizeState> {
   @Inject() customizationService: CustomizationService;
   @Inject() userService: UserService;
   @Inject() nicoliveProgramStateService: NicoliveProgramStateService;
+  @Inject() navigationService: NavigationService;
 
   static initialState: IWindowSizeState = {
     panelOpened: null,
     isLoggedIn: null,
     isCompact: null,
+    isNavigating: false,
   };
 
   private stateChangeSubject = new BehaviorSubject(this.state);
@@ -73,10 +77,15 @@ export class WindowSizeService extends StatefulService<IWindowSizeState> {
       },
     });
 
+    this.navigationService.navigated.subscribe(state => {
+      this.setState({ isNavigating: state.currentPage !== 'Studio' });
+    });
+
     // UserServiceのSubjectをBehaviorに変更するのは影響が広すぎる
     this.setState({
       isLoggedIn: this.userService.isLoggedIn(),
       isCompact: this.customizationService.state.compactMode,
+      isNavigating: this.navigationService.state.currentPage !== 'Studio',
     });
   }
 
@@ -96,12 +105,15 @@ export class WindowSizeService extends StatefulService<IWindowSizeState> {
     panelOpened,
     isLoggedIn,
     isCompact,
+    isNavigating,
   }: {
     panelOpened: boolean;
     isLoggedIn: boolean;
     isCompact: boolean;
+    isNavigating: boolean;
   }): PanelState | null {
     if (panelOpened === null || isLoggedIn === null) return null;
+    if (isNavigating) return PanelState.INACTIVE;
     if (isCompact) return PanelState.COMPACT;
     if (!isLoggedIn) return PanelState.INACTIVE;
     return panelOpened ? PanelState.OPENED : PanelState.CLOSED;

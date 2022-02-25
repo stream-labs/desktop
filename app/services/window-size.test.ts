@@ -40,6 +40,12 @@ const setup = createSetupFunction({
       state: {},
       setFullModeWidthOffset() {},
     },
+    NavigationService: {
+      navigated: {
+        subscribe() {},
+      },
+      state: { currentPage: 'Studio' },
+    },
   },
 });
 
@@ -63,28 +69,37 @@ test('get instance', () => {
 });
 
 describe('static getPanelState', () => {
-  const suites = [
-    { panelOpened: null, isLoggedIn: null, isCompact: null, result: null },
-    { panelOpened: null, isLoggedIn: true, isCompact: null, result: null },
-    { panelOpened: null, isLoggedIn: false, isCompact: null, result: null },
-    { panelOpened: true, isLoggedIn: null, isCompact: null, result: null },
-    { panelOpened: false, isLoggedIn: null, isCompact: null, result: null },
-    { panelOpened: true, isLoggedIn: false, isCompact: false, result: 'INACTIVE' },
-    { panelOpened: false, isLoggedIn: false, isCompact: false, result: 'INACTIVE' },
-    { panelOpened: true, isLoggedIn: true, isCompact: false, result: 'OPENED' },
-    { panelOpened: false, isLoggedIn: true, isCompact: false, result: 'CLOSED' },
-    { panelOpened: true, isLoggedIn: false, isCompact: true, result: 'COMPACT' },
-    { panelOpened: false, isLoggedIn: false, isCompact: true, result: 'COMPACT' },
-    { panelOpened: true, isLoggedIn: true, isCompact: true, result: 'COMPACT' },
-    { panelOpened: false, isLoggedIn: true, isCompact: true, result: 'COMPACT' },
+  const suites: [boolean | null, boolean | null, boolean | null, boolean, string | null][] = [
+    // panelOpen, isLoggedIn, isCompact, isMaximized, expected
+    [null, null, null, false, null],
+    [null, true, null, false, null],
+    [null, false, null, false, null],
+    [true, null, null, false, null],
+    [false, null, null, false, null],
+    [true, false, false, false, 'INACTIVE'],
+    [false, false, false, false, 'INACTIVE'],
+    [true, true, false, false, 'OPENED'],
+    [false, true, false, false, 'CLOSED'],
+    [true, false, true, false, 'COMPACT'],
+    [false, false, true, false, 'COMPACT'],
+    [true, true, true, false, 'COMPACT'],
+    [false, true, true, false, 'COMPACT'],
+    [true, true, false, true, 'INACTIVE'],
+    [false, true, false, true, 'INACTIVE'],
+    [true, false, true, true, 'INACTIVE'],
+    [false, false, true, true, 'INACTIVE'],
+    [true, true, true, true, 'INACTIVE'],
+    [false, true, true, true, 'INACTIVE'],
   ];
 
-  for (const { panelOpened, isLoggedIn, isCompact, result } of suites) {
+  for (const [panelOpened, isLoggedIn, isCompact, isNavigating, result] of suites) {
     test(`panelOpened: ${panelOpened}, isLoggedIn: ${isLoggedIn}`, () => {
       setup();
       const { WindowSizeService } = require('./window-size');
 
-      expect(WindowSizeService.getPanelState({ panelOpened, isLoggedIn, isCompact })).toBe(result);
+      expect(
+        WindowSizeService.getPanelState({ panelOpened, isLoggedIn, isCompact, isNavigating }),
+      ).toBe(result);
     });
   }
 });
@@ -171,6 +186,10 @@ describe('refreshWindowSize', () => {
                 setMaximizable: () => {},
               };
             },
+          },
+          NavigationService: {
+            navigated: new Subject(),
+            state: { currentPage: 'Studio' },
           },
         },
       });
