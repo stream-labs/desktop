@@ -39,8 +39,8 @@ export default class FourByFour extends BaseLayout {
           reverse={true}
         />
         <div class={styles.segmented} style={{ height: `${this.resizes.bar1 * 100}%` }}>
-          <div class={cx(styles.cell, styles.noTopPadding)}>{this.$slots['2']}</div>
-          <div class={cx(styles.cell, styles.noTopPadding)}>{this.$slots['3']}</div>
+          <div class={cx(styles.cell, 'no-top-padding')}>{this.$slots['2']}</div>
+          <div class={cx(styles.cell, 'no-top-padding')}>{this.$slots['3']}</div>
         </div>
         <ResizeBar
           position="top"
@@ -56,8 +56,8 @@ export default class FourByFour extends BaseLayout {
           class={styles.segmented}
           style={{ height: `${this.resizes.bar2 * 100}%`, padding: '0 8px' }}
         >
-          <div class={cx(styles.cell, styles.noTopPadding)}>{this.$slots['4']}</div>
-          <div class={cx(styles.cell, styles.noTopPadding)}>{this.$slots['5']}</div>
+          <div class={cx(styles.cell, 'no-top-padding')}>{this.$slots['4']}</div>
+          <div class={cx(styles.cell, 'no-top-padding')}>{this.$slots['5']}</div>
         </div>
       </div>
     );
