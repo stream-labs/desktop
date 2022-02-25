@@ -299,6 +299,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     );
 
     await obsUserPluginsService.initialize();
+
     // Initialize OBS API
     const apiResult = obs.NodeObs.OBS_API_initAPI(
       'en-US',
