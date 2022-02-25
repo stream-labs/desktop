@@ -64,6 +64,13 @@ export class InternalApiClient {
           return target[property];
         }
 
+        if (
+          typeof target[property] === 'function' &&
+          target[property]['__executeInCurrentWindow']
+        ) {
+          return target[property];
+        }
+
         const methodName = property.toString();
         const isHelper = target['_isHelper'];
 
@@ -120,7 +127,7 @@ export class InternalApiClient {
 
         try {
           ipcRenderer.send('services-request-async', request);
-        } catch (e) {
+        } catch (e: unknown) {
           console.error('Failed to send async services request', e, {
             request,
           });

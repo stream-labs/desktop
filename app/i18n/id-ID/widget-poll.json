@@ -1,0 +1,21 @@
+{
+  "Poll": "Jajak Pendapat",
+  "Let your viewers vote on a result": "Minta penonton Anda memberikan suaranya",
+  "Bar Settings": "Pengaturan Bilah",
+  "Manage Poll": "Kelola Jajak Pendapat",
+  "Poll Type": "Jenis Jajak Pendapat",
+  "Show Closed Poll": "Tampilkan Jajak Pendapat yang Telah Ditutup",
+  "Show/hide poll widget on closed poll": "Tampilkan/sembunyikan widget jajak pendapat pada jajak pendapat yang telah ditutup",
+  "Primary Background Color": "Warna Latar Belakang Utama",
+  "Secondary Background Color": "Warna Latar Belakang Sekunder",
+  "Hide wigdet after X seconds of event": "Sembunyikan widget setelah X detik",
+  "Header Text Color": "Warna Teks Judul",
+  "Option Text Color": "Warna Teks Opsi",
+  "Title Font Size": "Ukuran Font Judul",
+  "Option Font Size": "Ukuran Font Opsi",
+  "Title Font Weight": "Ketebalan Font Judul",
+  "Option Font Weight": "Ketebalan Font Opsi",
+  "Thin Bar": "Bar Tipis",
+  "Display thin/thick Bar": "Tampilkan Bar tipis/tebal",
+  "You need to re-login to access Twitch chat polls": "Anda harus login kembali untuk mengakses jajak pendapat di obrolan Twitch"
+}

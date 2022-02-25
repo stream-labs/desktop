@@ -68,6 +68,13 @@
             >
               <i class="icon-studio" />
             </a>
+            <a
+              @click="openFBStreamDashboardUrl"
+              v-if="isFacebook && isStreaming"
+              v-tooltip="liveProducerTooltip"
+            >
+              <i class="icon-settings" />
+            </a>
           </div>
           <div class="flex">
             <a @click="refreshChat" v-if="isTwitch || (isYoutube && isStreaming) || isFacebook">
@@ -77,7 +84,7 @@
         </div>
         <div
           class="live-dock-chat"
-          v-if="!hideStyleBlockers && (isTwitch || (isYoutube && isStreaming) || isFacebook)"
+          v-if="!hideStyleBlockers && (isTwitch || (isYoutube && isStreaming) || (isFacebook && isStreaming))"
         >
           <div v-if="hasChatTabs" class="flex">
             <tabs :tabs="chatTabs" v-model="selectedChat" :hideContent="true" />

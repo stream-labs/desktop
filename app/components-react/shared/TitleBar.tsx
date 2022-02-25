@@ -1,32 +1,38 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import cx from 'classnames';
 import { useVuex } from '../hooks';
 import { Services } from '../service-provider';
 import { byOS, OS } from '../../util/operating-systems';
 import { $t } from '../../services/i18n';
-import { ipcRenderer, remote } from 'electron';
+import { ipcRenderer } from 'electron';
 import Utils from '../../services/utils';
 import KevinSvg from './KevinSvg';
 import styles from './TitleBar.m.less';
+import * as remote from '@electron/remote';
 
 export default function TitleBar(props: { windowId: string }) {
   const { CustomizationService, StreamingService, WindowsService } = Services;
 
   const isMaximizable = remote.getCurrentWindow().isMaximizable() !== false;
   const isMac = byOS({ [OS.Windows]: false, [OS.Mac]: true });
-  const v = useVuex(() => ({
-    theme: CustomizationService.views.currentTheme,
-    title: WindowsService.state[props.windowId]?.title,
-  }));
+  const v = useVuex(
+    () => ({
+      theme: CustomizationService.views.currentTheme,
+      title: WindowsService.state[props.windowId]?.title,
+    }),
+    false,
+  );
+
+  const isDev = useMemo(() => Utils.isDevMode(), []);
 
   const primeTheme = /prime/.test(v.theme);
-  let errorState = false;
+  const [errorState, setErrorState] = useState(false);
 
   useEffect(lifecycle, []);
 
   function lifecycle() {
     if (Utils.isDevMode()) {
-      ipcRenderer.on('unhandledErrorState', () => (errorState = true));
+      ipcRenderer.on('unhandledErrorState', () => setErrorState(true));
     }
   }
 
@@ -68,6 +74,12 @@ export default function TitleBar(props: { windowId: string }) {
       </div>
       {!isMac && (
         <div className={styles.titlebarActions}>
+          {isDev && (
+            <i
+              className={cx('fas fa-sync', styles.titlebarAction)}
+              onClick={() => window.location.reload()}
+            />
+          )}
           <i className={cx('icon-subtract', styles.titlebarAction)} onClick={minimize} />
           {isMaximizable && (
             <i className={cx('icon-expand-1', styles.titlebarAction)} onClick={maximize} />

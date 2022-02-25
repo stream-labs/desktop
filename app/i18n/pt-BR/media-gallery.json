@@ -26,5 +26,10 @@
   "Image URL": "URL da Imagem",
   "Example": "Exemplo",
   "Change Media": "Alterar mídia",
-  "No Sound": "Nenhum som"
+  "No Sound": "Nenhum som",
+  "No Media": "Sem mídia",
+  "Change Link": "Mudar link",
+  "Pick From Gallery": "Escolher da galeria",
+  "Clear Link": "Excluir link",
+  "Media URL": "URL da mídia"
 }

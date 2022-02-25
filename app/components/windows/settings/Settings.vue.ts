@@ -1,4 +1,3 @@
-import electron from 'electron';
 import Vue from 'vue';
 import { Component, Watch } from 'vue-property-decorator';
 import { Inject } from 'services/core/injector';
@@ -8,28 +7,24 @@ import NavItem from 'components/shared/NavItem.vue';
 import GenericFormGroups from 'components/obs/inputs/GenericFormGroups.vue';
 import { WindowsService } from 'services/windows';
 import { ISettingsSubCategory, SettingsService } from 'services/settings/index';
-import ExtraSettings from './ExtraSettings.vue';
 import DeveloperSettings from './DeveloperSettings';
 import InstalledApps from 'components/InstalledApps.vue';
 import Hotkeys from './Hotkeys.vue';
 import OverlaySettings from './OverlaySettings';
 import NotificationsSettings from './NotificationsSettings.vue';
-import AppearanceSettings from './AppearanceSettings';
 import ExperimentalSettings from './ExperimentalSettings.vue';
 import RemoteControlSettings from './RemoteControlSettings.vue';
-import LanguageSettings from './LanguageSettings.vue';
 import GameOverlaySettings from './GameOverlaySettings';
-import FacemaskSettings from './FacemaskSettings.vue';
 import SearchablePages from 'components/shared/SearchablePages';
 import FormInput from 'components/shared/inputs/FormInput.vue';
-import StreamSettings from './StreamSettings';
 import VirtualWebcamSettings from './VirtualWebcamSettings';
 import { MagicLinkService } from 'services/magic-link';
 import { UserService } from 'services/user';
 import Scrollable from 'components/shared/Scrollable';
-import PlatformLogo from 'components/shared/PlatformLogo';
+import { ObsSettings, PlatformLogo } from 'components/shared/ReactComponentList';
 import { $t } from 'services/i18n';
 import { debounce } from 'lodash-decorators';
+import * as remote from '@electron/remote';
 
 @Component({
   components: {
@@ -38,23 +33,19 @@ import { debounce } from 'lodash-decorators';
     GenericFormGroups,
     NavMenu,
     NavItem,
-    ExtraSettings,
     Hotkeys,
     DeveloperSettings,
     OverlaySettings,
     NotificationsSettings,
-    AppearanceSettings,
     RemoteControlSettings,
     ExperimentalSettings,
-    LanguageSettings,
     InstalledApps,
     GameOverlaySettings,
-    FacemaskSettings,
     FormInput,
-    StreamSettings,
     VirtualWebcamSettings,
     Scrollable,
     PlatformLogo,
+    ObsSettings,
   },
 })
 export default class Settings extends Vue {
@@ -115,7 +106,7 @@ export default class Settings extends Vue {
 
   set categoryName(val: string) {
     if (val === 'Prime') {
-      this.userService.openPrimeUrl('slobs-settings');
+      this.magicLinkService.actions.linkToPrime('slobs-settings');
     } else {
       this.internalCategoryName = val;
     }
@@ -127,6 +118,48 @@ export default class Settings extends Vue {
 
   get isLoggedIn() {
     return this.userService.views.isLoggedIn;
+  }
+
+  /**
+   * returns the list of the pages ported to React
+   */
+  get reactPages() {
+    return [
+      'General',
+      'Stream',
+      // 'Output',
+      // 'Audio',
+      // 'Video',
+      // 'Hotkeys',
+      'Advanced',
+      // 'SceneCollections',
+      // 'Notifications',
+      'Appearance',
+      // 'RemoteControl',
+      // 'VirtualWebcam',
+      // 'GameOverlay'
+    ];
+  }
+
+  get shouldShowReactPage() {
+    return this.reactPages.includes(this.categoryName);
+  }
+
+  get shouldShowVuePage() {
+    if (this.reactPages.includes(this.categoryName)) return false;
+    return ![
+      'Hotkeys',
+      'Stream',
+      'API',
+      'Overlays',
+      'Notifications',
+      'Appearance',
+      'Experimental',
+      'Remote Control',
+      'Installed Apps',
+      'Virtual Webcam',
+      'Developer',
+    ].includes(this.categoryName);
   }
 
   getInitialCategoryName() {
@@ -201,7 +234,7 @@ export default class Settings extends Vue {
 
   handleAuth() {
     if (this.userService.isLoggedIn) {
-      electron.remote.dialog
+      remote.dialog
         .showMessageBox({
           title: $t('Confirm'),
           message: $t('Are you sure you want to log out?'),

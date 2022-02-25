@@ -1,5 +1,5 @@
 import { useSpectron, test } from '../../helpers/spectron';
-import { getClient } from '../../helpers/api-client';
+import { getApiClient } from '../../helpers/api-client';
 import { SceneBuilder } from '../../helpers/scene-builder';
 import { sleep } from '../../helpers/sleep';
 import { ScenesService } from '../../../app/services/api/external-api/scenes';
@@ -9,7 +9,7 @@ const path = require('path');
 useSpectron({ restartAppAfterEachTest: false });
 
 test('The default scene exists', async t => {
-  const client = await getClient();
+  const client = await getApiClient();
   const scenesService = client.getResource<ScenesService>('ScenesService');
   const scenes = scenesService.getScenes();
 
@@ -17,7 +17,7 @@ test('The default scene exists', async t => {
 });
 
 test('Creating, fetching and removing scenes', async t => {
-  const client = await getClient();
+  const client = await getApiClient();
   const scenesService = client.getResource<ScenesService>('ScenesService');
 
   const scene2 = scenesService.createScene('Scene2');
@@ -46,7 +46,7 @@ test('Creating, fetching and removing scenes', async t => {
 });
 
 test('Switching between scenes', async t => {
-  const client = await getClient();
+  const client = await getApiClient();
   const scenesService = client.getResource<ScenesService>('ScenesService');
   const scene = scenesService.getScenes().find(scene => scene.name === 'Scene');
   const scene2 = scenesService.createScene('Scene2');
@@ -63,7 +63,7 @@ test('Switching between scenes', async t => {
 });
 
 test('Creating, fetching and removing scene-items', async t => {
-  const client = await getClient();
+  const client = await getApiClient();
   const scenesService = client.getResource<ScenesService>('ScenesService');
   const scene = scenesService.getScenes().find(scene => scene.name === 'Scene');
   const image1 = scene.createAndAddSource('Image1', 'image_source');
@@ -85,7 +85,7 @@ test('Creating, fetching and removing scene-items', async t => {
 });
 
 test('Scenes events', async t => {
-  const client = await getClient();
+  const client = await getApiClient();
   const scenesService = client.getResource<ScenesService>('ScenesService');
 
   scenesService.sceneSwitched.subscribe(() => void 0);
@@ -127,7 +127,7 @@ test('Scenes events', async t => {
 });
 
 test('Creating nested scenes', async t => {
-  const client = await getClient();
+  const client = await getApiClient();
   const scenesService = client.getResource<ScenesService>('ScenesService');
 
   const sceneA = scenesService.createScene('SceneA');
@@ -161,7 +161,7 @@ test('Creating nested scenes', async t => {
 });
 
 test('SceneItem.setSettings()', async t => {
-  const client = await getClient();
+  const client = await getApiClient();
   const scenesService = client.getResource<ScenesService>('ScenesService');
   const scene = scenesService.activeScene;
 
@@ -194,7 +194,7 @@ test('SceneItem.setSettings()', async t => {
 });
 
 test('SceneItem.resetTransform()', async t => {
-  const client = await getClient();
+  const client = await getApiClient();
   const scenesService = client.getResource<ScenesService>('ScenesService');
   const scene = scenesService.activeScene;
 
@@ -220,7 +220,7 @@ test('SceneItem.resetTransform()', async t => {
 test('SceneItem.addFile()', async t => {
   const dataDir = path.resolve(__dirname, '..', '..', '..', '..', 'test', 'data', 'sources-files');
 
-  const client = await getClient();
+  const client = await getApiClient();
   const sceneBuilder = new SceneBuilder(client);
   const scenesService = client.getResource<ScenesService>('ScenesService');
   const scene = scenesService.activeScene;
@@ -246,8 +246,41 @@ test('SceneItem.addFile()', async t => {
 });
 
 test('Try to make a not existing scene active', async t => {
-  const client = await getClient();
+  const client = await getApiClient();
   const scenesService = client.getResource<ScenesService>('ScenesService');
   const sceneHasBeenSwitched = scenesService.makeSceneActive('This id does not exist');
   t.false(sceneHasBeenSwitched);
+});
+
+test('Scene.getNestedItems()', async t => {
+  const client = await getApiClient();
+  const scenesService = client.getResource<ScenesService>('ScenesService');
+  const scene1 = scenesService.createScene('Scene1');
+  const scene2 = scenesService.createScene('Scene2');
+
+  const scene1Item1 = scene1.createAndAddSource('Item1', 'color_source');
+  const scene1Item2 = scene1.addSource(scene2.getSource().id);
+  const scene2Item1 = scene2.createAndAddSource('Item1', 'color_source');
+
+  const nestedItems = scene1.getNestedItems();
+  const nestedItemIds = nestedItems.map(item => item.id).sort();
+  const expectedItemIds = [scene1Item1, scene1Item2, scene2Item1].map(item => item.id).sort();
+
+  scene1.remove();
+  scene2.remove();
+
+  t.is(nestedItems.length, 3);
+  t.deepEqual(nestedItemIds, expectedItemIds);
+});
+
+test('SceneNode.getNextNode()', async t => {
+  const client = await getApiClient();
+  const scenesService = client.getResource<ScenesService>('ScenesService');
+  const scene = scenesService.createScene('Scene1');
+  const sceneNode1 = scene.createAndAddSource('Item1', 'color_source');
+  const sceneNode2 = scene.createAndAddSource('Item2', 'color_source');
+  const sceneNode3 = scene.createAndAddSource('Item3', 'color_source');
+  const nextSceneNode = sceneNode2.getNextNode();
+
+  t.is(nextSceneNode.nodeId, sceneNode1.nodeId);
 });

@@ -69,6 +69,7 @@ export type TSlotSchema = IItemSchema | IFolderSchema;
 interface IContext {
   assetsPath: string;
   scene: Scene;
+  savedAssets: Dictionary<string>;
 }
 
 export class SlotsNode extends ArrayNode<TSlotSchema, IContext, TSceneNode> {
@@ -81,10 +82,7 @@ export class SlotsNode extends ArrayNode<TSlotSchema, IContext, TSceneNode> {
   @Inject() audioService: AudioService;
 
   getItems(context: IContext) {
-    return context.scene
-      .getNodes()
-      .slice()
-      .reverse();
+    return context.scene.getNodes().slice().reverse();
   }
 
   async saveItem(sceneNode: TSceneNode, context: IContext): Promise<TSlotSchema> {
@@ -138,13 +136,21 @@ export class SlotsNode extends ArrayNode<TSlotSchema, IContext, TSceneNode> {
 
     if (manager === 'iconLibrary') {
       const content = new IconLibraryNode();
-      await content.save({ sceneItem: sceneNode, assetsPath: context.assetsPath });
+      await content.save({
+        sceneItem: sceneNode,
+        assetsPath: context.assetsPath,
+        savedAssets: context.savedAssets,
+      });
       return { ...details, content } as IItemSchema;
     }
 
     if (sceneNode.type === 'image_source') {
       const content = new ImageNode();
-      await content.save({ sceneItem: sceneNode, assetsPath: context.assetsPath });
+      await content.save({
+        sceneItem: sceneNode,
+        assetsPath: context.assetsPath,
+        savedAssets: context.savedAssets,
+      });
       return { ...details, content } as IItemSchema;
     }
 
@@ -162,7 +168,11 @@ export class SlotsNode extends ArrayNode<TSlotSchema, IContext, TSceneNode> {
 
     if (sceneNode.type === 'ffmpeg_source') {
       const content = new VideoNode();
-      await content.save({ sceneItem: sceneNode, assetsPath: context.assetsPath });
+      await content.save({
+        sceneItem: sceneNode,
+        assetsPath: context.assetsPath,
+        savedAssets: context.savedAssets,
+      });
       return { ...details, content } as IItemSchema;
     }
 
@@ -244,6 +254,11 @@ export class SlotsNode extends ArrayNode<TSlotSchema, IContext, TSceneNode> {
           {},
           { id, select: false },
         );
+
+        // Adjust scales by the ratio of the exported base resolution to
+        // the users current base resolution
+        obj.scaleX *= obj.content.data.width / this.videoService.baseWidth;
+        obj.scaleY *= obj.content.data.height / this.videoService.baseHeight;
       } else {
         // We will not load this source at all on mac
         return;
@@ -302,10 +317,21 @@ export class SlotsNode extends ArrayNode<TSlotSchema, IContext, TSceneNode> {
     } else if (obj.content instanceof SceneSourceNode) {
       const sceneId = obj.content.data.sceneId;
       sceneItem = context.scene.addSource(sceneId, { select: false });
+
+      // Adjust scales by the ratio of the exported base resolution to
+      // the users current base resolution
+      obj.scaleX *= obj.content.data.width / this.videoService.baseWidth;
+      obj.scaleY *= obj.content.data.height / this.videoService.baseHeight;
     }
 
     this.adjustTransform(sceneItem, obj);
-    if (!existing) await obj.content.load({ sceneItem, assetsPath: context.assetsPath });
+    if (!existing) {
+      await obj.content.load({
+        sceneItem,
+        assetsPath: context.assetsPath,
+        savedAssets: context.savedAssets,
+      });
+    }
 
     if (sceneItem.getObsInput().audioMixers) {
       this.audioService.views.getSource(sceneItem.sourceId).setHidden(obj.mixerHidden);

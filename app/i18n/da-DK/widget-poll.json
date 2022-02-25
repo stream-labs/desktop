@@ -1,0 +1,21 @@
+{
+  "Poll": "Afstemning",
+  "Let your viewers vote on a result": "Lad dine seere stemme om et resultat",
+  "Bar Settings": "Bjælkens indstillinger",
+  "Manage Poll": "Administrer afstemning",
+  "Poll Type": "Afstemningstype",
+  "Show Closed Poll": "Vis lukket afstemning",
+  "Show/hide poll widget on closed poll": "Vis/skjul afstemningswidget på lukket meningsmåling",
+  "Primary Background Color": "Primær baggrundsfarve",
+  "Secondary Background Color": "Sekundær baggrundsfarve",
+  "Hide wigdet after X seconds of event": "Skjul wigdet efter X sekunders begivenhed",
+  "Header Text Color": "Overskrifts tekstfarve",
+  "Option Text Color": "Muligheds tekstfarve",
+  "Title Font Size": "Skriftstørrelse for titel",
+  "Option Font Size": "Mulighed for titel",
+  "Title Font Weight": "Skrifttype vægt for titel",
+  "Option Font Weight": "Skrifttype vægt for mulighed",
+  "Thin Bar": "Tynd bjælke",
+  "Display thin/thick Bar": "Vis tynd/tyk bjælke",
+  "You need to re-login to access Twitch chat polls": "Du skal logge ind igen for at få adgang til Twitch-afstemninger"
+}

@@ -57,8 +57,9 @@ export abstract class RpcApi extends Service {
     this.requestErrors = []; // cleanup errors from previous request
     try {
       response = this.handleServiceRequest(request);
-    } catch (e) {
-      this.requestErrors.push(e);
+    } catch (e: unknown) {
+      // TODO: Type is probably wrong here
+      this.requestErrors.push(e as any);
     }
 
     if (this.requestErrors.length) response = this.onErrorsHandler(request, this.requestErrors);
@@ -183,7 +184,20 @@ export abstract class RpcApi extends Service {
 
       promise.then(
         data => this.sendPromiseMessage({ data, promiseId, isRejected: false }),
-        data => this.sendPromiseMessage({ data, promiseId, isRejected: true }),
+        data => {
+          if (request.params.noReturn) {
+            // If this was an async action call with no return, we
+            // need to log the Promise rejection somewhere, otherwise
+            // it will just silenty reject as nothing is listening in
+            // the window that made the request.
+            console.error(
+              `Rejected promise from async action call to ${request.params.resource}.${request.method}:`,
+              data,
+            );
+          } else {
+            this.sendPromiseMessage({ data, promiseId, isRejected: true });
+          }
+        },
       );
 
       // notify the API client that the Promise is created

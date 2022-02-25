@@ -1,11 +1,11 @@
 import { useSpectron, test } from '../../helpers/spectron';
-import { getClient } from '../../helpers/api-client';
+import { getApiClient } from '../../helpers/api-client';
 import { SceneCollectionsService } from 'services/scene-collections';
 
 useSpectron({ restartAppAfterEachTest: false });
 
 test('SceneCollection events', async t => {
-  const client = await getClient();
+  const client = await getApiClient();
   const collectionService = client.getResource<SceneCollectionsService>('SceneCollectionsService');
 
   // create a new collection

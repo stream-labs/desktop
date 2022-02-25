@@ -1,0 +1,21 @@
+{
+  "Poll": "Ankieta",
+  "Let your viewers vote on a result": "Pozwól swoim widzom zagłosować nad wynikiem",
+  "Bar Settings": "Ustawienia paska",
+  "Manage Poll": "Zarządzaj ankietą",
+  "Poll Type": "Typ ankiety",
+  "Show Closed Poll": "Pokaż zamkniętą ankietę",
+  "Show/hide poll widget on closed poll": "Pokaż/ukryj widżet ankiety w momencie zamknięcia ankiety",
+  "Primary Background Color": "Podstawowy kolor tła",
+  "Secondary Background Color": "Dodatkowy kolor tła",
+  "Hide wigdet after X seconds of event": "Ukryj widżet po X sekundach od wydarzenia",
+  "Header Text Color": "Kolor tekstu nagłówka",
+  "Option Text Color": "Kolor tekstu opcji",
+  "Title Font Size": "Rozmiar czcionki tytułu",
+  "Option Font Size": "Rozmiar czcionki opcji",
+  "Title Font Weight": "Grubość czcionki tytułu",
+  "Option Font Weight": "Grubość czcionki opcji",
+  "Thin Bar": "Cienki pasek",
+  "Display thin/thick Bar": "Wyświetl cienki/gruby pasek",
+  "You need to re-login to access Twitch chat polls": "Aby mieć dostęp do ankiet na czacie Twitch, musisz zalogować się ponownie"
+}

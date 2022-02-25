@@ -30,14 +30,15 @@
   "It is recommended that you wait until this finishes before going live.": "Az adás indítása előtt ajánlott megvárni, míg ez a művelet befejeződik.",
   "Go Live Anyway": "Adás Indítása Mindenképpen",
   "Wait": "Várj",
-  "Add a new Scene.": "Add a new Scene.",
-  "Remove Scene.": "Remove Scene.",
+  "Add a new Scene.": "Új jelenet hozzáadása.",
+  "Remove Scene.": "Jelenet eltávolítása.",
   "Edit Scene Transitions.": "Edit Scene Transitions.",
-  "Rename Scene": "Rename Scene",
+  "Rename Scene": "Jelenet átnevezése",
   "Name Scene": "Name Scene",
   "Rename Folder": "Könyvtár Átnevezése",
   "Name Folder": "Könyvtár Elnevezése",
   "Switch Scenes": "Switch Scenes",
   "Failed to load scene collection.  A new one will be created instead.": "Failed to load scene collection.  A new one will be created instead.",
-  "New Scene": "New Scene"
+  "New Scene": "Új jelenet",
+  "Projector": "Kivetítő"
 }

@@ -13,9 +13,7 @@ interface IDefaultHardwareServiceState {
   presetFilter: string;
 }
 
-export class DefaultHardwareService extends PersistentStatefulService<
-  IDefaultHardwareServiceState
-> {
+export class DefaultHardwareService extends PersistentStatefulService<IDefaultHardwareServiceState> {
   static defaultState: IDefaultHardwareServiceState = {
     defaultVideoDevice: null,
     defaultAudioDevice: 'default',

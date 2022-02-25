@@ -10,11 +10,11 @@ const node_modules = path.join(process.cwd(), 'node_modules');
 const fetch = require('node-fetch');
 
 function log_info(msg) {
-    sh.echo(colors.magenta(msg));
-  }
-  
+  sh.echo(colors.magenta(msg));
+}
+
 function log_error(msg) {
-    sh.echo(colors.red(`ERROR: ${msg}`));
+  sh.echo(colors.red(`ERROR: ${msg}`));
 }
 
 function executeCmd(cmd, options) {
@@ -67,24 +67,26 @@ function downloadFile(srcUrl, dstPath) {
 }
 
 async function runScript() {
-  colors.blue('----Streamlabs OBS native dependecies installation----');
+  colors.blue('----Streamlabs Desktop native dependecies installation----');
 
   try {
-    const jsonData = fs.readFileSync('./scripts/repositories.json')
+    const jsonData = fs.readFileSync('./scripts/repositories.json');
     const root = JSON.parse(jsonData.toString());
     const dependecies = root.root;
     let os = '';
 
-    if (process.platform === 'win32')
+    if (process.platform === 'win32') {
       os = 'win64';
-    else if (process.platform === 'darwin')
+    } else if (process.platform === 'darwin') {
       os = 'osx';
-    else
+    } else {
       throw 'Platform not supported.';
+    }
 
     sh.cd(node_modules);
 
-    const promises = dependecies.filter(dependency => dependency[os])
+    const promises = dependecies
+      .filter(dependency => dependency[os])
       .map(async dependency => {
         const file = path.join(process.cwd(), dependency['name'], 'package.json');
         const jsonData = fs.readFileSync(file);
@@ -92,37 +94,40 @@ async function runScript() {
         const currentVersion = root['version'];
         let moduleVersion = '';
 
-        if (os === 'osx' && dependency['mac_version'])
+        if (os === 'osx' && dependency['mac_version']) {
           moduleVersion = dependency['mac_version'];
-        else
+        } else {
           moduleVersion = dependency['version'];
+        }
 
-        if (currentVersion == dependency['version'])
+        if (currentVersion == dependency['version']) {
           return;
+        }
 
         sh.rm('-rf', path.join(node_modules, dependency['name']));
 
         let fileName = dependency['archive'];
         fileName = fileName.replace('[VERSION]', moduleVersion);
         fileName = fileName.replace('[OS]', os);
-        
+
         const url = dependency['url'] + fileName;
         const filePath = path.join(process.cwd(), fileName);
 
-        log_info ('Downloading ' + fileName);
+        log_info('Downloading ' + fileName);
         await downloadFile(url, filePath);
-        log_info ('Installing ' + fileName);
+        log_info('Installing ' + fileName);
         executeCmd('tar -xzvf ' + fileName, { silent: true });
         sh.rm(fileName);
       });
-      await Promise.all(promises);
+    await Promise.all(promises);
 
-      if (process.platform === 'win32') {
-        sh.cd('../scripts');
-        executeCmd('facemask-plugin-move.bat', { silent: false });
-      }
+    if (process.platform === 'win32') {
+      sh.cd('../scripts');
+    }
   } catch (error) {
-    log_error('An error occured preventing the script from installing successfully all required native dependencies.')
+    log_error(
+      'An error occured preventing the script from installing successfully all required native dependencies.',
+    );
     log_error(error);
     sh.exit(1);
   }

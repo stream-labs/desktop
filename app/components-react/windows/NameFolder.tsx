@@ -44,7 +44,7 @@ export default function NameFolder() {
   async function submit() {
     try {
       await form.validateFields();
-    } catch (e) {
+    } catch (e: unknown) {
       return;
     }
 
@@ -78,9 +78,10 @@ export default function NameFolder() {
         <TextInput
           name="name"
           value={name}
-          onChange={v => setName(v)}
+          onInput={v => setName(v)}
           label={$t('Please enter the name of the folder')}
           required={true}
+          uncontrolled={false}
         />
       </Form>
     </ModalLayout>

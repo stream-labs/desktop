@@ -8,21 +8,13 @@ const fs = require('fs');
 
 const plugins = [];
 
-const commit = cp
-  .execSync('git rev-parse --short HEAD')
-  .toString()
-  .replace('\n', '');
-
-if (!('SLOBS_SENTRY_URL_FE_DSN' in process.env)) {process.env.SLOBS_SENTRY_URL_FE_DSN = '';}
-if (!('SLOBS_SENTRY_URL_BE_SERVER' in process.env)) {process.env.SLOBS_SENTRY_URL_BE_SERVER = '';}
-if (!('SLOBS_SENTRY_URL_BE_CLIENT' in process.env)) {process.env.SLOBS_SENTRY_URL_BE_CLIENT = '';}
+const commit = cp.execSync('git rev-parse --short HEAD').toString().replace('\n', '');
 
 plugins.push(
   new webpack.DefinePlugin({
     SLOBS_BUNDLE_ID: JSON.stringify(commit),
-    SLOBS_SENTRY_URL_FE_DSN: JSON.stringify(process.env.SLOBS_SENTRY_URL_FE_DSN),
-    SLOBS_SENTRY_URL_BE_SERVER: JSON.stringify(process.env.SLOBS_SENTRY_URL_BE_SERVER),
-    SLOBS_SENTRY_URL_BE_CLIENT: JSON.stringify(process.env.SLOBS_SENTRY_URL_BE_CLIENT),
+    SLD_SENTRY_FRONTEND_DSN: JSON.stringify(process.env.SLD_SENTRY_FRONTEND_DSN ?? ''),
+    SLD_SENTRY_BACKEND_SERVER_DSN: JSON.stringify(process.env.SLD_SENTRY_BACKEND_SERVER_DSN ?? ''),
   }),
 );
 plugins.push(
@@ -36,6 +28,8 @@ plugins.push(
 
 plugins.push(new CleanWebpackPlugin());
 plugins.push(new VueLoaderPlugin());
+
+const OUTPUT_DIR = path.join(__dirname, 'bundles');
 
 const tsFiles = [];
 const tsxFiles = [];
@@ -62,7 +56,7 @@ module.exports = {
   },
 
   output: {
-    path: __dirname + '/bundles',
+    path: OUTPUT_DIR,
     filename: '[name].js',
     publicPath: '',
   },
@@ -79,6 +73,7 @@ module.exports = {
   externals: {
     'font-manager': 'require("font-manager")',
     'color-picker': 'require("color-picker")',
+    '@electron/remote': 'require("@electron/remote")',
 
     // Not actually a native addons, but for one reason or another
     // we don't want them compiled in our webpack bundle.

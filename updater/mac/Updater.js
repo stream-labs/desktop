@@ -2,7 +2,7 @@
 // be required by the main electron process.
 
 const { autoUpdater } = require('electron-updater');
-const { app, BrowserWindow, ipcMain } = require('electron');
+const { app, BrowserWindow, ipcMain, dialog } = require('electron');
 
 class Updater {
   // startApp is a callback that will start the app.  Ideally this
@@ -12,14 +12,18 @@ class Updater {
   // the auto updater.  Pre-initializing the mainWindow is now a
   // good option either, since then closing the auto updater will
   // orphan the main process in the background.
-  constructor(startApp) {
+  constructor(startApp, channel) {
     this.startApp = startApp;
+    this.channel = channel;
   }
 
   run() {
     this.updateState = {};
 
     this.bindListeners();
+
+    // Redirect to new channel for Streamlabs Desktop
+    autoUpdater.channel = `desktop-${this.channel}`;
 
     autoUpdater.checkForUpdates().catch(() => {
       // This usually means there is no internet connection.
@@ -84,7 +88,8 @@ class Updater {
       frame: false,
       resizable: false,
       show: false,
-      webPreferences: { nodeIntegration: true },
+      webPreferences: { nodeIntegration: true, enableRemoteModule: true, contextIsolation: false },
+      backgroundColor: '#17242d',
     });
 
     browserWindow.on('ready-to-show', () => {

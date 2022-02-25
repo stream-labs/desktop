@@ -1,0 +1,21 @@
+{
+  "Poll": "Sondaggio",
+  "Let your viewers vote on a result": "Lascia che i tuoi spettatori votino",
+  "Bar Settings": "Impostazioni delle barre",
+  "Manage Poll": "Gestisci sondaggio",
+  "Poll Type": "Tipo di sondaggio",
+  "Show Closed Poll": "Mostra sondaggio chiuso",
+  "Show/hide poll widget on closed poll": "Mostra/nascondi widget sondaggio su sondaggio chiuso",
+  "Primary Background Color": "Colore sfondo principale",
+  "Secondary Background Color": "Colore sfondo secondario",
+  "Hide wigdet after X seconds of event": "Nascondi widget dopo X secondi dell’evento",
+  "Header Text Color": "Colore testo intestazione",
+  "Option Text Color": "Colore testo opzioni",
+  "Title Font Size": "Dimensione font titolo",
+  "Option Font Size": "Dimensione font opzioni",
+  "Title Font Weight": "Spessore font titolo",
+  "Option Font Weight": "Spessore font opzioni",
+  "Thin Bar": "Barra sottile",
+  "Display thin/thick Bar": "Mostra barra sottile/spessa",
+  "You need to re-login to access Twitch chat polls": "È necessario effettuare nuovamente il login per accedere ai sondaggi chat di Twitch"
+}

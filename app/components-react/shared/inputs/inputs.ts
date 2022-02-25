@@ -8,18 +8,29 @@ import uuid from 'uuid';
 import { FormItemProps } from 'antd/lib/form';
 import { CheckboxChangeEvent } from 'antd/lib/checkbox';
 import { $t } from '../../../services/i18n';
-import { pick } from 'lodash';
+import pick from 'lodash/pick';
+import isEqual from 'lodash/isEqual';
+import * as InputComponents from './index';
 
 type TInputType =
+  | 'code'
+  | 'color'
+  | 'card'
   | 'text'
   | 'textarea'
+  | 'number'
   | 'toggle'
   | 'checkbox'
   | 'list'
+  | 'mediaurl'
+  | 'audiourl'
   | 'tags'
   | 'switch'
+  | 'date'
   | 'slider'
-  | 'image';
+  | 'image'
+  | 'time'
+  | 'file';
 
 export type TInputLayout = 'horizontal' | 'vertical' | 'inline';
 
@@ -34,8 +45,8 @@ export interface IInputCommonProps<TValue> {
   max?: number;
   placeholder?: string;
   disabled?: boolean;
+  readOnly?: boolean;
   debounce?: number;
-  emptyVal?: string;
   /**
    * true if the input is in the uncontrolled mode
    * all input components except text inputs are controlled by default
@@ -82,9 +93,7 @@ type TCreateSlobsInputProps<
   TAntProps,
   TFeatures extends keyof Partial<TAntProps> = never,
   // generate helper props:
-  TGeneratedProps = Pick<TAntProps, TFeatures> &
-    FormItemProps &
-    IInputCommonProps<TValue> & { inputRef?: React.Ref<HTMLInputElement> }
+  TGeneratedProps = Pick<TAntProps, TFeatures> & FormItemProps & IInputCommonProps<TValue>
 > = Omit<TGeneratedProps, keyof TCustomProps> & TCustomProps; // join generated props with custom props
 
 /**
@@ -94,9 +103,14 @@ type TCreateSlobsInputProps<
  */
 export function useInput<
   TInputProps extends TSlobsInputProps<{}, any>,
-  TValue = TInputProps['value']
+  TValue = NonNullable<TInputProps['value']>
 >(type: TInputType, inputProps: TInputProps, antFeatures?: readonly string[]) {
   const { name, value, label } = inputProps;
+
+  // save input props to Ref
+  // so it will always be updated in `useCallback` calls
+  const inputPropsRef = useRef(inputProps);
+  inputPropsRef.current = inputProps;
 
   const uncontrolled = (() => {
     // inputs with debounce are always uncontrolled
@@ -122,7 +136,7 @@ export function useInput<
   const prevValueRef = useRef(value);
 
   // sync local value on props change
-  if (value !== prevValueRef.current) {
+  if (!isEqual(value, prevValueRef.current)) {
     localValueRef.current = value;
     prevValueRef.current = value;
   }
@@ -134,37 +148,50 @@ export function useInput<
   }
 
   useEffect(() => {
-    // set empty string as a default empty value
-    const emptyVal = typeof inputProps.emptyVal === 'undefined' ? '' : inputProps.emptyVal;
-
     // if the input is inside the form
     // then we need to setup it's value via Form API
-    if (form && value !== emptyVal) form.setFieldsValue({ [inputId]: value });
+    if (form) {
+      // get the component class
+      const Component = getInputComponentByType(type);
+
+      if (!Component) {
+        throw new Error(`Component "${type}" not found.`);
+      }
+
+      // antd components may have another format than SLOBS wrapper components
+      // for example TimerInput requires dates to be in the Moment format
+      // meanwhile SLOBS services works with timestamps only
+      // call `Component.getAntdValue()` to make a conversion for this case
+      const newVal = Component.getAntdValue ? Component.getAntdValue(value) : value;
+      form.setFieldsValue({ [inputId]: newVal });
+    }
   }, [value]);
 
   const forceUpdate = useForceUpdate();
 
   // create an `emitChange()` method and it's debounced version
   function emitChange(newVal: TValue) {
-    prevValueRef.current = newVal;
-    inputProps.onChange && inputProps.onChange(newVal);
+    if (uncontrolled) prevValueRef.current = newVal;
+    inputPropsRef.current.onChange && inputPropsRef.current.onChange(newVal);
   }
   const emitChangeDebounced = useDebounce(inputProps.debounce, emitChange);
 
   // create onChange handler
   const onChange = useCallback((newVal: TValue) => {
-    if (newVal === localValueRef.current) return;
-    localValueRef.current = newVal;
+    // if nothing changed then just ignore
+    if (isEqual(newVal, localValueRef.current)) return;
+    const props = inputPropsRef.current;
 
     // call forceUpdate if component is uncontrolled
     // controlled components should be updated automatically via props changing
     if (uncontrolled) {
+      localValueRef.current = newVal;
       forceUpdate();
     }
 
-    inputProps.onInput && inputProps.onInput(newVal);
-    if (!inputProps.onChange) return;
-    if (inputProps.debounce) {
+    props.onInput && props.onInput(newVal);
+    if (!props.onChange) return;
+    if (props.debounce) {
       emitChangeDebounced(newVal);
     } else {
       emitChange(newVal);
@@ -181,7 +208,7 @@ export function useInput<
   };
 
   // Create validation rules
-  const rules = createValidationRules(inputProps);
+  const rules = createValidationRules(type, inputProps);
 
   // pick props for the input wrapper
   const wrapperAttrs = {
@@ -194,28 +221,40 @@ export function useInput<
       'labelCol',
       'wrapperCol',
       'disabled',
+      'readOnly',
       'nowrap',
       'layout',
+      'rules',
+      'tooltip',
+      'hidden',
     ]),
     rules,
     'data-role': 'input-wrapper',
     name: inputId,
   };
 
+  // sync wrapperAttrs with ref
+  const wrapperAttrsRef = useRef(wrapperAttrs);
+  Object.assign(wrapperAttrsRef.current, wrapperAttrs);
+
   // pick props for the input element
   const inputAttrs = {
-    ...(pick(inputProps, 'disabled', 'placeholder', antFeatures || []) as {}),
+    ...(pick(inputProps, 'disabled', 'readOnly', 'placeholder', 'size', antFeatures || []) as {}),
     ...dataAttrs,
     'data-role': 'input',
     name: inputId,
-    value: localValueRef.current,
-    ref: inputProps.inputRef as any,
+    value: localValueRef.current as TValue,
     onChange,
   };
 
+  // sync inputAttrs with ref
+  const inputAttrsRef = useRef(inputAttrs);
+  Object.assign(inputAttrsRef.current, inputAttrs);
+
   return {
-    inputAttrs,
-    wrapperAttrs,
+    inputAttrs: inputAttrsRef.current,
+    wrapperAttrs: wrapperAttrsRef.current,
+    dataAttrs,
     forceUpdate,
     setLocalValue,
     emitChange,
@@ -223,7 +262,7 @@ export function useInput<
 }
 
 /**
- * Hook for text fields: input, textarea, password, number
+ * Hook for text fields: text, textarea, password, number
  */
 export function useTextInput<
   TProps extends TSlobsInputProps<
@@ -231,11 +270,11 @@ export function useTextInput<
     TValue
   >,
   TValue extends string | number = string
->(p: TProps, antFeatures?: Parameters<typeof useInput>[2]) {
+>(type: TInputType, p: TProps, antFeatures?: Parameters<typeof useInput>[2]) {
   // Text inputs are uncontrolled by default for better performance
   const uncontrolled = p.uncontrolled === true || p.uncontrolled !== false;
   const { inputAttrs, wrapperAttrs, forceUpdate, setLocalValue, emitChange } = useInput(
-    'text',
+    type,
     { uncontrolled, ...p },
     antFeatures,
   );
@@ -257,20 +296,26 @@ export function useTextInput<
 
   const onBlur = useCallback((ev: FocusEvent<any>) => {
     // for uncontrolled components call the `onChange()` handler on blur
-    const newVal = ev.target.value;
+    const newVal = type === 'number' ? Number(ev.target.value) : ev.target.value;
     if (uncontrolled && p.value !== newVal) {
       emitChange(newVal);
     }
     p.onBlur && p.onBlur(ev);
   }, []);
 
+  const textInputAttrs = {
+    ...inputAttrs,
+    onChange,
+    onBlur,
+  };
+
+  // sync textInputAttrs with ref
+  const inputAttrsRef = useRef(textInputAttrs);
+  Object.assign(inputAttrsRef.current, textInputAttrs);
+
   return {
     wrapperAttrs,
-    inputAttrs: {
-      ...inputAttrs,
-      onChange,
-      onBlur,
-    },
+    inputAttrs: inputAttrsRef.current,
     originalOnChange: inputAttrs.onChange,
   };
 }
@@ -289,59 +334,78 @@ export function useTextInput<
  *   </form>
  *  }
  * </pre>
+ *
+ * @param stateGetter an object or function to read the field value from
+ * @param stateSetter a function that changes the field given field
+ * @param extraPropsGenerator a function that returns extra attributes for the input element (like disabled, placeholder,...)
  */
-export function createBinding<
-  TState extends object,
-  TFieldName extends keyof TState,
-  TExtraProps extends object = {}
->(
+export function createBinding<TState extends object, TExtraProps extends object = {}>(
   stateGetter: TState | (() => TState),
-  setter: (newTarget: Partial<TState>) => unknown,
+  stateSetter?: (newTarget: Partial<TState>) => unknown,
   extraPropsGenerator?: (fieldName: keyof TState) => TExtraProps,
-): TBindings<TState, TFieldName, TExtraProps> {
+): TBindings<TState, TExtraProps> {
   function getState(): TState {
     return typeof stateGetter === 'function'
       ? (stateGetter as Function)()
       : (stateGetter as TState);
   }
-  return new Proxy(
-    {},
-    {
-      get(t, fieldName: string) {
-        const extraProps = extraPropsGenerator
-          ? extraPropsGenerator(fieldName as keyof TState)
-          : {};
-        return {
-          name: fieldName,
-          value: getState()[fieldName],
-          onChange(newVal: unknown) {
-            setter({ ...getState(), [fieldName]: newVal });
-          },
-          ...extraProps,
-        };
-      },
+
+  const metadata = {
+    _proxyName: 'Binding',
+    _binding: {
+      id: `binding__${uuid()}`,
+      dependencies: {} as Record<string, unknown>,
     },
-  ) as TBindings<TState, TFieldName, TExtraProps>;
+  };
+
+  return (new Proxy(metadata, {
+    get(t, fieldName: string) {
+      if (fieldName in metadata) return metadata[fieldName];
+      const fieldValue = getState()[fieldName];
+      // register the fieldName in the dependencies list
+      // that helps keep this binding up to date when use it inside ReduxModules
+      metadata._binding.dependencies[fieldName] = fieldValue;
+      const extraProps = extraPropsGenerator ? extraPropsGenerator(fieldName as keyof TState) : {};
+      return {
+        name: fieldName,
+        value: fieldValue,
+        onChange(newVal: unknown) {
+          const state = getState();
+          // if the state object has a defined setter than use the local setter
+          if (Object.getOwnPropertyDescriptor(state, fieldName)?.set) {
+            state[fieldName] = newVal;
+          } else if (stateSetter) {
+            stateSetter({ ...state, [fieldName]: newVal });
+          }
+        },
+        ...extraProps,
+      };
+    },
+  }) as unknown) as TBindings<TState, TExtraProps>;
 }
 
-export type TBindings<
-  TState extends object,
-  TFieldName extends keyof TState,
-  TExtraProps extends object = {}
-> = {
-  [K in TFieldName]: {
+export type TBindings<TState extends Object, TExtraProps extends Object = {}> = {
+  [K in keyof TState]: {
     name: K;
     value: TState[K];
     onChange: (newVal: TState[K]) => unknown;
-  } & TExtraProps;
-};
+  };
+} &
+  TExtraProps & {
+    _proxyName: 'Binding';
+    _binding: {
+      id: string;
+      dependencies: Record<keyof TState, unknown>;
+      clone: () => TBindings<TState, TExtraProps>;
+    };
+  };
 
-function createValidationRules(inputProps: IInputCommonProps<unknown>) {
+function createValidationRules(type: TInputType, inputProps: IInputCommonProps<unknown>) {
   const rules = inputProps.rules ? [...inputProps.rules] : [];
   if (inputProps.required) {
     rules.push({ required: true, message: $t('The field is required') });
   }
-  if (inputProps.max) {
+  if (type === 'text' && inputProps.max) {
     rules.push({
       max: inputProps.max,
       message: $t('This field may not be greater than %{value} characters.', {
@@ -354,16 +418,29 @@ function createValidationRules(inputProps: IInputCommonProps<unknown>) {
 
 /**
  * Function for creating new input components
- * For performance optimization ignores changing of all function props like onChange and onInput
+ * Use the deep comparison algorithm for the `value` prop
  */
 export function InputComponent<T extends Function>(f: T): T {
   return (React.memo(f as any, (prevProps: any, newProps: any) => {
     const keys = Object.keys(newProps);
     if (keys.length !== Object.keys(prevProps).length) return false;
     for (const key of keys) {
-      if (typeof newProps[key] === 'function') continue;
+      // use deep comparison for the `value` prop
+      // because it could have an array type (For example TagsInput.value)
+      if (key === 'value' && !isEqual(newProps[key], prevProps[key])) return false;
+
+      // for other props use shallow comparison
       if (newProps[key] !== prevProps[key]) return false;
     }
     return true;
   }) as any) as T;
+}
+
+export function getInputComponentByType(
+  type: TInputType,
+): JSX.Element & { getAntdValue?: (value: unknown) => unknown } {
+  const name = Object.keys(InputComponents).find(componentName => {
+    return componentName.split('Input')[0].toLowerCase() === type;
+  });
+  return name ? InputComponents[name] : null;
 }

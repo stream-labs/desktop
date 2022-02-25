@@ -9,7 +9,7 @@
   "Push to Show %{sourcename}": "Pulsar para mostrar %{sourcename}",
   "Push to Hide %{sourcename}": "Pulsar para ocultar %{sourcename}",
   "Mute": "Silenciar",
-  "Unmute": "Reactivar sonido",
+  "Unmute": "Escuchar",
   "Push to Mute": "Pulsar para silenciar",
   "Push to Talk": "Pulsar para hablar",
   "Enable Studio Mode": "Activar modo Estudio",
@@ -22,6 +22,6 @@
   "Restart": "Reiniciar",
   "Next Slide": "Siguiente diapositiva",
   "Previous Slide": "Diapositiva anterior",
-  "Toggle Performance Mode": "Toggle Performance Mode",
+  "Toggle Performance Mode": "Alternar modo Rendimiento",
   "Skip Alert": "Omitir alerta"
 }

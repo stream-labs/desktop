@@ -10,6 +10,8 @@ import { IncrementalRolloutService } from './incremental-rollout';
 import electron from 'electron';
 import { StreamingService } from './streaming';
 import { FacebookService } from './platforms/facebook';
+import { TiktokService } from './platforms/tiktok';
+import * as remote from '@electron/remote';
 
 interface IRestreamTarget {
   id: number;
@@ -43,6 +45,7 @@ export class RestreamService extends StatefulService<IRestreamState> {
   @Inject() streamingService: StreamingService;
   @Inject() incrementalRolloutService: IncrementalRolloutService;
   @Inject() facebookService: FacebookService;
+  @Inject() tiktokService: TiktokService;
 
   settings: IUserSettingsResponse;
 
@@ -168,12 +171,13 @@ export class RestreamService extends StatefulService<IRestreamState> {
   }
 
   async setupTargets() {
+    // delete existing targets
     const targets = await this.fetchTargets();
     const promises = targets.map(t => this.deleteTarget(t.id));
-
     await Promise.all(promises);
 
-    await this.createTargets([
+    // setup new targets
+    const newTargets = [
       ...this.streamInfo.enabledPlatforms.map(platform => {
         return {
           platform: platform as TPlatform,
@@ -183,7 +187,17 @@ export class RestreamService extends StatefulService<IRestreamState> {
       ...this.streamInfo.savedSettings.customDestinations
         .filter(dest => dest.enabled)
         .map(dest => ({ platform: 'relay' as 'relay', streamKey: `${dest.url}${dest.streamKey}` })),
-    ]);
+    ];
+
+    // treat tiktok as a custom destination
+    const tikTokTarget = newTargets.find(t => t.platform === 'tiktok');
+    if (tikTokTarget) {
+      const ttSettings = this.tiktokService.state.settings;
+      tikTokTarget.platform = 'relay';
+      tikTokTarget.streamKey = `${ttSettings.serverUrl}/${ttSettings.streamKey}`;
+    }
+
+    await this.createTargets(newTargets);
   }
 
   checkStatus(): Promise<boolean> {
@@ -257,7 +271,7 @@ export class RestreamService extends StatefulService<IRestreamState> {
   mountChat(electronWindowId: number) {
     if (!this.chatView) this.initChat();
 
-    const win = electron.remote.BrowserWindow.fromId(electronWindowId);
+    const win = remote.BrowserWindow.fromId(electronWindowId);
 
     // This method was added in our fork
     (win as any).addBrowserView(this.chatView);
@@ -277,7 +291,7 @@ export class RestreamService extends StatefulService<IRestreamState> {
   unmountChat(electronWindowId: number) {
     if (!this.chatView) return;
 
-    const win = electron.remote.BrowserWindow.fromId(electronWindowId);
+    const win = remote.BrowserWindow.fromId(electronWindowId);
 
     // @ts-ignore: this method was added in our fork
     win.removeBrowserView(this.chatView);
@@ -291,7 +305,7 @@ export class RestreamService extends StatefulService<IRestreamState> {
 
     const partition = this.userService.state.auth.partition;
 
-    this.chatView = new electron.remote.BrowserView({
+    this.chatView = new remote.BrowserView({
       webPreferences: {
         partition,
         nodeIntegration: false,

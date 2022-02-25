@@ -21,7 +21,6 @@ import { PatchNotesService } from 'services/patch-notes';
 import { ProtocolLinksService } from 'services/protocol-links';
 import { WindowsService } from 'services/windows';
 import * as obs from '../../../obs-api';
-import { FacemasksService } from 'services/facemasks';
 import { OutageNotificationsService } from 'services/outage-notifications';
 import { CrashReporterService } from 'services/crash-reporter';
 import { PlatformAppsService } from 'services/platform-apps';
@@ -41,6 +40,7 @@ import { KeyListenerService } from 'services/key-listener';
 import { MetricsService } from '../metrics';
 import { SettingsService } from '../settings';
 import { OS, getOS } from 'util/operating-systems';
+import * as remote from '@electron/remote';
 
 interface IAppState {
   loading: boolean;
@@ -65,7 +65,6 @@ export class AppService extends StatefulService<IAppState> {
   @Inject() shortcutsService: ShortcutsService;
   @Inject() patchNotesService: PatchNotesService;
   @Inject() windowsService: WindowsService;
-  @Inject() facemasksService: FacemasksService;
   @Inject() outageNotificationsService: OutageNotificationsService;
   @Inject() platformAppsService: PlatformAppsService;
   @Inject() gameOverlayService: GameOverlayService;
@@ -94,12 +93,12 @@ export class AppService extends StatefulService<IAppState> {
 
   static initialState: IAppState = {
     loading: true,
-    argv: electron.remote.process.argv,
+    argv: remote.process.argv,
     errorAlert: false,
     onboarded: false,
   };
 
-  readonly appDataDirectory = electron.remote.app.getPath('userData');
+  readonly appDataDirectory = remote.app.getPath('userData');
 
   loadingChanged = new Subject<boolean>();
 
@@ -233,12 +232,12 @@ export class AppService extends StatefulService<IAppState> {
       await this.sceneCollectionsService.disableAutoSave();
     }
 
-    let error: Error = null;
+    let error: any = null;
     let result: any = null;
 
     try {
       result = fn();
-    } catch (e) {
+    } catch (e: unknown) {
       error = null;
     }
 
@@ -248,7 +247,7 @@ export class AppService extends StatefulService<IAppState> {
       this.loadingPromises[promiseId] = result;
       try {
         returningValue = await result;
-      } catch (e) {
+      } catch (e: unknown) {
         error = e;
       }
       delete this.loadingPromises[promiseId];

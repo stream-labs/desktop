@@ -6,6 +6,8 @@ import { NavigationService } from 'services/navigation';
 import { $t } from 'services/i18n';
 import { NotificationsService, ENotificationType } from 'services/notifications';
 import { JsonrpcService } from 'services/api/jsonrpc/jsonrpc';
+import { getOS, OS } from 'util/operating-systems';
+import { WindowsService } from 'services/windows';
 
 interface IPatchNotesState {
   lastVersionSeen: string;
@@ -23,6 +25,7 @@ export class PatchNotesService extends PersistentStatefulService<IPatchNotesStat
   @Inject() navigationService: NavigationService;
   @Inject() notificationsService: NotificationsService;
   @Inject() private jsonrpcService: JsonrpcService;
+  @Inject() windowsService: WindowsService;
 
   static defaultState: IPatchNotesState = {
     lastVersionSeen: null,
@@ -74,7 +77,7 @@ export class PatchNotesService extends PersistentStatefulService<IPatchNotesStat
         lifeTime: 30000,
         showTime: false,
         playSound: false,
-        message: $t('Streamlabs OBS has updated! Click here to see what changed.'),
+        message: $t('Streamlabs Desktop has updated! Click here to see what changed.'),
         action: this.jsonrpcService.createRequest(
           Service.getResourceId(this.navigationService),
           'navigate',

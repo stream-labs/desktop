@@ -11,6 +11,7 @@ interface ISchema {
 interface IContext {
   assetsPath: string;
   sceneItem: SceneItem;
+  savedAssets: Dictionary<string>;
 }
 
 export class IconLibraryNode extends Node<ISchema, IContext> {
@@ -19,6 +20,13 @@ export class IconLibraryNode extends Node<ISchema, IContext> {
   async save(context: IContext) {
     const folder = context.sceneItem.getSource().getPropertiesManagerSettings().folder;
     const newFolderName = uniqueId();
+
+    // Do not duplicate file if it has already been copied
+    if (context.savedAssets[folder]) {
+      this.data = { folder: context.savedAssets[folder] };
+      return;
+    }
+    context.savedAssets[folder] = newFolderName;
 
     // Copy the image file
     const destination = path.join(context.assetsPath, newFolderName);
@@ -32,14 +40,13 @@ export class IconLibraryNode extends Node<ISchema, IContext> {
       } else {
         files.forEach(file => {
           const filePath = path.join(folder, file);
+          if (fs.lstatSync(filePath).isDirectory()) return;
           fs.writeFileSync(path.join(destination, file), fs.readFileSync(filePath));
         });
       }
     });
 
-    this.data = {
-      folder: newFolderName,
-    };
+    this.data = { folder: newFolderName };
   }
 
   async load(context: IContext) {

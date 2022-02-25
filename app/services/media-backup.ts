@@ -1,4 +1,4 @@
-import { mutation, StatefulService } from 'services/core/stateful-service';
+import { mutation, StatefulService, ViewHandler } from 'services/core/stateful-service';
 import path from 'path';
 import fs from 'fs';
 import { Inject } from 'services/core/injector';
@@ -43,6 +43,21 @@ interface IMediaFileDataResponse {
 
 const ONE_MEGABYTE = 1_048_576;
 
+class MediaBackupViews extends ViewHandler<IMediaBackupState> {
+  /**
+   * Fetches the global sync status.
+   * Will be "synced" if all files are synced
+   * Will be "syncing" if at least 1 file is syncing
+   */
+  get globalSyncStatus(): EGlobalSyncStatus {
+    const syncing = this.state.files.find(file => file.status !== EMediaFileStatus.Synced);
+
+    if (syncing) return EGlobalSyncStatus.Syncing;
+
+    return EGlobalSyncStatus.Synced;
+  }
+}
+
 export class MediaBackupService extends StatefulService<IMediaBackupState> {
   @Inject() hostsService: HostsService;
   @Inject() userService: UserService;
@@ -57,17 +72,8 @@ export class MediaBackupService extends StatefulService<IMediaBackupState> {
     return uuid();
   }
 
-  /**
-   * Fetches the global sync status.
-   * Will be "synced" if all files are synced
-   * Will be "syncing" if at least 1 file is syncing
-   */
-  get globalSyncStatus(): EGlobalSyncStatus {
-    const syncing = this.state.files.find(file => file.status !== EMediaFileStatus.Synced);
-
-    if (syncing) return EGlobalSyncStatus.Syncing;
-
-    return EGlobalSyncStatus.Synced;
+  get views() {
+    return new MediaBackupViews(this.state);
   }
 
   /**
@@ -82,7 +88,7 @@ export class MediaBackupService extends StatefulService<IMediaBackupState> {
 
     try {
       name = path.parse(filePath).base;
-    } catch (e) {
+    } catch (e: unknown) {
       console.warn(`[Media Backup] Got unparseable path ${filePath}`);
       return null;
     }
@@ -99,7 +105,7 @@ export class MediaBackupService extends StatefulService<IMediaBackupState> {
           }
         });
       });
-    } catch (e) {
+    } catch (e: unknown) {
       // Lots of people have media sources that point to files that no
       // longer exist.  We want to silently do nothing in this scenario.
       console.warn(`[Media Backup] Error fetching stats for: ${filePath}`);
@@ -130,7 +136,7 @@ export class MediaBackupService extends StatefulService<IMediaBackupState> {
 
     try {
       data = await this.withRetry(() => this.uploadFile(file));
-    } catch (e) {
+    } catch (e: unknown) {
       console.error('[Media Backup] Error uploading file:', e);
 
       // We don't surface errors to the user currently
@@ -180,12 +186,12 @@ export class MediaBackupService extends StatefulService<IMediaBackupState> {
 
     try {
       data = await this.withRetry(() => this.getFileData(serverId));
-    } catch (e) {
+    } catch (e: unknown) {
       // At the moment, we don't surface sync errors to the user
       if (this.validateSyncLock(localId, syncLock)) {
-        if (e.status !== 404) {
+        if (e['status'] !== 404) {
           // Don't log 404s, these are somewhat expected.
-          console.error(`[Media Backup] Ran out of retries fetching data ${e.body}`);
+          console.error(`[Media Backup] Ran out of retries fetching data ${e['body']}`);
         }
         this.UPDATE_FILE(localId, { status: EMediaFileStatus.Synced });
       }
@@ -201,7 +207,7 @@ export class MediaBackupService extends StatefulService<IMediaBackupState> {
 
         try {
           checksum = await this.withRetry(() => getChecksum(fileToCheck));
-        } catch (e) {
+        } catch (e: unknown) {
           // This is not a fatal error, we can download a new copy
           console.warn(`[Media Backup] Error calculating checksum: ${e}`);
         }
@@ -228,8 +234,8 @@ export class MediaBackupService extends StatefulService<IMediaBackupState> {
       downloadedPath = await this.withRetry(() =>
         this.downloadFile(data.url, serverId, data.filename),
       );
-    } catch (e) {
-      console.error(`[Media Backup] Error downloading file: ${e.body}`);
+    } catch (e: unknown) {
+      console.error(`[Media Backup] Error downloading file: ${e['body']}`);
 
       // At the moment, we don't surface sync errors to the user
       if (this.validateSyncLock(localId, syncLock)) {
@@ -284,7 +290,7 @@ export class MediaBackupService extends StatefulService<IMediaBackupState> {
     while (true) {
       try {
         return await executor();
-      } catch (e) {
+      } catch (e: unknown) {
         if (retries <= 0) throw e;
         retries -= 1;
       }

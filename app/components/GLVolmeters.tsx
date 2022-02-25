@@ -7,15 +7,14 @@ import vShaderSrc from 'util/webgl/shaders/volmeter.vert';
 import fShaderSrc from 'util/webgl/shaders/volmeter.frag';
 import electron from 'electron';
 import TsxComponent, { createProps } from 'components/tsx-component';
-import { v2 } from 'util/vec2';
-import { difference } from 'lodash';
+import difference from 'lodash/difference';
 import { Subscription } from 'rxjs';
 
 // Configuration
 const CHANNEL_HEIGHT = 3;
 const SPACE_BETWEEN_CHANNELS = 2;
 const PADDING_TOP = 39;
-const PADDING_BOTTOM = 37;
+const PADDING_BOTTOM = 41;
 const PEAK_WIDTH = 4;
 const PEAK_HOLD_CYCLES = 100;
 const WARNING_LEVEL = -20;
@@ -128,9 +127,10 @@ export default class GLVolmeters extends TsxComponent<VolmetersProps> {
     );
   }
 
+  // TODO: refactor into a single source of truth between Mixer and Volmeters
   get audioSources() {
     return this.audioService.views.sourcesForCurrentScene.filter(source => {
-      return !source.mixerHidden;
+      return !source.mixerHidden && source.isControlledViaObs;
     });
   }
 
@@ -358,8 +358,11 @@ export default class GLVolmeters extends TsxComponent<VolmetersProps> {
       offsetTop += PADDING_TOP;
       const volmeter = this.subscriptions[sourceId];
       this.drawVolmeterWebgl(volmeter, offsetTop);
+
       offsetTop +=
-        (CHANNEL_HEIGHT + SPACE_BETWEEN_CHANNELS) * volmeter.channelsCount + PADDING_BOTTOM;
+        CHANNEL_HEIGHT * volmeter.channelsCount +
+        SPACE_BETWEEN_CHANNELS * (volmeter.channelsCount - 1) +
+        PADDING_BOTTOM;
     });
   }
 

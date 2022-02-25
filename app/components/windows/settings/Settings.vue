@@ -7,7 +7,7 @@
   >
     <div slot="content" class="settings">
       <NavMenu v-model="categoryName" class="settings-nav">
-        <scrollable style="height: 100%;" :isResizable="false">
+        <scrollable style="height: 100%" :isResizable="false">
           <form-input
             :value="searchStr"
             @input="str => onSearchInput(str)"
@@ -44,7 +44,7 @@
           >
             Prime
           </NavItem>
-          <button
+          <div
             class="settings-auth"
             @click="handleAuth()"
             v-track-click="{
@@ -54,9 +54,12 @@
           >
             <i :class="userService.isLoggedIn ? 'fas fa-sign-out-alt' : 'fas fa-sign-in-alt'" />
             <strong>{{ userService.isLoggedIn ? $t('Log Out') : $t('Log In') }}</strong>
-            <platform-logo v-if="userService.isLoggedIn" :platform="userService.platform.type" />
+            <platform-logo
+              v-if="userService.isLoggedIn"
+              :componentProps="{ platform: userService.platform.type, size: 14 }"
+            />
             <span v-if="userService.isLoggedIn">{{ userService.username }}</span>
-          </button>
+          </div>
         </scrollable>
       </NavMenu>
 
@@ -72,41 +75,23 @@
           @scanCompleted="onScanCompletedHandler"
           v-slot:default="{ page, scanning }"
         >
-          <extra-settings v-if="page === 'General'" />
-          <language-settings v-if="page === 'General'" />
           <hotkeys
             v-if="page === 'Hotkeys'"
             :globalSearchStr="scanning ? '' : searchStr"
             :highlightSearch="highlightSearch"
             :scanning="scanning"
           />
-          <stream-settings v-if="page === 'Stream'" />
           <developer-settings v-if="page === 'Developer'" />
           <installed-apps v-if="page === 'Installed Apps'" />
           <overlay-settings v-if="page === 'Scene Collections'" />
           <notifications-settings v-if="page === 'Notifications'" />
-          <appearance-settings v-if="page === 'Appearance'" />
           <experimental-settings v-if="page === 'Experimental'" />
           <remote-control-settings v-if="page === 'Remote Control'" />
           <game-overlay-settings v-if="page === 'Game Overlay'" />
           <virtual-webcam-settings v-if="page === 'Virtual Webcam'" />
-          <facemask-settings v-if="page === 'Face Masks'" />
+          <ObsSettings v-if="shouldShowReactPage" :componentProps="{ page: page }" />
           <GenericFormGroups
-            v-if="
-              ![
-                'Hotkeys',
-                'Stream',
-                'API',
-                'Overlays',
-                'Notifications',
-                'Appearance',
-                'Experimental',
-                'Remote Control',
-                'Installed Apps',
-                'Virtual Webcam',
-                'Developer',
-              ].includes(page)
-            "
+            v-if="shouldShowVuePage"
             :key="page"
             :categoryName="page"
             :value="settingsData"
@@ -136,8 +121,17 @@
   height: 100%;
 
   .search {
+    width: 177px;
     .margin-left(2);
     .margin-bottom(2);
+    & /deep/ input {
+      padding-left: 30px;
+    }
+    & /deep/ .fa {
+      left: 0;
+      right: auto;
+      pointer-events: none;
+    }
   }
 
   .clear-search-button {
@@ -174,7 +168,7 @@
   padding-left: 24px;
   font-size: 14px;
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: flex-start;
   position: fixed;
   bottom: 40px;
@@ -190,7 +184,8 @@
     overflow: hidden;
   }
 
-  i {
+  i,
+  .react {
     margin-right: 8px;
   }
   strong {

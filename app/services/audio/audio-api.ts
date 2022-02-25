@@ -17,6 +17,7 @@ export interface IAudioSource {
   syncOffset: number;
   muted: boolean;
   mixerHidden: boolean;
+  isControlledViaObs: boolean;
 }
 
 export interface IAudioSourceApi extends IAudioSource {
@@ -24,7 +25,6 @@ export interface IAudioSourceApi extends IAudioSource {
   setMul(mul: number): void;
   setMuted(muted: boolean): void;
   subscribeVolmeter(cb: (volmeter: IVolmeter) => void): Subscription;
-  getSettingsForm(): TObsFormData;
   setSettings(patch: Partial<IAudioSource>): void;
   getModel(): IAudioSource & ISource;
 }

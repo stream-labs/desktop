@@ -7,5 +7,6 @@
       "react"
     ]
   },
-  "files": ["./index.ts"]
+  "include": ["./**/*", "../index.d.ts"],
+  "exclude": []
 }

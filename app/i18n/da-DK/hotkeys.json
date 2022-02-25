@@ -8,8 +8,8 @@
   "Hide %{sourcename}": "Skjul %{sourcename}",
   "Push to Show %{sourcename}": "Tryk for at vise %{sourcename}",
   "Push to Hide %{sourcename}": "Tryk for at skjule %{sourcename}",
-  "Mute": "Mikrofon fra",
-  "Unmute": "Mikrofon til",
+  "Mute": "Gør stum",
+  "Unmute": "Fjern stum",
   "Push to Mute": "Tryk for at slå mikrofon fra",
   "Push to Talk": "Tryk for at tale",
   "Enable Studio Mode": "Aktivér studiotilstand",
@@ -22,6 +22,6 @@
   "Restart": "Genstart",
   "Next Slide": "Næste dias",
   "Previous Slide": "Forrige dias",
-  "Toggle Performance Mode": "Toggle Performance Mode",
+  "Toggle Performance Mode": "Performancetilstand til/fra",
   "Skip Alert": "Spring over"
 }

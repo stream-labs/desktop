@@ -104,6 +104,7 @@ export type TSourceType =
   | 'scene'
   | 'ndi_source'
   | 'openvr_capture'
+  | 'screen_capture'
   | 'liv_capture'
   | 'ovrstream_dc_source'
   | 'vlc_source'
@@ -139,4 +140,7 @@ export interface ISourceDisplayData {
   description: string;
   demoFilename?: string;
   supportList?: string[];
+  demoVideo?: boolean;
+  icon: string;
+  shortDesc?: string;
 }

@@ -10,7 +10,7 @@ import HFormGroup from 'components/shared/inputs/HFormGroup.vue';
 import { debounce } from 'lodash-decorators';
 import { IAlertBoxVariation } from 'services/widgets/settings/alert-box/alert-box-api';
 import Scrollable from 'components/shared/Scrollable';
-import electron from 'electron';
+import * as remote from '@electron/remote';
 
 const { ToggleInput } = inputComponents;
 
@@ -206,7 +206,7 @@ export default class CustomFieldsEditor extends Vue {
     newData = this.setCustomJson(newData);
     try {
       await this.settingsService.saveSettings(newData.settings);
-    } catch (e) {
+    } catch (e: unknown) {
       this.onFailHandler($t('Save failed, something went wrong.'));
       this.isLoading = false;
       return;
@@ -229,8 +229,8 @@ export default class CustomFieldsEditor extends Vue {
     let newCustomFields: Dictionary<ICustomField>;
     try {
       newCustomFields = JSON.parse(this.editorInputValue);
-    } catch (e) {
-      electron.remote.dialog.showErrorBox($t('Error'), $t('Invalid JSON'));
+    } catch (e: unknown) {
+      remote.dialog.showErrorBox($t('Error'), $t('Invalid JSON'));
       return;
     }
 

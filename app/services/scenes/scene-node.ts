@@ -73,9 +73,7 @@ export abstract class SceneItemNode implements ISceneItemNode {
   }
 
   getNodeIndex(): number {
-    return this.getScene()
-      .getNodesIds()
-      .indexOf(this.id);
+    return this.getScene().getNodesIds().indexOf(this.id);
   }
 
   placeAfter(nodeId: string) {

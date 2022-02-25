@@ -39,14 +39,13 @@
       </div>
     </div>
 
-    <scrollable className="vue-tree-container">
+    <scrollable className="vue-tree-container" @contextmenu.native="e => showContextMenu(null, e)">
       <sl-vue-tree
         :value="nodes"
         ref="slVueTree"
         @select="makeActive"
         @drop="handleSort"
         @toggle="toggleFolder"
-        @contextmenu.native="showContextMenu()"
         @nodecontextmenu="(node, event) => showContextMenu(node.data.id, event)"
         @nodedblclick="node => sourceProperties(node.data.id)"
         :scrollAreaHeight="50"
@@ -123,6 +122,10 @@ i.disabled {
       opacity: 1;
       color: var(--icon);
     }
+  }
+  .icon-right {
+    transform: translate(-20%, 180%) rotate(-90deg);
+    display: block;
   }
 }
 

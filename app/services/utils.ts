@@ -2,6 +2,9 @@ import URI from 'urijs';
 import isEqual from 'lodash/isEqual';
 import electron from 'electron';
 import cloneDeep from 'lodash/cloneDeep';
+import fs from 'fs';
+import path from 'path';
+import * as remote from '@electron/remote';
 
 export const enum EBit {
   ZERO,
@@ -15,6 +18,7 @@ export interface IEnv {
   SLOBS_USE_LOCAL_HOST: boolean;
   SLOBS_VERSION: string;
   SLOBS_TRACE_SYNC_IPC: boolean;
+  SLOBS_USE_CDN_MEDIA: boolean;
   CI: boolean;
 }
 
@@ -25,7 +29,7 @@ export default class Utils {
    */
   static _env: IEnv;
   static get env() {
-    if (!Utils._env) Utils._env = electron.remote.process.env as any;
+    if (!Utils._env) Utils._env = remote.process.env as any;
     return Utils._env;
   }
 
@@ -74,13 +78,13 @@ export default class Utils {
   }
 
   static getMainWindow(): Electron.BrowserWindow {
-    return electron.remote.BrowserWindow.getAllWindows().find(
+    return remote.BrowserWindow.getAllWindows().find(
       win => Utils.getUrlParams(win.webContents.getURL()).windowId === 'main',
     );
   }
 
   static getChildWindow(): Electron.BrowserWindow {
-    return electron.remote.BrowserWindow.getAllWindows().find(
+    return remote.BrowserWindow.getAllWindows().find(
       win => Utils.getUrlParams(win.webContents.getURL()).windowId === 'child',
     );
   }
@@ -101,7 +105,7 @@ export default class Utils {
     return Utils.env.SLOBS_IPC as boolean;
   }
 
-  static useLocalHost(): boolean {
+  static shouldUseLocalHost(): boolean {
     return Utils.env.SLOBS_USE_LOCAL_HOST as boolean;
   }
 
@@ -235,6 +239,17 @@ export default class Utils {
     } while (fileSizeInBytes > 1024);
     return Math.max(fileSizeInBytes, 0.1).toFixed(1) + byteUnits[i];
   }
+
+  /**
+   * Returns a type predicate that makes prop from TObj a required property.
+   * This function is primarily meant to be used with `filter`
+   * @param prop The property to make required
+   * @example
+   * a.filter(propertyExists('foo')).forEach(v => v.foo + 5);
+   */
+  static propertyExists<TObj, TProp extends keyof TObj>(prop: TProp) {
+    return (obj: TObj): obj is Required<Pick<TObj, TProp>> & TObj => obj[prop] != null;
+  }
 }
 
 /**
@@ -244,4 +259,34 @@ export default class Utils {
  */
 export function keys<T>(target: T) {
   return Object.keys(target) as (keyof T)[];
+}
+
+let appPath: string;
+
+/**
+ * Memoized function for getting the app path
+ */
+export function getAppPath() {
+  appPath = appPath ?? remote.app.getAppPath();
+  return appPath;
+}
+
+/**
+ * A fallback-safe method of fetching images
+ * from either our local storage or the CDN
+ * @param mediaPath The path structure to retrieve the image from the media folders
+ */
+export function $i(mediaPath: string) {
+  try {
+    // Useful for testing media fetches properly from the CDN
+    if (Utils.env.SLOBS_USE_CDN_MEDIA) throw new Error('Using CDN');
+
+    const localMediaPath = require(`../../media/${mediaPath}`);
+
+    if (!fs.existsSync(path.resolve(getAppPath(), localMediaPath))) throw new Error('Using CDN');
+
+    return localMediaPath;
+  } catch (e: unknown) {
+    return `https://slobs-cdn.streamlabs.com/media/${mediaPath}`;
+  }
 }

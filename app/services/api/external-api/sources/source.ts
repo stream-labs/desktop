@@ -10,6 +10,9 @@ import { Fallback, InjectFromExternalApi } from '../../external-api';
 import { SourcesService } from './sources';
 import Utils from '../../../utils';
 
+/**
+ * Serialized representation of a {@link Source}.
+ */
 export interface ISourceModel {
   sourceId: string;
   id: string; // Streamdeck uses id field
@@ -27,6 +30,11 @@ export interface ISourceModel {
   configurable: boolean;
 }
 
+/**
+ * API for single source management. Provides basic source operations like
+ * renaming the source or updating settings and properties form data. For more
+ * scene related operations see {@link SceneNode} and {@link Scene}.
+ */
 @ServiceHelper()
 export class Source implements ISourceModel, ISerializable {
   @Inject('SourcesService') private internalSourcesService: InternalSourcesService;
@@ -55,38 +63,75 @@ export class Source implements ISourceModel, ISerializable {
     return this.source.isDestroyed();
   }
 
+  /**
+   * @returns The serialized representation of this {@link Source}.
+   */
   getModel(): ISourceModel {
     return this.sourcesService.convertInternalModelToExternal(this.source.getModel());
   }
 
+  /**
+   * Updates the source's settings.
+   *
+   * @param settings The settings to update. Can be a partial representation.
+   */
   updateSettings(settings: Dictionary<any>): void {
     this.source.updateSettings(settings);
   }
 
+  /**
+   * @returns The source's settings
+   */
   getSettings(): Dictionary<any> {
     return this.source.getSettings();
   }
 
+  /**
+   * @returns The form data of the source's properties
+   */
   getPropertiesFormData(): TObsFormData {
     return this.source.getPropertiesFormData();
   }
 
+  /**
+   * Sets the source's properties form data.
+   *
+   * @param properties The properties form data to set
+   */
   setPropertiesFormData(properties: TObsFormData): void {
     return this.source.setPropertiesFormData(properties);
   }
 
+  /**
+   * Whether or not this source has properties.
+   *
+   * @returns `true` if this source has properties, `false` otherwise.
+   */
   hasProps(): boolean {
     return this.source.hasProps();
   }
 
+  /**
+   * Renames this source.
+   *
+   * @param newName The new name to set for this source
+   */
   setName(newName: string): void {
     return this.source.setName(newName);
   }
 
+  /**
+   * Refreshes the page of a browsers source. Only available for browser sources.
+   */
   refresh(): void {
     this.source.refresh();
   }
 
+  /**
+   * Duplicates this source.
+   *
+   * @returns A duplication of this source
+   */
   duplicate(): Source {
     return this.sourcesService.getSource(this.source.duplicate().sourceId);
   }

@@ -3,7 +3,7 @@ import uuid from 'uuid';
 import { I18nService } from '../../services/i18n';
 import { StatefulService } from '../../services/core/stateful-service';
 import Vue from 'vue';
-import { isEqual } from 'lodash';
+import isEqual from 'lodash/isEqual';
 
 interface IProps {
   componentClass: any;

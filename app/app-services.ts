@@ -53,12 +53,14 @@ export { ApplicationMenuService } from 'services/application-menu';
 export { MacPermissionsService } from 'services/mac-permissions';
 export { VirtualWebcamService } from 'services/virtual-webcam';
 export { MetricsService } from 'services/metrics';
+export { HighlighterService } from 'services/highlighter';
 
 // ONLINE SERVICES
 export { UserService } from './services/user';
 export { YoutubeService } from 'services/platforms/youtube';
 export { TwitchService } from 'services/platforms/twitch';
 export { FacebookService } from 'services/platforms/facebook';
+export { TiktokService } from 'services/platforms/tiktok';
 export { RestreamService } from 'services/restream';
 export { TwitterService } from 'services/integrations/twitter';
 export { UsageStatisticsService } from './services/usage-statistics';
@@ -76,13 +78,13 @@ export { VideoEncodingOptimizationService } from 'services/video-encoding-optimi
 export { StreamingService } from 'services/streaming';
 export { StreamlabelsService } from 'services/streamlabels';
 export { AutoConfigService } from 'services/auto-config';
-export { FacemasksService } from 'services/facemasks';
 export { PlatformAppsService } from 'services/platform-apps';
 export { PlatformAppStoreService } from 'services/platform-app-store';
 export { PlatformAppAssetsService } from 'services/platform-apps/platform-app-assets-service';
 export { ChatService } from 'services/chat';
 export { RecentEventsService } from 'services/recent-events';
 export { MagicLinkService } from 'services/magic-link';
+export { GrowService } from 'services/grow/grow';
 
 // WIDGETS
 export { WidgetSource, WidgetsService } from './services/widgets';
@@ -105,11 +107,16 @@ export { SubGoalService } from 'services/widgets/settings/sub-goal';
 export { MediaShareService } from 'services/widgets/settings/media-share';
 export { AlertBoxService } from 'services/widgets/settings/alert-box';
 export { SpinWheelService } from 'services/widgets/settings/spin-wheel';
+export { PollService } from 'services/widgets/settings/poll';
+export { EmoteWallService } from 'services/widgets/settings/emote-wall';
+export { ChatHighlightService } from 'services/widgets/settings/chat-highlight';
 
+import { AppService } from './services/app';
 import { WindowsService } from './services/windows';
 import { CustomizationService } from './services/customization';
 import { ScenesService } from './services/scenes';
 import { EditorCommandsService } from './services/editor-commands';
+import { EditorService } from 'services/editor';
 import { PerformanceService } from './services/performance';
 import { SourcesService } from './services/sources';
 import { StreamingService } from './services/streaming';
@@ -128,15 +135,37 @@ import { AnnouncementsService } from './services/announcements';
 import { PatchNotesService } from './services/patch-notes';
 import { VideoService } from './services/video';
 import { ChatService } from './services/chat';
+import { HighlighterService } from './services/highlighter';
+import { GrowService } from './services/grow/grow';
+import { TransitionsService } from './services/transitions';
+import { MagicLinkService } from './services/magic-link';
+import { UsageStatisticsService } from './services/usage-statistics';
+import { NotificationsService } from './services/notifications';
+import { MediaBackupService } from './services/media-backup';
+import { HotkeysService } from './services/hotkeys';
+import { WidgetsService } from './services/widgets';
+import { HostsService } from './services/hosts';
+import { OnboardingService } from './services/onboarding';
+import { CacheUploaderService } from './services/cache-uploader';
+import { StreamlabelsService } from './services/streamlabels';
+import { SceneCollectionsService } from './services/scene-collections';
+import { PlatformAppsService } from './services/platform-apps';
+import { MediaGalleryService } from './services/media-gallery';
+import { RecentEventsService } from 'services/recent-events';
+import { AudioService } from './services/audio';
+import { SourceFiltersService } from './services/source-filters';
 
 export const AppServices = {
+  AppService,
   WindowsService,
   ScenesService,
+  RecentEventsService,
   NavigationService,
   AnnouncementsService,
   SettingsService,
   CustomizationService,
   EditorCommandsService,
+  EditorService,
   PerformanceService,
   SourcesService,
   PatchNotesService,
@@ -152,4 +181,22 @@ export const AppServices = {
   UserService,
   TwitchService,
   DismissablesService,
+  HighlighterService,
+  GrowService,
+  TransitionsService,
+  MagicLinkService,
+  MediaGalleryService,
+  UsageStatisticsService,
+  NotificationsService,
+  MediaBackupService,
+  HotkeysService,
+  WidgetsService,
+  HostsService,
+  OnboardingService,
+  CacheUploaderService,
+  StreamlabelsService,
+  SceneCollectionsService,
+  PlatformAppsService,
+  AudioService,
+  SourceFiltersService,
 };

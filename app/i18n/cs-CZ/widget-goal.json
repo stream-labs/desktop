@@ -8,11 +8,11 @@
   "Starting Amount": "Počáteční částka",
   "End After": "Ukončit po",
   "Include resubs?": "Zahrnout prodloužení předplatného?",
-  "Layout": "Layout",
-  "Background Color": "Background Color",
+  "Layout": "Rozložení",
+  "Background Color": "Barva pozadí",
   "Bar Color": "Barva pruhu",
   "Bar Background Color": "Barva pozadí pruhu",
-  "Text Color": "Text Color",
+  "Text Color": "Barva textu",
   "Bar Text Color": "Barva textu na pruhu",
   "Bar Thickness": "Tloušťka pruhu",
   "Font Family": "Sada písem",
@@ -22,6 +22,6 @@
   "Facebook Supporters": "Příznivci na Facebooku",
   "Facebook chat": "Chat na Facebooku",
   "Member Goal": "Cílový počet členů",
-  "Streamlabs Charity Goal": "Streamlabs Charity Goal",
-  "Streamlabs Charity Donations": "Streamlabs Charity Donations"
+  "Streamlabs Charity Goal": "Cíl charity Streamlabs",
+  "Streamlabs Charity Donations": "Dary na charitu Streamlabs"
 }

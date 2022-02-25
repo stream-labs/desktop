@@ -7,16 +7,18 @@ import { $t } from '../../services/i18n';
 import css from './ModalLayout.m.less';
 import { Button } from 'antd';
 import { ModalProps } from 'antd/lib/modal';
+import Scrollable from './Scrollable';
 
 // use props of Modal from the antd lib
-type TProps = { children: ReactNode; fixedChild?: ReactNode } & Pick<
-  ModalProps,
-  'footer' | 'onOk' | 'okText'
->;
+type TProps = {
+  children: ReactNode;
+  fixedChild?: ReactNode;
+  hideFooter?: boolean;
+  scrollable?: boolean;
+} & Pick<ModalProps, 'footer' | 'onOk' | 'okText' | 'bodyStyle' | 'confirmLoading'>;
 
 // calculate OS dependent styles
 const titleHeight = getOS() === OS.Mac ? 22 : 30;
-const footerHeight = 53;
 const wrapperStyles: CSSProperties = {
   height: `calc(100% - ${titleHeight}px)`,
 };
@@ -33,17 +35,19 @@ const fixedStyles: CSSProperties = {
  * Wraps content for the child windows
  */
 export function ModalLayout(p: TProps) {
+  const footerHeight = p.hideFooter ? 0 : 53;
   const bodyStyles: CSSProperties = {
     height: p.fixedChild
       ? `calc(100% - ${footerHeight + 200}px)`
       : `calc(100% - ${footerHeight}px)`,
+    ...(p.bodyStyle || {}),
   };
 
   // inject services
   const { WindowsService, CustomizationService } = Services;
 
   // define a vuex state
-  const v = useVuex(() => ({ currentTheme: CustomizationService.currentTheme }));
+  const v = useVuex(() => ({ currentTheme: CustomizationService.currentTheme }), false);
 
   // define a close method for the modal
   function close() {
@@ -59,7 +63,10 @@ export function ModalLayout(p: TProps) {
       <>
         <Button onClick={close}>{$t('Close')}</Button>
         {p.onOk && (
-          <Button onClick={p.onOk} type="primary">
+          <Button onClick={p.onOk} type="primary" disabled={p.confirmLoading}>
+            {p.confirmLoading && (
+              <i className="fa fa-pulse fa-spinner" style={{ marginRight: 8 }} />
+            )}
             {okText}
           </Button>
         )}
@@ -70,10 +77,20 @@ export function ModalLayout(p: TProps) {
   return (
     <div className={cx('ant-modal-content', v.currentTheme)} style={wrapperStyles}>
       {p.fixedChild && <div style={fixedStyles}>{p.fixedChild}</div>}
-      <div className="ant-modal-body" style={bodyStyles}>
-        {p.children}
-      </div>
-      <div className="ant-modal-footer">{p.footer || <DefaultFooter />}</div>
+
+      {p.scrollable ? (
+        <div style={bodyStyles}>
+          <Scrollable isResizable={false} style={{ height: '100%' }}>
+            <div className="ant-modal-body">{p.children}</div>
+          </Scrollable>
+        </div>
+      ) : (
+        <div className="ant-modal-body" style={bodyStyles}>
+          {p.children}
+        </div>
+      )}
+
+      {!p.hideFooter && <div className="ant-modal-footer">{p.footer || <DefaultFooter />}</div>}
     </div>
   );
 }

@@ -8,28 +8,34 @@ import Vue, { Component } from 'vue';
 import Utils from 'services/utils';
 import { Subject } from 'rxjs';
 import { throttle } from 'lodash-decorators';
+import * as remote from '@electron/remote';
 
 import Main from 'components/windows/Main.vue';
 import Settings from 'components/windows/settings/Settings.vue';
 import FFZSettings from 'components/windows/FFZSettings.vue';
-import SourcesShowcase from 'components/windows/SourcesShowcase.vue';
 import SceneTransitions from 'components/windows/SceneTransitions.vue';
 import AddSource from 'components/windows/AddSource.vue';
-import RenameSource from 'components/windows/RenameSource.vue';
 import NameScene from 'components/windows/NameScene.vue';
 import {
   NameFolder,
   GoLiveWindow,
   EditStreamWindow,
   IconLibraryProperties,
-} from 'components/shared/ReactComponent';
+  ScreenCaptureProperties,
+  SharedComponentsLibrary,
+  SourceProperties,
+  PerformanceMetrics,
+  RenameSource,
+  AdvancedStatistics,
+  WidgetWindow,
+  CustomCodeWindow,
+  SafeMode,
+  AdvancedAudio,
+  SourceShowcase,
+  SourceFilters,
+} from 'components/shared/ReactComponentList';
 
-import GoLiveWindowDeprecated from 'components/windows/go-live/GoLiveWindow';
-import EditStreamWindowDeprecated from 'components/windows/go-live/EditStreamWindow';
-import SourceProperties from 'components/windows/SourceProperties.vue';
-import SourceFilters from 'components/windows/SourceFilters.vue';
-import AddSourceFilter from 'components/windows/AddSourceFilter';
-import AdvancedAudio from 'components/windows/AdvancedAudio';
+import SourcePropertiesDeprecated from 'components/windows/SourceProperties.vue';
 import Notifications from 'components/windows/Notifications.vue';
 import Troubleshooter from 'components/windows/Troubleshooter.vue';
 import Blank from 'components/windows/Blank.vue';
@@ -41,12 +47,10 @@ import MediaGallery from 'components/windows/MediaGallery.vue';
 import PlatformAppPopOut from 'components/windows/PlatformAppPopOut.vue';
 import EditTransform from 'components/windows/EditTransform';
 import EventFilterMenu from 'components/windows/EventFilterMenu';
-import AdvancedStatistics from 'components/windows/AdvancedStatistics';
 import OverlayWindow from 'components/windows/OverlayWindow.vue';
 import OverlayPlaceholder from 'components/windows/OverlayPlaceholder';
 import BrowserSourceInteraction from 'components/windows/BrowserSourceInteraction';
 import WelcomeToPrime from 'components/windows/WelcomeToPrime';
-import ScheduleStreamWindow from 'components/windows/go-live/ScheduleStreamWindow';
 
 import BitGoal from 'components/widgets/goal/BitGoal';
 import DonationGoal from 'components/widgets/goal/DonationGoal';
@@ -67,15 +71,17 @@ import SponsorBanner from 'components/widgets/SponsorBanner.vue';
 import MediaShare from 'components/widgets/MediaShare';
 import AlertBox from 'components/widgets/AlertBox.vue';
 import SpinWheel from 'components/widgets/SpinWheel.vue';
+import Poll from 'components/widgets/Poll';
+import EmoteWall from 'components/widgets/EmoteWall';
+import ChatHighlight from 'components/widgets/ChatHighlight';
 
-import PerformanceMetrics from 'components/PerformanceMetrics.vue';
 import { byOS, OS } from 'util/operating-systems';
 import { UsageStatisticsService } from './usage-statistics';
 import { Inject } from 'services/core';
 import MessageBoxModal from 'components/shared/modals/MessageBoxModal';
-import Modal from 'components/shared/modals/modal';
+import Modal from 'components/shared/modals/Modal';
 
-const { ipcRenderer, remote } = electron;
+const { ipcRenderer } = electron;
 const BrowserWindow = remote.BrowserWindow;
 const uuid = window['require']('uuid/v4');
 
@@ -87,14 +93,14 @@ export function getComponents() {
     Settings,
     FFZSettings,
     SceneTransitions,
-    SourcesShowcase,
     RenameSource,
     AddSource,
     NameScene,
     NameFolder,
+    SafeMode,
     SourceProperties,
+    SourcePropertiesDeprecated,
     SourceFilters,
-    AddSourceFilter,
     Blank,
     AdvancedAudio,
     Notifications,
@@ -131,13 +137,18 @@ export function getComponents() {
     MediaShare,
     AlertBox,
     SpinWheel,
+    Poll,
+    EmoteWall,
+    ChatHighlight,
     WelcomeToPrime,
     GoLiveWindow,
     EditStreamWindow,
-    GoLiveWindowDeprecated,
-    EditStreamWindowDeprecated,
-    ScheduleStreamWindow,
     IconLibraryProperties,
+    ScreenCaptureProperties,
+    SharedComponentsLibrary,
+    WidgetWindow,
+    CustomCodeWindow,
+    SourceShowcase,
   };
 }
 
@@ -156,6 +167,10 @@ export interface IWindowOptions extends Electron.BrowserWindowConstructorOptions
   isShown: boolean;
   title?: string;
   center?: boolean;
+  position?: {
+    x: number;
+    y: number;
+  };
   isPreserved?: boolean;
   preservePrevWindow?: boolean;
   prevWindowOptions?: IWindowOptions;
@@ -196,7 +211,7 @@ export class WindowsService extends StatefulService<IWindowsState> {
       scaleFactor: 1,
       isShown: true,
       hideStyleBlockers: true,
-      title: `Streamlabs OBS - ${Utils.env.SLOBS_VERSION}`,
+      title: `Streamlabs Desktop - ${Utils.env.SLOBS_VERSION}`,
     },
     child: {
       componentName: '',
@@ -250,12 +265,16 @@ export class WindowsService extends StatefulService<IWindowsState> {
     this.windows.main = BrowserWindow.fromId(windowIds.main);
     this.windows.child = BrowserWindow.fromId(windowIds.child);
 
+    // Background throttling can produce freezing on certain parts of the UI
+    this.windows.worker.webContents.setBackgroundThrottling(false);
+    this.windows.main.webContents.setBackgroundThrottling(false);
+
     this.updateScaleFactor('main');
     this.updateScaleFactor('child');
     this.windows.main.on('move', () => this.updateScaleFactor('main'));
     this.windows.child.on('move', () => this.updateScaleFactor('child'));
 
-    if (electron.remote.screen.getAllDisplays().length > 1) {
+    if (remote.screen.getAllDisplays().length > 1) {
       this.usageStatisticsService.recordFeatureUsage('MultipleDisplays');
     }
   }
@@ -265,10 +284,10 @@ export class WindowsService extends StatefulService<IWindowsState> {
     const window = this.windows[windowId];
     if (window && !window.isDestroyed()) {
       const bounds = byOS({
-        [OS.Windows]: () => electron.remote.screen.dipToScreenRect(window, window.getBounds()),
+        [OS.Windows]: () => remote.screen.dipToScreenRect(window, window.getBounds()),
         [OS.Mac]: () => window.getBounds(),
       });
-      const currentDisplay = electron.remote.screen.getDisplayMatching(bounds);
+      const currentDisplay = remote.screen.getDisplayMatching(bounds);
       this.UPDATE_SCALE_FACTOR(windowId, currentDisplay.scaleFactor);
     }
   }
@@ -290,10 +309,9 @@ export class WindowsService extends StatefulService<IWindowsState> {
      * to workaround.
      */
     if (options.size && !Utils.env.CI) {
-      const {
-        width: screenWidth,
-        height: screenHeight,
-      } = electron.remote.screen.getDisplayMatching(this.windows.main.getBounds()).workAreaSize;
+      const { width: screenWidth, height: screenHeight } = remote.screen.getDisplayMatching(
+        this.windows.main.getBounds(),
+      ).workAreaSize;
 
       const SCREEN_PERCENT = 0.75;
 
@@ -332,7 +350,7 @@ export class WindowsService extends StatefulService<IWindowsState> {
           height: options.size.height,
         });
       }
-    } catch (err) {
+    } catch (err: unknown) {
       console.error('Recovering from error:', err);
 
       childWindow.setMinimumSize(options.size.width, options.size.height);
@@ -345,7 +363,7 @@ export class WindowsService extends StatefulService<IWindowsState> {
   getMainWindowDisplay() {
     const window = this.windows.main;
     const bounds = window.getBounds();
-    return electron.remote.screen.getDisplayMatching(bounds);
+    return remote.screen.getDisplayMatching(bounds);
   }
 
   async closeChildWindow() {
@@ -412,10 +430,19 @@ export class WindowsService extends StatefulService<IWindowsState> {
       height: 400,
       title: 'New Window',
       backgroundColor: '#17242D',
-      webPreferences: { nodeIntegration: true, webviewTag: true, enableRemoteModule: true },
+      show: false,
+      webPreferences: {
+        nodeIntegration: true,
+        webviewTag: true,
+        contextIsolation: false,
+        backgroundThrottling: false,
+      },
       ...options,
       ...options.size,
+      ...(options.position || {}),
     }));
+
+    electron.ipcRenderer.sendSync('webContents-enableRemote', newWindow.webContents.id);
 
     newWindow.removeMenu();
     newWindow.on('closed', () => {
@@ -432,6 +459,8 @@ export class WindowsService extends StatefulService<IWindowsState> {
     const indexUrl = remote.getGlobal('indexUrl');
     newWindow.loadURL(`${indexUrl}?windowId=${windowId}`);
 
+    newWindow.show();
+
     return windowId;
   }
 
@@ -445,6 +474,8 @@ export class WindowsService extends StatefulService<IWindowsState> {
     this.CREATE_ONE_OFF_WINDOW(windowId, options);
 
     const newWindow = (this.windows[windowId] = new BrowserWindow(options));
+
+    electron.ipcRenderer.sendSync('webContents-enableRemote', newWindow.webContents.id);
 
     const indexUrl = remote.getGlobal('indexUrl');
     newWindow.loadURL(`${indexUrl}?windowId=${windowId}`);

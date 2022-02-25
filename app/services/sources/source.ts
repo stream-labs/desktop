@@ -14,7 +14,7 @@ import Utils from 'services/utils';
 import * as obs from '../../../obs-api';
 import isEqual from 'lodash/isEqual';
 import omitBy from 'lodash/omitBy';
-import { cloneDeep, omit } from 'lodash';
+import omit from 'lodash/omit';
 import { assertIsDefined } from '../../util/properties-type-guards';
 import { SourceFiltersService } from '../source-filters';
 

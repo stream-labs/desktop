@@ -1,5 +1,5 @@
 import { test, useSpectron } from '../../helpers/spectron';
-import { addSource } from '../../helpers/spectron/sources';
+import { addSource } from '../../helpers/modules/sources';
 import { logIn } from '../../helpers/spectron/user';
 import { FormMonkey } from '../../helpers/form-monkey';
 import { waitForWidgetSettingsSync } from '../../helpers/widget-helpers';
@@ -10,7 +10,7 @@ test.skip('Set stream-boss health', async t => {
   if (!(await logIn(t))) return;
 
   const client = t.context.app.client;
-  await addSource(t, 'Stream Boss', '__Stream Boss', false);
+  await addSource( 'Stream Boss', '__Stream Boss', false);
 
   const setButtonSelector = 'button=Set Stream Boss Health';
   const resetButtonSelector = 'button=Reset Stream Boss';
@@ -26,10 +26,10 @@ test.skip('Set stream-boss health', async t => {
   t.pass();
 });
 
-test('Stream Boss Manage Battle settings', async t => {
+test.skip('Stream Boss Manage Battle settings', async t => {
   const client = t.context.app.client;
   if (!(await logIn(t))) return;
-  await addSource(t, 'Stream Boss', '__Stream Boss', false);
+  await addSource( 'Stream Boss', '__Stream Boss', false);
 
   await (await client.$('li=Manage Battle')).click();
 
@@ -54,10 +54,10 @@ test('Stream Boss Manage Battle settings', async t => {
   t.true(await formMonkey.includes(testSet2));
 });
 
-test('Stream Boss Manage Visual Settings', async t => {
+test.skip('Stream Boss Manage Visual Settings', async t => {
   const client = t.context.app.client;
   if (!(await logIn(t))) return;
-  await addSource(t, 'Stream Boss', '__Stream Boss', false);
+  await addSource( 'Stream Boss', '__Stream Boss', false);
 
   await (await client.$('li=Visual Settings')).click();
   const formMonkey = new FormMonkey(t, 'form[name=visual-settings-form]');

@@ -1,0 +1,21 @@
+{
+  "Poll": "Průzkum",
+  "Let your viewers vote on a result": "Nechte své diváky hlasovat o výsledku",
+  "Bar Settings": "Nastavení lišty",
+  "Manage Poll": "Správa průzkumu",
+  "Poll Type": "Typ průzkumu",
+  "Show Closed Poll": "Zobrazit zavřený průzkum",
+  "Show/hide poll widget on closed poll": "Zobrazit/skrýt widget průzkumu u zavřeného průzkumu",
+  "Primary Background Color": "Primární barva pozadí",
+  "Secondary Background Color": "Sekundární barva pozadí",
+  "Hide wigdet after X seconds of event": "Skrýt widget po x sekundách události",
+  "Header Text Color": "Barva textu záhlaví",
+  "Option Text Color": "Barva textu možnosti",
+  "Title Font Size": "Velikost písma nadpisu",
+  "Option Font Size": "Velikost písma možnosti",
+  "Title Font Weight": "Tloušťka písma nadpisu",
+  "Option Font Weight": "Tloušťka písma možnosti",
+  "Thin Bar": "Tenká lišta",
+  "Display thin/thick Bar": "Zobrazit tenkou/silnou lištu",
+  "You need to re-login to access Twitch chat polls": "Pro přístup k chatovacím průzkumům Twitch je třeba se znovu přihlásit"
+}

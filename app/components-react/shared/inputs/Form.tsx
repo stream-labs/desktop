@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Form as AntForm } from 'antd';
 import { FormInstance, FormProps, FormItemProps } from 'antd/lib/form';
 import { TInputLayout } from './inputs';
@@ -19,7 +19,7 @@ export const FormContext = React.createContext<TFormContext | null>(null);
 export default React.memo(function Form(p: FormProps & { disabled?: boolean }) {
   const context = useContext(FormContext);
   const [antForm] = AntForm.useForm(context?.antForm || p.form);
-  const [contextValue] = useState(() => {
+  const [contextValue, setContextValue] = useState(() => {
     // set default layout to horizontal
     const layout = p.layout || 'horizontal';
     return {
@@ -28,11 +28,29 @@ export default React.memo(function Form(p: FormProps & { disabled?: boolean }) {
     };
   });
 
+  useEffect(() => {
+    const layout = p.layout || 'horizontal';
+    setContextValue(prevContext => ({ ...prevContext, layout }));
+  }, [p.layout]);
+
   // data attributes helps to find this form in DOM in tests
   const dataAttrs = {
     'data-role': 'form',
     'data-name': p.name,
   };
+
+  /* eslint-disable no-template-curly-in-string */
+  const validateMessages = {
+    required: '${label} is required',
+    types: { number: '${label} is not a valid number' },
+    string: {
+      max: '${label} cannot be more than ${max} characters',
+    },
+    number: {
+      range: '${label} must be between ${min} and ${max}',
+    },
+  };
+  /* eslint-enable no-template-curly-in-string */
 
   return (
     <FormContext.Provider value={contextValue}>
@@ -43,7 +61,7 @@ export default React.memo(function Form(p: FormProps & { disabled?: boolean }) {
       ) : (
         // there is no AntForm in ancestor, this is a root form
         // create the AntForm container for children
-        <AntForm {...dataAttrs} {...p} form={antForm}>
+        <AntForm {...dataAttrs} validateMessages={validateMessages} {...p} form={antForm}>
           {p.children}
         </AntForm>
       )}
@@ -53,4 +71,8 @@ export default React.memo(function Form(p: FormProps & { disabled?: boolean }) {
 
 export function useForm() {
   return AntForm.useForm()[0];
+}
+
+export function useFormContext() {
+  return useContext(FormContext);
 }

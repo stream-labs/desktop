@@ -38,10 +38,12 @@ import { UsageStatisticsService } from 'services/usage-statistics';
 import { StreamingService } from 'services/streaming';
 import { NotificationsService, ENotificationType } from 'services/notifications';
 import { JsonrpcService } from 'services/api/jsonrpc';
+import * as remote from '@electron/remote';
 
 export enum EAuthProcessState {
   Idle = 'idle',
-  Busy = 'busy',
+  Loading = 'loading',
+  InProgress = 'progress',
 }
 
 // Eventually we will support authing multiple platforms at once
@@ -52,6 +54,7 @@ interface IUserServiceState {
   isPrime: boolean;
   expires?: string;
   userId?: number;
+  createdAt?: number;
   isRelog?: boolean;
 }
 
@@ -65,7 +68,9 @@ interface ILinkedPlatformsResponse {
   twitch_account?: ILinkedPlatform;
   facebook_account?: ILinkedPlatform;
   youtube_account?: ILinkedPlatform;
+  tiktok_account?: ILinkedPlatform;
   user_id: number;
+  created_at: string;
 }
 
 export type LoginLifecycleOptions = {
@@ -91,7 +96,13 @@ export function setSentryContext(ctx: ISentryContext) {
 
   if (Utils.isWorkerWindow()) {
     obs.NodeObs.SetUsername(ctx.username);
+
+    // Sets main process sentry context. Only need to do this once.
+    remote.crashReporter.addExtraParameter('sentry[user][username]', ctx.username);
+    remote.crashReporter.addExtraParameter('platform', ctx.platform);
   }
+  electron.crashReporter.addExtraParameter('sentry[user][username]', ctx.username);
+  electron.crashReporter.addExtraParameter('platform', ctx.platform);
 }
 
 class UserViews extends ViewHandler<IUserServiceState> {
@@ -106,6 +117,18 @@ class UserViews extends ViewHandler<IUserServiceState> {
   get platform() {
     if (this.isLoggedIn) {
       return this.state.auth.platforms[this.state.auth.primaryPlatform];
+    }
+  }
+
+  get platforms() {
+    if (this.isLoggedIn) {
+      return this.state.auth.platforms;
+    }
+  }
+
+  get linkedPlatforms() {
+    if (this.isLoggedIn) {
+      return Object.keys(this.state.auth.platforms);
     }
   }
 
@@ -175,8 +198,9 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   }
 
   @mutation()
-  SET_USER_ID(userId: number) {
+  SET_USER(userId: number, createdAt: string) {
     this.state.userId = userId;
+    this.state.createdAt = new Date(createdAt).valueOf();
   }
 
   @mutation()
@@ -229,6 +253,14 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
 
   userLogin = new Subject<IUserAuth>();
   userLogout = new Subject();
+
+  /**
+   * Will fire on every login, similar to userLogin, but will
+   * fire after all normal on-login operations have finished.
+   * Useful when you need to check the state of a user after
+   * everything has finished updating.
+   */
+  userLoginFinished = new Subject();
   private socketConnection: Subscription = null;
 
   /**
@@ -249,27 +281,24 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     return new UserViews(this.state);
   }
 
-  mounted() {
-    // This is used for faking authentication in tests.  We have
-    // to do this because Twitch adds a captcha when we try to
-    // actually log in from integration tests.
-    electron.ipcRenderer.on(
-      'testing-fakeAuth',
-      async (e: Electron.Event, auth: IUserAuth, isOnboardingTest: boolean) => {
-        const service = getPlatformService(auth.primaryPlatform);
-        this.streamSettingsService.resetStreamSettings();
-        await this.login(service, auth);
-        if (!isOnboardingTest) this.onboardingService.finish();
-      },
-    );
+  /**
+   * This is used for faking authentication in tests.  We have
+   * to do this because Twitch adds a captcha when we try to
+   * actually log in from integration tests.
+   */
+  async testingFakeAuth(auth: IUserAuth, isOnboardingTest: boolean) {
+    const service = getPlatformService(auth.primaryPlatform);
+    this.streamSettingsService.resetStreamSettings();
+    await this.login(service, auth);
+    if (!isOnboardingTest) this.onboardingService.finish();
   }
 
   async autoLogin() {
     if (!this.state.auth) return;
 
     if (!this.state.auth.hasRelogged) {
-      await electron.remote.session.defaultSession.clearCache();
-      await electron.remote.session.defaultSession.clearStorageData({
+      await remote.session.defaultSession.clearCache();
+      await remote.session.defaultSession.clearStorageData({
         storages: ['appcache, cookies', 'cachestorage', 'filesystem'],
       });
       this.streamSettingsService.resetStreamSettings();
@@ -333,7 +362,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
       if (userInfo.username) {
         this.SET_USERNAME(this.platform.type, userInfo.username);
       }
-    } catch (e) {
+    } catch (e: unknown) {
       console.error('Error fetching user info', e);
     }
   }
@@ -346,7 +375,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
    */
   writeUserIdFile(userId?: number) {
     const filePath = path.join(this.appService.appDataDirectory, 'userId');
-    fs.writeFile(filePath, userId ?? '', err => {
+    fs.writeFile(filePath, userId?.toString() ?? '', err => {
       if (err) {
         console.error('Error writing user id file', err);
       }
@@ -360,7 +389,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
 
     if (linkedPlatforms.user_id) {
       this.writeUserIdFile(linkedPlatforms.user_id);
-      this.SET_USER_ID(linkedPlatforms.user_id);
+      this.SET_USER(linkedPlatforms.user_id, linkedPlatforms.created_at);
     }
 
     // TODO: Could metaprogram this a bit more
@@ -395,6 +424,17 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
       });
     } else if (this.state.auth.primaryPlatform !== 'youtube') {
       this.UNLINK_PLATFORM('youtube');
+    }
+
+    if (linkedPlatforms.tiktok_account) {
+      this.UPDATE_PLATFORM({
+        type: 'tiktok',
+        username: linkedPlatforms.tiktok_account.platform_name,
+        id: linkedPlatforms.tiktok_account.platform_id,
+        token: linkedPlatforms.tiktok_account.access_token,
+      });
+    } else if (this.state.auth.primaryPlatform !== 'tiktok') {
+      this.UNLINK_PLATFORM('tiktok');
     }
   }
 
@@ -461,7 +501,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     try {
       const link = await this.magicLinkService.getDashboardMagicLink('expiring_cc');
       electron.shell.openExternal(link);
-    } catch (e) {}
+    } catch (e: unknown) {}
   }
 
   /**
@@ -469,7 +509,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
    */
   flushUserSession(): Promise<void> {
     if (this.isLoggedIn && this.state.auth.partition) {
-      const session = electron.remote.session.fromPartition(this.state.auth.partition);
+      const session = remote.session.fromPartition(this.state.auth.partition);
       session.flushStorageData();
       return session.cookies.flushStore();
     }
@@ -556,16 +596,6 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     const theme = this.customizationService.isDarkTheme ? 'prime-dark' : 'prime-light';
     this.customizationService.setTheme(theme);
     this.showPrimeWindow();
-  }
-
-  /**
-   * open the prime onboarding in the browser
-   * @param refl a referral tag for analytics
-   */
-  openPrimeUrl(refl: 'slobs-multistream' | 'slobs-settings') {
-    this.magicLinkService.getDashboardMagicLink('prime-marketing', refl).then(link => {
-      electron.remote.shell.openExternal(link);
-    });
   }
 
   recentEventsUrl() {
@@ -670,7 +700,8 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
 
     if (!validateLoginResult) {
       this.logOut();
-      electron.remote.dialog.showMessageBox({
+      remote.dialog.showMessageBox({
+        title: 'Streamlabs Desktop',
         message: $t('You have been logged out'),
       });
       return;
@@ -686,17 +717,19 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
       await this.logOut();
       this.showLogin();
 
-      electron.remote.dialog.showMessageBox(electron.remote.getCurrentWindow(), {
+      remote.dialog.showMessageBox(remote.getCurrentWindow(), {
         type: 'warning',
         title: 'Twitch Error',
         message: $t(
-          $t('Your Twitch login is expired. Please log in again to continue using Streamlabs OBS'),
+          $t('Your Twitch login is expired. Please log in again to continue using Streamlabs'),
         ),
         buttons: [$t('Refresh Login')],
       });
 
       return validatePlatformResult;
     }
+
+    this.userLoginFinished.next();
   }
 
   @RunInLoadingMode()
@@ -708,8 +741,8 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     this.navigationService.navigate('Studio');
 
     const session = this.state.auth.partition
-      ? electron.remote.session.fromPartition(this.state.auth.partition)
-      : electron.remote.session.defaultSession;
+      ? remote.session.fromPartition(this.state.auth.partition)
+      : remote.session.defaultSession;
 
     session.clearStorageData({ storages: ['cookies'] });
     this.settingsService.setSettingValue('Stream', 'key', '');
@@ -742,8 +775,12 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
       throw new Error('Account merging can only be performed while logged in');
     }
 
-    this.SET_AUTH_STATE(EAuthProcessState.Busy);
-    const onWindowShow = () => this.SET_AUTH_STATE(EAuthProcessState.Idle);
+    this.SET_AUTH_STATE(EAuthProcessState.Loading);
+    const onWindowShow = () =>
+      this.SET_AUTH_STATE(
+        mode === 'internal' ? EAuthProcessState.InProgress : EAuthProcessState.Idle,
+      );
+    const onWindowClose = () => this.SET_AUTH_STATE(EAuthProcessState.Idle);
 
     const auth =
       mode === 'internal'
@@ -752,12 +789,13 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
           authUrl,
           service.authWindowOptions,
           onWindowShow,
+          onWindowClose,
           merge,
         )
         : await this.authModule.startExternalAuth(authUrl, onWindowShow, merge);
         /* eslint-enable */
 
-    this.SET_AUTH_STATE(EAuthProcessState.Busy);
+    this.SET_AUTH_STATE(EAuthProcessState.Loading);
     this.SET_IS_RELOG(false);
 
     let result: EPlatformCallResult;

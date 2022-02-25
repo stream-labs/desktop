@@ -8,8 +8,8 @@
   "Hide %{sourcename}": "Masquer %{sourcename}",
   "Push to Show %{sourcename}": "Appuyer pour afficher %{sourcename}",
   "Push to Hide %{sourcename}": "Appuyer pour masquer %{sourcename}",
-  "Mute": "Désactiver le son",
-  "Unmute": "Activer le son",
+  "Mute": "Désactivé le son",
+  "Unmute": "Activé le son",
   "Push to Mute": "Appuyer pour désactiver le son",
   "Push to Talk": "Appuyer pour parler",
   "Enable Studio Mode": "Activer le mode Studio",
@@ -22,6 +22,6 @@
   "Restart": "Redémarrer",
   "Next Slide": "Diapositive suivante",
   "Previous Slide": "Diapositive précédente",
-  "Toggle Performance Mode": "Toggle Performance Mode",
+  "Toggle Performance Mode": "Activer/désactiver le mode Performance",
   "Skip Alert": "Passer l'alerte"
 }

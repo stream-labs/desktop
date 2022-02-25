@@ -9,7 +9,7 @@
           <button class="button button--action" @click="addTransition">
             {{ $t('Add Transition') }}
           </button>
-          <table>
+          <table style="width: 100%">
             <thead>
               <tr>
                 <th>{{ $t('Default') }}</th>
@@ -51,7 +51,7 @@
           <button class="button button--action" @click="addConnection">
             {{ $t('Add Connection') }}
           </button>
-          <table>
+          <table style="width: 100%">
             <thead>
               <tr>
                 <th>{{ $t('Beginning Scene') }}</th>
@@ -131,7 +131,7 @@
 
 .transition-settings-modal {
   padding: 20px;
-  height: 480px;
+  height: 100%;
 }
 
 .connection-settings-modal {

@@ -1,11 +1,10 @@
 import Vue from 'vue';
 import { Component, Prop, Watch } from 'vue-property-decorator';
-import { Chat } from 'components/shared/ReactComponent';
+import { Chat } from 'components/shared/ReactComponentList';
 import { StreamingService, EStreamingState } from '../services/streaming';
 import { Inject } from 'services/core/injector';
 import { UserService } from '../services/user';
 import { CustomizationService } from 'services/customization';
-import electron from 'electron';
 import { $t } from 'services/i18n';
 import PlatformAppPageView from 'components/PlatformAppPageView.vue';
 import { PlatformAppsService, EAppPageSlot, ILoadedApp } from 'services/platform-apps';
@@ -16,6 +15,7 @@ import { ChatService } from 'services/chat';
 import { WindowsService } from 'services/windows';
 import { FacebookService, RestreamService, YoutubeService } from 'app-services';
 import { getPlatformService } from 'services/platforms';
+import * as remote from '@electron/remote';
 
 @Component({
   components: {
@@ -69,6 +69,7 @@ export default class LiveDock extends Vue {
   viewStreamTooltip = $t('View your live stream in a web browser');
   editStreamInfoTooltip = $t('Edit your stream title and description');
   controlRoomTooltip = $t('Go to YouTube Live Dashboard');
+  liveProducerTooltip = $t('Go to the Facebook Live Producer Dashboard');
 
   mounted() {
     this.elapsedInterval = window.setInterval(() => {
@@ -147,15 +148,19 @@ export default class LiveDock extends Vue {
   }
 
   openYoutubeStreamUrl() {
-    electron.remote.shell.openExternal(this.youtubeService.streamPageUrl);
+    remote.shell.openExternal(this.youtubeService.streamPageUrl);
   }
 
   openYoutubeControlRoom() {
-    electron.remote.shell.openExternal(this.youtubeService.dashboardUrl);
+    remote.shell.openExternal(this.youtubeService.dashboardUrl);
   }
 
   openFBStreamUrl() {
-    electron.remote.shell.openExternal(this.facebookService.streamPageUrl);
+    remote.shell.openExternal(this.facebookService.streamPageUrl);
+  }
+
+  openFBStreamDashboardUrl() {
+    remote.shell.openExternal(this.facebookService.streamDashboardUrl);
   }
 
   get isTwitch() {
@@ -269,7 +274,7 @@ export default class LiveDock extends Vue {
 
   get canEditChannelInfo(): boolean {
     return (
-      this.streamingService.state.info.checklist.startVideoTransmission === 'done' ||
+      this.streamingService.views.isMidStreamMode ||
       this.userService.state.auth?.primaryPlatform === 'twitch'
     );
   }

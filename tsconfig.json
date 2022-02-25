@@ -42,8 +42,6 @@
       "vue-tsx-support"
     ]
   },
-  "files": [
-    "./app/index.d.ts",
-    "./app/app.ts"
-  ]
+  "include": ["./app/**/*"],
+  "exclude": ["./app/components-react/**/*"]
 }

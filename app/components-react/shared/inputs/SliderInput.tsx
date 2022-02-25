@@ -3,12 +3,13 @@ import { InputComponent, TSlobsInputProps, useInput, ValuesOf } from './inputs';
 import { Slider, InputNumber, Row, Col } from 'antd';
 import { SliderSingleProps } from 'antd/lib/slider';
 import InputWrapper from './InputWrapper';
+import omit from 'lodash/omit';
 
 // select which features from the antd lib we are going to use
-const ANT_SLIDER_FEATURES = ['min', 'max'] as const;
+const ANT_SLIDER_FEATURES = ['min', 'max', 'step', 'tooltipPlacement', 'tipFormatter'] as const;
 
 export type TSliderInputProps = TSlobsInputProps<
-  { hasNumberInput?: boolean },
+  { hasNumberInput?: boolean; slimNumberInput?: boolean },
   number,
   SliderSingleProps,
   ValuesOf<typeof ANT_SLIDER_FEATURES>
@@ -17,11 +18,11 @@ export type TSliderInputProps = TSlobsInputProps<
 export const SliderInput = InputComponent((partialProps: TSliderInputProps) => {
   // apply default props
   const p = {
-    hasNumberInput: true,
+    hasNumberInput: false,
     ...partialProps,
   };
-  const { inputAttrs, wrapperAttrs } = useInput('slider', p, ANT_SLIDER_FEATURES);
-  const numberInputHeight = '70px';
+  const { inputAttrs, wrapperAttrs, dataAttrs } = useInput('slider', p, ANT_SLIDER_FEATURES);
+  const numberInputHeight = p.slimNumberInput ? '50px' : '70px';
 
   function onChangeHandler(val: number) {
     // don't emit onChange if the value is out of range
@@ -34,16 +35,19 @@ export const SliderInput = InputComponent((partialProps: TSliderInputProps) => {
   return (
     <InputWrapper {...wrapperAttrs}>
       <Row>
-        <Col flex="auto">
+        <Col flex="auto" {...dataAttrs} data-role="input" data-value={inputAttrs.value}>
           <Slider {...inputAttrs} />
         </Col>
 
         {p.hasNumberInput && (
           <Col flex={numberInputHeight}>
             <InputNumber
-              {...inputAttrs}
+              // Antd passes tooltipPlacement onto a DOM element when passed as
+              // a prop to InputNumber, which makes React complain. It's not a
+              // valid prop for InputNumber anyway, so we just omit it.
+              {...omit(inputAttrs, 'tooltipPlacement')}
               onChange={onChangeHandler}
-              style={{ width: numberInputHeight }}
+              style={{ width: numberInputHeight, marginLeft: '8px' }}
             />
           </Col>
         )}

@@ -34,6 +34,7 @@ interface ISocketEvent {
 
 /**
  * base class for widget settings
+ * @deprecated
  */
 export abstract class WidgetSettingsService<TWidgetData extends IWidgetData>
   extends StatefulService<IWidgetSettingsState<TWidgetData>>
@@ -71,6 +72,8 @@ export abstract class WidgetSettingsService<TWidgetData extends IWidgetData>
     const rawData = cloneDeep(this.state.rawData);
     rawData.settings = event.message;
     const data = this.handleDataAfterFetch(rawData);
+    this.SET_PENDING_REQUESTS(this.state.pendingRequests - 1);
+    if (this.state.pendingRequests !== 0) return;
     this.SET_WIDGET_DATA(data, rawData);
     this.dataUpdated.next(this.state.data);
   }
@@ -101,7 +104,7 @@ export abstract class WidgetSettingsService<TWidgetData extends IWidgetData>
         url: apiSettings.dataFetchUrl,
         method: 'GET',
       });
-    } catch (e) {
+    } catch (e: unknown) {
       if (isFirstLoading) this.SET_LOADING_STATE('fail');
       throw e;
     }
@@ -149,6 +152,7 @@ export abstract class WidgetSettingsService<TWidgetData extends IWidgetData>
   async saveSettings(settings: IWidgetSettings) {
     const body = this.patchBeforeSend(settings);
     const apiSettings = this.getApiSettings();
+    this.SET_PENDING_REQUESTS(this.state.pendingRequests + 1);
     return await this.request({
       body,
       url: apiSettings.settingsSaveUrl,
@@ -167,10 +171,8 @@ export abstract class WidgetSettingsService<TWidgetData extends IWidgetData>
       body: req.body ? JSON.stringify(req.body) : void 0,
     });
 
-    this.SET_PENDING_REQUESTS(this.state.pendingRequests + 1);
     return fetch(request)
       .then(res => {
-        this.SET_PENDING_REQUESTS(this.state.pendingRequests - 1);
         return Promise.resolve(res);
       })
       .then(handleResponse);

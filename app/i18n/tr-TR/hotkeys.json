@@ -8,8 +8,8 @@
   "Hide %{sourcename}": "%{sourcename} kaynağını gizle",
   "Push to Show %{sourcename}": "%{sourcename} Kaynağını Göstermek İçin Bas",
   "Push to Hide %{sourcename}": "%{sourcename} Kaynağını Gizlemek İçin Bas",
-  "Mute": "Sesi Kapat",
-  "Unmute": "Sesi Aç",
+  "Mute": "Sustur",
+  "Unmute": "Ses Aç",
   "Push to Mute": "Sesi Kapatmak İçin Bas",
   "Push to Talk": "Konuşmak İçin Bas",
   "Enable Studio Mode": "Stüdyo Modunu Etkinleştir",
@@ -22,6 +22,6 @@
   "Restart": "Yeniden Başlat",
   "Next Slide": "Sonraki Slayt",
   "Previous Slide": "Önceki Slayt",
-  "Toggle Performance Mode": "Toggle Performance Mode",
+  "Toggle Performance Mode": "Performans Moduna Geç",
   "Skip Alert": "Uyarıyı Atla"
 }

@@ -12,20 +12,24 @@ import { Scene } from './scene';
 import { SceneItem } from './scene-item';
 import { SceneItemFolder } from './scene-item-folder';
 import { SceneNode } from './scene-node';
+import { ISerializable } from '../../rpc-api';
 
+/**
+ * Serialized representation of a {@link Selection}.
+ */
 export interface ISelectionModel {
   selectedIds: string[];
   lastSelectedId: string;
 }
 
 /**
- * Allows call bulk actions with scene items and folders.
- * Selection can contain items only for one scene.
- * @see Scene.getSelection() to fetch a new selection object
- * @see SelectionService to make items active
+ * API for selection operations. Allows bulk actions on scene nodes (scene items
+ * and folders). Selection can contain items only for one scene.
+ *
+ * Use {@link Scene.getSelection} to fetch a new {@link Selection} object.
  */
 @ServiceHelper()
-export class Selection implements ISceneItemActions {
+export class Selection implements ISceneItemActions, ISerializable {
   @InjectFromExternalApi() private sourcesService: SourcesService;
   @InjectFromExternalApi() private scenesService: ScenesService;
   @Fallback() private internalSelection: InternalSelection;
@@ -38,7 +42,10 @@ export class Selection implements ISceneItemActions {
     return this.internalSelection.isDestroyed();
   }
 
-  get sceneId() {
+  /**
+   * @returns The id of the scene the selection is applied to
+   */
+  get sceneId(): string {
     return this.internalSelection.sceneId;
   }
 
@@ -47,7 +54,7 @@ export class Selection implements ISceneItemActions {
   }
 
   /**
-   * returns serializable representation of selection
+   * @returns A serializable representation of this {@link Selection}
    */
   getModel(): ISelectionModel {
     return {
@@ -56,49 +63,72 @@ export class Selection implements ISceneItemActions {
     };
   }
 
+  /**
+   * @returns The scene the selection applies to
+   */
   getScene(): Scene {
     return this.scenesService.getScene(this.sceneId);
   }
 
   /**
-   * Add items to current selection
+   * Adds items to current {@link Selection}.
+   *
+   * @param ids The ids of the items to add.
+   * @returns This selection
    */
   add(ids: string[]): Selection {
     this.selection.add(ids);
     return this;
   }
+
   /**
-   * Select items. Previous selected items will be unselected
+   * Selects items. Previous selected items will be unselected.
+   *
+   * @param ids ids of the items to select
+   * @returns This selection
    */
   select(ids: string[]): Selection {
     this.selection.select(ids);
     return this;
   }
+
   /**
-   * Deselect items
+   * Deselects items.
+   *
+   * @param ids ids of the items to deselect
+   * @returns This selection
    */
   deselect(ids: string[]): Selection {
     this.selection.deselect(ids);
     return this;
   }
+
   /**
-   * Reset current selection
+   * Resets current selection.
+   *
+   * @returns This selection
    */
   reset(): Selection {
     this.selection.reset();
     return this;
   }
+
   /**
-   * Invert current selection.
-   * If you need to get an inverted selection without changing the current object use `.getInverted()`
-   * @see ISelection.getInverted()
+   * Inverts current selection. If you need to get an inverted selection without
+   * changing the current object use {@link getInverted}.
+   *
+   * @returns This selection
+   * @see getInverted
    */
   invert(): Selection {
     this.selection.invert();
     return this;
   }
+
   /**
-   * Select the all items from the scene
+   * Selects all items from the scene.
+   *
+   * @returns This selection
    */
   selectAll(): Selection {
     this.selection.selectAll();
@@ -106,20 +136,25 @@ export class Selection implements ISceneItemActions {
   }
 
   /**
-   * Returns duplicated Selection
+   * Returns a duplication of this {@link Selection}.
+   *
+   * @returns A new instance of {@link Selection} containing all items of
+   * {@link getIds}.
    */
   clone(): Selection {
     return this.scenesService.getScene(this.sceneId).getSelection(this.getIds());
   }
+
   /**
-   * Returns all selected scene items
+   * @returns All selected {@link SceneItem}s
    */
   getItems(): SceneItem[] {
     const scene = this.scenesService.getScene(this.sceneId);
     return this.selection.getItems().map(item => scene.getItem(item.id));
   }
+
   /**
-   * Returns all selected scene folders
+   * @returns All selected {@link SceneItemFolder}s
    */
   getFolders(): SceneItemFolder[] {
     const scene = this.scenesService.getScene(this.sceneId);
@@ -127,7 +162,9 @@ export class Selection implements ISceneItemActions {
   }
 
   /**
-   * A visual item is visible in the editor and not locked
+   * Note: A visual item is visible in the editor and not locked.
+   *
+   * @returns All visual {@link SceneItem}s
    */
   getVisualItems(): SceneItem[] {
     const scene = this.scenesService.getScene(this.sceneId);
@@ -135,21 +172,26 @@ export class Selection implements ISceneItemActions {
   }
 
   /**
-   * Returns the list of selected folders and items ids
+   * @returns The list of selected folders and items ids
    */
   getIds(): string[] {
     return this.selection.getIds();
   }
+
   /**
-   * Returns the inverted list of selected folders and items ids
+   * @returns The inverted list of selected folders and items ids
    */
   getInvertedIds(): string[] {
     return this.selection.getInvertedIds();
   }
+
   /**
-   * Returns the inverted selection. The current object will not be changed.
-   * To change the current object use `.invert()`
-   * @see ISelection.invert()
+   * Returns the nodes of the scene this selection applies that are not
+   * selected. The current selection will not be changed. To change it use
+   * {@link invert}.
+   *
+   * @returns The {@link SceneNode}s of the selection's inversion
+   * @see invert
    */
   getInverted(): SceneNode[] {
     const scene = this.getScene();
@@ -157,91 +199,115 @@ export class Selection implements ISceneItemActions {
   }
 
   /**
-   * Returns a minimal bounding rectangle for selected items.
+   * @returns A minimal bounding rectangle for the selected items
    */
   getBoundingRect(): IRectangle {
     return this.selection.getBoundingRect();
   }
 
   /**
-   * Returns the last item or folder added to selection
+   * @returns The last item or folder added to selection
    */
   getLastSelected(): SceneNode {
     return this.getScene().getNode(this.getLastSelectedId());
   }
+
   /**
-   * Returns the id of the last item or folder added to selection
+   * @returns The id of the last item or folder added to selection
    */
   getLastSelectedId(): string {
     return this.selection.getLastSelectedId();
   }
 
   /**
-   * Returns the selection size
+   * @returns The selection size
    */
   getSize(): number {
     return this.selection.getSize();
   }
+
   /**
-   * Check the node is selected
+   * Checks if the node with the provided id is selected.
+   *
+   * @param nodeId The id of the node
+   * @returns `true` of the node is selected
    */
   isSelected(nodeId: string): boolean {
     return this.selection.isSelected(nodeId);
   }
 
   /**
-   * Copy selected item and folders to specific scene or folder
-   * For sources duplication use `.copyTo()` method.
-   * @see ISelection.copyTo()
+   * Copies selected items and folders to specific scene or folder.
+   *
+   * @param sceneId The id of the scene to copy the files into
+   * @param folderId The id of a folder inside the scene
+   * @param duplicateSources set to true of the sources should be duplicated
+   * @see moveTo
    */
   copyTo(sceneId: string, folderId?: string, duplicateSources?: boolean): void {
     this.selection.copyTo(sceneId, folderId, duplicateSources);
   }
 
   /**
-   * Do the same as `.copyTo()` and remove copied items
+   * Moves selected items and folders to specific scene or folder.
+   *
+   * @see copyTo
    */
   moveTo(sceneId: string, folderId?: string): void {
     this.selection.moveTo(sceneId, folderId);
   }
 
   /**
-   * Bulk version of `SceneNodeApi.placeAfter()`
-   * @see `SceneNodeApi.placeAfter()`
+   * Places selected items and folders after the node provided. This is a bulk
+   * version of {@link SceneNode.placeAfter}.
+   *
+   * @param sceneNodeId the id of the {@link SceneNode} the items and folders
+   * should be placed after it
+   * @see SceneNode.placeAfter
    */
   placeAfter(sceneNodeId: string): void {
     this.selection.placeAfter(sceneNodeId);
   }
 
   /**
-   * Bulk version of `SceneNodeApi.placeBefore()`
-   * @see `SceneNodeApi.placeBefore()`
+   * Places selected items and folders before the node provided. This is a bulk
+   * version of {@link SceneNode.placeBefore}.
+   *
+   * @param sceneNodeId the id of the {@link SceneNode} the items and folders
+   * should be placed before it
+   * @see SceneNode.placeBefore
    */
   placeBefore(sceneNodeId: string): void {
     this.selection.placeBefore(sceneNodeId);
   }
 
   /**
-   * Bulk version of `SceneNodeApi.setParent()`
-   * @see `SceneNodeApi.setParent()`
+   * Sets selected items and folders parent (folder) id. This moves all nodes
+   * into the provided folder. This is a bulk version of
+   * {@link SceneNode.setParent}.
+   *
+   * @param folderId The id of the folder to set as parent
+   * @see SceneNode.setParent
    */
   setParent(folderId: string): void {
     this.selection.setParent(folderId);
   }
 
   /**
-   * Returns a minimal representation of selection
-   * for selection list like this:
-   *
+   * Returns a minimal representation of the selection's root nodes. For
+   * selection list like this:
+   * ```
    * Folder1      <- selected
    *  |_ Item1    <- selected
    *  \_ Folder2  <- selected
    * Item3        <- selected
    * Folder3
-   *  |_ Item3
-   *  \_ Item4    <- selected
+   *  |_ Item4
+   *  \_ Item5    <- selected
+   * ```
+   * the return array would be [Folder1, Item3, Item5].
    *
-   *  returns Folder1, Item3, Item4
+   * @returns An array with all root nodes
    */
   getRootNodes(): SceneNode[] {
     const scene = this.getScene();
@@ -249,7 +315,7 @@ export class Selection implements ISceneItemActions {
   }
 
   /**
-   * Returns the linked to selection sources
+   * @returns The linked to selection sources
    */
   getSources(): Source[] {
     return this.selection
@@ -310,29 +376,29 @@ export class Selection implements ISceneItemActions {
   }
 
   /**
-   * only for scene sources
+   * Sets the content crop. Applicable only for scene sources.
    */
   setContentCrop(): void {
     return this.selection.setContentCrop();
   }
 
-  scale(scale: IVec2, origin?: IVec2) {
+  scale(scale: IVec2, origin?: IVec2): void {
     return this.selection.scale(scale, origin);
   }
 
-  scaleWithOffset(scale: IVec2, offset: IVec2) {
+  scaleWithOffset(scale: IVec2, offset: IVec2): void {
     return this.selection.scale(scale, offset);
   }
 
   /**
-   * returns true if selection contains only one SceneFolder
+   * @returns `true` if selection contains only one {@link SceneItemFolder}
    */
   isSceneFolder(): boolean {
     return this.selection.isSceneFolder();
   }
 
   /**
-   * returns true if selection contains only one SceneItem
+   * @returns `true` if selection contains only one {@link SceneItem}
    */
   isSceneItem(): boolean {
     return this.selection.isSceneFolder();

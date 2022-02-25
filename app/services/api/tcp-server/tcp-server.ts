@@ -50,7 +50,8 @@ const TCP_PORT = 28194;
 /**
  * A transport layer for TCP and Websockets communications with internal API
  */
-export class TcpServerService extends PersistentStatefulService<ITcpServersSettings>
+export class TcpServerService
+  extends PersistentStatefulService<ITcpServersSettings>
   implements ITcpServerServiceApi {
   static defaultState: ITcpServersSettings = {
     token: '',
@@ -394,7 +395,7 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
         }
 
         this.sendResponse(client, response);
-      } catch (e) {
+      } catch (e: unknown) {
         this.sendResponse(
           client,
           this.jsonrpcService.createError(null, {
@@ -531,7 +532,7 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
     // unhandled exceptions completely destroy Rx.Observable subscription
     try {
       client.socket.write(`${JSON.stringify(response)}\n`);
-    } catch (e) {
+    } catch (e: unknown) {
       // probably the client has been silently disconnected
       console.info('unable to send response', response, e);
     }

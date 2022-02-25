@@ -5,12 +5,12 @@ import { UserService } from './user';
 import { HostsService } from './hosts';
 import fs from 'fs';
 import path from 'path';
-import electron from 'electron';
 import { authorizedHeaders, handleResponse } from 'util/requests';
 import throttle from 'lodash/throttle';
 import { Service } from './core/service';
 import Utils from './utils';
 import os from 'os';
+import * as remote from '@electron/remote';
 
 export type TUsageEvent = 'stream_start' | 'stream_end' | 'app_start' | 'app_close' | 'crash';
 
@@ -32,7 +32,11 @@ type TAnalyticsEvent =
   | 'ReplayBufferStatus'
   | 'Click'
   | 'Session'
-  | 'Shown';
+  | 'Shown'
+  | 'AppStart'
+  | 'Highlighter'
+  | 'Hardware'
+  | 'WebcamUse';
 
 interface IAnalyticsEvent {
   product: string;
@@ -98,7 +102,7 @@ export class UsageStatisticsService extends Service {
     let installerId = localStorage.getItem('installerId');
 
     if (!installerId) {
-      const exePath = electron.remote.app.getPath('exe');
+      const exePath = remote.app.getPath('exe');
       const installerNamePath = path.join(path.dirname(exePath), 'installername');
 
       if (fs.existsSync(installerNamePath)) {
@@ -112,7 +116,7 @@ export class UsageStatisticsService extends Service {
               localStorage.setItem('installerId', installerId);
             }
           }
-        } catch (e) {
+        } catch (e: unknown) {
           console.error('Error loading installer id', e);
         }
       }
@@ -224,10 +228,8 @@ export class UsageStatisticsService extends Service {
     await this.sendAnalytics();
   }
 
-  private session: ISessionInfo = {
-    startTime: new Date(),
-    features: {},
-    sysInfo: {
+  getSysInfo() {
+    return {
       os: {
         platform: os.platform(),
         release: os.release(),
@@ -236,7 +238,13 @@ export class UsageStatisticsService extends Service {
       cpu: os.cpus()[0].model,
       cores: os.cpus().length,
       mem: os.totalmem(),
-    },
+    };
+  }
+
+  private session: ISessionInfo = {
+    startTime: new Date(),
+    features: {},
+    sysInfo: this.getSysInfo(),
   };
 
   recordFeatureUsage(feature: string) {

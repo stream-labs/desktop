@@ -67,7 +67,8 @@ class NotificationsViews extends ViewHandler<INotificationsState> {
   }
 }
 
-export class NotificationsService extends PersistentStatefulService<INotificationsState>
+export class NotificationsService
+  extends PersistentStatefulService<INotificationsState>
   implements INotificationsServiceApi {
   static defaultState: INotificationsState = {
     notifications: [],

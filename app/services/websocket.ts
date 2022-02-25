@@ -5,7 +5,7 @@ import { HostsService } from 'services/hosts';
 import { authorizedHeaders, jfetch } from 'util/requests';
 import { Subject } from 'rxjs';
 import { AppService } from 'services/app';
-import { IRecentEvent } from 'services/recent-events';
+import { IRecentEvent, ISafeModeServerSettings } from 'services/recent-events';
 import { importSocketIOClient } from '../util/slow-imports';
 import { SceneCollectionsService } from 'services/scene-collections';
 
@@ -19,7 +19,9 @@ export type TSocketEvent =
   | IMediaSharingSettingsUpdateSocketEvent
   | IPauseEventQueueSocketEvent
   | IUnpauseEventQueueSocketEvent
-  | IPrimeSubEvent;
+  | IPrimeSubEvent
+  | ISafeModeEnabledSocketEvent
+  | ISafeModeDisabledSocketEvent;
 
 interface IStreamlabelsSocketEvent {
   type: 'streamlabels';
@@ -32,7 +34,6 @@ export interface IEventSocketEvent {
   type:
     | 'merch'
     | 'donation'
-    | 'facemaskdonation'
     | 'follow'
     | 'subscription'
     | 'bits'
@@ -71,7 +72,6 @@ interface IFmExtEnabledSocketEvent {
 export interface IAlertPlayingSocketEvent {
   type: 'alertPlaying';
   message: {
-    facemask?: string;
     type: string;
     amount?: string;
   };
@@ -103,6 +103,16 @@ interface IMediaSharingSettingsUpdateSocketEvent {
       enabled?: boolean;
     };
   };
+}
+
+export interface ISafeModeEnabledSocketEvent {
+  type: 'safeModeEnabled';
+  message: ISafeModeServerSettings & { ends_at: number };
+}
+
+interface ISafeModeDisabledSocketEvent {
+  type: 'safeModeDisabled';
+  message: {};
 }
 
 export class WebsocketService extends Service {

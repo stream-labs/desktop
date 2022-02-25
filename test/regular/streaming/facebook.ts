@@ -1,108 +1,99 @@
-import { focusChild, focusMain, test, useSpectron } from '../../helpers/spectron';
-import { logIn } from '../../helpers/spectron/user';
+import { logIn } from '../../helpers/modules/user';
 import {
   chatIsVisible,
-  clickGoLive,
   goLive,
-  prepareToGoLive,
-  scheduleStream, stopStream,
+  scheduleStream,
+  stopStream,
   submit,
-  waitForStreamStart
-} from '../../helpers/spectron/streaming';
-import { FormMonkey, selectTitle } from '../../helpers/form-monkey';
-import moment = require('moment');
+  waitForStreamStart,
+} from '../../helpers/modules/streaming';
+import { test, useSpectron } from '../../helpers/spectron';
+import * as moment from 'moment';
+import { selectFirst, selectMatch } from '../../helpers/modules/forms/list';
+import { click, focusChild, focusMain, select } from '../../helpers/modules/core';
 
 useSpectron();
 
 test('Streaming to a Facebook Page', async t => {
-  await logIn(t, 'facebook');
-  await goLive(t, {
+  await logIn('facebook', { multistream: false });
+  await goLive({
     title: 'SLOBS Test Stream',
-    facebookGame: selectTitle('Fortnite'),
+    facebookGame: 'Fortnite',
     description: 'SLOBS Test Stream Description',
   });
-  t.true(await chatIsVisible(t), 'Chat should be visible');
-  await stopStream(t);
+  t.true(await chatIsVisible(), 'Chat should be visible');
+  await stopStream();
   t.pass();
 });
 
-test('Streaming to a Facebook User`s timeline', async t => {
-  await logIn(t, 'facebook', { allowStreamingToFBTimeline: true });
-  await goLive(t, {
-    title: 'SLOBS Test Stream',
-    facebookGame: selectTitle('Fortnite'),
-    description: 'SLOBS Test Stream Description',
-    destinationType: 'me',
+test.skip('Streaming to the scheduled event on Facebook page', async t => {
+  await logIn('facebook', { multistream: false });
+  const tomorrow = moment().add(1, 'day').toDate();
+
+  await scheduleStream(tomorrow, {
+    platform: 'Facebook',
+    title: 'Test FB Scheduler',
+    description: 'Description for a scheduled stream',
+    destinationType: 'Share to a Page You Manage',
+    pageId: selectFirst(),
   });
-  await stopStream(t);
+
+  await goLive({
+    liveVideoId: selectMatch('Test FB Scheduler'),
+  });
   t.pass();
 });
 
-test('Streaming to a Facebook User`s group', async t => {
-  await logIn(t, 'facebook', { hasFBGroup: true });
-  await goLive(t, {
+test('GoLive to a FB page from StreamScheduler', async t => {
+  await logIn('facebook', { multistream: false });
+  const tomorrow = moment().add(1, 'day').toDate();
+
+  await scheduleStream(tomorrow, {
+    platform: 'Facebook',
+    title: 'Test FB Scheduler',
+    description: 'Description for a scheduled stream',
+    destinationType: 'Share to a Page You Manage',
+    pageId: selectFirst(),
+  });
+
+  // open the modal
+  await focusMain();
+  await click('span=Test FB Scheduler');
+
+  // click GoLive
+  const $modal = await select('.ant-modal-content');
+  const $goLiveBtn = await $modal.$('button=Go Live');
+  await click($goLiveBtn);
+
+  // confirm settings
+  await focusChild();
+  await submit();
+  await waitForStreamStart();
+  t.pass();
+});
+
+// TODO: update expired permissions
+test.skip('Streaming to a Facebook User`s group', async t => {
+  await logIn('facebook', { hasFBGroup: true });
+  await goLive({
     title: 'SLOBS Test Stream',
-    facebookGame: selectTitle('Fortnite'),
+    facebookGame: 'DOOM',
     description: 'SLOBS Test Stream Description',
     destinationType: 'group',
   });
-  await stopStream(t);
+  await stopStream();
   t.pass();
 });
 
-// TODO: delete all the scheduled on the user-pool and enable this test
-test.skip('Streaming to the scheduled event on Facebook', async t => {
-  await logIn(t, 'facebook', { multistream: false });
-
-  // create event via scheduling form
-  const tomorrow = Date.now() + 1000 * 60 * 60 * 24;
-  const title = `facebook scheduled stream ${tomorrow}`;
-  await scheduleStream(t, tomorrow, {
-    title,
-    description: 'Facebook Test Stream Description',
-  });
-
-  // select event and go live
-  await prepareToGoLive(t);
-  await clickGoLive(t);
-  const form = new FormMonkey(t);
-  await form.fill({
-    fbEvent: selectTitle(title),
-  });
-  await submit(t);
-  await waitForStreamStart(t);
-  t.pass();
-});
-
-// TODO: refresh tookens on user-pool side
-test.skip('Schedule stream to facebook', async t => {
-  // login into the account:
-  await logIn(t, 'facebook', { multistream: false });
-  const app = t.context.app;
-
-  // open EditStreamInfo window
-  await focusMain(t);
-  await (await app.client.$('button .icon-date')).click();
-
-  await focusChild(t);
-  const formMonkey = new FormMonkey(t);
-
-  // wait fields to be shown
-  await (await app.client.$('[data-name=title]')).waitForDisplayed();
-
-  // set the date to tomorrow
-  const today = new Date();
-  const tomorrow = new Date();
-  tomorrow.setDate(today.getDate() + 1);
-
-  // fill streaming data
-  await formMonkey.fill({
+// TODO: update expired permissions
+test.skip('Streaming to a Facebook User`s timeline', async t => {
+  await logIn('facebook', { allowStreamingToFBTimeline: true });
+  await goLive({
     title: 'SLOBS Test Stream',
+    facebookGame: 'DOOM',
     description: 'SLOBS Test Stream Description',
-    date: moment(tomorrow).format('MM/DD/YYYY'),
+    destinationType: 'me',
   });
-
-  await (await app.client.$('button=Done')).click();
-  await (await app.client.$('.toast-success')).waitForDisplayed({ timeout: 30000 });
+  await stopStream();
   t.pass();
 });

@@ -15,7 +15,7 @@ import { inheritMutations } from './stateful-service';
 import Utils from 'services/utils';
 
 export function ServiceHelper() {
-  return function<T extends { new (...args: any[]): {} }>(constr: T) {
+  return function <T extends { new (...args: any[]): {} }>(constr: T) {
     const klass = class extends constr {
       constructor(...args: any[]) {
         super(...args);
@@ -52,7 +52,7 @@ export function ServiceHelper() {
 }
 
 export function ExecuteInWorkerProcess(): MethodDecorator {
-  return function(target: any, property: string, descriptor: PropertyDescriptor) {
+  return function (target: any, property: string, descriptor: PropertyDescriptor) {
     return Object.assign({}, descriptor, {
       value(...args: any[]) {
         if (Utils.isWorkerWindow()) {
@@ -66,5 +66,22 @@ export function ExecuteInWorkerProcess(): MethodDecorator {
         })(...args);
       },
     });
+  };
+}
+
+/**
+ * STOP! You most likely don't want to use this!
+ * Consider the following options first:
+ * - Using a service view handler
+ * - Calling as an async action
+ * - Calling as an async action that returns
+ * - Using a getter
+ * There are very, very few valid reasons to use this.
+ * Make sure you know what you're doing if you use it.
+ */
+export function ExecuteInCurrentWindow(): MethodDecorator {
+  return function (target: unknown, property: string, descriptor: PropertyDescriptor) {
+    descriptor.value['__executeInCurrentWindow'] = true;
+    return descriptor;
   };
 }

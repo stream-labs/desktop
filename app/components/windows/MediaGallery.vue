@@ -129,8 +129,10 @@
           <div v-if="!files.length" class="empty-box">
             <div>{{ noFilesCopy }}</div>
             <div>
-              <button @click="openFilePicker">{{ noFilesBtn }}</button>
-              <button @click="handleBrowseGalleryClick">{{ $t('Browse the Gallery') }}</button>
+              <button @click="openFilePicker" class="button">{{ noFilesBtn }}</button>
+              <button @click="handleBrowseGalleryClick" class="button">
+                {{ $t('Browse the Gallery') }}
+              </button>
             </div>
           </div>
         </div>

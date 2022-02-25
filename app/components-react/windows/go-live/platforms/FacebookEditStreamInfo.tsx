@@ -1,7 +1,5 @@
-import electron from 'electron';
 import css from './FacebookEditStreamInfo.m.less';
-import { useGoLiveSettings } from '../useGoLiveSettings';
-import CommonPlatformFields from '../CommonPlatformFields';
+import { CommonPlatformFields } from '../CommonPlatformFields';
 import React from 'react';
 import { Services } from '../../../service-provider';
 import Form from '../../../shared/inputs/Form';
@@ -11,7 +9,7 @@ import { $t } from '../../../../services/i18n';
 import { createBinding, ListInput } from '../../../shared/inputs';
 import GameSelector from '../GameSelector';
 import {
-  IFacebookLiveVideo,
+  IFacebookLiveVideoExtended,
   IFacebookStartStreamOptions,
   TDestinationType,
   TFacebookStreamPrivacy,
@@ -20,8 +18,15 @@ import moment from 'moment';
 import Translate from '../../../shared/Translate';
 import { IListOption } from '../../../shared/inputs/ListInput';
 import MessageLayout from '../MessageLayout';
+import PlatformSettingsLayout, { IPlatformComponentParams } from './PlatformSettingsLayout';
+import { useSelector } from '../../../store';
+import { assertIsDefined } from '../../../../util/properties-type-guards';
+import * as remote from '@electron/remote';
 
-export default function FacebookEditStreamInfo() {
+export default function FacebookEditStreamInfo(p: IPlatformComponentParams<'facebook'>) {
+  const fbSettings = p.value;
+  const { isUpdateMode, isScheduleMode } = p;
+
   // inject services
   const {
     FacebookService,
@@ -33,28 +38,23 @@ export default function FacebookEditStreamInfo() {
   } = Services;
 
   const {
-    updatePlatform,
-    isUpdateMode,
-    fbSettings,
     pages,
     groups,
     canStreamToTimeline,
     canStreamToGroup,
     isPrimary,
     shouldShowGamingWarning,
-    renderPlatformSettings,
     shouldShowPermissionWarn,
-  } = useGoLiveSettings(view => {
+  } = useSelector(() => {
     const fbState = FacebookService.state;
     const hasPages = !!fbState.facebookPages.length;
     const canStreamToTimeline = fbState.grantedPermissions.includes('publish_video');
     const canStreamToGroup = fbState.grantedPermissions.includes('publish_to_groups');
-    const fbSettings = view.platforms.facebook;
+    const view = StreamingService.views;
     return {
       canStreamToTimeline,
       canStreamToGroup,
       hasPages,
-      fbSettings,
       shouldShowGamingWarning: hasPages && fbSettings.game,
       shouldShowPermissionWarn:
         (!canStreamToTimeline || !canStreamToGroup) &&
@@ -64,21 +64,29 @@ export default function FacebookEditStreamInfo() {
       isPrimary: view.checkPrimaryPlatform('facebook'),
     };
   });
-  const shouldShowGroups = fbSettings.destinationType === 'group' && !isUpdateMode;
-  const shouldShowPages = fbSettings.destinationType === 'page' && !isUpdateMode;
-  const shouldShowEvents = !isUpdateMode;
+
+  const shouldShowDestinationType = !fbSettings.liveVideoId;
+  const shouldShowGroups =
+    fbSettings.destinationType === 'group' && !isUpdateMode && !fbSettings.liveVideoId;
+  const shouldShowPages =
+    fbSettings.destinationType === 'page' && !isUpdateMode && !fbSettings.liveVideoId;
+  const shouldShowEvents = !isUpdateMode && !isScheduleMode;
   const shouldShowPrivacy = fbSettings.destinationType === 'me';
   const shouldShowPrivacyWarn =
     (!fbSettings.liveVideoId && fbSettings.privacy?.value !== 'SELF') ||
     (fbSettings.liveVideoId && fbSettings.privacy?.value);
-  const bind = createBinding(fbSettings, newFbSettings =>
-    updatePlatform('facebook', newFbSettings),
-  );
+  const shouldShowGame = !isUpdateMode;
+
+  function updateSettings(patch: Partial<IFacebookStartStreamOptions>) {
+    p.onChange({ ...fbSettings, ...patch });
+  }
+
+  const bind = createBinding(fbSettings, newFbSettings => updateSettings(newFbSettings));
 
   // define the local state
   const { s, setItem, updateState } = useFormState({
     pictures: {} as Record<string, string>,
-    scheduledVideos: [] as IFacebookLiveVideo[],
+    scheduledVideos: [] as IFacebookLiveVideoExtended[],
     scheduledVideosLoaded: false,
   });
 
@@ -89,7 +97,7 @@ export default function FacebookEditStreamInfo() {
   });
 
   function setPrivacy(privacy: TFacebookStreamPrivacy) {
-    updatePlatform('facebook', { privacy: { value: privacy } });
+    updateSettings({ privacy: { value: privacy } });
   }
 
   async function loadScheduledBroadcasts() {
@@ -102,11 +110,23 @@ export default function FacebookEditStreamInfo() {
       fbSettings.destinationType === 'group' ? 'me' : fbSettings.destinationType;
     if (destinationType === 'me') destinationId = 'me';
 
-    updateState({
-      scheduledVideos: await FacebookService.actions.return.fetchScheduledVideos(
+    const scheduledVideos = await FacebookService.actions.return.fetchAllVideos(true);
+    const selectedVideoId = fbSettings.liveVideoId;
+    const shouldFetchSelectedVideo =
+      selectedVideoId && !scheduledVideos.find(v => v.id === selectedVideoId);
+
+    if (shouldFetchSelectedVideo) {
+      assertIsDefined(selectedVideoId);
+      const selectedVideo = await FacebookService.actions.return.fetchVideo(
+        selectedVideoId,
         destinationType,
         destinationId,
-      ),
+      );
+      scheduledVideos.push(selectedVideo);
+    }
+
+    updateState({
+      scheduledVideos,
       scheduledVideosLoaded: true,
     });
   }
@@ -126,7 +146,7 @@ export default function FacebookEditStreamInfo() {
 
   function verifyGroup() {
     const groupId = fbSettings.groupId;
-    electron.remote.shell.openExternal(`https://www.facebook.com/groups/${groupId}/edit`);
+    remote.shell.openExternal(`https://www.facebook.com/groups/${groupId}/edit`);
   }
 
   function dismissWarning() {
@@ -160,7 +180,7 @@ export default function FacebookEditStreamInfo() {
 
     // we cant read the privacy property of already created video
     if (fbSettings.liveVideoId || isUpdateMode) {
-      options.unshift({ value: '', title: $t('Do not change privacy settings') });
+      options.unshift({ value: '', label: $t('Do not change privacy settings') });
     }
     return options;
   }
@@ -170,8 +190,38 @@ export default function FacebookEditStreamInfo() {
     StreamingService.actions.showGoLiveWindow();
   }
 
+  async function onEventChange(liveVideoId: string) {
+    if (!liveVideoId) {
+      // reset destination settings if event has been unselected
+      const { groupId, pageId } = FacebookService.state.settings;
+      updateSettings({
+        liveVideoId,
+        pageId,
+        groupId,
+      });
+      return;
+    }
+
+    const liveVideo = s.scheduledVideos.find(vid => vid.id === liveVideoId);
+    assertIsDefined(liveVideo);
+    const newSettings = await FacebookService.actions.return.fetchStartStreamOptionsForVideo(
+      liveVideoId,
+      liveVideo.destinationType,
+      liveVideo.destinationId,
+    );
+    updateSettings(newSettings);
+  }
+
   function renderCommonFields() {
-    return <CommonPlatformFields key="common" platform="facebook" />;
+    return (
+      <CommonPlatformFields
+        key="common"
+        platform="facebook"
+        layoutMode={p.layoutMode}
+        value={fbSettings}
+        onChange={updateSettings}
+      />
+    );
   }
 
   function renderRequiredFields() {
@@ -179,23 +229,23 @@ export default function FacebookEditStreamInfo() {
       <div key="required">
         {!isUpdateMode && (
           <>
-            <ListInput
-              label={$t('Facebook Destination')}
-              {...bind.destinationType}
-              hasImage
-              imageSize={{ width: 35, height: 35 }}
-              onSelect={loadScheduledBroadcasts}
-              options={getDestinationOptions()}
-            />
+            {shouldShowDestinationType && (
+              <ListInput
+                label={$t('Facebook Destination')}
+                {...bind.destinationType}
+                hasImage
+                imageSize={{ width: 35, height: 35 }}
+                options={getDestinationOptions()}
+              />
+            )}
             {shouldShowPages && (
               <ListInput
                 {...bind.pageId}
+                required={true}
                 label={$t('Facebook Page')}
-                onChange={val => console.log(val)}
                 hasImage
                 imageSize={{ width: 44, height: 44 }}
                 onDropdownVisibleChange={shown => shown && loadPictures('page')}
-                onSelect={loadScheduledBroadcasts}
                 options={pages.map(page => ({
                   value: page.id,
                   label: `${page.name} | ${page.category}`,
@@ -207,6 +257,7 @@ export default function FacebookEditStreamInfo() {
               <>
                 <ListInput
                   {...bind.groupId}
+                  required={true}
                   label={$t('Facebook Group')}
                   hasImage
                   imageSize={{ width: 44, height: 44 }}
@@ -215,6 +266,7 @@ export default function FacebookEditStreamInfo() {
                     label: group.name,
                     image: s.pictures[group.id],
                   }))}
+                  defaultActiveFirstOption
                   onDropdownVisibleChange={() => loadPictures('group')}
                   extra={
                     <p>
@@ -231,12 +283,13 @@ export default function FacebookEditStreamInfo() {
     );
   }
 
-  function renderOptionalFields() {
+  function renderEvents() {
     return (
-      <div key="optional">
+      <div key="events">
         {shouldShowEvents && (
           <ListInput
             {...bind.liveVideoId}
+            onChange={onEventChange}
             label={$t('Scheduled Video')}
             loading={!s.scheduledVideosLoaded}
             allowClear
@@ -251,9 +304,16 @@ export default function FacebookEditStreamInfo() {
             ]}
           />
         )}
+      </div>
+    );
+  }
 
+  function renderOptionalFields() {
+    return (
+      <div key="optional">
         {shouldShowPrivacy && (
           <ListInput
+            label={$t('Privacy')}
             value={fbSettings.privacy?.value}
             onChange={setPrivacy}
             hasImage={true}
@@ -266,7 +326,7 @@ export default function FacebookEditStreamInfo() {
                   <a
                     slot="link"
                     onClick={() =>
-                      electron.remote.shell.openExternal(
+                      remote.shell.openExternal(
                         'https://www.facebook.com/settings?tab=business_tools',
                       )
                     }
@@ -277,17 +337,19 @@ export default function FacebookEditStreamInfo() {
           />
         )}
 
-        <GameSelector
-          {...bind.game}
-          platform="facebook"
-          extra={
-            shouldShowGamingWarning && (
-              <Translate message={$t('facebookGamingWarning')}>
-                <a slot="createPageLink" onClick={() => FacebookService.actions.createFBPage()} />
-              </Translate>
-            )
-          }
-        />
+        {shouldShowGame && (
+          <GameSelector
+            {...bind.game}
+            platform="facebook"
+            extra={
+              shouldShowGamingWarning && (
+                <Translate message={$t('facebookGamingWarning')}>
+                  <a slot="createPageLink" onClick={() => FacebookService.actions.createFBPage()} />
+                </Translate>
+              )
+            }
+          />
+        )}
       </div>
     );
   }
@@ -300,7 +362,7 @@ export default function FacebookEditStreamInfo() {
       >
         {isPrimary && (
           <div>
-            <p>{$t('Please log-out and log-in again to get these new features')}</p>
+            <div>{$t('Please log-out and log-in again to get these new features')}</div>
             <button className="button button--facebook" onClick={reLogin}>
               {$t('Re-login now')}
             </button>
@@ -311,7 +373,7 @@ export default function FacebookEditStreamInfo() {
         )}
         {!isPrimary && (
           <div>
-            <p>{$t('Please reconnect Facebook to get these new features')}</p>
+            <div>{$t('Please reconnect Facebook to get these new features')}</div>
             <button className="button button--facebook" onClick={reconnectFB}>
               {$t('Reconnect now')}
             </button>
@@ -352,7 +414,14 @@ export default function FacebookEditStreamInfo() {
   return (
     <Form name="facebook-settings">
       {shouldShowPermissionWarn && renderMissedPermissionsWarning()}
-      {renderPlatformSettings(renderCommonFields(), renderRequiredFields(), renderOptionalFields())}
+
+      <PlatformSettingsLayout
+        layoutMode={p.layoutMode}
+        commonFields={renderCommonFields()}
+        requiredFields={renderRequiredFields()}
+        optionalFields={renderOptionalFields()}
+        essentialOptionalFields={renderEvents()}
+      />
     </Form>
   );
 }

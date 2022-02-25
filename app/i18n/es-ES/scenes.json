@@ -28,7 +28,7 @@
   "Cloud Backup": "Copia de seguridad en la nube",
   "Your media files are currently being synced with the cloud. ": "Sus archivos multimedia se están sincronizando con la nube. ",
   "It is recommended that you wait until this finishes before going live.": "Es recomendable que espere hasta que el proceso termine antes de iniciar un directo.",
-  "Go Live Anyway": "Emitir en directo de todas formas",
+  "Go Live Anyway": "Transmitir en directo de todas formas",
   "Wait": "Esperar",
   "Add a new Scene.": "Agregue una nueva escena.",
   "Remove Scene.": "Quite escena.",
@@ -39,5 +39,6 @@
   "Name Folder": "Asignar nombrar a carpeta",
   "Switch Scenes": "Cambiar de escena",
   "Failed to load scene collection.  A new one will be created instead.": "No se pudo cargar la colección de escenas. Se creará una nueva.",
-  "New Scene": "Escena nueva"
+  "New Scene": "Escena nueva",
+  "Projector": "Proyector"
 }

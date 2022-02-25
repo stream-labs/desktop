@@ -1,0 +1,21 @@
+{
+  "Poll": "투표",
+  "Let your viewers vote on a result": "시청자에게 결과 투표권 주기",
+  "Bar Settings": "바 설정",
+  "Manage Poll": "투표 관리",
+  "Poll Type": "투표 유형",
+  "Show Closed Poll": "닫힌 투표 표시",
+  "Show/hide poll widget on closed poll": "닫힌 투표에 대한 투표 위젯 표시/숨김",
+  "Primary Background Color": "주요 배경색",
+  "Secondary Background Color": "보조 배경색",
+  "Hide wigdet after X seconds of event": "이벤트 X초 후 위젯 숨김",
+  "Header Text Color": "헤더 텍스트 색상",
+  "Option Text Color": "옵션 텍스트 색상",
+  "Title Font Size": "타이틀 폰트 사이즈",
+  "Option Font Size": "옵션 폰트 사이즈",
+  "Title Font Weight": "타이틀 폰트 굵기",
+  "Option Font Weight": "옵션 폰트 굵기",
+  "Thin Bar": "얇은 바",
+  "Display thin/thick Bar": "얇은/두꺼운 바 표시",
+  "You need to re-login to access Twitch chat polls": "Twitch 채팅 투표를 이용하려면 다시 로그인"
+}

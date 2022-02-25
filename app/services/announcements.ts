@@ -130,7 +130,7 @@ export class AnnouncementsService extends StatefulService<IAnnouncementsInfo> {
       }
 
       return newState.id ? newState : this.state;
-    } catch (e) {
+    } catch (e: unknown) {
       return this.state;
     }
   }
@@ -150,7 +150,7 @@ export class AnnouncementsService extends StatefulService<IAnnouncementsInfo> {
     try {
       await fetch(req);
       this.CLEAR_BANNER();
-    } catch (e) {}
+    } catch (e: unknown) {}
   }
 
   private formRequest(endpoint: string, options: any = {}) {

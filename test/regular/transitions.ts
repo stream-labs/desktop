@@ -1,10 +1,14 @@
-import { useSpectron, focusChild, focusMain, test } from '../helpers/spectron';
-import { clickSceneTransitions, addScene } from '../helpers/spectron/scenes';
+import { useSpectron, test } from '../helpers/spectron';
+import { clickSceneTransitions, addScene } from '../helpers/modules/scenes';
 import { getFormInput } from '../helpers/spectron/forms';
 import { dismissModal } from '../helpers/spectron/modals';
 import { FormMonkey } from '../helpers/form-monkey';
+import { click, clickButton, focusChild, focusMain } from '../helpers/modules/core';
 
-useSpectron();
+useSpectron({
+  restartAppAfterEachTest: false,
+  clearCollectionAfterEachTest: true,
+});
 
 test('Changing transition options', async t => {
   const app = t.context.app;
@@ -12,11 +16,11 @@ test('Changing transition options', async t => {
   const transitionDuration = 500;
 
   // We need at least 2 scenes to edit transitions
-  await addScene(t, 'Other Scene');
+  await addScene('Other Scene');
 
-  await focusMain(t);
-  await clickSceneTransitions(t);
-  await focusChild(t);
+  await focusMain();
+  await clickSceneTransitions();
+  await focusChild();
   await (await app.client.$('.icon-edit')).click();
   const form = new FormMonkey(t);
   await form.fillByTitles({
@@ -25,29 +29,31 @@ test('Changing transition options', async t => {
   });
 
   await dismissModal(t);
-  await (await t.context.app.client.$('button=Done')).click();
-  await focusMain(t);
-  await clickSceneTransitions(t);
-  await focusChild(t);
+  await clickButton('Done');
+  await focusMain();
+  await clickSceneTransitions();
+  await focusChild();
 
-  await (await app.client.$('.icon-edit')).click();
+  await click('.icon-edit');
+
   t.true(
     await form.includesByTitles({
       Type: transitionType,
       Duration: transitionDuration,
     }),
   );
+  t.pass();
 });
 
 test('Adding and removing transitions', async t => {
   const app = t.context.app;
 
   // We need at least 2 scenes to edit transitions
-  await addScene(t, 'Other Scene');
+  await addScene('Other Scene');
 
-  await focusMain(t);
-  await clickSceneTransitions(t);
-  await focusChild(t);
+  await focusMain();
+  await clickSceneTransitions();
+  await focusChild();
   await (await app.client.$('button=Add Transition')).click();
   await dismissModal(t);
   await (await app.client.$('.icon-trash')).click();
@@ -63,11 +69,11 @@ test('Changing connections', async t => {
   const connectionEnd = 'Scene';
 
   // We need at least 2 scenes to edit transitions
-  await addScene(t, 'Other Scene');
+  await addScene('Other Scene');
 
-  await focusMain(t);
-  await clickSceneTransitions(t);
-  await focusChild(t);
+  await focusMain();
+  await clickSceneTransitions();
+  await focusChild();
   await (await app.client.$('button=Add Transition')).click();
   await dismissModal(t);
   await (await app.client.$('button=Connections')).click();
@@ -79,9 +85,9 @@ test('Changing connections', async t => {
     'Ending Scene': connectionEnd,
   });
   await (await t.context.app.client.$('button=Done')).click();
-  await focusMain(t);
-  await clickSceneTransitions(t);
-  await focusChild(t);
+  await focusMain();
+  await clickSceneTransitions();
+  await focusChild();
 
   await (await app.client.$('button=Connections')).click();
   await (await app.client.$('.icon-edit')).click();
@@ -99,11 +105,11 @@ test('Showing redudant connection warning', async t => {
   const app = t.context.app;
 
   // We need at least 2 scenes to edit transitions
-  await addScene(t, 'Other Scene');
+  await addScene('Other Scene');
 
-  await focusMain(t);
-  await clickSceneTransitions(t);
-  await focusChild(t);
+  await focusMain();
+  await clickSceneTransitions();
+  await focusChild();
   await (await app.client.$('button=Add Transition')).click();
   await dismissModal(t);
   await (await app.client.$('button=Connections')).click();

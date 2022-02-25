@@ -1,7 +1,7 @@
 import { BaseInput } from './BaseInput';
 import { Component, Prop } from 'vue-property-decorator';
 import { IFileMetadata } from './index';
-import electron from 'electron';
+import * as remote from '@electron/remote';
 
 @Component({})
 export default class FileInput extends BaseInput<string, IFileMetadata> {
@@ -10,22 +10,34 @@ export default class FileInput extends BaseInput<string, IFileMetadata> {
   @Prop() readonly title: string;
 
   async showFileDialog() {
-    const options: Electron.OpenDialogOptions = {
-      defaultPath: this.value,
-      filters: this.metadata.filters,
-      properties: [],
-    };
+    if (this.metadata.save) {
+      const options: Electron.SaveDialogOptions = {
+        defaultPath: this.value,
+        filters: this.metadata.filters,
+        properties: [],
+      };
 
-    if (this.metadata.directory) {
-      options.properties.push('openDirectory');
+      const { filePath } = await remote.dialog.showSaveDialog(options);
+
+      if (filePath) this.emitInput(filePath);
     } else {
-      options.properties.push('openFile');
-    }
+      const options: Electron.OpenDialogOptions = {
+        defaultPath: this.value,
+        filters: this.metadata.filters,
+        properties: [],
+      };
 
-    const { filePaths } = await electron.remote.dialog.showOpenDialog(options);
+      if (this.metadata.directory) {
+        options.properties.push('openDirectory');
+      } else {
+        options.properties.push('openFile');
+      }
 
-    if (filePaths[0]) {
-      this.emitInput(filePaths[0]);
+      const { filePaths } = await remote.dialog.showOpenDialog(options);
+
+      if (filePaths[0]) {
+        this.emitInput(filePaths[0]);
+      }
     }
   }
 }

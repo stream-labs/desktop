@@ -2,20 +2,22 @@ import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 import { Inject } from '../services/core/injector';
 import { StreamingService, EReplayBufferState, EStreamingState } from '../services/streaming';
-import StartStreamingButton from './StartStreamingButton.vue';
-import TestWidgets from './TestWidgets.vue';
-import PerformanceMetrics from './PerformanceMetrics.vue';
-import NotificationsArea from './NotificationsArea.vue';
+import {
+  PerformanceMetrics,
+  StartStreamingButton,
+  TestWidgets,
+  NotificationsArea,
+} from 'components/shared/ReactComponentList';
 import { UserService } from '../services/user';
 import { getPlatformService } from 'services/platforms';
 import { YoutubeService } from 'services/platforms/youtube';
 import { PerformanceService, EStreamQuality } from 'services/performance';
-import electron from 'electron';
 import { CustomizationService } from 'services/customization';
 import { WindowsService } from 'services/windows';
 import { $t } from 'services/i18n';
 import { SettingsService } from 'services/settings';
 import { UsageStatisticsService } from 'services/usage-statistics';
+import { NavigationService } from '../services/navigation';
 
 @Component({
   components: {
@@ -34,6 +36,7 @@ export default class StudioFooterComponent extends Vue {
   @Inject() performanceService: PerformanceService;
   @Inject() youtubeService: YoutubeService;
   @Inject() usageStatisticsService: UsageStatisticsService;
+  @Inject() navigationService: NavigationService;
 
   @Prop() locked: boolean;
 
@@ -70,12 +73,12 @@ export default class StudioFooterComponent extends Vue {
 
     if (
       this.streamingStatus === EStreamingState.Reconnecting ||
-      this.performanceService.streamQuality === EStreamQuality.POOR
+      this.performanceService.views.streamQuality === EStreamQuality.POOR
     ) {
       return 'warning';
     }
 
-    if (this.performanceService.streamQuality === EStreamQuality.FAIR) {
+    if (this.performanceService.views.streamQuality === EStreamQuality.FAIR) {
       return 'info';
     }
 
@@ -95,7 +98,8 @@ export default class StudioFooterComponent extends Vue {
   }
 
   get canSchedule() {
-    return this.streamingService.views.supports('stream-schedule');
+    const streamingView = this.streamingService.views;
+    return streamingView.supports('stream-schedule', streamingView.linkedPlatforms);
   }
 
   get youtubeEnabled() {
@@ -114,11 +118,7 @@ export default class StudioFooterComponent extends Vue {
   }
 
   openScheduleStream() {
-    this.windowsService.showWindow({
-      componentName: 'ScheduleStreamWindow',
-      title: $t('Schedule Stream'),
-      size: { width: 800, height: 670 },
-    });
+    this.navigationService.navigate('StreamScheduler');
   }
 
   confirmYoutubeEnabled() {

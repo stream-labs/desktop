@@ -19,10 +19,11 @@ export default function GoLiveError() {
     UserService,
     NavigationService,
     WindowsService,
+    MagicLinkService,
   } = Services;
 
   // take an error from the global state
-  const { error } = useVuex(() => ({ error: StreamingService.state.info.error }));
+  const { error } = useVuex(() => ({ error: StreamingService.state.info.error }), false);
 
   function render() {
     if (!error) return null;
@@ -44,6 +45,8 @@ export default function GoLiveError() {
         return renderYoutubeStreamingDisabled(error);
       case 'MACHINE_LOCKED':
         return renderMachineLockedError(error);
+      case 'TWEET_FAILED':
+        return renderTweetFailedError(error);
       default:
         return <MessageLayout error={error} />;
     }
@@ -74,7 +77,7 @@ export default function GoLiveError() {
       >
         <button
           className="button button--prime"
-          onClick={() => UserService.actions.openPrimeUrl('slobs-multistream')}
+          onClick={() => MagicLinkService.actions.linkToPrime('slobs-multistream')}
         >
           {$t('Become a Prime member')}
         </button>
@@ -89,7 +92,7 @@ export default function GoLiveError() {
     }
 
     function navigatePlatformMerge() {
-      NavigationService.actions.navigate('PlatformMerge', 'twitch');
+      NavigationService.actions.navigate('PlatformMerge', { platform: 'twitch' });
       WindowsService.actions.closeChildWindow();
     }
 
@@ -142,6 +145,10 @@ export default function GoLiveError() {
         </Translate>
       </MessageLayout>
     );
+  }
+
+  function renderTweetFailedError(error: IStreamError) {
+    return <MessageLayout error={error} message={$t('Failed to post the Tweet')}></MessageLayout>;
   }
 
   function renderRestreamError(error: IStreamError) {

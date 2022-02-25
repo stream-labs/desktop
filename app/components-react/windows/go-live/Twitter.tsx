@@ -4,36 +4,50 @@ import { Services } from '../../service-provider';
 import cx from 'classnames';
 import { $t } from '../../../services/i18n';
 import css from './Twitter.m.less';
-import { SwitchInput, TextAreaInput, TextInput } from '../../shared/inputs';
-import { pick } from 'lodash';
+import { CheckboxInput, SwitchInput, TextAreaInput, TextInput } from '../../shared/inputs';
 import { Row, Col, Button } from 'antd';
 import { useGoLiveSettings } from './useGoLiveSettings';
+import { useVuex } from '../../hooks';
 
 export default function TwitterInput() {
-  const { TwitterService } = Services;
+  const { TwitterService, UserService } = Services;
   const {
     tweetText,
     updateSettings,
+    getTweetText,
+    getSettings,
+    streamTitle,
     tweetWhenGoingLive,
     linked,
     screenName,
-    streamTitle,
-    getTweetText,
-  } = useGoLiveSettings(view => ({
-    ...pick(TwitterService.state, 'tweetWhenGoingLive', 'linked', 'screenName'),
-    streamTitle: view.commonFields.title,
-  }));
+    platform,
+    useStreamlabsUrl,
+  } = useGoLiveSettings().selectExtra(module => {
+    const state = TwitterService.state;
+    return {
+      streamTitle: module.commonFields.title,
+      tweetWhenGoingLive: state.tweetWhenGoingLive,
+      useStreamlabsUrl: state.creatorSiteOnboardingComplete,
+      linked: state.linked,
+      screenName: state.screenName,
+      platform: UserService.views.platform?.type,
+      url: TwitterService.views.url,
+    };
+  });
 
   useEffect(() => {
-    console.log('update tweet text');
     const tweetText = getTweetText(streamTitle);
-    updateSettings({ tweetText });
-  }, [streamTitle]);
+    if (getSettings().tweetText !== tweetText) updateSettings({ tweetText });
+  }, [streamTitle, useStreamlabsUrl]);
 
   function unlink() {
     TwitterService.actions.return
       .unlinkTwitter()
       .then(() => TwitterService.actions.getTwitterStatus());
+  }
+
+  function setUseStreamlabsUrl(value: boolean) {
+    TwitterService.actions.setStreamlabsUrl(value);
   }
 
   function renderLinkedView() {
@@ -65,6 +79,13 @@ export default function TwitterInput() {
           rows={5}
           disabled={!tweetWhenGoingLive}
         />
+        {platform === 'twitch' && (
+          <CheckboxInput
+            value={useStreamlabsUrl}
+            onInput={setUseStreamlabsUrl}
+            label={$t('Use Streamlabs URL')}
+          />
+        )}
         <div style={{ marginTop: '30px', textAlign: 'right' }}>
           <Button onClick={unlink}>{$t('Unlink Twitter')}</Button>
         </div>

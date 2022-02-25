@@ -6,14 +6,17 @@ import { ScenesService } from 'services/scenes';
 import { TSourceType, ISourceApi, ISourceAddOptions, SourcesService } from 'services/sources';
 import ModalLayout from 'components/ModalLayout.vue';
 import Selector from 'components/Selector.vue';
-import { Display } from 'components/shared/ReactComponent';
-import { WidgetsService, WidgetDisplayData } from 'services/widgets';
+import { Display } from 'components/shared/ReactComponentList';
+import { WidgetsService, WidgetDisplayData, WidgetType } from 'services/widgets';
 import { $t } from 'services/i18n';
 import { PlatformAppsService } from 'services/platform-apps';
 import { EditorCommandsService } from 'services/editor-commands';
 import HFormGroup from 'components/shared/inputs/HFormGroup.vue';
 import electron from 'electron';
 import { UserService } from 'services/user';
+import { ChatService } from 'services/chat';
+import * as remote from '@electron/remote';
+import { AudioService, CustomizationService } from 'app-services';
 
 @Component({
   components: { ModalLayout, Selector, Display, HFormGroup },
@@ -26,6 +29,9 @@ export default class AddSource extends Vue {
   @Inject() platformAppsService: PlatformAppsService;
   @Inject() private editorCommandsService: EditorCommandsService;
   @Inject() userService: UserService;
+  @Inject() chatService: ChatService;
+  @Inject() customizationService: CustomizationService;
+  @Inject() audioService: AudioService;
 
   name = '';
   error = '';
@@ -109,7 +115,7 @@ export default class AddSource extends Vue {
     if (!scene.canAddSource(this.selectedSourceId)) {
       // for now only a scene-source can be a problem
 
-      electron.remote.dialog.showErrorBox(
+      remote.dialog.showErrorBox(
         $t('Error'),
         $t(
           'Unable to add a source: the scene you are trying to add already contains your current scene',
@@ -167,6 +173,11 @@ export default class AddSource extends Vue {
         );
 
         source = item.source;
+      }
+
+      if (!source.video && source.hasProps()) {
+        this.audioService.showAdvancedSettings(source.sourceId);
+        return;
       }
 
       if (source.hasProps()) {

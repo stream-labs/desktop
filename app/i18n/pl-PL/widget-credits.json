@@ -13,7 +13,7 @@
   "Loop Option": "Opcja pętli",
   "Loop the credits": "Zapętl napisy końcowe",
   "Manage Credits": "Zarządzaj napisami końcowymi",
-  "Visual Settings": "Visual Settings",
+  "Visual Settings": "Ustawienia wizualne",
   "Credit Title": "Tytuł napisów końcowych",
   "Credit Subtitle": "Podtytuł napisów końcowych",
   "When the credits roll, this will be the format of the subtitle. Available tokens: ": "Podczas wyświetlania napisów końcowych, to będzie formatem podtytułu. Dostępne tokeny: ",
@@ -28,8 +28,8 @@
   "Speed of the rolling credits.": "Prędkość napisów końcowych.",
   "Roll Time": "Czas napisów końcowych",
   "Duration of the rolling credits.": "Czas trwania napisów końcowych.",
-  "Show Donations": "Show Donations",
+  "Show Donations": "Pokaż donacje",
   "Show Subscriptions": "Pokaż subskrypcje",
-  "Show Members": "Show Members",
+  "Show Members": "Pokaż użytkowników",
   "Show Super Chats": "Pokaż Super czaty"
 }

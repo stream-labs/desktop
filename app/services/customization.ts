@@ -12,6 +12,9 @@ import { $t } from 'services/i18n';
 import { Inject } from 'services/core';
 import { UserService } from 'services/user';
 import { UsageStatisticsService } from 'services/usage-statistics';
+import fs from 'fs-extra';
+import path from 'path';
+import { AppService } from './app';
 
 // Maps to --background
 const THEME_BACKGROUNDS = {
@@ -52,6 +55,7 @@ export interface ICustomizationServiceState {
   leftDock: boolean;
   hideViewerCount: boolean;
   folderSelection: boolean;
+  legacyAlertbox: boolean | null;
   livedockCollapsed: boolean;
   livedockSize: number;
   eventsSize: number;
@@ -63,95 +67,21 @@ export interface ICustomizationServiceState {
   mediaBackupOptOut: boolean;
   navigateToLiveOnStreamStart: boolean;
   experimental?: {
-    legacyGoLive?: boolean;
     volmetersFPSLimit?: number;
   };
   designerMode: boolean;
   legacyEvents: boolean;
   pinnedStatistics: IPinnedStatistics;
+  enableCrashDumps: boolean;
 }
 
 class CustomizationViews extends ViewHandler<ICustomizationServiceState> {
-  get settingsFormData(): TObsFormData {
-    const settings = this.state;
-
-    const formData: TObsFormData = [
-      <IObsListInput<boolean>>{
-        value: settings.folderSelection,
-        name: 'folderSelection',
-        description: $t('Scene item selection mode'),
-        type: 'OBS_PROPERTY_LIST',
-        options: [
-          { value: true, description: $t('Single click selects group. Double click selects item') },
-          {
-            value: false,
-            description: $t('Double click selects group. Single click selects item'),
-          },
-        ],
-        visible: true,
-        enabled: true,
-      },
-
-      <IObsInput<boolean>>{
-        value: settings.leftDock,
-        name: 'leftDock',
-        description: $t('Show the live dock (chat) on the left side'),
-        type: 'OBS_PROPERTY_BOOL',
-        visible: true,
-        enabled: true,
-      },
-
-      <IObsNumberInputValue>{
-        value: settings.chatZoomFactor,
-        name: 'chatZoomFactor',
-        description: $t('Chat Text Size'),
-        type: 'OBS_PROPERTY_SLIDER',
-        minVal: 0.25,
-        maxVal: 2,
-        stepVal: 0.25,
-        visible: true,
-        enabled: true,
-        usePercentages: true,
-      },
-    ];
-
-    if (
-      this.getServiceViews(UserService).isLoggedIn &&
-      this.getServiceViews(UserService).platform.type === 'twitch'
-    ) {
-      formData.push(<IObsInput<boolean>>{
-        value: settings.enableBTTVEmotes,
-        name: 'enableBTTVEmotes',
-        description: $t('Enable BetterTTV emotes for Twitch'),
-        type: 'OBS_PROPERTY_BOOL',
-        visible: true,
-        enabled: true,
-      });
-
-      formData.push(<IObsInput<boolean>>{
-        value: settings.enableFFZEmotes,
-        name: 'enableFFZEmotes',
-        description: $t('Enable FrankerFaceZ emotes for Twitch'),
-        type: 'OBS_PROPERTY_BOOL',
-        visible: true,
-        enabled: true,
-      });
-    }
-
-    return formData;
+  get experimentalSettingsFormData(): TObsFormData {
+    return [];
   }
 
-  get experimentalSettingsFormData(): TObsFormData {
-    return [
-      <IObsInput<boolean>>{
-        value: this.state.experimental.legacyGoLive,
-        name: 'legacyGoLive',
-        description: 'Use legacy GoLive window',
-        type: 'OBS_PROPERTY_BOOL',
-        visible: true,
-        enabled: true,
-      },
-    ];
+  get pinnedStatistics() {
+    return this.state.pinnedStatistics;
   }
 
   get displayBackground() {
@@ -160,6 +90,10 @@ class CustomizationViews extends ViewHandler<ICustomizationServiceState> {
 
   get currentTheme() {
     return this.state.theme;
+  }
+
+  get isDarkTheme() {
+    return ['night-theme', 'prime-dark'].includes(this.currentTheme);
   }
 
   get designerMode() {
@@ -174,6 +108,7 @@ class CustomizationViews extends ViewHandler<ICustomizationServiceState> {
 export class CustomizationService extends PersistentStatefulService<ICustomizationServiceState> {
   @Inject() userService: UserService;
   @Inject() usageStatisticsService: UsageStatisticsService;
+  @Inject() appService: AppService;
 
   static get migrations() {
     return [
@@ -210,9 +145,11 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
       droppedFrames: false,
       bandwidth: false,
     },
+    legacyAlertbox: null,
     experimental: {
       // put experimental features here
     },
+    enableCrashDumps: true,
   };
 
   settingsChanged = new Subject<Partial<ICustomizationServiceState>>();
@@ -225,6 +162,9 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
     super.init();
     this.setSettings(this.runMigrations(this.state, CustomizationService.migrations));
     this.setLiveDockCollapsed(true); // livedock is always collapsed on app start
+    this.ensureCrashDumpFolder();
+
+    this.userService.userLoginFinished.subscribe(() => this.setInitialLegacyAlertboxState());
 
     if (
       this.state.pinnedStatistics.cpu ||
@@ -236,9 +176,23 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
     }
   }
 
+  setInitialLegacyAlertboxState() {
+    if (!this.userService.views.isLoggedIn) return;
+
+    // switch all new users to the new alertbox by default
+    if (this.state.legacyAlertbox === null) {
+      const registrationDate = this.userService.state.createdAt;
+      const legacyAlertbox = registrationDate < new Date('October 26, 2021').valueOf();
+      this.setSettings({ legacyAlertbox });
+    }
+  }
+
   setSettings(settingsPatch: Partial<ICustomizationServiceState>) {
     const changedSettings = Utils.getChangedParams(this.state, settingsPatch);
     this.SET_SETTINGS(changedSettings);
+
+    if (changedSettings.enableCrashDumps != null) this.ensureCrashDumpFolder();
+
     this.settingsChanged.next(changedSettings);
   }
 
@@ -296,14 +250,14 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
 
   get themeOptions() {
     const options = [
-      { value: 'night-theme', title: $t('Night') },
-      { value: 'day-theme', title: $t('Day') },
+      { value: 'night-theme', label: $t('Night') },
+      { value: 'day-theme', label: $t('Day') },
     ];
 
     if (this.userService.isPrime) {
       options.push(
-        { value: 'prime-dark', title: $t('Obsidian Prime') },
-        { value: 'prime-light', title: $t('Alabaster Prime') },
+        { value: 'prime-dark', label: $t('Obsidian Prime') },
+        { value: 'prime-light', label: $t('Alabaster Prime') },
       );
     }
     return options;
@@ -311,6 +265,20 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
 
   restoreDefaults() {
     this.setSettings(CustomizationService.defaultState);
+  }
+
+  /**
+   * Ensures that the existence of the crash dump folder matches the setting
+   */
+  ensureCrashDumpFolder() {
+    const crashDumpDirectory = path.join(this.appService.appDataDirectory, 'CrashMemoryDump');
+
+    // We do not care about the result of these calls;
+    if (this.state.enableCrashDumps) {
+      fs.ensureDir(crashDumpDirectory);
+    } else {
+      fs.remove(crashDumpDirectory);
+    }
   }
 
   @mutation()

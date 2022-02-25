@@ -1,3 +1,7 @@
+button {
+  cursor: pointer;
+}
+
 .button {
   .radius();
   .weight(@medium);
@@ -9,6 +13,8 @@
   font-family: 'Roboto', sans-serif;
   min-height: 32px;
   line-height: 30px;
+  cursor: pointer;
+  background-color: var(--button);
 
   &:focus,
   &:visited {
@@ -112,6 +118,7 @@
 
 .button--warn {
   background-color: var(--warning-button-bg);
+  color: white;
 
   &:hover,
   &:focus,
@@ -132,8 +139,9 @@
   align-items: center;
   justify-content: center;
   border-radius: 100%;
-  box-sizing: content-box;
+  box-sizing: border-box;
   letter-spacing: 0.2px;
+  border: none;
 
   &:hover {
     background-color: var(--button-hover);
@@ -230,6 +238,19 @@
     background: var(--facebook-hover) !important;
   }
 }
+
+.square-button--tiktok,
+.button--tiktok {
+  background: var(--tiktok);
+  color: var(--black);
+
+  &:hover,
+  &:active {
+    background: var(--tiktok) !important;
+    color: var(--black) !important;
+  }
+}
+
 
 .square-button--twitter {
   background: var(--twitter);

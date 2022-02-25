@@ -1,0 +1,21 @@
+{
+  "Poll": "投票",
+  "Let your viewers vote on a result": "讓您的觀眾對結果進行投票",
+  "Bar Settings": "橫條設定",
+  "Manage Poll": "管理投票",
+  "Poll Type": "投票類型",
+  "Show Closed Poll": "顯示結束的投票",
+  "Show/hide poll widget on closed poll": "在關閉的投票上顯示/隱藏投票小工具",
+  "Primary Background Color": "主要背景顏色",
+  "Secondary Background Color": "次要背景顏色",
+  "Hide wigdet after X seconds of event": "在活動 X 秒後隱藏小工具",
+  "Header Text Color": "標題文字顏色",
+  "Option Text Color": "選項文字顏色",
+  "Title Font Size": "標題字型大小",
+  "Option Font Size": "選項字型大小",
+  "Title Font Weight": "標題字型粗細",
+  "Option Font Weight": "選項字型粗細",
+  "Thin Bar": "細橫條",
+  "Display thin/thick Bar": "顯示粗/細橫條",
+  "You need to re-login to access Twitch chat polls": "您必須重新登入才能存取 Twitch 聊天投票"
+}

@@ -93,7 +93,7 @@ export default class CodeEditor extends Vue {
     newData = this.setCustomCode(newData);
     try {
       await this.settingsService.saveSettings(newData.settings);
-    } catch (e) {
+    } catch (e: unknown) {
       this.onFailHandler($t('Save failed, something went wrong.'));
       this.isLoading = false;
       return;

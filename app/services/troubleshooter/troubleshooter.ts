@@ -14,7 +14,8 @@ interface ITroubleshooterState {
   settings: ITroubleshooterSettings;
 }
 
-export class TroubleshooterService extends PersistentStatefulService<ITroubleshooterState>
+export class TroubleshooterService
+  extends PersistentStatefulService<ITroubleshooterState>
   implements ITroubleshooterServiceApi {
   static defaultState: ITroubleshooterState = {
     settings: {

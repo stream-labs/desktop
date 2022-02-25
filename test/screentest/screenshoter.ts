@@ -1,13 +1,14 @@
-import { getClient } from '../helpers/api-client';
+import { getApiClient } from '../helpers/api-client';
 import { CustomizationService } from '../../app/services/customization';
 import { getConfigsVariations, getConfig } from './utils';
 import test from 'ava';
 import { sleep } from '../helpers/sleep';
-import { afterAppStart, focusChild, focusMain, TExecutionContext } from '../helpers/spectron';
+import { afterAppStart, TExecutionContext } from '../helpers/spectron';
 import { PerformanceService } from '../../app/services/performance';
 import { IAudioServiceApi } from '../../app/services/audio';
 import { WindowsService } from '../../app/services/windows';
 import NativeImage = Electron.NativeImage;
+import {focusChild, focusMain} from "../helpers/modules/core";
 
 const fs = require('fs');
 const CONFIG = getConfig();
@@ -17,7 +18,7 @@ let branchName: string;
 let screenshotsCaptured = false;
 
 async function applyConfig(t: TExecutionContext, config: Dictionary<any>) {
-  const api = await getClient();
+  const api = await getApiClient();
   const customizationService = api.getResource<CustomizationService>('CustomizationService');
 
   customizationService.setTheme(config.nightMode ? 'night-theme' : 'day-theme');
@@ -36,7 +37,7 @@ async function getFocusedWindowId(t: TExecutionContext): Promise<string> {
 }
 
 export async function makeScreenshots(t: TExecutionContext, title = '') {
-  const api = await getClient();
+  const api = await getApiClient();
   const performanceService = api.getResource<PerformanceService>('PerformanceService');
   const audioService = api.getResource<IAudioServiceApi>('AudioService');
   const windowService = api.getResource<WindowsService>('WindowsService');
@@ -47,7 +48,7 @@ export async function makeScreenshots(t: TExecutionContext, title = '') {
   // AudioSources causes a different volmeter level
   audioService.getSources().forEach(audioSource => audioSource.setMuted(true));
   // main window title may contain different project version
-  windowService.updateMainWindowOptions({ title: 'Streamlabs OBS - screentest' });
+  windowService.updateMainWindowOptions({ title: 'Streamlabs Desktop - screentest' });
 
   const windowId = await getFocusedWindowId(t);
 
@@ -110,9 +111,9 @@ export function useScreentest() {
       document.head.appendChild(disableCaretEl);
     `;
     await t.context.app.webContents.executeJavaScript(disableCaretCode);
-    await focusChild(t);
+    await focusChild();
     await t.context.app.webContents.executeJavaScript(disableCaretCode);
-    await focusMain(t);
+    await focusMain();
   });
 }
 

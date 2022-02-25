@@ -56,8 +56,9 @@ const isSourceType = (type: TSourceType) => (sourceId: string) => {
 };
 
 function getHotkeyHash(hotkey: IHotkey): string {
-  return `${hotkey.actionName}/${hotkey.sceneId || ''}${hotkey.sourceId ||
-    ''}/${hotkey.sceneItemId || ''}`;
+  return `${hotkey.actionName}/${hotkey.sceneId || ''}${hotkey.sourceId || ''}/${
+    hotkey.sceneItemId || ''
+  }`;
 }
 
 /**
@@ -288,10 +289,7 @@ const SCENE_ITEM_ACTIONS: HotkeyGroup = {
     },
     shouldApply: sceneItemId => !!getScenesService().views.getSceneItem(sceneItemId)?.video,
     isActive: sceneItemId => !!getScenesService().views.getSceneItem(sceneItemId)?.visible,
-    down: sceneItemId =>
-      getScenesService()
-        .views.getSceneItem(sceneItemId)
-        ?.setVisibility(true),
+    down: sceneItemId => getScenesService().views.getSceneItem(sceneItemId)?.setVisibility(true),
   },
   TOGGLE_SOURCE_VISIBILITY_HIDE: {
     name: 'TOGGLE_SOURCE_VISIBILITY_HIDE',
@@ -301,10 +299,7 @@ const SCENE_ITEM_ACTIONS: HotkeyGroup = {
     },
     shouldApply: sceneItemId => !!getScenesService().views.getSceneItem(sceneItemId)?.video,
     isActive: sceneItemId => getScenesService().views.getSceneItem(sceneItemId)?.visible === false,
-    down: sceneItemId =>
-      getScenesService()
-        .views.getSceneItem(sceneItemId)
-        ?.setVisibility(false),
+    down: sceneItemId => getScenesService().views.getSceneItem(sceneItemId)?.setVisibility(false),
   },
   PUSH_TO_SOURCE_SHOW: {
     name: 'PUSH_TO_SOURCE_SHOW',
@@ -313,14 +308,8 @@ const SCENE_ITEM_ACTIONS: HotkeyGroup = {
       return $t('Push to Show %{sourcename}', { sourcename: sceneItem?.source.name });
     },
     shouldApply: sceneItemId => !!getScenesService().views.getSceneItem(sceneItemId)?.video,
-    up: sceneItemId =>
-      getScenesService()
-        .views.getSceneItem(sceneItemId)
-        ?.setVisibility(false),
-    down: sceneItemId =>
-      getScenesService()
-        .views.getSceneItem(sceneItemId)
-        ?.setVisibility(true),
+    up: sceneItemId => getScenesService().views.getSceneItem(sceneItemId)?.setVisibility(false),
+    down: sceneItemId => getScenesService().views.getSceneItem(sceneItemId)?.setVisibility(true),
   },
   PUSH_TO_SOURCE_HIDE: {
     name: 'PUSH_TO_SOURCE_HIDE',
@@ -329,14 +318,8 @@ const SCENE_ITEM_ACTIONS: HotkeyGroup = {
       return $t('Push to Hide %{sourcename}', { sourcename: sceneItem?.source.name });
     },
     shouldApply: sceneItemId => !!getScenesService().views.getSceneItem(sceneItemId)?.video,
-    up: sceneItemId =>
-      getScenesService()
-        .views.getSceneItem(sceneItemId)
-        ?.setVisibility(true),
-    down: sceneItemId =>
-      getScenesService()
-        .views.getSceneItem(sceneItemId)
-        ?.setVisibility(false),
+    up: sceneItemId => getScenesService().views.getSceneItem(sceneItemId)?.setVisibility(true),
+    down: sceneItemId => getScenesService().views.getSceneItem(sceneItemId)?.setVisibility(false),
   },
 };
 
@@ -495,6 +478,24 @@ export class HotkeysService extends StatefulService<IHotkeysServiceState> {
 
   getHotkey(obj: IHotkey): Hotkey {
     return new Hotkey(obj);
+  }
+
+  // Only works for general hotkeys for now
+  getGeneralHotkeyByName(name: string) {
+    return this.getHotkeysSet().general.find(hotkey => hotkey.actionName === name);
+  }
+
+  // Only works for general hotkeys for now
+  applyGeneralHotkey(hotkey: IHotkey) {
+    const set = this.getHotkeysSet();
+    console.log(set);
+    set.general.forEach(h => {
+      if (h.actionName === hotkey.actionName) {
+        h.bindings = hotkey.bindings;
+      }
+    });
+    this.applyHotkeySet(set);
+    console.log(set);
   }
 
   getHotkeys(): Hotkey[] {

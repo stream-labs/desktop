@@ -1,4 +1,3 @@
-import { remote } from 'electron';
 import { Component } from 'vue-property-decorator';
 import TsxComponent, { createProps } from 'components/tsx-component';
 import { $t } from 'services/i18n';
@@ -19,12 +18,9 @@ export default class PrimeExpiration extends TsxComponent<OnboardingStepProps> {
   async handlePrimeResubscribe() {
     this.usageStatisticsService.recordClick('PrimeExpiration', 'resubscribe-button');
     try {
-      const link = await this.magicLinkService.getDashboardMagicLink('prime', 'slobs_themes_resub');
-      remote.shell.openExternal(link);
+      this.magicLinkService.linkToPrime('slobs_themes_resub');
       this.navigationService.navigate('Studio');
-    } catch (e) {
-      console.error('Error generating dashboard magic link', e);
-    }
+    } catch (e: unknown) {}
   }
 
   leavePage() {

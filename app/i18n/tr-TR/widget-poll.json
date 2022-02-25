@@ -1,0 +1,21 @@
+{
+  "Poll": "Anket",
+  "Let your viewers vote on a result": "İzleyicilerinizin bir sonuca oy vermesine izin verin",
+  "Bar Settings": "Çubuk Ayarları",
+  "Manage Poll": "Anketi Yönet",
+  "Poll Type": "Anket Türü",
+  "Show Closed Poll": "Kapalı Anketi Göster",
+  "Show/hide poll widget on closed poll": "Kapalı ankette anket görsel bileşenini göster/gizle",
+  "Primary Background Color": "Birincil Arka Plan Rengi",
+  "Secondary Background Color": "İkincil Arka Plan Rengi",
+  "Hide wigdet after X seconds of event": "Olayın X saniyesinden sonra görsel bileşeni gizle",
+  "Header Text Color": "Başlık Metni Rengi",
+  "Option Text Color": "Seçenek Metni Rengi",
+  "Title Font Size": "Başlık Yazı Tipi Boyutu",
+  "Option Font Size": "Seçenek Yazı Tipi Boyutu",
+  "Title Font Weight": "Başlık Yazı Tipi Ağırlığı",
+  "Option Font Weight": "Seçenek Yazı Tipi Ağırlığı",
+  "Thin Bar": "İnce Çubuk",
+  "Display thin/thick Bar": "İnce/Kalın Çubuğu Görüntüle",
+  "You need to re-login to access Twitch chat polls": "Twitch sohbet anketlerine erişmek için yeniden oturum açmanız gerekir"
+}

@@ -3,12 +3,12 @@ import { PersistentStatefulService } from 'services/core/persistent-stateful-ser
 import { Inject } from 'services/core/injector';
 import { authorizedHeaders, jfetch } from 'util/requests';
 import { mutation, ViewHandler } from 'services/core/stateful-service';
-import electron from 'electron';
 import { HostsService } from 'services/hosts';
 import { UserService } from 'services/user';
 import { $t, I18nService } from 'services/i18n';
 import uuid from 'uuid/v4';
 import { throwStreamError } from '../streaming/stream-error';
+import * as remote from '@electron/remote';
 
 interface ITwitterServiceState {
   linked: boolean;
@@ -40,7 +40,7 @@ export class TwitterService extends PersistentStatefulService<ITwitterServiceSta
     creatorSiteOnboardingComplete: false,
     creatorSiteUrl: '',
     screenName: '',
-    tweetWhenGoingLive: true,
+    tweetWhenGoingLive: false,
   };
 
   init() {
@@ -56,7 +56,6 @@ export class TwitterService extends PersistentStatefulService<ITwitterServiceSta
   SET_TWITTER_STATUS(status: ITwitterStatusResponse) {
     this.state.linked = status.linked;
     this.state.prime = status.prime;
-    this.state.creatorSiteOnboardingComplete = status.cs_onboarding_complete;
     this.state.creatorSiteUrl = status.cs_url;
     this.state.screenName = status.screen_name;
   }
@@ -67,13 +66,18 @@ export class TwitterService extends PersistentStatefulService<ITwitterServiceSta
   }
 
   @mutation()
+  SET_STREAMLABS_URL(value: boolean) {
+    this.state.creatorSiteOnboardingComplete = value;
+  }
+
+  @mutation()
   RESET_TWITTER_STATUS() {
     this.state.linked = false;
     this.state.prime = false;
     this.state.creatorSiteOnboardingComplete = false;
     this.state.creatorSiteUrl = '';
     this.state.screenName = '';
-    this.state.tweetWhenGoingLive = true;
+    this.state.tweetWhenGoingLive = false;
   }
 
   setTweetPreference(preference: boolean) {
@@ -93,7 +97,7 @@ export class TwitterService extends PersistentStatefulService<ITwitterServiceSta
   }
 
   async unlinkTwitter() {
-    this.SET_TWEET_PREFERENCE(false);
+    this.RESET_TWITTER_STATUS();
     const host = this.hostsService.streamlabs;
     const url = `https://${host}/api/v5/slobs/twitter/unlink`;
     const headers = authorizedHeaders(this.userService.apiToken);
@@ -101,6 +105,10 @@ export class TwitterService extends PersistentStatefulService<ITwitterServiceSta
     return jfetch(request).catch(() => {
       console.warn('Error unlinking Twitter');
     });
+  }
+
+  setStreamlabsUrl(value: boolean) {
+    this.SET_STREAMLABS_URL(value);
   }
 
   async fetchTwitterStatus() {
@@ -124,7 +132,7 @@ export class TwitterService extends PersistentStatefulService<ITwitterServiceSta
       body: JSON.stringify({ tweet }),
     });
     return jfetch(request).catch(e =>
-      throwStreamError('TWEET_FAILED', e.result?.error || $t('Could not connect to Twitter')),
+      throwStreamError('TWEET_FAILED', e, e.result?.error || $t('Could not connect to Twitter')),
     );
   }
 
@@ -134,7 +142,7 @@ export class TwitterService extends PersistentStatefulService<ITwitterServiceSta
     this.authWindowOpen = true;
     const partition = `persist:${uuid()}`;
 
-    const twitterWindow = new electron.remote.BrowserWindow({
+    const twitterWindow = new remote.BrowserWindow({
       width: 600,
       height: 800,
       alwaysOnTop: false,

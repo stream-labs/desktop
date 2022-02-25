@@ -1,0 +1,145 @@
+@import "../../styles/index.less";
+
+.container {
+  height: 100%;
+
+  @media (max-width: 1200px) {
+    :global(.performance-metric-icon) {
+      display: inline-block !important;
+    }
+  }
+
+  :global(.performance-metric-wrapper) {
+    background-color: var(--section-alt);
+    padding: 10px;
+    margin-right: 2px;
+    flex-grow: 1;
+
+    &:hover {
+      cursor: pointer;
+    }
+  }
+
+  :global(.performance-metric-wrapper):global(.active) {
+    background: var(--button);
+  }
+
+  :global(.performance-metric-wrapper)::before {
+    content: '' !important;
+    padding: 0;
+    padding-right: 1px;
+  }
+}
+
+.section {
+  margin-top: 40px;
+}
+
+.description {
+  margin-top: 20px;
+}
+
+.status {
+  padding: 10px 10px;
+  text-align: center;
+  margin-bottom: 20px;
+  background: var(--border);
+  .radius(1);
+
+  span {
+    margin-left: 5px;
+  }
+}
+
+.error {
+  background: var(--red-semi);
+  color: var(--warning);
+}
+
+.warning {
+  background-color: var(--info-semi);
+  color: var(--info);
+}
+
+.error-text {
+  color: var(--warning);
+}
+
+.warning-text {
+  color: var(--info);
+}
+
+.success {
+  background-color: var(--teal-semi);
+  color: var(--teal);
+}
+
+.notification:nth-child(even) {
+  background: var(--background);
+}
+
+.notification-container {
+  max-height: 108px;
+}
+
+.notification-empty {
+  color: var(--paragraph);
+  padding: 5px 10px;
+  margin-bottom: 5px;
+  text-align: center;
+  background: var(--border);
+  .radius(1);
+}
+
+.notification {
+  color: var(--icon);
+  padding: 5px 10px;
+  margin-bottom: 5px;
+  display: grid;
+  grid-template-columns: 30px 1fr 130px;
+  background: var(--border);
+  .radius(1);
+
+  &.has-action:hover {
+    color: var(--title);
+    background: var(--section);
+    cursor: pointer;
+  }
+
+  &:last-child {
+    margin-bottom: 20px;
+  }
+
+  .fa-warning {
+    color: var(--warning);
+  }
+
+  .date {
+    text-align: right;
+  }
+}
+
+.stats-row {
+  display: flex;
+  width: 100%;
+  height: 50px;
+  align-items: center;
+
+  :global(.performance-metrics) {
+    flex-grow: 1;
+  }
+
+  :global(.global-sync-status) {
+    width: 50px;
+    background-color: var(--section-alt);
+    height: 41px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  :global(.global-sync-status)::before {
+    content: '' !important;
+    padding: 0;
+  }
+}

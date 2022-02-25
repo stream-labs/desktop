@@ -58,7 +58,7 @@ export default class WidgetSettings<
       this.lastSuccessfullySavedWData = cloneDeep(this.wData);
       this.requestState = 'success';
       this.afterFetch();
-    } catch (e) {
+    } catch (e: unknown) {
       this.requestState = 'fail';
     }
   }
@@ -97,8 +97,9 @@ export default class WidgetSettings<
     try {
       await this.service.saveSettings(this.wData.settings);
       this.requestState = 'success';
-    } catch (e) {
-      const errorMessage = e && e.message ? e.message : $t('Save failed, something went wrong.');
+    } catch (e: unknown) {
+      const errorMessage =
+        e && e['message'] ? e['message'] : $t('Save failed, something went wrong.');
       this.dataUpdatedHandler(this.lastSuccessfullySavedWData);
       this.requestState = 'fail';
       this.failHandler(errorMessage);

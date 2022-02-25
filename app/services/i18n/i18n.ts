@@ -1,4 +1,3 @@
-import electron from 'electron';
 import VueI18n from 'vue-i18n';
 import { PersistentStatefulService } from '../core/persistent-stateful-service';
 import { mutation } from 'services/core/stateful-service';
@@ -11,9 +10,11 @@ import * as fs from 'fs';
 import path from 'path';
 import Utils from '../utils';
 import fallback from '../../i18n/fallback';
+import * as remote from '@electron/remote';
 
 interface II18nState {
   locale: string;
+  localeList: { value: string; label: string }[];
 }
 
 /**
@@ -60,7 +61,7 @@ const LANG_CODE_MAP: Dictionary<{ lang: string; locale: string }> = {
   'zh-CN': { lang: 'Chinese (Simplified)', locale: 'zh-CN' },
 };
 
-const WHITE_LIST = [
+export const WHITE_LIST = [
   'en-US',
   'ru-RU',
   'zh-TW',
@@ -81,6 +82,7 @@ const WHITE_LIST = [
 export class I18nService extends PersistentStatefulService<II18nState> implements I18nServiceApi {
   static defaultState: II18nState = {
     locale: '',
+    localeList: [],
   };
 
   static vueI18nInstance: VueI18n;
@@ -149,7 +151,7 @@ export class I18nService extends PersistentStatefulService<II18nState> implement
     // if locale is not set than use electron's one
     let locale = this.state.locale;
     if (!locale) {
-      const electronLocale = electron.remote.app.getLocale();
+      const electronLocale = remote.app.getLocale();
       const langDescription = LANG_CODE_MAP[electronLocale];
       locale = langDescription ? langDescription.locale : 'en-US';
     }
@@ -173,6 +175,14 @@ export class I18nService extends PersistentStatefulService<II18nState> implement
 
     this.SET_LOCALE(locale);
 
+    const localeList = Object.keys(this.availableLocales).map(locale => {
+      return {
+        value: locale,
+        label: this.availableLocales[locale],
+      };
+    });
+    this.SET_LOCALE_LIST(localeList);
+
     I18nService.uploadTranslationsToVueI18n();
     this.isLoaded = true;
   }
@@ -187,33 +197,12 @@ export class I18nService extends PersistentStatefulService<II18nState> implement
 
   setLocale(locale: string) {
     this.SET_LOCALE(locale);
-    electron.remote.app.relaunch({ args: [] });
-    electron.remote.app.quit();
-  }
-
-  getLocaleFormData(): TObsFormData {
-    const options = Object.keys(this.availableLocales).map(locale => {
-      return {
-        value: locale,
-        description: this.availableLocales[locale],
-      };
-    });
-
-    return [
-      <IObsListInput<string>>{
-        options,
-        type: 'OBS_PROPERTY_LIST',
-        name: 'locale',
-        description: $t('Language'),
-        value: this.state.locale,
-        enabled: true,
-        visible: true,
-      },
-    ];
+    remote.app.relaunch({ args: [] });
+    remote.app.quit();
   }
 
   private getI18nPath() {
-    return path.join(electron.remote.app.getAppPath(), 'app/i18n');
+    return path.join(remote.app.getAppPath(), 'app/i18n');
   }
 
   private loadDictionary(locale: string): Dictionary<string> {
@@ -238,7 +227,7 @@ export class I18nService extends PersistentStatefulService<II18nState> implement
       let json: Dictionary<string>;
       try {
         json = JSON.parse(this.fileManagerService.read(filePath));
-      } catch (e) {
+      } catch (e: unknown) {
         throw new Error(`Invalid JSON in ${filePath}`);
       }
       Object.assign(dictionary, json);
@@ -255,5 +244,10 @@ export class I18nService extends PersistentStatefulService<II18nState> implement
   @mutation()
   private SET_LOCALE(locale: string) {
     this.state.locale = locale;
+  }
+
+  @mutation()
+  private SET_LOCALE_LIST(list: II18nState['localeList']) {
+    this.state.localeList = list;
   }
 }

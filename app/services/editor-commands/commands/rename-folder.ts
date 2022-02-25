@@ -23,9 +23,6 @@ export class RenameFolderCommand extends Command {
   }
 
   rollback() {
-    this.scenesService.views
-      .getScene(this.sceneId)
-      .getFolder(this.folderId)
-      .setName(this.oldName);
+    this.scenesService.views.getScene(this.sceneId).getFolder(this.folderId).setName(this.oldName);
   }
 }

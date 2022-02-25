@@ -12,13 +12,17 @@ import { lazyModule } from 'util/lazy-module';
 import { GuestApiHandler } from 'util/guest-api-handler';
 import { BehaviorSubject } from 'rxjs';
 import { IBrowserViewTransform } from './api/modules/module';
+import uuid from 'uuid/v4';
+import * as remote from '@electron/remote';
 
 interface IContainerInfo {
+  id: string;
   appId: string;
   slot: EAppPageSlot;
   persistent: boolean;
   container: electron.BrowserView;
   transform: BehaviorSubject<IBrowserViewTransform>;
+  mountedWindows: number[];
 }
 
 /**
@@ -91,7 +95,7 @@ export class PlatformContainerManager {
   unregisterApp(app: ILoadedApp) {
     this.containers.forEach(cont => {
       if (cont.appId === app.id) {
-        this.destroyContainer(cont.container.id);
+        this.destroyContainer(cont.id);
       }
     });
   }
@@ -103,10 +107,11 @@ export class PlatformContainerManager {
     slobsWindowId: string,
   ) {
     const containerInfo = this.getContainerInfoForSlot(app, slot);
-    const win = electron.remote.BrowserWindow.fromId(electronWindowId);
+    const win = remote.BrowserWindow.fromId(electronWindowId);
 
-    // This method was added in our fork
-    (win as any).addBrowserView(containerInfo.container);
+    win.addBrowserView(containerInfo.container);
+
+    containerInfo.mountedWindows.push(electronWindowId);
 
     containerInfo.transform.next({
       ...containerInfo.transform.getValue(),
@@ -115,11 +120,11 @@ export class PlatformContainerManager {
       mounted: true,
     });
 
-    return containerInfo.container.id;
+    return containerInfo.id;
   }
 
-  setContainerBounds(containerId: number, pos: IVec2, size: IVec2) {
-    const info = this.containers.find(cont => cont.container.id === containerId);
+  setContainerBounds(containerId: string, pos: IVec2, size: IVec2) {
+    const info = this.containers.find(cont => cont.id === containerId);
 
     if (!info) return;
 
@@ -137,16 +142,17 @@ export class PlatformContainerManager {
     });
   }
 
-  unmountContainer(containerId: number, electronWindowId: number) {
-    const info = this.containers.find(cont => cont.container.id === containerId);
+  unmountContainer(containerId: string, electronWindowId: number) {
+    const info = this.containers.find(cont => cont.id === containerId);
 
     if (!info) return;
 
     const transform = info.transform.getValue();
 
-    const win = electron.remote.BrowserWindow.fromId(electronWindowId);
-    // This method was added in our fork
-    (win as any).removeBrowserView(info.container);
+    const win = remote.BrowserWindow.fromId(electronWindowId);
+    win.removeBrowserView(info.container);
+
+    info.mountedWindows = info.mountedWindows.filter(id => id !== electronWindowId);
 
     /* If these are different, it means that another window (likely the main)
      * already mounted this view first, so we don't need to do the following
@@ -186,17 +192,19 @@ export class PlatformContainerManager {
   }
 
   private createContainer(app: ILoadedApp, slot: EAppPageSlot, persistent = false): IContainerInfo {
-    const view = new electron.remote.BrowserView({
+    const view = new remote.BrowserView({
       webPreferences: {
         contextIsolation: true,
-        enableRemoteModule: true,
         nodeIntegration: false,
         partition: this.getAppPartition(app),
-        preload: path.resolve(electron.remote.app.getAppPath(), 'bundles', 'guest-api'),
+        preload: path.resolve(remote.app.getAppPath(), 'bundles', 'guest-api'),
       },
     });
 
+    electron.ipcRenderer.sendSync('webContents-enableRemote', view.webContents.id);
+
     const info: IContainerInfo = {
+      id: uuid(),
       slot,
       persistent,
       container: view,
@@ -208,6 +216,7 @@ export class PlatformContainerManager {
         electronWindowId: null,
         slobsWindowId: null,
       }),
+      mountedWindows: [],
     };
 
     if (app.unpacked) view.webContents.openDevTools();
@@ -236,17 +245,25 @@ export class PlatformContainerManager {
     return info;
   }
 
-  private destroyContainer(containerId: number) {
-    const info = this.containers.find(cont => cont.container.id === containerId);
+  private destroyContainer(containerId: string) {
+    const info = this.containers.find(cont => cont.id === containerId);
 
     if (!info) return;
 
     // Remove the container from the list of containers
-    this.containers = this.containers.filter(c => c.container.id !== containerId);
+    this.containers = this.containers.filter(c => c.id !== containerId);
 
-    // Electron types are incorrect here.  This method exists and is documented, but
-    // does not appear in the type definitions.
-    (info.container as any).destroy();
+    // Unmount from all windows first (prevents crashes)
+    info.mountedWindows.forEach(winId => {
+      const win = remote.BrowserWindow.fromId(winId);
+      if (win && !win.isDestroyed()) win.removeBrowserView(info.container);
+    });
+
+    // This method is undocumented, but it's the only way to force a
+    // browser view to immediately be destroyed.
+    // See: https://github.com/electron/electron/issues/26929
+    // @ts-ignore
+    info.container.webContents.destroy();
   }
 
   private getPageUrlForSlot(app: ILoadedApp, slot: EAppPageSlot) {
@@ -267,7 +284,7 @@ export class PlatformContainerManager {
     const partition = `platformApp-${app.id}-${userId}-${app.unpacked}`;
 
     if (!this.sessionsInitialized[partition]) {
-      const session = electron.remote.session.fromPartition(partition);
+      const session = remote.session.fromPartition(partition);
       const frameUrls: string[] = [];
       let mainFrame = '';
 
@@ -307,6 +324,9 @@ export class PlatformContainerManager {
             'www.google-analytics.com',
             'widget.intercom.io',
             'js.intercomcdn.com',
+            'cdn.heapanalytics.com',
+            'edge.fullstory.com',
+            'www.youtube.com',
           ];
 
           const parsed = url.parse(details.url);

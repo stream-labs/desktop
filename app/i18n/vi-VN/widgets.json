@@ -80,10 +80,6 @@
   "Twitch Bits": "Twitch Bits",
   "Twitch Subs": "Twitch Subs",
   "Twitch Resubs": "Twitch Resubs",
-  "Mixer Follows": "Mixer Follows",
-  "Mixer Subscriptions": "Mixer Subscriptions",
-  "Mixer Effects": "Mixer Effects",
-  "Mixer Stickers": "Mixer Stickers",
   "YouTube Subscriptions": "YouTube Subscriptions",
   "YouTube Memberships": "YouTube Memberships",
   "YouTube Super Chats": "YouTube Super Chats",
@@ -95,6 +91,7 @@
   "Facebook Shares": "Facebook Shares",
   "Facebook Stars": "Facebook Stars",
   "Facebook Supports": "Facebook Supports",
+  "Facebook Support Gifters": "Facebook Support Gifters",
   "Likes": "Likes",
   "Shares": "Shares",
   "Stars": "Stars",
@@ -182,5 +179,10 @@
   "Slide Out Left": "Slide Out Left",
   "Slide Out Right": "Slide Out Right",
   "Slide Out Up": "Slide Out Up",
-  "Pick Screen Color": "Pick Screen Color"
+  "Pick Screen Color": "Pick Screen Color",
+  "Play Alert": "Play Alert",
+  "Browser Settings": "Browser Settings",
+  "Custom Code": "Custom Code",
+  "font_family_tooltip": "Google Font để sử dụng cho văn bản. Truy cập vào https://fonts.google.com để tìm thêm. Phông chữ phổ biến: Open Sans, Roboto, Oswald, Lato, Droid Sans.",
+  "Something went wrong while applying settings": "Something went wrong while applying settings"
 }

@@ -39,5 +39,6 @@
   "Name Folder": "Ordner benennen",
   "Switch Scenes": "Szene wechseln",
   "Failed to load scene collection.  A new one will be created instead.": "Fehler beim Laden der Szenensammlung. Stattdessen wird eine neue erstellt.",
-  "New Scene": "Neue Szene"
+  "New Scene": "Neue Szene",
+  "Projector": "Projektor"
 }

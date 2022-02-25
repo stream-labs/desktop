@@ -9,6 +9,7 @@ import fs from 'fs';
 import util from 'util';
 import mime from 'mime';
 import path from 'path';
+import * as remote from '@electron/remote';
 
 interface IGuestApiRequest {
   id: string;
@@ -52,7 +53,7 @@ export interface IRequestHandler {
   };
 
   // eslint-disable-next-line no-eval
-  global.eval = function() {
+  global.eval = function () {
     throw new Error('Eval is disabled for security');
   };
 
@@ -68,7 +69,7 @@ export interface IRequestHandler {
     [requestId: string]: IRequest;
   } = {};
 
-  const webContentsId = electron.remote.getCurrentWebContents().id;
+  const webContentsId = remote.getCurrentWebContents().id;
 
   const {
     schema,
@@ -80,7 +81,7 @@ export interface IRequestHandler {
     ipcChannel: string;
   } = electron.ipcRenderer.sendSync('guestApi-getInfo');
 
-  const hostWebContents = electron.remote.webContents.fromId(hostWebContentsId);
+  const hostWebContents = remote.webContents.fromId(hostWebContentsId);
 
   electron.ipcRenderer.on('guestApiCallback', (event: any, response: IGuestApiCallback) => {
     // This window was likely reloaded and no longer cares about this callback.
@@ -123,7 +124,7 @@ export interface IRequestHandler {
       if (typeof schema[key] === 'object') {
         newApi[key] = getApi(schema[key] as IRequestHandlerSchema, path.concat([key]));
       } else {
-        newApi[key] = function(...args) {
+        newApi[key] = function (...args) {
           console.log(`You called ${path.join('.')}.${key}`);
 
           const requestId = uuid();

@@ -12,18 +12,18 @@
 @highlight-color: @prime-dark; // var(--accent)
 @warning-color: @prime-dark; // var(--info)
 @normal-color: @primedark-5; // var(--midtone)
-@disabled-color: fade(@primelight-4, 50%); // var(--paragraph) + opacity: 0.5
+@disabled-color: fade(@primelight-3, 50%); // var(--paragraph) + opacity: 0.5
 @disabled-bg: fade(@primedark-5, 50%); // var(--button) + opacity 0.5
 
 @primary-1: darken(@prime-dark, 4%); // var(--teal-hover)
 @primary-2: darken(@prime-dark, 4%); // var(--teal-hover)
-@primary-5: fade(@prime-dark, 8%); // var(--teal-semi)
-@primary-7: fade(@prime-dark, 8%); // var(--teal-semi)
+@primary-5: darken(@prime-dark, 4%); // var(--teal-hover)
+@primary-7: darken(@prime-dark, 4%); // var(--teal-hover)
 
-@text-color: @primelight-4; // var(--paragraph)
-@text-color-secondary: @primelight-4; // var(--paragraph)
-@text-color-dark: @primelight-4; // var(--paragraph)
-@text-color-secondary-dark: @primelight-4; // var(--paragraph)
+@text-color: @primelight-3; // var(--paragraph)
+@text-color-secondary: @primelight-3; // var(--paragraph)
+@text-color-dark: @primelight-3; // var(--paragraph)
+@text-color-secondary-dark: @primelight-3; // var(--paragraph)
 @icon-color: @prime-dark; // var(--icon)
 @icon-color-hover: @prime-dark; // var(--icon)
 @heading-color: @primelight-1; // var(--title)
@@ -33,7 +33,6 @@
 @popover-background: @primedark-3; // var(--background)
 @background-color-light: @primedark-3; // var(--background)
 @background-color-base: @primedark-3; // var(--background)
-@border-color-split: @primedark-4; // var(--border)
 
 @item-active-bg: darken(@primedark-4, 4%); // var(--dropdown-alt-bg)
 @item-hover-bg: darken(@primedark-4, 4%); // var(--dropdown-alt-bg)
@@ -42,7 +41,7 @@
 @link-hover-color: @primelight-1; // var(--title)
 @link-active-color: @primelight-1; // var(--title)
 
-@border-color-base: @primedark-4; // var(--border)
+@border-color-base:   @primelight-5; // var(--button)
 @border-color-split: @primedark-4; // var(--border)
 @border-color-inverse: @primedark-4; // var(--border)
 
@@ -55,14 +54,16 @@
 @btn-danger-color: @red-dark; // var(--warning)
 @btn-danger-bg: fade(@red-dark, 28%); // var(--warning-bg)
 @btn-text-hover-bg: transparent;
-@btn-default-bg: @primedark-5; // var(--button)
+@btn-default-bg: @primelight-5; // var(--button)
+
+@radio-button-hover-color: @primary-1;
 
 @checkbox-check-color: @primelight-1; // var(--title)
 
 @radio-dot-disabled-color: @primedark-3; // var(--background)
 @radio-disabled-button-checked-bg: @primedark-3; // var(--background)
 
-@select-multiple-item-disabled-color: @primelight-4; // var(--paragraph)
+@select-multiple-item-disabled-color: @primelight-3; // var(--paragraph)
 @select-item-selected-color: @white;
 
 @slider-rail-background-color: @prime-dark; // var(--slider-bg)
@@ -78,22 +79,22 @@
 @slider-dot-border-color-active: @primedark-4; // var(--border)
 
 // FORM
-@label-color: @primelight-4; // var(--paragraph)
-@input-placeholder-color: @primelight-4; // var(--paragraph)
-@input-number-handler-active-bg: @primelight-4; // var(--paragraph)
+@label-color: @primelight-3; // var(--paragraph)
+@input-placeholder-color: @primelight-3; // var(--paragraph)
+@input-number-handler-active-bg: @primelight-3; // var(--paragraph)
 @input-icon-hover-color: @prime-dark; // var(--icon)
 @input-disabled-color: @disabled-color;
 
 @layout-body-background: @primedark-3; // var(--background)
 @layout-header-background: @primedark-3; // var(--background)
 @layout-trigger-background: @primedark-3; // var(--background)
-@layout-trigger-color: @primelight-4; // var(--paragraph)
+@layout-trigger-color: @primelight-3; // var(--paragraph)
 @layout-sider-background-light: @primedark-3; // var(--background)
 @layout-trigger-background-light: @primedark-3; // var(--background)
 
 @divider-color: @primedark-4; // var(--border)
 
-@tooltip-color: @primelight-4; // var(--paragraph)
+@tooltip-color: @primelight-3; // var(--paragraph)
 @tooltip-bg: @primedark-2; // var(--section)
 @tooltip-arrow-width: 4px;
 
@@ -108,10 +109,10 @@
 @table-expanded-row-bg: @primedark-2; // var(--section)
 @table-header-filter-active-bg: @primedark-2; // var(--section)
 
-@picker-basic-cell-hover-with-range-color: fade(@prime-dark, 8%); // var(--teal-semi)
-@picker-date-hover-range-border-color: fade(@prime-dark, 8%); // var(--teal-semi)
+@picker-basic-cell-hover-with-range-color: darken(@prime-dark, 4%); // var(--teal-hover)
+@picker-date-hover-range-border-color: darken(@prime-dark, 4%); // var(--teal-hover)
 
-@comment-author-time-color: @primelight-4; // var(--paragraph)
+@comment-author-time-color: @primelight-3; // var(--paragraph)
 @comment-action-hover-color: @primedark-3; // var(--background)
 
 @back-top-color: @primelight-1; // var(--title)
@@ -135,6 +136,46 @@
 
 @border-radius-base: 4px;
 @font-family: 'Roboto', sans-serif;
+
+// Menu
+// ---
+//@menu-inline-toplevel-item-height: 40px;
+@menu-item-height: 48px;
+//@menu-item-group-height: @line-height-base;
+//@menu-collapsed-width: 80px;
+//@menu-bg: @component-background;
+//@menu-popup-bg: @component-background;
+//@menu-item-color: @text-color;
+//@menu-inline-submenu-bg: @background-color-light;
+@menu-highlight-color: @white;
+//@menu-highlight-danger-color: @error-color;
+@menu-item-active-bg: fade(@primary-1, 25%);
+//@menu-item-active-danger-bg: @red-1;
+@menu-item-active-border-width: 3px;
+//@menu-item-group-title-color: @text-color-secondary;
+@menu-item-vertical-margin: 0;
+//@menu-item-font-size: @font-size-base;
+@menu-item-boundary-margin: 0;
+//@menu-item-padding-horizontal: 20px;
+//@menu-item-padding: 0 @menu-item-padding-horizontal;
+//@menu-horizontal-line-height: 46px;
+//@menu-icon-margin-right: 10px;
+//@menu-icon-size: @menu-item-font-size;
+//@menu-icon-size-lg: @font-size-lg;
+//@menu-item-group-title-font-size: @menu-item-font-size;
+
+// dark theme menu
+//@menu-dark-color: @text-color-secondary-dark;
+//@menu-dark-danger-color: @error-color;
+@menu-dark-bg: @primedark-2; // var(--section);;
+//@menu-dark-arrow-color: #fff;
+//@menu-dark-inline-submenu-bg: #000c17;
+//@menu-dark-highlight-color: #fff;
+@menu-dark-item-active-bg: fade(@primary-1, 25%);
+//@menu-dark-item-active-danger-bg: @error-color;
+//@menu-dark-selected-item-icon-color: @white;
+//@menu-dark-selected-item-text-color: @white;
+@menu-dark-item-hover-bg: darken(@primedark-4, 4%); // var(--dropdown-alt-bg);
 
 // ADDITIONAL STYLES
 .ant-modal-footer {

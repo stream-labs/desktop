@@ -2,11 +2,11 @@ import { Service } from 'services/core/service';
 import { NotificationsService, ENotificationType } from 'services/notifications';
 import { Inject } from 'services/core/injector';
 import { JsonrpcService, IJsonRpcRequest } from 'services/api/jsonrpc';
-import electron from 'electron';
 import { UserService } from 'services/user';
 import { TPlatform } from 'services/platforms';
 import { InitAfter } from './core';
 import { jfetch } from 'util/requests';
+import * as remote from '@electron/remote';
 
 interface IOutageNotification {
   /**
@@ -78,7 +78,7 @@ export class OutageNotificationsService extends Service {
   }
 
   private openBrowserWindow(url: string) {
-    electron.remote.shell.openExternal(url);
+    remote.shell.openExternal(url);
   }
 
   private async checkForNotification() {
@@ -126,7 +126,7 @@ export class OutageNotificationsService extends Service {
 
     try {
       return await jfetch(req, { headers });
-    } catch (e) {
+    } catch (e: unknown) {
       return;
     }
   }

@@ -5,6 +5,7 @@ import defer from 'lodash/defer';
 import URI from 'urijs';
 import http from 'http';
 import Utils from 'services/utils';
+import * as remote from '@electron/remote';
 
 /**
  * Responsible for secure handling of platform OAuth flows.
@@ -20,11 +21,13 @@ export class AuthModule {
     authUrl: string,
     windowOptions: electron.BrowserWindowConstructorOptions,
     onWindowShow: () => void,
+    onWindowClose: () => void,
     merge = false,
   ): Promise<IUserAuth> {
     return new Promise<IUserAuth>(resolve => {
+      let completed = false;
       const partition = `persist:${uuid()}`;
-      const authWindow = new electron.remote.BrowserWindow({
+      const authWindow = new remote.BrowserWindow({
         ...windowOptions,
         alwaysOnTop: false,
         show: false,
@@ -40,6 +43,7 @@ export class AuthModule {
 
         if (parsed) {
           parsed.partition = partition;
+          completed = true;
           authWindow.close();
           resolve(parsed);
         }
@@ -48,6 +52,10 @@ export class AuthModule {
       authWindow.once('ready-to-show', () => {
         authWindow.show();
         defer(onWindowShow);
+      });
+
+      authWindow.on('close', () => {
+        if (!completed) onWindowClose();
       });
 
       authWindow.removeMenu();

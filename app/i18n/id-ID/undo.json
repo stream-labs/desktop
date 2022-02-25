@@ -1,6 +1,6 @@
 {
   "Add %{filterName}": "Tambahkan %{filterName}",
-  "Center %{sourceName}": "Pusatkan ${sourceName}",
+  "Center %{sourceName}": "Pusatkan %{sourceName}",
   "Paste %{nodeName}": "Rekatkan %{nodeName}",
   "Create a new connection": "Buat koneksi baru",
   "Create %{sourceName}": "Buat %{sourceName}",

@@ -31,7 +31,7 @@ export class AutoConfigService extends Service {
     try {
       const key = await service.fetchStreamKey();
       this.streamSettingsService.setSettings({ key, platform: 'twitch' });
-    } catch (e) {
+    } catch (e: unknown) {
       console.error('Failure fetching stream key for auto config');
       this.handleProgress({ event: 'error', description: 'error_fetching_stream_key' });
       return;

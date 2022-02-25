@@ -178,9 +178,7 @@ export default class AnimationInput extends BaseInput<string, IAnimationMetadata
       default:
         return {
           ...this.options,
-          options: textAnimations()
-            .concat(inAnimations())
-            .concat(outAnimations()),
+          options: textAnimations().concat(inAnimations()).concat(outAnimations()),
         };
     }
   }

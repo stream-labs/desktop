@@ -5,8 +5,8 @@
   "Generate new": "Générer un nouveau jeton",
   "Port": "Port",
   "IP addresses": "Adresses IP",
-  "You can now control Streamlabs OBS from your phone.": "Vous pouvez maintenant contrôler Streamlabs OBS depuis votre téléphone.",
-  "To begin, Scan this QR code with your phone.": "Pour commencer, scannez ce code QR à l'aide de votre téléphone.",
+  "You can now control Streamlabs from your phone.": "Vous pouvez maintenant contrôler Streamlabs depuis votre téléphone.",
+  "To begin, scan this QR code with your phone.": "Pour commencer, scannez ce code QR avec votre téléphone.",
   "This feature will only work with the most recent version of the Streamlabs mobile app.": "Cette fonctionnalité fonctionne uniquement avec la version la plus récente de l'application mobile Streamlabs.",
   "Click to show": "Cliquer pour afficher"
 }

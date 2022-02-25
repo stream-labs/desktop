@@ -30,6 +30,9 @@ export interface IAlertBoxData extends IWidgetData {
   tts_languages?: any[];
 }
 
+/**
+ * @deprecated
+ */
 @InheritMutations()
 export class AlertBoxService extends WidgetSettingsService<IAlertBoxData> {
   static initialState = WIDGET_INITIAL_STATE;
@@ -234,6 +237,9 @@ export class AlertBoxService extends WidgetSettingsService<IAlertBoxData> {
   private varifySetting(setting: any, type: string): IAlertBoxSetting {
     const { show_message, enabled, showResubMessage, ...rest } = setting;
     const variations = setting.variations || [];
+    variations.forEach((variation: IAlertBoxVariation) => {
+      variation.settings.duration = variation.settings.duration / 1000;
+    });
     const defaultVariation = this.reshapeVariation(rest, type);
     const idVariations = variations.map((variation: IAlertBoxVariation) => ({
       id: uuid(),
@@ -407,6 +413,13 @@ export class AlertBoxService extends WidgetSettingsService<IAlertBoxData> {
     };
   }
 
+  private multiplyVariationDuration(variations: IAlertBoxVariation[]) {
+    variations.forEach(variation => {
+      variation.settings.duration = variation.settings.duration * 1000;
+    });
+    return variations;
+  }
+
   private flattenSettings(settings: IAlertBoxSettings): IAlertBoxApiSettings {
     const settingsObj = {} as IAlertBoxApiSettings;
     Object.keys(settings).forEach(setting => {
@@ -414,7 +427,9 @@ export class AlertBoxService extends WidgetSettingsService<IAlertBoxData> {
       if (prefix && prefix !== 'resub') {
         const bitsPrefix = prefix === 'bit' ? 'bits' : prefix;
         const defaultVariation = settings[setting].variations.shift();
-        settingsObj[`${prefix}_variations`] = settings[setting].variations;
+        settingsObj[`${prefix}_variations`] = this.multiplyVariationDuration(
+          settings[setting].variations,
+        );
         settingsObj[`${bitsPrefix}_enabled`] = settings[setting].enabled;
         settingsObj[`show_${bitsPrefix}_message`] = settings[setting].showMessage;
         if (bitsPrefix === 'facebook_stars') {

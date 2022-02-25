@@ -9,8 +9,9 @@ import { EditorCommandsService } from 'services/editor-commands';
 import { E_AUDIO_CHANNELS, AudioService } from 'services/audio';
 import { getSharedResource } from 'util/get-shared-resource';
 import { PerformanceService, EStreamQuality } from './performance';
+import * as remote from '@electron/remote';
 
-const TB = electron.remote.TouchBar;
+const TB = remote.TouchBar;
 
 export class TouchBarService extends Service {
   @Inject() streamingService: StreamingService;
@@ -28,14 +29,16 @@ export class TouchBarService extends Service {
   micBar: electron.TouchBar;
   micSlider: electron.TouchBarSlider;
   micMute: electron.TouchBarButton;
-  micUnmutedIcon = electron.remote.nativeImage.createFromNamedImage(
-    'NSTouchBarAudioInputTemplate',
-    [0, 0, 1],
-  );
-  micMutedIcon = electron.remote.nativeImage.createFromNamedImage(
-    'NSTouchBarAudioInputMuteTemplate',
-    [0, 0, 1],
-  );
+  micUnmutedIcon = remote.nativeImage.createFromNamedImage('NSTouchBarAudioInputTemplate', [
+    0,
+    0,
+    1,
+  ]);
+  micMutedIcon = remote.nativeImage.createFromNamedImage('NSTouchBarAudioInputMuteTemplate', [
+    0,
+    0,
+    1,
+  ]);
 
   perfPopover: electron.TouchBarPopover;
   perfBar: electron.TouchBar;
@@ -189,11 +192,7 @@ export class TouchBarService extends Service {
     this.micBar = new TB({ items: [this.micSlider, this.micMute] });
     this.micPopover = new TB.TouchBarPopover({
       items: this.micBar,
-      icon: electron.remote.nativeImage.createFromNamedImage('NSTouchBarAudioInputTemplate', [
-        0,
-        0,
-        1,
-      ]),
+      icon: remote.nativeImage.createFromNamedImage('NSTouchBarAudioInputTemplate', [0, 0, 1]),
     });
 
     if (source) this.updateMicValues(source);
@@ -226,25 +225,25 @@ export class TouchBarService extends Service {
       ],
     });
 
-    const poorIcon = electron.remote.nativeImage.createFromPath(
+    const poorIcon = remote.nativeImage.createFromPath(
       getSharedResource('touchbar-icons/stats-red.png'),
     );
-    const fairIcon = electron.remote.nativeImage.createFromPath(
+    const fairIcon = remote.nativeImage.createFromPath(
       getSharedResource('touchbar-icons/stats-yellow.png'),
     );
-    const goodIcon = electron.remote.nativeImage.createFromPath(
+    const goodIcon = remote.nativeImage.createFromPath(
       getSharedResource('touchbar-icons/stats-green.png'),
     );
 
     this.perfPopover = new TB.TouchBarPopover({ items: this.perfBar, icon: goodIcon });
 
-    let status = this.performanceService.streamQuality;
+    let status = this.performanceService.views.streamQuality;
 
     setInterval(() => {
-      if (status !== this.performanceService.streamQuality) {
+      if (status !== this.performanceService.views.streamQuality) {
         // Update this as infrequently as possible, as electron is changing references underneath
         // and our stats stop updating until the popover is re-opened.
-        status = this.performanceService.streamQuality;
+        status = this.performanceService.views.streamQuality;
 
         if (status === EStreamQuality.POOR) {
           this.perfPopover.icon = poorIcon;
@@ -257,22 +256,22 @@ export class TouchBarService extends Service {
 
       this.cpuLabel.label = `CPU: ${this.performanceService.state.CPU.toFixed(1)}%`;
       this.fpsLabel.label = `FPS: ${this.performanceService.state.frameRate.toFixed(2)}`;
-      this.dfLabel.label = `Dropped Frames: ${this.performanceService.state.numberDroppedFrames}`;
-      this.brLabel.label = `Bitrate: ${this.performanceService.state.streamingBandwidth} kbps`;
+      this.dfLabel.label = `Dropped Frames: ${this.performanceService.state.numberDroppedFrames.toFixed(
+        0,
+      )}`;
+      this.brLabel.label = `Bitrate: ${this.performanceService.state.streamingBandwidth.toFixed(
+        0,
+      )} kbps`;
     }, 2000);
   }
 
   setupUndo() {
     this.undoButton = new TB.TouchBarButton({
-      icon: electron.remote.nativeImage.createFromPath(
-        getSharedResource('touchbar-icons/undo.png'),
-      ),
+      icon: remote.nativeImage.createFromPath(getSharedResource('touchbar-icons/undo.png')),
       click: () => this.editorCommandsService.undo(),
     });
     this.redoButton = new TB.TouchBarButton({
-      icon: electron.remote.nativeImage.createFromPath(
-        getSharedResource('touchbar-icons/redo.png'),
-      ),
+      icon: remote.nativeImage.createFromPath(getSharedResource('touchbar-icons/redo.png')),
       click: () => this.editorCommandsService.redo(),
     });
   }

@@ -1,8 +1,9 @@
 import electron, { ipcRenderer } from 'electron';
 import { Subscription } from 'rxjs';
 import { Inject, InitAfter } from 'services/core';
-import { LoginLifecycle, UserService } from 'services/user';
+import { UserService } from 'services/user';
 import { CustomizationService } from 'services/customization';
+import { enableBTTVEmotesScript } from 'services/chat';
 import { WindowsService } from '../windows';
 import { PersistentStatefulService } from 'services/core/persistent-stateful-service';
 import { mutation } from 'services/core/stateful-service';
@@ -10,8 +11,9 @@ import { $t } from 'services/i18n';
 import { getOS, OS } from 'util/operating-systems';
 import { StreamingService } from '../streaming';
 import { UsageStatisticsService } from 'services/usage-statistics';
+import * as remote from '@electron/remote';
 
-const { BrowserWindow } = electron.remote;
+const { BrowserWindow } = remote;
 
 interface IWindowProperties {
   chat: { position: IVec2; id: number; enabled: boolean };
@@ -96,7 +98,7 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
 
   initializeOverlay() {
     if (!this.state.isEnabled) return;
-    this.overlay = electron.remote.require('game-overlay');
+    this.overlay = remote.require('game_overlay');
 
     if (this.overlayRunning) return;
     this.overlayRunning = true;
@@ -104,7 +106,7 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
     let crashHandlerLogPath = '';
     if (process.env.NODE_ENV !== 'production' || !!process.env.SLOBS_PREVIEW) {
       const overlayLogFile = '\\game-overlays.log';
-      crashHandlerLogPath = electron.remote.app.getPath('userData') + overlayLogFile;
+      crashHandlerLogPath = remote.app.getPath('userData') + overlayLogFile;
     }
 
     this.overlay.start(crashHandlerLogPath);
@@ -117,7 +119,7 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
       width: 600,
       componentName: 'GameOverlayEventFeed',
       queryParams: { gameOverlay: true },
-      webPreferences: { offscreen: true, nodeIntegration: true, enableRemoteModule: true },
+      webPreferences: { offscreen: true, nodeIntegration: true, contextIsolation: false },
       isFullScreen: true,
     });
     this.windows.chat = new BrowserWindow({
@@ -154,7 +156,7 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
       ...this.commonWindowOptions,
       width: 600,
       transparent: true,
-      webPreferences: { offscreen: false, nodeIntegration: true, enableRemoteModule: true },
+      webPreferences: { offscreen: false, nodeIntegration: true, contextIsolation: false },
       isFullScreen: true,
       alwaysOnTop: true,
       componentName: 'OverlayPlaceholder',
@@ -165,7 +167,7 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
       ...this.commonWindowOptions,
       height: 600,
       transparent: true,
-      webPreferences: { offscreen: false, nodeIntegration: true, enableRemoteModule: true },
+      webPreferences: { offscreen: false, nodeIntegration: true, contextIsolation: false },
       isFullScreen: true,
       alwaysOnTop: true,
       componentName: 'OverlayPlaceholder',
@@ -213,7 +215,7 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
   determineStartPosition(window: string) {
     const pos = this.state.windowProperties[window].position;
     if (pos) {
-      const display = electron.remote.screen.getAllDisplays().find(display => {
+      const display = remote.screen.getAllDisplays().find(display => {
         const bounds = display.bounds;
         const intBounds = pos.x >= bounds.x && pos.y >= bounds.y;
         const extBounds = pos.x < bounds.x + bounds.width && pos.y < bounds.y + bounds.height;
@@ -285,7 +287,7 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
 
   async setEnabled(shouldEnable: boolean = true) {
     if (shouldEnable && !this.userService.isLoggedIn) {
-      return Promise.reject($t('Please log in to use the in-game overlay.'));
+      return Promise.reject();
     }
 
     const shouldStop = !shouldEnable && this.state.isEnabled;
@@ -381,6 +383,10 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
       this.overlay.setVisibility(overlayId, this.state.windowProperties[key].enabled);
 
       win.webContents.executeJavaScript(hideInteraction);
+      win.webContents.executeJavaScript(
+        enableBTTVEmotesScript(this.customizationService.isDarkTheme),
+        true,
+      );
 
       // We bind the paint callback in the main process to avoid a memory
       // leak in electron. This can be moved back to the renderer process

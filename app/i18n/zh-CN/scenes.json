@@ -17,7 +17,7 @@
   "Create Output Projector": "创建输出投影机",
   "Studio Mode": "工作室模式",
   "Are you sure you want to remove %{sceneName}?": "是否确定移除 %{sceneName}？",
-  "Are you sure you want to remove these %{count} items?": "是否确定移除这 %{count} 个项目？",
+  "Are you sure you want to remove these %{count} items?": "是否确定移除这 %{count}个项目？",
   "Disable Performance Mode": "禁用演出模式",
   "Scene Collections": "场景集",
   "The building blocks of your scene. Also contains widgets.": "场景的基础。包含小工具。",
@@ -39,5 +39,6 @@
   "Name Folder": "命名文件夹",
   "Switch Scenes": "切换场景",
   "Failed to load scene collection.  A new one will be created instead.": "无法加载场景集。将创建新场景集。",
-  "New Scene": "新建场景"
+  "New Scene": "新建场景",
+  "Projector": "投影机"
 }

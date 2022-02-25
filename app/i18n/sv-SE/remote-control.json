@@ -5,8 +5,8 @@
   "Generate new": "Generera ny",
   "Port": "Port",
   "IP addresses": "IP-adresser",
-  "You can now control Streamlabs OBS from your phone.": "Nu kan du styra Streamlabs OBS från telefonen.",
-  "To begin, Scan this QR code with your phone.": "För att börja, skanna den här QR-koden med din telefon.",
+  "You can now control Streamlabs from your phone.": "You can now control Streamlabs from your phone.",
+  "To begin, scan this QR code with your phone.": "To begin, scan this QR code with your phone.",
   "This feature will only work with the most recent version of the Streamlabs mobile app.": "Denna funktion fungerar endast med den senaste versionen av Streamlabs mobil app.",
   "Click to show": "Klicka för att Visa"
 }

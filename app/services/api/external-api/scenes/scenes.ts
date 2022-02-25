@@ -16,7 +16,8 @@ import { map } from 'rxjs/operators';
 import { SelectionService } from 'services/selection';
 
 /**
- * Api for scenes management
+ * API for scenes management. Contains operations like scene creation, switching
+ * and deletion and provides observables for scene events registration.
  */
 @Singleton()
 export class ScenesService {
@@ -51,18 +52,51 @@ export class ScenesService {
   }
 
   // convert internal models from events to external models
+  /**
+   * Observable event that is triggered whenever a new scene is added. The
+   * observed value is the newly added scene serialized as {@link ISceneModel}.
+   */
   sceneAdded = this.scenesService.sceneAdded.pipe(map(m => this.convertToExternalSceneModel(m)));
+
+  /**
+   * Observable event that is triggered whenever a scene is removed. The
+   * observed value is the scene that was removed serialized as
+   * {@link ISceneModel}.
+   */
   sceneRemoved = this.scenesService.sceneRemoved.pipe(
     map(m => this.convertToExternalSceneModel(m)),
   );
+
+  /**
+   * Observable event that is triggered whenever the scene is switched. The
+   * observed value is the scene that was switched to serialized as
+   * {@link ISceneModel}.
+   */
   sceneSwitched = this.scenesService.sceneSwitched.pipe(
     map(m => this.convertToExternalSceneModel(m)),
   );
+
+  /**
+   * Observable event that is triggered whenever a scene item is removed. The
+   * observed value is the the removed scene item serialized as
+   * {@link ISceneItemModel}.
+   */
   itemRemoved = this.scenesService.itemRemoved.pipe(
     map(m => this.convertToExternalSceneItemModel(m)),
   );
+
+  /**
+   * Observable event that is triggered whenever a new scene item is added. The
+   * observed value is the newly added scene item serialized as
+   * {@link ISceneItemModel}.
+   */
   itemAdded = this.scenesService.itemAdded.pipe(map(m => this.convertToExternalSceneItemModel(m)));
 
+  /**
+   * Observable event that is triggered whenever a scene item is updated. The
+   * observed value is the updated scene item serialized as
+   * {@link ISceneItemModel}.
+   */
   itemUpdated = (() => {
     const itemUpdated = new Subject<ISceneItemModel>();
 
@@ -82,6 +116,12 @@ export class ScenesService {
     return itemUpdated;
   })();
 
+  /**
+   * Returns the scene with the {@param id} provided.
+   *
+   * @param id The id of the scene to return
+   * @returns the scene with the {@param id}
+   */
   getScene(id: string): Scene {
     if (!this.scenesService.state.scenes[id]) return null;
     return new Scene(id);
@@ -95,29 +135,56 @@ export class ScenesService {
     return this.scenesService.views.scenes.map(scene => this.getScene(scene.id));
   }
 
-  getSceneNames() {
+  /**
+   * @returns A list with names of the available scenes.
+   */
+  getSceneNames(): string[] {
     return this.scenesService.views.scenes.map(scene => scene.name);
   }
 
+  /**
+   * Creates a new scene.
+   *
+   * @param name The name of the new scene
+   * @returns The newly created scene
+   */
   createScene(name: string): Scene {
     const scene = this.scenesService.createScene(name);
     return this.getScene(scene.id);
   }
 
+  /**
+   * Removes the scene with the {@param id}.
+   *
+   * @param id The id of the scene to remove
+   * @returns The scene that was removed
+   */
   removeScene(id: string): ISceneModel {
     const model = this.getScene(id).getModel();
     this.scenesService.removeScene(id);
     return model;
   }
 
+  /**
+   * Switches to the scene with the passed {@param id}.
+   *
+   * @param id The id of the scene to make active
+   * @returns `true` if successfully switched to the scene, `false` otherwise.
+   */
   makeSceneActive(id: string): boolean {
     return this.scenesService.makeSceneActive(id);
   }
 
+  /**
+   * Accessor for the currently active scene.
+   */
   get activeScene(): Scene {
     return this.getScene(this.activeSceneId);
   }
 
+  /**
+   * Accessor for the id of the currently active scene.
+   */
   get activeSceneId(): string {
     return this.scenesService.views.activeSceneId;
   }

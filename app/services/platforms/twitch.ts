@@ -8,12 +8,11 @@ import {
 } from '.';
 import { HostsService } from 'services/hosts';
 import { Inject } from 'services/core/injector';
-import { authorizedHeaders, handleResponse, jfetch } from 'util/requests';
+import { authorizedHeaders, jfetch } from 'util/requests';
 import { UserService } from 'services/user';
 import { getAllTags, getStreamTags, TTwitchTag, updateTags } from './twitch/tags';
 import { TTwitchOAuthScope } from './twitch/scopes';
 import { platformAuthorizedRequest, platformRequest } from './utils';
-import { StreamSettingsService } from 'services/settings/streaming';
 import { CustomizationService } from 'services/customization';
 import { assertIsDefined } from 'util/properties-type-guards';
 import { IGoLiveSettings } from 'services/streaming';
@@ -62,21 +61,23 @@ interface ITwitchOAuthValidateResponse {
 
 interface ITwitchServiceState extends IPlatformState {
   hasUpdateTagsPermission: boolean;
+  hasPollsPermission: boolean;
   availableTags: TTwitchTag[];
   settings: ITwitchStartStreamOptions;
 }
 
 @InheritMutations()
-export class TwitchService extends BasePlatformService<ITwitchServiceState>
+export class TwitchService
+  extends BasePlatformService<ITwitchServiceState>
   implements IPlatformService {
   @Inject() hostsService: HostsService;
-  @Inject() streamSettingsService: StreamSettingsService;
   @Inject() userService: UserService;
   @Inject() customizationService: CustomizationService;
 
   static initialState: ITwitchServiceState = {
     ...BasePlatformService.initialState,
     hasUpdateTagsPermission: false,
+    hasPollsPermission: false,
     availableTags: [],
     settings: {
       title: '',
@@ -97,6 +98,9 @@ export class TwitchService extends BasePlatformService<ITwitchServiceState>
     'tags',
     'game',
     'user-info',
+    'streamlabels',
+    'themes',
+    'viewerCount',
   ]);
 
   authWindowOptions: Electron.BrowserWindowConstructorOptions = {
@@ -110,7 +114,12 @@ export class TwitchService extends BasePlatformService<ITwitchServiceState>
   init() {
     // prepopulate data to make chat available after app start
     this.userService.userLogin.subscribe(_ => {
-      if (this.userService.platform?.type === 'twitch') this.prepopulateInfo();
+      if (this.userService.platform?.type === 'twitch') {
+        this.prepopulateInfo();
+
+        // Check for updated polls scopes
+        this.validatePollsScope();
+      }
     });
   }
 
@@ -220,12 +229,12 @@ export class TwitchService extends BasePlatformService<ITwitchServiceState>
   async requestTwitch<T = unknown>(reqInfo: IPlatformRequest | string): Promise<T> {
     try {
       return await platformAuthorizedRequest<T>('twitch', reqInfo);
-    } catch (e) {
-      const details = e.result
-        ? `${e.result.status} ${e.result.error} ${e.result.message}`
+    } catch (e: unknown) {
+      const details = (e as any).result
+        ? `${(e as any).result.status} ${(e as any).result.error} ${(e as any).result.message}`
         : 'Connection failed';
       let errorType: TStreamErrorType;
-      switch (e.result?.message) {
+      switch ((e as any).result?.message) {
         case 'missing required oauth scope':
           errorType = 'TWITCH_MISSED_OAUTH_SCOPE';
           break;
@@ -235,16 +244,14 @@ export class TwitchService extends BasePlatformService<ITwitchServiceState>
         default:
           errorType = 'PLATFORM_REQUEST_FAILED';
       }
-      throwStreamError(errorType, e, details);
+      throwStreamError(errorType, e as any, details);
     }
   }
 
-  private fetchRawChannelInfo(): Promise<ITWitchChannelResponse> {
-    return this.requestTwitch<ITWitchChannelResponse>(`${this.apiBase}/kraken/channel`);
-  }
-
   fetchStreamKey(): Promise<string> {
-    return this.fetchRawChannelInfo().then(json => json.stream_key);
+    return this.requestTwitch<{ data: { stream_key: string }[] }>(
+      `${this.apiBase}/helix/streams/key?broadcaster_id=${this.twitchId}`,
+    ).then(json => json.data[0].stream_key);
   }
 
   /**
@@ -252,9 +259,11 @@ export class TwitchService extends BasePlatformService<ITwitchServiceState>
    */
   async prepopulateInfo(): Promise<void> {
     const [channelInfo, hasUpdateTagsPermission] = await Promise.all([
-      this.fetchRawChannelInfo().then(json => ({
-        title: json.status,
-        game: json.game,
+      this.requestTwitch<{ data: { title: string; game_name: string }[] }>(
+        `${this.apiBase}/helix/channels?broadcaster_id=${this.twitchId}`,
+      ).then(json => ({
+        title: json.data[0].title,
+        game: json.data[0].game_name,
       })),
       this.getHasUpdateTagsPermission(),
     ]);
@@ -273,6 +282,11 @@ export class TwitchService extends BasePlatformService<ITwitchServiceState>
     this.state.hasUpdateTagsPermission = true;
   }
 
+  @mutation()
+  private SET_HAS_POLLS_PERMISSION(hasPollsPermission: boolean) {
+    this.state.hasPollsPermission = hasPollsPermission;
+  }
+
   fetchUserInfo() {
     return platformAuthorizedRequest<{ login: string }[]>(
       'twitch',
@@ -281,18 +295,30 @@ export class TwitchService extends BasePlatformService<ITwitchServiceState>
   }
 
   fetchViewerCount(): Promise<number> {
-    return platformRequest<{ stream?: { viewers: number } }>(
+    return platformAuthorizedRequest<{ data: { viewer_count: number }[] }>(
       'twitch',
-      `${this.apiBase}/kraken/streams/${this.twitchId}`,
-    ).then(json => (json.stream ? json.stream.viewers : 0));
+      `${this.apiBase}/helix/streams?user_id=${this.twitchId}`,
+    ).then(json => json.data[0]?.viewer_count ?? 0);
+  }
+
+  fetchFollowers(): Promise<number> {
+    return this.requestTwitch<{ total: number }>({
+      url: `${this.apiBase}/helix/users/follows?to_id=${this.twitchId}`,
+    }).then(json => json.total);
   }
 
   async putChannelInfo({ title, game, tags = [] }: ITwitchStartStreamOptions): Promise<void> {
+    let gameId;
+    if (game) {
+      gameId = await this.requestTwitch<{ data: { id: string }[] }>(
+        `${this.apiBase}/helix/games?name=${encodeURIComponent(game)}`,
+      ).then(json => json.data[0].id);
+    }
     await Promise.all([
       this.requestTwitch({
-        url: `${this.apiBase}/kraken/channels/${this.twitchId}`,
-        method: 'PUT',
-        body: JSON.stringify({ channel: { game, status: title } }),
+        url: `${this.apiBase}/helix/channels?broadcaster_id=${this.twitchId}`,
+        method: 'PATCH',
+        body: JSON.stringify({ game_id: gameId, title }),
       }),
       this.setStreamTags(tags),
     ]);
@@ -310,7 +336,7 @@ export class TwitchService extends BasePlatformService<ITwitchServiceState>
   async fetchGame(name: string): Promise<IGame> {
     const gamesResponse = await platformAuthorizedRequest<{
       data: { id: string; name: string; box_art_url: string }[];
-    }>('twitch', `${this.apiBase}/helix/games?name=${name}`);
+    }>('twitch', `${this.apiBase}/helix/games?name=${encodeURIComponent(name)}`);
     return gamesResponse.data.map(g => {
       const imageTemplate = g.box_art_url;
       const imageSize = this.gameImageSize;
@@ -350,6 +376,11 @@ export class TwitchService extends BasePlatformService<ITwitchServiceState>
     }
     assertIsDefined(this.twitchId);
     return updateTags()(tags)(this.twitchId);
+  }
+
+  async validatePollsScope() {
+    const hasPollsPermission = await this.hasScope('channel:manage:polls');
+    this.SET_HAS_POLLS_PERMISSION(hasPollsPermission);
   }
 
   hasScope(scope: TTwitchOAuthScope): Promise<boolean> {

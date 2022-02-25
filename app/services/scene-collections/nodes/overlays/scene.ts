@@ -1,8 +1,12 @@
 import { Node } from '../node';
 import { SceneItem } from 'services/scenes';
+import { Inject } from 'services/core';
+import { VideoService } from 'services/video';
 
 interface ISceneNodeSchema {
   sceneId: string;
+  width: number; // Exported base resolution width
+  height: number; // Exported base resolution height
 }
 
 interface IContext {
@@ -11,14 +15,28 @@ interface IContext {
 }
 
 export class SceneSourceNode extends Node<ISceneNodeSchema, IContext> {
-  schemaVersion = 1;
+  schemaVersion = 2;
+
+  @Inject() videoService: VideoService;
 
   async save(context: IContext) {
-    this.data = { sceneId: context.sceneItem.sourceId };
+    this.data = {
+      sceneId: context.sceneItem.sourceId,
+      width: this.videoService.baseWidth,
+      height: this.videoService.baseHeight,
+    };
   }
 
   async load(context: IContext) {
     const settings = { ...context.sceneItem.getObsInput().settings };
     context.sceneItem.getObsInput().update(settings);
+  }
+
+  migrate(version: number) {
+    if (version === 1) {
+      // Assume 1080p as that will almost always be right
+      this.data.width = 1920;
+      this.data.height = 1080;
+    }
   }
 }

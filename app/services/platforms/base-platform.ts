@@ -1,10 +1,18 @@
-import { Inject, mutation, StatefulService } from 'services/core';
-import { IPlatformState, TPlatform, TStartStreamOptions } from './index';
+import { ExecuteInCurrentWindow, Inject, mutation, StatefulService } from 'services/core';
+import {
+  EPlatformCallResult,
+  IPlatformState,
+  TPlatform,
+  TPlatformCapability,
+  TStartStreamOptions,
+  TPlatformCapabilityMap,
+} from './index';
 import { StreamingService } from 'services/streaming';
 import { UserService } from 'services/user';
 import { HostsService } from 'services/hosts';
-import electron from 'electron';
 import { IFacebookStartStreamOptions } from './facebook';
+import { StreamSettingsService } from '../settings/streaming';
+import * as remote from '@electron/remote';
 
 const VIEWER_COUNT_UPDATE_INTERVAL = 60 * 1000;
 
@@ -23,10 +31,14 @@ export abstract class BasePlatformService<T extends IPlatformState> extends Stat
   @Inject() protected streamingService: StreamingService;
   @Inject() protected userService: UserService;
   @Inject() protected hostsService: HostsService;
+  @Inject() protected streamSettingsService: StreamSettingsService;
   abstract readonly platform: TPlatform;
 
-  protected fetchViewerCount(): Promise<number> {
-    return Promise.reject('not implemented');
+  abstract capabilities: Set<TPlatformCapability>;
+
+  @ExecuteInCurrentWindow()
+  hasCapability<T extends TPlatformCapability>(capability: T): this is TPlatformCapabilityMap[T] {
+    return this.capabilities.has(capability);
   }
 
   get mergeUrl() {
@@ -35,16 +47,34 @@ export abstract class BasePlatformService<T extends IPlatformState> extends Stat
     return `https://${host}/slobs/merge/${token}/${this.platform}_account`;
   }
 
+  averageViewers: number;
+  peakViewers: number;
+  private nViewerSamples: number;
+
   async afterGoLive(): Promise<void> {
+    this.averageViewers = 0;
+    this.peakViewers = 0;
+    this.nViewerSamples = 0;
+
     // update viewers count
     const runInterval = async () => {
-      this.SET_VIEWERS_COUNT(await this.fetchViewerCount());
+      if (this.hasCapability('viewerCount')) {
+        const count = await this.fetchViewerCount();
+
+        this.nViewerSamples += 1;
+        this.averageViewers =
+          (this.averageViewers * (this.nViewerSamples - 1) + count) / this.nViewerSamples;
+        this.peakViewers = Math.max(this.peakViewers, count);
+
+        this.SET_VIEWERS_COUNT(count);
+      }
+
       // stop updating if streaming has stopped
       if (this.streamingService.views.isMidStreamMode) {
         setTimeout(runInterval, VIEWER_COUNT_UPDATE_INTERVAL);
       }
     };
-    await runInterval();
+    if (this.hasCapability('viewerCount')) await runInterval();
   }
 
   unlink() {
@@ -56,7 +86,7 @@ export abstract class BasePlatformService<T extends IPlatformState> extends Stat
     //   .then(handleResponse)
     //   .then(_ => this.userService.updateLinkedPlatforms());
 
-    electron.remote.shell.openExternal(
+    remote.shell.openExternal(
       `https://${this.hostsService.streamlabs}/dashboard#/settings/account-settings`,
     );
   }
@@ -74,6 +104,14 @@ export abstract class BasePlatformService<T extends IPlatformState> extends Stat
       },
       { deep: true },
     );
+  }
+
+  async validatePlatform() {
+    return EPlatformCallResult.Success;
+  }
+
+  fetchUserInfo() {
+    return Promise.resolve({});
   }
 
   @mutation()

@@ -13,6 +13,7 @@ import { Subject } from 'rxjs';
 import { isUrl } from '../util/requests';
 import { getOS, OS } from 'util/operating-systems';
 import { UsageStatisticsService } from './usage-statistics';
+import { SourcesService } from 'services/sources';
 
 export const TRANSITION_DURATION_MAX = 2_000_000_000;
 
@@ -90,6 +91,10 @@ class TransitionsViews extends ViewHandler<ITransitionsState> {
   getConnection(id: string) {
     return this.state.connections.find(conn => conn.id === id);
   }
+
+  get studioMode() {
+    return this.state.studioMode;
+  }
 }
 
 export class TransitionsService extends StatefulService<ITransitionsState> {
@@ -104,6 +109,7 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
   @Inject() scenesService: ScenesService;
   @Inject() sceneCollectionsService: SceneCollectionsService;
   @Inject() usageStatisticsService: UsageStatisticsService;
+  @Inject() sourcesService: SourcesService;
 
   get views() {
     return new TransitionsViews(this.state);
@@ -485,6 +491,25 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
     });
 
     return states;
+  }
+
+  /**
+   * Sets a single source to the global output.
+   * Useful for isolating the performance impact of a single source.
+   * WARNING: Only used by the Theme Audit system. Should
+   * never be used for real production systems and should never
+   * be done while live.
+   * @param sourceId the source id to inspect
+   */
+  inspectSource(sourceId: string) {
+    const source = this.sourcesService.views.getSource(sourceId);
+    if (!source) return;
+
+    obs.Global.setOutputSource(0, source.getObsInput());
+  }
+
+  cancelInspectSource() {
+    this.transition(null, this.scenesService.views.activeSceneId);
   }
 
   @mutation()

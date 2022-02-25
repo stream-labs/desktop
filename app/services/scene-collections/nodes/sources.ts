@@ -14,7 +14,7 @@ import { ScenesService } from 'services/scenes';
 import defaultTo from 'lodash/defaultTo';
 import { byOS, OS } from 'util/operating-systems';
 import { UsageStatisticsService } from 'services/usage-statistics';
-import { TSourceFilterType } from 'services/source-filters';
+import { SourceFiltersService, TSourceFilterType } from 'services/source-filters';
 
 interface ISchema {
   items: ISourceInfo[];
@@ -58,6 +58,7 @@ export class SourcesNode extends Node<ISchema, {}> {
   @Inject() private audioService: AudioService;
   @Inject() private scenesService: ScenesService;
   @Inject() private usageStatisticsService: UsageStatisticsService;
+  @Inject() private sourceFiltersService: SourceFiltersService;
 
   getItems() {
     const linkedSourcesIds = this.scenesService.views
@@ -190,6 +191,11 @@ export class SourcesNode extends Node<ISchema, {}> {
 
     // This shit is complicated, IPC sucks
     const sourceCreateData = supportedSources.map(source => {
+      // Universally disabled for security reasons
+      if (source.settings.is_media_flag) {
+        source.settings.is_media_flag = false;
+      }
+
       return {
         name: source.id,
         type: source.type,
@@ -197,18 +203,22 @@ export class SourcesNode extends Node<ISchema, {}> {
         settings: source.settings,
         volume: source.volume,
         syncOffset: source.syncOffset,
-        filters: source.filters.items.map(filter => {
-          if (filter.type === 'vst_filter') {
-            this.usageStatisticsService.recordFeatureUsage('VST');
-          }
+        filters: source.filters.items
+          .filter(filter => {
+            return filter.type !== 'face_mask_filter';
+          })
+          .map(filter => {
+            if (filter.type === 'vst_filter') {
+              this.usageStatisticsService.recordFeatureUsage('VST');
+            }
 
-          return {
-            name: filter.name,
-            type: filter.type,
-            settings: filter.settings,
-            enabled: filter.enabled === void 0 ? true : filter.enabled,
-          };
-        }),
+            return {
+              name: filter.name,
+              type: filter.type,
+              settings: filter.settings,
+              enabled: filter.enabled === void 0 ? true : filter.enabled,
+            };
+          }),
       };
     });
 
@@ -252,6 +262,18 @@ export class SourcesNode extends Node<ISchema, {}> {
       if (sourceInfo.hotkeys) {
         promises.push(supportedSources[index].hotkeys.load({ sourceId: sourceInfo.id }));
       }
+
+      this.sourceFiltersService.loadFilterData(
+        sourceInfo.id,
+        sourceInfo.filters.items.map(f => {
+          return {
+            name: f.name,
+            type: f.type,
+            visible: f.enabled,
+            settings: f.settings,
+          };
+        }),
+      );
     });
 
     return new Promise(resolve => {

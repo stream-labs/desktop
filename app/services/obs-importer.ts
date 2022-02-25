@@ -1,5 +1,5 @@
 import electron from 'electron';
-import { StatefulService } from 'services/core/stateful-service';
+import { StatefulService, ViewHandler } from 'services/core/stateful-service';
 import fs from 'fs';
 import path from 'path';
 import { ScenesService } from 'services/scenes';
@@ -17,6 +17,7 @@ import { AppService } from 'services/app';
 import { RunInLoadingMode } from 'services/app/app-decorators';
 import defaultTo from 'lodash/defaultTo';
 import { $t } from 'services/i18n';
+import * as remote from '@electron/remote';
 
 interface Source {
   name?: string;
@@ -79,6 +80,24 @@ interface IOBSConfigJSON {
   transition_duration: number;
 }
 
+class ObsImporterViews extends ViewHandler<{ progress: number; total: number }> {
+  get OBSconfigFileDirectory() {
+    return path.join(remote.app.getPath('appData'), 'obs-studio');
+  }
+
+  get sceneCollectionsDirectory() {
+    return path.join(this.OBSconfigFileDirectory, 'basic/scenes/');
+  }
+
+  get profilesDirectory() {
+    return path.join(this.OBSconfigFileDirectory, 'basic/profiles');
+  }
+
+  isOBSinstalled() {
+    return fs.existsSync(this.OBSconfigFileDirectory);
+  }
+}
+
 export class ObsImporterService extends StatefulService<{ progress: number; total: number }> {
   @Inject() scenesService: ScenesService;
   @Inject() sourcesService: SourcesService;
@@ -90,13 +109,17 @@ export class ObsImporterService extends StatefulService<{ progress: number; tota
   @Inject() settingsService: SettingsService;
   @Inject() appService: AppService;
 
+  get views() {
+    return new ObsImporterViews(this.state);
+  }
+
   @RunInLoadingMode()
   async import() {
     await this.load();
   }
 
   async load(selectedProfile?: string) {
-    if (!this.isOBSinstalled()) return;
+    if (!this.views.isOBSinstalled()) return;
     // Scene collections
     const collections = this.getSceneCollections();
     for (const collection of collections) {
@@ -107,7 +130,7 @@ export class ObsImporterService extends StatefulService<{ progress: number; tota
     if (selectedProfile) this.importProfile(selectedProfile);
 
     // Select current scene collection
-    const globalConfigFile = path.join(this.OBSconfigFileDirectory, 'global.ini');
+    const globalConfigFile = path.join(this.views.OBSconfigFileDirectory, 'global.ini');
 
     const data = fs.readFileSync(globalConfigFile).toString();
 
@@ -127,7 +150,10 @@ export class ObsImporterService extends StatefulService<{ progress: number; tota
   }
 
   private async importCollection(collection: ISceneCollection) {
-    const sceneCollectionPath = path.join(this.sceneCollectionsDirectory, collection.filename);
+    const sceneCollectionPath = path.join(
+      this.views.sceneCollectionsDirectory,
+      collection.filename,
+    );
     if (sceneCollectionPath.indexOf('.json') === -1) {
       return true;
     }
@@ -150,7 +176,7 @@ export class ObsImporterService extends StatefulService<{ progress: number; tota
   importFilters(filtersJSON: IOBSConfigFilter[], source: Source) {
     if (Array.isArray(filtersJSON)) {
       filtersJSON.forEach(filterJSON => {
-        const isFilterAvailable = this.filtersService.getTypes().find(availableFilter => {
+        const isFilterAvailable = this.filtersService.state.types.find(availableFilter => {
           return availableFilter.type === filterJSON.id;
         });
 
@@ -383,6 +409,8 @@ export class ObsImporterService extends StatefulService<{ progress: number; tota
           syncOffset: obsAudioSource.sync / 1000000,
           forceMono: !!(obsAudioSource.flags & obs.ESourceFlags.ForceMono),
         });
+
+        this.importFilters(obsAudioSource.filters, newSource);
       }
     });
   }
@@ -402,7 +430,7 @@ export class ObsImporterService extends StatefulService<{ progress: number; tota
   }
 
   importProfile(profile: string) {
-    const profileDirectory = path.join(this.profilesDirectory, profile);
+    const profileDirectory = path.join(this.views.profilesDirectory, profile);
     const files = fs.readdirSync(profileDirectory);
 
     files.forEach(file => {
@@ -419,10 +447,10 @@ export class ObsImporterService extends StatefulService<{ progress: number; tota
   }
 
   getSceneCollections(): ISceneCollection[] {
-    if (!this.isOBSinstalled()) return [];
-    if (!fs.existsSync(this.sceneCollectionsDirectory)) return [];
+    if (!this.views.isOBSinstalled()) return [];
+    if (!fs.existsSync(this.views.sceneCollectionsDirectory)) return [];
 
-    let files = fs.readdirSync(this.sceneCollectionsDirectory);
+    let files = fs.readdirSync(this.views.sceneCollectionsDirectory);
 
     files = files.filter(file => !file.match(/\.bak$/));
     return files.map(file => {
@@ -434,26 +462,10 @@ export class ObsImporterService extends StatefulService<{ progress: number; tota
   }
 
   getProfiles(): string[] {
-    if (!this.isOBSinstalled()) return [];
+    if (!this.views.isOBSinstalled()) return [];
 
-    let profiles = fs.readdirSync(this.profilesDirectory);
+    let profiles = fs.readdirSync(this.views.profilesDirectory);
     profiles = profiles.filter(profile => !profile.match(/\./));
     return profiles;
-  }
-
-  get OBSconfigFileDirectory() {
-    return path.join(electron.remote.app.getPath('appData'), 'obs-studio');
-  }
-
-  get sceneCollectionsDirectory() {
-    return path.join(this.OBSconfigFileDirectory, 'basic/scenes/');
-  }
-
-  get profilesDirectory() {
-    return path.join(this.OBSconfigFileDirectory, 'basic/profiles');
-  }
-
-  isOBSinstalled() {
-    return fs.existsSync(this.OBSconfigFileDirectory);
   }
 }

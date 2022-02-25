@@ -24,10 +24,13 @@ export default function Display(props: DisplayProps) {
     ...props,
   };
 
-  const v = useVuex(() => ({
-    paddingColor: CustomizationService.views.displayBackground,
-    baseResolution: VideoService.baseResolution,
-  }));
+  const v = useVuex(
+    () => ({
+      paddingColor: CustomizationService.views.displayBackground,
+      baseResolution: VideoService.baseResolution,
+    }),
+    false,
+  );
 
   const obsDisplay = useRef<OBSDisplay>();
   const displayEl = useRef<HTMLDivElement>(null);

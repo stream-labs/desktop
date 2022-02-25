@@ -25,6 +25,7 @@
   "Configure Default Devices": "Configure Default Devices",
   "OBS Import": "OBS Import",
   "Confirm stream title and game before going live": "Confirm stream title and game before going live",
+  "Enable reporting additional information on a crash (requires restart)": "Enable reporting additional information on a crash (requires restart)",
   "WARNING! You will lose all scenes, sources, and settings. This cannot be undone!": "WARNING! You will lose all scenes, sources, and settings. This cannot be undone!",
   "Your cache directory has been successfully uploaded.  The file name %{file} has been copied to your clipboard.": "Your cache directory has been successfully uploaded.  The file name %{file} has been copied to your clipboard.",
   "Stream Labels session has been successfully restarted!": "Stream Labels session has been successfully restarted!",
@@ -91,7 +92,7 @@
   "Streaming to %{platformName}": "Streaming to %{platformName}",
   "Stream to custom ingest": "Stream to custom ingest",
   "Use recommended settings": "Use recommended settings",
-  "Streaming to a custom ingest is advanced functionality. Some features of Streamlabs OBS may stop working as expected": "Streaming to a custom ingest is advanced functionality. Some features of Streamlabs OBS may stop working as expected",
+  "Streaming to a custom ingest is advanced functionality. Some features may stop working as expected": "Streaming to a custom ingest is advanced functionality. Some features may stop working as expected",
   "Disable hardware acceleration (requires restart)": "Disable hardware acceleration (requires restart)",
   "Deleting your cache directory will cause you to lose some settings. Do not delete your cache directory unless instructed to do so by a Streamlabs staff member.": "Deleting your cache directory will cause you to lose some settings. Do not delete your cache directory unless instructed to do so by a Streamlabs staff member.",
   "Reset Overlay Position": "Reset Overlay Position",
@@ -118,7 +119,7 @@
   "Stream Key": "Stream Key",
   "You can not change these settings when you're live": "You can not change these settings when you're live",
   "This feature is intended for overlay designers to export their work for our Theme Store. Not all sources will be exported, use at your own risk.": "This feature is intended for overlay designers to export their work for our Theme Store. Not all sources will be exported, use at your own risk.",
-  "Change the look of Streamlabs OBS with Prime": "Change the look of Streamlabs OBS with Prime",
+  "Change the look of Streamlabs Desktop with Prime": "Change the look of Streamlabs Desktop with Prime",
   "Virtual Webcam": "Virtual Webcam",
   "unlinked": "unlinked",
   "Unlink": "Unlink",
@@ -135,8 +136,9 @@
   "Virtual webcam is <status>Offline</status>": "Virtual webcam is <status>Offline</status>",
   "If the virtual webcam does not appear in other applications, you may need to restart your computer.": "If the virtual webcam does not appear in other applications, you may need to restart your computer.",
   "This is an experimental feature.": "This is an experimental feature.",
-  "Virtual Webcam allows you to display your scenes from Streamlabs OBS in video conferencing software. Streamlabs OBS will appear as a Webcam that can be selected in most video conferencing apps.": "Virtual Webcam allows you to display your scenes from Streamlabs OBS in video conferencing software. Streamlabs OBS will appear as a Webcam that can be selected in most video conferencing apps.",
+  "Virtual Webcam allows you to display your scenes from Streamlabs Desktop in video conferencing software. Streamlabs Desktop will appear as a Webcam that can be selected in most video conferencing apps.": "Virtual Webcam allows you to display your scenes from Streamlabs Desktop in video conferencing software. Streamlabs Desktop will appear as a Webcam that can be selected in most video conferencing apps.",
   "Uninstalling Virtual Webcam will remove it as a device option in other applications.": "Uninstalling Virtual Webcam will remove it as a device option in other applications.",
   "Uninstall Virtual Webcam": "Uninstall Virtual Webcam",
-  "Use custom resolution": "Use custom resolution"
+  "Use custom resolution": "Use custom resolution",
+  "Enable Designer Mode": "Enable Designer Mode"
 }

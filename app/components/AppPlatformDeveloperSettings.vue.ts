@@ -56,7 +56,7 @@ export default class AppPlatformDeveloperSettings extends Vue {
         this.appPathValue,
         this.appTokenValue,
       );
-    } catch (e) {
+    } catch (e: unknown) {
       this.error =
         'There was an error loading this app, please try again ' +
         'or contact the Streamlabs development team for assistance.';
@@ -71,7 +71,7 @@ export default class AppPlatformDeveloperSettings extends Vue {
 
     try {
       this.error = await this.platformAppsService.refreshApp(this.currentlyLoadedUnpackedApp.id);
-    } catch (e) {
+    } catch (e: unknown) {
       this.error =
         'There was an error loading this app, please try again ' +
         'or contact the Streamlabs development team for assistance.';

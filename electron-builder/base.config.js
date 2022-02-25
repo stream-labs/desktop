@@ -2,7 +2,7 @@ const signtool = require('signtool');
 
 const base = {
   appId: 'com.streamlabs.slobs',
-  productName: 'Streamlabs OBS',
+  productName: 'Streamlabs Desktop',
   icon: 'media/images/icon.ico',
   files: [
     'bundles',
@@ -35,7 +35,12 @@ const base = {
     url: 'https://slobs-cdn.streamlabs.com',
   },
   win: {
+    executableName: 'Streamlabs OBS',
     extraFiles: ['LICENSE', 'AGREEMENT', 'shared-resources/**/*', '!shared-resources/README'],
+    extraResources: [
+      'node_modules/ffmpeg-ffprobe-static/ffmpeg.exe',
+      'node_modules/ffmpeg-ffprobe-static/ffprobe.exe',
+    ],
     rfc3161TimeStampServer: 'http://timestamp.digicert.com',
     timeStampServer: 'http://timestamp.digicert.com',
     async sign(config) {
@@ -60,7 +65,24 @@ const base = {
     },
   },
   mac: {
-    extraFiles: ['shared-resources/**/*', '!shared-resources/README'],
+    extraFiles: [
+      'shared-resources/**/*',
+      '!shared-resources/README',
+      // {
+      //   "from": "node_modulesdwadawd/obs-studio-node/Frameworks/*",
+      //   "to": "Frameworks/",
+      //   "filter": ["**/*"]
+      // },
+      // {
+      //   "from": "node_modules/obs-studio-node/Frameworks/*",
+      //   "to": "Resources/app.asar.unpacked/node_modules/",
+      //   "filter": ["**/*"]
+      // }
+    ],
+    extraResources: [
+      'node_modules/ffmpeg-ffprobe-static/ffmpeg',
+      'node_modules/ffmpeg-ffprobe-static/ffprobe',
+    ],
     icon: 'media/images/icon-mac.icns',
     hardenedRuntime: true,
     entitlements: 'electron-builder/entitlements.plist',
@@ -76,25 +98,24 @@ const base = {
   },
   dmg: {
     background: 'media/images/dmg-bg.png',
-    iconSize: 100,
+    iconSize: 85,
     contents: [
       {
-        x: 112,
-        y: 165,
+        x: 130,
+        y: 208,
       },
       {
         type: 'link',
         path: '/Applications',
-        x: 396,
-        y: 165,
+        x: 380,
+        y: 208,
       },
     ],
   },
   extraMetadata: {
     env: 'production',
-    sentry_url_fe_dsn:process.env.SLOBS_SENTRY_URL_FE_DSN,
-    sentry_url_be_server:process.env.SLOBS_SENTRY_URL_BE_SERVER,
-    sentry_url_be_client:process.env.SLOBS_SENTRY_URL_BE_CLIENT,
+    sentryFrontendDSN: process.env.SLD_SENTRY_FRONTEND_DSN,
+    sentryBackendClientDSN: process.env.SLD_SENTRY_BACKEND_CLIENT_DSN,
   },
   afterPack: './electron-builder/afterPack.js',
   afterSign: './electron-builder/notarize.js',

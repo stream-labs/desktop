@@ -3,8 +3,7 @@ import { Component } from 'vue-property-decorator';
 import { Inject } from 'services/core';
 import { GameOverlayService } from 'services/game-overlay';
 import ModalLayout from '../ModalLayout.vue';
-import { Display } from 'components/shared/ReactComponent';
-import StartStreamingButton from '../StartStreamingButton.vue';
+import { Display, StartStreamingButton } from 'components/shared/ReactComponentList';
 import { StreamingService } from 'services/streaming';
 
 @Component({ components: { Display, ModalLayout, StartStreamingButton } })

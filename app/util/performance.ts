@@ -42,7 +42,7 @@ export function measure() {
   return (target: unknown, methodName: string, descriptor: PropertyDescriptor) => {
     const original = descriptor.value;
 
-    descriptor.value = function(...args: unknown[]) {
+    descriptor.value = function (...args: unknown[]) {
       const meas = new Measure(methodName);
       original.apply(this, args);
       meas.end();

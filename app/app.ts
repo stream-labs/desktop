@@ -1,5 +1,5 @@
 /*global SLOBS_BUNDLE_ID*/
-/*global SLOBS_SENTRY_URL_BE_SERVER, SLOBS_SENTRY_URL_BE_CLIENT, SLOBS_SENTRY_URL_FE_DSN*/
+/*global SLD_SENTRY_BACKEND_SERVER_DSN, SLD_SENTRY_FRONTEND_DSN*/
 
 import { I18nService, $t } from 'services/i18n';
 
@@ -33,39 +33,34 @@ import util from 'util';
 import uuid from 'uuid/v4';
 import Blank from 'components/windows/Blank.vue';
 import Main from 'components/windows/Main.vue';
-import CustomLoader from 'components/CustomLoader';
+import { Loader } from 'components/shared/ReactComponentList';
 import process from 'process';
 import { MetricsService } from 'services/metrics';
 import { UsageStatisticsService } from 'services/usage-statistics';
+import * as remote from '@electron/remote';
 
-const crashHandler = window['require']('crash-handler');
-
-const { ipcRenderer, remote, app, contentTracing } = electron;
+const { ipcRenderer } = electron;
 const slobsVersion = Utils.env.SLOBS_VERSION;
 const isProduction = Utils.env.NODE_ENV === 'production';
 const isPreview = !!Utils.env.SLOBS_PREVIEW;
 
-// Used by Eddy for debugging on mac.
-if (!isProduction) {
-  const windowId = Utils.getWindowId();
-  process.title = `SLOBS Renderer ${windowId}`;
-}
-
 if (isProduction) {
-  electron.crashReporter.start({
-    productName: 'streamlabs-obs',
-    companyName: 'streamlabs',
-    ignoreSystemCrashHandler: true,
-    submitURL: SLOBS_SENTRY_URL_BE_CLIENT,
-    extra: {
-      'sentry[release]': slobsVersion,
-      windowId: Utils.getWindowId(),
-    },
-  });
+  electron.crashReporter.addExtraParameter('windowId', Utils.getWindowId());
 }
 
 let usingSentry = false;
 const windowId = Utils.getWindowId();
+
+// TODO: Remove after 1.6.0
+const styleSheets = document.styleSheets;
+
+for (let i = 0; i < styleSheets.length; i++) {
+  const sheet = styleSheets[i];
+  if (sheet.href?.match(/foundation\.min\.css/)) {
+    sheet.disabled = true;
+    break;
+  }
+}
 
 function wrapLogFn(fn: string) {
   const old: Function = console[fn];
@@ -111,6 +106,13 @@ if (window['_startupErrorHandler']) {
   delete window['_startupErrorHandler'];
 }
 
+// Used by Eddy for debugging on mac.
+if (!isProduction) {
+  const windowId = Utils.getWindowId();
+  process.title = `SLOBS Renderer ${windowId}`;
+  console.log(`${windowId} - PID: ${process.pid}`);
+}
+
 if (isProduction || process.env.SLOBS_REPORT_TO_SENTRY) {
   const sampleRate = isPreview || process.env.SLOBS_REPORT_TO_SENTRY ? 1.0 : 0.1;
   const isSampled = Math.random() < sampleRate;
@@ -125,7 +127,7 @@ if (isProduction || process.env.SLOBS_REPORT_TO_SENTRY) {
   const bundleNames = electron.ipcRenderer.sendSync('getBundleNames', bundles);
 
   Sentry.init({
-    dsn: SLOBS_SENTRY_URL_FE_DSN,
+    dsn: SLD_SENTRY_URL_FE_DSN,
     release: `${slobsVersion}-${SLOBS_BUNDLE_ID}`,
     beforeSend: (event, hint) => {
       // Because our URLs are local files and not publicly
@@ -158,7 +160,7 @@ if (isProduction || process.env.SLOBS_REPORT_TO_SENTRY) {
         event.request.url = normalize(event.request.url);
       }
 
-      return isSampled ? event : null;
+      return isSampled || event.tags?.feature === 'highlighter' ? event : null;
     },
     integrations: [new Integrations.Vue({ Vue })],
   });
@@ -225,22 +227,31 @@ document.addEventListener('dragover', event => event.preventDefault());
 document.addEventListener('dragenter', event => event.preventDefault());
 document.addEventListener('drop', event => event.preventDefault());
 
+const ctxMenu = remote.Menu.buildFromTemplate([
+  { role: 'copy', accelerator: 'CommandOrControl+C' },
+  { role: 'paste', accelerator: 'CommandOrControl+V' },
+]);
+
+document.addEventListener('contextmenu', () => {
+  ctxMenu.popup();
+});
+
 export const apiInitErrorResultToMessage = (resultCode: obs.EVideoCodes) => {
   switch (resultCode) {
     case obs.EVideoCodes.NotSupported: {
-      return 'Failed to initialize OBS. Your video drivers may be out of date, or Streamlabs OBS may not be supported on your system.';
+      return 'Failed to initialize Streamlabs Desktop. Your video drivers may be out of date, or Streamlabs Desktop may not be supported on your system.';
     }
     case obs.EVideoCodes.ModuleNotFound: {
       return 'DirectX could not be found on your system. Please install the latest version of DirectX for your machine here <https://www.microsoft.com/en-us/download/details.aspx?id=35?> and try again.';
     }
     default: {
-      return 'An unknown error was encountered while initializing OBS.';
+      return 'An unknown error was encountered while initializing Streamlabs Desktop.';
     }
   }
 };
 
 const showDialog = (message: string): void => {
-  electron.remote.dialog.showErrorBox('Initialization Error', message);
+  remote.dialog.showErrorBox('Initialization Error', message);
 };
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -261,8 +272,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
   I18nService.setVuei18nInstance(i18n);
 
-  if (!Utils.isOneOffWindow()) {
-    crashHandler.registerProcess(process.pid, false);
+  // We don't register main/child windows in dev mode to allow refreshing
+  if (!Utils.isOneOffWindow() && !Utils.isDevMode()) {
+    ipcRenderer.send('register-in-crash-handler', { pid: process.pid, critical: false });
   }
 
   // The worker window can safely access services immediately
@@ -277,10 +289,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     window['obs'] = obs;
 
     // Host a new OBS server instance
-    obs.IPC.host(`slobs-${uuid()}`);
+    obs.IPC.host(remote.process.env.IPC_UUID);
     obs.NodeObs.SetWorkingDirectory(
       path.join(
-        electron.remote.app.getAppPath().replace('app.asar', 'app.asar.unpacked'),
+        remote.app.getAppPath().replace('app.asar', 'app.asar.unpacked'),
         'node_modules',
         'obs-studio-node',
       ),
@@ -291,15 +303,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     const apiResult = obs.NodeObs.OBS_API_initAPI(
       'en-US',
       appService.appDataDirectory,
-      electron.remote.process.env.SLOBS_VERSION,
-      SLOBS_SENTRY_URL_BE_SERVER,
+      remote.process.env.SLOBS_VERSION,
+      SLD_SENTRY_URL_BE_SERVER,
     );
 
     if (apiResult !== obs.EVideoCodes.Success) {
       const message = apiInitErrorResultToMessage(apiResult);
       showDialog(message);
 
-      crashHandler.unregisterProcess(process.pid);
+      ipcRenderer.send('unregister-in-crash-handler', { pid: process.pid });
 
       obs.NodeObs.InitShutdownSequence();
       obs.IPC.disconnect();
@@ -326,14 +338,31 @@ document.addEventListener('DOMContentLoaded', async () => {
     i18n,
     store,
     el: '#app',
-    render: h => {
+    data: { isRefreshing: false },
+    methods: {
+      // refresh current window
+      startWindowRefresh() {
+        // set isRefreshing to true to unmount all components and destroy Displays
+        this.isRefreshing = true;
+
+        // unregister current window from the crash handler
+        ipcRenderer.send('unregister-in-crash-handler', { pid: process.pid });
+
+        // give the window some time to finish unmounting before reload
+        Utils.sleep(100).then(() => {
+          window.location.reload();
+        });
+      },
+    },
+    render(h) {
+      if (this.isRefreshing) return h(Blank);
       if (windowId === 'worker') return h(Blank);
       if (windowId === 'child') {
         if (store.state.bulkLoadFinished && store.state.i18nReady) {
           return h(ChildWindow);
         }
 
-        return h(CustomLoader);
+        return h(Loader);
       }
       if (windowId === 'main') return h(Main);
       return h(OneOffWindow);
@@ -342,7 +371,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   let mainWindowShowTime = 0;
   if (Utils.isMainWindow()) {
-    electron.remote.getCurrentWindow().show();
+    remote.getCurrentWindow().show();
     mainWindowShowTime = Date.now();
   }
 
@@ -365,6 +394,13 @@ document.addEventListener('DOMContentLoaded', async () => {
       const ctx = userService.getSentryContext();
       if (ctx) setSentryContext(ctx);
       userService.sentryContext.subscribe(setSentryContext);
+    }
+
+    // allow to refresh the window by pressing `F5` in the DevMode
+    if (Utils.isDevMode()) {
+      window.addEventListener('keyup', ev => {
+        if (ev.key === 'F5') vm.startWindowRefresh();
+      });
     }
   });
 });

@@ -44,7 +44,7 @@ export default class ObsImport extends TsxComponent<ObsImportProps> {
         this.progress = 1;
         this.props.setProcessing(false);
         this.props.continue(true);
-      } catch (e) {
+      } catch (e: unknown) {
         this.$toasted.show($t('Something went wrong.'), {
           position: 'bottom-center',
           className: 'toast-alert',
@@ -148,7 +148,7 @@ export default class ObsImport extends TsxComponent<ObsImportProps> {
           <KevinSvg />
           <div>
             {$t(
-              'While we import your settings and scenes from OBS Studio, check out these great features unique to Streamlabs OBS',
+              'While we import your settings and scenes from OBS Studio, check out these great features unique to Streamlabs',
             )}
           </div>
         </div>

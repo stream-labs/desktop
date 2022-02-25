@@ -1,0 +1,50 @@
+@import '../../styles/index';
+
+.performance-metrics {
+  background: var(--section);
+  height: calc(100% - 30px);
+}
+
+.performance-metric-wrapper {
+  .padding-right();
+
+  color: var(--paragraph);
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+
+  &::before {
+    .padding-right();
+
+    content: '|';
+    opacity: 0.5;
+  }
+}
+
+.performance-metric-wrapper.clickable {
+  cursor: pointer;
+}
+
+.performance-metric {
+  vertical-align: middle;
+}
+
+.performance-metric-icon {
+  .margin-right();
+
+  height: 14px;
+  width: auto;
+  vertical-align: text-top;
+
+  @media (max-width: 1200px) {
+    display: none;
+  }
+
+  @media (max-width: 1300px) {
+    height: 12px;
+  }
+}
+
+.performance-metric__value {
+  .weight(@medium);
+}

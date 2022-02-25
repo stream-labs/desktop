@@ -5,13 +5,15 @@ import InputWrapper from './InputWrapper';
 import { SelectProps } from 'antd/lib/select';
 import { ICustomListProps, IListOption, renderOption } from './ListInput';
 import { TagProps } from 'antd/lib/tag';
-import { keyBy } from 'lodash';
+import keyBy from 'lodash/keyBy';
 import { $t } from '../../../services/i18n';
+import Message from '../Message';
 
 // select which features from the antd lib we are going to use
 const ANT_SELECT_FEATURES = ['showSearch', 'loading'] as const;
 
 interface ICustomTagsProps<TValue> extends ICustomListProps<SingleType<TValue>> {
+  max?: number;
   tagRender?: (
     tagProps: TagProps,
     tag: IListOption<SingleType<TValue>>,
@@ -25,8 +27,8 @@ export type TTagsInputProps<TValue> = TSlobsInputProps<
   ValuesOf<typeof ANT_SELECT_FEATURES>
 >;
 
-export const TagsInput = InputComponent(<T extends any>(p: TTagsInputProps<T>) => {
-  const { inputAttrs, wrapperAttrs } = useInput('tags', p);
+export const TagsInput = InputComponent(<T extends any[]>(p: TTagsInputProps<T>) => {
+  const { inputAttrs, wrapperAttrs, forceUpdate } = useInput('tags', p);
   const options = p.options;
   const tagsMap = useMemo(() => keyBy(options, 'value'), [options]);
 
@@ -38,6 +40,29 @@ export const TagsInput = InputComponent(<T extends any>(p: TTagsInputProps<T>) =
     return <Tag {...tagProps}>{tag.label}</Tag>;
   }
 
+  function dropdownRender(menu: JSX.Element) {
+    const maxTagsReached = p.max && (inputAttrs.value?.length ?? 0) >= p.max;
+    return (
+      <div>
+        {maxTagsReached && (
+          <Message type="warning">
+            {$t('You can only select up to %{max} items', { max: p.max })}
+          </Message>
+        )}
+        {menu}
+      </div>
+    );
+  }
+
+  function onChangeHandler(values: T) {
+    const max = p.max;
+    const count = values.length;
+    if (max && count > max) values.pop();
+    inputAttrs.onChange(values as any);
+  }
+
+  const displayValue = (inputAttrs.value || []).map((val: string) => tagsMap[val].label);
+
   return (
     <InputWrapper {...wrapperAttrs}>
       <Select
@@ -46,10 +71,13 @@ export const TagsInput = InputComponent(<T extends any>(p: TTagsInputProps<T>) =
         optionFilterProp={'label'}
         mode={'multiple'}
         allowClear
-        value={p.value as string | number}
-        onChange={val => inputAttrs.onChange(val as T)}
+        onChange={val => onChangeHandler((val as unknown) as T)}
         tagRender={renderTag}
         placeholder={$t('Start typing to search')}
+        dropdownRender={dropdownRender}
+        data-value={JSON.stringify(inputAttrs.value)}
+        data-display-value={JSON.stringify(displayValue)}
+        data-show-search={inputAttrs['showSearch']}
       >
         {options && options.map((opt, ind) => renderOption(opt, ind, p))}
       </Select>

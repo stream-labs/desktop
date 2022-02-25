@@ -8,6 +8,9 @@ import TsxComponent from 'components/tsx-component';
 import { OS } from 'util/operating-systems';
 import { $t } from './i18n';
 import { handleResponse } from 'util/requests';
+import { getPlatformService, IPlatformCapabilityResolutionPreset } from './platforms';
+import { OutputSettingsService } from './settings';
+import { ObsImporterService } from './obs-importer';
 
 enum EOnboardingSteps {
   MacPermissions = 'MacPermissions',
@@ -88,12 +91,12 @@ const ONBOARDING_STEPS = () => ({
 });
 
 const THEME_METADATA = {
-  1246: 'https://cdn.streamlabs.com/marketplace/overlays/7684923/ea91062/ea91062.overlay',
-  1248: 'https://cdn.streamlabs.com/marketplace/overlays/7684923/3205db0/3205db0.overlay',
-  668: 'https://cdn.streamlabs.com/marketplace/overlays/2116872/17f7cb5/17f7cb5.overlay',
-  1144: 'https://cdn.streamlabs.com/marketplace/overlays/7684923/dd96270/dd96270.overlay',
-  1100: 'https://cdn.streamlabs.com/marketplace/overlays/7684923/0d2e611/0d2e611.overlay',
-  1190: 'https://cdn.streamlabs.com/marketplace/overlays/8062844/4a0582e/4a0582e.overlay',
+  2560: 'https://cdn.streamlabs.com/marketplace/overlays/7684923/0a2acb8/0a2acb8.overlay',
+  2559: 'https://cdn.streamlabs.com/marketplace/overlays/7684923/6dcbf5f/6dcbf5f.overlay',
+  2624: 'https://cdn.streamlabs.com/marketplace/overlays/7684923/eeeb9e1/eeeb9e1.overlay',
+  2657: 'https://cdn.streamlabs.com/marketplace/overlays/7684923/0697cee/0697cee.overlay',
+  2656: 'https://cdn.streamlabs.com/marketplace/overlays/7684923/59acc9a/59acc9a.overlay',
+  2639: 'https://cdn.streamlabs.com/marketplace/overlays/7684923/a1a4ab0/a1a4ab0.overlay',
 };
 
 interface IOnboardingStep {
@@ -135,6 +138,7 @@ class OnboardingViews extends ViewHandler<IOnboardingServiceState> {
   get steps() {
     const steps: IOnboardingStep[] = [];
     const userViews = this.getServiceViews(UserService);
+    const isOBSinstalled = this.getServiceViews(ObsImporterService).isOBSinstalled();
 
     if (process.platform === OS.Mac) {
       steps.push(ONBOARDING_STEPS()[EOnboardingSteps.MacPermissions]);
@@ -146,15 +150,23 @@ class OnboardingViews extends ViewHandler<IOnboardingServiceState> {
       steps.push(ONBOARDING_STEPS()[EOnboardingSteps.Prime]);
     }
 
-    steps.push(ONBOARDING_STEPS()[EOnboardingSteps.ChooseYourAdventure]);
+    if (isOBSinstalled) {
+      steps.push(ONBOARDING_STEPS()[EOnboardingSteps.ChooseYourAdventure]);
+    }
 
-    if (this.state.importedFromObs) {
+    if (this.state.importedFromObs && isOBSinstalled) {
       steps.push(ONBOARDING_STEPS()[EOnboardingSteps.ObsImport]);
     } else {
       steps.push(ONBOARDING_STEPS()[EOnboardingSteps.HardwareSetup]);
     }
 
-    if (!this.state.existingSceneCollections && !this.state.importedFromObs) {
+    if (
+      !this.state.existingSceneCollections &&
+      !this.state.importedFromObs &&
+      ((userViews.isLoggedIn &&
+        getPlatformService(userViews.platform.type).hasCapability('themes')) ||
+        !userViews.isLoggedIn)
+    ) {
       steps.push(ONBOARDING_STEPS()[EOnboardingSteps.ThemeSelector]);
     }
 
@@ -185,6 +197,7 @@ export class OnboardingService extends StatefulService<IOnboardingServiceState> 
   @Inject() navigationService: NavigationService;
   @Inject() userService: UserService;
   @Inject() sceneCollectionsService: SceneCollectionsService;
+  @Inject() outputSettingsService: OutputSettingsService;
 
   @mutation()
   SET_OPTIONS(options: Partial<IOnboardingOptions>) {
@@ -257,6 +270,18 @@ export class OnboardingService extends StatefulService<IOnboardingServiceState> 
   // Ends the onboarding process
   finish() {
     localStorage.setItem(this.localStorageKey, 'true');
+
+    // setup a custom resolution if the platform requires that
+    const platformService = getPlatformService(this.userService.views.platform?.type);
+    if (platformService && platformService.hasCapability('resolutionPreset')) {
+      const { inputResolution, outputResolution } = platformService;
+      this.outputSettingsService.setSettings({
+        mode: 'Advanced',
+        inputResolution,
+        streaming: { outputResolution },
+      });
+    }
+
     this.navigationService.navigate('Studio');
   }
 

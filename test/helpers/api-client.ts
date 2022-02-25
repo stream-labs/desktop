@@ -122,7 +122,7 @@ export class ApiClient {
 
     const response = this.sendMessageSync(requestBody);
     const parsedResponse = JSON.parse(response.toString());
-    this.log(`Response Sync:`, parsedResponse);
+    this.log('Response Sync:', parsedResponse);
 
     if (parsedResponse.error) {
       throw parsedResponse.error;
@@ -324,7 +324,7 @@ export class ApiClient {
   }
 }
 
-export async function getClient() {
+export async function getApiClient() {
   if (!clientInstance) clientInstance = new ApiClient();
 
   if (clientInstance.getConnectionStatus() === 'disconnected') {

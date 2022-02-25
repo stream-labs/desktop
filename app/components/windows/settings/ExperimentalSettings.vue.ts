@@ -5,8 +5,8 @@ import GenericForm from 'components/obs/inputs/GenericForm';
 import { TObsFormData, TObsValue } from 'components/obs/inputs/ObsInput';
 import { CustomizationService } from 'services/customization';
 import { ScenesService } from 'services/scenes';
-import { $t } from '../../../services/i18n';
-import electron from 'electron';
+import { WindowsService } from '../../../services/windows';
+import * as remote from '@electron/remote';
 
 @Component({
   components: { GenericForm },
@@ -14,6 +14,7 @@ import electron from 'electron';
 export default class ExperimentalSettings extends Vue {
   @Inject() private customizationService: CustomizationService;
   @Inject() private scenesService: ScenesService;
+  @Inject() private windowsService: WindowsService;
 
   settingsFormData: TObsFormData = null;
 
@@ -32,8 +33,17 @@ export default class ExperimentalSettings extends Vue {
 
   repairSceneCollection() {
     this.scenesService.repair();
-    electron.remote.dialog.showMessageBox(electron.remote.getCurrentWindow(), {
+    remote.dialog.showMessageBox(remote.getCurrentWindow(), {
+      title: 'Streamlabs Desktop',
       message: 'Repair finished. See details in the log file',
+    });
+  }
+
+  showDemoComponents() {
+    this.windowsService.showWindow({
+      title: 'Shared React Components',
+      componentName: 'SharedComponentsLibrary',
+      size: { width: 1000, height: 1000 },
     });
   }
 }

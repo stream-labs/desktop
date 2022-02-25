@@ -9,7 +9,7 @@
   "Push to Show %{sourcename}": "Naciśnij, aby pokazać %{sourcename}",
   "Push to Hide %{sourcename}": "Naciśnij, aby ukryć %{sourcename}",
   "Mute": "Wycisz",
-  "Unmute": "Wyłącz wyciszenie",
+  "Unmute": "Odcisz",
   "Push to Mute": "Naciśnij, aby wyciszyć",
   "Push to Talk": "Naciśnij, aby mówić",
   "Enable Studio Mode": "Włącz tryb studia",
@@ -22,6 +22,6 @@
   "Restart": "Uruchom ponownie",
   "Next Slide": "Kolejny slajd",
   "Previous Slide": "Poprzedni slajd",
-  "Toggle Performance Mode": "Toggle Performance Mode",
+  "Toggle Performance Mode": "Przełącz Tryb wydajności",
   "Skip Alert": "Pomiń powiadomienie"
 }

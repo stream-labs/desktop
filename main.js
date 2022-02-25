@@ -32,12 +32,10 @@ const {
 } = require('electron');
 const path = require('path');
 const rimraf = require('rimraf');
+const remote = require('@electron/remote/main');
 
 // Game overlay is Windows only
 let overlay;
-if (process.platform === 'win32') {
-  overlay = require('game-overlay');
-}
 
 // We use a special cache directory for running tests
 if (process.env.SLOBS_CACHE_DIR) {
@@ -65,7 +63,6 @@ const uuid = require('uuid/v4');
 const semver = require('semver');
 const windowStateKeeper = require('electron-window-state');
 const pid = require('process').pid;
-const crashHandler = require('crash-handler');
 
 app.commandLine.appendSwitch('force-ui-direction', 'ltr');
 app.commandLine.appendSwitch(
@@ -73,8 +70,7 @@ app.commandLine.appendSwitch(
   'streamlabs.com,youtube.com,twitch.tv,facebook.com,mixer.com',
 );
 
-// Remove this when all backend module are on NAPI
-app.allowRendererProcessReuse = false;
+process.env.IPC_UUID = `slobs-${uuid()}`;
 
 /* Determine the current release channel we're
  * on based on name. The channel will always be
@@ -189,7 +185,7 @@ function humanFileSize(bytes, si) {
 }
 
 console.log('=================================');
-console.log('Streamlabs OBS');
+console.log('Streamlabs Desktop');
 console.log(`Version: ${process.env.SLOBS_VERSION}`);
 console.log(`OS: ${os.platform()} ${os.release()}`);
 console.log(`Arch: ${process.arch}`);
@@ -208,8 +204,8 @@ app.on('ready', () => {
       // This error code indicates a read only file system
       if (e.code === 'EROFS') {
         dialog.showErrorBox(
-          'Streamlabs OBS',
-          'Please run Streamlabs OBS from your Applications folder. Streamlabs OBS cannot run directly from this disk image.',
+          'Streamlabs Desktop',
+          'Please run Streamlabs Desktop from your Applications folder. Streamlabs Desktop cannot run directly from this disk image.',
         );
         app.exit();
       }
@@ -257,8 +253,13 @@ const waitingVuexStores = [];
 let workerInitFinished = false;
 
 async function startApp() {
+  const crashHandler = require('crash-handler');
   const isDevMode = process.env.NODE_ENV !== 'production' && process.env.NODE_ENV !== 'test';
   const crashHandlerLogPath = app.getPath('userData');
+
+  if (process.platform === 'win32') {
+    overlay = require('game_overlay');
+  }
 
   await bundleUpdater(__dirname);
 
@@ -267,15 +268,26 @@ async function startApp() {
     process.env.SLOBS_VERSION,
     isDevMode.toString(),
     crashHandlerLogPath,
+    process.env.IPC_UUID,
   );
   crashHandler.registerProcess(pid, false);
+
+  ipcMain.on('register-in-crash-handler', (event, arg) => {
+    crashHandler.registerProcess(arg.pid, arg.critical);
+  });
+
+  ipcMain.on('unregister-in-crash-handler', (event, arg) => {
+    crashHandler.unregisterProcess(arg.pid);
+  });
+
+  remote.initialize();
 
   const Raven = require('raven');
 
   function handleFinishedReport() {
     dialog.showErrorBox(
       'Something Went Wrong',
-      'An unexpected error occured and Streamlabs OBS must be shut down.\n' +
+      'An unexpected error occured and Streamlabs Desktop must be shut down.\n' +
         'Please restart the application.',
     );
 
@@ -283,7 +295,7 @@ async function startApp() {
   }
 
   if (pjson.env === 'production') {
-    Raven.config(pjson.sentry_url_fe_dsn, {
+    Raven.config(pjson.sentryFrontendDSN, {
       release: process.env.SLOBS_VERSION,
     }).install((err, initialErr, eventId) => {
       handleFinishedReport();
@@ -293,7 +305,7 @@ async function startApp() {
       productName: 'streamlabs-obs',
       companyName: 'streamlabs',
       ignoreSystemCrashHandler: true,
-      submitURL: pjson.sentry_url_be_client,
+      submitURL: pjson.sentryBackendClientDSN,
       extra: {
         'sentry[release]': pjson.version,
         processType: 'main',
@@ -303,8 +315,10 @@ async function startApp() {
 
   workerWindow = new BrowserWindow({
     show: false,
-    webPreferences: { nodeIntegration: true, enableRemoteModule: true },
+    webPreferences: { nodeIntegration: true, contextIsolation: false },
   });
+
+  remote.enable(workerWindow.webContents);
 
   // setTimeout(() => {
   workerWindow.loadURL(`${global.indexUrl}?windowId=worker`);
@@ -333,14 +347,16 @@ async function startApp() {
     show: false,
     frame: false,
     titleBarStyle: 'hidden',
-    title: 'Streamlabs OBS',
+    title: 'Streamlabs Desktop',
     backgroundColor: '#17242D',
     webPreferences: {
       nodeIntegration: true,
       webviewTag: true,
-      enableRemoteModule: true,
+      contextIsolation: false,
     },
   });
+
+  remote.enable(mainWindow.webContents);
 
   // setTimeout(() => {
   mainWindow.loadURL(`${global.indexUrl}?windowId=main`);
@@ -409,9 +425,12 @@ async function startApp() {
     backgroundColor: '#17242D',
     webPreferences: {
       nodeIntegration: true,
-      enableRemoteModule: true,
+      backgroundThrottling: false,
+      contextIsolation: false,
     },
   });
+
+  remote.enable(childWindow.webContents);
 
   childWindow.removeMenu();
 
@@ -572,7 +591,7 @@ app.on('ready', () => {
 
       bootstrap(updateInfo, startApp, app.exit);
     } else {
-      new Updater(startApp).run();
+      new Updater(startApp, releaseChannel).run();
     }
   } else {
     startApp();
@@ -707,6 +726,17 @@ ipcMain.on('webContents-bindYTChat', (e, id) => {
       e.preventDefault();
     }
   });
+});
+
+ipcMain.on('webContents-enableRemote', (e, id) => {
+  const contents = webContents.fromId(id);
+
+  if (contents.isDestroyed()) return;
+
+  remote.enable(contents);
+
+  // Needed otherwise the renderer will lock up
+  e.returnValue = null;
 });
 
 ipcMain.on('getMainWindowWebContentsId', e => {

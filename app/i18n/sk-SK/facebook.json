@@ -11,7 +11,7 @@
   "All of your scenes, sources, and settings will be preserved.": "All of your scenes, sources, and settings will be preserved.",
   "Connect Facebook": "Connect Facebook",
   "Multistream To Facebook": "Multistream To Facebook",
-  "Connect": "Connect",
+  "Connect": "Pripojiť",
   "Install Your Theme": "Install Your Theme",
   "Install": "Install",
   "facebookGamingWarning": "For the full Facebook Gaming experience <create-page-link>create a Gaming Video Creator Page</create-page-link>",
@@ -29,6 +29,7 @@
   "Re-login now": "Re-login now",
   "Please reconnect Facebook to get these new features": "Please reconnect Facebook to get these new features",
   "Reconnect now": "Reconnect now",
+  "Privacy": "Privacy",
   "FBPrivacyWarning": "The granted privacy level may be limited for your Facebook account. Check the \"Who can see you use this business integration\" section for the Streamlabs integration <link>here</link>",
   "Only Me": "Only Me",
   "Do not change privacy settings": "Do not change privacy settings"

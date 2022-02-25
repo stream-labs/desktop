@@ -26,5 +26,10 @@
   "Image URL": "Ссылка картинки",
   "Example": "Пример",
   "Change Media": "Изменить медиафайл",
-  "No Sound": "Нет звука"
+  "No Sound": "Нет звука",
+  "No Media": "Нет медиафайлов",
+  "Change Link": "Изменить ссылку",
+  "Pick From Gallery": "Выбрать из галереи",
+  "Clear Link": "Очистить ссылку",
+  "Media URL": "URL-адрес медиафайла"
 }

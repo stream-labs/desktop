@@ -1,8 +1,11 @@
 import { readdir } from 'fs-extra';
-import { focusMain, test, useSpectron } from '../helpers/spectron';
-import { sleep } from '../helpers/sleep';
-import { setOutputResolution, setTemporaryRecordingPath } from '../helpers/spectron/output';
-import { addSource } from '../helpers/spectron/sources';
+import { test, useSpectron } from '../helpers/spectron';
+import { addSource } from '../helpers/modules/sources';
+import {
+  setOutputResolution,
+  setTemporaryRecordingPath,
+} from '../helpers/modules/settings/settings';
+import { focusMain } from '../helpers/modules/core';
 
 useSpectron();
 
@@ -10,16 +13,16 @@ test('Selective Recording', async t => {
   const sourceType = 'Browser Source';
   const sourceName = `Example ${sourceType}`;
   const { client } = t.context.app;
-  const tmpDir = await setTemporaryRecordingPath(t);
+  const tmpDir = await setTemporaryRecordingPath();
 
   // set lower resolution for better performance in CI
-  await setOutputResolution(t, '100x100');
+  await setOutputResolution('100x100');
 
   // Add a browser source
-  await addSource(t, sourceType, sourceName);
+  await addSource(sourceType, sourceName);
 
   // Toggle selective recording
-  await focusMain(t);
+  await focusMain();
   await (await client.$('.studio-controls-top .icon-smart-record')).click();
 
   // Check that selective recording icon is active

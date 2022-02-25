@@ -1,0 +1,21 @@
+{
+  "Poll": "投票",
+  "Let your viewers vote on a result": "視聴者に結果投票をしてもらう",
+  "Bar Settings": "バーの設定",
+  "Manage Poll": "投票を管理",
+  "Poll Type": "投票タイプ",
+  "Show Closed Poll": "終了した投票を表示",
+  "Show/hide poll widget on closed poll": "終了した投票の投票ウィジェットを表示/非表示",
+  "Primary Background Color": "背景色（プライマリ）",
+  "Secondary Background Color": "背景色（セカンダリ）",
+  "Hide wigdet after X seconds of event": "イベントで X 秒経過後にウィジェットを非表示",
+  "Header Text Color": "ヘッダーのテキスト色",
+  "Option Text Color": "オプションのテキスト色",
+  "Title Font Size": "タイトルのフォントサイズ",
+  "Option Font Size": "オプションのフォントサイズ",
+  "Title Font Weight": "タイトルのフォント太さ",
+  "Option Font Weight": "オプションのフォント太さ",
+  "Thin Bar": "細いバー",
+  "Display thin/thick Bar": "細い/太いバーを表示",
+  "You need to re-login to access Twitch chat polls": "Twitch チャット投票に参加するには再ログインが必要です"
+}

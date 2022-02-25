@@ -1,4 +1,3 @@
-import electron from 'electron';
 import { mutation, StatefulService, ViewHandler } from 'services/core/stateful-service';
 import { lazyModule } from 'util/lazy-module';
 import path from 'path';
@@ -17,6 +16,7 @@ import without from 'lodash/without';
 import { PlatformContainerManager, getPageUrl, getAssetUrl } from './container-manager';
 import { NavigationService } from 'services/navigation';
 import { InitAfter } from '../core';
+import * as remote from '@electron/remote';
 
 const DEV_PORT = 8081;
 
@@ -144,6 +144,10 @@ class PlatformAppsViews extends ViewHandler<IPlatformAppServiceState> {
     if (!app) return null;
 
     return getAssetUrl(app, asset);
+  }
+
+  get enabledApps() {
+    return this.state.loadedApps.filter(app => app.enabled);
   }
 }
 
@@ -281,8 +285,8 @@ export class PlatformAppsService extends StatefulService<IPlatformAppServiceStat
 
     try {
       await this.validateManifest(manifest, appPath);
-    } catch (e) {
-      return e.message;
+    } catch (e: unknown) {
+      return e['message'];
     }
 
     // Make sure there isn't already a dev server
@@ -545,11 +549,11 @@ export class PlatformAppsService extends StatefulService<IPlatformAppServiceStat
     return this.containerManager.mountContainer(app, slot, electronWindowId, slobsWindowId);
   }
 
-  setContainerBounds(containerId: number, pos: IVec2, size: IVec2) {
+  setContainerBounds(containerId: string, pos: IVec2, size: IVec2) {
     return this.containerManager.setContainerBounds(containerId, pos, size);
   }
 
-  unmountContainer(containerId: number, electronWindowId: number) {
+  unmountContainer(containerId: string, electronWindowId: number) {
     this.containerManager.unmountContainer(containerId, electronWindowId);
   }
 
@@ -597,7 +601,7 @@ export class PlatformAppsService extends StatefulService<IPlatformAppServiceStat
     if (!app || !app.enabled) return;
 
     const windowId = `${appId}-${pageSlot}`;
-    const mousePos = electron.remote.screen.getCursorScreenPoint();
+    const mousePos = remote.screen.getCursorScreenPoint();
 
     // We use a generated window Id to prevent someobody popping out the
     // same winow multiple times.

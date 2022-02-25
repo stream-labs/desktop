@@ -47,7 +47,7 @@ export const ImageInput = InputComponent((p: TImageInputProps) => {
   // update metadata if the value has been changed
   useEffect(() => {
     if (fileInfo.url === p.value) return;
-    setFileInfo({ ...defaultImageMetadata, url: p.value });
+    setFileInfo({ ...defaultImageMetadata, url: p.value as string });
   }, [p.value]);
 
   /**
@@ -75,7 +75,7 @@ export const ImageInput = InputComponent((p: TImageInputProps) => {
       alertAsync(error);
       // a hack for removing this file from the list
       // @see https://ant.design/components/upload/#components-upload-demo-upload-png-only
-      return Upload.LIST_IGNORE as boolean;
+      return (Upload.LIST_IGNORE as unknown) as boolean;
     }
 
     getBase64(file).then(previewImage => {

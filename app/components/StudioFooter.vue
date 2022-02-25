@@ -1,6 +1,6 @@
 <template>
   <div class="footer">
-    <div class="flex flex--center flex--grow flex--justify-start">
+    <div class="flex flex--center flex--grow flex--justify-start footer--left">
       <div class="error-wrapper" v-if="loggedIn && !youtubeEnabled">
         <div class="platform-error">
           <i class="fa fa-exclamation-triangle" />
@@ -16,7 +16,7 @@
         @click="openMetricsWindow"
         v-tooltip.left="$t('Open Performance Window')"
       />
-      <performance-metrics mode="limited" class="performance-metrics" />
+      <performance-metrics :componentProps="{ mode: 'limited' }" class="performance-metrics" />
       <notifications-area class="notifications-area flex--grow" />
     </div>
 
@@ -96,6 +96,12 @@
   background-color: var(--section);
   max-width: none;
   flex: 0 0 auto;
+  overflow-x: auto;
+  overflow-y: hidden;
+
+  .footer--left {
+    overflow-x: auto;
+  }
 }
 
 .nav-right {
@@ -170,8 +176,9 @@
   align-items: center;
   justify-content: center;
   border-radius: 100%;
-  box-sizing: content-box;
+  box-sizing: border-box;
   letter-spacing: 0.2px;
+  border: none;
 
   span {
     font-size: 10px;
@@ -236,5 +243,6 @@
   position: relative;
   display: inline-flex;
   background: var(--section) !important;
+  overflow-x: auto;
 }
 </style>

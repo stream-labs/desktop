@@ -31,6 +31,7 @@ export default function GameSelector(p: TProps) {
   }, []);
 
   async function loadImageForSelectedGame() {
+    if (platform !== 'twitch') return;
     if (!selectedGame) return;
     const game = await TwitchService.actions.return.fetchGame(selectedGame);
     if (!game || game.name !== selectedGame) return;
@@ -74,6 +75,7 @@ export default function GameSelector(p: TProps) {
       imageSize={TwitchService.gameImageSize}
       loading={isSearching}
       notFoundContent={isSearching ? $t('Searching...') : $t('No matching game(s) found.')}
+      allowClear
     />
   );
 }

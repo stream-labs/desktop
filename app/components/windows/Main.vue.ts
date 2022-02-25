@@ -1,18 +1,27 @@
 import Vue from 'vue';
 import { Component, Watch } from 'vue-property-decorator';
 import SideNav from '../SideNav';
-import { NewsBanner, TitleBar } from 'components/shared/ReactComponent';
+import {
+  NewsBanner,
+  TitleBar,
+  Grow,
+  PatchNotes,
+  Loader,
+  StreamScheduler,
+  Highlighter,
+  ThemeAudit,
+} from 'components/shared/ReactComponentList';
 import { ScenesService } from 'services/scenes';
 import { PlatformAppsService } from 'services/platform-apps';
 import { EditorCommandsService } from '../../app-services';
 import VueResize from 'vue-resize';
 import { $t } from 'services/i18n';
 import fs from 'fs';
+import * as remote from '@electron/remote';
 Vue.use(VueResize);
 
 // Pages
 import Studio from '../pages/Studio';
-import Chatbot from '../pages/Chatbot.vue';
 import PlatformAppStore from '../pages/PlatformAppStore.vue';
 import BrowseOverlays from 'components/pages/BrowseOverlays.vue';
 import AlertboxLibrary from 'components/pages/AlertboxLibrary';
@@ -26,10 +35,7 @@ import { UserService } from 'services/user';
 import { IModalOptions, WindowsService } from 'services/windows';
 import LiveDock from '../LiveDock.vue';
 import StudioFooter from '../StudioFooter.vue';
-import CustomLoader from '../CustomLoader';
-import { PatchNotes } from '../shared/ReactComponent';
 import PlatformAppMainPage from '../pages/PlatformAppMainPage.vue';
-import electron from 'electron';
 import ResizeBar from 'components/shared/ResizeBar.vue';
 import PlatformMerge from 'components/pages/PlatformMerge';
 import { getPlatformService } from 'services/platforms';
@@ -52,10 +58,9 @@ const loadedTheme = () => {
     Onboarding,
     LiveDock,
     StudioFooter,
-    CustomLoader,
+    CustomLoader: Loader,
     PatchNotes,
     NewsBanner,
-    Chatbot,
     PlatformAppMainPage,
     PlatformAppStore,
     ResizeBar,
@@ -63,6 +68,10 @@ const loadedTheme = () => {
     LayoutEditor,
     AlertboxLibrary,
     ModalWrapper,
+    StreamScheduler,
+    Highlighter,
+    Grow,
+    ThemeAudit,
   },
 })
 export default class Main extends Vue {
@@ -210,13 +219,14 @@ export default class Main extends Vue {
     while (fi--) files.push(fileList.item(fi).path);
 
     const isDirectory = await this.isDirectory(files[0]).catch(err => {
-      console.error(err);
+      console.error('Error checking if drop is directory', err);
       return false;
     });
 
     if (files.length > 1 || isDirectory) {
-      electron.remote.dialog
-        .showMessageBox(electron.remote.getCurrentWindow(), {
+      remote.dialog
+        .showMessageBox(remote.getCurrentWindow(), {
+          title: 'Streamlabs Desktop',
           message: $t('Are you sure you want to import multiple files?'),
           type: 'warning',
           buttons: [$t('Cancel'), $t('OK')],

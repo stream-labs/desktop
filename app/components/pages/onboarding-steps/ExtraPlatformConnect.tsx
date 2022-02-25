@@ -8,8 +8,8 @@ import { UserService } from 'services/user';
 import VFormGroup from 'components/shared/inputs/VFormGroup.vue';
 import { metadata } from 'components/shared/inputs';
 import { StreamSettingsService } from 'services/settings/streaming';
-import electron from 'electron';
 import PlatformLogo from 'components/shared/PlatformLogo';
+import * as remote from '@electron/remote';
 
 export type TExtraPlatform = 'nimotv' | 'dlive';
 
@@ -55,47 +55,49 @@ export default class ExtraPlatformConnect extends TsxComponent<ConnectProps> {
   }
 
   openHelp() {
-    electron.remote.shell.openExternal(this.platformDefinition.helpUrl);
+    remote.shell.openExternal(this.platformDefinition.helpUrl);
   }
 
   render() {
     return (
-      <div class={styles.container}>
-        <p>
-          <PlatformLogo platform={this.props.platform} />
-        </p>
-        <h1>{$t('Connect to %{platform}', { platform: this.platformDefinition.name })}</h1>
-        <p>
-          {$t('Enter your stream key.')}
-          &nbsp;
-          <span class={styles['link-button']} onClick={() => this.openHelp()}>
-            {$t('View help docs')}
-          </span>
-        </p>
-
-        <div class="section">
-          <VFormGroup vModel={this.key} metadata={this.keyMetadata} />
-        </div>
-
-        {!!this.key.trim().length && (
+      <div>
+        <div class={styles.container} style={{ height: '50%' }}>
           <p>
-            <button class={`button button--${this.props.platform}`} onClick={() => this.next()}>
-              {$t('Finish')}
-            </button>
+            <PlatformLogo platform={this.props.platform} />
           </p>
-        )}
+          <h1>{$t('Connect to %{platform}', { platform: this.platformDefinition.name })}</h1>
+          <p>
+            {$t('Enter your stream key.')}
+            &nbsp;
+            <span class={styles['link-button']} onClick={() => this.openHelp()}>
+              {$t('View help docs')}
+            </span>
+          </p>
 
-        <p>
-          <a class={styles['link-button']} onClick={this.props.continue}>
-            {$t('Skip')}
-          </a>
+          <div class="section">
+            <VFormGroup vModel={this.key} metadata={this.keyMetadata} />
+          </div>
 
-          <span style="display: inline-block; width: 32px"> </span>
+          {!!this.key.trim().length && (
+            <p>
+              <button class={`button button--${this.props.platform}`} onClick={() => this.next()}>
+                {$t('Finish')}
+              </button>
+            </p>
+          )}
 
-          <a class={styles['link-button']} onClick={() => this.props.back()}>
-            {$t('Back')}
-          </a>
-        </p>
+          <p>
+            <a class={styles['link-button']} onClick={this.props.continue}>
+              {$t('Skip')}
+            </a>
+
+            <span style="display: inline-block; width: 32px"> </span>
+
+            <a class={styles['link-button']} onClick={() => this.props.back()}>
+              {$t('Back')}
+            </a>
+          </p>
+        </div>
       </div>
     );
   }
