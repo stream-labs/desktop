@@ -1,16 +1,16 @@
 import React, { useState, useRef, useEffect } from 'react';
 import cx from 'classnames';
-import { useVuex } from 'components-react/hooks';
+import { Tooltip, Tree } from 'antd';
 import { SourceDisplayData } from 'services/sources';
-import { TSceneNode, ISceneItemFolder, ISceneItem } from 'services/scenes';
+import { ISceneItemFolder, ISceneItem } from 'services/scenes';
 import { EditMenu } from 'util/menus/EditMenu';
 import { WidgetDisplayData } from 'services/widgets';
 import { $t } from 'services/i18n';
 import { EPlaceType } from 'services/editor-commands/commands/reorder-nodes';
+import { useVuex } from 'components-react/hooks';
 import Scrollable from 'components-react/shared/Scrollable';
 import { Services } from 'components-react/service-provider';
 import styles from './SceneSelector.m.less';
-import { Tooltip } from 'antd';
 
 export default function SourceSelector() {
   const {
@@ -21,14 +21,6 @@ export default function SourceSelector() {
     StreamingService,
     AudioService,
   } = Services;
-
-  // sourcesTooltip = $t('The building blocks of your scene. Also contains widgets.');
-  // addSourceTooltip = $t('Add a new Source to your Scene. Includes widgets.');
-  // removeSourcesTooltip = $t('Remove Sources from your Scene.');
-  // openSourcePropertiesTooltip = $t('Open the Source Properties.');
-  // addGroupTooltip = $t('Add a Group so you can move multiple Sources at the same time.');
-
-  // private expandedFoldersIds: string[] = [];
 
   const [expandedFolders, setExpandedFolders] = useState<string[]>([]);
 
@@ -287,44 +279,52 @@ export default function SourceSelector() {
   }
 
   return (
-    <div className="studio-controls-top">
-      <Tooltip
-        title={$t('The building blocks of your scene. Also contains widgets.')}
-        placement="bottom"
-      >
+    <>
+      <div className="studio-controls-top">
         <span className={styles.activeScene}>{$t('Sources')}</span>
-      </Tooltip>
-      <i
-        className="[
-            { 'icon--active': selectiveRecordingEnabled },
-            { disabled: selectiveRecordingLocked },
-            'icon-smart-record icon-button icon-button--lg',
-          ]"
-        onClick={toggleSelectiveRecording}
-        bottom="$t('Toggle Selective Recording')"
-      />
-      <i
-        className="icon-add-folder icon-button icon-button--lg"
-        onClick={addFolder}
-        bottom="addGroupTooltip"
-      />
-      <i
-        className="icon-add icon-button icon-button--lg"
-        onClick={addSource}
-        bottom="addSourceTooltip"
-      />
-      <i
-        className="icon-subtract icon-button icon-button--lg"
-        // :class="{ disabled: activeItemIds.length === 0 }"
-        onClick={removeItems}
-        bottom="removeSourcesTooltip"
-      />
-      <i
-        // class="{ disabled: !canShowProperties() }"
-        className="icon-settings icon-button"
-        onClick={() => sourceProperties()}
-        bottom="openSourcePropertiesTooltip"
-      />
-    </div>
+        <Tooltip title={$t('Toggle Selective Recording')} placement="bottom">
+          <i
+            className={cx('icon-smart-record icon-button icon-button--lg', {
+              'icon--active': selectiveRecordingEnabled,
+              disabled: !StreamingService.isIdle,
+            })}
+            onClick={toggleSelectiveRecording}
+          />
+        </Tooltip>
+        <Tooltip
+          title={$t('Add a Group so you can move multiple Sources at the same time.')}
+          placement="bottom"
+        >
+          <i className="icon-add-folder icon-button icon-button--lg" onClick={addFolder} />
+        </Tooltip>
+        <Tooltip title={$t('Add a new Source to your Scene. Includes widgets.')} placement="bottom">
+          <i className="icon-add icon-button icon-button--lg" onClick={addSource} />
+        </Tooltip>
+        <Tooltip title={$t('Remove Sources from your Scene.')} placement="bottom">
+          <i
+            className={cx('icon-subtract icon-button icon-button--lg', {
+              disabled: activeItemIds.length === 0,
+            })}
+            onClick={removeItems}
+          />
+        </Tooltip>
+        <Tooltip title={$t('Open the Source Properties.')} placement="bottom">
+          <i
+            className={cx('icon-settings icon-button', { disabled: !canShowProperties() })}
+            onClick={() => sourceProperties()}
+          />
+        </Tooltip>
+      </div>
+      <Scrollable style={{ height: '100%' }} className={styles.scenesContainer}>
+        <Tree
+          draggable
+          treeData={sources}
+          onDrop={handleSort}
+          onSelect={makeActive}
+          onRightClick={showContextMenu}
+          selectedKeys={[activeSceneId]}
+        />
+      </Scrollable>
+    </>
   );
 }
