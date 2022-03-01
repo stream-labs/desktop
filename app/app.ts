@@ -1,5 +1,5 @@
 /*global SLOBS_BUNDLE_ID*/
-/*global SLD_SENTRY_BACKEND_SERVER_DSN, SLD_SENTRY_FRONTEND_DSN, SLD_SENTRY_BACKEND_SERVER_PREVIEW_DSN*/
+/*global SLD_SENTRY_BACKEND_SERVER_URL, SLD_SENTRY_FRONTEND_DSN, SLD_SENTRY_BACKEND_SERVER_PREVIEW_URL*/
 
 import { I18nService, $t } from 'services/i18n';
 
@@ -305,7 +305,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       'en-US',
       appService.appDataDirectory,
       remote.process.env.SLOBS_VERSION,
-      isPreview ? SLD_SENTRY_BACKEND_SERVER_PREVIEW_DSN : SLD_SENTRY_BACKEND_SERVER_DSN,
+      isPreview ? SLD_SENTRY_BACKEND_SERVER_PREVIEW_URL : SLD_SENTRY_BACKEND_SERVER_URL,
     );
 
     if (apiResult !== obs.EVideoCodes.Success) {

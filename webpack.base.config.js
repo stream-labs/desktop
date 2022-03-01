@@ -14,9 +14,9 @@ plugins.push(
   new webpack.DefinePlugin({
     SLOBS_BUNDLE_ID: JSON.stringify(commit),
     SLD_SENTRY_FRONTEND_DSN: JSON.stringify(process.env.SLD_SENTRY_FRONTEND_DSN ?? ''),
-    SLD_SENTRY_BACKEND_SERVER_DSN: JSON.stringify(process.env.SLD_SENTRY_BACKEND_SERVER_DSN ?? ''),
-    SLD_SENTRY_BACKEND_SERVER_PREVIEW_DSN: JSON.stringify(
-      process.env.SLD_SENTRY_BACKEND_SERVER_PREVIEW_DSN ?? '',
+    SLD_SENTRY_BACKEND_SERVER_URL: JSON.stringify(process.env.SLD_SENTRY_BACKEND_SERVER_URL ?? ''),
+    SLD_SENTRY_BACKEND_SERVER_PREVIEW_URL: JSON.stringify(
+      process.env.SLD_SENTRY_BACKEND_SERVER_PREVIEW_URL ?? '',
     ),
   }),
 );
