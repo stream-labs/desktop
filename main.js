@@ -309,8 +309,10 @@ async function startApp() {
         ? pjson.sentryBackendClientPreviewURL
         : pjson.sentryBackendClientURL,
       extra: {
-        'sentry[release]': pjson.version,
         processType: 'main',
+      },
+      globalExtra: {
+        'sentry[release]': pjson.version,
       },
     });
   }
