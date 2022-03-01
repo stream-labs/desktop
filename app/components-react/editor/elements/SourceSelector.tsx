@@ -52,7 +52,7 @@ export default function SourceSelector() {
 
   function nodes(): any[] {
     // recursive function for transform SceneNode[] to ISlTreeNodeModel[]
-    const getSlVueTreeNodes = (sceneNodes: (ISceneItem | ISceneItemFolder)[]): any => {
+    const getTreeNodes = (sceneNodes: any[]): any => {
       return sceneNodes.map(sceneNode => {
         return {
           title: getNameForNode(sceneNode),
@@ -64,18 +64,18 @@ export default function SourceSelector() {
             sourceId: sceneNode.sceneNodeType === 'item' ? sceneNode.sourceId : null,
           },
           children:
-            sceneNode.sceneNodeType === 'folder' ? getSlVueTreeNodes(getChildren(sceneNode)) : null,
+            sceneNode.sceneNodeType === 'folder' ? getTreeNodes(getChildren(sceneNode)) : null,
         };
       });
     };
 
     const nodes = scene?.state.nodes.filter(n => !n.parentId);
     if (!nodes) return [];
-    return getSlVueTreeNodes(nodes);
+    return getTreeNodes(nodes);
   }
 
   // // TODO: Clean this up.  These only access state, no helpers
-  function getNameForNode(node: ISceneItem | ISceneItemFolder) {
+  function getNameForNode(node: any) {
     if (node.sceneNodeType === 'item') {
       return SourcesService.state.sources[node.sourceId].name;
     }
@@ -84,7 +84,8 @@ export default function SourceSelector() {
   }
 
   function getChildren(node: ISceneItemFolder) {
-    return scene?.state.nodes.filter(n => n.parentId === node.id);
+    if (!scene) return [];
+    return scene.state.nodes.filter(n => n.parentId === node.id);
   }
 
   function determineIcon(isLeaf: boolean, sourceId: string) {
