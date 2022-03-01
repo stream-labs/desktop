@@ -1,38 +1,39 @@
+import electron from 'electron';
+import { AppService } from 'services/app';
+import { CompactModeService } from 'services/compact-mode';
+import { Inject } from 'services/core/injector';
+import { NavigationService } from 'services/navigation';
+import { ScenesService } from 'services/scenes';
+import { UserService } from 'services/user';
+import { WindowSizeService } from 'services/window-size';
+import { WindowsService } from 'services/windows';
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
-import TopNav from '../TopNav.vue';
-import { ScenesService } from 'services/scenes';
-
-// Pages
-import Studio from '../pages/Studio.vue';
-import Onboarding from '../pages/Onboarding.vue';
-import TitleBar from '../TitleBar.vue';
-import { Inject } from '../../services/core/injector';
-import { CustomizationService } from 'services/customization';
-import { NavigationService } from 'services/navigation';
-import { AppService } from 'services/app';
-import { UserService } from 'services/user';
-import { WindowsService } from 'services/windows';
-import StudioFooter from '../StudioFooter.vue';
+import BottomLine from '../BottomLine.vue';
 import CustomLoader from '../CustomLoader.vue';
-import PatchNotes from '../pages/PatchNotes.vue';
 import NicoliveArea from '../nicolive-area/NicoliveArea.vue';
-import electron from 'electron';
+import Onboarding from '../pages/Onboarding.vue';
+import PatchNotes from '../pages/PatchNotes.vue';
+import Studio from '../pages/Studio.vue';
+import SideNav from '../SideNav.vue';
+import StudioFooter from '../StudioFooter.vue';
+import TitleBar from '../TitleBar.vue';
 
 @Component({
   components: {
     TitleBar,
-    TopNav,
+    SideNav,
     Studio,
     Onboarding,
     StudioFooter,
     CustomLoader,
     PatchNotes,
     NicoliveArea,
+    BottomLine,
   },
 })
 export default class Main extends Vue {
-  @Inject() customizationService: CustomizationService;
+  @Inject() compactModeService: CompactModeService;
   @Inject() navigationService: NavigationService;
   @Inject() appService: AppService;
   @Inject() userService: UserService;
@@ -41,6 +42,14 @@ export default class Main extends Vue {
 
   mounted() {
     electron.remote.getCurrentWindow().show();
+    WindowSizeService.instance; // manage compact mode
+  }
+
+  get isCompactMode() {
+    return this.compactModeService.isCompactMode;
+  }
+  get compactModeTab() {
+    return this.compactModeService.compactModeTab;
   }
 
   get title() {
@@ -67,7 +76,17 @@ export default class Main extends Vue {
     return this.navigationService.state.currentPage === 'Onboarding';
   }
 
+  get showMainMiddle() {
+    if (this.isCompactMode) {
+      return this.compactModeTab === 'studio';
+    }
+    return true;
+  }
+
   get showNicoliveArea() {
+    if (this.isCompactMode) {
+      return this.compactModeTab === 'niconico';
+    }
     return this.page === 'Studio' && this.isLoggedIn;
   }
 

@@ -1,5 +1,8 @@
-import { Observable } from 'rxjs';
 import { TObsFormData } from 'components/obs/inputs/ObsInput';
+import { Observable } from 'rxjs';
+
+export type TCompactModeTab = 'studio' | 'niconico';
+export type TCompactModeStudioController = 'scenes' | 'mixer';
 
 export interface ICustomizationServiceState {
   performanceMode: boolean;
@@ -8,10 +11,22 @@ export interface ICustomizationServiceState {
   showOptimizationDialogForNiconico: boolean;
   optimizeWithHardwareEncoder: boolean;
   pollingPerformanceStatistics: boolean;
+  compactMode: boolean;
+  compactModeTab: TCompactModeTab;
+  compactModeStudioController: TCompactModeStudioController;
+  compactModeNewComment: boolean;
+  fullModeWidthOffset: number;
+  compactBackupPositionX: number;
+  compactBackupPositionY: number;
+  compactBackupHeight: number;
+  compactMaximized: boolean;
+  autoCompactMode: boolean;
+  showAutoCompactDialog: boolean;
   experimental: any;
 }
 
-export interface ICustomizationSettings extends ICustomizationServiceState {}
+// eslint-disable-next-line prettier/prettier
+export interface ICustomizationSettings extends ICustomizationServiceState { }
 
 export interface ICustomizationServiceApi {
   settingsChanged: Observable<Partial<ICustomizationSettings>>;

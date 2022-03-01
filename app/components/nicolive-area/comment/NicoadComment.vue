@@ -14,23 +14,22 @@
 .root {
   display: flex;
   flex-direction: row;
-
   .comment-row-fade(@nicoad-brand-color);
 }
 
 .comment-header {
-  .common__comment-header();
+  .common__comment-header;
   > i {
-    color: @nicoad-brand-color;
+    color: var(--color-brand-nicoad);
   }
 }
 
 .comment-body {
-  .common__comment-body();
-  color: @light-grey;
+  .common__comment-body;
+  color: var(--color-text);
 
   [speaking=true] & {
-    color: @text-primary;
+    color: var(--color-text-active);
   }
 }
 </style>

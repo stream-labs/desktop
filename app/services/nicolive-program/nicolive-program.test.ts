@@ -1,8 +1,6 @@
 import { createSetupFunction } from 'util/test-setup';
-import { Subject, BehaviorSubject } from 'rxjs';
 
 type NicoliveProgramService = import('./nicolive-program').NicoliveProgramService;
-type PanelState = import('./nicolive-program').PanelState;
 
 const rooms = [{ id: 0, name: 'arena', webSocketUri: 'https://example.com/lv1', threadId: 'hoge' }];
 
@@ -88,27 +86,21 @@ const setup = createSetupFunction({
         subscribe() {},
       },
     },
-    WindowsService: {
-      getWindow() {
-        return {
-          getMinimumSize: () => [800, 600],
-          setMinimumSize: () => {},
-          getSize: () => [800, 600],
-          setSize: () => {},
-          isMaximized: () => false,
-        };
-      },
-    },
     UserService: {
       userLoginState: {
         subscribe() {},
       },
       isLoggedIn: () => true,
     },
+    CustomizationService: {
+      settingsChanged: {
+        subscribe() {},
+      },
+      state: {},
+    },
   },
 });
 
-jest.mock('services/windows', () => ({ WindowsService: {} }));
 jest.mock('services/user', () => ({ UserService: {} }));
 jest.mock('services/nicolive-program/state', () => ({ NicoliveProgramStateService: {} }));
 jest.mock('services/i18n', () => ({
@@ -215,12 +207,24 @@ test('fetchProgramで結果が空ならエラー', async () => {
                               }
                         `);
   expect(instance.client.fetchProgramSchedules).toHaveBeenCalledTimes(1);
-  expect((instance as any).setState).toHaveBeenCalledTimes(1);
-  expect((instance as any).setState.mock.calls[0]).toMatchInlineSnapshot(`
+  expect((instance as any).setState).toHaveBeenCalledTimes(3);
+  expect((instance as any).setState.mock.calls).toMatchInlineSnapshot(`
             Array [
-              Object {
-                "status": "end",
-              },
+              Array [
+                Object {
+                  "isFetching": true,
+                },
+              ],
+              Array [
+                Object {
+                  "status": "end",
+                },
+              ],
+              Array [
+                Object {
+                  "isFetching": false,
+                },
+              ],
             ]
       `);
 });
@@ -246,23 +250,35 @@ test('fetchProgram:成功', async () => {
   expect(instance.client.fetchProgramSchedules).toHaveBeenCalledTimes(1);
   expect(instance.client.fetchProgram).toHaveBeenCalledTimes(1);
   expect(instance.client.fetchCommunity).toHaveBeenCalledTimes(1);
-  expect((instance as any).setState.mock.calls[0]).toMatchInlineSnapshot(`
+  expect((instance as any).setState.mock.calls).toMatchInlineSnapshot(`
     Array [
-      Object {
-        "communityID": "co1",
-        "communityName": "comunity.name",
-        "communitySymbol": "symbol url",
-        "description": "番組詳細情報",
-        "endTime": 150,
-        "isMemberOnly": true,
-        "programID": "lv1",
-        "roomThreadID": "hoge",
-        "roomURL": "https://example.com/lv1",
-        "startTime": 100,
-        "status": "onAir",
-        "title": "番組タイトル",
-        "vposBaseTime": 50,
-      },
+      Array [
+        Object {
+          "isFetching": true,
+        },
+      ],
+      Array [
+        Object {
+          "communityID": "co1",
+          "communityName": "comunity.name",
+          "communitySymbol": "symbol url",
+          "description": "番組詳細情報",
+          "endTime": 150,
+          "isMemberOnly": true,
+          "programID": "lv1",
+          "roomThreadID": "hoge",
+          "roomURL": "https://example.com/lv1",
+          "startTime": 100,
+          "status": "onAir",
+          "title": "番組タイトル",
+          "vposBaseTime": 50,
+        },
+      ],
+      Array [
+        Object {
+          "isFetching": false,
+        },
+      ],
     ]
   `);
 });
@@ -298,7 +314,7 @@ test('fetchProgramで番組があったが取りに行ったらエラー', async
   expect(instance.client.fetchProgramSchedules).toHaveBeenCalledTimes(1);
   expect(instance.client.fetchProgram).toHaveBeenCalledTimes(1);
   expect(instance.client.fetchCommunity).toHaveBeenCalledTimes(1);
-  expect((instance as any).setState).not.toHaveBeenCalled();
+  expect((instance as any).setState).toHaveBeenCalledTimes(2);
 });
 
 test('fetchProgramでコミュ情報がエラーでも番組があったら先に進む', async () => {
@@ -322,23 +338,35 @@ test('fetchProgramでコミュ情報がエラーでも番組があったら先�
   expect(instance.client.fetchProgramSchedules).toHaveBeenCalledTimes(1);
   expect(instance.client.fetchProgram).toHaveBeenCalledTimes(1);
   expect(instance.client.fetchCommunity).toHaveBeenCalledTimes(1);
-  expect((instance as any).setState.mock.calls[0]).toMatchInlineSnapshot(`
+  expect((instance as any).setState.mock.calls).toMatchInlineSnapshot(`
     Array [
-      Object {
-        "communityID": "co1",
-        "communityName": "(コミュニティの取得に失敗しました)",
-        "communitySymbol": "",
-        "description": "番組詳細情報",
-        "endTime": 150,
-        "isMemberOnly": true,
-        "programID": "lv1",
-        "roomThreadID": "hoge",
-        "roomURL": "https://example.com/lv1",
-        "startTime": 100,
-        "status": "onAir",
-        "title": "番組タイトル",
-        "vposBaseTime": 50,
-      },
+      Array [
+        Object {
+          "isFetching": true,
+        },
+      ],
+      Array [
+        Object {
+          "communityID": "co1",
+          "communityName": "(コミュニティの取得に失敗しました)",
+          "communitySymbol": "",
+          "description": "番組詳細情報",
+          "endTime": 150,
+          "isMemberOnly": true,
+          "programID": "lv1",
+          "roomThreadID": "hoge",
+          "roomURL": "https://example.com/lv1",
+          "startTime": 100,
+          "status": "onAir",
+          "title": "番組タイトル",
+          "vposBaseTime": 50,
+        },
+      ],
+      Array [
+        Object {
+          "isFetching": false,
+        },
+      ],
     ]
   `);
 });
@@ -406,13 +434,25 @@ test('endProgram:成功', async () => {
   await expect(instance.endProgram()).resolves.toBeUndefined();
   expect(instance.client.endProgram).toHaveBeenCalledTimes(1);
   expect(instance.client.endProgram).toHaveBeenCalledWith('lv1');
-  expect((instance as any).setState).toHaveBeenCalledTimes(1);
-  expect((instance as any).setState.mock.calls[0]).toMatchInlineSnapshot(`
+  expect((instance as any).setState).toHaveBeenCalledTimes(3);
+  expect((instance as any).setState.mock.calls).toMatchInlineSnapshot(`
             Array [
-              Object {
-                "endTime": 125,
-                "status": "end",
-              },
+              Array [
+                Object {
+                  "isEnding": true,
+                },
+              ],
+              Array [
+                Object {
+                  "endTime": 125,
+                  "status": "end",
+                },
+              ],
+              Array [
+                Object {
+                  "isEnding": false,
+                },
+              ],
             ]
       `);
 });
@@ -436,7 +476,7 @@ test('endProgram:失敗', async () => {
                         `);
   expect(instance.client.endProgram).toHaveBeenCalledTimes(1);
   expect(instance.client.endProgram).toHaveBeenCalledWith('lv1');
-  expect((instance as any).setState).not.toHaveBeenCalled();
+  expect((instance as any).setState).toHaveBeenCalledTimes(2);
 });
 
 test('extendProgram:成功', async () => {
@@ -452,12 +492,24 @@ test('extendProgram:成功', async () => {
   await expect(instance.extendProgram()).resolves.toBeUndefined();
   expect(instance.client.extendProgram).toHaveBeenCalledTimes(1);
   expect(instance.client.extendProgram).toHaveBeenCalledWith('lv1');
-  expect((instance as any).setState).toHaveBeenCalledTimes(1);
-  expect((instance as any).setState.mock.calls[0]).toMatchInlineSnapshot(`
+  expect((instance as any).setState).toHaveBeenCalledTimes(3);
+  expect((instance as any).setState.mock.calls).toMatchInlineSnapshot(`
             Array [
-              Object {
-                "endTime": 125,
-              },
+              Array [
+                Object {
+                  "isExtending": true,
+                },
+              ],
+              Array [
+                Object {
+                  "endTime": 125,
+                },
+              ],
+              Array [
+                Object {
+                  "isExtending": false,
+                },
+              ],
             ]
       `);
 });
@@ -481,7 +533,7 @@ test('extendProgram:失敗', async () => {
                         `);
   expect(instance.client.extendProgram).toHaveBeenCalledTimes(1);
   expect(instance.client.extendProgram).toHaveBeenCalledWith('lv1');
-  expect((instance as any).setState).not.toHaveBeenCalled();
+  expect((instance as any).setState).toHaveBeenCalledTimes(2);
 });
 
 describe('refreshStatisticsPolling', () => {
@@ -1081,253 +1133,6 @@ describe('refreshAutoExtensionTimer', () => {
         case 'CLEAR':
           expect(window.clearTimeout).toHaveBeenCalledTimes(1);
           expect(window.clearTimeout).toHaveBeenCalledWith(0);
-      }
-    });
-  }
-});
-
-describe('static getPanelState', () => {
-  const suites = [
-    { panelOpened: null, isLoggedIn: null, result: null },
-    { panelOpened: null, isLoggedIn: true, result: null },
-    { panelOpened: null, isLoggedIn: false, result: null },
-    { panelOpened: true, isLoggedIn: null, result: null },
-    { panelOpened: false, isLoggedIn: null, result: null },
-    { panelOpened: true, isLoggedIn: false, result: 'INACTIVE' },
-    { panelOpened: false, isLoggedIn: false, result: 'INACTIVE' },
-    { panelOpened: true, isLoggedIn: true, result: 'OPENED' },
-    { panelOpened: false, isLoggedIn: true, result: 'CLOSED' },
-  ];
-
-  for (const { panelOpened, isLoggedIn, result } of suites) {
-    test(`panelOpened: ${panelOpened}, isLoggedIn: ${isLoggedIn}`, () => {
-      setup();
-      const { NicoliveProgramService } = require('./nicolive-program');
-
-      expect(NicoliveProgramService.getPanelState(panelOpened, isLoggedIn)).toBe(result);
-    });
-  }
-});
-
-describe('refreshWindowSize', () => {
-  const suites = [
-    {
-      name: 'ログイン中でパネル展開状態を復元し、ログインチェックに成功',
-      persistentIsLoggedIn: true,
-      persistentPanelOpened: true,
-      isLoggedIn: true,
-      states: ['OPENED'],
-    },
-    {
-      name: 'ログイン中でパネル展開状態を復元し、ログインチェックに失敗',
-      persistentIsLoggedIn: true,
-      persistentPanelOpened: true,
-      isLoggedIn: false,
-      states: ['OPENED', 'INACTIVE'],
-    },
-    {
-      name: 'ログイン中でパネル収納状態を復元し、ログインチェックに成功',
-      persistentIsLoggedIn: true,
-      persistentPanelOpened: false,
-      isLoggedIn: true,
-      states: ['CLOSED'],
-    },
-    {
-      name: 'ログイン中でパネル収納状態を復元し、ログインチェックに失敗',
-      persistentIsLoggedIn: true,
-      persistentPanelOpened: false,
-      isLoggedIn: false,
-      states: ['CLOSED', 'INACTIVE'],
-    },
-    {
-      name: '未ログインでパネル展開状態を復元し、手動ログイン',
-      persistentIsLoggedIn: false,
-      persistentPanelOpened: true,
-      isLoggedIn: true,
-      states: ['INACTIVE', 'OPENED'],
-    },
-    {
-      name: '未ログインでパネル収納状態を復元し、手動ログイン',
-      persistentIsLoggedIn: false,
-      persistentPanelOpened: false,
-      isLoggedIn: true,
-      states: ['INACTIVE', 'CLOSED'],
-    },
-  ];
-
-  for (const suite of suites) {
-    test(suite.name, () => {
-      const userLoginState = new Subject();
-      const updated = new BehaviorSubject({
-        panelOpened: suite.persistentPanelOpened,
-      });
-      const setMinimumSize = jest.fn();
-      const setSize = jest.fn();
-      setup({
-        injectee: {
-          UserService: {
-            userLoginState,
-            isLoggedIn: () => suite.persistentIsLoggedIn,
-          },
-          NicoliveProgramStateService: {
-            updated,
-          },
-          WindowsService: {
-            getWindow() {
-              return {
-                getMinimumSize: () => [800, 600],
-                setMinimumSize,
-                getSize: () => [800, 600],
-                setSize,
-                isMaximized: () => false,
-              };
-            },
-          },
-        },
-      });
-
-      const { NicoliveProgramService } = require('./nicolive-program');
-      const updateWindowSize = jest.fn();
-      // inject spy
-      NicoliveProgramService.updateWindowSize = updateWindowSize;
-
-      // kick getter
-      NicoliveProgramService.instance;
-
-      userLoginState.next(suite.isLoggedIn);
-
-      suite.states.forEach((item, index, arr) => {
-        expect(updateWindowSize).toHaveBeenNthCalledWith(
-          index + 1,
-          expect.anything(),
-          arr[index - 1] || null,
-          item,
-        );
-      });
-      expect(updateWindowSize).toHaveBeenCalledTimes(suite.states.length);
-    });
-  }
-});
-
-describe('updateWindowSize', () => {
-  const states = ['INACTIVE', 'OPENED', 'CLOSED'] as (PanelState | null)[];
-  const stateName = {
-    null: '初期',
-    INACTIVE: '未ログイン',
-    OPENED: 'パネル展開',
-    CLOSED: 'パネル収納',
-  };
-  const BASE_HEIGHT = 600;
-  const BASE_WIDTH = 800;
-  const SMALL_WIDTH = BASE_WIDTH - 1; // 800より小さくしておくと便利
-
-  const initSuites: {
-    prev: PanelState | null;
-    next: PanelState;
-    smallerThanMinWidth: boolean;
-  }[] = [
-    [null, 'INACTIVE', true],
-    [null, 'INACTIVE', false],
-    [null, 'CLOSED', true],
-    [null, 'CLOSED', false],
-    [null, 'OPENED', true],
-    [null, 'OPENED', false],
-  ].map(([prev, next, smallerThanMinWidth]: [PanelState | null, PanelState, boolean]) => ({
-    prev,
-    next,
-    smallerThanMinWidth,
-  }));
-
-  for (const suite of initSuites) {
-    test(`${stateName[suite.prev]}→${stateName[suite.next]} 最小幅より${
-      suite.smallerThanMinWidth ? '小さい' : '大きい'
-    }`, () => {
-      setup();
-      const { NicoliveProgramService } = require('./nicolive-program');
-      const { WINDOW_MIN_WIDTH } = NicoliveProgramService;
-      const WIDTH = suite.smallerThanMinWidth
-        ? SMALL_WIDTH
-        : WINDOW_MIN_WIDTH[suite.next] || BASE_WIDTH;
-
-      const win = {
-        getMinimumSize: () => [WINDOW_MIN_WIDTH[suite.prev], BASE_HEIGHT],
-        getSize: () => [WIDTH, BASE_HEIGHT],
-        setMinimumSize: jest.fn(),
-        setSize: jest.fn(),
-        isMaximized: () => false,
-      };
-
-      NicoliveProgramService.updateWindowSize(win, suite.prev, suite.next);
-      expect(win.setMinimumSize).toHaveBeenCalledTimes(1);
-      expect(win.setMinimumSize).toHaveBeenNthCalledWith(
-        1,
-        WINDOW_MIN_WIDTH[suite.next],
-        BASE_HEIGHT,
-      );
-
-      if (suite.smallerThanMinWidth) {
-        expect(win.setSize).toHaveBeenCalledTimes(1);
-        expect(win.setSize).toHaveBeenNthCalledWith(1, WINDOW_MIN_WIDTH[suite.next], BASE_HEIGHT);
-      } else {
-        expect(win.setSize).toHaveBeenCalledTimes(0);
-      }
-    });
-  }
-
-  const suites = [
-    ['INACTIVE', 'CLOSED', false],
-    ['INACTIVE', 'OPENED', false],
-    ['CLOSED', 'OPENED', false],
-    ['OPENED', 'CLOSED', false],
-    ['OPENED', 'INACTIVE', false],
-    ['CLOSED', 'INACTIVE', false],
-    ['INACTIVE', 'CLOSED', true],
-    ['INACTIVE', 'OPENED', true],
-    ['CLOSED', 'OPENED', true],
-    ['OPENED', 'CLOSED', true],
-    ['OPENED', 'INACTIVE', true],
-    ['CLOSED', 'INACTIVE', true],
-  ].map(([prev, next, isMaximized]: [PanelState, PanelState, boolean]) => ({
-    prev,
-    next,
-    isMaximized,
-  }));
-  const WIDTH_DIFF = 32;
-
-  for (const suite of suites) {
-    test(`${stateName[suite.prev]}→${stateName[suite.next]} ${
-      suite.isMaximized ? '最大化中は幅が変わらない' : '変化量を維持して幅を更新する'
-    }`, () => {
-      setup();
-      const { NicoliveProgramService } = require('./nicolive-program');
-      const { WINDOW_MIN_WIDTH } = NicoliveProgramService;
-
-      const win = {
-        getMinimumSize: () => [WINDOW_MIN_WIDTH[suite.prev], BASE_HEIGHT],
-        getSize: () => [WINDOW_MIN_WIDTH[suite.prev] + WIDTH_DIFF, BASE_HEIGHT],
-        setMinimumSize: jest.fn(),
-        setSize: jest.fn(),
-        isMaximized: () => suite.isMaximized,
-      };
-
-      NicoliveProgramService.updateWindowSize(win, suite.prev, suite.next);
-
-      expect(win.setMinimumSize).toHaveBeenCalledTimes(1);
-      expect(win.setMinimumSize).toHaveBeenNthCalledWith(
-        1,
-        WINDOW_MIN_WIDTH[suite.next],
-        BASE_HEIGHT,
-      );
-
-      if (suite.isMaximized) {
-        expect(win.setSize).toHaveBeenCalledTimes(0);
-      } else {
-        expect(win.setSize).toHaveBeenCalledTimes(1);
-        expect(win.setSize).toHaveBeenNthCalledWith(
-          1,
-          WINDOW_MIN_WIDTH[suite.next] + WIDTH_DIFF,
-          BASE_HEIGHT,
-        );
       }
     });
   }

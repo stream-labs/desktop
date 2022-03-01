@@ -84,7 +84,7 @@
   </div>
   <div slot="controls" v-if="currentStep === 'confirm'">
     <button
-      class="button button--action"
+      class="button button--primary"
       @click="ok"
       data-test="Done">
       {{ $t('streaming.nicoliveProgramSelector.done') }}
@@ -96,8 +96,7 @@
 <script lang="ts" src="./NicoliveProgramSelector.vue.ts"></script>
 
 <style lang="less" scoped>
-@import "../../styles/_colors";
-@import "../../styles/mixins";
+@import "../../styles/index";
 
 .nicolive-program-selector {
   display: flex;
@@ -112,19 +111,24 @@
 .step-item {
   display: flex;
   align-items: center;
+  height: auto;
   padding: 12px 40px 12px 16px;
   position: relative;
 
   & /deep/ .icon-check {
-    font-size: 12px;
-    color: @accent;
+    font-size: @font-size2;
+    color: var(--color-text-active);
     width: auto;
     margin: 0;
     position: absolute;
     top: 50%;
     left: inherit;
-    right: 16px;
+    right: 20px;
     transform: translateY(-50%);
+  }
+
+  &:not(.active):hover /deep/ .icon-check {
+    color: var(--color-text-active);
   }
 
   & /deep/ .nav-item__name {
@@ -132,37 +136,35 @@
   }
 
   &.active {
-    color: @white;
     cursor: default;
-    .bg-active();
-  }
-
-  &:not(.active):not(.disabled):hover {
-    .bg-hover();
   }
 }
 
 .step-item-title {
-  font-size: 14px;
-  color: @light-grey;
+  color: var(--color-text);
   margin: 0;
 
-  .step-item.active & {
-    color: @text-active;
+  .active & {
+    color: var(--color-text-active);
+  }
+
+  .disabled & {
+    cursor: default;
+    color: var(--color-text-disabled);
   }
 }
 
 .step-item-selected-item {
-  font-size: 12px;
-  color: @grey;
+  font-size: @font-size2;
+  color: var(--color-text-dark);
   margin: 4px 0 0;
-  .text-ellipsis();
+  .text-ellipsis;
 }
 
 .nicolive-program-selector-container {
   margin: 0;
-  overflow-y: auto;
-  background-color: @bg-tertiary;
+  padding: 16px 8px 16px 0;
+  overflow-y: scroll;
   width: 100%;
 }
 
@@ -180,18 +182,18 @@
     .confirm-step & {
       display: flex;
       flex-direction: column;
-      padding: 12px 24px;
+      padding: 8px 16px;
     }
 
     > .caption {
-      color: @grey;
-      font-size: 12px;
+      color: var(--color-text-dark);
+      font-size: @font-size2;
       margin-bottom: 8px;
     }
 
     > .value {
       color: @white;
-      font-size: 14px;
+      font-size: @font-size4;
     }
 
     > a {
@@ -199,13 +201,9 @@
       align-items: center;
       width: 100%;
       min-height: 56px;
-      padding: 12px 16px;
+      padding: 8px 16px;
       cursor: pointer;
       text-decoration: none;
-
-      &:hover {
-        .bg-hover();
-      }
 
       .program-select-step & {
         flex-direction: column;
@@ -216,17 +214,23 @@
         width: 40px;
         height: 40px;
         margin-right: 16px;
-        background-color: @bg-secondary;
+        background-color: var(--color-black);
         overflow: hidden;
         border-radius: 50%;
         flex-shrink: 0;
       }
 
       .anchor-text {
-        color: @white;
-        font-size: 14px;
+        color: var(--color-text);
+        font-size: @font-size4;
         margin: 0;
-        .text-ellipsis();
+        .text-ellipsis;
+      }
+
+      &:hover {
+        .anchor-text {
+          color: var(--color-text-light);
+        }
       }
 
       .annotation {
@@ -236,7 +240,7 @@
           display: block;
           font-size: 12px;
           line-height: 24px;
-          background-color: @bg-quinary;
+          background-color: var(--color-bg-quinary);
           color: @white;
           border-radius: 2px;
           padding: 0 8px;
@@ -248,7 +252,7 @@
         height: 6px;
         border-radius: 50%;
         content: '';
-        background-color: @text-primary;
+        background-color: var(--color-text-active);
         position: absolute;
         left: 5px;
         top: 9px;
@@ -261,7 +265,7 @@
 }
 
 .no-program-message {
-  color: @grey;
+  color: var(--color-text-dark);
   text-align: center;
   margin: auto;
   padding-bottom: 80px;

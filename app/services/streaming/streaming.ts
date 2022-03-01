@@ -349,8 +349,8 @@ export class StreamingService
           title: $t('streaming.optimizationForNiconico.title'),
           queryParams: settings,
           size: {
-            width: 500,
-            height: this.calculateOptimizeWindowSize(settings),
+            width: 600,
+            height: 594,
           },
         });
       } else {

@@ -24,11 +24,14 @@
 <script lang="ts" src="./NameScene.vue.ts"></script>
 
 <style lang="less" scoped>
+@import "../../styles/index";
+
 .NameScene-label {
+  color: var(--color-text);
   margin-bottom: 8px;
 }
 
 .NameScene-label__error {
-  color: red;
+  color: var(--color-error);
 }
 </style>

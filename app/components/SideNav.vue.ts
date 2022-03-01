@@ -1,17 +1,17 @@
-import Vue from 'vue';
-import { Component, Prop } from 'vue-property-decorator';
-import { Inject } from 'services/core/injector';
-import { CustomizationService } from 'services/customization';
-import { NavigationService } from 'services/navigation';
-import { UserService } from 'services/user';
-import electron from 'electron';
 import Login from 'components/Login.vue';
 import StreamingStatus from 'components/StreamingStatus.vue';
-import { SettingsService } from 'services/settings';
-import Utils from 'services/utils';
-import { TransitionsService } from 'services/transitions';
+import electron from 'electron';
+import { CompactModeService } from 'services/compact-mode';
+import { Inject } from 'services/core/injector';
+import { EAvailableFeatures, IncrementalRolloutService } from 'services/incremental-rollout';
 import { InformationsService } from 'services/informations';
-import { IncrementalRolloutService, EAvailableFeatures } from 'services/incremental-rollout';
+import { NavigationService } from 'services/navigation';
+import { SettingsService } from 'services/settings';
+import { TransitionsService } from 'services/transitions';
+import { UserService } from 'services/user';
+import Utils from 'services/utils';
+import Vue from 'vue';
+import { Component, Prop, Watch } from 'vue-property-decorator';
 
 @Component({
   components: {
@@ -19,9 +19,9 @@ import { IncrementalRolloutService, EAvailableFeatures } from 'services/incremen
     StreamingStatus,
   },
 })
-export default class TopNav extends Vue {
+export default class SideNav extends Vue {
   @Inject() settingsService: SettingsService;
-  @Inject() customizationService: CustomizationService;
+  @Inject() compactModeService: CompactModeService;
   @Inject() navigationService: NavigationService;
   @Inject() userService: UserService;
   @Inject() transitionsService: TransitionsService;
@@ -48,6 +48,22 @@ export default class TopNav extends Vue {
 
   featureIsEnabled(feature: EAvailableFeatures) {
     return this.incrementalRolloutService.featureIsEnabled(feature);
+  }
+
+  get isCompactMode(): boolean {
+    return this.compactModeService.isCompactMode;
+  }
+  toggleCompactMode() {
+    this.compactModeService.toggleCompactMode();
+  }
+  get compactModeTab(): 'studio' | 'niconico' {
+    return this.compactModeService.compactModeTab;
+  }
+  set compactModeTab(tab: 'studio' | 'niconico') {
+    this.compactModeService.compactModeTab = tab;
+  }
+  get notifyNewComment(): boolean {
+    return this.compactModeService.notifyNewComment;
   }
 
   studioMode() {

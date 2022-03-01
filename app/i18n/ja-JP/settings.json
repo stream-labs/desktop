@@ -635,5 +635,15 @@
   "keyframeInterval": "キーフレーム間隔(秒)",
   "encoderPreset": "エンコーダープリセット",
   "pollingPerformanceStatistics": "パフォーマンス統計情報（ビットレート・FPS・ドロップフレーム数）を取得する",
-  "pollingPerformanceStatisticsDescription": "配信が不安定な場合は無効にしてみてください。"
+  "pollingPerformanceStatisticsDescription": "配信が不安定な場合は無効にしてみてください。",
+  "compactMode": "コンパクトモード",
+  "autoCompact": {
+    "title": "コンパクトモード自動化設定",
+    "message": "番組開始時に自動的にコンパクトモードになり、番組終了時に自動で解除されるように設定できます。\n※設定をOFFにしたい場合は[設定]>[一般]から変更できます",
+    "doNotShowAgain": "今後、このダイアログを表示しない",
+    "later": "今はONにしない",
+    "activate": "コンパクトモード自動化設定をONにする",
+    "setting": "配信中に自動でコンパクトモードに切り替える",
+    "showDialog": "コンパクトモード自動化設定ダイアログを表示する"
+  }
 }

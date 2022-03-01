@@ -1,5 +1,5 @@
-'use strict';
-
+/* eslint-disable prettier/prettier */
+/* eslint-disable no-inner-declarations */
 ////////////////////////////////////////////////////////////////////////////////
 // Set Up Environment Variables
 ////////////////////////////////////////////////////////////////////////////////
@@ -30,7 +30,16 @@ if (!process.env.NAIR_LICENSE_API_KEY && pjson.getlicensenair_key) {
 ////////////////////////////////////////////////////////////////////////////////
 // Modules and other Requires
 ////////////////////////////////////////////////////////////////////////////////
-const { app, BrowserWindow, ipcMain, session, crashReporter, dialog, webContents, shell } = require('electron');
+const {
+  app,
+  BrowserWindow,
+  ipcMain,
+  session,
+  crashReporter,
+  dialog,
+  webContents,
+  shell,
+} = require('electron');
 const path = require('path');
 const rimraf = require('rimraf');
 const electronLog = require('electron-log');
@@ -47,7 +56,7 @@ if (process.env.NAIR_CACHE_DIR) {
   electronLog.transports.file.file = path.join(
     process.env.NAIR_CACHE_DIR,
     'nair-client',
-    'log.log'
+    'log.log',
   );
   app.setPath('userData', path.join(app.getPath('appData'), 'nair-client'));
 } else {
@@ -109,7 +118,6 @@ if (!gotTheLock) {
     // network logging is disabled by default
     if (!process.argv.includes('--network-logging')) return;
     app.on('ready', () => {
-
       // ignore fs requests
       const filter = { urls: ['https://*', 'http://*'] };
 
@@ -118,15 +126,15 @@ if (!gotTheLock) {
         callback(details);
       });
 
-      session.defaultSession.webRequest.onErrorOccurred(filter, (details) => {
+      session.defaultSession.webRequest.onErrorOccurred(filter, details => {
         log('HTTP REQUEST FAILED', details.method, details.url);
       });
 
-      session.defaultSession.webRequest.onCompleted(filter, (details) => {
+      session.defaultSession.webRequest.onCompleted(filter, details => {
         log('HTTP REQUEST COMPLETED', details.method, details.url, details.statusCode);
       });
     });
-  })();
+  }());
 
   // Windows
   let mainWindow;
@@ -139,36 +147,46 @@ if (!gotTheLock) {
   let shutdownStarted = false;
   let appShutdownTimeout;
 
-  global.indexUrl = 'file://' + __dirname + '/index.html';
+  global.indexUrl = process.env.DEV_SERVER || `file://${__dirname}/index.html`;
 
   function openDevTools() {
-    childWindow.webContents.openDevTools({ mode: 'undocked' });
+    if (childWindow.isVisible()) {
+      childWindow.webContents.openDevTools({ mode: 'undocked' });
+    }
     mainWindow.webContents.openDevTools({ mode: 'undocked' });
   }
 
   function startApp() {
-    const isDevMode = (process.env.NODE_ENV !== 'production') && (process.env.NODE_ENV !== 'test');
+    const isDevMode = process.env.NODE_ENV !== 'production' && process.env.NODE_ENV !== 'test';
 
-    crashHandler.startCrashHandler(app.getAppPath(), process.env.NAIR_VERSION, isDevMode.toString());
-    crashHandler.registerProcess(pid, false);
+    if (!process.env.DEV_SERVER) {
+      crashHandler.startCrashHandler(
+        app.getAppPath(),
+        process.env.NAIR_VERSION,
+        isDevMode.toString(),
+      );
+      crashHandler.registerProcess(pid, false);
+    }
 
     const Raven = require('raven-js');
 
     function handleFinishedReport() {
-      dialog.showErrorBox(`予期せぬエラー`,
+      dialog.showErrorBox(
+        '予期せぬエラー',
         '予期しないエラーが発生したため、アプリケーションをシャットダウンします。ご不便をおかけして申し訳ありません。\n' +
-        'この件に関する情報はデバッグ目的で送信されました。不具合を解決するためにご協力いただきありがとうございます。');
+        'この件に関する情報はデバッグ目的で送信されました。不具合を解決するためにご協力いただきありがとうございます。',
+      );
 
       app.exit();
     }
 
     if (pjson.env === 'production') {
-      const params = !!process.env.NAIR_UNSTABLE
+      const params = process.env.NAIR_UNSTABLE
         ? { project: '5372801', key: '819e76e51864453aafd28c6d0473881f' } // crash-reporter-unstable
         : { project: '1520076', key: 'd965eea4b2254c2b9f38d2346fb8a472' }; // crash-reporter
 
       Raven.config(`https://${params.key}@o170115.ingest.sentry.io/${params.project}`, {
-        release: process.env.NAIR_VERSION
+        release: process.env.NAIR_VERSION,
       }).install(function (err, initialErr, eventId) {
         handleFinishedReport();
       });
@@ -181,35 +199,40 @@ if (!gotTheLock) {
           `?sentry_key=${params.key}`,
         extra: {
           version: pjson.version,
-          processType: 'main'
-        }
+          processType: 'main',
+        },
       });
     }
 
     const mainWindowState = windowStateKeeper({
       defaultWidth: 1600,
-      defaultHeight: 1000
+      defaultHeight: 1000,
     });
 
-    const mainWindowIsVisible = electron.screen.getAllDisplays().some(display => (
-      display.workArea.x < mainWindowState.x + mainWindowState.width &&
-      mainWindowState.x < display.workArea.x + display.workArea.width &&
-      display.workArea.y < mainWindowState.y &&
-      mainWindowState.y < display.workArea.y + display.workArea.height
-    ));
+    const mainWindowIsVisible = electron.screen
+      .getAllDisplays()
+      .some(
+        display =>
+          display.workArea.x < mainWindowState.x + mainWindowState.width &&
+          mainWindowState.x < display.workArea.x + display.workArea.width &&
+          display.workArea.y < mainWindowState.y &&
+          mainWindowState.y < display.workArea.y + display.workArea.height,
+      );
 
     mainWindow = new BrowserWindow({
-      minWidth: 800,
+      minWidth: 448,
       minHeight: 600,
       width: mainWindowState.width,
       height: mainWindowState.height,
       show: false,
       frame: false,
       title: process.env.NAIR_PRODUCT_NAME,
-      ...(mainWindowIsVisible ? {
-        x: mainWindowState.x,
-        y: mainWindowState.y
-      } : {}),
+      ...(mainWindowIsVisible
+        ? {
+          x: mainWindowState.x,
+          y: mainWindowState.y,
+        }
+        : {}),
       webPreferences: { nodeIntegration: true, webviewTag: true },
     });
 
@@ -221,9 +244,13 @@ if (!gotTheLock) {
     // it allows to start application with clean cache
     // and handle breakpoints on startup
     const LOAD_DELAY = 2000;
-    setTimeout(() => {
-      mainWindow.loadURL(`${global.indexUrl}?windowId=main`);
-    }, isDevMode ? LOAD_DELAY : 0);
+    setTimeout(
+      () => {
+        if (process.env.NAIR_PRODUCTION_DEBUG || process.env.DEV_SERVER) openDevTools();
+        mainWindow.loadURL(`${global.indexUrl}?windowId=main`);
+      },
+      isDevMode ? LOAD_DELAY : 0,
+    );
 
     mainWindow.on('close', e => {
       if (!shutdownStarted) {
@@ -267,7 +294,7 @@ if (!gotTheLock) {
       show: false,
       frame: false,
       backgroundColor: '#17242D', // これいる?
-      webPreferences: { nodeIntegration: true }
+      webPreferences: { nodeIntegration: true },
     });
 
     childWindow.setMenu(null);
@@ -283,7 +310,12 @@ if (!gotTheLock) {
       }
     });
 
-    if (process.env.NAIR_PRODUCTION_DEBUG) openDevTools();
+    const { default: installExtension, VUEJS_DEVTOOLS } = require('electron-devtools-installer');
+    installExtension(VUEJS_DEVTOOLS)
+      .then(name => console.log(name))
+      .catch(err => console.log(err));
+
+    // if (process.env.NAIR_PRODUCTION_DEBUG || process.env.DEV_SERVER) openDevTools();
 
     // simple messaging system for services between windows
     // WARNING! the child window use synchronous requests and will be frozen
@@ -303,8 +335,8 @@ if (!gotTheLock) {
         method,
         params: {
           resource,
-          args
-        }
+          args,
+        },
       });
     }
 
@@ -332,12 +364,11 @@ if (!gotTheLock) {
       });
     });
 
-
     if (isDevMode) {
       require('devtron').install();
 
       // Vue dev tools appears to cause strange non-deterministic
-      // interference with certain NodeJS APIs, expecially asynchronous
+      // interference with certain NodeJS APIs, especially asynchronous
       // IO from the renderer process.  Enable at your own risk.
 
       // const devtoolsInstaller = require('electron-devtools-installer');
@@ -373,8 +404,8 @@ if (!gotTheLock) {
   });
 
   app.on('ready', () => {
-    if ((process.env.NODE_ENV === 'production') || process.env.NAIR_FORCE_AUTO_UPDATE) {
-      (new Updater(startApp)).run();
+    if (process.env.NODE_ENV === 'production' || process.env.NAIR_FORCE_AUTO_UPDATE) {
+      new Updater(startApp).run();
     } else {
       startApp();
     }
@@ -394,8 +425,8 @@ if (!gotTheLock) {
       // about the bounds.
       try {
         const bounds = mainWindow.getBounds();
-        const childX = (bounds.x + (bounds.width / 2)) - (windowOptions.size.width / 2);
-        const childY = (bounds.y + (bounds.height / 2)) - (windowOptions.size.height / 2);
+        const childX = bounds.x + bounds.width / 2 - windowOptions.size.width / 2;
+        const childY = bounds.y + bounds.height / 2 - windowOptions.size.height / 2;
 
         childWindow.show();
         childWindow.restore();
@@ -406,7 +437,7 @@ if (!gotTheLock) {
             x: Math.floor(childX),
             y: Math.floor(childY),
             width: windowOptions.size.width,
-            height: windowOptions.size.height
+            height: windowOptions.size.height,
           });
         }
       } catch (err) {
@@ -419,15 +450,12 @@ if (!gotTheLock) {
 
       childWindow.focus();
     }
-
   });
 
-
-  ipcMain.on('window-closeChildWindow', (event) => {
+  ipcMain.on('window-closeChildWindow', event => {
     // never close the child window, hide it instead
     childWindow.hide();
   });
-
 
   ipcMain.on('window-focusMain', () => {
     mainWindow.focus();
@@ -456,11 +484,10 @@ if (!gotTheLock) {
    **/
   function preventLogout(e, url) {
     const urlObj = new URL(url);
-    const isLogout = (
+    const isLogout =
       /^https?:$/.test(urlObj.protocol) &&
       /^live2?\.nicovideo\.jp$/.test(urlObj.hostname) &&
-      /^\/logout$/.test(urlObj.pathname)
-    );
+      /^\/logout$/.test(urlObj.pathname);
     if (isLogout) {
       e.preventDefault();
     }
@@ -488,11 +515,11 @@ if (!gotTheLock) {
 
   // The main process acts as a hub for various windows
   // syncing their vuex stores.
-  let registeredStores = {};
+  const registeredStores = {};
 
   ipcMain.on('vuex-register', event => {
-    let win = BrowserWindow.fromWebContents(event.sender);
-    let windowId = win.id;
+    const win = BrowserWindow.fromWebContents(event.sender);
+    const windowId = win.id;
 
     // Register can be received multiple times if the window is
     // refreshed.  We only want to register it once.
@@ -522,10 +549,12 @@ if (!gotTheLock) {
     if (senderWindow && !senderWindow.isDestroyed()) {
       const windowId = senderWindow.id;
 
-      Object.keys(registeredStores).filter(id => id !== windowId.toString()).forEach(id => {
-        const win = registeredStores[id];
-        if (!win.isDestroyed()) win.webContents.send('vuex-mutation', mutation);
-      });
+      Object.keys(registeredStores)
+        .filter(id => id !== windowId.toString())
+        .forEach(id => {
+          const win = registeredStores[id];
+          if (!win.isDestroyed()) win.webContents.send('vuex-mutation', mutation);
+        });
     }
   });
 
@@ -570,7 +599,8 @@ if (!gotTheLock) {
   });
 
   ipcMain.on('showErrorAlert', () => {
-    if (!mainWindow.isDestroyed()) { // main window may be destroyed on shutdown
+    if (!mainWindow.isDestroyed()) {
+      // main window may be destroyed on shutdown
       mainWindow.send('showErrorAlert');
     }
   });

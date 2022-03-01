@@ -23,7 +23,7 @@
       </div>
       <div class="row">
         <div class="columns small-12 buttons">
-          <button @click="addNew" class="button button--action" data-test="AddNewSource">{{ $t('sources.addNewSource') }}</button>
+          <button @click="addNew" class="button button--primary" data-test="AddNewSource">{{ $t('sources.addNewSource') }}</button>
         </div>
       </div>
     </div>
@@ -60,7 +60,7 @@
       <div class="columns small-12 buttons">
         <button
           @click="addExisting"
-          class="button button--action"
+          class="button button--primary"
           data-test="AddExistingSource"
         >
           {{ $t('sources.addExistingSource') }}
@@ -78,11 +78,12 @@
 @import "../../styles/index";
 
 .NameSource-label {
+  color: var(--color-text);
   margin-bottom: 8px;
 }
 
 .NameSource-label__error {
-  color: @red;
+  color: var(--color-error);
 }
 
 .sources-container {

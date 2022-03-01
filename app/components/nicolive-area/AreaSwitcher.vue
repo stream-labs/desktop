@@ -3,10 +3,10 @@
     <div class="contentContainer">
       <slot :name="activeContent.slotName" />
     </div>
-    <div class="header">
-      <popper trigger="hover" :options="{ placement: 'bottom-start' }">
+    <div class="header" v-if="!isCompactMode">
+      <popper trigger="click" :options="{ placement: 'bottom-start' }">
         <div class="popper">
-          <ul class="selector">
+          <ul class="popup-menu-list">
             <li
               class="item"
               :class="{ active: content.slotName === activeContent.slotName }"
@@ -14,13 +14,8 @@
               v-for="content in contents"
               @click="select(content.slotName)"
             >
-              <i
-                class="item-icon"
-                :class="content.slotName === 'commentViewer' ? 'icon-comment' : 'icon-program-text'"
-              ></i>
               <p class="item-name">{{ content.name }}</p>
               <p class="item-text">{{ content.text }}</p>
-              <i class="icon-check" v-if="content.slotName === activeContent.slotName"></i>
             </li>
           </ul>
         </div>
@@ -37,8 +32,7 @@
 <script lang="ts" src="./AreaSwitcher.vue.ts"></script>
 
 <style lang="less" scoped>
-@import "../../styles/_colors";
-@import "../../styles/mixins";
+@import '../../styles/index';
 
 .container {
   position: relative;
@@ -47,7 +41,7 @@
 }
 
 .header {
-  z-index: 1;
+  z-index: @z-index-default-content;
   position: absolute;
   top: 0;
   left: 0;
@@ -56,82 +50,25 @@
 }
 
 .indicator {
-  font-size: 12px;
-  color: @white;
-  margin: 8px;
-  height: 32px;
-  line-height: 32px;
-  padding: 8px;
+  .transition;
   display: flex;
   align-items: center;
+  font-size: @font-size4;
+  color: var(--color-text-light);
+  height: 32px;
+  line-height: 32px;
+  margin: 8px;
+  padding: 8px;
   border-radius: 4px;
   cursor: pointer;
 
   &:hover {
-     .bg-hover();
+    background-color: var(--color-button-tertiary-hover);
   }
 
   > i {
-    font-size: 10px;
+    font-size: @font-size1;
     margin-left: 8px;
-  }
-}
-
-.selector {
-  border-radius: 4px;
-  margin: 0;
-  padding: 8px 1px;
-  width: 330px;
-  background-color: @bg-primary;
-  box-shadow: 0 0 4px rgba(@black, 0.5), inset 0 0 0 1px rgba(@white, 0.1);
-
-  & > .item {
-    list-style: none;
-    height: 56px;
-    position: relative;
-    padding: 0 48px 0 48px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    cursor: pointer;
-
-    &.active {
-      .bg-active();
-    }
-
-    &:not(.active):hover {
-      .bg-hover();
-    }
-
-    > i {
-      position: absolute;
-      transform: translateY(-50%);
-      top: 50%;
-    }
-  }
-
-  .item-name {
-    font-size: 12px;
-    margin: 0;
-    color: @white;
-  }
-
-  .item-text {
-    font-size: 10px;
-    margin: 0;
-    color: @light-grey;
-  }
-
-  .item-icon {
-    font-size: 16px;
-    left: 16px;
-    color: @light-grey;
-  }
-
-  .icon-check {
-    font-size: 12px;
-    right: 16px;
-    color: @accent;
   }
 }
 
@@ -143,14 +80,45 @@
 }
 
 .popper {
-  background-color: transparent;
+  .popper-styling;
+  width: 320px;
+
   padding: 0;
   margin-left: 8px;
-  border: none;
-  text-align: unset;
 
-  & /deep/ .popper__arrow {
-    border-color: transparent !important;
+  .popup-menu-list {
+    margin: 0;
+
+    & > .item {
+      text-align: left;
+      position: relative;
+      padding: 0 16px;
+      height: 64px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      cursor: pointer;
+
+      &.active {
+        .bg-hover();
+      }
+
+      &:not(.active):hover {
+        .bg-hover();
+      }
+    }
+
+    .item-name {
+      font-size: @font-size4;
+      margin: 0 0 4px 0;
+      color: var(--color-text-light);
+    }
+
+    .item-text {
+      font-size: @font-size2;
+      margin: 0;
+      color: var(--color-text);
+    }
   }
 }
 </style>

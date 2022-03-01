@@ -22,22 +22,22 @@
 @import "../styles/index";
 
 .tabs__container {
-  height: 100%;
+  .flex__column;
+  flex-grow: 1;
 }
 
 .tabs {
   display: flex;
-  background-color: @bg-primary;
   box-sizing: border-box;
   position: relative;
   width: 100%;
-  padding: 0 15px;
+  padding: 0 16px;
   height: 54px;
-  border-bottom: 1px solid @border;
 }
 
 .tab-content {
-  height: calc(~'100% - 54px');
+  .flex__column;
+  flex-grow: 1;
   position: relative;
   overflow-y: auto;
 }

@@ -64,6 +64,12 @@
   "Hr": "時間",
   "Min": "分",
   "Sec": "秒",
+  "fullMode": "クリックしてフルモードに切り替える",
+  "compactMode": "クリックしてコンパクトモードに切り替える",
+  "compactModeTab": {
+    "niconico": "ニコニコ生放送番組関連タブ",
+    "studio": "配信関連タブ"
+  },
   "fieldIsRequired": "このフィールドは必須です",
   "fieldMustBeLarger": "%{value} 以上を指定してください",
   "fieldMustBeLess": "%{value} 以上を指定してください",

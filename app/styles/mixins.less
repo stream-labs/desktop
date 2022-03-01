@@ -78,12 +78,17 @@
 
 // Border radius
 .radius() {
-  border-radius: 2px;
+  border-radius: 4px;
 }
 
 // Borders
 .border() {
   border: 1px solid @border;
+}
+
+// opacity
+.opacity() {
+  opacity: @opacity-disabled;
 }
 
 // Typography
@@ -109,12 +114,11 @@
 
 // Hovers
 .icon-hover() {
-  color: @text-primary;
-  opacity: .7;
+  color: var(--color-text);
   transition: all 275ms;
 
   &:hover {
-    opacity: 1;
+    color: var(--color-text-light);
   }
 }
 
@@ -285,17 +289,15 @@
   }
 }
 
-
 .align-items--top {
   & > * {
     vertical-align: top;
   }
 }
 
-
 // Shadows
 .shadow() {
-  box-shadow: 0 6px 14px 1px rgba(1, 2, 2, .3);
+  box-shadow: 0 6px 14px 1px rgba(0, 8, 16, .4);
 }
 
 // Transitiions
@@ -303,16 +305,81 @@
   transition: all 275ms;
 }
 
-.bg-hover(@color: @white) {
-  background-color: rgba(@color, .06);
+.bg-hover {
+  .transition;
+  background-color: var(--color-bg-active);
 }
 
 .bg-active(@color: @black) {
   background-color: rgba(@color, .25);
 }
 
-.text-ellipsis() {
+.text-ellipsis {
   text-overflow: ellipsis;
   white-space: nowrap;
   overflow: hidden;
+}
+
+.dividing-border(@direction: top) {
+  border-@{direction}: 1px solid var(--color-border-dark);
+}
+
+.time-styling {
+  .semibold;
+  font-size: @font-size2;
+  white-space: nowrap;
+  letter-spacing: .08em;
+  color: var(--color-text-light);
+}
+
+.popper-styling {
+  .shadow;
+  z-index: @z-index-popper;
+  border-radius: 4px;
+  background-color: var(--color-popper-bg-light);
+  border: 1px solid var(--color-border-light);
+  padding: 0;
+
+  & /deep/ .popper__arrow {
+    display: none;
+  }
+
+  .popup-menu-list {
+    list-style: none;
+    margin: 0;
+    padding: 8px 0;
+
+    &:not(:first-child) {
+      border-top: 1px solid var(--color-border-light);
+    }
+  }
+
+  .popup-menu-head {
+    color: var(--color-text-light);
+    font-size: @font-size4;
+    font-weight: @font-weight-bold;
+    text-align: left;
+    padding: 16px;
+    word-wrap: break-word;
+  }
+
+  .popup-menu-item {
+    > * {
+      width: 100%;
+      line-height: 32px;
+      padding: 0 16px;
+      font-size: @font-size2;
+    }
+
+    a, button {
+      &:not(:disabled):hover {
+        color: var(--color-text-light);
+        background-color: var(--color-bg-active);
+      }
+    }
+
+    i {
+      margin-right: 16px;
+    }
+  }
 }

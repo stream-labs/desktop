@@ -13,7 +13,8 @@
       @click="(ev) => handleSelect(ev, index)"
       @dblclick="(ev) => handleDoubleClick(ev, index)">
       <div class="selector-item-text" :data-test="item.name">
-        <span class="layer-icon"><i class="icon-studio-mode"/></span>{{item.name}}
+        <span class="layer-icon"><i class="icon-studio-mode"/></span>
+        <span class="item-title">{{item.name}}</span>
       </div>
       <div class="selector-actions">
         <slot name="actions" :item="item"/>
@@ -31,18 +32,17 @@
 .sortable-ghost {
   opacity: .7;
   background-image: none;
-  background: @accent-light;
+  background-color: var(--color-bg-active);
 }
 
 .sortable-chosen {
   opacity: .7;
   background-image: none;
-  background: @accent-light;
+  background-color: var(--color-bg-active);
 }
-
 .sortable-drag {
-  border: 1px solid #ddd;
-  background-color: #eee;
+  border: 1px solid var(--color-border-light);
+  background-color: var(--color-bg-active);
 }
 
 .selector-list {
@@ -55,18 +55,20 @@
   display: flex;
   flex-direction: row;
   align-items: center;
-  padding: 4px 8px;
+  min-height: @item-generic-size;
+  padding: 0 12px;
   cursor: pointer;
   justify-content: space-between;
-  color: @text-secondary;
+
+  .text-ellipsis;
   .transition;
 
   &:hover {
-    color: @text-primary;
+    color: var(--color-text-light);
   }
   &.selector-item--active {
-    background-color: @hover;
-    color: @text-primary;
+    background-color: var(--color-bg-active);
+    color: var(--color-text-light);
   }
 
   &:hover {
@@ -79,21 +81,15 @@
 .layer-icon {
   display: inline-block;
   text-align: left;
-  width: 16px;
-  margin-right: 4px;
 
   i {
-    font-size: 12px;
-    font-weight: 700;
+    font-size: @font-size2;
   }
 }
 .selector-item-text {
-  text-overflow: ellipsis;
-  max-width: 100%;
-  white-space: nowrap;
-  overflow: hidden;
+  .text-ellipsis;
   display: flex;
-  justify-content: flex-end;
+  align-items: center;
 }
 
 .selector-actions {
@@ -105,7 +101,7 @@
 
 .selector-drag-handle {
   cursor: move;
-  .icon-hover();
+  .icon-hover;
 }
 
 </style>

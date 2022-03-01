@@ -1,14 +1,15 @@
+import { TObsFormData } from 'components/obs/inputs/ObsInput';
 import { Subject } from 'rxjs';
+import Utils from 'services/utils';
 import { PersistentStatefulService } from '../core/persistent-stateful-service';
 import { mutation } from '../core/stateful-service';
 import {
   ICustomizationServiceApi,
   ICustomizationServiceState,
   ICustomizationSettings,
+  TCompactModeStudioController,
+  TCompactModeTab,
 } from './customization-api';
-import { TObsFormData } from 'components/obs/inputs/ObsInput';
-import Utils from 'services/utils';
-import { $t } from 'services/i18n';
 
 /**
  * This class is used to store general UI behavior flags
@@ -16,8 +17,8 @@ import { $t } from 'services/i18n';
  */
 export class CustomizationService
   extends PersistentStatefulService<ICustomizationServiceState>
-  implements ICustomizationServiceApi
-{
+  // eslint-disable-next-line prettier/prettier
+  implements ICustomizationServiceApi {
   static defaultState: ICustomizationServiceState = {
     performanceMode: false,
     studioControlsOpened: true,
@@ -25,6 +26,19 @@ export class CustomizationService
     showOptimizationDialogForNiconico: true,
     optimizeWithHardwareEncoder: true,
     pollingPerformanceStatistics: true,
+
+    compactMode: false,
+    compactModeTab: 'niconico',
+    compactModeStudioController: 'scenes',
+    compactModeNewComment: false,
+    fullModeWidthOffset: 0,
+    compactBackupPositionX: undefined,
+    compactBackupPositionY: undefined,
+    compactBackupHeight: undefined,
+    compactMaximized: false,
+    autoCompactMode: false,
+    showAutoCompactDialog: true,
+
     experimental: {
       // put experimental features here
     },
@@ -83,6 +97,54 @@ export class CustomizationService
 
   setPollingPerformanceStatistics(activate: boolean) {
     this.setSettings({ pollingPerformanceStatistics: activate });
+  }
+
+  toggleCompactMode() {
+    this.setSettings({ compactMode: !this.state.compactMode });
+  }
+  setCompactMode(value: boolean) {
+    this.setSettings({ compactMode: value });
+  }
+
+  setCompactModeTab(tab: TCompactModeTab) {
+    if (tab === 'studio' || tab === 'niconico') {
+      this.setSettings({ compactModeTab: tab, compactModeNewComment: false });
+    } else {
+      console.warn('Invalid compact mode tab:', tab);
+    }
+  }
+  setCompactModeNewComment(value: boolean) {
+    this.setSettings({ compactModeNewComment: value });
+  }
+
+  setCompactModeStudioController(controller: TCompactModeStudioController) {
+    this.setSettings({ compactModeStudioController: controller });
+  }
+
+  get autoCompactMode(): boolean {
+    return this.state.autoCompactMode;
+  }
+
+  setAutoCompatMode(auto: boolean) {
+    this.setSettings({ autoCompactMode: auto });
+  }
+
+  get showAutoCompactDialog(): boolean {
+    return this.state.showAutoCompactDialog;
+  }
+
+  setShowAutoCompactDialog(show: boolean) {
+    this.setSettings({ showAutoCompactDialog: show });
+  }
+
+  setFullModeWidthOffset(state: {
+    fullModeWidthOffset: number;
+    compactBackupPositionX: number;
+    compactBackupPositionY: number;
+    compactBackupHeight: number;
+    compactMaximized: boolean;
+  }) {
+    this.setSettings(state);
   }
 
   getSettingsFormData(): TObsFormData {

@@ -1,31 +1,38 @@
 <template>
-<div class="main" id="mainWrapper" @drop="onDropHandler">
-  <title-bar class="main-title" :title="title" />
-  <div class="main-contents">
-    <div class="main-middle">
-      <top-nav v-if="(page !== 'Onboarding')" :locked="applicationLoading"></top-nav>
-      <div v-if="shouldLockContent" class="main-loading">
-        <custom-loader></custom-loader>
-      </div>
+  <div
+    class="main"
+    id="mainWrapper"
+    @drop="onDropHandler"
+    :class="{ isCompactMode: isCompactMode }"
+  >
+    <title-bar class="main-title" :title="title" />
+    <div class="main-contents">
+      <side-nav v-if="page !== 'Onboarding'" :locked="applicationLoading"></side-nav>
+      <div class="main-middle" v-if="showMainMiddle">
+        <div v-if="shouldLockContent" class="main-loading">
+          <custom-loader></custom-loader>
+        </div>
 
-      <component
-        v-if="!shouldLockContent"
-        class="main-page-container"
-        :is="page"
-        :params="params"/>
-      <studio-footer v-if="(page !== 'Onboarding')" :locked="applicationLoading" />
+        <component
+          v-if="!shouldLockContent"
+          class="main-page-container"
+          :is="page"
+          :params="params"
+        />
+        <studio-footer v-if="page !== 'Onboarding'" :locked="applicationLoading" />
+      </div>
+      <div class="nicolive-area" v-if="showNicoliveArea">
+        <nicolive-area />
+      </div>
     </div>
-    <div class="nicolive-area" v-if="showNicoliveArea">
-      <nicolive-area />
-    </div>
+    <bottom-line />
   </div>
-</div>
 </template>
 
 <script lang="ts" src="./Main.vue.ts"></script>
 
 <style lang="less" scoped>
-@import "../../styles/index";
+@import '../../styles/index';
 
 .main {
   display: flex;
@@ -63,5 +70,4 @@
   align-items: center;
   justify-content: center;
 }
-
 </style>

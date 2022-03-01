@@ -82,7 +82,7 @@ export class NiconicoService extends Service implements IPlatformService {
   isPremium(token: string): Promise<boolean> {
     const url = `${this.hostsService.niconicoOAuth}/v1/user/premium.json`;
     const headers = authorizedHeaders(token);
-    const request = new Request(url, { headers });
+    const request = new Request(this.hostsService.replaceHost(url), { headers });
     return fetch(request)
       .then(res => res.json())
       .then(({ data }) => {
@@ -92,10 +92,12 @@ export class NiconicoService extends Service implements IPlatformService {
 
   logout(): Promise<void> {
     const url = `${this.hostsService.niconicoAccount}/logout`;
-    const request = new Request(url, { credentials: 'same-origin' });
+    const request = new Request(this.hostsService.replaceHost(url), { credentials: 'same-origin' });
     return fetch(request)
       .then(handleErrors)
-      .then(() => {});
+      .then(() => {
+        // nothing to do
+      });
   }
 
   get authUrl() {
@@ -121,7 +123,7 @@ export class NiconicoService extends Service implements IPlatformService {
     return this.userService.channelId;
   }
   getUserPageURL(): string {
-    return `http://www.nicovideo.jp/user/${this.niconicoUserId}`;
+    return 'http://live.nicovideo.jp/my';
   }
 
   getHeaders(authorized = false): Headers {
@@ -140,7 +142,7 @@ export class NiconicoService extends Service implements IPlatformService {
       if (this.streamingStatus === EStreamingState.Reconnecting) {
         console.log('reconnecting - checking stream key');
         this.client.fetchBroadcastStream(this.channelId).catch(() => {
-          console.log('niconico programas has ended! stopping streaming.');
+          console.log('niconico program has ended! stopping streaming.');
           this.streamingService.stopStreaming();
         });
       }

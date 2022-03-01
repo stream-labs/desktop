@@ -1,8 +1,64 @@
+input[type=text],
+input[type=number],
+input[type=password],
+textarea {
+  color: var(--color-text);
+  font-size: @font-size4;
+  height: @item-generic-size;
+  border: 1px solid var(--color-border-light);
+  border-radius: 4px;
+  background: var(--color-input-bg);
+  margin-bottom: 0;
+  
+  &::placeholder {
+    color: var(--color-text-dark);
+  }
+
+  &:hover {
+    border-color: var(--color-border-accent);
+  }
+
+  &:focus {
+    box-shadow: none;
+    background: var(--color-input-bg);
+    border-color: var(--color-border-accent);
+  }
+
+  &.input--transparent {
+    border: 0;
+    border-bottom: 1px dashed var(--color-text-dark);
+    padding: 0;
+    height: 20px;
+    background: transparent;
+    border-radius: 0;
+  }
+
+  &::selection {
+    color: var(--color-bg-primary);
+    background-color: var(--color-primary);
+  }
+}
+
+.input {
+  &.disabled {
+    opacity: @opacity-disabled;
+  }
+}
+
 .input-container {
-  margin-bottom: 12px;
   position: relative;
   display: flex;
   align-items: flex-start;
+
+  &:last-of-type {
+    label {
+      margin-bottom: 0;
+    }
+  }
+
+  .input-label {
+    margin-bottom: 0;
+  }
 
   &.input-container--no-label {
     width: 100%;
@@ -22,21 +78,25 @@
 }
 
 .input-label {
-  width: 35%;
-  padding-right: 15px;
-  margin-bottom: 8px;
+  width: 45%;
+  padding-right: 16px;
+  margin-bottom: 16px;
+  font-size: @font-size4;
+  font-weight: @font-weight-bold;
+
+  label {
+    line-height: inherit;
+    color: var(--color-text-light);
+  }
 }
 
 .input-wrapper {
   width: 65%;
-
-  .checkbox {
-    &:last-child {
-      margin-right: 0;
-    }
-  }
+  margin-bottom: 16px;
 
   .button {
+    flex-shrink: 0;
+    
     &:last-child {
       margin-right: 0;
     }
@@ -50,7 +110,7 @@
     content: @n-air--codepoint--search;
     font-family: n-air;
     .absolute(@top: 0, @right: 8px, @bottom: 0);
-    line-height: 36px;
+    line-height: @item-generic-size;
   }
 }
 
@@ -58,41 +118,57 @@
   padding: 0 30px 0 8px;
 }
 
-input[type=text],
-input[type=number],
-input[type=password],
-textarea {
-  border: 1px solid @grey;
-  background: #2B2F3B;
-  margin-bottom: 0;
-
-  &:focus {
-    box-shadow: none;
-    background: @input-bg;
-    border-color: @text-secondary;
-  }
-
-  &.input--transparent {
-    border: 0;
-    border-bottom: 1px dashed @grey;
-    padding: 0;
-    height: 20px;
-    background: transparent;
-    border-radius: 0;
-  }
-}
-
 .checkbox {
+  display: block;
   margin-bottom: 0;
 
-  label {
-    line-height: 20px;
-    cursor: pointer;
+  input[type=checkbox] {
+    top: 2px;
+    margin: 0;
+    width: 16px;
+    height: 16px;
 
-    &:before {
-      background: transparent;
-      border-color: @grey;
+    & ~ label {
+      &:before {
+        top: 2px;
+        width: 16px;
+        height: 16px;
+        border: 2px solid var(--color-input);
+        background-color: transparent;
+      }
     }
+
+    &:checked ~ label {
+      &:before {
+        border-color: var(--color-input-active);
+        background-color: var(--color-input-active);
+      }
+
+      &:after {
+        content: @n-air--codepoint--check;
+        top: 4px;
+        left: 2px;
+        color: var(--color-bg-secondary);
+        background-color: transparent;
+      }
+    }
+
+    label {
+      font-size: @font-size4;
+      color: var(--color-text);
+      line-height: 20px;
+      padding-left: 24px;
+      cursor: pointer;
+    }
+
+    &:disabled + label {
+      opacity: @opacity-disabled;
+      cursor: not-allowed;
+    }
+  }
+
+  &:last-child {
+    margin-right: 0;
   }
 }
 
@@ -117,8 +193,7 @@ textarea {
 }
 
 .toggle-label {
-  color: @light-grey;
-  font-size: 12px;
+  color: var(--color-text);
   margin-right: 16px;
 }
 
@@ -146,31 +221,32 @@ textarea {
     width: 32px;
     height: 16px;;
     margin: auto;
-    background-color: @bg-quaternary;
+    background-color: var(--color-border-light);
     border-radius: 8px;
   }
 
   &:after {
     width: 20px;
     height: 20px;
-    background-color: @light-grey;
+    background-color: var(--color-text);
     border-radius: 100%;
   }
 
   &:checked {
     &:before {
-        background-color: @text-secondary;
+        background-color: var(--color-primary-dark);
     }
 
     &:after {
       left: 12px;
-      background-color: @text-active;
+      background-color: var(--color-primary);
     }
   }
 }
 
 .multiselect {
-  min-height: 36px;
+  min-height: @item-generic-size;
+  width: 100%;
 }
 
 .multiselect__select {
@@ -178,19 +254,19 @@ textarea {
   padding: 0;
   width: auto;
   height: auto;
-  right: 8px;
+  right: 0;
   top: 0px;
-  line-height: 32px;
+  line-height: @item-generic-size;
   position: relative;
 
   &:before {
     font-family: n-air;
     content: @n-air--codepoint--drop-down-arrow;
     border: none;
-    font-size: 9px;
+    font-size: @font-size1;
     position: absolute;
-    right: 0;
-    top: 2px;
+    right: 12px;
+    pointer-events: none;
   }
 }
 
@@ -199,18 +275,19 @@ textarea {
   border: none;
   height: 0;
   min-height: 0;
-  .radius();
+  .radius;
 
   input[type="text"] {
     cursor: pointer;
+    width: 100%;
+    padding-right: 32px;
   }
 }
 
 .multiselect__input,
 .multiselect__single {
   &:hover, &:focus {
-    background: @input-bg;
-    border-color: @text-secondary;
+    border-color: var(--color-border-accent);
   }
 }
 
@@ -219,22 +296,21 @@ textarea {
 }
 
 .multiselect__content {
-  border-bottom-left-radius: 3px;
-  border-bottom-right-radius: 3px;
-  border: 1px solid @text-secondary;
-  top: 35px;
-  background: @input-bg;
-  list-style-type: none;
-  margin: 0;
+  .shadow;
   width: 100%;
-  z-index: 100;
+  max-height: 264px;
+  margin: 0;
+  list-style-type: none;
+  border-radius: 4px;
+  background-color: var(--color-popper-bg-light);
+  z-index: @z-index-expand-content;
   position: absolute;
-  max-height: 300px;
+  top: 40px;
   overflow-y: auto;
 }
 
 .multiselect__element {
-  font-size: 13px;
+  font-size: @font-size4;
   white-space: nowrap;
   display: inline-block;
   min-width: 100%;
@@ -242,9 +318,9 @@ textarea {
 
 .multiselect__option {
   padding: 0px 8px;
-  height: 36px;
+  height: @item-generic-size;
   min-height: 0;
-  line-height: 36px;
+  line-height: @item-generic-size;
   .transition;
   display: block;
   cursor: pointer;
@@ -255,8 +331,8 @@ textarea {
 }
 
 .multiselect__option--highlight {
-  background: @hover;
-  color: @navy;
+  color: var(--color-text-light);
+  background: var(--color-bg-active);
 
   &:after {
     display: none;
@@ -264,16 +340,9 @@ textarea {
 }
 
 .multiselect__option--selected {
-  background: @accent;
-  color: @white;
-
-  &.multiselect__option--highlight {
-    background: @accent;
-
-    &:after {
-      display: none;
-    }
-  }
+  font-weight: @font-weight-bold;
+  background: var(--color-primary);
+  color: var(--color-black);
 
   &:after {
     display: none;
@@ -281,11 +350,11 @@ textarea {
 }
 
 .multiselect__option--disabled {
-  opacity: 0.5;
+  opacity: @opacity-disabled;
 }
 
 .multiselect--disabled {
-  opacity: .5;
+  opacity: @opacity-disabled;
 
   &:focus {
     outline: none;
@@ -298,36 +367,16 @@ textarea {
   }
 }
 
-input[type="text"],
-input[type="password"],
-input[type="number"],
-textarea {
-  background: @bg-secondary;
-  color: @white;
-  border-color: transparent;
-
-  &.input--transparent {
-    border-bottom: 1px dashed @grey;
-  }
-}
-
-.multiselect__content {
-  background: @bg-secondary;
-  border-color: @bg-secondary;
-  color: @white;
-}
-
-.multiselect__option--highlight {
-  background: @hover;
-  color: @white;
-}
-
 .input-wrapper--inverted {
   input[type="text"] {
-    background: @input-bg;
+    background: var(--color-input-bg);
   }
 
   .multiselect__content {
-    background: @input-bg;
+    background: var(--color-input-bg);
   }
+}
+
+.custom-select-trigger:after {
+  content: @n-air--codepoint--drop-down-arrow;
 }

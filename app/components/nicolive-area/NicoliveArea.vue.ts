@@ -9,18 +9,18 @@ import CommentFilter from './CommentFilter.vue';
 import ProgramInfo from './ProgramInfo.vue';
 import ProgramStatistics from './ProgramStatistics.vue';
 import ToolBar from './ToolBar.vue';
-import TopNav from './TopNav.vue';
 import ControlsArrow from '../../../media/images/controls-arrow-vertical.svg';
 import AreaSwitcher from './AreaSwitcher.vue';
+import PerformanceMetrics from '../PerformanceMetrics.vue';
 import {
   NicoliveFailure,
   openErrorDialogFromFailure,
 } from 'services/nicolive-program/NicoliveFailure';
+import { CustomizationService } from 'services/customization';
 
 @Component({
   components: {
     AreaSwitcher,
-    TopNav,
     ProgramInfo,
     ProgramDescription,
     CommentViewer,
@@ -28,11 +28,13 @@ import {
     ProgramStatistics,
     ToolBar,
     ControlsArrow,
+    PerformanceMetrics,
   },
 })
 export default class NicolivePanelRoot extends Vue {
   @Inject()
   nicoliveProgramService: NicoliveProgramService;
+  @Inject() private customizationService: CustomizationService;
 
   get contents() {
     return [
@@ -55,6 +57,10 @@ export default class NicolivePanelRoot extends Vue {
 
   onToggle(): void {
     this.nicoliveProgramService.togglePanelOpened();
+  }
+
+  get isCompactMode(): boolean {
+    return this.customizationService.state.compactMode;
   }
 
   isCreating: boolean = false;

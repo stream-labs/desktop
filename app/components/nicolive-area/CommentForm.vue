@@ -4,17 +4,14 @@
       type="text"
       ref="input"
       :readonly="isCommentSending"
-      :disabled="isCommentSending"
-      placeholder="コメントを入力"
+      :disabled="isCommentSending || programEnded"
+      :placeholder="programEnded ? '番組が終了したため、放送者コメントを投稿できません' : 'コメント入力'"
       v-model="operatorCommentValue"
       class="comment-input"
       maxlength="80"
       @keydown.enter="sendOperatorComment($event)"
     />
-    <button @click="sendOperatorComment($event)" :disabled="isCommentSending || operatorCommentValue.length === 0" class="comment-button"><i class="icon-comment-send"></i></button>
-    <div class="comment-disabled-message" v-if="programEnded">
-      番組が終了したため、放送者コメントを投稿できません
-    </div>
+    <button @click="sendOperatorComment($event)" :disabled="isCommentSending || operatorCommentValue.length === 0 || programEnded" class="comment-button"><i class="icon-comment-send"></i></button>
   </div>
 </template>
 
@@ -25,68 +22,48 @@
 .comment-form {
   display: flex;
   justify-content: center;
-  padding: 8px;
-  border-top: 1px solid @bg-primary;
-  background-color: @bg-secondary;
+  border-top: 1px solid var(--color-border-light);
   position: relative;
 }
 
 .comment-input {
-  font-size: 12px;
-  flex-grow: 1;
+  font-size: @font-size2;
   width: auto;
-  background-color: @bg-quaternary;
-  box-sizing: border-box;
+  height: 48px;
+  padding: 0 0 0 16px;
+  flex-grow: 1;
+  background-color: var(--color-bg-tertiary);
+  border: none;
+  border-radius: 0;
 
   &:focus {
-    background-color: @bg-tertiary;
-
-    &::placeholder {
-      opacity: .5;
-    }
+    background-color: var(--color-bg-tertiary);
   }
 
   &::placeholder {
-    color: @white;
-    opacity: .5;
+    color: var(--color-text-dark);
   }
 }
 
 .comment-button {
-  height: 36px;
-  padding: 0 8px 0 16px;
+  height: 48px;
+  padding: 0 16px 0 16px;
 
   > i {
-    font-size: 14px;
-    color: @text-secondary;
+    color: var(--color-text);
+    .transition;
   }
 
   &:hover {
     > i {
-      color: @text-primary;
+      color: var(--color-text-light);
     }
   }
 
   &:disabled {
     > i {
-      color: @white;
-      opacity: .26;
+      color: var(--color-text-disabled);
     }
   }
-}
-
-.comment-disabled-message {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: @white;
-  font-size: 12px;
-  width: 100%;
-  height: 100%;
-  padding: 8px 16px;
-  position: absolute;
-  top: 0;
-  left: 0;
-  background-color: rgba(31, 34, 45, .8);
 }
 </style>

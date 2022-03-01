@@ -4,7 +4,7 @@
     {{ $t('common.studioModeButtons.preview') }}
   </span>
   <button
-    class="button button--semi-opac"
+    class="button button--secondary button--semi-opac"
     @click="studioModeTransition">
     {{ $t('common.studioModeButtons.transition') }}
     <i class="icon-arrow rotate-r90" v-if="stacked" />
@@ -22,11 +22,10 @@
 @import "../styles/index";
 
 .studio-mode-controls {
-  height: 60px;
+  padding-top: 16px;
   display: flex;
   align-items: center;
-  color: @text-primary;
-  background-color: @bg-secondary;
+  color: var(--color-text-light);
 
   &.stacked {
     flex-direction: column;

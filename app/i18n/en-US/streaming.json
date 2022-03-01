@@ -21,6 +21,8 @@
   "endingWithDelay": "DISCARD %{delaySeconds}s",
   "reconnecting": "RECONNECTING",
   "goLive": "GO LIVE",
+  "goLiveTooltip": "Click to go live",
+  "endStreamTooltip": "Click to end stream",
   "startReplayBuffer": "Start Replay Buffer",
   "stopReplayBuffer": "Stop",
   "saveReplay": "Save Replay",
@@ -56,7 +58,7 @@
       },
       "programSelect": {
         "menuTitle": "Program",
-        "title":"Select a program",
+        "title": "Select a program",
         "description": "Select a program you will start streaming to."
       },
       "confirm": {

@@ -91,6 +91,28 @@ export default class ExtraSettings extends Vue {
     this.customizationService.setPollingPerformanceStatistics(model.value);
   }
 
+  get autoCompactModel(): IObsInput<boolean> {
+    return {
+      name: 'auto_compact',
+      description: $t('settings.autoCompact.setting'),
+      value: this.customizationService.state.autoCompactMode,
+    };
+  }
+  setAutoCompact(model: IObsInput<boolean>) {
+    this.customizationService.setAutoCompatMode(model.value);
+  }
+
+  get showAutoCompactDialogModel(): IObsInput<boolean> {
+    return {
+      name: 'show_auto_compact_confirm_dialog',
+      description: $t('settings.autoCompact.showDialog'),
+      value: this.customizationService.state.showAutoCompactDialog,
+    };
+  }
+  setShowAutoCompactDialog(model: IObsInput<boolean>) {
+    this.customizationService.setShowAutoCompactDialog(model.value);
+  }
+
   showCacheDir() {
     electron.remote.shell.showItemInFolder(electron.remote.app.getPath('userData'));
   }

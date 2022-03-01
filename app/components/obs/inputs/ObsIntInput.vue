@@ -34,36 +34,39 @@
 .int-input {
   position: relative;
 
+  input {
+    padding-right: 32px;
+  }
+
   .arrows {
     .absolute(0, 8px, 0, auto);
     width: 30px;
-    color: @text-primary;
-    opacity: .7;
+    color: var(--color-text);
     cursor: pointer;
     .transition;
-
-    &:hover {
-      opacity: 1;
-    }
 
     .arrow {
       display: flex !important;
 
       i {
         position: relative;
-        font-size: 9px;
+        font-size: @font-size1;
+      }
+
+      &:hover {
+        color: var(--color-text-light);
       }
 
       &:active {
-        color: black;
+        color: var(--color-text-active);
       }
 
       &.arrow-up {
-        .absolute(6px, 0px, auto, auto);
+        .absolute(6px, 4px, auto, auto);
       }
 
       &.arrow-down {
-        .absolute(auto, 0px, 6px, auto);
+        .absolute(auto, 4px, 6px, auto);
       }
     }
   }
