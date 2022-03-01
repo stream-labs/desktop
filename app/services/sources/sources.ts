@@ -146,6 +146,10 @@ class SourcesViews extends ViewHandler<ISourcesState> {
     });
     return sourceModels.map(sourceModel => this.getSource(sourceModel.sourceId)!);
   }
+
+  suggestName(name: string): string {
+    return namingHelpers.suggestName(name, (name: string) => this.getSourcesByName(name).length);
+  }
 }
 
 export class SourcesService extends StatefulService<ISourcesState> {
@@ -427,13 +431,6 @@ export class SourcesService extends StatefulService<ISourcesState> {
       if (settings) return this.createSource(filename, type as TSourceType, settings);
     }
     return null;
-  }
-
-  suggestName(name: string): string {
-    return namingHelpers.suggestName(
-      name,
-      (name: string) => this.views.getSourcesByName(name).length,
-    );
   }
 
   private onSceneItemRemovedHandler(sceneItemState: ISceneItem) {

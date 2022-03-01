@@ -153,6 +153,14 @@ export class NameFolder extends ReactComponent {}
 
 @Component({
   props: {
+    name: { default: 'NameScene' },
+    wrapperStyles: { default: () => ({ height: '100%' }) },
+  },
+})
+export class NameScene extends ReactComponent {}
+
+@Component({
+  props: {
     name: { default: 'NavTools' },
     wrapperStyles: { default: () => ({ marginTop: 'auto', flexShrink: 0 }) },
   },

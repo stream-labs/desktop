@@ -1,4 +1,5 @@
 import NameFolder from './windows/NameFolder';
+import NameScene from './windows/NameScene';
 import GoLiveWindow from './windows/go-live/GoLiveWindow';
 import EditStreamWindow from './windows/go-live/EditStreamWindow';
 import IconLibraryProperties from './windows/IconLibraryProperties';
@@ -45,6 +46,7 @@ import SceneSelector from './editor/elements/SceneSelectorElement';
 // list of React components to be used inside Vue components
 export const components = {
   NameFolder,
+  NameScene,
   BrowserView,
   GoLiveWindow: createRoot(GoLiveWindow),
   EditStreamWindow: createRoot(EditStreamWindow),
