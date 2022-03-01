@@ -3,6 +3,7 @@ import { contextMenuClick } from '../spectron/context-menu';
 import { dialogDismiss } from '../spectron/dialog';
 import { click, clickButton, focusChild, focusMain, select, waitForLoader } from './core';
 import { sleep } from '../sleep';
+import { useForm } from './forms';
 
 async function clickSceneAction(selector: string) {
   await click(`[data-name=SceneSelector] ${selector}`);
@@ -32,7 +33,8 @@ export async function rightClickScene(name: string) {
 
 export async function duplicateScene(sceneName: string, targetName: string) {
   await openDuplicateWindow(sceneName);
-  await (await select('input')).setValue(targetName);
+  const { fillForm } = useForm('nameSceneForm');
+  await fillForm({ sceneName: targetName });
   await clickButton('Done');
 }
 
@@ -40,7 +42,8 @@ export async function addScene(name: string) {
   await focusMain();
   await clickAddScene();
   await focusChild();
-  await (await select('input')).setValue(name);
+  const { fillForm } = useForm('nameSceneForm');
+  await fillForm({ sceneName: name });
   await clickButton('Done');
 }
 
