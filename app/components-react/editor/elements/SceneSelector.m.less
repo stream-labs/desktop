@@ -47,6 +47,11 @@
 
 .scenes-container {
   background: var(--section);
+  border-radius: 4px;
+
+  &:global(.os-host) {
+    overflow: hidden !important;
+  }
 
   :global(.ant-tree-switcher) {
     display: none;
@@ -54,6 +59,8 @@
 
   :global(.ant-tree-treenode), :global(.ant-tree-node-content-wrapper) {
     width: 100%;
+    transition: all 0s !important;
+    border-radius: 0 !important;
   }
 
   :global(.ant-tree-node-content-wrapper) {
