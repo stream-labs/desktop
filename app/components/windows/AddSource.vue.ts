@@ -78,7 +78,7 @@ export default class AddSource extends Vue {
     } else if (this.sourceAddOptions.propertiesManager === 'iconLibrary') {
       this.name = $t('Custom Icon');
     } else if (this.sourceAddOptions.propertiesManager === 'widget') {
-      this.name = this.sourcesService.suggestName(
+      this.name = this.sourcesService.views.suggestName(
         WidgetDisplayData(this.platform)[this.widgetType].name,
       );
     } else if (this.sourceAddOptions.propertiesManager === 'platformApp') {
@@ -89,7 +89,7 @@ export default class AddSource extends Vue {
         source => source.id === this.sourceAddOptions.propertiesManagerSettings.appSourceId,
       ).name;
 
-      this.name = this.sourcesService.suggestName(sourceName);
+      this.name = this.sourcesService.views.suggestName(sourceName);
     } else {
       const sourceType =
         this.sourceType &&
@@ -97,7 +97,7 @@ export default class AddSource extends Vue {
           .getAvailableSourcesTypesList()
           .find(sourceTypeDef => sourceTypeDef.value === this.sourceType);
 
-      this.name = this.sourcesService.suggestName(this.sourceType && sourceType.description);
+      this.name = this.sourcesService.views.suggestName(this.sourceType && sourceType.description);
     }
   }
 
