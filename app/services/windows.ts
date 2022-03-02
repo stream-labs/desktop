@@ -15,9 +15,9 @@ import Settings from 'components/windows/settings/Settings.vue';
 import FFZSettings from 'components/windows/FFZSettings.vue';
 import SceneTransitions from 'components/windows/SceneTransitions.vue';
 import AddSource from 'components/windows/AddSource.vue';
-import NameScene from 'components/windows/NameScene.vue';
 import {
   NameFolder,
+  NameScene,
   GoLiveWindow,
   EditStreamWindow,
   IconLibraryProperties,
