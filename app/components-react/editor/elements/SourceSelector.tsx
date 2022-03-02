@@ -11,6 +11,8 @@ import { useVuex } from 'components-react/hooks';
 import Scrollable from 'components-react/shared/Scrollable';
 import { Services } from 'components-react/service-provider';
 import styles from './SceneSelector.m.less';
+import { EventDataNode, DataNode } from 'antd/lib/tree';
+import { useTree } from 'components-react/hooks/useTree';
 
 export default function SourceSelector() {
   const {
@@ -23,10 +25,8 @@ export default function SourceSelector() {
   } = Services;
 
   const [expandedFolders, setExpandedFolders] = useState<string[]>([]);
-
-  const treeContainer = useRef<HTMLDivElement | null>(null);
-
   const [callCameFromInsideTheHouse, setInsideHouseCall] = useState(false);
+  const { treeSort } = useTree();
 
   const {
     isSelected,
@@ -50,21 +50,18 @@ export default function SourceSelector() {
 
   useEffect(expandSelectedFolders, [lastSelectedId]);
 
-  function nodes(): any[] {
+  function nodes(): DataNode[] {
     // recursive function for transform SceneNode[] to ISlTreeNodeModel[]
-    const getTreeNodes = (sceneNodes: any[]): any => {
+    const getTreeNodes = (sceneNodes: any[]): DataNode[] => {
       return sceneNodes.map(sceneNode => {
+        let children;
+        if (sceneNode.sceneNodeType === 'folder') children = getTreeNodes(getChildren(sceneNode));
         return {
+          key: sceneNode.id,
           title: getNameForNode(sceneNode),
-          isSelected: isSelected(sceneNode.id),
+          icon: determineIcon(sceneNode.sceneNodeType === 'item', sceneNode.id),
           isLeaf: sceneNode.sceneNodeType === 'item',
-          isExpanded: !!expandedFolders.find(nodeId => nodeId === sceneNode.id),
-          data: {
-            id: sceneNode.id,
-            sourceId: sceneNode.sceneNodeType === 'item' ? sceneNode.sourceId : null,
-          },
-          children:
-            sceneNode.sceneNodeType === 'folder' ? getTreeNodes(getChildren(sceneNode)) : null,
+          children,
         };
       });
     };
@@ -118,7 +115,7 @@ export default function SourceSelector() {
   function addFolder() {
     if (scene) {
       let itemsToGroup: string[] = [];
-      let parentId: string;
+      let parentId: string | undefined;
       if (globalSelection.canGroupIntoFolder()) {
         itemsToGroup = globalSelection.getIds();
         const parent = globalSelection.getClosestParent();
@@ -132,22 +129,23 @@ export default function SourceSelector() {
     }
   }
 
-  function showContextMenu(sceneNodeId?: string, event?: MouseEvent) {
-    const sceneNode = scene?.getNode(sceneNodeId);
-    let sourceId: string;
-
-    if (sceneNode) {
-      sourceId = sceneNode.isFolder() ? sceneNode.getItems()[0]?.sourceId : sceneNode.sourceId;
-    }
+  function showContextMenu(info: { event: React.MouseEvent; node: EventDataNode }) {
+    info.event && info.event.stopPropagation();
+    const sceneNode = scene?.getNode(info.node.key as string);
 
     if (sceneNode && !sceneNode.isSelected()) sceneNode.select();
     const menuOptions = sceneNode
-      ? { selectedSceneId: scene?.id, showSceneItemMenu: true, selectedSourceId: sourceId }
+      ? {
+          selectedSceneId: scene?.id,
+          showSceneItemMenu: true,
+          selectedSourceId: sceneNode.isFolder()
+            ? sceneNode.getItems()[0]?.sourceId
+            : sceneNode.sourceId,
+        }
       : { selectedSceneId: scene?.id };
 
     const menu = new EditMenu(menuOptions);
     menu.popup();
-    event && event.stopPropagation();
   }
 
   function removeItems() {
@@ -176,15 +174,14 @@ export default function SourceSelector() {
       : false;
   }
 
-  function makeActive(treeNodes: any, ev: MouseEvent) {
-    const ids = treeNodes.map(treeNode => treeNode.data.id);
+  function makeActive(selectedKeys: string[]) {
     setInsideHouseCall(true);
-    globalSelection.select(ids);
+    globalSelection.select(selectedKeys);
   }
 
-  function toggleFolder(treeNode: any) {
-    const nodeId = treeNode.data.id;
-    if (treeNode.isExpanded) {
+  function handleExpand(expandedKeys: string[], info: { expanded: boolean; node: EventDataNode }) {
+    const nodeId = info.node.key as string;
+    if (info.expanded) {
       setExpandedFolders(expandedFolders.filter(node => node === nodeId));
     } else {
       setExpandedFolders(expandedFolders.concat([nodeId]));
@@ -259,7 +256,7 @@ export default function SourceSelector() {
       : { icon: 'icon-studio', tooltip: $t('Only visible on Recording') };
   }
 
-  function sourceIcons(sceneNodeId: string) {
+  function sourceMetadata(sceneNodeId: string) {
     const items = getItemsForNode(sceneNodeId);
     const visible = items.some(i => i.visible);
     const locked = items.every(i => i.locked);
@@ -319,11 +316,11 @@ export default function SourceSelector() {
       <Scrollable style={{ height: '100%' }} className={styles.scenesContainer}>
         <Tree
           draggable
-          treeData={sources}
-          onDrop={handleSort}
+          treeData={nodes()}
           onSelect={makeActive}
           onRightClick={showContextMenu}
-          selectedKeys={[activeSceneId]}
+          onExpand={handleExpand}
+          selectedKeys={activeItemIds}
         />
       </Scrollable>
     </>
