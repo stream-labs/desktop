@@ -10,6 +10,7 @@ import {
 import { getApiClient } from '../helpers/api-client';
 import { SceneCollectionsService } from 'app-services';
 import { clickButton, focusMain, select, waitForDisplayed } from '../helpers/modules/core';
+import { useForm } from '../helpers/modules/forms';
 
 useSpectron();
 
@@ -86,7 +87,8 @@ test('Restarting the app preserves the default sources', async t => {
 test('Rename scene', async t => {
   const newSceneName = 'Scene2';
   await openRenameWindow('Scene');
-  await (await select('input')).setValue(newSceneName);
+  const { fillForm } = useForm('nameSceneForm');
+  await fillForm({ sceneName: newSceneName });
   await clickButton('Done');
   await focusMain();
   await waitForDisplayed(`div=${newSceneName}`);
