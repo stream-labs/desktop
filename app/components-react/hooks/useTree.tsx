@@ -1,3 +1,4 @@
+import RCTree from 'rc-tree';
 import { EventDataNode, DataNode } from 'antd/lib/tree';
 
 export interface IOnDropInfo {
@@ -25,8 +26,7 @@ export function useTree(onlyLeaves?: boolean) {
     const data = [...state];
 
     // Find dragObject
-    // Assert dragObj since Typescript doesn't like it being assigned in loop
-    let dragObj!: DataNode;
+    let dragObj: DataNode | undefined;
     loop(data, dragKey, (item: DataNode, index: number, arr: DataNode[]) => {
       arr.splice(index, 1);
       dragObj = item;
@@ -35,6 +35,7 @@ export function useTree(onlyLeaves?: boolean) {
     if (!info.dropToGap && !onlyLeaves) {
       // Drop on the content
       loop(data, dropKey, (item: DataNode) => {
+        if (item.isLeaf || !dragObj) return;
         item.children = item.children || [];
         item.children.unshift(dragObj);
       });
@@ -45,10 +46,9 @@ export function useTree(onlyLeaves?: boolean) {
       !onlyLeaves
     ) {
       loop(data, dropKey, (item: DataNode) => {
+        if (item.isLeaf || !dragObj) return;
         item.children = item.children || [];
         item.children.unshift(dragObj);
-        // in previous version, we use item.children.push(dragObj) to insert the
-        // item to the tail of the children
       });
     } else {
       let ar: DataNode[] = [];
@@ -57,6 +57,7 @@ export function useTree(onlyLeaves?: boolean) {
         ar = arr;
         i = index;
       });
+      if (!dragObj) return data;
       if (dropPosition === -1) {
         ar.splice(i, 0, dragObj);
       } else {

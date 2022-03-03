@@ -1,6 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import cx from 'classnames';
 import { Tooltip, Tree } from 'antd';
+import RCTree from 'rc-tree';
+import { EventDataNode, DataNode } from 'antd/lib/tree';
 import { SourceDisplayData } from 'services/sources';
 import { ISceneItemFolder, ISceneItem } from 'services/scenes';
 import { EditMenu } from 'util/menus/EditMenu';
@@ -10,26 +12,25 @@ import { EPlaceType } from 'services/editor-commands/commands/reorder-nodes';
 import { useVuex } from 'components-react/hooks';
 import Scrollable from 'components-react/shared/Scrollable';
 import { Services } from 'components-react/service-provider';
-import styles from './SceneSelector.m.less';
-import { EventDataNode, DataNode } from 'antd/lib/tree';
 import { useTree } from 'components-react/hooks/useTree';
+import useBaseElement from './hooks';
+import styles from './SceneSelector.m.less';
 
-export default function SourceSelector() {
+function SourceSelector() {
   const {
     ScenesService,
     SourcesService,
     SelectionService,
-    EditorCommandsService,
     StreamingService,
     AudioService,
   } = Services;
 
   const [expandedFolders, setExpandedFolders] = useState<string[]>([]);
   const [callCameFromInsideTheHouse, setInsideHouseCall] = useState(false);
+  const treeRef = useRef<RCTree>(null);
   const { treeSort } = useTree();
 
   const {
-    isSelected,
     scene,
     globalSelection,
     sceneNode,
@@ -41,7 +42,6 @@ export default function SourceSelector() {
     scene: ScenesService.views.activeScene,
     activeItemIds: SelectionService.state.selectedIds,
     lastSelectedId: SelectionService.state.lastSelectedId,
-    isSelected: (nodeId: string) => SelectionService.state.selectedIds.includes(nodeId),
     sceneNode: (nodeId: string) => ScenesService.views.getSceneNode(nodeId),
     activeScene: ScenesService.views.activeScene,
     globalSelection: SelectionService.views.globalSelection,
@@ -74,7 +74,7 @@ export default function SourceSelector() {
   // // TODO: Clean this up.  These only access state, no helpers
   function getNameForNode(node: any) {
     if (node.sceneNodeType === 'item') {
-      return SourcesService.state.sources[node.sourceId].name;
+      return SourcesService.views.sources[node.sourceId].name;
     }
 
     return node.name;
@@ -90,7 +90,7 @@ export default function SourceSelector() {
       return 'fa fa-folder';
     }
 
-    const source = SourcesService.state.sources[sourceId];
+    const source = SourcesService.views.sources[sourceId];
 
     if (source.propertiesManagerType === 'streamlabels') {
       return 'fas fa-file-alt';
@@ -188,10 +188,6 @@ export default function SourceSelector() {
     }
   }
 
-  function canShowActions(sceneNodeId: string) {
-    return getItemsForNode(sceneNodeId).length > 0;
-  }
-
   function expandSelectedFolders() {
     if (callCameFromInsideTheHouse) {
       setInsideHouseCall(false);
@@ -201,30 +197,7 @@ export default function SourceSelector() {
     if (!node || SelectionService.state.selectedIds.length > 1) return;
     setExpandedFolders(expandedFolders.concat(node.getPath().slice(0, -1)));
 
-    // this.$refs[this.lastSelectedId].scrollIntoView({ behavior: 'smooth' });
-  }
-
-  function toggleVisibility(sceneNodeId: string) {
-    if (!scene) return;
-    const selection = scene.getSelection(sceneNodeId);
-    const visible = !selection.isVisible();
-    EditorCommandsService.actions.executeCommand('HideItemsCommand', selection, !visible);
-  }
-
-  // // TODO: Refactor into elsewhere
-  function getItemsForNode(sceneNodeId: string): ISceneItem[] {
-    const node = scene?.state.nodes.find(n => n.id === sceneNodeId);
-
-    if (node?.sceneNodeType === 'item') {
-      return [node];
-    }
-
-    const children = scene?.state.nodes.filter(n => n.parentId === sceneNodeId);
-    let childrenItems: ISceneItem[] = [];
-
-    children?.forEach(c => (childrenItems = childrenItems.concat(getItemsForNode(c.id))));
-
-    return childrenItems;
+    treeRef.current?.scrollTo({ key: lastSelectedId });
   }
 
   function toggleSelectiveRecording() {
@@ -232,49 +205,7 @@ export default function SourceSelector() {
     StreamingService.actions.setSelectiveRecording(!StreamingService.state.selectiveRecording);
   }
 
-  function cycleSelectiveRecording(sceneNodeId: string) {
-    const selection = scene?.getSelection(sceneNodeId);
-    if (!selection || selection.isLocked()) return;
-    if (selection.isStreamVisible() && selection.isRecordingVisible()) {
-      selection.setRecordingVisible(false);
-    } else if (selection.isStreamVisible()) {
-      selection.setStreamVisible(false);
-      selection.setRecordingVisible(true);
-    } else {
-      selection.setStreamVisible(true);
-      selection.setRecordingVisible(true);
-    }
-  }
-
-  function selectiveRecordingMetadata(sceneNodeId: string) {
-    const selection = scene?.getSelection(sceneNodeId);
-    if (selection?.isStreamVisible() && selection.isRecordingVisible()) {
-      return { icon: 'icon-smart-record', tooltip: $t('Visible on both Stream and Recording') };
-    }
-    return selection?.isStreamVisible()
-      ? { icon: 'icon-broadcast', tooltip: $t('Only visible on Stream') }
-      : { icon: 'icon-studio', tooltip: $t('Only visible on Recording') };
-  }
-
-  function sourceMetadata(sceneNodeId: string) {
-    const items = getItemsForNode(sceneNodeId);
-    const visible = items.some(i => i.visible);
-    const locked = items.every(i => i.locked);
-    return {
-      visibleIcon: visible ? 'icon-view' : 'icon-hide',
-      lockedIcon: locked ? 'icon-lock' : 'icon-unlock',
-    };
-  }
-
-  function toggleLock(sceneNodeId: string) {
-    const selection = scene?.getSelection(sceneNodeId);
-    const locked = !selection?.isLocked();
-    selection?.setSettings({ locked });
-  }
-
-  function isLocked(sceneNodeId: string) {
-    return scene?.getSelection(sceneNodeId).isLocked();
-  }
+  function handleSort() {}
 
   return (
     <>
@@ -315,14 +246,118 @@ export default function SourceSelector() {
       </div>
       <Scrollable style={{ height: '100%' }} className={styles.scenesContainer}>
         <Tree
-          draggable
           treeData={nodes()}
           onSelect={makeActive}
           onRightClick={showContextMenu}
           onExpand={handleExpand}
+          onDrop={handleSort}
           selectedKeys={activeItemIds}
+          ref={treeRef}
+          titleRender={TreeNode}
+          draggable
+          blockNode
         />
       </Scrollable>
     </>
+  );
+}
+
+function TreeNode(node: DataNode) {
+  const { ScenesService, EditorCommandsService, StreamingService } = Services;
+  const { scene, selectiveRecordingEnabled } = useVuex(() => ({
+    scene: ScenesService.views.activeScene,
+    selectiveRecordingEnabled: StreamingService.state.selectiveRecording,
+  }));
+
+  function getItemsForNode(id: string): ISceneItem[] {
+    const sceneNode = scene?.state.nodes.find(n => n.id === id);
+
+    if (sceneNode?.sceneNodeType === 'item') {
+      return [sceneNode];
+    }
+
+    const children = scene?.state.nodes.filter(n => n.parentId === node.key);
+    let childrenItems: ISceneItem[] = [];
+
+    children?.forEach(c => (childrenItems = childrenItems.concat(getItemsForNode(c.id))));
+
+    return childrenItems;
+  }
+
+  const selection = scene?.getSelection(node.key as string);
+  const items = getItemsForNode(node.key as string);
+  const visible = items.some(i => i.visible);
+  const locked = items.every(i => i.locked);
+
+  function toggleLock() {
+    const locked = !selection?.isLocked();
+    selection?.setSettings({ locked });
+  }
+
+  function toggleVisibility() {
+    if (!selection) return;
+    const visible = !selection.isVisible();
+    EditorCommandsService.actions.executeCommand('HideItemsCommand', selection, !visible);
+  }
+
+  function cycleSelectiveRecording() {
+    if (!selection || selection.isLocked()) return;
+    if (selection.isStreamVisible() && selection.isRecordingVisible()) {
+      selection.setRecordingVisible(false);
+    } else if (selection.isStreamVisible()) {
+      selection.setStreamVisible(false);
+      selection.setRecordingVisible(true);
+    } else {
+      selection.setStreamVisible(true);
+      selection.setRecordingVisible(true);
+    }
+  }
+
+  function selectiveRecordingMetadata() {
+    if (selection?.isStreamVisible() && selection.isRecordingVisible()) {
+      return { icon: 'icon-smart-record', tooltip: $t('Visible on both Stream and Recording') };
+    }
+    return selection?.isStreamVisible()
+      ? { icon: 'icon-broadcast', tooltip: $t('Only visible on Stream') }
+      : { icon: 'icon-studio', tooltip: $t('Only visible on Recording') };
+  }
+
+  return (
+    <div>
+      <span>{node.title}</span>
+      {items.length > 0 && (
+        <div>
+          {selectiveRecordingEnabled && (
+            <Tooltip title={selectiveRecordingMetadata().tooltip}>
+              <i
+                className={cx(selectiveRecordingMetadata().icon, { disabled: locked })}
+                onClick={cycleSelectiveRecording}
+              />
+            </Tooltip>
+          )}
+          <i className={locked ? 'icon-lock' : 'icon-unlock'} onClick={toggleLock} />
+          <i className={visible ? 'icon-view' : 'icon-hide'} onClick={toggleVisibility} />
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default function SourceSelectorElement() {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const { renderElement } = useBaseElement(
+    <SourceSelector />,
+    { x: 230, y: 120 },
+    containerRef.current,
+  );
+
+  return (
+    <div
+      ref={containerRef}
+      data-name="SourceSelector"
+      style={{ height: '100%', display: 'flex', flexDirection: 'column' }}
+    >
+      {renderElement()}
+    </div>
   );
 }

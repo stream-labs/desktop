@@ -192,12 +192,13 @@ export default function SceneSelector() {
       </div>
       <Scrollable style={{ height: '100%' }} className={styles.scenesContainer}>
         <Tree
-          draggable
           treeData={scenes}
           onDrop={handleSort}
           onSelect={makeActive}
           onRightClick={showContextMenu}
           selectedKeys={[activeSceneId]}
+          draggable
+          blockNode
         />
       </Scrollable>
       <HelpTip
