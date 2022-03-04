@@ -15,6 +15,7 @@ import { Services } from 'components-react/service-provider';
 import { useTree } from 'components-react/hooks/useTree';
 import useBaseElement from './hooks';
 import styles from './SceneSelector.m.less';
+import { node } from 'execa';
 
 function SourceSelector() {
   const {
@@ -38,11 +39,13 @@ function SourceSelector() {
     lastSelectedId,
     selectiveRecordingEnabled,
     activeScene,
+    nameForSource,
   } = useVuex(() => ({
     scene: ScenesService.views.activeScene,
     activeItemIds: SelectionService.state.selectedIds,
     lastSelectedId: SelectionService.state.lastSelectedId,
     sceneNode: (nodeId: string) => ScenesService.views.getSceneNode(nodeId),
+    nameForSource: (sourceId: string) => SourcesService.views.getNameForSource(sourceId),
     activeScene: ScenesService.views.activeScene,
     globalSelection: SelectionService.views.globalSelection,
     selectiveRecordingEnabled: StreamingService.state.selectiveRecording,
@@ -51,16 +54,18 @@ function SourceSelector() {
   useEffect(expandSelectedFolders, [lastSelectedId]);
 
   function nodes(): DataNode[] {
-    // recursive function for transform SceneNode[] to ISlTreeNodeModel[]
-    const getTreeNodes = (sceneNodes: any[]): DataNode[] => {
+    // recursive function for transform SceneNode[] to antd DataNode[]
+    const getTreeNodes = (sceneNodes: (ISceneItem | ISceneItemFolder)[]): DataNode[] => {
       return sceneNodes.map(sceneNode => {
         let children;
-        if (sceneNode.sceneNodeType === 'folder') children = getTreeNodes(getChildren(sceneNode));
+        const isItem = sceneNode.sceneNodeType === 'item';
+        if (!isItem) children = getTreeNodes(getChildren(sceneNode));
+        const sourceId = isItem ? sceneNode.sourceId : sceneNode.id;
         return {
           key: sceneNode.id,
-          title: getNameForNode(sceneNode),
-          icon: determineIcon(sceneNode.sceneNodeType === 'item', sceneNode.id),
-          isLeaf: sceneNode.sceneNodeType === 'item',
+          title: isItem ? nameForSource(sourceId) : sceneNode.name,
+          icon: determineIcon(isItem, sourceId),
+          isLeaf: isItem,
           children,
         };
       });
@@ -69,15 +74,6 @@ function SourceSelector() {
     const nodes = scene?.state.nodes.filter(n => !n.parentId);
     if (!nodes) return [];
     return getTreeNodes(nodes);
-  }
-
-  // // TODO: Clean this up.  These only access state, no helpers
-  function getNameForNode(node: any) {
-    if (node.sceneNodeType === 'item') {
-      return SourcesService.views.sources[node.sourceId].name;
-    }
-
-    return node.name;
   }
 
   function getChildren(node: ISceneItemFolder) {
@@ -92,18 +88,18 @@ function SourceSelector() {
 
     const source = SourcesService.views.sources[sourceId];
 
-    if (source.propertiesManagerType === 'streamlabels') {
+    if (source?.propertiesManagerType === 'streamlabels') {
       return 'fas fa-file-alt';
     }
 
-    if (source.propertiesManagerType === 'widget') {
+    if (source?.propertiesManagerType === 'widget') {
       const widgetType = SourcesService.views.getSource(sourceId)?.getPropertiesManagerSettings()
         .widgetType;
 
       return WidgetDisplayData()[widgetType]?.icon || 'icon-error';
     }
 
-    return SourceDisplayData()[source.type]?.icon || 'fas fa-file';
+    return SourceDisplayData()[source?.type]?.icon || 'fas fa-file';
   }
 
   function addSource() {
@@ -210,7 +206,9 @@ function SourceSelector() {
   return (
     <>
       <div className="studio-controls-top">
-        <span className={styles.activeScene}>{$t('Sources')}</span>
+        <div className={styles.activeSceneContainer}>
+          <span className={styles.activeScene}>{$t('Sources')}</span>
+        </div>
         <Tooltip title={$t('Toggle Selective Recording')} placement="bottom">
           <i
             className={cx('icon-smart-record icon-button icon-button--lg', {
@@ -253,7 +251,7 @@ function SourceSelector() {
           onDrop={handleSort}
           selectedKeys={activeItemIds}
           ref={treeRef}
-          titleRender={TreeNode}
+          titleRender={(node: DataNode) => <TreeNode node={node} />}
           draggable
           blockNode
         />
@@ -262,7 +260,7 @@ function SourceSelector() {
   );
 }
 
-function TreeNode(node: DataNode) {
+function TreeNode(p: { node: DataNode }) {
   const { ScenesService, EditorCommandsService, StreamingService } = Services;
   const { scene, selectiveRecordingEnabled } = useVuex(() => ({
     scene: ScenesService.views.activeScene,
@@ -276,7 +274,7 @@ function TreeNode(node: DataNode) {
       return [sceneNode];
     }
 
-    const children = scene?.state.nodes.filter(n => n.parentId === node.key);
+    const children = scene?.state.nodes.filter(n => n.parentId === p.node.key);
     let childrenItems: ISceneItem[] = [];
 
     children?.forEach(c => (childrenItems = childrenItems.concat(getItemsForNode(c.id))));
@@ -284,8 +282,8 @@ function TreeNode(node: DataNode) {
     return childrenItems;
   }
 
-  const selection = scene?.getSelection(node.key as string);
-  const items = getItemsForNode(node.key as string);
+  const selection = scene?.getSelection(p.node.key as string);
+  const items = getItemsForNode(p.node.key as string);
   const visible = items.some(i => i.visible);
   const locked = items.every(i => i.locked);
 
@@ -323,10 +321,10 @@ function TreeNode(node: DataNode) {
   }
 
   return (
-    <div>
-      <span>{node.title}</span>
+    <div style={{ display: 'flex' }}>
+      <span className={styles.sourceTitle}>{p.node.title}</span>
       {items.length > 0 && (
-        <div>
+        <div className={styles.sourceIcons}>
           {selectiveRecordingEnabled && (
             <Tooltip title={selectiveRecordingMetadata().tooltip}>
               <i

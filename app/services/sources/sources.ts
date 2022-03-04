@@ -147,6 +147,10 @@ class SourcesViews extends ViewHandler<ISourcesState> {
     return sourceModels.map(sourceModel => this.getSource(sourceModel.sourceId)!);
   }
 
+  getNameForSource(sourceId: string) {
+    return this.state.sources[sourceId]?.name;
+  }
+
   suggestName(name: string): string {
     return namingHelpers.suggestName(name, (name: string) => this.getSourcesByName(name).length);
   }
