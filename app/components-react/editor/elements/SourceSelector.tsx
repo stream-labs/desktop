@@ -170,18 +170,20 @@ function SourceSelector() {
       : false;
   }
 
-  function makeActive(selectedKeys: string[]) {
+  function makeActive(
+    selectedKeys: string[],
+    info: { node: EventDataNode; nativeEvent: MouseEvent },
+  ) {
     setInsideHouseCall(true);
-    globalSelection.select(selectedKeys);
+    if (info.nativeEvent.shiftKey) {
+      globalSelection.select(selectedKeys);
+    } else {
+      globalSelection.select([info.node.key as string]);
+    }
   }
 
-  function handleExpand(expandedKeys: string[], info: { expanded: boolean; node: EventDataNode }) {
-    const nodeId = info.node.key as string;
-    if (info.expanded) {
-      setExpandedFolders(expandedFolders.filter(node => node === nodeId));
-    } else {
-      setExpandedFolders(expandedFolders.concat([nodeId]));
-    }
+  function handleExpand(expandedKeys: string[]) {
+    setExpandedFolders(expandedKeys);
   }
 
   function expandSelectedFolders() {
