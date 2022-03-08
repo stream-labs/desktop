@@ -1,14 +1,25 @@
 import RCTree from 'rc-tree';
 import { EventDataNode, DataNode } from 'antd/lib/tree';
+import { Key } from 'react';
+import { EPlaceType } from 'services/editor-commands/commands/reorder-nodes';
 
 export interface IOnDropInfo {
   node: EventDataNode;
   dragNode: DataNode;
+  dragNodesKeys: (string | number)[];
   dropPosition: number;
   dropToGap: boolean;
 }
 
 export function useTree(onlyLeaves?: boolean) {
+  function determinePlacement(info: IOnDropInfo) {
+    if (!info.dropToGap) return EPlaceType.Inside;
+    const dropPos = info.node.pos.split('-');
+    const delta = info.dropPosition - Number(dropPos[dropPos.length - 1]);
+
+    return delta > 0 ? EPlaceType.After : EPlaceType.Before;
+  }
+
   function treeSort(info: IOnDropInfo, state: DataNode[]) {
     const dropKey = info.node.key;
     const dragKey = info.dragNode.key;
@@ -68,5 +79,5 @@ export function useTree(onlyLeaves?: boolean) {
     return data;
   }
 
-  return { treeSort };
+  return { treeSort, determinePlacement };
 }

@@ -13,7 +13,7 @@ import { EPlaceType } from 'services/editor-commands/commands/reorder-nodes';
 import { useVuex } from 'components-react/hooks';
 import Scrollable from 'components-react/shared/Scrollable';
 import { Services } from 'components-react/service-provider';
-import { useTree } from 'components-react/hooks/useTree';
+import { IOnDropInfo, useTree } from 'components-react/hooks/useTree';
 import useBaseElement from './hooks';
 import styles from './SceneSelector.m.less';
 
@@ -24,12 +24,13 @@ function SourceSelector() {
     SelectionService,
     StreamingService,
     AudioService,
+    EditorCommandsService,
   } = Services;
 
   const [expandedFolders, setExpandedFolders] = useState<string[]>([]);
   const [callCameFromInsideTheHouse, setInsideHouseCall] = useState(false);
   const treeRef = useRef<RCTree>(null);
-  const { treeSort } = useTree();
+  const { determinePlacement } = useTree();
 
   const {
     scene,
@@ -200,7 +201,17 @@ function SourceSelector() {
     StreamingService.actions.setSelectiveRecording(!StreamingService.state.selectiveRecording);
   }
 
-  function handleSort() {}
+  function handleSort(info: IOnDropInfo) {
+    const nodesToDrop = scene?.getSelection(info.dragNodesKeys as string[]);
+    const destNode = scene?.getNode(info.node.key as string);
+    if (!nodesToDrop || !destNode) return;
+    EditorCommandsService.actions.executeCommand(
+      'ReorderNodesCommand',
+      nodesToDrop,
+      destNode?.id,
+      determinePlacement(info),
+    );
+  }
 
   return (
     <>
@@ -253,6 +264,7 @@ function SourceSelector() {
           titleRender={(node: DataNode) => <TreeNode node={node} />}
           draggable
           blockNode
+          multiple
         />
       </Scrollable>
     </>
