@@ -4,10 +4,11 @@ import { Tooltip, Tree } from 'antd';
 import RCTree from 'rc-tree';
 import { EventDataNode, DataNode } from 'antd/lib/tree';
 import { SourceDisplayData } from 'services/sources';
-import { ISceneItemFolder, ISceneItem } from 'services/scenes';
+import { TSceneNode, SceneItemFolder, SceneItem } from 'services/scenes';
 import { EditMenu } from 'util/menus/EditMenu';
 import { WidgetDisplayData } from 'services/widgets';
 import { $t } from 'services/i18n';
+import { isItem } from 'services/scenes/scene-node';
 import { EPlaceType } from 'services/editor-commands/commands/reorder-nodes';
 import { useVuex } from 'components-react/hooks';
 import Scrollable from 'components-react/shared/Scrollable';
@@ -15,7 +16,6 @@ import { Services } from 'components-react/service-provider';
 import { useTree } from 'components-react/hooks/useTree';
 import useBaseElement from './hooks';
 import styles from './SceneSelector.m.less';
-import { node } from 'execa';
 
 function SourceSelector() {
   const {
@@ -55,30 +55,29 @@ function SourceSelector() {
 
   function nodes(): DataNode[] {
     // recursive function for transform SceneNode[] to antd DataNode[]
-    const getTreeNodes = (sceneNodes: (ISceneItem | ISceneItemFolder)[]): DataNode[] => {
+    const getTreeNodes = (sceneNodes: TSceneNode[]): DataNode[] => {
       return sceneNodes.map(sceneNode => {
         let children;
-        const isItem = sceneNode.sceneNodeType === 'item';
-        if (!isItem) children = getTreeNodes(getChildren(sceneNode));
-        const sourceId = isItem ? sceneNode.sourceId : sceneNode.id;
+        if (!isItem(sceneNode)) children = getTreeNodes(getChildren(sceneNode));
+        const sourceId = isItem(sceneNode) ? sceneNode.sourceId : sceneNode.id;
         return {
           key: sceneNode.id,
-          title: isItem ? nameForSource(sourceId) : sceneNode.name,
-          icon: determineIcon(isItem, sourceId),
-          isLeaf: isItem,
+          title: isItem(sceneNode) ? nameForSource(sourceId) : sceneNode.name,
+          icon: determineIcon(isItem(sceneNode), sourceId),
+          isLeaf: isItem(sceneNode),
           children,
         };
       });
     };
 
-    const nodes = scene?.state.nodes.filter(n => !n.parentId);
+    const nodes = scene?.getNodes().filter(n => !n.parentId);
     if (!nodes) return [];
     return getTreeNodes(nodes);
   }
 
-  function getChildren(node: ISceneItemFolder) {
+  function getChildren(node: SceneItemFolder) {
     if (!scene) return [];
-    return scene.state.nodes.filter(n => n.parentId === node.id);
+    return scene.getNodes().filter(n => n.parentId === node.id);
   }
 
   function determineIcon(isLeaf: boolean, sourceId: string) {
@@ -267,15 +266,15 @@ function TreeNode(p: { node: DataNode }) {
     selectiveRecordingEnabled: StreamingService.state.selectiveRecording,
   }));
 
-  function getItemsForNode(id: string): ISceneItem[] {
-    const sceneNode = scene?.state.nodes.find(n => n.id === id);
+  function getItemsForNode(id: string): SceneItem[] {
+    const sceneNode = scene?.getNodes().find(n => n.id === id);
 
-    if (sceneNode?.sceneNodeType === 'item') {
+    if (sceneNode && isItem(sceneNode)) {
       return [sceneNode];
     }
 
-    const children = scene?.state.nodes.filter(n => n.parentId === p.node.key);
-    let childrenItems: ISceneItem[] = [];
+    const children = scene?.getNodes().filter(n => n.parentId === p.node.key);
+    let childrenItems: SceneItem[] = [];
 
     children?.forEach(c => (childrenItems = childrenItems.concat(getItemsForNode(c.id))));
 
