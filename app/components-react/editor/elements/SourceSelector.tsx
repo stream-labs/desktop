@@ -86,20 +86,22 @@ function SourceSelector() {
       return 'fa fa-folder';
     }
 
-    const source = SourcesService.views.sources[sourceId];
+    const source = SourcesService.views.getSource(sourceId);
 
-    if (source?.propertiesManagerType === 'streamlabels') {
+    if (!source) return 'fas fa-file';
+
+    if (source.propertiesManagerType === 'streamlabels') {
       return 'fas fa-file-alt';
     }
 
-    if (source?.propertiesManagerType === 'widget') {
+    if (source.propertiesManagerType === 'widget') {
       const widgetType = SourcesService.views.getSource(sourceId)?.getPropertiesManagerSettings()
         .widgetType;
 
       return WidgetDisplayData()[widgetType]?.icon || 'icon-error';
     }
 
-    return SourceDisplayData()[source?.type]?.icon || 'fas fa-file';
+    return SourceDisplayData()[source.type]?.icon || 'fas fa-file';
   }
 
   function addSource() {
@@ -334,7 +336,7 @@ function TreeNode(p: { node: DataNode }) {
   }
 
   return (
-    <div style={{ display: 'flex' }}>
+    <div className={styles.sourceTitleContainer}>
       <i className={p.node.icon as string} />
       <span className={styles.sourceTitle}>{p.node.title}</span>
       {items.length > 0 && (
