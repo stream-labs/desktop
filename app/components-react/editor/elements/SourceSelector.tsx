@@ -333,6 +333,7 @@ function TreeNode(p: { node: DataNode }) {
 
   return (
     <div style={{ display: 'flex' }}>
+      <i className={p.node.icon as string} />
       <span className={styles.sourceTitle}>{p.node.title}</span>
       {items.length > 0 && (
         <div className={styles.sourceIcons}>
