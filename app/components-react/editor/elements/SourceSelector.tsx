@@ -292,6 +292,7 @@ function TreeNode(p: { node: DataNode; expandFolder: (key: string) => void }) {
     scene: ScenesService.views.activeScene,
     selectiveRecordingEnabled: StreamingService.state.selectiveRecording,
   }));
+  if (!scene || scene.isDestroyed()) return <></>;
 
   function getItemsForNode(id: string): SceneItem[] {
     const sceneNode = scene?.getNodes().find(n => n.id === id);
@@ -310,13 +311,13 @@ function TreeNode(p: { node: DataNode; expandFolder: (key: string) => void }) {
     return childrenItems;
   }
 
-  const selection = scene?.getSelection(p.node.key as string);
+  const selection = scene.getSelection(p.node.key as string);
   const items = getItemsForNode(p.node.key as string);
   const visible = items.some(i => i.visible);
   const locked = items.every(i => i.locked);
 
   function toggleLock() {
-    const locked = !selection?.isLocked();
+    const locked = !selection.isLocked();
     selection?.setSettings({ locked });
   }
 
@@ -340,10 +341,10 @@ function TreeNode(p: { node: DataNode; expandFolder: (key: string) => void }) {
   }
 
   function selectiveRecordingMetadata() {
-    if (selection?.isStreamVisible() && selection.isRecordingVisible()) {
+    if (selection.isStreamVisible() && selection.isRecordingVisible()) {
       return { icon: 'icon-smart-record', tooltip: $t('Visible on both Stream and Recording') };
     }
-    return selection?.isStreamVisible()
+    return selection.isStreamVisible()
       ? { icon: 'icon-broadcast', tooltip: $t('Only visible on Stream') }
       : { icon: 'icon-studio', tooltip: $t('Only visible on Recording') };
   }

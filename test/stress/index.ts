@@ -1,15 +1,11 @@
 // The stress test will not be run when normally running tests.
 
 import { uniqueId, sample } from 'lodash';
-import {
-  useSpectron,
-  TExecutionContext,
-  test,
-} from '../helpers/spectron/index';
+import { useSpectron, TExecutionContext, test } from '../helpers/spectron/index';
 import { addScene, clickRemoveScene } from '../helpers/modules/scenes';
 import { addSource, clickRemoveSource, rightClickSource } from '../helpers/modules/sources';
 import { contextMenuClick } from '../helpers/spectron/context-menu';
-import {closeWindow, focusMain, focusWindow} from "../helpers/modules/core";
+import { closeWindow, focusMain, focusWindow } from '../helpers/modules/core';
 
 useSpectron();
 
@@ -37,7 +33,7 @@ async function getSceneElements(t: TExecutionContext) {
 }
 
 async function getSourceElements(t: TExecutionContext) {
-  return (await (await t.context.app.client.$('h2=Sources')).$('../..')).$$(
+  return (await (await t.context.app.client.$('#SourceSelector')).$('../..')).$$(
     '.sl-vue-tree-node-item',
   );
 }
@@ -123,7 +119,7 @@ async function createProjector(t: TExecutionContext) {
 }
 
 async function destroyProjector(t: TExecutionContext) {
-  if (await focusWindow( /windowId=(?!main)(?!child)/)) {
+  if (await focusWindow(/windowId=(?!main)(?!child)/)) {
     await closeWindow('child');
   }
   await focusMain();

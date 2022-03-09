@@ -44,7 +44,7 @@ test('Onboarding steps', async t => {
   await (await app.client.$('div=Choose Free')).click();
 
   // success?
-  await (await app.client.$('h2=Sources')).waitForDisplayed({ timeout: 60000 });
+  await (await app.client.$('#SourceSelector')).waitForDisplayed({ timeout: 60000 });
   await makeScreenshots(t, 'Onboarding completed');
   t.pass();
 });
@@ -76,7 +76,7 @@ test('OBS Importer', async t => {
   await (await client.$('h2=Start')).click();
 
   // success?
-  await (await client.$('h2=Sources')).waitForDisplayed({ timeout: 60000 });
+  await (await client.$('#SourceSelector')).waitForDisplayed({ timeout: 60000 });
   await makeScreenshots(t, 'Import from OBS is completed');
   t.pass();
 });
