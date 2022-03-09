@@ -5,7 +5,7 @@ import { dialogDismiss } from '../spectron/dialog';
 import { contextMenuClick } from '../spectron/context-menu';
 
 async function clickSourceAction(selector: string) {
-  const $el = await (await (await select('h2=Sources')).$('..')).$(selector);
+  const $el = await (await (await select('#SourceSelector')).$('..')).$(selector);
   await $el.click();
 }
 
@@ -23,15 +23,15 @@ export async function clickSourceProperties() {
 }
 
 export async function selectSource(name: string) {
-  await click(`.item-title=${name}`);
+  await click(`[data-name="${name}"]`);
 }
 
 export async function selectTestSource() {
-  await click('.item-title*=__');
+  await click('[data-name*=__]');
 }
 
 export async function rightClickSource(name: string) {
-  await (await select(`.item-title=${name}`)).click({ button: 'right' });
+  await (await select(`[data-name="${name}"]`)).click({ button: 'right' });
 }
 
 export async function openSourceProperties(name: string) {
@@ -89,16 +89,16 @@ export async function openRenameWindow(sourceName: string) {
 }
 
 export async function sourceIsExisting(sourceName: string) {
-  return await isDisplayed(`.item-title=${sourceName}`);
+  return await isDisplayed(`[data-name="${sourceName}"]`);
 }
 
 export async function waitForSourceExist(sourceName: string, invert = false) {
-  return (await select(`.item-title=${sourceName}`)).waitForExist({
+  return (await select(`[data-name="${sourceName}"]`)).waitForExist({
     timeout: 5000,
     reverse: invert,
   });
 }
 
 export async function testSourceExists() {
-  return (await select('.item-title*=__')).isExisting();
+  return (await select('[data-name*=__]')).isExisting();
 }

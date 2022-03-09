@@ -344,7 +344,7 @@ function TreeNode(p: { node: DataNode; expandFolder: (key: string) => void }) {
   }
 
   return (
-    <div className={styles.sourceTitleContainer}>
+    <div className={styles.sourceTitleContainer} data-name={p.node.title}>
       <i className={p.node.icon as string} onClick={() => p.expandFolder(p.node.key as string)} />
       <span className={styles.sourceTitle}>{p.node.title}</span>
       {items.length > 0 && (
