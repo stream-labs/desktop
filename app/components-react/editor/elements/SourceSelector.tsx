@@ -54,7 +54,7 @@ function SourceSelector() {
 
   useEffect(expandSelectedFolders, [lastSelectedId]);
 
-  function nodes(): DataNode[] {
+  function nodes() {
     // recursive function for transform SceneNode[] to antd DataNode[]
     const getTreeNodes = (sceneNodes: TSceneNode[]): DataNode[] => {
       return sceneNodes.map(sceneNode => {
@@ -82,17 +82,13 @@ function SourceSelector() {
   }
 
   function determineIcon(isLeaf: boolean, sourceId: string) {
-    if (!isLeaf) {
-      return 'fa fa-folder';
-    }
+    if (!isLeaf) return expandedFolders.includes(sourceId) ? 'fa fa-folder-open' : 'fa fa-folder';
 
     const source = SourcesService.views.getSource(sourceId);
 
-    if (!source) return 'fas fa-file';
+    if (!source) return 'icon-error';
 
-    if (source.propertiesManagerType === 'streamlabels') {
-      return 'fas fa-file-alt';
-    }
+    if (source.propertiesManagerType === 'streamlabels') return 'fas fa-file-alt';
 
     if (source.propertiesManagerType === 'widget') {
       const widgetType = SourcesService.views.getSource(sourceId)?.getPropertiesManagerSettings()
@@ -200,14 +196,24 @@ function SourceSelector() {
     treeRef.current?.scrollTo({ key: lastSelectedId });
   }
 
+  function toggleFolder(key: string) {
+    if (expandedFolders.includes(key)) {
+      setExpandedFolders(expandedFolders.filter(k => k !== key));
+    } else {
+      setExpandedFolders(expandedFolders.concat([key]));
+    }
+  }
+
   function toggleSelectiveRecording() {
     if (StreamingService.isReplayBufferActive || !StreamingService.isIdle) return;
     StreamingService.actions.setSelectiveRecording(!StreamingService.state.selectiveRecording);
   }
 
   function handleSort(info: IOnDropInfo) {
-    const nodesToDrop = scene?.getSelection(info.dragNodesKeys as string[]);
+    const targetNodes = activeItemIds.length > 0 ? activeItemIds : (info.dragNodesKeys as string[]);
+    const nodesToDrop = scene?.getSelection(targetNodes);
     const destNode = scene?.getNode(info.node.key as string);
+
     if (!nodesToDrop || !destNode) return;
     EditorCommandsService.actions.executeCommand(
       'ReorderNodesCommand',
@@ -226,7 +232,7 @@ function SourceSelector() {
         <Tooltip title={$t('Toggle Selective Recording')} placement="bottom">
           <i
             className={cx('icon-smart-record icon-button icon-button--lg', {
-              'icon--active': selectiveRecordingEnabled,
+              active: selectiveRecordingEnabled,
               disabled: !StreamingService.isIdle,
             })}
             onClick={toggleSelectiveRecording}
@@ -264,8 +270,9 @@ function SourceSelector() {
           onExpand={handleExpand}
           onDrop={handleSort}
           selectedKeys={activeItemIds}
+          expandedKeys={expandedFolders}
           ref={treeRef}
-          titleRender={(node: DataNode) => <TreeNode node={node} />}
+          titleRender={(node: DataNode) => <TreeNode node={node} expandFolder={toggleFolder} />}
           draggable
           blockNode
           multiple
@@ -275,7 +282,7 @@ function SourceSelector() {
   );
 }
 
-function TreeNode(p: { node: DataNode }) {
+function TreeNode(p: { node: DataNode; expandFolder: (key: string) => void }) {
   const { ScenesService, EditorCommandsService, StreamingService } = Services;
   const { scene, selectiveRecordingEnabled } = useVuex(() => ({
     scene: ScenesService.views.activeScene,
@@ -337,7 +344,7 @@ function TreeNode(p: { node: DataNode }) {
 
   return (
     <div className={styles.sourceTitleContainer}>
-      <i className={p.node.icon as string} />
+      <i className={p.node.icon as string} onClick={() => p.expandFolder(p.node.key as string)} />
       <span className={styles.sourceTitle}>{p.node.title}</span>
       {items.length > 0 && (
         <div className={styles.sourceIcons}>
