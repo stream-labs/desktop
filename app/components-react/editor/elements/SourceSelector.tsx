@@ -225,7 +225,7 @@ function SourceSelector() {
 
   return (
     <>
-      <div className="studio-controls-top">
+      <div className={styles.topContainer} id="SourceSelector">
         <div className={styles.activeSceneContainer}>
           <span className={styles.activeScene}>{$t('Sources')}</span>
         </div>
@@ -269,6 +269,7 @@ function SourceSelector() {
           onRightClick={showContextMenu}
           onExpand={handleExpand}
           onDrop={handleSort}
+          onDoubleClick={() => sourceProperties()}
           selectedKeys={activeItemIds}
           expandedKeys={expandedFolders}
           ref={treeRef}
