@@ -210,7 +210,10 @@ function SourceSelector() {
   }
 
   function handleSort(info: IOnDropInfo) {
-    const targetNodes = activeItemIds.length > 0 ? activeItemIds : (info.dragNodesKeys as string[]);
+    const targetNodes =
+      activeItemIds.length > 0 && activeItemIds.includes(info.dragNode.key as string)
+        ? activeItemIds
+        : (info.dragNodesKeys as string[]);
     const nodesToDrop = scene?.getSelection(targetNodes);
     const destNode = scene?.getNode(info.node.key as string);
 
@@ -297,10 +300,12 @@ function TreeNode(p: { node: DataNode; expandFolder: (key: string) => void }) {
       return [sceneNode];
     }
 
-    const children = scene?.getNodes().filter(n => n.parentId === p.node.key);
+    const children = scene?.getNodes().filter(n => n.parentId === id);
     let childrenItems: SceneItem[] = [];
 
-    children?.forEach(c => (childrenItems = childrenItems.concat(getItemsForNode(c.id))));
+    children?.forEach(c => {
+      childrenItems = childrenItems.concat(getItemsForNode(c.id));
+    });
 
     return childrenItems;
   }
