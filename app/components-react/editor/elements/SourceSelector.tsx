@@ -173,7 +173,7 @@ function SourceSelector() {
     info: { node: EventDataNode; nativeEvent: MouseEvent },
   ) {
     setInsideHouseCall(true);
-    if (info.nativeEvent.shiftKey) {
+    if (info.nativeEvent.shiftKey || info.nativeEvent.ctrlKey) {
       globalSelection.select(selectedKeys);
     } else {
       globalSelection.select([info.node.key as string]);
