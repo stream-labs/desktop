@@ -23,8 +23,8 @@ export default function RenameSource() {
     } catch (err: unknown) {
       return;
     }
-    EditorCommandsService.executeCommand('RenameSourceCommand', options.sourceId, name);
-    WindowsService.closeChildWindow();
+    EditorCommandsService.actions.executeCommand('RenameSourceCommand', options.sourceId, name);
+    WindowsService.actions.closeChildWindow();
   }
 
   return (

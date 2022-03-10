@@ -9,7 +9,6 @@ import { EditMenu } from 'util/menus/EditMenu';
 import { WidgetDisplayData } from 'services/widgets';
 import { $t } from 'services/i18n';
 import { isItem } from 'services/scenes/scene-node';
-import { EPlaceType } from 'services/editor-commands/commands/reorder-nodes';
 import { useVuex } from 'components-react/hooks';
 import Scrollable from 'components-react/shared/Scrollable';
 import { Services } from 'components-react/service-provider';
@@ -25,6 +24,7 @@ function SourceSelector() {
     StreamingService,
     AudioService,
     EditorCommandsService,
+    WindowsService,
   } = Services;
 
   const [expandedFolders, setExpandedFolders] = useState<string[]>([]);
@@ -41,6 +41,7 @@ function SourceSelector() {
     selectiveRecordingEnabled,
     activeScene,
     nameForSource,
+    childWindowOpen,
   } = useVuex(() => ({
     scene: ScenesService.views.activeScene,
     activeItemIds: SelectionService.state.selectedIds,
@@ -50,9 +51,15 @@ function SourceSelector() {
     activeScene: ScenesService.views.activeScene,
     globalSelection: SelectionService.views.globalSelection,
     selectiveRecordingEnabled: StreamingService.state.selectiveRecording,
+    childWindowOpen: WindowsService.state.child.isShown,
   }));
 
   useEffect(expandSelectedFolders, [lastSelectedId]);
+
+  // hack to recalculate nodes state after renaming a source
+  useEffect(() => {
+    nodes();
+  }, [childWindowOpen]);
 
   function nodes() {
     // recursive function for transform SceneNode[] to antd DataNode[]
