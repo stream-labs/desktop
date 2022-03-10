@@ -142,9 +142,9 @@
   "Use custom resolution": "Use custom resolution",
   "Enable Designer Mode": "Enable Designer Mode",
   "Get Support": "Get Support",
-  "Support Links": "Support Links",
-  "Streamlabs Support": "Streamlabs Support",
-  "Community Discord": "Community Discord",
+  "Support Links": "Támogatási linkek",
+  "Streamlabs Support": "Streamlabs támogatás",
+  "Community Discord": "Közösségi Discord",
   "Diagnostic Report": "Diagnostic Report",
   "The diagnostic report is an automatically generated report that contains information about your system and configuration. Clicking the upload button below will generate and securely transmit a diagnostic report to the Streamlabs team.": "The diagnostic report is an automatically generated report that contains information about your system and configuration. Clicking the upload button below will generate and securely transmit a diagnostic report to the Streamlabs team.",
   "Upload Diagnostic Report": "Upload Diagnostic Report",
@@ -154,7 +154,7 @@
   "Error Uploading Diagnostic Report": "Error Uploading Diagnostic Report",
   "There was an error uploading the diagnostic report. Please try again, and let the Streamlabs Streamer Success team know if the issue persists.": "There was an error uploading the diagnostic report. Please try again, and let the Streamlabs Streamer Success team know if the issue persists.",
   "The diagnostic report was securely uploaded, and the Report ID below has been copied to your clipboard. Please provide the Report ID to the Streamlabs Streamer Success Team.": "The diagnostic report was securely uploaded, and the Report ID below has been copied to your clipboard. Please provide the Report ID to the Streamlabs Streamer Success Team.",
-  "Chat Settings": "Chat Settings",
+  "Chat Settings": "Chat beállítások",
   "Text Size": "Szövegméret",
   "Show announcements for new Streamlabs features and products": "Show announcements for new Streamlabs features and products"
 }
