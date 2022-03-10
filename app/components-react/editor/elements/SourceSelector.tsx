@@ -9,10 +9,13 @@ import { EditMenu } from 'util/menus/EditMenu';
 import { WidgetDisplayData } from 'services/widgets';
 import { $t } from 'services/i18n';
 import { isItem } from 'services/scenes/scene-node';
+import { EDismissable } from 'services/dismissables';
 import { useVuex } from 'components-react/hooks';
 import Scrollable from 'components-react/shared/Scrollable';
 import { Services } from 'components-react/service-provider';
 import { IOnDropInfo, useTree } from 'components-react/hooks/useTree';
+import HelpTip from 'components-react/shared/HelpTip';
+import Translate from 'components-react/shared/Translate';
 import useBaseElement from './hooks';
 import styles from './SceneSelector.m.less';
 
@@ -289,6 +292,17 @@ function SourceSelector() {
           multiple
         />
       </Scrollable>
+      <HelpTip
+        title={$t('Folder Expansion')}
+        dismissableKey={EDismissable.SourceSelectorFolders}
+        position={{ top: '-8px', left: '102px' }}
+      >
+        <Translate
+          message={$t('Wondering how to expand your folders? Just click on the <icon></icon> icon')}
+        >
+          <i slot="icon" className="fa fa-folder" />
+        </Translate>
+      </HelpTip>
     </>
   );
 }
