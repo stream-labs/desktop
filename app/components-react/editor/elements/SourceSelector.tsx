@@ -316,18 +316,21 @@ function TreeNode(p: { node: DataNode; expandFolder: (key: string) => void }) {
   const visible = items.some(i => i.visible);
   const locked = items.every(i => i.locked);
 
-  function toggleLock() {
+  function toggleLock(e: React.MouseEvent) {
+    e.stopPropagation();
     const locked = !selection.isLocked();
     selection?.setSettings({ locked });
   }
 
-  function toggleVisibility() {
+  function toggleVisibility(e: React.MouseEvent) {
+    e.stopPropagation();
     if (!selection) return;
     const visible = !selection.isVisible();
     EditorCommandsService.actions.executeCommand('HideItemsCommand', selection, !visible);
   }
 
-  function cycleSelectiveRecording() {
+  function cycleSelectiveRecording(e: React.MouseEvent) {
+    e.stopPropagation();
     if (!selection || selection.isLocked()) return;
     if (selection.isStreamVisible() && selection.isRecordingVisible()) {
       selection.setRecordingVisible(false);

@@ -23,7 +23,7 @@ test('Selective Recording', async t => {
 
   // Toggle selective recording
   await focusMain();
-  await (await client.$('.studio-controls-top .icon-smart-record')).click();
+  await (await client.$('#SourceSelector .icon-smart-record')).click();
 
   // Check that selective recording icon is active
   await (await client.$('.icon-smart-record.icon--active')).waitForExist();
