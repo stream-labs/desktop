@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import cx from 'classnames';
 import { Tooltip, Tree } from 'antd';
 import RCTree from 'rc-tree';
@@ -30,10 +30,9 @@ function SourceSelector() {
     WindowsService,
   } = Services;
 
-  const [expandedFolders, setExpandedFolders] = useState<string[]>([]);
   const [callCameFromInsideTheHouse, setInsideHouseCall] = useState(false);
   const treeRef = useRef<RCTree>(null);
-  const { determinePlacement } = useTree();
+  const { determinePlacement, expandedFolders, setExpandedFolders, toggleFolder } = useTree();
 
   const {
     scene,
@@ -58,11 +57,8 @@ function SourceSelector() {
   }));
 
   useEffect(expandSelectedFolders, [lastSelectedId]);
-
-  // hack to recalculate nodes state after renaming a source
-  useEffect(() => {
-    nodes();
-  }, [childWindowOpen]);
+  const [reorderOperation, setReorderOperation] = useState(0);
+  const memoizedNodes = useMemo(nodes, [childWindowOpen, reorderOperation]);
 
   function nodes() {
     // recursive function for transform SceneNode[] to antd DataNode[]
@@ -92,7 +88,7 @@ function SourceSelector() {
   }
 
   function determineIcon(isLeaf: boolean, sourceId: string) {
-    if (!isLeaf) return expandedFolders.includes(sourceId) ? 'fa fa-folder-open' : 'fa fa-folder';
+    if (!isLeaf) return 'fa fa-folder';
 
     const source = SourcesService.views.getSource(sourceId);
 
@@ -206,20 +202,12 @@ function SourceSelector() {
     treeRef.current?.scrollTo({ key: lastSelectedId });
   }
 
-  function toggleFolder(key: string) {
-    if (expandedFolders.includes(key)) {
-      setExpandedFolders(expandedFolders.filter(k => k !== key));
-    } else {
-      setExpandedFolders(expandedFolders.concat([key]));
-    }
-  }
-
   function toggleSelectiveRecording() {
     if (StreamingService.isReplayBufferActive || !StreamingService.isIdle) return;
     StreamingService.actions.setSelectiveRecording(!StreamingService.state.selectiveRecording);
   }
 
-  function handleSort(info: IOnDropInfo) {
+  async function handleSort(info: IOnDropInfo) {
     const targetNodes =
       activeItemIds.length > 0 && activeItemIds.includes(info.dragNode.key as string)
         ? activeItemIds
@@ -228,12 +216,13 @@ function SourceSelector() {
     const destNode = scene?.getNode(info.node.key as string);
 
     if (!nodesToDrop || !destNode) return;
-    EditorCommandsService.actions.executeCommand(
+    await EditorCommandsService.actions.return.executeCommand(
       'ReorderNodesCommand',
       nodesToDrop,
       destNode?.id,
       determinePlacement(info),
     );
+    setReorderOperation(reorderOperation + 1);
   }
 
   return (
@@ -277,7 +266,7 @@ function SourceSelector() {
       </div>
       <Scrollable style={{ height: '100%' }} className={styles.scenesContainer}>
         <Tree
-          treeData={nodes()}
+          treeData={memoizedNodes}
           onSelect={makeActive}
           onRightClick={showContextMenu}
           onExpand={handleExpand}
@@ -286,7 +275,9 @@ function SourceSelector() {
           selectedKeys={activeItemIds}
           expandedKeys={expandedFolders}
           ref={treeRef}
-          titleRender={(node: DataNode) => <TreeNode node={node} expandFolder={toggleFolder} />}
+          titleRender={(node: DataNode) => (
+            <TreeNode node={node} expandFolder={toggleFolder} expandedFolders={expandedFolders} />
+          )}
           draggable
           blockNode
           multiple
@@ -307,7 +298,11 @@ function SourceSelector() {
   );
 }
 
-function TreeNode(p: { node: DataNode; expandFolder: (key: string) => void }) {
+function TreeNode(p: {
+  node: DataNode;
+  expandFolder: (key: string) => void;
+  expandedFolders: string[];
+}) {
   const { ScenesService, EditorCommandsService, StreamingService } = Services;
   const { scene, selectiveRecordingEnabled } = useVuex(() => ({
     scene: ScenesService.views.activeScene,
@@ -375,7 +370,14 @@ function TreeNode(p: { node: DataNode; expandFolder: (key: string) => void }) {
 
   return (
     <div className={styles.sourceTitleContainer} data-name={p.node.title}>
-      <i className={p.node.icon as string} onClick={() => p.expandFolder(p.node.key as string)} />
+      <i
+        className={
+          p.expandedFolders.includes(p.node.key as string)
+            ? 'fas fa-folder-open'
+            : (p.node.icon as string)
+        }
+        onClick={() => p.expandFolder(p.node.key as string)}
+      />
       <span className={styles.sourceTitle}>{p.node.title}</span>
       {items.length > 0 && (
         <div className={styles.sourceIcons}>

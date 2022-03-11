@@ -1,6 +1,5 @@
-import RCTree from 'rc-tree';
+import { useState } from 'react';
 import { EventDataNode, DataNode } from 'antd/lib/tree';
-import { Key } from 'react';
 import { EPlaceType } from 'services/editor-commands/commands/reorder-nodes';
 
 export interface IOnDropInfo {
@@ -12,6 +11,16 @@ export interface IOnDropInfo {
 }
 
 export function useTree(onlyLeaves?: boolean) {
+  const [expandedFolders, setExpandedFolders] = useState<string[]>([]);
+
+  function toggleFolder(key: string) {
+    if (expandedFolders.includes(key)) {
+      setExpandedFolders(expandedFolders.filter(k => k !== key));
+    } else {
+      setExpandedFolders(expandedFolders.concat([key]));
+    }
+  }
+
   function determinePlacement(info: IOnDropInfo) {
     if (!info.dropToGap) return EPlaceType.Inside;
     const dropPos = info.node.pos.split('-');
@@ -79,5 +88,5 @@ export function useTree(onlyLeaves?: boolean) {
     return data;
   }
 
-  return { treeSort, determinePlacement };
+  return { treeSort, determinePlacement, expandedFolders, setExpandedFolders, toggleFolder };
 }
