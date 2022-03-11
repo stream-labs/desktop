@@ -34,6 +34,6 @@
   "Designates which tracks are being recorded": "Designates which tracks are being recorded",
   "Your Stream and VOD Track are the same. This may result in unexpected audio behavior, go to Global Settings to change.": "Your Stream and VOD Track are the same. This may result in unexpected audio behavior, go to Global Settings to change.",
   "Streaming Track": "Streaming Track",
-  "Enable Twitch VOD Track": "Enable Twitch VOD Track",
+  "Enable Twitch VOD Track": "Twitch VOD sáv engedélyezése",
   "Twitch VOD Track": "Twitch VOD sáv"
 }
