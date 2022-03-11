@@ -1,71 +1,119 @@
 <template>
   <div class="tool-bar">
-    <span class="status-indicator" :class="{ 'is-live': programStatus === 'onAir' }">LIVE</span>
-    <span class="program-time"><time>{{ format(programCurrentTime) }}</time> / <time>{{ format(programTotalTime) }}</time></span>
-    <button class="manual-extention" v-tooltip.bottom="manualExtentionTooltip" @click="extendProgram" :disabled="autoExtensionEnabled || isExtending || !isProgramExtendable">
-      <i class="icon-extention icon-btn icon-btn--lg"></i>
-    </button>
+
     <div class="reservation-timer" v-if="programStatus === 'reserved'">
       番組開始まで {{ format(-programCurrentTime) }}
     </div>
-    <div class="auto-extention">
-      <div class="toggle-item"><span class="toggle-label">自動延長</span><input type="checkbox" :checked="autoExtensionEnabled" @click="toggleAutoExtension" class="toggle-button"/></div>
+    <div class="elapsed-time" v-else>
+      <div class="program-time">
+        <time>{{ format(programCurrentTime) }}</time> / 
+        <time>{{ format(programTotalTime) }}</time>
+      </div>
+    </div>
+
+    <div class="side-bar">
+      <popper 
+        trigger="click"
+        :options="{ placement: 'bottom-end' }"
+        @show="showPopupMenu = true"
+        @hide="showPopupMenu = false"
+      >
+        <div class="popper">
+          <ul class="popup-menu-list">
+            <li class="popup-menu-item">
+              <div class="toggle-item">
+                <span class="toggle-label">自動延長</span
+                ><input
+                  type="checkbox"
+                  :checked="autoExtensionEnabled"
+                  @click="toggleAutoExtension"
+                  class="toggle-button"
+                />
+              </div>
+            </li>
+            <li class="popup-menu-item">
+              <button
+                class="manual-extention link"
+                @click="extendProgram"
+                :disabled="autoExtensionEnabled || isExtending || !isProgramExtendable || programStatus === 'reserved'"
+              >30分延長</button>
+            </li>
+          </ul>
+        </div>
+        <button class="button--circle button--secondary button--extention" v-tooltip.bottom="extentionTooltip" :class="{ 'is-show': showPopupMenu, 'active': autoExtensionEnabled }" slot="reference">
+          <i class="icon-extention"></i>
+        </button>
+      </popper>
+    
+      <button @click="fetchProgram" :disabled="isFetching" v-tooltip.bottom="fetchTooltip" class="button--circle button--secondary">
+        <i class="icon-reload"></i>
+      </button>
+
+      <div class="program-button">
+        <button
+          v-if="programStatus === 'onAir' || programStatus === 'reserved'"
+          @click="endProgram"
+          :disabled="isEnding || programStatus === 'reserved'"
+          class="button button--end-program button--live"
+        >
+          番組終了
+        </button>
+        <button
+          v-else-if="programStatus === 'end'"
+          @click="createProgram"
+          :disabled="isCreating"
+          class="button button--primary"
+        >
+          番組作成
+        </button>
+        <button
+          v-else
+          @click="startProgram"
+          :disabled="isStarting"
+          class="button button--action"
+        >
+          番組開始
+        </button>
+      </div>
     </div>
   </div>
 </template>
 <script lang="ts" src="./ToolBar.vue.ts"></script>
 <style lang="less" scoped>
-@import "../../styles/index";
+@import '../../styles/index';
 
 .tool-bar {
   display: flex;
   align-items: center;
-  height: 48px;
+  height: 64px;
   padding: 0 16px;
-  background-color: @bg-tertiary;
+  background-color: var(--color-bg-quinary);
   position: relative;
 }
 
-.status-indicator {
-  color: @white;
-  font-size: 12px;
-  font-weight: bold;
-  padding: 0 4px;
-  line-height: 20px;
-  opacity: .2;
-
-  &.is-live {
-    background-color: @red;
-    animation: live-indeicator-shadow 3s infinite;
-    opacity: 1;
-  }
+.elapsed-time {
+  display: flex;
+  align-items: center;
 }
 
-@keyframes live-indeicator-shadow {
-  0% { box-shadow: 0 0 10px @red; }
-  50% { box-shadow: 0 0 0 @red; }
-  100% { box-shadow: 0 0 10px @red; }
+.program-time,
+.reservation-timer {
+  .time-styling;
 }
 
-.program-time {
-  color: @white;
-  font-size: 12px;
-  margin-left: 16px;
+.side-bar {
+  display: flex;
+  align-items: center;
+  margin-left: auto;
 }
 
-.manual-extention {
-  margin-left: 16px;
-  i {
-    font-size: 14px;
-    margin-left: 0;
-  }
+.popper {
+  .popper-styling();
+  width: 160px;
+}
 
-  &:disabled {
-    i {
-      opacity: 0.26;
-      cursor: inherit;
-    }
-  }
+.toggle-button {
+  margin-left: auto;
 }
 
 .auto-extention {
@@ -74,19 +122,19 @@
   z-index: 2;
 }
 
-.reservation-timer {
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  color: @white;
-  font-size: 12px;
-  width: 100%;
-  height: 100%;
-  padding: 0 16px;
-  background-color: rgba(0,0,0,.8);
-  position: absolute;
-  top: 0;
-  left: 0;
-  z-index: 1;
+.button--circle {
+  margin-left: 16px;
 }
+
+.button--extention {
+  i {
+    margin-bottom: 1px;
+    margin-left: 2px;
+  }
+}
+
+.program-button {
+  margin-left: 16px;
+}
+
 </style>

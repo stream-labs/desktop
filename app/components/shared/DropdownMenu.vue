@@ -21,65 +21,67 @@
 
 // 詳細度でライブラリ側の指定を上書きする
 .popper.dropdown-menu {
-  width: 124%;
-  position: absolute;
-  background-color: @bg-secondary;
-  border-color: @bg-primary;
-  .border;
-  .radius;
-  padding: 8px;
+  .popper-styling;
+  max-width: 240px;
   max-height: 152px;
   overflow-y: auto;
-  z-index: 200000;
 }
 
 .dropdown-menu__toggle {
   display: flex;
   text-align: left;
   align-items: center;
-  font-size: 12px;
+  font-size: @font-size4;
   .semibold;
   letter-spacing: .7px;
-  color: @text-primary;
+  color: var(--color-text);
+  overflow: hidden;
 
   i {
-    margin-left: 6px;
-    font-size: 10px;
-    color: @text-secondary;
-    &:hover {
-      color: @text-primary;
+    margin-left: 8px;
+    font-size: @font-size1;
+    .icon-hover();
+  }
+
+  &:hover {
+    i {
+      
+      color: var(--color-text-light);
     }
   }
 
   > .scene-name {
+    .text-ellipsis;
+
     display: inline-block;
-    width: 160px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    &:hover,
-    &.active {
-      color: @text-primary;
-    }
+    color: var(--color-text-light);
+    font-size: @font-size4;
   }
 }
 
 .dropdown-menu__item {
+  .text-ellipsis;
+  width: 100%;
+  line-height: 32px;
+  padding: 0 8px;
+  color: var(--color-text);
+  font-size: @font-size2;
   text-align: left;
-  white-space: nowrap;
-  max-width: 300px;
-  overflow: hidden;
-  text-overflow: ellipsis;
   cursor: pointer;
-  color: @text-secondary;
 
   &:hover,
   &.active {
-    color: @text-primary;
-    background-color: @bg-primary;
-    &:before {
-      content:"\003e";
-    }
+    color: var(--color-text-light);
+    background-color: var(--color-bg-active);
+  }
+
+  &:last-child,
+  &:last-of-type {
+    margin-bottom: 8px;
+  }
+
+  .setting-link + & {
+    border-top: 1px solid var(--color-border-light);
   }
 }
 

@@ -5,19 +5,19 @@
       <h4 class="studio-controls__label" v-tooltip.bottom="sourcesTooltip">
         {{ $t('common.sources') }}
       </h4>
-      <div>
+      <div class="studio-controls-top-sidebar">
         <i
-          class="icon-folder icon-btn icon-btn--lg"
+          class="icon-folder icon-btn"
           @click="addFolder"
           v-tooltip.bottom="addGroupTooltip"
           data-test="AddFolder" />
         <i
-          class="icon-add icon-btn icon-btn--lg"
+          class="icon-add icon-btn"
           @click="addSource"
           v-tooltip.bottom="addSourceTooltip"
           data-test="Add" />
         <i
-          class="icon-delete icon-btn icon-btn--lg"
+          class="icon-delete icon-btn"
           :class="{ disabled: activeItemIds.length === 0}" @click="removeItems"
           v-tooltip.bottom="removeSourcesTooltip"
           data-test="Remove" />
@@ -73,21 +73,103 @@
 @import "../styles/index";
 @import "~sl-vue-tree/dist/sl-vue-tree-dark.css";
 
+.studio-controls-top-sidebar {
+  display: flex;
+  align-items: center;
+}
+
+.sl-vue-tree.sl-vue-tree-root {
+  .radius;
+
+  flex-grow: 1;
+  overflow: auto;
+  color: var(--color-text);
+  background-color: var(--color-bg-tertiary);
+  border: none;
+}
+
+.sl-vue-tree-nodes-list {
+  .sl-vue-tree-root > & {
+    padding-bottom: 0;
+  } 
+}
+
+.sl-vue-tree-node-item {
+  padding: 0 12px;
+  min-height: @item-generic-size;
+  line-height: @item-generic-size;
+  cursor: pointer;
+  border: none;
+
+  .sl-vue-tree-selected > & {
+    background-color: var(--color-bg-active);
+  }
+}
+
+.sl-vue-tree-cursor-inside {
+  .sl-vue-tree-node-item& {
+    border-color: var(--color-border-light);
+  }
+}
+
+.sl-vue-tree-title,
+.sl-vue-tree-sidebar {
+  display: flex;
+  align-items: center;
+}
+
+.sl-vue-tree-sidebar {
+  flex-shrink: 0;
+}
+
+.sl-vue-tree-title {
+  flex-grow: 1;
+  overflow: hidden;
+}
+
+.sl-vue-tree-gap {
+  width: 24px;
+}
+
+.title-container {
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+
+  .sl-vue-tree-node-item:hover & {
+    .transition();
+    opacity: 1;
+    color: var(--color-text-light);
+  }
+
+  .sl-vue-tree-selected & {
+    .transition();
+    color: var(--color-text-light);
+  }
+}
+
+.item-title {
+  .text-ellipsis();
+  font-size: @font-size2;
+}
+
 .source-selector-action {
   display: inline-block;
   width: 16px;
   text-align: center;
-  opacity: .26;
+  opacity: @opacity-disabled;
   margin-left: 8px;
-  color: @text-primary;
-}
+  color: var(--color-text);
 
-.sl-vue-tree-node-item {
-  padding: 0 4px;
+  .sl-vue-tree-node-item:hover & {
+    .transition();
+    opacity: 1;
+    color: var(--color-text-light);
+  }
 }
 
 i.disabled {
-  opacity: 0.26;
+  opacity: @opacity-disabled;
   cursor: inherit;
 
    :hover {
@@ -95,94 +177,38 @@ i.disabled {
   }
 }
 
-.sl-vue-tree.sl-vue-tree-root {
-  flex-grow: 1;
-  overflow: auto;
-}
-
-.sl-vue-tree-node {
-  &:hover,
-  &.sl-vue-tree-selected {
-    .transition();
-
-    .source-selector-action {
-      .transition();
-      opacity: 1;
-      color: @text-primary;
-    }
-
-    .title-container {
-      color: @text-primary;
-    }
-  }
-}
-
-.sl-vue-tree.sl-vue-tree-root {
-  border-color: @text-secondary;
-}
-
-.sl-vue-tree-node-item {
-  cursor: pointer;
-  margin-top: -1px;
-  border: none;
-}
-
-.title-container {
-  display: inline-block;
-  color: @text-primary;
-}
-
 .layer-icon {
   display: inline-block;
   text-align: left;
-  width: 16px;
+  width: 20px;
+  margin-right: 4px;
+  flex-shrink: 0;
 
   i {
-    font-size: 12px;
-    font-weight: 700;
-  }
-}
-
-.title-container {
-  color: @text-secondary;
-  &:hover {
-    color: @text-primary;
+    font-size: @font-size2;
+    font-weight: @font-weight-bold;
   }
 }
 
 .sl-vue-tree-toggle {
-  width: 16px;
-  margin-right: 8px;
   display: inline-block;
+  flex-shrink: 0;
+  margin-right: 4px;
 
   i {
-    font-size: 7px;
-    font-weight: 700;
-    color: @text-primary;
+    font-size: 8px;
+    width: 12px;
+    color: var(--color-text);
     text-align: center;
+    display: block;
+
+    &.icon-right {
+      transform: rotate(-90deg);
+    }
   }
 }
 
-.sl-vue-tree.sl-vue-tree-root {
-  color: @text-primary;
-  background-color: #050e18;
-  border: #050e18 1px solid;
-}
-
-.sl-vue-tree-selected>.sl-vue-tree-node-item {
-  background-color: @hover;
-  color: @text-primary;
-}
-
-.sl-vue-tree-node-item:hover {
-  color: @text-primary;
-}
-
 .sl-vue-tree-cursor {
-  border-color: @navy;
-}
-
-.sl-vue-tree-node-item.sl-vue-tree-cursor-inside {
   border-color: @navy;
 }
 

@@ -1,37 +1,41 @@
 <template>
   <div class="performance-metrics flex">
-    <span class="performance-metric-wrapper resolution">
-      <i class="performance-metric-icon icon-display"/>
+    <span class="performance-metric-wrapper resolution" v-if="!isCompactMode">
+      <i class="performance-metric-icon icon-display" />
       <span class="performance-metric">
         <span class="performance-metric__value">{{ outputResolution }}</span>
       </span>
     </span>
 
     <span class="performance-metric-wrapper cpu_percent">
-      <i class="performance-metric-icon icon-cpu"/>
+      <i class="performance-metric-icon icon-cpu" />
       <span class="performance-metric">
         <span class="performance-metric__value">{{ $t('common.cpu') }}{{ cpuPercent }}%</span>
       </span>
     </span>
 
     <span class="performance-metric-wrapper band_width">
-      <i class="performance-metric-icon icon-kbps"/>
+      <i class="performance-metric-icon icon-kbps" />
+      <i class="icon-warning-circle" v-if="bandwidthAlert" />
       <span class="performance-metric">
         <span class="performance-metric__value">{{ bandwidth }}</span> kbps
       </span>
     </span>
 
     <span class="performance-metric-wrapper frame_rate">
-      <i class="performance-metric-icon icon-fps"/>
+      <i class="performance-metric-icon icon-fps" />
       <span class="performance-metric">
-        <span class="performance-metric__value">{{ frameRate }}</span>&#47;<span class="performance-metric__value">{{ targetFrameRate }}FPS</span>
+        <span class="performance-metric__value">{{ frameRate }}</span
+        >&#47;<span class="performance-metric__value">{{ targetFrameRate }}FPS</span>
       </span>
     </span>
 
-    <span class="performance-metric-wrapper dropped_frames">
-      <i class="performance-metric-icon icon-drop-fps"/>
+    <span class="performance-metric-wrapper dropped_frames" v-if="!isCompactMode">
+      <i class="performance-metric-icon icon-drop-fps" />
       <span class="performance-metric">
-        <span class="performance-metric__value">{{ $t('common.droppedFrames') }}{{ droppedFrames }} ({{ percentDropped }}%)</span>
+        <span class="performance-metric__value"
+          >{{ $t('common.droppedFrames') }}{{ droppedFrames }} ({{ percentDropped }}%)</span
+        >
       </span>
     </span>
   </div>
@@ -40,7 +44,7 @@
 <script lang="ts" src="./PerformanceMetrics.vue.ts"></script>
 
 <style lang="less" scoped>
-@import "../styles/index";
+@import '../styles/index';
 
 .performance-metrics {
   flex-wrap: wrap;
@@ -55,9 +59,17 @@
 }
 
 .performance-metric-wrapper {
-  padding-right: 12px;
-  color: @text-secondary;
+  padding-right: 16px;
   white-space: nowrap;
+  position: relative;
+
+  &.band_width {
+    .icon-warning-circle {
+      top: 4px;
+      left: 12px;
+      font-size: @font-size2;
+    }
+  }
 }
 
 .performance-metric {
@@ -65,34 +77,44 @@
 }
 
 .performance-metric-icon {
-  font-size: 14px;
   width: auto;
   vertical-align: middle;
-  margin-right: 4px;
+  margin-right: 8px;
+  font-size: @font-size4;
+  color: var(--color-text-dark);
 }
 
 .performance-metric__value {
-  font-size: 14px;
+  font-size: @font-size2;
+  color: var(--color-text);
 }
 
-.viewer_count,
-.comment_count {
-  min-width: 88px;
-}
-.resolution {
-  min-width: 120px;
-}
-.cpu_percent {
-  min-width: 168px;
-}
-.frame_rate {
-  min-width: 136px;
-}
-.dropped_frames {
-  min-width: 224px;
-}
-.band_width {
-  min-width: 108px;
-}
+.icon-warning-circle {
+  width: 16px;
+  height: 16px;
+  color: var(--color-yellow);
+  position: absolute;
 
+  &:before,
+  &:after {
+    position: absolute;
+    top: 0;
+    left: 0;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  &:before {
+    z-index: @z-index-expand-content;
+  }
+
+  &:after {
+    content: '';
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background-color: var(--color-bg-primary);
+  }
+}
 </style>

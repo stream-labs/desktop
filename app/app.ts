@@ -7,7 +7,6 @@ window['eval'] = global.eval = () => {
 
 import 'reflect-metadata';
 import Vue from 'vue';
-import URI from 'urijs';
 
 import { createStore } from './store';
 import { IWindowOptions, WindowsService } from './services/windows';
@@ -104,6 +103,7 @@ if ((isProduction || process.env.NAIR_REPORT_TO_SENTRY) && !electron.remote.proc
 }
 
 require('./app.less');
+require('./theme.less');
 
 // Initiates tooltips and sets their parent wrapper
 Vue.use(VTooltip);

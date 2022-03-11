@@ -1,13 +1,15 @@
-import Vue from 'vue';
-import { Component } from 'vue-property-decorator';
-import { UserService } from 'services/user';
+import electron from 'electron';
+import { CompactModeService } from 'services/compact-mode';
 import { Inject } from 'services/core/injector';
 import { $t } from 'services/i18n';
-import electron from 'electron';
+import { UserService } from 'services/user';
+import Vue from 'vue';
+import { Component } from 'vue-property-decorator';
 
 @Component({})
 export default class Login extends Vue {
   @Inject() userService: UserService;
+  @Inject() compactModeService: CompactModeService;
 
   get loggedIn() {
     return this.userService.isLoggedIn();
@@ -26,6 +28,10 @@ export default class Login extends Vue {
     return this.userService.platformUserPageURL;
   }
 
+  get isCompactMode(): boolean {
+    return this.compactModeService.isCompactMode;
+  }
+
   logout() {
     if (confirm($t('common.logoutConfirmMessage'))) {
       this.userService.logOut();
@@ -36,7 +42,7 @@ export default class Login extends Vue {
     this.userService.showLogin();
   }
 
-  openUserpage() {
+  openUserPage() {
     electron.remote.shell.openExternal(this.userPageURL);
   }
 }

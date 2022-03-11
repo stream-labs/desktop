@@ -1,13 +1,12 @@
-import { StatefulService, mutation } from 'services/core/stateful-service';
-import { NicoliveClient, CreateResult, EditResult, isOk } from './NicoliveClient';
-import { ProgramSchedules } from './ResponseTypes';
-import { Inject } from 'services/core/injector';
-import { NicoliveProgramStateService } from './state';
-import { WindowsService } from 'services/windows';
-import { UserService } from 'services/user';
-import { BrowserWindow } from 'electron';
+/* eslint-disable prettier/prettier */
 import { BehaviorSubject } from 'rxjs';
+import { Inject } from 'services/core/injector';
+import { mutation, StatefulService } from 'services/core/stateful-service';
+import { UserService } from 'services/user';
+import { CreateResult, EditResult, isOk, NicoliveClient } from './NicoliveClient';
 import { NicoliveFailure, openErrorDialogFromFailure } from './NicoliveFailure';
+import { ProgramSchedules } from './ResponseTypes';
+import { NicoliveProgramStateService } from './state';
 
 type Schedules = ProgramSchedules['data'];
 type Schedule = Schedules[0];
@@ -40,18 +39,22 @@ interface INicoliveProgramState extends ProgramState {
   autoExtensionEnabled: boolean;
   panelOpened: boolean | null; // 初期化前はnull、永続化された値の読み出し後に値が入る
   isLoggedIn: boolean | null; // 初期化前はnull、永続化された値の読み出し後に値が入る
+
+  isFetching: boolean;
+  isExtending: boolean;
+  isStarting: boolean;
+  isEnding: boolean;
 }
 
 export enum PanelState {
   INACTIVE = 'INACTIVE',
   OPENED = 'OPENED',
   CLOSED = 'CLOSED',
+  COMPACT = 'COMPACT',
 }
 
 export class NicoliveProgramService extends StatefulService<INicoliveProgramState> {
   @Inject('NicoliveProgramStateService') stateService: NicoliveProgramStateService;
-  @Inject()
-  windowsService: WindowsService;
   @Inject()
   userService: UserService;
 
@@ -85,6 +88,10 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
     autoExtensionEnabled: false,
     panelOpened: null,
     isLoggedIn: null,
+    isFetching: false,
+    isExtending: false,
+    isStarting: false,
+    isEnding: false,
   };
 
   init(): void {
@@ -106,7 +113,9 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
     });
 
     // UserServiceのSubjectをBehaviorに変更するのは影響が広すぎる
-    this.setState({ isLoggedIn: this.userService.isLoggedIn() });
+    this.setState({
+      isLoggedIn: this.userService.isLoggedIn(),
+    });
   }
 
   private setState(partialState: Partial<INicoliveProgramState>) {
@@ -114,7 +123,6 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
     this.refreshStatisticsPolling(this.state, nextState);
     this.refreshProgramStatusTimer(this.state, nextState);
     this.refreshAutoExtensionTimer(this.state, nextState);
-    this.refreshWindowSize(this.state, nextState);
     this.SET_STATE(nextState);
     this.stateChangeSubject.next(nextState);
   }
@@ -184,60 +192,65 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
   }
 
   async fetchProgram(): Promise<void> {
-    const schedulesResponse = await this.client.fetchProgramSchedules();
-    if (!isOk(schedulesResponse)) {
-      throw NicoliveFailure.fromClientError('fetchProgramSchedules', schedulesResponse);
-    }
-
-    const programSchedule = NicoliveProgramService.findSuitableProgram(schedulesResponse.value);
-
-    if (!programSchedule) {
-      this.setState({ status: 'end' });
-      throw NicoliveFailure.fromConditionalError('fetchProgram', 'no_suitable_program');
-    }
-    const { nicoliveProgramId, socialGroupId } = programSchedule;
-
-    const [programResponse, communityResponse] = await Promise.all([
-      this.client.fetchProgram(nicoliveProgramId),
-      this.client.fetchCommunity(socialGroupId),
-    ]);
-    if (!isOk(programResponse)) {
-      throw NicoliveFailure.fromClientError('fetchProgram', programResponse);
-    }
-    if (!isOk(communityResponse)) {
-      // コミュニティ情報が取れなくても配信はできてよいはず
-      if (communityResponse.value instanceof Error) {
-        console.error('fetchCommunity', communityResponse.value);
-      } else {
-        console.error(
-          'fetchCommunity',
-          communityResponse.value.meta.status,
-          communityResponse.value.meta.errorMessage || '',
-        );
+    this.setState({ isFetching: true });
+    try {
+      const schedulesResponse = await this.client.fetchProgramSchedules();
+      if (!isOk(schedulesResponse)) {
+        throw NicoliveFailure.fromClientError('fetchProgramSchedules', schedulesResponse);
       }
+
+      const programSchedule = NicoliveProgramService.findSuitableProgram(schedulesResponse.value);
+
+      if (!programSchedule) {
+        this.setState({ status: 'end' });
+        throw NicoliveFailure.fromConditionalError('fetchProgram', 'no_suitable_program');
+      }
+      const { nicoliveProgramId, socialGroupId } = programSchedule;
+
+      const [programResponse, communityResponse] = await Promise.all([
+        this.client.fetchProgram(nicoliveProgramId),
+        this.client.fetchCommunity(socialGroupId),
+      ]);
+      if (!isOk(programResponse)) {
+        throw NicoliveFailure.fromClientError('fetchProgram', programResponse);
+      }
+      if (!isOk(communityResponse)) {
+        // コミュニティ情報が取れなくても配信はできてよいはず
+        if (communityResponse.value instanceof Error) {
+          console.error('fetchCommunity', communityResponse.value);
+        } else {
+          console.error(
+            'fetchCommunity',
+            communityResponse.value.meta.status,
+            communityResponse.value.meta.errorMessage || '',
+          );
+        }
+      }
+
+      const community = isOk(communityResponse) && communityResponse.value;
+      const program = programResponse.value;
+
+      // アリーナのみ取得する
+      const room = program.rooms.find(r => r.id === 0);
+
+      this.setState({
+        programID: nicoliveProgramId,
+        status: program.status,
+        title: program.title,
+        description: program.description,
+        startTime: program.beginAt,
+        vposBaseTime: program.vposBaseAt,
+        endTime: program.endAt,
+        isMemberOnly: program.isMemberOnly,
+        communityID: socialGroupId,
+        communityName: community ? community.name : '(コミュニティの取得に失敗しました)',
+        communitySymbol: community ? community.thumbnailUrl.small : '',
+        roomURL: room ? room.webSocketUri : '',
+        roomThreadID: room ? room.threadId : '',
+      });
+    } finally {
+      this.setState({ isFetching: false });
     }
-
-    const community = isOk(communityResponse) && communityResponse.value;
-    const program = programResponse.value;
-
-    // アリーナのみ取得する
-    const room = program.rooms.find(r => r.id === 0);
-
-    this.setState({
-      programID: nicoliveProgramId,
-      status: program.status,
-      title: program.title,
-      description: program.description,
-      startTime: program.beginAt,
-      vposBaseTime: program.vposBaseAt,
-      endTime: program.endAt,
-      isMemberOnly: program.isMemberOnly,
-      communityID: socialGroupId,
-      communityName: community ? community.name : '(コミュニティの取得に失敗しました)',
-      communitySymbol: community ? community.thumbnailUrl.small : '',
-      roomURL: room ? room.webSocketUri : '',
-      roomThreadID: room ? room.threadId : '',
-    });
   }
 
   async refreshProgram(): Promise<void> {
@@ -270,24 +283,34 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
   }
 
   async startProgram(): Promise<void> {
-    const result = await this.client.startProgram(this.state.programID);
-    if (!isOk(result)) {
-      throw NicoliveFailure.fromClientError('startProgram', result);
-    }
+    this.setState({ isStarting: true });
+    try {
+      const result = await this.client.startProgram(this.state.programID);
+      if (!isOk(result)) {
+        throw NicoliveFailure.fromClientError('startProgram', result);
+      }
 
-    const endTime = result.value.end_time;
-    const startTime = result.value.start_time;
-    this.setState({ status: 'onAir', endTime, startTime });
+      const endTime = result.value.end_time;
+      const startTime = result.value.start_time;
+      this.setState({ status: 'onAir', endTime, startTime });
+    } finally {
+      this.setState({ isStarting: false });
+    }
   }
 
   async endProgram(): Promise<void> {
-    const result = await this.client.endProgram(this.state.programID);
-    if (!isOk(result)) {
-      throw NicoliveFailure.fromClientError('endProgram', result);
-    }
+    this.setState({ isEnding: true });
+    try {
+      const result = await this.client.endProgram(this.state.programID);
+      if (!isOk(result)) {
+        throw NicoliveFailure.fromClientError('endProgram', result);
+      }
 
-    const endTime = result.value.end_time;
-    this.setState({ status: 'end', endTime });
+      const endTime = result.value.end_time;
+      this.setState({ status: 'end', endTime });
+    } finally {
+      this.setState({ isEnding: false });
+    }
   }
 
   toggleAutoExtension(): void {
@@ -295,7 +318,18 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
   }
 
   async extendProgram(): Promise<void> {
-    return this.internalExtendProgram(this.state);
+    this.setState({ isExtending: true });
+    try {
+      if (process.env.DEV_SERVER) {
+        const endTime = this.state.endTime + 30 * 60;
+        this.setState({ endTime });
+        return;
+      }
+
+      return await this.internalExtendProgram(this.state);
+    } finally {
+      this.setState({ isExtending: false });
+    }
   }
 
   private async internalExtendProgram(state: INicoliveProgramState): Promise<void> {
@@ -389,7 +423,7 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
     /*: 予約番組で現在時刻が開始時刻より30分以上前なら、30分を切ったときに再取得するための補正項 */
     const readyTimeTermIfReserved =
       nextState.status === 'reserved' &&
-      nextState.startTime - Math.floor(Date.now() / 1000) > 30 * 60
+        nextState.startTime - Math.floor(Date.now() / 1000) > 30 * 60
         ? -30 * 60
         : 0;
     const nextTargetTime: number =
@@ -477,69 +511,5 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
 
   togglePanelOpened(): void {
     this.stateService.togglePanelOpened();
-  }
-
-  static getPanelState(panelOpened: boolean, isLoggedIn: boolean): PanelState | null {
-    if (panelOpened === null || isLoggedIn === null) return null;
-    if (!isLoggedIn) return PanelState.INACTIVE;
-    return panelOpened ? PanelState.OPENED : PanelState.CLOSED;
-  }
-
-  /** パネルが出る幅の分だけ画面の最小幅を拡張する */
-  refreshWindowSize(prevState: INicoliveProgramState, nextState: INicoliveProgramState): void {
-    if (
-      prevState.panelOpened === nextState.panelOpened &&
-      prevState.isLoggedIn === nextState.isLoggedIn
-    ) {
-      return;
-    }
-
-    const prevPanelState = NicoliveProgramService.getPanelState(
-      prevState.panelOpened,
-      prevState.isLoggedIn,
-    );
-    const nextPanelState = NicoliveProgramService.getPanelState(
-      nextState.panelOpened,
-      nextState.isLoggedIn,
-    );
-    if (prevPanelState !== nextPanelState) {
-      NicoliveProgramService.updateWindowSize(
-        this.windowsService.getWindow('main'),
-        prevPanelState,
-        nextPanelState,
-      );
-    }
-  }
-
-  static WINDOW_MIN_WIDTH: { [key in PanelState]: number } = {
-    INACTIVE: 800, // 通常値
-    OPENED: 800 + 400 + 24, // +パネル幅+開閉ボタン幅
-    CLOSED: 800 + 24, // +開閉ボタン幅
-  };
-
-  /*
-   * NOTE: 似た処理を他所にも書きたくなったらウィンドウ幅を管理する存在を置くべきで、コピペは悪いことを言わないのでやめておけ
-   * このコメントを書いている時点でメインウィンドウのウィンドウ幅を操作する存在は他にいない
-   */
-  static updateWindowSize(win: BrowserWindow, prevState: PanelState, nextState: PanelState): void {
-    if (nextState === null) throw new Error('nextState is null');
-    const onInit = !prevState;
-
-    const [, minHeight] = win.getMinimumSize();
-    const [width, height] = win.getSize();
-    const nextMinWidth = NicoliveProgramService.WINDOW_MIN_WIDTH[nextState];
-    win.setMinimumSize(nextMinWidth, minHeight);
-
-    // 復元されたウィンドウ幅が復元されたパネル状態の最小幅を満たさない場合、最小幅まで広げる
-    if (onInit && width < nextMinWidth) {
-      win.setSize(nextMinWidth, height);
-    }
-
-    // ウィンドウ幅とログイン状態・パネル開閉状態の永続化が別管理なので、初期化が終わって情報が揃ってから更新する
-    // 最大化されているときはウィンドウサイズを操作しない（画面外に飛び出したりして不自然なことになる）
-    if (!onInit && !win.isMaximized()) {
-      const prevMinWidth = NicoliveProgramService.WINDOW_MIN_WIDTH[prevState];
-      win.setSize(Math.max(width + nextMinWidth - prevMinWidth, nextMinWidth), height);
-    }
   }
 }

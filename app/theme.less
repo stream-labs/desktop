@@ -1,0 +1,109 @@
+@import './styles/_colors.less';
+
+// デフォルトのスタイルセット
+:root {
+  // generic color
+  --color-black: @black;
+  --color-white: @white;
+  --color-yellow: @yellow;
+
+  // background
+  --color-bg-primary: @bg-primary;
+  --color-bg-secondary: @bg-secondary;
+  --color-bg-tertiary: @bg-tertiary;
+  --color-bg-quaternary: @bg-quaternary;
+  --color-bg-quinary: @bg-quinary;
+  --color-bg-active: rgba(@light-grey, .2);
+
+  // primary
+  --color-primary: @text-primary;
+  --color-primary-light: @text-active;
+  --color-primary-dark: @text-secondary;
+
+  // accent
+  --color-accent: @accent;
+  --color-accent-variant: @accent-hover;
+
+  // border
+  --color-border-dark: rgba(@black, .5);
+  --color-border-light: rgba(@white, .15);
+  --color-border-accent:  @grey;
+
+  // text
+  --color-text: @light-grey;
+  --color-text-light: @white;
+  --color-text-dark: @grey;
+  --color-text-active: @text-primary;
+  --color-text-disabled: rgba(@light-grey, .26);
+
+  // button
+  --color-button-label: @white;
+  --color-button-primary: @text-secondary;
+  --color-button-primary-hover: rgba(@text-secondary, .8);
+  --color-button-secondary: rgba(@grey, .8);
+  --color-button-secondary-hover: rgba(@grey, .6);
+  --color-button-tertiary: darken(@grey, 25%);
+  --color-button-tertiary-hover: darken(@grey, 32%);
+  --color-button-accent: @accent;
+  --color-button-accent-hover: @accent-hover;
+  --color-button-active-label: @black;
+  --color-button-active: @text-primary;
+
+  // titleBar
+  --color-titlebar: @bg-primary;
+  --color-titlebar-text: @grey;
+  --color-titlebar-action: @light-grey;
+  --color-titlebar-action-hover: @white;
+
+  // popper
+  --color-popper-bg-light: @bg-primary;
+  --color-popper-bg-dark: @bg-secondary;
+
+  // bottom-line
+  --color-bottom-line: darken(@text-secondary, 40%);
+  --color-bottom-line-active: @text-primary;
+
+  // scroll 
+  --color-scroll-bar: rgba(@grey, .4);
+
+  // brand color
+  --color-brand-nicoad: @nicoad-brand-color;
+  --color-brand-emotion: @emotion-brand-color;
+  --color-brand-gift: @gift-brand-color;
+
+  // input color
+  --color-input: @grey;
+  --color-input-active: @text-primary;
+  --color-input-bg: rgba(@bg-primary, .6);
+
+  // tooltip
+  --color-tooltip-bg: @bg-secondary;
+  --color-tooltip-text: @white;
+  --color-tooltip-border: rgba(@light-grey, .2);
+
+  // red
+  --color-red: @red;
+  --color-red-hover: darken(@red, 15%);
+  --color-red-dark: darken(@red, 40%);
+
+  // error
+  --color-error: @red;
+}
+
+// 実験版（ヘッダー）
+.isUnstable {
+  --color-titlebar: @yellow;
+  --color-titlebar-text: @black;
+  --color-titlebar-action: @black;
+  --color-titlebar-action-hover: @black;
+}
+
+// フルモード
+.isFullMode {
+  /*!*/
+}
+
+// コンパクトモード
+.isCompactMode {
+  /*!*/
+}

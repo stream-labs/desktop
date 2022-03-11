@@ -4,12 +4,13 @@
 @import "./styles/custom-icons";
 @import "./styles/inputs";
 @import "./styles/tooltips";
-@import "./styles/twitchalertsCustom";
 @import '~codemirror/lib/codemirror.css';
 
 body {
-  color: @navy;
-  font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", "Hiragino Kaku Gothic ProN", "Meiryo", "メイリオ", sans-serif;
+  color: var(--color-text);
+  font-size: @font-size4;
+  font-family: @font-family;
+  font-weight: @font-weight-normal;
 }
 
 :not(input):not(textarea),
@@ -20,15 +21,16 @@ body {
 }
 
 .main {
-  background: @bg-primary;
-  color: @text-primary;
+  background: var(--color-bg-secondary);
+  color: var(--color-text);
 }
 
 a {
   .transition;
   text-decoration: underline;
-  &:hover {
-    color: @white;
+  &:hover,
+  &:focus {
+    color: var(--color-text-light);
   }
 }
 
@@ -43,16 +45,23 @@ a {
 
 // Type
 h3 {
-  font-size: 14px;
-  color: @text-primary;
+  font-size: @font-size4;
+  color: var(--color-text-light);
   .semibold;
 }
 
 h4 {
-  font-size: 13px;
+  font-size: @font-size4;
+  color: var(--color-text-light);
   .letter-spacing;
   .semibold;
   margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+
+  i {
+    margin-right: 8px;
+  }
 }
 
 .label--essential {
@@ -61,7 +70,7 @@ h4 {
   .semibold;
   text-transform: uppercase;
   font-size: 9px;
-  color: white;
+  color: var(--color-text-light);
   letter-spacing: .5px;
   padding: 0px 4px;
   margin-left: 10px;
@@ -70,26 +79,31 @@ h4 {
 
 .link {
   .semibold;
-  color: @text-secondary;
   .transition;
+  color: var(--color-text);
   text-decoration: none;
   display: flex;
   align-items: center;
 
-  &:hover {
-    color: @text-primary;
+  &:not(:disabled):hover {
+    color: var(--color-text-light);
+  }
+
+  &.disabled,
+  &:disabled {
+    color: var(--color-text-disabled);
+    cursor: not-allowed;
   }
 
   i {
-    margin-right: 4px;
-    font-size: 14px;
+    font-size: @font-size4;
   }
 }
 
 .link--underlined {
   span {
     text-decoration: underline;
-    font-weight: 400;
+    font-weight:@font-weight-normal;
   }
 }
 
@@ -100,7 +114,7 @@ h4 {
 .link--uppercase {
   text-transform: uppercase;
   letter-spacing: .7px;
-  font-size: 12px;
+  font-size: @font-size2;
 }
 
 .label--icon {
@@ -111,7 +125,7 @@ h4 {
   position: relative;
 
   select {
-    font-size: 13px;
+    font-size: @font-size4;
     margin: 0;
     padding: 0 32px 0 8px;
 
@@ -125,8 +139,8 @@ h4 {
   position: absolute;
   right: 8px;
   top: 10px;
-  font-size: 10px;
-  color: @white;
+  font-size: @font-size1;
+  color: var(--color-text-light);
 }
 
 .select--onboarding {
@@ -139,13 +153,13 @@ h4 {
   }
 
   .multiselect__input {
-    background: #45535a;
+    background: var(--color-input-bg);
     border-color: transparent;
-    color: white;
+    color: var(--color-text-light);
   }
 
   .multiselect__content {
-    background: #45535a;
+    background: var(--color-input-bg);
     border-color: transparent;
   }
 }
@@ -157,12 +171,12 @@ h4 {
     background: transparent;
     border: none;
     padding: 0 32px 0 8px;
-    color: @text-primary;
+    font-size: @font-size4;
+    color: var(--color-text);
     .radius;
     .transition;
 
     &:focus {
-      background: rgba(255,255,255,.14);
       outline: none;
       box-shadow: none;
     }
@@ -172,7 +186,7 @@ h4 {
     position: absolute;
     top: 8px;
     right: 8px;
-    font-size: 16px;
+    font-size: @font-size5;
   }
 }
 
@@ -192,7 +206,7 @@ h4 {
   &:focus,
   &:active,
   &:hover {
-    color: @white;
+    color: var(--color-text-light);
   }
 }
 
@@ -203,7 +217,7 @@ h4 {
 
 .slide-open__menu {
   position: absolute;
-  background-color: @bg-secondary;
+  background-color: var(--color-bg-secondary);
   right: calc(~'100% + 20px');
   bottom: -10px;
   padding: 0 12px;
@@ -219,62 +233,56 @@ h4 {
 }
 
 .tab-button {
-  border-bottom: 1px solid transparent;
   height: 54px;
-  margin-right: 20px;
+  margin-right: 16px;
   text-transform: uppercase;
-  font-size: 12px;
+  font-size: @font-size2;
   .semibold;
   letter-spacing: .7px;
-  color: @text-primary;
+  color: var(--color-text);
+  position: relative;
   .transition;
+
+  &:after {
+    display: block;
+    content: '';
+    width: 100%;
+    height: 2px;
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    background-color: transparent;
+  }
 
   i {
     margin-right: 4px;
-    font-size: 15px;
+    font-size: @font-size4;
     vertical-align: middle;
   }
 
-  &.active,
   &:hover {
-    border-color: @white;
-    color: @white;
+    color: var(--color-text-light);
     i {
-      color: @white;
+      color: var(--color-text-light);
+    }
+  }
+
+  &.active {
+    color: var(--color-text-active);
+
+    &:after {
+      background-color: var(--color-text-active);
+    }
+
+    i {
+      color: var(--color-text-active);
     }
   }
 }
-
-.input {
-  &.disabled {
-    opacity: .5;
-
-    &.checkbox input:checked~label,
-
-    &.checkbox input~label {
-      color: @white;
-      &:before {
-        border-color: gray;
-        background: transparent;
-      }
-
-      &:after {color: gray}
-    }
-  }
-}
-
-.checkbox {
-  label {
-    text-transform: none;
-    background: transparent;
-    border-color: @accent-hover;
-  }
-}
-
 
 select {
   .radius;
-  height: 36px;
+  height: @item-generic-size;
 }
 
 table {
@@ -308,29 +316,32 @@ th {
 }
 
 th {
-  color: @text-primary;
+  color: var(--color-text-dark);
   text-transform: uppercase;
   .semibold;
   letter-spacing: 1.5px;
-  font-size: 11px;
-  padding-bottom: 10px;
+  font-size: @font-size2;
+  padding-bottom: 8px;
 }
 
 // Scrolls
 ::-webkit-scrollbar {
-  width: 10px;
+  width: 8px;
   height: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: @black;
+  background: transparent;
   border-radius: 0 3px 3px 0;
 }
 
 ::-webkit-scrollbar-thumb {
-  background-color: @accent-light;
-  border: 2px solid @black;
-  border-radius: 10px;
+  background-color: var(--color-scroll-bar);
+  border-radius: 8px;
+}
+
+::-webkit-scrollbar-corner {
+  background: transparent;
 }
 
 // Vue transitions
@@ -364,6 +375,5 @@ th {
 }
 
 .v--modal {
-  background-color: @bg-primary;
+  background-color: var(--color-bg-primary);
 }
-

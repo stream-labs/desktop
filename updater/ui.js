@@ -17,70 +17,71 @@ const i18n = new VueI18n({
   messages: {
     'en-US': {
       checking: {
-        message: 'Checking for updates'
+        message: 'Checking for updates',
       },
       asking: {
         message: 'There is an update. download?',
-        changeLog: `Update contents`,
-        mandatoryUpdate: `Mandatory Update`,
-        skippableUpdate: `Skippable updates`,
+        changeLog: 'Update contents',
+        mandatoryUpdate: 'Mandatory Update',
+        skippableUpdate: 'Skippable updates',
         download: 'Download',
-        skip: 'skip'
+        skip: 'skip',
       },
       downloading: {
-        message: 'Downloading version {version}'
+        message: 'Downloading version {version}',
       },
       installing: {
         message: 'Installing version {version}',
-        description: 'This may take a few minutes. If you are having issues updating, please {linkText}',
-        linkText: 'download a fresh installer.'
+        description:
+          'This may take a few minutes. If you are having issues updating, please {linkText}',
+        linkText: 'download a fresh installer.',
       },
       error: {
         message: 'Something went wrong',
         description: 'There was an error updating. Please {linkText}',
-        linkText: 'download a fresh installer.'
+        linkText: 'download a fresh installer.',
       },
-      cancel: 'Cancel'
+      cancel: 'Cancel',
     },
-    'ja': {
+    ja: {
       checking: {
-        message: 'アップデート情報を確認しています'
+        message: 'アップデート情報を確認しています',
       },
       asking: {
         message: 'アップデート {version} があります。{br}更新しますか?',
-        changeLog: `更新内容`,
-        mandatoryUpdate: `必須アップデートです`,
-        skippableUpdate: `スキップ可能なアップデートです`,
+        changeLog: '更新内容',
+        mandatoryUpdate: '必須アップデートです',
+        skippableUpdate: 'スキップ可能なアップデートです',
         download: '更新する',
-        skip: 'あとで'
+        skip: 'あとで',
       },
       downloading: {
-        message: 'バージョン{version}を{br}ダウンロードしています'
+        message: 'バージョン{version}を{br}ダウンロードしています',
       },
       installing: {
         message: 'バージョン{version}を{br}インストールしています',
-        description: 'この処理には数分かかる場合があります。{br}アップデートに問題が発生した場合は{br}{linkText}',
-        linkText: '最新のインストーラーをダウンロードしてください。'
+        description:
+          'この処理には数分かかる場合があります。{br}アップデートに問題が発生した場合は{br}{linkText}',
+        linkText: '最新のインストーラーをダウンロードしてください。',
       },
       error: {
         message: '問題が発生しました',
         description: 'アップデートに失敗しました。{br}{linkText}',
-        linkText: '最新のインストーラーをダウンロードしてください。'
+        linkText: '最新のインストーラーをダウンロードしてください。',
       },
-      cancel: 'キャンセル'
-    }
+      cancel: 'キャンセル',
+    },
   },
-  silentTranslationWarn: true
+  silentTranslationWarn: true,
 });
 
 document.addEventListener('DOMContentLoaded', () => {
-
+  // eslint-disable-next-line no-new
   new Vue({
     el: '#app',
     i18n,
     render: createEl => {
       return createEl(UpdaterWindow);
-    }
+    },
   });
-
 });

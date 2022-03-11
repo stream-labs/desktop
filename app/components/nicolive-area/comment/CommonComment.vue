@@ -8,8 +8,7 @@
 <script lang="ts" src="./CommonComment.vue.ts"></script>
 
 <style lang="less" scoped>
-@import "../../../styles/_colors";
-@import "../../../styles/mixins";
+@import "../../../styles/index";
 @import "./comment";
 
 .root {
@@ -25,29 +24,24 @@
 }
 
 .comment-number {
-  .common__comment-number();
-  color: @grey;
-
-  [speaking=true] & {
-    color: @text-primary;
-  }
+  .common__comment-number;
 }
 
 .comment-body {
-  .common__comment-body();
-  color: @white;
+  .common__comment-body;
+    color: var(--color-text-light);
 
   .operator & {
-    color: @accent;
+    color: var(--color-accent);
   }
 
   [speaking=true] & {
-    color: @text-primary;
+    color: var(--color-text-active);
   }
 }
 
 .comment-misc {
-  .common__comment-misc();
+  .common__comment-misc;
   display: none;
 }
 

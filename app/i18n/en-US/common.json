@@ -64,6 +64,12 @@
   "Hr": "Hr",
   "Min": "Min",
   "Sec": "Sec",
+  "fullMode": "Click to switch to full mode",
+  "compactMode": "Click to switch to compact mode",
+  "compactModeTab": {
+    "niconico": "Tab related to niconico program",
+    "studio": "Tab related to streaming"
+  },
   "fieldIsRequired": "The field is required",
   "fieldMustBeLarger": "The field value must be %{value} or larger",
   "fieldMustBeLess": "The field value must be %{value} or less",

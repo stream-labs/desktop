@@ -108,5 +108,7 @@ module.exports = {
     'import/first': OFF,
     'no-script-url': OFF,
     'import/no-named-default': OFF,
+
+    'no-use-before-declare': OFF,
   },
 };

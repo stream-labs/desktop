@@ -1,41 +1,71 @@
-const CircularDependencyPlugin = require('circular-dependency-plugin');
-const VueLoaderPlugin = require('vue-loader/lib/plugin')
+/* eslint-disable prettier/prettier */
+const { VueLoaderPlugin } = require('vue-loader');
+const { WebpackManifestPlugin } = require('webpack-manifest-plugin');
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 
 const path = require('path');
-const TerserPlugin = require('terser-webpack-plugin')
+const TerserPlugin = require('terser-webpack-plugin');
 
-const plugins = [
-  new VueLoaderPlugin()
-];
+const plugins = [];
 
+/*
+plugins.push(
+  new WebpackManifestPlugin({
+    basePath: 'bundles/',
+    filter: file =>
+      ['renderer.js', 'vendors~renderer.js', 'renderer.js.map', 'vendors~renderer.js.map'].includes(
+        file.name,
+      ),
+  }),
+);
+*/
 
-// uncomment to watch circular dependencies
+// plugins.push(new CleanWebpackPlugin());
 
-// plugins.push(new CircularDependencyPlugin({
-//   // exclude detection of files based on a RegExp
-//   exclude: /a\.js|node_modules/,
-//   // add errors to webpack instead of warnings
-//   //failOnError: true
-// }));
-
+plugins.push(new VueLoaderPlugin());
 
 module.exports = {
   entry: {
     renderer: './app/app.ts',
-    updater: './updater/ui.js'
+    updater: './updater/ui.js',
   },
   output: {
-    path: __dirname + '/bundles',
-    filename: '[name].js'
+    path: `${__dirname}/bundles`,
+    filename: '[name].js',
+    publicPath: '/bundles/',
   },
 
-  devtool: 'source-map',
+  devServer: {
+    static: {
+      directory: __dirname,
+      publicPath: '/',
+    },
+    proxy: {
+      '/account': {
+        target: 'https://account.nicovideo.jp',
+        changeOrigin: true,
+        pathRewrite: { '^/account': '' },
+      },
+      '/oauth': {
+        target: 'https://oauth.nicovideo.jp',
+        changeOrigin: true,
+        pathRewrite: { '^/oauth': '' },
+      },
+      '/blog': {
+        target: 'https://blog.nicovideo.jp',
+        changeOrigin: true,
+        pathRewrite: { '^/blog': '' },
+      },
+    },
+  },
+
+  devtool: 'cheap-module-source-map', // source-map',
 
   target: 'electron-renderer',
 
   resolve: {
     extensions: ['.js', '.ts'],
-    modules: [path.resolve(__dirname, 'app'), 'node_modules']
+    modules: [path.resolve(__dirname, 'app'), 'node_modules'],
   },
 
   // We want to dynamically require native addons
@@ -50,8 +80,7 @@ module.exports = {
     'node-fontinfo': 'require("node-fontinfo")',
     'socket.io-client': 'require("socket.io-client")',
     'rimraf': 'require("rimraf")',
-    'backtrace-js': 'require("backtrace-js")',
-    'request': 'require("request")'
+    'request': 'require("request")',
   },
 
   module: {
@@ -63,19 +92,19 @@ module.exports = {
           esModule: true,
           transformToRequire: {
             video: 'src',
-            source: 'src'
-          }
-        }
+            source: 'src',
+          },
+        },
       },
       {
         test: /\.ts$/,
         loader: 'ts-loader',
-        exclude: /node_modules|vue\/src/
+        exclude: /node_modules|vue\/src/,
       },
       {
         test: /\.ts$/,
         enforce: 'pre',
-        loader: 'eslint-loader'
+        loader: 'eslint-loader',
       },
       {
         test: /\.js$/,
@@ -89,10 +118,10 @@ module.exports = {
           {
             loader: 'css-loader',
             options: {
-              importLoaders: 1
-            }
-          }
-        ]
+              importLoaders: 1,
+            },
+          },
+        ],
       },
       {
         test: /\.less$/,
@@ -101,11 +130,11 @@ module.exports = {
           {
             loader: 'css-loader',
             options: {
-              importLoaders: 1
-            }
+              importLoaders: 1,
+            },
           },
-          'less-loader'
-        ]
+          'less-loader',
+        ],
       },
       {
         test: /\.(png|jpe?g|gif|mp4|ico|wav|webm)(\?.*)?$/,
@@ -113,8 +142,8 @@ module.exports = {
         options: {
           name: '[name]-[hash].[ext]',
           outputPath: 'media/',
-          publicPath: 'bundles/media/'
-        }
+          publicPath: 'bundles/media/',
+        },
       },
       // Handles custom fonts. Currently used for icons.
       {
@@ -123,27 +152,28 @@ module.exports = {
         options: {
           name: '[name].[ext]',
           outputPath: 'fonts/',
-          publicPath: 'bundles/fonts/'
-        }
+          publicPath: 'bundles/fonts/',
+        },
       },
       {
         test: /\.svg$/,
-        use: [
-          'vue-svg-loader'
-        ]
-      }
-    ]
+        use: ['vue-svg-loader'],
+      },
+    ],
   },
 
   optimization: {
-    minimizer: [new TerserPlugin({ sourceMap: true, terserOptions: { mangle: false } })]
+    splitChunks: {
+      chunks: chunk => chunk.name === 'renderer',
+      name: 'vendors~renderer',
+    },
+    chunkIds: 'named',
+    minimizer: [new TerserPlugin({ sourceMap: true, terserOptions: { mangle: false } })],
   },
 
   plugins,
 
   stats: {
-    warningsFilter: [
-      "Can't resolve 'osx-temperature-sensor'",
-    ]
-  }
+    warningsFilter: ["Can't resolve 'osx-temperature-sensor'"],
+  },
 };

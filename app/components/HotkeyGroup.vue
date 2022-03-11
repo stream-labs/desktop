@@ -25,12 +25,4 @@
 </div>
 </template>
 
-<style lang="less" scoped>
-.hotkey {
-  & + & {
-    margin-top: 20px;
-  }
-}
-</style>
-
 <script lang="ts" src="./HotkeyGroup.vue.ts"></script>

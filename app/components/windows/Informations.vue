@@ -48,7 +48,7 @@
 }
 
 .information-list-item {
-  border-bottom: 1px solid @border;
+  border-bottom: 1px solid var(--color-border-light);
 }
 
 .information-link {
@@ -60,7 +60,7 @@
 
   &:after {
     border-style: solid;
-    border-color: @text-secondary;
+    border-color: var(--color-text);
     border-width: 1px 1px 0 0;
     content: "";
     display: block;
@@ -73,19 +73,19 @@
   }
 
   &:hover {
-    background-color: @bg-secondary;
+    background-color: var(--color-bg-active);
 
     &:after {
-      border-color: @text-primary;
+      border-color: var(--color-text-light);
     }
   }
 }
 
 .information-label-new {
-  color: @white;
-  background-color: @accent-hover;
-  font-size: 10px;
-  font-weight: bold;
+  color: var(--color-text-light);
+  background-color: var(--color-accent);
+  font-size: @font-size1;
+  font-weight: @font-weight-bold;
   text-align: center;
   line-height: 16px;
   flex-basis: 32px;
@@ -93,7 +93,7 @@
 }
 
 .information-date {
-  color: @grey;
+  color: var(--color-text-dark);
   margin-left: 16px;
   white-space: nowrap;
 }
@@ -117,15 +117,15 @@
 }
 
 .icon-warning {
-  color: @bg-primary;
+  color: var(--color-text);
   font-size: 70px;
   margin-bottom: 16px;
 }
 
 .error-title {
-  color: @white;
-  font-size: 16px;
-  font-weight: bold;
+  color: var(--color-text-light);
+  font-size: @font-size5;
+  font-weight: @font-weight-bold;
   margin-bottom: 12px;
 }
 
@@ -136,8 +136,8 @@
 }
 
 .error-attention {
-  color: @grey;
-  font-size: 12px;
+  color: var(--color-text-dark);
+  font-size: @font-size2;
   margin-bottom: 0;
 }
 

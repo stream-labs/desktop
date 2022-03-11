@@ -21,6 +21,8 @@
   "endingWithDelay": "配信終了中 %{delaySeconds}秒",
   "reconnecting": "再接続中",
   "goLive": "配信開始",
+  "goLiveTooltip": "クリックして配信開始",
+  "endStreamTooltip": "クリックして配信終了",
   "startReplayBuffer": "リプレイ録画をスタンバイ状態にする",
   "stopReplayBuffer": "リプレイ録画のスタンバイ状態を終了する",
   "saveReplay": "リプレイ保存",

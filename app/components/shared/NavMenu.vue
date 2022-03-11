@@ -11,9 +11,13 @@
 
 .nav-menu:not(.nav-menu--child) {
   margin: 0;
-  flex: 0 0 240px;
+  padding: 8px 0; 
+  flex: 0 0 232px;
   display: flex;
   flex-direction: column;
-  background-color: @bg-secondary;
+
+  i {
+    font-size: @font-size5;
+  }
 }
 </style>

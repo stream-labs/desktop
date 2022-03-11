@@ -1,28 +1,106 @@
-button,
-.button {
-  .transition;
-  text-decoration: none;
-
-  &:focus, &:visited {
+button {
+  &:focus,
+  &:visited {
     outline: none;
   }
 }
 
-.button--action {
-  background-color: @accent;
-  color: @white;
+.button {
+  .transition;
+  .radius();
 
-  &:hover {
-    background-color: lighten(@accent, 4%);
+  height: @item-generic-size;
+  line-height: normal;
+  font-size: @font-size4;
+  color: var(--color-button-label);
+  background-color: var(--color-button-primary);
+  padding: 0 16px;
+  letter-spacing: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &:disabled {
+    opacity: .5;
   }
 
+  i {
+    margin-right: 8px;
+  }
+}
+
+.button--primary {
+  background-color: var(--color-button-primary);
+
+  &:hover,
   &:focus {
-    background-color: @accent;
+    background-color: var(--color-button-primary-hover);
+  }
+
+  &:disabled,
+  &:disabled:hover {
+    background-color: var(--color-button-primary);
+  }
+}
+
+.button--secondary {
+  background-color: var(--color-button-secondary);
+
+  &:hover,
+  &:focus {
+    background-color: var(--color-button-secondary-hover);
+  }
+
+  &:disabled,
+  &:disabled:hover {
+    background-color: var(--color-button-secondary);
+  }
+}
+
+.button--tertiary {
+  background-color: var(--color-button-tertiary);
+
+  &:hover,
+  &:focus {
+    background-color: var(--color-button-tertiary-hover);
+  }
+
+  &:disabled,
+  &:disabled:hover {
+    background-color: var(--color-button-tertiary);
+  }
+}
+
+.button--action,
+.button--accent {
+  background-color: var(--color-button-accent);
+  color: var(--color-button-label);
+
+  &:hover,
+  &:focus {
+    background-color: var(--color-button-accent-hover);
+  }
+
+  &:disabled,
+  &:disabled:hover {
+    background-color: var(--color-button-accent);
+  }
+}
+
+.button--border {
+  color: var(--colorbutton-secondary);
+  border: 1px solid var(--color-button-secondary);
+  background-color: transparent;
+  
+  &:hover,
+  &:focus,
+  &.active {
+    color: var(--color-button-label);
+    background-color: var(--color-button-secondary);
   }
 }
 
 .button--disabled {
-
   background-color: @grey;
   cursor: default;
 
@@ -32,9 +110,24 @@ button,
   }
 }
 
+// live中の赤ボタン
+.button--live {
+  background-color: var(--color-red);
+
+  &:focus,
+  &:hover {
+    background-color: var(--color-red-hover);
+  }
+
+  &:disabled,
+  &:disabled:hover {
+    opacity: @opacity-disabled;
+  }
+}
+
 .button--trans {
   background: transparent;
-  color: @text-primary;
+  color: var(--color-text-light);
 
   i {
     color: @text-primary;
@@ -52,14 +145,8 @@ button,
 }
 
 .button--semi-opac {
-  background: rgba(255, 255, 255, .1);
-
-  &:hover {
-    background: rgba(255, 255, 255, .14);
-  }
-
-  &:focus {
-    background: rgba(255, 255, 255, .1);
+  i {
+    margin: 0 0 0 8px;
   }
 }
 
@@ -68,22 +155,23 @@ button,
 }
 
 .icon-btn {
-  font-size: 14px;
-  cursor: pointer;
-  margin-left: 10px;
   .icon-hover();
 
+  font-size: @font-size4;
+  cursor: pointer;
+  margin-left: 12px;
+  
   &:first-child {
     margin-left: inherit;
   }
 }
 
 .icon-btn--sm {
-  font-size: 13px;
+  font-size: @font-size3;
 }
 
 .icon-btn--lg {
-  font-size: 15px;
+  font-size: @font-size6;
 }
 
 .back-arrow {
@@ -106,12 +194,6 @@ button,
   align-content: center;
 }
 
-.button--niconico,
-.button--skip {
-  width: 56%;
-  border-radius: 25px;
-}
-
 .square-button {
   .radius();
   .transition();
@@ -124,28 +206,16 @@ button,
   font-size: 16px;
 }
 
-.square-button--niconico,
-.button--niconico {
-  color: @white;
-  background: @accent;
-  font-size: 16px;
-
-  &:focus,
-  &:hover {
-    background: @red;
-  }
-}
-
 .square-button--skip,
 .button--skip {
   background: transparent;
-  border: 1px solid @text-primary;
-  color: @text-primary;
-  text-decoration: none;
+  border: none;
+  color: var(--color-text);
+  text-decoration: underline;
 
   &:hover {
-    background: @text-primary;
-    color: @bg-primary;
+    text-decoration: none;
+    background: transparent;
   }
 
   &:focus {
@@ -156,35 +226,33 @@ button,
 
 .button--go-live,
 .button--start-program {
-  color: @white;
-  background: @accent;
-  font-size: 20px;
+  color: var(--color-button-label);
+  background-color: var(--color-button-secondary);
+  border-radius: 20px;
 
-  &:focus,
-  &:hover {
-    background: @accent-hover;
+  &:hover,
+  &:focus {
+    background-color: var(--color-button-secondary-hover);
+    border-radius: 20px;
+  }
+
+  &:disabled,
+  &:disabled:hover {
+    background-color: var(--color-button-secondary);
   }
 }
 
 .button--soft-warning {
-  color: @white;
-  background: @red;
-  border: 1px solid @red;
-  font-size: 20px;
+  color: var(--color-button-label);
+  background: var(--color-red);
 
   &:focus,
   &:hover {
-    background: rgba(204, 0, 41, .3);
-    border: 1px solid @red;
+    background: var(--color-red-hover);
   }
 
   &:disabled {
-    background-color: @black;
-    border-color: @black;
-
-    &:hover {
-      background-color: @black;
-    }
+    opacity: @opacity-disabled;
   }
 }
 
@@ -219,28 +287,6 @@ button,
   }
 }
 
-.button--fetch-program {
-  font-size: 13px;
-  color:@text-secondary;
-  background-color: transparent;
-  border-width: 1px;
-  border-style: solid;
-  border-color: @text-secondary;
-
-   &:hover {
-    opacity: .5;
-    color: inherit;
-    background-color: transparent
-  }
-
-  &:disabled {
-    &:hover {
-      color:@text-secondary;
-      background-color: transparent;
-    }
-  }
-}
-
 .button-nicolive--action {
   color: @white;
   background-color: @text-secondary;
@@ -261,11 +307,26 @@ button,
   background-color: @grey;
 }
 
-.button--replay-buffer {
-  width: 32px;
-  height: 32px;
+.button--circle {
+  width: @item-generic-size;
+  height: @item-generic-size;
   display: flex;
   align-items: center;
   justify-content: center;
+  border-radius: 50%;
+  cursor: pointer;
   .transition;
+
+  i {
+    font-size: @font-size5;
+    color: var(--color-button-label);
+  }
+
+  &.active {
+    background-color: var(--color-button-active);
+
+    i {
+      color: var(--color-bg-secondary);
+    }
+  }
 }

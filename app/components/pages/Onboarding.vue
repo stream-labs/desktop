@@ -36,6 +36,11 @@
   }
 }
 
+.onboarding-logo {
+  width: 296px;
+  margin-bottom: 40px;
+}
+
 .onboarding-step--wide {
   width: 1200px;
   margin: 0 auto;
@@ -64,8 +69,8 @@
 }
 
 .onboarding-desc {
-  color: @text-primary;
-  margin-bottom: 20px;
+  color: var(--color-text);
+  margin-bottom: 40px;
   padding: 0 20px;
 }
 

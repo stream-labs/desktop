@@ -43,11 +43,24 @@
 }
 
 .section {
-  padding: 16px;
-  border-bottom: 1px solid @bg-primary;
-  background-color: @bg-tertiary;
-  &:last-child {
-    margin-bottom: 0;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 16px;
+  padding: 16px 16px 0;
+  background-color: var(--color-bg-secondary);
+  border-radius: 4px;
+
+  p, label {
+    font-size: @font-size4;
+    color: var(--color-text);
+  }
+
+  p {
+    margin-bottom: 16px;
+  }
+
+  a {
+    text-decoration: none;
   }
 
   .button {
@@ -58,12 +71,12 @@
 .section-title--dropdown {
   h4 {
     cursor: pointer;
-    margin-bottom: 0;
+    margin-bottom: 16px;
   }
 }
 
 .section-content--dropdown {
-  margin-top: 16px;
+  // margin-top: 16px;
 
   > div {
     div {

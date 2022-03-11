@@ -1,25 +1,54 @@
 <template>
   <div class="root">
-    <button @click="onToggle" class="nicolive-area-toggle-button" :class="{ 'nicolive-area--opened': opened }">
-      <ControlsArrow />
+    <button
+      @click="onToggle"
+      class="nicolive-area-toggle-button"
+      :class="{ 'nicolive-area--opened': opened }"
+      v-if="!isCompactMode"
+    >
+      <i class="icon-drop-down-arrow"></i>
     </button>
-    <div class="nicolive-area-container" v-if="opened">
-      <top-nav />
-      <div class="program-area" :class="{ 'isCreate': !hasProgram }">
+    <div class="nicolive-area-container" v-if="opened || isCompactMode">
+      <div class="program-area" :class="{ isCreate: !hasProgram }">
         <template v-if="hasProgram">
           <program-info class="program-area-item" />
-          <tool-bar class="program-area-item" />
           <program-statistics class="program-area-item" />
           <area-switcher class="switch-area" :contents="contents">
             <template v-slot:commentViewer><comment-viewer /></template>
             <template v-slot:description><program-description /></template>
           </area-switcher>
+          <tool-bar class="program-area-item" />
+          <div class="footer performance-metrics" v-if="isCompactMode">
+            <div class="flex flex--center flex--grow flex--justify-start">
+              <performance-metrics />
+            </div>
+          </div>
         </template>
         <template v-else>
-          <p class="message"><i class="icon-niconico"></i>このエリアではニコニコ生放送を<br>配信するための機能が利用できます</p>
+          <p class="message">
+            <i class="icon-namaco"></i>
+            このエリアではニコニコ生放送を<br />配信するための機能が利用できます
+          </p>
           <div class="button-wrapper">
-            <button class="button button--create-program" @click="createProgram" :disabled="isCreating">新しく番組を作成する</button>
-            <button class="button button--fetch-program" @click="fetchProgram" :disabled="isFetching">作成済みの番組を取得する</button>
+            <button
+              class="button button--primary button--create-program"
+              @click="createProgram"
+              :disabled="isCreating"
+              v-if="!isCompactMode"
+            >
+              新しく番組を作成する
+            </button>
+            <div class="devider" v-if="!isCompactMode">
+              <span class="devider-label">または</span>
+            </div>
+            <button
+              class="button button--fetch-program"
+              @click="fetchProgram"
+              :disabled="isFetching"
+              :class="[isCompactMode ? 'button--primary' : 'button--secondary']"
+            >
+              作成済みの番組を取得する
+            </button>
           </div>
         </template>
       </div>
@@ -29,54 +58,47 @@
 
 <script lang="ts" src="./NicoliveArea.vue.ts"></script>
 <style lang="less" scoped>
-@import "../../styles/index";
+@import '../../styles/index';
 
 .root {
   display: flex;
   height: 100%;
-  border-left: 1px solid @bg-secondary;
 }
 
 .nicolive-area-toggle-button {
-  width: 16px;
-  height: 180px;
-  margin: auto 8px auto auto;
-  background-color: @bg-primary;
-  border-width: 1px 1px 1px 0;
-  border-style: solid;
-  border-color: @bg-secondary;
+  .dividing-border(left);
+  .dividing-border(right);
 
-  > svg {
-    width: 10px;
-    height: 140px;
-    fill: @text-primary;
-    transition: .5s;
-    transform: rotate(0deg);
+  width: 24px;
+  background-color: var(--color-bg-primary);
+
+  > i {
+    display: block;
+    font-size: @font-size2;
+    color: var(--color-text);
+    transform: rotate(-90deg);
   }
 
   &:hover {
-    background-color: @bg-secondary;
-
-    > svg {
-      fill: @text-primary;
+    > i {
+      color: var(--color-text-light);
     }
   }
 
   &.nicolive-area--opened {
-    > svg {
-      transform: rotate(180deg);
+    > i {
+      transform: rotate(90deg);
     }
   }
 }
 
 .nicolive-area-container {
-  width: 400px;
+  width: @nicolive-area-width;
   display: flex;
   flex-direction: column;
   flex-grow: 1;
   align-items: center;
-  background-color: @bg-primary;
-  border-left: 1px solid @bg-tertiary;
+  background-color: var(--color-bg-quinary);
 }
 
 .program-area {
@@ -89,22 +111,24 @@
   &.isCreate {
     padding: 16px;
     align-items: center;
-    background-color: @bg-secondary;
+  }
+}
 
-    .message {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      color: @text-secondary;
-      text-align: center;
-      margin-bottom: 40px;
+.message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 
-      .icon-niconico {
-        color: @text-secondary;
-        font-size: 60px;
-        margin-bottom: 16px;
-      }
-    }
+  font-size: @font-size4;
+  color: var(--color-text);
+  line-height: 24px;
+  text-align: center;
+  margin-bottom: 24px;
+
+  i {
+    color: var(--color-text-dark);
+    font-size: 88px;
+    margin-bottom: 16px;
   }
 }
 
@@ -115,8 +139,8 @@
 .button-wrapper {
   display: flex;
   flex-direction: column;
-  min-width: 210px;
-  padding-bottom: 72px;
+  min-width: 200px;
+  padding-bottom: 80px;
 
   .button {
     width: 100%;
@@ -132,6 +156,37 @@
   flex-basis: 0;
 }
 
+.devider {
+  display: flex;
+  align-items: center;
+  margin: 16px 0;
+
+  .devider-label {
+    font-size: @font-size2;
+    padding: 0 8px;
+    color: var(--color-text-dark);
+  }
+
+  &:before,
+  &:after {
+    content: '';
+    height: 1px;
+    flex-grow: 1;
+    background-color: var(--color-text-dark);
+  }
+}
+
+.footer {
+  .dividing-border;
+  display: flex;
+  justify-content: space-between;
+  flex-direction: row;
+  align-items: center;
+  position: relative;
+  padding: 0 16px;
+  max-width: none;
+  height: 32px;
+  flex: 0 0 auto;
+  background-color: var(--color-bg-secondary);
+}
 </style>
-
-

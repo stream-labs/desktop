@@ -635,5 +635,15 @@
   "keyframeInterval": "Keyframe Interval (in seconds)",
   "encoderPreset": "Encoder Preset",
   "pollingPerformanceStatistics": "Activate performance statistics(bitrate, FPS, dropped frames)",
-  "pollingPerformanceStatisticsDescription": "If the streaming is unstable, try disabling this option."
+  "pollingPerformanceStatisticsDescription": "If the streaming is unstable, try disabling this option.",
+  "compactMode": "Compact Mode",
+  "autoCompact": {
+    "title": "Compact Mode Automation Settings",
+    "message": "Do you allow N Air to automatically switch to compact mode at the start of streaming and back to full mode at the end of it?\nYou can turn off the setting anytime from Settings> General.",
+    "doNotShowAgain": "Do not show the dialog again.",
+    "later": "Not change now",
+    "activate": "Turn on",
+    "setting": "Automatically switch to the compact mode in streaming",
+    "showDialog": "Show the Compact Mode Automation Settings dialog."
+  }
 }
