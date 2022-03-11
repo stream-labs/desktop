@@ -10,6 +10,6 @@
   "Click to add %{stat} info to your footer": "Click to add %{stat} info to your footer",
   "CPU": "Processzor",
   "FPS": "FPS",
-  "dropped frames": "dropped frames",
+  "dropped frames": "eldobott képkockák",
   "bandwidth": "sávszélesség"
 }
