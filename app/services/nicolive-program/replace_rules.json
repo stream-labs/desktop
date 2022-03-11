@@ -194,6 +194,10 @@
       "replacement": "あいかわらず"
     },
     {
+      "regularExpression": "（生放送クルーズさんの番組）$",
+      "replacement": ""
+    },
+    {
       "regularExpression": "[＾Ω∞☠♭〇㈲＃#＄$＊\\*＾≧≦･＞＜．.×\"'<>^°]+",
       "replacement": ""
     },

@@ -9,6 +9,16 @@ describe('ParaphraseDictionary', async () => {
   expect(dictionary.process('ww')).toBe('ワラワラ');
   expect(dictionary.process('テストw')).toBe('テスト、ワラ');
 
+  test('末尾の（生放送クルーズさんの番組）を除去', () => {
+    expect(dictionary.process('A（生放送クルーズさんの番組）')).toBe('A');
+    expect(dictionary.process('A（生放送クルーズさんの番組）B')).toBe(
+      'A（生放送クルーズさんの番組）B',
+    );
+    expect(dictionary.process('（生放送クルーズさんの番組）B')).toBe(
+      '（生放送クルーズさんの番組）B',
+    );
+  });
+
   test('remove multiple lines comments', () => {
     expect(dictionary.process('複数行は\nすべて無視')).toBe('');
     expect(dictionary.process('今\n北\n産\n業')).toBe('');
