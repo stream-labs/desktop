@@ -113,12 +113,11 @@ export class ChatService extends Service {
       .find(source => source.type === WidgetType.ChatHighlight);
   }
 
-  mountChat(electronWindowId: number) {
+  async mountChat(electronWindowId: number) {
     if (!this.chatView) this.initChat();
     this.electronWindowId = electronWindowId;
     const win = remote.BrowserWindow.fromId(electronWindowId);
     if (this.chatView && win) win.addBrowserView(this.chatView);
-    this.chatView.webContents.openDevTools();
   }
 
   setChatBounds(position: IVec2, size: IVec2) {
