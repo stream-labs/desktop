@@ -61,7 +61,7 @@ export function getWidgetsConfig(host: string, token: string): Record<TWidgetTyp
       },
 
       url: `https://${host}/alert-box/v3/${token}`,
-      previewUrl: `https://${host}}/alert-box/v3/${token}`,
+      previewUrl: `https://${host}/alert-box/v3/${token}`,
       dataFetchUrl: `https://${host}/api/v5/slobs/widget/alertbox?include_linked_integrations_only=true&primary_only=false`,
       settingsSaveUrl: `https://${host}/api/v5/slobs/widget/alertbox`,
       settingsUpdateEvent: 'filteredAlertBoxSettingsUpdate',
