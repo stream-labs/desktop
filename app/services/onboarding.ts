@@ -27,6 +27,7 @@ enum EOnboardingSteps {
 const ONBOARDING_STEPS = () => ({
   [EOnboardingSteps.MacPermissions]: {
     element: onboardingSteps.MacPermissions,
+    component: 'MacPermissions',
     disableControls: false,
     hideSkip: true,
     hideButton: true,
@@ -34,6 +35,7 @@ const ONBOARDING_STEPS = () => ({
   },
   [EOnboardingSteps.Connect]: {
     element: onboardingSteps.Connect,
+    component: 'Connect',
     disableControls: false,
     hideSkip: true,
     hideButton: true,
@@ -41,6 +43,7 @@ const ONBOARDING_STEPS = () => ({
   },
   [EOnboardingSteps.ChooseYourAdventure]: {
     element: onboardingSteps.ChooseYourAdventure,
+    component: 'Connect',
     disableControls: true,
     hideSkip: true,
     hideButton: true,
@@ -48,6 +51,7 @@ const ONBOARDING_STEPS = () => ({
   },
   [EOnboardingSteps.ObsImport]: {
     element: onboardingSteps.ObsImport,
+    component: 'Connect',
     disableControls: true,
     hideSkip: true,
     hideButton: true,
@@ -55,6 +59,7 @@ const ONBOARDING_STEPS = () => ({
   },
   [EOnboardingSteps.HardwareSetup]: {
     element: onboardingSteps.HardwareSetup,
+    component: 'Connect',
     disableControls: false,
     hideSkip: false,
     hideButton: false,
@@ -62,6 +67,7 @@ const ONBOARDING_STEPS = () => ({
   },
   [EOnboardingSteps.ThemeSelector]: {
     element: onboardingSteps.ThemeSelector,
+    component: 'Connect',
     disableControls: false,
     hideSkip: false,
     hideButton: true,
@@ -69,6 +75,7 @@ const ONBOARDING_STEPS = () => ({
   },
   [EOnboardingSteps.Optimize]: {
     element: onboardingSteps.Optimize,
+    component: 'Connect',
     disableControls: false,
     hideSkip: false,
     hideButton: true,
@@ -76,6 +83,7 @@ const ONBOARDING_STEPS = () => ({
   },
   [EOnboardingSteps.Prime]: {
     element: onboardingSteps.Prime,
+    component: 'Connect',
     disableControls: false,
     hideSkip: false,
     hideButton: true,
@@ -83,6 +91,7 @@ const ONBOARDING_STEPS = () => ({
   },
   [EOnboardingSteps.PrimeExpiration]: {
     element: onboardingSteps.PrimeExpiration,
+    component: 'Connect',
     disableControls: true,
     hideSkip: true,
     hideButton: true,
@@ -101,6 +110,7 @@ const THEME_METADATA = {
 
 interface IOnboardingStep {
   element: typeof TsxComponent;
+  component: string;
   disableControls: boolean;
   hideSkip: boolean;
   hideButton: boolean;

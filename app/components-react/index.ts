@@ -15,6 +15,7 @@ import Grow from './pages/grow/Grow';
 import Loader from './pages/Loader';
 import NavTools from './sidebar/NavTools';
 import PlatformLogo from './shared/PlatformLogo';
+import Onboarding from './pages/onboarding/Onboarding';
 import AdvancedStatistics from './windows/AdvancedStatistics';
 import StreamScheduler from './pages/stream-scheduler/StreamScheduler';
 import { createRoot } from './root/ReactRoot';
@@ -63,6 +64,7 @@ export const components = {
   Loader,
   NavTools,
   PlatformLogo,
+  Onboarding: createRoot(Onboarding),
   Projector,
   StreamScheduler: createRoot(StreamScheduler),
   AdvancedStatistics,

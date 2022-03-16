@@ -181,6 +181,13 @@ export class NotificationsArea extends ReactComponent {}
 })
 export class ObsSettings extends ReactComponent {}
 
+@Component({
+  props: {
+    name: { default: 'Onboarding' },
+  },
+})
+export class Onboarding extends ReactComponent {}
+
 @Component({ props: { name: { default: 'PatchNotes' } } })
 export class PatchNotes extends ReactComponent {}
 

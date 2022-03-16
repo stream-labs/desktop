@@ -1,0 +1,47 @@
+.title-container {
+  width: 100%;
+  text-align: center;
+  font-size: 32px;
+
+  h1 {
+    display: inline-block;
+    font-size: 32px;
+  }
+
+  margin-bottom: 40px;
+}
+
+.option-card {
+  position: relative;
+  background: var(--teal);
+  padding: 16px;
+  overflow: hidden;
+  height: 80px;
+  border-radius: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 280px;
+  border: none;
+
+  &:hover {
+    cursor: pointer;
+  }
+
+  h2 {
+    font-size: 20px;
+    margin-bottom: 0;
+  }
+
+  svg {
+    position: absolute;
+    bottom: -50%;
+    right: 0;
+    opacity: 0.08;
+  }
+}
+
+.onboarding-button {
+  padding: 12px !important;
+  line-height: normal !important;
+}
