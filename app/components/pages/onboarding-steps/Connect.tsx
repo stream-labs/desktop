@@ -76,10 +76,6 @@ export default class Connect extends TsxComponent<ConnectProps> {
     }
   }
 
-  get isSecurityUpgrade() {
-    return this.onboardingService.options.isSecurityUpgrade;
-  }
-
   get securityUpgradeLink() {
     return (
       <span>
@@ -126,14 +122,10 @@ export default class Connect extends TsxComponent<ConnectProps> {
     return (
       <div class={styles.pageContainer}>
         <div class={styles.container}>
-          <h1 class={commonStyles.titleContainer}>
-            {this.isSecurityUpgrade ? $t('Re-Authorize') : $t('Connect')}
-          </h1>
+          <h1 class={commonStyles.titleContainer}>{$t('Connect')}</h1>
           {!this.isRelog && (
             <p style="margin-bottom: 80px;">
-              {this.isSecurityUpgrade
-                ? this.securityUpgradeLink
-                : $t('Sign in with your streaming account to get started with Streamlabs')}
+              {$t('Sign in with your streaming account to get started with Streamlabs')}
             </p>
           )}
           {this.isRelog && (

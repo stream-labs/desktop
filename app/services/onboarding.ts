@@ -15,7 +15,7 @@ import { ObsImporterService } from './obs-importer';
 enum EOnboardingSteps {
   MacPermissions = 'MacPermissions',
   Connect = 'Connect',
-  ChooseYourAdventure = 'ChooseYourAdventure',
+  FreshOrImport = 'FreshOrImport',
   ObsImport = 'ObsImport',
   HardwareSetup = 'HardwareSetup',
   ThemeSelector = 'ThemeSelector',
@@ -41,9 +41,9 @@ const ONBOARDING_STEPS = () => ({
     hideButton: true,
     isPreboarding: true,
   },
-  [EOnboardingSteps.ChooseYourAdventure]: {
+  [EOnboardingSteps.FreshOrImport]: {
     element: onboardingSteps.ChooseYourAdventure,
-    component: 'Connect',
+    component: 'FreshOrImport',
     disableControls: true,
     hideSkip: true,
     hideButton: true,
@@ -51,7 +51,7 @@ const ONBOARDING_STEPS = () => ({
   },
   [EOnboardingSteps.ObsImport]: {
     element: onboardingSteps.ObsImport,
-    component: 'Connect',
+    component: 'ObsImport',
     disableControls: true,
     hideSkip: true,
     hideButton: true,
@@ -121,7 +121,6 @@ interface IOnboardingStep {
 interface IOnboardingOptions {
   isLogin: boolean; // When logging into a new account after onboarding
   isOptimize: boolean; // When re-running the optimizer after onboarding
-  isSecurityUpgrade: boolean; // When logging in, display a special message
   // about our security upgrade.
   isHardware: boolean; // When configuring capture defaults
   isPrimeExpiration: boolean; // Only shown as a singleton step if prime is expiring soon
@@ -157,7 +156,7 @@ class OnboardingViews extends ViewHandler<IOnboardingServiceState> {
     steps.push(ONBOARDING_STEPS()[EOnboardingSteps.Connect]);
 
     if (isOBSinstalled) {
-      steps.push(ONBOARDING_STEPS()[EOnboardingSteps.ChooseYourAdventure]);
+      steps.push(ONBOARDING_STEPS()[EOnboardingSteps.FreshOrImport]);
     }
 
     if (this.state.importedFromObs && isOBSinstalled) {
@@ -193,7 +192,6 @@ export class OnboardingService extends StatefulService<IOnboardingServiceState> 
     options: {
       isLogin: false,
       isOptimize: false,
-      isSecurityUpgrade: false,
       isHardware: false,
       isPrimeExpiration: false,
       isImport: false,
@@ -266,7 +264,6 @@ export class OnboardingService extends StatefulService<IOnboardingServiceState> 
     const actualOptions: IOnboardingOptions = {
       isLogin: false,
       isOptimize: false,
-      isSecurityUpgrade: false,
       isHardware: false,
       isPrimeExpiration: false,
       isImport: false,
@@ -305,19 +302,10 @@ export class OnboardingService extends StatefulService<IOnboardingServiceState> 
 
   startOnboardingIfRequired() {
     if (localStorage.getItem(this.localStorageKey)) {
-      this.forceLoginForSecurityUpgradeIfRequired();
       return false;
     }
 
     this.start();
     return true;
-  }
-
-  forceLoginForSecurityUpgradeIfRequired() {
-    if (!this.userService.isLoggedIn) return;
-
-    if (!this.userService.apiToken) {
-      this.start({ isLogin: true, isSecurityUpgrade: true });
-    }
   }
 }

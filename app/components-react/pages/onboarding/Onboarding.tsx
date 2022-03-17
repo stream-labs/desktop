@@ -60,13 +60,13 @@ function TopBar() {
 
   return (
     <div className={styles.topBarContainer}>
-      {filteredSteps.map((_step, i) => {
+      {filteredSteps.map((step, i) => {
         let stepClass;
         if (i === stepIdx) stepClass = styles.current;
         if (i < stepIdx) stepClass = styles.completed;
         if (i > stepIdx) stepClass = styles.incomplete;
         return (
-          <div className={styles.topBarSegment}>
+          <div className={styles.topBarSegment} key={step.label}>
             <div className={cx(styles.topBarStep, stepClass)}>
               {i < stepIdx && <i className="icon-check-mark" />}
             </div>
@@ -98,7 +98,7 @@ function ActionButton() {
   );
 }
 
-class OnboardingModule {
+export class OnboardingModule {
   state = {
     stepIndex: 0,
     processing: false,
@@ -122,6 +122,10 @@ class OnboardingModule {
 
   get preboardingOffset() {
     return this.steps.filter(step => step.isPreboarding).length;
+  }
+
+  setImportFromObs() {
+    this.OnboardingService.actions.setObsImport(true);
   }
 
   finish() {
