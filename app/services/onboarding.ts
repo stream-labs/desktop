@@ -108,7 +108,7 @@ const THEME_METADATA = {
   2639: 'https://cdn.streamlabs.com/marketplace/overlays/7684923/a1a4ab0/a1a4ab0.overlay',
 };
 
-interface IOnboardingStep {
+export interface IOnboardingStep {
   element: typeof TsxComponent;
   component: string;
   disableControls: boolean;

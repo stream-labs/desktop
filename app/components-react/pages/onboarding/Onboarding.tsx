@@ -12,6 +12,8 @@ export default function Onboarding() {
   const { currentStep, next, processing } = useModule(OnboardingModule).select();
   const Component = stepComponents[currentStep.component];
 
+  console.log('RENDER ONBOARDING', currentStep.component);
+
   return (
     <div className={styles.onboardingContainer}>
       {<TopBar />}
@@ -125,11 +127,11 @@ export class OnboardingModule {
   }
 
   setImportFromObs() {
-    this.OnboardingService.actions.setObsImport(true);
+    this.OnboardingService.setObsImport(true);
   }
 
   finish() {
-    this.OnboardingService.finish();
+    this.OnboardingService.actions.finish();
   }
 
   @mutation()
