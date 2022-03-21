@@ -1,16 +1,19 @@
 import { StatefulService, mutation } from './core/stateful-service';
 import { UserService } from './user';
 import { HostsService } from './hosts';
+import { Inject, Service } from 'services';
 import { AppService } from 'services/app';
-import { Inject } from './core/injector';
 import { authorizedHeaders, jfetch } from '../util/requests';
 import path from 'path';
 import fs from 'fs';
 import { PatchNotesService } from 'services/patch-notes';
 import { I18nService } from 'services/i18n';
+import { NotificationsService, ENotificationType } from 'services/notifications';
 import { CustomizationService } from './customization';
+import { JsonrpcService } from 'services/api/jsonrpc/jsonrpc';
+import { WindowsService } from 'services/windows';
 
-interface IAnnouncementsInfo {
+export interface IAnnouncementsInfo {
   id: number;
   header: string;
   subHeader: string;
@@ -29,6 +32,9 @@ export class AnnouncementsService extends StatefulService<IAnnouncementsInfo> {
   @Inject() private patchNotesService: PatchNotesService;
   @Inject() private i18nService: I18nService;
   @Inject() private customizationService: CustomizationService;
+  @Inject() private notificationsService: NotificationsService;
+  @Inject() private jsonrpcService: JsonrpcService;
+  @Inject() private windowsService: WindowsService;
 
   static initialState: IAnnouncementsInfo = {
     id: null,
@@ -45,6 +51,13 @@ export class AnnouncementsService extends StatefulService<IAnnouncementsInfo> {
   async updateBanner() {
     const newBanner = await this.fetchBanner();
     this.SET_BANNER(newBanner);
+    if (this.bannerExists) {
+      this.notificationsService.push({
+        message: this.state.header,
+        type: ENotificationType.SUCCESS,
+        action: this.jsonrpcService.createRequest(Service.getResourceId(this), 'openNewsWindow'),
+      });
+    }
   }
 
   get bannerExists() {
@@ -165,6 +178,14 @@ export class AnnouncementsService extends StatefulService<IAnnouncementsInfo> {
     const headers = authorizedHeaders(this.userService.apiToken, options.headers);
     const url = `https://${host}/${endpoint}`;
     return new Request(url, { ...options, headers });
+  }
+
+  openNewsWindow() {
+    this.windowsService.showWindow({
+      componentName: 'News',
+      width: 400,
+      height: 600,
+    });
   }
 
   @mutation()

@@ -1,35 +1,83 @@
-import Scrollable from 'components-react/shared/Scrollable';
 import React from 'react';
+import Scrollable from 'components-react/shared/Scrollable';
+import { IAnnouncementsInfo } from 'services/announcements';
+import styles from './News.m.less';
+import { ModalLayout } from 'components-react/shared/ModalLayout';
 
-interface INewsItem {
-  title: string;
-  id: string;
-  description: string;
-  img: string;
-  cta: string;
-  target: string;
-  notif: string;
-}
-
-const FAKE_NEWS_ITEMS: INewsItem[] = [];
+const FAKE_NEWS_ITEMS: IAnnouncementsInfo[] = [
+  {
+    header: 'This is a News Item',
+    subHeader:
+      'Et fugiat culpa ea magna aliquip commodo veniam enim do deserunt aute ex Lorem. Labore incididunt dolor officia eiusmod enim.',
+    thumbnail: '',
+    id: 1,
+    linkTarget: 'external',
+    link: '',
+    linkTitle: 'Fugiat nostrud dolor consequat non cupidatat mollit labore magna et.',
+  },
+  {
+    header: 'This is a News Item',
+    subHeader:
+      'Et fugiat culpa ea magna aliquip commodo veniam enim do deserunt aute ex Lorem. Labore incididunt dolor officia eiusmod enim.',
+    thumbnail: '',
+    id: 2,
+    linkTarget: 'external',
+    link: '',
+    linkTitle: 'Fugiat nostrud dolor consequat non cupidatat mollit labore magna et.',
+  },
+  {
+    header: 'This is a News Item',
+    subHeader:
+      'Et fugiat culpa ea magna aliquip commodo veniam enim do deserunt aute ex Lorem. Labore incididunt dolor officia eiusmod enim.',
+    thumbnail: '',
+    id: 3,
+    linkTarget: 'external',
+    link: '',
+    linkTitle: 'Fugiat nostrud dolor consequat non cupidatat mollit labore magna et.',
+  },
+  {
+    header: 'This is a News Item',
+    subHeader:
+      'Et fugiat culpa ea magna aliquip commodo veniam enim do deserunt aute ex Lorem. Labore incididunt dolor officia eiusmod enim.',
+    thumbnail: '',
+    id: 4,
+    linkTarget: 'external',
+    link: '',
+    linkTitle: 'Fugiat nostrud dolor consequat non cupidatat mollit labore magna et.',
+  },
+  {
+    header: 'This is a News Item',
+    subHeader:
+      'Et fugiat culpa ea magna aliquip commodo veniam enim do deserunt aute ex Lorem. Labore incididunt dolor officia eiusmod enim.',
+    thumbnail: '',
+    id: 5,
+    linkTarget: 'external',
+    link: '',
+    linkTitle: 'Fugiat nostrud dolor consequat non cupidatat mollit labore magna et.',
+  },
+];
 
 export default function News() {
   const newsItems = FAKE_NEWS_ITEMS;
 
-  function handleClick(target: string) {
+  function handleClick(link: string, target: 'external' | 'slobs') {
     return () => {};
   }
 
   return (
-    <Scrollable>
-      {newsItems.map(item => (
-        <div key={item.id}>
-          <img src={item.img} />
-          <h4>{item.title}</h4>
-          <span>{item.description}</span>
-          <button onClick={handleClick(item.target)}>{item.cta}</button>
-        </div>
-      ))}
-    </Scrollable>
+    <ModalLayout hideFooter>
+      <Scrollable>
+        {newsItems.map(item => (
+          <div className={styles.newsItemContainer} key={item.id}>
+            <img className={styles.newsImage} src={item.thumbnail} />
+            <h4 className={styles.newsTitle}>{item.header}</h4>
+            <span>{item.subHeader}</span>
+            <button className={styles.newsButton} onClick={handleClick(item.link, item.linkTarget)}>
+              {item.link}
+            </button>
+          </div>
+        ))}
+      </Scrollable>
+    </ModalLayout>
   );
 }
