@@ -3,6 +3,7 @@ import Scrollable from 'components-react/shared/Scrollable';
 import { IAnnouncementsInfo } from 'services/announcements';
 import styles from './News.m.less';
 import { ModalLayout } from 'components-react/shared/ModalLayout';
+import { Services } from 'components-react/service-provider';
 
 const FAKE_NEWS_ITEMS: IAnnouncementsInfo[] = [
   {
@@ -58,10 +59,14 @@ const FAKE_NEWS_ITEMS: IAnnouncementsInfo[] = [
 ];
 
 export default function News() {
+  const { WindowsService } = Services;
+
   const newsItems = FAKE_NEWS_ITEMS;
 
-  function handleClick(link: string, target: 'external' | 'slobs') {
-    return () => {};
+  function handleClick(item: IAnnouncementsInfo) {
+    return () => {
+      if (item.closeOnLink) WindowsService.closeChildWindow();
+    };
   }
 
   return (
@@ -72,7 +77,7 @@ export default function News() {
             <img className={styles.newsImage} src={item.thumbnail} />
             <h4 className={styles.newsTitle}>{item.header}</h4>
             <span>{item.subHeader}</span>
-            <button className={styles.newsButton} onClick={handleClick(item.link, item.linkTarget)}>
+            <button className={styles.newsButton} onClick={handleClick(item)}>
               {item.link}
             </button>
           </div>

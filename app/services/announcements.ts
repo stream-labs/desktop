@@ -51,7 +51,7 @@ export class AnnouncementsService extends StatefulService<IAnnouncementsInfo> {
   async updateBanner() {
     const newBanner = await this.fetchBanner();
     this.SET_BANNER(newBanner);
-    if (this.bannerExists) {
+    if (this.bannerExists || true) {
       this.notificationsService.push({
         message: this.state.header,
         type: ENotificationType.SUCCESS,
