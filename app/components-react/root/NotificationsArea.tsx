@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Tooltip } from 'antd';
+import { Badge, Tooltip } from 'antd';
 import moment from 'moment';
 import cx from 'classnames';
 import { useVuex, useRenderInterval } from '../hooks';
@@ -27,8 +27,9 @@ export default function NotificationsArea() {
   });
   const [notifications, setNotifications] = useState([] as IUiNotification[]);
 
-  const { unreadCount, settings } = useVuex(() => ({
-    unreadCount: NotificationsService.views.getUnread(ENotificationType.WARNING).length,
+  const { unreadWarnings, unreadNotifs, settings } = useVuex(() => ({
+    unreadWarnings: NotificationsService.views.getUnread(ENotificationType.WARNING).length,
+    unreadNotifs: NotificationsService.views.getUnread().length,
     settings: NotificationsService.state.settings,
   }));
 
@@ -159,21 +160,25 @@ export default function NotificationsArea() {
 
   return (
     <div className={styles.notificationsArea}>
-      {unreadCount > 0 && (
+      {unreadWarnings > 0 && (
         <Tooltip placement="right" title={showUnreadNotificationsTooltip}>
           <div
             className={cx(styles.notificationsCounter, styles.notificationsCounterWarning)}
             onClick={showNotifications}
           >
-            <i className="fa fa-exclamation-triangle" />
-            {unreadCount}
+            <Badge dot={unreadWarnings > 0} color="red">
+              <i className="fa fa-exclamation-triangle" />
+              {unreadWarnings}
+            </Badge>
           </div>
         </Tooltip>
       )}
-      {!unreadCount && (
+      {!unreadWarnings && (
         <Tooltip placement="right" title={showNotificationsTooltip}>
           <div className={styles.notificationsCounter} onClick={showNotifications}>
-            <i className="icon-information" />
+            <Badge dot={unreadNotifs > 0}>
+              <i className="icon-notifications" />
+            </Badge>
           </div>
         </Tooltip>
       )}
