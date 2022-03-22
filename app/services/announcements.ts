@@ -39,10 +39,10 @@ export class AnnouncementsService extends StatefulService<IAnnouncementsInfo[]> 
   static initialState: IAnnouncementsInfo[] = [];
 
   async updateBanner() {
-    // this.SET_BANNER(await this.fetchNews());
+    this.SET_BANNER(await this.fetchNews());
     if (this.bannerExists || true) {
       this.notificationsService.push({
-        message: 'this.state[0].header',
+        message: this.state[0].header,
         type: ENotificationType.SUCCESS,
         playSound: false,
         action: this.jsonrpcService.createRequest(Service.getResourceId(this), 'openNewsWindow'),

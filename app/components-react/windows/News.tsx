@@ -4,6 +4,8 @@ import { IAnnouncementsInfo } from 'services/announcements';
 import styles from './News.m.less';
 import { ModalLayout } from 'components-react/shared/ModalLayout';
 import { Services } from 'components-react/service-provider';
+import { TAppPage } from 'services/navigation';
+import { shell } from 'electron';
 
 const FAKE_NEWS_ITEMS: IAnnouncementsInfo[] = [
   {
@@ -59,12 +61,21 @@ const FAKE_NEWS_ITEMS: IAnnouncementsInfo[] = [
 ];
 
 export default function News() {
-  const { WindowsService } = Services;
+  const { WindowsService, SettingsService, NavigationService } = Services;
 
   const newsItems = FAKE_NEWS_ITEMS;
 
   function handleClick(item: IAnnouncementsInfo) {
     return () => {
+      if (item.linkTarget === 'slobs') {
+        if (item.link === 'Settings') {
+          SettingsService.showSettings(item.params?.category);
+        } else {
+          NavigationService.navigate(item.link as TAppPage);
+        }
+      } else {
+        shell.openExternal(item.link);
+      }
       if (item.closeOnLink) WindowsService.closeChildWindow();
     };
   }
