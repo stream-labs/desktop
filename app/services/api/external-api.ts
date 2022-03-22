@@ -105,7 +105,7 @@ export class ExternalApiService extends RpcApi {
     // if resource is not singleton
     // take serialized constructor arguments from `resourceId` string and construct a new instance
     const helperName = resourceId.split('[')[0];
-    const constructorArgsStr = resourceId.substr(helperName.length);
+    const constructorArgsStr = resourceId.slice(helperName.length);
     const constructorArgs = constructorArgsStr ? JSON.parse(constructorArgsStr) : void 0;
     const Helper = this.resources[helperName];
     if (Helper) {

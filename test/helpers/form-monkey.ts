@@ -296,7 +296,7 @@ export class FormMonkey {
     const $colorPicker = await this.client.$(`${selector} [name="colorpicker-input"]`);
     await $colorPicker.click(); // open colorpicker
     // tslint:disable-next-line:no-parameter-reassignment TODO
-    value = value.substr(1); // get rid of # character in value
+    value = value.slice(1); // get rid of # character in value
     const inputSelector = `${selector} .vc-input__input`;
     await sleep(100); // give colorpicker some time to be opened
     await this.setInputValue(inputSelector, value);
