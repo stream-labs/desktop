@@ -40,7 +40,7 @@ export class AnnouncementsService extends StatefulService<IAnnouncementsInfo[]> 
 
   async updateBanner() {
     this.SET_BANNER(await this.fetchNews());
-    if (this.bannerExists || true) {
+    if (this.bannerExists) {
       this.notificationsService.push({
         message: this.state[0].header,
         type: ENotificationType.SUCCESS,
@@ -117,7 +117,7 @@ export class AnnouncementsService extends StatefulService<IAnnouncementsInfo[]> 
     ) {
       return this.state;
     }
-    const endpoint = `api/v5/slobs/announcement/v2/get?clientId=${this.userService.getLocalUserId()}&locale=${
+    const endpoint = `api/v5/slobs/announcements/get?clientId=${this.userService.getLocalUserId()}&locale=${
       this.i18nService.state.locale
     }`;
     const req = this.formRequest(endpoint);
