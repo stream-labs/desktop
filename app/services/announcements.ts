@@ -7,7 +7,7 @@ import { authorizedHeaders, jfetch } from '../util/requests';
 import path from 'path';
 import fs from 'fs';
 import { PatchNotesService } from 'services/patch-notes';
-import { I18nService } from 'services/i18n';
+import { I18nService, $t } from 'services/i18n';
 import { NotificationsService, ENotificationType } from 'services/notifications';
 import { CustomizationService } from './customization';
 import { JsonrpcService } from 'services/api/jsonrpc/jsonrpc';
@@ -53,7 +53,7 @@ export class AnnouncementsService extends StatefulService<IAnnouncementsInfo> {
     this.SET_BANNER(newBanner);
     if (this.bannerExists || true) {
       this.notificationsService.push({
-        message: this.state.header,
+        message: 'this.state.header',
         type: ENotificationType.SUCCESS,
         action: this.jsonrpcService.createRequest(Service.getResourceId(this), 'openNewsWindow'),
       });
@@ -183,8 +183,11 @@ export class AnnouncementsService extends StatefulService<IAnnouncementsInfo> {
   openNewsWindow() {
     this.windowsService.showWindow({
       componentName: 'News',
-      width: 400,
-      height: 600,
+      title: $t('News'),
+      size: {
+        width: 400,
+        height: 600,
+      },
     });
   }
 

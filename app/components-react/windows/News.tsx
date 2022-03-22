@@ -71,7 +71,7 @@ export default function News() {
 
   return (
     <ModalLayout hideFooter>
-      <Scrollable>
+      <Scrollable style={{ height: '100%' }} snapToWindowEdge>
         {newsItems.map(item => (
           <div className={styles.newsItemContainer} key={item.id}>
             <img className={styles.newsImage} src={item.thumbnail} />
