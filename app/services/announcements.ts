@@ -25,7 +25,7 @@ export interface IAnnouncementsInfo {
   closeOnLink?: boolean;
 }
 
-export class AnnouncementsService extends StatefulService<IAnnouncementsInfo> {
+export class AnnouncementsService extends StatefulService<IAnnouncementsInfo[]> {
   @Inject() private hostsService: HostsService;
   @Inject() private userService: UserService;
   @Inject() private appService: AppService;
@@ -36,21 +36,10 @@ export class AnnouncementsService extends StatefulService<IAnnouncementsInfo> {
   @Inject() private jsonrpcService: JsonrpcService;
   @Inject() private windowsService: WindowsService;
 
-  static initialState: IAnnouncementsInfo = {
-    id: null,
-    header: '',
-    subHeader: null,
-    link: null,
-    linkTitle: null,
-    thumbnail: null,
-    linkTarget: null,
-    params: null,
-    closeOnLink: false,
-  };
+  static initialState: IAnnouncementsInfo[] = [];
 
   async updateBanner() {
-    const newBanner = await this.fetchBanner();
-    this.SET_BANNER(newBanner);
+    this.SET_BANNER(await this.fetchNews());
     if (this.bannerExists || true) {
       this.notificationsService.push({
         message: 'this.state.header',
@@ -61,11 +50,7 @@ export class AnnouncementsService extends StatefulService<IAnnouncementsInfo> {
   }
 
   get bannerExists() {
-    return this.state.id !== null;
-  }
-
-  async closeBanner(clickType: 'action' | 'dismissal') {
-    await this.postBannerClose(clickType);
+    return this.state.length > 0;
   }
 
   private get installDateProxyFilePath() {
@@ -120,7 +105,7 @@ export class AnnouncementsService extends StatefulService<IAnnouncementsInfo> {
     return Date.parse(this.patchNotesService.state.updateTimestamp) > twoDaysAgo;
   }
 
-  private async fetchBanner() {
+  private async fetchNews() {
     const recentlyInstalled = await this.recentlyInstalled();
 
     if (
@@ -131,46 +116,30 @@ export class AnnouncementsService extends StatefulService<IAnnouncementsInfo> {
     ) {
       return this.state;
     }
-    const endpoint = `api/v5/slobs/announcement/get?clientId=${this.userService.getLocalUserId()}&locale=${
+    const endpoint = `api/v5/slobs/announcement/v2/get?clientId=${this.userService.getLocalUserId()}&locale=${
       this.i18nService.state.locale
     }`;
     const req = this.formRequest(endpoint);
     try {
-      const newState = await jfetch<IAnnouncementsInfo>(req);
+      const newState = await jfetch<IAnnouncementsInfo[]>(req);
 
       // splits out params for local links eg PlatformAppStore?appId=<app-id>
-      const queryString = newState.link.split('?')[1];
-      if (newState.linkTarget === 'slobs' && queryString) {
-        newState.link = newState.link.split('?')[0];
-        newState.params = {};
-        queryString.split(',').forEach((query: string) => {
-          const [key, value] = query.split('=');
-          newState.params[key] = value;
-        });
-      }
+      newState.forEach(item => {
+        const queryString = item.link.split('?')[1];
+        if (item.linkTarget === 'slobs' && queryString) {
+          item.link = item.link.split('?')[0];
+          item.params = {};
+          queryString.split(',').forEach((query: string) => {
+            const [key, value] = query.split('=');
+            item.params[key] = value;
+          });
+        }
+      });
 
-      return newState.id ? newState : this.state;
+      return newState[0].id ? newState : this.state;
     } catch (e: unknown) {
       return this.state;
     }
-  }
-
-  private async postBannerClose(clickType: 'action' | 'dismissal') {
-    const endpoint = 'api/v5/slobs/announcement/close';
-    const postData = {
-      method: 'POST',
-      body: JSON.stringify({
-        clickType,
-        clientId: this.userService.getLocalUserId(),
-        announcementId: this.state.id,
-      }),
-      headers: new Headers({ 'Content-Type': 'application/json' }),
-    };
-    const req = this.formRequest(endpoint, postData);
-    try {
-      await fetch(req);
-      this.CLEAR_BANNER();
-    } catch (e: unknown) {}
   }
 
   private formRequest(endpoint: string, options: any = {}) {
@@ -192,8 +161,8 @@ export class AnnouncementsService extends StatefulService<IAnnouncementsInfo> {
   }
 
   @mutation()
-  SET_BANNER(banner: IAnnouncementsInfo) {
-    this.state = banner;
+  SET_BANNER(banners: IAnnouncementsInfo[]) {
+    this.state = banners;
   }
 
   @mutation()
