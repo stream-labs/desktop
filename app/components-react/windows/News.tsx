@@ -13,8 +13,8 @@ const FAKE_NEWS_ITEMS: IAnnouncementsInfo[] = [
     thumbnail: '',
     id: 1,
     linkTarget: 'external',
-    link: '',
-    linkTitle: 'Fugiat nostrud dolor consequat non cupidatat mollit labore magna et.',
+    link: 'jsdkhfdsjk',
+    linkTitle: 'Fugiat nostrud dolor',
   },
   {
     header: 'This is a News Item',
@@ -23,8 +23,8 @@ const FAKE_NEWS_ITEMS: IAnnouncementsInfo[] = [
     thumbnail: '',
     id: 2,
     linkTarget: 'external',
-    link: '',
-    linkTitle: 'Fugiat nostrud dolor consequat non cupidatat mollit labore magna et.',
+    link: 'fdjhsklkfjds',
+    linkTitle: 'Fugiat nostrud dolor',
   },
   {
     header: 'This is a News Item',
@@ -33,8 +33,8 @@ const FAKE_NEWS_ITEMS: IAnnouncementsInfo[] = [
     thumbnail: '',
     id: 3,
     linkTarget: 'external',
-    link: '',
-    linkTitle: 'Fugiat nostrud dolor consequat non cupidatat mollit labore magna et.',
+    link: 'sjkfhdsjkhfskd',
+    linkTitle: 'Fugiat nostrud dolor',
   },
   {
     header: 'This is a News Item',
@@ -43,8 +43,8 @@ const FAKE_NEWS_ITEMS: IAnnouncementsInfo[] = [
     thumbnail: '',
     id: 4,
     linkTarget: 'external',
-    link: '',
-    linkTitle: 'Fugiat nostrud dolor consequat non cupidatat mollit labore magna et.',
+    link: 'sjkfhdsjkfdskj',
+    linkTitle: 'Fugiat nostrud dolor',
   },
   {
     header: 'This is a News Item',
@@ -53,8 +53,8 @@ const FAKE_NEWS_ITEMS: IAnnouncementsInfo[] = [
     thumbnail: '',
     id: 5,
     linkTarget: 'external',
-    link: '',
-    linkTitle: 'Fugiat nostrud dolor consequat non cupidatat mollit labore magna et.',
+    link: 'skjfhdsjk',
+    linkTitle: 'Fugiat nostrud dolor',
   },
 ];
 
@@ -75,10 +75,10 @@ export default function News() {
         {newsItems.map(item => (
           <div className={styles.newsItemContainer} key={item.id}>
             <img className={styles.newsImage} src={item.thumbnail} />
-            <h4 className={styles.newsTitle}>{item.header}</h4>
+            <h4>{item.header}</h4>
             <span>{item.subHeader}</span>
-            <button className={styles.newsButton} onClick={handleClick(item)}>
-              {item.link}
+            <button className="button button--action" onClick={handleClick(item)}>
+              {item.linkTitle}
             </button>
           </div>
         ))}
