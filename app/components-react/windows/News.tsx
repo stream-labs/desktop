@@ -1,69 +1,19 @@
 import React from 'react';
+import { shell } from 'electron';
 import Scrollable from 'components-react/shared/Scrollable';
-import { IAnnouncementsInfo } from 'services/announcements';
-import styles from './News.m.less';
 import { ModalLayout } from 'components-react/shared/ModalLayout';
 import { Services } from 'components-react/service-provider';
+import { useVuex } from 'components-react/hooks';
 import { TAppPage } from 'services/navigation';
-import { shell } from 'electron';
-
-const FAKE_NEWS_ITEMS: IAnnouncementsInfo[] = [
-  {
-    header: 'This is a News Item',
-    subHeader:
-      'Et fugiat culpa ea magna aliquip commodo veniam enim do deserunt aute ex Lorem. Labore incididunt dolor officia eiusmod enim.',
-    thumbnail: '',
-    id: 1,
-    linkTarget: 'external',
-    link: 'jsdkhfdsjk',
-    linkTitle: 'Fugiat nostrud dolor',
-  },
-  {
-    header: 'This is a News Item',
-    subHeader:
-      'Et fugiat culpa ea magna aliquip commodo veniam enim do deserunt aute ex Lorem. Labore incididunt dolor officia eiusmod enim.',
-    thumbnail: '',
-    id: 2,
-    linkTarget: 'external',
-    link: 'fdjhsklkfjds',
-    linkTitle: 'Fugiat nostrud dolor',
-  },
-  {
-    header: 'This is a News Item',
-    subHeader:
-      'Et fugiat culpa ea magna aliquip commodo veniam enim do deserunt aute ex Lorem. Labore incididunt dolor officia eiusmod enim.',
-    thumbnail: '',
-    id: 3,
-    linkTarget: 'external',
-    link: 'sjkfhdsjkhfskd',
-    linkTitle: 'Fugiat nostrud dolor',
-  },
-  {
-    header: 'This is a News Item',
-    subHeader:
-      'Et fugiat culpa ea magna aliquip commodo veniam enim do deserunt aute ex Lorem. Labore incididunt dolor officia eiusmod enim.',
-    thumbnail: '',
-    id: 4,
-    linkTarget: 'external',
-    link: 'sjkfhdsjkfdskj',
-    linkTitle: 'Fugiat nostrud dolor',
-  },
-  {
-    header: 'This is a News Item',
-    subHeader:
-      'Et fugiat culpa ea magna aliquip commodo veniam enim do deserunt aute ex Lorem. Labore incididunt dolor officia eiusmod enim.',
-    thumbnail: '',
-    id: 5,
-    linkTarget: 'external',
-    link: 'skjfhdsjk',
-    linkTitle: 'Fugiat nostrud dolor',
-  },
-];
+import { IAnnouncementsInfo } from 'services/announcements';
+import styles from './News.m.less';
 
 export default function News() {
-  const { WindowsService, SettingsService, NavigationService } = Services;
+  const { WindowsService, SettingsService, NavigationService, AnnouncementsService } = Services;
 
-  const newsItems = FAKE_NEWS_ITEMS;
+  const { newsItems } = useVuex(() => ({
+    newsItems: AnnouncementsService.state,
+  }));
 
   function handleClick(item: IAnnouncementsInfo) {
     return () => {
