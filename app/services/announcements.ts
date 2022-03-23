@@ -1,4 +1,4 @@
-import { StatefulService, mutation } from './core/stateful-service';
+import { PersistentStatefulService, mutation, InitAfter } from 'services/core/index';
 import { UserService } from './user';
 import { HostsService } from './hosts';
 import { Inject, Service } from 'services';
@@ -25,7 +25,11 @@ export interface IAnnouncementsInfo {
   closeOnLink?: boolean;
 }
 
-export class AnnouncementsService extends StatefulService<IAnnouncementsInfo[]> {
+@InitAfter('UserService')
+export class AnnouncementsService extends PersistentStatefulService<{
+  news: IAnnouncementsInfo[];
+  lastReadId: number;
+}> {
   @Inject() private hostsService: HostsService;
   @Inject() private userService: UserService;
   @Inject() private appService: AppService;
@@ -36,22 +40,32 @@ export class AnnouncementsService extends StatefulService<IAnnouncementsInfo[]> 
   @Inject() private jsonrpcService: JsonrpcService;
   @Inject() private windowsService: WindowsService;
 
-  static initialState: IAnnouncementsInfo[] = [];
+  static defaultState: { news: IAnnouncementsInfo[]; lastReadId: number } = {
+    news: [],
+    lastReadId: 145,
+  };
 
-  async updateBanner() {
-    this.SET_BANNER(await this.fetchNews());
-    if (this.bannerExists) {
-      this.notificationsService.push({
-        message: this.state[0].header,
-        type: ENotificationType.SUCCESS,
-        playSound: false,
-        action: this.jsonrpcService.createRequest(Service.getResourceId(this), 'openNewsWindow'),
-      });
-    }
+  static filter(state: { news: IAnnouncementsInfo[]; lastReadId: number }) {
+    return { ...state, news: [] as IAnnouncementsInfo[] };
   }
 
-  get bannerExists() {
-    return this.state.length > 0;
+  init() {
+    super.init();
+    this.userService.userLogin.subscribe(() => this.fetchLatestNews());
+  }
+
+  get bannersExist() {
+    return this.state.news.length > 0;
+  }
+
+  async getNews() {
+    if (this.bannersExist) return;
+    this.SET_BANNER(await this.fetchNews());
+  }
+
+  seenNews() {
+    if (!this.bannersExist) return;
+    this.SET_LATEST_READ(this.state.news[0].id);
   }
 
   private get installDateProxyFilePath() {
@@ -106,6 +120,28 @@ export class AnnouncementsService extends StatefulService<IAnnouncementsInfo[]> 
     return Date.parse(this.patchNotesService.state.updateTimestamp) > twoDaysAgo;
   }
 
+  private async fetchLatestNews() {
+    const req = this.formRequest(
+      `api/v5/slobs/announcements/status?clientId=${this.userService.getLocalUserId()}&lastAnnouncementId=${
+        this.state.lastReadId
+      }`,
+    );
+    const resp = await jfetch<{
+      newUnreadAnnouncements: boolean;
+      newUnreadAnnouncement?: IAnnouncementsInfo;
+    }>(req);
+
+    if (resp.newUnreadAnnouncements) {
+      this.notificationsService.push({
+        message: resp.newUnreadAnnouncement.header,
+        type: ENotificationType.SUCCESS,
+        playSound: false,
+        lifeTime: -1,
+        action: this.jsonrpcService.createRequest(Service.getResourceId(this), 'openNewsWindow'),
+      });
+    }
+  }
+
   private async fetchNews() {
     const recentlyInstalled = await this.recentlyInstalled();
 
@@ -115,7 +151,7 @@ export class AnnouncementsService extends StatefulService<IAnnouncementsInfo[]> 
       this.recentlyUpdatedTo017 ||
       !this.customizationService.state.enableAnnouncements
     ) {
-      return this.state;
+      return this.state.news;
     }
     const endpoint = `api/v5/slobs/announcements/get?clientId=${this.userService.getLocalUserId()}&locale=${
       this.i18nService.state.locale
@@ -137,9 +173,9 @@ export class AnnouncementsService extends StatefulService<IAnnouncementsInfo[]> 
         }
       });
 
-      return newState[0].id ? newState : this.state;
+      return newState[0].id ? newState : this.state.news;
     } catch (e: unknown) {
-      return this.state;
+      return this.state.news;
     }
   }
 
@@ -163,11 +199,16 @@ export class AnnouncementsService extends StatefulService<IAnnouncementsInfo[]> 
 
   @mutation()
   SET_BANNER(banners: IAnnouncementsInfo[]) {
-    this.state = banners;
+    this.state.news = banners;
   }
 
   @mutation()
   CLEAR_BANNER() {
     this.state = AnnouncementsService.initialState;
+  }
+
+  @mutation()
+  SET_LATEST_READ(id: number) {
+    this.state.lastReadId = id;
   }
 }

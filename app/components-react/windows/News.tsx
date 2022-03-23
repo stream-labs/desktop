@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { shell } from 'electron';
 import Scrollable from 'components-react/shared/Scrollable';
 import { ModalLayout } from 'components-react/shared/ModalLayout';
@@ -12,8 +12,16 @@ export default function News() {
   const { WindowsService, SettingsService, NavigationService, AnnouncementsService } = Services;
 
   const { newsItems } = useVuex(() => ({
-    newsItems: AnnouncementsService.state,
+    newsItems: AnnouncementsService.state.news,
   }));
+
+  useEffect(() => {
+    AnnouncementsService.actions.getNews();
+
+    return () => {
+      AnnouncementsService.actions.seenNews();
+    };
+  }, []);
 
   function handleClick(item: IAnnouncementsInfo) {
     return () => {
