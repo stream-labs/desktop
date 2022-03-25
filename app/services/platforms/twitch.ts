@@ -6,7 +6,7 @@ import {
   IPlatformState,
   TPlatformCapability,
 } from '.';
-import { HostsService } from 'services/hosts';
+import { UrlService } from 'services/hosts';
 import { Inject } from 'services/core/injector';
 import { authorizedHeaders, jfetch } from 'util/requests';
 import { UserService } from 'services/user';
@@ -70,7 +70,7 @@ interface ITwitchServiceState extends IPlatformState {
 export class TwitchService
   extends BasePlatformService<ITwitchServiceState>
   implements IPlatformService {
-  @Inject() hostsService: HostsService;
+  @Inject() urlService: UrlService;
   @Inject() userService: UserService;
   @Inject() customizationService: CustomizationService;
 
@@ -126,14 +126,13 @@ export class TwitchService
   }
 
   get authUrl() {
-    const host = this.hostsService.streamlabs;
     const scopes: TTwitchOAuthScope[] = ['channel_read', 'channel_editor', 'user:edit:broadcast'];
 
     const query =
       `_=${Date.now()}&skip_splash=true&external=electron&twitch&force_verify&` +
       `scope=${scopes.join(',')}&origin=slobs`;
 
-    return `https://${host}/slobs/login?${query}`;
+    return `${this.urlService.streamlabsBase}/slobs/login?${query}`;
   }
 
   // TODO: Refactor so this is reusable
@@ -215,8 +214,7 @@ export class TwitchService
   }
 
   fetchNewToken(): Promise<void> {
-    const host = this.hostsService.streamlabs;
-    const url = `https://${host}/api/v5/slobs/twitch/refresh`;
+    const url = this.urlService.getStreamlabsApi('twitch/refresh');
     const headers = authorizedHeaders(this.userService.apiToken!);
     const request = new Request(url, { headers });
 

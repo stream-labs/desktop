@@ -48,13 +48,17 @@ export class HostsService extends Service {
 }
 
 export class UrlService extends Service {
-  @Inject('HostsService') private hosts: HostsService;
+  @Inject('HostsService') private hostsService: HostsService;
 
   get protocol() {
     return Util.shouldUseLocalHost() ? 'http://' : 'https://';
   }
 
+  get streamlabsBase() {
+    return `${this.protocol}${this.hostsService.streamlabs}`;
+  }
+
   getStreamlabsApi(endpoint: string) {
-    return `${this.protocol}${this.hosts.streamlabs}/api/v5/slobs/${endpoint}`;
+    return `${this.streamlabsBase}/api/v5/slobs/${endpoint}`;
   }
 }
