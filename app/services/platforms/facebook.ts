@@ -664,7 +664,7 @@ export class FacebookService
       this.state.facebookPages.find(p => p.id === this.state.settings.pageId);
 
     // determine the chat url
-    if (page && page.category === 'Gaming Video Creator') {
+    if (page && page.category === 'Gaming video creator') {
       // GVC pages have a specific chat url
       return `https://www.facebook.com/live/producer/dashboard/${this.state.videoId}/COMMENTS/`;
     } else if (page && this.state.settings.game) {
