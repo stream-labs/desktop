@@ -106,7 +106,7 @@
   "Failed to update settings for %{platformName}": "Indstillinger for %{platformName} kunne ikke opdateres",
   "prepopulateStreamSettingsError": "Der opstod en fejl under indlæsningen af dine kanaloplysninger. Du kan prøve at &lt;fetch-again-link&gt;indlæse oplysningerne igen&lt;/fetch-again-link&gt;, eller du kan bare &lt;just-go-live-link&gt;gå live&lt;/just-go-live-link&gt;. Hvis problemet fortsætter, kan du prøve at logge ud og ind igen.",
   "updateStreamSettingsError": "Der opstod en fejl under opdateringen af streamoplysningerne. Du kan &lt;try-again-link&gt;prøve igen&lt;/try-again-link&gt;, eller du kan &lt;just-go-live-link&gt;bare gå live&lt;/just-go-live-link&gt;. Hvis problemet fortsætter, kan du prøve at logge ud og ind igen.",
-  "twitchMissedScopeError": "<p>Det ser ud til at du har tilsluttet din Twitch-konto via streamlabs.com-webstedet. For at starte streaming skal du tilslutte kontoen igen ved at bruge knappen </p><connect-button>Tilslut Twitch</connect-button> i Streamlabs Desktop",
+  "twitchMissedScopeError": "<p>Det ser ud til, at du er logget ind på din Twitch-konto via streamlabs.com-webstedet. For at kunne streame skal du logge ind igen via Streamlabs Desktop</p><connect-button>Log på Twitch</connect-button>",
   "Multistreaming to these platforms requires Prime": "Multistreaming til disse platforme kræver Prime",
   "Become a Prime member": "Opret et Prime-medlemskab",
   "You must select a game for %{platformName}": "Du skal vælge et spil til %{platformName}",
