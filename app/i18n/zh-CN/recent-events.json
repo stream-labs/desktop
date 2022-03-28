@@ -75,7 +75,7 @@
   "Disable Safe Mode": "禁用安全模式",
   "Something went wrong disabling Safe Mode": "禁用安全模式时出现问题",
   "Automatically disable Safe Mode": "自动禁用安全模式",
-  "Disable after <duration></duration> minutes": "&lt;duration&gt;&lt;/duration&gt;分钟后禁用",
+  "Disable after <duration></duration> minutes": "<duration></duration>分钟后禁用",
   "has resubscribed": "has resubscribed",
   "has gifted a sub to": "has gifted a sub to",
   "has resubscribed for %{streak} months in a row! (%{months} total)": "has resubscribed for %{streak} months in a row! (%{months} total)",
