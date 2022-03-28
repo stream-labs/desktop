@@ -106,7 +106,7 @@
   "Failed to update settings for %{platformName}": "%{platformName} için ayarlar güncellenemedi",
   "prepopulateStreamSettingsError": "Kanal bilginiz alınırken bir hata oluştu. &lt;fetch-again-link&gt;Bilgileri almayı tekrar&lt;/fetch-again-link&gt; deneyebilirsiniz veya &lt;just-go-live-link&gt;doğrudan canlı yayına geçebilirsiniz&lt;/just-go-live-link&gt;. Bu hata devam ediyorsa oturumunuzu kapatıp yeniden açmayı deneyebilirsiniz.",
   "updateStreamSettingsError": "Yayın bilgileriniz güncellenirken bir hata oluştu. &lt;try-again-link&gt;Tekrar deneyebilir&lt;/try-again-link&gt; veya &lt;just-go-live-link&gt;canlı yayına geçebilirsiniz&lt;/just-go-live-link&gt;. Bu hata devam ediyorsa oturumunuzu kapatıp yeniden açmayı deneyebilirsiniz.",
-  "twitchMissedScopeError": "&lt;p&gt;Twitch hesabınızı streamlabs.com web sitesine bağladığınız görülüyor. Yayını başlatmak için Streamlabs Desktop aracılığıyla tekrar bağlamanız gerekir&lt;/p&gt;&lt;connect-button&gt;Twitch’e Bağlan&lt;/connect-button&gt;",
+  "twitchMissedScopeError": "<p>Twitch hesabınızı streamlabs.com web sitesine bağladığınız görülüyor. Yayını başlatmak için şuradan tekrar bağlanmanız gerekir: Streamlabs Desktop</p><connect-button>Twitch’e Bağlan</connect-button>",
   "Multistreaming to these platforms requires Prime": "Bu platformlara çoklu yayın yapmak için Prime gereklidir",
   "Become a Prime member": "Prime üyesi olun",
   "You must select a game for %{platformName}": "%{platformName} için bir oyun seçmelisiniz",
