@@ -106,7 +106,7 @@
   "Failed to update settings for %{platformName}": "未能更新 %{platformName}的设置",
   "prepopulateStreamSettingsError": "提取您的频道信息时出错。您可以尝试&lt;fetch-again-link&gt;再次获取信息&lt;/fetch-again-link&gt;，也可以&lt;just-go-live-link&gt;直接上线&lt;/just-go-live-link&gt;。如果此错误仍然存在，您可以尝试注销然后重新登录。",
   "updateStreamSettingsError": "更新您的直播信息时出错。您可以&lt;try-again-link&gt;再试一次&lt;/try-again-link&gt;，也可以&lt;just-go-live-link&gt;直接上线&lt;/just-go-live-link&gt;。如果此错误仍然存在，您可以尝试注销然后重新登录。",
-  "twitchMissedScopeError": "&lt;p&gt;您似乎在 streamlabs.com 网站上连接了您的 Twitch 帐户。要开始直播，您应通过 Streamlabs Desktop 再次连接它&lt;/p&gt;&lt;connect-button&gt;连接 Twitch&lt;/connect-button&gt;",
+  "twitchMissedScopeError": "<p>您似乎在 streamlabs.com 网站上连接了您的 Twitch 帐户。要开始直播，您应通过 Streamlabs Desktop 再次连接它</p><connect-button>连接 Twitch</connect-button>",
   "Multistreaming to these platforms requires Prime": "多重直播至这些平台需要 Prime",
   "Become a Prime member": "成为 Prime 会员",
   "You must select a game for %{platformName}": "您必须为 %{platformName}选择一个游戏",
