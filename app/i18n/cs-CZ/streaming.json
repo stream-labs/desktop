@@ -106,7 +106,7 @@
   "Failed to update settings for %{platformName}": "Nepodařilo se aktualizovat nastavení pro %{platformName}",
   "prepopulateStreamSettingsError": "Při pokusu o načtení informací o kanálu došlo k chybě. Můžete zkusit &lt;fetch-again-link&gt;informace načíst znovu&lt;/fetch-again-link&gt; nebo můžete &lt;just-go-live-link&gt;začít živé vysílání&lt;/just-go-live-link&gt;. Pokud tato chyba přetrvá, můžete se zkusit odhlásit a znovu přihlásit.",
   "updateStreamSettingsError": "Při aktualizaci informací o streamu došlo k chybě. Můžete to &lt;try-again-link&gt;zkusit znovu&lt;/try-again-link&gt; nebo můžete &lt;just-go-live-link&gt;začít živé vysílání&lt;/just-go-live-link&gt;. Pokud tato chyba přetrvává, můžete se zkusit odhlásit a znovu přihlásit.",
-  "twitchMissedScopeError": "&lt;p&gt;Zdá se, že jste svůj účet Twitch připojili na stránce streamlabs.com. Chcete-li začít streamovat, je třeba účet připojit znovu prostřednictvím Streamlabs Desktop&lt;/p&gt;&lt;connect-button&gt;Připojit Twitch&lt;/connect-button&gt;",
+  "twitchMissedScopeError": "<p>Zdá se, že jste svůj účet Twitch připojili na stránce streamlabs.com. Chcete-li začít streamovat, je třeba účet připojit znovu prostřednictvím Streamlabs Desktop</p><connect-button>Připojit Twitch</connect-button>",
   "Multistreaming to these platforms requires Prime": "Multistreaming na tyto platformy vyžaduje službu Prime",
   "Become a Prime member": "Staňte se členem služby Prime",
   "You must select a game for %{platformName}": "Musíte vybrat hru pro %{platformName}",
