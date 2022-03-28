@@ -106,7 +106,7 @@
   "Failed to update settings for %{platformName}": "Не удалось обновить настройки для %{platformName}",
   "prepopulateStreamSettingsError": "Не удалось получить информацию о вашем канале. Попробуйте &lt;fetch-again-link&gt;повторно запросить информацию&lt;/fetch-again-link&gt; или &lt;just-go-live-link&gt;просто начать эфир&lt;/just-go-live-link&gt;. Если ошибка не будет устранена, попробуйте выйти из системы и войти снова.",
   "updateStreamSettingsError": "Не удалось обновить информацию о вашей трансляции. Попробуйте &lt;try-again-link&gt;повторно обновить информацию&lt;/try-again-link&gt; или &lt;just-go-live-link&gt;просто начать эфир&lt;/just-go-live-link&gt;. Если ошибка повторится, попробуйте выйти из системы и войти снова.",
-  "twitchMissedScopeError": "&lt;p&gt;Похоже, вы уже подключили учетную запись Twitch на сайте streamlabs.com. Чтобы начать эфир, подключите ее снова через Streamlabs Desktop&lt;/p&gt;&lt;connect-button&gt;Подключить Twitch&lt;/connect-button&gt;",
+  "twitchMissedScopeError": "<p>Похоже, вы уже подключили учетную запись на сайте streamlabs.com. Чтобы начать эфир, подключите ее снова через Streamlabs Desktop</p><connect-button>Connect Twitch</connect-button>",
   "Multistreaming to these platforms requires Prime": "Для многопоточной трансляции на этих платформах требуется Prime",
   "Become a Prime member": "Стать участником Prime",
   "You must select a game for %{platformName}": "Выберите игру для %{platformName}",
