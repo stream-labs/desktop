@@ -106,7 +106,7 @@
   "Failed to update settings for %{platformName}": "Gagal memperbarui pengaturan untuk %{platformName}",
   "prepopulateStreamSettingsError": "Terjadi kesalahan saat mengambil informasi channel Anda. Anda dapat mencoba &lt;fetch-again-link&gt;mengambil informasi kembali&lt;/fetch-again-link&gt; atau Anda bisa &lt;just-go-live-link&gt;langsung live&lt;/just-go-live-link&gt;. Jika masih menemui masalah ini, Anda bisa mencoba log out dan log in kembali.",
   "updateStreamSettingsError": "Terjadi kesalahan saat memperbarui info streaming Anda. Anda dapat mencoba kembali, atau Anda bisa &lt;just-go-live-link&gt;langsung live&lt;/just-go-live-link&gt;. Jika masih menemui masalah ini, Anda bisa mencoba log out dan log in kembali.",
-  "twitchMissedScopeError": "&lt;p&gt;Sepertinya Anda telah menghubungkan akun Twitch Anda di situs web streamlabs.com. Untuk mulai streaming, Anda harus menghubungkannya kembali via Streamlabs Desktop&lt;/p&gt;&lt;connect-button&gt;Hubungkan Twitch&lt;/connect-button&gt;",
+  "twitchMissedScopeError": "<p>Sepertinya Anda telah menghubungkan akun Twitch Anda di situs web streamlabs.com. Untuk mulai streaming, Anda harus menghubungkannya kembali via Streamlabs Desktop</p><connect-button>Connect Twitch</connect-button>",
   "Multistreaming to these platforms requires Prime": "Multistreaming ke semua platform ini memerlukan Prime",
   "Become a Prime member": "Menjadi anggota Prime",
   "You must select a game for %{platformName}": "Anda harus memilih sebuah game untuk %{platformName}",
