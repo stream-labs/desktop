@@ -106,7 +106,7 @@
   "Failed to update settings for %{platformName}": "%{platformName} 설정 업데이트 실패",
   "prepopulateStreamSettingsError": "채널 정보를 가져오는 중 오류가 발생했습니다. &lt;fetch-again-link&gt;정보를 다시 가져오거나&lt;/fetch-again-link&gt; &lt;just-go-live-link&gt;그냥 라이브를 시작&lt;/just-go-live-link&gt;할 수 있습니다. 오류가 계속되는 경우, 로그아웃한 뒤 다시 시도하세요.",
   "updateStreamSettingsError": "스트리밍 정보 업데이트 중 문제가 발생했습니다. &lt;try-again-link&gt;다시 시도&lt;/try-again-link&gt;하거나 &lt;just-go-live-link&gt;그냥 라이브를 시작&lt;/just-go-live-link&gt;할 수 있습니다. 오류가 계속되는 경우, 로그아웃한 뒤 다시 시도하세요.",
-  "twitchMissedScopeError": "&lt;p&gt;streamlabs.com 웹사이트에서 Twitch 계정을 연결하신 것 같습니다. 스트리밍을 시작하려면 Streamlabs 데스크톱&lt;/p&gt;&lt;connect-button&gt;Twitch 연결&lt;/connect-button&gt;을 통해 연결하셔야 합니다.",
+  "twitchMissedScopeError": "<p>streamlabs.com 웹사이트에서 Twitch 계정을 연결하신 것 같습니다. 스트리밍을 시작하려면 Streamlabs Desktop</p><connect-button>Twitch 연결</connect-button>을 통해 연결하셔야 합니다.",
   "Multistreaming to these platforms requires Prime": "해당 플랫폼으로 멀티 스트리밍하려면 Prime이 필요합니다",
   "Become a Prime member": "Prime 멤버 되기",
   "You must select a game for %{platformName}": "%{platformName}에 게임을 선택해야 합니다",
