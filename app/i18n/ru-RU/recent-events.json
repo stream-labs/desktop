@@ -75,7 +75,7 @@
   "Disable Safe Mode": "Отключить безопасный режим",
   "Something went wrong disabling Safe Mode": "При отключении безопасного режима произошла ошибка",
   "Automatically disable Safe Mode": "Автоматически отключать безопасный режим",
-  "Disable after <duration></duration> minutes": "Отключать через &lt;duration&gt;&lt;/duration&gt; минут",
+  "Disable after <duration></duration> minutes": "Отключать через <duration></duration> минут",
   "has resubscribed": "has resubscribed",
   "has gifted a sub to": "has gifted a sub to",
   "has resubscribed for %{streak} months in a row! (%{months} total)": "has resubscribed for %{streak} months in a row! (%{months} total)",
