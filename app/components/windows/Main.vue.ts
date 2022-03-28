@@ -1,6 +1,5 @@
 import Vue from 'vue';
 import { Component, Watch } from 'vue-property-decorator';
-import SideNav from '../SideNav';
 import {
   NewsBanner,
   TitleBar,
@@ -11,6 +10,7 @@ import {
   Highlighter,
   ThemeAudit,
   LayoutEditor,
+  SideNav,
 } from 'components/shared/ReactComponentList';
 import { ScenesService } from 'services/scenes';
 import { PlatformAppsService } from 'services/platform-apps';
