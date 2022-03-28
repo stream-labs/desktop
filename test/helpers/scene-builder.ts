@@ -79,7 +79,7 @@ export class SceneBuilder {
     }
 
     // normalize sketch by removing spaces at the beginning of each line
-    strings = strings.map(str => str.substr(offset));
+    strings = strings.map(str => str.slice(offset));
 
     const foldersStack: ISceneBuilderNode[] = [];
     const result: ISceneBuilderNode[] = [];
