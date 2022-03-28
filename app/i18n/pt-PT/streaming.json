@@ -106,7 +106,7 @@
   "Failed to update settings for %{platformName}": "Falha ao atualizar definições para %{platformName}",
   "prepopulateStreamSettingsError": "Ocorreu um erro ao obter a informação do canal. Pode tentar &lt;fetch-again-link&gt;obter a informação novamente&lt;/fetch-again-link&gt; ou &lt;just-go-live-link&gt;simplesmente iniciar a transmissão em direto&lt;/just-go-live-link&gt;. Se o erro persistir, pode tentar terminar e iniciar sessão novamente.",
   "updateStreamSettingsError": "Ocorreu um erro ao atualizar as informações da sua transmissão. Pode tentar &lt;try-again-link&gt;tentar novamente&lt;/try-again-link&gt; ou &lt;just-go-live-link&gt;simplesmente iniciar a transmissão em direto&lt;/just-go-live-link&gt;. Se o erro persistir, pode tentar terminar e iniciar sessão novamente.",
-  "twitchMissedScopeError": "&lt;p&gt;Parece que ligou a sua conta Twitch no website streamlabs.com. Para iniciar a transmissão, deve ligar novamente através do botão &lt;/p&gt;&lt;connect-button&gt;Ligar Twitch&lt;/connect-button&gt; do Streamlabs Desktop",
+  "twitchMissedScopeError": "<p>Parece que ligou a sua conta Twitch no website streamlabs.com. Para iniciar a transmissão, deve ligar novamente no Streamlabs Desktop com o botão</p><connect-button>Ligar Twitch</connect-button>",
   "Multistreaming to these platforms requires Prime": "A multitransmissão para estas plataformas requer o Prime",
   "Become a Prime member": "Torne-se um membro Prime",
   "You must select a game for %{platformName}": "Deve selecionar um jogo para %{platformName}",
