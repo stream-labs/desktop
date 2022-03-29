@@ -207,7 +207,7 @@ function PrimaryStudioTab(p: { currentPage: string; navigate: (page: TAppPage) =
           />
         )}
       </div>
-      <Animation transitionName="sidenav-slide">
+      <Animation transitionName="ant-slide-up">
         {showTabDropdown && (
           <div className={styles.studioTabs}>
             {studioTabs.slice(1).map(page => (
