@@ -59,7 +59,7 @@ const ONBOARDING_STEPS = () => ({
   },
   [EOnboardingSteps.HardwareSetup]: {
     element: onboardingSteps.HardwareSetup,
-    component: 'Connect',
+    component: 'HardwareSetup',
     disableControls: false,
     hideSkip: false,
     hideButton: false,

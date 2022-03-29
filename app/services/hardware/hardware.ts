@@ -46,11 +46,11 @@ export class HardwareService extends StatefulService<IHardwareServiceState> {
     });
   }
 
-  getDevices() {
+  get devices() {
     return this.state.devices;
   }
 
-  getDshowDevices() {
+  get dshowDevices() {
     return this.state.dshowDevices;
   }
 

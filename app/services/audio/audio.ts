@@ -180,10 +180,10 @@ export class AudioService extends StatefulService<IAudioSourcesState> {
     };
   }
 
-  getDevices(): IDevice[] {
-    return this.hardwareService
-      .getDevices()
-      .filter(device => [EDeviceType.audioOutput, EDeviceType.audioInput].includes(device.type));
+  get devices(): IDevice[] {
+    return this.hardwareService.devices.filter(device =>
+      [EDeviceType.audioOutput, EDeviceType.audioInput].includes(device.type),
+    );
   }
 
   showAdvancedSettings(sourceId?: string) {

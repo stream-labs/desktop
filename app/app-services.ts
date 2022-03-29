@@ -165,6 +165,7 @@ import { SpinWheelService } from 'services/widgets/settings/spin-wheel';
 import { LayoutService } from './services/layout';
 import { ProjectorService } from './services/projector';
 import { ObsImporterService } from 'services/obs-importer';
+import { DefaultHardwareService } from 'services/hardware';
 
 export const AppServices = {
   AppService,
@@ -218,4 +219,5 @@ export const AppServices = {
   LayoutService,
   ProjectorService,
   ObsImporterService,
+  DefaultHardwareService,
 };

@@ -116,13 +116,13 @@ export class DefaultHardwareService extends PersistentStatefulService<IDefaultHa
   }
 
   get videoDevices() {
-    return this.hardwareService
-      .getDshowDevices()
-      .filter(device => EDeviceType.videoInput === device.type);
+    return this.hardwareService.dshowDevices.filter(
+      device => EDeviceType.videoInput === device.type,
+    );
   }
 
   get audioDevices() {
-    return this.audioService.getDevices().filter(device => device.type === EDeviceType.audioInput);
+    return this.audioService.devices.filter(device => device.type === EDeviceType.audioInput);
   }
 
   get selectedAudioSource() {
