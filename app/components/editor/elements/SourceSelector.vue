@@ -123,6 +123,10 @@ i.disabled {
       color: var(--icon);
     }
   }
+  .icon-right {
+    transform: translate(-20%, 180%) rotate(-90deg);
+    display: block;
+  }
 }
 
 .sl-vue-tree-title {

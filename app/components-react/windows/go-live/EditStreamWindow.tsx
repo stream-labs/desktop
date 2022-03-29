@@ -9,7 +9,7 @@ import GoLiveChecklist from './GoLiveChecklist';
 import Form, { useForm } from '../../shared/inputs/Form';
 import Animation from 'rc-animate';
 import { SwitchInput } from '../../shared/inputs';
-import { useGoLiveSettings } from './useGoLiveSettings';
+import { useGoLiveSettingsRoot } from './useGoLiveSettings';
 import PlatformSettings from './PlatformSettings';
 import Scrollable from '../../shared/Scrollable';
 import Spinner from '../../shared/Spinner';
@@ -27,7 +27,7 @@ export default function EditStreamWindow() {
     prepopulate,
     isLoading,
     form,
-  } = useGoLiveSettings({ isUpdateMode: true }).select();
+  } = useGoLiveSettingsRoot({ isUpdateMode: true }).select();
 
   const shouldShowChecklist = lifecycle === 'runChecklist';
   const shouldShowSettings = !shouldShowChecklist;
@@ -94,7 +94,7 @@ export default function EditStreamWindow() {
         <Animation transitionName="fade">
           {/* STEP 1 - FILL OUT THE SETTINGS FORM */}
           {shouldShowSettings && (
-            <Scrollable key={'settings'} style={{ maxHeight: '100%' }} snapToWindowEdge>
+            <Scrollable key={'settings'} style={{ height: '100%' }} snapToWindowEdge>
               <GoLiveError />
               <PlatformSettings />
             </Scrollable>

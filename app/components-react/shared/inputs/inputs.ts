@@ -13,18 +13,24 @@ import isEqual from 'lodash/isEqual';
 import * as InputComponents from './index';
 
 type TInputType =
+  | 'code'
+  | 'color'
+  | 'card'
   | 'text'
   | 'textarea'
   | 'number'
   | 'toggle'
   | 'checkbox'
   | 'list'
+  | 'mediaurl'
+  | 'audiourl'
   | 'tags'
   | 'switch'
   | 'date'
   | 'slider'
   | 'image'
-  | 'time';
+  | 'time'
+  | 'file';
 
 export type TInputLayout = 'horizontal' | 'vertical' | 'inline';
 
@@ -39,8 +45,8 @@ export interface IInputCommonProps<TValue> {
   max?: number;
   placeholder?: string;
   disabled?: boolean;
+  readOnly?: boolean;
   debounce?: number;
-  emptyVal?: string;
   /**
    * true if the input is in the uncontrolled mode
    * all input components except text inputs are controlled by default
@@ -97,7 +103,7 @@ type TCreateSlobsInputProps<
  */
 export function useInput<
   TInputProps extends TSlobsInputProps<{}, any>,
-  TValue = TInputProps['value']
+  TValue = NonNullable<TInputProps['value']>
 >(type: TInputType, inputProps: TInputProps, antFeatures?: readonly string[]) {
   const { name, value, label } = inputProps;
 
@@ -142,14 +148,16 @@ export function useInput<
   }
 
   useEffect(() => {
-    // set empty string as a default empty value
-    const emptyVal = typeof inputProps.emptyVal === 'undefined' ? '' : inputProps.emptyVal;
-
     // if the input is inside the form
     // then we need to setup it's value via Form API
-    if (form && value !== emptyVal) {
+    if (form) {
       // get the component class
       const Component = getInputComponentByType(type);
+
+      if (!Component) {
+        throw new Error(`Component "${type}" not found.`);
+      }
+
       // antd components may have another format than SLOBS wrapper components
       // for example TimerInput requires dates to be in the Moment format
       // meanwhile SLOBS services works with timestamps only
@@ -213,10 +221,12 @@ export function useInput<
       'labelCol',
       'wrapperCol',
       'disabled',
+      'readOnly',
       'nowrap',
       'layout',
       'rules',
       'tooltip',
+      'hidden',
     ]),
     rules,
     'data-role': 'input-wrapper',
@@ -229,11 +239,11 @@ export function useInput<
 
   // pick props for the input element
   const inputAttrs = {
-    ...(pick(inputProps, 'disabled', 'placeholder', 'size', antFeatures || []) as {}),
+    ...(pick(inputProps, 'disabled', 'readOnly', 'placeholder', 'size', antFeatures || []) as {}),
     ...dataAttrs,
     'data-role': 'input',
     name: inputId,
-    value: localValueRef.current,
+    value: localValueRef.current as TValue,
     onChange,
   };
 
@@ -244,9 +254,11 @@ export function useInput<
   return {
     inputAttrs: inputAttrsRef.current,
     wrapperAttrs: wrapperAttrsRef.current,
+    dataAttrs,
     forceUpdate,
     setLocalValue,
     emitChange,
+    form,
   };
 }
 
@@ -259,7 +271,7 @@ export function useTextInput<
     TValue
   >,
   TValue extends string | number = string
->(type: 'text' | 'textarea' | 'number', p: TProps, antFeatures?: Parameters<typeof useInput>[2]) {
+>(type: TInputType, p: TProps, antFeatures?: Parameters<typeof useInput>[2]) {
   // Text inputs are uncontrolled by default for better performance
   const uncontrolled = p.uncontrolled === true || p.uncontrolled !== false;
   const { inputAttrs, wrapperAttrs, forceUpdate, setLocalValue, emitChange } = useInput(
@@ -285,7 +297,7 @@ export function useTextInput<
 
   const onBlur = useCallback((ev: FocusEvent<any>) => {
     // for uncontrolled components call the `onChange()` handler on blur
-    const newVal = ev.target.value;
+    const newVal = type === 'number' ? Number(ev.target.value) : ev.target.value;
     if (uncontrolled && p.value !== newVal) {
       emitChange(newVal);
     }
@@ -328,15 +340,11 @@ export function useTextInput<
  * @param stateSetter a function that changes the field given field
  * @param extraPropsGenerator a function that returns extra attributes for the input element (like disabled, placeholder,...)
  */
-export function createBinding<
-  TState extends object,
-  TFieldName extends keyof TState,
-  TExtraProps extends object = {}
->(
+export function createBinding<TState extends object, TExtraProps extends object = {}>(
   stateGetter: TState | (() => TState),
   stateSetter?: (newTarget: Partial<TState>) => unknown,
   extraPropsGenerator?: (fieldName: keyof TState) => TExtraProps,
-): TBindings<TState, TFieldName, TExtraProps> {
+): TBindings<TState, TExtraProps> {
   function getState(): TState {
     return typeof stateGetter === 'function'
       ? (stateGetter as Function)()
@@ -374,15 +382,11 @@ export function createBinding<
         ...extraProps,
       };
     },
-  }) as unknown) as TBindings<TState, TFieldName, TExtraProps>;
+  }) as unknown) as TBindings<TState, TExtraProps>;
 }
 
-export type TBindings<
-  TState extends Object,
-  TFieldName extends keyof TState,
-  TExtraProps extends Object = {}
-> = {
-  [K in TFieldName]: {
+export type TBindings<TState extends Object, TExtraProps extends Object = {}> = {
+  [K in keyof TState]: {
     name: K;
     value: TState[K];
     onChange: (newVal: TState[K]) => unknown;
@@ -392,8 +396,8 @@ export type TBindings<
     _proxyName: 'Binding';
     _binding: {
       id: string;
-      dependencies: Record<TFieldName, unknown>;
-      clone: () => TBindings<TState, TFieldName, TExtraProps>;
+      dependencies: Record<keyof TState, unknown>;
+      clone: () => TBindings<TState, TExtraProps>;
     };
   };
 

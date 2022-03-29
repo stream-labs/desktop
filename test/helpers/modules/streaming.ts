@@ -7,7 +7,7 @@ import { getApiClient } from '../api-client';
 import {
   click,
   clickButton,
-  focusChild,
+  focusChild, getFocusedWindowId,
   isDisplayed,
   select,
   selectButton,
@@ -162,7 +162,7 @@ export async function openScheduler() {
 
 export async function scheduleStream(date: Date, formData: TFormData) {
   const year = date.getFullYear();
-  const month = date.getMonth();
+  const month = date.toLocaleString('default', { month: 'short' });
   const day = date.getDate();
 
   await useMainWindow(async () => {
@@ -174,7 +174,7 @@ export async function scheduleStream(date: Date, formData: TFormData) {
 
     // select the month
     await click('.ant-picker-calendar-month-select');
-    await click(`.rc-virtual-list-holder-inner div:nth-child(${month + 1})`);
+    await click(`.rc-virtual-list-holder-inner [label="${month}"]`);
 
     // click the date
     await click(`.ant-picker-calendar-date-value=${day}`);

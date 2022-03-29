@@ -7,6 +7,8 @@ import { EWidgetType } from '../helpers/widget-helpers';
 import { FormMonkey } from '../helpers/form-monkey';
 import { ExecutionContext } from 'ava';
 import { click, focusChild, focusMain, waitForDisplayed } from '../helpers/modules/core';
+import { logIn } from '../helpers/spectron/user';
+import { sleep } from '../helpers/sleep';
 
 const path = require('path');
 
@@ -34,14 +36,18 @@ async function installOBSCache(t: ExecutionContext) {
 test('OBS Importer', async t => {
   const client = t.context.app.client;
 
-  // skip auth
-  await click('span=Skip');
+  await logIn(t, 'twitch', { prime: false }, false, true);
+  await sleep(1000);
+  await (await t.context.app.client.$('span=Skip')).click();
 
   // import from OBS
-  await click('div=Import from OBS');
+  await click('div=Import from OBS Studio');
   await click('div=Start');
 
-  await waitForDisplayed('.scene-collections-wrapper');
+  await (await t.context.app.client.$('button=Skip')).click();
+  await (await t.context.app.client.$('div=Choose Free')).click();
+
+  await waitForDisplayed('[data-name=SceneSelector]');
 
   // check collection 1 and sources
   await switchCollection('Collection 1');

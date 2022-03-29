@@ -32,21 +32,27 @@ export function useForm(name?: string) {
    * Returns an array of input values in the order as they appear in the form
    */
   async function readForm(): Promise<
-    { name: string; value: any; displayValue: boolean | string | string[] }[]
+    {
+      name: string;
+      title: string;
+      value: any;
+      displayValue: boolean | number | string | string[];
+    }[]
   > {
     return traverseForm(async input => ({
       name: input.name,
       value: await input.getValue(),
       displayValue: await input.getDisplayValue(),
+      title: await input.getTitle(),
     }));
   }
   /**
    * Returns a map of input values where key is an input name
    */
-  async function readFields() {
+  async function readFields(indexKey = 'name', valueKey = 'displayValue') {
     const fields = await readForm();
-    const fieldsMap = keyBy(fields, 'name');
-    return mapValues(fieldsMap, 'displayValue');
+    const fieldsMap = keyBy(fields, indexKey);
+    return mapValues(fieldsMap, valueKey);
   }
 
   /**
@@ -154,8 +160,12 @@ export function useForm(name?: string) {
    * Check if form contains expected data
    * Throws an exception if not
    */
-  async function assertFormContains(expectedFormData: TFormData) {
-    const actualFormData = await readFields();
+  async function assertFormContains(
+    expectedFormData: TFormData,
+    indexKey = 'name',
+    valueKey = 'displayValue',
+  ) {
+    const actualFormData = await readFields(indexKey, valueKey);
     const expectedFieldNames = Object.keys(expectedFormData);
     for (const fieldName of expectedFieldNames) {
       const expectedValue = expectedFormData[fieldName];
@@ -185,7 +195,7 @@ export function useForm(name?: string) {
     return String(value);
   }
 
-  return { readForm, fillForm, assertFormContains, getInput };
+  return { readForm, readFields, fillForm, assertFormContains, getInput };
 }
 
 /**
@@ -205,18 +215,42 @@ export async function fillForm(...args: unknown[]): Promise<unknown> {
 }
 
 /**
- * A shortcut for useForm().assertFormContains()
+ * A shortcut for useForm().readFields()
  */
-export async function assertFormContains(formData: TFormData): Promise<unknown>;
-export async function assertFormContains(formName: string, formData: TFormData): Promise<unknown>;
-export async function assertFormContains(...args: unknown[]): Promise<unknown> {
+export async function readFields(): Promise<unknown>;
+export async function readFields(formName: string): Promise<TFormData>;
+export async function readFields(...args: unknown[]): Promise<TFormData> {
   if (typeof args[0] === 'string') {
     const formName = args[0];
     const formData = args[1] as TFormData;
-    return useForm(formName).assertFormContains(formData);
+    return useForm(formName).readFields();
   } else {
     const formData = args[0] as TFormData;
-    return useForm().assertFormContains(formData);
+    return useForm().readFields();
+  }
+}
+
+/**
+ * A shortcut for useForm().assertFormContains()
+ */
+export async function assertFormContains(
+  formData: TFormData,
+  indexKey?: string,
+  valueKey?: string,
+): Promise<unknown>;
+export async function assertFormContains(
+  formName: string,
+  formData: TFormData,
+  indexKey?: string,
+  valueKey?: string,
+): Promise<unknown>;
+export async function assertFormContains(...args: any[]): Promise<unknown> {
+  if (typeof args[0] === 'string') {
+    const [formName, formData, indexKey, valueKey] = args;
+    return useForm(formName).assertFormContains(formData, indexKey, valueKey);
+  } else {
+    const [formData, indexKey, valueKey] = args;
+    return useForm().assertFormContains(formData, indexKey, valueKey);
   }
 }
 

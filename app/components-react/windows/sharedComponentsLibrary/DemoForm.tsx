@@ -6,7 +6,9 @@ import { IListOption, ListInput } from '../../shared/inputs/ListInput';
 import Form from '../../shared/inputs/Form';
 import {
   CheckboxInput,
+  FileInput,
   NumberInput,
+  SliderInput,
   SwitchInput,
   TagsInput,
   TextAreaInput,
@@ -26,11 +28,13 @@ export function DemoForm() {
     age: 0,
     colors: [] as number[],
     city: '',
+    weight: 65,
     addIntroduction: false,
     introduction: '',
     plusOneName: '',
     confirm1: false,
     confirm2: false,
+    saveFilePath: '',
   });
 
   const genderOptions = [
@@ -73,12 +77,14 @@ export function DemoForm() {
           onSearch={onCitySearch}
           loading={isSearching}
         />
+        <SliderInput {...bind.weight} label={'Weight'} min={1} max={300} />
         <TagsInput label="Pick your favorite colors" {...bind.colors} options={colorOptions} />
+        <FileInput label="Save to File" save={true} {...bind.saveFilePath} />
         <SwitchInput {...bind.addIntroduction} label={'Add Introduction'} />
         {s.addIntroduction && <TextAreaInput {...bind.introduction} label={'Introduction'} />}
         <InputWrapper>
           <CheckboxInput {...bind.confirm1} label={'Confirm you allow processing your data'} />
-          <CheckboxInput {...bind.confirm2} required label={'Confirm you love Streamlabs OBS'} />
+          <CheckboxInput {...bind.confirm2} required label={'Confirm you love Streamlabs'} />
         </InputWrapper>
       </Example>
     </Form>

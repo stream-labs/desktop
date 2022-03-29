@@ -88,9 +88,9 @@
   "here": "tutaj",
   "Link": "Link",
   "Description": "Opis",
-  "OBSInit.UnknownError": "Wystąpił nieznany błąd podczas inicjalizacji OBS.",
-  "OBSInit.ModuleNotFoundError": "Nie można odnaleźć DirectX w systemie. Zainstaluj najnowszą wersję DirectX dla swojej maszyny korzystając z odnośnika <https://www.microsoft.com/en-us/download/details.aspx?id=35?> i spróbuj ponownie.",
-  "OBSInit.NotSupportedError": "Inicjalizacja OBS nie powiodła się. Twoje sterowniki karty graficznej mogą być nieaktualne lub Streamlabs OBS nie jest obsługiwany na Twoim systemie.",
+  "OBSInit.UnknownError": "Wystąpił nieznany błąd podczas inicjalizacji Streamlabs.",
+  "OBSInit.ModuleNotFoundError": "Nie można odnaleźć DirectX w systemie. Zainstaluj najnowszą wersję DirectX dla swojej maszyny korzystając z odnośnika &lt;https://www.microsoft.com/en-us/download/details.aspx?id=35?&gt; i spróbuj ponownie.",
+  "OBSInit.NotSupportedError": "Inicjalizacja Streamlabs nie powiodła się. Twoje sterowniki karty graficznej mogą być nieaktualne lub Streamlabs Desktop nie jest obsługiwany na Twoim systemie.",
   "Log Out": "Wyloguj",
   "Layout Editor": "Edytor układu",
   "Are you sure you want to import multiple files?": "Czy na pewno chcesz importować wiele plików?",
@@ -132,5 +132,12 @@
   "Apply": "Zastosuj",
   "Do not show this message again": "Nie pokazuj tego komunikatu ponownie",
   "You can only select up to %{max} items": "Możesz wybrać tylko do %{max} elementów",
-  "Time": "Czas"
+  "Time": "Czas",
+  "Sound Volume": "Głośność dźwięku",
+  "Sound": "Dźwięk",
+  "Play Audio": "Odtwórz audio",
+  "Click here": "Kliknij tutaj",
+  "More Info": "Więcej informacji",
+  "Revert Changes": "Cofnij zmiany",
+  "Animations": "Animacje"
 }

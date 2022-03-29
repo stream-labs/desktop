@@ -2,10 +2,10 @@ import React, { useEffect, useState } from 'react';
 import cx from 'classnames';
 import { EStreamingState } from 'services/streaming';
 import { EGlobalSyncStatus } from 'services/media-backup';
-import electron from 'electron';
 import { $t } from 'services/i18n';
 import { useVuex } from '../hooks';
 import { Services } from '../service-provider';
+import * as remote from '@electron/remote';
 
 export default function StartStreamingButton(p: { disabled?: boolean }) {
   const {
@@ -49,8 +49,8 @@ export default function StartStreamingButton(p: { disabled?: boolean }) {
       StreamingService.toggleStreaming();
     } else {
       if (MediaBackupService.views.globalSyncStatus === EGlobalSyncStatus.Syncing) {
-        const goLive = await electron.remote.dialog
-          .showMessageBox(electron.remote.getCurrentWindow(), {
+        const goLive = await remote.dialog
+          .showMessageBox(remote.getCurrentWindow(), {
             title: $t('Cloud Backup'),
             type: 'warning',
             message:
@@ -69,8 +69,8 @@ export default function StartStreamingButton(p: { disabled?: boolean }) {
           .length === 0;
 
       if (needToShowNoSourcesWarning) {
-        const goLive = await electron.remote.dialog
-          .showMessageBox(electron.remote.getCurrentWindow(), {
+        const goLive = await remote.dialog
+          .showMessageBox(remote.getCurrentWindow(), {
             title: $t('No Sources'),
             type: 'warning',
             message:
@@ -112,27 +112,13 @@ export default function StartStreamingButton(p: { disabled?: boolean }) {
     const primaryPlatform = UserService.state.auth?.primaryPlatform;
     const updateStreamInfoOnLive = CustomizationService.state.updateStreamInfoOnLive;
 
+    if (!primaryPlatform) return false;
+
     if (primaryPlatform === 'twitch') {
       // For Twitch, we can show the Go Live window even with protected mode off
       // This is mainly for legacy reasons.
       return StreamingService.views.isMultiplatformMode || updateStreamInfoOnLive;
-    }
-
-    if (primaryPlatform === 'facebook') {
-      return (
-        StreamSettingsService.state.protectedModeEnabled &&
-        StreamSettingsService.isSafeToModifyStreamKey()
-      );
-    }
-
-    if (primaryPlatform === 'youtube') {
-      return (
-        StreamSettingsService.state.protectedModeEnabled &&
-        StreamSettingsService.isSafeToModifyStreamKey()
-      );
-    }
-
-    if (primaryPlatform === 'tiktok') {
+    } else {
       return (
         StreamSettingsService.state.protectedModeEnabled &&
         StreamSettingsService.isSafeToModifyStreamKey()

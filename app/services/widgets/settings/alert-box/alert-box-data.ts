@@ -30,7 +30,44 @@ export const API_NAME_MAP = {
   facebook_share: 'shares',
   facebook_follow: 'fbfollows',
   loyalty_store_redemption: 'loyaltystore',
+  trovo_follow: 'trovo_follow',
+  trovo_sub: 'trovo_sub',
+  trovo_raid: 'trovo_raid',
 };
+
+export const alertNameMap = () => ({
+  bits: $t('Bits'),
+  donations: $t('Donations'),
+  donordrive: $t('Charity Streaming Donations'),
+  patreon: $t('Patreon Pledges'),
+  extraLife: $t('Extra Life Donations'),
+  justGiving: $t('JustGiving Donations'),
+  merch: $t('Merch'),
+  resubs: $t('Resubs'),
+  gamewisp: $t('Gamewisp Subscriptions'),
+  subs: $t('Subscriptions'),
+  tiltify: $t('Tiltify Donations'),
+  treat: $t('TreatStream'),
+  follows: $t('Follows'),
+  hosts: $t('Hosts'),
+  raids: $t('Raids'),
+  superhearts: $t('Super Hearts'),
+  fanfunding: $t('Super Chat'),
+  sponsors: $t('Members'),
+  subscribers: $t('Subscribers'), // YouTube
+  stars: $t('Stars'),
+  support: $t('Support'),
+  giftSupport: $t('Gifted Support'),
+  likes: $t('Likes'),
+  shares: $t('Shares'),
+  fbfollows: $t('Follows'),
+  loyaltystore: $t('Cloudbot Store'),
+  stickers: $t('Stickers'),
+  effects: $t('Effects/Rallies'),
+  trovo_follow: $t('Trovo Follow'),
+  trovo_sub: $t('Trovo Subscription'),
+  trovo_raid: $t('Trovo Raid'),
+});
 
 // different tests are required due to api idiosyncracies
 const determineTester = (key: string) => {
@@ -68,6 +105,10 @@ export const conditions = () => ({
     {
       value: 'MIN_SUBSCRIPTION_STREAK',
       title: $t('Streak shared with chat, and months subscribed in a streak is at least <months>'),
+    },
+    {
+      value: 'SUBSCRIPTION_PRIME_UPGRADE',
+      title: $t('When a Prime Gaming sub is upgraded to a recurring <tier> sub'),
     },
   ],
   hosts: [{ value: 'MIN_VIEWERS_ACQUIRED', title: $t('Viewers gained is at least <viewers>') }],
@@ -146,6 +187,7 @@ export const conditionData = () => ({
   SUBSCRIPTION_GIFT: metadata.frequency({ title: $t('Variation Frequency') }),
   SUBSCRIPTION_PRIME: metadata.frequency({ title: $t('Variation Frequency') }),
   SUBTEMBER: metadata.frequency({ title: $t('Variation Frequency') }),
+  SUBSCRIPTION_PRIME_UPGRADE: metadata.frequency({ title: $t('Variation Frequency') }),
   ANON_SUBSCRIPTION_GIFT: metadata.frequency({ title: $t('Variation Frequency') }),
   SUB_EXTENDED: metadata.frequency({ title: $t('Variation Frequency') }),
   SUPPORT_GIFT_REDEEMED: metadata.frequency({ title: $t('Variation Frequency') }),

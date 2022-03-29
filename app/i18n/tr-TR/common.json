@@ -88,9 +88,9 @@
   "here": "buraya",
   "Link": "Bağlantı",
   "Description": "Açıklama",
-  "OBSInit.UnknownError": "OBS başlatılırken bilinmeyen bir hatayla karşılaşıldı.",
-  "OBSInit.ModuleNotFoundError": "Sisteminizde DirectX bulunamadı. Lütfen <https://www.microsoft.com/en-us/download/details.aspx?id=35?> adresinden makineniz için en son DirectX sürümünü yükleyin ve tekrar deneyin.",
-  "OBSInit.NotSupportedError": "OBS başlatılamadı. Video sürücüleriniz güncel olmayabilir veya Streamlabs OBS sisteminizde desteklenmiyor olabilir.",
+  "OBSInit.UnknownError": "Streamlabs başlatılırken bilinmeyen bir hatayla karşılaşıldı.",
+  "OBSInit.ModuleNotFoundError": "Sisteminizde DirectX bulunamadı. Lütfen &lt;https://www.microsoft.com/en-us/download/details.aspx?id=35?&gt; adresinden makineniz için en son DirectX sürümünü yükleyin ve tekrar deneyin.",
+  "OBSInit.NotSupportedError": "Streamlabs başlatılamadı. Video sürücüleriniz güncel olmayabilir veya Streamlabs Desktop sisteminizde desteklenmiyor olabilir.",
   "Log Out": "Çıkış Yap",
   "Layout Editor": "Düzen Editörü",
   "Are you sure you want to import multiple files?": "Birden fazla dosyayı aktarmak istediğinize emin misiniz?",
@@ -132,5 +132,12 @@
   "Apply": "Uygula",
   "Do not show this message again": "Bu mesajı tekrar gösterme",
   "You can only select up to %{max} items": "En fazla %{max} öğeye kadar seçebilirsiniz",
-  "Time": "Zaman"
+  "Time": "Zaman",
+  "Sound Volume": "Ses Düzeyi",
+  "Sound": "Ses",
+  "Play Audio": "Sesi Çal",
+  "Click here": "Buraya tıklayın",
+  "More Info": "Daha Fazla Bilgi",
+  "Revert Changes": "Değişiklikleri Geri Al",
+  "Animations": "Animasyonlar"
 }

@@ -15,7 +15,8 @@ import HFormGroup from 'components/shared/inputs/HFormGroup.vue';
 import electron from 'electron';
 import { UserService } from 'services/user';
 import { ChatService } from 'services/chat';
-import { CustomizationService } from 'app-services';
+import * as remote from '@electron/remote';
+import { AudioService, CustomizationService } from 'app-services';
 
 @Component({
   components: { ModalLayout, Selector, Display, HFormGroup },
@@ -30,6 +31,7 @@ export default class AddSource extends Vue {
   @Inject() userService: UserService;
   @Inject() chatService: ChatService;
   @Inject() customizationService: CustomizationService;
+  @Inject() audioService: AudioService;
 
   name = '';
   error = '';
@@ -76,7 +78,7 @@ export default class AddSource extends Vue {
     } else if (this.sourceAddOptions.propertiesManager === 'iconLibrary') {
       this.name = $t('Custom Icon');
     } else if (this.sourceAddOptions.propertiesManager === 'widget') {
-      this.name = this.sourcesService.suggestName(
+      this.name = this.sourcesService.views.suggestName(
         WidgetDisplayData(this.platform)[this.widgetType].name,
       );
     } else if (this.sourceAddOptions.propertiesManager === 'platformApp') {
@@ -87,7 +89,7 @@ export default class AddSource extends Vue {
         source => source.id === this.sourceAddOptions.propertiesManagerSettings.appSourceId,
       ).name;
 
-      this.name = this.sourcesService.suggestName(sourceName);
+      this.name = this.sourcesService.views.suggestName(sourceName);
     } else {
       const sourceType =
         this.sourceType &&
@@ -95,7 +97,7 @@ export default class AddSource extends Vue {
           .getAvailableSourcesTypesList()
           .find(sourceTypeDef => sourceTypeDef.value === this.sourceType);
 
-      this.name = this.sourcesService.suggestName(this.sourceType && sourceType.description);
+      this.name = this.sourcesService.views.suggestName(this.sourceType && sourceType.description);
     }
   }
 
@@ -113,7 +115,7 @@ export default class AddSource extends Vue {
     if (!scene.canAddSource(this.selectedSourceId)) {
       // for now only a scene-source can be a problem
 
-      electron.remote.dialog.showErrorBox(
+      remote.dialog.showErrorBox(
         $t('Error'),
         $t(
           'Unable to add a source: the scene you are trying to add already contains your current scene',
@@ -144,7 +146,6 @@ export default class AddSource extends Vue {
       if (this.sourceAddOptions.propertiesManager === 'widget') {
         const widget = this.widgetsService.createWidget(this.widgetType, this.name);
         source = widget.getSource();
-        if (this.widgetType === WidgetType.ChatHighlight) this.chatService.refreshChat();
       } else {
         const settings: Dictionary<any> = {};
 
@@ -172,6 +173,11 @@ export default class AddSource extends Vue {
         );
 
         source = item.source;
+      }
+
+      if (!source.video && source.hasProps()) {
+        this.audioService.showAdvancedSettings(source.sourceId);
+        return;
       }
 
       if (source.hasProps()) {

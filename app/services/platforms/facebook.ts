@@ -8,10 +8,10 @@ import { platformAuthorizedRequest, platformRequest } from './utils';
 import { IGoLiveSettings } from 'services/streaming';
 import { throwStreamError } from 'services/streaming/stream-error';
 import { BasePlatformService } from './base-platform';
-import electron from 'electron';
 import { WindowsService } from '../windows';
 import { assertIsDefined, getDefined } from '../../util/properties-type-guards';
 import { flatten } from 'lodash';
+import * as remote from '@electron/remote';
 
 interface IFacebookPage {
   access_token: string;
@@ -239,7 +239,7 @@ export class FacebookService
 
     // setup stream key and new settings
     const streamUrl = liveVideo.stream_url;
-    const streamKey = streamUrl.substr(streamUrl.lastIndexOf('/') + 1);
+    const streamKey = streamUrl.slice(streamUrl.lastIndexOf('/') + 1);
     if (!this.streamingService.views.isMultiplatformMode) {
       this.streamSettingsService.setSettings({
         key: streamKey,
@@ -664,7 +664,7 @@ export class FacebookService
       this.state.facebookPages.find(p => p.id === this.state.settings.pageId);
 
     // determine the chat url
-    if (page && page.category === 'Gaming Video Creator') {
+    if (page && page.category === 'Gaming video creator') {
       // GVC pages have a specific chat url
       return `https://www.facebook.com/live/producer/dashboard/${this.state.videoId}/COMMENTS/`;
     } else if (page && this.state.settings.game) {
@@ -686,9 +686,7 @@ export class FacebookService
   }
 
   createFBPage() {
-    electron.remote.shell.openExternal(
-      'https://www.facebook.com/gaming/pages/create?ref=streamlabs',
-    );
+    remote.shell.openExternal('https://www.facebook.com/gaming/pages/create?ref=streamlabs');
     this.windowsService.actions.closeChildWindow();
   }
 

@@ -17,6 +17,7 @@ import { AppService } from 'services/app';
 import { RunInLoadingMode } from 'services/app/app-decorators';
 import defaultTo from 'lodash/defaultTo';
 import { $t } from 'services/i18n';
+import * as remote from '@electron/remote';
 
 interface Source {
   name?: string;
@@ -81,7 +82,7 @@ interface IOBSConfigJSON {
 
 class ObsImporterViews extends ViewHandler<{ progress: number; total: number }> {
   get OBSconfigFileDirectory() {
-    return path.join(electron.remote.app.getPath('appData'), 'obs-studio');
+    return path.join(remote.app.getPath('appData'), 'obs-studio');
   }
 
   get sceneCollectionsDirectory() {
@@ -175,7 +176,7 @@ export class ObsImporterService extends StatefulService<{ progress: number; tota
   importFilters(filtersJSON: IOBSConfigFilter[], source: Source) {
     if (Array.isArray(filtersJSON)) {
       filtersJSON.forEach(filterJSON => {
-        const isFilterAvailable = this.filtersService.getTypes().find(availableFilter => {
+        const isFilterAvailable = this.filtersService.state.types.find(availableFilter => {
           return availableFilter.type === filterJSON.id;
         });
 
@@ -418,7 +419,15 @@ export class ObsImporterService extends StatefulService<{ progress: number; tota
   importTransitions(configJSON: IOBSConfigJSON) {
     // Only import a single transition from OBS for now.
     // Eventually we should import all transitions
-    if (configJSON.transitions && configJSON.transitions.length > 0) {
+    if (
+      configJSON.transitions &&
+      configJSON.transitions.length > 0 &&
+      // only import if it's a supported transition type
+      this.transitionsService.views
+        .getTypes()
+        .map(t => t.value)
+        .includes(configJSON.transitions[0].id as ETransitionType)
+    ) {
       this.transitionsService.deleteAllTransitions();
       this.transitionsService.createTransition(
         configJSON.transitions[0].id as ETransitionType,

@@ -26,5 +26,10 @@
   "Image URL": "画像 URL",
   "Example": "例",
   "Change Media": "メディアの変更",
-  "No Sound": "サウンドがありません"
+  "No Sound": "サウンドがありません",
+  "No Media": "メディアがありません",
+  "Change Link": "リンクを変更",
+  "Pick From Gallery": "ギャラリーから選択",
+  "Clear Link": "リンクをクリア",
+  "Media URL": "メディア URL"
 }

@@ -10,15 +10,15 @@ import { WidgetsService } from 'services/widgets';
 import { CustomizationService } from 'services/customization';
 import { SelectionService } from 'services/selection';
 import { ProjectorService } from 'services/projector';
-import { AudioService } from 'services/audio';
-import electron from 'electron';
 import { $t } from 'services/i18n';
 import { EditorCommandsService } from 'services/editor-commands';
 import { ERenderingMode } from '../../../obs-api';
 import { StreamingService } from 'services/streaming';
 import Utils from 'services/utils';
+import * as remote from '@electron/remote';
 import { ProjectorMenu } from './ProjectorMenu';
 import { FiltersMenu } from './FiltersMenu';
+import { AudioService } from 'services/audio';
 
 interface IEditMenuOptions {
   selectedSourceId?: string;
@@ -38,6 +38,7 @@ export class EditMenu extends Menu {
   @Inject() private projectorService: ProjectorService;
   @Inject() private editorCommandsService: EditorCommandsService;
   @Inject() private streamingService: StreamingService;
+  @Inject() private audioService: AudioService;
 
   private scene = this.scenesService.views.getScene(this.options.selectedSceneId);
 
@@ -169,7 +170,7 @@ export class EditMenu extends Menu {
           this.append({
             label: $t('Export Widget'),
             click: () => {
-              electron.remote.dialog
+              remote.dialog
                 .showSaveDialog({
                   filters: [{ name: 'Widget File', extensions: ['widget'] }],
                 })
@@ -219,9 +220,9 @@ export class EditMenu extends Menu {
               );
             } else {
               // remove a global source
-              electron.remote.dialog
-                .showMessageBox(electron.remote.getCurrentWindow(), {
-                  title: 'Streamlabs OBS',
+              remote.dialog
+                .showMessageBox(remote.getCurrentWindow(), {
+                  title: 'Streamlabs Desktop',
                   message: $t('This source will be removed from all of your scenes'),
                   type: 'warning',
                   buttons: [$t('Cancel'), $t('OK')],
@@ -249,7 +250,13 @@ export class EditMenu extends Menu {
     if (this.source && !isMultipleSelection) {
       this.append({
         label: $t('Rename'),
-        click: () => this.sourcesService.showRenameSource(this.source.sourceId),
+        click: () => {
+          if (this.source.type === 'scene') {
+            this.scenesService.actions.showNameScene({ rename: this.source.sourceId });
+          } else {
+            this.sourcesService.actions.showRenameSource(this.source.sourceId);
+          }
+        },
       });
 
       const filtersCount = this.sourceFiltersService.getFilters(this.source.sourceId).length;
@@ -330,7 +337,11 @@ export class EditMenu extends Menu {
   }
 
   private showProperties() {
-    this.sourcesService.showSourceProperties(this.source.sourceId);
+    if (this.options.showAudioMixerMenu || !this.source.video) {
+      this.audioService.actions.showAdvancedSettings(this.source.sourceId);
+    } else {
+      this.sourcesService.actions.showSourceProperties(this.source.sourceId);
+    }
   }
 
   private transformSubmenu() {

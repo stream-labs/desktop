@@ -1,5 +1,5 @@
 // Source helper functions
-import { focusMain, focusChild } from './core';
+import { focusMain, focusChild, closeWindow } from './core';
 import { click, clickButton, isDisplayed, select, waitForDisplayed } from './core';
 import { dialogDismiss } from '../spectron/dialog';
 import { contextMenuClick } from '../spectron/context-menu';
@@ -34,17 +34,23 @@ export async function rightClickSource(name: string) {
   await (await select(`.item-title=${name}`)).click({ button: 'right' });
 }
 
-export async function addSource(type: string, name: string, closeProps = true) {
+export async function openSourceProperties(name: string) {
+  await selectSource(name);
+  await clickSourceProperties();
+}
+
+export async function addSource(
+  type: string,
+  name: string,
+  closeProps = true,
+  audioSource = false,
+) {
   await focusMain();
   await clickAddSource();
   await focusChild();
 
-  await waitForDisplayed('h2=Welcome to sources!');
-  if (await isDisplayed(`li=${type}`)) {
-    await click(`li=${type}`); // source
-  } else {
-    await click(`div=${type}`); // widget
-  }
+  await waitForDisplayed('span=Essential Sources');
+  await click(`[data-name="${type}"]`);
 
   await clickButton('Add Source');
   const isInputVisible = await isDisplayed('input', { timeout: 200, interval: 100 });
@@ -58,7 +64,7 @@ export async function addSource(type: string, name: string, closeProps = true) {
 
   // Close source properties too
   if (closeProps) {
-    await clickButton('Done');
+    await closeWindow('child');
   } else {
     await focusChild();
   }
@@ -69,7 +75,7 @@ export async function addExistingSource(type: string, name: string) {
   await clickAddSource();
 
   await focusChild();
-  await click(`li=${type}`);
+  await click(`div=${type}`);
   await clickButton('Add Source');
   await click(`div=${name}`);
   await clickButton('Add Source');

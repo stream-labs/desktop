@@ -3,15 +3,15 @@ import Vue from 'vue';
 import { Subject } from 'rxjs';
 import cloneDeep from 'lodash/cloneDeep';
 import { IObsListOption, TObsValue } from 'components/obs/inputs/ObsInput';
-import { StatefulService, mutation, ViewHandler } from 'services/core/stateful-service';
+import { mutation, StatefulService, ViewHandler } from 'services/core/stateful-service';
 import * as obs from '../../../obs-api';
 import { Inject } from 'services/core/injector';
 import namingHelpers from 'util/NamingHelpers';
 import { WindowsService } from 'services/windows';
-import { WidgetsService, WidgetType, WidgetDisplayData } from 'services/widgets';
+import { WidgetDisplayData, WidgetsService, WidgetType } from 'services/widgets';
 import { DefaultManager } from './properties-managers/default-manager';
 import { WidgetManager } from './properties-managers/widget-manager';
-import { ScenesService, ISceneItem, Scene } from 'services/scenes';
+import { ISceneItem, Scene, ScenesService } from 'services/scenes';
 import { StreamlabelsManager } from './properties-managers/streamlabels-manager';
 import { PlatformAppManager } from './properties-managers/platform-app-manager';
 import { UserService } from 'services/user';
@@ -20,9 +20,9 @@ import {
   ISource,
   ISourceAddOptions,
   ISourcesState,
-  TSourceType,
   Source,
   TPropertiesManager,
+  TSourceType,
 } from './index';
 import uuid from 'uuid/v4';
 import { $t } from 'services/i18n';
@@ -36,8 +36,9 @@ import { IconLibraryManager } from './properties-managers/icon-library-manager';
 import { assertIsDefined } from 'util/properties-type-guards';
 import { UsageStatisticsService } from 'services/usage-statistics';
 import { SourceFiltersService } from 'services/source-filters';
-import { FileReturnWrapper } from 'util/guest-api-handler';
 import { VideoService } from 'services/video';
+import { CustomizationService } from '../customization';
+import { EAvailableFeatures, IncrementalRolloutService } from '../incremental-rollout';
 
 const AudioFlag = obs.ESourceOutputFlags.Audio;
 const VideoFlag = obs.ESourceOutputFlags.Video;
@@ -145,6 +146,10 @@ class SourcesViews extends ViewHandler<ISourcesState> {
     });
     return sourceModels.map(sourceModel => this.getSource(sourceModel.sourceId)!);
   }
+
+  suggestName(name: string): string {
+    return namingHelpers.suggestName(name, (name: string) => this.getSourcesByName(name).length);
+  }
 }
 
 export class SourcesService extends StatefulService<ISourcesState> {
@@ -169,6 +174,8 @@ export class SourcesService extends StatefulService<ISourcesState> {
   @Inject() private usageStatisticsService: UsageStatisticsService;
   @Inject() private sourceFiltersService: SourceFiltersService;
   @Inject() private videoService: VideoService;
+  @Inject() private customizationService: CustomizationService;
+  @Inject() private incrementalRolloutService: IncrementalRolloutService;
 
   get views() {
     return new SourcesViews(this.state);
@@ -426,13 +433,6 @@ export class SourcesService extends StatefulService<ISourcesState> {
     return null;
   }
 
-  suggestName(name: string): string {
-    return namingHelpers.suggestName(
-      name,
-      (name: string) => this.views.getSourcesByName(name).length,
-    );
-  }
-
   private onSceneItemRemovedHandler(sceneItemState: ISceneItem) {
     // remove source if it has been removed from the all scenes
     const source = this.views.getSource(sceneItemState.sourceId);
@@ -587,8 +587,46 @@ export class SourcesService extends StatefulService<ISourcesState> {
     if (propertiesManagerType === 'replay') propertiesName = $t('Instant Replay');
     if (propertiesManagerType === 'streamlabels') propertiesName = $t('Stream Label');
 
+    // uncomment the source type to use it's React version
+    const reactSourceProps: TSourceType[] = [
+      'color_source',
+      // 'image_source',
+      'browser_source',
+      // 'slideshow',
+      'ffmpeg_source',
+      // 'text_gdiplus',
+      // 'text_ft2_source',
+      // 'monitor_capture',
+      // 'window_capture',
+      'game_capture',
+      // 'dshow_input',
+      'dshow_input',
+      // 'wasapi_input_capture',
+      // 'wasapi_output_capture',
+      // 'decklink-input',
+      // 'scene',
+      // 'ndi_source',
+      'openvr_capture',
+      // 'screen_capture',
+      // 'liv_capture',
+      // 'ovrstream_dc_source',
+      // 'vlc_source',
+      // 'coreaudio_input_capture',
+      // 'coreaudio_output_capture',
+      // 'av_capture_input',
+      // 'display_capture',
+      // 'audio_line',
+      // 'syphon-input',
+      // 'soundtrack_source',
+    ];
+
+    const componentName =
+      reactSourceProps.includes(source.type) && propertiesManagerType === 'default'
+        ? 'SourceProperties'
+        : 'SourcePropertiesDeprecated';
+
     this.windowsService.showWindow({
-      componentName: 'SourceProperties',
+      componentName,
       title: $t('Settings for %{sourceName}', { sourceName: propertiesName }),
       queryParams: { sourceId },
       size: {
@@ -604,16 +642,57 @@ export class SourcesService extends StatefulService<ISourcesState> {
     assertIsDefined(platform);
     const widgetType = source.getPropertiesManagerSettings().widgetType;
     const componentName = this.widgetsService.getWidgetComponent(widgetType);
+
+    // React widgets are in the WidgetsWindow component
+    let reactWidgets = [
+      'AlertBox',
+      // TODO:
+      // BitGoal
+      // DonationGoal
+      // CharityGoal
+      // FollowerGoal
+      // StarsGoal
+      // SubGoal
+      // SubscriberGoal
+      // ChatBox
+      // ChatHighlight
+      // Credits
+      // DonationTicker
+      'EmoteWall',
+      // EventList
+      // MediaShare
+      // Poll
+      // SpinWheel
+      // SponsorBanner
+      // StreamBoss
+      // TipJar
+      'ViewerCount',
+      'GameWidget',
+    ];
+    const isLegacyAlertbox = this.customizationService.state.legacyAlertbox;
+    if (isLegacyAlertbox) reactWidgets = reactWidgets.filter(w => w !== 'AlertBox');
+    const isReactComponent =
+      this.incrementalRolloutService.views.featureIsEnabled(EAvailableFeatures.reactWidgets) &&
+      reactWidgets.includes(componentName);
+    const windowComponentName = isReactComponent ? 'WidgetWindow' : componentName;
+
+    const defaultVueWindowSize = { width: 920, height: 1024 };
+    const defaultReactWindowSize = { width: 600, height: 800 };
+    const widgetInfo = this.widgetsService.widgetsConfig[WidgetType[componentName]];
+    const { width, height } = isReactComponent
+      ? widgetInfo.settingsWindowSize || defaultReactWindowSize
+      : defaultVueWindowSize;
+
     if (componentName) {
       this.windowsService.showWindow({
-        componentName,
+        componentName: windowComponentName,
         title: $t('Settings for %{sourceName}', {
-          sourceName: WidgetDisplayData(platform.type)[widgetType].name,
+          sourceName: WidgetDisplayData(platform.type)[widgetType]?.name || componentName,
         }),
-        queryParams: { sourceId: source.sourceId },
+        queryParams: { sourceId: source.sourceId, widgetType: WidgetType[widgetType] },
         size: {
-          width: 920,
-          height: 1024,
+          width,
+          height,
         },
       });
     }
@@ -641,7 +720,7 @@ export class SourcesService extends StatefulService<ISourcesState> {
       }
     }
     this.windowsService.showWindow({
-      componentName: 'SourceProperties',
+      componentName: 'SourcePropertiesDeprecated',
       title: $t('Settings for %{sourceName}', {
         sourceName: SourceDisplayData()[source.type].name,
       }),
@@ -681,11 +760,11 @@ export class SourcesService extends StatefulService<ISourcesState> {
 
   showShowcase() {
     this.windowsService.showWindow({
-      componentName: 'SourcesShowcase',
+      componentName: 'SourceShowcase',
       title: $t('Add Source'),
       size: {
-        width: 1200,
-        height: 665,
+        width: 900,
+        height: 700,
       },
     });
   }

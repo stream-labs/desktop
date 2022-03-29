@@ -31,7 +31,7 @@
       >
         {{ $t('Global Settings') }}
       </div>
-      <div v-for="alert in alertTypes" :key="alert" style="position: relative;">
+      <div v-for="alert in alertTypes" :key="alert" style="position: relative">
         <div
           class="left-accordion__button"
           :class="{ active: selectedAlert === alert }"
@@ -87,12 +87,12 @@
             </div>
             <div class="variation-tile__toolbar">
               <i
-                v-if="variation.id !== 'default'"
+                v-if="!variation.id.includes('default')"
                 class="icon-trash"
                 @click.stop="removeVariation(variation.id)"
               />
               <i
-                v-if="variation.id !== 'default'"
+                v-if="!variation.id.includes('default')"
                 class="icon-edit"
                 @click.stop="editName(variation.id)"
               />
@@ -142,10 +142,6 @@
         v-if="wData.settings.moderation_delay > -1"
         v-model="wData.settings.moderation_delay"
         :metadata="metadata.moderationDelay"
-      />
-      <v-form-group
-        v-model="wData.settings.unlimited_media_moderation_delay"
-        :metadata="metadata.unlimitedMediaMod"
       />
     </validated-form>
 

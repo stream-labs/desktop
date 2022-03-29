@@ -14,7 +14,7 @@
   "Connect": "接続",
   "Install Your Theme": "テーマをインストール",
   "Install": "インストール",
-  "facebookGamingWarning": "完全な Facebook ゲーム体験を実現するには、<create-page-link>ゲーミングビデオクリエーターページを作成</create-page-link>",
+  "facebookGamingWarning": "完全な Facebook ゲーム体験を実現するには、&lt;create-page-link&gt;ゲーミングビデオクリエーターページを作成&lt;/create-page-link&gt;",
   "Facebook Destination": "Facebook 行き先",
   "Share to Your Timeline": "タイムラインで共有",
   "Share to a Page You Manage": "自分で管理するページで共有",
@@ -30,7 +30,7 @@
   "Please reconnect Facebook to get these new features": "Facebook を再接続して、これらの新機能を入手",
   "Reconnect now": "今すぐ再接続",
   "Privacy": "プライバシー",
-  "FBPrivacyWarning": "付与されたプライバシーレベルは、Facebook アカウントに制限される場合があります。Streamlabs 統合に関する、「あなたがこのビジネス統合を使用していることを確認できる人」セクションを<link>こちら</link>で確認してください",
+  "FBPrivacyWarning": "付与されたプライバシーレベルは、Facebook アカウントに制限される場合があります。Streamlabs 統合に関する、「あなたがこのビジネス統合を使用していることを確認できる人」セクションを&lt;link&gt;こちら&lt;/link&gt;で確認してください",
   "Only Me": "自分のみ",
   "Do not change privacy settings": "プライバシー設定を変更しない"
 }

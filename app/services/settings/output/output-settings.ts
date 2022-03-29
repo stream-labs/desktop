@@ -2,6 +2,7 @@ import { Service } from 'services/core/service';
 import { ISettingsSubCategory, SettingsService } from 'services/settings';
 import { Inject } from 'services/core/injector';
 import { Dictionary } from 'vuex';
+import { AudioService } from 'app-services';
 
 /**
  * list of encoders for simple mode
@@ -99,6 +100,7 @@ export interface IEncoderSettings {
   encoder: EEncoderFamily;
   outputResolution: string;
   bitrate: number;
+  rateControl: string;
 }
 
 export interface IReplayBufferSettings {
@@ -109,6 +111,7 @@ export interface IReplayBufferSettings {
 export interface IRecordingEncoderSettings extends IEncoderSettings {
   path: string;
   format: EFileFormat;
+  isSameAsStream: boolean;
 }
 
 export interface IStreamingEncoderSettings extends IEncoderSettings {
@@ -176,6 +179,7 @@ export function obsEncoderToEncoderFamily(
 
 export class OutputSettingsService extends Service {
   @Inject() private settingsService: SettingsService;
+  @Inject() private audioService: AudioService;
 
   /**
    * returns unified settings for the Streaming and Recording encoder
@@ -270,6 +274,9 @@ export class OutputSettingsService extends Service {
 
     const hasCustomResolution = !resolutions.includes(outputResolution);
 
+    // Will only have a value in advanced mode
+    const rateControl = this.settingsService.findSettingValue(output, 'Streaming', 'rate_control');
+
     return {
       encoder,
       preset,
@@ -278,6 +285,7 @@ export class OutputSettingsService extends Service {
       encoderOptions,
       rescaleOutput,
       hasCustomResolution,
+      rateControl,
     };
   }
 
@@ -298,9 +306,8 @@ export class OutputSettingsService extends Service {
       'RecFormat',
     ) as EFileFormat;
 
-    let encoder = obsEncoderToEncoderFamily(
-      this.settingsService.findSettingValue(output, 'Recording', 'RecEncoder'),
-    ) as EEncoderFamily;
+    const recEncoder = this.settingsService.findSettingValue(output, 'Recording', 'RecEncoder');
+    let encoder = obsEncoderToEncoderFamily(recEncoder) as EEncoderFamily;
 
     const outputResolution: string =
       this.settingsService.findSettingValue(output, 'Recording', 'RecRescaleRes') ||
@@ -309,6 +316,8 @@ export class OutputSettingsService extends Service {
     const quality = this.settingsService.findValidListValue(output, 'Recording', 'RecQuality');
 
     let bitrate: number;
+    let rateControl = this.settingsService.findSettingValue(output, 'Recording', 'Recrate_control');
+    let isSameAsStream = false;
 
     if (mode === 'Simple') {
       // convert Quality to Bitrate in the Simple mode
@@ -323,12 +332,20 @@ export class OutputSettingsService extends Service {
           bitrate = 80000;
           break;
         case 'Stream':
+          isSameAsStream = true;
           bitrate = streamingSettings.bitrate;
           encoder = streamingSettings.encoder;
           break;
       }
     } else {
-      this.settingsService.findSettingValue(output, 'Recording', 'Recbitrate');
+      if (recEncoder === 'none') {
+        isSameAsStream = true;
+        bitrate = streamingSettings.bitrate;
+        encoder = streamingSettings.encoder;
+        rateControl = streamingSettings.rateControl;
+      } else {
+        bitrate = this.settingsService.findSettingValue(output, 'Recording', 'Recbitrate');
+      }
     }
 
     return {
@@ -337,6 +354,8 @@ export class OutputSettingsService extends Service {
       encoder,
       outputResolution,
       bitrate,
+      rateControl,
+      isSameAsStream,
     };
   }
 

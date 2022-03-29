@@ -1,4 +1,4 @@
-import { remote } from 'electron';
+import * as remote from '@electron/remote';
 import React, { useEffect, useState, useRef } from 'react';
 import shuffle from 'lodash/shuffle';
 import { Button, Modal } from 'antd';
@@ -33,7 +33,7 @@ export default function Grow() {
   function fetchApiData() {
     GrowService.actions.fetchGoals();
     GrowService.actions.fetchAnalytics();
-    // GrowService.actions.fetchUniversityProgress();
+    GrowService.actions.fetchUniversityProgress();
     GrowService.actions.fetchPlatformFollowers();
   }
 
@@ -242,7 +242,7 @@ function ResourceFooter(p: { universityProgress: IUniversityProgress }) {
       <span>{$t('')}</span>
 
       <div className={styles.resourcesContainer}>
-        {/* <UniversityCard progress={p.universityProgress} /> */}
+        <UniversityCard progress={p.universityProgress} />
         <ContentHubCard />
       </div>
     </div>

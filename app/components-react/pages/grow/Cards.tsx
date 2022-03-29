@@ -1,4 +1,4 @@
-import { remote } from 'electron';
+import * as remote from '@electron/remote';
 import React from 'react';
 import cx from 'classnames';
 import { Progress, Button } from 'antd';
@@ -99,7 +99,7 @@ export function UniversityCard(p: { progress: IUniversityProgress }) {
         <span>{content}</span>
         <Button onClick={openLink}>{buttonText}</Button>
       </div>
-      <img src={imageUrl} />
+      <img style={{ borderRadius: '8px' }} src={imageUrl} />
     </div>
   );
 }

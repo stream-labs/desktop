@@ -1,10 +1,10 @@
-# Streamlabs OBS
+# Streamlabs Desktop
 
 [![Build Status](https://dev.azure.com/streamlabs/Streamlabs%20OBS/_apis/build/status/stream-labs.streamlabs-obs?branchName=staging)](https://dev.azure.com/streamlabs/Streamlabs%20OBS/_build/latest?definitionId=1&branchName=staging)
 
 Simple, powerful, and efficient live streaming software built on Electron and OBS.
 
-![Streamlabs OBS](https://cdn.streamlabs.com/slobs/slobs-chatbox.png)
+![Streamlabs Desktop](https://slobs-cdn.streamlabs.com/media/streamlabs-desktop_1920x1050.png)
 
 This application currently only supports OSX 10.14+ and 64-bit Windows.
 
@@ -13,17 +13,32 @@ This application currently only supports OSX 10.14+ and 64-bit Windows.
 ### Node.js
 
 Node is required for installing npm packages and for running
-various scripts. We recommend the current LTS release, 14.x.x:
+various scripts. We recommend the latest LTS release.
 
 https://nodejs.org
 
 ### Yarn
 
-In order to ensure you are using the correct version of each
-node module, you should use the yarn package manager.
-Installation instructions can be found here:
+We use Yarn as our package manager. We use yarn modern (berry) with
+the yarn version checked in to version control. To get the yarn CLI,
+we currently recommend installing it with npm:
 
-https://yarnpkg.com/en/docs/install
+```
+npm install -g yarn
+```
+
+### Bash
+
+Some of our scripts assume a bash-like environment. On Windows, we recommend
+using Git Bash, which is included with Git for Windows. On macOS, the
+default shell should work fine.
+
+### Native Modules
+
+Streamlabs Desktop uses several native C++ modules. These are NPM modules
+that live in separate repositories, and are automatically installed as prebuilt
+binaries by Yarn. If you are not doing any development on these native modules,
+no additional action is required to install native modules.
 
 ## Installation
 
@@ -39,12 +54,15 @@ Then, compile assets with webpack:
 yarn compile
 ```
 
+Alternatively, you can watch for changes to app files:
+
+```
+yarn watch
+```
+
 ## Starting
 
-If you are using Visual Studio Code, you can start the app
-using the built in debugger (default F5).
-
-Otherwise, you can run the app with:
+You can start the app by running:
 
 ```
 yarn start
@@ -63,76 +81,105 @@ this would only run in production.
 
 `SLOBS_REPORT_TO_SENTRY`: Report errors to sentry in the dev environment
 
-## Packaging / Distributing
+`SLOBS_PRODUCTION_DEBUG`: Forces dev tools to open when the app starts
 
-Currently only Windows x64 packaging is supported.
+## Development
 
-### Packaging
+You can open dev tools by clicking the `</>` button on the sidebar.
+In the development environment, the titlebar of the main window will
+light up red when an exception occurs in any window.
 
-Make sure the app is not running in your dev environment
-before you start the packaging process.
+Our app is comprised of several windows, which are essential separate
+copies of the same Javascript app, which are running different pieces
+of the code and communicating via Electron IPC.
 
-You can package the app by running:
+`worker` - This is a persistent invisible window that runs our entire
+services layer.
+
+`main` - This is the main window of the application. It communicates
+with the worker window to perform actions.
+
+`child` - This window is always running in the background, and appears
+to show windows like Source Properties. It stays always running because
+Electron windows can take several seconds to initialize, so we keep it
+ready in the background.
+
+There are potentially many other JS runtime processes that can be running
+depending on use, for features like Apps, embedded webviews, one-off windows
+like projectors, pop-outs etc.
+
+### Sync / Async
+
+Given the heavy reliance on interprocess communication in our application,
+we strongly recommend using asynchronous IPC whenever possible. When
+accessing a service, calling it as an action will call it asynchronously.
+
+For example the following (synchronous):
+
+```
+StreamingService.toggleStreaming()
+```
+
+Can be rewritten as (asynchronous):
+
+```
+StreamingService.actions.toggleStreaming()
+```
+
+The return type of the latter will automatically be `void` as actions
+are unable to return values.  In general, receiving information from
+services is best done via `views`.  `views` are executed in-window, and
+backed by our `vuex` data store, which is replicated across windows.
+
+### Vue / React
+
+We are in the process of migrating from Vue to React. There are many components
+of both frameworks in our codebase currently. All new components should be
+written in React, and major non-trivial changes to existing Vue components
+should be accompanied with a rewrite to React.
+
+We exclusively use functional components in React, relying on the hooks API
+for things like component state and lifecycle.
+
+## Contributing
+
+We accept outside contributions, and do our best to respond to Pull Requests.
+We ask that all contributors sign a Contributor License Agreement before merging
+code. We do not guarantee that all external Pull Requests will be merged, but
+we deeply appreciate any and all changes submitted. Thank you for your interest
+and contribution.
+
+### Translations
+
+At this time, we are not able to accept translations submitted to GitHub, as we
+use a professional translation team that manages translations elsewhere.
+
+## Packaging/Distribution
+
+For Windows:
 
 ```
 yarn package
 ```
 
-This will package a distributable installer `.exe` to the `dist/`
-directory. There is also an unpacked version in `dist/win-unpacked`.
-
-### Releasing
-
-If you want to release a new version to the update server, you will need
-the following variables in your environment:
+For macOS:
 
 ```
-AWS_ACCESS_KEY_ID
-AWS_SECRET_ACCESS_KEY
-CSC_LINK
-CSC_KEY_PASSWORD
-SENTRY_AUTH_TOKEN
+yarn package:mac
 ```
 
-Only authorized team members have permission to release new versions.
-If you need help setting up your environment for release, you can ask
-someone on the team for help.
+Note that both of these commands require code signing certificates to be
+present in the environment, and in the case of macOS, a valid Apple developer
+account for notarization of the app package.
 
-If your environment is properly set up, you can use the automated
-release script to push out a new release.
+There are some environment variables that can be passed to skip these steps:
 
-Simply run:
+`SLOBS_NO_SIGN` Do not attempt to codesign the app package
 
-```
-yarn release
-```
-
-and follow the instructions.
-
-### Legacy Release Checklist
-
-NOTE: This checklist is deprecated, and is only kept here in case
-the automated deploy script isn't working and we need to do a
-manual deploy.
-
-- [ ] Merge `staging` into `master` - DO NOT "Squash & Merge", just do a regular merge
-- [ ] Check out `master`
-- [ ] If submodules are out of date `git submodule update --init --recursive`
-- [ ] Remove node modules `rm -rf node_modules`
-- [ ] Install fresh packages `yarn install`
-- [ ] Install node-obs with latest plugins `yarn install-node-obs`
-- [ ] Compile assets `yarn compile`
-- [ ] Run the test suite `yarn test`
-- [ ] Change the version in `package.json`
-- [ ] Commit and push
-- [ ] Tag the repo `git tag 'v0.0.11'` and `git push --tags`
-- [ ] Package the app `yarn package`
-- [ ] Run the packaged version in `dist/win-unpacked` and make sure it runs
-- [ ] Deploy the new version `yarn deploy`
-- [ ] Merge master back into staging
+`SLOBS_NO_NOTARIZE` Do not attempt to notarize the macOS package
 
 ## ❤ OBS Developers
 
-At its core, Streamlabs OBS is powered by the [OBS](https://obsproject.com/)
-engine. We want to thank all of the developers over at the OBS project for
-their years of tireless hard work, without which Streamlabs OBS wouldn't exist today.
+At its core, Streamlabs Desktop is powered by the [OBS](https://obsproject.com/)
+project. We want to thank all of the developers over at the OBS project for
+their years of tireless hard work, without which Streamlabs Desktop wouldn't exist today.

@@ -88,9 +88,9 @@
   "here": "здесь",
   "Link": "Ссылка",
   "Description": "Описание",
-  "OBSInit.UnknownError": "Обнаружена неизвестная ошибка при инициализации OBS.",
-  "OBSInit.ModuleNotFoundError": "Не найден DirectX в вашей системе. Установите последнюю версию DirectX для вашего компьютера, загрузив ее по ссылке <https://www.microsoft.com/ru-ru/download/details.aspx?id=35?>, и попробуйте снова.",
-  "OBSInit.NotSupportedError": "Не удалось инициализировать OBS. Возможно, используются устаревшие видеодрайверы или система не поддерживает Streamlabs OBS.",
+  "OBSInit.UnknownError": "Во время инициализации Streamlabs произошла неизвестная ошибка.",
+  "OBSInit.ModuleNotFoundError": "Не найден DirectX в вашей системе. Установите последнюю версию DirectX для вашего компьютера, загрузив ее по ссылке , и попробуйте снова.",
+  "OBSInit.NotSupportedError": "Не удалось инициализировать Streamlabs. Возможно, используются устаревшие видеодрайверы или система не поддерживает версию Streamlabs Desktop.",
   "Log Out": "Выход",
   "Layout Editor": "Редактор макета",
   "Are you sure you want to import multiple files?": "Импортировать несколько файлов?",
@@ -132,5 +132,12 @@
   "Apply": "Применить",
   "Do not show this message again": "Больше не показывать это сообщение",
   "You can only select up to %{max} items": "Можно выбрать не более %{max} эл.",
-  "Time": "Время"
+  "Time": "Время",
+  "Sound Volume": "Громкость звука",
+  "Sound": "Звук",
+  "Play Audio": "Воспроизвести звук",
+  "Click here": "Нажмите здесь",
+  "More Info": "Узнать больше",
+  "Revert Changes": "Отменить изменения",
+  "Animations": "Анимации"
 }

@@ -88,9 +88,9 @@
   "here": "aquí",
   "Link": "Vínculo",
   "Description": "Descripción",
-  "OBSInit.UnknownError": "Se produjo un error desconocido al inicializar OBS.",
-  "OBSInit.ModuleNotFoundError": "No se pudo encontrar DirectX en el sistema. Instale la versión más reciente de DirectX en su equipo desde <https://www.microsoft.com/en-us/download/details.aspx?id=35?> y vuelva a intentarlo.",
-  "OBSInit.NotSupportedError": "No se pudo inicializar OBS. Es posible que sus controladores de vídeo estén desfasados, o que su sistema no sea compatible con Streamlabs OBS.",
+  "OBSInit.UnknownError": "Se produjo un error desconocido al inicializar Streamlabs.",
+  "OBSInit.ModuleNotFoundError": "No se pudo encontrar DirectX en el sistema. Instale la versión más reciente de DirectX en su equipo desde &lt;https://www.microsoft.com/en-us/download/details.aspx?id=35?&gt; y vuelva a intentarlo.",
+  "OBSInit.NotSupportedError": "No se pudo inicializar Streamlabs. Es posible que sus controladores de vídeo estén desfasados, o que su sistema no sea compatible con Streamlabs Desktop.",
   "Log Out": "Cerrar sesión",
   "Layout Editor": "Editor de diseño",
   "Are you sure you want to import multiple files?": "¿Confirma que desea importar varios archivos?",
@@ -132,5 +132,12 @@
   "Apply": "Aplicar",
   "Do not show this message again": "No volver a mostrar este mensaje",
   "You can only select up to %{max} items": "Solo puede seleccionar hasta %{max} elementos",
-  "Time": "Tiempo"
+  "Time": "Tiempo",
+  "Sound Volume": "Volumen del sonido",
+  "Sound": "Sonido",
+  "Play Audio": "Reproducir audio",
+  "Click here": "Haz clic aquí",
+  "More Info": "Más información",
+  "Revert Changes": "Revertir cambios",
+  "Animations": "Animaciones"
 }

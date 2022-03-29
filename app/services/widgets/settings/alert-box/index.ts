@@ -30,6 +30,9 @@ export interface IAlertBoxData extends IWidgetData {
   tts_languages?: any[];
 }
 
+/**
+ * @deprecated
+ */
 @InheritMutations()
 export class AlertBoxService extends WidgetSettingsService<IAlertBoxData> {
   static initialState = WIDGET_INITIAL_STATE;
@@ -145,9 +148,6 @@ export class AlertBoxService extends WidgetSettingsService<IAlertBoxData> {
       messageEmojis: metadata.toggle({ title: $t('Allow Twitch Emojis?') }),
       ttsEnabled: metadata.toggle({ title: $t('Enable TTS?') }),
       unlimitedAlertMod: metadata.toggle({ title: $t('Unlimited Alert Moderation Delay') }),
-      unlimitedMediaMod: metadata.toggle({
-        title: $t('Unlimited Media Sharing Alert Moderation Delay'),
-      }),
       skillImage: metadata.toggle({ title: $t('Use Skill Image') }),
       imageFile: metadata.mediaGallery({ title: $t('Image/Video File') }),
       soundFile: metadata.sound({ title: $t('Sound File') }),

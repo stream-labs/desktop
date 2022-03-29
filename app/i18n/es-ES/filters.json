@@ -20,7 +20,7 @@
   "Filter name": "Nombre de filtro",
   "Add source filter": "Agregar filtro de fuente",
   "No filters applied": "No se han aplicado filtros",
-  "Filters for %{sourceName}": "Filters for %{sourceName}",
+  "Filters for %{sourceName}": "Filtros para %{sourceName}",
   "Invert Polarity": "Invertir polaridad",
   "Limiter": "Limitador",
   "Expander": "Ampliador",
@@ -37,5 +37,6 @@
   "Heat Map": "Mapa de calor",
   "Cel Shade": "Sombra de celda",
   "Dramatic": "Dramático",
-  "Wintergreen": "Gaulteria"
+  "Wintergreen": "Gaulteria",
+  "Edit Filters": "Editar filtros"
 }

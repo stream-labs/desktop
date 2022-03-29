@@ -1,6 +1,6 @@
 import { test, useSpectron } from '../../helpers/spectron';
 import { showSettingsWindow } from '../../helpers/modules/settings/settings';
-import { clickButton, clickTab } from '../../helpers/modules/core';
+import { clickButton, clickTab, focusChild } from '../../helpers/modules/core';
 import { useForm } from '../../helpers/modules/forms';
 useSpectron();
 
@@ -19,14 +19,26 @@ test('Form inputs', async t => {
   const initialFormData = await readForm();
 
   t.deepEqual(initialFormData, [
-    { name: 'name', value: '', displayValue: '' },
-    { name: 'gender', value: '', displayValue: null },
-    { name: 'age', value: '0', displayValue: '0' },
-    { name: 'city', value: '', displayValue: null },
-    { name: 'colors', value: [], displayValue: [] },
-    { name: 'addIntroduction', value: false, displayValue: false },
-    { name: 'confirm1', value: false, displayValue: false },
-    { name: 'confirm2', value: false, displayValue: false },
+    { name: 'name', title: 'Name', value: '', displayValue: '' },
+    { name: 'gender', title: 'Gender', value: '', displayValue: null },
+    { name: 'age', title: 'Age', value: '0', displayValue: '0' },
+    { name: 'city', title: 'City', value: '', displayValue: null },
+    { name: 'weight', title: 'Weight', value: 65, displayValue: 65 },
+    { name: 'colors', title: 'Pick your favorite colors', value: [], displayValue: [] },
+    { name: 'saveFilePath', title: 'Save to File', value: '', displayValue: '' },
+    { name: 'addIntroduction', title: 'Add Introduction', value: false, displayValue: false },
+    {
+      name: 'confirm1',
+      title: 'Confirm you allow processing your data',
+      value: false,
+      displayValue: false,
+    },
+    {
+      name: 'confirm2',
+      title: 'Confirm you love Streamlabs',
+      value: false,
+      displayValue: false,
+    },
   ]);
 
   // fill out all inputs
@@ -35,9 +47,11 @@ test('Form inputs', async t => {
     gender: 'Male',
     colors: ['Red', 'Orange'],
     age: 20,
+    weight: 100,
     city: 'Cairo',
     addIntroduction: true,
     introduction: 'Hello World!',
+    saveFilePath: 'C:\\myreport.txt',
     confirm1: true,
     confirm2: true,
   });
@@ -46,23 +60,38 @@ test('Form inputs', async t => {
   const filledFormData = await readForm();
 
   t.deepEqual(filledFormData, [
-    { name: 'name', value: 'John Doe', displayValue: 'John Doe' },
-    { name: 'gender', value: 'male', displayValue: 'Male' },
-    { name: 'age', value: '20', displayValue: '20' },
-    { name: 'city', value: 'C', displayValue: 'Cairo' },
+    { name: 'name', title: 'Name', value: 'John Doe', displayValue: 'John Doe' },
+    { name: 'gender', title: 'Gender', value: 'male', displayValue: 'Male' },
+    { name: 'age', title: 'Age', value: '20', displayValue: '20' },
+    { name: 'city', title: 'City', value: 'C', displayValue: 'Cairo' },
+    { name: 'weight', title: 'Weight', value: 100, displayValue: 100 },
     {
       name: 'colors',
+      title: 'Pick your favorite colors',
+
       value: [1, 4],
       displayValue: ['Red', 'Orange'],
     },
-    { name: 'addIntroduction', value: true, displayValue: true },
+    {
+      name: 'saveFilePath',
+      title: 'Save to File',
+      value: 'C:\\myreport.txt',
+      displayValue: 'C:\\myreport.txt',
+    },
+    { name: 'addIntroduction', title: 'Add Introduction', value: true, displayValue: true },
     {
       name: 'introduction',
+      title: 'Introduction',
       value: 'Hello World!',
       displayValue: 'Hello World!',
     },
-    { name: 'confirm1', value: true, displayValue: true },
-    { name: 'confirm2', value: true, displayValue: true },
+    {
+      name: 'confirm1',
+      title: 'Confirm you allow processing your data',
+      value: true,
+      displayValue: true,
+    },
+    { name: 'confirm2', title: 'Confirm you love Streamlabs', value: true, displayValue: true },
   ]);
 
   // test assertion
@@ -72,8 +101,10 @@ test('Form inputs', async t => {
     colors: ['Red', 'Orange'],
     age: 20,
     city: 'Cairo',
+    weight: 100,
     addIntroduction: true,
     introduction: 'Hello World!',
+    saveFilePath: 'C:\\myreport.txt',
     confirm1: true,
     confirm2: true,
   });

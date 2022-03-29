@@ -54,6 +54,7 @@ export { MacPermissionsService } from 'services/mac-permissions';
 export { VirtualWebcamService } from 'services/virtual-webcam';
 export { MetricsService } from 'services/metrics';
 export { HighlighterService } from 'services/highlighter';
+export { DiagnosticsService } from 'services/diagnostics';
 
 // ONLINE SERVICES
 export { UserService } from './services/user';
@@ -61,6 +62,7 @@ export { YoutubeService } from 'services/platforms/youtube';
 export { TwitchService } from 'services/platforms/twitch';
 export { FacebookService } from 'services/platforms/facebook';
 export { TiktokService } from 'services/platforms/tiktok';
+export { TrovoService } from 'services/platforms/trovo';
 export { RestreamService } from 'services/restream';
 export { TwitterService } from 'services/integrations/twitter';
 export { UsageStatisticsService } from './services/usage-statistics';
@@ -110,6 +112,7 @@ export { SpinWheelService } from 'services/widgets/settings/spin-wheel';
 export { PollService } from 'services/widgets/settings/poll';
 export { EmoteWallService } from 'services/widgets/settings/emote-wall';
 export { ChatHighlightService } from 'services/widgets/settings/chat-highlight';
+export { SuperchatGoalService } from 'services/widgets/settings/superchat-goal';
 
 import { AppService } from './services/app';
 import { WindowsService } from './services/windows';
@@ -127,6 +130,7 @@ import { TwitterService } from './services/integrations/twitter';
 import { SettingsService } from './services/settings';
 import { UserService } from './services/user';
 import { TwitchService } from './services/platforms/twitch';
+import { TrovoService } from './services/platforms/trovo';
 import { YoutubeService } from './services/platforms/youtube';
 import { FacebookService } from './services/platforms/facebook';
 import { DismissablesService } from './services/dismissables';
@@ -138,6 +142,7 @@ import { ChatService } from './services/chat';
 import { HighlighterService } from './services/highlighter';
 import { GrowService } from './services/grow/grow';
 import { TransitionsService } from './services/transitions';
+import { TcpServerService } from './services/api/tcp-server';
 import { MagicLinkService } from './services/magic-link';
 import { UsageStatisticsService } from './services/usage-statistics';
 import { NotificationsService } from './services/notifications';
@@ -150,7 +155,15 @@ import { CacheUploaderService } from './services/cache-uploader';
 import { StreamlabelsService } from './services/streamlabels';
 import { SceneCollectionsService } from './services/scene-collections';
 import { PlatformAppsService } from './services/platform-apps';
+import { MediaGalleryService } from './services/media-gallery';
 import { RecentEventsService } from 'services/recent-events';
+import { AudioService } from './services/audio';
+import { SourceFiltersService } from './services/source-filters';
+import { DiagnosticsService } from './services/diagnostics';
+import { WebsocketService } from './services/websocket';
+import { SpinWheelService } from 'services/widgets/settings/spin-wheel';
+import { LayoutService } from './services/layout';
+import { ProjectorService } from './services/projector';
 
 export const AppServices = {
   AppService,
@@ -177,11 +190,14 @@ export const AppServices = {
   FacebookService,
   UserService,
   TwitchService,
+  TrovoService,
   DismissablesService,
   HighlighterService,
   GrowService,
   TransitionsService,
+  TcpServerService,
   MagicLinkService,
+  MediaGalleryService,
   UsageStatisticsService,
   NotificationsService,
   MediaBackupService,
@@ -193,4 +209,11 @@ export const AppServices = {
   StreamlabelsService,
   SceneCollectionsService,
   PlatformAppsService,
+  AudioService,
+  SourceFiltersService,
+  DiagnosticsService,
+  WebsocketService,
+  SpinWheelService,
+  LayoutService,
+  ProjectorService,
 };

@@ -5,7 +5,7 @@ import InputWrapper from './InputWrapper';
 import { InputProps } from 'antd/lib/input';
 
 // select which features from the antd lib we are going to use
-const ANT_INPUT_FEATURES = ['addonBefore', 'addonAfter'] as const;
+const ANT_INPUT_FEATURES = ['addonBefore', 'addonAfter', 'autoFocus'] as const;
 
 export type TTextInputProps = TSlobsInputProps<
   {
@@ -14,6 +14,7 @@ export type TTextInputProps = TSlobsInputProps<
     onBlur?: React.FocusEventHandler<HTMLInputElement>;
     onKeyDown?: React.KeyboardEventHandler<HTMLInputElement>;
     inputRef?: React.Ref<Input>;
+    isPassword?: boolean;
   },
   string,
   InputProps,
@@ -22,9 +23,16 @@ export type TTextInputProps = TSlobsInputProps<
 
 export const TextInput = InputComponent((p: TTextInputProps) => {
   const { inputAttrs, wrapperAttrs } = useTextInput('text', p, ANT_INPUT_FEATURES);
+  const textInputAttrs = {
+    ...inputAttrs,
+    onFocus: p.onFocus,
+    onKeyDown: p.onKeyDown,
+    ref: p.inputRef,
+  };
   return (
     <InputWrapper {...wrapperAttrs}>
-      <Input {...inputAttrs} onFocus={p.onFocus} onKeyDown={p.onKeyDown} ref={p.inputRef} />
+      {p.isPassword && <Input.Password {...textInputAttrs} />}
+      {!p.isPassword && <Input {...textInputAttrs} />}
     </InputWrapper>
   );
 });

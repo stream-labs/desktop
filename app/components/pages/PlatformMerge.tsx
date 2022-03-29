@@ -37,7 +37,11 @@ export default class PlatformMerge extends TsxComponent<PlatformMergeProps> {
   }
 
   get loading() {
-    return this.userService.state.authProcessState === EAuthProcessState.Busy;
+    return this.userService.state.authProcessState === EAuthProcessState.Loading;
+  }
+
+  get authInProgress() {
+    return this.userService.state.authProcessState === EAuthProcessState.InProgress;
   }
 
   get platformName() {
@@ -78,7 +82,7 @@ export default class PlatformMerge extends TsxComponent<PlatformMergeProps> {
     return (
       <div>
         <div>
-          {$t('Connect %{platformName} to Streamlabs OBS.', { platformName })}
+          {$t('Connect %{platformName} to Streamlabs.', { platformName })}
           <br />
           {$t('All of your scenes, sources, and settings will be preserved.')}
         </div>
@@ -105,7 +109,7 @@ export default class PlatformMerge extends TsxComponent<PlatformMergeProps> {
         <button
           style={{ marginTop: '24px' }}
           class="button button--action"
-          disabled={this.loading}
+          disabled={this.loading || this.authInProgress}
           onClick={() => this.installOverlay()}
         >
           <i class={this.loading ? 'fas fa-spinner fa-spin' : 'icon-themes'} />

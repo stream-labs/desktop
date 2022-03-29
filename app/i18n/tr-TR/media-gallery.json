@@ -26,5 +26,10 @@
   "Image URL": "Görüntü URL’si",
   "Example": "Örnek",
   "Change Media": "Medyayı Değiştir",
-  "No Sound": "Ses Yok"
+  "No Sound": "Ses Yok",
+  "No Media": "Medya Yok",
+  "Change Link": "Bağlantıyı Değiştir",
+  "Pick From Gallery": "Galeriden Seç",
+  "Clear Link": "Bağlantıyı Temizle",
+  "Media URL": "Medya URL’si"
 }

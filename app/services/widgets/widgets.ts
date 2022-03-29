@@ -1,4 +1,3 @@
-import throttle from 'lodash/throttle';
 import { Inject } from 'services/core/injector';
 import { UserService } from '../user';
 import { ScenesService, SceneItem, Scene } from '../scenes';
@@ -8,9 +7,8 @@ import { HostsService } from '../hosts';
 import { ScalableRectangle } from 'util/ScalableRectangle';
 import namingHelpers from 'util/NamingHelpers';
 import fs from 'fs';
-import { WidgetSettingsService } from './settings/widget-settings';
 import { ServicesManager } from 'services-manager';
-import { authorizedHeaders } from 'util/requests';
+import { authorizedHeaders, handleResponse } from 'util/requests';
 import { ISerializableWidget, IWidgetSource, IWidgetsServiceApi } from './widgets-api';
 import { WidgetType, WidgetDefinitions, WidgetTesters } from './widgets-data';
 import { mutation, StatefulService } from '../core/stateful-service';
@@ -18,10 +16,15 @@ import { WidgetSource } from './widget-source';
 import { InitAfter } from 'services/core/service-initialization-observer';
 import Vue from 'vue';
 import cloneDeep from 'lodash/cloneDeep';
-import { Subscription } from 'rxjs';
+import { Subject, Subscription } from 'rxjs';
 import { Throttle } from 'lodash-decorators';
 import { EditorCommandsService } from 'services/editor-commands';
 import { TWindowComponentName } from '../windows';
+import { THttpMethod } from './settings/widget-settings';
+import { TPlatform } from '../platforms';
+import { getAlertsConfig, TAlertType } from './alerts-config';
+import { getWidgetsConfig } from './widgets-config';
+import { WidgetDisplayData } from '.';
 
 export interface IWidgetSourcesState {
   widgetSources: Dictionary<IWidgetSource>;
@@ -73,21 +76,26 @@ export class WidgetsService
   createWidget(type: WidgetType, name?: string): SceneItem {
     if (!this.userService.isLoggedIn) return;
 
-    const scene = this.scenesService.views.activeScene;
-    const widget = WidgetDefinitions[type];
+    const widget = this.widgetsConfig[type] || WidgetDefinitions[type];
+    const widgetTransform = this.widgetsConfig[type]?.defaultTransform || WidgetDefinitions[type];
 
     const suggestedName =
       name ||
-      namingHelpers.suggestName(name || widget.name, (name: string) => {
+      namingHelpers.suggestName(name || WidgetDisplayData()[type]?.name, (name: string) => {
         return this.sourcesService.views.getSourcesByName(name).length;
       });
 
     // Calculate initial position
-    const rect = new ScalableRectangle({ x: 0, y: 0, width: widget.width, height: widget.height });
+    const rect = new ScalableRectangle({
+      x: 0,
+      y: 0,
+      width: widgetTransform.width,
+      height: widgetTransform.height,
+    });
 
-    rect.withAnchor(widget.anchor, () => {
-      rect.x = widget.x * this.videoService.baseWidth;
-      rect.y = widget.y * this.videoService.baseHeight;
+    rect.withAnchor(widgetTransform.anchor, () => {
+      rect.x = widgetTransform.x * this.videoService.baseWidth;
+      rect.y = widgetTransform.y * this.videoService.baseHeight;
     });
 
     const item = this.editorCommandsService.executeCommand(
@@ -96,9 +104,11 @@ export class WidgetsService
       suggestedName,
       'browser_source',
       {
-        url: widget.url(this.hostsService.streamlabs, this.userService.widgetToken),
-        width: widget.width,
-        height: widget.height,
+        url: this.widgetsConfig[type]
+          ? widget.url
+          : widget.url(this.hostsService.streamlabs, this.userService.widgetToken),
+        width: widgetTransform.width,
+        height: widgetTransform.height,
       },
       {
         sourceAddOptions: {
@@ -136,9 +146,9 @@ export class WidgetsService
     return WidgetType[type] as TWindowComponentName;
   }
 
-  getWidgetSettingsService(type: WidgetType): WidgetSettingsService<any> {
-    const serviceName = `${this.getWidgetComponent(type)}Service`;
+  getWidgetSettingsService(type: WidgetType): any {
     const servicesManager: ServicesManager = ServicesManager.instance;
+    const serviceName = `${this.getWidgetComponent(type)}Service`;
     return servicesManager.getResource(serviceName);
   }
 
@@ -154,11 +164,21 @@ export class WidgetsService
     });
   }
 
+  /**
+   * @deprecated use .playAlert() instead
+   */
   @Throttle(1000)
   test(testerName: string) {
     const tester = this.getTesters().find(tester => tester.name === testerName);
     const headers = authorizedHeaders(this.userService.apiToken);
     fetch(new Request(tester.url, { headers }));
+  }
+
+  @Throttle(1000)
+  playAlert(alertType: TAlertType) {
+    const config = this.alertsConfig[alertType];
+    const headers = authorizedHeaders(this.userService.apiToken);
+    fetch(new Request(config.url(), { headers }));
   }
 
   private previewSourceWatchers: Dictionary<Subscription> = {};
@@ -178,7 +198,9 @@ export class WidgetsService
         const source = widget.getSource();
         const newPreviewSettings = cloneDeep(source.getSettings());
         delete newPreviewSettings.shutdown;
-        newPreviewSettings.url = widget.getSettingsService().getApiSettings().previewUrl;
+        const config = this.widgetsConfig[widget.type];
+        newPreviewSettings.url =
+          config?.previewUrl || widget.getSettingsService().getApiSettings().previewUrl;
         const previewSource = widget.getPreviewSource();
         previewSource.updateSettings(newPreviewSettings);
         previewSource.refresh();
@@ -218,6 +240,8 @@ export class WidgetsService
    * returns -1 if it's no type detected
    */
   getWidgetTypeByUrl(url: string): WidgetType {
+    if (!this.userService.views.isLoggedIn) return -1;
+
     const type = Number(
       Object.keys(WidgetDefinitions).find(WidgetType => {
         let regExpStr = WidgetDefinitions[WidgetType].url(this.hostsService.streamlabs, '')
@@ -331,6 +355,43 @@ export class WidgetsService
         y: widget.scaleY * this.videoService.baseHeight,
       },
     });
+  }
+
+  get widgetsConfig() {
+    return getWidgetsConfig(this.hostsService.streamlabs, this.userService.widgetToken);
+  }
+
+  get alertsConfig() {
+    const platforms = Object.keys(this.userService.views.platforms || []) as TPlatform[];
+    return getAlertsConfig(this.hostsService.streamlabs, platforms);
+  }
+
+  // make a request to widgets API
+  async request(req: { url: string; method?: THttpMethod; body?: any }): Promise<any> {
+    const method = req.method || 'GET';
+    const headers = authorizedHeaders(this.userService.apiToken);
+    headers.append('Content-Type', 'application/json');
+
+    const request = new Request(req.url, {
+      headers,
+      method,
+      body: req.body ? JSON.stringify(req.body) : void 0,
+    });
+
+    return fetch(request)
+      .then(res => {
+        return Promise.resolve(res);
+      })
+      .then(handleResponse);
+  }
+
+  settingsInvalidated = new Subject();
+
+  /**
+   * Ask the WidgetSetting window to re-load data
+   */
+  invalidateSettingsWindow() {
+    this.settingsInvalidated.next();
   }
 
   @mutation()

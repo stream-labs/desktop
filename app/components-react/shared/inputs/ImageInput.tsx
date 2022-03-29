@@ -47,7 +47,7 @@ export const ImageInput = InputComponent((p: TImageInputProps) => {
   // update metadata if the value has been changed
   useEffect(() => {
     if (fileInfo.url === p.value) return;
-    setFileInfo({ ...defaultImageMetadata, url: p.value });
+    setFileInfo({ ...defaultImageMetadata, url: p.value as string });
   }, [p.value]);
 
   /**

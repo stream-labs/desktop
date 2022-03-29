@@ -1,0 +1,114 @@
+@import '../../../styles/index';
+
+.top-container {
+  display: flex;
+  margin-bottom: 8px;
+  align-items: center;
+  justify-content: flex-end;
+
+  > div:last-child {
+    top: 44px !important;
+    height: calc(100% - 44px);
+  }
+
+  :global(.ant-dropdown) {
+    top: 0 !important;
+    height: 100%;
+  }
+}
+
+:global(.no-top-padding) {
+  .top-container > div:last-child {
+    top: 32px !important;
+    height: calc(100% - 32px);
+  }
+}
+
+.active-scene-container {
+  margin-right: auto;
+  font-weight: 500;
+  font-size: 16px;
+  color: var(--title);
+  display: flex;
+  align-items: center;
+  min-width: 0;
+
+  &:hover {
+    cursor: pointer;
+  }
+}
+
+.active-scene {
+  display: block;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.scenes-container {
+  background: var(--section);
+  border-radius: 4px;
+
+  &:global(.os-host) {
+    overflow: hidden !important;
+  }
+
+  :global(.ant-tree) {
+    background: transparent;
+  }
+
+  :global(.ant-tree-switcher) {
+    display: none;
+  }
+
+  :global(.ant-tree-treenode), :global(.ant-tree-node-content-wrapper) {
+    width: 100%;
+    transition: all 0s !important;
+    border-radius: 0 !important;
+  }
+
+  :global(.ant-tree-node-content-wrapper) {
+    padding-left: 16px !important;
+  }
+
+  :global(.ant-tree-node-selected) {
+    background-color: var(--solid-input) !important;
+
+    :global(.ant-tree-title) {
+      color: var(--title);
+    }
+  }
+}
+
+.dropdown-container {
+  background: var(--section);
+  border: 1px solid var(--border);
+  padding: 8px;
+  border-radius: 4px;
+  height: 100%;
+}
+
+.dropdown-item {
+  margin: 4px;
+  display: block;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+
+  i {
+    margin-right: 4px;
+  }
+
+  &:hover {
+    color: var(--title);
+    cursor: pointer;
+  }
+
+  &.os-mismatch {
+    opacity: 0.7;
+
+    &:hover {
+      cursor: not-allowed;
+    }
+  }
+}

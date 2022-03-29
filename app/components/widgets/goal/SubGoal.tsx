@@ -5,6 +5,6 @@ import Vue from 'vue';
 @Component({})
 export default class SubGoal extends Vue {
   render() {
-    return <GenericGoal />;
+    return <GenericGoal goalType="sub" />;
   }
 }

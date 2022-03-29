@@ -1,4 +1,5 @@
 /*global SLOBS_BUNDLE_ID*/
+/*global SLD_SENTRY_BACKEND_SERVER_URL, SLD_SENTRY_FRONTEND_DSN, SLD_SENTRY_BACKEND_SERVER_PREVIEW_URL*/
 
 import { I18nService, $t } from 'services/i18n';
 
@@ -36,19 +37,14 @@ import { Loader } from 'components/shared/ReactComponentList';
 import process from 'process';
 import { MetricsService } from 'services/metrics';
 import { UsageStatisticsService } from 'services/usage-statistics';
+import * as remote from '@electron/remote';
 
-const { ipcRenderer, remote, app, contentTracing } = electron;
+const { ipcRenderer } = electron;
 const slobsVersion = Utils.env.SLOBS_VERSION;
 const isProduction = Utils.env.NODE_ENV === 'production';
 const isPreview = !!Utils.env.SLOBS_PREVIEW;
 
-// This is the development DSN
-let sentryDsn = 'https://8f444a81edd446b69ce75421d5e91d4d@sentry.io/252950';
-
 if (isProduction) {
-  // This is the production DSN
-  sentryDsn = 'https://6971fa187bb64f58ab29ac514aa0eb3d@sentry.io/251674';
-
   electron.crashReporter.addExtraParameter('windowId', Utils.getWindowId());
 }
 
@@ -131,7 +127,7 @@ if (isProduction || process.env.SLOBS_REPORT_TO_SENTRY) {
   const bundleNames = electron.ipcRenderer.sendSync('getBundleNames', bundles);
 
   Sentry.init({
-    dsn: sentryDsn,
+    dsn: SLD_SENTRY_FRONTEND_DSN,
     release: `${slobsVersion}-${SLOBS_BUNDLE_ID}`,
     beforeSend: (event, hint) => {
       // Because our URLs are local files and not publicly
@@ -231,7 +227,7 @@ document.addEventListener('dragover', event => event.preventDefault());
 document.addEventListener('dragenter', event => event.preventDefault());
 document.addEventListener('drop', event => event.preventDefault());
 
-const ctxMenu = electron.remote.Menu.buildFromTemplate([
+const ctxMenu = remote.Menu.buildFromTemplate([
   { role: 'copy', accelerator: 'CommandOrControl+C' },
   { role: 'paste', accelerator: 'CommandOrControl+V' },
 ]);
@@ -243,19 +239,19 @@ document.addEventListener('contextmenu', () => {
 export const apiInitErrorResultToMessage = (resultCode: obs.EVideoCodes) => {
   switch (resultCode) {
     case obs.EVideoCodes.NotSupported: {
-      return 'Failed to initialize OBS. Your video drivers may be out of date, or Streamlabs OBS may not be supported on your system.';
+      return 'Failed to initialize Streamlabs Desktop. Your video drivers may be out of date, or Streamlabs Desktop may not be supported on your system.';
     }
     case obs.EVideoCodes.ModuleNotFound: {
       return 'DirectX could not be found on your system. Please install the latest version of DirectX for your machine here <https://www.microsoft.com/en-us/download/details.aspx?id=35?> and try again.';
     }
     default: {
-      return 'An unknown error was encountered while initializing OBS.';
+      return 'An unknown error was encountered while initializing Streamlabs Desktop.';
     }
   }
 };
 
 const showDialog = (message: string): void => {
-  electron.remote.dialog.showErrorBox('Initialization Error', message);
+  remote.dialog.showErrorBox('Initialization Error', message);
 };
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -276,7 +272,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
   I18nService.setVuei18nInstance(i18n);
 
-  if (!Utils.isOneOffWindow()) {
+  // We don't register main/child windows in dev mode to allow refreshing
+  if (!Utils.isOneOffWindow() && !Utils.isDevMode()) {
     ipcRenderer.send('register-in-crash-handler', { pid: process.pid, critical: false });
   }
 
@@ -292,10 +289,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     window['obs'] = obs;
 
     // Host a new OBS server instance
-    obs.IPC.host(electron.remote.process.env.IPC_UUID);
+    obs.IPC.host(remote.process.env.IPC_UUID);
     obs.NodeObs.SetWorkingDirectory(
       path.join(
-        electron.remote.app.getAppPath().replace('app.asar', 'app.asar.unpacked'),
+        remote.app.getAppPath().replace('app.asar', 'app.asar.unpacked'),
         'node_modules',
         'obs-studio-node',
       ),
@@ -307,7 +304,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     const apiResult = obs.NodeObs.OBS_API_initAPI(
       'en-US',
       appService.appDataDirectory,
-      electron.remote.process.env.SLOBS_VERSION,
+      remote.process.env.SLOBS_VERSION,
+      isPreview ? SLD_SENTRY_BACKEND_SERVER_PREVIEW_URL : SLD_SENTRY_BACKEND_SERVER_URL,
     );
 
     if (apiResult !== obs.EVideoCodes.Success) {
@@ -374,7 +372,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   let mainWindowShowTime = 0;
   if (Utils.isMainWindow()) {
-    electron.remote.getCurrentWindow().show();
+    remote.getCurrentWindow().show();
     mainWindowShowTime = Date.now();
   }
 

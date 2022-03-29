@@ -1,12 +1,12 @@
 import React from 'react';
 import { Services } from '../../service-provider';
 import { $t } from '../../../services/i18n';
-import electron from 'electron';
 import { useBinding } from '../../store';
 import { CheckboxInput, ListInput, SliderInput } from '../../shared/inputs';
 import { getDefined } from '../../../util/properties-type-guards';
 import { ObsSettingsSection } from './ObsSettings';
 import { cloneDeep } from 'lodash';
+import * as remote from '@electron/remote';
 
 export function AppearanceSettings() {
   const { CustomizationService, WindowsService, UserService, MagicLinkService } = Services;
@@ -35,7 +35,7 @@ export function AppearanceSettings() {
 
   async function upgradeToPrime() {
     const link = await MagicLinkService.getDashboardMagicLink('prime-marketing', 'slobs-ui-themes');
-    electron.remote.shell.openExternal(link);
+    remote.shell.openExternal(link);
   }
 
   const shouldShowPrime = UserService.views.isLoggedIn && !UserService.views.isPrime;
@@ -50,31 +50,21 @@ export function AppearanceSettings() {
           <div style={{ marginBottom: '16px' }}>
             <a style={{ color: 'var(--prime)' }} onClick={upgradeToPrime}>
               <i style={{ color: 'var(--prime)' }} className="icon-prime" />
-              {$t('Change the look of Streamlabs OBS with Prime')}
+              {$t('Change the look of Streamlabs Desktop with Prime')}
             </a>
           </div>
         )}
       </ObsSettingsSection>
 
-      <ObsSettingsSection>
-        <ListInput
-          {...bind.folderSelection}
-          label={$t('Scene item selection mode')}
-          options={[
-            { value: true, label: $t('Single click selects group. Double click selects item') },
-            {
-              value: false,
-              label: $t('Double click selects group. Single click selects item'),
-            },
-          ]}
-        />
+      <ObsSettingsSection title={$t('Chat Settings')}>
         <CheckboxInput
           {...bind.leftDock}
           label={$t('Show the live dock (chat) on the left side')}
         />
         <SliderInput
           {...bind.chatZoomFactor}
-          label={$t('Chat Text Size')}
+          label={$t('Text Size')}
+          tipFormatter={(val: number) => `${val * 100}%`}
           min={0.25}
           max={2}
           step={0.25}
@@ -92,6 +82,27 @@ export function AppearanceSettings() {
             />
           </div>
         )}
+      </ObsSettingsSection>
+
+      <ObsSettingsSection>
+        <CheckboxInput
+          {...bind.enableAnnouncements}
+          label={$t('Show announcements for new Streamlabs features and products')}
+        />
+      </ObsSettingsSection>
+
+      <ObsSettingsSection>
+        <ListInput
+          {...bind.folderSelection}
+          label={$t('Scene item selection mode')}
+          options={[
+            { value: true, label: $t('Single click selects group. Double click selects item') },
+            {
+              value: false,
+              label: $t('Double click selects group. Single click selects item'),
+            },
+          ]}
+        />
       </ObsSettingsSection>
 
       {bind.enableFFZEmotes.value && (

@@ -39,5 +39,6 @@
   "Name Folder": "フォルダーに名前を付ける",
   "Switch Scenes": "シーンを切り替える",
   "Failed to load scene collection.  A new one will be created instead.": "シーンコレクションを読み込めませんでした。代わりに新しいシーンコレクションが作成されます。",
-  "New Scene": "新しいシーン"
+  "New Scene": "新しいシーン",
+  "Projector": "プロジェクター"
 }

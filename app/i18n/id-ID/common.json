@@ -88,9 +88,9 @@
   "here": "di sini",
   "Link": "Tautan",
   "Description": "Deskripsi",
-  "OBSInit.UnknownError": "Ditemui kesalahan yang tidak diketahui saat menginisialisasi OBS.",
-  "OBSInit.ModuleNotFoundError": "DirectX tidak bisa ditemukan di sistem Anda. Instal versi DirectX terbaru di mesin Anda di sini <https://www.microsoft.com/en-us/download/details.aspx?id=35?> dan coba lagi.",
-  "OBSInit.NotSupportedError": "Gagal menginisialisasi OBS. Driver video Anda mungkin sudah kedaluwarsa atau Streamlabs OBS mungkin tidak didukung pada sistem Anda.",
+  "OBSInit.UnknownError": "Ditemui kesalahan yang tidak diketahui saat menginisialisasi Streamlabs.",
+  "OBSInit.ModuleNotFoundError": "DirectX tidak bisa ditemukan di sistem Anda. Instal versi DirectX terbaru di mesin Anda di sini &lt;https://www.microsoft.com/en-us/download/details.aspx?id=35?&gt; dan coba lagi.",
+  "OBSInit.NotSupportedError": "Gagal menginisialisasi Streamlabs. Driver video Anda mungkin sudah kedaluwarsa atau Streamlabs Desktop mungkin tidak didukung pada sistem Anda.",
   "Log Out": "Log Out",
   "Layout Editor": "Editor Tata Letak",
   "Are you sure you want to import multiple files?": "Anda yakin ingin mengimpor beberapa file?",
@@ -132,5 +132,12 @@
   "Apply": "Daftar",
   "Do not show this message again": "Jangan menampilkan pesan ini kembali",
   "You can only select up to %{max} items": "Anda hanya bisa memilih hingga %{max} item",
-  "Time": "Waktu"
+  "Time": "Waktu",
+  "Sound Volume": "Volume Suara",
+  "Sound": "Suara",
+  "Play Audio": "Mainkan Audio",
+  "Click here": "Klik di sini",
+  "More Info": "Info Selengkapnya",
+  "Revert Changes": "Membalikkan Perubahan",
+  "Animations": "Animasi"
 }

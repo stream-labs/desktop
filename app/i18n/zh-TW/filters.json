@@ -20,7 +20,7 @@
   "Filter name": "篩選器名稱",
   "Add source filter": "新增來源篩選器",
   "No filters applied": "未套用篩選器",
-  "Filters for %{sourceName}": "Filters for %{sourceName}",
+  "Filters for %{sourceName}": "%{sourceName} 的篩選器",
   "Invert Polarity": "反轉極性",
   "Limiter": "限制器",
   "Expander": "擴展器",
@@ -37,5 +37,6 @@
   "Heat Map": "熱區地圖",
   "Cel Shade": "卡通渲染",
   "Dramatic": "戲劇性",
-  "Wintergreen": "冬青"
+  "Wintergreen": "冬青",
+  "Edit Filters": "編輯篩選器"
 }

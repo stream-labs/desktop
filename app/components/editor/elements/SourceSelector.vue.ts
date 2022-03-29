@@ -1,62 +1,18 @@
 import { Component, Watch } from 'vue-property-decorator';
 import { Inject } from 'services/core/injector';
-import { SourcesService } from 'services/sources';
+import { SourcesService, SourceDisplayData } from 'services/sources';
 import { ScenesService, TSceneNode, ISceneItemFolder, ISceneItem } from 'services/scenes';
 import { SelectionService } from 'services/selection';
 import { EditMenu } from 'util/menus/EditMenu';
 import SlVueTree, { ISlTreeNode, ISlTreeNodeModel, ICursorPosition } from 'sl-vue-tree';
-import { WidgetType } from 'services/widgets';
+import { WidgetDisplayData } from 'services/widgets';
 import { $t } from 'services/i18n';
 import { EditorCommandsService } from 'services/editor-commands';
 import { EPlaceType } from 'services/editor-commands/commands/reorder-nodes';
-import { CustomizationService } from 'services/customization';
+import { AudioService } from 'services/audio';
 import { StreamingService } from 'services/streaming';
 import TsxComponent from 'components/tsx-component';
 import Scrollable from 'components/shared/Scrollable';
-
-const widgetIconMap = {
-  [WidgetType.AlertBox]: 'fas fa-bell',
-  [WidgetType.StreamBoss]: 'fas fa-gavel',
-  [WidgetType.EventList]: 'fas fa-th-list',
-  [WidgetType.TipJar]: 'fas fa-beer',
-  [WidgetType.DonationTicker]: 'fas fa-ellipsis-h',
-  [WidgetType.ChatBox]: 'fas fa-comments',
-  [WidgetType.ViewerCount]: 'fas fa-eye',
-  [WidgetType.SpinWheel]: 'fas fa-chart-pie',
-  [WidgetType.Credits]: 'fas fa-align-center',
-  [WidgetType.SponsorBanner]: 'fas fa-heart',
-  [WidgetType.DonationGoal]: 'fas fa-calendar',
-  [WidgetType.CharityGoal]: 'fas fa-calendar',
-  [WidgetType.BitGoal]: 'fas fa-calendar',
-  [WidgetType.FollowerGoal]: 'fas fa-calendar',
-  [WidgetType.SubGoal]: 'fas fa-calendar',
-  [WidgetType.StarsGoal]: 'fas fa-calendar',
-  [WidgetType.SupporterGoal]: 'fas fa-calendar',
-  [WidgetType.SubscriberGoal]: 'fas fa-calendar',
-  [WidgetType.MediaShare]: 'icon-share',
-  [WidgetType.Poll]: 'icon-text-align-left',
-  [WidgetType.EmoteWall]: 'icon-smile',
-  [WidgetType.ChatHighlight]: 'icon-community',
-};
-
-const sourceIconMap = {
-  ffmpeg_source: 'far fa-file-video',
-  text_gdiplus: 'fas fa-font',
-  text_ft2_source: 'fas fa-font',
-  image_source: 'icon-image',
-  slideshow: 'icon-image',
-  dshow_input: 'icon-webcam',
-  wasapi_input_capture: 'icon-mic',
-  wasapi_output_capture: 'icon-audio',
-  monitor_capture: 'fas fa-desktop',
-  browser_source: 'fas fa-globe',
-  game_capture: 'fas fa-gamepad',
-  scene: 'far fa-object-group',
-  color_source: 'fas fa-fill',
-  openvr_capture: 'fab fa-simplybuilt fa-rotate-180',
-  screen_capture: 'fab fa-simplybuilt fa-rotate-180',
-  liv_capture: 'fab fa-simplybuilt fa-rotate-180',
-};
 
 interface ISceneNodeData {
   id: string;
@@ -72,6 +28,7 @@ export default class SourceSelector extends TsxComponent {
   @Inject() private selectionService: SelectionService;
   @Inject() private editorCommandsService: EditorCommandsService;
   @Inject() private streamingService: StreamingService;
+  @Inject() private audioService: AudioService;
 
   sourcesTooltip = $t('The building blocks of your scene. Also contains widgets.');
   addSourceTooltip = $t('Add a new Source to your Scene. Includes widgets.');
@@ -148,10 +105,10 @@ export default class SourceSelector extends TsxComponent {
         .getSource(sourceId)
         .getPropertiesManagerSettings().widgetType;
 
-      return widgetIconMap[widgetType] || 'icon-error';
+      return WidgetDisplayData()[widgetType]?.icon || 'icon-error';
     }
 
-    return sourceIconMap[source.type] || 'fas fa-file';
+    return SourceDisplayData()[source.type]?.icon || 'fas fa-file';
   }
 
   addSource() {
@@ -212,6 +169,11 @@ export default class SourceSelector extends TsxComponent {
 
     if (item.type === 'scene') {
       this.scenesService.actions.makeSceneActive(item.sourceId);
+      return;
+    }
+
+    if (!item.video) {
+      this.audioService.actions.showAdvancedSettings(item.sourceId);
       return;
     }
 

@@ -65,10 +65,10 @@
   "Banned by %{user}": "Banido por %{user}",
   "No banned media found": "Nenhuma mídia banida encontrada",
   "Effects/Rallies": "Efeitos/Comícios",
-  "Sparks sent are at least <amount>": "Sparks enviados são pelo menos <amount>",
-  "Sparks sent are exactly <amount>": "Sparks enviados são exatamente <amount>",
-  "Ember amount is at least <amount>": "Ember enviados são pelo menos <amount>",
-  "Ember amount is exactly <amopunt>": "Ember enviados são exatamente <amopunt>",
+  "Sparks sent are at least <amount>": "Sparks enviados são pelo menos &lt;amount&gt;",
+  "Sparks sent are exactly <amount>": "Sparks enviados são exatamente &lt;amount&gt;",
+  "Ember amount is at least <amount>": "Ember enviados são pelo menos &lt;amount&gt;",
+  "Ember amount is exactly <amopunt>": "Ember enviados são exatamente &lt;amopunt&gt;",
   "Please note that when advanced media share is enabled, media will no longer play through your alert box widget. Media will only play through this media share widget.": "Observe que, quando o compartilhamento avançado de mídia estiver habilitado, a mídia não será mais reproduzida no widget da caixa de alerta. A mídia será reproduzida apenas por esse widget de compartilhamento de mídia.",
   "Twitch Subscribers": "Inscritos no Twitch",
   "YouTube Members": "Membros do YouTube",
@@ -179,5 +179,12 @@
   "Slide Out Left": "Deslizar para Fora/Esquerda",
   "Slide Out Right": "Deslizar para Fora/Direita",
   "Slide Out Up": "Deslizar para Fora/Cima",
-  "Pick Screen Color": "Selecionar cor da tela"
+  "Pick Screen Color": "Selecionar cor da tela",
+  "Play Alert": "Reproduzir alerta",
+  "Browser Settings": "Configurações do navegador",
+  "Custom Code": "Código personalizado",
+  "font_family_tooltip": "As fontes do Google para utilizar no texto. Acesse http://google.com/fonts para encontrar uma! Fontes populares: Open Sans, Roboto, Oswald, Lato, Droid Sans.",
+  "Something went wrong while applying settings": "Ocorreu um erro ao aplicar as configurações",
+  "Superchat Goal": "Superchat Goal",
+  "YouTube Superchats": "YouTube Superchats"
 }

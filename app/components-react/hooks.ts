@@ -141,7 +141,7 @@ type TUseFormStateResult<TState extends object> = {
     key: TKey,
     value: TState[TDict][TKey],
   ) => unknown;
-  bind: TBindings<TState, keyof TState>;
+  bind: TBindings<TState>;
   stateRef: { current: TState };
   form: FormInstance<TState>;
 };
@@ -161,18 +161,17 @@ export function useForceUpdate() {
 /**
  * Sets a function that guarantees a re-render and fresh state on every tick of the delay
  */
-export function useRenderInterval(callback: () => void, delay: number, condition?: boolean) {
+export function useRenderInterval(callback: () => void, delay: number, condition = true) {
   const [tick, setTick] = useState(0);
 
   useEffect(() => {
-    let timeout: number;
     if (condition) {
-      timeout = window.setTimeout(() => {
+      const timeout = window.setTimeout(() => {
         callback();
         setTick(tick + 1);
       }, delay);
-    }
 
-    return () => clearTimeout(timeout);
+      return () => clearTimeout(timeout);
+    }
   }, [tick, condition]);
 }

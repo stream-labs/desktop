@@ -5,8 +5,6 @@
   "Generate new": "新規生成",
   "Port": "ポート",
   "IP addresses": "IP アドレス",
-  "You can now control Streamlabs OBS from your phone.": "スマートフォンから Streamlabs OBS をコントロールできるようになりました。",
-  "To begin, scan this QR code with your phone.": "開始するには、スマートフォンでこの QR コードをスキャンします。",
-  "This feature will only work with the most recent version of the Streamlabs mobile app.": "この機能は、最新バージョンの Streamlabs モバイルアプリでのみ動作します。",
-  "Click to show": "クリックして表示"
+  "Click to show": "クリックして表示",
+  "The free Streamlabs Deck app allows you to control Streamlabs Desktop from your iOS or Android device. Scan the QR code below to begin.": "The free Streamlabs Deck app allows you to control Streamlabs Desktop from your iOS or Android device. Scan the QR code below to begin."
 }

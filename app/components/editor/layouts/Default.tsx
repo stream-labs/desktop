@@ -26,7 +26,7 @@ export default class Default extends BaseLayout {
         style={{ height: `${this.resizes.bar2 * 100}%`, padding: '0 8px' }}
       >
         {['3', '4', '5'].map(slot => (
-          <div class={cx(styles.cell, styles.noTopPadding)}>{this.$slots[slot]}</div>
+          <div class={cx(styles.cell, 'no-top-padding')}>{this.$slots[slot]}</div>
         ))}
       </div>
     );
@@ -53,7 +53,7 @@ export default class Default extends BaseLayout {
         />
         <div
           style={{ height: `${this.resizes.bar1 * 100}%` }}
-          class={cx(styles.cell, styles.noTopPadding)}
+          class={cx(styles.cell, 'no-top-padding')}
         >
           {this.$slots['2']}
         </div>

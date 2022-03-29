@@ -4,6 +4,7 @@ import electron from 'electron';
 import cloneDeep from 'lodash/cloneDeep';
 import fs from 'fs';
 import path from 'path';
+import * as remote from '@electron/remote';
 
 export const enum EBit {
   ZERO,
@@ -18,6 +19,7 @@ export interface IEnv {
   SLOBS_VERSION: string;
   SLOBS_TRACE_SYNC_IPC: boolean;
   SLOBS_USE_CDN_MEDIA: boolean;
+  SLD_USE_BETA: boolean;
   CI: boolean;
 }
 
@@ -28,7 +30,7 @@ export default class Utils {
    */
   static _env: IEnv;
   static get env() {
-    if (!Utils._env) Utils._env = electron.remote.process.env as any;
+    if (!Utils._env) Utils._env = remote.process.env as any;
     return Utils._env;
   }
 
@@ -77,13 +79,13 @@ export default class Utils {
   }
 
   static getMainWindow(): Electron.BrowserWindow {
-    return electron.remote.BrowserWindow.getAllWindows().find(
+    return remote.BrowserWindow.getAllWindows().find(
       win => Utils.getUrlParams(win.webContents.getURL()).windowId === 'main',
     );
   }
 
   static getChildWindow(): Electron.BrowserWindow {
-    return electron.remote.BrowserWindow.getAllWindows().find(
+    return remote.BrowserWindow.getAllWindows().find(
       win => Utils.getUrlParams(win.webContents.getURL()).windowId === 'child',
     );
   }
@@ -106,6 +108,10 @@ export default class Utils {
 
   static shouldUseLocalHost(): boolean {
     return Utils.env.SLOBS_USE_LOCAL_HOST as boolean;
+  }
+
+  static shouldUseBeta(): boolean {
+    return Utils.env.SLD_USE_BETA as boolean;
   }
 
   /**
@@ -266,7 +272,7 @@ let appPath: string;
  * Memoized function for getting the app path
  */
 export function getAppPath() {
-  appPath = appPath ?? electron.remote.app.getAppPath();
+  appPath = appPath ?? remote.app.getAppPath();
   return appPath;
 }
 
