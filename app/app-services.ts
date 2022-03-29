@@ -166,6 +166,7 @@ import { LayoutService } from './services/layout';
 import { ProjectorService } from './services/projector';
 import { ObsImporterService } from 'services/obs-importer';
 import { DefaultHardwareService } from 'services/hardware';
+import { AutoConfigService } from 'services/auto-config';
 
 export const AppServices = {
   AppService,
@@ -220,4 +221,5 @@ export const AppServices = {
   ProjectorService,
   ObsImporterService,
   DefaultHardwareService,
+  AutoConfigService,
 };

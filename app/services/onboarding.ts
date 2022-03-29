@@ -75,7 +75,7 @@ const ONBOARDING_STEPS = () => ({
   },
   [EOnboardingSteps.Optimize]: {
     element: onboardingSteps.Optimize,
-    component: 'Connect',
+    component: 'Optimize',
     disableControls: false,
     hideSkip: false,
     hideButton: true,

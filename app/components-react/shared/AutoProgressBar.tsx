@@ -22,5 +22,5 @@ export default function AutoProgressBar(p: { percent: number; timeTarget: number
     return () => clearInterval(interval);
   }, [p.percent]);
 
-  return <Progress percent={renderedPercent} status="active" />;
+  return <Progress percent={renderedPercent} status="active" format={p => `${p?.toFixed(0)}%`} />;
 }
