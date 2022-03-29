@@ -106,7 +106,7 @@
   "Failed to update settings for %{platformName}": "%{platformName} の設定を更新できませんでした",
   "prepopulateStreamSettingsError": "チャネル情報のフェッチ中にエラーが発生しました。&lt;fetch-again-link&gt;情報のフェッチを再試行&lt;/fetch-again-link&gt;するか、または&lt;just-go-live-link&gt;ライブ配信を開始&lt;/just-go-live-link&gt;することができます。このエラーが解決しない場合、ログアウトしてからログインし直してください。",
   "updateStreamSettingsError": "ストリーム情報の更新中に問題が発生しました。&lt;try-again-link&gt;再試行&lt;/try-again-link&gt;するか、または&lt;just-go-live-link&gt;ライブ配信を開始&lt;/just-go-live-link&gt;することができます。このエラーが続く場合は、ログアウト、再ログインを試すことができます。",
-  "twitchMissedScopeError": "<p>streamlabs.com ウェブサイト上で Twitch アカウントが接続されたようです。ストリーミングを開始するには、Streamlabs Desktop</p><connect-button>Twitch を接続</connect-button>を通して再接続する必要があります",
+  "twitchMissedScopeError": "<p>streamlabs.com ウェブサイト上で Twitch アカウントが接続されたようです。ストリーミングを開始するには、以下を通して再接続する必要があります：Streamlabs Desktop</p><connect-button>Twitch を接続</connect-button>",
   "Multistreaming to these platforms requires Prime": "これらのプラットフォームへのマルチストリーミングには Prime が必要です",
   "Become a Prime member": "Prime メンバーになる",
   "You must select a game for %{platformName}": "%{platformName} のゲームを選択する必要があります。",
