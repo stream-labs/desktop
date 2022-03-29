@@ -40,10 +40,7 @@
           @totalWidth="width => handleEditorWidth(width)"
           style="grid-row: 1 / span 1"
         />
-        <studio-footer
-          v-if="!applicationLoading && page !== 'Onboarding'"
-          style="grid-row: 2 / span 1"
-        />
+        <studio-footer v-if="!applicationLoading && page !== 'Onboarding'" />
       </div>
 
       <div class="live-dock-wrapper" v-if="renderDock && !leftDock">

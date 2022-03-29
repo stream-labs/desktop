@@ -288,7 +288,18 @@ export class StreamScheduler extends ReactComponent {}
 @Component({ props: { name: { default: 'StudioEditor' } } })
 export class StudioEditor extends ReactComponent {}
 
-@Component({ props: { name: { default: 'StudioFooter' } } })
+@Component({
+  props: {
+    name: { default: 'StudioFooter' },
+    wrapperStyles: {
+      default: () => ({
+        'grid-row': '2 / span 1',
+        display: 'flex',
+        'min-width': 0,
+      }),
+    },
+  },
+})
 export class StudioFooter extends ReactComponent {}
 
 @Component({
