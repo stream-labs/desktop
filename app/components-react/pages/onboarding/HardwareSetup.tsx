@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { $t } from 'services/i18n';
 import commonStyles from './Common.m.less';
 import styles from './HardwareSetup.m.less';
@@ -8,6 +8,7 @@ import { ERenderingMode } from '../../../../obs-api';
 import Form from 'components-react/shared/inputs/Form';
 import { ListInput } from 'components-react/shared/inputs';
 import { useVuex } from 'components-react/hooks';
+import { Volmeter2d } from 'services/audio/volmeter-2d';
 
 export function HardwareSetup() {
   const { DefaultHardwareService, SourceFiltersService } = Services;
@@ -24,8 +25,20 @@ export function HardwareSetup() {
     selectedVideoDevice: DefaultHardwareService.state.defaultVideoDevice,
     presetFilterValue: DefaultHardwareService.state.presetFilter,
     selectedAudioDevice: DefaultHardwareService.state.defaultAudioDevice,
+    selectedAudioSource: DefaultHardwareService.selectedAudioSource,
   }));
+  const canvasRef = useRef<HTMLCanvasElement>(null);
 
+  // Set up volmeter
+  useEffect(() => {
+    if (canvasRef.current && v.selectedAudioSource) {
+      const volmeter2d = new Volmeter2d(v.selectedAudioSource, canvasRef.current);
+
+      return () => volmeter2d.destroy();
+    }
+  }, [canvasRef.current, v.selectedAudioSource]);
+
+  // Set up temporary sources
   useEffect(() => {
     DefaultHardwareService.createTemporarySources();
 
@@ -94,7 +107,9 @@ export function HardwareSetup() {
               onChange={val => DefaultHardwareService.actions.setDefault('audio', val)}
               allowClear={false}
             />
-            <div>Volmeter Placeholder</div>
+            <div className="section">
+              <canvas ref={canvasRef} style={{ backgroundColor: 'var(--border)', width: '100%' }} />
+            </div>
           </Form>
         )}
 
