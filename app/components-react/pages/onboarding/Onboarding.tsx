@@ -12,8 +12,6 @@ export default function Onboarding() {
   const { currentStep, next, processing } = useModule(OnboardingModule).select();
   const Component = stepComponents[currentStep.component];
 
-  console.log('RENDER ONBOARDING', currentStep.component);
-
   return (
     <div className={styles.onboardingContainer}>
       {<TopBar />}
