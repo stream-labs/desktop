@@ -1,6 +1,12 @@
 import { Progress } from 'antd';
 import React, { useEffect, useState } from 'react';
 
+/**
+ * A progress bar that automatically increments itself in the
+ * absence of progress updates.
+ * @param p.percent current percent of the progress bar
+ * @param p.timeTarget the time it takes to reach 100% in ms
+ */
 export default function AutoProgressBar(p: { percent: number; timeTarget: number }) {
   const [renderedPercent, setRenderedPercent] = useState(0);
 
