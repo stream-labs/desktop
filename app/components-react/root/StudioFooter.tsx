@@ -116,6 +116,7 @@ export default function StudioFooterComponent(p: { locked?: boolean }) {
   }
 
   function saveReplay() {
+    if (replayBufferSaving || replayBufferStopping) return;
     StreamingService.actions.saveReplay();
   }
 
@@ -180,11 +181,7 @@ export default function StudioFooterComponent(p: { locked?: boolean }) {
               </button>
             </Tooltip>
             <Tooltip placement="top" title={$t('Save Replay')}>
-              <button
-                className={cx('circle-button', styles.rightReplay)}
-                onClick={saveReplay}
-                disabled={replayBufferSaving || replayBufferStopping}
-              >
+              <button className={cx('circle-button', styles.rightReplay)} onClick={saveReplay}>
                 <i className="icon-save" />
               </button>
             </Tooltip>
