@@ -7,7 +7,7 @@ import * as onboardingSteps from 'components/pages/onboarding-steps';
 import TsxComponent from 'components/tsx-component';
 import { OS } from 'util/operating-systems';
 import { $t } from './i18n';
-import { handleResponse } from 'util/requests';
+import { handleResponse, jfetch } from 'util/requests';
 import { getPlatformService, IPlatformCapabilityResolutionPreset } from './platforms';
 import { OutputSettingsService } from './settings';
 import { ObsImporterService } from './obs-importer';
@@ -67,7 +67,7 @@ const ONBOARDING_STEPS = () => ({
   },
   [EOnboardingSteps.ThemeSelector]: {
     element: onboardingSteps.ThemeSelector,
-    component: 'Connect',
+    component: 'ThemeSelector',
     disableControls: false,
     hideSkip: false,
     hideButton: true,
@@ -131,6 +131,14 @@ interface IOnboardingServiceState {
   options: IOnboardingOptions;
   importedFromObs: boolean;
   existingSceneCollections: boolean;
+}
+
+export interface IThemeMetadata {
+  data: {
+    id: number;
+    name: string;
+    custom_images: Dictionary<string>;
+  };
 }
 
 class OnboardingViews extends ViewHandler<IOnboardingServiceState> {
@@ -224,14 +232,14 @@ export class OnboardingService extends StatefulService<IOnboardingServiceState> 
 
   async fetchThemeData(id: string) {
     const url = `https://overlays.streamlabs.com/api/overlay/${id}`;
-    return await fetch(new Request(url)).then(handleResponse);
+    return jfetch<IThemeMetadata>(url);
   }
 
   async fetchThemes() {
     return await Promise.all(Object.keys(THEME_METADATA).map(id => this.fetchThemeData(id)));
   }
 
-  themeUrl(id: string) {
+  themeUrl(id: number) {
     return THEME_METADATA[id];
   }
 

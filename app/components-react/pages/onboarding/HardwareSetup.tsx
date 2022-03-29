@@ -46,7 +46,7 @@ export function HardwareSetup() {
       DefaultHardwareService.actions.setDefault('video', v.videoDevices[0].value);
     }
 
-    return () => DefaultHardwareService.clearTemporarySources();
+    return () => DefaultHardwareService.actions.clearTemporarySources();
   }, []);
 
   function setVideoDevice(val: string) {
@@ -112,42 +112,6 @@ export function HardwareSetup() {
             </div>
           </Form>
         )}
-
-        {/* {!!this.videoDevices.length && (
-          <div>
-            <VFormGroup
-              metadata={metadata.list({ options: this.videoDevices })}
-              value={this.selectedVideoDevice}
-              onInput={(id: string) => this.setVideoDevice(id)}
-            />
-            <VFormGroup
-              metadata={this.sourceFiltersService.views.presetFilterMetadata}
-              value={this.presetFilterValue}
-              onInput={(value: string) => this.setPresetFilter(value)}
-            />
-          </div>
-        )}
-        {this.defaultHardwareService.selectedAudioSource && (
-          <div
-            class={styles.volmeter}
-            key={this.defaultHardwareService.selectedAudioSource.sourceId}
-          >
-            <MixerVolmeter
-              audioSource={this.defaultHardwareService.selectedAudioSource}
-              volmetersEnabled={true}
-              class={styles.volmeterCenter}
-            />
-          </div>
-        )}
-        <VFormGroup
-          metadata={metadata.list({
-            options: this.audioDevices,
-            openDirection: 'bottom',
-            optionsHeight: 120,
-          })}
-          value={this.selectedAudioDevice}
-          onInput={(id: string) => (this.selectedAudioDevice = id)}
-        /> */}
       </div>
     </div>
   );
