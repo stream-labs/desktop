@@ -1,4 +1,5 @@
 import { useModule } from 'components-react/hooks/useModule';
+import { alertAsync } from 'components-react/modals';
 import { Services } from 'components-react/service-provider';
 import AutoProgressBar from 'components-react/shared/AutoProgressBar';
 import { ListInput } from 'components-react/shared/inputs';
@@ -71,6 +72,11 @@ function PreImport() {
             })
             .catch(() => {
               setProcessing(false);
+              alertAsync(
+                $t(
+                  'Something went wrong while importing from OBS Studio. Please try again or skip to the next step.',
+                ),
+              );
             });
         }}
       >
@@ -151,9 +157,9 @@ class ObsImportModule {
         this.setImporting(false);
         return r;
       })
-      .catch(() => {
+      .catch(e => {
         this.setImporting(false);
-        // TODO: Error handling
+        throw e;
       });
   }
 

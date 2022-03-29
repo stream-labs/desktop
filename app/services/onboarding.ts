@@ -53,7 +53,7 @@ const ONBOARDING_STEPS = () => ({
     element: onboardingSteps.ObsImport,
     component: 'ObsImport',
     disableControls: true,
-    hideSkip: true,
+    hideSkip: false,
     hideButton: true,
     label: $t('Import'),
   },
