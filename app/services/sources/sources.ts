@@ -288,6 +288,14 @@ export class SourcesService extends StatefulService<ISourcesState> {
     ) {
       this.sourceFiltersService.addPresetFilter(id, this.defaultHardwareService.state.presetFilter);
     }
+
+    if (
+      this.defaultHardwareService.state.defaultVideoDevice === obsInputSettings.device &&
+      this.defaultHardwareService.state.presetFilter !== ''
+    ) {
+      this.sourceFiltersService.addPresetFilter(id, this.defaultHardwareService.state.presetFilter);
+    }
+
     return this.views.getSource(id)!;
   }
 
@@ -465,6 +473,14 @@ export class SourcesService extends StatefulService<ISourcesState> {
       this.defaultHardwareService.state.defaultVideoDevice
     ) {
       resolvedSettings.video_device_id = this.defaultHardwareService.state.defaultVideoDevice;
+    }
+
+    if (
+      type === 'av_capture_input' &&
+      resolvedSettings.device === void 0 &&
+      this.defaultHardwareService.state.defaultVideoDevice
+    ) {
+      resolvedSettings.device = this.defaultHardwareService.state.defaultVideoDevice;
     }
 
     // TODO: Specifically for TikTok, we don't use auto mode on game capture
