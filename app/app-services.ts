@@ -167,6 +167,7 @@ import { ProjectorService } from './services/projector';
 import { ObsImporterService } from 'services/obs-importer';
 import { DefaultHardwareService } from 'services/hardware';
 import { AutoConfigService } from 'services/auto-config';
+import { MacPermissionsService } from 'services/mac-permissions';
 
 export const AppServices = {
   AppService,
@@ -222,4 +223,5 @@ export const AppServices = {
   ObsImporterService,
   DefaultHardwareService,
   AutoConfigService,
+  MacPermissionsService,
 };
