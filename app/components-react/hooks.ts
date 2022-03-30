@@ -27,6 +27,32 @@ export function useVuex<TReturnValue>(selector: () => TReturnValue, deep = true)
 }
 
 /**
+ * Watch a value in Vuex. A few caveats:
+ * - This intentionally does not call your watch function on first
+ *   render. This is specifically for tying behavior to when the
+ *   watched value changes.
+ * - Your selector should return a simple value, not an object. This
+ *   is because (like React deps) the values are compared with simple
+ *   === equality, and will not do a proper object comparison.
+ * @param selector A function that returns a value to watch
+ * @param watchFn A function that runs when the value changes
+ */
+export function useWatchVuex<TSelectorValue>(
+  selector: () => TSelectorValue,
+  watchFn: (newVal: TSelectorValue, oldVal: TSelectorValue) => void,
+) {
+  const selectorVal = useVuex(selector);
+  const oldVal = useRef(selectorVal);
+
+  useEffect(() => {
+    if (selectorVal !== oldVal.current) {
+      watchFn(selectorVal, oldVal.current);
+      oldVal.current = selectorVal;
+    }
+  }, [selectorVal]);
+}
+
+/**
  * onCreate shortcut
  * Helpful if you need to calculate an immutable initial state for a component
  */

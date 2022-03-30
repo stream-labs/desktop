@@ -11,6 +11,7 @@ import { handleResponse, jfetch } from 'util/requests';
 import { getPlatformService, IPlatformCapabilityResolutionPreset } from './platforms';
 import { OutputSettingsService } from './settings';
 import { ObsImporterService } from './obs-importer';
+import Utils from './utils';
 
 enum EOnboardingSteps {
   MacPermissions = 'MacPermissions',
@@ -24,7 +25,7 @@ enum EOnboardingSteps {
   PrimeExpiration = 'PrimeExpiration',
 }
 
-const ONBOARDING_STEPS = () => ({
+export const ONBOARDING_STEPS = () => ({
   [EOnboardingSteps.MacPermissions]: {
     element: onboardingSteps.MacPermissions,
     component: 'MacPermissions',
@@ -83,7 +84,7 @@ const ONBOARDING_STEPS = () => ({
   },
   [EOnboardingSteps.Prime]: {
     element: onboardingSteps.Prime,
-    component: 'Connect',
+    component: 'Prime',
     disableControls: false,
     hideSkip: false,
     hideButton: true,
@@ -309,6 +310,12 @@ export class OnboardingService extends StatefulService<IOnboardingServiceState> 
   }
 
   startOnboardingIfRequired() {
+    // Useful for testing in dev env
+    if (Utils.env.SLD_FORCE_ONBOARDING_STEP) {
+      this.start();
+      return true;
+    }
+
     if (localStorage.getItem(this.localStorageKey)) {
       return false;
     }

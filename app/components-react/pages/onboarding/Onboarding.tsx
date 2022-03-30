@@ -7,6 +7,8 @@ import cx from 'classnames';
 import { mutation } from 'components-react/store';
 import { $t } from 'services/i18n';
 import * as stepComponents from './steps';
+import Utils from 'services/utils';
+import { ONBOARDING_STEPS } from 'services/onboarding';
 
 export default function Onboarding() {
   const { currentStep, next, processing } = useModule(OnboardingModule).select();
@@ -117,6 +119,11 @@ export class OnboardingModule {
   }
 
   get currentStep() {
+    // Useful for testing in development
+    if (Utils.env.SLD_FORCE_ONBOARDING_STEP) {
+      return ONBOARDING_STEPS()[Utils.env.SLD_FORCE_ONBOARDING_STEP];
+    }
+
     return this.singletonStep ?? this.steps[this.state.stepIndex];
   }
 
