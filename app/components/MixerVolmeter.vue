@@ -1,6 +1,6 @@
 <template>
 <div class="volmeter-container">
-  <canvas class="volmeter" ref="canvas" v-show="renderingInitialized" :key="canvasId" />
+  <canvas class="volmeter" ref="canvas" v-show="renderingInitialized" />
   <div class="volmeter-spacer" ref="spacer" />
 </div>
 </template>

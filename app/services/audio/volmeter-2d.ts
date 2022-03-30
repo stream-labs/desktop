@@ -62,9 +62,13 @@ export class Volmeter2d {
   frameNumber: number;
   styleBlockersSubscription: Subscription;
 
-  volmetersEnabled = true;
-
-  constructor(public audioSource: AudioSource, public canvas: HTMLCanvasElement) {
+  constructor(
+    public audioSource: AudioSource,
+    public canvas: HTMLCanvasElement,
+    public spacer?: HTMLDivElement,
+    public onRenderingInit?: () => void,
+    public volmetersEnabled = true,
+  ) {
     this.subscribeVolmeter();
     this.peakHoldCounters = [];
     this.peakHolds = [];
@@ -142,6 +146,7 @@ export class Volmeter2d {
 
     this.ctx = this.canvas.getContext('2d', { alpha: false });
     this.renderingInitialized = true;
+    if (this.onRenderingInit) this.onRenderingInit();
   }
 
   private setChannelCount(channels: number) {
@@ -156,6 +161,7 @@ export class Volmeter2d {
 
       this.canvas.height = this.canvasHeight;
       this.canvas.style.height = `${this.canvasHeight}px`;
+      if (this.spacer) this.spacer.style.height = `${this.canvasHeight}px`;
     }
   }
 
