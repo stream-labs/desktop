@@ -22,7 +22,6 @@ enum EOnboardingSteps {
   ThemeSelector = 'ThemeSelector',
   Optimize = 'Optimize',
   Prime = 'Prime',
-  PrimeExpiration = 'PrimeExpiration',
 }
 
 export const ONBOARDING_STEPS = () => ({
@@ -90,14 +89,6 @@ export const ONBOARDING_STEPS = () => ({
     hideButton: true,
     label: $t('Prime'),
   },
-  [EOnboardingSteps.PrimeExpiration]: {
-    element: onboardingSteps.PrimeExpiration,
-    component: 'Connect',
-    disableControls: true,
-    hideSkip: true,
-    hideButton: true,
-    label: '',
-  },
 });
 
 const THEME_METADATA = {
@@ -124,7 +115,6 @@ interface IOnboardingOptions {
   isOptimize: boolean; // When re-running the optimizer after onboarding
   // about our security upgrade.
   isHardware: boolean; // When configuring capture defaults
-  isPrimeExpiration: boolean; // Only shown as a singleton step if prime is expiring soon
   isImport: boolean; // When users are importing from OBS
 }
 
@@ -148,9 +138,6 @@ class OnboardingViews extends ViewHandler<IOnboardingServiceState> {
     if (this.state.options.isOptimize) return ONBOARDING_STEPS()[EOnboardingSteps.Optimize];
     if (this.state.options.isHardware) return ONBOARDING_STEPS()[EOnboardingSteps.HardwareSetup];
     if (this.state.options.isImport) return ONBOARDING_STEPS()[EOnboardingSteps.ObsImport];
-    if (this.state.options.isPrimeExpiration) {
-      return ONBOARDING_STEPS()[EOnboardingSteps.PrimeExpiration];
-    }
   }
 
   get steps() {
@@ -202,7 +189,6 @@ export class OnboardingService extends StatefulService<IOnboardingServiceState> 
       isLogin: false,
       isOptimize: false,
       isHardware: false,
-      isPrimeExpiration: false,
       isImport: false,
     },
     importedFromObs: false,
@@ -274,7 +260,6 @@ export class OnboardingService extends StatefulService<IOnboardingServiceState> 
       isLogin: false,
       isOptimize: false,
       isHardware: false,
-      isPrimeExpiration: false,
       isImport: false,
       ...options,
     };
