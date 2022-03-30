@@ -3,7 +3,6 @@ import { NavigationService } from 'services/navigation';
 import { UserService } from 'services/user';
 import { Inject, ViewHandler } from 'services/core/';
 import { SceneCollectionsService } from 'services/scene-collections';
-import * as onboardingSteps from 'components/pages/onboarding-steps';
 import TsxComponent from 'components/tsx-component';
 import { OS } from 'util/operating-systems';
 import { $t } from './i18n';
@@ -26,7 +25,6 @@ enum EOnboardingSteps {
 
 export const ONBOARDING_STEPS = () => ({
   [EOnboardingSteps.MacPermissions]: {
-    element: onboardingSteps.MacPermissions,
     component: 'MacPermissions',
     disableControls: false,
     hideSkip: true,
@@ -34,7 +32,6 @@ export const ONBOARDING_STEPS = () => ({
     isPreboarding: true,
   },
   [EOnboardingSteps.Connect]: {
-    element: onboardingSteps.Connect,
     component: 'Connect',
     disableControls: false,
     hideSkip: true,
@@ -42,7 +39,6 @@ export const ONBOARDING_STEPS = () => ({
     isPreboarding: true,
   },
   [EOnboardingSteps.FreshOrImport]: {
-    element: onboardingSteps.ChooseYourAdventure,
     component: 'FreshOrImport',
     disableControls: true,
     hideSkip: true,
@@ -50,7 +46,6 @@ export const ONBOARDING_STEPS = () => ({
     isPreboarding: true,
   },
   [EOnboardingSteps.ObsImport]: {
-    element: onboardingSteps.ObsImport,
     component: 'ObsImport',
     disableControls: true,
     hideSkip: false,
@@ -58,7 +53,6 @@ export const ONBOARDING_STEPS = () => ({
     label: $t('Import'),
   },
   [EOnboardingSteps.HardwareSetup]: {
-    element: onboardingSteps.HardwareSetup,
     component: 'HardwareSetup',
     disableControls: false,
     hideSkip: false,
@@ -66,7 +60,6 @@ export const ONBOARDING_STEPS = () => ({
     label: $t('Set Up Mic and Webcam'),
   },
   [EOnboardingSteps.ThemeSelector]: {
-    element: onboardingSteps.ThemeSelector,
     component: 'ThemeSelector',
     disableControls: false,
     hideSkip: false,
@@ -74,7 +67,6 @@ export const ONBOARDING_STEPS = () => ({
     label: $t('Add a Theme'),
   },
   [EOnboardingSteps.Optimize]: {
-    element: onboardingSteps.Optimize,
     component: 'Optimize',
     disableControls: false,
     hideSkip: false,
@@ -82,7 +74,6 @@ export const ONBOARDING_STEPS = () => ({
     label: $t('Optimize'),
   },
   [EOnboardingSteps.Prime]: {
-    element: onboardingSteps.Prime,
     component: 'Prime',
     disableControls: false,
     hideSkip: false,
@@ -101,7 +92,6 @@ const THEME_METADATA = {
 };
 
 export interface IOnboardingStep {
-  element: typeof TsxComponent;
   component: string;
   disableControls: boolean;
   hideSkip: boolean;
