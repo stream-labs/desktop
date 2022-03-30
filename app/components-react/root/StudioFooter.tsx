@@ -52,11 +52,15 @@ export default function StudioFooterComponent(p: { locked?: boolean }) {
     youtubeEnabled: YoutubeService.state.liveStreamingEnabled,
   }));
 
-  useRenderInterval(
-    () => setRecordingTime(StreamingService.formattedDurationInCurrentRecordingState),
-    1000,
-    isRecording,
-  );
+  useEffect(() => {
+    if (isRecording) {
+      const recordingTimeout = window.setTimeout(() => {
+        setRecordingTime(StreamingService.formattedDurationInCurrentRecordingState);
+      }, 1000);
+
+      return () => clearTimeout(recordingTimeout);
+    }
+  }, [isRecording, recordingTime]);
 
   useEffect(confirmYoutubeEnabled, [platform]);
 
