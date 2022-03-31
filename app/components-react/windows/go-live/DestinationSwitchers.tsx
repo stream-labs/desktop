@@ -23,7 +23,7 @@ export function DestinationSwitchers() {
     switchPlatforms,
     switchCustomDestination,
     checkPrimaryPlatform,
-  } = useGoLiveSettings().select();
+  } = useGoLiveSettings();
   const enabledPlatformsRef = useRef(enabledPlatforms);
   enabledPlatformsRef.current = enabledPlatforms;
 

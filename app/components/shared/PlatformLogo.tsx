@@ -11,24 +11,27 @@ class LogoProps {
 
 @Component({ props: createProps(LogoProps) })
 export default class PlatformLogo extends TsxComponent<LogoProps> {
-  get iconForPlatform() {
-    return {
-      twitch: 'fab fa-twitch',
-      youtube: 'fab fa-youtube',
-      facebook: 'fab fa-facebook',
-      tiktok: 'fab fa-tiktok',
-      dlive: 'dlive',
-      nimotv: 'nimotv',
-      streamlabs: 'icon-streamlabs',
-    }[this.props.platform];
-  }
-
   render() {
-    return (
-      <i
-        class={cx(this.iconForPlatform, styles[this.props.platform])}
-        style={this.props.size && `font-size: ${this.props.size}px`}
-      />
-    );
+    return <div>Should be removed</div>
   }
+  // get iconForPlatform() {
+  //   return {
+  //     twitch: 'fab fa-twitch',
+  //     youtube: 'fab fa-youtube',
+  //     facebook: 'fab fa-facebook',
+  //     tiktok: 'fab fa-tiktok',
+  //     dlive: 'dlive',
+  //     nimotv: 'nimotv',
+  //     streamlabs: 'icon-streamlabs',
+  //   }[this.props.platform];
+  // }
+  //
+  // render() {
+  //   return (
+  //     <i
+  //       class={cx(this.iconForPlatform, styles[this.props.platform])}
+  //       style={this.props.size && `font-size: ${this.props.size}px`}
+  //     />
+  //   );
+  // }
 }

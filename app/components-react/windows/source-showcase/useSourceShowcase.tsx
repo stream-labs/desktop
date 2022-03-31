@@ -1,7 +1,6 @@
 import React from 'react';
 import omit from 'lodash/omit';
-import { useModule } from '../../hooks/useModule';
-import { mutation } from '../../store';
+import { injectState, useModule } from 'slap';
 import { Services } from '../../service-provider';
 import { TPropertiesManager, TSourceType } from 'services/sources';
 import { WidgetType } from 'services/widgets';
@@ -21,11 +20,17 @@ type TInspectableSource = TSourceType | WidgetType | 'streamlabel' | 'app_source
  * A module for components in the SourceShowcase window
  */
 class SourceShowcaseModule {
-  state = {
+  state = injectState({
     inspectedSource: '' as TInspectableSource,
     inspectedAppId: '',
     inspectedAppSourceId: '',
-  };
+
+    inspectSource(source: string, appId?: string, appSourceId?: string) {
+      this.inspectedSource = source;
+      this.inspectedAppId = appId || '';
+      this.inspectedAppSourceId = appSourceId || '';
+    },
+  });
 
   private get sourcesService() {
     return Services.SourcesService;
@@ -47,13 +52,6 @@ class SourceShowcaseModule {
 
       return sources;
     }, []);
-  }
-
-  @mutation()
-  inspectSource(source: string, appId?: string, appSourceId?: string) {
-    this.state.inspectedSource = source;
-    this.state.inspectedAppId = appId || '';
-    this.state.inspectedAppSourceId = appSourceId || '';
   }
 
   selectInspectedSource() {
@@ -110,5 +108,5 @@ class SourceShowcaseModule {
 
 // wrap the module in a hook
 export function useSourceShowcaseSettings() {
-  return useModule(SourceShowcaseModule).select();
+  return useModule(SourceShowcaseModule);
 }

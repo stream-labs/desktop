@@ -9,6 +9,7 @@ import { metadata } from 'components/widgets/inputs/index';
 import { WIDGET_INITIAL_STATE } from './widget-settings';
 import { InheritMutations } from 'services/core/stateful-service';
 import { $t } from 'services/i18n';
+import {TPlatform} from "../../platforms";
 
 export interface IEventListSettings extends IWidgetSettings {
   animation_speed: number;
@@ -95,7 +96,7 @@ export class EventListService extends WidgetSettingsService<IEventListData> {
   }
 
   eventsByPlatform(): { key: string; title: string }[] {
-    const platform = this.userService.platform.type;
+    const platform = this.userService.platform.type as Exclude<TPlatform, 'tiktok'>;
     return {
       twitch: [
         { key: 'show_follows', title: $t('Follows') },

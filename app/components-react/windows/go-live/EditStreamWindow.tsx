@@ -27,7 +27,7 @@ export default function EditStreamWindow() {
     prepopulate,
     isLoading,
     form,
-  } = useGoLiveSettingsRoot({ isUpdateMode: true }).select();
+  } = useGoLiveSettingsRoot({ isUpdateMode: true });
 
   const shouldShowChecklist = lifecycle === 'runChecklist';
   const shouldShowSettings = !shouldShowChecklist;
@@ -85,7 +85,7 @@ export default function EditStreamWindow() {
   return (
     <ModalLayout footer={renderFooter()}>
       <Form
-        form={form}
+        form={form!}
         style={{ position: 'relative', height: '100%' }}
         layout="horizontal"
         name="editStreamForm"

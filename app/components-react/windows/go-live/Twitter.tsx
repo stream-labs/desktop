@@ -22,16 +22,34 @@ export default function TwitterInput() {
     screenName,
     platform,
     useStreamlabsUrl,
-  } = useGoLiveSettings().selectExtra(module => {
+  } = useGoLiveSettings().extend(module => {
     const state = TwitterService.state;
     return {
-      streamTitle: module.commonFields.title,
-      tweetWhenGoingLive: state.tweetWhenGoingLive,
-      useStreamlabsUrl: state.creatorSiteOnboardingComplete,
-      linked: state.linked,
-      screenName: state.screenName,
-      platform: UserService.views.platform?.type,
-      url: TwitterService.views.url,
+      get streamTitle() {
+        return module.commonFields.title;
+      },
+      get tweetWhenGoingLive() {
+        return state.tweetWhenGoingLive;
+      },
+      get useStreamlabsUrl() {
+        return state.creatorSiteOnboardingComplete;
+      },
+
+      get linked() {
+        return state.linked;
+      },
+
+      get screenName() {
+        return state.screenName;
+      },
+
+      get platform() {
+        return UserService.views.platform?.type;
+      },
+
+      get url() {
+        return TwitterService.views.url;
+      },
     };
   });
 

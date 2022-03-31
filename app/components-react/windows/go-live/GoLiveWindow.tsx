@@ -25,7 +25,7 @@ export default function GoLiveWindow() {
     prepopulate,
     isLoading,
     form,
-  } = useGoLiveSettingsRoot().select();
+  } = useGoLiveSettingsRoot();
 
   const shouldShowConfirm = ['prepopulate', 'waitForNewSettings'].includes(lifecycle);
   const shouldShowSettings = ['empty', 'prepopulate', 'waitForNewSettings'].includes(lifecycle);
@@ -84,7 +84,7 @@ export default function GoLiveWindow() {
   return (
     <ModalLayout footer={renderFooter()}>
       <Form
-        form={form}
+        form={form!}
         style={{ position: 'relative', height: '100%' }}
         layout="horizontal"
         name="editStreamForm"

@@ -31,13 +31,15 @@ export default function GoLiveSettings() {
     error,
     isLoading,
     canAddDestinations,
-  } = useGoLiveSettings().selectExtra(module => {
-    const linkedPlatforms = module.linkedPlatforms;
-    const customDestinations = module.customDestinations;
-    return {
-      canAddDestinations: linkedPlatforms.length + customDestinations.length < 5,
-    };
-  });
+  } = useGoLiveSettings().extend(module => ({
+
+    get canAddDestinations() {
+      const linkedPlatforms = module.linkedPlatforms;
+      const customDestinations = module.customDestinations;
+      return linkedPlatforms.length + customDestinations.length < 5;
+    }
+
+  }));
 
   const shouldShowSettings = !error && !isLoading;
   const shouldShowPrimeLabel = !RestreamService.state.grandfathered;

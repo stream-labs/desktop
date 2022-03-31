@@ -8680,6 +8680,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"immer@npm:^9.0.12":
+  version: 9.0.12
+  resolution: "immer@npm:9.0.12"
+  checksum: bcbec6d76dac65e49068eb67ece4d407116e62b8cde3126aa89c801e408f5047763ba0aeb62f1938c1aa704bb6612f1d8302bb2a86fa1fc60fcc12d8b25dc895
+  languageName: node
+  linkType: hard
+
 "import-fresh@npm:^2.0.0":
   version: 2.0.0
   resolution: "import-fresh@npm:2.0.0"
@@ -13139,16 +13146,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-dom@npm:17.0.1":
-  version: 17.0.1
-  resolution: "react-dom@npm:17.0.1"
+"react-dom@npm:17.0.2":
+  version: 17.0.2
+  resolution: "react-dom@npm:17.0.2"
   dependencies:
     loose-envify: ^1.1.0
     object-assign: ^4.1.1
-    scheduler: ^0.20.1
+    scheduler: ^0.20.2
   peerDependencies:
-    react: 17.0.1
-  checksum: df2af300dd4f49a5daaccc38f5a307def2a9ae2b7ebffa3dce8fb9986129057696b86a2c94e5ae36133057c69428c500e4ee3bf5884eb44e5632ace8b7ace41f
+    react: 17.0.2
+  checksum: 1c1eaa3bca7c7228d24b70932e3d7c99e70d1d04e13bb0843bbf321582bc25d7961d6b8a6978a58a598af2af496d1cedcfb1bf65f6b0960a0a8161cb8dab743c
   languageName: node
   linkType: hard
 
@@ -13217,13 +13224,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react@npm:17.0.1":
-  version: 17.0.1
-  resolution: "react@npm:17.0.1"
+"react@npm:17.0.2, react@npm:^17.0.2":
+  version: 17.0.2
+  resolution: "react@npm:17.0.2"
   dependencies:
     loose-envify: ^1.1.0
     object-assign: ^4.1.1
-  checksum: 83b9df9529a2b489f00a4eaa608fc7d55518b258e046c100344ae068713e43ae64e477a140f87e38cfe75489bcfd26d27fce5818f89f4ec41bdbda7ead4bb426
+  checksum: b254cc17ce3011788330f7bbf383ab653c6848902d7936a87b09d835d091e3f295f7e9dd1597c6daac5dc80f90e778c8230218ba8ad599f74adcc11e33b9d61b
   languageName: node
   linkType: hard
 
@@ -13993,13 +14000,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"scheduler@npm:^0.20.1":
-  version: 0.20.1
-  resolution: "scheduler@npm:0.20.1"
+"scheduler@npm:^0.20.2":
+  version: 0.20.2
+  resolution: "scheduler@npm:0.20.2"
   dependencies:
     loose-envify: ^1.1.0
     object-assign: ^4.1.1
-  checksum: ace896fff8ccc516a4b5a249c712fc88d4e2456587d991acc220b54690362d6a2b9d426a7f030454cb439f6f5ff2706b13ee8c44ccb953884c4756304a2f8ad6
+  checksum: c4b35cf967c8f0d3e65753252d0f260271f81a81e427241295c5a7b783abf4ea9e905f22f815ab66676f5313be0a25f47be582254db8f9241b259213e999b8fc
   languageName: node
   linkType: hard
 
@@ -14306,6 +14313,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"slap@git+https://github.com/stream-labs/slap.git#alpha":
+  version: 0.1.30
+  resolution: "slap@https://github.com/stream-labs/slap.git#commit=208caa4368f29043caa0a97d6e99688f3d372955"
+  dependencies:
+    immer: ^9.0.12
+    react: ^17.0.2
+  checksum: 69fa078e20a334f6f7830a463c92ab678e15b45dbec4a3cc945a5701c6d9db1ac7b4d438bdca41cf9a5c5f8509f974e43eb6f8e1d811fcb55db6d8963007bba2
+  languageName: node
+  linkType: hard
+
 "slash@npm:^2.0.0":
   version: 2.0.0
   resolution: "slash@npm:2.0.0"
@@ -14475,10 +14492,10 @@ __metadata:
     raven: ^2.6.4
     raw-loader: 2.0.0
     rc-animate: 3.1.1
-    react: 17.0.1
+    react: 17.0.2
     react-colorful: ^5.5.0
     react-devtools-electron: ^4.7.0
-    react-dom: 17.0.1
+    react-dom: 17.0.2
     react-redux: 7.2.4
     react-sortablejs: 6.0.0
     react-transition-group: ^4.4.1
@@ -14491,6 +14508,7 @@ __metadata:
     shelljs: 0.8.5
     signtool: 1.0.0
     sl-vue-tree: "https://github.com/stream-labs/sl-vue-tree.git"
+    slap: "git+https://github.com/stream-labs/slap.git#alpha"
     socket.io-client: 2.1.1
     sockjs: 0.3.20
     sockjs-client: 1.1.5
@@ -14509,7 +14527,7 @@ __metadata:
     ts-loader: 8.0.11
     ts-node: 7.0.1
     typedoc: 0.22.10
-    typescript: 4.0.7
+    typescript: 4.5.5
     urijs: 1.19.7
     uuid: ^3.0.1
     v-selectpage: 2.0.2
@@ -15894,13 +15912,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typescript@npm:4.0.7":
-  version: 4.0.7
-  resolution: "typescript@npm:4.0.7"
+"typescript@npm:4.5.5":
+  version: 4.5.5
+  resolution: "typescript@npm:4.5.5"
   bin:
     tsc: bin/tsc
     tsserver: bin/tsserver
-  checksum: dcdea680ae7ad95b3ebc154867b38a5f855b5e8375b7069c5536081076cc3fce9fc977b96f1212446fa55f65746e1a7ea5bbc9d2984968349af0fafffd957a1e
+  checksum: 506f4c919dc8aeaafa92068c997f1d213b9df4d9756d0fae1a1e7ab66b585ab3498050e236113a1c9e57ee08c21ec6814ca7a7f61378c058d79af50a4b1f5a5e
   languageName: node
   linkType: hard
 
@@ -15914,13 +15932,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typescript@patch:typescript@4.0.7#~builtin<compat/typescript>":
-  version: 4.0.7
-  resolution: "typescript@patch:typescript@npm%3A4.0.7#~builtin<compat/typescript>::version=4.0.7&hash=493e53"
+"typescript@patch:typescript@4.5.5#~builtin<compat/typescript>":
+  version: 4.5.5
+  resolution: "typescript@patch:typescript@npm%3A4.5.5#~builtin<compat/typescript>::version=4.5.5&hash=493e53"
   bin:
     tsc: bin/tsc
     tsserver: bin/tsserver
-  checksum: 713faf8e7ed7e9ac5484bc41e62aab59107cd7ae84371c14fd5d42cec84efd8c4fc4bb2ab455cf2149c56c89073e23158dffa2bba3879fd9c4a876b77b6731a8
+  checksum: c05c318d79c690f101d7ffb34cd6c7d6bbd884d3af9cefe7749ad0cd6be43c7082f098280982ca945dcba23fde34a08fed9602bb26540936baf8c0520727d3ba
   languageName: node
   linkType: hard
 

@@ -77,7 +77,7 @@ export default function GameSelector(p: TProps) {
     twitch: $t('Twitch Game'),
     facebook: $t('Facebook Game'),
     trovo: $t('Trovo Category'),
-  }[platform];
+  }[platform as string];
 
   return (
     <ListInput
