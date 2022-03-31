@@ -1,5 +1,5 @@
 import React from 'react';
-import { useModule } from '../../hooks/useModule';
+import { useModule, injectState } from 'slap';
 import { mutation } from '../../store';
 import { Services } from '../../service-provider';
 import { ISettingsSubCategory } from '../../../services/settings';
@@ -8,9 +8,9 @@ import { ISettingsSubCategory } from '../../../services/settings';
  * A module for components in the SettingsWindow
  */
 class ObsSettingsModule {
-  state = {
+  state = injectState({
     page: '',
-  };
+  });
 
   init() {
     // init page
@@ -22,10 +22,10 @@ class ObsSettingsModule {
     }
   }
 
-  @mutation()
-  setPage(page: string) {
-    this.state.page = page;
-  }
+  // @mutation()
+  // setPage(page: string) {
+  //   this.state.page = page;
+  // }
 
   private get settingsService() {
     return Services.SettingsService;
@@ -42,5 +42,5 @@ class ObsSettingsModule {
 
 // wrap the module in a hook
 export function useObsSettings() {
-  return useModule(ObsSettingsModule).select();
+  return useModule(ObsSettingsModule);
 }
