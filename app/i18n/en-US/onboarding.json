@@ -98,5 +98,10 @@
   "Pro features to take your stream and channel to the next level.": "Pro features to take your stream and channel to the next level.",
   "Something went wrong while importing from OBS Studio. Please try again or skip to the next step.": "Something went wrong while importing from OBS Studio. Please try again or skip to the next step.",
   "Visual Preset": "Visual Preset",
-  "Installing theme...": "Installing theme..." 
+  "Installing theme...": "Installing theme..." ,
+  "How do you plan to use Streamlabs Desktop?": "How do you plan to use Streamlabs Desktop?",
+  "Live Streaming": "Live Streaming",
+  "Recording Only": "Recording Only",
+  "I want to live stream to a platform. I may also want to record my live streams.": "I want to live stream to a platform. I may also want to record my live streams.",
+  "I want to record my screen or camera. I will not be live streaming.": "I want to record my screen or camera. I will not be live streaming."
 }

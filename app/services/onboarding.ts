@@ -14,6 +14,7 @@ import Utils from './utils';
 
 enum EOnboardingSteps {
   MacPermissions = 'MacPermissions',
+  SteamingOrRecording = 'StreamingOrRecording',
   Connect = 'Connect',
   FreshOrImport = 'FreshOrImport',
   ObsImport = 'ObsImport',
@@ -27,6 +28,13 @@ export const ONBOARDING_STEPS = () => ({
   [EOnboardingSteps.MacPermissions]: {
     component: 'MacPermissions',
     disableControls: false,
+    hideSkip: true,
+    hideButton: true,
+    isPreboarding: true,
+  },
+  [EOnboardingSteps.SteamingOrRecording]: {
+    component: 'StreamingOrRecording',
+    disableControls: true,
     hideSkip: true,
     hideButton: true,
     isPreboarding: true,
@@ -138,6 +146,8 @@ class OnboardingViews extends ViewHandler<IOnboardingServiceState> {
     if (process.platform === OS.Mac) {
       steps.push(ONBOARDING_STEPS()[EOnboardingSteps.MacPermissions]);
     }
+
+    steps.push(ONBOARDING_STEPS()[EOnboardingSteps.SteamingOrRecording]);
 
     steps.push(ONBOARDING_STEPS()[EOnboardingSteps.Connect]);
 
