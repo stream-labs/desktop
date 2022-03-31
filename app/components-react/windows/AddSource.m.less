@@ -1,0 +1,55 @@
+@import '../../styles/index';
+
+.name-source-label {
+  margin-bottom: 10px;
+}
+
+.name-source-label.error {
+  color: var(--warning);
+}
+
+.sources-container {
+  padding: 20px;
+  display: flex;
+  flex: 1 0 auto;
+  height: 170px;
+
+  > div {
+    flex: 1 0 50%;
+  }
+}
+
+.sources-browser {
+  .columns:first-child {
+    display: flex;
+  }
+
+  .columns {
+    height: 170px;
+  }
+}
+
+.columns.buttons {
+  text-align: right;
+  padding-top: 20px;
+  padding-bottom: 20px;
+}
+
+.recommended-label {
+  color: var(--teal);
+  margin-left: 10px;
+}
+
+.studio-controls-selector {
+  width: 100%;
+}
+
+.new-source-toggle {
+  position: absolute;
+  bottom: 8px;
+
+  /deep/ .input-label,
+  /deep/ .input-body {
+    width: auto;
+  }
+}
