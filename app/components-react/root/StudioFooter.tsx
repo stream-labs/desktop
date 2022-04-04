@@ -143,7 +143,7 @@ export default function StudioFooterComponent(p: { locked?: boolean }) {
         )}
         <Tooltip placement="left" title={$t('Open Performance Window')}>
           <i
-            className={cx('icon-leaderboard-4', 'metrics-icon', performanceIconClassName())}
+            className={cx('icon-leaderboard-4', styles.metricsIcon, performanceIconClassName())}
             onClick={openMetricsWindow}
           />
         </Tooltip>
