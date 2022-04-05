@@ -51,7 +51,17 @@ export class AlertBoxService extends WidgetSettingsService<IAlertBoxData> {
       settingsUpdateEvent: 'filteredAlertBoxSettingsUpdate',
       customCodeAllowed: true,
       customFieldsAllowed: true,
-      testers: ['Follow', 'Subscription', 'Donation', 'Bits', 'Host'],
+      testers: [
+        'Follow',
+        'Subscription',
+        'Donation',
+        'Bits',
+        'Host',
+        'Share',
+        'Support',
+        'Stars',
+        'Like',
+      ],
     };
   }
 
