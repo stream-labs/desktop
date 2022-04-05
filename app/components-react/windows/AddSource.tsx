@@ -11,6 +11,7 @@ import { Services } from 'components-react/service-provider';
 import { useVuex } from 'components-react/hooks';
 import styles from './AddSource.m.less';
 import { TextInput, SwitchInput } from 'components-react/shared/inputs';
+import Form, { useForm } from 'components-react/shared/inputs/Form';
 
 export default function AddSource() {
   const {
@@ -52,39 +53,42 @@ export default function AddSource() {
   }));
 
   const [name, setName] = useState('');
-  const [error, setError] = useState('');
   const [overrideExistingSource, setOverrideExistingSource] = useState(false);
   const [selectedSourceId, setSelectedSourceId] = useState(sources[0].sourceId || '');
+  const form = useForm();
 
   const existingSources = sources.map(source => ({ name: source.name, value: source.sourceId }));
 
   useEffect(() => {
-    const suggestName = SourcesService.views.suggestName;
-
-    const nameMap = {
-      replay: $t('Instant Replay'),
-      streamlabels: $t('Stream Label'),
-      iconLibrary: $t('Custom Icon'),
-      widget: suggestName(WidgetDisplayData(platform)[widgetType]?.name),
-    };
-
-    if (sourceAddOptions.propertiesManager && nameMap[sourceAddOptions.propertiesManager]) {
-      return setName(nameMap[sourceAddOptions.propertiesManager]);
-    }
-    const app = PlatformAppsService.views.getApp(sourceAddOptions.propertiesManagerSettings?.appId);
-    if (app) {
-      const sourceName = app.manifest.sources.find(
+    const suggestName = (name: string) => SourcesService.views.suggestName(name);
+    let name;
+    if (sourceAddOptions.propertiesManager === 'replay') {
+      name = $t('Instant Replay');
+    } else if (sourceAddOptions.propertiesManager === 'streamlabels') {
+      name = $t('Stream Label');
+    } else if (sourceAddOptions.propertiesManager === 'iconLibrary') {
+      name = $t('Custom Icon');
+    } else if (sourceAddOptions.propertiesManager === 'widget') {
+      name = suggestName(WidgetDisplayData(platform)[widgetType].name);
+    } else if (sourceAddOptions.propertiesManager === 'platformApp') {
+      const app = PlatformAppsService.views.getApp(
+        sourceAddOptions.propertiesManagerSettings?.appId,
+      );
+      const sourceName = app?.manifest.sources.find(
         source => source.id === sourceAddOptions.propertiesManagerSettings?.appSourceId,
       )?.name;
-      return setName(suggestName(sourceName || ''));
+
+      name = suggestName(sourceName || '');
+    } else {
+      const sourceDescription =
+        sourceType &&
+        SourcesService.getAvailableSourcesTypesList().find(
+          sourceTypeDef => sourceTypeDef.value === sourceType,
+        )?.description;
+
+      name = suggestName(sourceDescription || '');
     }
-
-    const sourceDescription =
-      sourceType &&
-      SourcesService.getAvailableSourcesTypesList().find(def => def.value === sourceType)
-        ?.description;
-
-    setName(suggestName(sourceDescription || ''));
+    setName(name);
   }, []);
 
   function close() {
@@ -118,45 +122,46 @@ export default function AddSource() {
 
   async function addNew() {
     if (!activeScene) return;
-    if (!name) {
-      setError($t('The source name is required'));
+    try {
+      await form.validateFields();
+    } catch (e: unknown) {
+      return;
+    }
+    let source: ISourceApi;
+    if (sourceAddOptions.propertiesManager === 'widget') {
+      const widget = await WidgetsService.actions.return.createWidget(widgetType, name);
+      source = widget.getSource();
     } else {
-      let source: ISourceApi;
-      if (sourceAddOptions.propertiesManager === 'widget') {
-        const widget = await WidgetsService.actions.return.createWidget(widgetType, name);
-        source = widget.getSource();
-      } else {
-        const settings: Dictionary<any> = {};
-        if (sourceAddOptions.propertiesManager === 'platformApp') {
-          const { width, height } = await PlatformAppsService.actions.return.getAppSourceSize(
-            sourceAddOptions.propertiesManagerSettings?.appId,
-            sourceAddOptions.propertiesManagerSettings?.appSourceId,
-          );
-          settings.width = width;
-          settings.height = height;
-        }
-        const item = EditorCommandsService.actions.executeCommand(
-          'CreateNewItemCommand',
-          activeScene.id,
-          name,
-          sourceType,
-          settings,
-          {
-            sourceAddOptions: {
-              propertiesManager: sourceAddOptions.propertiesManager,
-              propertiesManagerSettings: sourceAddOptions.propertiesManagerSettings,
-            },
-          },
+      const settings: Dictionary<any> = {};
+      if (sourceAddOptions.propertiesManager === 'platformApp') {
+        const { width, height } = await PlatformAppsService.actions.return.getAppSourceSize(
+          sourceAddOptions.propertiesManagerSettings?.appId,
+          sourceAddOptions.propertiesManagerSettings?.appSourceId,
         );
-        source = item.source;
+        settings.width = width;
+        settings.height = height;
       }
-      if (!source.video && source.hasProps()) {
-        AudioService.actions.showAdvancedSettings(source.sourceId);
-      } else if (source.hasProps()) {
-        SourcesService.actions.showSourceProperties(source.sourceId);
-      } else {
-        close();
-      }
+      const item = EditorCommandsService.actions.executeCommand(
+        'CreateNewItemCommand',
+        activeScene.id,
+        name,
+        sourceType,
+        settings,
+        {
+          sourceAddOptions: {
+            propertiesManager: sourceAddOptions.propertiesManager,
+            propertiesManagerSettings: sourceAddOptions.propertiesManagerSettings,
+          },
+        },
+      );
+      source = item.source;
+    }
+    if (!source.video && source.hasProps()) {
+      AudioService.actions.showAdvancedSettings(source.sourceId);
+    } else if (source.hasProps()) {
+      SourcesService.actions.showSourceProperties(source.sourceId);
+    } else {
+      close();
     }
   }
 
@@ -176,7 +181,7 @@ export default function AddSource() {
             />
           )}
         </div>
-        <button className="button button--default" onClick={close}>
+        <button className="button button--default" onClick={close} style={{ marginRight: '6px' }}>
           {$t('Cancel')}
         </button>
         <button className="button button--action" onClick={handleSubmit}>
@@ -188,47 +193,44 @@ export default function AddSource() {
 
   return (
     <ModalLayout footer={<Footer />}>
-      <div slot="content">
+      <div className={styles.container}>
         {!isNewSource() && (
           <>
-            <div className="row">
-              <div className="columns small-12">
-                <h4>
-                  {$t('Add Existing Source')}
-                  {sourceAddOptions.propertiesManager === 'widget' &&
-                    existingSources.length > 0 && (
-                      <span className={styles.recommendedLabel}>{$t('Recommended')}</span>
-                    )}
-                </h4>
-              </div>
+            <div>
+              <h4>
+                {$t('Add Existing Source')}
+                {sourceAddOptions.propertiesManager === 'widget' && existingSources.length > 0 && (
+                  <span className={styles.recommendedLabel}>{$t('Recommended')}</span>
+                )}
+              </h4>
+              <Menu
+                mode="vertical"
+                selectedKeys={[selectedSourceId]}
+                style={{ width: 300 }}
+                onClick={({ key }: { key: string }) => setSelectedSourceId(key)}
+              >
+                {existingSources.map(source => (
+                  <Menu.Item key={source.value}>{source.name}</Menu.Item>
+                ))}
+              </Menu>
             </div>
-            {existingSources.length > 0 && (
-              <>
-                <Menu
-                  mode="vertical"
-                  selectedKeys={[selectedSourceId]}
-                  style={{ width: 300 }}
-                  onClick={({ key }: { key: string }) => setSelectedSourceId(key)}
-                >
-                  {existingSources.map(source => (
-                    <Menu.Item key={source.value}>{source.name}</Menu.Item>
-                  ))}
-                </Menu>
-                {selectedSourceId && <Display sourceId={selectedSourceId} />}
-              </>
+            {selectedSourceId && (
+              <Display sourceId={selectedSourceId} style={{ width: '200px', height: '200px' }} />
             )}
           </>
         )}
         {isNewSource() && (
-          <div className="row">
-            <div className="column small-12">
-              <h4>{$t('Add New Source')}</h4>
-              <p className={cx(styles.nameSourceLabel, { [styles.error]: error })}>
-                {error ? { error } : $t('Please enter the name of the source')}
-              </p>
-              <TextInput value={name} onChange={setName} autoFocus />
-            </div>
-          </div>
+          <Form form={form} name="addNewSourceForm" onFinish={addNew}>
+            <h4>{$t('Add New Source')}</h4>
+            <TextInput
+              label={$t('Please enter the name of the source')}
+              value={name}
+              onChange={setName}
+              autoFocus
+              required
+              layout="vertical"
+            />
+          </Form>
         )}
       </div>
     </ModalLayout>

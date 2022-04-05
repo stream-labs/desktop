@@ -1,5 +1,9 @@
 @import '../../styles/index';
 
+.container {
+  display: flex;
+}
+
 .name-source-label {
   margin-bottom: 10px;
 }
@@ -48,8 +52,7 @@
   position: absolute;
   bottom: 8px;
 
-  /deep/ .input-label,
-  /deep/ .input-body {
-    width: auto;
+  :global(.ant-row) {
+    margin-bottom: 0;
   }
 }
