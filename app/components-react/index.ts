@@ -4,7 +4,7 @@ import GoLiveWindow from './windows/go-live/GoLiveWindow';
 import EditStreamWindow from './windows/go-live/EditStreamWindow';
 import IconLibraryProperties from './windows/IconLibraryProperties';
 import ScreenCaptureProperties from './windows/ScreenCaptureProperties';
-import NewsBanner from './root/NewsBanner';
+import News from './windows/News';
 import PerformanceMetrics from './shared/PerformanceMetrics';
 import PatchNotes from './pages/PatchNotes';
 import Display from './shared/Display';
@@ -51,7 +51,7 @@ export const components = {
   EditStreamWindow: createRoot(EditStreamWindow),
   IconLibraryProperties,
   ScreenCaptureProperties,
-  NewsBanner,
+  News,
   PerformanceMetrics,
   PatchNotes,
   Display,
