@@ -103,31 +103,10 @@ export class AnnouncementsService extends PersistentStatefulService<{
     return Date.now() - installationTimestamp < 1000 * 60 * 60 * 24 * 7;
   }
 
-  private get recentlyUpdatedTo017() {
-    const lastUpdatedVersion = this.patchNotesService.state.lastVersionSeen;
-
-    if (!lastUpdatedVersion) return false;
-
-    const minorVersionRegex = /^(\d+\.\d+)\.\d+$/;
-    const minorVersion = lastUpdatedVersion.match(minorVersionRegex);
-
-    if (!minorVersion || !minorVersion[1]) return false;
-    if (minorVersion[1] !== '0.17') return false;
-    if (!this.patchNotesService.state.updateTimestamp) return false;
-
-    const twoDaysAgo = Date.now() - 2 * 24 * 60 * 60 * 1000;
-
-    return Date.parse(this.patchNotesService.state.updateTimestamp) > twoDaysAgo;
-  }
-
   private async fetchLatestNews() {
     const recentlyInstalled = await this.recentlyInstalled();
 
-    if (
-      recentlyInstalled ||
-      this.recentlyUpdatedTo017 ||
-      !this.customizationService.state.enableAnnouncements
-    ) {
+    if (recentlyInstalled || !this.customizationService.state.enableAnnouncements) {
       return;
     }
 
