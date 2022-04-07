@@ -74,7 +74,7 @@ export default function GameSelector(p: TProps) {
   const isTrovo = platform === 'trovo';
 
   const label = {
-    twitch: $t('Twitch Game'),
+    twitch: $t('Twitch Category'),
     facebook: $t('Facebook Game'),
     trovo: $t('Trovo Category'),
   }[platform];
