@@ -167,8 +167,10 @@ export class NameScene extends ReactComponent {}
 })
 export class NavTools extends ReactComponent {}
 
-@Component({ props: { name: { default: 'NewsBanner' } } })
-export class NewsBanner extends ReactComponent {}
+@Component({
+  props: { name: { default: 'News' }, wrapperStyles: { default: () => ({ height: '100%' }) } },
+})
+export class News extends ReactComponent {}
 
 @Component({ props: { name: { default: 'NotificationsArea' } } })
 export class NotificationsArea extends ReactComponent {}
