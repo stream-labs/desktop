@@ -121,6 +121,16 @@ export class AnnouncementsService extends PersistentStatefulService<{
   }
 
   private async fetchLatestNews() {
+    const recentlyInstalled = await this.recentlyInstalled();
+
+    if (
+      recentlyInstalled ||
+      this.recentlyUpdatedTo017 ||
+      !this.customizationService.state.enableAnnouncements
+    ) {
+      return;
+    }
+
     const req = this.formRequest(
       `api/v5/slobs/announcements/status?clientId=${this.userService.getLocalUserId()}&lastAnnouncementId=${
         this.state.lastReadId
@@ -143,16 +153,6 @@ export class AnnouncementsService extends PersistentStatefulService<{
   }
 
   private async fetchNews() {
-    const recentlyInstalled = await this.recentlyInstalled();
-
-    if (
-      !this.userService.isLoggedIn ||
-      recentlyInstalled ||
-      this.recentlyUpdatedTo017 ||
-      !this.customizationService.state.enableAnnouncements
-    ) {
-      return this.state.news;
-    }
     const endpoint = `api/v5/slobs/announcements/get?clientId=${this.userService.getLocalUserId()}&locale=${
       this.i18nService.state.locale
     }`;
