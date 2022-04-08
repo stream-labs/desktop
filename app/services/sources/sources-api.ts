@@ -91,6 +91,7 @@ export type TSourceType =
   | 'color_source'
   | 'browser_source'
   | 'slideshow'
+  | 'mediasoupconnector'
   | 'ffmpeg_source'
   | 'text_gdiplus'
   | 'text_ft2_source'

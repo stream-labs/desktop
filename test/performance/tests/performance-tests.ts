@@ -152,6 +152,7 @@ test('Create sources', async t => {
     'image_source',
     'color_source',
     'slideshow',
+    'mediasoupconnector',
     'text_gdiplus',
     'text_ft2_source',
     'monitor_capture',

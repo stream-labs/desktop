@@ -502,6 +502,7 @@ export class SourcesService extends StatefulService<ISourcesState> {
       { description: 'Browser Source', value: 'browser_source' },
       { description: 'Media Source', value: 'ffmpeg_source' },
       { description: 'Image Slide Show', value: 'slideshow' },
+      { description: 'Streamlabs Join', value: 'mediasoupconnector' },
       { description: 'Text (GDI+)', value: 'text_gdiplus' },
       { description: 'Text (FreeType 2)', value: 'text_ft2_source' },
       { description: 'Display Capture', value: 'monitor_capture' },

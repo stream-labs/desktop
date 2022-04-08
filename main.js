@@ -294,7 +294,7 @@ async function startApp() {
     app.exit();
   }
 
-  if (pjson.env === 'production') {
+  /*if (pjson.env === 'production') {
     Raven.config(pjson.sentryFrontendDSN, {
       release: process.env.SLOBS_VERSION,
     }).install((err, initialErr, eventId) => {
@@ -315,7 +315,7 @@ async function startApp() {
         'sentry[release]': pjson.version,
       },
     });
-  }
+  }*/
 
   workerWindow = new BrowserWindow({
     show: false,
@@ -575,7 +575,7 @@ ipcMain.on('protocolLinkReady', () => {
 });
 
 app.on('ready', () => {
-  if (
+  /*if (
     !process.argv.includes('--skip-update') &&
     (process.env.NODE_ENV === 'production' || process.env.SLOBS_FORCE_AUTO_UPDATE)
   ) {
@@ -599,7 +599,8 @@ app.on('ready', () => {
     }
   } else {
     startApp();
-  }
+  }*/
+    startApp();
 });
 
 ipcMain.on('openDevTools', () => {

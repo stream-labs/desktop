@@ -57,6 +57,13 @@ export const SourceDisplayData = (): { [key: string]: ISourceDisplayData } => ({
     supportList: imageSupport,
     icon: 'icon-image',
   },
+  mediasoupconnector: {
+    name: $t('Streamlabs Join'),
+    description: $t('Add a slideshow of images to your scene.'),
+    demoFilename: 'image-slide-show.png',
+    supportList: imageSupport,
+    icon: 'icon-image',
+  },
   text_gdiplus: {
     name: $t('Text (GDI+)'),
     description: $t('Add text to your scene and adjust its style.'),
