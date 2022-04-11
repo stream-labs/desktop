@@ -29,6 +29,7 @@ import { EmoteWall, EmoteWallModule } from '../EmoteWall';
 import { GameWidget, GameWidgetModule } from '../GameWidget';
 import { ViewerCount, ViewerCountModule } from '../ViewerCount';
 import { useSubscription } from '../../hooks/useSubscription';
+import { ChatBox, ChatBoxModule } from '../ChatBox';
 
 // define list of Widget components and modules
 export const components = {
@@ -41,7 +42,7 @@ export const components = {
   // StarsGoal
   // SubGoal
   // SubscriberGoal
-  // ChatBox
+  ChatBox: [ChatBox, ChatBoxModule],
   // ChatHighlight
   // Credits
   // DonationTicker

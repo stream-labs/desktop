@@ -4,6 +4,7 @@ import { WidgetType } from './widgets-data';
 
 export type TWidgetType =
   | WidgetType.AlertBox
+  | WidgetType.ChatBox
   | WidgetType.ViewerCount
   | WidgetType.GameWidget
   | WidgetType.EmoteWall;
@@ -173,9 +174,32 @@ export function getWidgetsConfig(host: string, token: string): Record<TWidgetTyp
     //
     // },
 
-    // ChatBox: {
-    //
-    // },
+    [WidgetType.ChatBox]: {
+      type: WidgetType.ChatBox,
+
+      defaultTransform: {
+        width: 600,
+        height: 600,
+
+        x: 0,
+        y: 0.5,
+
+        anchor: AnchorPoint.West,
+      },
+
+      settingsWindowSize: {
+        width: 600,
+        height: 900,
+      },
+
+      url: `https://${host}/widgets/chat-box/v1/${token}`,
+      previewUrl: `https://${host}/widgets/chat-box/v1/${token}?simulate=1`,
+      dataFetchUrl: `https://${host}/api/v5/slobs/widget/chatbox`,
+      settingsSaveUrl: `https://${host}/api/v5/slobs/widget/chatbox`,
+      settingsUpdateEvent: 'chatBoxSettingsUpdate',
+      customCodeAllowed: true,
+      customFieldsAllowed: true,
+    },
 
     // ChatHighlight: {
     //
