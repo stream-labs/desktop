@@ -5,12 +5,10 @@ import cloneDeep from 'lodash/cloneDeep';
 import { FormInstance } from 'antd/lib/form';
 import { message } from 'antd';
 import { $t } from '../../../services/i18n';
-import { injectState, useModule } from 'slap';
+import { defineGetter, injectState, traverse, useModule } from 'slap';
 import { useForm } from '../../shared/inputs/Form';
 import { getDefined } from '../../../util/properties-type-guards';
 import { isEqual } from 'lodash';
-import { traverse } from 'slap/dist/utils/traverse';
-import { defineGetter } from 'slap/dist/scope';
 
 type TCommonFieldName = 'title' | 'description';
 
@@ -30,7 +28,7 @@ export function createSettingsState() {
   //   form: null as FormInstance | null,
   // }
 
-  const defaultState: IGoLiveSettings = {
+  const state: IGoLiveSettingsState = {
     isUpdateMode: false,
     platforms: {},
     customDestinations: [],
@@ -39,21 +37,40 @@ export function createSettingsState() {
     advancedMode: false,
     needPrepopulate: true,
     prepopulateOptions: undefined,
-    form: null as FormInstance | null,
   };
 
-  const stateWithMutations = {
+  const streamInfoView = new StreamInfoView({});
 
-    ...defaultState,
+  const getters = {
+    get settings(): IGoLiveSettings {
+      // @ts-ignore
+      return this.state;
+    },
+  };
+
+  traverse(streamInfoView, (propName, descr) => {
+    if (descr.get) {
+      defineGetter(getters, propName, descr.get);
+      return;
+    }
+    const propValue = streamInfoView[propName];
+    if (typeof propValue !== 'function') return;
+    getters[propName] = streamInfoView[propName];
+  });
+
+  const stateConfig = {
+    state,
+    getters,
+
 
     /**
      * Update top level settings
      */
     updateSettings(patch: Partial<IGoLiveSettingsState>) {
-      const newSettings = { ...this, ...patch };
+      const newSettings = { ...this.state, ...patch };
       // we should re-calculate common fields before applying new settings
-      const platforms = this.getView(newSettings).applyCommonFields(newSettings.platforms);
-      Object.assign(this, { ...newSettings, platforms });
+      const platforms = this.getViewFromState(newSettings).applyCommonFields(newSettings.platforms);
+      Object.assign(this.state, { ...newSettings, platforms });
     },
     /**
      * Update settings for a specific platforms
@@ -61,8 +78,8 @@ export function createSettingsState() {
     updatePlatform(platform: TPlatform, patch: Partial<IGoLiveSettings['platforms'][TPlatform]>) {
       const updated = {
         platforms: {
-          ...this.platforms,
-          [platform]: { ...this.platforms[platform], ...patch },
+          ...this.state.platforms,
+          [platform]: { ...this.state.platforms[platform], ...patch },
         },
       };
       this.updateSettings(updated);
@@ -71,7 +88,7 @@ export function createSettingsState() {
      * Enable/disable a custom ingest destinations
      */
     switchCustomDestination(destInd: number, enabled: boolean) {
-      const customDestinations = cloneDeep(this.getView(this).customDestinations);
+      const customDestinations = cloneDeep(this.getView().customDestinations);
       customDestinations[destInd].enabled = enabled;
       this.updateSettings({ customDestinations });
     },
@@ -82,7 +99,7 @@ export function createSettingsState() {
       this.updateSettings({ advancedMode: enabled });
 
       // reset common fields for all platforms in simple mode
-      if (!enabled) this.updateCommonFields(this.getView(this).commonFields);
+      if (!enabled) this.updateCommonFields(this.getView().commonFields);
     },
     /**
      * Set a common field like title or description for all eligible platforms
@@ -92,32 +109,30 @@ export function createSettingsState() {
       shouldChangeAllPlatforms = false,
     ) {
       Object.keys(fields).forEach((fieldName: TCommonFieldName) => {
-        const view = this.getView(this);
+        const view = this.getView();
         const value = fields[fieldName];
         const platforms = shouldChangeAllPlatforms
           ? view.platformsWithoutCustomFields
           : view.enabledPlatforms;
         platforms.forEach(platform => {
           if (!view.supports(fieldName, [platform])) return;
-          const platformSettings = getDefined(this.platforms[platform]);
+          const platformSettings = getDefined(this.state.platforms[platform]);
           platformSettings[fieldName] = value;
         });
       });
     },
 
-    getView(state: IGoLiveSettingsState) {
+    getView() {
+      return this.getViewFromState(this.state);
+    },
+
+    getViewFromState(state: IGoLiveSettingsState) {
       return new StreamInfoView(state);
     },
   };
 
-  const streamInfoView = new StreamInfoView(this);
 
-  traverse(streamInfoView, propName => {
-    if (propName in defaultState) return;
-    defineGetter(stateWithMutations, propName, () => streamInfoView[propName]);
-  });
-
-  return stateWithMutations as typeof stateWithMutations & StreamInfoView<any>;
+  return stateConfig as typeof stateConfig & StreamInfoView<IGoLiveSettingsState>;
 }
 
 /**
@@ -128,14 +143,23 @@ export class GoLiveSettingsModule {
   // define initial state
   state = injectState(createSettingsState());
 
+
+  form: FormInstance | null = null;
+
+  setForm(form: FormInstance) {
+    this.form = form;
+  }
+
   // initial setup
-  load() {
+  async load() {
     // take prefill options from the windows' `queryParams`
     const windowParams = Services.WindowsService.state.child.queryParams as unknown;
-    if (!isEqual(windowParams, {})) {
-      this.state.setPrepopulateOptions(windowParams as IGoLiveSettings['prepopulateOptions']);
+    if (windowParams && !isEqual(windowParams, {})) {
+      getDefined(this.state.setPrepopulateOptions)(
+        windowParams as IGoLiveSettings['prepopulateOptions'],
+      );
     }
-    return this.prepopulate();
+    await this.prepopulate();
   }
 
   /**
@@ -144,6 +168,9 @@ export class GoLiveSettingsModule {
   async prepopulate() {
     const { StreamingService } = Services;
     await StreamingService.actions.return.prepopulateInfo();
+    // TODO investigate mutation order issue
+    await new Promise(r => setTimeout(r, 100));
+
     const prepopulateOptions = this.state.prepopulateOptions;
     const view = new StreamInfoView({});
     const settings = {
@@ -153,9 +180,9 @@ export class GoLiveSettingsModule {
     };
     // if stream has not been started than we allow to change settings only for a primary platform
     // so delete other platforms from the settings object
-    if (this.isUpdateMode && !view.isMidStreamMode) {
+    if (this.state.isUpdateMode && !view.isMidStreamMode) {
       Object.keys(settings.platforms).forEach((platform: TPlatform) => {
-        if (!this.state.checkPrimaryPlatform(platform)) delete settings.platforms[platform];
+        if (!this.state.isPrimaryPlatform(platform)) delete settings.platforms[platform];
       });
     }
 
@@ -167,7 +194,7 @@ export class GoLiveSettingsModule {
 
       // disable non-primary platforms
       Object.keys(settings.platforms).forEach((platform: TPlatform) => {
-        if (!view.checkPrimaryPlatform(platform)) settings.platforms[platform]!.enabled = false;
+        if (!view.isPrimaryPlatform(platform)) settings.platforms[platform]!.enabled = false;
       });
     }
 
@@ -182,10 +209,10 @@ export class GoLiveSettingsModule {
     return this.state.state;
   }
 
-  get isLoading() {
-    const state = this.state;
-    return state.needPrepopulate || this.state.getView(this.state).isLoading;
-  }
+  // get isLoading() {
+  //   const state = this.state;
+  //   return state.needPrepopulate || this.state.getView().isLoading;
+  // }
 
   // get tweetText() {
   //   return this.state.tweetText;
@@ -219,7 +246,7 @@ export class GoLiveSettingsModule {
    */
   async validate() {
     try {
-      await getDefined(this.state.form).validateFields();
+      await getDefined(this.form).validateFields();
       return true;
     } catch (e: unknown) {
       message.error($t('Invalid settings. Please check the form'));
@@ -232,7 +259,7 @@ export class GoLiveSettingsModule {
    */
   async goLive() {
     if (await this.validate()) {
-      Services.StreamingService.actions.goLive(this.state);
+      Services.StreamingService.actions.goLive(this.state.settings);
     }
   }
   /**
@@ -241,7 +268,7 @@ export class GoLiveSettingsModule {
   async updateStream() {
     if (
       (await this.validate()) &&
-      (await Services.StreamingService.actions.return.updateStreamSettings(this.state))
+      (await Services.StreamingService.actions.return.updateStreamSettings(this.state.settings))
     ) {
       message.success($t('Successfully updated'));
     }
@@ -255,8 +282,10 @@ export function useGoLiveSettings() {
 export function useGoLiveSettingsRoot(params?: { isUpdateMode: boolean }) {
   const form = useForm();
 
-  return useModule(GoLiveSettingsModule, {
-    form,
+  const useModuleResult = useModule(GoLiveSettingsModule, {
     isUpdateMode: params?.isUpdateMode,
   });
+
+  useModuleResult.setForm(form);
+  return useModuleResult;
 }

@@ -22,10 +22,13 @@ export function DestinationSwitchers() {
     customDestinations,
     switchPlatforms,
     switchCustomDestination,
-    checkPrimaryPlatform,
+    isPrimaryPlatform,
+    componentView,
   } = useGoLiveSettings();
   const enabledPlatformsRef = useRef(enabledPlatforms);
   enabledPlatformsRef.current = enabledPlatforms;
+
+  console.log('component view', componentView);
 
   const emitSwitch = useDebounce(500, () => {
     switchPlatforms(enabledPlatformsRef.current);
@@ -49,7 +52,7 @@ export function DestinationSwitchers() {
           destination={platform}
           enabled={isEnabled(platform)}
           onChange={enabled => togglePlatform(platform, enabled)}
-          isPrimary={checkPrimaryPlatform(platform)}
+          isPrimary={isPrimaryPlatform(platform)}
         />
       ))}
       {customDestinations?.map((dest, ind) => (

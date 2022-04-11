@@ -280,10 +280,10 @@ function Platform(p: { platform: TPlatform }) {
   const platform = p.platform;
   const { UserService, StreamingService } = Services;
   const { canEditSettings, platformMerge, platformUnlink } = useStreamSettings();
-  const isMerged = StreamingService.views.checkPlatformLinked(platform);
+  const isMerged = StreamingService.views.isPlatformLinked(platform);
   const username = UserService.state.auth!.platforms[platform]?.username;
   const platformName = getPlatformService(platform).displayName;
-  const isPrimary = StreamingService.views.checkPrimaryPlatform(platform);
+  const isPrimary = StreamingService.views.isPrimaryPlatform(platform);
   const shouldShowPrimaryBtn = isPrimary;
   const shouldShowConnectBtn = !isMerged && canEditSettings;
   const shouldShowUnlinkBtn = !isPrimary && isMerged && canEditSettings;

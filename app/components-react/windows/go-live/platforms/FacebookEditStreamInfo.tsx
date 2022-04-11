@@ -61,7 +61,7 @@ export default function FacebookEditStreamInfo(p: IPlatformComponentParams<'face
         DismissablesService.views.shouldShow(EDismissable.FacebookNeedPermissionsTip),
       groups: fbState.facebookGroups,
       pages: fbState.facebookPages,
-      isPrimary: view.checkPrimaryPlatform('facebook'),
+      isPrimary: view.isPrimaryPlatform('facebook'),
     };
   });
 

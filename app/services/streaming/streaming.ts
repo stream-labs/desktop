@@ -173,7 +173,7 @@ export class StreamingService
         // primary platform is always available to stream into
         // prime users are eligeble for streaming to any platform
         let primeRequired = false;
-        if (!this.views.checkPrimaryPlatform(platform) && !this.userService.isPrime) {
+        if (!this.views.isPrimaryPlatform(platform) && !this.userService.isPrime) {
           const primaryPlatform = this.userService.state.auth?.primaryPlatform;
 
           // grandfathared users allowed to stream primary + FB

@@ -103,7 +103,7 @@ export class StreamInfoView<T extends Object> extends ViewHandler<T> {
     if (!this.restreamView.canEnableRestream || !this.protectedModeEnabled) {
       return [this.userView.auth!.primaryPlatform];
     }
-    return this.allPlatforms.filter(p => this.checkPlatformLinked(p));
+    return this.allPlatforms.filter(p => this.isPlatformLinked(p));
   }
 
   get protectedModeEnabled() {
@@ -264,9 +264,9 @@ export class StreamInfoView<T extends Object> extends ViewHandler<T> {
   sortPlatforms(platforms: TPlatform[]): TPlatform[] {
     platforms = platforms.sort();
     return [
-      ...platforms.filter(p => this.checkPrimaryPlatform(p)),
-      ...platforms.filter(p => !this.checkPrimaryPlatform(p) && this.checkPlatformLinked(p)),
-      ...platforms.filter(p => !this.checkPlatformLinked(p)),
+      ...platforms.filter(p => this.isPrimaryPlatform(p)),
+      ...platforms.filter(p => !this.isPrimaryPlatform(p) && this.isPlatformLinked(p)),
+      ...platforms.filter(p => !this.isPlatformLinked(p)),
     ];
   }
 
@@ -288,12 +288,12 @@ export class StreamInfoView<T extends Object> extends ViewHandler<T> {
     return false;
   }
 
-  checkPlatformLinked(platform: TPlatform): boolean {
+  isPlatformLinked(platform: TPlatform): boolean {
     if (!this.userView.auth?.platforms) return false;
     return !!this.userView.auth?.platforms[platform];
   }
 
-  checkPrimaryPlatform(platform: TPlatform) {
+  isPrimaryPlatform(platform: TPlatform) {
     return platform === this.userView.auth?.primaryPlatform;
   }
 
@@ -358,7 +358,7 @@ export class StreamInfoView<T extends Object> extends ViewHandler<T> {
     return {
       ...settings,
       useCustomFields,
-      enabled: enabled || this.checkPrimaryPlatform(platform),
+      enabled: enabled || this.isPrimaryPlatform(platform),
     };
   }
 
