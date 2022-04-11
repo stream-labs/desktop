@@ -8,6 +8,7 @@ import * as remote from '@electron/remote';
 import { TextInput } from 'components-react/shared/inputs/TextInput';
 import { OnboardingModule } from './Onboarding';
 import { Services } from 'components-react/service-provider';
+import Form from 'components-react/shared/inputs/Form';
 
 export function ExtraPlatformConnect() {
   const { selectedExtraPlatform, setExtraPlatform } = useModule(LoginModule).select();
@@ -60,16 +61,26 @@ export function ExtraPlatformConnect() {
         </p>
 
         <div className="section">
-          <TextInput label={$t('Stream Key')} value={key} onChange={setKey} />
+          <Form>
+            <TextInput
+              label={$t('Stream Key')}
+              value={key}
+              onChange={setKey}
+              isPassword={true}
+              uncontrolled={false}
+            />
+          </Form>
         </div>
 
-        {!!key.trim().length && (
-          <p>
-            <button className={`button button--${selectedExtraPlatform}`} onClick={onFinish}>
-              {$t('Finish')}
-            </button>
-          </p>
-        )}
+        <p>
+          <button
+            className="button button--action"
+            onClick={onFinish}
+            disabled={!key.trim().length}
+          >
+            {$t('Finish')}
+          </button>
+        </p>
 
         <p>
           <a className={styles['link-button']} onClick={next}>

@@ -77,7 +77,7 @@ export function ThemeSelector() {
         {!installing ? (
           <div className={styles.container}>
             {getFilteredMetadata().map(theme => (
-              <div className={styles.cell} onClick={() => focusTheme(theme)}>
+              <div className={styles.cell} onClick={() => focusTheme(theme)} key={theme.data.name}>
                 <img className={styles.thumbnail} src={thumbnail(theme)} />
                 <div className={styles.title}>{theme.data.name}</div>
               </div>

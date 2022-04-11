@@ -9,6 +9,7 @@ import Form from 'components-react/shared/inputs/Form';
 import { ListInput } from 'components-react/shared/inputs';
 import { useVuex } from 'components-react/hooks';
 import { Volmeter2d } from 'services/audio/volmeter-2d';
+import cx from 'classnames';
 
 export function HardwareSetup() {
   const { DefaultHardwareService, SourceFiltersService } = Services;
@@ -23,20 +24,10 @@ export function HardwareSetup() {
     })),
     selectedVideoSource: DefaultHardwareService.selectedVideoSource,
     selectedVideoDevice: DefaultHardwareService.state.defaultVideoDevice,
-    presetFilterValue: DefaultHardwareService.state.presetFilter,
+    presetFilterValue: DefaultHardwareService.state.presetFilter || 'none',
     selectedAudioDevice: DefaultHardwareService.state.defaultAudioDevice,
     selectedAudioSource: DefaultHardwareService.selectedAudioSource,
   }));
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-
-  // Set up volmeter
-  useEffect(() => {
-    if (canvasRef.current && v.selectedAudioSource) {
-      const volmeter2d = new Volmeter2d(v.selectedAudioSource, canvasRef.current);
-
-      return () => volmeter2d.destroy();
-    }
-  }, [canvasRef.current, v.selectedAudioSource]);
 
   // Set up temporary sources
   useEffect(() => {
@@ -52,14 +43,14 @@ export function HardwareSetup() {
   function setVideoDevice(val: string) {
     const oldPresetValue = v.presetFilterValue;
 
-    if (oldPresetValue) {
-      setPresetFilter('');
+    if (oldPresetValue !== 'none') {
+      setPresetFilter('none');
     }
 
     // Needs to be sync
     DefaultHardwareService.setDefault('video', val);
 
-    if (oldPresetValue) {
+    if (oldPresetValue !== 'none') {
       setPresetFilter(oldPresetValue);
     }
   }
@@ -69,7 +60,7 @@ export function HardwareSetup() {
 
     DefaultHardwareService.actions.setPresetFilter(value);
 
-    if (value === '') {
+    if (value === 'none') {
       SourceFiltersService.remove(DefaultHardwareService.selectedVideoSource.sourceId, '__PRESET');
     } else {
       SourceFiltersService.addPresetFilter(
@@ -85,7 +76,7 @@ export function HardwareSetup() {
       <div className={styles.contentContainer}>
         <DisplaySection />
         {!!v.videoDevices.length && (
-          <Form layout="vertical">
+          <Form layout="vertical" style={{ width: 300 }}>
             <ListInput
               label={$t('Webcam')}
               options={v.videoDevices}
@@ -107,9 +98,6 @@ export function HardwareSetup() {
               onChange={val => DefaultHardwareService.actions.setDefault('audio', val)}
               allowClear={false}
             />
-            <div className="section">
-              <canvas ref={canvasRef} style={{ backgroundColor: 'var(--border)', width: '100%' }} />
-            </div>
           </Form>
         )}
       </div>
@@ -122,15 +110,30 @@ function DisplaySection() {
   const v = useVuex(() => ({
     videoDevices: DefaultHardwareService.videoDevices,
     selectedVideoSource: DefaultHardwareService.selectedVideoSource,
+    selectedAudioSource: DefaultHardwareService.selectedAudioSource,
   }));
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  // Set up volmeter
+  useEffect(() => {
+    if (canvasRef.current && v.selectedAudioSource) {
+      const volmeter2d = new Volmeter2d(v.selectedAudioSource, canvasRef.current);
+
+      return () => volmeter2d.destroy();
+    }
+  }, [canvasRef.current, v.selectedAudioSource]);
 
   if (v.selectedVideoSource && v.videoDevices.length) {
     return (
-      <div className={styles.display}>
+      <div className={cx(styles.display, 'section')}>
         <Display
+          style={{ height: 200 }}
           sourceId={v.selectedVideoSource.sourceId}
           renderingMode={ERenderingMode.OBS_MAIN_RENDERING}
         />
+        <div>
+          <canvas ref={canvasRef} style={{ backgroundColor: 'var(--border)', width: '100%' }} />
+        </div>
       </div>
     );
   }

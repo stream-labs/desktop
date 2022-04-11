@@ -10,7 +10,7 @@ import { useWatchVuex } from 'components-react/hooks';
 
 export function Prime() {
   const { MagicLinkService, UserService } = Services;
-  const { next } = useModule(OnboardingModule).select();
+  const { next, finish } = useModule(OnboardingModule).select();
   const primeMetadata = {
     standard: [
       { text: $t('Go live to one platform'), icon: 'icon-broadcast' },
@@ -34,7 +34,7 @@ export function Prime() {
 
   useWatchVuex(
     () => UserService.views.isPrime,
-    isPrime => isPrime && next(),
+    isPrime => isPrime && finish(),
   );
 
   function linkToPrime() {

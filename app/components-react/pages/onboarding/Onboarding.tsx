@@ -9,24 +9,22 @@ import { $t } from 'services/i18n';
 import * as stepComponents from './steps';
 import Utils from 'services/utils';
 import { ONBOARDING_STEPS } from 'services/onboarding';
+import Scrollable from 'components-react/shared/Scrollable';
 
 export default function Onboarding() {
   const { currentStep, next, processing } = useModule(OnboardingModule).select();
+
+  if (!currentStep) return <div></div>;
+
   const Component = stepComponents[currentStep.component];
 
   return (
     <div className={styles.onboardingContainer}>
       {<TopBar />}
       <div className={styles.onboardingContent}>
-        {/* TODO: Add back in scrollable */}
-        {/* <Scrollable className={styles.scroll}> */}
-        {/* <Component
-          style="height: 100%;"
-          continue={() => this.continue()}
-          setProcessing={(processing: boolean) => this.setProcessing(processing)}
-        /> */}
-        <Component />
-        {/* </Scrollable> */}
+        <Scrollable style={{ height: '100%' }}>
+          <Component />
+        </Scrollable>
       </div>
       {(!currentStep.hideSkip || !currentStep.hideButton) && (
         <div className={styles.footer}>

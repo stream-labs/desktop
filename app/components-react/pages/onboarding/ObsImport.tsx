@@ -48,10 +48,11 @@ function PreImport() {
   return (
     <div>
       {profiles.length > 1 && (
-        <div style={{ width: 400, margin: 'auto' }}>
+        <div style={{ width: 400, margin: 'auto', textAlign: 'center' }}>
           <span className={styles.profileSelectTitle}>{$t('Select an OBS profile to import')}</span>
           <Form layout="inline">
             <ListInput
+              style={{ width: '100%' }}
               options={profiles.map(p => ({ label: p, value: p }))}
               value={selectedProfile}
               onChange={setSelectedProfile}
