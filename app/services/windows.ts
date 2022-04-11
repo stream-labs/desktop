@@ -35,6 +35,7 @@ import {
   SourceFilters,
   MediaGallery,
   Projector,
+  News,
 } from 'components/shared/ReactComponentList';
 
 import SourcePropertiesDeprecated from 'components/windows/SourceProperties.vue';
@@ -148,6 +149,7 @@ export function getComponents() {
     WidgetWindow,
     CustomCodeWindow,
     SourceShowcase,
+    News,
   };
 }
 
