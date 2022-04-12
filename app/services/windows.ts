@@ -61,7 +61,6 @@ import SubscriberGoal from 'components/widgets/goal/SubscriberGoal';
 import FollowerGoal from 'components/widgets/goal/FollowerGoal';
 import CharityGoal from 'components/widgets/goal/CharityGoal';
 import ChatBox from 'components/widgets/ChatBox.vue';
-import ViewerCount from 'components/widgets/ViewerCount.vue';
 import StreamBoss from 'components/widgets/StreamBoss.vue';
 import DonationTicker from 'components/widgets/DonationTicker.vue';
 import Credits from 'components/widgets/Credits.vue';
@@ -126,7 +125,6 @@ export function getComponents() {
     SuperchatGoal,
     CharityGoal,
     ChatBox,
-    ViewerCount,
     DonationTicker,
     Credits,
     EventList,
