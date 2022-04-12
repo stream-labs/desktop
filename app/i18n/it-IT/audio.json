@@ -32,8 +32,8 @@
   "Source Settings": "Impostazioni sorgente",
   "Audio Tracks": "Tracce audio",
   "Designates which tracks are being recorded": "Indica quali tracce sono registrate",
-  "Your Stream and VOD Track are the same. This may result in unexpected audio behavior, go to Global Settings to change.": "Your Stream and VOD Track are the same. This may result in unexpected audio behavior, go to Global Settings to change.",
-  "Streaming Track": "Streaming Track",
-  "Enable Twitch VOD Track": "Enable Twitch VOD Track",
-  "Twitch VOD Track": "Twitch VOD Track"
+  "Your Stream and VOD Track are the same. This may result in unexpected audio behavior, go to Global Settings to change.": "Il tuo Stream e la traccia VOD sono uguali. In questo caso potrebbero verificarsi comportamenti audio inaspettati. Vai su Impostazioni generali per cambiare.",
+  "Streaming Track": "Traccia streaming",
+  "Enable Twitch VOD Track": "Abilita Traccia Twitch VOD",
+  "Twitch VOD Track": "Traccia Twitch VOD"
 }
