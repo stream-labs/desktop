@@ -58,7 +58,7 @@ export async function addSource(
     interval: 100,
   });
   if (!isInputVisible) {
-    await click('[data-type="toggle"]');
+    await click('[data-type="switch"]');
     await waitForDisplayed('[data-name=newSourceName]');
   }
   await (await select('[data-name=newSourceName]')).setValue(name);
