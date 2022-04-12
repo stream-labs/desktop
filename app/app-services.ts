@@ -164,6 +164,7 @@ import { WebsocketService } from './services/websocket';
 import { SpinWheelService } from 'services/widgets/settings/spin-wheel';
 import { LayoutService } from './services/layout';
 import { ProjectorService } from './services/projector';
+import { IncrementalRolloutService } from './services/incremental-rollout';
 
 export const AppServices = {
   AppService,
@@ -216,4 +217,5 @@ export const AppServices = {
   SpinWheelService,
   LayoutService,
   ProjectorService,
+  IncrementalRolloutService,
 };
