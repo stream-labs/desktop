@@ -15,6 +15,7 @@ import Grow from './pages/grow/Grow';
 import Loader from './pages/Loader';
 import PlatformLogo from './shared/PlatformLogo';
 import AdvancedStatistics from './windows/AdvancedStatistics';
+import StudioFooter from './root/StudioFooter';
 import StreamScheduler from './pages/stream-scheduler/StreamScheduler';
 import { createRoot } from './root/ReactRoot';
 import StartStreamingButton from './root/StartStreamingButton';
@@ -66,9 +67,10 @@ export const components = {
   AdvancedStatistics,
   SourceProperties: createRoot(SourceProperties),
   SharedComponentsLibrary: createRoot(SharedComponentsLibrary),
-  StartStreamingButton,
   TestWidgets,
   RenameSource,
+  StudioFooter,
+  StartStreamingButton,
   NotificationsArea,
   ObsSettings: createRoot(ObsSettings),
   ThemeAudit,
