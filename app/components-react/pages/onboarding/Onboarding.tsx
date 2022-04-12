@@ -12,9 +12,16 @@ import { ONBOARDING_STEPS } from 'services/onboarding';
 import Scrollable from 'components-react/shared/Scrollable';
 
 export default function Onboarding() {
-  const { currentStep, next, processing } = useModule(OnboardingModule).select();
+  const { currentStep, next, processing, finish } = useModule(OnboardingModule).select();
 
-  if (!currentStep) return <div></div>;
+  // TODO: Onboarding service needs a refactor away from step index-based.
+  // In the meantime, if we run a render cycle and step index is greater
+  // than the total number of steps, we just need to end the onboarding
+  // immediately. Render side effects are bad btw.
+  if (currentStep == null) {
+    finish();
+    return <></>;
+  }
 
   const Component = stepComponents[currentStep.component];
 

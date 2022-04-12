@@ -65,7 +65,6 @@ export function ThemeSelector() {
 
   useEffect(() => {
     OnboardingService.actions.return.fetchThemes().then(themes => {
-      console.log(themes);
       setThemesMetadata(themes);
     });
   }, []);

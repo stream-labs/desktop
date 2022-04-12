@@ -71,7 +71,7 @@ export function HardwareSetup() {
   }
 
   return (
-    <div style={{ width: '100%', height: '100%' }}>
+    <div style={{ width: '100%' }}>
       <h1 className={commonStyles.titleContainer}>{$t('Set Up Mic and Webcam')}</h1>
       <div className={styles.contentContainer}>
         <DisplaySection />
