@@ -54,7 +54,7 @@ export default function AddSource() {
 
   const [name, setName] = useState('');
   const [overrideExistingSource, setOverrideExistingSource] = useState(false);
-  const [selectedSourceId, setSelectedSourceId] = useState(sources[0].sourceId || '');
+  const [selectedSourceId, setSelectedSourceId] = useState(sources[0]?.sourceId || '');
   const form = useForm();
 
   const existingSources = sources.map(source => ({ name: source.name, value: source.sourceId }));
