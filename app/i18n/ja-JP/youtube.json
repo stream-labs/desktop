@@ -34,10 +34,10 @@
   "Enable Auto-start": "自動開始",
   "Enable Auto-stop": "自動開始を有効化",
   "latencyTooltip": "低遅延ストリームでは、ブロードキャストを視聴しているユーザーに対して動画が表示されるまでにかかる時間を短くできます。ただし、これによって再生の滑らかさが影響を受けます。",
-  "Enabling auto-start will automatically start the stream when you start sending data from your streaming software": "自動開始を有効にすると、ストリーミングソフトウェアからデータの送信を開始すると、ストリームが自動的に開始します。",
-  "Enabling auto-stop will automatically stop the stream when you stop sending data from your streaming software": "自動停止を有効にすると、ストリーミングソフトウェアからデータの送信を停止すると、ストリームが自動的に停止します。",
+  "Enabling auto-start will automatically start the stream when you start sending data from your streaming software": "自動開始を有効にすると、ストリーミングソフトウェアからデータの送信を開始すると、ストリームが自動的に開始します",
+  "Enabling auto-stop will automatically stop the stream when you stop sending data from your streaming software": "自動停止を有効にすると、ストリーミングソフトウェアからデータの送信を停止すると、ストリームが自動的に停止します",
   "DVR controls enable the viewer to control the video playback experience by pausing, rewinding, or fast forwarding content": "DVR コントロールによって、視聴者は、動画再生をコントロールできます（コンテンツの一時停止、巻き戻し、または早送りなど）",
-  "Auto-start is disabled for your broadcast. You should manually publish your stream from Youtube Studio": "ブロードキャストでは自動開始は無効になっています。Youtube Studio から手動でストリームを公開する必要があります。",
+  "Auto-start is disabled for your broadcast. You should manually publish your stream from Youtube Studio": "ブロードキャストでは自動開始は無効になっています。Youtube Studio から手動でストリームを公開する必要があります",
   "Made for kids": "子供向けストリーム",
   "Features like personalized ads and live chat won't be available on live streams made for kids.": "パーソナライズされた広告やライブチャットなどの機能は、子供向けに作られたライブストリームでは利用できません。",
   "Try our new thumbnail editor": "新しいサムネイルエディタをお試しください"
