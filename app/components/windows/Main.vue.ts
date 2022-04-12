@@ -1,8 +1,6 @@
 import Vue from 'vue';
 import { Component, Watch } from 'vue-property-decorator';
-import SideNav from '../SideNav';
 import {
-  NewsBanner,
   TitleBar,
   Grow,
   PatchNotes,
@@ -11,6 +9,7 @@ import {
   Highlighter,
   ThemeAudit,
   LayoutEditor,
+  SideNav,
 } from 'components/shared/ReactComponentList';
 import { ScenesService } from 'services/scenes';
 import { PlatformAppsService } from 'services/platform-apps';
@@ -60,7 +59,6 @@ const loadedTheme = () => {
     StudioFooter,
     CustomLoader: Loader,
     PatchNotes,
-    NewsBanner,
     PlatformAppMainPage,
     PlatformAppStore,
     ResizeBar,

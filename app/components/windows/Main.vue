@@ -5,7 +5,6 @@
       :class="{ 'titlebar--error': errorAlert }"
       v-if="uiReady"
     />
-    <news-banner v-if="uiReady" />
     <div
       class="main-contents"
       v-if="uiReady"

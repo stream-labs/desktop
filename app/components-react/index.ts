@@ -4,7 +4,7 @@ import GoLiveWindow from './windows/go-live/GoLiveWindow';
 import EditStreamWindow from './windows/go-live/EditStreamWindow';
 import IconLibraryProperties from './windows/IconLibraryProperties';
 import ScreenCaptureProperties from './windows/ScreenCaptureProperties';
-import NewsBanner from './root/NewsBanner';
+import News from './windows/News';
 import PerformanceMetrics from './shared/PerformanceMetrics';
 import PatchNotes from './pages/PatchNotes';
 import Display from './shared/Display';
@@ -13,7 +13,6 @@ import Chat from './root/Chat';
 import Highlighter from './pages/Highlighter';
 import Grow from './pages/grow/Grow';
 import Loader from './pages/Loader';
-import NavTools from './sidebar/NavTools';
 import PlatformLogo from './shared/PlatformLogo';
 import AdvancedStatistics from './windows/AdvancedStatistics';
 import StreamScheduler from './pages/stream-scheduler/StreamScheduler';
@@ -23,7 +22,6 @@ import SourceProperties from './windows/SourceProperties';
 import TestWidgets from './root/TestWidgets';
 import RenameSource from './windows/RenameSource';
 import NotificationsArea from './root/NotificationsArea';
-import AppsNav from './sidebar/AppsNav';
 import StudioEditor from './root/StudioEditor';
 import SharedComponentsLibrary from './windows/sharedComponentsLibrary/SharedComponentsLibrary';
 import { ObsSettings } from './windows/settings/ObsSettings';
@@ -43,6 +41,7 @@ import LayoutEditor from './pages/layout-editor/LayoutEditor';
 import Projector from './windows/Projector';
 import SceneSelector from './editor/elements/SceneSelectorElement';
 import AddSource from './windows/AddSource';
+import SideNav from './sidebar/SideNav';
 
 // list of React components to be used inside Vue components
 export const components = {
@@ -53,7 +52,7 @@ export const components = {
   EditStreamWindow: createRoot(EditStreamWindow),
   IconLibraryProperties,
   ScreenCaptureProperties,
-  NewsBanner,
+  News,
   PerformanceMetrics,
   PatchNotes,
   Display,
@@ -62,7 +61,6 @@ export const components = {
   Highlighter,
   Grow,
   Loader,
-  NavTools,
   PlatformLogo,
   Projector,
   StreamScheduler: createRoot(StreamScheduler),
@@ -75,7 +73,6 @@ export const components = {
   NotificationsArea,
   ObsSettings: createRoot(ObsSettings),
   ThemeAudit,
-  AppsNav,
   StudioEditor,
   WidgetWindow: createRoot(WidgetWindow),
   CustomCodeWindow: createRoot(CustomCodeWindow),
@@ -90,4 +87,5 @@ export const components = {
   LayoutEditor: createRoot(LayoutEditor),
   SceneSelector: createRoot(SceneSelector),
   AddSource,
+  SideNav,
 };

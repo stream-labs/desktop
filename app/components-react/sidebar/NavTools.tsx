@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import cx from 'classnames';
 import electron from 'electron';
-import Utils from '../../services/utils';
-import { $t } from '../../services/i18n';
-import styles from '../../components/SideNav.m.less';
+import Utils from 'services/utils';
+import { $t } from 'services/i18n';
 import throttle from 'lodash/throttle';
 import { Services } from '../service-provider';
 import { useVuex } from '../hooks';
+import styles from './SideNav.m.less';
 import * as remote from '@electron/remote';
 
 export default function SideNav() {
@@ -21,7 +21,7 @@ export default function SideNav() {
 
   const isDevMode = Utils.isDevMode();
 
-  const v = useVuex(
+  const { studioMode, isLoggedIn, isPrime } = useVuex(
     () => ({
       studioMode: TransitionsService.views.studioMode,
       isLoggedIn: UserService.views.isLoggedIn,
@@ -30,7 +30,7 @@ export default function SideNav() {
     false,
   );
 
-  const [s, setState] = useState({ dashboardOpening: false });
+  const [dashboardOpening, setDashboardOpening] = useState(false);
 
   function openSettingsWindow() {
     UsageStatisticsService.actions.recordClick('NavTools', 'settings');
@@ -46,9 +46,9 @@ export default function SideNav() {
     electron.ipcRenderer.send('openDevTools');
   }
 
-  function studioMode() {
+  function toggleStudioMode() {
     UsageStatisticsService.actions.recordClick('NavTools', 'studio-mode');
-    if (v.studioMode) {
+    if (studioMode) {
       TransitionsService.actions.disableStudioMode();
     } else {
       TransitionsService.actions.enableStudioMode();
@@ -57,8 +57,8 @@ export default function SideNav() {
 
   async function openDashboard(page?: string) {
     UsageStatisticsService.actions.recordClick('NavTools', page || 'dashboard');
-    if (s.dashboardOpening) return;
-    setState({ dashboardOpening: true });
+    if (dashboardOpening) return;
+    setDashboardOpening(true);
 
     try {
       const link = await MagicLinkService.getDashboardMagicLink(page);
@@ -67,7 +67,7 @@ export default function SideNav() {
       console.error('Error generating dashboard magic link', e);
     }
 
-    setState({ dashboardOpening: false });
+    setDashboardOpening(false);
   }
 
   const throttledOpenDashboard = throttle(openDashboard, 2000, { trailing: false });
@@ -97,7 +97,7 @@ export default function SideNav() {
           <i className="icon-developer" />
         </div>
       )}
-      {v.isLoggedIn && !v.isPrime && (
+      {isLoggedIn && !isPrime && (
         <div
           className={cx(styles.cell, styles.primeCell)}
           onClick={upgradeToPrime}
@@ -106,7 +106,7 @@ export default function SideNav() {
           <i className="icon-prime" />
         </div>
       )}
-      {v.isLoggedIn && (
+      {isLoggedIn && (
         <div
           className={cx(styles.cell)}
           onClick={() => throttledOpenDashboard()}
@@ -115,7 +115,7 @@ export default function SideNav() {
           <i className="icon-dashboard" />
         </div>
       )}
-      {v.isLoggedIn && (
+      {isLoggedIn && (
         <div
           className={cx(styles.cell)}
           onClick={() => throttledOpenDashboard('cloudbot')}
@@ -128,8 +128,8 @@ export default function SideNav() {
         <i className="fas fa-th-large" />
       </div>
       <div
-        className={cx(styles.cell, { [styles.toggleOn]: v.studioMode })}
-        onClick={studioMode}
+        className={cx(styles.cell, { [styles.toggleOn]: studioMode })}
+        onClick={toggleStudioMode}
         title={$t('Studio Mode')}
       >
         <i className="icon-studio-mode-3" />
