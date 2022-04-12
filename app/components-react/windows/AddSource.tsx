@@ -48,7 +48,7 @@ export default function AddSource() {
           ? { ...comparison, isStreamlabel: true }
           : comparison,
       );
-      return isSameType && source.sourceId !== ScenesService.views.activeSceneId;
+      return isSameType && source?.sourceId !== ScenesService.views.activeSceneId;
     }),
   }));
 
@@ -226,6 +226,7 @@ export default function AddSource() {
               label={$t('Please enter the name of the source')}
               value={name}
               onChange={setName}
+              data-name="newSourceName"
               autoFocus
               required
               layout="vertical"

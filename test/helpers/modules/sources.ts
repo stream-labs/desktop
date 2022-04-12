@@ -53,12 +53,15 @@ export async function addSource(
   await click(`[data-name="${type}"]`);
 
   await clickButton('Add Source');
-  const isInputVisible = await isDisplayed('input', { timeout: 200, interval: 100 });
+  const isInputVisible = await isDisplayed('[data-name=newSourceName]', {
+    timeout: 200,
+    interval: 100,
+  });
   if (!isInputVisible) {
     await click('[data-type="toggle"]');
-    await waitForDisplayed('input');
+    await waitForDisplayed('[data-name=newSourceName]');
   }
-  await (await select('input')).setValue(name);
+  await (await select('[data-name=newSourceName]')).setValue(name);
 
   await clickButton('Add Source');
 
