@@ -164,7 +164,7 @@ export interface Community {
   id: string; // eg. '1'
   global_id: string; // eg. 'co123'
   name: string;
-  description: 'string';
+  description: string;
   public: 'open' | 'closed';
   icon: {
     id: number;

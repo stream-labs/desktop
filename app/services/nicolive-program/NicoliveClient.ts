@@ -52,7 +52,7 @@ export type FailedResult = {
  * if (isOk(result)) result.value; // number
  * else result.value // CommonErrorResponse
  */
-type WrappedResult<T> = SucceededResult<T> | FailedResult;
+export type WrappedResult<T> = SucceededResult<T> | FailedResult;
 
 export function isOk<T>(result: WrappedResult<T>): result is SucceededResult<T> {
   return result.ok === true;
