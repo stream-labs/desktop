@@ -14314,12 +14314,12 @@ __metadata:
   linkType: hard
 
 "slap@git+https://github.com/stream-labs/slap.git#alpha":
-  version: 0.1.43
-  resolution: "slap@https://github.com/stream-labs/slap.git#commit=bb70c8fcc5cac1d9d62d94c694264113002205ea"
+  version: 0.1.44
+  resolution: "slap@https://github.com/stream-labs/slap.git#commit=cf990100884ad0988be7b90bfc35cc0b216f85a4"
   dependencies:
     immer: ^9.0.12
     react: ^17.0.2
-  checksum: 6f0811dc236e4b93394a0e8ec79180cefc0081094d82d5a944f8cfa668b904b4e3ec22f2f6a4b6c53cd702307a948a85c12d762143baf559d177cd4f0c5e1220
+  checksum: 2e897076fe87d07d81a10b377479ac5c6d4141d85957b23f8e77b5994a041e71a0820227d565db7801439a222bc5391af0f7204def98c1c2f5365b40d973aa45
   languageName: node
   linkType: hard
 

@@ -44,3 +44,12 @@ class ObsSettingsModule {
 export function useObsSettings() {
   return useModule(ObsSettingsModule);
 }
+
+class MyModule {
+  foo: 1;
+  bar: 2;
+}
+
+const { foo, bar, zoom } = useModule(MyModule).extend(m => ({
+  zoom: 3,
+}));

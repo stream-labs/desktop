@@ -9,6 +9,7 @@ import { defineGetter, injectState, traverse, useModule } from 'slap';
 import { useForm } from '../../shared/inputs/Form';
 import { getDefined } from '../../../util/properties-type-guards';
 import { isEqual } from 'lodash';
+import {ObsSettingsModule} from "../../../services/platform-apps/api/modules/obs-settings";
 
 type TCommonFieldName = 'title' | 'description';
 
