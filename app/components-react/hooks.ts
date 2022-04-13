@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import debounce from 'lodash/debounce';
 import { StatefulService } from '../services/core';
 import { createBinding, TBindings } from './shared/inputs';
@@ -200,4 +200,41 @@ export function useRenderInterval(callback: () => void, delay: number, condition
       return () => clearTimeout(timeout);
     }
   }, [tick, condition]);
+}
+
+/**
+ * Useful for firing off an async request when the component mounts, but
+ * the result will be automatically discarded if the component unmounts
+ * before the request finishes. React throws a warning when doing state
+ * updates for unmounted components, and this prevents that.
+ * @param executor Function that returns a promise
+ * @param handler Function that takes a promise that is canceled on unmount
+ */
+export function usePromise<TPromiseResult>(
+  executor: () => Promise<TPromiseResult>,
+  handler: (promise: Promise<TPromiseResult>) => void,
+) {
+  useEffect(() => {
+    let unmounted = false;
+
+    handler(
+      new Promise((resolve, reject) => {
+        executor()
+          .then(r => {
+            if (unmounted) return;
+
+            resolve(r);
+          })
+          .catch(e => {
+            if (unmounted) return;
+
+            reject(e);
+          });
+      }),
+    );
+
+    return () => {
+      unmounted = true;
+    };
+  }, []);
 }

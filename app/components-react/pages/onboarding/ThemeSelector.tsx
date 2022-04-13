@@ -8,6 +8,7 @@ import cx from 'classnames';
 import { useModule } from 'components-react/hooks/useModule';
 import { OnboardingModule } from './Onboarding';
 import AutoProgressBar from 'components-react/shared/AutoProgressBar';
+import { usePromise } from 'components-react/hooks';
 
 export function ThemeSelector() {
   const { OnboardingService, SceneCollectionsService } = Services;
@@ -63,11 +64,10 @@ export function ThemeSelector() {
     next();
   }
 
-  useEffect(() => {
-    OnboardingService.actions.return.fetchThemes().then(themes => {
-      setThemesMetadata(themes);
-    });
-  }, []);
+  usePromise(
+    () => OnboardingService.actions.return.fetchThemes(),
+    p => p.then(themes => setThemesMetadata(themes)),
+  );
 
   return (
     <div style={{ width: '100%' }}>
