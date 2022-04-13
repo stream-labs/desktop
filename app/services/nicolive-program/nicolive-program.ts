@@ -36,7 +36,7 @@ function getCommunityIconUrl(community: Community): string {
   if (urls.size_64x64) {
     return urls.size_64x64;
   }
-   // 目的のサイズが存在しなかった場合、フォールバックとして存在する一つを返す
+  // 目的のサイズが存在しなかった場合、フォールバックとして存在する一つを返す
   return urls[Object.keys(urls)[0]] || '';
 }
 
