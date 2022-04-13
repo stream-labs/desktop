@@ -24,8 +24,6 @@ export default function StudioFooterComponent(p: { locked?: boolean }) {
     NavigationService,
   } = Services;
 
-  const [recordingTime, setRecordingTime] = useState('');
-
   const {
     streamingStatus,
     platform,
@@ -51,16 +49,6 @@ export default function StudioFooterComponent(p: { locked?: boolean }) {
     replayBufferSaving: StreamingService.state.replayBufferStatus === EReplayBufferState.Saving,
     youtubeEnabled: YoutubeService.state.liveStreamingEnabled,
   }));
-
-  useEffect(() => {
-    if (isRecording) {
-      const recordingTimeout = window.setTimeout(() => {
-        setRecordingTime(StreamingService.formattedDurationInCurrentRecordingState);
-      }, 1000);
-
-      return () => clearTimeout(recordingTimeout);
-    }
-  }, [isRecording, recordingTime]);
 
   useEffect(confirmYoutubeEnabled, [platform]);
 
@@ -158,9 +146,7 @@ export default function StudioFooterComponent(p: { locked?: boolean }) {
 
       <div className={styles.navRight}>
         <div className={styles.navItem}>{isLoggedIn && <TestWidgets />}</div>
-        {isRecording && (
-          <div className={cx(styles.navItem, styles.recordTime)}>{recordingTime}</div>
-        )}
+        <RecordingTimer />
         <div className={styles.navItem}>
           <button
             disabled={p.locked}
@@ -211,4 +197,26 @@ export default function StudioFooterComponent(p: { locked?: boolean }) {
       </div>
     </div>
   );
+}
+
+function RecordingTimer() {
+  const { StreamingService } = Services;
+  const [recordingTime, setRecordingTime] = useState('');
+
+  const { isRecording } = useVuex(() => ({
+    isRecording: StreamingService.views.isRecording,
+  }));
+
+  useEffect(() => {
+    if (isRecording) {
+      const recordingTimeout = window.setTimeout(() => {
+        setRecordingTime(StreamingService.formattedDurationInCurrentRecordingState);
+      }, 1000);
+
+      return () => clearTimeout(recordingTimeout);
+    }
+  }, [isRecording, recordingTime]);
+
+  if (!isRecording) return <></>;
+  return <div className={cx(styles.navItem, styles.recordTime)}>{recordingTime}</div>;
 }
