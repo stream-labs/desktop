@@ -98,7 +98,6 @@ export { StarsGoalService } from 'services/widgets/settings/stars-goal';
 export { SupporterGoalService } from 'services/widgets/settings/supporter-goal';
 export { SubscriberGoalService } from 'services/widgets/settings/subscriber-goal';
 export { CharityGoalService } from 'services/widgets/settings/charity-goal';
-export { ViewerCountService } from 'services/widgets/settings/viewer-count';
 export { StreamBossService } from 'services/widgets/settings/stream-boss';
 export { DonationTickerService } from 'services/widgets/settings/donation-ticker';
 export { CreditsService } from 'services/widgets/settings/credits';
