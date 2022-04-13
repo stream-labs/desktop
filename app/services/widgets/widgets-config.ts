@@ -203,7 +203,7 @@ export function getWidgetsConfig(host: string, token: string): Record<TWidgetTyp
       },
 
       url: `https://${host}/widgets/donation-ticker?token=${token}`,
-      previewUrl: `https://${host}}/widgets/donation-ticker?token=${token}&simulate=1`,
+      previewUrl: `https://${host}/widgets/donation-ticker?token=${token}&simulate=1`,
       dataFetchUrl: `https://${host}/api/v5/slobs/widget/ticker`,
       settingsSaveUrl: `https://${host}/api/v5/slobs/widget/ticker`,
       settingsUpdateEvent: 'donationTickerSettingsUpdate',
