@@ -35,6 +35,7 @@ import {
   SourceFilters,
   MediaGallery,
   Projector,
+  News,
 } from 'components/shared/ReactComponentList';
 
 import SourcePropertiesDeprecated from 'components/windows/SourceProperties.vue';
@@ -47,7 +48,6 @@ import GameOverlayEventFeed from 'components/windows/GameOverlayEventFeed';
 import PlatformAppPopOut from 'components/windows/PlatformAppPopOut.vue';
 import EditTransform from 'components/windows/EditTransform';
 import EventFilterMenu from 'components/windows/EventFilterMenu';
-import OverlayWindow from 'components/windows/OverlayWindow.vue';
 import OverlayPlaceholder from 'components/windows/OverlayPlaceholder';
 import BrowserSourceInteraction from 'components/windows/BrowserSourceInteraction';
 import WelcomeToPrime from 'components/windows/WelcomeToPrime';
@@ -61,7 +61,6 @@ import SubscriberGoal from 'components/widgets/goal/SubscriberGoal';
 import FollowerGoal from 'components/widgets/goal/FollowerGoal';
 import CharityGoal from 'components/widgets/goal/CharityGoal';
 import ChatBox from 'components/widgets/ChatBox.vue';
-import ViewerCount from 'components/widgets/ViewerCount.vue';
 import StreamBoss from 'components/widgets/StreamBoss.vue';
 import DonationTicker from 'components/widgets/DonationTicker.vue';
 import Credits from 'components/widgets/Credits.vue';
@@ -112,9 +111,7 @@ export function getComponents() {
     MediaGallery,
     PlatformAppPopOut,
     EditTransform,
-    OverlayWindow,
     OverlayPlaceholder,
-    PerformanceMetrics,
     BrowserSourceInteraction,
     EventFilterMenu,
     GameOverlayEventFeed,
@@ -128,7 +125,6 @@ export function getComponents() {
     SuperchatGoal,
     CharityGoal,
     ChatBox,
-    ViewerCount,
     DonationTicker,
     Credits,
     EventList,
@@ -151,6 +147,7 @@ export function getComponents() {
     WidgetWindow,
     CustomCodeWindow,
     SourceShowcase,
+    News,
   };
 }
 

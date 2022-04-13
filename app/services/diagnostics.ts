@@ -644,11 +644,11 @@ export class DiagnosticsService extends PersistentStatefulService<IDiagnosticsSe
         return {
           'Start Time': new Date(s.startTime).toString(),
           'End Time': s.endTime ? new Date(s.endTime).toString() : 'Stream did not end cleanly',
-          'Skipped Frames': `${s.pctSkipped.toFixed(2)}%`,
-          'Lagged Frames': `${s.pctLagged.toFixed(2)}%`,
-          'Dropped Frames': `${s.pctDropped.toFixed(2)}%`,
-          'Average CPU': `${s.avgCpu.toFixed(2)}%`,
-          'Average FPS': s.avgFps.toFixed(2),
+          'Skipped Frames': `${s.pctSkipped?.toFixed(2)}%`,
+          'Lagged Frames': `${s.pctLagged?.toFixed(2)}%`,
+          'Dropped Frames': `${s.pctDropped?.toFixed(2)}%`,
+          'Average CPU': `${s.avgCpu?.toFixed(2)}%`,
+          'Average FPS': s.avgFps?.toFixed(2),
         };
       }),
     );

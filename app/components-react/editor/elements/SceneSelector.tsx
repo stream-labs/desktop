@@ -137,7 +137,7 @@ export default function SceneSelector() {
         nowrap
         uncontrolled={false}
       />
-      <div className="link link--pointer" onClick={manageCollections}>
+      <div className="link link--pointer" onClick={manageCollections} style={{ marginTop: '6px' }}>
         {$t('Manage All')}
       </div>
       <hr style={{ borderColor: 'var(--border)' }} />

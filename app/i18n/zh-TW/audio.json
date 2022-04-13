@@ -31,5 +31,9 @@
   "Designates if this source is audible in your recorded track(s)": "指定在您錄製的音軌中此來源是否發出聲音",
   "Source Settings": "來源設定",
   "Audio Tracks": "音訊音軌",
-  "Designates which tracks are being recorded": "指定要錄製哪個音軌"
+  "Designates which tracks are being recorded": "指定要錄製哪個音軌",
+  "Your Stream and VOD Track are the same. This may result in unexpected audio behavior, go to Global Settings to change.": "Your Stream and VOD Track are the same. This may result in unexpected audio behavior, go to Global Settings to change.",
+  "Streaming Track": "Streaming Track",
+  "Enable Twitch VOD Track": "Enable Twitch VOD Track",
+  "Twitch VOD Track": "Twitch VOD Track"
 }

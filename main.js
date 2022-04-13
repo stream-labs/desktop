@@ -295,7 +295,7 @@ async function startApp() {
   }
 
   if (pjson.env === 'production') {
-    Raven.config('https://6971fa187bb64f58ab29ac514aa0eb3d@sentry.io/251674', {
+    Raven.config(pjson.sentryFrontendDSN, {
       release: process.env.SLOBS_VERSION,
     }).install((err, initialErr, eventId) => {
       handleFinishedReport();
@@ -305,11 +305,14 @@ async function startApp() {
       productName: 'streamlabs-obs',
       companyName: 'streamlabs',
       ignoreSystemCrashHandler: true,
-      submitURL:
-        'https://sentry.io/api/1283430/minidump/?sentry_key=01fc20f909124c8499b4972e9a5253f2',
+      submitURL: process.env.SLOBS_PREVIEW
+        ? pjson.sentryBackendClientPreviewURL
+        : pjson.sentryBackendClientURL,
       extra: {
-        'sentry[release]': pjson.version,
         processType: 'main',
+      },
+      globalExtra: {
+        'sentry[release]': pjson.version,
       },
     });
   }
@@ -343,8 +346,8 @@ async function startApp() {
     minHeight: 600,
     width: mainWindowState.width,
     height: mainWindowState.height,
-    x: mainWindowState.x,
-    y: mainWindowState.y,
+    x: mainWindowState.isMaximized ? mainWindowState.displayBounds.x : mainWindowState.x,
+    y: mainWindowState.isMaximized ? mainWindowState.displayBounds.y : mainWindowState.y,
     show: false,
     frame: false,
     titleBarStyle: 'hidden',

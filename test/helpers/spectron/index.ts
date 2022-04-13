@@ -242,7 +242,7 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
     const logs: string = await readLogs();
     lastLogs = logs;
     const errors = logs
-      .substr(logFileLastReadingPos)
+      .slice(logFileLastReadingPos)
       .split('\n')
       .filter((record: string) => {
         // This error is outside our control and can be ignored.

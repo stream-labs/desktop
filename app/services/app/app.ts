@@ -155,7 +155,6 @@ export class AppService extends StatefulService<IAppState> {
     this.tcpServerService.listen();
 
     this.patchNotesService.showPatchNotesIfRequired(this.state.onboarded);
-    this.announcementsService.updateBanner();
 
     this.crashReporterService.endStartup();
 

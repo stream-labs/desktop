@@ -5,8 +5,6 @@
   "Generate new": "Yeni oluştur",
   "Port": "Bağlantı noktası",
   "IP addresses": "IP adresleri",
-  "You can now control Streamlabs from your phone.": "Streamlabs’i artık telefonunuzdan kontrol edebilirsiniz.",
-  "To begin, scan this QR code with your phone.": "Başlamak için telefonunuz ile bu QR kodunu taratın.",
-  "This feature will only work with the most recent version of the Streamlabs mobile app.": "Bu özellik yalnızca Streamlabs mobil uygulamasının en güncel sürümüyle çalışır.",
-  "Click to show": "Görüntülemek için tıklayın"
+  "Click to show": "Görüntülemek için tıklayın",
+  "The free Streamlabs Deck app allows you to control Streamlabs Desktop from your iOS or Android device. Scan the QR code below to begin.": "The free Streamlabs Deck app allows you to control Streamlabs Desktop from your iOS or Android device. Scan the QR code below to begin."
 }
