@@ -254,6 +254,8 @@ export class Display {
   }
 
   async refreshOutputRegion() {
+    if (this.displayDestroyed) return;
+
     const position = await this.videoService.actions.return.getOBSDisplayPreviewOffset(this.name);
 
     // This can happen while we were async fetching the offset
