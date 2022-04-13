@@ -234,6 +234,26 @@
     "nodeType": "ScenesNode",
     "items": [
       {
+        "id": "scene_72e390cb-66d6-47ae-9b6d-e0deda2be1ec",
+        "name": "シーン",
+        "sceneItems": {
+          "schemaVersion": 1,
+          "nodeType": "SceneItemsNode",
+          "items": []
+        },
+        "hotkeys": {
+          "schemaVersion": 2,
+          "nodeType": "HotkeysNode",
+          "items": []
+        },
+        "filters": {
+          "schemaVersion": 1,
+          "nodeType": "SceneFiltersNode",
+          "items": []
+        },
+        "active": true
+      },
+      {
         "id": "scene_d8929ac0-3632-4225-b0ba-59a67227b388",
         "name": "プリセット",
         "sceneItems": {
@@ -429,8 +449,7 @@
           "schemaVersion": 1,
           "nodeType": "SceneFiltersNode",
           "items": []
-        },
-        "active": true
+        }
       }
     ]
   },
