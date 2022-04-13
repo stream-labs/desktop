@@ -11,10 +11,11 @@ test('The default sources exists', async t => {
   const audioService = client.getResource<IAudioServiceApi>('AudioService');
   const audioSources = audioService.getSourcesForCurrentScene();
 
-  t.deepEqual(audioSources.map(i => i.getModel().name), ['デスクトップ音声', 'マイク', 'Webカメラ']);
-
+  t.deepEqual(
+    audioSources.map(i => i.getModel().name),
+    ['デスクトップ音声', 'マイク'],
+  );
 });
-
 
 test('The sources with audio have to be appeared in AudioService', async t => {
   const client = await getClient();
@@ -25,15 +26,18 @@ test('The sources with audio have to be appeared in AudioService', async t => {
   scene.createAndAddSource('MyAudio', 'wasapi_output_capture');
   const audioSources = audioService.getSourcesForCurrentScene();
 
-  t.deepEqual(audioSources.map(i => i.getModel().name), ['デスクトップ音声', 'マイク', 'MyAudio', 'Webカメラ']);
+  t.deepEqual(
+    audioSources.map(i => i.getModel().name),
+    ['デスクトップ音声', 'マイク', 'MyAudio'],
+  );
 });
-
 
 test('The audio sources have to keep settings after application restart', async t => {
   const client = await getClient();
   const scenesService = client.getResource<ScenesService>('ScenesService');
   const audioService = client.getResource<IAudioServiceApi>('AudioService');
-  const sceneCollectionsService = client.getResource<ISceneCollectionsServiceApi>('SceneCollectionsService');
+  const sceneCollectionsService =
+    client.getResource<ISceneCollectionsServiceApi>('SceneCollectionsService');
 
   const scene = scenesService.activeScene;
   const source = scene.createAndAddSource('MyMic', 'wasapi_input_capture');
@@ -44,7 +48,7 @@ test('The audio sources have to keep settings after application restart', async 
     monitoringType: 1,
     forceMono: true,
     syncOffset: 10,
-    muted: true
+    muted: true,
   });
 
   const audioSourceModel = audioSource.getModel();
@@ -55,7 +59,6 @@ test('The audio sources have to keep settings after application restart', async 
   const loadedAudioSourceModel = audioService.getSource(source.sourceId).getModel();
 
   t.deepEqual(audioSourceModel, loadedAudioSourceModel);
-
 });
 
 test('Events are emitted when the audio source is updated', async t => {
