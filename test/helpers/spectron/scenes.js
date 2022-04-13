@@ -3,7 +3,8 @@ import { focusMain, focusChild } from '.';
 import { contextMenuClick } from './context-menu';
 import { dialogDismiss } from './dialog';
 
-export const DefaultSceneName = 'プリセット';
+export const DefaultSceneName = 'シーン';
+export const PresetSceneName = 'プリセット';
 
 async function clickSceneAction(t, selector) {
   await t.context.app.client
