@@ -5,7 +5,7 @@ import { mutation, StatefulService } from 'services/core/stateful-service';
 import { UserService } from 'services/user';
 import { CreateResult, EditResult, isOk, NicoliveClient } from './NicoliveClient';
 import { NicoliveFailure, openErrorDialogFromFailure } from './NicoliveFailure';
-import { ProgramSchedules } from './ResponseTypes';
+import { Community, ProgramSchedules } from './ResponseTypes';
 import { NicoliveProgramStateService } from './state';
 
 type Schedules = ProgramSchedules['data'];
@@ -30,6 +30,15 @@ type ProgramState = {
   adPoint: number;
   giftPoint: number;
 };
+
+function getCommunityIconUrl(community: Community): string {
+  const urls = community.icon.url;
+  if (urls.size_64x64) {
+    return urls.size_64x64;
+  }
+  // 目的のサイズが存在しなかった場合、フォールバックとして存在する一つを返す
+  return urls[Object.keys(urls)[0]] || '';
+}
 
 interface INicoliveProgramState extends ProgramState {
   /**
@@ -244,7 +253,7 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
         isMemberOnly: program.isMemberOnly,
         communityID: socialGroupId,
         communityName: community ? community.name : '(コミュニティの取得に失敗しました)',
-        communitySymbol: community ? community.thumbnailUrl.small : '',
+        communitySymbol: community ? getCommunityIconUrl(community) : '',
         roomURL: room ? room.webSocketUri : '',
         roomThreadID: room ? room.threadId : '',
       });

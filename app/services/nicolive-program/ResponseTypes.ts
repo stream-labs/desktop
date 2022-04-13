@@ -161,20 +161,17 @@ export interface NicoadStatistics {
 
 export interface Community {
   // 使用しそうなものだけ雑に抜粋
-  id: string;
+  id: string; // eg. '1'
+  global_id: string; // eg. 'co123'
   name: string;
-  description: 'string';
-  status: 'open' | 'closed';
-  thumbnailUrl: {
-    normal: string;
-    small: string;
-  };
-  thumbnails: {
-    '1024x1024': string;
-    '512x512': string;
-    '256x256': string;
-    '128x128': string;
-    '64x64': string;
+  description: string;
+  public: 'open' | 'closed';
+  icon: {
+    id: number;
+    url: {
+      size_128x128: string;
+      size_64x64: string;
+    };
   };
 }
 
@@ -183,15 +180,10 @@ export interface Communities {
     status: 200;
   };
   data: {
-    communities: Community[];
-    errors: {
-      id: string;
-      meta: {
-        status: number;
-        errorCode: string;
-        errorMessage: string;
-      };
-    }[];
+    communities: {
+      total: number;
+      communities: Community[];
+    };
   };
 }
 

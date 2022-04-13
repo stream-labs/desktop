@@ -1,4 +1,6 @@
 import { createSetupFunction } from 'util/test-setup';
+import { WrappedResult } from './NicoliveClient';
+import { Community } from './ResponseTypes';
 
 type NicoliveProgramService = import('./nicolive-program').NicoliveProgramService;
 
@@ -240,8 +242,8 @@ test('fetchProgram:成功', async () => {
   instance.client.fetchProgram = jest.fn().mockResolvedValue({ ok: true, value: programs.onAir });
   instance.client.fetchCommunity = jest.fn().mockResolvedValue({
     ok: true,
-    value: { name: 'comunity.name', thumbnailUrl: { small: 'symbol url' } },
-  });
+    value: { name: 'community.name', icon: { url: { size_64x64: 'symbol url' } } },
+  } as WrappedResult<Community>);
 
   // TODO: StatefulServiceのモックをVue非依存にする
   (instance as any).setState = jest.fn();
@@ -260,7 +262,7 @@ test('fetchProgram:成功', async () => {
       Array [
         Object {
           "communityID": "co1",
-          "communityName": "comunity.name",
+          "communityName": "community.name",
           "communitySymbol": "symbol url",
           "description": "番組詳細情報",
           "endTime": 150,
@@ -298,7 +300,7 @@ test('fetchProgramで番組があったが取りに行ったらエラー', async
   });
   instance.client.fetchCommunity = jest.fn().mockResolvedValue({
     ok: true,
-    value: { name: 'comunity.name', thumbnailUrl: { small: 'symbol url' } },
+    value: { name: 'community.name', thumbnailUrl: { small: 'symbol url' } },
   });
 
   (instance as any).setState = jest.fn();
