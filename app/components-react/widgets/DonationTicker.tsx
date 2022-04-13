@@ -48,6 +48,7 @@ export function DonationTicker() {
             label={$t('Max Donations')}
             {...bind.max_donations}
             min={0}
+            max={1000}
             tooltip={tips.maxDonationsTooltip}
           />
           <SliderInput
