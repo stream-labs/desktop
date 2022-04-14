@@ -369,11 +369,13 @@ async function entry(info: IUpdateInfo) {
 
   console.log('Spawning updater with args:', updaterArgs);
 
-  var arg_file = fs.createWriteStream(path.resolve(info.tempDir, 'update.cfg'));
-  arg_file.on('error', function (err) { });
+  const arg_file = fs.createWriteStream(path.resolve(info.tempDir, 'update.cfg'));
+  arg_file.on('error', function (err) {});
   const updaterArgsPath = [`"${updaterPath}"`];
-  var argumentsArray = updaterArgsPath.concat(updaterArgs);
-  argumentsArray.forEach(function (v) { arg_file.write(v.replace(/"/g, '').replace(/\\\\/g, '\\') + '\n'); });
+  const argumentsArray = updaterArgsPath.concat(updaterArgs);
+  argumentsArray.forEach(function (v) {
+    arg_file.write(v.replace(/"/g, '').replace(/\\\\/g, '\\') + '\n');
+  });
   arg_file.end();
 
   const updaterProcess = cp.spawn(updaterStartCommand, updaterArgs, {
