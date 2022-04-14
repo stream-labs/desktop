@@ -371,7 +371,7 @@ async function entry(info: IUpdateInfo) {
 
   const arg_file = fs.createWriteStream(path.resolve(info.tempDir, 'update.cfg'));
   arg_file.on('error', function (err) {
-    console.log('Failed to write updater argument to a file ' + path.resolve(info.tempDir, 'update.cfg'));
+    console.log('Failed to write updater argument to a file');
   });
   const updaterArgsPath = [`"${updaterPath}"`];
   const argumentsArray = updaterArgsPath.concat(updaterArgs);
