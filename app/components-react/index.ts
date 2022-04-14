@@ -14,6 +14,7 @@ import Highlighter from './pages/Highlighter';
 import Grow from './pages/grow/Grow';
 import Loader from './pages/Loader';
 import PlatformLogo from './shared/PlatformLogo';
+import Onboarding from './pages/onboarding/Onboarding';
 import AdvancedStatistics from './windows/AdvancedStatistics';
 import StudioFooter from './root/StudioFooter';
 import StreamScheduler from './pages/stream-scheduler/StreamScheduler';
@@ -62,6 +63,7 @@ export const components = {
   Grow,
   Loader,
   PlatformLogo,
+  Onboarding: createRoot(Onboarding),
   Projector,
   StreamScheduler: createRoot(StreamScheduler),
   AdvancedStatistics,

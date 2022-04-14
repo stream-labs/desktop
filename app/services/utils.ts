@@ -20,6 +20,7 @@ export interface IEnv {
   SLOBS_TRACE_SYNC_IPC: boolean;
   SLOBS_USE_CDN_MEDIA: boolean;
   SLD_USE_BETA: boolean;
+  SLD_FORCE_ONBOARDING_STEP: string;
   CI: boolean;
 }
 
