@@ -225,10 +225,11 @@ export default function AddSource() {
             <TextInput
               label={$t('Please enter the name of the source')}
               value={name}
-              onChange={setName}
-              data-name="newSourceName"
+              onInput={setName}
+              name="newSourceName"
               autoFocus
               required
+              uncontrolled={false}
               layout="vertical"
             />
           </Form>
