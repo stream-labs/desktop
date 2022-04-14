@@ -95,5 +95,8 @@
   "Access to all App Store Apps": "Доступ ко всем приложениям App Store",
   "Prime Web Suite": "Веб-версия Prime",
   "Choose Free": "Выбрать бесплатный пакет",
-  "Pro features to take your stream and channel to the next level.": "Новый уровень ваших трансляций и канала с функциями уровня Pro."
+  "Pro features to take your stream and channel to the next level.": "Новый уровень ваших трансляций и канала с функциями уровня Pro.",
+  "Something went wrong while importing from OBS Studio. Please try again or skip to the next step.": "Something went wrong while importing from OBS Studio. Please try again or skip to the next step.",
+  "Visual Preset": "Visual Preset",
+  "Installing theme...": "Installing theme..."
 }
