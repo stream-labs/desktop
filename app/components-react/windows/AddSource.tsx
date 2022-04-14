@@ -156,9 +156,9 @@ export default function AddSource() {
       );
       source = item.source;
     }
-    if (!source.video && source.hasProps()) {
+    if (!source?.video && source?.hasProps()) {
       AudioService.actions.showAdvancedSettings(source.sourceId);
-    } else if (source.hasProps()) {
+    } else if (source?.hasProps()) {
       SourcesService.actions.showSourceProperties(source.sourceId);
     } else {
       close();
