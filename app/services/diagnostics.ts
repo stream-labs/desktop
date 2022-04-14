@@ -456,7 +456,7 @@ export class DiagnosticsService extends PersistentStatefulService<IDiagnosticsSe
 
   private generateAudioSection() {
     const settings = this.settingsService.views.values;
-    const devices = this.hardwareService.getDevices();
+    const devices = this.hardwareService.devices;
 
     function audioDeviceObj(deviceId: string) {
       if (deviceId == null) return {};
@@ -496,8 +496,8 @@ export class DiagnosticsService extends PersistentStatefulService<IDiagnosticsSe
   }
 
   private generateDevicesSection() {
-    const devices = this.hardwareService.getDevices();
-    const dshowDevices = this.hardwareService.getDshowDevices();
+    const devices = this.hardwareService.devices;
+    const dshowDevices = this.hardwareService.dshowDevices;
 
     function mapDevice(d: IDevice) {
       return {
@@ -574,7 +574,7 @@ export class DiagnosticsService extends PersistentStatefulService<IDiagnosticsSe
     // TODO: Handle macOS
     if (source.type === 'dshow_input') {
       const deviceId = source.getObsInput().settings['video_device_id'];
-      const device = this.hardwareService.getDshowDevices().find(d => d.id === deviceId);
+      const device = this.hardwareService.dshowDevices.find(d => d.id === deviceId);
 
       if (device == null) {
         this.logProblem(

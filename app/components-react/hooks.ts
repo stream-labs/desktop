@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import debounce from 'lodash/debounce';
 import { StatefulService } from '../services/core';
 import { createBinding, TBindings } from './shared/inputs';
@@ -24,6 +24,32 @@ export function useVuex<TReturnValue>(selector: () => TReturnValue, deep = true)
   }, []);
 
   return state;
+}
+
+/**
+ * Watch a value in Vuex. A few caveats:
+ * - This intentionally does not call your watch function on first
+ *   render. This is specifically for tying behavior to when the
+ *   watched value changes.
+ * - Your selector should return a simple value, not an object. This
+ *   is because (like React deps) the values are compared with simple
+ *   === equality, and will not do a proper object comparison.
+ * @param selector A function that returns a value to watch
+ * @param watchFn A function that runs when the value changes
+ */
+export function useWatchVuex<TSelectorValue>(
+  selector: () => TSelectorValue,
+  watchFn: (newVal: TSelectorValue, oldVal: TSelectorValue) => void,
+) {
+  const selectorVal = useVuex(selector);
+  const oldVal = useRef(selectorVal);
+
+  useEffect(() => {
+    if (selectorVal !== oldVal.current) {
+      watchFn(selectorVal, oldVal.current);
+      oldVal.current = selectorVal;
+    }
+  }, [selectorVal]);
 }
 
 /**
@@ -174,4 +200,41 @@ export function useRenderInterval(callback: () => void, delay: number, condition
       return () => clearTimeout(timeout);
     }
   }, [tick, condition]);
+}
+
+/**
+ * Useful for firing off an async request when the component mounts, but
+ * the result will be automatically discarded if the component unmounts
+ * before the request finishes. React throws a warning when doing state
+ * updates for unmounted components, and this prevents that.
+ * @param executor Function that returns a promise
+ * @param handler Function that takes a promise that is canceled on unmount
+ */
+export function usePromise<TPromiseResult>(
+  executor: () => Promise<TPromiseResult>,
+  handler: (promise: Promise<TPromiseResult>) => void,
+) {
+  useEffect(() => {
+    let unmounted = false;
+
+    handler(
+      new Promise((resolve, reject) => {
+        executor()
+          .then(r => {
+            if (unmounted) return;
+
+            resolve(r);
+          })
+          .catch(e => {
+            if (unmounted) return;
+
+            reject(e);
+          });
+      }),
+    );
+
+    return () => {
+      unmounted = true;
+    };
+  }, []);
 }

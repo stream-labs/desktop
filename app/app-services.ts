@@ -163,6 +163,10 @@ import { WebsocketService } from './services/websocket';
 import { SpinWheelService } from 'services/widgets/settings/spin-wheel';
 import { LayoutService } from './services/layout';
 import { ProjectorService } from './services/projector';
+import { ObsImporterService } from 'services/obs-importer';
+import { DefaultHardwareService } from 'services/hardware';
+import { AutoConfigService } from 'services/auto-config';
+import { MacPermissionsService } from 'services/mac-permissions';
 import { IncrementalRolloutService } from './services/incremental-rollout';
 
 export const AppServices = {
@@ -216,5 +220,9 @@ export const AppServices = {
   SpinWheelService,
   LayoutService,
   ProjectorService,
+  ObsImporterService,
+  DefaultHardwareService,
+  AutoConfigService,
+  MacPermissionsService,
   IncrementalRolloutService,
 };

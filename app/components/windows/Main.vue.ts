@@ -10,6 +10,7 @@ import {
   Highlighter,
   ThemeAudit,
   LayoutEditor,
+  Onboarding,
   SideNav,
 } from 'components/shared/ReactComponentList';
 import { ScenesService } from 'services/scenes';
@@ -26,7 +27,6 @@ import Studio from '../pages/Studio';
 import PlatformAppStore from '../pages/PlatformAppStore.vue';
 import BrowseOverlays from 'components/pages/BrowseOverlays.vue';
 import AlertboxLibrary from 'components/pages/AlertboxLibrary';
-import Onboarding from '../pages/Onboarding';
 import { Inject } from '../../services/core/injector';
 import { CustomizationService } from 'services/customization';
 import { NavigationService } from 'services/navigation';

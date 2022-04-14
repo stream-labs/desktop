@@ -3,90 +3,82 @@ import { NavigationService } from 'services/navigation';
 import { UserService } from 'services/user';
 import { Inject, ViewHandler } from 'services/core/';
 import { SceneCollectionsService } from 'services/scene-collections';
-import * as onboardingSteps from 'components/pages/onboarding-steps';
 import TsxComponent from 'components/tsx-component';
 import { OS } from 'util/operating-systems';
 import { $t } from './i18n';
-import { handleResponse } from 'util/requests';
+import { handleResponse, jfetch } from 'util/requests';
 import { getPlatformService, IPlatformCapabilityResolutionPreset } from './platforms';
 import { OutputSettingsService } from './settings';
 import { ObsImporterService } from './obs-importer';
+import Utils from './utils';
 
 enum EOnboardingSteps {
   MacPermissions = 'MacPermissions',
   Connect = 'Connect',
-  ChooseYourAdventure = 'ChooseYourAdventure',
+  FreshOrImport = 'FreshOrImport',
   ObsImport = 'ObsImport',
   HardwareSetup = 'HardwareSetup',
   ThemeSelector = 'ThemeSelector',
   Optimize = 'Optimize',
   Prime = 'Prime',
-  PrimeExpiration = 'PrimeExpiration',
 }
 
-const ONBOARDING_STEPS = () => ({
+export const ONBOARDING_STEPS = () => ({
   [EOnboardingSteps.MacPermissions]: {
-    element: onboardingSteps.MacPermissions,
+    component: 'MacPermissions',
     disableControls: false,
     hideSkip: true,
     hideButton: true,
     isPreboarding: true,
   },
   [EOnboardingSteps.Connect]: {
-    element: onboardingSteps.Connect,
+    component: 'Connect',
     disableControls: false,
     hideSkip: true,
     hideButton: true,
     isPreboarding: true,
   },
-  [EOnboardingSteps.ChooseYourAdventure]: {
-    element: onboardingSteps.ChooseYourAdventure,
+  [EOnboardingSteps.FreshOrImport]: {
+    component: 'FreshOrImport',
     disableControls: true,
     hideSkip: true,
     hideButton: true,
     isPreboarding: true,
   },
   [EOnboardingSteps.ObsImport]: {
-    element: onboardingSteps.ObsImport,
+    component: 'ObsImport',
     disableControls: true,
-    hideSkip: true,
+    hideSkip: false,
     hideButton: true,
     label: $t('Import'),
   },
   [EOnboardingSteps.HardwareSetup]: {
-    element: onboardingSteps.HardwareSetup,
+    component: 'HardwareSetup',
     disableControls: false,
     hideSkip: false,
     hideButton: false,
     label: $t('Set Up Mic and Webcam'),
   },
   [EOnboardingSteps.ThemeSelector]: {
-    element: onboardingSteps.ThemeSelector,
+    component: 'ThemeSelector',
     disableControls: false,
     hideSkip: false,
     hideButton: true,
     label: $t('Add a Theme'),
   },
   [EOnboardingSteps.Optimize]: {
-    element: onboardingSteps.Optimize,
+    component: 'Optimize',
     disableControls: false,
     hideSkip: false,
     hideButton: true,
     label: $t('Optimize'),
   },
   [EOnboardingSteps.Prime]: {
-    element: onboardingSteps.Prime,
+    component: 'Prime',
     disableControls: false,
     hideSkip: false,
     hideButton: true,
     label: $t('Prime'),
-  },
-  [EOnboardingSteps.PrimeExpiration]: {
-    element: onboardingSteps.PrimeExpiration,
-    disableControls: true,
-    hideSkip: true,
-    hideButton: true,
-    label: '',
   },
 });
 
@@ -99,8 +91,8 @@ const THEME_METADATA = {
   2639: 'https://cdn.streamlabs.com/marketplace/overlays/7684923/a1a4ab0/a1a4ab0.overlay',
 };
 
-interface IOnboardingStep {
-  element: typeof TsxComponent;
+export interface IOnboardingStep {
+  component: string;
   disableControls: boolean;
   hideSkip: boolean;
   hideButton: boolean;
@@ -111,10 +103,8 @@ interface IOnboardingStep {
 interface IOnboardingOptions {
   isLogin: boolean; // When logging into a new account after onboarding
   isOptimize: boolean; // When re-running the optimizer after onboarding
-  isSecurityUpgrade: boolean; // When logging in, display a special message
   // about our security upgrade.
   isHardware: boolean; // When configuring capture defaults
-  isPrimeExpiration: boolean; // Only shown as a singleton step if prime is expiring soon
   isImport: boolean; // When users are importing from OBS
 }
 
@@ -124,15 +114,20 @@ interface IOnboardingServiceState {
   existingSceneCollections: boolean;
 }
 
+export interface IThemeMetadata {
+  data: {
+    id: number;
+    name: string;
+    custom_images: Dictionary<string>;
+  };
+}
+
 class OnboardingViews extends ViewHandler<IOnboardingServiceState> {
   get singletonStep(): IOnboardingStep {
     if (this.state.options.isLogin) return ONBOARDING_STEPS()[EOnboardingSteps.Connect];
     if (this.state.options.isOptimize) return ONBOARDING_STEPS()[EOnboardingSteps.Optimize];
     if (this.state.options.isHardware) return ONBOARDING_STEPS()[EOnboardingSteps.HardwareSetup];
     if (this.state.options.isImport) return ONBOARDING_STEPS()[EOnboardingSteps.ObsImport];
-    if (this.state.options.isPrimeExpiration) {
-      return ONBOARDING_STEPS()[EOnboardingSteps.PrimeExpiration];
-    }
   }
 
   get steps() {
@@ -147,7 +142,7 @@ class OnboardingViews extends ViewHandler<IOnboardingServiceState> {
     steps.push(ONBOARDING_STEPS()[EOnboardingSteps.Connect]);
 
     if (isOBSinstalled) {
-      steps.push(ONBOARDING_STEPS()[EOnboardingSteps.ChooseYourAdventure]);
+      steps.push(ONBOARDING_STEPS()[EOnboardingSteps.FreshOrImport]);
     }
 
     if (this.state.importedFromObs && isOBSinstalled) {
@@ -183,9 +178,7 @@ export class OnboardingService extends StatefulService<IOnboardingServiceState> 
     options: {
       isLogin: false,
       isOptimize: false,
-      isSecurityUpgrade: false,
       isHardware: false,
-      isPrimeExpiration: false,
       isImport: false,
     },
     importedFromObs: false,
@@ -216,14 +209,14 @@ export class OnboardingService extends StatefulService<IOnboardingServiceState> 
 
   async fetchThemeData(id: string) {
     const url = `https://overlays.streamlabs.com/api/overlay/${id}`;
-    return await fetch(new Request(url)).then(handleResponse);
+    return jfetch<IThemeMetadata>(url);
   }
 
   async fetchThemes() {
     return await Promise.all(Object.keys(THEME_METADATA).map(id => this.fetchThemeData(id)));
   }
 
-  themeUrl(id: string) {
+  themeUrl(id: number) {
     return THEME_METADATA[id];
   }
 
@@ -256,9 +249,7 @@ export class OnboardingService extends StatefulService<IOnboardingServiceState> 
     const actualOptions: IOnboardingOptions = {
       isLogin: false,
       isOptimize: false,
-      isSecurityUpgrade: false,
       isHardware: false,
-      isPrimeExpiration: false,
       isImport: false,
       ...options,
     };
@@ -294,20 +285,17 @@ export class OnboardingService extends StatefulService<IOnboardingServiceState> 
   }
 
   startOnboardingIfRequired() {
+    // Useful for testing in dev env
+    if (Utils.env.SLD_FORCE_ONBOARDING_STEP) {
+      this.start();
+      return true;
+    }
+
     if (localStorage.getItem(this.localStorageKey)) {
-      this.forceLoginForSecurityUpgradeIfRequired();
       return false;
     }
 
     this.start();
     return true;
-  }
-
-  forceLoginForSecurityUpgradeIfRequired() {
-    if (!this.userService.isLoggedIn) return;
-
-    if (!this.userService.apiToken) {
-      this.start({ isLogin: true, isSecurityUpgrade: true });
-    }
   }
 }
