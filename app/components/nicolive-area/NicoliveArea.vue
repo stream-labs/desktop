@@ -50,6 +50,10 @@
               作成済みの番組を取得する
             </button>
           </div>
+          <div class="divider">デザインテスト用</div>
+          <button class="button button-secondary" @click="resetAllDismissables">
+            ヘルプチップを復活する
+          </button>
         </template>
       </div>
     </div>
