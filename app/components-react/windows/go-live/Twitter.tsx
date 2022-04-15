@@ -8,6 +8,7 @@ import { CheckboxInput, SwitchInput, TextAreaInput, TextInput } from '../../shar
 import { Row, Col, Button } from 'antd';
 import { useGoLiveSettings } from './useGoLiveSettings';
 import { useVuex } from '../../hooks';
+import {injectWatch} from "slap";
 
 export default function TwitterInput() {
   const { TwitterService, UserService } = Services;
@@ -24,9 +25,17 @@ export default function TwitterInput() {
     useStreamlabsUrl,
   } = useGoLiveSettings().extend(module => {
     const state = TwitterService.state;
+
+    function getTwitterState() {
+      return {
+        streamTitle: module.state.commonFields.title,
+        useStreamlabsUrl: state.creatorSiteOnboardingComplete,
+      }
+    }
+
     return {
       get streamTitle() {
-        return module.commonFields.title;
+        return module.state.commonFields.title;
       },
       get tweetWhenGoingLive() {
         return state.tweetWhenGoingLive;
@@ -50,13 +59,18 @@ export default function TwitterInput() {
       get url() {
         return TwitterService.views.url;
       },
+
+      tweetTextWatch: injectWatch(getTwitterState, () => {
+        const tweetText = module.getTweetText(getTwitterState().streamTitle);
+        module.updateSettings({ tweetText });
+      }),
     };
   });
 
-  useEffect(() => {
-    const tweetText = getTweetText(streamTitle);
-    if (getSettings().tweetText !== tweetText) updateSettings({ tweetText });
-  }, [streamTitle, useStreamlabsUrl]);
+  // useEffect(() => {
+  //   const tweetText = getTweetText(streamTitle);
+  //   if (getSettings().tweetText !== tweetText) updateSettings({ tweetText });
+  // }, [streamTitle, useStreamlabsUrl]);
 
   function unlink() {
     TwitterService.actions.return

@@ -36,8 +36,8 @@ export default function GoLiveSettings() {
 
     return {
       get canAddDestinations() {
-        const linkedPlatforms = module.linkedPlatforms;
-        const customDestinations = module.customDestinations;
+        const linkedPlatforms = module.state.linkedPlatforms;
+        const customDestinations = module.state.customDestinations;
         return linkedPlatforms.length + customDestinations.length < 5;
       },
 

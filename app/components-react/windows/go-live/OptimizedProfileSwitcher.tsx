@@ -4,7 +4,7 @@ import { $t } from '../../../services/i18n';
 import { CheckboxInput } from '../../shared/inputs';
 import { Services } from '../../service-provider';
 import InputWrapper from '../../shared/inputs/InputWrapper';
-import { injectState } from 'slap';
+import { injectLoading } from 'slap';
 
 export default function OptimizedProfileSwitcher() {
   const { game, isLoading, enabled, setEnabled, label, tooltip } = useGoLiveSettings().extend(
@@ -13,7 +13,7 @@ export default function OptimizedProfileSwitcher() {
       const actions = VideoEncodingOptimizationService.actions;
 
       return {
-        state: injectState({}),
+        state: injectLoading(),
 
         async load() {
           // TODO reload on game change
@@ -34,8 +34,8 @@ export default function OptimizedProfileSwitcher() {
             'resolution may be changed for a better quality of experience',
         ),
 
-        get label() {
-          return settings.optimizedProfile?.game && settings.optimizedProfile?.game !== 'DEFAULT'
+        get label(): string {
+          return settings.state.optimizedProfile?.game && settings.state.optimizedProfile?.game !== 'DEFAULT'
             ? $t('Use optimized encoder settings for %{game}', { game })
             : $t('Use optimized encoder settings');
         },

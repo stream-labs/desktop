@@ -5,136 +5,236 @@ import cloneDeep from 'lodash/cloneDeep';
 import { FormInstance } from 'antd/lib/form';
 import { message } from 'antd';
 import { $t } from '../../../services/i18n';
-import { defineGetter, injectState, traverse, useModule } from 'slap';
+import {defineGetter, injectLoading, injectState, traverse, useModule} from 'slap';
 import { useForm } from '../../shared/inputs/Form';
 import { getDefined } from '../../../util/properties-type-guards';
 import { isEqual } from 'lodash';
-import {ObsSettingsModule} from "../../../services/platform-apps/api/modules/obs-settings";
 
 type TCommonFieldName = 'title' | 'description';
 
 export type TModificators = { isUpdateMode?: boolean; isScheduleMode?: boolean };
 export type IGoLiveSettingsState = IGoLiveSettings & TModificators & { needPrepopulate: boolean };
 
-export function createSettingsState() {
-  // state: IGoLiveSettings = {
-  //   isUpdateMode: false,
-  //   platforms: {},
-  //   customDestinations: [],
-  //   tweetText: '',
-  //   optimizedProfile: undefined,
-  //   advancedMode: false,
-  //   needPrepopulate: true,
-  //   prepopulateOptions: undefined,
-  //   form: null as FormInstance | null,
-  // }
 
-  const state: IGoLiveSettingsState = {
-    isUpdateMode: false,
-    platforms: {},
-    customDestinations: [],
-    tweetText: '',
+class GoLiveSettingsState extends StreamInfoView<IGoLiveSettingsState> {
+
+  state: IGoLiveSettingsState = {
+    // platforms: {},
+    // customDestinations: [],
+    // advancedMode: false,
     optimizedProfile: undefined,
-    advancedMode: false,
+    tweetText: '',
+    isUpdateMode: false,
     needPrepopulate: true,
     prepopulateOptions: undefined,
+    ...this.savedSettings,
   };
 
-  const streamInfoView = new StreamInfoView({});
+  get settings(): IGoLiveSettingsState {
+    return this.state;
+  }
 
-  const getters = {
-    get settings(): IGoLiveSettings {
-      // @ts-ignore
-      return this.state;
-    },
+  /**
+   * Update top level settings
+   */
+  updateSettings(patch: Partial<IGoLiveSettingsState>) {
+    const newSettings = { ...this.state, ...patch };
+    // we should re-calculate common fields before applying new settings
+    const platforms = this.getViewFromState(newSettings).applyCommonFields(newSettings.platforms);
+    Object.assign(this.state, { ...newSettings, platforms });
+  }
+  /**
+   * Update settings for a specific platforms
+   */
+  updatePlatform(platform: TPlatform, patch: Partial<IGoLiveSettings['platforms'][TPlatform]>) {
+    const updated = {
+      platforms: {
+        ...this.state.platforms,
+        [platform]: { ...this.state.platforms[platform], ...patch },
+      },
+    };
+    this.updateSettings(updated);
+  }
+
+  switchPlatforms(enabledPlatforms: TPlatform[]) {
+    this.linkedPlatforms.forEach(platform => {
+      this.updatePlatform(platform, { enabled: enabledPlatforms.includes(platform) });
+    });
+  }
+  /**
+   * Enable/disable a custom ingest destinations
+   */
+  switchCustomDestination(destInd: number, enabled: boolean) {
+    const customDestinations = cloneDeep(this.getView().customDestinations);
+    customDestinations[destInd].enabled = enabled;
+    this.updateSettings({ customDestinations });
+  }
+  /**
+   * Switch Advanced or Simple mode
+   */
+  switchAdvancedMode(enabled: boolean) {
+    this.updateSettings({ advancedMode: enabled });
+
+    // reset common fields for all platforms in simple mode
+    if (!enabled) this.updateCommonFields(this.getView().commonFields);
   };
-
-  traverse(streamInfoView, (propName, descr) => {
-    if (descr.get) {
-      defineGetter(getters, propName, descr.get);
-      return;
-    }
-    const propValue = streamInfoView[propName];
-    if (typeof propValue !== 'function') return;
-    getters[propName] = streamInfoView[propName];
-  });
-
-  const stateConfig = {
-    state,
-    getters,
-
-
-    /**
-     * Update top level settings
-     */
-    updateSettings(patch: Partial<IGoLiveSettingsState>) {
-      const newSettings = { ...this.state, ...patch };
-      // we should re-calculate common fields before applying new settings
-      const platforms = this.getViewFromState(newSettings).applyCommonFields(newSettings.platforms);
-      Object.assign(this.state, { ...newSettings, platforms });
-    },
-    /**
-     * Update settings for a specific platforms
-     */
-    updatePlatform(platform: TPlatform, patch: Partial<IGoLiveSettings['platforms'][TPlatform]>) {
-      const updated = {
-        platforms: {
-          ...this.state.platforms,
-          [platform]: { ...this.state.platforms[platform], ...patch },
-        },
-      };
-      this.updateSettings(updated);
-    },
-    /**
-     * Enable/disable a custom ingest destinations
-     */
-    switchCustomDestination(destInd: number, enabled: boolean) {
-      const customDestinations = cloneDeep(this.getView().customDestinations);
-      customDestinations[destInd].enabled = enabled;
-      this.updateSettings({ customDestinations });
-    },
-    /**
-     * Switch Advanced or Simple mode
-     */
-    switchAdvancedMode(enabled: boolean) {
-      this.updateSettings({ advancedMode: enabled });
-
-      // reset common fields for all platforms in simple mode
-      if (!enabled) this.updateCommonFields(this.getView().commonFields);
-    },
-    /**
-     * Set a common field like title or description for all eligible platforms
-     **/
-    updateCommonFields(
-      fields: { title: string; description: string },
-      shouldChangeAllPlatforms = false,
-    ) {
-      Object.keys(fields).forEach((fieldName: TCommonFieldName) => {
-        const view = this.getView();
-        const value = fields[fieldName];
-        const platforms = shouldChangeAllPlatforms
-          ? view.platformsWithoutCustomFields
-          : view.enabledPlatforms;
-        platforms.forEach(platform => {
-          if (!view.supports(fieldName, [platform])) return;
-          const platformSettings = getDefined(this.state.platforms[platform]);
-          platformSettings[fieldName] = value;
-        });
+  /**
+   * Set a common field like title or description for all eligible platforms
+   **/
+  updateCommonFields(
+    fields: { title: string; description: string },
+    shouldChangeAllPlatforms = false,
+  ) {
+    Object.keys(fields).forEach((fieldName: TCommonFieldName) => {
+      const view = this.getView();
+      const value = fields[fieldName];
+      const platforms = shouldChangeAllPlatforms
+        ? view.platformsWithoutCustomFields
+        : view.enabledPlatforms;
+      platforms.forEach(platform => {
+        if (!view.supports(fieldName, [platform])) return;
+        const platformSettings = getDefined(this.state.platforms[platform]);
+        platformSettings[fieldName] = value;
       });
-    },
+    });
+  }
 
-    getView() {
-      return this.getViewFromState(this.state);
-    },
+  getView() {
+    return this;
+  }
 
-    getViewFromState(state: IGoLiveSettingsState) {
-      return new StreamInfoView(state);
-    },
-  };
-
-
-  return stateConfig as typeof stateConfig & StreamInfoView<IGoLiveSettingsState>;
+  getViewFromState(state: IGoLiveSettingsState) {
+    return new StreamInfoView(state);
+  }
 }
+
+
+// export function createSettingsState() {
+//   // state: IGoLiveSettings = {
+//   //   isUpdateMode: false,
+//   //   platforms: {},
+//   //   customDestinations: [],
+//   //   tweetText: '',
+//   //   optimizedProfile: undefined,
+//   //   advancedMode: false,
+//   //   needPrepopulate: true,
+//   //   prepopulateOptions: undefined,
+//   //   form: null as FormInstance | null,
+//   // }
+//
+//   const state: IGoLiveSettingsState = {
+//     isUpdateMode: false,
+//     platforms: {},
+//     customDestinations: [],
+//     tweetText: '',
+//     optimizedProfile: undefined,
+//     advancedMode: false,
+//     needPrepopulate: true,
+//     prepopulateOptions: undefined,
+//   };
+//
+//   const streamInfoView = new StreamInfoView({});
+//
+//   const getters = {
+//     get settings(): IGoLiveSettings {
+//       // @ts-ignore
+//       return this.state;
+//     },
+//   };
+//
+//   traverse(streamInfoView, (propName, descr) => {
+//     if (descr.get) {
+//       defineGetter(getters, propName, descr.get);
+//       return;
+//     }
+//     const propValue = streamInfoView[propName];
+//     if (typeof propValue !== 'function') return;
+//     getters[propName] = streamInfoView[propName];
+//   });
+//
+//   const stateConfig = {
+//     state,
+//     getters,
+//
+//
+//     /**
+//      * Update top level settings
+//      */
+//     updateSettings(patch: Partial<IGoLiveSettingsState>) {
+//       const newSettings = { ...this.state, ...patch };
+//       // we should re-calculate common fields before applying new settings
+//       const platforms = this.getViewFromState(newSettings).applyCommonFields(newSettings.platforms);
+//       Object.assign(this.state, { ...newSettings, platforms });
+//     },
+//     /**
+//      * Update settings for a specific platforms
+//      */
+//     updatePlatform(platform: TPlatform, patch: Partial<IGoLiveSettings['platforms'][TPlatform]>) {
+//       const updated = {
+//         platforms: {
+//           ...this.state.platforms,
+//           [platform]: { ...this.state.platforms[platform], ...patch },
+//         },
+//       };
+//       this.updateSettings(updated);
+//     },
+//     switchPlatforms(enabledPlatforms: TPlatform[]) {
+//       this.state.linkedPlatforms.forEach(platform => {
+//         this.state.updatePlatform(platform, { enabled: enabledPlatforms.includes(platform) });
+//       });
+//       this.save(this.state.settings);
+//       this.prepopulate();
+//     }
+//     /**
+//      * Enable/disable a custom ingest destinations
+//      */
+//     switchCustomDestination(destInd: number, enabled: boolean) {
+//       const customDestinations = cloneDeep(this.getView().customDestinations);
+//       customDestinations[destInd].enabled = enabled;
+//       this.updateSettings({ customDestinations });
+//     },
+//     /**
+//      * Switch Advanced or Simple mode
+//      */
+//     switchAdvancedMode(enabled: boolean) {
+//       this.updateSettings({ advancedMode: enabled });
+//
+//       // reset common fields for all platforms in simple mode
+//       if (!enabled) this.updateCommonFields(this.getView().commonFields);
+//     },
+//     /**
+//      * Set a common field like title or description for all eligible platforms
+//      **/
+//     updateCommonFields(
+//       fields: { title: string; description: string },
+//       shouldChangeAllPlatforms = false,
+//     ) {
+//       Object.keys(fields).forEach((fieldName: TCommonFieldName) => {
+//         const view = this.getView();
+//         const value = fields[fieldName];
+//         const platforms = shouldChangeAllPlatforms
+//           ? view.platformsWithoutCustomFields
+//           : view.enabledPlatforms;
+//         platforms.forEach(platform => {
+//           if (!view.supports(fieldName, [platform])) return;
+//           const platformSettings = getDefined(this.state.platforms[platform]);
+//           platformSettings[fieldName] = value;
+//         });
+//       });
+//     },
+//
+//     getView() {
+//       return this.getViewFromState(this.state);
+//     },
+//
+//     getViewFromState(state: IGoLiveSettingsState) {
+//       return new StreamInfoView(state);
+//     },
+//   };
+//
+//
+//   return stateConfig as typeof stateConfig & StreamInfoView<IGoLiveSettingsState>;
+// }
 
 /**
  * Extend GoLiveSettingsModule from StreamInfoView
@@ -142,7 +242,8 @@ export function createSettingsState() {
  */
 export class GoLiveSettingsModule {
   // define initial state
-  state = injectState(createSettingsState());
+  state = injectState(GoLiveSettingsState);
+  loading = injectLoading();
 
 
   form: FormInstance | null = null;
@@ -202,13 +303,22 @@ export class GoLiveSettingsModule {
     this.state.updateSettings(settings);
   }
 
-  get settings() {
-    return this.state.state;
+  getSettings() {
+    return this.state.settings;
   }
 
-  getSettings() {
-    return this.state.state;
-  }
+  //
+  // updateSettings(patch: Partial<IGoLiveSettingsState>) {
+  //   this.state.updateSettings(patch);
+  // }
+
+  // get settings() {
+  //   return this.state.state;
+  // }
+  //
+  // getSettings() {
+  //   return this.state.state;
+  // }
 
   // get isLoading() {
   //   const state = this.state;
@@ -238,7 +348,7 @@ export class GoLiveSettingsModule {
     this.state.linkedPlatforms.forEach(platform => {
       this.state.updatePlatform(platform, { enabled: enabledPlatforms.includes(platform) });
     });
-    this.save(this.settings);
+    this.save(this.state.settings);
     this.prepopulate();
   }
 

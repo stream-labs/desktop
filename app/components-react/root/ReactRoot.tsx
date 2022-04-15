@@ -46,7 +46,7 @@ export function createRoot(ChildComponent: (props: any) => JSX.Element) {
     scope.init(VuexModule);
 
     Object.keys(AppServices).forEach(serviceName => {
-      scope.register(() => getResource(serviceName), serviceName);
+      scope.register(() => getResource(serviceName), serviceName, { shouldCallHooks: false });
     });
 
     return (

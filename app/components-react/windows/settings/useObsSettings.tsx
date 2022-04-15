@@ -1,5 +1,5 @@
 import React from 'react';
-import { useModule, injectState } from 'slap';
+import { useModule, injectState, TModuleInstanceFor } from 'slap';
 import { mutation } from '../../store';
 import { Services } from '../../service-provider';
 import { ISettingsSubCategory } from '../../../services/settings';
@@ -20,6 +20,30 @@ class ObsSettingsModule {
     } else {
       this.state.page = 'General';
     }
+
+    //
+    // type GetUseModuleResult<TModuleConfig> = TModuleConfig & {
+    //   extend: <TNewProps>(newPropsFactory: (props: TModuleConfig) => TNewProps) => TNewProps
+    // }
+    //
+    // class MyModule {
+    //   foo: 1;
+    //   bar: 2;
+    // }
+    //
+    // const mBase1 = null as any as GetUseModuleResult<MyModule>;
+    // let { zoom2 } = useModule(MyModule).extend(() => ({
+    //   zoom2: 2,
+    // }));
+    //
+    // zoom2 = '2';
+    //
+    // let { zoom } = mBase1.extend(m => ({
+    //   zoom: 1,
+    // }));
+    //
+    // zoom = '1';
+
   }
 
   // @mutation()
@@ -44,12 +68,3 @@ class ObsSettingsModule {
 export function useObsSettings() {
   return useModule(ObsSettingsModule);
 }
-
-class MyModule {
-  foo: 1;
-  bar: 2;
-}
-
-const { foo, bar, zoom } = useModule(MyModule).extend(m => ({
-  zoom: 3,
-}));

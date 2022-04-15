@@ -92,7 +92,7 @@ export class StreamInfoView<T extends Object> extends ViewHandler<T> {
    */
   get allPlatforms(): TPlatform[] {
     const allPlatforms: TPlatform[] = ['twitch', 'facebook', 'youtube', 'tiktok', 'trovo'];
-    return this.sortPlatforms(allPlatforms);
+    return this.getSortedPlatforms(allPlatforms);
   }
 
   /**
@@ -261,7 +261,7 @@ export class StreamInfoView<T extends Object> extends ViewHandler<T> {
    * - linked platforms are always on the top of the list
    * - the rest has an alphabetic sort
    */
-  sortPlatforms(platforms: TPlatform[]): TPlatform[] {
+  getSortedPlatforms(platforms: TPlatform[]): TPlatform[] {
     platforms = platforms.sort();
     return [
       ...platforms.filter(p => this.isPrimaryPlatform(p)),
