@@ -50,6 +50,8 @@ export default function StudioFooterComponent(p: { locked?: boolean }) {
     youtubeEnabled: YoutubeService.state.liveStreamingEnabled,
   }));
 
+  console.log('FOOTER RENDER');
+
   useEffect(confirmYoutubeEnabled, [platform]);
 
   function toggleRecording() {

@@ -23,7 +23,7 @@ export default function GoLiveError() {
   } = Services;
 
   // take an error from the global state
-  const { error } = useVuex(() => ({ error: StreamingService.state.info.error }), false);
+  const { error } = useVuex(() => ({ error: StreamingService.state.info.error }));
 
   function render() {
     if (!error) return null;
