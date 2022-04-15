@@ -215,6 +215,20 @@ export class LayoutService extends PersistentStatefulService<ILayoutServiceState
 
   @mutation()
   SET_SLOTS(slottedElements: { [key in ELayoutElement]?: { slot: LayoutSlot } }) {
+    // This is necessary because of the backwars data model of this service's state,
+    // combined with the way persistent stateful service does a deep merge of default
+    // state. If we don't explicitly set elements contained in the default state to null
+    // then we will get multiple elements assigned to a slot on next restart.
+    if (LayoutService.defaultState.tabs[this.state.currentTab]) {
+      Object.keys(LayoutService.defaultState.tabs[this.state.currentTab].slottedElements).forEach(
+        el => {
+          if (!slottedElements[el]) {
+            slottedElements[el] = { slot: null };
+          }
+        },
+      );
+    }
+
     Vue.set(this.state.tabs[this.state.currentTab], 'slottedElements', slottedElements);
   }
 

@@ -9,10 +9,31 @@ import commonStyles from './Common.m.less';
 import ObsSvg from './ObsSvg';
 import { OnboardingModule } from './Onboarding';
 import cx from 'classnames';
+import { confirmAsync } from 'components-react/modals';
 
 export function StreamingOrRecording() {
   const { setImportFromObs, next } = useModule(OnboardingModule).select();
   const [active, setActive] = useState<'streaming' | 'recording' | null>(null);
+
+  async function onContinue() {
+    if (active === 'recording') {
+      const result = await confirmAsync({
+        title: $t('Streamlabs will be optimized for recording'),
+        content: (
+          <p>
+            {$t(
+              'Certain features related to live streaming will be hidden. If you would like to enable these features in the future, you can disable Recording Mode in the application settings.',
+            )}
+          </p>
+        ),
+        okText: $t('Continue'),
+      });
+
+      if (!result) return;
+    }
+
+    next();
+  }
 
   return (
     <div>
@@ -53,6 +74,7 @@ export function StreamingOrRecording() {
             shape="round"
             style={{ width: 200, height: 60, fontSize: 16 }}
             disabled={!active}
+            onClick={onContinue}
           >
             {$t('Continue')}
           </Button>

@@ -57,8 +57,7 @@ function TopBar() {
   ).select();
 
   if (stepIndex < preboardingOffset || singletonStep) {
-    // TODO: Remove styles?
-    return <div className={styles.topBarContainer} />;
+    return <div />;
   }
 
   const offset = preboardingOffset;
