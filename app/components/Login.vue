@@ -1,19 +1,24 @@
 <template>
-  <div class="login__status help_tip_content" v-if="loggedIn">
+  <div class="login__status" v-if="loggedIn">
     <a v-if="!isCompactMode" class="link" @click="logout" :title="$t('common.logout')">
       <i class="icon-log-out" />
     </a>
     <a @click="openUserPage" class="user__profile" :title="username">
       <img class="user__thumbnail" :src="userIcon" />
     </a>
-    <help-tip :dismissable-key="loginHelpTipDismissable">
-      <div slot="title">ログイン</div>
-      <div slot="content">ニコニコのログインはこちら</div>
-    </help-tip>
   </div>
   <div v-else>
     <a v-if="!isCompactMode" class="link" @click="login" :title="$t('common.login')">
-      <i class="icon-log-in" />
+      <i class="icon-log-in help_tip_content">
+        <help-tip :dismissable-key="loginHelpTipDismissable">
+          <div slot="title">
+            {{ $t('common.loginHelpTipTitle') }}
+          </div>
+          <div slot="content">
+            {{ $t('common.loginHelpTipContent') }}
+          </div>
+        </help-tip>
+      </i>
     </a>
   </div>
 </template>
