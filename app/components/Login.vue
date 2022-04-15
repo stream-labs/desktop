@@ -1,11 +1,15 @@
 <template>
-  <div class="login__status" v-if="loggedIn">
+  <div class="login__status help_tip_content" v-if="loggedIn">
     <a v-if="!isCompactMode" class="link" @click="logout" :title="$t('common.logout')">
       <i class="icon-log-out" />
     </a>
     <a @click="openUserPage" class="user__profile" :title="username">
       <img class="user__thumbnail" :src="userIcon" />
     </a>
+    <help-tip :dismissable-key="loginHelpTipDismissable">
+      <div slot="title">ログイン</div>
+      <div slot="content">ニコニコのログインはこちら</div>
+    </help-tip>
   </div>
   <div v-else>
     <a v-if="!isCompactMode" class="link" @click="login" :title="$t('common.login')">
@@ -49,5 +53,9 @@
   justify-content: center;
   width: 48px;
   height: 36px;
+}
+
+.help_tip_content {
+  position: relative;
 }
 </style>
