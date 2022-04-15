@@ -1,6 +1,7 @@
 import { Service } from './core/service';
 import Util from 'services/utils';
 import { Inject } from './core/injector';
+import { ViewHandler } from './core';
 
 // Hands out hostnames to the rest of the app. Eventually
 // we should allow overriding this value. But for now we
