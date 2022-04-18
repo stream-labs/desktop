@@ -41,14 +41,11 @@ export default function AddSource() {
         propertiesManager: sourceAddOptions.propertiesManager,
         appId: sourceAddOptions.propertiesManagerSettings?.appId,
         appSourceId: sourceAddOptions.propertiesManagerSettings?.appSourceId,
+        isStreamlabel: sourceAddOptions.propertiesManager === 'streamlabels' || undefined,
         widgetType,
       };
-      const isSameType = source.isSameType(
-        comparison.propertiesManager === 'streamlabels'
-          ? { ...comparison, isStreamlabel: true }
-          : comparison,
-      );
-      return isSameType && source?.sourceId !== ScenesService.views.activeSceneId;
+      const isSameType = source.isSameType(comparison);
+      return isSameType && source.sourceId !== ScenesService.views.activeSceneId;
     }),
   }));
 
