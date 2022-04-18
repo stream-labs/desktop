@@ -4,19 +4,21 @@ import { StatefulService } from '../services/core';
 import { createBinding, TBindings } from './shared/inputs';
 import { useForm } from './shared/inputs/Form';
 import { FormInstance } from 'antd/lib/form/hooks/useForm';
+import { isEqual } from 'lodash';
 
 /**
  * Creates a reactive state for a React component based on Vuex store
  */
-export function useVuex<TReturnValue>(selector: () => TReturnValue, deep = true): TReturnValue {
+export function useVuex<TReturnValue>(selector: () => TReturnValue): TReturnValue {
   const [state, setState] = useState(selector);
   useEffect(() => {
     const unsubscribe = StatefulService.store.watch(
       () => selector(),
-      newState => {
-        setState(newState);
+      (newState, oldState) => {
+        if (!isEqual(newState, oldState)) {
+          setState(newState);
+        }
       },
-      { deep },
     );
     return () => {
       unsubscribe();

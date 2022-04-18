@@ -30,11 +30,9 @@ export function $t(...args: any[]): string {
  * get localized string from dictionary if exists
  * returns a keypath if localized version of string doesn't exist
  */
-export function $translateIfExist(str: string): string {
-  // TODO: Call into worker window instead
-  // const vueI18nInstance = I18nService.vueI18nInstance;
-  // if (vueI18nInstance.te(str)) return $t(str);
-  return str;
+export function $translateIfExist(...args: any[]): string {
+  const hasTranslation = I18nService.vueI18nInstance.te(args[0]);
+  return hasTranslation ? $t(...args) : args[0];
 }
 
 /**

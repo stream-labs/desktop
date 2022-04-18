@@ -115,7 +115,7 @@ function ObsInput(p: IObsInputProps) {
       const textVal = p.value as IObsTextInputValue;
 
       if (textVal.multiline) {
-        return <TextAreaInput {...inputProps} />;
+        return <TextAreaInput {...inputProps} debounce={300} />;
       } else {
         return <TextInput {...inputProps} isPassword={inputProps.masked} />;
       }
