@@ -1,6 +1,15 @@
 // Source helper functions
-import { focusMain, focusChild, closeWindow } from './core';
-import { click, clickButton, isDisplayed, select, waitForDisplayed } from './core';
+import {
+  focusMain,
+  focusChild,
+  closeWindow,
+  click,
+  clickButton,
+  isDisplayed,
+  select,
+  waitForDisplayed,
+} from './core';
+import { setInputValue } from './forms/form';
 import { dialogDismiss } from '../spectron/dialog';
 import { contextMenuClick } from '../spectron/context-menu';
 
@@ -61,7 +70,7 @@ export async function addSource(
     await click('[data-type=switch]');
     await waitForDisplayed('[data-name=newSourceName]');
   }
-  await (await select('[data-name=newSourceName]')).setValue(name);
+  await setInputValue('[data-name=newSourceName]', name);
 
   await clickButton('Add Source');
 
