@@ -138,7 +138,7 @@ export default function AddSource() {
         settings.width = width;
         settings.height = height;
       }
-      const item = EditorCommandsService.actions.executeCommand(
+      const item = await EditorCommandsService.actions.return.executeCommand(
         'CreateNewItemCommand',
         activeScene.id,
         name,
@@ -151,7 +151,7 @@ export default function AddSource() {
           },
         },
       );
-      source = item.source;
+      source = item?.source;
     }
     if (!source?.video && source?.hasProps()) {
       AudioService.actions.showAdvancedSettings(source.sourceId);
