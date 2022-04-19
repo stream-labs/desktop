@@ -10,20 +10,23 @@ import cloneDeep from 'lodash/cloneDeep';
 /**
  * Creates a reactive state for a React component based on Vuex store
  */
-export function useVuex<TReturnValue>(selector: () => TReturnValue): TReturnValue {
+export function useVuex<TReturnValue>(selector: () => TReturnValue, deep = true): TReturnValue {
   const [state, setState] = useState(selector);
   const previousState = useRef<TReturnValue | null>(null);
 
   useEffect(() => {
     const unsubscribe = StatefulService.store.watch(
       () => selector(),
-      state => {
-        if (previousState.current == null || !isEqual(state, previousState.current)) {
-          setState(state);
-          previousState.current = cloneDeep(state);
+      (newState, oldState) => {
+        // Vuex only keeps a shallow reference to old state
+        const oldComparison = deep ? previousState.current : oldState;
+
+        if ((deep && previousState.current == null) || !isEqual(state, oldComparison)) {
+          setState(newState);
+          if (deep) previousState.current = cloneDeep(newState);
         }
       },
-      { deep: true },
+      { deep },
     );
     return () => {
       unsubscribe();
