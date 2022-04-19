@@ -17,7 +17,6 @@ import {
   openErrorDialogFromFailure,
 } from 'services/nicolive-program/NicoliveFailure';
 import { CustomizationService } from 'services/customization';
-import { DismissablesService } from 'services/dismissables';
 
 @Component({
   components: {
@@ -36,7 +35,6 @@ export default class NicolivePanelRoot extends Vue {
   @Inject()
   nicoliveProgramService: NicoliveProgramService;
   @Inject() private customizationService: CustomizationService;
-  @Inject() private dismissablesService: DismissablesService;
 
   get contents() {
     return [
@@ -97,10 +95,5 @@ export default class NicolivePanelRoot extends Vue {
 
   get hasProgram(): boolean {
     return this.nicoliveProgramService.hasProgram;
-  }
-
-  // デザイン用
-  resetAllDismissables() {
-    this.dismissablesService.resetAll();
   }
 }
