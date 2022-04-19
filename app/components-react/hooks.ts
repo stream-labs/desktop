@@ -20,9 +20,8 @@ export function useVuex<TReturnValue>(selector: () => TReturnValue): TReturnValu
       state => {
         if (previousState.current == null || !isEqual(state, previousState.current)) {
           setState(state);
+          previousState.current = cloneDeep(state);
         }
-
-        previousState.current = cloneDeep(state);
       },
       { deep: true },
     );
