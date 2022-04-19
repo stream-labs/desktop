@@ -1,18 +1,15 @@
-import { Button, Tooltip } from 'antd';
+import { Button } from 'antd';
 import { useModule } from 'components-react/hooks/useModule';
-import KevinSvg from 'components-react/shared/KevinSvg';
 import React, { useState } from 'react';
 import { $t } from 'services/i18n';
 import { $i } from 'services/utils';
 import styles from './StreamingOrRecording.m.less';
-import commonStyles from './Common.m.less';
-import ObsSvg from './ObsSvg';
 import { OnboardingModule } from './Onboarding';
 import cx from 'classnames';
 import { confirmAsync } from 'components-react/modals';
 
 export function StreamingOrRecording() {
-  const { setImportFromObs, next } = useModule(OnboardingModule).select();
+  const { next, setRecordingMode } = useModule(OnboardingModule).select();
   const [active, setActive] = useState<'streaming' | 'recording' | null>(null);
 
   async function onContinue() {
@@ -30,6 +27,8 @@ export function StreamingOrRecording() {
       });
 
       if (!result) return;
+
+      setRecordingMode();
     }
 
     next();

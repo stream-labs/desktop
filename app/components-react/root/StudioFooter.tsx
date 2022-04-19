@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import cx from 'classnames';
 import { EStreamQuality } from '../../services/performance';
-import { EStreamingState, EReplayBufferState } from '../../services/streaming';
+import { EStreamingState, EReplayBufferState, ERecordingState } from '../../services/streaming';
 import { Services } from '../service-provider';
 import { $t } from '../../services/i18n';
-import { useRenderInterval, useVuex } from '../hooks';
+import { useVuex } from '../hooks';
 import styles from './StudioFooter.m.less';
 import PerformanceMetrics from '../shared/PerformanceMetrics';
 import TestWidgets from './TestWidgets';
@@ -12,7 +12,7 @@ import StartStreamingButton from './StartStreamingButton';
 import NotificationsArea from './NotificationsArea';
 import { Tooltip } from 'antd';
 
-export default function StudioFooterComponent(p: { locked?: boolean }) {
+export default function StudioFooterComponent() {
   const {
     StreamingService,
     UserService,
@@ -22,13 +22,13 @@ export default function StudioFooterComponent(p: { locked?: boolean }) {
     YoutubeService,
     UsageStatisticsService,
     NavigationService,
+    RecordingModeService,
   } = Services;
 
   const {
     streamingStatus,
     platform,
     streamQuality,
-    isRecording,
     isLoggedIn,
     canSchedule,
     replayBufferEnabled,
@@ -36,11 +36,11 @@ export default function StudioFooterComponent(p: { locked?: boolean }) {
     replayBufferStopping,
     replayBufferSaving,
     youtubeEnabled,
+    recordingModeEnabled,
   } = useVuex(() => ({
     streamingStatus: StreamingService.views.streamingStatus,
     platform: UserService.views.platform?.type,
     streamQuality: PerformanceService.views.streamQuality,
-    isRecording: StreamingService.views.isRecording,
     isLoggedIn: UserService.views.isLoggedIn,
     canSchedule: StreamingService.views.supports('stream-schedule'),
     replayBufferEnabled: SettingsService.views.values.Output.RecRB,
@@ -48,13 +48,10 @@ export default function StudioFooterComponent(p: { locked?: boolean }) {
     replayBufferStopping: StreamingService.state.replayBufferStatus === EReplayBufferState.Stopping,
     replayBufferSaving: StreamingService.state.replayBufferStatus === EReplayBufferState.Saving,
     youtubeEnabled: YoutubeService.state.liveStreamingEnabled,
+    recordingModeEnabled: RecordingModeService.views.isRecordingModeEnabled,
   }));
 
   useEffect(confirmYoutubeEnabled, [platform]);
-
-  function toggleRecording() {
-    StreamingService.actions.toggleRecording();
-  }
 
   function performanceIconClassName() {
     if (!streamingStatus || streamingStatus === EStreamingState.Offline) {
@@ -146,19 +143,10 @@ export default function StudioFooterComponent(p: { locked?: boolean }) {
 
       <div className={styles.navRight}>
         <div className={styles.navItem}>{isLoggedIn && <TestWidgets />}</div>
-        <RecordingTimer />
-        <div className={styles.navItem}>
-          <button
-            disabled={p.locked}
-            className={cx(styles.recordButton, 'record-button', { active: isRecording })}
-            onClick={toggleRecording}
-          >
-            <span>REC</span>
-          </button>
-        </div>
+        {!recordingModeEnabled && <RecordingButton />}
         {replayBufferEnabled && replayBufferOffline && (
           <div className={styles.navItem}>
-            <Tooltip placement="top" title={$t('Start Replay Buffer')}>
+            <Tooltip placement="left" title={$t('Start Replay Buffer')}>
               <button className="circle-button" onClick={toggleReplayBuffer}>
                 <i className="icon-replay-buffer" />
               </button>
@@ -167,35 +155,83 @@ export default function StudioFooterComponent(p: { locked?: boolean }) {
         )}
         {!replayBufferOffline && (
           <div className={cx(styles.navItem, styles.replayButtonGroup)}>
-            <Tooltip placement="top" title={$t('Stop')}>
+            <Tooltip placement="left" title={$t('Stop')}>
               <button
                 className={cx('circle-button', styles.leftReplay, 'button--soft-warning')}
                 onClick={toggleReplayBuffer}
               >
-                <i className="fa fa-stop" />
+                {replayBufferStopping ? (
+                  <i className="fa fa-spinner fa-pulse" />
+                ) : (
+                  <i className="fa fa-stop" />
+                )}
               </button>
             </Tooltip>
-            <Tooltip placement="top" title={$t('Save Replay')}>
+            <Tooltip placement="right" title={$t('Save Replay')}>
               <button className={cx('circle-button', styles.rightReplay)} onClick={saveReplay}>
-                <i className="icon-save" />
+                {replayBufferSaving ? (
+                  <i className="fa fa-spinner fa-pulse" />
+                ) : (
+                  <i className="icon-save" />
+                )}
               </button>
             </Tooltip>
           </div>
         )}
         {canSchedule && (
           <div className={styles.navItem}>
-            <Tooltip placement="top" title={$t('Schedule Stream')}>
+            <Tooltip placement="left" title={$t('Schedule Stream')}>
               <button className="circle-button" onClick={openScheduleStream}>
                 <i className="icon-date" />
               </button>
             </Tooltip>
           </div>
         )}
-        <div className={styles.navItem}>
-          <StartStreamingButton disabled={p.locked} />
-        </div>
+        {!recordingModeEnabled && (
+          <div className={styles.navItem}>
+            <StartStreamingButton />
+          </div>
+        )}
+        {recordingModeEnabled && <RecordingButton />}
       </div>
     </div>
+  );
+}
+
+function RecordingButton() {
+  const { StreamingService } = Services;
+  const { isRecording, recordingStatus } = useVuex(() => ({
+    isRecording: StreamingService.views.isRecording,
+    recordingStatus: StreamingService.state.recordingStatus,
+  }));
+
+  function toggleRecording() {
+    StreamingService.actions.toggleRecording();
+  }
+
+  return (
+    <>
+      <RecordingTimer />
+      <div className={styles.navItem}>
+        <Tooltip
+          placement="left"
+          title={isRecording ? $t('Stop Recording') : $t('Start Recording')}
+        >
+          <button
+            className={cx(styles.recordButton, 'record-button', { active: isRecording })}
+            onClick={toggleRecording}
+          >
+            <span>
+              {recordingStatus === ERecordingState.Stopping ? (
+                <i className="fa fa-spinner fa-pulse" />
+              ) : (
+                <>REC</>
+              )}
+            </span>
+          </button>
+        </Tooltip>
+      </div>
+    </>
   );
 }
 

@@ -11,6 +11,7 @@ import { getPlatformService, IPlatformCapabilityResolutionPreset } from './platf
 import { OutputSettingsService } from './settings';
 import { ObsImporterService } from './obs-importer';
 import Utils from './utils';
+import { RecordingModeService } from './recording-mode';
 
 enum EOnboardingSteps {
   MacPermissions = 'MacPermissions',
@@ -142,6 +143,7 @@ class OnboardingViews extends ViewHandler<IOnboardingServiceState> {
     const steps: IOnboardingStep[] = [];
     const userViews = this.getServiceViews(UserService);
     const isOBSinstalled = this.getServiceViews(ObsImporterService).isOBSinstalled();
+    const recordingModeEnabled = this.getServiceViews(RecordingModeService).isRecordingModeEnabled;
 
     if (process.platform === OS.Mac) {
       steps.push(ONBOARDING_STEPS()[EOnboardingSteps.MacPermissions]);
@@ -149,9 +151,9 @@ class OnboardingViews extends ViewHandler<IOnboardingServiceState> {
 
     steps.push(ONBOARDING_STEPS()[EOnboardingSteps.SteamingOrRecording]);
 
-    steps.push(ONBOARDING_STEPS()[EOnboardingSteps.Connect]);
+    if (!recordingModeEnabled) steps.push(ONBOARDING_STEPS()[EOnboardingSteps.Connect]);
 
-    if (isOBSinstalled) {
+    if (isOBSinstalled && !recordingModeEnabled) {
       steps.push(ONBOARDING_STEPS()[EOnboardingSteps.FreshOrImport]);
     }
 
@@ -164,6 +166,7 @@ class OnboardingViews extends ViewHandler<IOnboardingServiceState> {
     if (
       !this.state.existingSceneCollections &&
       !this.state.importedFromObs &&
+      !recordingModeEnabled &&
       ((userViews.isLoggedIn &&
         getPlatformService(userViews.platform.type).hasCapability('themes')) ||
         !userViews.isLoggedIn)

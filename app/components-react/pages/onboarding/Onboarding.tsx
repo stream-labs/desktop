@@ -114,6 +114,10 @@ export class OnboardingModule {
     return Services.OnboardingService;
   }
 
+  get ReocrdingModeService() {
+    return Services.RecordingModeService;
+  }
+
   get steps() {
     return this.OnboardingService.views.steps;
   }
@@ -133,6 +137,11 @@ export class OnboardingModule {
 
   get preboardingOffset() {
     return this.steps.filter(step => step.isPreboarding).length;
+  }
+
+  setRecordingMode() {
+    this.ReocrdingModeService.setRecordingMode(true);
+    this.ReocrdingModeService.setUpRecordingFirstTimeSetup();
   }
 
   setImportFromObs() {

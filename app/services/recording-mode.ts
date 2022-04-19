@@ -1,19 +1,31 @@
-import { Inject, mutation, PersistentStatefulService } from 'services/core';
+import { Inject, mutation, PersistentStatefulService, ViewHandler } from 'services/core';
 import { $t } from './i18n';
 import { ELayout, ELayoutElement, LayoutService } from './layout';
 import { ScenesService } from './scenes';
+import { EObsSimpleEncoder, SettingsService } from './settings';
 
 interface IRecordingModeState {
   enabled: boolean;
 }
 
+class RecordingModeViews extends ViewHandler<IRecordingModeState> {
+  get isRecordingModeEnabled() {
+    return this.state.enabled;
+  }
+}
+
 export class RecordingModeService extends PersistentStatefulService<IRecordingModeState> {
   @Inject() private layoutService: LayoutService;
   @Inject() private scenesService: ScenesService;
+  @Inject() private settingsService: SettingsService;
 
   static defaultState: IRecordingModeState = {
     enabled: false,
   };
+
+  get views() {
+    return new RecordingModeViews(this.state);
+  }
 
   /**
    * When recording mode is enabled as part of onboarding, it does a handful
@@ -24,6 +36,7 @@ export class RecordingModeService extends PersistentStatefulService<IRecordingMo
   setUpRecordingFirstTimeSetup() {
     this.setRecordingLayout();
     this.setRecordingSources();
+    this.setRecordingEncoder();
   }
 
   setRecordingMode(enabled: boolean) {
@@ -49,7 +62,27 @@ export class RecordingModeService extends PersistentStatefulService<IRecordingMo
   }
 
   private setRecordingEncoder() {
-    
+    const encoderPriority: EObsSimpleEncoder[] = [
+      EObsSimpleEncoder.jim_nvenc,
+      EObsSimpleEncoder.amd,
+      EObsSimpleEncoder.nvenc,
+      EObsSimpleEncoder.x264,
+    ];
+
+    // Set these first, as they affect available options
+    this.settingsService.setSettingsPatch({ Output: { Mode: 'Simple' } });
+    this.settingsService.setSettingsPatch({ Output: { RecQuality: 'Small' } });
+
+    const availableEncoders = this.settingsService
+      .findSetting(this.settingsService.state.Output.formData, 'Recording', 'RecEncoder')
+      .options.map((opt: { value: EObsSimpleEncoder }) => opt.value);
+    const bestEncoder = encoderPriority.find(e => {
+      return availableEncoders.includes(e);
+    });
+
+    this.settingsService.setSettingsPatch({
+      Output: { RecEncoder: bestEncoder, RecFormat: 'mp4' },
+    });
   }
 
   @mutation()
