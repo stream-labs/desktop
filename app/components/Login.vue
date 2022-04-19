@@ -8,17 +8,16 @@
     </a>
   </div>
   <div v-else>
-    <a v-if="!isCompactMode" class="link" @click="login" :title="$t('common.login')">
-      <i class="icon-log-in help_tip_content">
-        <help-tip :dismissable-key="loginHelpTipDismissable">
-          <div slot="title">
-            {{ $t('common.loginHelpTipTitle') }}
-          </div>
-          <div slot="content">
-            {{ $t('common.loginHelpTipContent') }}
-          </div>
-        </help-tip>
-      </i>
+    <a v-if="!isCompactMode" class="link help_tip_content" @click="login" :title="$t('common.login')">
+      <i class="icon-log-in"></i>
+      <help-tip :dismissable-key="loginHelpTipDismissable" mode="login">
+        <div slot="title">
+          {{ $t('common.loginHelpTipTitle') }}
+        </div>
+        <div slot="content">
+          {{ $t('common.loginHelpTipContent') }}
+        </div>
+      </help-tip>
     </a>
   </div>
 </template>

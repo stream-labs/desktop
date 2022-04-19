@@ -5,7 +5,7 @@ import { EDismissable } from 'services/dismissables';
 import { $t } from 'services/i18n';
 import { UserService } from 'services/user';
 import Vue from 'vue';
-import { Component } from 'vue-property-decorator';
+import { Component, Prop } from 'vue-property-decorator';
 import HelpTip from './shared/HelpTip.vue';
 
 @Component({ components: { HelpTip } })

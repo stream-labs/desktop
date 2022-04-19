@@ -1,5 +1,5 @@
 <template>
-  <div class="help-tip" v-if="shouldShow && !isCompactMode">
+  <div class="help-tip" v-if="shouldShow && !isCompactMode" :data-mode="mode">
     <div class="help-tip__arrow"></div>
     <i @click="closeHelpTip" class="help-tip__close icon-close" />
     <div class="help-tip__title">
@@ -20,13 +20,21 @@
   background: @text-primary;
   .radius;
   color: @hover;
-  top: -8px;
-  left: 90px;
   width: 240px;
   padding: 8px;
   font-size: 14px;
   z-index: 100000;
   white-space: initial;
+
+  &[data-mode="scene-selector"] {
+    top: -8px;
+    left: 90px;
+  }
+
+  &[data-mode="login"] {
+    bottom: 2px;
+    left: 44px;
+  }
 }
 
 .help-tip__arrow {
@@ -37,6 +45,14 @@
   border-color: transparent @text-primary transparent transparent;
   position: absolute;
   left: -8px;
+
+  .help-tip[data-mode="scene-selector"] & {
+    top: 8px;
+  }
+
+  .help-tip[data-mode="login"] & {
+    bottom: 8px;
+  }
 }
 
 .help-tip__close {
