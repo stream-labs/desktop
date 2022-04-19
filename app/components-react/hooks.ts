@@ -21,9 +21,13 @@ export function useVuex<TReturnValue>(selector: () => TReturnValue, deep = true)
         // Vuex only keeps a shallow reference to old state
         const oldComparison = deep ? previousState.current : oldState;
 
-        if ((deep && previousState.current == null) || !isEqual(state, oldComparison)) {
+        if (!isEqual(newState, oldComparison)) {
           setState(newState);
           if (deep) previousState.current = cloneDeep(newState);
+        }
+
+        if (deep && previousState.current == null) {
+          previousState.current = cloneDeep(newState);
         }
       },
       { deep },
