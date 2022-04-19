@@ -12,7 +12,7 @@ import cloneDeep from 'lodash/cloneDeep';
  */
 export function useVuex<TReturnValue>(selector: () => TReturnValue, deep = true): TReturnValue {
   const [state, setState] = useState(selector);
-  const previousState = useRef<TReturnValue | null>(null);
+  const previousState = useRef<TReturnValue>(state);
 
   useEffect(() => {
     const unsubscribe = StatefulService.store.watch(
@@ -24,10 +24,6 @@ export function useVuex<TReturnValue>(selector: () => TReturnValue, deep = true)
         if (!isEqual(newState, oldComparison)) {
           setState(newState);
           if (deep) previousState.current = cloneDeep(newState);
-        }
-
-        if (deep && previousState.current == null) {
-          previousState.current = cloneDeep(newState);
         }
       },
       { deep },
