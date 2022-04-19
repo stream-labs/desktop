@@ -89,7 +89,7 @@ export async function addExistingSource(type: string, name: string) {
   await focusChild();
   await click(`div=${type}`);
   await clickButton('Add Source');
-  await click(`div=${name}`);
+  await click(`span=${name}`);
   await clickButton('Add Source');
 }
 
