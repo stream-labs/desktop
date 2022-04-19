@@ -4,7 +4,6 @@ import { ModalLayout } from '../../shared/ModalLayout';
 import Form from '../../shared/inputs/Form';
 import {
   CheckboxInput,
-  createBinding,
   DateInput,
   FileInput,
   ImageInput,
@@ -26,12 +25,10 @@ import PlatformLogo from '../../shared/PlatformLogo';
 import { DownloadOutlined } from '@ant-design/icons';
 import { alertAsync, confirmAsync } from '../../modals';
 import { I18nService, WHITE_LIST } from '../../../services/i18n';
-import { mutation } from '../../store';
 import { pick } from 'lodash';
-import { useModule } from '../../hooks/useModule';
-import { merge } from '../../../util/merge';
 import { DemoForm } from './DemoForm';
 import { CodeInput } from '../../shared/inputs/CodeInput';
+import { injectState, merge, mutation, useModule, createFormBinding, injectFormBinding } from 'slap';
 
 const { TabPane } = Tabs;
 
@@ -67,42 +64,57 @@ function Examples() {
     hasTooltips,
     disabled,
     size,
-  } = useSharedComponentsLibrary();
-  const { s, bind } = useFormState({
-    textVal: '',
-    textAreaVal: '',
-    switcherVal: false,
-    numberVal: 0,
-    sliderVal: 5,
-    imageVal: '',
-    galleryImage: '',
-    galleryAudio: '',
-    javascript: 'alert("Hello World!")',
-    saveFilePathVal: '',
-    checkboxVal: false,
-    dateVal: undefined as Date | undefined,
-    listVal: 1,
-    listOptions: [
-      { value: 1, label: 'Red' },
-      { value: 2, label: 'Green' },
-      { value: 3, label: 'Blue' },
-      { value: 4, label: 'Orange' },
-    ],
-    listVal2: '',
-    listOptions2: [
-      { value: '', label: 'Please Select the option' },
-      { value: 'foo', label: 'Foo' },
-      { value: 'bar', label: 'Bar' },
-    ],
-    tagsVal: [1, 2, 3],
-    tagsOptions: [
-      { value: 1, label: 'Red' },
-      { value: 2, label: 'Green' },
-      { value: 3, label: 'Blue' },
-      { value: 4, label: 'Orange' },
-    ],
+    bindForm,
+    s,
+  } = useSharedComponentsLibrary().extend(module => {
+
+    const result = {
+
+      s: injectState({
+        textVal: '',
+        textAreaVal: '',
+        switcherVal: false,
+        numberVal: 0,
+        sliderVal: 5,
+        imageVal: '',
+        galleryImage: '',
+        galleryAudio: '',
+        javascript: 'alert("Hello World!")',
+        saveFilePathVal: '',
+        checkboxVal: false,
+        dateVal: undefined as Date | undefined,
+        listVal: 1,
+        listOptions: [
+          { value: 1, label: 'Red' },
+          { value: 2, label: 'Green' },
+          { value: 3, label: 'Blue' },
+          { value: 4, label: 'Orange' },
+        ],
+        listVal2: '',
+        listOptions2: [
+          { value: '', label: 'Please Select the option' },
+          { value: 'foo', label: 'Foo' },
+          { value: 'bar', label: 'Bar' },
+        ],
+        tagsVal: [1, 2, 3],
+        tagsOptions: [
+          { value: 1, label: 'Red' },
+          { value: 2, label: 'Green' },
+          { value: 3, label: 'Blue' },
+          { value: 4, label: 'Orange' },
+        ],
+      }),
+
+      bindForm: injectFormBinding(() => {
+        return this.state.getters;
+      }, patch => {
+        return this.state.updateState(patch);
+      }),
+    };
+    return result;
   });
 
+  const bind = bindForm;
   const globalProps: Record<string, any> = {};
   if (hasTooltips) globalProps.tooltip = 'This is tooltip';
   if (required) globalProps.required = true;
@@ -456,11 +468,11 @@ function SettingsPanel() {
 }
 
 export function useSharedComponentsLibrary() {
-  return useModule(SharedComponentsModule).select();
+  return useModule(SharedComponentsModule);
 }
 
 class SharedComponentsModule {
-  state: ISharedComponentsState = {
+  state = injectState({
     layout: 'horizontal',
     hasTooltips: false,
     required: false,
@@ -469,7 +481,7 @@ class SharedComponentsModule {
     size: 'middle',
     background: 'section',
     locales: WHITE_LIST,
-  };
+  } as ISharedComponentsState);
 
   private globalState = {
     get theme() {
@@ -488,21 +500,15 @@ class SharedComponentsModule {
     },
   };
 
-  private mergedState = merge(
-    () => this.state,
-    () => this.globalState,
-  );
-
-  @mutation()
-  private updateState(statePatch: Partial<ISharedComponentsState>) {
-    Object.assign(this.state, statePatch);
+  get mergedState() {
+    return merge(this.state.getters, this.globalState);
   }
 
-  bind = createBinding(
+  bind = injectFormBinding(
     () => this.mergedState,
     statePatch => {
       const localStatePatch = pick(statePatch, Object.keys(this.state));
-      this.updateState(localStatePatch);
+      this.state.update(localStatePatch);
       const globalStatePatch = pick(statePatch, Object.keys(this.globalState));
       Object.assign(this.globalState, globalStatePatch);
     },
