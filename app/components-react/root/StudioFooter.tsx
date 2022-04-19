@@ -11,6 +11,7 @@ import TestWidgets from './TestWidgets';
 import StartStreamingButton from './StartStreamingButton';
 import NotificationsArea from './NotificationsArea';
 import { Tooltip } from 'antd';
+import { confirmAsync } from 'components-react/modals';
 
 export default function StudioFooterComponent() {
   const {
@@ -109,6 +110,19 @@ export default function StudioFooterComponent() {
     StreamingService.actions.saveReplay();
   }
 
+  async function showRecordingModeDisableModal() {
+    const result = await confirmAsync({
+      title: $t('Disable recording mode?'),
+      content: (
+        <p>
+          {$t(
+            'Streamlabs is currently in recording mode, which hides live streaming features. Would you like to enable live streaming features?',
+          )}
+        </p>
+      ),
+    });
+  }
+
   return (
     <div className={cx('footer', styles.footer)}>
       <div className={cx('flex flex--center flex--grow flex--justify-start', styles.footerLeft)}>
@@ -143,6 +157,9 @@ export default function StudioFooterComponent() {
 
       <div className={styles.navRight}>
         <div className={styles.navItem}>{isLoggedIn && <TestWidgets />}</div>
+        {recordingModeEnabled && (
+          <button className="button button--trans">{$t('Looking to stream?')}</button>
+        )}
         {!recordingModeEnabled && <RecordingButton />}
         {replayBufferEnabled && replayBufferOffline && (
           <div className={styles.navItem}>
