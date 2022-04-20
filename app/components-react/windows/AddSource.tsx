@@ -12,6 +12,7 @@ import { useVuex } from 'components-react/hooks';
 import styles from './AddSource.m.less';
 import { TextInput, SwitchInput } from 'components-react/shared/inputs';
 import Form, { useForm } from 'components-react/shared/inputs/Form';
+import Scrollable from 'components-react/shared/Scrollable';
 
 export default function AddSource() {
   const {
@@ -200,16 +201,21 @@ export default function AddSource() {
                   <span className={styles.recommendedLabel}>{$t('Recommended')}</span>
                 )}
               </h4>
-              <Menu
-                mode="vertical"
-                selectedKeys={[selectedSourceId]}
-                style={{ width: 300 }}
-                onClick={({ key }: { key: string }) => setSelectedSourceId(key)}
-              >
-                {existingSources.map(source => (
-                  <Menu.Item key={source.value}>{source.name}</Menu.Item>
-                ))}
-              </Menu>
+              <Scrollable className={styles.menuContainer}>
+                <Menu
+                  mode="vertical"
+                  selectedKeys={[selectedSourceId]}
+                  onClick={({ key }: { key: string }) => {
+                    console.log('firing', key);
+                    setSelectedSourceId(key);
+                  }}
+                  className={styles.menu}
+                >
+                  {existingSources.map(source => (
+                    <Menu.Item key={source.value}>{source.name}</Menu.Item>
+                  ))}
+                </Menu>
+              </Scrollable>
             </div>
             {selectedSourceId && (
               <Display sourceId={selectedSourceId} style={{ width: '200px', height: '200px' }} />
