@@ -38,7 +38,7 @@ export default function Onboarding() {
           {!currentStep.hideSkip && (
             <button
               className={cx('button button--trans', commonStyles.onboardingButton)}
-              onClick={next}
+              onClick={() => next(true)}
               disabled={processing}
             >
               {$t('Skip')}
@@ -153,7 +153,16 @@ export class OnboardingModule {
   }
 
   @mutation()
-  next() {
+  next(isSkip = false) {
+    if (
+      this.ReocrdingModeService.views.isRecordingModeEnabled &&
+      this.currentStep.component === 'HardwareSetup' &&
+      this.OnboardingService.state.options.isHardware &&
+      !isSkip
+    ) {
+      this.ReocrdingModeService.actions.addRecordingWebcam();
+    }
+
     if (this.state.processing) return;
 
     if (this.state.stepIndex >= this.steps.length - 1 || this.singletonStep) {

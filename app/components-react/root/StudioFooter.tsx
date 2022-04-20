@@ -12,14 +12,12 @@ import StartStreamingButton from './StartStreamingButton';
 import NotificationsArea from './NotificationsArea';
 import { Tooltip } from 'antd';
 import { confirmAsync } from 'components-react/modals';
+import { useModule } from 'components-react/hooks/useModule';
 
 export default function StudioFooterComponent() {
   const {
     StreamingService,
-    UserService,
     WindowsService,
-    SettingsService,
-    PerformanceService,
     YoutubeService,
     UsageStatisticsService,
     NavigationService,
@@ -32,25 +30,13 @@ export default function StudioFooterComponent() {
     streamQuality,
     isLoggedIn,
     canSchedule,
-    replayBufferEnabled,
     replayBufferOffline,
     replayBufferStopping,
     replayBufferSaving,
     youtubeEnabled,
     recordingModeEnabled,
-  } = useVuex(() => ({
-    streamingStatus: StreamingService.views.streamingStatus,
-    platform: UserService.views.platform?.type,
-    streamQuality: PerformanceService.views.streamQuality,
-    isLoggedIn: UserService.views.isLoggedIn,
-    canSchedule: StreamingService.views.supports('stream-schedule'),
-    replayBufferEnabled: SettingsService.views.values.Output.RecRB,
-    replayBufferOffline: StreamingService.state.replayBufferStatus === EReplayBufferState.Offline,
-    replayBufferStopping: StreamingService.state.replayBufferStatus === EReplayBufferState.Stopping,
-    replayBufferSaving: StreamingService.state.replayBufferStatus === EReplayBufferState.Saving,
-    youtubeEnabled: YoutubeService.state.liveStreamingEnabled,
-    recordingModeEnabled: RecordingModeService.views.isRecordingModeEnabled,
-  }));
+    replayBufferEnabled,
+  } = useModule(FooterModule).select();
 
   useEffect(confirmYoutubeEnabled, [platform]);
 
@@ -112,15 +98,20 @@ export default function StudioFooterComponent() {
 
   async function showRecordingModeDisableModal() {
     const result = await confirmAsync({
-      title: $t('Disable recording mode?'),
+      title: $t('Enable Live Streaming?'),
       content: (
         <p>
           {$t(
-            'Streamlabs is currently in recording mode, which hides live streaming features. Would you like to enable live streaming features?',
+            'Streamlabs is currently in recording mode, which hides live streaming features. Would you like to enable live streaming features? You can disable them again in General settings.',
           )}
         </p>
       ),
+      okText: $t('Enable Streaming'),
     });
+
+    if (result) {
+      RecordingModeService.actions.setRecordingMode(false);
+    }
   }
 
   return (
@@ -158,7 +149,7 @@ export default function StudioFooterComponent() {
       <div className={styles.navRight}>
         <div className={styles.navItem}>{isLoggedIn && <TestWidgets />}</div>
         {recordingModeEnabled && (
-          <button className="button button--trans">{$t('Looking to stream?')}</button>
+          <button className="button button--trans" onClick={showRecordingModeDisableModal}>{$t('Looking to stream?')}</button>
         )}
         {!recordingModeEnabled && <RecordingButton />}
         {replayBufferEnabled && replayBufferOffline && (
@@ -272,4 +263,52 @@ function RecordingTimer() {
 
   if (!isRecording) return <></>;
   return <div className={cx(styles.navItem, styles.recordTime)}>{recordingTime}</div>;
+}
+
+class FooterModule {
+  state = {};
+
+  get replayBufferEnabled() {
+    return Services.SettingsService.views.values.Output.RecRB;
+  }
+
+  get streamingStatus() {
+    return Services.StreamingService.views.streamingStatus;
+  }
+
+  get platform() {
+    return Services.UserService.views.platform?.type;
+  }
+
+  get streamQuality() {
+    return Services.PerformanceService.views.streamQuality;
+  }
+
+  get isLoggedIn() {
+    return Services.UserService.views.isLoggedIn;
+  }
+
+  get canSchedule() {
+    return Services.StreamingService.views.supports('stream-schedule');
+  }
+
+  get replayBufferOffline() {
+    return Services.StreamingService.state.replayBufferStatus === EReplayBufferState.Offline;
+  }
+
+  get replayBufferStopping() {
+    return Services.StreamingService.state.replayBufferStatus === EReplayBufferState.Stopping;
+  }
+
+  get replayBufferSaving() {
+    return Services.StreamingService.state.replayBufferStatus === EReplayBufferState.Saving;
+  }
+
+  get youtubeEnabled() {
+    return Services.YoutubeService.state.liveStreamingEnabled;
+  }
+
+  get recordingModeEnabled() {
+    return Services.RecordingModeService.views.isRecordingModeEnabled;
+  }
 }

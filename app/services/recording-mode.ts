@@ -1,8 +1,11 @@
 import { Inject, mutation, PersistentStatefulService, ViewHandler } from 'services/core';
+import { SourcesService } from './sources';
 import { $t } from './i18n';
 import { ELayout, ELayoutElement, LayoutService } from './layout';
 import { ScenesService } from './scenes';
 import { EObsSimpleEncoder, SettingsService } from './settings';
+import { AnchorPoint, ScalableRectangle } from 'util/ScalableRectangle';
+import { VideoService } from './video';
 
 interface IRecordingModeState {
   enabled: boolean;
@@ -18,6 +21,8 @@ export class RecordingModeService extends PersistentStatefulService<IRecordingMo
   @Inject() private layoutService: LayoutService;
   @Inject() private scenesService: ScenesService;
   @Inject() private settingsService: SettingsService;
+  @Inject() private sourcesService: SourcesService;
+  @Inject() private videoService: VideoService;
 
   static defaultState: IRecordingModeState = {
     enabled: false,
@@ -35,7 +40,7 @@ export class RecordingModeService extends PersistentStatefulService<IRecordingMo
    */
   setUpRecordingFirstTimeSetup() {
     this.setRecordingLayout();
-    this.setRecordingSources();
+    this.addRecordingCapture();
     this.setRecordingEncoder();
   }
 
@@ -54,11 +59,53 @@ export class RecordingModeService extends PersistentStatefulService<IRecordingMo
     this.layoutService.setBarResize('bar1', 0.3);
   }
 
-  private setRecordingSources() {
+  private addRecordingCapture() {
     this.scenesService.views.activeScene.createAndAddSource(
       $t('Screen Capture (Double-click to select)'),
       'screen_capture',
     );
+  }
+
+  /**
+   * This is only done after hardware setup so that we apply the
+   * correct webcam and preset filter.
+   */
+  addRecordingWebcam() {
+    // TODO: Mac
+    const item = this.scenesService.views.activeScene.createAndAddSource('Webcam', 'dshow_input');
+
+    let sub = this.sourcesService.sourceUpdated.subscribe(s => {
+      if (s.sourceId === item.source.sourceId && s.width && s.height) {
+        sub.unsubscribe();
+        sub = null;
+
+        // Create a rect to represent the source
+        const rect = new ScalableRectangle({ x: 0, y: 0, width: s.width, height: s.height });
+
+        // Scale width to approximately 25% of canvas width
+        rect.scaleX = (this.videoService.baseWidth / rect.width) * 0.25;
+
+        // Scale height to match
+        rect.scaleY = rect.scaleX;
+
+        // Move to just near bottom left corner
+        rect.withAnchor(AnchorPoint.SouthWest, () => {
+          rect.x = 20;
+          rect.y = this.videoService.baseHeight - 20;
+        });
+
+        item.setTransform({
+          position: { x: rect.x, y: rect.y },
+          scale: { x: rect.scaleX, y: rect.scaleY },
+        });
+      }
+    });
+
+    // If for some reason we don't hear about the width/height within 10
+    // seconds, don't keep waiting for it to come.
+    setTimeout(() => {
+      if (sub) sub.unsubscribe();
+    }, 10 * 1000);
   }
 
   private setRecordingEncoder() {
