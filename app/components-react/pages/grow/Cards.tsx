@@ -165,11 +165,12 @@ export function PlatformCard(p: { platform: ICommunityReach }) {
     twitch: 'Twitch',
     facebook: 'Facebook',
     youtube: 'YouTube',
+    trovo: 'Trovo',
   };
   return (
     <div className={styles.card}>
       <div className={styles.cardHeader}>
-        <PlatformLogo platform={icon} />
+        <PlatformLogo platform={icon} className={styles.cardIcon} />
         <span className={cx(styles.title, styles[icon])}>{nameMap[icon]}</span>
       </div>
       {followers != null ? (
