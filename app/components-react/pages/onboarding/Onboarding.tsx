@@ -160,7 +160,10 @@ export class OnboardingModule {
       !this.OnboardingService.state.options.isHardware &&
       !isSkip
     ) {
-      this.ReocrdingModeService.actions.addRecordingWebcam();
+      // TODO: Remove timeout
+      setTimeout(() => {
+        this.ReocrdingModeService.actions.addRecordingWebcam();
+      }, 1000);
     }
 
     if (this.state.processing) return;
