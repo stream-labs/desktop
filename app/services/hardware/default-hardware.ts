@@ -107,6 +107,7 @@ export class DefaultHardwareService extends PersistentStatefulService<IDefaultHa
         source => source.deviceId === device.id,
       );
       if (existingSource) return;
+      console.log('REMOVING SOURCE', device.id);
       this.sourcesService.removeSource(device.id);
     });
   }

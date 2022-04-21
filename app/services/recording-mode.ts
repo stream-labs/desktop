@@ -72,10 +72,12 @@ export class RecordingModeService extends PersistentStatefulService<IRecordingMo
    */
   addRecordingWebcam() {
     // TODO: Mac
+    console.log('CREATING WEBCAM');
     const item = this.scenesService.views.activeScene.createAndAddSource('Webcam', 'dshow_input');
 
     let sub = this.sourcesService.sourceUpdated.subscribe(s => {
       if (s.sourceId === item.source.sourceId && s.width && s.height) {
+        console.log('GOT WEBCAM SIZE', s.width, s.height);
         sub.unsubscribe();
         sub = null;
 
