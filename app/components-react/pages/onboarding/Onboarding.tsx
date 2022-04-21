@@ -157,7 +157,7 @@ export class OnboardingModule {
     if (
       this.ReocrdingModeService.views.isRecordingModeEnabled &&
       this.currentStep.component === 'HardwareSetup' &&
-      this.OnboardingService.state.options.isHardware &&
+      !this.OnboardingService.state.options.isHardware &&
       !isSkip
     ) {
       this.ReocrdingModeService.actions.addRecordingWebcam();
