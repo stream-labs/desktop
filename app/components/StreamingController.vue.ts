@@ -74,11 +74,11 @@ export default class StudioFooterComponent extends Vue {
     this.clearTimeoutHandle();
   }
 
-  private timeoutHandle: NodeJS.Timeout = undefined;
+  private timeoutHandle = 0;
   private clearTimeoutHandle() {
     if (this.timeoutHandle) {
-      clearTimeout(this.timeoutHandle);
-      this.timeoutHandle = undefined;
+      window.clearTimeout(this.timeoutHandle);
+      this.timeoutHandle = 0;
     }
   }
 
@@ -94,7 +94,7 @@ export default class StudioFooterComponent extends Vue {
     this.streamingElapsedTime = this.streamingService.formattedDurationInCurrentStreamingState;
 
     this.clearTimeoutHandle();
-    this.timeoutHandle = setTimeout(() => this.updateStreamingElapsedTime(), 200);
+    this.timeoutHandle = window.setTimeout(() => this.updateStreamingElapsedTime(), 200);
   }
 
   recordTooltip = $t('streaming.recordTooltip');
