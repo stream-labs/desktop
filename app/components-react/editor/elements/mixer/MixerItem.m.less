@@ -1,0 +1,37 @@
+@import "../../../styles/index";
+
+.mixer-item {
+  position: relative;
+  .padding-h-sides(2);
+  .padding-v-sides();
+
+  .source-name {
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .db-value {
+    width: 60px;
+    text-align: right;
+  }
+
+  .slider {
+    flex: 1;
+  }
+
+  &.muted .slider {
+    opacity: 0.4;
+  }
+
+  .controls {
+    width: 60px;
+    text-align: right;
+    flex: 0 0 60px;
+
+    .fa-volume-off {
+      color: var(--warning);
+    }
+  }
+}
