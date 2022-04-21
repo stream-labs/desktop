@@ -9,7 +9,7 @@ import InputWrapper from '../../shared/inputs/InputWrapper';
 export default function OptimizedProfileSwitcher() {
   const { VideoEncodingOptimizationService } = Services;
   const { game, optimizedProfile, updateSettings } = useGoLiveSettings();
-  const enabled = useVuex(() => VideoEncodingOptimizationService.state.useOptimizedProfile);
+  const enabled = useVuex(() => VideoEncodingOptimizationService.state.useOptimizedProfile, false);
   const actions = VideoEncodingOptimizationService.actions;
 
   function setEnabled(enabled: boolean) {
