@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import { Component } from 'vue-property-decorator';
+import { Component, Prop } from 'vue-property-decorator';
 import { Inject } from 'services/core/injector';
 import { NicoliveCommentViewerService } from 'services/nicolive-program/nicolive-comment-viewer';
 import { WrappedChat, WrappedChatWithComponent } from 'services/nicolive-program/WrappedChat';
@@ -51,6 +51,8 @@ export default class CommentViewer extends Vue {
   private nicoliveCommentFilterService: NicoliveCommentFilterService;
 
   @Inject() private customizationService: CustomizationService;
+
+  @Prop({ default: false }) showProgramCreatedNotice: boolean;
 
   get isCompactMode(): boolean {
     return this.customizationService.state.compactMode;

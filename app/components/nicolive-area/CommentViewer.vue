@@ -61,6 +61,10 @@
           <i :class="speakingEnabled ? 'icon-speaker' : 'icon-mute'"></i>
         </button>
       </div>
+      <div class="created-notice" v-if="showProgramCreatedNotice">
+        <p>番組の作成に成功しました！</p>
+        <p>番組を開始して視聴者に配信を届けましょう</p>
+      </div>
     </div>
     <comment-form class="comment-form" />
     <comment-filter
@@ -222,5 +226,19 @@
     margin: 0 8px;
     pointer-events: auto;
   }
+}
+
+.created-notice {
+  z-index: @z-index-expand-content; // AreaSwitcherのheaderより大きく
+  position: absolute;
+  width: 100%;
+  bottom: 0;
+  background: white;
+}
+.created-notice p {
+  color: black;
+}
+.created-notice p:nth-of-type(1) {
+  font-weight: bold;
 }
 </style>
