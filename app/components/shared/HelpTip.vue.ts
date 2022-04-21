@@ -9,6 +9,7 @@ export default class HelpTip extends Vue {
   @Inject() dismissablesService: DismissablesService;
   @Inject() compactModeService: CompactModeService;
   @Prop() dismissableKey: EDismissable;
+  @Prop({ default: 'scene-selector' }) mode: String;
 
   get shouldShow() {
     return this.dismissablesService.shouldShow(this.dismissableKey);

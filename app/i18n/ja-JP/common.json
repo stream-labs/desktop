@@ -70,6 +70,8 @@
     "niconico": "ニコニコ生放送番組関連タブ",
     "studio": "配信関連タブ"
   },
+  "loginHelpTipTitle": "ログイン",
+  "loginHelpTipContent": "ニコニコへのログインはこちら",
   "fieldIsRequired": "このフィールドは必須です",
   "fieldMustBeLarger": "%{value} 以上を指定してください",
   "fieldMustBeLess": "%{value} 以上を指定してください",

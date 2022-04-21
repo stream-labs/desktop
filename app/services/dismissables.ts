@@ -5,6 +5,7 @@ import Vue from 'vue';
 export enum EDismissable {
   SceneCollectionsHelpTip = 'scene_collections_help_tip',
   ScenePresetHelpTip = 'scene_preset_help_tip',
+  LoginHelpTip = 'login_help_tip',
 }
 
 const InitiallyDismissed = new Set<EDismissable>([EDismissable.ScenePresetHelpTip]);
@@ -35,6 +36,10 @@ export class DismissablesService extends PersistentStatefulService<IDismissables
 
   dismissAll() {
     Object.keys(EDismissable).forEach(key => this.dismiss(EDismissable[key]));
+  }
+
+  resetAll() {
+    Object.keys(EDismissable).forEach(key => this.reset(EDismissable[key]));
   }
 
   @mutation()

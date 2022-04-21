@@ -8,8 +8,16 @@
     </a>
   </div>
   <div v-else>
-    <a v-if="!isCompactMode" class="link" @click="login" :title="$t('common.login')">
-      <i class="icon-log-in" />
+    <a v-if="!isCompactMode" class="link help_tip_content" @click="login" :title="$t('common.login')">
+      <i class="icon-log-in"></i>
+      <help-tip :dismissable-key="loginHelpTipDismissable" mode="login">
+        <div slot="title">
+          {{ $t('common.loginHelpTipTitle') }}
+        </div>
+        <div slot="content">
+          {{ $t('common.loginHelpTipContent') }}
+        </div>
+      </help-tip>
     </a>
   </div>
 </template>
@@ -49,5 +57,9 @@
   justify-content: center;
   width: 48px;
   height: 36px;
+}
+
+.help_tip_content {
+  position: relative;
 }
 </style>
