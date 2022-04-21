@@ -255,7 +255,17 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
       .filter((record: string) => {
         // This error is outside our control and can be ignored.
         // See: https://stackoverflow.com/questions/49384120/resizeobserver-loop-limit-exceeded
-        return record.match(/\[error\]/) && !record.match(/ResizeObserver loop limit exceeded/);
+        if (record.match(/ResizeObserver loop limit exceeded/)) {
+          return false;
+        }
+
+        // This error is related to a bug in `useModule` and this check should be removed
+        // after we fix it in the new `useModule`
+        if (record.match(/while rendering a different component/)) {
+          return false;
+        }
+
+        return record.match(/\[error\]/);
       });
 
     // save the last reading position, to skip already read records next time
