@@ -162,7 +162,7 @@ export class OnboardingModule {
     ) {
       // TODO: Remove timeout
       setTimeout(() => {
-        this.ReocrdingModeService.actions.addRecordingWebcam();
+        // this.ReocrdingModeService.actions.addRecordingWebcam();
       }, 1000);
     }
 
