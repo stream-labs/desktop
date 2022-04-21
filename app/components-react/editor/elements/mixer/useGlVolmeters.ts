@@ -1,14 +1,11 @@
-import { Component, Watch } from 'vue-property-decorator';
-import { AudioService, IVolmeter } from 'services/audio';
-import { Inject } from 'services/core/injector';
-import { CustomizationService } from 'services/customization';
+import { useModule } from 'components-react/hooks/useModule';
+import electron from 'electron';
+import { Services } from 'components-react/service-provider';
+import { IVolmeter } from 'services/audio';
 import { compileShader, createProgram } from 'util/webgl/utils';
 import vShaderSrc from 'util/webgl/shaders/volmeter.vert';
 import fShaderSrc from 'util/webgl/shaders/volmeter.frag';
-import electron from 'electron';
-import TsxComponent, { createProps } from 'components/tsx-component';
 import difference from 'lodash/difference';
-import { Subscription } from 'rxjs';
 
 // Configuration
 const CHANNEL_HEIGHT = 3;
@@ -42,90 +39,57 @@ interface IVolmeterSubscription {
   listener: (e: Electron.Event, volmeter: IVolmeter) => void;
 }
 
-class VolmetersProps {}
+class GlVolmetersModule {
+  state = {};
 
-/**
- * Renders volmeters for the current scene via WebGL
- */
-@Component({ props: createProps(VolmetersProps) })
-export default class GLVolmeters extends TsxComponent<VolmetersProps> {
-  render() {
-    return (
-      <div style={{ position: 'absolute' }}>
-        <canvas
-          ref="canvas"
-          style={{
-            display: 'block',
-            position: 'absolute',
-            top: 0,
-            right: 0,
-            left: 0,
-            height: '100%',
-          }}
-        />
-      </div>
-    );
+  get customizationService() {
+    return Services.CustomizationService;
   }
 
-  $refs: {
-    canvas: HTMLCanvasElement;
-  };
+  get audioService() {
+    return Services.AudioService;
+  }
 
-  @Inject() customizationService!: CustomizationService;
-  @Inject() audioService: AudioService;
+  get bg() {
+    return this.customizationService.sectionBackground;
+  }
+
+  get fpsLimit() {
+    return this.customizationService.state.experimental?.volmetersFPSLimit;
+  }
 
   subscriptions: Dictionary<IVolmeterSubscription> = {};
 
   // Used for WebGL rendering
-  private gl: WebGLRenderingContext;
-  private program: WebGLProgram;
+  private gl: WebGLRenderingContext | null;
+  private program: WebGLProgram | null;
 
   // GL Attribute locations
-  private positionLocation: number;
+  private positionLocation: number | null;
 
   // GL Uniform locations
-  private resolutionLocation: WebGLUniformLocation;
-  private translationLocation: WebGLUniformLocation;
-  private scaleLocation: WebGLUniformLocation;
-  private volumeLocation: WebGLUniformLocation;
-  private peakHoldLocation: WebGLUniformLocation;
-  private bgMultiplierLocation: WebGLUniformLocation;
+  private resolutionLocation: WebGLUniformLocation | null;
+  private translationLocation: WebGLUniformLocation | null;
+  private scaleLocation: WebGLUniformLocation | null;
+  private volumeLocation: WebGLUniformLocation | null;
+  private peakHoldLocation: WebGLUniformLocation | null;
+  private bgMultiplierLocation: WebGLUniformLocation | null;
 
-  private canvasWidth: number;
+  private canvasWidth: number | null;
   private canvasWidthInterval: number;
-  private channelCount: number;
-  private canvasHeight: number;
+  private channelCount: number | null;
+  private canvasHeight: number | null;
   private renderingInitialized: boolean;
 
   // time between 2 received peaks.
   // Used to render extra interpolated frames
   interpolationTime = 35;
-  private bg: { r: number; g: number; b: number };
-  private fpsLimit: number;
   private firstFrameTime: number;
   private frameNumber: number;
   private sourcesOrder: string[];
-  private workerId: number;
+  private workerId = electron.ipcRenderer.sendSync('getWorkerWindowId');
   private requestedFrameId: number;
   private bgMultiplier = this.customizationService.isDarkTheme ? 0.2 : 0.5;
-  private customizationServiceSubscription: Subscription = null;
-
-  mounted() {
-    this.workerId = electron.ipcRenderer.sendSync('getWorkerWindowId');
-    this.subscribeVolmeters();
-    this.bg = this.customizationService.sectionBackground;
-    this.fpsLimit = this.customizationService.state.experimental.volmetersFPSLimit;
-    this.setupNewCanvas();
-
-    // update FPS limit if settings have changed
-    this.customizationServiceSubscription = this.customizationService.settingsChanged.subscribe(
-      settings => {
-        if (settings.experimental?.volmetersFPSLimit) {
-          this.fpsLimit = settings.experimental.volmetersFPSLimit;
-        }
-      },
-    );
-  }
 
   // TODO: refactor into a single source of truth between Mixer and Volmeters
   get audioSources() {
@@ -137,8 +101,7 @@ export default class GLVolmeters extends TsxComponent<VolmetersProps> {
   /**
    * add or remove subscription for volmeters depending on current scene
    */
-  @Watch('audioSources')
-  private subscribeVolmeters() {
+  subscribeVolmeters() {
     const audioSources = this.audioSources;
     const sourcesOrder = audioSources.map(source => source.sourceId);
 
@@ -207,10 +170,9 @@ export default class GLVolmeters extends TsxComponent<VolmetersProps> {
 
     // cancel next frame rendering
     cancelAnimationFrame(this.requestedFrameId);
-    this.customizationServiceSubscription.unsubscribe();
   }
 
-  private setupNewCanvas() {
+  setupNewCanvas(canvas: HTMLCanvasElement) {
     // Make sure all state is cleared out
     this.gl = null;
     this.program = null;
@@ -225,11 +187,13 @@ export default class GLVolmeters extends TsxComponent<VolmetersProps> {
     this.channelCount = null;
     this.canvasHeight = null;
 
-    this.setCanvasSize();
-    this.canvasWidthInterval = window.setInterval(() => this.setCanvasSize(), 500);
-    this.requestedFrameId = requestAnimationFrame(t => this.onRequestAnimationFrameHandler(t));
+    this.setCanvasSize(canvas);
+    this.canvasWidthInterval = window.setInterval(() => this.setCanvasSize(canvas), 500);
+    this.requestedFrameId = requestAnimationFrame(t =>
+      this.onRequestAnimationFrameHandler(t, canvas),
+    );
 
-    this.gl = this.$refs.canvas.getContext('webgl', { alpha: false });
+    this.gl = canvas.getContext('webgl', { alpha: false });
     this.initWebglRendering();
     this.renderingInitialized = true;
   }
@@ -237,10 +201,8 @@ export default class GLVolmeters extends TsxComponent<VolmetersProps> {
   /**
    * Render volmeters with FPS capping
    */
-  private onRequestAnimationFrameHandler(now: DOMHighResTimeStamp) {
-    const isDestroyed = !this.$refs.canvas;
-    if (isDestroyed) return;
-
+  private onRequestAnimationFrameHandler(now: DOMHighResTimeStamp, canvas: HTMLCanvasElement) {
+    if (!canvas) return;
     // init first rendering frame
     if (!this.firstFrameTime) {
       this.frameNumber = -1;
@@ -248,7 +210,7 @@ export default class GLVolmeters extends TsxComponent<VolmetersProps> {
     }
 
     const timeElapsed = now - this.firstFrameTime;
-    const timeBetweenFrames = 1000 / this.fpsLimit;
+    const timeBetweenFrames = 1000 / (this.fpsLimit || 60);
     const currentFrameNumber = Math.ceil(timeElapsed / timeBetweenFrames);
 
     if (currentFrameNumber !== this.frameNumber) {
@@ -258,12 +220,17 @@ export default class GLVolmeters extends TsxComponent<VolmetersProps> {
       // happens when the browser source stops playing audio
       this.drawVolmeters();
     }
-    this.requestedFrameId = requestAnimationFrame(t => this.onRequestAnimationFrameHandler(t));
+    this.requestedFrameId = requestAnimationFrame(t =>
+      this.onRequestAnimationFrameHandler(t, canvas),
+    );
   }
 
   private initWebglRendering() {
+    if (!this.gl) return;
     const vShader = compileShader(this.gl, vShaderSrc, this.gl.VERTEX_SHADER);
     const fShader = compileShader(this.gl, fShaderSrc, this.gl.FRAGMENT_SHADER);
+
+    if (!vShader || !fShader) return;
     this.program = createProgram(this.gl, vShader, fShader);
 
     const positionBuffer = this.gl.createBuffer();
@@ -281,6 +248,8 @@ export default class GLVolmeters extends TsxComponent<VolmetersProps> {
     ];
 
     this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(positions), this.gl.STATIC_DRAW);
+
+    if (!this.program) return;
 
     // look up where the vertex data needs to go.
     this.positionLocation = this.gl.getAttribLocation(this.program, 'a_position');
@@ -308,33 +277,34 @@ export default class GLVolmeters extends TsxComponent<VolmetersProps> {
   }
 
   private setColorUniform(uniform: string, color: number[]) {
+    if (!this.gl || !this.program) return;
     const location = this.gl.getUniformLocation(this.program, uniform);
     // eslint-disable-next-line
     this.gl.uniform3fv(location, color.map(c => c / 255));
   }
 
-  private setCanvasSize() {
-    const width = Math.floor(this.$refs.canvas.parentElement.offsetWidth);
-    const height = Math.floor(this.$refs.canvas.parentElement.offsetHeight);
+  private setCanvasSize(canvas: HTMLCanvasElement) {
+    if (!canvas.parentElement) return;
+    const width = Math.floor(canvas.parentElement.offsetWidth);
+    const height = Math.floor(canvas.parentElement.offsetHeight);
 
     if (width !== this.canvasWidth) {
       this.canvasWidth = width;
-      this.$refs.canvas.width = width;
-      this.$refs.canvas.style.width = `${width}px`;
+      canvas.width = width;
+      canvas.style.width = `${width}px`;
     }
 
     if (height !== this.canvasHeight) {
       this.canvasHeight = height;
-      this.$refs.canvas.height = this.canvasHeight;
-      this.$refs.canvas.style.height = `${this.canvasHeight}px`;
+      canvas.height = this.canvasHeight;
+      canvas.style.height = `${this.canvasHeight}px`;
     }
-
-    this.bg = this.customizationService.sectionBackground;
     // Volmeter backgrounds appear brighter against a darker background
     this.bgMultiplier = this.customizationService.isDarkTheme ? 0.2 : 0.5;
   }
 
   private drawVolmeters() {
+    if (!this.gl || !this.canvasWidth || !this.canvasHeight || !this.positionLocation) return;
     const bg = this.bg;
 
     this.gl.clearColor(bg.r / 255, bg.g / 255, bg.b / 255, 1);
@@ -380,6 +350,8 @@ export default class GLVolmeters extends TsxComponent<VolmetersProps> {
     const peak = volmeter.currentPeaks[channel];
     this.updatePeakHold(volmeter, peak, channel);
 
+    if (!this.gl || !this.canvasWidth) return;
+
     this.gl.uniform2f(this.scaleLocation, 1, CHANNEL_HEIGHT);
     this.gl.uniform2f(
       this.translationLocation,
@@ -410,7 +382,7 @@ export default class GLVolmeters extends TsxComponent<VolmetersProps> {
     return Math.max((db + 60) * (1 / 60), 0);
   }
 
-  updatePeakHold(volmeter: IVolmeterSubscription, peak: number, channel: number) {
+  private updatePeakHold(volmeter: IVolmeterSubscription, peak: number, channel: number) {
     if (!volmeter.peakHoldCounters[channel] || peak > volmeter.peakHolds[channel]) {
       volmeter.peakHolds[channel] = peak;
       volmeter.peakHoldCounters[channel] = PEAK_HOLD_CYCLES;
@@ -423,7 +395,12 @@ export default class GLVolmeters extends TsxComponent<VolmetersProps> {
    * Linearly interpolates between val1 and val2
    * alpha = 0 will be val1, and alpha = 1 will be val2.
    */
-  lerp(val1: number, val2: number, alpha: number) {
+  private lerp(val1: number, val2: number, alpha: number) {
     return val1 + (val2 - val1) * alpha;
   }
+}
+
+// wrap the module in a hook
+export function useGlVolmeters() {
+  return useModule(GlVolmetersModule).select();
 }

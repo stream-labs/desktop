@@ -50,11 +50,13 @@ export default function MixerItem(p: { audioSource: AudioSource; volmetersEnable
     menu.popup();
   }
 
+  const muted = p.audioSource.muted;
+
   return (
     <div className={cx(styles.mixerItem, { [styles.muted]: p.audioSource.muted })}>
       <div className="flex">
-        <div className="source-name">{sourceName}</div>
-        <div className="db-value">
+        <div className={styles.sourceName}>{sourceName}</div>
+        <div className={styles.dbValue}>
           {p.audioSource.fader.deflection === 0 && <div>-Inf dB</div>}
           {p.audioSource.fader.deflection !== 0 && (
             <div>{p.audioSource.fader.db.toFixed(1)} dB</div>
@@ -72,21 +74,12 @@ export default function MixerItem(p: { audioSource: AudioSource; volmetersEnable
           onInput={onSliderChangeHandler}
           {...SLIDER_METADATA}
         />
-        <div className="controls">
-          {p.audioSource.muted && (
-            <i
-              className="icon-button icon-audio"
-              title="click to switch off"
-              onClick={() => setMuted(true)}
-            />
-          )}
-          {p.audioSource.muted && (
-            <i
-              className="icon-button icon-mute"
-              title="click to switch on"
-              onClick={() => setMuted(false)}
-            />
-          )}
+        <div className={styles.controls}>
+          <i
+            className={cx('icon-button', muted ? 'icon-mute' : 'icon-audio')}
+            title={muted ? 'click to switch on' : 'click to switch off'}
+            onClick={() => setMuted(!muted)}
+          />
           <i
             className="icon-button icon-settings"
             onClick={() => showSourceMenu(p.audioSource.sourceId)}
