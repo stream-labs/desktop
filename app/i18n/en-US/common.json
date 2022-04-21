@@ -71,7 +71,7 @@
     "studio": "Tab related to streaming"
   },
   "loginHelpTipTitle": "Login",
-  "loginHelpTipContent": "Login to niconico is here",
+  "loginHelpTipContent": "Click here to log in to niconico",
   "fieldIsRequired": "The field is required",
   "fieldMustBeLarger": "The field value must be %{value} or larger",
   "fieldMustBeLess": "The field value must be %{value} or less",
