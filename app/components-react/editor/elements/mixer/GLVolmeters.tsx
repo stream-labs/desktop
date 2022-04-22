@@ -1,6 +1,5 @@
 import React, { useEffect, useRef } from 'react';
 import { useGlVolmeters } from './useGlVolmeters';
-import { Services } from 'components-react/service-provider';
 
 /**
  * Renders volmeters for the current scene via WebGL
