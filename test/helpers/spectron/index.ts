@@ -249,6 +249,7 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
     await sleep(1000); // electron-log needs some time to write down logs
     const logs: string = await readLogs();
     lastLogs = logs;
+    let ignoringErrors = false;
     const errors = logs
       .slice(logFileLastReadingPos)
       .split('\n')
@@ -262,10 +263,19 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
         // This error is related to a bug in `useModule` and this check should be removed
         // after we fix it in the new `useModule`
         if (record.match(/while rendering a different component/)) {
+          // Ignore errors until we encouter the next thing that isn't an error
+          ignoringErrors = true;
           return false;
         }
 
-        return record.match(/\[error\]/);
+        const isError = !!record.match(/\[error\]/);
+
+        if (isError && !ignoringErrors) {
+          return true;
+        } else {
+          ignoringErrors = false;
+          return false;
+        }
       });
 
     // save the last reading position, to skip already read records next time
