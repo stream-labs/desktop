@@ -21,7 +21,7 @@ export default function GLVolmeters() {
   return (
     <div style={{ position: 'absolute', left: '17px', right: '17px', height: '100%' }}>
       <canvas
-        ref="canvas"
+        ref={canvas}
         style={{
           display: 'block',
           position: 'absolute',

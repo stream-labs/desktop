@@ -88,7 +88,7 @@ export const components = {
   MiniFeed: createRoot(MiniFeed),
   LegacyEvents: createRoot(LegacyEvents),
   MediaGallery,
-  Mixer,
+  Mixer: createRoot(Mixer),
   LayoutEditor: createRoot(LayoutEditor),
   SceneSelector: createRoot(SceneSelector),
   SideNav,

@@ -42,7 +42,7 @@ export default function Mixer() {
 
   function Element() {
     return (
-      <div onContextMenu={handleRightClick}>
+      <div onContextMenu={handleRightClick} style={{ height: '100%' }}>
         <div className="studio-controls-top">
           <Tooltip
             title={$t('Monitor audio levels. If the bars are moving you are outputting audio.')}
@@ -54,7 +54,10 @@ export default function Mixer() {
             <i className="icon-settings icon-button" onClick={showAdvancedSettings} />
           </Tooltip>
         </div>
-        <Scrollable className="studio-controls-selector mixer-panel">
+        <Scrollable
+          className="studio-controls-selector mixer-panel"
+          style={{ height: 'calc(100% - 33px)' }}
+        >
           <div style={{ position: 'relative' }}>
             {audioSources.length !== 0 && !performanceMode && <GLVolmeters />}
             {audioSources.map(audioSource => (
