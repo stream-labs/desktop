@@ -51,7 +51,7 @@ class GlVolmetersModule {
   }
 
   get bg() {
-    return this.customizationService.sectionBackground;
+    return this.customizationService.views.sectionBackground;
   }
 
   get fpsLimit() {
@@ -77,9 +77,7 @@ class GlVolmetersModule {
 
   private canvasWidth: number | null;
   private canvasWidthInterval: number;
-  private channelCount: number | null;
   private canvasHeight: number | null;
-  private renderingInitialized: boolean;
 
   // time between 2 received peaks.
   // Used to render extra interpolated frames
@@ -184,7 +182,6 @@ class GlVolmetersModule {
     this.peakHoldLocation = null;
     this.bgMultiplierLocation = null;
     this.canvasWidth = null;
-    this.channelCount = null;
     this.canvasHeight = null;
 
     this.setCanvasSize(canvas);
@@ -195,7 +192,6 @@ class GlVolmetersModule {
 
     this.gl = canvas.getContext('webgl', { alpha: false });
     this.initWebglRendering();
-    this.renderingInitialized = true;
   }
 
   /**

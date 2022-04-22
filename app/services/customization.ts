@@ -89,6 +89,10 @@ class CustomizationViews extends ViewHandler<ICustomizationServiceState> {
     return DISPLAY_BACKGROUNDS[this.state.theme];
   }
 
+  get sectionBackground() {
+    return SECTION_BACKGROUNDS[this.currentTheme];
+  }
+
   get currentTheme() {
     return this.state.theme;
   }
