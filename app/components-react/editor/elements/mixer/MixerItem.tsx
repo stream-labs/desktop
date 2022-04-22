@@ -7,39 +7,34 @@ import { AudioSource } from 'services/audio';
 import { EditMenu } from 'util/menus/EditMenu';
 import MixerVolmeter from './MixerVolmeter';
 import styles from './MixerItem.m.less';
+import { cloneDeep } from 'lodash';
 
 const SLIDER_METADATA = {
   min: 0,
   max: 1,
   interval: 0.01,
-  displayValue: 'false',
-  simpleTheme: true,
+  style: { flexGrow: 1 },
 };
 
-export default function MixerItem(p: { audioSource: AudioSource; volmetersEnabled?: boolean }) {
+export default function MixerItem(p: { audioSourceId: string; volmetersEnabled?: boolean }) {
   const volmetersEnabled = p.volmetersEnabled ?? true;
 
-  const { CustomizationService, EditorCommandsService, SourcesService } = Services;
+  const { CustomizationService, EditorCommandsService, SourcesService, AudioService } = Services;
 
-  const { performanceMode, sourceName } = useVuex(() => ({
+  const { performanceMode, sourceName, muted, deflection, db } = useVuex(() => ({
     performanceMode: CustomizationService.state.performanceMode,
-    sourceName: SourcesService.state.sources[p.audioSource.sourceId].name,
+    sourceName: SourcesService.state.sources[p.audioSourceId].name,
+    muted: AudioService.views.getSource(p.audioSourceId).muted,
+    deflection: AudioService.views.getSource(p.audioSourceId).fader.deflection,
+    db: AudioService.views.getSource(p.audioSourceId).fader.db,
   }));
 
-  function setMuted(muted: boolean) {
-    EditorCommandsService.actions.executeCommand(
-      'MuteSourceCommand',
-      p.audioSource.sourceId,
-      muted,
-    );
+  function setMuted() {
+    EditorCommandsService.actions.executeCommand('MuteSourceCommand', p.audioSourceId, !muted);
   }
 
   function onSliderChangeHandler(newVal: number) {
-    EditorCommandsService.actions.executeCommand(
-      'SetDeflectionCommand',
-      p.audioSource.sourceId,
-      newVal,
-    );
+    EditorCommandsService.actions.executeCommand('SetDeflectionCommand', p.audioSourceId, newVal);
   }
 
   function showSourceMenu(sourceId: string) {
@@ -50,39 +45,39 @@ export default function MixerItem(p: { audioSource: AudioSource; volmetersEnable
     menu.popup();
   }
 
-  const muted = p.audioSource.muted;
-
   return (
-    <div className={cx(styles.mixerItem, { [styles.muted]: p.audioSource.muted })}>
+    <div className={cx(styles.mixerItem, { [styles.muted]: muted })}>
       <div className="flex">
         <div className={styles.sourceName}>{sourceName}</div>
         <div className={styles.dbValue}>
-          {p.audioSource.fader.deflection === 0 && <div>-Inf dB</div>}
-          {p.audioSource.fader.deflection !== 0 && (
-            <div>{p.audioSource.fader.db.toFixed(1)} dB</div>
-          )}
+          {deflection === 0 && <div>-Inf dB</div>}
+          {deflection !== 0 && <div>{db.toFixed(1)} dB</div>}
         </div>
       </div>
 
       {!performanceMode && (
-        <MixerVolmeter audioSource={p.audioSource} volmetersEnabled={volmetersEnabled} />
+        <MixerVolmeter audioSourceId={p.audioSourceId} volmetersEnabled={volmetersEnabled} />
       )}
 
       <div className="flex">
         <SliderInput
-          value={p.audioSource.fader.deflection}
+          value={deflection}
           onInput={onSliderChangeHandler}
-          {...SLIDER_METADATA}
+          min={0}
+          max={1}
+          step={0.01}
+          style={{ flexGrow: 1 }}
+          uncontrolled
         />
         <div className={styles.controls}>
           <i
             className={cx('icon-button', muted ? 'icon-mute' : 'icon-audio')}
             title={muted ? 'click to switch on' : 'click to switch off'}
-            onClick={() => setMuted(!muted)}
+            onClick={setMuted}
           />
           <i
             className="icon-button icon-settings"
-            onClick={() => showSourceMenu(p.audioSource.sourceId)}
+            onClick={() => showSourceMenu(p.audioSourceId)}
           />
         </div>
       </div>

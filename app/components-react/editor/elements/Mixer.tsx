@@ -62,7 +62,7 @@ export default function Mixer() {
             {audioSources.length !== 0 && !performanceMode && <GLVolmeters />}
             {audioSources.map(audioSource => (
               <MixerItem
-                audioSource={audioSource}
+                audioSourceId={audioSource.sourceId}
                 key={audioSource.sourceId}
                 volmetersEnabled={needToRenderVolmeters}
               />

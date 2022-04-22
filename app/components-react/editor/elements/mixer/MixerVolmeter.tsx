@@ -1,17 +1,20 @@
+import { Services } from 'components-react/service-provider';
 import React, { useEffect, useRef, useState } from 'react';
 import { AudioSource } from 'services/audio';
 import { Volmeter2d } from 'services/audio/volmeter-2d';
 
-export default function MixerVolmeter(p: { audioSource: AudioSource; volmetersEnabled: boolean }) {
+export default function MixerVolmeter(p: { audioSourceId: string; volmetersEnabled: boolean }) {
   const canvas = useRef<HTMLCanvasElement>(null);
   const spacer = useRef<HTMLDivElement>(null);
+  const { AudioService } = Services;
 
   const [renderingInitialized, setRenderingInitialized] = useState(false);
 
   useEffect(() => {
     if (!spacer.current || !canvas.current) return;
+    const source = AudioService.views.getSource(p.audioSourceId);
     const volmeterRenderer = new Volmeter2d(
-      p.audioSource,
+      source,
       canvas.current,
       spacer.current,
       () => setRenderingInitialized(true),
