@@ -39,6 +39,7 @@ import MiniFeed from './editor/elements/Minifeed';
 import BrowserView from './shared/BrowserView';
 import LegacyEvents from './editor/elements/LegacyEvents';
 import MediaGallery from './windows/MediaGallery';
+import Mixer from './editor/elements/Mixer';
 import LayoutEditor from './pages/layout-editor/LayoutEditor';
 import Projector from './windows/Projector';
 import SceneSelector from './editor/elements/SceneSelectorElement';
@@ -87,6 +88,7 @@ export const components = {
   MiniFeed: createRoot(MiniFeed),
   LegacyEvents: createRoot(LegacyEvents),
   MediaGallery,
+  Mixer,
   LayoutEditor: createRoot(LayoutEditor),
   SceneSelector: createRoot(SceneSelector),
   SideNav,

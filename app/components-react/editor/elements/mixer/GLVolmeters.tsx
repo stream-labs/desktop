@@ -19,7 +19,7 @@ export default function GLVolmeters() {
   useEffect(() => subscribeVolmeters(), [audioSources]);
 
   return (
-    <div style={{ position: 'absolute' }}>
+    <div style={{ position: 'absolute', left: '17px', right: '17px', height: '100%' }}>
       <canvas
         ref="canvas"
         style={{

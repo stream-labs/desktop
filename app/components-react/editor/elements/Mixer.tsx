@@ -1,12 +1,12 @@
 import React, { useRef, useMemo } from 'react';
-import { $t } from 'services/i18n';
-import { Menu } from 'util/menus/Menu';
+import { Tooltip } from 'antd';
 import { Services } from 'components-react/service-provider';
 import Scrollable from 'components-react/shared/Scrollable';
-import useBaseElement from './hooks';
 import { useVuex } from 'components-react/hooks';
+import { $t } from 'services/i18n';
+import { Menu } from 'util/menus/Menu';
+import useBaseElement from './hooks';
 import { MixerItem, GLVolmeters } from './mixer/index';
-import { Tooltip } from 'antd';
 
 export default function Mixer() {
   const { AudioService, EditorCommandsService, CustomizationService } = Services;
@@ -26,10 +26,6 @@ export default function Mixer() {
     const canvas = document.createElement('canvas');
     return !canvas.getContext('webgl');
   }, []);
-
-  // get performanceMode() {
-  //   return this.customizationService.state.performanceMode;
-  // }
 
   function showAdvancedSettings() {
     AudioService.actions.showAdvancedSettings();
@@ -60,9 +56,7 @@ export default function Mixer() {
         </div>
         <Scrollable className="studio-controls-selector mixer-panel">
           <div style={{ position: 'relative' }}>
-            {audioSources.length !== 0 && !performanceMode && (
-              <GLVolmeters style={{ left: '17px', right: '17px', height: '100%' }} />
-            )}
+            {audioSources.length !== 0 && !performanceMode && <GLVolmeters />}
             {audioSources.map(audioSource => (
               <MixerItem
                 audioSource={audioSource}

@@ -126,6 +126,15 @@ export class MiniFeed extends ReactComponent {}
 
 @Component({
   props: {
+    name: { default: 'Mixer' },
+    wrapperStyles: { default: () => ({ height: '100%' }) },
+    mins: { default: () => ({ x: 150, y: 120 }) },
+  },
+})
+export class Mixer extends ReactComponent {}
+
+@Component({
+  props: {
     name: { default: 'NameFolder' },
     wrapperStyles: { default: () => ({ height: '100%' }) },
   },
