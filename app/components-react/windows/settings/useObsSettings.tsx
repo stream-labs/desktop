@@ -19,36 +19,8 @@ class ObsSettingsModule {
     } else {
       this.state.setPage('General');
     }
-
-    //
-    // type GetUseModuleResult<TModuleConfig> = TModuleConfig & {
-    //   extend: <TNewProps>(newPropsFactory: (props: TModuleConfig) => TNewProps) => TNewProps
-    // }
-    //
-    // class MyModule {
-    //   foo: 1;
-    //   bar: 2;
-    // }
-    //
-    // const mBase1 = null as any as GetUseModuleResult<MyModule>;
-    // let { zoom2 } = useModule(MyModule).extend(() => ({
-    //   zoom2: 2,
-    // }));
-    //
-    // zoom2 = '2';
-    //
-    // let { zoom } = mBase1.extend(m => ({
-    //   zoom: 1,
-    // }));
-    //
-    // zoom = '1';
-
   }
 
-  // @mutation()
-  // setPage(page: string) {
-  //   this.state.page = page;
-  // }
 
   private get settingsService() {
     return Services.SettingsService;

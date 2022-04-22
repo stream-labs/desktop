@@ -62,26 +62,6 @@ export const YoutubeEditStreamInfo = InputComponent((p: IPlatformComponentParams
     return { broadcastsQuery };
   });
 
-  // const [{ broadcastLoading, broadcasts }] = useAsyncState(
-  //   { broadcastLoading: true, broadcasts: [] },
-  //   async () => {
-  //     const broadcasts = await YoutubeService.actions.return.fetchEligibleBroadcasts();
-  //     const shouldFetchSelectedBroadcast =
-  //       broadcastId && !broadcasts.find(b => b.id === broadcastId);
-  //
-  //     if (shouldFetchSelectedBroadcast) {
-  //       assertIsDefined(broadcastId);
-  //       const selectedBroadcast = await YoutubeService.actions.return.fetchBroadcast(broadcastId);
-  //       broadcasts.push(selectedBroadcast);
-  //     }
-  //
-  //     return {
-  //       broadcastLoading: false,
-  //       broadcasts,
-  //     };
-  //   },
-  // );
-
   // re-fill form when the broadcastId selected
   useEffect(() => {
     if (!broadcastId) return;

@@ -1,6 +1,6 @@
 import React from 'react';
 import omit from 'lodash/omit';
-import { injectState, useModule } from 'slap';
+import { injectState, mutation, useModule } from 'slap';
 import { Services } from '../../service-provider';
 import { TPropertiesManager, TSourceType } from 'services/sources';
 import { WidgetType } from 'services/widgets';
@@ -24,12 +24,6 @@ class SourceShowcaseModule {
     inspectedSource: '' as TInspectableSource,
     inspectedAppId: '',
     inspectedAppSourceId: '',
-
-    inspectSource(source: string, appId?: string, appSourceId?: string) {
-      this.inspectedSource = source;
-      this.inspectedAppId = appId || '';
-      this.inspectedAppSourceId = appSourceId || '';
-    },
   });
 
   private get sourcesService() {
@@ -52,6 +46,13 @@ class SourceShowcaseModule {
 
       return sources;
     }, []);
+  }
+
+  @mutation()
+  inspectSource(source: string, appId?: string, appSourceId?: string) {
+    this.state.inspectedSource = source;
+    this.state.inspectedAppId = appId || '';
+    this.state.inspectedAppSourceId = appSourceId || '';
   }
 
   selectInspectedSource() {
