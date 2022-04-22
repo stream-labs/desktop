@@ -6,7 +6,6 @@ import { CheckboxInput, ListInput } from '../../shared/inputs';
 import { Services } from '../../service-provider';
 import fs from 'fs';
 import path from 'path';
-import { useBinding } from '../../store';
 import { getDefined } from '../../../util/properties-type-guards';
 
 export function GeneralSettings() {
@@ -99,21 +98,13 @@ function ExtraSettings() {
     }
   }
 
-  const bind = useBinding({
-    get streamInfoUpdate() {
-      return CustomizationService.state.updateStreamInfoOnLive;
-    },
-    set streamInfoUpdate(value) {
-      CustomizationService.setUpdateStreamInfoOnLive(value);
-    },
-  });
-
   return (
     <>
       <ObsSettingsSection>
         {isLoggedIn && !isFacebook && !isYoutube && (
           <CheckboxInput
-            {...bind.streamInfoUpdate}
+            value={CustomizationService.state.updateStreamInfoOnLive}
+            onChange={val => CustomizationService.setUpdateStreamInfoOnLive(val)}
             label={$t('Confirm stream title and game before going live')}
             name="stream_info_udpate"
           />

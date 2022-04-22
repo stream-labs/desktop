@@ -1,6 +1,4 @@
 import React from 'react';
-import { Provider } from 'react-redux';
-import { store } from '../store';
 import { createApp, injectState, ReactModules } from 'slap';
 import { getResource, StatefulService } from '../../services';
 import { AppServices } from '../../app-services';
@@ -26,7 +24,7 @@ class VuexModule {
     },
   });
 
-  onLoad() {
+  init() {
     // watch for mutations from the global Vuex store
     // and increment the revision number for affected StatefulService
     StatefulService.store.subscribe(mutation => {
@@ -42,7 +40,7 @@ class VuexModule {
 export function createRoot(ChildComponent: (props: any) => JSX.Element) {
   return function ReactRoot(childProps: Object) {
     const app = createApp({ VuexModule });
-    const scope = app.rootScope;
+    const scope = app.servicesScope;
     scope.init(VuexModule);
 
     Object.keys(AppServices).forEach(serviceName => {
@@ -50,11 +48,9 @@ export function createRoot(ChildComponent: (props: any) => JSX.Element) {
     });
 
     return (
-      <Provider store={store}>
-        <ReactModules app={app}>
-          <ChildComponent {...childProps} />
-        </ReactModules>
-      </Provider>
+      <ReactModules app={app}>
+        <ChildComponent {...childProps} />
+      </ReactModules>
     );
   };
 }

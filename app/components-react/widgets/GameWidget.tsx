@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { IWidgetState, useWidget, WidgetModule } from './common/useWidget';
+import { IWidgetCommonState, useWidget, WidgetModule } from './common/useWidget';
 import { WidgetLayout } from './common/WidgetLayout';
 import { $t } from 'services/i18n';
 import { metadata } from 'components-react/shared/inputs/metadata';
@@ -27,7 +27,7 @@ interface ITicTacToeOptions {
   cannot_play_here: string;
 }
 
-interface IGameWidgetState extends IWidgetState {
+interface IGameWidgetState extends IWidgetCommonState {
   data: {
     settings: {
       decision_poll_timer: number;

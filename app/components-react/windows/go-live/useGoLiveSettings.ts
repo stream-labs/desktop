@@ -243,17 +243,20 @@ class GoLiveSettingsState extends StreamInfoView<IGoLiveSettingsState> {
 export class GoLiveSettingsModule {
   // define initial state
   state = injectState(GoLiveSettingsState);
-  loading = injectLoading();
+  // loading = injectLoading();
 
 
-  form: FormInstance | null = null;
-
-  setForm(form: FormInstance) {
-    this.form = form;
+  constructor(public form: FormInstance, public isUpdateMode: boolean) {
   }
 
+  // form: FormInstance | null = null;
+
+  // setForm(form: FormInstance) {
+  //   this.form = form;
+  // }
+
   // initial setup
-  async load() {
+  async init() {
     // take prefill options from the windows' `queryParams`
     const windowParams = Services.WindowsService.state.child.queryParams as unknown;
     if (windowParams && !isEqual(windowParams, {})) {
@@ -393,10 +396,8 @@ export function useGoLiveSettings() {
 export function useGoLiveSettingsRoot(params?: { isUpdateMode: boolean }) {
   const form = useForm();
 
-  const useModuleResult = useModule(GoLiveSettingsModule, {
-    isUpdateMode: params?.isUpdateMode,
-  });
-
-  useModuleResult.setForm(form);
+  const useModuleResult = useModule(GoLiveSettingsModule, [form, !!params?.isUpdateMode]);
+  //
+  // useModuleResult.setForm(form);
   return useModuleResult;
 }

@@ -1,5 +1,4 @@
 import React, { HTMLAttributes } from 'react';
-import { useFormState } from '../../hooks';
 import { ModalLayout } from '../../shared/ModalLayout';
 import Form from '../../shared/inputs/Form';
 import {
@@ -64,13 +63,10 @@ function Examples() {
     hasTooltips,
     disabled,
     size,
-    bindForm,
-    s,
+    formState,
   } = useSharedComponentsLibrary().extend(module => {
 
-    const result = {
-
-      s: injectState({
+    const formState = injectState({
         textVal: '',
         textAreaVal: '',
         switcherVal: false,
@@ -103,18 +99,15 @@ function Examples() {
           { value: 3, label: 'Blue' },
           { value: 4, label: 'Orange' },
         ],
-      }),
+      });
 
-      bindForm: injectFormBinding(() => {
-        return this.state.getters;
-      }, patch => {
-        return this.state.updateState(patch);
-      }),
+    return {
+      formState,
     };
-    return result;
   });
 
-  const bind = bindForm;
+  const s = formState;
+  const bind = formState.bind;
   const globalProps: Record<string, any> = {};
   if (hasTooltips) globalProps.tooltip = 'This is tooltip';
   if (required) globalProps.required = true;

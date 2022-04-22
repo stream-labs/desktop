@@ -2,18 +2,17 @@ import React, { CSSProperties } from 'react';
 import { ObsSettingsSection } from './ObsSettings';
 import { $t } from '../../../services/i18n';
 import QRCode from 'qrcode.react';
-import { mutation } from '../../store';
-import { useModule } from '../../hooks/useModule';
 import { Services } from '../../service-provider';
 import Form from '../../shared/inputs/Form';
 import { TextInput } from '../../shared/inputs';
 import { Button, Col, Row, Space } from 'antd';
 import Utils from '../../../services/utils';
+import { injectState, mutation, useModule } from 'slap';
 
 const QRCODE_SIZE = 350;
 
 class RemoteControlModule {
-  state = {
+  state = injectState({
     qrcodeIsVisible: false,
     detailsIsVisible: false,
     qrCodeData: {
@@ -22,7 +21,7 @@ class RemoteControlModule {
       token: '',
       version: '',
     },
-  };
+  });
 
   private updateNetworkInterval: number;
 
@@ -85,7 +84,7 @@ export function RemoteControlSettings() {
     showQrCode,
     showDetails,
     generateToken,
-  } = useModule(RemoteControlModule).select();
+  } = useModule(RemoteControlModule);
 
   const colStyle: CSSProperties = {
     width: `${QRCODE_SIZE}px`,

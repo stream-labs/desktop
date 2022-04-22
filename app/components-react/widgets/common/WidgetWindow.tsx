@@ -1,10 +1,10 @@
-import React from 'react';
-import { useOnCreate } from '../../hooks';
+import React, {FC, useEffect, useState} from 'react';
+import {useOnCreate, useOnDestroy} from '../../hooks';
 import { ModalLayout } from '../../shared/ModalLayout';
 import { Services } from '../../service-provider';
 import { AlertBox } from '../AlertBox';
 import { AlertBoxModule } from '../useAlertBox';
-import { useWidgetRoot } from './useWidget';
+import { useWidgetRoot, WidgetModule } from './useWidget';
 import { getDefined } from '../../../util/properties-type-guards';
 // TODO: import other widgets here to avoid merge conflicts
 // BitGoal
@@ -57,6 +57,9 @@ export const components = {
   GameWidget: [GameWidget, GameWidgetModule],
 };
 
+let instance = 0;
+let counter = 0;
+
 /**
  * Renders a widget window by given sourceId from window's query params
  */
@@ -64,15 +67,29 @@ export function WidgetWindow() {
   const { WindowsService, WidgetsService } = Services;
 
   // take the source id and widget's component from the window's params
-  const { sourceId, WidgetModule, WidgetSettingsComponent } = useOnCreate(() => {
+  const { sourceId, Module, WidgetSettingsComponent } = useOnCreate(() => {
     const { sourceId, widgetType } = WindowsService.getChildWindowQueryParams();
-    const [WidgetSettingsComponent, WidgetModule] = components[widgetType];
-    return { sourceId, WidgetModule, WidgetSettingsComponent };
+    const [WidgetSettingsComponent, Module] = components[widgetType];
+    return { sourceId, Module, WidgetSettingsComponent };
   });
+
+  const myState = useState(() => {
+    instance++;
+    console.log('CREATE WIDGETWINDOW', instance);
+    return 1;
+  });
+
+  console.log('RENDER WIDGETWINDOW', counter);
+  counter++;
+
+  useEffect(() => {
+
+    console.log('DESTROY WIDGETWINDOW', instance);
+  }, []);
 
   // initialize the Redux module for the widget
   // so all children components can use it via `useWidget()` call
-  const { reload } = useWidgetRoot(WidgetModule, { sourceId });
+  const { reload } = useWidgetRoot(Module as typeof WidgetModule, { sourceId });
 
   useSubscription(WidgetsService.settingsInvalidated, reload);
 

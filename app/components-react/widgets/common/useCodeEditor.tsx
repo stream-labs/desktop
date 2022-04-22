@@ -1,11 +1,10 @@
 import { WidgetModule } from './useWidget';
-import { getModuleManager, mutation, watch } from '../../store';
 import { message } from 'antd';
 import Utils from '../../../services/utils';
 import { Services } from '../../service-provider';
 import { DEFAULT_CUSTOM_FIELDS } from './CustomFields';
-import { useModule } from '../../hooks/useModule';
 import { getDefined } from '../../../util/properties-type-guards';
+import {inject, injectState, injectWatch, mutation, useModule} from 'slap';
 
 type TLang = 'json' | 'js' | 'css' | 'html';
 
@@ -20,7 +19,7 @@ class CodeEditorModule {
     { label: 'JS', key: 'js' },
   ];
 
-  state = {
+  state = injectState({
     selectedTab: 'json' as TLang,
     canSave: false,
     isLoading: true,
@@ -31,17 +30,22 @@ class CodeEditorModule {
       custom_css: '',
       custom_js: '',
     },
-  };
+  });
 
-  private widgetModule: WidgetModule = getModuleManager().getModule('WidgetModule');
+  private widgetModule = inject(WidgetModule);
 
   init() {
+
+
     // wait for the WidgetModule to load to get the custom code data from it
-    watch(
-      this,
-      () => this.widgetModule.state.isLoading,
-      () => this.reset(),
-    );
+
+    injectWatch(() => this.widgetModule.state.isLoading, () => this.reset());
+
+    // watch(
+    //   this,
+    //   () => this.widgetModule.state.isLoading,
+    //   () => this.reset(),
+    // );
   }
 
   /**
@@ -111,15 +115,15 @@ class CodeEditorModule {
   @mutation()
   reset() {
     const customCode = getDefined(this.widgetModule.customCode);
-    this.state = {
-      ...this.state,
+    this.state.update({
+      ...this.state.getters,
       isLoading: false,
       customCode: {
         ...customCode,
         custom_json: customCode.custom_json ? JSON.stringify(customCode.custom_json, null, 2) : '',
       },
       canSave: false,
-    };
+    });
   }
 
   @mutation()
@@ -147,5 +151,5 @@ class CodeEditorModule {
 }
 
 export function useCodeEditor() {
-  return useModule(CodeEditorModule).select();
+  return useModule(CodeEditorModule);
 }

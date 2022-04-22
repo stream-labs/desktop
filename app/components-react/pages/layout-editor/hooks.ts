@@ -1,17 +1,16 @@
 import cloneDeep from 'lodash/cloneDeep';
 import { Services } from 'components-react/service-provider';
 import { ELayoutElement, ELayout, LayoutSlot } from 'services/layout';
-import { useModule } from 'components-react/hooks/useModule';
-import { mutation } from 'components-react/store';
+import { injectState, mutation, useModule } from 'slap';
 
 class LayoutEditorModule {
-  state = {
+  state = injectState({
     currentLayout: this.layoutService.views.currentTab.currentLayout || ELayout.Default,
     slottedElements: cloneDeep(this.layoutService.views.currentTab.slottedElements) || {},
     browserUrl:
       this.layoutService.views.currentTab.slottedElements[ELayoutElement.Browser]?.src || '',
     showModal: false,
-  };
+  });
 
   private get layoutService() {
     return Services.LayoutService;
@@ -81,5 +80,5 @@ class LayoutEditorModule {
 }
 
 export function useLayoutEditor() {
-  return useModule(LayoutEditorModule).select();
+  return useModule(LayoutEditorModule);
 }

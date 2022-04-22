@@ -1,6 +1,5 @@
 import React from 'react';
-import { useModule, injectState, TModuleInstanceFor } from 'slap';
-import { mutation } from '../../store';
+import { useModule, injectState } from 'slap';
 import { Services } from '../../service-provider';
 import { ISettingsSubCategory } from '../../../services/settings';
 
@@ -16,9 +15,9 @@ class ObsSettingsModule {
     // init page
     const { WindowsService } = Services;
     if (WindowsService.state.child.queryParams) {
-      this.state.page = WindowsService.state.child.queryParams.categoryName || 'General';
+      this.state.setPage(WindowsService.state.child.queryParams.categoryName || 'General');
     } else {
-      this.state.page = 'General';
+      this.state.setPage('General');
     }
 
     //

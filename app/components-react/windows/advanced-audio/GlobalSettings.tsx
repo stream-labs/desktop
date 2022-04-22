@@ -9,7 +9,6 @@ import { $t } from 'services/i18n';
 import Utils from 'services/utils';
 import styles from './AdvancedAudio.m.less';
 import { ObsSettings, ObsSettingsSection } from '../../windows/settings/ObsSettings';
-import { store } from '../../store';
 
 const trackOptions = [
   { label: '1', value: 1 },
@@ -136,9 +135,8 @@ export default function GlobalSettings() {
           </InputWrapper>
         )}
       </ObsSettingsSection>
-      <Provider store={store}>
-        <ObsSettings page="Audio" />
-      </Provider>
+
+      <ObsSettings page="Audio" />
     </>
   );
 }

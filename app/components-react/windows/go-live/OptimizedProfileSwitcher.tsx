@@ -4,7 +4,7 @@ import { $t } from '../../../services/i18n';
 import { CheckboxInput } from '../../shared/inputs';
 import { Services } from '../../service-provider';
 import InputWrapper from '../../shared/inputs/InputWrapper';
-import { injectLoading } from 'slap';
+import { injectState } from 'slap';
 
 export default function OptimizedProfileSwitcher() {
   const { game, isLoading, enabled, setEnabled, label, tooltip } = useGoLiveSettings().extend(
@@ -13,12 +13,16 @@ export default function OptimizedProfileSwitcher() {
       const actions = VideoEncodingOptimizationService.actions;
 
       return {
-        state: injectLoading(),
 
-        async load() {
+        state: injectState({
+          isLoading: true,
+        }),
+
+        async init() {
           // TODO reload on game change
           const optimizedProfile = await actions.return.fetchOptimizedProfile(settings.game);
           settings.updateSettings({ optimizedProfile });
+          this.state.setIsLoading(false);
         },
 
         get enabled() {
