@@ -25,7 +25,6 @@
         <nicolive-area />
       </div>
     </div>
-    <bottom-line />
   </div>
 </template>
 
