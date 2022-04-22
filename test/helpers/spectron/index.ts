@@ -8,14 +8,16 @@ import { getUser, logOut } from './user';
 import { sleep } from '../sleep';
 
 import {
-  ITestStats, killElectronInstances,
+  ITestStats,
+  killElectronInstances,
   removeFailedTestFromFile,
   saveFailedTestsToFile,
   saveTestStatsToFile,
-  testFn, waitForElectronInstancesExist,
+  testFn,
+  waitForElectronInstancesExist,
 } from './runner-utils';
 import { skipOnboarding } from '../modules/onboarding';
-import { closeWindow, focusChild, focusMain, waitForLoader } from '../modules/core';
+import { closeWindow, focusChild, focusMain, getClient, waitForLoader } from '../modules/core';
 import { clearCollections } from '../modules/api/scenes';
 export const test = testFn; // the overridden "test" function
 
@@ -119,6 +121,13 @@ export function skipCheckingErrorsInLog() {
   skipCheckingErrorsInLogFlag = true;
 }
 
+export async function debugPause() {
+  await getClient().execute(
+    "(() => { var _elec = require('electron'); _elec.ipcRenderer.send('openDevTools'); })();",
+  );
+  await new Promise(() => {});
+}
+
 export function useSpectron(options: ITestRunnerOptions = {}) {
   // tslint:disable-next-line:no-parameter-reassignment TODO
   options = Object.assign({}, DEFAULT_OPTIONS, options);
@@ -213,7 +222,6 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
     try {
       await closeWindow('main');
       await waitForElectronInstancesExist();
-
 
       await app.chromeDriver.stop();
     } catch (e: unknown) {

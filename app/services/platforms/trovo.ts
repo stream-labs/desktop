@@ -31,6 +31,7 @@ interface ITrovoChannelInfo {
   category_name: string;
   stream_key: string;
   current_viewers: number;
+  followers: number;
 }
 
 interface ITrovoUserInfo {
@@ -187,6 +188,10 @@ export class TrovoService
 
   async fetchViewerCount(): Promise<number> {
     return (await this.fetchChannelInfo()).current_viewers;
+  }
+
+  async fetchFollowers(): Promise<number> {
+    return (await this.fetchChannelInfo()).followers;
   }
 
   get streamPageUrl() {

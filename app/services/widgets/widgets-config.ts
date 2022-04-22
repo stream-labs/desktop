@@ -6,7 +6,8 @@ export type TWidgetType =
   | WidgetType.AlertBox
   | WidgetType.ViewerCount
   | WidgetType.GameWidget
-  | WidgetType.EmoteWall;
+  | WidgetType.EmoteWall
+  | WidgetType.DonationTicker;
 
 export interface IWidgetConfig {
   type: TWidgetType;
@@ -185,9 +186,30 @@ export function getWidgetsConfig(host: string, token: string): Record<TWidgetTyp
     //
     // },
 
-    // DonationTicker: {
-    //
-    //  },
+    [WidgetType.DonationTicker]: {
+      type: WidgetType.DonationTicker,
+
+      defaultTransform: {
+        width: 600,
+        height: 200,
+        x: 1,
+        y: 1,
+        anchor: AnchorPoint.SouthEast,
+      },
+
+      settingsWindowSize: {
+        width: 600,
+        height: 900,
+      },
+
+      url: `https://${host}/widgets/donation-ticker?token=${token}`,
+      previewUrl: `https://${host}/widgets/donation-ticker?token=${token}&simulate=1`,
+      dataFetchUrl: `https://${host}/api/v5/slobs/widget/ticker`,
+      settingsSaveUrl: `https://${host}/api/v5/slobs/widget/ticker`,
+      settingsUpdateEvent: 'donationTickerSettingsUpdate',
+      customCodeAllowed: true,
+      customFieldsAllowed: true,
+    },
 
     // EventList: {
     //

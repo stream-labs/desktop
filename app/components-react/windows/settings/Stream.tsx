@@ -239,9 +239,10 @@ export function StreamSettings() {
           <CustomDestinationList />
 
           {canEditSettings && (
-            <div>
+            <p>
+              <br />
               <a onClick={disableProtectedMode}>{$t('Stream to custom ingest')}</a>
-            </div>
+            </p>
           )}
         </div>
       )}
