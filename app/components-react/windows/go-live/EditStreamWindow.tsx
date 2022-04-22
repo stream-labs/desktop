@@ -6,7 +6,7 @@ import { Services } from '../../service-provider';
 import React from 'react';
 import { $t } from '../../../services/i18n';
 import GoLiveChecklist from './GoLiveChecklist';
-import Form, { useForm } from '../../shared/inputs/Form';
+import Form from '../../shared/inputs/Form';
 import Animation from 'rc-animate';
 import { SwitchInput } from '../../shared/inputs';
 import { useGoLiveSettingsRoot } from './useGoLiveSettings';
@@ -85,7 +85,7 @@ export default function EditStreamWindow() {
   return (
     <ModalLayout footer={renderFooter()}>
       <Form
-        form={form!}
+        form={form}
         style={{ position: 'relative', height: '100%' }}
         layout="horizontal"
         name="editStreamForm"

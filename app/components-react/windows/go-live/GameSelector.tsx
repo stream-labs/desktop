@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import {
   getPlatformService,
   IGame,
@@ -35,16 +35,6 @@ export default function GameSelector(p: TProps) {
   function fetchGames(query: string): Promise<IGame[]> {
     return platformService.searchGames(query);
   }
-
-  // const { s, updateState } = useFormState(() => {
-  //   return {
-  //     games: selectedGameId
-  //       ? [{ label: selectedGameName, value: selectedGameId }]
-  //       : ([] as IListOption<string>[]),
-  //   };
-  // });
-  //
-  // const [isSearching, setIsSearching] = useState(false);
 
   useEffect(() => {
     loadImageForSelectedGame();
