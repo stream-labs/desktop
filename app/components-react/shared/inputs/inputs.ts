@@ -3,7 +3,8 @@
  */
 import React, { useEffect, useContext, ChangeEvent, FocusEvent, useCallback, useRef } from 'react';
 import { FormContext } from './Form';
-import { useDebounce, useOnCreate, useForceUpdate } from '../../hooks';
+import { useDebounce } from '../../hooks';
+import { useOnCreate, useForceUpdate } from 'slap';
 import uuid from 'uuid';
 import { FormItemProps } from 'antd/lib/form';
 import { CheckboxChangeEvent } from 'antd/lib/checkbox';

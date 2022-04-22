@@ -1,7 +1,7 @@
 import styles from './GoLive.m.less';
 import { ModalLayout } from '../../shared/ModalLayout';
 import { Button } from 'antd';
-import { useOnCreate } from '../../hooks';
+import { useOnCreate } from 'slap';
 import { Services } from '../../service-provider';
 import React from 'react';
 import { $t } from '../../../services/i18n';

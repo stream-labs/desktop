@@ -1,11 +1,10 @@
-import React, {FC, useEffect, useState} from 'react';
-import {useOnCreate, useOnDestroy} from '../../hooks';
+import React, { useEffect, useState } from 'react';
+import { useOnCreate } from 'slap';
 import { ModalLayout } from '../../shared/ModalLayout';
 import { Services } from '../../service-provider';
 import { AlertBox } from '../AlertBox';
 import { AlertBoxModule } from '../useAlertBox';
 import { useWidgetRoot, WidgetModule } from './useWidget';
-import { getDefined } from '../../../util/properties-type-guards';
 // TODO: import other widgets here to avoid merge conflicts
 // BitGoal
 // DonationGoal

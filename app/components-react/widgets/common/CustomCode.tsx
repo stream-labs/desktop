@@ -4,7 +4,7 @@ import { $t } from '../../../services/i18n';
 import { CodeInput, SwitchInput } from '../../shared/inputs';
 import { useWidget, useWidgetRoot } from './useWidget';
 import Form from '../../shared/inputs/Form';
-import { useOnCreate } from '../../hooks';
+import { useOnCreate } from 'slap';
 import { Services } from '../../service-provider';
 import { getDefined } from '../../../util/properties-type-guards';
 import { ModalLayout } from '../../shared/ModalLayout';

@@ -4,7 +4,7 @@ import Utils from '../../../services/utils';
 import { Services } from '../../service-provider';
 import { DEFAULT_CUSTOM_FIELDS } from './CustomFields';
 import { getDefined } from '../../../util/properties-type-guards';
-import {inject, injectState, injectWatch, mutation, useModule} from 'slap';
+import { inject, injectState, injectWatch, mutation, useModule } from 'slap';
 
 type TLang = 'json' | 'js' | 'css' | 'html';
 
@@ -40,12 +40,6 @@ class CodeEditorModule {
     // wait for the WidgetModule to load to get the custom code data from it
 
     injectWatch(() => this.widgetModule.state.isLoading, () => this.reset());
-
-    // watch(
-    //   this,
-    //   () => this.widgetModule.state.isLoading,
-    //   () => this.reset(),
-    // );
   }
 
   /**

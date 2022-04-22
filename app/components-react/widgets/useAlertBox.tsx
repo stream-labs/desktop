@@ -358,10 +358,7 @@ export class AlertBoxModule extends WidgetModule<IAlertBoxState> {
     };
   }
 
-  /**
-   * @override
-   */
-  updateCustomCode(patch: Partial<ICustomCode>) {
+  override updateCustomCode(patch: Partial<ICustomCode>) {
     // save custom code from the selected variation
     const selectedAlert = getDefined(this.selectedAlert);
     const newPatch = cloneDeep(patch) as Partial<ICustomCode> & { custom_html_enabled?: boolean };

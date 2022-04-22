@@ -22,18 +22,8 @@ class LayoutEditorModule {
 
   setCurrentTab(tab: string) {
     this.layoutService.actions.setCurrentTab(tab);
-    this.setCurrentLayout(this.layoutService.state.tabs[tab].currentLayout);
+    this.state.setCurrentLayout(this.layoutService.state.tabs[tab].currentLayout);
     this.setSlottedElements(cloneDeep(this.layoutService.state.tabs[tab].slottedElements));
-  }
-
-  @mutation()
-  setCurrentLayout(layout: ELayout) {
-    this.state.currentLayout = layout;
-  }
-
-  @mutation()
-  setBrowserUrl(url: string) {
-    this.state.browserUrl = url;
   }
 
   @mutation()
@@ -42,12 +32,7 @@ class LayoutEditorModule {
   ) {
     this.state.slottedElements = elements;
     if (!elements[ELayoutElement.Browser]) return;
-    this.setBrowserUrl(elements[ELayoutElement.Browser]?.src || '');
-  }
-
-  @mutation()
-  setShowModal(bool: boolean) {
-    this.state.showModal = bool;
+    this.state.setBrowserUrl(elements[ELayoutElement.Browser]?.src || '');
   }
 
   handleElementDrag(event: React.DragEvent<HTMLDivElement>, el: ELayoutElement) {
