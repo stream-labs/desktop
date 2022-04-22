@@ -270,8 +270,8 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
 
         const isError = !!record.match(/\[error\]/);
 
-        if (isError && !ignoringErrors) {
-          return true;
+        if (isError) {
+          return !ignoringErrors;
         } else {
           ignoringErrors = false;
           return false;
