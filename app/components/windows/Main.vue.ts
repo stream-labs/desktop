@@ -9,7 +9,6 @@ import { WindowSizeService } from 'services/window-size';
 import { WindowsService } from 'services/windows';
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
-import BottomLine from '../BottomLine.vue';
 import CustomLoader from '../CustomLoader.vue';
 import NicoliveArea from '../nicolive-area/NicoliveArea.vue';
 import Onboarding from '../pages/Onboarding.vue';
@@ -29,7 +28,6 @@ import TitleBar from '../TitleBar.vue';
     CustomLoader,
     PatchNotes,
     NicoliveArea,
-    BottomLine,
   },
 })
 export default class Main extends Vue {
