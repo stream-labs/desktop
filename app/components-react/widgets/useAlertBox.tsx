@@ -1,7 +1,7 @@
 import {
   createAlertsMap,
   ICustomCode,
-  IWidgetCommonState, IWidgetState,
+  IWidgetState,
   useWidget,
   WidgetModule,
 } from './common/useWidget';
@@ -11,7 +11,6 @@ import { createBinding } from '../shared/inputs';
 import { Services } from '../service-provider';
 import { metadata } from '../shared/inputs/metadata';
 import { $t } from '../../services/i18n';
-import * as electron from 'electron';
 import { getDefined } from '../../util/properties-type-guards';
 import { TPlatform } from '../../services/platforms';
 import * as remote from '@electron/remote';
@@ -143,10 +142,9 @@ export class AlertBoxModule extends WidgetModule<IAlertBoxState> {
   }
 
   /**
-   * @override
    * Patch and sanitize the AlertBox settings after fetching data from the server
    */
-  protected patchAfterFetch(data: any): any {
+  protected override patchAfterFetch(data: any): any {
     const settings = data.settings;
 
     // sanitize general settings
@@ -182,10 +180,7 @@ export class AlertBoxModule extends WidgetModule<IAlertBoxState> {
     return data;
   }
 
-  /**
-   * @override
-   */
-  setData(data: IAlertBoxState['data']) {
+  override setData(data: IAlertBoxState['data']) {
     // save widget data instate and calculate additional state variables
     super.setData(data);
     const settings = data.settings;
@@ -335,10 +330,7 @@ export class AlertBoxModule extends WidgetModule<IAlertBoxState> {
     return null;
   }
 
-  /**
-   * @override
-   */
-  get customCode() {
+  override get customCode() {
     // get custom code from the selected variation
     if (!this.selectedAlert) return null;
     const variationSettings = this.getVariationSettings(this.selectedAlert);

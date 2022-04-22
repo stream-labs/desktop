@@ -11,14 +11,11 @@ import { alertAsync } from '../../modals';
 import { onUnload } from 'util/unload';
 import merge from 'lodash/merge';
 import {
-  GetUseComponentViewResult,
   GetUseModuleResult,
   injectState,
-  TStateFor,
   useModule,
 } from 'slap';
-import { GetModuleInstanceFor } from 'slap/lib/scope/index';
-import {IWidgetConfig} from "../../../services/widgets/widgets-config";
+import { IWidgetConfig } from '../../../services/widgets/widgets-config';
 
 /**
  * Common state for all widgets
@@ -90,15 +87,6 @@ export class WidgetModule<TWidgetState extends IWidgetState = IWidgetState> {
 
   // init module
   async init() {
-    // const params = this.params;
-    // // init state from params
-    // this.state.sourceId = params.sourceId;
-    // if (params.shouldCreatePreviewSource === false) {
-    //   this.state.shouldCreatePreviewSource = false;
-    // }
-    // if (params.selectedTab) {
-    //   this.state.selectedTab = params.selectedTab;
-    // }
 
     // save browser source settings into store
     const widget = this.widget;
