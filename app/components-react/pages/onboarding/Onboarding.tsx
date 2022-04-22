@@ -154,6 +154,8 @@ export class OnboardingModule {
 
   @mutation()
   next(isSkip = false) {
+    if (this.state.processing) return;
+
     if (
       this.ReocrdingModeService.views.isRecordingModeEnabled &&
       this.currentStep.component === 'HardwareSetup' &&
@@ -162,8 +164,6 @@ export class OnboardingModule {
     ) {
       this.ReocrdingModeService.actions.addRecordingWebcam();
     }
-
-    if (this.state.processing) return;
 
     if (this.state.stepIndex >= this.steps.length - 1 || this.singletonStep) {
       return this.finish();

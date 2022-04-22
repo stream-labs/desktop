@@ -6,6 +6,8 @@ import { ScenesService } from './scenes';
 import { EObsSimpleEncoder, SettingsService } from './settings';
 import { AnchorPoint, ScalableRectangle } from 'util/ScalableRectangle';
 import { VideoService } from './video';
+import { DefaultHardwareService } from './hardware';
+import { RunInLoadingMode } from './app/app-decorators';
 
 interface IRecordingModeState {
   enabled: boolean;
@@ -23,6 +25,7 @@ export class RecordingModeService extends PersistentStatefulService<IRecordingMo
   @Inject() private settingsService: SettingsService;
   @Inject() private sourcesService: SourcesService;
   @Inject() private videoService: VideoService;
+  @Inject() private defaultHardwareService: DefaultHardwareService;
 
   static defaultState: IRecordingModeState = {
     enabled: false,
@@ -70,14 +73,22 @@ export class RecordingModeService extends PersistentStatefulService<IRecordingMo
    * This is only done after hardware setup so that we apply the
    * correct webcam and preset filter.
    */
-  addRecordingWebcam() {
+  @RunInLoadingMode()
+  async addRecordingWebcam() {
+    // Force clearing of temporary sources
+    this.defaultHardwareService.clearTemporarySources();
+
+    // This gives the backend time to release exclusive rights to the webcam
+    // TODO: This really shouldn't be required to be a race condition.
+    await new Promise(r => {
+      setTimeout(r, 2000);
+    });
+
     // TODO: Mac
-    console.log('CREATING WEBCAM');
     const item = this.scenesService.views.activeScene.createAndAddSource('Webcam', 'dshow_input');
 
     let sub = this.sourcesService.sourceUpdated.subscribe(s => {
       if (s.sourceId === item.source.sourceId && s.width && s.height) {
-        console.log('GOT WEBCAM SIZE', s.width, s.height);
         sub.unsubscribe();
         sub = null;
 
