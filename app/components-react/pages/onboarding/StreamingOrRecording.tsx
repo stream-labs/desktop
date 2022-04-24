@@ -7,12 +7,15 @@ import styles from './StreamingOrRecording.m.less';
 import { OnboardingModule } from './Onboarding';
 import cx from 'classnames';
 import { confirmAsync } from 'components-react/modals';
+import { Services } from 'components-react/service-provider';
 
 export function StreamingOrRecording() {
   const { next, setRecordingMode } = useModule(OnboardingModule).select();
   const [active, setActive] = useState<'streaming' | 'recording' | null>(null);
 
   async function onContinue() {
+    if (!active) return;
+
     if (active === 'recording') {
       const result = await confirmAsync({
         title: $t('Streamlabs will be optimized for recording'),
@@ -30,6 +33,8 @@ export function StreamingOrRecording() {
 
       setRecordingMode();
     }
+
+    Services.UsageStatisticsService.recordClick('StreamingOrRecording', active);
 
     next();
   }
