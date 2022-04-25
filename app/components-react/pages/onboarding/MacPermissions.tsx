@@ -47,7 +47,7 @@ export function MacPermissions() {
       <button
         className="button button--action"
         style={{ float: 'right' }}
-        onClick={next}
+        onClick={() => next()}
         disabled={!permissions.webcamPermission || !permissions.micPermission}
       >
         {$t('Continue')}

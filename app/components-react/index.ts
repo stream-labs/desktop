@@ -71,7 +71,7 @@ export const components = {
   SharedComponentsLibrary: createRoot(SharedComponentsLibrary),
   TestWidgets,
   RenameSource,
-  StudioFooter,
+  StudioFooter: createRoot(StudioFooter),
   StartStreamingButton,
   NotificationsArea,
   ObsSettings: createRoot(ObsSettings),
