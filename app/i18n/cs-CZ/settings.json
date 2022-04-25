@@ -156,5 +156,6 @@
   "The diagnostic report was securely uploaded, and the Report ID below has been copied to your clipboard. Please provide the Report ID to the Streamlabs Streamer Success Team.": "Diagnostická zpráva byla bezpečně odeslána a ID zprávy níže bylo zkopírováno do schránky. ID zprávy poskytněte týmu služby Streamlabs Streamer Success.",
   "Chat Settings": "Nastavení chatu",
   "Text Size": "Velikost textu",
-  "Show announcements for new Streamlabs features and products": "Zobrazit oznámení pro nové funkce a produkty Streamlabs"
+  "Show announcements for new Streamlabs features and products": "Zobrazit oznámení pro nové funkce a produkty Streamlabs",
+  "Disable live streaming features (Recording Only mode)": "Disable live streaming features (Recording Only mode)"
 }
