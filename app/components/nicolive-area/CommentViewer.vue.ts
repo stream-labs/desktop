@@ -19,6 +19,7 @@ import NicoadComment from './comment/NicoadComment.vue';
 import EmotionComment from './comment/EmotionComment.vue';
 import { ChatComponentType } from 'services/nicolive-program/ChatMessage/ChatComponentType';
 import { CustomizationService } from 'services/customization';
+import NAirLogo from '../../../media/images/n-air-logo.svg';
 
 const componentMap: { [type in ChatComponentType]: Vue.Component } = {
   common: CommonComment,
@@ -38,6 +39,7 @@ const componentMap: { [type in ChatComponentType]: Vue.Component } = {
     GiftComment,
     EmotionComment,
     SystemMessage,
+    NAirLogo,
   },
 })
 export default class CommentViewer extends Vue {
