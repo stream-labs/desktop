@@ -14,7 +14,7 @@
   "Developer": "Fejlesztő",
   "Face Masks": "Arc Maszkok",
   "Night mode": "Éjszakai mód",
-  "Game Overlay": "Game Overlay",
+  "Game Overlay": "Játékon belüli átfedés",
   "Installed Apps": "Telepített alkalmazások",
   "Deleting your cache directory will cause you to lose some settings. Do not delete your cache directory unless instructed to do so by a Streamlabs staff member": "A gyorsítótár könyvtár törlése egyes beállítások elvesztésével jár. Csak akkor törölje a gyorsítótár-könyvtárat, ha a Streamlabs munkatársa erre utasítja",
   "Show Cache Directory": "Cache Könyvtár Megjelenítése",
@@ -88,7 +88,7 @@
   "Navigate to Live tab when going live": "Nyissa meg az Élő fület, amikor élőben jelenik meg",
   "Save Replay": "Visszajátszás Mentése",
   "Disable hardware acceleration": "Disable hardware acceleration",
-  "Replay Buffer": "Replay Buffer",
+  "Replay Buffer": "Replay puffer",
   "Streaming to %{platformName}": "Streaming to %{platformName}",
   "Stream to custom ingest": "Stream to custom ingest",
   "Use recommended settings": "Use recommended settings",
@@ -156,5 +156,6 @@
   "The diagnostic report was securely uploaded, and the Report ID below has been copied to your clipboard. Please provide the Report ID to the Streamlabs Streamer Success Team.": "The diagnostic report was securely uploaded, and the Report ID below has been copied to your clipboard. Please provide the Report ID to the Streamlabs Streamer Success Team.",
   "Chat Settings": "Chat beállítások",
   "Text Size": "Szövegméret",
-  "Show announcements for new Streamlabs features and products": "Show announcements for new Streamlabs features and products"
+  "Show announcements for new Streamlabs features and products": "Show announcements for new Streamlabs features and products",
+  "Disable live streaming features (Recording Only mode)": "Disable live streaming features (Recording Only mode)"
 }
