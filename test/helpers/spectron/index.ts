@@ -249,13 +249,33 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
     await sleep(1000); // electron-log needs some time to write down logs
     const logs: string = await readLogs();
     lastLogs = logs;
+    let ignoringErrors = false;
     const errors = logs
       .slice(logFileLastReadingPos)
       .split('\n')
       .filter((record: string) => {
         // This error is outside our control and can be ignored.
         // See: https://stackoverflow.com/questions/49384120/resizeobserver-loop-limit-exceeded
-        return record.match(/\[error\]/) && !record.match(/ResizeObserver loop limit exceeded/);
+        if (record.match(/ResizeObserver loop limit exceeded/)) {
+          return false;
+        }
+
+        // This error is related to a bug in `useModule` and this check should be removed
+        // after we fix it in the new `useModule`
+        if (record.match(/while rendering a different component/)) {
+          // Ignore errors until we encouter the next thing that isn't an error
+          ignoringErrors = true;
+          return false;
+        }
+
+        const isError = !!record.match(/\[error\]/);
+
+        if (isError) {
+          return !ignoringErrors;
+        } else {
+          ignoringErrors = false;
+          return false;
+        }
       });
 
     // save the last reading position, to skip already read records next time
