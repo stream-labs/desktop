@@ -156,5 +156,6 @@
   "The diagnostic report was securely uploaded, and the Report ID below has been copied to your clipboard. Please provide the Report ID to the Streamlabs Streamer Success Team.": "診斷報告已成功上傳，下方的報告 ID 已複製到您的剪貼簿。請將報告 ID 提供給 Streamlabs Streamer Success 團隊。",
   "Chat Settings": "聊天設定",
   "Text Size": "文字大小",
-  "Show announcements for new Streamlabs features and products": "顯示新 Streamlabs 功能與產品的公告"
+  "Show announcements for new Streamlabs features and products": "顯示新 Streamlabs 功能與產品的公告",
+  "Disable live streaming features (Recording Only mode)": "Disable live streaming features (Recording Only mode)"
 }
