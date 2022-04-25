@@ -7,7 +7,7 @@ import { AudioService } from 'app-services';
 /**
  * list of encoders for simple mode
  */
-enum EObsSimpleEncoder {
+export enum EObsSimpleEncoder {
   x264 = 'x264',
   x264_lowcpu = 'x264_lowcpu',
   nvenc = 'nvenc',

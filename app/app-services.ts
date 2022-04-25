@@ -55,6 +55,7 @@ export { VirtualWebcamService } from 'services/virtual-webcam';
 export { MetricsService } from 'services/metrics';
 export { HighlighterService } from 'services/highlighter';
 export { DiagnosticsService } from 'services/diagnostics';
+export { RecordingModeService } from 'services/recording-mode';
 
 // ONLINE SERVICES
 export { UserService } from './services/user';
@@ -168,6 +169,7 @@ import { DefaultHardwareService } from 'services/hardware';
 import { AutoConfigService } from 'services/auto-config';
 import { MacPermissionsService } from 'services/mac-permissions';
 import { IncrementalRolloutService } from './services/incremental-rollout';
+import { RecordingModeService } from 'services/recording-mode';
 
 export const AppServices = {
   AppService,
@@ -225,4 +227,5 @@ export const AppServices = {
   AutoConfigService,
   MacPermissionsService,
   IncrementalRolloutService,
+  RecordingModeService,
 };

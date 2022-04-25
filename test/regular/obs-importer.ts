@@ -6,7 +6,13 @@ import { WidgetsService } from '../../app/services/widgets';
 import { EWidgetType } from '../helpers/widget-helpers';
 import { FormMonkey } from '../helpers/form-monkey';
 import { ExecutionContext } from 'ava';
-import { click, focusChild, focusMain, waitForDisplayed } from '../helpers/modules/core';
+import {
+  click,
+  focusChild,
+  focusMain,
+  isDisplayed,
+  waitForDisplayed,
+} from '../helpers/modules/core';
 import { logIn } from '../helpers/spectron/user';
 import { sleep } from '../helpers/sleep';
 
@@ -38,6 +44,10 @@ test('OBS Importer', async t => {
   skipCheckingErrorsInLog();
 
   const client = t.context.app.client;
+
+  if (!(await isDisplayed('h2=Live Streaming'))) return;
+  await click('h2=Live Streaming');
+  await click('button=Continue');
 
   await logIn(t, 'twitch', { prime: false }, false, true);
   await sleep(1000);

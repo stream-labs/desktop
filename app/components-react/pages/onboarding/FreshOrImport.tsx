@@ -42,7 +42,7 @@ export function FreshOrImport() {
         <SvgBackground />
         <img src={$i('images/onboarding/splash.png')} />
       </div>
-      <h1 className={styles.title}>{$t('Welcome to Streamlabs')}</h1>
+      <h1 className={styles.title}>{$t('1-Click Import from OBS')}</h1>
       <div className={styles.optionContainer}>
         {optionsMetadata.map(data => (
           <Tooltip title={data.description} placement="bottom" key={data.title}>
