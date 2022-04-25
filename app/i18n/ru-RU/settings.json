@@ -156,5 +156,6 @@
   "The diagnostic report was securely uploaded, and the Report ID below has been copied to your clipboard. Please provide the Report ID to the Streamlabs Streamer Success Team.": "Отчет о диагностике загружен успешно, а ID отчета скопирован в буфер обмена. Пожалуйста, предоставьте этот ID команде поддержки стримеров Streamlabs.",
   "Chat Settings": "Настройки чата",
   "Text Size": "Размер текста",
-  "Show announcements for new Streamlabs features and products": "Показывать оповещения о новых функциях и продуктах Streamlabs"
+  "Show announcements for new Streamlabs features and products": "Показывать оповещения о новых функциях и продуктах Streamlabs",
+  "Disable live streaming features (Recording Only mode)": "Disable live streaming features (Recording Only mode)"
 }
