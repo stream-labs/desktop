@@ -149,7 +149,9 @@ export default function StudioFooterComponent() {
       <div className={styles.navRight}>
         <div className={styles.navItem}>{isLoggedIn && <TestWidgets />}</div>
         {recordingModeEnabled && (
-          <button className="button button--trans" onClick={showRecordingModeDisableModal}>{$t('Looking to stream?')}</button>
+          <button className="button button--trans" onClick={showRecordingModeDisableModal}>
+            {$t('Looking to stream?')}
+          </button>
         )}
         {!recordingModeEnabled && <RecordingButton />}
         {replayBufferEnabled && replayBufferOffline && (
@@ -289,7 +291,10 @@ class FooterModule {
   }
 
   get canSchedule() {
-    return Services.StreamingService.views.supports('stream-schedule');
+    return (
+      Services.StreamingService.views.supports('stream-schedule') &&
+      !Services.RecordingModeService.views.isRecordingModeEnabled
+    );
   }
 
   get replayBufferOffline() {
