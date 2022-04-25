@@ -156,5 +156,6 @@
   "The diagnostic report was securely uploaded, and the Report ID below has been copied to your clipboard. Please provide the Report ID to the Streamlabs Streamer Success Team.": "진단 보고서가 안전하게 업로드되었으며 아래 보고서 ID가 클립보드에 복사되었습니다. Streamlabs 스트리머 성공팀에 보고서 ID를 알려주세요.",
   "Chat Settings": "채팅 설정",
   "Text Size": "텍스트 사이즈",
-  "Show announcements for new Streamlabs features and products": "신규 Streamlabs 기능 및 제품 알림 표시"
+  "Show announcements for new Streamlabs features and products": "신규 Streamlabs 기능 및 제품 알림 표시",
+  "Disable live streaming features (Recording Only mode)": "Disable live streaming features (Recording Only mode)"
 }
