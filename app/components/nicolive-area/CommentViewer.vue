@@ -61,7 +61,7 @@
           <i :class="speakingEnabled ? 'icon-speaker' : 'icon-mute'"></i>
         </button>
       </div>
-      <div class="created-notice">
+      <div class="created-notice" v-if="showProgramCreatedNotice">
         <NAirLogo class="created-notice-logo" aria-hidden="true" />
         <div class="created-notice-body">
           <p class="created-notice-large">番組の作成に成功しました！</p>
@@ -242,7 +242,7 @@
   width: calc(100% - 32px);
   .radius;
   .shadow;
-  background-color: var(--color-bg-primary);
+  background-color: var(--color-bg-quaternary);
   padding: 8px 12px;
 }
 
