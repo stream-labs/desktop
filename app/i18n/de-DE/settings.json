@@ -156,5 +156,6 @@
   "The diagnostic report was securely uploaded, and the Report ID below has been copied to your clipboard. Please provide the Report ID to the Streamlabs Streamer Success Team.": "Der Diagnostic Report wurde gesichert hochgeladen und die unten stehende Report-ID wurde in deine Zwischenablage kopiert. Bitte teile dem Streamlabs Streamer Success Team die Report-ID mit.",
   "Chat Settings": "Chat-Einstellungen",
   "Text Size": "Schriftgröße",
-  "Show announcements for new Streamlabs features and products": "Ankündigungen für neue Streamlabs Funktionen und Produkte anzeigen"
+  "Show announcements for new Streamlabs features and products": "Ankündigungen für neue Streamlabs Funktionen und Produkte anzeigen",
+  "Disable live streaming features (Recording Only mode)": "Disable live streaming features (Recording Only mode)"
 }
