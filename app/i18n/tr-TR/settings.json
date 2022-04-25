@@ -156,5 +156,6 @@
   "The diagnostic report was securely uploaded, and the Report ID below has been copied to your clipboard. Please provide the Report ID to the Streamlabs Streamer Success Team.": "Tanılama raporu güvenli bir şekilde yüklendi ve aşağıdaki Rapor Kimliği panonuza kopyalandı. Lütfen Rapor Kimliği’ni Streamlabs Streamer Success Ekibi’ne gönderin.",
   "Chat Settings": "Sohbet Ayarları",
   "Text Size": "Metin Boyutu",
-  "Show announcements for new Streamlabs features and products": "Yeni Streamlabs özellikleri ve ürünlerine yönelik duyuruları gösterin"
+  "Show announcements for new Streamlabs features and products": "Yeni Streamlabs özellikleri ve ürünlerine yönelik duyuruları gösterin",
+  "Disable live streaming features (Recording Only mode)": "Disable live streaming features (Recording Only mode)"
 }
