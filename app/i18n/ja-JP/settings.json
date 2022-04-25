@@ -156,5 +156,6 @@
   "The diagnostic report was securely uploaded, and the Report ID below has been copied to your clipboard. Please provide the Report ID to the Streamlabs Streamer Success Team.": "診断レポートが安全にアップロードされ、以下のレポート ID がクリップボードにコピーされました。レポート ID を Streamlabs Streamer Success チームに伝えてください。",
   "Chat Settings": "チャット設定",
   "Text Size": "テキストサイズ",
-  "Show announcements for new Streamlabs features and products": "Streamlabs の新機能と新製品に関する通知を表示します"
+  "Show announcements for new Streamlabs features and products": "Streamlabs の新機能と新製品に関する通知を表示します",
+  "Disable live streaming features (Recording Only mode)": "Disable live streaming features (Recording Only mode)"
 }
