@@ -24,7 +24,7 @@ class SourceShowcaseModule {
   state = {
     inspectedSource: (Services.UserService.views.isLoggedIn
       ? 'AlertBox'
-      : 'screen_capture') as TInspectableSource,
+      : 'ffmpeg_source') as TInspectableSource,
     inspectedAppId: '',
     inspectedAppSourceId: '',
   };
@@ -53,7 +53,6 @@ class SourceShowcaseModule {
 
   @mutation()
   inspectSource(source: string, appId?: string, appSourceId?: string) {
-    console.log(source);
     this.state.inspectedSource = source;
     this.state.inspectedAppId = appId || '';
     this.state.inspectedAppSourceId = appSourceId || '';
