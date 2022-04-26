@@ -36,6 +36,7 @@ import {
   Projector,
   AddSource,
   News,
+  WelcomeToPrime,
 } from 'components/shared/ReactComponentList';
 
 import SourcePropertiesDeprecated from 'components/windows/SourceProperties.vue';
@@ -50,7 +51,6 @@ import EditTransform from 'components/windows/EditTransform';
 import EventFilterMenu from 'components/windows/EventFilterMenu';
 import OverlayPlaceholder from 'components/windows/OverlayPlaceholder';
 import BrowserSourceInteraction from 'components/windows/BrowserSourceInteraction';
-import WelcomeToPrime from 'components/windows/WelcomeToPrime';
 
 import BitGoal from 'components/widgets/goal/BitGoal';
 import DonationGoal from 'components/widgets/goal/DonationGoal';

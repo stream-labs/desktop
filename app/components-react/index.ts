@@ -44,6 +44,7 @@ import Projector from './windows/Projector';
 import SceneSelector from './editor/elements/SceneSelectorElement';
 import AddSource from './windows/AddSource';
 import SideNav from './sidebar/SideNav';
+import WelcomeToPrime from './windows/WelcomeToPrime';
 
 // list of React components to be used inside Vue components
 export const components = {
@@ -92,4 +93,5 @@ export const components = {
   SceneSelector: createRoot(SceneSelector),
   AddSource,
   SideNav,
+  WelcomeToPrime,
 };
