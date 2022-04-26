@@ -22,7 +22,7 @@ type TInspectableSource = TSourceType | WidgetType | 'streamlabel' | 'app_source
  */
 class SourceShowcaseModule {
   state = {
-    inspectedSource: '' as TInspectableSource,
+    inspectedSource: 'AlertBox' as TInspectableSource,
     inspectedAppId: '',
     inspectedAppSourceId: '',
   };
