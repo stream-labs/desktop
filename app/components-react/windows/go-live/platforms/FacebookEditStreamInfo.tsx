@@ -47,9 +47,7 @@ class FacebookEditStreamInfoModule {
   pages = this.fbState.facebookPages;
   groups = this.fbState.facebookGroups;
   isPrimary = this.streamingService.views.isPrimaryPlatform('facebook');
-  isUpdateMode = false;
   isScheduleMode = false;
-  layoutMode = 'singlePlatform' as TLayoutMode;
   props: IPlatformComponentParams<'facebook'>;
 
   get settings() {
@@ -58,8 +56,6 @@ class FacebookEditStreamInfoModule {
 
   setProps(props: IPlatformComponentParams<'facebook'>) {
     this.props = props;
-    this.isUpdateMode = !!props.isUpdateMode;
-    this.isScheduleMode = !!props.isScheduleMode;
     if (!this.state.scheduledVideosLoaded) this.loadScheduledBroadcasts();
     if (this.settings.pageId) this.loadPicture(this.settings.pageId);
     if (this.settings.groupId) this.loadPicture(this.settings.groupId);
@@ -78,13 +74,13 @@ class FacebookEditStreamInfoModule {
       newFbSettings => this.updateSettings(newFbSettings),
   );
 
-  // get layoutMode() {
-  //   return this.props.layoutMode;
-  // }
-  //
-  // get isUpdateMode() {
-  //   return this.props.isUpdateMode;
-  // }
+  get layoutMode() {
+    return this.props.layoutMode;
+  }
+
+  get isUpdateMode() {
+    return this.props.isUpdateMode;
+  }
 
   get shouldShowGamingWarning() {
     return this.pages.length && this.settings.game;

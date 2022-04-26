@@ -15,9 +15,7 @@ type TCommonFieldName = 'title' | 'description';
 export type TModificators = { isUpdateMode?: boolean; isScheduleMode?: boolean };
 export type IGoLiveSettingsState = IGoLiveSettings & TModificators & { needPrepopulate: boolean };
 
-
 class GoLiveSettingsState extends StreamInfoView<IGoLiveSettingsState> {
-
   state: IGoLiveSettingsState = {
     optimizedProfile: undefined,
     tweetText: '',
@@ -96,6 +94,11 @@ class GoLiveSettingsState extends StreamInfoView<IGoLiveSettingsState> {
     });
   }
 
+  get isLoading() {
+    const state = this.state;
+    return state.needPrepopulate || this.getViewFromState(state).isLoading;
+  }
+
   getView() {
     return this;
   }
@@ -104,8 +107,6 @@ class GoLiveSettingsState extends StreamInfoView<IGoLiveSettingsState> {
     return new StreamInfoView(state);
   }
 }
-
-
 
 /**
  * Extend GoLiveSettingsModule from StreamInfoView
@@ -116,7 +117,6 @@ export class GoLiveSettingsModule {
   state = injectState(GoLiveSettingsState);
 
   constructor(public form: FormInstance, public isUpdateMode: boolean) {}
-
 
   // initial setup
   async init() {
@@ -135,6 +135,7 @@ export class GoLiveSettingsModule {
    */
   async prepopulate() {
     const { StreamingService } = Services;
+    this.state.setNeedPrepopulate(true);
     await StreamingService.actions.return.prepopulateInfo();
     // TODO investigate mutation order issue
     await new Promise(r => setTimeout(r, 100));

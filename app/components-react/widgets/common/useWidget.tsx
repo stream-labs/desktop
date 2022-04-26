@@ -108,7 +108,6 @@ export class WidgetModule<TWidgetState extends IWidgetState = IWidgetState> {
     this.state.setIsLoading(false);
   }
 
-  // de-init module
   destroy() {
     if (this.state.previewSourceId) this.widget.destroyPreviewSource();
     this.cancelUnload();

@@ -30,7 +30,6 @@ export function DemoForm() {
     addIntroduction,
     setSearchStr,
   } = useSharedComponentsLibrary().extend(module => {
-
     const formState = injectState({
       name: '',
       gender: '',
@@ -44,15 +43,12 @@ export function DemoForm() {
       confirm1: false,
       confirm2: false,
       saveFilePath: '',
-
       searchStr: '',
     });
 
-
-    const citiesQuery = injectQuery([], () => fetchCities(formState.searchStr), () => formState.searchStr);
+    const citiesQuery = injectQuery(fetchCities, () => formState.searchStr);
 
     return {
-
       formState,
       citiesQuery,
 
@@ -73,7 +69,6 @@ export function DemoForm() {
 
   const bind = formState.bind;
 
-
   return (
     <Form layout={layout} name="demo-form">
       <Example title="Demo Form">
@@ -83,7 +78,7 @@ export function DemoForm() {
         <ListInput
           {...bind.city}
           label={'City'}
-          placeholder='Start typing for search'
+          placeholder="Start typing for search"
           options={citiesQuery.data}
           showSearch
           onSearch={search => setSearchStr(search)}
@@ -107,8 +102,8 @@ async function fetchCities(searchStr: string) {
   const availableCities = ['Tokyo', 'Delhi', 'Shanghai', 'MexicoCity', 'Cairo'];
   await Utils.sleep(1000);
   if (!searchStr) return [];
-  const cities = availableCities.filter(
-    cityName => cityName.toLowerCase().startsWith(searchStr.toLowerCase()),
+  const cities = availableCities.filter(cityName =>
+    cityName.toLowerCase().startsWith(searchStr.toLowerCase()),
   );
   return cities.map(cityName => ({ label: cityName, value: cityName }));
 }

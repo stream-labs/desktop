@@ -4,53 +4,56 @@ import { $t } from '../../../services/i18n';
 import { CheckboxInput } from '../../shared/inputs';
 import { Services } from '../../service-provider';
 import InputWrapper from '../../shared/inputs/InputWrapper';
-import { injectState } from 'slap';
+import { inject, injectQuery } from 'slap';
+import { VideoEncodingOptimizationService } from '../../../app-services';
 
 export default function OptimizedProfileSwitcher() {
-  const { game, isLoading, enabled, setEnabled, label, tooltip } = useGoLiveSettings().extend(
-    settings => {
-      const { VideoEncodingOptimizationService } = Services;
-      const actions = VideoEncodingOptimizationService.actions;
+  const {
+    game,
+    enabled,
+    setEnabled,
+    label,
+    tooltip,
+    optimizedProfileQuery,
+  } = useGoLiveSettings().extend(settings => {
+    const optimizationService = inject(VideoEncodingOptimizationService);
 
-      return {
+    async function fetchProfile(game: string) {
+      const optimizedProfile = await optimizationService.actions.return.fetchOptimizedProfile(game);
+      settings.updateSettings({ optimizedProfile });
+    }
 
-        state: injectState({
-          isLoading: true,
-        }),
+    const optimizedProfileQuery = injectQuery(fetchProfile, () => settings.game);
 
-        async init() {
-          // TODO reload on game change
-          const optimizedProfile = await actions.return.fetchOptimizedProfile(settings.game);
-          settings.updateSettings({ optimizedProfile });
-          this.state.setIsLoading(false);
-        },
+    return {
+      optimizedProfileQuery,
 
-        get enabled() {
-          return VideoEncodingOptimizationService.state.useOptimizedProfile;
-        },
+      get enabled() {
+        return optimizationService.state.useOptimizedProfile;
+      },
 
-        setEnabled(enabled: boolean) {
-          actions.useOptimizedProfile(enabled);
-        },
+      setEnabled(enabled: boolean) {
+        optimizationService.actions.useOptimizedProfile(enabled);
+      },
 
-        tooltip: $t(
-          'Optimized encoding provides better quality and/or lower cpu/gpu usage. Depending on the game, ' +
-            'resolution may be changed for a better quality of experience',
-        ),
+      tooltip: $t(
+        'Optimized encoding provides better quality and/or lower cpu/gpu usage. Depending on the game, ' +
+          'resolution may be changed for a better quality of experience',
+      ),
 
-        get label(): string {
-          return settings.state.optimizedProfile?.game && settings.state.optimizedProfile?.game !== 'DEFAULT'
-            ? $t('Use optimized encoder settings for %{game}', { game })
-            : $t('Use optimized encoder settings');
-        },
-      };
-    },
-  );
+      get label(): string {
+        return settings.state.optimizedProfile?.game &&
+          settings.state.optimizedProfile?.game !== 'DEFAULT'
+          ? $t('Use optimized encoder settings for %{game}', { game })
+          : $t('Use optimized encoder settings');
+      },
+    };
+  });
 
   return (
     <InputWrapper>
-      {isLoading && $t('Checking optimized setting for %{game}', { game })}
-      {!isLoading && (
+      {optimizedProfileQuery.isLoading && $t('Checking optimized setting for %{game}', { game })}
+      {!optimizedProfileQuery.isLoading && (
         <CheckboxInput value={enabled} onChange={setEnabled} label={label} tooltip={tooltip} />
       )}
     </InputWrapper>

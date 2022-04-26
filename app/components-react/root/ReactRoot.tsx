@@ -1,5 +1,5 @@
 import React from 'react';
-import { createApp, injectState, ReactModules } from 'slap';
+import {createApp, inject, injectState, ReactModules, Store, TAppContext} from 'slap';
 import { getResource, StatefulService } from '../../services';
 import { AppServices } from '../../app-services';
 
@@ -24,7 +24,17 @@ class VuexModule {
     },
   });
 
+  store = inject(Store);
+
   init() {
+
+    StatefulService.onStateRead = serviceName => {
+      // integrate tracking Vuex dependencies with ReactModules
+      if (this.store.recordingAccessors) {
+        this.store.affectedModules[serviceName] = this.state.revisions[serviceName];
+      }
+    };
+
     // watch for mutations from the global Vuex store
     // and increment the revision number for affected StatefulService
     StatefulService.store.subscribe(mutation => {
@@ -34,18 +44,29 @@ class VuexModule {
   }
 }
 
+let modulesApp: TAppContext;
+
+function resolveApp() {
+  if (modulesApp) return modulesApp;
+  const app = createApp({ VuexModule });
+  const scope = app.servicesScope;
+  scope.init(VuexModule);
+
+  Object.keys(AppServices).forEach(serviceName => {
+    scope.register(() => getResource(serviceName), serviceName, { shouldCallHooks: false });
+  });
+
+  modulesApp = app;
+  return modulesApp;
+}
+
+
 /**
  * Creates a root React component with integrated Redux store
  */
 export function createRoot(ChildComponent: (props: any) => JSX.Element) {
   return function ReactRoot(childProps: Object) {
-    const app = createApp({ VuexModule });
-    const scope = app.servicesScope;
-    scope.init(VuexModule);
-
-    Object.keys(AppServices).forEach(serviceName => {
-      scope.register(() => getResource(serviceName), serviceName, { shouldCallHooks: false });
-    });
+    const app = resolveApp();
 
     return (
       <ReactModules app={app}>

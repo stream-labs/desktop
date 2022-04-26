@@ -61,6 +61,8 @@ export class AlertBoxModule extends WidgetModule<IAlertBoxState> {
    * returns settings for a given variation from the state
    */
   getVariationSettings<T extends TAlertType>(alertType: T, variationId = 'default') {
+    const variations = this.widgetData.variations;
+    if (!variations) return null;
     return this.widgetData.variations[alertType][variationId];
   }
 
@@ -183,30 +185,34 @@ export class AlertBoxModule extends WidgetModule<IAlertBoxState> {
   override setData(data: IAlertBoxState['data']) {
     // save widget data instate and calculate additional state variables
     super.setData(data);
-    const settings = data.settings;
     const allAlerts = values(this.eventsConfig) as IAlertConfig[];
 
     // group alertbox settings by alert types and store them in `state.data.variations`
-    allAlerts.map(alertEvent => {
-      const apiKey = alertEvent.apiKey || alertEvent.type;
-      const alertFields = Object.keys(settings).filter(key => key.startsWith(`${apiKey}_`));
-      const variationSettings = {} as any;
-      alertFields.forEach(key => {
-        let value = settings[key];
-        const targetKey = key.replace(`${apiKey}_`, '');
+    this.state.mutate(state => {
+      const settings = this.state.widgetData.data.settings;
 
-        // sanitize the variation value
-        value = this.sanitizeValue(
-          value,
-          targetKey,
-          this.variationsMetadata[alertEvent.type][targetKey],
-        );
+      allAlerts.map(alertEvent => {
+        const apiKey = alertEvent.apiKey || alertEvent.type;
+        const alertFields = Object.keys(settings).filter(key => key.startsWith(`${apiKey}_`));
+        const variationSettings = {} as any;
+        alertFields.forEach(key => {
+          let value = settings[key];
+          const targetKey = key.replace(`${apiKey}_`, '');
 
-        settings[key] = value;
-        variationSettings[targetKey] = value;
+          // sanitize the variation value
+          value = this.sanitizeValue(
+            value,
+            targetKey,
+            this.variationsMetadata[alertEvent.type][targetKey],
+          );
+
+          settings[key] = value;
+          variationSettings[targetKey] = value;
+        });
+        this.setVariationSettings(alertEvent.type, 'default', variationSettings as any);
       });
-      this.setVariationSettings(alertEvent.type, 'default', variationSettings as any);
     });
+
 
     // define available alerts
     const userPlatforms = Object.keys(Services.UserService.views.platforms!) as TPlatform[];
@@ -288,7 +294,7 @@ export class AlertBoxModule extends WidgetModule<IAlertBoxState> {
   ) {
     const event = this.eventsConfig[type];
     const apiKey = event.apiKey || event.type;
-    const currentVariationSettings = this.getVariationSettings(type);
+    const currentVariationSettings = getDefined(this.getVariationSettings(type));
 
     // save current settings to the state
     const newVariationSettings = {
@@ -334,6 +340,7 @@ export class AlertBoxModule extends WidgetModule<IAlertBoxState> {
     // get custom code from the selected variation
     if (!this.selectedAlert) return null;
     const variationSettings = this.getVariationSettings(this.selectedAlert);
+    if (!variationSettings) return null;
     const {
       custom_html_enabled,
       custom_html,

@@ -19,8 +19,7 @@ module.exports = {
   },
   plugins: ['vue', '@typescript-eslint', 'prettier'],
   rules: {
-    // TODO prettier conflicts with some eslint rules. For example the "padded-blocks" rule
-    // 'prettier/prettier': ERROR,
+    'prettier/prettier': ERROR,
     '@typescript-eslint/no-implicit-any-catch': ERROR,
 
     // The indent rule is redundant when we are using prettier, and it
@@ -116,9 +115,6 @@ module.exports = {
     'import/first': OFF,
     'no-script-url': OFF,
     'import/no-named-default': OFF,
-
-    // an empty line after function or object declaration provides better readability in some cases
-    'padded-blocks': OFF,
   },
   overrides: [
     {

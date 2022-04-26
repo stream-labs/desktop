@@ -14219,13 +14219,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"slap@git+https://github.com/stream-labs/slap.git#alpha":
-  version: 0.1.64
-  resolution: "slap@https://github.com/stream-labs/slap.git#commit=5e5093520bc68e62554d5ce3d1517e8673ffdd06"
+"slap@git+https://github.com/stream-labs/slap.git#v0.1.72":
+  version: 0.1.72
+  resolution: "slap@https://github.com/stream-labs/slap.git#commit=4d52856c6d9033fa9a19390584fe337b976c4e28"
   dependencies:
     immer: ^9.0.12
     react: ^17.0.2
-  checksum: 5b023a2e209165f593311a14027b27e2320d40481b041b8a595cd14daf06b443f46024faf9799a89412203cc90bec30107192e89ab42d64e1f75b9b1ea929486
+  checksum: 91625a975e78966e69189e7707dd7b77f2c7b2f86db761119337ce5693f9674b0db338bf71bfdeb6c1baa698d9a8c5e0d81cb533da51d3c56efc5e0d6463a1ac
   languageName: node
   linkType: hard
 
@@ -14412,7 +14412,7 @@ __metadata:
     shelljs: 0.8.5
     signtool: 1.0.0
     sl-vue-tree: "https://github.com/stream-labs/sl-vue-tree.git"
-    slap: "git+https://github.com/stream-labs/slap.git#alpha"
+    slap: "git+https://github.com/stream-labs/slap.git#v0.1.72"
     socket.io-client: 2.1.1
     sockjs: 0.3.20
     sockjs-client: 1.1.5

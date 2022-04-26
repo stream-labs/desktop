@@ -9,7 +9,7 @@ import { metadata } from 'components/widgets/inputs/index';
 import { WIDGET_INITIAL_STATE } from './widget-settings';
 import { InheritMutations } from 'services/core/stateful-service';
 import { $t } from 'services/i18n';
-import {TPlatform} from "../../platforms";
+import { TPlatform } from '../../platforms';
 
 export interface IEventListSettings extends IWidgetSettings {
   animation_speed: number;

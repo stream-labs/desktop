@@ -2,7 +2,7 @@ import React from 'react';
 import { Alert, Button, Collapse, Spin, Tabs } from 'antd';
 import { $t } from '../../../services/i18n';
 import { CodeInput, SwitchInput } from '../../shared/inputs';
-import { useWidget, useWidgetRoot } from './useWidget';
+import {useWidget, useWidgetRoot, WidgetParams} from './useWidget';
 import Form from '../../shared/inputs/Form';
 import { useOnCreate } from 'slap';
 import { Services } from '../../service-provider';
@@ -27,12 +27,19 @@ export function CustomCodeWindow() {
     return { sourceId, WidgetModule, widgetSelectedTab: selectedTab };
   });
 
-  useWidgetRoot(WidgetModule, {
+  // useWidgetRoot(WidgetModule, {
+  //   sourceId,
+  //   shouldCreatePreviewSource: false,
+  //   selectedTab: widgetSelectedTab,
+  // });
+
+  const widgetParams: WidgetParams = {
     sourceId,
     shouldCreatePreviewSource: false,
     selectedTab: widgetSelectedTab,
-  });
-  const { selectedTab, selectTab, tabs, isLoading } = useCodeEditor();
+  };
+
+  const { selectedTab, selectTab, tabs, isLoading } = useCodeEditor(widgetParams);
 
   return (
     <ModalLayout footer={<EditorFooter />}>

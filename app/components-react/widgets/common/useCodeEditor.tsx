@@ -1,10 +1,10 @@
-import { WidgetModule } from './useWidget';
+import {WidgetModule, WidgetParams} from './useWidget';
 import { message } from 'antd';
 import Utils from '../../../services/utils';
 import { Services } from '../../service-provider';
 import { DEFAULT_CUSTOM_FIELDS } from './CustomFields';
 import { getDefined } from '../../../util/properties-type-guards';
-import { inject, injectState, injectWatch, mutation, useModule } from 'slap';
+import {inject, injectChild, injectState, injectWatch, mutation, useModule} from 'slap';
 
 type TLang = 'json' | 'js' | 'css' | 'html';
 
@@ -12,6 +12,9 @@ type TLang = 'json' | 'js' | 'css' | 'html';
  * Manages the state for Code Editor window
  */
 class CodeEditorModule {
+
+  constructor(public widgetParams: WidgetParams) {}
+
   tabs = [
     { label: 'Custom Fields', key: 'json' },
     { label: 'HTML', key: 'html' },
@@ -32,15 +35,11 @@ class CodeEditorModule {
     },
   });
 
-  private widgetModule = inject(WidgetModule);
-
-  init() {
+  private widgetModule = injectChild(WidgetModule, this.widgetParams);
 
 
-    // wait for the WidgetModule to load to get the custom code data from it
-
-    injectWatch(() => this.widgetModule.state.isLoading, () => this.reset());
-  }
+  // wait for the WidgetModule to load to get the custom code data from it
+  watchWidgetModule = injectWatch(() => this.widgetModule.state.isLoading, () => this.reset());
 
   /**
    * Save the custom code on the server
@@ -144,6 +143,7 @@ class CodeEditorModule {
   }
 }
 
-export function useCodeEditor() {
-  return useModule(CodeEditorModule);
+export function useCodeEditor(widgetParams?: WidgetParams) {
+  const params = widgetParams ? [widgetParams] : false;
+  return useModule(CodeEditorModule, params as any); // TODO fix types
 }
