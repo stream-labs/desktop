@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { useOnCreate } from 'slap';
 import { ModalLayout } from '../../shared/ModalLayout';
 import { Services } from '../../service-provider';
@@ -56,9 +56,6 @@ export const components = {
   GameWidget: [GameWidget, GameWidgetModule],
 };
 
-let instance = 0;
-let counter = 0;
-
 /**
  * Renders a widget window by given sourceId from window's query params
  */
@@ -71,20 +68,6 @@ export function WidgetWindow() {
     const [WidgetSettingsComponent, Module] = components[widgetType];
     return { sourceId, Module, WidgetSettingsComponent };
   });
-
-  const myState = useState(() => {
-    instance++;
-    console.log('CREATE WIDGETWINDOW', instance);
-    return 1;
-  });
-
-  console.log('RENDER WIDGETWINDOW', counter);
-  counter++;
-
-  useEffect(() => {
-
-    console.log('DESTROY WIDGETWINDOW', instance);
-  }, []);
 
   // initialize the Redux module for the widget
   // so all children components can use it via `useWidget()` call

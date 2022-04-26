@@ -3,13 +3,7 @@ import { IWidgetCommonState, useWidget, WidgetModule } from './common/useWidget'
 import { WidgetLayout } from './common/WidgetLayout';
 import InputWrapper from '../shared/inputs/InputWrapper';
 import { $t } from '../../services/i18n';
-import {
-  CheckboxInput,
-  ColorInput,
-  FontFamilyInput,
-  FontSizeInput,
-} from '../shared/inputs';
-import { injectFormBinding } from 'slap';
+import { CheckboxInput, ColorInput, FontFamilyInput, FontSizeInput } from '../shared/inputs';
 
 interface IViewerCountState extends IWidgetCommonState {
   data: {
@@ -50,11 +44,6 @@ export function ViewerCount() {
 }
 
 export class ViewerCountModule extends WidgetModule<IViewerCountState> {
-  bind = injectFormBinding(
-    () => this.settings,
-    statePatch => this.updateSettings(statePatch),
-  );
-
   patchAfterFetch(data: any): IViewerCountState {
     // transform platform types to simple booleans
     return {

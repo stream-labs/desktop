@@ -11,7 +11,7 @@ import { alertAsync } from '../../modals';
 import { onUnload } from 'util/unload';
 import merge from 'lodash/merge';
 import {
-  GetUseModuleResult,
+  GetUseModuleResult, injectFormBinding,
   injectState,
   useModule,
 } from 'slap';
@@ -82,12 +82,15 @@ export class WidgetModule<TWidgetState extends IWidgetState = IWidgetState> {
   public widgetsConfig = this.widgetsService.widgetsConfig;
   public eventsConfig = this.widgetsService.alertsConfig;
 
-  cancelUnload: () => void;
+  bind = injectFormBinding(
+    () => this.settings,
+    statePatch => this.updateSettings(statePatch),
+  );
 
+  cancelUnload: () => void;
 
   // init module
   async init() {
-
     // save browser source settings into store
     const widget = this.widget;
     this.setBrowserSourceProps(widget.getSource()!.getPropertiesFormData());

@@ -3,7 +3,7 @@ import { IWidgetCommonState, useWidget, WidgetModule } from './common/useWidget'
 import { WidgetLayout } from './common/WidgetLayout';
 import { $t } from 'services/i18n';
 import { metadata } from 'components-react/shared/inputs/metadata';
-import { TextInput, ColorInput, createBinding, SliderInput } from 'components-react/shared/inputs';
+import { TextInput, ColorInput, SliderInput } from 'components-react/shared/inputs';
 import Form from 'components-react/shared/inputs/Form';
 import { Menu } from 'antd';
 
@@ -44,18 +44,16 @@ interface IGameWidgetState extends IWidgetCommonState {
 }
 
 export function GameWidget() {
-  const { isLoading, bind } = useGameWidget();
-
-  const [activeTab, setActiveTab] = useState('general');
+  const { isLoading, bind, selectedTab, setSelectedTab } = useGameWidget();
 
   return (
     <WidgetLayout>
-      <Menu onClick={e => setActiveTab(e.key)} selectedKeys={[activeTab]}>
+      <Menu onClick={e => setSelectedTab(e.key)} selectedKeys={[selectedTab]}>
         <Menu.Item key="general">{$t('General Settings')}</Menu.Item>
         <Menu.Item key="game">{$t('Game Settings')}</Menu.Item>
       </Menu>
       <Form>
-        {!isLoading && activeTab === 'general' && (
+        {!isLoading && selectedTab === 'general' && (
           <>
             <SliderInput
               label={$t('Chat Decision Time')}
@@ -85,18 +83,13 @@ export function GameWidget() {
             />
           </>
         )}
-        {!isLoading && activeTab === 'game' && <GameOptions game="tic-tac-toe" />}
+        {!isLoading && selectedTab === 'game' && <GameOptions game="tic-tac-toe" />}
       </Form>
     </WidgetLayout>
   );
 }
 
-export class GameWidgetModule extends WidgetModule<IGameWidgetState> {
-  bind = createBinding(
-    () => this.settings,
-    statePatch => this.updateSettings(statePatch),
-  );
-}
+export class GameWidgetModule extends WidgetModule<IGameWidgetState> {}
 
 function useGameWidget() {
   return useWidget<GameWidgetModule>();

@@ -2,7 +2,7 @@ import React from 'react';
 import { Alert, Button, Collapse, Spin, Tabs } from 'antd';
 import { $t } from '../../../services/i18n';
 import { CodeInput, SwitchInput } from '../../shared/inputs';
-import {useWidget, useWidgetRoot, WidgetParams} from './useWidget';
+import { useWidget } from './useWidget';
 import Form from '../../shared/inputs/Form';
 import { useOnCreate } from 'slap';
 import { Services } from '../../service-provider';
@@ -19,27 +19,18 @@ const { TabPane } = Tabs;
  */
 export function CustomCodeWindow() {
   // take the source id from the window's params
-  const { sourceId, WidgetModule, widgetSelectedTab } = useOnCreate(() => {
+  const { sourceId, widgetSelectedTab } = useOnCreate(() => {
     const { WindowsService } = Services;
-    const { sourceId, widgetType } = getDefined(WindowsService.state.child.queryParams);
+    const { sourceId } = getDefined(WindowsService.state.child.queryParams);
     const { selectedTab } = getDefined(WindowsService.state[Utils.getWindowId()].queryParams);
-    const [, WidgetModule] = components[widgetType];
-    return { sourceId, WidgetModule, widgetSelectedTab: selectedTab };
+    return { sourceId, widgetSelectedTab: selectedTab };
   });
 
-  // useWidgetRoot(WidgetModule, {
-  //   sourceId,
-  //   shouldCreatePreviewSource: false,
-  //   selectedTab: widgetSelectedTab,
-  // });
-
-  const widgetParams: WidgetParams = {
+  const { selectedTab, selectTab, tabs, isLoading } = useCodeEditor({
     sourceId,
     shouldCreatePreviewSource: false,
     selectedTab: widgetSelectedTab,
-  };
-
-  const { selectedTab, selectTab, tabs, isLoading } = useCodeEditor(widgetParams);
+  });
 
   return (
     <ModalLayout footer={<EditorFooter />}>
