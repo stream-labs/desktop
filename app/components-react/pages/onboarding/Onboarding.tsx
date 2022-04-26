@@ -37,7 +37,7 @@ export default function Onboarding() {
           {!currentStep.hideSkip && (
             <button
               className={cx('button button--trans', commonStyles.onboardingButton)}
-              onClick={next}
+              onClick={() => next(true)}
               disabled={processing}
             >
               {$t('Skip')}
@@ -56,8 +56,7 @@ function TopBar() {
   );
 
   if (stepIndex < preboardingOffset || singletonStep) {
-    // TODO: Remove styles?
-    return <div className={styles.topBarContainer} />;
+    return <div />;
   }
 
   const offset = preboardingOffset;
@@ -114,6 +113,10 @@ export class OnboardingModule {
     return Services.OnboardingService;
   }
 
+  get ReocrdingModeService() {
+    return Services.RecordingModeService;
+  }
+
   get steps() {
     return this.OnboardingService.views.steps;
   }
@@ -135,6 +138,11 @@ export class OnboardingModule {
     return this.steps.filter(step => step.isPreboarding).length;
   }
 
+  setRecordingMode() {
+    this.ReocrdingModeService.setRecordingMode(true);
+    this.ReocrdingModeService.setUpRecordingFirstTimeSetup();
+  }
+
   setImportFromObs() {
     this.OnboardingService.setObsImport(true);
   }
@@ -144,8 +152,17 @@ export class OnboardingModule {
   }
 
   @mutation()
-  next() {
+  next(isSkip = false) {
     if (this.state.processing) return;
+
+    if (
+      this.ReocrdingModeService.views.isRecordingModeEnabled &&
+      this.currentStep.component === 'HardwareSetup' &&
+      !this.OnboardingService.state.options.isHardware &&
+      !isSkip
+    ) {
+      this.ReocrdingModeService.actions.addRecordingWebcam();
+    }
 
     if (this.state.stepIndex >= this.steps.length - 1 || this.singletonStep) {
       return this.finish();

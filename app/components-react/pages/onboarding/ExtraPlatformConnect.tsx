@@ -83,7 +83,7 @@ export function ExtraPlatformConnect() {
         </p>
 
         <p>
-          <a className={styles['link-button']} onClick={next}>
+          <a className={styles['link-button']} onClick={() => next()}>
             {$t('Skip')}
           </a>
 

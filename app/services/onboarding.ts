@@ -10,9 +10,11 @@ import { getPlatformService } from './platforms';
 import { OutputSettingsService } from './settings';
 import { ObsImporterService } from './obs-importer';
 import Utils from './utils';
+import { RecordingModeService } from './recording-mode';
 
 enum EOnboardingSteps {
   MacPermissions = 'MacPermissions',
+  SteamingOrRecording = 'StreamingOrRecording',
   Connect = 'Connect',
   FreshOrImport = 'FreshOrImport',
   ObsImport = 'ObsImport',
@@ -26,6 +28,13 @@ export const ONBOARDING_STEPS = () => ({
   [EOnboardingSteps.MacPermissions]: {
     component: 'MacPermissions',
     disableControls: false,
+    hideSkip: true,
+    hideButton: true,
+    isPreboarding: true,
+  },
+  [EOnboardingSteps.SteamingOrRecording]: {
+    component: 'StreamingOrRecording',
+    disableControls: true,
     hideSkip: true,
     hideButton: true,
     isPreboarding: true,
@@ -133,14 +142,17 @@ class OnboardingViews extends ViewHandler<IOnboardingServiceState> {
     const steps: IOnboardingStep[] = [];
     const userViews = this.getServiceViews(UserService);
     const isOBSinstalled = this.getServiceViews(ObsImporterService).isOBSinstalled();
+    const recordingModeEnabled = this.getServiceViews(RecordingModeService).isRecordingModeEnabled;
 
     if (process.platform === OS.Mac) {
       steps.push(ONBOARDING_STEPS()[EOnboardingSteps.MacPermissions]);
     }
 
-    steps.push(ONBOARDING_STEPS()[EOnboardingSteps.Connect]);
+    steps.push(ONBOARDING_STEPS()[EOnboardingSteps.SteamingOrRecording]);
 
-    if (isOBSinstalled) {
+    if (!recordingModeEnabled) steps.push(ONBOARDING_STEPS()[EOnboardingSteps.Connect]);
+
+    if (isOBSinstalled && !recordingModeEnabled) {
       steps.push(ONBOARDING_STEPS()[EOnboardingSteps.FreshOrImport]);
     }
 
@@ -153,6 +165,7 @@ class OnboardingViews extends ViewHandler<IOnboardingServiceState> {
     if (
       !this.state.existingSceneCollections &&
       !this.state.importedFromObs &&
+      !recordingModeEnabled &&
       ((userViews.isLoggedIn &&
         getPlatformService(userViews.platform.type).hasCapability('themes')) ||
         !userViews.isLoggedIn)

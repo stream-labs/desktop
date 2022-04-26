@@ -47,10 +47,13 @@ export interface ISettingsValues {
     server: string;
   };
   Output: {
+    Mode: string;
     RecRB?: boolean;
     RecRBTime?: number;
     RecFormat: string;
     RecTracks?: number;
+    RecEncoder?: string;
+    RecQuality?: string;
     TrackIndex?: string;
     VodTrackEnabled?: boolean;
     VodTrackIndex?: string;
