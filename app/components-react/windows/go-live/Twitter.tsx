@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
 import InputWrapper from '../../shared/inputs/InputWrapper';
 import { Services } from '../../service-provider';
 import cx from 'classnames';
@@ -7,8 +7,7 @@ import css from './Twitter.m.less';
 import { CheckboxInput, SwitchInput, TextAreaInput, TextInput } from '../../shared/inputs';
 import { Row, Col, Button } from 'antd';
 import { useGoLiveSettings } from './useGoLiveSettings';
-import { useVuex } from '../../hooks';
-import {injectWatch} from "slap";
+import { injectWatch } from 'slap';
 
 export default function TwitterInput() {
   const { TwitterService, UserService } = Services;
@@ -30,7 +29,7 @@ export default function TwitterInput() {
       return {
         streamTitle: module.state.commonFields.title,
         useStreamlabsUrl: state.creatorSiteOnboardingComplete,
-      }
+      };
     }
 
     return {
@@ -66,11 +65,6 @@ export default function TwitterInput() {
       }),
     };
   });
-
-  // useEffect(() => {
-  //   const tweetText = getTweetText(streamTitle);
-  //   if (getSettings().tweetText !== tweetText) updateSettings({ tweetText });
-  // }, [streamTitle, useStreamlabsUrl]);
 
   function unlink() {
     TwitterService.actions.return

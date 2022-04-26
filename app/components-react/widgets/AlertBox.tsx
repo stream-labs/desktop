@@ -24,7 +24,6 @@ import { WidgetLayout } from './common/WidgetLayout';
 import { CaretRightOutlined, QuestionCircleOutlined } from '@ant-design/icons';
 import { TAlertType } from '../../services/widgets/alerts-config';
 import { useAlertBox } from './useAlertBox';
-import electron from 'electron';
 import { Services } from '../service-provider';
 import { ButtonGroup } from '../shared/ButtonGroup';
 import { LayoutInput } from './common/LayoutInput';
