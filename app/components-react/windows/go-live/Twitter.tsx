@@ -14,9 +14,6 @@ export default function TwitterInput() {
   const {
     tweetText,
     updateSettings,
-    getTweetText,
-    getSettings,
-    streamTitle,
     tweetWhenGoingLive,
     linked,
     screenName,
