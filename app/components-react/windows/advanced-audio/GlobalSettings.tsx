@@ -1,5 +1,4 @@
-import React, { useState, useRef, useMemo } from 'react';
-import { Provider } from 'react-redux';
+import React from 'react';
 import { BoolButtonInput, ListInput, SwitchInput } from 'components-react/shared/inputs';
 import InputWrapper from 'components-react/shared/inputs/InputWrapper';
 import { TObsValue, IObsListInput, IObsInput } from 'components/obs/inputs/ObsInput';
