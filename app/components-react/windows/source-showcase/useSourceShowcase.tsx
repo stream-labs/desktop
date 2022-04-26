@@ -22,7 +22,9 @@ type TInspectableSource = TSourceType | WidgetType | 'streamlabel' | 'app_source
  */
 class SourceShowcaseModule {
   state = {
-    inspectedSource: 'AlertBox' as TInspectableSource,
+    inspectedSource: (Services.UserService.views.isLoggedIn
+      ? 'AlertBox'
+      : 'screen_capture') as TInspectableSource,
     inspectedAppId: '',
     inspectedAppSourceId: '',
   };
@@ -51,6 +53,7 @@ class SourceShowcaseModule {
 
   @mutation()
   inspectSource(source: string, appId?: string, appSourceId?: string) {
+    console.log(source);
     this.state.inspectedSource = source;
     this.state.inspectedAppId = appId || '';
     this.state.inspectedAppSourceId = appSourceId || '';
