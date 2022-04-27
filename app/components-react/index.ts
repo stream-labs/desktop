@@ -44,9 +44,11 @@ import Projector from './windows/Projector';
 import SceneSelector from './editor/elements/SceneSelectorElement';
 import AddSource from './windows/AddSource';
 import SideNav from './sidebar/SideNav';
+import AlertboxLibrary from './pages/AlertboxLibrary';
 
 // list of React components to be used inside Vue components
 export const components = {
+  AlertboxLibrary,
   NameFolder,
   NameScene,
   BrowserView,
