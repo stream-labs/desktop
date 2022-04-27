@@ -40,39 +40,7 @@ export class SourceSelectorModule {
     expandedFoldersIds: [] as string[],
   });
 
-  // $refs: {
-  //   treeContainer: HTMLDivElement;
-  //   slVueTree: SlVueTree<ISceneNodeData>;
-  // };
-
   callCameFromInsideTheHouse = false;
-
-  get nodes(): ISlTreeNodeModel<ISceneNodeData>[] {
-    // recursive function for transform SceneNode[] to ISlTreeNodeModel[]
-    const getSlVueTreeNodes = (
-      sceneNodes: (ISceneItem | ISceneItemFolder)[],
-    ): ISlTreeNodeModel<ISceneNodeData>[] => {
-      return sceneNodes.map(sceneNode => {
-        return {
-          title: this.getNameForNode(sceneNode),
-          isSelected: this.isSelected(sceneNode),
-          isLeaf: sceneNode.sceneNodeType === 'item',
-          isExpanded: this.state.expandedFoldersIds.indexOf(sceneNode.id) !== -1,
-          data: {
-            id: sceneNode.id,
-            sourceId: sceneNode.sceneNodeType === 'item' ? sceneNode.sourceId : '',
-          },
-          children:
-            sceneNode.sceneNodeType === 'folder'
-              ? getSlVueTreeNodes(this.getChildren(sceneNode))
-              : undefined,
-        };
-      });
-    };
-
-    const nodes = this.scene.state.nodes.filter(n => !n.parentId);
-    return getSlVueTreeNodes(nodes);
-  }
 
   get treeData() {
     // recursive function for transforming SceneNode[] to a Tree format of Antd.Tree
@@ -80,15 +48,14 @@ export class SourceSelectorModule {
       return sceneNodes.map(sceneNode => {
         return {
           title: (
-            // this.getNameForNode(sceneNode)
-            // <NodeView
-            //   title={this.getNameForNode(sceneNode)}
-            //   id={sceneNode.id}
-            //   visible={this.scene.getSelection(sceneNode.id).isVisible()}
-            //   toggleVisibility={() => this.toggleVisibility(sceneNode.id)}
-            // />
-
-            <NodeView2 id={sceneNode.id} />
+            <TreeNode
+              title={this.getNameForNode(sceneNode)}
+              id={sceneNode.id}
+              visibilityClasses={this.visibilityClassesForSource(sceneNode.id)}
+              lockClasses={this.lockClassesForSource(sceneNode.id)}
+              toggleVisibility={() => this.toggleVisibility(sceneNode.id)}
+              toggleLock={() => this.toggleLock(sceneNode.id)}
+            />
           ),
           isLeaf: sceneNode.sceneNodeType === 'item',
           key: sceneNode.id,
@@ -225,8 +192,6 @@ export class SourceSelectorModule {
   }
 
   onDrop(info: Parameters<Required<TreeProps>['onDrop']>[0]) {
-    console.log('DROP', info);
-
     const nodesToMove = this.scene.getSelection(info.dragNodesKeys as string[]);
     const destNode = info.node;
     const destNodePos = Number(destNode.pos.split('-').slice(-1)[0]);
@@ -261,41 +226,6 @@ export class SourceSelectorModule {
         'ReorderNodesCommand',
         nodesToMove,
         destNodeId,
-        EPlaceType.Inside,
-      );
-    }
-    this.selectionService.views.globalSelection.select(nodesToMove.getIds());
-  }
-
-  handleSort(
-    treeNodesToMove: ISlTreeNode<ISceneNodeData>[],
-    position: ICursorPosition<TSceneNode>,
-  ) {
-    const nodesToMove = this.scene.getSelection(
-      treeNodesToMove.map(node => getDefined(node.data?.id)),
-    );
-
-    const destNode = getDefined(this.scene.getNode(getDefined(position.node.data?.id)));
-
-    if (position.placement === 'before') {
-      this.editorCommandsService.executeCommand(
-        'ReorderNodesCommand',
-        nodesToMove,
-        destNode.id,
-        EPlaceType.Before,
-      );
-    } else if (position.placement === 'after') {
-      this.editorCommandsService.executeCommand(
-        'ReorderNodesCommand',
-        nodesToMove,
-        destNode.id,
-        EPlaceType.After,
-      );
-    } else if (position.placement === 'inside') {
-      this.editorCommandsService.executeCommand(
-        'ReorderNodesCommand',
-        nodesToMove,
-        destNode.id,
         EPlaceType.Inside,
       );
     }
@@ -541,7 +471,6 @@ function StudioControls() {
 
 function ItemsTree() {
   const {
-    lastSelectedId,
     treeData,
     activeItemIds,
     expandedFoldersIds,
@@ -549,12 +478,10 @@ function ItemsTree() {
     makeActive,
     toggleFolder,
     onDrop,
-    handleSort,
   } = useModule(SourceSelectorModule);
 
   return (
     <div className="vue-tree-container" onContextMenu={e => showContextMenu('', e)}>
-      Tree is here, last selected: {lastSelectedId}
       <Tree
         height={233}
         draggable={true}
@@ -571,60 +498,19 @@ function ItemsTree() {
   );
 }
 
-// function NodeView(p: { title: string; visible: boolean; toggleVisibility: () => unknown }) {
-//   return (
-//     <span>
-//       {p.title}
-//       <i
-//         onClick={p.toggleVisibility}
-//         className={cx({
-//           'source-selector-action': true,
-//           'icon-view': p.visible,
-//           'icon-hide': !p.visible,
-//         })}
-//       />
-//     </span>
-//   );
-// }
-
-function NodeView(p: {
+function TreeNode(p: {
   title: string;
   id: string;
-  visible: boolean;
-  toggleVisibility: () => unknown;
+  visibilityClasses: Record<string, boolean>;
+  lockClasses: Record<string, boolean>;
+  toggleVisibility: (ev: unknown) => unknown;
+  toggleLock: (ev: unknown) => unknown;
 }) {
   return (
     <span>
       {p.title}
-      <i
-        onClick={p.toggleVisibility}
-        className={cx({
-          'source-selector-action': true,
-          'icon-view': p.visible,
-          'icon-hide': !p.visible,
-        })}
-      />
-    </span>
-  );
-}
-
-function NodeView2(p: { id: string; visible?: boolean }) {
-  const { toggleVisibility, isVisible } = useModule(SourceSelectorModule).extend(module => ({
-    get isVisible() {
-      return module.scene.getSelection(p.id).isVisible();
-    },
-  }));
-  return (
-    <span>
-      Item {p.id}
-      <i
-        onClick={() => toggleVisibility(p.id)}
-        className={cx({
-          'source-selector-action': true,
-          'icon-view': isVisible,
-          'icon-hide': !isVisible,
-        })}
-      />
+      <i onClick={p.toggleVisibility} className={cx(p.visibilityClasses)} />
+      <i onClick={p.toggleLock} className={cx(p.lockClasses)} />
     </span>
   );
 }

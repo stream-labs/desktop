@@ -1,5 +1,5 @@
 import React from 'react';
-import { createApp, Dict, inject, injectState, ReactModules, Store, TAppContext } from 'slap';
+import { createApp, Dict, inject, ReactModules, Store, TAppContext } from 'slap';
 import { getResource, StatefulService } from '../../services';
 import { AppServices } from '../../app-services';
 
@@ -9,30 +9,19 @@ import { AppServices } from '../../app-services';
  *
  */
 class VuexModule {
+  private store = inject(Store);
+
   /**
    * Keep revisions for each StatefulService module in this state
    */
-  // state = injectState({
-  //   revisions: {} as Record<string, number>,
-  //
-  //   incrementRevision(statefulServiceName: string) {
-  //     if (!this.revisions[statefulServiceName]) {
-  //       this.revisions[statefulServiceName] = 1;
-  //     } else {
-  //       this.revisions[statefulServiceName]++;
-  //     }
-  //   },
-  // });
-
-  store = inject(Store);
-
-  modules: Dict<any> = {};
+  private modules: Dict<any> = {};
 
   init() {
+    // make sure the module will be added to the component dependency list
+    // when the component is building their dependencies
     StatefulService.onStateRead = serviceName => {
-      // integrate tracking Vuex dependencies with ReactModules
       if (this.store.recordingAccessors) {
-        const module = this.resolveModule(serviceName);
+        const module = this.resolveState(serviceName);
         this.store.affectedModules[serviceName] = module.state.revision;
       }
     };
@@ -41,36 +30,42 @@ class VuexModule {
     // and increment the revision number for affected StatefulService
     StatefulService.store.subscribe(mutation => {
       if (!mutation.payload.__vuexSyncIgnore) return;
-      console.log('Commit vuex mutation', mutation);
       const serviceName = mutation.type.split('.')[0];
-      const module = this.resolveModule(serviceName);
+      const module = this.resolveState(serviceName);
       module.incrementRevision();
     });
   }
 
-  resolveModule(serviceName: string) {
+  /**
+   * Create and memoize the state for the stateful service
+   */
+  private resolveState(serviceName: string) {
     if (!this.modules[serviceName]) {
-      this.modules[serviceName] = this.store.createState(serviceName, {
+      const module = this.store.createState(serviceName, {
         revision: 0,
-
         incrementRevision() {
           this.revision++;
         },
       });
-      this.modules[serviceName].finishInitialization();
+      module.finishInitialization();
+      this.modules[serviceName] = module;
     }
     return this.modules[serviceName];
   }
 }
 
+// keep initialized modules in the global variable
+// until we have multiple React roots
 let modulesApp: TAppContext;
 
+// create and memoize the React Modules
 function resolveApp() {
   if (modulesApp) return modulesApp;
   const app = createApp({ VuexModule });
   const scope = app.servicesScope;
   scope.init(VuexModule);
 
+  // register Services to be accessible via `inject()`
   Object.keys(AppServices).forEach(serviceName => {
     scope.register(() => getResource(serviceName), serviceName, { shouldCallHooks: false });
   });
