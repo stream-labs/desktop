@@ -21,7 +21,6 @@ import { injectFormBinding, injectState, mutation, useModule } from 'slap';
  * A Redux module for components in the StreamSetting window
  */
 class StreamSettingsModule {
-
   constructor(private form: FormInstance) {}
 
   // DEFINE A STATE
@@ -40,10 +39,9 @@ class StreamSettingsModule {
     } as ICustomStreamDestination,
   });
 
-
   bind = injectFormBinding(
     () => this.state.customDestForm,
-      patch => this.updateCustomDestForm(patch),
+    patch => this.updateCustomDestForm(patch),
   );
 
   // INJECT SERVICES
@@ -90,7 +88,6 @@ class StreamSettingsModule {
     this.state.editCustomDestMode = true;
   }
 
-  @mutation()
   removeCustomDest(ind: number) {
     const destinations = cloneDeep(this.customDestinations);
     destinations.splice(ind, 1);
@@ -209,14 +206,14 @@ class StreamSettingsModule {
 
 // wrap the module into a React hook
 function useStreamSettings() {
-  const form = useForm();
-  return useModule(StreamSettingsModule, [form]);
+  return useModule(StreamSettingsModule);
 }
 
 /**
  * A root component for StreamSettings
  */
 export function StreamSettings() {
+  const form = useForm();
   const {
     platforms,
     protectedModeEnabled,
@@ -224,7 +221,7 @@ export function StreamSettings() {
     disableProtectedMode,
     needToShowWarning,
     enableProtectedMode,
-  } = useStreamSettings();
+  } = useModule(StreamSettingsModule, [form]);
 
   return (
     <div>
@@ -343,12 +340,24 @@ function Platform(p: { platform: TPlatform }) {
  * Renders a custom destinations list
  */
 function CustomDestinationList() {
-  const { isPrime, customDestinations, editCustomDestMode, addCustomDest } = useStreamSettings();
+  const {
+    isPrime,
+    customDestinations,
+    editCustomDestMode,
+    addCustomDest,
+    componentView,
+  } = useStreamSettings();
   const shouldShowPrimeLabel = !isPrime;
   const destinations = customDestinations;
   const isEditMode = editCustomDestMode !== false;
   const shouldShowAddForm = editCustomDestMode === true;
   const canAddMoreDestinations = destinations.length < 2;
+
+  componentView.setShouldComponentUpdate(defaultComparsion => {
+    console.log('check should component update');
+    return defaultComparsion();
+  });
+
   return (
     <div>
       {destinations.map((dest, ind) => (
@@ -417,11 +426,7 @@ function CustomDestination(p: { destination: ICustomStreamDestination; ind: numb
  * Renders an ADD/EDIT form for the custom destination
  */
 function CustomDestForm() {
-  const {
-    saveCustomDest,
-    stopEditing,
-    bind,
-  } = useStreamSettings();
+  const { saveCustomDest, stopEditing, bind } = useStreamSettings();
 
   return (
     <Form name="customDestForm">
