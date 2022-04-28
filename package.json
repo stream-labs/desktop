@@ -92,6 +92,7 @@
     "rimraf": "^2.6.1",
     "semver": "^5.5.1",
     "socket.io-client": "2.1.1",
+    "socket.io-client4": "npm:socket.io-client@4.1.2",
     "tasklist": "^3.1.1",
     "uuid": "^3.0.1",
     "vuejs-datepicker": "^1.6.2"

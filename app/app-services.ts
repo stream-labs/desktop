@@ -88,6 +88,7 @@ export { ChatService } from 'services/chat';
 export { RecentEventsService } from 'services/recent-events';
 export { MagicLinkService } from 'services/magic-link';
 export { GrowService } from 'services/grow/grow';
+export { GuestCamService } from 'services/guest-cam';
 
 // WIDGETS
 export { WidgetSource, WidgetsService } from './services/widgets';

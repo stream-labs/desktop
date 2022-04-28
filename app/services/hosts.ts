@@ -14,7 +14,7 @@ export class HostsService extends Service {
       return 'beta.streamlabs.com';
     }
 
-    return 'streamlabs.com';
+    return 'stage6.streamlabs.com';
   }
 
   get overlays() {
