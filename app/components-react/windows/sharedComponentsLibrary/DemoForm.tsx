@@ -75,6 +75,7 @@ export function DemoForm() {
         <TextInput {...bind.name} label={'Name'} required />
         <ListInput {...bind.gender} label={'Gender'} options={genderOptions} />
         <NumberInput {...bind.age} label={'Age'} />
+        {/*Selected city {bind.city.value}*/}
         <ListInput
           {...bind.city}
           label={'City'}
