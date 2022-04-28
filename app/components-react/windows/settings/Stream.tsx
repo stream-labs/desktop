@@ -353,11 +353,6 @@ function CustomDestinationList() {
   const shouldShowAddForm = editCustomDestMode === true;
   const canAddMoreDestinations = destinations.length < 2;
 
-  componentView.setShouldComponentUpdate(defaultComparsion => {
-    console.log('check should component update');
-    return defaultComparsion();
-  });
-
   return (
     <div>
       {destinations.map((dest, ind) => (
