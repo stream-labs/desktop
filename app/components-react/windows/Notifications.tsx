@@ -47,6 +47,7 @@ export default function Notifications() {
                 [styles.unread]: notify.unread,
                 [styles.hasAction]: notify.action,
               })}
+              data-name={notify.action && 'hasAction'}
             >
               <div className="icon">
                 {notify.type === 'INFO' && <span className="fa fa-info-circle" />}
