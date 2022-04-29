@@ -11,6 +11,7 @@ import styles from './Notifications.m.less';
 export default function Notifications() {
   const { NotificationsService } = Services;
 
+  // Re-render every minute to refresh timestamps
   useRenderInterval(() => {}, 60 * 1000);
   useEffect(() => () => NotificationsService.actions.markAllAsRead(), []);
 
