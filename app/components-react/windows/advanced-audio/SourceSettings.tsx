@@ -49,7 +49,7 @@ export default function AdvancedAudio() {
 }
 
 function PanelHeader(p: { source: AudioSource }) {
-  const { EditorCommandsService, SettingsService, AudioService } = Services;
+  const { EditorCommandsService, SettingsService } = Services;
 
   const {
     isAdvancedOutput,
@@ -65,7 +65,7 @@ function PanelHeader(p: { source: AudioSource }) {
     vodTrackEnabled: SettingsService.views.vodTrackEnabled,
     vodTrack: SettingsService.views.vodTrack,
     // Hack to make muted property reactive
-    muted: AudioService.views.getSource(p.source.sourceId).muted,
+    muted: p.source.muted,
   }));
 
   const { name, mixerHidden, fader, audioMixers, sourceId } = p.source;
