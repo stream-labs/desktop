@@ -285,14 +285,16 @@ export class SourcesService extends StatefulService<ISourcesState> {
 
     if (
       this.defaultHardwareService.state.defaultVideoDevice === obsInputSettings.video_device_id &&
-      this.defaultHardwareService.state.presetFilter !== ''
+      this.defaultHardwareService.state.presetFilter !== '' &&
+      this.defaultHardwareService.state.presetFilter !== 'none'
     ) {
       this.sourceFiltersService.addPresetFilter(id, this.defaultHardwareService.state.presetFilter);
     }
 
     if (
       this.defaultHardwareService.state.defaultVideoDevice === obsInputSettings.device &&
-      this.defaultHardwareService.state.presetFilter !== ''
+      this.defaultHardwareService.state.presetFilter !== '' &&
+      this.defaultHardwareService.state.presetFilter !== 'none'
     ) {
       this.sourceFiltersService.addPresetFilter(id, this.defaultHardwareService.state.presetFilter);
     }

@@ -284,7 +284,7 @@ export class SourcesNode extends Node<ISchema, {}> {
 
       this.sourceFiltersService.loadFilterData(
         sourceInfo.id,
-        sourceInfo.filters.items.map(f => {
+        sourceCreateData[index].filters.map(f => {
           return {
             name: f.name,
             type: f.type,
