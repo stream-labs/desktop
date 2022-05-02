@@ -12,6 +12,7 @@ import {
   LayoutEditor,
   Onboarding,
   SideNav,
+  AlertboxLibrary,
 } from 'components/shared/ReactComponentList';
 import { ScenesService } from 'services/scenes';
 import { PlatformAppsService } from 'services/platform-apps';
@@ -26,7 +27,6 @@ Vue.use(VueResize);
 import Studio from '../pages/Studio';
 import PlatformAppStore from '../pages/PlatformAppStore.vue';
 import BrowseOverlays from 'components/pages/BrowseOverlays.vue';
-import AlertboxLibrary from 'components/pages/AlertboxLibrary';
 import { Inject } from '../../services/core/injector';
 import { CustomizationService } from 'services/customization';
 import { NavigationService } from 'services/navigation';
