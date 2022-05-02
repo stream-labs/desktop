@@ -35,6 +35,14 @@ export class AlertboxLibrary extends ReactComponent {}
 
 @Component({
   props: {
+    name: { default: 'BrowseOverlays' },
+    wrapperStyles: { default: () => ({ height: '100%' }) },
+  },
+})
+export class BrowseOverlays extends ReactComponent {}
+
+@Component({
+  props: {
     name: { default: 'BrowserView' },
     componentProps: { default: () => ({ src: '' }) },
     wrapperStyles: { default: () => ({ height: '100%' }) },
