@@ -42,7 +42,7 @@ export default function PlatformAppStore(p: { params: { appId?: string } }) {
   return (
     <BrowserView
       style={{ position: 'absolute', top: 0, right: 0, bottom: 0, left: 0 }}
-      src={UserService.views.appStoreUrl(p.params.appId)}
+      src={UserService.views.appStoreUrl(p.params?.appId)}
       onReady={onBrowserViewReady}
       enableGuestApi
     />
