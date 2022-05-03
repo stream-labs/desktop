@@ -189,6 +189,10 @@ export class SourcesNode extends Node<ISchema, {}> {
       });
     });
 
+    const supportedPresets = this.sourceFiltersService.views.presetFilterOptions.map(
+      opt => opt.value,
+    );
+
     // This shit is complicated, IPC sucks
     const sourceCreateData = supportedSources.map(source => {
       // Universally disabled for security reasons
@@ -205,7 +209,22 @@ export class SourcesNode extends Node<ISchema, {}> {
         syncOffset: source.syncOffset,
         filters: source.filters.items
           .filter(filter => {
-            return filter.type !== 'face_mask_filter';
+            if (filter.type === 'face_mask_filter') {
+              return false;
+            }
+
+            // Work around an issue where we accidentaly had invalid filters
+            // in scene collections.
+            if (
+              filter.name === '__PRESET' &&
+              !supportedPresets.includes(
+                this.sourceFiltersService.views.parsePresetValue(filter.settings.image_path),
+              )
+            ) {
+              return false;
+            }
+
+            return true;
           })
           .map(filter => {
             if (filter.type === 'vst_filter') {
@@ -265,7 +284,7 @@ export class SourcesNode extends Node<ISchema, {}> {
 
       this.sourceFiltersService.loadFilterData(
         sourceInfo.id,
-        sourceInfo.filters.items.map(f => {
+        sourceCreateData[index].filters.map(f => {
           return {
             name: f.name,
             type: f.type,

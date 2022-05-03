@@ -27,6 +27,14 @@ export class AdvancedStatistics extends ReactComponent {}
 
 @Component({
   props: {
+    name: { default: 'AlertboxLibrary' },
+    wrapperStyles: { default: () => ({ height: '100%' }) },
+  },
+})
+export class AlertboxLibrary extends ReactComponent {}
+
+@Component({
+  props: {
     name: { default: 'BrowserView' },
     componentProps: { default: () => ({ src: '' }) },
     wrapperStyles: { default: () => ({ height: '100%' }) },

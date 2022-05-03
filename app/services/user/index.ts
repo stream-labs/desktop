@@ -107,6 +107,13 @@ export function setSentryContext(ctx: ISentryContext) {
 }
 
 class UserViews extends ViewHandler<IUserServiceState> {
+  // Injecting HostsService since it's not stateful
+  @Inject() hostsService: HostsService;
+
+  get customizationServiceViews() {
+    return this.getServiceViews(CustomizationService);
+  }
+
   get isLoggedIn() {
     return !!(this.state.auth && this.state.auth.widgetToken && this.state.loginValidated);
   }
@@ -145,6 +152,19 @@ class UserViews extends ViewHandler<IUserServiceState> {
 
   get auth() {
     return this.state.auth;
+  }
+
+  alertboxLibraryUrl(id?: string) {
+    const uiTheme = this.customizationServiceViews.isDarkTheme ? 'night' : 'day';
+    let url = `https://${this.hostsService.streamlabs}/alertbox-library?mode=${uiTheme}&slobs`;
+
+    if (this.isLoggedIn) {
+      url += `&oauth_token=${this.auth.apiToken}`;
+    }
+
+    if (id) url += `&id=${id}`;
+
+    return url;
   }
 }
 
@@ -662,19 +682,6 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     if (type && id) {
       url += `#/?type=${type}&id=${id}`;
     }
-
-    return url;
-  }
-
-  alertboxLibraryUrl(id?: string) {
-    const uiTheme = this.customizationService.isDarkTheme ? 'night' : 'day';
-    let url = `https://${this.hostsService.streamlabs}/alertbox-library?mode=${uiTheme}&slobs`;
-
-    if (this.isLoggedIn) {
-      url += `&oauth_token=${this.apiToken}`;
-    }
-
-    if (id) url += `&id=${id}`;
 
     return url;
   }
