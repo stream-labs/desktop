@@ -166,6 +166,21 @@ class UserViews extends ViewHandler<IUserServiceState> {
 
     return url;
   }
+
+  overlaysUrl(type?: 'overlay' | 'widget-theme', id?: string) {
+    const uiTheme = this.customizationServiceViews.isDarkTheme ? 'night' : 'day';
+    let url = `https://${this.hostsService.streamlabs}/library?mode=${uiTheme}&slobs`;
+
+    if (this.isLoggedIn) {
+      url += `&oauth_token=${this.auth.apiToken}`;
+    }
+
+    if (type && id) {
+      url += `#/?type=${type}&id=${id}`;
+    }
+
+    return url;
+  }
 }
 
 export class UserService extends PersistentStatefulService<IUserServiceState> {
@@ -669,21 +684,6 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     }
 
     return `${url}?token=${token}&mode=${nightMode}`;
-  }
-
-  overlaysUrl(type?: 'overlay' | 'widget-theme', id?: string) {
-    const uiTheme = this.customizationService.isDarkTheme ? 'night' : 'day';
-    let url = `https://${this.hostsService.streamlabs}/library?mode=${uiTheme}&slobs`;
-
-    if (this.isLoggedIn) {
-      url += `&oauth_token=${this.apiToken}`;
-    }
-
-    if (type && id) {
-      url += `#/?type=${type}&id=${id}`;
-    }
-
-    return url;
   }
 
   getDonationSettings() {
