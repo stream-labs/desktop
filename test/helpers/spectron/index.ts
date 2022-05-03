@@ -178,10 +178,11 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
     await app.createClient();
 
     // Disable CSS transitions while running tests to allow for eager test clicks
+    // also disable tooltips
     const disableTransitionsCode = `
       const disableAnimationsEl = document.createElement('style');
       disableAnimationsEl.textContent =
-        '*{ transition: none !important; transition-property: none !important; animation-duration: 0 !important }';
+        '*{ transition: none !important; transition-property: none !important; animation-duration: 0 !important } .ant-tooltip-content{display: none}';
       document.head.appendChild(disableAnimationsEl);
       0; // Prevent returning a value that cannot be serialized
     `;
