@@ -20,12 +20,11 @@ export default function TwitterInput() {
     platform,
     useStreamlabsUrl,
   } = useGoLiveSettings().extend(module => {
-    const state = TwitterService.state;
 
     function getTwitterState() {
       return {
         streamTitle: module.state.commonFields.title,
-        useStreamlabsUrl: state.creatorSiteOnboardingComplete,
+        useStreamlabsUrl: TwitterService.state.creatorSiteOnboardingComplete,
       };
     }
 
@@ -34,18 +33,18 @@ export default function TwitterInput() {
         return module.state.commonFields.title;
       },
       get tweetWhenGoingLive() {
-        return state.tweetWhenGoingLive;
+        return TwitterService.state.tweetWhenGoingLive;
       },
       get useStreamlabsUrl() {
-        return state.creatorSiteOnboardingComplete;
+        return TwitterService.state.creatorSiteOnboardingComplete;
       },
 
       get linked() {
-        return state.linked;
+        return TwitterService.state.linked;
       },
 
       get screenName() {
-        return state.screenName;
+        return TwitterService.state.screenName;
       },
 
       get platform() {
