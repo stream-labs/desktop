@@ -47,6 +47,7 @@ import SideNav from './sidebar/SideNav';
 import AlertboxLibrary from './pages/AlertboxLibrary';
 import PlatformAppStore from './pages/PlatformAppStore';
 import BrowseOverlays from './pages/BrowseOverlays';
+import PlatformAppMainPage from './pages/PlatformAppMainPage';
 
 // list of React components to be used inside Vue components
 export const components = {
@@ -98,4 +99,5 @@ export const components = {
   AddSource,
   SideNav,
   PlatformAppStore,
+  PlatformAppMainPage,
 };
