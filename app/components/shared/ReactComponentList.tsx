@@ -35,6 +35,14 @@ export class AlertboxLibrary extends ReactComponent {}
 
 @Component({
   props: {
+    name: { default: 'BrowseOverlays' },
+    wrapperStyles: { default: () => ({ height: '100%' }) },
+  },
+})
+export class BrowseOverlays extends ReactComponent {}
+
+@Component({
+  props: {
     name: { default: 'BrowserView' },
     componentProps: { default: () => ({ src: '' }) },
     wrapperStyles: { default: () => ({ height: '100%' }) },
@@ -189,6 +197,9 @@ export class PatchNotes extends ReactComponent {}
   },
 })
 export class PerformanceMetrics extends ReactComponent<{ mode: 'full' | 'limited' }> {}
+
+@Component({ props: { name: { default: 'PlatformAppStore' } } })
+export class PlatformAppStore extends ReactComponent {}
 
 @Component({ props: { name: { default: 'PlatformLogo' } } })
 export class PlatformLogo extends ReactComponent<{
