@@ -127,7 +127,7 @@ export default class Settings extends Vue {
       'Stream',
       // 'Output',
       // 'Audio',
-      // 'Video',
+      'Video',
       // 'Hotkeys',
       'Advanced',
       // 'SceneCollections',

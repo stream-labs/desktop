@@ -27,6 +27,7 @@ import { Button } from 'antd';
 import InputWrapper from '../shared/inputs/InputWrapper';
 import { $t, $translateIfExist } from '../../services/i18n';
 import Utils from 'services/utils';
+import {CustomResolutionInput} from "./CustomResolutionInput";
 
 interface IExtraInputProps {
   debounce?: number;
@@ -181,6 +182,10 @@ function ObsInput(p: IObsInputProps) {
           tooltipPlacement="right"
         />
       );
+
+    case 'OBS_INPUT_RESOLUTION_LIST':
+      return <CustomResolutionInput {...inputProps} options={(p.value as any).options} />
+
 
     default:
       return <span style={{ color: 'red' }}>Unknown input type {type}</span>;
