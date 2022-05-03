@@ -9,6 +9,7 @@ import {
   waitForSourceExist,
 } from '../helpers/modules/sources';
 import {
+  click,
   clickButton,
   focusChild,
   focusMain,
@@ -18,8 +19,7 @@ import {
 
 useSpectron({ restartAppAfterEachTest: false });
 
-// TODO: re-write test for the React version
-test.skip('Create/Remove Color Source and view Source Properties', async t => {
+test('Create/Remove Color Source and view Source Properties', async t => {
   const sourceName = 'Color Source';
 
   await addSource('Color Source', sourceName);
@@ -40,8 +40,7 @@ test.skip('Create/Remove Color Source and view Source Properties', async t => {
   t.pass();
 });
 
-// TODO: re-write test for the React version
-test.skip('Create/Remove Image Source and view Source Properties', async t => {
+test('Create/Remove Image Source and view Source Properties', async t => {
   const sourceName = 'Image Source';
   await addSource('Image', sourceName);
   await focusMain();
@@ -59,8 +58,7 @@ test.skip('Create/Remove Image Source and view Source Properties', async t => {
   t.pass();
 });
 
-// TODO: re-write test for the React version
-test.skip('Create/Remove Browser Source and view Source Properties', async t => {
+test('Create/Remove Browser Source and view Source Properties', async t => {
   const sourceName = 'Browser Source';
 
   await addSource('Browser Source', sourceName);
@@ -75,7 +73,7 @@ test.skip('Create/Remove Browser Source and view Source Properties', async t => 
   await waitForDisplayed('label=Width');
   await waitForDisplayed('label=Height');
 
-  await (await (await select('[data-name=fps_custom')).$('[type=checkbox]')).click();
+  await click('span=Use custom frame rate');
 
   await waitForDisplayed('label=FPS');
   await waitForDisplayed('label=Custom CSS');
@@ -87,8 +85,7 @@ test.skip('Create/Remove Browser Source and view Source Properties', async t => 
   t.pass();
 });
 
-// TODO: re-write test for the React version
-test.skip('Create/Remove Media Source and view Source Properties', async t => {
+test('Create/Remove Media Source and view Source Properties', async t => {
   const sourceName = 'Media Source';
 
   await addSource('Media Source', sourceName);
@@ -103,7 +100,7 @@ test.skip('Create/Remove Media Source and view Source Properties', async t => {
   await waitForDisplayed('label=Speed');
   await waitForDisplayed('label=YUV Color Range');
 
-  await (await (await select('[data-name=is_local_file')).$('[type=checkbox]')).click();
+  await click('span=Local File');
   await waitForDisplayed('label=Network Buffering');
   await waitForDisplayed('label=Input');
   await waitForDisplayed('label=Input Format');
@@ -242,8 +239,7 @@ test('Create/Remove Window Capture and view Source Properties', async t => {
   t.pass();
 });
 
-// TODO: re-write test for the React version
-test.skip('Create/Remove Game Capture and view Source Properties', async t => {
+test('Create/Remove Game Capture and view Source Properties', async t => {
   const sourceName = 'Game Capture';
 
   await addSource('Game Capture', sourceName);
@@ -256,7 +252,8 @@ test.skip('Create/Remove Game Capture and view Source Properties', async t => {
   await waitForDisplayed('label=Mode');
   await waitForDisplayed('label=Hook Rate');
 
-  await (await (await select('[data-name=user_placeholder_use')).$('[type=checkbox]')).click();
+  await waitForDisplayed('span=Сustomize placeholder');
+  await click('span=Сustomize placeholder');
   await waitForDisplayed('label=Placeholder Image');
 
   await focusMain();
@@ -266,8 +263,7 @@ test.skip('Create/Remove Game Capture and view Source Properties', async t => {
   t.pass();
 });
 
-// TODO: re-write test for the React version
-test.skip('Create/Remove Video Capture Device and view Source Properties', async t => {
+test('Create/Remove Video Capture Device and view Source Properties', async t => {
   const sourceName = 'Video Capture Device';
 
   await addSource('Video Capture Device', sourceName);
