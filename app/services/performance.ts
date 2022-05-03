@@ -142,10 +142,9 @@ export class PerformanceService extends StatefulService<IPerformanceState> {
 
   @mutation()
   private SET_PERFORMANCE_STATS(stats: Partial<IPerformanceState>) {
-    // TODO uncomment
-    // Object.keys(stats).forEach(stat => {
-    //   Vue.set(this.state, stat, stats[stat]);
-    // });
+    Object.keys(stats).forEach(stat => {
+      Vue.set(this.state, stat, stats[stat]);
+    });
   }
 
   init() {

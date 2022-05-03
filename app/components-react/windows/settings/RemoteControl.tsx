@@ -44,10 +44,9 @@ class RemoteControlModule {
     return Services.TcpServerService;
   }
 
-  @mutation()
   showQrCode() {
     this.TcpServerService.enableWebsoketsRemoteConnections();
-    this.state.qrcodeIsVisible = true;
+    this.state.setQrcodeIsVisible(true);
   }
 
   @mutation()
@@ -59,19 +58,18 @@ class RemoteControlModule {
     this.TcpServerService.actions.generateToken();
   }
 
-  @mutation()
   private refreshQrcodeData() {
     const settings = this.TcpServerService.state;
     const addresses = this.TcpServerService.getIPAddresses()
       .filter(address => !address.internal)
       .map(address => address.address);
 
-    this.state.qrCodeData = {
+    this.state.setQrCodeData({
       addresses,
       token: settings.token,
       port: settings.websockets.port,
       version: Utils.env.SLOBS_VERSION,
-    };
+    });
   }
 }
 
