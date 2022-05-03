@@ -198,6 +198,9 @@ export class PatchNotes extends ReactComponent {}
 })
 export class PerformanceMetrics extends ReactComponent<{ mode: 'full' | 'limited' }> {}
 
+@Component({ props: { name: { default: 'PlatformAppStore' } } })
+export class PlatformAppStore extends ReactComponent {}
+
 @Component({ props: { name: { default: 'PlatformLogo' } } })
 export class PlatformLogo extends ReactComponent<{
   platform: string;
