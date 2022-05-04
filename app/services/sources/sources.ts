@@ -86,6 +86,7 @@ export const windowsSources: TSourceType[] = [
   'ovrstream_dc_source',
   'vlc_source',
   'soundtrack_source',
+  'mediasoupconnector',
 ];
 
 /**
@@ -145,6 +146,10 @@ class SourcesViews extends ViewHandler<ISourcesState> {
       return source.name === name;
     });
     return sourceModels.map(sourceModel => this.getSource(sourceModel.sourceId)!);
+  }
+
+  getSourcesByType(type: TSourceType) {
+    return this.sources.filter(s => s.type === type);
   }
 
   suggestName(name: string): string {
@@ -522,6 +527,7 @@ export class SourcesService extends StatefulService<ISourcesState> {
       { description: 'Video Capture Device', value: 'av_capture_input' },
       { description: 'Display Capture', value: 'display_capture' },
       { description: 'Soundtrack source', value: 'soundtrack_source' },
+      { description: 'Guest Cam', value: 'mediasoupconnector' },
     ];
 
     const availableAllowlistedTypes = allowlistedTypes.filter(type =>

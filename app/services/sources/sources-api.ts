@@ -114,7 +114,8 @@ export type TSourceType =
   | 'display_capture'
   | 'audio_line'
   | 'syphon-input'
-  | 'soundtrack_source';
+  | 'soundtrack_source'
+  | 'mediasoupconnector';
 
 // Register new properties managers here
 export type TPropertiesManager =
