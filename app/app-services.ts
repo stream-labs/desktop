@@ -170,6 +170,9 @@ import { AutoConfigService } from 'services/auto-config';
 import { MacPermissionsService } from 'services/mac-permissions';
 import { IncrementalRolloutService } from './services/incremental-rollout';
 import { RecordingModeService } from 'services/recording-mode';
+import { JsonrpcService } from 'services/api/jsonrpc';
+import { OverlaysPersistenceService } from 'services/scene-collections/overlays';
+import { PlatformAppStoreService } from 'services/platform-app-store';
 
 export const AppServices = {
   AppService,
@@ -228,4 +231,7 @@ export const AppServices = {
   MacPermissionsService,
   IncrementalRolloutService,
   RecordingModeService,
+  JsonrpcService,
+  OverlaysPersistenceService,
+  PlatformAppStoreService,
 };
