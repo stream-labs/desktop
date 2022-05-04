@@ -1713,28 +1713,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@electron/get@npm:^1.0.1":
-  version: 1.12.2
-  resolution: "@electron/get@npm:1.12.2"
-  dependencies:
-    debug: ^4.1.1
-    env-paths: ^2.2.0
-    fs-extra: ^8.1.0
-    global-agent: ^2.0.2
-    global-tunnel-ng: ^2.7.1
-    got: ^9.6.0
-    progress: ^2.0.3
-    sanitize-filename: ^1.6.2
-    sumchecker: ^3.0.1
-  dependenciesMeta:
-    global-agent:
-      optional: true
-    global-tunnel-ng:
-      optional: true
-  checksum: 447a08021d6fabc437dcf02b2a2edac718802f3b5dd1ff86c3a8aa7b35de03b39c7abc0a817ca58ea68c295cf64365935156191fa5b5a3d00263c8b4a8439ef1
-  languageName: node
-  linkType: hard
-
 "@electron/get@npm:^1.12.4":
   version: 1.13.0
   resolution: "@electron/get@npm:1.13.0"
@@ -1757,21 +1735,43 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@electron/get@npm:^1.13.0":
+  version: 1.14.1
+  resolution: "@electron/get@npm:1.14.1"
+  dependencies:
+    debug: ^4.1.1
+    env-paths: ^2.2.0
+    fs-extra: ^8.1.0
+    global-agent: ^3.0.0
+    global-tunnel-ng: ^2.7.1
+    got: ^9.6.0
+    progress: ^2.0.3
+    semver: ^6.2.0
+    sumchecker: ^3.0.1
+  dependenciesMeta:
+    global-agent:
+      optional: true
+    global-tunnel-ng:
+      optional: true
+  checksum: 21fec5e82bbee8f9fa183b46e05675b137c3130c7999d3b2b34a0047d1a06ec3c76347b9bbdb9911ba9b2123697804e360a15dda9db614c0226d5d4dcc4d6d15
+  languageName: node
+  linkType: hard
+
+"@electron/remote@npm:2.0.8":
+  version: 2.0.8
+  resolution: "@electron/remote@npm:2.0.8"
+  peerDependencies:
+    electron: ">= 13.0.0"
+  checksum: d0ef11b3f09d789baf4330c2c021cfc1a997fc5ffdb56e8810ed7fe2fd76cda1a168c0589d2a10284a907fd3829bae14002a58b35c4881473cdd0049f07fbd63
+  languageName: node
+  linkType: hard
+
 "@electron/remote@npm:^1.1.0":
   version: 1.2.1
   resolution: "@electron/remote@npm:1.2.1"
   peerDependencies:
     electron: ">= 10.0.0-beta.1"
   checksum: 2ec4a3f7bee66ed89097ae449fe70a4dca63fb49c4c19235cc8c38b4a44caa2edae2df4de05a9fb8e234187f7bb3edfcd71dddac5fdb06e9f873f57495c69aff
-  languageName: node
-  linkType: hard
-
-"@electron/remote@npm:^2.0.1":
-  version: 2.0.1
-  resolution: "@electron/remote@npm:2.0.1"
-  peerDependencies:
-    electron: ">= 10.0.0-beta.1"
-  checksum: 0d363d8c41d21041b0ba294f538bb7cabf6e7cc7719910634be4bc3318f090a0acdcf079c90199f2a739418ef72664bf97eb260ec81053f48464cb5dd1871e67
   languageName: node
   linkType: hard
 
@@ -6532,16 +6532,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"electron@npm:14.2.6":
-  version: 14.2.6
-  resolution: "electron@npm:14.2.6"
+"electron@npm:17.4.1":
+  version: 17.4.1
+  resolution: "electron@npm:17.4.1"
   dependencies:
-    "@electron/get": ^1.0.1
+    "@electron/get": ^1.13.0
     "@types/node": ^14.6.2
     extract-zip: ^1.0.3
   bin:
     electron: cli.js
-  checksum: f0ce42459502f9f7d937374699eefbb56dacc03b21c7e7933f5a865c4f1f05aba00eafa3a217fa97d91559ffffe5f57ab17c2001a5e122118957932e360bb707
+  checksum: 7f70989d52620beaeb4f83a5608f68e9381714718950e1cf5e0581e8ec1325ba0d15227228c0a25a4e68c466a1338d74f05ca47edd8909df708a1bd17db93eec
   languageName: node
   linkType: hard
 
@@ -8014,6 +8014,20 @@ __metadata:
     semver: ^7.3.2
     serialize-error: ^7.0.1
   checksum: 220c30f0ee19bf0a32a286d94b5d23c11b4f1c0a029b68a6ba22c25e0e9409dbe5e9e19e724cb4dd68e7be64f5fc5fd04cb0a897361f8e2fdda571438ecc37ad
+  languageName: node
+  linkType: hard
+
+"global-agent@npm:^3.0.0":
+  version: 3.0.0
+  resolution: "global-agent@npm:3.0.0"
+  dependencies:
+    boolean: ^3.0.1
+    es6-error: ^4.1.1
+    matcher: ^3.0.0
+    roarr: ^2.15.3
+    semver: ^7.3.2
+    serialize-error: ^7.0.1
+  checksum: 75074d80733b4bd5386c47f5df028e798018025beac0ab310e9908c72bf5639e408203e7bca0130d5ee01b5f4abc6d34385d96a9f950ea5fe1979bb431c808f7
   languageName: node
   linkType: hard
 
@@ -13970,7 +13984,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"sanitize-filename@npm:^1.6.2, sanitize-filename@npm:^1.6.3":
+"sanitize-filename@npm:^1.6.3":
   version: 1.6.3
   resolution: "sanitize-filename@npm:1.6.3"
   dependencies:
@@ -14371,7 +14385,7 @@ __metadata:
     "@babel/core": 7.17.2
     "@babel/plugin-proposal-decorators": 7.17.2
     "@babel/preset-env": 7.16.11
-    "@electron/remote": ^2.0.1
+    "@electron/remote": 2.0.8
     "@octokit/app": 3.0.2
     "@octokit/request": 4.1.1
     "@octokit/rest": 16.43.2
@@ -14423,7 +14437,7 @@ __metadata:
     css-element-queries: 1.2.3
     css-loader: 2.1.1
     dotenv: 8.2.0
-    electron: 14.2.6
+    electron: 17.4.1
     electron-builder: 22.14.5
     electron-chromedriver: ^14.0.0
     electron-devtools-installer: 3.1.1

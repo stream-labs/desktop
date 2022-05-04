@@ -29,6 +29,7 @@ const {
   crashReporter,
   dialog,
   webContents,
+  desktopCapturer,
 } = require('electron');
 const path = require('path');
 const rimraf = require('rimraf');
@@ -806,3 +807,5 @@ function measure(msg, time) {
   if (delta > 2000) console.log('------------------');
   console.log(msg, delta + 'ms');
 }
+
+ipcMain.handle('DESKTOP_CAPTURER_GET_SOURCES', (event, opts) => desktopCapturer.getSources(opts));
