@@ -957,6 +957,9 @@ export class StreamingService
         [EOBSOutputSignal.Stopping]: ERecordingState.Stopping,
       } as Dictionary<ERecordingState>)[info.signal];
 
+      // We received a signal we didn't recognize
+      if (!nextState) return;
+
       if (info.signal === EOBSOutputSignal.Start) {
         this.usageStatisticsService.recordFeatureUsage('Recording');
         this.usageStatisticsService.recordAnalyticsEvent('RecordingStatus', {

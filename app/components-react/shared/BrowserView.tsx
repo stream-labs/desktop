@@ -18,6 +18,7 @@ interface BrowserViewProps {
   enableGuestApi?: boolean;
   onReady?: (view: any) => void;
   className?: string;
+  style?: React.CSSProperties;
 }
 
 export default function BrowserView(p: BrowserViewProps) {
@@ -151,5 +152,5 @@ export default function BrowserView(p: BrowserViewProps) {
     );
   }
 
-  return <div style={{ height: '100%' }} ref={sizeContainer} className={p.className} />;
+  return <div style={{ height: '100%', ...p.style }} ref={sizeContainer} className={p.className} />;
 }
