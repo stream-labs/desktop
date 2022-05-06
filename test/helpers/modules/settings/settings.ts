@@ -1,17 +1,9 @@
-import {
-  click,
-  clickButton,
-  focusChild,
-  getFocusedWindowId,
-  useChildWindow,
-  useMainWindow
-} from '../core';
+import { click, clickButton, focusChild, useChildWindow, useMainWindow } from '../core';
 import { mkdtemp } from 'fs-extra';
 import { tmpdir } from 'os';
 import * as path from 'path';
 import { setInputValue } from '../forms/base';
-import { FormMonkey } from '../../form-monkey';
-import { getContext } from '../../spectron';
+import { fillForm } from '../forms';
 
 /**
  * Open the settings window with a given category selected
@@ -53,8 +45,7 @@ export async function setOutputResolution(resolution: string) {
   const [width, height] = resolution.split('x');
   await showSettingsWindow('Video', async () => {
     await clickButton('Use Custom');
-    const form = new FormMonkey(getContext());
-    await form.fill({ width, height });
+    await fillForm({ width, height });
     await clickButton('Apply');
     await clickButton('Done');
   });
