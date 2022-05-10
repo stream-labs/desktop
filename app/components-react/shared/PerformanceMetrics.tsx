@@ -90,7 +90,9 @@ export default function PerformanceMetrics(props: {
             >
               <i className={cx(styles.performanceMetricIcon, data.icon)} />
               <span className={styles.performanceMetric}>
-                <span className={styles.performanceMetricValue}>{data.value}</span>
+                <span className={styles.performanceMetricValue} role={`metric-${attribute}`}>
+                  {data.value}
+                </span>
                 {showLabel(attribute) && (
                   <span className={styles.performanceMetricLabel}> {data.label}</span>
                 )}
