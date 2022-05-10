@@ -5,7 +5,7 @@
   "Streamer Dashboard": "主播仪表板",
   "Share": "分享",
   "Like": "赞",
-  "Step": "步骤",
+  "Step 3:": "第3步:",
   "Create a Facebook Gaming page to get started.": "创建一个 Facebook 游戏页面以开始使用。",
   "Create a Gaming Page": "创建游戏页面",
   "All of your scenes, sources, and settings will be preserved.": "您所有的场景、源和设置都将保留。",
@@ -32,5 +32,6 @@
   "Privacy": "隐私",
   "FBPrivacyWarning": "授予的隐私级别可能会限制您的 Facebook 帐户。请在<link>此处</link>检查“谁可以看到您使用此业务集成”部分以了解 Streamlabs 集成",
   "Only Me": "只有我",
-  "Do not change privacy settings": "不要更改隐私设置"
+  "Do not change privacy settings": "不要更改隐私设置",
+  "Install %{overlayName}": "Install %{overlayName}"
 }
