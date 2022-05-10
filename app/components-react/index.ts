@@ -44,6 +44,7 @@ import Projector from './windows/Projector';
 import SceneSelector from './editor/elements/SceneSelectorElement';
 import AddSource from './windows/AddSource';
 import SideNav from './sidebar/SideNav';
+import PlatformMerge from './pages/PlatformMerge';
 import AlertboxLibrary from './pages/AlertboxLibrary';
 import PlatformAppStore from './pages/PlatformAppStore';
 import BrowseOverlays from './pages/BrowseOverlays';
@@ -97,5 +98,6 @@ export const components = {
   SceneSelector: createRoot(SceneSelector),
   AddSource,
   SideNav,
+  PlatformMerge,
   PlatformAppStore,
 };
