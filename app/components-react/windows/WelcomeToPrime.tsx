@@ -56,15 +56,15 @@ export default function WelcomeToPrime() {
       <p>{$t("We've picked out a few Prime benefits to get you started:")}</p>
       <div className={styles.panelContainer}>
         {panelData.map(panel => (
-          <Panel panel={panel} />
+          <Panel panel={panel} key={panel.link} />
         ))}
       </div>
-      <p className={styles.themeToggle}>
+      <div className={styles.themeToggle}>
         {$t("We've added a new UI theme exclusive to Prime members:")}
         <span>{$t('Classic Theme')}</span>
         <SwitchInput value={/prime/.test(theme)} onInput={toggleTheme} />
         <span>{$t('Prime Theme')}</span>
-      </p>
+      </div>
     </div>
   );
 }
