@@ -24,7 +24,7 @@ export default function PlatformMerge(p: IPlatformMergeProps) {
 
   const [showOverlay, setShowOverlay] = useState(false);
 
-  const platform = p.params.platform;
+  const platform = p.params?.platform;
 
   if (!platform) throw new Error('Platform should be provided for PlatformMerge');
 
@@ -102,7 +102,7 @@ export default function PlatformMerge(p: IPlatformMergeProps) {
   }
 
   return (
-    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%' }}>
       <div style={{ width: '400px' }}>
         <h1>{$t('Connect %{platformName}', { platformName })}</h1>
         {showOverlay ? <OverlayStep /> : <LoginStep />}
