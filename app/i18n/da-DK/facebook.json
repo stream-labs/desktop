@@ -5,7 +5,7 @@
   "Streamer Dashboard": "Streamer skrivebord",
   "Share": "Del",
   "Like": "Synes godt om",
-  "Step": "Trin",
+  "Step 3:": "Step 3:",
   "Create a Facebook Gaming page to get started.": "Opret en Facebook-gamingside for at komme i gang.",
   "Create a Gaming Page": "Opret en gamingside",
   "All of your scenes, sources, and settings will be preserved.": "Alle dine scener, kilder og indstillinger bevares.",
@@ -32,5 +32,6 @@
   "Privacy": "Beskyttelse af personlige oplysninger",
   "FBPrivacyWarning": "Det tilladte niveau for beskyttelse af personlige oplysninger kan være begrænset for din Facebook-konto. Du kan læse om Streamlabs-integrationen under \"Hvem kan se at du bruger denne integration\" <link>her</link>",
   "Only Me": "Kun mig",
-  "Do not change privacy settings": "Ændr ikke indstillinger for beskyttelse af personlige oplysninger"
+  "Do not change privacy settings": "Ændr ikke indstillinger for beskyttelse af personlige oplysninger",
+  "Install %{overlayName}": "Install %{overlayName}"
 }
