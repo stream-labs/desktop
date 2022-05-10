@@ -6,8 +6,7 @@ import {
   addExistingSource,
 } from '../helpers/modules/sources';
 import { addScene } from '../helpers/modules/scenes';
-import { focusMain } from '../helpers/modules/core';
-
+import {click, focusChild, focusMain, waitForDisplayed} from '../helpers/modules/core';
 useSpectron();
 
 test('Adding and removing a AudioSource', async t => {
@@ -50,4 +49,12 @@ test('Nested scenes should provide audio sources to mixer', async t => {
   t.true(
     await (await (await app.client.$('.mixer-panel')).$('div=Nested Media Source')).isExisting(),
   );
+});
+
+test('Advanced audio', async t => {
+  await click('[role="show-advanced-audio"]');
+  await focusChild();
+  await click('span=Global Settings');
+  await waitForDisplayed('label=Audio Monitoring Device');
+  t.pass();
 });

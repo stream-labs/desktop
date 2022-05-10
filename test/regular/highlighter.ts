@@ -1,7 +1,14 @@
 import { test, useSpectron } from '../helpers/spectron';
 import { sleep } from '../helpers/sleep';
 import { setTemporaryRecordingPath } from '../helpers/modules/settings/settings';
-import { click, clickButton, select, waitForDisplayed } from '../helpers/modules/core';
+import {
+  click,
+  clickButton,
+  focusMain,
+  getClient,
+  select,
+  waitForDisplayed
+} from '../helpers/modules/core';
 import { showPage } from '../helpers/modules/navigation';
 import { goLive, stopStream } from '../helpers/modules/streaming';
 import { logIn } from '../helpers/modules/user';
@@ -23,6 +30,8 @@ test('Highlighter save and export', async t => {
   await sleep(2000);
   await saveReplayBuffer();
   await stopStream();
+
+  await focusMain();
   await clickButton('Export');
   const fileName = 'MyTestVideo.mp4';
   const exportLocation = path.resolve(recordingDir, fileName);
