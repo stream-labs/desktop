@@ -32,13 +32,14 @@ export default function PlatformAppPageView(p: {
       }
     });
 
+    const interval = window.setInterval(checkResize, 100);
+
     return () => {
       subscription.unsubscribe();
       unmountContainer();
+      clearInterval(interval);
     };
   }, []);
-
-  useRenderInterval(checkResize, 100);
 
   async function mountContainer() {
     containerId = await PlatformAppsService.actions.return.mountContainer(
