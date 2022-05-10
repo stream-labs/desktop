@@ -45,9 +45,14 @@ import SceneSelector from './editor/elements/SceneSelectorElement';
 import AddSource from './windows/AddSource';
 import SideNav from './sidebar/SideNav';
 import WelcomeToPrime from './windows/WelcomeToPrime';
+import AlertboxLibrary from './pages/AlertboxLibrary';
+import PlatformAppStore from './pages/PlatformAppStore';
+import BrowseOverlays from './pages/BrowseOverlays';
 
 // list of React components to be used inside Vue components
 export const components = {
+  AlertboxLibrary,
+  BrowseOverlays,
   NameFolder,
   NameScene,
   BrowserView,
@@ -94,4 +99,5 @@ export const components = {
   AddSource,
   SideNav,
   WelcomeToPrime,
+  PlatformAppStore,
 };
