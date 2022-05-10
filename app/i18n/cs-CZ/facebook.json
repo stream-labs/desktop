@@ -5,7 +5,7 @@
   "Streamer Dashboard": "Řídicí panel pro streamery",
   "Share": "Sdílet",
   "Like": "To se mi líbí",
-  "Step": "Krok",
+  "Step 3:": "Krok 3:",
   "Create a Facebook Gaming page to get started.": "Začněte vytvořením herní stránky na Facebooku.",
   "Create a Gaming Page": "Vytvořit stránku",
   "All of your scenes, sources, and settings will be preserved.": "Všechny vaše scény, zdroje a nastavení budou zachovány.",
@@ -32,5 +32,6 @@
   "Privacy": "Soukromí",
   "FBPrivacyWarning": "Poskytnutá úroveň ochrany soukromí může být omezena pro váš účet na Facebooku. Podívejte se do části „Kdo vidí, že používáte tuto firemní integraci“ pro integraci Streamlabs <link>zde</link>",
   "Only Me": "Jen já",
-  "Do not change privacy settings": "Neměnit nastavení ochrany soukromí"
+  "Do not change privacy settings": "Neměnit nastavení ochrany soukromí",
+  "Install %{overlayName}": "Install %{overlayName}"
 }
