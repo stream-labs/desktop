@@ -224,6 +224,14 @@ export class PlatformLogo extends ReactComponent<{
 }> {}
 
 @Component({
+  props: {
+    name: { default: 'PlatformMerge' },
+    wrapperStyles: { default: () => ({ height: '100%' }) },
+  },
+})
+export class PlatformMerge extends ReactComponent {}
+
+@Component({
   props: { name: { default: 'Projector' }, wrapperStyles: { default: () => ({ height: '100%' }) } },
 })
 export class Projector extends ReactComponent {}
