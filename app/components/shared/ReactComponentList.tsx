@@ -3,6 +3,14 @@ import ReactComponent from './ReactComponent';
 
 @Component({
   props: {
+    name: { default: 'AddSource' },
+    wrapperStyles: { default: () => ({ height: '100%' }) },
+  },
+})
+export class AddSource extends ReactComponent {}
+
+@Component({
+  props: {
     name: { default: 'AdvancedAudio' },
     wrapperStyles: { default: () => ({ height: '100%' }) },
   },
@@ -16,6 +24,22 @@ export class AdvancedAudio extends ReactComponent {}
   },
 })
 export class AdvancedStatistics extends ReactComponent {}
+
+@Component({
+  props: {
+    name: { default: 'AlertboxLibrary' },
+    wrapperStyles: { default: () => ({ height: '100%' }) },
+  },
+})
+export class AlertboxLibrary extends ReactComponent {}
+
+@Component({
+  props: {
+    name: { default: 'BrowseOverlays' },
+    wrapperStyles: { default: () => ({ height: '100%' }) },
+  },
+})
+export class BrowseOverlays extends ReactComponent {}
 
 @Component({
   props: {
@@ -174,6 +198,9 @@ export class PatchNotes extends ReactComponent {}
 })
 export class PerformanceMetrics extends ReactComponent<{ mode: 'full' | 'limited' }> {}
 
+@Component({ props: { name: { default: 'PlatformAppStore' } } })
+export class PlatformAppStore extends ReactComponent {}
+
 @Component({ props: { name: { default: 'PlatformLogo' } } })
 export class PlatformLogo extends ReactComponent<{
   platform: string;
@@ -181,6 +208,14 @@ export class PlatformLogo extends ReactComponent<{
   color?: string;
   unwrapped?: boolean;
 }> {}
+
+@Component({
+  props: {
+    name: { default: 'PlatformMerge' },
+    wrapperStyles: { default: () => ({ height: '100%' }) },
+  },
+})
+export class PlatformMerge extends ReactComponent {}
 
 @Component({
   props: { name: { default: 'Projector' }, wrapperStyles: { default: () => ({ height: '100%' }) } },

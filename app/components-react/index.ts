@@ -42,10 +42,17 @@ import MediaGallery from './windows/MediaGallery';
 import LayoutEditor from './pages/layout-editor/LayoutEditor';
 import Projector from './windows/Projector';
 import SceneSelector from './editor/elements/SceneSelectorElement';
+import AddSource from './windows/AddSource';
 import SideNav from './sidebar/SideNav';
+import PlatformMerge from './pages/PlatformMerge';
+import AlertboxLibrary from './pages/AlertboxLibrary';
+import PlatformAppStore from './pages/PlatformAppStore';
+import BrowseOverlays from './pages/BrowseOverlays';
 
 // list of React components to be used inside Vue components
 export const components = {
+  AlertboxLibrary,
+  BrowseOverlays,
   NameFolder,
   NameScene,
   BrowserView,
@@ -71,7 +78,7 @@ export const components = {
   SharedComponentsLibrary: createRoot(SharedComponentsLibrary),
   TestWidgets,
   RenameSource,
-  StudioFooter,
+  StudioFooter: createRoot(StudioFooter),
   StartStreamingButton,
   NotificationsArea,
   ObsSettings: createRoot(ObsSettings),
@@ -89,5 +96,8 @@ export const components = {
   MediaGallery,
   LayoutEditor: createRoot(LayoutEditor),
   SceneSelector: createRoot(SceneSelector),
+  AddSource,
   SideNav,
+  PlatformMerge,
+  PlatformAppStore,
 };

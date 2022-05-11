@@ -147,7 +147,8 @@ class SourcesViews extends ViewHandler<ISourcesState> {
     return sourceModels.map(sourceModel => this.getSource(sourceModel.sourceId)!);
   }
 
-  suggestName(name: string): string {
+  suggestName(name?: string): string {
+    if (!name) return '';
     return namingHelpers.suggestName(name, (name: string) => this.getSourcesByName(name).length);
   }
 }
@@ -284,14 +285,16 @@ export class SourcesService extends StatefulService<ISourcesState> {
 
     if (
       this.defaultHardwareService.state.defaultVideoDevice === obsInputSettings.video_device_id &&
-      this.defaultHardwareService.state.presetFilter !== ''
+      this.defaultHardwareService.state.presetFilter !== '' &&
+      this.defaultHardwareService.state.presetFilter !== 'none'
     ) {
       this.sourceFiltersService.addPresetFilter(id, this.defaultHardwareService.state.presetFilter);
     }
 
     if (
       this.defaultHardwareService.state.defaultVideoDevice === obsInputSettings.device &&
-      this.defaultHardwareService.state.presetFilter !== ''
+      this.defaultHardwareService.state.presetFilter !== '' &&
+      this.defaultHardwareService.state.presetFilter !== 'none'
     ) {
       this.sourceFiltersService.addPresetFilter(id, this.defaultHardwareService.state.presetFilter);
     }
@@ -547,6 +550,7 @@ export class SourcesService extends StatefulService<ISourcesState> {
       if (source.width !== info.width || source.height !== info.height) {
         const size = { id: source.sourceId, width: info.width, height: info.height };
         this.UPDATE_SOURCE(size);
+        this.sourceUpdated.next(source.getModel());
       }
       this.updateSourceFlags(source, info.flags);
     });

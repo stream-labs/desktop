@@ -45,7 +45,7 @@ export function Prime() {
     <div style={{ width: '100%' }}>
       <h1 className={commonStyles.titleContainer}>{$t('Choose your Streamlabs plan')}</h1>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <div className={styles.cardContainer} onClick={next}>
+        <div className={styles.cardContainer} onClick={() => next()}>
           <h1>
             <i className="icon-streamlabs" />
             {$t('Free')}

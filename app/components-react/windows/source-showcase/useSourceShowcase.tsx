@@ -22,7 +22,9 @@ type TInspectableSource = TSourceType | WidgetType | 'streamlabel' | 'app_source
  */
 class SourceShowcaseModule {
   state = {
-    inspectedSource: '' as TInspectableSource,
+    inspectedSource: (Services.UserService.views.isLoggedIn
+      ? 'AlertBox'
+      : 'ffmpeg_source') as TInspectableSource,
     inspectedAppId: '',
     inspectedAppSourceId: '',
   };
