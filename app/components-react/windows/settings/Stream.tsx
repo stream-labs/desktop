@@ -340,12 +340,7 @@ function Platform(p: { platform: TPlatform }) {
  * Renders a custom destinations list
  */
 function CustomDestinationList() {
-  const {
-    isPrime,
-    customDestinations,
-    editCustomDestMode,
-    addCustomDest,
-  } = useStreamSettings();
+  const { isPrime, customDestinations, editCustomDestMode, addCustomDest } = useStreamSettings();
   const shouldShowPrimeLabel = !isPrime;
   const destinations = customDestinations;
   const isEditMode = editCustomDestMode !== false;

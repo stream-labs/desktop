@@ -249,7 +249,7 @@ class FacebookEditStreamInfoModule {
 }
 
 export default function FacebookEditStreamInfo(p: IPlatformComponentParams<'facebook'>) {
-  const { shouldShowPermissionWarn, setProps } = useModule(FacebookEditStreamInfoModule);
+  const { shouldShowPermissionWarn, setProps } = useModule(FacebookEditStreamInfoModule, true);
   setProps(p);
   return (
     <Form name="facebook-settings">
