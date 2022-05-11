@@ -27,10 +27,15 @@ export default function GoLiveChecklist(p: HTMLAttributes<unknown>) {
     isUpdateMode,
     shouldShowOptimizedProfile,
     shouldPostTweet,
-  } = useGoLiveSettings().selectExtra(module => ({
-    shouldShowOptimizedProfile:
-      VideoEncodingOptimizationService.state.useOptimizedProfile && !module.isUpdateMode,
-    shouldPostTweet: !module.isUpdateMode && TwitterService.state.tweetWhenGoingLive,
+  } = useGoLiveSettings().extend(module => ({
+
+    get shouldShowOptimizedProfile() {
+      return VideoEncodingOptimizationService.state.useOptimizedProfile && !module.isUpdateMode;
+    },
+
+    get shouldPostTweet() {
+      return !module.isUpdateMode && TwitterService.state.tweetWhenGoingLive;
+    },
   }));
 
   const success = lifecycle === 'live';

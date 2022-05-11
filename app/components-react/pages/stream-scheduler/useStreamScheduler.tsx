@@ -15,13 +15,11 @@ import {
   IYoutubeLiveBroadcast,
   IYoutubeStartStreamOptions,
 } from '../../../services/platforms/youtube';
-import { mutation } from '../../store';
-import { Moment } from 'moment';
 import { message } from 'antd';
 import { $t } from '../../../services/i18n';
 import { IStreamError } from '../../../services/streaming/stream-error';
-import { useModule } from '../../hooks/useModule';
 import { IGoLiveSettings } from '../../../services/streaming';
+import { injectState, useModule, mutation } from 'slap';
 
 /**
  * Represents a single stream event
@@ -71,7 +69,7 @@ interface ISchedulerPlatformSettings extends Partial<Record<TPlatform, Object>> 
  */
 export function useStreamScheduler() {
   // call `.select()` so all getters and state returned from the hook will be reactive
-  return useModule(StreamSchedulerModule).select();
+  return useModule(StreamSchedulerModule);
 }
 
 /**
@@ -79,7 +77,7 @@ export function useStreamScheduler() {
  * The module controls the components' state and provides actions
  */
 class StreamSchedulerModule {
-  state = {
+  state = injectState({
     /**
      * `true` if should show a spinner in the modal window
      */
@@ -113,7 +111,8 @@ class StreamSchedulerModule {
      * Fill out the default settings for each platform
      */
     platformSettings: this.defaultPlatformSettings,
-  };
+    defaultPlatformSettings: this.defaultPlatformSettings,
+  });
 
   /**
    * Load all events into state on module init

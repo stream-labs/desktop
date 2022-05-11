@@ -2,17 +2,16 @@ import React from 'react';
 import styles from './Onboarding.m.less';
 import commonStyles from './Common.m.less';
 import { Services } from 'components-react/service-provider';
-import { useModule } from 'components-react/hooks/useModule';
+import { injectState, useModule, mutation } from 'slap';
 import cx from 'classnames';
-import { mutation } from 'components-react/store';
 import { $t } from 'services/i18n';
 import * as stepComponents from './steps';
 import Utils from 'services/utils';
-import { ONBOARDING_STEPS } from 'services/onboarding';
+import {IOnboardingStep, ONBOARDING_STEPS} from 'services/onboarding';
 import Scrollable from 'components-react/shared/Scrollable';
 
 export default function Onboarding() {
-  const { currentStep, next, processing, finish } = useModule(OnboardingModule).select();
+  const { currentStep, next, processing, finish } = useModule(OnboardingModule);
 
   // TODO: Onboarding service needs a refactor away from step index-based.
   // In the meantime, if we run a render cycle and step index is greater
@@ -54,7 +53,7 @@ export default function Onboarding() {
 function TopBar() {
   const { stepIndex, preboardingOffset, singletonStep, steps } = useModule(
     OnboardingModule,
-  ).select();
+  );
 
   if (stepIndex < preboardingOffset || singletonStep) {
     return <div />;
@@ -87,7 +86,7 @@ function TopBar() {
 }
 
 function ActionButton() {
-  const { currentStep, next, processing } = useModule(OnboardingModule).select();
+  const { currentStep, next, processing } = useModule(OnboardingModule);
 
   if (currentStep.hideButton) return null;
   const isPrimeStep = currentStep.label === $t('Prime');
@@ -105,10 +104,10 @@ function ActionButton() {
 }
 
 export class OnboardingModule {
-  state = {
+  state = injectState({
     stepIndex: 0,
     processing: false,
-  };
+  });
 
   get OnboardingService() {
     return Services.OnboardingService;
@@ -126,7 +125,7 @@ export class OnboardingModule {
     return this.OnboardingService.views.singletonStep;
   }
 
-  get currentStep() {
+  get currentStep(): IOnboardingStep {
     // Useful for testing in development
     if (Utils.env.SLD_FORCE_ONBOARDING_STEP) {
       return ONBOARDING_STEPS()[Utils.env.SLD_FORCE_ONBOARDING_STEP];

@@ -9,14 +9,13 @@ import { values, cloneDeep, intersection } from 'lodash';
 import { IAlertConfig, TAlertType } from '../../services/widgets/alerts-config';
 import { createBinding } from '../shared/inputs';
 import { Services } from '../service-provider';
-import { mutation } from '../store';
 import { metadata } from '../shared/inputs/metadata';
 import { $t } from '../../services/i18n';
-import * as electron from 'electron';
 import { getDefined } from '../../util/properties-type-guards';
 import { TPlatform } from '../../services/platforms';
 import * as remote from '@electron/remote';
 import { IListOption } from '../shared/inputs/ListInput';
+import { injectFormBinding, mutation } from 'slap';
 
 interface IAlertBoxState extends IWidgetState {
   data: {
@@ -45,7 +44,7 @@ export class AlertBoxModule extends WidgetModule<IAlertBoxState> {
    * config for all events supported by users' platforms
    */
   get alerts() {
-    return this.state.availableAlerts.map(alertType => this.eventsConfig[alertType]);
+    return this.widgetState.availableAlerts.map(alertType => this.eventsConfig[alertType]);
   }
 
   /**
@@ -62,15 +61,17 @@ export class AlertBoxModule extends WidgetModule<IAlertBoxState> {
    * returns settings for a given variation from the state
    */
   getVariationSettings<T extends TAlertType>(alertType: T, variationId = 'default') {
-    return this.state.data.variations[alertType][variationId];
+    const variations = this.widgetData.variations;
+    if (!variations) return null;
+    return this.widgetData.variations[alertType][variationId];
   }
 
   /**
    * 2-way bindings for general settings inputs
    */
-  bind = createBinding(
+  bind = injectFormBinding(
     // define source of values
-    () => this.settings,
+    () => this.settings as IAlertBoxState['data']['settings'],
     // define onChange handler
     statePatch => this.updateSettings(statePatch),
     // pull additional metadata like tooltip, label, min, max, etc...
@@ -113,8 +114,8 @@ export class AlertBoxModule extends WidgetModule<IAlertBoxState> {
    * list of enabled alerts
    */
   get enabledAlerts() {
-    return Object.keys(this.state.data.variations).filter(
-      alertType => this.state.data.variations[alertType].default.enabled,
+    return Object.keys(this.widgetData.variations).filter(
+      alertType => this.widgetData.variations[alertType].default.enabled,
     );
   }
 
@@ -122,7 +123,7 @@ export class AlertBoxModule extends WidgetModule<IAlertBoxState> {
    * available animations
    */
   get animationOptions() {
-    return this.state.data.animationOptions;
+    return this.widgetData.animationOptions;
   }
 
   /**
@@ -143,10 +144,9 @@ export class AlertBoxModule extends WidgetModule<IAlertBoxState> {
   }
 
   /**
-   * @override
    * Patch and sanitize the AlertBox settings after fetching data from the server
    */
-  protected patchAfterFetch(data: any): any {
+  protected override patchAfterFetch(data: any): any {
     const settings = data.settings;
 
     // sanitize general settings
@@ -182,36 +182,37 @@ export class AlertBoxModule extends WidgetModule<IAlertBoxState> {
     return data;
   }
 
-  /**
-   * @override
-   */
-  setData(data: IAlertBoxState['data']) {
+  override setData(data: IAlertBoxState['data']) {
     // save widget data instate and calculate additional state variables
     super.setData(data);
-    const settings = data.settings;
     const allAlerts = values(this.eventsConfig) as IAlertConfig[];
 
     // group alertbox settings by alert types and store them in `state.data.variations`
-    allAlerts.map(alertEvent => {
-      const apiKey = alertEvent.apiKey || alertEvent.type;
-      const alertFields = Object.keys(settings).filter(key => key.startsWith(`${apiKey}_`));
-      const variationSettings = {} as any;
-      alertFields.forEach(key => {
-        let value = settings[key];
-        const targetKey = key.replace(`${apiKey}_`, '');
+    this.state.mutate(state => {
+      const settings = this.state.widgetData.data.settings;
 
-        // sanitize the variation value
-        value = this.sanitizeValue(
-          value,
-          targetKey,
-          this.variationsMetadata[alertEvent.type][targetKey],
-        );
+      allAlerts.map(alertEvent => {
+        const apiKey = alertEvent.apiKey || alertEvent.type;
+        const alertFields = Object.keys(settings).filter(key => key.startsWith(`${apiKey}_`));
+        const variationSettings = {} as any;
+        alertFields.forEach(key => {
+          let value = settings[key];
+          const targetKey = key.replace(`${apiKey}_`, '');
 
-        settings[key] = value;
-        variationSettings[targetKey] = value;
+          // sanitize the variation value
+          value = this.sanitizeValue(
+            value,
+            targetKey,
+            this.variationsMetadata[alertEvent.type][targetKey],
+          );
+
+          settings[key] = value;
+          variationSettings[targetKey] = value;
+        });
+        this.setVariationSettings(alertEvent.type, 'default', variationSettings as any);
       });
-      this.setVariationSettings(alertEvent.type, 'default', variationSettings as any);
     });
+
 
     // define available alerts
     const userPlatforms = Object.keys(Services.UserService.views.platforms!) as TPlatform[];
@@ -220,7 +221,7 @@ export class AlertBoxModule extends WidgetModule<IAlertBoxState> {
         if (alertConfig.platforms && !intersection(alertConfig.platforms, userPlatforms).length) {
           return false;
         }
-        return !!this.state.data.variations[alertConfig.type];
+        return !!this.widgetData.variations[alertConfig.type];
       })
       .map(alertConfig => alertConfig.type);
     this.setAvailableAlerts(availableAlerts);
@@ -293,7 +294,7 @@ export class AlertBoxModule extends WidgetModule<IAlertBoxState> {
   ) {
     const event = this.eventsConfig[type];
     const apiKey = event.apiKey || event.type;
-    const currentVariationSettings = this.getVariationSettings(type);
+    const currentVariationSettings = getDefined(this.getVariationSettings(type));
 
     // save current settings to the state
     const newVariationSettings = {
@@ -310,7 +311,7 @@ export class AlertBoxModule extends WidgetModule<IAlertBoxState> {
 
     // set the same message template for all Cheer variations
     if (type === 'twCheer') {
-      const newBitsVariations = this.state.data.settings.bit_variations.map((variation: any) => {
+      const newBitsVariations = this.widgetData.settings.bit_variations.map((variation: any) => {
         const newVariation = cloneDeep(variation);
         newVariation.settings.text.format = newVariationSettings.message_template;
         return newVariation;
@@ -319,7 +320,7 @@ export class AlertBoxModule extends WidgetModule<IAlertBoxState> {
     }
 
     // save flatten setting in store and save them on the server
-    this.updateSettings({ ...this.state.data.settings, ...settingsPatch });
+    this.updateSettings({ ...this.widgetData.settings, ...settingsPatch });
   }
 
   openAlertInfo(alertType: TAlertType) {
@@ -335,13 +336,11 @@ export class AlertBoxModule extends WidgetModule<IAlertBoxState> {
     return null;
   }
 
-  /**
-   * @override
-   */
-  get customCode() {
+  override get customCode() {
     // get custom code from the selected variation
     if (!this.selectedAlert) return null;
     const variationSettings = this.getVariationSettings(this.selectedAlert);
+    if (!variationSettings) return null;
     const {
       custom_html_enabled,
       custom_html,
@@ -358,10 +357,7 @@ export class AlertBoxModule extends WidgetModule<IAlertBoxState> {
     };
   }
 
-  /**
-   * @override
-   */
-  updateCustomCode(patch: Partial<ICustomCode>) {
+  override updateCustomCode(patch: Partial<ICustomCode>) {
     // save custom code from the selected variation
     const selectedAlert = getDefined(this.selectedAlert);
     const newPatch = cloneDeep(patch) as Partial<ICustomCode> & { custom_html_enabled?: boolean };
@@ -381,7 +377,7 @@ export class AlertBoxModule extends WidgetModule<IAlertBoxState> {
     variationId: string,
     settings: TVariationsSettings[TAlertType],
   ) {
-    const state = this.state;
+    const state = this.widgetState;
     if (!state.data.variations) state.data.variations = {} as any;
     if (!state.data.variations[type]) state.data.variations[type] = {} as any;
     state.data.variations[type][variationId] = settings;
@@ -399,7 +395,7 @@ export class AlertBoxModule extends WidgetModule<IAlertBoxState> {
 
     // TODO: fbSupportGift is impossible to enable on backend
     alerts = alerts.filter(alert => alert !== 'fbSupportGift');
-    this.state.availableAlerts = alerts;
+    this.widgetState.availableAlerts = alerts;
   }
 }
 

@@ -113,6 +113,7 @@ export function inheritMutations(target: any) {
  */
 export abstract class StatefulService<TState extends object> extends Service {
   static store: Store<any>;
+  static onStateRead: ((serviceName: string) => unknown) | null = null;
 
   static setupVuexStore(store: Store<any>) {
     this.store = store;
@@ -128,6 +129,7 @@ export abstract class StatefulService<TState extends object> extends Service {
   }
 
   get state(): TState {
+    StatefulService.onStateRead && StatefulService.onStateRead(this.serviceName);
     return this.store.state[this.serviceName];
   }
 
