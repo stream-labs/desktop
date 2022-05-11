@@ -45,6 +45,7 @@ import SceneSelector from './editor/elements/SceneSelectorElement';
 import AddSource from './windows/AddSource';
 import SideNav from './sidebar/SideNav';
 import Notifications from './windows/Notifications';
+import PlatformMerge from './pages/PlatformMerge';
 import AlertboxLibrary from './pages/AlertboxLibrary';
 import PlatformAppStore from './pages/PlatformAppStore';
 import BrowseOverlays from './pages/BrowseOverlays';
@@ -99,5 +100,6 @@ export const components = {
   AddSource,
   SideNav,
   Notifications,
+  PlatformMerge,
   PlatformAppStore,
 };
