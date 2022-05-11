@@ -345,7 +345,6 @@ function CustomDestinationList() {
     customDestinations,
     editCustomDestMode,
     addCustomDest,
-    componentView,
   } = useStreamSettings();
   const shouldShowPrimeLabel = !isPrime;
   const destinations = customDestinations;
