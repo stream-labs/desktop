@@ -1,5 +1,5 @@
-import { useModule } from 'components-react/hooks/useModule';
-import React, { useEffect, useRef } from 'react';
+import { useModule } from 'slap';
+import React from 'react';
 import { $t } from 'services/i18n';
 import commonStyles from './Common.m.less';
 import { OnboardingModule } from './Onboarding';
@@ -10,7 +10,7 @@ import { useWatchVuex } from 'components-react/hooks';
 
 export function Prime() {
   const { MagicLinkService, UserService } = Services;
-  const { next } = useModule(OnboardingModule).select();
+  const { next } = useModule(OnboardingModule);
   const primeMetadata = {
     standard: [
       { text: $t('Go live to one platform'), icon: 'icon-broadcast' },

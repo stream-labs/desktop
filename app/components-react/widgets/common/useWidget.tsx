@@ -1,7 +1,5 @@
-import { useModuleByName, useModuleRoot } from '../../hooks/useModule';
 import { WidgetType } from '../../../services/widgets';
 import { Services } from '../../service-provider';
-import { mutation } from '../../store';
 import { throttle } from 'lodash-decorators';
 import { assertIsDefined, getDefined } from '../../../util/properties-type-guards';
 import { TObsFormData } from '../../../components/obs/inputs/ObsInput';
@@ -12,11 +10,17 @@ import { TAlertType } from '../../../services/widgets/alerts-config';
 import { alertAsync } from '../../modals';
 import { onUnload } from 'util/unload';
 import merge from 'lodash/merge';
+import {
+  GetUseModuleResult, injectFormBinding,
+  injectState,
+  useModule,
+} from 'slap';
+import { IWidgetConfig } from '../../../services/widgets/widgets-config';
 
 /**
  * Common state for all widgets
  */
-export interface IWidgetState {
+export interface IWidgetCommonState {
   isLoading: boolean;
   sourceId: string;
   shouldCreatePreviewSource: boolean;
@@ -26,58 +30,67 @@ export interface IWidgetState {
   browserSourceProps: TObsFormData;
   prevSettings: any;
   canRevert: boolean;
-  data: {
-    settings: Record<string, any>;
-  };
+  widgetData: IWidgetState;
 }
+
+/**
+ * Common state for all widgets
+ */
+export interface IWidgetState {
+  data: {
+    settings: any;
+  }
+}
+
 
 /**
  * Default state for all widgets
  */
-export const DEFAULT_WIDGET_STATE = ({
+export const DEFAULT_WIDGET_STATE: IWidgetCommonState = {
   isLoading: true,
   sourceId: '',
   shouldCreatePreviewSource: true,
   previewSourceId: '',
   isPreviewVisible: false,
   selectedTab: 'general',
-  type: '',
-  data: {},
+  type: '' as any as WidgetType,
+  widgetData: {
+    data: {
+      settings: {},
+    },
+  },
   prevSettings: {},
   canRevert: false,
-  browserSourceProps: null,
-} as unknown) as IWidgetState;
+  browserSourceProps: null as any as TObsFormData,
+} as IWidgetCommonState;
 
 /**
  * A base Redux module for all widget components
  */
 export class WidgetModule<TWidgetState extends IWidgetState = IWidgetState> {
+  constructor(public params: WidgetParams) {}
+
   // init default state
-  state: TWidgetState = {
-    ...((DEFAULT_WIDGET_STATE as unknown) as TWidgetState),
-  };
+  state = injectState({
+    ...DEFAULT_WIDGET_STATE,
+    sourceId: this.params.sourceId,
+    shouldCreatePreviewSource: this.params.shouldCreatePreviewSource ?? true,
+    selectedTab: this.params.selectedTab ?? 'general',
+  } as IWidgetCommonState);
 
   // create shortcuts for widgetsConfig and eventsInfo
   public widgetsConfig = this.widgetsService.widgetsConfig;
   public eventsConfig = this.widgetsService.alertsConfig;
 
+  bind = injectFormBinding(
+    () => this.settings,
+    statePatch => this.updateSettings(statePatch),
+  );
+
   cancelUnload: () => void;
 
   // init module
-  async init(params: {
-    sourceId: string;
-    shouldCreatePreviewSource?: boolean;
-    selectedTab?: string;
-  }) {
-    // init state from params
-    this.state.sourceId = params.sourceId;
-    if (params.shouldCreatePreviewSource === false) {
-      this.state.shouldCreatePreviewSource = false;
-    }
-    if (params.selectedTab) {
-      this.state.selectedTab = params.selectedTab;
-    }
-
+  async init() {
     // save browser source settings into store
     const widget = this.widget;
     this.setBrowserSourceProps(widget.getSource()!.getPropertiesFormData());
@@ -95,30 +108,37 @@ export class WidgetModule<TWidgetState extends IWidgetState = IWidgetState> {
     const data = await this.fetchData();
     this.setData(data);
     this.setPrevSettings(data);
-    this.setIsLoading(false);
+    this.state.setIsLoading(false);
   }
 
-  // de-init module
   destroy() {
     if (this.state.previewSourceId) this.widget.destroyPreviewSource();
     this.cancelUnload();
   }
 
   async reload() {
-    this.setIsLoading(true);
+    this.state.setIsLoading(true);
     this.setData(await this.fetchData());
-    this.setIsLoading(false);
+    this.state.setIsLoading(false);
   }
 
   close() {
     Services.WindowsService.actions.closeChildWindow();
   }
 
+  get widgetState() {
+    return getDefined(this.state.widgetData) as TWidgetState;
+  }
+
+  get widgetData(): TWidgetState['data'] {
+    return this.widgetState.data;
+  }
+
   /**
    * returns widget's settings from the store
    */
   get settings(): TWidgetState['data']['settings'] {
-    return getDefined(this.state.data).settings;
+    return this.widgetData.settings;
   }
 
   get availableAlerts(): TAlertType[] {
@@ -186,7 +206,7 @@ export class WidgetModule<TWidgetState extends IWidgetState = IWidgetState> {
     return this.widgetsService.getWidgetSource(this.state.sourceId);
   }
 
-  get config() {
+  get config(): IWidgetConfig {
     return this.widgetsConfig[this.state.type];
   }
 
@@ -195,7 +215,7 @@ export class WidgetModule<TWidgetState extends IWidgetState = IWidgetState> {
   }
 
   public onMenuClickHandler(e: { key: string }) {
-    this.setSelectedTab(e.key);
+    this.state.setSelectedTab(e.key);
   }
 
   public playAlert(type: TAlertType) {
@@ -274,47 +294,32 @@ export class WidgetModule<TWidgetState extends IWidgetState = IWidgetState> {
   }
 
   async revertChanges() {
-    this.setIsLoading(true);
+    this.state.setIsLoading(true);
     await this.updateSettings(this.state.prevSettings);
-    this.setCanRevert(false);
+    this.state.setCanRevert(false);
     await this.reload();
   }
 
   // DEFINE MUTATIONS
 
-  @mutation()
-  private setIsLoading(isLoading: boolean) {
-    this.state.isLoading = isLoading;
-  }
-
-  @mutation()
-  private setSelectedTab(name: string) {
-    this.state.selectedTab = name;
-  }
-
-  @mutation()
-  protected setData(data: TWidgetState['data']) {
-    this.state.data = data;
-  }
-
-  @mutation()
   private setPrevSettings(data: TWidgetState['data']) {
-    this.state.prevSettings = cloneDeep(data.settings);
+    this.state.setPrevSettings(cloneDeep(data.settings));
   }
 
-  @mutation()
-  private setCanRevert(canRevert: boolean) {
-    this.state.canRevert = canRevert;
+  protected setData(data: TWidgetState['data']) {
+    this.state.mutate(state => {
+      state.widgetData.data = data;
+    });
   }
 
-  @mutation()
   private setSettings(settings: TWidgetState['data']['settings']) {
-    assertIsDefined(this.state.data);
-    this.state.data.settings = settings;
-    this.state.canRevert = true;
+    assertIsDefined(this.state.widgetData.data);
+    this.state.mutate(state => {
+      state.widgetData.data.settings = settings;
+      state.canRevert = true;
+    });
   }
 
-  @mutation()
   private setBrowserSourceProps(props: TObsFormData) {
     const propsOrder = [
       'width',
@@ -328,27 +333,27 @@ export class WidgetModule<TWidgetState extends IWidgetState = IWidgetState> {
       'fps',
     ];
     const sortedProps = propsOrder.map(propName => props.find(p => p.name === propName)!);
-    this.state.browserSourceProps = sortedProps;
+    this.state.setBrowserSourceProps(sortedProps);
   }
 }
 
+export type WidgetParams = { sourceId?: string; shouldCreatePreviewSource?: boolean; selectedTab?: string }
+
 /**
- * Initializes a context with a Redux module for a given widget
  * Have to be called in the root widget component
- * all widget components can access the initialized module via `useWidget` hook
  */
 export function useWidgetRoot<T extends typeof WidgetModule>(
   Module: T,
-  params: { sourceId?: string; shouldCreatePreviewSource?: boolean; selectedTab?: string },
+  params: WidgetParams,
 ) {
-  return useModuleRoot(Module, params, 'WidgetModule').select();
+  return useModule(Module, [params] as any, 'WidgetModule');
 }
 
 /**
  * Returns the widget's module from the existing context and selects requested fields
  */
 export function useWidget<TModule extends WidgetModule>() {
-  return useModuleByName<TModule>('WidgetModule').select();
+  return useModule('WidgetModule') as GetUseModuleResult<TModule>;
 }
 
 /**

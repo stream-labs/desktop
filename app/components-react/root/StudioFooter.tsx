@@ -12,7 +12,7 @@ import StartStreamingButton from './StartStreamingButton';
 import NotificationsArea from './NotificationsArea';
 import { Tooltip } from 'antd';
 import { confirmAsync } from 'components-react/modals';
-import { useModule } from 'components-react/hooks/useModule';
+import { useModule } from 'slap';
 
 export default function StudioFooterComponent() {
   const {
@@ -36,7 +36,7 @@ export default function StudioFooterComponent() {
     youtubeEnabled,
     recordingModeEnabled,
     replayBufferEnabled,
-  } = useModule(FooterModule).select();
+  } = useModule(FooterModule);
 
   useEffect(confirmYoutubeEnabled, [platform]);
 

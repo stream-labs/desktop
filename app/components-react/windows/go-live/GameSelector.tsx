@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import {
   getPlatformService,
   IGame,
@@ -7,9 +7,9 @@ import {
 } from '../../../services/platforms';
 import { ListInput, TSlobsInputProps } from '../../shared/inputs';
 import { $t } from '../../../services/i18n';
-import { useFormState } from '../../hooks';
 import { IListOption } from '../../shared/inputs/ListInput';
 import { Services } from '../../service-provider';
+import { injectState, useModule } from 'slap';
 
 type TProps = TSlobsInputProps<{ platform: TPlatform }, string>;
 
@@ -23,19 +23,18 @@ export default function GameSelector(p: TProps) {
     selectedGameName = Services.TrovoService.state.channelInfo.gameName;
   }
 
-  function fetchGames(query: string): Promise<IGame[]> {
-    return platformService.searchGames(query);
-  }
-
-  const { s, updateState } = useFormState(() => {
-    return {
+  const { isSearching, setIsSearching, games, setGames } = useModule(() => ({
+    state: injectState({
+      isSearching: false,
       games: selectedGameId
         ? [{ label: selectedGameName, value: selectedGameId }]
         : ([] as IListOption<string>[]),
-    };
-  });
+    }),
+  }));
 
-  const [isSearching, setIsSearching] = useState(false);
+  function fetchGames(query: string): Promise<IGame[]> {
+    return platformService.searchGames(query);
+  }
 
   useEffect(() => {
     loadImageForSelectedGame();
@@ -47,11 +46,9 @@ export default function GameSelector(p: TProps) {
     if (!selectedGameName) return;
     const game = await platformService.fetchGame(selectedGameName);
     if (!game || game.name !== selectedGameName) return;
-    updateState({
-      games: s.games.map(opt =>
-        opt.value === selectedGameId ? { ...opt, image: game.image } : opt,
-      ),
-    });
+    setGames(games.map(opt =>
+      opt.value === selectedGameId ? { ...opt, image: game.image } : opt,
+    ));
   }
 
   async function onSearch(searchString: string) {
@@ -61,7 +58,7 @@ export default function GameSelector(p: TProps) {
       label: g.name,
       image: g.image,
     }));
-    updateState({ games });
+    setGames(games);
     setIsSearching(false);
   }
 
@@ -77,7 +74,7 @@ export default function GameSelector(p: TProps) {
     twitch: $t('Twitch Category'),
     facebook: $t('Facebook Game'),
     trovo: $t('Trovo Category'),
-  }[platform];
+  }[platform as string];
 
   return (
     <ListInput
@@ -87,7 +84,7 @@ export default function GameSelector(p: TProps) {
       extra={p.extra}
       onChange={p.onChange}
       placeholder={$t('Start typing to search')}
-      options={s.games}
+      options={games}
       showSearch
       onSearch={onSearch}
       debounce={500}

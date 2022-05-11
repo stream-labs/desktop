@@ -24,14 +24,13 @@ import { WidgetLayout } from './common/WidgetLayout';
 import { CaretRightOutlined, QuestionCircleOutlined } from '@ant-design/icons';
 import { TAlertType } from '../../services/widgets/alerts-config';
 import { useAlertBox } from './useAlertBox';
-import { useForceUpdate } from '../hooks';
-import electron from 'electron';
 import { Services } from '../service-provider';
 import { ButtonGroup } from '../shared/ButtonGroup';
 import { LayoutInput } from './common/LayoutInput';
 import InputWrapper from '../shared/inputs/InputWrapper';
 import * as remote from '@electron/remote';
 import { assertIsDefined } from '../../util/properties-type-guards';
+import { useForceUpdate } from 'slap';
 
 /**
  * Root component
