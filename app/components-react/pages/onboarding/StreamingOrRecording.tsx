@@ -1,5 +1,4 @@
 import { Button } from 'antd';
-import { useModule } from 'components-react/hooks/useModule';
 import React, { useState } from 'react';
 import { $t } from 'services/i18n';
 import { $i } from 'services/utils';
@@ -8,9 +7,10 @@ import { OnboardingModule } from './Onboarding';
 import cx from 'classnames';
 import { confirmAsync } from 'components-react/modals';
 import { Services } from 'components-react/service-provider';
+import { useModule } from 'slap';
 
 export function StreamingOrRecording() {
-  const { next, setRecordingMode } = useModule(OnboardingModule).select();
+  const { next, setRecordingMode } = useModule(OnboardingModule);
   const [active, setActive] = useState<'streaming' | 'recording' | null>(null);
 
   async function onContinue() {

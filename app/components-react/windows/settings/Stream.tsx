@@ -1,5 +1,4 @@
 import React from 'react';
-import { useModule } from '../../hooks/useModule';
 import { $t } from '../../../services/i18n';
 import { ICustomStreamDestination } from '../../../services/settings/streaming';
 import { EStreamingState } from '../../../services/streaming';
@@ -8,22 +7,24 @@ import cloneDeep from 'lodash/cloneDeep';
 import namingHelpers from '../../../util/NamingHelpers';
 import { Services } from '../../service-provider';
 import { ObsGenericSettingsForm } from './ObsSettings';
-import { mutation } from '../../store';
 import css from './Stream.m.less';
 import cx from 'classnames';
 import { Button, message, Tooltip } from 'antd';
 import PlatformLogo from '../../shared/PlatformLogo';
 import Form, { useForm } from '../../shared/inputs/Form';
-import { createBinding, TextInput } from '../../shared/inputs';
+import { TextInput } from '../../shared/inputs';
 import { ButtonGroup } from '../../shared/ButtonGroup';
 import { FormInstance } from 'antd/lib/form';
+import { injectFormBinding, injectState, mutation, useModule } from 'slap';
 
 /**
  * A Redux module for components in the StreamSetting window
  */
 class StreamSettingsModule {
+  constructor(private form: FormInstance) {}
+
   // DEFINE A STATE
-  state = {
+  state = injectState({
     // false = edit mode off
     // true = add custom destination mode
     // number = edit custom destination mode where number is the index of the destination
@@ -36,7 +37,12 @@ class StreamSettingsModule {
       streamKey: '',
       enabled: false,
     } as ICustomStreamDestination,
-  };
+  });
+
+  bind = injectFormBinding(
+    () => this.state.customDestForm,
+    patch => this.updateCustomDestForm(patch),
+  );
 
   // INJECT SERVICES
 
@@ -82,7 +88,6 @@ class StreamSettingsModule {
     this.state.editCustomDestMode = true;
   }
 
-  @mutation()
   removeCustomDest(ind: number) {
     const destinations = cloneDeep(this.customDestinations);
     destinations.splice(ind, 1);
@@ -159,11 +164,6 @@ class StreamSettingsModule {
     return this.streamingView.savedSettings.customDestinations;
   }
 
-  private form: FormInstance;
-  setForm(form: FormInstance) {
-    this.form = form;
-  }
-
   platformMerge(platform: TPlatform) {
     this.navigationService.navigate('PlatformMerge', { platform });
     this.windowsService.actions.closeChildWindow();
@@ -206,13 +206,14 @@ class StreamSettingsModule {
 
 // wrap the module into a React hook
 function useStreamSettings() {
-  return useModule(StreamSettingsModule).select();
+  return useModule(StreamSettingsModule);
 }
 
 /**
  * A root component for StreamSettings
  */
 export function StreamSettings() {
+  const form = useForm();
   const {
     platforms,
     protectedModeEnabled,
@@ -220,7 +221,7 @@ export function StreamSettings() {
     disableProtectedMode,
     needToShowWarning,
     enableProtectedMode,
-  } = useStreamSettings();
+  } = useModule(StreamSettingsModule, [form]);
 
   return (
     <div>
@@ -281,10 +282,10 @@ function Platform(p: { platform: TPlatform }) {
   const platform = p.platform;
   const { UserService, StreamingService } = Services;
   const { canEditSettings, platformMerge, platformUnlink } = useStreamSettings();
-  const isMerged = StreamingService.views.checkPlatformLinked(platform);
+  const isMerged = StreamingService.views.isPlatformLinked(platform);
   const username = UserService.state.auth!.platforms[platform]?.username;
   const platformName = getPlatformService(platform).displayName;
-  const isPrimary = StreamingService.views.checkPrimaryPlatform(platform);
+  const isPrimary = StreamingService.views.isPrimaryPlatform(platform);
   const shouldShowPrimaryBtn = isPrimary;
   const shouldShowConnectBtn = !isMerged && canEditSettings;
   const shouldShowUnlinkBtn = !isPrimary && isMerged && canEditSettings;
@@ -345,6 +346,7 @@ function CustomDestinationList() {
   const isEditMode = editCustomDestMode !== false;
   const shouldShowAddForm = editCustomDestMode === true;
   const canAddMoreDestinations = destinations.length < 2;
+
   return (
     <div>
       {destinations.map((dest, ind) => (
@@ -413,16 +415,7 @@ function CustomDestination(p: { destination: ICustomStreamDestination; ind: numb
  * Renders an ADD/EDIT form for the custom destination
  */
 function CustomDestForm() {
-  const {
-    saveCustomDest,
-    stopEditing,
-    customDestForm,
-    updateCustomDestForm,
-    setForm,
-  } = useStreamSettings();
-  const form = useForm();
-  setForm(form);
-  const bind = createBinding(customDestForm, updateCustomDestForm);
+  const { saveCustomDest, stopEditing, bind } = useStreamSettings();
 
   return (
     <Form name="customDestForm">

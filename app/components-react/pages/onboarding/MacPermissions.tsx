@@ -1,4 +1,4 @@
-import { useModule } from 'components-react/hooks/useModule';
+import { useModule } from 'slap';
 import { Services } from 'components-react/service-provider';
 import React, { useEffect, useState } from 'react';
 import { $t } from 'services/i18n';
@@ -7,7 +7,7 @@ import { OnboardingModule } from './Onboarding';
 
 export function MacPermissions() {
   const { MacPermissionsService } = Services;
-  const { next } = useModule(OnboardingModule).select();
+  const { next } = useModule(OnboardingModule);
   const [permissions, setPermissions] = useState(() =>
     MacPermissionsService.getPermissionsStatus(),
   );

@@ -1,47 +1,59 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { useGoLiveSettings } from './useGoLiveSettings';
 import { $t } from '../../../services/i18n';
-import { useVuex } from '../../hooks';
 import { CheckboxInput } from '../../shared/inputs';
 import { Services } from '../../service-provider';
 import InputWrapper from '../../shared/inputs/InputWrapper';
+import { inject, injectQuery } from 'slap';
+import { VideoEncodingOptimizationService } from '../../../app-services';
 
 export default function OptimizedProfileSwitcher() {
-  const { VideoEncodingOptimizationService } = Services;
-  const { game, optimizedProfile, updateSettings } = useGoLiveSettings();
-  const enabled = useVuex(() => VideoEncodingOptimizationService.state.useOptimizedProfile, false);
-  const actions = VideoEncodingOptimizationService.actions;
+  const {
+    game,
+    enabled,
+    setEnabled,
+    label,
+    tooltip,
+    optimizedProfileQuery,
+  } = useGoLiveSettings().extend(settings => {
+    const optimizationService = inject(VideoEncodingOptimizationService);
 
-  function setEnabled(enabled: boolean) {
-    VideoEncodingOptimizationService.actions.return.useOptimizedProfile(enabled);
-  }
+    async function fetchProfile(game: string) {
+      const optimizedProfile = await optimizationService.actions.return.fetchOptimizedProfile(game);
+      settings.updateSettings({ optimizedProfile });
+    }
 
-  const [isLoading, setIsLoading] = useState(true);
+    const optimizedProfileQuery = injectQuery(fetchProfile, () => settings.game);
 
-  useEffect(() => {
-    loadAvailableProfiles();
-  }, [game]);
+    return {
+      optimizedProfileQuery,
 
-  async function loadAvailableProfiles() {
-    setIsLoading(true);
-    const optimizedProfile = await actions.return.fetchOptimizedProfile(game);
-    updateSettings({ optimizedProfile });
-    setIsLoading(false);
-  }
+      get enabled() {
+        return optimizationService.state.useOptimizedProfile;
+      },
 
-  const label =
-    optimizedProfile?.game && optimizedProfile.game !== 'DEFAULT'
-      ? $t('Use optimized encoder settings for %{game}', { game })
-      : $t('Use optimized encoder settings');
-  const tooltip = $t(
-    'Optimized encoding provides better quality and/or lower cpu/gpu usage. Depending on the game, ' +
-      'resolution may be changed for a better quality of experience',
-  );
+      setEnabled(enabled: boolean) {
+        optimizationService.actions.useOptimizedProfile(enabled);
+      },
+
+      tooltip: $t(
+        'Optimized encoding provides better quality and/or lower cpu/gpu usage. Depending on the game, ' +
+          'resolution may be changed for a better quality of experience',
+      ),
+
+      get label(): string {
+        return settings.state.optimizedProfile?.game &&
+          settings.state.optimizedProfile?.game !== 'DEFAULT'
+          ? $t('Use optimized encoder settings for %{game}', { game })
+          : $t('Use optimized encoder settings');
+      },
+    };
+  });
 
   return (
     <InputWrapper>
-      {isLoading && $t('Checking optimized setting for %{game}', { game })}
-      {!isLoading && (
+      {optimizedProfileQuery.isLoading && $t('Checking optimized setting for %{game}', { game })}
+      {!optimizedProfileQuery.isLoading && (
         <CheckboxInput value={enabled} onChange={setEnabled} label={label} tooltip={tooltip} />
       )}
     </InputWrapper>

@@ -1,4 +1,4 @@
-import { useModule } from 'components-react/hooks/useModule';
+import { useModule } from 'slap';
 import { Services } from 'components-react/service-provider';
 import AutoProgressBar from 'components-react/shared/AutoProgressBar';
 import React, { useState } from 'react';
@@ -30,7 +30,7 @@ export function Optimize() {
   ];
   const percentage =
     optimizing && stepInfo ? (steps.indexOf(stepInfo.description) + 1) / steps.length : 0;
-  const { setProcessing, next } = useModule(OnboardingModule).select();
+  const { setProcessing, next } = useModule(OnboardingModule);
 
   function summaryForStep(progress: IConfigProgress) {
     return {

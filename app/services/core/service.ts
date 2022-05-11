@@ -143,7 +143,9 @@ export abstract class Service {
   }
 
   constructor(enforcer: Symbol) {
-    if (enforcer !== singletonEnforcer) throw new Error('Cannot construct singleton');
+    if (enforcer !== singletonEnforcer) {
+      throw new Error('Cannot construct singleton');
+    }
   }
 
   /**

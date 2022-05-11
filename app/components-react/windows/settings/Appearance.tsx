@@ -1,22 +1,26 @@
 import React from 'react';
 import { Services } from '../../service-provider';
 import { $t } from '../../../services/i18n';
-import { useBinding } from '../../store';
 import { CheckboxInput, ListInput, SliderInput } from '../../shared/inputs';
 import { getDefined } from '../../../util/properties-type-guards';
 import { ObsSettingsSection } from './ObsSettings';
-import { cloneDeep } from 'lodash';
 import * as remote from '@electron/remote';
+import { injectFormBinding, useModule } from 'slap';
 
 export function AppearanceSettings() {
   const { CustomizationService, WindowsService, UserService, MagicLinkService } = Services;
 
-  const bind = useBinding(
-    () => cloneDeep(CustomizationService.state),
-    newSettings => {
+  const { bind } = useModule(() => {
+    function getSettings() {
+      return CustomizationService.state;
+    }
+
+    function setSettings(newSettings: typeof CustomizationService.state) {
       CustomizationService.actions.setSettings(newSettings);
-    },
-  );
+    }
+
+    return { bind: injectFormBinding(getSettings, setSettings) };
+  });
 
   function openFFZSettings() {
     WindowsService.createOneOffWindow(

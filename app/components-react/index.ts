@@ -44,9 +44,13 @@ import Projector from './windows/Projector';
 import SceneSelector from './editor/elements/SceneSelectorElement';
 import AddSource from './windows/AddSource';
 import SideNav from './sidebar/SideNav';
+import PlatformMerge from './pages/PlatformMerge';
 import AlertboxLibrary from './pages/AlertboxLibrary';
 import PlatformAppStore from './pages/PlatformAppStore';
 import BrowseOverlays from './pages/BrowseOverlays';
+import PlatformAppMainPage from './pages/PlatformAppMainPage';
+import PlatformAppPageView from './shared/PlatformAppPageView';
+import PlatformAppPopOut from './windows/PlatformAppPopOut';
 
 // list of React components to be used inside Vue components
 export const components = {
@@ -86,7 +90,7 @@ export const components = {
   WidgetWindow: createRoot(WidgetWindow),
   CustomCodeWindow: createRoot(CustomCodeWindow),
   SafeMode,
-  AdvancedAudio,
+  AdvancedAudio: createRoot(AdvancedAudio),
   SourceShowcase: createRoot(SourceShowcase),
   SourceFilters,
   RecentEvents,
@@ -97,5 +101,9 @@ export const components = {
   SceneSelector: createRoot(SceneSelector),
   AddSource,
   SideNav,
+  PlatformMerge,
   PlatformAppStore,
+  PlatformAppMainPage,
+  PlatformAppPageView,
+  PlatformAppPopOut,
 };
