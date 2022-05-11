@@ -48,6 +48,9 @@ import PlatformMerge from './pages/PlatformMerge';
 import AlertboxLibrary from './pages/AlertboxLibrary';
 import PlatformAppStore from './pages/PlatformAppStore';
 import BrowseOverlays from './pages/BrowseOverlays';
+import PlatformAppMainPage from './pages/PlatformAppMainPage';
+import PlatformAppPageView from './shared/PlatformAppPageView';
+import PlatformAppPopOut from './windows/PlatformAppPopOut';
 
 // list of React components to be used inside Vue components
 export const components = {
@@ -100,4 +103,7 @@ export const components = {
   SideNav,
   PlatformMerge,
   PlatformAppStore,
+  PlatformAppMainPage,
+  PlatformAppPageView,
+  PlatformAppPopOut,
 };
