@@ -1,13 +1,12 @@
 import React from 'react';
-import { IWidgetState, useWidget, WidgetModule } from './common/useWidget';
+import { IWidgetCommonState, useWidget, WidgetModule } from './common/useWidget';
 import { WidgetLayout } from './common/WidgetLayout';
 import InputWrapper from '../shared/inputs/InputWrapper';
 import { $t } from '../../services/i18n';
-import { createBinding, SliderInput, SwitchInput } from '../shared/inputs';
-import { IEmoteWallSettings } from 'services/widgets/settings/emote-wall';
+import { SliderInput, SwitchInput } from '../shared/inputs';
 import { metadata } from '../shared/inputs/metadata';
 
-interface IEmoteWallState extends IWidgetState {
+interface IEmoteWallState extends IWidgetCommonState {
   data: {
     settings: {
       combo_count: number;
@@ -58,11 +57,6 @@ export function EmoteWall() {
 }
 
 export class EmoteWallModule extends WidgetModule<IEmoteWallState> {
-  bind = createBinding(
-    () => this.settings,
-    statePatch => this.updateSettings(statePatch),
-  );
-
   get isComboRequired() {
     return this.settings?.combo_required;
   }

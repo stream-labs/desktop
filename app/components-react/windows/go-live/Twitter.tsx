@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
 import InputWrapper from '../../shared/inputs/InputWrapper';
 import { Services } from '../../service-provider';
 import cx from 'classnames';
@@ -7,38 +7,60 @@ import css from './Twitter.m.less';
 import { CheckboxInput, SwitchInput, TextAreaInput, TextInput } from '../../shared/inputs';
 import { Row, Col, Button } from 'antd';
 import { useGoLiveSettings } from './useGoLiveSettings';
-import { useVuex } from '../../hooks';
+import { injectWatch } from 'slap';
 
 export default function TwitterInput() {
   const { TwitterService, UserService } = Services;
   const {
     tweetText,
     updateSettings,
-    getTweetText,
-    getSettings,
-    streamTitle,
     tweetWhenGoingLive,
     linked,
     screenName,
     platform,
     useStreamlabsUrl,
-  } = useGoLiveSettings().selectExtra(module => {
-    const state = TwitterService.state;
+  } = useGoLiveSettings().extend(module => {
+
+    function getTwitterState() {
+      return {
+        streamTitle: module.state.commonFields.title,
+        useStreamlabsUrl: TwitterService.state.creatorSiteOnboardingComplete,
+      };
+    }
+
     return {
-      streamTitle: module.commonFields.title,
-      tweetWhenGoingLive: state.tweetWhenGoingLive,
-      useStreamlabsUrl: state.creatorSiteOnboardingComplete,
-      linked: state.linked,
-      screenName: state.screenName,
-      platform: UserService.views.platform?.type,
-      url: TwitterService.views.url,
+      get streamTitle() {
+        return module.state.commonFields.title;
+      },
+      get tweetWhenGoingLive() {
+        return TwitterService.state.tweetWhenGoingLive;
+      },
+      get useStreamlabsUrl() {
+        return TwitterService.state.creatorSiteOnboardingComplete;
+      },
+
+      get linked() {
+        return TwitterService.state.linked;
+      },
+
+      get screenName() {
+        return TwitterService.state.screenName;
+      },
+
+      get platform() {
+        return UserService.views.platform?.type;
+      },
+
+      get url() {
+        return TwitterService.views.url;
+      },
+
+      tweetTextWatch: injectWatch(getTwitterState, () => {
+        const tweetText = module.getTweetText(getTwitterState().streamTitle);
+        module.updateSettings({ tweetText });
+      }),
     };
   });
-
-  useEffect(() => {
-    const tweetText = getTweetText(streamTitle);
-    if (getSettings().tweetText !== tweetText) updateSettings({ tweetText });
-  }, [streamTitle, useStreamlabsUrl]);
 
   function unlink() {
     TwitterService.actions.return

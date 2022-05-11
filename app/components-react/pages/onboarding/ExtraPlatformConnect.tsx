@@ -1,4 +1,4 @@
-import { useModule } from 'components-react/hooks/useModule';
+import { useModule } from 'slap';
 import PlatformLogo from 'components-react/shared/PlatformLogo';
 import React, { useState } from 'react';
 import { $t } from 'services/i18n';
@@ -11,8 +11,8 @@ import { Services } from 'components-react/service-provider';
 import Form from 'components-react/shared/inputs/Form';
 
 export function ExtraPlatformConnect() {
-  const { selectedExtraPlatform, setExtraPlatform } = useModule(LoginModule).select();
-  const { next } = useModule(OnboardingModule).select();
+  const { selectedExtraPlatform, setExtraPlatform } = useModule(LoginModule);
+  const { next } = useModule(OnboardingModule);
   const [key, setKey] = useState('');
 
   if (!selectedExtraPlatform) return <div></div>;

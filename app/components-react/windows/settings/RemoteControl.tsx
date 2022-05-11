@@ -2,18 +2,17 @@ import React, { CSSProperties } from 'react';
 import { ObsSettingsSection } from './ObsSettings';
 import { $t } from '../../../services/i18n';
 import QRCode from 'qrcode.react';
-import { mutation } from '../../store';
-import { useModule } from '../../hooks/useModule';
 import { Services } from '../../service-provider';
 import Form from '../../shared/inputs/Form';
 import { TextInput } from '../../shared/inputs';
 import { Button, Col, Row, Space } from 'antd';
 import Utils from '../../../services/utils';
+import { injectState, mutation, useModule } from 'slap';
 
 const QRCODE_SIZE = 350;
 
 class RemoteControlModule {
-  state = {
+  state = injectState({
     qrcodeIsVisible: false,
     detailsIsVisible: false,
     qrCodeData: {
@@ -22,7 +21,7 @@ class RemoteControlModule {
       token: '',
       version: '',
     },
-  };
+  });
 
   private updateNetworkInterval: number;
 
@@ -45,10 +44,9 @@ class RemoteControlModule {
     return Services.TcpServerService;
   }
 
-  @mutation()
   showQrCode() {
     this.TcpServerService.enableWebsoketsRemoteConnections();
-    this.state.qrcodeIsVisible = true;
+    this.state.setQrcodeIsVisible(true);
   }
 
   @mutation()
@@ -60,19 +58,18 @@ class RemoteControlModule {
     this.TcpServerService.actions.generateToken();
   }
 
-  @mutation()
   private refreshQrcodeData() {
     const settings = this.TcpServerService.state;
     const addresses = this.TcpServerService.getIPAddresses()
       .filter(address => !address.internal)
       .map(address => address.address);
 
-    this.state.qrCodeData = {
+    this.state.setQrCodeData({
       addresses,
       token: settings.token,
       port: settings.websockets.port,
       version: Utils.env.SLOBS_VERSION,
-    };
+    });
   }
 }
 
@@ -85,7 +82,7 @@ export function RemoteControlSettings() {
     showQrCode,
     showDetails,
     generateToken,
-  } = useModule(RemoteControlModule).select();
+  } = useModule(RemoteControlModule);
 
   const colStyle: CSSProperties = {
     width: `${QRCODE_SIZE}px`,

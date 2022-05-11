@@ -1,5 +1,5 @@
 import { TagsInput, TSlobsInputProps } from '../../../shared/inputs';
-import { useOnCreate } from '../../../hooks';
+import { useOnCreate } from 'slap';
 import { Services } from '../../../service-provider';
 import { prepareOptions, TTwitchTag } from '../../../../services/platforms/twitch/tags';
 import React from 'react';

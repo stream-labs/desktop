@@ -1,5 +1,5 @@
 import { Tooltip } from 'antd';
-import { useModule } from 'components-react/hooks/useModule';
+import { useModule } from 'slap';
 import KevinSvg from 'components-react/shared/KevinSvg';
 import React from 'react';
 import { $t } from 'services/i18n';
@@ -10,7 +10,7 @@ import ObsSvg from './ObsSvg';
 import { OnboardingModule } from './Onboarding';
 
 export function FreshOrImport() {
-  const { setImportFromObs, next } = useModule(OnboardingModule).select();
+  const { setImportFromObs, next } = useModule(OnboardingModule);
 
   const optionsMetadata = [
     {

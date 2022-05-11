@@ -4,7 +4,6 @@ import { WidgetLayout } from './common/WidgetLayout';
 import { $t } from '../../services/i18n';
 import {
   ColorInput,
-  createBinding,
   FontFamilyInput,
   FontSizeInput,
   FontWeightInput,
@@ -96,10 +95,6 @@ export function DonationTicker() {
 }
 
 export class DonationTickerModule extends WidgetModule<IDonationTickerState> {
-  bind = createBinding(
-    () => this.settings,
-    statePatch => this.updateSettings(statePatch),
-  );
 
   patchAfterFetch(data: any): IDonationTickerState {
     // backend accepts and returns some numerical values as strings

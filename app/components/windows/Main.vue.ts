@@ -16,6 +16,7 @@ import {
   AlertboxLibrary,
   PlatformAppStore,
   BrowseOverlays,
+  PlatformAppMainPage,
 } from 'components/shared/ReactComponentList';
 import { ScenesService } from 'services/scenes';
 import { PlatformAppsService } from 'services/platform-apps';
@@ -35,7 +36,6 @@ import { AppService } from 'services/app';
 import { UserService } from 'services/user';
 import { IModalOptions, WindowsService } from 'services/windows';
 import LiveDock from '../LiveDock.vue';
-import PlatformAppMainPage from '../pages/PlatformAppMainPage.vue';
 import ResizeBar from 'components/shared/ResizeBar.vue';
 import { getPlatformService } from 'services/platforms';
 import ModalWrapper from '../shared/modals/ModalWrapper';
