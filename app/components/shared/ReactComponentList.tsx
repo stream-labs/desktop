@@ -198,6 +198,20 @@ export class PatchNotes extends ReactComponent {}
 })
 export class PerformanceMetrics extends ReactComponent<{ mode: 'full' | 'limited' }> {}
 
+@Component({ props: { name: { default: 'PlatformAppPageView' } } })
+export class PlatformAppPageView extends ReactComponent {}
+
+@Component({ props: { name: { default: 'PlatformAppMainPage' } } })
+export class PlatformAppMainPage extends ReactComponent {}
+
+@Component({
+  props: {
+    name: { default: 'PlatformAppPopOut' },
+    wrapperStyles: { default: () => ({ height: '100%' }) },
+  },
+})
+export class PlatformAppPopOut extends ReactComponent {}
+
 @Component({ props: { name: { default: 'PlatformAppStore' } } })
 export class PlatformAppStore extends ReactComponent {}
 
@@ -208,6 +222,14 @@ export class PlatformLogo extends ReactComponent<{
   color?: string;
   unwrapped?: boolean;
 }> {}
+
+@Component({
+  props: {
+    name: { default: 'PlatformMerge' },
+    wrapperStyles: { default: () => ({ height: '100%' }) },
+  },
+})
+export class PlatformMerge extends ReactComponent {}
 
 @Component({
   props: { name: { default: 'Projector' }, wrapperStyles: { default: () => ({ height: '100%' }) } },

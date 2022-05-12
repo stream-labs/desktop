@@ -1,12 +1,11 @@
 import Vue from 'vue';
 import { Component, Prop, Watch } from 'vue-property-decorator';
-import { Chat } from 'components/shared/ReactComponentList';
+import { Chat, PlatformAppPageView } from 'components/shared/ReactComponentList';
 import { StreamingService, EStreamingState } from '../services/streaming';
 import { Inject } from 'services/core/injector';
 import { UserService } from '../services/user';
 import { CustomizationService } from 'services/customization';
 import { $t } from 'services/i18n';
-import PlatformAppPageView from 'components/PlatformAppPageView.vue';
 import { PlatformAppsService, EAppPageSlot, ILoadedApp } from 'services/platform-apps';
 import ListInput from 'components/shared/inputs/ListInput.vue';
 import { AppService } from 'services/app';

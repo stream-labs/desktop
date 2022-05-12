@@ -64,6 +64,7 @@ export default class Mixer extends BaseElement {
           <div>
             <i
               class="icon-settings icon-button"
+              role="show-advanced-audio"
               onClick={() => this.showAdvancedSettings()}
               v-tooltip={{ content: this.advancedSettingsTooltip, placement: 'left' }}
             />
