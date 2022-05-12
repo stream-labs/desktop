@@ -42,7 +42,13 @@ export function CustomResolutionInput(p: {
       {!isCustomMode && (
         <Row>
           <Col flex="auto">
-            <ListInput options={options} value={p.value} nowrap onChange={p.onChange} />
+            <ListInput
+              options={options}
+              name={p.name}
+              value={p.value}
+              nowrap
+              onChange={p.onChange}
+            />
           </Col>
           <Col>
             <Button onClick={toggleCustomMode}>{$t('Use Custom')}</Button>

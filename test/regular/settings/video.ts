@@ -1,8 +1,24 @@
-import { test, useSpectron } from '../../helpers/spectron';
-import { assertOptions } from '../../helpers/spectron/assertions';
+import { test, TExecutionContext, useSpectron } from '../../helpers/spectron';
 import { showSettingsWindow } from '../../helpers/modules/settings/settings';
+import { useForm } from '../../helpers/modules/forms';
+import { ListInputController } from '../../helpers/modules/forms/list';
 
 useSpectron();
+
+export async function assertOptions(
+  t: TExecutionContext,
+  inputName: string,
+  expectedValue: string,
+  expectedOptions: string[],
+) {
+  const form = useForm();
+  const scaleTypeInput = await form.getInput<ListInputController<string>>(inputName);
+  const options = (await scaleTypeInput.getOptions()).map(opt => opt.label);
+  const value = await scaleTypeInput.getDisplayValue();
+
+  t.is(value, expectedValue);
+  t.deepEqual(options, expectedOptions);
+}
 
 test('Populates video settings', async t => {
   await showSettingsWindow('Video');
