@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react';
 import PlatformAppPageView from 'components-react/shared/PlatformAppPageView';
-import { ModalLayout } from 'components-react/shared/ModalLayout';
 import Util from 'services/utils';
 import { Services } from 'components-react/service-provider';
 
