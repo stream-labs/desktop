@@ -12,11 +12,16 @@ export default function PlatformAppMainPage(p: { params: { appId: string } }) {
   const poppedOut = !!app?.poppedOutSlots.find(slot => slot === pageSlot);
 
   return (
-    <div>
+    <div style={{ height: '100%', width: '100%' }}>
       {poppedOut ? (
         $t('This app is currently popped out in another window.')
       ) : (
-        <PlatformAppPageView appId={p.params.appId} pageSlot={pageSlot} key={p.params.appId} />
+        <PlatformAppPageView
+          appId={p.params.appId}
+          pageSlot={pageSlot}
+          key={p.params.appId}
+          style={{ height: '100%' }}
+        />
       )}
     </div>
   );
