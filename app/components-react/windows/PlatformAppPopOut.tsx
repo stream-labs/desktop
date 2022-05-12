@@ -20,12 +20,10 @@ export default function PlatformAppPopOut() {
   }, []);
 
   return (
-    <ModalLayout hideFooter>
-      <PlatformAppPageView
-        appId={params.appId}
-        pageSlot={params.pageSlot}
-        style={{ height: '100%' }}
-      />
-    </ModalLayout>
+    <PlatformAppPageView
+      appId={params.appId}
+      pageSlot={params.pageSlot}
+      style={{ height: '100%', width: '100%' }}
+    />
   );
 }
