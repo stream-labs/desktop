@@ -16,7 +16,6 @@ export function GameOverlay() {
   }));
 
   const [enabling, setEnabling] = useState(false);
-  const [overlayOpacity, setOverlayOpacity] = useState(opacity / 100);
 
   async function enableGameOverlay(val: boolean) {
     setEnabling(true);
@@ -33,8 +32,7 @@ export function GameOverlay() {
   }
 
   function setOpacity(value: number) {
-    setOverlayOpacity(value);
-    GameOverlayService.actions.setOverlayOpacity(value * 100);
+    GameOverlayService.actions.setOverlayOpacity(value);
   }
 
   function resetPosition() {
@@ -44,9 +42,10 @@ export function GameOverlay() {
   const sliderMetadata = {
     label: $t('Overlay Opacity'),
     min: 0,
-    max: 1,
-    step: 0.1,
-    usePercentages: true,
+    max: 100,
+    step: 10,
+    tipFormatter: (val: number) => `${val}%`,
+    debounce: 500,
   };
 
   function WindowEnableToggles() {
@@ -75,7 +74,7 @@ export function GameOverlay() {
           onInput={togglePreviewMode}
           label={$t('Toggle positioning mode')}
         />
-        <SliderInput value={overlayOpacity} onInput={setOpacity} {...sliderMetadata} />
+        <SliderInput value={opacity} onChange={setOpacity} {...sliderMetadata} />
         <button
           className="button button--action"
           onClick={resetPosition}
