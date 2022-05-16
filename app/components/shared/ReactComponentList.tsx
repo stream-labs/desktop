@@ -169,6 +169,14 @@ export class NameScene extends ReactComponent {}
 })
 export class News extends ReactComponent {}
 
+@Component({
+  props: {
+    name: { default: 'Notifications' },
+    wrapperStyles: { default: () => ({ height: '100%' }) },
+  },
+})
+export class Notifications extends ReactComponent {}
+
 @Component({ props: { name: { default: 'NotificationsArea' } } })
 export class NotificationsArea extends ReactComponent {}
 
