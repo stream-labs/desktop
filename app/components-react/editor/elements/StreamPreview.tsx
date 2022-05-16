@@ -1,11 +1,11 @@
 import React, { useRef } from 'react';
+import { useModule } from 'slap';
 import Display from 'components-react/shared/Display';
 import Util from 'services/utils';
 import { ERenderingMode } from '../../../../obs-api';
 import styles from './BaseElement.m.less';
 import { $t } from 'services/i18n';
 import { Services } from 'components-react/service-provider';
-import { useVuex } from 'components-react/hooks';
 import useBaseElement from './hooks';
 
 export default function StreamPreview() {
@@ -19,7 +19,7 @@ export default function StreamPreview() {
     containerRef.current,
   );
 
-  const { hideStyleBlockers, selectiveRecording } = useVuex(() => ({
+  const { hideStyleBlockers, selectiveRecording } = useModule(() => ({
     hideStyleBlockers: WindowsService.state[Util.getCurrentUrlParams().windowId].hideStyleBlockers,
     selectiveRecording: StreamingService.state.selectiveRecording,
   }));
