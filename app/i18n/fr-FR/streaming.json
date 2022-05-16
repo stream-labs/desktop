@@ -135,7 +135,7 @@
   "You cannot unlink the platform you used to sign in to Streamlabs Desktop. If you want to unlink this platform, please sign in with a different platform.": "Vous ne pouvez pas dissocier la plate-forme utilisée pour vous connecter à Streamlabs Desktop. Si vous souhaitez dissocier cette plate-forme, connectez-vous avec une autre plate-forme.",
   "You cannot disable the platform you used to sign in to Streamlabs Desktop. Please sign in with a different platform to disable streaming to this destination.": "Vous ne pouvez pas désactiver la plate-forme utilisée pour vous connecter à Streamlabs Desktop. Veuillez vous connecter avec une autre plate-forme pour désactiver le streaming vers cette destination.",
   "Checking optimized setting for %{game}": "Vérification des paramètres optimisés pour %{game}",
-  "There was an error starting the output. Check your settings and try again. If this issue persists, please contact Streamlabs support.": "Une erreur est survenue au démarrage de la sortie. Vérifiez vos paramètres et réessayez. Si le problème persiste, contactez le support Streamlabs.",
+  "There was an error starting the output. Check your settings and try again. If this issue persists, please contact Streamlabs support.": "Une erreur est survenue au démarrage de la sortie. Vérifiez vos paramètres et réessayez. Si le problème persiste, contactez l'assistance Streamlabs.",
   "Contact Support": "Contacter le support",
   "The request to the platform failed": "La demande envoyée à la plate-forme a échoué",
   "No Facebook pages were found": "Aucune page Facebook trouvée",
