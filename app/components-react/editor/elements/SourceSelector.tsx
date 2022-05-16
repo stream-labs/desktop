@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect, useMemo } from 'react';
 import cx from 'classnames';
 import { Tooltip, Tree } from 'antd';
 import RCTree from 'rc-tree';
+import { useModule } from 'slap';
 import { EventDataNode, DataNode } from 'antd/lib/tree';
 import { SourceDisplayData } from 'services/sources';
 import { TSceneNode, SceneItemFolder, SceneItem } from 'services/scenes';
@@ -10,7 +11,6 @@ import { WidgetDisplayData } from 'services/widgets';
 import { $t } from 'services/i18n';
 import { isItem } from 'services/scenes/scene-node';
 import { EDismissable } from 'services/dismissables';
-import { useVuex } from 'components-react/hooks';
 import Scrollable from 'components-react/shared/Scrollable';
 import { Services } from 'components-react/service-provider';
 import { IOnDropInfo, useTree } from 'components-react/hooks/useTree';
@@ -34,31 +34,18 @@ function SourceSelector() {
   const treeRef = useRef<RCTree>(null);
   const { determinePlacement, expandedFolders, setExpandedFolders, toggleFolder } = useTree();
 
-  const {
-    scene,
-    globalSelection,
-    sceneNode,
-    activeItemIds,
-    lastSelectedId,
-    selectiveRecordingEnabled,
-    activeScene,
-    nameForSource,
-    childWindowOpen,
-  } = useVuex(() => ({
+  const globalSelection = SelectionService.views.globalSelection;
+
+  const { scene, activeItemIds, lastSelectedId, selectiveRecordingEnabled } = useModule(() => ({
     scene: ScenesService.views.activeScene,
     activeItemIds: SelectionService.state.selectedIds,
     lastSelectedId: SelectionService.state.lastSelectedId,
-    sceneNode: (nodeId: string) => ScenesService.views.getSceneNode(nodeId),
-    nameForSource: (sourceId: string) => SourcesService.views.getNameForSource(sourceId),
-    activeScene: ScenesService.views.activeScene,
-    globalSelection: SelectionService.views.globalSelection,
     selectiveRecordingEnabled: StreamingService.state.selectiveRecording,
-    childWindowOpen: WindowsService.state.child.isShown,
   }));
 
   useEffect(expandSelectedFolders, [lastSelectedId]);
   const [reorderOperation, setReorderOperation] = useState(0);
-  const memoizedNodes = useMemo(nodes, [childWindowOpen, reorderOperation]);
+  const memoizedNodes = useMemo(nodes, [reorderOperation]);
 
   function nodes() {
     // recursive function for transform SceneNode[] to antd DataNode[]
@@ -69,7 +56,9 @@ function SourceSelector() {
         const sourceId = isItem(sceneNode) ? sceneNode.sourceId : sceneNode.id;
         return {
           key: sceneNode.id,
-          title: isItem(sceneNode) ? nameForSource(sourceId) : sceneNode.name,
+          title: isItem(sceneNode)
+            ? SourcesService.views.getNameForSource(sourceId)
+            : sceneNode.name,
           icon: determineIcon(isItem(sceneNode), sourceId),
           isLeaf: isItem(sceneNode),
           children,
@@ -107,9 +96,7 @@ function SourceSelector() {
   }
 
   function addSource() {
-    if (scene) {
-      SourcesService.actions.showShowcase();
-    }
+    if (scene) SourcesService.actions.showShowcase();
   }
 
   function addFolder() {
@@ -153,7 +140,7 @@ function SourceSelector() {
   }
 
   function sourceProperties(nodeId?: string) {
-    const node = nodeId ? sceneNode(nodeId) : globalSelection.getNodes()[0];
+    const node = nodeId ? ScenesService.views.getSceneNode(nodeId) : globalSelection.getNodes()[0];
 
     if (!node) return;
 
@@ -195,7 +182,7 @@ function SourceSelector() {
       setInsideHouseCall(false);
       return;
     }
-    const node = activeScene?.getNode(lastSelectedId);
+    const node = scene?.getNode(lastSelectedId);
     if (!node || SelectionService.state.selectedIds.length > 1) return;
     setExpandedFolders(expandedFolders.concat(node.getPath().slice(0, -1)));
 
@@ -304,7 +291,7 @@ function TreeNode(p: {
   expandedFolders: string[];
 }) {
   const { ScenesService, EditorCommandsService, StreamingService } = Services;
-  const { scene, selectiveRecordingEnabled } = useVuex(() => ({
+  const { scene, selectiveRecordingEnabled } = useModule(() => ({
     scene: ScenesService.views.activeScene,
     selectiveRecordingEnabled: StreamingService.state.selectiveRecording,
   }));
