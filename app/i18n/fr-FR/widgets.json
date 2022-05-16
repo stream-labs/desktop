@@ -184,5 +184,7 @@
   "Browser Settings": "Paramètres du navigateur",
   "Custom Code": "Code personnalisé",
   "font_family_tooltip": "La police Google à utiliser pour le texte. Visitez http://google.com/fonts pour trouver celle qui vous convient! Polices populaires: Open Sans, Roboto, Oswald, Lato, Droid Sans.",
-  "Something went wrong while applying settings": "Un problème est survenu lors de l'application des paramètres"
+  "Something went wrong while applying settings": "Un problème est survenu lors de l'application des paramètres",
+  "Superchat Goal": "Superchat Goal",
+  "YouTube Superchats": "YouTube Superchats"
 }

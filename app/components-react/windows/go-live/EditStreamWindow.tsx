@@ -1,12 +1,12 @@
 import styles from './GoLive.m.less';
 import { ModalLayout } from '../../shared/ModalLayout';
 import { Button } from 'antd';
-import { useOnCreate } from '../../hooks';
+import { useOnCreate } from 'slap';
 import { Services } from '../../service-provider';
 import React from 'react';
 import { $t } from '../../../services/i18n';
 import GoLiveChecklist from './GoLiveChecklist';
-import Form, { useForm } from '../../shared/inputs/Form';
+import Form from '../../shared/inputs/Form';
 import Animation from 'rc-animate';
 import { SwitchInput } from '../../shared/inputs';
 import { useGoLiveSettingsRoot } from './useGoLiveSettings';
@@ -27,7 +27,7 @@ export default function EditStreamWindow() {
     prepopulate,
     isLoading,
     form,
-  } = useGoLiveSettingsRoot({ isUpdateMode: true }).select();
+  } = useGoLiveSettingsRoot({ isUpdateMode: true });
 
   const shouldShowChecklist = lifecycle === 'runChecklist';
   const shouldShowSettings = !shouldShowChecklist;

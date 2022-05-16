@@ -23,6 +23,7 @@ export interface IChatBoxSettings extends IWidgetSettings {
   show_coin_icons: boolean;
   show_bttv_emotes: boolean;
   show_franker_emotes: boolean;
+  show_7t_emotes: boolean;
   always_show_messages: boolean;
   hide_common_chat_bots: boolean;
   message_hide_delay: number;
@@ -76,6 +77,7 @@ export class ChatBoxService extends WidgetSettingsService<IChatBoxData> {
       show_coin_icons: metadata.bool({ title: $t('Show Top Coin Holder Badges') }),
       show_bttv_emotes: metadata.bool({ title: $t('Enable BetterTTV Emotes') }),
       show_franker_emotes: metadata.bool({ title: $t('Enable FrankerFaceZ Emotes') }),
+      show_7tv_emotes: metadata.bool({ title: $t('Enable 7TV Emotes') }),
 
       text_color: metadata.color({
         title: $t('Text Color'),

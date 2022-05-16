@@ -151,7 +151,8 @@ class SourcesViews extends ViewHandler<ISourcesState> {
     return this.state.sources[sourceId]?.name;
   }
 
-  suggestName(name: string): string {
+  suggestName(name?: string): string {
+    if (!name) return '';
     return namingHelpers.suggestName(name, (name: string) => this.getSourcesByName(name).length);
   }
 }
@@ -288,10 +289,20 @@ export class SourcesService extends StatefulService<ISourcesState> {
 
     if (
       this.defaultHardwareService.state.defaultVideoDevice === obsInputSettings.video_device_id &&
-      this.defaultHardwareService.state.presetFilter !== ''
+      this.defaultHardwareService.state.presetFilter !== '' &&
+      this.defaultHardwareService.state.presetFilter !== 'none'
     ) {
       this.sourceFiltersService.addPresetFilter(id, this.defaultHardwareService.state.presetFilter);
     }
+
+    if (
+      this.defaultHardwareService.state.defaultVideoDevice === obsInputSettings.device &&
+      this.defaultHardwareService.state.presetFilter !== '' &&
+      this.defaultHardwareService.state.presetFilter !== 'none'
+    ) {
+      this.sourceFiltersService.addPresetFilter(id, this.defaultHardwareService.state.presetFilter);
+    }
+
     return this.views.getSource(id)!;
   }
 
@@ -471,6 +482,14 @@ export class SourcesService extends StatefulService<ISourcesState> {
       resolvedSettings.video_device_id = this.defaultHardwareService.state.defaultVideoDevice;
     }
 
+    if (
+      type === 'av_capture_input' &&
+      resolvedSettings.device === void 0 &&
+      this.defaultHardwareService.state.defaultVideoDevice
+    ) {
+      resolvedSettings.device = this.defaultHardwareService.state.defaultVideoDevice;
+    }
+
     // TODO: Specifically for TikTok, we don't use auto mode on game capture
     // for portrait resolutions, because auto mode will distort the game.
     // We should remove this change when the backend team makes a change on their
@@ -535,6 +554,7 @@ export class SourcesService extends StatefulService<ISourcesState> {
       if (source.width !== info.width || source.height !== info.height) {
         const size = { id: source.sourceId, width: info.width, height: info.height };
         this.UPDATE_SOURCE(size);
+        this.sourceUpdated.next(source.getModel());
       }
       this.updateSourceFlags(source, info.flags);
     });
@@ -661,7 +681,7 @@ export class SourcesService extends StatefulService<ISourcesState> {
       // ChatBox
       // ChatHighlight
       // Credits
-      // DonationTicker
+      // 'DonationTicker',
       'EmoteWall',
       // EventList
       // MediaShare

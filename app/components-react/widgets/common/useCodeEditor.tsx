@@ -1,11 +1,10 @@
-import { WidgetModule } from './useWidget';
-import { getModuleManager, mutation, watch } from '../../store';
+import {WidgetModule, WidgetParams} from './useWidget';
 import { message } from 'antd';
 import Utils from '../../../services/utils';
 import { Services } from '../../service-provider';
 import { DEFAULT_CUSTOM_FIELDS } from './CustomFields';
-import { useModule } from '../../hooks/useModule';
 import { getDefined } from '../../../util/properties-type-guards';
+import {inject, injectChild, injectState, injectWatch, mutation, useModule} from 'slap';
 
 type TLang = 'json' | 'js' | 'css' | 'html';
 
@@ -13,6 +12,9 @@ type TLang = 'json' | 'js' | 'css' | 'html';
  * Manages the state for Code Editor window
  */
 class CodeEditorModule {
+
+  constructor(public widgetParams: WidgetParams) {}
+
   tabs = [
     { label: 'Custom Fields', key: 'json' },
     { label: 'HTML', key: 'html' },
@@ -20,7 +22,7 @@ class CodeEditorModule {
     { label: 'JS', key: 'js' },
   ];
 
-  state = {
+  state = injectState({
     selectedTab: 'json' as TLang,
     canSave: false,
     isLoading: true,
@@ -31,18 +33,13 @@ class CodeEditorModule {
       custom_css: '',
       custom_js: '',
     },
-  };
+  });
 
-  private widgetModule: WidgetModule = getModuleManager().getModule('WidgetModule');
+  private widgetModule = injectChild(WidgetModule, this.widgetParams);
 
-  init() {
-    // wait for the WidgetModule to load to get the custom code data from it
-    watch(
-      this,
-      () => this.widgetModule.state.isLoading,
-      () => this.reset(),
-    );
-  }
+
+  // wait for the WidgetModule to load to get the custom code data from it
+  watchWidgetModule = injectWatch(() => this.widgetModule.state.isLoading, () => this.reset());
 
   /**
    * Save the custom code on the server
@@ -111,15 +108,15 @@ class CodeEditorModule {
   @mutation()
   reset() {
     const customCode = getDefined(this.widgetModule.customCode);
-    this.state = {
-      ...this.state,
+    this.state.update({
+      ...this.state.getters,
       isLoading: false,
       customCode: {
         ...customCode,
         custom_json: customCode.custom_json ? JSON.stringify(customCode.custom_json, null, 2) : '',
       },
       canSave: false,
-    };
+    });
   }
 
   @mutation()
@@ -146,6 +143,7 @@ class CodeEditorModule {
   }
 }
 
-export function useCodeEditor() {
-  return useModule(CodeEditorModule).select();
+export function useCodeEditor(widgetParams?: WidgetParams) {
+  const params = widgetParams ? [widgetParams] : false;
+  return useModule(CodeEditorModule, params as any); // TODO fix types
 }

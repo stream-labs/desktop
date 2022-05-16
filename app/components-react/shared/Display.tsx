@@ -33,7 +33,7 @@ export default function Display(props: DisplayProps) {
     false,
   );
 
-  const obsDisplay = useRef<OBSDisplay>();
+  const obsDisplay = useRef<OBSDisplay | null>(null);
   const displayEl = useRef<HTMLDivElement>(null);
 
   useEffect(updateDisplay, [p.sourceId, v.paddingColor]);
@@ -63,6 +63,7 @@ export default function Display(props: DisplayProps) {
 
   function destroyDisplay() {
     if (obsDisplay.current) obsDisplay.current.destroy();
+    obsDisplay.current = null;
   }
 
   function updateDisplay() {

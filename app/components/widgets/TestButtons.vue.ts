@@ -10,7 +10,7 @@ export default class TestButtons extends Vue {
   @Prop() testers: string[];
 
   get widgetTesters() {
-    const availableTesters = this.widgetsService.getTesters();
+    const availableTesters = this.widgetsService.views.testers;
     return this.testers
       ? availableTesters.filter(tester => this.testers.includes(tester.name))
       : availableTesters;

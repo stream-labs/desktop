@@ -199,15 +199,6 @@ export class RestreamService extends StatefulService<IRestreamState> {
       tikTokTarget.streamKey = `${ttSettings.serverUrl}/${ttSettings.streamKey}`;
     }
 
-    // treat trovo as a custom destination
-    const trovoTarget = newTargets.find(t => t.platform === 'trovo');
-    if (trovoTarget) {
-      const serverUrl = this.trovoService.rtmpServer;
-      const streamKey = this.trovoService.state.streamKey;
-      trovoTarget.platform = 'relay';
-      trovoTarget.streamKey = `${serverUrl}${streamKey}`;
-    }
-
     await this.createTargets(newTargets);
   }
 

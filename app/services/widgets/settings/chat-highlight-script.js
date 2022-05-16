@@ -218,7 +218,7 @@ addStyle(`
     height: 22px;
     top: 0px;
     right: 44px;
-    opacity: 0;
+    opacity: 0 !important;
     padding: 4px;
     transition: 0.1s linear opacity;
     border-radius: 2px;
@@ -253,7 +253,7 @@ addStyle(`
     position: relative;
   }
   .chat-line__message:hover .slobs-chat-highlight-icon {
-    opacity: 1;
+    opacity: 1 !important;
     cursor: pointer;
   }
 `);

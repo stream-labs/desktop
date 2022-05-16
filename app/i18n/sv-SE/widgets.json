@@ -184,5 +184,7 @@
   "Browser Settings": "Browser Settings",
   "Custom Code": "Custom Code",
   "font_family_tooltip": "Det Google-typsnitt som används för texten. Besök https://fonts.google.com för att hitta en! Populära typsnitt: Open Sans, Roboto, Oswald, Lato, Droid Sans.",
-  "Something went wrong while applying settings": "Something went wrong while applying settings"
+  "Something went wrong while applying settings": "Something went wrong while applying settings",
+  "Superchat Goal": "Superchat Goal",
+  "YouTube Superchats": "YouTube Superchats"
 }

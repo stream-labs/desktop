@@ -43,6 +43,7 @@ import { assertIsDefined, getDefined } from 'util/properties-type-guards';
 import { StreamInfoView } from './streaming-view';
 import { GrowService } from 'services/grow/grow';
 import * as remote from '@electron/remote';
+import { RecordingModeService } from 'services/recording-mode';
 
 enum EOBSOutputType {
   Streaming = 'streaming',
@@ -83,6 +84,7 @@ export class StreamingService
   @Inject() private hostsService: HostsService;
   @Inject() private twitterService: TwitterService;
   @Inject() private growService: GrowService;
+  @Inject() private recordingModeService: RecordingModeService;
 
   streamingStatusChange = new Subject<EStreamingState>();
   recordingStatusChange = new Subject<ERecordingState>();
@@ -173,7 +175,7 @@ export class StreamingService
         // primary platform is always available to stream into
         // prime users are eligeble for streaming to any platform
         let primeRequired = false;
-        if (!this.views.checkPrimaryPlatform(platform) && !this.userService.isPrime) {
+        if (!this.views.isPrimaryPlatform(platform) && !this.userService.isPrime) {
           const primaryPlatform = this.userService.state.auth?.primaryPlatform;
 
           // grandfathared users allowed to stream primary + FB
@@ -644,6 +646,8 @@ export class StreamingService
 
   async toggleStreaming(options?: TStartStreamOptions, force = false) {
     if (this.state.streamingStatus === EStreamingState.Offline) {
+      if (this.recordingModeService.views.isRecordingModeEnabled) return;
+
       // in the "force" mode just try to start streaming without updating channel info
       if (force) {
         await this.finishStartStreaming();
@@ -952,6 +956,9 @@ export class StreamingService
         [EOBSOutputSignal.Stop]: ERecordingState.Offline,
         [EOBSOutputSignal.Stopping]: ERecordingState.Stopping,
       } as Dictionary<ERecordingState>)[info.signal];
+
+      // We received a signal we didn't recognize
+      if (!nextState) return;
 
       if (info.signal === EOBSOutputSignal.Start) {
         this.usageStatisticsService.recordFeatureUsage('Recording');

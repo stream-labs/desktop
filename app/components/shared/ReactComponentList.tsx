@@ -3,6 +3,14 @@ import ReactComponent from './ReactComponent';
 
 @Component({
   props: {
+    name: { default: 'AddSource' },
+    wrapperStyles: { default: () => ({ height: '100%' }) },
+  },
+})
+export class AddSource extends ReactComponent {}
+
+@Component({
+  props: {
     name: { default: 'AdvancedAudio' },
     wrapperStyles: { default: () => ({ height: '100%' }) },
   },
@@ -19,22 +27,19 @@ export class AdvancedStatistics extends ReactComponent {}
 
 @Component({
   props: {
-    name: { default: 'AppsNav' },
-    wrapperStyles: {
-      default: () => ({
-        background: 'var(--section-alt)',
-        position: 'relative',
-        width: '52px',
-        height: 0,
-        paddingTop: '6px',
-        flexGrow: 1,
-        flexBasis: 0,
-        overflow: 'hidden',
-      }),
-    },
+    name: { default: 'AlertboxLibrary' },
+    wrapperStyles: { default: () => ({ height: '100%' }) },
   },
 })
-export class AppsNav extends ReactComponent {}
+export class AlertboxLibrary extends ReactComponent {}
+
+@Component({
+  props: {
+    name: { default: 'BrowseOverlays' },
+    wrapperStyles: { default: () => ({ height: '100%' }) },
+  },
+})
+export class BrowseOverlays extends ReactComponent {}
 
 @Component({
   props: {
@@ -160,15 +165,17 @@ export class NameFolder extends ReactComponent {}
 export class NameScene extends ReactComponent {}
 
 @Component({
+  props: { name: { default: 'News' }, wrapperStyles: { default: () => ({ height: '100%' }) } },
+})
+export class News extends ReactComponent {}
+
+@Component({
   props: {
-    name: { default: 'NavTools' },
-    wrapperStyles: { default: () => ({ marginTop: 'auto', flexShrink: 0 }) },
+    name: { default: 'Notifications' },
+    wrapperStyles: { default: () => ({ height: '100%' }) },
   },
 })
-export class NavTools extends ReactComponent {}
-
-@Component({ props: { name: { default: 'NewsBanner' } } })
-export class NewsBanner extends ReactComponent {}
+export class Notifications extends ReactComponent {}
 
 @Component({ props: { name: { default: 'NotificationsArea' } } })
 export class NotificationsArea extends ReactComponent {}
@@ -181,6 +188,13 @@ export class NotificationsArea extends ReactComponent {}
 })
 export class ObsSettings extends ReactComponent {}
 
+@Component({
+  props: {
+    name: { default: 'Onboarding' },
+  },
+})
+export class Onboarding extends ReactComponent {}
+
 @Component({ props: { name: { default: 'PatchNotes' } } })
 export class PatchNotes extends ReactComponent {}
 
@@ -192,6 +206,23 @@ export class PatchNotes extends ReactComponent {}
 })
 export class PerformanceMetrics extends ReactComponent<{ mode: 'full' | 'limited' }> {}
 
+@Component({ props: { name: { default: 'PlatformAppPageView' } } })
+export class PlatformAppPageView extends ReactComponent {}
+
+@Component({ props: { name: { default: 'PlatformAppMainPage' } } })
+export class PlatformAppMainPage extends ReactComponent {}
+
+@Component({
+  props: {
+    name: { default: 'PlatformAppPopOut' },
+    wrapperStyles: { default: () => ({ height: '100%' }) },
+  },
+})
+export class PlatformAppPopOut extends ReactComponent {}
+
+@Component({ props: { name: { default: 'PlatformAppStore' } } })
+export class PlatformAppStore extends ReactComponent {}
+
 @Component({ props: { name: { default: 'PlatformLogo' } } })
 export class PlatformLogo extends ReactComponent<{
   platform: string;
@@ -199,6 +230,14 @@ export class PlatformLogo extends ReactComponent<{
   color?: string;
   unwrapped?: boolean;
 }> {}
+
+@Component({
+  props: {
+    name: { default: 'PlatformMerge' },
+    wrapperStyles: { default: () => ({ height: '100%' }) },
+  },
+})
+export class PlatformMerge extends ReactComponent {}
 
 @Component({
   props: { name: { default: 'Projector' }, wrapperStyles: { default: () => ({ height: '100%' }) } },
@@ -240,6 +279,14 @@ export class SafeMode extends ReactComponent {}
   },
 })
 export class SceneSelector extends ReactComponent {}
+
+@Component({
+  props: {
+    name: { default: 'SideNav' },
+    wrapperStyles: { default: () => ({ height: '100%' }) },
+  },
+})
+export class SideNav extends ReactComponent {}
 
 @Component({
   props: {
@@ -297,6 +344,20 @@ export class StreamScheduler extends ReactComponent {}
 
 @Component({ props: { name: { default: 'StudioEditor' } } })
 export class StudioEditor extends ReactComponent {}
+
+@Component({
+  props: {
+    name: { default: 'StudioFooter' },
+    wrapperStyles: {
+      default: () => ({
+        'grid-row': '2 / span 1',
+        display: 'flex',
+        'min-width': 0,
+      }),
+    },
+  },
+})
+export class StudioFooter extends ReactComponent {}
 
 @Component({
   props: {

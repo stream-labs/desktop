@@ -51,7 +51,17 @@ export class AlertBoxService extends WidgetSettingsService<IAlertBoxData> {
       settingsUpdateEvent: 'filteredAlertBoxSettingsUpdate',
       customCodeAllowed: true,
       customFieldsAllowed: true,
-      testers: ['Follow', 'Subscription', 'Donation', 'Bits', 'Host'],
+      testers: [
+        'Follow',
+        'Subscription',
+        'Donation',
+        'Bits',
+        'Host',
+        'Share',
+        'Support',
+        'Stars',
+        'Like',
+      ],
     };
   }
 
@@ -148,9 +158,6 @@ export class AlertBoxService extends WidgetSettingsService<IAlertBoxData> {
       messageEmojis: metadata.toggle({ title: $t('Allow Twitch Emojis?') }),
       ttsEnabled: metadata.toggle({ title: $t('Enable TTS?') }),
       unlimitedAlertMod: metadata.toggle({ title: $t('Unlimited Alert Moderation Delay') }),
-      unlimitedMediaMod: metadata.toggle({
-        title: $t('Unlimited Media Sharing Alert Moderation Delay'),
-      }),
       skillImage: metadata.toggle({ title: $t('Use Skill Image') }),
       imageFile: metadata.mediaGallery({ title: $t('Image/Video File') }),
       soundFile: metadata.sound({ title: $t('Sound File') }),

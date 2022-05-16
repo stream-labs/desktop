@@ -23,35 +23,40 @@ const PlusIcon = PlusOutlined as Function;
  * - Extras settings
  **/
 export default function GoLiveSettings() {
-  const { RestreamService, SettingsService, UserService, MagicLinkService } = Services;
-
   const {
+    addDestination,
     isAdvancedMode,
     protectedModeEnabled,
     error,
     isLoading,
     canAddDestinations,
-  } = useGoLiveSettings().selectExtra(module => {
-    const linkedPlatforms = module.linkedPlatforms;
-    const customDestinations = module.customDestinations;
+    shouldShowPrimeLabel,
+  } = useGoLiveSettings().extend(module => {
+    const { RestreamService, SettingsService, UserService, MagicLinkService } = Services;
+
     return {
-      canAddDestinations: linkedPlatforms.length + customDestinations.length < 5,
+      get canAddDestinations() {
+        const linkedPlatforms = module.state.linkedPlatforms;
+        const customDestinations = module.state.customDestinations;
+        return linkedPlatforms.length + customDestinations.length < 5;
+      },
+
+      addDestination() {
+        // open the stream settings or prime page
+        if (UserService.views.isPrime) {
+          SettingsService.actions.showSettings('Stream');
+        } else {
+          MagicLinkService.linkToPrime('slobs-multistream');
+        }
+      },
+
+      shouldShowPrimeLabel: !RestreamService.state.grandfathered,
     };
   });
 
   const shouldShowSettings = !error && !isLoading;
-  const shouldShowPrimeLabel = !RestreamService.state.grandfathered;
   const shouldShowLeftCol = protectedModeEnabled;
   const shouldShowAddDestButton = canAddDestinations;
-
-  function addDestination() {
-    // open the stream settings or prime page
-    if (UserService.views.isPrime) {
-      SettingsService.actions.showSettings('Stream');
-    } else {
-      MagicLinkService.linkToPrime('slobs-multistream');
-    }
-  }
 
   return (
     <Row gutter={16} style={{ height: 'calc(100% + 24px)' }}>

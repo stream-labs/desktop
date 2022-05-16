@@ -33,7 +33,7 @@ export default class FormInput extends BaseInput<any, IInputMetadata> {
     const type = this.options.type;
 
     // tslint:disable-next-line:prefer-template
-    return type.charAt(0).toUpperCase() + type.substr(1) + 'Input';
+    return type.charAt(0).toUpperCase() + type.slice(1) + 'Input';
   }
 
   getOptions() {

@@ -4,7 +4,7 @@ import GoLiveWindow from './windows/go-live/GoLiveWindow';
 import EditStreamWindow from './windows/go-live/EditStreamWindow';
 import IconLibraryProperties from './windows/IconLibraryProperties';
 import ScreenCaptureProperties from './windows/ScreenCaptureProperties';
-import NewsBanner from './root/NewsBanner';
+import News from './windows/News';
 import PerformanceMetrics from './shared/PerformanceMetrics';
 import PatchNotes from './pages/PatchNotes';
 import Display from './shared/Display';
@@ -13,9 +13,10 @@ import Chat from './root/Chat';
 import Highlighter from './pages/Highlighter';
 import Grow from './pages/grow/Grow';
 import Loader from './pages/Loader';
-import NavTools from './sidebar/NavTools';
 import PlatformLogo from './shared/PlatformLogo';
+import Onboarding from './pages/onboarding/Onboarding';
 import AdvancedStatistics from './windows/AdvancedStatistics';
+import StudioFooter from './root/StudioFooter';
 import StreamScheduler from './pages/stream-scheduler/StreamScheduler';
 import { createRoot } from './root/ReactRoot';
 import StartStreamingButton from './root/StartStreamingButton';
@@ -23,7 +24,6 @@ import SourceProperties from './windows/SourceProperties';
 import TestWidgets from './root/TestWidgets';
 import RenameSource from './windows/RenameSource';
 import NotificationsArea from './root/NotificationsArea';
-import AppsNav from './sidebar/AppsNav';
 import StudioEditor from './root/StudioEditor';
 import SharedComponentsLibrary from './windows/sharedComponentsLibrary/SharedComponentsLibrary';
 import { ObsSettings } from './windows/settings/ObsSettings';
@@ -43,9 +43,21 @@ import LayoutEditor from './pages/layout-editor/LayoutEditor';
 import Projector from './windows/Projector';
 import SceneSelector from './editor/elements/SceneSelectorElement';
 import SourceSelector from './editor/elements/SourceSelector';
+import AddSource from './windows/AddSource';
+import SideNav from './sidebar/SideNav';
+import Notifications from './windows/Notifications';
+import PlatformMerge from './pages/PlatformMerge';
+import AlertboxLibrary from './pages/AlertboxLibrary';
+import PlatformAppStore from './pages/PlatformAppStore';
+import BrowseOverlays from './pages/BrowseOverlays';
+import PlatformAppMainPage from './pages/PlatformAppMainPage';
+import PlatformAppPageView from './shared/PlatformAppPageView';
+import PlatformAppPopOut from './windows/PlatformAppPopOut';
 
 // list of React components to be used inside Vue components
 export const components = {
+  AlertboxLibrary,
+  BrowseOverlays,
   NameFolder,
   NameScene,
   BrowserView,
@@ -53,7 +65,7 @@ export const components = {
   EditStreamWindow: createRoot(EditStreamWindow),
   IconLibraryProperties,
   ScreenCaptureProperties,
-  NewsBanner,
+  News,
   PerformanceMetrics,
   PatchNotes,
   Display,
@@ -62,25 +74,25 @@ export const components = {
   Highlighter,
   Grow,
   Loader,
-  NavTools,
   PlatformLogo,
+  Onboarding: createRoot(Onboarding),
   Projector,
   StreamScheduler: createRoot(StreamScheduler),
   AdvancedStatistics,
   SourceProperties: createRoot(SourceProperties),
   SharedComponentsLibrary: createRoot(SharedComponentsLibrary),
-  StartStreamingButton,
   TestWidgets,
   RenameSource,
+  StudioFooter: createRoot(StudioFooter),
+  StartStreamingButton,
   NotificationsArea,
   ObsSettings: createRoot(ObsSettings),
   ThemeAudit,
-  AppsNav,
   StudioEditor,
   WidgetWindow: createRoot(WidgetWindow),
   CustomCodeWindow: createRoot(CustomCodeWindow),
   SafeMode,
-  AdvancedAudio,
+  AdvancedAudio: createRoot(AdvancedAudio),
   SourceShowcase: createRoot(SourceShowcase),
   SourceFilters,
   RecentEvents,
@@ -90,4 +102,12 @@ export const components = {
   LayoutEditor: createRoot(LayoutEditor),
   SceneSelector: createRoot(SceneSelector),
   SourceSelector: createRoot(SourceSelector),
+  AddSource,
+  SideNav,
+  Notifications,
+  PlatformMerge,
+  PlatformAppStore,
+  PlatformAppMainPage,
+  PlatformAppPageView,
+  PlatformAppPopOut,
 };

@@ -1,6 +1,15 @@
 // Source helper functions
-import { focusMain, focusChild, closeWindow } from './core';
-import { click, clickButton, isDisplayed, select, waitForDisplayed } from './core';
+import {
+  focusMain,
+  focusChild,
+  closeWindow,
+  click,
+  clickButton,
+  isDisplayed,
+  select,
+  waitForDisplayed,
+} from './core';
+import { setInputValue } from './forms/form';
 import { dialogDismiss } from '../spectron/dialog';
 import { contextMenuClick } from '../spectron/context-menu';
 
@@ -53,12 +62,15 @@ export async function addSource(
   await click(`[data-name="${type}"]`);
 
   await clickButton('Add Source');
-  const isInputVisible = await isDisplayed('input', { timeout: 200, interval: 100 });
+  const isInputVisible = await isDisplayed('[data-name=newSourceName]', {
+    timeout: 200,
+    interval: 100,
+  });
   if (!isInputVisible) {
-    await click('[data-type="toggle"]');
-    await waitForDisplayed('input');
+    await click('[data-type=switch]');
+    await waitForDisplayed('[data-name=newSourceName]');
   }
-  await (await select('input')).setValue(name);
+  await setInputValue('[data-name=newSourceName]', name);
 
   await clickButton('Add Source');
 
@@ -77,7 +89,7 @@ export async function addExistingSource(type: string, name: string) {
   await focusChild();
   await click(`div=${type}`);
   await clickButton('Add Source');
-  await click(`div=${name}`);
+  await click(`span=${name}`);
   await clickButton('Add Source');
 }
 

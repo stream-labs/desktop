@@ -1569,7 +1569,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/runtime@npm:^7.10.1, @babel/runtime@npm:^7.10.2, @babel/runtime@npm:^7.10.4, @babel/runtime@npm:^7.11.1, @babel/runtime@npm:^7.11.2, @babel/runtime@npm:^7.12.1, @babel/runtime@npm:^7.12.5, @babel/runtime@npm:^7.5.5, @babel/runtime@npm:^7.8.4, @babel/runtime@npm:^7.8.7, @babel/runtime@npm:^7.9.2":
+"@babel/runtime@npm:^7.10.1, @babel/runtime@npm:^7.10.2, @babel/runtime@npm:^7.10.4, @babel/runtime@npm:^7.11.1, @babel/runtime@npm:^7.11.2, @babel/runtime@npm:^7.12.5, @babel/runtime@npm:^7.5.5, @babel/runtime@npm:^7.8.4, @babel/runtime@npm:^7.8.7":
   version: 7.14.0
   resolution: "@babel/runtime@npm:7.14.0"
   dependencies:
@@ -2070,18 +2070,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@reduxjs/toolkit@npm:1.5.1":
-  version: 1.5.1
-  resolution: "@reduxjs/toolkit@npm:1.5.1"
-  dependencies:
-    immer: ^8.0.1
-    redux: ^4.0.0
-    redux-thunk: ^2.3.0
-    reselect: ^4.0.0
-  checksum: 5cdabdf04c3da3b7c5b86136e44325f7b185fb1b812bc432026781c888c3031730429282382eddeefc8bae1f38f6db01e84cbbc51c2d3f0c7a800a35f129dc18
-  languageName: node
-  linkType: hard
-
 "@sentry/browser@npm:5.21.4":
   version: 5.21.4
   resolution: "@sentry/browser@npm:5.21.4"
@@ -2340,16 +2328,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/hoist-non-react-statics@npm:^3.3.0":
-  version: 3.3.1
-  resolution: "@types/hoist-non-react-statics@npm:3.3.1"
-  dependencies:
-    "@types/react": "*"
-    hoist-non-react-statics: ^3.3.0
-  checksum: 2c0778570d9a01d05afabc781b32163f28409bb98f7245c38d5eaf082416fdb73034003f5825eb5e21313044e8d2d9e1f3fe2831e345d3d1b1d20bcd12270719
-  languageName: node
-  linkType: hard
-
 "@types/http-cache-semantics@npm:*":
   version: 4.0.0
   resolution: "@types/http-cache-semantics@npm:4.0.0"
@@ -2533,18 +2511,6 @@ __metadata:
   dependencies:
     "@types/react": "*"
   checksum: be256f0192366b4c0822da43c732bf3e29beb954c89d739aa770f09e5160842a3ca4d6814cb57bbcbbf8997cf7af0b998de318dab957f0820f267bb746c9a329
-  languageName: node
-  linkType: hard
-
-"@types/react-redux@npm:^7.1.16":
-  version: 7.1.16
-  resolution: "@types/react-redux@npm:7.1.16"
-  dependencies:
-    "@types/hoist-non-react-statics": ^3.3.0
-    "@types/react": "*"
-    hoist-non-react-statics: ^3.3.0
-    redux: ^4.0.0
-  checksum: c07ee677be781df70aa6209d4152373ec470f6c99b50051e302add8b57d49e89322250959bf9e192738cccc5dbbe05c77514339a45b46ec973c8326227408f26
   languageName: node
   linkType: hard
 
@@ -6532,16 +6498,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"electron@npm:14.2.2":
-  version: 14.2.2
-  resolution: "electron@npm:14.2.2"
+"electron@npm:14.2.6":
+  version: 14.2.6
+  resolution: "electron@npm:14.2.6"
   dependencies:
     "@electron/get": ^1.0.1
     "@types/node": ^14.6.2
     extract-zip: ^1.0.3
   bin:
     electron: cli.js
-  checksum: c56e561f175c3016e31844d4e518ac548cc06588c52fa9e4c3dc5bccd8c6ec30cf392316c9749ef18d5d4d91daeb4513c4575a0828dfd8a7881ac465725f1e83
+  checksum: f0ce42459502f9f7d937374699eefbb56dacc03b21c7e7933f5a865c4f1f05aba00eafa3a217fa97d91559ffffe5f57ab17c2001a5e122118957932e360bb707
   languageName: node
   linkType: hard
 
@@ -8420,15 +8386,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"hoist-non-react-statics@npm:^3.3.0, hoist-non-react-statics@npm:^3.3.2":
-  version: 3.3.2
-  resolution: "hoist-non-react-statics@npm:3.3.2"
-  dependencies:
-    react-is: ^16.7.0
-  checksum: b1538270429b13901ee586aa44f4cc3ecd8831c061d06cb8322e50ea17b3f5ce4d0e2e66394761e6c8e152cd8c34fb3b4b690116c6ce2bd45b18c746516cb9e8
-  languageName: node
-  linkType: hard
-
 "hosted-git-info@npm:^2.1.4":
   version: 2.5.0
   resolution: "hosted-git-info@npm:2.5.0"
@@ -8673,10 +8630,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"immer@npm:^8.0.1":
-  version: 8.0.4
-  resolution: "immer@npm:8.0.4"
-  checksum: 9d3b28df1ac5bf6918c611e71c15bdb136588c21a3431100448f21325fef9b055cc9a44fe8b023f0c5ecbc66a2ba38f403c9a67d581f613b49d0e4ff15564f79
+"immer@npm:^9.0.12":
+  version: 9.0.12
+  resolution: "immer@npm:9.0.12"
+  checksum: bcbec6d76dac65e49068eb67ece4d407116e62b8cde3126aa89c801e408f5047763ba0aeb62f1938c1aa704bb6612f1d8302bb2a86fa1fc60fcc12d8b25dc895
   languageName: node
   linkType: hard
 
@@ -12339,7 +12296,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"prop-types@npm:^15.5.10, prop-types@npm:^15.6.0, prop-types@npm:^15.6.2, prop-types@npm:^15.7.2":
+"prop-types@npm:^15.5.10, prop-types@npm:^15.6.0, prop-types@npm:^15.6.2":
   version: 15.7.2
   resolution: "prop-types@npm:15.7.2"
   dependencies:
@@ -13139,20 +13096,20 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-dom@npm:17.0.1":
-  version: 17.0.1
-  resolution: "react-dom@npm:17.0.1"
+"react-dom@npm:17.0.2":
+  version: 17.0.2
+  resolution: "react-dom@npm:17.0.2"
   dependencies:
     loose-envify: ^1.1.0
     object-assign: ^4.1.1
-    scheduler: ^0.20.1
+    scheduler: ^0.20.2
   peerDependencies:
-    react: 17.0.1
-  checksum: df2af300dd4f49a5daaccc38f5a307def2a9ae2b7ebffa3dce8fb9986129057696b86a2c94e5ae36133057c69428c500e4ee3bf5884eb44e5632ace8b7ace41f
+    react: 17.0.2
+  checksum: 1c1eaa3bca7c7228d24b70932e3d7c99e70d1d04e13bb0843bbf321582bc25d7961d6b8a6978a58a598af2af496d1cedcfb1bf65f6b0960a0a8161cb8dab743c
   languageName: node
   linkType: hard
 
-"react-is@npm:^16.12.0, react-is@npm:^16.13.1, react-is@npm:^16.7.0, react-is@npm:^16.8.1":
+"react-is@npm:^16.12.0, react-is@npm:^16.8.1":
   version: 16.13.1
   resolution: "react-is@npm:16.13.1"
   checksum: f7a19ac3496de32ca9ae12aa030f00f14a3d45374f1ceca0af707c831b2a6098ef0d6bdae51bd437b0a306d7f01d4677fcc8de7c0d331eb47ad0f46130e53c5f
@@ -13163,27 +13120,6 @@ __metadata:
   version: 3.0.4
   resolution: "react-lifecycles-compat@npm:3.0.4"
   checksum: a904b0fc0a8eeb15a148c9feb7bc17cec7ef96e71188280061fc340043fd6d8ee3ff233381f0e8f95c1cf926210b2c4a31f38182c8f35ac55057e453d6df204f
-  languageName: node
-  linkType: hard
-
-"react-redux@npm:7.2.4":
-  version: 7.2.4
-  resolution: "react-redux@npm:7.2.4"
-  dependencies:
-    "@babel/runtime": ^7.12.1
-    "@types/react-redux": ^7.1.16
-    hoist-non-react-statics: ^3.3.2
-    loose-envify: ^1.4.0
-    prop-types: ^15.7.2
-    react-is: ^16.13.1
-  peerDependencies:
-    react: ^16.8.3 || ^17
-  peerDependenciesMeta:
-    react-dom:
-      optional: true
-    react-native:
-      optional: true
-  checksum: 214fa1a4811f95090b77d96ec7114c322adf388b6d086ebebf50cdaf03549758037283f953d2b920cf6ee2f6ffad8f35e92f1ab959b3f2c957f5075d00e16d0a
   languageName: node
   linkType: hard
 
@@ -13217,13 +13153,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react@npm:17.0.1":
-  version: 17.0.1
-  resolution: "react@npm:17.0.1"
+"react@npm:17.0.2, react@npm:^17.0.2":
+  version: 17.0.2
+  resolution: "react@npm:17.0.2"
   dependencies:
     loose-envify: ^1.1.0
     object-assign: ^4.1.1
-  checksum: 83b9df9529a2b489f00a4eaa608fc7d55518b258e046c100344ae068713e43ae64e477a140f87e38cfe75489bcfd26d27fce5818f89f4ec41bdbda7ead4bb426
+  checksum: b254cc17ce3011788330f7bbf383ab653c6848902d7936a87b09d835d091e3f295f7e9dd1597c6daac5dc80f90e778c8230218ba8ad599f74adcc11e33b9d61b
   languageName: node
   linkType: hard
 
@@ -13379,22 +13315,6 @@ __metadata:
   version: 2.0.0
   resolution: "reduce-flatten@npm:2.0.0"
   checksum: 64393ef99a16b20692acfd60982d7fdbd7ff8d9f8f185c6023466444c6dd2abb929d67717a83cec7f7f8fb5f46a25d515b3b2bf2238fdbfcdbfd01d2a9e73cb8
-  languageName: node
-  linkType: hard
-
-"redux-thunk@npm:^2.3.0":
-  version: 2.3.0
-  resolution: "redux-thunk@npm:2.3.0"
-  checksum: d13f442ffc91249b534bf14884c33feff582894be2562169637dc9d4d70aec6423bfe6d66f88c46ac027ac1c0cd07d6c2dd4a61cf7695b8e43491de679df9bcf
-  languageName: node
-  linkType: hard
-
-"redux@npm:^4.0.0":
-  version: 4.1.0
-  resolution: "redux@npm:4.1.0"
-  dependencies:
-    "@babel/runtime": ^7.9.2
-  checksum: 322d5f4b49cbbdb3f64f04e9279cabbdea9a698024b530dc98563eb598b6bd55ff8a715208e3ee09db9802a2f426c991c78906b1c6491ebb52e7310e55ee5cdf
   languageName: node
   linkType: hard
 
@@ -13708,13 +13628,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"reselect@npm:^4.0.0":
-  version: 4.0.0
-  resolution: "reselect@npm:4.0.0"
-  checksum: ac7dfc9ef2cdb42b6fc87a856f3ce904c2e4363a2bc1e6fb7eea5f78902a6f506e4388e6509752984877c6dbfe501100c076671d334799eb5a1bfe9936cb2c12
-  languageName: node
-  linkType: hard
-
 "resize-observer-polyfill@npm:^1.5.0, resize-observer-polyfill@npm:^1.5.1":
   version: 1.5.1
   resolution: "resize-observer-polyfill@npm:1.5.1"
@@ -13993,13 +13906,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"scheduler@npm:^0.20.1":
-  version: 0.20.1
-  resolution: "scheduler@npm:0.20.1"
+"scheduler@npm:^0.20.2":
+  version: 0.20.2
+  resolution: "scheduler@npm:0.20.2"
   dependencies:
     loose-envify: ^1.1.0
     object-assign: ^4.1.1
-  checksum: ace896fff8ccc516a4b5a249c712fc88d4e2456587d991acc220b54690362d6a2b9d426a7f030454cb439f6f5ff2706b13ee8c44ccb953884c4756304a2f8ad6
+  checksum: c4b35cf967c8f0d3e65753252d0f260271f81a81e427241295c5a7b783abf4ea9e905f22f815ab66676f5313be0a25f47be582254db8f9241b259213e999b8fc
   languageName: node
   linkType: hard
 
@@ -14306,6 +14219,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"slap@git+https://github.com/stream-labs/slap.git#v0.1.83":
+  version: 0.1.83
+  resolution: "slap@https://github.com/stream-labs/slap.git#commit=17549e49d3235081bc474a3a49831e79e95e5ea6"
+  dependencies:
+    immer: ^9.0.12
+    react: ^17.0.2
+  checksum: cbc49167d9eead0fb0e7fd44320aa27e27a1b4158383aa7b3dd2d86bb45ad6f8dbf7ddfbebcac68bc129abdeacedb3cb56d36f6770de673805a21ce14f28e13a
+  languageName: node
+  linkType: hard
+
 "slash@npm:^2.0.0":
   version: 2.0.0
   resolution: "slash@npm:2.0.0"
@@ -14375,7 +14298,6 @@ __metadata:
     "@octokit/app": 3.0.2
     "@octokit/request": 4.1.1
     "@octokit/rest": 16.43.2
-    "@reduxjs/toolkit": 1.5.1
     "@sentry/browser": 5.21.4
     "@sentry/integrations": 5.21.4
     "@types/archiver": 2.1.3
@@ -14423,7 +14345,7 @@ __metadata:
     css-element-queries: 1.2.3
     css-loader: 2.1.1
     dotenv: 8.2.0
-    electron: 14.2.2
+    electron: 14.2.6
     electron-builder: 22.14.5
     electron-chromedriver: ^14.0.0
     electron-devtools-installer: 3.1.1
@@ -14475,11 +14397,10 @@ __metadata:
     raven: ^2.6.4
     raw-loader: 2.0.0
     rc-animate: 3.1.1
-    react: 17.0.1
+    react: 17.0.2
     react-colorful: ^5.5.0
     react-devtools-electron: ^4.7.0
-    react-dom: 17.0.1
-    react-redux: 7.2.4
+    react-dom: 17.0.2
     react-sortablejs: 6.0.0
     react-transition-group: ^4.4.1
     recursive-readdir: 2.2.2
@@ -14491,6 +14412,7 @@ __metadata:
     shelljs: 0.8.5
     signtool: 1.0.0
     sl-vue-tree: "https://github.com/stream-labs/sl-vue-tree.git"
+    slap: "git+https://github.com/stream-labs/slap.git#v0.1.83"
     socket.io-client: 2.1.1
     sockjs: 0.3.20
     sockjs-client: 1.1.5
@@ -14509,7 +14431,7 @@ __metadata:
     ts-loader: 8.0.11
     ts-node: 7.0.1
     typedoc: 0.22.10
-    typescript: 4.0.7
+    typescript: 4.5.5
     urijs: 1.19.7
     uuid: ^3.0.1
     v-selectpage: 2.0.2
@@ -15893,13 +15815,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typescript@npm:4.0.7":
-  version: 4.0.7
-  resolution: "typescript@npm:4.0.7"
+"typescript@npm:4.5.5":
+  version: 4.5.5
+  resolution: "typescript@npm:4.5.5"
   bin:
     tsc: bin/tsc
     tsserver: bin/tsserver
-  checksum: dcdea680ae7ad95b3ebc154867b38a5f855b5e8375b7069c5536081076cc3fce9fc977b96f1212446fa55f65746e1a7ea5bbc9d2984968349af0fafffd957a1e
+  checksum: 506f4c919dc8aeaafa92068c997f1d213b9df4d9756d0fae1a1e7ab66b585ab3498050e236113a1c9e57ee08c21ec6814ca7a7f61378c058d79af50a4b1f5a5e
   languageName: node
   linkType: hard
 
@@ -15913,13 +15835,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typescript@patch:typescript@4.0.7#~builtin<compat/typescript>":
-  version: 4.0.7
-  resolution: "typescript@patch:typescript@npm%3A4.0.7#~builtin<compat/typescript>::version=4.0.7&hash=493e53"
+"typescript@patch:typescript@4.5.5#~builtin<compat/typescript>":
+  version: 4.5.5
+  resolution: "typescript@patch:typescript@npm%3A4.5.5#~builtin<compat/typescript>::version=4.5.5&hash=493e53"
   bin:
     tsc: bin/tsc
     tsserver: bin/tsserver
-  checksum: 713faf8e7ed7e9ac5484bc41e62aab59107cd7ae84371c14fd5d42cec84efd8c4fc4bb2ab455cf2149c56c89073e23158dffa2bba3879fd9c4a876b77b6731a8
+  checksum: c05c318d79c690f101d7ffb34cd6c7d6bbd884d3af9cefe7749ad0cd6be43c7082f098280982ca945dcba23fde34a08fed9602bb26540936baf8c0520727d3ba
   languageName: node
   linkType: hard
 

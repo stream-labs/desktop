@@ -31,5 +31,9 @@
   "Designates if this source is audible in your recorded track(s)": "Indica se la sorgente è udibile nella traccia o nelle tracce registrate",
   "Source Settings": "Impostazioni sorgente",
   "Audio Tracks": "Tracce audio",
-  "Designates which tracks are being recorded": "Indica quali tracce sono registrate"
+  "Designates which tracks are being recorded": "Indica quali tracce sono registrate",
+  "Your Stream and VOD Track are the same. This may result in unexpected audio behavior, go to Global Settings to change.": "Your Stream and VOD Track are the same. This may result in unexpected audio behavior, go to Global Settings to change.",
+  "Streaming Track": "Streaming Track",
+  "Enable Twitch VOD Track": "Enable Twitch VOD Track",
+  "Twitch VOD Track": "Twitch VOD Track"
 }

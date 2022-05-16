@@ -10,19 +10,19 @@ import React, { useEffect, useState } from 'react';
 import { Services } from '../../../service-provider';
 import { $t } from '../../../../services/i18n';
 import BroadcastInput from './BroadcastInput';
-import { useAsyncState } from '../../../hooks';
 import InputWrapper from '../../../shared/inputs/InputWrapper';
 import Form from '../../../shared/inputs/Form';
-import { IYoutubeStartStreamOptions } from '../../../../services/platforms/youtube';
+import {IYoutubeStartStreamOptions, YoutubeService} from '../../../../services/platforms/youtube';
 import PlatformSettingsLayout, { IPlatformComponentParams } from './PlatformSettingsLayout';
 import { assertIsDefined } from '../../../../util/properties-type-guards';
 import * as remote from '@electron/remote';
+import { inject, injectQuery, useModule } from 'slap';
 
 /***
  * Stream Settings for YT
  */
 export const YoutubeEditStreamInfo = InputComponent((p: IPlatformComponentParams<'youtube'>) => {
-  const { YoutubeService, StreamingService } = Services;
+  const { StreamingService } = Services;
   const { isScheduleMode, isUpdateMode } = p;
   const isMidStreamMode = StreamingService.views.isMidStreamMode;
 
@@ -40,30 +40,32 @@ export const YoutubeEditStreamInfo = InputComponent((p: IPlatformComponentParams
     fieldName => ({ disabled: fieldIsDisabled(fieldName as keyof IYoutubeStartStreamOptions) }),
   );
 
-  const [{ broadcastLoading, broadcasts }] = useAsyncState(
-    { broadcastLoading: true, broadcasts: [] },
-    async () => {
-      const broadcasts = await YoutubeService.actions.return.fetchEligibleBroadcasts();
+  const { broadcastsQuery } = useModule(() => {
+
+    const youtube = inject(YoutubeService);
+
+    async function fetchBroadcasts() {
+      const broadcasts = await youtube.actions.return.fetchEligibleBroadcasts();
       const shouldFetchSelectedBroadcast =
         broadcastId && !broadcasts.find(b => b.id === broadcastId);
 
       if (shouldFetchSelectedBroadcast) {
         assertIsDefined(broadcastId);
-        const selectedBroadcast = await YoutubeService.actions.return.fetchBroadcast(broadcastId);
+        const selectedBroadcast = await youtube.actions.return.fetchBroadcast(broadcastId);
         broadcasts.push(selectedBroadcast);
       }
+      return broadcasts;
+    }
 
-      return {
-        broadcastLoading: false,
-        broadcasts,
-      };
-    },
-  );
+    const broadcastsQuery = injectQuery([], fetchBroadcasts);
+
+    return { broadcastsQuery };
+  });
 
   // re-fill form when the broadcastId selected
   useEffect(() => {
     if (!broadcastId) return;
-    YoutubeService.actions.return
+    Services.YoutubeService.actions.return
       .fetchStartStreamOptionsForBroadcast(broadcastId)
       .then(newYtSettings => {
         updateSettings(newYtSettings);
@@ -83,7 +85,7 @@ export const YoutubeEditStreamInfo = InputComponent((p: IPlatformComponentParams
     }
 
     if (!isMidStreamMode) return false;
-    return !YoutubeService.updatableSettings.includes(fieldName);
+    return !Services.YoutubeService.updatableSettings.includes(fieldName);
   }
 
   function projectionChangeHandler(enable360: boolean) {
@@ -108,8 +110,8 @@ export const YoutubeEditStreamInfo = InputComponent((p: IPlatformComponentParams
         {!isScheduleMode && (
           <BroadcastInput
             label={$t('Event')}
-            loading={broadcastLoading}
-            broadcasts={broadcasts}
+            loading={broadcastsQuery.isLoading}
+            broadcasts={broadcastsQuery.data}
             disabled={isUpdateMode}
             {...bind.broadcastId}
           />
@@ -142,7 +144,7 @@ export const YoutubeEditStreamInfo = InputComponent((p: IPlatformComponentParams
           {...bind.categoryId}
           label={$t('Category')}
           showSearch
-          options={YoutubeService.state.categories.map(category => ({
+          options={Services.YoutubeService.state.categories.map(category => ({
             value: category.id,
             label: category.snippet.title,
           }))}

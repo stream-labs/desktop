@@ -100,7 +100,7 @@ export class ServicesManager extends Service {
     }
 
     const helperName = resourceId.split('[')[0];
-    const constructorArgsStr = resourceId.substr(helperName.length);
+    const constructorArgsStr = resourceId.slice(helperName.length);
     const constructorArgs = constructorArgsStr ? JSON.parse(constructorArgsStr) : void 0;
     return this.getHelper(helperName, constructorArgs);
   }

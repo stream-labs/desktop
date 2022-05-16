@@ -776,7 +776,7 @@ const getMigrationMapping = (actionName: string) => {
   return {
     MUTE: 'TOGGLE_MUTE',
     UNMUTE: 'TOGGLE_UNMUTE',
-  }[normalizeActionName(actionName)];
+  }[normalizeActionName(actionName)] as string;
 };
 
 const getActionFromName = (actionName: string) => ({

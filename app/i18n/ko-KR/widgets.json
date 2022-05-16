@@ -184,5 +184,7 @@
   "Browser Settings": "브라우저 설정",
   "Custom Code": "사용자 지정 코드",
   "font_family_tooltip": "텍스트에 사용할 Google 폰트. https://fonts.google.com에 방문하여 찾아보세요! 인기 폰트: Open Sans, Roboto, Oswald, Lato, Droid Sans.",
-  "Something went wrong while applying settings": "설정 적용 중 오류 발생"
+  "Something went wrong while applying settings": "설정 적용 중 오류 발생",
+  "Superchat Goal": "Superchat Goal",
+  "YouTube Superchats": "YouTube Superchats"
 }

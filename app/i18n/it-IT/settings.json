@@ -140,5 +140,18 @@
   "Uninstalling Virtual Webcam will remove it as a device option in other applications.": "Se si disinstalla Virtual Webcam, questa verrà rimossa come opzione di dispositivo in altre applicazioni.",
   "Uninstall Virtual Webcam": "Disinstalla Virtual Webcam",
   "Use custom resolution": "Usa la risoluzione personalizzata",
-  "Enable Designer Mode": "Abilita modalità Designer"
+  "Enable Designer Mode": "Abilita modalità Designer",
+  "Get Support": "Get Support",
+  "Support Links": "Support Links",
+  "Streamlabs Support": "Streamlabs Support",
+  "Community Discord": "Community Discord",
+  "Diagnostic Report": "Diagnostic Report",
+  "The diagnostic report is an automatically generated report that contains information about your system and configuration. Clicking the upload button below will generate and securely transmit a diagnostic report to the Streamlabs team.": "The diagnostic report is an automatically generated report that contains information about your system and configuration. Clicking the upload button below will generate and securely transmit a diagnostic report to the Streamlabs team.",
+  "Upload Diagnostic Report": "Upload Diagnostic Report",
+  "Cache Directory": "Cache Directory",
+  "Crash Reporting": "Crash Reporting",
+  "Diagnostic Report Uploaded Successfully": "Diagnostic Report Uploaded Successfully",
+  "Error Uploading Diagnostic Report": "Error Uploading Diagnostic Report",
+  "There was an error uploading the diagnostic report. Please try again, and let the Streamlabs Streamer Success team know if the issue persists.": "There was an error uploading the diagnostic report. Please try again, and let the Streamlabs Streamer Success team know if the issue persists.",
+  "The diagnostic report was securely uploaded, and the Report ID below has been copied to your clipboard. Please provide the Report ID to the Streamlabs Streamer Success Team.": "The diagnostic report was securely uploaded, and the Report ID below has been copied to your clipboard. Please provide the Report ID to the Streamlabs Streamer Success Team."
 }
