@@ -18,7 +18,7 @@ import {
 } from 'services/nicolive-program/NicoliveFailure';
 import { CustomizationService } from 'services/customization';
 
-const CREATED_NOTICE_DURATION = 5000;
+const CREATED_NOTICE_DURATION = 5000; // 番組作成通知の表示時間(ミリ秒)
 
 @Component({
   components: {
