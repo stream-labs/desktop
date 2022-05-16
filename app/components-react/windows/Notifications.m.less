@@ -1,0 +1,29 @@
+@import "../../styles/index";
+
+.notification {
+  color: var(--icon);
+  padding: 5px 10px;
+  margin-bottom: 5px;
+  display: grid;
+  grid-template-columns: 30px 1fr 130px;
+  background: var(--border);
+  .border();
+
+  &.has-action:hover {
+    color: var(--title);
+    background: var(--section);
+    cursor: pointer;
+  }
+
+  &:last-child {
+    margin-bottom: 20px;
+  }
+
+  :global(.fa-warning) {
+    color: var(--warning);
+  }
+
+  .date {
+    text-align: right;
+  }
+}
