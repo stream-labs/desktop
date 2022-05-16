@@ -38,6 +38,7 @@ import RecentEvents from './editor/elements/RecentEvents';
 import MiniFeed from './editor/elements/Minifeed';
 import BrowserView from './shared/BrowserView';
 import LegacyEvents from './editor/elements/LegacyEvents';
+import Browser from './editor/elements/Browser';
 import MediaGallery from './windows/MediaGallery';
 import LayoutEditor from './pages/layout-editor/LayoutEditor';
 import Projector from './windows/Projector';
@@ -97,6 +98,7 @@ export const components = {
   RecentEvents,
   MiniFeed: createRoot(MiniFeed),
   LegacyEvents: createRoot(LegacyEvents),
+  Browser: createRoot(Browser),
   MediaGallery,
   LayoutEditor: createRoot(LayoutEditor),
   SceneSelector: createRoot(SceneSelector),
