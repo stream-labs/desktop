@@ -27,7 +27,6 @@ function SourceSelector() {
     StreamingService,
     AudioService,
     EditorCommandsService,
-    WindowsService,
   } = Services;
 
   const [callCameFromInsideTheHouse, setInsideHouseCall] = useState(false);
@@ -291,8 +290,9 @@ function TreeNode(p: {
   expandedFolders: string[];
 }) {
   const { ScenesService, EditorCommandsService, StreamingService } = Services;
-  const { scene, selectiveRecordingEnabled } = useModule(() => ({
-    scene: ScenesService.views.activeScene,
+
+  const scene = ScenesService.views.activeScene;
+  const { selectiveRecordingEnabled } = useModule(() => ({
     selectiveRecordingEnabled: StreamingService.state.selectiveRecording,
   }));
   if (!scene || scene.isDestroyed()) return <></>;
