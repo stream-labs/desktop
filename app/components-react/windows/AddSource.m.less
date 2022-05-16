@@ -1,0 +1,30 @@
+@import '../../styles/index';
+
+.container {
+  display: flex;
+}
+
+.menu-container {
+  width: 270px;
+  height: 170px;
+  margin-right: 24px;
+}
+
+.menu {
+  min-height: 100%;
+  background: var(--section) !important;
+}
+
+.recommended-label {
+  color: var(--teal);
+  margin-left: 10px;
+}
+
+.new-source-toggle {
+  position: absolute;
+  bottom: 8px;
+
+  :global(.ant-row) {
+    margin-bottom: 0;
+  }
+}

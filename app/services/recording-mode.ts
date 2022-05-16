@@ -8,6 +8,7 @@ import { AnchorPoint, ScalableRectangle } from 'util/ScalableRectangle';
 import { VideoService } from './video';
 import { DefaultHardwareService } from './hardware';
 import { RunInLoadingMode } from './app/app-decorators';
+import { byOS, OS } from 'util/operating-systems';
 
 interface IRecordingModeState {
   enabled: boolean;
@@ -65,7 +66,7 @@ export class RecordingModeService extends PersistentStatefulService<IRecordingMo
   private addRecordingCapture() {
     this.scenesService.views.activeScene.createAndAddSource(
       $t('Screen Capture (Double-click to select)'),
-      'screen_capture',
+      byOS({ [OS.Windows]: 'screen_capture', [OS.Mac]: 'window_capture' }),
     );
   }
 
@@ -84,8 +85,10 @@ export class RecordingModeService extends PersistentStatefulService<IRecordingMo
       setTimeout(r, 2000);
     });
 
-    // TODO: Mac
-    const item = this.scenesService.views.activeScene.createAndAddSource('Webcam', 'dshow_input');
+    const item = this.scenesService.views.activeScene.createAndAddSource(
+      'Webcam',
+      byOS({ [OS.Windows]: 'dshow_input', [OS.Mac]: 'av_capture_input' }),
+    );
 
     let sub = this.sourcesService.sourceUpdated.subscribe(s => {
       if (s.sourceId === item.source.sourceId && s.width && s.height) {

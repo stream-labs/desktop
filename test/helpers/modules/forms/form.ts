@@ -198,6 +198,19 @@ export function useForm(name?: string) {
   return { readForm, readFields, fillForm, assertFormContains, getInput };
 }
 
+export async function setInputValue(selector: string, value: string) {
+  const client = getClient();
+  const $el = await client.$(selector);
+
+  await $el.waitForDisplayed();
+  await $el.click();
+  await ((client.keys(['Control', 'a']) as any) as Promise<any>); // select all
+  await ((client.keys('Control') as any) as Promise<any>); // release ctrl key
+  await ((client.keys('Backspace') as any) as Promise<any>); // clear
+  await $el.click(); // click again if it's a list input
+  await ((client.keys(value) as any) as Promise<any>); // type text
+}
+
 /**
  * A shortcut for useForm().fillForm()
  */

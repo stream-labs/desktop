@@ -98,7 +98,7 @@ export class StreamInfoView<T extends Object> extends ViewHandler<T> {
    */
   get allPlatforms(): TPlatform[] {
     const allPlatforms: TPlatform[] = ['twitch', 'facebook', 'youtube', 'tiktok', 'trovo'];
-    return this.sortPlatforms(allPlatforms);
+    return this.getSortedPlatforms(allPlatforms);
   }
 
   /**
@@ -109,7 +109,7 @@ export class StreamInfoView<T extends Object> extends ViewHandler<T> {
     if (!this.restreamView.canEnableRestream || !this.protectedModeEnabled) {
       return [this.userView.auth!.primaryPlatform];
     }
-    return this.allPlatforms.filter(p => this.checkPlatformLinked(p));
+    return this.allPlatforms.filter(p => this.isPlatformLinked(p));
   }
 
   get protectedModeEnabled() {
@@ -267,12 +267,12 @@ export class StreamInfoView<T extends Object> extends ViewHandler<T> {
    * - linked platforms are always on the top of the list
    * - the rest has an alphabetic sort
    */
-  sortPlatforms(platforms: TPlatform[]): TPlatform[] {
+  getSortedPlatforms(platforms: TPlatform[]): TPlatform[] {
     platforms = platforms.sort();
     return [
-      ...platforms.filter(p => this.checkPrimaryPlatform(p)),
-      ...platforms.filter(p => !this.checkPrimaryPlatform(p) && this.checkPlatformLinked(p)),
-      ...platforms.filter(p => !this.checkPlatformLinked(p)),
+      ...platforms.filter(p => this.isPrimaryPlatform(p)),
+      ...platforms.filter(p => !this.isPrimaryPlatform(p) && this.isPlatformLinked(p)),
+      ...platforms.filter(p => !this.isPlatformLinked(p)),
     ];
   }
 
@@ -294,12 +294,12 @@ export class StreamInfoView<T extends Object> extends ViewHandler<T> {
     return false;
   }
 
-  checkPlatformLinked(platform: TPlatform): boolean {
+  isPlatformLinked(platform: TPlatform): boolean {
     if (!this.userView.auth?.platforms) return false;
     return !!this.userView.auth?.platforms[platform];
   }
 
-  checkPrimaryPlatform(platform: TPlatform) {
+  isPrimaryPlatform(platform: TPlatform) {
     return platform === this.userView.auth?.primaryPlatform;
   }
 
@@ -364,7 +364,7 @@ export class StreamInfoView<T extends Object> extends ViewHandler<T> {
     return {
       ...settings,
       useCustomFields,
-      enabled: enabled || this.checkPrimaryPlatform(platform),
+      enabled: enabled || this.isPrimaryPlatform(platform),
     };
   }
 

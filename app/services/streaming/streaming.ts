@@ -175,7 +175,7 @@ export class StreamingService
         // primary platform is always available to stream into
         // prime users are eligeble for streaming to any platform
         let primeRequired = false;
-        if (!this.views.checkPrimaryPlatform(platform) && !this.userService.isPrime) {
+        if (!this.views.isPrimaryPlatform(platform) && !this.userService.isPrime) {
           const primaryPlatform = this.userService.state.auth?.primaryPlatform;
 
           // grandfathared users allowed to stream primary + FB
@@ -956,6 +956,9 @@ export class StreamingService
         [EOBSOutputSignal.Stop]: ERecordingState.Offline,
         [EOBSOutputSignal.Stopping]: ERecordingState.Stopping,
       } as Dictionary<ERecordingState>)[info.signal];
+
+      // We received a signal we didn't recognize
+      if (!nextState) return;
 
       if (info.signal === EOBSOutputSignal.Start) {
         this.usageStatisticsService.recordFeatureUsage('Recording');

@@ -3,8 +3,7 @@ import styles from './Connect.m.less';
 import commonStyles from './Common.m.less';
 import { $t } from 'services/i18n';
 import { Services } from 'components-react/service-provider';
-import { useModule } from 'components-react/hooks/useModule';
-import { mutation } from 'components-react/store';
+import { injectState, useModule, mutation } from 'slap';
 import { ExtraPlatformConnect } from './ExtraPlatformConnect';
 import { EPlatformCallResult, TPlatform } from 'services/platforms';
 import cx from 'classnames';
@@ -23,8 +22,8 @@ export function Connect() {
     authInProgress,
     authPlatform,
     setExtraPlatform,
-  } = useModule(LoginModule).select();
-  const { next } = useModule(OnboardingModule).select();
+  } = useModule(LoginModule);
+  const { next } = useModule(OnboardingModule);
   const { UsageStatisticsService } = Services;
 
   if (selectedExtraPlatform) {
@@ -124,9 +123,9 @@ export function Connect() {
 type TExtraPlatform = 'nimotv' | 'dlive';
 
 export class LoginModule {
-  state = {
+  state = injectState({
     selectedExtraPlatform: undefined as TExtraPlatform | undefined,
-  };
+  });
 
   get UserService() {
     return Services.UserService;
