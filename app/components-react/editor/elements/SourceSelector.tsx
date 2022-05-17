@@ -1,28 +1,24 @@
-import React from 'react';
+import React, { useRef } from 'react';
+import { Tooltip, Tree } from 'antd';
+import { DataNode } from 'rc-tree/lib/interface';
+import { TreeProps } from 'rc-tree/lib/Tree';
+import cx from 'classnames';
+import { inject, injectState, injectWatch, mutation, useModule } from 'slap';
 import { SourcesService, SourceDisplayData } from 'services/sources';
-import { ScenesService, TSceneNode, ISceneItemFolder, ISceneItem } from 'services/scenes';
+import { ScenesService, ISceneItemFolder, ISceneItem } from 'services/scenes';
 import { SelectionService } from 'services/selection';
 import { EditMenu } from 'util/menus/EditMenu';
-import { ISlTreeNode, ISlTreeNodeModel, ICursorPosition } from 'sl-vue-tree';
 import { WidgetDisplayData } from 'services/widgets';
 import { $t } from 'services/i18n';
 import { EditorCommandsService } from 'services/editor-commands';
 import { EPlaceType } from 'services/editor-commands/commands/reorder-nodes';
 import { AudioService } from 'services/audio';
 import { StreamingService } from 'services/streaming';
-import { inject, injectState, injectWatch, mutation, useModule } from 'slap';
-import { Tooltip, Tree } from 'antd';
-import cx from 'classnames';
-import { assertIsDefined, getDefined } from '../../../util/properties-type-guards';
-import { DataNode } from 'rc-tree/lib/interface';
-import { TreeProps } from 'rc-tree/lib/Tree';
+import { assertIsDefined, getDefined } from 'util/properties-type-guards';
+import useBaseElement from './hooks';
+import styles from './SceneSelector.m.less';
 
-interface ISceneNodeData {
-  id: string;
-  sourceId: string;
-}
-
-export class SourceSelectorModule {
+class SourceSelectorModule {
   private scenesService = inject(ScenesService);
   private sourcesService = inject(SourcesService);
   private selectionService = inject(SelectionService);
@@ -395,7 +391,7 @@ export class SourceSelectorModule {
   }
 }
 
-export default function SourceSelector() {
+function SourceSelector() {
   useModule(SourceSelectorModule);
   return (
     <div className="source-selector">
@@ -423,9 +419,9 @@ function StudioControls() {
   } = useModule(SourceSelectorModule);
 
   return (
-    <div className="studio-controls-top">
+    <div className={styles.topContainer}>
       <Tooltip title={sourcesTooltip}>
-        <h2 className="studio-controls__label">{$t('Sources')}</h2>
+        <h2>{$t('Sources')}</h2>
       </Tooltip>
 
       <div>
@@ -481,7 +477,7 @@ function ItemsTree() {
   } = useModule(SourceSelectorModule);
 
   return (
-    <div className="vue-tree-container" onContextMenu={e => showContextMenu('', e)}>
+    <div onContextMenu={e => showContextMenu('', e)}>
       <Tree
         height={233}
         draggable={true}
@@ -512,5 +508,24 @@ function TreeNode(p: {
       <i onClick={p.toggleVisibility} className={cx(p.visibilityClasses)} />
       <i onClick={p.toggleLock} className={cx(p.lockClasses)} />
     </span>
+  );
+}
+
+export default function SourceSelectorElement() {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const { renderElement } = useBaseElement(
+    <SourceSelector />,
+    { x: 200, y: 120 },
+    containerRef.current,
+  );
+
+  return (
+    <div
+      ref={containerRef}
+      data-name="SourceSelector"
+      style={{ height: '100%', display: 'flex', flexDirection: 'column' }}
+    >
+      {renderElement()}
+    </div>
   );
 }

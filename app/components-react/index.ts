@@ -42,7 +42,7 @@ import MediaGallery from './windows/MediaGallery';
 import LayoutEditor from './pages/layout-editor/LayoutEditor';
 import Projector from './windows/Projector';
 import SceneSelector from './editor/elements/SceneSelectorElement';
-import SourceSelector from './editor/elements/SourceSelectorElement';
+import SourceSelector from './editor/elements/SourceSelector';
 import SideNav from './sidebar/SideNav';
 
 // list of React components to be used inside Vue components
