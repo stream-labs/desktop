@@ -18,6 +18,8 @@ import {
 } from 'services/nicolive-program/NicoliveFailure';
 import { CustomizationService } from 'services/customization';
 
+const CREATED_NOTICE_DURATION = 5000; // 番組作成通知の表示時間(ミリ秒)
+
 @Component({
   components: {
     AreaSwitcher,
@@ -35,6 +37,10 @@ export default class NicolivePanelRoot extends Vue {
   @Inject()
   nicoliveProgramService: NicoliveProgramService;
   @Inject() private customizationService: CustomizationService;
+
+  destroyed() {
+    this.hideCreatedNotice();
+  }
 
   get contents() {
     return [
@@ -69,6 +75,8 @@ export default class NicolivePanelRoot extends Vue {
     try {
       this.isCreating = true;
       await this.nicoliveProgramService.createProgram();
+
+      this.showCreatedNotice();
     } catch (e) {
       console.error(e);
     } finally {
@@ -95,5 +103,24 @@ export default class NicolivePanelRoot extends Vue {
 
   get hasProgram(): boolean {
     return this.nicoliveProgramService.hasProgram;
+  }
+
+  private createdNoticeTimer: number = 0;
+  get isShownCreatedNotice(): boolean {
+    return this.createdNoticeTimer !== 0;
+  }
+
+  showCreatedNotice() {
+    this.hideCreatedNotice();
+    this.createdNoticeTimer = window.setTimeout(() => {
+      this.createdNoticeTimer = 0;
+    }, CREATED_NOTICE_DURATION);
+  }
+
+  hideCreatedNotice() {
+    if (this.createdNoticeTimer) {
+      window.clearTimeout(this.createdNoticeTimer);
+      this.createdNoticeTimer = 0;
+    }
   }
 }

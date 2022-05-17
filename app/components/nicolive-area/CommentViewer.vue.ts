@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import { Component } from 'vue-property-decorator';
+import { Component, Prop } from 'vue-property-decorator';
 import { Inject } from 'services/core/injector';
 import { NicoliveCommentViewerService } from 'services/nicolive-program/nicolive-comment-viewer';
 import { WrappedChat, WrappedChatWithComponent } from 'services/nicolive-program/WrappedChat';
@@ -19,6 +19,7 @@ import NicoadComment from './comment/NicoadComment.vue';
 import EmotionComment from './comment/EmotionComment.vue';
 import { ChatComponentType } from 'services/nicolive-program/ChatMessage/ChatComponentType';
 import { CustomizationService } from 'services/customization';
+import NAirLogo from '../../../media/images/n-air-logo.svg';
 
 const componentMap: { [type in ChatComponentType]: Vue.Component } = {
   common: CommonComment,
@@ -38,6 +39,7 @@ const componentMap: { [type in ChatComponentType]: Vue.Component } = {
     GiftComment,
     EmotionComment,
     SystemMessage,
+    NAirLogo,
   },
 })
 export default class CommentViewer extends Vue {
@@ -51,6 +53,8 @@ export default class CommentViewer extends Vue {
   private nicoliveCommentFilterService: NicoliveCommentFilterService;
 
   @Inject() private customizationService: CustomizationService;
+
+  @Prop({ default: false }) showProgramCreatedNotice: boolean;
 
   get isCompactMode(): boolean {
     return this.customizationService.state.compactMode;

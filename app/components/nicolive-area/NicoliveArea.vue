@@ -14,7 +14,9 @@
           <program-info class="program-area-item" />
           <program-statistics class="program-area-item" />
           <area-switcher class="switch-area" :contents="contents">
-            <template v-slot:commentViewer><comment-viewer /></template>
+            <template v-slot:commentViewer
+              ><comment-viewer :showProgramCreatedNotice="isShownCreatedNotice"
+            /></template>
             <template v-slot:description><program-description /></template>
           </area-switcher>
           <tool-bar class="program-area-item" />
