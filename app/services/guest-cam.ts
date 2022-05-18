@@ -15,6 +15,60 @@ interface IIoConfigResponse {
   token: string;
 }
 
+/**
+ * Interface describing the various functions and expected return values
+ * we can make to the plugin using `callHandler`
+ */
+interface IObsReturnTypes {
+  func_send_transport_response: {};
+  func_routerRtpCapabilities: {};
+  func_create_audio_producer: {
+    connect_params: unknown;
+  };
+  func_create_video_producer: {
+    produce_params: {
+      rtpParameters: unknown;
+      kind: string;
+      transportId: string;
+    };
+  };
+  func_connect_result: {
+    produce_params: {
+      rtpParameters: unknown;
+      kind: string;
+      transportId: string;
+    };
+  };
+  func_produce_result: {};
+  func_receive_transport_response: {};
+}
+
+type TWebRTCSocketEvent = IProducerCreatedEvent | IConsumerCreatedEvent;
+
+interface IProducerCreatedEvent {
+  type: 'producerCreated';
+  data: {
+    audioId: string;
+    name: string;
+    socketId: string;
+    streamId: string;
+    type: string;
+    videoId: string;
+  };
+}
+
+interface IConsumerCreatedEvent {
+  type: 'consumerCreated';
+  data: {
+    dtlsParameters: unknown;
+    iceCandidates: unknown;
+    iceParameters: unknown;
+    id: string;
+    socketId: string;
+    streamId: string;
+  };
+}
+
 export class GuestCamService extends Service {
   @Inject() userService: UserService;
   @Inject() sourcesService: SourcesService;
@@ -72,43 +126,114 @@ export class GuestCamService extends Service {
 
       this.getSource().updateSettings({
         room: this.room,
-        routerRtpCapabilities: JSON.stringify(auth.rtpCapabilities),
       });
 
-      this.bustSettingsCache();
+      this.makeObsRequest('func_routerRtpCapabilities', auth.rtpCapabilities);
 
-      console.log(this.getSource().getObsInput().settings);
-
-
-      // this.createProducer();
+      this.createProducer();
     });
     this.socket.on('connect_error', (e: any) => console.log('Connection Error', e));
     this.socket.on('connect_timeout', () => console.log('Connection Timeout'));
     this.socket.on('error', () => console.log('Error'));
     this.socket.on('disconnect', () => console.log('Connection Closed'));
+    this.socket.on('webrtc', (e: TWebRTCSocketEvent) => this.onWebRTC(e));
+  }
+
+  onWebRTC(event: TWebRTCSocketEvent) {
+    this.log('WebRTC Event', event);
+
+    if (event.type === 'producerCreated') {
+      this.createConsumer(event);
+    } else if (event.type === 'consumerCreated') {
+      this.onConsumerCreated(event);
+    }
   }
 
   async createProducer() {
+    const source = this.getSource();
+    const input = source.getObsInput();
+    const streamId = uuid();
     const result = await this.sendWebRTCRequest({
       type: 'createProducer',
-      data: { streamId: uuid(), type: 'stream', name: 'Andy', tracks: 2 },
+      data: { streamId, type: 'stream', name: 'Andy', tracks: 2 },
     });
     this.log('Producer Created', result);
 
-    this.getSource().updateSettings({ send_transport_response: result });
-    this.getSource().updateSettings({ create_audio_producer: true });
-    this.bustSettingsCache();
+    input.callHandler('func_send_transport_response', JSON.stringify(result));
+
+    const connectParams = this.makeObsRequest('func_create_audio_producer', '').connect_params;
+
+    this.log('Got Connect Params', connectParams);
+
+    await this.sendWebRTCRequest({
+      type: 'connectSendTransport',
+      data: connectParams,
+    });
+
+    this.log('Connected Send Transport');
+
+    // Always true - it's unclear what failure looks like from server
+    const audioProduceParams = this.makeObsRequest('func_connect_result', 'true').produce_params;
+
+    this.log('Got Audio Produce Params', audioProduceParams);
+
+    const audioProduceResult = await this.sendWebRTCRequest({
+      type: 'addProducerTrack',
+      data: {
+        streamId,
+        producerTransportId: audioProduceParams.transportId,
+        kind: audioProduceParams.kind,
+        rtpParameters: audioProduceParams.rtpParameters,
+      },
+    });
+
+    // Always true - it's unclear what failure looks like from server
+    this.makeObsRequest('func_produce_result', 'true');
+
+    this.log('Got Server Add Audio Track Result', audioProduceResult);
+
+    const videoProduceParams = this.makeObsRequest('func_create_video_producer', 'true')
+      .produce_params;
+
+    this.log('Got Video Produce Params', videoProduceParams);
+
+    const videoProduceResult = await this.sendWebRTCRequest({
+      type: 'addProducerTrack',
+      data: {
+        streamId,
+        producerTransportId: videoProduceParams.transportId,
+        kind: videoProduceParams.kind,
+        rtpParameters: videoProduceParams.rtpParameters,
+      },
+    });
+
+    // Always true - it's unclear what failure looks like from server
+    this.makeObsRequest('func_produce_result', 'true');
+
+    this.log('Got Server Add Video Track Result', videoProduceResult);
+  }
+
+  async createConsumer(event: IProducerCreatedEvent) {
+    this.log('Creating Consumer', event);
+
+    // TODO - Don't consume our own producer
+
+    this.sendWebRTCRequest({
+      type: 'createConsumer',
+      data: event.data,
+    });
+  }
+
+  async onConsumerCreated(event: IConsumerCreatedEvent) {
+    this.log('Consumer Created', event);
+
+    this.makeObsRequest('func_receive_transport_response', event.data);
   }
 
   async authenticateSocket(token: string): Promise<{ success: boolean; rtpCapabilities: unknown }> {
     return new Promise(r => {
       this.socket.emit('authenticate', { token, username: 'Andy' }, r);
     });
-  }
-
-  // TODO: No longer needed after Steven's changes
-  private bustSettingsCache() {
-    this.getSource().updateSettings({ force_cache_bust: true });
   }
 
   sendWebRTCRequest(data: unknown) {
@@ -129,6 +254,38 @@ export class GuestCamService extends Service {
 
   getSource() {
     return this.sourcesService.views.getSource(this.getSourceId());
+  }
+
+  private makeObsRequest<TFunc extends keyof IObsReturnTypes>(
+    func: TFunc,
+    arg?: Object,
+  ): IObsReturnTypes[TFunc] {
+    let stringArg = arg ?? '';
+
+    if (typeof stringArg === 'object') {
+      stringArg = JSON.stringify(arg);
+    }
+
+    if (typeof stringArg !== 'string') {
+      throw new Error(`Unsupported arg type for OBS call ${arg}`);
+    }
+
+    let result = (this.getSource().getObsInput().callHandler(func, stringArg) as any).output;
+
+    if (result !== '') {
+      result = JSON.parse(result);
+    }
+
+    // Attempt to parse keys as JSON
+    Object.keys(result).forEach(k => {
+      if (typeof result[k] === 'string') {
+        try {
+          result[k] = JSON.parse(result[k]);
+        } catch {}
+      }
+    });
+
+    return result;
   }
 
   private log(...msgs: unknown[]) {
