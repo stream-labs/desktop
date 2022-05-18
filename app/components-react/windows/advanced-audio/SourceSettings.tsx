@@ -51,17 +51,24 @@ export default function AdvancedAudio() {
 function PanelHeader(p: { source: AudioSource }) {
   const { EditorCommandsService, SettingsService } = Services;
 
-  const { isAdvancedOutput, recordingTracks, streamTrack, vodTrackEnabled, vodTrack } = useVuex(
-    () => ({
-      isAdvancedOutput: SettingsService.views.isAdvancedOutput,
-      streamTrack: SettingsService.views.streamTrack,
-      recordingTracks: SettingsService.views.recordingTracks,
-      vodTrackEnabled: SettingsService.views.vodTrackEnabled,
-      vodTrack: SettingsService.views.vodTrack,
-    }),
-  );
+  const {
+    isAdvancedOutput,
+    recordingTracks,
+    streamTrack,
+    vodTrackEnabled,
+    vodTrack,
+    muted,
+  } = useVuex(() => ({
+    isAdvancedOutput: SettingsService.views.isAdvancedOutput,
+    streamTrack: SettingsService.views.streamTrack,
+    recordingTracks: SettingsService.views.recordingTracks,
+    vodTrackEnabled: SettingsService.views.vodTrackEnabled,
+    vodTrack: SettingsService.views.vodTrack,
+    // Hack to make muted property reactive
+    muted: p.source.muted,
+  }));
 
-  const { name, mixerHidden, muted, fader, audioMixers, sourceId } = p.source;
+  const { name, mixerHidden, fader, audioMixers, sourceId } = p.source;
 
   const [trackFlags, setTrackFlags] = useState(
     Utils.numberToBinnaryArray(audioMixers, 6).reverse(),

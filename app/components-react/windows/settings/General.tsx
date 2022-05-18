@@ -59,9 +59,10 @@ function ExtraSettings() {
   const protectedMode = StreamSettingsService.state.protectedModeEnabled;
   const disableHAFilePath = path.join(AppService.appDataDirectory, 'HADisable');
   const [disableHA, setDisableHA] = useState(() => fs.existsSync(disableHAFilePath));
-  const { isRecordingOrStreaming, recordingMode } = useVuex(() => ({
+  const { isRecordingOrStreaming, recordingMode, updateStreamInfoOnLive } = useVuex(() => ({
     isRecordingOrStreaming: StreamingService.isStreaming || StreamingService.isRecording,
     recordingMode: RecordingModeService.views.isRecordingModeEnabled,
+    updateStreamInfoOnLive: CustomizationService.state.updateStreamInfoOnLive,
   }));
   const canRunOptimizer = isTwitch && !isRecordingOrStreaming && protectedMode;
 
@@ -108,7 +109,7 @@ function ExtraSettings() {
       <ObsSettingsSection>
         {isLoggedIn && !isFacebook && !isYoutube && (
           <CheckboxInput
-            value={CustomizationService.state.updateStreamInfoOnLive}
+            value={updateStreamInfoOnLive}
             onChange={val => CustomizationService.setUpdateStreamInfoOnLive(val)}
             label={$t('Confirm stream title and game before going live')}
             name="stream_info_udpate"

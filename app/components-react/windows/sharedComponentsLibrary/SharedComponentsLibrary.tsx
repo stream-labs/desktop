@@ -27,7 +27,7 @@ import { I18nService, WHITE_LIST } from '../../../services/i18n';
 import { pick } from 'lodash';
 import { DemoForm } from './DemoForm';
 import { CodeInput } from '../../shared/inputs/CodeInput';
-import { injectState, merge, mutation, useModule, createFormBinding, injectFormBinding } from 'slap';
+import { injectState, merge, useModule, injectFormBinding } from 'slap';
 
 const { TabPane } = Tabs;
 
@@ -65,41 +65,40 @@ function Examples() {
     size,
     formState,
   } = useSharedComponentsLibrary().extend(module => {
-
     const formState = injectState({
-        textVal: '',
-        textAreaVal: '',
-        switcherVal: false,
-        numberVal: 0,
-        sliderVal: 5,
-        imageVal: '',
-        galleryImage: '',
-        galleryAudio: '',
-        javascript: 'alert("Hello World!")',
-        saveFilePathVal: '',
-        checkboxVal: false,
-        dateVal: undefined as Date | undefined,
-        listVal: 1,
-        listOptions: [
-          { value: 1, label: 'Red' },
-          { value: 2, label: 'Green' },
-          { value: 3, label: 'Blue' },
-          { value: 4, label: 'Orange' },
-        ],
-        listVal2: '',
-        listOptions2: [
-          { value: '', label: 'Please Select the option' },
-          { value: 'foo', label: 'Foo' },
-          { value: 'bar', label: 'Bar' },
-        ],
-        tagsVal: [1, 2, 3],
-        tagsOptions: [
-          { value: 1, label: 'Red' },
-          { value: 2, label: 'Green' },
-          { value: 3, label: 'Blue' },
-          { value: 4, label: 'Orange' },
-        ],
-      });
+      textVal: '',
+      textAreaVal: '',
+      switcherVal: false,
+      numberVal: 0,
+      sliderVal: 5,
+      imageVal: '',
+      galleryImage: '',
+      galleryAudio: '',
+      javascript: 'alert("Hello World!")',
+      saveFilePathVal: '',
+      checkboxVal: false,
+      dateVal: undefined as Date | undefined,
+      listVal: 1,
+      listOptions: [
+        { value: 1, label: 'Red' },
+        { value: 2, label: 'Green' },
+        { value: 3, label: 'Blue' },
+        { value: 4, label: 'Orange' },
+      ],
+      listVal2: '',
+      listOptions2: [
+        { value: '', label: 'Please Select the option' },
+        { value: 'foo', label: 'Foo' },
+        { value: 'bar', label: 'Bar' },
+      ],
+      tagsVal: [1, 2, 3],
+      tagsOptions: [
+        { value: 1, label: 'Red' },
+        { value: 2, label: 'Green' },
+        { value: 3, label: 'Blue' },
+        { value: 4, label: 'Orange' },
+      ],
+    });
 
     return {
       formState,

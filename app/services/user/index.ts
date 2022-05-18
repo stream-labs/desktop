@@ -107,6 +107,13 @@ export function setSentryContext(ctx: ISentryContext) {
 }
 
 class UserViews extends ViewHandler<IUserServiceState> {
+  // Injecting HostsService since it's not stateful
+  @Inject() hostsService: HostsService;
+
+  get customizationServiceViews() {
+    return this.getServiceViews(CustomizationService);
+  }
+
   get isLoggedIn() {
     return !!(this.state.auth && this.state.auth.widgetToken && this.state.loginValidated);
   }
@@ -145,6 +152,47 @@ class UserViews extends ViewHandler<IUserServiceState> {
 
   get auth() {
     return this.state.auth;
+  }
+
+  alertboxLibraryUrl(id?: string) {
+    const uiTheme = this.customizationServiceViews.isDarkTheme ? 'night' : 'day';
+    let url = `https://${this.hostsService.streamlabs}/alertbox-library?mode=${uiTheme}&slobs`;
+
+    if (this.isLoggedIn) {
+      url += `&oauth_token=${this.auth.apiToken}`;
+    }
+
+    if (id) url += `&id=${id}`;
+
+    return url;
+  }
+
+  appStoreUrl(appId?: string) {
+    const host = this.hostsService.platform;
+    const token = this.auth.apiToken;
+    const nightMode = this.customizationServiceViews.isDarkTheme ? 'night' : 'day';
+    let url = `https://${host}/slobs-store`;
+
+    if (appId) {
+      url = `${url}/app/${appId}`;
+    }
+
+    return `${url}?token=${token}&mode=${nightMode}`;
+  }
+
+  overlaysUrl(type?: 'overlay' | 'widget-theme', id?: string) {
+    const uiTheme = this.customizationServiceViews.isDarkTheme ? 'night' : 'day';
+    let url = `https://${this.hostsService.streamlabs}/library?mode=${uiTheme}&slobs`;
+
+    if (this.isLoggedIn) {
+      url += `&oauth_token=${this.auth.apiToken}`;
+    }
+
+    if (type && id) {
+      url += `#/?type=${type}&id=${id}`;
+    }
+
+    return url;
   }
 }
 
@@ -636,47 +684,6 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     return `https://${
       this.hostsService.streamlabs
     }/slobs/dashboard?oauth_token=${token}&mode=${nightMode}&r=${subPage}&l=${locale}&hidenav=${hideNav}`;
-  }
-
-  appStoreUrl(appId?: string) {
-    const host = this.hostsService.platform;
-    const token = this.apiToken;
-    const nightMode = this.customizationService.isDarkTheme ? 'night' : 'day';
-    let url = `https://${host}/slobs-store`;
-
-    if (appId) {
-      url = `${url}/app/${appId}`;
-    }
-
-    return `${url}?token=${token}&mode=${nightMode}`;
-  }
-
-  overlaysUrl(type?: 'overlay' | 'widget-theme', id?: string) {
-    const uiTheme = this.customizationService.isDarkTheme ? 'night' : 'day';
-    let url = `https://${this.hostsService.streamlabs}/library?mode=${uiTheme}&slobs`;
-
-    if (this.isLoggedIn) {
-      url += `&oauth_token=${this.apiToken}`;
-    }
-
-    if (type && id) {
-      url += `#/?type=${type}&id=${id}`;
-    }
-
-    return url;
-  }
-
-  alertboxLibraryUrl(id?: string) {
-    const uiTheme = this.customizationService.isDarkTheme ? 'night' : 'day';
-    let url = `https://${this.hostsService.streamlabs}/alertbox-library?mode=${uiTheme}&slobs`;
-
-    if (this.isLoggedIn) {
-      url += `&oauth_token=${this.apiToken}`;
-    }
-
-    if (id) url += `&id=${id}`;
-
-    return url;
   }
 
   getDonationSettings() {

@@ -15,7 +15,7 @@ import { inject } from 'slap';
 
 export default function GoLiveWindow() {
   const { lifecycle, form } = useGoLiveSettingsRoot().extend(module => ({
-    onDestroy() {
+    destroy() {
       // clear failed checks and warnings on window close
       if (module.checklist.startVideoTransmission !== 'done') {
         Services.StreamingService.actions.resetInfo();
