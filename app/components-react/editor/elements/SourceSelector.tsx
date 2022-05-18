@@ -5,7 +5,7 @@ import { TreeProps } from 'rc-tree/lib/Tree';
 import cx from 'classnames';
 import { inject, injectState, injectWatch, mutation, useModule } from 'slap';
 import { SourcesService, SourceDisplayData } from 'services/sources';
-import { ScenesService, ISceneItemFolder, ISceneItem } from 'services/scenes';
+import { ScenesService, SceneItemFolder, ISceneItem, TSceneNode, isItem } from 'services/scenes';
 import { SelectionService } from 'services/selection';
 import { EditMenu } from 'util/menus/EditMenu';
 import { WidgetDisplayData } from 'services/widgets';
@@ -14,9 +14,13 @@ import { EditorCommandsService } from 'services/editor-commands';
 import { EPlaceType } from 'services/editor-commands/commands/reorder-nodes';
 import { AudioService } from 'services/audio';
 import { StreamingService } from 'services/streaming';
+import { EDismissable } from 'services/dismissables';
 import { assertIsDefined, getDefined } from 'util/properties-type-guards';
 import useBaseElement from './hooks';
 import styles from './SceneSelector.m.less';
+import Scrollable from 'components-react/shared/Scrollable';
+import HelpTip from 'components-react/shared/HelpTip';
+import Translate from 'components-react/shared/Translate';
 
 class SourceSelectorModule {
   private scenesService = inject(ScenesService);
@@ -40,54 +44,56 @@ class SourceSelectorModule {
 
   get treeData() {
     // recursive function for transforming SceneNode[] to a Tree format of Antd.Tree
-    const getTreeNodes = (sceneNodes: (ISceneItem | ISceneItemFolder)[]): DataNode[] => {
+    const getTreeNodes = (sceneNodes: TSceneNode[]): DataNode[] => {
       return sceneNodes.map(sceneNode => {
+        const sourceId = isItem(sceneNode) ? sceneNode.sourceId : sceneNode.id;
+        let children;
+        if (!isItem(sceneNode)) children = getTreeNodes(this.getChildren(sceneNode));
         return {
           title: (
             <TreeNode
               title={this.getNameForNode(sceneNode)}
               id={sceneNode.id}
-              visibilityClasses={this.visibilityClassesForSource(sceneNode.id)}
-              lockClasses={this.lockClassesForSource(sceneNode.id)}
+              isVisible={this.isLocked(sceneNode.id)}
+              isLocked={this.isLocked(sceneNode.id)}
               toggleVisibility={() => this.toggleVisibility(sceneNode.id)}
               toggleLock={() => this.toggleLock(sceneNode.id)}
+              selectiveRecordingEnabled={this.selectiveRecordingEnabled}
+              selectiveRecordingMetadata={this.selectiveRecordingMetadata(sceneNode.id)}
+              cycleSelectiveRecording={() => this.cycleSelectiveRecording(sceneNode.id)}
             />
           ),
-          isLeaf: sceneNode.sceneNodeType === 'item',
+          isLeaf: isItem(sceneNode),
           key: sceneNode.id,
-          children:
-            sceneNode.sceneNodeType === 'folder'
-              ? getTreeNodes(this.getChildren(sceneNode))
-              : undefined,
+          icon: <i className={this.determineIcon(isItem(sceneNode), sourceId)} />,
+          children: !isItem(sceneNode) ? getTreeNodes(this.getChildren(sceneNode)) : undefined,
         };
       });
     };
 
-    const nodes = this.scene.state.nodes.filter(n => !n.parentId);
+    const nodes = this.scene.getNodes().filter(n => !n.parentId);
     return getTreeNodes(nodes);
   }
 
   // TODO: Clean this up.  These only access state, no helpers
-  getNameForNode(node: ISceneItem | ISceneItemFolder) {
-    if (node.sceneNodeType === 'item') {
+  getNameForNode(node: TSceneNode) {
+    if (isItem(node)) {
       return this.sourcesService.state.sources[node.sourceId].name;
     }
 
     return node.name;
   }
 
-  isSelected(node: ISceneItem | ISceneItemFolder) {
+  isSelected(node: TSceneNode) {
     return this.selectionService.state.selectedIds.includes(node.id);
   }
 
-  getChildren(node: ISceneItemFolder) {
-    return this.scene.state.nodes.filter(n => n.parentId === node.id);
+  getChildren(node: SceneItemFolder) {
+    return this.scene.getNodes().filter(n => n.parentId === node.id);
   }
 
   determineIcon(isLeaf: boolean, sourceId: string) {
-    if (!isLeaf) {
-      return 'fa fa-folder';
-    }
+    if (!isLeaf) return 'fa fa-folder';
 
     const source = this.sourcesService.state.sources[sourceId];
 
@@ -332,57 +338,34 @@ class SourceSelectorModule {
     }
   }
 
-  selectiveRecordingClassesForSource(sceneNodeId: string) {
+  selectiveRecordingMetadata(sceneNodeId: string) {
     const selection = this.scene.getSelection(sceneNodeId);
     if (selection.isStreamVisible() && selection.isRecordingVisible()) {
-      return 'icon-smart-record';
-    }
-    return selection.isStreamVisible() ? 'icon-broadcast' : 'icon-studio';
-  }
-
-  selectiveRecordingTooltip(sceneNodeId: string) {
-    const selection = this.scene.getSelection(sceneNodeId);
-    if (selection.isStreamVisible() && selection.isRecordingVisible()) {
-      return $t('Visible on both Stream and Recording');
+      return { icon: 'icon-smart-record', tooltip: $t('Visible on both Stream and Recording') };
     }
     return selection.isStreamVisible()
-      ? $t('Only visible on Stream')
-      : $t('Only visible on Recording');
+      ? { icon: 'icon-broadcast', tooltip: $t('Only visible on Stream') }
+      : { icon: 'icon-studio', tooltip: $t('Only visible on Recording') };
   }
 
-  visibilityClassesForSource(sceneNodeId: string) {
+  isVisible(sceneNodeId: string) {
     // TODO: Clean up - need views or similar
     const items = this.getItemsForNode(sceneNodeId);
     // Visible if at least 1 item is visible
-    const visible = !!items.find(i => i.visible);
-
-    return {
-      'icon-view': visible,
-      'icon-hide': !visible,
-    };
+    return !!items.find(i => i.visible);
   }
 
-  lockClassesForSource(sceneNodeId: string) {
+  isLocked(sceneNodeId: string) {
     // TODO: Clean up - need views or similar
     const items = this.getItemsForNode(sceneNodeId);
     // Locked if all items are locked
-    const locked = !items.find(i => !i.locked);
-
-    return {
-      'icon-lock': locked,
-      'icon-unlock': !locked,
-    };
+    return !items.find(i => !i.locked);
   }
 
   toggleLock(sceneNodeId: string) {
     const selection = this.scene.getSelection(sceneNodeId);
     const locked = !selection.isLocked();
     selection.setSettings({ locked });
-  }
-
-  isLocked(sceneNodeId: string) {
-    const selection = this.scene.getSelection(sceneNodeId);
-    return selection.isLocked();
   }
 
   get scene() {
@@ -394,10 +377,21 @@ class SourceSelectorModule {
 function SourceSelector() {
   useModule(SourceSelectorModule);
   return (
-    <div className="source-selector">
+    <>
       <StudioControls />
       <ItemsTree />
-    </div>
+      <HelpTip
+        title={$t('Folder Expansion')}
+        dismissableKey={EDismissable.SourceSelectorFolders}
+        position={{ top: '-8px', left: '102px' }}
+      >
+        <Translate
+          message={$t('Wondering how to expand your folders? Just click on the <icon></icon> icon')}
+        >
+          <i slot="icon" className="fa fa-folder" />
+        </Translate>
+      </HelpTip>
+    </>
   );
 }
 
@@ -420,47 +414,47 @@ function StudioControls() {
 
   return (
     <div className={styles.topContainer}>
-      <Tooltip title={sourcesTooltip}>
-        <h2>{$t('Sources')}</h2>
-      </Tooltip>
-
-      <div>
-        <Tooltip title={$t('Toggle Selective Recording')}>
-          <i
-            className={cx({
-              'icon--active': selectiveRecordingEnabled,
-              disabled: selectiveRecordingLocked,
-              'icon-smart-record icon-button icon-button--lg': true,
-            })}
-            onClick={toggleSelectiveRecording}
-          />
-        </Tooltip>
-
-        <Tooltip title={addGroupTooltip}>
-          <i className="icon-add-folder icon-button icon-button--lg" onClick={addFolder} />
-        </Tooltip>
-
-        <Tooltip title={addSourceTooltip}>
-          <i className="icon-add icon-button icon-button--lg" onClick={addSource} />
-        </Tooltip>
-
-        <Tooltip title={removeSourcesTooltip}>
-          <i
-            className={cx({
-              'icon-subtract icon-button icon-button--lg': true,
-              disabled: activeItemIds.length === 0,
-            })}
-            onClick={removeItems}
-          />
-        </Tooltip>
-
-        <Tooltip title={openSourcePropertiesTooltip}>
-          <i
-            className={cx({ disabled: !canShowProperties(), 'icon-settings icon-button': true })}
-            onClick={removeItems}
-          />
+      <div className={styles.activeSceneContainer}>
+        <Tooltip title={sourcesTooltip}>
+          <span className={styles.activeScene}>{$t('Sources')}</span>
         </Tooltip>
       </div>
+
+      <Tooltip title={$t('Toggle Selective Recording')}>
+        <i
+          className={cx({
+            'icon--active': selectiveRecordingEnabled,
+            disabled: selectiveRecordingLocked,
+            'icon-smart-record icon-button icon-button--lg': true,
+          })}
+          onClick={toggleSelectiveRecording}
+        />
+      </Tooltip>
+
+      <Tooltip title={addGroupTooltip}>
+        <i className="icon-add-folder icon-button icon-button--lg" onClick={addFolder} />
+      </Tooltip>
+
+      <Tooltip title={addSourceTooltip}>
+        <i className="icon-add icon-button icon-button--lg" onClick={addSource} />
+      </Tooltip>
+
+      <Tooltip title={removeSourcesTooltip}>
+        <i
+          className={cx({
+            'icon-subtract icon-button icon-button--lg': true,
+            disabled: activeItemIds.length === 0,
+          })}
+          onClick={removeItems}
+        />
+      </Tooltip>
+
+      <Tooltip title={openSourcePropertiesTooltip}>
+        <i
+          className={cx({ disabled: !canShowProperties(), 'icon-settings icon-button': true })}
+          onClick={removeItems}
+        />
+      </Tooltip>
     </div>
   );
 }
@@ -477,11 +471,13 @@ function ItemsTree() {
   } = useModule(SourceSelectorModule);
 
   return (
-    <div onContextMenu={e => showContextMenu('', e)}>
+    <Scrollable
+      className={cx(styles.scenesContainer, styles.sourcesContainer)}
+      style={{ height: 'calc(100% - 33px)' }}
+      onContextMenu={(e: React.MouseEvent) => showContextMenu('', e)}
+    >
       <Tree
         height={233}
-        draggable={true}
-        multiple={true}
         selectedKeys={activeItemIds}
         expandedKeys={expandedFoldersIds}
         onSelect={(selectedKeys, info) => makeActive([info.node.key as string])}
@@ -489,25 +485,40 @@ function ItemsTree() {
         onRightClick={info => showContextMenu(info.node.key as string, info.event)}
         onDrop={onDrop}
         treeData={treeData}
+        draggable
+        multiple
+        blockNode
+        showIcon
       />
-    </div>
+    </Scrollable>
   );
 }
 
 function TreeNode(p: {
   title: string;
   id: string;
-  visibilityClasses: Record<string, boolean>;
-  lockClasses: Record<string, boolean>;
+  isLocked: boolean;
+  isVisible: boolean;
+  selectiveRecordingEnabled: boolean;
+  selectiveRecordingMetadata: { icon: string; tooltip: string };
   toggleVisibility: (ev: unknown) => unknown;
   toggleLock: (ev: unknown) => unknown;
+  cycleSelectiveRecording: (ev: unknown) => void;
 }) {
   return (
-    <span>
-      {p.title}
-      <i onClick={p.toggleVisibility} className={cx(p.visibilityClasses)} />
-      <i onClick={p.toggleLock} className={cx(p.lockClasses)} />
-    </span>
+    <div className={styles.sourceTitleContainer} data-name={p.title}>
+      <span className={styles.sourceTitle}>{p.title}</span>
+      {p.selectiveRecordingEnabled && (
+        <Tooltip title={p.selectiveRecordingMetadata.tooltip} placement="left">
+          <i
+            className={cx(p.selectiveRecordingMetadata.icon, { disabled: p.isLocked })}
+            onClick={p.cycleSelectiveRecording}
+          />
+        </Tooltip>
+      )}
+      <i onClick={p.toggleLock} className={p.isLocked ? 'icon-lock' : 'icon-unlock'} />
+      <i onClick={p.toggleVisibility} className={p.isVisible ? 'icon-view' : 'icon-hide'} />
+    </div>
   );
 }
 

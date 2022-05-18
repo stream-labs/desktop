@@ -15,6 +15,18 @@
     top: 0 !important;
     height: 100%;
   }
+
+  :global(.active) {
+    color: var(--title);
+  }
+
+  :global(.disabled) {
+    opacity: 0.7;
+
+    &:hover {
+      cursor: not-allowed;
+    }
+  }
 }
 
 :global(.no-top-padding) {
@@ -38,7 +50,7 @@
   }
 }
 
-.active-scene {
+.active-scene, .source-title {
   display: block;
   overflow: hidden;
   white-space: nowrap;
@@ -48,6 +60,7 @@
 .scenes-container {
   background: var(--section);
   border-radius: 4px;
+  height: 100%;
 
   &:global(.os-host) {
     overflow: hidden !important;
@@ -69,6 +82,7 @@
 
   :global(.ant-tree-node-content-wrapper) {
     padding-left: 16px !important;
+    display: flex;
   }
 
   :global(.ant-tree-node-selected) {
@@ -110,5 +124,47 @@
     &:hover {
       cursor: not-allowed;
     }
+  }
+}
+
+.source-icons {
+  display: flex;
+  align-items: center;
+  margin-right: 16px;
+
+  i {
+    margin-left: 8px;
+  }
+}
+
+.source-title-container {
+  display: flex;
+  align-items: center;
+
+  > i {
+    margin-right: 8px;
+  }
+}
+
+.source-title {
+  margin-right: auto;
+}
+
+.sources-container {
+  :global(.ant-tree-switcher) {
+    width: 0;
+    display: block;
+    z-index: 1;
+    left: 10px;
+  }
+
+  :global(.ant-tree-node-content-wrapper) {
+    padding-left: 32px !important;
+    display: flex;
+  }
+
+  :global(.ant-tree-title) {
+    display: block;
+    width: 100%;
   }
 }
