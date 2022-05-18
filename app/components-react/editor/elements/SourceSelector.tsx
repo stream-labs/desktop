@@ -54,7 +54,7 @@ class SourceSelectorModule {
             <TreeNode
               title={this.getNameForNode(sceneNode)}
               id={sceneNode.id}
-              isVisible={this.isLocked(sceneNode.id)}
+              isVisible={this.isVisible(sceneNode.id)}
               isLocked={this.isLocked(sceneNode.id)}
               toggleVisibility={() => this.toggleVisibility(sceneNode.id)}
               toggleLock={() => this.toggleLock(sceneNode.id)}
