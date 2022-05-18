@@ -65,7 +65,7 @@ class SourceSelectorModule {
           ),
           isLeaf: isItem(sceneNode),
           key: sceneNode.id,
-          icon: <i className={this.determineIcon(isItem(sceneNode), sourceId)} />,
+          switcherIcon: <i className={this.determineIcon(isItem(sceneNode), sourceId)} />,
           children: !isItem(sceneNode) ? getTreeNodes(this.getChildren(sceneNode)) : undefined,
         };
       });
@@ -93,7 +93,11 @@ class SourceSelectorModule {
   }
 
   determineIcon(isLeaf: boolean, sourceId: string) {
-    if (!isLeaf) return 'fa fa-folder';
+    if (!isLeaf) {
+      return this.state.expandedFoldersIds.includes(sourceId)
+        ? 'fas fa-folder-open'
+        : 'fa fa-folder';
+    }
 
     const source = this.sourcesService.state.sources[sourceId];
 
@@ -477,7 +481,6 @@ function ItemsTree() {
       onContextMenu={(e: React.MouseEvent) => showContextMenu('', e)}
     >
       <Tree
-        height={233}
         selectedKeys={activeItemIds}
         expandedKeys={expandedFoldersIds}
         onSelect={(selectedKeys, info) => makeActive([info.node.key as string])}
