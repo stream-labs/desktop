@@ -59,10 +59,13 @@ function useCaptureSource(sourceId: string): ICaptureSourceApi {
 
   useEffect(() => {
     (async () => {
-      const windows = await electron.desktopCapturer.getSources({
-        types: ['window'],
-        fetchWindowIcons: true,
-      });
+      const windows: Electron.DesktopCapturerSource[] = await electron.ipcRenderer.invoke(
+        'DESKTOP_CAPTURER_GET_SOURCES',
+        {
+          types: ['window'],
+          fetchWindowIcons: true,
+        },
+      );
       const windowOptions = windows.map(win => {
         const opt: ICapturableOption = {
           description: win.name,
@@ -76,7 +79,10 @@ function useCaptureSource(sourceId: string): ICaptureSourceApi {
       });
 
       // Attempt to get thumbnails for screens
-      const screenData = await electron.desktopCapturer.getSources({ types: ['screen'] });
+      const screenData: Electron.DesktopCapturerSource[] = await electron.ipcRenderer.invoke(
+        'DESKTOP_CAPTURER_GET_SOURCES',
+        { types: ['screen'] },
+      );
 
       const screenOptions = remote.screen.getAllDisplays().map((screen, index) => {
         const opt: ICapturableOption = {
