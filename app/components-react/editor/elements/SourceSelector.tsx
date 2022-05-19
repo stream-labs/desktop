@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Tooltip, Tree } from 'antd';
 import { DataNode } from 'rc-tree/lib/interface';
 import { TreeProps } from 'rc-tree/lib/Tree';
@@ -22,6 +22,18 @@ import Scrollable from 'components-react/shared/Scrollable';
 import HelpTip from 'components-react/shared/HelpTip';
 import Translate from 'components-react/shared/Translate';
 
+interface ISourceMetadata {
+  title: string;
+  icon: string;
+  isVisible: boolean;
+  isLocked: boolean;
+  isStreamVisible: boolean;
+  isRecordingVisible: boolean;
+  isFolder: boolean;
+  sourceId?: string;
+  parentId?: string;
+}
+
 class SourceSelectorModule {
   private scenesService = inject(ScenesService);
   private sourcesService = inject(SourcesService);
@@ -38,41 +50,71 @@ class SourceSelectorModule {
 
   state = injectState({
     expandedFoldersIds: [] as string[],
+    sourceMetadata: {} as { [sceneNodeId: string]: ISourceMetadata },
   });
 
   callCameFromInsideTheHouse = false;
 
   get treeData() {
     // recursive function for transforming SceneNode[] to a Tree format of Antd.Tree
-    const getTreeNodes = (sceneNodes: TSceneNode[]): DataNode[] => {
-      return sceneNodes.map(sceneNode => {
-        const sourceId = isItem(sceneNode) ? sceneNode.sourceId : sceneNode.id;
+    const getTreeNodes = (sceneNodeIds: string[]): DataNode[] => {
+      return sceneNodeIds.map(id => {
+        const sceneNode = this.state.sourceMetadata[id];
+        const sourceId = sceneNode.sourceId || id;
         let children;
-        if (!isItem(sceneNode)) children = getTreeNodes(this.getChildren(sceneNode));
+        if (sceneNode.isFolder) children = getTreeNodes(this.getChildren(id));
         return {
           title: (
             <TreeNode
-              title={this.getNameForNode(sceneNode)}
-              id={sceneNode.id}
-              isVisible={this.isVisible(sceneNode.id)}
-              isLocked={this.isLocked(sceneNode.id)}
-              toggleVisibility={() => this.toggleVisibility(sceneNode.id)}
-              toggleLock={() => this.toggleLock(sceneNode.id)}
+              title={sceneNode.title}
+              id={id}
+              isVisible={sceneNode.isVisible}
+              isLocked={sceneNode.isLocked}
+              toggleVisibility={() => this.toggleVisibility(id)}
+              toggleLock={() => this.toggleLock(id)}
               selectiveRecordingEnabled={this.selectiveRecordingEnabled}
-              selectiveRecordingMetadata={this.selectiveRecordingMetadata(sceneNode.id)}
-              cycleSelectiveRecording={() => this.cycleSelectiveRecording(sceneNode.id)}
+              isStreamVisible={sceneNode.isStreamVisible}
+              isRecordingVisible={sceneNode.isRecordingVisible}
+              cycleSelectiveRecording={() => this.cycleSelectiveRecording(id)}
             />
           ),
-          isLeaf: isItem(sceneNode),
-          key: sceneNode.id,
-          switcherIcon: <i className={this.determineIcon(isItem(sceneNode), sourceId)} />,
-          children: !isItem(sceneNode) ? getTreeNodes(this.getChildren(sceneNode)) : undefined,
+          isLeaf: !sceneNode.parentId,
+          key: id,
+          switcherIcon: <i className={sceneNode.icon} />,
+          children,
         };
       });
     };
 
-    const nodes = this.scene.getNodes().filter(n => !n.parentId);
-    return getTreeNodes(nodes);
+    return getTreeNodes(
+      Object.keys(this.state.sourceMetadata).filter(id => !this.state.sourceMetadata[id].parentId),
+    );
+  }
+
+  @mutation()
+  fetchSourceMetadata() {
+    this.scene.getNodes().forEach(node => {
+      const selection = this.scene.getSelection(node.id);
+      this.state.sourceMetadata[node.id] = {
+        title: this.getNameForNode(node),
+        icon: this.determineIcon(isItem(node), isItem(node) ? node.sourceId : node.id),
+        isVisible: selection.isVisible(),
+        isLocked: selection.isLocked(),
+        isFolder: node.isFolder(),
+        isRecordingVisible: selection.isRecordingVisible(),
+        isStreamVisible: selection.isStreamVisible(),
+        sourceId: isItem(node) ? node.sourceId : undefined,
+        parentId: node.parentId,
+      };
+    });
+  }
+
+  @mutation()
+  patchSourceMetadata(id: string, patch: Partial<ISourceMetadata>) {
+    this.state.sourceMetadata[id] = {
+      ...this.state.sourceMetadata[id],
+      ...patch,
+    };
   }
 
   // TODO: Clean this up.  These only access state, no helpers
@@ -88,8 +130,10 @@ class SourceSelectorModule {
     return this.selectionService.state.selectedIds.includes(node.id);
   }
 
-  getChildren(node: SceneItemFolder) {
-    return this.scene.getNodes().filter(n => n.parentId === node.id);
+  getChildren(parentId: string) {
+    return Object.keys(this.state.sourceMetadata).filter(
+      id => this.state.sourceMetadata[id].parentId === parentId,
+    );
   }
 
   determineIcon(isLeaf: boolean, sourceId: string) {
@@ -247,8 +291,10 @@ class SourceSelectorModule {
   toggleFolder(nodeId: string) {
     if (this.state.expandedFoldersIds.includes(nodeId)) {
       this.state.expandedFoldersIds.splice(this.state.expandedFoldersIds.indexOf(nodeId), 1);
+      this.patchSourceMetadata(nodeId, { icon: 'fa fa-folder' });
     } else {
       this.state.expandedFoldersIds.push(nodeId);
+      this.patchSourceMetadata(nodeId, { icon: 'fas fa-folder-open' });
     }
   }
 
@@ -273,6 +319,10 @@ class SourceSelectorModule {
       this.state.expandedFoldersIds.concat(node.getPath().slice(0, -1)),
     );
 
+    this.state.expandedFoldersIds.forEach(id => {
+      this.patchSourceMetadata(id, { icon: 'fas fa-folder-open' });
+    });
+
     // TODO
     // this.$refs[this.lastSelectedId].scrollIntoView({ behavior: 'smooth' });
   }
@@ -288,7 +338,8 @@ class SourceSelectorModule {
   toggleVisibility(sceneNodeId: string) {
     const selection = this.scene.getSelection(sceneNodeId);
     const visible = !selection.isVisible();
-    this.editorCommandsService.executeCommand('HideItemsCommand', selection, !visible);
+    this.patchSourceMetadata(sceneNodeId, { isVisible: visible });
+    this.editorCommandsService.actions.executeCommand('HideItemsCommand', selection, !visible);
   }
 
   // TODO: Refactor into elsewhere
@@ -325,50 +376,32 @@ class SourceSelectorModule {
 
   toggleSelectiveRecording() {
     if (this.selectiveRecordingLocked) return;
-    this.streamingService.setSelectiveRecording(!this.streamingService.state.selectiveRecording);
+    this.streamingService.actions.setSelectiveRecording(
+      !this.streamingService.state.selectiveRecording,
+    );
   }
 
   cycleSelectiveRecording(sceneNodeId: string) {
     const selection = this.scene.getSelection(sceneNodeId);
     if (selection.isLocked()) return;
     if (selection.isStreamVisible() && selection.isRecordingVisible()) {
+      this.patchSourceMetadata(sceneNodeId, { isRecordingVisible: false });
       selection.setRecordingVisible(false);
     } else if (selection.isStreamVisible()) {
+      this.patchSourceMetadata(sceneNodeId, { isRecordingVisible: true, isStreamVisible: false });
       selection.setStreamVisible(false);
       selection.setRecordingVisible(true);
     } else {
+      this.patchSourceMetadata(sceneNodeId, { isRecordingVisible: true, isStreamVisible: true });
       selection.setStreamVisible(true);
       selection.setRecordingVisible(true);
     }
   }
 
-  selectiveRecordingMetadata(sceneNodeId: string) {
-    const selection = this.scene.getSelection(sceneNodeId);
-    if (selection.isStreamVisible() && selection.isRecordingVisible()) {
-      return { icon: 'icon-smart-record', tooltip: $t('Visible on both Stream and Recording') };
-    }
-    return selection.isStreamVisible()
-      ? { icon: 'icon-broadcast', tooltip: $t('Only visible on Stream') }
-      : { icon: 'icon-studio', tooltip: $t('Only visible on Recording') };
-  }
-
-  isVisible(sceneNodeId: string) {
-    // TODO: Clean up - need views or similar
-    const items = this.getItemsForNode(sceneNodeId);
-    // Visible if at least 1 item is visible
-    return !!items.find(i => i.visible);
-  }
-
-  isLocked(sceneNodeId: string) {
-    // TODO: Clean up - need views or similar
-    const items = this.getItemsForNode(sceneNodeId);
-    // Locked if all items are locked
-    return !items.find(i => !i.locked);
-  }
-
   toggleLock(sceneNodeId: string) {
     const selection = this.scene.getSelection(sceneNodeId);
     const locked = !selection.isLocked();
+    this.patchSourceMetadata(sceneNodeId, { isLocked: locked });
     selection.setSettings({ locked });
   }
 
@@ -379,7 +412,6 @@ class SourceSelectorModule {
 }
 
 function SourceSelector() {
-  useModule(SourceSelectorModule);
   return (
     <>
       <StudioControls />
@@ -468,11 +500,15 @@ function ItemsTree() {
     treeData,
     activeItemIds,
     expandedFoldersIds,
+    scene,
     showContextMenu,
     makeActive,
     toggleFolder,
     onDrop,
+    fetchSourceMetadata,
   } = useModule(SourceSelectorModule);
+
+  useEffect(fetchSourceMetadata, [scene]);
 
   return (
     <Scrollable
@@ -502,19 +538,29 @@ function TreeNode(p: {
   id: string;
   isLocked: boolean;
   isVisible: boolean;
+  isStreamVisible: boolean;
+  isRecordingVisible: boolean;
   selectiveRecordingEnabled: boolean;
-  selectiveRecordingMetadata: { icon: string; tooltip: string };
   toggleVisibility: (ev: unknown) => unknown;
   toggleLock: (ev: unknown) => unknown;
   cycleSelectiveRecording: (ev: unknown) => void;
 }) {
+  function selectiveRecordingMetadata() {
+    if (p.isStreamVisible && p.isRecordingVisible) {
+      return { icon: 'icon-smart-record', tooltip: $t('Visible on both Stream and Recording') };
+    }
+    return p.isStreamVisible
+      ? { icon: 'icon-broadcast', tooltip: $t('Only visible on Stream') }
+      : { icon: 'icon-studio', tooltip: $t('Only visible on Recording') };
+  }
+
   return (
     <div className={styles.sourceTitleContainer} data-name={p.title}>
       <span className={styles.sourceTitle}>{p.title}</span>
       {p.selectiveRecordingEnabled && (
-        <Tooltip title={p.selectiveRecordingMetadata.tooltip} placement="left">
+        <Tooltip title={selectiveRecordingMetadata().tooltip} placement="left">
           <i
-            className={cx(p.selectiveRecordingMetadata.icon, { disabled: p.isLocked })}
+            className={cx(selectiveRecordingMetadata().icon, { disabled: p.isLocked })}
             onClick={p.cycleSelectiveRecording}
           />
         </Tooltip>
