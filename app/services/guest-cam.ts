@@ -41,9 +41,15 @@ interface IObsReturnTypes {
   };
   func_produce_result: {};
   func_receive_transport_response: {};
+  func_video_consumer_response: {
+    connect_params: unknown;
+  };
+  func_audio_consumer_response: {
+    connect_params: unknown;
+  };
 }
 
-type TWebRTCSocketEvent = IProducerCreatedEvent | IConsumerCreatedEvent;
+type TWebRTCSocketEvent = IProducerCreatedEvent | IConsumerCreatedEvent | IConsumerTrackEvent;
 
 interface IProducerCreatedEvent {
   type: 'producerCreated';
@@ -69,6 +75,36 @@ interface IConsumerCreatedEvent {
   };
 }
 
+interface IConsumerTrackEvent {
+  type: 'consumerTrack';
+  data: {
+    kind: 'audio' | 'video';
+  };
+}
+
+interface ISocketAuthResponse {
+  success: boolean;
+  rtpCapabilities: unknown;
+}
+
+/**
+ * Represents a guest that we can consume audio/video from
+ */
+interface IConsumableStream {
+  streamId: string;
+  socketId: string;
+  audioId: string;
+  videoId: string;
+  transportConnected: boolean;
+}
+
+interface ITurnConfig {
+  expires_at: number;
+  credential: string;
+  urls: string[];
+  username: string;
+}
+
 export class GuestCamService extends Service {
   @Inject() userService: UserService;
   @Inject() sourcesService: SourcesService;
@@ -77,6 +113,12 @@ export class GuestCamService extends Service {
   io: SocketIOClientStatic;
   socket: SocketIOClient.Socket;
   room: string;
+  auth: ISocketAuthResponse;
+
+  // TODO: We only support one guest for now
+  guestStream: IConsumableStream;
+
+  turnConfig: ITurnConfig;
 
   async start() {
     // Ensure we have a Guest Cam source
@@ -101,6 +143,21 @@ export class GuestCamService extends Service {
     this.openSocketConnection(ioConfigResult.url, ioConfigResult.token);
   }
 
+  async getTurnConfig() {
+    if (this.turnConfig && this.turnConfig.expires_at > Date.now()) {
+      return this.turnConfig;
+    }
+
+    const turnConfigUrl = 'https://stage6.streamlabs.com/api/v5/slobs/streamrooms/turn/config';
+    const turnConfigResult = await jfetch<ITurnConfig>(turnConfigUrl, {
+      headers: authorizedHeaders(this.userService.views.auth.apiToken),
+    });
+
+    this.log('Fetched new TURN config', turnConfigResult);
+
+    return turnConfigResult;
+  }
+
   async openSocketConnection(url: string, token: string) {
     // dynamically import socket.io because it takes to much time to import it on startup
     if (!this.io) {
@@ -121,21 +178,21 @@ export class GuestCamService extends Service {
     this.socket.on('connect', async () => {
       this.log('Socket Connected');
 
-      const auth = await this.authenticateSocket(token);
-      this.log('Socket Authenticated', auth);
+      this.auth = await this.authenticateSocket(token);
+      this.log('Socket Authenticated', this.auth);
 
       this.getSource().updateSettings({
         room: this.room,
       });
 
-      this.makeObsRequest('func_routerRtpCapabilities', auth.rtpCapabilities);
+      this.makeObsRequest('func_routerRtpCapabilities', this.auth.rtpCapabilities);
 
       this.createProducer();
     });
-    this.socket.on('connect_error', (e: any) => console.log('Connection Error', e));
-    this.socket.on('connect_timeout', () => console.log('Connection Timeout'));
-    this.socket.on('error', () => console.log('Error'));
-    this.socket.on('disconnect', () => console.log('Connection Closed'));
+    this.socket.on('connect_error', (e: any) => this.log('Connection Error', e));
+    this.socket.on('connect_timeout', () => this.log('Connection Timeout'));
+    this.socket.on('error', () => this.log('Socket Error'));
+    this.socket.on('disconnect', () => this.log('Connection Closed'));
     this.socket.on('webrtc', (e: TWebRTCSocketEvent) => this.onWebRTC(e));
   }
 
@@ -146,6 +203,8 @@ export class GuestCamService extends Service {
       this.createConsumer(event);
     } else if (event.type === 'consumerCreated') {
       this.onConsumerCreated(event);
+    } else if (event.type === 'consumerTrack') {
+      this.onConsumerTrack(event);
     }
   }
 
@@ -158,6 +217,10 @@ export class GuestCamService extends Service {
       data: { streamId, type: 'stream', name: 'Andy', tracks: 2 },
     });
     this.log('Producer Created', result);
+
+    const turnConfig = await this.getTurnConfig();
+
+    result['iceServers'] = [turnConfig];
 
     input.callHandler('func_send_transport_response', JSON.stringify(result));
 
@@ -218,6 +281,15 @@ export class GuestCamService extends Service {
 
     // TODO - Don't consume our own producer
 
+    // We need to store these for later so we can subscribe to the tracks
+    this.guestStream = {
+      streamId: event.data.streamId,
+      socketId: event.data.socketId,
+      audioId: event.data.audioId,
+      videoId: event.data.videoId,
+      transportConnected: false,
+    };
+
     this.sendWebRTCRequest({
       type: 'createConsumer',
       data: event.data,
@@ -227,10 +299,70 @@ export class GuestCamService extends Service {
   async onConsumerCreated(event: IConsumerCreatedEvent) {
     this.log('Consumer Created', event);
 
+    const turnConfig = await this.getTurnConfig();
+
+    event.data['iceServers'] = [turnConfig];
+
     this.makeObsRequest('func_receive_transport_response', event.data);
+
+    if (this.guestStream.videoId) {
+      this.sendWebRTCRequest({
+        type: 'getConsumerTrack',
+        data: {
+          socketId: this.guestStream.socketId,
+          streamId: this.guestStream.streamId,
+          producerId: this.guestStream.videoId,
+          rtpCapabilities: this.auth.rtpCapabilities,
+          consumerTransportId: event.data.id,
+        },
+      });
+    }
+
+    if (this.guestStream.audioId) {
+      this.sendWebRTCRequest({
+        type: 'getConsumerTrack',
+        data: {
+          socketId: this.guestStream.socketId,
+          streamId: this.guestStream.streamId,
+          producerId: this.guestStream.audioId,
+          rtpCapabilities: this.auth.rtpCapabilities,
+          consumerTransportId: event.data.id,
+        },
+      });
+    }
   }
 
-  async authenticateSocket(token: string): Promise<{ success: boolean; rtpCapabilities: unknown }> {
+  async onConsumerTrack(event: IConsumerTrackEvent) {
+    this.log('Got Consumer Track', event);
+
+    const connectParams = this.makeObsRequest(
+      `func_${event.data.kind}_consumer_response`,
+      event.data,
+    );
+
+    this.log('Got Consumer Connect Params', connectParams);
+
+    // This only needs to be done once, and we don't know which track we will receive first
+    if (!this.guestStream.transportConnected) {
+      this.sendWebRTCRequest({
+        type: 'connectReceiveTransport',
+        data: {
+          ...connectParams,
+          socketId: this.guestStream.socketId,
+          streamId: this.guestStream.streamId,
+        },
+      });
+
+      // TODO: This will never fail
+      this.makeObsRequest('func_connect_result', 'true');
+
+      this.guestStream.transportConnected = true;
+
+      this.log('Connected Receive Transport');
+    }
+  }
+
+  async authenticateSocket(token: string): Promise<ISocketAuthResponse> {
     return new Promise(r => {
       this.socket.emit('authenticate', { token, username: 'Andy' }, r);
     });

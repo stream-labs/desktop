@@ -45,7 +45,9 @@ export type TSourceFilterType =
   | 'invert_polarity_filter'
   | 'limiter_filter'
   | 'expander_filter'
-  | 'shader_filter';
+  | 'shader_filter'
+  | 'mediasoupconnector_afilter'
+  | 'mediasoupconnector_vfilter';
 
 interface ISourceFilterType {
   type: TSourceFilterType;
@@ -193,6 +195,7 @@ export class SourceFiltersService extends StatefulService<IFiltersServiceState> 
    */
   private getTypes() {
     const obsAvailableTypes = obs.FilterFactory.types();
+    console.log('OBS FILTER TYPES', obsAvailableTypes);
     const allowlistedTypes: IObsListOption<TSourceFilterType>[] = [
       { description: $t('Image Mask/Blend'), value: 'mask_filter' },
       { description: $t('Crop/Pad'), value: 'crop_filter' },
@@ -215,6 +218,9 @@ export class SourceFiltersService extends StatefulService<IFiltersServiceState> 
       { description: $t('Limiter'), value: 'limiter_filter' },
       { description: $t('Expander'), value: 'expander_filter' },
       { description: $t('Shader'), value: 'shader_filter' },
+      // TODO: Remove
+      { description: 'Mediasoup Audio Filter', value: 'mediasoupconnector_afilter' },
+      { description: 'Mediasoup Video Filter', value: 'mediasoupconnector_vfilter' },
     ];
     const allowedAvailableTypes = allowlistedTypes.filter(type =>
       obsAvailableTypes.includes(type.value),
