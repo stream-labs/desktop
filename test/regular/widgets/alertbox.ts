@@ -14,7 +14,7 @@ import { CustomizationService } from '../../../app/services/customization';
 import { assertFormContains, fillForm } from '../../helpers/modules/forms';
 import { sleep } from '../../helpers/sleep';
 
-useSpectron();
+useSpectron({pauseIfFailed: false });
 
 test('AlertBox for Twitch', t => testAlertbox(t, 'twitch'));
 test('AlertBox for YouTube', t => testAlertbox(t, 'youtube'));
@@ -40,12 +40,14 @@ async function testAlertbox(t: TExecutionContext, platform: TPlatform) {
 
   // create alertbox
   await enableNewAlertbox();
-  await addSource('Alertbox', 'Alertbox', false);
+  await addSource('Alertbox', 'Alertbox');
+  await sleep(500);
   await openAlertboxSettings();
 
   // click through all available alert types and check for console errors
   const alerts = platformAlerts[platform];
   for (const alert of alerts) await click(`span*=${alert}`);
+  await sleep(500);
 
   // test the donation alert settings
   if (platform === 'twitch') await testDonationAlert();
