@@ -416,7 +416,7 @@ export class SourceFiltersService extends StatefulService<IFiltersServiceState> 
     });
   }
 
-  private getObsFilter(sourceId: string, filterName: string): obs.IFilter {
+  getObsFilter(sourceId: string, filterName: string): obs.IFilter {
     return this.sourcesService.views.getSource(sourceId).getObsInput().findFilter(filterName);
   }
 

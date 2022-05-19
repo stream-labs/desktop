@@ -5,6 +5,7 @@ import { UserService } from './user';
 import uuid from 'uuid/v4';
 import { SourcesService } from 'services/sources';
 import { ScenesService } from './scenes';
+import { SourceFiltersService } from './source-filters';
 
 interface IRoomResponse {
   room: string;
@@ -109,6 +110,7 @@ export class GuestCamService extends Service {
   @Inject() userService: UserService;
   @Inject() sourcesService: SourcesService;
   @Inject() scenesService: ScenesService;
+  @Inject() sourceFiltersService: SourceFiltersService;
 
   io: SocketIOClientStatic;
   socket: SocketIOClient.Socket;
@@ -184,6 +186,8 @@ export class GuestCamService extends Service {
       this.getSource().updateSettings({
         room: this.room,
       });
+
+      this.ensureFilterSettings();
 
       this.makeObsRequest('func_routerRtpCapabilities', this.auth.rtpCapabilities);
 
@@ -378,6 +382,17 @@ export class GuestCamService extends Service {
     if (!this.getSourceId()) {
       this.scenesService.views.activeScene.createAndAddSource('Guest Cam', 'mediasoupconnector');
     }
+  }
+
+  ensureFilterSettings() {
+    // TODO this is inefficient
+    Object.keys(this.sourceFiltersService.state.filters).forEach(sourceId => {
+      this.sourceFiltersService.state.filters[sourceId].forEach(filter => {
+        if (['mediasoupconnector_afilter', 'mediasoupconnector_vfilter'].includes(filter.type)) {
+          this.sourceFiltersService.getObsFilter(sourceId, filter.name).update({ room: this.room });
+        }
+      });
+    });
   }
 
   getSourceId() {
