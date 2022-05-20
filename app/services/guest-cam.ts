@@ -80,6 +80,9 @@ interface IConsumerTrackEvent {
   type: 'consumerTrack';
   data: {
     kind: 'audio' | 'video';
+    paused: boolean;
+    producerId: string;
+    id: string;
   };
 }
 
@@ -318,6 +321,7 @@ export class GuestCamService extends Service {
           producerId: this.guestStream.videoId,
           rtpCapabilities: this.auth.rtpCapabilities,
           consumerTransportId: event.data.id,
+          paused: true,
         },
       });
     }
@@ -345,6 +349,18 @@ export class GuestCamService extends Service {
     ).connect_params;
 
     this.log('Got Consumer Connect Params', connectParams);
+
+    if (event.data.paused) {
+      this.sendWebRTCRequest({
+        type: 'resumeConsumerTrack',
+        data: {
+          socketId: this.guestStream.socketId,
+          streamId: this.guestStream.streamId,
+          producerId: event.data.producerId,
+          consumerId: event.data.id,
+        },
+      });
+    }
 
     // This only needs to be done once, and we don't know which track we will receive first
     if (!this.guestStream.transportConnected) {
