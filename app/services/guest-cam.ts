@@ -128,9 +128,14 @@ export class GuestCamService extends Service {
   // TODO: Remove this
   apiToken: string;
 
+  producerDonePromise: Promise<void>;
+  producerDone: () => void;
+
   // TODO - Remove override token
   async start(apiToken?: string) {
     this.apiToken = apiToken;
+
+    this.producerDonePromise = new Promise(r => (this.producerDone = r));
 
     // Ensure we have a Guest Cam source
     this.ensureSource();
@@ -213,7 +218,8 @@ export class GuestCamService extends Service {
     this.log('WebRTC Event', event);
 
     if (event.type === 'producerCreated') {
-      this.createConsumer(event);
+      // Don't try to create any consumers until the producer is created
+      this.producerDonePromise.then(() => this.createConsumer(event));
     } else if (event.type === 'consumerCreated') {
       this.onConsumerCreated(event);
     } else if (event.type === 'consumerTrack') {
@@ -287,6 +293,8 @@ export class GuestCamService extends Service {
     this.makeObsRequest('func_produce_result', 'true');
 
     this.log('Got Server Add Video Track Result', videoProduceResult);
+
+    this.producerDone();
   }
 
   async createConsumer(event: IProducerCreatedEvent) {
