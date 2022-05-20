@@ -30,7 +30,6 @@ interface ISourceMetadata {
   isStreamVisible: boolean;
   isRecordingVisible: boolean;
   isFolder: boolean;
-  sourceId?: string;
   parentId?: string;
 }
 
@@ -60,7 +59,6 @@ class SourceSelectorModule {
     const getTreeNodes = (sceneNodeIds: string[]): DataNode[] => {
       return sceneNodeIds.map(id => {
         const sceneNode = this.state.sourceMetadata[id];
-        const sourceId = sceneNode.sourceId || id;
         let children;
         if (sceneNode.isFolder) children = getTreeNodes(this.getChildren(id));
         return {
@@ -78,7 +76,7 @@ class SourceSelectorModule {
               cycleSelectiveRecording={() => this.cycleSelectiveRecording(id)}
             />
           ),
-          isLeaf: !sceneNode.parentId,
+          isLeaf: !children,
           key: id,
           switcherIcon: <i className={sceneNode.icon} />,
           children,
@@ -95,16 +93,16 @@ class SourceSelectorModule {
   fetchSourceMetadata() {
     this.scene.getNodes().forEach(node => {
       const selection = this.scene.getSelection(node.id);
+      const isFolder = !isItem(node);
       this.state.sourceMetadata[node.id] = {
         title: this.getNameForNode(node),
-        icon: this.determineIcon(isItem(node), isItem(node) ? node.sourceId : node.id),
+        icon: this.determineIcon(!isFolder, isFolder ? node.id : node.sourceId),
         isVisible: selection.isVisible(),
         isLocked: selection.isLocked(),
-        isFolder: node.isFolder(),
         isRecordingVisible: selection.isRecordingVisible(),
         isStreamVisible: selection.isStreamVisible(),
-        sourceId: isItem(node) ? node.sourceId : undefined,
         parentId: node.parentId,
+        isFolder,
       };
     });
   }
@@ -258,21 +256,21 @@ class SourceSelectorModule {
     const destNodeId = destNode.key as string;
 
     if (placement === 'before') {
-      this.editorCommandsService.executeCommand(
+      this.editorCommandsService.actions.executeCommand(
         'ReorderNodesCommand',
         nodesToMove,
         destNodeId,
         EPlaceType.Before,
       );
     } else if (placement === 'after') {
-      this.editorCommandsService.executeCommand(
+      this.editorCommandsService.actions.executeCommand(
         'ReorderNodesCommand',
         nodesToMove,
         destNodeId,
         EPlaceType.After,
       );
     } else if (placement === 'inside') {
-      this.editorCommandsService.executeCommand(
+      this.editorCommandsService.actions.executeCommand(
         'ReorderNodesCommand',
         nodesToMove,
         destNodeId,
@@ -508,7 +506,9 @@ function ItemsTree() {
     fetchSourceMetadata,
   } = useModule(SourceSelectorModule);
 
-  useEffect(fetchSourceMetadata, [scene]);
+  useEffect(fetchSourceMetadata, [scene.id]);
+
+  console.log(treeData);
 
   return (
     <Scrollable
