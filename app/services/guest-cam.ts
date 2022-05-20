@@ -213,7 +213,7 @@ export class GuestCamService extends Service {
     this.log('WebRTC Event', event);
 
     if (event.type === 'producerCreated') {
-      // this.createConsumer(event);
+      this.createConsumer(event);
     } else if (event.type === 'consumerCreated') {
       this.onConsumerCreated(event);
     } else if (event.type === 'consumerTrack') {
