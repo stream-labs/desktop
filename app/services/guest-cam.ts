@@ -125,13 +125,19 @@ export class GuestCamService extends Service {
 
   turnConfig: ITurnConfig;
 
-  async start() {
+  // TODO: Remove this
+  apiToken: string;
+
+  // TODO - Remove override token
+  async start(apiToken?: string) {
+    this.apiToken = apiToken;
+
     // Ensure we have a Guest Cam source
     this.ensureSource();
 
     const roomUrl = 'https://stage6.streamlabs.com/api/v5/slobs/streamrooms/current';
     const roomResult = await jfetch<IRoomResponse>(roomUrl, {
-      headers: authorizedHeaders(this.userService.views.auth.apiToken),
+      headers: authorizedHeaders(this.apiToken ?? this.userService.views.auth.apiToken),
     });
 
     this.log('Room result', roomResult);
@@ -140,7 +146,7 @@ export class GuestCamService extends Service {
 
     const ioConfigUrl = 'https://stage6.streamlabs.com/api/v5/slobs/streamrooms/io/config';
     const ioConfigResult = await jfetch<IIoConfigResponse>(ioConfigUrl, {
-      headers: authorizedHeaders(this.userService.views.auth.apiToken),
+      headers: authorizedHeaders(this.apiToken ?? this.userService.views.auth.apiToken),
     });
 
     this.log('io Config Result', ioConfigResult);
@@ -155,7 +161,7 @@ export class GuestCamService extends Service {
 
     const turnConfigUrl = 'https://stage6.streamlabs.com/api/v5/slobs/streamrooms/turn/config';
     const turnConfigResult = await jfetch<ITurnConfig>(turnConfigUrl, {
-      headers: authorizedHeaders(this.userService.views.auth.apiToken),
+      headers: authorizedHeaders(this.apiToken ?? this.userService.views.auth.apiToken),
     });
 
     this.log('Fetched new TURN config', turnConfigResult);
@@ -207,7 +213,7 @@ export class GuestCamService extends Service {
     this.log('WebRTC Event', event);
 
     if (event.type === 'producerCreated') {
-      // this.createConsumer(event);
+      this.createConsumer(event);
     } else if (event.type === 'consumerCreated') {
       this.onConsumerCreated(event);
     } else if (event.type === 'consumerTrack') {
@@ -284,9 +290,13 @@ export class GuestCamService extends Service {
   }
 
   async createConsumer(event: IProducerCreatedEvent) {
-    this.log('Creating Consumer', event);
-
     // TODO - Don't consume our own producer
+    if (this.socket.id === event.data.socketId) {
+      this.log('createConsumer ignoring own producer');
+      return;
+    }
+
+    this.log('Creating Consumer', event);
 
     // We need to store these for later so we can subscribe to the tracks
     this.guestStream = {
