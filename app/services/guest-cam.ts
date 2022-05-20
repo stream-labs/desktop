@@ -43,10 +43,10 @@ interface IObsReturnTypes {
   func_produce_result: {};
   func_receive_transport_response: {};
   func_video_consumer_response: {
-    connect_params: unknown;
+    connect_params: Object;
   };
   func_audio_consumer_response: {
-    connect_params: unknown;
+    connect_params: Object;
   };
 }
 
@@ -224,7 +224,7 @@ export class GuestCamService extends Service {
 
     const turnConfig = await this.getTurnConfig();
 
-    // result['iceServers'] = [turnConfig];
+    result['iceServers'] = [turnConfig];
 
     input.callHandler('func_send_transport_response', JSON.stringify(result));
 
@@ -305,7 +305,7 @@ export class GuestCamService extends Service {
 
     const turnConfig = await this.getTurnConfig();
 
-    // event.data['iceServers'] = [turnConfig];
+    event.data['iceServers'] = [turnConfig];
 
     this.makeObsRequest('func_receive_transport_response', event.data);
 
@@ -342,7 +342,7 @@ export class GuestCamService extends Service {
     const connectParams = this.makeObsRequest(
       `func_${event.data.kind}_consumer_response`,
       event.data,
-    );
+    ).connect_params;
 
     this.log('Got Consumer Connect Params', connectParams);
 
