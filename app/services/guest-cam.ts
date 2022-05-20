@@ -227,7 +227,7 @@ export class GuestCamService extends Service {
 
     const turnConfig = await this.getTurnConfig();
 
-    result['iceServers'] = [turnConfig];
+    // result['iceServers'] = [turnConfig];
 
     input.callHandler('func_send_transport_response', JSON.stringify(result));
 
@@ -308,7 +308,7 @@ export class GuestCamService extends Service {
 
     const turnConfig = await this.getTurnConfig();
 
-    event.data['iceServers'] = [turnConfig];
+    // event.data['iceServers'] = [turnConfig];
 
     this.makeObsRequest('func_receive_transport_response', event.data);
 
