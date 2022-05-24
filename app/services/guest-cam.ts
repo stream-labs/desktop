@@ -48,6 +48,7 @@ interface IObsReturnTypes {
   func_audio_consumer_response: {
     connect_params: Object;
   };
+  func_stop_consumer: {};
 }
 
 type TWebRTCSocketEvent = IProducerCreatedEvent | IConsumerCreatedEvent | IConsumerTrackEvent;
@@ -99,7 +100,6 @@ interface IConsumableStream {
   socketId: string;
   audioId: string;
   videoId: string;
-  transportConnected: boolean;
 }
 
 interface ITurnConfig {
@@ -119,6 +119,8 @@ export class GuestCamService extends Service {
   socket: SocketIOClient.Socket;
   room: string;
   auth: ISocketAuthResponse;
+
+  receiveTransportConnected = false;
 
   // TODO: We only support one guest for now
   guestStream: IConsumableStream;
@@ -298,6 +300,11 @@ export class GuestCamService extends Service {
   }
 
   async createConsumer(event: IProducerCreatedEvent) {
+    if (this.guestStream) {
+      this.makeObsRequest('func_stop_consumer', this.guestStream.audioId);
+      this.makeObsRequest('func_stop_consumer', this.guestStream.videoId);
+    }
+
     // TODO - Don't consume our own producer
     if (this.socket.id === event.data.socketId) {
       this.log('createConsumer ignoring own producer');
@@ -312,7 +319,6 @@ export class GuestCamService extends Service {
       socketId: event.data.socketId,
       audioId: event.data.audioId,
       videoId: event.data.videoId,
-      transportConnected: false,
     };
 
     this.sendWebRTCRequest({
@@ -381,7 +387,7 @@ export class GuestCamService extends Service {
     }
 
     // This only needs to be done once, and we don't know which track we will receive first
-    if (!this.guestStream.transportConnected) {
+    if (!this.receiveTransportConnected) {
       this.sendWebRTCRequest({
         type: 'connectReceiveTransport',
         data: {
@@ -394,7 +400,7 @@ export class GuestCamService extends Service {
       // TODO: This will never fail
       this.makeObsRequest('func_connect_result', 'true');
 
-      this.guestStream.transportConnected = true;
+      this.receiveTransportConnected = true;
 
       this.log('Connected Receive Transport');
     }
