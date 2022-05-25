@@ -9,8 +9,9 @@ import { $t } from 'services/i18n';
 import { NumberInput } from 'components/shared/inputs/inputs';
 import { WindowsService } from 'services/windows';
 import { EditorCommandsService } from 'services/editor-commands';
-import { v2 } from 'util/vec2';
 import { AnchorPositions, AnchorPoint } from 'util/ScalableRectangle';
+import { SourcesService } from '../../services/sources';
+import { Subscription } from 'rxjs';
 
 const dirMap = (dir: string) =>
   ({
@@ -25,6 +26,7 @@ export default class EditTransform extends TsxComponent<{}> {
   @Inject() selectionService!: SelectionService;
   @Inject() windowsService: WindowsService;
   @Inject() private editorCommandsService: EditorCommandsService;
+  @Inject() private sourcesService: SourcesService;
 
   selection = this.selectionService.views.globalSelection;
 
@@ -34,6 +36,19 @@ export default class EditTransform extends TsxComponent<{}> {
   $refs: {
     validForm: ValidatedForm;
   };
+
+  private sourceRemoveSubscr: Subscription;
+
+  mounted() {
+    // close the window if the source has been deleted
+    this.sourceRemoveSubscr = this.sourcesService.sourceRemoved.subscribe(() => {
+      this.cancel();
+    });
+  }
+
+  destroyed() {
+    this.sourceRemoveSubscr.unsubscribe();
+  }
 
   get transform() {
     return this.selection.getItems()[0].transform;
