@@ -40,16 +40,6 @@ export default function NotificationsArea() {
   const showNotificationsTooltip = $t('Click to open your Notifications window');
   const showUnreadNotificationsTooltip = $t('Click to read your unread Notifications');
 
-  useRenderInterval(checkQueue, 5000);
-  useRenderInterval(
-    () => {
-      if (!notificationsContainer.current) return;
-      setShowExtendedNotifications(notificationsContainer.current?.offsetWidth >= 150);
-    },
-    1000,
-    !!notificationsContainer.current,
-  );
-
   useEffect(() => {
     if (notificationQueue) {
       checkQueue();
@@ -62,9 +52,17 @@ export default function NotificationsArea() {
       onNotificationsReadHandler(notif);
     });
 
+    const refreshNotifsInterval = window.setInterval(checkQueue, 5000);
+    const resizeInterval = window.setInterval(() => {
+      if (!notificationsContainer.current) return;
+      setShowExtendedNotifications(notificationsContainer.current?.offsetWidth >= 150);
+    }, 1000);
+
     return () => {
       notifPushedSub.unsubscribe();
       notifReadSub.unsubscribe();
+      clearInterval(refreshNotifsInterval);
+      clearInterval(resizeInterval);
     };
   }, []);
 
