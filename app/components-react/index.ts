@@ -41,7 +41,7 @@ import LegacyEvents from './editor/elements/LegacyEvents';
 import MediaGallery from './windows/MediaGallery';
 import LayoutEditor from './pages/layout-editor/LayoutEditor';
 import Projector from './windows/Projector';
-import SceneSelector from './editor/elements/SceneSelectorElement';
+import SceneSelector from './editor/elements/SceneSelector';
 import AddSource from './windows/AddSource';
 import SideNav from './sidebar/SideNav';
 import Notifications from './windows/Notifications';
