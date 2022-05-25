@@ -36,12 +36,14 @@ import SourceShowcase from './windows/source-showcase';
 import SourceFilters from './windows/SourceFilters';
 import RecentEvents from './editor/elements/RecentEvents';
 import MiniFeed from './editor/elements/Minifeed';
+import RecordingPreview from './editor/elements/RecordingPreview';
+import StreamPreview from './editor/elements/StreamPreview';
 import BrowserView from './shared/BrowserView';
 import LegacyEvents from './editor/elements/LegacyEvents';
 import MediaGallery from './windows/MediaGallery';
 import LayoutEditor from './pages/layout-editor/LayoutEditor';
 import Projector from './windows/Projector';
-import SceneSelector from './editor/elements/SceneSelectorElement';
+import SceneSelector from './editor/elements/SceneSelector';
 import AddSource from './windows/AddSource';
 import SideNav from './sidebar/SideNav';
 import Notifications from './windows/Notifications';
@@ -97,6 +99,8 @@ export const components = {
   RecentEvents,
   MiniFeed: createRoot(MiniFeed),
   LegacyEvents: createRoot(LegacyEvents),
+  RecordingPreview: createRoot(RecordingPreview),
+  StreamPreview: createRoot(StreamPreview),
   MediaGallery,
   LayoutEditor: createRoot(LayoutEditor),
   SceneSelector: createRoot(SceneSelector),
