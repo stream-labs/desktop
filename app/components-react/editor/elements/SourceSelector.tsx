@@ -5,7 +5,7 @@ import { TreeProps } from 'rc-tree/lib/Tree';
 import cx from 'classnames';
 import { inject, injectState, injectWatch, mutation, useModule } from 'slap';
 import { SourcesService, SourceDisplayData } from 'services/sources';
-import { ScenesService, SceneItemFolder, ISceneItem, TSceneNode, isItem } from 'services/scenes';
+import { ScenesService, ISceneItem, TSceneNode, isItem } from 'services/scenes';
 import { SelectionService } from 'services/selection';
 import { EditMenu } from 'util/menus/EditMenu';
 import { WidgetDisplayData } from 'services/widgets';
@@ -50,6 +50,7 @@ class SourceSelectorModule {
   state = injectState({
     expandedFoldersIds: [] as string[],
     sourceMetadata: {} as { [sceneNodeId: string]: ISourceMetadata },
+    reorderOperation: 0,
   });
 
   callCameFromInsideTheHouse = false;
@@ -57,6 +58,7 @@ class SourceSelectorModule {
   get treeData() {
     // recursive function for transforming SceneNode[] to a Tree format of Antd.Tree
     const getTreeNodes = (sceneNodeIds: string[]): DataNode[] => {
+      if (Object.keys(this.state.sourceMetadata).length < 1) return [];
       return sceneNodeIds.map(id => {
         const sceneNode = this.state.sourceMetadata[id];
         let children;
@@ -84,9 +86,12 @@ class SourceSelectorModule {
       });
     };
 
-    return getTreeNodes(
-      Object.keys(this.state.sourceMetadata).filter(id => !this.state.sourceMetadata[id].parentId),
-    );
+    const nodes = this.scene
+      .getNodes()
+      .filter(node => !node.parentId)
+      .map(node => node.id);
+
+    return getTreeNodes(nodes);
   }
 
   @mutation()
@@ -129,9 +134,10 @@ class SourceSelectorModule {
   }
 
   getChildren(parentId: string) {
-    return Object.keys(this.state.sourceMetadata).filter(
-      id => this.state.sourceMetadata[id].parentId === parentId,
-    );
+    return this.scene
+      .getNodes()
+      .filter(node => this.state.sourceMetadata[node.id].parentId === parentId)
+      .map(node => node.id);
   }
 
   determineIcon(isLeaf: boolean, sourceId: string) {
@@ -239,45 +245,35 @@ class SourceSelectorModule {
       : false);
   }
 
-  onDrop(info: Parameters<Required<TreeProps>['onDrop']>[0]) {
-    const nodesToMove = this.scene.getSelection(info.dragNodesKeys as string[]);
-    const destNode = info.node;
-    const destNodePos = Number(destNode.pos.split('-').slice(-1)[0]);
+  determinePlacement(info: Parameters<Required<TreeProps>['onDrop']>[0]) {
+    if (!info.dropToGap && !info.node.isLeaf) return EPlaceType.Inside;
+    const dropPos = info.node.pos.split('-');
+    const delta = info.dropPosition - Number(dropPos[dropPos.length - 1]);
 
-    let placement: 'before' | 'after' | 'inside';
-    if (!info.dropToGap && !destNode.isLeaf) {
-      placement = 'inside';
-    } else if (destNodePos < info.dropPosition) {
-      placement = 'after';
-    } else {
-      placement = 'before';
-    }
+    return delta > 0 ? EPlaceType.After : EPlaceType.Before;
+  }
 
-    const destNodeId = destNode.key as string;
+  async handleSort(info: Parameters<Required<TreeProps>['onDrop']>[0]) {
+    const targetNodes =
+      this.activeItemIds.length > 0 && this.activeItemIds.includes(info.dragNode.key as string)
+        ? this.activeItemIds
+        : (info.dragNodesKeys as string[]);
+    const nodesToDrop = this.scene.getSelection(targetNodes);
+    const destNode = this.scene.getNode(info.node.key as string);
 
-    if (placement === 'before') {
-      this.editorCommandsService.actions.executeCommand(
-        'ReorderNodesCommand',
-        nodesToMove,
-        destNodeId,
-        EPlaceType.Before,
-      );
-    } else if (placement === 'after') {
-      this.editorCommandsService.actions.executeCommand(
-        'ReorderNodesCommand',
-        nodesToMove,
-        destNodeId,
-        EPlaceType.After,
-      );
-    } else if (placement === 'inside') {
-      this.editorCommandsService.actions.executeCommand(
-        'ReorderNodesCommand',
-        nodesToMove,
-        destNodeId,
-        EPlaceType.Inside,
-      );
-    }
-    this.selectionService.views.globalSelection.select(nodesToMove.getIds());
+    const placement =
+      destNode?.parentId !== nodesToDrop.getClosestParent()?.id
+        ? EPlaceType.Inside
+        : this.determinePlacement(info);
+
+    if (!nodesToDrop || !destNode) return;
+    await this.editorCommandsService.actions.return.executeCommand(
+      'ReorderNodesCommand',
+      nodesToDrop,
+      destNode?.id,
+      placement,
+    );
+    this.state.setReorderOperation(this.state.reorderOperation + 1);
   }
 
   makeActive(ids: string[]) {
@@ -502,13 +498,11 @@ function ItemsTree() {
     showContextMenu,
     makeActive,
     toggleFolder,
-    onDrop,
+    handleSort,
     fetchSourceMetadata,
   } = useModule(SourceSelectorModule);
 
   useEffect(fetchSourceMetadata, [scene.id]);
-
-  console.log(treeData);
 
   return (
     <Scrollable
@@ -522,7 +516,7 @@ function ItemsTree() {
         onSelect={(selectedKeys, info) => makeActive([info.node.key as string])}
         onExpand={(selectedKeys, info) => toggleFolder(info.node.key as string)}
         onRightClick={info => showContextMenu(info.node.key as string, info.event)}
-        onDrop={onDrop}
+        onDrop={handleSort}
         treeData={treeData}
         draggable
         multiple
