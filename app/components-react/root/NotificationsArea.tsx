@@ -15,7 +15,7 @@ interface IUiNotification extends INotification {
 }
 
 export default function NotificationsArea() {
-  const { NotificationsService } = Services;
+  const { NotificationsService, AnnouncementsService } = Services;
 
   const [showExtendedNotifications, setShowExtendedNotifications] = useState(true);
   const [canShowNextNotif, setCanShowNextNotif] = useState(true);
@@ -29,7 +29,7 @@ export default function NotificationsArea() {
 
   const { unreadWarnings, unreadNotifs, settings } = useVuex(() => ({
     unreadWarnings: NotificationsService.views.getUnread(ENotificationType.WARNING).length,
-    unreadNotifs: NotificationsService.views.getUnread().length,
+    unreadNotifs: NotificationsService.views.getUnread(),
     settings: NotificationsService.state.settings,
   }));
 
@@ -134,7 +134,18 @@ export default function NotificationsArea() {
   }
 
   function showNotifications() {
-    NotificationsService.showNotifications();
+    NotificationsService.actions.showNotifications();
+  }
+
+  function showNews() {
+    if (
+      unreadNotifs.every(notif => notif.subType === ENotificationSubType.NEWS) ||
+      unreadNotifs.length === 0
+    ) {
+      AnnouncementsService.actions.openNewsWindow();
+    } else {
+      showNotifications();
+    }
   }
 
   function onNotificationClickHandler(id: number) {
@@ -175,8 +186,8 @@ export default function NotificationsArea() {
       )}
       {!unreadWarnings && (
         <Tooltip placement="right" title={showNotificationsTooltip}>
-          <div className={styles.notificationsCounter} onClick={showNotifications}>
-            <Badge dot={unreadNotifs > 0}>
+          <div className={styles.notificationsCounter} onClick={showNews}>
+            <Badge dot={unreadNotifs.length > 0}>
               <i className="icon-notifications" />
             </Badge>
           </div>
