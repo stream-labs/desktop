@@ -283,6 +283,7 @@ class SourceSelectorModule {
 
   @mutation()
   toggleFolder(nodeId: string) {
+    if (!this.state.sourceMetadata[nodeId].isFolder) return;
     if (this.state.expandedFoldersIds.includes(nodeId)) {
       this.state.expandedFoldersIds.splice(this.state.expandedFoldersIds.indexOf(nodeId), 1);
       this.patchSourceMetadata(nodeId, { icon: 'fa fa-folder' });
