@@ -35,7 +35,6 @@ export default function StreamPreview() {
   }
 
   function StreamPreviewElement() {
-    console.log(selectiveRecording);
     if (!selectiveRecording) return <SelectiveRecordingMessage />;
     if (hideStyleBlockers) return <div />;
     return <Display renderingMode={ERenderingMode.OBS_STREAMING_RENDERING} />;
