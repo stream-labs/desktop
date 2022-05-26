@@ -257,6 +257,7 @@ export class RecentEvents extends ReactComponent<{ isOverlay?: boolean }> {}
   props: {
     name: { default: 'RecordingPreview' },
     wrapperStyles: { default: () => ({ height: '100%' }) },
+    mins: { default: () => ({ x: 0, y: 0 }) },
   },
 })
 export class RecordingPreview extends ReactComponent {}
@@ -281,6 +282,7 @@ export class SafeMode extends ReactComponent {}
   props: {
     name: { default: 'StreamPreview' },
     wrapperStyles: { default: () => ({ height: '100%' }) },
+    mins: { default: () => ({ x: 0, y: 0 }) },
   },
 })
 export class StreamPreview extends ReactComponent {}
