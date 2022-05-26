@@ -1,5 +1,4 @@
 import React, { useRef } from 'react';
-import { useModule } from 'slap';
 import Display from 'components-react/shared/Display';
 import Util from 'services/utils';
 import { ERenderingMode } from '../../../../obs-api';
@@ -7,6 +6,7 @@ import styles from './BaseElement.m.less';
 import { $t } from 'services/i18n';
 import { Services } from 'components-react/service-provider';
 import useBaseElement from './hooks';
+import { useVuex } from 'components-react/hooks';
 
 export default function StreamPreview() {
   const { WindowsService, StreamingService } = Services;
@@ -19,7 +19,7 @@ export default function StreamPreview() {
     containerRef.current,
   );
 
-  const { hideStyleBlockers, selectiveRecording } = useModule(() => ({
+  const { hideStyleBlockers, selectiveRecording } = useVuex(() => ({
     hideStyleBlockers: WindowsService.state[Util.getCurrentUrlParams().windowId].hideStyleBlockers,
     selectiveRecording: StreamingService.state.selectiveRecording,
   }));
@@ -35,6 +35,7 @@ export default function StreamPreview() {
   }
 
   function StreamPreviewElement() {
+    console.log(selectiveRecording);
     if (!selectiveRecording) return <SelectiveRecordingMessage />;
     if (hideStyleBlockers) return <div />;
     return <Display renderingMode={ERenderingMode.OBS_STREAMING_RENDERING} />;
