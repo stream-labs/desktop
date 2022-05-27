@@ -261,17 +261,12 @@ class SourceSelectorModule {
     const nodesToDrop = this.scene.getSelection(targetNodes);
     const destNode = this.scene.getNode(info.node.key as string);
 
-    const placement =
-      destNode?.parentId !== nodesToDrop.getClosestParent()?.id
-        ? EPlaceType.Inside
-        : this.determinePlacement(info);
-
     if (!nodesToDrop || !destNode) return;
     await this.editorCommandsService.actions.return.executeCommand(
       'ReorderNodesCommand',
       nodesToDrop,
       destNode?.id,
-      placement,
+      this.determinePlacement(info),
     );
     this.state.setReorderOperation(this.state.reorderOperation + 1);
   }
