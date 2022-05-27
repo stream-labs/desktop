@@ -479,7 +479,11 @@ export class GuestCamService extends PersistentStatefulService<IGuestCamServiceS
 
   async authenticateSocket(token: string): Promise<ISocketAuthResponse> {
     return new Promise(r => {
-      this.socket.emit('authenticate', { token, username: 'Andy' }, r);
+      this.socket.emit(
+        'authenticate',
+        { token, username: this.userService.views.platform.username },
+        r,
+      );
     });
   }
 
