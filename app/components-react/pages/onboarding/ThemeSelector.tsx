@@ -120,9 +120,9 @@ export function ThemeSelector() {
             )}
           </div>
         ) : (
-          <div className={styles.progressBar}>
-            <p>{$t('Installing theme...')}</p>
+          <div style={{ margin: 'auto', marginTop: 24, width: '80%' }}>
             <AutoProgressBar percent={progress} timeTarget={60 * 1000} />
+            <p>{$t('Installing theme...')}</p>
           </div>
         )}
       </div>
