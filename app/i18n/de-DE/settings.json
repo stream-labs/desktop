@@ -145,7 +145,7 @@
   "Support Links": "Support-Links",
   "Streamlabs Support": "Streamlabs Support",
   "Community Discord": "Community-Discord",
-  "Diagnostic Report": "Diagnostic Report",
+  "Diagnostic Report": "Diagnosedaten übertragen",
   "The diagnostic report is an automatically generated report that contains information about your system and configuration. Clicking the upload button below will generate and securely transmit a diagnostic report to the Streamlabs team.": "Der Diagnostic Report wird automatisch generiert und enthält Informationen zu deinem System und seiner Konfiguration. Durch Klicken auf die unten stehende Schaltfläche zum Hochladen generierst du einen Diagnostic Report und sendest ihn gesichert an das Streamlabs Team.",
   "Upload Diagnostic Report": "Diagnostic Report hochladen",
   "Cache Directory": "Cache-Verzeichnis",
@@ -157,5 +157,5 @@
   "Chat Settings": "Chat-Einstellungen",
   "Text Size": "Schriftgröße",
   "Show announcements for new Streamlabs features and products": "Ankündigungen für neue Streamlabs Funktionen und Produkte anzeigen",
-  "Disable live streaming features (Recording Only mode)": "Disable live streaming features (Recording Only mode)"
+  "Disable live streaming features (Recording Only mode)": "Live-Stream Module deaktivieren (Nur Aufnahme-Modus)"
 }
