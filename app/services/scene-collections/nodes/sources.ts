@@ -14,7 +14,11 @@ import { ScenesService } from 'services/scenes';
 import defaultTo from 'lodash/defaultTo';
 import { byOS, OS } from 'util/operating-systems';
 import { UsageStatisticsService } from 'services/usage-statistics';
-import { SourceFiltersService, TSourceFilterType } from 'services/source-filters';
+import {
+  EFilterDisplayType,
+  SourceFiltersService,
+  TSourceFilterType,
+} from 'services/source-filters';
 
 interface ISchema {
   items: ISourceInfo[];
@@ -25,6 +29,7 @@ interface IFilterInfo {
   type: TSourceFilterType;
   settings: obs.ISettings;
   enabled?: boolean;
+  displayType?: EFilterDisplayType;
 }
 
 export interface ISourceInfo {
@@ -91,6 +96,24 @@ export class SourcesNode extends Node<ISchema, {}> {
            * we're about to cache them to disk. */
           obsInput.save();
 
+          const filters = this.sourceFiltersService.views
+            .filtersBySourceId(source.sourceId, true)
+            // For now, don't persist hidden filters as we don't have a use case
+            .filter(f => f.displayType !== EFilterDisplayType.Hidden)
+            .map(f => {
+              const filterInput = this.sourceFiltersService.getObsFilter(source.sourceId, f.name);
+
+              filterInput.save();
+
+              return {
+                name: f.name,
+                type: f.type,
+                settings: filterInput.settings,
+                enabled: f.visible,
+                displayType: f.displayType,
+              };
+            });
+
           let data: ISourceInfo = {
             hotkeys,
             id: source.sourceId,
@@ -101,19 +124,7 @@ export class SourcesNode extends Node<ISchema, {}> {
             channel: source.channel,
             muted: obsInput.muted,
             filters: {
-              items: obsInput.filters.map(filter => {
-                /* Remember that filters are also sources.
-                 * We should eventually do this for transitions
-                 * as well. Scenes can be ignored. */
-                filter.save();
-
-                return {
-                  name: filter.name,
-                  type: filter.id as TSourceFilterType,
-                  settings: filter.settings,
-                  enabled: filter.enabled,
-                };
-              }),
+              items: filters,
             },
             propertiesManager: source.getPropertiesManagerType(),
             propertiesManagerSettings: source.getPropertiesManagerSettings(),
@@ -236,11 +247,23 @@ export class SourcesNode extends Node<ISchema, {}> {
               this.usageStatisticsService.recordFeatureUsage('VST');
             }
 
+            let displayType = filter.displayType;
+
+            // Migrate scene collections that don't have displayType saved
+            if (displayType == null) {
+              if (filter.name === '__PRESET') {
+                displayType = EFilterDisplayType.Preset;
+              } else {
+                displayType = EFilterDisplayType.Normal;
+              }
+            }
+
             return {
               name: filter.name,
               type: filter.type,
               settings: filter.settings,
               enabled: filter.enabled === void 0 ? true : filter.enabled,
+              displayType,
             };
           }),
       };
@@ -295,6 +318,7 @@ export class SourcesNode extends Node<ISchema, {}> {
             type: f.type,
             visible: f.enabled,
             settings: f.settings,
+            displayType: f.displayType,
           };
         }),
       );

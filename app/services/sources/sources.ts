@@ -602,6 +602,7 @@ export class SourcesService extends StatefulService<ISourcesState> {
     if (!source) return;
 
     if (source.type === 'screen_capture') return this.showScreenCaptureProperties(source);
+    if (source.type === 'mediasoupconnector') return this.showGuestCamProperties(source);
 
     const propertiesManagerType = source.getPropertiesManagerType();
 
@@ -776,6 +777,19 @@ export class SourcesService extends StatefulService<ISourcesState> {
     this.windowsService.showWindow({
       componentName: 'ScreenCaptureProperties',
       title: $t('Settings for %{sourceName}', { sourceName: propertiesName }),
+      queryParams: { sourceId: source.sourceId },
+      size: {
+        width: 690,
+        height: 800,
+      },
+    });
+  }
+
+  showGuestCamProperties(source: Source) {
+    const propertiesName = SourceDisplayData()[source.type].name;
+    this.windowsService.showWindow({
+      componentName: 'GuestCamProperties',
+      title: $t('Guest Cam Properties', { sourceName: propertiesName }),
       queryParams: { sourceId: source.sourceId },
       size: {
         width: 690,

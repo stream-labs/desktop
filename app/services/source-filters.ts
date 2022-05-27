@@ -23,6 +23,7 @@ import { mutation, StatefulService, ViewHandler } from 'services/core/stateful-s
 import { byOS, OS } from 'util/operating-systems';
 import Vue from 'vue';
 import { InitAfter } from 'services';
+import uuid from 'uuid/v4';
 
 export type TSourceFilterType =
   | 'mask_filter'
@@ -62,6 +63,7 @@ export interface ISourceFilter {
   type: TSourceFilterType;
   visible: boolean;
   settings: Dictionary<TObsValue>;
+  displayType: EFilterDisplayType;
 }
 
 export interface ISourceFilterIdentifier {
@@ -73,10 +75,19 @@ interface IFiltersServiceState {
   filters: {
     [sourceId: string]: ISourceFilter[] | undefined;
   };
-  presets: {
-    [sourceId: string]: ISourceFilter | undefined;
-  };
   types: ISourceFilterType[];
+}
+
+/**
+ * Determines how the filter is displayed in the UI.
+ * Normal = A filter manually added by the user
+ * Preset = A visual preset selected from the dropdown
+ * Hidden = A filter automatically added but hidden from the user, i.e. Guest Cam
+ */
+export enum EFilterDisplayType {
+  Normal = 'normal',
+  Preset = 'preset',
+  Hidden = 'hidden',
 }
 
 class SourceFiltersViews extends ViewHandler<IFiltersServiceState> {
@@ -119,12 +130,20 @@ class SourceFiltersViews extends ViewHandler<IFiltersServiceState> {
     return match ? match[0] : null;
   }
 
-  filtersBySourceId(sourceId: string) {
-    return this.state.filters[sourceId];
+  filtersBySourceId(sourceId: string, includeHidden = false) {
+    return this.state.filters[sourceId].filter(
+      f => f.displayType === EFilterDisplayType.Normal || includeHidden,
+    );
+  }
+
+  getFilter(sourceId: string, filterName: string) {
+    return this.filtersBySourceId(sourceId, true).find(f => f.name === filterName);
   }
 
   presetFilterBySourceId(sourceId: string) {
-    return this.state.presets[sourceId];
+    return this.filtersBySourceId(sourceId, true).find(
+      f => f.displayType === EFilterDisplayType.Preset,
+    );
   }
 
   getTypesForSource(sourceId: string): ISourceFilterType[] {
@@ -166,7 +185,7 @@ export class SourceFiltersService extends StatefulService<IFiltersServiceState> 
   @Inject() private windowsService: WindowsService;
   @Inject() private usageStatisticsService: UsageStatisticsService;
 
-  static initialState: IFiltersServiceState = { filters: {}, presets: {}, types: [] };
+  static initialState: IFiltersServiceState = { filters: {}, types: [] };
 
   filterAdded = new Subject<ISourceFilterIdentifier>();
   filterRemoved = new Subject<ISourceFilterIdentifier>();
@@ -218,9 +237,6 @@ export class SourceFiltersService extends StatefulService<IFiltersServiceState> 
       { description: $t('Limiter'), value: 'limiter_filter' },
       { description: $t('Expander'), value: 'expander_filter' },
       { description: $t('Shader'), value: 'shader_filter' },
-      // TODO: Remove
-      { description: 'Mediasoup Audio Filter', value: 'mediasoupconnector_afilter' },
-      { description: 'Mediasoup Video Filter', value: 'mediasoupconnector_vfilter' },
     ];
     const allowedAvailableTypes = allowlistedTypes.filter(type =>
       obsAvailableTypes.includes(type.value),
@@ -244,6 +260,7 @@ export class SourceFiltersService extends StatefulService<IFiltersServiceState> 
     filterType: TSourceFilterType,
     filterName: string,
     settings?: Dictionary<TObsValue>,
+    displayType: EFilterDisplayType = EFilterDisplayType.Normal,
   ) {
     const source = this.sourcesService.views.getSource(sourceId);
     const obsFilter = obs.FilterFactory.create(filterType, filterName, settings || {});
@@ -257,28 +274,33 @@ export class SourceFiltersService extends StatefulService<IFiltersServiceState> 
     // We need to release one
     obsFilter.release();
 
-    if (filterName === '__PRESET') {
-      this.SET_PRESET_FILTER(sourceId, {
+    this.SET_FILTERS(sourceId, [
+      ...(this.state.filters[sourceId] ?? []),
+      {
         name: filterName,
         type: filterType,
         visible: true,
         settings: filterReference.settings,
-      });
-    } else {
-      this.SET_FILTERS(sourceId, [
-        ...(this.state.filters[sourceId] ?? []),
-        {
-          name: filterName,
-          type: filterType,
-          visible: true,
-          settings: filterReference.settings,
-        },
-      ]);
+        displayType,
+      },
+    ]);
+
+    // This filter will have been added to the end of the list, so we need
+    // to get it back in the order of normal -> preset -> hidden
+    const numHiddenFilters = this.views
+      .filtersBySourceId(sourceId, true)
+      .filter(f => f.displayType === EFilterDisplayType.Hidden).length;
+    const numPresetFilters = this.views
+      .filtersBySourceId(sourceId, true)
+      .filter(f => f.displayType === EFilterDisplayType.Preset).length;
+
+    if (displayType === EFilterDisplayType.Normal) {
+      this.setOrder(sourceId, filterName, -1 * (numHiddenFilters + numPresetFilters));
     }
 
-    if (this.views.presetFilterBySourceId(sourceId)) {
+    if (displayType === EFilterDisplayType.Preset) {
+      this.setOrder(sourceId, filterName, -1 * numHiddenFilters);
       this.usageStatisticsService.recordFeatureUsage('PresetFilter');
-      this.setOrder(sourceId, '__PRESET', 1);
     }
     this.filterAdded.next({ sourceId, name: filterName });
 
@@ -299,14 +321,10 @@ export class SourceFiltersService extends StatefulService<IFiltersServiceState> 
     const obsFilter = this.getObsFilter(sourceId, filterName);
     const source = this.sourcesService.views.getSource(sourceId);
 
-    if (filterName === '__PRESET') {
-      this.REMOVE_PRESET_FILTER(sourceId);
-    } else {
-      this.SET_FILTERS(
-        sourceId,
-        this.state.filters[sourceId].filter(f => f.name !== filterName),
-      );
-    }
+    this.SET_FILTERS(
+      sourceId,
+      this.state.filters[sourceId].filter(f => f.name !== filterName),
+    );
 
     source.getObsInput().removeFilter(obsFilter);
     this.filterRemoved.next({ sourceId, name: filterName });
@@ -322,7 +340,7 @@ export class SourceFiltersService extends StatefulService<IFiltersServiceState> 
   }
 
   getFilters(sourceId: string): ISourceFilter[] {
-    return this.state.filters[sourceId];
+    return this.views.filtersBySourceId(sourceId);
   }
 
   /**
@@ -332,19 +350,13 @@ export class SourceFiltersService extends StatefulService<IFiltersServiceState> 
    * @param filters The filter data
    */
   loadFilterData(sourceId: string, filters: ISourceFilter[]): void {
-    this.SET_FILTERS(
-      sourceId,
-      filters.filter(f => f.name !== '__PRESET'),
-    );
-
-    const preset = filters.find(f => f.name === '__PRESET');
-    if (preset) this.SET_PRESET_FILTER(sourceId, preset);
+    this.SET_FILTERS(sourceId, filters);
   }
 
   addPresetFilter(sourceId: string, path: string) {
     const preset = this.views.presetFilterBySourceId(sourceId);
     if (preset) {
-      this.setPropertiesFormData(sourceId, '__PRESET', [
+      this.setPropertiesFormData(sourceId, preset.name, [
         {
           name: 'image_path',
           value: getSharedResource(path),
@@ -354,9 +366,20 @@ export class SourceFiltersService extends StatefulService<IFiltersServiceState> 
         },
       ]);
     } else {
-      // Funky name to attempt avoiding namespace collisions with user-set filters
-      this.add(sourceId, 'clut_filter', '__PRESET', { image_path: getSharedResource(path) });
+      this.add(
+        sourceId,
+        'clut_filter',
+        uuid(),
+        { image_path: getSharedResource(path) },
+        EFilterDisplayType.Preset,
+      );
     }
+  }
+
+  removePresetFilter(sourceId: string) {
+    const preset = this.views.presetFilterBySourceId(sourceId);
+
+    if (preset) this.remove(sourceId, preset.name);
   }
 
   setVisibility(sourceId: string, filterName: string, visible: boolean) {
@@ -386,20 +409,29 @@ export class SourceFiltersService extends StatefulService<IFiltersServiceState> 
   }
 
   setOrder(sourceId: string, filterName: string, delta: number) {
+    console.log('setOrder', filterName, delta);
+
     // Reorder in the store
-    if (filterName !== '__PRESET') {
-      const from = this.state.filters[sourceId].findIndex(f => f.name === filterName);
-      const to = from + delta;
-      this.REORDER_FILTERS(sourceId, from, to);
-    }
+    const from = this.state.filters[sourceId].findIndex(f => f.name === filterName);
+    const to = from + delta;
+    this.REORDER_FILTERS(sourceId, from, to);
 
     const obsFilter = this.getObsFilter(sourceId, filterName);
     const obsInput = this.sourcesService.views.getSource(sourceId).getObsInput();
+    console.log(
+      'OBS ORDER BEFORE',
+      obsInput.filters.map(f => f.name),
+    );
     const movement = delta > 0 ? EOrderMovement.Down : EOrderMovement.Up;
     let i = Math.abs(delta);
     while (i--) {
+      console.log('SET OBS ORDER', obsFilter.name, movement);
       obsInput.setFilterOrder(obsFilter, movement);
     }
+    console.log(
+      'OBS ORDER AFTER',
+      obsInput.filters.map(f => f.name),
+    );
     this.filtersReordered.next();
   }
 
@@ -422,15 +454,12 @@ export class SourceFiltersService extends StatefulService<IFiltersServiceState> 
 
   @mutation()
   SET_FILTERS(sourceId: string, filters: ISourceFilter[]) {
-    Vue.set(this.state.filters, sourceId, filters);
+    Vue.set(this.state.filters, sourceId, [...filters]);
   }
 
   @mutation()
   UPDATE_FILTER(sourceId: string, patch: Partial<ISourceFilter>) {
-    const filter =
-      patch.name === '__PRESET'
-        ? this.state.presets[sourceId]
-        : this.state.filters[sourceId].find(f => f.name === patch.name);
+    const filter = this.state.filters[sourceId].find(f => f.name === patch.name);
 
     Object.assign(filter, patch);
   }
@@ -438,17 +467,6 @@ export class SourceFiltersService extends StatefulService<IFiltersServiceState> 
   @mutation()
   REMOVE_FILTERS(sourceId: string) {
     Vue.delete(this.state.filters, sourceId);
-    Vue.delete(this.state.presets, sourceId);
-  }
-
-  @mutation()
-  SET_PRESET_FILTER(sourceId: string, filter: ISourceFilter) {
-    Vue.set(this.state.presets, sourceId, filter);
-  }
-
-  @mutation()
-  REMOVE_PRESET_FILTER(sourceId: string) {
-    Vue.delete(this.state.presets, sourceId);
   }
 
   @mutation()

@@ -261,4 +261,9 @@ export const SourceDisplayData = (): { [key: string]: ISourceDisplayData } => ({
     icon: 'fas fa-file',
     shortDesc: $t('Viewer shoutouts'),
   },
+  mediasoupconnector: {
+    name: $t('Guest Cam'),
+    description: $t('Invite a guest to join your stream from a web browser.'),
+    icon: 'fas fa-user',
+  },
 });

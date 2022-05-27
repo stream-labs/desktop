@@ -166,7 +166,7 @@ import { SpinWheelService } from 'services/widgets/settings/spin-wheel';
 import { LayoutService } from './services/layout';
 import { ProjectorService } from './services/projector';
 import { ObsImporterService } from 'services/obs-importer';
-import { DefaultHardwareService } from 'services/hardware';
+import { DefaultHardwareService, HardwareService } from 'services/hardware';
 import { AutoConfigService } from 'services/auto-config';
 import { MacPermissionsService } from 'services/mac-permissions';
 import { IncrementalRolloutService } from './services/incremental-rollout';
@@ -175,6 +175,7 @@ import { JsonrpcService } from 'services/api/jsonrpc';
 import { OverlaysPersistenceService } from 'services/scene-collections/overlays';
 import { PlatformAppStoreService } from 'services/platform-app-store';
 import { GameOverlayService } from 'services/game-overlay';
+import { GuestCamService } from 'services/guest-cam';
 
 export const AppServices = {
   AppService,
@@ -237,4 +238,6 @@ export const AppServices = {
   OverlaysPersistenceService,
   PlatformAppStoreService,
   GameOverlayService,
+  GuestCamService,
+  HardwareService,
 };
