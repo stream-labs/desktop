@@ -28,7 +28,7 @@
   "Enable reporting additional information on a crash (requires restart)": "Enable reporting additional information on a crash (requires restart)",
   "WARNING! You will lose all scenes, sources, and settings. This cannot be undone!": "FIGYELEM! Az összes jelenet, forrás és beállítás elveszik. Nem visszavonható!",
   "Your cache directory has been successfully uploaded.  The file name %{file} has been copied to your clipboard.": "A gyorsítótár könyvtár sikeresen feltöltődött. A %{file} fájlnevet másolták a vágólapra.",
-  "Stream Labels session has been successfully restarted!": "Stream Labels session has been successfully restarted!",
+  "Stream Labels session has been successfully restarted!": "A Stream Labels munkamenet sikeresen újra lett indítva!",
   "This action will restart the application. Continue?": "Ez a művelet újraindítja az alkalmazást. Folytatod?",
   "Show confirmation dialog when starting streams": "Megerősítő párbeszédpanel megjelenítése stream indításakor",
   "Show confirmation dialog when stopping streams": "Megerősítő párbeszédpanel megjelenítése stream leállításakor",
