@@ -53,6 +53,8 @@ class SourceSelectorModule {
     reorderOperation: 0,
   });
 
+  nodeRefs = {};
+
   callCameFromInsideTheHouse = false;
 
   get treeData() {
@@ -60,6 +62,8 @@ class SourceSelectorModule {
     const getTreeNodes = (sceneNodeIds: string[]): DataNode[] => {
       if (Object.keys(this.state.sourceMetadata).length < 1) return [];
       return sceneNodeIds.map(id => {
+        if (!this.nodeRefs[id]) this.nodeRefs[id] = React.createRef();
+
         const sceneNode = this.state.sourceMetadata[id];
         let children;
         if (sceneNode.isFolder) children = getTreeNodes(this.getChildren(id));
@@ -76,6 +80,7 @@ class SourceSelectorModule {
               isStreamVisible={sceneNode.isStreamVisible}
               isRecordingVisible={sceneNode.isRecordingVisible}
               cycleSelectiveRecording={() => this.cycleSelectiveRecording(id)}
+              ref={this.nodeRefs[id]}
             />
           ),
           isLeaf: !children,
@@ -313,8 +318,7 @@ class SourceSelectorModule {
       this.patchSourceMetadata(id, { icon: 'fas fa-folder-open' });
     });
 
-    // TODO
-    // this.$refs[this.lastSelectedId].scrollIntoView({ behavior: 'smooth' });
+    this.nodeRefs[this.lastSelectedId].current.scrollIntoView({ behavior: 'smooth' });
   }
 
   get activeItemIds() {
@@ -523,43 +527,48 @@ function ItemsTree() {
   );
 }
 
-function TreeNode(p: {
-  title: string;
-  id: string;
-  isLocked: boolean;
-  isVisible: boolean;
-  isStreamVisible: boolean;
-  isRecordingVisible: boolean;
-  selectiveRecordingEnabled: boolean;
-  toggleVisibility: (ev: unknown) => unknown;
-  toggleLock: (ev: unknown) => unknown;
-  cycleSelectiveRecording: (ev: unknown) => void;
-}) {
-  function selectiveRecordingMetadata() {
-    if (p.isStreamVisible && p.isRecordingVisible) {
-      return { icon: 'icon-smart-record', tooltip: $t('Visible on both Stream and Recording') };
+const TreeNode = React.forwardRef(
+  (
+    p: {
+      title: string;
+      id: string;
+      isLocked: boolean;
+      isVisible: boolean;
+      isStreamVisible: boolean;
+      isRecordingVisible: boolean;
+      selectiveRecordingEnabled: boolean;
+      toggleVisibility: (ev: unknown) => unknown;
+      toggleLock: (ev: unknown) => unknown;
+      cycleSelectiveRecording: (ev: unknown) => void;
+    },
+    ref: React.RefObject<HTMLDivElement>,
+  ) => {
+    function selectiveRecordingMetadata() {
+      if (p.isStreamVisible && p.isRecordingVisible) {
+        return { icon: 'icon-smart-record', tooltip: $t('Visible on both Stream and Recording') };
+      }
+      return p.isStreamVisible
+        ? { icon: 'icon-broadcast', tooltip: $t('Only visible on Stream') }
+        : { icon: 'icon-studio', tooltip: $t('Only visible on Recording') };
     }
-    return p.isStreamVisible
-      ? { icon: 'icon-broadcast', tooltip: $t('Only visible on Stream') }
-      : { icon: 'icon-studio', tooltip: $t('Only visible on Recording') };
-  }
 
-  return (
-    <div className={styles.sourceTitleContainer} data-name={p.title}>
-      <span className={styles.sourceTitle}>{p.title}</span>
-      {p.selectiveRecordingEnabled && (
-        <Tooltip title={selectiveRecordingMetadata().tooltip} placement="left">
-          <i
-            className={cx(selectiveRecordingMetadata().icon, { disabled: p.isLocked })}
-            onClick={p.cycleSelectiveRecording}
-          />
-        </Tooltip>
-      )}
-      <i onClick={p.toggleLock} className={p.isLocked ? 'icon-lock' : 'icon-unlock'} />
-      <i onClick={p.toggleVisibility} className={p.isVisible ? 'icon-view' : 'icon-hide'} />
-    </div>
-  );
-}
+    return (
+      <div className={styles.sourceTitleContainer} data-name={p.title} ref={ref}>
+        <span className={styles.sourceTitle}>{p.title}</span>
+        {p.selectiveRecordingEnabled && (
+          <Tooltip title={selectiveRecordingMetadata().tooltip} placement="left">
+            <i
+              className={cx(selectiveRecordingMetadata().icon, { disabled: p.isLocked })}
+              onClick={p.cycleSelectiveRecording}
+            />
+          </Tooltip>
+        )}
+        <i onClick={p.toggleLock} className={p.isLocked ? 'icon-lock' : 'icon-unlock'} />
+        <i onClick={p.toggleVisibility} className={p.isVisible ? 'icon-view' : 'icon-hide'} />
+      </div>
+    );
+  },
+);
 
 export default function SourceSelectorElement() {
   const containerRef = useRef<HTMLDivElement>(null);
