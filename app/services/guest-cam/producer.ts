@@ -76,7 +76,7 @@ export class Producer extends MediasoupEntity {
   }
 
   destroy() {
+    this.makeObsRequest('func_stop_sender', '');
     super.destroy();
-    // TODO: What does teardown for a producer look like?
   }
 }

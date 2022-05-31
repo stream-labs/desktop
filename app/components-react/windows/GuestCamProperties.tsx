@@ -5,6 +5,7 @@ import { ListInput, TextInput } from 'components-react/shared/inputs';
 import Form from 'components-react/shared/inputs/Form';
 import { ModalLayout } from 'components-react/shared/ModalLayout';
 import React, { useMemo } from 'react';
+import { EGuestCamStatus } from 'services/guest-cam';
 import { EDeviceType } from 'services/hardware';
 import { $t } from 'services/i18n';
 
@@ -28,6 +29,12 @@ export default function GuestCamProperties() {
 
   const videoSourceExists = !!useMemo(() => GuestCamService.views.findVideoSource(), [videoDevice]);
   const audioSourceExists = !!useMemo(() => GuestCamService.views.findAudioSource(), [audioDevice]);
+
+  function onProduceClick() {
+    if (status === EGuestCamStatus.Busy) return;
+    if (status === EGuestCamStatus.Offline) GuestCamService.actions.startProducing();
+    if (status === EGuestCamStatus.Connected) GuestCamService.actions.stopProducing();
+  }
 
   return (
     <ModalLayout scrollable>
@@ -60,7 +67,9 @@ export default function GuestCamProperties() {
           )}
         </div>
       )}
-      <Button>Start</Button>
+      <Button disabled={status === EGuestCamStatus.Busy} onClick={onProduceClick}>
+        {status === EGuestCamStatus.Connected ? 'Stop' : 'Start'}
+      </Button>
     </ModalLayout>
   );
 }

@@ -55,6 +55,7 @@ export interface IObsReturnTypes {
     connect_params: Object;
   };
   func_stop_consumer: {};
+  func_stop_sender: {};
 }
 
 interface IRoomResponse {
@@ -126,7 +127,7 @@ interface ITurnConfig {
   username: string;
 }
 
-enum EGuestCamStatus {
+export enum EGuestCamStatus {
   Offline = 'offline',
   Connected = 'connected',
   Busy = 'busy',
@@ -319,11 +320,21 @@ export class GuestCamService extends PersistentStatefulService<IGuestCamServiceS
     // TODO: What happens if the producer isn't working?
     if (this.producer) return;
 
+    this.SET_STATUS(EGuestCamStatus.Busy);
+
     this.ensureSourceAndFilters(this.room);
 
     this.producer = new Producer();
 
     await this.producer.connect();
+
+    this.SET_STATUS(EGuestCamStatus.Connected);
+  }
+
+  stopProducing() {
+    this.producer.destroy();
+    this.producer = null;
+    this.SET_STATUS(EGuestCamStatus.Offline);
   }
 
   /**
