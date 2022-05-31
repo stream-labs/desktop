@@ -51,7 +51,7 @@
   "Enable Replay Buffer": "啟用重播緩衝",
   "Base (Canvas) Resolution": "基本 (畫布) 解析度",
   "Output (Scaled) Resolution": "輸出 (縮放) 解析度",
-  "Downscale Filter": "縮減篩選器",
+  "Downscale Filter": "縮減濾鏡",
   "Bilinear (Fastest, but blurry if scaling)": "雙線性 (速度最快，但縮放時會模糊)",
   "Bicubic (Sharpened scaling, 16 samples)": "雙三次插值 (銳利的縮放結果，16 點取樣)",
   "Lanczos (Sharpened scaling, 32 samples)": "Lanczos 演算法 (銳利的縮放結果，32 點取樣)",
