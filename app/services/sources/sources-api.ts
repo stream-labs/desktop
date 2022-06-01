@@ -19,6 +19,14 @@ export interface ISource {
   propertiesManagerType: TPropertiesManager;
   propertiesManagerSettings?: Dictionary<any>;
   channel?: number;
+  /**
+   * When set to true, all scene items referencing this source
+   * will automatically be hidden, regardless of whether they
+   * are set to visible in the UI.
+   *
+   * This is mainly meant to support Guest Cam
+   */
+  forceHidden: boolean;
 }
 
 /**

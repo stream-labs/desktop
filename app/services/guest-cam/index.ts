@@ -56,6 +56,7 @@ export interface IObsReturnTypes {
   };
   func_stop_consumer: {};
   func_stop_sender: {};
+  func_change_playback_volume: {};
 }
 
 interface IRoomResponse {
@@ -67,7 +68,11 @@ interface IIoConfigResponse {
   token: string;
 }
 
-type TWebRTCSocketEvent = IProducerCreatedEvent | IConsumerCreatedEvent | IConsumerTrackEvent;
+type TWebRTCSocketEvent =
+  | IProducerCreatedEvent
+  | IConsumerCreatedEvent
+  | IConsumerTrackEvent
+  | IConsumerDestroyedEvent;
 
 export interface IRemoteProducer {
   audioId: string;
@@ -105,19 +110,14 @@ export interface IConsumerTrackEvent {
   };
 }
 
+// TODO: What does this look like?
+interface IConsumerDestroyedEvent {
+  type: 'consumerDestroyed';
+}
+
 interface ISocketAuthResponse {
   success: boolean;
   rtpCapabilities: unknown;
-}
-
-/**
- * Represents a guest that we can consume audio/video from
- */
-interface IConsumableStream {
-  streamId: string;
-  socketId: string;
-  audioId: string;
-  videoId: string;
 }
 
 interface ITurnConfig {
@@ -133,11 +133,17 @@ export enum EGuestCamStatus {
   Busy = 'busy',
 }
 
+interface IGuest {
+  name: string;
+  visible: boolean;
+}
+
 interface IGuestCamServiceState {
   status: EGuestCamStatus;
   videoDevice: string;
   audioDevice: string;
   inviteHash: string;
+  guestInfo: IGuest;
 }
 
 interface IInviteLink {
@@ -204,6 +210,7 @@ export class GuestCamService extends PersistentStatefulService<IGuestCamServiceS
     videoDevice: '',
     audioDevice: '',
     inviteHash: '',
+    guestInfo: null,
   };
 
   get views() {
@@ -238,6 +245,7 @@ export class GuestCamService extends PersistentStatefulService<IGuestCamServiceS
 
     this.SET_STATUS(EGuestCamStatus.Offline);
     this.SET_INVITE_HASH('');
+    this.SET_GUEST(null);
 
     // TODO - check default hardware service instead of taking first in list?
     if (this.state.audioDevice === '') {
@@ -464,14 +472,14 @@ export class GuestCamService extends PersistentStatefulService<IGuestCamServiceS
 
     this.webrtcEvent.next(event);
 
-    // Fires whenever a guest joins
     if (event.type === 'producerCreated') {
-      // Don't try to create any consumers until the producer is created
-      this.onProducerCreated(event);
+      this.onGuestJoin(event);
+    } else if (event.type === 'consumerDestroyed') {
+      this.onGuestLeave(event);
     }
   }
 
-  async onProducerCreated(event: IProducerCreatedEvent) {
+  async onGuestJoin(event: IProducerCreatedEvent) {
     if (this.socket.id === event.data.socketId) {
       this.log('onProducerCreated fired - ignoring our own producer');
       return;
@@ -484,8 +492,18 @@ export class GuestCamService extends PersistentStatefulService<IGuestCamServiceS
       this.consumer.destroy();
     }
 
+    // Make sure the source isn't visible in any scene
+    this.getSource().setForceHidden(true);
+
+    // Set audio volume to 0 until the guest is approved
+    this.makeObsRequest('func_change_playback_volume', '0');
+
     this.consumer = new Consumer(event.data);
     this.consumer.connect();
+  }
+
+  async onGuestLeave(event: IConsumerDestroyedEvent) {
+    this.log('ON GUEST LEAVE', event);
   }
 
   async authenticateSocket(token: string): Promise<ISocketAuthResponse> {
@@ -574,5 +592,10 @@ export class GuestCamService extends PersistentStatefulService<IGuestCamServiceS
   @mutation()
   private SET_INVITE_HASH(hash: string) {
     this.state.inviteHash = hash;
+  }
+
+  @mutation()
+  private SET_GUEST(guest: IGuest) {
+    this.state.guestInfo = guest;
   }
 }

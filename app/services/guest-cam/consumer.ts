@@ -13,7 +13,7 @@ export class Consumer extends MediasoupEntity {
 
   destroyed = false;
 
-  constructor(private remoteProducer: IRemoteProducer) {
+  constructor(public readonly remoteProducer: IRemoteProducer) {
     super();
   }
 

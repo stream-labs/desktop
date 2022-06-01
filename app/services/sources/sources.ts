@@ -243,6 +243,8 @@ export class SourcesService extends StatefulService<ISourcesState> {
 
       muted: false,
       channel: addOptions.channel,
+
+      forceHidden: false,
     };
 
     if (addOptions.isTemporary) {

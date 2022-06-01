@@ -35,6 +35,7 @@ export class Source implements ISourceApi {
   resourceId: string;
   propertiesManagerType: TPropertiesManager;
   propertiesManagerSettings: Dictionary<any>;
+  forceHidden: boolean;
 
   state: ISource;
 
@@ -63,6 +64,25 @@ export class Source implements ISourceApi {
   @ExecuteInWorkerProcess()
   getSettings(): Dictionary<any> {
     return this.getObsInput().settings;
+  }
+
+  setForceHidden(val: boolean) {
+    this.SET_FORCE_HIDDEN(val);
+
+    // This is probably not great separation of concerns, but
+    // is a side effect of needing forceHidden to be a property
+    // on the source, whereas visibility is controlled by scene-item.
+    // Anyway, we need to find all scene items referencing this source
+    // and force hide/show them.
+    this.scenesService.views.getSceneItemsBySourceId(this.sourceId).forEach(sceneItem => {
+      if (val) {
+        // Force hide everything without touching UI state
+        sceneItem.getObsSceneItem().visible = false;
+      } else {
+        // Return everything to the state in the UI
+        sceneItem.setVisibility(sceneItem.visible);
+      }
+    });
   }
 
   /**
@@ -327,6 +347,11 @@ export class Source implements ISourceApi {
       !this.sourcesService.state.sources[this.sourceId] &&
       !this.sourcesService.state.temporarySources[this.sourceId]
     );
+  }
+
+  @mutation()
+  private SET_FORCE_HIDDEN(val: boolean) {
+    this.state.forceHidden = val;
   }
 
   @mutation()
