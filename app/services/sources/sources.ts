@@ -39,6 +39,7 @@ import { SourceFiltersService } from 'services/source-filters';
 import { VideoService } from 'services/video';
 import { CustomizationService } from '../customization';
 import { EAvailableFeatures, IncrementalRolloutService } from '../incremental-rollout';
+import { byOS, OS } from 'util/operating-systems';
 
 const AudioFlag = obs.ESourceOutputFlags.Audio;
 const VideoFlag = obs.ESourceOutputFlags.Video;
@@ -470,20 +471,17 @@ export class SourcesService extends StatefulService<ISourcesState> {
       resolvedSettings.text = name;
     }
 
-    if (
-      type === 'dshow_input' &&
-      resolvedSettings.video_device_id === void 0 &&
-      this.defaultHardwareService.state.defaultVideoDevice
-    ) {
-      resolvedSettings.video_device_id = this.defaultHardwareService.state.defaultVideoDevice;
-    }
+    const webcamSourceType = byOS({ [OS.Windows]: 'dshow_input', [OS.Mac]: 'av_capture_input' });
+    const deviceProperty = byOS({ [OS.Windows]: 'video_device_id', [OS.Mac]: 'device' });
 
-    if (
-      type === 'av_capture_input' &&
-      resolvedSettings.device === void 0 &&
-      this.defaultHardwareService.state.defaultVideoDevice
-    ) {
-      resolvedSettings.device = this.defaultHardwareService.state.defaultVideoDevice;
+    if (type === webcamSourceType && resolvedSettings[deviceProperty] == null) {
+      const devices = this.hardwareService.dshowDevices;
+
+      if (devices.find(d => d.id === this.defaultHardwareService.state.defaultVideoDevice)) {
+        resolvedSettings[deviceProperty] = this.defaultHardwareService.state.defaultVideoDevice;
+      } else if (devices.length > 0) {
+        resolvedSettings[deviceProperty] = devices[0].id;
+      }
     }
 
     // TODO: Specifically for TikTok, we don't use auto mode on game capture
