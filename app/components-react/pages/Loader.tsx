@@ -1,29 +1,45 @@
 import React, { useEffect, useState } from 'react';
 import SvgContainer from 'components-react/shared/SvgContainer';
+import { $t } from 'services/i18n';
 
-const loadingStrings = [
-  'You can edit the sounds of your stream alerts from the alertbox properties menu.',
-  'You can access our theme library from the left sidebar.',
-  'Our 24/7 support staff is available at Discord.gg/stream.',
-  '"Sources" are what we call media like text, images, video & audio feeds.',
-  'Undo works in the Editor. Praise the Ctrl + Z gods!',
-  'The sources listed at the top of your sources pane will be layered the highest in your editor.',
-  'Studio Mode is a powerful way to curate a professional-quality stream.',
-  'Cloudbot is a chatbot that can help you moderate your stream.',
-  'The Remote Control feature lets you control your active scene in real-time from your phone.',
-  'Set Hotkeys from your settings to control your stream with your keyboard.',
-  'With Game Overlay you can view chat messages while gaming without switching screens.',
-  'The editor is fully customizable. Try repositioning things from the Layout Editor.',
-  'Studio Mode allows you to customize a scene while you are live before your viewers can see it.',
-  'With the Highlighter, you can save clips during your stream and publish them to YouTube.',
-  "You can login to Streamlabs from any device, and we'll load your scenes from the cloud.",
-  'As your scenes get more complex, try managing your sources in folders.',
-  'To fine-tune the positioning of a source, select it from the editor then press any arrow key.',
-  'Right-click a source, then choose "Properties" to view its advanced settings.',
-  'You can position your chat panel to be either on the left or right side of your screen.',
-  'Right-click on your camera source to add filters to your webcam.',
-  'You can add and edit stinger transitions by clicking the settings cog near your scene collections.',
-  'To crop your webcam, press Alt then drag the bounding box.',
+const loadingStrings = () => [
+  // Basic Feature Usage
+  $t('You can edit the sounds of your stream alerts from the alertbox properties menu.'),
+  $t('You can access our theme library from the left sidebar.'),
+  $t('Our 24/7 support staff is available at Discord.gg/stream.'),
+  $t('Sources are what we call media like text, images, video & audio feeds.'),
+  $t('Undo works in the Editor. Praise the Ctrl + Z gods!'),
+  $t(
+    'The sources listed at the top of your sources pane will be layered the highest in your editor.',
+  ),
+  $t('Studio Mode is a powerful way to curate a professional-quality stream.'),
+  $t('Cloudbot is a chatbot that can help you moderate your stream.'),
+  $t('The Remote Control feature lets you control your active scene in real-time from your phone.'),
+  $t('Set Hotkeys from your settings to control your stream with your keyboard.'),
+  $t('With Game Overlay you can view chat messages while gaming without switching screens.'),
+  $t('The editor is fully customizable. Try repositioning things from the Layout Editor.'),
+  $t(
+    'Studio Mode allows you to customize a scene while you are live before your viewers can see it.',
+  ),
+  $t('With the Highlighter, you can save clips during your stream and publish them to YouTube.'),
+  $t("You can login to Streamlabs from any device, and we'll load your scenes from the cloud."),
+  $t('As your scenes get more complex, try managing your sources in folders.'),
+  $t(
+    'To fine-tune the positioning of a source, select it from the editor then press any arrow key.',
+  ),
+  $t('Right-click a source, then choose "Properties" to view its advanced settings.'),
+  $t('You can position your chat panel to be either on the left or right side of your screen.'),
+  $t('Right-click on your camera source to add filters to your webcam.'),
+  $t(
+    'You can add and edit stinger transitions by clicking the settings cog near your scene collections.',
+  ),
+  $t('To crop your webcam, press Alt then drag the bounding box.'),
+  $t('Widgets are dynamic, interactive overlays you can add to your scene.'),
+
+  // Prime Feature Usage
+  $t('Our App Store contains advanced technology to take your stream to the next level.'),
+  $t('With multi-stream, you can stream to YouTube, Twitch, Trovo, and Facebook at the same time.'),
+  $t('You can customize the design of your tip page from the Theme Library.'),
 ];
 
 export default function Loader() {
@@ -33,7 +49,7 @@ export default function Loader() {
   function lifecycle() {
     function loopRandomText() {
       const randomIndex = Math.floor(Math.random() * loadingStrings.length);
-      if (loaderText === loadingStrings[randomIndex]) {
+      if (loaderText === loadingStrings()[randomIndex]) {
         loopRandomText();
       } else {
         setLoaderText(loadingStrings[randomIndex]);
