@@ -40,6 +40,7 @@ import RecordingPreview from './editor/elements/RecordingPreview';
 import StreamPreview from './editor/elements/StreamPreview';
 import BrowserView from './shared/BrowserView';
 import LegacyEvents from './editor/elements/LegacyEvents';
+import DisplayElement from './editor/elements/Display';
 import MediaGallery from './windows/MediaGallery';
 import LayoutEditor from './pages/layout-editor/LayoutEditor';
 import Projector from './windows/Projector';
@@ -101,6 +102,7 @@ export const components = {
   LegacyEvents: createRoot(LegacyEvents),
   RecordingPreview: createRoot(RecordingPreview),
   StreamPreview: createRoot(StreamPreview),
+  DisplayElement: createRoot(DisplayElement),
   MediaGallery,
   LayoutEditor: createRoot(LayoutEditor),
   SceneSelector: createRoot(SceneSelector),
