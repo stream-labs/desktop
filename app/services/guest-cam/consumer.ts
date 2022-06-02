@@ -129,8 +129,6 @@ export class Consumer extends MediasoupEntity {
   }
 
   destroy() {
-    super.destroy();
-
     if (this.webrtcSubscription) {
       this.webrtcSubscription.unsubscribe();
       this.webrtcSubscription = null;
@@ -138,5 +136,7 @@ export class Consumer extends MediasoupEntity {
 
     this.makeObsRequest('func_stop_consumer', this.remoteProducer.audioId);
     this.makeObsRequest('func_stop_consumer', this.remoteProducer.videoId);
+
+    super.destroy();
   }
 }

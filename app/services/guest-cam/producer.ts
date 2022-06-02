@@ -1,7 +1,11 @@
 import { MediasoupEntity } from './mediasoup-entity';
 import uuid from 'uuid/v4';
+import { Inject } from 'services/core';
+import { UserService } from 'app-services';
 
 export class Producer extends MediasoupEntity {
+  @Inject() userService: UserService;
+
   connected = false;
 
   async connect() {
@@ -9,7 +13,12 @@ export class Producer extends MediasoupEntity {
       const streamId = uuid();
       const result = await this.sendWebRTCRequest({
         type: 'createProducer',
-        data: { streamId, type: 'stream', name: 'Andy', tracks: 2 },
+        data: {
+          streamId,
+          type: 'stream',
+          name: this.userService.views.platform.username,
+          tracks: 2,
+        },
       });
       this.log('Producer Created', result);
 

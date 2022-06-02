@@ -493,10 +493,10 @@ export class GuestCamService extends PersistentStatefulService<IGuestCamServiceS
     }
 
     // Make sure the source isn't visible in any scene
-    this.getSource().setForceHidden(true);
+    // this.getSource().setForceHidden(true);
 
     // Set audio volume to 0 until the guest is approved
-    this.makeObsRequest('func_change_playback_volume', '0');
+    // this.makeObsRequest('func_change_playback_volume', '0');
 
     this.consumer = new Consumer(event.data);
     this.consumer.connect();
