@@ -20,6 +20,8 @@
     "keylistener",
     "libuiohook",
     "linebreak",
+    "llhp",
+    "llhq",
     "Maximizable",
     "minimizable",
     "multiselect",
@@ -54,14 +56,17 @@
     "spectron",
     "ssng",
     "statusarea",
+    "superfast",
     "systeminformation",
     "toplevel",
     "typedoc",
+    "ultrafast",
     "unama",
     "undocked",
     "unmaximize",
     "urijs",
     "userkey",
+    "veryfast",
     "Volmeter",
     "vpos",
     "vuedraggable",
@@ -69,7 +74,9 @@
     "vuex",
     "webdriverio",
     "webfont",
-    "xkeshi"
+    "xkeshi",
+    "yomiage"
   ],
-  "files.eol": "\n"
+  "files.eol": "\n",
+  "typescript.format.enable": true
 }

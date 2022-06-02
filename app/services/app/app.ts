@@ -74,7 +74,7 @@ export class AppService extends StatefulService<IAppState> {
 
   private pid = require('process').pid;
 
-  @track('app_start')
+  @track({ event: 'app_start' })
   @RunInLoadingMode()
   async load() {
     if (Utils.isDevMode()) {
@@ -162,7 +162,7 @@ export class AppService extends StatefulService<IAppState> {
     this.protocolLinksService.start(this.state.argv);
   }
 
-  @track('app_close')
+  @track({ event: 'app_close' })
   private shutdownHandler() {
     this.START_LOADING();
     obs.NodeObs.StopCrashHandler();
