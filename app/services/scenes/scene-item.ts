@@ -182,6 +182,8 @@ export class SceneItem extends SceneItemNode {
     }
 
     if (changed.visible !== void 0) {
+      // Do not adjust visibility in OBS while source is force hidden
+      if (this.source.forceHidden) return;
       this.getObsSceneItem().visible = newSettings.visible;
     }
 
