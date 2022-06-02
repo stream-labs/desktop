@@ -108,7 +108,7 @@ export default function SideNav() {
       )}
       {isLoggedIn && (
         <div
-          className={cx(styles.cell)}
+          className={cx(styles.cell, styles.linkIcon)}
           onClick={() => throttledOpenDashboard()}
           title={$t('Dashboard')}
         >
@@ -117,7 +117,7 @@ export default function SideNav() {
       )}
       {isLoggedIn && (
         <div
-          className={cx(styles.cell)}
+          className={cx(styles.cell, styles.linkIcon)}
           onClick={() => throttledOpenDashboard('cloudbot')}
           title={$t('Cloudbot')}
         >
@@ -134,7 +134,7 @@ export default function SideNav() {
       >
         <i className="icon-studio-mode-3" />
       </div>
-      <div className={styles.cell} onClick={openHelp} title={$t('Get Help')}>
+      <div className={cx(styles.cell, styles.linkIcon)} onClick={openHelp} title={$t('Get Help')}>
         <i className="icon-question" />
       </div>
       <div className={styles.cell} onClick={openSettingsWindow} title={$t('Settings')}>
