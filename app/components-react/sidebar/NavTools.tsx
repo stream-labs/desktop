@@ -8,6 +8,7 @@ import { Services } from '../service-provider';
 import { useVuex } from '../hooks';
 import styles from './SideNav.m.less';
 import * as remote from '@electron/remote';
+import { Badge } from 'antd';
 
 export default function SideNav() {
   const {
@@ -103,25 +104,31 @@ export default function SideNav() {
           onClick={upgradeToPrime}
           title={$t('Get Prime')}
         >
-          <i className="icon-prime" />
+          <Badge count={<i className={cx('icon-pop-out-3', styles.linkBadge)} />}>
+            <i className="icon-prime" />
+          </Badge>
         </div>
       )}
       {isLoggedIn && (
         <div
-          className={cx(styles.cell, styles.linkIcon)}
+          className={styles.cell}
           onClick={() => throttledOpenDashboard()}
           title={$t('Dashboard')}
         >
-          <i className="icon-dashboard" />
+          <Badge count={<i className={cx('icon-pop-out-3', styles.linkBadge)} />}>
+            <i className={cx('icon-dashboard', styles.linkIcon)} />
+          </Badge>
         </div>
       )}
       {isLoggedIn && (
         <div
-          className={cx(styles.cell, styles.linkIcon)}
+          className={cx(styles.cell)}
           onClick={() => throttledOpenDashboard('cloudbot')}
           title={$t('Cloudbot')}
         >
-          <i className="icon-cloudbot" />
+          <Badge count={<i className={cx('icon-pop-out-3', styles.linkBadge)} />}>
+            <i className={cx('icon-cloudbot', styles.linkIcon)} />
+          </Badge>
         </div>
       )}
       <div className={styles.cell} onClick={openLayoutEditor} title={$t('Layout Editor')}>
@@ -134,8 +141,10 @@ export default function SideNav() {
       >
         <i className="icon-studio-mode-3" />
       </div>
-      <div className={cx(styles.cell, styles.linkIcon)} onClick={openHelp} title={$t('Get Help')}>
-        <i className="icon-question" />
+      <div className={styles.cell} onClick={openHelp} title={$t('Get Help')}>
+        <Badge count={<i className={cx('icon-pop-out-3', styles.linkBadge)} />}>
+          <i className={cx('icon-question', styles.linkIcon)} />
+        </Badge>
       </div>
       <div className={styles.cell} onClick={openSettingsWindow} title={$t('Settings')}>
         <i className="icon-settings" />
