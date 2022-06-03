@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 /* eslint-disable no-inner-declarations */
 ////////////////////////////////////////////////////////////////////////////////
 // Set Up Environment Variables

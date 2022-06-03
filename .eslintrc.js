@@ -8,7 +8,7 @@ module.exports = {
     es6: true,
     'jest/globals': true,
   },
-  extends: ['plugin:vue/essential', 'airbnb-base'],
+  extends: ['plugin:vue/essential', 'airbnb-base', 'prettier'],
   globals: {
     Atomics: 'readonly',
     SharedArrayBuffer: 'readonly',
@@ -18,9 +18,8 @@ module.exports = {
     parser: '@typescript-eslint/parser',
     sourceType: 'module',
   },
-  plugins: ['vue', '@typescript-eslint', 'jest', 'prettier'],
+  plugins: ['vue', '@typescript-eslint', 'jest'],
   rules: {
-    'prettier/prettier': ERROR,
     'prefer-arrow-callback': OFF,
     'brace-style': OFF,
     'generator-star-spacing': OFF,
