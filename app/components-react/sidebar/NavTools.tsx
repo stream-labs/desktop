@@ -116,7 +116,7 @@ export default function SideNav() {
           title={$t('Dashboard')}
         >
           <Badge count={<i className={cx('icon-pop-out-3', styles.linkBadge)} />}>
-            <i className={cx('icon-dashboard', styles.linkIcon)} />
+            <i className="icon-dashboard" />
           </Badge>
         </div>
       )}
@@ -127,7 +127,7 @@ export default function SideNav() {
           title={$t('Cloudbot')}
         >
           <Badge count={<i className={cx('icon-pop-out-3', styles.linkBadge)} />}>
-            <i className={cx('icon-cloudbot', styles.linkIcon)} />
+            <i className="icon-cloudbot" />
           </Badge>
         </div>
       )}
@@ -143,7 +143,7 @@ export default function SideNav() {
       </div>
       <div className={styles.cell} onClick={openHelp} title={$t('Get Help')}>
         <Badge count={<i className={cx('icon-pop-out-3', styles.linkBadge)} />}>
-          <i className={cx('icon-question', styles.linkIcon)} />
+          <i className="icon-question" />
         </Badge>
       </div>
       <div className={styles.cell} onClick={openSettingsWindow} title={$t('Settings')}>
