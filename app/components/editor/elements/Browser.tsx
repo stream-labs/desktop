@@ -29,7 +29,13 @@ export default class Display extends BaseElement {
       <BrowserView
         componentProps={{
           src: this.url,
-          options: { webPreferences: { partition: this.partition, contextIsolation: true } },
+          options: {
+            webPreferences: {
+              partition: this.partition,
+              contextIsolation: true,
+              nativeWindowOpen: false,
+            },
+          },
         }}
       />
     );

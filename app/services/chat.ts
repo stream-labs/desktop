@@ -150,6 +150,7 @@ export class ChatService extends Service {
         nodeIntegration: false,
         contextIsolation: true,
         preload: path.resolve(remote.app.getAppPath(), 'bundles', 'guest-api'),
+        nativeWindowOpen: false,
       },
     });
 
@@ -260,6 +261,7 @@ export class ChatService extends Service {
               nodeIntegration: false,
               // Prevent trovo from playing streams in the background
               autoplayPolicy: 'document-user-activation-required',
+              nativeWindowOpen: false,
             },
           });
           loginWindow.webContents.setAudioMuted(true);

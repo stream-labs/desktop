@@ -40,6 +40,7 @@ export default function BrowserView(p: BrowserViewProps) {
     // Enforce node integration disabled to prevent security issues
     if (!opts.webPreferences) opts.webPreferences = {};
     opts.webPreferences.nodeIntegration = false;
+    opts.webPreferences.nativeWindowOpen = false;
 
     if (p.enableGuestApi) {
       opts.webPreferences.contextIsolation = true;

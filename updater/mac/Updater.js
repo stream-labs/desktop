@@ -88,7 +88,12 @@ class Updater {
       frame: false,
       resizable: false,
       show: false,
-      webPreferences: { nodeIntegration: true, enableRemoteModule: true, contextIsolation: false },
+      webPreferences: {
+        nodeIntegration: true,
+        enableRemoteModule: true,
+        contextIsolation: false,
+        nativeWindowOpen: false,
+      },
       backgroundColor: '#17242d',
     });
 

@@ -60,6 +60,7 @@ export class AuthorizationModule extends Module {
         nodeIntegration: false,
         sandbox: true,
         partition: uuid(),
+        nativeWindowOpen: false,
       },
     });
 

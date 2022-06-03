@@ -147,7 +147,7 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
       skipTaskbar: true,
       thickFrame: false,
       resizable: false,
-      webPreferences: { nodeIntegration: false, offscreen: true },
+      webPreferences: { nodeIntegration: false, offscreen: true, nativeWindowOpen: false },
     };
   }
 
@@ -156,7 +156,12 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
       ...this.commonWindowOptions,
       width: 600,
       transparent: true,
-      webPreferences: { offscreen: false, nodeIntegration: true, contextIsolation: false },
+      webPreferences: {
+        offscreen: false,
+        nodeIntegration: true,
+        contextIsolation: false,
+        nativeWindowOpen: false,
+      },
       isFullScreen: true,
       alwaysOnTop: true,
       componentName: 'OverlayPlaceholder',
@@ -167,7 +172,12 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
       ...this.commonWindowOptions,
       height: 600,
       transparent: true,
-      webPreferences: { offscreen: false, nodeIntegration: true, contextIsolation: false },
+      webPreferences: {
+        offscreen: false,
+        nodeIntegration: true,
+        contextIsolation: false,
+        nativeWindowOpen: false,
+      },
       isFullScreen: true,
       alwaysOnTop: true,
       componentName: 'OverlayPlaceholder',

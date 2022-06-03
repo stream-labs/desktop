@@ -428,6 +428,7 @@ export class WindowsService extends StatefulService<IWindowsState> {
         webviewTag: true,
         contextIsolation: false,
         backgroundThrottling: false,
+        nativeWindowOpen: false,
       },
       ...options,
       ...options.size,

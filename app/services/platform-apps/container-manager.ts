@@ -198,6 +198,7 @@ export class PlatformContainerManager {
         nodeIntegration: false,
         partition: this.getAppPartition(app),
         preload: path.resolve(remote.app.getAppPath(), 'bundles', 'guest-api'),
+        nativeWindowOpen: false,
       },
     });
 

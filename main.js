@@ -324,7 +324,7 @@ async function startApp() {
 
   workerWindow = new BrowserWindow({
     show: false,
-    webPreferences: { nodeIntegration: true, contextIsolation: false },
+    webPreferences: { nodeIntegration: true, contextIsolation: false, nativeWindowOpen: false },
   });
 
   remote.enable(workerWindow.webContents);
@@ -362,6 +362,7 @@ async function startApp() {
       nodeIntegration: true,
       webviewTag: true,
       contextIsolation: false,
+      nativeWindowOpen: false,
     },
   });
 
@@ -436,6 +437,7 @@ async function startApp() {
       nodeIntegration: true,
       backgroundThrottling: false,
       contextIsolation: false,
+      nativeWindowOpen: false,
     },
   });
 

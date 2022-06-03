@@ -40,7 +40,7 @@ module.exports = async (basePath: string) => {
       resizable: false,
       show: false,
       alwaysOnTop: true,
-      webPreferences: { nodeIntegration: true },
+      webPreferences: { nodeIntegration: true, nativeWindowOpen: false },
     });
 
     updaterWindow.on('ready-to-show', () => {

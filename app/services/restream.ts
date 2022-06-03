@@ -311,6 +311,7 @@ export class RestreamService extends StatefulService<IRestreamState> {
       webPreferences: {
         partition,
         nodeIntegration: false,
+        nativeWindowOpen: false,
       },
     });
 
