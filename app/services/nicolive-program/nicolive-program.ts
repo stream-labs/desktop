@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 import { BehaviorSubject } from 'rxjs';
 import { Inject } from 'services/core/injector';
 import { mutation, StatefulService } from 'services/core/stateful-service';

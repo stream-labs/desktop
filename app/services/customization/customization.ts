@@ -17,7 +17,6 @@ import {
  */
 export class CustomizationService
   extends PersistentStatefulService<ICustomizationServiceState>
-  // eslint-disable-next-line prettier/prettier
   implements ICustomizationServiceApi {
   static defaultState: ICustomizationServiceState = {
     performanceMode: false,

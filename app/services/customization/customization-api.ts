@@ -25,7 +25,6 @@ export interface ICustomizationServiceState {
   experimental: any;
 }
 
-// eslint-disable-next-line prettier/prettier
 export interface ICustomizationSettings extends ICustomizationServiceState { }
 
 export interface ICustomizationServiceApi {
