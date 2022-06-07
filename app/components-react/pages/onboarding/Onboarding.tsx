@@ -7,7 +7,7 @@ import cx from 'classnames';
 import { $t } from 'services/i18n';
 import * as stepComponents from './steps';
 import Utils from 'services/utils';
-import {IOnboardingStep, ONBOARDING_STEPS} from 'services/onboarding';
+import { IOnboardingStep, ONBOARDING_STEPS } from 'services/onboarding';
 import Scrollable from 'components-react/shared/Scrollable';
 
 export default function Onboarding() {
@@ -51,9 +51,7 @@ export default function Onboarding() {
 }
 
 function TopBar() {
-  const { stepIndex, preboardingOffset, singletonStep, steps } = useModule(
-    OnboardingModule,
-  );
+  const { stepIndex, preboardingOffset, singletonStep, steps } = useModule(OnboardingModule);
 
   if (stepIndex < preboardingOffset || singletonStep) {
     return <div />;
