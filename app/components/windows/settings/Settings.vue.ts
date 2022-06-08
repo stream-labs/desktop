@@ -12,7 +12,6 @@ import InstalledApps from 'components/InstalledApps.vue';
 import Hotkeys from './Hotkeys.vue';
 import OverlaySettings from './OverlaySettings';
 import NotificationsSettings from './NotificationsSettings.vue';
-import GameOverlaySettings from './GameOverlaySettings';
 import SearchablePages from 'components/shared/SearchablePages';
 import FormInput from 'components/shared/inputs/FormInput.vue';
 import VirtualWebcamSettings from './VirtualWebcamSettings';
@@ -37,7 +36,6 @@ import Utils from '../../../services/utils';
     OverlaySettings,
     NotificationsSettings,
     InstalledApps,
-    GameOverlaySettings,
     FormInput,
     VirtualWebcamSettings,
     Scrollable,
@@ -135,7 +133,7 @@ export default class Settings extends Vue {
       'Appearance',
       'Remote Control',
       // 'VirtualWebcam',
-      // 'GameOverlay'
+      'Game Overlay',
       'Get Support',
     ];
     if (Utils.isDevMode()) pages.push('Experimental');

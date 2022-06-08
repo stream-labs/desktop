@@ -1,5 +1,4 @@
-import React, { useState, useRef, useMemo } from 'react';
-import { Provider } from 'react-redux';
+import React from 'react';
 import { BoolButtonInput, ListInput, SwitchInput } from 'components-react/shared/inputs';
 import InputWrapper from 'components-react/shared/inputs/InputWrapper';
 import { TObsValue, IObsListInput, IObsInput } from 'components/obs/inputs/ObsInput';
@@ -9,7 +8,6 @@ import { $t } from 'services/i18n';
 import Utils from 'services/utils';
 import styles from './AdvancedAudio.m.less';
 import { ObsSettings, ObsSettingsSection } from '../../windows/settings/ObsSettings';
-import { store } from '../../store';
 
 const trackOptions = [
   { label: '1', value: 1 },
@@ -136,9 +134,8 @@ export default function GlobalSettings() {
           </InputWrapper>
         )}
       </ObsSettingsSection>
-      <Provider store={store}>
-        <ObsSettings page="Audio" />
-      </Provider>
+
+      <ObsSettings page="Audio" />
     </>
   );
 }

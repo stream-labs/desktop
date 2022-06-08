@@ -20,12 +20,12 @@ export abstract class BaseInputController<TValue> {
   /**
    * Set the input value
    */
-  abstract async setValue(value: TValue): Promise<string | Error | void>;
+  abstract setValue(value: TValue): Promise<string | Error | void>;
 
   /**
    * Get the current input value
    */
-  abstract async getValue(): Promise<TValue>;
+  abstract getValue(): Promise<TValue>;
 
   /**
    * Set the display value

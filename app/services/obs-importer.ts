@@ -223,7 +223,9 @@ export class ObsImporterService extends StatefulService<{ progress: number; tota
 
             if (sourceJSON.id === 'browser_source') {
               sourceJSON.settings.shutdown = true;
-              const widgetType = this.widgetsService.getWidgetTypeByUrl(sourceJSON.settings.url);
+              const widgetType: number = this.widgetsService.getWidgetTypeByUrl(
+                sourceJSON.settings.url,
+              );
               if (widgetType !== -1) {
                 propertiesManager = 'widget';
                 propertiesManagerSettings = { widgetType };

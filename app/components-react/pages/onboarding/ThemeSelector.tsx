@@ -1,11 +1,11 @@
 import { Services } from 'components-react/service-provider';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { $t } from 'services/i18n';
 import { IThemeMetadata } from 'services/onboarding';
 import commonStyles from './Common.m.less';
 import styles from './ThemeSelector.m.less';
 import cx from 'classnames';
-import { useModule } from 'components-react/hooks/useModule';
+import { useModule } from 'slap';
 import { OnboardingModule } from './Onboarding';
 import AutoProgressBar from 'components-react/shared/AutoProgressBar';
 import { usePromise } from 'components-react/hooks';
@@ -19,7 +19,7 @@ export function ThemeSelector() {
   const [progress, setProgress] = useState(0);
   const detailIndex = themesMetadata.findIndex(theme => theme.data.id === showDetail);
   const detailTheme = themesMetadata[detailIndex];
-  const { setProcessing, next } = useModule(OnboardingModule).select();
+  const { setProcessing, next } = useModule(OnboardingModule);
 
   function getFilteredMetadata() {
     if (!showDetail) return themesMetadata;
@@ -120,9 +120,9 @@ export function ThemeSelector() {
             )}
           </div>
         ) : (
-          <div className={styles.progressBar}>
-            <p>{$t('Installing theme...')}</p>
+          <div style={{ margin: 'auto', marginTop: 24, width: '80%' }}>
             <AutoProgressBar percent={progress} timeTarget={60 * 1000} />
+            <p>{$t('Installing theme...')}</p>
           </div>
         )}
       </div>

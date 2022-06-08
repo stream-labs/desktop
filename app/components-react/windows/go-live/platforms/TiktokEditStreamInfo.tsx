@@ -1,4 +1,3 @@
-import { useGoLiveSettings } from '../useGoLiveSettings';
 import React from 'react';
 import { createBinding, TextInput } from '../../../shared/inputs';
 import Form from '../../../shared/inputs/Form';

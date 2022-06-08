@@ -1,165 +1,152 @@
 import css from './FacebookEditStreamInfo.m.less';
 import { CommonPlatformFields } from '../CommonPlatformFields';
 import React from 'react';
-import { Services } from '../../../service-provider';
+import { inject, injectFormBinding, injectState, useModule } from 'slap';
 import Form from '../../../shared/inputs/Form';
-import { useOnCreate, useFormState } from '../../../hooks';
-import { EDismissable } from '../../../../services/dismissables';
-import { $t } from '../../../../services/i18n';
-import { createBinding, ListInput } from '../../../shared/inputs';
+import { DismissablesService, EDismissable } from 'services/dismissables';
+import { StreamingService } from 'services/streaming';
+import { UserService } from 'services/user';
+import { NavigationService } from 'services/navigation';
+import { ListInput } from '../../../shared/inputs';
 import GameSelector from '../GameSelector';
 import {
+  FacebookService,
   IFacebookLiveVideoExtended,
   IFacebookStartStreamOptions,
   TDestinationType,
   TFacebookStreamPrivacy,
-} from '../../../../services/platforms/facebook';
+} from 'services/platforms/facebook';
 import moment from 'moment';
 import Translate from '../../../shared/Translate';
 import { IListOption } from '../../../shared/inputs/ListInput';
 import MessageLayout from '../MessageLayout';
-import PlatformSettingsLayout, { IPlatformComponentParams } from './PlatformSettingsLayout';
-import { useSelector } from '../../../store';
+import PlatformSettingsLayout, {
+  IPlatformComponentParams,
+  TLayoutMode
+} from './PlatformSettingsLayout';
 import { assertIsDefined } from '../../../../util/properties-type-guards';
 import * as remote from '@electron/remote';
+import { $t } from 'services/i18n';
+import { Services } from '../../../service-provider';
 
-export default function FacebookEditStreamInfo(p: IPlatformComponentParams<'facebook'>) {
-  const fbSettings = p.value;
-  const { isUpdateMode, isScheduleMode } = p;
 
-  // inject services
-  const {
-    FacebookService,
-    DismissablesService,
-    StreamingService,
-    UserService,
-    NavigationService,
-    WindowsService,
-  } = Services;
+class FacebookEditStreamInfoModule {
 
-  const {
-    pages,
-    groups,
-    canStreamToTimeline,
-    canStreamToGroup,
-    isPrimary,
-    shouldShowGamingWarning,
-    shouldShowPermissionWarn,
-  } = useSelector(() => {
-    const fbState = FacebookService.state;
-    const hasPages = !!fbState.facebookPages.length;
-    const canStreamToTimeline = fbState.grantedPermissions.includes('publish_video');
-    const canStreamToGroup = fbState.grantedPermissions.includes('publish_to_groups');
-    const view = StreamingService.views;
-    return {
-      canStreamToTimeline,
-      canStreamToGroup,
-      hasPages,
-      shouldShowGamingWarning: hasPages && fbSettings.game,
-      shouldShowPermissionWarn:
-        (!canStreamToTimeline || !canStreamToGroup) &&
-        DismissablesService.views.shouldShow(EDismissable.FacebookNeedPermissionsTip),
-      groups: fbState.facebookGroups,
-      pages: fbState.facebookPages,
-      isPrimary: view.checkPrimaryPlatform('facebook'),
-    };
-  });
-
-  const shouldShowDestinationType = !fbSettings.liveVideoId;
-  const shouldShowGroups =
-    fbSettings.destinationType === 'group' && !isUpdateMode && !fbSettings.liveVideoId;
-  const shouldShowPages =
-    fbSettings.destinationType === 'page' && !isUpdateMode && !fbSettings.liveVideoId;
-  const shouldShowEvents = !isUpdateMode && !isScheduleMode;
-  const shouldShowPrivacy = fbSettings.destinationType === 'me';
-  const shouldShowPrivacyWarn =
-    (!fbSettings.liveVideoId && fbSettings.privacy?.value !== 'SELF') ||
-    (fbSettings.liveVideoId && fbSettings.privacy?.value);
-  const shouldShowGame = !isUpdateMode;
-
-  function updateSettings(patch: Partial<IFacebookStartStreamOptions>) {
-    p.onChange({ ...fbSettings, ...patch });
-  }
-
-  const bind = createBinding(fbSettings, newFbSettings => updateSettings(newFbSettings));
-
-  // define the local state
-  const { s, setItem, updateState } = useFormState({
+  fbService = inject(FacebookService);
+  dismissables = inject(DismissablesService);
+  streamingService = inject(StreamingService);
+  state = injectState({
     pictures: {} as Record<string, string>,
     scheduledVideos: [] as IFacebookLiveVideoExtended[],
     scheduledVideosLoaded: false,
   });
 
-  useOnCreate(() => {
-    loadScheduledBroadcasts();
-    if (fbSettings.pageId) loadPicture(fbSettings.pageId);
-    if (fbSettings.groupId) loadPicture(fbSettings.groupId);
-  });
+  fbState = this.fbService.state;
+  canStreamToTimeline = this.fbState.grantedPermissions.includes('publish_video');
+  canStreamToGroup = this.fbState.grantedPermissions.includes('publish_to_groups');
+  pages = this.fbState.facebookPages;
+  groups = this.fbState.facebookGroups;
+  isPrimary = this.streamingService.views.isPrimaryPlatform('facebook');
+  isScheduleMode = false;
+  props: IPlatformComponentParams<'facebook'>;
 
-  function setPrivacy(privacy: TFacebookStreamPrivacy) {
-    updateSettings({ privacy: { value: privacy } });
+  get settings() {
+    return this.props.value;
   }
 
-  async function loadScheduledBroadcasts() {
-    let destinationId = FacebookService.views.getDestinationId(fbSettings);
-    if (!destinationId) return;
+  setProps(props: IPlatformComponentParams<'facebook'>) {
+    this.props = props;
+    if (!this.state.scheduledVideosLoaded) this.loadScheduledBroadcasts();
+    if (this.settings.pageId) this.loadPicture(this.settings.pageId);
+    if (this.settings.groupId) this.loadPicture(this.settings.groupId);
+  }
 
-    // by some unknown reason FB returns scheduled events for groups
-    // only if you request these events from the user's personal page
-    const destinationType =
-      fbSettings.destinationType === 'group' ? 'me' : fbSettings.destinationType;
-    if (destinationType === 'me') destinationId = 'me';
+  updateSettings(patch: Partial<IFacebookStartStreamOptions>) {
+    this.props.onChange({ ...this.settings, ...patch });
+  }
 
-    const scheduledVideos = await FacebookService.actions.return.fetchAllVideos(true);
-    const selectedVideoId = fbSettings.liveVideoId;
-    const shouldFetchSelectedVideo =
-      selectedVideoId && !scheduledVideos.find(v => v.id === selectedVideoId);
+  setPrivacy(privacy: TFacebookStreamPrivacy) {
+    this.updateSettings({ privacy: { value: privacy } });
+  }
 
-    if (shouldFetchSelectedVideo) {
-      assertIsDefined(selectedVideoId);
-      const selectedVideo = await FacebookService.actions.return.fetchVideo(
-        selectedVideoId,
-        destinationType,
-        destinationId,
-      );
-      scheduledVideos.push(selectedVideo);
-    }
+  bind = injectFormBinding(
+    () => this.settings,
+      newFbSettings => this.updateSettings(newFbSettings),
+  );
 
-    updateState({
-      scheduledVideos,
-      scheduledVideosLoaded: true,
+  get layoutMode() {
+    return this.props.layoutMode;
+  }
+
+  get isUpdateMode() {
+    return this.props.isUpdateMode;
+  }
+
+  get shouldShowGamingWarning() {
+    return this.pages.length && this.settings.game;
+  }
+
+  get shouldShowPermissionWarn() {
+    return (!this.canStreamToTimeline || !this.canStreamToGroup) &&
+    this.dismissables.views.shouldShow(EDismissable.FacebookNeedPermissionsTip);
+  }
+
+  get shouldShowDestinationType() {
+    return !this.settings.liveVideoId;
+  }
+
+  get shouldShowGroups() {
+    return this.settings.destinationType === 'group' && !this.isUpdateMode && !this.settings.liveVideoId;
+  }
+
+  get shouldShowPages() {
+    return this.settings.destinationType === 'page' && !this.isUpdateMode && !this.settings.liveVideoId;
+  }
+
+  get shouldShowEvents() {
+    return !this.isUpdateMode && !this.props.isScheduleMode;
+  }
+
+  get shouldShowGame() {
+    return !this.isUpdateMode;
+  }
+
+  get shouldShowPrivacy() {
+    return this.settings.destinationType === 'me';
+  }
+
+  get shouldShowPrivacyWarn() {
+    const fbSettings = this.settings;
+    return !!((!fbSettings.liveVideoId && fbSettings.privacy?.value !== 'SELF') ||
+    (fbSettings.liveVideoId && fbSettings.privacy?.value));
+  }
+
+  getDestinationOptions(): IListOption<TDestinationType>[] {
+    const options: IListOption<TDestinationType>[] = [
+      {
+        value: 'me' as TDestinationType,
+        label: $t('Share to Your Timeline'),
+        image: this.fbState.userAvatar,
+      },
+      {
+        value: 'page' as TDestinationType,
+        label: $t('Share to a Page You Manage'),
+        image: 'https://slobs-cdn.streamlabs.com/media/fb-page.png',
+      },
+      {
+        value: 'group' as TDestinationType,
+        label: $t('Share in a Group'),
+        image: 'https://slobs-cdn.streamlabs.com/media/fb-group.png',
+      },
+    ].filter(opt => {
+      if (opt.value === 'me' && !this.canStreamToTimeline) return false;
+      if (opt.value === 'group' && !this.canStreamToGroup) return false;
+      return true;
     });
+    return options;
   }
 
-  async function loadPicture(objectId: string) {
-    if (s.pictures[objectId]) return s.pictures[objectId];
-    setItem('pictures', objectId, await FacebookService.actions.return.fetchPicture(objectId));
-  }
-
-  function loadPictures(groupOrPage: IFacebookStartStreamOptions['destinationType']) {
-    const ids =
-      groupOrPage === 'group'
-        ? FacebookService.state.facebookGroups.map(item => item.id)
-        : FacebookService.state.facebookPages.map(item => item.id);
-    ids.forEach(id => loadPicture(id));
-  }
-
-  function verifyGroup() {
-    const groupId = fbSettings.groupId;
-    remote.shell.openExternal(`https://www.facebook.com/groups/${groupId}/edit`);
-  }
-
-  function dismissWarning() {
-    DismissablesService.actions.dismiss(EDismissable.FacebookNeedPermissionsTip);
-  }
-
-  function reconnectFB() {
-    const platform = 'facebook';
-    NavigationService.actions.navigate('PlatformMerge', { platform });
-    WindowsService.actions.closeChildWindow();
-  }
-
-  function getPrivacyOptions(): IListOption<TFacebookStreamPrivacy>[] {
+  getPrivacyOptions(): IListOption<TFacebookStreamPrivacy>[] {
     const options: any = [
       {
         value: 'EVERYONE',
@@ -179,22 +166,17 @@ export default function FacebookEditStreamInfo(p: IPlatformComponentParams<'face
     ];
 
     // we cant read the privacy property of already created video
-    if (fbSettings.liveVideoId || isUpdateMode) {
+    if (this.settings.liveVideoId || this.isUpdateMode) {
       options.unshift({ value: '', label: $t('Do not change privacy settings') });
     }
     return options;
   }
 
-  async function reLogin() {
-    await UserService.actions.return.reLogin();
-    StreamingService.actions.showGoLiveWindow();
-  }
-
-  async function onEventChange(liveVideoId: string) {
+  async onEventChange(liveVideoId: string) {
     if (!liveVideoId) {
       // reset destination settings if event has been unselected
-      const { groupId, pageId } = FacebookService.state.settings;
-      updateSettings({
+      const { groupId, pageId } = this.fbState.settings;
+      this.updateSettings({
         liveVideoId,
         pageId,
         groupId,
@@ -202,226 +184,304 @@ export default function FacebookEditStreamInfo(p: IPlatformComponentParams<'face
       return;
     }
 
-    const liveVideo = s.scheduledVideos.find(vid => vid.id === liveVideoId);
+    const liveVideo = this.state.scheduledVideos.find(vid => vid.id === liveVideoId);
     assertIsDefined(liveVideo);
-    const newSettings = await FacebookService.actions.return.fetchStartStreamOptionsForVideo(
+    const newSettings = await this.fbService.actions.return.fetchStartStreamOptionsForVideo(
       liveVideoId,
       liveVideo.destinationType,
       liveVideo.destinationId,
     );
-    updateSettings(newSettings);
+    this.updateSettings(newSettings);
   }
 
-  function renderCommonFields() {
-    return (
-      <CommonPlatformFields
-        key="common"
-        platform="facebook"
-        layoutMode={p.layoutMode}
-        value={fbSettings}
-        onChange={updateSettings}
-      />
-    );
-  }
+  private async loadScheduledBroadcasts() {
+    let destinationId = this.fbService.views.getDestinationId(this.settings);
+    if (!destinationId) return;
+    const fbSettings = this.settings;
+    const fbService = this.fbService;
 
-  function renderRequiredFields() {
-    return (
-      <div key="required">
-        {!isUpdateMode && (
-          <>
-            {shouldShowDestinationType && (
-              <ListInput
-                label={$t('Facebook Destination')}
-                {...bind.destinationType}
-                hasImage
-                imageSize={{ width: 35, height: 35 }}
-                options={getDestinationOptions()}
-              />
-            )}
-            {shouldShowPages && (
-              <ListInput
-                {...bind.pageId}
-                required={true}
-                label={$t('Facebook Page')}
-                hasImage
-                imageSize={{ width: 44, height: 44 }}
-                onDropdownVisibleChange={shown => shown && loadPictures('page')}
-                options={pages.map(page => ({
-                  value: page.id,
-                  label: `${page.name} | ${page.category}`,
-                  image: s.pictures[page.id],
-                }))}
-              />
-            )}
-            {shouldShowGroups && (
-              <>
-                <ListInput
-                  {...bind.groupId}
-                  required={true}
-                  label={$t('Facebook Group')}
-                  hasImage
-                  imageSize={{ width: 44, height: 44 }}
-                  options={groups.map(group => ({
-                    value: group.id,
-                    label: group.name,
-                    image: s.pictures[group.id],
-                  }))}
-                  defaultActiveFirstOption
-                  onDropdownVisibleChange={() => loadPictures('group')}
-                  extra={
-                    <p>
-                      {$t('Make sure the Streamlabs app is added to your Group.')}
-                      <a onClick={verifyGroup}> {$t('Click here to verify.')}</a>
-                    </p>
-                  }
-                />
-              </>
-            )}
-          </>
-        )}
-      </div>
-    );
-  }
+    // by some unknown reason FB returns scheduled events for groups
+    // only if you request these events from the user's personal page
+    const destinationType =
+      fbSettings.destinationType === 'group' ? 'me' : fbSettings.destinationType;
+    if (destinationType === 'me') destinationId = 'me';
 
-  function renderEvents() {
-    return (
-      <div key="events">
-        {shouldShowEvents && (
-          <ListInput
-            {...bind.liveVideoId}
-            onChange={onEventChange}
-            label={$t('Scheduled Video')}
-            loading={!s.scheduledVideosLoaded}
-            allowClear
-            placeholder={$t('Not selected')}
-            options={[
-              ...s.scheduledVideos.map(v => ({
-                label: `${v.title} ${
-                  v.planned_start_time ? moment(new Date(v.planned_start_time)).calendar() : ''
-                }`,
-                value: v.id,
-              })),
-            ]}
-          />
-        )}
-      </div>
-    );
-  }
+    const scheduledVideos = await fbService.actions.return.fetchAllVideos(true);
+    const selectedVideoId = fbSettings.liveVideoId;
+    const shouldFetchSelectedVideo =
+      selectedVideoId && !scheduledVideos.find(v => v.id === selectedVideoId);
 
-  function renderOptionalFields() {
-    return (
-      <div key="optional">
-        {shouldShowPrivacy && (
-          <ListInput
-            label={$t('Privacy')}
-            value={fbSettings.privacy?.value}
-            onChange={setPrivacy}
-            hasImage={true}
-            imageSize={{ width: 24, height: 24 }}
-            options={getPrivacyOptions()}
-            className={css.privacySelector}
-            extra={
-              shouldShowPrivacyWarn && (
-                <Translate message={$t('FBPrivacyWarning')}>
-                  <a
-                    slot="link"
-                    onClick={() =>
-                      remote.shell.openExternal(
-                        'https://www.facebook.com/settings?tab=business_tools',
-                      )
-                    }
-                  />
-                </Translate>
-              )
-            }
-          />
-        )}
+    if (shouldFetchSelectedVideo) {
+      assertIsDefined(selectedVideoId);
+      const selectedVideo = await fbService.actions.return.fetchVideo(
+        selectedVideoId,
+        destinationType,
+        destinationId,
+      );
+      scheduledVideos.push(selectedVideo);
+    }
 
-        {shouldShowGame && (
-          <GameSelector
-            {...bind.game}
-            platform="facebook"
-            extra={
-              shouldShowGamingWarning && (
-                <Translate message={$t('facebookGamingWarning')}>
-                  <a slot="createPageLink" onClick={() => FacebookService.actions.createFBPage()} />
-                </Translate>
-              )
-            }
-          />
-        )}
-      </div>
-    );
-  }
-
-  function renderMissedPermissionsWarning() {
-    return (
-      <MessageLayout
-        message={$t('You can stream to your timeline and groups now')}
-        type={'success'}
-      >
-        {isPrimary && (
-          <div>
-            <div>{$t('Please log-out and log-in again to get these new features')}</div>
-            <button className="button button--facebook" onClick={reLogin}>
-              {$t('Re-login now')}
-            </button>
-            <button className="button button--trans" onClick={dismissWarning}>
-              {$t('Do not show this message again')}
-            </button>
-          </div>
-        )}
-        {!isPrimary && (
-          <div>
-            <div>{$t('Please reconnect Facebook to get these new features')}</div>
-            <button className="button button--facebook" onClick={reconnectFB}>
-              {$t('Reconnect now')}
-            </button>
-            <button className="button button--trans" onClick={dismissWarning}>
-              {$t('Do not show this message again')}
-            </button>
-          </div>
-        )}
-      </MessageLayout>
-    );
-  }
-
-  function getDestinationOptions(): IListOption<TDestinationType>[] {
-    const options: IListOption<TDestinationType>[] = [
-      {
-        value: 'me' as TDestinationType,
-        label: $t('Share to Your Timeline'),
-        image: FacebookService.state.userAvatar,
-      },
-      {
-        value: 'page' as TDestinationType,
-        label: $t('Share to a Page You Manage'),
-        image: 'https://slobs-cdn.streamlabs.com/media/fb-page.png',
-      },
-      {
-        value: 'group' as TDestinationType,
-        label: $t('Share in a Group'),
-        image: 'https://slobs-cdn.streamlabs.com/media/fb-group.png',
-      },
-    ].filter(opt => {
-      if (opt.value === 'me' && !canStreamToTimeline) return false;
-      if (opt.value === 'group' && !canStreamToGroup) return false;
-      return true;
+    this.state.update({
+      scheduledVideos,
+      scheduledVideosLoaded: true,
     });
-    return options;
   }
 
+  loadPictures(groupOrPage: IFacebookStartStreamOptions['destinationType']) {
+    const ids =
+      groupOrPage === 'group'
+        ? this.fbState.facebookGroups.map(item => item.id)
+        : this.fbState.facebookPages.map(item => item.id);
+    ids.forEach(id => this.loadPicture(id));
+  }
+
+  async loadPicture(objectId: string) {
+    const state = this.state;
+    if (state.pictures[objectId]) return state.pictures[objectId];
+    const picture = await this.fbService.actions.return.fetchPicture(objectId);
+    state.setPictures({ ...state.pictures, [objectId]: picture });
+  }
+
+  verifyGroup() {
+    remote.shell.openExternal(`https://www.facebook.com/groups/${this.settings.groupId}/edit`);
+  }
+
+}
+
+export default function FacebookEditStreamInfo(p: IPlatformComponentParams<'facebook'>) {
+  const { shouldShowPermissionWarn, setProps } = useModule(FacebookEditStreamInfoModule, true);
+  setProps(p);
   return (
     <Form name="facebook-settings">
-      {shouldShowPermissionWarn && renderMissedPermissionsWarning()}
+      {shouldShowPermissionWarn && <PermissionsWarning />}
 
       <PlatformSettingsLayout
         layoutMode={p.layoutMode}
-        commonFields={renderCommonFields()}
-        requiredFields={renderRequiredFields()}
-        optionalFields={renderOptionalFields()}
-        essentialOptionalFields={renderEvents()}
+        commonFields={<CommonFields key="common" />}
+        requiredFields={<RequiredFields key="required" />}
+        optionalFields={<OptionalFields key="optional" />}
+        essentialOptionalFields={<Events key="events" />}
       />
     </Form>
   );
+}
+
+function CommonFields() {
+  const { settings, updateSettings, layoutMode } = useFacebook();
+
+  return <CommonPlatformFields
+    key="common"
+    platform="facebook"
+    layoutMode={layoutMode}
+    value={settings}
+    onChange={updateSettings}
+  />;
+}
+
+function RequiredFields() {
+  const {
+    isUpdateMode,
+    shouldShowDestinationType,
+    bind,
+    shouldShowPages,
+    pages,
+    groups,
+    shouldShowGroups,
+    pictures,
+    loadPictures,
+    getDestinationOptions,
+    verifyGroup,
+  } = useFacebook();
+
+  return (
+    <div key="required">
+      {!isUpdateMode && (
+        <>
+          {shouldShowDestinationType && (
+            <ListInput
+              label={$t('Facebook Destination')}
+              {...bind.destinationType}
+              hasImage
+              imageSize={{ width: 35, height: 35 }}
+              options={getDestinationOptions()}
+            />
+          )}
+          {shouldShowPages && (
+            <ListInput
+              {...bind.pageId}
+              required={true}
+              label={$t('Facebook Page')}
+              hasImage
+              imageSize={{ width: 44, height: 44 }}
+              onDropdownVisibleChange={shown => shown && loadPictures('page')}
+              options={pages.map(page => ({
+                value: page.id,
+                label: `${page.name} | ${page.category}`,
+                image: pictures[page.id],
+              }))}
+            />
+          )}
+          {shouldShowGroups && (
+            <>
+              <ListInput
+                {...bind.groupId}
+                required={true}
+                label={$t('Facebook Group')}
+                hasImage
+                imageSize={{ width: 44, height: 44 }}
+                options={groups.map(group => ({
+                  value: group.id,
+                  label: group.name,
+                  image: pictures[group.id],
+                }))}
+                defaultActiveFirstOption
+                onDropdownVisibleChange={() => loadPictures('group')}
+                extra={
+                  <p>
+                    {$t('Make sure the Streamlabs app is added to your Group.')}
+                    <a onClick={verifyGroup}> {$t('Click here to verify.')}</a>
+                  </p>
+                }
+              />
+            </>
+          )}
+        </>
+      )}
+    </div>
+  );
+}
+
+
+function OptionalFields() {
+  const { shouldShowPrivacy, settings, setPrivacy, getPrivacyOptions, shouldShowPrivacyWarn, shouldShowGame, shouldShowGamingWarning, bind, fbService } = useFacebook();
+  return (
+    <div key="optional">
+      {shouldShowPrivacy && (
+        <ListInput
+          label={$t('Privacy')}
+          value={settings.privacy?.value}
+          onChange={setPrivacy}
+          hasImage={true}
+          imageSize={{ width: 24, height: 24 }}
+          options={getPrivacyOptions()}
+          className={css.privacySelector}
+          extra={
+            shouldShowPrivacyWarn && (
+              <Translate message={$t('FBPrivacyWarning')}>
+                <a
+                  slot="link"
+                  onClick={() =>
+                    remote.shell.openExternal(
+                      'https://www.facebook.com/settings?tab=business_tools',
+                    )
+                  }
+                />
+              </Translate>
+            )
+          }
+        />
+      )}
+
+      {shouldShowGame && (
+        <GameSelector
+          {...bind.game}
+          platform="facebook"
+          extra={
+            shouldShowGamingWarning && (
+              <Translate message={$t('facebookGamingWarning')}>
+                <a slot="createPageLink" onClick={() => fbService.actions.createFBPage()} />
+              </Translate>
+            )
+          }
+        />
+      )}
+    </div>
+  );
+}
+
+
+function Events() {
+  const { bind, shouldShowEvents, onEventChange, scheduledVideosLoaded, scheduledVideos } = useFacebook();
+  return (
+    <div key="events">
+      {shouldShowEvents && (
+        <ListInput
+          {...bind.liveVideoId}
+          onChange={onEventChange}
+          label={$t('Scheduled Video')}
+          loading={!scheduledVideosLoaded}
+          allowClear
+          placeholder={$t('Not selected')}
+          options={[
+            ...scheduledVideos.map(v => ({
+              label: `${v.title} ${
+                v.planned_start_time ? moment(new Date(v.planned_start_time)).calendar() : ''
+              }`,
+              value: v.id,
+            })),
+          ]}
+        />
+      )}
+    </div>
+  );
+}
+
+
+function PermissionsWarning() {
+  const { isPrimary, reLogin, dismissWarning, reconnectFB } = useFacebook().extend(module => ({
+
+    user: inject(UserService),
+    navigation: inject(NavigationService),
+    windows: Services.WindowsService,
+
+    async reLogin() {
+      await this.user.actions.return.reLogin();
+      module.streamingService.actions.showGoLiveWindow();
+    },
+
+    dismissWarning() {
+      module.dismissables.actions.dismiss(EDismissable.FacebookNeedPermissionsTip);
+    },
+
+    reconnectFB() {
+      const platform = 'facebook';
+      this.navigation.actions.navigate('PlatformMerge', { platform });
+      this.windows.actions.closeChildWindow();
+    },
+  }));
+
+  return (
+    <MessageLayout
+      message={$t('You can stream to your timeline and groups now')}
+      type={'success'}
+    >
+      {isPrimary && (
+        <div>
+          <div>{$t('Please log-out and log-in again to get these new features')}</div>
+          <button className="button button--facebook" onClick={reLogin}>
+            {$t('Re-login now')}
+          </button>
+          <button className="button button--trans" onClick={dismissWarning}>
+            {$t('Do not show this message again')}
+          </button>
+        </div>
+      )}
+      {!isPrimary && (
+        <div>
+          <div>{$t('Please reconnect Facebook to get these new features')}</div>
+          <button className="button button--facebook" onClick={reconnectFB}>
+            {$t('Reconnect now')}
+          </button>
+          <button className="button button--trans" onClick={dismissWarning}>
+            {$t('Do not show this message again')}
+          </button>
+        </div>
+      )}
+    </MessageLayout>
+  );
+}
+
+
+function useFacebook() {
+  return useModule(FacebookEditStreamInfoModule);
 }

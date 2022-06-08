@@ -36,18 +36,25 @@ import SourceShowcase from './windows/source-showcase';
 import SourceFilters from './windows/SourceFilters';
 import RecentEvents from './editor/elements/RecentEvents';
 import MiniFeed from './editor/elements/Minifeed';
+import RecordingPreview from './editor/elements/RecordingPreview';
+import StreamPreview from './editor/elements/StreamPreview';
 import BrowserView from './shared/BrowserView';
 import LegacyEvents from './editor/elements/LegacyEvents';
 import MediaGallery from './windows/MediaGallery';
 import LayoutEditor from './pages/layout-editor/LayoutEditor';
 import Projector from './windows/Projector';
-import SceneSelector from './editor/elements/SceneSelectorElement';
+import SceneSelector from './editor/elements/SceneSelector';
 import AddSource from './windows/AddSource';
 import SideNav from './sidebar/SideNav';
 import WelcomeToPrime from './windows/WelcomeToPrime';
+import Notifications from './windows/Notifications';
+import PlatformMerge from './pages/PlatformMerge';
 import AlertboxLibrary from './pages/AlertboxLibrary';
 import PlatformAppStore from './pages/PlatformAppStore';
 import BrowseOverlays from './pages/BrowseOverlays';
+import PlatformAppMainPage from './pages/PlatformAppMainPage';
+import PlatformAppPageView from './shared/PlatformAppPageView';
+import PlatformAppPopOut from './windows/PlatformAppPopOut';
 
 // list of React components to be used inside Vue components
 export const components = {
@@ -87,17 +94,24 @@ export const components = {
   WidgetWindow: createRoot(WidgetWindow),
   CustomCodeWindow: createRoot(CustomCodeWindow),
   SafeMode,
-  AdvancedAudio,
+  AdvancedAudio: createRoot(AdvancedAudio),
   SourceShowcase: createRoot(SourceShowcase),
   SourceFilters,
   RecentEvents,
   MiniFeed: createRoot(MiniFeed),
   LegacyEvents: createRoot(LegacyEvents),
+  RecordingPreview: createRoot(RecordingPreview),
+  StreamPreview: createRoot(StreamPreview),
   MediaGallery,
   LayoutEditor: createRoot(LayoutEditor),
   SceneSelector: createRoot(SceneSelector),
   AddSource,
   SideNav,
   WelcomeToPrime,
+  Notifications,
+  PlatformMerge,
   PlatformAppStore,
+  PlatformAppMainPage,
+  PlatformAppPageView,
+  PlatformAppPopOut,
 };

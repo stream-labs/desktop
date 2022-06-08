@@ -3,11 +3,10 @@ import { NavigationService } from 'services/navigation';
 import { UserService } from 'services/user';
 import { Inject, ViewHandler } from 'services/core/';
 import { SceneCollectionsService } from 'services/scene-collections';
-import TsxComponent from 'components/tsx-component';
 import { OS } from 'util/operating-systems';
 import { $t } from './i18n';
-import { handleResponse, jfetch } from 'util/requests';
-import { getPlatformService, IPlatformCapabilityResolutionPreset } from './platforms';
+import { jfetch } from 'util/requests';
+import { getPlatformService } from './platforms';
 import { OutputSettingsService } from './settings';
 import { ObsImporterService } from './obs-importer';
 import Utils from './utils';
@@ -178,9 +177,9 @@ class OnboardingViews extends ViewHandler<IOnboardingServiceState> {
       steps.push(ONBOARDING_STEPS()[EOnboardingSteps.Optimize]);
     }
 
-    if (userViews.isLoggedIn && !userViews.isPrime) {
-      steps.push(ONBOARDING_STEPS()[EOnboardingSteps.Prime]);
-    }
+    // if (userViews.isLoggedIn && !userViews.isPrime) {
+    //   steps.push(ONBOARDING_STEPS()[EOnboardingSteps.Prime]);
+    // }
 
     return steps;
   }
