@@ -80,7 +80,7 @@ export class Source implements ISourceApi {
         sceneItem.getObsSceneItem().visible = false;
       } else {
         // Return everything to the state in the UI
-        sceneItem.setVisibility(sceneItem.visible);
+        sceneItem.getObsSceneItem().visible = sceneItem.visible;
       }
     });
   }

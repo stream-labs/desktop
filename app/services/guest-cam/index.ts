@@ -113,6 +113,9 @@ export interface IConsumerTrackEvent {
 // TODO: What does this look like?
 interface IConsumerDestroyedEvent {
   type: 'consumerDestroyed';
+  data: {
+    socketId: string;
+  };
 }
 
 interface ISocketAuthResponse {
@@ -135,7 +138,6 @@ export enum EGuestCamStatus {
 
 interface IGuest {
   name: string;
-  visible: boolean;
 }
 
 interface IGuestCamServiceState {
@@ -194,6 +196,18 @@ class GuestCamViews extends ViewHandler<IGuestCamServiceState> {
     return this.getServiceViews(SourcesService).sources.find(s => {
       return s.type === sourceType && s.getSettings().device_id === this.audioDevice;
     });
+  }
+
+  get sourceId() {
+    return this.getServiceViews(SourcesService).getSourcesByType('mediasoupconnector')[0]?.sourceId;
+  }
+
+  get source() {
+    return this.getServiceViews(SourcesService).getSource(this.sourceId);
+  }
+
+  get inviteUrl() {
+    return `https://streamlabs-obs-dev.s3.us-west-2.amazonaws.com/guestcam/build/index.html#/join/${this.state.inviteHash}`;
   }
 }
 
@@ -262,7 +276,7 @@ export class GuestCamService extends PersistentStatefulService<IGuestCamServiceS
       if (firstVideoDevice) this.SET_VIDEO_DEVICE(firstVideoDevice.id);
     }
 
-    if (this.getSourceId()) {
+    if (this.views.sourceId) {
       this.startListeningForGuests();
     }
 
@@ -313,7 +327,7 @@ export class GuestCamService extends PersistentStatefulService<IGuestCamServiceS
     if (existingLinks.links.length) {
       this.SET_INVITE_HASH(existingLinks.links[0].hash);
     } else {
-      const link = await this.createInviteLink(this.getSourceId());
+      const link = await this.createInviteLink(this.views.sourceId);
       this.SET_INVITE_HASH(link.hash);
     }
   }
@@ -352,7 +366,7 @@ export class GuestCamService extends PersistentStatefulService<IGuestCamServiceS
    * - All sources and filters are updated with the room id
    */
   private ensureSourceAndFilters(roomId: string) {
-    if (!this.getSourceId()) {
+    if (!this.views.sourceId) {
       throw new Error('Tried to start producer but mediasoup source does not exist');
     }
 
@@ -456,7 +470,7 @@ export class GuestCamService extends PersistentStatefulService<IGuestCamServiceS
       this.auth = await this.authenticateSocket(token);
       this.log('Socket Authenticated', this.auth);
 
-      this.getSource().updateSettings({ room: this.room });
+      this.views.source.updateSettings({ room: this.room });
 
       this.makeObsRequest('func_routerRtpCapabilities', this.auth.rtpCapabilities);
     });
@@ -487,6 +501,8 @@ export class GuestCamService extends PersistentStatefulService<IGuestCamServiceS
 
     this.log('New guest joined', event);
 
+    this.SET_GUEST({ name: event.data.name });
+
     // Clean up any existing consumer before connecting the new one
     if (this.consumer) {
       this.consumer.destroy();
@@ -503,7 +519,13 @@ export class GuestCamService extends PersistentStatefulService<IGuestCamServiceS
   }
 
   async onGuestLeave(event: IConsumerDestroyedEvent) {
-    this.log('ON GUEST LEAVE', event);
+    this.log('Guest left', event);
+
+    if (this.consumer && this.consumer.remoteProducer.socketId === event.data.socketId) {
+      this.consumer.destroy();
+      this.consumer = null;
+      this.SET_GUEST(null);
+    }
   }
 
   async authenticateSocket(token: string): Promise<ISocketAuthResponse> {
@@ -522,14 +544,6 @@ export class GuestCamService extends PersistentStatefulService<IGuestCamServiceS
     });
   }
 
-  getSourceId() {
-    return this.sourcesService.views.getSourcesByType('mediasoupconnector')[0]?.sourceId;
-  }
-
-  getSource() {
-    return this.sourcesService.views.getSource(this.getSourceId());
-  }
-
   makeObsRequest<TFunc extends keyof IObsReturnTypes>(
     func: TFunc,
     arg?: Object,
@@ -544,7 +558,7 @@ export class GuestCamService extends PersistentStatefulService<IGuestCamServiceS
       throw new Error(`Unsupported arg type for OBS call ${arg}`);
     }
 
-    let result = (this.getSource().getObsInput().callHandler(func, stringArg) as any).output;
+    let result = (this.views.source.getObsInput().callHandler(func, stringArg) as any).output;
 
     if (result !== '') {
       result = JSON.parse(result);

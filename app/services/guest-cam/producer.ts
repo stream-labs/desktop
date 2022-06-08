@@ -8,13 +8,16 @@ export class Producer extends MediasoupEntity {
 
   connected = false;
 
+  streamId: string;
+  transportId: string;
+
   async connect() {
     return this.withMutex(async () => {
-      const streamId = uuid();
+      this.streamId = uuid();
       const result = await this.sendWebRTCRequest({
         type: 'createProducer',
         data: {
-          streamId,
+          streamId: this.streamId,
           type: 'stream',
           name: this.userService.views.platform.username,
           tracks: 2,
@@ -47,12 +50,14 @@ export class Producer extends MediasoupEntity {
       const audioProduceResult = await this.sendWebRTCRequest({
         type: 'addProducerTrack',
         data: {
-          streamId,
+          streamId: this.streamId,
           producerTransportId: audioProduceParams.transportId,
           kind: audioProduceParams.kind,
           rtpParameters: audioProduceParams.rtpParameters,
         },
       });
+
+      this.transportId = audioProduceParams.transportId;
 
       // Always true - it's unclear what failure looks like from server
       this.makeObsRequest('func_produce_result', 'true');
@@ -67,7 +72,7 @@ export class Producer extends MediasoupEntity {
       const videoProduceResult = await this.sendWebRTCRequest({
         type: 'addProducerTrack',
         data: {
-          streamId,
+          streamId: this.streamId,
           producerTransportId: videoProduceParams.transportId,
           kind: videoProduceParams.kind,
           rtpParameters: videoProduceParams.rtpParameters,
@@ -86,6 +91,12 @@ export class Producer extends MediasoupEntity {
 
   destroy() {
     this.makeObsRequest('func_stop_sender', '');
+    if (this.streamId && this.transportId) {
+      this.sendWebRTCRequest({
+        type: 'closeProducerTrack',
+        data: { streamId: this.streamId, producerTransportId: this.transportId },
+      });
+    }
     super.destroy();
   }
 }

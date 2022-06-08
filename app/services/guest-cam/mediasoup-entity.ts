@@ -23,7 +23,7 @@ export abstract class MediasoupEntity {
   }
 
   getSource() {
-    return this.guestCamService.getSource();
+    return this.guestCamService.views.source;
   }
 
   makeObsRequest<TFunc extends keyof IObsReturnTypes>(
