@@ -4,7 +4,7 @@ import { Inject } from 'services/core/injector';
 import { Subject } from 'rxjs';
 import { PlatformAppsService } from 'services/platform-apps';
 import { ScenesService } from 'services/scenes';
-import { AudioService } from 'services/audio';
+import { AudioService, IAudioSource } from 'services/audio';
 
 interface ISourceFlags {
   audio: boolean;
@@ -17,6 +17,8 @@ interface ISourceSize {
   height: number;
 }
 
+type TMonitoringType = 'none' | 'monitor-only' | 'monitor-and-output';
+
 interface ISource {
   id: string;
   name: string;
@@ -28,6 +30,7 @@ interface ISource {
   appSourceId?: string;
   muted?: boolean;
   volume?: number;
+  monitoringType?: TMonitoringType;
 }
 
 export class SourcesModule extends Module {
@@ -162,6 +165,15 @@ export class SourcesModule extends Module {
     if (patch.volume != null) {
       this.audioService.views.getSource(patch.id).setDeflection(patch.volume);
     }
+
+    if (patch.monitoringType) {
+      const monitorTypes: TMonitoringType[] = ['none', 'monitor-only', 'monitor-and-output'];
+      const type = monitorTypes.findIndex(t => t === patch.monitoringType);
+
+      if (type != null) {
+        this.audioService.setSettings(patch.id, { monitoringType: type });
+      }
+    }
   }
 
   @apiMethod()
@@ -215,6 +227,9 @@ export class SourcesModule extends Module {
       const audioSource = this.audioService.views.getSource(source.sourceId);
       serialized.volume = audioSource.fader.deflection;
       serialized.muted = audioSource.muted;
+
+      const monitorTypes: TMonitoringType[] = ['none', 'monitor-only', 'monitor-and-output'];
+      serialized.monitoringType = monitorTypes[audioSource.monitoringType];
     }
 
     return serialized;
