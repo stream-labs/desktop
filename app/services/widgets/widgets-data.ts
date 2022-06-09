@@ -564,8 +564,8 @@ export const WidgetDisplayData = (platform?: string): { [x: number]: IWidgetDisp
   [WidgetType.EventList]: {
     name: $t('Event List'),
     description: $t("Include your channel's most recent events into your stream."),
-    demoVideo: true,
-    demoFilename: 'source-eventlist.mp4',
+    demoVideo: false,
+    demoFilename: 'source-eventlist.png',
     supportList: [
       $t('Donations'),
       $t('Subscriptions'),
