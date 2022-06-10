@@ -44,14 +44,14 @@ export type OptimizeSettings = {
   simpleUseAdvanced?: boolean;
   targetUsage?: 'quality' | 'balanced' | 'speed'; // for QSV
   encoderPreset?:
-    | 'ultrafast'
-    | 'superfast'
-    | 'veryfast'
-    | 'faster'
-    | 'fast'
-    | 'medium'
-    | 'slow'
-    | 'slower'; // for x264
+  | 'ultrafast'
+  | 'superfast'
+  | 'veryfast'
+  | 'faster'
+  | 'fast'
+  | 'medium'
+  | 'slow'
+  | 'slower'; // for x264
   NVENCPreset?: 'default' | 'mq' | 'hq' | 'hp' | 'll' | 'llhp' | 'llhq' | 'llhp'; // for NVENC
   advRateControl?: 'CBR' | 'VBR' | 'ABR' | 'CRF';
   videoBitrate?: number;
@@ -769,7 +769,7 @@ export class SettingsKeyAccessor {
    * @param keyDescriptions
    * @param f
    */
-  *travarseKeyDescriptions<T>(
+  *traverseKeyDescriptions<T>(
     keyDescriptions: KeyDescription[],
     f: (d: KeyDescription) => T,
   ): IterableIterator<T> {
@@ -780,7 +780,7 @@ export class SettingsKeyAccessor {
         if (value) {
           for (const dependent of item.dependents) {
             if (dependent.values.includes(value)) {
-              yield* this.travarseKeyDescriptions(dependent.params, f);
+              yield* this.traverseKeyDescriptions(dependent.params, f);
             }
           }
         }
@@ -789,7 +789,7 @@ export class SettingsKeyAccessor {
   }
 
   *getValues(keyDescriptions: KeyDescription[]): IterableIterator<OptimizeSettings> {
-    yield* this.travarseKeyDescriptions(
+    yield* this.traverseKeyDescriptions(
       keyDescriptions,
       (item: KeyDescription): OptimizeSettings => {
         /* DEBUG
@@ -807,7 +807,7 @@ export class SettingsKeyAccessor {
   }
 
   *getSettings(keyDescriptions: KeyDescription[]): IterableIterator<[OptimizationKey, any]> {
-    yield* this.travarseKeyDescriptions(
+    yield* this.traverseKeyDescriptions(
       keyDescriptions,
       (item: KeyDescription): [OptimizationKey, any] => {
         const setting = this.findSetting(item);
