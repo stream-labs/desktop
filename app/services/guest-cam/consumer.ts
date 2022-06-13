@@ -136,6 +136,7 @@ export class Consumer extends MediasoupEntity {
 
     this.makeObsRequest('func_stop_consumer', this.remoteProducer.audioId);
     this.makeObsRequest('func_stop_consumer', this.remoteProducer.videoId);
+    this.makeObsRequest('func_stop_receiver');
 
     super.destroy();
   }

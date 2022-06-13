@@ -5,7 +5,7 @@ import Display from 'components-react/shared/Display';
 import { ListInput, TextInput } from 'components-react/shared/inputs';
 import Form from 'components-react/shared/inputs/Form';
 import { ModalLayout } from 'components-react/shared/ModalLayout';
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { EGuestCamStatus } from 'services/guest-cam';
 import { EDeviceType } from 'services/hardware';
 import { $t } from 'services/i18n';
@@ -38,6 +38,7 @@ export default function GuestCamProperties() {
     source: GuestCamService.views.source,
     guestInfo: GuestCamService.state.guestInfo,
   }));
+  const [regeneratingLink, setRegeneratingLink] = useState(false);
 
   const videoSourceExists = !!useMemo(() => GuestCamService.views.findVideoSource(), [videoDevice]);
   const audioSourceExists = !!useMemo(() => GuestCamService.views.findAudioSource(), [audioDevice]);
@@ -46,6 +47,13 @@ export default function GuestCamProperties() {
     if (status === EGuestCamStatus.Busy) return;
     if (status === EGuestCamStatus.Offline) GuestCamService.actions.startProducing();
     if (status === EGuestCamStatus.Connected) GuestCamService.actions.stopProducing();
+  }
+
+  async function regenerateLink() {
+    setRegeneratingLink(true);
+    await GuestCamService.actions.return
+      .ensureInviteLink(true)
+      .finally(() => setRegeneratingLink(false));
   }
 
   return (
@@ -77,6 +85,12 @@ export default function GuestCamProperties() {
                   }
                 />
               </Form>
+              <Button disabled={regeneratingLink} onClick={regenerateLink}>
+                {$t('Generate a new link')}
+                {regeneratingLink && (
+                  <i className="fa fa-spinner fa-pulse" style={{ marginLeft: 8 }} />
+                )}
+              </Button>
             </div>
             <div style={{ width: 300, background: 'var(--section)', borderRadius: '0 8px 8px 0' }}>
               {/* Weird double div is to avoid display blocking border radius */}

@@ -57,6 +57,7 @@ export interface IObsReturnTypes {
   func_stop_consumer: {};
   func_stop_sender: {};
   func_change_playback_volume: {};
+  func_stop_receiver: {};
 }
 
 interface IRoomResponse {
@@ -151,6 +152,7 @@ interface IGuestCamServiceState {
 interface IInviteLink {
   source_id: string;
   hash: string;
+  id: number;
 }
 
 interface IInviteLinksResponse {
@@ -319,17 +321,32 @@ export class GuestCamService extends PersistentStatefulService<IGuestCamServiceS
     this.openSocketConnection(ioConfigResult.url, ioConfigResult.token);
   }
 
-  async ensureInviteLink() {
+  /**
+   * Ensures we have exactly one valid invite link
+   * @param force If true, will invalidate the old link and generate a new one
+   */
+  async ensureInviteLink(force = false) {
     const existingLinks = await this.getInviteLinks();
 
-    // For now we don't worry about tying invite links to individual guests.
-    // Just use whatever links already exist
-    if (existingLinks.links.length) {
-      this.SET_INVITE_HASH(existingLinks.links[0].hash);
-    } else {
-      const link = await this.createInviteLink(this.views.sourceId);
-      this.SET_INVITE_HASH(link.hash);
+    // Ensure there is only one link (or 0 if we want to regenerate)
+    const existingLink = existingLinks.links.shift();
+
+    // Delete all remaining links just in case the exist somehow
+    for (const link of existingLinks.links) {
+      await this.deleteInviteLink(link.id);
     }
+
+    if (existingLink && !force) {
+      this.SET_INVITE_HASH(existingLink.hash);
+      return;
+    }
+
+    if (existingLink && force) {
+      await this.deleteInviteLink(existingLink.id);
+    }
+
+    const newLink = await this.createInviteLink(this.views.sourceId);
+    this.SET_INVITE_HASH(newLink.hash);
   }
 
   /**
@@ -344,7 +361,7 @@ export class GuestCamService extends PersistentStatefulService<IGuestCamServiceS
 
     this.SET_STATUS(EGuestCamStatus.Busy);
 
-    this.ensureSourceAndFilters(this.room);
+    this.ensureSourceAndFilters();
 
     this.producer = new Producer();
 
@@ -365,7 +382,7 @@ export class GuestCamService extends PersistentStatefulService<IGuestCamServiceS
    * - We have 1 audio filter and 1 video filter
    * - All sources and filters are updated with the room id
    */
-  private ensureSourceAndFilters(roomId: string) {
+  private ensureSourceAndFilters() {
     if (!this.views.sourceId) {
       throw new Error('Tried to start producer but mediasoup source does not exist');
     }
@@ -389,7 +406,7 @@ export class GuestCamService extends PersistentStatefulService<IGuestCamServiceS
       videoSource.sourceId,
       'mediasoupconnector_vfilter',
       uuid(),
-      { room: roomId },
+      { room: this.room },
       EFilterDisplayType.Hidden,
     );
 
@@ -403,7 +420,7 @@ export class GuestCamService extends PersistentStatefulService<IGuestCamServiceS
       audioSource.sourceId,
       'mediasoupconnector_afilter',
       uuid(),
-      { room: roomId },
+      { room: this.room },
       EFilterDisplayType.Hidden,
     );
   }
@@ -440,6 +457,15 @@ export class GuestCamService extends PersistentStatefulService<IGuestCamServiceS
 
   createInviteLink(sourceId: string) {
     const url = `https://stage6.streamlabs.com/api/v5/slobs/streamrooms/create-source?source_id=${sourceId}`;
+
+    return jfetch<IInviteLink>(url, {
+      method: 'POST',
+      headers: authorizedHeaders(this.userService.views.auth.apiToken),
+    });
+  }
+
+  deleteInviteLink(id: number) {
+    const url = `https://stage6.streamlabs.com/api/v5/slobs/streamrooms/remove-source?id=${id}`;
 
     return jfetch<IInviteLink>(url, {
       method: 'POST',
@@ -582,10 +608,12 @@ export class GuestCamService extends PersistentStatefulService<IGuestCamServiceS
 
   setVideoDevice(device: string) {
     this.SET_VIDEO_DEVICE(device);
+    this.ensureSourceAndFilters();
   }
 
   setAudioDevice(device: string) {
     this.SET_AUDIO_DEVICE(device);
+    this.ensureSourceAndFilters();
   }
 
   @mutation()
