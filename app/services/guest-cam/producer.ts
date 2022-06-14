@@ -29,7 +29,7 @@ export class Producer extends MediasoupEntity {
 
       result['iceServers'] = [turnConfig];
 
-      this.makeObsRequest('func_send_transport_response', result);
+      this.makeObsRequest('func_create_send_transport', result);
 
       const connectParams = this.makeObsRequest('func_create_audio_producer', '').connect_params;
 

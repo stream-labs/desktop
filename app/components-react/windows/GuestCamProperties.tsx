@@ -1,4 +1,4 @@
-import { Button, Tabs, Tooltip } from 'antd';
+import { Alert, Button, Modal, Tabs, Tooltip } from 'antd';
 import { useVuex } from 'components-react/hooks';
 import { Services } from 'components-react/service-provider';
 import Display from 'components-react/shared/Display';
@@ -6,7 +6,6 @@ import { ListInput, TextInput } from 'components-react/shared/inputs';
 import Form from 'components-react/shared/inputs/Form';
 import { ModalLayout } from 'components-react/shared/ModalLayout';
 import React, { useMemo, useState } from 'react';
-import { EGuestCamStatus } from 'services/guest-cam';
 import { EDeviceType } from 'services/hardware';
 import { $t } from 'services/i18n';
 import * as remote from '@electron/remote';
@@ -15,7 +14,8 @@ import { Spinner } from 'components-react/pages/Loader';
 export default function GuestCamProperties() {
   const { GuestCamService, HardwareService } = Services;
   const {
-    status,
+    produceOk,
+    visible,
     videoDevice,
     videoDevices,
     audioDevice,
@@ -24,7 +24,8 @@ export default function GuestCamProperties() {
     source,
     guestInfo,
   } = useVuex(() => ({
-    status: GuestCamService.state.status,
+    produceOk: GuestCamService.state.produceOk,
+    visible: GuestCamService.views.guestVisible,
     videoDevice: GuestCamService.views.videoDevice,
     audioDevice: GuestCamService.views.audioDevice,
     videoDevices: HardwareService.state.dshowDevices.map(d => ({
@@ -42,12 +43,6 @@ export default function GuestCamProperties() {
 
   const videoSourceExists = !!useMemo(() => GuestCamService.views.findVideoSource(), [videoDevice]);
   const audioSourceExists = !!useMemo(() => GuestCamService.views.findAudioSource(), [audioDevice]);
-
-  function onProduceClick() {
-    if (status === EGuestCamStatus.Busy) return;
-    if (status === EGuestCamStatus.Offline) GuestCamService.actions.startProducing();
-    if (status === EGuestCamStatus.Connected) GuestCamService.actions.stopProducing();
-  }
 
   async function regenerateLink() {
     setRegeneratingLink(true);
@@ -71,6 +66,9 @@ export default function GuestCamProperties() {
           >
             <div style={{ flexGrow: 1, padding: 20 }}>
               <h3>{$t('Source: %{sourceName}', { sourceName: source?.name })}</h3>
+              <Button onClick={() => GuestCamService.actions.setVisibility(!visible)}>
+                {visible ? $t('Hide') : $t('Show')}
+              </Button>
               <Form layout="vertical">
                 <TextInput
                   readOnly
@@ -95,7 +93,7 @@ export default function GuestCamProperties() {
             <div style={{ width: 300, background: 'var(--section)', borderRadius: '0 8px 8px 0' }}>
               {/* Weird double div is to avoid display blocking border radius */}
               <div style={{ margin: '10px 0', height: 'calc(100% - 20px)' }}>
-                {!!guestInfo && <Display sourceId={source?.sourceId} />}
+                {!!guestInfo && produceOk && <Display sourceId={source?.sourceId} />}
                 {!guestInfo && (
                   <div
                     style={{
@@ -142,11 +140,51 @@ export default function GuestCamProperties() {
               )}
             </div>
           )}
-          <Button disabled={status === EGuestCamStatus.Busy} onClick={onProduceClick}>
-            {status === EGuestCamStatus.Connected ? 'Stop' : 'Start'}
-          </Button>
         </Tabs.TabPane>
       </Tabs>
+      <Modal footer={null} visible={!produceOk} getContainer={false}>
+        <h2>{$t('Initialize Guest Cam?')}</h2>
+        <p>
+          {$t(
+            'Guest Cam is currently listening for connecting guests, but is not broadcasting your microphone and webcam to your guests yet.',
+          )}
+        </p>
+        <Alert
+          message={
+            <div style={{ color: 'var(--paragraph)' }}>
+              <p>{$t('Please consider the following before starting Guest Cam')}</p>
+              <ul>
+                <li>
+                  {$t(
+                    'Once you start Guest Cam, people joining your invite link will be able to see and hear you',
+                  )}
+                </li>
+                <li>
+                  {$t('Guests will not be visible on your stream until you unhide them from here')}
+                </li>
+                <li>{$t('Do not share your invite link with anyone you do not wish to invite')}</li>
+                <li>
+                  {$t(
+                    'You can always generate a new link from this window, which will invalidate old links',
+                  )}
+                </li>
+                <li>{$t('Do not show this window on stream')}</li>
+              </ul>
+            </div>
+          }
+          type="info"
+          closable={false}
+          showIcon={false}
+          banner
+        />
+        <Button
+          type="primary"
+          style={{ marginTop: 24 }}
+          onClick={() => GuestCamService.actions.setProduceOk()}
+        >
+          {$t('Start Guest Cam')}
+        </Button>
+      </Modal>
     </ModalLayout>
   );
 }

@@ -27,8 +27,8 @@ import Utils from 'services/utils';
  * we can make to the plugin using `callHandler`
  */
 export interface IObsReturnTypes {
-  func_send_transport_response: {};
-  func_routerRtpCapabilities: {};
+  func_create_send_transport: {};
+  func_load_device: {};
   func_create_audio_producer: {
     connect_params: unknown;
   };
@@ -47,7 +47,7 @@ export interface IObsReturnTypes {
     };
   };
   func_produce_result: {};
-  func_receive_transport_response: {};
+  func_create_receive_transport: {};
   func_video_consumer_response: {
     connect_params: Object;
   };
@@ -131,18 +131,12 @@ interface ITurnConfig {
   username: string;
 }
 
-export enum EGuestCamStatus {
-  Offline = 'offline',
-  Connected = 'connected',
-  Busy = 'busy',
-}
-
 interface IGuest {
   name: string;
 }
 
 interface IGuestCamServiceState {
-  status: EGuestCamStatus;
+  produceOk: boolean;
   videoDevice: string;
   audioDevice: string;
   inviteHash: string;
@@ -211,6 +205,10 @@ class GuestCamViews extends ViewHandler<IGuestCamServiceState> {
   get inviteUrl() {
     return `https://streamlabs-obs-dev.s3.us-west-2.amazonaws.com/guestcam/build/index.html#/join/${this.state.inviteHash}`;
   }
+
+  get guestVisible() {
+    return !this.source?.forceHidden;
+  }
 }
 
 @InitAfter('SourcesService')
@@ -222,7 +220,7 @@ export class GuestCamService extends PersistentStatefulService<IGuestCamServiceS
   @Inject() hardwareService: HardwareService;
 
   static defaultState: IGuestCamServiceState = {
-    status: EGuestCamStatus.Offline,
+    produceOk: false,
     videoDevice: '',
     audioDevice: '',
     inviteHash: '',
@@ -259,7 +257,8 @@ export class GuestCamService extends PersistentStatefulService<IGuestCamServiceS
   init() {
     super.init();
 
-    this.SET_STATUS(EGuestCamStatus.Offline);
+    // TODO: Add setting that allows auto-starting producer?
+    this.SET_PRODUCE_OK(false);
     this.SET_INVITE_HASH('');
     this.SET_GUEST(null);
 
@@ -349,6 +348,15 @@ export class GuestCamService extends PersistentStatefulService<IGuestCamServiceS
     this.SET_INVITE_HASH(newLink.hash);
   }
 
+  setProduceOk() {
+    this.SET_PRODUCE_OK(true);
+
+    // If a guest is already connected and we are not yet producing, start doing so now
+    if (!this.producer && this.consumer) {
+      this.startProducing();
+    }
+  }
+
   /**
    * The main function to connect to the remote service with A/V.
    * The following will happen:
@@ -359,21 +367,16 @@ export class GuestCamService extends PersistentStatefulService<IGuestCamServiceS
     // TODO: What happens if the producer isn't working?
     if (this.producer) return;
 
-    this.SET_STATUS(EGuestCamStatus.Busy);
-
     this.ensureSourceAndFilters();
 
     this.producer = new Producer();
 
     await this.producer.connect();
-
-    this.SET_STATUS(EGuestCamStatus.Connected);
   }
 
   stopProducing() {
     this.producer.destroy();
     this.producer = null;
-    this.SET_STATUS(EGuestCamStatus.Offline);
   }
 
   /**
@@ -498,7 +501,7 @@ export class GuestCamService extends PersistentStatefulService<IGuestCamServiceS
 
       this.views.source.updateSettings({ room: this.room });
 
-      this.makeObsRequest('func_routerRtpCapabilities', this.auth.rtpCapabilities);
+      this.makeObsRequest('func_load_device', this.auth.rtpCapabilities);
     });
     this.socket.on('connect_error', (e: any) => this.log('Connection Error', e));
     this.socket.on('connect_timeout', () => this.log('Connection Timeout'));
@@ -534,14 +537,30 @@ export class GuestCamService extends PersistentStatefulService<IGuestCamServiceS
       this.consumer.destroy();
     }
 
-    // Make sure the source isn't visible in any scene
-    // this.getSource().setForceHidden(true);
-
-    // Set audio volume to 0 until the guest is approved
-    // this.makeObsRequest('func_change_playback_volume', '0');
+    // If we're allowed to produce, we should start producing right now
+    if (!this.producer && this.state.produceOk) {
+      this.startProducing();
+    }
 
     this.consumer = new Consumer(event.data);
     this.consumer.connect();
+
+    // Make sure the source isn't visible in any scene
+    this.views.source.setForceHidden(true);
+
+    // Set audio volume to 0 until the guest is approved
+    // this.makeObsRequest('func_change_playback_volume', '0');
+  }
+
+  setVisibility(visible: boolean) {
+    if (!this.views.source) return;
+
+    this.views.source.setForceHidden(!visible);
+
+    // TODO: User adjustable volume
+    const volume = visible ? 100 : 0;
+
+    this.makeObsRequest('func_change_playback_volume', volume.toString());
   }
 
   async onGuestLeave(event: IConsumerDestroyedEvent) {
@@ -617,8 +636,8 @@ export class GuestCamService extends PersistentStatefulService<IGuestCamServiceS
   }
 
   @mutation()
-  private SET_STATUS(status: EGuestCamStatus) {
-    this.state.status = status;
+  private SET_PRODUCE_OK(val: boolean) {
+    this.state.produceOk = val;
   }
 
   @mutation()

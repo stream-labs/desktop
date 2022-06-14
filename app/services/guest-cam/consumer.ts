@@ -42,7 +42,7 @@ export class Consumer extends MediasoupEntity {
 
       event.data['iceServers'] = [turnConfig];
 
-      this.makeObsRequest('func_receive_transport_response', event.data);
+      this.makeObsRequest('func_create_receive_transport', event.data);
 
       if (this.remoteProducer.videoId) {
         this.hasVideo = true;
@@ -122,6 +122,7 @@ export class Consumer extends MediasoupEntity {
       // Figure out if we're completely done to unlock the mutex
       if ((this.hasAudio && this.audioSubscribed) || !this.hasAudio) {
         if ((this.hasVideo && this.videoSubscribed) || !this.hasVideo) {
+          this.makeObsRequest('func_change_playback_volume', '0');
           this.unlockMutex();
         }
       }
