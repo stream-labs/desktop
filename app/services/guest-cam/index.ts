@@ -21,6 +21,8 @@ import { Consumer } from './consumer';
 import { byOS, OS } from 'util/operating-systems';
 import { Mutex } from 'util/mutex';
 import Utils from 'services/utils';
+import { E_AUDIO_CHANNELS } from 'services/audio';
+import { SceneCollectionsService } from 'app-services';
 
 /**
  * Interface describing the various functions and expected return values
@@ -137,8 +139,8 @@ interface IGuest {
 
 interface IGuestCamServiceState {
   produceOk: boolean;
-  videoDevice: string;
-  audioDevice: string;
+  videoSourceId: string;
+  audioSourceId: string;
   inviteHash: string;
   guestInfo: IGuest;
 }
@@ -154,44 +156,20 @@ interface IInviteLinksResponse {
 }
 
 class GuestCamViews extends ViewHandler<IGuestCamServiceState> {
-  get videoDevice() {
-    return this.state.videoDevice;
+  get videoSourceId() {
+    return this.state.videoSourceId;
   }
 
-  get audioDevice() {
-    return this.state.audioDevice;
+  get videoSource() {
+    return this.getServiceViews(SourcesService).getSource(this.videoSourceId);
   }
 
-  /**
-   * Finds an existing source in the current scene collection that matches
-   * the selected video device. This is a somewhat slow operation because
-   * we need to fetch the settings from OBS.
-   * @returns The source
-   */
-  findVideoSource() {
-    const sourceType = byOS({ [OS.Windows]: 'dshow_input', [OS.Mac]: 'av_capture_input' });
-    const deviceProperty = byOS({ [OS.Windows]: 'video_device_id', [OS.Mac]: 'device' });
-
-    return this.getServiceViews(SourcesService).sources.find(s => {
-      return s.type === sourceType && s.getSettings()[deviceProperty] === this.videoDevice;
-    });
+  get audioSourceId() {
+    return this.state.audioSourceId;
   }
 
-  /**
-   * Finds an existing source in the current scene collection that matches
-   * the selected audio device. This is a somewhat slow operation because
-   * we need to fetch the settings from OBS.
-   * @returns The source
-   */
-  findAudioSource() {
-    const sourceType = byOS({
-      [OS.Windows]: 'wasapi_input_capture',
-      [OS.Mac]: 'coreaudio_input_capture',
-    });
-
-    return this.getServiceViews(SourcesService).sources.find(s => {
-      return s.type === sourceType && s.getSettings().device_id === this.audioDevice;
-    });
+  get audioSource() {
+    return this.getServiceViews(SourcesService).getSource(this.audioSourceId);
   }
 
   get sourceId() {
@@ -211,18 +189,19 @@ class GuestCamViews extends ViewHandler<IGuestCamServiceState> {
   }
 }
 
-@InitAfter('SourcesService')
+@InitAfter('SceneCollectionsService')
 export class GuestCamService extends PersistentStatefulService<IGuestCamServiceState> {
   @Inject() userService: UserService;
   @Inject() sourcesService: SourcesService;
   @Inject() scenesService: ScenesService;
   @Inject() sourceFiltersService: SourceFiltersService;
   @Inject() hardwareService: HardwareService;
+  @Inject() sceneCollectionsService: SceneCollectionsService;
 
   static defaultState: IGuestCamServiceState = {
     produceOk: false,
-    videoDevice: '',
-    audioDevice: '',
+    videoSourceId: '',
+    audioSourceId: '',
     inviteHash: '',
     guestInfo: null,
   };
@@ -262,21 +241,6 @@ export class GuestCamService extends PersistentStatefulService<IGuestCamServiceS
     this.SET_INVITE_HASH('');
     this.SET_GUEST(null);
 
-    // TODO - check default hardware service instead of taking first in list?
-    if (this.state.audioDevice === '') {
-      const firstAudioDevice = this.hardwareService.devices.find(
-        d => d.type === EDeviceType.audioInput,
-      );
-
-      if (firstAudioDevice) this.SET_AUDIO_DEVICE(firstAudioDevice.id);
-    }
-
-    if (this.state.videoDevice === '') {
-      const firstVideoDevice = this.hardwareService.dshowDevices[0];
-
-      if (firstVideoDevice) this.SET_VIDEO_DEVICE(firstVideoDevice.id);
-    }
-
     if (this.views.sourceId) {
       this.startListeningForGuests();
     }
@@ -286,6 +250,44 @@ export class GuestCamService extends PersistentStatefulService<IGuestCamServiceS
         this.startListeningForGuests();
       }
     });
+
+    this.sceneCollectionsService.collectionInitialized.subscribe(() => {
+      this.findDefaultSources();
+    });
+  }
+
+  findDefaultSources() {
+    if (!this.state.audioSourceId) {
+      // Check input channels first
+      let audioSource = [
+        E_AUDIO_CHANNELS.INPUT_1,
+        E_AUDIO_CHANNELS.INPUT_2,
+        E_AUDIO_CHANNELS.INPUT_3,
+      ]
+        .map(channel => {
+          return this.sourcesService.views.getSourceByChannel(channel);
+        })
+        .find(s => s);
+
+      // Fall back to *any* audio source
+      if (!audioSource) {
+        const sourceType = byOS({
+          [OS.Windows]: 'wasapi_input_capture',
+          [OS.Mac]: 'coreaudio_input_capture',
+        });
+
+        audioSource = this.sourcesService.views.sources.find(s => s.type === sourceType);
+      }
+
+      if (audioSource) this.SET_AUDIO_SOURCE(audioSource.sourceId);
+    }
+
+    if (!this.state.videoSourceId) {
+      const sourceType = byOS({ [OS.Windows]: 'dshow_input', [OS.Mac]: 'av_capture_input' });
+      const videoSource = this.sourcesService.views.sources.find(s => s.type === sourceType);
+
+      if (videoSource) this.SET_VIDEO_SOURCE(videoSource.sourceId);
+    }
   }
 
   async startListeningForGuests() {
@@ -367,7 +369,12 @@ export class GuestCamService extends PersistentStatefulService<IGuestCamServiceS
     // TODO: What happens if the producer isn't working?
     if (this.producer) return;
 
-    this.ensureSourceAndFilters();
+    // Don't hold up starting the producer if the filters can't be created
+    try {
+      this.ensureSourceAndFilters();
+    } catch (e: unknown) {
+      this.log('Unable to ensure filters but continuing with producer creation', e);
+    }
 
     this.producer = new Producer();
 
@@ -399,7 +406,7 @@ export class GuestCamService extends PersistentStatefulService<IGuestCamServiceS
       });
     });
 
-    const videoSource = this.views.findVideoSource();
+    const videoSource = this.views.videoSource;
 
     if (!videoSource) {
       throw new Error('Tried to start producer but video source does not exist');
@@ -413,7 +420,7 @@ export class GuestCamService extends PersistentStatefulService<IGuestCamServiceS
       EFilterDisplayType.Hidden,
     );
 
-    const audioSource = this.views.findAudioSource();
+    const audioSource = this.views.audioSource;
 
     if (!audioSource) {
       throw new Error('Tried to start producer but audio source does not exist');
@@ -549,7 +556,7 @@ export class GuestCamService extends PersistentStatefulService<IGuestCamServiceS
     this.views.source.setForceHidden(true);
 
     // Set audio volume to 0 until the guest is approved
-    // this.makeObsRequest('func_change_playback_volume', '0');
+    this.makeObsRequest('func_change_playback_volume', '0');
   }
 
   setVisibility(visible: boolean) {
@@ -558,7 +565,7 @@ export class GuestCamService extends PersistentStatefulService<IGuestCamServiceS
     this.views.source.setForceHidden(!visible);
 
     // TODO: User adjustable volume
-    const volume = visible ? 100 : 0;
+    const volume = visible ? 255 : 0;
 
     this.makeObsRequest('func_change_playback_volume', volume.toString());
   }
@@ -625,13 +632,13 @@ export class GuestCamService extends PersistentStatefulService<IGuestCamServiceS
     console.log('[Guest Cam]', ...msgs);
   }
 
-  setVideoDevice(device: string) {
-    this.SET_VIDEO_DEVICE(device);
+  setVideoSource(sourceId: string) {
+    this.SET_VIDEO_SOURCE(sourceId);
     this.ensureSourceAndFilters();
   }
 
-  setAudioDevice(device: string) {
-    this.SET_AUDIO_DEVICE(device);
+  setAudioSource(sourceId: string) {
+    this.SET_AUDIO_SOURCE(sourceId);
     this.ensureSourceAndFilters();
   }
 
@@ -641,13 +648,13 @@ export class GuestCamService extends PersistentStatefulService<IGuestCamServiceS
   }
 
   @mutation()
-  private SET_VIDEO_DEVICE(device: string) {
-    this.state.videoDevice = device;
+  private SET_VIDEO_SOURCE(sourceId: string) {
+    this.state.videoSourceId = sourceId;
   }
 
   @mutation()
-  private SET_AUDIO_DEVICE(device: string) {
-    this.state.audioDevice = device;
+  private SET_AUDIO_SOURCE(sourceId: string) {
+    this.state.audioSourceId = sourceId;
   }
 
   @mutation()

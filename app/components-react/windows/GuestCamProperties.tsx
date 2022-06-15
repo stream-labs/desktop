@@ -10,39 +10,48 @@ import { EDeviceType } from 'services/hardware';
 import { $t } from 'services/i18n';
 import * as remote from '@electron/remote';
 import { Spinner } from 'components-react/pages/Loader';
+import { byOS, OS } from 'util/operating-systems';
+import { TSourceType } from 'services/sources';
 
 export default function GuestCamProperties() {
-  const { GuestCamService, HardwareService } = Services;
+  const { GuestCamService, SourcesService } = Services;
+  const audioSourceType = byOS({
+    [OS.Windows]: 'wasapi_input_capture',
+    [OS.Mac]: 'coreaudio_input_capture',
+  });
+  const videoSourceType = byOS({ [OS.Windows]: 'dshow_input', [OS.Mac]: 'av_capture_input' });
   const {
     produceOk,
     visible,
-    videoDevice,
-    videoDevices,
-    audioDevice,
-    audioDevices,
+    videoSourceId,
+    audioSourceId,
+    videoSources,
+    audioSources,
+    videoSourceExists,
+    audioSourceExists,
     inviteUrl,
     source,
     guestInfo,
   } = useVuex(() => ({
     produceOk: GuestCamService.state.produceOk,
     visible: GuestCamService.views.guestVisible,
-    videoDevice: GuestCamService.views.videoDevice,
-    audioDevice: GuestCamService.views.audioDevice,
-    videoDevices: HardwareService.state.dshowDevices.map(d => ({
-      label: d.description,
-      value: d.id,
+    videoSourceId: GuestCamService.views.videoSourceId,
+    videoSources: SourcesService.views.getSourcesByType(videoSourceType as TSourceType).map(s => ({
+      label: s.name,
+      value: s.sourceId,
     })),
-    audioDevices: HardwareService.state.devices
-      .filter(d => d.type === EDeviceType.audioInput)
-      .map(d => ({ label: d.description, value: d.id })),
+    videoSourceExists: !!GuestCamService.views.videoSource,
+    audioSourceId: GuestCamService.views.audioSourceId,
+    audioSources: SourcesService.views.getSourcesByType(audioSourceType as TSourceType).map(s => ({
+      label: s.name,
+      value: s.sourceId,
+    })),
+    audioSourceExists: !!GuestCamService.views.audioSource,
     inviteUrl: GuestCamService.views.inviteUrl,
     source: GuestCamService.views.source,
     guestInfo: GuestCamService.state.guestInfo,
   }));
   const [regeneratingLink, setRegeneratingLink] = useState(false);
-
-  const videoSourceExists = !!useMemo(() => GuestCamService.views.findVideoSource(), [videoDevice]);
-  const audioSourceExists = !!useMemo(() => GuestCamService.views.findAudioSource(), [audioDevice]);
 
   async function regenerateLink() {
     setRegeneratingLink(true);
@@ -67,7 +76,7 @@ export default function GuestCamProperties() {
             <div style={{ flexGrow: 1, padding: 20 }}>
               <h3>{$t('Source: %{sourceName}', { sourceName: source?.name })}</h3>
               <Button onClick={() => GuestCamService.actions.setVisibility(!visible)}>
-                {visible ? $t('Hide') : $t('Show')}
+                {visible ? $t('Hide on Stream') : $t('Show on Stream')}
               </Button>
               <Form layout="vertical">
                 <TextInput
@@ -113,31 +122,32 @@ export default function GuestCamProperties() {
         </Tabs.TabPane>
         <Tabs.TabPane tab={$t('Global Settings')} key="global-settings">
           <Form>
+            <h2>
+              {$t(
+                'You will need to select a microphone and webcam source in your current scene collection that will be sent to your guests for them to see and hear you.',
+              )}
+            </h2>
             <ListInput
-              label={$t('Webcam')}
-              options={videoDevices}
-              value={videoDevice}
-              onChange={d => GuestCamService.actions.setVideoDevice(d)}
+              label={$t('Webcam Source')}
+              options={videoSources}
+              value={videoSourceId}
+              onChange={s => GuestCamService.actions.setVideoSource(s)}
+              allowClear={true}
             />
             <ListInput
-              label={$t('Microphone')}
-              options={audioDevices}
-              value={audioDevice}
-              onChange={d => GuestCamService.actions.setAudioDevice(d)}
+              label={$t('Microphone Source')}
+              options={audioSources}
+              value={audioSourceId}
+              onChange={s => GuestCamService.actions.setAudioSource(s)}
+              allowClear={true}
             />
           </Form>
           {!videoSourceExists && (
-            <div>
-              {$t(
-                'The selected webcam does not exist as a source in your current scene collection. Please add it as a source before starting Guest Cam',
-              )}
-            </div>
+            <div>{$t('No webcam source is selected. Your guest will not be able to see you.')}</div>
           )}
           {!audioSourceExists && (
             <div>
-              {$t(
-                'The selected microphone does not exist as a source in your current scene collection. Please add it as a source before starting Guest Cam',
-              )}
+              {$t('No microphone source is selected. Your guest will not be able to hear you.')}
             </div>
           )}
         </Tabs.TabPane>
