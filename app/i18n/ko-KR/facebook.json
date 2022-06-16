@@ -30,8 +30,8 @@
   "Please reconnect Facebook to get these new features": "새 기능을 이용하려면 Facebook에 다시 연결하세요",
   "Reconnect now": "지금 다시 연결하기",
   "Privacy": "개인정보",
-  "FBPrivacyWarning": "승인된 프라이버시 수준이 Facebook 계정에 제한될 수 있습니다. <link>여기</link>의 \"비즈니스 통합 내용을 확인할 수 있는 사람\" 섹션에서 Streamlabs 통합 내용을 확인하세요",
+  "FBPrivacyWarning": "승인된 프라이버시 수준이 Facebook 계정에 제한될 수 있습니다. <link>여기</link> \"비즈니스 통합 내용을 확인할 수 있는 사람\" 섹션에서 Streamlabs 통합 내용을 확인하세요.",
   "Only Me": "나만",
   "Do not change privacy settings": "개인정보 설정을 변경하지 않음",
-  "Install %{overlayName}": "Install %{overlayName}"
+  "Install %{overlayName}": "%{overlayName} 설치"
 }
