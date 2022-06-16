@@ -30,8 +30,8 @@
   "Please reconnect Facebook to get these new features": "Harap hubungkan kembali Facebook untuk mendapatkan fitur baru ini",
   "Reconnect now": "Hubungkan kembali sekarang",
   "Privacy": "Privasi",
-  "FBPrivacyWarning": "Level privasi yang diberikan mungkin terbatas bagi akun Facebook Anda. Periksa bagian \"Siapa yang dapat melihat Anda menggunakan integrasi bisnis ini\" untuk integrasi Streamlabs <link>di sini</link>",
+  "FBPrivacyWarning": "Level privasi yang diberikan mungkin terbatas untuk akun Facebook Anda. Bacalah bagian \"Siapa yang bisa melihat Anda menggunakan integrasi bisnis ini\" untuk integrasi Streamlabs <link>di sini</link>",
   "Only Me": "Hanya Saya",
   "Do not change privacy settings": "Jangan mengganti pengaturan privasi",
-  "Install %{overlayName}": "Install %{overlayName}"
+  "Install %{overlayName}": "Instal %{overlayName}"
 }
