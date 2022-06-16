@@ -33,5 +33,5 @@
   "FBPrivacyWarning": "El nivel de privacidad concedido puede estar limitado para su cuenta de Facebook. Compruebe la sección \"¿Quién puede ver que usa esta integración de negocios\" para la integración de Streamlabs <link>aquí</link>",
   "Only Me": "Solo yo",
   "Do not change privacy settings": "No cambiar ajustes de privacidad",
-  "Install %{overlayName}": "Install %{overlayName}"
+  "Install %{overlayName}": "Instalar %{overlayName}"
 }
