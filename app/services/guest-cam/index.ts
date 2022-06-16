@@ -251,6 +251,23 @@ export class GuestCamService extends PersistentStatefulService<IGuestCamServiceS
       }
     });
 
+    this.sourcesService.sourceRemoved.subscribe(s => {
+      if (s.type === 'mediasoupconnector') {
+        if (this.consumer) {
+          this.consumer.destroy();
+          this.consumer = null;
+        }
+
+        if (this.producer) {
+          this.producer.destroy();
+          this.producer = null;
+        }
+
+        this.socket.disconnect();
+        this.socket = null;
+      }
+    });
+
     this.sceneCollectionsService.collectionInitialized.subscribe(() => {
       this.findDefaultSources();
     });
@@ -559,6 +576,18 @@ export class GuestCamService extends PersistentStatefulService<IGuestCamServiceS
     this.makeObsRequest('func_change_playback_volume', '0');
   }
 
+  /**
+   * Disconnects the currently connected guest
+   */
+  disconnectGuest() {
+    if (this.consumer) {
+      this.consumer.destroy();
+      this.consumer = null;
+    }
+
+    this.SET_GUEST(null);
+  }
+
   setVisibility(visible: boolean) {
     if (!this.views.source) return;
 
@@ -600,6 +629,12 @@ export class GuestCamService extends PersistentStatefulService<IGuestCamServiceS
     func: TFunc,
     arg?: Object,
   ): IObsReturnTypes[TFunc] {
+    // If underlying source is destroyed, do nothing
+    if (!this.views.source) {
+      this.log(`Ignoring OBS call ${func} due to source not existing`);
+      return;
+    }
+
     let stringArg = arg ?? '';
 
     if (typeof stringArg === 'object') {

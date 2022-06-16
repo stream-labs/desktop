@@ -75,9 +75,24 @@ export default function GuestCamProperties() {
           >
             <div style={{ flexGrow: 1, padding: 20 }}>
               <h3>{$t('Source: %{sourceName}', { sourceName: source?.name })}</h3>
-              <Button onClick={() => GuestCamService.actions.setVisibility(!visible)}>
-                {visible ? $t('Hide on Stream') : $t('Show on Stream')}
-              </Button>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
+                <Button
+                  onClick={() => GuestCamService.actions.setVisibility(!visible)}
+                  disabled={!guestInfo}
+                  style={{ width: '45%' }}
+                  type={!!guestInfo && !visible ? 'primary' : 'default'}
+                >
+                  {!!guestInfo && visible ? $t('Hide on Stream') : $t('Show on Stream')}
+                </Button>
+                <button
+                  className="button button--soft-warning"
+                  style={{ width: '45%' }}
+                  disabled={!guestInfo}
+                  onClick={() => GuestCamService.actions.disconnectGuest()}
+                >
+                  {$t('Disconnect')}
+                </button>
+              </div>
               <Form layout="vertical">
                 <TextInput
                   readOnly
