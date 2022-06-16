@@ -27,7 +27,7 @@
   "Confirm stream title and game before going live": "Confirmar título de stream y juego antes de transmitir en directo",
   "Enable reporting additional information on a crash (requires restart)": "Active la notificación de información adicional al producirse un bloque (requiere reinicio)",
   "WARNING! You will lose all scenes, sources, and settings. This cannot be undone!": "¡ADVERTENCIA! Perderá todas las escenas, fuentes y ajustes. ¡Esta operación no se puede deshacer!",
-  "Your cache directory has been successfully uploaded.  The file name %{file} has been copied to your clipboard.": "Su directorio de caché se ha cargado correctamente. El nombre de archivo %{file} se ha copiado al portapapeles.",
+  "Your cache directory has been successfully uploaded.  The file name %{file} has been copied to your clipboard.": "Su directorio de caché se ha cargado correctamente.  El nombre de archivo %{file} se ha copiado al portapapeles.",
   "Stream Labels session has been successfully restarted!": "¡La sesión de Stream Labels se ha reiniciado correctamente!",
   "This action will restart the application. Continue?": "Esta acción reiniciará la aplicación. ¿Continuar?",
   "Show confirmation dialog when starting streams": "Mostrar cuadro de confirmación al iniciar streams",
@@ -146,7 +146,7 @@
   "Streamlabs Support": "Asistencia de Streamlabs",
   "Community Discord": "Comunidad Discord",
   "Diagnostic Report": "Informe de diagnóstico",
-  "The diagnostic report is an automatically generated report that contains information about your system and configuration. Clicking the upload button below will generate and securely transmit a diagnostic report to the Streamlabs team.": "El informe de diagnóstico se genera automáticamente y contiene información sobre el sistema y la configuración. Haga clic en el botón de carga a continuación si quiere generar y transmitir de modo seguro un informe de diagnóstico al equipo de Streamlabs.",
+  "The diagnostic report is an automatically generated report that contains information about your system and configuration. Clicking the upload button below will generate and securely transmit a diagnostic report to the Streamlabs team.": "El informe de diagnóstico se genera automáticamente y contiene información sobre su sistema y la configuración. Haga clic en el botón de carga a continuación si quiere generar y transmitir de modo seguro un informe de diagnóstico al equipo de Streamlabs.",
   "Upload Diagnostic Report": "Cargar informe de diagnóstico",
   "Cache Directory": "Directorio de caché",
   "Crash Reporting": "Informes de bloqueos",
@@ -157,5 +157,5 @@
   "Chat Settings": "Ajustes de chat",
   "Text Size": "Tamaño del texto",
   "Show announcements for new Streamlabs features and products": "Mostrar anuncios de nuevas funciones y productos de Streamlabs",
-  "Disable live streaming features (Recording Only mode)": "Disable live streaming features (Recording Only mode)"
+  "Disable live streaming features (Recording Only mode)": "Desactivar funciones de streaming en tiempo real (solo modo de grabación)"
 }
