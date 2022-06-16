@@ -5,7 +5,7 @@
   "Streamer Dashboard": "Панель управления стримера",
   "Share": "Поделиться",
   "Like": "Понравилось",
-  "Step 3:": "Шаг 3:",
+  "Step 3:": "Шаг 3.",
   "Create a Facebook Gaming page to get started.": "Создайте игровую страницу в Facebook, чтобы начать.",
   "Create a Gaming Page": "Создать игровую страницу",
   "All of your scenes, sources, and settings will be preserved.": "Все ваши сцены, источники и настройки будут сохранены.",
@@ -30,8 +30,8 @@
   "Please reconnect Facebook to get these new features": "Подключитесь к Facebook снова для доступа к этим новым функциям",
   "Reconnect now": "Переподключиться",
   "Privacy": "Конфиденциальность",
-  "FBPrivacyWarning": "Предоставленный уровень конфиденциальности может быть ограничен для вашего аккаунта Facebook. Проверьте раздел Who can see you use this business integration (Кто может видеть, что вы используете эту бизнес-интеграцию) для интеграции Streamlabs <link>здесь</link>",
+  "FBPrivacyWarning": "Выданный уровень доступа может быть ограничен для вашего аккаунта Facebook. Подробнее см. в меню Интеграции со Streamlabs <link>здесь</link> в разделе «Кто может видеть, что я использую эту рабочую интеграцию».",
   "Only Me": "Только для меня",
   "Do not change privacy settings": "Не изменять настройки конфиденциальности",
-  "Install %{overlayName}": "Install %{overlayName}"
+  "Install %{overlayName}": "Установить %{overlayName}"
 }
