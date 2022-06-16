@@ -5,7 +5,7 @@
   "Streamer Dashboard": "Yayıncı Panosu",
   "Share": "Paylaş",
   "Like": "Beğen",
-  "Step 3:": "Adım 3:",
+  "Step 3:": "3. Adım:",
   "Create a Facebook Gaming page to get started.": "Başlamak için bir Facebook Oyun sayfası oluşturun.",
   "Create a Gaming Page": "Oyun Sayfası Oluştur",
   "All of your scenes, sources, and settings will be preserved.": "Tüm sahneleriniz, kaynaklarınız ve ayarlarınız korunacaktır.",
@@ -30,8 +30,8 @@
   "Please reconnect Facebook to get these new features": "Bu yeni özellikleri edinmek için lütfen Facebook’a yeniden bağlanın",
   "Reconnect now": "Şimdi yeniden bağlan",
   "Privacy": "Gizlilik",
-  "FBPrivacyWarning": "Facebook hesabınız için verilen gizlilik düzeyi sınırlı olabilir. Streamlabs entegrasyonu için <link>buradan</link> \"Bu işletme entegrasyonunu kullandığınızı kimler görebilir\" bölümüne bakın",
+  "FBPrivacyWarning": "Facebook hesabınız için sağlanan gizlilik düzeyi sınırlı olabilir. <link>Buradan</link> Streamlabs entegrasyonu için “Bu iş entegrasyonunu kullandığınızı kimler görebilir” bölümünü kontrol edin",
   "Only Me": "Yalnızca Ben",
   "Do not change privacy settings": "Gizlilik ayarlarını değiştirme",
-  "Install %{overlayName}": "Install %{overlayName}"
+  "Install %{overlayName}": "Yükle %{overlayName}"
 }
