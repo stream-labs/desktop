@@ -253,6 +253,11 @@ export class GuestCamService extends PersistentStatefulService<IGuestCamServiceS
 
     this.sourcesService.sourceRemoved.subscribe(s => {
       if (s.type === 'mediasoupconnector') {
+        // Only clean up if this is the last mediasoup source
+        // There is no use case for multiple sources right now, but
+        // we shouldn't break in this scenario
+        if (this.sourcesService.views.getSourcesByType('mediasoupconnector').length) return;
+
         if (this.consumer) {
           this.consumer.destroy();
           this.consumer = null;
