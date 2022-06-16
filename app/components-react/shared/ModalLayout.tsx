@@ -16,7 +16,7 @@ type TProps = {
   hideFooter?: boolean;
   scrollable?: boolean;
   wrapperStyle?: React.CSSProperties;
-} & Pick<ModalProps, 'footer' | 'onOk' | 'okText' | 'bodyStyle' | 'confirmLoading'>;
+} & Pick<ModalProps, 'footer' | 'onOk' | 'okText' | 'bodyStyle' | 'confirmLoading' | 'onCancel'>;
 
 // calculate OS dependent styles
 const titleHeight = getOS() === OS.Mac ? 22 : 30;
@@ -60,9 +60,10 @@ export function ModalLayout(p: TProps) {
   // render a default footer with action buttons
   function DefaultFooter() {
     const okText = p.okText || $t('Done');
+    const closeFunc = p.onCancel || close;
     return (
       <>
-        <Button onClick={close}>{$t('Close')}</Button>
+        <Button onClick={closeFunc}>{$t('Close')}</Button>
         {p.onOk && (
           <Button onClick={p.onOk} type="primary" disabled={p.confirmLoading}>
             {p.confirmLoading && (
