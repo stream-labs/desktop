@@ -1,10 +1,15 @@
-import React, { useState } from 'react';
-import Fuse from 'fuse.js';
+import React, { useEffect, useState } from 'react';
 import { Layout, Input } from 'antd';
+import Fuse from 'fuse.js';
+import moment from 'moment';
+import cx from 'classnames';
 import { ModalLayout } from 'components-react/shared/ModalLayout';
 import { Services } from 'components-react/service-provider';
+import { alertAsync, promptAsync } from 'components-react/modals';
 import { $t } from 'services/i18n';
-import { promptAsync } from 'components-react/modals';
+import { ISceneCollectionsManifestEntry } from 'services/scene-collections';
+import { byOS, getOS, OS } from 'util/operating-systems';
+
 const { Sider, Content } = Layout;
 const { Search } = Input;
 
@@ -86,5 +91,82 @@ export default function ManageSceneCollections() {
         </Content>
       </Layout>
     </ModalLayout>
+  );
+}
+
+function CollectionNode(p: { collection: ISceneCollectionsManifestEntry }) {
+  const { SceneCollectionsService } = Services;
+  const [duplicating, setDuplicating] = useState(false);
+  const modified = moment(p.collection.modified).fromNow();
+  const isActive = p.collection.id === SceneCollectionsService.activeCollection?.id;
+
+  useEffect(onNeedsRenamedChanged, [p.collection.needsRename]);
+
+  function onNeedsRenamedChanged() {
+    if (p.collection.needsRename) startRenaming();
+  }
+
+  function makeActive() {
+    if (SceneCollectionsService.getCollection(p.collection.id)?.operatingSystem !== getOS()) {
+      return;
+    }
+
+    SceneCollectionsService.actions.load(p.collection.id);
+  }
+
+  function duplicate() {
+    setDuplicating(true);
+
+    setTimeout(() => {
+      SceneCollectionsService.actions.return
+        .duplicate(p.collection.name, p.collection.id)
+        .then(() => setDuplicating(false))
+        .catch(() => setDuplicating(false));
+    }, 500);
+  }
+
+  async function startRenaming() {
+    return await promptAsync(
+      { placeholder: $t('Enter a Scene Collection Name'), onOk: submitRename },
+      p.collection.name,
+    );
+  }
+
+  function submitRename(editableName: string) {
+    SceneCollectionsService.actions.rename(editableName, p.collection.id);
+  }
+
+  function remove() {
+    alertAsync({
+      content: $t(
+        $t('Are you sure you want to remove %{collectionName}?', {
+          collectionName: p.collection.name,
+        }),
+      ),
+      onOk: () => SceneCollectionsService.actions.delete(p.collection.id),
+    });
+  }
+
+  return (
+    <div onDoubleClick={makeActive}>
+      <span className="editable-scene-collection--name">
+        <i className={cx('fab', byOS({ [OS.Windows]: 'fa-windows', [OS.Mac]: 'fa-apple' }))} />
+        {p.collection.name}
+      </span>
+      {isActive && <span className="editable-scene-collection--active">Active</span>}
+      <span className="editable-scene-collection--modified flex--grow">Updated {modified}</span>
+      <a className="editable-scene-collection--action">
+        <span onClick={startRenaming}>{$t('Rename')}</span>
+      </a>
+      {!duplicating && (
+        <a className="editable-scene-collection--action">
+          <span onClick={duplicate}>{$t('Duplicate')}</span>
+        </a>
+      )}
+      {duplicating && <i className="fa fa-spinner fa-pulse" />}
+      <a className="editable-scene-collection--action editable-scene-collection--action-delete">
+        <span onClick={remove}>{$t('Delete')}</span>
+      </a>
+    </div>
   );
 }
