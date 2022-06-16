@@ -30,8 +30,8 @@
   "Please reconnect Facebook to get these new features": "Connettiti di nuovo a Facebook per ottenere queste nuove funzionalità",
   "Reconnect now": "Riconnettiti ora",
   "Privacy": "Privacy",
-  "FBPrivacyWarning": "Il livello di privacy garantito potrebbe essere limitato per il tuo account Facebook. Controlla la sezione “Chi può usare questa integrazione business” per l’integrazione di Streamlabs <link>qui</link>",
+  "FBPrivacyWarning": "Il livello di privacy garantito potrebbe essere limitato per il tuo account Facebook. Consulta la sezione \"Who can see you use this business integration\" (Chi può vedere che utilizzi questa integrazione business) per l'integrazione Streamlabs <link>qui</link>",
   "Only Me": "Solo io",
   "Do not change privacy settings": "Non modificare le impostazioni della privacy",
-  "Install %{overlayName}": "Install %{overlayName}"
+  "Install %{overlayName}": "Installa %{overlayName}"
 }
