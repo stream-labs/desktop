@@ -5,13 +5,14 @@ import moment from 'moment';
 import cx from 'classnames';
 import { ModalLayout } from 'components-react/shared/ModalLayout';
 import { Services } from 'components-react/service-provider';
-import { alertAsync, promptAsync } from 'components-react/modals';
+import { confirmAsync, promptAsync } from 'components-react/modals';
 import Scrollable from 'components-react/shared/Scrollable';
 import { $t } from 'services/i18n';
 import { $i } from 'services/utils';
 import { ISceneCollectionsManifestEntry } from 'services/scene-collections';
 import { byOS, getOS, OS } from 'util/operating-systems';
 import styles from './ManageSceneCollections.m.less';
+import { TextInput } from 'components-react/shared/inputs';
 
 const { Sider, Content } = Layout;
 const { Search } = Input;
@@ -32,7 +33,7 @@ export default function ManageSceneCollections() {
 
   async function create() {
     const name = await promptAsync(
-      { placeholder: '', content: $t('Enter a Scene Collection Name') },
+      { title: $t('Enter a Scene Collection Name'), closable: true },
       SceneCollectionsService.suggestName('Scenes'),
     );
     SceneCollectionsService.actions.create({ name });
@@ -65,7 +66,13 @@ export default function ManageSceneCollections() {
       <Layout style={{ height: '100%' }}>
         <Sider width={300}>
           <div>{$t('Your Scene Collections:')}</div>
-          <Search placeholder={$t('Search Scene Collections')} onSearch={setQuery} allowClear />
+          <TextInput
+            placeholder={$t('Search Scene Collections')}
+            onChange={setQuery}
+            uncontrolled={false}
+            addonBefore={<i className="icon-search" />}
+            nowrap
+          />
           <Scrollable style={{ height: '100%' }}>
             {filteredCollections().map((collection, i) => (
               <CollectionNode collection={collection} recentlyUpdated={i < 2} key={collection.id} />
@@ -133,26 +140,21 @@ function CollectionNode(p: {
     }, 500);
   }
 
-  function rename() {
-    promptAsync(
-      { placeholder: '', content: $t('Enter a Scene Collection Name'), onOk: submitRename },
+  async function rename() {
+    const newName = await promptAsync(
+      { title: $t('Enter a Scene Collection Name'), closable: true },
       p.collection.name,
     );
+    SceneCollectionsService.actions.rename(newName, p.collection.id);
   }
 
-  function submitRename(editableName: string) {
-    SceneCollectionsService.actions.rename(editableName, p.collection.id);
-  }
-
-  function remove() {
-    alertAsync({
-      content: $t(
-        $t('Are you sure you want to remove %{collectionName}?', {
-          collectionName: p.collection.name,
-        }),
-      ),
-      onOk: () => SceneCollectionsService.actions.delete(p.collection.id),
-    });
+  async function remove() {
+    const deleteConfirmed = await confirmAsync(
+      $t('Are you sure you want to remove %{collectionName}?', {
+        collectionName: p.collection.name,
+      }),
+    );
+    if (deleteConfirmed) SceneCollectionsService.actions.delete(p.collection.id);
   }
 
   return (
