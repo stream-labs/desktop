@@ -8,6 +8,7 @@ import { Services } from 'components-react/service-provider';
 import { alertAsync, promptAsync } from 'components-react/modals';
 import Scrollable from 'components-react/shared/Scrollable';
 import { $t } from 'services/i18n';
+import { $i } from 'services/utils';
 import { ISceneCollectionsManifestEntry } from 'services/scene-collections';
 import { byOS, getOS, OS } from 'util/operating-systems';
 import styles from './ManageSceneCollections.m.less';
@@ -89,7 +90,7 @@ export default function ManageSceneCollections() {
                 <strong>{$t('Template')}</strong>
                 <p>{$t('Choose a template from our theme library')}</p>
               </div>
-              <img />
+              <img src={$i('images/prime-themes.png')} />
             </button>
           </div>
         </Content>
