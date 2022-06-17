@@ -77,6 +77,15 @@ export class Display extends ReactComponent {}
 
 @Component({
   props: {
+    name: { default: 'DisplayElement' },
+    wrapperStyles: { default: () => ({ height: '100%' }) },
+    mins: { default: () => ({ x: 0, y: 0 }) },
+  },
+})
+export class DisplayElement extends ReactComponent {}
+
+@Component({
+  props: {
     name: { default: 'EditStreamWindow' },
     wrapperStyles: { default: () => ({ height: '100%' }) },
   },
