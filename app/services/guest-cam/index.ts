@@ -5,6 +5,7 @@ import {
   Inject,
   mutation,
   PersistentStatefulService,
+  Service,
   StatefulService,
   ViewHandler,
 } from 'services/core';
@@ -22,7 +23,10 @@ import { byOS, OS } from 'util/operating-systems';
 import { Mutex } from 'util/mutex';
 import Utils from 'services/utils';
 import { E_AUDIO_CHANNELS } from 'services/audio';
-import { SceneCollectionsService } from 'app-services';
+import { NotificationsService, SceneCollectionsService } from 'app-services';
+import { ENotificationType } from 'services/notifications';
+import { $t } from 'services/i18n';
+import { JsonrpcService } from 'services/api/jsonrpc';
 
 /**
  * Interface describing the various functions and expected return values
@@ -197,6 +201,8 @@ export class GuestCamService extends PersistentStatefulService<IGuestCamServiceS
   @Inject() sourceFiltersService: SourceFiltersService;
   @Inject() hardwareService: HardwareService;
   @Inject() sceneCollectionsService: SceneCollectionsService;
+  @Inject() notificationsService: NotificationsService;
+  @Inject() jsonrpcService: JsonrpcService;
 
   static defaultState: IGuestCamServiceState = {
     produceOk: false,
@@ -315,6 +321,8 @@ export class GuestCamService extends PersistentStatefulService<IGuestCamServiceS
   async startListeningForGuests() {
     // TODO: Handle socket disconnects
     if (this.socket) return;
+
+    if (!this.userService.views.isLoggedIn) return;
 
     await this.ensureInviteLink();
 
@@ -579,6 +587,17 @@ export class GuestCamService extends PersistentStatefulService<IGuestCamServiceS
 
     // Set audio volume to 0 until the guest is approved
     this.makeObsRequest('func_change_playback_volume', '0');
+
+    this.notificationsService.push({
+      type: ENotificationType.SUCCESS,
+      lifeTime: -1,
+      message: $t('A guest has joined - click to show'),
+      action: this.jsonrpcService.createRequest(
+        Service.getResourceId(this.sourcesService),
+        'showGuestCamProperties',
+        this.views.source,
+      ),
+    });
   }
 
   /**
