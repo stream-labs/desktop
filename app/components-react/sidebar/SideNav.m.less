@@ -27,6 +27,7 @@
 
   i, svg {
     margin: auto;
+    display: block;
   }
 
   svg {
@@ -45,7 +46,9 @@
   }
 
   &.prime-cell {
-    color: var(--prime);
+    i:not(.link-badge) {
+      color: var(--prime);
+    }
   }
 
   :global(.ant-badge) {
