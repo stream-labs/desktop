@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Tooltip, Tree } from 'antd';
 import { DataNode } from 'rc-tree/lib/interface';
 import { TreeProps } from 'rc-tree/lib/Tree';
@@ -21,7 +21,6 @@ import styles from './SceneSelector.m.less';
 import Scrollable from 'components-react/shared/Scrollable';
 import HelpTip from 'components-react/shared/HelpTip';
 import Translate from 'components-react/shared/Translate';
-import { SceneNode } from 'services/api/external-api/resources';
 
 interface ISourceMetadata {
   title: string;
@@ -51,13 +50,14 @@ class SourceSelectorModule {
   state = injectState({
     expandedFoldersIds: [] as string[],
     sourceMetadata: {} as { [sceneNodeId: string]: ISourceMetadata },
+    reorderOperation: 0,
   });
 
   nodeRefs = {};
 
   callCameFromInsideTheHouse = false;
 
-  getTreeData(nodesIds: string[]) {
+  get treeData() {
     // recursive function for transforming SceneNode[] to a Tree format of Antd.Tree
     const getTreeNodes = (sceneNodeIds: string[]): DataNode[] => {
       if (Object.keys(this.state.sourceMetadata).length < 1) return [];
@@ -65,10 +65,8 @@ class SourceSelectorModule {
         if (!this.nodeRefs[id]) this.nodeRefs[id] = React.createRef();
 
         const sceneNode = this.state.sourceMetadata[id];
-        const children: DataNode[] = [];
-        if (sceneNode.isFolder) {
-          children.push(...getTreeNodes(this.getChildren(id)));
-        }
+        let children;
+        if (sceneNode.isFolder) children = getTreeNodes(this.getChildren(id));
         return {
           title: (
             <TreeNode
@@ -85,7 +83,7 @@ class SourceSelectorModule {
               ref={this.nodeRefs[id]}
             />
           ),
-          isLeaf: children.length === 0,
+          isLeaf: !children,
           key: id,
           switcherIcon: <i className={sceneNode.icon} />,
           children,
@@ -93,15 +91,12 @@ class SourceSelectorModule {
       });
     };
 
-    return getTreeNodes(nodesIds);
-  }
-
-  get nodesIds() {
-    console.log('COMPUTE NODE IDS');
-    return this.scene
+    const nodes = this.scene
       .getNodes()
       .filter(node => !node.parentId)
       .map(node => node.id);
+
+    return getTreeNodes(nodes);
   }
 
   @mutation()
@@ -278,6 +273,7 @@ class SourceSelectorModule {
       destNode?.id,
       this.determinePlacement(info),
     );
+    this.state.setReorderOperation(this.state.reorderOperation + 1);
   }
 
   makeActive(ids: string[]) {
@@ -495,8 +491,7 @@ function StudioControls() {
 
 function ItemsTree() {
   const {
-    getTreeData,
-    nodesIds,
+    treeData,
     activeItemIds,
     expandedFoldersIds,
     scene,
@@ -506,10 +501,8 @@ function ItemsTree() {
     handleSort,
     fetchSourceMetadata,
   } = useModule(SourceSelectorModule);
-  useMemo(fetchSourceMetadata, [scene.id]);
-  const treeData = getTreeData(nodesIds);
 
-  console.log('RENDER', treeData);
+  useEffect(fetchSourceMetadata, [scene.id]);
 
   return (
     <Scrollable

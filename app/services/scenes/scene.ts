@@ -534,7 +534,6 @@ export class Scene {
   @mutation()
   private SET_NODES_ORDER(order: string[]) {
     // TODO: This is O(n^2)
-    console.log('SET_NODES_ORDER', order);
     this.state.nodes = order.map(id => {
       return this.state.nodes.find(item => {
         return item.id === id;
