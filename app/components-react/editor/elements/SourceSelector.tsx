@@ -50,7 +50,6 @@ class SourceSelectorModule {
   state = injectState({
     expandedFoldersIds: [] as string[],
     sourceMetadata: {} as { [sceneNodeId: string]: ISourceMetadata },
-    reorderOperation: 0,
   });
 
   nodeRefs = {};
@@ -265,15 +264,23 @@ class SourceSelectorModule {
         : (info.dragNodesKeys as string[]);
     const nodesToDrop = this.scene.getSelection(targetNodes);
     const destNode = this.scene.getNode(info.node.key as string);
+    const placement = this.determinePlacement(info);
+
+    nodesToDrop.getRootNodes().forEach(node => {
+      if (placement === EPlaceType.Inside) {
+        this.patchSourceMetadata(node.id, { parentId: destNode?.id });
+      } else {
+        this.patchSourceMetadata(node.id, { parentId: destNode?.parentId });
+      }
+    });
 
     if (!nodesToDrop || !destNode) return;
     await this.editorCommandsService.actions.return.executeCommand(
       'ReorderNodesCommand',
       nodesToDrop,
       destNode?.id,
-      this.determinePlacement(info),
+      placement,
     );
-    this.state.setReorderOperation(this.state.reorderOperation + 1);
   }
 
   makeActive(ids: string[]) {
