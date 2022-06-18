@@ -14,7 +14,7 @@ import * as remote from '@electron/remote';
  * store in the SelectionService, and selecting items
  * actually selects them in OBS.
  */
-@ServiceHelper()
+@ServiceHelper('SelectionService')
 export class GlobalSelection extends Selection {
   @Inject() selectionService: SelectionService;
   @Inject() editorCommandsService: EditorCommandsService;

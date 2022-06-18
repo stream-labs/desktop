@@ -20,7 +20,7 @@ import { ISelectionState, TNodesList } from './index';
 /**
  * Helper for working with multiple sceneItems
  */
-@ServiceHelper()
+@ServiceHelper('SelectionService')
 export class Selection {
   @Inject() scenesService: ScenesService;
 

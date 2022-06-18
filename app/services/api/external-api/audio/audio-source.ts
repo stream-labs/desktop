@@ -36,7 +36,7 @@ export interface IAudioSourceModel {
  * API for audio source management. Provides operations related to a single
  * audio source like set deflection and mute / unmute audio source.
  */
-@ServiceHelper()
+@ServiceHelper('AudioService')
 export class AudioSource implements ISerializable {
   @Inject() private audioService: InternalAudioService;
   @Inject() private sourcesService: InternalSourcesService;
