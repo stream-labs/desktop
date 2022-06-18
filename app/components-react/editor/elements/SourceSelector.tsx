@@ -23,6 +23,7 @@ import HelpTip from 'components-react/shared/HelpTip';
 import Translate from 'components-react/shared/Translate';
 
 interface ISourceMetadata {
+  id: string;
   title: string;
   icon: string;
   isVisible: boolean;
@@ -49,61 +50,55 @@ class SourceSelectorModule {
 
   state = injectState({
     expandedFoldersIds: [] as string[],
-    sourceMetadata: {} as { [sceneNodeId: string]: ISourceMetadata },
   });
 
   nodeRefs = {};
 
   callCameFromInsideTheHouse = false;
 
-  get treeData() {
+  getTreeData(nodeData: ISourceMetadata[]) {
     // recursive function for transforming SceneNode[] to a Tree format of Antd.Tree
-    const getTreeNodes = (sceneNodeIds: string[]): DataNode[] => {
-      if (Object.keys(this.state.sourceMetadata).length < 1) return [];
-      return sceneNodeIds.map(id => {
-        if (!this.nodeRefs[id]) this.nodeRefs[id] = React.createRef();
+    const getTreeNodes = (sceneNodes: ISourceMetadata[]): DataNode[] => {
+      return sceneNodes.map(sceneNode => {
+        if (!this.nodeRefs[sceneNode.id]) this.nodeRefs[sceneNode.id] = React.createRef();
 
-        const sceneNode = this.state.sourceMetadata[id];
         let children;
-        if (sceneNode.isFolder) children = getTreeNodes(this.getChildren(id));
+        if (sceneNode.isFolder) {
+          children = getTreeNodes(nodeData.filter(n => n.parentId === sceneNode.id));
+        }
         return {
           title: (
             <TreeNode
               title={sceneNode.title}
-              id={id}
+              id={sceneNode.id}
               isVisible={sceneNode.isVisible}
               isLocked={sceneNode.isLocked}
-              toggleVisibility={() => this.toggleVisibility(id)}
-              toggleLock={() => this.toggleLock(id)}
+              toggleVisibility={() => this.toggleVisibility(sceneNode.id)}
+              toggleLock={() => this.toggleLock(sceneNode.id)}
               selectiveRecordingEnabled={this.selectiveRecordingEnabled}
               isStreamVisible={sceneNode.isStreamVisible}
               isRecordingVisible={sceneNode.isRecordingVisible}
-              cycleSelectiveRecording={() => this.cycleSelectiveRecording(id)}
-              ref={this.nodeRefs[id]}
+              cycleSelectiveRecording={() => this.cycleSelectiveRecording(sceneNode.id)}
+              ref={this.nodeRefs[sceneNode.id]}
             />
           ),
           isLeaf: !children,
-          key: id,
+          key: sceneNode.id,
           switcherIcon: <i className={sceneNode.icon} />,
           children,
         };
       });
     };
 
-    const nodes = this.scene
-      .getNodes()
-      .filter(node => !node.parentId)
-      .map(node => node.id);
-
-    return getTreeNodes(nodes);
+    return getTreeNodes(nodeData.filter(n => !n.parentId));
   }
 
-  @mutation()
-  fetchSourceMetadata() {
-    this.scene.getNodes().forEach(node => {
+  get nodeData(): ISourceMetadata[] {
+    return this.scene.getNodes().map(node => {
       const selection = this.scene.getSelection(node.id);
       const isFolder = !isItem(node);
-      this.state.sourceMetadata[node.id] = {
+      return {
+        id: node.id,
         title: this.getNameForNode(node),
         icon: this.determineIcon(!isFolder, isFolder ? node.id : node.sourceId),
         isVisible: selection.isVisible(),
@@ -114,14 +109,6 @@ class SourceSelectorModule {
         isFolder,
       };
     });
-  }
-
-  @mutation()
-  patchSourceMetadata(id: string, patch: Partial<ISourceMetadata>) {
-    this.state.sourceMetadata[id] = {
-      ...this.state.sourceMetadata[id],
-      ...patch,
-    };
   }
 
   // TODO: Clean this up.  These only access state, no helpers
@@ -135,13 +122,6 @@ class SourceSelectorModule {
 
   isSelected(node: TSceneNode) {
     return this.selectionService.state.selectedIds.includes(node.id);
-  }
-
-  getChildren(parentId: string) {
-    return this.scene
-      .getNodes()
-      .filter(node => this.state.sourceMetadata[node.id].parentId === parentId)
-      .map(node => node.id);
   }
 
   determineIcon(isLeaf: boolean, sourceId: string) {
@@ -266,14 +246,6 @@ class SourceSelectorModule {
     const destNode = this.scene.getNode(info.node.key as string);
     const placement = this.determinePlacement(info);
 
-    nodesToDrop.getRootNodes().forEach(node => {
-      if (placement === EPlaceType.Inside) {
-        this.patchSourceMetadata(node.id, { parentId: destNode?.id });
-      } else {
-        this.patchSourceMetadata(node.id, { parentId: destNode?.parentId });
-      }
-    });
-
     if (!nodesToDrop || !destNode) return;
     await this.editorCommandsService.actions.return.executeCommand(
       'ReorderNodesCommand',
@@ -290,13 +262,10 @@ class SourceSelectorModule {
 
   @mutation()
   toggleFolder(nodeId: string) {
-    if (!this.state.sourceMetadata[nodeId].isFolder) return;
     if (this.state.expandedFoldersIds.includes(nodeId)) {
       this.state.expandedFoldersIds.splice(this.state.expandedFoldersIds.indexOf(nodeId), 1);
-      this.patchSourceMetadata(nodeId, { icon: 'fa fa-folder' });
     } else {
       this.state.expandedFoldersIds.push(nodeId);
-      this.patchSourceMetadata(nodeId, { icon: 'fas fa-folder-open' });
     }
   }
 
@@ -321,10 +290,6 @@ class SourceSelectorModule {
       this.state.expandedFoldersIds.concat(node.getPath().slice(0, -1)),
     );
 
-    this.state.expandedFoldersIds.forEach(id => {
-      this.patchSourceMetadata(id, { icon: 'fas fa-folder-open' });
-    });
-
     this.nodeRefs[this.lastSelectedId].current.scrollIntoView({ behavior: 'smooth' });
   }
 
@@ -339,7 +304,6 @@ class SourceSelectorModule {
   toggleVisibility(sceneNodeId: string) {
     const selection = this.scene.getSelection(sceneNodeId);
     const visible = !selection.isVisible();
-    this.patchSourceMetadata(sceneNodeId, { isVisible: visible });
     this.editorCommandsService.actions.executeCommand('HideItemsCommand', selection, !visible);
   }
 
@@ -386,14 +350,11 @@ class SourceSelectorModule {
     const selection = this.scene.getSelection(sceneNodeId);
     if (selection.isLocked()) return;
     if (selection.isStreamVisible() && selection.isRecordingVisible()) {
-      this.patchSourceMetadata(sceneNodeId, { isRecordingVisible: false });
       selection.setRecordingVisible(false);
     } else if (selection.isStreamVisible()) {
-      this.patchSourceMetadata(sceneNodeId, { isRecordingVisible: true, isStreamVisible: false });
       selection.setStreamVisible(false);
       selection.setRecordingVisible(true);
     } else {
-      this.patchSourceMetadata(sceneNodeId, { isRecordingVisible: true, isStreamVisible: true });
       selection.setStreamVisible(true);
       selection.setRecordingVisible(true);
     }
@@ -402,7 +363,6 @@ class SourceSelectorModule {
   toggleLock(sceneNodeId: string) {
     const selection = this.scene.getSelection(sceneNodeId);
     const locked = !selection.isLocked();
-    this.patchSourceMetadata(sceneNodeId, { isLocked: locked });
     selection.setSettings({ locked });
   }
 
@@ -498,7 +458,8 @@ function StudioControls() {
 
 function ItemsTree() {
   const {
-    treeData,
+    nodeData,
+    getTreeData,
     activeItemIds,
     expandedFoldersIds,
     scene,
@@ -506,10 +467,9 @@ function ItemsTree() {
     makeActive,
     toggleFolder,
     handleSort,
-    fetchSourceMetadata,
   } = useModule(SourceSelectorModule);
 
-  useEffect(fetchSourceMetadata, [scene.id]);
+  const treeData = getTreeData(nodeData);
 
   return (
     <Scrollable
