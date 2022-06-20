@@ -45,7 +45,7 @@ export default function ManageSceneCollections() {
 
   function filteredCollections() {
     const list = SceneCollectionsService.collections.sort((a, b) =>
-      a.modified > b.modified ? 1 : -1,
+      a.modified > b.modified ? -1 : 1,
     );
 
     if (query) {
@@ -122,10 +122,7 @@ function CollectionNode(p: {
   }
 
   function makeActive() {
-    if (SceneCollectionsService.getCollection(p.collection.id)?.operatingSystem !== getOS()) {
-      return;
-    }
-
+    if (p.collection.operatingSystem !== getOS()) return;
     SceneCollectionsService.actions.load(p.collection.id);
   }
 

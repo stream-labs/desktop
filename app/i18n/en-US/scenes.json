@@ -40,5 +40,13 @@
   "Switch Scenes": "Switch Scenes",
   "Failed to load scene collection.  A new one will be created instead.": "Failed to load scene collection.  A new one will be created instead.",
   "New Scene": "New Scene",
-  "Projector": "Projector"
+  "Projector": "Projector",
+  "Your Scene Collections:": "Your Scene Collections:",
+  "Add New Scene Collection:": "Add New Scene Collection:",
+  "Search Scene Collections": "Search Scene Collections",
+  "Start fresh and build from scratch": "Start fresh and build from scratch",
+  "Load existing scenes from OBS": "Load existing scenes from OBS",
+  "Template": "Template",
+  "Choose a template from our theme library": "Choose a template from our theme library",
+  "Enter a Scene Collection Name": "Enter a Scene Collection Name"
 }
