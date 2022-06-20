@@ -13,6 +13,7 @@ import { ISceneCollectionsManifestEntry } from 'services/scene-collections';
 import { byOS, getOS, OS } from 'util/operating-systems';
 import styles from './ManageSceneCollections.m.less';
 import { TextInput } from 'components-react/shared/inputs';
+import { useVuex } from 'components-react/hooks';
 
 const { Sider, Content } = Layout;
 const { Search } = Input;
@@ -25,6 +26,8 @@ export default function ManageSceneCollections() {
     NavigationService,
   } = Services;
   const [query, setQuery] = useState('');
+
+  const { collections } = useVuex(() => ({ collections: SceneCollectionsService.collections }));
 
   function close() {
     SceneCollectionsService.stateService.flushManifestFile();
@@ -44,9 +47,7 @@ export default function ManageSceneCollections() {
   }
 
   function filteredCollections() {
-    const list = SceneCollectionsService.collections.sort((a, b) =>
-      a.modified > b.modified ? -1 : 1,
-    );
+    const list = collections.sort((a, b) => (a.modified > b.modified ? -1 : 1));
 
     if (query) {
       const fuse = new Fuse(list, { shouldSort: true, keys: ['name'] });
