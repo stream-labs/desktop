@@ -95,16 +95,21 @@ class SourceSelectorModule {
 
   get nodeData(): ISourceMetadata[] {
     return this.scene.getNodes().map(node => {
-      const selection = this.scene.getSelection(node.id);
+      const itemsForNode = this.getItemsForNode(node.id);
+      const isVisible = itemsForNode.some(i => i.visible);
+      const isLocked = itemsForNode.every(i => i.locked);
+      const isRecordingVisible = itemsForNode.every(i => i.recordingVisible);
+      const isStreamVisible = itemsForNode.every(i => i.streamVisible);
+
       const isFolder = !isItem(node);
       return {
         id: node.id,
         title: this.getNameForNode(node),
         icon: this.determineIcon(!isFolder, isFolder ? node.id : node.sourceId),
-        isVisible: selection.isVisible(),
-        isLocked: selection.isLocked(),
-        isRecordingVisible: selection.isRecordingVisible(),
-        isStreamVisible: selection.isStreamVisible(),
+        isVisible,
+        isLocked,
+        isRecordingVisible,
+        isStreamVisible,
         parentId: node.parentId,
         isFolder,
       };
@@ -307,7 +312,7 @@ class SourceSelectorModule {
     this.editorCommandsService.actions.executeCommand('HideItemsCommand', selection, !visible);
   }
 
-  // TODO: Refactor into elsewhere
+  // Required for performance. Using Selection is too slow (Service Helpers)
   getItemsForNode(sceneNodeId: string): ISceneItem[] {
     const node = getDefined(this.scene.state.nodes.find(n => n.id === sceneNodeId));
 
