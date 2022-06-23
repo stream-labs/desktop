@@ -67,14 +67,16 @@ export default function ManageSceneCollections() {
       <Layout style={{ height: '100%' }}>
         <Sider width={300}>
           <div>{$t('Your Scene Collections:')}</div>
-          <TextInput
-            placeholder={$t('Search Scene Collections')}
-            onChange={setQuery}
-            uncontrolled={false}
-            addonBefore={<i className="icon-search" />}
-            nowrap
-          />
-          <Scrollable style={{ height: '100%' }}>
+          <div style={{ width: '96%' }}>
+            <TextInput
+              placeholder={$t('Search Scene Collections')}
+              onChange={setQuery}
+              uncontrolled={false}
+              addonBefore={<i className="icon-search" />}
+              nowrap
+            />
+          </div>
+          <Scrollable style={{ height: 'calc(100% - 32px)' }}>
             {filteredCollections().map((collection, i) => (
               <CollectionNode collection={collection} recentlyUpdated={i < 2} key={collection.id} />
             ))}
@@ -161,7 +163,12 @@ function CollectionNode(p: {
       className={cx(styles.collectionNode, { [styles.active]: isActive })}
     >
       <span>
-        <i className={cx('fab', byOS({ [OS.Windows]: 'fa-windows', [OS.Mac]: 'fa-apple' }))} />
+        <i
+          className={cx(
+            'fab',
+            p.collection.operatingSystem === OS.Windows ? 'fa-windows' : 'fa-apple',
+          )}
+        />
         {p.collection.name}
       </span>
       {p.recentlyUpdated && <span className={styles.whisper}>Updated {modified}</span>}

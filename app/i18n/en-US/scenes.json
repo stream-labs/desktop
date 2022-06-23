@@ -48,5 +48,6 @@
   "Load existing scenes from OBS": "Load existing scenes from OBS",
   "Template": "Template",
   "Choose a template from our theme library": "Choose a template from our theme library",
-  "Enter a Scene Collection Name": "Enter a Scene Collection Name"
+  "Enter a Scene Collection Name": "Enter a Scene Collection Name",
+  "Copy of %{collectionName}": "Copy of %{collectionName}"
 }
