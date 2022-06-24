@@ -8,13 +8,16 @@ const setup = createSetupFunction({
   injectee: {
     NicoliveProgramStateService: {
       updated: {
-        subscribe() {},
+        subscribe() { },
       },
+    },
+    NVoiceClientService: {
     },
   },
 });
 
 jest.mock('services/nicolive-program/state', () => ({ NicoliveProgramStateService: {} }));
+jest.mock('services/nicolive-program/n-voice-client', () => ({ NVoiceClientService: {} }));
 
 beforeEach(() => {
   jest.doMock('services/core/stateful-service');
@@ -37,13 +40,23 @@ test('makeSpeech', async () => {
   jest.spyOn(instance as any, 'state', 'get').mockReturnValue({
     enabled: true,
     pitch: testPitch,
-    rate: testRate,
+    webSpeech: {
+      rate: testRate,
+    },
+    nVoice: {
+      maxTime: 4,
+    },
     volume: testVolume,
+    selector: {
+      normal: 'nVoice',
+      operator: 'webSpeech',
+      system: 'webSpeech',
+    },
   });
 
   // 辞書変換しない
   jest
-    .spyOn(instance.synth, 'makeSpeechText')
+    .spyOn(instance, 'makeSpeechText')
     .mockImplementation((chat: WrappedChat) => chat.value.content);
 
   const makeChat = (s: string): WrappedChat => ({
@@ -58,22 +71,28 @@ test('makeSpeech', async () => {
   // stateの設定値を反映している
   expect(instance.makeSpeech(makeChat('test'))).toEqual({
     text: 'test',
+    synthesizer: 'nVoice',
     pitch: testPitch,
-    rate: testRate,
+    webSpeech: {
+      rate: undefined,
+    },
+    nVoice: {
+      maxTime: undefined,
+    },
     volume: testVolume,
   });
 });
 
-test('NicoliveCommentSynthesizer', async () => {
+test('WebSpeechSynthesizer', async () => {
   setup();
-  const { NicoliveCommentSynthesizer } = require('./nicolive-comment-synthesizer');
+  const { WebSpeechSynthesizer } = require('./nicolive-comment-synthesizer');
 
   jest.mock('./nicolive-comment-synthesizer', () => ({
     ...jest.requireActual('./nicolive-comment-synthesizer'),
     NicoliveProgramCommentSynthesizerService: {},
   }));
 
-  const synth = new NicoliveCommentSynthesizer();
+  const synth = new WebSpeechSynthesizer();
 
   jest.spyOn(window, 'speechSynthesis', 'get').mockImplementation(undefined);
   expect(synth.available).toBeFalsy();
@@ -83,5 +102,6 @@ test('NicoliveCommentSynthesizer', async () => {
     .mockImplementation(() => true as unknown as SpeechSynthesis);
   expect(synth.available).toBeTruthy();
 
-  expect(synth.makeSpeechText('')).toEqual('');
+  // TODO
+  // expect(synth.makeSpeechText('')).toEqual('');
 });

@@ -59,6 +59,7 @@ export { NicoliveCommentViewerService } from 'services/nicolive-program/nicolive
 export { NicoliveCommentFilterService } from 'services/nicolive-program/nicolive-comment-filter';
 export { NicoliveCommentLocalFilterService } from 'services/nicolive-program/nicolive-comment-local-filter';
 export { NicoliveCommentSynthesizerService } from 'services/nicolive-program/nicolive-comment-synthesizer';
+export { NVoiceClientService } from 'services/nicolive-program/n-voice-client';
 
 export { IncrementalRolloutService } from 'services/incremental-rollout';
 export { CrashReporterService } from 'services/crash-reporter';

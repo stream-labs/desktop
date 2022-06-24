@@ -28,10 +28,12 @@ export default class CommentSynthesizer extends Vue {
         await sleep(200);
       }
 
+      speech.synthesizer = 'nVoice'; // TODO これを変更することでテスト対象を指定する
+
       service.speakText(
         speech,
-        () => {},
-        () => {},
+        () => { },
+        () => { },
       );
     }
   }
