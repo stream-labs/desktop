@@ -59,7 +59,7 @@ test('OBS Importer', async t => {
 
   await waitForDisplayed('h1=Optimize');
   await (await t.context.app.client.$('button=Skip')).click();
-  await (await t.context.app.client.$('div=Choose Free')).click();
+  // await (await t.context.app.client.$('div=Choose Free')).click();
 
   await waitForDisplayed('[data-name=SceneSelector]');
 

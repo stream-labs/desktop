@@ -6,9 +6,12 @@ import { AppService } from 'services/app';
 import { authorizedHeaders, jfetch } from '../util/requests';
 import path from 'path';
 import fs from 'fs';
-import { PatchNotesService } from 'services/patch-notes';
 import { I18nService, $t } from 'services/i18n';
-import { NotificationsService, ENotificationType } from 'services/notifications';
+import {
+  NotificationsService,
+  ENotificationType,
+  ENotificationSubType,
+} from 'services/notifications';
 import { CustomizationService } from './customization';
 import { JsonrpcService } from 'services/api/jsonrpc/jsonrpc';
 import { WindowsService } from 'services/windows';
@@ -33,7 +36,6 @@ export class AnnouncementsService extends PersistentStatefulService<{
   @Inject() private hostsService: HostsService;
   @Inject() private userService: UserService;
   @Inject() private appService: AppService;
-  @Inject() private patchNotesService: PatchNotesService;
   @Inject() private i18nService: I18nService;
   @Inject() private customizationService: CustomizationService;
   @Inject() private notificationsService: NotificationsService;
@@ -124,6 +126,7 @@ export class AnnouncementsService extends PersistentStatefulService<{
       this.notificationsService.push({
         message: resp.newUnreadAnnouncement.header,
         type: ENotificationType.SUCCESS,
+        subType: ENotificationSubType.NEWS,
         playSound: false,
         lifeTime: -1,
         action: this.jsonrpcService.createRequest(Service.getResourceId(this), 'openNewsWindow'),

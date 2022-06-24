@@ -77,6 +77,15 @@ export class Display extends ReactComponent {}
 
 @Component({
   props: {
+    name: { default: 'DisplayElement' },
+    wrapperStyles: { default: () => ({ height: '100%' }) },
+    mins: { default: () => ({ x: 0, y: 0 }) },
+  },
+})
+export class DisplayElement extends ReactComponent {}
+
+@Component({
+  props: {
     name: { default: 'EditStreamWindow' },
     wrapperStyles: { default: () => ({ height: '100%' }) },
   },
@@ -255,13 +264,20 @@ export class Projector extends ReactComponent {}
 @Component({
   props: {
     name: { default: 'RecentEvents' },
-    wrapperStyles: {
-      default: () => ({ height: '100%' }),
-    },
+    wrapperStyles: { default: () => ({ height: '100%' }) },
     componentProps: { default: () => ({ isOverlay: false }) },
   },
 })
 export class RecentEvents extends ReactComponent<{ isOverlay?: boolean }> {}
+
+@Component({
+  props: {
+    name: { default: 'RecordingPreview' },
+    wrapperStyles: { default: () => ({ height: '100%' }) },
+    mins: { default: () => ({ x: 0, y: 0 }) },
+  },
+})
+export class RecordingPreview extends ReactComponent {}
 
 @Component({
   props: {
@@ -278,6 +294,15 @@ export class RenameSource extends ReactComponent {}
   },
 })
 export class SafeMode extends ReactComponent {}
+
+@Component({
+  props: {
+    name: { default: 'StreamPreview' },
+    wrapperStyles: { default: () => ({ height: '100%' }) },
+    mins: { default: () => ({ x: 0, y: 0 }) },
+  },
+})
+export class StreamPreview extends ReactComponent {}
 
 @Component({
   props: {
