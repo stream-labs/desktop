@@ -142,7 +142,7 @@ export function DefaultPromptForm(
 
   return (
     <Form name="prompt" form={form}>
-      <TextInput name="prompt" value={p.values.prompt} onChange={onChange} />
+      <TextInput name="prompt" value={p.values.prompt} onChange={onChange} nowrap />
     </Form>
   );
 }
