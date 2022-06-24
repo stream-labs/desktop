@@ -28,7 +28,7 @@ export interface ISelectionModel {
  *
  * Use {@link Scene.getSelection} to fetch a new {@link Selection} object.
  */
-@ServiceHelper()
+@ServiceHelper('SelectionService')
 export class Selection implements ISceneItemActions, ISerializable {
   @InjectFromExternalApi() private sourcesService: SourcesService;
   @InjectFromExternalApi() private scenesService: ScenesService;

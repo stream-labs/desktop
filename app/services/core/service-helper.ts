@@ -14,8 +14,9 @@
 import { inheritMutations } from './stateful-service';
 import Utils from 'services/utils';
 
-export function ServiceHelper() {
+export function ServiceHelper(parentServiceName: string) {
   return function <T extends { new (...args: any[]): {} }>(constr: T) {
+    constr['_isHelperFor'] = parentServiceName;
     const klass = class extends constr {
       constructor(...args: any[]) {
         super(...args);

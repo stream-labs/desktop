@@ -20,8 +20,10 @@ function registerMutation(
   descriptor: PropertyDescriptor,
   options: IMutationOptions = {},
 ) {
-  const serviceName = target.constructor.name;
-  const mutationName = `${serviceName}.${methodName}`;
+  const serviceName = target.constructor._isHelperFor ?? target.constructor.name;
+  const mutationName = target.constructor._isHelperFor
+    ? `${serviceName}.${target.constructor.name}.${methodName}`
+    : `${serviceName}.${methodName}`;
   const opts: IMutationOptions = { unsafe: false, sync: true, ...options };
 
   target.originalMethods = target.originalMethods || {};
@@ -152,7 +154,7 @@ export function getModule(ModuleContainer: any): Module<any, any> {
   // filter inherited mutations
   for (const mutationName in prototypeMutations) {
     const serviceName = mutationName.split('.')[0];
-    if (serviceName !== ModuleContainer.name) continue;
+    if (serviceName !== (ModuleContainer._isHelperFor ?? ModuleContainer.name)) continue;
     mutations[mutationName] = prototypeMutations[mutationName];
   }
 
