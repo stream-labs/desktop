@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { injectState, mutation, useModule } from 'slap';
 import { Badge, Tooltip } from 'antd';
 import moment from 'moment';
 import cx from 'classnames';
@@ -14,26 +15,78 @@ interface IUiNotification extends INotification {
   outdated?: boolean;
 }
 
+class NotificationsModule {
+  state = injectState({
+    currentNotif: {} as IUiNotification,
+  });
+
+  notifQueue = cloneDeep(Services.NotificationsService.state.notifications);
+
+  audio = new Audio(notificationAudio);
+
+  playNotif(notif: IUiNotification) {
+    if (this.state.currentNotif.id) {
+      this.notifQueue.push(notif);
+    } else {
+      this.addCurrentNotif(notif);
+    }
+  }
+
+  addCurrentNotif(notif: IUiNotification) {
+    this.state.setCurrentNotif(notif);
+
+    if (this.settings.playSound) this.audio.play();
+
+    if (notif.lifeTime !== -1) {
+      setTimeout(() => this.finishNotif(), notif.lifeTime);
+    }
+  }
+
+  finishNotif() {
+    this.state.setCurrentNotif({} as IUiNotification);
+
+    if (this.notifQueue.length > 0) {
+      this.state.setCurrentNotif(this.notifQueue.shift() as IUiNotification);
+    }
+  }
+
+  clearQueueOfRead(ids: number[]) {
+    this.notifQueue = this.notifQueue.filter(notif => !ids.includes(notif.id));
+  }
+
+  get unreadWarnings() {
+    return Services.NotificationsService.views.getUnread(ENotificationType.WARNING);
+  }
+
+  get unreadNotifs() {
+    return Services.NotificationsService.views.getUnread();
+  }
+
+  get settings() {
+    return Services.NotificationsService.state.settings;
+  }
+}
+
+function useNotifications() {
+  return useModule(NotificationsModule);
+}
+
 export default function NotificationsArea() {
   const { NotificationsService, AnnouncementsService } = Services;
 
-  const [showExtendedNotifications, setShowExtendedNotifications] = useState(true);
-  const [canShowNextNotif, setCanShowNextNotif] = useState(true);
-  const [notificationQueue, setNotificationQueue] = useState(() => {
-    if (NotificationsService.state.notifications) {
-      return cloneDeep(NotificationsService.state.notifications);
-    }
-    return [];
-  });
-  const [notifications, setNotifications] = useState([] as IUiNotification[]);
-
-  const { unreadWarnings, unreadNotifs, settings } = useVuex(() => ({
-    unreadWarnings: NotificationsService.views.getUnread(ENotificationType.WARNING).length,
-    unreadNotifs: NotificationsService.views.getUnread(),
-    settings: NotificationsService.state.settings,
-  }));
+  const {
+    notifQueue,
+    currentNotif,
+    unreadWarnings,
+    unreadNotifs,
+    settings,
+    finishNotif,
+    playNotif,
+    clearQueueOfRead,
+  } = useNotifications();
 
   const notificationsContainer = useRef<HTMLDivElement>(null);
+  const [showExtendedNotifications, setShowExtendedNotifications] = useState(true);
 
   const notifyAudio = useRef(new Audio(notificationAudio));
 
@@ -41,18 +94,17 @@ export default function NotificationsArea() {
   const showUnreadNotificationsTooltip = $t('Click to read your unread Notifications');
 
   useEffect(() => {
-    if (notificationQueue) {
-      checkQueue();
+    if (notifQueue.length > 0) {
+      finishNotif();
     }
 
     const notifPushedSub = NotificationsService.notificationPushed.subscribe(notif => {
-      onNotificationHandler(notif);
+      playNotif(notif);
     });
-    const notifReadSub = NotificationsService.notificationRead.subscribe(notif => {
-      onNotificationsReadHandler(notif);
+    const notifReadSub = NotificationsService.notificationRead.subscribe(ids => {
+      clearQueueOfRead(ids);
     });
 
-    const refreshNotifsInterval = window.setInterval(checkQueue, 5000);
     const resizeInterval = window.setInterval(() => {
       if (!notificationsContainer.current) return;
       setShowExtendedNotifications(notificationsContainer.current?.offsetWidth >= 150);
@@ -61,41 +113,12 @@ export default function NotificationsArea() {
     return () => {
       notifPushedSub.unsubscribe();
       notifReadSub.unsubscribe();
-      clearInterval(refreshNotifsInterval);
       clearInterval(resizeInterval);
     };
   }, []);
 
   function fromNow(time: number): string {
     return moment(time).fromNow();
-  }
-
-  function checkQueue() {
-    hideOutdated();
-
-    if (notificationQueue.length > 0) {
-      const notif = notificationQueue[0];
-      setNotificationQueue(notificationQueue.slice(1));
-      showNotification(notif);
-      setCanShowNextNotif(false);
-    } else {
-      setCanShowNextNotif(true);
-    }
-  }
-
-  function onNotificationsReadHandler(ids: number[]) {
-    // remove read notifications from queue
-    setNotificationQueue(
-      notificationQueue.filter(notify => {
-        return ids.includes(notify.id);
-      }),
-    );
-    setNotifications(
-      notifications.map(notif => ({
-        ...notif,
-        outdated: ids.includes(notif.id) ? true : notif.outdated,
-      })),
-    );
   }
 
   function showNotification(notif: INotification) {
