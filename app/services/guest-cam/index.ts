@@ -147,6 +147,7 @@ interface IGuestCamServiceState {
   audioSourceId: string;
   inviteHash: string;
   guestInfo: IGuest;
+  volume: number;
 }
 
 interface IInviteLink {
@@ -210,6 +211,7 @@ export class GuestCamService extends PersistentStatefulService<IGuestCamServiceS
     audioSourceId: '',
     inviteHash: '',
     guestInfo: null,
+    volume: 255,
   };
 
   get views() {
@@ -427,6 +429,10 @@ export class GuestCamService extends PersistentStatefulService<IGuestCamServiceS
       throw new Error('Tried to start producer but mediasoup source does not exist');
     }
 
+    // Load volume from source properties manager
+    const volume = this.views.source.getPropertiesManagerSettings()['guest_cam_volume'] ?? 255;
+    this.SET_VOLUME(volume);
+
     // Remove all existing mediasoup filters
     Object.keys(this.sourceFiltersService.state.filters).forEach(sourceId => {
       this.sourceFiltersService.views.filtersBySourceId(sourceId, true).forEach(filter => {
@@ -463,6 +469,21 @@ export class GuestCamService extends PersistentStatefulService<IGuestCamServiceS
       { room: this.room },
       EFilterDisplayType.Hidden,
     );
+  }
+
+  setVolume(vol: number) {
+    if (vol < 0 || vol > 255) return;
+
+    // Unfortunately we need to update it in 3 places:
+    // - OBS Source, to make the volume actually change
+    // - Vuex store, to ensure UI reactivity
+    // - Properties manager, to ensure persistence in the scene collection
+    //   on the source itself
+    if (!this.views.source.forceHidden) {
+      this.makeObsRequest('func_change_playback_volume', vol.toString());
+    }
+    this.SET_VOLUME(vol);
+    this.views.source.setPropertiesManagerSettings({ guest_cam_volume: vol });
   }
 
   async getTurnConfig() {
@@ -594,8 +615,8 @@ export class GuestCamService extends PersistentStatefulService<IGuestCamServiceS
       message: $t('A guest has joined - click to show'),
       action: this.jsonrpcService.createRequest(
         Service.getResourceId(this.sourcesService),
-        'showGuestCamProperties',
-        this.views.source,
+        'showGuestCamPropertiesBySourceId',
+        this.views.sourceId,
       ),
     });
   }
@@ -617,8 +638,7 @@ export class GuestCamService extends PersistentStatefulService<IGuestCamServiceS
 
     this.views.source.setForceHidden(!visible);
 
-    // TODO: User adjustable volume
-    const volume = visible ? 255 : 0;
+    const volume = visible ? this.state.volume : 0;
 
     this.makeObsRequest('func_change_playback_volume', volume.toString());
   }
@@ -724,5 +744,10 @@ export class GuestCamService extends PersistentStatefulService<IGuestCamServiceS
   @mutation()
   private SET_GUEST(guest: IGuest) {
     this.state.guestInfo = guest;
+  }
+
+  @mutation()
+  private SET_VOLUME(vol: number) {
+    this.state.volume = vol;
   }
 }

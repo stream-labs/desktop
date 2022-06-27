@@ -794,10 +794,14 @@ export class SourcesService extends StatefulService<ISourcesState> {
       title: $t('Guest Cam Properties', { sourceName: propertiesName }),
       queryParams: { sourceId: source.sourceId },
       size: {
-        width: 690,
-        height: 800,
+        width: 800,
+        height: 600,
       },
     });
+  }
+
+  showGuestCamPropertiesBySourceId(sourceId: string) {
+    this.showGuestCamProperties(this.views.getSource(sourceId));
   }
 
   showShowcase() {

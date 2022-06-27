@@ -1,3 +1,5 @@
 {
-  "Source: %{sourceName}": "Source: %{sourceName}"
+  "Source: %{sourceName}": "Source: %{sourceName}",
+  "Guest Cam": "Guest Cam",
+  "Invite a guest to join your stream from a web browser.": "Invite a guest to join your stream from a web browser."
 }

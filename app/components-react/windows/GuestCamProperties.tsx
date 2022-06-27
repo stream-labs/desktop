@@ -2,7 +2,7 @@ import { Alert, Button, Modal, Tabs, Tooltip } from 'antd';
 import { useVuex } from 'components-react/hooks';
 import { Services } from 'components-react/service-provider';
 import Display from 'components-react/shared/Display';
-import { ListInput, TextInput } from 'components-react/shared/inputs';
+import { ListInput, SliderInput, TextInput } from 'components-react/shared/inputs';
 import Form from 'components-react/shared/inputs/Form';
 import { ModalLayout } from 'components-react/shared/ModalLayout';
 import React, { useMemo, useState } from 'react';
@@ -14,7 +14,7 @@ import { byOS, OS } from 'util/operating-systems';
 import { TSourceType } from 'services/sources';
 
 export default function GuestCamProperties() {
-  const { GuestCamService, SourcesService } = Services;
+  const { GuestCamService, SourcesService, WindowsService } = Services;
   const audioSourceType = byOS({
     [OS.Windows]: 'wasapi_input_capture',
     [OS.Mac]: 'coreaudio_input_capture',
@@ -32,6 +32,7 @@ export default function GuestCamProperties() {
     inviteUrl,
     source,
     guestInfo,
+    volume,
   } = useVuex(() => ({
     produceOk: GuestCamService.state.produceOk,
     visible: GuestCamService.views.guestVisible,
@@ -50,6 +51,7 @@ export default function GuestCamProperties() {
     inviteUrl: GuestCamService.views.inviteUrl,
     source: GuestCamService.views.source,
     guestInfo: GuestCamService.state.guestInfo,
+    volume: GuestCamService.state.volume,
   }));
   const [regeneratingLink, setRegeneratingLink] = useState(false);
 
@@ -68,7 +70,7 @@ export default function GuestCamProperties() {
             style={{
               display: 'flex',
               flexDirection: 'row',
-              height: 250,
+              height: 260,
               background: 'var(--section-alt)',
               borderRadius: 8,
             }}
@@ -93,11 +95,23 @@ export default function GuestCamProperties() {
                   {$t('Disconnect')}
                 </button>
               </div>
-              <Form layout="vertical">
+              <Form layout="inline">
+                <SliderInput
+                  label={$t('Volume')}
+                  value={volume}
+                  onChange={GuestCamService.actions.setVolume}
+                  min={0}
+                  max={255}
+                  debounce={500}
+                  step={1}
+                  tipFormatter={v => `${((v / 255) * 100).toFixed(1)}%`}
+                  style={{ width: '100%', margin: '10px 0' }}
+                />
                 <TextInput
                   readOnly
                   value={inviteUrl}
                   label={$t('Invite URL')}
+                  style={{ width: '100%', margin: '10px 0 20px' }}
                   addonAfter={
                     <Tooltip title={$t('Copied!')} trigger="click">
                       <Button onClick={() => remote.clipboard.writeText(inviteUrl)}>
@@ -114,7 +128,7 @@ export default function GuestCamProperties() {
                 )}
               </Button>
             </div>
-            <div style={{ width: 300, background: 'var(--section)', borderRadius: '0 8px 8px 0' }}>
+            <div style={{ width: 400, background: 'var(--section)', borderRadius: '0 8px 8px 0' }}>
               {/* Weird double div is to avoid display blocking border radius */}
               <div style={{ margin: '10px 0', height: 'calc(100% - 20px)' }}>
                 {!!guestInfo && produceOk && <Display sourceId={source?.sourceId} />}
@@ -157,17 +171,39 @@ export default function GuestCamProperties() {
               allowClear={true}
             />
           </Form>
-          {!videoSourceExists && (
-            <div>{$t('No webcam source is selected. Your guest will not be able to see you.')}</div>
-          )}
-          {!audioSourceExists && (
-            <div>
-              {$t('No microphone source is selected. Your guest will not be able to hear you.')}
-            </div>
+          {(!videoSourceExists || !audioSourceExists) && (
+            <Alert
+              type="error"
+              showIcon={true}
+              closable={false}
+              message={
+                <div style={{ color: 'var(--paragraph)' }}>
+                  {!videoSourceExists && (
+                    <div>
+                      {$t('No webcam source is selected. Your guest will not be able to see you.')}
+                    </div>
+                  )}
+                  {!audioSourceExists && (
+                    <div>
+                      {$t(
+                        'No microphone source is selected. Your guest will not be able to hear you.',
+                      )}
+                    </div>
+                  )}
+                </div>
+              }
+            />
           )}
         </Tabs.TabPane>
       </Tabs>
-      <Modal footer={null} visible={!produceOk} getContainer={false}>
+      <Modal
+        visible={!produceOk}
+        getContainer={false}
+        closable={false}
+        okText={$t('Start Guest Cam')}
+        onOk={() => GuestCamService.actions.setProduceOk()}
+        onCancel={() => WindowsService.actions.closeChildWindow()}
+      >
         <h2>{$t('Initialize Guest Cam?')}</h2>
         <p>
           {$t(
@@ -202,13 +238,6 @@ export default function GuestCamProperties() {
           showIcon={false}
           banner
         />
-        <Button
-          type="primary"
-          style={{ marginTop: 24 }}
-          onClick={() => GuestCamService.actions.setProduceOk()}
-        >
-          {$t('Start Guest Cam')}
-        </Button>
       </Modal>
     </ModalLayout>
   );
