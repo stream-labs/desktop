@@ -7,8 +7,7 @@ import { afterAppStart, TExecutionContext } from '../helpers/spectron';
 import { PerformanceService } from '../../app/services/performance';
 import { IAudioServiceApi } from '../../app/services/audio';
 import { WindowsService } from '../../app/services/windows';
-import NativeImage = Electron.NativeImage;
-import {focusChild, focusMain} from "../helpers/modules/core";
+import { focusChild, focusMain } from '../helpers/modules/core';
 
 const fs = require('fs');
 const CONFIG = getConfig();
@@ -69,7 +68,7 @@ export async function makeScreenshots(t: TExecutionContext, title = '') {
     processedConfigs.push(configStr);
 
     await applyConfig(t, config);
-    await t.context.app.browserWindow.capturePage().then((imageBuffer: NativeImage) => {
+    await t.context.app.browserWindow.capturePage().then(imageBuffer => {
       const testName = t.title.replace('afterEach hook for ', '');
       const screenshotName = title ? `${testName}_${title}` : testName;
       const imageFileName = `${screenshotName}__${configInd}.png`;

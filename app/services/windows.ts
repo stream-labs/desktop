@@ -23,7 +23,6 @@ import {
   ScreenCaptureProperties,
   SharedComponentsLibrary,
   SourceProperties,
-  PerformanceMetrics,
   RenameSource,
   AdvancedStatistics,
   WidgetWindow,
@@ -36,11 +35,11 @@ import {
   Projector,
   AddSource,
   News,
+  Notifications,
   PlatformAppPopOut,
 } from 'components/shared/ReactComponentList';
 
 import SourcePropertiesDeprecated from 'components/windows/SourceProperties.vue';
-import Notifications from 'components/windows/Notifications.vue';
 import Troubleshooter from 'components/windows/Troubleshooter.vue';
 import Blank from 'components/windows/Blank.vue';
 import ManageSceneCollections from 'components/windows/ManageSceneCollections.vue';
