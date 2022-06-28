@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { injectState, useModule } from 'slap';
-import { Badge, Tooltip } from 'antd';
+import { Badge, message, Tooltip } from 'antd';
 import moment from 'moment';
 import cx from 'classnames';
 import cloneDeep from 'lodash/cloneDeep';
@@ -11,37 +11,36 @@ import styles from './NotificationsArea.m.less';
 const notificationAudio = require('../../../media/sound/ding.wav');
 
 class NotificationsModule {
-  state = injectState({
-    currentNotif: {} as INotification,
-  });
-
+  currentNotif = {} as INotification;
   notifQueue = cloneDeep(Services.NotificationsService.state.notifications);
 
   audio = new Audio(notificationAudio);
 
-  playNotif(notif: INotification) {
-    if (this.state.currentNotif.id) {
+  addNotif(notif: INotification) {
+    if (this.currentNotif.id) {
       this.notifQueue.push(notif);
     } else {
-      this.addCurrentNotif(notif);
+      this.playNotif(notif);
     }
   }
 
-  addCurrentNotif(notif: INotification) {
-    this.state.setCurrentNotif(notif);
-
+  playNotif(notif: INotification) {
+    this.currentNotif = notif;
     if (this.settings.playSound) this.audio.play();
 
-    if (notif.lifeTime !== -1) {
-      setTimeout(() => this.finishNotif(), notif.lifeTime);
-    }
+    message
+      .info({
+        content: <MessageNode notif={notif} />,
+        duration: notif.lifeTime === -1 ? 0 : notif.lifeTime / 1000,
+        key: `${notif.message}${notif.date}`,
+        onClick: () => this.clickNotif(),
+      })
+      .then(() => this.playNext());
   }
 
-  finishNotif() {
-    this.state.setCurrentNotif({} as INotification);
-
+  playNext() {
     if (this.notifQueue.length > 0) {
-      this.state.setCurrentNotif(this.notifQueue.shift() as INotification);
+      this.playNotif(this.notifQueue.shift() as INotification);
     }
   }
 
@@ -62,10 +61,10 @@ class NotificationsModule {
   }
 
   clickNotif() {
-    if (!this.state.currentNotif.id) return;
-    Services.NotificationsService.applyAction(this.state.currentNotif.id);
-    Services.NotificationsService.markAsRead(this.state.currentNotif.id);
-    this.finishNotif();
+    if (!this.currentNotif.id) return;
+    Services.NotificationsService.applyAction(this.currentNotif.id);
+    Services.NotificationsService.markAsRead(this.currentNotif.id);
+    this.playNext();
   }
 }
 
@@ -77,15 +76,12 @@ export default function NotificationsArea() {
   const { NotificationsService, AnnouncementsService } = Services;
 
   const {
-    notifQueue,
-    currentNotif,
     unreadWarnings,
     unreadNotifs,
     settings,
-    finishNotif,
-    playNotif,
+    addNotif,
+    playNext,
     clearQueueOfRead,
-    clickNotif,
   } = useNotifications();
 
   const notificationsContainer = useRef<HTMLDivElement>(null);
@@ -95,12 +91,10 @@ export default function NotificationsArea() {
   const showUnreadNotificationsTooltip = $t('Click to read your unread Notifications');
 
   useEffect(() => {
-    if (notifQueue.length > 0) {
-      finishNotif();
-    }
+    playNext();
 
     const notifPushedSub = NotificationsService.notificationPushed.subscribe(notif => {
-      playNotif(notif);
+      addNotif(notif);
     });
     const notifReadSub = NotificationsService.notificationRead.subscribe(ids => {
       clearQueueOfRead(ids);
@@ -118,9 +112,13 @@ export default function NotificationsArea() {
     };
   }, []);
 
-  function fromNow(time: number): string {
-    return moment(time).fromNow();
-  }
+  useEffect(() => {
+    if (!notificationsContainer.current) return;
+    message.config({
+      getContainer: () => notificationsContainer.current as HTMLElement,
+      maxCount: showExtendedNotifications ? 1 : 0,
+    });
+  }, [notificationsContainer.current]);
 
   function showNotifications() {
     NotificationsService.actions.showNotifications();
@@ -163,23 +161,29 @@ export default function NotificationsArea() {
           </div>
         </Tooltip>
       )}
-      <div className={cx(styles.notificationsContainer, 'flex--grow')} ref={notificationsContainer}>
-        {showExtendedNotifications && (
-          <div
-            key={`${currentNotif.message}${currentNotif.date}`}
-            className={cx(styles.notification, {
-              [styles.info]: currentNotif.type === 'INFO',
-              [styles.warning]: currentNotif.type === 'WARNING',
-              [styles.success]: currentNotif.type === 'SUCCESS',
-              [styles.hasAction]: currentNotif.action,
-            })}
-            onClick={clickNotif}
-          >
-            {currentNotif.message}{' '}
-            {currentNotif.showTime && <span> {fromNow(currentNotif.date)}</span>}
-          </div>
-        )}
-      </div>
+      <div
+        className={cx(styles.notificationsContainer, 'flex--grow')}
+        ref={notificationsContainer}
+      />
+    </div>
+  );
+}
+
+function MessageNode(p: { notif: INotification }) {
+  function fromNow(time: number): string {
+    return moment(time).fromNow();
+  }
+
+  return (
+    <div
+      className={cx(styles.notification, {
+        [styles.info]: p.notif.type === 'INFO',
+        [styles.warning]: p.notif.type === 'WARNING',
+        [styles.success]: p.notif.type === 'SUCCESS',
+        [styles.hasAction]: p.notif.action,
+      })}
+    >
+      {p.notif.message} {p.notif.showTime && <span> {fromNow(p.notif.date)}</span>}
     </div>
   );
 }
