@@ -118,7 +118,7 @@ export default function NotificationsArea() {
       getContainer: () => notificationsContainer.current as HTMLElement,
       maxCount: showExtendedNotifications ? 1 : 0,
     });
-  }, [notificationsContainer.current]);
+  }, [notificationsContainer.current, showExtendedNotifications]);
 
   function showNotifications() {
     NotificationsService.actions.showNotifications();
