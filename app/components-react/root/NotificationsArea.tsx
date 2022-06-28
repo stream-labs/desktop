@@ -26,6 +26,7 @@ class NotificationsModule {
   }
 
   playNotif(notif: INotification) {
+    if (!this.settings.enabled) return;
     this.currentNotif = notif;
     if (this.settings.playSound) this.audio.play();
 
