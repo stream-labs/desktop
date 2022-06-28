@@ -1,9 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { injectState, mutation, useModule } from 'slap';
+import { injectState, useModule } from 'slap';
 import { Badge, Tooltip } from 'antd';
 import moment from 'moment';
 import cx from 'classnames';
-import { useVuex, useRenderInterval } from '../hooks';
 import cloneDeep from 'lodash/cloneDeep';
 import { Services } from '../service-provider';
 import { ENotificationType, INotification, ENotificationSubType } from 'services/notifications';
@@ -11,20 +10,16 @@ import { $t } from 'services/i18n';
 import styles from './NotificationsArea.m.less';
 const notificationAudio = require('../../../media/sound/ding.wav');
 
-interface IUiNotification extends INotification {
-  outdated?: boolean;
-}
-
 class NotificationsModule {
   state = injectState({
-    currentNotif: {} as IUiNotification,
+    currentNotif: {} as INotification,
   });
 
   notifQueue = cloneDeep(Services.NotificationsService.state.notifications);
 
   audio = new Audio(notificationAudio);
 
-  playNotif(notif: IUiNotification) {
+  playNotif(notif: INotification) {
     if (this.state.currentNotif.id) {
       this.notifQueue.push(notif);
     } else {
@@ -32,7 +27,7 @@ class NotificationsModule {
     }
   }
 
-  addCurrentNotif(notif: IUiNotification) {
+  addCurrentNotif(notif: INotification) {
     this.state.setCurrentNotif(notif);
 
     if (this.settings.playSound) this.audio.play();
@@ -43,10 +38,10 @@ class NotificationsModule {
   }
 
   finishNotif() {
-    this.state.setCurrentNotif({} as IUiNotification);
+    this.state.setCurrentNotif({} as INotification);
 
     if (this.notifQueue.length > 0) {
-      this.state.setCurrentNotif(this.notifQueue.shift() as IUiNotification);
+      this.state.setCurrentNotif(this.notifQueue.shift() as INotification);
     }
   }
 
@@ -64,6 +59,13 @@ class NotificationsModule {
 
   get settings() {
     return Services.NotificationsService.state.settings;
+  }
+
+  clickNotif() {
+    if (!this.state.currentNotif.id) return;
+    Services.NotificationsService.applyAction(this.state.currentNotif.id);
+    Services.NotificationsService.markAsRead(this.state.currentNotif.id);
+    this.finishNotif();
   }
 }
 
@@ -83,12 +85,11 @@ export default function NotificationsArea() {
     finishNotif,
     playNotif,
     clearQueueOfRead,
+    clickNotif,
   } = useNotifications();
 
   const notificationsContainer = useRef<HTMLDivElement>(null);
   const [showExtendedNotifications, setShowExtendedNotifications] = useState(true);
-
-  const notifyAudio = useRef(new Audio(notificationAudio));
 
   const showNotificationsTooltip = $t('Click to open your Notifications window');
   const showUnreadNotificationsTooltip = $t('Click to read your unread Notifications');
@@ -121,39 +122,6 @@ export default function NotificationsArea() {
     return moment(time).fromNow();
   }
 
-  function showNotification(notif: INotification) {
-    if (!settings.enabled || !notif.playSound) return;
-    notifyAudio.current.play();
-
-    setNotifications(notifications.filter(note => !note.outdated));
-
-    // setup order of appearing elements to have a correct animation
-    requestAnimationFrame(() => {
-      setNotifications(
-        notifications.map((n, i) => ({ ...n, outdated: i === 0 ? true : n.outdated })),
-      );
-
-      requestAnimationFrame(() => {
-        setNotifications([...notifications, { ...notif, outdated: false }]);
-        if (notif.lifeTime !== -1) window.setTimeout(() => hideOutdated(), notif.lifeTime);
-      });
-    });
-  }
-
-  function onNotificationHandler(notif: INotification) {
-    if (
-      [
-        ENotificationSubType.DROPPED,
-        ENotificationSubType.LAGGED,
-        ENotificationSubType.SKIPPED,
-      ].includes(notif.subType)
-    ) {
-      return;
-    }
-    setNotificationQueue([...notificationQueue, notif]);
-    if (canShowNextNotif) checkQueue();
-  }
-
   function showNotifications() {
     NotificationsService.actions.showNotifications();
   }
@@ -169,36 +137,17 @@ export default function NotificationsArea() {
     }
   }
 
-  function onNotificationClickHandler(id: number) {
-    const notif = notifications.find(notif => notif.id === id);
-    if (!notif || notif.outdated) return;
-    NotificationsService.applyAction(id);
-    NotificationsService.markAsRead(id);
-    notif.outdated = true;
-  }
-
-  function hideOutdated() {
-    notifications.forEach(uiNotif => {
-      const notif = NotificationsService.views.getNotification(uiNotif.id);
-      if (!notif) return;
-      const now = Date.now();
-      if (!notif.unread || (notif.lifeTime !== -1 && now - notif.date > notif.lifeTime)) {
-        uiNotif.outdated = true;
-      }
-    });
-  }
-
   if (!settings.enabled) return <></>;
 
   return (
     <div className={cx(styles.notificationsArea, 'flex--grow')}>
-      {unreadWarnings > 0 && (
+      {unreadWarnings.length > 0 && (
         <Tooltip placement="right" title={showUnreadNotificationsTooltip}>
           <div
             className={cx(styles.notificationsCounter, styles.notificationsCounterWarning)}
             onClick={showNotifications}
           >
-            <Badge dot={unreadWarnings > 0} color="red">
+            <Badge dot={unreadWarnings.length > 0} color="red">
               <i className="fa fa-exclamation-triangle" />
               {unreadWarnings}
             </Badge>
@@ -215,23 +164,20 @@ export default function NotificationsArea() {
         </Tooltip>
       )}
       <div className={cx(styles.notificationsContainer, 'flex--grow')} ref={notificationsContainer}>
-        {notifications.map(
-          notif =>
-            showExtendedNotifications && (
-              <div
-                key={`${notif.message}${notif.date}`}
-                className={cx(styles.notification, {
-                  [styles.info]: notif.type === 'INFO',
-                  [styles.warning]: notif.type === 'WARNING',
-                  [styles.success]: notif.type === 'SUCCESS',
-                  [styles.hasAction]: notif.action && !notif.outdated,
-                  [styles.outdated]: notif.outdated,
-                })}
-                onClick={() => onNotificationClickHandler(notif.id)}
-              >
-                {notif.message} {notif.showTime && <span> {fromNow(notif.date)}</span>}
-              </div>
-            ),
+        {showExtendedNotifications && (
+          <div
+            key={`${currentNotif.message}${currentNotif.date}`}
+            className={cx(styles.notification, {
+              [styles.info]: currentNotif.type === 'INFO',
+              [styles.warning]: currentNotif.type === 'WARNING',
+              [styles.success]: currentNotif.type === 'SUCCESS',
+              [styles.hasAction]: currentNotif.action,
+            })}
+            onClick={clickNotif}
+          >
+            {currentNotif.message}{' '}
+            {currentNotif.showTime && <span> {fromNow(currentNotif.date)}</span>}
+          </div>
         )}
       </div>
     </div>
