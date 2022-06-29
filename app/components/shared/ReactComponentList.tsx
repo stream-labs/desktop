@@ -42,6 +42,11 @@ export class AlertboxLibrary extends ReactComponent {}
 export class BrowseOverlays extends ReactComponent {}
 
 @Component({
+  props: { name: { default: 'Browser' }, wrapperStyles: { default: () => ({ height: '100%' }) } },
+})
+export class Browser extends ReactComponent {}
+
+@Component({
   props: {
     name: { default: 'BrowserView' },
     componentProps: { default: () => ({ src: '' }) },
@@ -392,6 +397,14 @@ export class ThemeAudit extends ReactComponent {}
   },
 })
 export class TitleBar extends ReactComponent {}
+
+@Component({
+  props: {
+    name: { default: 'WelcomeToPrime' },
+    wrapperStyles: { default: () => ({ height: '100%' }) },
+  },
+})
+export class WelcomeToPrime extends ReactComponent {}
 
 @Component({
   props: {

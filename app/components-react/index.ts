@@ -40,6 +40,7 @@ import RecordingPreview from './editor/elements/RecordingPreview';
 import StreamPreview from './editor/elements/StreamPreview';
 import BrowserView from './shared/BrowserView';
 import LegacyEvents from './editor/elements/LegacyEvents';
+import Browser from './editor/elements/Browser';
 import DisplayElement from './editor/elements/Display';
 import MediaGallery from './windows/MediaGallery';
 import LayoutEditor from './pages/layout-editor/LayoutEditor';
@@ -47,6 +48,7 @@ import Projector from './windows/Projector';
 import SceneSelector from './editor/elements/SceneSelector';
 import AddSource from './windows/AddSource';
 import SideNav from './sidebar/SideNav';
+import WelcomeToPrime from './windows/WelcomeToPrime';
 import Notifications from './windows/Notifications';
 import PlatformMerge from './pages/PlatformMerge';
 import AlertboxLibrary from './pages/AlertboxLibrary';
@@ -100,6 +102,7 @@ export const components = {
   RecentEvents,
   MiniFeed: createRoot(MiniFeed),
   LegacyEvents: createRoot(LegacyEvents),
+  Browser: createRoot(Browser),
   RecordingPreview: createRoot(RecordingPreview),
   StreamPreview: createRoot(StreamPreview),
   DisplayElement: createRoot(DisplayElement),
@@ -108,6 +111,7 @@ export const components = {
   SceneSelector: createRoot(SceneSelector),
   AddSource,
   SideNav,
+  WelcomeToPrime,
   Notifications,
   PlatformMerge,
   PlatformAppStore,
