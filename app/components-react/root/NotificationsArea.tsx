@@ -128,7 +128,6 @@ export default function NotificationsArea() {
     message.config({
       getContainer: () => notificationsContainer.current as HTMLElement,
       maxCount: showExtendedNotifications ? 1 : 0,
-      prefixCls: 'desktop-message',
     });
   }, [notificationsContainer.current, showExtendedNotifications]);
 
