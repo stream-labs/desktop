@@ -214,7 +214,6 @@ export class SourceFiltersService extends StatefulService<IFiltersServiceState> 
    */
   private getTypes() {
     const obsAvailableTypes = obs.FilterFactory.types();
-    console.log('OBS FILTER TYPES', obsAvailableTypes);
     const allowlistedTypes: IObsListOption<TSourceFilterType>[] = [
       { description: $t('Image Mask/Blend'), value: 'mask_filter' },
       { description: $t('Crop/Pad'), value: 'crop_filter' },
@@ -409,8 +408,6 @@ export class SourceFiltersService extends StatefulService<IFiltersServiceState> 
   }
 
   setOrder(sourceId: string, filterName: string, delta: number) {
-    console.log('setOrder', filterName, delta);
-
     // Reorder in the store
     const from = this.state.filters[sourceId].findIndex(f => f.name === filterName);
     const to = from + delta;
@@ -418,20 +415,11 @@ export class SourceFiltersService extends StatefulService<IFiltersServiceState> 
 
     const obsFilter = this.getObsFilter(sourceId, filterName);
     const obsInput = this.sourcesService.views.getSource(sourceId).getObsInput();
-    console.log(
-      'OBS ORDER BEFORE',
-      obsInput.filters.map(f => f.name),
-    );
     const movement = delta > 0 ? EOrderMovement.Down : EOrderMovement.Up;
     let i = Math.abs(delta);
     while (i--) {
-      console.log('SET OBS ORDER', obsFilter.name, movement);
       obsInput.setFilterOrder(obsFilter, movement);
     }
-    console.log(
-      'OBS ORDER AFTER',
-      obsInput.filters.map(f => f.name),
-    );
     this.filtersReordered.next();
   }
 
