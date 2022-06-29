@@ -1,5 +1,25 @@
 {
   "Source: %{sourceName}": "Source: %{sourceName}",
   "Guest Cam": "Guest Cam",
-  "Invite a guest to join your stream from a web browser.": "Invite a guest to join your stream from a web browser."
+  "Invite a guest to join your stream from a web browser.": "Invite a guest to join your stream from a web browser.",
+  "Do not show this window on stream": "Do not show this window on stream",
+  "You can always generate a new link from this window, which will invalidate old links": "You can always generate a new link from this window, which will invalidate old links",
+  "Do not share your invite link with anyone you do not wish to invite": "Do not share your invite link with anyone you do not wish to invite",
+  "Guests will not be visible on your stream until you unhide them from here": "Guests will not be visible on your stream until you unhide them from here",
+  "Once you start Guest Cam, people joining your invite link will be able to see and hear you": "Once you start Guest Cam, people joining your invite link will be able to see and hear you",
+  "Please consider the following before starting Guest Cam": "Please consider the following before starting Guest Cam",
+  "Guest Cam is currently listening for connecting guests, but is not broadcasting your microphone and webcam to your guests yet.": "Guest Cam is currently listening for connecting guests, but is not broadcasting your microphone and webcam to your guests yet.",
+  "Initialize Guest Cam?": "Initialize Guest Cam?",
+  "Start Guest Cam": "Start Guest Cam",
+  "No microphone source is selected. Your guest will not be able to hear you.": "No microphone source is selected. Your guest will not be able to hear you.",
+  "No webcam source is selected. Your guest will not be able to see you.": "No webcam source is selected. Your guest will not be able to see you.",
+  "Microphone Source": "Microphone Source",
+  "Webcam Source": "Webcam Source",
+  "You will need to select a microphone and webcam source in your current scene collection that will be sent to your guests for them to see and hear you.": "You will need to select a microphone and webcam source in your current scene collection that will be sent to your guests for them to see and hear you.",
+  "Waiting for guest to join": "Waiting for guest to join",
+  "Generate a new link": "Generate a new link",
+  "Copied!": "Copied!",
+  "Invite URL": "Invite URL",
+  "Disconnect": "Disconnect",
+  "Guest Settings": "Guest Settings"
 }
