@@ -15,6 +15,12 @@
       font-size: 24px;
       margin-right: 0;
     }
+
+    &:hover {
+      cursor: pointer;
+      opacity: 0.8;
+      color: var(--title);
+    }
   }
 
   .button.lg {
@@ -36,8 +42,8 @@
   display: flex;
   padding: 4px;
   border-radius: 2px;
-  box-sizing: border-box;
   border: 1px solid transparent;
+  align-items: center;
   margin-top: 4px;
   width: 96%;
 
@@ -55,6 +61,12 @@
   .edit-icons {
     opacity: 0;
     margin-left: auto;
+
+    i {
+      &:hover {
+        color: var(--title);
+      }
+    }
   }
 
   &:hover {
@@ -74,5 +86,6 @@
     opacity: 0.7;
     margin-left: 6px;
     font-style: italic;
+    font-size: 11px;
   }
 }
