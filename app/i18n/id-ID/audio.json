@@ -32,8 +32,8 @@
   "Source Settings": "Pengaturan Sumber",
   "Audio Tracks": "Track Audio",
   "Designates which tracks are being recorded": "Tetapkan track manakah yang sedang direkam",
-  "Your Stream and VOD Track are the same. This may result in unexpected audio behavior, go to Global Settings to change.": "Your Stream and VOD Track are the same. This may result in unexpected audio behavior, go to Global Settings to change.",
-  "Streaming Track": "Streaming Track",
-  "Enable Twitch VOD Track": "Enable Twitch VOD Track",
-  "Twitch VOD Track": "Twitch VOD Track"
+  "Your Stream and VOD Track are the same. This may result in unexpected audio behavior, go to Global Settings to change.": "Stream dan VOD Track Anda itu sama. Hal ini dapat menyebabkan perilaku audio yang tidak terduga, bukalah Pengaturan Global untuk melakukan perubahan.",
+  "Streaming Track": "Track Streaming",
+  "Enable Twitch VOD Track": "Mengaktifkan Track Twitch VOD",
+  "Twitch VOD Track": "Track Twitch VOD"
 }

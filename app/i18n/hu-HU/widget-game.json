@@ -1,5 +1,5 @@
 {
-  "Game Widget": "Game Widget",
+  "Game Widget": "Játék widget",
   "Let your viewers play a game in chat": "Let your viewers play a game in chat",
   "Chat Decision Time": "Chat Decision Time",
   "Trigger Command": "Trigger Command",
@@ -33,5 +33,5 @@
   "Message to let chat know that they cannot play the current move.": "Message to let chat know that they cannot play the current move.",
   "Display the game ended message for these many seconds.": "Display the game ended message for these many seconds.",
   "General Settings": "Általános beállítások",
-  "Game Settings": "Game Settings"
+  "Game Settings": "Játékbeállítások"
 }

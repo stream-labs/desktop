@@ -36,8 +36,8 @@
   "latencyTooltip": "Düşük gecikmeli bir akış, videonun yayını izleyen kullanıcılar tarafından görülmesi için gereken süreyi azaltabilir, ancak oynatmanın akıcılığını de etkileyebilir.",
   "Enabling auto-start will automatically start the stream when you start sending data from your streaming software": "Otomatik başlatmayı etkinleştirmek, akış yazılımınızdan veri göndermeye başladığınızda akışı otomatik olarak başlatır",
   "Enabling auto-stop will automatically stop the stream when you stop sending data from your streaming software": "Otomatik durdurmayı etkinleştirmek, akış yazılımınızdan veri göndermeyi durdurduğunuzda akışı otomatik olarak durdurur",
-  "DVR controls enable the viewer to control the video playback experience by pausing, rewinding, or fast forwarding content": "DVR kontrolleri, izleyicinin içeriği duraklatarak, geri sararak veya hızlı ileri sararak video oynatma deneyimini kontrol etmesini sağlar.",
-  "Auto-start is disabled for your broadcast. You should manually publish your stream from Youtube Studio": "Yayınınız için otomatik başlatma devre dışı bırakıldı. Akışınızı Youtube Studio'dan manuel olarak yayınlamalısınız",
+  "DVR controls enable the viewer to control the video playback experience by pausing, rewinding, or fast forwarding content": "DVR kontrolleri, izleyicinin içeriği duraklatarak, geri sararak veya hızlı ileri sararak video oynatma deneyimini kontrol etmesini sağlar",
+  "Auto-start is disabled for your broadcast. You should manually publish your stream from Youtube Studio": "Yayınınız için otomatik başlatma devre dışı bırakıldı. Akışınızı YouTube Studio'dan manuel olarak yayınlamalısınız",
   "Made for kids": "Çocuklara özel içerik",
   "Features like personalized ads and live chat won't be available on live streams made for kids.": "Kişiselleştirilmiş reklamlar ve canlı sohbet gibi özellikler, çocuklara özel canlı yayınlarda kullanılamaz.",
   "Try our new thumbnail editor": "Yeni küçük resim düzenleyicimizi deneyin"

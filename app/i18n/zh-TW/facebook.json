@@ -5,7 +5,7 @@
   "Streamer Dashboard": "直播主儀表板",
   "Share": "分享",
   "Like": "讚",
-  "Step": "步驟",
+  "Step 3:": "步驟 3：",
   "Create a Facebook Gaming page to get started.": "建立 Facebook 遊戲專頁以開始使用。",
   "Create a Gaming Page": "建立遊戲專頁",
   "All of your scenes, sources, and settings will be preserved.": "您的所有場景、來源和設定都會保留。",
@@ -14,7 +14,7 @@
   "Connect": "連線",
   "Install Your Theme": "安裝您的主題",
   "Install": "安裝",
-  "facebookGamingWarning": "如需獲得完整 Facebook Gaming 體驗，請&lt;create-page-link&gt;建立遊戲影片創作者頁面&lt;/create-page-link&gt;",
+  "facebookGamingWarning": "如需獲得完整 Facebook Gaming 體驗，請<create-page-link>建立遊戲影片創作者頁面</create-page-link>",
   "Facebook Destination": "Facebook 目的地",
   "Share to Your Timeline": "分享到您的動態時報",
   "Share to a Page You Manage": "分享到您管理的頁面",
@@ -30,7 +30,8 @@
   "Please reconnect Facebook to get these new features": "請中斷與 Facebook 的連線以獲得這些新功能",
   "Reconnect now": "立即中斷連線",
   "Privacy": "隱私",
-  "FBPrivacyWarning": "授予的隱私層級可能會限制您的 Facebook 帳戶。請到&lt;link&gt;這裡&lt;/link&gt;查看「誰可以看到您使用此商業整合」區段，以瞭解 Streamlabs 整合",
+  "FBPrivacyWarning": "對於您的 Facebook 帳戶，授予的隱私權層級可能會受到限制。請在<link>這裡</link>查看 Streamlabs 整合的「誰可以看到您使用此業務整合」部分",
   "Only Me": "只有我",
-  "Do not change privacy settings": "不要變更隱私設定"
+  "Do not change privacy settings": "不要變更隱私設定",
+  "Install %{overlayName}": "安裝 %{overlayName}"
 }

@@ -5,7 +5,7 @@
   "Streamer Dashboard": "Pulpit transmitującego",
   "Share": "Udostępnij",
   "Like": "Polub",
-  "Step": "Krok",
+  "Step 3:": "Krok 3:",
   "Create a Facebook Gaming page to get started.": "Utwórz stronę Facebook Gaming, aby rozpocząć.",
   "Create a Gaming Page": "Utwórz stronę Gaming",
   "All of your scenes, sources, and settings will be preserved.": "Wszystkie Twoje sceny, źródła i ustawienia zostaną zachowane.",
@@ -14,7 +14,7 @@
   "Connect": "Connect",
   "Install Your Theme": "Zainstaluj swój motyw",
   "Install": "Zainstaluj",
-  "facebookGamingWarning": "Aby w pełni korzystać z gier na Facebooku &lt;create-page-link&gt;stwórz Stronę Kreatora Wideo Gier&lt;/create-page-link&gt;",
+  "facebookGamingWarning": "Aby w pełni korzystać z gier na Facebooku <create-page-link>stwórz Stronę Kreatora Wideo Gier</create-page-link>",
   "Facebook Destination": "Miejsce docelowe Facebook",
   "Share to Your Timeline": "Udostępnij na swojej osi czasu",
   "Share to a Page You Manage": "Udostępnij na zarządzanej przez siebie stronie",
@@ -30,7 +30,8 @@
   "Please reconnect Facebook to get these new features": "Proszę ponownie połączyć się z Facebookiem, aby uzyskać dostęp do tych nowych funkcji",
   "Reconnect now": "Połącz się ponownie teraz",
   "Privacy": "Prywatność",
-  "FBPrivacyWarning": "Przyznany poziom prywatności może być ograniczony dla Twojego konta Facebook. Sprawdź sekcję: „Kto może zobaczyć, że korzystasz z tej integracji biznesowej” dla integracji Streamlabs &lt;link&gt;here&lt;/link&gt;.",
+  "FBPrivacyWarning": "Przyznany poziom prywatności można ograniczyć do Twojego konta na Facebooku. Zobacz sekcję „Kto może zobaczyć, że korzystasz z tej integracji biznesowej” dla integracji ze Streamlabs <link>tutaj</link>",
   "Only Me": "Tylko ja",
-  "Do not change privacy settings": "Nie zmieniaj ustawień prywatności"
+  "Do not change privacy settings": "Nie zmieniaj ustawień prywatności",
+  "Install %{overlayName}": "Zainstaluj %{overlayName}"
 }

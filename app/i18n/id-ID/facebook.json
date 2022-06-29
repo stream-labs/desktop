@@ -5,7 +5,7 @@
   "Streamer Dashboard": "Streamer Dashboard",
   "Share": "Bagi",
   "Like": "Suka",
-  "Step": "Langkah",
+  "Step 3:": "Langkah 3:",
   "Create a Facebook Gaming page to get started.": "Buat halaman Facebook Gaming untuk memulainya.",
   "Create a Gaming Page": "Buat Halaman Gaming",
   "All of your scenes, sources, and settings will be preserved.": "Semua scene, sumber, dan pengaturan akan disimpan.",
@@ -14,7 +14,7 @@
   "Connect": "Hubungkan",
   "Install Your Theme": "Instal Tema Anda",
   "Install": "Instal",
-  "facebookGamingWarning": "Untuk pengalaman lengkap Facebook Gaming &lt;create-page-link&gt;buat Halaman Kreator Video Gaming&lt;/create-page-link&gt;",
+  "facebookGamingWarning": "Untuk pengalaman lengkap Facebook Gaming <create-page-link>buat Halaman Kreator Video Gaming</create-page-link>",
   "Facebook Destination": "Tujuan Facebook",
   "Share to Your Timeline": "Bagi ke Linimasa Anda",
   "Share to a Page You Manage": "Bagi ke Halaman yang Anda Kelola",
@@ -30,7 +30,8 @@
   "Please reconnect Facebook to get these new features": "Harap hubungkan kembali Facebook untuk mendapatkan fitur baru ini",
   "Reconnect now": "Hubungkan kembali sekarang",
   "Privacy": "Privasi",
-  "FBPrivacyWarning": "Level privasi yang diberikan mungkin terbatas bagi akun Facebook Anda. Periksa bagian \"Siapa yang dapat melihat Anda menggunakan integrasi bisnis ini\" untuk integrasi Streamlabs &lt;link&gt;di sini&lt;/link&gt;",
+  "FBPrivacyWarning": "Level privasi yang diberikan mungkin terbatas untuk akun Facebook Anda. Bacalah bagian \"Siapa yang bisa melihat Anda menggunakan integrasi bisnis ini\" untuk integrasi Streamlabs <link>di sini</link>",
   "Only Me": "Hanya Saya",
-  "Do not change privacy settings": "Jangan mengganti pengaturan privasi"
+  "Do not change privacy settings": "Jangan mengganti pengaturan privasi",
+  "Install %{overlayName}": "Instal %{overlayName}"
 }

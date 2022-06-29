@@ -32,8 +32,8 @@
   "Source Settings": "소스 설정",
   "Audio Tracks": "오디오 트랙",
   "Designates which tracks are being recorded": "어떤 트랙을 녹음할 지 지정",
-  "Your Stream and VOD Track are the same. This may result in unexpected audio behavior, go to Global Settings to change.": "Your Stream and VOD Track are the same. This may result in unexpected audio behavior, go to Global Settings to change.",
-  "Streaming Track": "Streaming Track",
-  "Enable Twitch VOD Track": "Enable Twitch VOD Track",
-  "Twitch VOD Track": "Twitch VOD Track"
+  "Your Stream and VOD Track are the same. This may result in unexpected audio behavior, go to Global Settings to change.": "Stream 및 VOD 트랙이 같습니다. 이로 인해 예상치 못한 오디오 동작이 발생할 수 있습니다. 글로벌 설정에서 변경하세요.",
+  "Streaming Track": "스트리밍 트랙",
+  "Enable Twitch VOD Track": "Twitch VOD 트랙 활성화",
+  "Twitch VOD Track": "Twitch VOD 트랙"
 }

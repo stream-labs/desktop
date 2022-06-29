@@ -95,5 +95,18 @@
   "Access to all App Store Apps": "Access to all App Store Apps",
   "Prime Web Suite": "Prime Web Suite",
   "Choose Free": "Choose Free",
-  "Pro features to take your stream and channel to the next level.": "Pro features to take your stream and channel to the next level."
+  "Pro features to take your stream and channel to the next level.": "Pro features to take your stream and channel to the next level.",
+  "Something went wrong while importing from OBS Studio. Please try again or skip to the next step.": "Something went wrong while importing from OBS Studio. Please try again or skip to the next step.",
+  "Visual Preset": "Visual Preset",
+  "Installing theme...": "Installing theme...",
+  "How do you plan to use Streamlabs Desktop?": "How do you plan to use Streamlabs Desktop?",
+  "Live Streaming": "Live Streaming",
+  "Recording Only": "Recording Only",
+  "I want to live stream to a platform. I may also want to record my live streams.": "I want to live stream to a platform. I may also want to record my live streams.",
+  "I want to record my screen or camera. I will not be live streaming.": "I want to record my screen or camera. I will not be live streaming.",
+  "Streamlabs will be optimized for recording": "Streamlabs will be optimized for recording",
+  "Certain features related to live streaming will be hidden. If you would like to enable these features in the future, you can disable Recording Mode in the application settings.": "Certain features related to live streaming will be hidden. If you would like to enable these features in the future, you can disable Recording Mode in the application settings.",
+  "Looking to stream?": "Looking to stream?",
+  "Screen Capture (Double-click to select)": "Screen Capture (Double-click to select)",
+  "1-Click Import from OBS": "1-Click Import from OBS"
 }

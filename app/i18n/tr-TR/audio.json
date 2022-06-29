@@ -32,8 +32,8 @@
   "Source Settings": "Kaynak Ayarları",
   "Audio Tracks": "Ses Parçaları",
   "Designates which tracks are being recorded": "Hangi parçaların kaydedileceğini belirler",
-  "Your Stream and VOD Track are the same. This may result in unexpected audio behavior, go to Global Settings to change.": "Your Stream and VOD Track are the same. This may result in unexpected audio behavior, go to Global Settings to change.",
-  "Streaming Track": "Streaming Track",
-  "Enable Twitch VOD Track": "Enable Twitch VOD Track",
-  "Twitch VOD Track": "Twitch VOD Track"
+  "Your Stream and VOD Track are the same. This may result in unexpected audio behavior, go to Global Settings to change.": "Akışınız ve VOD Parçası aynıdır. Bu, beklenmeyen ses davranışına neden olabilir; değiştirmek için Global Ayarlar’a gidin.",
+  "Streaming Track": "Parça Yayınlanıyor",
+  "Enable Twitch VOD Track": "Twitch VOD Parçası’nı etkinleştir",
+  "Twitch VOD Track": "Twitch VOD Parçası"
 }

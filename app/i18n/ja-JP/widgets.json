@@ -27,7 +27,7 @@
   "A hex code for the base text color.": "ベーステキスト色用の 16 進コード。",
   "A hex code for the widget background. This is for preview purposes only. It will not be shown in your stream.": "ウィジェット背景用の 16 進コード。これはプレビューのみを目的としており、ストリーム内には表示されません。",
   "Note: This background color is for preview purposes only. It will not be shown in your stream.": "注：この背景色はプレビューのみを目的としており、ストリーム内には表示されません。",
-  "Please login to configure widget": "ログインしてウィジェットを構成します。",
+  "Please login to configure widget": "ログインしてウィジェットを構成します",
   "Enable Custom Code": "カスタムコードを有効化",
   "Sources and Settings": "ソースおよび設定",
   "Selected Properties": "選択したプロパティ",
@@ -65,10 +65,10 @@
   "Banned by %{user}": "%{user} によって禁止されています",
   "No banned media found": "禁止されたメディアは見つかりません",
   "Effects/Rallies": "エフェクト/ラリー",
-  "Sparks sent are at least <amount>": "送信されたスパークは最低 &lt;amount&gt; です",
-  "Sparks sent are exactly <amount>": "送信されたスパークはちょうど &lt;amount&gt; です",
-  "Ember amount is at least <amount>": "エンバー量は最低 &lt;amount&gt; です",
-  "Ember amount is exactly <amopunt>": "エンバー量はちょうど &lt;amopunt&gt; です",
+  "Sparks sent are at least <amount>": "送信されたスパークは最低 <amount> です",
+  "Sparks sent are exactly <amount>": "送信されたスパークはちょうど <amount> です",
+  "Ember amount is at least <amount>": "エンバー量は最低 <amount> です",
+  "Ember amount is exactly <amopunt>": "エンバー量はちょうど <amopunt> です",
   "Please note that when advanced media share is enabled, media will no longer play through your alert box widget. Media will only play through this media share widget.": "高度なメディア共有を有効化すると、メディアはアラートボックスウィジェットを通して再生されなくなり、メディアはこのメディア共有ウィジェットを通してのみ再生されます。",
   "Twitch Subscribers": "Twitch サブスクライバー",
   "YouTube Members": "YouTube メンバー",
@@ -185,6 +185,6 @@
   "Custom Code": "カスタムコード",
   "font_family_tooltip": "テキストに使用する Google フォント。https://fonts.google.com にアクセスしてフォントを検索しましょう！人気のあるフォント：Open Sans、Roboto、Oswald、Lato、Droid Sans。",
   "Something went wrong while applying settings": "設定の適用中に、問題が発生しました",
-  "Superchat Goal": "Superchat Goal",
-  "YouTube Superchats": "YouTube Superchats"
+  "Superchat Goal": "スーパーチャット目標",
+  "YouTube Superchats": "YouTube スーパーチャット"
 }
