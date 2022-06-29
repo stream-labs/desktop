@@ -801,7 +801,9 @@ export class SourcesService extends StatefulService<ISourcesState> {
   }
 
   showGuestCamPropertiesBySourceId(sourceId: string) {
-    this.showGuestCamProperties(this.views.getSource(sourceId));
+    const source = this.views.getSource(sourceId);
+
+    if (source) this.showGuestCamProperties(source);
   }
 
   showShowcase() {
