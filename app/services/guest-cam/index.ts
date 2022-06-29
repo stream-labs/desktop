@@ -6,7 +6,6 @@ import {
   mutation,
   PersistentStatefulService,
   Service,
-  StatefulService,
   ViewHandler,
 } from 'services/core';
 import { UserService } from 'services/user';
@@ -14,16 +13,15 @@ import uuid from 'uuid/v4';
 import { SourcesService } from 'services/sources';
 import { ScenesService } from 'services/scenes';
 import { EFilterDisplayType, SourceFiltersService } from 'services/source-filters';
-import { Subject, Subscription } from 'rxjs';
-import { EDeviceType, HardwareService } from 'services/hardware';
-import { MediasoupEntity } from './mediasoup-entity';
+import { Subject } from 'rxjs';
+import { HardwareService } from 'services/hardware';
 import { Producer } from './producer';
 import { Consumer } from './consumer';
 import { byOS, OS } from 'util/operating-systems';
 import { Mutex } from 'util/mutex';
 import Utils from 'services/utils';
 import { E_AUDIO_CHANNELS } from 'services/audio';
-import { NotificationsService, SceneCollectionsService } from 'app-services';
+import { NotificationsService, SceneCollectionsService, UrlService } from 'app-services';
 import { ENotificationType } from 'services/notifications';
 import { $t } from 'services/i18n';
 import { JsonrpcService } from 'services/api/jsonrpc';
@@ -204,6 +202,7 @@ export class GuestCamService extends PersistentStatefulService<IGuestCamServiceS
   @Inject() sceneCollectionsService: SceneCollectionsService;
   @Inject() notificationsService: NotificationsService;
   @Inject() jsonrpcService: JsonrpcService;
+  @Inject() urlService: UrlService;
 
   static defaultState: IGuestCamServiceState = {
     produceOk: false,
@@ -328,7 +327,7 @@ export class GuestCamService extends PersistentStatefulService<IGuestCamServiceS
 
     await this.ensureInviteLink();
 
-    const roomUrl = 'https://stage6.streamlabs.com/api/v5/slobs/streamrooms/current';
+    const roomUrl = this.urlService.getStreamlabsApi('streamrooms/current');
     const roomResult = await jfetch<IRoomResponse>(roomUrl, {
       headers: authorizedHeaders(this.userService.views.auth.apiToken),
     });
@@ -340,10 +339,12 @@ export class GuestCamService extends PersistentStatefulService<IGuestCamServiceS
     let ioConfigResult: IIoConfigResponse;
 
     if (Utils.env.SLD_GUEST_CAM_HASH) {
-      const url = `https://stage6.streamlabs.com/api/v5/slobs/streamrooms/io/config/${Utils.env.SLD_GUEST_CAM_HASH}`;
+      const url = this.urlService.getStreamlabsApi(
+        `streamrooms/io/config/${Utils.env.SLD_GUEST_CAM_HASH}`,
+      );
       ioConfigResult = await jfetch<IIoConfigResponse>(url);
     } else {
-      const ioConfigUrl = 'https://stage6.streamlabs.com/api/v5/slobs/streamrooms/io/config';
+      const ioConfigUrl = this.urlService.getStreamlabsApi('streamrooms/io/config');
       ioConfigResult = await jfetch<IIoConfigResponse>(ioConfigUrl, {
         headers: authorizedHeaders(this.userService.views.auth.apiToken),
       });
@@ -494,10 +495,12 @@ export class GuestCamService extends PersistentStatefulService<IGuestCamServiceS
     let turnConfigResult: ITurnConfig;
 
     if (Utils.env.SLD_GUEST_CAM_HASH) {
-      const url = `https://stage6.streamlabs.com/api/v5/slobs/streamrooms/turn/config/${Utils.env.SLD_GUEST_CAM_HASH}`;
+      const url = this.urlService.getStreamlabsApi(
+        `streamrooms/turn/config/${Utils.env.SLD_GUEST_CAM_HASH}`,
+      );
       turnConfigResult = await jfetch<ITurnConfig>(url);
     } else {
-      const turnConfigUrl = 'https://stage6.streamlabs.com/api/v5/slobs/streamrooms/turn/config';
+      const turnConfigUrl = this.urlService.getStreamlabsApi('streamrooms/turn/config');
       turnConfigResult = await jfetch<ITurnConfig>(turnConfigUrl, {
         headers: authorizedHeaders(this.userService.views.auth.apiToken),
       });
@@ -509,7 +512,7 @@ export class GuestCamService extends PersistentStatefulService<IGuestCamServiceS
   }
 
   getInviteLinks() {
-    const url = 'https://stage6.streamlabs.com/api/v5/slobs/streamrooms/current';
+    const url = this.urlService.getStreamlabsApi('streamrooms/current');
 
     return jfetch<IInviteLinksResponse>(url, {
       headers: authorizedHeaders(this.userService.views.auth.apiToken),
@@ -517,7 +520,7 @@ export class GuestCamService extends PersistentStatefulService<IGuestCamServiceS
   }
 
   createInviteLink(sourceId: string) {
-    const url = `https://stage6.streamlabs.com/api/v5/slobs/streamrooms/create-source?source_id=${sourceId}`;
+    const url = this.urlService.getStreamlabsApi(`streamrooms/create-source?source_id=${sourceId}`);
 
     return jfetch<IInviteLink>(url, {
       method: 'POST',
@@ -526,7 +529,7 @@ export class GuestCamService extends PersistentStatefulService<IGuestCamServiceS
   }
 
   deleteInviteLink(id: number) {
-    const url = `https://stage6.streamlabs.com/api/v5/slobs/streamrooms/remove-source?id=${id}`;
+    const url = this.urlService.getStreamlabsApi(`streamrooms/remove-source?id=${id}`);
 
     return jfetch<IInviteLink>(url, {
       method: 'POST',

@@ -18,6 +18,7 @@ export enum EAvailableFeatures {
   growTab = 'slobs--grow-tab',
   themeAudit = 'slobs--theme-audit',
   reactWidgets = 'slobs--react-widgets',
+  guestCam = 'slobs--guest-join',
 }
 
 interface IIncrementalRolloutServiceState {
