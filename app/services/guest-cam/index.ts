@@ -21,10 +21,16 @@ import { byOS, OS } from 'util/operating-systems';
 import { Mutex } from 'util/mutex';
 import Utils from 'services/utils';
 import { E_AUDIO_CHANNELS } from 'services/audio';
-import { NotificationsService, SceneCollectionsService, UrlService } from 'app-services';
+import {
+  NotificationsService,
+  SceneCollectionsService,
+  UrlService,
+  StreamingService,
+} from 'app-services';
 import { ENotificationType } from 'services/notifications';
 import { $t } from 'services/i18n';
 import { JsonrpcService } from 'services/api/jsonrpc';
+import { EStreamingState } from 'services/streaming';
 
 /**
  * Interface describing the various functions and expected return values
@@ -203,6 +209,7 @@ export class GuestCamService extends PersistentStatefulService<IGuestCamServiceS
   @Inject() notificationsService: NotificationsService;
   @Inject() jsonrpcService: JsonrpcService;
   @Inject() urlService: UrlService;
+  @Inject() streamingService: StreamingService;
 
   static defaultState: IGuestCamServiceState = {
     produceOk: false,
@@ -283,6 +290,12 @@ export class GuestCamService extends PersistentStatefulService<IGuestCamServiceS
     this.sceneCollectionsService.collectionInitialized.subscribe(() => {
       this.findDefaultSources();
     });
+
+    this.streamingService.streamingStatusChange.subscribe(status => {
+      if ([EStreamingState.Live, EStreamingState.Offline].includes(status)) {
+        this.emitStreamingStatus();
+      }
+    });
   }
 
   findDefaultSources() {
@@ -317,6 +330,15 @@ export class GuestCamService extends PersistentStatefulService<IGuestCamServiceS
 
       if (videoSource) this.SET_VIDEO_SOURCE(videoSource.sourceId);
     }
+  }
+
+  emitStreamingStatus() {
+    if (!this.socket) return;
+
+    this.socket.emit('message', {
+      type: 'streamingStatusChange',
+      live: this.streamingService.views.streamingStatus === EStreamingState.Live,
+    });
   }
 
   async startListeningForGuests() {
@@ -611,6 +633,8 @@ export class GuestCamService extends PersistentStatefulService<IGuestCamServiceS
 
     // Set audio volume to 0 until the guest is approved
     this.makeObsRequest('func_change_playback_volume', '0');
+
+    this.emitStreamingStatus();
 
     this.notificationsService.push({
       type: ENotificationType.SUCCESS,
