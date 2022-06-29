@@ -115,6 +115,14 @@ export class Grow extends ReactComponent {}
 
 @Component({
   props: {
+    name: { default: 'GuestCamProperties' },
+    wrapperStyles: { default: () => ({ height: '100%' }) },
+  },
+})
+export class GuestCamProperties extends ReactComponent {}
+
+@Component({
+  props: {
     name: { default: 'Highlighter' },
     componentProps: { default: () => ({}) },
   },
