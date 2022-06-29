@@ -47,6 +47,7 @@ import Projector from './windows/Projector';
 import SceneSelector from './editor/elements/SceneSelector';
 import AddSource from './windows/AddSource';
 import SideNav from './sidebar/SideNav';
+import WelcomeToPrime from './windows/WelcomeToPrime';
 import Notifications from './windows/Notifications';
 import PlatformMerge from './pages/PlatformMerge';
 import AlertboxLibrary from './pages/AlertboxLibrary';
@@ -108,6 +109,7 @@ export const components = {
   SceneSelector: createRoot(SceneSelector),
   AddSource,
   SideNav,
+  WelcomeToPrime,
   Notifications,
   PlatformMerge,
   PlatformAppStore,

@@ -395,6 +395,14 @@ export class TitleBar extends ReactComponent {}
 
 @Component({
   props: {
+    name: { default: 'WelcomeToPrime' },
+    wrapperStyles: { default: () => ({ height: '100%' }) },
+  },
+})
+export class WelcomeToPrime extends ReactComponent {}
+
+@Component({
+  props: {
     name: { default: 'WidgetWindow' },
     wrapperStyles: { default: () => ({ height: '100%' }) },
   },
