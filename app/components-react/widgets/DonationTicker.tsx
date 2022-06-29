@@ -11,7 +11,6 @@ import {
   TextInput,
   SliderInput,
 } from '../shared/inputs';
-import { injectFormBinding } from 'slap';
 
 interface IDonationTickerState extends IWidgetState {
   data: {

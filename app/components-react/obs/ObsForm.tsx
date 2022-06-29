@@ -106,6 +106,7 @@ function ObsInput(p: IObsInputProps) {
     case 'OBS_PROPERTY_DOUBLE':
       return <NumberInput {...inputProps} />;
     case 'OBS_PROPERTY_INT':
+    case 'OBS_PROPERTY_UINT':
       // eslint-disable-next-line no-case-declarations
       const intVal = p.value as IObsNumberInputValue;
 
