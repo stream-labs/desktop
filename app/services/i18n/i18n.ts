@@ -94,13 +94,24 @@ export class I18nService extends PersistentStatefulService<II18nState> implement
 
     // use a static method here because it allows to accept unserializable arguments like browserview from other windows
     const i18nService = I18nService.instance as I18nService; // TODO: replace with getResource('I18nService')
-    const locale = i18nService.state.locale;
+    const locale = i18nService.state.locale.toLowerCase();
     view.webContents.on('dom-ready', () => {
       view.webContents.executeJavaScript(`
-        var langCode = $.cookie('langCode');
-        if (langCode !== '${locale}') {
-           $.cookie('langCode', '${locale}');
-           window.location.reload();
+        const langCode = $.cookie('langCode');
+
+        if (!(new RegExp('${locale}', 'i').test(langCode))) {
+          // Detect the proper format and set the cookie to Desktop's locale
+          const isUpper = x => x.toUpperCase() === x;
+          const splitLocale = l => l.split('-');
+          
+          const [lang, code] = splitLocale(langCode)
+          const usesUpperCode = code && isUpper(code[0]);
+          const [newLang, newCode] = splitLocale('${locale}');
+          
+          const localeToSet = [newLang, (usesUpperCode ? newCode.toUpperCase() : newCode)].join('-');
+
+          $.cookie('langCode', localeToSet);
+          window.location.reload();
         }
       `);
     });
