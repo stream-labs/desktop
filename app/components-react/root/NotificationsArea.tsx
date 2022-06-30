@@ -158,7 +158,7 @@ export default function NotificationsArea() {
           >
             <Badge dot={unreadWarnings.length > 0} color="red">
               <i className="fa fa-exclamation-triangle" />
-              {unreadWarnings}
+              {unreadWarnings.length}
             </Badge>
           </div>
         </Tooltip>
