@@ -28,9 +28,7 @@ export default function SourceFilters() {
   const { WindowsService, SourceFiltersService, SourcesService, EditorCommandsService } = Services;
   const sourceId = useMemo(() => WindowsService.getChildWindowQueryParams().sourceId, []);
   const { filters, isVisual, preset } = useVuex(() => ({
-    filters: SourceFiltersService.views
-      .filtersBySourceId(sourceId)
-      ?.filter(f => f.name !== '__PRESET'),
+    filters: SourceFiltersService.views.filtersBySourceId(sourceId),
     isVisual: !!SourcesService.views.getSource(sourceId)?.video,
     preset: SourceFiltersService.views.presetFilterBySourceId(sourceId),
   }));
@@ -55,7 +53,7 @@ export default function SourceFilters() {
 
   function setPreset(val: string) {
     if (val === 'none') {
-      SourceFiltersService.actions.remove(sourceId, '__PRESET');
+      SourceFiltersService.actions.removePresetFilter(sourceId);
     } else {
       SourceFiltersService.actions.addPresetFilter(sourceId, val);
     }
