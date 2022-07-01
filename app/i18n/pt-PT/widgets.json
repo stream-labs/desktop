@@ -65,10 +65,10 @@
   "Banned by %{user}": "Banido por %{user}",
   "No banned media found": "Não foi encontrada multimédia banida",
   "Effects/Rallies": "Efeitos/Reuniões",
-  "Sparks sent are at least <amount>": "O mínimo de Sparks enviados é &lt;amount&gt;",
-  "Sparks sent are exactly <amount>": "Os Sparks enviados são exatamente &lt;amount&gt;",
-  "Ember amount is at least <amount>": "O valor mínimo de Embers é &lt;amount&gt;",
-  "Ember amount is exactly <amopunt>": "O valor de Embers é exatamente &lt;amopunt&gt;",
+  "Sparks sent are at least <amount>": "O mínimo de Sparks enviados é <amount>",
+  "Sparks sent are exactly <amount>": "Os Sparks enviados são exatamente <amount>",
+  "Ember amount is at least <amount>": "O valor mínimo de Embers é <amount>",
+  "Ember amount is exactly <amopunt>": "O valor de Embers é exatamente <amopunt>",
   "Please note that when advanced media share is enabled, media will no longer play through your alert box widget. Media will only play through this media share widget.": "Tenha em atenção que, quando a partilha avançada de multimédia está ativada, o ficheiro multimédia não será reproduzido no seu widget de caixa de alerta. O ficheiro multimédia apenas será reproduzido através do widget de partilha de multimédia.",
   "Twitch Subscribers": "Subscritores do Twitch",
   "YouTube Members": "Membros do YouTube",
@@ -185,6 +185,6 @@
   "Custom Code": "Código personalizado",
   "font_family_tooltip": "O tipo de letra Google usado para o texto. Visite http://fonts.google.com para escolher um! Os tipos de letra mais populares incluem: Open Sans, Roboto, Oswald, Lato e Droid Sans.",
   "Something went wrong while applying settings": "Ocorreu um erro ao aplicar as definições",
-  "Superchat Goal": "Superchat Goal",
-  "YouTube Superchats": "YouTube Superchats"
+  "Superchat Goal": "Objetivo do Superchat",
+  "YouTube Superchats": "Superchats do YouTube"
 }

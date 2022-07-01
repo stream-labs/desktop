@@ -86,6 +86,7 @@ export const windowsSources: TSourceType[] = [
   'ovrstream_dc_source',
   'vlc_source',
   'soundtrack_source',
+  'mediasoupconnector',
 ];
 
 /**
@@ -145,6 +146,10 @@ class SourcesViews extends ViewHandler<ISourcesState> {
       return source.name === name;
     });
     return sourceModels.map(sourceModel => this.getSource(sourceModel.sourceId)!);
+  }
+
+  getSourcesByType(type: TSourceType) {
+    return this.sources.filter(s => s.type === type);
   }
 
   suggestName(name?: string): string {
@@ -238,6 +243,8 @@ export class SourcesService extends StatefulService<ISourcesState> {
 
       muted: false,
       channel: addOptions.channel,
+
+      forceHidden: false,
     };
 
     if (addOptions.isTemporary) {
@@ -525,6 +532,7 @@ export class SourcesService extends StatefulService<ISourcesState> {
       { description: 'Video Capture Device', value: 'av_capture_input' },
       { description: 'Display Capture', value: 'display_capture' },
       { description: 'Soundtrack source', value: 'soundtrack_source' },
+      { description: 'Guest Cam', value: 'mediasoupconnector' },
     ];
 
     const availableAllowlistedTypes = allowlistedTypes.filter(type =>
@@ -596,6 +604,7 @@ export class SourcesService extends StatefulService<ISourcesState> {
     if (!source) return;
 
     if (source.type === 'screen_capture') return this.showScreenCaptureProperties(source);
+    if (source.type === 'mediasoupconnector') return this.showGuestCamProperties(source);
 
     const propertiesManagerType = source.getPropertiesManagerType();
 
@@ -776,6 +785,25 @@ export class SourcesService extends StatefulService<ISourcesState> {
         height: 800,
       },
     });
+  }
+
+  showGuestCamProperties(source: Source) {
+    const propertiesName = SourceDisplayData()[source.type].name;
+    this.windowsService.showWindow({
+      componentName: 'GuestCamProperties',
+      title: $t('Guest Cam Properties', { sourceName: propertiesName }),
+      queryParams: { sourceId: source.sourceId },
+      size: {
+        width: 800,
+        height: 600,
+      },
+    });
+  }
+
+  showGuestCamPropertiesBySourceId(sourceId: string) {
+    const source = this.views.getSource(sourceId);
+
+    if (source) this.showGuestCamProperties(source);
   }
 
   showShowcase() {

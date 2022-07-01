@@ -1,11 +1,11 @@
 {
-  "Trovo Category": "Trovo Category",
-  "Trovo Raid": "Trovo Raid",
-  "Trovo Follow": "Trovo Follow",
-  "Trovo Subscription": "Trovo Subscription",
-  "Trovo Follows": "Trovo Follows",
-  "Plays an alert for new Trovo followers": "Plays an alert for new Trovo followers",
-  "Plays an alert for new Trovo subscriptions": "Plays an alert for new Trovo subscriptions",
-  "Trovo Resubs": "Trovo Resubs",
-  "Trovo Subs": "Trovo Subs"
+  "Trovo Category": "Trovo-kategori",
+  "Trovo Raid": "Trovo-raid",
+  "Trovo Follow": "Trovo-følger",
+  "Trovo Subscription": "Trovo-abonnement",
+  "Trovo Follows": "Trovo-følgere",
+  "Plays an alert for new Trovo followers": "Viser en notifikation, når der er nye Trovo-følgere",
+  "Plays an alert for new Trovo subscriptions": "Viser en notifikation, når der er nye Trovo-abonnenter",
+  "Trovo Resubs": "Trovo-abonnementsforlængelser",
+  "Trovo Subs": "Trovo-abonnementer"
 }

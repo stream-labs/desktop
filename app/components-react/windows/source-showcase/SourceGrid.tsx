@@ -12,6 +12,7 @@ import { byOS, OS } from 'util/operating-systems';
 import { $t } from 'services/i18n';
 import SourceTag from './SourceTag';
 import { useSourceShowcaseSettings } from './useSourceShowcase';
+import { EAvailableFeatures } from 'services/incremental-rollout';
 
 export default function SourceGrid(p: { activeTab: string }) {
   const {
@@ -20,6 +21,7 @@ export default function SourceGrid(p: { activeTab: string }) {
     ScenesService,
     WindowsService,
     CustomizationService,
+    IncrementalRolloutService,
   } = Services;
 
   const { demoMode, designerMode, isLoggedIn, linkedPlatforms, primaryPlatform } = useVuex(() => ({
@@ -56,17 +58,24 @@ export default function SourceGrid(p: { activeTab: string }) {
     [],
   );
 
-  const availableSources = useMemo(
-    () =>
-      SourcesService.getAvailableSourcesTypesList().filter(type => {
-        // Freetype on windows is hidden
-        if (type.value === 'text_ft2_source' && byOS({ [OS.Windows]: true, [OS.Mac]: false })) {
-          return;
-        }
-        return !(type.value === 'scene' && ScenesService.views.scenes.length <= 1);
-      }),
-    [],
-  );
+  const availableSources = useMemo(() => {
+    const guestCamAvailable = IncrementalRolloutService.views.featureIsEnabled(
+      EAvailableFeatures.guestCam,
+    );
+
+    return SourcesService.getAvailableSourcesTypesList().filter(type => {
+      // Freetype on windows is hidden
+      if (type.value === 'text_ft2_source' && byOS({ [OS.Windows]: true, [OS.Mac]: false })) {
+        return;
+      }
+
+      if (type.value === 'mediasoupconnector' && !guestCamAvailable) {
+        return false;
+      }
+
+      return !(type.value === 'scene' && ScenesService.views.scenes.length <= 1);
+    });
+  }, []);
 
   const essentialSources = useMemo(() => {
     const essentialDefaults = availableSources.filter(source =>

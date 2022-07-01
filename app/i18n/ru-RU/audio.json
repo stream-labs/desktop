@@ -32,8 +32,8 @@
   "Source Settings": "Настройки источника",
   "Audio Tracks": "Звуковые дорожки",
   "Designates which tracks are being recorded": "Указывает на то, какие дорожки записываются",
-  "Your Stream and VOD Track are the same. This may result in unexpected audio behavior, go to Global Settings to change.": "Your Stream and VOD Track are the same. This may result in unexpected audio behavior, go to Global Settings to change.",
-  "Streaming Track": "Streaming Track",
-  "Enable Twitch VOD Track": "Enable Twitch VOD Track",
-  "Twitch VOD Track": "Twitch VOD Track"
+  "Your Stream and VOD Track are the same. This may result in unexpected audio behavior, go to Global Settings to change.": "Дорожки трансляции и записи VOD совпадают, что может привести к сбоям в работе аудио. Изменить это можно в глобальных настройках.",
+  "Streaming Track": "Дорожка трансляции",
+  "Enable Twitch VOD Track": "Включить дорожку записи VOD для Twitch",
+  "Twitch VOD Track": "Дорожка записи VOD для Twitch"
 }

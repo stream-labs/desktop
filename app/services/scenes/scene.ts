@@ -165,6 +165,8 @@ export class Scene {
 
     const obsSceneItem: obs.ISceneItem = this.getObsScene().add(source.getObsInput());
 
+    if (source.forceHidden) obsSceneItem.visible = false;
+
     this.ADD_SOURCE_TO_SCENE(sceneItemId, source.sourceId, obsSceneItem.id);
     const sceneItem = this.getItem(sceneItemId)!;
 

@@ -5,7 +5,7 @@
   "Streamer Dashboard": "Streamer Dashboard",
   "Share": "Share",
   "Like": "Like",
-  "Step": "Step",
+  "Step 3:": "Step 3:",
   "Create a Facebook Gaming page to get started.": "Create a Facebook Gaming page to get started.",
   "Create a Gaming Page": "Create a Gaming Page",
   "All of your scenes, sources, and settings will be preserved.": "All of your scenes, sources, and settings will be preserved.",
@@ -32,5 +32,6 @@
   "Privacy": "Bảo mật",
   "FBPrivacyWarning": "The granted privacy level may be limited for your Facebook account. Check the \"Who can see you use this business integration\" section for the Streamlabs integration <link>here</link>",
   "Only Me": "Only Me",
-  "Do not change privacy settings": "Do not change privacy settings"
+  "Do not change privacy settings": "Do not change privacy settings",
+  "Install %{overlayName}": "Install %{overlayName}"
 }
