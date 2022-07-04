@@ -260,8 +260,26 @@ class SourceSelectorModule {
     );
   }
 
-  makeActive(ids: string[]) {
+  makeActive(info: {
+    selected: boolean;
+    node: DataNode;
+    selectedNodes: DataNode[];
+    nativeEvent: MouseEvent;
+  }) {
     this.callCameFromInsideTheHouse = true;
+    let ids: string[] = [info.node.key as string];
+
+    if (info.nativeEvent.ctrlKey) {
+      ids = this.activeItemIds.concat(ids);
+    } else if (info.nativeEvent.shiftKey) {
+      // Logic for multi-select
+      const beginningIdx = this.nodeData.findIndex(
+        i => i.id === this.activeItemIds[this.activeItemIds.length - 1],
+      );
+      const endIdx = this.nodeData.findIndex(i => i.id === info.node.key);
+      ids = this.nodeData.map(i => i.id).slice(beginningIdx, endIdx + 1);
+    }
+
     this.selectionService.views.globalSelection.select(ids);
   }
 
@@ -485,7 +503,7 @@ function ItemsTree() {
       <Tree
         selectedKeys={activeItemIds}
         expandedKeys={expandedFoldersIds}
-        onSelect={(selectedKeys, info) => makeActive([info.node.key as string])}
+        onSelect={(selectedKeys, info) => makeActive(info)}
         onExpand={(selectedKeys, info) => toggleFolder(info.node.key as string)}
         onRightClick={info => showContextMenu(info.node.key as string, info.event)}
         onDrop={handleSort}
