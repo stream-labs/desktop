@@ -273,11 +273,12 @@ class SourceSelectorModule {
       ids = this.activeItemIds.concat(ids);
     } else if (info.nativeEvent.shiftKey) {
       // Logic for multi-select
-      const beginningIdx = this.nodeData.findIndex(
+      const idx1 = this.nodeData.findIndex(
         i => i.id === this.activeItemIds[this.activeItemIds.length - 1],
       );
-      const endIdx = this.nodeData.findIndex(i => i.id === info.node.key);
-      ids = this.nodeData.map(i => i.id).slice(beginningIdx, endIdx + 1);
+      const idx2 = this.nodeData.findIndex(i => i.id === info.node.key);
+      const swapIdx = idx1 > idx2;
+      ids = this.nodeData.map(i => i.id).slice(swapIdx ? idx2 : idx1, swapIdx ? idx1 : idx2 + 1);
     }
 
     this.selectionService.views.globalSelection.select(ids);
