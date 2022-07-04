@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Tooltip, Tree } from 'antd';
 import { DataNode } from 'rc-tree/lib/interface';
 import { TreeProps } from 'rc-tree/lib/Tree';
@@ -445,10 +445,9 @@ function StudioControls() {
 
       <Tooltip title={$t('Toggle Selective Recording')}>
         <i
-          className={cx({
-            'icon--active': selectiveRecordingEnabled,
+          className={cx('icon-smart-record icon-button icon-button--lg', {
+            active: selectiveRecordingEnabled,
             disabled: selectiveRecordingLocked,
-            'icon-smart-record icon-button icon-button--lg': true,
           })}
           onClick={toggleSelectiveRecording}
         />
@@ -488,12 +487,18 @@ function ItemsTree() {
     getTreeData,
     activeItemIds,
     expandedFoldersIds,
-    scene,
+    selectiveRecordingEnabled,
     showContextMenu,
     makeActive,
     toggleFolder,
     handleSort,
   } = useModule(SourceSelectorModule);
+
+  // Force a rerender when the state of selective recording changes
+  const [selectiveRecordingToggled, setSelectiveRecordingToggled] = useState(false);
+  useEffect(() => setSelectiveRecordingToggled(!selectiveRecordingToggled), [
+    selectiveRecordingEnabled,
+  ]);
 
   const treeData = getTreeData(nodeData);
 
