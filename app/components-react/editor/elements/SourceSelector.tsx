@@ -80,6 +80,7 @@ class SourceSelectorModule {
               isRecordingVisible={sceneNode.isRecordingVisible}
               cycleSelectiveRecording={() => this.cycleSelectiveRecording(sceneNode.id)}
               ref={this.nodeRefs[sceneNode.id]}
+              onDoubleClick={() => this.sourceProperties(sceneNode.id)}
             />
           ),
           isLeaf: !children,
@@ -431,6 +432,7 @@ function StudioControls() {
     removeItems,
     toggleSelectiveRecording,
     canShowProperties,
+    sourceProperties,
   } = useModule(SourceSelectorModule);
 
   return (
@@ -473,7 +475,7 @@ function StudioControls() {
       <Tooltip title={openSourcePropertiesTooltip}>
         <i
           className={cx({ disabled: !canShowProperties(), 'icon-settings icon-button': true })}
-          onClick={removeItems}
+          onClick={() => sourceProperties(activeItemIds[0])}
         />
       </Tooltip>
     </div>
@@ -531,6 +533,7 @@ const TreeNode = React.forwardRef(
       toggleVisibility: (ev: unknown) => unknown;
       toggleLock: (ev: unknown) => unknown;
       cycleSelectiveRecording: (ev: unknown) => void;
+      onDoubleClick: () => void;
     },
     ref: React.RefObject<HTMLDivElement>,
   ) => {
@@ -544,7 +547,12 @@ const TreeNode = React.forwardRef(
     }
 
     return (
-      <div className={styles.sourceTitleContainer} data-name={p.title} ref={ref}>
+      <div
+        className={styles.sourceTitleContainer}
+        data-name={p.title}
+        ref={ref}
+        onDoubleClick={p.onDoubleClick}
+      >
         <span className={styles.sourceTitle}>{p.title}</span>
         {p.selectiveRecordingEnabled && (
           <Tooltip title={selectiveRecordingMetadata().tooltip} placement="left">
