@@ -23,7 +23,6 @@ import {
   ScreenCaptureProperties,
   SharedComponentsLibrary,
   SourceProperties,
-  PerformanceMetrics,
   RenameSource,
   AdvancedStatistics,
   WidgetWindow,
@@ -36,11 +35,12 @@ import {
   Projector,
   AddSource,
   News,
+  WelcomeToPrime,
+  Notifications,
   PlatformAppPopOut,
 } from 'components/shared/ReactComponentList';
 
 import SourcePropertiesDeprecated from 'components/windows/SourceProperties.vue';
-import Notifications from 'components/windows/Notifications.vue';
 import Troubleshooter from 'components/windows/Troubleshooter.vue';
 import Blank from 'components/windows/Blank.vue';
 import ManageSceneCollections from 'components/windows/ManageSceneCollections.vue';
@@ -50,7 +50,6 @@ import EditTransform from 'components/windows/EditTransform';
 import EventFilterMenu from 'components/windows/EventFilterMenu';
 import OverlayPlaceholder from 'components/windows/OverlayPlaceholder';
 import BrowserSourceInteraction from 'components/windows/BrowserSourceInteraction';
-import WelcomeToPrime from 'components/windows/WelcomeToPrime';
 
 import BitGoal from 'components/widgets/goal/BitGoal';
 import DonationGoal from 'components/widgets/goal/DonationGoal';

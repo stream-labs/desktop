@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react';
 import PlatformAppPageView from 'components-react/shared/PlatformAppPageView';
-import { ModalLayout } from 'components-react/shared/ModalLayout';
 import Util from 'services/utils';
 import { Services } from 'components-react/service-provider';
 
@@ -20,12 +19,10 @@ export default function PlatformAppPopOut() {
   }, []);
 
   return (
-    <ModalLayout hideFooter>
-      <PlatformAppPageView
-        appId={params.appId}
-        pageSlot={params.pageSlot}
-        style={{ height: '100%' }}
-      />
-    </ModalLayout>
+    <PlatformAppPageView
+      appId={params.appId}
+      pageSlot={params.pageSlot}
+      style={{ height: '100%', width: '100%' }}
+    />
   );
 }
