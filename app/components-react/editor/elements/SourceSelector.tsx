@@ -398,21 +398,26 @@ class SourceSelectorModule {
 }
 
 function SourceSelector() {
+  const { nodeData } = useModule(SourceSelectorModule);
   return (
     <>
       <StudioControls />
       <ItemsTree />
-      <HelpTip
-        title={$t('Folder Expansion')}
-        dismissableKey={EDismissable.SourceSelectorFolders}
-        position={{ top: '-8px', left: '102px' }}
-      >
-        <Translate
-          message={$t('Wondering how to expand your folders? Just click on the <icon></icon> icon')}
+      {nodeData.some(node => node.isFolder) && (
+        <HelpTip
+          title={$t('Folder Expansion')}
+          dismissableKey={EDismissable.SourceSelectorFolders}
+          position={{ top: '-8px', left: '102px' }}
         >
-          <i slot="icon" className="fa fa-folder" />
-        </Translate>
-      </HelpTip>
+          <Translate
+            message={$t(
+              'Wondering how to expand your folders? Just click on the <icon></icon> icon',
+            )}
+          >
+            <i slot="icon" className="fa fa-folder" />
+          </Translate>
+        </HelpTip>
+      )}
     </>
   );
 }
