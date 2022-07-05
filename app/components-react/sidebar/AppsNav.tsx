@@ -5,6 +5,8 @@ import { EAppPageSlot, ILoadedApp } from '../../services/platform-apps';
 import styles from './AppsNav.m.less';
 import { Services } from '../service-provider';
 import { useVuex } from '../hooks';
+import { Menu } from 'util/menus/Menu';
+import { $t } from 'services/i18n';
 
 /**
  * The default amount the nav bar should scroll when clicking the scroll arrow buttons.
@@ -115,11 +117,29 @@ export default function AppsNav() {
     );
   }
 
+  function showContextMenu(e: React.MouseEvent, app: ILoadedApp) {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (!isPopOutAllowed(app)) return;
+
+    const menu = new Menu();
+    menu.append({
+      label: $t('Pop Out'),
+      click: () => popOut(app),
+    });
+    menu.popup();
+  }
+
   return (
     <div className={styles.container}>
       <div className={styles.scroll} ref={scroll} onScroll={handleScroll}>
         {navApps.map(app => (
-          <div style={{ position: 'relative' }} key={app.id}>
+          <div
+            style={{ position: 'relative' }}
+            key={app.id}
+            onContextMenu={e => showContextMenu(e, app)}
+          >
             {<div className={cx(styles.activeApp, { [styles.active]: isSelectedApp(app.id) })} />}
             <div
               title={app.manifest.name}

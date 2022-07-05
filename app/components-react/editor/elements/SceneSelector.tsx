@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import Fuse from 'fuse.js';
 import cx from 'classnames';
 import { Dropdown, Tooltip, Tree } from 'antd';
+import { DownOutlined } from '@ant-design/icons';
 import * as remote from '@electron/remote';
 import { Menu } from 'util/menus/Menu';
 import { getOS } from 'util/operating-systems';
@@ -15,9 +16,9 @@ import { $t } from 'services/i18n';
 import { EDismissable } from 'services/dismissables';
 import { ERenderingMode } from '../../../../obs-api';
 import styles from './SceneSelector.m.less';
-import { DownOutlined } from '@ant-design/icons';
+import useBaseElement from './hooks';
 
-export default function SceneSelector() {
+function SceneSelector() {
   const {
     ScenesService,
     SceneCollectionsService,
@@ -212,5 +213,24 @@ export default function SceneSelector() {
         </div>
       </HelpTip>
     </>
+  );
+}
+
+export default function SceneSelectorElement() {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const { renderElement } = useBaseElement(
+    <SceneSelector />,
+    { x: 200, y: 120 },
+    containerRef.current,
+  );
+
+  return (
+    <div
+      ref={containerRef}
+      data-name="SceneSelector"
+      style={{ height: '100%', display: 'flex', flexDirection: 'column' }}
+    >
+      {renderElement()}
+    </div>
   );
 }

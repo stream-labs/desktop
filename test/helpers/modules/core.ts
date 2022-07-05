@@ -5,10 +5,11 @@
 import { getContext } from '../spectron';
 import { getApiClient } from '../api-client';
 import { WindowsService } from '../../../app/services/windows';
+import { ClickOptions, WaitForOptions } from 'webdriverio';
 
 export type TSelectorOrEl = string | WebdriverIO.Element;
 
-export function getClient(): WebdriverIO.BrowserObject {
+export function getClient(): WebdriverIO.Browser {
   return getContext().context.app.client;
 }
 
@@ -30,7 +31,7 @@ export function selectButton(buttonText: string) {
 
 // CLICK SHORTCUTS
 
-export async function click(selectorOrEl: TSelectorOrEl, options?: WebdriverIO.ClickOptions) {
+export async function click(selectorOrEl: TSelectorOrEl, options?: ClickOptions) {
   const $el = await select(selectorOrEl);
   await $el.waitForClickable();
   await $el.click(options);
@@ -59,7 +60,7 @@ export async function clickTab(tabText: string) {
 
 export async function isDisplayed(
   selectorOrEl: TSelectorOrEl,
-  waitForOptions?: WebdriverIO.WaitForOptions,
+  waitForOptions?: WaitForOptions,
 ) {
   if (waitForOptions) {
     try {
@@ -74,14 +75,14 @@ export async function isDisplayed(
 
 export async function waitForDisplayed(
   selectorOrEl: TSelectorOrEl,
-  options?: WebdriverIO.WaitForOptions,
+  options?: WaitForOptions,
 ) {
   await (await select(selectorOrEl)).waitForDisplayed(options);
 }
 
 export async function waitForClickable(
   selectorOrEl: TSelectorOrEl,
-  options?: WebdriverIO.WaitForOptions,
+  options?: WaitForOptions,
 ) {
   await (await select(selectorOrEl)).waitForClickable(options);
 }
@@ -92,7 +93,7 @@ export function waitForText(text: string) {
 
 export async function waitForEnabled(
   selectorOrEl: TSelectorOrEl,
-  options?: WebdriverIO.WaitForOptions,
+  options?: WaitForOptions,
 ) {
   await (await select(selectorOrEl)).waitForEnabled(options);
 }

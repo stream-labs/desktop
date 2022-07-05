@@ -228,7 +228,9 @@ export class TcpServerService
         });
       });
     });
-    return addresses;
+
+    // Sort IPv4 before IPv6
+    return addresses.sort((a, b) => parseInt(a.family[3], 10) - parseInt(b.family[3], 10));
   }
 
   generateToken(): string {

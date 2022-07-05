@@ -27,6 +27,7 @@
 
   i, svg {
     margin: auto;
+    display: block;
   }
 
   svg {
@@ -36,7 +37,7 @@
   &:hover {
     cursor: pointer;
 
-    i, svg {
+    svg, i:not(.link-badge) {
       transition: transform 0.2s;
       color: var(--title);
       fill: var(--title);
@@ -45,7 +46,13 @@
   }
 
   &.prime-cell {
-    color: var(--prime);
+    i:not(.link-badge) {
+      color: var(--prime);
+    }
+  }
+
+  :global(.ant-badge) {
+    margin: auto;
   }
 }
 
@@ -131,4 +138,10 @@
     height: 35px;
     font-size: 14px;
   }
+}
+
+.link-badge {
+  color: var(--title);
+  border: 1px solid var(--section-alt);
+  font-size: 8px;
 }

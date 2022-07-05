@@ -10,6 +10,6 @@ export * from './Advanced';
 export * from './Appearance';
 export * from './RemoteControl';
 // 'VirtualWebcam',
-// 'GameOverlay'
+export * from './GameOverlay';
 export * from './Support';
 export * from './Experimental';
