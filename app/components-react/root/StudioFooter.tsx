@@ -254,13 +254,13 @@ function RecordingTimer() {
   }));
 
   useEffect(() => {
+    let recordingTimeout: number | undefined;
     if (isRecording) {
-      const recordingTimeout = window.setTimeout(() => {
+      recordingTimeout = window.setTimeout(() => {
         setRecordingTime(StreamingService.formattedDurationInCurrentRecordingState);
       }, 1000);
-
-      return () => clearTimeout(recordingTimeout);
     }
+    return () => clearTimeout(recordingTimeout);
   }, [isRecording, recordingTime]);
 
   if (!isRecording) return <></>;
