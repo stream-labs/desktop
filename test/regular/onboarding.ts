@@ -53,7 +53,7 @@ test('Go through the onboarding and autoconfig', async t => {
     await sleep(1000);
   }
 
-  await (await app.client.$('h2=Sources')).waitForDisplayed({ timeout: 60000 });
+  await (await app.client.$('span=Sources')).waitForDisplayed({ timeout: 60000 });
   // success?
-  t.true(await (await app.client.$('h2=Sources')).isDisplayed(), 'Sources selector is visible');
+  t.true(await (await app.client.$('span=Sources')).isDisplayed(), 'Sources selector is visible');
 });
