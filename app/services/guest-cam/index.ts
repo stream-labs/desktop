@@ -191,7 +191,7 @@ class GuestCamViews extends ViewHandler<IGuestCamServiceState> {
   }
 
   get inviteUrl() {
-    return `https://streamlabs-obs-dev.s3.us-west-2.amazonaws.com/guestcam/build/index.html#/join/${this.state.inviteHash}`;
+    return `https://join.streamlabs.com/#/join/${this.state.inviteHash}`;
   }
 
   get guestVisible() {
