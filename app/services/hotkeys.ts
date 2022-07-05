@@ -14,6 +14,7 @@ import { CustomizationService } from './customization';
 import { RecentEventsService } from './recent-events';
 import { UsageStatisticsService } from './usage-statistics';
 import { getOS, OS } from 'util/operating-systems';
+import { VirtualWebcamService } from 'app-services';
 
 function getScenesService(): ScenesService {
   return ScenesService.instance;
@@ -41,6 +42,10 @@ function getCustomizationService(): CustomizationService {
 
 function getRecentEventsService(): RecentEventsService {
   return RecentEventsService.instance;
+}
+
+function getVirtualCameraService(): VirtualWebcamService {
+  return VirtualWebcamService.instance;
 }
 
 const isAudio = (sourceId: string) => {
@@ -182,6 +187,16 @@ const GENERAL_ACTIONS: HotkeyGroup = {
     name: 'SKIP_ALERT',
     description: () => $t('Skip Alert'),
     down: () => getRecentEventsService().skipAlert(),
+  },
+  TOGGLE_VIRTUAL_CAMERA_ON: {
+    name: 'TOGGLE_VIRTUAL_CAMERA_ON',
+    description: () => $t('Start Virtual Camera'),
+    down: () => getVirtualCameraService().start(),
+  },
+  TOGGLE_VIRTUAL_CAMERA_OFF: {
+    name: 'TOGGLE_VIRTUAL_CAMERA_OFF',
+    description: () => $t('Stop Virtual Camera'),
+    down: () => getVirtualCameraService().stop(),
   },
 };
 
