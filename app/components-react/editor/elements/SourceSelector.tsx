@@ -560,6 +560,7 @@ const TreeNode = React.forwardRef(
       <div
         className={styles.sourceTitleContainer}
         data-name={p.title}
+        data-role="source"
         ref={ref}
         onDoubleClick={p.onDoubleClick}
       >
