@@ -143,6 +143,7 @@ interface ITurnConfig {
 
 interface IGuest {
   name: string;
+  streamId: string;
 }
 
 interface IGuestCamServiceState {
@@ -190,7 +191,7 @@ class GuestCamViews extends ViewHandler<IGuestCamServiceState> {
   }
 
   get inviteUrl() {
-    return `https://streamlabs-obs-dev.s3.us-west-2.amazonaws.com/guestcam/build/index.html#/join/${this.state.inviteHash}`;
+    return `https://join.streamlabs.com/j/${this.state.inviteHash}`;
   }
 
   get guestVisible() {
@@ -611,9 +612,14 @@ export class GuestCamService extends PersistentStatefulService<IGuestCamServiceS
       return;
     }
 
+    if (this.disconnectedStreamIds.includes(event.data.streamId)) {
+      this.log(`Ignoring previously disconnected stream id ${event.data.streamId}`);
+      return;
+    }
+
     this.log('New guest joined', event);
 
-    this.SET_GUEST({ name: event.data.name });
+    this.SET_GUEST({ name: event.data.name, streamId: event.data.streamId });
 
     // Clean up any existing consumer before connecting the new one
     if (this.consumer) {
@@ -648,6 +654,8 @@ export class GuestCamService extends PersistentStatefulService<IGuestCamServiceS
     });
   }
 
+  disconnectedStreamIds: string[] = [];
+
   /**
    * Disconnects the currently connected guest
    */
@@ -656,6 +664,25 @@ export class GuestCamService extends PersistentStatefulService<IGuestCamServiceS
       this.consumer.destroy();
       this.consumer = null;
     }
+
+    // Also stop sending our mic/video
+    // When we do multi-guest this will need to change
+    if (this.producer) {
+      this.producer.destroy();
+      this.producer = null;
+    }
+
+    // Add the stream id to the list of disconnected guests, so we don't
+    // immediately connect to that same guest again until they are forced
+    // to refresh the page.
+    this.disconnectedStreamIds.push(this.state.guestInfo.streamId);
+
+    // TODO: AFAIK there is no way to cleanly recreate the producer without
+    // entirely disconnecting destroying all state on the server. For now, we
+    // disconnect from the socket and start listening to guests again.
+    this.socket.disconnect();
+    this.socket = null;
+    this.startListeningForGuests();
 
     this.SET_GUEST(null);
   }
@@ -690,9 +717,15 @@ export class GuestCamService extends PersistentStatefulService<IGuestCamServiceS
     });
   }
 
-  sendWebRTCRequest(data: unknown) {
+  sendWebRTCRequest(data: Object) {
     return new Promise(resolve => {
-      this.socket.emit('webrtc', data, resolve);
+      this.socket.emit('webrtc', data, (result: Object) => {
+        if (result && result['error']) {
+          this.error(`Got error response from request ${data['type']}`);
+        }
+
+        resolve(result);
+      });
     });
   }
 
@@ -736,6 +769,10 @@ export class GuestCamService extends PersistentStatefulService<IGuestCamServiceS
 
   log(...msgs: unknown[]) {
     console.log('[Guest Cam]', ...msgs);
+  }
+
+  error(...msgs: unknown[]) {
+    console.error('[Guest Cam]', ...msgs);
   }
 
   setVideoSource(sourceId: string) {

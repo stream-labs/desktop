@@ -8,7 +8,7 @@ import { WidgetDisplayData, WidgetType } from 'services/widgets';
 import { TSourceType } from 'services/sources';
 import { getPlatformService } from 'services/platforms';
 import { $i } from 'services/utils';
-import { byOS, OS } from 'util/operating-systems';
+import { byOS, getOS, OS } from 'util/operating-systems';
 import { $t } from 'services/i18n';
 import SourceTag from './SourceTag';
 import { useSourceShowcaseSettings } from './useSourceShowcase';
@@ -69,7 +69,7 @@ export default function SourceGrid(p: { activeTab: string }) {
         return;
       }
 
-      if (type.value === 'mediasoupconnector' && !guestCamAvailable) {
+      if (type.value === 'mediasoupconnector' && (!guestCamAvailable || getOS() === OS.Mac)) {
         return false;
       }
 

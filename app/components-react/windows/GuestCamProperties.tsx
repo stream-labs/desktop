@@ -229,7 +229,9 @@ export default function GuestCamProperties() {
                     'You can always generate a new link from this window, which will invalidate old links',
                   )}
                 </li>
-                <li>{$t('Do not show this window on stream')}</li>
+                <li>
+                  <b>{$t('Do not show this window on stream')}</b>
+                </li>
               </ul>
             </div>
           }
