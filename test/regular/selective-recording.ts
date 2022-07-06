@@ -26,7 +26,7 @@ test('Selective Recording', async t => {
   await (await client.$('[data-name=sourcesControls] .icon-smart-record')).click();
 
   // Check that selective recording icon is active
-  await (await client.$('.icon-smart-record.icon--active')).waitForExist();
+  await (await client.$('.icon-smart-record.active')).waitForExist();
 
   // Check that browser source has a selective recording toggle
   t.true(await (await client.$('[data-role=source] .icon-smart-record')).isExisting());
