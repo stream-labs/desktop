@@ -14,7 +14,7 @@ import { dialogDismiss } from '../spectron/dialog';
 import { contextMenuClick } from '../spectron/context-menu';
 
 async function clickSourceAction(selector: string) {
-  const $el = await (await (await select('span=Sources')).$('..')).$(selector);
+  const $el = await (await select('[data-name=sourcesControls]')).$(selector);
   await $el.click();
 }
 

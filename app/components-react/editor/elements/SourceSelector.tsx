@@ -441,7 +441,7 @@ function StudioControls() {
   } = useModule(SourceSelectorModule);
 
   return (
-    <div className={styles.topContainer}>
+    <div className={styles.topContainer} data-name="sourcesControls">
       <div className={styles.activeSceneContainer}>
         <Tooltip title={sourcesTooltip}>
           <span className={styles.activeScene}>{$t('Sources')}</span>
