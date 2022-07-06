@@ -443,12 +443,12 @@ function StudioControls() {
   return (
     <div className={styles.topContainer} data-name="sourcesControls">
       <div className={styles.activeSceneContainer}>
-        <Tooltip title={sourcesTooltip}>
+        <Tooltip title={sourcesTooltip} placement="bottomLeft">
           <span className={styles.activeScene}>{$t('Sources')}</span>
         </Tooltip>
       </div>
 
-      <Tooltip title={$t('Toggle Selective Recording')}>
+      <Tooltip title={$t('Toggle Selective Recording')} placement="bottomRight">
         <i
           className={cx('icon-smart-record icon-button icon-button--lg', {
             active: selectiveRecordingEnabled,
@@ -458,15 +458,15 @@ function StudioControls() {
         />
       </Tooltip>
 
-      <Tooltip title={addGroupTooltip}>
+      <Tooltip title={addGroupTooltip} placement="bottomRight">
         <i className="icon-add-folder icon-button icon-button--lg" onClick={addFolder} />
       </Tooltip>
 
-      <Tooltip title={addSourceTooltip}>
+      <Tooltip title={addSourceTooltip} placement="bottomRight">
         <i className="icon-add icon-button icon-button--lg" onClick={addSource} />
       </Tooltip>
 
-      <Tooltip title={removeSourcesTooltip}>
+      <Tooltip title={removeSourcesTooltip} placement="bottomRight">
         <i
           className={cx({
             'icon-subtract icon-button icon-button--lg': true,
@@ -476,7 +476,7 @@ function StudioControls() {
         />
       </Tooltip>
 
-      <Tooltip title={openSourcePropertiesTooltip}>
+      <Tooltip title={openSourcePropertiesTooltip} placement="bottomRight">
         <i
           className={cx({ disabled: !canShowProperties(), 'icon-settings icon-button': true })}
           onClick={() => sourceProperties(activeItemIds[0])}
