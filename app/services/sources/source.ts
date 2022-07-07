@@ -36,6 +36,7 @@ export class Source implements ISourceApi {
   propertiesManagerType: TPropertiesManager;
   propertiesManagerSettings: Dictionary<any>;
   forceHidden: boolean;
+  forceMuted: boolean;
 
   state: ISource;
 
@@ -66,6 +67,7 @@ export class Source implements ISourceApi {
     return this.getObsInput().settings;
   }
 
+  @ExecuteInWorkerProcess()
   setForceHidden(val: boolean) {
     this.SET_FORCE_HIDDEN(val);
 
@@ -83,6 +85,13 @@ export class Source implements ISourceApi {
         sceneItem.getObsSceneItem().visible = sceneItem.visible;
       }
     });
+  }
+
+  @ExecuteInWorkerProcess()
+  setForceMuted(val: boolean) {
+    this.SET_FORCE_MUTED(val);
+
+    this.getObsInput().muted = val ? true : this.muted;
   }
 
   /**
@@ -352,6 +361,11 @@ export class Source implements ISourceApi {
   @mutation()
   private SET_FORCE_HIDDEN(val: boolean) {
     this.state.forceHidden = val;
+  }
+
+  @mutation()
+  private SET_FORCE_MUTED(val: boolean) {
+    this.state.forceMuted = val;
   }
 
   @mutation()

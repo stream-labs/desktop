@@ -20,7 +20,7 @@ import { Consumer } from './consumer';
 import { byOS, OS } from 'util/operating-systems';
 import { Mutex } from 'util/mutex';
 import Utils from 'services/utils';
-import { E_AUDIO_CHANNELS } from 'services/audio';
+import { AudioService, E_AUDIO_CHANNELS } from 'services/audio';
 import {
   NotificationsService,
   SceneCollectionsService,
@@ -66,7 +66,6 @@ export interface IObsReturnTypes {
   };
   func_stop_consumer: {};
   func_stop_sender: {};
-  func_change_playback_volume: {};
   func_stop_receiver: {};
 }
 
@@ -152,7 +151,6 @@ interface IGuestCamServiceState {
   audioSourceId: string;
   inviteHash: string;
   guestInfo: IGuest;
-  volume: number;
 }
 
 interface IInviteLink {
@@ -190,6 +188,10 @@ class GuestCamViews extends ViewHandler<IGuestCamServiceState> {
     return this.getServiceViews(SourcesService).getSource(this.sourceId);
   }
 
+  get deflection() {
+    return this.getServiceViews(AudioService).getSource(this.sourceId).fader.deflection;
+  }
+
   get inviteUrl() {
     return `https://join.streamlabs.com/j/${this.state.inviteHash}`;
   }
@@ -218,7 +220,6 @@ export class GuestCamService extends PersistentStatefulService<IGuestCamServiceS
     audioSourceId: '',
     inviteHash: '',
     guestInfo: null,
-    volume: 255,
   };
 
   get views() {
@@ -455,7 +456,6 @@ export class GuestCamService extends PersistentStatefulService<IGuestCamServiceS
 
     // Load volume from source properties manager
     const volume = this.views.source.getPropertiesManagerSettings()['guest_cam_volume'] ?? 255;
-    this.SET_VOLUME(volume);
 
     // Remove all existing mediasoup filters
     Object.keys(this.sourceFiltersService.state.filters).forEach(sourceId => {
@@ -493,21 +493,6 @@ export class GuestCamService extends PersistentStatefulService<IGuestCamServiceS
       { room: this.room },
       EFilterDisplayType.Hidden,
     );
-  }
-
-  setVolume(vol: number) {
-    if (vol < 0 || vol > 255) return;
-
-    // Unfortunately we need to update it in 3 places:
-    // - OBS Source, to make the volume actually change
-    // - Vuex store, to ensure UI reactivity
-    // - Properties manager, to ensure persistence in the scene collection
-    //   on the source itself
-    if (!this.views.source.forceHidden) {
-      this.makeObsRequest('func_change_playback_volume', vol.toString());
-    }
-    this.SET_VOLUME(vol);
-    this.views.source.setPropertiesManagerSettings({ guest_cam_volume: vol });
   }
 
   async getTurnConfig() {
@@ -636,9 +621,7 @@ export class GuestCamService extends PersistentStatefulService<IGuestCamServiceS
 
     // Make sure the source isn't visible in any scene
     this.views.source.setForceHidden(true);
-
-    // Set audio volume to 0 until the guest is approved
-    this.makeObsRequest('func_change_playback_volume', '0');
+    this.views.source.setForceMuted(true);
 
     this.emitStreamingStatus();
 
@@ -691,10 +674,7 @@ export class GuestCamService extends PersistentStatefulService<IGuestCamServiceS
     if (!this.views.source) return;
 
     this.views.source.setForceHidden(!visible);
-
-    const volume = visible ? this.state.volume : 0;
-
-    this.makeObsRequest('func_change_playback_volume', volume.toString());
+    this.views.source.setForceMuted(!visible);
   }
 
   async onGuestLeave(event: IConsumerDestroyedEvent) {
@@ -808,10 +788,5 @@ export class GuestCamService extends PersistentStatefulService<IGuestCamServiceS
   @mutation()
   private SET_GUEST(guest: IGuest) {
     this.state.guestInfo = guest;
-  }
-
-  @mutation()
-  private SET_VOLUME(vol: number) {
-    this.state.volume = vol;
   }
 }
