@@ -61,6 +61,7 @@ class NotificationsModule {
   // Remove already ready Notifications captured via subscription from the queue
   clearQueueOfRead(ids: number[]) {
     this.notifQueue = this.notifQueue.filter(notif => !ids.includes(notif.id));
+    if (this.currentNotif && ids.includes(this.currentNotif.id)) this.playNext();
   }
 
   get unreadWarnings() {
