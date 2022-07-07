@@ -125,12 +125,11 @@ export default function NotificationsArea() {
   }, []);
 
   useEffect(() => {
-    if (!notificationsContainer.current) return;
     message.config({
       getContainer: () => notificationsContainer.current as HTMLElement,
       maxCount: showExtendedNotifications ? 1 : 0,
     });
-  }, [notificationsContainer.current, showExtendedNotifications]);
+  }, [showExtendedNotifications]);
 
   function showNotifications() {
     NotificationsService.actions.showNotifications();
