@@ -14,7 +14,7 @@ import { byOS, OS } from 'util/operating-systems';
 import { TSourceType } from 'services/sources';
 
 export default function GuestCamProperties() {
-  const { GuestCamService, SourcesService, WindowsService } = Services;
+  const { GuestCamService, SourcesService, WindowsService, EditorCommandsService } = Services;
   const audioSourceType = byOS({
     [OS.Windows]: 'wasapi_input_capture',
     [OS.Mac]: 'coreaudio_input_capture',
@@ -51,7 +51,7 @@ export default function GuestCamProperties() {
     inviteUrl: GuestCamService.views.inviteUrl,
     source: GuestCamService.views.source,
     guestInfo: GuestCamService.state.guestInfo,
-    volume: GuestCamService.state.volume,
+    volume: GuestCamService.views.deflection,
   }));
   const [regeneratingLink, setRegeneratingLink] = useState(false);
 
@@ -60,6 +60,12 @@ export default function GuestCamProperties() {
     await GuestCamService.actions.return
       .ensureInviteLink(true)
       .finally(() => setRegeneratingLink(false));
+  }
+
+  function setDeflection(val: number) {
+    if (!source) return;
+
+    EditorCommandsService.actions.executeCommand('SetDeflectionCommand', source.sourceId, val);
   }
 
   return (
@@ -99,12 +105,12 @@ export default function GuestCamProperties() {
                 <SliderInput
                   label={$t('Volume')}
                   value={volume}
-                  onChange={GuestCamService.actions.setVolume}
+                  onChange={setDeflection}
                   min={0}
-                  max={255}
+                  max={1}
                   debounce={500}
-                  step={1}
-                  tipFormatter={v => `${((v / 255) * 100).toFixed(1)}%`}
+                  step={0.01}
+                  tipFormatter={v => `${(v * 100).toFixed(0)}%`}
                   style={{ width: '100%', margin: '10px 0' }}
                 />
                 <TextInput
