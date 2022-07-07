@@ -27,6 +27,13 @@ export interface ISource {
    * This is mainly meant to support Guest Cam
    */
   forceHidden: boolean;
+  /**
+   * When set to true, this source will not ouptut any audio,
+   * irrespective of what the user-set muted option displays.
+   *
+   * This is mainly meant to support Guest Cam
+   */
+  forceMuted: boolean;
 }
 
 /**

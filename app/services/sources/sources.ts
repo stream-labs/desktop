@@ -39,6 +39,7 @@ import { SourceFiltersService } from 'services/source-filters';
 import { VideoService } from 'services/video';
 import { CustomizationService } from '../customization';
 import { EAvailableFeatures, IncrementalRolloutService } from '../incremental-rollout';
+import { EMonitoringType } from '../../../obs-api';
 
 const AudioFlag = obs.ESourceOutputFlags.Audio;
 const VideoFlag = obs.ESourceOutputFlags.Video;
@@ -245,6 +246,7 @@ export class SourcesService extends StatefulService<ISourcesState> {
       channel: addOptions.channel,
 
       forceHidden: false,
+      forceMuted: false,
     };
 
     if (addOptions.isTemporary) {
@@ -287,6 +289,12 @@ export class SourcesService extends StatefulService<ISourcesState> {
     }
 
     const obsInput = obs.InputFactory.create(type, id, obsInputSettings);
+
+    // For Guest Cam, we default sources to monitor so the streamer can hear guests
+    if (type === 'mediasoupconnector' && !options.audioSettings?.monitoringType) {
+      options.audioSettings ??= {};
+      options.audioSettings.monitoringType = EMonitoringType.MonitoringOnly;
+    }
 
     this.addSource(obsInput, name, options);
 
@@ -580,7 +588,11 @@ export class SourcesService extends StatefulService<ISourcesState> {
   setMuted(id: string, muted: boolean) {
     const source = this.views.getSource(id);
     if (!source) return;
-    source.getObsInput().muted = muted;
+
+    // Only update in OBS if forceMuted is false
+    if (!source.forceMuted) {
+      source.getObsInput().muted = muted;
+    }
     this.UPDATE_SOURCE({ id, muted });
     this.sourceUpdated.next(source.state);
   }
