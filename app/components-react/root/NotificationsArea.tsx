@@ -117,8 +117,6 @@ export default function NotificationsArea() {
   const showUnreadNotificationsTooltip = $t('Click to read your unread Notifications');
 
   useEffect(() => {
-    playNext();
-
     const notifPushedSub = NotificationsService.notificationPushed.subscribe(addNotif);
     const notifReadSub = NotificationsService.notificationRead.subscribe(clearQueueOfRead);
 
