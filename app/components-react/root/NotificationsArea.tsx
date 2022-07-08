@@ -16,9 +16,18 @@ class NotificationsModule {
 
   audio = new Audio(notificationAudio);
 
+  readyToPlay = false;
+
+  setReadyToPlay() {
+    if (this.readyToPlay) return;
+
+    this.readyToPlay = true;
+    this.playNext();
+  }
+
   // Add Notification to queue if one is playing, otherwise play it
   addNotif(notif: INotification) {
-    if (this.currentNotif) {
+    if (this.currentNotif || !this.readyToPlay) {
       this.notifQueue.push(notif);
     } else {
       this.playNotif(notif);
@@ -98,6 +107,7 @@ export default function NotificationsArea() {
     addNotif,
     playNext,
     clearQueueOfRead,
+    setReadyToPlay,
   } = useNotifications();
 
   const notificationsContainer = useRef<HTMLDivElement>(null);
@@ -107,8 +117,6 @@ export default function NotificationsArea() {
   const showUnreadNotificationsTooltip = $t('Click to read your unread Notifications');
 
   useEffect(() => {
-    playNext();
-
     const notifPushedSub = NotificationsService.notificationPushed.subscribe(addNotif);
     const notifReadSub = NotificationsService.notificationRead.subscribe(clearQueueOfRead);
 
@@ -129,6 +137,7 @@ export default function NotificationsArea() {
       getContainer: () => notificationsContainer.current as HTMLElement,
       maxCount: showExtendedNotifications ? 1 : 0,
     });
+    setReadyToPlay();
   }, [showExtendedNotifications]);
 
   function showNotifications() {
