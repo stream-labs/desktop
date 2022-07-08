@@ -167,4 +167,13 @@
     display: block;
     width: 100%;
   }
+
+  :global(.fa-folder) {
+    &:hover {
+      &::before {
+        content: "\f07c";
+      }
+      color: var(--title);
+    }
+  }
 }
