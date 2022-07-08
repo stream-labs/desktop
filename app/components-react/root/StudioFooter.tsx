@@ -259,6 +259,8 @@ function RecordingTimer() {
       recordingTimeout = window.setTimeout(() => {
         setRecordingTime(StreamingService.formattedDurationInCurrentRecordingState);
       }, 1000);
+    } else {
+      setRecordingTime('');
     }
     return () => clearTimeout(recordingTimeout);
   }, [isRecording, recordingTime]);
