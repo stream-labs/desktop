@@ -262,7 +262,7 @@ export const SourceDisplayData = (): { [key: string]: ISourceDisplayData } => ({
     shortDesc: $t('Viewer shoutouts'),
   },
   mediasoupconnector: {
-    name: $t('Guest Cam'),
+    name: $t('Collab Cam'),
     description: $t('Invite a guest to join your stream from a web browser.'),
     icon: 'fas fa-user',
   },
