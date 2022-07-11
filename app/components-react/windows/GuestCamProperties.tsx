@@ -217,7 +217,10 @@ export default function GuestCamProperties() {
         getContainer={false}
         closable={false}
         okText={$t('Start Collab Cam')}
-        onOk={() => GuestCamService.actions.setProduceOk()}
+        onOk={() => {
+          GuestCamService.actions.setProduceOk();
+          DismissablesService.actions.dismiss(EDismissable.GuestCamFirstTimeModal);
+        }}
         onCancel={() => WindowsService.actions.closeChildWindow()}
       >
         {showFirstTimeModal ? <FirstTimeModalContent /> : <EveryTimeModalContent />}
