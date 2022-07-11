@@ -807,7 +807,7 @@ export class SourcesService extends StatefulService<ISourcesState> {
       queryParams: { sourceId: source.sourceId },
       size: {
         width: 800,
-        height: 600,
+        height: 670,
       },
     });
   }

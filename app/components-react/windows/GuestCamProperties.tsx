@@ -12,9 +12,17 @@ import * as remote from '@electron/remote';
 import { Spinner } from 'components-react/pages/Loader';
 import { byOS, OS } from 'util/operating-systems';
 import { TSourceType } from 'services/sources';
+import { ExclamationCircleOutlined } from '@ant-design/icons';
+import { EDismissable } from 'services/dismissables';
 
 export default function GuestCamProperties() {
-  const { GuestCamService, SourcesService, WindowsService, EditorCommandsService } = Services;
+  const {
+    GuestCamService,
+    SourcesService,
+    WindowsService,
+    EditorCommandsService,
+    DismissablesService,
+  } = Services;
   const audioSourceType = byOS({
     [OS.Windows]: 'wasapi_input_capture',
     [OS.Mac]: 'coreaudio_input_capture',
@@ -33,6 +41,7 @@ export default function GuestCamProperties() {
     source,
     guestInfo,
     volume,
+    showFirstTimeModal,
   } = useVuex(() => ({
     produceOk: GuestCamService.state.produceOk,
     visible: GuestCamService.views.guestVisible,
@@ -52,6 +61,7 @@ export default function GuestCamProperties() {
     source: GuestCamService.views.source,
     guestInfo: GuestCamService.state.guestInfo,
     volume: GuestCamService.views.deflection,
+    showFirstTimeModal: DismissablesService.views.shouldShow(EDismissable.GuestCamFirstTimeModal),
   }));
   const [regeneratingLink, setRegeneratingLink] = useState(false);
 
@@ -206,47 +216,63 @@ export default function GuestCamProperties() {
         visible={!produceOk}
         getContainer={false}
         closable={false}
-        okText={$t('Start Guest Cam')}
-        onOk={() => GuestCamService.actions.setProduceOk()}
+        okText={$t('Start Collab Cam')}
+        onOk={() => {
+          GuestCamService.actions.setProduceOk();
+          DismissablesService.actions.dismiss(EDismissable.GuestCamFirstTimeModal);
+        }}
         onCancel={() => WindowsService.actions.closeChildWindow()}
       >
-        <h2>{$t('Initialize Guest Cam?')}</h2>
-        <p>
-          {$t(
-            'Guest Cam is currently listening for connecting guests, but is not broadcasting your microphone and webcam to your guests yet.',
-          )}
-        </p>
-        <Alert
-          message={
-            <div style={{ color: 'var(--paragraph)' }}>
-              <p>{$t('Please consider the following before starting Guest Cam')}</p>
-              <ul>
-                <li>
-                  {$t(
-                    'Once you start Guest Cam, people joining your invite link will be able to see and hear you',
-                  )}
-                </li>
-                <li>
-                  {$t('Guests will not be visible on your stream until you unhide them from here')}
-                </li>
-                <li>{$t('Do not share your invite link with anyone you do not wish to invite')}</li>
-                <li>
-                  {$t(
-                    'You can always generate a new link from this window, which will invalidate old links',
-                  )}
-                </li>
-                <li>
-                  <b>{$t('Do not show this window on stream')}</b>
-                </li>
-              </ul>
-            </div>
-          }
-          type="info"
-          closable={false}
-          showIcon={false}
-          banner
-        />
+        {showFirstTimeModal ? <FirstTimeModalContent /> : <EveryTimeModalContent />}
       </Modal>
     </ModalLayout>
+  );
+}
+
+function EveryTimeModalContent() {
+  return (
+    <h2 style={{ textAlign: 'center' }}>
+      {$t('Collab Cam is not yet sending your video and audio to guests. Start Collab Cam?')}
+    </h2>
+  );
+}
+
+function FirstTimeModalContent() {
+  return (
+    <>
+      <h2>{$t('Welcome to Collab Cam')}</h2>
+      <h3>{$t('Step 1')}</h3>
+      <p>
+        {$t(
+          "Copy and share a link with your guest. When they join, they'll be able to see and hear you.",
+        )}
+      </p>
+      <h3>{$t('Step 2')}</h3>
+      <p>
+        {$t(
+          "Verify their identity in the preview area. When ready, add them to your stream by clicking 'Show on Stream'.",
+        )}
+      </p>
+      <h3>{$t('Step 3')}</h3>
+      <p>
+        {$t(
+          'Enjoy your stream! Adjust their volume, create new links, and change your mic and camera from the properties window.',
+        )}
+      </p>
+      <Alert
+        message={
+          <div style={{ color: 'var(--info)' }}>
+            <ExclamationCircleOutlined style={{ color: 'var(--info)', marginRight: 8 }} />
+            {$t(
+              "Don't share your invite link with anyone you don't want on your stream. You can invalidate an old link by generating a new one. Do not show this window on stream.",
+            )}
+          </div>
+        }
+        type="info"
+        closable={false}
+        showIcon={false}
+        banner
+      />
+    </>
   );
 }
