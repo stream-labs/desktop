@@ -279,7 +279,9 @@ class SourceSelectorModule {
       );
       const idx2 = this.nodeData.findIndex(i => i.id === info.node.key);
       const swapIdx = idx1 > idx2;
-      ids = this.nodeData.map(i => i.id).slice(swapIdx ? idx2 : idx1, swapIdx ? idx1 : idx2 + 1);
+      ids = this.nodeData
+        .map(i => i.id)
+        .slice(swapIdx ? idx2 : idx1, swapIdx ? idx1 + 1 : idx2 + 1);
     }
 
     this.selectionService.views.globalSelection.select(ids);
