@@ -7,6 +7,7 @@ import { Inject } from 'services/core';
 import { VideoService } from 'services/video';
 import { StreamingService } from 'services/streaming';
 import { OS } from 'util/operating-systems';
+import { GuestCamNode } from './guest-cam';
 
 interface ISchema {
   baseResolution: {
@@ -18,6 +19,8 @@ interface ISchema {
   scenes: ScenesNode;
   hotkeys?: HotkeysNode;
   transitions?: TransitionsNode; // V2 Transitions
+
+  guestCam?: GuestCamNode;
 
   operatingSystem?: OS;
 }
@@ -34,17 +37,20 @@ export class RootNode extends Node<ISchema, {}> {
     const scenes = new ScenesNode();
     const transitions = new TransitionsNode();
     const hotkeys = new HotkeysNode();
+    const guestCam = new GuestCamNode();
 
     await sources.save({});
     await scenes.save({});
     await transitions.save();
     await hotkeys.save({});
+    await guestCam.save();
 
     this.data = {
       sources,
       scenes,
       transitions,
       hotkeys,
+      guestCam,
       baseResolution: this.videoService.baseResolution,
       selectiveRecording: this.streamingService.state.selectiveRecording,
       operatingSystem: process.platform as OS,
@@ -61,6 +67,10 @@ export class RootNode extends Node<ISchema, {}> {
 
     if (this.data.hotkeys) {
       await this.data.hotkeys.load({});
+    }
+
+    if (this.data.guestCam) {
+      await this.data.guestCam.load();
     }
   }
 
