@@ -107,7 +107,7 @@
   "Name Folder": "命名資料夾",
   "Rename Source": "重新命名來源",
   "Name Source": "命名來源",
-  "Source filters": "Source filters",
+  "Source filters": "濾鏡來源",
   "Add source filter": "濾鏡新增來源",
   "Reset Transform": "重設變形",
   "Flip Vertical": "垂直翻轉",
@@ -207,5 +207,7 @@
   "Dynamic, live alerts": "動態、即時通知",
   "Display recent events": "顯示最近的事件",
   "Viewer shoutouts": "觀眾喊話",
-  "Capture an application window": "擷取應用程式視窗"
+  "Capture an application window": "擷取應用程式視窗",
+  "Folder Expansion": "Folder Expansion",
+  "Wondering how to expand your folders? Just click on the <icon></icon> icon": "Wondering how to expand your folders? Just click on the <icon></icon> icon"
 }
