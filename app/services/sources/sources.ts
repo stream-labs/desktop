@@ -540,7 +540,7 @@ export class SourcesService extends StatefulService<ISourcesState> {
       { description: 'Video Capture Device', value: 'av_capture_input' },
       { description: 'Display Capture', value: 'display_capture' },
       { description: 'Soundtrack source', value: 'soundtrack_source' },
-      { description: 'Guest Cam', value: 'mediasoupconnector' },
+      { description: 'Collab Cam', value: 'mediasoupconnector' },
     ];
 
     const availableAllowlistedTypes = allowlistedTypes.filter(type =>
@@ -803,7 +803,7 @@ export class SourcesService extends StatefulService<ISourcesState> {
     const propertiesName = SourceDisplayData()[source.type].name;
     this.windowsService.showWindow({
       componentName: 'GuestCamProperties',
-      title: $t('Guest Cam Properties', { sourceName: propertiesName }),
+      title: $t('Collab Cam Properties', { sourceName: propertiesName }),
       queryParams: { sourceId: source.sourceId },
       size: {
         width: 800,
