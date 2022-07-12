@@ -13,8 +13,10 @@ export class GuestCamNode extends Node<ISchema, {}> {
   @Inject() guestCamService: GuestCamService;
 
   async save() {
-    this.data.audioSourceId = this.guestCamService.state.audioSourceId;
-    this.data.videoSourceId = this.guestCamService.state.videoSourceId;
+    this.data = {
+      audioSourceId: this.guestCamService.state.audioSourceId,
+      videoSourceId: this.guestCamService.state.videoSourceId,
+    };
   }
 
   async load() {
