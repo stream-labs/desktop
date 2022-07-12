@@ -28,8 +28,6 @@ export function DestinationSwitchers() {
   const enabledPlatformsRef = useRef(enabledPlatforms);
   enabledPlatformsRef.current = enabledPlatforms;
 
-  console.log('component view', componentView);
-
   const emitSwitch = useDebounce(500, () => {
     switchPlatforms(enabledPlatformsRef.current);
   });
