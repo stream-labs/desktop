@@ -18,7 +18,7 @@ import omit from 'lodash/omit';
 import { assertIsDefined } from '../../util/properties-type-guards';
 import { SourceFiltersService } from '../source-filters';
 
-@ServiceHelper()
+@ServiceHelper('SourcesService')
 export class Source implements ISourceApi {
   sourceId: string;
   name: string;

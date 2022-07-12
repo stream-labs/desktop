@@ -320,6 +320,15 @@ export class SceneSelector extends ReactComponent {}
 
 @Component({
   props: {
+    name: { default: 'SourceSelector' },
+    wrapperStyles: { default: () => ({ height: '100%' }) },
+    mins: { default: () => ({ x: 200, y: 120 }) },
+  },
+})
+export class SourceSelector extends ReactComponent {}
+
+@Component({
+  props: {
     name: { default: 'SideNav' },
     wrapperStyles: { default: () => ({ height: '100%' }) },
   },

@@ -48,6 +48,7 @@ import LayoutEditor from './pages/layout-editor/LayoutEditor';
 import Projector from './windows/Projector';
 import SceneSelector from './editor/elements/SceneSelector';
 import AddSource from './windows/AddSource';
+import SourceSelector from './editor/elements/SourceSelector';
 import SideNav from './sidebar/SideNav';
 import WelcomeToPrime from './windows/WelcomeToPrime';
 import Notifications from './windows/Notifications';
@@ -112,6 +113,7 @@ export const components = {
   LayoutEditor: createRoot(LayoutEditor),
   SceneSelector: createRoot(SceneSelector),
   AddSource,
+  SourceSelector: createRoot(SourceSelector),
   SideNav,
   WelcomeToPrime,
   Notifications,

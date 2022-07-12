@@ -1,5 +1,4 @@
 export { default as Mixer } from './Mixer';
-export { default as SourceSelector } from './SourceSelectorElement';
 export {
   MiniFeed,
   SceneSelector,
@@ -8,4 +7,5 @@ export {
   RecordingPreview,
   StreamPreview,
   DisplayElement as Display,
+  SourceSelector,
 } from 'components/shared/ReactComponentList';
