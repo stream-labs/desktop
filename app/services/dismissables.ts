@@ -9,6 +9,7 @@ export enum EDismissable {
   RecentEventsHelpTip = 'recent_events_help_tip',
   FacebookNeedPermissionsTip = 'facebook_need_permissions_tip',
   HighlighterNotification = 'highlighter_notification',
+  SourceSelectorFolders = 'source_selector_folders',
 }
 
 interface IDismissablesServiceState {
