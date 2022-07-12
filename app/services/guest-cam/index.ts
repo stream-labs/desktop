@@ -340,6 +340,7 @@ export class GuestCamService extends PersistentStatefulService<IGuestCamServiceS
     this.socket.emit('message', {
       type: 'streamingStatusChange',
       live: this.streamingService.views.streamingStatus === EStreamingState.Live,
+      chatUrl: this.streamingService.views.chatUrl,
     });
   }
 
