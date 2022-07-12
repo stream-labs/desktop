@@ -37,17 +37,20 @@ export class RootNode extends Node<ISchema, {}> {
     const scenes = new ScenesNode();
     const transitions = new TransitionsNode();
     const hotkeys = new HotkeysNode();
+    const guestCam = new GuestCamNode();
 
     await sources.save({});
     await scenes.save({});
     await transitions.save();
     await hotkeys.save({});
+    await guestCam.save();
 
     this.data = {
       sources,
       scenes,
       transitions,
       hotkeys,
+      guestCam,
       baseResolution: this.videoService.baseResolution,
       selectiveRecording: this.streamingService.state.selectiveRecording,
       operatingSystem: process.platform as OS,
