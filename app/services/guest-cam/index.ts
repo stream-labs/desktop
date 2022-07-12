@@ -757,14 +757,20 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
     if (!this.sourcesService.views.getSource(sourceId)) return;
 
     this.SET_VIDEO_SOURCE(sourceId);
-    this.ensureSourceAndFilters();
+
+    if (this.producer && this.views.sourceId) {
+      this.ensureSourceAndFilters();
+    }
   }
 
   setAudioSource(sourceId: string) {
     if (!this.sourcesService.views.getSource(sourceId)) return;
 
     this.SET_AUDIO_SOURCE(sourceId);
-    this.ensureSourceAndFilters();
+
+    if (this.producer && this.views.sourceId) {
+      this.ensureSourceAndFilters();
+    }
   }
 
   @mutation()
