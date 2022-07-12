@@ -177,14 +177,12 @@ export default function GuestCamProperties() {
               options={videoSources}
               value={videoSourceId}
               onChange={s => GuestCamService.actions.setVideoSource(s)}
-              allowClear={true}
             />
             <ListInput
               label={$t('Microphone Source')}
               options={audioSources}
               value={audioSourceId}
               onChange={s => GuestCamService.actions.setAudioSource(s)}
-              allowClear={true}
             />
           </Form>
           {(!videoSourceExists || !audioSourceExists) && (

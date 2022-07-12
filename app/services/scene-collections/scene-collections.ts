@@ -38,6 +38,7 @@ import { byOS, OS, getOS } from 'util/operating-systems';
 import Utils from 'services/utils';
 import { OutputSettingsService } from '../settings';
 import * as remote from '@electron/remote';
+import { GuestCamNode } from './nodes/guest-cam';
 
 const uuid = window['require']('uuid/v4');
 
@@ -49,6 +50,7 @@ export const NODE_TYPES = {
   TransitionsNode,
   HotkeysNode,
   SceneFiltersNode,
+  GuestCamNode,
   TransitionNode: TransitionsNode, // Alias old name to new node
 };
 

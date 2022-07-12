@@ -1,13 +1,6 @@
 import { authorizedHeaders, jfetch } from 'util/requests';
 import { importSocketIOClient } from 'util/slow-imports';
-import {
-  InitAfter,
-  Inject,
-  mutation,
-  PersistentStatefulService,
-  Service,
-  ViewHandler,
-} from 'services/core';
+import { InitAfter, Inject, mutation, StatefulService, Service, ViewHandler } from 'services/core';
 import { UserService } from 'services/user';
 import uuid from 'uuid/v4';
 import { SourcesService } from 'services/sources';
@@ -202,7 +195,7 @@ class GuestCamViews extends ViewHandler<IGuestCamServiceState> {
 }
 
 @InitAfter('SceneCollectionsService')
-export class GuestCamService extends PersistentStatefulService<IGuestCamServiceState> {
+export class GuestCamService extends StatefulService<IGuestCamServiceState> {
   @Inject() userService: UserService;
   @Inject() sourcesService: SourcesService;
   @Inject() scenesService: ScenesService;
@@ -214,7 +207,7 @@ export class GuestCamService extends PersistentStatefulService<IGuestCamServiceS
   @Inject() urlService: UrlService;
   @Inject() streamingService: StreamingService;
 
-  static defaultState: IGuestCamServiceState = {
+  static initialState: IGuestCamServiceState = {
     produceOk: false,
     videoSourceId: '',
     audioSourceId: '',
@@ -252,11 +245,6 @@ export class GuestCamService extends PersistentStatefulService<IGuestCamServiceS
   init() {
     super.init();
 
-    // TODO: Add setting that allows auto-starting producer?
-    this.SET_PRODUCE_OK(false);
-    this.SET_INVITE_HASH('');
-    this.SET_GUEST(null);
-
     if (this.views.sourceId) {
       this.startListeningForGuests();
     }
@@ -289,7 +277,10 @@ export class GuestCamService extends PersistentStatefulService<IGuestCamServiceS
       }
     });
 
-    this.sceneCollectionsService.collectionInitialized.subscribe(() => {
+    // Make sure we do this after every single load of the scene collection.
+    // This will ensure that if the scene collection did not contain valid
+    // sources, we will choose the best ones we can.
+    this.sceneCollectionsService.collectionSwitched.subscribe(() => {
       this.findDefaultSources();
     });
 
@@ -301,7 +292,10 @@ export class GuestCamService extends PersistentStatefulService<IGuestCamServiceS
   }
 
   findDefaultSources() {
-    if (!this.state.audioSourceId) {
+    if (
+      !this.state.audioSourceId ||
+      !this.sourcesService.views.getSource(this.state.audioSourceId)
+    ) {
       // Check input channels first
       let audioSource = [
         E_AUDIO_CHANNELS.INPUT_1,
@@ -326,7 +320,10 @@ export class GuestCamService extends PersistentStatefulService<IGuestCamServiceS
       if (audioSource) this.SET_AUDIO_SOURCE(audioSource.sourceId);
     }
 
-    if (!this.state.videoSourceId) {
+    if (
+      !this.state.videoSourceId ||
+      !this.sourcesService.views.getSource(this.state.videoSourceId)
+    ) {
       const sourceType = byOS({ [OS.Windows]: 'dshow_input', [OS.Mac]: 'av_capture_input' });
       const videoSource = this.sourcesService.views.sources.find(s => s.type === sourceType);
 
@@ -340,6 +337,7 @@ export class GuestCamService extends PersistentStatefulService<IGuestCamServiceS
     this.socket.emit('message', {
       type: 'streamingStatusChange',
       live: this.streamingService.views.streamingStatus === EStreamingState.Live,
+      chatUrl: this.streamingService.views.chatUrl,
     });
   }
 
@@ -756,13 +754,23 @@ export class GuestCamService extends PersistentStatefulService<IGuestCamServiceS
   }
 
   setVideoSource(sourceId: string) {
+    if (!this.sourcesService.views.getSource(sourceId)) return;
+
     this.SET_VIDEO_SOURCE(sourceId);
-    this.ensureSourceAndFilters();
+
+    if (this.producer && this.views.sourceId) {
+      this.ensureSourceAndFilters();
+    }
   }
 
   setAudioSource(sourceId: string) {
+    if (!this.sourcesService.views.getSource(sourceId)) return;
+
     this.SET_AUDIO_SOURCE(sourceId);
-    this.ensureSourceAndFilters();
+
+    if (this.producer && this.views.sourceId) {
+      this.ensureSourceAndFilters();
+    }
   }
 
   @mutation()
