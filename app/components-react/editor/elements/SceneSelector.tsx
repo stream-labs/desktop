@@ -131,17 +131,12 @@ function SceneSelector() {
 
   const DropdownMenu = (
     <div className={cx(styles.dropdownContainer, 'react')}>
-      <TextInput
-        placeholder={$t('Search')}
-        value={searchQuery}
-        onChange={setSearchQuery}
-        nowrap
-        uncontrolled={false}
-      />
-      <div className="link link--pointer" onClick={manageCollections} style={{ marginTop: '6px' }}>
-        {$t('Manage All')}
+      <div className={styles.dropdownItem} onClick={manageCollections} style={{ marginTop: '6px' }}>
+        <i className="icon-edit" />
+        {$t('Manage Scene Collections')}
       </div>
       <hr style={{ borderColor: 'var(--border)' }} />
+      <span className={styles.whisper}>{$t('Your Scene Collections')}</span>
       <Scrollable style={{ height: 'calc(100% - 60px)' }}>
         {filteredCollections().map(collection => (
           <div
@@ -188,7 +183,7 @@ function SceneSelector() {
           <i className="icon-subtract icon-button icon-button--lg" onClick={removeScene} />
         </Tooltip>
         <Tooltip title={$t('Edit Scene Transitions.')} placement="bottom">
-          <i className="icon-settings icon-button icon-button--lg" onClick={showTransitions} />
+          <i className="icon-transition icon-button icon-button--lg" onClick={showTransitions} />
         </Tooltip>
       </div>
       <Scrollable style={{ height: '100%' }} className={styles.scenesContainer}>
