@@ -6,7 +6,6 @@
   "There needs to be at least one scene.": "최소한 한 개의 장면이 있어야 합니다.",
   "Projector:": "프로젝터:",
   "Projector: Output": "프로젝터: 출력",
-  "Manage All": "모두 관리",
   "This is where your Scene Collections live. Clicking the title will dropdown a menu where you can view & manage.": "여기가 바로 장면 컬렉션이 있는 곳입니다. 제목을 클릭하면 보고 관리할 수 있는 드롭다운 메뉴가 표시됩니다.",
   "Are you sure you want to remove %{collectionName}?": "정말 %{collectionName} 컬렉션을 삭제하시겠습니까?",
   "Create Scene Projector": "장면 프로젝터 만들기",
@@ -40,5 +39,15 @@
   "Switch Scenes": "장면 전환",
   "Failed to load scene collection.  A new one will be created instead.": "장면 컬렉션 로드에 실패했습니다. 새로운 장면 컬렉션이 생성됩니다.",
   "New Scene": "새로운 장면",
-  "Projector": "프로젝터"
+  "Projector": "프로젝터",
+  "Your Scene Collections:": "Your Scene Collections:",
+  "Add New Scene Collection:": "Add New Scene Collection:",
+  "Search Scene Collections": "Search Scene Collections",
+  "Start fresh and build from scratch": "Start fresh and build from scratch",
+  "Load existing scenes from OBS": "Load existing scenes from OBS",
+  "Template": "Template",
+  "Choose a template from our theme library": "Choose a template from our theme library",
+  "Enter a Scene Collection Name": "Enter a Scene Collection Name",
+  "Copy of %{collectionName}": "Copy of %{collectionName}",
+  "Your Scene Collections": "Your Scene Collections"
 }
