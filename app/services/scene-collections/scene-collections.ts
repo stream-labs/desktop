@@ -313,8 +313,8 @@ export class SceneCollectionsService extends Service implements ISceneCollection
     await this.disableAutoSave();
 
     const newId = uuid();
-    await this.insertCollection(newId, name, oldColl.operatingSystem, false, oldId);
-    this.stateService.SET_NEEDS_RENAME(newId);
+    const duplicatedName = $t('Copy of %{collectionName}', { collectionName: name });
+    await this.insertCollection(newId, duplicatedName, oldColl.operatingSystem, false, oldId);
     this.enableAutoSave();
   }
 
