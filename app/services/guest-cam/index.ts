@@ -335,9 +335,12 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
     if (!this.socket) return;
 
     this.socket.emit('message', {
+      target: '*',
       type: 'streamingStatusChange',
-      live: this.streamingService.views.streamingStatus === EStreamingState.Live,
-      chatUrl: this.streamingService.views.chatUrl,
+      data: {
+        live: this.streamingService.views.streamingStatus === EStreamingState.Live,
+        chatUrl: this.streamingService.views.chatUrl,
+      },
     });
   }
 
