@@ -26,6 +26,7 @@ import {
   SourceProperties,
   RenameSource,
   AdvancedStatistics,
+  ManageSceneCollections,
   WidgetWindow,
   CustomCodeWindow,
   SafeMode,
@@ -44,7 +45,6 @@ import {
 import SourcePropertiesDeprecated from 'components/windows/SourceProperties.vue';
 import Troubleshooter from 'components/windows/Troubleshooter.vue';
 import Blank from 'components/windows/Blank.vue';
-import ManageSceneCollections from 'components/windows/ManageSceneCollections.vue';
 import RecentEvents from 'components/windows/RecentEvents.vue';
 import GameOverlayEventFeed from 'components/windows/GameOverlayEventFeed';
 import EditTransform from 'components/windows/EditTransform';

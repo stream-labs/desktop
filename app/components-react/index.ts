@@ -28,6 +28,7 @@ import NotificationsArea from './root/NotificationsArea';
 import StudioEditor from './root/StudioEditor';
 import SharedComponentsLibrary from './windows/sharedComponentsLibrary/SharedComponentsLibrary';
 import { ObsSettings } from './windows/settings/ObsSettings';
+import ManageSceneCollections from './windows/ManageSceneCollections';
 import ThemeAudit from './pages/ThemeAudit';
 import { WidgetWindow } from './widgets/common/WidgetWindow';
 import SafeMode from './windows/SafeMode';
@@ -74,6 +75,7 @@ export const components = {
   GuestCamProperties,
   News,
   PerformanceMetrics,
+  ManageSceneCollections,
   PatchNotes,
   Display,
   TitleBar,
