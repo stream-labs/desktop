@@ -135,8 +135,7 @@ function CollectionNode(p: {
     setTimeout(() => {
       SceneCollectionsService.actions.return
         .duplicate(p.collection.name, p.collection.id)
-        .then(() => setDuplicating(false))
-        .catch(() => setDuplicating(false));
+        .finally(() => setDuplicating(false));
     }, 500);
   }
 
