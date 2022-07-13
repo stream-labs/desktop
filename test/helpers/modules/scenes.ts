@@ -20,7 +20,7 @@ export async function clickRemoveScene() {
 
 export async function clickSceneTransitions() {
   await sleep(100);
-  await clickSceneAction('.icon-settings');
+  await clickSceneAction('.icon-transition');
 }
 
 export async function selectScene(name: string) {

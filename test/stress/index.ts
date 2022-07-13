@@ -37,7 +37,7 @@ async function getSceneElements(t: TExecutionContext) {
 }
 
 async function getSourceElements(t: TExecutionContext) {
-  return (await (await t.context.app.client.$('h2=Sources')).$('../..')).$$(
+  return (await (await t.context.app.client.$('span=Sources')).$('../..')).$$(
     '.sl-vue-tree-node-item',
   );
 }

@@ -122,6 +122,7 @@ import { EditorCommandsService } from './services/editor-commands';
 import { EditorService } from 'services/editor';
 import { PerformanceService } from './services/performance';
 import { SourcesService } from './services/sources';
+import { SelectionService } from './services/selection';
 import { StreamingService } from './services/streaming';
 import { StreamSettingsService } from './services/settings/streaming';
 import { RestreamService } from './services/restream';
@@ -188,6 +189,7 @@ export const AppServices = {
   EditorService,
   PerformanceService,
   SourcesService,
+  SelectionService,
   PatchNotesService,
   VideoService,
   ChatService,

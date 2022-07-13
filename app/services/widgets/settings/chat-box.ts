@@ -27,6 +27,7 @@ export interface IChatBoxSettings extends IWidgetSettings {
   always_show_messages: boolean;
   hide_common_chat_bots: boolean;
   message_hide_delay: number;
+  message_show_delay: number;
   text_size: 14;
   muted_chatters: string;
   hide_commands: boolean;
@@ -69,6 +70,10 @@ export class ChatBoxService extends WidgetSettingsService<IChatBoxData> {
         min: 0,
         max: 200,
       }),
+      message_show_delay: metadata.slider({
+        min: 0,
+        max: 6,
+      }),
       show_moderator_icons: metadata.bool({ title: $t('Show Moderator Badges') }),
       show_subscriber_icons: metadata.bool({ title: $t('Show Subscriber Badges') }),
       show_turbo_icons: metadata.bool({ title: $t('Show Turbo Badges') }),
@@ -104,6 +109,7 @@ export class ChatBoxService extends WidgetSettingsService<IChatBoxData> {
   protected patchAfterFetch(data: IChatBoxData): IChatBoxData {
     // backend accepts and returns message_hide_delay in different precision
     data.settings.message_hide_delay = Math.round(data.settings.message_hide_delay / 1000);
+    data.settings.message_show_delay = Math.round(data.settings.message_show_delay / 1000);
     return data;
   }
 }
