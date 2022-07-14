@@ -80,91 +80,7 @@ export default function GuestCamProperties() {
 
   return (
     <ModalLayout scrollable>
-      <Tabs destroyInactiveTabPane={true}>
-        <Tabs.TabPane tab={$t('Guest Settings')} key="guest-settings">
-          <div
-            style={{
-              display: 'flex',
-              flexDirection: 'row',
-              height: 260,
-              background: 'var(--section-alt)',
-              borderRadius: 8,
-            }}
-          >
-            <div style={{ flexGrow: 1, padding: 20 }}>
-              <h3>{$t('Source: %{sourceName}', { sourceName: source?.name })}</h3>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
-                <Button
-                  onClick={() => GuestCamService.actions.setVisibility(!visible)}
-                  disabled={!guestInfo}
-                  style={{ width: '45%' }}
-                  type={!!guestInfo && !visible ? 'primary' : 'default'}
-                >
-                  {!!guestInfo && visible ? $t('Hide on Stream') : $t('Show on Stream')}
-                </Button>
-                <button
-                  className="button button--soft-warning"
-                  style={{ width: '45%' }}
-                  disabled={!guestInfo}
-                  onClick={() => GuestCamService.actions.disconnectGuest()}
-                >
-                  {$t('Disconnect')}
-                </button>
-              </div>
-              <Form layout="inline">
-                <SliderInput
-                  label={$t('Volume')}
-                  value={volume}
-                  onChange={setDeflection}
-                  min={0}
-                  max={1}
-                  debounce={500}
-                  step={0.01}
-                  tipFormatter={v => `${(v * 100).toFixed(0)}%`}
-                  style={{ width: '100%', margin: '10px 0' }}
-                />
-                <TextInput
-                  readOnly
-                  value={inviteUrl}
-                  label={$t('Invite URL')}
-                  style={{ width: '100%', margin: '10px 0 20px' }}
-                  addonAfter={
-                    <Tooltip title={$t('Copied!')} trigger="click">
-                      <Button onClick={() => remote.clipboard.writeText(inviteUrl)}>
-                        {$t('Copy')}
-                      </Button>
-                    </Tooltip>
-                  }
-                />
-              </Form>
-              <Button disabled={regeneratingLink} onClick={regenerateLink}>
-                {$t('Generate a new link')}
-                {regeneratingLink && (
-                  <i className="fa fa-spinner fa-pulse" style={{ marginLeft: 8 }} />
-                )}
-              </Button>
-            </div>
-            <div style={{ width: 400, background: 'var(--section)', borderRadius: '0 8px 8px 0' }}>
-              {/* Weird double div is to avoid display blocking border radius */}
-              <div style={{ margin: '10px 0', height: 'calc(100% - 20px)' }}>
-                {!!guestInfo && produceOk && <Display sourceId={source?.sourceId} />}
-                {!guestInfo && (
-                  <div
-                    style={{
-                      height: '100%',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      padding: '50px 0',
-                    }}
-                  >
-                    <Spinner />
-                    <div style={{ textAlign: 'center' }}>{$t('Waiting for guest to join')}</div>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-        </Tabs.TabPane>
+      <Tabs destroyInactiveTabPane={true} defaultActiveKey="guest-settings">
         <Tabs.TabPane tab={$t('Global Settings')} key="global-settings">
           <Form>
             <h2>
@@ -208,6 +124,113 @@ export default function GuestCamProperties() {
               }
             />
           )}
+        </Tabs.TabPane>
+        <Tabs.TabPane tab={$t('Guest %{num} Settings', { num: 1 })} key="guest-settings">
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              background: 'var(--section-alt)',
+              borderRadius: 8,
+            }}
+          >
+            <div style={{ flexGrow: 1, padding: 20 }}>
+              <h3>{$t('Source: %{sourceName}', { sourceName: source?.name })}</h3>
+              <div style={{ display: 'flex', flexDirection: 'row' }}>
+                <div style={{ flexGrow: 1 }}>
+                  <TextInput
+                    readOnly
+                    value={inviteUrl}
+                    label={$t('Invite URL')}
+                    style={{ width: '100%', margin: '10px 0 20px' }}
+                  />
+                  <SliderInput
+                    label={$t('Volume')}
+                    value={volume}
+                    onChange={setDeflection}
+                    min={0}
+                    max={1}
+                    debounce={500}
+                    step={0.01}
+                    tipFormatter={v => `${(v * 100).toFixed(0)}%`}
+                    style={{ width: '100%', margin: '10px 0' }}
+                  />
+                </div>
+                <div style={{ width: 350, marginLeft: 20 }}>
+                  <div
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'row',
+                      justifyContent: 'space-between',
+                      margin: '10px 0 20px',
+                    }}
+                  >
+                    <Tooltip title={$t('Copied!')} trigger="click">
+                      <Button
+                        onClick={() => remote.clipboard.writeText(inviteUrl)}
+                        style={{ width: 160 }}
+                      >
+                        {$t('Copy Link')}
+                      </Button>
+                    </Tooltip>
+                    <Button
+                      disabled={regeneratingLink}
+                      onClick={regenerateLink}
+                      style={{ width: 160 }}
+                    >
+                      {$t('Generate a new link')}
+                      {regeneratingLink && (
+                        <i className="fa fa-spinner fa-pulse" style={{ marginLeft: 8 }} />
+                      )}
+                    </Button>
+                  </div>
+                  <div
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'row',
+                      justifyContent: 'space-between',
+                    }}
+                  >
+                    <Button
+                      onClick={() => GuestCamService.actions.setVisibility(!visible)}
+                      disabled={!guestInfo}
+                      style={{ width: 160 }}
+                      type={!!guestInfo && !visible ? 'primary' : 'default'}
+                    >
+                      {!!guestInfo && visible ? $t('Hide on Stream') : $t('Show on Stream')}
+                    </Button>
+                    <button
+                      className="button button--soft-warning"
+                      style={{ width: 160 }}
+                      disabled={!guestInfo}
+                      onClick={() => GuestCamService.actions.disconnectGuest()}
+                    >
+                      {$t('Disconnect')}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div style={{ background: 'var(--section)', borderRadius: '0 0 8px 8px', height: 280 }}>
+              {/* Weird double div is to avoid display blocking border radius */}
+              <div style={{ margin: '0 10px', width: 'calc(100% - 20px)', height: '100%' }}>
+                {!!guestInfo && produceOk && <Display sourceId={source?.sourceId} />}
+                {!guestInfo && (
+                  <div
+                    style={{
+                      height: '100%',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      padding: '50px 0',
+                    }}
+                  >
+                    <Spinner />
+                    <div style={{ textAlign: 'center' }}>{$t('Waiting for guest to join')}</div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
         </Tabs.TabPane>
       </Tabs>
       <Modal
