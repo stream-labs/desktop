@@ -13,7 +13,7 @@
   "Copied!": "Copied!",
   "Invite URL": "Invite URL",
   "Disconnect": "Disconnect",
-  "Guest Settings": "Guest Settings",
+  "Guest %{num} Settings": "Guest %{num} Settings",
   "Collab Cam Properties": "Collab Cam Properties",
   "A guest has joined - click to show": "A guest has joined - click to show",
   "Welcome to Collab Cam": "Welcome to Collab Cam",
@@ -25,5 +25,6 @@
   "Enjoy your stream! Adjust their volume, create new links, and change your mic and camera from the properties window.": "Enjoy your stream! Adjust their volume, create new links, and change your mic and camera from the properties window.",
   "Don't share your invite link with anyone you don't want on your stream. You can invalidate an old link by generating a new one. Do not show this window on stream.": "Don't share your invite link with anyone you don't want on your stream. You can invalidate an old link by generating a new one. Do not show this window on stream.",
   "Start Collab Cam": "Start Collab Cam",
-  "Collab Cam is not yet sending your video and audio to guests. Start Collab Cam?": "Collab Cam is not yet sending your video and audio to guests. Start Collab Cam?"
+  "Collab Cam is not yet sending your video and audio to guests. Start Collab Cam?": "Collab Cam is not yet sending your video and audio to guests. Start Collab Cam?",
+  "Copy Link": "Copiar vínculo"
 }
