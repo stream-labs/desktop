@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Layout, Input, Tooltip } from 'antd';
+import { Layout, Tooltip } from 'antd';
 import Fuse from 'fuse.js';
 import moment from 'moment';
 import cx from 'classnames';
@@ -10,13 +10,12 @@ import Scrollable from 'components-react/shared/Scrollable';
 import { $t } from 'services/i18n';
 import { $i } from 'services/utils';
 import { ISceneCollectionsManifestEntry } from 'services/scene-collections';
-import { byOS, getOS, OS } from 'util/operating-systems';
+import { getOS, OS } from 'util/operating-systems';
 import styles from './ManageSceneCollections.m.less';
 import { TextInput } from 'components-react/shared/inputs';
 import { useVuex } from 'components-react/hooks';
 
 const { Sider, Content } = Layout;
-const { Search } = Input;
 
 export default function ManageSceneCollections() {
   const {
@@ -67,12 +66,12 @@ export default function ManageSceneCollections() {
       <Layout style={{ height: '100%' }}>
         <Sider width={300}>
           <div>{$t('Your Scene Collections:')}</div>
-          <div style={{ width: '96%' }}>
+          <div style={{ width: '96%', marginTop: '8px', marginBottom: '8px' }}>
             <TextInput
               placeholder={$t('Search Scene Collections')}
               onChange={setQuery}
               uncontrolled={false}
-              addonBefore={<i className="icon-search" />}
+              prefix={<i className="icon-search" />}
               nowrap
             />
           </div>

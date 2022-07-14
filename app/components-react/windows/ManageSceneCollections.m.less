@@ -4,11 +4,13 @@
   grid-template-rows: 150px 150px;
   gap: 16px;
   padding-right: 20px;
+  margin-top: 8px;
 
   .button {
     background: var(--button);
     color: var(--paragraph);
     padding: 8px;
+    border-radius: 8px;
 
     i {
       display: block;
@@ -59,7 +61,7 @@
   }
 
   .edit-icons {
-    opacity: 0;
+    display: none;
     margin-left: auto;
 
     i {
@@ -74,7 +76,7 @@
     border: 1px solid var(--border);
 
     .edit-icons {
-      opacity: 1;
+      display: block;
     }
   }
 

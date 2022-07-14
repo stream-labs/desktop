@@ -132,7 +132,7 @@ function SceneSelector() {
   const DropdownMenu = (
     <div className={cx(styles.dropdownContainer, 'react')}>
       <div className={styles.dropdownItem} onClick={manageCollections} style={{ marginTop: '6px' }}>
-        <i className="icon-edit" />
+        <i className="icon-edit" style={{ marginRight: '6px' }} />
         {$t('Manage Scene Collections')}
       </div>
       <hr style={{ borderColor: 'var(--border)' }} />
