@@ -122,7 +122,7 @@ export class SourcesNode extends Node<ISchema, {}> {
             settings: obsInput.settings,
             volume: obsInput.volume,
             channel: source.channel,
-            muted: obsInput.muted,
+            muted: source.muted,
             filters: {
               items: filters,
             },

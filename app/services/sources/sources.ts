@@ -806,8 +806,8 @@ export class SourcesService extends StatefulService<ISourcesState> {
       title: $t('Collab Cam Properties', { sourceName: propertiesName }),
       queryParams: { sourceId: source.sourceId },
       size: {
-        width: 800,
-        height: 670,
+        width: 850,
+        height: 650,
       },
     });
   }
