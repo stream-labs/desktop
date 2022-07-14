@@ -10903,9 +10903,9 @@ mute-stream@0.0.7:
   version "0.0.7"
   resolved "https://registry.yarnpkg.com/mute-stream/-/mute-stream-0.0.7.tgz#3075ce93bc21b8fab43e1bc4da7e8115ed1e7bab"
 
-n-voice-package@../n-voice-package/n-voice-package-0.0.8.tgz:
-  version "0.0.8"
-  resolved "../n-voice-package/n-voice-package-0.0.8.tgz#7f8b2d0dd47126bde07f6d01a9081c6fa927d57a"
+n-voice-package@../n-voice-package/n-voice-package-0.0.12.tgz:
+  version "0.0.12"
+  resolved "../n-voice-package/n-voice-package-0.0.12.tgz#43ca7e40fe337f94b53b9bf99db1e7e83ae1e8ee"
   dependencies:
     "@rollup/plugin-babel" "^5.3.1"
     "@types/node" "^18.0.0"

@@ -187,7 +187,7 @@ const ErrorCodes: { [code: number]: string } = {
   401: 'could not parse text',
 };
 
-const supportedProtocolVersion = '0.9.0';
+const supportedProtocolVersion = '1.0.0';
 export class NVoiceClient {
   private commandLineClient: CommandLineClient | undefined;
 
@@ -203,7 +203,7 @@ export class NVoiceClient {
       const enginePath = join(baseDir, 'n-voice-engine.exe');
       const dictionaryPath = 'open_jtalk_dic_shift_jis-1.11';
       const userDictionary = 'user.dic';
-      const modelPath = 'jsss_default@2022-06-03T07-51-07.0100@False_jsss_16k_mcd_L20-D10_S4-F64-C64-I0@2022-04-29T15-24-59.0040@False_False.pt';
+      const modelPath = 'nvoice_default@2022-07-12T04-10-10.0060@False_nvoice_16k_mcd_L20-D10_S4-F64-C64-I0@2022-07-12T04-08-25.0040@False_False.pt';
       const cwd = baseDir;
       const client = await StartNVoice(enginePath, dictionaryPath, userDictionary, modelPath, cwd);
       this.commandLineClient = client;

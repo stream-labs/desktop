@@ -112,7 +112,7 @@ export class NicoliveCommentSynthesizerService extends StatefulService<ICommentS
       case 'normal':
         return this.state.selector.normal;
       case 'operator':
-        return this.state.selector.operator;
+        return 'nVoice'; // this.state.selector.operator; // DEBUG
       default:
         return this.state.selector.system;
     }
