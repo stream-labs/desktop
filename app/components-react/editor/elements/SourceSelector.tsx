@@ -527,9 +527,7 @@ function ItemsTree() {
         className={cx(styles.scenesContainer, styles.sourcesContainer)}
         onContextMenu={(e: React.MouseEvent) => showContextMenu('', e)}
       >
-        {showTreeMask && (
-          <div style={{ width: '100%', height: '100%', zIndex: 100, position: 'absolute' }} />
-        )}
+        {showTreeMask && <div className={styles.treeMask} data-name="treeMask" />}
         <Tree
           selectedKeys={activeItemIds}
           expandedKeys={expandedFoldersIds}
