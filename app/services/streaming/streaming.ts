@@ -498,16 +498,19 @@ export class StreamingService
     return `${hours}:${minutes}:${seconds}`;
   }
 
-  private actionLog(eventType: 'stream_start' | 'stream_end') {
-    if (eventType === 'stream_start') {
-      const streaming_track_id = this.usageStatisticsService.generateStreamingTrackID();
-      this.SET_STREAMING_TRACK_ID(streaming_track_id);
-    }
-    const streamingTrackId = this.state.streamingTrackId;
-    if (eventType === 'stream_end') {
-      this.SET_STREAMING_TRACK_ID('');
-    }
+  private logStreamStart() {
+    const streamingTrackId = this.usageStatisticsService.generateStreamingTrackID();
+    this.SET_STREAMING_TRACK_ID(streamingTrackId);
+    this.actionLog('stream_start', streamingTrackId);
+  }
 
+  private logStreamEnd() {
+    const streamingTrackId = this.state.streamingTrackId;
+    this.SET_STREAMING_TRACK_ID('');
+    this.actionLog('stream_end', streamingTrackId);
+  }
+
+  private actionLog(eventType: 'stream_start' | 'stream_end', streamingTrackId: string) {
     const settings = this.settingsService.getStreamEncoderSettings();
 
     const event: TUsageEvent = {
@@ -577,7 +580,7 @@ export class StreamingService
           this.startReplayBuffer();
         }
 
-        this.actionLog('stream_start');
+        this.logStreamStart();
       } else if (info.signal === EOBSOutputSignal.Starting) {
         this.SET_STREAMING_STATUS(EStreamingState.Starting, time);
         this.streamingStatusChange.next(EStreamingState.Starting);
@@ -587,7 +590,7 @@ export class StreamingService
       } else if (info.signal === EOBSOutputSignal.Stopping) {
         this.SET_STREAMING_STATUS(EStreamingState.Ending, time);
         this.streamingStatusChange.next(EStreamingState.Ending);
-        this.actionLog('stream_end');
+        this.logStreamEnd();
       } else if (info.signal === EOBSOutputSignal.Reconnect) {
         this.SET_STREAMING_STATUS(EStreamingState.Reconnecting);
         this.streamingStatusChange.next(EStreamingState.Reconnecting);
