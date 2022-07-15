@@ -128,6 +128,7 @@ export class UsageStatisticsService extends Service {
   }
 
   generateStreamingTrackID(): string {
+    // 配信の開始と終了を対応付ける一時的な識別子はランダムな文字列で生成する
     const id = randomCharacters(10);
     return id;
   }

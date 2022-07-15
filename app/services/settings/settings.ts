@@ -422,9 +422,6 @@ export class SettingsService
     const audio = this.getSettingsFormData('Audio');
     const stream = this.getSettingsFormData('Stream');
 
-    console.log('output', output); // DEBUG
-    console.log('video', video); // DEBUG
-
     const outputMode = this.findSettingValue(output, 'Untitled', 'Mode') as 'Simple' | 'Advanced';
     const isSimple = outputMode === 'Simple';
     const streamingURL = this.findSettingValue(stream, 'Untitled', 'server') as string;
