@@ -3,7 +3,7 @@ import { EStreamingState, ERecordingState } from './streaming-api';
 
 import { createSetupFunction } from 'util/test-setup';
 
-function noop(..._args: any[]) {}
+function noop(..._args: any[]) { }
 
 jest.mock('services/core/stateful-service');
 jest.mock('services/core/injector');
@@ -24,10 +24,28 @@ jest.mock('services/customization', () => ({}));
 jest.mock('services/user', () => ({}));
 jest.mock('util/menus/Menu', () => ({}));
 jest.mock('services/notifications', () => ({}));
+jest.mock('services/nicolive-program/nicolive-program', () => ({}));
+jest.mock('services/nicolive-program/nicolive-comment-synthesizer', () => ({}));
 const showWindow = jest.fn();
 
 const createInjectee = ({
   recordEvent = noop,
+  generateStreamingTrackID = noop,
+  getStreamEncoderSettings = () => ({
+    streamingURL: 'rtmp://service.domain/path',
+    encoder: '',
+    preset: '',
+    profile: '',
+    bitrate: '',
+    baseResolution: '',
+    outputResolution: '',
+    fps: '',
+    audio: {
+      bitrate: '',
+      sampleRate: 48000,
+      rateControl: null,
+    }
+  }),
   WarnBeforeStartingStream = false,
   WarnBeforeStoppingStream = false,
   RecordWhenStreaming = false,
@@ -45,21 +63,36 @@ const createInjectee = ({
         KeepRecordingWhenStreamStops,
       },
     },
+    getStreamEncoderSettings,
   },
   UserService: {
     isNiconicoLoggedIn() {
       return isNiconicoLoggedIn;
     },
     updateStreamSettings,
+    isLoggedIn() {
+      return isNiconicoLoggedIn;
+    },
   },
   UsageStatisticsService: {
     recordEvent,
+    generateStreamingTrackID,
   },
   CustomizationService: {
+    state: {
+      autoCompactMode: false,
+    },
     optimizeForNiconico,
   },
   WindowsService: {
     showWindow,
+  },
+  NicoliveCommentSynthesizerService: {
+  },
+  NicoliveProgramService: {
+    state: {
+      programID: '',
+    }
   },
 });
 

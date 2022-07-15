@@ -29,6 +29,7 @@ export interface IStreamingServiceState {
   recordingStatusTime: string;
   replayBufferStatus: EReplayBufferState;
   replayBufferStatusTime: string;
+  streamingTrackId: string;
 }
 
 export interface IStreamingServiceApi {

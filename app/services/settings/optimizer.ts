@@ -44,15 +44,15 @@ export type OptimizeSettings = {
   simpleUseAdvanced?: boolean;
   targetUsage?: 'quality' | 'balanced' | 'speed'; // for QSV
   encoderPreset?:
-    | 'ultrafast'
-    | 'superfast'
-    | 'veryfast'
-    | 'faster'
-    | 'fast'
-    | 'medium'
-    | 'slow'
-    | 'slower'; // for x264
-  NVENCPreset?: 'default' | 'mq' | 'hq' | 'hp' | 'll' | 'llhp' | 'llhq' | 'llhp'; // for NVENC
+  | 'ultrafast'
+  | 'superfast'
+  | 'veryfast'
+  | 'faster'
+  | 'fast'
+  | 'medium'
+  | 'slow'
+  | 'slower'; // for x264
+  NVENCPreset?: 'default' | 'mq' | 'hq' | 'hp' | 'll' | 'llhp' | 'llhq'; // for NVENC
   advRateControl?: 'CBR' | 'VBR' | 'ABR' | 'CRF';
   videoBitrate?: number;
   advKeyframeInterval?: number;
@@ -60,7 +60,7 @@ export type OptimizeSettings = {
   advX264Tune?: string;
   audioBitrate?: string;
   advAudioTrackIndex?: string;
-  audioSampleRate?: 441000 | 48000;
+  audioSampleRate?: 44100 | 48000;
 };
 
 export enum CategoryName {
@@ -592,10 +592,11 @@ function isDependOnItems(values: OptimizeSettings, items: KeyDescription[]): boo
  * @param keysNeeded
  */
 export function filterKeyDescriptions(
-  keysNeeded: OptimizeSettings,
+  keysNeeded: Set<OptimizationKey> | OptimizeSettings,
   source: KeyDescription[],
 ): KeyDescription[] {
   const result: KeyDescription[] = [];
+  const keys = keysNeeded instanceof Set ? keysNeeded : new Set(Object.keys(keysNeeded));
 
   for (const item of source) {
     const key = item.key;
@@ -615,11 +616,11 @@ export function filterKeyDescriptions(
       if (newDependents.length > 0) {
         newItem.dependents = newDependents;
       }
-      if (newDependents.length > 0 || keysNeeded.hasOwnProperty(key)) {
+      if (newDependents.length > 0 || keys.has(key)) {
         result.push(newItem);
       }
     } else {
-      if (keysNeeded.hasOwnProperty(key)) {
+      if (keys.has(key)) {
         result.push(item);
       }
     }
@@ -769,7 +770,7 @@ export class SettingsKeyAccessor {
    * @param keyDescriptions
    * @param f
    */
-  *travarseKeyDescriptions<T>(
+  *traverseKeyDescriptions<T>(
     keyDescriptions: KeyDescription[],
     f: (d: KeyDescription) => T,
   ): IterableIterator<T> {
@@ -780,7 +781,7 @@ export class SettingsKeyAccessor {
         if (value) {
           for (const dependent of item.dependents) {
             if (dependent.values.includes(value)) {
-              yield* this.travarseKeyDescriptions(dependent.params, f);
+              yield* this.traverseKeyDescriptions(dependent.params, f);
             }
           }
         }
@@ -789,7 +790,7 @@ export class SettingsKeyAccessor {
   }
 
   *getValues(keyDescriptions: KeyDescription[]): IterableIterator<OptimizeSettings> {
-    yield* this.travarseKeyDescriptions(
+    yield* this.traverseKeyDescriptions(
       keyDescriptions,
       (item: KeyDescription): OptimizeSettings => {
         /* DEBUG
@@ -807,7 +808,7 @@ export class SettingsKeyAccessor {
   }
 
   *getSettings(keyDescriptions: KeyDescription[]): IterableIterator<[OptimizationKey, any]> {
-    yield* this.travarseKeyDescriptions(
+    yield* this.traverseKeyDescriptions(
       keyDescriptions,
       (item: KeyDescription): [OptimizationKey, any] => {
         const setting = this.findSetting(item);
@@ -858,7 +859,7 @@ export class SettingsKeyAccessor {
     value: any,
     keyDescriptions: KeyDescription[] = AllKeyDescriptions,
   ): boolean {
-    const descriptions = filterKeyDescriptions({ [key]: 'dummy' }, keyDescriptions);
+    const descriptions = filterKeyDescriptions(new Set([key]), keyDescriptions);
     const setting = this.getSetting(key, descriptions);
     if (setting && setting.hasOwnProperty('options') && Array.isArray(setting.options)) {
       const options: { value: any }[] = setting.options;
@@ -872,7 +873,7 @@ export class Optimizer {
   private accessor: SettingsKeyAccessor;
   private keyDescriptions: KeyDescription[];
 
-  constructor(accessor: SettingsKeyAccessor, keysNeeded: OptimizeSettings) {
+  constructor(accessor: SettingsKeyAccessor, keysNeeded: Set<OptimizationKey> | OptimizeSettings) {
     this.accessor = accessor;
     this.keyDescriptions = filterKeyDescriptions(keysNeeded, AllKeyDescriptions);
   }

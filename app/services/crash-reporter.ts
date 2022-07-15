@@ -47,9 +47,7 @@ export class CrashReporterService extends Service {
 
     // Report any crash that happened last time
     if (this.appState !== EAppState.CleanExit) {
-      this.usageStatisticsService.recordEvent('crash', {
-        crashType: this.appState,
-      });
+      this.usageStatisticsService.recordEvent({ event: 'crash' });
     }
 
     this.setState(EAppState.Starting);

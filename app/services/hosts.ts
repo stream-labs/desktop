@@ -1,5 +1,5 @@
 import { Service } from './core/service';
-import Util from 'services/utils';
+import Utils from 'services/utils';
 
 // Hands out hostnames to the rest of the app. Eventually
 // we should allow overriding this value. But for now we
@@ -48,6 +48,13 @@ export class HostsService extends Service {
   }
   get niconicoNAirInformationsFeed() {
     return this.replaceHost('https://blog.nicovideo.jp/niconews/category/se_n-air/feed/index.xml');
+  }
+  get statistics() {
+    if (Utils.isDevMode()) {
+      return 'https://n-air-app.dev.nicovideo.jp/statistics';
+    } else {
+      return 'https://n-air-app.nicovideo.jp/statistics';
+    }
   }
 
   getWatchPageURL(programID: string): string {

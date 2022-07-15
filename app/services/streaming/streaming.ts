@@ -1,26 +1,32 @@
-import { StatefulService, mutation } from 'services/core/stateful-service';
-import * as obs from '../../../obs-api';
-import { Inject } from 'services/core/injector';
-import moment from 'moment';
-import { SettingsService } from 'services/settings';
-import { WindowsService } from 'services/windows';
-import { Subject } from 'rxjs';
 import * as electron from 'electron';
+import moment from 'moment';
+import { Subject } from 'rxjs';
+import { Inject } from 'services/core/injector';
+import { mutation, StatefulService } from 'services/core/stateful-service';
+import { CustomizationService } from 'services/customization';
+import { $t } from 'services/i18n';
+import { NicoliveCommentSynthesizerService } from 'services/nicolive-program/nicolive-comment-synthesizer';
+import { NicoliveProgramService } from 'services/nicolive-program/nicolive-program';
+import { isOk, NicoliveClient } from 'services/nicolive-program/NicoliveClient';
+import { ENotificationType, INotification, NotificationsService } from 'services/notifications';
+import { SettingsService } from 'services/settings';
 import {
-  IStreamingServiceApi,
-  IStreamingServiceState,
-  EStreamingState,
+  EncoderType,
+  OptimizedSettings,
+} from 'services/settings/optimizer';
+import { TUsageEvent, UsageStatisticsService } from 'services/usage-statistics';
+import { UserService } from 'services/user';
+import { WindowsService } from 'services/windows';
+import * as obs from '../../../obs-api';
+import { IStreamingSetting } from '../platforms';
+import { extractPlatform } from './extractPlatform';
+import {
   ERecordingState,
   EReplayBufferState,
+  EStreamingState,
+  IStreamingServiceApi,
+  IStreamingServiceState,
 } from './streaming-api';
-import { UsageStatisticsService } from 'services/usage-statistics';
-import { $t } from 'services/i18n';
-import { CustomizationService } from 'services/customization';
-import { UserService } from 'services/user';
-import { IStreamingSetting } from '../platforms';
-import { OptimizedSettings } from 'services/settings/optimizer';
-import { NicoliveClient, isOk } from 'services/nicolive-program/NicoliveClient';
-import { NotificationsService, ENotificationType, INotification } from 'services/notifications';
 
 enum EOBSOutputType {
   Streaming = 'streaming',
@@ -48,14 +54,15 @@ interface IOBSOutputSignalInfo {
 
 export class StreamingService
   extends StatefulService<IStreamingServiceState>
-  implements IStreamingServiceApi
-{
+  implements IStreamingServiceApi {
   @Inject() settingsService: SettingsService;
   @Inject() userService: UserService;
   @Inject() windowsService: WindowsService;
   @Inject() usageStatisticsService: UsageStatisticsService;
   @Inject() customizationService: CustomizationService;
   @Inject() notificationsService: NotificationsService;
+  @Inject() private nicoliveCommentSynthesizerService: NicoliveCommentSynthesizerService;
+  @Inject() private nicoliveProgramService: NicoliveProgramService;
 
   streamingStatusChange = new Subject<EStreamingState>();
   recordingStatusChange = new Subject<ERecordingState>();
@@ -69,7 +76,7 @@ export class StreamingService
 
   powerSaveId: number;
 
-  static initialState = {
+  static initialState: IStreamingServiceState = {
     programFetching: false,
     streamingStatus: EStreamingState.Offline,
     streamingStatusTime: new Date().toISOString(),
@@ -77,6 +84,7 @@ export class StreamingService
     recordingStatusTime: new Date().toISOString(),
     replayBufferStatus: EReplayBufferState.Offline,
     replayBufferStatusTime: new Date().toISOString(),
+    streamingTrackId: '',
   };
 
   init() {
@@ -196,8 +204,8 @@ export class StreamingService
         // ユーザー番組については、即時番組があればそれを優先し、なければ予約番組の番組IDを採用する。
         const programId =
           opts.nicoliveProgramSelectorResult &&
-          opts.nicoliveProgramSelectorResult.providerType === 'channel' &&
-          opts.nicoliveProgramSelectorResult.channelProgramId
+            opts.nicoliveProgramSelectorResult.providerType === 'channel' &&
+            opts.nicoliveProgramSelectorResult.channelProgramId
             ? opts.nicoliveProgramSelectorResult.channelProgramId
             : broadcastableUserProgram.programId || broadcastableUserProgram.nextProgramId;
 
@@ -207,8 +215,8 @@ export class StreamingService
         }
 
         const setting = await this.userService.updateStreamSettings(programId);
-        const streamkey = setting.key;
-        if (streamkey === '') {
+        const streamKey = setting.key;
+        if (streamKey === '') {
           return this.showNotBroadcastingMessageBox();
         }
         if (this.customizationService.optimizeForNiconico) {
@@ -350,7 +358,7 @@ export class StreamingService
           queryParams: settings,
           size: {
             width: 600,
-            height: 594,
+            height: 594, // なぜ {@link this.calculateOptimizeWindowSize()} を使っていない?
           },
         });
       } else {
@@ -490,6 +498,65 @@ export class StreamingService
     return `${hours}:${minutes}:${seconds}`;
   }
 
+  private logStreamStart() {
+    const streamingTrackId = this.usageStatisticsService.generateStreamingTrackID();
+    this.SET_STREAMING_TRACK_ID(streamingTrackId);
+    this.actionLog('stream_start', streamingTrackId);
+  }
+
+  private logStreamEnd() {
+    const streamingTrackId = this.state.streamingTrackId;
+    this.SET_STREAMING_TRACK_ID('');
+    this.actionLog('stream_end', streamingTrackId);
+  }
+
+  private actionLog(eventType: 'stream_start' | 'stream_end', streamingTrackId: string) {
+    const settings = this.settingsService.getStreamEncoderSettings();
+
+    const event: TUsageEvent = {
+      event: eventType,
+      user_id: this.userService.isLoggedIn() ? this.userService.platformId : null,
+      platform: extractPlatform(settings.streamingURL),
+      stream_track_id: streamingTrackId,
+      content_id: this.nicoliveProgramService.state.programID || null,
+      output_mode: settings.outputMode,
+      video: {
+        base_resolution: settings.baseResolution,
+        output_resolution: settings.outputResolution,
+        bitrate: settings.bitrate,
+        fps: settings.fps,
+      },
+      audio: {
+        bitrate: Number(settings.audio.bitrate),
+        sample_rate: settings.audio.sampleRate,
+      },
+      advanced: settings.outputMode === 'Advanced' ? {
+        rate_control: settings.audio.rateControl,
+        profile: settings.profile,
+      } : undefined,
+      encoder: {
+        encoder_type: settings.encoder as unknown as EncoderType,
+        preset: settings.preset,
+      },
+      auto_optimize: {
+        enabled: this.customizationService.optimizeForNiconico,
+        use_hardware_encoder: this.customizationService.optimizeWithHardwareEncoder,
+      },
+      yomiage: {
+        enabled: this.nicoliveCommentSynthesizerService.enabled,
+        pitch: this.nicoliveCommentSynthesizerService.pitch,
+        rate: this.nicoliveCommentSynthesizerService.rate,
+        volume: this.nicoliveCommentSynthesizerService.volume,
+      },
+      compact_mode: {
+        auto_compact_mode: this.customizationService.state.autoCompactMode,
+        current: this.customizationService.state.compactMode,
+      },
+    };
+
+    this.usageStatisticsService.recordEvent(event);
+  }
+
   private handleOBSOutputSignal(info: IOBSOutputSignalInfo) {
     console.debug('OBS Output signal: ', info);
 
@@ -502,14 +569,6 @@ export class StreamingService
         this.SET_STREAMING_STATUS(EStreamingState.Live, time);
         this.streamingStatusChange.next(EStreamingState.Live);
 
-        let streamEncoderInfo: Dictionary<string> = {};
-
-        try {
-          streamEncoderInfo = this.settingsService.getStreamEncoderSettings();
-        } catch (e) {
-          console.error('Error fetching stream encoder info: ', e);
-        }
-
         const recordWhenStreaming = this.settingsService.state.General.RecordWhenStreaming;
         if (recordWhenStreaming && this.state.recordingStatus === ERecordingState.Offline) {
           this.toggleRecording();
@@ -521,7 +580,7 @@ export class StreamingService
           this.startReplayBuffer();
         }
 
-        this.usageStatisticsService.recordEvent('stream_start', streamEncoderInfo);
+        this.logStreamStart();
       } else if (info.signal === EOBSOutputSignal.Starting) {
         this.SET_STREAMING_STATUS(EStreamingState.Starting, time);
         this.streamingStatusChange.next(EStreamingState.Starting);
@@ -531,7 +590,7 @@ export class StreamingService
       } else if (info.signal === EOBSOutputSignal.Stopping) {
         this.SET_STREAMING_STATUS(EStreamingState.Ending, time);
         this.streamingStatusChange.next(EStreamingState.Ending);
-        this.usageStatisticsService.recordEvent('stream_end');
+        this.logStreamEnd();
       } else if (info.signal === EOBSOutputSignal.Reconnect) {
         this.SET_STREAMING_STATUS(EStreamingState.Reconnecting);
         this.streamingStatusChange.next(EStreamingState.Reconnecting);
@@ -616,5 +675,10 @@ export class StreamingService
   private SET_REPLAY_BUFFER_STATUS(status: EReplayBufferState, time?: string) {
     this.state.replayBufferStatus = status;
     if (time) this.state.replayBufferStatusTime = time;
+  }
+
+  @mutation()
+  private SET_STREAMING_TRACK_ID(id: string) {
+    this.state.streamingTrackId = id;
   }
 }
