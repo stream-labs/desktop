@@ -59,6 +59,7 @@ import BrowseOverlays from './pages/BrowseOverlays';
 import PlatformAppMainPage from './pages/PlatformAppMainPage';
 import PlatformAppPageView from './shared/PlatformAppPageView';
 import PlatformAppPopOut from './windows/PlatformAppPopOut';
+import RecentEventsWindow from './windows/RecentEvents';
 
 // list of React components to be used inside Vue components
 export const components = {
@@ -114,6 +115,7 @@ export const components = {
   SceneSelector: createRoot(SceneSelector),
   AddSource,
   SourceSelector: createRoot(SourceSelector),
+  RecentEventsWindow,
   SideNav,
   WelcomeToPrime,
   Notifications,

@@ -277,6 +277,14 @@ export class RecentEvents extends ReactComponent<{ isOverlay?: boolean }> {}
 
 @Component({
   props: {
+    name: { default: 'RecentEventsWindow' },
+    wrapperStyles: { default: () => ({ height: '100%' }) },
+  },
+})
+export class RecentEventsWindow extends ReactComponent {}
+
+@Component({
+  props: {
     name: { default: 'RecordingPreview' },
     wrapperStyles: { default: () => ({ height: '100%' }) },
     mins: { default: () => ({ x: 0, y: 0 }) },
