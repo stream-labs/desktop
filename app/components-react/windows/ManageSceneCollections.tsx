@@ -75,7 +75,7 @@ export default function ManageSceneCollections() {
               nowrap
             />
           </div>
-          <Scrollable style={{ height: 'calc(100% - 32px)' }}>
+          <Scrollable style={{ height: 'calc(100% - 48px)' }}>
             {filteredCollections().map((collection, i) => (
               <CollectionNode collection={collection} recentlyUpdated={i < 2} key={collection.id} />
             ))}
