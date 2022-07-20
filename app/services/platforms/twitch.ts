@@ -66,6 +66,8 @@ interface ITwitchServiceState extends IPlatformState {
   settings: ITwitchStartStreamOptions;
 }
 
+const UNLISTED_GAME_CATEGORY = { id: '0', name: 'Unlisted', box_art_url: '' };
+
 @InheritMutations()
 export class TwitchService
   extends BasePlatformService<ITwitchServiceState>
@@ -310,8 +312,10 @@ export class TwitchService
   }
 
   async putChannelInfo({ title, game, tags = [] }: ITwitchStartStreamOptions): Promise<void> {
-    let gameId;
-    if (game) {
+    let gameId = '';
+    const isUnlisted = game === UNLISTED_GAME_CATEGORY.name;
+    if (isUnlisted) gameId = '0';
+    if (game && !isUnlisted) {
       gameId = await this.requestTwitch<{ data: { id: string }[] }>(
         `${this.apiBase}/helix/games?name=${encodeURIComponent(game)}`,
       ).then(json => json.data[0].id);
@@ -331,11 +335,21 @@ export class TwitchService
     const gamesResponse = await platformAuthorizedRequest<{
       data: { id: string; name: string; box_art_url: string }[];
     }>('twitch', `${this.apiBase}/helix/search/categories?query=${searchString}`);
-    if (!gamesResponse.data) return [];
-    return gamesResponse.data.map(g => ({ id: g.id, name: g.name, image: g.box_art_url }));
+    const data = gamesResponse.data || [];
+
+    const shouldIncludeUnlisted =
+      searchString.toLowerCase() === 'unlisted'.substring(0, searchString.length);
+
+    if (shouldIncludeUnlisted) {
+      data.push(UNLISTED_GAME_CATEGORY);
+    }
+
+    return data.map(g => ({ id: g.id, name: g.name, image: g.box_art_url }));
   }
 
   async fetchGame(name: string): Promise<IGame> {
+    if (name === UNLISTED_GAME_CATEGORY.name) return UNLISTED_GAME_CATEGORY;
+
     const gamesResponse = await platformAuthorizedRequest<{
       data: { id: string; name: string; box_art_url: string }[];
     }>('twitch', `${this.apiBase}/helix/games?name=${encodeURIComponent(name)}`);
