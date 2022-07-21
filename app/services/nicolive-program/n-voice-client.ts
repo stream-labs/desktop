@@ -1,7 +1,7 @@
 // N Voice Client Service
 
 import electron from 'electron';
-import { readFileSync, unlinkSync } from 'fs';
+import { existsSync, readFileSync, unlinkSync } from 'fs';
 import { join } from "path";
 import { StatefulService } from "services/core/stateful-service";
 import { getNVoicePath, NVoiceClient } from './NVoiceClient';
@@ -66,9 +66,13 @@ export class NVoiceClientService extends StatefulService<INVoiceClientState> {
     await client.set_max_time(options.maxTime); // TODO 変わらないときは省略したい
     await client.talk(options.speed, text, wavFileName);
     const buffer = readFileSync(wavFileName);
-    unlinkSync(wavFileName);
+    if (existsSync(wavFileName)) {
+      unlinkSync(wavFileName);
+    }
     const labels = loadLabelFile(labelFileName);
-    unlinkSync(labelFileName);
+    if (existsSync(labelFileName)) {
+      unlinkSync(labelFileName);
+    }
     console.log('NVoiceClientService.talk label:\n', labels); // DEBUG
     // TODO use labels along with audio
 

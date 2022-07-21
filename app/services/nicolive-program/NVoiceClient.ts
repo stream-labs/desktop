@@ -1,4 +1,5 @@
 import { ChildProcess, spawn } from "child_process";
+import { readdirSync } from "fs";
 import { basename, join } from "path";
 import { createInterface } from "readline";
 
@@ -203,9 +204,13 @@ export class NVoiceClient {
       const enginePath = join(baseDir, 'n-voice-engine.exe');
       const dictionaryPath = 'open_jtalk_dic_shift_jis-1.11';
       const userDictionary = 'user.dic';
-      const modelPath = 'nvoice_default@2022-07-12T04-10-10.0060@False_nvoice_16k_mcd_L20-D10_S4-F64-C64-I0@2022-07-12T04-08-25.0040@False_False.pt';
+
+      const models = readdirSync(baseDir).filter(s => /.*\.pt$/.test(s))
+      if (models.length !== 1) {
+        throw new Error('model file found: ' + models.join(', '));
+      }
       const cwd = baseDir;
-      const client = await StartNVoice(enginePath, dictionaryPath, userDictionary, modelPath, cwd);
+      const client = await StartNVoice(enginePath, dictionaryPath, userDictionary, models[0], cwd);
       this.commandLineClient = client;
       const r = await this.waitOkNg(client);
       const protocolVersion = await this.protocol_version();
