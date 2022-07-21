@@ -394,6 +394,7 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
    */
   joinAsGuest(inviteHash: string) {
     this.SET_JOIN_AS_GUEST(inviteHash);
+    this.disconnectGuest();
     this.startListeningForGuests();
     this.sourcesService.showGuestCamPropertiesBySourceId(this.views.sourceId);
   }
