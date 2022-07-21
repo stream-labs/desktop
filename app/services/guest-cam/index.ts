@@ -394,8 +394,7 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
    */
   joinAsGuest(inviteHash: string) {
     this.SET_JOIN_AS_GUEST(inviteHash);
-    this.disconnectGuest();
-    this.startListeningForGuests();
+    this.resetSocketConnection();
     this.sourcesService.showGuestCamPropertiesBySourceId(this.views.sourceId);
   }
 
@@ -664,6 +663,17 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
    * Disconnects the currently connected guest
    */
   disconnectGuest() {
+    // Add the stream id to the list of disconnected guests, so we don't
+    // immediately connect to that same guest again until they are forced
+    // to refresh the page.
+    if (this.state.guestInfo) {
+      this.disconnectedStreamIds.push(this.state.guestInfo.streamId);
+    }
+
+    this.resetSocketConnection();
+  }
+
+  resetSocketConnection() {
     if (this.consumer) {
       this.consumer.destroy();
       this.consumer = null;
@@ -674,13 +684,6 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
     if (this.producer) {
       this.producer.destroy();
       this.producer = null;
-    }
-
-    // Add the stream id to the list of disconnected guests, so we don't
-    // immediately connect to that same guest again until they are forced
-    // to refresh the page.
-    if (this.state.guestInfo) {
-      this.disconnectedStreamIds.push(this.state.guestInfo.streamId);
     }
 
     // TODO: AFAIK there is no way to cleanly recreate the producer without
@@ -825,6 +828,6 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
 
   @mutation()
   private SET_JOIN_AS_GUEST(inviteHash: string | null) {
-    this.state.joinAsGuestHash = null;
+    this.state.joinAsGuestHash = inviteHash;
   }
 }
