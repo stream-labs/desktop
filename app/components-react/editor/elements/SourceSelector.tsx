@@ -21,6 +21,7 @@ import styles from './SceneSelector.m.less';
 import Scrollable from 'components-react/shared/Scrollable';
 import HelpTip from 'components-react/shared/HelpTip';
 import Translate from 'components-react/shared/Translate';
+import { returnAtIndex } from 'lodash-decorators/utils';
 
 interface ISourceMetadata {
   id: string;
@@ -257,6 +258,8 @@ class SourceSelectorModule {
     const placement = this.determinePlacement(info);
 
     if (!nodesToDrop || !destNode) return;
+    if (targetNodes.some(nodeId => nodeId === destNode.id)) return;
+
     await this.editorCommandsService.actions.return.executeCommand(
       'ReorderNodesCommand',
       nodesToDrop,
@@ -528,7 +531,6 @@ function ItemsTree() {
           onSelect={(selectedKeys, info) => makeActive(info)}
           onExpand={(selectedKeys, info) => toggleFolder(info.node.key as string)}
           onRightClick={info => showContextMenu(info.node.key as string, info.event)}
-          onDragStart={info => makeActive(info)}
           onDrop={handleSort}
           treeData={treeData}
           draggable
