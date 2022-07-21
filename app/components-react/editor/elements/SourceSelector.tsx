@@ -21,7 +21,6 @@ import styles from './SceneSelector.m.less';
 import Scrollable from 'components-react/shared/Scrollable';
 import HelpTip from 'components-react/shared/HelpTip';
 import Translate from 'components-react/shared/Translate';
-import { returnAtIndex } from 'lodash-decorators/utils';
 
 interface ISourceMetadata {
   id: string;
