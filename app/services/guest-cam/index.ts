@@ -69,6 +69,9 @@ interface IRoomResponse {
 interface IIoConfigResponse {
   url: string;
   token: string;
+  host: {
+    name: string;
+  };
 }
 
 type TWebRTCSocketEvent =
@@ -150,6 +153,11 @@ interface IGuestCamServiceState {
    * be set to the hash.
    */
   joinAsGuestHash: string | null;
+
+  /**
+   * Name of the host of the room
+   */
+  hostName: string;
 }
 
 interface IInviteLink {
@@ -220,6 +228,7 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
     inviteHash: '',
     guestInfo: null,
     joinAsGuestHash: null,
+    hostName: null,
   };
 
   get views() {
@@ -384,6 +393,8 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
 
     this.log('io Config Result', ioConfigResult);
 
+    this.SET_HOST_NAME(ioConfigResult.host.name);
+
     this.openSocketConnection(ioConfigResult.url, ioConfigResult.token);
   }
 
@@ -394,6 +405,7 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
    */
   joinAsGuest(inviteHash: string) {
     this.SET_JOIN_AS_GUEST(inviteHash);
+    this.SET_PRODUCE_OK(false);
     this.resetSocketConnection();
     this.sourcesService.showGuestCamPropertiesBySourceId(this.views.sourceId);
   }
@@ -829,5 +841,10 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
   @mutation()
   private SET_JOIN_AS_GUEST(inviteHash: string | null) {
     this.state.joinAsGuestHash = inviteHash;
+  }
+
+  @mutation()
+  private SET_HOST_NAME(name: string) {
+    this.state.hostName = name;
   }
 }

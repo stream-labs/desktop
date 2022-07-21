@@ -42,6 +42,7 @@ export default function GuestCamProperties() {
     guestInfo,
     volume,
     showFirstTimeModal,
+    joinAsGuest,
   } = useVuex(() => ({
     produceOk: GuestCamService.state.produceOk,
     visible: GuestCamService.views.guestVisible,
@@ -62,6 +63,7 @@ export default function GuestCamProperties() {
     guestInfo: GuestCamService.state.guestInfo,
     volume: GuestCamService.views.deflection,
     showFirstTimeModal: DismissablesService.views.shouldShow(EDismissable.GuestCamFirstTimeModal),
+    joinAsGuest: !!GuestCamService.state.joinAsGuestHash,
   }));
   const [regeneratingLink, setRegeneratingLink] = useState(false);
 
@@ -76,6 +78,16 @@ export default function GuestCamProperties() {
     if (!source) return;
 
     EditorCommandsService.actions.executeCommand('SetDeflectionCommand', source.sourceId, val);
+  }
+
+  function getModalContent() {
+    if (joinAsGuest) {
+      return <JoinAsGuestModalContent />;
+    } else if (showFirstTimeModal) {
+      return <FirstTimeModalContent />;
+    } else {
+      return <EveryTimeModalContent />;
+    }
   }
 
   return (
@@ -244,7 +256,7 @@ export default function GuestCamProperties() {
         }}
         onCancel={() => WindowsService.actions.closeChildWindow()}
       >
-        {showFirstTimeModal ? <FirstTimeModalContent /> : <EveryTimeModalContent />}
+        {getModalContent()}
       </Modal>
     </ModalLayout>
   );
@@ -294,6 +306,23 @@ function FirstTimeModalContent() {
         showIcon={false}
         banner
       />
+    </>
+  );
+}
+
+function JoinAsGuestModalContent() {
+  const { GuestCamService } = Services;
+  const { hostName } = useVuex(() => ({ hostName: GuestCamService.state.hostName }));
+
+  return (
+    <>
+      <h2>{$t("You're about to join %{name}", hostName)}</h2>
+      <p>
+        {$t(
+          "%{name} has invited you to join their stream. When you're ready to join, click the button below.",
+          hostName,
+        )}
+      </p>
     </>
   );
 }
