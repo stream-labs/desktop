@@ -144,6 +144,12 @@ interface IGuestCamServiceState {
   audioSourceId: string;
   inviteHash: string;
   guestInfo: IGuest;
+
+  /**
+   * If we are connecting to as a guest to someone else's stream, this will
+   * be set to the hash.
+   */
+  joinAsGuestHash: string | null;
 }
 
 interface IInviteLink {
@@ -213,6 +219,7 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
     audioSourceId: '',
     inviteHash: '',
     guestInfo: null,
+    joinAsGuestHash: null,
   };
 
   get views() {
@@ -363,9 +370,9 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
 
     let ioConfigResult: IIoConfigResponse;
 
-    if (Utils.env.SLD_GUEST_CAM_HASH) {
+    if (Utils.env.SLD_GUEST_CAM_HASH ?? this.state.joinAsGuestHash) {
       const url = this.urlService.getStreamlabsApi(
-        `streamrooms/io/config/${Utils.env.SLD_GUEST_CAM_HASH}`,
+        `streamrooms/io/config/${Utils.env.SLD_GUEST_CAM_HASH ?? this.state.joinAsGuestHash}`,
       );
       ioConfigResult = await jfetch<IIoConfigResponse>(url);
     } else {
@@ -378,6 +385,16 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
     this.log('io Config Result', ioConfigResult);
 
     this.openSocketConnection(ioConfigResult.url, ioConfigResult.token);
+  }
+
+  /**
+   * This should be called when we are attempting to join somebody else's
+   * stream as a guest.
+   * @param inviteHash The invite code of the room to join
+   */
+  joinAsGuest(inviteHash: string) {
+    this.SET_JOIN_AS_GUEST(inviteHash);
+    this.sourcesService.showGuestCamPropertiesBySourceId(this.views.sourceId);
   }
 
   /**
@@ -503,9 +520,9 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
 
     let turnConfigResult: ITurnConfig;
 
-    if (Utils.env.SLD_GUEST_CAM_HASH) {
+    if (Utils.env.SLD_GUEST_CAM_HASH ?? this.state.joinAsGuestHash) {
       const url = this.urlService.getStreamlabsApi(
-        `streamrooms/turn/config/${Utils.env.SLD_GUEST_CAM_HASH}`,
+        `streamrooms/turn/config/${Utils.env.SLD_GUEST_CAM_HASH ?? this.state.joinAsGuestHash}`,
       );
       turnConfigResult = await jfetch<ITurnConfig>(url);
     } else {
@@ -799,5 +816,10 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
   @mutation()
   private SET_GUEST(guest: IGuest) {
     this.state.guestInfo = guest;
+  }
+
+  @mutation()
+  private SET_JOIN_AS_GUEST(inviteHash: string | null) {
+    this.state.joinAsGuestHash = null;
   }
 }
