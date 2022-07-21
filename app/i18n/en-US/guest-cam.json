@@ -28,5 +28,6 @@
   "Collab Cam is not yet sending your video and audio to guests. Start Collab Cam?": "Collab Cam is not yet sending your video and audio to guests. Start Collab Cam?",
   "Copy Link": "Copy Link",
   "You're about to join %{name}": "You're about to join %{name}",
-  "%{name} has invited you to join their stream. When you're ready to join, click the button below.": "%{name} has invited you to join their stream. When you're ready to join, click the button below."
+  "%{name} has invited you to join their stream. When you're ready to join, click the button below.": "%{name} has invited you to join their stream. When you're ready to join, click the button below.",
+  "Waiting for host to begin": "Waiting for host to begin"
 }

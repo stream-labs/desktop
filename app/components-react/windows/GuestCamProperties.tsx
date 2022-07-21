@@ -150,12 +150,14 @@ export default function GuestCamProperties() {
               <h3>{$t('Source: %{sourceName}', { sourceName: source?.name })}</h3>
               <div style={{ display: 'flex', flexDirection: 'row' }}>
                 <div style={{ flexGrow: 1 }}>
-                  <TextInput
-                    readOnly
-                    value={inviteUrl}
-                    label={$t('Invite URL')}
-                    style={{ width: '100%', margin: '10px 0 20px' }}
-                  />
+                  {!joinAsGuest && (
+                    <TextInput
+                      readOnly
+                      value={inviteUrl}
+                      label={$t('Invite URL')}
+                      style={{ width: '100%', margin: '10px 0 10px' }}
+                    />
+                  )}
                   <SliderInput
                     label={$t('Volume')}
                     value={volume}
@@ -165,42 +167,45 @@ export default function GuestCamProperties() {
                     debounce={500}
                     step={0.01}
                     tipFormatter={v => `${(v * 100).toFixed(0)}%`}
-                    style={{ width: '100%', margin: '10px 0' }}
+                    style={{ width: '100%', margin: '20px 0' }}
                   />
                 </div>
                 <div style={{ width: 350, marginLeft: 20 }}>
-                  <div
-                    style={{
-                      display: 'flex',
-                      flexDirection: 'row',
-                      justifyContent: 'space-between',
-                      margin: '10px 0 20px',
-                    }}
-                  >
-                    <Tooltip title={$t('Copied!')} trigger="click">
+                  {!joinAsGuest && (
+                    <div
+                      style={{
+                        display: 'flex',
+                        flexDirection: 'row',
+                        justifyContent: 'space-between',
+                        margin: '10px 0',
+                      }}
+                    >
+                      <Tooltip title={$t('Copied!')} trigger="click">
+                        <Button
+                          onClick={() => remote.clipboard.writeText(inviteUrl)}
+                          style={{ width: 160 }}
+                        >
+                          {$t('Copy Link')}
+                        </Button>
+                      </Tooltip>
                       <Button
-                        onClick={() => remote.clipboard.writeText(inviteUrl)}
+                        disabled={regeneratingLink}
+                        onClick={regenerateLink}
                         style={{ width: 160 }}
                       >
-                        {$t('Copy Link')}
+                        {$t('Generate a new link')}
+                        {regeneratingLink && (
+                          <i className="fa fa-spinner fa-pulse" style={{ marginLeft: 8 }} />
+                        )}
                       </Button>
-                    </Tooltip>
-                    <Button
-                      disabled={regeneratingLink}
-                      onClick={regenerateLink}
-                      style={{ width: 160 }}
-                    >
-                      {$t('Generate a new link')}
-                      {regeneratingLink && (
-                        <i className="fa fa-spinner fa-pulse" style={{ marginLeft: 8 }} />
-                      )}
-                    </Button>
-                  </div>
+                    </div>
+                  )}
                   <div
                     style={{
                       display: 'flex',
                       flexDirection: 'row',
                       justifyContent: 'space-between',
+                      margin: '20px 0 0',
                     }}
                   >
                     <Button
@@ -237,7 +242,11 @@ export default function GuestCamProperties() {
                     }}
                   >
                     <Spinner />
-                    <div style={{ textAlign: 'center' }}>{$t('Waiting for guest to join')}</div>
+                    <div style={{ textAlign: 'center' }}>
+                      {joinAsGuest
+                        ? $t('Waiting for host to begin')
+                        : $t('Waiting for guest to join')}
+                    </div>
                   </div>
                 )}
               </div>
@@ -316,11 +325,11 @@ function JoinAsGuestModalContent() {
 
   return (
     <>
-      <h2>{$t("You're about to join %{name}", hostName)}</h2>
+      <h2>{$t("You're about to join %{name}", { name: hostName })}</h2>
       <p>
         {$t(
           "%{name} has invited you to join their stream. When you're ready to join, click the button below.",
-          hostName,
+          { name: hostName },
         )}
       </p>
     </>
