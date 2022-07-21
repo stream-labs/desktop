@@ -267,13 +267,13 @@ class SourceSelectorModule {
     );
   }
 
-  makeActive(info: { node: DataNode; nativeEvent?: MouseEvent }) {
+  makeActive(info: { node: DataNode; nativeEvent: MouseEvent }) {
     this.callCameFromInsideTheHouse = true;
     let ids: string[] = [info.node.key as string];
 
-    if (info?.nativeEvent?.ctrlKey) {
+    if (info.nativeEvent.ctrlKey) {
       ids = this.activeItemIds.concat(ids);
-    } else if (info?.nativeEvent?.shiftKey) {
+    } else if (info.nativeEvent.shiftKey) {
       // Logic for multi-select
       const idx1 = this.nodeData.findIndex(
         i => i.id === this.activeItemIds[this.activeItemIds.length - 1],
