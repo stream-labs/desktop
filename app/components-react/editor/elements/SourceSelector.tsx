@@ -31,6 +31,7 @@ interface ISourceMetadata {
   isStreamVisible: boolean;
   isRecordingVisible: boolean;
   isFolder: boolean;
+  canShowActions: boolean;
   parentId?: string;
 }
 
@@ -73,7 +74,7 @@ class SourceSelectorModule {
               id={sceneNode.id}
               isVisible={sceneNode.isVisible}
               isLocked={sceneNode.isLocked}
-              canShowActions={this.canShowActions(sceneNode.id)}
+              canShowActions={sceneNode.canShowActions}
               toggleVisibility={() => this.toggleVisibility(sceneNode.id)}
               toggleLock={() => this.toggleLock(sceneNode.id)}
               selectiveRecordingEnabled={this.selectiveRecordingEnabled}
@@ -113,6 +114,7 @@ class SourceSelectorModule {
         isRecordingVisible,
         isStreamVisible,
         parentId: node.parentId,
+        canShowActions: itemsForNode.length > 0,
         isFolder,
       };
     });
@@ -295,10 +297,6 @@ class SourceSelectorModule {
     } else {
       this.state.expandedFoldersIds.push(nodeId);
     }
-  }
-
-  canShowActions(sceneNodeId: string) {
-    return this.getItemsForNode(sceneNodeId).length > 0;
   }
 
   get lastSelectedId() {
