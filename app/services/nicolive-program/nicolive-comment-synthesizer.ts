@@ -335,6 +335,9 @@ export class NVoiceSynthesizer implements ISpeechSynthesizer {
       speed: speech.pitch,
       volume: speech.volume,
       maxTime: speech.nVoice.maxTime,
+      phonemeCallback: (phoneme: string) => {
+        console.log(phoneme); // DEBUG
+      },
     }).then(async ({ cancel, speaking }) => {
       this._cancel = cancel;
       onstart();
