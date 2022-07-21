@@ -176,13 +176,13 @@ function SceneSelector() {
             <DownOutlined style={{ marginLeft: '4px' }} />
           </span>
         </Dropdown>
-        <Tooltip title={$t('Add a new Scene.')} placement="bottom">
+        <Tooltip title={$t('Add a new Scene.')} placement="bottomRight">
           <i className="icon-add icon-button icon-button--lg" onClick={addScene} />
         </Tooltip>
-        <Tooltip title={$t('Remove Scene.')} placement="bottom">
+        <Tooltip title={$t('Remove Scene.')} placement="bottomRight">
           <i className="icon-subtract icon-button icon-button--lg" onClick={removeScene} />
         </Tooltip>
-        <Tooltip title={$t('Edit Scene Transitions.')} placement="bottom">
+        <Tooltip title={$t('Edit Scene Transitions.')} placement="bottomRight">
           <i className="icon-transition icon-button icon-button--lg" onClick={showTransitions} />
         </Tooltip>
       </div>
