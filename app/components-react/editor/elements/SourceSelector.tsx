@@ -265,18 +265,13 @@ class SourceSelectorModule {
     );
   }
 
-  makeActive(info: {
-    selected: boolean;
-    node: DataNode;
-    selectedNodes: DataNode[];
-    nativeEvent: MouseEvent;
-  }) {
+  makeActive(info: { node: DataNode; nativeEvent?: MouseEvent }) {
     this.callCameFromInsideTheHouse = true;
     let ids: string[] = [info.node.key as string];
 
-    if (info.nativeEvent.ctrlKey) {
+    if (info?.nativeEvent?.ctrlKey) {
       ids = this.activeItemIds.concat(ids);
-    } else if (info.nativeEvent.shiftKey) {
+    } else if (info?.nativeEvent?.shiftKey) {
       // Logic for multi-select
       const idx1 = this.nodeData.findIndex(
         i => i.id === this.activeItemIds[this.activeItemIds.length - 1],
@@ -533,8 +528,8 @@ function ItemsTree() {
           onSelect={(selectedKeys, info) => makeActive(info)}
           onExpand={(selectedKeys, info) => toggleFolder(info.node.key as string)}
           onRightClick={info => showContextMenu(info.node.key as string, info.event)}
+          onDragStart={info => makeActive(info)}
           onDrop={handleSort}
-          onDragOver={e => console.log(e)}
           treeData={treeData}
           draggable
           multiple
