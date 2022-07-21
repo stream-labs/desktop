@@ -394,6 +394,7 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
    */
   joinAsGuest(inviteHash: string) {
     this.SET_JOIN_AS_GUEST(inviteHash);
+    this.startListeningForGuests();
     this.sourcesService.showGuestCamPropertiesBySourceId(this.views.sourceId);
   }
 
@@ -428,8 +429,9 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
   setProduceOk() {
     this.SET_PRODUCE_OK(true);
 
-    // If a guest is already connected and we are not yet producing, start doing so now
-    if (!this.producer && this.consumer) {
+    // If a guest is already connected and we are not yet producing, start doing so now.
+    // If we are joined as a guest, we should also start producing first.
+    if (!this.producer && (this.consumer || this.state.joinAsGuestHash)) {
       this.startProducing();
     }
   }
@@ -676,7 +678,9 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
     // Add the stream id to the list of disconnected guests, so we don't
     // immediately connect to that same guest again until they are forced
     // to refresh the page.
-    this.disconnectedStreamIds.push(this.state.guestInfo.streamId);
+    if (this.state.guestInfo) {
+      this.disconnectedStreamIds.push(this.state.guestInfo.streamId);
+    }
 
     // TODO: AFAIK there is no way to cleanly recreate the producer without
     // entirely disconnecting destroying all state on the server. For now, we
