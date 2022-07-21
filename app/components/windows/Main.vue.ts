@@ -239,7 +239,7 @@ export default class Main extends Vue {
   }
 
   executeFileDrop(files: string[]) {
-    this.editorCommandsService.executeCommand(
+    this.editorCommandsService.actions.executeCommand(
       'AddFilesCommand',
       this.scenesService.views.activeSceneId,
       files,

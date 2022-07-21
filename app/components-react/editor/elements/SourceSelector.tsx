@@ -50,6 +50,7 @@ class SourceSelectorModule {
 
   state = injectState({
     expandedFoldersIds: [] as string[],
+    showTreeMask: true,
   });
 
   nodeRefs = {};
@@ -400,7 +401,7 @@ class SourceSelectorModule {
 }
 
 function SourceSelector() {
-  const { nodeData } = useModule(SourceSelectorModule);
+  const { nodeData, setShowTreeMask } = useModule(SourceSelectorModule);
   return (
     <>
       <StudioControls />
@@ -499,6 +500,8 @@ function ItemsTree() {
     makeActive,
     toggleFolder,
     handleSort,
+    showTreeMask,
+    setShowTreeMask,
   } = useModule(SourceSelectorModule);
 
   // Force a rerender when the state of selective recording changes
@@ -510,25 +513,37 @@ function ItemsTree() {
   const treeData = getTreeData(nodeData);
 
   return (
-    <Scrollable
-      className={cx(styles.scenesContainer, styles.sourcesContainer)}
+    <div
       style={{ height: 'calc(100% - 33px)' }}
-      onContextMenu={(e: React.MouseEvent) => showContextMenu('', e)}
+      // antd Tree swallows all drag events unless a TreeNode is being dragged.
+      // This allows us to drag files into the tree to add them to the scene
+      // by persisting a transparent div on top of the tree unless no buttons are
+      // being held over it.
+      onMouseEnter={(e: React.MouseEvent) => setShowTreeMask(e.buttons !== 0)}
+      onMouseUp={() => setShowTreeMask(false)}
+      onMouseLeave={() => setShowTreeMask(true)}
     >
-      <Tree
-        selectedKeys={activeItemIds}
-        expandedKeys={expandedFoldersIds}
-        onSelect={(selectedKeys, info) => makeActive(info)}
-        onExpand={(selectedKeys, info) => toggleFolder(info.node.key as string)}
-        onRightClick={info => showContextMenu(info.node.key as string, info.event)}
-        onDrop={handleSort}
-        treeData={treeData}
-        draggable
-        multiple
-        blockNode
-        showIcon
-      />
-    </Scrollable>
+      <Scrollable
+        className={cx(styles.scenesContainer, styles.sourcesContainer)}
+        onContextMenu={(e: React.MouseEvent) => showContextMenu('', e)}
+      >
+        {showTreeMask && <div className={styles.treeMask} data-name="treeMask" />}
+        <Tree
+          selectedKeys={activeItemIds}
+          expandedKeys={expandedFoldersIds}
+          onSelect={(selectedKeys, info) => makeActive(info)}
+          onExpand={(selectedKeys, info) => toggleFolder(info.node.key as string)}
+          onRightClick={info => showContextMenu(info.node.key as string, info.event)}
+          onDrop={handleSort}
+          onDragOver={e => console.log(e)}
+          treeData={treeData}
+          draggable
+          multiple
+          blockNode
+          showIcon
+        />
+      </Scrollable>
+    </div>
   );
 }
 
