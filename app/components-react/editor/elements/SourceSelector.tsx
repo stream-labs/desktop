@@ -45,7 +45,6 @@ class SourceSelectorModule {
 
   sourcesTooltip = $t('The building blocks of your scene. Also contains widgets.');
   addSourceTooltip = $t('Add a new Source to your Scene. Includes widgets.');
-  removeSourcesTooltip = $t('Remove Sources from your Scene.');
   openSourcePropertiesTooltip = $t('Open the Source Properties.');
   addGroupTooltip = $t('Add a Group so you can move multiple Sources at the same time.');
 
@@ -84,6 +83,8 @@ class SourceSelectorModule {
               cycleSelectiveRecording={() => this.cycleSelectiveRecording(sceneNode.id)}
               ref={this.nodeRefs[sceneNode.id]}
               onDoubleClick={() => this.sourceProperties(sceneNode.id)}
+              removeSource={() => this.removeItems(sceneNode.id)}
+              sourceProperties={() => this.sourceProperties(sceneNode.id)}
             />
           ),
           isLeaf: !children,
@@ -201,7 +202,10 @@ class SourceSelectorModule {
     event && event.stopPropagation();
   }
 
-  removeItems() {
+  async removeItems(id?: string) {
+    if (id) {
+      await this.selectionService.actions.return.select([id]);
+    }
     this.selectionService.views.globalSelection.remove();
   }
 
@@ -227,16 +231,6 @@ class SourceSelectorModule {
     }
 
     this.sourcesService.actions.showSourceProperties(item.sourceId);
-  }
-
-  canShowProperties(): boolean {
-    if (this.activeItemIds.length === 0) return false;
-    const sceneNode = this.scene.state.nodes.find(
-      n => n.id === this.selectionService.state.lastSelectedId,
-    );
-    return !!(sceneNode && sceneNode.sceneNodeType === 'item'
-      ? this.sourcesService.views.getSource(sceneNode.sourceId)?.hasProps()
-      : false);
   }
 
   determinePlacement(info: Parameters<Required<TreeProps>['onDrop']>[0]) {
@@ -429,17 +423,11 @@ function StudioControls() {
     sourcesTooltip,
     addGroupTooltip,
     addSourceTooltip,
-    removeSourcesTooltip,
-    openSourcePropertiesTooltip,
     selectiveRecordingEnabled,
     selectiveRecordingLocked,
-    activeItemIds,
     addSource,
     addFolder,
-    removeItems,
     toggleSelectiveRecording,
-    canShowProperties,
-    sourceProperties,
   } = useModule(SourceSelectorModule);
 
   return (
@@ -449,6 +437,9 @@ function StudioControls() {
           <span className={styles.activeScene}>{$t('Sources')}</span>
         </Tooltip>
       </div>
+      <Tooltip title={addSourceTooltip} placement="bottomLeft">
+        <i className="icon-add-circle icon-button icon-button--lg" onClick={addSource} />
+      </Tooltip>
 
       <Tooltip title={$t('Toggle Selective Recording')} placement="bottomRight">
         <i
@@ -459,30 +450,8 @@ function StudioControls() {
           onClick={toggleSelectiveRecording}
         />
       </Tooltip>
-
       <Tooltip title={addGroupTooltip} placement="bottomRight">
         <i className="icon-add-folder icon-button icon-button--lg" onClick={addFolder} />
-      </Tooltip>
-
-      <Tooltip title={addSourceTooltip} placement="bottomRight">
-        <i className="icon-add icon-button icon-button--lg" onClick={addSource} />
-      </Tooltip>
-
-      <Tooltip title={removeSourcesTooltip} placement="bottomRight">
-        <i
-          className={cx({
-            'icon-subtract icon-button icon-button--lg': true,
-            disabled: activeItemIds.length === 0,
-          })}
-          onClick={removeItems}
-        />
-      </Tooltip>
-
-      <Tooltip title={openSourcePropertiesTooltip} placement="bottomRight">
-        <i
-          className={cx({ disabled: !canShowProperties(), 'icon-settings icon-button': true })}
-          onClick={() => sourceProperties(activeItemIds[0])}
-        />
       </Tooltip>
     </div>
   );
@@ -561,6 +530,8 @@ const TreeNode = React.forwardRef(
       toggleLock: (ev: unknown) => unknown;
       cycleSelectiveRecording: (ev: unknown) => void;
       onDoubleClick: () => void;
+      removeSource: () => void;
+      sourceProperties: () => void;
     },
     ref: React.RefObject<HTMLDivElement>,
   ) => {
@@ -596,6 +567,12 @@ const TreeNode = React.forwardRef(
             <i onClick={p.toggleVisibility} className={p.isVisible ? 'icon-view' : 'icon-hide'} />
           </>
         )}
+        <Tooltip title={$t('Remove Sources from your Scene.')} placement="left">
+          <i onClick={p.removeSource} className="icon-trash" />
+        </Tooltip>
+        <Tooltip title={$t('Open the Source Properties.')} placement="left">
+          <i onClick={p.sourceProperties} className="icon-settings" />
+        </Tooltip>
       </div>
     );
   },
