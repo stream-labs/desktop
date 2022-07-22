@@ -401,6 +401,9 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
    * @param inviteHash The invite code of the room to join
    */
   async joinAsGuest(inviteHash: string) {
+    // TODO: We should show a nice error message
+    if (!this.views.sourceId) return;
+
     await this.cleanUpSocketConnection();
     this.SET_JOIN_AS_GUEST(inviteHash);
     this.SET_PRODUCE_OK(false);
