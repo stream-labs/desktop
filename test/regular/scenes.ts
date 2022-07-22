@@ -38,7 +38,7 @@ test('Adding and removing a scene', async t => {
 
   await selectScene(sceneName);
   await checkDefaultSources();
-  await clickRemoveScene();
+  await clickRemoveScene(sceneName);
 
   t.false(await (await select(`div=${sceneName}`)).isExisting());
 });

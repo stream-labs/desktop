@@ -114,7 +114,7 @@ test('Deleting a scene with undo/redo', async t => {
   sceneBuilder.build(sketch);
 
   await focusMain();
-  await clickRemoveScene();
+  await clickRemoveScene('New Scene');
 
   t.true(sceneBuilder.isEqualTo(''));
 
