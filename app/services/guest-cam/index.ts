@@ -254,7 +254,13 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
    * up the consumer while the producer is being set up. This mutex
    * ensures that only one operation accesses the plugin at a time.
    */
-  mutex = new Mutex();
+  pluginMutex = new Mutex();
+
+  /**
+   * Used to ensure we don't try to clean up or start a new socket
+   * connect while we are in the process of initializing it.
+   */
+  socketMutex = new Mutex();
 
   turnConfig: ITurnConfig;
 
@@ -278,18 +284,7 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
         // we shouldn't break in this scenario
         if (this.sourcesService.views.getSourcesByType('mediasoupconnector').length) return;
 
-        if (this.consumer) {
-          this.consumer.destroy();
-          this.consumer = null;
-        }
-
-        if (this.producer) {
-          this.producer.destroy();
-          this.producer = null;
-        }
-
-        this.socket.disconnect();
-        this.socket = null;
+        this.cleanUpSocketConnection();
       }
     });
 
@@ -361,41 +356,43 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
   }
 
   async startListeningForGuests() {
-    // TODO: Handle socket disconnects
-    if (this.socket) return;
+    await this.socketMutex.do(async () => {
+      // TODO: Handle socket disconnects
+      if (this.socket) return;
 
-    if (!this.userService.views.isLoggedIn) return;
+      if (!this.userService.views.isLoggedIn) return;
 
-    await this.ensureInviteLink();
+      await this.ensureInviteLink();
 
-    const roomUrl = this.urlService.getStreamlabsApi('streamrooms/current');
-    const roomResult = await jfetch<IRoomResponse>(roomUrl, {
-      headers: authorizedHeaders(this.userService.views.auth.apiToken),
-    });
-
-    this.log('Room result', roomResult);
-
-    this.room = roomResult.room;
-
-    let ioConfigResult: IIoConfigResponse;
-
-    if (Utils.env.SLD_GUEST_CAM_HASH ?? this.state.joinAsGuestHash) {
-      const url = this.urlService.getStreamlabsApi(
-        `streamrooms/io/config/${Utils.env.SLD_GUEST_CAM_HASH ?? this.state.joinAsGuestHash}`,
-      );
-      ioConfigResult = await jfetch<IIoConfigResponse>(url);
-    } else {
-      const ioConfigUrl = this.urlService.getStreamlabsApi('streamrooms/io/config');
-      ioConfigResult = await jfetch<IIoConfigResponse>(ioConfigUrl, {
+      const roomUrl = this.urlService.getStreamlabsApi('streamrooms/current');
+      const roomResult = await jfetch<IRoomResponse>(roomUrl, {
         headers: authorizedHeaders(this.userService.views.auth.apiToken),
       });
-    }
 
-    this.log('io Config Result', ioConfigResult);
+      this.log('Room result', roomResult);
 
-    this.SET_HOST_NAME(ioConfigResult.host.name);
+      this.room = roomResult.room;
 
-    this.openSocketConnection(ioConfigResult.url, ioConfigResult.token);
+      let ioConfigResult: IIoConfigResponse;
+
+      if (Utils.env.SLD_GUEST_CAM_HASH ?? this.state.joinAsGuestHash) {
+        const url = this.urlService.getStreamlabsApi(
+          `streamrooms/io/config/${Utils.env.SLD_GUEST_CAM_HASH ?? this.state.joinAsGuestHash}`,
+        );
+        ioConfigResult = await jfetch<IIoConfigResponse>(url);
+      } else {
+        const ioConfigUrl = this.urlService.getStreamlabsApi('streamrooms/io/config');
+        ioConfigResult = await jfetch<IIoConfigResponse>(ioConfigUrl, {
+          headers: authorizedHeaders(this.userService.views.auth.apiToken),
+        });
+      }
+
+      this.log('io Config Result', ioConfigResult);
+
+      this.SET_HOST_NAME(ioConfigResult.host.name);
+
+      await this.openSocketConnection(ioConfigResult.url, ioConfigResult.token);
+    });
   }
 
   /**
@@ -403,10 +400,11 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
    * stream as a guest.
    * @param inviteHash The invite code of the room to join
    */
-  joinAsGuest(inviteHash: string) {
+  async joinAsGuest(inviteHash: string) {
+    await this.cleanUpSocketConnection();
     this.SET_JOIN_AS_GUEST(inviteHash);
     this.SET_PRODUCE_OK(false);
-    this.resetSocketConnection();
+    await this.startListeningForGuests();
     this.sourcesService.showGuestCamPropertiesBySourceId(this.views.sourceId);
   }
 
@@ -678,14 +676,19 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
     // Add the stream id to the list of disconnected guests, so we don't
     // immediately connect to that same guest again until they are forced
     // to refresh the page.
-    if (this.state.guestInfo) {
+    if (this.state.guestInfo && !this.state.joinAsGuestHash) {
       this.disconnectedStreamIds.push(this.state.guestInfo.streamId);
     }
 
-    this.resetSocketConnection();
+    this.cleanUpSocketConnection();
+    this.startListeningForGuests();
   }
 
-  resetSocketConnection() {
+  async cleanUpSocketConnection() {
+    await this.socketMutex.synchronize();
+
+    if (!this.socket) return;
+
     if (this.consumer) {
       this.consumer.destroy();
       this.consumer = null;
@@ -703,9 +706,8 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
     // disconnect from the socket and start listening to guests again.
     this.socket.disconnect();
     this.socket = null;
-    this.startListeningForGuests();
-
     this.SET_GUEST(null);
+    this.SET_JOIN_AS_GUEST(null);
   }
 
   setVisibility(visible: boolean) {
