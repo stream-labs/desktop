@@ -29,5 +29,7 @@
   "Copy Link": "Copy Link",
   "You're about to join %{name}": "You're about to join %{name}",
   "%{name} has invited you to join their stream. When you're ready to join, click the button below.": "%{name} has invited you to join their stream. When you're ready to join, click the button below.",
-  "Waiting for host to begin": "Waiting for host to begin"
+  "Waiting for host to begin": "Waiting for host to begin",
+  "Connected To Host:": "Connected To Host:",
+  "You are connected as a guest using someone else's invite link. To leave, click the Disconnect button.": "You are connected as a guest using someone else's invite link. To leave, click the Disconnect button."
 }

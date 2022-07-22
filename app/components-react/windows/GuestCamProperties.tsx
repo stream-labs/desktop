@@ -1,19 +1,19 @@
+import { ExclamationCircleOutlined, QuestionCircleOutlined } from '@ant-design/icons';
+import * as remote from '@electron/remote';
 import { Alert, Button, Modal, Tabs, Tooltip } from 'antd';
 import { useVuex } from 'components-react/hooks';
+import { Spinner } from 'components-react/pages/Loader';
 import { Services } from 'components-react/service-provider';
 import Display from 'components-react/shared/Display';
 import { ListInput, SliderInput, TextInput } from 'components-react/shared/inputs';
 import Form from 'components-react/shared/inputs/Form';
 import { ModalLayout } from 'components-react/shared/ModalLayout';
 import React, { useMemo, useState } from 'react';
+import { EDismissable } from 'services/dismissables';
 import { EDeviceType } from 'services/hardware';
 import { $t } from 'services/i18n';
-import * as remote from '@electron/remote';
-import { Spinner } from 'components-react/pages/Loader';
-import { byOS, OS } from 'util/operating-systems';
 import { TSourceType } from 'services/sources';
-import { ExclamationCircleOutlined } from '@ant-design/icons';
-import { EDismissable } from 'services/dismissables';
+import { byOS, OS } from 'util/operating-systems';
 
 export default function GuestCamProperties() {
   const {
@@ -43,6 +43,7 @@ export default function GuestCamProperties() {
     volume,
     showFirstTimeModal,
     joinAsGuest,
+    hostName,
   } = useVuex(() => ({
     produceOk: GuestCamService.state.produceOk,
     visible: GuestCamService.views.guestVisible,
@@ -64,6 +65,7 @@ export default function GuestCamProperties() {
     volume: GuestCamService.views.deflection,
     showFirstTimeModal: DismissablesService.views.shouldShow(EDismissable.GuestCamFirstTimeModal),
     joinAsGuest: !!GuestCamService.state.joinAsGuestHash,
+    hostName: GuestCamService.state.hostName,
   }));
   const [regeneratingLink, setRegeneratingLink] = useState(false);
 
@@ -150,14 +152,27 @@ export default function GuestCamProperties() {
               <h3>{$t('Source: %{sourceName}', { sourceName: source?.name })}</h3>
               <div style={{ display: 'flex', flexDirection: 'row' }}>
                 <div style={{ flexGrow: 1 }}>
-                  {!joinAsGuest && (
-                    <TextInput
-                      readOnly
-                      value={inviteUrl}
-                      label={$t('Invite URL')}
-                      style={{ width: '100%', margin: '10px 0 10px' }}
-                    />
-                  )}
+                  <div style={{ height: 32, margin: '10px 0 10px' }}>
+                    {joinAsGuest ? (
+                      <div>
+                        <b>{$t('Connected To Host:')}</b> <span style={{ color: 'var(--title)' }}>{hostName}</span>
+                        <Tooltip
+                          title={$t(
+                            "You are connected as a guest using someone else's invite link. To leave, click the Disconnect button.",
+                          )}
+                        >
+                          <QuestionCircleOutlined style={{ marginLeft: 6 }} />
+                        </Tooltip>
+                      </div>
+                    ) : (
+                      <TextInput
+                        readOnly
+                        value={inviteUrl}
+                        label={$t('Invite URL')}
+                        style={{ width: '100%' }}
+                      />
+                    )}
+                  </div>
                   <SliderInput
                     label={$t('Volume')}
                     value={volume}
@@ -171,35 +186,40 @@ export default function GuestCamProperties() {
                   />
                 </div>
                 <div style={{ width: 350, marginLeft: 20 }}>
-                  {!joinAsGuest && (
-                    <div
-                      style={{
-                        display: 'flex',
-                        flexDirection: 'row',
-                        justifyContent: 'space-between',
-                        margin: '10px 0',
-                      }}
-                    >
-                      <Tooltip title={$t('Copied!')} trigger="click">
+                  <div
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'row',
+                      justifyContent: 'space-between',
+                      margin: '10px 0',
+                      height: 32,
+                    }}
+                  >
+                    {joinAsGuest ? (
+                      <></>
+                    ) : (
+                      <>
+                        <Tooltip title={$t('Copied!')} trigger="click">
+                          <Button
+                            onClick={() => remote.clipboard.writeText(inviteUrl)}
+                            style={{ width: 160 }}
+                          >
+                            {$t('Copy Link')}
+                          </Button>
+                        </Tooltip>
                         <Button
-                          onClick={() => remote.clipboard.writeText(inviteUrl)}
+                          disabled={regeneratingLink}
+                          onClick={regenerateLink}
                           style={{ width: 160 }}
                         >
-                          {$t('Copy Link')}
+                          {$t('Generate a new link')}
+                          {regeneratingLink && (
+                            <i className="fa fa-spinner fa-pulse" style={{ marginLeft: 8 }} />
+                          )}
                         </Button>
-                      </Tooltip>
-                      <Button
-                        disabled={regeneratingLink}
-                        onClick={regenerateLink}
-                        style={{ width: 160 }}
-                      >
-                        {$t('Generate a new link')}
-                        {regeneratingLink && (
-                          <i className="fa fa-spinner fa-pulse" style={{ marginLeft: 8 }} />
-                        )}
-                      </Button>
-                    </div>
-                  )}
+                      </>
+                    )}
+                  </div>
                   <div
                     style={{
                       display: 'flex',
@@ -219,7 +239,7 @@ export default function GuestCamProperties() {
                     <button
                       className="button button--soft-warning"
                       style={{ width: 160 }}
-                      disabled={!guestInfo}
+                      disabled={!guestInfo && !joinAsGuest}
                       onClick={() => GuestCamService.actions.disconnectGuest()}
                     >
                       {$t('Disconnect')}
