@@ -8,6 +8,7 @@ import { PlatformAppStoreService } from 'services/platform-app-store';
 import { UserService } from 'services/user';
 import { SettingsService } from './settings';
 import { byOS, OS } from 'util/operating-systems';
+import { GuestCamService } from './guest-cam';
 
 function protocolHandler(base: string) {
   return (target: any, methodName: string, descriptor: PropertyDescriptor) => {
@@ -32,6 +33,7 @@ export class ProtocolLinksService extends Service {
   @Inject() platformAppStoreService: PlatformAppStoreService;
   @Inject() userService: UserService;
   @Inject() settingsService: SettingsService;
+  @Inject() guestCamService: GuestCamService;
 
   // Maps base URL components to handler function names
   private handlers: Dictionary<string>;
@@ -117,5 +119,12 @@ export class ProtocolLinksService extends Service {
     const category = info.path.replace('/', '');
 
     this.settingsService.showSettings(category);
+  }
+
+  @protocolHandler('join')
+  private guestCamJoin(info: IProtocolLinkInfo) {
+    const hash = info.path.replace('/', '');
+
+    this.guestCamService.joinAsGuest(hash);
   }
 }
