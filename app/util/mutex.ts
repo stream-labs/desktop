@@ -41,7 +41,7 @@ export class Mutex {
    * @param fun The function to execute
    * @returns void
    */
-   async do<TReturn>(fun: () => TReturn) {
+  async do<TReturn>(fun: () => TReturn) {
     const unlock = await this.wait();
 
     try {
