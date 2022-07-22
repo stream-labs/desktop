@@ -50,7 +50,7 @@ export abstract class MediasoupEntity {
    */
   async withMutex<TReturn>(fun: () => TReturn) {
     if (!this.mutexUnlockFunc) {
-      this.mutexUnlockFunc = await this.guestCamService.mutex.wait();
+      this.mutexUnlockFunc = await this.guestCamService.pluginMutex.wait();
     }
 
     try {
