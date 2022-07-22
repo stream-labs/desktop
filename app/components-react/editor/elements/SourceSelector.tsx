@@ -33,6 +33,7 @@ interface ISourceMetadata {
   isRecordingVisible: boolean;
   isGuestCamActive: boolean;
   isFolder: boolean;
+  canShowActions: boolean;
   parentId?: string;
 }
 
@@ -53,6 +54,7 @@ class SourceSelectorModule {
 
   state = injectState({
     expandedFoldersIds: [] as string[],
+    showTreeMask: true,
   });
 
   nodeRefs = {};
@@ -76,6 +78,7 @@ class SourceSelectorModule {
               id={sceneNode.id}
               isVisible={sceneNode.isVisible}
               isLocked={sceneNode.isLocked}
+              canShowActions={sceneNode.canShowActions}
               toggleVisibility={() => this.toggleVisibility(sceneNode.id)}
               toggleLock={() => this.toggleLock(sceneNode.id)}
               selectiveRecordingEnabled={this.selectiveRecordingEnabled}
@@ -123,6 +126,7 @@ class SourceSelectorModule {
         isStreamVisible,
         isGuestCamActive,
         parentId: node.parentId,
+        canShowActions: itemsForNode.length > 0,
         isFolder,
       };
     });
@@ -307,10 +311,6 @@ class SourceSelectorModule {
     }
   }
 
-  canShowActions(sceneNodeId: string) {
-    return this.getItemsForNode(sceneNodeId).length > 0;
-  }
-
   get lastSelectedId() {
     return this.selectionService.state.lastSelectedId;
   }
@@ -411,7 +411,7 @@ class SourceSelectorModule {
 }
 
 function SourceSelector() {
-  const { nodeData } = useModule(SourceSelectorModule);
+  const { nodeData, setShowTreeMask } = useModule(SourceSelectorModule);
   return (
     <>
       <StudioControls />
@@ -510,6 +510,8 @@ function ItemsTree() {
     makeActive,
     toggleFolder,
     handleSort,
+    showTreeMask,
+    setShowTreeMask,
   } = useModule(SourceSelectorModule);
 
   // Force a rerender when the state of selective recording changes
@@ -521,25 +523,37 @@ function ItemsTree() {
   const treeData = getTreeData(nodeData);
 
   return (
-    <Scrollable
-      className={cx(styles.scenesContainer, styles.sourcesContainer)}
+    <div
       style={{ height: 'calc(100% - 33px)' }}
-      onContextMenu={(e: React.MouseEvent) => showContextMenu('', e)}
+      // antd Tree swallows all drag events unless a TreeNode is being dragged.
+      // This allows us to drag files into the tree to add them to the scene
+      // by persisting a transparent div on top of the tree unless no buttons are
+      // being held over it.
+      onMouseEnter={(e: React.MouseEvent) => setShowTreeMask(e.buttons !== 0)}
+      onMouseUp={() => setShowTreeMask(false)}
+      onMouseLeave={() => setShowTreeMask(true)}
     >
-      <Tree
-        selectedKeys={activeItemIds}
-        expandedKeys={expandedFoldersIds}
-        onSelect={(selectedKeys, info) => makeActive(info)}
-        onExpand={(selectedKeys, info) => toggleFolder(info.node.key as string)}
-        onRightClick={info => showContextMenu(info.node.key as string, info.event)}
-        onDrop={handleSort}
-        treeData={treeData}
-        draggable
-        multiple
-        blockNode
-        showIcon
-      />
-    </Scrollable>
+      <Scrollable
+        className={cx(styles.scenesContainer, styles.sourcesContainer)}
+        onContextMenu={(e: React.MouseEvent) => showContextMenu('', e)}
+      >
+        {showTreeMask && <div className={styles.treeMask} data-name="treeMask" />}
+        <Tree
+          selectedKeys={activeItemIds}
+          expandedKeys={expandedFoldersIds}
+          onSelect={(selectedKeys, info) => makeActive(info)}
+          onExpand={(selectedKeys, info) => toggleFolder(info.node.key as string)}
+          onRightClick={info => showContextMenu(info.node.key as string, info.event)}
+          onDrop={handleSort}
+          onDragOver={e => console.log(e)}
+          treeData={treeData}
+          draggable
+          multiple
+          blockNode
+          showIcon
+        />
+      </Scrollable>
+    </div>
   );
 }
 
@@ -554,6 +568,7 @@ const TreeNode = React.forwardRef(
       isRecordingVisible: boolean;
       selectiveRecordingEnabled: boolean;
       isGuestCamActive: boolean;
+      canShowActions: boolean;
       toggleVisibility: (ev: unknown) => unknown;
       toggleLock: (ev: unknown) => unknown;
       cycleSelectiveRecording: (ev: unknown) => void;
@@ -579,17 +594,21 @@ const TreeNode = React.forwardRef(
         onDoubleClick={p.onDoubleClick}
       >
         <span className={styles.sourceTitle}>{p.title}</span>
-        {p.isGuestCamActive && <i className="fa fa-signal" style={{ color: 'var(--teal)' }} />}
-        {p.selectiveRecordingEnabled && (
-          <Tooltip title={selectiveRecordingMetadata().tooltip} placement="left">
-            <i
-              className={cx(selectiveRecordingMetadata().icon, { disabled: p.isLocked })}
-              onClick={p.cycleSelectiveRecording}
-            />
-          </Tooltip>
+        {p.canShowActions && (
+          <>
+            {p.isGuestCamActive && <i className="fa fa-signal" style={{ color: 'var(--teal)' }} />}
+            {p.selectiveRecordingEnabled && (
+              <Tooltip title={selectiveRecordingMetadata().tooltip} placement="left">
+                <i
+                  className={cx(selectiveRecordingMetadata().icon, { disabled: p.isLocked })}
+                  onClick={p.cycleSelectiveRecording}
+                />
+              </Tooltip>
+            )}
+            <i onClick={p.toggleLock} className={p.isLocked ? 'icon-lock' : 'icon-unlock'} />
+            <i onClick={p.toggleVisibility} className={p.isVisible ? 'icon-view' : 'icon-hide'} />
+          </>
         )}
-        <i onClick={p.toggleLock} className={p.isLocked ? 'icon-lock' : 'icon-unlock'} />
-        <i onClick={p.toggleVisibility} className={p.isVisible ? 'icon-view' : 'icon-hide'} />
       </div>
     );
   },

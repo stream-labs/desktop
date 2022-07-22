@@ -106,7 +106,6 @@ export default function SideNav() {
       svgIcon: <HighlighterIcon />,
       title: 'Highlighter',
       trackingTarget: 'highlighter',
-      newBadge: true,
     });
   }
 
