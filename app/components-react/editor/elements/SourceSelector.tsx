@@ -21,6 +21,7 @@ import Scrollable from 'components-react/shared/Scrollable';
 import HelpTip from 'components-react/shared/HelpTip';
 import Translate from 'components-react/shared/Translate';
 import { WidgetsService } from '../../../app-services';
+import { GuestCamService } from 'app-services';
 
 interface ISourceMetadata {
   id: string;
@@ -30,6 +31,7 @@ interface ISourceMetadata {
   isLocked: boolean;
   isStreamVisible: boolean;
   isRecordingVisible: boolean;
+  isGuestCamActive: boolean;
   isFolder: boolean;
   canShowActions: boolean;
   parentId?: string;
@@ -43,6 +45,7 @@ class SourceSelectorModule {
   private editorCommandsService = inject(EditorCommandsService);
   private streamingService = inject(StreamingService);
   private audioService = inject(AudioService);
+  private guestCamService = inject(GuestCamService);
 
   sourcesTooltip = $t('The building blocks of your scene. Also contains widgets.');
   addSourceTooltip = $t('Add a new Source to your Scene. Includes widgets.');
@@ -82,6 +85,7 @@ class SourceSelectorModule {
               selectiveRecordingEnabled={this.selectiveRecordingEnabled}
               isStreamVisible={sceneNode.isStreamVisible}
               isRecordingVisible={sceneNode.isRecordingVisible}
+              isGuestCamActive={sceneNode.isGuestCamActive}
               cycleSelectiveRecording={() => this.cycleSelectiveRecording(sceneNode.id)}
               ref={this.nodeRefs[sceneNode.id]}
               onDoubleClick={() => this.sourceProperties(sceneNode.id)}
@@ -105,6 +109,12 @@ class SourceSelectorModule {
       const isLocked = itemsForNode.every(i => i.locked);
       const isRecordingVisible = itemsForNode.every(i => i.recordingVisible);
       const isStreamVisible = itemsForNode.every(i => i.streamVisible);
+      const isGuestCamActive = itemsForNode.some(i => {
+        return (
+          this.sourcesService.state.sources[i.sourceId].type === 'mediasoupconnector' &&
+          this.guestCamService.state.guestInfo
+        );
+      });
 
       const isFolder = !isItem(node);
       return {
@@ -115,6 +125,7 @@ class SourceSelectorModule {
         isLocked,
         isRecordingVisible,
         isStreamVisible,
+        isGuestCamActive,
         parentId: node.parentId,
         canShowActions: itemsForNode.length > 0,
         isFolder,
@@ -558,6 +569,7 @@ const TreeNode = React.forwardRef(
       isStreamVisible: boolean;
       isRecordingVisible: boolean;
       selectiveRecordingEnabled: boolean;
+      isGuestCamActive: boolean;
       canShowActions: boolean;
       toggleVisibility: (ev: unknown) => unknown;
       toggleLock: (ev: unknown) => unknown;
@@ -586,6 +598,7 @@ const TreeNode = React.forwardRef(
         <span className={styles.sourceTitle}>{p.title}</span>
         {p.canShowActions && (
           <>
+            {p.isGuestCamActive && <i className="fa fa-signal" style={{ color: 'var(--teal)' }} />}
             {p.selectiveRecordingEnabled && (
               <Tooltip title={selectiveRecordingMetadata().tooltip} placement="left">
                 <i

@@ -1,19 +1,19 @@
+import { ExclamationCircleOutlined, QuestionCircleOutlined } from '@ant-design/icons';
+import * as remote from '@electron/remote';
 import { Alert, Button, Modal, Tabs, Tooltip } from 'antd';
 import { useVuex } from 'components-react/hooks';
+import { Spinner } from 'components-react/pages/Loader';
 import { Services } from 'components-react/service-provider';
 import Display from 'components-react/shared/Display';
 import { ListInput, SliderInput, TextInput } from 'components-react/shared/inputs';
 import Form from 'components-react/shared/inputs/Form';
 import { ModalLayout } from 'components-react/shared/ModalLayout';
 import React, { useMemo, useState } from 'react';
+import { EDismissable } from 'services/dismissables';
 import { EDeviceType } from 'services/hardware';
 import { $t } from 'services/i18n';
-import * as remote from '@electron/remote';
-import { Spinner } from 'components-react/pages/Loader';
-import { byOS, OS } from 'util/operating-systems';
 import { TSourceType } from 'services/sources';
-import { ExclamationCircleOutlined } from '@ant-design/icons';
-import { EDismissable } from 'services/dismissables';
+import { byOS, OS } from 'util/operating-systems';
 
 export default function GuestCamProperties() {
   const {
@@ -42,6 +42,8 @@ export default function GuestCamProperties() {
     guestInfo,
     volume,
     showFirstTimeModal,
+    joinAsGuest,
+    hostName,
   } = useVuex(() => ({
     produceOk: GuestCamService.state.produceOk,
     visible: GuestCamService.views.guestVisible,
@@ -62,6 +64,8 @@ export default function GuestCamProperties() {
     guestInfo: GuestCamService.state.guestInfo,
     volume: GuestCamService.views.deflection,
     showFirstTimeModal: DismissablesService.views.shouldShow(EDismissable.GuestCamFirstTimeModal),
+    joinAsGuest: !!GuestCamService.state.joinAsGuestHash,
+    hostName: GuestCamService.state.hostName,
   }));
   const [regeneratingLink, setRegeneratingLink] = useState(false);
 
@@ -76,6 +80,16 @@ export default function GuestCamProperties() {
     if (!source) return;
 
     EditorCommandsService.actions.executeCommand('SetDeflectionCommand', source.sourceId, val);
+  }
+
+  function getModalContent() {
+    if (joinAsGuest) {
+      return <JoinAsGuestModalContent />;
+    } else if (showFirstTimeModal) {
+      return <FirstTimeModalContent />;
+    } else {
+      return <EveryTimeModalContent />;
+    }
   }
 
   return (
@@ -138,12 +152,27 @@ export default function GuestCamProperties() {
               <h3>{$t('Source: %{sourceName}', { sourceName: source?.name })}</h3>
               <div style={{ display: 'flex', flexDirection: 'row' }}>
                 <div style={{ flexGrow: 1 }}>
-                  <TextInput
-                    readOnly
-                    value={inviteUrl}
-                    label={$t('Invite URL')}
-                    style={{ width: '100%', margin: '10px 0 20px' }}
-                  />
+                  <div style={{ height: 32, margin: '10px 0 10px' }}>
+                    {joinAsGuest ? (
+                      <div>
+                        <b>{$t('Connected To Host:')}</b> <span style={{ color: 'var(--title)' }}>{hostName}</span>
+                        <Tooltip
+                          title={$t(
+                            "You are connected as a guest using someone else's invite link. To leave, click the Disconnect button.",
+                          )}
+                        >
+                          <QuestionCircleOutlined style={{ marginLeft: 6 }} />
+                        </Tooltip>
+                      </div>
+                    ) : (
+                      <TextInput
+                        readOnly
+                        value={inviteUrl}
+                        label={$t('Invite URL')}
+                        style={{ width: '100%' }}
+                      />
+                    )}
+                  </div>
                   <SliderInput
                     label={$t('Volume')}
                     value={volume}
@@ -153,7 +182,7 @@ export default function GuestCamProperties() {
                     debounce={500}
                     step={0.01}
                     tipFormatter={v => `${(v * 100).toFixed(0)}%`}
-                    style={{ width: '100%', margin: '10px 0' }}
+                    style={{ width: '100%', margin: '20px 0' }}
                   />
                 </div>
                 <div style={{ width: 350, marginLeft: 20 }}>
@@ -162,33 +191,41 @@ export default function GuestCamProperties() {
                       display: 'flex',
                       flexDirection: 'row',
                       justifyContent: 'space-between',
-                      margin: '10px 0 20px',
+                      margin: '10px 0',
+                      height: 32,
                     }}
                   >
-                    <Tooltip title={$t('Copied!')} trigger="click">
-                      <Button
-                        onClick={() => remote.clipboard.writeText(inviteUrl)}
-                        style={{ width: 160 }}
-                      >
-                        {$t('Copy Link')}
-                      </Button>
-                    </Tooltip>
-                    <Button
-                      disabled={regeneratingLink}
-                      onClick={regenerateLink}
-                      style={{ width: 160 }}
-                    >
-                      {$t('Generate a new link')}
-                      {regeneratingLink && (
-                        <i className="fa fa-spinner fa-pulse" style={{ marginLeft: 8 }} />
-                      )}
-                    </Button>
+                    {joinAsGuest ? (
+                      <></>
+                    ) : (
+                      <>
+                        <Tooltip title={$t('Copied!')} trigger="click">
+                          <Button
+                            onClick={() => remote.clipboard.writeText(inviteUrl)}
+                            style={{ width: 160 }}
+                          >
+                            {$t('Copy Link')}
+                          </Button>
+                        </Tooltip>
+                        <Button
+                          disabled={regeneratingLink}
+                          onClick={regenerateLink}
+                          style={{ width: 160 }}
+                        >
+                          {$t('Generate a new link')}
+                          {regeneratingLink && (
+                            <i className="fa fa-spinner fa-pulse" style={{ marginLeft: 8 }} />
+                          )}
+                        </Button>
+                      </>
+                    )}
                   </div>
                   <div
                     style={{
                       display: 'flex',
                       flexDirection: 'row',
                       justifyContent: 'space-between',
+                      margin: '20px 0 0',
                     }}
                   >
                     <Button
@@ -202,7 +239,7 @@ export default function GuestCamProperties() {
                     <button
                       className="button button--soft-warning"
                       style={{ width: 160 }}
-                      disabled={!guestInfo}
+                      disabled={!guestInfo && !joinAsGuest}
                       onClick={() => GuestCamService.actions.disconnectGuest()}
                     >
                       {$t('Disconnect')}
@@ -225,7 +262,11 @@ export default function GuestCamProperties() {
                     }}
                   >
                     <Spinner />
-                    <div style={{ textAlign: 'center' }}>{$t('Waiting for guest to join')}</div>
+                    <div style={{ textAlign: 'center' }}>
+                      {joinAsGuest
+                        ? $t('Waiting for host to begin')
+                        : $t('Waiting for guest to join')}
+                    </div>
                   </div>
                 )}
               </div>
@@ -244,7 +285,7 @@ export default function GuestCamProperties() {
         }}
         onCancel={() => WindowsService.actions.closeChildWindow()}
       >
-        {showFirstTimeModal ? <FirstTimeModalContent /> : <EveryTimeModalContent />}
+        {getModalContent()}
       </Modal>
     </ModalLayout>
   );
@@ -294,6 +335,23 @@ function FirstTimeModalContent() {
         showIcon={false}
         banner
       />
+    </>
+  );
+}
+
+function JoinAsGuestModalContent() {
+  const { GuestCamService } = Services;
+  const { hostName } = useVuex(() => ({ hostName: GuestCamService.state.hostName }));
+
+  return (
+    <>
+      <h2>{$t("You're about to join %{name}", { name: hostName })}</h2>
+      <p>
+        {$t(
+          "%{name} has invited you to join their stream. When you're ready to join, click the button below.",
+          { name: hostName },
+        )}
+      </p>
     </>
   );
 }
