@@ -4,11 +4,10 @@ import { DataNode } from 'rc-tree/lib/interface';
 import { TreeProps } from 'rc-tree/lib/Tree';
 import cx from 'classnames';
 import { inject, injectState, injectWatch, mutation, useModule } from 'slap';
-import { SourcesService, SourceDisplayData } from 'services/sources';
+import { SourcesService } from 'services/sources';
 import { ScenesService, ISceneItem, TSceneNode, isItem } from 'services/scenes';
 import { SelectionService } from 'services/selection';
 import { EditMenu } from 'util/menus/EditMenu';
-import { WidgetDisplayData } from 'services/widgets';
 import { $t } from 'services/i18n';
 import { EditorCommandsService } from 'services/editor-commands';
 import { EPlaceType } from 'services/editor-commands/commands/reorder-nodes';
@@ -21,6 +20,7 @@ import styles from './SceneSelector.m.less';
 import Scrollable from 'components-react/shared/Scrollable';
 import HelpTip from 'components-react/shared/HelpTip';
 import Translate from 'components-react/shared/Translate';
+import { WidgetsService } from '../../../app-services';
 
 interface ISourceMetadata {
   id: string;
@@ -38,6 +38,7 @@ interface ISourceMetadata {
 class SourceSelectorModule {
   private scenesService = inject(ScenesService);
   private sourcesService = inject(SourcesService);
+  private widgetsService = inject(WidgetsService);
   private selectionService = inject(SelectionService);
   private editorCommandsService = inject(EditorCommandsService);
   private streamingService = inject(StreamingService);
@@ -141,7 +142,8 @@ class SourceSelectorModule {
         : 'fa fa-folder';
     }
 
-    const source = this.sourcesService.state.sources[sourceId];
+    const { sourcesService, widgetsService } = this;
+    const source = sourcesService.state.sources[sourceId];
 
     if (source.propertiesManagerType === 'streamlabels') {
       return 'fas fa-file-alt';
@@ -154,10 +156,10 @@ class SourceSelectorModule {
 
       assertIsDefined(widgetType);
 
-      return WidgetDisplayData()[widgetType]?.icon || 'icon-error';
+      return widgetsService.widgetDisplayData[widgetType]?.icon || 'icon-error';
     }
 
-    return SourceDisplayData()[source.type]?.icon || 'fas fa-file';
+    return sourcesService.sourceDisplayData[source.type]?.icon || 'fas fa-file';
   }
 
   addSource() {
@@ -400,7 +402,7 @@ class SourceSelectorModule {
 }
 
 function SourceSelector() {
-  const { nodeData, setShowTreeMask } = useModule(SourceSelectorModule);
+  const { nodeData } = useModule(SourceSelectorModule);
   return (
     <>
       <StudioControls />
