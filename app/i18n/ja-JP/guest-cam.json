@@ -26,5 +26,10 @@
   "Don't share your invite link with anyone you don't want on your stream. You can invalidate an old link by generating a new one. Do not show this window on stream.": "ストリームに参加させたくない人とは招待リンクを共有しないでください。新しいリンクを生成することで、古いリンクを無効にすることができます。このウィンドウをストリームに表示しないでください。",
   "Start Collab Cam": "Collab Cam の起動",
   "Collab Cam is not yet sending your video and audio to guests. Start Collab Cam?": "Collab Cam は、動画とオーディオをゲストにまだ送信していません。Collab Cam を起動しますか？",
-  "Copy Link": "リンクをコピー"
+  "Copy Link": "リンクをコピー",
+  "You're about to join %{name}": "You're about to join %{name}",
+  "%{name} has invited you to join their stream. When you're ready to join, click the button below.": "%{name} has invited you to join their stream. When you're ready to join, click the button below.",
+  "Waiting for host to begin": "Waiting for host to begin",
+  "Connected To Host:": "Connected To Host:",
+  "You are connected as a guest using someone else's invite link. To leave, click the Disconnect button.": "You are connected as a guest using someone else's invite link. To leave, click the Disconnect button."
 }
