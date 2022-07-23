@@ -26,5 +26,10 @@
   "Don't share your invite link with anyone you don't want on your stream. You can invalidate an old link by generating a new one. Do not show this window on stream.": "스트리밍에 초대할 사람 외에는 초대 링크를 공유하지 마세요. 새 링크를 생성하면 이전 링크가 유효성을 상실합니다. 스트리밍에 이 창을 표시하지 마세요.",
   "Start Collab Cam": "Collab Cam 시작",
   "Collab Cam is not yet sending your video and audio to guests. Start Collab Cam?": "Collab Cam은 아직 게스트에게 내 비디오 및 오디오를 전송하지 않습니다. Collab Cam을 시작할까요?",
-  "Copy Link": "링크 복사"
+  "Copy Link": "링크 복사",
+  "You're about to join %{name}": "You're about to join %{name}",
+  "%{name} has invited you to join their stream. When you're ready to join, click the button below.": "%{name} has invited you to join their stream. When you're ready to join, click the button below.",
+  "Waiting for host to begin": "Waiting for host to begin",
+  "Connected To Host:": "Connected To Host:",
+  "You are connected as a guest using someone else's invite link. To leave, click the Disconnect button.": "You are connected as a guest using someone else's invite link. To leave, click the Disconnect button."
 }
