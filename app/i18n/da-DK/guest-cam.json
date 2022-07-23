@@ -26,5 +26,10 @@
   "Don't share your invite link with anyone you don't want on your stream. You can invalidate an old link by generating a new one. Do not show this window on stream.": "Du må ikke dele dit invitationslink med nogen, du ikke ønsker at have på din stream. Du kan gøre et gammelt link ugyldigt ved at generere et nyt. Dette vindue må ikke vises på stream.",
   "Start Collab Cam": "Start Collab Cam",
   "Collab Cam is not yet sending your video and audio to guests. Start Collab Cam?": "Collab Cam sender endnu ikke din video og lyd til gæsterne. Start Collab Cam?",
-  "Copy Link": "Kopiér link"
+  "Copy Link": "Kopiér link",
+  "You're about to join %{name}": "You're about to join %{name}",
+  "%{name} has invited you to join their stream. When you're ready to join, click the button below.": "%{name} has invited you to join their stream. When you're ready to join, click the button below.",
+  "Waiting for host to begin": "Waiting for host to begin",
+  "Connected To Host:": "Connected To Host:",
+  "You are connected as a guest using someone else's invite link. To leave, click the Disconnect button.": "You are connected as a guest using someone else's invite link. To leave, click the Disconnect button."
 }
