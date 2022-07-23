@@ -26,5 +26,10 @@
   "Don't share your invite link with anyone you don't want on your stream. You can invalidate an old link by generating a new one. Do not show this window on stream.": "Davet bağlantınızı yayınınıza katılmasını istemediğiniz hiç kimseyle paylaşmayın. Yeni bir bağlantı oluşturarak eski bağlantıyı geçersiz kılabilirsiniz. Bunu yayında göstermeyin.",
   "Start Collab Cam": "İş Birliği Kamerasını Başlatın",
   "Collab Cam is not yet sending your video and audio to guests. Start Collab Cam?": "İş Birliği Kamerası videonuzu ve sesinizi henüz konuklarınıza iletmiyor. İş Birliği Kamerasını Başlatılsın mı?",
-  "Copy Link": "Bağlantıyı Kopyalayın"
+  "Copy Link": "Bağlantıyı Kopyalayın",
+  "You're about to join %{name}": "You're about to join %{name}",
+  "%{name} has invited you to join their stream. When you're ready to join, click the button below.": "%{name} has invited you to join their stream. When you're ready to join, click the button below.",
+  "Waiting for host to begin": "Waiting for host to begin",
+  "Connected To Host:": "Connected To Host:",
+  "You are connected as a guest using someone else's invite link. To leave, click the Disconnect button.": "You are connected as a guest using someone else's invite link. To leave, click the Disconnect button."
 }
