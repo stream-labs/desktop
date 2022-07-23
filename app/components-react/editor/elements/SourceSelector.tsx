@@ -268,6 +268,8 @@ class SourceSelectorModule {
     const placement = this.determinePlacement(info);
 
     if (!nodesToDrop || !destNode) return;
+    if (targetNodes.some(nodeId => nodeId === destNode.id)) return;
+
     await this.editorCommandsService.actions.return.executeCommand(
       'ReorderNodesCommand',
       nodesToDrop,
@@ -276,12 +278,7 @@ class SourceSelectorModule {
     );
   }
 
-  makeActive(info: {
-    selected: boolean;
-    node: DataNode;
-    selectedNodes: DataNode[];
-    nativeEvent: MouseEvent;
-  }) {
+  makeActive(info: { node: DataNode; nativeEvent: MouseEvent }) {
     this.callCameFromInsideTheHouse = true;
     let ids: string[] = [info.node.key as string];
 
@@ -545,7 +542,6 @@ function ItemsTree() {
           onExpand={(selectedKeys, info) => toggleFolder(info.node.key as string)}
           onRightClick={info => showContextMenu(info.node.key as string, info.event)}
           onDrop={handleSort}
-          onDragOver={e => console.log(e)}
           treeData={treeData}
           draggable
           multiple
