@@ -23,12 +23,14 @@ export async function clickAddSource() {
 }
 
 export async function clickRemoveSource(name: string) {
-  await clickSourceAction(`[data-name="${name}"] .icon-trash`);
+  const $el = await (await select(`[data-name="${name}"]`)).$('.icon-trash');
+  await $el.click();
   await dialogDismiss('OK');
 }
 
 export async function clickSourceProperties(name: string) {
-  await clickSourceAction(`[data-name=${name}] .icon-settings`);
+  const $el = await (await select(`[data-name="${name}"]`)).$('.icon-settings');
+  await $el.click();
 }
 
 export async function selectSource(name: string) {

@@ -14,7 +14,8 @@ export async function clickAddScene() {
 }
 
 export async function clickRemoveScene(name: string) {
-  await clickSceneAction(`[data-name="${name}"] .icon-trash`);
+  const $el = await (await select(`[data-name="${name}"]`)).$('.icon-trash');
+  await $el.click();
   await dialogDismiss('OK');
 }
 
