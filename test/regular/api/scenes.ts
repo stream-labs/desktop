@@ -228,8 +228,7 @@ test('SceneItem.addFile()', async t => {
   scene.clear();
   scene.addFile(dataDir);
 
-  t.true(
-    sceneBuilder.isEqualTo(`
+  const success = sceneBuilder.isEqualTo(`
     sources-files
       html
         hello.html: browser_source
@@ -241,8 +240,13 @@ test('SceneItem.addFile()', async t => {
         chatbox.mp4: ffmpeg_source
       text
         hello.txt: text_gdiplus
-  `),
-  );
+  `);
+
+	// This is a workaround for the slow volume meter drawing on the test machines.
+	// We wait for some time to allow the UI to finalize initialization before app closing.
+	await new Promise(resolve => setTimeout(resolve, 10000));
+
+  t.true(success);
 });
 
 test('Try to make a not existing scene active', async t => {
