@@ -10,7 +10,7 @@ import { focusMain } from '../helpers/modules/core';
 useSpectron();
 
 test('Selective Recording', async t => {
-  const sourceType = 'Browser Source';
+  const sourceType = 'Browser Window';
   const sourceName = `Example ${sourceType}`;
   const { client } = t.context.app;
   const tmpDir = await setTemporaryRecordingPath();

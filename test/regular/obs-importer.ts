@@ -67,7 +67,7 @@ test('OBS Importer', async t => {
   await switchCollection('Collection 1');
   t.true(await sceneExisting('Scene'));
   t.true(await sceneExisting('Scene 2'));
-  t.true(await sourceIsExisting('Color Source'));
+  t.true(await sourceIsExisting('Color Block'));
   t.true(await sourceIsExisting('Text (GDI+)'));
 
   // check collection 2 exists

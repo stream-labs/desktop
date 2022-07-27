@@ -27,14 +27,14 @@ export const SourceDisplayData = (): { [key: string]: ISourceDisplayData } => ({
     icon: 'icon-image',
   },
   color_source: {
-    name: $t('Color Source'),
+    name: $t('Color Block'),
     description: $t('Add a color to the background of your whole scene or just a part.'),
     demoFilename: 'color-source.png',
     supportList: colorSupport,
     icon: 'fas fa-fill',
   },
   browser_source: {
-    name: $t('Browser Source'),
+    name: $t('Browser Window'),
     description: $t(
       'Allows you to add web-based content as a source, such as web pages, widgets, and streaming video.',
     ),
@@ -43,7 +43,7 @@ export const SourceDisplayData = (): { [key: string]: ISourceDisplayData } => ({
     icon: 'fas fa-globe',
   },
   ffmpeg_source: {
-    name: $t('Media Source'),
+    name: $t('Media File'),
     description: $t('Add videos or sound clips to your scene.'),
     demoFilename: 'media.png',
     supportList: mediaSupport,
