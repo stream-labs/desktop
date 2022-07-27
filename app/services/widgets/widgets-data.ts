@@ -674,7 +674,7 @@ export const WidgetDisplayData = (platform?: string): { [x: number]: IWidgetDisp
     demoVideo: false,
     demoFilename: 'game-widget.png',
     supportList: [],
-    platforms: new Set(['twitch']),
+    platforms: new Set(['twitch', 'youtube']),
     icon: 'icon-face-masks',
   },
 });
