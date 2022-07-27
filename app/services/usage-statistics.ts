@@ -1,12 +1,13 @@
-import { Inject } from './core/injector';
-import { UserService } from './user';
-import { HostsService } from './hosts';
+import { randomBytes } from 'crypto';
+import electron from 'electron';
 import fs from 'fs';
 import path from 'path';
-import electron from 'electron';
+import { Inject } from './core/injector';
 import { Service } from './core/service';
-import { randomBytes } from 'crypto';
+import { HostsService } from './hosts';
+import { QuestionaireService } from './questionaire';
 import { EncoderType } from './settings/optimizer';
+import { UserService } from './user';
 
 function randomCharacters(len: number): string {
   const buf = randomBytes(len);
@@ -19,6 +20,7 @@ function randomCharacters(len: number): string {
 export type TUsageEvent =
   | {
     event: 'stream_start' | 'stream_end';
+    uuid?: string;
     user_id: string | null;
     platform: string;
     stream_track_id: string;
@@ -66,17 +68,6 @@ export type TUsageEvent =
 
 type TAnalyticsEvent = 'TCP_API_REQUEST' | 'FacebookLogin'; // add more types if you need
 
-interface IAnalyticsEvent {
-  product: string;
-  version: number;
-  event: string;
-  value?: any;
-  time?: string;
-  count?: number;
-  uuid?: string;
-  saveUser?: boolean;
-}
-
 export function track(event: TUsageEvent) {
   return (target: any, methodName: string, descriptor: PropertyDescriptor) => {
     return {
@@ -92,6 +83,7 @@ export function track(event: TUsageEvent) {
 export class UsageStatisticsService extends Service {
   @Inject() userService: UserService;
   @Inject() hostsService: HostsService;
+  @Inject() questionaireService: QuestionaireService;
 
   installerId: string;
   version = electron.remote.process.env.NAIR_VERSION;
@@ -148,7 +140,10 @@ export class UsageStatisticsService extends Service {
       const request = new Request(`${this.hostsService.statistics}/action`, {
         headers,
         method: 'POST',
-        body: JSON.stringify(event),
+        body: JSON.stringify({
+          uuid: this.questionaireService.uuid, // inject UUID
+          ...event,
+        }),
       });
 
       return fetch(request);
