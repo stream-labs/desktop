@@ -544,6 +544,8 @@ const TreeNode = React.forwardRef(
         : { icon: 'icon-studio', tooltip: $t('Only visible on Recording') };
     }
 
+    const [hoveredIcon, setHoveredIcon] = useState('');
+
     return (
       <div
         className={styles.sourceTitleContainer}
@@ -567,11 +569,29 @@ const TreeNode = React.forwardRef(
             <i onClick={p.toggleVisibility} className={p.isVisible ? 'icon-view' : 'icon-hide'} />
           </>
         )}
-        <Tooltip title={$t('Remove Sources from your Scene.')} placement="left">
-          <i onClick={p.removeSource} className="icon-trash" />
+        <Tooltip
+          title={$t('Remove Sources from your Scene.')}
+          placement="left"
+          visible={hoveredIcon === 'icon-trash'}
+        >
+          <i
+            onClick={p.removeSource}
+            className="icon-trash"
+            onMouseEnter={() => setHoveredIcon('icon-trash')}
+            onMouseLeave={() => setHoveredIcon('')}
+          />
         </Tooltip>
-        <Tooltip title={$t('Open the Source Properties.')} placement="left">
-          <i onClick={p.sourceProperties} className="icon-settings" />
+        <Tooltip
+          title={$t('Open the Source Properties.')}
+          placement="left"
+          visible={hoveredIcon === 'icon-settings'}
+        >
+          <i
+            onClick={p.sourceProperties}
+            className="icon-settings"
+            onMouseEnter={() => setHoveredIcon('icon-settings')}
+            onMouseLeave={() => setHoveredIcon('')}
+          />
         </Tooltip>
       </div>
     );
