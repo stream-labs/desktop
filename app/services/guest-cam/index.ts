@@ -677,7 +677,7 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
   /**
    * Disconnects the currently connected guest
    */
-  disconnectGuest() {
+  async disconnectGuest() {
     // Add the stream id to the list of disconnected guests, so we don't
     // immediately connect to that same guest again until they are forced
     // to refresh the page.
@@ -685,7 +685,7 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
       this.disconnectedStreamIds.push(this.state.guestInfo.streamId);
     }
 
-    this.cleanUpSocketConnection();
+    await this.cleanUpSocketConnection();
     this.startListeningForGuests();
   }
 
