@@ -565,7 +565,7 @@ const TreeNode = React.forwardRef(
         <span className={styles.sourceTitle}>{p.title}</span>
         {p.canShowActions && (
           <>
-            {p.isGuestCamActive && <i className="fa fa-signal" style={{ color: 'var(--teal)' }} />}
+            {p.isGuestCamActive && <i className="fa fa-signal" />}
             {p.selectiveRecordingEnabled && (
               <Tooltip title={selectiveRecordingMetadata().tooltip} placement="left">
                 <i
