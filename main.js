@@ -338,6 +338,11 @@ async function startApp() {
   // we will refactor this to not use electron IPC, which will make it much
   // more efficient.
   ipcMain.on('getWorkerWindowId', event => {
+    if (workerWindow.isDestroyed()) {
+      // prevent potential race-condition issues on app close
+      // https://github.com/stream-labs/desktop/pull/4239
+      return;
+    }
     event.returnValue = workerWindow.webContents.id;
   });
 
