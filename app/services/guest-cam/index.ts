@@ -26,6 +26,13 @@ import { JsonrpcService } from 'services/api/jsonrpc';
 import { EStreamingState } from 'services/streaming';
 
 /**
+ * This is in actuality a big data blob at runtime, the shape
+ * of which we don't care about. This effectively implements this
+ * as an opaque type that we don't do anything to and just pass along.
+ */
+export type TConnectParams = { __type: 'ConnectParams' };
+
+/**
  * Interface describing the various functions and expected return values
  * we can make to the plugin using `callHandler`
  */
@@ -33,7 +40,7 @@ export interface IObsReturnTypes {
   func_create_send_transport: {};
   func_load_device: {};
   func_create_audio_producer: {
-    connect_params: unknown;
+    connect_params: TConnectParams;
   };
   func_create_video_producer: {
     produce_params: {
@@ -52,10 +59,10 @@ export interface IObsReturnTypes {
   func_produce_result: {};
   func_create_receive_transport: {};
   func_video_consumer_response: {
-    connect_params: Object;
+    connect_params: TConnectParams;
   };
   func_audio_consumer_response: {
-    connect_params: Object;
+    connect_params: TConnectParams;
   };
   func_stop_consumer: {};
   func_stop_sender: {};
@@ -187,8 +194,12 @@ class GuestCamViews extends ViewHandler<IGuestCamServiceState> {
     return this.getServiceViews(SourcesService).getSource(this.audioSourceId);
   }
 
+  get sources() {
+    return this.getServiceViews(SourcesService).getSourcesByType('mediasoupconnector');
+  }
+
   get sourceId() {
-    return this.getServiceViews(SourcesService).getSourcesByType('mediasoupconnector')[0]?.sourceId;
+    return this.sources[0]?.sourceId;
   }
 
   get source() {
@@ -468,7 +479,8 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
       this.log('Unable to ensure filters but continuing with producer creation', e);
     }
 
-    this.producer = new Producer();
+    // It doesn't matter which source we produce from, so just pick the first one
+    this.producer = new Producer(this.views.sources[0].sourceId);
 
     await this.producer.connect();
   }
@@ -605,7 +617,12 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
 
       this.views.source.updateSettings({ room: this.room });
 
-      this.makeObsRequest('func_load_device', this.auth.rtpCapabilities);
+      // It doesn't matter which source we call this on
+      this.makeObsRequest(
+        this.views.sources[0].sourceId,
+        'func_load_device',
+        this.auth.rtpCapabilities,
+      );
     });
     this.socket.on('connect_error', (e: any) => this.log('Connection Error', e));
     this.socket.on('connect_timeout', () => this.log('Connection Timeout'));
@@ -641,22 +658,22 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
 
     this.SET_GUEST({ name: event.data.name, streamId: event.data.streamId });
 
-    // Clean up any existing consumer before connecting the new one
-    if (this.consumer) {
-      this.consumer.destroy();
-    }
-
     // If we're allowed to produce, we should start producing right now
     if (!this.producer && this.state.produceOk) {
       this.startProducing();
     }
 
-    this.consumer = new Consumer(event.data);
-    this.consumer.connect();
+    if (!this.consumer) {
+      this.consumer = new Consumer(this.views.sources[0].sourceId, event.data);
+      this.consumer.connect();
+    } else {
+      // TODO: Guest indexing
+      this.consumer.addGuest(this.views.sources[1].sourceId, event.data);
+    }
 
     // Make sure the source isn't visible in any scene
-    this.views.source.setForceHidden(true);
-    this.views.source.setForceMuted(true);
+    // this.views.source.setForceHidden(true);
+    // this.views.source.setForceMuted(true);
 
     this.emitStreamingStatus();
 
@@ -755,6 +772,7 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
   }
 
   makeObsRequest<TFunc extends keyof IObsReturnTypes>(
+    sourceId: string,
     func: TFunc,
     arg?: Object,
   ): IObsReturnTypes[TFunc] {
@@ -774,7 +792,9 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
       throw new Error(`Unsupported arg type for OBS call ${arg}`);
     }
 
-    let result = (this.views.source.getObsInput().callHandler(func, stringArg) as any).output;
+    const source = this.sourcesService.views.getSource(sourceId);
+
+    let result = (source.getObsInput().callHandler(func, stringArg) as any).output;
 
     if (result !== '') {
       result = JSON.parse(result);

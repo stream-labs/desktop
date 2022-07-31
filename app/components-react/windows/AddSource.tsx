@@ -98,8 +98,7 @@ export default function AddSource() {
     return overrideExistingSource || !existingSources.length;
   }
 
-  const canCreateNew =
-    existingSources.length > 0 && !['scene', 'mediasoupconnector'].includes(sourceType);
+  const canCreateNew = existingSources.length > 0 && !['scene'].includes(sourceType);
 
   function addExisting() {
     if (!selectedSourceId || !activeScene) return;
