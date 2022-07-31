@@ -1,131 +1,87 @@
 import { Subscription } from 'rxjs';
-import { IConsumerCreatedEvent, IConsumerTrackEvent, IRemoteProducer } from '.';
+import { IConsumerCreatedEvent, IConsumerTrackEvent, IRemoteProducer, TConnectParams } from '.';
+import { Guest } from './guest';
 import { MediasoupEntity } from './mediasoup-entity';
 
 export class Consumer extends MediasoupEntity {
   webrtcSubscription: Subscription;
 
   transportConnected = false;
-  hasAudio = false;
-  hasVideo = false;
-  audioSubscribed = false;
-  videoSubscribed = false;
+  transportId: string;
+  guest: Guest;
 
   destroyed = false;
 
-  constructor(public readonly remoteProducer: IRemoteProducer) {
-    super();
+  constructor(public readonly sourceId: string, public readonly remoteProducer: IRemoteProducer) {
+    super(sourceId);
   }
 
   async connect() {
-    return this.withMutex(() => {
-      this.webrtcSubscription = this.guestCamService.webrtcEvent.subscribe(event => {
-        if (event.type === 'consumerCreated') {
-          this.onConsumerCreated(event);
-        } else if (event.type === 'consumerTrack') {
-          this.onConsumerTrack(event);
-        }
-      });
+    this.webrtcSubscription = this.guestCamService.webrtcEvent.subscribe(event => {
+      if (event.type === 'consumerCreated') {
+        this.onConsumerCreated(event);
+      }
+    });
 
-      this.sendWebRTCRequest({
-        type: 'createConsumer',
-        data: this.remoteProducer,
-      });
+    this.sendWebRTCRequest({
+      type: 'createConsumer',
+      data: this.remoteProducer,
     });
   }
 
-  onConsumerCreated(event: IConsumerCreatedEvent) {
-    return this.withMutex(async () => {
-      this.log('Consumer Created', event);
+  async onConsumerCreated(event: IConsumerCreatedEvent) {
+    this.log('Consumer Created', event);
 
-      const turnConfig = await this.guestCamService.getTurnConfig();
+    this.transportId = event.data.id;
 
-      event.data['iceServers'] = [turnConfig];
+    const turnConfig = await this.guestCamService.getTurnConfig();
 
-      this.makeObsRequest('func_create_receive_transport', event.data);
+    event.data['iceServers'] = [turnConfig];
 
-      if (this.remoteProducer.videoId) {
-        this.hasVideo = true;
-        this.sendWebRTCRequest({
-          type: 'getConsumerTrack',
-          data: {
-            socketId: this.remoteProducer.socketId,
-            streamId: this.remoteProducer.streamId,
-            producerId: this.remoteProducer.videoId,
-            rtpCapabilities: this.guestCamService.auth.rtpCapabilities,
-            consumerTransportId: event.data.id,
-            paused: true,
-          },
-        });
-      }
+    // TODO: Talk to Steven about how much synchronization is really needed here.
+    // For now, just hold up creating the receive transport until the mutext is unlocked.
+    await this.guestCamService.pluginMutex.synchronize();
 
-      if (this.remoteProducer.audioId) {
-        this.hasAudio = true;
-        this.sendWebRTCRequest({
-          type: 'getConsumerTrack',
-          data: {
-            socketId: this.remoteProducer.socketId,
-            streamId: this.remoteProducer.streamId,
-            producerId: this.remoteProducer.audioId,
-            rtpCapabilities: this.guestCamService.auth.rtpCapabilities,
-            consumerTransportId: event.data.id,
-          },
-        });
-      }
-    });
+    this.makeObsRequest('func_create_receive_transport', event.data);
+
+    this.addGuest(this.sourceId, this.remoteProducer);
   }
 
-  onConsumerTrack(event: IConsumerTrackEvent) {
-    return this.withMutex(() => {
-      this.log('Got Consumer Track', event);
+  addGuest(sourceId: string, remoteProducer: IRemoteProducer) {
+    console.log('ADD GUEST');
 
-      const connectParams = this.makeObsRequest(
-        `func_${event.data.kind}_consumer_response`,
-        event.data,
-      ).connect_params;
-
-      this.log('Got Consumer Connect Params', connectParams);
-
-      if (event.data.paused) {
-        this.sendWebRTCRequest({
-          type: 'resumeConsumerTrack',
-          data: {
-            socketId: this.remoteProducer.socketId,
-            streamId: this.remoteProducer.streamId,
-            producerId: event.data.producerId,
-            consumerId: event.data.id,
-          },
-        });
-      }
-
-      // This only needs to be done once, and we don't know which track we will receive first
-      if (!this.transportConnected) {
-        this.sendWebRTCRequest({
-          type: 'connectReceiveTransport',
-          data: {
-            ...connectParams,
-            socketId: this.remoteProducer.socketId,
-            streamId: this.remoteProducer.streamId,
-          },
-        });
-
-        this.makeObsRequest('func_connect_result', 'true');
-
-        this.transportConnected = true;
-
-        this.log('Connected Receive Transport');
-      }
-
-      if (event.data.kind === 'audio') this.audioSubscribed = true;
-      if (event.data.kind === 'video') this.videoSubscribed = true;
-
-      // Figure out if we're completely done to unlock the mutex
-      if ((this.hasAudio && this.audioSubscribed) || !this.hasAudio) {
-        if ((this.hasVideo && this.videoSubscribed) || !this.hasVideo) {
-          this.unlockMutex();
-        }
-      }
+    this.guest = new Guest({
+      name: remoteProducer.name,
+      socketId: remoteProducer.socketId,
+      streamId: remoteProducer.streamId,
+      transportId: this.transportId,
+      audioId: remoteProducer.audioId,
+      videoId: remoteProducer.videoId,
+      sourceId,
     });
+
+    this.guest.connect();
+  }
+
+  /**
+   * Connects this transport on the server side
+   * @param connectParams Data blob the shape of which is opaque to us
+   */
+  async connectOnServer(connectParams: TConnectParams) {
+    this.sendWebRTCRequest({
+      type: 'connectReceiveTransport',
+      data: {
+        ...connectParams,
+        socketId: this.remoteProducer.socketId,
+        streamId: this.remoteProducer.streamId,
+      },
+    });
+
+    this.makeObsRequest('func_connect_result', 'true');
+
+    this.transportConnected = true;
+
+    this.log('Connected Receive Transport');
   }
 
   destroy() {

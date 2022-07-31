@@ -16,14 +16,14 @@ export abstract class MediasoupEntity {
 
   mutexUnlockFunc: () => void;
 
-  constructor() {}
+  constructor(public readonly sourceId: string) {}
 
   sendWebRTCRequest(data: unknown) {
     return this.guestCamService.sendWebRTCRequest(data);
   }
 
   getSource() {
-    return this.guestCamService.views.source;
+    return this.sourcesService.views.getSource(this.sourceId);
   }
 
   makeObsRequest<TFunc extends keyof IObsReturnTypes>(
@@ -34,7 +34,7 @@ export abstract class MediasoupEntity {
       throw new Error('Attempted to make OBS request from destroyed entity');
     }
 
-    return this.guestCamService.makeObsRequest(func, arg);
+    return this.guestCamService.makeObsRequest(this.sourceId, func, arg);
   }
 
   log(...args: unknown[]) {
