@@ -16,6 +16,8 @@ interface IGuestTrackConstructorOptions {
 export class GuestTrack extends MediasoupEntity {
   webrtcSubscription: Subscription;
 
+  private resolve: (val?: unknown) => void;
+
   constructor(public readonly opts: IGuestTrackConstructorOptions) {
     super(opts.sourceId);
   }
@@ -27,7 +29,10 @@ export class GuestTrack extends MediasoupEntity {
       }
     });
 
-    this.requestTrack();
+    return new Promise(resolve => {
+      this.resolve = resolve;
+      this.requestTrack();
+    });
   }
 
   /**
@@ -79,6 +84,8 @@ export class GuestTrack extends MediasoupEntity {
     if (connectParams && !this.guestCamService.consumer.transportConnected) {
       this.guestCamService.consumer.connectTransport(connectParams);
     }
+
+    if (this.resolve) this.resolve();
   }
 
   destroy() {

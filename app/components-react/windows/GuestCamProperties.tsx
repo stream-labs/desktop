@@ -39,7 +39,7 @@ export default function GuestCamProperties() {
     audioSourceExists,
     inviteUrl,
     source,
-    guestInfo,
+    guests,
     volume,
     showFirstTimeModal,
     joinAsGuest,
@@ -61,13 +61,16 @@ export default function GuestCamProperties() {
     audioSourceExists: !!GuestCamService.views.audioSource,
     inviteUrl: GuestCamService.views.inviteUrl,
     source: GuestCamService.views.source,
-    guestInfo: GuestCamService.state.guestInfo,
+    guests: GuestCamService.state.guests,
     volume: GuestCamService.views.deflection,
     showFirstTimeModal: DismissablesService.views.shouldShow(EDismissable.GuestCamFirstTimeModal),
     joinAsGuest: !!GuestCamService.state.joinAsGuestHash,
     hostName: GuestCamService.state.hostName,
   }));
   const [regeneratingLink, setRegeneratingLink] = useState(false);
+
+  // TODO:
+  const guestInfo = guests[0];
 
   async function regenerateLink() {
     setRegeneratingLink(true);
@@ -155,7 +158,8 @@ export default function GuestCamProperties() {
                   <div style={{ height: 32, margin: '10px 0 10px' }}>
                     {joinAsGuest ? (
                       <div>
-                        <b>{$t('Connected To Host:')}</b> <span style={{ color: 'var(--title)' }}>{hostName}</span>
+                        <b>{$t('Connected To Host:')}</b>{' '}
+                        <span style={{ color: 'var(--title)' }}>{hostName}</span>
                         <Tooltip
                           title={$t(
                             "You are connected as a guest using someone else's invite link. To leave, click the Disconnect button.",

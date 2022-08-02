@@ -87,6 +87,10 @@ type TWebRTCSocketEvent =
   | IConsumerTrackEvent
   | IConsumerDestroyedEvent;
 
+/**
+ * Contains all the information about a guest we get from
+ * the server whenever a new guest joins.
+ */
 export interface IRemoteProducer {
   audioId: string;
   name: string;
@@ -144,8 +148,8 @@ interface ITurnConfig {
 }
 
 interface IGuest {
-  name: string;
-  streamId: string;
+  remoteProducer: IRemoteProducer;
+  sourceId?: string;
 }
 
 interface IGuestCamServiceState {
@@ -153,7 +157,8 @@ interface IGuestCamServiceState {
   videoSourceId: string;
   audioSourceId: string;
   inviteHash: string;
-  guestInfo: IGuest;
+
+  guests: IGuest[];
 
   /**
    * If we are connecting to as a guest to someone else's stream, this will
@@ -217,6 +222,15 @@ class GuestCamViews extends ViewHandler<IGuestCamServiceState> {
   get guestVisible() {
     return !this.source?.forceHidden;
   }
+
+  /**
+   * A list of sources which don't currently have a guest assigned
+   */
+  get vacantSources() {
+    return this.sources.filter(source => {
+      return this.state.guests.every(guest => guest.sourceId !== source.sourceId);
+    });
+  }
 }
 
 @InitAfter('SceneCollectionsService')
@@ -237,7 +251,7 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
     videoSourceId: '',
     audioSourceId: '',
     inviteHash: '',
-    guestInfo: null,
+    guests: [],
     joinAsGuestHash: null,
     hostName: null,
   };
@@ -661,7 +675,11 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
 
     this.log('New guest joined', event);
 
-    this.SET_GUEST({ name: event.data.name, streamId: event.data.streamId });
+    // If we have a vacant source, assign the guest now
+    const vacantSources = this.views.vacantSources;
+    const sourceId = vacantSources.length ? vacantSources[0].sourceId : undefined;
+
+    this.ADD_GUEST({ remoteProducer: event.data, sourceId });
 
     // If we're allowed to produce, we should start producing right now
     if (!this.producer && this.state.produceOk) {
@@ -702,9 +720,9 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
     // Add the stream id to the list of disconnected guests, so we don't
     // immediately connect to that same guest again until they are forced
     // to refresh the page.
-    if (this.state.guestInfo && !this.state.joinAsGuestHash) {
-      this.disconnectedStreamIds.push(this.state.guestInfo.streamId);
-    }
+    // if (this.state.guestInfo && !this.state.joinAsGuestHash) {
+    //   this.disconnectedStreamIds.push(this.state.guestInfo.streamId);
+    // }
 
     await this.cleanUpSocketConnection();
     this.startListeningForGuests();
@@ -732,7 +750,7 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
     // disconnect from the socket and start listening to guests again.
     this.socket.disconnect();
     this.socket = null;
-    this.SET_GUEST(null);
+    this.CLEAR_GUESTS();
     this.SET_JOIN_AS_GUEST(null);
   }
 
@@ -866,8 +884,18 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
   }
 
   @mutation()
-  private SET_GUEST(guest: IGuest) {
-    this.state.guestInfo = guest;
+  private ADD_GUEST(guest: IGuest) {
+    this.state.guests.push(guest);
+  }
+
+  @mutation()
+  private REMOVE_GUEST(streamId: string) {
+    this.state.guests = this.state.guests.filter(g => g.remoteProducer.streamId !== streamId);
+  }
+
+  @mutation()
+  private CLEAR_GUESTS() {
+    this.state.guests = [];
   }
 
   @mutation()
