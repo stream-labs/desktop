@@ -111,7 +111,7 @@ class SourceSelectorModule {
       const isGuestCamActive = itemsForNode.some(i => {
         return (
           this.sourcesService.state.sources[i.sourceId].type === 'mediasoupconnector' &&
-          this.guestCamService.state.guestInfo
+          this.guestCamService.state.guests.length
         );
       });
 

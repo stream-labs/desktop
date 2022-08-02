@@ -22,7 +22,10 @@ export class Guest extends MediasoupEntity {
 
   connect() {
     this.webrtcSubscription = this.guestCamService.webrtcEvent.subscribe(event => {
-      if (event.type === 'consumerCreated') {
+      if (
+        event.type === 'consumerCreated' &&
+        event.data.streamId === this.opts.remoteProducer.streamId
+      ) {
         this.onConsumerCreated(event);
       }
     });
@@ -33,27 +36,26 @@ export class Guest extends MediasoupEntity {
     });
   }
 
-  async onConsumerCreated(event: IConsumerCreatedEvent) {
+  onConsumerCreated(event: IConsumerCreatedEvent) {
     this.log('Consumer Created', event);
 
     this.transportId = event.data.id;
 
-    if (!this.guestCamService.consumer.transportConnected) {
-      const turnConfig = await this.guestCamService.getTurnConfig();
+    this.withMutex(async () => {
+      if (!this.guestCamService.consumer.transportConnected) {
+        const turnConfig = await this.guestCamService.getTurnConfig();
 
-      event.data['iceServers'] = [turnConfig];
+        event.data['iceServers'] = [turnConfig];
 
-      // TODO: Talk to Steven about how much synchronization is really needed here.
-      // For now, just hold up creating the receive transport until the mutext is unlocked.
-      await this.guestCamService.pluginMutex.synchronize();
+        this.makeObsRequest('func_create_receive_transport', event.data);
+      }
 
-      this.makeObsRequest('func_create_receive_transport', event.data);
-    }
-
-    this.createTracks();
+      await this.createTracks();
+      this.unlockMutex();
+    });
   }
 
-  createTracks() {
+  async createTracks() {
     if (this.opts.remoteProducer.audioId) {
       this.audioTrack = new GuestTrack({
         kind: 'audio',
@@ -64,7 +66,7 @@ export class Guest extends MediasoupEntity {
         sourceId: this.sourceId,
       });
 
-      this.audioTrack.connect();
+      await this.audioTrack.connect();
     }
 
     if (this.opts.remoteProducer.videoId) {
@@ -77,7 +79,7 @@ export class Guest extends MediasoupEntity {
         sourceId: this.sourceId,
       });
 
-      this.videoTrack.connect();
+      await this.videoTrack.connect();
     }
   }
 
