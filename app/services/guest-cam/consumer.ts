@@ -1,80 +1,34 @@
-import { Subscription } from 'rxjs';
-import { IConsumerCreatedEvent, IConsumerTrackEvent, IRemoteProducer, TConnectParams } from '.';
+import { IRemoteProducer, TConnectParams } from '.';
 import { Guest } from './guest';
 import { MediasoupEntity } from './mediasoup-entity';
 
 export class Consumer extends MediasoupEntity {
-  webrtcSubscription: Subscription;
-
   transportConnected = false;
-  transportId: string;
-  guest: Guest;
-
-  destroyed = false;
-
-  constructor(public readonly sourceId: string, public readonly remoteProducer: IRemoteProducer) {
-    super(sourceId);
-  }
-
-  async connect() {
-    this.webrtcSubscription = this.guestCamService.webrtcEvent.subscribe(event => {
-      if (event.type === 'consumerCreated') {
-        this.onConsumerCreated(event);
-      }
-    });
-
-    this.sendWebRTCRequest({
-      type: 'createConsumer',
-      data: this.remoteProducer,
-    });
-  }
-
-  async onConsumerCreated(event: IConsumerCreatedEvent) {
-    this.log('Consumer Created', event);
-
-    this.transportId = event.data.id;
-
-    const turnConfig = await this.guestCamService.getTurnConfig();
-
-    event.data['iceServers'] = [turnConfig];
-
-    // TODO: Talk to Steven about how much synchronization is really needed here.
-    // For now, just hold up creating the receive transport until the mutext is unlocked.
-    await this.guestCamService.pluginMutex.synchronize();
-
-    this.makeObsRequest('func_create_receive_transport', event.data);
-
-    this.addGuest(this.sourceId, this.remoteProducer);
-  }
+  guests: Guest[] = [];
 
   addGuest(sourceId: string, remoteProducer: IRemoteProducer) {
-    console.log('ADD GUEST');
+    const guest = new Guest({ remoteProducer, sourceId });
+    this.guests.push(guest);
+    guest.connect();
+  }
 
-    this.guest = new Guest({
-      name: remoteProducer.name,
-      socketId: remoteProducer.socketId,
-      streamId: remoteProducer.streamId,
-      transportId: this.transportId,
-      audioId: remoteProducer.audioId,
-      videoId: remoteProducer.videoId,
-      sourceId,
-    });
+  removeGuest(streamId: string) {
+    const idx = this.guests.findIndex(guest => guest.streamId === streamId);
 
-    this.guest.connect();
+    if (idx > -1) {
+      this.guests[idx].destroy();
+      this.guests.splice(idx, 1);
+    }
   }
 
   /**
    * Connects this transport on the server side
    * @param connectParams Data blob the shape of which is opaque to us
    */
-  async connectOnServer(connectParams: TConnectParams) {
+  async connectTransport(connectParams: TConnectParams) {
     this.sendWebRTCRequest({
       type: 'connectReceiveTransport',
-      data: {
-        ...connectParams,
-        socketId: this.remoteProducer.socketId,
-        streamId: this.remoteProducer.streamId,
-      },
+      data: { ...connectParams },
     });
 
     this.makeObsRequest('func_connect_result', 'true');
@@ -85,13 +39,8 @@ export class Consumer extends MediasoupEntity {
   }
 
   destroy() {
-    if (this.webrtcSubscription) {
-      this.webrtcSubscription.unsubscribe();
-      this.webrtcSubscription = null;
-    }
+    this.guests.forEach(guest => guest.destroy());
 
-    this.makeObsRequest('func_stop_consumer', this.remoteProducer.audioId);
-    this.makeObsRequest('func_stop_consumer', this.remoteProducer.videoId);
     this.makeObsRequest('func_stop_receiver');
 
     super.destroy();
