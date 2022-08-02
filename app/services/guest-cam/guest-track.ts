@@ -77,7 +77,18 @@ export class GuestTrack extends MediasoupEntity {
     // are the first track to be added on this transport, we are responsible
     // for connecting the parent transport.
     if (connectParams && !this.guestCamService.consumer.transportConnected) {
-      this.guestCamService.consumer.connectOnServer(connectParams);
+      this.guestCamService.consumer.connectTransport(connectParams);
     }
+  }
+
+  destroy() {
+    if (this.webrtcSubscription) {
+      this.webrtcSubscription.unsubscribe();
+      this.webrtcSubscription = null;
+    }
+
+    this.makeObsRequest('func_stop_consumer', this.opts.trackId);
+
+    super.destroy();
   }
 }

@@ -615,7 +615,10 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
       this.auth = await this.authenticateSocket(token);
       this.log('Socket Authenticated', this.auth);
 
-      this.views.source.updateSettings({ room: this.room });
+      // this.views.source.updateSettings({ room: this.room });
+      this.views.sources.forEach(source => {
+        source.updateSettings({ room: this.room });
+      });
 
       // It doesn't matter which source we call this on
       this.makeObsRequest(
@@ -643,6 +646,8 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
     }
   }
 
+  sourceIndex = 0;
+
   async onGuestJoin(event: IProducerCreatedEvent) {
     if (this.socket.id === event.data.socketId) {
       this.log('onProducerCreated fired - ignoring our own producer');
@@ -664,12 +669,11 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
     }
 
     if (!this.consumer) {
-      this.consumer = new Consumer(this.views.sources[0].sourceId, event.data);
-      this.consumer.connect();
-    } else {
-      // TODO: Guest indexing
-      this.consumer.addGuest(this.views.sources[1].sourceId, event.data);
+      this.consumer = new Consumer(this.views.sources[0].sourceId);
     }
+
+    this.consumer.addGuest(this.views.sources[this.sourceIndex].sourceId, event.data);
+    this.sourceIndex += 1;
 
     // Make sure the source isn't visible in any scene
     // this.views.source.setForceHidden(true);
@@ -742,11 +746,12 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
   async onGuestLeave(event: IConsumerDestroyedEvent) {
     this.log('Guest left', event);
 
-    if (this.consumer && this.consumer.remoteProducer.socketId === event.data.socketId) {
-      this.consumer.destroy();
-      this.consumer = null;
-      this.SET_GUEST(null);
-    }
+    // TODO: Guest Leave handling
+    // if (this.consumer && this.consumer.remoteProducer.socketId === event.data.socketId) {
+    //   this.consumer.destroy();
+    //   this.consumer = null;
+    //   this.SET_GUEST(null);
+    // }
   }
 
   async authenticateSocket(token: string): Promise<ISocketAuthResponse> {
