@@ -66,6 +66,8 @@ export class WidgetsService
   @Inject() videoService: VideoService;
   @Inject() editorCommandsService: EditorCommandsService;
 
+  widgetDisplayData = WidgetDisplayData(); // cache widget display data
+
   protected init() {
     // sync widgetSources with sources
 
