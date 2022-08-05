@@ -1,12 +1,14 @@
 import { ChildProcess, spawn } from "child_process";
+import electron from "electron";
 import { readdirSync } from "fs";
 import { basename, join } from "path";
 import { createInterface } from "readline";
+import { $t } from "services/i18n";
 
 export function getNVoicePath(): string {
   // import/require構文を使うとビルド時に展開してしまうが、
   // バイナリファイルを実行時に参照するために実行時のrequireでロードする必要がある
-  return window['require']('n-voice-package').getNVoicePath();
+  return window['require']('@n-air-app/n-voice-package').getNVoicePath();
 }
 
 class CallbackReceiver {
@@ -147,12 +149,12 @@ class CommandLineClient {
 
 // 参考: https://github.com/seiren-voice/desktop-application/blob/main/electron/CommandLineClient.ts
 
-async function StartNVoice(enginePath: string, dictionaryPath: string, userDictionary: string, modelPath: string, cwd: string): Promise<CommandLineClient> {
+async function StartNVoice(enginePath: string, dictionaryPath: string, userDictionary: string, modelPath: string, extraVoicesPath: string, cwd: string): Promise<CommandLineClient> {
   const log = ((...args: unknown[]) => { console.log(...args); });
 
-  console.log('StartNVoice', { enginePath, dictionaryPath, userDictionary, modelPath, cwd }); // DEBUG
+  console.log('StartNVoice', { enginePath, dictionaryPath, userDictionary, modelPath, extraVoicesPath, cwd }); // DEBUG
   const client = new CommandLineClient(
-    spawn(enginePath, [dictionaryPath, userDictionary, modelPath], { stdio: 'pipe', cwd }),
+    spawn(enginePath, [dictionaryPath, userDictionary, modelPath, extraVoicesPath], { stdio: 'pipe', cwd }),
     log,
     true, // options.showStdout,
   );
@@ -188,6 +190,21 @@ const ErrorCodes: { [code: number]: string } = {
   401: 'could not parse text',
 };
 
+function showError(err: Error): Promise<void> {
+  return new Promise<void>((resolve) => {
+    electron.remote.dialog.showMessageBox(
+      electron.remote.getCurrentWindow(),
+      {
+        type: 'error',
+        message: err.toString(),
+        buttons: [$t('common.close')],
+        noLink: true,
+      },
+      () => resolve(),
+    );
+  });
+}
+
 const supportedProtocolVersion = '1.0.0';
 export class NVoiceClient {
   private commandLineClient: CommandLineClient | undefined;
@@ -210,16 +227,25 @@ export class NVoiceClient {
         throw new Error('model file found: ' + models.join(', '));
       }
       const cwd = baseDir;
-      const client = await StartNVoice(enginePath, dictionaryPath, userDictionary, models[0], cwd);
+      const extraVoicesPath = 'n-voice_extra-voices'
+      const client = await StartNVoice(enginePath, dictionaryPath, userDictionary, models[0], extraVoicesPath, cwd);
+      let started = false;
+      client.waitExit().then(code => {
+        if (!started) {
+          showError(new Error(`n-voice-engine start failed! ${code}`));
+        }
+      });
       this.commandLineClient = client;
       const r = await this.waitOkNg(client);
       const protocolVersion = await this.protocol_version();
       if (protocolVersion !== supportedProtocolVersion) {
         throw new Error(`unexpected protocol version: ${protocolVersion}`);
       }
+      started = true;
     } catch (err) {
-      console.log(err);
-      throw err;
+      console.error(err);
+      showError(err as Error);
+      // throw err;
     }
   }
 

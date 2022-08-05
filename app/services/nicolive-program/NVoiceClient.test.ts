@@ -1,5 +1,5 @@
 import { existsSync, unlinkSync } from "fs";
-import { getNVoicePath } from "n-voice-package";
+import { getNVoicePath } from "@n-air-app/n-voice-package";
 import { join } from "path";
 import { NVoiceClient } from "./NVoiceClient";
 

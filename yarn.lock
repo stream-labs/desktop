@@ -2039,6 +2039,18 @@
     "@jridgewell/resolve-uri" "^3.0.3"
     "@jridgewell/sourcemap-codec" "^1.4.10"
 
+"@n-air-app/n-voice-package@0.0.17":
+  version "0.0.17"
+  resolved "https://npm.pkg.github.com/download/@n-air-app/n-voice-package/0.0.17/798dfbfe32f68130277c270601f758f377d27300#798dfbfe32f68130277c270601f758f377d27300"
+  integrity sha512-j4YTV1+cbSk2Uz/86XpVNuaiGfnnQEE+tD+wvOtsPuDXbcu4rFJYQh+zaqstvjM6WzjRKjI1JYS0YSPG8wBmWw==
+  dependencies:
+    "@rollup/plugin-babel" "^5.3.1"
+    "@types/node" "^18.6.3"
+    rollup "^2.77.2"
+    rollup-plugin-terser "^7.0.2"
+    rollup-plugin-typescript2 "^0.32.1"
+    typescript "^4.7.4"
+
 "@nodelib/fs.scandir@2.1.4":
   version "2.1.4"
   resolved "https://registry.yarnpkg.com/@nodelib/fs.scandir/-/fs.scandir-2.1.4.tgz#d4b3549a5db5de2683e0c1071ab4f140904bbf69"
@@ -2328,10 +2340,10 @@
   resolved "https://registry.yarnpkg.com/@types/node/-/node-10.17.58.tgz#10682f6016fd866725c36d22ce6bbbd029bf4545"
   integrity sha512-Dn5RBxLohjdHFj17dVVw3rtrZAeXeWg+LQfvxDIW/fdPkSiuQk7h3frKMYtsQhtIW42wkErDcy9UMVxhGW4O7w==
 
-"@types/node@^18.0.0":
-  version "18.0.0"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-18.0.0.tgz#67c7b724e1bcdd7a8821ce0d5ee184d3b4dd525a"
-  integrity sha512-cHlGmko4gWLVI27cGJntjs/Sj8th9aYwplmZFwmmgYQQvL5NUsgVJG7OddLvNfLqYS31KFN0s3qlaD9qCaxACA==
+"@types/node@^18.6.3":
+  version "18.6.3"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-18.6.3.tgz#4e4a95b6fe44014563ceb514b2598b3e623d1c98"
+  integrity sha512-6qKpDtoaYLM+5+AFChLhHermMQxc3TOEFIDzrZLPRGHPrLEwqFkkT5Kx3ju05g6X7uDPazz3jHbKPX0KzCjntg==
 
 "@types/normalize-package-data@^2.4.0":
   version "2.4.0"
@@ -10903,17 +10915,6 @@ mute-stream@0.0.7:
   version "0.0.7"
   resolved "https://registry.yarnpkg.com/mute-stream/-/mute-stream-0.0.7.tgz#3075ce93bc21b8fab43e1bc4da7e8115ed1e7bab"
 
-n-voice-package@../n-voice-package/n-voice-package-0.0.13.tgz:
-  version "0.0.13"
-  resolved "../n-voice-package/n-voice-package-0.0.13.tgz#eb0bdff10834537783ac1eddab5986a1bfcff4a5"
-  dependencies:
-    "@rollup/plugin-babel" "^5.3.1"
-    "@types/node" "^18.0.0"
-    rollup "^2.75.7"
-    rollup-plugin-terser "^7.0.2"
-    rollup-plugin-typescript2 "^0.32.1"
-    typescript "^4.7.4"
-
 nan@^2.9.2:
   version "2.10.0"
   resolved "https://registry.yarnpkg.com/nan/-/nan-2.10.0.tgz#96d0cd610ebd58d4b4de9cc0c6828cda99c7548f"
@@ -13201,10 +13202,10 @@ rollup-plugin-typescript2@^0.32.1:
     resolve "^1.20.0"
     tslib "^2.4.0"
 
-rollup@^2.75.7:
-  version "2.75.7"
-  resolved "https://registry.yarnpkg.com/rollup/-/rollup-2.75.7.tgz#221ff11887ae271e37dcc649ba32ce1590aaa0b9"
-  integrity sha512-VSE1iy0eaAYNCxEXaleThdFXqZJ42qDBatAwrfnPlENEZ8erQ+0LYX4JXOLPceWfZpV1VtZwZ3dFCuOZiSyFtQ==
+rollup@^2.77.2:
+  version "2.77.2"
+  resolved "https://registry.yarnpkg.com/rollup/-/rollup-2.77.2.tgz#6b6075c55f9cc2040a5912e6e062151e42e2c4e3"
+  integrity sha512-m/4YzYgLcpMQbxX3NmAqDvwLATZzxt8bIegO78FZLl+lAgKJBd1DRAOeEiZcKOIOPjxE6ewHWHNgGEalFXuz1g==
   optionalDependencies:
     fsevents "~2.3.2"
 
