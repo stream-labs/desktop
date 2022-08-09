@@ -31,8 +31,7 @@ export function $t(...args: any[]): string {
  * returns a keypath if localized version of string doesn't exist
  */
 export function $translateIfExist(...args: any[]): string {
-  const hasTranslation = I18nService.vueI18nInstance.te(args[0]);
-  return hasTranslation ? $t(...args) : args[0];
+  return $t(...args);
 }
 
 /**
