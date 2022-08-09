@@ -194,6 +194,10 @@
       "replacement": "あいかわらず"
     },
     {
+      "text": "穣崇",
+      "replacement": "しげたか"
+    },
+    {
       "regularExpression": "（生放送クルーズさんの番組）$",
       "replacement": ""
     },
