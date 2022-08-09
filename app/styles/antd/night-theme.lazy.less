@@ -55,6 +55,7 @@
 @btn-danger-bg: fade(@red-dark, 28%); // var(--warning-bg)
 @btn-text-hover-bg: transparent;
 @btn-default-bg: @dark-5; // var(--button)
+@btn-primary-color: @dark-2; // var(--active-button-text)
 
 @radio-button-hover-color: @primary-1;
 
@@ -188,6 +189,9 @@
 .ant-btn:hover,
 .ant-btn:focus {
   color: @heading-color;
+}
+.ant-btn-primary:hover {
+  color: @dark-2;
 }
 
 // change color for the search box
