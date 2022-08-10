@@ -226,10 +226,21 @@ export class StreamingService
           );
         }
       } catch (e) {
-        const message =
-          e instanceof Response
-            ? $t('streaming.broadcastStatusFetchingError.httpError', { statusText: e.statusText })
-            : $t('streaming.broadcastStatusFetchingError.default');
+        console.error('StreamingService.toggleStreamAsync niconico', JSON.stringify(e));
+        let message: string;
+        if (e instanceof Response) {
+          if (e.status === 401) {
+            message = $t('streaming.invalidSessionError');
+          } else {
+            message = $t('streaming.broadcastStatusFetchingError.httpError',
+              {
+                requestURL: e.url,
+                statusText: e.statusText,
+              });
+          }
+        } else {
+          message = $t('streaming.broadcastStatusFetchingError.default');
+        }
 
         return new Promise(resolve => {
           electron.remote.dialog.showMessageBox(
