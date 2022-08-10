@@ -29,9 +29,6 @@ export class HostsService extends Service {
   get niconicoFlapi() {
     return 'http://flapi.nicovideo.jp/api';
   }
-  get niconicolive() {
-    return 'http://live.nicovideo.jp';
-  }
   get nAirLogin() {
     if (process.env.NAIR_LOGIN_URL) {
       return process.env.NAIR_LOGIN_URL;
