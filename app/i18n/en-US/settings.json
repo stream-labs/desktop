@@ -174,5 +174,12 @@
   "Overwrite if file exists": "Overwrite if file exists",
   "Replay Buffer Filename Prefix": "Replay Buffer Filename Prefix",
   "Replay Buffer Filename Suffix": "Replay Buffer Filename Suffix",
-  "Use stream encoder": "Use stream encoder"
+  "Use stream encoder": "Use stream encoder",
+  "Enable Caching": "Enable Caching",
+  "Seekable": "Seekable",
+  "Reconnect Delay": "Reconnect Delay",
+  "Input Format": "Input Format",
+  "Input": "Input",
+  "Network Buffering": "Network Buffering",
+  "Page permissions": "Page permissions"
 }
