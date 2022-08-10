@@ -209,5 +209,22 @@
   "Viewer shoutouts": "Viewer shoutouts",
   "Capture an application window": "Capture an application window",
   "Folder Expansion": "Folder Expansion",
-  "Wondering how to expand your folders? Just click on the <icon></icon> icon": "Wondering how to expand your folders? Just click on the <icon></icon> icon"
+  "Wondering how to expand your folders? Just click on the <icon></icon> icon": "Wondering how to expand your folders? Just click on the <icon></icon> icon",
+  "Use custom frame rate": "Use custom frame rate",
+  "Control audio via Streamlabs Desktop": "Control audio via Streamlabs Desktop",
+  "Custom CSS": "Custom CSS",
+  "Shutdown source when not visible": "Shutdown source when not visible",
+  "Refresh browser when scene becomes active": "Refresh browser when scene becomes active",
+  "Refresh cache of current page": "Refresh cache of current page",
+  "Local file": "Local file",
+  "URL": "URL",
+  "Color": "Color",
+  "IsMediaFlag": "IsMediaFlag",
+  "Loop": "Loop",
+  "Restart playback when source becomes active": "Restart playback when source becomes active",
+  "Use hardware decoding when available": "Use hardware decoding when available",
+  "Show nothing when playback ends": "Show nothing when playback ends",
+  "Close file when inactive": "Close file when inactive",
+  "Apply alpha in linear space": "Apply alpha in linear space",
+  "Speed": "Speed"
 }
