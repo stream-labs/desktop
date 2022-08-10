@@ -101,6 +101,8 @@ function ObsInput(p: IObsInputProps) {
     ...extraProps,
   };
 
+  console.log(extraProps);
+
   switch (type) {
     case 'OBS_PROPERTY_DOUBLE':
       return <NumberInput {...inputProps} />;
@@ -128,7 +130,7 @@ function ObsInput(p: IObsInputProps) {
         }
         return {
           value: opt.value,
-          label: $translateIfExist(opt.description),
+          label: opt.description,
         };
       });
       return <ListInput {...inputProps} options={options} allowClear={false} />;

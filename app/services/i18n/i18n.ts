@@ -102,11 +102,11 @@ export class I18nService extends PersistentStatefulService<II18nState> implement
           // Detect the proper format and set the cookie to Desktop's locale
           const isUpper = x => x.toUpperCase() === x;
           const splitLocale = l => l.split('-');
-          
+
           const [lang, code] = splitLocale(langCode)
           const usesUpperCode = code && isUpper(code[0]);
           const [newLang, newCode] = splitLocale('${locale}');
-          
+
           const localeToSet = [newLang, (usesUpperCode ? newCode.toUpperCase() : newCode)].join('-');
 
           $.cookie('langCode', localeToSet);

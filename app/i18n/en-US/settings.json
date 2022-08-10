@@ -173,5 +173,6 @@
   "Force GPU as render device": "Force GPU as render device",
   "Overwrite if file exists": "Overwrite if file exists",
   "Replay Buffer Filename Prefix": "Replay Buffer Filename Prefix",
-  "Replay Buffer Filename Suffix": "Replay Buffer Filename Suffix"
+  "Replay Buffer Filename Suffix": "Replay Buffer Filename Suffix",
+  "Use stream encoder": "Use stream encoder"
 }
