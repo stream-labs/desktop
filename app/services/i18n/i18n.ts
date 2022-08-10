@@ -31,6 +31,7 @@ export function $t(...args: any[]): string {
  * returns a keypath if localized version of string doesn't exist
  */
 export function $translateIfExist(...args: any[]): string {
+  // TODO: Investigate method to silently fail and not trigger console warnings ($te is unreliable)
   return $t(...args);
 }
 
