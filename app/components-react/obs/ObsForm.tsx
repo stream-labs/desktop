@@ -128,7 +128,7 @@ function ObsInput(p: IObsInputProps) {
         }
         return {
           value: opt.value,
-          label: $translateIfExist(opt.description),
+          label: opt.description,
         };
       });
       return <ListInput {...inputProps} options={options} allowClear={false} />;

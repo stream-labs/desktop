@@ -31,8 +31,8 @@ export function $t(...args: any[]): string {
  * returns a keypath if localized version of string doesn't exist
  */
 export function $translateIfExist(...args: any[]): string {
-  const hasTranslation = I18nService.vueI18nInstance.te(args[0]);
-  return hasTranslation ? $t(...args) : args[0];
+  // TODO: Investigate method to silently fail and not trigger console warnings ($te is unreliable)
+  return $t(...args);
 }
 
 /**
@@ -103,11 +103,11 @@ export class I18nService extends PersistentStatefulService<II18nState> implement
           // Detect the proper format and set the cookie to Desktop's locale
           const isUpper = x => x.toUpperCase() === x;
           const splitLocale = l => l.split('-');
-          
+
           const [lang, code] = splitLocale(langCode)
           const usesUpperCode = code && isUpper(code[0]);
           const [newLang, newCode] = splitLocale('${locale}');
-          
+
           const localeToSet = [newLang, (usesUpperCode ? newCode.toUpperCase() : newCode)].join('-');
 
           $.cookie('langCode', localeToSet);
