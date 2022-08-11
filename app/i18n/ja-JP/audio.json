@@ -35,5 +35,12 @@
   "Your Stream and VOD Track are the same. This may result in unexpected audio behavior, go to Global Settings to change.": "ストリームと VOD トラックが同じです。これはオーディオの予期しない動作につながる場合があります。[グローバル設定] に進んで変更してください。",
   "Streaming Track": "ストリーミングトラック",
   "Enable Twitch VOD Track": "Twitch VOD トラックを有効化",
-  "Twitch VOD Track": "Twitch VOD トラック"
+  "Twitch VOD Track": "Twitch VOD トラック",
+  "Sample Rate (requires a restart)": "Sample Rate (requires a restart)",
+  "Channels (requires a restart)": "Channels (requires a restart)",
+  "Desktop Audio Device 1": "Desktop Audio Device 1",
+  "Desktop Audio Device 2": "Desktop Audio Device 2",
+  "Mic/Auxiliary Device 1": "Mic/Auxiliary Device 1",
+  "Mic/Auxiliary Device 2": "Mic/Auxiliary Device 2",
+  "Mic/Auxiliary Device 3": "Mic/Auxiliary Device 3"
 }
