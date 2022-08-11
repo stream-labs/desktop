@@ -35,5 +35,12 @@
   "Your Stream and VOD Track are the same. This may result in unexpected audio behavior, go to Global Settings to change.": "Дорожки трансляции и записи VOD совпадают, что может привести к сбоям в работе аудио. Изменить это можно в глобальных настройках.",
   "Streaming Track": "Дорожка трансляции",
   "Enable Twitch VOD Track": "Включить дорожку записи VOD для Twitch",
-  "Twitch VOD Track": "Дорожка записи VOD для Twitch"
+  "Twitch VOD Track": "Дорожка записи VOD для Twitch",
+  "Sample Rate (requires a restart)": "Sample Rate (requires a restart)",
+  "Channels (requires a restart)": "Channels (requires a restart)",
+  "Desktop Audio Device 1": "Desktop Audio Device 1",
+  "Desktop Audio Device 2": "Desktop Audio Device 2",
+  "Mic/Auxiliary Device 1": "Mic/Auxiliary Device 1",
+  "Mic/Auxiliary Device 2": "Mic/Auxiliary Device 2",
+  "Mic/Auxiliary Device 3": "Mic/Auxiliary Device 3"
 }
