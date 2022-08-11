@@ -244,7 +244,12 @@ export default function GuestCamProperties() {
                       className="button button--soft-warning"
                       style={{ width: 160 }}
                       disabled={!guestInfo && !joinAsGuest}
-                      onClick={() => GuestCamService.actions.disconnectGuest()}
+                      onClick={() =>
+                        GuestCamService.actions.disconnectGuest(
+                          guestInfo.remoteProducer.socketId,
+                          true,
+                        )
+                      }
                     >
                       {$t('Disconnect')}
                     </button>

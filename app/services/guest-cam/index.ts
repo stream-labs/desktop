@@ -720,16 +720,26 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
   /**
    * Disconnects the currently connected guest
    */
-  async disconnectGuest() {
-    // Add the stream id to the list of disconnected guests, so we don't
-    // immediately connect to that same guest again until they are forced
-    // to refresh the page.
-    // if (this.state.guestInfo && !this.state.joinAsGuestHash) {
-    //   this.disconnectedStreamIds.push(this.state.guestInfo.streamId);
-    // }
+  async disconnectGuest(socketId: string, kick = false) {
+    const guest = this.views.getGuestBySocketId(socketId);
 
-    await this.cleanUpSocketConnection();
-    this.startListeningForGuests();
+    if (guest) {
+      if (kick) {
+        // TODO: Need to implement kick message handling on guest page
+        this.disconnectedStreamIds.push(guest.remoteProducer.streamId);
+      }
+
+      if (this.consumer) {
+        this.consumer.removeGuest(guest.remoteProducer.streamId);
+      }
+
+      this.REMOVE_GUEST(guest.remoteProducer.streamId);
+    }
+
+    if (this.state.guests.length === 0) {
+      await this.cleanUpSocketConnection();
+      this.startListeningForGuests();
+    }
   }
 
   async cleanUpSocketConnection() {
@@ -768,20 +778,7 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
   async onGuestLeave(event: IConsumerDestroyedEvent) {
     this.log('Guest left', event);
 
-    const guest = this.views.getGuestBySocketId(event.data.socketId);
-
-    if (guest) {
-      if (this.consumer) {
-        this.consumer.removeGuest(guest.remoteProducer.streamId);
-      }
-
-      this.REMOVE_GUEST(guest.remoteProducer.streamId);
-    }
-
-    if (this.state.guests.length === 0) {
-      await this.cleanUpSocketConnection();
-      this.startListeningForGuests();
-    }
+    this.disconnectGuest(event.data.socketId);
   }
 
   async authenticateSocket(token: string): Promise<ISocketAuthResponse> {
