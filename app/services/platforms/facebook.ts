@@ -693,7 +693,7 @@ export class FacebookService
   private async fetchPages(): Promise<IFacebookPage[]> {
     return (
       await this.requestFacebook<{ data: IFacebookPage[] }>(
-        `${this.apiBase}/me/accounts?limit=50`,
+        `${this.apiBase}/me/accounts?limit=100`,
         this.oauthToken,
       )
     ).data;

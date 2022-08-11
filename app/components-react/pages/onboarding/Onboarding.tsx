@@ -111,7 +111,7 @@ export class OnboardingModule {
     return Services.OnboardingService;
   }
 
-  get ReocrdingModeService() {
+  get RecordingModeService() {
     return Services.RecordingModeService;
   }
 
@@ -137,8 +137,8 @@ export class OnboardingModule {
   }
 
   setRecordingMode() {
-    this.ReocrdingModeService.setRecordingMode(true);
-    this.ReocrdingModeService.setUpRecordingFirstTimeSetup();
+    this.RecordingModeService.setRecordingMode(true);
+    this.RecordingModeService.setUpRecordingFirstTimeSetup();
   }
 
   setImportFromObs() {
@@ -154,12 +154,12 @@ export class OnboardingModule {
     if (this.state.processing) return;
 
     if (
-      this.ReocrdingModeService.views.isRecordingModeEnabled &&
+      this.RecordingModeService.views.isRecordingModeEnabled &&
       this.currentStep.component === 'HardwareSetup' &&
       !this.OnboardingService.state.options.isHardware &&
       !isSkip
     ) {
-      this.ReocrdingModeService.actions.addRecordingWebcam();
+      this.RecordingModeService.actions.addRecordingWebcam();
     }
 
     if (this.state.stepIndex >= this.steps.length - 1 || this.singletonStep) {

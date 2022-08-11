@@ -191,7 +191,7 @@ export function obsValuesToInputValues(
         for (const listOption of obsProp.values || []) {
           listOptions.push({
             value: listOption[Object.keys(listOption)[0]],
-            description: $translateIfExist(Object.keys(listOption)[0]),
+            description: Object.keys(listOption)[0],
           });
         }
       }
