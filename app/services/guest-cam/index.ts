@@ -231,6 +231,10 @@ class GuestCamViews extends ViewHandler<IGuestCamServiceState> {
       return this.state.guests.every(guest => guest.sourceId !== source.sourceId);
     });
   }
+
+  getGuestBySocketId(socketId: string) {
+    return this.state.guests.find(g => g.remoteProducer.socketId === socketId);
+  }
 }
 
 @InitAfter('SceneCollectionsService')
@@ -660,8 +664,6 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
     }
   }
 
-  sourceIndex = 0;
-
   async onGuestJoin(event: IProducerCreatedEvent) {
     if (this.socket.id === event.data.socketId) {
       this.log('onProducerCreated fired - ignoring our own producer');
@@ -690,8 +692,10 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
       this.consumer = new Consumer(this.views.sources[0].sourceId);
     }
 
-    this.consumer.addGuest(this.views.sources[this.sourceIndex].sourceId, event.data);
-    this.sourceIndex += 1;
+    // We can only start consuming this guest if there was a source available
+    if (sourceId) {
+      this.consumer.addGuest(sourceId, event.data);
+    }
 
     // Make sure the source isn't visible in any scene
     // this.views.source.setForceHidden(true);
@@ -764,12 +768,20 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
   async onGuestLeave(event: IConsumerDestroyedEvent) {
     this.log('Guest left', event);
 
-    // TODO: Guest Leave handling
-    // if (this.consumer && this.consumer.remoteProducer.socketId === event.data.socketId) {
-    //   this.consumer.destroy();
-    //   this.consumer = null;
-    //   this.SET_GUEST(null);
-    // }
+    const guest = this.views.getGuestBySocketId(event.data.socketId);
+
+    if (guest) {
+      if (this.consumer) {
+        this.consumer.removeGuest(guest.remoteProducer.streamId);
+      }
+
+      this.REMOVE_GUEST(guest.remoteProducer.streamId);
+    }
+
+    if (this.state.guests.length === 0) {
+      await this.cleanUpSocketConnection();
+      this.startListeningForGuests();
+    }
   }
 
   async authenticateSocket(token: string): Promise<ISocketAuthResponse> {
