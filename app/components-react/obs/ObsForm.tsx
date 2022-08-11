@@ -101,8 +101,6 @@ function ObsInput(p: IObsInputProps) {
     ...extraProps,
   };
 
-  console.log(extraProps);
-
   switch (type) {
     case 'OBS_PROPERTY_DOUBLE':
       return <NumberInput {...inputProps} />;

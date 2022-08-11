@@ -61,5 +61,16 @@
   "Undistort center of image when scaling from ultrawide": "Undistort center of image when scaling from ultrawide",
   "Scale Filtering": "Scale Filtering",
   "Relative": "Relative",
-  "Stretch Image (discard image aspect ratio)": "Stretch Image (discard image aspect ratio)"
+  "Stretch Image (discard image aspect ratio)": "Stretch Image (discard image aspect ratio)",
+  "Sidechain/Ducking Source": "Sidechain/Ducking Source",
+  "Output Gain": "Output Gain",
+  "Release": "Release",
+  "Attack": "Attack",
+  "Threshold": "Threshold",
+  "Ratio": "Ratio",
+  "Release Time": "Release Time",
+  "Hold Time": "Hold Time",
+  "Attack Time": "Attack Time",
+  "Open Threshold": "Open Threshold",
+  "Close Threshold": "Close Threshold"
 }
