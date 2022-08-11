@@ -72,5 +72,7 @@
   "Hold Time": "Hold Time",
   "Attack Time": "Attack Time",
   "Open Threshold": "Open Threshold",
-  "Close Threshold": "Close Threshold"
+  "Close Threshold": "Close Threshold",
+  "Presets": "Presets",
+  "Detection": "Detection"
 }
