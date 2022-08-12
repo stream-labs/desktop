@@ -16,7 +16,7 @@ export abstract class MediasoupEntity {
 
   mutexUnlockFunc: () => void;
 
-  constructor(public readonly sourceId: string) {}
+  constructor(public sourceId: string) {}
 
   sendWebRTCRequest(data: unknown) {
     return this.guestCamService.sendWebRTCRequest(data);

@@ -87,6 +87,18 @@ export class Guest extends MediasoupEntity {
     return this.opts.remoteProducer.streamId;
   }
 
+  swapSource(sourceId: string) {
+    this.withMutex(async () => {
+      this.sourceId = sourceId;
+
+      if (this.audioTrack) this.audioTrack.destroy();
+      if (this.videoTrack) this.videoTrack.destroy();
+
+      await this.createTracks();
+      this.unlockMutex();
+    });
+  }
+
   destroy() {
     if (this.webrtcSubscription) {
       this.webrtcSubscription.unsubscribe();
