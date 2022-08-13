@@ -1,4 +1,4 @@
-import { IRemoteProducer, TConnectParams } from '.';
+import { IConsumerCreatedEvent, IRemoteProducer, TConnectParams } from '.';
 import { Guest } from './guest';
 import { MediasoupEntity } from './mediasoup-entity';
 
@@ -19,6 +19,14 @@ export class Consumer extends MediasoupEntity {
       this.guests[idx].destroy();
       this.guests.splice(idx, 1);
     }
+  }
+
+  async createTransport(event: IConsumerCreatedEvent) {
+    const turnConfig = await this.guestCamService.getTurnConfig();
+
+    event.data['iceServers'] = [turnConfig];
+
+    this.makeObsRequest('func_create_receive_transport', event.data);
   }
 
   /**

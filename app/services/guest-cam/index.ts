@@ -232,8 +232,8 @@ class GuestCamViews extends ViewHandler<IGuestCamServiceState> {
     });
   }
 
-  getGuestBySocketId(socketId: string) {
-    return this.state.guests.find(g => g.remoteProducer.socketId === socketId);
+  getGuestByStreamId(streamId: string) {
+    return this.state.guests.find(g => g.remoteProducer.streamId === streamId);
   }
 }
 
@@ -519,9 +519,6 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
       throw new Error('Tried to start producer but mediasoup source does not exist');
     }
 
-    // Load volume from source properties manager
-    const volume = this.views.source.getPropertiesManagerSettings()['guest_cam_volume'] ?? 255;
-
     // Remove all existing mediasoup filters
     Object.keys(this.sourceFiltersService.state.filters).forEach(sourceId => {
       this.sourceFiltersService.views.filtersBySourceId(sourceId, true).forEach(filter => {
@@ -692,10 +689,7 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
       this.consumer = new Consumer(this.views.sources[0].sourceId);
     }
 
-    // We can only start consuming this guest if there was a source available
-    if (sourceId) {
-      this.consumer.addGuest(sourceId, event.data);
-    }
+    this.consumer.addGuest(sourceId, event.data);
 
     // Make sure the source isn't visible in any scene
     // this.views.source.setForceHidden(true);
@@ -715,13 +709,27 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
     });
   }
 
+  setGuestSource(streamId: string, sourceId: string) {
+    const guest = this.views.getGuestByStreamId(streamId);
+
+    if (!guest) return;
+
+    const guestConsumer = this.consumer.guests.find(
+      g => g.opts.remoteProducer.streamId === streamId,
+    );
+
+    if (!guestConsumer) return;
+
+    guestConsumer.setSource(sourceId);
+  }
+
   disconnectedStreamIds: string[] = [];
 
   /**
    * Disconnects the currently connected guest
    */
-  async disconnectGuest(socketId: string, kick = false) {
-    const guest = this.views.getGuestBySocketId(socketId);
+  async disconnectGuest(streamId: string, kick = false) {
+    const guest = this.views.getGuestByStreamId(streamId);
 
     if (guest) {
       if (kick) {
