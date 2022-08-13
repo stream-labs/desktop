@@ -246,7 +246,7 @@ export default function GuestCamProperties() {
                       disabled={!guestInfo && !joinAsGuest}
                       onClick={() =>
                         GuestCamService.actions.disconnectGuest(
-                          guestInfo.remoteProducer.socketId,
+                          guestInfo.remoteProducer.streamId,
                           true,
                         )
                       }

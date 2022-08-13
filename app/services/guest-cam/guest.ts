@@ -5,7 +5,11 @@ import { MediasoupEntity } from './mediasoup-entity';
 
 interface IGuestConstructorOptions {
   remoteProducer: IRemoteProducer;
-  sourceId: string;
+
+  /**
+   * Source id doesn't need to be immediately assigned
+   */
+  sourceId?: string;
 }
 
 export class Guest extends MediasoupEntity {
@@ -43,14 +47,10 @@ export class Guest extends MediasoupEntity {
 
     this.withMutex(async () => {
       if (!this.guestCamService.consumer.transportConnected) {
-        const turnConfig = await this.guestCamService.getTurnConfig();
-
-        event.data['iceServers'] = [turnConfig];
-
-        this.makeObsRequest('func_create_receive_transport', event.data);
+        this.guestCamService.consumer.createTransport(event);
       }
 
-      await this.createTracks();
+      if (this.sourceId) await this.createTracks();
       this.unlockMutex();
     });
   }
@@ -87,14 +87,26 @@ export class Guest extends MediasoupEntity {
     return this.opts.remoteProducer.streamId;
   }
 
-  swapSource(sourceId: string) {
+  /**
+   * Sets the source this guest should play on.
+   * Calling without a sourceId will stop playing this guest
+   * @param sourceId The id of the source to play on
+   */
+  setSource(sourceId?: string) {
     this.withMutex(async () => {
       this.sourceId = sourceId;
 
-      if (this.audioTrack) this.audioTrack.destroy();
-      if (this.videoTrack) this.videoTrack.destroy();
+      if (this.audioTrack) {
+        this.audioTrack.destroy();
+        this.audioTrack = null;
+      }
 
-      await this.createTracks();
+      if (this.videoTrack) {
+        this.videoTrack.destroy();
+        this.videoTrack = null;
+      }
+
+      if (sourceId) await this.createTracks();
       this.unlockMutex();
     });
   }
