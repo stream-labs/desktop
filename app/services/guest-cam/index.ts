@@ -24,6 +24,7 @@ import { ENotificationType } from 'services/notifications';
 import { $t } from 'services/i18n';
 import { JsonrpcService } from 'services/api/jsonrpc';
 import { EStreamingState } from 'services/streaming';
+import Vue from 'vue';
 
 /**
  * This is in actuality a big data blob at runtime, the shape
@@ -152,6 +153,7 @@ interface ITurnConfig {
 export interface IGuest {
   remoteProducer: IRemoteProducer;
   sourceId?: string;
+  showOnStream: boolean;
 }
 
 interface IGuestCamServiceState {
@@ -172,16 +174,6 @@ interface IGuestCamServiceState {
    * Name of the host of the room
    */
   hostName: string;
-}
-
-interface IInviteLink {
-  source_id: string;
-  hash: string;
-  id: number;
-}
-
-interface IInviteLinksResponse {
-  links: IInviteLink[];
 }
 
 class GuestCamViews extends ViewHandler<IGuestCamServiceState> {
@@ -647,7 +639,7 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
     const vacantSources = this.views.vacantSources;
     const sourceId = vacantSources.length ? vacantSources[0].sourceId : undefined;
 
-    this.ADD_GUEST({ remoteProducer: event.data, sourceId });
+    this.ADD_GUEST({ remoteProducer: event.data, sourceId, showOnStream: false });
 
     // If we're allowed to produce, we should start producing right now
     if (!this.producer && this.state.produceOk) {
@@ -691,12 +683,29 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
 
     const source = this.sourcesService.views.getSource(sourceId);
 
-    if (!source) return;
+    if (source) {
+      // If there's already a guest connected on this source, we need
+      // to unassign it.
+      const existingGuest = this.views.getGuestBySourceId(sourceId);
 
-    source.setForceHidden(true);
-    source.setForceMuted(true);
+      if (existingGuest) {
+        const existingConsumer = this.consumer.findGuestBySteamId(
+          existingGuest.remoteProducer.streamId,
+        );
+
+        if (existingConsumer) {
+          existingConsumer.setSource();
+        }
+
+        this.UPDATE_GUEST(existingGuest.remoteProducer.streamId, { sourceId: null });
+      }
+
+      source.setForceHidden(!guest.showOnStream);
+      source.setForceMuted(!guest.showOnStream);
+    }
 
     guestConsumer.setSource(sourceId);
+    this.UPDATE_GUEST(streamId, { sourceId });
   }
 
   disconnectedStreamIds: string[] = [];
@@ -758,6 +767,9 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
 
     source.setForceHidden(!visible);
     source.setForceMuted(!visible);
+
+    const guest = this.views.getGuestBySourceId(sourceId);
+    this.UPDATE_GUEST(guest.remoteProducer.streamId, { showOnStream: visible });
   }
 
   async onGuestLeave(event: IConsumerDestroyedEvent) {
@@ -880,6 +892,14 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
   @mutation()
   private ADD_GUEST(guest: IGuest) {
     this.state.guests.push(guest);
+  }
+
+  @mutation()
+  private UPDATE_GUEST(streamId: string, patch: Partial<IGuest>) {
+    const guest = this.state.guests.find(g => g.remoteProducer.streamId === streamId);
+    Object.keys(patch).forEach(key => {
+      Vue.set(guest, key, patch[key]);
+    });
   }
 
   @mutation()
