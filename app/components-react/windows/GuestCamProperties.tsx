@@ -298,9 +298,20 @@ function GuestSourceSelector(p: { guest: IGuest }) {
   const { availableSources, getBindingsForGuest } = useModule(GuestCamModule);
   const bindings = useVuex(() => getBindingsForGuest(p.guest.remoteProducer.streamId));
   const sourceId = bindings ? bindings.sourceId : null;
+  const { GuestCamService } = Services;
+
+  function setSourceId(sourceId: string) {
+    GuestCamService.actions.setGuestSource(p.guest.remoteProducer.streamId, sourceId);
+  }
 
   return (
-    <ListInput options={availableSources} value={sourceId} label={$t('Source')} listHeight={120} />
+    <ListInput
+      options={availableSources}
+      value={sourceId}
+      label={$t('Source')}
+      listHeight={120}
+      onChange={setSourceId}
+    />
   );
 }
 
@@ -312,7 +323,12 @@ function GuestPane(p: { guest: IGuest }) {
   const bindings = useVuex(() => getBindingsForGuest(p.guest.remoteProducer.streamId));
 
   if (!bindings) {
-    return <div>TODO: Guest is not assigned to a source</div>;
+    return (
+      <div>
+        <h2>{$t('This guest is not assigned to a source')}</h2>
+        <GuestSourceSelector guest={p.guest} />
+      </div>
+    );
   }
 
   const { visible, setVisible, volume, setVolume, disconnect } = bindings;
