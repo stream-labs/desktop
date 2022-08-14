@@ -6,8 +6,8 @@ export class Consumer extends MediasoupEntity {
   transportConnected = false;
   guests: Guest[] = [];
 
-  addGuest(sourceId: string, remoteProducer: IRemoteProducer) {
-    const guest = new Guest({ remoteProducer, sourceId });
+  addGuest(remoteProducer: IRemoteProducer) {
+    const guest = new Guest({ remoteProducer });
     this.guests.push(guest);
     guest.connect();
   }

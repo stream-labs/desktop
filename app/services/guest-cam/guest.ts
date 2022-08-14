@@ -5,11 +5,6 @@ import { MediasoupEntity } from './mediasoup-entity';
 
 interface IGuestConstructorOptions {
   remoteProducer: IRemoteProducer;
-
-  /**
-   * Source id doesn't need to be immediately assigned
-   */
-  sourceId?: string;
 }
 
 export class Guest extends MediasoupEntity {
@@ -20,8 +15,13 @@ export class Guest extends MediasoupEntity {
   audioTrack: GuestTrack;
   videoTrack: GuestTrack;
 
+  // This resolves a rare race condition where we try to create
+  // tracks before the consumer has been created.
+  consumerCreatedReady: () => void;
+  consumerCreatedPromise = new Promise<void>(r => (this.consumerCreatedReady = r));
+
   constructor(public readonly opts: IGuestConstructorOptions) {
-    super(opts.sourceId);
+    super(undefined);
   }
 
   connect() {
@@ -50,12 +50,14 @@ export class Guest extends MediasoupEntity {
         this.guestCamService.consumer.createTransport(event);
       }
 
-      if (this.sourceId) await this.createTracks();
+      this.consumerCreatedReady();
       this.unlockMutex();
     });
   }
 
   async createTracks() {
+    await this.consumerCreatedPromise;
+
     if (this.opts.remoteProducer.audioId) {
       this.audioTrack = new GuestTrack({
         kind: 'audio',
