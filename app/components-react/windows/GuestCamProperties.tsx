@@ -9,13 +9,13 @@ import { ListInput, SliderInput, TextInput } from 'components-react/shared/input
 import Form from 'components-react/shared/inputs/Form';
 import { ModalLayout } from 'components-react/shared/ModalLayout';
 import React, { useMemo, useState } from 'react';
-import { EDismissable } from 'services/dismissables';
+import { DismissablesService, EDismissable } from 'services/dismissables';
 import { EDeviceType } from 'services/hardware';
 import { $t } from 'services/i18n';
 import { SourcesService, TSourceType } from 'services/sources';
 import { byOS, OS } from 'util/operating-systems';
 import { IGuest, GuestCamService } from 'services/guest-cam';
-import { inject, useModule } from 'slap';
+import { inject, injectState, useModule } from 'slap';
 import { AudioService, EditorCommandsService } from 'app-services';
 
 class GuestCamModule {
@@ -23,6 +23,23 @@ class GuestCamModule {
   private SourcesService = inject(SourcesService);
   private AudioService = inject(AudioService);
   private EditorCommandsService = inject(EditorCommandsService);
+  private DismissablesService = inject(DismissablesService);
+
+  state = injectState({
+    regeneratingLink: false,
+  });
+
+  get joinAsGuest() {
+    return !!this.GuestCamService.state.joinAsGuestHash;
+  }
+
+  get showFirstTimeModal() {
+    return this.DismissablesService.views.shouldShow(EDismissable.GuestCamFirstTimeModal);
+  }
+
+  get inviteUrl() {
+    return this.GuestCamService.views.inviteUrl;
+  }
 
   get produceOk() {
     return this.GuestCamService.state.produceOk;
@@ -112,6 +129,13 @@ class GuestCamModule {
       sourceId,
     };
   }
+
+  regenerateLink() {
+    this.state.setRegeneratingLink(true);
+    this.GuestCamService.actions.return
+      .regenerateInviteLink()
+      .finally(() => this.state.setRegeneratingLink(false));
+  }
 }
 
 export default function GuestCamProperties() {
@@ -122,58 +146,29 @@ export default function GuestCamProperties() {
     EditorCommandsService,
     DismissablesService,
   } = Services;
-  const audioSourceType = byOS({
-    [OS.Windows]: 'wasapi_input_capture',
-    [OS.Mac]: 'coreaudio_input_capture',
-  });
-  const videoSourceType = byOS({ [OS.Windows]: 'dshow_input', [OS.Mac]: 'av_capture_input' });
-  const {
-    produceOk,
-    visible,
-    videoSourceId,
-    audioSourceId,
-    videoSources,
-    audioSources,
-    videoSourceExists,
-    audioSourceExists,
-    inviteUrl,
-    source,
-    volume,
-    showFirstTimeModal,
-    joinAsGuest,
-    hostName,
-  } = useVuex(() => ({
-    produceOk: GuestCamService.state.produceOk,
-    visible: GuestCamService.views.guestVisible,
-    videoSourceId: GuestCamService.views.videoSourceId,
-    videoSources: SourcesService.views.getSourcesByType(videoSourceType as TSourceType).map(s => ({
-      label: s.name,
-      value: s.sourceId,
-    })),
-    videoSourceExists: !!GuestCamService.views.videoSource,
-    audioSourceId: GuestCamService.views.audioSourceId,
-    audioSources: SourcesService.views.getSourcesByType(audioSourceType as TSourceType).map(s => ({
-      label: s.name,
-      value: s.sourceId,
-    })),
-    audioSourceExists: !!GuestCamService.views.audioSource,
-    inviteUrl: GuestCamService.views.inviteUrl,
-    source: GuestCamService.views.source,
-    volume: GuestCamService.views.deflection,
-    showFirstTimeModal: DismissablesService.views.shouldShow(EDismissable.GuestCamFirstTimeModal),
-    joinAsGuest: !!GuestCamService.state.joinAsGuestHash,
-    hostName: GuestCamService.state.hostName,
-  }));
-  const { guests } = useModule(GuestCamModule);
-  const [regeneratingLink, setRegeneratingLink] = useState(false);
-  const openedSourceId = useMemo(() => WindowsService.getChildWindowQueryParams().sourceId, []);
+  const defaultTab = useMemo(() => {
+    const openedSourceId = WindowsService.getChildWindowQueryParams().sourceId;
+    const guest = GuestCamService.views.getGuestBySourceId(openedSourceId);
 
-  async function regenerateLink() {
-    setRegeneratingLink(true);
-    await GuestCamService.actions.return
-      .ensureInviteLink(true)
-      .finally(() => setRegeneratingLink(false));
-  }
+    if (!guest) return 'global-settings';
+
+    return guest.remoteProducer.streamId;
+  }, []);
+  const {
+    guests,
+    joinAsGuest,
+    showFirstTimeModal,
+    inviteUrl,
+    videoProducerSource,
+    videoProducerSourceId,
+    videoProducerSourceOptions,
+    audioProducerSource,
+    audioProducerSourceId,
+    audioProducerSourceOptions,
+    produceOk,
+    regeneratingLink,
+    regenerateLink,
+  } = useModule(GuestCamModule);
 
   function getModalContent() {
     if (joinAsGuest) {
@@ -187,22 +182,30 @@ export default function GuestCamProperties() {
 
   return (
     <ModalLayout scrollable>
-      <Tabs destroyInactiveTabPane={true} defaultActiveKey="guest-settings">
+      <Tabs destroyInactiveTabPane={true} defaultActiveKey={defaultTab}>
         <Tabs.TabPane tab={$t('Global Settings')} key="global-settings">
-          <Form>
-            <TextInput
-              readOnly
-              value={inviteUrl}
-              label={$t('Invite URL')}
-              style={{ width: '100%' }}
-              addonAfter={
-                <Tooltip trigger="click" title={$t('Copied!')}>
-                  <Button onClick={() => remote.clipboard.writeText(inviteUrl)}>
-                    {$t('Copy')}
-                  </Button>
-                </Tooltip>
-              }
-            />
+          <Form layout="inline">
+            <div style={{ display: 'flex', width: '100%' }}>
+              <TextInput
+                readOnly
+                value={inviteUrl}
+                label={$t('Invite URL')}
+                style={{ flexGrow: 1 }}
+                addonAfter={
+                  <Tooltip trigger="click" title={$t('Copied!')}>
+                    <Button onClick={() => remote.clipboard.writeText(inviteUrl)}>
+                      {$t('Copy')}
+                    </Button>
+                  </Tooltip>
+                }
+              />
+              <Button disabled={regeneratingLink} onClick={regenerateLink} style={{ width: 180 }}>
+                {$t('Generate a new link')}
+                {regeneratingLink && (
+                  <i className="fa fa-spinner fa-pulse" style={{ marginLeft: 8 }} />
+                )}
+              </Button>
+            </div>
             <h2>
               {$t(
                 'You will need to select a microphone and webcam source in your current scene collection that will be sent to your guests for them to see and hear you.',
@@ -210,30 +213,30 @@ export default function GuestCamProperties() {
             </h2>
             <ListInput
               label={$t('Webcam Source')}
-              options={videoSources}
-              value={videoSourceId}
+              options={videoProducerSourceOptions}
+              value={videoProducerSourceId}
               onChange={s => GuestCamService.actions.setVideoSource(s)}
             />
             <ListInput
               label={$t('Microphone Source')}
-              options={audioSources}
-              value={audioSourceId}
+              options={audioProducerSourceOptions}
+              value={audioProducerSourceId}
               onChange={s => GuestCamService.actions.setAudioSource(s)}
             />
           </Form>
-          {(!videoSourceExists || !audioSourceExists) && (
+          {(!videoProducerSource || !audioProducerSource) && (
             <Alert
               type="error"
               showIcon={true}
               closable={false}
               message={
                 <div style={{ color: 'var(--paragraph)' }}>
-                  {!videoSourceExists && (
+                  {!videoProducerSource && (
                     <div>
                       {$t('No webcam source is selected. Your guest will not be able to see you.')}
                     </div>
                   )}
-                  {!audioSourceExists && (
+                  {!audioProducerSource && (
                     <div>
                       {$t(
                         'No microphone source is selected. Your guest will not be able to hear you.',

@@ -71,6 +71,7 @@ export interface IObsReturnTypes {
 
 interface IRoomResponse {
   room: string;
+  hash: string;
 }
 
 interface IIoConfigResponse {
@@ -244,6 +245,10 @@ class GuestCamViews extends ViewHandler<IGuestCamServiceState> {
 
     return this.getServiceViews(SourcesService).getSource(guest.sourceId);
   }
+
+  getGuestBySourceId(sourceId: string) {
+    return this.state.guests.find(g => g.sourceId === sourceId);
+  }
 }
 
 @InitAfter('SceneCollectionsService')
@@ -400,14 +405,14 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
 
       if (!this.userService.views.isLoggedIn) return;
 
-      await this.ensureInviteLink();
-
       const roomUrl = this.urlService.getStreamlabsApi('streamrooms/current');
       const roomResult = await jfetch<IRoomResponse>(roomUrl, {
         headers: authorizedHeaders(this.userService.views.auth.apiToken),
       });
 
       this.log('Room result', roomResult);
+
+      this.SET_INVITE_HASH(roomResult.hash);
 
       this.room = roomResult.room;
 
@@ -433,6 +438,15 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
     });
   }
 
+  async regenerateInviteLink() {
+    const regenerateUrl = this.urlService.getStreamlabsApi('streamrooms/regenerate');
+    const regenerateResult = await jfetch<{ hash: string }>(regenerateUrl, {
+      headers: authorizedHeaders(this.userService.views.auth.apiToken),
+      method: 'POST',
+    });
+    this.SET_INVITE_HASH(regenerateResult.hash);
+  }
+
   /**
    * This should be called when we are attempting to join somebody else's
    * stream as a guest.
@@ -449,34 +463,6 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
     this.SET_PRODUCE_OK(false);
     await this.startListeningForGuests();
     this.sourcesService.showGuestCamPropertiesBySourceId(this.views.sourceId);
-  }
-
-  /**
-   * Ensures we have exactly one valid invite link
-   * @param force If true, will invalidate the old link and generate a new one
-   */
-  async ensureInviteLink(force = false) {
-    const existingLinks = await this.getInviteLinks();
-
-    // Ensure there is only one link (or 0 if we want to regenerate)
-    const existingLink = existingLinks.links.shift();
-
-    // Delete all remaining links just in case the exist somehow
-    for (const link of existingLinks.links) {
-      await this.deleteInviteLink(link.id);
-    }
-
-    if (existingLink && !force) {
-      this.SET_INVITE_HASH(existingLink.hash);
-      return;
-    }
-
-    if (existingLink && force) {
-      await this.deleteInviteLink(existingLink.id);
-    }
-
-    const newLink = await this.createInviteLink(this.views.sourceId);
-    this.SET_INVITE_HASH(newLink.hash);
   }
 
   setProduceOk() {
@@ -588,32 +574,6 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
     this.log('Fetched new TURN config', turnConfigResult);
 
     return turnConfigResult;
-  }
-
-  getInviteLinks() {
-    const url = this.urlService.getStreamlabsApi('streamrooms/current');
-
-    return jfetch<IInviteLinksResponse>(url, {
-      headers: authorizedHeaders(this.userService.views.auth.apiToken),
-    });
-  }
-
-  createInviteLink(sourceId: string) {
-    const url = this.urlService.getStreamlabsApi(`streamrooms/create-source?source_id=${sourceId}`);
-
-    return jfetch<IInviteLink>(url, {
-      method: 'POST',
-      headers: authorizedHeaders(this.userService.views.auth.apiToken),
-    });
-  }
-
-  deleteInviteLink(id: number) {
-    const url = this.urlService.getStreamlabsApi(`streamrooms/remove-source?id=${id}`);
-
-    return jfetch<IInviteLink>(url, {
-      method: 'POST',
-      headers: authorizedHeaders(this.userService.views.auth.apiToken),
-    });
   }
 
   async openSocketConnection(url: string, token: string) {
