@@ -82,6 +82,15 @@ class GuestCamModule {
     return this.GuestCamService.views.audioSource;
   }
 
+  get availableSources() {
+    return this.GuestCamService.views.sources.map(source => {
+      return {
+        label: source.name,
+        value: source.sourceId,
+      };
+    });
+  }
+
   get guests() {
     // TODO: Talk to Alex about this. Because reactivity is done via shallow
     // comparison, this won't be reactive unless it's a new array every time.
@@ -136,6 +145,14 @@ class GuestCamModule {
       .regenerateInviteLink()
       .finally(() => this.state.setRegeneratingLink(false));
   }
+
+  truncateName(name: string) {
+    if (name.length > 10) {
+      return `${name.substring(0, 10)}...`;
+    }
+
+    return name;
+  }
 }
 
 export default function GuestCamProperties() {
@@ -150,7 +167,7 @@ export default function GuestCamProperties() {
     const openedSourceId = WindowsService.getChildWindowQueryParams().sourceId;
     const guest = GuestCamService.views.getGuestBySourceId(openedSourceId);
 
-    if (!guest) return 'global-settings';
+    if (!guest) return 'settings';
 
     return guest.remoteProducer.streamId;
   }, []);
@@ -168,6 +185,7 @@ export default function GuestCamProperties() {
     produceOk,
     regeneratingLink,
     regenerateLink,
+    truncateName,
   } = useModule(GuestCamModule);
 
   function getModalContent() {
@@ -183,7 +201,7 @@ export default function GuestCamProperties() {
   return (
     <ModalLayout scrollable>
       <Tabs destroyInactiveTabPane={true} defaultActiveKey={defaultTab}>
-        <Tabs.TabPane tab={$t('Global Settings')} key="global-settings">
+        <Tabs.TabPane tab={$t('Settings')} key="settings">
           <Form layout="inline">
             <div style={{ display: 'flex', width: '100%' }}>
               <TextInput
@@ -248,10 +266,10 @@ export default function GuestCamProperties() {
             />
           )}
         </Tabs.TabPane>
-        {guests.map((guest, index) => {
+        {guests.map(guest => {
           return (
             <Tabs.TabPane
-              tab={$t('Guest %{num} Settings', { num: index + 1 })}
+              tab={truncateName(guest.remoteProducer.name)}
               key={guest.remoteProducer.streamId}
             >
               <GuestPane guest={guest} />
@@ -273,6 +291,16 @@ export default function GuestCamProperties() {
         {getModalContent()}
       </Modal>
     </ModalLayout>
+  );
+}
+
+function GuestSourceSelector(p: { guest: IGuest }) {
+  const { availableSources, getBindingsForGuest } = useModule(GuestCamModule);
+  const bindings = useVuex(() => getBindingsForGuest(p.guest.remoteProducer.streamId));
+  const sourceId = bindings ? bindings.sourceId : null;
+
+  return (
+    <ListInput options={availableSources} value={sourceId} label={$t('Source')} listHeight={120} />
   );
 }
 
@@ -298,10 +326,15 @@ function GuestPane(p: { guest: IGuest }) {
         borderRadius: 8,
       }}
     >
+      <GuestDisplay guest={p.guest} />
       <div style={{ flexGrow: 1, padding: 20 }}>
-        <div style={{ display: 'flex', flexDirection: 'row' }}>
-          <div style={{ flexGrow: 1 }}>
-            {/* <div style={{ height: 32, margin: '10px 0 10px' }}>
+        <Form layout="inline">
+          <div style={{ display: 'flex', flexDirection: 'row', width: '100%' }}>
+            <div style={{ width: 400, margin: '0 20px 20px' }}>
+              <GuestSourceSelector guest={p.guest} />
+            </div>
+            <div style={{ flexGrow: 1, margin: '0 20px 20px' }}>
+              {/* <div style={{ height: 32, margin: '10px 0 10px' }}>
               {joinAsGuest ? (
                 <div>
                   <b>{$t('Connected To Host:')}</b>{' '}
@@ -323,64 +356,32 @@ function GuestPane(p: { guest: IGuest }) {
                 />
               )}
             </div> */}
-            <SliderInput
-              label={$t('Volume')}
-              value={volume}
-              onChange={setVolume}
-              min={0}
-              max={1}
-              debounce={500}
-              step={0.01}
-              tipFormatter={v => `${(v * 100).toFixed(0)}%`}
-              style={{ width: '100%', margin: '20px 0' }}
-            />
-          </div>
-          <div style={{ width: 350, marginLeft: 20 }}>
-            <div
-              style={{
-                display: 'flex',
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                margin: '10px 0',
-                height: 32,
-              }}
-            >
-              {/* {joinAsGuest ? (
-                <></>
-              ) : (
-                <>
-                  <Tooltip title={$t('Copied!')} trigger="click">
-                    <Button
-                      onClick={() => remote.clipboard.writeText(inviteUrl)}
-                      style={{ width: 160 }}
-                    >
-                      {$t('Copy Link')}
-                    </Button>
-                  </Tooltip>
-                  <Button
-                    disabled={regeneratingLink}
-                    onClick={regenerateLink}
-                    style={{ width: 160 }}
-                  >
-                    {$t('Generate a new link')}
-                    {regeneratingLink && (
-                      <i className="fa fa-spinner fa-pulse" style={{ marginLeft: 8 }} />
-                    )}
-                  </Button>
-                </>
-              )} */}
+              <SliderInput
+                label={$t('Volume')}
+                value={volume}
+                onChange={setVolume}
+                min={0}
+                max={1}
+                debounce={500}
+                step={0.01}
+                tipFormatter={v => `${(v * 100).toFixed(0)}%`}
+                tooltipPlacement="bottom"
+                style={{ width: '100%' }}
+              />
             </div>
+          </div>
+          <div style={{ width: '100%', marginLeft: 20 }}>
             <div
               style={{
                 display: 'flex',
                 flexDirection: 'row',
-                justifyContent: 'space-between',
-                margin: '20px 0 0',
+                justifyContent: 'center',
+                margin: '20px 0',
               }}
             >
               <Button
                 onClick={setVisible}
-                style={{ width: 160 }}
+                style={{ width: 160, marginRight: 40 }}
                 type={!visible ? 'primary' : 'default'}
               >
                 {visible ? $t('Hide on Stream') : $t('Show on Stream')}
@@ -394,9 +395,8 @@ function GuestPane(p: { guest: IGuest }) {
               </button>
             </div>
           </div>
-        </div>
+        </Form>
       </div>
-      <GuestDisplay guest={p.guest} />
     </div>
   );
 }
@@ -406,7 +406,7 @@ function GuestDisplay(p: { guest: IGuest }) {
   const { sourceId } = useVuex(() => getBindingsForGuest(p.guest.remoteProducer.streamId)!);
 
   return (
-    <div style={{ background: 'var(--section)', borderRadius: '0 0 8px 8px', height: 280 }}>
+    <div style={{ background: 'var(--section)', borderRadius: '8px 8px 0 0', height: 280 }}>
       {/* Weird double div is to avoid display blocking border radius */}
       <div style={{ margin: '0 10px', width: 'calc(100% - 20px)', height: '100%' }}>
         {produceOk && <Display sourceId={sourceId} />}

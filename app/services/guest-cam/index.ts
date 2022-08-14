@@ -658,11 +658,11 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
       this.consumer = new Consumer(this.views.sources[0].sourceId);
     }
 
-    this.consumer.addGuest(sourceId, event.data);
+    this.consumer.addGuest(event.data);
 
-    // Make sure the source isn't visible in any scene
-    // this.views.source.setForceHidden(true);
-    // this.views.source.setForceMuted(true);
+    if (sourceId) {
+      this.setGuestSource(event.data.streamId, sourceId);
+    }
 
     this.emitStreamingStatus();
 
@@ -688,6 +688,13 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
     );
 
     if (!guestConsumer) return;
+
+    const source = this.sourcesService.views.getSource(sourceId);
+
+    if (!source) return;
+
+    source.setForceHidden(true);
+    source.setForceMuted(true);
 
     guestConsumer.setSource(sourceId);
   }
