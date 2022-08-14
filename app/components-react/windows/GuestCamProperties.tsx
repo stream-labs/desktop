@@ -17,6 +17,7 @@ import { byOS, OS } from 'util/operating-systems';
 import { IGuest, GuestCamService } from 'services/guest-cam';
 import { inject, injectState, useModule } from 'slap';
 import { AudioService, EditorCommandsService } from 'app-services';
+import { confirmAsync } from 'components-react/modals';
 
 class GuestCamModule {
   private GuestCamService = inject(GuestCamService);
@@ -27,6 +28,7 @@ class GuestCamModule {
 
   state = injectState({
     regeneratingLink: false,
+    hideDisplay: false,
   });
 
   get joinAsGuest() {
@@ -295,12 +297,28 @@ export default function GuestCamProperties() {
 }
 
 function GuestSourceSelector(p: { guest: IGuest }) {
-  const { availableSources, getBindingsForGuest } = useModule(GuestCamModule);
+  const { availableSources, getBindingsForGuest, setHideDisplay } = useModule(GuestCamModule);
   const bindings = useVuex(() => getBindingsForGuest(p.guest.remoteProducer.streamId));
   const sourceId = bindings ? bindings.sourceId : null;
-  const { GuestCamService } = Services;
+  const { GuestCamService, SourcesService } = Services;
 
-  function setSourceId(sourceId: string) {
+  async function setSourceId(sourceId: string) {
+    const existingGuest = GuestCamService.views.getGuestBySourceId(sourceId);
+
+    if (existingGuest) {
+      const source = SourcesService.views.getSource(sourceId)!;
+      setHideDisplay(true);
+      const confirmed = await confirmAsync(
+        $t(
+          'The source %{sourceName} is already occupied by %{guestName}. If you continue, %{guestName} will be unassigned.',
+          { sourceName: source.name, guestName: existingGuest.remoteProducer.name },
+        ),
+      );
+      setHideDisplay(false);
+
+      if (!confirmed) return;
+    }
+
     GuestCamService.actions.setGuestSource(p.guest.remoteProducer.streamId, sourceId);
   }
 
@@ -326,7 +344,9 @@ function GuestPane(p: { guest: IGuest }) {
     return (
       <div>
         <h2>{$t('This guest is not assigned to a source')}</h2>
-        <GuestSourceSelector guest={p.guest} />
+        <Form>
+          <GuestSourceSelector guest={p.guest} />
+        </Form>
       </div>
     );
   }
@@ -418,14 +438,14 @@ function GuestPane(p: { guest: IGuest }) {
 }
 
 function GuestDisplay(p: { guest: IGuest }) {
-  const { produceOk, getBindingsForGuest } = useModule(GuestCamModule);
+  const { produceOk, getBindingsForGuest, hideDisplay } = useModule(GuestCamModule);
   const { sourceId } = useVuex(() => getBindingsForGuest(p.guest.remoteProducer.streamId)!);
 
   return (
     <div style={{ background: 'var(--section)', borderRadius: '8px 8px 0 0', height: 280 }}>
       {/* Weird double div is to avoid display blocking border radius */}
       <div style={{ margin: '0 10px', width: 'calc(100% - 20px)', height: '100%' }}>
-        {produceOk && <Display sourceId={sourceId} />}
+        {produceOk && !hideDisplay && <Display sourceId={sourceId} />}
       </div>
     </div>
   );
