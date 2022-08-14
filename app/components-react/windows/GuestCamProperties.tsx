@@ -12,8 +12,107 @@ import React, { useMemo, useState } from 'react';
 import { EDismissable } from 'services/dismissables';
 import { EDeviceType } from 'services/hardware';
 import { $t } from 'services/i18n';
-import { TSourceType } from 'services/sources';
+import { SourcesService, TSourceType } from 'services/sources';
 import { byOS, OS } from 'util/operating-systems';
+import { IGuest, GuestCamService } from 'services/guest-cam';
+import { inject, useModule } from 'slap';
+import { AudioService, EditorCommandsService } from 'app-services';
+
+class GuestCamModule {
+  private GuestCamService = inject(GuestCamService);
+  private SourcesService = inject(SourcesService);
+  private AudioService = inject(AudioService);
+  private EditorCommandsService = inject(EditorCommandsService);
+
+  get produceOk() {
+    return this.GuestCamService.state.produceOk;
+  }
+
+  get videoProducerSourceId() {
+    return this.GuestCamService.views.videoSourceId;
+  }
+
+  get audioProducerSourceId() {
+    return this.GuestCamService.views.audioSourceId;
+  }
+
+  get videoProducerSourceOptions() {
+    const videoSourceType = byOS({ [OS.Windows]: 'dshow_input', [OS.Mac]: 'av_capture_input' });
+
+    return this.SourcesService.views.getSourcesByType(videoSourceType as TSourceType).map(s => ({
+      label: s.name,
+      value: s.sourceId,
+    }));
+  }
+
+  get audioProducerSourceOptions() {
+    const audioSourceType = byOS({
+      [OS.Windows]: 'wasapi_input_capture',
+      [OS.Mac]: 'coreaudio_input_capture',
+    });
+
+    return this.SourcesService.views.getSourcesByType(audioSourceType as TSourceType).map(s => ({
+      label: s.name,
+      value: s.sourceId,
+    }));
+  }
+
+  get videoProducerSource() {
+    return this.GuestCamService.views.videoSource;
+  }
+
+  get audioProducerSource() {
+    return this.GuestCamService.views.audioSource;
+  }
+
+  get guests() {
+    // TODO: Talk to Alex about this. Because reactivity is done via shallow
+    // comparison, this won't be reactive unless it's a new array every time.
+    // This seems fairly unexpected.
+    return [...this.GuestCamService.state.guests];
+  }
+
+  /**
+   * Fetches data needed to display a guest and functions needed to modify state
+   * @param streamId The streamId of the guest
+   */
+  getBindingsForGuest(streamId: string) {
+    const guest = this.GuestCamService.views.getGuestByStreamId(streamId);
+    if (!guest?.sourceId) return;
+
+    const source = this.SourcesService.views.getSource(guest.sourceId);
+    if (!source) return;
+
+    const volume = this.AudioService.views.getSource(source.sourceId).fader.deflection;
+    const setVolume = (val: number) => {
+      this.EditorCommandsService.actions.executeCommand(
+        'SetDeflectionCommand',
+        source.sourceId,
+        val,
+      );
+    };
+
+    const visible = !source.forceHidden;
+    const setVisible = () => {
+      this.GuestCamService.actions.setVisibility(source.sourceId, !visible);
+    };
+
+    const disconnect = () => {
+      this.GuestCamService.actions.disconnectGuest(streamId, true);
+    };
+
+    const sourceId = source.sourceId;
+
+    return {
+      volume,
+      setVolume,
+      visible,
+      setVisible,
+      disconnect,
+      sourceId,
+    };
+  }
+}
 
 export default function GuestCamProperties() {
   const {
@@ -39,7 +138,6 @@ export default function GuestCamProperties() {
     audioSourceExists,
     inviteUrl,
     source,
-    guests,
     volume,
     showFirstTimeModal,
     joinAsGuest,
@@ -61,28 +159,20 @@ export default function GuestCamProperties() {
     audioSourceExists: !!GuestCamService.views.audioSource,
     inviteUrl: GuestCamService.views.inviteUrl,
     source: GuestCamService.views.source,
-    guests: GuestCamService.state.guests,
     volume: GuestCamService.views.deflection,
     showFirstTimeModal: DismissablesService.views.shouldShow(EDismissable.GuestCamFirstTimeModal),
     joinAsGuest: !!GuestCamService.state.joinAsGuestHash,
     hostName: GuestCamService.state.hostName,
   }));
+  const { guests } = useModule(GuestCamModule);
   const [regeneratingLink, setRegeneratingLink] = useState(false);
-
-  // TODO:
-  const guestInfo = guests[0];
+  const openedSourceId = useMemo(() => WindowsService.getChildWindowQueryParams().sourceId, []);
 
   async function regenerateLink() {
     setRegeneratingLink(true);
     await GuestCamService.actions.return
       .ensureInviteLink(true)
       .finally(() => setRegeneratingLink(false));
-  }
-
-  function setDeflection(val: number) {
-    if (!source) return;
-
-    EditorCommandsService.actions.executeCommand('SetDeflectionCommand', source.sourceId, val);
   }
 
   function getModalContent() {
@@ -100,6 +190,19 @@ export default function GuestCamProperties() {
       <Tabs destroyInactiveTabPane={true} defaultActiveKey="guest-settings">
         <Tabs.TabPane tab={$t('Global Settings')} key="global-settings">
           <Form>
+            <TextInput
+              readOnly
+              value={inviteUrl}
+              label={$t('Invite URL')}
+              style={{ width: '100%' }}
+              addonAfter={
+                <Tooltip trigger="click" title={$t('Copied!')}>
+                  <Button onClick={() => remote.clipboard.writeText(inviteUrl)}>
+                    {$t('Copy')}
+                  </Button>
+                </Tooltip>
+              }
+            />
             <h2>
               {$t(
                 'You will need to select a microphone and webcam source in your current scene collection that will be sent to your guests for them to see and hear you.',
@@ -142,146 +245,16 @@ export default function GuestCamProperties() {
             />
           )}
         </Tabs.TabPane>
-        <Tabs.TabPane tab={$t('Guest %{num} Settings', { num: 1 })} key="guest-settings">
-          <div
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              background: 'var(--section-alt)',
-              borderRadius: 8,
-            }}
-          >
-            <div style={{ flexGrow: 1, padding: 20 }}>
-              <h3>{$t('Source: %{sourceName}', { sourceName: source?.name })}</h3>
-              <div style={{ display: 'flex', flexDirection: 'row' }}>
-                <div style={{ flexGrow: 1 }}>
-                  <div style={{ height: 32, margin: '10px 0 10px' }}>
-                    {joinAsGuest ? (
-                      <div>
-                        <b>{$t('Connected To Host:')}</b>{' '}
-                        <span style={{ color: 'var(--title)' }}>{hostName}</span>
-                        <Tooltip
-                          title={$t(
-                            "You are connected as a guest using someone else's invite link. To leave, click the Disconnect button.",
-                          )}
-                        >
-                          <QuestionCircleOutlined style={{ marginLeft: 6 }} />
-                        </Tooltip>
-                      </div>
-                    ) : (
-                      <TextInput
-                        readOnly
-                        value={inviteUrl}
-                        label={$t('Invite URL')}
-                        style={{ width: '100%' }}
-                      />
-                    )}
-                  </div>
-                  <SliderInput
-                    label={$t('Volume')}
-                    value={volume}
-                    onChange={setDeflection}
-                    min={0}
-                    max={1}
-                    debounce={500}
-                    step={0.01}
-                    tipFormatter={v => `${(v * 100).toFixed(0)}%`}
-                    style={{ width: '100%', margin: '20px 0' }}
-                  />
-                </div>
-                <div style={{ width: 350, marginLeft: 20 }}>
-                  <div
-                    style={{
-                      display: 'flex',
-                      flexDirection: 'row',
-                      justifyContent: 'space-between',
-                      margin: '10px 0',
-                      height: 32,
-                    }}
-                  >
-                    {joinAsGuest ? (
-                      <></>
-                    ) : (
-                      <>
-                        <Tooltip title={$t('Copied!')} trigger="click">
-                          <Button
-                            onClick={() => remote.clipboard.writeText(inviteUrl)}
-                            style={{ width: 160 }}
-                          >
-                            {$t('Copy Link')}
-                          </Button>
-                        </Tooltip>
-                        <Button
-                          disabled={regeneratingLink}
-                          onClick={regenerateLink}
-                          style={{ width: 160 }}
-                        >
-                          {$t('Generate a new link')}
-                          {regeneratingLink && (
-                            <i className="fa fa-spinner fa-pulse" style={{ marginLeft: 8 }} />
-                          )}
-                        </Button>
-                      </>
-                    )}
-                  </div>
-                  <div
-                    style={{
-                      display: 'flex',
-                      flexDirection: 'row',
-                      justifyContent: 'space-between',
-                      margin: '20px 0 0',
-                    }}
-                  >
-                    <Button
-                      onClick={() => GuestCamService.actions.setVisibility(!visible)}
-                      disabled={!guestInfo}
-                      style={{ width: 160 }}
-                      type={!!guestInfo && !visible ? 'primary' : 'default'}
-                    >
-                      {!!guestInfo && visible ? $t('Hide on Stream') : $t('Show on Stream')}
-                    </Button>
-                    <button
-                      className="button button--soft-warning"
-                      style={{ width: 160 }}
-                      disabled={!guestInfo && !joinAsGuest}
-                      onClick={() =>
-                        GuestCamService.actions.disconnectGuest(
-                          guestInfo.remoteProducer.streamId,
-                          true,
-                        )
-                      }
-                    >
-                      {$t('Disconnect')}
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div style={{ background: 'var(--section)', borderRadius: '0 0 8px 8px', height: 280 }}>
-              {/* Weird double div is to avoid display blocking border radius */}
-              <div style={{ margin: '0 10px', width: 'calc(100% - 20px)', height: '100%' }}>
-                {!!guestInfo && produceOk && <Display sourceId={source?.sourceId} />}
-                {!guestInfo && (
-                  <div
-                    style={{
-                      height: '100%',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      padding: '50px 0',
-                    }}
-                  >
-                    <Spinner />
-                    <div style={{ textAlign: 'center' }}>
-                      {joinAsGuest
-                        ? $t('Waiting for host to begin')
-                        : $t('Waiting for guest to join')}
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-        </Tabs.TabPane>
+        {guests.map((guest, index) => {
+          return (
+            <Tabs.TabPane
+              tab={$t('Guest %{num} Settings', { num: index + 1 })}
+              key={guest.remoteProducer.streamId}
+            >
+              <GuestPane guest={guest} />
+            </Tabs.TabPane>
+          );
+        })}
       </Tabs>
       <Modal
         visible={!produceOk}
@@ -297,6 +270,145 @@ export default function GuestCamProperties() {
         {getModalContent()}
       </Modal>
     </ModalLayout>
+  );
+}
+
+function GuestPane(p: { guest: IGuest }) {
+  const { getBindingsForGuest } = useModule(GuestCamModule);
+
+  // TODO: Talk to Alex about how the useModule pattern thinks this should
+  // be handled with reactivity. For now, wrap in useVuex to make it reactive.
+  const bindings = useVuex(() => getBindingsForGuest(p.guest.remoteProducer.streamId));
+
+  if (!bindings) {
+    return <div>TODO: Guest is not assigned to a source</div>;
+  }
+
+  const { visible, setVisible, volume, setVolume, disconnect } = bindings;
+
+  return (
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        background: 'var(--section-alt)',
+        borderRadius: 8,
+      }}
+    >
+      <div style={{ flexGrow: 1, padding: 20 }}>
+        <div style={{ display: 'flex', flexDirection: 'row' }}>
+          <div style={{ flexGrow: 1 }}>
+            {/* <div style={{ height: 32, margin: '10px 0 10px' }}>
+              {joinAsGuest ? (
+                <div>
+                  <b>{$t('Connected To Host:')}</b>{' '}
+                  <span style={{ color: 'var(--title)' }}>{hostName}</span>
+                  <Tooltip
+                    title={$t(
+                      "You are connected as a guest using someone else's invite link. To leave, click the Disconnect button.",
+                    )}
+                  >
+                    <QuestionCircleOutlined style={{ marginLeft: 6 }} />
+                  </Tooltip>
+                </div>
+              ) : (
+                <TextInput
+                  readOnly
+                  value={inviteUrl}
+                  label={$t('Invite URL')}
+                  style={{ width: '100%' }}
+                />
+              )}
+            </div> */}
+            <SliderInput
+              label={$t('Volume')}
+              value={volume}
+              onChange={setVolume}
+              min={0}
+              max={1}
+              debounce={500}
+              step={0.01}
+              tipFormatter={v => `${(v * 100).toFixed(0)}%`}
+              style={{ width: '100%', margin: '20px 0' }}
+            />
+          </div>
+          <div style={{ width: 350, marginLeft: 20 }}>
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                margin: '10px 0',
+                height: 32,
+              }}
+            >
+              {/* {joinAsGuest ? (
+                <></>
+              ) : (
+                <>
+                  <Tooltip title={$t('Copied!')} trigger="click">
+                    <Button
+                      onClick={() => remote.clipboard.writeText(inviteUrl)}
+                      style={{ width: 160 }}
+                    >
+                      {$t('Copy Link')}
+                    </Button>
+                  </Tooltip>
+                  <Button
+                    disabled={regeneratingLink}
+                    onClick={regenerateLink}
+                    style={{ width: 160 }}
+                  >
+                    {$t('Generate a new link')}
+                    {regeneratingLink && (
+                      <i className="fa fa-spinner fa-pulse" style={{ marginLeft: 8 }} />
+                    )}
+                  </Button>
+                </>
+              )} */}
+            </div>
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                margin: '20px 0 0',
+              }}
+            >
+              <Button
+                onClick={setVisible}
+                style={{ width: 160 }}
+                type={!visible ? 'primary' : 'default'}
+              >
+                {visible ? $t('Hide on Stream') : $t('Show on Stream')}
+              </Button>
+              <button
+                className="button button--soft-warning"
+                style={{ width: 160 }}
+                onClick={disconnect}
+              >
+                {$t('Disconnect')}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <GuestDisplay guest={p.guest} />
+    </div>
+  );
+}
+
+function GuestDisplay(p: { guest: IGuest }) {
+  const { produceOk, getBindingsForGuest } = useModule(GuestCamModule);
+  const { sourceId } = useVuex(() => getBindingsForGuest(p.guest.remoteProducer.streamId)!);
+
+  return (
+    <div style={{ background: 'var(--section)', borderRadius: '0 0 8px 8px', height: 280 }}>
+      {/* Weird double div is to avoid display blocking border radius */}
+      <div style={{ margin: '0 10px', width: 'calc(100% - 20px)', height: '100%' }}>
+        {produceOk && <Display sourceId={sourceId} />}
+      </div>
+    </div>
   );
 }
 

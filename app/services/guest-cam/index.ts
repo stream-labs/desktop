@@ -132,6 +132,7 @@ interface IConsumerDestroyedEvent {
   type: 'consumerDestroyed';
   data: {
     socketId: string;
+    streamId: string;
   };
 }
 
@@ -147,7 +148,7 @@ interface ITurnConfig {
   username: string;
 }
 
-interface IGuest {
+export interface IGuest {
   remoteProducer: IRemoteProducer;
   sourceId?: string;
 }
@@ -234,6 +235,14 @@ class GuestCamViews extends ViewHandler<IGuestCamServiceState> {
 
   getGuestByStreamId(streamId: string) {
     return this.state.guests.find(g => g.remoteProducer.streamId === streamId);
+  }
+
+  getSourceForGuest(streamId: string) {
+    const guest = this.getGuestByStreamId(streamId);
+    if (!guest) return null;
+    if (!guest.sourceId) return null;
+
+    return this.getServiceViews(SourcesService).getSource(guest.sourceId);
   }
 }
 
@@ -776,17 +785,18 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
     this.SET_JOIN_AS_GUEST(null);
   }
 
-  setVisibility(visible: boolean) {
-    if (!this.views.source) return;
+  setVisibility(sourceId: string, visible: boolean) {
+    const source = this.sourcesService.views.getSource(sourceId);
+    if (!source) return;
 
-    this.views.source.setForceHidden(!visible);
-    this.views.source.setForceMuted(!visible);
+    source.setForceHidden(!visible);
+    source.setForceMuted(!visible);
   }
 
   async onGuestLeave(event: IConsumerDestroyedEvent) {
     this.log('Guest left', event);
 
-    this.disconnectGuest(event.data.socketId);
+    this.disconnectGuest(event.data.streamId);
   }
 
   async authenticateSocket(token: string): Promise<ISocketAuthResponse> {
