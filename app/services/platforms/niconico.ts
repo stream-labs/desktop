@@ -158,6 +158,7 @@ export class NiconicoService extends Service implements IPlatformService {
       const result = await this._setupStreamSettings(programId);
       return result;
     } catch (e) {
+      console.error('NiconicoService.setupStreamSettings(1)', e);
       // APIのレスポンスに番組状態が反映されるのが遅れる場合があるので、少し待ってリトライ
       await sleep(3000);
     }
@@ -167,6 +168,7 @@ export class NiconicoService extends Service implements IPlatformService {
       return result;
     } catch (e) {
       // リトライは1回だけ
+      console.error('NiconicoService.setupStreamSettings(2)', e);
       return NiconicoService.emptyStreamingSetting();
     }
   }

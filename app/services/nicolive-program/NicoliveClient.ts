@@ -58,7 +58,7 @@ export function isOk<T>(result: WrappedResult<T>): result is SucceededResult<T> 
   return result.ok === true;
 }
 
-export class NotLoggedInError {}
+export class NotLoggedInError { }
 
 export class NicoliveClient {
   static live2BaseURL = 'https://live2.nicovideo.jp';
@@ -445,20 +445,16 @@ export class NicoliveClient {
    * 放送可能なユーザー番組IDを取得する
    * 放送可能な番組がない場合はundefinedを返す
    */
-  async fetchOnairUserProgram(): Promise<OnairUserProgramData | undefined> {
+  async fetchOnairUserProgram(): Promise<OnairUserProgramData> {
     const url = `${NicoliveClient.live2BaseURL}/unama/tool/v2/onairs/user`;
     const headers = new Headers();
     const userSession = await this.fetchSession();
     headers.append('X-niconico-session', userSession);
     const request = new Request(url, { headers });
-    try {
-      return await fetch(request)
-        .then(handleErrors)
-        .then(response => response.json())
-        .then(json => json.data);
-    } catch {
-      return Promise.resolve(undefined);
-    }
+    return await fetch(request)
+      .then(handleErrors)
+      .then(response => response.json())
+      .then(json => json.data);
   }
 
   /**
