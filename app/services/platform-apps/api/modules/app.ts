@@ -17,6 +17,8 @@ enum EPage {
 
 type TNavigationCallback = (nav: INavigation) => void;
 
+type TAllowableWindowOptions = 'width' | 'height' | 'resizable' | 'title';
+
 export class AppModule extends Module {
   readonly moduleName = 'App';
   readonly permissions: EApiPermissions[] = [];
@@ -66,10 +68,15 @@ export class AppModule extends Module {
   popout(
     ctx: IApiContext,
     slot: EAppPageSlot,
-    windowOptions?: Partial<Omit<IWindowOptions, 'webPreferences'>>,
+    windowOptions?: Pick<IWindowOptions, TAllowableWindowOptions>,
   ) {
     if (slot === EAppPageSlot.Background) return;
 
-    this.platformAppsService.popOutAppPage(ctx.app.id, slot, windowOptions);
+    this.platformAppsService.popOutAppPage(ctx.app.id, slot, {
+      width: windowOptions.width,
+      height: windowOptions.height,
+      resizable: windowOptions.resizable,
+      title: windowOptions.title,
+    });
   }
 }
