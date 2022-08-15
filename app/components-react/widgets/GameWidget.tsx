@@ -3,7 +3,7 @@ import { IWidgetCommonState, useWidget, WidgetModule } from './common/useWidget'
 import { WidgetLayout } from './common/WidgetLayout';
 import { $t } from 'services/i18n';
 import { metadata } from 'components-react/shared/inputs/metadata';
-import { TextInput, SliderInput } from 'components-react/shared/inputs';
+import { TextInput, SliderInput, ListInput } from 'components-react/shared/inputs';
 import Form from 'components-react/shared/inputs/Form';
 import componentMap from './games';
 import { Menu } from 'antd';
@@ -28,7 +28,22 @@ export interface ITicTacToeOptions {
   cannot_play_here: string;
 }
 
-export interface IChatWordOptions {}
+export interface IChatWordOptions {
+  character_misplaced_tile_color: string;
+  character_misplaced_color: string;
+  character_correct_tile_color: string;
+  character_correct_color: string;
+  character_wrong_tile_color: string;
+  character_wrong_color: string;
+  chat_won_game_title: string;
+  chat_won_game_message: string;
+  chat_lost_game_title: string;
+  chat_lost_game_message: string;
+  chat_turn_message: string;
+  chat_wrong_word_chosen: string;
+  chat_response_invalid: string;
+  game_ended_message_duration: number;
+}
 
 interface IGameWidgetState extends IWidgetCommonState {
   data: {
@@ -41,13 +56,25 @@ interface IGameWidgetState extends IWidgetCommonState {
       available_games: TGameType[];
       game_options: {
         'tic-tac-toe': ITicTacToeOptions;
+        'chat-word': IChatWordOptions;
       };
     };
   };
 }
 
+function gameOption(key: string) {
+  const optionTable = {
+    'tic-tac-toe': $t('Tic Tac Toe'),
+    'chat-word': $t('Chat Word'),
+  };
+
+  return { label: optionTable[key], value: key };
+}
+
 export function GameWidget() {
-  const { isLoading, bind, selectedTab, setSelectedTab } = useGameWidget();
+  const { isLoading, bind, selectedTab, setSelectedTab, settings } = useGameWidget();
+
+  const availableGames = settings.available_games.map(gameOption);
 
   return (
     <WidgetLayout>
@@ -58,11 +85,12 @@ export function GameWidget() {
       <Form>
         {!isLoading && selectedTab === 'general' && (
           <>
+            <ListInput label={$t('Current Game')} {...bind.current_game} options={availableGames} />
             <SliderInput
               label={$t('Chat Decision Time')}
               tooltip={{
                 title: $t(
-                  "The duration in seconds to collect chat's responses before passing them to the game.",
+                  "The duration in seconds to collect chat's responses before passing them to the game",
                 ),
                 placement: 'bottom',
               }}
@@ -71,22 +99,22 @@ export function GameWidget() {
             />
             <TextInput
               label={$t('Trigger Command')}
-              tooltip={$t('Command used by the chat to provide their response.')}
+              tooltip={$t('Command used by the chat to provide their response')}
               {...bind.trigger_command}
             />
             <TextInput
               label={$t('No Input Recieved')}
-              tooltip={$t("Message displayed to let the chat know they didn't provide any input.")}
+              tooltip={$t("Message displayed to let the chat know they didn't provide any input")}
               {...bind.no_input_received_message}
             />
             <TextInput
               label={$t('Restarting Game')}
-              tooltip={$t('Message displayed to let the chat know the game is restarting.')}
+              tooltip={$t('Message displayed to let the chat know the game is restarting')}
               {...bind.restarting_game_message}
             />
           </>
         )}
-        {!isLoading && selectedTab === 'game' && <GameOptions game="tic-tac-toe" />}
+        {!isLoading && selectedTab === 'game' && <GameOptions game={settings.current_game} />}
       </Form>
     </WidgetLayout>
   );
