@@ -73,10 +73,9 @@ export class AppModule extends Module {
     if (slot === EAppPageSlot.Background) return;
 
     this.platformAppsService.popOutAppPage(ctx.app.id, slot, {
-      width: windowOptions.width,
-      height: windowOptions.height,
       resizable: windowOptions.resizable,
       title: windowOptions.title,
+      size: { width: windowOptions.width, height: windowOptions.height },
     });
   }
 }
