@@ -3,7 +3,7 @@ import { lazyModule } from 'util/lazy-module';
 import path from 'path';
 import fs from 'fs';
 import { Subject } from 'rxjs';
-import { WindowsService } from 'services/windows';
+import { IWindowOptions, WindowsService } from 'services/windows';
 import { Inject } from 'services/core/injector';
 import { EApiPermissions } from './api/modules/module';
 import { VideoService } from 'services/video';
@@ -70,6 +70,11 @@ export enum EAppPageSlot {
    * The background slot is never mounted anywhere
    */
   Background = 'background',
+
+  /**
+   * Auxillary slot for functionality handled in a different window
+   */
+  PopOut = 'pop_out',
 }
 
 interface IAppPage {
@@ -596,7 +601,7 @@ export class PlatformAppsService extends StatefulService<IPlatformAppServiceStat
     return this.state.loadedApps.filter(app => !app.unpacked);
   }
 
-  popOutAppPage(appId: string, pageSlot: EAppPageSlot) {
+  popOutAppPage(appId: string, pageSlot: EAppPageSlot, windowOptions?: Partial<IWindowOptions>) {
     const app = this.views.getApp(appId);
     if (!app || !app.enabled) return;
 
@@ -613,6 +618,7 @@ export class PlatformAppsService extends StatefulService<IPlatformAppServiceStat
         size: this.getPagePopOutSize(appId, pageSlot),
         x: mousePos.x,
         y: mousePos.y,
+        ...windowOptions,
       },
       windowId,
     );

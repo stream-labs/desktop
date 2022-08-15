@@ -2,6 +2,7 @@ import { Module, EApiPermissions, apiMethod, IApiContext } from './module';
 import { Inject } from 'services/core/injector';
 import { NavigationService } from 'services/navigation';
 import { EAppPageSlot, PlatformAppsService } from 'services/platform-apps';
+import { IWindowOptions } from 'services/windows';
 
 interface INavigation {
   sourceId?: string;
@@ -62,9 +63,13 @@ export class AppModule extends Module {
   }
 
   @apiMethod()
-  popout(ctx: IApiContext, slot: EAppPageSlot) {
+  popout(
+    ctx: IApiContext,
+    slot: EAppPageSlot,
+    windowOptions?: Partial<Omit<IWindowOptions, 'webPreferences'>>,
+  ) {
     if (slot === EAppPageSlot.Background) return;
 
-    this.platformAppsService.popOutAppPage(ctx.app.id, slot);
+    this.platformAppsService.popOutAppPage(ctx.app.id, slot, windowOptions);
   }
 }
