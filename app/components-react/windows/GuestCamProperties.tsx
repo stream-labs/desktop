@@ -205,7 +205,7 @@ export default function GuestCamProperties() {
       <Tabs destroyInactiveTabPane={true} defaultActiveKey={defaultTab}>
         <Tabs.TabPane tab={$t('Settings')} key="settings">
           <Form layout="inline">
-            <div style={{ display: 'flex', width: '100%' }}>
+            <div style={{ display: 'flex', width: '100%', margin: '10px 0' }}>
               <TextInput
                 readOnly
                 value={inviteUrl}
@@ -226,23 +226,34 @@ export default function GuestCamProperties() {
                 )}
               </Button>
             </div>
-            <h2>
+            <h2 style={{ marginTop: 20 }}>
               {$t(
-                'You will need to select a microphone and webcam source in your current scene collection that will be sent to your guests for them to see and hear you.',
+                'The webcam and microphone source you select below will be broadcast to your guests.',
               )}
             </h2>
-            <ListInput
-              label={$t('Webcam Source')}
-              options={videoProducerSourceOptions}
-              value={videoProducerSourceId}
-              onChange={s => GuestCamService.actions.setVideoSource(s)}
-            />
-            <ListInput
-              label={$t('Microphone Source')}
-              options={audioProducerSourceOptions}
-              value={audioProducerSourceId}
-              onChange={s => GuestCamService.actions.setAudioSource(s)}
-            />
+            <div
+              style={{
+                display: 'flex',
+                width: '100%',
+                margin: '10px 0',
+                justifyContent: 'space-between',
+              }}
+            >
+              <ListInput
+                label={$t('Webcam Source')}
+                options={videoProducerSourceOptions}
+                value={videoProducerSourceId}
+                onChange={s => GuestCamService.actions.setVideoSource(s)}
+                style={{ width: '45%', margin: 0 }}
+              />
+              <ListInput
+                label={$t('Microphone Source')}
+                options={audioProducerSourceOptions}
+                value={audioProducerSourceId}
+                onChange={s => GuestCamService.actions.setAudioSource(s)}
+                style={{ width: '45%', margin: 0 }}
+              />
+            </div>
           </Form>
           {(!videoProducerSource || !audioProducerSource) && (
             <Alert
