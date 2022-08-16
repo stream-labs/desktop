@@ -670,7 +670,7 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
     });
   }
 
-  setGuestSource(streamId: string, sourceId: string) {
+  setGuestSource(streamId: string, sourceId: string | null) {
     const guest = this.views.getGuestByStreamId(streamId);
 
     if (!guest) return;

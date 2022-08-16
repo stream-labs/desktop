@@ -313,7 +313,22 @@ function GuestSourceSelector(p: { guest: IGuest }) {
   const sourceId = bindings ? bindings.sourceId : null;
   const { GuestCamService, SourcesService } = Services;
 
-  async function setSourceId(sourceId: string) {
+  async function setSourceId(sourceId?: string) {
+    if (!sourceId) {
+      setHideDisplay(true);
+      const confirmed = await confirmAsync(
+        $t('Are you sure you want to unassign %{guestName} from the source?', {
+          guestName: p.guest.remoteProducer.name,
+        }),
+      );
+      setHideDisplay(false);
+
+      if (!confirmed) return;
+
+      GuestCamService.actions.setGuestSource(p.guest.remoteProducer.streamId, null);
+      return;
+    }
+
     const existingGuest = GuestCamService.views.getGuestBySourceId(sourceId);
 
     if (existingGuest) {
@@ -335,6 +350,7 @@ function GuestSourceSelector(p: { guest: IGuest }) {
 
   return (
     <ListInput
+      allowClear
       options={availableSources}
       value={sourceId}
       label={$t('Source')}
@@ -450,7 +466,11 @@ function GuestPane(p: { guest: IGuest }) {
 
 function GuestDisplay(p: { guest: IGuest }) {
   const { produceOk, getBindingsForGuest, hideDisplay } = useModule(GuestCamModule);
-  const { sourceId } = useVuex(() => getBindingsForGuest(p.guest.remoteProducer.streamId)!);
+  const bindings = useVuex(() => getBindingsForGuest(p.guest.remoteProducer.streamId));
+
+  if (!bindings) return <div></div>;
+
+  const { sourceId } = bindings;
 
   return (
     <div style={{ background: 'var(--section)', borderRadius: '8px 8px 0 0', height: 280 }}>
