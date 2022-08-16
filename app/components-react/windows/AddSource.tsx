@@ -151,6 +151,7 @@ export default function AddSource() {
           sourceAddOptions: {
             propertiesManager: sourceAddOptions.propertiesManager,
             propertiesManagerSettings: sourceAddOptions.propertiesManagerSettings,
+            guestCamStreamId: sourceAddOptions.guestCamStreamId,
           },
         },
       );

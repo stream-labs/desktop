@@ -40,6 +40,7 @@ import { VideoService } from 'services/video';
 import { CustomizationService } from '../customization';
 import { EAvailableFeatures, IncrementalRolloutService } from '../incremental-rollout';
 import { EMonitoringType } from '../../../obs-api';
+import { GuestCamService } from 'services/guest-cam';
 
 const AudioFlag = obs.ESourceOutputFlags.Audio;
 const VideoFlag = obs.ESourceOutputFlags.Video;
@@ -183,6 +184,7 @@ export class SourcesService extends StatefulService<ISourcesState> {
   @Inject() private videoService: VideoService;
   @Inject() private customizationService: CustomizationService;
   @Inject() private incrementalRolloutService: IncrementalRolloutService;
+  @Inject() private guestCamService: GuestCamService;
 
   get views() {
     return new SourcesViews(this.state);
@@ -382,6 +384,10 @@ export class SourcesService extends StatefulService<ISourcesState> {
 
     if (options.audioSettings) {
       this.audioService.views.getSource(id).setSettings(options.audioSettings);
+    }
+
+    if (type === 'mediasoupconnector' && options.guestCamStreamId) {
+      this.guestCamService.setGuestSource(options.guestCamStreamId, id);
     }
   }
 

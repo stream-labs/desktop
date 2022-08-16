@@ -165,6 +165,10 @@ class GuestCamModule {
 
     return name;
   }
+
+  addNewSource(streamId: string) {
+    this.SourcesService.actions.showAddSource('mediasoupconnector', { guestCamStreamId: streamId });
+  }
 }
 
 export default function GuestCamProperties() {
@@ -371,7 +375,7 @@ function GuestSourceSelector(p: { guest: IGuest; style?: React.CSSProperties }) 
 }
 
 function GuestPane(p: { guest: IGuest }) {
-  const { getBindingsForGuest } = useModule(GuestCamModule);
+  const { getBindingsForGuest, addNewSource } = useModule(GuestCamModule);
 
   // TODO: Talk to Alex about how the useModule pattern thinks this should
   // be handled with reactivity. For now, wrap in useVuex to make it reactive.
@@ -383,6 +387,9 @@ function GuestPane(p: { guest: IGuest }) {
         <h2>{$t('This guest is not assigned to a source')}</h2>
         <Form layout="inline">
           <GuestSourceSelector guest={p.guest} style={{ width: 400 }} />
+          <Button onClick={() => addNewSource(p.guest.remoteProducer.streamId)}>
+            {$t('Add New Source')}
+          </Button>
         </Form>
       </div>
     );
