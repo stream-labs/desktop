@@ -314,6 +314,13 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
 
     this.sourcesService.sourceRemoved.subscribe(s => {
       if (s.type === 'mediasoupconnector') {
+        // Make sure source is unassigned
+        const guest = this.views.getGuestBySourceId(s.sourceId);
+
+        if (guest) {
+          this.setGuestSource(guest.remoteProducer.streamId, null);
+        }
+
         // Only clean up if this is the last mediasoup source
         // There is no use case for multiple sources right now, but
         // we shouldn't break in this scenario
@@ -823,12 +830,6 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
     func: TFunc,
     arg?: Object,
   ): IObsReturnTypes[TFunc] {
-    // If underlying source is destroyed, do nothing
-    if (!this.views.source) {
-      this.log(`Ignoring OBS call ${func} due to source not existing`);
-      return;
-    }
-
     let stringArg = arg ?? '';
 
     if (typeof stringArg === 'object') {
@@ -840,6 +841,12 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
     }
 
     const source = this.sourcesService.views.getSource(sourceId);
+
+    // If underlying source is destroyed, do nothing
+    if (!source) {
+      this.log(`Ignoring OBS call ${func} due to source not existing`);
+      return;
+    }
 
     let result = (source.getObsInput().callHandler(func, stringArg) as any).output;
 
