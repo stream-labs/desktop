@@ -606,8 +606,26 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
     this.socket.on('connect_error', (e: any) => this.log('Connection Error', e));
     this.socket.on('connect_timeout', () => this.log('Connection Timeout'));
     this.socket.on('error', () => this.log('Socket Error'));
-    this.socket.on('disconnect', () => this.log('Connection Closed'));
+    this.socket.on('disconnect', () => this.handleDisconnect);
+    // this.socket.on('reconnect', () => this.handleReconnect);
     this.socket.on('webrtc', (e: TWebRTCSocketEvent) => this.onWebRTC(e));
+  }
+
+  handleDisconnect() {
+    this.log('Socket Disconnected!');
+
+    if (this.consumer) {
+      this.consumer.destroy();
+      this.consumer = null;
+    }
+
+    if (this.producer) {
+      this.producer.destroy();
+      this.producer = null;
+    }
+
+    this.CLEAR_GUESTS();
+    this.SET_JOIN_AS_GUEST(null);
   }
 
   onWebRTC(event: TWebRTCSocketEvent) {
