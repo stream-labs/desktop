@@ -34,5 +34,6 @@
   "You are connected as a guest using someone else's invite link. To leave, click the Disconnect button.": "You are connected as a guest using someone else's invite link. To leave, click the Disconnect button.",
   "This guest is not assigned to a source": "This guest is not assigned to a source",
   "The source %{sourceName} is already occupied by %{guestName}. If you continue, %{guestName} will be unassigned.": "The source %{sourceName} is already occupied by %{guestName}. If you continue, %{guestName} will be unassigned.",
-  "Are you sure you want to unassign %{guestName} from the source?": "Are you sure you want to unassign %{guestName} from the source?"
+  "Are you sure you want to unassign %{guestName} from the source?": "Are you sure you want to unassign %{guestName} from the source?",
+  "Assign to Source": "Assign to Source"
 }

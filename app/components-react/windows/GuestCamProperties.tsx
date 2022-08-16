@@ -317,7 +317,7 @@ export default function GuestCamProperties() {
   );
 }
 
-function GuestSourceSelector(p: { guest: IGuest }) {
+function GuestSourceSelector(p: { guest: IGuest; style?: React.CSSProperties }) {
   const { availableSources, getBindingsForGuest, setHideDisplay } = useModule(GuestCamModule);
   const bindings = useVuex(() => getBindingsForGuest(p.guest.remoteProducer.streamId));
   const sourceId = bindings ? bindings.sourceId : null;
@@ -362,9 +362,10 @@ function GuestSourceSelector(p: { guest: IGuest }) {
     <ListInput
       options={availableSources}
       value={sourceId}
-      label={$t('Source')}
+      label={$t('Assign to Source')}
       listHeight={120}
       onChange={setSourceId}
+      style={p.style}
     />
   );
 }
@@ -380,8 +381,8 @@ function GuestPane(p: { guest: IGuest }) {
     return (
       <div>
         <h2>{$t('This guest is not assigned to a source')}</h2>
-        <Form>
-          <GuestSourceSelector guest={p.guest} />
+        <Form layout="inline">
+          <GuestSourceSelector guest={p.guest} style={{ width: 400 }} />
         </Form>
       </div>
     );
