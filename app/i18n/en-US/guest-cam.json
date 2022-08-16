@@ -7,7 +7,7 @@
   "No webcam source is selected. Your guest will not be able to see you.": "No webcam source is selected. Your guest will not be able to see you.",
   "Microphone Source": "Microphone Source",
   "Webcam Source": "Webcam Source",
-  "You will need to select a microphone and webcam source in your current scene collection that will be sent to your guests for them to see and hear you.": "You will need to select a microphone and webcam source in your current scene collection that will be sent to your guests for them to see and hear you.",
+  "The webcam and microphone source you select below will be broadcast to your guests.": "The webcam and microphone source you select below will be broadcast to your guests.",
   "Waiting for guest to join": "Waiting for guest to join",
   "Generate a new link": "Generate a new link",
   "Copied!": "Copied!",
