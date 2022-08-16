@@ -56,8 +56,6 @@ export class Guest extends MediasoupEntity {
   }
 
   async createTracks() {
-    await this.consumerCreatedPromise;
-
     if (this.opts.remoteProducer.audioId) {
       this.audioTrack = new GuestTrack({
         kind: 'audio',
@@ -94,7 +92,9 @@ export class Guest extends MediasoupEntity {
    * Calling without a sourceId will stop playing this guest
    * @param sourceId The id of the source to play on
    */
-  setSource(sourceId?: string) {
+  async setSource(sourceId?: string) {
+    await this.consumerCreatedPromise;
+
     this.withMutex(async () => {
       this.sourceId = sourceId;
 
