@@ -85,12 +85,22 @@ class GuestCamModule {
   }
 
   get availableSources() {
-    return this.GuestCamService.views.sources.map(source => {
-      return {
-        label: source.name,
-        value: source.sourceId,
-      };
-    });
+    const list: { label: string; value: string | null }[] = this.GuestCamService.views.sources.map(
+      source => {
+        const existingGuest = this.GuestCamService.views.getGuestBySourceId(source.sourceId);
+        const name = existingGuest
+          ? `${source.name} <${existingGuest.remoteProducer.name}>`
+          : source.name;
+
+        return {
+          label: name,
+          value: source.sourceId,
+        };
+      },
+    );
+    list.unshift({ label: $t('Unassigned'), value: null });
+
+    return list;
   }
 
   get guests() {
@@ -350,7 +360,6 @@ function GuestSourceSelector(p: { guest: IGuest }) {
 
   return (
     <ListInput
-      allowClear
       options={availableSources}
       value={sourceId}
       label={$t('Source')}
