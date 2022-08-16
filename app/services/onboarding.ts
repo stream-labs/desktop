@@ -216,7 +216,7 @@ export class OnboardingService extends StatefulService<IOnboardingServiceState> 
 
   @mutation()
   SET_EXISTING_COLLECTIONS(val: boolean) {
-    // this.state.existingSceneCollections = val;
+    this.state.existingSceneCollections = val;
   }
 
   async fetchThemeData(id: string) {
@@ -248,11 +248,15 @@ export class OnboardingService extends StatefulService<IOnboardingServiceState> 
   }
 
   init() {
-    this.SET_EXISTING_COLLECTIONS(this.existingSceneCollections);
+    this.setExistingCollections();
   }
 
   setObsImport(val: boolean) {
     this.SET_OBS_IMPORTED(val);
+  }
+
+  setExistingCollections() {
+    this.SET_EXISTING_COLLECTIONS(this.existingSceneCollections);
   }
 
   // A login attempt is an abbreviated version of the onboarding process,

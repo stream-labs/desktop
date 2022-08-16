@@ -4,11 +4,10 @@ import { DataNode } from 'rc-tree/lib/interface';
 import { TreeProps } from 'rc-tree/lib/Tree';
 import cx from 'classnames';
 import { inject, injectState, injectWatch, mutation, useModule } from 'slap';
-import { SourcesService, SourceDisplayData } from 'services/sources';
+import { SourcesService } from 'services/sources';
 import { ScenesService, ISceneItem, TSceneNode, isItem } from 'services/scenes';
 import { SelectionService } from 'services/selection';
 import { EditMenu } from 'util/menus/EditMenu';
-import { WidgetDisplayData } from 'services/widgets';
 import { $t } from 'services/i18n';
 import { EditorCommandsService } from 'services/editor-commands';
 import { EPlaceType } from 'services/editor-commands/commands/reorder-nodes';
@@ -21,6 +20,8 @@ import styles from './SceneSelector.m.less';
 import Scrollable from 'components-react/shared/Scrollable';
 import HelpTip from 'components-react/shared/HelpTip';
 import Translate from 'components-react/shared/Translate';
+import { WidgetsService } from '../../../app-services';
+import { GuestCamService } from 'app-services';
 
 interface ISourceMetadata {
   id: string;
@@ -30,17 +31,21 @@ interface ISourceMetadata {
   isLocked: boolean;
   isStreamVisible: boolean;
   isRecordingVisible: boolean;
+  isGuestCamActive: boolean;
   isFolder: boolean;
+  canShowActions: boolean;
   parentId?: string;
 }
 
 class SourceSelectorModule {
   private scenesService = inject(ScenesService);
   private sourcesService = inject(SourcesService);
+  private widgetsService = inject(WidgetsService);
   private selectionService = inject(SelectionService);
   private editorCommandsService = inject(EditorCommandsService);
   private streamingService = inject(StreamingService);
   private audioService = inject(AudioService);
+  private guestCamService = inject(GuestCamService);
 
   sourcesTooltip = $t('The building blocks of your scene. Also contains widgets.');
   addSourceTooltip = $t('Add a new Source to your Scene. Includes widgets.');
@@ -50,6 +55,7 @@ class SourceSelectorModule {
 
   state = injectState({
     expandedFoldersIds: [] as string[],
+    showTreeMask: true,
   });
 
   nodeRefs = {};
@@ -73,11 +79,13 @@ class SourceSelectorModule {
               id={sceneNode.id}
               isVisible={sceneNode.isVisible}
               isLocked={sceneNode.isLocked}
+              canShowActions={sceneNode.canShowActions}
               toggleVisibility={() => this.toggleVisibility(sceneNode.id)}
               toggleLock={() => this.toggleLock(sceneNode.id)}
               selectiveRecordingEnabled={this.selectiveRecordingEnabled}
               isStreamVisible={sceneNode.isStreamVisible}
               isRecordingVisible={sceneNode.isRecordingVisible}
+              isGuestCamActive={sceneNode.isGuestCamActive}
               cycleSelectiveRecording={() => this.cycleSelectiveRecording(sceneNode.id)}
               ref={this.nodeRefs[sceneNode.id]}
               onDoubleClick={() => this.sourceProperties(sceneNode.id)}
@@ -101,6 +109,12 @@ class SourceSelectorModule {
       const isLocked = itemsForNode.every(i => i.locked);
       const isRecordingVisible = itemsForNode.every(i => i.recordingVisible);
       const isStreamVisible = itemsForNode.every(i => i.streamVisible);
+      const isGuestCamActive = itemsForNode.some(i => {
+        return (
+          this.sourcesService.state.sources[i.sourceId].type === 'mediasoupconnector' &&
+          this.guestCamService.state.guestInfo
+        );
+      });
 
       const isFolder = !isItem(node);
       return {
@@ -111,7 +125,9 @@ class SourceSelectorModule {
         isLocked,
         isRecordingVisible,
         isStreamVisible,
+        isGuestCamActive,
         parentId: node.parentId,
+        canShowActions: itemsForNode.length > 0,
         isFolder,
       };
     });
@@ -137,7 +153,8 @@ class SourceSelectorModule {
         : 'fa fa-folder';
     }
 
-    const source = this.sourcesService.state.sources[sourceId];
+    const { sourcesService, widgetsService } = this;
+    const source = sourcesService.state.sources[sourceId];
 
     if (source.propertiesManagerType === 'streamlabels') {
       return 'fas fa-file-alt';
@@ -150,10 +167,10 @@ class SourceSelectorModule {
 
       assertIsDefined(widgetType);
 
-      return WidgetDisplayData()[widgetType]?.icon || 'icon-error';
+      return widgetsService.widgetDisplayData[widgetType]?.icon || 'icon-error';
     }
 
-    return SourceDisplayData()[source.type]?.icon || 'fas fa-file';
+    return sourcesService.sourceDisplayData[source.type]?.icon || 'fas fa-file';
   }
 
   addSource() {
@@ -253,6 +270,8 @@ class SourceSelectorModule {
     const placement = this.determinePlacement(info);
 
     if (!nodesToDrop || !destNode) return;
+    if (targetNodes.some(nodeId => nodeId === destNode.id)) return;
+
     await this.editorCommandsService.actions.return.executeCommand(
       'ReorderNodesCommand',
       nodesToDrop,
@@ -261,12 +280,7 @@ class SourceSelectorModule {
     );
   }
 
-  makeActive(info: {
-    selected: boolean;
-    node: DataNode;
-    selectedNodes: DataNode[];
-    nativeEvent: MouseEvent;
-  }) {
+  makeActive(info: { node: DataNode; nativeEvent: MouseEvent }) {
     this.callCameFromInsideTheHouse = true;
     let ids: string[] = [info.node.key as string];
 
@@ -294,10 +308,6 @@ class SourceSelectorModule {
     } else {
       this.state.expandedFoldersIds.push(nodeId);
     }
-  }
-
-  canShowActions(sceneNodeId: string) {
-    return this.getItemsForNode(sceneNodeId).length > 0;
   }
 
   get lastSelectedId() {
@@ -499,6 +509,8 @@ function ItemsTree() {
     makeActive,
     toggleFolder,
     handleSort,
+    showTreeMask,
+    setShowTreeMask,
   } = useModule(SourceSelectorModule);
 
   // Force a rerender when the state of selective recording changes
@@ -510,25 +522,36 @@ function ItemsTree() {
   const treeData = getTreeData(nodeData);
 
   return (
-    <Scrollable
-      className={cx(styles.scenesContainer, styles.sourcesContainer)}
+    <div
       style={{ height: 'calc(100% - 33px)' }}
-      onContextMenu={(e: React.MouseEvent) => showContextMenu('', e)}
+      // antd Tree swallows all drag events unless a TreeNode is being dragged.
+      // This allows us to drag files into the tree to add them to the scene
+      // by persisting a transparent div on top of the tree unless no buttons are
+      // being held over it.
+      onMouseEnter={(e: React.MouseEvent) => setShowTreeMask(e.buttons !== 0)}
+      onMouseUp={() => setShowTreeMask(false)}
+      onMouseLeave={() => setShowTreeMask(true)}
     >
-      <Tree
-        selectedKeys={activeItemIds}
-        expandedKeys={expandedFoldersIds}
-        onSelect={(selectedKeys, info) => makeActive(info)}
-        onExpand={(selectedKeys, info) => toggleFolder(info.node.key as string)}
-        onRightClick={info => showContextMenu(info.node.key as string, info.event)}
-        onDrop={handleSort}
-        treeData={treeData}
-        draggable
-        multiple
-        blockNode
-        showIcon
-      />
-    </Scrollable>
+      <Scrollable
+        className={cx(styles.scenesContainer, styles.sourcesContainer)}
+        onContextMenu={(e: React.MouseEvent) => showContextMenu('', e)}
+      >
+        {showTreeMask && <div className={styles.treeMask} data-name="treeMask" />}
+        <Tree
+          selectedKeys={activeItemIds}
+          expandedKeys={expandedFoldersIds}
+          onSelect={(selectedKeys, info) => makeActive(info)}
+          onExpand={(selectedKeys, info) => toggleFolder(info.node.key as string)}
+          onRightClick={info => showContextMenu(info.node.key as string, info.event)}
+          onDrop={handleSort}
+          treeData={treeData}
+          draggable
+          multiple
+          blockNode
+          showIcon
+        />
+      </Scrollable>
+    </div>
   );
 }
 
@@ -542,6 +565,8 @@ const TreeNode = React.forwardRef(
       isStreamVisible: boolean;
       isRecordingVisible: boolean;
       selectiveRecordingEnabled: boolean;
+      isGuestCamActive: boolean;
+      canShowActions: boolean;
       toggleVisibility: (ev: unknown) => unknown;
       toggleLock: (ev: unknown) => unknown;
       cycleSelectiveRecording: (ev: unknown) => void;
@@ -567,16 +592,21 @@ const TreeNode = React.forwardRef(
         onDoubleClick={p.onDoubleClick}
       >
         <span className={styles.sourceTitle}>{p.title}</span>
-        {p.selectiveRecordingEnabled && (
-          <Tooltip title={selectiveRecordingMetadata().tooltip} placement="left">
-            <i
-              className={cx(selectiveRecordingMetadata().icon, { disabled: p.isLocked })}
-              onClick={p.cycleSelectiveRecording}
-            />
-          </Tooltip>
+        {p.canShowActions && (
+          <>
+            {p.isGuestCamActive && <i className="fa fa-signal" style={{ color: 'var(--teal)' }} />}
+            {p.selectiveRecordingEnabled && (
+              <Tooltip title={selectiveRecordingMetadata().tooltip} placement="left">
+                <i
+                  className={cx(selectiveRecordingMetadata().icon, { disabled: p.isLocked })}
+                  onClick={p.cycleSelectiveRecording}
+                />
+              </Tooltip>
+            )}
+            <i onClick={p.toggleLock} className={p.isLocked ? 'icon-lock' : 'icon-unlock'} />
+            <i onClick={p.toggleVisibility} className={p.isVisible ? 'icon-view' : 'icon-hide'} />
+          </>
         )}
-        <i onClick={p.toggleLock} className={p.isLocked ? 'icon-lock' : 'icon-unlock'} />
-        <i onClick={p.toggleVisibility} className={p.isVisible ? 'icon-view' : 'icon-hide'} />
       </div>
     );
   },

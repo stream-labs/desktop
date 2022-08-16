@@ -58,32 +58,23 @@ export async function clickTab(tabText: string) {
 
 // OTHER SHORTCUTS
 
-export async function isDisplayed(
-  selectorOrEl: TSelectorOrEl,
-  waitForOptions?: WaitForOptions,
-) {
+export async function isDisplayed(selectorOrEl: TSelectorOrEl, waitForOptions?: WaitForOptions) {
   if (waitForOptions) {
     try {
       await waitForDisplayed(selectorOrEl, waitForOptions);
       return true;
-    } catch (e) {
+    } catch (e: unknown) {
       return false;
     }
   }
   return await (await select(selectorOrEl)).isDisplayed();
 }
 
-export async function waitForDisplayed(
-  selectorOrEl: TSelectorOrEl,
-  options?: WaitForOptions,
-) {
+export async function waitForDisplayed(selectorOrEl: TSelectorOrEl, options?: WaitForOptions) {
   await (await select(selectorOrEl)).waitForDisplayed(options);
 }
 
-export async function waitForClickable(
-  selectorOrEl: TSelectorOrEl,
-  options?: WaitForOptions,
-) {
+export async function waitForClickable(selectorOrEl: TSelectorOrEl, options?: WaitForOptions) {
   await (await select(selectorOrEl)).waitForClickable(options);
 }
 
@@ -91,10 +82,7 @@ export function waitForText(text: string) {
   return waitForDisplayed(`*="${text}"`);
 }
 
-export async function waitForEnabled(
-  selectorOrEl: TSelectorOrEl,
-  options?: WaitForOptions,
-) {
+export async function waitForEnabled(selectorOrEl: TSelectorOrEl, options?: WaitForOptions) {
   await (await select(selectorOrEl)).waitForEnabled(options);
 }
 

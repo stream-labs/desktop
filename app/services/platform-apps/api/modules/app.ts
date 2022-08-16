@@ -1,7 +1,7 @@
 import { Module, EApiPermissions, apiMethod, IApiContext } from './module';
 import { Inject } from 'services/core/injector';
 import { NavigationService } from 'services/navigation';
-import { PlatformAppsService } from 'services/platform-apps';
+import { EAppPageSlot, PlatformAppsService } from 'services/platform-apps';
 
 interface INavigation {
   sourceId?: string;
@@ -59,5 +59,12 @@ export class AppModule extends Module {
   @apiMethod()
   reload(ctx: IApiContext) {
     this.platformAppsService.refreshApp(ctx.app.id);
+  }
+
+  @apiMethod()
+  popout(ctx: IApiContext, slot: EAppPageSlot) {
+    if (slot === EAppPageSlot.Background) return;
+
+    this.platformAppsService.popOutAppPage(ctx.app.id, slot);
   }
 }
