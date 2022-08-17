@@ -35,5 +35,12 @@
   "Your Stream and VOD Track are the same. This may result in unexpected audio behavior, go to Global Settings to change.": "您的 Stream 和 VOD Track 相同。这可能会导致意外的音频行为，请前往“全局设置”进行更改。",
   "Streaming Track": "直播音轨",
   "Enable Twitch VOD Track": "启用 Twitch VOD Track",
-  "Twitch VOD Track": "Twitch VOD Track"
+  "Twitch VOD Track": "Twitch VOD Track",
+  "Sample Rate (requires a restart)": "Sample Rate (requires a restart)",
+  "Channels (requires a restart)": "Channels (requires a restart)",
+  "Desktop Audio Device 1": "Desktop Audio Device 1",
+  "Desktop Audio Device 2": "Desktop Audio Device 2",
+  "Mic/Auxiliary Device 1": "Mic/Auxiliary Device 1",
+  "Mic/Auxiliary Device 2": "Mic/Auxiliary Device 2",
+  "Mic/Auxiliary Device 3": "Mic/Auxiliary Device 3"
 }

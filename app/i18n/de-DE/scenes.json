@@ -6,7 +6,6 @@
   "There needs to be at least one scene.": "Es muss mindestens eine Szene vorhanden sein.",
   "Projector:": "Projektor:",
   "Projector: Output": "Projektor: Ausgabe",
-  "Manage All": "Alle verwalten",
   "This is where your Scene Collections live. Clicking the title will dropdown a menu where you can view & manage.": "Hier befinden sich Ihre Szenen-Sammlungen. Durch Klicken auf den Titel öffnet sich ein Dropdown-Menü zum Anzeigen und Verwalten.",
   "Are you sure you want to remove %{collectionName}?": "Möchten Sie %{collectionName} wirklich entfernen?",
   "Create Scene Projector": "Szenen-Projektor erstellen",
@@ -40,5 +39,15 @@
   "Switch Scenes": "Szene wechseln",
   "Failed to load scene collection.  A new one will be created instead.": "Fehler beim Laden der Szenensammlung. Stattdessen wird eine neue erstellt.",
   "New Scene": "Neue Szene",
-  "Projector": "Projektor"
+  "Projector": "Projektor",
+  "Your Scene Collections:": "Your Scene Collections:",
+  "Add New Scene Collection:": "Add New Scene Collection:",
+  "Search Scene Collections": "Search Scene Collections",
+  "Start fresh and build from scratch": "Start fresh and build from scratch",
+  "Load existing scenes from OBS": "Load existing scenes from OBS",
+  "Template": "Template",
+  "Choose a template from our theme library": "Choose a template from our theme library",
+  "Enter a Scene Collection Name": "Enter a Scene Collection Name",
+  "Copy of %{collectionName}": "Copy of %{collectionName}",
+  "Your Scene Collections": "Your Scene Collections"
 }

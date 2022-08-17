@@ -35,5 +35,12 @@
   "Your Stream and VOD Track are the same. This may result in unexpected audio behavior, go to Global Settings to change.": "A sua Transmissão e Faixa VOD são iguais. Isto pode provocar um comportamento de áudio inesperado, altere-o nas Definições globais.",
   "Streaming Track": "Faixa de transmissão",
   "Enable Twitch VOD Track": "Ativar Faixa VOD do Twitch",
-  "Twitch VOD Track": "Faixa VOD do Twitch"
+  "Twitch VOD Track": "Faixa VOD do Twitch",
+  "Sample Rate (requires a restart)": "Sample Rate (requires a restart)",
+  "Channels (requires a restart)": "Channels (requires a restart)",
+  "Desktop Audio Device 1": "Desktop Audio Device 1",
+  "Desktop Audio Device 2": "Desktop Audio Device 2",
+  "Mic/Auxiliary Device 1": "Mic/Auxiliary Device 1",
+  "Mic/Auxiliary Device 2": "Mic/Auxiliary Device 2",
+  "Mic/Auxiliary Device 3": "Mic/Auxiliary Device 3"
 }
