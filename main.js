@@ -422,7 +422,7 @@ async function startApp() {
 
   workerWindow.on('closed', () => {
     session.defaultSession.flushStorageData();
-    session.defaultSession.cookies.flushStore(() => app.quit());
+    session.defaultSession.cookies.flushStore().then(() => app.quit());
   });
 
   // Pre-initialize the child window
