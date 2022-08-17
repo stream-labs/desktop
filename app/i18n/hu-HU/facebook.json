@@ -1,6 +1,6 @@
 {
   "You can access your Facebook Streamer Dashboard here.": "You can access your Facebook Streamer Dashboard here.",
-  "Create a Page": "Create a Page",
+  "Create a Page": "Oldal létrehozása",
   "Facebook Setup": "Facebook Setup",
   "Streamer Dashboard": "Streamer Dashboard",
   "Share": "Share",
@@ -33,5 +33,5 @@
   "FBPrivacyWarning": "The granted privacy level may be limited for your Facebook account. Check the \"Who can see you use this business integration\" section for the Streamlabs integration <link>here</link>",
   "Only Me": "Csak én",
   "Do not change privacy settings": "Do not change privacy settings",
-  "Install %{overlayName}": "Install %{overlayName}"
+  "Install %{overlayName}": "%{overlayName} telepítése"
 }

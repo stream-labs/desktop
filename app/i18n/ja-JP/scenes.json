@@ -6,7 +6,6 @@
   "There needs to be at least one scene.": "少なくとも 1 つのシーンが必要です。",
   "Projector:": "プロジェクター：",
   "Projector: Output": "プロジェクター：出力",
-  "Manage All": "すべて管理",
   "This is where your Scene Collections live. Clicking the title will dropdown a menu where you can view & manage.": "これはシーンコレクション用の場所です。タイトルをクリックすると、ドロップダウンメニューが表示され、そこで表示と管理を行うことができます。",
   "Are you sure you want to remove %{collectionName}?": "%{collectionName} を削除してよろしいですか?",
   "Create Scene Projector": "シーンプロジェクターを作成",
@@ -40,5 +39,15 @@
   "Switch Scenes": "シーンを切り替える",
   "Failed to load scene collection.  A new one will be created instead.": "シーンコレクションを読み込めませんでした。代わりに新しいシーンコレクションが作成されます。",
   "New Scene": "新しいシーン",
-  "Projector": "プロジェクター"
+  "Projector": "プロジェクター",
+  "Your Scene Collections:": "Your Scene Collections:",
+  "Add New Scene Collection:": "Add New Scene Collection:",
+  "Search Scene Collections": "Search Scene Collections",
+  "Start fresh and build from scratch": "Start fresh and build from scratch",
+  "Load existing scenes from OBS": "Load existing scenes from OBS",
+  "Template": "Template",
+  "Choose a template from our theme library": "Choose a template from our theme library",
+  "Enter a Scene Collection Name": "Enter a Scene Collection Name",
+  "Copy of %{collectionName}": "Copy of %{collectionName}",
+  "Your Scene Collections": "Your Scene Collections"
 }
