@@ -6,7 +6,7 @@ export class Consumer extends MediasoupEntity {
   transportConnected = false;
   guests: Guest[] = [];
 
-  findGuestBySteamId(streamId: string) {
+  findGuestByStreamId(streamId: string) {
     return this.guests.find(g => g.streamId === streamId);
   }
 
