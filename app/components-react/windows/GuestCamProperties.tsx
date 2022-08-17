@@ -35,6 +35,10 @@ class GuestCamModule {
     return !!this.GuestCamService.state.joinAsGuestHash;
   }
 
+  get hostName() {
+    return this.GuestCamService.state.hostName;
+  }
+
   get showFirstTimeModal() {
     return this.DismissablesService.views.shouldShow(EDismissable.GuestCamFirstTimeModal);
   }
@@ -169,6 +173,10 @@ class GuestCamModule {
   addNewSource(streamId: string) {
     this.SourcesService.actions.showAddSource('mediasoupconnector', { guestCamStreamId: streamId });
   }
+
+  disconnectFromHost() {
+    this.GuestCamService.actions.disconnectFromHost();
+  }
 }
 
 export default function GuestCamProperties() {
@@ -190,6 +198,7 @@ export default function GuestCamProperties() {
   const {
     guests,
     joinAsGuest,
+    hostName,
     showFirstTimeModal,
     inviteUrl,
     videoProducerSource,
@@ -202,6 +211,7 @@ export default function GuestCamProperties() {
     regeneratingLink,
     regenerateLink,
     truncateName,
+    disconnectFromHost,
   } = useModule(GuestCamModule);
 
   function getModalContent() {
@@ -219,27 +229,50 @@ export default function GuestCamProperties() {
       <Tabs destroyInactiveTabPane={true} defaultActiveKey={defaultTab}>
         <Tabs.TabPane tab={$t('Settings')} key="settings">
           <Form layout="inline">
-            <div style={{ display: 'flex', width: '100%', margin: '10px 0' }}>
-              <TextInput
-                readOnly
-                value={inviteUrl}
-                label={$t('Invite URL')}
-                style={{ flexGrow: 1 }}
-                addonAfter={
-                  <Tooltip trigger="click" title={$t('Copied!')}>
-                    <Button onClick={() => remote.clipboard.writeText(inviteUrl)}>
-                      {$t('Copy')}
-                    </Button>
+            {joinAsGuest ? (
+              <div style={{ height: 32, margin: '10px 0 10px' }}>
+                <div>
+                  <b>{$t('Connected To Host:')}</b>{' '}
+                  <span style={{ color: 'var(--title)' }}>{hostName}</span>
+                  <Tooltip
+                    title={$t(
+                      "You are connected as a guest using someone else's invite link. To leave, click the Disconnect button.",
+                    )}
+                  >
+                    <QuestionCircleOutlined style={{ marginLeft: 6 }} />
                   </Tooltip>
-                }
-              />
-              <Button disabled={regeneratingLink} onClick={regenerateLink} style={{ width: 180 }}>
-                {$t('Generate a new link')}
-                {regeneratingLink && (
-                  <i className="fa fa-spinner fa-pulse" style={{ marginLeft: 8 }} />
-                )}
-              </Button>
-            </div>
+                  <button
+                    style={{ marginLeft: 10 }}
+                    className="button button--soft-warning"
+                    onClick={disconnectFromHost}
+                  >
+                    {$t('Disconnect')}
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div style={{ display: 'flex', width: '100%', margin: '10px 0' }}>
+                <TextInput
+                  readOnly
+                  value={inviteUrl}
+                  label={$t('Invite URL')}
+                  style={{ flexGrow: 1 }}
+                  addonAfter={
+                    <Tooltip trigger="click" title={$t('Copied!')}>
+                      <Button onClick={() => remote.clipboard.writeText(inviteUrl)}>
+                        {$t('Copy')}
+                      </Button>
+                    </Tooltip>
+                  }
+                />
+                <Button disabled={regeneratingLink} onClick={regenerateLink} style={{ width: 180 }}>
+                  {$t('Generate a new link')}
+                  {regeneratingLink && (
+                    <i className="fa fa-spinner fa-pulse" style={{ marginLeft: 8 }} />
+                  )}
+                </Button>
+              </div>
+            )}
             <h2 style={{ marginTop: 20 }}>
               {$t(
                 'The webcam and microphone source you select below will be broadcast to your guests.',
@@ -414,28 +447,6 @@ function GuestPane(p: { guest: IGuest }) {
               <GuestSourceSelector guest={p.guest} />
             </div>
             <div style={{ flexGrow: 1, margin: '0 20px 20px' }}>
-              {/* <div style={{ height: 32, margin: '10px 0 10px' }}>
-              {joinAsGuest ? (
-                <div>
-                  <b>{$t('Connected To Host:')}</b>{' '}
-                  <span style={{ color: 'var(--title)' }}>{hostName}</span>
-                  <Tooltip
-                    title={$t(
-                      "You are connected as a guest using someone else's invite link. To leave, click the Disconnect button.",
-                    )}
-                  >
-                    <QuestionCircleOutlined style={{ marginLeft: 6 }} />
-                  </Tooltip>
-                </div>
-              ) : (
-                <TextInput
-                  readOnly
-                  value={inviteUrl}
-                  label={$t('Invite URL')}
-                  style={{ width: '100%' }}
-                />
-              )}
-            </div> */}
               <SliderInput
                 label={$t('Volume')}
                 value={volume}
