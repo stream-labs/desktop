@@ -632,7 +632,6 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
     }
 
     this.CLEAR_GUESTS();
-    this.SET_JOIN_AS_GUEST(null);
   }
 
   onWebRTC(event: TWebRTCSocketEvent) {
@@ -760,6 +759,18 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
     }
   }
 
+  /**
+   * Should only be called if we are joining from Desktop as a guest.
+   * Will disconnect from the host and rejoin our own room.
+   */
+  async disconnectFromHost() {
+    if (!this.state.joinAsGuestHash) return;
+
+    this.SET_JOIN_AS_GUEST(null);
+    await this.cleanUpSocketConnection();
+    this.startListeningForGuests();
+  }
+
   async cleanUpSocketConnection() {
     await this.socketMutex.synchronize();
 
@@ -783,7 +794,6 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
     this.socket.disconnect();
     this.socket = null;
     this.CLEAR_GUESTS();
-    this.SET_JOIN_AS_GUEST(null);
   }
 
   setVisibility(sourceId: string, visible: boolean) {
