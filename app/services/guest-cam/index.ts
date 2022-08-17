@@ -713,7 +713,7 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
       const existingGuest = this.views.getGuestBySourceId(sourceId);
 
       if (existingGuest) {
-        const existingConsumer = this.consumer.findGuestBySteamId(
+        const existingConsumer = this.consumer.findGuestByStreamId(
           existingGuest.remoteProducer.streamId,
         );
 
