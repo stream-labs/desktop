@@ -94,7 +94,7 @@ export class TouchBarService extends Service {
   setupGoLive() {
     this.goLiveButton = new TB.TouchBarButton({
       label: 'Go Live',
-      backgroundColor: '#31C3A2',
+      backgroundColor: '#80F5D2',
       click: () => {
         this.streamingService.toggleStreaming();
       },
@@ -109,7 +109,7 @@ export class TouchBarService extends Service {
         this.goLiveButton.backgroundColor = '#F85640';
       } else if (status === EStreamingState.Offline) {
         this.goLiveButton.label = 'Go Live';
-        this.goLiveButton.backgroundColor = '#31C3A2';
+        this.goLiveButton.backgroundColor = '#80F5D2';
       } else if (status === EStreamingState.Ending) {
         this.goLiveButton.label = 'Ending...';
         this.goLiveButton.backgroundColor = '#F85640';
