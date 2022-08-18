@@ -456,7 +456,7 @@ function StudioControls() {
     <div className={styles.topContainer} data-name="sourcesControls">
       <div className={styles.activeSceneContainer}>
         <Tooltip title={sourcesTooltip} placement="bottomLeft">
-          <span className={styles.activeScene}>{$t('Sources')}</span>
+          <span className={styles.sourcesHeader}>{$t('Sources')}</span>
         </Tooltip>
       </div>
 
