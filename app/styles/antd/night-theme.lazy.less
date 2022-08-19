@@ -187,15 +187,15 @@
 
 // Make selected inputs readable
 .ant-switch-handle::before {
-  background-color: var(--action-button-text);
+  background-color: @dark-2;
 }
 .ant-checkbox-checked .ant-checkbox-inner::after {
-  border: 2px solid var(--action-button-text);
+  border: 2px solid @dark-2;
   border-top: 0;
   border-left: 0;
 }
 .ant-select-item-option-selected:not(.ant-select-item-option-disabled) {
-  color: var(--action-button-text);
+  color: @dark-2;
 }
 
 // make button text not disappear on hover
@@ -203,7 +203,8 @@
 .ant-btn:focus {
   color: @heading-color;
 }
-.ant-btn-primary:hover {
+.ant-btn-primary:hover,
+.ant-btn-primary:focus {
   color: @dark-2;
 }
 
