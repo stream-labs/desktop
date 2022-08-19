@@ -3,5 +3,6 @@
   "Reload": "Znovu načíst",
   "Unpacked vers loaded": "Rozbalené verze byly načteny",
   "You must unload unpacked version before enabling this app.": "Před povolením této aplikace musíte z paměti uvolnit rozbalenou verzi.",
-  "Pop Out": "Vyskočit"
+  "Pop Out": "Vyskočit",
+  "The developer has ended support for this app. The app may continue to work, but it won't recieve any updates. If you wish to uninstall, please follow the directions here.": "The developer has ended support for this app. The app may continue to work, but it won't recieve any updates. If you wish to uninstall, please follow the directions here."
 }
