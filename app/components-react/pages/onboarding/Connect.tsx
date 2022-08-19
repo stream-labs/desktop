@@ -24,7 +24,7 @@ export function Connect() {
     setExtraPlatform,
   } = useModule(LoginModule);
   const { next } = useModule(OnboardingModule);
-  const { UsageStatisticsService } = Services;
+  const { UsageStatisticsService, OnboardingService } = Services;
 
   if (selectedExtraPlatform) {
     return <ExtraPlatformConnect />;
@@ -37,12 +37,17 @@ export function Connect() {
 
   function onSelectExtraPlatform(val: TExtraPlatform | 'tiktok' | undefined) {
     if (val === 'tiktok') {
-      authPlatform('tiktok', next);
+      authPlatform('tiktok', afterLogin);
       return;
     }
 
     UsageStatisticsService.recordAnalyticsEvent('PlatformLogin', val);
     setExtraPlatform(val);
+  }
+
+  function afterLogin() {
+    OnboardingService.actions.setExistingCollections();
+    next();
   }
 
   const platforms = ['twitch', 'youtube', 'facebook', 'trovo'];
@@ -66,7 +71,7 @@ export function Connect() {
             <button
               className={cx(`button button--${platform}`, styles.loginButton)}
               disabled={loading || authInProgress}
-              onClick={() => authPlatform(platform, next)}
+              onClick={() => authPlatform(platform, afterLogin)}
               key={platform}
             >
               {loading && <i className="fas fa-spinner fa-spin" />}

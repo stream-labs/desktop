@@ -186,6 +186,8 @@ export class SourcesService extends StatefulService<ISourcesState> {
   @Inject() private incrementalRolloutService: IncrementalRolloutService;
   @Inject() private guestCamService: GuestCamService;
 
+  sourceDisplayData = SourceDisplayData(); // cache source display data
+
   get views() {
     return new SourcesViews(this.state);
   }

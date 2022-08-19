@@ -6,7 +6,6 @@
   "There needs to be at least one scene.": "至少需要一個場景。",
   "Projector:": "投影器：",
   "Projector: Output": "投影器：輸出",
-  "Manage All": "管理全部",
   "This is where your Scene Collections live. Clicking the title will dropdown a menu where you can view & manage.": "這是您的場景組合所在的地方。按一下標題會顯示可讓您進行檢視與管理的下拉功能表。",
   "Are you sure you want to remove %{collectionName}?": "您確定要移除 %{collectionName} 嗎？",
   "Create Scene Projector": "建立場景投影器",
@@ -40,5 +39,15 @@
   "Switch Scenes": "切換場景",
   "Failed to load scene collection.  A new one will be created instead.": "無法載入場景組合。改為建立新組合。",
   "New Scene": "新場景",
-  "Projector": "投影器"
+  "Projector": "投影器",
+  "Your Scene Collections:": "Your Scene Collections:",
+  "Add New Scene Collection:": "Add New Scene Collection:",
+  "Search Scene Collections": "Search Scene Collections",
+  "Start fresh and build from scratch": "Start fresh and build from scratch",
+  "Load existing scenes from OBS": "Load existing scenes from OBS",
+  "Template": "Template",
+  "Choose a template from our theme library": "Choose a template from our theme library",
+  "Enter a Scene Collection Name": "Enter a Scene Collection Name",
+  "Copy of %{collectionName}": "Copy of %{collectionName}",
+  "Your Scene Collections": "Your Scene Collections"
 }

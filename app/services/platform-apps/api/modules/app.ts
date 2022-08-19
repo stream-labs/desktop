@@ -1,7 +1,8 @@
 import { Module, EApiPermissions, apiMethod, IApiContext } from './module';
 import { Inject } from 'services/core/injector';
 import { NavigationService } from 'services/navigation';
-import { PlatformAppsService } from 'services/platform-apps';
+import { EAppPageSlot, PlatformAppsService } from 'services/platform-apps';
+import { IWindowOptions } from 'services/windows';
 
 interface INavigation {
   sourceId?: string;
@@ -15,6 +16,8 @@ enum EPage {
 }
 
 type TNavigationCallback = (nav: INavigation) => void;
+
+type TAllowableWindowOptions = 'width' | 'height' | 'resizable' | 'title';
 
 export class AppModule extends Module {
   readonly moduleName = 'App';
@@ -59,5 +62,20 @@ export class AppModule extends Module {
   @apiMethod()
   reload(ctx: IApiContext) {
     this.platformAppsService.refreshApp(ctx.app.id);
+  }
+
+  @apiMethod()
+  popout(
+    ctx: IApiContext,
+    slot: EAppPageSlot,
+    windowOptions?: Pick<IWindowOptions, TAllowableWindowOptions>,
+  ) {
+    if (slot === EAppPageSlot.Background) return;
+
+    this.platformAppsService.popOutAppPage(ctx.app.id, slot, {
+      resizable: windowOptions.resizable,
+      title: windowOptions.title,
+      size: { width: windowOptions.width, height: windowOptions.height },
+    });
   }
 }

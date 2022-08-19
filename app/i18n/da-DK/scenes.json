@@ -6,7 +6,6 @@
   "There needs to be at least one scene.": "Der skal være mindst én scene.",
   "Projector:": "Projektor:",
   "Projector: Output": "Projektor: Udgang",
-  "Manage All": "Administrer alle",
   "This is where your Scene Collections live. Clicking the title will dropdown a menu where you can view & manage.": "Her finder du dine scener. Ved at klikke på titlen vises der en menu hvor du kan se og administrere scenerne.",
   "Are you sure you want to remove %{collectionName}?": "Er du sikker på at du vil fjerne %{collectionName}?",
   "Create Scene Projector": "Opret sceneprojektor",
@@ -40,5 +39,15 @@
   "Switch Scenes": "Skift scener",
   "Failed to load scene collection.  A new one will be created instead.": "Scenesamlingen kunne ikke indlæses. I stedet oprettes en ny.",
   "New Scene": "Ny scene",
-  "Projector": "Projektor"
+  "Projector": "Projektor",
+  "Your Scene Collections:": "Your Scene Collections:",
+  "Add New Scene Collection:": "Add New Scene Collection:",
+  "Search Scene Collections": "Search Scene Collections",
+  "Start fresh and build from scratch": "Start fresh and build from scratch",
+  "Load existing scenes from OBS": "Load existing scenes from OBS",
+  "Template": "Template",
+  "Choose a template from our theme library": "Choose a template from our theme library",
+  "Enter a Scene Collection Name": "Enter a Scene Collection Name",
+  "Copy of %{collectionName}": "Copy of %{collectionName}",
+  "Your Scene Collections": "Your Scene Collections"
 }
