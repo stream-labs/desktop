@@ -23,6 +23,7 @@ import {
 import { $t } from 'services/i18n';
 import { AudioService } from '../audio';
 import uuid from 'uuid/v4';
+import SourceProperties from 'components/windows/SourceProperties.vue';
 
 const AudioFlag = obs.ESourceOutputFlags.Audio;
 const VideoFlag = obs.ESourceOutputFlags.Video;
@@ -45,6 +46,8 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
     sources: {},
     temporarySources: {}, // don't save temporarySources in the config file
   } as ISourcesState;
+
+  private static readonly sourcePropertiesWindowId = 'sourcePropertiesWindow';
 
   sourceAdded = new Subject<ISource>();
   sourceUpdated = new Subject<ISource>();
@@ -460,15 +463,33 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
   showSourceProperties(sourceId: string) {
     const source = this.getSource(sourceId);
 
-    this.windowsService.showWindow({
-      componentName: 'SourceProperties',
-      title: $t('sources.propertyWindowTitle', { sourceName: source.name }),
-      queryParams: { sourceId },
-      size: {
-        width: 600,
-        height: 600,
-      },
-    });
+    // HACK: childWindow で表示してしまうとウィンドウキャプチャでクラッシュするので OneOffWindow で代替している
+    // StreamLabs 1.3.0 まで追従したらこのワークアラウンドはなくせる
+    this.windowsService.closeChildWindow();
+    (this.windowsService.getWindow(SourcesService.sourcePropertiesWindowId)
+      ? this.closeSourcePropertiesWindow()
+      : Promise.resolve()
+    ).then(() =>
+      this.windowsService.createOneOffWindow(
+        {
+          componentName: 'SourceProperties',
+          title: $t('sources.propertyWindowTitle', { sourceName: source.name }),
+          queryParams: { sourceId },
+          size: {
+            width: 600,
+            height: 600,
+          },
+          // alwaysOnTop を利用した場合、メインウィンドウの背面に隠れることは防げるが、
+          // N Air 以外のウィンドウよりも前面に出てしまう
+          alwaysOnTop: true,
+        },
+        SourcesService.sourcePropertiesWindowId,
+      ),
+    );
+  }
+
+  async closeSourcePropertiesWindow() {
+    await this.windowsService.closeOneOffWindow(SourcesService.sourcePropertiesWindowId);
   }
 
   showShowcase() {

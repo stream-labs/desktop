@@ -11,6 +11,7 @@ import GenericForm from 'components/obs/inputs/GenericForm.vue';
 import { $t } from 'services/i18n';
 import { Subscription } from 'rxjs';
 import electron from 'electron';
+import Util from 'services/utils';
 
 @Component({
   components: {
@@ -26,13 +27,20 @@ export default class SourceProperties extends Vue {
   @Inject()
   windowsService: WindowsService;
 
-  sourceId = this.windowsService.getChildWindowQueryParams().sourceId;
   source = this.sourcesService.getSource(this.sourceId);
   properties: TObsFormData = [];
   initialProperties: TObsFormData = [];
   tainted = false;
 
   sourcesSubscription: Subscription;
+
+  get windowId() {
+    return Util.getCurrentUrlParams().windowId;
+  }
+
+  get sourceId() {
+    return this.windowsService.getWindowOptions(this.windowId).sourceId;
+  }
 
   mounted() {
     this.properties = this.source ? this.source.getPropertiesFormData() : [];
@@ -64,7 +72,7 @@ export default class SourceProperties extends Vue {
   }
 
   closeWindow() {
-    this.windowsService.closeChildWindow();
+    this.sourcesService.closeSourcePropertiesWindow();
   }
 
   done() {
