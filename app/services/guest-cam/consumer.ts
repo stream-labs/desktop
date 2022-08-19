@@ -3,6 +3,7 @@ import { Guest } from './guest';
 import { MediasoupEntity } from './mediasoup-entity';
 
 export class Consumer extends MediasoupEntity {
+  transportCreated = false;
   transportConnected = false;
   guests: Guest[] = [];
 
@@ -26,6 +27,7 @@ export class Consumer extends MediasoupEntity {
   }
 
   async createTransport(event: IConsumerCreatedEvent) {
+    this.transportCreated = true;
     const turnConfig = await this.guestCamService.getTurnConfig();
 
     event.data['iceServers'] = [turnConfig];
