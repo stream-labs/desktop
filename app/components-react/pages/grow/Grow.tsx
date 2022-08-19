@@ -146,7 +146,7 @@ function AddGoalModal(p: {
             onChange={setGoalTitle}
             uncontrolled={false}
             placeholder={'My Goal'}
-            rules={[{ max: 32 }]}
+            rules={[{ max: 50 }]}
             required
           />
         )}
