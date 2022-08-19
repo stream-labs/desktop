@@ -49,7 +49,10 @@ export function FreshOrImport() {
             <div
               className={commonStyles.optionCard}
               onClick={() => data.onClick()}
-              style={{ background: `var(${data.color})` }}
+              style={{
+                background: `var(${data.color})`,
+                color: data.color === '--teal' ? 'var(--action-button-text)' : undefined,
+              }}
             >
               <h2>{data.title}</h2>
               {data.image}
