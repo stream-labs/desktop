@@ -613,7 +613,7 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
     this.socket.on('connect_error', (e: any) => this.log('Connection Error', e));
     this.socket.on('connect_timeout', () => this.log('Connection Timeout'));
     this.socket.on('error', () => this.log('Socket Error'));
-    this.socket.on('disconnect', () => this.handleDisconnect);
+    this.socket.on('disconnect', () => this.handleDisconnect());
     // this.socket.on('reconnect', () => this.handleReconnect);
     this.socket.on('webrtc', (e: TWebRTCSocketEvent) => this.onWebRTC(e));
   }

@@ -46,8 +46,8 @@ export class Guest extends MediasoupEntity {
     this.transportId = event.data.id;
 
     this.withMutex(async () => {
-      if (!this.guestCamService.consumer.transportConnected) {
-        this.guestCamService.consumer.createTransport(event);
+      if (!this.guestCamService.consumer.transportCreated) {
+        await this.guestCamService.consumer.createTransport(event);
       }
 
       this.consumerCreatedReady();
