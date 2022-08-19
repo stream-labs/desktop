@@ -199,7 +199,7 @@
 }
 
 .test-button .link {
-  color: var(--white);
+  color: var(--action-button-text);
 }
 </style>
 
