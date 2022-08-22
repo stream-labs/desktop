@@ -1,32 +1,40 @@
 <template>
-  <div class="help-tip" v-if="shouldShow">
+  <div class="help-tip" v-if="shouldShow && !isCompactMode" :data-mode="mode">
     <div class="help-tip__arrow"></div>
     <i @click="closeHelpTip" class="help-tip__close icon-close" />
     <div class="help-tip__title">
       <i class="icon-notification" />
       <slot name="title"></slot>
     </div>
-    <div class="help-tip__body"><slot name="content"></slot>
-    </div>
+    <div class="help-tip__body"><slot name="content"></slot></div>
   </div>
 </template>
 
 <script lang="ts" src="./HelpTip.vue.ts"></script>
 
 <style lang="less" scoped>
-@import "../../styles/index";
+@import '../../styles/index';
 
 .help-tip {
   position: absolute;
   background: @text-primary;
   .radius;
   color: @hover;
-  top: -8px;
-  left: 90px;
   width: 240px;
   padding: 8px;
   font-size: 14px;
   z-index: 100000;
+  white-space: initial;
+
+  &[data-mode="scene-selector"] {
+    top: -8px;
+    left: 90px;
+  }
+
+  &[data-mode="login"] {
+    bottom: 2px;
+    left: 44px;
+  }
 }
 
 .help-tip__arrow {
@@ -37,6 +45,14 @@
   border-color: transparent @text-primary transparent transparent;
   position: absolute;
   left: -8px;
+
+  .help-tip[data-mode="scene-selector"] & {
+    top: 8px;
+  }
+
+  .help-tip[data-mode="login"] & {
+    bottom: 8px;
+  }
 }
 
 .help-tip__close {
@@ -44,7 +60,7 @@
   right: 10px;
   font-size: 20px;
   cursor: pointer;
-  opacity: .6;
+  opacity: 0.6;
   .transition();
 
   &:hover {
@@ -66,5 +82,4 @@
     font-size: 16px;
   }
 }
-
 </style>

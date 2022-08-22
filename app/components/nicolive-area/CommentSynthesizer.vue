@@ -31,8 +31,8 @@
       </div>
       <div class="section-item">
         <div class="row">
-          <button class="button button-nicolive--action" :disabled="!enabled" @click="testSpeechPlay">読み上げテスト</button>
-          <button class="button button--default" :disabled="!enabled" @click="reset">リセット</button>
+          <button class="button button--primary" :disabled="!enabled" @click="testSpeechPlay">読み上げテスト</button>
+          <button class="button button--secondary" :disabled="!enabled" @click="reset">リセット</button>
         </div>
       </div>
     </div>
@@ -41,12 +41,11 @@
 
 <script lang="ts" src="./CommentSynthesizer.vue.ts"></script>
 <style lang="less" scoped>
-@import "../../styles/_colors";
-@import "../../styles/mixins";
+@import "../../styles/index";
 
 .section-heading {
-  color: @grey;
-  padding: 16px 16px 8px;
+  color: var(--color-text-light);
+  padding: 16px 16px 0;
 }
 
 .section-item {
@@ -65,15 +64,15 @@
 }
 
 .name {
-  font-size: 12px;
-  color: @light-grey;
+  font-size: @font-size4;
+  color: var(--color-text);
   flex-grow: 1;
 }
 
 .value {
   display: flex;
   align-items: center;
-  color: @light-grey;
+  color: var(--color-text);
 }
 
 .slider {

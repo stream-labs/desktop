@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import { Component } from 'vue-property-decorator';
+import { Component, Prop } from 'vue-property-decorator';
 import { Inject } from 'services/core/injector';
 import { NicoliveCommentViewerService } from 'services/nicolive-program/nicolive-comment-viewer';
 import { WrappedChat, WrappedChatWithComponent } from 'services/nicolive-program/WrappedChat';
@@ -18,6 +18,8 @@ import GiftComment from './comment/GiftComment.vue';
 import NicoadComment from './comment/NicoadComment.vue';
 import EmotionComment from './comment/EmotionComment.vue';
 import { ChatComponentType } from 'services/nicolive-program/ChatMessage/ChatComponentType';
+import { CustomizationService } from 'services/customization';
+import NAirLogo from '../../../media/images/n-air-logo.svg';
 
 const componentMap: { [type in ChatComponentType]: Vue.Component } = {
   common: CommonComment,
@@ -37,6 +39,7 @@ const componentMap: { [type in ChatComponentType]: Vue.Component } = {
     GiftComment,
     EmotionComment,
     SystemMessage,
+    NAirLogo,
   },
 })
 export default class CommentViewer extends Vue {
@@ -49,9 +52,18 @@ export default class CommentViewer extends Vue {
   @Inject()
   private nicoliveCommentFilterService: NicoliveCommentFilterService;
 
+  @Inject() private customizationService: CustomizationService;
+
+  @Prop({ default: false }) showProgramCreatedNotice: boolean;
+
+  get isCompactMode(): boolean {
+    return this.customizationService.state.compactMode;
+  }
+
   // TODO: 後で言語ファイルに移動する
   commentReloadTooltip = 'コメント再取得';
-  commentSynthesizerTooltip = 'コメント読み上げ';
+  commentSynthesizerOnTooltip = 'コメント読み上げ：クリックしてOFFにする';
+  commentSynthesizerOffTooltip = 'コメント読み上げ：クリックしてONにする';
   filterTooltip = 'NG設定';
   settingsTooltip = 'コメント設定';
 
@@ -170,10 +182,12 @@ export default class CommentViewer extends Vue {
     menu.popup();
   }
 
+  private cleanup: () => void = undefined;
+
   mounted() {
     const sentinelEl = this.$refs.sentinel as HTMLElement;
     const ioCallback: IntersectionObserverCallback = entries => {
-      this.isLatestVisible = entries[0].isIntersecting;
+      this.isLatestVisible = entries[entries.length - 1].isIntersecting;
     };
     const ioOptions = {
       rootMargin: '0px',
@@ -181,6 +195,16 @@ export default class CommentViewer extends Vue {
     };
     const io = new IntersectionObserver(ioCallback, ioOptions);
     io.observe(sentinelEl);
+    this.cleanup = () => {
+      io.unobserve(sentinelEl);
+    };
+  }
+
+  beforeDestroy() {
+    if (this.cleanup) {
+      this.cleanup();
+      this.cleanup = undefined;
+    }
   }
 
   updated() {

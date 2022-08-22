@@ -45,10 +45,8 @@ interface IUserServiceState {
 export class UserService extends PersistentStatefulService<IUserServiceState> {
   @Inject() private appService: AppService;
   @Inject() private sceneCollectionsService: SceneCollectionsService;
-  @Inject() private windowsService: WindowsService;
   @Inject() private onboardingService: OnboardingService;
   @Inject() private incrementalRolloutService: IncrementalRolloutService;
-  @Inject() private hostsService: HostsService;
   @Inject() private questionaireService: QuestionaireService;
 
   @mutation()
@@ -78,7 +76,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   init() {
     super.init();
     this.setSentryContext();
-    this.validateLogin();
+    setTimeout(() => this.validateLogin(), 0); // validateLogin is async
     this.incrementalRolloutService.fetchAvailableFeatures();
   }
 
@@ -277,8 +275,8 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
 
     this.startAuth({
       platform: this.platform.type,
-      onAuthFinish: () => {},
-      onAuthClose: () => {},
+      onAuthFinish: () => { },
+      onAuthClose: () => { },
     });
   }
 

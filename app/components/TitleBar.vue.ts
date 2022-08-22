@@ -6,6 +6,7 @@ import { Inject } from 'services/core/injector';
 import { StreamingService } from 'services/streaming';
 import Utils from 'services/utils';
 import { $t } from 'services/i18n';
+import { CompactModeService } from 'services/compact-mode';
 
 @Component({
   components: {},
@@ -13,6 +14,7 @@ import { $t } from 'services/i18n';
 export default class TitleBar extends Vue {
   @Inject() customizationService: CustomizationService;
   @Inject() streamingService: StreamingService;
+  @Inject() compactModeService: CompactModeService;
 
   @Prop() title: string;
 
@@ -22,6 +24,10 @@ export default class TitleBar extends Vue {
 
   get isUnstable() {
     return Utils.isMainWindow() && Utils.isUnstable();
+  }
+
+  get isCompactMode() {
+    return this.compactModeService.isCompactMode;
   }
 
   minimize() {

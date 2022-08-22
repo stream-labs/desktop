@@ -52,18 +52,19 @@ export type FailedResult = {
  * if (isOk(result)) result.value; // number
  * else result.value // CommonErrorResponse
  */
-type WrappedResult<T> = SucceededResult<T> | FailedResult;
+export type WrappedResult<T> = SucceededResult<T> | FailedResult;
 
 export function isOk<T>(result: WrappedResult<T>): result is SucceededResult<T> {
   return result.ok === true;
 }
 
-export class NotLoggedInError {}
+export class NotLoggedInError { }
 
 export class NicoliveClient {
   static live2BaseURL = 'https://live2.nicovideo.jp';
   static publicBaseURL = 'https://public.api.nicovideo.jp';
   static nicoadBaseURL = 'https://api.nicoad.nicovideo.jp';
+  static communityBaseURL = 'https://com.nicovideo.jp';
   private static frontendID = 134;
 
   static isProgramPage(url: string): boolean {
@@ -372,9 +373,10 @@ export class NicoliveClient {
     communityId: string,
     headers?: HeaderSeed,
   ): Promise<WrappedResult<Community>> {
-    const url = new URL(`${NicoliveClient.publicBaseURL}/v1/communities.json`);
+    const url = new URL(`${NicoliveClient.communityBaseURL}/api/v2/communities.json`);
+    const communityNo = communityId.replace(/^co/, '');
     const params = {
-      communityIds: communityId,
+      ids: communityNo,
     };
     for (const [key, value] of Object.entries(params)) {
       url.searchParams.append(key, value);
@@ -409,24 +411,26 @@ export class NicoliveClient {
 
     if (res.ok) {
       const data = obj.data as Communities['data'];
-      const communities = data.communities || [];
-      const errors = data.errors || [];
+      const communities = data.communities?.communities || [];
 
-      const community = communities.find(c => c.id === communityId);
+      const community = communities.find(c => c.global_id === communityId);
       if (community) {
         // 正常成功
         return {
           ok: true,
           value: community,
         };
-      }
-
-      const error = errors.find(e => e.id === communityId);
-      if (error) {
-        // 正常失敗
+      } else {
+        // community not found
         return {
           ok: false,
-          value: errors[0] as CommonErrorResponse,
+          value: {
+            meta: {
+              status: 404,
+              errorCode: 'NOT_FOUND',
+              errorMessage: `community ${communityId} not found`,
+            },
+          } as CommonErrorResponse,
         };
       }
     }
@@ -441,20 +445,16 @@ export class NicoliveClient {
    * 放送可能なユーザー番組IDを取得する
    * 放送可能な番組がない場合はundefinedを返す
    */
-  async fetchOnairUserProgram(): Promise<OnairUserProgramData | undefined> {
+  async fetchOnairUserProgram(): Promise<OnairUserProgramData> {
     const url = `${NicoliveClient.live2BaseURL}/unama/tool/v2/onairs/user`;
     const headers = new Headers();
     const userSession = await this.fetchSession();
     headers.append('X-niconico-session', userSession);
     const request = new Request(url, { headers });
-    try {
-      return await fetch(request)
-        .then(handleErrors)
-        .then(response => response.json())
-        .then(json => json.data);
-    } catch {
-      return Promise.resolve(undefined);
-    }
+    return await fetch(request)
+      .then(handleErrors)
+      .then(response => response.json())
+      .then(json => json.data);
   }
 
   /**

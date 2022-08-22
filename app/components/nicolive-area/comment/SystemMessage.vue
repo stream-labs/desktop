@@ -16,11 +16,7 @@
 }
 
 .comment-body {
-  .common__comment-body();
-  color: @light-grey;
-
-  [speaking=true] & {
-    color: @text-primary;
-  }
+  .common__comment-body;
+  color: var(--color-text);
 }
 </style>

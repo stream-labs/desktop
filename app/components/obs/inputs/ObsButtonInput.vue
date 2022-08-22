@@ -4,7 +4,7 @@
     </div>
     <div class="input-wrapper">
       <button
-        class="button button--action button-property-button"
+        class="button button--primary button-property-button"
         @click="handleClick">
         {{ value.description }}
       </button>

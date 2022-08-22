@@ -67,8 +67,9 @@
 .settings-container {
   flex-grow: 1;
   margin: 0;
-  overflow-y: auto;
-  background-color: @bg-tertiary;
+  padding: 16px 8px 0 0;
+  overflow-y: scroll;
+  overflow-x: auto;
 }
 </style>
 
@@ -80,14 +81,11 @@
 子コンポーネントのclassを直接参照しているのでscopedにできない
 */
 .notice-section {
-  padding-top: 16px;
-
   .notice-message {
-    color: @accent;
-    font-size: 18px;
-    font-weight: bold;
+    color: var(--color-accent);
+    font-size: @font-size5;
+    font-weight: @font-weight-bold;
     text-align: center;
-    padding-top: 12px;
   }
 
   .icon-warning {
@@ -106,7 +104,7 @@
 
     .input-label {
       label {
-        margin-bottom: 8px;
+        margin-bottom: 12px;
       }
     }
   }

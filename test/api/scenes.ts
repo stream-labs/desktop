@@ -13,41 +13,45 @@ test('The default scene exists', async t => {
   const scenesService = client.getResource<ScenesService>('ScenesService');
   const scenes = scenesService.getScenes();
 
-  t.true(scenes.length === 1);
+  t.true(scenes.length === 2);
 });
 
 test('Creating, fetching and removing scenes', async t => {
   const client = await getClient();
   const scenesService = client.getResource<ScenesService>('ScenesService');
-  t.is(scenesService.getScenes().length, 1);
-  const scene1name = scenesService.getScenes()[0].name;
+  t.is(scenesService.getScenes().length, 2);
+  const scenesBefore = scenesService.getScenes().map(s => s.name);
 
   const scene2 = scenesService.createScene('Scene2');
 
   t.is(scene2.name, 'Scene2');
 
-  let scenes = scenesService.getScenes().filter(scene => [scene1name, 'Scene2'].includes(scene.name));
+  let scenes = scenesService
+    .getScenes()
+    .filter(scene => [...scenesBefore, 'Scene2'].includes(scene.name));
   let scenesNames = scenes.map(scene => scene.name);
 
-  t.deepEqual(scenesNames, [scene1name, 'Scene2']);
+  t.deepEqual(scenesNames, [...scenesBefore, 'Scene2']);
 
-  scenesService.removeScene(scenes[1].id);
-  scenes = scenesService.getScenes().filter(scene => [scene1name, 'Scene2'].includes(scene.name));
+  scenesService.removeScene(scenes[scenes.length - 1].id);
+  scenes = scenesService
+    .getScenes()
+    .filter(scene => [...scenesBefore, 'Scene2'].includes(scene.name));
   scenesNames = scenes.map(scene => scene.name);
 
-  t.deepEqual(scenesNames, [scene1name]);
+  t.deepEqual(scenesNames, scenesBefore);
 });
 
 test('Switching between scenes', async t => {
   const client = await getClient();
   const scenesService = client.getResource<ScenesService>('ScenesService');
-  t.is(scenesService.getScenes().length, 1);
-  const scene1name = scenesService.getScenes()[0].name;
+  t.is(scenesService.getScenes().length, 2);
 
-  const scene = scenesService.getSceneByName(scene1name);
+  const beforeActiveSceneId = scenesService.activeSceneId;
+
   const scene2 = scenesService.createScene('Scene2');
 
-  t.is(scene.id, scenesService.activeSceneId);
+  t.is(beforeActiveSceneId, scenesService.activeSceneId);
 
   scenesService.makeSceneActive(scene2.id);
 
@@ -55,8 +59,7 @@ test('Switching between scenes', async t => {
 
   scene2.remove();
 
-  t.is(scene.id, scenesService.activeSceneId);
-
+  t.is(beforeActiveSceneId, scenesService.activeSceneId);
 });
 
 test('Creating, fetching and removing scene-items', async t => {
@@ -169,7 +172,7 @@ test('SceneItem.setSettings()', async t => {
       bottom: 5.6,
       left: 7.1,
       right: 10,
-    }
+    },
   });
 
   // crop values must be rounded
@@ -216,7 +219,8 @@ test('SceneItem.addFile()', async t => {
   scene.clear();
   scene.addFile(dataDir);
 
-  t.true(sceneBuilder.isEqualTo(`
+  t.true(
+    sceneBuilder.isEqualTo(`
     sources-files
       html
         hello.html: browser_source
@@ -228,5 +232,6 @@ test('SceneItem.addFile()', async t => {
         chatbox.mp4: ffmpeg_source
       text
         hello.txt: text_gdiplus
-  `));
+  `),
+  );
 });

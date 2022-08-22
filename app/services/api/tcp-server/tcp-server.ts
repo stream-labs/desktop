@@ -50,8 +50,7 @@ const TCP_PORT = 28194;
  */
 export class TcpServerService
   extends PersistentStatefulService<ITcpServersSettings>
-  implements ITcpServerServiceApi
-{
+  implements ITcpServerServiceApi {
   static defaultState: ITcpServersSettings = {
     token: '',
     namedPipe: {
@@ -348,7 +347,6 @@ export class TcpServerService
       if (!requestString) return;
       try {
         const request: IJsonRpcRequest = JSON.parse(requestString);
-        this.usageStatisticsService.recordAnalyticsEvent('TCP_API_REQUEST', request);
 
         const errorMessage = this.validateRequest(request);
 

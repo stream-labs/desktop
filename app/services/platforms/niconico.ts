@@ -61,41 +61,41 @@ export class NiconicoService extends Service implements IPlatformService {
 
   client: NicoliveClient = new NicoliveClient();
 
-  getUserKey(): Promise<string> {
-    const url = `${this.hostsService.niconicoFlapi}/getuserkey`;
+  async getUserId(): Promise<string> {
+    const url = `${this.hostsService.niconicoAccount}/api/public/v1/user/id.json`;
     const request = new Request(url, { credentials: 'same-origin' });
 
-    return fetch(request)
-      .then(handleErrors)
-      .then(response => response.text())
-      .then(text => {
-        if (text.startsWith('userkey=')) {
-          return text.substr('userkey='.length);
-        }
-        return '';
-      });
-  }
-  isLoggedIn(): Promise<boolean> {
-    return this.getUserKey().then(userkey => userkey !== '');
+    const response = await fetch(request);
+    if (response.status === 401) {
+      return '';
+    }
+    const response_1 = await handleErrors(response); // !response.ok を例外にする
+    const json = await response_1.json();
+    if (json.data && json.data.userId) {
+      return json.data.userId;
+    }
+    return '';
   }
 
-  isPremium(token: string): Promise<boolean> {
+  async isLoggedIn(): Promise<boolean> {
+    const id = await this.getUserId();
+    return id !== '';
+  }
+
+  async isPremium(token: string): Promise<boolean> {
     const url = `${this.hostsService.niconicoOAuth}/v1/user/premium.json`;
     const headers = authorizedHeaders(token);
-    const request = new Request(url, { headers });
-    return fetch(request)
-      .then(res => res.json())
-      .then(({ data }) => {
-        return data.type === 'premium';
-      });
+    const request = new Request(this.hostsService.replaceHost(url), { headers });
+    const res = await fetch(request);
+    const { data } = await res.json();
+    return data.type === 'premium';
   }
 
-  logout(): Promise<void> {
+  async logout(): Promise<void> {
     const url = `${this.hostsService.niconicoAccount}/logout`;
-    const request = new Request(url, { credentials: 'same-origin' });
-    return fetch(request)
-      .then(handleErrors)
-      .then(() => {});
+    const request = new Request(this.hostsService.replaceHost(url), { credentials: 'same-origin' });
+    const response = await fetch(request);
+    await handleErrors(response);
   }
 
   get authUrl() {
@@ -121,7 +121,7 @@ export class NiconicoService extends Service implements IPlatformService {
     return this.userService.channelId;
   }
   getUserPageURL(): string {
-    return `http://www.nicovideo.jp/user/${this.niconicoUserId}`;
+    return 'http://live.nicovideo.jp/my';
   }
 
   getHeaders(authorized = false): Headers {
@@ -140,7 +140,7 @@ export class NiconicoService extends Service implements IPlatformService {
       if (this.streamingStatus === EStreamingState.Reconnecting) {
         console.log('reconnecting - checking stream key');
         this.client.fetchBroadcastStream(this.channelId).catch(() => {
-          console.log('niconico programas has ended! stopping streaming.');
+          console.log('niconico program has ended! stopping streaming.');
           this.streamingService.stopStreaming();
         });
       }
@@ -158,6 +158,7 @@ export class NiconicoService extends Service implements IPlatformService {
       const result = await this._setupStreamSettings(programId);
       return result;
     } catch (e) {
+      console.error('NiconicoService.setupStreamSettings(1)', e);
       // APIのレスポンスに番組状態が反映されるのが遅れる場合があるので、少し待ってリトライ
       await sleep(3000);
     }
@@ -167,6 +168,7 @@ export class NiconicoService extends Service implements IPlatformService {
       return result;
     } catch (e) {
       // リトライは1回だけ
+      console.error('NiconicoService.setupStreamSettings(2)', e);
       return NiconicoService.emptyStreamingSetting();
     }
   }
@@ -215,14 +217,14 @@ export class NiconicoService extends Service implements IPlatformService {
   }
 
   // TODO ニコニコOAuthのtoken更新に使う
-  fetchNewToken(): Promise<void> {
+  async fetchNewToken(): Promise<void> {
     const url = `${this.hostsService.niconicoOAuth}/oauth2/token`;
     const headers = authorizedHeaders(this.userService.apiToken);
     const request = new Request(url, { headers });
 
-    return fetch(request)
-      .then(handleErrors)
-      .then(response => response.json())
-      .then(response => this.userService.updatePlatformToken(response.access_token));
+    const response = await fetch(request);
+    const response_1 = await handleErrors(response);
+    const response_2 = await response_1.json();
+    return this.userService.updatePlatformToken(response_2.access_token);
   }
 }

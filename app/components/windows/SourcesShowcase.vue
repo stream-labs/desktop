@@ -148,12 +148,12 @@
     </div>
 
     <div class="sources">
-      <div class="source-group">
+      <div class="source-group section">
         <ul class="source-list">
           <li
             v-for="source in availableSources"
-            class="source source--standard"
-            :class="{'source--active': inspectedSource === source.value}"
+            class="source source--standard button--border"
+            :class="{'active': inspectedSource === source.value}"
             :data-test="`${source.value}`"
             :key="source.value"
             @click="inspectSource(source.value)"
@@ -167,7 +167,7 @@
     <div class="modal-layout-controls">
       <button
         @click="selectInspectedSource()"
-        class="button button--action"
+        class="button button--primary"
         :disabled="inspectedSource === null"
         data-test="AddSource">
         {{ $t('sources.addSourceButton') }}
@@ -184,13 +184,18 @@
 
 .source-info {
   padding: 0 20px;
-  background-color: @bg-tertiary;
   display: flex;
   flex-direction: row;
   flex-wrap: nowrap;
   flex: 0 0 192px;
   height: 192px;
   align-items: center;
+
+  svg {
+    * {
+      fill: var(--color-text);
+    }
+  }
 }
 
 .source-image {
@@ -211,11 +216,8 @@
 <style lang="less" scoped>
 @import "../../styles/index";
 
-.modal-layout-controls {
-  border-top: 1px solid @bg-secondary;
-}
 .add-source {
-  color: @text-primary;
+  color: var(--color-text);
   display: flex;
   flex-direction: column;
   position: relative;
@@ -223,14 +225,12 @@
 }
 
 .sources {
-  padding: 16px;
+  padding: 0 16px;
   display: flex;
   flex: 1 0 auto;
 }
 
 .source-group {
-  margin: 0;
-  padding: 4px;
   flex: 0 0 100%;
 }
 
@@ -240,32 +240,26 @@
   display: flex;
   justify-content: space-between;
   flex-wrap: wrap;
-
 }
 
 .source {
-  color: @text-secondary;
   cursor: pointer;
   .transition;
   text-align: center;
   padding: 8px;
   margin-bottom: 16px;
-  min-width: 198px;
-  border-radius: 3px;
-  border: 1px solid @text-secondary;
+  min-width: calc((100% - 16px * 2) / 3);
+  border-radius: 4px;
 
   &:hover,
   &.source--active {
-    color: @hover;
-    background: @text-primary;
+    color: var(--color-text-light);
   }
 
-  >div {
-    white-space: nowrap;
-    text-overflow: ellipsis;
+  > div {
+    .text-ellipsis;
     max-width: 100%;
     display: inline-block;
-    overflow: hidden;
   }
 }
 
@@ -283,13 +277,12 @@
   justify-content: center;
   display: flex;
   flex: 0 0 50%;
-
 }
 
 .attention {
-  font-size: 12px;
-  color: @text-secondary;
-  padding-right: 20px;
+  font-size: @font-size2;
+  color: var(--color-text);
+  padding-right: 16px;
 }
 
 </style>

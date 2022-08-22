@@ -1,70 +1,74 @@
 <template>
-<div
-  class="mixer-item"
-  :class="{ muted: audioSource.muted }"
-  :data-test-source-name="audioSource.source.name"
-  :data-test-source-type="audioSource.source.type"
->
+  <div
+    class="mixer-item"
+    :class="{ muted: audioSource.muted }"
+    :data-test-source-name="audioSource.source.name"
+    :data-test-source-type="audioSource.source.type"
+  >
+    <div class="title-container">
+      <div class="source-name">{{ audioSource.source.name }}</div>
+      <div class="db-value">
+        <div v-if="audioSource.fader.deflection == 0">-Inf dB</div>
+        <div v-if="audioSource.fader.deflection !== 0">
+          {{ audioSource.fader.db.toFixed(1) }} dB
+        </div>
+      </div>
+    </div>
 
-  <div class="flex">
-    <div class="source-name">{{ audioSource.source.name }}</div>
-    <div class="db-value">
-      <div v-if="audioSource.fader.deflection == 0">-Inf dB</div>
-      <div v-if="audioSource.fader.deflection !== 0">{{ audioSource.fader.db.toFixed(1) }} dB</div>
+    <MixerVolmeter :audioSource="audioSource" v-if="previewEnabled"></MixerVolmeter>
+
+    <div class="flex">
+      <Slider
+        :value="audioSource.fader.deflection"
+        :min="0"
+        :max="1"
+        :interval="0.01"
+        @input="onSliderChangeHandler"
+        tooltip="false"
+      />
+      <div class="controls">
+        <i
+          class="icon-btn icon-speaker"
+          title="click to switch off"
+          v-if="!audioSource.muted"
+          @click="setMuted(true)"
+        >
+        </i>
+        <i
+          class="icon-btn icon-mute"
+          title="click to switch on"
+          v-if="audioSource.muted"
+          @click="setMuted(false)"
+        >
+        </i>
+        <i
+          class="icon-btn icon-settings"
+          @click="showSourceMenu(audioSource.sourceId)"
+          v-if="!isCompactMode"
+        >
+        </i>
+      </div>
     </div>
   </div>
-
-  <MixerVolmeter :audioSource="audioSource" v-if="previewEnabled"></MixerVolmeter>
-
-  <div class="flex">
-    <Slider
-      :value="audioSource.fader.deflection"
-      :min="0"
-      :max="1"
-      :interval="0.01"
-      @input="onSliderChangeHandler"
-      tooltip="false"
-    />
-    <div class="controls">
-      <i class="icon-btn icon-speaker"
-         title="click to switch off"
-         v-if="!audioSource.muted"
-         @click="setMuted(true)"
-      >
-      </i>
-      <i
-        class="icon-btn icon-mute"
-        title="click to switch on"
-        v-if="audioSource.muted"
-        @click="setMuted(false)"
-      >
-      </i>
-      <i
-        class="icon-btn icon-settings"
-        @click="showSourceMenu(audioSource.sourceId)"
-      >
-      </i>
-    </div>
-  </div>
-
-</div>
 </template>
 
 <script lang="ts" src="./MixerItem.vue.ts"></script>
 
 <style lang="less" scoped>
-@import "../styles/index";
+@import '../styles/index';
 
 .mixer-item {
   position: relative;
-  padding: 4px 8px;
-  color: @text-secondary;
+  padding: 8px 12px 0;
+  color: var(--color-text);
 
   .source-name {
     flex: 1;
+    font-size: @font-size2;
   }
 
   .db-value {
+    font-size: @font-size2;
     width: 60px;
     text-align: right;
   }
@@ -77,16 +81,10 @@
     opacity: 0.4;
   }
 
-  &.muted .icon-mute {
-    color: @text-active;
-    opacity: 1;
-  }
-
   .controls {
-    width: 60px;
-    text-align: right;
-    flex: 0 0 60px;
+    display: flex;
+    align-items: center;
+    margin-left: 8px;
   }
 }
-
 </style>

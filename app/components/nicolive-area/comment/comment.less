@@ -1,4 +1,6 @@
-.common__comment-header() {
+@import "../../../styles/index";
+
+.common__comment-header {
   padding-left: 16px;
   text-align: center;
   box-sizing: border-box;
@@ -7,28 +9,30 @@
   align-items: center;
 
   > i {
-    font-size: 14px;
+    font-size: @font-size4;
   }
 }
 
-.common__comment-number() {
+.common__comment-number {
   min-width: 40px;
   padding-left: 16px;
   text-align: right;
   flex-shrink: 0;
   box-sizing: border-box;
+  color: var(--color-text-dark);
+
+  [speaking=true] & {
+    color: var(--color-text-active);
+  }
 }
 
-.common__comment-body() {
+.common__comment-body {
+  .text-ellipsis;
   margin-left: 16px;
-  overflow-x: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
   flex-grow: 1;
-  color: @light-grey;
 }
 
-.common__comment-misc() {
+.common__comment-misc {
   width: 32px;
   text-align: center;
   flex-shrink: 0;

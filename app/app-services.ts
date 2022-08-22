@@ -23,6 +23,7 @@ export { PerformanceService } from 'services/performance';
 export { PerformanceMonitorService } from 'services/performance-monitor';
 export { SettingsService, OutputSettingsService } from 'services/settings';
 export { VideoService } from 'services/video';
+export { WindowSizeService } from 'services/window-size';
 export { WindowsService } from 'services/windows';
 export { TransitionsService } from 'services/transitions';
 export { FontLibraryService } from 'services/font-library';
@@ -46,6 +47,7 @@ export { UserService } from './services/user';
 export { UsageStatisticsService } from './services/usage-statistics';
 
 // nicolive
+export { CompactModeService } from 'services/compact-mode';
 export { QuestionaireService } from 'services/questionaire';
 export { MonitorCaptureCroppingService } from 'services/sources/monitor-capture-cropping';
 export { InformationsService } from 'services/informations';

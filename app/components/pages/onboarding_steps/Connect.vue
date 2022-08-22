@@ -1,7 +1,7 @@
 <template>
   <div class="main" data-test="Connect">
     <div class="onboarding-step">
-      <NAirLogo />
+      <NAirLogo class="onboarding-logo" />
       <div class="onboarding-title" v-if="isSecurityUpgrade">Re-Authorize</div>
       <div class="onboarding-desc" v-if="isSecurityUpgrade">
         {{ $t('onboarding.secutityUpgrade') }}
@@ -10,16 +10,16 @@
       <div class="onboarding-desc" v-else>{{ $t('onboarding.urgeToSignIn') }}</div>
       <div class="signup-buttons">
         <button
-          class="button button--niconico"
+          class="button button--accent button--niconico"
           :disabled="loadingState"
           @click="authPlatform('niconico')"
           data-test="NiconicoSignup">
-          <i class="fa" :class="iconForPlatform('niconico')" /> {{ $t('onboarding.loginToNiconico') }}
+          {{ $t('onboarding.loginToNiconico') }}
         </button>
       </div>
       <button
         @click="skipOnboarding"
-        class="button button--skip"
+        class="link link--skip"
         :disabled="loadingState"
         v-if="!isSecurityUpgrade"
         data-test="Skip">{{ $t('onboarding.skipConnect')}}</button>
@@ -31,12 +31,6 @@
 <script lang="ts" src="./Connect.vue.ts"></script>
 
 <style lang="less" scoped>
-.onboarding-step {
-  > svg {
-    width: 256px;
-    margin-bottom: 30px;
-  }
-}
 .signup-buttons {
   display: flex;
   flex-direction: column;
@@ -49,10 +43,10 @@
 }
 footer {
   position: fixed;
-  color: #70A0AF;
+  color: var(--color-text-dark);
   bottom: 0;
   width: 100%;
-  padding: 8px;
+  padding: 16px;
 }
 
 .icon-spin {
@@ -66,6 +60,17 @@ footer {
   100% {
     transform: rotate(359deg);
   }
+}
+
+// ログインボタン
+.button--niconico {
+  height: 40px;
+  width: 188px;
+}
+
+// スキップリンク
+.link--skip {
+  text-decoration: underline;
 }
 
 </style>

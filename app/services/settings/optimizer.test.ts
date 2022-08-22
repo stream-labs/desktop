@@ -93,7 +93,7 @@ test('SettingsKeyAccessor#traverseKeyDescriptions', () => {
 
   // 分岐の選択されている側のみの値が得られること
   outputMode = 'Simple';
-  const simpleResult = [...a.travarseKeyDescriptions(simpleDescriptions, d => [d.key, d.setting])];
+  const simpleResult = [...a.traverseKeyDescriptions(simpleDescriptions, d => [d.key, d.setting])];
 
   expect(accessor.findSettingValue).toHaveBeenCalledTimes(1);
   expect(accessor.findSettingValue).toHaveBeenLastCalledWith(undefined, 'Untitled', 'Mode');
@@ -105,7 +105,7 @@ test('SettingsKeyAccessor#traverseKeyDescriptions', () => {
 
   outputMode = 'Advanced';
   const advancedResult = [
-    ...a.travarseKeyDescriptions(advancedDescriptions, d => [d.key, d.setting]),
+    ...a.traverseKeyDescriptions(advancedDescriptions, d => [d.key, d.setting]),
   ];
   expect(advancedResult).toEqual([
     [OptimizationKey.outputMode, 'Mode'],

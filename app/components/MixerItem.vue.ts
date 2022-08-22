@@ -1,11 +1,12 @@
+import { CompactModeService } from 'services/compact-mode';
+import { CustomizationService } from 'services/customization';
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
-import { EditMenu } from '../util/menus/EditMenu';
 import { AudioSource } from '../services/audio';
-import { CustomizationService } from 'services/customization';
-import Slider from './shared/Slider.vue';
-import MixerVolmeter from './MixerVolmeter.vue';
 import { Inject } from '../services/core/injector';
+import { EditMenu } from '../util/menus/EditMenu';
+import MixerVolmeter from './MixerVolmeter.vue';
+import Slider from './shared/Slider.vue';
 
 @Component({
   components: { Slider, MixerVolmeter },
@@ -13,10 +14,15 @@ import { Inject } from '../services/core/injector';
 export default class MixerItem extends Vue {
   @Prop() audioSource: AudioSource;
 
+  @Inject() compactModeService: CompactModeService;
   @Inject() private customizationService: CustomizationService;
 
   get previewEnabled() {
     return !this.customizationService.state.performanceMode;
+  }
+
+  get isCompactMode(): boolean {
+    return this.compactModeService.isCompactMode;
   }
 
   setMuted(muted: boolean) {

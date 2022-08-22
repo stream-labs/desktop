@@ -45,6 +45,10 @@ export default class ModalLayout extends Vue {
   @Prop({ default: false, type: Boolean })
   bareContent: boolean;
 
+  /* Contentをスクロールさせない場合 */
+  @Prop({ default: false, type: Boolean })
+  noScroll: boolean;
+
   created() {
     const fixedStyle = {
       height: (this.fixedSectionHeight || 0).toString() + 'px',

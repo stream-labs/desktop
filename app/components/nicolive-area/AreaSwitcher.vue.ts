@@ -1,6 +1,8 @@
+import { Inject } from 'services/core/injector';
+import { CustomizationService } from 'services/customization';
 import Vue from 'vue';
-import { Component, Prop } from 'vue-property-decorator';
 import Popper from 'vue-popperjs';
+import { Component, Prop } from 'vue-property-decorator';
 
 interface IArea {
   name: string;
@@ -15,9 +17,20 @@ export default class AreaSwitcher extends Vue {
   @Prop()
   contents: IArea[];
 
-  activeContent: IArea = this.contents.find(c => c.defaultSelected) ?? this.contents[0];
+  @Inject()
+  private customizationService: CustomizationService;
+
+  get isCompactMode(): boolean {
+    return this.customizationService.state.compactMode;
+  }
+
+  private selectedContent: IArea = this.contents.find(c => c.defaultSelected) ?? this.contents[0];
+
+  get activeContent(): IArea {
+    return this.isCompactMode ? this.contents[0] : this.selectedContent;
+  }
 
   select(slotName: string) {
-    this.activeContent = this.contents.find(c => c.slotName === slotName)!;
+    this.selectedContent = this.contents.find(c => c.slotName === slotName)!;
   }
 }

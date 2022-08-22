@@ -1,4 +1,6 @@
 import * as fetchMock from 'fetch-mock';
+import { WrappedResult } from './NicoliveClient';
+import { Communities, Community } from './ResponseTypes';
 const { NicoliveClient } = require('./NicoliveClient');
 
 jest.mock('services/i18n', () => ({
@@ -148,18 +150,30 @@ suites.forEach((suite: Suite) => {
   });
 });
 
-const dummyCommunities = {
+const dummyCommunities: Communities = {
   meta: {
     status: 200,
-    errorCode: 'OK',
   },
   data: {
-    communities: [
-      {
-        id: communityID,
-      },
-    ],
-    errors: [] as any,
+    communities: {
+      total: 1,
+      communities: [
+        {
+          global_id: communityID,
+          id: communityID.replace(/^co/, ''),
+          name: 'name',
+          description: 'description',
+          public: 'open',
+          icon: {
+            id: 1,
+            url: {
+              size_64x64: 'url',
+              size_128x128: 'url',
+            },
+          },
+        },
+      ],
+    },
   },
 };
 
@@ -167,12 +181,15 @@ test('fetchCommunityはコミュをひとつだけ返す', async () => {
   const client = new NicoliveClient();
 
   fetchMock.get(
-    `${NicoliveClient.publicBaseURL}/v1/communities.json?communityIds=${communityID}`,
+    `${NicoliveClient.communityBaseURL}/api/v2/communities.json?ids=${communityID.replace(
+      /^co/,
+      '',
+    )}`,
     dummyCommunities,
   );
-  const result = await client.fetchCommunity(communityID);
+  const result = (await client.fetchCommunity(communityID)) as WrappedResult<Community>;
 
-  expect(result).toEqual({ ok: true, value: dummyCommunities.data.communities[0] });
+  expect(result).toEqual({ ok: true, value: dummyCommunities.data.communities.communities[0] });
   expect(fetchMock.done()).toBe(true);
 });
 
@@ -180,7 +197,10 @@ test('fetchCommunityはbodyがJSONでなければSyntaxErrorをwrapして返す'
   const client = new NicoliveClient();
 
   fetchMock.get(
-    `${NicoliveClient.publicBaseURL}/v1/communities.json?communityIds=${communityID}`,
+    `${NicoliveClient.communityBaseURL}/api/v2/communities.json?ids=${communityID.replace(
+      /^co/,
+      '',
+    )}`,
     'invalid json',
   );
   const result = client.fetchCommunity(communityID);

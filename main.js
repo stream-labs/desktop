@@ -1,3 +1,4 @@
+/* eslint-disable no-inner-declarations */
 ////////////////////////////////////////////////////////////////////////////////
 // Set Up Environment Variables
 ////////////////////////////////////////////////////////////////////////////////
@@ -228,11 +229,13 @@ if (!gotTheLock) {
   let shutdownStarted = false;
   let appShutdownTimeout;
 
-  global.indexUrl = 'file://' + path.join(__dirname, '/index.html');
+  global.indexUrl = process.env.DEV_SERVER || `file://${__dirname}/index.html`;
 
   // eslint-disable-next-line no-inner-declarations
   function openDevTools() {
-    childWindow.webContents.openDevTools({ mode: 'undocked' });
+    if (childWindow.isVisible()) {
+      childWindow.webContents.openDevTools({ mode: 'undocked' });
+    }
     mainWindow.webContents.openDevTools({ mode: 'undocked' });
   }
 
@@ -258,7 +261,7 @@ if (!gotTheLock) {
       dialog.showErrorBox(
         '予期せぬエラー',
         '予期しないエラーが発生したため、アプリケーションをシャットダウンします。ご不便をおかけして申し訳ありません。\n' +
-          'この件に関する情報はデバッグ目的で送信されました。不具合を解決するためにご協力いただきありがとうございます。',
+        'この件に関する情報はデバッグ目的で送信されました。不具合を解決するためにご協力いただきありがとうございます。',
       );
 
       app.exit();
@@ -304,7 +307,7 @@ if (!gotTheLock) {
       );
 
     mainWindow = new BrowserWindow({
-      minWidth: 800,
+      minWidth: 448,
       minHeight: 600,
       width: mainWindowState.width,
       height: mainWindowState.height,
@@ -313,9 +316,9 @@ if (!gotTheLock) {
       title: process.env.NAIR_PRODUCT_NAME,
       ...(mainWindowIsVisible
         ? {
-            x: mainWindowState.x,
-            y: mainWindowState.y,
-          }
+          x: mainWindowState.x,
+          y: mainWindowState.y,
+        }
         : {}),
       webPreferences: { nodeIntegration: true, webviewTag: true },
     });
@@ -330,6 +333,7 @@ if (!gotTheLock) {
     const LOAD_DELAY = 2000;
     setTimeout(
       () => {
+        if (process.env.NAIR_PRODUCTION_DEBUG || process.env.DEV_SERVER) openDevTools();
         mainWindow.loadURL(`${global.indexUrl}?windowId=main`);
       },
       isDevMode ? LOAD_DELAY : 0,
@@ -393,7 +397,12 @@ if (!gotTheLock) {
       }
     });
 
-    if (process.env.NAIR_PRODUCTION_DEBUG) openDevTools();
+    const { default: installExtension, VUEJS_DEVTOOLS } = require('electron-devtools-installer');
+    installExtension(VUEJS_DEVTOOLS)
+      .then(name => console.log(name))
+      .catch(err => console.log(err));
+
+    // if (process.env.NAIR_PRODUCTION_DEBUG || process.env.DEV_SERVER) openDevTools();
 
     // simple messaging system for services between windows
     // WARNING! the child window use synchronous requests and will be frozen
@@ -446,7 +455,7 @@ if (!gotTheLock) {
       require('devtron').install();
 
       // Vue dev tools appears to cause strange non-deterministic
-      // interference with certain NodeJS APIs, expecially asynchronous
+      // interference with certain NodeJS APIs, especially asynchronous
       // IO from the renderer process.  Enable at your own risk.
 
       // const devtoolsInstaller = require('electron-devtools-installer');

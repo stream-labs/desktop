@@ -13,7 +13,7 @@
         @change="handleChange">
       <button
         @click="showFileDialog"
-        class="path__browse-button button button--dark">
+        class="path__browse-button button button--secondary">
         {{ $t('common.browse') }}
       </button>
     </div>
@@ -24,5 +24,13 @@
 <script lang="ts" src="./ObsPathInput.vue.ts"></script>
 
 <style lang="less" scoped>
+@import "../../../styles/index";
 
+.path__input {
+  border-radius: 4px 0 0 4px;
+}
+
+.path__browse-button {
+  border-radius: 0 4px 4px 0;
+}
 </style>

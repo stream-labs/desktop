@@ -1,94 +1,147 @@
 <template>
-<div class="studio-controls row expanded" :class="{ opened }">
-  <button @click="onToggleControls" class="studio-controls-toggle-button" :class="{ 'studio-controls--opened': opened }">
-    <ControlsArrow />
-  </button>
-  <template v-if="opened">
-    <scene-selector class="studio-controls-panel small-4 columns" />
-    <source-selector class="studio-controls-panel small-4 columns" />
-    <mixer class="studio-controls-panel small-4 columns" />
-  </template>
-</div>
+  <div class="studio-controls row expanded" :class="{ opened: opened || isCompactMode }">
+    <button
+      @click="onToggleControls"
+      class="studio-controls-toggle-button"
+      :class="{ 'studio-controls--opened': opened }"
+      v-if="!isCompactMode"
+    >
+      <i class="icon-drop-down-arrow"></i>
+    </button>
+    <template v-if="isCompactMode">
+      <div class="studio-controls-compact">
+        <div class="studio-controls-tabs">
+          <a
+            @click="compactModeStudioController = 'mixer'"
+            class="studio-controls-tab"
+            :class="{ active: compactModeStudioController === 'mixer' }"
+            >ミキサー</a
+          >
+          <a
+            @click="compactModeStudioController = 'scenes'"
+            class="studio-controls-tab"
+            :class="{ active: compactModeStudioController === 'scenes' }"
+            >{{ activeCollection.name }}</a
+          >
+        </div>
+        <scene-selector
+          class="studio-controls-panel"
+          v-if="compactModeStudioController === 'scenes'"
+        />
+        <mixer class="studio-controls-panel" v-if="compactModeStudioController === 'mixer'" />
+      </div>
+    </template>
+    <template v-else-if="opened">
+      <scene-selector class="studio-controls-panel small-4 columns" />
+      <source-selector class="studio-controls-panel small-4 columns" />
+      <mixer class="studio-controls-panel small-4 columns" />
+    </template>
+  </div>
 </template>
 
 <script lang="ts" src="./StudioControls.vue.ts"></script>
 
 <style lang="less" scoped>
-@import "../styles/index";
+@import '../styles/index';
 
 .studio-controls {
+  .dividing-border;
+
   position: relative;
   height: 0;
   width: 100%;
-  padding: 16px 8px 0 8px;
-  border-top: 1px solid @bg-tertiary;
+  padding: @toggle-button-size 8px 0 8px;
+  background-color: var(--color-bg-quinary);
 
-  svg {
-    width: 140px;
-    height: 10px;
-    transition: .5s;
-  }
-  &:hover {
-    svg {
-      transition: .5s;
-      width: 160px;
-    }
-  }
   &.opened {
-    height: 196px;
-    padding-top: 28px;
-    svg {
-      width: 140px;
-      height: 10px;
-      transform: rotate(0deg);
-    }
+    height: @studio-controls-opened-height;
+    padding-bottom: 16px;
+  }
+
+  .isCompactMode & {
+    display: flex;
+    padding-top: 0;
+    width: @nicolive-area-width;
   }
 }
 
 .studio-controls-toggle-button {
   position: absolute;
-  background-color: @bg-primary;
-  border: 1px solid @bg-secondary;
-  border-width: 0 1px 1px 1px;
-
   width: 180px;
-  height: 16px;
-  margin: -16px auto 0 auto;
+  height: @toggle-button-size;
+  margin: -@toggle-button-size auto 0 auto;
   left: 0;
   right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
-  >svg {
-    width: 140px;
-    height: 10px;
-    transform: rotate(180deg);
-    fill: @text-primary;
-    transition: .5s;
+  > i {
+    .icon-hover;
+    font-size: @font-size2;
+    color: var(--color-text);
+    display: block;
+    transform: rotate(-180deg);
   }
 
   .opened & {
-    margin-top: -28px;
-  }
-
-  &:hover {
-    background-color: @bg-secondary;
-    >svg {
-      transition: 0.5s;
-      width: 160px;
-      fill: @text-primary;
+    i {
+      transform: rotate(0deg);
     }
   }
 }
 </style>
 
 <style lang="less">
-@import "../styles/index";
+@import '../styles/index';
 
 .studio-controls-panel {
   display: flex;
   flex-direction: column;
   height: 100%;
-  padding: 0 4px;
+  min-height: 0;
+  padding: 0 8px;
   position: relative;
+  flex-grow: 1;
+}
+
+.studio-controls-compact {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  .text-ellipsis;
+}
+
+.studio-controls-tabs {
+  display: flex;
+  padding: 0 8px;
+}
+
+.studio-controls-tab {
+  .text-ellipsis;
+
+  flex: 1 0 50%;
+  text-align: center;
+  height: 48px;
+  line-height: 48px;
+  text-decoration: none;
+  color: var(--color-text);
+  position: relative;
+  padding: 0 8px;
+
+  &.active {
+    color: var(--color-primary);
+
+    &:after {
+      content: '';
+      height: 2px;
+      width: 100%;
+      position: absolute;
+      left: 0;
+      bottom: 0;
+      background-color: var(--color-primary);
+    }
+  }
 }
 
 .studio-controls-top {
@@ -97,21 +150,21 @@
   align-items: center;
   justify-content: space-between;
   flex: 0 0 16px;
-  margin: 4px 0;
+  height: 16px;
+  margin-bottom: 12px;
 }
 
 .studio-controls__label {
-  color: @text-primary;
+  color: var(--color-text-light);
   margin-bottom: 0;
-  font-size: 12px;
+  font-size: @font-size4;
   .semibold;
 }
 
 .studio-controls-selector {
-  background: @bg-tertiary;
+  background: var(--color-bg-tertiary);
   .radius;
   flex-grow: 1;
   overflow-y: auto;
 }
-
 </style>

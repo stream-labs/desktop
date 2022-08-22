@@ -93,8 +93,7 @@ type RecordingSettings = {
 
 export class SettingsService
   extends StatefulService<ISettingsState>
-  implements ISettingsServiceApi, ISettingsAccessor
-{
+  implements ISettingsServiceApi, ISettingsAccessor {
   static initialState = {};
 
   static convertFormDataToState(settingsFormData: TSettingsFormData): ISettingsState {
@@ -420,10 +419,17 @@ export class SettingsService
   getStreamEncoderSettings() {
     const output = this.getSettingsFormData('Output');
     const video = this.getSettingsFormData('Video');
+    const audio = this.getSettingsFormData('Audio');
+    const stream = this.getSettingsFormData('Stream');
 
-    const encoder =
-      (this.findSettingValue(output, 'Streaming', 'Encoder') as string) ||
-      (this.findSettingValue(output, 'Streaming', 'StreamEncoder') as string);
+    const outputMode = this.findSettingValue(output, 'Untitled', 'Mode') as 'Simple' | 'Advanced';
+    const isSimple = outputMode === 'Simple';
+    const streamingURL = this.findSettingValue(stream, 'Untitled', 'server') as string;
+
+    const encoder = isSimple ?
+      (this.findSettingValue(output, 'Streaming', 'StreamEncoder') as string)
+      :
+      (this.findSettingValue(output, 'Streaming', 'Encoder') as string);
     const preset =
       (this.findSettingValue(output, 'Streaming', 'preset') as string) ||
       (this.findSettingValue(output, 'Streaming', 'Preset') as string) ||
@@ -432,18 +438,65 @@ export class SettingsService
       (this.findSettingValue(output, 'Streaming', 'target_usage') as string) ||
       (this.findSettingValue(output, 'Streaming', 'QualityPreset') as string) ||
       (this.findSettingValue(output, 'Streaming', 'AMDPreset') as string);
-    const bitrate =
-      (this.findSettingValue(output, 'Streaming', 'bitrate') as string) ||
-      (this.findSettingValue(output, 'Streaming', 'VBitrate') as string);
+    const bitrate = isSimple ?
+      (this.findSettingValue(output, 'Streaming', 'VBitrate') as number)
+      :
+      (this.findSettingValue(output, 'Streaming', 'bitrate') as number);
     const baseResolution = this.findSettingValue(video, 'Untitled', 'Base') as string;
     const outputResolution = this.findSettingValue(video, 'Untitled', 'Output') as string;
 
+    const fpsType = this.findSettingValue(video, 'Untitled', 'FPSType') as 'Fractional FPS Value' | 'Integer FPS Value' | 'Common FPS Values';
+    let fps = '';
+    switch (fpsType) {
+      case 'Fractional FPS Value':
+        {
+          const fpsNum = this.findSettingValue(video, 'Untitled', 'FPSNum') as number;
+          const fpsDen = this.findSettingValue(video, 'Untitled', 'FPSDen') as number;
+          fps = `${fpsNum}/${fpsDen}`;
+        }
+        break;
+      case 'Integer FPS Value':
+        {
+          const fpsInt = this.findSettingValue(video, 'Untitled', 'FPSInt') as number;
+          fps = `${fpsInt}`;
+        }
+        break;
+      case 'Common FPS Values':
+        {
+          const fpsCommon = this.findSettingValue(video, 'Untitled', 'FPSCommon') as string;
+          fps = fpsCommon;
+        }
+        break;
+    }
+
+    const audio_bitrate = isSimple ?
+      this.findSettingValue(output, 'Streaming', 'ABitrate') as string
+      :
+      this.findSettingValue(output, 'Audio - Track 1', 'Track1Bitrate') as string;
+    const rate_control = !isSimple ?
+      this.findSettingValue(output, 'Streaming', 'rate_control') as 'CBR' | 'VBR' | 'ABR' | 'CRF'
+      : null;
+    const profile = !isSimple ?
+      this.findSettingValue(output, 'Streaming', 'profile') as 'high' | 'main' | 'baseline'
+      : null;
+
+    const sample_rate = this.findSettingValue(audio, 'Untitled', 'SampleRate') as 44100 | 48000;
+
     return {
+      streamingURL,
+      outputMode,
       encoder,
       preset,
+      profile,
       bitrate,
       baseResolution,
       outputResolution,
+      fps,
+      audio: {
+        bitrate: audio_bitrate,
+        sampleRate: sample_rate,
+        rateControl: rate_control,
+      }
     };
   }
 

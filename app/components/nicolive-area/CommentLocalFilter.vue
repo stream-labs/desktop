@@ -14,16 +14,15 @@
 
 <script lang="ts" src="./CommentLocalFilter.vue.ts"></script>
 <style lang="less" scoped>
-@import "../../styles/_colors";
-@import "../../styles/mixins";
+@import "../../styles/index";
 
 .setting-section {
-  border-bottom: 1px solid @bg-quinary;
+  border-bottom: 1px solid var(--color-border-light);
 }
 
 .section-heading {
-  color: @grey;
-  padding: 16px 16px 8px;
+  color: var(--color-text-light);
+  padding: 16px 16px 0;
 }
 
 .section-item {
@@ -38,8 +37,8 @@
 }
 
 .name {
-  font-size: 12px;
-  color: @light-grey;
+  font-size: @font-size4;
+  color: var(--color-text);
   flex-grow: 1;
 }
 

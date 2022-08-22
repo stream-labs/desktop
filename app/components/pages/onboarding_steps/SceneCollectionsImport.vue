@@ -9,7 +9,7 @@
       </li>
     </ul>
     <button
-      class="button button--action button--lg"
+      class="button button--primary button--lg"
       @click="next">
       {{ $t('common.continue') }}
     </button>
