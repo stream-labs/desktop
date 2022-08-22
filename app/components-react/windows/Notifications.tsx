@@ -4,6 +4,7 @@ import cx from 'classnames';
 import { useRenderInterval, useVuex } from 'components-react/hooks';
 import { ModalLayout } from 'components-react/shared/ModalLayout';
 import { Services } from 'components-react/service-provider';
+import Scrollable from 'components-react/shared/Scrollable';
 import { INotification } from 'services/notifications';
 import { $t } from 'services/i18n';
 import styles from './Notifications.m.less';
@@ -33,33 +34,35 @@ export default function Notifications() {
 
   return (
     <ModalLayout hideFooter>
-      {!notificationsCount && <h4>{$t("You don't have any notifications")}</h4>}
+      <Scrollable style={{ height: '100%' }}>
+        {!notificationsCount && <h4>{$t("You don't have any notifications")}</h4>}
 
-      {Object.keys(notificationGroups).map((groupName: string) => (
-        <div key={groupName}>
-          {notificationGroups[groupName].length > 0 && (
-            <h4>{groupName === 'unread' ? $t('New Notifications') : $t('Log')}</h4>
-          )}
-          {notificationGroups[groupName].map((notify: INotification) => (
-            <div
-              key={notify.id}
-              onClick={() => onNotificationClickHandler(notify.id)}
-              className={cx(styles.notification, {
-                [styles.unread]: notify.unread,
-                [styles.hasAction]: notify.action,
-              })}
-              data-name={notify.action && 'hasAction'}
-            >
-              <div className="icon">
-                {notify.type === 'INFO' && <span className="fa fa-info-circle" />}
-                {notify.type === 'WARNING' && <span className="fa fa-warning" />}
+        {Object.keys(notificationGroups).map((groupName: string) => (
+          <div key={groupName}>
+            {notificationGroups[groupName].length > 0 && (
+              <h4>{groupName === 'unread' ? $t('New Notifications') : $t('Log')}</h4>
+            )}
+            {notificationGroups[groupName].map((notify: INotification) => (
+              <div
+                key={notify.id}
+                onClick={() => onNotificationClickHandler(notify.id)}
+                className={cx(styles.notification, {
+                  [styles.unread]: notify.unread,
+                  [styles.hasAction]: notify.action,
+                })}
+                data-name={notify.action && 'hasAction'}
+              >
+                <div className="icon">
+                  {notify.type === 'INFO' && <span className="fa fa-info-circle" />}
+                  {notify.type === 'WARNING' && <span className="fa fa-warning" />}
+                </div>
+                <div className="message">{notify.message}</div>
+                <div className={styles.date}>{momentize(notify.date)}</div>
               </div>
-              <div className="message">{notify.message}</div>
-              <div className={styles.date}>{momentize(notify.date)}</div>
-            </div>
-          ))}
-        </div>
-      ))}
+            ))}
+          </div>
+        ))}
+      </Scrollable>
     </ModalLayout>
   );
 }
