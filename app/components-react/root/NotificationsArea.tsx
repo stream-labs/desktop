@@ -88,7 +88,7 @@ class NotificationsModule {
   clickNotif() {
     if (!this.currentNotif) return;
     Services.NotificationsService.actions.applyAction(this.currentNotif.id);
-    Services.NotificationsService.actions.markAsRead(this.currentNotif.id);
+    Services.NotificationsService.actions.showNotifications();
     this.playNext();
   }
 }
