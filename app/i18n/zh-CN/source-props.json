@@ -1,8 +1,8 @@
 {
  "Image": "图片",
- "Color Source": "色彩来源",
+ "Color Block": "Color Block",
  "Browser Source": "浏览器源",
- "Media Source": "媒体源",
+ "Media File": "Media File",
  "Image Slide Show": "图片幻灯片展示",
  "Text (GDI+)": "文字 (GDI+)",
  "Text (FreeType 2)": "文字 (FreeType 2)",
