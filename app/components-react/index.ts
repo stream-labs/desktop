@@ -53,6 +53,7 @@ import SourceSelector from './editor/elements/SourceSelector';
 import SideNav from './sidebar/SideNav';
 import WelcomeToPrime from './windows/WelcomeToPrime';
 import Notifications from './windows/Notifications';
+import NotificationsAndNews from './windows/NotificationsAndNews';
 import PlatformMerge from './pages/PlatformMerge';
 import AlertboxLibrary from './pages/AlertboxLibrary';
 import PlatformAppStore from './pages/PlatformAppStore';
@@ -119,6 +120,7 @@ export const components = {
   SideNav,
   WelcomeToPrime,
   Notifications,
+  NotificationsAndNews,
   PlatformMerge,
   PlatformAppStore,
   PlatformAppMainPage,

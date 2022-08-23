@@ -212,6 +212,14 @@ export class NotificationsArea extends ReactComponent {}
 
 @Component({
   props: {
+    name: { default: 'NotificationsAndNews' },
+    wrapperStyles: { default: () => ({ height: '100%' }) },
+  },
+})
+export class NotificationsAndNews extends ReactComponent {}
+
+@Component({
+  props: {
     name: { default: 'ObsSettings' },
     componentProps: { default: () => ({ page: 'General' }) },
   },

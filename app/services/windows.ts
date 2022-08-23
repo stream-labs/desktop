@@ -39,6 +39,7 @@ import {
   News,
   WelcomeToPrime,
   Notifications,
+  NotificationsAndNews,
   PlatformAppPopOut,
 } from 'components/shared/ReactComponentList';
 
@@ -104,6 +105,7 @@ export function getComponents() {
     Blank,
     AdvancedAudio,
     Notifications,
+    NotificationsAndNews,
     Troubleshooter,
     ManageSceneCollections,
     Projector,
