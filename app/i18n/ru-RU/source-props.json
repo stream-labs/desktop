@@ -1,8 +1,8 @@
 {
  "Image": "Изображение",
- "Color Source": "Цвет",
+ "Color Block": "Color Block",
  "Browser Source": "Браузер",
- "Media Source": "Мультимедиа",
+ "Media File": "Media File",
  "Image Slide Show": "Слайд-шоу изображений",
  "Text (GDI+)": "Текст (GDI+)",
  "Text (FreeType 2)": "Текст (FreeType 2)",
