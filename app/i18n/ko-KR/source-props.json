@@ -1,8 +1,8 @@
 {
  "Image": "이미지",
- "Color Source": "색상 소스",
+ "Color Block": "Color Block",
  "Browser Source": "브라우저 소스",
- "Media Source": "미디어 소스",
+ "Media File": "Media File",
  "Image Slide Show": "이미지 슬라이드 쇼",
  "Text (GDI+)": "텍스트(GDI+)",
  "Text (FreeType 2)": "텍스트(FreeType 2)",
