@@ -518,9 +518,9 @@ export class SourcesService extends StatefulService<ISourcesState> {
     const obsAvailableTypes = obs.InputFactory.types();
     const allowlistedTypes: IObsListOption<TSourceType>[] = [
       { description: 'Image', value: 'image_source' },
-      { description: 'Color Source', value: 'color_source' },
+      { description: 'Color Block', value: 'color_source' },
       { description: 'Browser Source', value: 'browser_source' },
-      { description: 'Media Source', value: 'ffmpeg_source' },
+      { description: 'Media File', value: 'ffmpeg_source' },
       { description: 'Image Slide Show', value: 'slideshow' },
       { description: 'Text (GDI+)', value: 'text_gdiplus' },
       { description: 'Text (FreeType 2)', value: 'text_ft2_source' },
