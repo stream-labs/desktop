@@ -517,7 +517,7 @@ export class SourcesService extends StatefulService<ISourcesState> {
     const allowlistedTypes: IObsListOption<TSourceType>[] = [
       { description: 'Image', value: 'image_source' },
       { description: 'Color Block', value: 'color_source' },
-      { description: 'Browser Window', value: 'browser_source' },
+      { description: 'Browser Source', value: 'browser_source' },
       { description: 'Media File', value: 'ffmpeg_source' },
       { description: 'Image Slide Show', value: 'slideshow' },
       { description: 'Text (GDI+)', value: 'text_gdiplus' },

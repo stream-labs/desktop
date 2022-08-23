@@ -61,7 +61,7 @@ test('Create/Remove Image Source and view Source Properties', async t => {
 test('Create/Remove Browser Source and view Source Properties', async t => {
   const sourceName = 'Browser Source';
 
-  await addSource('Browser Window', sourceName);
+  await addSource('Browser Source', sourceName);
   await focusMain();
 
   await selectSource(sourceName);

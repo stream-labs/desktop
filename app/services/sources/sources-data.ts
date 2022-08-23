@@ -34,7 +34,7 @@ export const SourceDisplayData = (): { [key: string]: ISourceDisplayData } => ({
     icon: 'fas fa-fill',
   },
   browser_source: {
-    name: $t('Browser Window'),
+    name: $t('Browser Source'),
     description: $t(
       'Allows you to add web-based content as a source, such as web pages, widgets, and streaming video.',
     ),
