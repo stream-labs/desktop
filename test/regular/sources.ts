@@ -22,7 +22,7 @@ useSpectron({ restartAppAfterEachTest: false });
 test('Create/Remove Color Source and view Source Properties', async t => {
   const sourceName = 'Color Source';
 
-  await addSource('Color Source', sourceName);
+  await addSource('Color Block', sourceName);
   await focusMain();
 
   await selectSource(sourceName);
@@ -88,7 +88,7 @@ test('Create/Remove Browser Source and view Source Properties', async t => {
 test('Create/Remove Media Source and view Source Properties', async t => {
   const sourceName = 'Media Source';
 
-  await addSource('Media Source', sourceName);
+  await addSource('Media File', sourceName);
   await focusMain();
 
   await selectSource(sourceName);
@@ -336,7 +336,7 @@ test('Rename source', async t => {
   const sourceName = 'MyColorSource1';
   const newSourceName = 'MyColorSource2';
 
-  await addSource('Color Source', sourceName);
+  await addSource('Color Block', sourceName);
 
   await openRenameWindow(sourceName);
 
