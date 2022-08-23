@@ -31,7 +31,7 @@ export const GROWTH_TIPS = () => [
     title: 'Use the Streamlabs Controller App',
     icon: 'icon-phone-case',
     link: 'https://streamlabs.com/content-hub/post/streamlabs-deck-app-remote-control-your-stream',
-    cta: 'Download Streamlabs Controller',
+    cta: 'Download Streamlabs Controller App',
     description:
       'Control your scenes, sources, and more from your mobile device for free with the Streamlabs Controller App',
   },

@@ -110,6 +110,7 @@ interface IProductionAppResponse {
   is_beta: boolean;
   manifest: IAppManifest;
   name: string;
+  delisted?: boolean;
   screenshots: string[];
   version: string;
 }
@@ -125,6 +126,7 @@ export interface ILoadedApp {
   appUrl?: string;
   devPort?: number;
   enabled: boolean;
+  delisted?: boolean;
   icon?: string;
 }
 
@@ -153,6 +155,10 @@ class PlatformAppsViews extends ViewHandler<IPlatformAppServiceState> {
 
   get enabledApps() {
     return this.state.loadedApps.filter(app => app.enabled);
+  }
+
+  getDelisted(appId: string) {
+    return this.getApp(appId).delisted;
   }
 }
 
@@ -251,6 +257,7 @@ export class PlatformAppsService extends StatefulService<IPlatformAppServiceStat
         appToken: app.app_token,
         poppedOutSlots: [],
         icon: app.icon,
+        delisted: app.delisted,
         enabled: !(unpackedVersionLoaded || disabledApps.includes(app.id_hash)),
       });
     });
