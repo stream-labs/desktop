@@ -5,7 +5,7 @@ import { useVuex } from 'components-react/hooks';
 import { Spinner } from 'components-react/pages/Loader';
 import { Services } from 'components-react/service-provider';
 import Display from 'components-react/shared/Display';
-import { ListInput, SliderInput, TextInput } from 'components-react/shared/inputs';
+import { CheckboxInput, ListInput, SliderInput, TextInput } from 'components-react/shared/inputs';
 import Form from 'components-react/shared/inputs/Form';
 import { ModalLayout } from 'components-react/shared/ModalLayout';
 import React, { useMemo, useState } from 'react';
@@ -407,8 +407,34 @@ function GuestSourceSelector(p: { guest: IGuest; style?: React.CSSProperties }) 
   );
 }
 
+function DisconnectModal(p: { setCheckboxVal: (val: boolean) => void }) {
+  const [regen, setRegen] = useState(true);
+
+  return (
+    <>
+      <p>
+        {$t(
+          'If you want to prevent this guest from rejoining, you should also regenerate your invite link.',
+        )}
+      </p>
+      <Form>
+        <CheckboxInput
+          label={$t('Regenerate Link')}
+          value={regen}
+          onChange={(val: boolean) => {
+            setRegen(val);
+            p.setCheckboxVal(val);
+          }}
+        />
+      </Form>
+    </>
+  );
+}
+
 function GuestPane(p: { guest: IGuest }) {
-  const { getBindingsForGuest, addNewSource } = useModule(GuestCamModule);
+  const { getBindingsForGuest, addNewSource, regenerateLink, setHideDisplay } = useModule(
+    GuestCamModule,
+  );
 
   // TODO: Talk to Alex about how the useModule pattern thinks this should
   // be handled with reactivity. For now, wrap in useVuex to make it reactive.
@@ -429,6 +455,26 @@ function GuestPane(p: { guest: IGuest }) {
   }
 
   const { visible, setVisible, volume, setVolume, disconnect } = bindings;
+
+  async function onDisonnectClick() {
+    let regen = true;
+    setHideDisplay(true);
+    const confirmed = await confirmAsync({
+      title: $t('Are you sure you want to disconnect %{guestName}?', {
+        guestName: p.guest.remoteProducer.name,
+      }),
+      content: <DisconnectModal setCheckboxVal={val => (regen = val)} />,
+    });
+    setHideDisplay(false);
+
+    if (!confirmed) return;
+
+    if (regen) {
+      regenerateLink();
+    }
+
+    disconnect();
+  }
 
   return (
     <div
@@ -480,7 +526,7 @@ function GuestPane(p: { guest: IGuest }) {
               <button
                 className="button button--soft-warning"
                 style={{ width: 160 }}
-                onClick={disconnect}
+                onClick={onDisonnectClick}
               >
                 {$t('Disconnect')}
               </button>

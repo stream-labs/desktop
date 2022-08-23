@@ -742,6 +742,12 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
 
     if (guest) {
       if (kick) {
+        this.socket.emit('message', {
+          target: '*',
+          type: 'kick',
+          data: { streamId },
+        });
+
         // TODO: Need to implement kick message handling on guest page
         this.disconnectedStreamIds.push(guest.remoteProducer.streamId);
       }
