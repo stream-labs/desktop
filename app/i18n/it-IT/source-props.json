@@ -1,8 +1,8 @@
 {
  "Image": "Immagine",
- "Color Source": "Sorgente colore",
+ "Color Block": "Color Block",
  "Browser Source": "Sorgente browser",
- "Media Source": "Sorgente multimediale",
+ "Media File": "Media File",
  "Image Slide Show": "Presentazione di immagini",
  "Text (GDI+)": "Testo (GDI+)",
  "Text (FreeType 2)": "Testo (FreeType2)",
