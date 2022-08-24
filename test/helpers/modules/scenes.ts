@@ -10,11 +10,12 @@ async function clickSceneAction(selector: string) {
 }
 
 export async function clickAddScene() {
-  await clickSceneAction('.icon-add');
+  await clickSceneAction('.icon-add-circle');
 }
 
-export async function clickRemoveScene() {
-  await clickSceneAction('.icon-subtract');
+export async function clickRemoveScene(name: string) {
+  const $el = await (await select(`[data-name="${name}"]`)).$('.icon-trash');
+  await $el.click();
   await dialogDismiss('OK');
 }
 

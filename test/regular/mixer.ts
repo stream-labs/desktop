@@ -24,7 +24,7 @@ test('Adding and removing a AudioSource', async t => {
   );
 
   await selectSource('Source With Audio');
-  await clickRemoveSource();
+  await clickRemoveSource('Source With Audio');
 
   await (await (await app.client.$('.mixer-panel')).$('div=Source With Audio')).waitForExist({
     timeout: 5000,

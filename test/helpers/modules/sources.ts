@@ -19,16 +19,18 @@ async function clickSourceAction(selector: string) {
 }
 
 export async function clickAddSource() {
-  await clickSourceAction('.icon-add');
+  await clickSourceAction('.icon-add-circle');
 }
 
-export async function clickRemoveSource() {
-  await clickSourceAction('.icon-subtract');
+export async function clickRemoveSource(name: string) {
+  const $el = await (await select(`[data-name="${name}"]`)).$('.icon-trash');
+  await $el.click();
   await dialogDismiss('OK');
 }
 
-export async function clickSourceProperties() {
-  await clickSourceAction('.icon-settings');
+export async function clickSourceProperties(name: string) {
+  const $el = await (await select(`[data-name="${name}"]`)).$('.icon-settings');
+  await $el.click();
 }
 
 export async function selectSource(name: string) {
@@ -45,7 +47,7 @@ export async function rightClickSource(name: string) {
 
 export async function openSourceProperties(name: string) {
   await selectSource(name);
-  await clickSourceProperties();
+  await clickSourceProperties(name);
 }
 
 export async function addSource(
