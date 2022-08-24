@@ -140,15 +140,18 @@ export function ContentHubCard() {
         <h3>{$t('Creator Resource Hub')}</h3>
         <span>
           {$t(
-            'The Ultimate Resource For Live Streamers; The Content Hub is your one-stop-shop for everything related to live streaming. There are dozens of different categories to choose from. Learn how to set up your live stream, find new features, and stay up-to-date on all of the tools you can use to enhance your stream.',
+            'The Ultimate Resource For Live Streamers; The Creator Resource Hub is your one-stop-shop for everything related to live streaming. There are dozens of different categories to choose from. Learn how to set up your live stream, find new features, and stay up-to-date on all of the tools you can use to enhance your stream.',
           )}
         </span>
         <footer>
-          <Button onClick={() => openLink()}>{$t('Open Content Hub')}</Button>
+          <Button onClick={() => openLink()}>{$t('Open Resource Hub')}</Button>
           <Button onClick={() => openLink(true)}>{$t('Streamlabs on YouTube')}</Button>
         </footer>
       </div>
-      <img src="https://slobs-cdn.streamlabs.com/media/grow/content_hub.png" />
+      <img
+        className={styles.cardImage}
+        src="https://slobs-cdn.streamlabs.com/media/grow/content_hub.png"
+      />
     </div>
   );
 }
