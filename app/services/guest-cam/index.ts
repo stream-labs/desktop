@@ -24,6 +24,14 @@ import { ENotificationType } from 'services/notifications';
 import { $t } from 'services/i18n';
 import { JsonrpcService } from 'services/api/jsonrpc';
 import { EStreamingState } from 'services/streaming';
+import Vue from 'vue';
+
+/**
+ * This is in actuality a big data blob at runtime, the shape
+ * of which we don't care about. This effectively implements this
+ * as an opaque type that we don't do anything to and just pass along.
+ */
+export type TConnectParams = { __type: 'ConnectParams' };
 
 /**
  * Interface describing the various functions and expected return values
@@ -33,7 +41,7 @@ export interface IObsReturnTypes {
   func_create_send_transport: {};
   func_load_device: {};
   func_create_audio_producer: {
-    connect_params: unknown;
+    connect_params: TConnectParams;
   };
   func_create_video_producer: {
     produce_params: {
@@ -52,10 +60,10 @@ export interface IObsReturnTypes {
   func_produce_result: {};
   func_create_receive_transport: {};
   func_video_consumer_response: {
-    connect_params: Object;
+    connect_params: TConnectParams;
   };
   func_audio_consumer_response: {
-    connect_params: Object;
+    connect_params: TConnectParams;
   };
   func_stop_consumer: {};
   func_stop_sender: {};
@@ -64,6 +72,7 @@ export interface IObsReturnTypes {
 
 interface IRoomResponse {
   room: string;
+  hash: string;
 }
 
 interface IIoConfigResponse {
@@ -80,6 +89,10 @@ type TWebRTCSocketEvent =
   | IConsumerTrackEvent
   | IConsumerDestroyedEvent;
 
+/**
+ * Contains all the information about a guest we get from
+ * the server whenever a new guest joins.
+ */
 export interface IRemoteProducer {
   audioId: string;
   name: string;
@@ -121,6 +134,7 @@ interface IConsumerDestroyedEvent {
   type: 'consumerDestroyed';
   data: {
     socketId: string;
+    streamId: string;
   };
 }
 
@@ -136,9 +150,10 @@ interface ITurnConfig {
   username: string;
 }
 
-interface IGuest {
-  name: string;
-  streamId: string;
+export interface IGuest {
+  remoteProducer: IRemoteProducer;
+  sourceId?: string;
+  showOnStream: boolean;
 }
 
 interface IGuestCamServiceState {
@@ -146,7 +161,8 @@ interface IGuestCamServiceState {
   videoSourceId: string;
   audioSourceId: string;
   inviteHash: string;
-  guestInfo: IGuest;
+
+  guests: IGuest[];
 
   /**
    * If we are connecting to as a guest to someone else's stream, this will
@@ -158,16 +174,6 @@ interface IGuestCamServiceState {
    * Name of the host of the room
    */
   hostName: string;
-}
-
-interface IInviteLink {
-  source_id: string;
-  hash: string;
-  id: number;
-}
-
-interface IInviteLinksResponse {
-  links: IInviteLink[];
 }
 
 class GuestCamViews extends ViewHandler<IGuestCamServiceState> {
@@ -187,8 +193,12 @@ class GuestCamViews extends ViewHandler<IGuestCamServiceState> {
     return this.getServiceViews(SourcesService).getSource(this.audioSourceId);
   }
 
+  get sources() {
+    return this.getServiceViews(SourcesService).getSourcesByType('mediasoupconnector');
+  }
+
   get sourceId() {
-    return this.getServiceViews(SourcesService).getSourcesByType('mediasoupconnector')[0]?.sourceId;
+    return this.sources[0]?.sourceId;
   }
 
   get source() {
@@ -205,6 +215,31 @@ class GuestCamViews extends ViewHandler<IGuestCamServiceState> {
 
   get guestVisible() {
     return !this.source?.forceHidden;
+  }
+
+  /**
+   * A list of sources which don't currently have a guest assigned
+   */
+  get vacantSources() {
+    return this.sources.filter(source => {
+      return this.state.guests.every(guest => guest.sourceId !== source.sourceId);
+    });
+  }
+
+  getGuestByStreamId(streamId: string) {
+    return this.state.guests.find(g => g.remoteProducer.streamId === streamId);
+  }
+
+  getSourceForGuest(streamId: string) {
+    const guest = this.getGuestByStreamId(streamId);
+    if (!guest) return null;
+    if (!guest.sourceId) return null;
+
+    return this.getServiceViews(SourcesService).getSource(guest.sourceId);
+  }
+
+  getGuestBySourceId(sourceId: string) {
+    return this.state.guests.find(g => g.sourceId === sourceId);
   }
 }
 
@@ -226,7 +261,7 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
     videoSourceId: '',
     audioSourceId: '',
     inviteHash: '',
-    guestInfo: null,
+    guests: [],
     joinAsGuestHash: null,
     hostName: null,
   };
@@ -279,6 +314,13 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
 
     this.sourcesService.sourceRemoved.subscribe(s => {
       if (s.type === 'mediasoupconnector') {
+        // Make sure source is unassigned
+        const guest = this.views.getGuestBySourceId(s.sourceId);
+
+        if (guest) {
+          this.setGuestSource(guest.remoteProducer.streamId, null);
+        }
+
         // Only clean up if this is the last mediasoup source
         // There is no use case for multiple sources right now, but
         // we shouldn't break in this scenario
@@ -362,14 +404,14 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
 
       if (!this.userService.views.isLoggedIn) return;
 
-      await this.ensureInviteLink();
-
       const roomUrl = this.urlService.getStreamlabsApi('streamrooms/current');
       const roomResult = await jfetch<IRoomResponse>(roomUrl, {
         headers: authorizedHeaders(this.userService.views.auth.apiToken),
       });
 
       this.log('Room result', roomResult);
+
+      this.SET_INVITE_HASH(roomResult.hash);
 
       this.room = roomResult.room;
 
@@ -395,6 +437,15 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
     });
   }
 
+  async regenerateInviteLink() {
+    const regenerateUrl = this.urlService.getStreamlabsApi('streamrooms/regenerate');
+    const regenerateResult = await jfetch<{ hash: string }>(regenerateUrl, {
+      headers: authorizedHeaders(this.userService.views.auth.apiToken),
+      method: 'POST',
+    });
+    this.SET_INVITE_HASH(regenerateResult.hash);
+  }
+
   /**
    * This should be called when we are attempting to join somebody else's
    * stream as a guest.
@@ -411,34 +462,6 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
     this.SET_PRODUCE_OK(false);
     await this.startListeningForGuests();
     this.sourcesService.showGuestCamPropertiesBySourceId(this.views.sourceId);
-  }
-
-  /**
-   * Ensures we have exactly one valid invite link
-   * @param force If true, will invalidate the old link and generate a new one
-   */
-  async ensureInviteLink(force = false) {
-    const existingLinks = await this.getInviteLinks();
-
-    // Ensure there is only one link (or 0 if we want to regenerate)
-    const existingLink = existingLinks.links.shift();
-
-    // Delete all remaining links just in case the exist somehow
-    for (const link of existingLinks.links) {
-      await this.deleteInviteLink(link.id);
-    }
-
-    if (existingLink && !force) {
-      this.SET_INVITE_HASH(existingLink.hash);
-      return;
-    }
-
-    if (existingLink && force) {
-      await this.deleteInviteLink(existingLink.id);
-    }
-
-    const newLink = await this.createInviteLink(this.views.sourceId);
-    this.SET_INVITE_HASH(newLink.hash);
   }
 
   setProduceOk() {
@@ -468,7 +491,8 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
       this.log('Unable to ensure filters but continuing with producer creation', e);
     }
 
-    this.producer = new Producer();
+    // It doesn't matter which source we produce from, so just pick the first one
+    this.producer = new Producer(this.views.sources[0].sourceId);
 
     await this.producer.connect();
   }
@@ -488,9 +512,6 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
     if (!this.views.sourceId) {
       throw new Error('Tried to start producer but mediasoup source does not exist');
     }
-
-    // Load volume from source properties manager
-    const volume = this.views.source.getPropertiesManagerSettings()['guest_cam_volume'] ?? 255;
 
     // Remove all existing mediasoup filters
     Object.keys(this.sourceFiltersService.state.filters).forEach(sourceId => {
@@ -554,32 +575,6 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
     return turnConfigResult;
   }
 
-  getInviteLinks() {
-    const url = this.urlService.getStreamlabsApi('streamrooms/current');
-
-    return jfetch<IInviteLinksResponse>(url, {
-      headers: authorizedHeaders(this.userService.views.auth.apiToken),
-    });
-  }
-
-  createInviteLink(sourceId: string) {
-    const url = this.urlService.getStreamlabsApi(`streamrooms/create-source?source_id=${sourceId}`);
-
-    return jfetch<IInviteLink>(url, {
-      method: 'POST',
-      headers: authorizedHeaders(this.userService.views.auth.apiToken),
-    });
-  }
-
-  deleteInviteLink(id: number) {
-    const url = this.urlService.getStreamlabsApi(`streamrooms/remove-source?id=${id}`);
-
-    return jfetch<IInviteLink>(url, {
-      method: 'POST',
-      headers: authorizedHeaders(this.userService.views.auth.apiToken),
-    });
-  }
-
   async openSocketConnection(url: string, token: string) {
     // dynamically import socket.io because it takes to much time to import it on startup
     if (!this.io) {
@@ -603,15 +598,40 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
       this.auth = await this.authenticateSocket(token);
       this.log('Socket Authenticated', this.auth);
 
-      this.views.source.updateSettings({ room: this.room });
+      // this.views.source.updateSettings({ room: this.room });
+      this.views.sources.forEach(source => {
+        source.updateSettings({ room: this.room });
+      });
 
-      this.makeObsRequest('func_load_device', this.auth.rtpCapabilities);
+      // It doesn't matter which source we call this on
+      this.makeObsRequest(
+        this.views.sources[0].sourceId,
+        'func_load_device',
+        this.auth.rtpCapabilities,
+      );
     });
     this.socket.on('connect_error', (e: any) => this.log('Connection Error', e));
     this.socket.on('connect_timeout', () => this.log('Connection Timeout'));
     this.socket.on('error', () => this.log('Socket Error'));
-    this.socket.on('disconnect', () => this.log('Connection Closed'));
+    this.socket.on('disconnect', () => this.handleDisconnect());
+    // this.socket.on('reconnect', () => this.handleReconnect);
     this.socket.on('webrtc', (e: TWebRTCSocketEvent) => this.onWebRTC(e));
+  }
+
+  handleDisconnect() {
+    this.log('Socket Disconnected!');
+
+    if (this.consumer) {
+      this.consumer.destroy();
+      this.consumer = null;
+    }
+
+    if (this.producer) {
+      this.producer.destroy();
+      this.producer = null;
+    }
+
+    this.CLEAR_GUESTS();
   }
 
   onWebRTC(event: TWebRTCSocketEvent) {
@@ -639,24 +659,26 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
 
     this.log('New guest joined', event);
 
-    this.SET_GUEST({ name: event.data.name, streamId: event.data.streamId });
+    // If we have a vacant source, assign the guest now
+    const vacantSources = this.views.vacantSources;
+    const sourceId = vacantSources.length ? vacantSources[0].sourceId : undefined;
 
-    // Clean up any existing consumer before connecting the new one
-    if (this.consumer) {
-      this.consumer.destroy();
-    }
+    this.ADD_GUEST({ remoteProducer: event.data, sourceId, showOnStream: false });
 
     // If we're allowed to produce, we should start producing right now
     if (!this.producer && this.state.produceOk) {
       this.startProducing();
     }
 
-    this.consumer = new Consumer(event.data);
-    this.consumer.connect();
+    if (!this.consumer) {
+      this.consumer = new Consumer(this.views.sources[0].sourceId);
+    }
 
-    // Make sure the source isn't visible in any scene
-    this.views.source.setForceHidden(true);
-    this.views.source.setForceMuted(true);
+    this.consumer.addGuest(event.data);
+
+    if (sourceId) {
+      this.setGuestSource(event.data.streamId, sourceId);
+    }
 
     this.emitStreamingStatus();
 
@@ -672,19 +694,85 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
     });
   }
 
+  setGuestSource(streamId: string, sourceId: string | null) {
+    const guest = this.views.getGuestByStreamId(streamId);
+
+    if (!guest) return;
+
+    const guestConsumer = this.consumer.guests.find(
+      g => g.opts.remoteProducer.streamId === streamId,
+    );
+
+    if (!guestConsumer) return;
+
+    const source = this.sourcesService.views.getSource(sourceId);
+
+    if (source) {
+      // If there's already a guest connected on this source, we need
+      // to unassign it.
+      const existingGuest = this.views.getGuestBySourceId(sourceId);
+
+      if (existingGuest) {
+        const existingConsumer = this.consumer.findGuestByStreamId(
+          existingGuest.remoteProducer.streamId,
+        );
+
+        if (existingConsumer) {
+          existingConsumer.setSource();
+        }
+
+        this.UPDATE_GUEST(existingGuest.remoteProducer.streamId, { sourceId: null });
+      }
+
+      source.setForceHidden(!guest.showOnStream);
+      source.setForceMuted(!guest.showOnStream);
+    }
+
+    guestConsumer.setSource(sourceId);
+    this.UPDATE_GUEST(streamId, { sourceId });
+  }
+
   disconnectedStreamIds: string[] = [];
 
   /**
    * Disconnects the currently connected guest
    */
-  async disconnectGuest() {
-    // Add the stream id to the list of disconnected guests, so we don't
-    // immediately connect to that same guest again until they are forced
-    // to refresh the page.
-    if (this.state.guestInfo && !this.state.joinAsGuestHash) {
-      this.disconnectedStreamIds.push(this.state.guestInfo.streamId);
+  async disconnectGuest(streamId: string, kick = false) {
+    const guest = this.views.getGuestByStreamId(streamId);
+
+    if (guest) {
+      if (kick) {
+        this.socket.emit('message', {
+          target: '*',
+          type: 'kick',
+          data: { streamId },
+        });
+
+        // TODO: Need to implement kick message handling on guest page
+        this.disconnectedStreamIds.push(guest.remoteProducer.streamId);
+      }
+
+      if (this.consumer) {
+        this.consumer.removeGuest(guest.remoteProducer.streamId);
+      }
+
+      this.REMOVE_GUEST(guest.remoteProducer.streamId);
     }
 
+    if (this.state.guests.length === 0) {
+      await this.cleanUpSocketConnection();
+      this.startListeningForGuests();
+    }
+  }
+
+  /**
+   * Should only be called if we are joining from Desktop as a guest.
+   * Will disconnect from the host and rejoin our own room.
+   */
+  async disconnectFromHost() {
+    if (!this.state.joinAsGuestHash) return;
+
+    this.SET_JOIN_AS_GUEST(null);
     await this.cleanUpSocketConnection();
     this.startListeningForGuests();
   }
@@ -711,25 +799,24 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
     // disconnect from the socket and start listening to guests again.
     this.socket.disconnect();
     this.socket = null;
-    this.SET_GUEST(null);
-    this.SET_JOIN_AS_GUEST(null);
+    this.CLEAR_GUESTS();
   }
 
-  setVisibility(visible: boolean) {
-    if (!this.views.source) return;
+  setVisibility(sourceId: string, visible: boolean) {
+    const source = this.sourcesService.views.getSource(sourceId);
+    if (!source) return;
 
-    this.views.source.setForceHidden(!visible);
-    this.views.source.setForceMuted(!visible);
+    source.setForceHidden(!visible);
+    source.setForceMuted(!visible);
+
+    const guest = this.views.getGuestBySourceId(sourceId);
+    this.UPDATE_GUEST(guest.remoteProducer.streamId, { showOnStream: visible });
   }
 
   async onGuestLeave(event: IConsumerDestroyedEvent) {
     this.log('Guest left', event);
 
-    if (this.consumer && this.consumer.remoteProducer.socketId === event.data.socketId) {
-      this.consumer.destroy();
-      this.consumer = null;
-      this.SET_GUEST(null);
-    }
+    this.disconnectGuest(event.data.streamId);
   }
 
   async authenticateSocket(token: string): Promise<ISocketAuthResponse> {
@@ -755,15 +842,10 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
   }
 
   makeObsRequest<TFunc extends keyof IObsReturnTypes>(
+    sourceId: string,
     func: TFunc,
     arg?: Object,
   ): IObsReturnTypes[TFunc] {
-    // If underlying source is destroyed, do nothing
-    if (!this.views.source) {
-      this.log(`Ignoring OBS call ${func} due to source not existing`);
-      return;
-    }
-
     let stringArg = arg ?? '';
 
     if (typeof stringArg === 'object') {
@@ -774,7 +856,15 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
       throw new Error(`Unsupported arg type for OBS call ${arg}`);
     }
 
-    let result = (this.views.source.getObsInput().callHandler(func, stringArg) as any).output;
+    const source = this.sourcesService.views.getSource(sourceId);
+
+    // If underlying source is destroyed, do nothing
+    if (!source) {
+      this.log(`Ignoring OBS call ${func} due to source not existing`);
+      return;
+    }
+
+    let result = (source.getObsInput().callHandler(func, stringArg) as any).output;
 
     if (result !== '') {
       result = JSON.parse(result);
@@ -841,8 +931,26 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
   }
 
   @mutation()
-  private SET_GUEST(guest: IGuest) {
-    this.state.guestInfo = guest;
+  private ADD_GUEST(guest: IGuest) {
+    this.state.guests.push(guest);
+  }
+
+  @mutation()
+  private UPDATE_GUEST(streamId: string, patch: Partial<IGuest>) {
+    const guest = this.state.guests.find(g => g.remoteProducer.streamId === streamId);
+    Object.keys(patch).forEach(key => {
+      Vue.set(guest, key, patch[key]);
+    });
+  }
+
+  @mutation()
+  private REMOVE_GUEST(streamId: string) {
+    this.state.guests = this.state.guests.filter(g => g.remoteProducer.streamId !== streamId);
+  }
+
+  @mutation()
+  private CLEAR_GUESTS() {
+    this.state.guests = [];
   }
 
   @mutation()
