@@ -36,9 +36,7 @@ import {
   MediaGallery,
   Projector,
   AddSource,
-  News,
   WelcomeToPrime,
-  Notifications,
   NotificationsAndNews,
   PlatformAppPopOut,
 } from 'components/shared/ReactComponentList';
@@ -104,7 +102,6 @@ export function getComponents() {
     SourceFilters,
     Blank,
     AdvancedAudio,
-    Notifications,
     NotificationsAndNews,
     Troubleshooter,
     ManageSceneCollections,
@@ -150,7 +147,6 @@ export function getComponents() {
     WidgetWindow,
     CustomCodeWindow,
     SourceShowcase,
-    News,
   };
 }
 

@@ -20,19 +20,19 @@ export default function NotificationsAndNews() {
             ? tabNames.notifications.toLowerCase()
             : tabNames.news.toLowerCase()
         }
-        style={{ height: '100vh' }}
+        style={{ height: 'calc(100vh - 50px)' }}
       >
         <Tabs.TabPane
           tab={tabNames.news}
           key={tabNames.news.toLowerCase()}
-          style={{ height: '100vh' }}
+          style={{ height: 'calc(100vh - 50px)' }}
         >
           <News />
         </Tabs.TabPane>
         <Tabs.TabPane
           tab={tabNames.notifications}
           key={tabNames.notifications.toLowerCase()}
-          style={{ height: '100vh' }}
+          style={{ height: 'calc(100vh - 50px)' }}
         >
           <Notifications />
         </Tabs.TabPane>
