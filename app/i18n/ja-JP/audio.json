@@ -9,7 +9,7 @@
   "Monitor and Output": "モニターと出力",
   "Stream Track": "トラックのストリーム",
   "Stream Tracks": "トラックのストリーム",
-  "Rec. Tracks": "トラックの録音",
+  "Rec. Tracks": "レコーディングトラック",
   "Advanced Audio Settings": "詳細オーディオ設定",
   "Volume ( % )": "音量 ( % )",
   "Sync Offset": "同期オフセット",
@@ -36,11 +36,11 @@
   "Streaming Track": "ストリーミングトラック",
   "Enable Twitch VOD Track": "Twitch VOD トラックを有効化",
   "Twitch VOD Track": "Twitch VOD トラック",
-  "Sample Rate (requires a restart)": "Sample Rate (requires a restart)",
-  "Channels (requires a restart)": "Channels (requires a restart)",
-  "Desktop Audio Device 1": "Desktop Audio Device 1",
-  "Desktop Audio Device 2": "Desktop Audio Device 2",
-  "Mic/Auxiliary Device 1": "Mic/Auxiliary Device 1",
-  "Mic/Auxiliary Device 2": "Mic/Auxiliary Device 2",
-  "Mic/Auxiliary Device 3": "Mic/Auxiliary Device 3"
+  "Sample Rate (requires a restart)": "サンプルレート（再起動が必要）",
+  "Channels (requires a restart)": "チャンネル（再起動が必要）",
+  "Desktop Audio Device 1": "デスクトップ オーディオ デバイス 1",
+  "Desktop Audio Device 2": "デスクトップ オーディオ デバイス 2",
+  "Mic/Auxiliary Device 1": "マイク/補助デバイス 1",
+  "Mic/Auxiliary Device 2": "マイク/補助デバイス 2",
+  "Mic/Auxiliary Device 3": "マイク/補助デバイス 3"
 }
