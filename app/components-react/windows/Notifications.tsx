@@ -33,7 +33,9 @@ export default function Notifications() {
   }
 
   return (
-    <ModalLayout hideFooter>
+    <ModalLayout bodyStyle={{ paddingBottom: '53px' }}>
+      {/* 53px is the default size of antd's Modal component, so we're including the footer and offsetting with padding so that the entire component's content can be seen */}
+      {/* Hiding the footer in this instance cuts off some of the component's content */}
       <Scrollable style={{ height: '100%' }}>
         {!notificationsCount && <h4>{$t("You don't have any notifications")}</h4>}
 

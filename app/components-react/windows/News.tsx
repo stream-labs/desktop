@@ -39,7 +39,9 @@ export default function News() {
   }
 
   return (
-    <ModalLayout hideFooter>
+    <ModalLayout bodyStyle={{ paddingBottom: '53px' }}>
+      {/* 53px is the default size of antd's Modal component footer, so we're including the footer and offsetting with padding so that the entire component's content can be seen */}
+      {/* Hiding the footer in this instance cuts off some of the component's content */}
       <Scrollable style={{ height: '100%' }} snapToWindowEdge>
         {newsItems.map(item => (
           <div className={styles.newsItemContainer} key={item.id}>

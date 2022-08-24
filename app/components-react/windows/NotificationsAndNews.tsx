@@ -1,51 +1,42 @@
-import React, { useState, useEffect } from 'react';
-import { Menu } from 'antd';
-import { useVuex } from 'components-react/hooks';
-import { ModalLayout } from 'components-react/shared/ModalLayout';
+import React from 'react';
 import { Services } from 'components-react/service-provider';
+import { Tabs } from 'antd';
+import { ModalLayout } from 'components-react/shared/ModalLayout';
 import News from './News';
 import Notifications from './Notifications';
 import { $t } from 'services/i18n';
-import styles from './NotificationsAndNews.m.less';
 
 export default function NotificationsAndNews() {
-  const { NotificationsService } = Services;
-
   const tabNames = {
     news: $t('News'),
     notifications: $t('Notifications'),
   };
 
-  const [selectedTab, setSelectedTab] = useState(tabNames.news);
-
-  const { notificationGroups } = useVuex(() => ({
-    notificationGroups: {
-      unread: NotificationsService.views.getUnread(),
-    },
-  }));
-
-  useEffect(() => {
-    if (!!notificationGroups && notificationGroups.unread.length > 0) {
-      setSelectedTab(tabNames.notifications);
-    }
-  }, [notificationGroups]);
-
   return (
     <ModalLayout hideFooter>
-      <div className={styles.notificationsMenu}>
-        <Menu
-          mode="horizontal"
-          selectedKeys={[selectedTab]}
-          onClick={({ key }: { key: string }) => {
-            setSelectedTab(key);
-          }}
+      <Tabs
+        defaultActiveKey={
+          Services.NotificationsService.views.getUnread().length > 0
+            ? tabNames.notifications.toLowerCase()
+            : tabNames.news.toLowerCase()
+        }
+        style={{ height: '100vh' }}
+      >
+        <Tabs.TabPane
+          tab={tabNames.news}
+          key={tabNames.news.toLowerCase()}
+          style={{ height: '100vh' }}
         >
-          {Object.values(tabNames).map(tabName => (
-            <Menu.Item key={tabName}>{tabName}</Menu.Item>
-          ))}
-        </Menu>
-      </div>
-      {selectedTab === tabNames.notifications ? <Notifications /> : <News />}
+          <News />
+        </Tabs.TabPane>
+        <Tabs.TabPane
+          tab={tabNames.notifications}
+          key={tabNames.notifications.toLowerCase()}
+          style={{ height: '100vh' }}
+        >
+          <Notifications />
+        </Tabs.TabPane>
+      </Tabs>
     </ModalLayout>
   );
 }
