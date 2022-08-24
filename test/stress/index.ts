@@ -54,7 +54,8 @@ async function removeRandomScene(t: TExecutionContext) {
   if (scenes.length > 1) {
     const scene = sample(scenes);
     await await scene.click();
-    await clickRemoveScene();
+    // TODO: refactor to grab scene names
+    // await clickRemoveScene(scene.name);
   }
 }
 
@@ -89,7 +90,8 @@ async function removeRandomSource(t: TExecutionContext) {
     console.log('  Source:', text);
 
     await source.click();
-    await clickRemoveSource();
+    // TODO: Refactor to grab source names
+    // await clickRemoveSource();
   }
 }
 

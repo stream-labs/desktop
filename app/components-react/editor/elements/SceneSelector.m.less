@@ -27,6 +27,10 @@
       cursor: not-allowed;
     }
   }
+
+  :global(.icon-add-circle) {
+    margin-right: auto;
+  }
 }
 
 :global(.no-top-padding) {
@@ -37,7 +41,7 @@
 }
 
 .active-scene-container {
-  margin-right: auto;
+  margin-right: 4px;
   font-weight: 500;
   font-size: 16px;
   color: var(--title);
@@ -78,6 +82,11 @@
 
   :global(.ant-tree-switcher) {
     display: none;
+  }
+
+  :global(.ant-tree-title) {
+    display: block;
+    width: 100%;
   }
 
   :global(.ant-tree-treenode), :global(.ant-tree-node-content-wrapper) {
@@ -154,6 +163,22 @@
 
   > i {
     margin-right: 8px;
+    opacity: 0;
+  }
+
+  :global(.fa-signal) {
+    opacity: 1;
+    color: var(--teal);
+  }
+
+  :global(.icon-lock), :global(.icon-hide), :global(.icon-broadcast), :global(.icon-studio) {
+    opacity: 0.7;
+  }
+
+  &:hover {
+    i {
+      opacity: 1;
+    }
   }
 }
 
