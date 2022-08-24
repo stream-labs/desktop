@@ -36,11 +36,11 @@
   "Streaming Track": "Pista de streaming",
   "Enable Twitch VOD Track": "Activar pista de VOD de Twitch",
   "Twitch VOD Track": "Pista de VOD de Twitch",
-  "Sample Rate (requires a restart)": "Sample Rate (requires a restart)",
-  "Channels (requires a restart)": "Channels (requires a restart)",
-  "Desktop Audio Device 1": "Desktop Audio Device 1",
-  "Desktop Audio Device 2": "Desktop Audio Device 2",
-  "Mic/Auxiliary Device 1": "Mic/Auxiliary Device 1",
-  "Mic/Auxiliary Device 2": "Mic/Auxiliary Device 2",
-  "Mic/Auxiliary Device 3": "Mic/Auxiliary Device 3"
+  "Sample Rate (requires a restart)": "Frecuencia de muestreo (requiere reinicio)",
+  "Channels (requires a restart)": "Canales (requiere reinicio)",
+  "Desktop Audio Device 1": "Dispositivo de audio de escritorio 1",
+  "Desktop Audio Device 2": "Dispositivo de audio de escritorio 2",
+  "Mic/Auxiliary Device 1": "Micrófono/Dispositivo auxiliar 1",
+  "Mic/Auxiliary Device 2": "Micrófono/Dispositivo auxiliar 2",
+  "Mic/Auxiliary Device 3": "Micrófono/Dispositivo auxiliar 3"
 }
