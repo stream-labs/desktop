@@ -72,7 +72,7 @@ export const components = {
   EditStreamWindow: createRoot(EditStreamWindow),
   IconLibraryProperties,
   ScreenCaptureProperties,
-  GuestCamProperties,
+  GuestCamProperties: createRoot(GuestCamProperties),
   News,
   PerformanceMetrics,
   ManageSceneCollections,
