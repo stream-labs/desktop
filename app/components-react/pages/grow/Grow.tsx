@@ -196,7 +196,7 @@ function MyCommunity(p: { platforms: ICommunityReach[] }) {
                 percentage:
                   Math.floor(reachableFollowing / totalFollowing) === 0
                     ? 'less than 1'
-                    : `${Math.floor((reachableFollowing / totalFollowing) * 100)}%`,
+                    : `${Math.floor((reachableFollowing / totalFollowing) * 100)}`,
               },
             )}
       </span>
