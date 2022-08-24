@@ -1,5 +1,4 @@
 import React, { useState, useRef } from 'react';
-import Fuse from 'fuse.js';
 import cx from 'classnames';
 import { Dropdown, Tooltip, Tree } from 'antd';
 import { DownOutlined } from '@ant-design/icons';
@@ -8,7 +7,6 @@ import { Menu } from 'util/menus/Menu';
 import { getOS } from 'util/operating-systems';
 import { Services } from 'components-react/service-provider';
 import { useVuex } from 'components-react/hooks';
-import { TextInput } from 'components-react/shared/inputs';
 import HelpTip from 'components-react/shared/HelpTip';
 import Scrollable from 'components-react/shared/Scrollable';
 import { useTree, IOnDropInfo } from 'components-react/hooks/useTree';
@@ -17,6 +15,7 @@ import { EDismissable } from 'services/dismissables';
 import { ERenderingMode } from '../../../../obs-api';
 import styles from './SceneSelector.m.less';
 import useBaseElement from './hooks';
+import { IScene } from 'services/scenes';
 
 function SceneSelector() {
   const {
@@ -30,15 +29,15 @@ function SceneSelector() {
 
   const { treeSort } = useTree(true);
 
-  const [searchQuery, setSearchQuery] = useState('');
   const [showDropdown, setShowDropdown] = useState(false);
-  const { scenes, activeSceneId, collections, activeCollection } = useVuex(() => ({
+  const { scenes, activeSceneId, activeScene, collections, activeCollection } = useVuex(() => ({
     scenes: ScenesService.views.scenes.map(scene => ({
-      title: scene.name,
+      title: <TreeNode scene={scene} removeScene={removeScene} />,
       key: scene.id,
       selectable: true,
       isLeaf: true,
     })),
+    activeScene: ScenesService.views.activeScene,
     activeSceneId: ScenesService.views.activeSceneId,
     activeCollection: SceneCollectionsService.activeCollection,
     collections: SceneCollectionsService.collections,
@@ -58,7 +57,7 @@ function SceneSelector() {
     });
     menu.append({
       label: $t('Remove'),
-      click: removeScene,
+      click: () => removeScene(activeScene),
     });
     menu.append({
       label: $t('Filters'),
@@ -85,8 +84,17 @@ function SceneSelector() {
     ScenesService.actions.showNameScene();
   }
 
-  function removeScene() {
-    const name = ScenesService.views.activeScene?.name;
+  function showTransitions() {
+    TransitionsService.actions.showSceneTransitions();
+  }
+
+  function manageCollections() {
+    SceneCollectionsService.actions.showManageWindow();
+  }
+
+  function removeScene(scene: IScene | null) {
+    if (!scene) return;
+    const name = scene.name;
     remote.dialog
       .showMessageBox(remote.getCurrentWindow(), {
         title: 'Streamlabs Desktop',
@@ -104,16 +112,8 @@ function SceneSelector() {
           return;
         }
 
-        EditorCommandsService.actions.executeCommand('RemoveSceneCommand', activeSceneId);
+        EditorCommandsService.actions.executeCommand('RemoveSceneCommand', scene.id);
       });
-  }
-
-  function showTransitions() {
-    TransitionsService.actions.showSceneTransitions();
-  }
-
-  function manageCollections() {
-    SceneCollectionsService.actions.showManageWindow();
   }
 
   function loadCollection(id: string) {
@@ -121,12 +121,6 @@ function SceneSelector() {
 
     SceneCollectionsService.actions.load(id);
     setShowDropdown(false);
-  }
-
-  function filteredCollections() {
-    if (!searchQuery) return collections;
-    const fuse = new Fuse(collections, { shouldSort: true, keys: ['name'] });
-    return fuse.search(searchQuery);
   }
 
   const DropdownMenu = (
@@ -138,7 +132,7 @@ function SceneSelector() {
       <hr style={{ borderColor: 'var(--border)' }} />
       <span className={styles.whisper}>{$t('Your Scene Collections')}</span>
       <Scrollable style={{ height: 'calc(100% - 60px)' }}>
-        {filteredCollections().map(collection => (
+        {collections.map(collection => (
           <div
             key={collection.id}
             onClick={() => loadCollection(collection.id)}
@@ -172,16 +166,14 @@ function SceneSelector() {
           placement="bottomLeft"
         >
           <span className={styles.activeSceneContainer} data-name="SceneSelectorDropdown">
+            <DownOutlined style={{ marginRight: '4px' }} />
             <span className={styles.activeScene}>{activeCollection?.name}</span>
-            <DownOutlined style={{ marginLeft: '4px' }} />
           </span>
         </Dropdown>
-        <Tooltip title={$t('Add a new Scene.')} placement="bottomRight">
-          <i className="icon-add icon-button icon-button--lg" onClick={addScene} />
+        <Tooltip title={$t('Add a new Scene.')} placement="bottomLeft">
+          <i className="icon-add-circle icon-button icon-button--lg" onClick={addScene} />
         </Tooltip>
-        <Tooltip title={$t('Remove Scene.')} placement="bottomRight">
-          <i className="icon-subtract icon-button icon-button--lg" onClick={removeScene} />
-        </Tooltip>
+
         <Tooltip title={$t('Edit Scene Transitions.')} placement="bottomRight">
           <i className="icon-transition icon-button icon-button--lg" onClick={showTransitions} />
         </Tooltip>
@@ -208,6 +200,19 @@ function SceneSelector() {
         </div>
       </HelpTip>
     </>
+  );
+}
+
+function TreeNode(p: { scene: IScene; removeScene: (scene: IScene) => void }) {
+  const { ScenesService, EditorCommandsService } = Services;
+
+  return (
+    <div className={styles.sourceTitleContainer} data-name={p.scene.name} data-role="scene">
+      <span className={styles.sourceTitle}>{p.scene.name}</span>
+      <Tooltip title={$t('Remove Scene.')} placement="left">
+        <i onClick={() => p.removeScene(p.scene)} className="icon-trash" />
+      </Tooltip>
+    </div>
   );
 }
 

@@ -40,12 +40,12 @@ import {
   WelcomeToPrime,
   Notifications,
   PlatformAppPopOut,
+  RecentEventsWindow,
 } from 'components/shared/ReactComponentList';
 
 import SourcePropertiesDeprecated from 'components/windows/SourceProperties.vue';
 import Troubleshooter from 'components/windows/Troubleshooter.vue';
 import Blank from 'components/windows/Blank.vue';
-import RecentEvents from 'components/windows/RecentEvents.vue';
 import GameOverlayEventFeed from 'components/windows/GameOverlayEventFeed';
 import EditTransform from 'components/windows/EditTransform';
 import EventFilterMenu from 'components/windows/EventFilterMenu';
@@ -107,7 +107,7 @@ export function getComponents() {
     Troubleshooter,
     ManageSceneCollections,
     Projector,
-    RecentEvents,
+    RecentEvents: RecentEventsWindow,
     MediaGallery,
     PlatformAppPopOut,
     EditTransform,
