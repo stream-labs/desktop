@@ -222,7 +222,7 @@
   "URL": "URL",
   "Color": "Colore",
   "IsMediaFlag": "IsMediaFlag",
-  "Loop": "Loop",
+  "Loop": "Ripeti",
   "Restart playback when source becomes active": "Riavvia il playback quando la sorgente diventa attiva",
   "Use hardware decoding when available": "Usa la codifica hardware quando è disponibile",
   "Show nothing when playback ends": "Non mostrare niente quando finisce il playback",
