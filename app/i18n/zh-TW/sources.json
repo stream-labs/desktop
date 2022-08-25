@@ -269,7 +269,7 @@
   "Allow Transparency": "允許透明度",
   "SLI/Crossfire Capture Mode (Slow)": "SLI/Crossfire 擷取模式 (緩慢)",
   "Limit capture framerate": "限制擷取幀率",
-  "Window Match Priority": "視窗相符優先度",
+  "Window Match Priority": "視窗比對優先度",
   "Window": "視窗",
   "auto_placeholder_message": "auto_placeholder_message",
   "auto_placeholder_image": "auto_placeholder_image",
