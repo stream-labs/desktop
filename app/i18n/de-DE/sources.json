@@ -269,7 +269,7 @@
   "Allow Transparency": "Transparenz zulassen",
   "SLI/Crossfire Capture Mode (Slow)": "SLI/Crossfire-Aufnahmemodus (langsam)",
   "Limit capture framerate": "Aufnahmebildfrequenz beschränken",
-  "Window Match Priority": "Priorität der Fensterübereinstimmung",
+  "Window Match Priority": "Fensterübereinstimmungspriorität",
   "Window": "Fenster",
   "auto_placeholder_message": "auto_placeholder_message",
   "auto_placeholder_image": "auto_placeholder_image",
