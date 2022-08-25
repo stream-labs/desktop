@@ -87,8 +87,12 @@ class NotificationsModule {
 
   clickNotif() {
     if (!this.currentNotif) return;
-    Services.NotificationsService.actions.applyAction(this.currentNotif.id);
-    Services.NotificationsService.actions.markAsRead(this.currentNotif.id);
+    if (this.currentNotif.action) {
+      Services.NotificationsService.actions.applyAction(this.currentNotif.id);
+      Services.NotificationsService.actions.markAsRead(this.currentNotif.id);
+    } else {
+      Services.NotificationsService.actions.showNotifications();
+    }
     this.playNext();
   }
 }
@@ -144,17 +148,6 @@ export default function NotificationsArea() {
     NotificationsService.actions.showNotifications();
   }
 
-  function showNews() {
-    if (
-      unreadNotifs.every(notif => notif.subType === ENotificationSubType.NEWS) ||
-      unreadNotifs.length === 0
-    ) {
-      AnnouncementsService.actions.openNewsWindow();
-    } else {
-      showNotifications();
-    }
-  }
-
   if (!settings.enabled) return <></>;
 
   return (
@@ -174,7 +167,7 @@ export default function NotificationsArea() {
       )}
       {unreadWarnings.length < 1 && (
         <Tooltip placement="right" title={showNotificationsTooltip}>
-          <div className={styles.notificationsCounter} onClick={showNews}>
+          <div className={styles.notificationsCounter} onClick={showNotifications}>
             <Badge dot={unreadNotifs.length > 0}>
               <i className="icon-notifications" />
             </Badge>

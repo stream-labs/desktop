@@ -170,8 +170,8 @@ export class AnnouncementsService extends PersistentStatefulService<{
 
   openNewsWindow() {
     this.windowsService.showWindow({
-      componentName: 'News',
-      title: $t('News'),
+      componentName: 'NotificationsAndNews',
+      title: $t('Notifications & News'),
       size: {
         width: 500,
         height: 600,
