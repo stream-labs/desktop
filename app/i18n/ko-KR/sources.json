@@ -269,7 +269,7 @@
   "Allow Transparency": "투명도 허용",
   "SLI/Crossfire Capture Mode (Slow)": "SLI/크로스파이어 캡처 모드(느림)",
   "Limit capture framerate": "캡처 프레임률 한도",
-  "Window Match Priority": "창 일치 우선순위",
+  "Window Match Priority": "창 탐색 우선순위",
   "Window": "창",
   "auto_placeholder_message": "auto_placeholder_message",
   "auto_placeholder_image": "auto_placeholder_image",
