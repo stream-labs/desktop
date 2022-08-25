@@ -1,7 +1,6 @@
 import React, { useEffect } from 'react';
 import { shell } from 'electron';
 import Scrollable from 'components-react/shared/Scrollable';
-import { ModalLayout } from 'components-react/shared/ModalLayout';
 import { Services } from 'components-react/service-provider';
 import { useVuex } from 'components-react/hooks';
 import { TAppPage } from 'services/navigation';
@@ -39,19 +38,17 @@ export default function News() {
   }
 
   return (
-    <ModalLayout hideFooter>
-      <Scrollable style={{ height: '100%' }} snapToWindowEdge>
-        {newsItems.map(item => (
-          <div className={styles.newsItemContainer} key={item.id}>
-            <img className={styles.newsImage} src={item.thumbnail} />
-            <h4>{item.header}</h4>
-            <span>{item.subHeader}</span>
-            <button className="button button--action" onClick={handleClick(item)}>
-              {item.linkTitle}
-            </button>
-          </div>
-        ))}
-      </Scrollable>
-    </ModalLayout>
+    <Scrollable style={{ height: 'calc(93vh - 100px)' }} snapToWindowEdge>
+      {newsItems.map(item => (
+        <div className={styles.newsItemContainer} key={item.id}>
+          <img className={styles.newsImage} src={item.thumbnail} />
+          <h4>{item.header}</h4>
+          <span>{item.subHeader}</span>
+          <button className="button button--action" onClick={handleClick(item)}>
+            {item.linkTitle}
+          </button>
+        </div>
+      ))}
+    </Scrollable>
   );
 }
