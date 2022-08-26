@@ -147,8 +147,7 @@ export class GoLiveSettingsModule {
       tweetText: view.getTweetText(view.commonFields.title), // generate a default tweet text
       needPrepopulate: false,
     };
-    // if stream has not been started than we allow to change settings only for a primary platform
-    // so delete other platforms from the settings object
+
     if (this.state.isUpdateMode && !view.isMidStreamMode) {
       Object.keys(settings.platforms).forEach((platform: TPlatform) => {
         if (!this.state.isPrimaryPlatform(platform)) delete settings.platforms[platform];
@@ -159,11 +158,6 @@ export class GoLiveSettingsModule {
     if (prepopulateOptions) {
       Object.keys(prepopulateOptions).forEach(platform => {
         Object.assign(settings.platforms[platform], prepopulateOptions[platform]);
-      });
-
-      // disable non-primary platforms
-      Object.keys(settings.platforms).forEach((platform: TPlatform) => {
-        if (!view.isPrimaryPlatform(platform)) settings.platforms[platform]!.enabled = false;
       });
     }
 
