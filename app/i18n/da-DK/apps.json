@@ -3,5 +3,6 @@
   "Reload": "Indlæs igen",
   "Unpacked vers loaded": "Udpakket version indlæst",
   "You must unload unpacked version before enabling this app.": "Du skal tømme den udpakkede version, inden du aktiverer denne app.",
-  "Pop Out": "Pop ud"
+  "Pop Out": "Pop ud",
+  "The developer has ended support for this app. The app may continue to work, but it won't recieve any updates. If you wish to uninstall, please follow the directions here.": "The developer has ended support for this app. The app may continue to work, but it won't recieve any updates. If you wish to uninstall, please follow the directions here."
 }

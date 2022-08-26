@@ -3,5 +3,6 @@
   "Reload": "Ricarica",
   "Unpacked vers loaded": "Versione decompressa caricata",
   "You must unload unpacked version before enabling this app.": "È necessario scaricare la versione decompressa prima di abilitare questa app.",
-  "Pop Out": "Apri nuova finestra"
+  "Pop Out": "Apri nuova finestra",
+  "The developer has ended support for this app. The app may continue to work, but it won't recieve any updates. If you wish to uninstall, please follow the directions here.": "The developer has ended support for this app. The app may continue to work, but it won't recieve any updates. If you wish to uninstall, please follow the directions here."
 }

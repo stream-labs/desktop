@@ -3,5 +3,6 @@
   "Reload": "Yeniden yükle",
   "Unpacked vers loaded": "Açık sürüm yüklendi",
   "You must unload unpacked version before enabling this app.": "Bu uygulamayı etkinleştirmeden önce açık sürümü kaldırmanız gerekir.",
-  "Pop Out": "Açılır Pencere"
+  "Pop Out": "Açılır Pencere",
+  "The developer has ended support for this app. The app may continue to work, but it won't recieve any updates. If you wish to uninstall, please follow the directions here.": "The developer has ended support for this app. The app may continue to work, but it won't recieve any updates. If you wish to uninstall, please follow the directions here."
 }

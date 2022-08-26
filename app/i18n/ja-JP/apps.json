@@ -3,5 +3,6 @@
   "Reload": "再読み込み",
   "Unpacked vers loaded": "解凍されたバージョンがロードされました",
   "You must unload unpacked version before enabling this app.": "このアプリを有効化する前に、解凍されたバージョンをアンロードする必要があります。",
-  "Pop Out": "ポップアウト"
+  "Pop Out": "ポップアウト",
+  "The developer has ended support for this app. The app may continue to work, but it won't recieve any updates. If you wish to uninstall, please follow the directions here.": "The developer has ended support for this app. The app may continue to work, but it won't recieve any updates. If you wish to uninstall, please follow the directions here."
 }
