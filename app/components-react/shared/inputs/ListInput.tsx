@@ -19,6 +19,7 @@ const ANT_SELECT_FEATURES = [
   'onSelect',
   'allowClear',
   'defaultActiveFirstOption',
+  'listHeight',
 ] as const;
 
 // define custom props

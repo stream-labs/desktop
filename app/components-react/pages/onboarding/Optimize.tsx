@@ -101,7 +101,7 @@ export function Optimize() {
           onClick={optimize}
           style={{ margin: 'auto', marginTop: 24 }}
         >
-          <h2>{$t('Start')}</h2>
+          <h2 style={{ color: 'var(--action-button-text)' }}>{$t('Start')}</h2>
         </button>
       )}
     </div>

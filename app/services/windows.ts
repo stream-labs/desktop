@@ -36,16 +36,15 @@ import {
   MediaGallery,
   Projector,
   AddSource,
-  News,
   WelcomeToPrime,
-  Notifications,
+  NotificationsAndNews,
   PlatformAppPopOut,
+  RecentEventsWindow,
 } from 'components/shared/ReactComponentList';
 
 import SourcePropertiesDeprecated from 'components/windows/SourceProperties.vue';
 import Troubleshooter from 'components/windows/Troubleshooter.vue';
 import Blank from 'components/windows/Blank.vue';
-import RecentEvents from 'components/windows/RecentEvents.vue';
 import GameOverlayEventFeed from 'components/windows/GameOverlayEventFeed';
 import EditTransform from 'components/windows/EditTransform';
 import EventFilterMenu from 'components/windows/EventFilterMenu';
@@ -103,11 +102,11 @@ export function getComponents() {
     SourceFilters,
     Blank,
     AdvancedAudio,
-    Notifications,
+    NotificationsAndNews,
     Troubleshooter,
     ManageSceneCollections,
     Projector,
-    RecentEvents,
+    RecentEvents: RecentEventsWindow,
     MediaGallery,
     PlatformAppPopOut,
     EditTransform,
@@ -148,7 +147,6 @@ export function getComponents() {
     WidgetWindow,
     CustomCodeWindow,
     SourceShowcase,
-    News,
   };
 }
 

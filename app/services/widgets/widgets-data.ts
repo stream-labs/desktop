@@ -558,7 +558,7 @@ export const WidgetDisplayData = (platform?: string): { [x: number]: IWidgetDisp
     description: $t("Include your channel's chat into your stream."),
     demoVideo: false,
     demoFilename: 'source-chatbox.png',
-    supportList: [$t('Twitch chat'), $t('YouTube chat'), $t('Facebook chat')],
+    supportList: [$t('Twitch chat'), $t('YouTube chat'), $t('Facebook chat'), $t('Trovo chat')],
     icon: 'fas fa-comments',
   },
   [WidgetType.EventList]: {
@@ -590,7 +590,7 @@ export const WidgetDisplayData = (platform?: string): { [x: number]: IWidgetDisp
     description: $t('Show off your viewers from multiple platforms.'),
     demoVideo: false,
     demoFilename: 'source-viewer-count.png',
-    supportList: ['YouTube', 'Twitch', 'Facebook'],
+    supportList: ['YouTube', 'Twitch', 'Facebook', 'Trovo'],
     icon: 'fas fa-eye',
   },
   [WidgetType.StreamBoss]: {
@@ -674,7 +674,7 @@ export const WidgetDisplayData = (platform?: string): { [x: number]: IWidgetDisp
     demoVideo: false,
     demoFilename: 'game-widget.png',
     supportList: [],
-    platforms: new Set(['twitch']),
+    platforms: new Set(['twitch', 'youtube']),
     icon: 'icon-face-masks',
   },
 });

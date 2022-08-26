@@ -146,7 +146,7 @@ function AddGoalModal(p: {
             onChange={setGoalTitle}
             uncontrolled={false}
             placeholder={'My Goal'}
-            rules={[{ max: 32 }]}
+            rules={[{ max: 50 }]}
             required
           />
         )}
@@ -186,13 +186,19 @@ function MyCommunity(p: { platforms: ICommunityReach[] }) {
         })}
       </h2>
       <span>
-        {$t(
-          'You can reach %{percentage}% of your community across all platforms. Multistream to more platforms to increase this number',
-          {
-            percentage:
-              totalFollowing === 0 ? 0 : Math.floor((reachableFollowing / totalFollowing) * 100),
-          },
-        )}
+        {totalFollowing === 0
+          ? $t(
+              'You do not currently have any followers. Multistreaming to multiple platforms is a great way to increase followers.',
+            )
+          : $t(
+              'You can reach %{percentage}% of your community across all platforms. Multistream to more platforms to increase this number',
+              {
+                percentage:
+                  Math.floor(reachableFollowing / totalFollowing) === 0
+                    ? 'less than 1'
+                    : `${Math.floor((reachableFollowing / totalFollowing) * 100)}`,
+              },
+            )}
       </span>
 
       <div className={styles.communityContainer}>

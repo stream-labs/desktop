@@ -5,7 +5,7 @@ import EditStreamWindow from './windows/go-live/EditStreamWindow';
 import IconLibraryProperties from './windows/IconLibraryProperties';
 import ScreenCaptureProperties from './windows/ScreenCaptureProperties';
 import GuestCamProperties from './windows/GuestCamProperties';
-import News from './windows/News';
+import News from './windows/notifications/News';
 import PerformanceMetrics from './shared/PerformanceMetrics';
 import PatchNotes from './pages/PatchNotes';
 import Display from './shared/Display';
@@ -52,7 +52,8 @@ import AddSource from './windows/AddSource';
 import SourceSelector from './editor/elements/SourceSelector';
 import SideNav from './sidebar/SideNav';
 import WelcomeToPrime from './windows/WelcomeToPrime';
-import Notifications from './windows/Notifications';
+import Notifications from './windows/notifications/Notifications';
+import NotificationsAndNews from './windows/notifications';
 import PlatformMerge from './pages/PlatformMerge';
 import AlertboxLibrary from './pages/AlertboxLibrary';
 import PlatformAppStore from './pages/PlatformAppStore';
@@ -60,6 +61,7 @@ import BrowseOverlays from './pages/BrowseOverlays';
 import PlatformAppMainPage from './pages/PlatformAppMainPage';
 import PlatformAppPageView from './shared/PlatformAppPageView';
 import PlatformAppPopOut from './windows/PlatformAppPopOut';
+import RecentEventsWindow from './windows/RecentEvents';
 
 // list of React components to be used inside Vue components
 export const components = {
@@ -72,7 +74,7 @@ export const components = {
   EditStreamWindow: createRoot(EditStreamWindow),
   IconLibraryProperties,
   ScreenCaptureProperties,
-  GuestCamProperties,
+  GuestCamProperties: createRoot(GuestCamProperties),
   News,
   PerformanceMetrics,
   ManageSceneCollections,
@@ -116,9 +118,11 @@ export const components = {
   SceneSelector: createRoot(SceneSelector),
   AddSource,
   SourceSelector: createRoot(SourceSelector),
+  RecentEventsWindow,
   SideNav,
   WelcomeToPrime,
   Notifications,
+  NotificationsAndNews,
   PlatformMerge,
   PlatformAppStore,
   PlatformAppMainPage,

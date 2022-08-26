@@ -99,6 +99,7 @@ export interface ISourceAddOptions<TPropertiesManagerSettings = Dictionary<any>>
   propertiesManagerSettings?: TPropertiesManagerSettings;
   audioSettings?: Partial<IAudioSource>;
   isTemporary?: boolean;
+  guestCamStreamId?: string; // Automatically assign a guest to this source after creation
 }
 
 export type TSourceType =

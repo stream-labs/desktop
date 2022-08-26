@@ -2,8 +2,8 @@ import React, { useEffect } from 'react';
 import moment from 'moment';
 import cx from 'classnames';
 import { useRenderInterval, useVuex } from 'components-react/hooks';
-import { ModalLayout } from 'components-react/shared/ModalLayout';
 import { Services } from 'components-react/service-provider';
+import Scrollable from 'components-react/shared/Scrollable';
 import { INotification } from 'services/notifications';
 import { $t } from 'services/i18n';
 import styles from './Notifications.m.less';
@@ -32,7 +32,7 @@ export default function Notifications() {
   }
 
   return (
-    <ModalLayout hideFooter>
+    <Scrollable style={{ height: 'calc(93vh - 100px)' }}>
       {!notificationsCount && <h4>{$t("You don't have any notifications")}</h4>}
 
       {Object.keys(notificationGroups).map((groupName: string) => (
@@ -60,6 +60,6 @@ export default function Notifications() {
           ))}
         </div>
       ))}
-    </ModalLayout>
+    </Scrollable>
   );
 }
