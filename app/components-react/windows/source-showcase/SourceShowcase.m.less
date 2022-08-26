@@ -4,7 +4,8 @@
   padding: 24px;
   background: var(--section);
 
-  img, video {
+  img,
+  video {
     width: 100%;
     height: auto;
   }
@@ -17,12 +18,9 @@
 .source-tag {
   background: var(--section-alt);
   border-radius: 4px;
-  height: 32px;
-  padding-top: 6px;
-  padding-left: 8px;
-  padding-right: 8px;
-  overflow: hidden;
-  white-space: nowrap;
+  height: 100%;
+  padding: 6px 8px;
+  overflow-wrap: break-word;
   text-overflow: ellipsis;
 
   i {
@@ -40,6 +38,6 @@
   }
 }
 
-.source-tag.essential {
-  height: 64px;
-}
+// .source-tag.essential {
+//   height: 64px;
+// }
