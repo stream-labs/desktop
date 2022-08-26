@@ -1,8 +1,8 @@
 {
  "Image": "Gambar",
- "Color Source": "Sumber Warna",
+ "Color Block": "Color Block",
  "Browser Source": "Sumber Browser",
- "Media Source": "Sumber Media",
+ "Media File": "Media File",
  "Image Slide Show": "Slide Show Gambar",
  "Text (GDI+)": "Teks (GDI+)",
  "Text (FreeType 2)": "Teks (FreeType 2)",

@@ -3,5 +3,6 @@
   "Reload": "Recarregar",
   "Unpacked vers loaded": "Versão descompactada carregada",
   "You must unload unpacked version before enabling this app.": "Tem de descarregar a versão descompactada antes de ativar esta aplicação.",
-  "Pop Out": "Pop-out"
+  "Pop Out": "Pop-out",
+  "The developer has ended support for this app. The app may continue to work, but it won't recieve any updates. If you wish to uninstall, please follow the directions here.": "The developer has ended support for this app. The app may continue to work, but it won't recieve any updates. If you wish to uninstall, please follow the directions here."
 }

@@ -1,8 +1,8 @@
 {
  "Image": "Billede",
- "Color Source": "Farvekilde",
+ "Color Block": "Color Block",
  "Browser Source": "Browserkilde",
- "Media Source": "Mediekilde",
+ "Media File": "Media File",
  "Image Slide Show": "Billeddiasshow",
  "Text (GDI+)": "Tekst (GDI+)",
  "Text (FreeType 2)": "Tekst (FreeType 2)",

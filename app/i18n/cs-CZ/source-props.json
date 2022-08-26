@@ -1,8 +1,8 @@
 {
  "Image": "Obraz",
- "Color Source": "Zdroj barev",
+ "Color Block": "Color Block",
  "Browser Source": "Zdroj prohlížeče",
- "Media Source": "Zdroj médií",
+ "Media File": "Media File",
  "Image Slide Show": "Obrázková prezentace",
  "Text (GDI+)": "Text (GDI+)",
  "Text (FreeType 2)": "Text (FreeType 2)",
