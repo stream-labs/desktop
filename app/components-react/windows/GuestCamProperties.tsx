@@ -8,7 +8,7 @@ import Display from 'components-react/shared/Display';
 import { CheckboxInput, ListInput, SliderInput, TextInput } from 'components-react/shared/inputs';
 import Form from 'components-react/shared/inputs/Form';
 import { ModalLayout } from 'components-react/shared/ModalLayout';
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { DismissablesService, EDismissable } from 'services/dismissables';
 import { EDeviceType } from 'services/hardware';
 import { $t } from 'services/i18n';
@@ -145,6 +145,10 @@ class GuestCamModule {
 
     const sourceId = source.sourceId;
 
+    const markAsRead = () => {
+      this.GuestCamService.actions.markGuestAsRead(streamId);
+    };
+
     return {
       volume,
       setVolume,
@@ -152,6 +156,7 @@ class GuestCamModule {
       setVisible,
       disconnect,
       sourceId,
+      markAsRead,
     };
   }
 
@@ -439,6 +444,10 @@ function GuestPane(p: { guest: IGuest }) {
   // TODO: Talk to Alex about how the useModule pattern thinks this should
   // be handled with reactivity. For now, wrap in useVuex to make it reactive.
   const bindings = useVuex(() => getBindingsForGuest(p.guest.remoteProducer.streamId));
+
+  useEffect(() => {
+    if (bindings) bindings.markAsRead();
+  }, []);
 
   if (!bindings) {
     return (
