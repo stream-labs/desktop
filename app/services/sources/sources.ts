@@ -89,6 +89,7 @@ export const windowsSources: TSourceType[] = [
   'vlc_source',
   'soundtrack_source',
   'mediasoupconnector',
+  'wasapi_process_output_capture',
 ];
 
 /**
@@ -549,6 +550,7 @@ export class SourcesService extends StatefulService<ISourcesState> {
       { description: 'Display Capture', value: 'display_capture' },
       { description: 'Soundtrack source', value: 'soundtrack_source' },
       { description: 'Collab Cam', value: 'mediasoupconnector' },
+      { description: 'Application Audio Capture (BETA)', value: 'wasapi_process_output_capture' },
     ];
 
     const availableAllowlistedTypes = allowlistedTypes.filter(type =>
