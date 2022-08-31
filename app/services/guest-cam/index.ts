@@ -154,6 +154,7 @@ export interface IGuest {
   remoteProducer: IRemoteProducer;
   sourceId?: string;
   showOnStream: boolean;
+  notificationId: number;
 }
 
 interface IGuestCamServiceState {
@@ -663,7 +664,23 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
     const vacantSources = this.views.vacantSources;
     const sourceId = vacantSources.length ? vacantSources[0].sourceId : undefined;
 
-    this.ADD_GUEST({ remoteProducer: event.data, sourceId, showOnStream: false });
+    const notif = this.notificationsService.push({
+      type: ENotificationType.SUCCESS,
+      lifeTime: -1,
+      message: $t('A guest has joined - click to show'),
+      action: this.jsonrpcService.createRequest(
+        Service.getResourceId(this.sourcesService),
+        'showGuestCamPropertiesBySourceId',
+        this.views.sourceId,
+      ),
+    });
+
+    this.ADD_GUEST({
+      remoteProducer: event.data,
+      sourceId,
+      showOnStream: false,
+      notificationId: notif.id,
+    });
 
     // If we're allowed to produce, we should start producing right now
     if (!this.producer && this.state.produceOk) {
@@ -681,17 +698,18 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
     }
 
     this.emitStreamingStatus();
+  }
 
-    this.notificationsService.push({
-      type: ENotificationType.SUCCESS,
-      lifeTime: -1,
-      message: $t('A guest has joined - click to show'),
-      action: this.jsonrpcService.createRequest(
-        Service.getResourceId(this.sourcesService),
-        'showGuestCamPropertiesBySourceId',
-        this.views.sourceId,
-      ),
-    });
+  /**
+   * Mark's a guests join notification as read
+   * @param streamId the stream id of the guest
+   */
+  markGuestAsRead(streamId: string) {
+    const guest = this.views.getGuestByStreamId(streamId);
+
+    if (!guest) return;
+
+    this.notificationsService.markAsRead(guest.notificationId);
   }
 
   setGuestSource(streamId: string, sourceId: string | null) {
