@@ -185,5 +185,13 @@
   "Service": "Service",
   "Server": "Server",
   "Stream key": "Stream key",
-  "Show all services": "Show all services"
+  "Show all services": "Show all services",
+  "Maximum Replay Time (Seconds)": "Maximum Replay Time (Seconds)",
+  "Encoder": "Encoder",
+  "Always minimize to system tray instead of task bar": "Always minimize to system tray instead of task bar",
+  "Minimize to system tray when started": "Minimize to system tray when started",
+  "Save projectors on exit": "Save projectors on exit",
+  "Make projectors always on top": "Make projectors always on top",
+  "Hide cursor over projectors": "Hide cursor over projectors",
+  "Snap Sources to horizontal and vertical center": "Snap Sources to horizontal and vertical center"
 }
