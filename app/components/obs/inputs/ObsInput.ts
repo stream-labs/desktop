@@ -179,6 +179,7 @@ export function obsValuesToInputValues(
     prop.masked = !!obsProp.masked;
     prop.enabled = !!obsProp.enabled;
     prop.visible = !!obsProp.visible;
+    prop.description = $translateIfExist(obsProp.description);
 
     if (options.disabledFields && options.disabledFields.includes(prop.name)) {
       prop.visible = false;
