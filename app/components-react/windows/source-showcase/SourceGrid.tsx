@@ -69,7 +69,7 @@ export default function SourceGrid(p: { activeTab: string }) {
         return;
       }
 
-      if (type.value === 'mediasoupconnector' && (!guestCamAvailable || getOS() === OS.Mac)) {
+      if (type.value === 'mediasoupconnector' && !guestCamAvailable) {
         return false;
       }
 
