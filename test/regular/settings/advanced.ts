@@ -10,7 +10,7 @@ test('Populates advanced settings', async t => {
   await assertFormContains(
     {
       'Process Priority': 'Normal',
-      'Color Format': 'NV12',
+      'Color Format': 'NV12 (8-bit, 4:2:0, 2 planes)',
       'YUV Color Space': '601',
       'YUV Color Range': 'Partial',
       'Force GPU as render device': true,
