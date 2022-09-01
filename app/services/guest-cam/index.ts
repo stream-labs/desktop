@@ -41,14 +41,20 @@ export interface IObsReturnTypes {
   func_create_send_transport: {};
   func_load_device: {};
   func_create_audio_producer: {
-    connect_params: TConnectParams;
-  };
-  func_create_video_producer: {
-    produce_params: {
+    produce_params?: {
       rtpParameters: unknown;
       kind: string;
       transportId: string;
     };
+    connect_params?: TConnectParams;
+  };
+  func_create_video_producer: {
+    produce_params?: {
+      rtpParameters: unknown;
+      kind: string;
+      transportId: string;
+    };
+    connect_params?: TConnectParams;
   };
   func_connect_result: {
     produce_params: {
@@ -68,6 +74,7 @@ export interface IObsReturnTypes {
   func_stop_consumer: {};
   func_stop_sender: {};
   func_stop_receiver: {};
+  func_stop_producer: {};
 }
 
 interface IRoomResponse {
@@ -495,7 +502,7 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
     // It doesn't matter which source we produce from, so just pick the first one
     this.producer = new Producer(this.views.sources[0].sourceId);
 
-    await this.producer.connect();
+    await this.producer.addStream(this.views.videoSourceId, 'camera', this.views.audioSourceId);
   }
 
   stopProducing() {
@@ -506,8 +513,7 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
   /**
    * Ensures the following:
    * - We have at least 1 guest cam source
-   * - We have 1 audio filter and 1 video filter
-   * - All sources and filters are updated with the room id
+   * - Removes all existing filters
    */
   private ensureSourceAndFilters() {
     if (!this.views.sourceId) {
@@ -522,34 +528,6 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
         }
       });
     });
-
-    const videoSource = this.views.videoSource;
-
-    if (!videoSource) {
-      throw new Error('Tried to start producer but video source does not exist');
-    }
-
-    this.sourceFiltersService.add(
-      videoSource.sourceId,
-      'mediasoupconnector_vfilter',
-      uuid(),
-      { room: this.room },
-      EFilterDisplayType.Hidden,
-    );
-
-    const audioSource = this.views.audioSource;
-
-    if (!audioSource) {
-      throw new Error('Tried to start producer but audio source does not exist');
-    }
-
-    this.sourceFiltersService.add(
-      audioSource.sourceId,
-      'mediasoupconnector_afilter',
-      uuid(),
-      { room: this.room },
-      EFilterDisplayType.Hidden,
-    );
   }
 
   async getTurnConfig() {
@@ -615,7 +593,6 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
     this.socket.on('connect_timeout', () => this.log('Connection Timeout'));
     this.socket.on('error', () => this.log('Socket Error'));
     this.socket.on('disconnect', () => this.handleDisconnect());
-    // this.socket.on('reconnect', () => this.handleReconnect);
     this.socket.on('webrtc', (e: TWebRTCSocketEvent) => this.onWebRTC(e));
   }
 
