@@ -25,6 +25,7 @@
   "Limiter": "Limiter",
   "Expander": "Expander",
   "Shader": "Shader",
+  "HDR Tone Mapping (Override)": "HDR Tone Mapping (Override)",
   "No settings are available for this filter": "No settings are available for this filter",
   "Visual Presets": "Visual Presets",
   "None": "None",
