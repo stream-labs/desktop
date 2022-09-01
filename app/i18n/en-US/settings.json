@@ -172,6 +172,8 @@
   "Maximum Retries": "Maximum Retries",
   "Filename Formatting": "Filename Formatting",
   "Force GPU as render device": "Force GPU as render device",
+  "HDR Nominal Peak Level": "HDR Nominal Peak Level",
+  "Low Latency Audio Buffering Mode (For Decklink/NDI outputs), requires a restart": "Low Latency Audio Buffering Mode (For Decklink/NDI outputs), requires a restart",
   "Overwrite if file exists": "Overwrite if file exists",
   "Replay Buffer Filename Prefix": "Replay Buffer Filename Prefix",
   "Replay Buffer Filename Suffix": "Replay Buffer Filename Suffix",
