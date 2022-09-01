@@ -10,8 +10,13 @@ type TStreamType = 'camera' | 'screenshare';
 interface IStream {
   id: string;
   type: TStreamType;
-  videoSourceId: string;
-  audioSourceId: string;
+  videoSourceId?: string;
+  audioSourceId?: string;
+
+  // These ids are unique to a single track and are solely used for
+  // associating a particular filter to a track.
+  videoFilterId: string;
+  audioFilterId: string;
 }
 
 interface RtpEncodingParameters {
@@ -29,25 +34,31 @@ export class Producer extends MediasoupEntity {
 
   streams: IStream[] = [];
 
-  addStream(videoSourceId: string, type: TStreamType, audioSourceId?: string) {
+  get cameraStreamId() {
+    return this.streams.find(s => s.type === 'camera')?.id;
+  }
+
+  get screenshareStreamId() {
+    return this.streams.find(s => s.type === 'screenshare')?.id;
+  }
+
+  addStream(type: TStreamType, videoSourceId?: string, audioSourceId?: string) {
     return this.withMutex(async () => {
       const videoSource = this.sourcesService.views.getSource(videoSourceId);
-
-      if (!videoSource) {
-        // TODO error handling
-      }
+      const videoFilterId = uuid();
+      const audioFilterId = uuid();
 
       const streamId = uuid();
       this.streams.push({
         id: streamId,
         type,
-        videoSourceId,
-        audioSourceId,
+        videoFilterId,
+        audioFilterId,
       });
 
       // Start by setting up filters
-      this.setupFiltersOnSource(videoSourceId, 'video', streamId);
-      if (audioSourceId) this.setupFiltersOnSource(audioSourceId, 'audio', streamId);
+      if (videoSourceId) this.setStreamSource(videoSourceId, streamId, 'video');
+      if (audioSourceId) this.setStreamSource(audioSourceId, streamId, 'audio');
 
       const result = await this.sendWebRTCRequest({
         type: 'createProducer',
@@ -67,13 +78,21 @@ export class Producer extends MediasoupEntity {
         this.makeObsRequest('func_create_send_transport', result);
       }
 
-      const encodings =
-        type === 'camera'
-          ? this.getCameraEncodingParameters(videoSource.height)
-          : this.getScreenshareEncodingParameters(videoSource.height);
+      let encodings: RtpEncodingParameters[];
+
+      if (videoSource) {
+        encodings =
+          type === 'camera'
+            ? this.getCameraEncodingParameters(videoSource.height)
+            : this.getScreenshareEncodingParameters(videoSource.height);
+      } else {
+        this.log(
+          'WARNING: Video source was not available at stream creation. Simulcast was not enabled.',
+        );
+      }
 
       const videoProduceResult = this.makeObsRequest('func_create_video_producer', {
-        id: videoSourceId,
+        id: videoFilterId,
         encodings,
       });
       this.log('Got Video Produce Result', videoProduceResult);
@@ -114,7 +133,7 @@ export class Producer extends MediasoupEntity {
 
       if (audioSourceId) {
         const audioProduceParams = this.makeObsRequest('func_create_audio_producer', {
-          id: audioSourceId,
+          id: audioFilterId,
         }).produce_params;
 
         this.log('Got Audio Produce Params', audioProduceParams);
@@ -137,20 +156,27 @@ export class Producer extends MediasoupEntity {
     });
   }
 
-  setupFiltersOnSource(sourceId: string, type: 'audio' | 'video', streamId: string) {
-    // Remove all mediasoup filters
-    this.sourceFiltersService.views.filtersBySourceId(sourceId).forEach(filter => {
-      if (
-        [
-          'mediasoupconnector_afilter',
-          'mediasoupconnector_vfilter',
-          'mediasoupconnector_vsfilter',
-        ].includes(filter.type)
-      ) {
-        this.sourceFiltersService.remove(sourceId, filter.name);
-      }
-    });
+  setStreamSource(sourceId: string, streamId: string, type: 'audio' | 'video') {
+    const stream = this.streams.find(s => s.id === streamId);
 
+    // Clean up filters on existing source
+    const existingSourceId = type === 'video' ? stream.videoSourceId : stream.audioSourceId;
+
+    if (existingSourceId) {
+      this.removeFiltersFromSource(existingSourceId);
+    }
+
+    // Clean up filters on new source
+    this.removeFiltersFromSource(sourceId);
+
+    this.setupFiltersOnSource(
+      sourceId,
+      type,
+      type === 'video' ? stream.videoFilterId : stream.audioFilterId,
+    );
+  }
+
+  private setupFiltersOnSource(sourceId: string, type: 'audio' | 'video', filterId: string) {
     let filterType: TSourceFilterType = 'mediasoupconnector_afilter';
     const source = this.sourcesService.views.getSource(sourceId);
 
@@ -171,9 +197,24 @@ export class Producer extends MediasoupEntity {
       sourceId,
       filterType,
       uuid(),
-      { room: this.guestCamService.room, producerId: sourceId },
+      { room: this.guestCamService.room, producerId: filterId },
       EFilterDisplayType.Hidden,
     );
+  }
+
+  private removeFiltersFromSource(sourceId: string) {
+    // Remove all mediasoup filters
+    this.sourceFiltersService.views.filtersBySourceId(sourceId).forEach(filter => {
+      if (
+        [
+          'mediasoupconnector_afilter',
+          'mediasoupconnector_vfilter',
+          'mediasoupconnector_vsfilter',
+        ].includes(filter.type)
+      ) {
+        this.sourceFiltersService.remove(sourceId, filter.name);
+      }
+    });
   }
 
   getCameraEncodingParameters(height: number): RtpEncodingParameters[] {
@@ -224,15 +265,22 @@ export class Producer extends MediasoupEntity {
     return [{ maxBitrate: 1000000, scaleResolutionDownBy: 3 }];
   }
 
+  stopStream(streamId: string) {
+    const stream = this.streams.find(s => s.id === streamId);
+    if (!stream) return;
+
+    this.makeObsRequest('func_stop_producer', stream.videoFilterId);
+    if (stream.audioSourceId) this.makeObsRequest('func_stop_producer', stream.audioFilterId);
+    this.sendWebRTCRequest({
+      type: 'closeProducerTrack',
+      data: { streamId: stream.id, producerTransportId: this.transportId },
+    });
+  }
+
   destroy() {
     this.makeObsRequest('func_stop_sender');
     this.streams.forEach(stream => {
-      this.makeObsRequest('func_stop_producer', stream.videoSourceId);
-      if (stream.audioSourceId) this.makeObsRequest('func_stop_producer', stream.audioSourceId);
-      this.sendWebRTCRequest({
-        type: 'closeProducerTrack',
-        data: { streamId: stream.id, producerTransportId: this.transportId },
-      });
+      this.stopStream(stream.id);
     });
     super.destroy();
   }
