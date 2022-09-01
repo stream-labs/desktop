@@ -18,6 +18,8 @@ export class GuestTrack extends MediasoupEntity {
 
   private resolve: (val?: unknown) => void;
 
+  consumerId: string;
+
   constructor(public readonly opts: IGuestTrackConstructorOptions) {
     super(opts.sourceId);
   }
@@ -52,11 +54,43 @@ export class GuestTrack extends MediasoupEntity {
     });
   }
 
+  setConsumerPreferredLayers() {
+    if (this.opts.kind !== 'video') return;
+    if (!this.consumerId) return;
+
+    const totalStreams = this.guestCamService.consumer.guests.length;
+    const highLayer = { spatialLayer: 2, temporalLayer: 2 };
+    const midLayer = { spatialLayer: 1, temporalLayer: 2 };
+    const lowLayer = { spatialLayer: 0, temporalLayer: 2 };
+
+    let preferredLayer = highLayer;
+
+    if (totalStreams > 1) {
+      preferredLayer = midLayer;
+    }
+
+    if (totalStreams > 3) {
+      preferredLayer = lowLayer;
+    }
+
+    this.sendWebRTCRequest({
+      type: 'setConsumerPreferredLayers',
+      data: {
+        socketId: this.opts.socketId,
+        streamId: this.opts.streamId,
+        consumerId: this.consumerId,
+        preferredLayers: preferredLayer,
+      },
+    });
+  }
+
   /**
    * Takes a track we received from the server and connects it to the C++ source
    */
   private playTrack(event: IConsumerTrackEvent) {
     this.log('Got Consumer Track', event);
+
+    this.consumerId = event.data.id;
 
     const connectParams = this.makeObsRequest(
       `func_${event.data.kind}_consumer_response`,
@@ -84,6 +118,8 @@ export class GuestTrack extends MediasoupEntity {
     if (connectParams && !this.guestCamService.consumer.transportConnected) {
       this.guestCamService.consumer.connectTransport(connectParams);
     }
+
+    this.setConsumerPreferredLayers();
 
     if (this.resolve) this.resolve();
   }

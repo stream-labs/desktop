@@ -59,6 +59,10 @@ class GuestCamModule {
     return this.GuestCamService.views.audioSourceId;
   }
 
+  get screenshareProducerSourceId() {
+    return this.GuestCamService.views.screenshareSourceId;
+  }
+
   get videoProducerSourceOptions() {
     const videoSourceType = byOS({ [OS.Windows]: 'dshow_input', [OS.Mac]: 'av_capture_input' });
 
@@ -80,12 +84,25 @@ class GuestCamModule {
     }));
   }
 
+  get screenshareProducerSourceOptions() {
+    return this.SourcesService.views.sources
+      .filter(s => s.video)
+      .map(s => ({
+        label: s.name,
+        value: s.sourceId,
+      }));
+  }
+
   get videoProducerSource() {
     return this.GuestCamService.views.videoSource;
   }
 
   get audioProducerSource() {
     return this.GuestCamService.views.audioSource;
+  }
+
+  get screenshareProducerSource() {
+    return this.GuestCamService.views.screenshareSource;
   }
 
   get availableSources() {
@@ -212,6 +229,8 @@ export default function GuestCamProperties() {
     audioProducerSource,
     audioProducerSourceId,
     audioProducerSourceOptions,
+    screenshareProducerSourceId,
+    screenshareProducerSourceOptions,
     produceOk,
     regeneratingLink,
     regenerateLink,
@@ -306,6 +325,17 @@ export default function GuestCamProperties() {
                 style={{ width: '45%', margin: 0 }}
               />
             </div>
+            {/* TODO: Uncomment when new guest page is deployed */}
+            {/* <div>
+              <ListInput
+                label={$t('Share Video Source (Optional)')}
+                options={screenshareProducerSourceOptions}
+                value={screenshareProducerSourceId}
+                onChange={s => GuestCamService.actions.setScreenshareSource(s)}
+                style={{ width: 500, margin: 0 }}
+                allowClear
+              />
+            </div> */}
           </Form>
           {(!videoProducerSource || !audioProducerSource) && (
             <Alert

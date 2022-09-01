@@ -41,14 +41,20 @@ export interface IObsReturnTypes {
   func_create_send_transport: {};
   func_load_device: {};
   func_create_audio_producer: {
-    connect_params: TConnectParams;
-  };
-  func_create_video_producer: {
-    produce_params: {
+    produce_params?: {
       rtpParameters: unknown;
       kind: string;
       transportId: string;
     };
+    connect_params?: TConnectParams;
+  };
+  func_create_video_producer: {
+    produce_params?: {
+      rtpParameters: unknown;
+      kind: string;
+      transportId: string;
+    };
+    connect_params?: TConnectParams;
   };
   func_connect_result: {
     produce_params: {
@@ -68,6 +74,7 @@ export interface IObsReturnTypes {
   func_stop_consumer: {};
   func_stop_sender: {};
   func_stop_receiver: {};
+  func_stop_producer: {};
 }
 
 interface IRoomResponse {
@@ -161,6 +168,7 @@ interface IGuestCamServiceState {
   produceOk: boolean;
   videoSourceId: string;
   audioSourceId: string;
+  screenshareSourceId: string;
   inviteHash: string;
 
   guests: IGuest[];
@@ -192,6 +200,14 @@ class GuestCamViews extends ViewHandler<IGuestCamServiceState> {
 
   get audioSource() {
     return this.getServiceViews(SourcesService).getSource(this.audioSourceId);
+  }
+
+  get screenshareSourceId() {
+    return this.state.screenshareSourceId;
+  }
+
+  get screenshareSource() {
+    return this.getServiceViews(SourcesService).getSource(this.screenshareSourceId);
   }
 
   get sources() {
@@ -261,6 +277,7 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
     produceOk: false,
     videoSourceId: '',
     audioSourceId: '',
+    screenshareSourceId: '',
     inviteHash: '',
     guests: [],
     joinAsGuestHash: null,
@@ -495,7 +512,11 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
     // It doesn't matter which source we produce from, so just pick the first one
     this.producer = new Producer(this.views.sources[0].sourceId);
 
-    await this.producer.connect();
+    await this.producer.addStream('camera', this.views.videoSourceId, this.views.audioSourceId);
+
+    if (this.views.screenshareSource) {
+      await this.producer.addStream('screenshare', this.views.screenshareSourceId);
+    }
   }
 
   stopProducing() {
@@ -506,8 +527,7 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
   /**
    * Ensures the following:
    * - We have at least 1 guest cam source
-   * - We have 1 audio filter and 1 video filter
-   * - All sources and filters are updated with the room id
+   * - Removes all existing filters
    */
   private ensureSourceAndFilters() {
     if (!this.views.sourceId) {
@@ -522,34 +542,6 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
         }
       });
     });
-
-    const videoSource = this.views.videoSource;
-
-    if (!videoSource) {
-      throw new Error('Tried to start producer but video source does not exist');
-    }
-
-    this.sourceFiltersService.add(
-      videoSource.sourceId,
-      'mediasoupconnector_vfilter',
-      uuid(),
-      { room: this.room },
-      EFilterDisplayType.Hidden,
-    );
-
-    const audioSource = this.views.audioSource;
-
-    if (!audioSource) {
-      throw new Error('Tried to start producer but audio source does not exist');
-    }
-
-    this.sourceFiltersService.add(
-      audioSource.sourceId,
-      'mediasoupconnector_afilter',
-      uuid(),
-      { room: this.room },
-      EFilterDisplayType.Hidden,
-    );
   }
 
   async getTurnConfig() {
@@ -615,7 +607,6 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
     this.socket.on('connect_timeout', () => this.log('Connection Timeout'));
     this.socket.on('error', () => this.log('Socket Error'));
     this.socket.on('disconnect', () => this.handleDisconnect());
-    // this.socket.on('reconnect', () => this.handleReconnect);
     this.socket.on('webrtc', (e: TWebRTCSocketEvent) => this.onWebRTC(e));
   }
 
@@ -914,7 +905,7 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
     this.SET_VIDEO_SOURCE(sourceId);
 
     if (this.producer && this.views.sourceId) {
-      this.ensureSourceAndFilters();
+      this.producer.setStreamSource(sourceId, this.producer.cameraStreamId, 'video');
     }
   }
 
@@ -924,7 +915,25 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
     this.SET_AUDIO_SOURCE(sourceId);
 
     if (this.producer && this.views.sourceId) {
-      this.ensureSourceAndFilters();
+      this.producer.setStreamSource(sourceId, this.producer.cameraStreamId, 'audio');
+    }
+  }
+
+  setScreenshareSource(sourceId?: string) {
+    this.SET_SCREENSHARE_SOURCE(sourceId ?? '');
+
+    if (this.producer && this.views.sourceId) {
+      if (sourceId) {
+        if (this.producer.screenshareStreamId) {
+          this.producer.setStreamSource(sourceId, this.producer.screenshareStreamId, 'video');
+        } else {
+          this.producer.addStream('screenshare', sourceId);
+        }
+      } else {
+        if (this.producer.screenshareStreamId) {
+          this.producer.stopStream(this.producer.screenshareStreamId);
+        }
+      }
     }
   }
 
@@ -941,6 +950,11 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
   @mutation()
   private SET_AUDIO_SOURCE(sourceId: string) {
     this.state.audioSourceId = sourceId;
+  }
+
+  @mutation()
+  private SET_SCREENSHARE_SOURCE(sourceId: string) {
+    this.state.screenshareSourceId = sourceId;
   }
 
   @mutation()
