@@ -15,6 +15,7 @@ export class Consumer extends MediasoupEntity {
     const guest = new Guest({ remoteProducer });
     this.guests.push(guest);
     guest.connect();
+    this.setConsumerPreferredLayers();
   }
 
   removeGuest(streamId: string) {
@@ -24,6 +25,15 @@ export class Consumer extends MediasoupEntity {
       this.guests[idx].destroy();
       this.guests.splice(idx, 1);
     }
+
+    this.setConsumerPreferredLayers();
+  }
+
+  setConsumerPreferredLayers() {
+    this.guests.forEach(guest => {
+      if (!guest.videoTrack) return;
+      guest.videoTrack.setConsumerPreferredLayers();
+    });
   }
 
   async createTransport(event: IConsumerCreatedEvent) {

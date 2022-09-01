@@ -5,6 +5,7 @@ import { Node } from './node';
 interface ISchema {
   audioSourceId: string;
   videoSourceId: string;
+  screenshareSourceId?: string;
 }
 
 export class GuestCamNode extends Node<ISchema, {}> {

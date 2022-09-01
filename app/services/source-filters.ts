@@ -48,7 +48,8 @@ export type TSourceFilterType =
   | 'expander_filter'
   | 'shader_filter'
   | 'mediasoupconnector_afilter'
-  | 'mediasoupconnector_vfilter';
+  | 'mediasoupconnector_vfilter'
+  | 'mediasoupconnector_vsfilter';
 
 interface ISourceFilterType {
   type: TSourceFilterType;
@@ -336,6 +337,15 @@ export class SourceFiltersService extends StatefulService<IFiltersServiceState> 
     setPropertiesFormData(obsFilter, properties);
     this.UPDATE_FILTER(sourceId, { name: filterName, settings: obsFilter.settings });
     this.filterUpdated.next({ sourceId, name: filterName });
+  }
+
+  setSettings(sourceId: string, filterName: string, settings: Dictionary<TObsValue>) {
+    if (!filterName) return;
+    const obsFilter = this.getObsFilter(sourceId, filterName);
+
+    obsFilter.update(settings);
+
+    this.UPDATE_FILTER(sourceId, { name: filterName, settings });
   }
 
   getFilters(sourceId: string): ISourceFilter[] {
