@@ -48,7 +48,8 @@ export type TSourceFilterType =
   | 'expander_filter'
   | 'shader_filter'
   | 'mediasoupconnector_afilter'
-  | 'mediasoupconnector_vfilter';
+  | 'mediasoupconnector_vfilter'
+  | 'hdr_tonemap_filter';
 
 interface ISourceFilterType {
   type: TSourceFilterType;
@@ -236,6 +237,7 @@ export class SourceFiltersService extends StatefulService<IFiltersServiceState> 
       { description: $t('Limiter'), value: 'limiter_filter' },
       { description: $t('Expander'), value: 'expander_filter' },
       { description: $t('Shader'), value: 'shader_filter' },
+      { description: $t('HDR Tone Mapping (Override)'), value: 'hdr_tonemap_filter' },
     ];
     const allowedAvailableTypes = allowlistedTypes.filter(type =>
       obsAvailableTypes.includes(type.value),
