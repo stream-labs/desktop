@@ -462,6 +462,15 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
 
   showSourceProperties(sourceId: string) {
     const source = this.getSource(sourceId);
+    const baseConfig = {
+      componentName: 'SourceProperties',
+      title: $t('sources.propertyWindowTitle', { sourceName: source.name }),
+      queryParams: { sourceId },
+      size: {
+        width: 600,
+        height: 600,
+      }
+    };
 
     // HACK: childWindow で表示してしまうとウィンドウキャプチャでクラッシュするので OneOffWindow で代替している
     // StreamLabs 1.3.0 まで追従したらこのワークアラウンドはなくせる
@@ -469,26 +478,25 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
     (this.windowsService.getWindow(SourcesService.sourcePropertiesWindowId)
       ? this.closeSourcePropertiesWindow()
       : Promise.resolve()
-    ).then(() =>
+    ).then(() => {
+      if (!sourceId.startsWith("window_capture")) {
+        this.windowsService.showWindow(baseConfig);
+        return;
+      }
       this.windowsService.createOneOffWindow(
         {
-          componentName: 'SourceProperties',
-          title: $t('sources.propertyWindowTitle', { sourceName: source.name }),
-          queryParams: { sourceId },
-          size: {
-            width: 600,
-            height: 600,
-          },
-          // alwaysOnTop を利用した場合、メインウィンドウの背面に隠れることは防げるが、
+          ...baseConfig,
+         // alwaysOnTop を利用した場合、メインウィンドウの背面に隠れることは防げるが、
           // N Air 以外のウィンドウよりも前面に出てしまう
           alwaysOnTop: true,
         },
         SourcesService.sourcePropertiesWindowId,
-      ),
-    );
+      );
+    });
   }
 
   async closeSourcePropertiesWindow() {
+    this.windowsService.closeChildWindow();
     await this.windowsService.closeOneOffWindow(SourcesService.sourcePropertiesWindowId);
   }
 
