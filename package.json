@@ -187,7 +187,7 @@
     "prettier": "^2.3.2",
     "prettier-eslint": "^13.0.0",
     "shx": "^0.3.3",
-    "spectron": "^7.0.0",
+    "spectron": "^8.0.0",
     "style-loader": "^0.23.1",
     "terser-webpack-plugin": "^2.0.0",
     "ts-jest": "^24.0.2",
