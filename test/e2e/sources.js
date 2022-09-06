@@ -17,7 +17,7 @@ const sourceTypes = [
   'wasapi_output_capture',
   'wasapi_input_capture',
   'game_capture',
-  // 'window_capture', // TODO: oneOffWindow にしているが、addSource() がchildWindow 専用なのでテストできない
+  'window_capture',
   'monitor_capture',
   'image_source',
   'slideshow',

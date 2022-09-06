@@ -1,5 +1,5 @@
 // Source helper functions
-import { focusMain, focusChild } from '.';
+import { focusMain, focusChild, focusSourcePropertiesWindow } from '.';
 import { contextMenuClick } from './context-menu';
 import { dialogDismiss } from './dialog';
 
@@ -64,9 +64,16 @@ export async function addSource(t, type, name, closeProps = true) {
 
   // Close source properties too
   if (closeProps) {
+    if (type === 'window_capture') {
+      await focusSourcePropertiesWindow(t);
+    }
     await app.client.click('[data-test="Done"]');
   } else {
-    await focusChild(t);
+    if (type === 'window_capture') {
+      await focusSourcePropertiesWindow(t);
+    } else {
+      await focusChild(t);
+    }
   }
 }
 
