@@ -17,7 +17,7 @@ const sourceTypes = [
   'wasapi_output_capture',
   'wasapi_input_capture',
   'game_capture',
-  'window_capture',
+  // 'window_capture', // TODO: oneOffWindow にしているが、addSource() がchildWindow 専用なのでテストできない
   'monitor_capture',
   'image_source',
   'slideshow',
@@ -39,7 +39,6 @@ test('Adding and removing some sources', async t => {
     await selectSource(t, sourceName);
     await clickRemoveSource(t);
 
-    // t.false(await sourceIsExisting(t, sourceName));
     await waitForSourceExist(t, sourceName, true);
   }
 });
