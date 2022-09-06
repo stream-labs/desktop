@@ -98,6 +98,13 @@ export async function sourceIsExisting(t, sourceName) {
     .isExisting(`[data-test="${sourceName}"]`);
 }
 
+export async function waitForSourceExist(t, sourceName, invert) {
+  const app = t.context.app;
+  return app.client
+    .$('[data-test="SourceSelector"]')
+    .waitForExist(`[data-test="${sourceName}"]`, 5000, invert);
+}
+
 export async function testSourceExists(t) {
   return t.context.app.client.isExisting('.item-title*=__')
 }
