@@ -62,6 +62,9 @@ export const CommonPlatformFields = InputComponent((rawProps: IProps) => {
       ? p.descriptionIsRequired
       : p.platform === 'facebook';
 
+  const user = Services.UserService.views;
+  const platform = user.auth?.platform?.type;
+
   const hasDescription = p.platform
     ? view.supports('description', [p.platform as TPlatform])
     : view.supports('description');
@@ -96,7 +99,7 @@ export const CommonPlatformFields = InputComponent((rawProps: IProps) => {
               name="title"
               onChange={val => updateCommonField('title', val)}
               label={$t('Title')}
-              required={true}
+              required={platform && platform?.toLowerCase() !== 'tiktok' ? true : false}
               max={p.platform === 'twitch' ? 140 : 120}
             />
 
