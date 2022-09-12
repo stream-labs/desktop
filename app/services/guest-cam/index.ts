@@ -421,7 +421,7 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
       type: 'guestStatus',
       data: {
         streamId,
-        visible
+        visible,
       },
     });
   }
