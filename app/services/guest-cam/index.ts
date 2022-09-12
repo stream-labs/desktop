@@ -415,6 +415,17 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
     });
   }
 
+  emitGuestStatus(streamId: string, visible: boolean) {
+    this.socket.emit('message', {
+      target: '*',
+      type: 'guestStatus',
+      data: {
+        streamId,
+        visible
+      },
+    });
+  }
+
   async startListeningForGuests() {
     await this.socketMutex.do(async () => {
       // TODO: Handle socket disconnects
@@ -822,6 +833,7 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
 
     const guest = this.views.getGuestBySourceId(sourceId);
     this.UPDATE_GUEST(guest.remoteProducer.streamId, { showOnStream: visible });
+    this.emitGuestStatus(guest.remoteProducer.streamId, visible);
   }
 
   async onGuestLeave(event: IConsumerDestroyedEvent) {
