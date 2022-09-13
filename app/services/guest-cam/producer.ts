@@ -174,6 +174,9 @@ export class Producer extends MediasoupEntity {
       type,
       type === 'video' ? stream.videoFilterId : stream.audioFilterId,
     );
+
+    const key = type === 'video' ? 'videoSourceId' : 'audioSourceId';
+    stream[key] = sourceId;
   }
 
   private setupFiltersOnSource(sourceId: string, type: 'audio' | 'video', filterId: string) {
@@ -204,7 +207,7 @@ export class Producer extends MediasoupEntity {
 
   private removeFiltersFromSource(sourceId: string) {
     // Remove all mediasoup filters
-    this.sourceFiltersService.views.filtersBySourceId(sourceId).forEach(filter => {
+    this.sourceFiltersService.views.filtersBySourceId(sourceId, true).forEach(filter => {
       if (
         [
           'mediasoupconnector_afilter',
@@ -275,6 +278,8 @@ export class Producer extends MediasoupEntity {
       type: 'closeProducerTrack',
       data: { streamId: stream.id, producerTransportId: this.transportId },
     });
+
+    this.streams = this.streams.filter(s => s.id !== streamId);
   }
 
   destroy() {
