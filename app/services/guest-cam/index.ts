@@ -415,6 +415,17 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
     });
   }
 
+  emitGuestStatus(streamId: string, visible: boolean) {
+    this.socket.emit('message', {
+      target: '*',
+      type: 'guestStatus',
+      data: {
+        streamId,
+        visible,
+      },
+    });
+  }
+
   async startListeningForGuests() {
     await this.socketMutex.do(async () => {
       // TODO: Handle socket disconnects
@@ -472,14 +483,16 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
   async joinAsGuest(inviteHash: string) {
     if (!inviteHash) return;
 
-    // TODO: We should show a nice error message
-    if (!this.views.sourceId) return;
-
     await this.cleanUpSocketConnection();
     this.SET_JOIN_AS_GUEST(inviteHash);
     this.SET_PRODUCE_OK(false);
-    await this.startListeningForGuests();
-    this.sourcesService.showGuestCamPropertiesBySourceId(this.views.sourceId);
+    if (this.views.sourceId) {
+      await this.startListeningForGuests();
+      this.sourcesService.showGuestCamPropertiesBySourceId(this.views.sourceId);
+    } else {
+      // User will be prompted to add a source
+      this.sourcesService.showGuestCamProperties();
+    }
   }
 
   setProduceOk() {
@@ -820,6 +833,7 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
 
     const guest = this.views.getGuestBySourceId(sourceId);
     this.UPDATE_GUEST(guest.remoteProducer.streamId, { showOnStream: visible });
+    this.emitGuestStatus(guest.remoteProducer.streamId, visible);
   }
 
   async onGuestLeave(event: IConsumerDestroyedEvent) {
