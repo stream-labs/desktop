@@ -330,8 +330,7 @@ export default function GuestCamProperties() {
                 style={{ width: '45%', margin: 0 }}
               />
             </div>
-            {/* TODO: Uncomment when new guest page is deployed */}
-            {/* <div>
+            <div>
               <ListInput
                 label={$t('Share Video Source (Optional)')}
                 options={screenshareProducerSourceOptions}
@@ -340,7 +339,7 @@ export default function GuestCamProperties() {
                 style={{ width: 500, margin: 0 }}
                 allowClear
               />
-            </div> */}
+            </div>
           </Form>
           {(!videoProducerSource || !audioProducerSource) && (
             <Alert
