@@ -131,6 +131,10 @@ class GuestCamModule {
     return [...this.GuestCamService.state.guests];
   }
 
+  get sourceExists() {
+    return !!this.GuestCamService.views.sourceId;
+  }
+
   /**
    * Fetches data needed to display a guest and functions needed to modify state
    * @param streamId The streamId of the guest
@@ -231,6 +235,7 @@ export default function GuestCamProperties() {
     audioProducerSourceOptions,
     screenshareProducerSourceId,
     screenshareProducerSourceOptions,
+    sourceExists,
     produceOk,
     regeneratingLink,
     regenerateLink,
@@ -372,19 +377,34 @@ export default function GuestCamProperties() {
           );
         })}
       </Tabs>
-      <Modal
-        visible={!produceOk}
-        getContainer={false}
-        closable={false}
-        okText={$t('Start Collab Cam')}
-        onOk={() => {
-          GuestCamService.actions.setProduceOk();
-          DismissablesService.actions.dismiss(EDismissable.GuestCamFirstTimeModal);
-        }}
-        onCancel={() => WindowsService.actions.closeChildWindow()}
-      >
-        {getModalContent()}
-      </Modal>
+      {sourceExists ? (
+        <Modal
+          visible={!produceOk}
+          getContainer={false}
+          closable={false}
+          okText={$t('Start Collab Cam')}
+          onOk={() => {
+            GuestCamService.actions.setProduceOk();
+            DismissablesService.actions.dismiss(EDismissable.GuestCamFirstTimeModal);
+          }}
+          onCancel={() => WindowsService.actions.closeChildWindow()}
+        >
+          {getModalContent()}
+        </Modal>
+      ) : (
+        <Modal
+          visible={true}
+          getContainer={false}
+          closable={false}
+          okText={$t('Add New Source')}
+          onOk={() => {
+            SourcesService.actions.showAddSource('mediasoupconnector');
+          }}
+          onCancel={() => WindowsService.actions.closeChildWindow()}
+        >
+          {MissingSourceModalContent()}
+        </Modal>
+      )}
     </ModalLayout>
   );
 }
@@ -654,6 +674,19 @@ function JoinAsGuestModalContent() {
         {$t(
           "%{name} has invited you to join their stream. When you're ready to join, click the button below.",
           { name: hostName },
+        )}
+      </p>
+    </>
+  );
+}
+
+function MissingSourceModalContent() {
+  return (
+    <>
+      <h2>{$t('Collab Cam requires a source')}</h2>
+      <p>
+        {$t(
+          'At least one Collab Cam source is required to connect to this stream. Would you like to add one now?',
         )}
       </p>
     </>
