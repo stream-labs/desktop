@@ -18,7 +18,14 @@ export enum EAvailableFeatures {
   growTab = 'slobs--grow-tab',
   themeAudit = 'slobs--theme-audit',
   reactWidgets = 'slobs--react-widgets',
-  guestCam = 'slobs--guest-join',
+
+  /**
+   * There are two flags because one is used for beta access and
+   * grandfathering access, whereas the other is for production
+   * availability at launch.
+   */
+  guestCamBeta = 'slobs--guest-join',
+  guestCaProduction = 'slobs--guest-join-prod',
 }
 
 interface IIncrementalRolloutServiceState {

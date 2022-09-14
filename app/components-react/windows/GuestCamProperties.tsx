@@ -16,7 +16,7 @@ import { SourcesService, TSourceType } from 'services/sources';
 import { byOS, OS } from 'util/operating-systems';
 import { IGuest, GuestCamService } from 'services/guest-cam';
 import { inject, injectState, useModule } from 'slap';
-import { AudioService, EditorCommandsService } from 'app-services';
+import { AudioService, EditorCommandsService, UserService } from 'app-services';
 import { confirmAsync } from 'components-react/modals';
 
 class GuestCamModule {
@@ -25,6 +25,7 @@ class GuestCamModule {
   private AudioService = inject(AudioService);
   private EditorCommandsService = inject(EditorCommandsService);
   private DismissablesService = inject(DismissablesService);
+  private UserService = inject(UserService);
 
   state = injectState({
     regeneratingLink: false,
@@ -37,6 +38,14 @@ class GuestCamModule {
 
   get hostName() {
     return this.GuestCamService.state.hostName;
+  }
+
+  get maxGuests() {
+    return this.GuestCamService.state.maxGuests;
+  }
+
+  get shouldShowPrimeUpgrade() {
+    return this.maxGuests === 2 && !this.UserService.views.isPrime;
   }
 
   get showFirstTimeModal() {
@@ -131,6 +140,24 @@ class GuestCamModule {
     return [...this.GuestCamService.state.guests];
   }
 
+  /**
+   * Because screenshares appear like a second guest, but aren't technically a second
+   * guest and don't count towards a guest slot, this can be used to get simply unique
+   * guests where their webcam and screenshare count as one.
+   */
+  get uniqueGuests() {
+    const socketIds: Dictionary<boolean> = {};
+
+    return this.GuestCamService.state.guests.filter(g => {
+      if (!socketIds[g.remoteProducer.socketId]) {
+        socketIds[g.remoteProducer.socketId] = true;
+        return true;
+      } else {
+        return false;
+      }
+    });
+  }
+
   get sourceExists() {
     return !!this.GuestCamService.views.sourceId;
   }
@@ -212,6 +239,7 @@ export default function GuestCamProperties() {
     WindowsService,
     EditorCommandsService,
     DismissablesService,
+    MagicLinkService,
   } = Services;
   const defaultTab = useMemo(() => {
     const openedSourceId = WindowsService.getChildWindowQueryParams().sourceId;
@@ -223,6 +251,9 @@ export default function GuestCamProperties() {
   }, []);
   const {
     guests,
+    uniqueGuests,
+    maxGuests,
+    shouldShowPrimeUpgrade,
     joinAsGuest,
     hostName,
     showFirstTimeModal,
@@ -300,6 +331,30 @@ export default function GuestCamProperties() {
                     <i className="fa fa-spinner fa-pulse" style={{ marginLeft: 8 }} />
                   )}
                 </Button>
+              </div>
+            )}
+            {!joinAsGuest && (
+              <div style={{ margin: '10px 0 0', width: '100%' }}>
+                <span>{$t('Guests')}</span>
+                <span
+                  style={{
+                    marginLeft: 8,
+                    background: 'var(--section-alt)',
+                    padding: 5,
+                    borderRadius: 6,
+                  }}
+                >
+                  {uniqueGuests.length} / {maxGuests - 1}
+                </span>
+                {shouldShowPrimeUpgrade && (
+                  <span
+                    style={{ marginLeft: 8, color: 'var(--prime)', cursor: 'pointer' }}
+                    onClick={() => MagicLinkService.actions.linkToPrime('desktop-collab-cam')}
+                  >
+                    <i className="icon-prime" />
+                    <b style={{ marginLeft: 5 }}>{$t('Upgrade for more Guests')}</b>
+                  </span>
+                )}
               </div>
             )}
             <h2 style={{ marginTop: 20 }}>
