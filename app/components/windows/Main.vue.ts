@@ -27,6 +27,8 @@ import fs from 'fs';
 import * as remote from '@electron/remote';
 Vue.use(VueResize);
 
+// THIS
+
 // Pages
 import Studio from '../pages/Studio';
 import { Inject } from '../../services/core/injector';

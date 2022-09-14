@@ -10,7 +10,9 @@ import { useVuex } from 'components-react/hooks';
 import AppsNav from './AppsNav';
 import NavTools from './NavTools';
 import styles from './SideNav.m.less';
+import { Menu, Layout } from 'antd';
 
+const { Sider } = Layout;
 interface IPageData {
   target: TAppPage;
   icon?: string;
@@ -119,28 +121,42 @@ export default function SideNav() {
       trackingTarget: 'themeaudit',
     });
   }
-
+  const [open, setOpen] = useState(false);
   return (
-    <div className={cx('side-nav', styles.container, { [styles.leftDock]: leftDock })}>
-      <PrimaryStudioTab currentPage={currentPage} navigate={navigate} />
-      {pageData.map(page => (
-        <div
-          key={page.target}
-          className={cx(styles.mainCell, {
-            [styles.active]: currentPage === page.target,
-            [styles.disabled]: !loggedIn && page.target !== 'Studio',
-          })}
-          onClick={() => navigate(page.target as TAppPage, page.trackingTarget)}
-          title={page.title}
-        >
-          {!!page.icon && <i className={page.icon} />}
-          {!!page.svgIcon && page.svgIcon}
-          {page.newBadge && <div className={cx(styles.badge, styles.newBadge)}>{$t('New')}</div>}
-        </div>
-      ))}
-      {enabledApps.length > 0 && <AppsNav />}
-      <NavTools />
-    </div>
+    <Layout style={{ flexDirection: 'column', width: '100%', minHeight: '100vh' }}>
+      <Sider collapsible collapsed={!open} onCollapse={() => setOpen(!open)}>
+        {/* <div className={cx('side-nav', styles.container, { [styles.leftDock]: leftDock })}> */}
+        <PrimaryStudioTab currentPage={currentPage} navigate={navigate} />
+        <NavTools />
+        <Menu>
+          {pageData.map(page => (
+            <Menu.Item
+              key={page.target}
+              // className={cx(styles.mainCell, {
+              //   [styles.active]: currentPage === page.target,
+              //   [styles.disabled]: !loggedIn && page.target !== 'Studio',
+              // })}
+              onClick={() => navigate(page.target as TAppPage, page.trackingTarget)}
+              title={page.title}
+              icon={
+                !!page.icon ? (
+                  <i className={page.icon} />
+                ) : !!page.svgIcon ? (
+                  <div>{page.svgIcon}</div>
+                ) : page.newBadge ? (
+                  <div className={cx(styles.badge, styles.newBadge)}>{$t('New')}</div>
+                ) : (
+                  ''
+                )
+              }
+            >
+              {page.title}
+            </Menu.Item>
+          ))}
+        </Menu>
+        {enabledApps.length > 0 && <AppsNav />}
+      </Sider>
+    </Layout>
   );
 }
 
