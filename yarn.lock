@@ -2039,10 +2039,10 @@
     "@jridgewell/resolve-uri" "^3.0.3"
     "@jridgewell/sourcemap-codec" "^1.4.10"
 
-"@n-air-app/n-voice-package@^0.0.18":
-  version "0.0.18"
-  resolved "https://npm.pkg.github.com/download/@n-air-app/n-voice-package/0.0.18/c7f4fd97ebd5d3d10efa5d3ab9710c41d5d6117d#c7f4fd97ebd5d3d10efa5d3ab9710c41d5d6117d"
-  integrity sha512-l211cOmzkoAPbXZXIudLik9gl6rzthQGJWIZCAnGSjZx7gwPEQnsKE+lsn55bf7D0pA6K0ZXE+S4TvFSXt80zw==
+"@n-air-app/n-voice-package@^0.0.20":
+  version "0.0.20"
+  resolved "https://npm.pkg.github.com/download/@n-air-app/n-voice-package/0.0.20/533fdf15d34f5a5f15437f5f12c0ef51a2e75623#533fdf15d34f5a5f15437f5f12c0ef51a2e75623"
+  integrity sha512-m5W1+PnfZ2HmGY4jKRriyQnRPOwrMtL9HQbhQ4sB0bnzfqUGoKctar14MM+r3ftT7GRgT3LqpVc+sNO+h6kYZQ==
   dependencies:
     "@rollup/plugin-babel" "^5.3.1"
     "@types/node" "^18.6.3"
