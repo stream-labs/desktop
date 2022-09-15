@@ -87,6 +87,7 @@ interface IIoConfigResponse {
   token: string;
   host: {
     name: string;
+    maxGuests: number;
   };
 }
 
@@ -183,6 +184,11 @@ interface IGuestCamServiceState {
    * Name of the host of the room
    */
   hostName: string;
+
+  /**
+   * Number includes the host
+   */
+  maxGuests: number;
 }
 
 class GuestCamViews extends ViewHandler<IGuestCamServiceState> {
@@ -282,6 +288,7 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
     guests: [],
     joinAsGuestHash: null,
     hostName: null,
+    maxGuests: 0,
   };
 
   get views() {
@@ -461,6 +468,7 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
       this.log('io Config Result', ioConfigResult);
 
       this.SET_HOST_NAME(ioConfigResult.host.name);
+      this.SET_MAX_GUESTS(ioConfigResult.host.maxGuests);
 
       await this.openSocketConnection(ioConfigResult.url, ioConfigResult.token);
     });
@@ -1007,5 +1015,10 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
   @mutation()
   private SET_HOST_NAME(name: string) {
     this.state.hostName = name;
+  }
+
+  @mutation()
+  private SET_MAX_GUESTS(maxGuests: number) {
+    this.state.maxGuests = maxGuests;
   }
 }
