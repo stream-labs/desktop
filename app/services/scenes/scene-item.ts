@@ -33,6 +33,9 @@ import { assertIsDefined } from '../../util/properties-type-guards';
  * all of the information about that source, and
  * how it fits in to the given scene
  */
+
+export { EScaleType } from '../../../obs-api';
+
 @ServiceHelper('ScenesService')
 export class SceneItem extends SceneItemNode {
   sourceId: string;
@@ -54,6 +57,7 @@ export class SceneItem extends SceneItemNode {
   locked: boolean;
   streamVisible: boolean;
   recordingVisible: boolean;
+  scaleFilter: obs.EScaleType;
 
   sceneNodeType: TSceneNodeType = 'item';
 
@@ -126,6 +130,7 @@ export class SceneItem extends SceneItemNode {
       visible: this.visible,
       streamVisible: this.streamVisible,
       recordingVisible: this.recordingVisible,
+      scaleFilter: this.scaleFilter
     };
   }
 
@@ -194,6 +199,10 @@ export class SceneItem extends SceneItemNode {
       this.getObsSceneItem().recordingVisible = newSettings.recordingVisible;
     }
 
+    if (changed.scaleFilter !== void 0) {
+      this.getObsSceneItem().scaleFilter = newSettings.scaleFilter;
+    }
+
     this.UPDATE({ sceneItemId: this.sceneItemId, ...changed });
 
     this.scenesService.itemUpdated.next(this.getModel());
@@ -256,6 +265,7 @@ export class SceneItem extends SceneItemNode {
       locked: !!customSceneItem.locked,
       streamVisible: !!customSceneItem.streamVisible,
       recordingVisible: !!customSceneItem.recordingVisible,
+      scaleFilter: customSceneItem.scaleFilter,
     });
   }
 
@@ -373,6 +383,10 @@ export class SceneItem extends SceneItemNode {
     return this.getScene()
       .getItems()
       .findIndex(sceneItemModel => sceneItemModel.id === this.id);
+  }
+
+  setScaleFilter(scaleFilter: obs.EScaleType): void {
+    this.setSettings({ scaleFilter });
   }
 
   /**

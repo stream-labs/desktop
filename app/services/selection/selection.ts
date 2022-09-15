@@ -11,6 +11,7 @@ import {
   ISceneItemSettings,
   ISceneItemNode,
   IPartialTransform,
+  EScaleType
 } from 'services/scenes';
 import { Source } from 'services/sources';
 import { Rect } from 'util/rect';
@@ -156,6 +157,12 @@ export class Selection {
   isSceneFolder(): boolean {
     const rootNodes = this.getRootNodes();
     return rootNodes.length === 1 && rootNodes[0].sceneNodeType === 'folder';
+  }
+
+  isScaleFilterSelected(filter: EScaleType): boolean {
+    const items = this.getItems().filter(item => item.scaleFilter === filter);
+    console.log(items)
+    return items.length > 0;
   }
 
   getVisualItems(): SceneItem[] {
@@ -432,6 +439,10 @@ export class Selection {
 
   resetTransform() {
     this.getItems().forEach(item => item.resetTransform());
+  }
+
+  setScaleFilter(filter: EScaleType) {
+    this.getItems().forEach(item => item.setScaleFilter(filter));
   }
 
   /**

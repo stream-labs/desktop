@@ -19,6 +19,7 @@ import * as remote from '@electron/remote';
 import { ProjectorMenu } from './ProjectorMenu';
 import { FiltersMenu } from './FiltersMenu';
 import { AudioService } from 'services/audio';
+import { ScaleFilteringMenu } from './ScaleFilteringMenu';
 
 interface IEditMenuOptions {
   selectedSourceId?: string;
@@ -107,6 +108,15 @@ export class EditMenu extends Menu {
         label: 'Group',
         submenu: this.groupSubmenu().menu,
       });
+
+      this.append({ type: 'separator' });
+
+      this.append({
+        label: $t('Scale Filtering'),
+        submenu: this.scaleFilteringSubmenu().menu,
+      });
+
+      this.append({ type: 'separator' });
 
       if (selectedItem && isItem(selectedItem)) {
         const visibilityLabel = selectedItem.visible ? $t('Hide') : $t('Show');
@@ -354,5 +364,9 @@ export class EditMenu extends Menu {
 
   private projectorSubmenu() {
     return new ProjectorMenu();
+  }
+
+  private scaleFilteringSubmenu() {
+    return new ScaleFilteringMenu();
   }
 }

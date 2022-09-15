@@ -1,5 +1,5 @@
 import { Node } from './node';
-import { ISceneItemFolder, Scene, ScenesService, TSceneNodeType } from '../../scenes';
+import { EScaleType, ISceneItemFolder, Scene, ScenesService, TSceneNodeType } from '../../scenes';
 import { HotkeysNode } from './hotkeys';
 import { SourcesService } from '../../sources';
 import { Inject } from '../../core/injector';
@@ -21,6 +21,7 @@ export interface ISceneItemInfo extends ISceneNodeInfo {
   rotation?: number;
   streamVisible?: boolean;
   recordingVisible?: boolean;
+  scaleFilter?: EScaleType;
   sceneNodeType: 'item';
 }
 
@@ -76,6 +77,7 @@ export class SceneItemsNode extends Node<ISchema, {}> {
               rotation: transform.rotation,
               streamVisible: sceneItem.streamVisible,
               recordingVisible: sceneItem.recordingVisible,
+              scaleFilter: sceneItem.scaleFilter,
               sceneNodeType: 'item',
             });
           });

@@ -1,6 +1,6 @@
 import { InjectFromExternalApi, Fallback } from 'services/api/external-api';
 import { ServiceHelper } from 'services/core';
-import { ISceneItemActions, ISceneItemSettings, IPartialTransform } from 'services/scenes';
+import { ISceneItemActions, ISceneItemSettings, IPartialTransform, EScaleType } from 'services/scenes';
 import {
   Selection as InternalSelection,
   SelectionService as InternalSelectionService,
@@ -402,5 +402,9 @@ export class Selection implements ISceneItemActions, ISerializable {
    */
   isSceneItem(): boolean {
     return this.selection.isSceneFolder();
+  }
+
+  setScaleFilter(filter: EScaleType): void {
+    return this.selection.setScaleFilter(filter);
   }
 }
