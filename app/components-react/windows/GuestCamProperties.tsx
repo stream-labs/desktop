@@ -16,8 +16,14 @@ import { SourcesService, TSourceType } from 'services/sources';
 import { byOS, OS } from 'util/operating-systems';
 import { IGuest, GuestCamService } from 'services/guest-cam';
 import { inject, injectState, useModule } from 'slap';
-import { AudioService, EditorCommandsService, UserService } from 'app-services';
+import {
+  AudioService,
+  EditorCommandsService,
+  IncrementalRolloutService,
+  UserService,
+} from 'app-services';
 import { confirmAsync } from 'components-react/modals';
+import { EAvailableFeatures } from 'services/incremental-rollout';
 
 class GuestCamModule {
   private GuestCamService = inject(GuestCamService);
@@ -26,6 +32,7 @@ class GuestCamModule {
   private EditorCommandsService = inject(EditorCommandsService);
   private DismissablesService = inject(DismissablesService);
   private UserService = inject(UserService);
+  private IncrementalRolloutService = inject(IncrementalRolloutService);
 
   state = injectState({
     regeneratingLink: false,
@@ -45,7 +52,11 @@ class GuestCamModule {
   }
 
   get shouldShowPrimeUpgrade() {
-    return this.maxGuests === 2 && !this.UserService.views.isPrime;
+    return (
+      this.maxGuests === 2 &&
+      !this.UserService.views.isPrime &&
+      !this.IncrementalRolloutService.views.featureIsEnabled(EAvailableFeatures.guestCamBeta)
+    );
   }
 
   get showFirstTimeModal() {
@@ -94,12 +105,15 @@ class GuestCamModule {
   }
 
   get screenshareProducerSourceOptions() {
-    return this.SourcesService.views.sources
-      .filter(s => s.video)
-      .map(s => ({
-        label: s.name,
-        value: s.sourceId,
-      }));
+    return [
+      { label: $t('None'), value: '' },
+      ...this.SourcesService.views.sources
+        .filter(s => s.video)
+        .map(s => ({
+          label: s.name,
+          value: s.sourceId,
+        })),
+    ];
   }
 
   get videoProducerSource() {
@@ -375,25 +389,39 @@ export default function GuestCamProperties() {
                 options={videoProducerSourceOptions}
                 value={videoProducerSourceId}
                 onChange={s => GuestCamService.actions.setVideoSource(s)}
-                style={{ width: '45%', margin: 0 }}
+                style={{ width: '48%', margin: 0 }}
               />
               <ListInput
                 label={$t('Microphone Source')}
                 options={audioProducerSourceOptions}
                 value={audioProducerSourceId}
                 onChange={s => GuestCamService.actions.setAudioSource(s)}
-                style={{ width: '45%', margin: 0 }}
+                style={{ width: '48%', margin: 0 }}
               />
             </div>
-            <div>
+            <div
+              style={{
+                display: 'flex',
+                width: '100%',
+                margin: '10px 0',
+              }}
+            >
               <ListInput
                 label={$t('Share Video Source (Optional)')}
                 options={screenshareProducerSourceOptions}
                 value={screenshareProducerSourceId}
                 onChange={s => GuestCamService.actions.setScreenshareSource(s)}
-                style={{ width: 500, margin: 0 }}
-                allowClear
+                style={{ width: '48%', margin: 0 }}
               />
+              {screenshareProducerSourceId && (
+                <button
+                  className="button button--soft-warning"
+                  onClick={() => GuestCamService.actions.setScreenshareSource('')}
+                  style={{ marginLeft: 30 }}
+                >
+                  {$t('Stop Sharing')}
+                </button>
+              )}
             </div>
           </Form>
           {(!videoProducerSource || !audioProducerSource) && (

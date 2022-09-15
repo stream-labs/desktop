@@ -288,7 +288,7 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
     guests: [],
     joinAsGuestHash: null,
     hostName: null,
-    maxGuests: 0,
+    maxGuests: 2,
   };
 
   get views() {
