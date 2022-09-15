@@ -425,7 +425,7 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
 
   async startListeningForGuests() {
     await this.socketMutex.do(async () => {
-      if (!this.state.produceOk) return;
+      if (!this.state.produceOk && !this.state.joinAsGuestHash) return;
 
       if (this.socket) return;
 
