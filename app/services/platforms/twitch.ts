@@ -272,10 +272,12 @@ export class TwitchService
       this.getHasUpdateTagsPermission(),
     ]);
 
-    let tags: TTwitchTag[] = [];
-    if (hasUpdateTagsPermission) {
+    let tags: TTwitchTag[] = this.state.settings.tags ?? [];
+
+    if (hasUpdateTagsPermission && this.state.availableTags.length === 0) {
       [tags] = await Promise.all([this.getStreamTags(), this.getAllTags()]);
     }
+
     this.SET_PREPOPULATED(true);
     this.SET_STREAM_SETTINGS({ tags, title: channelInfo.title, game: channelInfo.game });
   }
@@ -400,7 +402,7 @@ export class TwitchService
   }
 
   hasScope(scope: TTwitchOAuthScope): Promise<boolean> {
-    // eslint-disable-next-line prettier/prettier
+    // prettier-ignore
     return platformAuthorizedRequest('twitch', 'https://id.twitch.tv/oauth2/validate').then(
       (response: ITwitchOAuthValidateResponse) => response.scopes.includes(scope),
     );
