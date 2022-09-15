@@ -347,6 +347,8 @@ export class NVoiceSynthesizer implements ISpeechSynthesizer {
       this._cancel = undefined;
       onend();
       this._playPromise = undefined;
+    }, error => {
+      console.error(`NVoiceSynthesizer: text:${JSON.stringify(speech.text)} -> ${error}`);
     });
   }
 
