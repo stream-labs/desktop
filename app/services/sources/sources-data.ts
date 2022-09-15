@@ -264,6 +264,6 @@ export const SourceDisplayData = (): { [key: string]: ISourceDisplayData } => ({
   mediasoupconnector: {
     name: $t('Collab Cam'),
     description: $t('Invite a guest to join your stream from a web browser.'),
-    icon: 'fas fa-user',
+    icon: 'icon-team-2',
   },
 });
