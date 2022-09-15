@@ -25,6 +25,8 @@ import { byOS, getOS, OS } from 'util/operating-systems';
 import { UsageStatisticsService } from 'services/usage-statistics';
 import { SceneCollectionsService } from 'services/scene-collections';
 import * as remote from '@electron/remote';
+import fs from 'fs';
+import path from 'path';
 
 export interface ISettingsValues {
   General: {
@@ -187,6 +189,15 @@ export class SettingsService extends StatefulService<ISettingsServiceState> {
     this.loadSettingsIntoStore();
     this.ensureValidEncoder();
     this.sceneCollectionsService.collectionSwitched.subscribe(() => this.refreshAudioSettings());
+
+    // TODO: Remove in a week
+    try {
+      if (fs.existsSync(path.join(this.appService.appDataDirectory, 'HADisable'))) {
+        this.usageStatisticsService.recordFeatureUsage('HardwareAccelDisabled');
+      }
+    } catch (e: unknown) {
+      console.error('Error fetching hardware acceleration state', e);
+    }
   }
 
   private fetchSettingsFromObs(categoryName: string): ISettingsCategory {

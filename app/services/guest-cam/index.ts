@@ -288,7 +288,7 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
     guests: [],
     joinAsGuestHash: null,
     hostName: null,
-    maxGuests: 0,
+    maxGuests: 2,
   };
 
   get views() {
@@ -326,16 +326,6 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
 
   init() {
     super.init();
-
-    if (this.views.sourceId) {
-      this.startListeningForGuests();
-    }
-
-    this.sourcesService.sourceAdded.subscribe(s => {
-      if (s.type === 'mediasoupconnector') {
-        this.startListeningForGuests();
-      }
-    });
 
     this.sourcesService.sourceRemoved.subscribe(s => {
       if (s.type === 'mediasoupconnector') {
@@ -435,7 +425,8 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
 
   async startListeningForGuests() {
     await this.socketMutex.do(async () => {
-      // TODO: Handle socket disconnects
+      if (!this.state.produceOk) return;
+
       if (this.socket) return;
 
       if (!this.userService.views.isLoggedIn) return;
@@ -505,6 +496,8 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
 
   setProduceOk() {
     this.SET_PRODUCE_OK(true);
+
+    this.startListeningForGuests();
 
     // If a guest is already connected and we are not yet producing, start doing so now.
     // If we are joined as a guest, we should also start producing first.
