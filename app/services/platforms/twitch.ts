@@ -274,7 +274,7 @@ export class TwitchService
 
     let tags: TTwitchTag[] = this.state.settings.tags;
 
-    if (hasUpdateTagsPermission && tags.length === 0) {
+    if (hasUpdateTagsPermission && this.state.availableTags.length === 0) {
       [tags] = await Promise.all([this.getStreamTags(), this.getAllTags()]);
     }
 
