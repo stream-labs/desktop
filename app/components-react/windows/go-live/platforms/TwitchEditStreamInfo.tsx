@@ -40,7 +40,7 @@ export function TwitchEditStreamInfo(p: IPlatformComponentParams<'twitch'>) {
         <Col span={16} style={{ whiteSpace: 'normal', fontSize: '12px' }}>
           <Message type="info">
             {$t(
-              "Warning! Editing tags in Streamlabs will overwrite tags in Twitch. To use Twitch's new custom tags, you must edit your tags in the Twitch dashboard directly until until Twitch provides third parties access to editing the new custom tags.",
+              "Warning! Editing tags in Streamlabs will overwrite tags in Twitch. To use Twitch's new custom tags, you must edit your tags in the Twitch dashboard directly until Twitch provides third parties access to editing the new custom tags.",
             )}
           </Message>
         </Col>
