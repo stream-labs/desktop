@@ -8,7 +8,7 @@ import Display from 'components-react/shared/Display';
 import { CheckboxInput, ListInput, SliderInput, TextInput } from 'components-react/shared/inputs';
 import Form from 'components-react/shared/inputs/Form';
 import { ModalLayout } from 'components-react/shared/ModalLayout';
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { DismissablesService, EDismissable } from 'services/dismissables';
 import { EDeviceType } from 'services/hardware';
 import { $t } from 'services/i18n';
@@ -59,6 +59,10 @@ class GuestCamModule {
     return this.GuestCamService.views.audioSourceId;
   }
 
+  get screenshareProducerSourceId() {
+    return this.GuestCamService.views.screenshareSourceId;
+  }
+
   get videoProducerSourceOptions() {
     const videoSourceType = byOS({ [OS.Windows]: 'dshow_input', [OS.Mac]: 'av_capture_input' });
 
@@ -80,12 +84,25 @@ class GuestCamModule {
     }));
   }
 
+  get screenshareProducerSourceOptions() {
+    return this.SourcesService.views.sources
+      .filter(s => s.video)
+      .map(s => ({
+        label: s.name,
+        value: s.sourceId,
+      }));
+  }
+
   get videoProducerSource() {
     return this.GuestCamService.views.videoSource;
   }
 
   get audioProducerSource() {
     return this.GuestCamService.views.audioSource;
+  }
+
+  get screenshareProducerSource() {
+    return this.GuestCamService.views.screenshareSource;
   }
 
   get availableSources() {
@@ -112,6 +129,10 @@ class GuestCamModule {
     // comparison, this won't be reactive unless it's a new array every time.
     // This seems fairly unexpected.
     return [...this.GuestCamService.state.guests];
+  }
+
+  get sourceExists() {
+    return !!this.GuestCamService.views.sourceId;
   }
 
   /**
@@ -145,6 +166,10 @@ class GuestCamModule {
 
     const sourceId = source.sourceId;
 
+    const markAsRead = () => {
+      this.GuestCamService.actions.markGuestAsRead(streamId);
+    };
+
     return {
       volume,
       setVolume,
@@ -152,6 +177,7 @@ class GuestCamModule {
       setVisible,
       disconnect,
       sourceId,
+      markAsRead,
     };
   }
 
@@ -207,6 +233,9 @@ export default function GuestCamProperties() {
     audioProducerSource,
     audioProducerSourceId,
     audioProducerSourceOptions,
+    screenshareProducerSourceId,
+    screenshareProducerSourceOptions,
+    sourceExists,
     produceOk,
     regeneratingLink,
     regenerateLink,
@@ -301,6 +330,16 @@ export default function GuestCamProperties() {
                 style={{ width: '45%', margin: 0 }}
               />
             </div>
+            <div>
+              <ListInput
+                label={$t('Share Video Source (Optional)')}
+                options={screenshareProducerSourceOptions}
+                value={screenshareProducerSourceId}
+                onChange={s => GuestCamService.actions.setScreenshareSource(s)}
+                style={{ width: 500, margin: 0 }}
+                allowClear
+              />
+            </div>
           </Form>
           {(!videoProducerSource || !audioProducerSource) && (
             <Alert
@@ -337,19 +376,34 @@ export default function GuestCamProperties() {
           );
         })}
       </Tabs>
-      <Modal
-        visible={!produceOk}
-        getContainer={false}
-        closable={false}
-        okText={$t('Start Collab Cam')}
-        onOk={() => {
-          GuestCamService.actions.setProduceOk();
-          DismissablesService.actions.dismiss(EDismissable.GuestCamFirstTimeModal);
-        }}
-        onCancel={() => WindowsService.actions.closeChildWindow()}
-      >
-        {getModalContent()}
-      </Modal>
+      {sourceExists ? (
+        <Modal
+          visible={!produceOk}
+          getContainer={false}
+          closable={false}
+          okText={$t('Start Collab Cam')}
+          onOk={() => {
+            GuestCamService.actions.setProduceOk();
+            DismissablesService.actions.dismiss(EDismissable.GuestCamFirstTimeModal);
+          }}
+          onCancel={() => WindowsService.actions.closeChildWindow()}
+        >
+          {getModalContent()}
+        </Modal>
+      ) : (
+        <Modal
+          visible={true}
+          getContainer={false}
+          closable={false}
+          okText={$t('Add New Source')}
+          onOk={() => {
+            SourcesService.actions.showAddSource('mediasoupconnector');
+          }}
+          onCancel={() => WindowsService.actions.closeChildWindow()}
+        >
+          {MissingSourceModalContent()}
+        </Modal>
+      )}
     </ModalLayout>
   );
 }
@@ -439,6 +493,10 @@ function GuestPane(p: { guest: IGuest }) {
   // TODO: Talk to Alex about how the useModule pattern thinks this should
   // be handled with reactivity. For now, wrap in useVuex to make it reactive.
   const bindings = useVuex(() => getBindingsForGuest(p.guest.remoteProducer.streamId));
+
+  useEffect(() => {
+    if (bindings) bindings.markAsRead();
+  }, []);
 
   if (!bindings) {
     return (
@@ -615,6 +673,19 @@ function JoinAsGuestModalContent() {
         {$t(
           "%{name} has invited you to join their stream. When you're ready to join, click the button below.",
           { name: hostName },
+        )}
+      </p>
+    </>
+  );
+}
+
+function MissingSourceModalContent() {
+  return (
+    <>
+      <h2>{$t('Collab Cam requires a source')}</h2>
+      <p>
+        {$t(
+          'At least one Collab Cam source is required to connect to this stream. Would you like to add one now?',
         )}
       </p>
     </>

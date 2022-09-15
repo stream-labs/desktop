@@ -34,7 +34,9 @@ export abstract class MediasoupEntity {
       throw new Error('Attempted to make OBS request from destroyed entity');
     }
 
-    return this.guestCamService.makeObsRequest(this.sourceId, func, arg);
+    const ret = this.guestCamService.makeObsRequest(this.sourceId, func, arg);
+    this.log('OBS REQUEST', func, arg, ret);
+    return ret;
   }
 
   log(...args: unknown[]) {

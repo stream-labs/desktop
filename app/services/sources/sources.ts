@@ -809,12 +809,11 @@ export class SourcesService extends StatefulService<ISourcesState> {
     });
   }
 
-  showGuestCamProperties(source: Source) {
-    const propertiesName = SourceDisplayData()[source.type].name;
+  showGuestCamProperties(source?: Source) {
     this.windowsService.showWindow({
       componentName: 'GuestCamProperties',
-      title: $t('Collab Cam Properties', { sourceName: propertiesName }),
-      queryParams: { sourceId: source.sourceId },
+      title: $t('Collab Cam Properties', { sourceName: $t('Collab Cam') }),
+      queryParams: { sourceId: source?.sourceId },
       size: {
         width: 850,
         height: 660,
