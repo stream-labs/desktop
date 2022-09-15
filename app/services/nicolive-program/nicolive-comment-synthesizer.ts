@@ -96,13 +96,13 @@ export class NicoliveCommentSynthesizerService extends StatefulService<ICommentS
 
   private dictionary = new ParaphraseDictionary();
 
-  makeSpeechText(chat: WrappedChat): string {
+  makeSpeechText(chat: WrappedChat, engine: 'webSpeech' | 'nVoice'): string {
     if (!chat.value || !chat.value.content) {
       return '';
     }
     const text = getDisplayText(AddComponent(chat));
 
-    const converted = this.dictionary.process(text);
+    const converted = this.dictionary.process(text, engine);
 
     return converted;
   }
@@ -118,14 +118,16 @@ export class NicoliveCommentSynthesizerService extends StatefulService<ICommentS
     }
   }
 
-  makeSpeech(chat: WrappedChat): Speech | null {
-    const r = this.makeSpeechText(chat);
+  makeSpeech(chat: WrappedChat, synthId?: SynthesizerId): Speech | null {
+    const synthesizer = synthId || this.selectSpeechSynthesizer(chat);
+
+    const r = this.makeSpeechText(chat, synthesizer);
     if (r === '') {
       return null;
     }
     return {
       pitch: this.state.pitch,
-      synthesizer: this.selectSpeechSynthesizer(chat),
+      synthesizer,
       volume: this.state.volume,
       webSpeech: {
         rate: this.state.rate,
@@ -137,14 +139,14 @@ export class NicoliveCommentSynthesizerService extends StatefulService<ICommentS
     };
   }
 
-  makeSimpleTextSpeech(text: string): Speech | null {
+  makeSimpleTextSpeech(text: string, synthId?: SynthesizerId): Speech | null {
     return this.makeSpeech({
       type: 'normal',
       value: {
         content: text,
       },
       seqId: 1,
-    });
+    }, synthId);
   }
 
   async speakText(

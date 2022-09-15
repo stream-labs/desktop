@@ -65,6 +65,7 @@ test('makeSpeech', async () => {
     seqId: 1,
   });
 
+  const synthId = 'nVoice';
   // 空文字列を与えるとnullが返ってくる
   expect(instance.makeSpeech(makeChat(''))).toBeNull();
 

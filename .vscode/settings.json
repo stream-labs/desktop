@@ -78,5 +78,62 @@
     "yomiage"
   ],
   "files.eol": "\n",
-  "typescript.format.enable": true
+  "typescript.format.enable": true,
+  "json.schemas": [
+    {
+      "fileMatch": [
+        "**/replace_rules.json",
+      ],
+      "schema": {
+        "type": "object",
+        "properties": {
+          "elements": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "note": {
+                  "type": "string"
+                },
+                "onlyFor": {
+                  "enum": [
+                    "webSpeech",
+                    "nVoice"
+                  ],
+                },
+                "replacement": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "replacement"
+              ],
+              "oneOf": [
+                {
+                  "properties": {
+                    "regularExpression": {
+                      "type": "string"
+                    },
+                  },
+                  "required": [
+                    "regularExpression"
+                  ]
+                },
+                {
+                  "properties": {
+                    "text": {
+                      "type": "string"
+                    },
+                  },
+                  "required": [
+                    "text"
+                  ]
+                },
+              ],
+            },
+          }
+        }
+      },
+    }
+  ]
 }
