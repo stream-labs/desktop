@@ -3,7 +3,7 @@ import { IObsListOption, TObsFormData } from 'components/obs/inputs/ObsInput';
 import { WidgetType } from 'services/widgets';
 import { Observable } from 'rxjs';
 import { IAudioSource } from 'services/audio';
-import { EDeinterlaceMode } from 'obs-studio-node';
+import { EDeinterlaceFieldOrder, EDeinterlaceMode } from 'obs-studio-node';
 
 export interface ISource {
   sourceId: string;
@@ -36,6 +36,7 @@ export interface ISource {
    */
   forceMuted: boolean;
   deinterlaceMode?: EDeinterlaceMode;
+  deinterlaceFieldOrder?: EDeinterlaceFieldOrder;
 }
 
 /**
@@ -103,6 +104,7 @@ export interface ISourceAddOptions<TPropertiesManagerSettings = Dictionary<any>>
   isTemporary?: boolean;
   guestCamStreamId?: string; // Automatically assign a guest to this source after creation
   deinterlaceMode?: EDeinterlaceMode;
+  deinterlaceFieldOrder?: EDeinterlaceFieldOrder;
 }
 
 export type TSourceType =

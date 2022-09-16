@@ -290,6 +290,13 @@ export class Source implements ISourceApi {
     this.getObsInput().deinterlaceMode = mode;
   }
 
+  @ExecuteInWorkerProcess()
+  setDeinterlaceFieldOrder(order: obs.EDeinterlaceFieldOrder) {
+    this.SET_DEINTERLACE_FIELD_ORDER(order);
+
+    this.getObsInput().deinterlaceFieldOrder = order;
+  }
+
   /**
    * Used for browser source interaction
    * @param pos the cursor position in source space
@@ -390,5 +397,10 @@ export class Source implements ISourceApi {
   @mutation()
   private SET_DEINTERLACE_MODE(val: obs.EDeinterlaceMode) {
     this.state.deinterlaceMode = val;
+  }
+
+  @mutation()
+  private SET_DEINTERLACE_FIELD_ORDER(val: obs.EDeinterlaceFieldOrder) {
+    this.state.deinterlaceFieldOrder = val;
   }
 }

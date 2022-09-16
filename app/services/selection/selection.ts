@@ -15,7 +15,7 @@ import {
   EBlendingMode,
   EBlendingMethod
 } from 'services/scenes';
-import { EDeinterlaceMode, Source } from 'services/sources';
+import { EDeinterlaceFieldOrder, EDeinterlaceMode, Source } from 'services/sources';
 import { Rect } from 'util/rect';
 import { AnchorPoint, AnchorPositions, CenteringAxis } from 'util/ScalableRectangle';
 import { ISelectionState, TNodesList } from './index';
@@ -178,6 +178,11 @@ export class Selection {
 
   isDeinterlacingModeSelected(mode: EDeinterlaceMode): boolean {
     const items = this.getItems().filter(item => item.source.deinterlaceMode === mode);
+    return items.length > 0;
+  }
+
+  isDeinterlacingFieldOrderSelected(order: EDeinterlaceFieldOrder): boolean {
+    const items = this.getItems().filter(item => item.source.deinterlaceFieldOrder === order);
     return items.length > 0;
   }
 
@@ -471,6 +476,10 @@ export class Selection {
 
   setDeinterlaceMode(mode: EDeinterlaceMode) {
     this.getItems().forEach(item => item.source.setDeinterlaceMode(mode));
+  }
+
+  setDeinterlaceFieldOrder(order: EDeinterlaceFieldOrder) {
+    this.getItems().forEach(item => item.source.setDeinterlaceFieldOrder(order));
   }
 
   /**

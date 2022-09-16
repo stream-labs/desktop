@@ -47,8 +47,8 @@ export interface ISourceInfo {
   monitoringType?: obs.EMonitoringType;
   mixerHidden?: boolean;
 
-  deinterlaceFieldOrder?: EDeinterlaceFieldOrder;
   deinterlaceMode?: EDeinterlaceMode;
+  deinterlaceFieldOrder?: EDeinterlaceFieldOrder;
 
   filters: {
     items: IFilterInfo[];
@@ -231,6 +231,7 @@ export class SourcesNode extends Node<ISchema, {}> {
         volume: source.volume,
         syncOffset: source.syncOffset,
         deinterlaceMode: source.deinterlaceMode,
+        deinterlaceFieldOrder: source.deinterlaceFieldOrder,
         filters: source.filters.items
           .filter(filter => {
             if (filter.type === 'face_mask_filter') {
@@ -291,7 +292,8 @@ export class SourcesNode extends Node<ISchema, {}> {
         channel: sourceInfo.channel,
         propertiesManager: sourceInfo.propertiesManager,
         propertiesManagerSettings: sourceInfo.propertiesManagerSettings || {},
-        deinterlaceMode: sourceInfo.deinterlaceMode
+        deinterlaceMode: sourceInfo.deinterlaceMode,
+        deinterlaceFieldOrder: sourceInfo.deinterlaceFieldOrder
       });
 
       if (source.audioMixers) {

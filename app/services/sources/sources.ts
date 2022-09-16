@@ -229,6 +229,7 @@ export class SourcesService extends StatefulService<ISourcesState> {
     isTemporary?: boolean;
     propertiesManagerType?: TPropertiesManager;
     deinterlaceMode?: EDeinterlaceMode;
+    deinterlaceFieldOrder?: EDeinterlaceFieldOrder;
   }) {
     const id = addOptions.id;
     const sourceModel: ISource = {
@@ -256,7 +257,8 @@ export class SourcesService extends StatefulService<ISourcesState> {
       forceHidden: false,
       forceMuted: false,
 
-      deinterlaceMode: addOptions.deinterlaceMode
+      deinterlaceMode: addOptions.deinterlaceMode,
+      deinterlaceFieldOrder: addOptions.deinterlaceFieldOrder,
     };
 
     if (addOptions.isTemporary) {
@@ -344,7 +346,8 @@ export class SourcesService extends StatefulService<ISourcesState> {
       channel: options.channel,
       isTemporary: options.isTemporary,
       propertiesManagerType: managerType,
-      deinterlaceMode: options.deinterlaceMode
+      deinterlaceMode: options.deinterlaceMode,
+      deinterlaceFieldOrder: options.deinterlaceFieldOrder
     });
     const source = this.views.getSource(id)!;
     const muted = obsInput.muted;

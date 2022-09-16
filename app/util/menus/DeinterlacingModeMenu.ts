@@ -3,7 +3,7 @@ import { Inject } from 'services/core/injector';
 import { $t } from 'services/i18n';
 import { SelectionService } from 'services/selection';
 import { EditorCommandsService } from 'services/editor-commands';
-import { EDeinterlaceMode } from 'services/sources';
+import { EDeinterlaceMode, EDeinterlaceFieldOrder } from 'services/sources';
 
 export class DeinterlacingModeMenu extends Menu {
     @Inject() private selectionService: SelectionService;
@@ -115,5 +115,28 @@ export class DeinterlacingModeMenu extends Menu {
           checked: this.selectionService.views.globalSelection.isDeinterlacingModeSelected(EDeinterlaceMode.Yadif2X),
           type: 'checkbox'
           });
+      this.append({ type: 'separator' });
+      this.append({
+        label: $t('Top Field First'),
+        click: () =>
+            this.editorCommandsService.executeCommand(
+            'SetDeinterlacingFieldOrderCommand',
+            this.selectionService.views.globalSelection,
+            EDeinterlaceFieldOrder.Top,
+            ),
+        checked: this.selectionService.views.globalSelection.isDeinterlacingFieldOrderSelected(EDeinterlaceFieldOrder.Top),
+        type: 'checkbox'
+        });
+      this.append({
+        label: $t('Bottom Field First'),
+        click: () =>
+            this.editorCommandsService.executeCommand(
+            'SetDeinterlacingFieldOrderCommand',
+            this.selectionService.views.globalSelection,
+            EDeinterlaceFieldOrder.Bottom,
+            ),
+        checked: this.selectionService.views.globalSelection.isDeinterlacingFieldOrderSelected(EDeinterlaceFieldOrder.Bottom),
+        type: 'checkbox'
+        });
     }
   }
