@@ -470,7 +470,7 @@ export class Selection {
   }
 
   setDeinterlaceMode(mode: EDeinterlaceMode) {
-    this.getItems().forEach(item => item.getSource().setDeinterlaceMode(mode));
+    this.getItems().forEach(item => item.source.setDeinterlaceMode(mode));
   }
 
   /**
