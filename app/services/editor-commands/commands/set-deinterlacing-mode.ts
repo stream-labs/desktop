@@ -12,7 +12,7 @@ export class SetDeinterlacingModeCommand extends Command {
     this.selection.freeze();
 
     this.selection.getItems().forEach(item => (
-      this.initialValues[item.id] = item.getSource().deinterlaceMode));
+      this.initialValues[item.id] = item.source.deinterlaceMode));
   }
 
   get description() {
@@ -69,6 +69,6 @@ export class SetDeinterlacingModeCommand extends Command {
 
   rollback() {
     this.selection.getItems().forEach(item =>
-      item.getSource().setDeinterlaceMode(this.initialValues[item.id]));
+      item.source.setDeinterlaceMode(this.initialValues[item.id]));
   }
 }
