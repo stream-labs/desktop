@@ -11,7 +11,8 @@ import {
   ISceneItemSettings,
   ISceneItemNode,
   IPartialTransform,
-  EScaleType
+  EScaleType,
+  EBlendingMode
 } from 'services/scenes';
 import { Source } from 'services/sources';
 import { Rect } from 'util/rect';
@@ -161,7 +162,11 @@ export class Selection {
 
   isScaleFilterSelected(filter: EScaleType): boolean {
     const items = this.getItems().filter(item => item.scaleFilter === filter);
-    console.log(items)
+    return items.length > 0;
+  }
+
+  isBlendingModeSelected(mode: EBlendingMode): boolean {
+    const items = this.getItems().filter(item => item.blendingMode === mode);
     return items.length > 0;
   }
 
@@ -443,6 +448,10 @@ export class Selection {
 
   setScaleFilter(filter: EScaleType) {
     this.getItems().forEach(item => item.setScaleFilter(filter));
+  }
+
+  setBlendingMode(mode: EBlendingMode) {
+    this.getItems().forEach(item => item.setBlendingMode(mode));
   }
 
   /**

@@ -20,6 +20,7 @@ import { ProjectorMenu } from './ProjectorMenu';
 import { FiltersMenu } from './FiltersMenu';
 import { AudioService } from 'services/audio';
 import { ScaleFilteringMenu } from './ScaleFilteringMenu';
+import { BlendingModeMenu } from './BlendingModeMenu';
 
 interface IEditMenuOptions {
   selectedSourceId?: string;
@@ -114,6 +115,11 @@ export class EditMenu extends Menu {
       this.append({
         label: $t('Scale Filtering'),
         submenu: this.scaleFilteringSubmenu().menu,
+      });
+
+      this.append({
+        label: $t('Blending Mode'),
+        submenu: this.blendingModeSubmenu().menu,
       });
 
       this.append({ type: 'separator' });
@@ -368,5 +374,9 @@ export class EditMenu extends Menu {
 
   private scaleFilteringSubmenu() {
     return new ScaleFilteringMenu();
+  }
+
+  private blendingModeSubmenu() {
+    return new BlendingModeMenu();
   }
 }

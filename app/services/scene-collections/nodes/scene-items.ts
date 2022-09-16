@@ -1,5 +1,5 @@
 import { Node } from './node';
-import { EScaleType, ISceneItemFolder, Scene, ScenesService, TSceneNodeType } from '../../scenes';
+import { EBlendingMode, EScaleType, ISceneItemFolder, Scene, ScenesService, TSceneNodeType } from '../../scenes';
 import { HotkeysNode } from './hotkeys';
 import { SourcesService } from '../../sources';
 import { Inject } from '../../core/injector';
@@ -22,6 +22,7 @@ export interface ISceneItemInfo extends ISceneNodeInfo {
   streamVisible?: boolean;
   recordingVisible?: boolean;
   scaleFilter?: EScaleType;
+  blendingMode?: EBlendingMode;
   sceneNodeType: 'item';
 }
 
@@ -78,6 +79,7 @@ export class SceneItemsNode extends Node<ISchema, {}> {
               streamVisible: sceneItem.streamVisible,
               recordingVisible: sceneItem.recordingVisible,
               scaleFilter: sceneItem.scaleFilter,
+              blendingMode: sceneItem.blendingMode,
               sceneNodeType: 'item',
             });
           });

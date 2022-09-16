@@ -4,6 +4,7 @@ import {
   ISceneItem as IInternalSceneItemModel,
   ISceneItem,
   EScaleType,
+  EBlendingMode,
 } from 'services/scenes';
 import { InjectFromExternalApi, Fallback } from 'services/api/external-api';
 import { Source, SourcesService } from 'services/api/external-api/sources';
@@ -30,6 +31,8 @@ export interface ISceneItemSettings {
   locked: boolean;
   streamVisible: boolean;
   recordingVisible: boolean;
+  scaleFilter: EScaleType;
+  blendingMode: EBlendingMode;
 }
 
 /**
@@ -161,6 +164,7 @@ export class SceneItem extends SceneNode implements ISceneItemActions, ISceneIte
   streamVisible: boolean;
   recordingVisible: boolean;
   scaleFilter: EScaleType;
+  blendingMode: EBlendingMode;
   resourceId: string;
 
   constructor(public sceneId: string, public nodeId: string, sourceId: string) {
@@ -260,5 +264,7 @@ export function getExternalSceneItemModel(
     locked: internalModel.locked,
     streamVisible: internalModel.streamVisible,
     recordingVisible: internalModel.recordingVisible,
+    scaleFilter: internalModel.scaleFilter,
+    blendingMode: internalModel.blendingMode
   };
 }

@@ -1,7 +1,7 @@
 import { ModifyTransformCommand } from './modify-transform';
 import { Selection } from 'services/selection';
 import { $t } from 'services/i18n';
-import { EScaleType } from 'obs-studio-node';
+import { EScaleType } from 'services/scenes';
 import { Command } from './command';
 
 export class SetScaleFilterCommand extends Command {
