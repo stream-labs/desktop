@@ -4,6 +4,7 @@ import electron from 'electron';
 import { existsSync, readFileSync, unlinkSync } from 'fs';
 import { join } from "path";
 import { StatefulService } from "services/core/stateful-service";
+import { $t } from "services/i18n";
 import { sleep } from 'util/sleep';
 import { getNVoicePath, NVoiceClient } from './NVoiceClient';
 
@@ -46,6 +47,21 @@ interface INVoiceClientState {
   enabled: boolean;
 }
 
+function showError(err: Error): Promise<void> {
+  return new Promise<void>((resolve) => {
+    electron.remote.dialog.showMessageBox(
+      electron.remote.getCurrentWindow(),
+      {
+        type: 'error',
+        message: err.toString(),
+        buttons: [$t('common.close')],
+        noLink: true,
+      },
+      () => resolve(),
+    );
+  });
+}
+
 export class NVoiceClientService extends StatefulService<INVoiceClientState> {
 
   static initialState: INVoiceClientState = {
@@ -55,29 +71,25 @@ export class NVoiceClientService extends StatefulService<INVoiceClientState> {
   private client: NVoiceClient;
 
   init(): void {
-    this.client = new NVoiceClient({ baseDir: getNVoicePath() });
+    this.client = new NVoiceClient({ baseDir: getNVoicePath(), onError: showError });
   }
 
   private index = 0;
   private speaking: Promise<void> | undefined;
 
-  async talk(text: string, options: { speed: number; volume: number; maxTime: number; phonemeCallback?: (phoneme: string) => void }): Promise<{ cancel: () => void; speaking: Promise<void> }> {
+  async talk(text: string, options: { speed: number; volume: number; maxTime: number; phonemeCallback?: (phoneme: string) => void }): Promise<{ cancel: () => void; speaking: Promise<void> } | null> {
     const client = this.client;
     const tempDir = electron.remote.app.getPath('temp');
     const wavFileName = join(tempDir, `n-voice-talk-${this.index}.wav`);
-    const labelFileName = wavFileName + '.txt';
     this.index++;
     // TODO transaction
     await client.set_max_time(options.maxTime); // TODO 変わらないときは省略したい
-    await client.talk(options.speed, text, wavFileName);
-    const buffer = readFileSync(wavFileName);
-    if (existsSync(wavFileName)) {
-      unlinkSync(wavFileName);
+    const { wave, labels } = await client.talk(options.speed, text, wavFileName);
+    if (!wave) {
+      // なにも発音しないときは無視
+      return null;
     }
-    const labels = loadLabelFile(labelFileName);
-    if (existsSync(labelFileName)) {
-      unlinkSync(labelFileName);
-    }
+
     console.log('NVoiceClientService.talk label:\n', labels); // DEBUG
 
     if (this.speaking) {
@@ -85,7 +97,7 @@ export class NVoiceClientService extends StatefulService<INVoiceClientState> {
     }
 
     const startTime = Date.now();
-    const { cancel, done } = await playAudio(buffer, options.volume);
+    const { cancel, done } = await playAudio(wave, options.volume);
     let phonemeCancel = false;
     if (options.phonemeCallback) {
       const phonemeLoop = async () => {
@@ -111,23 +123,3 @@ export class NVoiceClientService extends StatefulService<INVoiceClientState> {
     };
   }
 };
-
-type Label = {
-  start: number;
-  end: number;
-  phoneme: string;
-};
-function loadLabelFile(filename: string): Label[] {
-  const labels = readFileSync(filename, 'utf8');
-  const lines = labels.split('\n').filter(line => line.length > 0);
-  const result: Label[] = [];
-  for (const line of lines) {
-    const [start, end, phoneme] = line.split('\t');
-    result.push({
-      start: parseFloat(start),
-      end: parseFloat(end),
-      phoneme,
-    });
-  }
-  return result;
-}

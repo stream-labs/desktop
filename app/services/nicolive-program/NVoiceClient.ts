@@ -1,9 +1,7 @@
 import { ChildProcess, spawn } from "child_process";
-import electron from "electron";
-import { readdirSync } from "fs";
+import { existsSync, readdirSync, readFileSync, unlinkSync } from "fs";
 import { basename, join } from "path";
 import { createInterface } from "readline";
-import { $t } from "services/i18n";
 
 export function getNVoicePath(): string {
   // import/require構文を使うとビルド時に展開してしまうが、
@@ -190,19 +188,25 @@ const ErrorCodes: { [code: number]: string } = {
   401: 'could not parse text',
 };
 
-function showError(err: Error): Promise<void> {
-  return new Promise<void>((resolve) => {
-    electron.remote.dialog.showMessageBox(
-      electron.remote.getCurrentWindow(),
-      {
-        type: 'error',
-        message: err.toString(),
-        buttons: [$t('common.close')],
-        noLink: true,
-      },
-      () => resolve(),
-    );
-  });
+export type Label = {
+  start: number;
+  end: number;
+  phoneme: string;
+};
+
+function loadLabelFile(filename: string): Label[] {
+  const labels = readFileSync(filename, 'utf8');
+  const lines = labels.split(/\r?\n/).filter(line => line.length > 0);
+  const result: Label[] = [];
+  for (const line of lines) {
+    const [start, end, phoneme] = line.split('\t');
+    result.push({
+      start: parseFloat(start),
+      end: parseFloat(end),
+      phoneme,
+    });
+  }
+  return result;
 }
 
 const supportedProtocolVersion = '1.0.0';
@@ -211,8 +215,15 @@ export class NVoiceClient {
 
   constructor(readonly options: {
     baseDir: string;
+    onError: (err: Error) => void;
   }) {
     console.log(`NVoiceClient: baseDir: ${this.options.baseDir}`);
+  }
+
+  async startNVoice(): Promise<void> {
+    if (this.commandLineClient === undefined) {
+      await this._startNVoice();
+    }
   }
 
   async _startNVoice(): Promise<void> {
@@ -232,7 +243,7 @@ export class NVoiceClient {
       let started = false;
       client.waitExit().then(code => {
         if (!started) {
-          showError(new Error(`n-voice-engine start failed! ${code}`));
+          this.options.onError(new Error(`n-voice-engine start failed! ${code}`));
         }
       });
       this.commandLineClient = client;
@@ -244,7 +255,7 @@ export class NVoiceClient {
       started = true;
     } catch (err) {
       console.error(err);
-      showError(err as Error);
+      this.options.onError(err);
       // throw err;
     }
   }
@@ -275,12 +286,14 @@ export class NVoiceClient {
   }
 
   async _command(command: Command, ...args: string[]): Promise<string[]> {
-    if (this.commandLineClient === undefined) {
-      await this._startNVoice();
-    }
+    await this.startNVoice();
     console.log('send', command, args); // DEBUG
-    await this.commandLineClient.send([command, ...args].join(' '));
-    return this.waitOkNg(this.commandLineClient);
+    try {
+      await this.commandLineClient.send([command, ...args].join(' '));
+      return await this.waitOkNg(this.commandLineClient);
+    } catch (err) {
+      throw new Error(`${err}: ${command} ${args.join(' ')}`);
+    }
   }
 
   async protocol_version(): Promise<string> {
@@ -288,8 +301,24 @@ export class NVoiceClient {
     return r[0];
   }
 
-  async talk(speed: number, text: string, filename: string): Promise<void> {
-    await this._command('talk', speed.toString(), toShiftJisBase64(text), toShiftJisBase64(filename));
+  async talk(speed: number, text: string, filename: string): Promise<{ wave: Buffer | null, labels: Label[] }> {
+    const sjis = toShiftJisBase64(text);
+    if (sjis === '') {
+      // ignore empty text
+      return { wave: null, labels: [] };
+    }
+    await this._command('talk', speed.toString(), sjis, toShiftJisBase64(filename));
+    const wave = existsSync(filename) ? readFileSync(filename) : null;
+    if (wave) {
+      unlinkSync(filename);
+    }
+    const labelFilename = filename + '.txt';
+    let labels: Label[] = [];
+    if (existsSync(labelFilename)) {
+      labels = loadLabelFile(labelFilename);
+      unlinkSync(labelFilename);
+    }
+    return { wave, labels };
   }
 
   async set_max_time(seconds: number): Promise<void> {

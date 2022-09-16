@@ -340,7 +340,12 @@ export class NVoiceSynthesizer implements ISpeechSynthesizer {
       phonemeCallback: (phoneme: string) => {
         console.log(phoneme); // DEBUG
       },
-    }).then(async ({ cancel, speaking }) => {
+    }).then(async (r) => {
+      if (r === null) {
+        // no sound
+        return;
+      }
+      const { cancel, speaking } = r;
       this._cancel = cancel;
       onstart();
       await speaking;
