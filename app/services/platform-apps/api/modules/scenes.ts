@@ -6,7 +6,13 @@ import {
   Module,
   NotImplementedError,
 } from './module';
-import { EBlendingMode, EScaleType, Scene, ScenesService, TSceneNode } from 'services/scenes';
+import {
+  EBlendingMode,
+  EScaleType,
+  Scene,
+  ScenesService,
+  TSceneNode,
+  EBlendingMethod } from 'services/scenes';
 import { Inject } from 'services/core/injector';
 import { Subject } from 'rxjs';
 
@@ -37,6 +43,7 @@ interface ISceneItem extends INode {
   recordingVisible: boolean;
   scaleFiler: EScaleType;
   blendingMode: EBlendingMode;
+  blendingMethod: EBlendingMethod;
 }
 
 interface ISceneItemFolder extends INode {

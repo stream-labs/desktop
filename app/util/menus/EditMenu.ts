@@ -21,6 +21,7 @@ import { FiltersMenu } from './FiltersMenu';
 import { AudioService } from 'services/audio';
 import { ScaleFilteringMenu } from './ScaleFilteringMenu';
 import { BlendingModeMenu } from './BlendingModeMenu';
+import { BlendingMethodMenu } from './BlendingMethodMenu';
 
 interface IEditMenuOptions {
   selectedSourceId?: string;
@@ -120,6 +121,11 @@ export class EditMenu extends Menu {
       this.append({
         label: $t('Blending Mode'),
         submenu: this.blendingModeSubmenu().menu,
+      });
+
+      this.append({
+        label: $t('Blending Method'),
+        submenu: this.blendingMethodSubmenu().menu,
       });
 
       this.append({ type: 'separator' });
@@ -378,5 +384,9 @@ export class EditMenu extends Menu {
 
   private blendingModeSubmenu() {
     return new BlendingModeMenu();
+  }
+
+  private blendingMethodSubmenu() {
+    return new BlendingMethodMenu();
   }
 }

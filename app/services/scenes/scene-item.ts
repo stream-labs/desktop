@@ -34,7 +34,7 @@ import { assertIsDefined } from '../../util/properties-type-guards';
  * how it fits in to the given scene
  */
 
-export { EScaleType, EBlendingMode } from '../../../obs-api';
+export { EScaleType, EBlendingMode, EBlendingMethod } from '../../../obs-api';
 
 @ServiceHelper('ScenesService')
 export class SceneItem extends SceneItemNode {
@@ -59,6 +59,7 @@ export class SceneItem extends SceneItemNode {
   recordingVisible: boolean;
   scaleFilter: obs.EScaleType;
   blendingMode: obs.EBlendingMode;
+  blendingMethod: obs.EBlendingMethod;
 
   sceneNodeType: TSceneNodeType = 'item';
 
@@ -133,6 +134,7 @@ export class SceneItem extends SceneItemNode {
       recordingVisible: this.recordingVisible,
       scaleFilter: this.scaleFilter,
       blendingMode: this.blendingMode,
+      blendingMethod: this.blendingMethod,
     };
   }
 
@@ -209,6 +211,10 @@ export class SceneItem extends SceneItemNode {
       this.getObsSceneItem().blendingMode = newSettings.blendingMode;
     }
 
+    if (changed.blendingMethod !== void 0) {
+      this.getObsSceneItem().blendingMethod = newSettings.blendingMethod;
+    }
+
     this.UPDATE({ sceneItemId: this.sceneItemId, ...changed });
 
     this.scenesService.itemUpdated.next(this.getModel());
@@ -273,6 +279,7 @@ export class SceneItem extends SceneItemNode {
       recordingVisible: !!customSceneItem.recordingVisible,
       scaleFilter: customSceneItem.scaleFilter,
       blendingMode: customSceneItem.blendingMode,
+      blendingMethod: customSceneItem.blendingMethod,
     });
   }
 
@@ -398,6 +405,10 @@ export class SceneItem extends SceneItemNode {
 
   setBlendingMode(blendingMode: obs.EBlendingMode): void {
     this.setSettings({ blendingMode });
+  }
+
+  setBlendingMethod(blendingMethod: obs.EBlendingMethod): void {
+    this.setSettings({ blendingMethod });
   }
 
   /**

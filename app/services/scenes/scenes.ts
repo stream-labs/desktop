@@ -5,7 +5,13 @@ import { Subject } from 'rxjs';
 import { mutation, StatefulService } from 'services/core/stateful-service';
 import { TransitionsService } from 'services/transitions';
 import { WindowsService } from 'services/windows';
-import { Scene, SceneItem, TSceneNode, EScaleType, EBlendingMode } from './index';
+import {
+  Scene,
+  SceneItem,
+  TSceneNode,
+  EScaleType,
+  EBlendingMode,
+  EBlendingMethod } from './index';
 import { ISource, SourcesService, ISourceAddOptions } from 'services/sources';
 import { Inject } from 'services/core/injector';
 import * as obs from '../../../obs-api';
@@ -45,6 +51,7 @@ export interface ISceneItemInfo {
   recordingVisible?: boolean;
   scaleFilter?: EScaleType;
   blendingMode?: EBlendingMode;
+  blendingMethod?: EBlendingMethod;
 }
 
 export interface IScenesState {
@@ -81,6 +88,7 @@ export interface ISceneItemSettings {
   recordingVisible: boolean;
   scaleFilter: EScaleType;
   blendingMode: EBlendingMode;
+  blendingMethod: EBlendingMethod;
 }
 
 export interface IPartialSettings {
@@ -91,6 +99,7 @@ export interface IPartialSettings {
   recordingVisible?: boolean;
   scaleFilter?: EScaleType;
   blendingMode?: EBlendingMode;
+  blendingMethod?: EBlendingMethod;
 }
 
 export interface ISceneItem extends ISceneItemSettings, ISceneItemNode {
@@ -118,6 +127,7 @@ export interface ISceneItemActions {
   setRecordingVisible(recordingVisible: boolean): void;
   setScaleFilter(filter: EScaleType): void;
   setBlendingMode(mode: EBlendingMode): void;
+  setBlendingMethod(method: EBlendingMethod): void;
 
   /**
    * only for scene sources

@@ -1,6 +1,12 @@
 import { InjectFromExternalApi, Fallback } from 'services/api/external-api';
 import { ServiceHelper } from 'services/core';
-import { ISceneItemActions, ISceneItemSettings, IPartialTransform, EScaleType, EBlendingMode } from 'services/scenes';
+import {
+  ISceneItemActions,
+  ISceneItemSettings,
+  IPartialTransform,
+  EScaleType,
+  EBlendingMode,
+  EBlendingMethod } from 'services/scenes';
 import {
   Selection as InternalSelection,
   SelectionService as InternalSelectionService,
@@ -410,5 +416,9 @@ export class Selection implements ISceneItemActions, ISerializable {
 
   setBlendingMode(mode: EBlendingMode): void {
     return this.selection.setBlendingMode(mode);
+  }
+
+  setBlendingMethod(method: EBlendingMethod): void {
+    return this.selection.setBlendingMethod(method);
   }
 }

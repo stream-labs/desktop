@@ -30,6 +30,7 @@ export { CreateExistingItemCommand } from './create-existing-item';
 export { CreateNewItemCommand } from './create-new-item';
 export { SetScaleFilterCommand } from './set-item-scale-filter';
 export { SetBlendingModeCommand } from './set-blending-mode';
+export { SetBlendingMethodCommand } from './set-blending-method';
 
 // Folders
 export { CreateFolderCommand } from './create-folder';

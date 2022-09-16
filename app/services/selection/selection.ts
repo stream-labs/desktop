@@ -12,7 +12,8 @@ import {
   ISceneItemNode,
   IPartialTransform,
   EScaleType,
-  EBlendingMode
+  EBlendingMode,
+  EBlendingMethod
 } from 'services/scenes';
 import { Source } from 'services/sources';
 import { Rect } from 'util/rect';
@@ -167,6 +168,11 @@ export class Selection {
 
   isBlendingModeSelected(mode: EBlendingMode): boolean {
     const items = this.getItems().filter(item => item.blendingMode === mode);
+    return items.length > 0;
+  }
+
+  isBlendingMethodSelected(method: EBlendingMethod): boolean {
+    const items = this.getItems().filter(item => item.blendingMethod === method);
     return items.length > 0;
   }
 
@@ -452,6 +458,10 @@ export class Selection {
 
   setBlendingMode(mode: EBlendingMode) {
     this.getItems().forEach(item => item.setBlendingMode(mode));
+  }
+
+  setBlendingMethod(method: EBlendingMethod) {
+    this.getItems().forEach(item => item.setBlendingMethod(method));
   }
 
   /**
