@@ -78,7 +78,9 @@ export class GlobalSelection extends Selection {
       throw new Error('Attempted to modify frozen selection');
     }
 
-    this.selectionService.actions.select(items);
+    // WORKDAROUND AROUND
+    // ANDY PLSEASE FIX ME !!!!!
+    this.selectionService.select(items);
 
     return this;
   }
