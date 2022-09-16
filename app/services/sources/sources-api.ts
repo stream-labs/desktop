@@ -3,6 +3,7 @@ import { IObsListOption, TObsFormData } from 'components/obs/inputs/ObsInput';
 import { WidgetType } from 'services/widgets';
 import { Observable } from 'rxjs';
 import { IAudioSource } from 'services/audio';
+import { EDeinterlaceMode } from 'obs-studio-node';
 
 export interface ISource {
   sourceId: string;
@@ -34,6 +35,7 @@ export interface ISource {
    * This is mainly meant to support Guest Cam
    */
   forceMuted: boolean;
+  deinterlaceMode?: EDeinterlaceMode;
 }
 
 /**
@@ -100,6 +102,7 @@ export interface ISourceAddOptions<TPropertiesManagerSettings = Dictionary<any>>
   audioSettings?: Partial<IAudioSource>;
   isTemporary?: boolean;
   guestCamStreamId?: string; // Automatically assign a guest to this source after creation
+  deinterlaceMode?: EDeinterlaceMode;
 }
 
 export type TSourceType =

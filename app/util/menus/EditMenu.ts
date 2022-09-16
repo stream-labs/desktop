@@ -22,6 +22,7 @@ import { AudioService } from 'services/audio';
 import { ScaleFilteringMenu } from './ScaleFilteringMenu';
 import { BlendingModeMenu } from './BlendingModeMenu';
 import { BlendingMethodMenu } from './BlendingMethodMenu';
+import { DeinterlacingModeMenu } from './DeinterlacingModeMenu';
 
 interface IEditMenuOptions {
   selectedSourceId?: string;
@@ -126,6 +127,11 @@ export class EditMenu extends Menu {
       this.append({
         label: $t('Blending Method'),
         submenu: this.blendingMethodSubmenu().menu,
+      });
+
+      this.append({
+        label: $t('Deinterlacing'),
+        submenu: this.deinterlacingSubmenu().menu,
       });
 
       this.append({ type: 'separator' });
@@ -388,5 +394,9 @@ export class EditMenu extends Menu {
 
   private blendingMethodSubmenu() {
     return new BlendingMethodMenu();
+  }
+
+  private deinterlacingSubmenu() {
+    return new DeinterlacingModeMenu();
   }
 }

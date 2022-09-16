@@ -39,8 +39,10 @@ import { SourceFiltersService } from 'services/source-filters';
 import { VideoService } from 'services/video';
 import { CustomizationService } from '../customization';
 import { EAvailableFeatures, IncrementalRolloutService } from '../incremental-rollout';
-import { EMonitoringType } from '../../../obs-api';
+import { EMonitoringType, EDeinterlaceMode, EDeinterlaceFieldOrder } from '../../../obs-api';
 import { GuestCamService } from 'services/guest-cam';
+
+export { EDeinterlaceMode, EDeinterlaceFieldOrder } from '../../../obs-api';
 
 const AudioFlag = obs.ESourceOutputFlags.Audio;
 const VideoFlag = obs.ESourceOutputFlags.Video;
@@ -226,6 +228,7 @@ export class SourcesService extends StatefulService<ISourcesState> {
     channel?: number;
     isTemporary?: boolean;
     propertiesManagerType?: TPropertiesManager;
+    deinterlaceMode?: EDeinterlaceMode;
   }) {
     const id = addOptions.id;
     const sourceModel: ISource = {
@@ -252,6 +255,8 @@ export class SourcesService extends StatefulService<ISourcesState> {
 
       forceHidden: false,
       forceMuted: false,
+
+      deinterlaceMode: addOptions.deinterlaceMode
     };
 
     if (addOptions.isTemporary) {
@@ -339,6 +344,7 @@ export class SourcesService extends StatefulService<ISourcesState> {
       channel: options.channel,
       isTemporary: options.isTemporary,
       propertiesManagerType: managerType,
+      deinterlaceMode: options.deinterlaceMode
     });
     const source = this.views.getSource(id)!;
     const muted = obsInput.muted;
