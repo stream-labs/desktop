@@ -27,9 +27,6 @@ import VeeValidate from 'vee-validate';
 import ChildWindow from 'components/windows/ChildWindow.vue';
 import OneOffWindow from 'components/windows/OneOffWindow.vue';
 import electronLog from 'electron-log';
-import { NVoiceClient, getNVoicePath } from './services/nicolive-program/NVoiceClient';
-import { unlinkSync } from 'fs';
-import { join } from 'path';
 
 const { ipcRenderer, remote } = electron;
 
@@ -246,17 +243,3 @@ function writeErrorToLog(...errors: (Error | string)[]) {
     ${formattedErrors.join('\n')}
   `);
 }
-
-async function talk() {
-  const nVoice = new NVoiceClient({ baseDir: getNVoicePath() });
-  const tempDir = electron.remote.app.getPath('temp');
-  const wavFileName = join(tempDir, 'n-voice-talk.wav');
-  const text = 'テスト';
-  try {
-    await nVoice.talk(1.0, text, wavFileName);
-  } finally {
-    unlinkSync(wavFileName);
-  }
-}
-
-talk();
