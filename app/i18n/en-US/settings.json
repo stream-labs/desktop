@@ -214,5 +214,9 @@
   "Twitch VOD": "Twitch VOD",
   "Use authentication": "Use authentication",
   "Username": "Username",
-  "Password": "Password"
+  "Password": "Password",
+  "Keyframe Interval (0=auto)": "Keyframe Interval (0=auto)",
+  "Automatic File Splitting": "Automatic File Splitting",
+  "Split Time (MB)": "Split Time (MB)",
+  "Reset timestamps at the beginning of each split file": "Reset timestamps at the beginning of each split file"
 }
