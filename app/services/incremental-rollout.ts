@@ -42,7 +42,21 @@ export class IncrementalRolloutService extends StatefulService<IIncrementalRollo
     availableFeatures: [],
   };
 
+  /**
+   * Available features are fetched async.  This is normally not a problem,
+   * as they are reactive.  However, any service logic that happens during
+   * initialization probably needs to wait on this promise before accessing
+   * the list of available features.
+   */
+  featuresReady: Promise<void>;
+
+  private featuresReadyResolve: () => void;
+
   init() {
+    this.featuresReady = new Promise(resolve => {
+      this.featuresReadyResolve = resolve;
+    });
+
     this.setCommandLineFeatures();
 
     this.userService.userLogin.subscribe(() => this.fetchAvailableFeatures());
@@ -67,6 +81,7 @@ export class IncrementalRolloutService extends StatefulService<IIncrementalRollo
 
       return jfetch<{ features: string[] }>(request).then(response => {
         this.SET_AVAILABLE_FEATURES([...this.state.availableFeatures, ...response.features]);
+        this.featuresReadyResolve();
       });
     }
   }
@@ -95,7 +110,7 @@ class IncrementalRolloutView extends ViewHandler<IIncrementalRolloutServiceState
   }
 
   featureIsEnabled(feature: EAvailableFeatures): boolean {
-    if (Utils.isDevMode()) return true; // always show for dev mode
+    // if (Utils.isDevMode()) return true; // always show for dev mode
 
     return this.availableFeatures.indexOf(feature) > -1;
   }

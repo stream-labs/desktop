@@ -11,6 +11,7 @@ export enum EDismissable {
   HighlighterNotification = 'highlighter_notification',
   GuestCamFirstTimeModal = 'guest_cam_first_time',
   SourceSelectorFolders = 'source_selector_folders',
+  CollabCamRollout = 'collab_cam_rollout',
 }
 
 interface IDismissablesServiceState {
