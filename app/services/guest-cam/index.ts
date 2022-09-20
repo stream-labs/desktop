@@ -20,12 +20,17 @@ import {
   UrlService,
   StreamingService,
   UsageStatisticsService,
+  AppService,
+  DismissablesService,
+  IncrementalRolloutService,
 } from 'app-services';
 import { ENotificationType } from 'services/notifications';
 import { $t } from 'services/i18n';
 import { JsonrpcService } from 'services/api/jsonrpc';
 import { EStreamingState } from 'services/streaming';
 import Vue from 'vue';
+import { EDismissable } from 'services/dismissables';
+import { EAvailableFeatures } from 'services/incremental-rollout';
 
 /**
  * This is in actuality a big data blob at runtime, the shape
@@ -280,6 +285,9 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
   @Inject() urlService: UrlService;
   @Inject() streamingService: StreamingService;
   @Inject() usageStatisticsService: UsageStatisticsService;
+  @Inject() appService: AppService;
+  @Inject() dismissablesService: DismissablesService;
+  @Inject() incrementalRolloutService: IncrementalRolloutService;
 
   static initialState: IGuestCamServiceState = {
     produceOk: false,
@@ -365,6 +373,30 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
 
       if (status === EStreamingState.Live) {
         this.recordStreamAnalytics();
+      }
+    });
+
+    this.incrementalRolloutService.featuresReady.then(() => {
+      if (this.appService.state.onboarded) {
+        // If this is a new user, they should never see this notification. It's only for
+        // existing users who are newly rolled out to.
+        this.dismissablesService.dismiss(EDismissable.CollabCamRollout);
+      } else if (
+        this.incrementalRolloutService.views.featureIsEnabled(
+          EAvailableFeatures.guestCaProduction,
+        ) &&
+        this.dismissablesService.views.shouldShow(EDismissable.CollabCamRollout)
+      ) {
+        this.dismissablesService.dismiss(EDismissable.CollabCamRollout);
+        this.notificationsService.push({
+          type: ENotificationType.SUCCESS,
+          lifeTime: -1,
+          message: $t('You now have access to Collab Cam!'),
+          action: this.jsonrpcService.createRequest(
+            Service.getResourceId(this.sourcesService),
+            'showGuestCamProperties',
+          ),
+        });
       }
     });
   }

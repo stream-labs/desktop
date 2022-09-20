@@ -289,12 +289,24 @@ export default function GuestCamProperties() {
   } = useModule(GuestCamModule);
 
   function getModalContent() {
-    if (joinAsGuest) {
-      return <JoinAsGuestModalContent />;
-    } else if (showFirstTimeModal) {
+    if (showFirstTimeModal) {
       return <FirstTimeModalContent />;
+    } else if (!sourceExists) {
+      return <MissingSourceModalContent />;
+    } else if (joinAsGuest) {
+      return <JoinAsGuestModalContent />;
     } else {
       return <EveryTimeModalContent />;
+    }
+  }
+
+  function getModalButtonText() {
+    if (showFirstTimeModal) {
+      return $t('Get Started');
+    } else if (!sourceExists) {
+      return $t('Add Source');
+    } else {
+      return $t('Start Collab Cam');
     }
   }
 
@@ -459,34 +471,24 @@ export default function GuestCamProperties() {
           );
         })}
       </Tabs>
-      {sourceExists ? (
-        <Modal
-          visible={!produceOk}
-          getContainer={false}
-          closable={false}
-          okText={$t('Start Collab Cam')}
-          onOk={() => {
+      <Modal
+        visible={!produceOk}
+        getContainer={false}
+        closable={false}
+        okText={getModalButtonText()}
+        onOk={() => {
+          if (sourceExists) {
             GuestCamService.actions.setProduceOk();
-            DismissablesService.actions.dismiss(EDismissable.GuestCamFirstTimeModal);
-          }}
-          onCancel={() => WindowsService.actions.closeChildWindow()}
-        >
-          {getModalContent()}
-        </Modal>
-      ) : (
-        <Modal
-          visible={true}
-          getContainer={false}
-          closable={false}
-          okText={$t('Add New Source')}
-          onOk={() => {
+          } else if (!showFirstTimeModal) {
             SourcesService.actions.showAddSource('mediasoupconnector');
-          }}
-          onCancel={() => WindowsService.actions.closeChildWindow()}
-        >
-          {MissingSourceModalContent()}
-        </Modal>
-      )}
+          }
+
+          DismissablesService.actions.dismiss(EDismissable.GuestCamFirstTimeModal);
+        }}
+        onCancel={() => WindowsService.actions.closeChildWindow()}
+      >
+        {getModalContent()}
+      </Modal>
     </ModalLayout>
   );
 }
@@ -741,6 +743,12 @@ function FirstTimeModalContent() {
         showIcon={false}
         banner
       />
+      <a
+        style={{ display: 'inline-block', marginTop: 10 }}
+        onClick={() => remote.shell.openExternal('https://streamlabs.com/collab-cam')}
+      >
+        {$t('Learn More')}
+      </a>
     </>
   );
 }
@@ -768,7 +776,7 @@ function MissingSourceModalContent() {
       <h2>{$t('Collab Cam requires a source')}</h2>
       <p>
         {$t(
-          'At least one Collab Cam source is required to connect to this stream. Would you like to add one now?',
+          'At least one Collab Cam source is required to use Collab Cam. Would you like to add one now?',
         )}
       </p>
     </>
