@@ -19,6 +19,7 @@ import {
   SceneCollectionsService,
   UrlService,
   StreamingService,
+  UsageStatisticsService,
   AppService,
   DismissablesService,
   IncrementalRolloutService,
@@ -283,6 +284,7 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
   @Inject() jsonrpcService: JsonrpcService;
   @Inject() urlService: UrlService;
   @Inject() streamingService: StreamingService;
+  @Inject() usageStatisticsService: UsageStatisticsService;
   @Inject() appService: AppService;
   @Inject() dismissablesService: DismissablesService;
   @Inject() incrementalRolloutService: IncrementalRolloutService;
@@ -363,6 +365,14 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
     this.streamingService.streamingStatusChange.subscribe(status => {
       if ([EStreamingState.Live, EStreamingState.Offline].includes(status)) {
         this.emitStreamingStatus();
+      }
+
+      if (status === EStreamingState.Offline) {
+        this.streamRecorded = false;
+      }
+
+      if (status === EStreamingState.Live) {
+        this.recordStreamAnalytics();
       }
     });
 
@@ -735,6 +745,9 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
     }
 
     this.emitStreamingStatus();
+    this.recordStreamAnalytics();
+    this.recordGuestAnalytics();
+    this.usageStatisticsService.recordFeatureUsage('CollabCam');
   }
 
   /**
@@ -982,6 +995,32 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
         }
       }
     }
+  }
+
+  /**
+   * Whether the current stream has been recorded as via guest cam
+   */
+  streamRecorded = false;
+
+  recordStreamAnalytics() {
+    if (
+      this.streamingService.views.streamingStatus === EStreamingState.Live &&
+      this.state.guests.length &&
+      !this.streamRecorded
+    ) {
+      this.usageStatisticsService.recordAnalyticsEvent('GuestCam', {
+        type: 'stream',
+        platforms: this.streamingService.views.enabledPlatforms,
+      });
+      this.streamRecorded = true;
+    }
+  }
+
+  recordGuestAnalytics() {
+    this.usageStatisticsService.recordAnalyticsEvent('GuestCam', {
+      type: 'guestJoin',
+      numGuests: this.state.guests.length,
+    });
   }
 
   @mutation()
