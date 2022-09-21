@@ -12,7 +12,6 @@ export interface IMenuItem {
   title: string;
   trackingTarget?: string;
   icon?: string;
-  svgIcon?: boolean; // TODO: Remove after converting Highlighter to font icon
   isActive?: boolean;
   isLegacy?: boolean;
 }

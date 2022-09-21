@@ -5,9 +5,16 @@
   font-style: normal;
 }
 
+@font-face {
+  font-family: 'highlighter';
+  src: url('../../media/fonts/highlighter.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+
 [class^="icon-"], [class*=" icon-"] {
   /* use !important to prevent issues with browser extensions that change fonts */
-  font-family: 'icomoon' !important;
+  font-family: 'icomoon', 'highlighter' !important;
   speak: never;
   font-style: normal;
   font-weight: normal;
@@ -20,6 +27,9 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+/**
+ * icomoon icons
+ */
 .icon-tiktok:before {
   content: "\e9f9";
 }
@@ -769,4 +779,11 @@
 }
 .icon-twitch:before {
   content: "\e9c4";
+}
+
+/**
+ * highlighter icon
+ */
+ .icon-highlighter:before {
+  content: "\e9fa";
 }

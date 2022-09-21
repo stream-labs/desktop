@@ -92,7 +92,7 @@ export const SideBarTopNavData = (): IMenu => ({
     },
     {
       target: 'Highlighter',
-      svgIcon: true, // TODO: Convert to font icon, then delete property
+      icon: 'icon-highlighter',
       title: $t('Highlighter'),
       trackingTarget: 'highlighter',
       isActive: false,
