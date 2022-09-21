@@ -20,12 +20,13 @@
 .cell {
   display: flex;
   height: 46px;
-  width: 52px;
+  // width: 52px;
   position: relative;
   flex-shrink: 0;
   font-size: 16px;
 
-  i, svg {
+  i,
+  svg {
     margin: auto;
     display: block;
   }
@@ -37,7 +38,8 @@
   &:hover {
     cursor: pointer;
 
-    svg, i:not(.link-badge) {
+    svg,
+    i:not(.link-badge) {
       transition: transform 0.2s;
       color: var(--title);
       fill: var(--title);
@@ -96,7 +98,8 @@
   }
 
   &.active {
-    i, svg {
+    i,
+    svg {
       transform: scale(1.2, 1.2);
       color: var(--teal);
       fill: var(--teal);
@@ -141,6 +144,11 @@
 }
 
 .link-badge {
+  transform: scale(1.2, 1.2);
+  color: var(--teal);
+  fill: var(--teal);
+  margin: auto;
+  display: block;
   color: var(--title);
   border: 1px solid var(--section-alt);
   font-size: 8px;

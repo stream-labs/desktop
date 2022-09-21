@@ -78,8 +78,23 @@ export default function SideNav() {
   const themeAuditEnabled = featureIsEnabled(EAvailableFeatures.themeAudit);
 
   return (
-    <Layout style={{ flexDirection: 'column', width: '100%', minHeight: '100vh' }}>
-      <Sider collapsible collapsed={!open} onCollapse={() => setOpen(!open)}>
+    <Layout
+      hasSider
+      style={{
+        width: '100%',
+        minHeight: '100vh',
+      }}
+    >
+      <Sider
+        collapsible
+        collapsed={!open}
+        onCollapse={() => setOpen(!open)}
+        style={{
+          width: '100%',
+          height: '100%',
+          overflow: 'visible',
+        }}
+      >
         {/* TODO: Apply styles */}
         {/* <div className={cx('side-nav', styles.container, { [styles.leftDock]: leftDock })}> */}
         <Menu forceSubMenuRender mode="inline">
@@ -129,9 +144,12 @@ export default function SideNav() {
               </Menu.Item>
             );
           })}
+          <Menu.Item>
+            {/* TODO: Convert AppsNav to antd menu items */}
+            {enabledApps.length > 0 && hasLegacyMenu && <AppsNav />}
+          </Menu.Item>
         </Menu>
-        {/* TODO: Convert AppsNav to antd menu */}
-        {enabledApps.length > 0 && hasLegacyMenu && <AppsNav />}
+
         {/* TODO: Convert NavTools to antd menu */}
         <NavTools />
       </Sider>

@@ -8,7 +8,7 @@ export interface IMenu {
 }
 
 export interface IMenuItem {
-  target?: TAppPage; // optional because menu item could be a toggle
+  target?: TAppPage | 'NavTools'; // optional because menu item could be a toggle
   title: string;
   trackingTarget?: string;
   icon?: string;

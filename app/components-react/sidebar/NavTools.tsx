@@ -8,7 +8,7 @@ import { Services } from '../service-provider';
 import { useVuex } from '../hooks';
 import styles from './SideNav.m.less';
 import * as remote from '@electron/remote';
-import { Badge } from 'antd';
+import { Badge, Menu } from 'antd';
 
 export default function SideNav() {
   const {
@@ -92,63 +92,114 @@ export default function SideNav() {
   }
 
   return (
-    <div className={styles.bottomTools}>
+    <Menu forceSubMenuRender mode="inline">
       {isDevMode && (
-        <div className={styles.cell} onClick={openDevTools} title={'Dev Tools'}>
-          <i className="icon-developer" />
-        </div>
+        <Menu.Item
+          key="dev-tools"
+          title={'Dev Tools'}
+          // className={styles.cell}
+          icon={<i className="icon-developer" />}
+          onClick={openDevTools}
+        >
+          {'Dev Tools'}
+        </Menu.Item>
       )}
       {isLoggedIn && !isPrime && (
-        <div
-          className={cx(styles.cell, styles.primeCell)}
-          onClick={upgradeToPrime}
+        <Menu.Item
+          key="get-prime"
           title={$t('Get Prime')}
+          // className={cx(styles.cell, styles.primeCell)}
+          icon={
+            <Badge count={<i className={cx('icon-pop-out-3', styles.linkBadge)} />}>
+              <>
+                <i className="icon-prime" /> {$t('Get Prime')}
+              </>
+            </Badge>
+          }
+          onClick={upgradeToPrime}
         >
-          <Badge count={<i className={cx('icon-pop-out-3', styles.linkBadge)} />}>
-            <i className="icon-prime" />
-          </Badge>
-        </div>
+          <>{$t('Get Prime')}</>
+        </Menu.Item>
       )}
       {isLoggedIn && (
-        <div
-          className={styles.cell}
-          onClick={() => throttledOpenDashboard()}
+        <Menu.SubMenu
+          key="dashboard"
           title={$t('Dashboard')}
+          // className={styles.cell}
+          icon={
+            <Badge count={<i className={cx('icon-pop-out-3', styles.linkBadge)} />}>
+              <i className="icon-dashboard" />
+            </Badge>
+          }
+          // onTitleClick={() => throttledOpenDashboard()} // does this still need an onClick?
         >
-          <Badge count={<i className={cx('icon-pop-out-3', styles.linkBadge)} />}>
-            <i className="icon-dashboard" />
-          </Badge>
-        </div>
+          {/* TODO: if the onClicks are similar, maybe refactor to map over objects */}
+          <Menu.Item
+            key="cloudbot"
+            title={$t('Cloudbot')}
+            // className={cx(styles.cell)}
+            onClick={() => throttledOpenDashboard('cloudbot')}
+          >
+            {$t('Cloudbot')}
+          </Menu.Item>
+          <Menu.Item
+            key="alertbox-library"
+            title={$t('Alert Box')}
+            // className={cx(styles.cell)}
+            // onClick={} // TODO: navigate to alert box library
+          >
+            {$t('Alert Box')}
+          </Menu.Item>
+          <Menu.Item
+            key="widgets"
+            title={$t('Widgets')}
+            // className={cx(styles.cell)}
+            // onClick={} // TODO: create onClick
+          >
+            {$t('Widgets')}
+          </Menu.Item>
+          <Menu.Item
+            key="tip-settings"
+            title={$t('Tip Settings')}
+            // className={cx(styles.cell)}
+            // onClick={} // TODO: create onClick
+          >
+            {$t('Tip Settings')}
+          </Menu.Item>
+          <Menu.Item
+            key="multistream"
+            title={$t('Multistream')}
+            // className={cx(styles.cell)}
+            // onClick={} // TODO: create onClick
+          >
+            {$t('Multistream')}
+          </Menu.Item>
+        </Menu.SubMenu>
       )}
-      {isLoggedIn && (
-        <div
-          className={cx(styles.cell)}
-          onClick={() => throttledOpenDashboard('cloudbot')}
-          title={$t('Cloudbot')}
-        >
+
+      <Menu.Item
+        key="get-help"
+        title={$t('Get Help')}
+        // className={styles.cell}
+        icon={
           <Badge count={<i className={cx('icon-pop-out-3', styles.linkBadge)} />}>
-            <i className="icon-cloudbot" />
+            <i className="icon-question" />
           </Badge>
-        </div>
-      )}
-      <div className={styles.cell} onClick={openLayoutEditor} title={$t('Layout Editor')}>
-        <i className="fas fa-th-large" />
-      </div>
-      <div
-        className={cx(styles.cell, { [styles.toggleOn]: studioMode })}
-        onClick={toggleStudioMode}
-        title={$t('Studio Mode')}
+        }
+        onClick={openLayoutEditor}
       >
-        <i className="icon-studio-mode-3" />
-      </div>
-      <div className={styles.cell} onClick={openHelp} title={$t('Get Help')}>
-        <Badge count={<i className={cx('icon-pop-out-3', styles.linkBadge)} />}>
-          <i className="icon-question" />
-        </Badge>
-      </div>
-      <div className={styles.cell} onClick={openSettingsWindow} title={$t('Settings')}>
-        <i className="icon-settings" />
-      </div>
-    </div>
+        {$t('Get Help')}
+      </Menu.Item>
+
+      <Menu.Item
+        key="settings"
+        title={$t('Settings')}
+        // className={styles.cell}
+        icon={<i className="icon-settings" />}
+        onClick={openLayoutEditor}
+      >
+        {$t('Settings')}
+      </Menu.Item>
+    </Menu>
   );
 }
