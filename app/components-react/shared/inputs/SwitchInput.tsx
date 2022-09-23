@@ -16,6 +16,10 @@ export type TSwitchInputProps = TSlobsInputProps<
 
 export const SwitchInput = InputComponent((p: TSwitchInputProps) => {
   const { wrapperAttrs, inputAttrs } = useInput('switch', p, ANT_SWITCH_FEATURES);
+
+  // TODO: implement special handling for horizontal styling for settings
+  console.log('wrapperAttrs ', wrapperAttrs);
+
   return (
     <InputWrapper {...wrapperAttrs}>
       <Switch checked={inputAttrs.value} size="small" {...inputAttrs} ref={p.inputRef} />

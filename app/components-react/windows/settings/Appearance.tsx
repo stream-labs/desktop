@@ -100,7 +100,7 @@ export function AppearanceSettings() {
           <Col flex={1}>
             <SwitchInput
               label={$t('Editor')}
-              layout="inline"
+              layout="horizontal"
               // onChange={}
               // value={}
               // className={}
