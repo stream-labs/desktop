@@ -196,7 +196,7 @@ export default function SideNav() {
         title={$t('Settings')}
         // className={styles.cell}
         icon={<i className="icon-settings" />}
-        onClick={openLayoutEditor}
+        onClick={openSettingsWindow}
       >
         {$t('Settings')}
       </Menu.Item>

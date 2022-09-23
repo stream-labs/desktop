@@ -150,7 +150,6 @@ export default function SideNav() {
           </Menu.Item>
         </Menu>
 
-        {/* TODO: Convert NavTools to antd menu */}
         <NavTools />
       </Sider>
     </Layout>
