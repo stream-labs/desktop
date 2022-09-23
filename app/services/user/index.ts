@@ -156,7 +156,7 @@ class UserViews extends ViewHandler<IUserServiceState> {
 
   alertboxLibraryUrl(id?: string) {
     const uiTheme = this.customizationServiceViews.isDarkTheme ? 'night' : 'day';
-    let url = `https://${this.hostsService.streamlabs}/alertbox-library?mode=${uiTheme}&slobs`;
+    let url = `https://${this.hostsService.streamlabs}/alert-box-themes?mode=${uiTheme}&slobs`;
 
     if (this.isLoggedIn) {
       url += `&oauth_token=${this.auth.apiToken}`;
