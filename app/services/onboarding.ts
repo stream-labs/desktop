@@ -11,6 +11,7 @@ import { OutputSettingsService } from './settings';
 import { ObsImporterService } from './obs-importer';
 import Utils from './utils';
 import { RecordingModeService } from './recording-mode';
+import * as remote from '@electron/remote';
 
 enum EOnboardingSteps {
   MacPermissions = 'MacPermissions',
@@ -277,6 +278,8 @@ export class OnboardingService extends StatefulService<IOnboardingServiceState> 
   // Ends the onboarding process
   finish() {
     localStorage.setItem(this.localStorageKey, 'true');
+    remote.session.defaultSession.flushStorageData();
+    console.log('Set onboarding key successful.');
 
     // setup a custom resolution if the platform requires that
     const platformService = getPlatformService(this.userService.views.platform?.type);
