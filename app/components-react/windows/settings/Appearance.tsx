@@ -1,7 +1,8 @@
 import React from 'react';
 import { Services } from '../../service-provider';
 import { $t } from '../../../services/i18n';
-import { CheckboxInput, ListInput, SliderInput } from '../../shared/inputs';
+import { Row, Col } from 'antd';
+import { CheckboxInput, ListInput, SliderInput, SwitchInput } from '../../shared/inputs';
 import { getDefined } from '../../../util/properties-type-guards';
 import { ObsSettingsSection } from './ObsSettings';
 import * as remote from '@electron/remote';
@@ -86,6 +87,64 @@ export function AppearanceSettings() {
             />
           </div>
         )}
+      </ObsSettingsSection>
+
+      <ObsSettingsSection>
+        <CheckboxInput
+          // {...bind.enableCustomNavigation} TODO: functionality
+          label={$t(
+            'Enable custom navigation bar to pin your favorite features for quick access.\nDisable to swap to compact view.',
+          )}
+        />
+        <Row gutter={[8, 8]}>
+          <Col flex={1}>
+            <SwitchInput
+              label={$t('Editor')}
+              layout="inline"
+              // onChange={}
+              // value={}
+              // className={}
+            />
+            <SwitchInput
+              label={$t('Custom Editor')}
+              layout="inline"
+              // onChange={}
+              // value={}
+              // className={}
+            />
+            <SwitchInput
+              label={$t('Studio Mode')}
+              layout="inline"
+              // onChange={}
+              // value={}
+              // className={}
+            />
+            <SwitchInput
+              label={$t('Layout Editor')}
+              layout="inline"
+              // onChange={}
+              // value={}
+              // className={}
+            />
+            <SwitchInput
+              label={$t('Themes')}
+              layout="inline"
+              // onChange={}
+              // value={}
+              // className={}
+            />
+          </Col>
+          <Col flex={3}>
+            <SwitchInput
+              label={$t('App Store')}
+              layout="inline"
+              // onChange={}
+              // value={}
+              // className={}
+            />
+            {/* TODO: if apps, map over apps */}
+          </Col>
+        </Row>
       </ObsSettingsSection>
 
       <ObsSettingsSection>
