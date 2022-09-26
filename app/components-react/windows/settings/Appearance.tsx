@@ -89,7 +89,7 @@ export function AppearanceSettings() {
         )}
       </ObsSettingsSection>
 
-      <ObsSettingsSection>
+      <ObsSettingsSection title={$t('Custom Navigation Bar')}>
         <CheckboxInput
           // {...bind.enableCustomNavigation} TODO: functionality
           label={$t(
@@ -107,28 +107,28 @@ export function AppearanceSettings() {
             />
             <SwitchInput
               label={$t('Custom Editor')}
-              layout="inline"
+              layout="horizontal"
               // onChange={}
               // value={}
               // className={}
             />
             <SwitchInput
               label={$t('Studio Mode')}
-              layout="inline"
+              layout="horizontal"
               // onChange={}
               // value={}
               // className={}
             />
             <SwitchInput
               label={$t('Layout Editor')}
-              layout="inline"
+              layout="horizontal"
               // onChange={}
               // value={}
               // className={}
             />
             <SwitchInput
               label={$t('Themes')}
-              layout="inline"
+              layout="horizontal"
               // onChange={}
               // value={}
               // className={}
@@ -137,7 +137,7 @@ export function AppearanceSettings() {
           <Col flex={3}>
             <SwitchInput
               label={$t('App Store')}
-              layout="inline"
+              layout="horizontal"
               // onChange={}
               // value={}
               // className={}
