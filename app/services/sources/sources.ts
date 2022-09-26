@@ -486,7 +486,8 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
       this.windowsService.createOneOffWindow(
         {
           ...baseConfig,
-         // alwaysOnTop を利用した場合、メインウィンドウの背面に隠れることは防げるが、
+          limitMinimumSize: true, // 小さくできなくする
+          // alwaysOnTop を利用した場合、メインウィンドウの背面に隠れることは防げるが、
           // N Air 以外のウィンドウよりも前面に出てしまう
           alwaysOnTop: true,
         },
