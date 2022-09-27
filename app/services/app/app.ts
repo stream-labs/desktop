@@ -74,7 +74,7 @@ export class AppService extends StatefulService<IAppState> {
 
   private pid = require('process').pid;
 
-  @track({ event: 'boot' })
+  @track({ event: 'app_start' })
   @RunInLoadingMode()
   async load() {
     if (Utils.isDevMode()) {
