@@ -19,9 +19,13 @@ function randomCharacters(len: number): string {
 
 export type TUsageEvent =
   | {
+    event: 'boot';
+    uuid?: string;
+    user_id?: string | null;
+  } | {
     event: 'stream_start' | 'stream_end';
     uuid?: string;
-    user_id: string | null;
+    user_id?: string | null;
     platform: string;
     stream_track_id: string;
     content_id: string | null;
@@ -66,8 +70,6 @@ export type TUsageEvent =
     event: 'crash';
   };
 
-type TAnalyticsEvent = 'TCP_API_REQUEST' | 'FacebookLogin'; // add more types if you need
-
 export function track(event: TUsageEvent) {
   return (target: any, methodName: string, descriptor: PropertyDescriptor) => {
     return {
@@ -85,38 +87,9 @@ export class UsageStatisticsService extends Service {
   @Inject() hostsService: HostsService;
   @Inject() questionaireService: QuestionaireService;
 
-  installerId: string;
   version = electron.remote.process.env.NAIR_VERSION;
 
   init() {
-    this.loadInstallerId();
-  }
-
-  loadInstallerId() {
-    let installerId = localStorage.getItem('installerId');
-
-    if (!installerId) {
-      const exePath = electron.remote.app.getPath('exe');
-      const installerNamePath = path.join(path.dirname(exePath), 'installername');
-
-      if (fs.existsSync(installerNamePath)) {
-        try {
-          const installerName = fs.readFileSync(installerNamePath).toString();
-
-          if (installerName) {
-            const matches = installerName.match(/\-([A-Za-z0-9]+)\.exe/);
-            if (matches) {
-              installerId = matches[1];
-              localStorage.setItem('installerId', installerId);
-            }
-          }
-        } catch (e) {
-          console.error('Error loading installer id', e);
-        }
-      }
-    }
-
-    this.installerId = installerId;
   }
 
   generateStreamingTrackID(): string {
@@ -132,21 +105,40 @@ export class UsageStatisticsService extends Service {
    */
   recordEvent(event: TUsageEvent) {
     console.log('recordEvent', event);
-
-    if (event.event === 'stream_start' || event.event === 'stream_end') {
+    if (event.event === 'boot') {
       const headers = new Headers();
       headers.append('Content-Type', 'application/json');
-
-      const request = new Request(`${this.hostsService.statistics}/action`, {
-        headers,
-        method: 'POST',
-        body: JSON.stringify({
-          uuid: this.questionaireService.uuid, // inject UUID
-          ...event,
-        }),
+      const body = JSON.stringify({
+        uuid: this.questionaireService.uuid, // inject UUID
+        ...event,
+        user_id: this.userService.isLoggedIn() ? this.userService.platformId : null,
       });
 
+      const request = new Request(`${this.hostsService.statistics}/boot`, {
+        headers,
+        method: 'POST',
+        body,
+      });
+
+      console.log('send boot log', request.url, body);
       return fetch(request);
-    }
+    } else
+      if (event.event === 'stream_start' || event.event === 'stream_end') {
+        console.log('send action log', `${this.hostsService.statistics}/action`);
+        const headers = new Headers();
+        headers.append('Content-Type', 'application/json');
+
+        const request = new Request(`${this.hostsService.statistics}/action`, {
+          headers,
+          method: 'POST',
+          body: JSON.stringify({
+            uuid: this.questionaireService.uuid, // inject UUID
+            ...event,
+            user_id: this.userService.isLoggedIn() ? this.userService.platformId : null,
+          }),
+        });
+
+        return fetch(request);
+      }
   }
 }
