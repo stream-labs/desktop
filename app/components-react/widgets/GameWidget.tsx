@@ -62,6 +62,8 @@ interface IGameWidgetState extends IWidgetCommonState {
   };
 }
 
+type TGameOptions = ITicTacToeOptions & IChatWordOptions;
+
 function gameOption(key: string) {
   const optionTable = {
     'tic-tac-toe': $t('Tic Tac Toe'),
@@ -74,7 +76,7 @@ function gameOption(key: string) {
 export function GameWidget() {
   const { isLoading, bind, selectedTab, setSelectedTab, settings } = useGameWidget();
 
-  const availableGames = settings.available_games.map(gameOption);
+  const availableGames = settings.available_games?.map(gameOption);
 
   return (
     <WidgetLayout>
@@ -138,7 +140,7 @@ function GameOptions(p: { game: TGameType }) {
 
   return (
     <GameSettings
-      gameSettings={settings.game_options[p.game]}
+      gameSettings={settings.game_options[p.game] as TGameOptions}
       updateGameOption={updateGameOption}
     />
   );

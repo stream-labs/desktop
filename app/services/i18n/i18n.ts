@@ -206,6 +206,7 @@ export class I18nService extends PersistentStatefulService<II18nState> implement
 
   setLocale(locale: string) {
     this.SET_LOCALE(locale);
+    remote.session.defaultSession.flushStorageData();
     remote.app.relaunch({ args: [] });
     remote.app.quit();
   }

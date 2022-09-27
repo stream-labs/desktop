@@ -39,7 +39,7 @@ export default function SourceGrid(p: { activeTab: string }) {
 
   const i18nService = I18nService.instance as I18nService;
   const locale = i18nService.state.locale;
-  const excludedLanguages = ['en', 'ko', 'ja', 'zh']; // add i18n prefixes here to exclude languages from wrapping
+  const excludedLanguages = ['en', 'ko', 'zh']; // add i18n prefixes here to exclude languages from wrapping
   const excludeWrap = excludedLanguages.includes(locale.split('-')[0]);
 
   const { availableAppSources } = useSourceShowcaseSettings();
