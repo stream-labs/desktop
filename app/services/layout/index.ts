@@ -7,6 +7,7 @@ import { CustomizationService } from 'services/customization';
 import { $t } from 'services/i18n';
 import uuid from 'uuid/v4';
 import { LAYOUT_DATA, ELEMENT_DATA, ELayout, ELayoutElement } from './layout-data';
+import { IMenu, Login, SideBarTopNavData, SideBarBottomNavData } from './side-nav';
 import { UsageStatisticsService } from 'services/usage-statistics';
 
 export { ELayout, ELayoutElement };
@@ -22,12 +23,12 @@ interface ILayoutState {
   slottedElements: { [Element in ELayoutElement]?: { slot: LayoutSlot; src?: string } };
   resizes: { bar1: number; bar2?: number };
 }
-
 interface ILayoutServiceState {
   currentTab: string;
   tabs: {
     [key: string]: ILayoutState;
   };
+  sidebar: IMenu[];
 }
 
 class LayoutViews extends ViewHandler<ILayoutServiceState> {
@@ -118,6 +119,7 @@ export class LayoutService extends PersistentStatefulService<ILayoutServiceState
         },
       },
     },
+    sidebar: [Login, SideBarTopNavData(), SideBarBottomNavData()],
   };
 
   @Inject() private customizationService: CustomizationService;
@@ -131,6 +133,7 @@ export class LayoutService extends PersistentStatefulService<ILayoutServiceState
     if (!this.state.tabs.default.name) {
       this.SET_TAB_NAME('default', $t('Editor'));
     }
+
     if (
       this.customizationService.state.legacyEvents &&
       isEqual(this.state, LayoutService.defaultState)
@@ -205,6 +208,8 @@ export class LayoutService extends PersistentStatefulService<ILayoutServiceState
   removeCurrentTab() {
     this.REMOVE_TAB(this.state.currentTab);
   }
+
+  // @mutation()
 
   @mutation()
   CHANGE_LAYOUT(layout: ELayout) {

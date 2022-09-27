@@ -200,6 +200,21 @@ export default function SideNav() {
       >
         {$t('Settings')}
       </Menu.Item>
+
+      {/* TODO: move to own component */}
+      <Menu.Item
+        key="login"
+        title={$t('Login')}
+        // className={styles.cell}
+        icon={
+          <div>
+            <i className="icon-user" /> <i className="icon-logout" />
+          </div>
+        }
+        // onClick={openSettingsWindow}
+      >
+        {$t('Login')}
+      </Menu.Item>
     </Menu>
   );
 }

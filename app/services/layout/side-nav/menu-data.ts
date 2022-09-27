@@ -1,9 +1,8 @@
 import { IMenu, IMenuItem } from './menu';
-import { $t } from 'services/i18n';
 
 const AlertBoxLibrary = (): IMenuItem => ({
   target: 'AlertboxLibrary',
-  title: $t('Alert Box'),
+  title: 'Alert Box',
   trackingTarget: 'alertbox-library',
   icon: 'icon-alert-box',
   isActive: false,
@@ -17,7 +16,7 @@ export const SideBarTopNavData = (): IMenu => ({
   menuItems: [
     {
       target: 'Studio',
-      title: $t('Editor'),
+      title: 'Editor',
       trackingTarget: 'editor',
       icon: 'icon-studio',
       isLegacy: false,
@@ -29,7 +28,7 @@ export const SideBarTopNavData = (): IMenu => ({
     AlertBoxLibrary(),
     {
       target: 'LayoutEditor',
-      title: $t('Layout Editor'),
+      title: 'Layout Editor',
       trackingTarget: 'layout-editor',
       icon: 'fas fa-th-large',
       isActive: false,
@@ -37,7 +36,7 @@ export const SideBarTopNavData = (): IMenu => ({
     },
     {
       // target: '', this toggles studio mode
-      title: $t('Studio Mode'),
+      title: 'Studio Mode',
       trackingTarget: 'studio-mode',
       icon: 'icon-studio-mode-3',
       isActive: false,
@@ -46,7 +45,7 @@ export const SideBarTopNavData = (): IMenu => ({
     },
     {
       target: 'BrowseOverlays',
-      title: $t('Themes'),
+      title: 'Themes',
       trackingTarget: 'themes', // maybe required?
       isActive: false, // maybe track in MenuStatus
       icon: 'icon-themes',
@@ -54,20 +53,20 @@ export const SideBarTopNavData = (): IMenu => ({
       subMenuItems: [
         {
           target: 'BrowseOverlays', // to the scene tab
-          title: $t('Scene'),
+          title: 'Scene',
           // trackingTarget?: 'themes', // maybe required?
           isActive: false, // maybe track in MenuStatus
         },
         AlertBoxLibrary(),
         {
           // target: 'Widget', TODO: where does this go?
-          title: $t('Widget'),
+          title: 'Widget',
           // trackingTarget?: 'themes', // maybe required?
           isActive: false, // maybe track in MenuStatus
         },
         {
           // target: 'Tip Page', TODO: where does this go?
-          title: $t('Tip Page'),
+          title: 'Tip Page',
           // trackingTarget?: 'themes', // maybe required?
           isActive: false, // maybe track in MenuStatus
         },
@@ -75,7 +74,7 @@ export const SideBarTopNavData = (): IMenu => ({
     },
     {
       target: 'PlatformAppStore',
-      title: $t('App Store'),
+      title: 'App Store',
       trackingTarget: 'app-store',
       icon: 'icon-store',
       isActive: false,
@@ -83,7 +82,7 @@ export const SideBarTopNavData = (): IMenu => ({
       subMenuItems: [
         {
           target: 'PlatformAppMainPage', // to the My Apps tab in Profile?
-          title: $t('Apps Manager'),
+          title: 'Apps Manager',
           // trackingTarget?: 'themes', // maybe required?
           isActive: false, // maybe track in MenuStatus
         },
@@ -93,16 +92,96 @@ export const SideBarTopNavData = (): IMenu => ({
     {
       target: 'Highlighter',
       icon: 'icon-highlighter',
-      title: $t('Highlighter'),
+      title: 'Highlighter',
       trackingTarget: 'highlighter',
       isActive: false,
     },
     {
       target: 'ThemeAudit',
       icon: 'fas fa-exclamation-triangle',
-      title: $t('Theme Audit'),
+      title: 'Theme Audit',
       trackingTarget: 'themeaudit',
       isActive: false,
     },
   ],
 });
+
+export const SideBarBottomNavData = (): IMenu => ({
+  name: 'bottom-nav',
+  isOpen: false, // TODO: update to be set by user settings on layout load
+  isLegacy: true, // TODO: update to be set by user creation date
+  menuItems: [
+    {
+      title: 'Dev Tools',
+      trackingTarget: 'editor',
+      icon: 'icon-developer',
+      isLegacy: false,
+      isActive: true,
+    },
+    {
+      title: 'Get Prime',
+      icon: 'icon-prime',
+      isLegacy: false,
+      isActive: true,
+    },
+    {
+      title: 'Dashboard',
+      icon: 'icon-dashboard',
+      isLegacy: false,
+      isActive: true,
+      subMenuItems: [
+        {
+          title: 'Cloudbot',
+          isLegacy: false,
+          isActive: true,
+        },
+        {
+          title: 'Alert Box',
+          isLegacy: false,
+          isActive: true,
+        },
+        {
+          title: 'Widgets',
+          isLegacy: false,
+          isActive: true,
+        },
+        {
+          title: 'Tip Settings',
+          isLegacy: false,
+          isActive: true,
+        },
+        {
+          title: 'Multistream',
+          isLegacy: false,
+          isActive: true,
+        },
+      ],
+    },
+    {
+      title: 'Get Help',
+      icon: 'icon-question',
+      isLegacy: false,
+      isActive: true,
+    },
+    {
+      title: 'Settings',
+      icon: 'icon-settings',
+      isLegacy: false,
+      isActive: true,
+    },
+  ],
+});
+
+export const Login: IMenu = {
+  name: 'login',
+  isOpen: false,
+  isLegacy: true,
+  menuItems: [
+    {
+      title: 'Login',
+      icon: 'icon-user',
+      isLegacy: false,
+      isActive: true,
+    },
+  ],
+};

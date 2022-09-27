@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 // import cx from 'classnames';
 import { TAppPage } from 'services/navigation';
 import { EAvailableFeatures } from 'services/incremental-rollout';
-// import { $t } from 'services/i18n';
+import { $t } from 'services/i18n';
 // import { getPlatformService } from 'services/platforms';
 import { Services } from 'components-react/service-provider';
 import { useVuex } from 'components-react/hooks';
@@ -111,7 +111,7 @@ export default function SideNav() {
               (themeAuditEnabled && menuItem.title !== 'Theme Audit') ? (
               <Menu.SubMenu
                 key={menuItem?.target ?? menuItem?.trackingTarget}
-                title={`${menuItem.title}`}
+                title={$t(menuItem.title)}
                 icon={menuItem?.icon && <i className={menuItem.icon} />}
                 onTitleClick={() =>
                   (menuItem.hasOwnProperty('isToggled') && console.log('Toggle studio mode')) ||
@@ -122,7 +122,7 @@ export default function SideNav() {
                 {menuItem?.subMenuItems?.map((subMenuItem: IMenuItem) => (
                   <Menu.Item
                     key={subMenuItem?.target ?? subMenuItem?.trackingTarget}
-                    title={subMenuItem.title}
+                    title={$t(subMenuItem.title)}
                     onClick={() =>
                       menuItem?.target
                         ? navigate(menuItem?.target as TAppPage, menuItem?.trackingTarget)
@@ -130,7 +130,7 @@ export default function SideNav() {
                     }
                     // TODO: Update onclick after all targets confirmed
                   >
-                    {subMenuItem.title}
+                    {$t(subMenuItem.title)}
                   </Menu.Item>
                 ))}
               </Menu.SubMenu>
@@ -140,7 +140,7 @@ export default function SideNav() {
                 title={`${menuItem.title}`}
                 icon={menuItem?.icon && <i className={menuItem.icon} />}
               >
-                {menuItem.title}
+                {$t(menuItem.title)}
               </Menu.Item>
             );
           })}
