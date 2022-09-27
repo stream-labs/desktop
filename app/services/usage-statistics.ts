@@ -20,12 +20,8 @@ function randomCharacters(len: number): string {
 export type TUsageEvent =
   | {
     event: 'boot';
-    uuid?: string;
-    user_id?: string | null;
   } | {
     event: 'stream_start' | 'stream_end';
-    uuid?: string;
-    user_id?: string | null;
     platform: string;
     stream_track_id: string;
     content_id: string | null;
@@ -109,8 +105,8 @@ export class UsageStatisticsService extends Service {
       const headers = new Headers();
       headers.append('Content-Type', 'application/json');
       const body = JSON.stringify({
-        uuid: this.questionaireService.uuid, // inject UUID
         ...event,
+        uuid: this.questionaireService.uuid, // inject UUID
         user_id: this.userService.isLoggedIn() ? this.userService.platformId : null,
       });
 
@@ -132,8 +128,8 @@ export class UsageStatisticsService extends Service {
           headers,
           method: 'POST',
           body: JSON.stringify({
-            uuid: this.questionaireService.uuid, // inject UUID
             ...event,
+            uuid: this.questionaireService.uuid, // inject UUID
             user_id: this.userService.isLoggedIn() ? this.userService.platformId : null,
           }),
         });
