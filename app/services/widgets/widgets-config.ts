@@ -100,7 +100,7 @@ export function getWidgetsConfig(host: string, token: string): Record<TWidgetTyp
 
       defaultTransform: {
         width: 400,
-        height: 450,
+        height: 750,
         x: 0.5,
         y: 0,
         anchor: AnchorPoint.North,
