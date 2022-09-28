@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 // import Animation from 'rc-animate';
 // import cx from 'classnames';
 import { TAppPage } from 'services/navigation';
+import { ENavNames, EMenuItem, IMenuItem, IParentMenuItem } from 'services/side-nav';
 import { EAvailableFeatures } from 'services/incremental-rollout';
 import { $t } from 'services/i18n';
 // import { getPlatformService } from 'services/platforms';
@@ -11,7 +12,6 @@ import AppsNav from './AppsNav';
 import NavTools from './NavTools';
 // import styles from './SideNav.m.less';
 import { Menu, Layout } from 'antd';
-import { SideBarTopNavData, IMenuItem, IParentMenuItem } from 'services/layout/side-nav';
 // import { has } from 'lodash';
 
 const { Sider } = Layout;
@@ -25,9 +25,8 @@ export default function SideNav() {
     PlatformAppsService,
     IncrementalRolloutService,
     UsageStatisticsService,
+    SideNavService,
   } = Services;
-
-  const menuOptions = SideBarTopNavData();
 
   function navigate(page: TAppPage, trackingTarget?: string) {
     if (!UserService.views.isLoggedIn && page !== 'Studio') return;
@@ -45,6 +44,7 @@ export default function SideNav() {
     // leftDock,
     enabledApps,
     loggedIn,
+    menu,
   } = useVuex(() => ({
     featureIsEnabled: (feature: EAvailableFeatures) =>
       IncrementalRolloutService.views.featureIsEnabled(feature),
@@ -54,6 +54,7 @@ export default function SideNav() {
     loading: AppService.state.loading,
     enabledApps: PlatformAppsService.views.enabledApps,
     loggedIn: UserService.views.isLoggedIn,
+    menu: SideNavService.views.sidebar[ENavNames.TopNav],
   }));
 
   /*
@@ -98,19 +99,21 @@ export default function SideNav() {
         {/* TODO: Apply styles */}
         {/* <div className={cx('side-nav', styles.container, { [styles.leftDock]: leftDock })}> */}
         <Menu forceSubMenuRender mode="inline">
-          {menuOptions.menuItems.map((menuItem: IParentMenuItem) => {
+          {menu.menuItems.map((menuItem: IParentMenuItem) => {
             if (
-              (menuItem.isLegacy && !hasLegacyMenu) ||
-              (!loggedIn && menuItem.title === 'Alert Box')
+              (menuItem?.isLegacy && !hasLegacyMenu) ||
+              (!loggedIn && menuItem.title === EMenuItem.AlertBox) ||
+              (menuItem.hasOwnProperty('isActive') && !menuItem?.isActive)
             ) {
               // skip legacy menu items for new users
               // skip alert box library for users that are not logged in
+              // skip inactive menu items
               return null;
             }
             return menuItem.hasOwnProperty('subMenuItems') ||
-              (themeAuditEnabled && menuItem.title !== 'Theme Audit') ? (
+              (themeAuditEnabled && menuItem.title !== EMenuItem.ThemeAudit) ? (
               <Menu.SubMenu
-                key={menuItem?.target ?? menuItem?.trackingTarget}
+                key={`menu-${menuItem?.target ?? menuItem?.trackingTarget}`}
                 title={$t(menuItem.title)}
                 icon={menuItem?.icon && <i className={menuItem.icon} />}
                 onTitleClick={() =>
@@ -119,9 +122,9 @@ export default function SideNav() {
                     navigate(menuItem.target as TAppPage, menuItem?.trackingTarget))
                 }
               >
-                {menuItem?.subMenuItems?.map((subMenuItem: IMenuItem) => (
+                {menuItem?.subMenuItems?.map((subMenuItem: IMenuItem, index: number) => (
                   <Menu.Item
-                    key={subMenuItem?.target ?? subMenuItem?.trackingTarget}
+                    key={`submenu-${subMenuItem?.target ?? subMenuItem?.trackingTarget ?? index}`}
                     title={$t(subMenuItem.title)}
                     onClick={() =>
                       menuItem?.target
@@ -136,7 +139,7 @@ export default function SideNav() {
               </Menu.SubMenu>
             ) : (
               <Menu.Item
-                key={menuItem?.target ?? menuItem?.trackingTarget}
+                key={`menu-${menuItem?.target ?? menuItem?.trackingTarget}`}
                 title={`${menuItem.title}`}
                 icon={menuItem?.icon && <i className={menuItem.icon} />}
               >
@@ -144,10 +147,10 @@ export default function SideNav() {
               </Menu.Item>
             );
           })}
-          <Menu.Item>
-            {/* TODO: Convert AppsNav to antd menu items */}
+          {/* <Menu.Item>
+            {/* TODO: Convert AppsNav to antd menu items
             {enabledApps.length > 0 && hasLegacyMenu && <AppsNav />}
-          </Menu.Item>
+          </Menu.Item> */}
         </Menu>
 
         <NavTools />

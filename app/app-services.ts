@@ -56,6 +56,7 @@ export { MetricsService } from 'services/metrics';
 export { HighlighterService } from 'services/highlighter';
 export { DiagnosticsService } from 'services/diagnostics';
 export { RecordingModeService } from 'services/recording-mode';
+export { SideNavService } from 'services/side-nav';
 
 // ONLINE SERVICES
 export { UserService } from './services/user';
@@ -177,6 +178,7 @@ import { OverlaysPersistenceService } from 'services/scene-collections/overlays'
 import { PlatformAppStoreService } from 'services/platform-app-store';
 import { GameOverlayService } from 'services/game-overlay';
 import { GuestCamService } from 'services/guest-cam';
+import { SideNavService } from './services/side-nav';
 
 export const AppServices = {
   AppService,
@@ -242,4 +244,5 @@ export const AppServices = {
   GameOverlayService,
   GuestCamService,
   HardwareService,
+  SideNavService,
 };

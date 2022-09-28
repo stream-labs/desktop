@@ -34,6 +34,7 @@ type ILayoutData = {
   };
 };
 
+// TODO: explore refactoring to this kind of export
 export const LAYOUT_DATA: ILayoutData = {
   [ELayout.Default]: {
     resizeDefaults: { bar1: 0.2, bar2: 0.3 },

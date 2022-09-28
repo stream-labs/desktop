@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Services } from '../../service-provider';
 import { $t } from '../../../services/i18n';
 import { Row, Col } from 'antd';
@@ -7,9 +7,17 @@ import { getDefined } from '../../../util/properties-type-guards';
 import { ObsSettingsSection } from './ObsSettings';
 import * as remote from '@electron/remote';
 import { injectFormBinding, useModule } from 'slap';
+import { EMenuItem } from 'services/side-nav';
+import { useVuex } from 'components-react/hooks';
 
 export function AppearanceSettings() {
-  const { CustomizationService, WindowsService, UserService, MagicLinkService } = Services;
+  const {
+    CustomizationService,
+    WindowsService,
+    UserService,
+    MagicLinkService,
+    SideNavService,
+  } = Services;
 
   const { bind } = useModule(() => {
     function getSettings() {
@@ -22,6 +30,8 @@ export function AppearanceSettings() {
 
     return { bind: injectFormBinding(getSettings, setSettings) };
   });
+
+  const { menuItems } = useVuex(() => ({ menuItems: SideNavService.views.menuItems }));
 
   function openFFZSettings() {
     WindowsService.createOneOffWindow(
@@ -62,6 +72,7 @@ export function AppearanceSettings() {
       </ObsSettingsSection>
 
       <ObsSettingsSection title={$t('Chat Settings')}>
+        {/* TODO: Will this conflict with the new menu? */}
         <CheckboxInput
           {...bind.leftDock}
           label={$t('Show the live dock (chat) on the left side')}
@@ -99,47 +110,47 @@ export function AppearanceSettings() {
         <Row gutter={[8, 8]}>
           <Col flex={1}>
             <SwitchInput
-              label={$t('Editor')}
+              label={$t(EMenuItem.Editor)}
               layout="horizontal"
-              // onChange={}
-              // value={}
+              onChange={() => SideNavService.actions.toggleMenuItem(EMenuItem.Editor)}
+              value={menuItems[EMenuItem.Editor].isActive}
               // className={}
             />
             <SwitchInput
               label={$t('Custom Editor')}
               layout="horizontal"
-              // onChange={}
-              // value={}
+              onChange={() => SideNavService.actions.toggleMenuItem(EMenuItem.Highlighter)}
+              value={menuItems[EMenuItem.Highlighter].isActive} // what value? Highlighter temporarily
               // className={}
             />
             <SwitchInput
-              label={$t('Studio Mode')}
+              label={$t(EMenuItem.StudioMode)}
               layout="horizontal"
-              // onChange={}
-              // value={}
+              onChange={() => SideNavService.actions.toggleMenuItem(EMenuItem.StudioMode)}
+              value={menuItems[EMenuItem.StudioMode].isActive}
               // className={}
             />
             <SwitchInput
-              label={$t('Layout Editor')}
+              label={$t(EMenuItem.LayoutEditor)}
               layout="horizontal"
-              // onChange={}
-              // value={}
+              onChange={() => SideNavService.actions.toggleMenuItem(EMenuItem.LayoutEditor)}
+              value={menuItems[EMenuItem.LayoutEditor].isActive}
               // className={}
             />
             <SwitchInput
-              label={$t('Themes')}
+              label={$t(EMenuItem.Themes)}
               layout="horizontal"
-              // onChange={}
-              // value={}
+              onChange={() => SideNavService.actions.toggleMenuItem(EMenuItem.Themes)}
+              value={menuItems[EMenuItem.Themes].isActive}
               // className={}
             />
           </Col>
           <Col flex={3}>
             <SwitchInput
-              label={$t('App Store')}
+              label={$t(EMenuItem.AppStore)}
               layout="horizontal"
-              // onChange={}
-              // value={}
+              onChange={() => SideNavService.actions.toggleMenuItem(EMenuItem.AppStore)}
+              value={menuItems[EMenuItem.AppStore].isActive}
               // className={}
             />
             {/* TODO: if apps, map over apps */}

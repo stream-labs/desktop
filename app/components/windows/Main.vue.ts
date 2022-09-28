@@ -46,6 +46,7 @@ import antdThemes from 'styles/antd/index';
 const loadedTheme = () => {
   const customizationState = localStorage.getItem('PersistentStatefulService-CustomizationService');
   if (customizationState) {
+    console.log('JSON.parse(customizationState) ', JSON.parse(customizationState));
     return JSON.parse(customizationState)?.theme;
   }
 };
