@@ -55,7 +55,7 @@ export default function SideNav() {
     loading: AppService.state.loading,
     enabledApps: PlatformAppsService.views.enabledApps,
     loggedIn: UserService.views.isLoggedIn,
-    menu: SideNavService.views.sidebar[ENavName.TopNav],
+    menu: SideNavService.views.state[ENavName.TopNav],
   }));
 
   // TODO HERE!!!!
