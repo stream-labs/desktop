@@ -8,9 +8,9 @@ import { Services } from '../service-provider';
 import { useVuex } from '../hooks';
 import styles from './SideNav.m.less';
 import * as remote from '@electron/remote';
-import { Badge, Menu } from 'antd';
+import { Badge, Menu, Typography } from 'antd';
 import { EMenuItem, ESubMenuItem, ENavName } from 'services/side-nav';
-import PlatformLogo from 'components/shared/PlatformLogo';
+import PlatformLogo from 'components-react/shared/PlatformLogo';
 import { TPlatform } from 'services/platforms';
 
 export default function SideNav() {
@@ -27,16 +27,14 @@ export default function SideNav() {
 
   const isDevMode = Utils.isDevMode();
 
-  const { studioMode, isLoggedIn, isPrime, platform, menu } = useVuex(
+  const { studioMode, isLoggedIn, isPrime, platform, menu, isOpen } = useVuex(
     () => ({
       studioMode: TransitionsService.views.studioMode,
       isLoggedIn: UserService.views.isLoggedIn,
       isPrime: UserService.views.isPrime,
-      platform: {
-        name: UserService.views.auth?.primaryPlatform as TPlatform,
-        userName: UserService.views.auth?.platforms[UserService.views.auth?.primaryPlatform],
-      },
+      platform: UserService.views.auth?.platforms[UserService.views.auth?.primaryPlatform],
       menu: SideNavService.views.sidebar[ENavName.BottomNav],
+      isOpen: SideNavService.views.isOpen,
     }),
     false,
   );
@@ -235,27 +233,48 @@ export default function SideNav() {
       {/* TODO: move to own component */}
       <Menu.Item
         key="login"
-        title={$t(EMenuItem.Login)}
-        // className={styles.cell}
+        title={!isLoggedIn ? $t(EMenuItem.Login) : $t('Log Out')}
+        className={styles.login}
         icon={
-          <div>
-            <i className="icon-user" /> <i className="icon-logout" />
-          </div>
+          !isOpen && (
+            // need to flip this entire div to transform the login arrow icon because
+            // the Menu.Item antd component does not apply transforms to icons when loading
+            <div style={{ transform: 'scaleX(-1)' }}>
+              <LoginArrowIcon />
+              <i className="icon-user" />
+            </div>
+          )
         }
         onClick={() => handleAuth()}
       >
-        {!isLoggedIn && !!platform?.name ? (
-          $t(EMenuItem.Login)
+        {!isLoggedIn ? (
+          <Typography.Text underline style={{ marginBottom: '0px', flexGrow: 1 }}>
+            {$t(EMenuItem.Login)}
+          </Typography.Text>
         ) : (
-          <>
-            <PlatformLogo
-              platform={platform.name}
-              // className={styles[`platform-logo-${platform.name}`]}
-            />
-            {$t(platform.userName)}
-          </>
+          isOpen && (
+            <>
+              {platform && (
+                <PlatformLogo
+                  platform={platform?.type!}
+                  className={cx(styles.platformLogo, styles[`platform-logo-${platform?.type}`])}
+                />
+              )}
+              <Typography.Text
+                underline
+                style={{ color: 'var(--logged-in)', marginBottom: '0px', flexGrow: 1 }}
+              >
+                {$t(platform?.username) || $t('Log Out')}
+              </Typography.Text>
+            </>
+          )
         )}
+        <LoginArrowIcon />
       </Menu.Item>
     </Menu>
   );
+}
+
+function LoginArrowIcon() {
+  return <i className={cx('icon-logout', styles.loginArrow)} />;
 }

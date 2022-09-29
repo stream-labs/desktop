@@ -1,6 +1,4 @@
-import Vue from 'vue';
-import { Inject, ViewHandler, InitAfter, PersistentStatefulService } from 'services/core';
-import { CustomizationService } from 'services/customization';
+import { ViewHandler, InitAfter, PersistentStatefulService } from 'services/core';
 import { mutation } from 'services/core/stateful-service';
 import {
   TNavMenu,
@@ -16,6 +14,7 @@ import {
 } from './menu-data';
 
 interface ISideNavServiceState {
+  isOpen: boolean;
   compactView: boolean;
   sidebar: TNavMenu;
   menuItems: TMenuItems;
@@ -25,6 +24,10 @@ interface ISideNavServiceState {
 }
 
 class SideNavViews extends ViewHandler<ISideNavServiceState> {
+  get isOpen() {
+    return this.state.isOpen;
+  }
+
   get sidebar() {
     return this.state.sidebar;
   }
@@ -51,6 +54,7 @@ class SideNavViews extends ViewHandler<ISideNavServiceState> {
 @InitAfter('UserService')
 export class SideNavService extends PersistentStatefulService<ISideNavServiceState> {
   static defaultState: ISideNavServiceState = {
+    isOpen: false,
     compactView: true,
     sidebar: SideNavMenu(),
     menuItems: SideNavMenuItems(),
@@ -58,7 +62,6 @@ export class SideNavService extends PersistentStatefulService<ISideNavServiceSta
     [ENavName.BottomNav]: SideBarBottomNavData(),
     [ENavName.Login]: Login(),
   };
-  @Inject() private customizationService: CustomizationService;
 
   init() {
     super.init();
@@ -68,6 +71,10 @@ export class SideNavService extends PersistentStatefulService<ISideNavServiceSta
 
   get views() {
     return new SideNavViews(this.state);
+  }
+
+  toggleMenuStatus() {
+    this.OPEN_CLOSE_MENU();
   }
 
   setCompactView() {
@@ -82,6 +89,11 @@ export class SideNavService extends PersistentStatefulService<ISideNavServiceSta
   //   if (!menuName) return;
   //   this.SET_EXPANDED_STATUS(menuName);
   // }
+
+  @mutation()
+  private OPEN_CLOSE_MENU() {
+    this.state.isOpen = !this.state.isOpen;
+  }
 
   @mutation()
   private SET_COMPACT_VIEW() {

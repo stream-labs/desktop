@@ -1,3 +1,4 @@
+@import '../../styles/index';
 @import '../../styles/mixins';
 @import '../../styles/badges';
 
@@ -152,4 +153,24 @@
   color: var(--title);
   border: 1px solid var(--section-alt);
   font-size: 8px;
+}
+
+.login > span {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.platform-logo {
+  margin-right: 10px;
+  color: var(--logged-in);
+}
+
+.login-arrow {
+  justify-self: flex-end;
+  margin-left: 5px;
+  transform: scaleX(-1);
+  -moz-transform: scaleX(-1);
+  -webkit-transform: scaleX(-1);
+  -ms-transform: scaleX(-1);
 }
