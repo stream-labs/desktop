@@ -30,7 +30,7 @@ export const SwitchInput = InputComponent((p: TSwitchInputProps) => {
           size="small"
           {...inputAttrs}
           ref={p.inputRef}
-          className={cx(styles.horizontal, { [styles.checked]: inputAttrs?.value })}
+          className={cx(styles.horizontal)}
         />
         {p.label}
       </Form.Item>
