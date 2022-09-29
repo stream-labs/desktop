@@ -9,7 +9,7 @@ import { useVuex } from '../hooks';
 import styles from './SideNav.m.less';
 import * as remote from '@electron/remote';
 import { Badge, Menu } from 'antd';
-import { EMenuItem, ESubMenuItem, ENavNames } from 'services/side-nav';
+import { EMenuItem, ESubMenuItem, ENavName } from 'services/side-nav';
 
 export default function SideNav() {
   const {
@@ -29,7 +29,7 @@ export default function SideNav() {
       studioMode: TransitionsService.views.studioMode,
       isLoggedIn: UserService.views.isLoggedIn,
       isPrime: UserService.views.isPrime,
-      menu: SideNavService.views.sidebar[ENavNames.BottomNav],
+      menu: SideNavService.views.sidebar[ENavName.BottomNav],
     }),
     false,
   );

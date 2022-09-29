@@ -7,8 +7,10 @@ import { getDefined } from '../../../util/properties-type-guards';
 import { ObsSettingsSection } from './ObsSettings';
 import * as remote from '@electron/remote';
 import { injectFormBinding, useModule } from 'slap';
-import { EMenuItem } from 'services/side-nav';
+import { ENavName, EMenuItem, IMenuItem, IParentMenuItem, TMenuItems } from 'services/side-nav';
 import { useVuex } from 'components-react/hooks';
+import styles from './Appearance.m.less';
+import cx from 'classnames';
 
 export function AppearanceSettings() {
   const {
@@ -31,7 +33,13 @@ export function AppearanceSettings() {
     return { bind: injectFormBinding(getSettings, setSettings) };
   });
 
-  const { menuItems } = useVuex(() => ({ menuItems: SideNavService.views.menuItems }));
+  const { compactView, menuItems } = useVuex(() => ({
+    compactView: SideNavService.views.compactView,
+    views: SideNavService.views,
+    menuItems: SideNavService.views.menuItems,
+  }));
+
+  console.log('APPEARANCE COMPONENT: menuItems ', menuItems);
 
   function openFFZSettings() {
     WindowsService.createOneOffWindow(
@@ -102,45 +110,61 @@ export function AppearanceSettings() {
 
       <ObsSettingsSection title={$t('Custom Navigation Bar')}>
         <CheckboxInput
-          // {...bind.enableCustomNavigation} TODO: functionality
+          onChange={() => SideNavService.actions.setCompactView()}
           label={$t(
             'Enable custom navigation bar to pin your favorite features for quick access.\nDisable to swap to compact view.',
           )}
+          value={compactView}
+          className={cx(styles.settingsCheckbox)}
+          // style={{
+          //   backgroundColor: compactView ? 'var(--checkbox)' : 'var(--teal_',
+          //   borderColor: compactView ? 'var(--checkbox)' : 'var(--teal)',
+          // }}
         />
         <Row gutter={[8, 8]}>
           <Col flex={1}>
             <SwitchInput
               label={$t(EMenuItem.Editor)}
               layout="horizontal"
-              onChange={() => SideNavService.actions.toggleMenuItem(EMenuItem.Editor)}
+              onChange={() =>
+                SideNavService.actions.toggleMenuItem(ENavName.TopNav, EMenuItem.Editor)
+              }
               value={menuItems[EMenuItem.Editor].isActive}
               // className={}
             />
             <SwitchInput
               label={$t('Custom Editor')}
               layout="horizontal"
-              onChange={() => SideNavService.actions.toggleMenuItem(EMenuItem.Highlighter)}
+              onChange={() =>
+                SideNavService.actions.toggleMenuItem(ENavName.TopNav, EMenuItem.Highlighter)
+              }
               value={menuItems[EMenuItem.Highlighter].isActive} // what value? Highlighter temporarily
               // className={}
             />
             <SwitchInput
               label={$t(EMenuItem.StudioMode)}
               layout="horizontal"
-              onChange={() => SideNavService.actions.toggleMenuItem(EMenuItem.StudioMode)}
+              onChange={() =>
+                SideNavService.actions.toggleMenuItem(ENavName.TopNav, EMenuItem.StudioMode)
+              }
               value={menuItems[EMenuItem.StudioMode].isActive}
               // className={}
             />
             <SwitchInput
               label={$t(EMenuItem.LayoutEditor)}
               layout="horizontal"
-              onChange={() => SideNavService.actions.toggleMenuItem(EMenuItem.LayoutEditor)}
+              onChange={() =>
+                SideNavService.actions.toggleMenuItem(ENavName.TopNav, EMenuItem.LayoutEditor)
+              }
               value={menuItems[EMenuItem.LayoutEditor].isActive}
               // className={}
             />
             <SwitchInput
               label={$t(EMenuItem.Themes)}
               layout="horizontal"
-              onChange={() => SideNavService.actions.toggleMenuItem(EMenuItem.Themes)}
+              onChange={() =>
+                SideNavService.actions.toggleMenuItem(ENavName.TopNav, EMenuItem.Themes)
+              }
               value={menuItems[EMenuItem.Themes].isActive}
               // className={}
             />
@@ -149,7 +173,9 @@ export function AppearanceSettings() {
             <SwitchInput
               label={$t(EMenuItem.AppStore)}
               layout="horizontal"
-              onChange={() => SideNavService.actions.toggleMenuItem(EMenuItem.AppStore)}
+              onChange={() =>
+                SideNavService.actions.toggleMenuItem(ENavName.TopNav, EMenuItem.AppStore)
+              }
               value={menuItems[EMenuItem.AppStore].isActive}
               // className={}
             />

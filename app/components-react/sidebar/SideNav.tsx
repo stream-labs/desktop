@@ -2,12 +2,13 @@ import React, { useState } from 'react';
 // import Animation from 'rc-animate';
 // import cx from 'classnames';
 import { TAppPage } from 'services/navigation';
-import { ENavNames, EMenuItem, IMenuItem, IParentMenuItem } from 'services/side-nav';
+import { ENavName, EMenuItem, IMenuItem, IParentMenuItem, SideNavMenu } from 'services/side-nav';
 import { EAvailableFeatures } from 'services/incremental-rollout';
 import { $t } from 'services/i18n';
 // import { getPlatformService } from 'services/platforms';
 import { Services } from 'components-react/service-provider';
-import { useVuex } from 'components-react/hooks';
+import { injectState, useModule, mutation } from 'slap';
+import { useVuex, useWatchVuex } from 'components-react/hooks';
 import AppsNav from './AppsNav';
 import NavTools from './NavTools';
 // import styles from './SideNav.m.less';
@@ -54,9 +55,16 @@ export default function SideNav() {
     loading: AppService.state.loading,
     enabledApps: PlatformAppsService.views.enabledApps,
     loggedIn: UserService.views.isLoggedIn,
-    menu: SideNavService.views.sidebar[ENavNames.TopNav],
+    menu: SideNavService.views.sidebar[ENavName.TopNav],
   }));
 
+  // TODO HERE!!!!
+  // useWatchVuex(
+  //   () => SideNavService.views.sidebar[ENavName.TopNav],
+  //   isPrime => isPrime && next(),
+  // );
+
+  // const menu = SideNavService.views.sidebar[ENavName.TopNav];
   /*
    * TODO: Create logic for legacy menu to show themes as primary items
    */
@@ -77,6 +85,8 @@ export default function SideNav() {
    * via command line flag. Not for general use.
    */
   const themeAuditEnabled = featureIsEnabled(EAvailableFeatures.themeAudit);
+
+  console.log('SIDENAV COMPONENT: menu', menu);
 
   return (
     <Layout
@@ -158,6 +168,40 @@ export default function SideNav() {
     </Layout>
   );
 }
+
+// class SideNavModule {
+//   state = injectState({
+//     compactView: true,
+//     sidebar: SideNavMenu(),
+//     menuItems: SideNavMenuItems(),
+//   })
+
+//   state = injectState({
+//     stepIndex: 0,
+//     processing: false,
+//   });
+//     get sidebar() {
+//       return this.state.sidebar;
+//     }
+
+//     get compactView() {
+//       return this.state.compactView;
+//     }
+
+//     get menuItems() {
+//       return this.state.menuItems;
+//     }
+
+//     getMenuItem(name: EMenuItem) {
+//       if (!name) return;
+//       return this.state.menuItems[name];
+//     }
+
+//     isMenuItemActive(name: EMenuItem) {
+//       if (!name) return;
+//       return this.state.menuItems[name].isActive;
+//     }
+//   }
 
 // function StudioTab(p: {
 //   page: { target: string; title: string; icon: string; trackingTarget: string };

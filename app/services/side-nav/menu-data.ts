@@ -23,7 +23,7 @@ export interface IParentMenuItem extends IMenuItem {
   subMenuItems: IMenuItem[];
 }
 
-export enum ENavNames {
+export enum ENavName {
   TopNav = 'top-nav',
   BottomNav = 'bottom-nav',
   Login = 'login-button',
@@ -59,7 +59,7 @@ export enum ESubMenuItem {
 }
 
 export const SideBarTopNavData = (): IMenu => ({
-  name: ENavNames.TopNav,
+  name: ENavName.TopNav,
   isOpen: false, // TODO: update to be set by user settings on layout load
   isLegacy: true, // TODO: update to be set by user creation date
   menuItems: [
@@ -75,7 +75,7 @@ export const SideBarTopNavData = (): IMenu => ({
 });
 
 export const SideBarBottomNavData = (): IMenu => ({
-  name: ENavNames.BottomNav,
+  name: ENavName.BottomNav,
   isOpen: false, // TODO: update to be set by user settings on layout load
   isLegacy: true, // TODO: update to be set by user creation date
   menuItems: [
@@ -88,20 +88,20 @@ export const SideBarBottomNavData = (): IMenu => ({
 });
 
 export const Login = (): IMenu => ({
-  name: ENavNames.Login,
+  name: ENavName.Login,
   isOpen: false,
   isLegacy: true,
   menuItems: [SideNavMenuItems()[EMenuItem.Login]],
 });
 
 export type TNavMenu = {
-  [Nav in ENavNames]: IMenu;
+  [Nav in ENavName]: IMenu;
 };
 
 export const SideNavMenu = (): TNavMenu => ({
-  [ENavNames.TopNav]: SideBarTopNavData(),
-  [ENavNames.BottomNav]: SideBarBottomNavData(),
-  [ENavNames.Login]: Login(),
+  [ENavName.TopNav]: SideBarTopNavData(),
+  [ENavName.BottomNav]: SideBarBottomNavData(),
+  [ENavName.Login]: Login(),
 });
 
 export type TMenuItems = {
