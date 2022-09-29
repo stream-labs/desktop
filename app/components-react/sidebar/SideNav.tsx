@@ -14,6 +14,7 @@ import NavTools from './NavTools';
 // import styles from './SideNav.m.less';
 import { Menu, Layout } from 'antd';
 // import { has } from 'lodash';
+import Scrollable from 'components/shared/Scrollable';
 
 const { Sider } = Layout;
 
@@ -89,83 +90,85 @@ export default function SideNav() {
   console.log('SIDENAV COMPONENT: menu', menu);
 
   return (
-    <Layout
-      hasSider
-      style={{
-        width: '100%',
-        minHeight: '100vh',
-      }}
-    >
-      <Sider
-        collapsible
-        collapsed={!open}
-        onCollapse={() => setOpen(!open)}
+    <Scrollable style={{ height: '100%' }}>
+      <Layout
+        hasSider
         style={{
           width: '100%',
-          height: '100%',
-          overflow: 'visible',
+          minHeight: '100vh',
         }}
       >
-        {/* TODO: Apply styles */}
-        {/* <div className={cx('side-nav', styles.container, { [styles.leftDock]: leftDock })}> */}
-        <Menu forceSubMenuRender mode="inline">
-          {menu.menuItems.map((menuItem: IParentMenuItem) => {
-            if (
-              (menuItem?.isLegacy && !hasLegacyMenu) ||
-              (!loggedIn && menuItem.title === EMenuItem.AlertBox) ||
-              (menuItem.hasOwnProperty('isActive') && !menuItem?.isActive)
-            ) {
-              // skip legacy menu items for new users
-              // skip alert box library for users that are not logged in
-              // skip inactive menu items
-              return null;
-            }
-            return menuItem.hasOwnProperty('subMenuItems') ||
-              (themeAuditEnabled && menuItem.title !== EMenuItem.ThemeAudit) ? (
-              <Menu.SubMenu
-                key={`menu-${menuItem?.target ?? menuItem?.trackingTarget}`}
-                title={$t(menuItem.title)}
-                icon={menuItem?.icon && <i className={menuItem.icon} />}
-                onTitleClick={() =>
-                  (menuItem.hasOwnProperty('isToggled') && console.log('Toggle studio mode')) ||
-                  (menuItem?.target &&
-                    navigate(menuItem.target as TAppPage, menuItem?.trackingTarget))
-                }
-              >
-                {menuItem?.subMenuItems?.map((subMenuItem: IMenuItem, index: number) => (
-                  <Menu.Item
-                    key={`submenu-${subMenuItem?.target ?? subMenuItem?.trackingTarget ?? index}`}
-                    title={$t(subMenuItem.title)}
-                    onClick={() =>
-                      menuItem?.target
-                        ? navigate(menuItem?.target as TAppPage, menuItem?.trackingTarget)
-                        : console.log('target tbd')
-                    }
-                    // TODO: Update onclick after all targets confirmed
-                  >
-                    {$t(subMenuItem.title)}
-                  </Menu.Item>
-                ))}
-              </Menu.SubMenu>
-            ) : (
-              <Menu.Item
-                key={`menu-${menuItem?.target ?? menuItem?.trackingTarget}`}
-                title={`${menuItem.title}`}
-                icon={menuItem?.icon && <i className={menuItem.icon} />}
-              >
-                {$t(menuItem.title)}
-              </Menu.Item>
-            );
-          })}
-          {/* <Menu.Item>
+        <Sider
+          collapsible
+          collapsed={!open}
+          onCollapse={() => setOpen(!open)}
+          style={{
+            width: '100%',
+            height: '100%',
+            overflow: 'visible',
+          }}
+        >
+          {/* TODO: Apply styles */}
+          {/* <div className={cx('side-nav', styles.container, { [styles.leftDock]: leftDock })}> */}
+          <Menu forceSubMenuRender mode="inline">
+            {menu.menuItems.map((menuItem: IParentMenuItem) => {
+              if (
+                (menuItem?.isLegacy && !hasLegacyMenu) ||
+                (!loggedIn && menuItem.title === EMenuItem.AlertBox) ||
+                (menuItem.hasOwnProperty('isActive') && !menuItem?.isActive)
+              ) {
+                // skip legacy menu items for new users
+                // skip alert box library for users that are not logged in
+                // skip inactive menu items
+                return null;
+              }
+              return menuItem.hasOwnProperty('subMenuItems') ||
+                (themeAuditEnabled && menuItem.title !== EMenuItem.ThemeAudit) ? (
+                <Menu.SubMenu
+                  key={`menu-${menuItem?.target ?? menuItem?.trackingTarget}`}
+                  title={$t(menuItem.title)}
+                  icon={menuItem?.icon && <i className={menuItem.icon} />}
+                  onTitleClick={() =>
+                    (menuItem.hasOwnProperty('isToggled') && console.log('Toggle studio mode')) ||
+                    (menuItem?.target &&
+                      navigate(menuItem.target as TAppPage, menuItem?.trackingTarget))
+                  }
+                >
+                  {menuItem?.subMenuItems?.map((subMenuItem: IMenuItem, index: number) => (
+                    <Menu.Item
+                      key={`submenu-${subMenuItem?.target ?? subMenuItem?.trackingTarget ?? index}`}
+                      title={$t(subMenuItem.title)}
+                      onClick={() =>
+                        menuItem?.target
+                          ? navigate(menuItem?.target as TAppPage, menuItem?.trackingTarget)
+                          : console.log('target tbd')
+                      }
+                      // TODO: Update onclick after all targets confirmed
+                    >
+                      {$t(subMenuItem.title)}
+                    </Menu.Item>
+                  ))}
+                </Menu.SubMenu>
+              ) : (
+                <Menu.Item
+                  key={`menu-${menuItem?.target ?? menuItem?.trackingTarget}`}
+                  title={`${menuItem.title}`}
+                  icon={menuItem?.icon && <i className={menuItem.icon} />}
+                >
+                  {$t(menuItem.title)}
+                </Menu.Item>
+              );
+            })}
+            {/* <Menu.Item>
             {/* TODO: Convert AppsNav to antd menu items
             {enabledApps.length > 0 && hasLegacyMenu && <AppsNav />}
           </Menu.Item> */}
-        </Menu>
+          </Menu>
 
-        <NavTools />
-      </Sider>
-    </Layout>
+          <NavTools />
+        </Sider>
+      </Layout>
+    </Scrollable>
   );
 }
 

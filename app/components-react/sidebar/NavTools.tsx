@@ -10,6 +10,8 @@ import styles from './SideNav.m.less';
 import * as remote from '@electron/remote';
 import { Badge, Menu } from 'antd';
 import { EMenuItem, ESubMenuItem, ENavName } from 'services/side-nav';
+import PlatformLogo from 'components/shared/PlatformLogo';
+import { TPlatform } from 'services/platforms';
 
 export default function SideNav() {
   const {
@@ -20,19 +22,26 @@ export default function SideNav() {
     MagicLinkService,
     UsageStatisticsService,
     SideNavService,
+    WindowsService,
   } = Services;
 
   const isDevMode = Utils.isDevMode();
 
-  const { studioMode, isLoggedIn, isPrime, menu } = useVuex(
+  const { studioMode, isLoggedIn, isPrime, platform, menu } = useVuex(
     () => ({
       studioMode: TransitionsService.views.studioMode,
       isLoggedIn: UserService.views.isLoggedIn,
       isPrime: UserService.views.isPrime,
+      platform: {
+        name: UserService.views.auth?.primaryPlatform as TPlatform,
+        userName: UserService.views.auth?.platforms[UserService.views.auth?.primaryPlatform],
+      },
       menu: SideNavService.views.sidebar[ENavName.BottomNav],
     }),
     false,
   );
+
+  console.log('platform ', platform);
 
   const [dashboardOpening, setDashboardOpening] = useState(false);
 
@@ -93,6 +102,25 @@ export default function SideNav() {
       console.error('Error generating dashboard magic link', e);
     }
   }
+
+  const handleAuth = () => {
+    if (isLoggedIn) {
+      remote.dialog
+        .showMessageBox({
+          title: $t('Confirm'),
+          message: $t('Are you sure you want to log out?'),
+          buttons: [$t('Yes'), $t('No')],
+        })
+        .then(({ response }) => {
+          if (response === 0) {
+            UserService.actions.logOut();
+          }
+        });
+    } else {
+      WindowsService.actions.closeChildWindow();
+      UserService.actions.showLogin();
+    }
+  };
 
   return (
     <Menu forceSubMenuRender mode="inline">
@@ -214,9 +242,19 @@ export default function SideNav() {
             <i className="icon-user" /> <i className="icon-logout" />
           </div>
         }
-        // onClick={openSettingsWindow}
+        onClick={() => handleAuth()}
       >
-        {$t(EMenuItem.Login)}
+        {!isLoggedIn && !!platform?.name ? (
+          $t(EMenuItem.Login)
+        ) : (
+          <>
+            <PlatformLogo
+              platform={platform.name}
+              // className={styles[`platform-logo-${platform.name}`]}
+            />
+            {$t(platform.userName)}
+          </>
+        )}
       </Menu.Item>
     </Menu>
   );
