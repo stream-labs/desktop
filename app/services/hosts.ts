@@ -26,9 +26,6 @@ export class HostsService extends Service {
   get niconicoOAuth() {
     return 'https://oauth.nicovideo.jp';
   }
-  get niconicoFlapi() {
-    return 'http://flapi.nicovideo.jp/api';
-  }
   get nAirLogin() {
     if (process.env.NAIR_LOGIN_URL) {
       return process.env.NAIR_LOGIN_URL;
