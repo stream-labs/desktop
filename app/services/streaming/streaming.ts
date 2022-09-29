@@ -520,7 +520,6 @@ export class StreamingService
 
     const event: TUsageEvent = {
       event: eventType,
-      user_id: this.userService.isLoggedIn() ? this.userService.platformId : null,
       platform: extractPlatform(settings.streamingURL),
       stream_track_id: streamingTrackId,
       content_id: this.nicoliveProgramService.state.programID || null,
