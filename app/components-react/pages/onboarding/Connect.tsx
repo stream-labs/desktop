@@ -50,7 +50,7 @@ export function Connect() {
     next();
   }
 
-  const platforms = ['twitch', 'youtube', 'facebook', 'trovo'];
+  const platforms = ['streamlabs', 'twitch', 'youtube', 'facebook', 'trovo'];
 
   return (
     <div className={styles.pageContainer}>
@@ -152,8 +152,14 @@ export class LoginModule {
     return this.UserService.state.authProcessState === EAuthProcessState.InProgress;
   }
 
-  async authPlatform(platform: TPlatform, onSuccess: () => void) {
+  async authPlatform(platform: TPlatform | 'streamlabs', onSuccess: () => void) {
     this.UsageStatisticsService.recordAnalyticsEvent('PlatformLogin', platform);
+
+    if (platform === 'streamlabs') {
+      this.UserService.startSLAuth();
+      return;
+    }
+
     const result = await this.UserService.startAuth(
       platform,
       platform === 'youtube' ? 'external' : 'internal',
