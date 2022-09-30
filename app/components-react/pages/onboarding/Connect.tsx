@@ -162,7 +162,7 @@ export class LoginModule {
 
     const result = await this.UserService.startAuth(
       platform,
-      platform === 'youtube' ? 'external' : 'internal',
+      ['youtube', 'twitch'].includes(platform) ? 'external' : 'internal',
     );
 
     if (result === EPlatformCallResult.TwitchTwoFactor) {
@@ -171,7 +171,7 @@ export class LoginModule {
           type: 'error',
           message: $t(
             'Twitch requires two factor authentication to be enabled on your account in order to stream to Twitch. ' +
-              'Please enable two factor authentication and try again.',
+            'Please enable two factor authentication and try again.',
           ),
           title: $t('Twitch Authentication Error'),
           buttons: [$t('Enable Two Factor Authentication'), $t('Dismiss')],
