@@ -157,9 +157,11 @@ export default function SideNav() {
           title={$t(EMenuItem.Dashboard)}
           // className={styles.cell}
           icon={
-            <Badge count={<i className={cx('icon-pop-out-3', styles.linkBadge)} />}>
-              <i className="icon-dashboard" />
-            </Badge>
+            <div>
+              <Badge count={<i className={cx('icon-pop-out-3', styles.linkBadge)} />}>
+                <i className="icon-dashboard" />
+              </Badge>
+            </div>
           }
           // onTitleClick={() => throttledOpenDashboard()} // does this still need an onClick?
         >
