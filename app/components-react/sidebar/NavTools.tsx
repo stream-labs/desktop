@@ -8,7 +8,7 @@ import { Services } from '../service-provider';
 import { useVuex } from '../hooks';
 import styles from './SideNav.m.less';
 import * as remote from '@electron/remote';
-import { Badge, Menu, Typography } from 'antd';
+import { Badge, Menu, Typography, Divider } from 'antd';
 import { EMenuItem, ESubMenuItem, ENavName } from 'services/side-nav';
 import PlatformLogo from 'components-react/shared/PlatformLogo';
 import { TPlatform } from 'services/platforms';
@@ -121,7 +121,8 @@ export default function SideNav() {
   };
 
   return (
-    <Menu forceSubMenuRender mode="inline">
+    <Menu forceSubMenuRender mode="inline" className={styles.bottomNav}>
+      <Divider className={styles.divider} />
       {isDevMode && (
         <Menu.Item
           key="dev-tools"
@@ -211,9 +212,11 @@ export default function SideNav() {
         title={$t(EMenuItem.GetHelp)}
         // className={styles.cell}
         icon={
-          <Badge count={<i className={cx('icon-pop-out-3', styles.linkBadge)} />}>
-            <i className="icon-question" />
-          </Badge>
+          <div>
+            <Badge count={<i className={cx('icon-pop-out-3', styles.linkBadge)} />}>
+              <i className="icon-question" />
+            </Badge>
+          </div>
         }
         onClick={openLayoutEditor}
       >
@@ -230,7 +233,7 @@ export default function SideNav() {
         {$t(EMenuItem.Settings)}
       </Menu.Item>
 
-      {/* TODO: move to own component */}
+      <Divider className={styles.loginDivider} />
       <Menu.Item
         key="login"
         title={!isLoggedIn ? $t(EMenuItem.Login) : $t('Log Out')}

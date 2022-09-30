@@ -155,6 +155,22 @@
   font-size: 8px;
 }
 
+.divider {
+  margin: 0 !important;
+  border: none !important;
+  height: 2px !important;
+  border-radius: !important;
+  background-color: var(--nav-divider) !important;
+  border-top: 2px solid var(--nav-divider);
+}
+
+.login-divider:extend(.divider) {
+  &:extend(.divider);
+  margin: 0 15px !important;
+  width: auto !important;
+  min-width: auto !important;
+}
+
 .login > span {
   display: flex;
   flex-direction: row;
