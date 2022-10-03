@@ -152,7 +152,11 @@ export class LoginModule {
     return this.UserService.state.authProcessState === EAuthProcessState.InProgress;
   }
 
-  async authPlatform(platform: TPlatform | 'streamlabs', onSuccess: () => void) {
+  get isPartialSLAuth() {
+    return this.UserService.views.isPartialSLAuth;
+  }
+
+  async authPlatform(platform: TPlatform | 'streamlabs', onSuccess: () => void, merge = false) {
     this.UsageStatisticsService.recordAnalyticsEvent('PlatformLogin', platform);
 
     if (platform === 'streamlabs') {
@@ -163,6 +167,7 @@ export class LoginModule {
     const result = await this.UserService.startAuth(
       platform,
       ['youtube', 'twitch'].includes(platform) ? 'external' : 'internal',
+      merge,
     );
 
     if (result === EPlatformCallResult.TwitchTwoFactor) {
