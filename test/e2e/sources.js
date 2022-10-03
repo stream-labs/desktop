@@ -6,7 +6,8 @@ import {
   clickSourceProperties,
   selectSource,
   openRenameWindow,
-  sourceIsExisting
+  sourceIsExisting,
+  waitForSourceExist,
 } from '../helpers/spectron/sources';
 
 useSpectron();
@@ -38,7 +39,7 @@ test('Adding and removing some sources', async t => {
     await selectSource(t, sourceName);
     await clickRemoveSource(t);
 
-    t.false(await sourceIsExisting(t, sourceName));
+    await waitForSourceExist(t, sourceName, true);
   }
 });
 

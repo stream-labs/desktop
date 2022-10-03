@@ -577,6 +577,9 @@
       },
       "LowLatencyEnable": {
         "name": "低遅延を有効にする"
+      },
+      "DynamicBitrate": {
+        "name": "配信中にフレームがドロップした場合に、ビットレートを動的に変更する"
       }
     },
     "Replay Buffer": {

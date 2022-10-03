@@ -37,17 +37,15 @@ async function openErrorDialog({
   message: string;
 }): Promise<void> {
   return new Promise<void>(resolve => {
-    remote.dialog.showMessageBox(
-      remote.getCurrentWindow(),
-      {
+    remote.dialog
+      .showMessageBox(remote.getCurrentWindow(), {
         type: 'warning',
         title,
         message,
         buttons: [$t('common.close')],
         noLink: true,
-      },
-      _ => resolve(),
-    );
+      })
+      .then(() => resolve());
   });
 }
 

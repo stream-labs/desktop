@@ -60,6 +60,7 @@ export interface ISourcesServiceApi {
   getSources(): ISourceApi[];
   getSource(sourceId: string): ISourceApi;
   getSourcesByName(name: string): ISourceApi[];
+  closeSourcePropertiesWindow(): Promise<void>;
 
   /**
    * creates a source from a file

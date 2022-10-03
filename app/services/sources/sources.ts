@@ -23,6 +23,7 @@ import {
 import { $t } from 'services/i18n';
 import { AudioService } from '../audio';
 import uuid from 'uuid/v4';
+import SourceProperties from 'components/windows/SourceProperties.vue';
 
 const AudioFlag = obs.ESourceOutputFlags.Audio;
 const VideoFlag = obs.ESourceOutputFlags.Video;
@@ -45,6 +46,8 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
     sources: {},
     temporarySources: {}, // don't save temporarySources in the config file
   } as ISourcesState;
+
+  private static readonly sourcePropertiesWindowId = 'sourcePropertiesWindow';
 
   sourceAdded = new Subject<ISource>();
   sourceUpdated = new Subject<ISource>();
@@ -119,12 +122,20 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
 
   @mutation()
   private REMOVE_SOURCE(id: string) {
-    Vue.delete(this.state.sources, id);
+    if (this.state.sources[id]) {
+      Vue.delete(this.state.sources, id);
+    } else {
+      Vue.delete(this.state.temporarySources, id);
+    }
   }
 
   @mutation()
   private UPDATE_SOURCE(sourcePatch: TPatch<ISource>) {
-    Object.assign(this.state.sources[sourcePatch.id], sourcePatch);
+    if (this.state.sources[sourcePatch.id]) {
+      Object.assign(this.state.sources[sourcePatch.id], sourcePatch);
+    } else {
+      Object.assign(this.state.temporarySources[sourcePatch.id], sourcePatch);
+    }
   }
 
   createSource(
@@ -169,7 +180,9 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
     };
 
     this.sourceAdded.next(source.state);
-    if (options.audioSettings) this.audioService.getSource(id).setSettings(options.audioSettings);
+    if (options.audioSettings) {
+      this.audioService.getSource(id).setSettings(options.audioSettings);
+    }
   }
 
   removeSource(id: string) {
@@ -185,14 +198,14 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
       obs.Global.setOutputSource(source.channel, null);
     }
 
-    this.REMOVE_SOURCE(id);
+    source.getObsInput().release();
     this.propertiesManagers[id].manager.destroy();
     delete this.propertiesManagers[id];
+    this.REMOVE_SOURCE(id);
     this.sourceRemoved.next(source.state);
-    source.getObsInput().release();
   }
 
-  addFile(path: string): Source {
+  addFile(path: string): Source | null {
     const SUPPORTED_EXT = {
       image_source: ['png', 'jpg', 'jpeg', 'tga', 'bmp'],
       ffmpeg_source: [
@@ -237,7 +250,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
       } else if (type === 'text_gdiplus') {
         settings = { text: fs.readFileSync(path).toString() };
       }
-      return this.createSource(filename, type as TSourceType, settings);
+      if (settings) return this.createSource(filename, type as TSourceType, settings);
     }
     return null;
   }
@@ -249,6 +262,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
   private onSceneItemRemovedHandler(sceneItemState: ISceneItem) {
     // remove source if it has been removed from the all scenes
     const source = this.getSource(sceneItemState.sourceId);
+    if (!source) return;
 
     if (source.type === 'scene') return;
 
@@ -402,6 +416,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
 
   setMuted(id: string, muted: boolean) {
     const source = this.getSource(id);
+    if (!source) return;
     source.getObsInput().muted = muted;
     this.UPDATE_SOURCE({ id, muted });
     this.sourceUpdated.next(source.state);
@@ -447,16 +462,43 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
 
   showSourceProperties(sourceId: string) {
     const source = this.getSource(sourceId);
-
-    this.windowsService.showWindow({
+    const baseConfig = {
       componentName: 'SourceProperties',
       title: $t('sources.propertyWindowTitle', { sourceName: source.name }),
       queryParams: { sourceId },
       size: {
         width: 600,
         height: 600,
-      },
+      }
+    };
+
+    // HACK: childWindow で表示してしまうとウィンドウキャプチャでクラッシュするので OneOffWindow で代替している
+    // StreamLabs 1.3.0 まで追従したらこのワークアラウンドはなくせる
+    this.windowsService.closeChildWindow();
+    (this.windowsService.getWindow(SourcesService.sourcePropertiesWindowId)
+      ? this.closeSourcePropertiesWindow()
+      : Promise.resolve()
+    ).then(() => {
+      if (!sourceId.startsWith("window_capture")) {
+        this.windowsService.showWindow(baseConfig);
+        return;
+      }
+      this.windowsService.createOneOffWindow(
+        {
+          ...baseConfig,
+          limitMinimumSize: true, // 小さくできなくする
+          // alwaysOnTop を利用した場合、メインウィンドウの背面に隠れることは防げるが、
+          // N Air 以外のウィンドウよりも前面に出てしまう
+          alwaysOnTop: true,
+        },
+        SourcesService.sourcePropertiesWindowId,
+      );
     });
+  }
+
+  async closeSourcePropertiesWindow() {
+    this.windowsService.closeChildWindow();
+    await this.windowsService.closeOneOffWindow(SourcesService.sourcePropertiesWindowId);
   }
 
   showShowcase() {

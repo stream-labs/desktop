@@ -5,18 +5,17 @@ afterEach(() => {
 });
 
 test('4xxで未定義文言だったら400にフォールバックする', async () => {
-  const showMessageBox = jest.fn().mockImplementation((_window, _option, callback) => {
-    callback();
+  const showMessageBox = jest.fn().mockImplementation(async (_window, _option) => {
   });
   jest.doMock('electron', () => ({
     remote: {
       dialog: {
         showMessageBox,
       },
-      getCurrentWindow: () => {},
+      getCurrentWindow: () => { },
     },
   }));
-  jest.doMock('./NicoliveClient', () => ({ NotLoggedInError: class {} }));
+  jest.doMock('./NicoliveClient', () => ({ NotLoggedInError: class { } }));
   jest.doMock('services/i18n', () => ({
     $t: jest.fn().mockImplementation((key, { fallback } = {}) => {
       const keys = key.split('.');
@@ -41,15 +40,14 @@ test('4xxで未定義文言だったら400にフォールバックする', async
 });
 
 test('5xxで未定義文言だったら500にフォールバックする', async () => {
-  const showMessageBox = jest.fn().mockImplementation((_window, _option, callback) => {
-    callback();
+  const showMessageBox = jest.fn().mockImplementation(async (_window, _option) => {
   });
   jest.doMock('electron', () => ({
     remote: {
       dialog: {
         showMessageBox,
       },
-      getCurrentWindow: () => {},
+      getCurrentWindow: () => { },
     },
   }));
   jest.doMock('services/i18n', () => ({

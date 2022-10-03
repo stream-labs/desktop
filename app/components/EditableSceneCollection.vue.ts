@@ -84,9 +84,8 @@ export default class EditableSceneCollection extends Vue {
   }
 
   remove() {
-    electron.remote.dialog.showMessageBox(
-      electron.remote.getCurrentWindow(),
-      {
+    electron.remote.dialog
+      .showMessageBox(electron.remote.getCurrentWindow(), {
         type: 'warning',
         buttons: [$t('common.cancel'), $t('common.ok')],
         title: $t('scenes.removeSceneCollectionConfirmTitle'),
@@ -94,11 +93,10 @@ export default class EditableSceneCollection extends Vue {
           collectionName: this.collection.name,
         }),
         noLink: true,
-      },
-      ok => {
+      })
+      .then(({ response: ok }) => {
         if (!ok) return;
         this.sceneCollectionsService.delete(this.collectionId);
-      },
-    );
+      });
   }
 }

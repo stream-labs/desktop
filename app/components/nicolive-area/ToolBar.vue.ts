@@ -153,19 +153,16 @@ export default class ToolBar extends Vue {
 
       // もし配信開始してなかったら確認する
       if (!this.streamingService.isStreaming) {
-        const startStreaming = await new Promise(resolve => {
-          // TODO: 翻訳
-          remote.dialog.showMessageBox(
-            remote.getCurrentWindow(),
-            {
-              type: 'warning',
-              message: $t('program-info.start-streaming-confirmation'),
-              buttons: [$t('streaming.goLive'), $t('program-info.later')],
-              noLink: true,
-            },
-            idx => resolve(idx === 0),
-          );
-        });
+        // TODO: 翻訳
+        const startStreaming = await remote.dialog.showMessageBox(
+          remote.getCurrentWindow(),
+          {
+            type: 'warning',
+            message: $t('program-info.start-streaming-confirmation'),
+            buttons: [$t('streaming.goLive'), $t('program-info.later')],
+            noLink: true,
+          },
+        ).then(value => value.response === 0);
         if (startStreaming) {
           // 開始
           await this.streamingService.toggleStreamingAsync();
@@ -185,19 +182,16 @@ export default class ToolBar extends Vue {
   async endProgram() {
     if (this.isEnding) throw new Error('endProgram is running');
     try {
-      const isOk = await new Promise(resolve => {
-        // TODO: 翻訳
-        remote.dialog.showMessageBox(
-          remote.getCurrentWindow(),
-          {
-            type: 'warning',
-            message: '番組を終了しますか？',
-            buttons: ['終了する', $t('common.cancel')],
-            noLink: true,
-          },
-          idx => resolve(idx === 0),
-        );
-      });
+      // TODO: 翻訳
+      const isOk = await remote.dialog.showMessageBox(
+        remote.getCurrentWindow(),
+        {
+          type: 'warning',
+          message: '番組を終了しますか？',
+          buttons: ['終了する', $t('common.cancel')],
+          noLink: true,
+        },
+      ).then(value => value.response === 0);
 
       if (isOk) {
         return await this.nicoliveProgramService.endProgram();

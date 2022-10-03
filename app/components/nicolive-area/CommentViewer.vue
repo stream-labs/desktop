@@ -123,7 +123,7 @@
   flex-grow: 1;
   overflow-y: auto;
   overflow-x: hidden;
-  height: 100%;
+  height: 0; // 100%がなぜか動かなくなったので workaround (Electron 6.1.11)
   padding-top: 8px;
 }
 
