@@ -16,8 +16,14 @@ import { SourcesService, TSourceType } from 'services/sources';
 import { byOS, OS } from 'util/operating-systems';
 import { IGuest, GuestCamService } from 'services/guest-cam';
 import { inject, injectState, useModule } from 'slap';
-import { AudioService, EditorCommandsService } from 'app-services';
+import {
+  AudioService,
+  EditorCommandsService,
+  IncrementalRolloutService,
+  UserService,
+} from 'app-services';
 import { confirmAsync } from 'components-react/modals';
+import { EAvailableFeatures } from 'services/incremental-rollout';
 
 class GuestCamModule {
   private GuestCamService = inject(GuestCamService);
@@ -25,6 +31,8 @@ class GuestCamModule {
   private AudioService = inject(AudioService);
   private EditorCommandsService = inject(EditorCommandsService);
   private DismissablesService = inject(DismissablesService);
+  private UserService = inject(UserService);
+  private IncrementalRolloutService = inject(IncrementalRolloutService);
 
   state = injectState({
     regeneratingLink: false,
@@ -37,6 +45,18 @@ class GuestCamModule {
 
   get hostName() {
     return this.GuestCamService.state.hostName;
+  }
+
+  get maxGuests() {
+    return this.GuestCamService.state.maxGuests;
+  }
+
+  get shouldShowPrimeUpgrade() {
+    return (
+      this.maxGuests === 2 &&
+      !this.UserService.views.isPrime &&
+      !this.IncrementalRolloutService.views.featureIsEnabled(EAvailableFeatures.guestCamBeta)
+    );
   }
 
   get showFirstTimeModal() {
@@ -85,12 +105,15 @@ class GuestCamModule {
   }
 
   get screenshareProducerSourceOptions() {
-    return this.SourcesService.views.sources
-      .filter(s => s.video)
-      .map(s => ({
-        label: s.name,
-        value: s.sourceId,
-      }));
+    return [
+      { label: $t('None'), value: '' },
+      ...this.SourcesService.views.sources
+        .filter(s => s.video)
+        .map(s => ({
+          label: s.name,
+          value: s.sourceId,
+        })),
+    ];
   }
 
   get videoProducerSource() {
@@ -129,6 +152,24 @@ class GuestCamModule {
     // comparison, this won't be reactive unless it's a new array every time.
     // This seems fairly unexpected.
     return [...this.GuestCamService.state.guests];
+  }
+
+  /**
+   * Because screenshares appear like a second guest, but aren't technically a second
+   * guest and don't count towards a guest slot, this can be used to get simply unique
+   * guests where their webcam and screenshare count as one.
+   */
+  get uniqueGuests() {
+    const socketIds: Dictionary<boolean> = {};
+
+    return this.GuestCamService.state.guests.filter(g => {
+      if (!socketIds[g.remoteProducer.socketId]) {
+        socketIds[g.remoteProducer.socketId] = true;
+        return true;
+      } else {
+        return false;
+      }
+    });
   }
 
   get sourceExists() {
@@ -212,6 +253,7 @@ export default function GuestCamProperties() {
     WindowsService,
     EditorCommandsService,
     DismissablesService,
+    MagicLinkService,
   } = Services;
   const defaultTab = useMemo(() => {
     const openedSourceId = WindowsService.getChildWindowQueryParams().sourceId;
@@ -223,6 +265,9 @@ export default function GuestCamProperties() {
   }, []);
   const {
     guests,
+    uniqueGuests,
+    maxGuests,
+    shouldShowPrimeUpgrade,
     joinAsGuest,
     hostName,
     showFirstTimeModal,
@@ -244,12 +289,24 @@ export default function GuestCamProperties() {
   } = useModule(GuestCamModule);
 
   function getModalContent() {
-    if (joinAsGuest) {
-      return <JoinAsGuestModalContent />;
-    } else if (showFirstTimeModal) {
+    if (showFirstTimeModal) {
       return <FirstTimeModalContent />;
+    } else if (!sourceExists) {
+      return <MissingSourceModalContent />;
+    } else if (joinAsGuest) {
+      return <JoinAsGuestModalContent />;
     } else {
       return <EveryTimeModalContent />;
+    }
+  }
+
+  function getModalButtonText() {
+    if (showFirstTimeModal) {
+      return $t('Get Started');
+    } else if (!sourceExists) {
+      return $t('Add Source');
+    } else {
+      return $t('Start Collab Cam');
     }
   }
 
@@ -302,6 +359,30 @@ export default function GuestCamProperties() {
                 </Button>
               </div>
             )}
+            {!joinAsGuest && (
+              <div style={{ margin: '10px 0 0', width: '100%' }}>
+                <span>{$t('Guests')}</span>
+                <span
+                  style={{
+                    marginLeft: 8,
+                    background: 'var(--section-alt)',
+                    padding: 5,
+                    borderRadius: 6,
+                  }}
+                >
+                  {uniqueGuests.length} / {maxGuests - 1}
+                </span>
+                {shouldShowPrimeUpgrade && (
+                  <span
+                    style={{ marginLeft: 8, color: 'var(--prime)', cursor: 'pointer' }}
+                    onClick={() => MagicLinkService.actions.linkToPrime('desktop-collab-cam')}
+                  >
+                    <i className="icon-prime" />
+                    <b style={{ marginLeft: 5 }}>{$t('Upgrade for more Guests')}</b>
+                  </span>
+                )}
+              </div>
+            )}
             <h2 style={{ marginTop: 20 }}>
               {$t(
                 'The webcam and microphone source you select below will be broadcast to your guests.',
@@ -320,25 +401,39 @@ export default function GuestCamProperties() {
                 options={videoProducerSourceOptions}
                 value={videoProducerSourceId}
                 onChange={s => GuestCamService.actions.setVideoSource(s)}
-                style={{ width: '45%', margin: 0 }}
+                style={{ width: '48%', margin: 0 }}
               />
               <ListInput
                 label={$t('Microphone Source')}
                 options={audioProducerSourceOptions}
                 value={audioProducerSourceId}
                 onChange={s => GuestCamService.actions.setAudioSource(s)}
-                style={{ width: '45%', margin: 0 }}
+                style={{ width: '48%', margin: 0 }}
               />
             </div>
-            <div>
+            <div
+              style={{
+                display: 'flex',
+                width: '100%',
+                margin: '10px 0',
+              }}
+            >
               <ListInput
                 label={$t('Share Video Source (Optional)')}
                 options={screenshareProducerSourceOptions}
                 value={screenshareProducerSourceId}
                 onChange={s => GuestCamService.actions.setScreenshareSource(s)}
-                style={{ width: 500, margin: 0 }}
-                allowClear
+                style={{ width: '48%', margin: 0 }}
               />
+              {screenshareProducerSourceId && (
+                <button
+                  className="button button--soft-warning"
+                  onClick={() => GuestCamService.actions.setScreenshareSource('')}
+                  style={{ marginLeft: 30 }}
+                >
+                  {$t('Stop Sharing')}
+                </button>
+              )}
             </div>
           </Form>
           {(!videoProducerSource || !audioProducerSource) && (
@@ -376,34 +471,24 @@ export default function GuestCamProperties() {
           );
         })}
       </Tabs>
-      {sourceExists ? (
-        <Modal
-          visible={!produceOk}
-          getContainer={false}
-          closable={false}
-          okText={$t('Start Collab Cam')}
-          onOk={() => {
+      <Modal
+        visible={!produceOk}
+        getContainer={false}
+        closable={false}
+        okText={getModalButtonText()}
+        onOk={() => {
+          if (sourceExists) {
             GuestCamService.actions.setProduceOk();
-            DismissablesService.actions.dismiss(EDismissable.GuestCamFirstTimeModal);
-          }}
-          onCancel={() => WindowsService.actions.closeChildWindow()}
-        >
-          {getModalContent()}
-        </Modal>
-      ) : (
-        <Modal
-          visible={true}
-          getContainer={false}
-          closable={false}
-          okText={$t('Add New Source')}
-          onOk={() => {
+          } else if (!showFirstTimeModal) {
             SourcesService.actions.showAddSource('mediasoupconnector');
-          }}
-          onCancel={() => WindowsService.actions.closeChildWindow()}
-        >
-          {MissingSourceModalContent()}
-        </Modal>
-      )}
+          }
+
+          DismissablesService.actions.dismiss(EDismissable.GuestCamFirstTimeModal);
+        }}
+        onCancel={() => WindowsService.actions.closeChildWindow()}
+      >
+        {getModalContent()}
+      </Modal>
     </ModalLayout>
   );
 }
@@ -658,6 +743,12 @@ function FirstTimeModalContent() {
         showIcon={false}
         banner
       />
+      <a
+        style={{ display: 'inline-block', marginTop: 10 }}
+        onClick={() => remote.shell.openExternal('https://streamlabs.com/collab-cam')}
+      >
+        {$t('Learn More')}
+      </a>
     </>
   );
 }
@@ -685,7 +776,7 @@ function MissingSourceModalContent() {
       <h2>{$t('Collab Cam requires a source')}</h2>
       <p>
         {$t(
-          'At least one Collab Cam source is required to connect to this stream. Would you like to add one now?',
+          'At least one Collab Cam source is required to use Collab Cam. Would you like to add one now?',
         )}
       </p>
     </>

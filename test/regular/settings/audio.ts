@@ -2,23 +2,20 @@ import { test, useSpectron } from '../../helpers/spectron';
 import { assertOptions } from '../../helpers/spectron/assertions';
 import { showSettingsWindow } from '../../helpers/modules/settings/settings';
 import { focusMain } from '../../helpers/modules/core';
+import { assertFormContains } from '../../helpers/modules/forms';
 
 useSpectron();
 
 test('Populates audio settings', async t => {
   await showSettingsWindow('Audio');
 
-  await assertOptions(t, 'SampleRate', '44.1khz', ['44.1khz', '48khz']);
-
-  await assertOptions(t, 'ChannelSetup', 'Stereo', [
-    'Mono',
-    'Stereo',
-    '2.1',
-    '4.0',
-    '4.1',
-    '5.1',
-    '7.1',
-  ]);
+  await assertFormContains(
+    {
+      'Sample Rate (requires a restart)': '44.1khz',
+      'Channels (requires a restart)': 'Stereo',
+    },
+    'title',
+  );
 
   /*
    * Since this is hardware-specific (and devices look disabled on AppVeyor), all we can test is

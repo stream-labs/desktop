@@ -18,7 +18,14 @@ export enum EAvailableFeatures {
   growTab = 'slobs--grow-tab',
   themeAudit = 'slobs--theme-audit',
   reactWidgets = 'slobs--react-widgets',
-  guestCam = 'slobs--guest-join',
+
+  /**
+   * There are two flags because one is used for beta access and
+   * grandfathering access, whereas the other is for production
+   * availability at launch.
+   */
+  guestCamBeta = 'slobs--guest-join',
+  guestCaProduction = 'slobs--guest-join-prod',
 }
 
 interface IIncrementalRolloutServiceState {
@@ -35,7 +42,21 @@ export class IncrementalRolloutService extends StatefulService<IIncrementalRollo
     availableFeatures: [],
   };
 
+  /**
+   * Available features are fetched async.  This is normally not a problem,
+   * as they are reactive.  However, any service logic that happens during
+   * initialization probably needs to wait on this promise before accessing
+   * the list of available features.
+   */
+  featuresReady: Promise<void>;
+
+  private featuresReadyResolve: () => void;
+
   init() {
+    this.featuresReady = new Promise(resolve => {
+      this.featuresReadyResolve = resolve;
+    });
+
     this.setCommandLineFeatures();
 
     this.userService.userLogin.subscribe(() => this.fetchAvailableFeatures());
@@ -60,6 +81,7 @@ export class IncrementalRolloutService extends StatefulService<IIncrementalRollo
 
       return jfetch<{ features: string[] }>(request).then(response => {
         this.SET_AVAILABLE_FEATURES([...this.state.availableFeatures, ...response.features]);
+        this.featuresReadyResolve();
       });
     }
   }

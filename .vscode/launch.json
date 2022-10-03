@@ -1,20 +1,32 @@
 {
-    "version": "0.2.0",
-    "configurations": [
-        {
-            "type": "node",
-            "request": "launch",
-            "name": "Launch",
-            "protocol": "inspector",
-            "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron.cmd",
-            "osx": {
-                "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron",
-            },
-            "runtimeArgs": [
-                "."
-            ],
-            "cwd": "${workspaceRoot}",
-            "outputCapture": "std"
-        }
-    ]
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Launch",
+      "protocol": "inspector",
+      "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron.cmd",
+      "osx": {
+        "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron"
+      },
+      "runtimeArgs": [".", "--remote-debugging-port=9222"],
+      "cwd": "${workspaceRoot}"
+    },
+    {
+      "type": "chrome",
+      "request": "attach",
+      "name": "Attach to Chrome",
+      "port": 9222,
+      "webRoot": "${workspaceRoot}",
+      "sourceMaps": true
+    }
+  ],
+  "compounds": [
+    {
+      "name": "Electron All",
+      "configurations": ["Launch", "Attach to Chrome"],
+      "stopAll": true
+    }
+  ]
 }

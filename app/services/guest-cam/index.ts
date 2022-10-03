@@ -19,12 +19,18 @@ import {
   SceneCollectionsService,
   UrlService,
   StreamingService,
+  UsageStatisticsService,
+  AppService,
+  DismissablesService,
+  IncrementalRolloutService,
 } from 'app-services';
 import { ENotificationType } from 'services/notifications';
 import { $t } from 'services/i18n';
 import { JsonrpcService } from 'services/api/jsonrpc';
 import { EStreamingState } from 'services/streaming';
 import Vue from 'vue';
+import { EDismissable } from 'services/dismissables';
+import { EAvailableFeatures } from 'services/incremental-rollout';
 
 /**
  * This is in actuality a big data blob at runtime, the shape
@@ -87,6 +93,7 @@ interface IIoConfigResponse {
   token: string;
   host: {
     name: string;
+    maxGuests: number;
   };
 }
 
@@ -183,6 +190,11 @@ interface IGuestCamServiceState {
    * Name of the host of the room
    */
   hostName: string;
+
+  /**
+   * Number includes the host
+   */
+  maxGuests: number;
 }
 
 class GuestCamViews extends ViewHandler<IGuestCamServiceState> {
@@ -272,6 +284,10 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
   @Inject() jsonrpcService: JsonrpcService;
   @Inject() urlService: UrlService;
   @Inject() streamingService: StreamingService;
+  @Inject() usageStatisticsService: UsageStatisticsService;
+  @Inject() appService: AppService;
+  @Inject() dismissablesService: DismissablesService;
+  @Inject() incrementalRolloutService: IncrementalRolloutService;
 
   static initialState: IGuestCamServiceState = {
     produceOk: false,
@@ -282,6 +298,7 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
     guests: [],
     joinAsGuestHash: null,
     hostName: null,
+    maxGuests: 2,
   };
 
   get views() {
@@ -320,16 +337,6 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
   init() {
     super.init();
 
-    if (this.views.sourceId) {
-      this.startListeningForGuests();
-    }
-
-    this.sourcesService.sourceAdded.subscribe(s => {
-      if (s.type === 'mediasoupconnector') {
-        this.startListeningForGuests();
-      }
-    });
-
     this.sourcesService.sourceRemoved.subscribe(s => {
       if (s.type === 'mediasoupconnector') {
         // Make sure source is unassigned
@@ -358,6 +365,38 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
     this.streamingService.streamingStatusChange.subscribe(status => {
       if ([EStreamingState.Live, EStreamingState.Offline].includes(status)) {
         this.emitStreamingStatus();
+      }
+
+      if (status === EStreamingState.Offline) {
+        this.streamRecorded = false;
+      }
+
+      if (status === EStreamingState.Live) {
+        this.recordStreamAnalytics();
+      }
+    });
+
+    this.incrementalRolloutService.featuresReady.then(() => {
+      if (this.appService.state.onboarded) {
+        // If this is a new user, they should never see this notification. It's only for
+        // existing users who are newly rolled out to.
+        this.dismissablesService.dismiss(EDismissable.CollabCamRollout);
+      } else if (
+        this.incrementalRolloutService.views.featureIsEnabled(
+          EAvailableFeatures.guestCaProduction,
+        ) &&
+        this.dismissablesService.views.shouldShow(EDismissable.CollabCamRollout)
+      ) {
+        this.dismissablesService.dismiss(EDismissable.CollabCamRollout);
+        this.notificationsService.push({
+          type: ENotificationType.SUCCESS,
+          lifeTime: -1,
+          message: $t('You now have access to Collab Cam!'),
+          action: this.jsonrpcService.createRequest(
+            Service.getResourceId(this.sourcesService),
+            'showGuestCamProperties',
+          ),
+        });
       }
     });
   }
@@ -428,7 +467,8 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
 
   async startListeningForGuests() {
     await this.socketMutex.do(async () => {
-      // TODO: Handle socket disconnects
+      if (!this.state.produceOk && !this.state.joinAsGuestHash) return;
+
       if (this.socket) return;
 
       if (!this.userService.views.isLoggedIn) return;
@@ -461,6 +501,7 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
       this.log('io Config Result', ioConfigResult);
 
       this.SET_HOST_NAME(ioConfigResult.host.name);
+      this.SET_MAX_GUESTS(ioConfigResult.host.maxGuests);
 
       await this.openSocketConnection(ioConfigResult.url, ioConfigResult.token);
     });
@@ -497,6 +538,8 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
 
   setProduceOk() {
     this.SET_PRODUCE_OK(true);
+
+    this.startListeningForGuests();
 
     // If a guest is already connected and we are not yet producing, start doing so now.
     // If we are joined as a guest, we should also start producing first.
@@ -702,6 +745,9 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
     }
 
     this.emitStreamingStatus();
+    this.recordStreamAnalytics();
+    this.recordGuestAnalytics();
+    this.usageStatisticsService.recordFeatureUsage('CollabCam');
   }
 
   /**
@@ -951,6 +997,32 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
     }
   }
 
+  /**
+   * Whether the current stream has been recorded as via guest cam
+   */
+  streamRecorded = false;
+
+  recordStreamAnalytics() {
+    if (
+      this.streamingService.views.streamingStatus === EStreamingState.Live &&
+      this.state.guests.length &&
+      !this.streamRecorded
+    ) {
+      this.usageStatisticsService.recordAnalyticsEvent('GuestCam', {
+        type: 'stream',
+        platforms: this.streamingService.views.enabledPlatforms,
+      });
+      this.streamRecorded = true;
+    }
+  }
+
+  recordGuestAnalytics() {
+    this.usageStatisticsService.recordAnalyticsEvent('GuestCam', {
+      type: 'guestJoin',
+      numGuests: this.state.guests.length,
+    });
+  }
+
   @mutation()
   private SET_PRODUCE_OK(val: boolean) {
     this.state.produceOk = val;
@@ -1007,5 +1079,10 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
   @mutation()
   private SET_HOST_NAME(name: string) {
     this.state.hostName = name;
+  }
+
+  @mutation()
+  private SET_MAX_GUESTS(maxGuests: number) {
+    this.state.maxGuests = maxGuests;
   }
 }

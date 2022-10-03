@@ -115,6 +115,7 @@ export const macSources: TSourceType[] = [
   'window_capture',
   'syphon-input',
   'decklink-input',
+  'mediasoupconnector',
 ];
 
 class SourcesViews extends ViewHandler<ISourcesState> {
