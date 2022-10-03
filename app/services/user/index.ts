@@ -187,7 +187,7 @@ class UserViews extends ViewHandler<IUserServiceState> {
   }
 
   get linkedPlatforms(): TPlatform[] {
-    if (this.isLoggedIn) {
+    if (this.state.auth && this.state.auth.platforms) {
       return Object.keys(this.state.auth.platforms) as TPlatform[];
     }
 
@@ -900,9 +900,20 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
    * Should be called to finish an in progress SLID auth. Needs to be called
    * with the new primary streaming platform, which needs to already be present
    * in the auth object.
-   * @param primaryPlatform The primary platform to use
+   * @param primaryPlatform The primary platform to use. If not provided, login
+   * attempt will be canceled.
    */
-  async finishSLAuth(primaryPlatform: TPlatform) {
+  async finishSLAuth(primaryPlatform?: TPlatform) {
+    if (!this.views.isPartialSLAuth) {
+      console.error('Called finishSLAuth but SL Auth is not in progress');
+      return;
+    }
+
+    if (!primaryPlatform) {
+      this.LOGOUT();
+      return;
+    }
+
     if (!this.state.auth.platforms[primaryPlatform]) {
       console.error('Tried to finish SL Auth with platform that does not exist!');
       this.LOGOUT();
@@ -929,7 +940,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     const service = getPlatformService(platform);
     const authUrl = merge ? service.mergeUrl : service.authUrl;
 
-    if (merge && !this.isLoggedIn) {
+    if (merge && !this.isLoggedIn && !this.views.isPartialSLAuth) {
       throw new Error('Account merging can only be performed while logged in');
     }
 

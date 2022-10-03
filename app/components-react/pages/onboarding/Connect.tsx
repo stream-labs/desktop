@@ -160,7 +160,8 @@ export class LoginModule {
     this.UsageStatisticsService.recordAnalyticsEvent('PlatformLogin', platform);
 
     if (platform === 'streamlabs') {
-      this.UserService.startSLAuth();
+      await this.UserService.startSLAuth();
+      onSuccess();
       return;
     }
 
@@ -190,6 +191,10 @@ export class LoginModule {
       // Currently we do not have special handling for generic errors
       onSuccess();
     }
+  }
+
+  finishSLAuth(primaryPlatform?: TPlatform) {
+    return this.UserService.finishSLAuth(primaryPlatform);
   }
 
   @mutation()
