@@ -21,6 +21,6 @@ export default class PerformanceMetrics extends Vue {
   }
 
   get bandwidth() {
-    return this.performanceService.state.bandwidth.toFixed(0);
+    return this.performanceService.state.streamingBandwidth.toFixed(0);
   }
 }
