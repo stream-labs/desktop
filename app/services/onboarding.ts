@@ -86,7 +86,7 @@ export const ONBOARDING_STEPS = () => ({
     disableControls: false,
     hideSkip: false,
     hideButton: true,
-    label: $t('Prime'),
+    label: $t('Ultra'),
   },
 });
 

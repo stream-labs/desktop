@@ -258,8 +258,8 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
 
     if (this.userService.isPrime) {
       options.push(
-        { value: 'prime-dark', label: $t('Obsidian Prime') },
-        { value: 'prime-light', label: $t('Alabaster Prime') },
+        { value: 'prime-dark', label: $t('Obsidian Ultra') },
+        { value: 'prime-light', label: $t('Alabaster Ultra') },
       );
     }
     return options;

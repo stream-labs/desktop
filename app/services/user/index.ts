@@ -519,7 +519,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
 
   async setPrimeStatus() {
     const host = this.hostsService.streamlabs;
-    const url = `https://${host}/api/v5/slobs/prime`;
+    const url = `https://${host}/api/v5/slobs/prime`; // TODO: will this url change?
     const headers = authorizedHeaders(this.apiToken);
     const request = new Request(url, { headers });
     return jfetch<{
@@ -555,7 +555,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
       type: ENotificationType.WARNING,
       lifeTime: -1,
       action: this.jsonrpcService.createRequest(Service.getResourceId(this), 'openCreditCardLink'),
-      message: $t('Your credit card expires soon. Click here to retain your Prime benefits'),
+      message: $t('Your credit card expires soon. Click here to retain your Ultra benefits'),
     });
   }
 
@@ -681,9 +681,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     const i18nService = I18nService.instance as I18nService; // TODO: replace with getResource('I18nService')
     const locale = i18nService.state.locale;
     // eslint-disable-next-line
-    return `https://${
-      this.hostsService.streamlabs
-    }/slobs/dashboard?oauth_token=${token}&mode=${nightMode}&r=${subPage}&l=${locale}&hidenav=${hideNav}`;
+    return `https://${this.hostsService.streamlabs}/slobs/dashboard?oauth_token=${token}&mode=${nightMode}&r=${subPage}&l=${locale}&hidenav=${hideNav}`;
   }
 
   getDonationSettings() {
@@ -804,16 +802,16 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
 
     const auth =
       mode === 'internal'
-        /* eslint-disable */
-        ? await this.authModule.startInternalAuth(
-          authUrl,
-          service.authWindowOptions,
-          onWindowShow,
-          onWindowClose,
-          merge,
-        )
+        ? /* eslint-disable */
+          await this.authModule.startInternalAuth(
+            authUrl,
+            service.authWindowOptions,
+            onWindowShow,
+            onWindowClose,
+            merge,
+          )
         : await this.authModule.startExternalAuth(authUrl, onWindowShow, merge);
-        /* eslint-enable */
+    /* eslint-enable */
 
     this.SET_AUTH_STATE(EAuthProcessState.Loading);
     this.SET_IS_RELOG(false);

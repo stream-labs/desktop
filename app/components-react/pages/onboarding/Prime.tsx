@@ -63,8 +63,8 @@ export function Prime() {
         </div>
         <div className={cx(styles.cardContainer, styles.primeCardContainer)} onClick={linkToPrime}>
           <h1>
-            <i className="icon-prime" />
-            {$t('Prime')}
+            <i className="icon-ultra" />
+            {$t('Ultra')}
           </h1>
           <span style={{ marginBottom: 8, display: 'inline-block' }}>
             {$t('Pro features to take your stream and channel to the next level.')}

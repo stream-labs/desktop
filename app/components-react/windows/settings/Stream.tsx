@@ -16,6 +16,7 @@ import { TextInput } from '../../shared/inputs';
 import { ButtonGroup } from '../../shared/ButtonGroup';
 import { FormInstance } from 'antd/lib/form';
 import { injectFormBinding, injectState, mutation, useModule } from 'slap';
+import UltraIcon from 'components-react/shared/UltraIcon';
 
 /**
  * A Redux module for components in the StreamSetting window
@@ -63,6 +64,9 @@ class StreamSettingsModule {
   }
   private get magicLinkService() {
     return Services.MagicLinkService;
+  }
+  private get customizationService() {
+    return Services.CustomizationService;
   }
 
   // DEFINE MUTATIONS
@@ -162,6 +166,10 @@ class StreamSettingsModule {
 
   get customDestinations() {
     return this.streamingView.savedSettings.customDestinations;
+  }
+
+  get isDarkTheme() {
+    return this.customizationService.isDarkTheme;
   }
 
   platformMerge(platform: TPlatform) {
@@ -340,7 +348,13 @@ function Platform(p: { platform: TPlatform }) {
  * Renders a custom destinations list
  */
 function CustomDestinationList() {
-  const { isPrime, customDestinations, editCustomDestMode, addCustomDest } = useStreamSettings();
+  const {
+    isPrime,
+    customDestinations,
+    editCustomDestMode,
+    addCustomDest,
+    isDarkTheme,
+  } = useStreamSettings();
   const shouldShowPrimeLabel = !isPrime;
   const destinations = customDestinations;
   const isEditMode = editCustomDestMode !== false;
@@ -356,8 +370,16 @@ function CustomDestinationList() {
         <a className={css.addDestinationBtn} onClick={addCustomDest}>
           <i className="fa fa-plus" />
           <span>{$t('Add Destination')}</span>
+
           {shouldShowPrimeLabel ? (
-            <b className={css.prime}>prime</b>
+            <Button className={cx(css.ultra)} onClick={addCustomDest}>
+              {/* {isDarkTheme ? (
+                        <UltraIcon type="night" style={{ marginRight: '5px' }} />
+                      ) : ( */}
+              <UltraIcon type="day" style={{ marginRight: '5px' }} />
+              {/* )} */}
+              {$t('Ultra')}
+            </Button>
           ) : (
             <div className={css.prime} />
           )}

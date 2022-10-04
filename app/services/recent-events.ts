@@ -152,7 +152,7 @@ const subscriptionMap = (subPlan: string) => {
     '1000': $t('Tier 1'),
     '2000': $t('Tier 2'),
     '3000': $t('Tier 3'),
-    Prime: $t('Prime'),
+    Prime: $t('Ultra'),
   }[subPlan];
 };
 
@@ -171,12 +171,12 @@ const filterName = (key: string): string => {
     filter_subscription_9_months: $t('9 Months'),
     filter_subscription_12_months: $t('12 Months'),
     filter_subscription_minimum_enabled: $t('Min. Months'),
-    primesub: $t('Prime'),
+    primesub: $t('Ultra'),
     resub: $t('Resubs'),
     resub_tier_1: $t('Tier 1'),
     resub_tier_2: $t('Tier 2'),
     resub_tier_3: $t('Tier 3'),
-    resub_prime: $t('Prime'),
+    resub_prime: $t('Ultra'),
     gifted_sub: $t('Gifted'),
     host: $t('Hosts'),
     bits: $t('Bits'),
@@ -375,7 +375,7 @@ class RecentEventsViews extends ViewHandler<IRecentEventsState> {
       });
     }
     if (event.sub_type === 'primepaidupgrade') {
-      return $t('has converted from a Prime Gaming sub to a %{tier} sub', {
+      return $t('has converted from an Ultra Gaming sub to a %{tier} sub', {
         tier: subscriptionMap(event.sub_plan),
       });
     }
@@ -469,9 +469,7 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
   fetchRecentEvents() {
     const typeString = this.getEventTypesString();
     // eslint-disable-next-line
-    const url = `https://${this.hostsService.streamlabs}/api/v5/slobs/recentevents/${
-      this.userService.widgetToken
-    }?types=${typeString}`;
+    const url = `https://${this.hostsService.streamlabs}/api/v5/slobs/recentevents/${this.userService.widgetToken}?types=${typeString}`;
     const headers = authorizedHeaders(this.userService.apiToken);
     const request = new Request(url, { headers });
     return jfetch<{ data: Dictionary<IRecentEvent[]> }>(request).catch(() => {
@@ -481,9 +479,7 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
 
   async fetchConfig() {
     // eslint-disable-next-line
-    const url = `https://${
-      this.hostsService.streamlabs
-    }/api/v5/slobs/widget/config?widget=recent_events`;
+    const url = `https://${this.hostsService.streamlabs}/api/v5/slobs/widget/config?widget=recent_events`;
     const headers = authorizedHeaders(this.userService.apiToken);
     return jfetch<IRecentEventsConfig>(url, { headers }).catch(() => {
       console.warn('Error fetching recent events config');
@@ -492,9 +488,7 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
 
   fetchMediaShareState() {
     // eslint-disable-next-line
-    const url = `https://${
-      this.hostsService.streamlabs
-    }/api/v5/slobs/widget/config?widget=media-sharing`;
+    const url = `https://${this.hostsService.streamlabs}/api/v5/slobs/widget/config?widget=media-sharing`;
     const headers = authorizedHeaders(this.userService.apiToken);
     return jfetch<{ settings: { advanced_settings: { enabled: boolean } } }>(url, {
       headers,
@@ -841,7 +835,7 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
       return false;
     }
 
-    if (!this.state.filterConfig.resub_prime && event.sub_plan.toString() === 'Prime') {
+    if (!this.state.filterConfig.resub_prime && event.sub_plan.toString() === 'Ultra') {
       return false;
     }
 
@@ -915,9 +909,7 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
       new Headers({ 'Content-Type': 'application/json' }),
     );
     // eslint-disable-next-line
-    const url = `https://${
-      this.hostsService.streamlabs
-    }/api/v5/slobs/widget/recentevents/eventspanel`;
+    const url = `https://${this.hostsService.streamlabs}/api/v5/slobs/widget/recentevents/eventspanel`;
     const body = JSON.stringify({ muted: !this.state.muted });
     return await fetch(new Request(url, { headers, body, method: 'POST' })).then(handleResponse);
   }

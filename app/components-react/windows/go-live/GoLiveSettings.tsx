@@ -70,7 +70,7 @@ export default function GoLiveSettings() {
             <a className={styles.addDestinationBtn} onClick={addDestination}>
               <PlusIcon />
               {$t('Add Destination')}{' '}
-              {shouldShowPrimeLabel && <b className={styles.prime}>prime</b>}
+              {shouldShowPrimeLabel && <b className={styles.prime}>ultra</b>}
             </a>
           )}
         </Col>

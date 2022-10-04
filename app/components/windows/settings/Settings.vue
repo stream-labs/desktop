@@ -37,12 +37,12 @@
           <NavItem
             v-if="!isPrime && isLoggedIn"
             key="Prime"
-            to="Prime"
-            ico="icon-prime"
+            to="Ultra"
+            ico="icon-ultra"
             :icoStyles="{ color: 'var(--prime)' }"
             :style="{ color: 'var(--prime)' }"
           >
-            Prime
+            Ultra
           </NavItem>
           <div
             class="settings-auth"

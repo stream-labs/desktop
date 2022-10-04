@@ -102,7 +102,7 @@ export default function MediaGallery() {
 
   function upgradeToPrime() {
     MagicLinkService.linkToPrime('slobs-media-gallery');
-    message.warning($t('You must have Streamlabs Prime to use this media'), 5);
+    message.warning($t('You must have Streamlabs Ultra to use this media'), 5);
   }
 
   const filteredGallery = galleryInfo?.files.filter(file => {
@@ -247,7 +247,7 @@ export default function MediaGallery() {
                   headStyle={{ position: 'absolute', padding: 0, border: 'none', right: '8px' }}
                   extra={[
                     file.prime ? (
-                      <i className="icon-prime" key="prime" />
+                      <i className="icon-ultra" key="prime" />
                     ) : (
                       <i className="icon-copy" onClick={() => handleCopy(file.href)} key="copy" />
                     ),

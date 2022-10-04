@@ -377,7 +377,7 @@ export default function GuestCamProperties() {
                     style={{ marginLeft: 8, color: 'var(--prime)', cursor: 'pointer' }}
                     onClick={() => MagicLinkService.actions.linkToPrime('desktop-collab-cam')}
                   >
-                    <i className="icon-prime" />
+                    <i className="icon-ultra" />
                     <b style={{ marginLeft: 5 }}>{$t('Upgrade for more Guests')}</b>
                   </span>
                 )}

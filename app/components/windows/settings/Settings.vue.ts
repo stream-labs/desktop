@@ -101,7 +101,7 @@ export default class Settings extends Vue {
   }
 
   set categoryName(val: string) {
-    if (val === 'Prime') {
+    if (val === 'Ultra') {
       this.magicLinkService.actions.linkToPrime('slobs-settings');
     } else {
       this.internalCategoryName = val;

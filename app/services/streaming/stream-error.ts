@@ -57,7 +57,7 @@ export const errorTypes = {
   },
   PRIME_REQUIRED: {
     get message() {
-      return $t('This feature is for Prime members only');
+      return $t('This feature is for Ultra members only');
     },
   },
   MACHINE_LOCKED: {
