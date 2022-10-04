@@ -34,14 +34,7 @@
           >
             {{ $t(category) }}
           </NavItem>
-          <NavItem
-            v-if="!isPrime && isLoggedIn"
-            key="Prime"
-            to="Ultra"
-            ico="icon-ultra"
-            :icoStyles="{ color: 'var(--prime)' }"
-            :style="{ color: 'var(--prime)' }"
-          >
+          <NavItem v-if="!isPrime && isLoggedIn" key="Prime" to="Ultra" ico="icon-ultra">
             Ultra
           </NavItem>
           <div

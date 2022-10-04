@@ -52,8 +52,8 @@ export function AppearanceSettings() {
         <ListInput {...bind.theme} label={'Theme'} options={CustomizationService.themeOptions} />
         {shouldShowPrime && (
           <div style={{ marginBottom: '16px' }}>
-            <a style={{ color: 'var(--prime)' }} onClick={upgradeToPrime}>
-              <i style={{ color: 'var(--prime)' }} className="icon-ultra" />
+            <a onClick={upgradeToPrime}>
+              <i style={{ color: 'var(--title)' }} className="icon-ultra" />
               {$t('Change the look of Streamlabs Desktop with Ultra')}
             </a>
           </div>
