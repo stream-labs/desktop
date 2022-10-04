@@ -16,6 +16,8 @@ import { TextInput } from '../../shared/inputs';
 import { ButtonGroup } from '../../shared/ButtonGroup';
 import { FormInstance } from 'antd/lib/form';
 import { injectFormBinding, injectState, mutation, useModule } from 'slap';
+import { useVuex } from 'components-react/hooks';
+import Translate from 'components-react/shared/Translate';
 
 /**
  * A Redux module for components in the StreamSetting window
@@ -228,6 +230,8 @@ export function StreamSettings() {
       {/* account info */}
       {protectedModeEnabled && (
         <div>
+          <h2>{$t('Streamlabs ID')}</h2>
+          <SLIDBlock />
           <h2>{$t('Stream Destinations')}</h2>
           {platforms.map(platform => (
             <Platform key={platform} platform={platform} />
@@ -274,6 +278,45 @@ export function StreamSettings() {
 }
 
 StreamSettings.page = 'Stream';
+
+function SLIDBlock() {
+  const { UserService } = Services;
+  const { hasSLID, username } = useVuex(() => ({
+    hasSLID: UserService.views.hasSLID,
+    username: UserService.views.auth?.slid?.username,
+  }));
+
+  return (
+    <div className="section">
+      <div className="flex">
+        <div className="margin-right--20" style={{ width: '50px' }}>
+          <PlatformLogo className={css.platformLogo} size="medium" platform="streamlabs" />
+        </div>
+        <div>
+          {hasSLID ? (
+            <div>
+              Streamlabs <br />
+              <b>{username}</b>
+            </div>
+          ) : (
+            <Translate message={$t('slidConnectMessage')} />
+          )}
+        </div>
+      </div>
+      {hasSLID && (
+        <div
+          style={{ margin: '10px -16px', height: 2, backgroundColor: 'var(--background)' }}
+        ></div>
+      )}
+      {hasSLID && (
+        <div style={{ display: 'flex', justifyContent: 'right' }}>
+          <a>{$t('Update Password')}</a>
+          <a>{$t('Update Two-factor Auth')}</a>
+        </div>
+      )}
+    </div>
+  );
+}
 
 /**
  * Renders a Platform placeholder
