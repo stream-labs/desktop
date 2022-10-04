@@ -213,5 +213,7 @@
   "Username": "Username",
   "Password": "Password",
   "slidConnectMessage": "Setup or Connect a <b>Streamlabs ID</b> to access all products from Streamlabs with one single login.",
-  "Streamlabs ID": "Streamlabs ID"
+  "Streamlabs ID": "Streamlabs ID",
+  "Update Password": "Update Password",
+  "Update Two-factor Auth": "Update Two-factor Auth"
 }

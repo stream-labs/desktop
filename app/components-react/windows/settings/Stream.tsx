@@ -18,6 +18,7 @@ import { FormInstance } from 'antd/lib/form';
 import { injectFormBinding, injectState, mutation, useModule } from 'slap';
 import { useVuex } from 'components-react/hooks';
 import Translate from 'components-react/shared/Translate';
+import * as remote from '@electron/remote';
 
 /**
  * A Redux module for components in the StreamSetting window
@@ -286,6 +287,16 @@ function SLIDBlock() {
     username: UserService.views.auth?.slid?.username,
   }));
 
+  function openPasswordLink() {
+    // TODO: Switch to prod
+    remote.shell.openExternal('https://id.streamlabs.dev/security/password?companyId=streamlabs');
+  }
+
+  function openTwoFactorLink() {
+    // TODO: Switch to prod
+    remote.shell.openExternal('https://id.streamlabs.dev/security/tfa?companyId=streamlabs');
+  }
+
   return (
     <div className="section">
       <div className="flex">
@@ -302,6 +313,11 @@ function SLIDBlock() {
             <Translate message={$t('slidConnectMessage')} />
           )}
         </div>
+        {!hasSLID && (
+          <Button type="primary" onClick={() => UserService.actions.startSLMerge()}>
+            {$t('Setup')}
+          </Button>
+        )}
       </div>
       {hasSLID && (
         <div
@@ -310,8 +326,15 @@ function SLIDBlock() {
       )}
       {hasSLID && (
         <div style={{ display: 'flex', justifyContent: 'right' }}>
-          <a>{$t('Update Password')}</a>
-          <a>{$t('Update Two-factor Auth')}</a>
+          <a
+            style={{ fontWeight: 400, marginRight: 10, textDecoration: 'underline' }}
+            onClick={openPasswordLink}
+          >
+            {$t('Update Password')}
+          </a>
+          <a style={{ fontWeight: 400, textDecoration: 'underline' }} onClick={openTwoFactorLink}>
+            {$t('Update Two-factor Auth')}
+          </a>
         </div>
       )}
     </div>
@@ -334,7 +357,7 @@ function Platform(p: { platform: TPlatform }) {
   const shouldShowUnlinkBtn = !isPrimary && isMerged && canEditSettings;
 
   return (
-    <div className="section flex">
+    <div className="section flex" style={{ marginBottom: 16 }}>
       <div className="margin-right--20" style={{ width: '50px' }}>
         <PlatformLogo className={css.platformLogo} size="medium" platform={platform} />
       </div>

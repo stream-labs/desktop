@@ -932,6 +932,25 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     this.SET_AUTH_STATE(EAuthProcessState.Idle);
   }
 
+  async startSLMerge(): Promise<EPlatformCallResult> {
+    const authUrl = `https://${this.hostsService.streamlabs}/slobs/merge/${this.apiToken}/streamlabs_account`;
+
+    if (!this.isLoggedIn) {
+      throw new Error('Account merging can only be performed while logged in');
+    }
+
+    this.SET_AUTH_STATE(EAuthProcessState.Loading);
+    const onWindowShow = () => this.SET_AUTH_STATE(EAuthProcessState.Idle);
+
+    const auth = await this.authModule.startExternalAuth(authUrl, onWindowShow, true);
+
+    this.SET_AUTH_STATE(EAuthProcessState.Loading);
+    this.SET_IS_RELOG(false);
+    this.SET_SLID(auth.slid);
+    this.SET_AUTH_STATE(EAuthProcessState.Idle);
+    return EPlatformCallResult.Success;
+  }
+
   /**
    * Starts the authentication process.  Multiple callbacks
    * can be passed for various events.
