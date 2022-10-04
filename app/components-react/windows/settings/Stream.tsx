@@ -17,6 +17,7 @@ import { ButtonGroup } from '../../shared/ButtonGroup';
 import { FormInstance } from 'antd/lib/form';
 import { injectFormBinding, injectState, mutation, useModule } from 'slap';
 import UltraIcon from 'components-react/shared/UltraIcon';
+import ButtonHighlighted from 'components-react/shared/ButtonHighlighted';
 
 /**
  * A Redux module for components in the StreamSetting window
@@ -372,14 +373,11 @@ function CustomDestinationList() {
           <span>{$t('Add Destination')}</span>
 
           {shouldShowPrimeLabel ? (
-            <Button className={cx(css.ultra)} onClick={addCustomDest}>
-              {/* {isDarkTheme ? (
-                        <UltraIcon type="night" style={{ marginRight: '5px' }} />
-                      ) : ( */}
-              <UltraIcon type="day" style={{ marginRight: '5px' }} />
-              {/* )} */}
-              {$t('Ultra')}
-            </Button>
+            <ButtonHighlighted
+              onClick={addCustomDest}
+              text={$t('Ultra')}
+              icon={<UltraIcon type="day" style={{ marginRight: '5px' }} />}
+            />
           ) : (
             <div className={css.prime} />
           )}
