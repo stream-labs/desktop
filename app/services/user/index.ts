@@ -888,7 +888,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
       false,
     );
 
-    console.log('GOT SL AUTH', auth);
+    this.LOGOUT();
     this.LOGIN(auth);
 
     // Find out if the user has any additional platforms linked

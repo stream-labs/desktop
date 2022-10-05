@@ -117,8 +117,6 @@ export class AuthModule {
           const paramSeparator = merge ? '?' : '&';
           const url = `${authUrl}${paramSeparator}port=${address.port}`;
 
-          console.log(url);
-
           electron.shell.openExternal(url);
           onWindowShow();
         }
