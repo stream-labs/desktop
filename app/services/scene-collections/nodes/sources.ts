@@ -230,8 +230,8 @@ export class SourcesNode extends Node<ISchema, {}> {
         settings: source.settings,
         volume: source.volume,
         syncOffset: source.syncOffset,
-        deinterlaceMode: source.deinterlaceMode,
-        deinterlaceFieldOrder: source.deinterlaceFieldOrder,
+        deinterlaceMode: source.deinterlaceMode ?? EDeinterlaceMode.Disable,
+        deinterlaceFieldOrder: source.deinterlaceFieldOrder ?? EDeinterlaceFieldOrder.Top,
         filters: source.filters.items
           .filter(filter => {
             if (filter.type === 'face_mask_filter') {
