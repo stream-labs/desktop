@@ -15,9 +15,10 @@ import { Services } from 'components-react/service-provider';
 import { useVuex, useWatchVuex } from 'components-react/hooks';
 
 export function PrimaryPlatformSelect() {
-  const { UserService } = Services;
-  const { linkedPlatforms } = useVuex(() => ({
+  const { UserService, OnboardingService } = Services;
+  const { linkedPlatforms, isLogin } = useVuex(() => ({
     linkedPlatforms: UserService.views.linkedPlatforms,
+    isLogin: OnboardingService.state.options.isLogin,
   }));
   const { loading, authInProgress, authPlatform, finishSLAuth } = useModule(LoginModule);
   const platforms = ['twitch', 'youtube', 'facebook', 'trovo'];
@@ -62,10 +63,12 @@ export function PrimaryPlatformSelect() {
   // is by being in the `isPartialSLAuth` state.  The only way to move past
   // this step is to get out of the `isPartialSLAuth` state, which will cause
   // this step to disappear from the flow, and we don't need to increment the
-  // step counter.
+  // step counter.  In the case of a normal login outside of onaobarding, we do
+  // call finish on the onboarding service.
 
   async function afterLogin(platform: TPlatform) {
     await finishSLAuth(platform);
+    if (isLogin) OnboardingService.actions.finish();
   }
 
   async function onSkip() {
@@ -79,6 +82,7 @@ export function PrimaryPlatformSelect() {
 
     if (result) {
       await finishSLAuth();
+      if (isLogin) OnboardingService.actions.finish();
     }
   }
 
@@ -86,6 +90,7 @@ export function PrimaryPlatformSelect() {
     if (!selectedPlatform) return;
 
     await finishSLAuth(selectedPlatform as TPlatform);
+    if (isLogin) OnboardingService.actions.finish();
   }
 
   if (linkedPlatforms.length) {
