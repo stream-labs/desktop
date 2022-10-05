@@ -292,6 +292,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     Vue.delete(this.state, 'auth');
     this.state.isPrime = false;
     Vue.delete(this.state, 'userId');
+    this.state.loginValidated = false;
   }
 
   @mutation()

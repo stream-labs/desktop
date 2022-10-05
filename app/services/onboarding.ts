@@ -140,7 +140,13 @@ export interface IThemeMetadata {
 
 class OnboardingViews extends ViewHandler<IOnboardingServiceState> {
   get singletonStep(): IOnboardingStep {
-    if (this.state.options.isLogin) return ONBOARDING_STEPS()[EOnboardingSteps.Connect];
+    if (this.state.options.isLogin) {
+      if (this.getServiceViews(UserService).isPartialSLAuth) {
+        return ONBOARDING_STEPS()[EOnboardingSteps.PrimaryPlatformSelect];
+      }
+
+      return ONBOARDING_STEPS()[EOnboardingSteps.Connect];
+    }
     if (this.state.options.isOptimize) return ONBOARDING_STEPS()[EOnboardingSteps.Optimize];
     if (this.state.options.isHardware) return ONBOARDING_STEPS()[EOnboardingSteps.HardwareSetup];
     if (this.state.options.isImport) return ONBOARDING_STEPS()[EOnboardingSteps.ObsImport];
