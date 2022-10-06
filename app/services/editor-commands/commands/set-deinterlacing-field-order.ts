@@ -11,22 +11,23 @@ export class SetDeinterlacingFieldOrderCommand extends Command {
     super();
     this.selection.freeze();
 
-    this.selection.getItems().forEach(item => (
-      this.initialValues[item.id] = item.source.deinterlaceFieldOrder));
+    this.selection
+      .getItems()
+      .forEach(item => (this.initialValues[item.id] = item.source.deinterlaceFieldOrder));
   }
 
   get description() {
     let text = '';
-    switch(this.order) {
+    switch (this.order) {
       case EDeinterlaceFieldOrder.Top: {
         text = 'Top Field First';
         break;
       }
-      case EDeinterlaceFieldOrder.Bottom:{
+      case EDeinterlaceFieldOrder.Bottom: {
         text = 'Bottom Field First';
         break;
       }
-      default:{
+      default: {
         text = 'Top Field First';
         break;
       }
@@ -40,7 +41,8 @@ export class SetDeinterlacingFieldOrderCommand extends Command {
   }
 
   rollback() {
-    this.selection.getItems().forEach(item =>
-      item.source.setDeinterlaceFieldOrder(this.initialValues[item.id]));
+    this.selection
+      .getItems()
+      .forEach(item => item.source.setDeinterlaceFieldOrder(this.initialValues[item.id]));
   }
 }

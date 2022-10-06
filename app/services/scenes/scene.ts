@@ -13,7 +13,7 @@ import {
   isItem,
   EScaleType,
   EBlendingMode,
-  EBlendingMethod
+  EBlendingMethod,
 } from './index';
 import Utils from 'services/utils';
 import * as obs from '../../../obs-api';
@@ -368,7 +368,7 @@ export class Scene {
         recordingVisible: sceneNode.recordingVisible,
         scaleFilter: sceneNode.scaleFilter,
         blendingMode: sceneNode.blendingMode,
-        blendingMethod: sceneNode.blendingMethod
+        blendingMethod: sceneNode.blendingMethod,
       });
       return true;
     });
@@ -524,7 +524,7 @@ export class Scene {
       recordingVisible: true,
       scaleFilter: EScaleType.Disable,
       blendingMode: EBlendingMode.Normal,
-      blendingMethod: EBlendingMethod.Default
+      blendingMethod: EBlendingMethod.Default,
     });
   }
 

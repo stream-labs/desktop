@@ -247,7 +247,7 @@ export class ObsImporterService extends StatefulService<{ progress: number; tota
                 propertiesManagerSettings,
                 channel: sourceJSON.channel !== 0 ? sourceJSON.channel : void 0,
                 deinterlaceMode: sourceJSON.deinterlace_mode,
-                deinterlaceFieldOrder: sourceJSON.deinterlace_field_order
+                deinterlaceFieldOrder: sourceJSON.deinterlace_field_order,
               },
             );
 
@@ -352,32 +352,32 @@ export class ObsImporterService extends StatefulService<{ progress: number; tota
                 }
 
                 let blendingMode: obs.EBlendingMode;
-                switch(item.blend_type) {
-                  case "normal": {
+                switch (item.blend_type) {
+                  case 'normal': {
                     blendingMode = obs.EBlendingMode.Normal;
                     break;
                   }
-                  case "additive": {
+                  case 'additive': {
                     blendingMode = obs.EBlendingMode.Additive;
                     break;
                   }
-                  case "subtract": {
+                  case 'subtract': {
                     blendingMode = obs.EBlendingMode.Substract;
                     break;
                   }
-                  case "screen": {
+                  case 'screen': {
                     blendingMode = obs.EBlendingMode.Screen;
                     break;
                   }
-                  case "multiply": {
+                  case 'multiply': {
                     blendingMode = obs.EBlendingMode.Multiply;
                     break;
                   }
-                  case "lighten": {
+                  case 'lighten': {
                     blendingMode = obs.EBlendingMode.Lighten;
                     break;
                   }
-                  case "darken": {
+                  case 'darken': {
                     blendingMode = obs.EBlendingMode.Darken;
                     break;
                   }
@@ -388,12 +388,12 @@ export class ObsImporterService extends StatefulService<{ progress: number; tota
                 }
 
                 let blendingMethod: obs.EBlendingMethod;
-                switch(item.blend_method) {
-                  case "default": {
+                switch (item.blend_method) {
+                  case 'default': {
                     blendingMethod = obs.EBlendingMethod.Default;
                     break;
                   }
-                  case "srgb_off": {
+                  case 'srgb_off': {
                     blendingMethod = obs.EBlendingMethod.SrgbOff;
                     break;
                   }
@@ -404,28 +404,28 @@ export class ObsImporterService extends StatefulService<{ progress: number; tota
                 }
 
                 let scaleFilter: obs.EScaleType;
-                switch(item.scale_filter) {
-                  case "disable": {
+                switch (item.scale_filter) {
+                  case 'disable': {
                     scaleFilter = obs.EScaleType.Disable;
                     break;
                   }
-                  case "point": {
+                  case 'point': {
                     scaleFilter = obs.EScaleType.Point;
                     break;
                   }
-                  case "bilinear": {
+                  case 'bilinear': {
                     scaleFilter = obs.EScaleType.Bilinear;
                     break;
                   }
-                  case "bicubic": {
+                  case 'bicubic': {
                     scaleFilter = obs.EScaleType.Bicubic;
                     break;
                   }
-                  case "lanczos": {
+                  case 'lanczos': {
                     scaleFilter = obs.EScaleType.Lanczos;
                     break;
                   }
-                  case "area": {
+                  case 'area': {
                     scaleFilter = obs.EScaleType.Area;
                     break;
                   }
@@ -442,9 +442,9 @@ export class ObsImporterService extends StatefulService<{ progress: number; tota
                     scale,
                     position: pos,
                   },
-                  blendingMode: blendingMode,
-                  blendingMethod: blendingMethod,
-                  scaleFilter: scaleFilter
+                  blendingMode,
+                  blendingMethod,
+                  scaleFilter,
                 });
               }
             });

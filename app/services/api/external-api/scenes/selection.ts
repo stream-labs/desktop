@@ -6,7 +6,8 @@ import {
   IPartialTransform,
   EScaleType,
   EBlendingMode,
-  EBlendingMethod } from 'services/scenes';
+  EBlendingMethod,
+} from 'services/scenes';
 import {
   Selection as InternalSelection,
   SelectionService as InternalSelectionService,

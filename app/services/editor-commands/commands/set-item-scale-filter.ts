@@ -16,32 +16,32 @@ export class SetScaleFilterCommand extends Command {
 
   get description() {
     let text = '';
-    switch(this.filter) {
+    switch (this.filter) {
       case EScaleType.Disable: {
         text = 'Disable';
         break;
       }
-      case EScaleType.Point:{
+      case EScaleType.Point: {
         text = 'Point';
         break;
       }
-      case EScaleType.Bicubic:{
+      case EScaleType.Bicubic: {
         text = 'Bicubic';
         break;
       }
-      case EScaleType.Bilinear:{
+      case EScaleType.Bilinear: {
         text = 'Bilinear';
         break;
       }
-      case EScaleType.Lanczos:{
+      case EScaleType.Lanczos: {
         text = 'Lanczos';
         break;
       }
-      case EScaleType.Area:{
+      case EScaleType.Area: {
         text = 'Area';
         break;
       }
-      default:{
+      default: {
         text = 'Disable';
         break;
       }

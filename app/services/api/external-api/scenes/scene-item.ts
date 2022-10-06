@@ -5,7 +5,7 @@ import {
   ISceneItem,
   EScaleType,
   EBlendingMode,
-  EBlendingMethod
+  EBlendingMethod,
 } from 'services/scenes';
 import { InjectFromExternalApi, Fallback } from 'services/api/external-api';
 import { Source, SourcesService } from 'services/api/external-api/sources';
@@ -269,6 +269,6 @@ export function getExternalSceneItemModel(
     recordingVisible: internalModel.recordingVisible,
     scaleFilter: internalModel.scaleFilter,
     blendingMode: internalModel.blendingMode,
-    blendingMethod: internalModel.blendingMethod
+    blendingMethod: internalModel.blendingMethod,
   };
 }

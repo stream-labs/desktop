@@ -7,7 +7,7 @@ import {
   macSources,
   windowsSources,
   EDeinterlaceMode,
-  EDeinterlaceFieldOrder
+  EDeinterlaceFieldOrder,
 } from 'services/sources';
 import { AudioService } from 'services/audio';
 import { Inject } from '../../core/injector';
@@ -293,7 +293,7 @@ export class SourcesNode extends Node<ISchema, {}> {
         propertiesManager: sourceInfo.propertiesManager,
         propertiesManagerSettings: sourceInfo.propertiesManagerSettings || {},
         deinterlaceMode: sourceInfo.deinterlaceMode,
-        deinterlaceFieldOrder: sourceInfo.deinterlaceFieldOrder
+        deinterlaceFieldOrder: sourceInfo.deinterlaceFieldOrder,
       });
 
       if (source.audioMixers) {

@@ -11,50 +11,51 @@ export class SetDeinterlacingModeCommand extends Command {
     super();
     this.selection.freeze();
 
-    this.selection.getItems().forEach(item => (
-      this.initialValues[item.id] = item.source.deinterlaceMode));
+    this.selection
+      .getItems()
+      .forEach(item => (this.initialValues[item.id] = item.source.deinterlaceMode));
   }
 
   get description() {
     let text = '';
-    switch(this.mode) {
+    switch (this.mode) {
       case EDeinterlaceMode.Disable: {
         text = 'Disable';
         break;
       }
-      case EDeinterlaceMode.Discard:{
+      case EDeinterlaceMode.Discard: {
         text = 'Discard';
         break;
       }
-      case EDeinterlaceMode.Retro:{
+      case EDeinterlaceMode.Retro: {
         text = 'Retro';
         break;
       }
-      case EDeinterlaceMode.Blend:{
+      case EDeinterlaceMode.Blend: {
         text = 'Blend';
         break;
       }
-      case EDeinterlaceMode.Blend2X:{
+      case EDeinterlaceMode.Blend2X: {
         text = 'Blend 2x';
         break;
       }
-      case EDeinterlaceMode.Linear:{
+      case EDeinterlaceMode.Linear: {
         text = 'Linear';
         break;
       }
-      case EDeinterlaceMode.Linear2X:{
+      case EDeinterlaceMode.Linear2X: {
         text = 'Linear 2x';
         break;
       }
-      case EDeinterlaceMode.Yadif:{
+      case EDeinterlaceMode.Yadif: {
         text = 'Yadif';
         break;
       }
-      case EDeinterlaceMode.Yadif2X:{
+      case EDeinterlaceMode.Yadif2X: {
         text = 'Yadif 2x';
         break;
       }
-      default:{
+      default: {
         text = 'Normal';
         break;
       }
@@ -68,7 +69,8 @@ export class SetDeinterlacingModeCommand extends Command {
   }
 
   rollback() {
-    this.selection.getItems().forEach(item =>
-      item.source.setDeinterlaceMode(this.initialValues[item.id]));
+    this.selection
+      .getItems()
+      .forEach(item => item.source.setDeinterlaceMode(this.initialValues[item.id]));
   }
 }

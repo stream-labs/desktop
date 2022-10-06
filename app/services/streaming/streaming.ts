@@ -737,8 +737,9 @@ export class StreamingService
   }
 
   splitFile() {
-    if (this.state.recordingStatus === ERecordingState.Recording)
+    if (this.state.recordingStatus === ERecordingState.Recording) {
       obs.NodeObs.OBS_service_splitFile();
+    }
   }
 
   startReplayBuffer() {

@@ -348,7 +348,7 @@ export class SourcesService extends StatefulService<ISourcesState> {
       isTemporary: options.isTemporary,
       propertiesManagerType: managerType,
       deinterlaceMode: options.deinterlaceMode || EDeinterlaceMode.Disable,
-      deinterlaceFieldOrder: options.deinterlaceFieldOrder || EDeinterlaceFieldOrder.Top
+      deinterlaceFieldOrder: options.deinterlaceFieldOrder || EDeinterlaceFieldOrder.Top,
     });
     const source = this.views.getSource(id)!;
     const muted = obsInput.muted;

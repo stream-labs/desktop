@@ -16,16 +16,16 @@ export class SetBlendingMethodCommand extends Command {
 
   get description() {
     let text = '';
-    switch(this.mode) {
+    switch (this.mode) {
       case EBlendingMethod.Default: {
         text = 'Default';
         break;
       }
-      case EBlendingMethod.SrgbOff:{
+      case EBlendingMethod.SrgbOff: {
         text = 'SRGB Off';
         break;
       }
-      default:{
+      default: {
         text = 'Normal';
         break;
       }

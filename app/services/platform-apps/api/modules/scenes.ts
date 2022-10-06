@@ -12,7 +12,8 @@ import {
   Scene,
   ScenesService,
   TSceneNode,
-  EBlendingMethod } from 'services/scenes';
+  EBlendingMethod,
+} from 'services/scenes';
 import { Inject } from 'services/core/injector';
 import { Subject } from 'rxjs';
 

@@ -1,5 +1,13 @@
 import { Node } from './node';
-import { EBlendingMethod, EBlendingMode, EScaleType, ISceneItemFolder, Scene, ScenesService, TSceneNodeType } from '../../scenes';
+import {
+  EBlendingMethod,
+  EBlendingMode,
+  EScaleType,
+  ISceneItemFolder,
+  Scene,
+  ScenesService,
+  TSceneNodeType,
+} from '../../scenes';
 import { HotkeysNode } from './hotkeys';
 import { SourcesService } from '../../sources';
 import { Inject } from '../../core/injector';

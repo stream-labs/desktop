@@ -16,36 +16,36 @@ export class SetBlendingModeCommand extends Command {
 
   get description() {
     let text = '';
-    switch(this.mode) {
+    switch (this.mode) {
       case EBlendingMode.Normal: {
         text = 'Normal';
         break;
       }
-      case EBlendingMode.Additive:{
+      case EBlendingMode.Additive: {
         text = 'Additive';
         break;
       }
-      case EBlendingMode.Substract:{
+      case EBlendingMode.Substract: {
         text = 'Substract';
         break;
       }
-      case EBlendingMode.Screen:{
+      case EBlendingMode.Screen: {
         text = 'Screen';
         break;
       }
-      case EBlendingMode.Multiply:{
+      case EBlendingMode.Multiply: {
         text = 'Multiply';
         break;
       }
-      case EBlendingMode.Lighten:{
+      case EBlendingMode.Lighten: {
         text = 'Lighten';
         break;
       }
-      case EBlendingMode.Darken:{
+      case EBlendingMode.Darken: {
         text = 'Darken';
         break;
       }
-      default:{
+      default: {
         text = 'Normal';
         break;
       }

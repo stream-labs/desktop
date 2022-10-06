@@ -5,7 +5,8 @@ import {
   Source,
   TPropertiesManager,
   EDeinterlaceMode,
-  EDeinterlaceFieldOrder } from 'services/sources';
+  EDeinterlaceFieldOrder,
+} from 'services/sources';
 import { Inject } from 'services/core/injector';
 import { Subject } from 'rxjs';
 import { PlatformAppsService } from 'services/platform-apps';
@@ -225,7 +226,7 @@ export class SourcesModule extends Module {
         height: source.height,
       },
       deinterlaceMode: source.deinterlaceMode,
-      deinterlaceFieldOrder: source.deinterlaceFieldOrder
+      deinterlaceFieldOrder: source.deinterlaceFieldOrder,
     };
 
     if (source.getPropertiesManagerType() === 'platformApp') {

@@ -13,7 +13,7 @@ import {
   IPartialTransform,
   EScaleType,
   EBlendingMode,
-  EBlendingMethod
+  EBlendingMethod,
 } from 'services/scenes';
 import { EDeinterlaceFieldOrder, EDeinterlaceMode, Source } from 'services/sources';
 import { Rect } from 'util/rect';
