@@ -211,5 +211,10 @@
   "Twitch VOD": "VOD de Twitch",
   "Use authentication": "Usar autenticación",
   "Username": "Nombre de usuario",
-  "Password": "Contraseña"
+  "Password": "Contraseña",
+  "slidConnectMessage": "Setup or Connect a <b>Streamlabs ID</b> to access all products from Streamlabs with one single login.",
+  "Streamlabs ID": "Streamlabs ID",
+  "Update Password": "Update Password",
+  "Update Two-factor Auth": "Update Two-factor Auth",
+  "Setup": "Setup"
 }
