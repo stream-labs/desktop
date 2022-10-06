@@ -129,14 +129,16 @@ export class EditMenu extends Menu {
         submenu: this.blendingMethodSubmenu().menu,
       });
 
-      this.append({
-        label: $t('Deinterlacing'),
-        submenu: this.deinterlacingSubmenu().menu,
-      });
-
-      this.append({ type: 'separator' });
-
       if (selectedItem && isItem(selectedItem)) {
+        if (selectedItem.getSource().async) {
+          this.append({
+            label: $t('Deinterlacing'),
+            submenu: this.deinterlacingSubmenu().menu,
+          });
+
+          this.append({ type: 'separator' });
+        }
+
         const visibilityLabel = selectedItem.visible ? $t('Hide') : $t('Show');
         const streamVisLabel = selectedItem.streamVisible
           ? $t('Hide on Stream')
