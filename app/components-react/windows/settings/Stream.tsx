@@ -288,13 +288,11 @@ function SLIDBlock() {
   }));
 
   function openPasswordLink() {
-    // TODO: Switch to prod
-    remote.shell.openExternal('https://id.streamlabs.dev/security/password?companyId=streamlabs');
+    remote.shell.openExternal('https://id.streamlabs.com/security/password?companyId=streamlabs');
   }
 
   function openTwoFactorLink() {
-    // TODO: Switch to prod
-    remote.shell.openExternal('https://id.streamlabs.dev/security/tfa?companyId=streamlabs');
+    remote.shell.openExternal('https://id.streamlabs.com/security/tfa?companyId=streamlabs');
   }
 
   return (
