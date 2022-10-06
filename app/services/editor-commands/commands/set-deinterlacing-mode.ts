@@ -20,48 +20,48 @@ export class SetDeinterlacingModeCommand extends Command {
     let text = '';
     switch (this.mode) {
       case EDeinterlaceMode.Disable: {
-        text = 'Disable';
+        text = $t("Set deinterlacing 'Disable'");
         break;
       }
       case EDeinterlaceMode.Discard: {
-        text = 'Discard';
+        text = $t("Set deinterlacing 'Discard'");
         break;
       }
       case EDeinterlaceMode.Retro: {
-        text = 'Retro';
+        text = $t("Set deinterlacing 'Retro'");
         break;
       }
       case EDeinterlaceMode.Blend: {
-        text = 'Blend';
+        text = $t("Set deinterlacing 'Blend'");
         break;
       }
       case EDeinterlaceMode.Blend2X: {
-        text = 'Blend 2x';
+        text = $t("Set deinterlacing 'Blend 2x'");
         break;
       }
       case EDeinterlaceMode.Linear: {
-        text = 'Linear';
+        text = $t("Set deinterlacing 'Linear'");
         break;
       }
       case EDeinterlaceMode.Linear2X: {
-        text = 'Linear 2x';
+        text = $t("Set deinterlacing 'Linear 2x'");
         break;
       }
       case EDeinterlaceMode.Yadif: {
-        text = 'Yadif';
+        text = $t("Set deinterlacing 'Yadif'");
         break;
       }
       case EDeinterlaceMode.Yadif2X: {
-        text = 'Yadif 2x';
+        text = $t("Set deinterlacing 'Yadif 2x'");
         break;
       }
       default: {
-        text = 'Normal';
+        text = $t("Set deinterlacing 'Normal'");
         break;
       }
     }
 
-    return $t(text, { sourceName: this.selection.getNodes()[0].name });
+    return text;
   }
 
   execute() {

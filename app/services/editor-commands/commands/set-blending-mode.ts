@@ -18,40 +18,40 @@ export class SetBlendingModeCommand extends Command {
     let text = '';
     switch (this.mode) {
       case EBlendingMode.Normal: {
-        text = 'Normal';
+        text = $t("Set blending mode 'Normal'");
         break;
       }
       case EBlendingMode.Additive: {
-        text = 'Additive';
+        text = $t("Set blending mode 'Additive'");
         break;
       }
       case EBlendingMode.Substract: {
-        text = 'Substract';
+        text = $t("Set blending mode 'Subtract'");
         break;
       }
       case EBlendingMode.Screen: {
-        text = 'Screen';
+        text = $t("Set blending mode 'Screen'");
         break;
       }
       case EBlendingMode.Multiply: {
-        text = 'Multiply';
+        text = $t("Set blending mode 'Multiply'");
         break;
       }
       case EBlendingMode.Lighten: {
-        text = 'Lighten';
+        text = $t("Set blending mode 'Lighten'");
         break;
       }
       case EBlendingMode.Darken: {
-        text = 'Darken';
+        text = $t("Set blending mode 'Darken'");
         break;
       }
       default: {
-        text = 'Normal';
+        text = $t("Set blending mode 'Normal'");
         break;
       }
     }
 
-    return $t(text, { sourceName: this.selection.getNodes()[0].name });
+    return text;
   }
 
   execute() {

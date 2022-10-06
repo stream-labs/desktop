@@ -20,20 +20,20 @@ export class SetDeinterlacingFieldOrderCommand extends Command {
     let text = '';
     switch (this.order) {
       case EDeinterlaceFieldOrder.Top: {
-        text = 'Top Field First';
+        text = $t("Set deinterlacing 'Top Field First'");
         break;
       }
       case EDeinterlaceFieldOrder.Bottom: {
-        text = 'Bottom Field First';
+        text = $t("Set deinterlacing 'Bottom Field First'");
         break;
       }
       default: {
-        text = 'Top Field First';
+        text = $t("Set deinterlacing 'Top Field First'");
         break;
       }
     }
 
-    return $t(text, { sourceName: this.selection.getNodes()[0].name });
+    return text;
   }
 
   execute() {

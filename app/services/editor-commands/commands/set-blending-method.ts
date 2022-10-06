@@ -18,20 +18,20 @@ export class SetBlendingMethodCommand extends Command {
     let text = '';
     switch (this.mode) {
       case EBlendingMethod.Default: {
-        text = 'Default';
+        text = $t("Set blending method 'Default'");
         break;
       }
       case EBlendingMethod.SrgbOff: {
-        text = 'SRGB Off';
+        text = $t("Set blending method 'SRGB Off'");
         break;
       }
       default: {
-        text = 'Normal';
+        text = $t("Set blending method 'Normal'");
         break;
       }
     }
 
-    return $t(text, { sourceName: this.selection.getNodes()[0].name });
+    return text;
   }
 
   execute() {
