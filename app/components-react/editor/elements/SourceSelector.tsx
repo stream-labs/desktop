@@ -205,7 +205,7 @@ class SourceSelectorModule {
       sourceId = sceneNode.isFolder() ? sceneNode.getItems()[0]?.sourceId : sceneNode.sourceId;
     }
 
-    if (sceneNode && !sceneNode.isSelected()) sceneNode.select();
+    if (sceneNode && !sceneNode.isSelected()) sceneNode.select(true);
     const menuOptions = sceneNode
       ? { selectedSceneId: this.scene.id, showSceneItemMenu: true, selectedSourceId: sourceId }
       : { selectedSceneId: this.scene.id };
