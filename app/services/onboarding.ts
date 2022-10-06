@@ -16,6 +16,7 @@ enum EOnboardingSteps {
   MacPermissions = 'MacPermissions',
   SteamingOrRecording = 'StreamingOrRecording',
   Connect = 'Connect',
+  PrimaryPlatformSelect = 'PrimaryPlatformSelect',
   FreshOrImport = 'FreshOrImport',
   ObsImport = 'ObsImport',
   HardwareSetup = 'HardwareSetup',
@@ -42,6 +43,13 @@ export const ONBOARDING_STEPS = () => ({
   [EOnboardingSteps.Connect]: {
     component: 'Connect',
     disableControls: false,
+    hideSkip: true,
+    hideButton: true,
+    isPreboarding: true,
+  },
+  [EOnboardingSteps.PrimaryPlatformSelect]: {
+    component: 'PrimaryPlatformSelect',
+    disableControls: true,
     hideSkip: true,
     hideButton: true,
     isPreboarding: true,
@@ -132,7 +140,13 @@ export interface IThemeMetadata {
 
 class OnboardingViews extends ViewHandler<IOnboardingServiceState> {
   get singletonStep(): IOnboardingStep {
-    if (this.state.options.isLogin) return ONBOARDING_STEPS()[EOnboardingSteps.Connect];
+    if (this.state.options.isLogin) {
+      if (this.getServiceViews(UserService).isPartialSLAuth) {
+        return ONBOARDING_STEPS()[EOnboardingSteps.PrimaryPlatformSelect];
+      }
+
+      return ONBOARDING_STEPS()[EOnboardingSteps.Connect];
+    }
     if (this.state.options.isOptimize) return ONBOARDING_STEPS()[EOnboardingSteps.Optimize];
     if (this.state.options.isHardware) return ONBOARDING_STEPS()[EOnboardingSteps.HardwareSetup];
     if (this.state.options.isImport) return ONBOARDING_STEPS()[EOnboardingSteps.ObsImport];
@@ -151,6 +165,10 @@ class OnboardingViews extends ViewHandler<IOnboardingServiceState> {
     steps.push(ONBOARDING_STEPS()[EOnboardingSteps.SteamingOrRecording]);
 
     if (!recordingModeEnabled) steps.push(ONBOARDING_STEPS()[EOnboardingSteps.Connect]);
+
+    if (userViews.auth && userViews.isPartialSLAuth) {
+      steps.push(ONBOARDING_STEPS()[EOnboardingSteps.PrimaryPlatformSelect]);
+    }
 
     if (isOBSinstalled && !recordingModeEnabled) {
       steps.push(ONBOARDING_STEPS()[EOnboardingSteps.FreshOrImport]);

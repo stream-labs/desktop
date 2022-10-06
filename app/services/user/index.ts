@@ -7,7 +7,6 @@ import electron from 'electron';
 import { HostsService } from 'services/hosts';
 import {
   getPlatformService,
-  IUserAuth,
   TPlatform,
   IPlatformService,
   EPlatformCallResult,
@@ -46,6 +45,49 @@ export enum EAuthProcessState {
   InProgress = 'progress',
 }
 
+interface IStreamlabsID {
+  id: string;
+  username: string;
+}
+
+export interface IUserAuth {
+  widgetToken: string;
+  apiToken: string; // Streamlabs API Token
+
+  /**
+   * Old key from when SLOBS only supported a single platform account
+   * @deprecated Use `platforms` instead
+   */
+  platform?: IPlatformAuth;
+
+  /**
+   * The primary platform used for chat, go live window, etc
+   */
+  primaryPlatform: TPlatform;
+
+  /**
+   * New key that supports multiple logged in platforms
+   */
+  platforms: { [platform in TPlatform]?: IPlatformAuth };
+
+  /**
+   * Session partition used to separate cookies associated
+   * with this user login.
+   */
+  partition?: string;
+
+  /**
+   * Whether re-login has been forced
+   */
+  hasRelogged: boolean;
+
+  /**
+   * If the user has an attached SLID account, this object
+   * will be present on the user auth.
+   */
+  slid?: IStreamlabsID;
+}
+
 // Eventually we will support authing multiple platforms at once
 interface IUserServiceState {
   loginValidated: boolean;
@@ -70,6 +112,7 @@ interface ILinkedPlatformsResponse {
   youtube_account?: ILinkedPlatform;
   tiktok_account?: ILinkedPlatform;
   trovo_account?: ILinkedPlatform;
+  streamlabs_account?: ILinkedPlatform;
   user_id: number;
   created_at: string;
 }
@@ -118,6 +161,15 @@ class UserViews extends ViewHandler<IUserServiceState> {
     return !!(this.state.auth && this.state.auth.widgetToken && this.state.loginValidated);
   }
 
+  /**
+   * If the user has an SLID but doesn't have a primary platform, then
+   * the user is in a partially authed state until they have a primary
+   * platform linked.
+   */
+  get isPartialSLAuth() {
+    return this.state.auth && this.state.auth.slid && !this.state.auth.primaryPlatform;
+  }
+
   get isPrime() {
     return this.state.isPrime;
   }
@@ -134,9 +186,9 @@ class UserViews extends ViewHandler<IUserServiceState> {
     }
   }
 
-  get linkedPlatforms() {
-    if (this.isLoggedIn) {
-      return Object.keys(this.state.auth.platforms);
+  get linkedPlatforms(): TPlatform[] {
+    if (this.state.auth && this.state.auth.platforms) {
+      return Object.keys(this.state.auth.platforms) as TPlatform[];
     }
 
     return [];
@@ -148,6 +200,10 @@ class UserViews extends ViewHandler<IUserServiceState> {
 
   get isFacebookAuthed() {
     return this.isLoggedIn && this.platform.type === 'facebook';
+  }
+
+  get hasSLID() {
+    return !!this.auth.slid;
   }
 
   get auth() {
@@ -236,6 +292,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     Vue.delete(this.state, 'auth');
     this.state.isPrime = false;
     Vue.delete(this.state, 'userId');
+    this.state.loginValidated = false;
   }
 
   @mutation()
@@ -284,6 +341,21 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     Vue.set(this.state, 'isRelog', isrelog);
   }
 
+  @mutation()
+  private SET_PRIMARY_PLATFORM(primary: string) {
+    Vue.set(this.state.auth, 'primaryPlatform', primary);
+  }
+
+  @mutation()
+  private SET_SLID(slid: IStreamlabsID) {
+    Vue.set(this.state.auth, 'slid', slid);
+  }
+
+  @mutation()
+  private UNLINK_SLID() {
+    Vue.delete(this.state.auth, 'slid');
+  }
+
   /**
    * Checks for v1 auth schema and migrates if needed
    */
@@ -326,6 +398,12 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     this.MIGRATE_AUTH();
     this.VALIDATE_LOGIN(false);
     this.SET_AUTH_STATE(EAuthProcessState.Idle);
+
+    // Just in case we somehow saved a partial auth in local storage,
+    // we should clear it out now.
+    if (this.views.isPartialSLAuth) {
+      this.LOGOUT();
+    }
   }
 
   get views() {
@@ -498,10 +576,19 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     } else if (this.state.auth.primaryPlatform !== 'trovo') {
       this.UNLINK_PLATFORM('trovo');
     }
+
+    if (linkedPlatforms.streamlabs_account) {
+      this.SET_SLID({
+        id: linkedPlatforms.streamlabs_account.platform_id,
+        username: linkedPlatforms.streamlabs_account.platform_name,
+      });
+    } else {
+      this.UNLINK_SLID();
+    }
   }
 
   fetchLinkedPlatforms() {
-    if (!this.isLoggedIn) return;
+    if (!this.state.auth || !this.state.auth.apiToken) return;
 
     const host = this.hostsService.streamlabs;
     const headers = authorizedHeaders(this.apiToken);
@@ -741,7 +828,9 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
         type: 'warning',
         title: 'Twitch Error',
         message: $t(
-          $t('Your Twitch login is expired. Please log in again to continue using Streamlabs'),
+          $t(
+            'Streamlabs requires additional permissions from your Twitch account. Please log in with Twitch to continue.',
+          ),
         ),
         buttons: [$t('Refresh Login')],
       });
@@ -780,6 +869,90 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   }
 
   /**
+   * Streamlabs ID is a special login case.  Once SL ID auth is complete,
+   * we need to make sure they have at least 1 streaming platform linked
+   * before completing the login process.  If they don't have at least 1
+   * platform linked, they will be prompted to merge a platform into their
+   * account before they can be considered fully logged in.
+   */
+  async startSLAuth() {
+    const query = `_=${Date.now()}&skip_splash=true&external=electron&slid&force_verify&origin=slobs`;
+    const url = `https://${this.hostsService.streamlabs}/slobs/login?${query}`;
+
+    this.SET_AUTH_STATE(EAuthProcessState.Loading);
+    const auth = await this.authModule.startExternalAuth(
+      url,
+      () => {
+        this.SET_AUTH_STATE(EAuthProcessState.Idle);
+      },
+      false,
+    );
+
+    this.LOGOUT();
+    this.LOGIN(auth);
+
+    // Find out if the user has any additional platforms linked
+    await this.updateLinkedPlatforms();
+
+    // If user has exactly one streaming platform linked, we can proceed straight
+    // to a logged in state.
+    if (this.views.linkedPlatforms.length === 1) {
+      await this.finishSLAuth(this.views.linkedPlatforms[0]);
+    }
+  }
+
+  /**
+   * Should be called to finish an in progress SLID auth. Needs to be called
+   * with the new primary streaming platform, which needs to already be present
+   * in the auth object.
+   * @param primaryPlatform The primary platform to use. If not provided, login
+   * attempt will be canceled.
+   */
+  async finishSLAuth(primaryPlatform?: TPlatform) {
+    if (!this.views.isPartialSLAuth) {
+      console.error('Called finishSLAuth but SL Auth is not in progress');
+      return;
+    }
+
+    if (!primaryPlatform) {
+      this.LOGOUT();
+      return;
+    }
+
+    if (!this.state.auth.platforms[primaryPlatform]) {
+      console.error('Tried to finish SL Auth with platform that does not exist!');
+      this.LOGOUT();
+      return;
+    }
+
+    this.SET_PRIMARY_PLATFORM(primaryPlatform);
+    const service = getPlatformService(primaryPlatform);
+
+    this.SET_AUTH_STATE(EAuthProcessState.Loading);
+    await this.login(service);
+    this.SET_AUTH_STATE(EAuthProcessState.Idle);
+  }
+
+  async startSLMerge(): Promise<EPlatformCallResult> {
+    const authUrl = `https://${this.hostsService.streamlabs}/slobs/merge/${this.apiToken}/streamlabs_account`;
+
+    if (!this.isLoggedIn) {
+      throw new Error('Account merging can only be performed while logged in');
+    }
+
+    this.SET_AUTH_STATE(EAuthProcessState.Loading);
+    const onWindowShow = () => this.SET_AUTH_STATE(EAuthProcessState.Idle);
+
+    const auth = await this.authModule.startExternalAuth(authUrl, onWindowShow, true);
+
+    this.SET_AUTH_STATE(EAuthProcessState.Loading);
+    this.SET_IS_RELOG(false);
+    this.SET_SLID(auth.slid);
+    this.SET_AUTH_STATE(EAuthProcessState.Idle);
+    return EPlatformCallResult.Success;
+  }
+
+  /**
    * Starts the authentication process.  Multiple callbacks
    * can be passed for various events.
    */
@@ -791,7 +964,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     const service = getPlatformService(platform);
     const authUrl = merge ? service.mergeUrl : service.authUrl;
 
-    if (merge && !this.isLoggedIn) {
+    if (merge && !this.isLoggedIn && !this.views.isPartialSLAuth) {
       throw new Error('Account merging can only be performed while logged in');
     }
 
