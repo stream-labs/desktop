@@ -208,38 +208,6 @@ export interface IPlatformService {
   state: IPlatformState;
 }
 
-export interface IUserAuth {
-  widgetToken: string;
-  apiToken: string; // Streamlabs API Token
-
-  /**
-   * Old key from when SLOBS only supported a single platform account
-   * @deprecated Use `platforms` instead
-   */
-  platform?: IPlatformAuth;
-
-  /**
-   * The primary platform used for chat, go live window, etc
-   */
-  primaryPlatform: TPlatform;
-
-  /**
-   * New key that supports multiple logged in platforms
-   */
-  platforms: { [platform in TPlatform]?: IPlatformAuth };
-
-  /**
-   * Session partition used to separate cookies associated
-   * with this user login.
-   */
-  partition?: string;
-
-  /**
-   * Whether re-login has been forced
-   */
-  hasRelogged: boolean;
-}
-
 export interface IPlatformAuth {
   type: TPlatform;
   username: string;
