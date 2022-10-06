@@ -18,36 +18,36 @@ export class SetScaleFilterCommand extends Command {
     let text = '';
     switch (this.filter) {
       case EScaleType.Disable: {
-        text = 'Disable';
+        text = $t("Set scale filter 'Disable'");
         break;
       }
       case EScaleType.Point: {
-        text = 'Point';
+        text = $t("Set scale filter 'Point'");
         break;
       }
       case EScaleType.Bicubic: {
-        text = 'Bicubic';
+        text = $t("Set scale filter 'Bicubic'");
         break;
       }
       case EScaleType.Bilinear: {
-        text = 'Bilinear';
+        text = $t("Set scale filter 'Bilinear'");
         break;
       }
       case EScaleType.Lanczos: {
-        text = 'Lanczos';
+        text = $t("Set scale filter 'Lanczos'");
         break;
       }
       case EScaleType.Area: {
-        text = 'Area';
+        text = $t("Set scale filter 'Area'");
         break;
       }
       default: {
-        text = 'Disable';
+        text = $t("Set scale filter 'Disable'");
         break;
       }
     }
 
-    return $t(text, { sourceName: this.selection.getNodes()[0].name });
+    return text;
   }
 
   execute() {

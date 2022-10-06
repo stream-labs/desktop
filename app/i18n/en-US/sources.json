@@ -348,5 +348,12 @@
   "Set deinterlacing 'Linear 2x'": "Set deinterlacing 'Linear 2x'",
   "Set deinterlacing 'Yadif'": "Set deinterlacing 'Yadif'",
   "Set deinterlacing 'Yadif 2x'": "Set deinterlacing 'Yadif 2x'",
-  "Set deinterlacing 'Normal'": "Set deinterlacing 'Normal'"
+  "Set deinterlacing 'Normal'": "Set deinterlacing 'Normal'",
+  "Set scale filter 'Disable'": "Set scale filter 'Disable'",
+  "Set scale filter 'Point'": "Set scale filter 'Point'",
+  "Set scale filter 'Bicubic'": "Set scale filter 'Bicubic'",
+  "Set scale filter 'Bilinear'": "Set scale filter 'Bilinear'",
+  "Set scale filter 'Lanczos'": "Set scale filter 'Lanczos'",
+  "Set scale filter 'Area'": "Set scale filter 'Area'",
+  "Set scale filter 'Disable'": "Set scale filter 'Disable'"
 }
