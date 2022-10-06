@@ -50,7 +50,7 @@ export function Connect() {
     next();
   }
 
-  const platforms = ['twitch', 'youtube', 'facebook', 'trovo'];
+  const platforms = ['streamlabs', 'twitch', 'youtube', 'facebook', 'trovo'];
 
   return (
     <div className={styles.pageContainer}>
@@ -152,11 +152,23 @@ export class LoginModule {
     return this.UserService.state.authProcessState === EAuthProcessState.InProgress;
   }
 
-  async authPlatform(platform: TPlatform, onSuccess: () => void) {
+  get isPartialSLAuth() {
+    return this.UserService.views.isPartialSLAuth;
+  }
+
+  async authPlatform(platform: TPlatform | 'streamlabs', onSuccess: () => void, merge = false) {
     this.UsageStatisticsService.recordAnalyticsEvent('PlatformLogin', platform);
+
+    if (platform === 'streamlabs') {
+      await this.UserService.startSLAuth();
+      onSuccess();
+      return;
+    }
+
     const result = await this.UserService.startAuth(
       platform,
       ['youtube', 'twitch'].includes(platform) ? 'external' : 'internal',
+      merge,
     );
 
     if (result === EPlatformCallResult.TwitchTwoFactor) {
@@ -179,6 +191,10 @@ export class LoginModule {
       // Currently we do not have special handling for generic errors
       onSuccess();
     }
+  }
+
+  finishSLAuth(primaryPlatform?: TPlatform) {
+    return this.UserService.finishSLAuth(primaryPlatform);
   }
 
   @mutation()
