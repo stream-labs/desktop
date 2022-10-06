@@ -364,10 +364,10 @@ export class Scene {
         y: sceneNode.y == null ? 0 : sceneNode.y,
         locked: sceneNode.locked,
         rotation: sceneNode.rotation || 0,
-        streamVisible: sceneNode.streamVisible,
-        recordingVisible: sceneNode.recordingVisible,
-        scaleFilter: sceneNode.scaleFilter,
-        blendingMode: sceneNode.blendingMode,
+        streamVisible: sceneNode.streamVisible!,
+        recordingVisible: sceneNode.recordingVisible!,
+        scaleFilter: sceneNode.scaleFilter!,
+        blendingMode: sceneNode.blendingMode!,
         blendingMethod: sceneNode.blendingMethod,
       });
       return true;
