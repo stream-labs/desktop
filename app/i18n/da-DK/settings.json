@@ -211,5 +211,10 @@
   "Twitch VOD": "Twitch VOD",
   "Use authentication": "Brug autentificering",
   "Username": "Brugernavn",
-  "Password": "Adgangskode"
+  "Password": "Adgangskode",
+  "slidConnectMessage": "Setup or Connect a <b>Streamlabs ID</b> to access all products from Streamlabs with one single login.",
+  "Streamlabs ID": "Streamlabs ID",
+  "Update Password": "Update Password",
+  "Update Two-factor Auth": "Update Two-factor Auth",
+  "Setup": "Setup"
 }
