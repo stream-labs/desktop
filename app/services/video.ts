@@ -346,12 +346,14 @@ export class VideoService extends Service {
         electronWindow.getNativeWindowHandle(),
         sourceId,
         name,
+        true
       );
     } else {
       obs.NodeObs.OBS_content_createDisplay(
         electronWindow.getNativeWindowHandle(),
         name,
         remderingMode,
+        true
       );
     }
   }

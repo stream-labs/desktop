@@ -79,8 +79,14 @@ export default function Display(props: DisplayProps) {
     <div
       className="display"
       ref={displayEl}
-      style={{ height: '100%', backgroundColor: 'var(--section)', flexGrow: 1, ...p.style }}
+      style={{ height: '100%', backgroundColor: 'transparent', flexGrow: 1, ...p.style }}
       onClick={onClickHandler}
-    />
+    >
+      <div
+        style={{ height: '100%', backgroundColor: 'transparent', flexGrow: 1, color: 'white', fontSize: '128px', ...p.style }}
+      >
+        THIS IS HTML
+      </div>
+    </div>
   );
 }
