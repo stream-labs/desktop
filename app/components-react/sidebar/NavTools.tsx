@@ -9,9 +9,8 @@ import { useVuex } from '../hooks';
 import styles from './SideNav.m.less';
 import * as remote from '@electron/remote';
 import { Badge, Menu, Typography, Divider } from 'antd';
-import { EMenuItem, ESubMenuItem, ENavName } from 'services/side-nav';
+import { EMenuItem, ENavName, IMenuItem, IParentMenuItem } from 'services/side-nav';
 import PlatformLogo from 'components-react/shared/PlatformLogo';
-import { TPlatform } from 'services/platforms';
 
 export default function SideNav() {
   const {
@@ -27,19 +26,28 @@ export default function SideNav() {
 
   const isDevMode = Utils.isDevMode();
 
-  const { studioMode, isLoggedIn, isPrime, platform, menu, isOpen } = useVuex(
+  const {
+    studioMode,
+    isLoggedIn,
+    isPrime,
+    platform,
+    menuItems,
+    isOpen,
+    openMenuItems,
+    expandMenuItem,
+  } = useVuex(
     () => ({
       studioMode: TransitionsService.views.studioMode,
       isLoggedIn: UserService.views.isLoggedIn,
       isPrime: UserService.views.isPrime,
       platform: UserService.views.auth?.platforms[UserService.views.auth?.primaryPlatform],
-      menu: SideNavService.views.sidebar[ENavName.BottomNav],
+      menuItems: SideNavService.views.state[ENavName.BottomNav].menuItems,
       isOpen: SideNavService.views.isOpen,
+      openMenuItems: SideNavService.views.getExpandedMenuItems(ENavName.TopNav),
+      expandMenuItem: SideNavService.actions.expandMenuItem,
     }),
     false,
   );
-
-  console.log('platform ', platform);
 
   const [dashboardOpening, setDashboardOpening] = useState(false);
 
@@ -48,22 +56,8 @@ export default function SideNav() {
     SettingsService.actions.showSettings();
   }
 
-  function openLayoutEditor() {
-    UsageStatisticsService.actions.recordClick('NavTools', 'layout-editor');
-    NavigationService.actions.navigate('LayoutEditor');
-  }
-
   function openDevTools() {
     electron.ipcRenderer.send('openDevTools');
-  }
-
-  function toggleStudioMode() {
-    UsageStatisticsService.actions.recordClick('NavTools', 'studio-mode');
-    if (studioMode) {
-      TransitionsService.actions.disableStudioMode();
-    } else {
-      TransitionsService.actions.enableStudioMode();
-    }
   }
 
   async function openDashboard(page?: string) {
@@ -121,165 +115,138 @@ export default function SideNav() {
   };
 
   return (
-    <Menu forceSubMenuRender mode="inline" className={styles.bottomNav}>
+    <Menu
+      forceSubMenuRender
+      mode="inline"
+      className={styles.bottomNav}
+      defaultOpenKeys={openMenuItems && openMenuItems}
+    >
       <Divider className={styles.divider} />
       {isDevMode && (
         <Menu.Item
           key="dev-tools"
           title={EMenuItem.DevTools}
-          // className={styles.cell}
           icon={<i className="icon-developer" />}
           onClick={openDevTools}
         >
           {EMenuItem.DevTools}
         </Menu.Item>
       )}
-      {isLoggedIn && !isPrime && (
-        <Menu.Item
-          key="get-prime"
-          title={$t(EMenuItem.GetPrime)}
-          // className={cx(styles.cell, styles.primeCell)}
-          icon={
-            <Badge count={<i className={cx('icon-pop-out-3', styles.linkBadge)} />}>
-              <>
-                <i className="icon-prime" /> {$t(EMenuItem.GetPrime)}
-              </>
-            </Badge>
-          }
-          onClick={upgradeToPrime}
-        >
-          <>{$t(EMenuItem.GetPrime)}</>
-        </Menu.Item>
-      )}
-      {isLoggedIn && (
-        <Menu.SubMenu
-          key="dashboard"
-          title={$t(EMenuItem.Dashboard)}
-          // className={styles.cell}
-          icon={
-            <div>
-              <Badge count={<i className={cx('icon-pop-out-3', styles.linkBadge)} />}>
-                <i className="icon-dashboard" />
-              </Badge>
-            </div>
-          }
-          // onTitleClick={() => throttledOpenDashboard()} // does this still need an onClick?
-        >
-          {/* TODO: if the onClicks are similar, maybe refactor to map over objects */}
-          <Menu.Item
-            key="cloudbot"
-            title={$t(ESubMenuItem.Cloudbot)}
-            // className={cx(styles.cell)}
-            onClick={() => throttledOpenDashboard('cloudbot')}
-          >
-            {$t(ESubMenuItem.Cloudbot)}
-          </Menu.Item>
-          <Menu.Item
-            key="alertbox-library"
-            title={$t('Alert Box')}
-            // className={cx(styles.cell)}
-            // onClick={} // TODO: navigate to alert box library
-          >
-            {$t('Alert Box')}
-          </Menu.Item>
-          <Menu.Item
-            key="widgets"
-            title={$t(ESubMenuItem.Widgets)}
-            // className={cx(styles.cell)}
-            // onClick={} // TODO: create onClick
-          >
-            {$t(ESubMenuItem.Widgets)}
-          </Menu.Item>
-          <Menu.Item
-            key="tip-settings"
-            title={$t(ESubMenuItem.TipSettings)}
-            // className={cx(styles.cell)}
-            // onClick={} // TODO: create onClick
-          >
-            {$t(ESubMenuItem.TipSettings)}
-          </Menu.Item>
-          <Menu.Item
-            key="multistream"
-            title={$t(ESubMenuItem.Multistream)}
-            // className={cx(styles.cell)}
-            // onClick={} // TODO: create onClick
-          >
-            {$t(ESubMenuItem.Multistream)}
-          </Menu.Item>
-        </Menu.SubMenu>
-      )}
 
-      <Menu.Item
-        key="get-help"
-        title={$t(EMenuItem.GetHelp)}
-        // className={styles.cell}
-        icon={
-          <div>
-            <Badge count={<i className={cx('icon-pop-out-3', styles.linkBadge)} />}>
-              <i className="icon-question" />
-            </Badge>
-          </div>
-        }
-        onClick={openLayoutEditor}
-      >
-        {$t(EMenuItem.GetHelp)}
-      </Menu.Item>
-
-      <Menu.Item
-        key="settings"
-        title={$t(EMenuItem.Settings)}
-        // className={styles.cell}
-        icon={<i className="icon-settings" />}
-        onClick={openSettingsWindow}
-      >
-        {$t(EMenuItem.Settings)}
-      </Menu.Item>
-
-      <Divider className={styles.loginDivider} />
-      <Menu.Item
-        key="login"
-        title={!isLoggedIn ? $t(EMenuItem.Login) : $t('Log Out')}
-        className={styles.login}
-        icon={
-          !isOpen && (
-            // need to flip this entire div to transform the login arrow icon because
-            // the Menu.Item antd component does not apply transforms to icons when loading
-            <div style={{ transform: 'scaleX(-1)' }}>
-              <LoginArrowIcon />
-              <i className="icon-user" />
-            </div>
-          )
-        }
-        onClick={() => handleAuth()}
-      >
-        {!isLoggedIn ? (
-          <Typography.Text underline style={{ marginBottom: '0px', flexGrow: 1 }}>
-            {$t(EMenuItem.Login)}
-          </Typography.Text>
-        ) : (
-          isOpen && (
+      {menuItems.map((menuItem: IParentMenuItem) => (
+        <>
+          {isLoggedIn && !isPrime && menuItem.title === EMenuItem.GetPrime && (
+            <Menu.Item
+              key={menuItem.title}
+              title={$t(menuItem.title)}
+              icon={
+                <div>
+                  <Badge count={<i className={cx('icon-pop-out-3', styles.linkBadge)} />}>
+                    <i className={menuItem.icon} />
+                  </Badge>
+                </div>
+              }
+              onClick={upgradeToPrime}
+            >
+              <>{$t(menuItem.title)}</>
+            </Menu.Item>
+          )}
+          {isLoggedIn && isPrime && menuItem.title === EMenuItem.Dashboard && (
+            <Menu.SubMenu
+              key={menuItem.title}
+              title={$t(menuItem.title)}
+              icon={
+                <div>
+                  <Badge count={<i className={cx('icon-pop-out-3', styles.linkBadge)} />}>
+                    <i className={menuItem.icon} />
+                  </Badge>
+                </div>
+              }
+              onTitleClick={() => expandMenuItem(ENavName.BottomNav, menuItem.title as EMenuItem)}
+            >
+              {menuItem?.subMenuItems.map((subMenuItem: IMenuItem) => (
+                <Menu.Item
+                  key={subMenuItem?.target ?? subMenuItem.title}
+                  title={$t(subMenuItem.title)}
+                  onClick={() => throttledOpenDashboard(subMenuItem?.target)}
+                >
+                  {$t(subMenuItem.title)}
+                </Menu.Item>
+              ))}
+            </Menu.SubMenu>
+          )}
+          {menuItem.title === EMenuItem.GetHelp && (
+            <Menu.Item
+              key={menuItem.title}
+              title={$t(menuItem.title)}
+              icon={
+                <div>
+                  <Badge count={<i className={cx('icon-pop-out-3', styles.linkBadge)} />}>
+                    <i className={menuItem?.icon} />
+                  </Badge>
+                </div>
+              }
+              onClick={() => openHelp()}
+            >
+              {$t(menuItem.title)}
+            </Menu.Item>
+          )}
+          {menuItem.title === EMenuItem.Settings && (
+            <Menu.Item
+              key={menuItem.title}
+              title={$t(menuItem.title)}
+              icon={<i className={menuItem?.icon} />}
+              onClick={openSettingsWindow}
+            >
+              {$t(EMenuItem.Settings)}
+            </Menu.Item>
+          )}
+          {menuItem.title === EMenuItem.Login && (
             <>
-              {platform && (
-                <PlatformLogo
-                  platform={platform?.type!}
-                  className={cx(styles.platformLogo, styles[`platform-logo-${platform?.type}`])}
-                />
-              )}
-              <Typography.Text
-                underline
-                style={{ color: 'var(--logged-in)', marginBottom: '0px', flexGrow: 1 }}
+              <Divider className={styles.loginDivider} />
+              <Menu.Item
+                key="login"
+                title={!isLoggedIn ? $t(EMenuItem.Login) : $t('Log Out')}
+                className={styles.login}
+                icon={
+                  !isOpen && (
+                    // need to flip this entire div to transform the login arrow icon because
+                    // the Menu.Item antd component does not apply transforms to icons when loading
+                    <div style={{ transform: 'scaleX(-1)' }}>
+                      <i className="icon-user" />
+                    </div>
+                  )
+                }
+                onClick={() => handleAuth()}
               >
-                {$t(platform?.username) || $t('Log Out')}
-              </Typography.Text>
+                {!isLoggedIn ? (
+                  <Typography.Text underline style={{ marginBottom: '0px', flexGrow: 1 }}>
+                    {$t(EMenuItem.Login)}
+                  </Typography.Text>
+                ) : (
+                  isOpen && (
+                    <>
+                      {platform && (
+                        <PlatformLogo
+                          platform={platform?.type!}
+                          className={cx(
+                            styles.platformLogo,
+                            styles[`platform-logo-${platform?.type ?? 'default'}`],
+                          )}
+                        />
+                      )}
+                      <Typography.Text className={styles.username}>
+                        {platform?.username || $t('Log Out')}
+                      </Typography.Text>
+                      <i className={cx('icon-logout', styles.loginArrow)} />
+                    </>
+                  )
+                )}
+              </Menu.Item>
             </>
-          )
-        )}
-        <LoginArrowIcon />
-      </Menu.Item>
+          )}
+        </>
+      ))}
     </Menu>
   );
-}
-
-function LoginArrowIcon() {
-  return <i className={cx('icon-logout', styles.loginArrow)} />;
 }

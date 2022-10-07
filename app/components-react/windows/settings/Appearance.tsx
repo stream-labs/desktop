@@ -1,16 +1,20 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import { Services } from '../../service-provider';
 import { $t } from '../../../services/i18n';
-import { Row, Col } from 'antd';
+import { Row, Col, Select } from 'antd';
 import { CheckboxInput, ListInput, SliderInput, SwitchInput } from '../../shared/inputs';
 import { getDefined } from '../../../util/properties-type-guards';
 import { ObsSettingsSection } from './ObsSettings';
 import * as remote from '@electron/remote';
 import { injectFormBinding, useModule } from 'slap';
-import { ENavName, EMenuItem, IMenuItem, IParentMenuItem, TMenuItems } from 'services/side-nav';
+import { ENavName, EMenuItem, IAppMenuItem } from 'services/side-nav';
 import { useVuex } from 'components-react/hooks';
 import styles from './Appearance.m.less';
 import cx from 'classnames';
+import { EAppPageSlot } from 'services/platform-apps';
+import Scrollable from 'components-react/shared/Scrollable';
+
+const { Option } = Select;
 
 export function AppearanceSettings() {
   const {
@@ -19,6 +23,7 @@ export function AppearanceSettings() {
     UserService,
     MagicLinkService,
     SideNavService,
+    PlatformAppsService,
   } = Services;
 
   const { bind } = useModule(() => {
@@ -33,13 +38,33 @@ export function AppearanceSettings() {
     return { bind: injectFormBinding(getSettings, setSettings) };
   });
 
-  const { compactView, menuItems } = useVuex(() => ({
+  const {
+    compactView,
+    menuItems,
+    apps,
+    displayedApps,
+    showCustomEditor,
+    toggleApp,
+    swapApp,
+    toggleSidebarSubMenu,
+    toggleMenuItem,
+    setCompactView,
+  } = useVuex(() => ({
     compactView: SideNavService.views.compactView,
-    views: SideNavService.views,
     menuItems: SideNavService.views.menuItems,
+    apps: PlatformAppsService.views.enabledApps.filter(app => {
+      return !!app.manifest.pages.find(page => {
+        return page.slot === EAppPageSlot.TopNav;
+      });
+    }),
+    displayedApps: Object.values(SideNavService.views.apps).sort((a, b) => a.index - b.index),
+    showCustomEditor: SideNavService.views.showCustomEditor,
+    toggleApp: SideNavService.actions.toggleApp,
+    swapApp: SideNavService.actions.swapApp,
+    toggleSidebarSubMenu: SideNavService.actions.toggleSidebarSubmenu,
+    toggleMenuItem: SideNavService.actions.toggleMenuItem,
+    setCompactView: SideNavService.actions.setCompactView,
   }));
-
-  console.log('APPEARANCE COMPONENT: menuItems ', menuItems);
 
   function openFFZSettings() {
     WindowsService.createOneOffWindow(
@@ -65,6 +90,28 @@ export function AppearanceSettings() {
   const shouldShowEmoteSettings =
     UserService.views.isLoggedIn && getDefined(UserService.platform).type === 'twitch';
 
+  /**
+   * Sort apps
+   */
+
+  const displayedAppsList = Object.values(displayedApps);
+
+  const enabledApps = apps.map(app => ({
+    id: app.id,
+    name: app.manifest.name,
+    icon: app.manifest.icon,
+    isActive: displayedAppsList[app.id]?.isActive ?? false,
+  }));
+
+  const appSelectFields = [...Array(5)].map((field, index) => {
+    if (displayedAppsList[index]) {
+      return displayedAppsList[index];
+    } else if (enabledApps[index]) {
+      swapApp({ ...enabledApps[index], isActive: false, index });
+      return { ...enabledApps[index], isActive: false, index };
+    }
+  });
+
   return (
     <div>
       <ObsSettingsSection>
@@ -80,7 +127,6 @@ export function AppearanceSettings() {
       </ObsSettingsSection>
 
       <ObsSettingsSection title={$t('Chat Settings')}>
-        {/* TODO: Will this conflict with the new menu? */}
         <CheckboxInput
           {...bind.leftDock}
           label={$t('Show the live dock (chat) on the left side')}
@@ -110,76 +156,95 @@ export function AppearanceSettings() {
 
       <ObsSettingsSection title={$t('Custom Navigation Bar')}>
         <CheckboxInput
-          onChange={() => SideNavService.actions.setCompactView()}
+          onChange={() => setCompactView()}
           label={$t(
             'Enable custom navigation bar to pin your favorite features for quick access.\nDisable to swap to compact view.',
           )}
           value={compactView}
           className={cx(styles.settingsCheckbox)}
-          // style={{
-          //   backgroundColor: compactView ? 'var(--checkbox)' : 'var(--teal_',
-          //   borderColor: compactView ? 'var(--checkbox)' : 'var(--teal)',
-          // }}
         />
+        {/* NAVBAR SETTINGS */}
         <Row gutter={[8, 8]}>
           <Col flex={1}>
             <SwitchInput
               label={$t(EMenuItem.Editor)}
               layout="horizontal"
-              onChange={() =>
-                SideNavService.actions.toggleMenuItem(ENavName.TopNav, EMenuItem.Editor)
-              }
+              onChange={() => toggleMenuItem(ENavName.TopNav, EMenuItem.Editor)}
               value={menuItems[EMenuItem.Editor].isActive}
               // className={}
             />
             <SwitchInput
               label={$t('Custom Editor')}
               layout="horizontal"
-              onChange={() =>
-                SideNavService.actions.toggleMenuItem(ENavName.TopNav, EMenuItem.Highlighter)
-              }
-              value={menuItems[EMenuItem.Highlighter].isActive} // what value? Highlighter temporarily
+              onChange={() => toggleSidebarSubMenu()}
+              value={showCustomEditor} // what value? Highlighter temporarily
               // className={}
             />
             <SwitchInput
               label={$t(EMenuItem.StudioMode)}
               layout="horizontal"
-              onChange={() =>
-                SideNavService.actions.toggleMenuItem(ENavName.TopNav, EMenuItem.StudioMode)
-              }
+              onChange={() => toggleMenuItem(ENavName.TopNav, EMenuItem.StudioMode)}
               value={menuItems[EMenuItem.StudioMode].isActive}
               // className={}
             />
             <SwitchInput
               label={$t(EMenuItem.LayoutEditor)}
               layout="horizontal"
-              onChange={() =>
-                SideNavService.actions.toggleMenuItem(ENavName.TopNav, EMenuItem.LayoutEditor)
-              }
+              onChange={() => toggleMenuItem(ENavName.TopNav, EMenuItem.LayoutEditor)}
               value={menuItems[EMenuItem.LayoutEditor].isActive}
               // className={}
             />
             <SwitchInput
               label={$t(EMenuItem.Themes)}
               layout="horizontal"
-              onChange={() =>
-                SideNavService.actions.toggleMenuItem(ENavName.TopNav, EMenuItem.Themes)
-              }
+              onChange={() => toggleMenuItem(ENavName.TopNav, EMenuItem.Themes)}
               value={menuItems[EMenuItem.Themes].isActive}
               // className={}
             />
           </Col>
-          <Col flex={3}>
-            <SwitchInput
-              label={$t(EMenuItem.AppStore)}
-              layout="horizontal"
-              onChange={() =>
-                SideNavService.actions.toggleMenuItem(ENavName.TopNav, EMenuItem.AppStore)
-              }
-              value={menuItems[EMenuItem.AppStore].isActive}
-              // className={}
-            />
-            {/* TODO: if apps, map over apps */}
+
+          {/* NAVBAR APPS SETTINGS */}
+          <Col flex={5}>
+            <Scrollable style={{ height: '100%' }}>
+              <SwitchInput
+                label={$t(EMenuItem.AppStore)}
+                layout="horizontal"
+                onChange={() => toggleMenuItem(ENavName.TopNav, EMenuItem.AppStore)}
+                value={menuItems[EMenuItem.AppStore].isActive}
+              />
+
+              {appSelectFields.map((app: IAppMenuItem | undefined, index: number) => (
+                <Row
+                  className="apps-selector"
+                  style={{ display: 'flex', flexDirection: 'row', width: '100%' }}
+                >
+                  <SwitchInput
+                    key={`app-${index + 1}`}
+                    label={`App ${index + 1}`}
+                    layout="horizontal"
+                    onChange={() => app?.id && toggleApp(app.id)}
+                    value={app && app?.isActive}
+                    disabled={index + 1 > apps.length}
+                  />
+                  {/* dropdown options for apps */}
+                  <Select
+                    defaultValue={app?.name ?? enabledApps[0].name}
+                    style={{ width: '300px' }}
+                    onChange={value => {
+                      const data = enabledApps.find(data => data.name === value);
+                      swapApp({ ...data, isActive: app ? app.isActive : false, index });
+                    }}
+                    disabled={index + 1 > apps.length}
+                  >
+                    {enabledApps.map(enabledApp => (
+                      <Option key={enabledApp.id} value={enabledApp.name}>
+                        {enabledApp.name}
+                      </Option>
+                    ))}
+                  </Select>
+                </Row>
+              ))}
+            </Scrollable>
           </Col>
         </Row>
       </ObsSettingsSection>
