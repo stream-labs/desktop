@@ -145,6 +145,7 @@
     padding-left: 0;
     padding-right: 16px;
     border-right: 1px solid var(--border);
+    background-color: var(--section);
   }
 
   @media (max-width: 1070px) {

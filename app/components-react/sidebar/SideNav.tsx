@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useEffect, useRef } from 'react';
 import cx from 'classnames';
 import { TAppPage } from 'services/navigation';
 import { ENavName, EMenuItem, IMenuItem, IParentMenuItem } from 'services/side-nav';
@@ -24,6 +24,7 @@ export default function SideNav() {
     SideNavService,
     LayoutService,
     TransitionsService,
+    WindowsService,
   } = Services;
 
   function navigate(page: TAppPage, trackingTarget?: string, param?: string) {
@@ -79,6 +80,7 @@ export default function SideNav() {
     hasLegacyMenu,
     studioMode,
     showCustomEditor,
+    updateStyleBlockers,
   } = useVuex(() => ({
     featureIsEnabled: (feature: EAvailableFeatures) =>
       IncrementalRolloutService.views.featureIsEnabled(feature),
@@ -94,7 +96,21 @@ export default function SideNav() {
     hasLegacyMenu: SideNavService.views.hasLegacyMenu,
     studioMode: TransitionsService.views.studioMode,
     showCustomEditor: SideNavService.views.showCustomEditor,
+    updateStyleBlockers: WindowsService.actions.updateStyleBlockers,
   }));
+
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    ref.current?.addEventListener('animationstart', () => {
+      console.log('started!');
+      updateStyleBlockers('main', true);
+    });
+    ref.current?.addEventListener('animationend', () => {
+      console.log('ended!');
+      updateStyleBlockers('main', false);
+    });
+  });
 
   const menuItems = useMemo(() => {
     if (!loggedIn) {
@@ -134,6 +150,7 @@ export default function SideNav() {
 
   return (
     <Layout
+      key="sidenav"
       hasSider
       style={{
         width: '100%',
@@ -145,13 +162,16 @@ export default function SideNav() {
         collapsible
         collapsed={!isOpen}
         trigger={null}
-        className={cx(styles.sidenavSider, !isOpen && styles.siderClosed)}
+        className={cx(
+          styles.sidenavSider,
+          !isOpen && styles.siderClosed,
+          !leftDock && styles.noLeftDock,
+        )}
+        ref={ref}
       >
-        <Scrollable
-          snapToWindowEdge
-          className={cx(styles.sidenavScroll, { [styles.leftDock]: leftDock })}
-        >
+        <Scrollable snapToWindowEdge className={cx(styles.sidenavScroll)}>
           <Menu
+            key={ENavName.TopNav}
             forceSubMenuRender
             mode="inline"
             className={cx(styles.menuContainer, !isOpen && styles.siderClosed)}
@@ -237,7 +257,7 @@ export default function SideNav() {
                       app =>
                         app.isActive && (
                           <Menu.Item
-                            key={app.id}
+                            key={`sub-${app.id}`}
                             title={app.name}
                             onClick={() => app?.id && navigateApp(app.id)}
                           >
@@ -314,7 +334,7 @@ export default function SideNav() {
                     app.isActive && (
                       <Menu.Item
                         key={app.id}
-                        title={$t(app.name)}
+                        title={app.name}
                         icon={
                           app?.icon && app?.id ? (
                             <img
@@ -343,7 +363,12 @@ export default function SideNav() {
       {/* this button toggles the menu open and close */}
       <Button
         type="primary"
-        className={cx(styles.sidenavButton, !isOpen && styles.flipped)}
+        className={cx(
+          styles.sidenavButton,
+          !isOpen && styles.flipped,
+          isOpen && styles.siderOpen,
+          leftDock && styles.leftDock,
+        )}
         onClick={() => SideNavService.actions.toggleMenuStatus()}
       >
         <i className="icon-back" />

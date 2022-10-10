@@ -261,6 +261,8 @@
   //   height: fit-content;
   // }
 
+  border: none !important;
+
   :global(.ant-menu-item) & :global(.ant-menu-inline .ant-menu-item) {
     min-height: 40px;
     height: fit-content;
@@ -295,23 +297,63 @@
 
 button.sidenav-button {
   height: 100vh;
-  background-color: var(--section);
+  background-color: var(--sider);
   border: 0;
+  border-left: 1px solid var(--border);
   border-right: 1px solid var(--border);
   border-radius: 0;
-
-  padding: 0;
+  padding-right: 3px;
+  padding-left: 3px;
 
   &:hover,
   &:focus,
   &:active {
-    background-color: var(--section);
+    // to overwrite default antd styling
+    background-color: var(--sider);
     border: 0;
+    border-left: 1px solid var(--border);
     border-right: 1px solid var(--border);
   }
 
+  // &:hover,
+  // &:focus,
+  // &:active {
+  //   background-color: var(--sider);
+  //   border: 0;
+  //   border-right: 1px solid var(--border);
+  // }
+
   i {
     color: var(--icon);
+    font-size: 12px;
+  }
+
+  &.left-dock {
+    // border: 0;
+    // border-right: 1px solid var(--border);
+    // border-right: 1px solid var(--border);
+    border-left: 0;
+
+    @media (max-width: 1070px) {
+      border-left: 1px solid var(--border) !important;
+      border-right: 1px solid var(--border) !important;
+    }
+  }
+
+  &.sider-open {
+    border: 0;
+    border-left: 1px solid var(--border);
+    border-right: 1px solid var(--border);
+    padding-left: 2px;
+    padding-right: 3px;
+
+    &.left-dock {
+      border-left: 1px solid var(--border) !important;
+
+      @media (min-width: 1070px) {
+        border-right: 0 !important;
+      }
+    }
   }
 }
 
