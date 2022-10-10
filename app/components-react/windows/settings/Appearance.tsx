@@ -113,13 +113,13 @@ export function AppearanceSettings() {
   });
 
   return (
-    <div style={{ marginBottom: '3px' }}>
+    <div className={styles.container}>
       <ObsSettingsSection>
         <ListInput {...bind.theme} label={'Theme'} options={CustomizationService.themeOptions} />
         {shouldShowPrime && (
-          <div style={{ marginBottom: '16px' }}>
-            <a style={{ color: 'var(--prime)' }} onClick={upgradeToPrime}>
-              <i style={{ color: 'var(--prime)' }} className="icon-prime" />
+          <div className={styles.primeContainer}>
+            <a className={styles.primeContainer} onClick={upgradeToPrime}>
+              <i className={cx('icon-prime', styles.primeContainer)} />
               {$t('Change the look of Streamlabs Desktop with Prime')}
             </a>
           </div>
@@ -163,22 +163,20 @@ export function AppearanceSettings() {
           value={!compactView}
           className={cx(styles.settingsCheckbox)}
         />
-        {/* NAVBAR SETTINGS */}
-        <Row style={{ paddingBottom: '16px' }}>
+        {/* SIDENAV SETTINGS */}
+        <Row className={styles.sidenavSettings}>
           <Col flex={1}>
             <SwitchInput
               label={$t(EMenuItem.Editor)}
               layout="horizontal"
               onChange={() => toggleMenuItem(ENavName.TopNav, EMenuItem.Editor)}
               value={menuItems[EMenuItem.Editor].isActive}
-              // className={}
             />
             <SwitchInput
               label={$t('Custom Editor')}
               layout="horizontal"
               onChange={() => toggleSidebarSubMenu()}
-              value={showCustomEditor} // what value? Highlighter temporarily
-              // className={}
+              value={showCustomEditor}
             />
             <SwitchInput
               label={$t(EMenuItem.StudioMode)}
@@ -186,7 +184,6 @@ export function AppearanceSettings() {
               onChange={() => toggleMenuItem(ENavName.TopNav, EMenuItem.StudioMode)}
               value={menuItems[EMenuItem.StudioMode].isActive}
               disabled={compactView}
-              // className={}
             />
             <SwitchInput
               label={$t(EMenuItem.LayoutEditor)}
@@ -194,18 +191,16 @@ export function AppearanceSettings() {
               onChange={() => toggleMenuItem(ENavName.TopNav, EMenuItem.LayoutEditor)}
               value={menuItems[EMenuItem.LayoutEditor].isActive}
               disabled={compactView && !menuItems[EMenuItem.LayoutEditor].isActive}
-              // className={}
             />
             <SwitchInput
               label={$t(EMenuItem.Themes)}
               layout="horizontal"
               onChange={() => toggleMenuItem(ENavName.TopNav, EMenuItem.Themes)}
               value={menuItems[EMenuItem.Themes].isActive}
-              // className={}
             />
           </Col>
 
-          {/* NAVBAR APPS SETTINGS */}
+          {/* SIDENAV APPS SETTINGS */}
           <Col flex={5}>
             <Scrollable style={{ height: '100%', right: '5px' }} snapToWindowEdge>
               <SwitchInput
@@ -216,17 +211,7 @@ export function AppearanceSettings() {
               />
 
               {appSelectFields.map((app: IAppMenuItem | undefined, index: number) => (
-                <Row
-                  key={`app-${index + 1}`}
-                  className="apps-selector"
-                  style={{
-                    display: 'flex',
-                    flexDirection: 'row',
-                    width: '100%',
-                    justifyContent: 'space-between',
-                    marginBottom: '10px',
-                  }}
-                >
+                <Row key={`app-${index + 1}`} className={styles.appsSelector}>
                   <SwitchInput
                     label={`App ${index + 1}`}
                     layout="horizontal"
@@ -234,10 +219,11 @@ export function AppearanceSettings() {
                     value={app && app?.isActive}
                     disabled={index + 1 > apps.length}
                   />
+
                   {/* dropdown options for apps */}
                   <Select
                     defaultValue={app?.name ?? enabledApps[0].name}
-                    style={{ width: '70%' }}
+                    className={styles.appsDropdown}
                     onChange={value => {
                       const data = enabledApps.find(data => data.name === value);
                       swapApp({ ...data, isActive: app ? app.isActive : false, index });
@@ -262,11 +248,11 @@ export function AppearanceSettings() {
         <CheckboxInput
           {...bind.enableAnnouncements}
           label={$t('Show announcements for new Streamlabs features and products')}
-          style={{ marginBottom: '16px' }}
+          className={styles.extraMargin}
         />
       </ObsSettingsSection>
 
-      <ObsSettingsSection style={{ marginBottom: '16px' }}>
+      <ObsSettingsSection className={styles.extraMargin}>
         <ListInput
           {...bind.folderSelection}
           label={$t('Scene item selection mode')}
