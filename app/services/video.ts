@@ -216,6 +216,7 @@ export class Display {
       nwr.createWindow(
         this.name,
         remote.BrowserWindow.fromId(this.electronWindowId).getNativeWindowHandle(),
+        true
       );
       nwr.connectIOSurface(this.name, surface);
       this.existingWindow = true;
