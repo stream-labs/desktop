@@ -215,11 +215,11 @@ export function AppearanceSettings() {
 
               {appSelectFields.map((app: IAppMenuItem | undefined, index: number) => (
                 <Row
+                  key={`app-${index + 1}`}
                   className="apps-selector"
                   style={{ display: 'flex', flexDirection: 'row', width: '100%' }}
                 >
                   <SwitchInput
-                    key={`app-${index + 1}`}
                     label={`App ${index + 1}`}
                     layout="horizontal"
                     onChange={() => app?.id && toggleApp(app.id)}

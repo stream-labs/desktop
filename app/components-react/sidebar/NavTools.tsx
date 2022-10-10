@@ -116,12 +116,13 @@ export default function SideNav() {
 
   return (
     <Menu
+      key={ENavName.BottomNav}
       forceSubMenuRender
       mode="inline"
       className={styles.bottomNav}
       defaultOpenKeys={openMenuItems && openMenuItems}
     >
-      <Divider className={styles.divider} />
+      <Divider key="divider-1" className={styles.divider} />
       {isDevMode && (
         <Menu.Item
           key="dev-tools"
@@ -135,7 +136,7 @@ export default function SideNav() {
 
       {menuItems.map((menuItem: IParentMenuItem) => (
         <>
-          {isLoggedIn && !isPrime && menuItem.title === EMenuItem.GetPrime && (
+          {/* {isLoggedIn && !isPrime && menuItem.title === EMenuItem.GetPrime && (
             <Menu.Item
               key={menuItem.title}
               title={$t(menuItem.title)}
@@ -150,8 +151,8 @@ export default function SideNav() {
             >
               <>{$t(menuItem.title)}</>
             </Menu.Item>
-          )}
-          {isLoggedIn && isPrime && menuItem.title === EMenuItem.Dashboard && (
+          )} */}
+          {/* {isLoggedIn && isPrime && menuItem.title === EMenuItem.Dashboard && (
             <Menu.SubMenu
               key={menuItem.title}
               title={$t(menuItem.title)}
@@ -166,7 +167,7 @@ export default function SideNav() {
             >
               {menuItem?.subMenuItems.map((subMenuItem: IMenuItem) => (
                 <Menu.Item
-                  key={subMenuItem?.target ?? subMenuItem.title}
+                  key={`sub-${subMenuItem.title}`}
                   title={$t(subMenuItem.title)}
                   onClick={() => throttledOpenDashboard(subMenuItem?.target)}
                 >
@@ -174,8 +175,8 @@ export default function SideNav() {
                 </Menu.Item>
               ))}
             </Menu.SubMenu>
-          )}
-          {menuItem.title === EMenuItem.GetHelp && (
+          )} */}
+          {/* {menuItem.title === EMenuItem.GetHelp && (
             <Menu.Item
               key={menuItem.title}
               title={$t(menuItem.title)}
@@ -190,7 +191,7 @@ export default function SideNav() {
             >
               {$t(menuItem.title)}
             </Menu.Item>
-          )}
+          )} */}
           {menuItem.title === EMenuItem.Settings && (
             <Menu.Item
               key={menuItem.title}
@@ -201,9 +202,9 @@ export default function SideNav() {
               {$t(EMenuItem.Settings)}
             </Menu.Item>
           )}
-          {menuItem.title === EMenuItem.Login && (
+          {/* {menuItem.title === EMenuItem.Login && (
             <>
-              <Divider className={styles.loginDivider} />
+              <Divider key="divider-2" className={styles.loginDivider} />
               <Menu.Item
                 key="login"
                 title={!isLoggedIn ? $t(EMenuItem.Login) : $t('Log Out')}
@@ -244,7 +245,7 @@ export default function SideNav() {
                 )}
               </Menu.Item>
             </>
-          )}
+          )} */}
         </>
       ))}
     </Menu>

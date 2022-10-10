@@ -1,4 +1,5 @@
-import React, { useMemo, useEffect, useRef } from 'react';
+import React, { useMemo, useLayoutEffect, useRef } from 'react';
+import ResizeObserver from 'resize-observer-polyfill';
 import cx from 'classnames';
 import { TAppPage } from 'services/navigation';
 import { ENavName, EMenuItem, IMenuItem, IParentMenuItem } from 'services/side-nav';
@@ -81,6 +82,7 @@ export default function SideNav() {
     studioMode,
     showCustomEditor,
     updateStyleBlockers,
+    hideStyleBlockers,
   } = useVuex(() => ({
     featureIsEnabled: (feature: EAvailableFeatures) =>
       IncrementalRolloutService.views.featureIsEnabled(feature),
@@ -97,20 +99,27 @@ export default function SideNav() {
     studioMode: TransitionsService.views.studioMode,
     showCustomEditor: SideNavService.views.showCustomEditor,
     updateStyleBlockers: WindowsService.actions.updateStyleBlockers,
+    hideStyleBlockers: WindowsService.state.hideStyleBlockers,
   }));
 
   const ref = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    ref.current?.addEventListener('animationstart', () => {
-      console.log('started!');
-      updateStyleBlockers('main', true);
-    });
-    ref.current?.addEventListener('animationend', () => {
-      console.log('ended!');
-      updateStyleBlockers('main', false);
+  const resizeObserver = new ResizeObserver((entries: ResizeObserverEntry[]) => {
+    entries.forEach((entry: ResizeObserverEntry) => {
+      const width = Math.floor(entry.contentRect.width);
+      if (width === 50 || width === 200) {
+        updateStyleBlockers('main', false);
+      } else if (!hideStyleBlockers && (width > 50 || width < 200)) {
+        updateStyleBlockers('main', true);
+      }
     });
   });
+
+  useLayoutEffect(() => {
+    if (ref.current) {
+      resizeObserver.observe(ref.current);
+    }
+  }, [ref]);
 
   const menuItems = useMemo(() => {
     if (!loggedIn) {
