@@ -16,6 +16,7 @@ interface ISideNavServiceState {
   isOpen: boolean;
   showCustomEditor: boolean;
   hasLegacyMenu: boolean;
+  showSidebarApps: boolean;
   compactView: boolean;
   menuItems: TMenuItems;
   apps: {
@@ -50,6 +51,10 @@ class SideNavViews extends ViewHandler<ISideNavServiceState> {
     return this.state.showCustomEditor;
   }
 
+  get showSidebarApps() {
+    return this.state.showSidebarApps;
+  }
+
   getMenuItem(name: EMenuItem) {
     if (!name) return;
     return this.state.menuItems[name];
@@ -77,7 +82,8 @@ export class SideNavService extends PersistentStatefulService<ISideNavServiceSta
     isOpen: false,
     showCustomEditor: true,
     hasLegacyMenu: true, // TODO: true for now, set to false and then update based off of user creation date
-    compactView: true,
+    showSidebarApps: true,
+    compactView: false,
     menuItems: SideNavMenuItems(),
     apps: {},
     [ENavName.TopNav]: SideBarTopNavData(),
@@ -133,17 +139,36 @@ export class SideNavService extends PersistentStatefulService<ISideNavServiceSta
   @mutation()
   private SET_COMPACT_VIEW() {
     this.state.compactView = !this.state.compactView;
-    Object.keys(this.state.menuItems).forEach((menuName: EMenuItem) => {
-      if (
-        [EMenuItem.Editor, EMenuItem.Themes, EMenuItem.AppStore, EMenuItem.Highlighter].includes(
-          menuName,
-        )
-      ) {
-        this.state.menuItems[menuName].isActive = true;
-      } else {
-        this.state.menuItems[menuName].isActive = false;
-      }
-    });
+    if (this.state.compactView) {
+      this.state.menuItems = {
+        ...this.state.menuItems,
+        // shown in compact view
+        [EMenuItem.Editor]: { ...this.state.menuItems[EMenuItem.Editor], isActive: true },
+        [EMenuItem.Themes]: { ...this.state.menuItems[EMenuItem.Themes], isActive: true },
+        [EMenuItem.AppStore]: { ...this.state.menuItems[EMenuItem.AppStore], isActive: true },
+        [EMenuItem.Highlighter]: { ...this.state.menuItems[EMenuItem.Highlighter], isActive: true },
+        // hidden in compact view
+        [EMenuItem.LayoutEditor]: {
+          ...this.state.menuItems[EMenuItem.LayoutEditor],
+          isActive: false,
+        },
+        [EMenuItem.StudioMode]: { ...this.state.menuItems[EMenuItem.StudioMode], isActive: false },
+        [EMenuItem.ThemeAudit]: { ...this.state.menuItems[EMenuItem.ThemeAudit], isActive: false },
+      };
+
+      this.state[ENavName.TopNav] = {
+        ...this.state[ENavName.TopNav],
+        menuItems: [
+          { ...this.state.menuItems[EMenuItem.Editor], isActive: true },
+          { ...this.state.menuItems[EMenuItem.LayoutEditor], isActive: false },
+          { ...this.state.menuItems[EMenuItem.StudioMode], isActive: false },
+          { ...this.state.menuItems[EMenuItem.Themes], isActive: true },
+          { ...this.state.menuItems[EMenuItem.AppStore], isActive: true },
+          { ...this.state.menuItems[EMenuItem.Highlighter], isActive: true },
+          { ...this.state.menuItems[EMenuItem.ThemeAudit], isActive: false },
+        ],
+      };
+    }
   }
 
   @mutation()
@@ -164,6 +189,11 @@ export class SideNavService extends PersistentStatefulService<ISideNavServiceSta
 
     // find menu item in object used for toggling custom navigation settings
     this.state.menuItems[menuItemName].isActive = !this.state.menuItems[menuItemName].isActive;
+
+    // toggle sidebar apps
+    if (menuItemName === EMenuItem.AppStore) {
+      this.state.showSidebarApps = !this.state.showSidebarApps;
+    }
   }
 
   @mutation()
@@ -176,7 +206,25 @@ export class SideNavService extends PersistentStatefulService<ISideNavServiceSta
 
   @mutation()
   private SWAP_APP(app: IAppMenuItem) {
-    this.state.apps[app.id] = app;
+    let found = false;
+    for (const [key, value] of Object.entries(this.state.apps)) {
+      if (value.index === app.index) {
+        // there is an app at this index
+        if (this.state.apps[app.id]) {
+          // the new app previously had an index, so swap the two apps
+          found = true;
+          this.state.apps = {
+            ...this.state.apps,
+            [key]: { ...value, index: this.state.apps[app.id].index },
+            [app.id]: app,
+          };
+          break;
+        }
+      }
+    }
+    if (!found) {
+      this.state.apps[app.id] = app;
+    }
   }
 
   @mutation()

@@ -113,7 +113,7 @@ export function AppearanceSettings() {
   });
 
   return (
-    <div>
+    <div style={{ marginBottom: '3px' }}>
       <ObsSettingsSection>
         <ListInput {...bind.theme} label={'Theme'} options={CustomizationService.themeOptions} />
         {shouldShowPrime && (
@@ -160,11 +160,11 @@ export function AppearanceSettings() {
           label={$t(
             'Enable custom navigation bar to pin your favorite features for quick access.\nDisable to swap to compact view.',
           )}
-          value={compactView}
+          value={!compactView}
           className={cx(styles.settingsCheckbox)}
         />
         {/* NAVBAR SETTINGS */}
-        <Row gutter={[8, 8]}>
+        <Row style={{ paddingBottom: '16px' }}>
           <Col flex={1}>
             <SwitchInput
               label={$t(EMenuItem.Editor)}
@@ -185,6 +185,7 @@ export function AppearanceSettings() {
               layout="horizontal"
               onChange={() => toggleMenuItem(ENavName.TopNav, EMenuItem.StudioMode)}
               value={menuItems[EMenuItem.StudioMode].isActive}
+              disabled={compactView}
               // className={}
             />
             <SwitchInput
@@ -192,6 +193,7 @@ export function AppearanceSettings() {
               layout="horizontal"
               onChange={() => toggleMenuItem(ENavName.TopNav, EMenuItem.LayoutEditor)}
               value={menuItems[EMenuItem.LayoutEditor].isActive}
+              disabled={compactView && !menuItems[EMenuItem.LayoutEditor].isActive}
               // className={}
             />
             <SwitchInput
@@ -205,7 +207,7 @@ export function AppearanceSettings() {
 
           {/* NAVBAR APPS SETTINGS */}
           <Col flex={5}>
-            <Scrollable style={{ height: '100%' }}>
+            <Scrollable style={{ height: '100%', right: '5px' }} snapToWindowEdge>
               <SwitchInput
                 label={$t(EMenuItem.AppStore)}
                 layout="horizontal"
@@ -217,7 +219,13 @@ export function AppearanceSettings() {
                 <Row
                   key={`app-${index + 1}`}
                   className="apps-selector"
-                  style={{ display: 'flex', flexDirection: 'row', width: '100%' }}
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'row',
+                    width: '100%',
+                    justifyContent: 'space-between',
+                    marginBottom: '10px',
+                  }}
                 >
                   <SwitchInput
                     label={`App ${index + 1}`}
@@ -229,11 +237,12 @@ export function AppearanceSettings() {
                   {/* dropdown options for apps */}
                   <Select
                     defaultValue={app?.name ?? enabledApps[0].name}
-                    style={{ width: '300px' }}
+                    style={{ width: '70%' }}
                     onChange={value => {
                       const data = enabledApps.find(data => data.name === value);
                       swapApp({ ...data, isActive: app ? app.isActive : false, index });
                     }}
+                    value={app?.name}
                     disabled={index + 1 > apps.length}
                   >
                     {enabledApps.map(enabledApp => (
@@ -253,10 +262,11 @@ export function AppearanceSettings() {
         <CheckboxInput
           {...bind.enableAnnouncements}
           label={$t('Show announcements for new Streamlabs features and products')}
+          style={{ marginBottom: '16px' }}
         />
       </ObsSettingsSection>
 
-      <ObsSettingsSection>
+      <ObsSettingsSection style={{ marginBottom: '16px' }}>
         <ListInput
           {...bind.folderSelection}
           label={$t('Scene item selection mode')}

@@ -72,6 +72,7 @@ export default function SideNav() {
     currentPage, // TODO: tracking & styling for currentPage
     tabs,
     leftDock,
+    showSidebarApps,
     apps,
     loggedIn,
     menu,
@@ -89,6 +90,7 @@ export default function SideNav() {
     currentPage: NavigationService.state.currentPage,
     tabs: LayoutService.state.tabs,
     leftDock: CustomizationService.state.leftDock,
+    showSidebarApps: SideNavService.views.showSidebarApps,
     apps: Object.values(SideNavService.views.apps).sort((a, b) => a.index - b.index),
     loggedIn: UserService.views.isLoggedIn,
     menu: SideNavService.views.state[ENavName.TopNav],
@@ -334,7 +336,7 @@ export default function SideNav() {
                 );
               }
             })}
-            {hasLegacyMenu && apps.length > 0 && (
+            {hasLegacyMenu && showSidebarApps && apps.length > 0 && (
               // if legacy menu, apps can also be seen in the sidebar
               // below the regular menu items
               <>
