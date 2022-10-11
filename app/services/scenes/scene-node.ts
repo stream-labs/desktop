@@ -146,8 +146,12 @@ export abstract class SceneItemNode implements ISceneItemNode {
     return this.selectionService.views.globalSelection.isSelected(this.id);
   }
 
-  select() {
-    this.selectionService.views.globalSelection.select(this.id);
+  /**
+   * Select this node
+   * @param sync Whether to select synchronously. Only use for rare race conditions.
+   */
+  select(sync = false) {
+    this.selectionService.views.globalSelection.select(this.id, sync);
   }
 
   addToSelection() {

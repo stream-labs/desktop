@@ -10,9 +10,9 @@ test('Populates advanced settings', async t => {
   await assertFormContains(
     {
       'Process Priority': 'Normal',
-      'Color Format': 'NV12',
-      'YUV Color Space': '601',
-      'YUV Color Range': 'Partial',
+      'Color Format': 'NV12 (8-bit, 4:2:0, 2 planes)',
+      'YUV Color Space': '709',
+      'YUV Color Range': 'Limited',
       'Force GPU as render device': true,
       'Audio Monitoring Device': 'Default',
       'Disable Windows audio ducking': false,
@@ -22,8 +22,8 @@ test('Populates advanced settings', async t => {
       'Replay Buffer Filename Suffix': '',
       'Duration (seconds)': '20',
       'Preserved cutoff point (increase delay) when reconnecting': true,
-      'Retry Delay (seconds)': '10',
-      'Maximum Retries': '20',
+      'Retry Delay (seconds)': '2',
+      'Maximum Retries': '25',
       'Bind to IP': 'Default',
       'Dynamically change bitrate when dropping frames while streaming': false,
       'Enable new networking code': false,
