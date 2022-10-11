@@ -6,7 +6,8 @@
             "archive": "osn-[VERSION]-release-[OS].tar.gz",
             "version": "0.23.21",
             "win64": true,
-            "osx": true
+            "osx": true,
+            "mac_version": "0.22.15"
         },
         {
             "name": "node-libuiohook",
@@ -44,7 +45,7 @@
             "name": "node-window-rendering",
             "url": "https://slobs-node-window-rendering.s3-us-west-2.amazonaws.com/",
             "archive": "node-window-rendering-[VERSION]-[OS].tar.gz",
-            "version": "1.0.15",
+            "version": "1.0.17",
             "win64": false,
             "osx": true
         },

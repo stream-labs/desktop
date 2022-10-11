@@ -1,4 +1,5 @@
-import { TPlatform, EPlatformCallResult, getPlatformService, IUserAuth } from 'services/platforms';
+import { TPlatform, EPlatformCallResult, getPlatformService } from 'services/platforms';
+import { IUserAuth } from '.';
 import uuid from 'uuid/v4';
 import electron from 'electron';
 import defer from 'lodash/defer';
@@ -131,11 +132,27 @@ export class AuthModule {
    */
   private parseAuthFromUrl(url: string, merge: boolean): IUserAuth {
     const query = URI.parseQuery(URI.parse(url).query) as Dictionary<string>;
-    const requiredFields = ['platform', 'platform_username', 'platform_token', 'platform_id'];
+    const requiredFields = ['platform', 'platform_username', 'platform_id'];
+
+    if (query.platform !== 'slid') requiredFields.push('platform_token');
 
     if (!merge) requiredFields.push('token', 'oauth_token');
 
     if (requiredFields.every(field => !!query[field])) {
+      if (query.platform === 'slid') {
+        return {
+          widgetToken: query.token,
+          apiToken: query.oauth_token,
+          primaryPlatform: null,
+          platforms: {},
+          slid: {
+            id: query.platform_id,
+            username: query.platform_username,
+          },
+          hasRelogged: true,
+        };
+      }
+
       return {
         widgetToken: query.token,
         apiToken: query.oauth_token,

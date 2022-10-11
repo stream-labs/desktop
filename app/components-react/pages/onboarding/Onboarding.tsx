@@ -115,6 +115,10 @@ export class OnboardingModule {
     return Services.RecordingModeService;
   }
 
+  get UserService() {
+    return Services.UserService;
+  }
+
   get steps() {
     return this.OnboardingService.views.steps;
   }
@@ -152,6 +156,10 @@ export class OnboardingModule {
   @mutation()
   next(isSkip = false) {
     if (this.state.processing) return;
+
+    if (this.OnboardingService.state.options.isLogin && this.UserService.views.isPartialSLAuth) {
+      return;
+    }
 
     if (
       this.RecordingModeService.views.isRecordingModeEnabled &&
