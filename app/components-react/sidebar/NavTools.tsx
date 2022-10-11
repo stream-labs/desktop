@@ -116,7 +116,7 @@ export default function SideNav() {
       key={ENavName.BottomNav}
       forceSubMenuRender
       mode="inline"
-      className={styles.bottomNav}
+      className={cx(styles.bottomNav, !isOpen && styles.siderClosed)}
       defaultOpenKeys={openMenuItems && openMenuItems}
     >
       <Divider key="divider-1" className={styles.divider} />

@@ -1,8 +1,43 @@
 @import '../../styles/index';
+@import '../../styles/mixins';
+@import '../../styles/badges';
 
 .bottom-nav {
   padding-bottom: 10px;
   justify-self: flex-end;
+
+  &.sider-closed {
+    :global(.ant-menu-item:hover) {
+      span {
+        transition: transform 0.2s;
+        transform: scale(1.2, 1.2);
+      }
+
+      i.link-badge {
+        position: absolute;
+        top: 0;
+        right: 0;
+        transition: transform 0.2s;
+        transform: translate(53%, -53%);
+        transform-origin: 100% 0%;
+      }
+    }
+    :global(.ant-menu-submenu:hover) {
+      span {
+        transition: transform 0.2s;
+        transform: scale(1.2, 1.2);
+      }
+
+      i.link-badge {
+        position: absolute;
+        top: 0;
+        right: 0;
+        transition: transform 0.2s;
+        transform: translate(53%, -53%);
+        transform-origin: 100% 0%;
+      }
+    }
+  }
 }
 
 .link-badge {
@@ -13,17 +48,6 @@
   fill: var(--title);
   border: 1px solid var(--section-alt);
   font-size: 8px;
-}
-
-.badge-scale {
-  :global(.ant-menu-item:hover) {
-    span {
-      transition: transform 0.2s;
-      color: var(--title);
-      fill: var(--title);
-      transform: scale(1.2, 1.2);
-    }
-  }
 }
 
 .divider {
