@@ -69,6 +69,7 @@ export default function SideNav() {
 
   const {
     featureIsEnabled,
+    appStoreVisible,
     currentPage, // TODO: tracking & styling for currentPage
     tabs,
     leftDock,
@@ -87,6 +88,7 @@ export default function SideNav() {
   } = useVuex(() => ({
     featureIsEnabled: (feature: EAvailableFeatures) =>
       IncrementalRolloutService.views.featureIsEnabled(feature),
+    appStoreVisible: UserService.views.isLoggedIn && PlatformAppsService.state.storeVisible,
     currentPage: NavigationService.state.currentPage,
     tabs: LayoutService.state.tabs,
     leftDock: CustomizationService.state.leftDock,
@@ -159,28 +161,23 @@ export default function SideNav() {
    */
   const themeAuditEnabled = featureIsEnabled(EAvailableFeatures.themeAudit);
 
+  console.log('currentPage ', currentPage);
+
   return (
-    <Layout
-      key="sidenav"
-      hasSider
-      style={{
-        width: '100%',
-        minHeight: '100vh',
-      }}
-      className="sidenav"
-    >
+    <Layout key="sidenav" hasSider className="sidenav">
       <Sider
         collapsible
         collapsed={!isOpen}
         trigger={null}
         className={cx(
+          styles.sidenav,
           styles.sidenavSider,
           !isOpen && styles.siderClosed,
           !leftDock && styles.noLeftDock,
         )}
         ref={ref}
       >
-        <Scrollable snapToWindowEdge className={cx(styles.sidenavScroll)}>
+        <Scrollable snapToWindowEdge className={cx(styles.sidenav, styles.sidenavScroll)}>
           <Menu
             key={ENavName.TopNav}
             forceSubMenuRender
@@ -207,6 +204,14 @@ export default function SideNav() {
                   studioTabs.map(tab => (
                     <Menu.Item
                       key={tab.title}
+                      className={cx(
+                        styles.sidenavItem,
+                        currentPage === tab.target && styles.active,
+                      )}
+                      style={{
+                        backgroundColor: currentPage === tab.target ? 'red' : 'var(--background)',
+                        border: 'none',
+                      }}
                       title={tab.title}
                       icon={<i className={tab.icon} />}
                       onClick={() => navigateToStudioTab(tab.target, tab.trackingTarget)}
@@ -220,14 +225,24 @@ export default function SideNav() {
                     title={$t(menuItem.title)}
                     icon={menuItem?.icon && <i className={menuItem.icon} />}
                     onTitleClick={() => {
-                      expandMenuItem(ENavName.TopNav, menuItem.title as EMenuItem);
                       menuItem?.target &&
                         navigate(menuItem?.target as TAppPage, menuItem?.trackingTarget);
+                      expandMenuItem(ENavName.TopNav, menuItem.title as EMenuItem);
+                    }}
+                    style={{
+                      backgroundColor:
+                        currentPage === (menuItem.target as string) ? 'red' : 'var(--background)',
+                      border: 'none',
                     }}
                   >
                     {studioTabs.map(tab => (
                       <Menu.Item
                         key={`tab-${tab.title}`}
+                        className={cx(
+                          styles.sidenavItem,
+                          currentPage === tab.target && styles.active,
+                        )}
+                        style={{ backgroundColor: 'var(--background)', border: 'none' }}
                         title={tab.title}
                         icon={<i className={tab.icon} />}
                         onClick={() => {
@@ -246,29 +261,44 @@ export default function SideNav() {
                     title={$t(menuItem.title)}
                     icon={menuItem?.icon && <i className={menuItem.icon} />}
                     onTitleClick={() => {
+                      menuItem?.target &&
+                        navigate(menuItem?.target as TAppPage, menuItem?.trackingTarget);
                       expandMenuItem(ENavName.TopNav, menuItem.title as EMenuItem);
                     }}
                   >
                     {/* The first sub menu item is the Apps Manager */}
-                    <Menu.Item
-                      key={`sub-${menuItem.title}`}
-                      title={menuItem?.subMenuItems[0]?.title}
-                      onClick={() =>
-                        navigate(
-                          menuItem?.subMenuItems[0].target as TAppPage,
-                          menuItem?.subMenuItems[0].trackingTarget,
-                          menuItem?.subMenuItems[0].type,
-                        )
-                      }
-                    >
-                      {/* TODO: Translations for app titles? */}
-                      {menuItem?.subMenuItems[0]?.title}
-                    </Menu.Item>
+                    {appStoreVisible && (
+                      <Menu.Item
+                        key={`sub-${menuItem.title}`}
+                        className={cx(
+                          styles.sidenavItem,
+                          currentPage === menuItem?.target && styles.active,
+                        )}
+                        style={{ backgroundColor: 'var(--background)', border: 'none' }}
+                        title={menuItem?.subMenuItems[0]?.title}
+                        onClick={() =>
+                          navigate(
+                            menuItem?.subMenuItems[0].target as TAppPage,
+                            menuItem?.subMenuItems[0].trackingTarget,
+                            // menuItem?.subMenuItems[0].type,
+                          )
+                        }
+                      >
+                        {/* TODO: Translations for app titles? */}
+                        {console.log('menuItem?.subMenuItems[0] ', menuItem?.subMenuItems[0])}
+                        {menuItem?.subMenuItems[0]?.title}
+                      </Menu.Item>
+                    )}
                     {apps.map(
                       app =>
                         app.isActive && (
                           <Menu.Item
                             key={`sub-${app.id}`}
+                            className={cx(
+                              styles.sidenavItem,
+                              currentPage === menuItem?.target && styles.active,
+                            )}
+                            style={{ backgroundColor: 'var(--background)', border: 'none' }}
                             title={app.name}
                             onClick={() => app?.id && navigateApp(app.id)}
                           >
@@ -285,13 +315,23 @@ export default function SideNav() {
                     key={menuItem.title}
                     title={$t(menuItem.title)}
                     icon={menuItem?.icon && <i className={menuItem.icon} />}
-                    onTitleClick={() =>
-                      expandMenuItem(ENavName.TopNav, menuItem.title as EMenuItem)
-                    }
+                    onTitleClick={() => {
+                      menuItem?.target &&
+                        navigate(menuItem?.target as TAppPage, menuItem?.trackingTarget);
+                      expandMenuItem(ENavName.TopNav, menuItem.title as EMenuItem);
+                    }}
                   >
                     {menuItem?.subMenuItems?.map((subMenuItem: IMenuItem, index: number) => (
                       <Menu.Item
                         key={`sub-${subMenuItem.title}`}
+                        className={cx(
+                          styles.sidenavItem,
+                          currentPage === subMenuItem?.target && styles.active,
+                        )}
+                        style={{
+                          backgroundColor: 'var(--background)',
+                          // '&::after': { content: `''`, border: '0px' },
+                        }}
                         title={$t(subMenuItem.title)}
                         onClick={() => {
                           if (subMenuItem?.target && subMenuItem?.type) {
@@ -313,6 +353,15 @@ export default function SideNav() {
                 ) : (
                   <Menu.Item
                     key={menuItem.title}
+                    className={cx(
+                      styles.sidenavItem,
+                      currentPage === menuItem.target && styles.active,
+                    )}
+                    style={{
+                      backgroundColor:
+                        currentPage === (menuItem.target as string) ? 'red' : 'var(--background)',
+                      border: 'none',
+                    }}
                     title={$t(menuItem.title)}
                     icon={menuItem?.icon && <i className={menuItem.icon} />}
                     onClick={() => {
@@ -345,6 +394,11 @@ export default function SideNav() {
                     app.isActive && (
                       <Menu.Item
                         key={app.id}
+                        className={cx(
+                          styles.sidenavItem,
+                          // currentPage === app.target && styles.active)}
+                        )}
+                        style={{ backgroundColor: 'var(--background)', border: 'none' }}
                         title={app.name}
                         icon={
                           app?.icon && app?.id ? (
@@ -375,6 +429,7 @@ export default function SideNav() {
       <Button
         type="primary"
         className={cx(
+          styles.sidenav,
           styles.sidenavButton,
           !isOpen && styles.flipped,
           isOpen && styles.siderOpen,

@@ -1,0 +1,92 @@
+@import '../../styles/index';
+
+.bottom-nav {
+  padding-bottom: 10px;
+  justify-self: flex-end;
+}
+
+.link-badge {
+  transform: scale(1.2, 1.2);
+  margin: auto;
+  display: block;
+  color: var(--title);
+  fill: var(--title);
+  border: 1px solid var(--section-alt);
+  font-size: 8px;
+}
+
+.badge-scale {
+  :global(.ant-menu-item:hover) {
+    span {
+      transition: transform 0.2s;
+      color: var(--title);
+      fill: var(--title);
+      transform: scale(1.2, 1.2);
+    }
+  }
+}
+
+.divider {
+  margin: 0 !important;
+  border: none !important;
+  height: 2px !important;
+  border-radius: 50% !important;
+  background-color: var(--nav-divider) !important;
+  border-top: 2px solid var(--nav-divider);
+}
+
+.login-divider:extend(.divider) {
+  &:extend(.divider);
+  margin: 10px 15px 0 15px !important;
+  width: auto !important;
+  min-width: auto !important;
+}
+
+.login > span {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.platform-logo {
+  margin-right: 10px;
+
+  &-twitch {
+    color: var(--twitch);
+  }
+  &-youtube {
+    color: var(--youtube);
+  }
+  &-facebook {
+    color: var(--facebook);
+  }
+  &-trovo {
+    width: 15px;
+    height: 15px;
+  }
+  &-tiktok {
+    color: var(--tiktok);
+  }
+  &-streamlabs {
+    color: var(--teal);
+  }
+  &-default {
+    color: var(--logged-in);
+  }
+}
+
+.username {
+  margin-bottom: 0px;
+  flex-grow: 1;
+  line-height: 20px;
+  margin: 2px 0 0 0;
+}
+
+.login-arrow {
+  justify-self: flex-end;
+  margin-left: 5px;
+  transform: scaleX(-1);
+  -moz-transform: scaleX(-1);
+  -webkit-transform: scaleX(-1);
+  -ms-transform: scaleX(-1);
+}

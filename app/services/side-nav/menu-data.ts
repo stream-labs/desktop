@@ -246,9 +246,9 @@ export const SideBarSubMenuItems = (): TSubMenuItems => ({
     isExpanded: false,
   },
   [ESubMenuItem.AppsManager]: {
-    target: 'PlatformAppMainPage', // TODO: direct to the My Apps tab in Profile
+    target: 'PlatformAppStore', // TODO: direct to the My Apps tab in Profile
     title: ESubMenuItem.AppsManager,
-    // type: 'list/installed', // path store/list/installed in web nav
+    // type: 'store/list/installed', // path store/list/installed in web nav
     trackingTarget: 'app-store',
     isExpanded: false,
   },

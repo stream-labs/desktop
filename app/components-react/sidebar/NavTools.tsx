@@ -6,7 +6,7 @@ import { $t } from 'services/i18n';
 import throttle from 'lodash/throttle';
 import { Services } from '../service-provider';
 import { useVuex } from '../hooks';
-import styles from './SideNav.m.less';
+import styles from './NavTools.m.less';
 import * as remote from '@electron/remote';
 import { Badge, Menu, Typography, Divider } from 'antd';
 import { EMenuItem, ENavName, IMenuItem, IParentMenuItem } from 'services/side-nav';
@@ -15,7 +15,6 @@ import PlatformLogo from 'components-react/shared/PlatformLogo';
 export default function SideNav() {
   const {
     UserService,
-    TransitionsService,
     SettingsService,
     NavigationService,
     MagicLinkService,
@@ -27,7 +26,6 @@ export default function SideNav() {
   const isDevMode = Utils.isDevMode();
 
   const {
-    studioMode,
     isLoggedIn,
     isPrime,
     platform,
@@ -37,7 +35,6 @@ export default function SideNav() {
     expandMenuItem,
   } = useVuex(
     () => ({
-      studioMode: TransitionsService.views.studioMode,
       isLoggedIn: UserService.views.isLoggedIn,
       isPrime: UserService.views.isPrime,
       platform: UserService.views.auth?.platforms[UserService.views.auth?.primaryPlatform],
@@ -136,7 +133,7 @@ export default function SideNav() {
 
       {menuItems.map((menuItem: IParentMenuItem) => (
         <>
-          {/* {isLoggedIn && !isPrime && menuItem.title === EMenuItem.GetPrime && (
+          {isLoggedIn && !isPrime && menuItem.title === EMenuItem.GetPrime && (
             <Menu.Item
               key={menuItem.title}
               title={$t(menuItem.title)}
@@ -148,11 +145,12 @@ export default function SideNav() {
                 </div>
               }
               onClick={upgradeToPrime}
+              className={styles.badgeScale}
             >
               <>{$t(menuItem.title)}</>
             </Menu.Item>
-          )} */}
-          {/* {isLoggedIn && isPrime && menuItem.title === EMenuItem.Dashboard && (
+          )}
+          {isLoggedIn && isPrime && menuItem.title === EMenuItem.Dashboard && (
             <Menu.SubMenu
               key={menuItem.title}
               title={$t(menuItem.title)}
@@ -175,8 +173,8 @@ export default function SideNav() {
                 </Menu.Item>
               ))}
             </Menu.SubMenu>
-          )} */}
-          {/* {menuItem.title === EMenuItem.GetHelp && (
+          )}
+          {menuItem.title === EMenuItem.GetHelp && (
             <Menu.Item
               key={menuItem.title}
               title={$t(menuItem.title)}
@@ -191,7 +189,7 @@ export default function SideNav() {
             >
               {$t(menuItem.title)}
             </Menu.Item>
-          )} */}
+          )}
           {menuItem.title === EMenuItem.Settings && (
             <Menu.Item
               key={menuItem.title}
@@ -202,7 +200,7 @@ export default function SideNav() {
               {$t(EMenuItem.Settings)}
             </Menu.Item>
           )}
-          {/* {menuItem.title === EMenuItem.Login && (
+          {menuItem.title === EMenuItem.Login && (
             <>
               <Divider key="divider-2" className={styles.loginDivider} />
               <Menu.Item
@@ -245,7 +243,7 @@ export default function SideNav() {
                 )}
               </Menu.Item>
             </>
-          )} */}
+          )}
         </>
       ))}
     </Menu>
