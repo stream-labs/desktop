@@ -59,6 +59,7 @@ export interface ISettingsValues {
     TrackIndex?: string;
     VodTrackEnabled?: boolean;
     VodTrackIndex?: string;
+    keyint_sec?: number;
   };
   Video: {
     Base: string;
