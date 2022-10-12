@@ -1,3 +1,5 @@
+// TODO DELETE
+
 import ResizeObserver from 'resize-observer-polyfill';
 import React, { useState, useRef, useEffect } from 'react';
 import cx from 'classnames';
@@ -7,16 +9,21 @@ import { Services } from '../service-provider';
 import { useVuex } from '../hooks';
 import { Menu } from 'util/menus/Menu';
 import { $t } from 'services/i18n';
+import { Menu as AntdMenu } from 'antd';
 
 /**
  * The default amount the nav bar should scroll when clicking the scroll arrow buttons.
  */
 const DEFAULT_SCROLL_DELTA = 43;
 
-export default function AppsNav() {
-  const { PlatformAppsService, NavigationService } = Services;
+interface IAppsNav {
+  isSubMenu?: boolean;
+}
 
-  const { currentPage, navApps, selectedApp } = useVuex(() => ({
+export default function AppsNav({ isSubMenu }: IAppsNav) {
+  const { PlatformAppsService, NavigationService, SideNavService } = Services;
+
+  const { currentPage, navApps, selectedApp, hasLegacyMenu } = useVuex(() => ({
     currentPage: NavigationService.state.currentPage,
     navApps: PlatformAppsService.views.enabledApps.filter(app => {
       return !!app.manifest.pages.find(page => {
@@ -24,6 +31,7 @@ export default function AppsNav() {
       });
     }),
     selectedApp: NavigationService.state.params.appId,
+    hasLegacyMenu: SideNavService.views.hasLegacyMenu,
   }));
 
   const [upArrowVisible, setUpArrowVisible] = useState(false);
@@ -132,42 +140,64 @@ export default function AppsNav() {
   }
 
   return (
-    <div className={styles.container}>
-      <div className={styles.scroll} ref={scroll} onScroll={handleScroll}>
-        {navApps.map(app => (
-          <div
-            style={{ position: 'relative' }}
-            key={app.id}
-            onContextMenu={e => showContextMenu(e, app)}
-          >
-            {<div className={cx(styles.activeApp, { [styles.active]: isSelectedApp(app.id) })} />}
-            <div
-              title={app.manifest.name}
-              onClick={() => navigateApp(app.id)}
-              draggable
-              onDragEnd={() => popOut(app)}
-              className={styles.appTab}
-            >
-              {app.manifest.icon ? (
-                <img src={iconSrc(app.id, app.manifest.icon)} />
-              ) : (
-                <i className="icon-integrations" />
-              )}
-            </div>
-            {refreshIcon(app)}
-          </div>
-        ))}
-      </div>
-      {upArrowVisible && (
-        <div className={cx(styles.arrow, styles.up)} onClick={scrollUp}>
-          <i className="icon-down" />
-        </div>
-      )}
-      {downArrowVisible && (
-        <div className={cx(styles.arrow, styles.down)} onClick={scrollDown}>
-          <i className="icon-down" />
-        </div>
-      )}
-    </div>
+    <>
+      {navApps.map(app => (
+        <AntdMenu.Item
+          key={app.id}
+          title={app.manifest.name}
+          icon={
+            hasLegacyMenu &&
+            !isSubMenu &&
+            (app.manifest.icon ? (
+              <img src={iconSrc(app.id, app.manifest.icon)} />
+            ) : (
+              <i className="icon-integrations" />
+            ))
+          }
+          onClick={() => navigateApp(app.id)}
+          className={styles.appTab}
+        >
+          {app.manifest.name}
+        </AntdMenu.Item>
+      ))}
+    </>
   );
 }
+
+// <div className={styles.container}>
+//   <div className={styles.scroll} ref={scroll} onScroll={handleScroll}>
+//     {navApps.map(app => (
+//       <div
+//         style={{ position: 'relative' }}
+//         key={app.id}
+//         onContextMenu={e => showContextMenu(e, app)}
+//       >
+//         {<div className={cx(styles.activeApp, { [styles.active]: isSelectedApp(app.id) })} />}
+//         <div
+//           title={app.manifest.name}
+//           onClick={() => navigateApp(app.id)}
+//           draggable
+//           onDragEnd={() => popOut(app)}
+//           className={styles.appTab}
+//         >
+//           {app.manifest.icon ? (
+//             <img src={iconSrc(app.id, app.manifest.icon)} />
+//           ) : (
+//             <i className="icon-integrations" />
+//           )}
+//         </div>
+//         {refreshIcon(app)}
+//       </div>
+//     ))}
+//   </div>
+//   {upArrowVisible && (
+//     <div className={cx(styles.arrow, styles.up)} onClick={scrollUp}>
+//       <i className="icon-down" />
+//     </div>
+//   )}
+//   {downArrowVisible && (
+//     <div className={cx(styles.arrow, styles.down)} onClick={scrollDown}>
+//       <i className="icon-down" />
+//     </div>
+//   )}
+// </div>

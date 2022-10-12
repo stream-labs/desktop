@@ -1,5 +1,7 @@
-import { ViewHandler, InitAfter, PersistentStatefulService } from 'services/core';
+import { ViewHandler, InitAfter, PersistentStatefulService, Inject } from 'services/core';
 import { mutation } from 'services/core/stateful-service';
+import { UserService, AppService, DismissablesService } from 'app-services';
+import { EDismissable } from 'services/dismissables';
 import {
   TMenuItems,
   EMenuItem,
@@ -10,6 +12,7 @@ import {
   IAppMenuItem,
   SideBarTopNavData,
   SideBarBottomNavData,
+  ESubMenuItem,
 } from './menu-data';
 
 interface ISideNavServiceState {
@@ -18,6 +21,7 @@ interface ISideNavServiceState {
   hasLegacyMenu: boolean;
   showSidebarApps: boolean;
   compactView: boolean;
+  currentMenuItem: EMenuItem | ESubMenuItem;
   menuItems: TMenuItems;
   apps: {
     [appId: string]: IAppMenuItem;
@@ -78,11 +82,16 @@ class SideNavViews extends ViewHandler<ISideNavServiceState> {
 
 @InitAfter('UserService')
 export class SideNavService extends PersistentStatefulService<ISideNavServiceState> {
+  @Inject() userService: UserService;
+  @Inject() appService: AppService;
+  @Inject() dismissablesService: DismissablesService;
+
   static defaultState: ISideNavServiceState = {
     isOpen: false,
     showCustomEditor: true,
-    hasLegacyMenu: true, // TODO: true for now, set to false and then update based off of user creation date
+    hasLegacyMenu: true,
     showSidebarApps: true,
+    currentMenuItem: EMenuItem.Editor,
     compactView: false,
     menuItems: SideNavMenuItems(),
     apps: {},
@@ -92,10 +101,50 @@ export class SideNavService extends PersistentStatefulService<ISideNavServiceSta
 
   init() {
     super.init();
+
+    const loggedIn = this.userService.views.isLoggedIn;
+
+    if (!loggedIn) {
+      // these are true by default, so only set if it's the new user's first time opening the app
+      this.setLoggedOutMenu();
+    }
+
+    // if this is a new user
+    // TODO: set Date to specific date
+    const legacyMenu =
+      this.userService.state.createdAt &&
+      this.userService.state.createdAt < new Date('October 12, 2022').valueOf();
+
+    if (!legacyMenu) {
+      this.setCompactView();
+      this.dismissablesService.dismiss(EDismissable.NewSideNav);
+      if (!loggedIn && this.state.menuItems[EMenuItem.Themes].isActive) {
+        // these are true by default so, this is the non-legacy user's first log-in
+        this.toggleMenuItem(ENavName.TopNav, EMenuItem.Themes);
+        this.toggleMenuItem(ENavName.TopNav, EMenuItem.AppStore);
+        this.toggleMenuItem(ENavName.TopNav, EMenuItem.Highlighter);
+      }
+      this.state.hasLegacyMenu = false;
+    } else {
+      // this is an existing user, so determine if new badge is shown
+      if (this.appService.state.onboarded) {
+        this.dismissablesService.dismiss(EDismissable.NewSideNav);
+      } else {
+        this.dismissablesService.views.shouldShow(EDismissable.NewSideNav);
+      }
+    }
   }
 
   get views() {
     return new SideNavViews(this.state);
+  }
+
+  setLoggedOutMenu() {
+    this.SET_LOGGED_OUT_MENU();
+  }
+
+  setLegacyMenu() {
+    this.SET_LEGACY_MENU();
   }
 
   toggleMenuStatus() {
@@ -129,6 +178,32 @@ export class SideNavService extends PersistentStatefulService<ISideNavServiceSta
   swapApp(app: IAppMenuItem) {
     // add/update apps
     this.SWAP_APP(app);
+  }
+
+  @mutation()
+  private SET_LEGACY_MENU() {
+    this.state.hasLegacyMenu = false;
+  }
+
+  @mutation()
+  private SET_LOGGED_OUT_MENU() {
+    // only show editor menu item
+    this.state[ENavName.TopNav].menuItems = this.state[ENavName.TopNav].menuItems.map(
+      (menuItem: IMenuItem) => {
+        if (menuItem.title !== EMenuItem.Editor && menuItem.isActive) {
+          this.toggleMenuItem(ENavName.TopNav, menuItem.title as EMenuItem);
+        }
+        return menuItem;
+      },
+    );
+
+    // do not show prime menu item
+    if (this.state[ENavName.BottomNav].menuItems[EMenuItem.GetPrime].isActive) {
+      this.state[ENavName.BottomNav].menuItems = [
+        ...this.state[ENavName.BottomNav].menuItems,
+        { ...this.state[ENavName.BottomNav].menuItems[EMenuItem.GetPrime], isActive: false },
+      ];
+    }
   }
 
   @mutation()

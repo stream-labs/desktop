@@ -12,6 +12,7 @@ export enum EDismissable {
   GuestCamFirstTimeModal = 'guest_cam_first_time',
   SourceSelectorFolders = 'source_selector_folders',
   CollabCamRollout = 'collab_cam_rollout',
+  NewSideNav = 'new_side_nav',
 }
 
 interface IDismissablesServiceState {

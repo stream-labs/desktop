@@ -2,29 +2,70 @@
 @import '../../styles/mixins';
 @import '../../styles/badges';
 
+body:last-child {
+  :global(div.ant-tooltip) {
+    display: none;
+  }
+}
+
+body > div > div {
+  :global(div.ant-menu-submenu.ant-menu-submenu-popup.ant-menu) {
+    display: none;
+  }
+}
+
 .bottom-nav {
-  padding-bottom: 10px;
+  margin-bottom: 10px !important;
   justify-self: flex-end;
+  border-right: 0px !important;
 
-  &.sider-closed {
-    :global(.ant-menu-item:hover) {
-      span {
-        transition: transform 0.2s;
-        transform: scale(1.2, 1.2);
-      }
-
-      i.link-badge {
-        position: absolute;
-        top: 0;
-        right: 0;
-        transition: transform 0.2s;
-        transform: translate(53%, -53%);
-        transform-origin: 100% 0%;
-      }
+  :global(.ant-menu-item-icon) {
+    i:not(.link-badge) {
+      font-size: 18px;
     }
+  }
+
+  :global(li.ant-menu-item.ant-menu-item-selected),
+  :global(li.ant-menu-submenu.ant-menu-item-selected) {
+    background: none;
+    color: var(--paragraph) !important;
+
+    i {
+      color: var(--paragraph) !important;
+    }
+
+    &::after {
+      display: none;
+    }
+  }
+
+  :global(li.ant-menu-item),
+  :global(li.ant-menu-submenu) {
+    background: none;
+    color: var(--paragraph);
+
+    i {
+      color: var(--paragraph);
+    }
+
+    :active,
+    :link,
+    :focus,
+    :visited {
+      background: none;
+    }
+
+    :hover {
+      color: var(--title) !important;
+    }
+  }
+
+  &.closed {
+    :global(.ant-menu-item:hover),
     :global(.ant-menu-submenu:hover) {
+      i:not(.link-badge),
       span {
-        transition: transform 0.2s;
+        transition: all 0.2s ease-in-out;
         transform: scale(1.2, 1.2);
       }
 
@@ -32,7 +73,7 @@
         position: absolute;
         top: 0;
         right: 0;
-        transition: transform 0.2s;
+        transition: all 0.2s ease-in-out;
         transform: translate(53%, -53%);
         transform-origin: 100% 0%;
       }
@@ -44,8 +85,6 @@
   transform: scale(1.2, 1.2);
   margin: auto;
   display: block;
-  color: var(--title);
-  fill: var(--title);
   border: 1px solid var(--section-alt);
   font-size: 8px;
 }
@@ -54,48 +93,61 @@
   margin: 0 !important;
   border: none !important;
   height: 2px !important;
-  border-radius: 50% !important;
   background-color: var(--nav-divider) !important;
   border-top: 2px solid var(--nav-divider);
 }
 
 .login-divider:extend(.divider) {
-  &:extend(.divider);
-  margin: 10px 15px 0 15px !important;
+  // &:extend(.divider);
+  margin: 8px 15px 0 15px !important;
   width: auto !important;
   min-width: auto !important;
+}
+
+.login {
+  :global(.ant-menu-item.ant-menu-item-only-child) {
+    margin-bottom: 10px;
+  }
 }
 
 .login > span {
   display: flex;
   flex-direction: row;
   align-items: center;
+
+  &:hover {
+    color: var(--title);
+    i {
+      transform: scale(1.2, 1.2);
+      transition: all 0.2s ease-in-out;
+    }
+  }
 }
 
 .platform-logo {
   margin-right: 10px;
 
   &-twitch {
-    color: var(--twitch);
+    color: var(--twitch) !important;
   }
   &-youtube {
-    color: var(--youtube);
+    color: var(--youtube) !important;
   }
   &-facebook {
-    color: var(--facebook);
+    color: var(--facebook) !important;
   }
   &-trovo {
     width: 15px;
     height: 15px;
   }
   &-tiktok {
-    color: var(--tiktok);
+    color: var(--tiktok) !important;
   }
   &-streamlabs {
-    color: var(--teal);
+    color: var(--teal) !important;
   }
   &-default {
-    color: var(--logged-in);
+    color: var(--logged-in) !important;
   }
 }
 

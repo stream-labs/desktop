@@ -5,7 +5,7 @@ import { GuestApiHandler } from 'util/guest-api-handler';
 import * as remote from '@electron/remote';
 import { Services } from 'components-react/service-provider';
 
-export default function PlatformAppStore(p: { params: { appId?: string } }) {
+export default function PlatformAppStore(p: { params: { appId?: string; path?: string } }) {
   const { UserService, PlatformAppsService, PlatformAppStoreService, NavigationService } = Services;
 
   function onBrowserViewReady(view: Electron.BrowserView) {
@@ -38,6 +38,12 @@ export default function PlatformAppStore(p: { params: { appId?: string } }) {
   async function navigateToApp(appId: string) {
     NavigationService.actions.navigate('PlatformAppMainPage', { appId });
   }
+
+  // TODO: WIP new params
+
+  // async function navigateToAppManager(appId: string) {
+  //   NavigationService.actions.navigate('PlatformAppMainPage', { path: 'list/installed' });
+  // }
 
   return (
     <BrowserView

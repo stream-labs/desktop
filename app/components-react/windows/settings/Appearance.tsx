@@ -44,6 +44,7 @@ export function AppearanceSettings() {
     apps,
     displayedApps,
     showCustomEditor,
+    isLoggedIn,
     toggleApp,
     swapApp,
     toggleSidebarSubMenu,
@@ -59,6 +60,7 @@ export function AppearanceSettings() {
     }),
     displayedApps: Object.values(SideNavService.views.apps).sort((a, b) => a.index - b.index),
     showCustomEditor: SideNavService.views.showCustomEditor,
+    isLoggedIn: UserService.views.isLoggedIn,
     toggleApp: SideNavService.actions.toggleApp,
     swapApp: SideNavService.actions.swapApp,
     toggleSidebarSubMenu: SideNavService.actions.toggleSidebarSubmenu,
@@ -96,17 +98,35 @@ export function AppearanceSettings() {
 
   const displayedAppsList = Object.values(displayedApps);
 
-  const enabledApps = apps.map(app => ({
-    id: app.id,
-    name: app.manifest.name,
-    icon: app.manifest.icon,
-    isActive: displayedAppsList[app.id]?.isActive ?? false,
-  }));
+  const enabledApps = apps.reduce(
+    (enabled: { id: string; name?: string; icon?: string; isActive: boolean }[], app) => {
+      if (app) {
+        enabled.push({
+          id: app.id,
+          name: app.manifest?.name,
+          icon: app.manifest?.icon,
+          isActive: displayedAppsList[app.id]?.isActive ?? false,
+        });
+      }
+      return enabled;
+    },
+    [],
+  );
+
+  // const enabledApps = apps.map(
+  //   app =>
+  //     app && {
+  //       id: app.id,
+  //       name: app.manifest?.name,
+  //       icon: app.manifest?.icon,
+  //       isActive: displayedAppsList[app.id]?.isActive ?? false,
+  //     },
+  // );
 
   const appSelectFields = [...Array(5)].map((field, index) => {
     if (displayedAppsList[index]) {
       return displayedAppsList[index];
-    } else if (enabledApps[index]) {
+    } else if (enabledApps && enabledApps[index]) {
       swapApp({ ...enabledApps[index], isActive: false, index });
       return { ...enabledApps[index], isActive: false, index };
     }
@@ -162,6 +182,7 @@ export function AppearanceSettings() {
           )}
           value={!compactView}
           className={cx(styles.settingsCheckbox)}
+          disabled={!isLoggedIn}
         />
         {/* SIDENAV SETTINGS */}
         <Row className={styles.sidenavSettings}>
@@ -171,32 +192,35 @@ export function AppearanceSettings() {
               layout="horizontal"
               onChange={() => toggleMenuItem(ENavName.TopNav, EMenuItem.Editor)}
               value={menuItems[EMenuItem.Editor].isActive}
+              disabled={!isLoggedIn}
             />
             <SwitchInput
               label={$t('Custom Editor')}
               layout="horizontal"
               onChange={() => toggleSidebarSubMenu()}
-              value={showCustomEditor}
+              value={isLoggedIn && showCustomEditor}
+              disabled={!isLoggedIn}
             />
             <SwitchInput
               label={$t(EMenuItem.StudioMode)}
               layout="horizontal"
               onChange={() => toggleMenuItem(ENavName.TopNav, EMenuItem.StudioMode)}
               value={menuItems[EMenuItem.StudioMode].isActive}
-              disabled={compactView}
+              disabled={!isLoggedIn || compactView}
             />
             <SwitchInput
               label={$t(EMenuItem.LayoutEditor)}
               layout="horizontal"
               onChange={() => toggleMenuItem(ENavName.TopNav, EMenuItem.LayoutEditor)}
               value={menuItems[EMenuItem.LayoutEditor].isActive}
-              disabled={compactView && !menuItems[EMenuItem.LayoutEditor].isActive}
+              disabled={!isLoggedIn || (compactView && !menuItems[EMenuItem.LayoutEditor].isActive)}
             />
             <SwitchInput
               label={$t(EMenuItem.Themes)}
               layout="horizontal"
               onChange={() => toggleMenuItem(ENavName.TopNav, EMenuItem.Themes)}
               value={menuItems[EMenuItem.Themes].isActive}
+              disabled={!isLoggedIn}
             />
           </Col>
 
@@ -208,6 +232,7 @@ export function AppearanceSettings() {
                 layout="horizontal"
                 onChange={() => toggleMenuItem(ENavName.TopNav, EMenuItem.AppStore)}
                 value={menuItems[EMenuItem.AppStore].isActive}
+                disabled={!isLoggedIn}
               />
 
               {appSelectFields.map((app: IAppMenuItem | undefined, index: number) => (
@@ -217,23 +242,23 @@ export function AppearanceSettings() {
                     layout="horizontal"
                     onChange={() => app?.id && toggleApp(app.id)}
                     value={app && app?.isActive}
-                    disabled={index + 1 > apps.length}
+                    disabled={!isLoggedIn || index + 1 > apps.length}
                   />
 
                   {/* dropdown options for apps */}
                   <Select
-                    defaultValue={app?.name ?? enabledApps[0].name}
+                    defaultValue={app?.name ?? enabledApps[0]?.name ?? ''}
                     className={styles.appsDropdown}
                     onChange={value => {
-                      const data = enabledApps.find(data => data.name === value);
+                      const data = enabledApps.find(data => data?.name === value);
                       swapApp({ ...data, isActive: app ? app.isActive : false, index });
                     }}
                     value={app?.name}
-                    disabled={index + 1 > apps.length}
+                    disabled={!isLoggedIn || index + 1 > apps.length}
                   >
                     {enabledApps.map(enabledApp => (
-                      <Option key={enabledApp.id} value={enabledApp.name}>
-                        {enabledApp.name}
+                      <Option key={enabledApp?.id} value={enabledApp?.name || ''}>
+                        {enabledApp?.name}
                       </Option>
                     ))}
                   </Select>

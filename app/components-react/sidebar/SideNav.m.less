@@ -2,66 +2,27 @@
 @import '../../styles/mixins';
 @import '../../styles/badges';
 
-// .sidenav {
-//   display: flex;
-//   flex-direction: column;
-//   flex-grow: 1;
-//   min-height: calc(100% - 53px);
-//   height: calc(100% - 53px);
-// }
+body:last-child {
+  :global(div.ant-tooltip) {
+    display: none;
+  }
+}
 
-.sidenav-item.active {
-  background-color: none;
-  border: none;
-  color: var(--icon-active);
-
-  i {
-    color: var(--icon-active);
+body > div > div {
+  :global(div.ant-menu-submenu.ant-menu-submenu-popup.ant-menu) {
+    display: none;
   }
 }
 
 .sidenav-sider {
   width: 100%;
-  // height: 100%;
   overflow: visible;
   transition: width 300ms;
-}
-
-.sider-closed {
-  width: 50px !important;
-  min-width: 50px !important;
-  max-width: 50px !important;
-
-  :global(.ant-menu-item:hover) {
-    i {
-      transition: transform 0.2s;
-      color: var(--title);
-      fill: var(--title);
-      transform: scale(1.2, 1.2);
-    }
-  }
-
-  :global(.ant-menu-submenu:hover) {
-    i {
-      transition: transform 0.2s;
-      color: var(--title);
-      fill: var(--title);
-      transform: scale(1.2, 1.2);
-    }
-  }
-
-  // & .ant-menu-submenu
-
-  &:global(.ant-menu-item-selected) &:global(.ant-menu-item-active) {
-    background-color: var(--background);
-    color: var(--teal);
-  }
 }
 
 .sidenav-scroll {
   min-height: 100%;
   height: 100%;
-  // width: 100%;
   min-width: 50px;
   padding-right: 0 !important;
   display: flex;
@@ -87,7 +48,6 @@ button.sidenav-button {
   &:hover,
   &:focus,
   &:active {
-    // to overwrite default antd styling
     background-color: var(--sider);
     border: 0;
     border-left: 1px solid var(--border);
@@ -129,8 +89,111 @@ button.sidenav-button {
   transform: scaleX(-1);
 }
 
+.sider-closed {
+  width: 50px !important;
+  min-width: 50px !important;
+  max-width: 50px !important;
+}
+
 .menu-container {
   flex: 1 1 auto;
+  border-right: 0px !important;
+
+  :global(.ant-menu-item-icon) {
+    i {
+      font-size: 18px;
+    }
+  }
+
+  &.menu-wrapper {
+    :global(.ant-menu-item:hover),
+    :global(.ant-menu-submenu:hover) {
+      span {
+        transition: transform 0.2s;
+        transition-timing-function: ease-in-out;
+        transform: scale(1.2, 1.2);
+      }
+
+      i.link-badge {
+        position: absolute;
+        top: 0;
+        right: 0;
+        transition: transform 0.2s;
+        transition-timing-function: ease-in-out;
+        transform: translate(53%, -53%);
+        transform-origin: 100% 0%;
+      }
+    }
+  }
+
+  :global(li.ant-menu-item.ant-menu-item-selected),
+  :global(li.ant-menu-submenu.ant-menu-item-selected) {
+    background: none;
+    color: var(--teal) !important;
+
+    i {
+      color: var(--teal) !important;
+    }
+
+    &::after {
+      display: none;
+    }
+  }
+
+  :global(li.ant-menu-item),
+  :global(li.ant-menu-submenu) {
+    background: none;
+    color: var(--paragraph);
+
+    i {
+      color: var(--paragraph);
+    }
+
+    :active,
+    :link,
+    :focus,
+    :visited {
+      background: none;
+    }
+
+    :hover {
+      color: var(--title) !important;
+    }
+  }
+
+  &.closed {
+    :global(.ant-menu-item:hover),
+    :global(.ant-menu-submenu:hover) {
+      i {
+        transition: all 0.2s ease-in-out;
+        transform: scale(1.2, 1.2);
+      }
+    }
+  }
+
+  // :global(.ant-menu-item:hover) {
+  //   i {
+  //     transition: transform 0.2s;
+  //     color: var(--title);
+  //     fill: var(--title);
+  //     transform: scale(1.2, 1.2);
+  //   }
+  // }
+
+  // :global(.ant-menu-submenu:hover) {
+  //   i {
+  //     transition: transform 0.2s;
+  //     color: var(--title);
+  //     fill: var(--title);
+  //     transform: scale(1.2, 1.2);
+  //   }
+  // }
+
+  // &:global(.ant-menu-item-selected) &:global(.ant-menu-item-active) {
+  //   background-color: var(--background);
+  //   color: var(--teal);
+  // }
+  // }
 
   // TODO: word wrap and height on menu items
   // for word wrap, need to add class to menu items
@@ -169,136 +232,39 @@ button.sidenav-button {
   // height: auto;
 }
 
-/* ^^^ */
+.studio-mode {
+  color: var(--icon-active) !important;
 
-.cell {
-  display: flex;
-  height: 46px;
-  position: relative;
-  flex-shrink: 0;
-  font-size: 16px;
-
-  i,
-  svg {
-    margin: auto;
-    display: block;
-  }
-
-  svg {
-    fill: var(--paragraph);
-  }
-
-  &:hover {
-    cursor: pointer;
-
-    svg,
-    i:not(.link-badge) {
-      transition: transform 0.2s;
-      color: var(--title);
-      fill: var(--title);
-      transform: scale(1.2, 1.2);
-    }
-  }
-
-  &.prime-cell {
-    i:not(.link-badge) {
-      color: var(--prime);
-    }
-  }
-
-  :global(.ant-badge) {
-    margin: auto;
-  }
-}
-
-.primary-tab {
-  position: relative;
-
-  .studio-dropdown {
-    position: absolute;
-    bottom: 2px;
-    right: 4px;
-    font-size: 10px;
-    color: var(--title);
-
-    &.studio-dropdown-active {
-      color: var(--teal);
-    }
-  }
-}
-
-.studio-tabs {
-  max-height: 230px;
-  position: absolute;
-  top: 46px;
-  left: 0;
-  overflow-y: auto;
-  background-color: var(--studio-tabs);
-  z-index: 10;
-  border-radius: 15px;
-
-  &::-webkit-scrollbar {
-    display: none;
-  }
-}
-
-.main-cell {
-  .cell;
-
-  svg {
-    width: 16px;
-    height: 16px;
-  }
-
-  &.active {
-    i,
-    svg {
-      transform: scale(1.2, 1.2);
-      color: var(--teal);
-      fill: var(--teal);
-    }
-  }
-
-  &.disabled {
-    &:hover {
-      cursor: not-allowed;
-      background: transparent;
-    }
-  }
-}
-
-.cell.toggle-on {
   i {
-    color: var(--teal);
+    color: var(--icon-active) !important;
+  }
+}
+
+.active {
+  background-color: none;
+  border: none;
+  color: var(--icon-active) !important;
+
+  i {
+    color: var(--icon-active) !important;
   }
 }
 
 .new-badge {
-  background: var(--new-badge);
-  color: var(--new-badge-text);
+  // TODO: styling for other languages
+  background: var(--new-badge-text);
+  color: var(--titlebar);
   font-size: 9px;
   position: absolute;
-  right: 2px;
-  top: 2px;
+  left: 20px;
+  top: calc(100% / 2);
   padding: 0 2px;
+  margin: 8px 0;
   line-height: 12px;
-  font-weight: 400;
-}
-
-.bottom-tools {
-  margin-top: auto;
-  margin-bottom: 12px;
-  flex-shrink: 0;
-
-  .cell {
-    height: 35px;
-    font-size: 14px;
-  }
-}
-
-.menu-parent {
-  display: flex;
-  flex-direction: column;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .ant-menu-inline-collapsed-tooltip {
@@ -313,50 +279,160 @@ button.sidenav-button {
   }
 }
 
-li.sidenav-item {
-  // background-color: var(--background);
-  // border: none !important;
-
-  &.ant-menu-item-selected.ant-menu-item {
-    background-color: red !important;
-  }
-
-  :global(.ant-menu:not(.ant-menu-horizontal).ant-menu-item-selected) {
-    background-color: red !important;
-  }
-
-  > .ant-menu-title-content::after {
-    border: 0px !important;
-  }
-
-  :global(.ant-menu-inline) {
-    content: none;
-  }
-
-  :global(.ant-menu-item::after) {
-    content: none;
-  }
-
-  // &.ant-menu-item.ant-menu-item-selected {
-  //   background-color: red !important;
-  //   border: none !important;
-  // }
-
-  // :global(.ant-menu:not(.ant-menu-horizontal).ant-menu-item-selected) {
-  //   background-color: none !important;
-  //   border: none !important;
-  // }
-  // &::after {
-  //   border: 0px;
-  // }
+.app-icons {
+  border-radius: 50%;
+  width: 25px;
+  height: 25px;
+  transform: translate(-18%, 0%);
 }
+/* ^^^ */
 
-li.ant-menu-item {
-  &::after {
-    content: none;
-  }
-}
+// .cell {
+//   display: flex;
+//   height: 46px;
+//   position: relative;
+//   flex-shrink: 0;
+//   font-size: 16px;
 
-li.sidenav-item > ::after {
-  content: none;
-}
+//   i,
+//   svg {
+//     margin: auto;
+//     display: block;
+//   }
+
+//   svg {
+//     fill: var(--paragraph);
+//   }
+
+//   &:hover {
+//     cursor: pointer;
+
+//     svg,
+//     i:not(.link-badge) {
+//       transition: transform 0.2s;
+//       color: var(--title);
+//       fill: var(--title);
+//       transform: scale(1.2, 1.2);
+//     }
+//   }
+
+//   &.prime-cell {
+//     i:not(.link-badge) {
+//       color: var(--prime);
+//     }
+//   }
+
+//   :global(.ant-badge) {
+//     margin: auto;
+//   }
+// }
+
+// .primary-tab {
+//   position: relative;
+
+//   .studio-dropdown {
+//     position: absolute;
+//     bottom: 2px;
+//     right: 4px;
+//     font-size: 10px;
+//     color: var(--title);
+
+//     &.studio-dropdown-active {
+//       color: var(--teal);
+//     }
+//   }
+// }
+
+// .studio-tabs {
+//   max-height: 230px;
+//   position: absolute;
+//   top: 46px;
+//   left: 0;
+//   overflow-y: auto;
+//   background-color: var(--studio-tabs);
+//   z-index: 10;
+//   border-radius: 15px;
+
+//   &::-webkit-scrollbar {
+//     display: none;
+//   }
+// }
+
+// .main-cell {
+//   .cell;
+
+//   svg {
+//     width: 16px;
+//     height: 16px;
+//   }
+
+//   &.active {
+//     i,
+//     svg {
+//       transform: scale(1.2, 1.2);
+//       color: var(--teal);
+//       fill: var(--teal);
+//     }
+//   }
+
+//   &.disabled {
+//     &:hover {
+//       cursor: not-allowed;
+//       background: transparent;
+//     }
+//   }
+// }
+
+// .cell.toggle-on {
+//   i {
+//     color: var(--teal);
+//   }
+// }
+
+// li.sidenav-item {
+//   // background-color: var(--background);
+//   // border: none !important;
+
+//   &.ant-menu-item-selected.ant-menu-item {
+//     background-color: red !important;
+//   }
+
+//   :global(.ant-menu:not(.ant-menu-horizontal).ant-menu-item-selected) {
+//     background-color: red !important;
+//   }
+
+//   > .ant-menu-title-content::after {
+//     border: 0px !important;
+//   }
+
+//   :global(.ant-menu-inline) {
+//     content: none;
+//   }
+
+//   :global(.ant-menu-item::after) {
+//     content: none;
+//   }
+
+// &.ant-menu-item.ant-menu-item-selected {
+//   background-color: red !important;
+//   border: none !important;
+// }
+
+// :global(.ant-menu:not(.ant-menu-horizontal).ant-menu-item-selected) {
+//   background-color: none !important;
+//   border: none !important;
+// }
+// &::after {
+//   border: 0px;
+// }
+// }
+
+// li.ant-menu-item {
+//   &::after {
+//     content: none;
+//   }
+// }
+
+// li.sidenav-item > ::after {
+//   content: none;
+// }

@@ -17,6 +17,8 @@ export type TAppPage =
   | 'Grow'
   | 'ThemeAudit';
 
+// write hash map to look up the page/type and match to name
+
 interface INavigationState {
   currentPage: TAppPage;
   params: Dictionary<string | boolean>;

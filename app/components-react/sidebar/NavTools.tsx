@@ -33,6 +33,7 @@ export default function SideNav() {
     isOpen,
     openMenuItems,
     expandMenuItem,
+    currentPage,
   } = useVuex(
     () => ({
       isLoggedIn: UserService.views.isLoggedIn,
@@ -42,6 +43,7 @@ export default function SideNav() {
       isOpen: SideNavService.views.isOpen,
       openMenuItems: SideNavService.views.getExpandedMenuItems(ENavName.TopNav),
       expandMenuItem: SideNavService.actions.expandMenuItem,
+      currentPage: NavigationService.state.currentPage,
     }),
     false,
   );
@@ -116,7 +118,7 @@ export default function SideNav() {
       key={ENavName.BottomNav}
       forceSubMenuRender
       mode="inline"
-      className={cx(styles.bottomNav, !isOpen && styles.siderClosed)}
+      className={cx(styles.bottomNav, !isOpen && styles.closed)}
       defaultOpenKeys={openMenuItems && openMenuItems}
     >
       <Divider key="divider-1" className={styles.divider} />
@@ -161,7 +163,11 @@ export default function SideNav() {
                   </Badge>
                 </div>
               }
-              onTitleClick={() => expandMenuItem(ENavName.BottomNav, menuItem.title as EMenuItem)}
+              onTitleClick={() => {
+                !isOpen && throttledOpenDashboard();
+                expandMenuItem(ENavName.BottomNav, menuItem.title as EMenuItem);
+              }}
+              className={styles.badgeScale}
             >
               {menuItem?.subMenuItems.map((subMenuItem: IMenuItem) => (
                 <Menu.Item
@@ -207,15 +213,7 @@ export default function SideNav() {
                 key="login"
                 title={!isLoggedIn ? $t(EMenuItem.Login) : $t('Log Out')}
                 className={styles.login}
-                icon={
-                  !isOpen && (
-                    // need to flip this entire div to transform the login arrow icon because
-                    // the Menu.Item antd component does not apply transforms to icons when loading
-                    <div style={{ transform: 'scaleX(-1)' }}>
-                      <i className="icon-user" />
-                    </div>
-                  )
-                }
+                icon={!isOpen && <i className="icon-user" />}
                 onClick={() => handleAuth()}
               >
                 {!isLoggedIn ? (
