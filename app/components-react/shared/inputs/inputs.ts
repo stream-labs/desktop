@@ -11,7 +11,7 @@ import { CheckboxChangeEvent } from 'antd/lib/checkbox';
 import { $t } from '../../../services/i18n';
 import pick from 'lodash/pick';
 import isEqual from 'lodash/isEqual';
-import * as InputComponents from './index';
+import * as InputComponents from './inputList';
 
 export type TInputType =
   | 'code'

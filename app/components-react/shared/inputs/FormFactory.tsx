@@ -1,10 +1,10 @@
 import React, { useEffect } from 'react';
-import { FormProps } from 'antd';
+import { FormProps } from 'antd/lib/form';
 import debounce from 'lodash/debounce';
-import * as inputs from './index';
+import * as inputs from './inputList';
+import { TSlobsInputProps } from './inputs';
 import Form, { useForm } from './Form';
 import { TInputMetadata } from './metadata';
-import { TSlobsInputProps } from './index';
 
 type TInputValue = string | number | boolean;
 
@@ -71,7 +71,7 @@ function FormInput(p: {
         value={p.values[p.id]}
         onChange={p.metadata.onChange || p.onChange(p.id)}
       />
-      {children &&
+      {!!children &&
         Object.keys(children)
           .filter(childKey => children[childKey].displayed)
           .map(childKey => (
@@ -80,7 +80,7 @@ function FormInput(p: {
               id={childKey}
               metadata={children[childKey]}
               values={p.values}
-              onChange={() => children[childKey].onChange || p.onChange(childKey)}
+              onChange={p.onChange}
             />
           ))}
     </>
