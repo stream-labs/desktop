@@ -164,5 +164,6 @@
   "Common Stream Settings": "Obecná nastavení streamu",
   "Schedule Stream for %{formattedDate}": "Naplánovat stream pro %{formattedDate}",
   "Update Scheduled Stream for %{formattedDate}": "Aktualizovat naplánovaný stream pro %{formattedDate}",
-  "You can not schedule to a past date": "Nelze naplánovat na datum v minulosti"
+  "You can not schedule to a past date": "Nelze naplánovat na datum v minulosti",
+  "Streamlabs requires additional permissions from your Twitch account. Please log in with Twitch to continue.": "Streamlabs requires additional permissions from your Twitch account. Please log in with Twitch to continue."
 }

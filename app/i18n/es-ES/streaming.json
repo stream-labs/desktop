@@ -164,5 +164,6 @@
   "Common Stream Settings": "Ajustes de transmisión comunes",
   "Schedule Stream for %{formattedDate}": "Programar transmisión para %{formattedDate}",
   "Update Scheduled Stream for %{formattedDate}": "Actualizar programación de transmisión para %{formattedDate}",
-  "You can not schedule to a past date": "No puede programar para una fecha pasada"
+  "You can not schedule to a past date": "No puede programar para una fecha pasada",
+  "Streamlabs requires additional permissions from your Twitch account. Please log in with Twitch to continue.": "Streamlabs requires additional permissions from your Twitch account. Please log in with Twitch to continue."
 }

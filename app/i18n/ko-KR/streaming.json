@@ -164,5 +164,6 @@
   "Common Stream Settings": "일반 스트리밍 설정",
   "Schedule Stream for %{formattedDate}": "%{formattedDate}에 스트리밍 예약",
   "Update Scheduled Stream for %{formattedDate}": "%{formattedDate}에 예약된 스트리밍 업데이트",
-  "You can not schedule to a past date": "지난 날짜로 예약할 수 없음"
+  "You can not schedule to a past date": "지난 날짜로 예약할 수 없음",
+  "Streamlabs requires additional permissions from your Twitch account. Please log in with Twitch to continue.": "Streamlabs requires additional permissions from your Twitch account. Please log in with Twitch to continue."
 }
