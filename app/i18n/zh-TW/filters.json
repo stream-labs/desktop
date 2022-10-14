@@ -26,6 +26,7 @@
   "Expander": "擴展器",
   "Shader": "著色器",
   "HDR Tone Mapping (Override)": "HDR Tone Mapping (Override)",
+  "NVIDIA Background Removal": "NVIDIA Background Removal",
   "No settings are available for this filter": "此篩選器沒有可用的設定",
   "Visual Presets": "視覺預先設定",
   "None": "無",
