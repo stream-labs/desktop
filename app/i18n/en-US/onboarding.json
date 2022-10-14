@@ -98,7 +98,7 @@
   "Pro features to take your stream and channel to the next level.": "Pro features to take your stream and channel to the next level.",
   "Something went wrong while importing from OBS Studio. Please try again or skip to the next step.": "Something went wrong while importing from OBS Studio. Please try again or skip to the next step.",
   "Visual Preset": "Visual Preset",
-  "Installing theme...": "Installing theme..." ,
+  "Installing theme...": "Installing theme...",
   "How do you plan to use Streamlabs Desktop?": "How do you plan to use Streamlabs Desktop?",
   "Live Streaming": "Live Streaming",
   "Recording Only": "Recording Only",
@@ -108,5 +108,6 @@
   "Certain features related to live streaming will be hidden. If you would like to enable these features in the future, you can disable Recording Mode in the application settings.": "Certain features related to live streaming will be hidden. If you would like to enable these features in the future, you can disable Recording Mode in the application settings.",
   "Looking to stream?": "Looking to stream?",
   "Screen Capture (Double-click to select)": "Screen Capture (Double-click to select)",
-  "1-Click Import from OBS": "1-Click Import from OBS"
+  "1-Click Import from OBS": "1-Click Import from OBS",
+  "Gain access to additional features by logging in with your preferred streaming platform.": "Gain access to additional features by logging in with your preferred streaming platform."
 }

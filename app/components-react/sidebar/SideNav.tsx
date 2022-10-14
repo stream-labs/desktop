@@ -11,7 +11,10 @@ import NavTools from './NavTools';
 import styles from './SideNav.m.less';
 import { Menu, Layout, Button } from 'antd';
 import Scrollable from 'components-react/shared/Scrollable';
+import HelpTip from 'components-react/shared/HelpTip';
+import NewButton from 'components-react/shared/NewButton';
 import { EDismissable } from 'services/dismissables';
+import { table } from 'console';
 
 const { Sider } = Layout;
 
@@ -30,7 +33,13 @@ export default function SideNav() {
     DismissablesService,
   } = Services;
 
-  function navigate(page: TAppPage, trackingTarget?: string, type?: string) {
+  function navigate(
+    page: TAppPage,
+    trackingTarget?: string,
+    // type?: TODO: 'overlay' | 'widget-theme' | 'site-theme', etc.
+    type?: string,
+  ) {
+    console.log('type ', type);
     if (!UserService.views.isLoggedIn && page !== 'Studio') return;
 
     if (trackingTarget) {
@@ -38,7 +47,8 @@ export default function SideNav() {
     }
 
     if (type) {
-      NavigationService.actions.navigate(page, { type });
+      // eslint-disable-next-line object-shorthand
+      NavigationService.actions.navigate(page, { type: type });
     } else {
       NavigationService.actions.navigate(page);
     }
@@ -71,7 +81,6 @@ export default function SideNav() {
 
   const {
     featureIsEnabled,
-    appStoreVisible,
     currentPage, // TODO: tracking & styling for currentPage
     tabs,
     leftDock,
@@ -94,7 +103,6 @@ export default function SideNav() {
   } = useVuex(() => ({
     featureIsEnabled: (feature: EAvailableFeatures) =>
       IncrementalRolloutService.views.featureIsEnabled(feature),
-    appStoreVisible: UserService.views.isLoggedIn && PlatformAppsService.state.storeVisible,
     currentPage: NavigationService.state.currentPage,
     tabs: LayoutService.state.tabs,
     leftDock: CustomizationService.state.leftDock,
@@ -144,57 +152,6 @@ export default function SideNav() {
 
   const menuItems = menu.menuItems;
 
-  // useMemo(() => {
-  //   if (!loggedIn) {
-  //     menu.menuItems.map(menuItem => {
-  //       if (menuItem.title !== EMenuItem.Editor) {
-  //         return { ...menuItem, isActive: false };
-  //       }
-  //       return menuItem;
-  //     });
-  //   } else if (loggedIn && !hasLegacyMenu) {
-  //     // setCompactView();
-  //     menu.menuItems.map(menuItem => {
-  //       if (
-  //         ![EMenuItem.Editor, EMenuItem.Themes, EMenuItem.AppStore, EMenuItem.Highlighter].includes(
-  //           menuItem.title as EMenuItem,
-  //         )
-  //       ) {
-  //         return { ...menuItem, isActive: false };
-  //       }
-  //       return menuItem;
-  //     });
-  //   }
-  //   return menu.menuItems;
-  // }, [menu, loggedIn, hasLegacyMenu, compactView]);
-
-  // const menuItems = useMemo(() => {
-  //   if (!loggedIn) {
-  //     menu.menuItems.map(menuItem => {
-  //       if (menuItem.title !== EMenuItem.Editor) {
-  //         return { ...menuItem, isActive: false };
-  //       }
-  //       return menuItem;
-  //     });
-  //   } else if (loggedIn && !hasLegacyMenu) {
-  //     // setCompactView();
-  //     menu.menuItems.map(menuItem => {
-  //       if (
-  //         ![EMenuItem.Editor, EMenuItem.Themes, EMenuItem.AppStore, EMenuItem.Highlighter].includes(
-  //           menuItem.title as EMenuItem,
-  //         )
-  //       ) {
-  //         return { ...menuItem, isActive: false };
-  //       }
-  //       return menuItem;
-  //     });
-  //   }
-  //   return menu.menuItems;
-  // }, [menu, loggedIn, hasLegacyMenu, compactView]);
-
-  console.log('menuItems ', menuItems);
-  console.log('compactView ', compactView);
-
   const studioTabs = Object.keys(tabs).map((tab, i) => ({
     target: tab,
     title: i === 0 || !tabs[tab].name ? $t('Editor') : tabs[tab].name,
@@ -211,7 +168,7 @@ export default function SideNav() {
   console.log('currentPage ', currentPage);
 
   return (
-    <Layout key="sidenav" hasSider className="sidenav">
+    <Layout hasSider className="sidenav">
       <Sider
         collapsible
         collapsed={!isOpen}
@@ -234,41 +191,47 @@ export default function SideNav() {
               !isOpen && (styles.siderClosed, styles.menuWrapper),
             )}
             defaultOpenKeys={openMenuItems && openMenuItems}
+            defaultSelectedKeys={[EMenuItem.Editor]}
           >
             {menuItems.map((menuItem: IParentMenuItem) => {
               if (
                 !menuItem?.isActive ||
-                (menuItem?.isLegacy && !hasLegacyMenu) ||
                 (menuItem.title === EMenuItem.ThemeAudit && !themeAuditEnabled)
               ) {
                 // skip inactive menu items
                 // skip legacy menu items for new users
                 // skip Theme Audit if not enabled
                 return null;
-              } else if (menuItem.title === EMenuItem.Editor && studioTabs.length > 0) {
+              } else if (menuItem.title === EMenuItem.Editor && loggedIn && studioTabs.length > 0) {
                 // if legacy menu, show editor tabs in sidenav
                 // which can be toggled to show or hide
                 // otherwise, show editor tabs in submenu
                 // don't translate tab title because the user has set it
                 return hasLegacyMenu && showCustomEditor ? (
-                  studioTabs.map(tab => (
-                    <Menu.Item
-                      key={tab.title}
-                      className={cx(
-                        styles.sidenavItem,
-                        !isOpen && styles.closed,
-                        // currentPage === tab.target && styles.active,
-                      )}
-                      title={tab.title}
-                      icon={<i className={tab.icon} />}
-                      onClick={() => navigateToStudioTab(tab.target, tab.trackingTarget)}
-                    >
-                      {tab.title}
-                    </Menu.Item>
-                  ))
+                  <>
+                    {studioTabs.map((tab, index) => (
+                      <Menu.Item
+                        key={
+                          tab.title === 'Editor' && index !== 0
+                            ? `Editor ${index}`
+                            : tab?.title ?? `Layout ${index}`
+                        }
+                        className={cx(
+                          styles.sidenavItem,
+                          !isOpen && styles.closed,
+                          currentPage === tab.target && styles.active,
+                        )}
+                        title={tab.title}
+                        icon={<i className={tab.icon} />}
+                        onClick={() => navigateToStudioTab(tab.target, tab.trackingTarget)}
+                      >
+                        {tab.title}
+                      </Menu.Item>
+                    ))}
+                  </>
                 ) : (
                   <Menu.SubMenu
-                    key={menuItem.title}
+                    key={menuItem.key}
                     title={$t(menuItem.title)}
                     icon={menuItem?.icon && <i className={menuItem.icon} />}
                     onTitleClick={() => {
@@ -285,20 +248,20 @@ export default function SideNav() {
                       currentPage === menuItem.target && styles.active,
                     )}
                   >
-                    {studioTabs.map(tab => (
+                    {studioTabs.map((tab, index) => (
                       <Menu.Item
-                        key={`tab-${tab.title}`}
+                        key={`${tab.title} Layout ${index}`}
                         className={cx(
                           styles.sidenavItem,
                           // currentPage === tab.target && styles.active,
                         )}
-                        title={tab.title}
+                        title={$t(tab.title)}
                         icon={<i className={tab.icon} />}
                         onClick={() => {
                           navigateToStudioTab(tab.target as TAppPage, tab.trackingTarget);
                         }}
                       >
-                        {tab.title}
+                        {$t(tab.title)}
                       </Menu.Item>
                     ))}
                   </Menu.SubMenu>
@@ -306,7 +269,7 @@ export default function SideNav() {
               } else if (menuItem.title === EMenuItem.AppStore) {
                 return (
                   <Menu.SubMenu
-                    key={menuItem.title}
+                    key={menuItem.key}
                     title={$t(menuItem.title)}
                     icon={menuItem?.icon && <i className={menuItem.icon} />}
                     onTitleClick={() => {
@@ -323,32 +286,32 @@ export default function SideNav() {
                       currentPage === menuItem.target && styles.active,
                     )}
                   >
-                    {/* The first sub menu item is the Apps Manager */}
-                    {appStoreVisible && (
+                    {console.log('menuItem?.subMenuItems ', menuItem?.subMenuItems)}
+                    {menuItem?.subMenuItems?.map(subMenuItem => (
                       <Menu.Item
-                        key={`sub-${menuItem.title}`}
+                        key={subMenuItem.key}
                         className={cx(
                           styles.sidenavItem,
                           currentPage === menuItem?.target && styles.active,
                         )}
-                        title={menuItem?.subMenuItems[0]?.title}
+                        title={subMenuItem?.title}
                         onClick={() =>
                           navigate(
-                            menuItem?.subMenuItems[0].target as TAppPage,
-                            menuItem?.subMenuItems[0].trackingTarget,
-                            // menuItem?.subMenuItems[0].type,
+                            subMenuItem.target as TAppPage,
+                            subMenuItem.trackingTarget,
+                            subMenuItem.type,
                           )
                         }
                       >
                         {/* TODO: Translations for app titles? */}
-                        {menuItem?.subMenuItems[0]?.title}
+                        {subMenuItem?.title}
                       </Menu.Item>
-                    )}
+                    ))}
                     {apps.map(
                       app =>
                         app.isActive && (
                           <Menu.Item
-                            key={`sub-${app.id}`}
+                            key={`Open ${app.id}`}
                             className={cx(
                               styles.sidenavItem,
                               currentPage === menuItem?.target && styles.active,
@@ -366,7 +329,7 @@ export default function SideNav() {
                 // otherwise, show a menu item or a menu item with a submenu
                 return menuItem.hasOwnProperty('subMenuItems') ? (
                   <Menu.SubMenu
-                    key={menuItem.title}
+                    key={`Open ${menuItem.key} Menu`}
                     title={$t(menuItem.title)}
                     icon={menuItem?.icon && <i className={menuItem.icon} />}
                     onTitleClick={() => {
@@ -385,12 +348,12 @@ export default function SideNav() {
                   >
                     {menuItem?.subMenuItems?.map((subMenuItem: IMenuItem, index: number) => (
                       <Menu.Item
-                        key={`sub-${subMenuItem.title}`}
+                        key={subMenuItem.key}
                         className={cx(
                           styles.sidenavItem,
                           currentPage === subMenuItem?.target && styles.active,
                         )}
-                        title={$t(subMenuItem.title)}
+                        title={$t(menuItem.title)}
                         onClick={() => {
                           if (subMenuItem?.target && subMenuItem?.type) {
                             // if navigating to specific tab on page
@@ -407,10 +370,24 @@ export default function SideNav() {
                         {$t(subMenuItem.title)}
                       </Menu.Item>
                     ))}
+                    {menuItem.title === EMenuItem.AppStore &&
+                      apps.map(app => (
+                        <Menu.Item
+                          key={`App: ${app?.name}`}
+                          className={cx(
+                            styles.sidenavItem,
+                            currentPage === menuItem?.target && styles.active,
+                          )}
+                          title={app.name}
+                          onClick={() => app?.id && navigateApp(app.id)}
+                        >
+                          {app.name}
+                        </Menu.Item>
+                      ))}
                   </Menu.SubMenu>
                 ) : (
                   <Menu.Item
-                    key={menuItem.title}
+                    key={menuItem.key}
                     className={cx(
                       styles.sidenavItem,
                       !isOpen && styles.closed,
@@ -428,7 +405,7 @@ export default function SideNav() {
                         navigate(
                           menuItem?.target as TAppPage,
                           menuItem?.trackingTarget,
-                          menuItem?.type,
+                          // menuItem?.type,
                         );
                       } else if (menuItem?.target) {
                         navigate(menuItem?.target as TAppPage, menuItem?.trackingTarget);
@@ -440,15 +417,14 @@ export default function SideNav() {
                 );
               }
             })}
-            {hasLegacyMenu && showSidebarApps && apps.length > 0 && (
-              // if legacy menu, apps can also be seen in the sidebar
-              // below the regular menu items
+            {showSidebarApps && apps.length > 0 && (
+              // apps shown in sidebar
               <>
                 {apps.map(
                   app =>
                     app.isActive && (
                       <Menu.Item
-                        key={app.id}
+                        key={app?.id}
                         className={cx(
                           styles.sidenavItem,
                           !isOpen && styles.closed,
@@ -464,17 +440,29 @@ export default function SideNav() {
                         }
                         onClick={() => app?.id && navigateApp(app?.id)}
                       >
-                        {app.name}
+                        {app?.name}
                       </Menu.Item>
                     ),
                 )}
               </>
             )}
           </Menu>
-
           {/* show the bottom navigation menu */}
           <NavTools />
         </Scrollable>
+        <HelpTip
+          title={$t('Login')}
+          dismissableKey={EDismissable.LoginPrompt}
+          position={{ top: 'calc(100vh - 175px)', left: '80px' }}
+          arrowPosition="bottom"
+          style={{ position: 'absolute' }}
+        >
+          <div>
+            {$t(
+              'Gain access to additional features by logging in with your preferred streaming platform.',
+            )}
+          </div>
+        </HelpTip>
       </Sider>
 
       {/* this button toggles the menu open and close */}
@@ -496,7 +484,12 @@ export default function SideNav() {
       </Button>
 
       {/* if it's a legacy menu, show new badge*/}
-      {showNewBadge && <div className={cx(styles.badge, styles.newBadge)}>{$t('New')}</div>}
+      <NewButton
+        dismissableKey={EDismissable.NewSideNav}
+        size="small"
+        absolute
+        style={{ left: 'calc(100% / 20px)', top: 'calc(100% / 2)' }}
+      />
     </Layout>
   );
 }

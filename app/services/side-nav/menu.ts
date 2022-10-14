@@ -104,34 +104,42 @@ export class SideNavService extends PersistentStatefulService<ISideNavServiceSta
 
     const loggedIn = this.userService.views.isLoggedIn;
 
-    if (!loggedIn) {
-      // these are true by default, so only set if it's the new user's first time opening the app
-      this.setLoggedOutMenu();
-    }
-
-    // if this is a new user
     // TODO: set Date to specific date
     const legacyMenu =
       this.userService.state.createdAt &&
       this.userService.state.createdAt < new Date('October 12, 2022').valueOf();
 
-    if (!legacyMenu) {
-      this.setCompactView();
-      this.dismissablesService.dismiss(EDismissable.NewSideNav);
-      if (!loggedIn && this.state.menuItems[EMenuItem.Themes].isActive) {
-        // these are true by default so, this is the non-legacy user's first log-in
-        this.toggleMenuItem(ENavName.TopNav, EMenuItem.Themes);
-        this.toggleMenuItem(ENavName.TopNav, EMenuItem.AppStore);
-        this.toggleMenuItem(ENavName.TopNav, EMenuItem.Highlighter);
-      }
-      this.state.hasLegacyMenu = false;
-    } else {
-      // this is an existing user, so determine if new badge is shown
-      if (this.appService.state.onboarded) {
-        this.dismissablesService.dismiss(EDismissable.NewSideNav);
-      } else {
+    if (loggedIn) {
+      this.dismissablesService.dismiss(EDismissable.LoginPrompt);
+      if (legacyMenu && !this.appService.state.onboarded) {
+        // show for legacy user's first startup after new side nav date
         this.dismissablesService.views.shouldShow(EDismissable.NewSideNav);
+        this.dismissablesService.views.shouldShow(EDismissable.CustomMenuSettings);
+      } else {
+        this.dismissablesService.dismiss(EDismissable.NewSideNav);
+        this.dismissablesService.dismiss(EDismissable.CustomMenuSettings);
       }
+    } else {
+      // the user is not logged in
+      if (legacyMenu) {
+        this.dismissablesService.dismiss(EDismissable.LoginPrompt);
+        if (!this.appService.state.onboarded) {
+          this.dismissablesService.views.shouldShow(EDismissable.NewSideNav);
+          this.dismissablesService.views.shouldShow(EDismissable.CustomMenuSettings);
+        } else {
+          this.dismissablesService.dismiss(EDismissable.NewSideNav);
+          this.dismissablesService.dismiss(EDismissable.CustomMenuSettings);
+        }
+      } else {
+        if (this.state.hasLegacyMenu) {
+          // this is a new user opening the app for the first time
+          this.state.hasLegacyMenu = false;
+        }
+        this.dismissablesService.views.shouldShow(EDismissable.LoginPrompt);
+        this.dismissablesService.dismiss(EDismissable.NewSideNav);
+        this.dismissablesService.dismiss(EDismissable.CustomMenuSettings);
+      }
+      this.setLoggedOutMenu();
     }
   }
 
@@ -143,16 +151,16 @@ export class SideNavService extends PersistentStatefulService<ISideNavServiceSta
     this.SET_LOGGED_OUT_MENU();
   }
 
-  setLegacyMenu() {
-    this.SET_LEGACY_MENU();
-  }
-
   toggleMenuStatus() {
     this.OPEN_CLOSE_MENU();
   }
 
-  setCompactView() {
-    this.SET_COMPACT_VIEW();
+  setCompactView(isCompact: boolean) {
+    this.SET_COMPACT_VIEW(isCompact);
+  }
+
+  setLegacyView() {
+    this.SET_LEGACY_VIEW();
   }
 
   expandMenuItem(navName: ENavName, menuItemName: EMenuItem) {
@@ -181,40 +189,28 @@ export class SideNavService extends PersistentStatefulService<ISideNavServiceSta
   }
 
   @mutation()
-  private SET_LEGACY_MENU() {
-    this.state.hasLegacyMenu = false;
-  }
-
-  @mutation()
   private SET_LOGGED_OUT_MENU() {
     // only show editor menu item
     this.state[ENavName.TopNav].menuItems = this.state[ENavName.TopNav].menuItems.map(
       (menuItem: IMenuItem) => {
-        if (menuItem.title !== EMenuItem.Editor && menuItem.isActive) {
-          this.toggleMenuItem(ENavName.TopNav, menuItem.title as EMenuItem);
+        if (menuItem.title !== EMenuItem.Editor) {
+          menuItem.isActive = false;
+          this.state.menuItems[menuItem.title].isActive = false;
         }
         return menuItem;
       },
     );
 
-    // do not show prime menu item
-    if (this.state[ENavName.BottomNav].menuItems[EMenuItem.GetPrime].isActive) {
-      this.state[ENavName.BottomNav].menuItems = [
-        ...this.state[ENavName.BottomNav].menuItems,
-        { ...this.state[ENavName.BottomNav].menuItems[EMenuItem.GetPrime], isActive: false },
-      ];
-    }
+    // hide sidebar apps
+    this.state.showSidebarApps = false;
   }
 
   @mutation()
-  private OPEN_CLOSE_MENU() {
-    this.state.isOpen = !this.state.isOpen;
-  }
+  private SET_COMPACT_VIEW(isCompact: boolean) {
+    this.state.compactView = isCompact;
+    this.state.showSidebarApps = false;
 
-  @mutation()
-  private SET_COMPACT_VIEW() {
-    this.state.compactView = !this.state.compactView;
-    if (this.state.compactView) {
+    if (isCompact) {
       this.state.menuItems = {
         ...this.state.menuItems,
         // shown in compact view
@@ -240,10 +236,46 @@ export class SideNavService extends PersistentStatefulService<ISideNavServiceSta
           { ...this.state.menuItems[EMenuItem.Themes], isActive: true },
           { ...this.state.menuItems[EMenuItem.AppStore], isActive: true },
           { ...this.state.menuItems[EMenuItem.Highlighter], isActive: true },
-          { ...this.state.menuItems[EMenuItem.ThemeAudit], isActive: false },
+          { ...this.state.menuItems[EMenuItem.ThemeAudit], isActive: true },
         ],
       };
     }
+  }
+
+  @mutation()
+  private SET_LEGACY_VIEW() {
+    this.state.showSidebarApps = true;
+    this.state.showCustomEditor = true;
+    this.state.compactView = false;
+
+    this.state.menuItems = {
+      ...this.state.menuItems,
+      [EMenuItem.Editor]: { ...this.state.menuItems[EMenuItem.Editor], isActive: true },
+      [EMenuItem.Themes]: { ...this.state.menuItems[EMenuItem.Themes], isActive: true },
+      [EMenuItem.AppStore]: { ...this.state.menuItems[EMenuItem.AppStore], isActive: true },
+      [EMenuItem.Highlighter]: { ...this.state.menuItems[EMenuItem.Highlighter], isActive: true },
+      [EMenuItem.LayoutEditor]: { ...this.state.menuItems[EMenuItem.LayoutEditor], isActive: true },
+      [EMenuItem.StudioMode]: { ...this.state.menuItems[EMenuItem.StudioMode], isActive: true },
+      [EMenuItem.ThemeAudit]: { ...this.state.menuItems[EMenuItem.ThemeAudit], isActive: true },
+    };
+
+    this.state[ENavName.TopNav] = {
+      ...this.state[ENavName.TopNav],
+      menuItems: [
+        { ...this.state.menuItems[EMenuItem.Editor], isActive: true },
+        { ...this.state.menuItems[EMenuItem.LayoutEditor], isActive: true },
+        { ...this.state.menuItems[EMenuItem.StudioMode], isActive: true },
+        { ...this.state.menuItems[EMenuItem.Themes], isActive: true },
+        { ...this.state.menuItems[EMenuItem.AppStore], isActive: true },
+        { ...this.state.menuItems[EMenuItem.Highlighter], isActive: true },
+        { ...this.state.menuItems[EMenuItem.ThemeAudit], isActive: true },
+      ],
+    };
+  }
+
+  @mutation()
+  private OPEN_CLOSE_MENU() {
+    this.state.isOpen = !this.state.isOpen;
   }
 
   @mutation()

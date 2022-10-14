@@ -5,7 +5,9 @@ import { GuestApiHandler } from 'util/guest-api-handler';
 import * as remote from '@electron/remote';
 import { Services } from 'components-react/service-provider';
 
-export default function PlatformAppStore(p: { params: { appId?: string; path?: string } }) {
+export default function PlatformAppStore(p: {
+  params: { appId?: string | undefined; type?: string | undefined };
+}) {
   const { UserService, PlatformAppsService, PlatformAppStoreService, NavigationService } = Services;
 
   function onBrowserViewReady(view: Electron.BrowserView) {
@@ -14,6 +16,7 @@ export default function PlatformAppStore(p: { params: { appId?: string; path?: s
       openLinkInBrowser,
       onPaypalAuthSuccess,
       navigateToApp,
+      navigateToAppManager,
     });
 
     view.webContents.on('did-finish-load', () => {
@@ -39,16 +42,15 @@ export default function PlatformAppStore(p: { params: { appId?: string; path?: s
     NavigationService.actions.navigate('PlatformAppMainPage', { appId });
   }
 
-  // TODO: WIP new params
-
-  // async function navigateToAppManager(appId: string) {
-  //   NavigationService.actions.navigate('PlatformAppMainPage', { path: 'list/installed' });
-  // }
+  // TODO: Is this needed?
+  async function navigateToAppManager(path: string) {
+    NavigationService.actions.navigate('PlatformAppMainPage', { path });
+  }
 
   return (
     <BrowserView
       style={{ position: 'absolute', top: 0, right: 0, bottom: 0, left: 0 }}
-      src={UserService.views.appStoreUrl(p.params?.appId)}
+      src={UserService.views.appStoreUrl(p.params)}
       onReady={onBrowserViewReady}
       enableGuestApi
     />

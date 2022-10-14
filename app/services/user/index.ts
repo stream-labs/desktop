@@ -36,6 +36,8 @@ import { AppService } from 'services/app';
 import { UsageStatisticsService } from 'services/usage-statistics';
 import { StreamingService } from 'services/streaming';
 import { NotificationsService, ENotificationType } from 'services/notifications';
+import { SideNavService } from 'app-services';
+import { DismissablesService, EDismissable } from 'services/dismissables';
 import { JsonrpcService } from 'services/api/jsonrpc';
 import * as remote from '@electron/remote';
 
@@ -223,25 +225,34 @@ class UserViews extends ViewHandler<IUserServiceState> {
     return url;
   }
 
-  appStoreUrl(appId?: string) {
+  appStoreUrl(params?: { appId?: string | undefined; type?: string | undefined }) {
     const host = this.hostsService.platform;
     const token = this.auth.apiToken;
     const nightMode = this.customizationServiceViews.isDarkTheme ? 'night' : 'day';
     let url = `https://${host}/slobs-store`;
 
-    if (appId) {
-      url = `${url}/app/${appId}`;
+    if (params?.appId) {
+      url = `${url}/app/${params?.appId}`;
+    }
+    if (params?.type) {
+      url = `${url}/${params?.type}`;
     }
 
     return `${url}?token=${token}&mode=${nightMode}`;
   }
 
-  overlaysUrl(type?: 'overlay' | 'widget-theme', id?: string) {
+  overlaysUrl(type?: 'overlay' | 'widget-theme' | 'site-theme', id?: string) {
     const uiTheme = this.customizationServiceViews.isDarkTheme ? 'night' : 'day';
     let url = `https://${this.hostsService.streamlabs}/library?mode=${uiTheme}&slobs`;
 
     if (this.isLoggedIn) {
       url += `&oauth_token=${this.auth.apiToken}`;
+    }
+    console.log('type ', type);
+    console.log('id ', id);
+
+    if (type) {
+      url += `#/?type=${type}`;
     }
 
     if (type && id) {
@@ -268,6 +279,8 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   @Inject() private usageStatisticsService: UsageStatisticsService;
   @Inject() private notificationsService: NotificationsService;
   @Inject() private jsonrpcService: JsonrpcService;
+  @Inject() private sideNavService: SideNavService;
+  @Inject() private dismissablesService: DismissablesService;
 
   @mutation()
   LOGIN(auth: IUserAuth) {
@@ -768,9 +781,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     const i18nService = I18nService.instance as I18nService; // TODO: replace with getResource('I18nService')
     const locale = i18nService.state.locale;
     // eslint-disable-next-line
-    return `https://${
-      this.hostsService.streamlabs
-    }/slobs/dashboard?oauth_token=${token}&mode=${nightMode}&r=${subPage}&l=${locale}&hidenav=${hideNav}`;
+    return `https://${this.hostsService.streamlabs}/slobs/dashboard?oauth_token=${token}&mode=${nightMode}&r=${subPage}&l=${locale}&hidenav=${hideNav}`;
   }
 
   getDonationSettings() {
@@ -838,6 +849,13 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
       return validatePlatformResult;
     }
 
+    if (this.sideNavService.views.hasLegacyMenu) {
+      this.sideNavService.setLegacyView();
+    } else {
+      this.sideNavService.setCompactView(true);
+    }
+
+    this.dismissablesService.dismiss(EDismissable.LoginPrompt);
     this.userLoginFinished.next();
   }
 
@@ -859,6 +877,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     this.writeUserIdFile();
     this.unsubscribeFromSocketConnection();
     this.LOGOUT();
+    this.sideNavService.setLoggedOutMenu();
     this.userLogout.next();
   }
 
@@ -977,16 +996,16 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
 
     const auth =
       mode === 'internal'
-        /* eslint-disable */
-        ? await this.authModule.startInternalAuth(
-          authUrl,
-          service.authWindowOptions,
-          onWindowShow,
-          onWindowClose,
-          merge,
-        )
+        ? /* eslint-disable */
+          await this.authModule.startInternalAuth(
+            authUrl,
+            service.authWindowOptions,
+            onWindowShow,
+            onWindowClose,
+            merge,
+          )
         : await this.authModule.startExternalAuth(authUrl, onWindowShow, merge);
-        /* eslint-enable */
+    /* eslint-enable */
 
     this.SET_AUTH_STATE(EAuthProcessState.Loading);
     this.SET_IS_RELOG(false);

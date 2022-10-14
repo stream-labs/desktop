@@ -108,20 +108,9 @@ button.sidenav-button {
   &.menu-wrapper {
     :global(.ant-menu-item:hover),
     :global(.ant-menu-submenu:hover) {
-      span {
-        transition: transform 0.2s;
-        transition-timing-function: ease-in-out;
+      i {
+        transition: all 0.2s ease-in-out;
         transform: scale(1.2, 1.2);
-      }
-
-      i.link-badge {
-        position: absolute;
-        top: 0;
-        right: 0;
-        transition: transform 0.2s;
-        transition-timing-function: ease-in-out;
-        transform: translate(53%, -53%);
-        transform-origin: 100% 0%;
       }
     }
   }

@@ -17,8 +17,9 @@ import FormInput from 'components/shared/inputs/FormInput.vue';
 import VirtualWebcamSettings from './VirtualWebcamSettings';
 import { MagicLinkService } from 'services/magic-link';
 import { UserService } from 'services/user';
+import { DismissablesService, EDismissable } from 'services/dismissables';
 import Scrollable from 'components/shared/Scrollable';
-import { ObsSettings, PlatformLogo } from 'components/shared/ReactComponentList';
+import { ObsSettings, PlatformLogo, NewBadge } from 'components/shared/ReactComponentList';
 import { $t } from 'services/i18n';
 import { debounce } from 'lodash-decorators';
 import * as remote from '@electron/remote';
@@ -41,6 +42,7 @@ import Utils from '../../../services/utils';
     Scrollable,
     PlatformLogo,
     ObsSettings,
+    NewBadge,
   },
 })
 export default class Settings extends Vue {
@@ -48,6 +50,7 @@ export default class Settings extends Vue {
   @Inject() windowsService: WindowsService;
   @Inject() magicLinkService: MagicLinkService;
   @Inject() userService: UserService;
+  @Inject() dismissablesService: DismissablesService;
 
   $refs: { settingsContainer: HTMLElement & SearchablePages };
 
@@ -72,6 +75,10 @@ export default class Settings extends Vue {
     Experimental: 'fas fa-flask',
     'Installed Apps': 'icon-store',
     'Get Support': 'icon-question',
+  };
+  // for additional dismissables, add below using the category/title as the key
+  dismissables: { [key: string]: EDismissable } = {
+    ['Appearance']: EDismissable.CustomMenuSettings,
   };
 
   internalCategoryName: string = null;
@@ -247,6 +254,12 @@ export default class Settings extends Vue {
     } else {
       this.windowsService.closeChildWindow();
       this.userService.showLogin();
+    }
+  }
+
+  dismiss(category: string) {
+    if (this.dismissables[category]) {
+      this.dismissablesService.dismiss(this.dismissables[category]);
     }
   }
 }

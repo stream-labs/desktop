@@ -45,6 +45,7 @@ export function AppearanceSettings() {
     displayedApps,
     showCustomEditor,
     isLoggedIn,
+    isPrime,
     toggleApp,
     swapApp,
     toggleSidebarSubMenu,
@@ -61,6 +62,7 @@ export function AppearanceSettings() {
     displayedApps: Object.values(SideNavService.views.apps).sort((a, b) => a.index - b.index),
     showCustomEditor: SideNavService.views.showCustomEditor,
     isLoggedIn: UserService.views.isLoggedIn,
+    isPrime: UserService.views.isPrime,
     toggleApp: SideNavService.actions.toggleApp,
     swapApp: SideNavService.actions.swapApp,
     toggleSidebarSubMenu: SideNavService.actions.toggleSidebarSubmenu,
@@ -176,11 +178,11 @@ export function AppearanceSettings() {
 
       <ObsSettingsSection title={$t('Custom Navigation Bar')}>
         <CheckboxInput
-          onChange={() => setCompactView()}
+          onChange={value => setCompactView(value)}
           label={$t(
             'Enable custom navigation bar to pin your favorite features for quick access.\nDisable to swap to compact view.',
           )}
-          value={!compactView}
+          value={compactView}
           className={cx(styles.settingsCheckbox)}
           disabled={!isLoggedIn}
         />
@@ -199,7 +201,7 @@ export function AppearanceSettings() {
               layout="horizontal"
               onChange={() => toggleSidebarSubMenu()}
               value={isLoggedIn && showCustomEditor}
-              disabled={!isLoggedIn}
+              disabled={!isLoggedIn || compactView}
             />
             <SwitchInput
               label={$t(EMenuItem.StudioMode)}
@@ -213,13 +215,20 @@ export function AppearanceSettings() {
               layout="horizontal"
               onChange={() => toggleMenuItem(ENavName.TopNav, EMenuItem.LayoutEditor)}
               value={menuItems[EMenuItem.LayoutEditor].isActive}
-              disabled={!isLoggedIn || (compactView && !menuItems[EMenuItem.LayoutEditor].isActive)}
+              disabled={!isLoggedIn || compactView}
             />
             <SwitchInput
               label={$t(EMenuItem.Themes)}
               layout="horizontal"
               onChange={() => toggleMenuItem(ENavName.TopNav, EMenuItem.Themes)}
               value={menuItems[EMenuItem.Themes].isActive}
+              disabled={!isLoggedIn}
+            />
+            <SwitchInput
+              label={$t(EMenuItem.Highlighter)}
+              layout="horizontal"
+              onChange={() => toggleMenuItem(ENavName.TopNav, EMenuItem.Highlighter)}
+              value={menuItems[EMenuItem.Highlighter].isActive}
               disabled={!isLoggedIn}
             />
           </Col>
@@ -238,7 +247,7 @@ export function AppearanceSettings() {
               {appSelectFields.map((app: IAppMenuItem | undefined, index: number) => (
                 <Row key={`app-${index + 1}`} className={styles.appsSelector}>
                   <SwitchInput
-                    label={`App ${index + 1}`}
+                    label={`${$t('App')} ${index + 1}`}
                     layout="horizontal"
                     onChange={() => app?.id && toggleApp(app.id)}
                     value={app && app?.isActive}

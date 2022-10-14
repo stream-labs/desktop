@@ -3,6 +3,7 @@ import cx from 'classnames';
 import electron from 'electron';
 import Utils from 'services/utils';
 import { $t } from 'services/i18n';
+import { EDismissable } from 'services/dismissables';
 import throttle from 'lodash/throttle';
 import { Services } from '../service-provider';
 import { useVuex } from '../hooks';
@@ -11,6 +12,7 @@ import * as remote from '@electron/remote';
 import { Badge, Menu, Typography, Divider } from 'antd';
 import { EMenuItem, ENavName, IMenuItem, IParentMenuItem } from 'services/side-nav';
 import PlatformLogo from 'components-react/shared/PlatformLogo';
+import HelpTip from 'components-react/shared/HelpTip';
 
 export default function SideNav() {
   const {
@@ -124,7 +126,7 @@ export default function SideNav() {
       <Divider key="divider-1" className={styles.divider} />
       {isDevMode && (
         <Menu.Item
-          key="dev-tools"
+          key={'dev-tools'}
           title={EMenuItem.DevTools}
           icon={<i className="icon-developer" />}
           onClick={openDevTools}
@@ -137,7 +139,7 @@ export default function SideNav() {
         <>
           {isLoggedIn && !isPrime && menuItem.title === EMenuItem.GetPrime && (
             <Menu.Item
-              key={menuItem.title}
+              key={menuItem.key}
               title={$t(menuItem.title)}
               icon={
                 <div>
@@ -154,7 +156,7 @@ export default function SideNav() {
           )}
           {isLoggedIn && isPrime && menuItem.title === EMenuItem.Dashboard && (
             <Menu.SubMenu
-              key={menuItem.title}
+              key={menuItem.key}
               title={$t(menuItem.title)}
               icon={
                 <div>
@@ -171,7 +173,7 @@ export default function SideNav() {
             >
               {menuItem?.subMenuItems.map((subMenuItem: IMenuItem) => (
                 <Menu.Item
-                  key={`sub-${subMenuItem.title}`}
+                  key={subMenuItem.key}
                   title={$t(subMenuItem.title)}
                   onClick={() => throttledOpenDashboard(subMenuItem?.target)}
                 >
@@ -182,7 +184,7 @@ export default function SideNav() {
           )}
           {menuItem.title === EMenuItem.GetHelp && (
             <Menu.Item
-              key={menuItem.title}
+              key={menuItem.key}
               title={$t(menuItem.title)}
               icon={
                 <div>
@@ -198,7 +200,7 @@ export default function SideNav() {
           )}
           {menuItem.title === EMenuItem.Settings && (
             <Menu.Item
-              key={menuItem.title}
+              key={menuItem.key}
               title={$t(menuItem.title)}
               icon={<i className={menuItem?.icon} />}
               onClick={openSettingsWindow}
@@ -210,7 +212,7 @@ export default function SideNav() {
             <>
               <Divider key="divider-2" className={styles.loginDivider} />
               <Menu.Item
-                key="login"
+                key={menuItem.key}
                 title={!isLoggedIn ? $t(EMenuItem.Login) : $t('Log Out')}
                 className={styles.login}
                 icon={!isOpen && <i className="icon-user" />}
