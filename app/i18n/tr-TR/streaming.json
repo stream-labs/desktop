@@ -164,5 +164,6 @@
   "Common Stream Settings": "Yaygın Yayın Ayarları",
   "Schedule Stream for %{formattedDate}": "%{formattedDate} için Yayın Planla",
   "Update Scheduled Stream for %{formattedDate}": "%{formattedDate} için Planlanan Yayını Güncelle",
-  "You can not schedule to a past date": "Geçmiş bir tarih için plan yapamazsınız"
+  "You can not schedule to a past date": "Geçmiş bir tarih için plan yapamazsınız",
+  "Streamlabs requires additional permissions from your Twitch account. Please log in with Twitch to continue.": "Streamlabs requires additional permissions from your Twitch account. Please log in with Twitch to continue."
 }

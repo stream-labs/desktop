@@ -164,5 +164,6 @@
   "Common Stream Settings": "Pengaturan Streaming yang Umum",
   "Schedule Stream for %{formattedDate}": "Jadwalkan Streaming untuk %{formattedDate}",
   "Update Scheduled Stream for %{formattedDate}": "Perbarui Streaming yang Sudah Dijadwalkan untuk %{formattedDate}",
-  "You can not schedule to a past date": "Anda tidak bisa menjadwalkan ke tanggal yang sudah berlalu"
+  "You can not schedule to a past date": "Anda tidak bisa menjadwalkan ke tanggal yang sudah berlalu",
+  "Streamlabs requires additional permissions from your Twitch account. Please log in with Twitch to continue.": "Streamlabs requires additional permissions from your Twitch account. Please log in with Twitch to continue."
 }

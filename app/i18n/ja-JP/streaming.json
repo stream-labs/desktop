@@ -164,5 +164,6 @@
   "Common Stream Settings": "一般ストリーム設定",
   "Schedule Stream for %{formattedDate}": "ストリームを %{formattedDate} にスケジュール",
   "Update Scheduled Stream for %{formattedDate}": "%{formattedDate} にスケジュールされたストリームを更新",
-  "You can not schedule to a past date": "過去の日付にはスケジュールできません"
+  "You can not schedule to a past date": "過去の日付にはスケジュールできません",
+  "Streamlabs requires additional permissions from your Twitch account. Please log in with Twitch to continue.": "Streamlabs requires additional permissions from your Twitch account. Please log in with Twitch to continue."
 }

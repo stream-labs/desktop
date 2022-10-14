@@ -164,5 +164,6 @@
   "Common Stream Settings": "Typowe ustawienia przekazu strumieniowego",
   "Schedule Stream for %{formattedDate}": "Zaplanuj stream na %{formattedDate}",
   "Update Scheduled Stream for %{formattedDate}": "Zaktualizuj zaplanowany stream na %{formattedDate}",
-  "You can not schedule to a past date": "Nie możesz planować na daty w przeszłości"
+  "You can not schedule to a past date": "Nie możesz planować na daty w przeszłości",
+  "Streamlabs requires additional permissions from your Twitch account. Please log in with Twitch to continue.": "Streamlabs requires additional permissions from your Twitch account. Please log in with Twitch to continue."
 }

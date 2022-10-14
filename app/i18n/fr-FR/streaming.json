@@ -164,5 +164,6 @@
   "Common Stream Settings": "Paramètres de stream courants",
   "Schedule Stream for %{formattedDate}": "Planifier le stream pour %{formattedDate}",
   "Update Scheduled Stream for %{formattedDate}": "Mettre à jour le stream planifié pour %{formattedDate}",
-  "You can not schedule to a past date": "Vous ne pouvez pas planifier à une date antérieure"
+  "You can not schedule to a past date": "Vous ne pouvez pas planifier à une date antérieure",
+  "Streamlabs requires additional permissions from your Twitch account. Please log in with Twitch to continue.": "Streamlabs requires additional permissions from your Twitch account. Please log in with Twitch to continue."
 }
