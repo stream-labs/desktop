@@ -1,11 +1,10 @@
-import { Inject } from 'services/core/injector';
 import * as remote from '@electron/remote';
+import { Inject } from 'services/core/injector';
 import { InitAfter } from 'services/core';
 import { mutation, StatefulService } from '../core/stateful-service';
 import * as obs from '../../../obs-api';
 import { SettingsManagerService } from 'services/settings-manager';
 import { $t } from 'services/i18n';
-import { metadata } from 'components-react/shared/inputs/metadata';
 
 // export interface IVideo {
 //   fpsNum: number;
@@ -66,19 +65,22 @@ export class VideoSettingsService extends StatefulService<{ videoContext: obs.IV
 
   get videoSettingsMetadata() {
     return {
-      baseRes: metadata.autocomplete({
+      baseRes: {
+        type: 'autocomplete',
         label: $t('Base (Canvas) Resolution'),
         options: CANVAS_RES_OPTIONS.concat(this.monitorResolutions),
         rules: [this.resolutionValidator],
         onChange: (val: string) => this.setResolution('baseRes', val),
-      }),
-      outputRes: metadata.autocomplete({
+      },
+      outputRes: {
+        type: 'autocomplete',
         label: $t('Output (Scaled) Resolution'),
         options: OUTPUT_RES_OPTIONS,
         rules: [this.resolutionValidator],
         onChange: (val: string) => this.setResolution('outputRes', val),
-      }),
-      scaleType: metadata.list({
+      },
+      scaleType: {
+        type: 'list',
         label: $t('Downscale Filter'),
         options: [
           {
@@ -88,8 +90,9 @@ export class VideoSettingsService extends StatefulService<{ videoContext: obs.IV
           { label: $t('Bicubic (Sharpened scaling, 16 samples)'), value: obs.EScaleType.Bicubic },
           { label: $t('Lanczos (Sharpened scaling, 32 samples)'), value: obs.EScaleType.Lanczos },
         ],
-      }),
-      fpsType: metadata.list({
+      },
+      fpsType: {
+        type: 'list',
         label: $t('FPS Type'),
         options: [
           { label: $t('Common FPS Values'), value: obs.EFPSType.Common },
@@ -98,24 +101,27 @@ export class VideoSettingsService extends StatefulService<{ videoContext: obs.IV
         ],
 
         children: {
-          fpsCom: metadata.list({
+          fpsCom: {
+            type: 'list',
             label: $t('Common FPS Values'),
             options: FPS_OPTIONS,
             onChange: (val: string) => this.setCommonFPS(val),
             displayed: this.videoSettingsValues.fpsType === obs.EFPSType.Common,
-          }),
-          fpsNum: metadata.number({
+          },
+          fpsNum: {
+            type: 'number',
             label: $t('FPS Number'),
             displayed: [obs.EFPSType.Integer, obs.EFPSType.Fractional].includes(
               this.videoSettingsValues.fpsType,
             ),
-          }),
-          fpsDen: metadata.number({
+          },
+          fpsDen: {
+            type: 'number',
             label: $t('FPS Density'),
             displayed: this.videoSettingsValues.fpsType === obs.EFPSType.Fractional,
-          }),
+          },
         },
-      }),
+      },
     };
   }
 
