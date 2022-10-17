@@ -24,6 +24,7 @@ export const AutocompleteInput = InputComponent(<T extends any>(p: TListInputPro
         onChange={handleChange}
         onSelect={handleChange}
         data-value={p.value}
+        data-name={p.name}
       />
     </InputWrapper>
   );
