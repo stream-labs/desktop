@@ -68,6 +68,8 @@ body > div > div {
   }
 
   &.closed {
+    border-top: 0px;
+
     :global(.ant-menu-item:hover),
     :global(.ant-menu-submenu:hover) {
       i:not(.link-badge),
@@ -140,8 +142,13 @@ body > div > div {
 }
 
 .login {
+  padding-top: 10px !important;
   :global(.ant-menu-item.ant-menu-item-only-child) {
     margin-bottom: 10px;
+  }
+
+  &.login-closed {
+    padding-top: 0px !important;
   }
 
   &::before {
@@ -216,4 +223,8 @@ body > div > div {
   -moz-transform: scaleX(-1);
   -webkit-transform: scaleX(-1);
   -ms-transform: scaleX(-1);
+}
+
+.hide-submenu {
+  display: none;
 }

@@ -91,7 +91,7 @@ export enum EMenuItem {
 
 export enum ESubMenuItem {
   Scene = 'Scene',
-  AlertBoxLibrary = 'Alert Box',
+  AlertBoxLibrary = 'Alert Box Library',
   Widget = 'Widget',
   Sites = 'Sites',
   AppsStoreHome = 'Apps Store Home',

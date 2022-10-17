@@ -169,6 +169,10 @@ export class SideNavService extends PersistentStatefulService<ISideNavServiceSta
     this.SET_COMPACT_VIEW(isCompact);
   }
 
+  setNewUserLogin() {
+    this.SET_NEW_USER_LOGIN();
+  }
+
   setLegacyView() {
     this.SET_LEGACY_VIEW();
   }
@@ -250,6 +254,62 @@ export class SideNavService extends PersistentStatefulService<ISideNavServiceSta
         ],
       };
     }
+  }
+
+  @mutation()
+  private SET_NEW_USER_LOGIN() {
+    // compact view with menu items expanded
+    this.state.isOpen = true;
+
+    this.state.menuItems = {
+      ...this.state.menuItems,
+      [EMenuItem.Editor]: {
+        ...this.state.menuItems[EMenuItem.Editor],
+        isActive: true,
+        isExpanded: true,
+      },
+      [EMenuItem.Themes]: {
+        ...this.state.menuItems[EMenuItem.Themes],
+        isActive: true,
+        isExpanded: true,
+      },
+      [EMenuItem.AppStore]: {
+        ...this.state.menuItems[EMenuItem.AppStore],
+        isActive: true,
+        isExpanded: true,
+      },
+      [EMenuItem.Highlighter]: { ...this.state.menuItems[EMenuItem.Highlighter], isActive: true },
+      [EMenuItem.LayoutEditor]: {
+        ...this.state.menuItems[EMenuItem.LayoutEditor],
+        isActive: false,
+      },
+      [EMenuItem.StudioMode]: { ...this.state.menuItems[EMenuItem.StudioMode], isActive: false },
+      [EMenuItem.ThemeAudit]: { ...this.state.menuItems[EMenuItem.ThemeAudit], isActive: false },
+      [EMenuItem.Dashboard]: { ...this.state.menuItems[EMenuItem.Dashboard], isExpanded: true },
+    };
+
+    this.state[ENavName.TopNav] = {
+      ...this.state[ENavName.TopNav],
+      menuItems: [
+        { ...this.state.menuItems[EMenuItem.Editor], isActive: true },
+        { ...this.state.menuItems[EMenuItem.LayoutEditor], isActive: false },
+        { ...this.state.menuItems[EMenuItem.StudioMode], isActive: false },
+        { ...this.state.menuItems[EMenuItem.Themes], isActive: true },
+        { ...this.state.menuItems[EMenuItem.AppStore], isActive: true },
+        { ...this.state.menuItems[EMenuItem.Highlighter], isActive: true },
+        { ...this.state.menuItems[EMenuItem.ThemeAudit], isActive: true },
+      ],
+    };
+
+    this.state[ENavName.BottomNav] = {
+      ...this.state[ENavName.BottomNav],
+      menuItems: this.state[ENavName.BottomNav].menuItems.map((menuItem: IMenuItem) => {
+        if (menuItem.title === EMenuItem.Dashboard) {
+          return { ...this.state.menuItems[EMenuItem.Dashboard], isExpanded: true };
+        }
+        return menuItem;
+      }),
+    };
   }
 
   @mutation()

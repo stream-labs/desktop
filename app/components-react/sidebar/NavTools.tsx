@@ -174,11 +174,9 @@ export default function SideNav() {
                   <Menu.Item
                     key={subMenuItem.key}
                     title={$t(subMenuItem.title)}
+                    className={cx(!isOpen && menuItem.isExpanded && styles.hideSubMenu)}
                     onClick={() => throttledOpenDashboard(subMenuItem?.type)}
                   >
-                    {'TEST TEST TEST TEST TEST'}
-                    {'TEST TEST TEST TEST TEST'}
-                    {'TEST TEST TEST TEST TEST'}
                     {$t(subMenuItem.title)}
                   </Menu.Item>
                 ))}

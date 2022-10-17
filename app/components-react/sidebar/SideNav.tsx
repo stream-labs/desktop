@@ -52,8 +52,6 @@ export default function SideNav() {
     } else {
       NavigationService.actions.navigate(page);
     }
-
-    // LayoutService.actions.setCurrentTab(page as string);
   }
 
   function navigateApp(appId: string, key?: string) {
@@ -98,7 +96,7 @@ export default function SideNav() {
     featureIsEnabled,
     currentMenuItem,
     setCurrentMenuItem,
-    currentPage, // TODO: tracking & styling for currentPage
+    currentPage,
     tabs,
     leftDock,
     showSidebarApps,
@@ -246,6 +244,7 @@ export default function SideNav() {
                     }}
                     className={cx(
                       !isOpen && styles.closed,
+                      !isOpen && menuItem.isExpanded && styles.hideSubMenu,
                       currentMenuItem === menuItem.key && styles.active,
                     )}
                   >
@@ -285,11 +284,12 @@ export default function SideNav() {
                       currentMenuItem === menuItem.key && styles.active,
                     )}
                   >
-                    {menuItem?.subMenuItems?.map((subMenuItem: IMenuItem, index: number) => (
+                    {menuItem?.subMenuItems?.map((subMenuItem: IMenuItem) => (
                       <Menu.Item
                         key={subMenuItem.key}
                         className={cx(
                           styles.sidenavItem,
+                          !isOpen && menuItem.isExpanded && styles.hideSubMenu,
                           currentMenuItem === subMenuItem?.key && styles.active,
                         )}
                         title={$t(menuItem.title)}
@@ -304,6 +304,7 @@ export default function SideNav() {
                           key={app.id}
                           className={cx(
                             styles.sidenavItem,
+                            !isOpen && menuItem.isExpanded && styles.hideSubMenu,
                             currentMenuItem === menuItem?.key && styles.active,
                           )}
                           title={app.name}
@@ -333,36 +334,35 @@ export default function SideNav() {
                 );
               }
             })}
-            {showSidebarApps && apps.length > 0 && (
+            {showSidebarApps &&
+              apps.length > 0 &&
               // apps shown in sidebar
-              <>
-                {apps.map(
-                  app =>
-                    app.isActive && (
-                      <Menu.Item
-                        key={app?.id}
-                        className={cx(
-                          styles.sidenavItem,
-                          !isOpen && styles.closed,
-                          isOpen && styles.open,
-                          currentMenuItem === app?.id && styles.active,
-                        )}
-                        title={app.name}
-                        icon={
-                          app?.icon && app?.id ? (
-                            <img src={iconSrc(app?.id, app.icon)} className={styles.appIcons} />
-                          ) : (
-                            <i className="icon-integrations" />
-                          )
-                        }
-                        onClick={() => app?.id && navigateApp(app?.id)}
-                      >
-                        {app?.name}
-                      </Menu.Item>
-                    ),
-                )}
-              </>
-            )}
+              apps.map(
+                app =>
+                  app.isActive && (
+                    <Menu.Item
+                      key={app?.id}
+                      className={cx(
+                        styles.sidenavItem,
+                        !isOpen && styles.closed,
+                        isOpen && styles.open,
+                        currentMenuItem === app?.id && styles.active,
+                      )}
+                      title={app.name}
+                      icon={
+                        app?.icon && app?.id ? (
+                          <img src={iconSrc(app?.id, app.icon)} className={styles.appIcons} />
+                        ) : (
+                          <i className="icon-integrations" />
+                        )
+                      }
+                      onClick={() => app?.id && navigateApp(app?.id)}
+                      style={{ border: '1px solid red' }}
+                    >
+                      {app?.name}
+                    </Menu.Item>
+                  ),
+              )}
           </Menu>
 
           {/* show the bottom navigation menu */}

@@ -16,7 +16,6 @@ export default function PlatformAppStore(p: {
       openLinkInBrowser,
       onPaypalAuthSuccess,
       navigateToApp,
-      navigateToAppManager,
     });
 
     view.webContents.on('did-finish-load', () => {
@@ -40,11 +39,6 @@ export default function PlatformAppStore(p: {
 
   async function navigateToApp(appId: string) {
     NavigationService.actions.navigate('PlatformAppMainPage', { appId });
-  }
-
-  // TODO: Is this needed?
-  async function navigateToAppManager(path: string) {
-    NavigationService.actions.navigate('PlatformAppMainPage', { path });
   }
 
   return (

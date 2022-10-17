@@ -855,7 +855,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     if (this.sideNavService.views.hasLegacyMenu) {
       this.sideNavService.setLegacyView();
     } else {
-      this.sideNavService.setCompactView(true);
+      this.sideNavService.setNewUserLogin();
     }
 
     this.dismissablesService.dismiss(EDismissable.LoginPrompt);
