@@ -131,7 +131,6 @@ export default function SideNav() {
                 icon={<i className="icon-developer" />}
                 onClick={openDevTools}
               >
-                {'TEST TEST TEST TEST TEST'}
                 {menuItem.title}
               </Menu.Item>
             );
