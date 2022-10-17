@@ -241,7 +241,8 @@ class UserViews extends ViewHandler<IUserServiceState> {
     return `${url}?token=${token}&mode=${nightMode}`;
   }
 
-  overlaysUrl(type?: 'overlay' | 'widget-theme' | 'site-theme', id?: string) {
+  // TODO: add 'site-theme' or whichever is needed to go to the site tab
+  overlaysUrl(type?: 'overlay' | 'widget-theme', id?: string) {
     const uiTheme = this.customizationServiceViews.isDarkTheme ? 'night' : 'day';
     let url = `https://${this.hostsService.streamlabs}/library?mode=${uiTheme}&slobs`;
 
@@ -258,6 +259,8 @@ class UserViews extends ViewHandler<IUserServiceState> {
     if (type && id) {
       url += `#/?type=${type}&id=${id}`;
     }
+
+    console.log('URL ', url);
 
     return url;
   }

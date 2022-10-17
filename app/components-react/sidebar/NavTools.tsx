@@ -3,16 +3,14 @@ import cx from 'classnames';
 import electron from 'electron';
 import Utils from 'services/utils';
 import { $t } from 'services/i18n';
-import { EDismissable } from 'services/dismissables';
 import throttle from 'lodash/throttle';
 import { Services } from '../service-provider';
 import { useVuex } from '../hooks';
 import styles from './NavTools.m.less';
 import * as remote from '@electron/remote';
-import { Badge, Menu, Typography, Divider } from 'antd';
+import { Badge, Menu, Typography } from 'antd';
 import { EMenuItem, ENavName, IMenuItem, IParentMenuItem } from 'services/side-nav';
 import PlatformLogo from 'components-react/shared/PlatformLogo';
-import HelpTip from 'components-react/shared/HelpTip';
 
 export default function SideNav() {
   const {
@@ -116,105 +114,111 @@ export default function SideNav() {
   };
 
   return (
-    <Menu
-      key={ENavName.BottomNav}
-      forceSubMenuRender
-      mode="inline"
-      className={cx(styles.bottomNav, !isOpen && styles.closed)}
-      defaultOpenKeys={openMenuItems && openMenuItems}
-    >
-      <Divider key="divider-1" className={styles.divider} />
-      {isDevMode && (
-        <Menu.Item
-          key={'dev-tools'}
-          title={EMenuItem.DevTools}
-          icon={<i className="icon-developer" />}
-          onClick={openDevTools}
-        >
-          {EMenuItem.DevTools}
-        </Menu.Item>
-      )}
-
-      {menuItems.map((menuItem: IParentMenuItem) => (
-        <>
-          {isLoggedIn && !isPrime && menuItem.title === EMenuItem.GetPrime && (
-            <Menu.Item
-              key={menuItem.key}
-              title={$t(menuItem.title)}
-              icon={
-                <div>
-                  <Badge count={<i className={cx('icon-pop-out-3', styles.linkBadge)} />}>
-                    <i className={menuItem.icon} />
-                  </Badge>
-                </div>
-              }
-              onClick={upgradeToPrime}
-              className={styles.badgeScale}
-            >
-              <>{$t(menuItem.title)}</>
-            </Menu.Item>
-          )}
-          {isLoggedIn && isPrime && menuItem.title === EMenuItem.Dashboard && (
-            <Menu.SubMenu
-              key={menuItem.key}
-              title={$t(menuItem.title)}
-              icon={
-                <div>
-                  <Badge count={<i className={cx('icon-pop-out-3', styles.linkBadge)} />}>
-                    <i className={menuItem.icon} />
-                  </Badge>
-                </div>
-              }
-              onTitleClick={() => {
-                !isOpen && throttledOpenDashboard();
-                expandMenuItem(ENavName.BottomNav, menuItem.title as EMenuItem);
-              }}
-              className={styles.badgeScale}
-            >
-              {menuItem?.subMenuItems.map((subMenuItem: IMenuItem) => (
-                <Menu.Item
-                  key={subMenuItem.key}
-                  title={$t(subMenuItem.title)}
-                  onClick={() => throttledOpenDashboard(subMenuItem?.target)}
-                >
-                  {$t(subMenuItem.title)}
-                </Menu.Item>
-              ))}
-            </Menu.SubMenu>
-          )}
-          {menuItem.title === EMenuItem.GetHelp && (
-            <Menu.Item
-              key={menuItem.key}
-              title={$t(menuItem.title)}
-              icon={
-                <div>
-                  <Badge count={<i className={cx('icon-pop-out-3', styles.linkBadge)} />}>
-                    <i className={menuItem?.icon} />
-                  </Badge>
-                </div>
-              }
-              onClick={() => openHelp()}
-            >
-              {$t(menuItem.title)}
-            </Menu.Item>
-          )}
-          {menuItem.title === EMenuItem.Settings && (
-            <Menu.Item
-              key={menuItem.key}
-              title={$t(menuItem.title)}
-              icon={<i className={menuItem?.icon} />}
-              onClick={openSettingsWindow}
-            >
-              {$t(EMenuItem.Settings)}
-            </Menu.Item>
-          )}
-          {menuItem.title === EMenuItem.Login && (
-            <>
-              <Divider key="divider-2" className={styles.loginDivider} />
+    <>
+      <Menu
+        key={ENavName.BottomNav}
+        forceSubMenuRender
+        mode="inline"
+        className={cx(styles.bottomNav, !isOpen && styles.closed, isOpen && styles.open)}
+        defaultOpenKeys={openMenuItems && openMenuItems}
+      >
+        {menuItems.map((menuItem: IParentMenuItem) => {
+          if (isDevMode && menuItem.title === EMenuItem.DevTools) {
+            return (
+              <Menu.Item
+                key={menuItem.key}
+                title={menuItem.title}
+                icon={<i className="icon-developer" />}
+                onClick={openDevTools}
+              >
+                {'TEST TEST TEST TEST TEST'}
+                {menuItem.title}
+              </Menu.Item>
+            );
+          } else if (isLoggedIn && !isPrime && menuItem.title === EMenuItem.GetPrime) {
+            return (
+              <Menu.Item
+                key={menuItem.key}
+                title={$t(menuItem.title)}
+                icon={
+                  <div>
+                    <Badge count={<i className={cx('icon-pop-out-3', styles.linkBadge)} />}>
+                      <i className={menuItem.icon} />
+                    </Badge>
+                  </div>
+                }
+                onClick={upgradeToPrime}
+                className={styles.badgeScale}
+              >
+                {$t(menuItem.title)}
+              </Menu.Item>
+            );
+          } else if (isLoggedIn && menuItem.title === EMenuItem.Dashboard) {
+            return (
+              <Menu.SubMenu
+                key={menuItem.key}
+                title={$t(menuItem.title)}
+                icon={
+                  <div>
+                    <Badge count={<i className={cx('icon-pop-out-3', styles.linkBadge)} />}>
+                      <i className={menuItem.icon} />
+                    </Badge>
+                  </div>
+                }
+                onTitleClick={() => {
+                  !isOpen && throttledOpenDashboard();
+                  expandMenuItem(ENavName.BottomNav, menuItem.title as EMenuItem);
+                }}
+                className={styles.badgeScale}
+              >
+                {menuItem?.subMenuItems.map((subMenuItem: IMenuItem) => (
+                  <Menu.Item
+                    key={subMenuItem.key}
+                    title={$t(subMenuItem.title)}
+                    onClick={() => throttledOpenDashboard(subMenuItem?.type)}
+                  >
+                    {'TEST TEST TEST TEST TEST'}
+                    {'TEST TEST TEST TEST TEST'}
+                    {'TEST TEST TEST TEST TEST'}
+                    {$t(subMenuItem.title)}
+                  </Menu.Item>
+                ))}
+              </Menu.SubMenu>
+            );
+          } else if (menuItem.title === EMenuItem.GetHelp) {
+            return (
+              <Menu.Item
+                key={menuItem.key}
+                title={$t(menuItem.title)}
+                icon={
+                  <div>
+                    <Badge count={<i className={cx('icon-pop-out-3', styles.linkBadge)} />}>
+                      <i className={menuItem?.icon} />
+                    </Badge>
+                  </div>
+                }
+                onClick={() => openHelp()}
+              >
+                {$t(menuItem.title)}
+              </Menu.Item>
+            );
+          } else if (menuItem.title === EMenuItem.Settings) {
+            return (
+              <Menu.Item
+                key={menuItem.key}
+                title={$t(menuItem.title)}
+                icon={<i className={menuItem?.icon} />}
+                onClick={openSettingsWindow}
+              >
+                {$t(EMenuItem.Settings)}
+              </Menu.Item>
+            );
+          } else if (menuItem.title === EMenuItem.Login) {
+            return (
               <Menu.Item
                 key={menuItem.key}
                 title={!isLoggedIn ? $t(EMenuItem.Login) : $t('Log Out')}
-                className={styles.login}
+                className={cx(styles.login, !isOpen && styles.loginClosed)}
                 icon={!isOpen && <i className="icon-user" />}
                 onClick={() => handleAuth()}
               >
@@ -242,10 +246,10 @@ export default function SideNav() {
                   )
                 )}
               </Menu.Item>
-            </>
-          )}
-        </>
-      ))}
-    </Menu>
+            );
+          }
+        })}
+      </Menu>
+    </>
   );
 }

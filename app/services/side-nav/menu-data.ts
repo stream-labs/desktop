@@ -1,16 +1,44 @@
 import { TAppPage } from 'services/navigation';
 
-type TExternalLinkParam =
+export enum EMenuItemKey {
+  Editor = 'editor',
+  LayoutEditor = 'layout-editor',
+  StudioMode = 'studio-mode',
+  Themes = 'themes',
+  AppStore = 'app-store',
+  Highlighter = 'highlighter',
+  ThemeAudit = 'theme-audit',
+  DevTools = 'dev-tools',
+  GetPrime = 'get-prime',
+  Dashboard = 'dashboard',
+  GetHelp = 'get-help',
+  Settings = 'settings',
+  Login = 'login',
+  Scene = 'browse-overlays',
+  AlertBoxLibrary = 'alertbox-library',
+  Widget = 'browse-overlays-widgets',
+  Sites = 'browse-overlays-sites',
+  AppsStoreHome = 'platform-app-store-home',
+  AppsManager = 'platform-app-store-manager',
+  DashboardHome = 'dashboard-home',
+  Cloudbot = 'dashboard-cloudbot',
+  AlertBoxSettings = 'dashboard-alertbox',
+  Widgets = 'dashboard-widgets',
+  TipSettings = 'dashboard-tips',
+  Multistream = 'dashboard-multistream',
+}
+
+export type TExternalLinkType =
   | 'overlay'
-  | 'widget-theme'
-  | 'site-theme'
+  | 'widget-theme' // TODO: confirm param
+  | 'site-theme' // TODO: confirm param
   | 'cloudbot'
   | 'alertbox'
   | 'widgets'
-  | 'tipping'
-  | 'multistream';
+  | 'tipping/methods'
+  | 'multistream/settings';
 
-type TSideNavItem = TAppPage | TExternalLinkParam | 'NavTools' | 'WidgetWindow' | string;
+type TSideNavItem = TAppPage | TExternalLinkType | 'NavTools' | 'WidgetWindow' | string;
 
 export interface IAppMenuItem {
   id?: string;
@@ -27,7 +55,7 @@ export interface IMenu {
 export interface IMenuItem {
   key: TSideNavItem;
   target?: TSideNavItem; // optional because menu item could be a toggle
-  type?: TExternalLinkParam | string;
+  type?: TExternalLinkType | string;
   title: string;
   trackingTarget?: string;
   icon?: string;
@@ -109,7 +137,7 @@ export type TMenuItems = {
 // so that the menu can apply open menu items on startup
 export const SideNavMenuItems = (): TMenuItems => ({
   [EMenuItem.Editor]: {
-    key: EMenuItem.Editor,
+    key: EMenuItemKey.Editor,
     target: 'Studio',
     title: EMenuItem.Editor,
     trackingTarget: 'editor',
@@ -118,7 +146,7 @@ export const SideNavMenuItems = (): TMenuItems => ({
     isExpanded: false,
   },
   [EMenuItem.LayoutEditor]: {
-    key: EMenuItem.LayoutEditor,
+    key: EMenuItemKey.LayoutEditor,
     target: 'LayoutEditor',
     title: EMenuItem.LayoutEditor,
     trackingTarget: 'layout-editor',
@@ -127,14 +155,14 @@ export const SideNavMenuItems = (): TMenuItems => ({
     isExpanded: false,
   },
   [EMenuItem.StudioMode]: {
-    key: EMenuItem.StudioMode,
+    key: EMenuItemKey.StudioMode,
     title: EMenuItem.StudioMode,
     icon: 'icon-studio-mode-3',
     isActive: true,
     isExpanded: false,
   },
   [EMenuItem.Themes]: {
-    key: EMenuItem.Themes,
+    key: EMenuItemKey.Themes,
     target: 'BrowseOverlays',
     title: EMenuItem.Themes,
     trackingTarget: 'themes',
@@ -150,7 +178,7 @@ export const SideNavMenuItems = (): TMenuItems => ({
   },
 
   [EMenuItem.AppStore]: {
-    key: EMenuItem.AppStore,
+    key: EMenuItemKey.AppStore,
     target: 'PlatformAppStore',
     title: EMenuItem.AppStore,
     trackingTarget: 'app-store',
@@ -163,7 +191,7 @@ export const SideNavMenuItems = (): TMenuItems => ({
     isExpanded: false,
   },
   [EMenuItem.Highlighter]: {
-    key: EMenuItem.Highlighter,
+    key: EMenuItemKey.Highlighter,
     target: 'Highlighter',
     icon: 'icon-highlighter',
     title: EMenuItem.Highlighter,
@@ -172,7 +200,7 @@ export const SideNavMenuItems = (): TMenuItems => ({
     isExpanded: false,
   },
   [EMenuItem.ThemeAudit]: {
-    key: EMenuItem.ThemeAudit,
+    key: EMenuItemKey.ThemeAudit,
     target: 'ThemeAudit',
     icon: 'fas fa-exclamation-triangle',
     title: EMenuItem.ThemeAudit,
@@ -181,22 +209,22 @@ export const SideNavMenuItems = (): TMenuItems => ({
     isExpanded: false,
   },
   [EMenuItem.DevTools]: {
-    key: EMenuItem.DevTools,
+    key: EMenuItemKey.DevTools,
     title: EMenuItem.DevTools,
-    trackingTarget: 'editor',
+    trackingTarget: 'devtools',
     icon: 'icon-developer',
     isActive: true, // showing/hiding is handled in the SideNav component
     isExpanded: false,
   },
   [EMenuItem.GetPrime]: {
-    key: EMenuItem.GetPrime,
+    key: EMenuItemKey.GetPrime,
     title: EMenuItem.GetPrime,
     icon: 'icon-prime',
     isActive: true,
     isExpanded: false,
   },
   [EMenuItem.Dashboard]: {
-    key: EMenuItem.Dashboard,
+    key: EMenuItemKey.Dashboard,
     title: EMenuItem.Dashboard,
     icon: 'icon-dashboard',
     isActive: true,
@@ -211,21 +239,21 @@ export const SideNavMenuItems = (): TMenuItems => ({
     isExpanded: false,
   },
   [EMenuItem.GetHelp]: {
-    key: EMenuItem.GetHelp,
+    key: EMenuItemKey.GetHelp,
     title: EMenuItem.GetHelp,
     icon: 'icon-question',
     isActive: true,
     isExpanded: false,
   },
   [EMenuItem.Settings]: {
-    key: EMenuItem.Settings,
+    key: EMenuItemKey.Settings,
     title: EMenuItem.Settings,
     icon: 'icon-settings',
     isActive: true,
     isExpanded: false,
   },
   [EMenuItem.Login]: {
-    key: EMenuItem.Login,
+    key: EMenuItemKey.Login,
     title: EMenuItem.Login,
     icon: 'icon-user',
     isActive: true,
@@ -239,7 +267,7 @@ type TSubMenuItems = {
 
 export const SideBarSubMenuItems = (): TSubMenuItems => ({
   [ESubMenuItem.Scene]: {
-    key: ESubMenuItem.Scene,
+    key: EMenuItemKey.Scene,
     target: 'BrowseOverlays',
     type: 'overlays',
     title: ESubMenuItem.Scene,
@@ -247,14 +275,14 @@ export const SideBarSubMenuItems = (): TSubMenuItems => ({
     isExpanded: false,
   },
   [ESubMenuItem.AlertBoxLibrary]: {
-    key: `${ESubMenuItem.AlertBoxLibrary} Library`,
+    key: EMenuItemKey.AlertBoxLibrary,
     target: 'AlertboxLibrary',
     title: ESubMenuItem.AlertBoxLibrary,
     trackingTarget: 'alertbox-library',
     isExpanded: false,
   },
   [ESubMenuItem.Widget]: {
-    key: ESubMenuItem.Widget,
+    key: EMenuItemKey.Widget,
     target: 'BrowseOverlays',
     type: 'widget-theme',
     title: ESubMenuItem.Widget,
@@ -262,7 +290,7 @@ export const SideBarSubMenuItems = (): TSubMenuItems => ({
     isExpanded: false,
   },
   [ESubMenuItem.Sites]: {
-    key: ESubMenuItem.Sites,
+    key: EMenuItemKey.Sites,
     target: 'BrowseOverlays',
     type: 'site-theme',
     title: ESubMenuItem.Sites,
@@ -271,14 +299,14 @@ export const SideBarSubMenuItems = (): TSubMenuItems => ({
     isExpanded: false,
   },
   [ESubMenuItem.AppsStoreHome]: {
-    key: ESubMenuItem.AppsStoreHome,
+    key: EMenuItemKey.AppsStoreHome,
     target: 'PlatformAppStore',
     title: ESubMenuItem.AppsStoreHome,
     trackingTarget: 'app-store',
     isExpanded: false,
   },
   [ESubMenuItem.AppsManager]: {
-    key: ESubMenuItem.AppsManager,
+    key: EMenuItemKey.AppsManager,
     target: 'PlatformAppStore',
     title: ESubMenuItem.AppsManager,
     type: 'profile',
@@ -286,42 +314,42 @@ export const SideBarSubMenuItems = (): TSubMenuItems => ({
     isExpanded: false,
   },
   [ESubMenuItem.DashboardHome]: {
-    key: ESubMenuItem.DashboardHome,
+    key: EMenuItemKey.DashboardHome,
     title: ESubMenuItem.DashboardHome,
     trackingTarget: 'dashboard',
     isExpanded: false,
   },
   [ESubMenuItem.Cloudbot]: {
-    key: ESubMenuItem.Cloudbot,
-    target: 'cloudbot',
+    key: EMenuItemKey.Cloudbot,
+    type: 'cloudbot',
     title: ESubMenuItem.Cloudbot,
     trackingTarget: 'dashboard',
     isExpanded: false,
   },
   [ESubMenuItem.AlertBoxSettings]: {
-    key: ESubMenuItem.AlertBoxSettings,
-    target: 'alertbox',
+    key: EMenuItemKey.AlertBoxSettings,
+    type: 'alertbox',
     title: ESubMenuItem.AlertBoxSettings,
     trackingTarget: 'dashboard',
     isExpanded: false,
   },
   [ESubMenuItem.Widgets]: {
-    key: ESubMenuItem.Widgets,
-    target: 'widgets',
+    key: EMenuItemKey.Widgets,
+    type: 'widgets',
     title: ESubMenuItem.Widgets,
     trackingTarget: 'dashboard',
     isExpanded: false,
   },
   [ESubMenuItem.TipSettings]: {
-    key: ESubMenuItem.TipSettings,
-    target: 'tipping',
+    key: EMenuItemKey.TipSettings,
+    type: 'tipping',
     title: ESubMenuItem.TipSettings,
     trackingTarget: 'dashboard',
     isExpanded: false,
   },
   [ESubMenuItem.Multistream]: {
-    key: ESubMenuItem.Multistream,
-    target: 'multistream',
+    key: EMenuItemKey.Multistream,
+    type: 'multistream',
     title: ESubMenuItem.Multistream,
     trackingTarget: 'dashboard',
     isExpanded: false,

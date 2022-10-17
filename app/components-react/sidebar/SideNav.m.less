@@ -101,7 +101,7 @@ button.sidenav-button {
 
   :global(.ant-menu-item-icon) {
     i {
-      font-size: 18px;
+      font-size: 18px !important;
     }
   }
 
@@ -118,11 +118,6 @@ button.sidenav-button {
   :global(li.ant-menu-item.ant-menu-item-selected),
   :global(li.ant-menu-submenu.ant-menu-item-selected) {
     background: none;
-    color: var(--teal) !important;
-
-    i {
-      color: var(--teal) !important;
-    }
 
     &::after {
       display: none;
@@ -133,6 +128,10 @@ button.sidenav-button {
   :global(li.ant-menu-submenu) {
     background: none;
     color: var(--paragraph);
+    height: unset !important;
+    min-height: 30px !important;
+    line-height: normal !important;
+    margin: 10px 0 !important;
 
     i {
       color: var(--paragraph);
@@ -158,67 +157,22 @@ button.sidenav-button {
         transform: scale(1.2, 1.2);
       }
     }
+
+    :global(span.ant-menu-title-content) {
+      display: none !important;
+    }
   }
 
-  // :global(.ant-menu-item:hover) {
-  //   i {
-  //     transition: transform 0.2s;
-  //     color: var(--title);
-  //     fill: var(--title);
-  //     transform: scale(1.2, 1.2);
-  //   }
-  // }
-
-  // :global(.ant-menu-submenu:hover) {
-  //   i {
-  //     transition: transform 0.2s;
-  //     color: var(--title);
-  //     fill: var(--title);
-  //     transform: scale(1.2, 1.2);
-  //   }
-  // }
-
-  // &:global(.ant-menu-item-selected) &:global(.ant-menu-item-active) {
-  //   background-color: var(--background);
-  //   color: var(--teal);
-  // }
-  // }
-
-  // TODO: word wrap and height on menu items
-  // for word wrap, need to add class to menu items
-
-  // li {
-  //   min-height: 40px;
-  //   height: fit-content;
-  // }
-
-  // border: none !important;
-
-  // :global(.ant-menu-item) & :global(.ant-menu-inline .ant-menu-item) {
-  //   min-height: 40px;
-  //   height: fit-content;
-  // }
-
-  // :global(.ant-menu-inline.ant-menu-root .ant-menu-item > .ant-menu-title-content) {
-  //   color: red;
-  // }
-
-  // :global(.ant-menu-title-content) {
-  //   overflow: visible;
-  //   overflow-wrap: break-word;
-  //   word-wrap: break-word;
-  //   text-overflow: '-';
-  // }
-
-  // :global(.ant-menu-vertical) {
-  //   height: auto;
-  // }
-
-  // :global(.ant-menu-item) {
-  //   height: auto;
-  // }
-
-  // height: auto;
+  &.open {
+    :global(li.ant-menu-item),
+    :global(li.ant-menu-submenu) {
+      overflow: unset !important;
+      text-overflow: unset !important;
+      overflow-wrap: break-word !important;
+      padding-bottom: 0px;
+      white-space: normal !important;
+    }
+  }
 }
 
 .studio-mode {
@@ -239,23 +193,6 @@ button.sidenav-button {
   }
 }
 
-.new-badge {
-  // TODO: styling for other languages
-  background: var(--new-badge-text);
-  color: var(--titlebar);
-  font-size: 9px;
-  position: absolute;
-  left: 20px;
-  top: calc(100% / 2);
-  padding: 0 2px;
-  margin: 8px 0;
-  line-height: 12px;
-  font-weight: 600;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
 .ant-menu-inline-collapsed-tooltip {
   display: none;
 }
@@ -274,154 +211,3 @@ button.sidenav-button {
   height: 25px;
   transform: translate(-18%, 0%);
 }
-/* ^^^ */
-
-// .cell {
-//   display: flex;
-//   height: 46px;
-//   position: relative;
-//   flex-shrink: 0;
-//   font-size: 16px;
-
-//   i,
-//   svg {
-//     margin: auto;
-//     display: block;
-//   }
-
-//   svg {
-//     fill: var(--paragraph);
-//   }
-
-//   &:hover {
-//     cursor: pointer;
-
-//     svg,
-//     i:not(.link-badge) {
-//       transition: transform 0.2s;
-//       color: var(--title);
-//       fill: var(--title);
-//       transform: scale(1.2, 1.2);
-//     }
-//   }
-
-//   &.prime-cell {
-//     i:not(.link-badge) {
-//       color: var(--prime);
-//     }
-//   }
-
-//   :global(.ant-badge) {
-//     margin: auto;
-//   }
-// }
-
-// .primary-tab {
-//   position: relative;
-
-//   .studio-dropdown {
-//     position: absolute;
-//     bottom: 2px;
-//     right: 4px;
-//     font-size: 10px;
-//     color: var(--title);
-
-//     &.studio-dropdown-active {
-//       color: var(--teal);
-//     }
-//   }
-// }
-
-// .studio-tabs {
-//   max-height: 230px;
-//   position: absolute;
-//   top: 46px;
-//   left: 0;
-//   overflow-y: auto;
-//   background-color: var(--studio-tabs);
-//   z-index: 10;
-//   border-radius: 15px;
-
-//   &::-webkit-scrollbar {
-//     display: none;
-//   }
-// }
-
-// .main-cell {
-//   .cell;
-
-//   svg {
-//     width: 16px;
-//     height: 16px;
-//   }
-
-//   &.active {
-//     i,
-//     svg {
-//       transform: scale(1.2, 1.2);
-//       color: var(--teal);
-//       fill: var(--teal);
-//     }
-//   }
-
-//   &.disabled {
-//     &:hover {
-//       cursor: not-allowed;
-//       background: transparent;
-//     }
-//   }
-// }
-
-// .cell.toggle-on {
-//   i {
-//     color: var(--teal);
-//   }
-// }
-
-// li.sidenav-item {
-//   // background-color: var(--background);
-//   // border: none !important;
-
-//   &.ant-menu-item-selected.ant-menu-item {
-//     background-color: red !important;
-//   }
-
-//   :global(.ant-menu:not(.ant-menu-horizontal).ant-menu-item-selected) {
-//     background-color: red !important;
-//   }
-
-//   > .ant-menu-title-content::after {
-//     border: 0px !important;
-//   }
-
-//   :global(.ant-menu-inline) {
-//     content: none;
-//   }
-
-//   :global(.ant-menu-item::after) {
-//     content: none;
-//   }
-
-// &.ant-menu-item.ant-menu-item-selected {
-//   background-color: red !important;
-//   border: none !important;
-// }
-
-// :global(.ant-menu:not(.ant-menu-horizontal).ant-menu-item-selected) {
-//   background-color: none !important;
-//   border: none !important;
-// }
-// &::after {
-//   border: 0px;
-// }
-// }
-
-// li.ant-menu-item {
-//   &::after {
-//     content: none;
-//   }
-// }
-
-// li.sidenav-item > ::after {
-//   content: none;
-// }

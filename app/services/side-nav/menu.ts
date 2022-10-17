@@ -12,7 +12,7 @@ import {
   IAppMenuItem,
   SideBarTopNavData,
   SideBarBottomNavData,
-  ESubMenuItem,
+  EMenuItemKey,
 } from './menu-data';
 
 interface ISideNavServiceState {
@@ -21,7 +21,7 @@ interface ISideNavServiceState {
   hasLegacyMenu: boolean;
   showSidebarApps: boolean;
   compactView: boolean;
-  currentMenuItem: EMenuItem | ESubMenuItem;
+  currentMenuItem: EMenuItemKey | string;
   menuItems: TMenuItems;
   apps: {
     [appId: string]: IAppMenuItem;
@@ -45,6 +45,10 @@ class SideNavViews extends ViewHandler<ISideNavServiceState> {
 
   get hasLegacyMenu() {
     return this.state.hasLegacyMenu;
+  }
+
+  get currentMenuItem() {
+    return this.state.currentMenuItem;
   }
 
   get apps() {
@@ -71,9 +75,9 @@ class SideNavViews extends ViewHandler<ISideNavServiceState> {
 
   getExpandedMenuItems(name: ENavName) {
     if (!name) return;
-    return this.state[name].menuItems.reduce((keys, menuItem: IMenuItem) => {
+    return Object.values(this.state.menuItems).reduce((keys, menuItem: IMenuItem) => {
       if (menuItem.isExpanded) {
-        keys.push(menuItem.title as string);
+        keys.push(menuItem.key);
       }
       return keys;
     }, []);
@@ -91,7 +95,7 @@ export class SideNavService extends PersistentStatefulService<ISideNavServiceSta
     showCustomEditor: true,
     hasLegacyMenu: true,
     showSidebarApps: true,
-    currentMenuItem: EMenuItem.Editor,
+    currentMenuItem: EMenuItemKey.Editor,
     compactView: false,
     menuItems: SideNavMenuItems(),
     apps: {},
@@ -141,6 +145,8 @@ export class SideNavService extends PersistentStatefulService<ISideNavServiceSta
       }
       this.setLoggedOutMenu();
     }
+
+    this.state.currentMenuItem = EMenuItemKey.Editor;
   }
 
   get views() {
@@ -153,6 +159,10 @@ export class SideNavService extends PersistentStatefulService<ISideNavServiceSta
 
   toggleMenuStatus() {
     this.OPEN_CLOSE_MENU();
+  }
+
+  setCurrentMenuItem(key: EMenuItemKey | string) {
+    this.SET_CURRENT_MENU_ITEM(key);
   }
 
   setCompactView(isCompact: boolean) {
@@ -336,10 +346,11 @@ export class SideNavService extends PersistentStatefulService<ISideNavServiceSta
 
   @mutation()
   private EXPAND_MENU_ITEM(navName: ENavName, menuItemName: EMenuItem) {
-    this.state[navName].menuItems.find(
-      (menuItem: IMenuItem) => menuItem.title === menuItemName,
-    ).isExpanded = !this.state[navName].menuItems.find(
-      (menuItem: IMenuItem) => menuItem.title === menuItemName,
-    ).isExpanded;
+    this.state.menuItems[menuItemName].isExpanded = !this.state.menuItems[menuItemName].isExpanded;
+  }
+
+  @mutation()
+  private SET_CURRENT_MENU_ITEM(key: EMenuItemKey | string) {
+    this.state.currentMenuItem = key;
   }
 }

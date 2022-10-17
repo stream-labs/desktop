@@ -90,9 +90,8 @@ export function AppearanceSettings() {
     remote.shell.openExternal(link);
   }
 
-  const shouldShowPrime = UserService.views.isLoggedIn && !UserService.views.isPrime;
-  const shouldShowEmoteSettings =
-    UserService.views.isLoggedIn && getDefined(UserService.platform).type === 'twitch';
+  const shouldShowPrime = isLoggedIn && !isPrime;
+  const shouldShowEmoteSettings = isLoggedIn && getDefined(UserService.platform).type === 'twitch';
 
   /**
    * Sort apps
@@ -201,21 +200,21 @@ export function AppearanceSettings() {
               layout="horizontal"
               onChange={() => toggleSidebarSubMenu()}
               value={isLoggedIn && showCustomEditor}
-              disabled={!isLoggedIn || compactView}
+              disabled={!isLoggedIn}
             />
             <SwitchInput
               label={$t(EMenuItem.StudioMode)}
               layout="horizontal"
               onChange={() => toggleMenuItem(ENavName.TopNav, EMenuItem.StudioMode)}
               value={menuItems[EMenuItem.StudioMode].isActive}
-              disabled={!isLoggedIn || compactView}
+              disabled={!isLoggedIn}
             />
             <SwitchInput
               label={$t(EMenuItem.LayoutEditor)}
               layout="horizontal"
               onChange={() => toggleMenuItem(ENavName.TopNav, EMenuItem.LayoutEditor)}
               value={menuItems[EMenuItem.LayoutEditor].isActive}
-              disabled={!isLoggedIn || compactView}
+              disabled={!isLoggedIn}
             />
             <SwitchInput
               label={$t(EMenuItem.Themes)}

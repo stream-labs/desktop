@@ -2,7 +2,13 @@ import React, { useMemo, useLayoutEffect, useRef } from 'react';
 import ResizeObserver from 'resize-observer-polyfill';
 import cx from 'classnames';
 import { TAppPage } from 'services/navigation';
-import { ENavName, EMenuItem, IMenuItem, IParentMenuItem } from 'services/side-nav';
+import {
+  ENavName,
+  EMenuItem,
+  IMenuItem,
+  IParentMenuItem,
+  TExternalLinkType,
+} from 'services/side-nav';
 import { EAvailableFeatures } from 'services/incremental-rollout';
 import { $t } from 'services/i18n';
 import { Services } from 'components-react/service-provider';
@@ -14,7 +20,6 @@ import Scrollable from 'components-react/shared/Scrollable';
 import HelpTip from 'components-react/shared/HelpTip';
 import NewButton from 'components-react/shared/NewButton';
 import { EDismissable } from 'services/dismissables';
-import { table } from 'console';
 
 const { Sider } = Layout;
 
@@ -33,12 +38,7 @@ export default function SideNav() {
     DismissablesService,
   } = Services;
 
-  function navigate(
-    page: TAppPage,
-    trackingTarget?: string,
-    // type?: TODO: 'overlay' | 'widget-theme' | 'site-theme', etc.
-    type?: string,
-  ) {
+  function navigate(page: TAppPage, trackingTarget?: string, type?: TExternalLinkType | string) {
     console.log('type ', type);
     if (!UserService.views.isLoggedIn && page !== 'Studio') return;
 
@@ -56,14 +56,16 @@ export default function SideNav() {
     // LayoutService.actions.setCurrentTab(page as string);
   }
 
-  function navigateApp(appId: string) {
+  function navigateApp(appId: string, key?: string) {
     NavigationService.actions.navigate('PlatformAppMainPage', { appId });
     LayoutService.actions.setCurrentTab(appId);
+    setCurrentMenuItem(key ?? appId);
   }
 
-  function navigateToStudioTab(tabId: string, trackingTarget: string) {
+  function navigateToStudioTab(tabId: string, trackingTarget: string, key: string) {
     NavigationService.actions.navigate('Studio', { trackingTarget });
     LayoutService.actions.setCurrentTab(tabId);
+    setCurrentMenuItem(key);
   }
 
   function iconSrc(appId: string, path: string) {
@@ -79,8 +81,23 @@ export default function SideNav() {
     }
   }
 
+  function handleNavigation(menuItem: IMenuItem, key?: string) {
+    if (menuItem.title === EMenuItem.StudioMode) {
+      // if studio mode, toggle studio mode
+      toggleStudioMode();
+      return;
+    } else if (menuItem?.target && menuItem?.type) {
+      navigate(menuItem?.target as TAppPage, menuItem?.trackingTarget, menuItem?.type);
+    } else if (menuItem?.target) {
+      navigate(menuItem?.target as TAppPage, menuItem?.trackingTarget);
+    }
+    setCurrentMenuItem(key ?? menuItem.key);
+  }
+
   const {
     featureIsEnabled,
+    currentMenuItem,
+    setCurrentMenuItem,
     currentPage, // TODO: tracking & styling for currentPage
     tabs,
     leftDock,
@@ -98,12 +115,12 @@ export default function SideNav() {
     hideStyleBlockers,
     dismiss,
     showNewBadge,
-    compactView,
-    setCompactView,
   } = useVuex(() => ({
     featureIsEnabled: (feature: EAvailableFeatures) =>
       IncrementalRolloutService.views.featureIsEnabled(feature),
     currentPage: NavigationService.state.currentPage,
+    currentMenuItem: SideNavService.state.currentMenuItem,
+    setCurrentMenuItem: SideNavService.actions.setCurrentMenuItem,
     tabs: LayoutService.state.tabs,
     leftDock: CustomizationService.state.leftDock,
     showSidebarApps: SideNavService.views.showSidebarApps,
@@ -122,11 +139,9 @@ export default function SideNav() {
     showNewBadge:
       DismissablesService.views.shouldShow(EDismissable.NewSideNav) &&
       SideNavService.views.hasLegacyMenu,
-    compactView: SideNavService.views.compactView,
-    setCompactView: SideNavService.actions.setCompactView,
   }));
 
-  const ref = useRef<HTMLDivElement>(null);
+  const sider = useRef<HTMLDivElement>(null);
 
   const resizeObserver = new ResizeObserver((entries: ResizeObserverEntry[]) => {
     entries.forEach((entry: ResizeObserverEntry) => {
@@ -140,19 +155,15 @@ export default function SideNav() {
   });
 
   useLayoutEffect(() => {
-    if (ref.current) {
-      resizeObserver.observe(ref.current);
+    if (sider.current) {
+      resizeObserver.observe(sider.current);
     }
-  }, [ref]);
-
-  console.log('loggedIn ', loggedIn);
-  console.log('hasLegacyMenu ', hasLegacyMenu);
-
-  console.log('menu.menuItems ', menu.menuItems);
+  }, [sider]);
 
   const menuItems = menu.menuItems;
 
   const studioTabs = Object.keys(tabs).map((tab, i) => ({
+    key: i === 0 ? EMenuItem.Editor : `editor-layout-${i}`,
     target: tab,
     title: i === 0 || !tabs[tab].name ? $t('Editor') : tabs[tab].name,
     icon: tabs[tab].icon,
@@ -164,8 +175,6 @@ export default function SideNav() {
    * via command line flag. Not for general use.
    */
   const themeAuditEnabled = featureIsEnabled(EAvailableFeatures.themeAudit);
-
-  console.log('currentPage ', currentPage);
 
   return (
     <Layout hasSider className="sidenav">
@@ -179,7 +188,7 @@ export default function SideNav() {
           !isOpen && styles.siderClosed,
           !leftDock && styles.noLeftDock,
         )}
-        ref={ref}
+        ref={sider}
       >
         <Scrollable className={cx(styles.sidenav, styles.sidenavScroll)}>
           <Menu
@@ -188,6 +197,7 @@ export default function SideNav() {
             mode="inline"
             className={cx(
               styles.menuContainer,
+              isOpen && styles.open,
               !isOpen && (styles.siderClosed, styles.menuWrapper),
             )}
             defaultOpenKeys={openMenuItems && openMenuItems}
@@ -203,71 +213,63 @@ export default function SideNav() {
                 // skip Theme Audit if not enabled
                 return null;
               } else if (menuItem.title === EMenuItem.Editor && loggedIn && studioTabs.length > 0) {
-                // if legacy menu, show editor tabs in sidenav
+                // if closed, show editor tabs in sidenav
                 // which can be toggled to show or hide
                 // otherwise, show editor tabs in submenu
                 // don't translate tab title because the user has set it
-                return hasLegacyMenu && showCustomEditor ? (
-                  <>
-                    {studioTabs.map((tab, index) => (
-                      <Menu.Item
-                        key={
-                          tab.title === 'Editor' && index !== 0
-                            ? `Editor ${index}`
-                            : tab?.title ?? `Layout ${index}`
-                        }
-                        className={cx(
-                          styles.sidenavItem,
-                          !isOpen && styles.closed,
-                          currentPage === tab.target && styles.active,
-                        )}
-                        title={tab.title}
-                        icon={<i className={tab.icon} />}
-                        onClick={() => navigateToStudioTab(tab.target, tab.trackingTarget)}
-                      >
-                        {tab.title}
-                      </Menu.Item>
-                    ))}
-                  </>
+                return showCustomEditor && !isOpen ? (
+                  studioTabs.map(tab => (
+                    <Menu.Item
+                      key={tab.key}
+                      className={cx(
+                        styles.sidenavItem,
+                        !isOpen && styles.closed,
+                        currentMenuItem === tab.key && styles.active,
+                      )}
+                      title={tab.title}
+                      icon={<i className={tab.icon} />}
+                      onClick={() => navigateToStudioTab(tab.target, tab.trackingTarget, tab.key)}
+                    >
+                      {tab.title}
+                    </Menu.Item>
+                  ))
                 ) : (
                   <Menu.SubMenu
                     key={menuItem.key}
                     title={$t(menuItem.title)}
                     icon={menuItem?.icon && <i className={menuItem.icon} />}
                     onTitleClick={() => {
-                      menuItem?.subMenuItems[0]?.target &&
-                        !isOpen &&
-                        navigate(
-                          menuItem?.subMenuItems[0]?.target as TAppPage,
-                          menuItem?.subMenuItems[0]?.trackingTarget,
-                        );
+                      !isOpen &&
+                        menuItem?.subMenuItems[0]?.target &&
+                        handleNavigation(menuItem?.subMenuItems[0], menuItem.key);
                       expandMenuItem(ENavName.TopNav, menuItem.title as EMenuItem);
                     }}
                     className={cx(
                       !isOpen && styles.closed,
-                      currentPage === menuItem.target && styles.active,
+                      currentMenuItem === menuItem.key && styles.active,
                     )}
                   >
-                    {studioTabs.map((tab, index) => (
+                    {studioTabs.map(tab => (
                       <Menu.Item
-                        key={`${tab.title} Layout ${index}`}
+                        key={`sub-${tab.key}}`}
                         className={cx(
                           styles.sidenavItem,
-                          // currentPage === tab.target && styles.active,
+                          currentPage === `sub-${tab.key}}` && styles.active,
                         )}
-                        title={$t(tab.title)}
+                        title={tab.title}
                         icon={<i className={tab.icon} />}
-                        onClick={() => {
-                          navigateToStudioTab(tab.target as TAppPage, tab.trackingTarget);
-                        }}
+                        onClick={() =>
+                          navigateToStudioTab(tab.target, tab.trackingTarget, `sub-${tab.key}}`)
+                        }
                       >
-                        {$t(tab.title)}
+                        {tab.title}
                       </Menu.Item>
                     ))}
                   </Menu.SubMenu>
                 );
-              } else if (menuItem.title === EMenuItem.AppStore) {
-                return (
+              } else {
+                // otherwise, show a menu item or a menu item with a submenu
+                return menuItem.hasOwnProperty('subMenuItems') ? (
                   <Menu.SubMenu
                     key={menuItem.key}
                     title={$t(menuItem.title)}
@@ -275,75 +277,12 @@ export default function SideNav() {
                     onTitleClick={() => {
                       menuItem?.subMenuItems[0]?.target &&
                         !isOpen &&
-                        navigate(
-                          menuItem?.subMenuItems[0]?.target as TAppPage,
-                          menuItem?.subMenuItems[0]?.trackingTarget,
-                        );
+                        handleNavigation(menuItem?.subMenuItems[0], menuItem.key);
                       expandMenuItem(ENavName.TopNav, menuItem.title as EMenuItem);
                     }}
                     className={cx(
                       !isOpen && styles.closed,
-                      currentPage === menuItem.target && styles.active,
-                    )}
-                  >
-                    {console.log('menuItem?.subMenuItems ', menuItem?.subMenuItems)}
-                    {menuItem?.subMenuItems?.map(subMenuItem => (
-                      <Menu.Item
-                        key={subMenuItem.key}
-                        className={cx(
-                          styles.sidenavItem,
-                          currentPage === menuItem?.target && styles.active,
-                        )}
-                        title={subMenuItem?.title}
-                        onClick={() =>
-                          navigate(
-                            subMenuItem.target as TAppPage,
-                            subMenuItem.trackingTarget,
-                            subMenuItem.type,
-                          )
-                        }
-                      >
-                        {/* TODO: Translations for app titles? */}
-                        {subMenuItem?.title}
-                      </Menu.Item>
-                    ))}
-                    {apps.map(
-                      app =>
-                        app.isActive && (
-                          <Menu.Item
-                            key={`Open ${app.id}`}
-                            className={cx(
-                              styles.sidenavItem,
-                              currentPage === menuItem?.target && styles.active,
-                            )}
-                            title={app.name}
-                            onClick={() => app?.id && navigateApp(app.id)}
-                          >
-                            {app.name}
-                          </Menu.Item>
-                        ),
-                    )}
-                  </Menu.SubMenu>
-                );
-              } else {
-                // otherwise, show a menu item or a menu item with a submenu
-                return menuItem.hasOwnProperty('subMenuItems') ? (
-                  <Menu.SubMenu
-                    key={`Open ${menuItem.key} Menu`}
-                    title={$t(menuItem.title)}
-                    icon={menuItem?.icon && <i className={menuItem.icon} />}
-                    onTitleClick={() => {
-                      menuItem?.subMenuItems[0]?.target &&
-                        !isOpen &&
-                        navigate(
-                          menuItem?.subMenuItems[0]?.target as TAppPage,
-                          menuItem?.subMenuItems[0]?.trackingTarget,
-                        );
-                      expandMenuItem(ENavName.TopNav, menuItem.title as EMenuItem);
-                    }}
-                    className={cx(
-                      !isOpen && styles.closed,
-                      currentPage === menuItem.target && styles.active,
+                      currentMenuItem === menuItem.key && styles.active,
                     )}
                   >
                     {menuItem?.subMenuItems?.map((subMenuItem: IMenuItem, index: number) => (
@@ -351,21 +290,10 @@ export default function SideNav() {
                         key={subMenuItem.key}
                         className={cx(
                           styles.sidenavItem,
-                          currentPage === subMenuItem?.target && styles.active,
+                          currentMenuItem === subMenuItem?.key && styles.active,
                         )}
                         title={$t(menuItem.title)}
-                        onClick={() => {
-                          if (subMenuItem?.target && subMenuItem?.type) {
-                            // if navigating to specific tab on page
-                            navigate(
-                              subMenuItem?.target as TAppPage,
-                              subMenuItem?.trackingTarget,
-                              subMenuItem?.type,
-                            );
-                          } else if (subMenuItem?.target) {
-                            navigate(subMenuItem?.target as TAppPage, subMenuItem?.trackingTarget);
-                          }
-                        }}
+                        onClick={() => handleNavigation(subMenuItem)}
                       >
                         {$t(subMenuItem.title)}
                       </Menu.Item>
@@ -373,10 +301,10 @@ export default function SideNav() {
                     {menuItem.title === EMenuItem.AppStore &&
                       apps.map(app => (
                         <Menu.Item
-                          key={`App: ${app?.name}`}
+                          key={app.id}
                           className={cx(
                             styles.sidenavItem,
-                            currentPage === menuItem?.target && styles.active,
+                            currentMenuItem === menuItem?.key && styles.active,
                           )}
                           title={app.name}
                           onClick={() => app?.id && navigateApp(app.id)}
@@ -392,24 +320,12 @@ export default function SideNav() {
                       styles.sidenavItem,
                       !isOpen && styles.closed,
                       menuItem.title === EMenuItem.StudioMode && studioMode && styles.studioMode,
-                      currentPage === menuItem.target && styles.active,
+                      currentMenuItem === menuItem.key && styles.active,
                     )}
                     title={$t(menuItem.title)}
                     icon={menuItem?.icon && <i className={menuItem.icon} />}
                     onClick={() => {
-                      if (menuItem.title === EMenuItem.StudioMode) {
-                        // if studio mode, toggle studio mode
-                        toggleStudioMode();
-                      } else if (menuItem?.target && menuItem?.type) {
-                        // if navigating to specific tab on page
-                        navigate(
-                          menuItem?.target as TAppPage,
-                          menuItem?.trackingTarget,
-                          // menuItem?.type,
-                        );
-                      } else if (menuItem?.target) {
-                        navigate(menuItem?.target as TAppPage, menuItem?.trackingTarget);
-                      }
+                      handleNavigation(menuItem);
                     }}
                   >
                     {$t(menuItem.title)}
@@ -428,7 +344,8 @@ export default function SideNav() {
                         className={cx(
                           styles.sidenavItem,
                           !isOpen && styles.closed,
-                          // currentPage === app.target && styles.active)}
+                          isOpen && styles.open,
+                          currentMenuItem === app?.id && styles.active,
                         )}
                         title={app.name}
                         icon={
@@ -447,6 +364,7 @@ export default function SideNav() {
               </>
             )}
           </Menu>
+
           {/* show the bottom navigation menu */}
           <NavTools />
         </Scrollable>

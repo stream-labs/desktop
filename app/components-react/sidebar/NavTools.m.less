@@ -18,10 +18,11 @@ body > div > div {
   margin-bottom: 10px !important;
   justify-self: flex-end;
   border-right: 0px !important;
+  border-top: 2px solid var(--nav-divider);
 
   :global(.ant-menu-item-icon) {
     i:not(.link-badge) {
-      font-size: 18px;
+      font-size: 18px !important;
     }
   }
 
@@ -43,6 +44,12 @@ body > div > div {
   :global(li.ant-menu-submenu) {
     background: none;
     color: var(--paragraph);
+    height: unset !important;
+    min-height: 30px !important;
+    line-height: normal !important;
+    margin: 10px 0 !important;
+    overflow-wrap: break-word !important;
+    padding-bottom: 0px;
 
     i {
       color: var(--paragraph);
@@ -78,6 +85,35 @@ body > div > div {
         transform-origin: 100% 0%;
       }
     }
+
+    :global(span.ant-menu-title-content) {
+      display: none !important;
+    }
+  }
+
+  &.open {
+    :global(li.ant-menu-item),
+    :global(li.ant-menu-submenu) {
+      overflow: unset !important;
+      text-overflow: unset !important;
+      overflow-wrap: break-word !important;
+      padding-bottom: 0px;
+      white-space: normal !important;
+    }
+  }
+
+  :global(div.ant-menu-submenu-title) {
+    height: unset !important;
+    min-height: 30px !important;
+    line-height: normal !important;
+    margin: 5px 0;
+  }
+
+  :global(span.ant-menu-title-content) {
+    overflow: unset !important;
+    text-overflow: unset !important;
+    white-space: normal !important;
+    overflow-wrap: break-word;
   }
 }
 
@@ -107,6 +143,22 @@ body > div > div {
   :global(.ant-menu-item.ant-menu-item-only-child) {
     margin-bottom: 10px;
   }
+
+  &::before {
+    content: '';
+    margin: 0 10px;
+    width: calc(100% - 20px);
+    height: 2px;
+    background: var(--nav-divider);
+    display: block;
+    left: 0;
+    top: 0;
+    position: absolute;
+  }
+
+  &.login-closed::before {
+    width: 30px;
+  }
 }
 
 .login > span {
@@ -116,7 +168,7 @@ body > div > div {
 
   &:hover {
     color: var(--title);
-    i {
+    i:not(.platform-logo) {
       transform: scale(1.2, 1.2);
       transition: all 0.2s ease-in-out;
     }
