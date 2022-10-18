@@ -8,11 +8,15 @@ import { OutputsService } from './output';
 interface IAdvancedSettingsState {
   delay: obs.IDelay;
   reconnect: obs.IReconnect;
+  network: obs.INetwork;
 }
-
 class AdvancedSettingsViews extends ViewHandler<IAdvancedSettingsState> {
   advancedSettingsValues(category: string) {
     return this.state[category];
+  }
+
+  get advancedSettingsCategories() {
+    return Object.keys(this.state);
   }
 }
 
@@ -24,6 +28,7 @@ export class AdvancedSettingsService extends StatefulService<IAdvancedSettingsSt
   initialState = {
     delay: obs.DelayFactory.create(),
     reconnect: obs.ReconnectFactory.create(),
+    network: obs.NetworkFactory.create(),
   };
 
   init() {
@@ -88,6 +93,22 @@ export class AdvancedSettingsService extends StatefulService<IAdvancedSettingsSt
     };
   }
 
+  get networkSettingsMetadata() {
+    return {
+      bindIP: {
+        type: 'list',
+        label: $t('Bind to IP'),
+        options: [{ label: $t('Default'), value: 'default' }],
+      },
+      enableDynamicBitrate: {
+        type: 'checkbox',
+        label: $t('Dynamically change bitrate when dropping frames while streaming'),
+      },
+      enableOptimizations: { type: 'checkbox', label: $t('Enable new networking code') },
+      enableLowLatency: { type: 'checkbox', label: $t('Low latency mode') },
+    };
+  }
+
   establishState() {
     this.migrateSettings();
 
@@ -95,19 +116,18 @@ export class AdvancedSettingsService extends StatefulService<IAdvancedSettingsSt
   }
 
   migrateSettings() {
-    const delay = this.settingsManagerService.simpleStreamSettings.delay;
-    Object.keys(delay).forEach((key: string) => {
-      this.SET_ADVANCED_SETTING('delay', key, delay[key]);
-    });
-    const reconnect = this.settingsManagerService.simpleStreamSettings.reconnect;
-    Object.keys(reconnect).forEach((key: string) => {
-      this.SET_ADVANCED_SETTING('reconnect', key, reconnect[key]);
+    this.views.advancedSettingsCategories.forEach(category => {
+      const setting = this.settingsManagerService.simpleStreamSettings[category];
+      Object.keys(setting).forEach((key: string) => {
+        this.SET_ADVANCED_SETTING(category, key, setting[key]);
+      });
     });
   }
 
   linkSettings() {
-    this.outputsService.streamSettings.delay = this.state.delay;
-    this.outputsService.streamSettings.reconnect = this.state.reconnect;
+    this.views.advancedSettingsCategories.forEach(category => {
+      this.outputsService.streamSettings[category] = this.state[category];
+    });
   }
 
   setVideoSetting(key: string, value: unknown) {

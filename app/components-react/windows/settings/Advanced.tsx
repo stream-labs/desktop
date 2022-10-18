@@ -20,12 +20,19 @@ class AdvancedSettingsModule {
     return this.service.views.advancedSettingsValues(category);
   }
 
-  get delayMetadata() {
-    return this.service.delaySettingsMetadata;
+  get metadata() {
+    return {
+      delay: { header: $t('Stream Delay'), data: this.service.delaySettingsMetadata },
+      reconnect: {
+        header: $t('Automatically Reconnect'),
+        data: this.service.reconnectSettingsMetadata,
+      },
+      network: { header: $t('Network'), data: this.service.networkSettingsMetadata },
+    };
   }
 
-  get reconnectMetadata() {
-    return this.service.reconnectSettingsMetadata;
+  get categories() {
+    return this.service.views.advancedSettingsCategories;
   }
 
   onVideoChange(key: string) {
@@ -45,8 +52,8 @@ export function AdvancedSettings() {
     onVideoChange,
     advancedValues,
     onAdvancedChange,
-    delayMetadata,
-    reconnectMetadata,
+    metadata,
+    categories,
   } = useModule(AdvancedSettingsModule);
 
   return (
@@ -72,27 +79,20 @@ export function AdvancedSettings() {
       <div>
         <h2>{$t('Replay Buffer')}</h2>
       </div>
-      <div>
-        <h2>{$t('Stream Delay')}</h2>
-        <FormFactory
-          values={advancedValues('delay')}
-          metadata={delayMetadata}
-          onChange={onAdvancedChange('delay')}
-          formOptions={{ layout: 'vertical' }}
-        />
-      </div>
-      <div>
-        <h2>{$t('Automatically Reconnect')}</h2>
-        <FormFactory
-          values={advancedValues('reconnect')}
-          metadata={reconnectMetadata}
-          onChange={onAdvancedChange('reconnect')}
-          formOptions={{ layout: 'vertical' }}
-        />
-      </div>
-      <div>
-        <h2>{$t('Network')}</h2>
-      </div>
+      {categories.map(category => {
+        const meta = metadata[category];
+        return (
+          <div>
+            <h2>{meta.header}</h2>
+            <FormFactory
+              values={advancedValues(category)}
+              metadata={meta.data}
+              onChange={onAdvancedChange(category)}
+              formOptions={{ layout: 'vertical' }}
+            />
+          </div>
+        );
+      })}
       <div>
         <h2>{$t('Sources')}</h2>
       </div>
