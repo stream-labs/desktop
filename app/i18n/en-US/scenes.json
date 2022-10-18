@@ -49,5 +49,8 @@
   "Choose a template from our theme library": "Choose a template from our theme library",
   "Enter a Scene Collection Name": "Enter a Scene Collection Name",
   "Copy of %{collectionName}": "Copy of %{collectionName}",
-  "Your Scene Collections": "Your Scene Collections"
+  "Your Scene Collections": "Your Scene Collections",
+  "Dual Output Mode": "Dual Output Mode",
+  "Horizontal Output": "Horizontal Output",
+  "Vertical Output": "Vertical Output"
 }

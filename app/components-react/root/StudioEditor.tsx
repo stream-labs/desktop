@@ -6,14 +6,22 @@ import cx from 'classnames';
 import Display from 'components-react/shared/Display';
 import { $t } from 'services/i18n';
 import { ERenderingMode } from '../../../obs-api';
+import { DualOutputService } from 'services/dual-output';
 
 export default function StudioEditor() {
-  const { WindowsService, CustomizationService, EditorService, TransitionsService } = Services;
+  const {
+    WindowsService,
+    CustomizationService,
+    EditorService,
+    TransitionsService,
+    DualOutputService,
+  } = Services;
   const v = useVuex(() => ({
     hideStyleBlockers: WindowsService.state.main.hideStyleBlockers,
     performanceMode: CustomizationService.state.performanceMode,
     cursor: EditorService.state.cursor,
     studioMode: TransitionsService.state.studioMode,
+    dualOutputMode: DualOutputService.views.dualOutputMode,
   }));
   const displayEnabled = !v.hideStyleBlockers && !v.performanceMode;
   const placeholderRef = useRef<HTMLDivElement>(null);
@@ -148,6 +156,7 @@ export default function StudioEditor() {
       {displayEnabled && (
         <div className={cx(styles.studioModeContainer, { [styles.stacked]: studioModeStacked })}>
           {v.studioMode && <StudioModeControls stacked={studioModeStacked} />}
+          {v.dualOutputMode && <DualOutputControls stacked={studioModeStacked} />}
           <div
             className={cx(styles.studioDisplayContainer, { [styles.stacked]: studioModeStacked })}
           >
@@ -172,6 +181,27 @@ export default function StudioEditor() {
             {v.studioMode && (
               <div className={styles.studioModeDisplayContainer}>
                 <Display paddingSize={10} />
+              </div>
+            )}
+            {v.dualOutputMode && (
+              <div
+                className={cx(styles.studioEditorDisplayContainer)}
+                style={{ cursor: v.cursor }}
+                onMouseDown={eventHandlers.onMouseDown}
+                onMouseUp={eventHandlers.onMouseUp}
+                onMouseEnter={eventHandlers.onMouseEnter}
+                onMouseMove={eventHandlers.onMouseMove}
+                onDoubleClick={eventHandlers.onMouseDblClick}
+                onContextMenu={eventHandlers.onContextMenu}
+              >
+                {/* @@@ TODO: replace with mobile layout */}
+                <Display
+                  drawUI={true}
+                  paddingSize={10}
+                  onOutputResize={eventHandlers.onOutputResize}
+                  renderingMode={ERenderingMode.OBS_MAIN_RENDERING}
+                  sourceId={v.studioMode ? studioModeTransitionName : undefined}
+                />
               </div>
             )}
           </div>
@@ -243,6 +273,26 @@ function StudioModeControls(p: { stacked: boolean }) {
         )}
       </button>
       <span className={styles.studioModeControl}>{$t('Live')}</span>
+    </div>
+  );
+}
+
+function DualOutputControls(p: { stacked: boolean }) {
+  const { TransitionsService } = Services;
+
+  return (
+    <div className={cx(styles.studioModeControls, { [styles.stacked]: p.stacked })}>
+      <div>
+        <i className="icon-desktop" />
+        <span className={styles.studioModeControl}>{$t('Horizontal Output')}</span>
+        <i className="icon-information" />
+      </div>
+
+      <div>
+        <i className="icon-phone-case" />
+        <span className={styles.studioModeControl}>{$t('Vertical Output')}</span>
+        <i className="icon-information" />
+      </div>
     </div>
   );
 }

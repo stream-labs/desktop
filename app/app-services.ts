@@ -91,6 +91,7 @@ export { RecentEventsService } from 'services/recent-events';
 export { MagicLinkService } from 'services/magic-link';
 export { GrowService } from 'services/grow/grow';
 export { GuestCamService } from 'services/guest-cam';
+export { DualOutputService } from 'services/dual-output';
 
 // WIDGETS
 export { WidgetSource, WidgetsService } from './services/widgets';
@@ -181,6 +182,7 @@ import { GameOverlayService } from 'services/game-overlay';
 import { GuestCamService } from 'services/guest-cam';
 import { VideoSettingsService } from 'services/settings-v2/video';
 import { SettingsManagerService } from 'services/settings-manager';
+import { DualOutputService } from 'services/dual-output';
 
 export const AppServices = {
   AppService,
@@ -248,4 +250,5 @@ export const AppServices = {
   HardwareService,
   VideoSettingsService,
   SettingsManagerService,
+  DualOutputService,
 };
