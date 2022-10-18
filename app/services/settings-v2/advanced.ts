@@ -1,12 +1,30 @@
-import { Inject, StatefulService } from 'services/core';
+import { Inject, mutation, StatefulService, ViewHandler } from 'services/core';
 import * as obs from '../../../obs-api';
 import { SettingsManagerService } from 'app-services';
 import { VideoSettingsService } from './video';
 import { $t } from 'services/i18n';
 
-export class AdvancedSettingsService extends StatefulService<{}> {
+interface IAdvancedSettingsState {
+  delay: obs.IDelay;
+}
+
+class AdvancedSettingsViews extends ViewHandler<IAdvancedSettingsState> {
+  advancedSettingsValues(category: string) {
+    return this.state[category];
+  }
+}
+
+export class AdvancedSettingsService extends StatefulService<IAdvancedSettingsState> {
   @Inject() videoSettingsService: VideoSettingsService;
   @Inject() settingsManagerService: SettingsManagerService;
+
+  initialState = {
+    delay: null as obs.IDelay,
+  };
+
+  get views() {
+    return new AdvancedSettingsViews(this.state);
+  }
 
   get videoSettingsMetadata() {
     return {
@@ -43,7 +61,27 @@ export class AdvancedSettingsService extends StatefulService<{}> {
     return this.videoSettingsService.advancedSettingsValues;
   }
 
+  get delaySettingsMetadata() {
+    return {
+      enabled: { type: 'toggle', label: $t('Enabled') },
+      delaySec: { type: 'number', label: $t('Duration (seconds)') },
+      preserveDelay: {
+        type: 'checkbox',
+        label: $t('Preserve cutoff point (increase delay) when reconnecting'),
+      },
+    };
+  }
+
   setVideoSetting(key: string, value: unknown) {
     this.videoSettingsService.setVideoSetting(key, value);
+  }
+
+  setAdvancedSetting(category: string, key: string, value: unknown) {
+    this.SET_ADVANCED_SETTING(category, key, value);
+  }
+
+  @mutation()
+  SET_ADVANCED_SETTING(category: string, key: string, value: unknown) {
+    this.state[category][key] = value;
   }
 }

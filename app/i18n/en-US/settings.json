@@ -69,7 +69,7 @@
   "YUV Color Range": "YUV Color Range",
   "Stream Delay": "Stream Delay",
   "Duration (Seconds)": "Duration (Seconds)",
-  "Preserved cutoff point (increase delay) when reconnecting": "Preserved cutoff point (increase delay) when reconnecting",
+  "Preserve cutoff point (increase delay) when reconnecting": "Preserve cutoff point (increase delay) when reconnecting",
   "Desktop Audio Device": "Desktop Audio Device",
   "Mic/Auxiliary Device": "Mic/Auxiliary Device",
   "Recording Path": "Recording Path",
