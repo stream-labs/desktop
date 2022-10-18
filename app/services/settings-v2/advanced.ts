@@ -7,6 +7,7 @@ import { OutputsService } from './output';
 
 interface IAdvancedSettingsState {
   delay: obs.IDelay;
+  reconnect: obs.IReconnect;
 }
 
 class AdvancedSettingsViews extends ViewHandler<IAdvancedSettingsState> {
@@ -21,7 +22,8 @@ export class AdvancedSettingsService extends StatefulService<IAdvancedSettingsSt
   @Inject() outputsService: OutputsService;
 
   initialState = {
-    delay: {} as obs.IDelay,
+    delay: obs.DelayFactory.create(),
+    reconnect: obs.ReconnectFactory.create(),
   };
 
   init() {
@@ -78,6 +80,14 @@ export class AdvancedSettingsService extends StatefulService<IAdvancedSettingsSt
     };
   }
 
+  get reconnectSettingsMetadata() {
+    return {
+      enabled: { type: 'toggle', label: $t('Enabled') },
+      retryDelay: { type: 'number', label: $t('Retry Delay (seconds') },
+      maxRetries: { type: 'number', label: $t('Maximum Retries') },
+    };
+  }
+
   establishState() {
     this.migrateSettings();
 
@@ -89,10 +99,15 @@ export class AdvancedSettingsService extends StatefulService<IAdvancedSettingsSt
     Object.keys(delay).forEach((key: string) => {
       this.SET_ADVANCED_SETTING('delay', key, delay[key]);
     });
+    const reconnect = this.settingsManagerService.simpleStreamSettings.reconnect;
+    Object.keys(reconnect).forEach((key: string) => {
+      this.SET_ADVANCED_SETTING('reconnect', key, reconnect[key]);
+    });
   }
 
   linkSettings() {
     this.outputsService.streamSettings.delay = this.state.delay;
+    this.outputsService.streamSettings.reconnect = this.state.reconnect;
   }
 
   setVideoSetting(key: string, value: unknown) {

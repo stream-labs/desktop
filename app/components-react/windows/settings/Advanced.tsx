@@ -24,6 +24,10 @@ class AdvancedSettingsModule {
     return this.service.delaySettingsMetadata;
   }
 
+  get reconnectMetadata() {
+    return this.service.reconnectSettingsMetadata;
+  }
+
   onVideoChange(key: string) {
     return (val: unknown) => this.service.actions.setVideoSetting(key, val);
   }
@@ -42,6 +46,7 @@ export function AdvancedSettings() {
     advancedValues,
     onAdvancedChange,
     delayMetadata,
+    reconnectMetadata,
   } = useModule(AdvancedSettingsModule);
 
   return (
@@ -78,6 +83,12 @@ export function AdvancedSettings() {
       </div>
       <div>
         <h2>{$t('Automatically Reconnect')}</h2>
+        <FormFactory
+          values={advancedValues('reconnect')}
+          metadata={reconnectMetadata}
+          onChange={onAdvancedChange('reconnect')}
+          formOptions={{ layout: 'vertical' }}
+        />
       </div>
       <div>
         <h2>{$t('Network')}</h2>
