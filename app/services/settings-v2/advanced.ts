@@ -3,6 +3,7 @@ import * as obs from '../../../obs-api';
 import { SettingsManagerService } from 'services/settings-manager';
 import { VideoSettingsService } from './video';
 import { $t } from 'services/i18n';
+import { OutputsService } from './output';
 
 interface IAdvancedSettingsState {
   delay: obs.IDelay;
@@ -17,10 +18,15 @@ class AdvancedSettingsViews extends ViewHandler<IAdvancedSettingsState> {
 export class AdvancedSettingsService extends StatefulService<IAdvancedSettingsState> {
   @Inject() videoSettingsService: VideoSettingsService;
   @Inject() settingsManagerService: SettingsManagerService;
+  @Inject() outputsService: OutputsService;
 
   initialState = {
-    delay: null as obs.IDelay,
+    delay: {} as obs.IDelay,
   };
+
+  init() {
+    this.establishState();
+  }
 
   get views() {
     return new AdvancedSettingsViews(this.state);
@@ -70,6 +76,23 @@ export class AdvancedSettingsService extends StatefulService<IAdvancedSettingsSt
         label: $t('Preserve cutoff point (increase delay) when reconnecting'),
       },
     };
+  }
+
+  establishState() {
+    this.migrateSettings();
+
+    this.linkSettings();
+  }
+
+  migrateSettings() {
+    const delay = this.settingsManagerService.simpleStreamSettings.delay;
+    Object.keys(delay).forEach((key: string) => {
+      this.SET_ADVANCED_SETTING('delay', key, delay[key]);
+    });
+  }
+
+  linkSettings() {
+    this.outputsService.streamSettings.delay = this.state.delay;
   }
 
   setVideoSetting(key: string, value: unknown) {
