@@ -292,7 +292,7 @@ function DualOutputControls(p: { stacked: boolean }) {
       <div className={styles.dualOutputModeDetails}>
         <i className="icon-desktop" />
         <span>{$t('Horizontal Output')}</span>
-        <Tooltip title={horizontalTooltipText} placement="bottom" className={styles.dualOutputTip}>
+        <Tooltip title={horizontalTooltipText} placement="right" className={styles.dualOutputTip}>
           <i className="icon-information" />
         </Tooltip>
       </div>
@@ -300,7 +300,7 @@ function DualOutputControls(p: { stacked: boolean }) {
       <div className={styles.dualOutputModeDetails}>
         <i className="icon-phone-case" />
         <span>{$t('Vertical Output')}</span>
-        <Tooltip title={verticalTooltipText} placement="bottom" className={styles.dualOutputTip}>
+        <Tooltip title={verticalTooltipText} placement="right" className={styles.dualOutputTip}>
           <i className="icon-information" />
         </Tooltip>
       </div>
