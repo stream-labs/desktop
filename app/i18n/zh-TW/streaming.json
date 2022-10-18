@@ -164,5 +164,6 @@
   "Common Stream Settings": "一般直播設定",
   "Schedule Stream for %{formattedDate}": "排程直播於 %{formattedDate}",
   "Update Scheduled Stream for %{formattedDate}": "更新排程的直播於 %{formattedDate}",
-  "You can not schedule to a past date": "您不可以排程到過去的日期"
+  "You can not schedule to a past date": "您不可以排程到過去的日期",
+  "Streamlabs requires additional permissions from your Twitch account. Please log in with Twitch to continue.": "Streamlabs requires additional permissions from your Twitch account. Please log in with Twitch to continue."
 }

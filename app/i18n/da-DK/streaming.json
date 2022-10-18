@@ -164,5 +164,6 @@
   "Common Stream Settings": "Hyppigt brugte streamindstillinger",
   "Schedule Stream for %{formattedDate}": "Planlæg stream til %{formattedDate}",
   "Update Scheduled Stream for %{formattedDate}": "Upload planlagt stream til %{formattedDate}",
-  "You can not schedule to a past date": "Du kan ikke planlægge til en dato i fortiden"
+  "You can not schedule to a past date": "Du kan ikke planlægge til en dato i fortiden",
+  "Streamlabs requires additional permissions from your Twitch account. Please log in with Twitch to continue.": "Streamlabs requires additional permissions from your Twitch account. Please log in with Twitch to continue."
 }

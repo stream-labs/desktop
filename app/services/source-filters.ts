@@ -50,7 +50,8 @@ export type TSourceFilterType =
   | 'mediasoupconnector_afilter'
   | 'mediasoupconnector_vfilter'
   | 'mediasoupconnector_vsfilter'
-  | 'hdr_tonemap_filter';
+  | 'hdr_tonemap_filter'
+  | 'nv_greenscreen_filter';
 
 interface ISourceFilterType {
   type: TSourceFilterType;
@@ -239,6 +240,7 @@ export class SourceFiltersService extends StatefulService<IFiltersServiceState> 
       { description: $t('Expander'), value: 'expander_filter' },
       { description: $t('Shader'), value: 'shader_filter' },
       { description: $t('HDR Tone Mapping (Override)'), value: 'hdr_tonemap_filter' },
+      { description: $t('NVIDIA Background Removal'), value: 'nv_greenscreen_filter' },
     ];
     const allowedAvailableTypes = allowlistedTypes.filter(type =>
       obsAvailableTypes.includes(type.value),

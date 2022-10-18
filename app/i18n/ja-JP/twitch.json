@@ -1,4 +1,5 @@
 {
   "Twitch Category": "Twitch カテゴリ",
-  "Twitch Tags": "Twitch タグ"
+  "Twitch Tags": "Twitch タグ",
+  "Warning! Editing tags in Streamlabs will overwrite tags in Twitch. To use Twitch's new custom tags, you must edit your tags in the Twitch dashboard directly until Twitch provides third parties access to editing the new custom tags.": "警告！Streamlabs 内でタグを編集すると、Twitch 内のタグが上書きされます。Twitch が新しいカスタムタグ編集へのアクセスをサードパーティーに提供するまで、Twitch の新しいカスタムタグを使用するには、Twitch ダッシュボードで直接タグを編集する必要があります。"
 }
