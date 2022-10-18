@@ -59,6 +59,7 @@ export { RecordingModeService } from 'services/recording-mode';
 export { SettingsManagerService } from 'services/settings-manager';
 export { VideoSettingsService } from 'services/settings-v2/video';
 export { AdvancedSettingsService } from 'services/settings-v2/advanced';
+export { OutputsService } from 'services/settings-v2/output';
 
 // ONLINE SERVICES
 export { UserService } from './services/user';
@@ -183,6 +184,7 @@ import { GuestCamService } from 'services/guest-cam';
 import { SettingsManagerService } from 'services/settings-manager';
 import { VideoSettingsService } from 'services/settings-v2/video';
 import { AdvancedSettingsService } from 'services/settings-v2/advanced';
+import { OutputsService } from 'services/settings-v2/output';
 
 export const AppServices = {
   AppService,
@@ -251,4 +253,5 @@ export const AppServices = {
   SettingsManagerService,
   VideoSettingsService,
   AdvancedSettingsService,
+  OutputsService,
 };

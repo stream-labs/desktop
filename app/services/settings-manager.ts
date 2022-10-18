@@ -10,6 +10,30 @@ from the backend.
 class SettingsManagerViews extends ViewHandler<{}> {}
 
 export class SettingsManagerService extends Service {
+  get simpleStreamSettings() {
+    return obs.SimpleStreamingFactory.legacySettings;
+  }
+
+  get advancedStreamSettings() {
+    return obs.AdvancedStreamingFactory.legacySettings;
+  }
+
+  get simpleRecordingSettings() {
+    return obs.SimpleRecordingFactory.legacySettings;
+  }
+
+  get advancedRecordingSettings() {
+    return obs.AdvancedRecordingFactory.legacySettings;
+  }
+
+  get simpleReplaySettings() {
+    return obs.SimpleReplayBufferFactory.legacySettings;
+  }
+
+  get advancedReplaySettings() {
+    return obs.AdvancedRecordingFactory.legacySettings;
+  }
+
   get videoSettings() {
     return obs.VideoFactory.legacySettings;
   }

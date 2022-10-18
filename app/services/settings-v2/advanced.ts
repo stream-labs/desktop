@@ -1,6 +1,6 @@
 import { Inject, mutation, StatefulService, ViewHandler } from 'services/core';
 import * as obs from '../../../obs-api';
-import { SettingsManagerService } from 'app-services';
+import { SettingsManagerService } from 'services/settings-manager';
 import { VideoSettingsService } from './video';
 import { $t } from 'services/i18n';
 
