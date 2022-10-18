@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import Vue from 'vue';
 import { Subject } from 'rxjs';
 import cloneDeep from 'lodash/cloneDeep';
-import { IObsListOption, TObsValue } from 'components/obs/inputs/ObsInput';
+import { IObsListOption, TObsValue, IObsListInput } from 'components/obs/inputs/ObsInput';
 import { mutation, StatefulService, ViewHandler } from 'services/core/stateful-service';
 import * as obs from '../../../obs-api';
 import { Inject } from 'services/core/injector';
@@ -386,12 +386,26 @@ export class SourcesService extends StatefulService<ISourcesState> {
     // Needs to happen after properties manager creation, otherwise we can't fetch props
     if (type === 'wasapi_input_capture') {
       const props = source.getPropertiesFormData();
-      const deviceNameProp = props.find(p => p.name === 'device_name');
+      const deviceProp = props.find(p => p.name === 'device_id');
 
-      if (deviceNameProp) {
-        this.usageStatisticsService.recordAnalyticsEvent('MicrophoneUse', {
-          device: deviceNameProp.description,
-        });
+      if (deviceProp && deviceProp.value === 'default') {
+        const defaultDeviceNameProp = props.find(p => p.name === 'device_name');
+
+        if (defaultDeviceNameProp) {
+          this.usageStatisticsService.recordAnalyticsEvent('MicrophoneUse', {
+            device: defaultDeviceNameProp.description,
+          });
+        }
+      } else if (deviceProp && deviceProp.type === 'OBS_PROPERTY_LIST') {
+        const deviceOption = (deviceProp as IObsListInput<string>).options.find(
+          opt => opt.value === deviceProp.value,
+        );
+
+        if (deviceOption) {
+          this.usageStatisticsService.recordAnalyticsEvent('MicrophoneUse', {
+            device: deviceOption.description,
+          });
+        }
       }
     }
 
