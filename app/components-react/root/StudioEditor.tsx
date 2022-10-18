@@ -7,6 +7,7 @@ import Display from 'components-react/shared/Display';
 import { $t } from 'services/i18n';
 import { ERenderingMode } from '../../../obs-api';
 import { DualOutputService } from 'services/dual-output';
+import { Tooltip } from 'antd';
 
 export default function StudioEditor() {
   const {
@@ -185,7 +186,7 @@ export default function StudioEditor() {
             )}
             {v.dualOutputMode && (
               <div
-                className={cx(styles.studioEditorDisplayContainer)}
+                className={cx(styles.dualOutputDisplayContainer)}
                 style={{ cursor: v.cursor }}
                 onMouseDown={eventHandlers.onMouseDown}
                 onMouseUp={eventHandlers.onMouseUp}
@@ -278,20 +279,30 @@ function StudioModeControls(p: { stacked: boolean }) {
 }
 
 function DualOutputControls(p: { stacked: boolean }) {
-  const { TransitionsService } = Services;
+  // const { TransitionsService } = Services;
+  const horizontalTooltipText = $t(
+    'Arrange your sources here to where you want them to be viewed on any platform you mark as being streamed  with a horizontal output.',
+  );
+  const verticalTooltipText = $t(
+    'Arrange your sources here to where you want them to be viewed on any platform you mark as being streamed with a vertical output.',
+  );
 
   return (
-    <div className={cx(styles.studioModeControls, { [styles.stacked]: p.stacked })}>
-      <div>
+    <div className={cx(styles.dualOutputModeControls, { [styles.stacked]: p.stacked })}>
+      <div className={styles.dualOutputModeDetails}>
         <i className="icon-desktop" />
-        <span className={styles.studioModeControl}>{$t('Horizontal Output')}</span>
-        <i className="icon-information" />
+        <span>{$t('Horizontal Output')}</span>
+        <Tooltip title={horizontalTooltipText} placement="bottom" className={styles.dualOutputTip}>
+          <i className="icon-information" />
+        </Tooltip>
       </div>
 
-      <div>
+      <div className={styles.dualOutputModeDetails}>
         <i className="icon-phone-case" />
-        <span className={styles.studioModeControl}>{$t('Vertical Output')}</span>
-        <i className="icon-information" />
+        <span>{$t('Vertical Output')}</span>
+        <Tooltip title={verticalTooltipText} placement="bottom" className={styles.dualOutputTip}>
+          <i className="icon-information" />
+        </Tooltip>
       </div>
     </div>
   );
