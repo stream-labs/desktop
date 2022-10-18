@@ -138,6 +138,17 @@ export class VideoSettingsService extends StatefulService<{ videoContext: obs.IV
     };
   }
 
+  // This area of settings is in the Advanced settings tab but refers to the VideoContext
+  get advancedSettingsValues() {
+    const context = this.state.videoContext;
+    return {
+      outputFormat: context.outputFormat,
+      colorSpace: context.colorspace,
+      range: context.range,
+      // forceGPU
+    };
+  }
+
   get videoSettings() {
     return this.settingsManagerService.videoSettings;
   }
