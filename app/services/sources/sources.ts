@@ -383,6 +383,18 @@ export class SourcesService extends StatefulService<ISourcesState> {
       type: managerType,
     };
 
+    // Needs to happen after properties manager creation, otherwise we can't fetch props
+    if (type === 'wasapi_input_capture') {
+      const props = source.getPropertiesFormData();
+      const deviceNameProp = props.find(p => p.name === 'device_name');
+
+      if (deviceNameProp) {
+        this.usageStatisticsService.recordAnalyticsEvent('MicrophoneUse', {
+          device: deviceNameProp.description,
+        });
+      }
+    }
+
     this.sourceAdded.next(source.state);
 
     if (options.audioSettings) {
