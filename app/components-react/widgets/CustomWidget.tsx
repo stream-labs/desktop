@@ -1,9 +1,6 @@
 import React from 'react';
-import { IWidgetCommonState, useWidget, WidgetModule } from './common/useWidget';
+import { IWidgetCommonState, WidgetModule } from './common/useWidget';
 import { WidgetLayout } from './common/WidgetLayout';
-import InputWrapper from '../shared/inputs/InputWrapper';
-import { $t } from '../../services/i18n';
-import { CheckboxInput, ColorInput, FontFamilyInput, FontSizeInput } from '../shared/inputs';
 
 interface ICustomWidgetState extends IWidgetCommonState {
   data: {
@@ -18,17 +15,15 @@ interface ICustomWidgetState extends IWidgetCommonState {
 }
 
 export function CustomWidget() {
-  const { isLoading, bind } = useCustomWidget();
-  // use 1 column layout
-  console.log('isLoading ', isLoading);
-  // return <WidgetLayout>{!isLoading && <>{'Custom Widget'}</>}</WidgetLayout>;
-  return <WidgetLayout>{!isLoading && <>{'Custom Widget Settings'}</>}</WidgetLayout>;
+  return (
+    <WidgetLayout>
+      <></>
+    </WidgetLayout>
+  );
 }
 
 export class CustomWidgetModule extends WidgetModule<ICustomWidgetState> {
   patchAfterFetch(data: any): ICustomWidgetState {
-    // transform platform types to simple booleans
-    console.log('data ', data);
     return {
       ...data,
       settings: {
@@ -43,8 +38,6 @@ export class CustomWidgetModule extends WidgetModule<ICustomWidgetState> {
   }
 
   patchBeforeSend(settings: ICustomWidgetState['data']['settings']): any {
-    // the API accepts an object instead of simple booleans for platforms
-    console.log('settings ', settings);
     return {
       ...settings,
       custom_enabled: settings.custom_enabled,
@@ -54,8 +47,4 @@ export class CustomWidgetModule extends WidgetModule<ICustomWidgetState> {
       custom_json: settings.custom_json,
     };
   }
-}
-
-function useCustomWidget() {
-  return useWidget<CustomWidgetModule>();
 }
