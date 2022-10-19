@@ -32,6 +32,30 @@ class AdvancedSettingsModule {
     return this.service.recordingSettingsValues;
   }
 
+  get generalMetadata() {
+    return this.service.generalSettingsMetadata;
+  }
+
+  get generalValues() {
+    return this.service.generalSettingsValues;
+  }
+
+  get sourcesMetadata() {
+    return this.service.sourcesSettingsMetadata;
+  }
+
+  get sourcesValues() {
+    return this.service.sourcesSettingsValues;
+  }
+
+  get mediaMetadata() {
+    return this.service.mediaSettingsMetadata;
+  }
+
+  get mediaValues() {
+    return this.service.mediaSettingsValues;
+  }
+
   advancedValues(category: string) {
     return this.service.views.advancedSettingsValues(category);
   }
@@ -59,27 +83,44 @@ class AdvancedSettingsModule {
     return (key: string) => (val: unknown) =>
       this.service.actions.setAdvancedSetting(category, key, val);
   }
+
+  onMiscChange(key: string) {
+    return (val: unknown) => this.service.actions.setMiscSetting(key, val);
+  }
 }
 
 export function AdvancedSettings() {
   const {
+    categories,
     videoValues,
     videoMetadata,
     replayValues,
     replayMetadata,
     recordingMetadata,
     recordingValues,
-    onVideoChange,
-    advancedValues,
-    onAdvancedChange,
+    generalMetadata,
+    generalValues,
+    sourcesMetadata,
+    sourcesValues,
+    mediaMetadata,
+    mediaValues,
     metadata,
-    categories,
+    advancedValues,
+    onVideoChange,
+    onAdvancedChange,
+    onMiscChange,
   } = useModule(AdvancedSettingsModule);
 
   return (
     <>
       <div>
         <h2>{$t('General')}</h2>
+        <FormFactory
+          values={generalValues}
+          metadata={generalMetadata}
+          onChange={onMiscChange}
+          formOptions={{ layout: 'vertical' }}
+        />
       </div>
       <div className={styles.formSection}>
         <h2>{$t('Video')}</h2>
@@ -127,9 +168,21 @@ export function AdvancedSettings() {
       })}
       <div>
         <h2>{$t('Sources')}</h2>
+        <FormFactory
+          values={sourcesValues}
+          metadata={sourcesMetadata}
+          onChange={onMiscChange}
+          formOptions={{ layout: 'vertical' }}
+        />
       </div>
       <div>
         <h2>{$t('Media Files')}</h2>
+        <FormFactory
+          values={mediaValues}
+          metadata={mediaMetadata}
+          onChange={onMiscChange}
+          formOptions={{ layout: 'vertical' }}
+        />
       </div>
     </>
   );

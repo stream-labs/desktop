@@ -125,6 +125,35 @@ export class AdvancedSettingsService extends StatefulService<IAdvancedSettingsSt
     };
   }
 
+  get sourcesSettingsMetadata() {
+    return {
+      browserAccel: {
+        type: 'checkbox',
+        label: $t('Enable Browser Source Hardware Acceleration (requires a restart)'),
+      },
+    };
+  }
+
+  get mediaSettingsMetadata() {
+    return { caching: { type: 'checkbox', label: $t('Enable media file caching') } };
+  }
+
+  get generalSettingsMetadata() {
+    return {
+      processPriority: {
+        type: 'list',
+        label: $t('Process Priority'),
+        options: [
+          { label: $t('High'), value: obs.EProcessPriority.High },
+          { label: $t('Above Normal'), value: obs.EProcessPriority.AboveNormal },
+          { label: $t('Normal'), value: obs.EProcessPriority.Normal },
+          { label: $t('Below Normal'), value: obs.EProcessPriority.BelowNormal },
+          { label: $t('Idle'), value: obs.EProcessPriority.Idle },
+        ],
+      },
+    };
+  }
+
   get replaySettingsValues() {
     const replay = this.outputsService.replay;
     return { prefix: replay.prefix, suffix: replay.suffix };
@@ -137,6 +166,18 @@ export class AdvancedSettingsService extends StatefulService<IAdvancedSettingsSt
   get recordingSettingsValues() {
     const recording = this.outputsService.recording;
     return { fileFormat: recording.fileFormat, overwrite: recording.overwrite };
+  }
+
+  get sourcesSettingsValues() {
+    return { browserAccel: obs.NodeObs.GetBrowserAccelerationLegacy };
+  }
+
+  get mediaSettingsValues() {
+    return { caching: obs.NodeObs.GetMediaFileCachingLegacy };
+  }
+
+  get generalSettingsValues() {
+    return { processPriority: obs.NodeObs.GetProcessPriorityLegacy };
   }
 
   establishState() {
@@ -166,6 +207,16 @@ export class AdvancedSettingsService extends StatefulService<IAdvancedSettingsSt
   setAdvancedSetting(category: string, key: string, value: unknown) {
     this.obsFactories[category][key] = value;
     this.SET_ADVANCED_SETTING(category, key, value);
+  }
+
+  setMiscSetting(key: string, value: unknown) {
+    if (key === 'browserAccel') {
+      obs.NodeObs.SetBrowserAcceleration(value);
+    } else if (key === 'caching') {
+      obs.NodeObs.SetMediaFileCaching(value);
+    } else if (key === 'processPriority') {
+      obs.NodeObs.SetProcessPriority(value);
+    }
   }
 
   @mutation()
