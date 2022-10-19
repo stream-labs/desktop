@@ -1,15 +1,28 @@
-import { Inject } from 'vue-property-decorator';
-import { Service } from 'services/core/service';
+import { Inject, mutation, StatefulService, ViewHandler } from 'services/core';
 import * as obs from '../../../obs-api';
 import { SettingsManagerService } from 'app-services';
 
-export class OutputsService extends Service {
+interface IOutputServiceState {
+  stream: obs.ISimpleStreaming | obs.IAdvancedStreaming;
+  recording: obs.ISimpleRecording | obs.IAdvancedRecording;
+  replay: obs.ISimpleReplayBuffer | obs.IAdvancedReplayBuffer;
+}
+
+type TOutputType = 'stream' | 'recording' | 'replay';
+
+export class OutputsService extends StatefulService<IOutputServiceState> {
   @Inject() settingsManagerService: SettingsManagerService;
 
-  outputs = {
-    stream: null as obs.ISimpleStreaming | obs.IAdvancedStreaming,
-    recording: null as obs.ISimpleRecording | obs.IAdvancedRecording,
-    replay: null as obs.ISimpleReplayBuffer | obs.IAdvancedReplayBuffer,
+  initialState = {
+    stream: {},
+    recording: {},
+    replay: {},
+  };
+
+  outputs: IOutputServiceState = {
+    stream: null,
+    recording: null,
+    replay: null,
   };
   activeOutputs: string[] = [];
 
@@ -72,25 +85,25 @@ export class OutputsService extends Service {
   }
 
   createAdvancedOutputs() {
-    let { stream, recording, replay } = this.outputs;
+    const { stream, recording, replay } = this.outputs;
     if (stream) obs.SimpleStreamingFactory.destroy(stream as obs.ISimpleStreaming);
     if (recording) obs.SimpleRecordingFactory.destroy(recording as obs.ISimpleRecording);
     if (replay) obs.SimpleReplayBufferFactory.destroy(replay as obs.ISimpleReplayBuffer);
 
-    stream = obs.AdvancedStreamingFactory.create();
-    recording = obs.AdvancedRecordingFactory.create();
-    replay = obs.AdvancedReplayBufferFactory.create();
+    this.outputs.stream = obs.AdvancedStreamingFactory.create();
+    this.outputs.recording = obs.AdvancedRecordingFactory.create();
+    this.outputs.replay = obs.AdvancedReplayBufferFactory.create();
   }
 
   createSimpleOutputs() {
-    let { stream, recording, replay } = this.outputs;
+    const { stream, recording, replay } = this.outputs;
     if (stream) obs.AdvancedStreamingFactory.destroy(stream as obs.IAdvancedStreaming);
     if (recording) obs.AdvancedRecordingFactory.destroy(recording as obs.IAdvancedRecording);
     if (replay) obs.AdvancedReplayBufferFactory.destroy(replay as obs.IAdvancedReplayBuffer);
 
-    stream = obs.SimpleStreamingFactory.create();
-    recording = obs.SimpleRecordingFactory.create();
-    replay = obs.SimpleReplayBufferFactory.create();
+    this.outputs.stream = obs.SimpleStreamingFactory.create();
+    this.outputs.recording = obs.SimpleRecordingFactory.create();
+    this.outputs.replay = obs.SimpleReplayBufferFactory.create();
   }
 
   setAdvanced(value: boolean) {
@@ -102,6 +115,7 @@ export class OutputsService extends Service {
 
   setStreamSetting(key: keyof obs.IAdvancedStreaming | keyof obs.ISimpleStreaming, value: unknown) {
     this.outputs.stream[key] = value;
+    this.SET_SETTING('stream', key, value);
   }
 
   setRecordingSetting(
@@ -109,6 +123,7 @@ export class OutputsService extends Service {
     value: unknown,
   ) {
     this.outputs.recording[key] = value;
+    this.SET_SETTING('recording', key, value);
   }
 
   setReplaySetting(
@@ -116,15 +131,21 @@ export class OutputsService extends Service {
     value: unknown,
   ) {
     this.outputs.replay[key] = value;
+    this.SET_SETTING('replay', key, value);
   }
 
-  startOutput(key: 'stream' | 'recording' | 'replay') {
-    this[key].start();
+  startOutput(key: TOutputType) {
+    this.outputs[key].start();
     this.activeOutputs.push(key);
   }
 
-  endOutput(key: 'stream' | 'recording' | 'replay') {
-    this[key].stop();
+  endOutput(key: TOutputType) {
+    this.outputs[key].stop();
     this.activeOutputs = this.activeOutputs.filter(output => output !== key);
+  }
+
+  @mutation()
+  SET_SETTING(category: TOutputType, property: string, value: unknown) {
+    this.state[category][property] = value;
   }
 }

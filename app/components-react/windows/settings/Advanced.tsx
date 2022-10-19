@@ -4,9 +4,11 @@ import { Services } from '../../service-provider';
 import FormFactory from 'components-react/shared/inputs/FormFactory';
 import styles from './Common.m.less';
 import { $t } from 'services/i18n';
+import * as obs from '../../../../obs-api';
 
 class AdvancedSettingsModule {
   service = Services.AdvancedSettingsService;
+  outputsService = Services.OutputsService;
 
   get videoValues() {
     return this.service.videoSettingsValues;
@@ -87,6 +89,14 @@ class AdvancedSettingsModule {
   onMiscChange(key: string) {
     return (val: unknown) => this.service.actions.setMiscSetting(key, val);
   }
+
+  onReplayChange(key: keyof obs.IAdvancedReplayBuffer | keyof obs.ISimpleReplayBuffer) {
+    return (val: unknown) => this.outputsService.setReplaySetting(key, val);
+  }
+
+  onRecordingChange(key: keyof obs.IAdvancedRecording | keyof obs.ISimpleRecording) {
+    return (val: unknown) => this.outputsService.setRecordingSetting(key, val);
+  }
 }
 
 export function AdvancedSettings() {
@@ -109,6 +119,8 @@ export function AdvancedSettings() {
     onVideoChange,
     onAdvancedChange,
     onMiscChange,
+    onReplayChange,
+    onRecordingChange,
   } = useModule(AdvancedSettingsModule);
 
   return (
@@ -139,7 +151,7 @@ export function AdvancedSettings() {
         <FormFactory
           values={recordingValues}
           metadata={recordingMetadata}
-          // onChange={onVideoChange}
+          onChange={onRecordingChange}
           formOptions={{ layout: 'vertical' }}
         />
       </div>
@@ -148,7 +160,7 @@ export function AdvancedSettings() {
         <FormFactory
           values={replayValues}
           metadata={replayMetadata}
-          // onChange={onVideoChange}
+          onChange={onReplayChange}
           formOptions={{ layout: 'vertical' }}
         />
       </div>

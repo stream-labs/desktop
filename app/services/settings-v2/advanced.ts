@@ -82,7 +82,7 @@ export class AdvancedSettingsService extends StatefulService<IAdvancedSettingsSt
       delaySec: { type: 'number', label: $t('Duration (seconds)') },
       preserveDelay: {
         type: 'checkbox',
-        label: $t('Preserve cutoff point (increase delay) when reconnecting'),
+        label: $t('Preserved cutoff point (increase delay) when reconnecting'),
       },
     };
   }
@@ -155,7 +155,7 @@ export class AdvancedSettingsService extends StatefulService<IAdvancedSettingsSt
   }
 
   get replaySettingsValues() {
-    const replay = this.outputsService.outputs.replay;
+    const replay = this.outputsService.state.replay;
     return { prefix: replay.prefix, suffix: replay.suffix };
   }
 
@@ -164,7 +164,7 @@ export class AdvancedSettingsService extends StatefulService<IAdvancedSettingsSt
   }
 
   get recordingSettingsValues() {
-    const recording = this.outputsService.outputs.recording;
+    const recording = this.outputsService.state.recording;
     return { fileFormat: recording.fileFormat, overwrite: recording.overwrite };
   }
 
