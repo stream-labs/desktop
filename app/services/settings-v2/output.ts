@@ -6,9 +6,11 @@ import { SettingsManagerService } from 'app-services';
 export class OutputsService extends Service {
   @Inject() settingsManagerService: SettingsManagerService;
 
-  stream: obs.ISimpleStreaming | obs.IAdvancedStreaming;
-  recording: obs.ISimpleRecording | obs.IAdvancedRecording;
-  replay: obs.ISimpleReplayBuffer | obs.IAdvancedReplayBuffer;
+  outputs = {
+    stream: null as obs.ISimpleStreaming | obs.IAdvancedStreaming,
+    recording: null as obs.ISimpleRecording | obs.IAdvancedRecording,
+    replay: null as obs.ISimpleReplayBuffer | obs.IAdvancedReplayBuffer,
+  };
   activeOutputs: string[] = [];
 
   advancedMode: boolean;
@@ -70,27 +72,25 @@ export class OutputsService extends Service {
   }
 
   createAdvancedOutputs() {
-    if (this.stream) obs.SimpleStreamingFactory.destroy(this.stream as obs.ISimpleStreaming);
-    if (this.recording) obs.SimpleRecordingFactory.destroy(this.recording as obs.ISimpleRecording);
-    if (this.replay) obs.SimpleReplayBufferFactory.destroy(this.replay as obs.ISimpleReplayBuffer);
+    let { stream, recording, replay } = this.outputs;
+    if (stream) obs.SimpleStreamingFactory.destroy(stream as obs.ISimpleStreaming);
+    if (recording) obs.SimpleRecordingFactory.destroy(recording as obs.ISimpleRecording);
+    if (replay) obs.SimpleReplayBufferFactory.destroy(replay as obs.ISimpleReplayBuffer);
 
-    this.stream = obs.AdvancedStreamingFactory.create();
-    this.recording = obs.AdvancedRecordingFactory.create();
-    this.replay = obs.AdvancedReplayBufferFactory.create();
+    stream = obs.AdvancedStreamingFactory.create();
+    recording = obs.AdvancedRecordingFactory.create();
+    replay = obs.AdvancedReplayBufferFactory.create();
   }
 
   createSimpleOutputs() {
-    if (this.stream) obs.AdvancedStreamingFactory.destroy(this.stream as obs.IAdvancedStreaming);
-    if (this.recording) {
-      obs.AdvancedRecordingFactory.destroy(this.recording as obs.IAdvancedRecording);
-    }
-    if (this.replay) {
-      obs.AdvancedReplayBufferFactory.destroy(this.replay as obs.IAdvancedReplayBuffer);
-    }
+    let { stream, recording, replay } = this.outputs;
+    if (stream) obs.AdvancedStreamingFactory.destroy(stream as obs.IAdvancedStreaming);
+    if (recording) obs.AdvancedRecordingFactory.destroy(recording as obs.IAdvancedRecording);
+    if (replay) obs.AdvancedReplayBufferFactory.destroy(replay as obs.IAdvancedReplayBuffer);
 
-    this.stream = obs.SimpleStreamingFactory.create();
-    this.recording = obs.SimpleRecordingFactory.create();
-    this.replay = obs.SimpleReplayBufferFactory.create();
+    stream = obs.SimpleStreamingFactory.create();
+    recording = obs.SimpleRecordingFactory.create();
+    replay = obs.SimpleReplayBufferFactory.create();
   }
 
   setAdvanced(value: boolean) {
@@ -101,21 +101,21 @@ export class OutputsService extends Service {
   }
 
   setStreamSetting(key: keyof obs.IAdvancedStreaming | keyof obs.ISimpleStreaming, value: unknown) {
-    this.stream[key] = value;
+    this.outputs.stream[key] = value;
   }
 
   setRecordingSetting(
     key: keyof obs.IAdvancedRecording | keyof obs.ISimpleRecording,
     value: unknown,
   ) {
-    this.recording[key] = value;
+    this.outputs.recording[key] = value;
   }
 
   setReplaySetting(
     key: keyof obs.IAdvancedReplayBuffer | keyof obs.ISimpleReplayBuffer,
     value: unknown,
   ) {
-    this.replay[key] = value;
+    this.outputs.replay[key] = value;
   }
 
   startOutput(key: 'stream' | 'recording' | 'replay') {

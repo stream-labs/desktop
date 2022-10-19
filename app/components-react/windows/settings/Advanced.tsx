@@ -72,7 +72,7 @@ class AdvancedSettingsModule {
   }
 
   get categories() {
-    return this.service.views.advancedSettingsCategories;
+    return this.service.views.streamSettingsCategories;
   }
 
   onVideoChange(key: string) {

@@ -15,7 +15,7 @@ class AdvancedSettingsViews extends ViewHandler<IAdvancedSettingsState> {
     return this.state[category];
   }
 
-  get advancedSettingsCategories() {
+  get streamSettingsCategories() {
     return Object.keys(this.state);
   }
 }
@@ -32,9 +32,9 @@ export class AdvancedSettingsService extends StatefulService<IAdvancedSettingsSt
   };
 
   obsFactories = {
-    delay: obs.DelayFactory.create(),
-    reconnect: obs.ReconnectFactory.create(),
-    network: obs.NetworkFactory.create(),
+    delay: null as obs.IDelay,
+    reconnect: null as obs.IReconnect,
+    network: null as obs.INetwork,
   };
 
   init() {
@@ -155,7 +155,7 @@ export class AdvancedSettingsService extends StatefulService<IAdvancedSettingsSt
   }
 
   get replaySettingsValues() {
-    const replay = this.outputsService.replay;
+    const replay = this.outputsService.outputs.replay;
     return { prefix: replay.prefix, suffix: replay.suffix };
   }
 
@@ -164,7 +164,7 @@ export class AdvancedSettingsService extends StatefulService<IAdvancedSettingsSt
   }
 
   get recordingSettingsValues() {
-    const recording = this.outputsService.recording;
+    const recording = this.outputsService.outputs.recording;
     return { fileFormat: recording.fileFormat, overwrite: recording.overwrite };
   }
 
@@ -181,23 +181,30 @@ export class AdvancedSettingsService extends StatefulService<IAdvancedSettingsSt
   }
 
   establishState() {
+    this.buildFactories();
     this.migrateSettings();
     this.linkSettings();
   }
 
   migrateSettings() {
-    this.views.advancedSettingsCategories.forEach(category => {
+    this.views.streamSettingsCategories.forEach(category => {
       const setting = this.settingsManagerService.simpleStreamSettings[category];
       Object.keys(setting).forEach((key: string) => {
-        this.SET_ADVANCED_SETTING(category, key, setting[key]);
+        this.setAdvancedSetting(category, key, setting[key]);
       });
     });
   }
 
   linkSettings() {
-    this.views.advancedSettingsCategories.forEach(category => {
-      this.outputsService.streamSettings[category] = this.state[category];
+    this.views.streamSettingsCategories.forEach(category => {
+      this.outputsService.outputs.stream[category] = this.obsFactories[category];
     });
+  }
+
+  buildFactories() {
+    this.obsFactories.delay = obs.DelayFactory.create();
+    this.obsFactories.reconnect = obs.ReconnectFactory.create();
+    this.obsFactories.network = obs.NetworkFactory.create();
   }
 
   setVideoSetting(key: string, value: unknown) {
