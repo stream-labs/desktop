@@ -76,10 +76,6 @@ export class AdvancedSettingsService extends StatefulService<IAdvancedSettingsSt
     };
   }
 
-  get videoSettingsValues() {
-    return this.videoSettingsService.advancedSettingsValues;
-  }
-
   get delaySettingsMetadata() {
     return {
       enabled: { type: 'toggle', label: $t('Enabled') },
@@ -113,6 +109,34 @@ export class AdvancedSettingsService extends StatefulService<IAdvancedSettingsSt
       enableOptimizations: { type: 'checkbox', label: $t('Enable new networking code') },
       enableLowLatency: { type: 'checkbox', label: $t('Low latency mode') },
     };
+  }
+
+  get replaySettingsMetadata() {
+    return {
+      prefix: { type: 'text', label: $t('Replay Buffer Filename Prefix') },
+      suffix: { type: 'text', label: $t('Replay Buffer Filename Suffix') },
+    };
+  }
+
+  get recordingSettingsMetadata() {
+    return {
+      fileFormat: { type: 'text', label: $t('Filename Formatting') },
+      overwrite: { type: 'checkbox', label: $t('Overwrite if file exists') },
+    };
+  }
+
+  get replaySettingsValues() {
+    const replay = this.outputsService.replay;
+    return { prefix: replay.prefix, suffix: replay.suffix };
+  }
+
+  get videoSettingsValues() {
+    return this.videoSettingsService.advancedSettingsValues;
+  }
+
+  get recordingSettingsValues() {
+    const recording = this.outputsService.recording;
+    return { fileFormat: recording.fileFormat, overwrite: recording.overwrite };
   }
 
   establishState() {

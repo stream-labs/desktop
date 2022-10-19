@@ -16,6 +16,22 @@ class AdvancedSettingsModule {
     return this.service.videoSettingsMetadata;
   }
 
+  get replayMetadata() {
+    return this.service.replaySettingsMetadata;
+  }
+
+  get replayValues() {
+    return this.service.replaySettingsValues;
+  }
+
+  get recordingMetadata() {
+    return this.service.recordingSettingsMetadata;
+  }
+
+  get recordingValues() {
+    return this.service.recordingSettingsValues;
+  }
+
   advancedValues(category: string) {
     return this.service.views.advancedSettingsValues(category);
   }
@@ -49,6 +65,10 @@ export function AdvancedSettings() {
   const {
     videoValues,
     videoMetadata,
+    replayValues,
+    replayMetadata,
+    recordingMetadata,
+    recordingValues,
     onVideoChange,
     advancedValues,
     onAdvancedChange,
@@ -75,9 +95,21 @@ export function AdvancedSettings() {
       </div>
       <div>
         <h2>{$t('Recording')}</h2>
+        <FormFactory
+          values={recordingValues}
+          metadata={recordingMetadata}
+          // onChange={onVideoChange}
+          formOptions={{ layout: 'vertical' }}
+        />
       </div>
       <div>
         <h2>{$t('Replay Buffer')}</h2>
+        <FormFactory
+          values={replayValues}
+          metadata={replayMetadata}
+          // onChange={onVideoChange}
+          formOptions={{ layout: 'vertical' }}
+        />
       </div>
       {categories.map(category => {
         const meta = metadata[category];

@@ -31,7 +31,7 @@ export class SettingsManagerService extends Service {
   }
 
   get advancedReplaySettings() {
-    return obs.AdvancedRecordingFactory.legacySettings;
+    return obs.AdvancedReplayBufferFactory.legacySettings;
   }
 
   get videoSettings() {
