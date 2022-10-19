@@ -718,6 +718,7 @@ export class SourcesService extends StatefulService<ISourcesState> {
       // TipJar
       'ViewerCount',
       'GameWidget',
+      'CustomWidget',
     ];
     const isLegacyAlertbox = this.customizationService.state.legacyAlertbox;
     if (isLegacyAlertbox) reactWidgets = reactWidgets.filter(w => w !== 'AlertBox');
