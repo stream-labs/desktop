@@ -6,14 +6,13 @@
     </div>
     <div class="content">
       <comment-local-filter />
-      <comment-synthesizer />
     </div>
   </div>
 </template>
 
 <script lang="ts" src="./CommentSettings.vue.ts"></script>
 <style lang="less" scoped>
-@import "../../styles/index";
+@import '../../styles/index';
 
 .container {
   display: flex;

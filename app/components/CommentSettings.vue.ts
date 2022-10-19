@@ -1,16 +1,17 @@
+import { Inject } from 'services/core/injector';
+import { NicoliveCommentSynthesizerService } from 'services/nicolive-program/nicolive-comment-synthesizer';
+import { SynthesizerId, SynthesizerIds } from 'services/nicolive-program/state';
+import { sleep } from 'util/sleep';
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import VueSlider from 'vue-slider-component';
-import { Inject } from 'services/core/injector';
-import { NicoliveCommentSynthesizerService } from 'services/nicolive-program/nicolive-comment-synthesizer';
-import { sleep } from 'util/sleep';
 
 @Component({
   components: {
     VueSlider,
   },
 })
-export default class CommentSynthesizer extends Vue {
+export default class CommentSettings extends Vue {
   @Inject()
   private nicoliveCommentSynthesizerService: NicoliveCommentSynthesizerService;
 
@@ -46,22 +47,6 @@ export default class CommentSynthesizer extends Vue {
     this.nicoliveCommentSynthesizerService.enabled = e;
   }
 
-  get pitch(): number {
-    return this.nicoliveCommentSynthesizerService.pitch;
-  }
-  set pitch(v: number) {
-    this.nicoliveCommentSynthesizerService.pitch = v;
-  }
-  get pitchCandidates(): number[] {
-    return [
-      0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9,
-      2,
-    ];
-  }
-  resetPitch() {
-    this.pitch = 1.0;
-  }
-
   get rate(): number {
     return this.nicoliveCommentSynthesizerService.rate;
   }
@@ -74,8 +59,11 @@ export default class CommentSynthesizer extends Vue {
       8, 9, 10,
     ];
   }
+  get rateDefault(): number {
+    return NicoliveCommentSynthesizerService.initialState.rate;
+  }
   resetRate() {
-    this.rate = 1.0;
+    this.rate = this.rateDefault;
   }
 
   get volume(): number {
@@ -87,13 +75,55 @@ export default class CommentSynthesizer extends Vue {
   get volumeCandidates(): number[] {
     return [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0];
   }
+  get volumeDefault(): number {
+    return NicoliveCommentSynthesizerService.initialState.volume;
+  }
   resetVolume() {
-    this.volume = 1.0;
+    this.volume = this.volumeDefault;
   }
 
-  reset() {
-    this.resetPitch();
+  resetVoice() {
     this.resetRate();
     this.resetVolume();
+  }
+
+  get synthIds(): readonly SynthesizerId[] {
+    return SynthesizerIds;
+  }
+  synthName(id: SynthesizerId): string {
+    return this.$t(`settings.synthId.${id}`) as string;
+  }
+  get normal(): SynthesizerId {
+    return this.nicoliveCommentSynthesizerService.normal;
+  }
+  set normal(s: SynthesizerId) {
+    this.nicoliveCommentSynthesizerService.normal = s;
+  }
+  get normalDefault(): SynthesizerId {
+    return NicoliveCommentSynthesizerService.initialState.selector.normal;
+  }
+  get operator(): SynthesizerId {
+    return this.nicoliveCommentSynthesizerService.operator;
+  }
+  set operator(s: SynthesizerId) {
+    this.nicoliveCommentSynthesizerService.operator = s;
+  }
+  get operatorDefault(): SynthesizerId {
+    return NicoliveCommentSynthesizerService.initialState.selector.operator;
+  }
+  get system(): SynthesizerId {
+    return this.nicoliveCommentSynthesizerService.system;
+  }
+  set system(s: SynthesizerId) {
+    this.nicoliveCommentSynthesizerService.system = s;
+  }
+  get systemDefault(): SynthesizerId {
+    return NicoliveCommentSynthesizerService.initialState.selector.system;
+  }
+
+  resetAssignment() {
+    this.normal = this.normalDefault;
+    this.operator = this.operatorDefault;
+    this.system = this.systemDefault;
   }
 }

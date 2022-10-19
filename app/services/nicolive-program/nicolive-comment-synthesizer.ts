@@ -112,7 +112,7 @@ export class NicoliveCommentSynthesizerService extends StatefulService<ICommentS
       case 'normal':
         return this.state.selector.normal;
       case 'operator':
-        return 'nVoice'; // this.state.selector.operator; // DEBUG
+        return this.state.selector.operator;
       default:
         return this.state.selector.system;
     }
@@ -228,13 +228,31 @@ export class NicoliveCommentSynthesizerService extends StatefulService<ICommentS
     this.setState({ maxTime });
   }
   get maxTime(): number {
-    return this.state.maxTime || 4;
+    return this.state.maxTime || NicoliveCommentSynthesizerService.initialState.maxTime;
   }
   set maxTime(m: number) {
     this.setMaxTime(m);
   }
 
-  // TODO selector accessor
+  // selector accessor
+  get normal(): SynthesizerId {
+    return this.state.selector.normal;
+  }
+  set normal(s: SynthesizerId) {
+    this.setState({ selector: { ...this.state.selector, normal: s } });
+  }
+  get operator(): SynthesizerId {
+    return this.state.selector.operator;
+  }
+  set operator(s: SynthesizerId) {
+    this.setState({ selector: { ...this.state.selector, operator: s } });
+  }
+  get system(): SynthesizerId {
+    return this.state.selector.system;
+  }
+  set system(s: SynthesizerId) {
+    this.setState({ selector: { ...this.state.selector, system: s } });
+  }
 
   private setState(partialState: Partial<ICommentSynthesizerState>) {
     const nextState = { ...this.state, ...partialState };

@@ -17,6 +17,8 @@ import NotificationsSettings from 'components/NotificationsSettings.vue';
 import AppearanceSettings from 'components/AppearanceSettings.vue';
 import ExperimentalSettings from 'components/ExperimentalSettings.vue';
 import LanguageSettings from 'components/LanguageSettings.vue';
+import CommentSettings from '../CommentSettings.vue';
+import SpeechEngineSettings from '../SpeechEngineSettings.vue';
 import { CategoryIcons } from './CategoryIcons';
 
 @Component({
@@ -31,6 +33,8 @@ import { CategoryIcons } from './CategoryIcons';
     AppearanceSettings,
     ExperimentalSettings,
     LanguageSettings,
+    CommentSettings,
+    SpeechEngineSettings,
   },
 })
 export default class Settings extends Vue {
@@ -44,6 +48,7 @@ export default class Settings extends Vue {
 
   categoryName: string = 'General';
   settingsData: ISettingsSubCategory[] = [];
+  // @ts-ignore: ts2729: use before initialization
   categoryNames = this.settingsService.getCategories();
   userSubscription: Subscription;
   icons = CategoryIcons;
