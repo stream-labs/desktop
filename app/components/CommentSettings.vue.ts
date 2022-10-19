@@ -1,4 +1,5 @@
 import { Inject } from 'services/core/injector';
+import { NicoliveCommentLocalFilterService } from 'services/nicolive-program/nicolive-comment-local-filter';
 import { NicoliveCommentSynthesizerService } from 'services/nicolive-program/nicolive-comment-synthesizer';
 import { SynthesizerId, SynthesizerIds } from 'services/nicolive-program/state';
 import { sleep } from 'util/sleep';
@@ -14,6 +15,8 @@ import VueSlider from 'vue-slider-component';
 export default class CommentSettings extends Vue {
   @Inject()
   private nicoliveCommentSynthesizerService: NicoliveCommentSynthesizerService;
+  @Inject()
+  private nicoliveCommentLocalFilterService: NicoliveCommentLocalFilterService;
 
   close() {
     this.$emit('close');
@@ -125,5 +128,13 @@ export default class CommentSettings extends Vue {
     this.normal = this.normalDefault;
     this.operator = this.operatorDefault;
     this.system = this.systemDefault;
+  }
+
+  get showAnonymous() {
+    return this.nicoliveCommentLocalFilterService.showAnonymous;
+  }
+
+  set showAnonymous(v: boolean) {
+    this.nicoliveCommentLocalFilterService.showAnonymous = v;
   }
 }

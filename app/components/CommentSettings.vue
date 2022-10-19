@@ -1,5 +1,16 @@
 <template>
   <div class="setting-section">
+    <div class="section-heading">フィルター設定</div>
+    <div class="section-content">
+      <div class="section-item">
+        <div class="row">
+          <div class="name">匿名(184)のコメントを表示</div>
+          <div class="value">
+            <input type="checkbox" v-model="showAnonymous" class="toggle-button" />
+          </div>
+        </div>
+      </div>
+    </div>
     <div class="section-heading">音声設定</div>
     <button class="button button--secondary" :disabled="!enabled" @click="resetVoice">
       設定をリセット

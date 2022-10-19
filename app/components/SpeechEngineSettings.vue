@@ -1,12 +1,3 @@
-// TODO
-// - N Voice
-//   - 音声設定
-//     - 合成音の最大秒数
-//     - [読み上げテスト]
-// Windows
-//   - 音声設定
-//     - 声の高さ
-//     - [読み上げテスト]
 <template>
   <div class="setting-section">
     <h2>N Voice</h2>
