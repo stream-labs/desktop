@@ -26,6 +26,12 @@ export class AdvancedSettingsService extends StatefulService<IAdvancedSettingsSt
   @Inject() outputsService: OutputsService;
 
   initialState = {
+    delay: {} as obs.IDelay,
+    reconnect: {} as obs.IReconnect,
+    network: {} as obs.INetwork,
+  };
+
+  obsFactories = {
     delay: obs.DelayFactory.create(),
     reconnect: obs.ReconnectFactory.create(),
     network: obs.NetworkFactory.create(),
@@ -111,7 +117,6 @@ export class AdvancedSettingsService extends StatefulService<IAdvancedSettingsSt
 
   establishState() {
     this.migrateSettings();
-
     this.linkSettings();
   }
 
@@ -135,6 +140,7 @@ export class AdvancedSettingsService extends StatefulService<IAdvancedSettingsSt
   }
 
   setAdvancedSetting(category: string, key: string, value: unknown) {
+    this.obsFactories[category][key] = value;
     this.SET_ADVANCED_SETTING(category, key, value);
   }
 
