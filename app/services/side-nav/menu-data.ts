@@ -342,14 +342,14 @@ export const SideBarSubMenuItems = (): TSubMenuItems => ({
   },
   [ESubMenuItem.TipSettings]: {
     key: EMenuItemKey.TipSettings,
-    type: 'tipping',
+    type: 'tipping/settings',
     title: ESubMenuItem.TipSettings,
     trackingTarget: 'dashboard',
     isExpanded: false,
   },
   [ESubMenuItem.Multistream]: {
     key: EMenuItemKey.Multistream,
-    type: 'multistream',
+    type: 'multistream', // todo: link to https://streamlabs.com/content-hub/post/how-to-multistream-the-ultimate-guide-to-multistreaming
     title: ESubMenuItem.Multistream,
     trackingTarget: 'dashboard',
     isExpanded: false,
