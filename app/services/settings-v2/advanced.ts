@@ -37,11 +37,7 @@ export class AdvancedSettingsService extends StatefulService<IAdvancedSettingsSt
     delay: {} as obs.IDelay,
     reconnect: {} as obs.IReconnect,
     network: {} as obs.INetwork,
-    misc: {
-      processPriority: null,
-      browserAccel: null,
-      caching: null,
-    } as IMiscSettings,
+    misc: {} as IMiscSettings,
   };
 
   obsFactories = {
