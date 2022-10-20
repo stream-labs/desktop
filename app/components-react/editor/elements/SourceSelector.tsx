@@ -367,11 +367,11 @@ class SourceSelectorModule {
   }
 
   toggleMobileVisibility() {
-    this.dualOutputService.toggleMobileVisibility();
+    this.dualOutputService.actions.toggleMobileVisibility();
   }
 
   toggleDesktopVisibility() {
-    this.dualOutputService.toggleDesktopVisibility();
+    this.dualOutputService.actions.toggleDesktopVisibility();
   }
 
   // Required for performance. Using Selection is too slow (Service Helpers)
@@ -614,11 +614,17 @@ const TreeNode = React.forwardRef(
           <>
             {p.isGuestCamActive && <i className="fa fa-signal" />}
             {/* @@@ HERE TODO: 1. font icons. 2. show hide functionality. 3. remove logic from custom widget and repush */}
-            {p.isDualOutputActive && p.isMobileActive && (
-              <i onClick={p.toggleMobileVisibility} className="icon-phone-case" />
+            {p.isDualOutputActive && (
+              <i
+                onClick={p.toggleMobileVisibility}
+                className={p.isMobileActive ? 'icon-phone-case' : 'icon-phone-case-hide'}
+              />
             )}
-            {p.isDualOutputActive && p.isDesktopActive && (
-              <i onClick={p.toggleDesktopVisibility} className="icon-desktop" />
+            {p.isDualOutputActive && (
+              <i
+                onClick={p.toggleDesktopVisibility}
+                className={p.isDesktopActive ? 'icon-desktop' : 'icon-desktop-hide'}
+              />
             )}
             {p.selectiveRecordingEnabled && (
               <Tooltip title={selectiveRecordingMetadata().tooltip} placement="left">

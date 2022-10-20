@@ -6,7 +6,6 @@ import cx from 'classnames';
 import Display from 'components-react/shared/Display';
 import { $t } from 'services/i18n';
 import { ERenderingMode } from '../../../obs-api';
-import { DualOutputService } from 'services/dual-output';
 import { Tooltip } from 'antd';
 
 export default function StudioEditor() {
@@ -23,6 +22,8 @@ export default function StudioEditor() {
     cursor: EditorService.state.cursor,
     studioMode: TransitionsService.state.studioMode,
     dualOutputMode: DualOutputService.views.dualOutputMode,
+    isDesktopActive: DualOutputService.views.isDesktopActive,
+    isMobileActive: DualOutputService.views.isMobileActive,
   }));
   const displayEnabled = !v.hideStyleBlockers && !v.performanceMode;
   const placeholderRef = useRef<HTMLDivElement>(null);
@@ -32,6 +33,8 @@ export default function StudioEditor() {
   const studioModeTransitionName = useMemo(() => TransitionsService.getStudioTransitionName(), [
     v.studioMode,
   ]);
+
+  // @@@ TODO: updateStyleBlockers() for smoother transition when rendering mobile display?
 
   // Track vertical orientation for placeholder
   useEffect(() => {
@@ -184,7 +187,7 @@ export default function StudioEditor() {
                 <Display paddingSize={10} />
               </div>
             )}
-            {v.dualOutputMode && (
+            {v.dualOutputMode && v.isMobileActive && (
               <div
                 className={cx(styles.dualOutputDisplayContainer)}
                 style={{ cursor: v.cursor }}

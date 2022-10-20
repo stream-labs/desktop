@@ -77,11 +77,18 @@ export class DualOutputService extends StatefulService<IDualOutputServiceState> 
     } else {
       this.state.dualOutputMode = status;
     }
+
+    if (this.state.dualOutputMode === false) {
+      // reset so both displays will always show when dual output is toggled on
+      this.state.isMobileActive = true;
+      this.state.isDesktopActive = true;
+    }
   }
 
   @mutation()
   private TOGGLE_MOBILE_VISIBILITY(status?: boolean) {
-    if (typeof status === 'undefined') {
+    console.log('mobile ', status);
+    if (typeof status === 'undefined' || 'null') {
       this.state.isMobileActive = !this.state.isMobileActive;
     } else {
       this.state.isMobileActive = status;
@@ -90,7 +97,8 @@ export class DualOutputService extends StatefulService<IDualOutputServiceState> 
 
   @mutation()
   private TOGGLE_DESKTOP_VISIBILITY(status?: boolean) {
-    if (typeof status === 'undefined') {
+    console.log('desktop ', status);
+    if (typeof status === 'undefined' || 'null') {
       this.state.isDesktopActive = !this.state.isDesktopActive;
     } else {
       this.state.isDesktopActive = status;
