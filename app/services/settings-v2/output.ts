@@ -1,4 +1,4 @@
-import { Inject, mutation, StatefulService, ViewHandler } from 'services/core';
+import { Inject, mutation, StatefulService, InitAfter } from 'services/core';
 import * as obs from '../../../obs-api';
 import { SettingsManagerService } from 'app-services';
 
@@ -10,6 +10,7 @@ interface IOutputServiceState {
 
 type TOutputType = 'stream' | 'recording' | 'replay';
 
+@InitAfter('VideoSettingsService')
 export class OutputsService extends StatefulService<IOutputServiceState> {
   @Inject() settingsManagerService: SettingsManagerService;
 

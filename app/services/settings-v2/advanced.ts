@@ -35,7 +35,7 @@ class AdvancedSettingsViews extends ViewHandler<IAdvancedSettingsState> {
   }
 }
 
-@InitAfter('VideoSettingsService')
+@InitAfter('OutputsService')
 export class AdvancedSettingsService extends StatefulService<IAdvancedSettingsState> {
   @Inject() videoSettingsService: VideoSettingsService;
   @Inject() settingsManagerService: SettingsManagerService;
@@ -55,9 +55,7 @@ export class AdvancedSettingsService extends StatefulService<IAdvancedSettingsSt
   };
 
   init() {
-    console.log('initializing');
     this.establishState();
-    console.log(this.obsFactories);
   }
 
   get views() {
@@ -207,7 +205,7 @@ export class AdvancedSettingsService extends StatefulService<IAdvancedSettingsSt
 
   migrateSettings() {
     this.views.streamSettingsCategories.forEach(category => {
-      const setting = this.settingsManagerService.simpleStreamSettings[category];
+      const setting = obs.SimpleStreamingFactory.legacySettings[category];
       Object.keys(setting).forEach((key: string) => {
         this.setAdvancedSetting(category, key, setting[key]);
       });
