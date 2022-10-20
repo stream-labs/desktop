@@ -55,7 +55,7 @@ const FPS_OPTIONS = [
 export class VideoSettingsService extends StatefulService<{ videoContext: obs.IVideo }> {
   @Inject() settingsManagerService: SettingsManagerService;
 
-  initialState = {
+  static initialState = {
     videoContext: null as obs.IVideo,
   };
 

@@ -40,9 +40,9 @@ export class SettingsManagerService extends Service {
 
   get miscSettings() {
     return {
-      browserAccel: obs.NodeObs.GetBrowserAccelerationLegacy,
-      caching: obs.NodeObs.GetMediaFileCachingLegacy,
-      processPriority: obs.NodeObs.GetProcessPriorityLegacy,
+      browserAccel: obs.NodeObs.GetBrowserAccelerationLegacy(),
+      caching: obs.NodeObs.GetMediaFileCachingLegacy(),
+      processPriority: obs.NodeObs.GetProcessPriorityLegacy(),
     };
   }
 }

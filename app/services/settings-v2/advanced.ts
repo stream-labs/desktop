@@ -1,4 +1,4 @@
-import { Inject, mutation, StatefulService, ViewHandler } from 'services/core';
+import { Inject, mutation, StatefulService, ViewHandler, InitAfter } from 'services/core';
 import * as obs from '../../../obs-api';
 import { SettingsManagerService } from 'services/settings-manager';
 import { VideoSettingsService } from './video';
@@ -33,7 +33,7 @@ export class AdvancedSettingsService extends StatefulService<IAdvancedSettingsSt
   @Inject() settingsManagerService: SettingsManagerService;
   @Inject() outputsService: OutputsService;
 
-  initialState: IAdvancedSettingsState = {
+  static initialState: IAdvancedSettingsState = {
     delay: {} as obs.IDelay,
     reconnect: {} as obs.IReconnect,
     network: {} as obs.INetwork,
@@ -103,7 +103,7 @@ export class AdvancedSettingsService extends StatefulService<IAdvancedSettingsSt
   get reconnectSettingsMetadata() {
     return {
       enabled: { type: 'toggle', label: $t('Enabled') },
-      retryDelay: { type: 'number', label: $t('Retry Delay (seconds') },
+      retryDelay: { type: 'number', label: $t('Retry Delay (seconds)') },
       maxRetries: { type: 'number', label: $t('Maximum Retries') },
     };
   }
@@ -207,8 +207,10 @@ export class AdvancedSettingsService extends StatefulService<IAdvancedSettingsSt
       });
     });
 
-    Object.keys(this.settingsManagerService.miscSettings).forEach((key: string) => {
-      this.SET_ADVANCED_SETTING('misc', key, this.settingsManagerService.miscSettings[key]);
+    const miscSettings = this.settingsManagerService.miscSettings;
+    Object.keys(miscSettings).forEach((key: string) => {
+      console.log(key, miscSettings[key]);
+      this.SET_ADVANCED_SETTING('misc', key, miscSettings[key]);
     });
   }
 

@@ -13,7 +13,7 @@ type TOutputType = 'stream' | 'recording' | 'replay';
 export class OutputsService extends StatefulService<IOutputServiceState> {
   @Inject() settingsManagerService: SettingsManagerService;
 
-  initialState = {
+  static initialState = {
     stream: {},
     recording: {},
     replay: {},
@@ -51,8 +51,6 @@ export class OutputsService extends StatefulService<IOutputServiceState> {
   }
 
   init() {
-    super.init();
-
     this.advancedMode = this.settingsManagerService.simpleStreamSettings.useAdvanced;
 
     if (this.advancedMode) {

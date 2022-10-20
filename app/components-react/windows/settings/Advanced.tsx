@@ -167,7 +167,7 @@ export function AdvancedSettings() {
       {categories.map(category => {
         const meta = metadata[category];
         return (
-          <div>
+          <div key={category}>
             <h2>{meta.header}</h2>
             <FormFactory
               values={advancedValues(category)}
