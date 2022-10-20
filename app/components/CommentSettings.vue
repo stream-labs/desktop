@@ -25,7 +25,7 @@
       <div class="section-item">
         <div class="row">
           <div class="name">速度</div>
-          <div class="value">×{{ rate }}<span v-if="rate == rateDefault">（規定）</span></div>
+          <div class="value">×{{ rate }}<span v-if="rate == rateDefault">（既定）</span></div>
         </div>
         <VueSlider
           class="slider"
@@ -40,7 +40,7 @@
       <div class="section-item">
         <div class="row">
           <div class="name">音量</div>
-          <div class="value">{{ volume }}<span v-if="volume == volumeDefault">（規定）</span></div>
+          <div class="value">{{ volume }}<span v-if="volume == volumeDefault">（既定）</span></div>
         </div>
         <VueSlider
           class="slider"
@@ -61,27 +61,40 @@
     <div class="section-content">
       <div class="section-item">
         <label for="normal-select">視聴者コメント</label>
+        <button class="button button--primary" :disabled="!enabled" @click="testSpeechPlay(normal)">
+          読み上げテスト
+        </button>
         <select id="normal-select" v-model="normal">
           <option v-for="id in synthIds" :key="id" :value="id">
-            {{ synthName(id) }}
+            {{ synthName(id) }}<span v-if="id == normalDefault">（既定）</span>
           </option>
         </select>
       </div>
 
       <div class="section-item">
         <label for="operator-select">放送者コメント</label>
+        <button
+          class="button button--primary"
+          :disabled="!enabled"
+          @click="testSpeechPlay(operator)"
+        >
+          読み上げテスト
+        </button>
         <select id="operator-select" v-model="operator">
           <option v-for="id in synthIds" :key="id" :value="id">
-            {{ synthName(id) }}
+            {{ synthName(id) }}<span v-if="id == operatorDefault">（既定）</span>
           </option>
         </select>
       </div>
 
       <div class="section-item">
         <label for="system-select">システムメッセージ</label>
+        <button class="button button--primary" :disabled="!enabled" @click="testSpeechPlay(system)">
+          読み上げテスト
+        </button>
         <select id="system-select" v-model="system">
           <option v-for="id in synthIds" :key="id" :value="id">
-            {{ synthName(id) }}
+            {{ synthName(id) }}<span v-if="id == systemDefault">（既定）</span>
           </option>
         </select>
       </div>

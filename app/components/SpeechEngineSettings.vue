@@ -11,7 +11,7 @@
         <div class="row">
           <div class="name">合成音の最大秒数</div>
           <div class="value">
-            {{ maxTime }}<span v-if="maxTime == maxTimeDefault">（規定）</span>
+            {{ maxTime }}<span v-if="maxTime == maxTimeDefault">（既定）</span>
           </div>
         </div>
         <VueSlider
@@ -47,7 +47,7 @@
       <div class="section-item">
         <div class="row">
           <div class="name">声の高さ</div>
-          <div class="value">{{ pitch }}<span v-if="pitch == pitchDefault">（規定）</span></div>
+          <div class="value">{{ pitch }}<span v-if="pitch == pitchDefault">（既定）</span></div>
         </div>
         <VueSlider
           class="slider"

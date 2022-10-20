@@ -22,9 +22,8 @@ export default class CommentSettings extends Vue {
     this.$emit('close');
   }
 
-  async testSpeechPlay() {
+  async testSpeechPlay(synthId: SynthesizerId) {
     const service = this.nicoliveCommentSynthesizerService;
-    const synthId = 'nVoice'; // TODO これを変更することでテスト対象を指定する
 
     const speech = service.makeSimpleTextSpeech('これは読み上げ設定のテスト音声です', synthId);
     if (speech) {
