@@ -94,7 +94,7 @@ export class AdvancedSettingsService extends StatefulService<IAdvancedSettingsSt
       enabled: { type: 'toggle', label: $t('Enabled') },
       delaySec: { type: 'number', label: $t('Duration (seconds)') },
       preserveDelay: {
-        type: 'checkbox',
+        type: 'bool',
         label: $t('Preserved cutoff point (increase delay) when reconnecting'),
       },
     };
@@ -116,11 +116,11 @@ export class AdvancedSettingsService extends StatefulService<IAdvancedSettingsSt
         options: [{ label: $t('Default'), value: 'default' }],
       },
       enableDynamicBitrate: {
-        type: 'checkbox',
+        type: 'bool',
         label: $t('Dynamically change bitrate when dropping frames while streaming'),
       },
-      enableOptimizations: { type: 'checkbox', label: $t('Enable new networking code') },
-      enableLowLatency: { type: 'checkbox', label: $t('Low latency mode') },
+      enableOptimizations: { type: 'bool', label: $t('Enable new networking code') },
+      enableLowLatency: { type: 'bool', label: $t('Low latency mode') },
     };
   }
 
@@ -134,21 +134,21 @@ export class AdvancedSettingsService extends StatefulService<IAdvancedSettingsSt
   get recordingSettingsMetadata() {
     return {
       fileFormat: { type: 'text', label: $t('Filename Formatting') },
-      overwrite: { type: 'checkbox', label: $t('Overwrite if file exists') },
+      overwrite: { type: 'bool', label: $t('Overwrite if file exists') },
     };
   }
 
   get sourcesSettingsMetadata() {
     return {
       browserAccel: {
-        type: 'checkbox',
+        type: 'bool',
         label: $t('Enable Browser Source Hardware Acceleration (requires a restart)'),
       },
     };
   }
 
   get mediaSettingsMetadata() {
-    return { caching: { type: 'checkbox', label: $t('Enable media file caching') } };
+    return { caching: { type: 'bool', label: $t('Enable media file caching') } };
   }
 
   get generalSettingsMetadata() {

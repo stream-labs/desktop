@@ -125,7 +125,7 @@ export function AdvancedSettings() {
 
   return (
     <>
-      <div>
+      <div className={styles.formSection}>
         <h2>{$t('General')}</h2>
         <FormFactory
           values={generalValues}
@@ -143,10 +143,10 @@ export function AdvancedSettings() {
           formOptions={{ layout: 'vertical' }}
         />
       </div>
-      <div>
+      <div className={styles.formSection}>
         <h2>{$t('Audio')}</h2>
       </div>
-      <div>
+      <div className={styles.formSection}>
         <h2>{$t('Recording')}</h2>
         <FormFactory
           values={recordingValues}
@@ -155,7 +155,7 @@ export function AdvancedSettings() {
           formOptions={{ layout: 'vertical' }}
         />
       </div>
-      <div>
+      <div className={styles.formSection}>
         <h2>{$t('Replay Buffer')}</h2>
         <FormFactory
           values={replayValues}
@@ -167,7 +167,7 @@ export function AdvancedSettings() {
       {categories.map(category => {
         const meta = metadata[category];
         return (
-          <div key={category}>
+          <div key={category} className={styles.formSection}>
             <h2>{meta.header}</h2>
             <FormFactory
               values={advancedValues(category)}
@@ -178,7 +178,7 @@ export function AdvancedSettings() {
           </div>
         );
       })}
-      <div>
+      <div className={styles.formSection}>
         <h2>{$t('Sources')}</h2>
         <FormFactory
           values={sourcesValues}
@@ -187,7 +187,7 @@ export function AdvancedSettings() {
           formOptions={{ layout: 'vertical' }}
         />
       </div>
-      <div>
+      <div className={styles.formSection}>
         <h2>{$t('Media Files')}</h2>
         <FormFactory
           values={mediaValues}

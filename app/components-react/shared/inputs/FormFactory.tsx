@@ -16,6 +16,7 @@ const componentTable: Dictionary<React.FunctionComponent<TSlobsInputProps<{}, TI
   list: inputs.ListInput,
   seconds: inputs.SliderInput,
   autocomplete: inputs.AutocompleteInput,
+  toggle: inputs.SwitchInput,
 };
 
 interface IFormMetadata {
