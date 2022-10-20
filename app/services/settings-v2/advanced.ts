@@ -1,4 +1,11 @@
-import { Inject, mutation, StatefulService, ViewHandler, InitAfter } from 'services/core';
+import {
+  Inject,
+  mutation,
+  StatefulService,
+  ViewHandler,
+  InitAfter,
+  ExecuteInWorkerProcess,
+} from 'services/core';
 import * as obs from '../../../obs-api';
 import { SettingsManagerService } from 'services/settings-manager';
 import { VideoSettingsService } from './video';
@@ -28,6 +35,7 @@ class AdvancedSettingsViews extends ViewHandler<IAdvancedSettingsState> {
   }
 }
 
+@InitAfter('VideoSettingsService')
 export class AdvancedSettingsService extends StatefulService<IAdvancedSettingsState> {
   @Inject() videoSettingsService: VideoSettingsService;
   @Inject() settingsManagerService: SettingsManagerService;
@@ -47,7 +55,9 @@ export class AdvancedSettingsService extends StatefulService<IAdvancedSettingsSt
   };
 
   init() {
+    console.log('initializing');
     this.establishState();
+    console.log(this.obsFactories);
   }
 
   get views() {
@@ -109,7 +119,7 @@ export class AdvancedSettingsService extends StatefulService<IAdvancedSettingsSt
       bindIP: {
         type: 'list',
         label: $t('Bind to IP'),
-        options: [{ label: $t('Default'), value: 'default' }],
+        options: this.getInterfaceOptions(),
       },
       enableDynamicBitrate: {
         type: 'bool',
@@ -164,8 +174,8 @@ export class AdvancedSettingsService extends StatefulService<IAdvancedSettingsSt
   }
 
   get replaySettingsValues() {
-    const replay = this.outputsService.state?.replay;
-    return { prefix: replay?.prefix, suffix: replay?.suffix };
+    const replay = this.outputsService.state.replay;
+    return { prefix: replay.prefix, suffix: replay.suffix };
   }
 
   get videoSettingsValues() {
@@ -173,8 +183,8 @@ export class AdvancedSettingsService extends StatefulService<IAdvancedSettingsSt
   }
 
   get recordingSettingsValues() {
-    const recording = this.outputsService.state?.recording;
-    return { fileFormat: recording?.fileFormat, overwrite: recording?.overwrite };
+    const recording = this.outputsService.state.recording;
+    return { fileFormat: recording.fileFormat, overwrite: recording.overwrite };
   }
 
   get sourcesSettingsValues() {
@@ -205,7 +215,6 @@ export class AdvancedSettingsService extends StatefulService<IAdvancedSettingsSt
 
     const miscSettings = this.settingsManagerService.miscSettings;
     Object.keys(miscSettings).forEach((key: string) => {
-      console.log(key, miscSettings[key]);
       this.SET_ADVANCED_SETTING('misc', key, miscSettings[key]);
     });
   }
@@ -220,6 +229,12 @@ export class AdvancedSettingsService extends StatefulService<IAdvancedSettingsSt
     this.obsFactories.delay = obs.DelayFactory.create();
     this.obsFactories.reconnect = obs.ReconnectFactory.create();
     this.obsFactories.network = obs.NetworkFactory.create();
+  }
+
+  @ExecuteInWorkerProcess()
+  getInterfaceOptions() {
+    const interfaces = this.obsFactories.network.networkInterfaces;
+    return Object.keys(interfaces).map(key => ({ label: key, value: interfaces[key] }));
   }
 
   setVideoSetting(key: string, value: unknown) {

@@ -91,11 +91,11 @@ class AdvancedSettingsModule {
   }
 
   onReplayChange(key: keyof obs.IAdvancedReplayBuffer | keyof obs.ISimpleReplayBuffer) {
-    return (val: unknown) => this.outputsService.setReplaySetting(key, val);
+    return (val: unknown) => this.outputsService.actions.setReplaySetting(key, val);
   }
 
   onRecordingChange(key: keyof obs.IAdvancedRecording | keyof obs.ISimpleRecording) {
-    return (val: unknown) => this.outputsService.setRecordingSetting(key, val);
+    return (val: unknown) => this.outputsService.actions.setRecordingSetting(key, val);
   }
 }
 
