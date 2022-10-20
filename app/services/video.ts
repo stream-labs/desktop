@@ -68,6 +68,10 @@ export class Display {
 
   cancelUnload: () => void;
 
+  // @@REFERENCE
+  // @@REUSE??: maybe pass something to indicate mobile display
+  // position + size and adds padding where needed
+
   constructor(public name: string, options: IDisplayOptions = {}) {
     this.sourceId = options.sourceId;
     this.electronWindowId = options.electronWindowId || remote.getCurrentWindow().id;

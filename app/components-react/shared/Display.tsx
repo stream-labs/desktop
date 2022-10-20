@@ -1,8 +1,10 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useLayoutEffect, useEffect, useRef } from 'react';
 import { useVuex } from '../hooks';
 import { Services } from '../service-provider';
 import { Display as OBSDisplay } from '../../services/video';
 import uuid from 'uuid/v4';
+
+// @@REFERENCE
 
 interface DisplayProps {
   sourceId?: string;
@@ -38,6 +40,9 @@ export default function Display(props: DisplayProps) {
 
   useEffect(updateDisplay, [p.sourceId, v.paddingColor]);
   useEffect(refreshOutputRegion, [v.baseResolution]);
+  // why not useLayoutEffect?
+  // useLayoutEffect(updateDisplay, [p.sourceId, v.paddingColor]);
+  // useLayoutEffect(refreshOutputRegion, [v.baseResolution]);
 
   function refreshOutputRegion() {
     if (!obsDisplay.current) return;
@@ -67,6 +72,7 @@ export default function Display(props: DisplayProps) {
   }
 
   function updateDisplay() {
+    // why destroying and creating every time?
     destroyDisplay();
     createDisplay();
 
@@ -79,7 +85,12 @@ export default function Display(props: DisplayProps) {
     <div
       className="display"
       ref={displayEl}
-      style={{ height: '100%', backgroundColor: 'var(--section)', flexGrow: 1, ...p.style }}
+      style={{
+        height: '100%',
+        backgroundColor: 'var(--section)',
+        flexGrow: 1,
+        ...p.style,
+      }}
       onClick={onClickHandler}
     />
   );

@@ -22,6 +22,7 @@ import HelpTip from 'components-react/shared/HelpTip';
 import Translate from 'components-react/shared/Translate';
 import { WidgetsService } from '../../../app-services';
 import { GuestCamService } from 'app-services';
+import { DualOutputService } from 'services/dual-output';
 
 interface ISourceMetadata {
   id: string;
@@ -32,6 +33,9 @@ interface ISourceMetadata {
   isStreamVisible: boolean;
   isRecordingVisible: boolean;
   isGuestCamActive: boolean;
+  isDualOutputActive: boolean;
+  isMobileActive: boolean;
+  isDesktopActive: boolean;
   isFolder: boolean;
   canShowActions: boolean;
   parentId?: string;
@@ -46,6 +50,7 @@ class SourceSelectorModule {
   private streamingService = inject(StreamingService);
   private audioService = inject(AudioService);
   private guestCamService = inject(GuestCamService);
+  private dualOutputService = inject(DualOutputService);
 
   sourcesTooltip = $t('The building blocks of your scene. Also contains widgets.');
   addSourceTooltip = $t('Add a new Source to your Scene. Includes widgets.');
@@ -81,10 +86,15 @@ class SourceSelectorModule {
               canShowActions={sceneNode.canShowActions}
               toggleVisibility={() => this.toggleVisibility(sceneNode.id)}
               toggleLock={() => this.toggleLock(sceneNode.id)}
+              toggleMobileVisibility={() => this.toggleMobileVisibility()}
+              toggleDesktopVisibility={() => this.toggleDesktopVisibility()}
               selectiveRecordingEnabled={this.selectiveRecordingEnabled}
               isStreamVisible={sceneNode.isStreamVisible}
               isRecordingVisible={sceneNode.isRecordingVisible}
               isGuestCamActive={sceneNode.isGuestCamActive}
+              isDualOutputActive={sceneNode.isDualOutputActive}
+              isMobileActive={sceneNode.isMobileActive}
+              isDesktopActive={sceneNode.isDesktopActive}
               cycleSelectiveRecording={() => this.cycleSelectiveRecording(sceneNode.id)}
               ref={this.nodeRefs[sceneNode.id]}
               onDoubleClick={() => this.sourceProperties(sceneNode.id)}
@@ -116,6 +126,9 @@ class SourceSelectorModule {
           !!this.guestCamService.views.getGuestBySourceId(i.sourceId)
         );
       });
+      const isDualOutputActive = this.isDualOutputActive;
+      const isMobileActive = this.isMobileActive;
+      const isDesktopActive = this.isDesktopActive;
 
       const isFolder = !isItem(node);
       return {
@@ -127,6 +140,9 @@ class SourceSelectorModule {
         isRecordingVisible,
         isStreamVisible,
         isGuestCamActive,
+        isDualOutputActive,
+        isMobileActive,
+        isDesktopActive,
         parentId: node.parentId,
         canShowActions: itemsForNode.length > 0,
         isFolder,
@@ -308,6 +324,18 @@ class SourceSelectorModule {
     return this.selectionService.state.lastSelectedId;
   }
 
+  get isDualOutputActive() {
+    return this.dualOutputService.state.dualOutputMode;
+  }
+
+  get isMobileActive() {
+    return this.dualOutputService.state.isMobileActive;
+  }
+
+  get isDesktopActive() {
+    return this.dualOutputService.state.isDesktopActive;
+  }
+
   watchSelected = injectWatch(() => this.lastSelectedId, this.expandSelectedFolders);
 
   async expandSelectedFolders() {
@@ -336,6 +364,14 @@ class SourceSelectorModule {
     const selection = this.scene.getSelection(sceneNodeId);
     const visible = !selection.isVisible();
     this.editorCommandsService.actions.executeCommand('HideItemsCommand', selection, !visible);
+  }
+
+  toggleMobileVisibility() {
+    this.dualOutputService.toggleMobileVisibility();
+  }
+
+  toggleDesktopVisibility() {
+    this.dualOutputService.toggleDesktopVisibility();
   }
 
   // Required for performance. Using Selection is too slow (Service Helpers)
@@ -441,7 +477,11 @@ function StudioControls() {
   } = useModule(SourceSelectorModule);
 
   return (
-    <div className={styles.topContainer} data-name="sourcesControls">
+    <div
+      className={styles.topContainer}
+      data-name="sourcesControls"
+      style={{ border: '1px solid dustyrose' }}
+    >
       <div className={styles.activeSceneContainer}>
         <Tooltip title={sourcesTooltip} placement="bottomLeft">
           <span className={styles.sourcesHeader}>{$t('Sources')}</span>
@@ -535,9 +575,14 @@ const TreeNode = React.forwardRef(
       isRecordingVisible: boolean;
       selectiveRecordingEnabled: boolean;
       isGuestCamActive: boolean;
+      isDualOutputActive: boolean;
+      isMobileActive: boolean;
+      isDesktopActive: boolean;
       canShowActions: boolean;
       toggleVisibility: (ev: unknown) => unknown;
       toggleLock: (ev: unknown) => unknown;
+      toggleMobileVisibility: (ev: unknown) => unknown;
+      toggleDesktopVisibility: (ev: unknown) => unknown;
       cycleSelectiveRecording: (ev: unknown) => void;
       onDoubleClick: () => void;
       removeSource: () => void;
@@ -568,6 +613,13 @@ const TreeNode = React.forwardRef(
         {p.canShowActions && (
           <>
             {p.isGuestCamActive && <i className="fa fa-signal" />}
+            {/* @@@ HERE TODO: 1. font icons. 2. show hide functionality. 3. remove logic from custom widget and repush */}
+            {p.isDualOutputActive && p.isMobileActive && (
+              <i onClick={p.toggleMobileVisibility} className="icon-phone-case" />
+            )}
+            {p.isDualOutputActive && p.isDesktopActive && (
+              <i onClick={p.toggleDesktopVisibility} className="icon-desktop" />
+            )}
             {p.selectiveRecordingEnabled && (
               <Tooltip title={selectiveRecordingMetadata().tooltip} placement="left">
                 <i
@@ -577,7 +629,9 @@ const TreeNode = React.forwardRef(
               </Tooltip>
             )}
             <i onClick={p.toggleLock} className={p.isLocked ? 'icon-lock' : 'icon-unlock'} />
-            <i onClick={p.toggleVisibility} className={p.isVisible ? 'icon-view' : 'icon-hide'} />
+            {!p.isDualOutputActive && (
+              <i onClick={p.toggleVisibility} className={p.isVisible ? 'icon-view' : 'icon-hide'} />
+            )}
           </>
         )}
         <Tooltip

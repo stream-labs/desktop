@@ -17,6 +17,10 @@ import { byOS, OS } from 'util/operating-systems';
 import { TcpServerService } from './api/tcp-server';
 import { Subject } from 'rxjs';
 
+// @@REUSE: MAGIC
+
+// Examine scene items props
+// Examine second set of scene items for dual output
 interface IResizeRegion {
   name: string;
   x: number;
