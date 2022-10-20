@@ -94,6 +94,10 @@ if (!gotTheLock) {
   // Main Program
   ////////////////////////////////////////////////////////////////////////////////
 
+  // workaround for  https://github.com/electron/electron/issues/19468, https://github.com/electron/electron/issues/19978
+  // (Electron 6 to 8 does not launch in Win10 dark mode with DevTool extensions installed)
+  rimraf.sync(path.join(app.getPath('userData'), 'extensions'));
+
   const util = require('util');
   const logFile = path.join(app.getPath('userData'), 'app.log');
   const maxLogBytes = 131072;
