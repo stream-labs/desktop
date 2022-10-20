@@ -37,4 +37,12 @@ export class SettingsManagerService extends Service {
   get videoSettings() {
     return obs.VideoFactory.legacySettings;
   }
+
+  get miscSettings() {
+    return {
+      browserAccel: obs.NodeObs.GetBrowserAccelerationLegacy,
+      caching: obs.NodeObs.GetMediaFileCachingLegacy,
+      processPriority: obs.NodeObs.GetProcessPriorityLegacy,
+    };
+  }
 }

@@ -232,5 +232,8 @@
   "FPS Density": "FPS Density",
   "The resolution must be in the format [width]x[height] (i.e. 1920x1080)": "The resolution must be in the format [width]x[height] (i.e. 1920x1080)",
   "Full": "Full",
-  "Partial": "Partial"
+  "Partial": "Partial",
+  "Above Normal": "Above Normal",
+  "Below Normal": "Below Normal",
+  "Idle": "Idle"
 }

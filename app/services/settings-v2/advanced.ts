@@ -9,14 +9,22 @@ interface IAdvancedSettingsState {
   delay: obs.IDelay;
   reconnect: obs.IReconnect;
   network: obs.INetwork;
+  misc: IMiscSettings;
 }
+
+interface IMiscSettings {
+  processPriority: obs.EProcessPriority;
+  browserAccel: boolean;
+  caching: boolean;
+}
+
 class AdvancedSettingsViews extends ViewHandler<IAdvancedSettingsState> {
   advancedSettingsValues(category: string) {
     return this.state[category];
   }
 
   get streamSettingsCategories() {
-    return Object.keys(this.state);
+    return ['delay', 'reconnect', 'network'];
   }
 }
 
@@ -25,10 +33,15 @@ export class AdvancedSettingsService extends StatefulService<IAdvancedSettingsSt
   @Inject() settingsManagerService: SettingsManagerService;
   @Inject() outputsService: OutputsService;
 
-  initialState = {
+  initialState: IAdvancedSettingsState = {
     delay: {} as obs.IDelay,
     reconnect: {} as obs.IReconnect,
     network: {} as obs.INetwork,
+    misc: {
+      processPriority: null,
+      browserAccel: null,
+      caching: null,
+    } as IMiscSettings,
   };
 
   obsFactories = {
@@ -155,8 +168,8 @@ export class AdvancedSettingsService extends StatefulService<IAdvancedSettingsSt
   }
 
   get replaySettingsValues() {
-    const replay = this.outputsService.state.replay;
-    return { prefix: replay.prefix, suffix: replay.suffix };
+    const replay = this.outputsService.state?.replay;
+    return { prefix: replay?.prefix, suffix: replay?.suffix };
   }
 
   get videoSettingsValues() {
@@ -164,20 +177,20 @@ export class AdvancedSettingsService extends StatefulService<IAdvancedSettingsSt
   }
 
   get recordingSettingsValues() {
-    const recording = this.outputsService.state.recording;
-    return { fileFormat: recording.fileFormat, overwrite: recording.overwrite };
+    const recording = this.outputsService.state?.recording;
+    return { fileFormat: recording?.fileFormat, overwrite: recording?.overwrite };
   }
 
   get sourcesSettingsValues() {
-    return { browserAccel: obs.NodeObs.GetBrowserAccelerationLegacy };
+    return { browserAccel: this.state.misc.browserAccel };
   }
 
   get mediaSettingsValues() {
-    return { caching: obs.NodeObs.GetMediaFileCachingLegacy };
+    return { caching: this.state.misc.caching };
   }
 
   get generalSettingsValues() {
-    return { processPriority: obs.NodeObs.GetProcessPriorityLegacy };
+    return { processPriority: this.state.misc.processPriority };
   }
 
   establishState() {
@@ -192,6 +205,10 @@ export class AdvancedSettingsService extends StatefulService<IAdvancedSettingsSt
       Object.keys(setting).forEach((key: string) => {
         this.setAdvancedSetting(category, key, setting[key]);
       });
+    });
+
+    Object.keys(this.settingsManagerService.miscSettings).forEach((key: string) => {
+      this.SET_ADVANCED_SETTING('misc', key, this.settingsManagerService.miscSettings[key]);
     });
   }
 
@@ -217,6 +234,7 @@ export class AdvancedSettingsService extends StatefulService<IAdvancedSettingsSt
   }
 
   setMiscSetting(key: string, value: unknown) {
+    this.SET_ADVANCED_SETTING('misc', key, value);
     if (key === 'browserAccel') {
       obs.NodeObs.SetBrowserAcceleration(value);
     } else if (key === 'caching') {
