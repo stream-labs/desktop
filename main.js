@@ -96,7 +96,7 @@ if (!gotTheLock) {
 
   // workaround for  https://github.com/electron/electron/issues/19468, https://github.com/electron/electron/issues/19978
   // (Electron 6 to 8 does not launch in Win10 dark mode with DevTool extensions installed)
-  rimraf.sync(path.join(app.getPath('userData'), 'extensions'));
+  rimraf.sync(path.join(app.getPath('userData'), 'DevTools Extensions'));
 
   const util = require('util');
   const logFile = path.join(app.getPath('userData'), 'app.log');
@@ -401,10 +401,13 @@ if (!gotTheLock) {
       }
     });
 
-    const { default: installExtension, VUEJS_DEVTOOLS } = require('electron-devtools-installer');
-    installExtension(VUEJS_DEVTOOLS)
-      .then(name => console.log(name))
-      .catch(err => console.log(err));
+    if (isDevMode || process.env.NAIR_PRODUCTION_DEBUG) {
+      console.log('installing vue devtools extension...');
+      const { default: installExtension, VUEJS_DEVTOOLS } = require('electron-devtools-installer');
+      installExtension(VUEJS_DEVTOOLS)
+        .then(name => console.log(name))
+        .catch(err => console.log(err));
+    }
 
     // if (process.env.NAIR_PRODUCTION_DEBUG || process.env.DEV_SERVER) openDevTools();
 
