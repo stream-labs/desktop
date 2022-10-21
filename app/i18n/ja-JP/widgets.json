@@ -186,5 +186,7 @@
   "font_family_tooltip": "テキストに使用する Google フォント。https://fonts.google.com にアクセスしてフォントを検索しましょう！人気のあるフォント：Open Sans、Roboto、Oswald、Lato、Droid Sans。",
   "Something went wrong while applying settings": "設定の適用中に、問題が発生しました",
   "Superchat Goal": "スーパーチャット目標",
-  "YouTube Superchats": "YouTube スーパーチャット"
+  "YouTube Superchats": "YouTube スーパーチャット",
+  "Custom Widget": "Custom Widget",
+  "Use HTML, CSS, and JavaScript to create a widget with custom functionality": "Use HTML, CSS, and JavaScript to create a widget with custom functionality"
 }
