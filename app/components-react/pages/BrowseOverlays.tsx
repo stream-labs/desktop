@@ -13,7 +13,7 @@ import { useVuex } from 'components-react/hooks';
 
 export default function BrowseOverlays(p: {
   //TODO add 'site-theme' to type
-  params: { type?: 'overlay' | 'widget-theme'; id?: string };
+  params: { type?: 'overlay' | 'widget-themes' | 'site-themes'; id?: string };
 }) {
   const {
     UserService,

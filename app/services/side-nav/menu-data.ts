@@ -284,7 +284,7 @@ export const SideBarSubMenuItems = (): TSubMenuItems => ({
   [ESubMenuItem.Widget]: {
     key: EMenuItemKey.Widget,
     target: 'BrowseOverlays',
-    type: 'widget-theme',
+    type: 'widget-themes',
     title: ESubMenuItem.Widget,
     trackingTarget: 'themes',
     isExpanded: false,
@@ -292,7 +292,7 @@ export const SideBarSubMenuItems = (): TSubMenuItems => ({
   [ESubMenuItem.Sites]: {
     key: EMenuItemKey.Sites,
     target: 'BrowseOverlays',
-    type: 'site-theme',
+    type: 'site-themes',
     title: ESubMenuItem.Sites,
     trackingTarget: 'themes',
     isActive: false,
@@ -349,7 +349,7 @@ export const SideBarSubMenuItems = (): TSubMenuItems => ({
   },
   [ESubMenuItem.Multistream]: {
     key: EMenuItemKey.Multistream,
-    type: 'multistream', // todo: link to https://streamlabs.com/content-hub/post/how-to-multistream-the-ultimate-guide-to-multistreaming
+    type: 'multistream',
     title: ESubMenuItem.Multistream,
     trackingTarget: 'dashboard',
     isExpanded: false,
