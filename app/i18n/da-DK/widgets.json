@@ -186,5 +186,7 @@
   "font_family_tooltip": "Den Google-skrifttype, der skal bruges til teksten. Besøg https://fonts.google.com for at finde en. Populære skrifttyper: Open Sans, Roboto, Oswald, Lato, Droid Sans.",
   "Something went wrong while applying settings": "Der opstod en fejl under anvendelsen af indstillingerne",
   "Superchat Goal": "Superchat-mål",
-  "YouTube Superchats": "YouTube Superchats"
+  "YouTube Superchats": "YouTube Superchats",
+  "Custom Widget": "Custom Widget",
+  "Use HTML, CSS, and JavaScript to create a widget with custom functionality": "Use HTML, CSS, and JavaScript to create a widget with custom functionality"
 }
