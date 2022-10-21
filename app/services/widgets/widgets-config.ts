@@ -7,7 +7,8 @@ export type TWidgetType =
   | WidgetType.ViewerCount
   | WidgetType.GameWidget
   | WidgetType.EmoteWall
-  | WidgetType.DonationTicker;
+  | WidgetType.DonationTicker
+  | WidgetType.CustomWidget;
 
 export interface IWidgetConfig {
   type: TWidgetType;
@@ -238,5 +239,30 @@ export function getWidgetsConfig(host: string, token: string): Record<TWidgetTyp
     // TipJar: {
     //
     // },
+
+    [WidgetType.CustomWidget]: {
+      type: WidgetType.CustomWidget,
+
+      defaultTransform: {
+        width: 400,
+        height: 750,
+        x: 0.5,
+        y: 0,
+        anchor: AnchorPoint.North,
+      },
+
+      settingsWindowSize: {
+        width: 850,
+        height: 700,
+      },
+
+      url: `https://${host}/widgets/custom-widget/${token}`,
+      previewUrl: `https://${host}/widgets/custom-widget/${token}`,
+      dataFetchUrl: `https://${host}/api/v5/slobs/widget/customwidget`,
+      settingsSaveUrl: `https://${host}/api/v5/slobs/widget/customwidget`,
+      settingsUpdateEvent: 'customWidgetSettingsUpdate',
+      customCodeAllowed: true,
+      customFieldsAllowed: true,
+    },
   };
 }
