@@ -27,6 +27,7 @@ import { EmoteWall, EmoteWallModule } from '../EmoteWall';
 // TipJar
 import { GameWidget, GameWidgetModule } from '../GameWidget';
 import { ViewerCount, ViewerCountModule } from '../ViewerCount';
+import { CustomWidget, CustomWidgetModule } from '../CustomWidget';
 import { useSubscription } from '../../hooks/useSubscription';
 
 // define list of Widget components and modules
@@ -54,6 +55,7 @@ export const components = {
   // TipJar
   ViewerCount: [ViewerCount, ViewerCountModule],
   GameWidget: [GameWidget, GameWidgetModule],
+  CustomWidget: [CustomWidget, CustomWidgetModule],
 };
 
 /**
