@@ -10,6 +10,10 @@ interface IOutputServiceState {
 
 type TOutputType = 'stream' | 'recording' | 'replay';
 
+// Since the legacySettings api does not send deep objects we must set which properties are expected
+const RECORDING_PROPERTIES = ['fileFormat', 'overwrite'];
+const REPLAY_PROPERTIES = ['prefix', 'suffix'];
+
 @InitAfter('VideoSettingsService')
 export class OutputsService extends StatefulService<IOutputServiceState> {
   @Inject() settingsManagerService: SettingsManagerService;
@@ -70,15 +74,16 @@ export class OutputsService extends StatefulService<IOutputServiceState> {
       },
     );
 
-    Object.keys(this.recordingSettings).forEach(
+    RECORDING_PROPERTIES.forEach(
       (key: keyof obs.IAdvancedRecording | keyof obs.ISimpleRecording) => {
         this.setRecordingSetting(key, this.recordingSettings[key]);
       },
     );
 
-    Object.keys(this.replaySettings).forEach(
-      (key: keyof obs.IAdvancedRecording | keyof obs.ISimpleRecording) => {
-        this.setRecordingSetting(key, this.replaySettings[key]);
+    REPLAY_PROPERTIES.forEach(
+      (key: keyof obs.IAdvancedReplayBuffer | keyof obs.ISimpleReplayBuffer) => {
+        console.log(key, this.replaySettings[key]);
+        this.setReplaySetting(key, this.replaySettings[key]);
       },
     );
   }

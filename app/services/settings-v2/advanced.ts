@@ -205,8 +205,8 @@ export class AdvancedSettingsService extends StatefulService<IAdvancedSettingsSt
 
   migrateSettings() {
     this.views.streamSettingsCategories.forEach(category => {
-      const setting = obs.SimpleStreamingFactory.legacySettings[category];
-      Object.keys(setting).forEach((key: string) => {
+      const setting = obs.AdvancedStreamingFactory.legacySettings[category];
+      Object.keys(this[`${category}SettingsMetadata`]).forEach((key: string) => {
         this.setAdvancedSetting(category, key, setting[key]);
       });
     });
