@@ -42,7 +42,7 @@ export default function SideNav() {
     if (!UserService.views.isLoggedIn && page !== 'Studio') return;
 
     if (trackingTarget) {
-      UsageStatisticsService.actions.recordClick('SideNav', trackingTarget);
+      UsageStatisticsService.actions.recordClick('SideNav2', trackingTarget);
     }
 
     if (type) {

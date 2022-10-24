@@ -51,7 +51,7 @@ export default function SideNav() {
   const [dashboardOpening, setDashboardOpening] = useState(false);
 
   function openSettingsWindow() {
-    UsageStatisticsService.actions.recordClick('NavTools', 'settings');
+    UsageStatisticsService.actions.recordClick('SideNav2', 'settings');
     SettingsService.actions.showSettings();
   }
 
@@ -60,7 +60,7 @@ export default function SideNav() {
   }
 
   async function openDashboard(page?: string) {
-    UsageStatisticsService.actions.recordClick('NavTools', page || 'dashboard');
+    UsageStatisticsService.actions.recordClick('SideNav2', page || 'dashboard');
     if (dashboardOpening) return;
     setDashboardOpening(true);
 
@@ -77,12 +77,12 @@ export default function SideNav() {
   const throttledOpenDashboard = throttle(openDashboard, 2000, { trailing: false });
 
   function openHelp() {
-    UsageStatisticsService.actions.recordClick('NavTools', 'help');
+    UsageStatisticsService.actions.recordClick('SideNav2', 'help');
     remote.shell.openExternal('https://howto.streamlabs.com/');
   }
 
   async function upgradeToPrime() {
-    UsageStatisticsService.actions.recordClick('NavTools', 'prime');
+    UsageStatisticsService.actions.recordClick('SideNav2', 'prime');
     try {
       const link = await MagicLinkService.getDashboardMagicLink(
         'prime-marketing',
