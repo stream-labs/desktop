@@ -356,7 +356,6 @@ export default function SideNav() {
                         )
                       }
                       onClick={() => app?.id && navigateApp(app?.id)}
-                      style={{ border: '1px solid red' }}
                     >
                       {app?.name}
                     </Menu.Item>
