@@ -1,20 +1,21 @@
-import React, { useEffect } from 'react';
+import React, { useMemo } from 'react';
 import { FormProps } from 'antd/lib/form';
 import debounce from 'lodash/debounce';
 import * as inputs from './inputList';
-import { TSlobsInputProps } from './inputs';
+import { TInputType, TSlobsInputProps } from './inputs';
 import Form, { useForm } from './Form';
 import { TInputMetadata } from './metadata';
 
 type TInputValue = string | number | boolean;
 
-const componentTable: Dictionary<React.FunctionComponent<TSlobsInputProps<{}, TInputValue>>> = {
+const componentTable: {
+  [k in TInputType]?: React.FunctionComponent<TSlobsInputProps<{}, TInputValue>>;
+} = {
   text: inputs.TextInput,
   number: inputs.NumberInput,
   slider: inputs.SliderInput,
-  bool: inputs.CheckboxInput,
+  checkbox: inputs.CheckboxInput,
   list: inputs.ListInput,
-  seconds: inputs.SliderInput,
   autocomplete: inputs.AutocompleteInput,
 };
 
@@ -30,7 +31,7 @@ export default function FormFactory(p: {
 }) {
   const form = useForm();
 
-  useEffect(() => form.setFieldsValue(p.values), []);
+  useMemo(() => form.setFieldsValue(p.values), []);
 
   return (
     <Form

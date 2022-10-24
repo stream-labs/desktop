@@ -9,7 +9,7 @@ export const metadata = {
   text: (options: ITextMetadata) => ({ ...options, type: 'text' }),
   number: (options: INumberMetadata) => ({ ...options, type: 'number' }),
   slider: (options: ISliderMetadata) => ({ ...options, type: 'slider' }),
-  bool: (options: ITextBoolMetadata) => ({ ...options, type: 'bool' }),
+  bool: (options: ITextBoolMetadata) => ({ ...options, type: 'checkbox' }),
   list: <T>(options: IListMetadata<T>) => ({ ...options, type: 'list' }),
   autocomplete: <T>(options: IListMetadata<T>) => ({
     ...options,

@@ -6,20 +6,6 @@ import * as obs from '../../../obs-api';
 import { SettingsManagerService } from 'services/settings-manager';
 import { $t } from 'services/i18n';
 
-// export interface IVideo {
-//   fpsNum: number;
-//   fpsDen: number;
-//   baseWidth: number;
-//   baseHeight: number;
-//   outputWidth: number;
-//   outputHeight: number;
-//   outputFormat: EVideoFormat;
-//   colorspace: EColorSpace;
-//   range: ERangeType;
-//   scaleType: EScaleType;
-//   fpsType: EFPSType;
-// }
-
 const CANVAS_RES_OPTIONS = [
   { label: '1920x1080', value: '1920x1080' },
   { label: '1280x720', value: '1280x720' },
