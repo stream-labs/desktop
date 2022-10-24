@@ -39,7 +39,6 @@ export default function SideNav() {
   } = Services;
 
   function navigate(page: TAppPage, trackingTarget?: string, type?: TExternalLinkType | string) {
-    console.log('type ', type);
     if (!UserService.views.isLoggedIn && page !== 'Studio') return;
 
     if (trackingTarget) {
@@ -210,7 +209,7 @@ export default function SideNav() {
                 // skip legacy menu items for new users
                 // skip Theme Audit if not enabled
                 return null;
-              } else if (menuItem.title === EMenuItem.Editor && loggedIn && studioTabs.length > 0) {
+              } else if (menuItem.title === EMenuItem.Editor && loggedIn && studioTabs.length > 1) {
                 // if closed, show editor tabs in sidenav
                 // which can be toggled to show or hide
                 // otherwise, show editor tabs in submenu
