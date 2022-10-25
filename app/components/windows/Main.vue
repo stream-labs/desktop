@@ -95,12 +95,6 @@
   flex-grow: 1;
 }
 
-.sidenav > * {
-  min-height: 100%;
-  height: 100%;
-  display: flex;
-  flex-grow: 1;
-}
 .main {
   display: flex;
   flex-direction: column;
