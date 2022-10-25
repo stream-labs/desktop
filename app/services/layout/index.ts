@@ -206,8 +206,6 @@ export class LayoutService extends PersistentStatefulService<ILayoutServiceState
     this.REMOVE_TAB(this.state.currentTab);
   }
 
-  // @mutation()
-
   @mutation()
   CHANGE_LAYOUT(layout: ELayout) {
     Vue.set(this.state.tabs[this.state.currentTab], 'currentLayout', layout);

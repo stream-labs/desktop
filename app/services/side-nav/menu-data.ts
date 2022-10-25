@@ -30,8 +30,8 @@ export enum EMenuItemKey {
 
 export type TExternalLinkType =
   | 'overlay'
-  | 'widget-theme' // TODO: confirm param
-  | 'site-theme' // TODO: confirm param
+  | 'widget-theme'
+  | 'site-theme'
   | 'cloudbot'
   | 'alertbox'
   | 'widgets'

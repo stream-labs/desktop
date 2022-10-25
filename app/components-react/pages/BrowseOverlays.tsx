@@ -11,7 +11,6 @@ import * as remote from '@electron/remote';
 import { Services } from 'components-react/service-provider';
 
 export default function BrowseOverlays(p: {
-  //TODO add 'site-theme' to type
   params: { type?: 'overlay' | 'widget-themes' | 'site-themes'; id?: string };
 }) {
   const {
