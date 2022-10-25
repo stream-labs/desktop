@@ -8,7 +8,7 @@ import { Services } from '../service-provider';
 import { useVuex } from '../hooks';
 import styles from './NavTools.m.less';
 import * as remote from '@electron/remote';
-import { Badge, Menu, Typography } from 'antd';
+import { Badge, Menu } from 'antd';
 import { EMenuItem, ENavName, IMenuItem, IParentMenuItem } from 'services/side-nav';
 import PlatformLogo from 'components-react/shared/PlatformLogo';
 
@@ -220,9 +220,7 @@ export default function SideNav() {
                 onClick={() => handleAuth()}
               >
                 {!isLoggedIn ? (
-                  <Typography.Text underline style={{ marginBottom: '0px', flexGrow: 1 }}>
-                    {$t(EMenuItem.Login)}
-                  </Typography.Text>
+                  <span className={styles.loggedOut}>{$t(EMenuItem.Login)}</span>
                 ) : (
                   isOpen && (
                     <>
@@ -235,9 +233,7 @@ export default function SideNav() {
                           )}
                         />
                       )}
-                      <Typography.Text className={styles.username}>
-                        {platform?.username || $t('Log Out')}
-                      </Typography.Text>
+                      <span className={styles.username}>{platform?.username || $t('Log Out')}</span>
                       <i className={cx('icon-logout', styles.loginArrow)} />
                     </>
                   )
