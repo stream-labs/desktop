@@ -40,7 +40,6 @@ import {
   NotificationsAndNews,
   PlatformAppPopOut,
   RecentEventsWindow,
-  NewBadge,
 } from 'components/shared/ReactComponentList';
 
 import SourcePropertiesDeprecated from 'components/windows/SourceProperties.vue';
@@ -148,7 +147,6 @@ export function getComponents() {
     WidgetWindow,
     CustomCodeWindow,
     SourceShowcase,
-    NewBadge,
   };
 }
 
