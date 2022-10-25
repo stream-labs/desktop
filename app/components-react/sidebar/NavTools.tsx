@@ -9,7 +9,7 @@ import { useVuex } from '../hooks';
 import styles from './NavTools.m.less';
 import * as remote from '@electron/remote';
 import { Badge, Menu } from 'antd';
-import { EMenuItem, ENavName, IMenuItem, IParentMenuItem } from 'services/side-nav';
+import { EMenuItem, ENavName, IMenuItem, IParentMenuItem, menuTitles } from 'services/side-nav';
 import PlatformLogo from 'components-react/shared/PlatformLogo';
 
 export default function SideNav() {
@@ -138,7 +138,7 @@ export default function SideNav() {
             return (
               <Menu.Item
                 key={menuItem.key}
-                title={$t(menuItem.title)}
+                title={menuTitles(menuItem.title)}
                 icon={
                   <div>
                     <Badge count={<i className={cx('icon-pop-out-3', styles.linkBadge)} />}>
@@ -149,14 +149,14 @@ export default function SideNav() {
                 onClick={upgradeToPrime}
                 className={styles.badgeScale}
               >
-                {$t(menuItem.title)}
+                {menuTitles(menuItem.title)}
               </Menu.Item>
             );
           } else if (isLoggedIn && menuItem.title === EMenuItem.Dashboard) {
             return (
               <Menu.SubMenu
                 key={menuItem.key}
-                title={$t(menuItem.title)}
+                title={menuTitles(menuItem.title)}
                 icon={
                   <div>
                     <Badge count={<i className={cx('icon-pop-out-3', styles.linkBadge)} />}>
@@ -173,11 +173,11 @@ export default function SideNav() {
                 {menuItem?.subMenuItems.map((subMenuItem: IMenuItem) => (
                   <Menu.Item
                     key={subMenuItem.key}
-                    title={$t(subMenuItem.title)}
+                    title={menuTitles(subMenuItem.title)}
                     className={cx(!isOpen && menuItem.isExpanded && styles.hideSubMenu)}
                     onClick={() => throttledOpenDashboard(subMenuItem?.type)}
                   >
-                    {$t(subMenuItem.title)}
+                    {menuTitles(subMenuItem.title)}
                   </Menu.Item>
                 ))}
               </Menu.SubMenu>
@@ -186,7 +186,7 @@ export default function SideNav() {
             return (
               <Menu.Item
                 key={menuItem.key}
-                title={$t(menuItem.title)}
+                title={menuTitles(menuItem.title)}
                 icon={
                   <div>
                     <Badge count={<i className={cx('icon-pop-out-3', styles.linkBadge)} />}>
@@ -196,31 +196,31 @@ export default function SideNav() {
                 }
                 onClick={() => openHelp()}
               >
-                {$t(menuItem.title)}
+                {menuTitles(menuItem.title)}
               </Menu.Item>
             );
           } else if (menuItem.title === EMenuItem.Settings) {
             return (
               <Menu.Item
                 key={menuItem.key}
-                title={$t(menuItem.title)}
+                title={menuTitles(menuItem.title)}
                 icon={<i className={menuItem?.icon} />}
                 onClick={openSettingsWindow}
               >
-                {$t(EMenuItem.Settings)}
+                {menuTitles(menuItem.title)}
               </Menu.Item>
             );
           } else if (menuItem.title === EMenuItem.Login) {
             return (
               <Menu.Item
                 key={menuItem.key}
-                title={!isLoggedIn ? $t(EMenuItem.Login) : $t('Log Out')}
+                title={!isLoggedIn ? menuTitles(menuItem.title) : $t('Log Out')}
                 className={cx(styles.login, !isOpen && styles.loginClosed)}
                 icon={!isOpen && <i className="icon-user" />}
                 onClick={() => handleAuth()}
               >
                 {!isLoggedIn ? (
-                  <span className={styles.loggedOut}>{$t(EMenuItem.Login)}</span>
+                  <span className={styles.loggedOut}>{menuTitles(menuItem.title)}</span>
                 ) : (
                   isOpen && (
                     <>

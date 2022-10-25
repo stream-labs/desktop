@@ -8,6 +8,7 @@ import {
   IMenuItem,
   IParentMenuItem,
   TExternalLinkType,
+  menuTitles,
 } from 'services/side-nav';
 import { EAvailableFeatures } from 'services/incremental-rollout';
 import { $t } from 'services/i18n';
@@ -233,7 +234,7 @@ export default function SideNav() {
                 ) : (
                   <Menu.SubMenu
                     key={menuItem.key}
-                    title={$t(menuItem.title)}
+                    title={menuTitles(menuItem.title)}
                     icon={menuItem?.icon && <i className={menuItem.icon} />}
                     onTitleClick={() => {
                       !isOpen &&
@@ -270,7 +271,7 @@ export default function SideNav() {
                 return menuItem.hasOwnProperty('subMenuItems') ? (
                   <Menu.SubMenu
                     key={menuItem.key}
-                    title={$t(menuItem.title)}
+                    title={menuTitles(menuItem.title)}
                     icon={menuItem?.icon && <i className={menuItem.icon} />}
                     onTitleClick={() => {
                       menuItem?.subMenuItems[0]?.target &&
@@ -291,10 +292,10 @@ export default function SideNav() {
                           !isOpen && menuItem.isExpanded && styles.hideSubMenu,
                           currentMenuItem === subMenuItem?.key && styles.active,
                         )}
-                        title={$t(menuItem.title)}
+                        title={menuTitles(menuItem.title)}
                         onClick={() => handleNavigation(subMenuItem)}
                       >
-                        {$t(subMenuItem.title)}
+                        {menuTitles(subMenuItem.title)}
                       </Menu.Item>
                     ))}
                     {menuItem.title === EMenuItem.AppStore &&
@@ -322,13 +323,13 @@ export default function SideNav() {
                       menuItem.title === EMenuItem.StudioMode && studioMode && styles.studioMode,
                       currentMenuItem === menuItem.key && styles.active,
                     )}
-                    title={$t(menuItem.title)}
+                    title={menuTitles(menuItem.title)}
                     icon={menuItem?.icon && <i className={menuItem.icon} />}
                     onClick={() => {
                       handleNavigation(menuItem);
                     }}
                   >
-                    {$t(menuItem.title)}
+                    {menuTitles(menuItem.title)}
                   </Menu.Item>
                 );
               }

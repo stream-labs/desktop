@@ -1,4 +1,5 @@
 import { TAppPage } from 'services/navigation';
+import { $t } from 'services/i18n';
 
 export enum EMenuItemKey {
   Editor = 'editor',
@@ -36,7 +37,7 @@ export type TExternalLinkType =
   | 'alertbox'
   | 'widgets'
   | 'tipping/methods'
-  | 'multistream/settings';
+  | 'multistream';
 
 type TSideNavItem = TAppPage | TExternalLinkType | 'NavTools' | 'WidgetWindow' | string;
 
@@ -103,6 +104,36 @@ export enum ESubMenuItem {
   TipSettings = 'Tip Settings',
   Multistream = 'Multistream',
 }
+
+export const menuTitles = (item: EMenuItem | ESubMenuItem | string) => {
+  return {
+    [EMenuItem.Editor]: $t('Editor'),
+    [EMenuItem.LayoutEditor]: $t('Layout Editor'),
+    [EMenuItem.StudioMode]: $t('Studio Mode'),
+    [EMenuItem.Themes]: $t('Themes'),
+    [EMenuItem.AppStore]: $t('App Store'),
+    [EMenuItem.Highlighter]: $t('Highlighter'),
+    [EMenuItem.ThemeAudit]: $t('Theme Audit'),
+    [EMenuItem.DevTools]: $t('Dev Tools'),
+    [EMenuItem.GetPrime]: $t('Get Prime'),
+    [EMenuItem.Dashboard]: $t('Dashboard'),
+    [EMenuItem.GetHelp]: $t('Get Help'),
+    [EMenuItem.Settings]: $t('Settings'),
+    [EMenuItem.Login]: $t('Login'),
+    [ESubMenuItem.Scene]: $t('Scene'),
+    [ESubMenuItem.AlertBoxLibrary]: $t('Alert Box Library'),
+    [ESubMenuItem.Widget]: $t('Widget'),
+    [ESubMenuItem.Sites]: $t('Sites'),
+    [ESubMenuItem.AppsStoreHome]: $t('Apps Store Home'),
+    [ESubMenuItem.AppsManager]: $t('Apps Manager'),
+    [ESubMenuItem.DashboardHome]: $t('Dashboard Home'),
+    [ESubMenuItem.Cloudbot]: $t('Cloudbot'),
+    [ESubMenuItem.AlertBoxSettings]: $t('Alert Box Settings'),
+    [ESubMenuItem.Widgets]: $t('Widgets'),
+    [ESubMenuItem.TipSettings]: $t('Tip Settings'),
+    [ESubMenuItem.Multistream]: $t('Multistream'),
+  }[item];
+};
 
 export const SideBarTopNavData = (): IMenu => ({
   name: ENavName.TopNav,
