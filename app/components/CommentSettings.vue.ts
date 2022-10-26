@@ -6,9 +6,11 @@ import { sleep } from 'util/sleep';
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import VueSlider from 'vue-slider-component';
+import Multiselect from 'vue-multiselect';
 
 @Component({
   components: {
+    Multiselect,
     VueSlider,
   },
 })

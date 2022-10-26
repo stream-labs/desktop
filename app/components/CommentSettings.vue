@@ -64,11 +64,18 @@
         <button class="button button--primary" :disabled="!enabled" @click="testSpeechPlay(normal)">
           読み上げテスト
         </button>
-        <select id="normal-select" v-model="normal">
-          <option v-for="id in synthIds" :key="id" :value="id">
-            {{ synthName(id) }}<span v-if="id == normalDefault">（既定）</span>
-          </option>
-        </select>
+        <multiselect
+          id="normal-select"
+          :value="normal"
+          :options="synthIds"
+          :allow-empty="false"
+          :custom-label="synthName"
+          :placeholder="$t('settings.listPlaceholder')"
+        >
+          <template slot="option" slot-scope="o">
+            {{ synthName(o.option) }}<span v-if="o.option == normalDefault">（既定）</span>
+          </template>
+        </multiselect>
       </div>
 
       <div class="section-item">
@@ -80,11 +87,18 @@
         >
           読み上げテスト
         </button>
-        <select id="operator-select" v-model="operator">
-          <option v-for="id in synthIds" :key="id" :value="id">
-            {{ synthName(id) }}<span v-if="id == operatorDefault">（既定）</span>
-          </option>
-        </select>
+        <multiselect
+          id="operator-select"
+          :value="operator"
+          :options="synthIds"
+          :allow-empty="false"
+          :custom-label="synthName"
+          :placeholder="$t('settings.listPlaceholder')"
+        >
+          <template slot="option" slot-scope="o">
+            {{ synthName(o.option) }}<span v-if="o.option == operatorDefault">（既定）</span>
+          </template>
+        </multiselect>
       </div>
 
       <div class="section-item">
@@ -92,11 +106,18 @@
         <button class="button button--primary" :disabled="!enabled" @click="testSpeechPlay(system)">
           読み上げテスト
         </button>
-        <select id="system-select" v-model="system">
-          <option v-for="id in synthIds" :key="id" :value="id">
-            {{ synthName(id) }}<span v-if="id == systemDefault">（既定）</span>
-          </option>
-        </select>
+        <multiselect
+          id="system-select"
+          :value="system"
+          :options="synthIds"
+          :allow-empty="false"
+          :custom-label="synthName"
+          :placeholder="$t('settings.listPlaceholder')"
+        >
+          <template slot="option" slot-scope="o">
+            {{ synthName(o.option) }}<span v-if="o.option == operatorDefault">（既定）</span>
+          </template>
+        </multiselect>
       </div>
     </div>
   </div>
