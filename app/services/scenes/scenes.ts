@@ -101,6 +101,9 @@ export interface ISceneItem extends ISceneItemSettings, ISceneItemNode {
   sourceId: string;
   obsSceneItemId: number;
   sceneNodeType: 'item';
+  scaleFilter: EScaleType;
+  blendingMode: EBlendingMode;
+  blendingMethod: EBlendingMethod;
 }
 
 export interface ISceneItemActions {

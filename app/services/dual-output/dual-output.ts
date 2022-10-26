@@ -1,5 +1,6 @@
 import { StatefulService, InitAfter, ViewHandler, mutation } from 'services/core';
 import { PersistentStatefulService } from 'services/core/persistent-stateful-service';
+import * as obs from '../../../obs-api';
 
 export type TOutputDisplayType = 'horizontal' | 'vertical';
 
@@ -9,6 +10,8 @@ export type TOutputDisplayType = 'horizontal' | 'vertical';
 // }
 
 interface IDualOutputServiceState {
+  horizontalContext: obs.IVideo;
+  verticalContext: obs.IVideo;
   isHorizontalActive: boolean;
   isVerticalActive: boolean;
   dualOutputMode: boolean;
@@ -31,6 +34,8 @@ class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
 @InitAfter('UserService')
 export class DualOutputService extends StatefulService<IDualOutputServiceState> {
   static initialState: IDualOutputServiceState = {
+    horizontalContext: null,
+    verticalContext: null,
     dualOutputMode: false,
     isHorizontalActive: true,
     isVerticalActive: true,
@@ -45,6 +50,17 @@ export class DualOutputService extends StatefulService<IDualOutputServiceState> 
 
   init() {
     super.init();
+
+    console.log('initiating dual output');
+
+    this.state.horizontalContext = obs.VideoFactory.create();
+    this.state.verticalContext = obs.VideoFactory.create();
+
+    console.log('horizontalContext ', this.state.horizontalContext);
+    console.log('verticalContext ', this.state.verticalContext);
+
+    // const tmp = new obs.OBSHandler();
+    // // await obs.reserveUser();
   }
 
   toggleDualOutputMode() {
@@ -72,6 +88,8 @@ export class DualOutputService extends StatefulService<IDualOutputServiceState> 
 
   @mutation()
   private TOGGLE_DUAL_OUTPUT_MODE(status?: boolean) {
+    console.log('toggle horizontalContext ', this.state.horizontalContext);
+    console.log('toggle verticalContext ', this.state.verticalContext);
     if (typeof status === 'undefined') {
       this.state.dualOutputMode = !this.state.dualOutputMode;
     } else {
