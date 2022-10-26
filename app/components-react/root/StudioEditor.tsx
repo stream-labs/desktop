@@ -7,6 +7,7 @@ import Display from 'components-react/shared/Display';
 import { $t } from 'services/i18n';
 import { ERenderingMode } from '../../../obs-api';
 import { Tooltip } from 'antd';
+import DualOutputDisplay from 'components-react/shared/DualOutputDisplay';
 
 export default function StudioEditor() {
   const {
@@ -22,8 +23,8 @@ export default function StudioEditor() {
     cursor: EditorService.state.cursor,
     studioMode: TransitionsService.state.studioMode,
     dualOutputMode: DualOutputService.views.dualOutputMode,
-    isDesktopActive: DualOutputService.views.isDesktopActive,
-    isMobileActive: DualOutputService.views.isMobileActive,
+    isHorizontalActive: DualOutputService.views.isHorizontalActive,
+    isVerticalActive: DualOutputService.views.isVerticalActive,
   }));
   const displayEnabled = !v.hideStyleBlockers && !v.performanceMode;
   const placeholderRef = useRef<HTMLDivElement>(null);
@@ -34,7 +35,7 @@ export default function StudioEditor() {
     v.studioMode,
   ]);
 
-  // @@@ TODO: updateStyleBlockers() for smoother transition when rendering mobile display?
+  // @@@ TODO: updateStyleBlockers() for smoother transition when rendering vertical display?
 
   // Track vertical orientation for placeholder
   useEffect(() => {
@@ -164,30 +165,32 @@ export default function StudioEditor() {
           <div
             className={cx(styles.studioDisplayContainer, { [styles.stacked]: studioModeStacked })}
           >
-            <div
-              className={cx(styles.studioEditorDisplayContainer, 'noselect')}
-              style={{ cursor: v.cursor }}
-              onMouseDown={eventHandlers.onMouseDown}
-              onMouseUp={eventHandlers.onMouseUp}
-              onMouseEnter={eventHandlers.onMouseEnter}
-              onMouseMove={eventHandlers.onMouseMove}
-              onDoubleClick={eventHandlers.onMouseDblClick}
-              onContextMenu={eventHandlers.onContextMenu}
-            >
-              <Display
-                drawUI={true}
-                paddingSize={10}
-                onOutputResize={eventHandlers.onOutputResize}
-                renderingMode={ERenderingMode.OBS_MAIN_RENDERING}
-                sourceId={v.studioMode ? studioModeTransitionName : undefined}
-              />
-            </div>
-            {v.studioMode && (
+            {!v.dualOutputMode && (
+              <div
+                className={cx(styles.studioEditorDisplayContainer, 'noselect')}
+                style={{ cursor: v.cursor }}
+                onMouseDown={eventHandlers.onMouseDown}
+                onMouseUp={eventHandlers.onMouseUp}
+                onMouseEnter={eventHandlers.onMouseEnter}
+                onMouseMove={eventHandlers.onMouseMove}
+                onDoubleClick={eventHandlers.onMouseDblClick}
+                onContextMenu={eventHandlers.onContextMenu}
+              >
+                <Display
+                  drawUI={true}
+                  paddingSize={10}
+                  onOutputResize={eventHandlers.onOutputResize}
+                  renderingMode={ERenderingMode.OBS_MAIN_RENDERING}
+                  sourceId={v.studioMode ? studioModeTransitionName : undefined}
+                />
+              </div>
+            )}
+            {!v.dualOutputMode && v.studioMode && (
               <div className={styles.studioModeDisplayContainer}>
                 <Display paddingSize={10} />
               </div>
             )}
-            {v.dualOutputMode && v.isMobileActive && (
+            {v.dualOutputMode && v.isHorizontalActive && (
               <div
                 className={cx(styles.dualOutputDisplayContainer)}
                 style={{ cursor: v.cursor }}
@@ -198,8 +201,29 @@ export default function StudioEditor() {
                 onDoubleClick={eventHandlers.onMouseDblClick}
                 onContextMenu={eventHandlers.onContextMenu}
               >
-                {/* @@@ TODO: replace with mobile layout */}
-                <Display
+                <DualOutputDisplay
+                  type="horizontal"
+                  drawUI={true}
+                  paddingSize={10}
+                  onOutputResize={eventHandlers.onOutputResize}
+                  renderingMode={ERenderingMode.OBS_MAIN_RENDERING}
+                  sourceId={v.studioMode ? studioModeTransitionName : undefined}
+                />
+              </div>
+            )}
+            {v.dualOutputMode && v.isVerticalActive && (
+              <div
+                className={cx(styles.dualOutputDisplayContainer)}
+                style={{ cursor: v.cursor }}
+                onMouseDown={eventHandlers.onMouseDown}
+                onMouseUp={eventHandlers.onMouseUp}
+                onMouseEnter={eventHandlers.onMouseEnter}
+                onMouseMove={eventHandlers.onMouseMove}
+                onDoubleClick={eventHandlers.onMouseDblClick}
+                onContextMenu={eventHandlers.onContextMenu}
+              >
+                <DualOutputDisplay
+                  type="vertical"
                   drawUI={true}
                   paddingSize={10}
                   onOutputResize={eventHandlers.onOutputResize}

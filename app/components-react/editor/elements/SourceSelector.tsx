@@ -34,8 +34,8 @@ interface ISourceMetadata {
   isRecordingVisible: boolean;
   isGuestCamActive: boolean;
   isDualOutputActive: boolean;
-  isMobileActive: boolean;
-  isDesktopActive: boolean;
+  isHorizontalActive: boolean;
+  isVerticalActive: boolean;
   isFolder: boolean;
   canShowActions: boolean;
   parentId?: string;
@@ -86,15 +86,15 @@ class SourceSelectorModule {
               canShowActions={sceneNode.canShowActions}
               toggleVisibility={() => this.toggleVisibility(sceneNode.id)}
               toggleLock={() => this.toggleLock(sceneNode.id)}
-              toggleMobileVisibility={() => this.toggleMobileVisibility()}
-              toggleDesktopVisibility={() => this.toggleDesktopVisibility()}
+              toggleHorizontalVisibility={() => this.toggleHorizontalVisibility()}
+              toggleVerticalVisibility={() => this.toggleVerticalVisibility()}
               selectiveRecordingEnabled={this.selectiveRecordingEnabled}
               isStreamVisible={sceneNode.isStreamVisible}
               isRecordingVisible={sceneNode.isRecordingVisible}
               isGuestCamActive={sceneNode.isGuestCamActive}
               isDualOutputActive={sceneNode.isDualOutputActive}
-              isMobileActive={sceneNode.isMobileActive}
-              isDesktopActive={sceneNode.isDesktopActive}
+              isHorizontalActive={sceneNode.isHorizontalActive}
+              isVerticalActive={sceneNode.isVerticalActive}
               cycleSelectiveRecording={() => this.cycleSelectiveRecording(sceneNode.id)}
               ref={this.nodeRefs[sceneNode.id]}
               onDoubleClick={() => this.sourceProperties(sceneNode.id)}
@@ -127,8 +127,8 @@ class SourceSelectorModule {
         );
       });
       const isDualOutputActive = this.isDualOutputActive;
-      const isMobileActive = this.isMobileActive;
-      const isDesktopActive = this.isDesktopActive;
+      const isHorizontalActive = this.isHorizontalActive;
+      const isVerticalActive = this.isVerticalActive;
 
       const isFolder = !isItem(node);
       return {
@@ -141,8 +141,8 @@ class SourceSelectorModule {
         isStreamVisible,
         isGuestCamActive,
         isDualOutputActive,
-        isMobileActive,
-        isDesktopActive,
+        isHorizontalActive,
+        isVerticalActive,
         parentId: node.parentId,
         canShowActions: itemsForNode.length > 0,
         isFolder,
@@ -328,12 +328,12 @@ class SourceSelectorModule {
     return this.dualOutputService.state.dualOutputMode;
   }
 
-  get isMobileActive() {
-    return this.dualOutputService.state.isMobileActive;
+  get isHorizontalActive() {
+    return this.dualOutputService.state.isHorizontalActive;
   }
 
-  get isDesktopActive() {
-    return this.dualOutputService.state.isDesktopActive;
+  get isVerticalActive() {
+    return this.dualOutputService.state.isVerticalActive;
   }
 
   watchSelected = injectWatch(() => this.lastSelectedId, this.expandSelectedFolders);
@@ -366,12 +366,12 @@ class SourceSelectorModule {
     this.editorCommandsService.actions.executeCommand('HideItemsCommand', selection, !visible);
   }
 
-  toggleMobileVisibility() {
-    this.dualOutputService.actions.toggleMobileVisibility();
+  toggleHorizontalVisibility() {
+    this.dualOutputService.actions.toggleHorizontalVisibility();
   }
 
-  toggleDesktopVisibility() {
-    this.dualOutputService.actions.toggleDesktopVisibility();
+  toggleVerticalVisibility() {
+    this.dualOutputService.actions.toggleVerticalVisibility();
   }
 
   // Required for performance. Using Selection is too slow (Service Helpers)
@@ -576,13 +576,13 @@ const TreeNode = React.forwardRef(
       selectiveRecordingEnabled: boolean;
       isGuestCamActive: boolean;
       isDualOutputActive: boolean;
-      isMobileActive: boolean;
-      isDesktopActive: boolean;
+      isHorizontalActive: boolean;
+      isVerticalActive: boolean;
       canShowActions: boolean;
       toggleVisibility: (ev: unknown) => unknown;
       toggleLock: (ev: unknown) => unknown;
-      toggleMobileVisibility: (ev: unknown) => unknown;
-      toggleDesktopVisibility: (ev: unknown) => unknown;
+      toggleHorizontalVisibility: (ev: unknown) => unknown;
+      toggleVerticalVisibility: (ev: unknown) => unknown;
       cycleSelectiveRecording: (ev: unknown) => void;
       onDoubleClick: () => void;
       removeSource: () => void;
@@ -616,14 +616,14 @@ const TreeNode = React.forwardRef(
             {/* @@@ HERE TODO: 1. font icons. 2. show hide functionality. 3. remove logic from custom widget and repush */}
             {p.isDualOutputActive && (
               <i
-                onClick={p.toggleMobileVisibility}
-                className={p.isMobileActive ? 'icon-phone-case' : 'icon-phone-case-hide'}
+                onClick={p.toggleVerticalVisibility}
+                className={p.isVerticalActive ? 'icon-phone-case' : 'icon-phone-case-hide'}
               />
             )}
             {p.isDualOutputActive && (
               <i
-                onClick={p.toggleDesktopVisibility}
-                className={p.isDesktopActive ? 'icon-desktop' : 'icon-desktop-hide'}
+                onClick={p.toggleHorizontalVisibility}
+                className={p.isHorizontalActive ? 'icon-desktop' : 'icon-desktop-hide'}
               />
             )}
             {p.selectiveRecordingEnabled && (
