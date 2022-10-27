@@ -15,7 +15,7 @@ test('Populates advanced settings', async t => {
       'YUV Color Range': 'Limited',
       'Force GPU as render device': true,
       'Audio Monitoring Device': 'Default',
-      'Disable Windows audio ducking': false,
+      'Disable Windows audio ducking': true,
       'Filename Formatting': '%CCYY-%MM-%DD %hh-%mm-%ss',
       'Overwrite if file exists': false,
       'Replay Buffer Filename Prefix': 'Replay',
