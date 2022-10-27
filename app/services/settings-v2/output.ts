@@ -6,6 +6,7 @@ interface IOutputServiceState {
   stream: obs.ISimpleStreaming | obs.IAdvancedStreaming;
   recording: obs.ISimpleRecording | obs.IAdvancedRecording;
   replay: obs.ISimpleReplayBuffer | obs.IAdvancedReplayBuffer;
+  advancedMode: boolean;
 }
 
 type TOutputType = 'stream' | 'recording' | 'replay';
@@ -18,35 +19,34 @@ const REPLAY_PROPERTIES = ['prefix', 'suffix'];
 export class OutputsService extends StatefulService<IOutputServiceState> {
   @Inject() settingsManagerService: SettingsManagerService;
 
-  static initialState = {
-    stream: {},
-    recording: {},
-    replay: {},
+  static initialState: IOutputServiceState = {
+    stream: {} as obs.ISimpleStreaming | obs.IAdvancedStreaming,
+    recording: {} as obs.ISimpleRecording | obs.IAdvancedRecording,
+    replay: {} as obs.ISimpleReplayBuffer | obs.IAdvancedReplayBuffer,
+    advancedMode: false,
   };
 
-  outputs: IOutputServiceState = {
+  outputs: Omit<IOutputServiceState, 'advancedMode'> = {
     stream: null,
     recording: null,
     replay: null,
   };
   activeOutputs: string[] = [];
 
-  advancedMode: boolean;
-
   get streamSettings() {
-    return this.advancedMode
+    return this.state.advancedMode
       ? this.settingsManagerService.advancedStreamSettings
       : this.settingsManagerService.simpleStreamSettings;
   }
 
   get recordingSettings() {
-    return this.advancedMode
+    return this.state.advancedMode
       ? this.settingsManagerService.advancedRecordingSettings
       : this.settingsManagerService.simpleRecordingSettings;
   }
 
   get replaySettings() {
-    return this.advancedMode
+    return this.state.advancedMode
       ? this.settingsManagerService.advancedReplaySettings
       : this.settingsManagerService.simpleReplaySettings;
   }
@@ -56,9 +56,9 @@ export class OutputsService extends StatefulService<IOutputServiceState> {
   }
 
   init() {
-    this.advancedMode = this.settingsManagerService.simpleStreamSettings.useAdvanced;
+    this.SET_ADVANCED_MODE(this.settingsManagerService.simpleStreamSettings.useAdvanced);
 
-    if (this.advancedMode) {
+    if (this.state.advancedMode) {
       this.createAdvancedOutputs();
     } else {
       this.createSimpleOutputs();
@@ -97,6 +97,8 @@ export class OutputsService extends StatefulService<IOutputServiceState> {
     this.outputs.stream = obs.AdvancedStreamingFactory.create();
     this.outputs.recording = obs.AdvancedRecordingFactory.create();
     this.outputs.replay = obs.AdvancedReplayBufferFactory.create();
+    this.outputs.recording.streaming = this.outputs.stream;
+    this.outputs.replay.streaming = this.outputs.stream;
   }
 
   createSimpleOutputs() {
@@ -111,10 +113,10 @@ export class OutputsService extends StatefulService<IOutputServiceState> {
   }
 
   setAdvanced(value: boolean) {
-    if (this.advancedMode === value) return;
+    if (this.state.advancedMode === value) return;
 
     value ? this.createAdvancedOutputs() : this.createSimpleOutputs();
-    this.advancedMode = value;
+    this.SET_ADVANCED_MODE(value);
   }
 
   setStreamSetting(key: keyof obs.IAdvancedStreaming | keyof obs.ISimpleStreaming, value: unknown) {
@@ -151,5 +153,10 @@ export class OutputsService extends StatefulService<IOutputServiceState> {
   @mutation()
   SET_SETTING(category: TOutputType, property: string, value: unknown) {
     this.state[category][property] = value;
+  }
+
+  @mutation()
+  SET_ADVANCED_MODE(value: boolean) {
+    this.state.advancedMode = value;
   }
 }
