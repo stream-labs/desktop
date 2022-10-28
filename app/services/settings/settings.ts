@@ -28,6 +28,7 @@ import * as remote from '@electron/remote';
 import fs from 'fs';
 import path from 'path';
 
+// @@@ HERE
 export interface ISettingsValues {
   General: {
     KeepRecordingWhenStreamStops: boolean;

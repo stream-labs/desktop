@@ -7,7 +7,7 @@ import Display from 'components-react/shared/Display';
 import { $t } from 'services/i18n';
 import { ERenderingMode } from '../../../obs-api';
 import { Tooltip } from 'antd';
-import DualOutputDisplay from 'components-react/shared/DualOutputDisplay';
+// import DualOutputDisplay from 'components-react/shared/DualOutputDisplay';
 
 export default function StudioEditor() {
   const {
@@ -181,6 +181,7 @@ export default function StudioEditor() {
                 <Display
                   drawUI={true}
                   paddingSize={10}
+                  paddingColor={{ r: 0, g: 51, b: 255 }} // @@@ temp
                   onOutputResize={eventHandlers.onOutputResize}
                   renderingMode={ERenderingMode.OBS_MAIN_RENDERING}
                   sourceId={v.studioMode ? studioModeTransitionName : v.activeSceneId}
@@ -189,7 +190,8 @@ export default function StudioEditor() {
             )}
             {!v.dualOutputMode && v.studioMode && (
               <div className={styles.studioModeDisplayContainer}>
-                <Display paddingSize={10} />
+                <Display paddingSize={10} paddingColor={{ r: 0, g: 255, b: 0 }} />
+                {/* @@@ TEMP PADDING COLOR */}
               </div>
             )}
             {v.dualOutputMode && v.isHorizontalActive && (
@@ -203,10 +205,11 @@ export default function StudioEditor() {
                 onDoubleClick={eventHandlers.onMouseDblClick}
                 onContextMenu={eventHandlers.onContextMenu}
               >
-                <DualOutputDisplay
+                <Display
                   type="horizontal"
                   drawUI={true}
                   paddingSize={10}
+                  paddingColor={{ r: 255, g: 238, b: 0 }} // @@@ temp
                   onOutputResize={eventHandlers.onOutputResize}
                   renderingMode={ERenderingMode.OBS_MAIN_RENDERING}
                   sourceId={v.studioMode ? studioModeTransitionName : v.activeSceneId}
@@ -224,10 +227,11 @@ export default function StudioEditor() {
                 onDoubleClick={eventHandlers.onMouseDblClick}
                 onContextMenu={eventHandlers.onContextMenu}
               >
-                <DualOutputDisplay
+                <Display
                   type="vertical"
                   drawUI={true}
                   paddingSize={10}
+                  paddingColor={{ r: 255, g: 0, b: 0 }} // @@@ temp
                   onOutputResize={eventHandlers.onOutputResize}
                   renderingMode={ERenderingMode.OBS_MAIN_RENDERING}
                   sourceId={v.studioMode ? studioModeTransitionName : v.activeSceneId}

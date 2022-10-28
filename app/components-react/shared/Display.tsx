@@ -1,7 +1,7 @@
 import React, { useLayoutEffect, useEffect, useRef } from 'react';
 import { useVuex } from '../hooks';
 import { Services } from '../service-provider';
-import { Display as OBSDisplay } from '../../services/video';
+import { Display as OBSDisplay, TDisplayType } from '../../services/video';
 import uuid from 'uuid/v4';
 
 // @@REFERENCE
@@ -14,6 +14,8 @@ interface DisplayProps {
   onOutputResize?: (region: IRectangle) => void;
   clickHandler?: (event: React.MouseEvent) => void;
   style?: React.CSSProperties;
+  paddingColor?: IRGBColor; // @@@ temp
+  type?: TDisplayType;
 }
 
 export default function Display(props: DisplayProps) {
@@ -58,8 +60,10 @@ export default function Display(props: DisplayProps) {
     obsDisplay.current = new OBSDisplay(displayId, {
       sourceId: p.sourceId,
       paddingSize: p.paddingSize,
-      paddingColor: v.paddingColor,
+      paddingColor: p.paddingColor, // @@@ temp
+      // paddingColor: v.paddingColor, // @@@ temp
       renderingMode: p.renderingMode,
+      type: p.type,
     });
     obsDisplay.current.setShoulddrawUI(p.drawUI);
     obsDisplay.current.onOutputResize(region => p.onOutputResize(region));

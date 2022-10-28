@@ -51,13 +51,13 @@ export class DualOutputService extends StatefulService<IDualOutputServiceState> 
   init() {
     super.init();
 
-    console.log('initiating dual output');
+    // console.log('initiating dual output');
 
-    this.state.horizontalContext = obs.VideoFactory.create();
-    this.state.verticalContext = obs.VideoFactory.create();
+    // this.state.horizontalContext = obs.VideoFactory.create();
+    // this.state.verticalContext = obs.VideoFactory.create();
 
-    console.log('horizontalContext ', this.state.horizontalContext);
-    console.log('verticalContext ', this.state.verticalContext);
+    // console.log('horizontalContext ', this.state.horizontalContext);
+    // console.log('verticalContext ', this.state.verticalContext);
 
     // const tmp = new obs.OBSHandler();
     // // await obs.reserveUser();
@@ -88,8 +88,8 @@ export class DualOutputService extends StatefulService<IDualOutputServiceState> 
 
   @mutation()
   private TOGGLE_DUAL_OUTPUT_MODE(status?: boolean) {
-    console.log('toggle horizontalContext ', this.state.horizontalContext);
-    console.log('toggle verticalContext ', this.state.verticalContext);
+    // console.log('toggle horizontalContext ', this.state.horizontalContext);
+    // console.log('toggle verticalContext ', this.state.verticalContext);
     if (typeof status === 'undefined') {
       this.state.dualOutputMode = !this.state.dualOutputMode;
     } else {
@@ -105,7 +105,7 @@ export class DualOutputService extends StatefulService<IDualOutputServiceState> 
 
   @mutation()
   private TOGGLE_HORIZONTAL_VISIBILITY(status?: boolean) {
-    console.log('horizontal ', status);
+    // console.log('horizontal ', status);
     if (typeof status === 'undefined' || 'null') {
       this.state.isHorizontalActive = !this.state.isHorizontalActive;
     } else {
@@ -115,7 +115,7 @@ export class DualOutputService extends StatefulService<IDualOutputServiceState> 
 
   @mutation()
   private TOGGLE_VERTICAL_VISIBILITY(status?: boolean) {
-    console.log('vertical ', status);
+    // console.log('vertical ', status);
     if (typeof status === 'undefined' || 'null') {
       this.state.isVerticalActive = !this.state.isVerticalActive;
     } else {
