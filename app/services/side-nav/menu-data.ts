@@ -114,7 +114,7 @@ export const menuTitles = (item: EMenuItem | ESubMenuItem | string) => {
     [EMenuItem.AppStore]: $t('App Store'),
     [EMenuItem.Highlighter]: $t('Highlighter'),
     [EMenuItem.ThemeAudit]: $t('Theme Audit'),
-    [EMenuItem.DevTools]: $t('Dev Tools'),
+    [EMenuItem.DevTools]: 'Dev Tools',
     [EMenuItem.GetPrime]: $t('Get Prime'),
     [EMenuItem.Dashboard]: $t('Dashboard'),
     [EMenuItem.GetHelp]: $t('Get Help'),
