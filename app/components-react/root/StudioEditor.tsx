@@ -16,6 +16,7 @@ export default function StudioEditor() {
     EditorService,
     TransitionsService,
     DualOutputService,
+    ScenesService,
   } = Services;
   const v = useVuex(() => ({
     hideStyleBlockers: WindowsService.state.main.hideStyleBlockers,
@@ -25,6 +26,7 @@ export default function StudioEditor() {
     dualOutputMode: DualOutputService.views.dualOutputMode,
     isHorizontalActive: DualOutputService.views.isHorizontalActive,
     isVerticalActive: DualOutputService.views.isVerticalActive,
+    activeSceneId: ScenesService.views.activeSceneId,
   }));
   const displayEnabled = !v.hideStyleBlockers && !v.performanceMode;
   const placeholderRef = useRef<HTMLDivElement>(null);
@@ -181,7 +183,7 @@ export default function StudioEditor() {
                   paddingSize={10}
                   onOutputResize={eventHandlers.onOutputResize}
                   renderingMode={ERenderingMode.OBS_MAIN_RENDERING}
-                  sourceId={v.studioMode ? studioModeTransitionName : undefined}
+                  sourceId={v.studioMode ? studioModeTransitionName : v.activeSceneId}
                 />
               </div>
             )}
@@ -207,7 +209,7 @@ export default function StudioEditor() {
                   paddingSize={10}
                   onOutputResize={eventHandlers.onOutputResize}
                   renderingMode={ERenderingMode.OBS_MAIN_RENDERING}
-                  sourceId={v.studioMode ? studioModeTransitionName : undefined}
+                  sourceId={v.studioMode ? studioModeTransitionName : v.activeSceneId}
                 />
               </div>
             )}
@@ -228,7 +230,7 @@ export default function StudioEditor() {
                   paddingSize={10}
                   onOutputResize={eventHandlers.onOutputResize}
                   renderingMode={ERenderingMode.OBS_MAIN_RENDERING}
-                  sourceId={v.studioMode ? studioModeTransitionName : undefined}
+                  sourceId={v.studioMode ? studioModeTransitionName : v.activeSceneId}
                 />
               </div>
             )}
