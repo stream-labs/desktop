@@ -66,7 +66,7 @@
         </button>
         <multiselect
           id="normal-select"
-          :value="normal"
+          v-model="normal"
           :options="synthIds"
           :allow-empty="false"
           :custom-label="synthName"
@@ -89,7 +89,7 @@
         </button>
         <multiselect
           id="operator-select"
-          :value="operator"
+          v-model="operator"
           :options="synthIds"
           :allow-empty="false"
           :custom-label="synthName"
@@ -108,7 +108,7 @@
         </button>
         <multiselect
           id="system-select"
-          :value="system"
+          v-model="system"
           :options="synthIds"
           :allow-empty="false"
           :custom-label="synthName"
