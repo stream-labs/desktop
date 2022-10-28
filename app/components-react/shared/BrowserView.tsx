@@ -154,8 +154,15 @@ export default function BrowserView(p: BrowserViewProps) {
 
   if (loading) {
     return (
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <Spinner />
+      <div
+        style={{
+          display: 'flex',
+          flexGrow: 1,
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <Spinner visible relative />
       </div>
     );
   }

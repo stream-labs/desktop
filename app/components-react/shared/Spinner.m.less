@@ -17,8 +17,16 @@
   }
 
   &.hasVisibleSpinner .spinner {
-   transition: opacity 300ms;
-   visibility: visible;
-   opacity: 1;
+    transition: opacity 300ms;
+    visibility: visible;
+    opacity: 1;
+  }
+}
+
+.page-loader:extend(.container) {
+  position: relative !important;
+
+  :global(.s-bars) {
+    min-width: 15px !important;
   }
 }
