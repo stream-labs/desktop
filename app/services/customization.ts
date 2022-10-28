@@ -166,6 +166,7 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
     this.setSettings(this.runMigrations(this.state, CustomizationService.migrations));
     this.setLiveDockCollapsed(true); // livedock is always collapsed on app start
     this.ensureCrashDumpFolder();
+    this.setObsTheme();
 
     this.userService.userLoginFinished.subscribe(() => this.setInitialLegacyAlertboxState());
 
@@ -204,11 +205,7 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
   }
 
   setTheme(theme: string) {
-    if (['night-theme', 'prime-dark'].includes(theme)) {
-      obs.NodeObs.OBS_content_setDayTheme(false);
-    } else {
-      obs.NodeObs.OBS_content_setDayTheme(true);
-    }
+    obs.NodeObs.OBS_content_setDayTheme(['day-theme', 'prime-light'].includes(theme));
     return this.setSettings({ theme });
   }
 
@@ -254,6 +251,10 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
 
   togglePerformanceMode() {
     this.setSettings({ performanceMode: !this.state.performanceMode });
+  }
+
+  setObsTheme() {
+    obs.NodeObs.OBS_content_setDayTheme(!this.isDarkTheme);
   }
 
   get themeOptions() {
