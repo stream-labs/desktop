@@ -223,5 +223,12 @@
   "Streamlabs ID": "Streamlabs ID",
   "Update Password": "更新密碼",
   "Update Two-factor Auth": "更新雙因子驗證",
-  "Setup": "設定"
+  "Setup": "設定",
+  "FPSNum": "FPSNum",
+  "FPSDen": "FPSDen",
+  "Integer FPS Values": "Integer FPS Values",
+  "Fractional FPS Values": "Fractional FPS Values",
+  "FPS Number": "FPS Number",
+  "FPS Density": "FPS Density",
+  "The resolution must be in the format [width]x[height] (i.e. 1920x1080)": "The resolution must be in the format [width]x[height] (i.e. 1920x1080)"
 }
