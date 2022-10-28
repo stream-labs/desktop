@@ -15,6 +15,7 @@ import { UsageStatisticsService } from 'services/usage-statistics';
 import fs from 'fs-extra';
 import path from 'path';
 import { AppService } from './app';
+import * as obs from '../../obs-api';
 
 // Maps to --background
 const THEME_BACKGROUNDS = {
@@ -203,6 +204,11 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
   }
 
   setTheme(theme: string) {
+    if (['night-theme', 'prime-dark'].includes(theme)) {
+      obs.NodeObs.OBS_content_setDayTheme(false);
+    } else {
+      obs.NodeObs.OBS_content_setDayTheme(true);
+    }
     return this.setSettings({ theme });
   }
 
