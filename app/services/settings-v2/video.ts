@@ -172,21 +172,21 @@ export class VideoSettingsService extends StatefulService<{ videoContext: obs.IV
   }
 
   setVideoSetting(key: string, value: unknown) {
-    obs.VideoFactory.legacySettings[key] = value;
     this.SET_VIDEO_SETTING(key, value);
+    obs.VideoFactory.legacySettings = this.state.videoContext;
   }
 
   setResolution(key: string, value: string) {
     const [width, height] = value.split('x').map(val => Number(val));
     const prefix = key === 'baseRes' ? 'base' : 'output';
-    this.SET_VIDEO_SETTING(`${prefix}Width`, width);
-    this.SET_VIDEO_SETTING(`${prefix}Height`, height);
+    this.setVideoSetting(`${prefix}Width`, width);
+    this.setVideoSetting(`${prefix}Height`, height);
   }
 
   setCommonFPS(value: string) {
     const [fpsNum, fpsDen] = value.split('-');
-    this.SET_VIDEO_SETTING('fpsNum', fpsNum);
-    this.SET_VIDEO_SETTING('fpsDen', fpsDen);
+    this.setVideoSetting('fpsNum', fpsNum);
+    this.setVideoSetting('fpsDen', fpsDen);
   }
 
   @mutation()
