@@ -453,6 +453,7 @@ export class SettingsService extends StatefulService<ISettingsServiceState> {
 
   setSettings(categoryName: string, settingsData: ISettingsSubCategory[]) {
     if (categoryName === 'Audio') this.setAudioSettings([settingsData.pop()]);
+    if (categoryName === 'Video') return;
 
     const dataToSave = [];
 
