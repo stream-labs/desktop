@@ -128,6 +128,14 @@ export class VideoSettingsService extends StatefulService<{ videoContext: obs.IV
     return this.settingsManagerService.videoSettings;
   }
 
+  get outputResOptions() {
+    const baseRes = `${this.state.videoContext.baseWidth}x${this.state.videoContext.baseHeight}`;
+    if (!OUTPUT_RES_OPTIONS.find(opt => opt.value === baseRes)) {
+      return [{ label: baseRes, value: baseRes }].concat(OUTPUT_RES_OPTIONS);
+    }
+    return OUTPUT_RES_OPTIONS;
+  }
+
   get monitorResolutions() {
     const resOptions: { label: string; value: string }[] = [];
     const displays = remote.screen.getAllDisplays();
@@ -165,19 +173,20 @@ export class VideoSettingsService extends StatefulService<{ videoContext: obs.IV
 
   setVideoSetting(key: string, value: unknown) {
     this.SET_VIDEO_SETTING(key, value);
+    obs.VideoFactory.legacySettings = this.state.videoContext;
   }
 
   setResolution(key: string, value: string) {
     const [width, height] = value.split('x').map(val => Number(val));
     const prefix = key === 'baseRes' ? 'base' : 'output';
-    this.SET_VIDEO_SETTING(`${prefix}Width`, width);
-    this.SET_VIDEO_SETTING(`${prefix}Height`, height);
+    this.setVideoSetting(`${prefix}Width`, width);
+    this.setVideoSetting(`${prefix}Height`, height);
   }
 
   setCommonFPS(value: string) {
     const [fpsNum, fpsDen] = value.split('-');
-    this.SET_VIDEO_SETTING('fpsNum', fpsNum);
-    this.SET_VIDEO_SETTING('fpsDen', fpsDen);
+    this.setVideoSetting('fpsNum', fpsNum);
+    this.setVideoSetting('fpsDen', fpsDen);
   }
 
   @mutation()
