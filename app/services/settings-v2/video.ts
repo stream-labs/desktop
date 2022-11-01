@@ -94,16 +94,20 @@ export class VideoSettingsService extends StatefulService<{ videoContext: obs.IV
             onChange: (val: string) => this.setCommonFPS(val),
             displayed: this.videoSettingsValues.fpsType === obs.EFPSType.Common,
           },
+          fpsInt: {
+            type: 'number',
+            label: $t('FPS Value'),
+            onChange: (val: string) => this.setIntegerFPS(val),
+            displayed: this.videoSettingsValues.fpsType === obs.EFPSType.Integer,
+          },
           fpsNum: {
             type: 'number',
-            label: $t('FPS Number'),
-            displayed: [obs.EFPSType.Integer, obs.EFPSType.Fractional].includes(
-              this.videoSettingsValues.fpsType,
-            ),
+            label: $t('FPS Numerator'),
+            displayed: this.videoSettingsValues.fpsType === obs.EFPSType.Fractional,
           },
           fpsDen: {
             type: 'number',
-            label: $t('FPS Density'),
+            label: $t('FPS Denominator'),
             displayed: this.videoSettingsValues.fpsType === obs.EFPSType.Fractional,
           },
         },
@@ -121,6 +125,7 @@ export class VideoSettingsService extends StatefulService<{ videoContext: obs.IV
       fpsCom: `${context.fpsNum}-${context.fpsDen}`,
       fpsNum: context.fpsNum,
       fpsDen: context.fpsDen,
+      fpsInt: context.fpsNum,
     };
   }
 
@@ -188,6 +193,11 @@ export class VideoSettingsService extends StatefulService<{ videoContext: obs.IV
     const [fpsNum, fpsDen] = value.split('-');
     this.actions.setVideoSetting('fpsNum', Number(fpsNum));
     this.actions.setVideoSetting('fpsDen', Number(fpsDen));
+  }
+
+  setIntegerFPS(value: string) {
+    this.actions.setVideoSetting('fpsNum', Number(value));
+    this.actions.setVideoSetting('fpsDen', 1);
   }
 
   @mutation()

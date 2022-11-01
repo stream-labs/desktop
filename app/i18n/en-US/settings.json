@@ -228,7 +228,8 @@
   "FPSDen": "FPSDen",
   "Integer FPS Values": "Integer FPS Values",
   "Fractional FPS Values": "Fractional FPS Values",
-  "FPS Number": "FPS Number",
-  "FPS Density": "FPS Density",
+  "FPS Numerator": "FPS Numerator",
+  "FPS Denominator": "FPS Denominator",
+  "FPS Value": "FPS Value",
   "The resolution must be in the format [width]x[height] (i.e. 1920x1080)": "The resolution must be in the format [width]x[height] (i.e. 1920x1080)"
 }
