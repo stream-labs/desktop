@@ -1,6 +1,6 @@
 import * as remote from '@electron/remote';
 import { Inject } from 'services/core/injector';
-import { InitAfter } from 'services/core';
+import { ExecuteInWorkerProcess, InitAfter } from 'services/core';
 import { mutation, StatefulService } from '../core/stateful-service';
 import * as obs from '../../../obs-api';
 import { SettingsManagerService } from 'services/settings-manager';
@@ -171,22 +171,23 @@ export class VideoSettingsService extends StatefulService<{ videoContext: obs.IV
     };
   }
 
+  @ExecuteInWorkerProcess()
   setVideoSetting(key: string, value: unknown) {
     this.SET_VIDEO_SETTING(key, value);
     obs.VideoFactory.legacySettings = this.state.videoContext;
   }
 
   setResolution(key: string, value: string) {
-    const [width, height] = value.split('x').map(val => Number(val));
+    const [width, height] = value.split('x');
     const prefix = key === 'baseRes' ? 'base' : 'output';
-    this.setVideoSetting(`${prefix}Width`, width);
-    this.setVideoSetting(`${prefix}Height`, height);
+    this.actions.setVideoSetting(`${prefix}Width`, Number(width));
+    this.actions.setVideoSetting(`${prefix}Height`, Number(height));
   }
 
   setCommonFPS(value: string) {
     const [fpsNum, fpsDen] = value.split('-');
-    this.setVideoSetting('fpsNum', fpsNum);
-    this.setVideoSetting('fpsDen', fpsDen);
+    this.actions.setVideoSetting('fpsNum', Number(fpsNum));
+    this.actions.setVideoSetting('fpsDen', Number(fpsDen));
   }
 
   @mutation()
