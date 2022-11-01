@@ -95,18 +95,16 @@ export class SelectionService extends StatefulService<ISelectionState> {
   @shortcut('Delete')
   remove() {
     const name = this.getLastSelected().name;
-    electron.remote.dialog.showMessageBox(
-      electron.remote.getCurrentWindow(),
-      {
+    electron.remote.dialog
+      .showMessageBox(electron.remote.getCurrentWindow(), {
         type: 'warning',
         message: $t('scenes.removeSceneConfirm', { sceneName: name }),
         buttons: [$t('common.cancel'), $t('common.ok')],
-      },
-      ok => {
+      })
+      .then(({ response: ok }) => {
         if (!ok) return;
         return this.getSelection().remove.call(this);
-      },
-    );
+      });
   }
 
   @shortcut('ArrowLeft')

@@ -47,19 +47,16 @@ interface INVoiceClientState {
   enabled: boolean;
 }
 
-function showError(err: Error): Promise<void> {
-  return new Promise<void>((resolve) => {
-    electron.remote.dialog.showMessageBox(
-      electron.remote.getCurrentWindow(),
-      {
-        type: 'error',
-        message: err.toString(),
-        buttons: [$t('common.close')],
-        noLink: true,
-      },
-      () => resolve(),
-    );
-  });
+async function showError(err: Error): Promise<void> {
+  await electron.remote.dialog.showMessageBox(
+    electron.remote.getCurrentWindow(),
+    {
+      type: 'error',
+      message: err.toString(),
+      buttons: [$t('common.close')],
+      noLink: true,
+    }
+  );
 }
 
 export class NVoiceClientService extends StatefulService<INVoiceClientState> {

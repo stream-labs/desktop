@@ -153,6 +153,12 @@ export class WindowsService extends StatefulService<IWindowsState> {
 
     ipcRenderer.send('window-showChildWindow', options);
     this.updateChildWindowOptions(options);
+
+    // HACK: ソースプロパティウィンドウを oneOffWindow で開いている場合は閉じる
+    // (childウィンドウで開く場合を模倣するため)
+    if (this.windows['sourcePropertiesWindow']) {
+      this.closeOneOffWindow('sourcePropertiesWindow');
+    }
   }
 
   closeChildWindow() {
@@ -191,7 +197,7 @@ export class WindowsService extends StatefulService<IWindowsState> {
    * already exists, this function will focus the existing window instead.
    * @return the window id of the created window
    */
-  createOneOffWindow(options: Partial<IWindowOptions>, windowId?: string): string {
+  createOneOffWindow(options: Partial<IWindowOptions & { limitMinimumSize?: boolean }>, windowId?: string): string {
     windowId = windowId || uuid();
 
     if (this.windows[windowId]) {
@@ -233,6 +239,9 @@ export class WindowsService extends StatefulService<IWindowsState> {
     const height =
       options.size && typeof options.size.height === 'number' ? options.size.height : 400;
     newWindow.setSize(width, height);
+    if (options.limitMinimumSize) {
+      newWindow.setMinimumSize(width, height);
+    }
 
     if (options.size && typeof options.size.x === 'number' && typeof options.size.y === 'number') {
       newWindow.setPosition(options.size.x, options.size.y);

@@ -85,18 +85,18 @@ const setup = createSetupFunction({
   injectee: {
     NicoliveProgramStateService: {
       updated: {
-        subscribe() {},
+        subscribe() { },
       },
     },
     UserService: {
       userLoginState: {
-        subscribe() {},
+        subscribe() { },
       },
       isLoggedIn: () => true,
     },
     CustomizationService: {
       settingsChanged: {
-        subscribe() {},
+        subscribe() { },
       },
       state: {},
     },
@@ -160,20 +160,22 @@ test('findSuitableProgram', () => {
 });
 
 test.each([
-  ['CREATED', 1],
-  ['RESERVED', 0],
-  ['OTHER', 0],
-])('createProgram with %s', async (result: string, fetchProgramCalled: number) => {
+  ['CREATED', 1, 1],
+  ['RESERVED', 0, 0],
+  ['OTHER', 0, 0],
+])('createProgram with %s', async (result: string, fetchProgramCalled: number, showCreatedNoticeCalled: number) => {
   setup();
   const { NicoliveProgramService } = require('./nicolive-program');
   const instance = NicoliveProgramService.instance as NicoliveProgramService;
 
   instance.client.createProgram = jest.fn().mockResolvedValue(result);
   instance.fetchProgram = jest.fn();
+  instance.showCreatedNotice = jest.fn();
 
   await expect(instance.createProgram()).resolves.toBe(result);
   expect(instance.client.createProgram).toHaveBeenCalledTimes(1);
   expect(instance.fetchProgram).toHaveBeenCalledTimes(fetchProgramCalled);
+  expect(instance.showCreatedNotice).toHaveBeenCalledTimes(showCreatedNoticeCalled);
 });
 
 test.each([
@@ -549,73 +551,73 @@ describe('refreshStatisticsPolling', () => {
     next: any;
     result: 'REFRESH' | 'STOP' | 'NOOP';
   }[] = [
-    {
-      name: '初期状態から予約状態の番組を開くとタイマーは止まったまま',
-      prev: null,
-      next: { status: 'reserved', programID: 'lv1' },
-      result: 'NOOP',
-    },
-    {
-      name: '初期状態からテスト状態の番組を開くとタイマーは止まったまま',
-      prev: null,
-      next: { status: 'test', programID: 'lv1' },
-      result: 'NOOP',
-    },
-    {
-      name: '初期状態から放送中状態の番組を開くとタイマーを更新する',
-      prev: null,
-      next: { status: 'onAir', programID: 'lv1' },
-      result: 'REFRESH',
-    },
-    {
-      name: '初期状態から終了状態の番組を開くとタイマーは止まったまま',
-      prev: null,
-      next: { status: 'end', programID: 'lv1' },
-      result: 'NOOP',
-    },
-    {
-      name: '予約状態から放送中状態になったらタイマーを更新する',
-      prev: { status: 'reserved', programID: 'lv1' },
-      next: { status: 'onAir', programID: 'lv1' },
-      result: 'REFRESH',
-    },
-    {
-      name: 'テスト状態から放送中状態になったらタイマーを更新する',
-      prev: { status: 'test', programID: 'lv1' },
-      next: { status: 'onAir', programID: 'lv1' },
-      result: 'REFRESH',
-    },
-    {
-      name: 'テスト状態から終了状態になったらタイマーを止める',
-      prev: { status: 'onAir', programID: 'lv1' },
-      next: { status: 'end', programID: 'lv1' },
-      result: 'STOP',
-    },
-    {
-      name: '放送中状態から別番組の予約状態になったらタイマーを止める',
-      prev: { status: 'onAir', programID: 'lv1' },
-      next: { status: 'reserved', programID: 'lv2' },
-      result: 'STOP',
-    },
-    {
-      name: '放送中状態から別番組の放送中状態になったらタイマーを止める',
-      prev: { status: 'onAir', programID: 'lv1' },
-      next: { status: 'test', programID: 'lv2' },
-      result: 'STOP',
-    },
-    {
-      name: '放送中状態から別番組の放送中状態になったらタイマーを更新する',
-      prev: { status: 'onAir', programID: 'lv1' },
-      next: { status: 'onAir', programID: 'lv2' },
-      result: 'REFRESH',
-    },
-    {
-      name: '放送中状態から別番組の終了状態になったらタイマーを止める',
-      prev: { status: 'onAir', programID: 'lv1' },
-      next: { status: 'end', programID: 'lv2' },
-      result: 'STOP',
-    },
-  ];
+      {
+        name: '初期状態から予約状態の番組を開くとタイマーは止まったまま',
+        prev: null,
+        next: { status: 'reserved', programID: 'lv1' },
+        result: 'NOOP',
+      },
+      {
+        name: '初期状態からテスト状態の番組を開くとタイマーは止まったまま',
+        prev: null,
+        next: { status: 'test', programID: 'lv1' },
+        result: 'NOOP',
+      },
+      {
+        name: '初期状態から放送中状態の番組を開くとタイマーを更新する',
+        prev: null,
+        next: { status: 'onAir', programID: 'lv1' },
+        result: 'REFRESH',
+      },
+      {
+        name: '初期状態から終了状態の番組を開くとタイマーは止まったまま',
+        prev: null,
+        next: { status: 'end', programID: 'lv1' },
+        result: 'NOOP',
+      },
+      {
+        name: '予約状態から放送中状態になったらタイマーを更新する',
+        prev: { status: 'reserved', programID: 'lv1' },
+        next: { status: 'onAir', programID: 'lv1' },
+        result: 'REFRESH',
+      },
+      {
+        name: 'テスト状態から放送中状態になったらタイマーを更新する',
+        prev: { status: 'test', programID: 'lv1' },
+        next: { status: 'onAir', programID: 'lv1' },
+        result: 'REFRESH',
+      },
+      {
+        name: 'テスト状態から終了状態になったらタイマーを止める',
+        prev: { status: 'onAir', programID: 'lv1' },
+        next: { status: 'end', programID: 'lv1' },
+        result: 'STOP',
+      },
+      {
+        name: '放送中状態から別番組の予約状態になったらタイマーを止める',
+        prev: { status: 'onAir', programID: 'lv1' },
+        next: { status: 'reserved', programID: 'lv2' },
+        result: 'STOP',
+      },
+      {
+        name: '放送中状態から別番組の放送中状態になったらタイマーを止める',
+        prev: { status: 'onAir', programID: 'lv1' },
+        next: { status: 'test', programID: 'lv2' },
+        result: 'STOP',
+      },
+      {
+        name: '放送中状態から別番組の放送中状態になったらタイマーを更新する',
+        prev: { status: 'onAir', programID: 'lv1' },
+        next: { status: 'onAir', programID: 'lv2' },
+        result: 'REFRESH',
+      },
+      {
+        name: '放送中状態から別番組の終了状態になったらタイマーを止める',
+        prev: { status: 'onAir', programID: 'lv1' },
+        next: { status: 'end', programID: 'lv2' },
+        result: 'STOP',
+      },
+    ];
 
   for (const suite of suites) {
     test(suite.name, () => {
@@ -724,140 +726,140 @@ describe('refreshProgramStatusTimer', () => {
     next: any;
     result: 'REFRESH' | 'STOP' | 'NOOP';
   }[] = [
-    {
-      name: '初期状態から予約状態の番組を開くとタイマーを更新する',
-      prev: null,
-      next: {
-        status: 'reserved',
-        programID: 'lv1',
-        testStartTime: 100,
-        startTime: 200,
-        endTime: 300,
+      {
+        name: '初期状態から予約状態の番組を開くとタイマーを更新する',
+        prev: null,
+        next: {
+          status: 'reserved',
+          programID: 'lv1',
+          testStartTime: 100,
+          startTime: 200,
+          endTime: 300,
+        },
+        result: 'REFRESH',
       },
-      result: 'REFRESH',
-    },
-    {
-      name: '初期状態からテスト状態の番組を開くとタイマーを更新する',
-      prev: null,
-      next: { status: 'test', programID: 'lv1', testStartTime: 100, startTime: 200, endTime: 300 },
-      result: 'REFRESH',
-    },
-    {
-      name: '初期状態から放送中状態の番組を開くとタイマーを更新する',
-      prev: null,
-      next: { status: 'onAir', programID: 'lv1', testStartTime: 100, startTime: 200, endTime: 300 },
-      result: 'REFRESH',
-    },
-    {
-      name: '初期状態から終了状態の番組を開くとタイマーは止まったまま',
-      prev: null,
-      next: { status: 'end', programID: 'lv1', testStartTime: 100, startTime: 200, endTime: 300 },
-      result: 'NOOP',
-    },
-    {
-      name: '終了状態から予約状態になったらタイマーを更新する',
-      prev: { status: 'end', programID: 'lv0', testStartTime: 10, startTime: 20, endTime: 30 },
-      next: {
-        status: 'reserved',
-        programID: 'lv1',
-        testStartTime: 100,
-        startTime: 200,
-        endTime: 300,
+      {
+        name: '初期状態からテスト状態の番組を開くとタイマーを更新する',
+        prev: null,
+        next: { status: 'test', programID: 'lv1', testStartTime: 100, startTime: 200, endTime: 300 },
+        result: 'REFRESH',
       },
-      result: 'REFRESH',
-    },
-    {
-      name: '予約状態なら毎回タイマーを更新する(30分前境界超え対策)',
-      prev: {
-        status: 'reserved',
-        programID: 'lv1',
-        testStartTime: 100,
-        startTime: 30 * 60 - 1,
-        endTime: 300,
+      {
+        name: '初期状態から放送中状態の番組を開くとタイマーを更新する',
+        prev: null,
+        next: { status: 'onAir', programID: 'lv1', testStartTime: 100, startTime: 200, endTime: 300 },
+        result: 'REFRESH',
       },
-      next: {
-        status: 'reserved',
-        programID: 'lv1',
-        testStartTime: 100,
-        startTime: 30 * 60 - 1,
-        endTime: 300,
+      {
+        name: '初期状態から終了状態の番組を開くとタイマーは止まったまま',
+        prev: null,
+        next: { status: 'end', programID: 'lv1', testStartTime: 100, startTime: 200, endTime: 300 },
+        result: 'NOOP',
       },
-      result: 'REFRESH',
-    },
-    {
-      name: '予約状態から放送中状態になったらタイマーを更新する',
-      prev: {
-        status: 'reserved',
-        programID: 'lv1',
-        testStartTime: 100,
-        startTime: 200,
-        endTime: 300,
+      {
+        name: '終了状態から予約状態になったらタイマーを更新する',
+        prev: { status: 'end', programID: 'lv0', testStartTime: 10, startTime: 20, endTime: 30 },
+        next: {
+          status: 'reserved',
+          programID: 'lv1',
+          testStartTime: 100,
+          startTime: 200,
+          endTime: 300,
+        },
+        result: 'REFRESH',
       },
-      next: { status: 'onAir', programID: 'lv1', testStartTime: 100, startTime: 200, endTime: 300 },
-      result: 'REFRESH',
-    },
-    {
-      name: 'テスト状態から放送中状態になったらタイマーを更新する',
-      prev: { status: 'test', programID: 'lv1', testStartTime: 100, startTime: 200, endTime: 300 },
-      next: { status: 'onAir', programID: 'lv1', testStartTime: 100, startTime: 200, endTime: 300 },
-      result: 'REFRESH',
-    },
-    {
-      name: 'テスト状態から終了状態になったらタイマーを止める',
-      prev: { status: 'onAir', programID: 'lv1', testStartTime: 100, startTime: 200, endTime: 300 },
-      next: { status: 'end', programID: 'lv1', testStartTime: 100, startTime: 200, endTime: 300 },
-      result: 'STOP',
-    },
-    {
-      name: '放送中に終了時間が変わったらタイマーを更新する',
-      prev: { status: 'onAir', programID: 'lv1', testStartTime: 100, startTime: 200, endTime: 300 },
-      next: { status: 'onAir', programID: 'lv1', testStartTime: 100, startTime: 200, endTime: 350 },
-      result: 'REFRESH',
-    },
-    {
-      name: '何も変わらなければ何もしない',
-      prev: { status: 'onAir', programID: 'lv1', testStartTime: 100, startTime: 200, endTime: 300 },
-      next: { status: 'onAir', programID: 'lv1', testStartTime: 100, startTime: 200, endTime: 300 },
-      result: 'NOOP',
-    },
-    // 以下、N Air外部で状態を操作した場合に壊れないことを保証したい
-    {
-      name: '予約状態から別番組の予約状態になったらタイマーを更新する',
-      prev: {
-        status: 'reserved',
-        programID: 'lv1',
-        testStartTime: 100,
-        startTime: 200,
-        endTime: 300,
+      {
+        name: '予約状態なら毎回タイマーを更新する(30分前境界超え対策)',
+        prev: {
+          status: 'reserved',
+          programID: 'lv1',
+          testStartTime: 100,
+          startTime: 30 * 60 - 1,
+          endTime: 300,
+        },
+        next: {
+          status: 'reserved',
+          programID: 'lv1',
+          testStartTime: 100,
+          startTime: 30 * 60 - 1,
+          endTime: 300,
+        },
+        result: 'REFRESH',
       },
-      next: {
-        status: 'reserved',
-        programID: 'lv2',
-        testStartTime: 400,
-        startTime: 500,
-        endTime: 600,
+      {
+        name: '予約状態から放送中状態になったらタイマーを更新する',
+        prev: {
+          status: 'reserved',
+          programID: 'lv1',
+          testStartTime: 100,
+          startTime: 200,
+          endTime: 300,
+        },
+        next: { status: 'onAir', programID: 'lv1', testStartTime: 100, startTime: 200, endTime: 300 },
+        result: 'REFRESH',
       },
-      result: 'REFRESH',
-    },
-    {
-      name: 'テスト状態から別番組のテスト状態になったらタイマーを更新する',
-      prev: { status: 'test', programID: 'lv1', testStartTime: 100, startTime: 200, endTime: 300 },
-      next: { status: 'test', programID: 'lv2', testStartTime: 400, startTime: 500, endTime: 600 },
-      result: 'REFRESH',
-    },
-    {
-      name: '放送中状態から別番組の放送中状態になったらタイマーを更新する',
-      prev: { status: 'onAir', programID: 'lv1', testStartTime: 100, startTime: 200, endTime: 300 },
-      next: { status: 'onAir', programID: 'lv2', testStartTime: 400, startTime: 500, endTime: 600 },
-      result: 'REFRESH',
-    },
-    {
-      name: '終了状態から別番組の終了状態になってもタイマーは止まったまま',
-      prev: { status: 'end', programID: 'lv1', testStartTime: 100, startTime: 200, endTime: 300 },
-      next: { status: 'end', programID: 'lv2', testStartTime: 400, startTime: 500, endTime: 600 },
-      result: 'NOOP',
-    },
-  ];
+      {
+        name: 'テスト状態から放送中状態になったらタイマーを更新する',
+        prev: { status: 'test', programID: 'lv1', testStartTime: 100, startTime: 200, endTime: 300 },
+        next: { status: 'onAir', programID: 'lv1', testStartTime: 100, startTime: 200, endTime: 300 },
+        result: 'REFRESH',
+      },
+      {
+        name: 'テスト状態から終了状態になったらタイマーを止める',
+        prev: { status: 'onAir', programID: 'lv1', testStartTime: 100, startTime: 200, endTime: 300 },
+        next: { status: 'end', programID: 'lv1', testStartTime: 100, startTime: 200, endTime: 300 },
+        result: 'STOP',
+      },
+      {
+        name: '放送中に終了時間が変わったらタイマーを更新する',
+        prev: { status: 'onAir', programID: 'lv1', testStartTime: 100, startTime: 200, endTime: 300 },
+        next: { status: 'onAir', programID: 'lv1', testStartTime: 100, startTime: 200, endTime: 350 },
+        result: 'REFRESH',
+      },
+      {
+        name: '何も変わらなければ何もしない',
+        prev: { status: 'onAir', programID: 'lv1', testStartTime: 100, startTime: 200, endTime: 300 },
+        next: { status: 'onAir', programID: 'lv1', testStartTime: 100, startTime: 200, endTime: 300 },
+        result: 'NOOP',
+      },
+      // 以下、N Air外部で状態を操作した場合に壊れないことを保証したい
+      {
+        name: '予約状態から別番組の予約状態になったらタイマーを更新する',
+        prev: {
+          status: 'reserved',
+          programID: 'lv1',
+          testStartTime: 100,
+          startTime: 200,
+          endTime: 300,
+        },
+        next: {
+          status: 'reserved',
+          programID: 'lv2',
+          testStartTime: 400,
+          startTime: 500,
+          endTime: 600,
+        },
+        result: 'REFRESH',
+      },
+      {
+        name: 'テスト状態から別番組のテスト状態になったらタイマーを更新する',
+        prev: { status: 'test', programID: 'lv1', testStartTime: 100, startTime: 200, endTime: 300 },
+        next: { status: 'test', programID: 'lv2', testStartTime: 400, startTime: 500, endTime: 600 },
+        result: 'REFRESH',
+      },
+      {
+        name: '放送中状態から別番組の放送中状態になったらタイマーを更新する',
+        prev: { status: 'onAir', programID: 'lv1', testStartTime: 100, startTime: 200, endTime: 300 },
+        next: { status: 'onAir', programID: 'lv2', testStartTime: 400, startTime: 500, endTime: 600 },
+        result: 'REFRESH',
+      },
+      {
+        name: '終了状態から別番組の終了状態になってもタイマーは止まったまま',
+        prev: { status: 'end', programID: 'lv1', testStartTime: 100, startTime: 200, endTime: 300 },
+        next: { status: 'end', programID: 'lv2', testStartTime: 400, startTime: 500, endTime: 600 },
+        result: 'NOOP',
+      },
+    ];
 
   for (const suite of suites) {
     test(suite.name, () => {
@@ -904,199 +906,199 @@ describe('refreshAutoExtensionTimer', () => {
     now: number;
     result: 'IMMEDIATE' | 'WAIT' | 'NOOP' | 'CLEAR';
   }[] = [
-    {
-      name: '初期値から遷移して延長が有効なとき放送中番組を取得して終了5分前を切っていると即延長する',
-      prev: null,
-      next: {
-        status: 'onAir',
-        programID: 'lv1',
-        startTime: 0,
-        endTime: 30 * 60,
-        autoExtensionEnabled: true,
+      {
+        name: '初期値から遷移して延長が有効なとき放送中番組を取得して終了5分前を切っていると即延長する',
+        prev: null,
+        next: {
+          status: 'onAir',
+          programID: 'lv1',
+          startTime: 0,
+          endTime: 30 * 60,
+          autoExtensionEnabled: true,
+        },
+        now: 25 * 60,
+        result: 'IMMEDIATE',
       },
-      now: 25 * 60,
-      result: 'IMMEDIATE',
-    },
-    {
-      name: '初期値から遷移して延長が無効なとき放送中番組を取得して終了5分前を切っていても何もしない',
-      prev: null,
-      next: {
-        status: 'onAir',
-        programID: 'lv1',
-        startTime: 0,
-        endTime: 30 * 60,
-        autoExtensionEnabled: false,
+      {
+        name: '初期値から遷移して延長が無効なとき放送中番組を取得して終了5分前を切っていても何もしない',
+        prev: null,
+        next: {
+          status: 'onAir',
+          programID: 'lv1',
+          startTime: 0,
+          endTime: 30 * 60,
+          autoExtensionEnabled: false,
+        },
+        now: 25 * 60,
+        result: 'NOOP',
       },
-      now: 25 * 60,
-      result: 'NOOP',
-    },
-    {
-      name: '初期値から遷移して延長が有効なとき放送中番組を取得して終了5分前より前ならタイマーをセットする',
-      prev: null,
-      next: {
-        status: 'onAir',
-        programID: 'lv1',
-        startTime: 0,
-        endTime: 30 * 60,
-        autoExtensionEnabled: true,
+      {
+        name: '初期値から遷移して延長が有効なとき放送中番組を取得して終了5分前より前ならタイマーをセットする',
+        prev: null,
+        next: {
+          status: 'onAir',
+          programID: 'lv1',
+          startTime: 0,
+          endTime: 30 * 60,
+          autoExtensionEnabled: true,
+        },
+        now: 24 * 60,
+        result: 'WAIT',
       },
-      now: 24 * 60,
-      result: 'WAIT',
-    },
-    {
-      name: '初期値から遷移して延長が無効なとき放送中番組を取得して終了5分前より前で何もしない',
-      prev: null,
-      next: {
-        status: 'onAir',
-        programID: 'lv1',
-        startTime: 0,
-        endTime: 30 * 60,
-        autoExtensionEnabled: false,
+      {
+        name: '初期値から遷移して延長が無効なとき放送中番組を取得して終了5分前より前で何もしない',
+        prev: null,
+        next: {
+          status: 'onAir',
+          programID: 'lv1',
+          startTime: 0,
+          endTime: 30 * 60,
+          autoExtensionEnabled: false,
+        },
+        now: 24 * 60,
+        result: 'NOOP',
       },
-      now: 24 * 60,
-      result: 'NOOP',
-    },
-    {
-      name: '初期値から遷移して延長が有効なとき放送中番組でないなら何もしない',
-      prev: null,
-      next: {
-        status: 'test',
-        programID: 'lv1',
-        startTime: 0,
-        endTime: 30 * 60,
-        autoExtensionEnabled: true,
+      {
+        name: '初期値から遷移して延長が有効なとき放送中番組でないなら何もしない',
+        prev: null,
+        next: {
+          status: 'test',
+          programID: 'lv1',
+          startTime: 0,
+          endTime: 30 * 60,
+          autoExtensionEnabled: true,
+        },
+        now: -30 * 60,
+        result: 'NOOP',
       },
-      now: -30 * 60,
-      result: 'NOOP',
-    },
-    {
-      name: '初期値から遷移して延長が無効なとき放送中番組でないなら何もしない',
-      prev: null,
-      next: {
-        status: 'test',
-        programID: 'lv1',
-        startTime: 0,
-        endTime: 30 * 60,
-        autoExtensionEnabled: false,
+      {
+        name: '初期値から遷移して延長が無効なとき放送中番組でないなら何もしない',
+        prev: null,
+        next: {
+          status: 'test',
+          programID: 'lv1',
+          startTime: 0,
+          endTime: 30 * 60,
+          autoExtensionEnabled: false,
+        },
+        now: -30 * 60,
+        result: 'NOOP',
       },
-      now: -30 * 60,
-      result: 'NOOP',
-    },
-    {
-      name: '延長完了したらタイマーをセットする',
-      prev: {
-        status: 'onAir',
-        programID: 'lv1',
-        startTime: 0,
-        endTime: 30 * 60,
-        autoExtensionEnabled: true,
+      {
+        name: '延長完了したらタイマーをセットする',
+        prev: {
+          status: 'onAir',
+          programID: 'lv1',
+          startTime: 0,
+          endTime: 30 * 60,
+          autoExtensionEnabled: true,
+        },
+        next: {
+          status: 'onAir',
+          programID: 'lv1',
+          startTime: 0,
+          endTime: 60 * 60,
+          autoExtensionEnabled: true,
+        },
+        now: 25 * 60,
+        result: 'WAIT',
       },
-      next: {
-        status: 'onAir',
-        programID: 'lv1',
-        startTime: 0,
-        endTime: 60 * 60,
-        autoExtensionEnabled: true,
+      {
+        name: '終了時刻が変わって延長上限に当たったらタイマーをクリアする',
+        prev: {
+          status: 'onAir',
+          programID: 'lv1',
+          startTime: 0,
+          endTime: 330 * 60,
+          autoExtensionEnabled: true,
+        },
+        next: {
+          status: 'onAir',
+          programID: 'lv1',
+          startTime: 0,
+          endTime: 360 * 60,
+          autoExtensionEnabled: true,
+        },
+        now: 325 * 60,
+        result: 'CLEAR',
       },
-      now: 25 * 60,
-      result: 'WAIT',
-    },
-    {
-      name: '終了時刻が変わって延長上限に当たったらタイマーをクリアする',
-      prev: {
-        status: 'onAir',
-        programID: 'lv1',
-        startTime: 0,
-        endTime: 330 * 60,
-        autoExtensionEnabled: true,
+      {
+        name: '放送開始したらタイマーをセットする',
+        prev: {
+          status: 'test',
+          programID: 'lv1',
+          startTime: 0,
+          endTime: 30 * 60,
+          autoExtensionEnabled: true,
+        },
+        next: {
+          status: 'onAir',
+          programID: 'lv1',
+          startTime: 0,
+          endTime: 30 * 60,
+          autoExtensionEnabled: true,
+        },
+        now: 0,
+        result: 'WAIT',
       },
-      next: {
-        status: 'onAir',
-        programID: 'lv1',
-        startTime: 0,
-        endTime: 360 * 60,
-        autoExtensionEnabled: true,
+      {
+        name: '放送終了したらタイマーをクリアする',
+        prev: {
+          status: 'onAir',
+          programID: 'lv1',
+          startTime: 0,
+          endTime: 30 * 60,
+          autoExtensionEnabled: true,
+        },
+        next: {
+          status: 'end',
+          programID: 'lv1',
+          startTime: 0,
+          endTime: 30 * 60,
+          autoExtensionEnabled: true,
+        },
+        now: 30 * 60,
+        result: 'CLEAR',
       },
-      now: 325 * 60,
-      result: 'CLEAR',
-    },
-    {
-      name: '放送開始したらタイマーをセットする',
-      prev: {
-        status: 'test',
-        programID: 'lv1',
-        startTime: 0,
-        endTime: 30 * 60,
-        autoExtensionEnabled: true,
+      {
+        name: '自動延長を有効にしたらタイマーをセットする',
+        prev: {
+          status: 'onAir',
+          programID: 'lv1',
+          startTime: 0,
+          endTime: 30 * 60,
+          autoExtensionEnabled: false,
+        },
+        next: {
+          status: 'onAir',
+          programID: 'lv1',
+          startTime: 0,
+          endTime: 30 * 60,
+          autoExtensionEnabled: true,
+        },
+        now: 24 * 60,
+        result: 'WAIT',
       },
-      next: {
-        status: 'onAir',
-        programID: 'lv1',
-        startTime: 0,
-        endTime: 30 * 60,
-        autoExtensionEnabled: true,
+      {
+        name: '自動延長を切ったらタイマーをクリアする',
+        prev: {
+          status: 'onAir',
+          programID: 'lv1',
+          startTime: 0,
+          endTime: 30 * 60,
+          autoExtensionEnabled: true,
+        },
+        next: {
+          status: 'onAir',
+          programID: 'lv1',
+          startTime: 0,
+          endTime: 30 * 60,
+          autoExtensionEnabled: false,
+        },
+        now: 24 * 60,
+        result: 'CLEAR',
       },
-      now: 0,
-      result: 'WAIT',
-    },
-    {
-      name: '放送終了したらタイマーをクリアする',
-      prev: {
-        status: 'onAir',
-        programID: 'lv1',
-        startTime: 0,
-        endTime: 30 * 60,
-        autoExtensionEnabled: true,
-      },
-      next: {
-        status: 'end',
-        programID: 'lv1',
-        startTime: 0,
-        endTime: 30 * 60,
-        autoExtensionEnabled: true,
-      },
-      now: 30 * 60,
-      result: 'CLEAR',
-    },
-    {
-      name: '自動延長を有効にしたらタイマーをセットする',
-      prev: {
-        status: 'onAir',
-        programID: 'lv1',
-        startTime: 0,
-        endTime: 30 * 60,
-        autoExtensionEnabled: false,
-      },
-      next: {
-        status: 'onAir',
-        programID: 'lv1',
-        startTime: 0,
-        endTime: 30 * 60,
-        autoExtensionEnabled: true,
-      },
-      now: 24 * 60,
-      result: 'WAIT',
-    },
-    {
-      name: '自動延長を切ったらタイマーをクリアする',
-      prev: {
-        status: 'onAir',
-        programID: 'lv1',
-        startTime: 0,
-        endTime: 30 * 60,
-        autoExtensionEnabled: true,
-      },
-      next: {
-        status: 'onAir',
-        programID: 'lv1',
-        startTime: 0,
-        endTime: 30 * 60,
-        autoExtensionEnabled: false,
-      },
-      now: 24 * 60,
-      result: 'CLEAR',
-    },
-  ];
+    ];
 
   for (const suite of suites) {
     test(suite.name, () => {

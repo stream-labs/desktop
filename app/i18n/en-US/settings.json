@@ -577,6 +577,9 @@
       },
       "LowLatencyEnable": {
         "name": null
+      },
+      "DynamicBitrate": {
+        "name": null
       }
     },
     "Replay Buffer": {

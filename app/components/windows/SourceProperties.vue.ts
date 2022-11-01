@@ -11,6 +11,7 @@ import GenericForm from 'components/obs/inputs/GenericForm.vue';
 import { $t } from 'services/i18n';
 import { Subscription } from 'rxjs';
 import electron from 'electron';
+import Util from 'services/utils';
 
 @Component({
   components: {
@@ -26,13 +27,22 @@ export default class SourceProperties extends Vue {
   @Inject()
   windowsService: WindowsService;
 
-  sourceId = this.windowsService.getChildWindowQueryParams().sourceId;
   source = this.sourcesService.getSource(this.sourceId);
   properties: TObsFormData = [];
   initialProperties: TObsFormData = [];
   tainted = false;
 
   sourcesSubscription: Subscription;
+
+  get windowId() {
+    return Util.getCurrentUrlParams().windowId;
+  }
+
+  get sourceId() {
+      // このビューはoneOffWindow と childWindow どちらからも開かれる可能性があるため
+      // どちらか有効な方のクエリパラメータから sourceId を取得する
+      return this.windowsService.getWindowOptions(this.windowId).sourceId || this.windowsService.getChildWindowQueryParams().sourceId;
+  }
 
   mounted() {
     this.properties = this.source ? this.source.getPropertiesFormData() : [];
@@ -64,7 +74,11 @@ export default class SourceProperties extends Vue {
   }
 
   closeWindow() {
-    this.windowsService.closeChildWindow();
+    if(this.sourceId.startsWith("window_capture")) {
+      this.sourcesService.closeSourcePropertiesWindow();
+    } else {
+      this.windowsService.closeChildWindow();
+    }
   }
 
   done() {

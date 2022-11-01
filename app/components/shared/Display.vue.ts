@@ -3,6 +3,7 @@ import { Component, Prop, Watch } from 'vue-property-decorator';
 import { Inject } from 'services/core/injector';
 import { VideoService, Display as OBSDisplay } from 'services/video';
 import { WindowsService } from 'services/windows';
+import uuid from 'uuid/v4';
 
 @Component({})
 export default class Display extends Vue {
@@ -12,6 +13,7 @@ export default class Display extends Vue {
   @Prop() sourceId: string;
   @Prop({ default: 0 }) paddingSize: number;
   @Prop({ default: false, type: Boolean }) drawUI: boolean;
+  @Prop() renderingMode: number;
   @Prop() clickHandler: boolean;
 
   $refs: {
@@ -29,10 +31,11 @@ export default class Display extends Vue {
   }
 
   createDisplay() {
-    const displayId = this.videoService.getRandomDisplayId();
+    const displayId = uuid();
     this.display = new OBSDisplay(displayId, {
       sourceId: this.sourceId,
       paddingSize: this.paddingSize,
+      renderingMode: this.renderingMode,
     });
     this.display.setShoulddrawUI(this.drawUI);
 

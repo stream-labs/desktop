@@ -13,7 +13,7 @@ import {
   IPlatformService,
   IStreamingSetting,
 } from './platforms';
-import Raven from 'raven-js';
+import * as Sentry from '@sentry/browser';
 import { AppService } from 'services/app';
 import { SceneCollectionsService } from 'services/scene-collections';
 import { Subject, Observable, merge } from 'rxjs';
@@ -45,10 +45,8 @@ interface IUserServiceState {
 export class UserService extends PersistentStatefulService<IUserServiceState> {
   @Inject() private appService: AppService;
   @Inject() private sceneCollectionsService: SceneCollectionsService;
-  @Inject() private windowsService: WindowsService;
   @Inject() private onboardingService: OnboardingService;
   @Inject() private incrementalRolloutService: IncrementalRolloutService;
-  @Inject() private hostsService: HostsService;
   @Inject() private questionaireService: QuestionaireService;
 
   @mutation()
@@ -77,8 +75,8 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
 
   init() {
     super.init();
-    this.setRavenContext();
-    this.validateLogin();
+    this.setSentryContext();
+    setTimeout(() => this.validateLogin(), 0); // validateLogin is async
     this.incrementalRolloutService.fetchAvailableFeatures();
   }
 
@@ -192,7 +190,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     const auth = { ...rawAuth, platform: { ...rawAuth.platform, isPremium } };
     this.LOGIN(auth);
     this.userLogin.next(auth);
-    this.setRavenContext();
+    this.setSentryContext();
   }
 
   async logOut() {
@@ -212,6 +210,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     this.LOGOUT();
     electron.remote.session.defaultSession.clearStorageData({ storages: ['cookies'] });
     this.appService.finishLoading();
+    this.setSentryContext();
   }
 
   /**
@@ -276,8 +275,8 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
 
     this.startAuth({
       platform: this.platform.type,
-      onAuthFinish: () => {},
-      onAuthClose: () => {},
+      onAuthFinish: () => { },
+      onAuthClose: () => { },
     });
   }
 
@@ -321,46 +320,17 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
    * Registers the current user information with Raven so
    * we can view more detailed information in sentry.
    */
-  async setRavenContext() {
-    if (!this.isLoggedIn()) return;
-    Raven.setUserContext({ username: this.username, id: this.platformId });
-    Raven.setExtraContext(await this.getUserExtraContext());
-  }
-
-  async getUserExtraContext() {
-    try {
-      const [graphics, cpu, osInfo, osUuid] = await Promise.all([
-        systemInfoGraphics(),
-        systemInfoCpu(),
-        systemInfoOsInfo(),
-        systemInfoUuid(),
-      ]);
-
-      return {
-        cacheId: this.questionaireService.uuid,
-        platform: this.platform ? this.platform.type : 'not logged in',
-        cpuModel: nodeCpus()[0].model,
-        cpuCores: `physical:${cpu.physicalCores} logical:${cpu.cores}`,
-        gpus: graphics.controllers,
-        os: `${osInfo.distro} ${osInfo.release}`,
-        osUuid: osUuid.os,
-        memTotal: nodeTotalMem(),
-        memAvailable: nodeFreeMem(),
-        memUsage: nodeMemUsage(),
-      };
-    } catch (err) {
-      return {
-        cacheId: this.questionaireService.uuid,
-        platform: this.platform ? this.platform.type : 'not logged in',
-        cpuModel: nodeCpus()[0].model,
-        cpuCores: `logical:${nodeCpus().length}`,
-        os: nodeOsRelease(),
-        memTotal: nodeTotalMem(),
-        memAvailable: nodeFreeMem(),
-        memUsage: nodeMemUsage(),
-        exceptionWhenGetSystemInfo: err,
-      };
-    }
+  async setSentryContext() {
+    Sentry.configureScope(scope => {
+      if (this.isLoggedIn()) {
+        scope.setUser({ username: this.username, id: this.platformId });
+        scope.setExtra('platform', this.platform ? this.platform.type : 'not logged in');
+      } else {
+        scope.setUser({});
+        scope.setExtra('platform', null);
+      }
+      scope.setExtra('uuid', this.questionaireService.uuid);
+    });
   }
 
   async updateStreamSettings(programId: string): Promise<IStreamingSetting> {

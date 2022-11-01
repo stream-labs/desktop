@@ -71,7 +71,7 @@
           </li>
           <li class="popup-menu-item">
             <a @click.prevent="openInDefaultBrowser($event)" :href="creatorsProgramURL" class="link"
-              ><i class="icon-creator-promotion-program"></i>奨励プログラムに登録する</a
+              ><i class="icon-creator-promotion-program"></i>この番組で収入を得る</a
             >
           </li>
         </ul>

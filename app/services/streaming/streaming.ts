@@ -123,17 +123,15 @@ export class StreamingService
 
   private async showNotBroadcastingMessageBox() {
     return new Promise(resolve => {
-      electron.remote.dialog.showMessageBox(
-        electron.remote.getCurrentWindow(),
-        {
+      electron.remote.dialog
+        .showMessageBox(electron.remote.getCurrentWindow(), {
           title: $t('streaming.notBroadcasting'),
           type: 'warning',
           message: $t('streaming.notBroadcastingMessage'),
           buttons: [$t('common.close')],
           noLink: true,
-        },
-        done => resolve(done),
-      );
+        })
+        .then(({ response: done }) => resolve(done));
     });
   }
 
@@ -226,22 +224,31 @@ export class StreamingService
           );
         }
       } catch (e) {
-        const message =
-          e instanceof Response
-            ? $t('streaming.broadcastStatusFetchingError.httpError', { statusText: e.statusText })
-            : $t('streaming.broadcastStatusFetchingError.default');
+        console.error('StreamingService.toggleStreamAsync niconico', JSON.stringify(e));
+        let message: string;
+        if (e instanceof Response) {
+          if (e.status === 401) {
+            message = $t('streaming.invalidSessionError');
+          } else {
+            message = $t('streaming.broadcastStatusFetchingError.httpError',
+              {
+                requestURL: e.url,
+                statusText: e.statusText,
+              });
+          }
+        } else {
+          message = $t('streaming.broadcastStatusFetchingError.default');
+        }
 
         return new Promise(resolve => {
-          electron.remote.dialog.showMessageBox(
-            electron.remote.getCurrentWindow(),
-            {
+          electron.remote.dialog
+            .showMessageBox(electron.remote.getCurrentWindow(), {
               type: 'warning',
               message,
               buttons: [$t('common.close')],
               noLink: true,
-            },
-            done => resolve(done),
-          );
+            })
+            .then(({ response: done }) => resolve(done));
         });
       } finally {
         this.SET_PROGRAM_FETCHING(false);
@@ -333,17 +340,15 @@ export class StreamingService
   ) {
     if (streamingSetting.bitrate === undefined) {
       return new Promise(resolve => {
-        electron.remote.dialog.showMessageBox(
-          electron.remote.getCurrentWindow(),
-          {
+        electron.remote.dialog
+          .showMessageBox(electron.remote.getCurrentWindow(), {
             title: $t('streaming.bitrateFetchingError.title'),
             type: 'warning',
             message: $t('streaming.bitrateFetchingError.message'),
             buttons: [$t('common.close')],
             noLink: true,
-          },
-          done => resolve(done),
-        );
+          })
+          .then(({ response: done }) => resolve(done));
       });
     }
     const settings = this.settingsService.diffOptimizedSettings({
@@ -515,7 +520,6 @@ export class StreamingService
 
     const event: TUsageEvent = {
       event: eventType,
-      user_id: this.userService.isLoggedIn() ? this.userService.platformId : null,
       platform: extractPlatform(settings.streamingURL),
       stream_track_id: streamingTrackId,
       content_id: this.nicoliveProgramService.state.programID || null,

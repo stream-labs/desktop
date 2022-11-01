@@ -11,7 +11,7 @@ interface IPerformanceState {
   CPU: number;
   numberDroppedFrames: number;
   percentageDroppedFrames: number;
-  bandwidth: number;
+  streamingBandwidth: number;
   frameRate: number;
 }
 
@@ -28,7 +28,7 @@ export class PerformanceService extends StatefulService<IPerformanceState> {
     CPU: 0,
     numberDroppedFrames: 0,
     percentageDroppedFrames: 0,
-    bandwidth: 0,
+    streamingBandwidth: 0,
     frameRate: 0,
   };
 

@@ -10,6 +10,8 @@ import { NicoliveProgramStateService } from './state';
 type Schedules = ProgramSchedules['data'];
 type Schedule = Schedules[0];
 
+const CREATED_NOTICE_DURATION = 5000; // 番組作成通知の表示時間(ミリ秒)
+
 type ProgramState = {
   programID: string;
   status: 'reserved' | 'test' | 'onAir' | 'end';
@@ -28,6 +30,7 @@ type ProgramState = {
   comments: number;
   adPoint: number;
   giftPoint: number;
+  createdNoticeTimer: number;
 };
 
 function getCommunityIconUrl(community: Community): string {
@@ -89,6 +92,7 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
     comments: 0,
     adPoint: 0,
     giftPoint: 0,
+    createdNoticeTimer: 0,
   };
 
   static initialState: INicoliveProgramState = {
@@ -191,10 +195,31 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
     return NicoliveProgramService.isProgramExtendable(this.state);
   }
 
+  get isShownCreatedNotice(): boolean {
+    return this.state.createdNoticeTimer !== 0;
+  }
+
+  showCreatedNotice() {
+    this.hideCreatedNotice();
+    this.setState({
+      createdNoticeTimer: window.setTimeout(() => {
+        this.setState({ createdNoticeTimer: 0 });
+      }, CREATED_NOTICE_DURATION)
+    });
+  }
+
+  hideCreatedNotice() {
+    if (this.state.createdNoticeTimer) {
+      window.clearTimeout(this.state.createdNoticeTimer);
+      this.setState({ createdNoticeTimer: 0 });
+    }
+  }
+
   async createProgram(): Promise<CreateResult> {
     const result = await this.client.createProgram();
     if (result === 'CREATED') {
       await this.fetchProgram();
+      this.showCreatedNotice();
     }
     return result;
   }

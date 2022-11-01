@@ -1,12 +1,13 @@
-import { Inject } from './core/injector';
-import { UserService } from './user';
-import { HostsService } from './hosts';
+import { randomBytes } from 'crypto';
+import electron from 'electron';
 import fs from 'fs';
 import path from 'path';
-import electron from 'electron';
+import { Inject } from './core/injector';
 import { Service } from './core/service';
-import { randomBytes } from 'crypto';
+import { HostsService } from './hosts';
+import { QuestionaireService } from './questionaire';
 import { EncoderType } from './settings/optimizer';
+import { UserService } from './user';
 
 function randomCharacters(len: number): string {
   const buf = randomBytes(len);
@@ -18,8 +19,9 @@ function randomCharacters(len: number): string {
 
 export type TUsageEvent =
   | {
+    event: 'boot';
+  } | {
     event: 'stream_start' | 'stream_end';
-    user_id: string | null;
     platform: string;
     stream_track_id: string;
     content_id: string | null;
@@ -64,19 +66,6 @@ export type TUsageEvent =
     event: 'crash';
   };
 
-type TAnalyticsEvent = 'TCP_API_REQUEST' | 'FacebookLogin'; // add more types if you need
-
-interface IAnalyticsEvent {
-  product: string;
-  version: number;
-  event: string;
-  value?: any;
-  time?: string;
-  count?: number;
-  uuid?: string;
-  saveUser?: boolean;
-}
-
 export function track(event: TUsageEvent) {
   return (target: any, methodName: string, descriptor: PropertyDescriptor) => {
     return {
@@ -92,39 +81,11 @@ export function track(event: TUsageEvent) {
 export class UsageStatisticsService extends Service {
   @Inject() userService: UserService;
   @Inject() hostsService: HostsService;
+  @Inject() questionaireService: QuestionaireService;
 
-  installerId: string;
   version = electron.remote.process.env.NAIR_VERSION;
 
   init() {
-    this.loadInstallerId();
-  }
-
-  loadInstallerId() {
-    let installerId = localStorage.getItem('installerId');
-
-    if (!installerId) {
-      const exePath = electron.remote.app.getPath('exe');
-      const installerNamePath = path.join(path.dirname(exePath), 'installername');
-
-      if (fs.existsSync(installerNamePath)) {
-        try {
-          const installerName = fs.readFileSync(installerNamePath).toString();
-
-          if (installerName) {
-            const matches = installerName.match(/\-([A-Za-z0-9]+)\.exe/);
-            if (matches) {
-              installerId = matches[1];
-              localStorage.setItem('installerId', installerId);
-            }
-          }
-        } catch (e) {
-          console.error('Error loading installer id', e);
-        }
-      }
-    }
-
-    this.installerId = installerId;
   }
 
   generateStreamingTrackID(): string {
@@ -140,18 +101,40 @@ export class UsageStatisticsService extends Service {
    */
   recordEvent(event: TUsageEvent) {
     console.log('recordEvent', event);
-
-    if (event.event === 'stream_start' || event.event === 'stream_end') {
+    if (event.event === 'boot') {
       const headers = new Headers();
       headers.append('Content-Type', 'application/json');
-
-      const request = new Request(`${this.hostsService.statistics}/action`, {
-        headers,
-        method: 'POST',
-        body: JSON.stringify(event),
+      const body = JSON.stringify({
+        ...event,
+        uuid: this.questionaireService.uuid, // inject UUID
+        user_id: this.userService.isLoggedIn() ? this.userService.platformId : null,
       });
 
+      const request = new Request(`${this.hostsService.statistics}/boot`, {
+        headers,
+        method: 'POST',
+        body,
+      });
+
+      console.log('send boot log', request.url, body);
       return fetch(request);
-    }
+    } else
+      if (event.event === 'stream_start' || event.event === 'stream_end') {
+        console.log('send action log', `${this.hostsService.statistics}/action`);
+        const headers = new Headers();
+        headers.append('Content-Type', 'application/json');
+
+        const request = new Request(`${this.hostsService.statistics}/action`, {
+          headers,
+          method: 'POST',
+          body: JSON.stringify({
+            ...event,
+            uuid: this.questionaireService.uuid, // inject UUID
+            user_id: this.userService.isLoggedIn() ? this.userService.platformId : null,
+          }),
+        });
+
+        return fetch(request);
+      }
   }
 }
