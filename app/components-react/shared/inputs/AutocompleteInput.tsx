@@ -13,6 +13,11 @@ export const AutocompleteInput = InputComponent(<T extends any>(p: TListInputPro
     }
   }
 
+  function handleSelect(val: string) {
+    handleChange(val);
+    setDropdownOpen(false);
+  }
+
   return (
     <InputWrapper label={p.label} rules={p.rules} name={p.name}>
       <AutoComplete
@@ -22,7 +27,7 @@ export const AutocompleteInput = InputComponent(<T extends any>(p: TListInputPro
         onBlur={() => setDropdownOpen(false)}
         open={dropdownOpen}
         onChange={handleChange}
-        onSelect={handleChange}
+        onSelect={handleSelect}
         data-value={p.value}
         data-name={p.name}
       />
