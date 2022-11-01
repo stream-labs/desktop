@@ -1,4 +1,4 @@
-import React, { useMemo, useLayoutEffect, useRef } from 'react';
+import React, { useLayoutEffect, useRef } from 'react';
 import ResizeObserver from 'resize-observer-polyfill';
 import cx from 'classnames';
 import { TAppPage } from 'services/navigation';
@@ -104,13 +104,12 @@ export default function SideNav() {
     loggedIn,
     menu,
     isOpen,
+    toggleMenuStatus,
     openMenuItems,
     expandMenuItem,
-    hasLegacyMenu,
     studioMode,
     showCustomEditor,
     updateStyleBlockers,
-    hideStyleBlockers,
     dismiss,
     showNewBadge,
   } = useVuex(() => ({
@@ -126,35 +125,37 @@ export default function SideNav() {
     loggedIn: UserService.views.isLoggedIn,
     menu: SideNavService.views.state[ENavName.TopNav],
     isOpen: SideNavService.views.isOpen,
+    toggleMenuStatus: SideNavService.actions.toggleMenuStatus,
     openMenuItems: SideNavService.views.getExpandedMenuItems(ENavName.TopNav),
     expandMenuItem: SideNavService.actions.expandMenuItem,
-    hasLegacyMenu: SideNavService.views.hasLegacyMenu,
     studioMode: TransitionsService.views.studioMode,
     showCustomEditor: SideNavService.views.showCustomEditor,
     updateStyleBlockers: WindowsService.actions.updateStyleBlockers,
-    hideStyleBlockers: WindowsService.state.hideStyleBlockers,
     dismiss: DismissablesService.actions.dismiss,
     showNewBadge:
       DismissablesService.views.shouldShow(EDismissable.NewSideNav) &&
       SideNavService.views.hasLegacyMenu,
   }));
 
-  const sider = useRef<HTMLDivElement>(null);
+  const sider = useRef<HTMLDivElement | null>(null);
+  const menuOpen = useRef<boolean>(isOpen);
+
+  const siderMinWidth: number = 50;
+  const siderMaxWidth: number = 200;
 
   const resizeObserver = new ResizeObserver((entries: ResizeObserverEntry[]) => {
     entries.forEach((entry: ResizeObserverEntry) => {
       const width = Math.floor(entry.contentRect.width);
-      if (width === 50 || width === 200) {
+
+      if ((!menuOpen && width === siderMinWidth) || (menuOpen && width === siderMaxWidth)) {
         updateStyleBlockers('main', false);
-      } else if (!hideStyleBlockers && (width > 50 || width < 200)) {
-        updateStyleBlockers('main', true);
       }
     });
   });
 
   useLayoutEffect(() => {
-    if (sider.current) {
-      resizeObserver.observe(sider.current);
+    if (sider && sider?.current) {
+      resizeObserver.observe(sider?.current);
     }
   }, [sider]);
 
@@ -394,7 +395,9 @@ export default function SideNav() {
         )}
         onClick={() => {
           showNewBadge && dismiss(EDismissable.NewSideNav);
-          SideNavService.actions.toggleMenuStatus();
+          toggleMenuStatus();
+          menuOpen.current = isOpen;
+          updateStyleBlockers('main', true); // hide style blockers
         }}
       >
         <i className="icon-back" />
