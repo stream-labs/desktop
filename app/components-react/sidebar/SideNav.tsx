@@ -61,9 +61,11 @@ export default function SideNav() {
   }
 
   function navigateToStudioTab(tabId: string, trackingTarget: string, key: string) {
-    NavigationService.actions.navigate('Studio', { trackingTarget });
-    LayoutService.actions.setCurrentTab(tabId);
-    setCurrentMenuItem(key);
+    if (currentTab !== tabs[tabId]) {
+      NavigationService.actions.navigate('Studio', { trackingTarget });
+      LayoutService.actions.setCurrentTab(tabId);
+      setCurrentMenuItem(key);
+    }
   }
 
   function iconSrc(appId: string, path: string) {
@@ -98,6 +100,7 @@ export default function SideNav() {
     setCurrentMenuItem,
     currentPage,
     tabs,
+    currentTab,
     leftDock,
     showSidebarApps,
     apps,
@@ -119,6 +122,7 @@ export default function SideNav() {
     currentMenuItem: SideNavService.state.currentMenuItem,
     setCurrentMenuItem: SideNavService.actions.setCurrentMenuItem,
     tabs: LayoutService.state.tabs,
+    currentTab: LayoutService.views.currentTab,
     leftDock: CustomizationService.state.leftDock,
     showSidebarApps: SideNavService.views.showSidebarApps,
     apps: Object.values(SideNavService.views.apps).sort((a, b) => a.index - b.index),
@@ -162,9 +166,9 @@ export default function SideNav() {
   const menuItems = menu.menuItems;
 
   const studioTabs = Object.keys(tabs).map((tab, i) => ({
-    key: i === 0 ? EMenuItem.Editor : `editor-layout-${i}`,
+    key: tab,
     target: tab,
-    title: i === 0 || !tabs[tab].name ? $t('Editor') : tabs[tab].name,
+    title: i === 0 || !tabs[tab].name ? menuTitles('Editor') : tabs[tab].name,
     icon: tabs[tab].icon,
     trackingTarget: tab === 'default' ? 'editor' : 'custom',
   }));
@@ -223,7 +227,7 @@ export default function SideNav() {
                       className={cx(
                         styles.sidenavItem,
                         !isOpen && styles.closed,
-                        currentMenuItem === tab.key && styles.active,
+                        currentTab === tabs[tab.key] && styles.active,
                       )}
                       title={tab.title}
                       icon={<i className={tab.icon} />}
@@ -246,20 +250,20 @@ export default function SideNav() {
                     className={cx(
                       !isOpen && styles.closed,
                       !isOpen && menuItem.isExpanded && styles.hideSubMenu,
-                      currentMenuItem === menuItem.key && styles.active,
+                      !isOpen && currentMenuItem === menuItem.key && styles.active,
                     )}
                   >
                     {studioTabs.map(tab => (
                       <Menu.Item
-                        key={`sub-${tab.key}}`}
+                        key={`sub-${tab.key}`}
                         className={cx(
                           styles.sidenavItem,
-                          currentPage === `sub-${tab.key}}` && styles.active,
+                          currentTab === tabs[tab.key] && styles.active,
                         )}
                         title={tab.title}
                         icon={<i className={tab.icon} />}
                         onClick={() =>
-                          navigateToStudioTab(tab.target, tab.trackingTarget, `sub-${tab.key}}`)
+                          navigateToStudioTab(tab.target, tab.trackingTarget, `sub-${tab.key}`)
                         }
                       >
                         {tab.title}
