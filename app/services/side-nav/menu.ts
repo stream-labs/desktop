@@ -39,8 +39,10 @@ class SideNavViews extends ViewHandler<ISideNavServiceState> {
     return this.state.compactView;
   }
 
-  get menuItems() {
-    return this.state.menuItems;
+  get menuItemStatus() {
+    return this.state[ENavName.TopNav].menuItems.reduce((menuItems, menuItem) => {
+      return { ...menuItems, [menuItem.title]: menuItem.isActive };
+    }, {});
   }
 
   get hasLegacyMenu() {
@@ -61,16 +63,6 @@ class SideNavViews extends ViewHandler<ISideNavServiceState> {
 
   get showSidebarApps() {
     return this.state.showSidebarApps;
-  }
-
-  getMenuItem(name: EMenuItem) {
-    if (!name) return;
-    return this.state.menuItems[name];
-  }
-
-  isMenuItemActive(name: EMenuItem) {
-    if (!name) return;
-    return this.state.menuItems[name].isActive;
   }
 
   getExpandedMenuItems(name: ENavName) {
@@ -223,6 +215,7 @@ export class SideNavService extends PersistentStatefulService<ISideNavServiceSta
   private SET_COMPACT_VIEW(isCompact: boolean) {
     this.state.compactView = isCompact;
     this.state.showSidebarApps = false;
+    this.state.showCustomEditor = false;
 
     if (isCompact) {
       this.state[ENavName.TopNav] = {
@@ -341,15 +334,12 @@ export class SideNavService extends PersistentStatefulService<ISideNavServiceSta
 
   @mutation()
   private TOGGLE_MENU_ITEM(navName: ENavName, menuItemName: EMenuItem) {
-    // find menu item and set to the opposite of current state
+    // toggle boolean value
     this.state[navName].menuItems.find(
       (menuItem: IMenuItem) => menuItem.title === menuItemName,
     ).isActive = !this.state[navName].menuItems.find(
       (menuItem: IMenuItem) => menuItem.title === menuItemName,
     ).isActive;
-
-    // find menu item in object used for toggling custom navigation settings
-    this.state.menuItems[menuItemName].isActive = !this.state.menuItems[menuItemName].isActive;
 
     // toggle sidebar apps
     if (menuItemName === EMenuItem.AppStore) {

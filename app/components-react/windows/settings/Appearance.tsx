@@ -7,7 +7,7 @@ import { getDefined } from '../../../util/properties-type-guards';
 import { ObsSettingsSection } from './ObsSettings';
 import * as remote from '@electron/remote';
 import { injectFormBinding, useModule } from 'slap';
-import { ENavName, EMenuItem, IAppMenuItem } from 'services/side-nav';
+import { ENavName, EMenuItem, IAppMenuItem, menuTitles } from 'services/side-nav';
 import { useVuex } from 'components-react/hooks';
 import styles from './Appearance.m.less';
 import cx from 'classnames';
@@ -40,7 +40,7 @@ export function AppearanceSettings() {
 
   const {
     compactView,
-    menuItems,
+    menuItemStatus,
     apps,
     displayedApps,
     showCustomEditor,
@@ -53,7 +53,7 @@ export function AppearanceSettings() {
     setCompactView,
   } = useVuex(() => ({
     compactView: SideNavService.views.compactView,
-    menuItems: SideNavService.views.menuItems,
+    menuItemStatus: SideNavService.views.menuItemStatus,
     apps: PlatformAppsService.views.enabledApps.filter(app => {
       return !!app.manifest.pages.find(page => {
         return page.slot === EAppPageSlot.TopNav;
@@ -189,46 +189,46 @@ export function AppearanceSettings() {
         <Row className={styles.sidenavSettings}>
           <Col flex={1} className={styles.menuControls}>
             <SwitchInput
-              label={$t(EMenuItem.Editor)}
+              label={menuTitles(EMenuItem.Editor)}
               layout="horizontal"
               onChange={() => toggleMenuItem(ENavName.TopNav, EMenuItem.Editor)}
-              value={menuItems[EMenuItem.Editor].isActive}
-              disabled={!isLoggedIn}
+              value={menuItemStatus[EMenuItem.Editor]}
+              disabled={!isLoggedIn || compactView}
             />
             <SwitchInput
               label={$t('Custom Editor')}
               layout="horizontal"
               onChange={() => toggleSidebarSubMenu()}
               value={isLoggedIn && showCustomEditor}
-              disabled={!isLoggedIn}
+              disabled={!isLoggedIn || compactView}
             />
             <SwitchInput
-              label={$t(EMenuItem.StudioMode)}
+              label={menuTitles(EMenuItem.StudioMode)}
               layout="horizontal"
               onChange={() => toggleMenuItem(ENavName.TopNav, EMenuItem.StudioMode)}
-              value={menuItems[EMenuItem.StudioMode].isActive}
-              disabled={!isLoggedIn}
+              value={menuItemStatus[EMenuItem.StudioMode]}
+              disabled={!isLoggedIn || compactView}
             />
             <SwitchInput
-              label={$t(EMenuItem.LayoutEditor)}
+              label={menuTitles(EMenuItem.LayoutEditor)}
               layout="horizontal"
               onChange={() => toggleMenuItem(ENavName.TopNav, EMenuItem.LayoutEditor)}
-              value={menuItems[EMenuItem.LayoutEditor].isActive}
-              disabled={!isLoggedIn}
+              value={menuItemStatus[EMenuItem.LayoutEditor]}
+              disabled={!isLoggedIn || compactView}
             />
             <SwitchInput
-              label={$t(EMenuItem.Themes)}
+              label={menuTitles(EMenuItem.Themes)}
               layout="horizontal"
               onChange={() => toggleMenuItem(ENavName.TopNav, EMenuItem.Themes)}
-              value={menuItems[EMenuItem.Themes].isActive}
-              disabled={!isLoggedIn}
+              value={menuItemStatus[EMenuItem.Themes]}
+              disabled={!isLoggedIn || compactView}
             />
             <SwitchInput
-              label={$t(EMenuItem.Highlighter)}
+              label={menuTitles(EMenuItem.Highlighter)}
               layout="horizontal"
               onChange={() => toggleMenuItem(ENavName.TopNav, EMenuItem.Highlighter)}
-              value={menuItems[EMenuItem.Highlighter].isActive}
-              disabled={!isLoggedIn}
+              value={menuItemStatus[EMenuItem.Highlighter]}
+              disabled={!isLoggedIn || compactView}
             />
           </Col>
 
@@ -236,11 +236,11 @@ export function AppearanceSettings() {
           <Col flex={5}>
             <Scrollable style={{ height: '100%', right: '5px' }} snapToWindowEdge>
               <SwitchInput
-                label={$t(EMenuItem.AppStore)}
+                label={menuTitles(EMenuItem.AppStore)}
                 layout="horizontal"
                 onChange={() => toggleMenuItem(ENavName.TopNav, EMenuItem.AppStore)}
-                value={menuItems[EMenuItem.AppStore].isActive}
-                disabled={!isLoggedIn}
+                value={menuItemStatus[EMenuItem.AppStore]}
+                disabled={!isLoggedIn || compactView}
               />
 
               {appSelectFields.map((app: IAppMenuItem | undefined, index: number) => (
@@ -250,7 +250,7 @@ export function AppearanceSettings() {
                     layout="horizontal"
                     onChange={() => app?.id && toggleApp(app.id)}
                     value={app && app?.isActive}
-                    disabled={!isLoggedIn || index + 1 > apps.length}
+                    disabled={!isLoggedIn || index + 1 > apps.length || compactView}
                   />
 
                   {/* dropdown options for apps */}
