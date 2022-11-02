@@ -120,7 +120,7 @@ export default function SideNav() {
     featureIsEnabled: (feature: EAvailableFeatures) =>
       IncrementalRolloutService.views.featureIsEnabled(feature),
     currentPage: NavigationService.state.currentPage,
-    currentMenuItem: SideNavService.state.currentMenuItem,
+    currentMenuItem: SideNavService.views.currentMenuItem,
     setCurrentMenuItem: SideNavService.actions.setCurrentMenuItem,
     tabs: LayoutService.state.tabs,
     currentTab: LayoutService.views.currentTab,
@@ -231,7 +231,7 @@ export default function SideNav() {
                 // which can be toggled to show or hide
                 // otherwise, show editor tabs in submenu
                 // don't translate tab title because the user has set it
-                return showCustomEditor && !isOpen ? (
+                return showCustomEditor && !isOpen && !compactView ? (
                   studioTabs.map(tab => (
                     <Menu.Item
                       key={tab.key}
@@ -363,6 +363,7 @@ export default function SideNav() {
               }
             })}
             {showSidebarApps &&
+              !compactView &&
               apps.length > 0 &&
               // apps shown in sidebar
               apps.map(

@@ -214,23 +214,6 @@ export class SideNavService extends PersistentStatefulService<ISideNavServiceSta
   @mutation()
   private SET_COMPACT_VIEW(isCompact: boolean) {
     this.state.compactView = isCompact;
-    this.state.showSidebarApps = false;
-    this.state.showCustomEditor = false;
-
-    if (isCompact) {
-      this.state[ENavName.TopNav] = {
-        ...this.state[ENavName.TopNav],
-        menuItems: [
-          { ...this.state.menuItems[EMenuItem.Editor], isActive: true },
-          { ...this.state.menuItems[EMenuItem.LayoutEditor], isActive: false },
-          { ...this.state.menuItems[EMenuItem.StudioMode], isActive: false },
-          { ...this.state.menuItems[EMenuItem.Themes], isActive: true },
-          { ...this.state.menuItems[EMenuItem.AppStore], isActive: true },
-          { ...this.state.menuItems[EMenuItem.Highlighter], isActive: true },
-          { ...this.state.menuItems[EMenuItem.ThemeAudit], isActive: true },
-        ],
-      };
-    }
   }
 
   @mutation()
