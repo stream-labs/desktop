@@ -135,7 +135,6 @@ export class SideNavService extends PersistentStatefulService<ISideNavServiceSta
         this.dismissablesService.dismiss(EDismissable.NewSideNav);
         this.dismissablesService.dismiss(EDismissable.CustomMenuSettings);
       }
-      this.setLoggedOutMenu();
     }
 
     this.state.currentMenuItem = EMenuItemKey.Editor;
@@ -143,10 +142,6 @@ export class SideNavService extends PersistentStatefulService<ISideNavServiceSta
 
   get views() {
     return new SideNavViews(this.state);
-  }
-
-  setLoggedOutMenu() {
-    this.SET_LOGGED_OUT_MENU();
   }
 
   toggleMenuStatus() {
@@ -192,23 +187,6 @@ export class SideNavService extends PersistentStatefulService<ISideNavServiceSta
   swapApp(app: IAppMenuItem) {
     // add/update apps
     this.SWAP_APP(app);
-  }
-
-  @mutation()
-  private SET_LOGGED_OUT_MENU() {
-    // only show editor menu item
-    this.state[ENavName.TopNav].menuItems = this.state[ENavName.TopNav].menuItems.map(
-      (menuItem: IMenuItem) => {
-        if (menuItem.title !== EMenuItem.Editor) {
-          menuItem.isActive = false;
-          this.state.menuItems[menuItem.title].isActive = false;
-        }
-        return menuItem;
-      },
-    );
-
-    // hide sidebar apps
-    this.state.showSidebarApps = false;
   }
 
   @mutation()

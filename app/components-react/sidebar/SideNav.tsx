@@ -1,4 +1,4 @@
-import React, { useLayoutEffect, useRef } from 'react';
+import React, { useLayoutEffect, useRef, useMemo } from 'react';
 import ResizeObserver from 'resize-observer-polyfill';
 import cx from 'classnames';
 import { TAppPage } from 'services/navigation';
@@ -164,17 +164,25 @@ export default function SideNav() {
     }
   }, [sider]);
 
-  const menuItems = !compactView
-    ? menu.menuItems
-    : menu.menuItems.filter((menuItem: IMenuItem) => {
-        if (
-          [EMenuItem.Editor, EMenuItem.Themes, EMenuItem.AppStore, EMenuItem.Highlighter].includes(
-            menuItem.title as EMenuItem,
-          )
-        ) {
-          return menuItem;
-        }
-      });
+  const menuItems = useMemo(() => {
+    if (!loggedIn) {
+      return menu.menuItems.filter(menuItem => menuItem.title === EMenuItem.Editor);
+    }
+    return !compactView
+      ? menu.menuItems
+      : menu.menuItems.filter((menuItem: IMenuItem) => {
+          if (
+            [
+              EMenuItem.Editor,
+              EMenuItem.Themes,
+              EMenuItem.AppStore,
+              EMenuItem.Highlighter,
+            ].includes(menuItem.title as EMenuItem)
+          ) {
+            return menuItem;
+          }
+        });
+  }, [compactView, menu, loggedIn]);
 
   const studioTabs = Object.keys(tabs).map((tab, i) => ({
     key: tab,
@@ -362,7 +370,8 @@ export default function SideNav() {
                 );
               }
             })}
-            {showSidebarApps &&
+            {loggedIn &&
+              showSidebarApps &&
               !compactView &&
               apps.length > 0 &&
               // apps shown in sidebar

@@ -878,7 +878,6 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     this.writeUserIdFile();
     this.unsubscribeFromSocketConnection();
     this.LOGOUT();
-    this.sideNavService.setLoggedOutMenu();
     this.userLogout.next();
   }
 
