@@ -106,6 +106,7 @@ export default function SideNav() {
     apps,
     loggedIn,
     menu,
+    compactView,
     isOpen,
     toggleMenuStatus,
     openMenuItems,
@@ -128,6 +129,7 @@ export default function SideNav() {
     apps: Object.values(SideNavService.views.apps).sort((a, b) => a.index - b.index),
     loggedIn: UserService.views.isLoggedIn,
     menu: SideNavService.views.state[ENavName.TopNav],
+    compactView: SideNavService.views.compactView,
     isOpen: SideNavService.views.isOpen,
     toggleMenuStatus: SideNavService.actions.toggleMenuStatus,
     openMenuItems: SideNavService.views.getExpandedMenuItems(ENavName.TopNav),
@@ -162,7 +164,17 @@ export default function SideNav() {
     }
   }, [sider]);
 
-  const menuItems = menu.menuItems;
+  const menuItems = !compactView
+    ? menu.menuItems
+    : menu.menuItems.filter((menuItem: IMenuItem) => {
+        if (
+          [EMenuItem.Editor, EMenuItem.Themes, EMenuItem.AppStore, EMenuItem.Highlighter].includes(
+            menuItem.title as EMenuItem,
+          )
+        ) {
+          return menuItem;
+        }
+      });
 
   const studioTabs = Object.keys(tabs).map((tab, i) => ({
     key: tab,
@@ -237,6 +249,7 @@ export default function SideNav() {
                   ))
                 ) : (
                   <div
+                    key={`wrap-${menuItem.key}`}
                     title={menuTitles(menuItem.title)}
                     className={cx(styles.submenuWrapper, !isOpen && styles.wrapperHidden)}
                   >
@@ -279,6 +292,7 @@ export default function SideNav() {
                 // otherwise, show a menu item or a menu item with a submenu
                 return menuItem.hasOwnProperty('subMenuItems') ? (
                   <div
+                    key={`wrap-${menuItem.key}`}
                     title={menuTitles(menuItem.title)}
                     className={cx(styles.submenuWrapper, !isOpen && styles.wrapperHidden)}
                   >

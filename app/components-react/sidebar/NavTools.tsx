@@ -40,7 +40,7 @@ export default function SideNav() {
       platform: UserService.views.auth?.platforms[UserService.views.auth?.primaryPlatform],
       menuItems: SideNavService.views.state[ENavName.BottomNav].menuItems,
       isOpen: SideNavService.views.isOpen,
-      openMenuItems: SideNavService.views.getExpandedMenuItems(ENavName.TopNav),
+      openMenuItems: SideNavService.views.getExpandedMenuItems(ENavName.BottomNav),
       expandMenuItem: SideNavService.actions.expandMenuItem,
       updateStyleBlockers: WindowsService.actions.updateStyleBlockers,
     }),

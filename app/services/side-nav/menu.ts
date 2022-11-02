@@ -75,7 +75,7 @@ class SideNavViews extends ViewHandler<ISideNavServiceState> {
 
   getExpandedMenuItems(name: ENavName) {
     if (!name) return;
-    return Object.values(this.state.menuItems).reduce((keys, menuItem: IMenuItem) => {
+    return this.state[name].menuItems.reduce((keys, menuItem: IMenuItem) => {
       if (menuItem.isExpanded) {
         keys.push(menuItem.key);
       }
@@ -225,22 +225,6 @@ export class SideNavService extends PersistentStatefulService<ISideNavServiceSta
     this.state.showSidebarApps = false;
 
     if (isCompact) {
-      this.state.menuItems = {
-        ...this.state.menuItems,
-        // shown in compact view
-        [EMenuItem.Editor]: { ...this.state.menuItems[EMenuItem.Editor], isActive: true },
-        [EMenuItem.Themes]: { ...this.state.menuItems[EMenuItem.Themes], isActive: true },
-        [EMenuItem.AppStore]: { ...this.state.menuItems[EMenuItem.AppStore], isActive: true },
-        [EMenuItem.Highlighter]: { ...this.state.menuItems[EMenuItem.Highlighter], isActive: true },
-        // hidden in compact view
-        [EMenuItem.LayoutEditor]: {
-          ...this.state.menuItems[EMenuItem.LayoutEditor],
-          isActive: false,
-        },
-        [EMenuItem.StudioMode]: { ...this.state.menuItems[EMenuItem.StudioMode], isActive: false },
-        [EMenuItem.ThemeAudit]: { ...this.state.menuItems[EMenuItem.ThemeAudit], isActive: false },
-      };
-
       this.state[ENavName.TopNav] = {
         ...this.state[ENavName.TopNav],
         menuItems: [
@@ -406,6 +390,12 @@ export class SideNavService extends PersistentStatefulService<ISideNavServiceSta
 
   @mutation()
   private EXPAND_MENU_ITEM(navName: ENavName, menuItemName: EMenuItem) {
+    // toggle boolean value
+    this.state[navName].menuItems.find(
+      (menuItem: IMenuItem) => menuItem.title === menuItemName,
+    ).isExpanded = !this.state[navName].menuItems.find(
+      (menuItem: IMenuItem) => menuItem.title === menuItemName,
+    ).isExpanded;
     this.state.menuItems[menuItemName].isExpanded = !this.state.menuItems[menuItemName].isExpanded;
   }
 
