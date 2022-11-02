@@ -59,7 +59,7 @@ export class VideoSettingsService extends StatefulService<{ videoContext: obs.IV
 
   setVideoSetting(key: string, value: unknown) {
     this.SET_VIDEO_SETTING(key, value);
-    debounce(() => this.updateObsSettings(), 200);
+    this.updateObsSettings();
   }
 
   @mutation()
