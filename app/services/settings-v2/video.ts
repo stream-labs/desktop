@@ -1,4 +1,4 @@
-import debounce from 'lodash/debounce';
+import { debounce } from 'lodash-decorators';
 import { Inject } from 'services/core/injector';
 import { InitAfter } from 'services/core';
 import { mutation, StatefulService } from '../core/stateful-service';
@@ -52,6 +52,7 @@ export class VideoSettingsService extends StatefulService<{ videoContext: obs.IV
     obs.VideoFactory.videoContext = this.state.videoContext;
   }
 
+  @debounce(200)
   updateObsSettings() {
     obs.VideoFactory.videoContext = this.state.videoContext;
     obs.VideoFactory.legacySettings = this.state.videoContext;
