@@ -142,16 +142,15 @@ export default function SideNav() {
   }));
 
   const sider = useRef<HTMLDivElement | null>(null);
-  const menuOpen = useRef<boolean>(isOpen);
 
   const siderMinWidth: number = 50;
   const siderMaxWidth: number = 200;
 
   const resizeObserver = new ResizeObserver((entries: ResizeObserverEntry[]) => {
     entries.forEach((entry: ResizeObserverEntry) => {
-      const width = Math.floor(entry.contentRect.width);
+      const width = Math.floor(entry?.contentRect?.width);
 
-      if ((!menuOpen && width === siderMinWidth) || (menuOpen && width === siderMaxWidth)) {
+      if (width === siderMinWidth || width === siderMaxWidth) {
         updateStyleBlockers('main', false);
       }
     });
@@ -400,7 +399,6 @@ export default function SideNav() {
         onClick={() => {
           showNewBadge && dismiss(EDismissable.NewSideNav);
           toggleMenuStatus();
-          menuOpen.current = isOpen;
           updateStyleBlockers('main', true); // hide style blockers
         }}
       >
