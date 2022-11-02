@@ -187,7 +187,7 @@ export function AppearanceSettings() {
         />
         {/* SIDENAV SETTINGS */}
         <Row className={styles.sidenavSettings}>
-          <Col flex={1}>
+          <Col flex={1} className={styles.menuControls}>
             <SwitchInput
               label={$t(EMenuItem.Editor)}
               layout="horizontal"
