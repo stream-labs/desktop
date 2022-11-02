@@ -177,11 +177,11 @@ export function AppearanceSettings() {
 
       <ObsSettingsSection title={$t('Custom Navigation Bar')}>
         <CheckboxInput
-          onChange={value => setCompactView(value)}
+          onChange={value => setCompactView(!value)}
           label={$t(
             'Enable custom navigation bar to pin your favorite features for quick access.\nDisable to swap to compact view.',
           )}
-          value={compactView}
+          value={!compactView}
           className={cx(styles.settingsCheckbox)}
           disabled={!isLoggedIn}
         />
