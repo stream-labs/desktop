@@ -236,88 +236,98 @@ export default function SideNav() {
                     </Menu.Item>
                   ))
                 ) : (
-                  <Menu.SubMenu
-                    key={menuItem.key}
+                  <div
                     title={menuTitles(menuItem.title)}
-                    icon={menuItem?.icon && <i className={menuItem.icon} />}
-                    onTitleClick={() => {
-                      !isOpen &&
-                        menuItem?.subMenuItems[0]?.target &&
-                        handleNavigation(menuItem?.subMenuItems[0], menuItem.key);
-                      expandMenuItem(ENavName.TopNav, menuItem.title as EMenuItem);
-                    }}
-                    className={cx(
-                      !isOpen && styles.closed,
-                      !isOpen && menuItem.isExpanded && styles.hideSubMenu,
-                      !isOpen && currentMenuItem === menuItem.key && styles.active,
-                    )}
+                    className={cx(styles.submenuWrapper, !isOpen && styles.wrapperHidden)}
                   >
-                    {studioTabs.map(tab => (
-                      <Menu.Item
-                        key={`sub-${tab.key}`}
-                        className={cx(
-                          styles.sidenavItem,
-                          currentTab === tabs[tab.key] && styles.active,
-                        )}
-                        title={tab.title}
-                        icon={<i className={tab.icon} />}
-                        onClick={() =>
-                          navigateToStudioTab(tab.target, tab.trackingTarget, `sub-${tab.key}`)
-                        }
-                      >
-                        {tab.title}
-                      </Menu.Item>
-                    ))}
-                  </Menu.SubMenu>
+                    <Menu.SubMenu
+                      key={menuItem.key}
+                      title={menuTitles(menuItem.title)}
+                      icon={menuItem?.icon && <i className={menuItem.icon} />}
+                      onTitleClick={() => {
+                        !isOpen &&
+                          menuItem?.subMenuItems[0]?.target &&
+                          handleNavigation(menuItem?.subMenuItems[0], menuItem.key);
+                        expandMenuItem(ENavName.TopNav, menuItem.title as EMenuItem);
+                      }}
+                      className={cx(
+                        !isOpen && styles.closed,
+                        !isOpen && menuItem.isExpanded && styles.hideSubMenu,
+                        !isOpen && currentMenuItem === menuItem.key && styles.active,
+                      )}
+                    >
+                      {studioTabs.map(tab => (
+                        <Menu.Item
+                          key={`sub-${tab.key}`}
+                          className={cx(
+                            styles.sidenavItem,
+                            currentTab === tabs[tab.key] && styles.active,
+                          )}
+                          title={tab.title}
+                          icon={<i className={tab.icon} />}
+                          onClick={() =>
+                            navigateToStudioTab(tab.target, tab.trackingTarget, `sub-${tab.key}`)
+                          }
+                        >
+                          {tab.title}
+                        </Menu.Item>
+                      ))}
+                    </Menu.SubMenu>
+                  </div>
                 );
               } else {
                 // otherwise, show a menu item or a menu item with a submenu
                 return menuItem.hasOwnProperty('subMenuItems') ? (
-                  <Menu.SubMenu
-                    key={menuItem.key}
+                  <div
                     title={menuTitles(menuItem.title)}
-                    icon={menuItem?.icon && <i className={menuItem.icon} />}
-                    onTitleClick={() => {
-                      menuItem?.subMenuItems[0]?.target &&
-                        !isOpen &&
-                        handleNavigation(menuItem?.subMenuItems[0], menuItem.key);
-                      expandMenuItem(ENavName.TopNav, menuItem.title as EMenuItem);
-                    }}
-                    className={cx(
-                      !isOpen && styles.closed,
-                      currentMenuItem === menuItem.key && styles.active,
-                    )}
+                    className={cx(styles.submenuWrapper, !isOpen && styles.wrapperHidden)}
                   >
-                    {menuItem?.subMenuItems?.map((subMenuItem: IMenuItem) => (
-                      <Menu.Item
-                        key={subMenuItem.key}
-                        className={cx(
-                          styles.sidenavItem,
-                          !isOpen && menuItem.isExpanded && styles.hideSubMenu,
-                          currentMenuItem === subMenuItem?.key && styles.active,
-                        )}
-                        title={menuTitles(menuItem.title)}
-                        onClick={() => handleNavigation(subMenuItem)}
-                      >
-                        {menuTitles(subMenuItem.title)}
-                      </Menu.Item>
-                    ))}
-                    {menuItem.title === EMenuItem.AppStore &&
-                      apps.map(app => (
+                    <Menu.SubMenu
+                      key={menuItem.key}
+                      title={menuTitles(menuItem.title)}
+                      icon={menuItem?.icon && <i className={menuItem.icon} />}
+                      onTitleClick={() => {
+                        menuItem?.subMenuItems[0]?.target &&
+                          !isOpen &&
+                          handleNavigation(menuItem?.subMenuItems[0], menuItem.key);
+                        expandMenuItem(ENavName.TopNav, menuItem.title as EMenuItem);
+                      }}
+                      className={cx(
+                        !isOpen && styles.closed,
+                        currentMenuItem === menuItem.key && styles.active,
+                      )}
+                    >
+                      {menuItem?.subMenuItems?.map((subMenuItem: IMenuItem) => (
                         <Menu.Item
-                          key={app.id}
+                          key={subMenuItem.key}
                           className={cx(
                             styles.sidenavItem,
                             !isOpen && menuItem.isExpanded && styles.hideSubMenu,
-                            currentMenuItem === menuItem?.key && styles.active,
+                            currentMenuItem === subMenuItem?.key && styles.active,
                           )}
-                          title={app.name}
-                          onClick={() => app?.id && navigateApp(app.id)}
+                          title={menuTitles(menuItem.title)}
+                          onClick={() => handleNavigation(subMenuItem)}
                         >
-                          {app.name}
+                          {menuTitles(subMenuItem.title)}
                         </Menu.Item>
                       ))}
-                  </Menu.SubMenu>
+                      {menuItem.title === EMenuItem.AppStore &&
+                        apps.map(app => (
+                          <Menu.Item
+                            key={app.id}
+                            className={cx(
+                              styles.sidenavItem,
+                              !isOpen && menuItem.isExpanded && styles.hideSubMenu,
+                              currentMenuItem === menuItem?.key && styles.active,
+                            )}
+                            title={app.name}
+                            onClick={() => app?.id && navigateApp(app.id)}
+                          >
+                            {app.name}
+                          </Menu.Item>
+                        ))}
+                    </Menu.SubMenu>
+                  </div>
                 ) : (
                   <Menu.Item
                     key={menuItem.key}
