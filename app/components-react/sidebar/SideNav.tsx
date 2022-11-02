@@ -102,7 +102,6 @@ export default function SideNav() {
     tabs,
     currentTab,
     leftDock,
-    showSidebarApps,
     apps,
     loggedIn,
     menu,
@@ -125,7 +124,6 @@ export default function SideNav() {
     tabs: LayoutService.state.tabs,
     currentTab: LayoutService.views.currentTab,
     leftDock: CustomizationService.state.leftDock,
-    showSidebarApps: SideNavService.views.showSidebarApps,
     apps: Object.values(SideNavService.views.apps).sort((a, b) => a.index - b.index),
     loggedIn: UserService.views.isLoggedIn,
     menu: SideNavService.views.state[ENavName.TopNav],
@@ -371,7 +369,6 @@ export default function SideNav() {
               }
             })}
             {loggedIn &&
-              showSidebarApps &&
               !compactView &&
               apps.length > 0 &&
               // apps shown in sidebar

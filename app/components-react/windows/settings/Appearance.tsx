@@ -69,6 +69,7 @@ export function AppearanceSettings() {
     toggleMenuItem: SideNavService.actions.toggleMenuItem,
     setCompactView: SideNavService.actions.setCompactView,
   }));
+  console.log('compactView ', compactView);
 
   function openFFZSettings() {
     WindowsService.createOneOffWindow(
