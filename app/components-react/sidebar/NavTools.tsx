@@ -8,7 +8,7 @@ import { Services } from '../service-provider';
 import { useVuex } from '../hooks';
 import styles from './NavTools.m.less';
 import * as remote from '@electron/remote';
-import { Badge, Menu } from 'antd';
+import { Badge, Button, Form, Menu, Modal } from 'antd';
 import { EMenuItem, ENavName, IMenuItem, IParentMenuItem, menuTitles } from 'services/side-nav';
 import PlatformLogo from 'components-react/shared/PlatformLogo';
 
@@ -16,7 +16,6 @@ export default function SideNav() {
   const {
     UserService,
     SettingsService,
-    NavigationService,
     MagicLinkService,
     UsageStatisticsService,
     SideNavService,
@@ -33,7 +32,7 @@ export default function SideNav() {
     isOpen,
     openMenuItems,
     expandMenuItem,
-    currentPage,
+    updateStyleBlockers,
   } = useVuex(
     () => ({
       isLoggedIn: UserService.views.isLoggedIn,
@@ -43,12 +42,13 @@ export default function SideNav() {
       isOpen: SideNavService.views.isOpen,
       openMenuItems: SideNavService.views.getExpandedMenuItems(ENavName.TopNav),
       expandMenuItem: SideNavService.actions.expandMenuItem,
-      currentPage: NavigationService.state.currentPage,
+      updateStyleBlockers: WindowsService.actions.updateStyleBlockers,
     }),
     false,
   );
 
   const [dashboardOpening, setDashboardOpening] = useState(false);
+  const [showModal, setShowModal] = useState(false);
 
   function openSettingsWindow() {
     UsageStatisticsService.actions.recordClick('SideNav2', 'settings');
@@ -96,21 +96,16 @@ export default function SideNav() {
 
   const handleAuth = () => {
     if (isLoggedIn) {
-      remote.dialog
-        .showMessageBox({
-          title: $t('Confirm'),
-          message: $t('Are you sure you want to log out?'),
-          buttons: [$t('Yes'), $t('No')],
-        })
-        .then(({ response }) => {
-          if (response === 0) {
-            UserService.actions.logOut();
-          }
-        });
+      UserService.actions.logOut();
     } else {
       WindowsService.actions.closeChildWindow();
       UserService.actions.showLogin();
     }
+  };
+
+  const handleShowModal = (status: boolean) => {
+    updateStyleBlockers('main', status);
+    setShowModal(status);
   };
 
   return (
@@ -217,7 +212,7 @@ export default function SideNav() {
                 title={!isLoggedIn ? menuTitles(menuItem.title) : $t('Log Out')}
                 className={cx(styles.login, !isOpen && styles.loginClosed)}
                 icon={!isOpen && <i className="icon-user" />}
-                onClick={() => handleAuth()}
+                onClick={() => (isLoggedIn ? handleShowModal(true) : handleAuth())}
               >
                 {!isLoggedIn ? (
                   <span className={styles.loggedOut}>{menuTitles(menuItem.title)}</span>
@@ -243,6 +238,36 @@ export default function SideNav() {
           }
         })}
       </Menu>
+      <LogoutModal
+        showModal={showModal}
+        handleAuth={handleAuth}
+        handleShowModal={handleShowModal}
+      />
     </>
+  );
+}
+
+function LogoutModal(p: {
+  showModal: boolean;
+  handleAuth: () => void;
+  handleShowModal: (status: boolean) => void;
+}) {
+  return (
+    <Modal
+      footer={null}
+      visible={p.showModal}
+      onCancel={() => p.handleShowModal(false)}
+      getContainer={false}
+      className={styles.confirmLogout}
+    >
+      <Form className={styles.confirmLogout}>
+        <h2>{$t('Confirm')}</h2>
+        {$t('Are you sure you want to log out?')}
+        <div className={styles.buttons}>
+          <Button onClick={() => p.handleAuth()}>{$t('Yes')}</Button>
+          <Button onClick={() => p.handleShowModal(false)}>{$t('No')}</Button>
+        </div>
+      </Form>
+    </Modal>
   );
 }

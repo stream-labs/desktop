@@ -13,6 +13,8 @@ body:last-child {
 }
 
 .sidenav-sider {
+  position: relative;
+  z-index: 1002; // allows logout confirmation modal to show above resize bars
   width: 100%;
   overflow: visible;
   transition: width 300ms;
