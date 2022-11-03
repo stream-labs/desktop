@@ -122,6 +122,8 @@ button.sidenav-button {
     min-height: 30px !important;
     line-height: normal !important;
     margin: 10px 0 !important;
+    overflow-wrap: break-word !important;
+    padding-bottom: 0px;
 
     i {
       color: var(--paragraph);
@@ -203,5 +205,35 @@ button.sidenav-button {
 
   &.wrapper-hidden {
     padding-left: 0px;
+  }
+}
+
+// @@@ TODO: remove
+.sub-menu {
+  :global(li.ant-menu-item),
+  :global(li.ant-menu-submenu) {
+    background: none;
+    color: var(--paragraph);
+    height: unset !important;
+    min-height: 30px !important;
+    line-height: normal !important;
+    margin: 10px 0 !important;
+    overflow-wrap: break-word !important;
+    padding-bottom: 0px;
+
+    i {
+      color: var(--paragraph);
+    }
+
+    :active,
+    :link,
+    :focus,
+    :visited {
+      background: none;
+    }
+
+    :hover {
+      color: var(--title) !important;
+    }
   }
 }
