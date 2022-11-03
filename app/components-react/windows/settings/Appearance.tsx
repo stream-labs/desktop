@@ -59,7 +59,7 @@ export function AppearanceSettings() {
         return page.slot === EAppPageSlot.TopNav;
       });
     }),
-    displayedApps: Object.values(SideNavService.views.apps).sort((a, b) => a.index - b.index),
+    displayedApps: SideNavService.views.apps,
     showCustomEditor: SideNavService.views.showCustomEditor,
     isLoggedIn: UserService.views.isLoggedIn,
     isPrime: UserService.views.isPrime,
@@ -69,7 +69,6 @@ export function AppearanceSettings() {
     toggleMenuItem: SideNavService.actions.toggleMenuItem,
     setCompactView: SideNavService.actions.setCompactView,
   }));
-  console.log('compactView ', compactView);
 
   function openFFZSettings() {
     WindowsService.createOneOffWindow(
@@ -98,41 +97,26 @@ export function AppearanceSettings() {
    * Sort apps
    */
 
-  const displayedAppsList = Object.values(displayedApps);
+  const displayedAppsStatus = displayedApps.reduce((hashmap, app) => {
+    return app ? { ...hashmap, [app.id]: app.isActive } : hashmap;
+  }, {});
 
-  const enabledApps = apps.reduce(
-    (enabled: { id: string; name?: string; icon?: string; isActive: boolean }[], app) => {
-      if (app) {
-        enabled.push({
-          id: app.id,
-          name: app.manifest?.name,
-          icon: app.manifest?.icon,
-          isActive: displayedAppsList[app.id]?.isActive ?? false,
-        });
-      }
-      return enabled;
-    },
-    [],
-  );
-
-  // const enabledApps = apps.map(
-  //   app =>
-  //     app && {
-  //       id: app.id,
-  //       name: app.manifest?.name,
-  //       icon: app.manifest?.icon,
-  //       isActive: displayedAppsList[app.id]?.isActive ?? false,
-  //     },
-  // );
-
-  const appSelectFields = [...Array(5)].map((field, index) => {
-    if (displayedAppsList[index]) {
-      return displayedAppsList[index];
-    } else if (enabledApps && enabledApps[index]) {
-      swapApp({ ...enabledApps[index], isActive: false, index });
-      return { ...enabledApps[index], isActive: false, index };
-    }
-  });
+  const allEnabledApps = apps
+    .reduce(
+      (enabledApps: { id: string; name?: string; icon?: string; isActive: boolean }[], app) => {
+        if (app) {
+          enabledApps.push({
+            id: app.id,
+            name: app.manifest?.name,
+            icon: app.manifest?.icon,
+            isActive: displayedAppsStatus[app.id] ?? false,
+          });
+        }
+        return enabledApps;
+      },
+      [],
+    )
+    .sort();
 
   return (
     <div className={styles.container}>
@@ -244,7 +228,7 @@ export function AppearanceSettings() {
                 disabled={!isLoggedIn || compactView}
               />
 
-              {appSelectFields.map((app: IAppMenuItem | undefined, index: number) => (
+              {displayedApps.map((app: IAppMenuItem | undefined, index: number) => (
                 <Row key={`app-${index + 1}`} className={styles.appsSelector}>
                   <SwitchInput
                     label={`${$t('App')} ${index + 1}`}
@@ -256,16 +240,16 @@ export function AppearanceSettings() {
 
                   {/* dropdown options for apps */}
                   <Select
-                    defaultValue={app?.name ?? enabledApps[0]?.name ?? ''}
+                    defaultValue={app?.name ?? ''}
                     className={styles.appsDropdown}
                     onChange={value => {
-                      const data = enabledApps.find(data => data?.name === value);
-                      swapApp({ ...data, isActive: app ? app.isActive : false, index });
+                      const data = allEnabledApps.find(data => data?.name === value);
+                      // swapApp({ ...data, isActive: app ? app.isActive : false, index });
                     }}
-                    value={app?.name}
+                    value={app?.name ?? ''}
                     disabled={!isLoggedIn || index + 1 > apps.length}
                   >
-                    {enabledApps.map(enabledApp => (
+                    {allEnabledApps.map(enabledApp => (
                       <Option key={enabledApp?.id} value={enabledApp?.name || ''}>
                         {enabledApp?.name}
                       </Option>

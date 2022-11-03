@@ -42,7 +42,7 @@ export type TExternalLinkType =
 type TSideNavItem = TAppPage | TExternalLinkType | 'NavTools' | 'WidgetWindow' | string;
 
 export interface IAppMenuItem {
-  id?: string;
+  id: string;
   name?: string;
   isActive: boolean;
   icon?: string;

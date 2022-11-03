@@ -126,7 +126,7 @@ export default function SideNav() {
     tabs: LayoutService.state.tabs,
     currentTab: LayoutService.views.currentTab,
     leftDock: CustomizationService.state.leftDock,
-    apps: Object.values(SideNavService.views.apps).sort((a, b) => a.index - b.index),
+    apps: SideNavService.views.apps,
     loggedIn: UserService.views.isLoggedIn,
     menu: SideNavService.views.state[ENavName.TopNav],
     compactView: SideNavService.views.compactView,
@@ -330,20 +330,23 @@ export default function SideNav() {
                       </Menu.Item>
                     ))}
                     {menuItem.title === EMenuItem.AppStore &&
-                      apps.map(app => (
-                        <Menu.Item
-                          key={app.id}
-                          className={cx(
-                            styles.sidenavItem,
-                            !isOpen && menuItem.isExpanded && styles.hideSubMenu,
-                            currentMenuItem === menuItem?.key && styles.active,
-                          )}
-                          title={app.name}
-                          onClick={() => app?.id && navigateApp(app.id)}
-                        >
-                          {app.name}
-                        </Menu.Item>
-                      ))}
+                      apps.map(
+                        app =>
+                          app && (
+                            <Menu.Item
+                              key={app?.id}
+                              className={cx(
+                                styles.sidenavItem,
+                                !isOpen && menuItem.isExpanded && styles.hideSubMenu,
+                                currentMenuItem === menuItem?.key && styles.active,
+                              )}
+                              title={app?.name}
+                              onClick={() => app?.id && navigateApp(app?.id)}
+                            >
+                              {app?.name}
+                            </Menu.Item>
+                          ),
+                      )}
                   </SubMenu>
                 ) : (
                   <Menu.Item
@@ -367,11 +370,11 @@ export default function SideNav() {
             })}
             {loggedIn &&
               !compactView &&
-              apps.length > 0 &&
               // apps shown in sidebar
               apps.map(
                 app =>
-                  app.isActive && (
+                  app &&
+                  app?.isActive && (
                     <Menu.Item
                       key={app?.id}
                       className={cx(
@@ -380,10 +383,10 @@ export default function SideNav() {
                         isOpen && styles.open,
                         currentMenuItem === app?.id && styles.active,
                       )}
-                      title={app.name}
+                      title={app?.name}
                       icon={
                         app?.icon && app?.id ? (
-                          <img src={iconSrc(app?.id, app.icon)} className={styles.appIcons} />
+                          <img src={iconSrc(app?.id, app?.icon)} className={styles.appIcons} />
                         ) : (
                           <i className="icon-integrations" />
                         )

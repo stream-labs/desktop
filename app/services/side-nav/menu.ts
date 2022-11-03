@@ -22,9 +22,7 @@ interface ISideNavServiceState {
   compactView: boolean;
   currentMenuItem: EMenuItemKey | string;
   menuItems: TMenuItems;
-  apps: {
-    [appId: string]: IAppMenuItem;
-  };
+  apps: IAppMenuItem[];
   [ENavName.TopNav]: IMenu;
   [ENavName.BottomNav]: IMenu;
 }
@@ -84,7 +82,7 @@ export class SideNavService extends PersistentStatefulService<ISideNavServiceSta
     currentMenuItem: EMenuItemKey.Editor,
     compactView: false,
     menuItems: SideNavMenuItems(),
-    apps: {},
+    apps: [null, null, null, null, null], // up to five apps may be displayed in the closed sidebar
     [ENavName.TopNav]: SideBarTopNavData(),
     [ENavName.BottomNav]: SideBarBottomNavData(),
   };
