@@ -100,7 +100,6 @@ export default function SideNav() {
     featureIsEnabled,
     currentMenuItem,
     setCurrentMenuItem,
-    currentPage,
     tabs,
     currentTab,
     leftDock,
@@ -120,7 +119,6 @@ export default function SideNav() {
   } = useVuex(() => ({
     featureIsEnabled: (feature: EAvailableFeatures) =>
       IncrementalRolloutService.views.featureIsEnabled(feature),
-    currentPage: NavigationService.state.currentPage,
     currentMenuItem: SideNavService.views.currentMenuItem,
     setCurrentMenuItem: SideNavService.actions.setCurrentMenuItem,
     tabs: LayoutService.state.tabs,
