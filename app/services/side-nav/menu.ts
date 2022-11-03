@@ -184,9 +184,9 @@ export class SideNavService extends PersistentStatefulService<ISideNavServiceSta
     this.TOGGLE_APP(appId);
   }
 
-  swapApp(app: IAppMenuItem) {
+  swapApp(newApp: IAppMenuItem, index: number) {
     // add/update apps
-    this.SWAP_APP(app);
+    this.SWAP_APP(newApp, index);
   }
 
   @mutation()
@@ -279,33 +279,30 @@ export class SideNavService extends PersistentStatefulService<ISideNavServiceSta
 
   @mutation()
   private TOGGLE_APP(appId: string) {
-    this.state.apps = {
-      ...this.state.apps,
-      [appId]: { ...this.state.apps[appId], isActive: !this.state.apps[appId].isActive },
-    };
+    this.state.apps = this.state.apps.map(app => {
+      if (!app) return null;
+
+      if (app.id === appId) {
+        return { ...app, isActive: !app.isActive };
+      }
+
+      return app;
+    });
   }
 
   @mutation()
-  private SWAP_APP(app: IAppMenuItem) {
-    let found = false;
-    for (const [key, value] of Object.entries(this.state.apps)) {
-      if (value.index === app.index) {
-        // there is an app at this index
-        if (this.state.apps[app.id]) {
-          // the new app previously had an index, so swap the two apps
-          found = true;
-          this.state.apps = {
-            ...this.state.apps,
-            [key]: { ...value, index: this.state.apps[app.id].index },
-            [app.id]: app,
-          };
-          break;
-        }
+  private SWAP_APP(newApp: IAppMenuItem, index: number) {
+    const updatedApps = this.state.apps.map((app, i) => {
+      if (i === index) return newApp;
+
+      if (!app || app?.id === newApp.id) {
+        // if the new app is already in the array, remove it
+        return null;
       }
-    }
-    if (!found) {
-      this.state.apps[app.id] = app;
-    }
+
+      return app;
+    });
+    this.state.apps = updatedApps;
   }
 
   @mutation()

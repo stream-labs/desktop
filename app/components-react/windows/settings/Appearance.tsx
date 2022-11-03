@@ -243,8 +243,8 @@ export function AppearanceSettings() {
                     defaultValue={app?.name ?? ''}
                     className={styles.appsDropdown}
                     onChange={value => {
-                      const data = allEnabledApps.find(data => data?.name === value);
-                      // swapApp({ ...data, isActive: app ? app.isActive : false, index });
+                      const selectedApp = allEnabledApps.find(selected => selected?.name === value);
+                      selectedApp && swapApp(selectedApp, index);
                     }}
                     value={app?.name ?? ''}
                     disabled={!isLoggedIn || index + 1 > apps.length}

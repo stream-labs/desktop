@@ -46,7 +46,6 @@ export interface IAppMenuItem {
   name?: string;
   isActive: boolean;
   icon?: string;
-  index: number;
 }
 export interface IMenu {
   name: string;
