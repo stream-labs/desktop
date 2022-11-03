@@ -139,7 +139,7 @@ export class SideNavService extends PersistentStatefulService<ISideNavServiceSta
       }
     }
 
-    // this.state.currentMenuItem = EMenuItemKey.Editor;
+    this.state.currentMenuItem = EMenuItemKey.Editor;
   }
 
   get views() {
@@ -166,9 +166,9 @@ export class SideNavService extends PersistentStatefulService<ISideNavServiceSta
     this.SET_LEGACY_VIEW();
   }
 
-  expandMenuItem(navName: ENavName, menuItemName: EMenuItem) {
+  expandMenuItem(navName: ENavName, key: EMenuItemKey) {
     // expand/contract menu items
-    this.EXPAND_MENU_ITEM(navName, menuItemName);
+    this.EXPAND_MENU_ITEM(navName, key);
   }
 
   toggleSidebarSubmenu() {
@@ -311,14 +311,19 @@ export class SideNavService extends PersistentStatefulService<ISideNavServiceSta
   }
 
   @mutation()
-  private EXPAND_MENU_ITEM(navName: ENavName, menuItemName: EMenuItem) {
+  private EXPAND_MENU_ITEM(navName: ENavName, key: EMenuItemKey) {
     // toggle boolean value
-    this.state[navName].menuItems.find(
-      (menuItem: IMenuItem) => menuItem.title === menuItemName,
-    ).isExpanded = !this.state[navName].menuItems.find(
-      (menuItem: IMenuItem) => menuItem.title === menuItemName,
-    ).isExpanded;
-    this.state.menuItems[menuItemName].isExpanded = !this.state.menuItems[menuItemName].isExpanded;
+    this.state[navName] = {
+      ...this.state[navName],
+      menuItems: [
+        ...this.state[navName].menuItems.map(menuItem => {
+          if (menuItem.key === key) {
+            return { ...menuItem, isExpanded: !menuItem.isExpanded };
+          }
+          return menuItem;
+        }),
+      ],
+    };
   }
 
   @mutation()

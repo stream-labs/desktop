@@ -9,8 +9,16 @@ import { useVuex } from '../hooks';
 import styles from './NavTools.m.less';
 import * as remote from '@electron/remote';
 import { Badge, Button, Form, Menu, Modal } from 'antd';
-import { EMenuItem, ENavName, IMenuItem, IParentMenuItem, menuTitles } from 'services/side-nav';
+import {
+  EMenuItem,
+  EMenuItemKey,
+  ENavName,
+  IMenuItem,
+  IParentMenuItem,
+  menuTitles,
+} from 'services/side-nav';
 import PlatformLogo from 'components-react/shared/PlatformLogo';
+import SubMenu from 'components-react/shared/SubMenu';
 
 export default function SideNav() {
   const {
@@ -149,7 +157,7 @@ export default function SideNav() {
             );
           } else if (isLoggedIn && menuItem.title === EMenuItem.Dashboard) {
             return (
-              <Menu.SubMenu
+              <SubMenu
                 key={menuItem.key}
                 title={menuTitles(menuItem.title)}
                 icon={
@@ -161,7 +169,7 @@ export default function SideNav() {
                 }
                 onTitleClick={() => {
                   !isOpen && throttledOpenDashboard();
-                  expandMenuItem(ENavName.BottomNav, menuItem.title as EMenuItem);
+                  expandMenuItem(ENavName.BottomNav, menuItem.key as EMenuItemKey);
                 }}
                 className={styles.badgeScale}
               >
@@ -175,7 +183,7 @@ export default function SideNav() {
                     {menuTitles(subMenuItem.title)}
                   </Menu.Item>
                 ))}
-              </Menu.SubMenu>
+              </SubMenu>
             );
           } else if (menuItem.title === EMenuItem.GetHelp) {
             return (
