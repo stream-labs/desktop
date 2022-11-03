@@ -12,6 +12,7 @@ import {
   menuTitles,
 } from 'services/side-nav';
 import { EAvailableFeatures } from 'services/incremental-rollout';
+import { EAppPageSlot } from 'services/platform-apps';
 import { $t } from 'services/i18n';
 import { Services } from 'components-react/service-provider';
 import { useVuex } from 'components-react/hooks';
@@ -104,6 +105,7 @@ export default function SideNav() {
     currentTab,
     leftDock,
     apps,
+    enabledApps,
     loggedIn,
     menu,
     compactView,
@@ -125,6 +127,13 @@ export default function SideNav() {
     currentTab: LayoutService.views.currentTab,
     leftDock: CustomizationService.state.leftDock,
     apps: SideNavService.views.apps,
+    enabledApps: PlatformAppsService.views.enabledApps
+      .filter(app => {
+        return !!app.manifest.pages.find(page => {
+          return page.slot === EAppPageSlot.TopNav;
+        });
+      })
+      .sort((a, b) => (a.manifest?.name > b.manifest?.name ? 1 : -1)),
     loggedIn: UserService.views.isLoggedIn,
     menu: SideNavService.views.state[ENavName.TopNav],
     compactView: SideNavService.views.compactView,
@@ -328,7 +337,7 @@ export default function SideNav() {
                       </Menu.Item>
                     ))}
                     {menuItem.title === EMenuItem.AppStore &&
-                      apps.map(
+                      enabledApps.map(
                         app =>
                           app && (
                             <Menu.Item
@@ -338,10 +347,10 @@ export default function SideNav() {
                                 !isOpen && menuItem.isExpanded && styles.hideSubMenu,
                                 currentMenuItem === menuItem?.key && styles.active,
                               )}
-                              title={app?.name}
+                              title={app.manifest?.name}
                               onClick={() => app?.id && navigateApp(app?.id)}
                             >
-                              {app?.name}
+                              {app.manifest?.name}
                             </Menu.Item>
                           ),
                       )}
