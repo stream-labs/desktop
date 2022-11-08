@@ -2,6 +2,7 @@ import React from 'react';
 import { Services } from '../../service-provider';
 import { $t } from '../../../services/i18n';
 import { ObsSettingsSection } from './ObsSettings';
+import Translate from 'components-react/shared/Translate';
 import * as remote from '@electron/remote';
 
 export function MultistreamingSettings() {
@@ -29,12 +30,12 @@ export function MultistreamingSettings() {
         ) : (
           <div style={{ marginBottom: '16px' }}>
             {/* TODO: add to intl json */}
-
             {$t('Go live on multiple platforms at once with Multistreaming.')}
             <ul>
               <li>
-                {/* TODO: fix underline */}
-                {$t('Step 1: Connect your streaming accounts in the <u>Connections</u> settings')}
+                <Translate message="Step 1: Connect your streaming accounts in the <connections>Connections</connections> settings">
+                  <u slot="connections" />
+                </Translate>
               </li>
               <li>
                 {/* TODO: add to intl json */}
