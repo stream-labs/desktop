@@ -1,4 +1,5 @@
 import React from 'react';
+import { useVuex } from 'components-react/hooks';
 import { Services } from '../../service-provider';
 import { $t } from '../../../services/i18n';
 import { ObsSettingsSection } from './ObsSettings';
@@ -8,12 +9,17 @@ import * as remote from '@electron/remote';
 export function MultistreamingSettings() {
   const { UserService, MagicLinkService } = Services;
 
+  const { isLoggedIn, isPrime } = useVuex(() => ({
+    isLoggedIn: UserService.views.isLoggedIn,
+    isPrime: UserService.views.isPrime,
+  }));
+
   async function upgradeToPrime() {
     const link = await MagicLinkService.getDashboardMagicLink('prime-marketing', 'slobs-ui-themes');
     remote.shell.openExternal(link);
   }
 
-  const shouldShowPrime = UserService.views.isLoggedIn && !UserService.views.isPrime;
+  const shouldShowPrime = isLoggedIn && !isPrime;
 
   return (
     <div>
