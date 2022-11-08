@@ -186,5 +186,7 @@
   "font_family_tooltip": "텍스트에 사용할 Google 폰트. https://fonts.google.com에 방문하여 찾아보세요! 인기 폰트: Open Sans, Roboto, Oswald, Lato, Droid Sans.",
   "Something went wrong while applying settings": "설정 적용 중 오류 발생",
   "Superchat Goal": "슈퍼챗 목표",
-  "YouTube Superchats": "YouTube 슈퍼챗"
+  "YouTube Superchats": "YouTube 슈퍼챗",
+  "Custom Widget": "Custom Widget",
+  "Use HTML, CSS, and JavaScript to create a widget with custom functionality": "Use HTML, CSS, and JavaScript to create a widget with custom functionality"
 }

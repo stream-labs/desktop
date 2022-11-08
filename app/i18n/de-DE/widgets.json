@@ -186,5 +186,7 @@
   "font_family_tooltip": "Der Google-Font, der für den Text verwendet werden soll. Besuchen Sie https://fonts.google.com, um einen zu finden! Populäre Fonts: Open Sans, Roboto, Oswald, Lato, Droid Sans.",
   "Something went wrong while applying settings": "Beim Anwenden der Einstellungen ist ein Fehler aufgetreten",
   "Superchat Goal": "Superchat-Ziel",
-  "YouTube Superchats": "YouTube-Superchats"
+  "YouTube Superchats": "YouTube-Superchats",
+  "Custom Widget": "Custom Widget",
+  "Use HTML, CSS, and JavaScript to create a widget with custom functionality": "Use HTML, CSS, and JavaScript to create a widget with custom functionality"
 }

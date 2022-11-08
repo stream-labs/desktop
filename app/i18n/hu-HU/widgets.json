@@ -61,7 +61,7 @@
   "Frequently": "Gyakran",
   "Very Frequently": "Nagyon Gyakran",
   "Recent Events": "Közelmúltbeli események",
-  "Unban": "Unban",
+  "Unban": "Kitiltás eltávolítása",
   "Banned by %{user}": "Banned by %{user}",
   "No banned media found": "No banned media found",
   "Effects/Rallies": "Effects/Rallies",
@@ -73,7 +73,7 @@
   "Twitch Subscribers": "Twitch Subscribers",
   "YouTube Members": "YouTube Members",
   "Media Share": "Média megosztás",
-  "Subscriber": "Subscriber",
+  "Subscriber": "Feliratkozó",
   "Membership": "Membership",
   "Tips & Donations": "Tips & Donations",
   "Twitch Follows": "Twitch Követések",
@@ -186,5 +186,7 @@
   "font_family_tooltip": "A szöveg betűtípusa. Látogass el a https://fonts.google.com címre, hogy válogass! Népszerű betűtípusok: Open Sans, Roboto, Oswald, Lato, Droid Sans.",
   "Something went wrong while applying settings": "Something went wrong while applying settings",
   "Superchat Goal": "Szuperchat cél",
-  "YouTube Superchats": "YouTube Superchats"
+  "YouTube Superchats": "YouTube Superchats",
+  "Custom Widget": "Custom Widget",
+  "Use HTML, CSS, and JavaScript to create a widget with custom functionality": "Use HTML, CSS, and JavaScript to create a widget with custom functionality"
 }

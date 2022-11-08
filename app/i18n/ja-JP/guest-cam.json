@@ -44,7 +44,7 @@
   "Upgrade for more Guests": "その他のゲストに対してアップグレード",
   "Share Video Source (Optional)": "ビデオソースを共有（オプション）",
   "Stop Sharing": "共有を停止",
-  "Collab Cam requires a source": "Collab Cam requires a source",
-  "At least one Collab Cam source is required to use Collab Cam. Would you like to add one now?": "At least one Collab Cam source is required to use Collab Cam. Would you like to add one now?",
-  "You now have access to Collab Cam!": "You now have access to Collab Cam!"
+  "Collab Cam requires a source": "Collab Cam ではソースが必要です",
+  "At least one Collab Cam source is required to use Collab Cam. Would you like to add one now?": "Collab Cam を使用するには、最低 1 つの Collab Cam ソースが必要です。ソースを今すぐ追加しますか？",
+  "You now have access to Collab Cam!": "Collab Cam にアクセスできるようになりました！"
 }

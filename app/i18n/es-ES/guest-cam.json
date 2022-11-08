@@ -1,6 +1,6 @@
 {
   "Source: %{sourceName}": "Fuente: %{sourceName}",
-  "Collab Cam": "Cámara Colaboración",
+  "Collab Cam": "Collab Cam",
   "Invite a guest to join your stream from a web browser.": "Invite a un usuario a unirse a su stream desde un navegador web.",
   "Guest Cam is currently listening for connecting guests, but is not broadcasting your microphone and webcam to your guests yet.": "Cámara Invitados está a la escucha para ver si se conectan invitados pero aún no está trasmitiendo contenido a sus invitados por su micrófono o cámara web.",
   "No microphone source is selected. Your guest will not be able to hear you.": "No se ha seleccionado una fuente de micrófono. Su invitado no le oirá.",
@@ -20,7 +20,7 @@
   "Step 1": "Paso 1",
   "Copy and share a link with your guest. When they join, they'll be able to see and hear you.": "Copie y comparta un vínculo con su invitado. Cuando el invitado se una, podrá verlo y oírlo.",
   "Step 2": "Paso 2",
-  "Verify their identity in the preview area. When ready, add them to your stream by clicking 'Show on Stream'.": "Verifique la identidad del invitado en el área de vista previa. Cuando todo esté listo, añádalo a su stream haciendo clic en en \"Mostrar en streaming\".",
+  "Verify their identity in the preview area. When ready, add them to your stream by clicking 'Show on Stream'.": "Verifique la identidad del invitado en el área de vista previa. Cuando todo esté listo, añádalo a su stream haciendo clic en en 'Mostrar en streaming'.",
   "Step 3": "Paso 3",
   "Enjoy your stream! Adjust their volume, create new links, and change your mic and camera from the properties window.": "¡Disfrute de su streaming! Ajuste el volumen, cree vínculos y cambie su micrófono y cámara web en la ventana de propiedades.",
   "Don't share your invite link with anyone you don't want on your stream. You can invalidate an old link by generating a new one. Do not show this window on stream.": "No comparta su vínculo de invitación con personas que no quiera incluir en su streaming. Puede anular un vínculo antiguo generando uno nuevo. No mostrar esta ventana en el stream.",
@@ -44,7 +44,7 @@
   "Upgrade for more Guests": "Actualizar para más invitados",
   "Share Video Source (Optional)": "Compartir fuente de vídeo (opcional)",
   "Stop Sharing": "Dejar de compartir",
-  "Collab Cam requires a source": "Collab Cam requires a source",
-  "At least one Collab Cam source is required to use Collab Cam. Would you like to add one now?": "At least one Collab Cam source is required to use Collab Cam. Would you like to add one now?",
-  "You now have access to Collab Cam!": "You now have access to Collab Cam!"
+  "Collab Cam requires a source": "Collab Cam requiere una fuente",
+  "At least one Collab Cam source is required to use Collab Cam. Would you like to add one now?": "Hace falta al menos una fuente de Collab Cam para usar Collab Cam. ¿Quiere agregar una ahora?",
+  "You now have access to Collab Cam!": "¡Ahora tiene acceso a Collab Cam!"
 }

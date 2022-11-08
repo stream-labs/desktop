@@ -186,5 +186,7 @@
   "font_family_tooltip": "Mesaj için kullanılan Google Yazı Tipi. Bunu bulmak için https://fonts.google.com bağlantısını ziyaret edin! Popüler yazı tipleri: Açık Sans, Roboto, Oswald, Lato, Droid Sans.",
   "Something went wrong while applying settings": "Ayarlar uygulanırken bir hata oluştu",
   "Superchat Goal": "Süper Sohbet Hedefi",
-  "YouTube Superchats": "YouTube Süper Sohbetleri"
+  "YouTube Superchats": "YouTube Süper Sohbetleri",
+  "Custom Widget": "Custom Widget",
+  "Use HTML, CSS, and JavaScript to create a widget with custom functionality": "Use HTML, CSS, and JavaScript to create a widget with custom functionality"
 }
