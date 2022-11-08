@@ -55,6 +55,7 @@ export default class Settings extends Vue {
   searchResultPages: string[] = [];
   icons: Dictionary<string> = {
     General: 'icon-overview',
+    Multistreaming: 'icon-multistream',
     Stream: 'fas fa-globe',
     Output: 'fas fa-microchip',
     Video: 'fas fa-film',
@@ -122,6 +123,7 @@ export default class Settings extends Vue {
   get reactPages() {
     const pages = [
       'General',
+      'Multistreaming',
       'Stream',
       // 'Output',
       'Audio',
