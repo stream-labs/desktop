@@ -36,8 +36,8 @@ export function MultistreamingSettings() {
             {$t('Go live on multiple platforms at once with Multistreaming.')}
             <ul>
               <li>
-                <Translate message="Step 1: Connect your streaming accounts in the <connections>Connections</connections> settings.">
-                  <u slot="connections" />
+                <Translate message="Step 1: Connect your streaming accounts in the <stream>Stream</stream> settings.">
+                  <u slot="stream" />
                 </Translate>
               </li>
               <li>
