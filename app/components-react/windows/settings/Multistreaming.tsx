@@ -15,7 +15,6 @@ export function MultistreamingSettings() {
 
   const shouldShowPrime = UserService.views.isLoggedIn && !UserService.views.isPrime;
 
-  // @@@ TODO: Add correct copy
   return (
     <div>
       <ObsSettingsSection title={$t('Multistreaming')}>
@@ -23,13 +22,11 @@ export function MultistreamingSettings() {
           <div style={{ marginBottom: '16px' }}>
             <a style={{ color: 'var(--prime)' }} onClick={upgradeToPrime}>
               <i style={{ color: 'var(--prime)' }} className="icon-prime" />
-              {/* TODO: add to intl json */}
               {$t('Stream to multiple platforms with Prime')}
             </a>
           </div>
         ) : (
           <div style={{ marginBottom: '16px' }}>
-            {/* TODO: add to intl json */}
             {$t('Go live on multiple platforms at once with Multistreaming.')}
             <ul>
               <li>
@@ -39,7 +36,7 @@ export function MultistreamingSettings() {
               </li>
               <li>
                 {/* eslint-disable-next-line no-useless-escape */}
-                {$t('Step 2: Select which platforms you are streaming to when you hit \"Go Live\".')}
+                {$t('Step 2: Select which platforms you are streaming to when you hit "Go Live".')}
               </li>
             </ul>
           </div>
