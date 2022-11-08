@@ -42,12 +42,16 @@ export function MultistreamingSettings() {
               </li>
               <li>
                 {/* eslint-disable-next-line no-useless-escape */}
-                {$t('Step 2: Select which platforms you are streaming to when you hit "Go Live".')}
+                {$t('Step 2: Select which platforms you are streaming to when you hit \"Go Live\".')}
               </li>
             </ul>
           </div>
         )}
       </ObsSettingsSection>
+      <ObsSettingsSection
+        title={$t('New features coming soon!')}
+        style={{ paddingBottom: '24px' }}
+      ></ObsSettingsSection>
     </div>
   );
 }
