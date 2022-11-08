@@ -33,13 +33,13 @@ export function MultistreamingSettings() {
             {$t('Go live on multiple platforms at once with Multistreaming.')}
             <ul>
               <li>
-                <Translate message="Step 1: Connect your streaming accounts in the <connections>Connections</connections> settings">
+                <Translate message="Step 1: Connect your streaming accounts in the <connections>Connections</connections> settings.">
                   <u slot="connections" />
                 </Translate>
               </li>
               <li>
-                {/* TODO: add to intl json */}
-                {$t('Step 2: Select which platforms you are streaming to when you hit "Go Live"')}
+                {/* eslint-disable-next-line no-useless-escape */}
+                {$t('Step 2: Select which platforms you are streaming to when you hit \"Go Live\".')}
               </li>
             </ul>
           </div>
