@@ -76,6 +76,7 @@ body > div > div {
       span {
         transition: all 0.2s ease-in-out;
         transform: scale(1.2, 1.2);
+        overflow: visible;
       }
 
       i.link-badge {
@@ -88,7 +89,16 @@ body > div > div {
       }
     }
 
+    :global(div.ant-menu-submenu-title) {
+      margin: 20px 0;
+      overflow: visible;
+    }
+
     :global(span.ant-menu-title-content) {
+      display: none !important;
+    }
+
+    :global(i.ant-menu-submenu-arrow) {
       display: none !important;
     }
   }
