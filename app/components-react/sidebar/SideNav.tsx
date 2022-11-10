@@ -84,6 +84,20 @@ export default function SideNav() {
     }
   }
 
+  function updateSubMenu() {
+    // when opening/closing the navbar swap the submenu current menu item
+    // to correctly display selected color
+    const subMenuItems = {
+      [EMenuItemKey.Themes]: EMenuItemKey.Scene,
+      [EMenuItemKey.Scene]: EMenuItemKey.Themes,
+      [EMenuItemKey.AppStore]: EMenuItemKey.AppsStoreHome,
+      [EMenuItemKey.AppsStoreHome]: EMenuItemKey.AppStore,
+    };
+    if (Object.keys(subMenuItems).includes(currentMenuItem as EMenuItemKey)) {
+      setCurrentMenuItem(subMenuItems[currentMenuItem]);
+    }
+  }
+
   function handleNavigation(menuItem: IMenuItem, key?: string) {
     if (menuItem.title === EMenuItem.StudioMode) {
       // if studio mode, toggle studio mode
@@ -276,7 +290,7 @@ export default function SideNav() {
                       !isOpen && styles.closed,
                       !isOpen && currentMenuItem === menuItem.key && styles.active,
                     )}
-                    applystyles={isOpen}
+                    applystyles={+isOpen}
                   >
                     {studioTabs.map(tab => (
                       <Menu.Item
@@ -301,9 +315,9 @@ export default function SideNav() {
                     title={menuTitles(menuItem.title)}
                     icon={
                       menuItem?.icon && (
-                        <div>
-                          <i className={menuItem.icon} />
-                        </div>
+                        // <div>
+                        <i className={menuItem.icon} />
+                        // </div>
                       )
                     }
                     onTitleClick={() => {
@@ -316,7 +330,7 @@ export default function SideNav() {
                       !isOpen && styles.closed,
                       currentMenuItem === menuItem.key && styles.active,
                     )}
-                    applystyles={isOpen}
+                    applystyles={+isOpen}
                   >
                     {menuItem?.subMenuItems?.map((subMenuItem: IMenuItem) => (
                       <Menu.Item
@@ -424,6 +438,7 @@ export default function SideNav() {
         )}
         onClick={() => {
           showNewBadge && dismiss(EDismissable.NewSideNav);
+          updateSubMenu();
           toggleMenuStatus();
           updateStyleBlockers('main', true); // hide style blockers
         }}

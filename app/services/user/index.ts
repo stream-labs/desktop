@@ -850,10 +850,13 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
       return validatePlatformResult;
     }
 
-    if (this.sideNavService.views.hasLegacyMenu) {
-      this.sideNavService.setLegacyView();
-    } else {
+    if (!this.sideNavService.views.hasLegacyMenu) {
       this.sideNavService.setNewUserLogin();
+    } else if (
+      this.sideNavService.views.hasLegacyMenu &&
+      this.dismissablesService.views.shouldShow(EDismissable.NewSideNav)
+    ) {
+      this.sideNavService.setLegacyView();
     }
 
     this.dismissablesService.dismiss(EDismissable.LoginPrompt);
