@@ -5,14 +5,14 @@ import styles from './SubMenu.m.less';
 interface ISubMenuProps extends SubMenuProps, MenuItemProps {
   title?: string;
   style?: CSSProperties;
-  applyStyles?: boolean;
+  applystyles?: boolean;
 }
 
 export default function SubMenu(p: ISubMenuProps) {
-  const { title, style, applyStyles } = p;
+  const { title, style, applystyles } = p;
 
   return (
-    <div title={title} className={applyStyles && styles.submenuWrapper} style={style}>
+    <div title={title} className={applystyles && styles.submenuWrapper} style={style}>
       <Menu.SubMenu {...p}>{p.children}</Menu.SubMenu>
     </div>
   );

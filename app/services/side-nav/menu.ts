@@ -98,10 +98,8 @@ export class SideNavService extends PersistentStatefulService<ISideNavServiceSta
       this.userService.state.createdAt < new Date('October 12, 2022').valueOf();
 
     if (loggedIn) {
-      console.log('loggedIn');
       this.dismissablesService.dismiss(EDismissable.LoginPrompt);
       if (legacyMenu && !this.appService.state.onboarded) {
-        console.log('onboarded');
         // show for legacy user's first startup after new side nav date
         this.dismissablesService.views.shouldShow(EDismissable.NewSideNav);
         this.dismissablesService.views.shouldShow(EDismissable.CustomMenuSettings);
@@ -111,24 +109,18 @@ export class SideNavService extends PersistentStatefulService<ISideNavServiceSta
       }
     } else {
       // the user is not logged in
-      console.log('not loggedIn');
       if (legacyMenu) {
-        console.log('legacy');
         this.dismissablesService.dismiss(EDismissable.LoginPrompt);
         if (!this.appService.state.onboarded) {
-          console.log('legacy not onboarded');
           this.dismissablesService.views.shouldShow(EDismissable.NewSideNav);
           this.dismissablesService.views.shouldShow(EDismissable.CustomMenuSettings);
         } else {
-          console.log('legacy onboarded');
           this.dismissablesService.dismiss(EDismissable.NewSideNav);
           this.dismissablesService.dismiss(EDismissable.CustomMenuSettings);
         }
       } else {
-        console.log('else');
         if (this.state.hasLegacyMenu) {
           // this is a new user opening the app for the first time
-          console.log('huh?');
           this.state.hasLegacyMenu = false;
         }
         this.dismissablesService.views.shouldShow(EDismissable.LoginPrompt);
@@ -198,8 +190,6 @@ export class SideNavService extends PersistentStatefulService<ISideNavServiceSta
   private SET_NEW_USER_LOGIN() {
     // compact view with menu items expanded
     this.state.isOpen = true;
-    // this.state.showCustomEditor = false;
-    // this.state.compactView = true;
 
     this.state[ENavName.TopNav] = {
       ...this.state[ENavName.TopNav],

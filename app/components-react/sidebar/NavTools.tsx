@@ -171,7 +171,7 @@ export default function SideNav() {
                   !isOpen && throttledOpenDashboard();
                   expandMenuItem(ENavName.BottomNav, menuItem.key as EMenuItemKey);
                 }}
-                applyStyles={isOpen}
+                applystyles={isOpen}
               >
                 {menuItem?.subMenuItems.map((subMenuItem: IMenuItem) => (
                   <Menu.Item
