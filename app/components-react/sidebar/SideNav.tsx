@@ -59,7 +59,6 @@ export default function SideNav() {
 
   function navigateApp(appId: string, key?: string) {
     NavigationService.actions.navigate('PlatformAppMainPage', { appId });
-    LayoutService.actions.setCurrentTab(appId);
     setCurrentMenuItem(key ?? appId);
   }
 
