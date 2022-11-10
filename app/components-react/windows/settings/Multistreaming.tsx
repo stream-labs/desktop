@@ -49,7 +49,6 @@ export function MultistreamingSettings() {
                 >
                   <u slot="general" />
                 </Translate>
-                {/* {$t('Step 2: Ensure the \"Confirm stream title and game before going live\" option is checked in the General settings tab.')} */}
               </li>
               <li>
                 {/* eslint-disable-next-line no-useless-escape */}
