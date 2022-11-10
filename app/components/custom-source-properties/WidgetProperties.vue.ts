@@ -48,6 +48,7 @@ export default class WidgetProperties extends Vue {
       [WidgetType.StreamBoss]: 'streamboss',
       [WidgetType.Credits]: 'credits',
       [WidgetType.SpinWheel]: 'wheel',
+      [WidgetType.CustomWidget]: 'customwidget',
     }[widgetType.toString()];
 
     this.disabled = true;
