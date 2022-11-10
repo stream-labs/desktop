@@ -265,7 +265,12 @@ export default function SideNav() {
                       key={tab.key}
                       className={cx(
                         !isOpen && styles.closed,
-                        currentTab === tabs[tab.key] && styles.active,
+                        (([EMenuItemKey.Editor as string, tab?.key, `sub-${tab?.key}`].includes(
+                          currentMenuItem,
+                        ) &&
+                          currentTab === tabs[tab?.key]) ||
+                          currentMenuItem === tab?.key) &&
+                          styles.active,
                       )}
                       title={tab.title}
                       icon={<i className={tab.icon} />}
@@ -294,7 +299,14 @@ export default function SideNav() {
                     {studioTabs.map(tab => (
                       <Menu.Item
                         key={`sub-${tab.key}`}
-                        className={cx(currentTab === tabs[tab.key] && styles.active)}
+                        className={cx(
+                          (([EMenuItemKey.Editor as string, tab?.key, `sub-${tab?.key}`].includes(
+                            currentMenuItem,
+                          ) &&
+                            currentTab === tabs[tab?.key]) ||
+                            currentMenuItem === `sub-${tab?.key}`) &&
+                            styles.active,
+                        )}
                         title={tab.title}
                         icon={<i className={tab.icon} />}
                         onClick={() =>
@@ -347,9 +359,7 @@ export default function SideNav() {
                           app && (
                             <Menu.Item
                               key={app?.id}
-                              className={cx(
-                                currentMenuItem === menuItem?.key ? styles.active : undefined,
-                              )}
+                              className={cx(currentMenuItem === app?.id && styles.active)}
                               title={app.manifest?.name}
                               onClick={() => app?.id && navigateApp(app?.id)}
                             >
