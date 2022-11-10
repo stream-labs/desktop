@@ -186,5 +186,7 @@
   "font_family_tooltip": "Písmo Google, které se má použít pro text. Navštivte stránku http://google.com/fonts a najděte jej! Populární písma: Open Sans, Roboto, Oswald, Lato, Droid Sans.",
   "Something went wrong while applying settings": "Při použití nastavení došlo k chybě",
   "Superchat Goal": "Cíl Superchatu",
-  "YouTube Superchats": "Superchaty YouTube"
+  "YouTube Superchats": "Superchaty YouTube",
+  "Custom Widget": "Custom Widget",
+  "Use HTML, CSS, and JavaScript to create a widget with custom functionality": "Use HTML, CSS, and JavaScript to create a widget with custom functionality"
 }
