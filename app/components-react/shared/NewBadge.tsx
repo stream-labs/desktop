@@ -1,5 +1,5 @@
 import React, { CSSProperties } from 'react';
-import styles from './NewButton.m.less';
+import styles from './NewBadge.m.less';
 import { EDismissable } from 'services/dismissables';
 import { Services } from 'components-react/service-provider';
 import { useVuex } from 'components-react/hooks';
@@ -13,7 +13,7 @@ interface INewButtonProps {
   style?: CSSProperties;
 }
 
-export default function HelpTip({
+export default function NewButton({
   dismissableKey,
   size = 'standard',
   absolute = false,

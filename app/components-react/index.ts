@@ -62,7 +62,7 @@ import PlatformAppMainPage from './pages/PlatformAppMainPage';
 import PlatformAppPageView from './shared/PlatformAppPageView';
 import PlatformAppPopOut from './windows/PlatformAppPopOut';
 import RecentEventsWindow from './windows/RecentEvents';
-import NewBadge from './shared/NewButton';
+import NewBadge from './shared/NewBadge';
 
 // list of React components to be used inside Vue components
 export const components = {

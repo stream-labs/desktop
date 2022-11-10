@@ -21,7 +21,7 @@ import styles from './SideNav.m.less';
 import { Menu, Layout, Button } from 'antd';
 import Scrollable from 'components-react/shared/Scrollable';
 import HelpTip from 'components-react/shared/HelpTip';
-import NewButton from 'components-react/shared/NewButton';
+import NewBadge from 'components-react/shared/NewBadge';
 import SubMenu from 'components-react/shared/SubMenu';
 import { EDismissable } from 'services/dismissables';
 
@@ -446,7 +446,7 @@ export default function SideNav() {
       </Button>
 
       {/* if it's a legacy menu, show new badge*/}
-      <NewButton
+      <NewBadge
         dismissableKey={EDismissable.NewSideNav}
         size="small"
         absolute
