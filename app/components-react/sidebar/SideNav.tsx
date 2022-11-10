@@ -225,9 +225,10 @@ export default function SideNav() {
             forceSubMenuRender
             mode="inline"
             className={cx(
-              styles.menuContainer,
+              styles.topNav,
               isOpen && styles.open,
-              !isOpen && (styles.siderClosed, styles.menuWrapper),
+              !isOpen && styles.siderClosed && styles.closed,
+              // !isOpen && (styles.siderClosed, styles.menuWrapper),
             )}
             defaultOpenKeys={openMenuItems && openMenuItems}
             defaultSelectedKeys={[EMenuItem.Editor]}
@@ -251,7 +252,7 @@ export default function SideNav() {
                     <Menu.Item
                       key={tab.key}
                       className={cx(
-                        styles.sidenavItem,
+                        // styles.sidenavItem,
                         !isOpen && styles.closed,
                         currentTab === tabs[tab.key] && styles.active,
                       )}
@@ -263,46 +264,40 @@ export default function SideNav() {
                     </Menu.Item>
                   ))
                 ) : (
-                  <div
-                    key={`wrap-${menuItem.key}`}
+                  <SubMenu
+                    key={menuItem.key}
                     title={menuTitles(menuItem.title)}
-                    className={cx(styles.submenuWrapper, !isOpen && styles.wrapperHidden)}
+                    icon={menuItem?.icon && <i className={menuItem.icon} />}
+                    onTitleClick={() => {
+                      !isOpen &&
+                        menuItem?.subMenuItems[0]?.target &&
+                        handleNavigation(menuItem?.subMenuItems[0], menuItem.key);
+                      expandMenuItem(ENavName.TopNav, menuItem.key as EMenuItemKey);
+                    }}
+                    className={cx(
+                      !isOpen && styles.closed,
+                      // !isOpen && menuItem.isExpanded && styles.hideSubMenu,
+                      !isOpen && currentMenuItem === menuItem.key && styles.active,
+                    )}
+                    applyStyles={isOpen}
                   >
-                    <SubMenu
-                      key={menuItem.key}
-                      title={menuTitles(menuItem.title)}
-                      icon={menuItem?.icon && <i className={menuItem.icon} />}
-                      onTitleClick={() => {
-                        !isOpen &&
-                          menuItem?.subMenuItems[0]?.target &&
-                          handleNavigation(menuItem?.subMenuItems[0], menuItem.key);
-                        expandMenuItem(ENavName.TopNav, menuItem.key as EMenuItemKey);
-                      }}
-                      className={cx(
-                        !isOpen && styles.closed,
-                        !isOpen && menuItem.isExpanded && styles.hideSubMenu,
-                        !isOpen && currentMenuItem === menuItem.key && styles.active,
-                      )}
-                      aria-label={menuTitles(menuItem.title)}
-                    >
-                      {studioTabs.map(tab => (
-                        <Menu.Item
-                          key={`sub-${tab.key}`}
-                          className={cx(
-                            styles.sidenavItem,
-                            currentTab === tabs[tab.key] && styles.active,
-                          )}
-                          title={tab.title}
-                          icon={<i className={tab.icon} />}
-                          onClick={() =>
-                            navigateToStudioTab(tab.target, tab.trackingTarget, `sub-${tab.key}`)
-                          }
-                        >
-                          {tab.title}
-                        </Menu.Item>
-                      ))}
-                    </SubMenu>
-                  </div>
+                    {studioTabs.map(tab => (
+                      <Menu.Item
+                        key={`sub-${tab.key}`}
+                        className={cx(
+                          // styles.sidenavItem,
+                          currentTab === tabs[tab.key] && styles.active,
+                        )}
+                        title={tab.title}
+                        icon={<i className={tab.icon} />}
+                        onClick={() =>
+                          navigateToStudioTab(tab.target, tab.trackingTarget, `sub-${tab.key}`)
+                        }
+                      >
+                        {tab.title}
+                      </Menu.Item>
+                    ))}
+                  </SubMenu>
                 );
               } else {
                 // otherwise, show a menu item or a menu item with a submenu
@@ -310,7 +305,13 @@ export default function SideNav() {
                   <SubMenu
                     key={menuItem.key}
                     title={menuTitles(menuItem.title)}
-                    icon={menuItem?.icon && <i className={menuItem.icon} />}
+                    icon={
+                      menuItem?.icon && (
+                        <div>
+                          <i className={menuItem.icon} />
+                        </div>
+                      )
+                    }
                     onTitleClick={() => {
                       menuItem?.subMenuItems[0]?.target &&
                         !isOpen &&
@@ -321,13 +322,14 @@ export default function SideNav() {
                       !isOpen && styles.closed,
                       currentMenuItem === menuItem.key && styles.active,
                     )}
+                    applyStyles={isOpen}
                   >
                     {menuItem?.subMenuItems?.map((subMenuItem: IMenuItem) => (
                       <Menu.Item
                         key={subMenuItem.key}
                         className={cx(
-                          styles.sidenavItem,
-                          !isOpen && menuItem.isExpanded && styles.hideSubMenu,
+                          // styles.sidenavItem,
+                          // !isOpen && menuItem.isExpanded && styles.hideSubMenu,
                           currentMenuItem === subMenuItem?.key && styles.active,
                         )}
                         title={menuTitles(subMenuItem.title)}
@@ -343,8 +345,8 @@ export default function SideNav() {
                             <Menu.Item
                               key={app?.id}
                               className={cx(
-                                styles.sidenavItem,
-                                !isOpen && menuItem.isExpanded && styles.hideSubMenu,
+                                // styles.sidenavItem,
+                                // !isOpen && menuItem.isExpanded && styles.hideSubMenu,
                                 currentMenuItem === menuItem?.key && styles.active,
                               )}
                               title={app.manifest?.name}
@@ -359,7 +361,7 @@ export default function SideNav() {
                   <Menu.Item
                     key={menuItem.key}
                     className={cx(
-                      styles.sidenavItem,
+                      // styles.sidenavItem,
                       !isOpen && styles.closed,
                       menuItem.title === EMenuItem.StudioMode && studioMode && styles.studioMode,
                       currentMenuItem === menuItem.key && styles.active,
@@ -385,7 +387,7 @@ export default function SideNav() {
                     <Menu.Item
                       key={app?.id}
                       className={cx(
-                        styles.sidenavItem,
+                        // styles.sidenavItem,
                         !isOpen && styles.closed,
                         isOpen && styles.open,
                         currentMenuItem === app?.id && styles.active,

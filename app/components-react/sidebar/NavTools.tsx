@@ -171,13 +171,12 @@ export default function SideNav() {
                   !isOpen && throttledOpenDashboard();
                   expandMenuItem(ENavName.BottomNav, menuItem.key as EMenuItemKey);
                 }}
-                className={styles.badgeScale}
+                applyStyles={isOpen}
               >
                 {menuItem?.subMenuItems.map((subMenuItem: IMenuItem) => (
                   <Menu.Item
                     key={subMenuItem.key}
                     title={menuTitles(subMenuItem.title)}
-                    className={cx(!isOpen && menuItem.isExpanded && styles.hideSubMenu)}
                     onClick={() => throttledOpenDashboard(subMenuItem?.type)}
                   >
                     {menuTitles(subMenuItem.title)}

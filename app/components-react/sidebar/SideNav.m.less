@@ -2,6 +2,16 @@
 @import '../../styles/mixins';
 @import '../../styles/badges';
 
+body:last-child {
+  :global(div.ant-tooltip) {
+    display: none;
+  }
+
+  :global(div.ant-menu-submenu.ant-menu-submenu-popup.ant-menu) {
+    display: none;
+  }
+}
+
 .sidenav-sider {
   position: relative;
   z-index: 1002; // allows logout confirmation modal to show above resize bars
@@ -73,10 +83,10 @@ button.sidenav-button {
       }
     }
   }
-}
 
-.flipped {
-  transform: scaleX(-1);
+  &.flipped {
+    transform: scaleX(-1);
+  }
 }
 
 .sider-closed {
@@ -85,25 +95,9 @@ button.sidenav-button {
   max-width: 50px !important;
 }
 
-.menu-container {
+.top-nav {
   flex: 1 1 auto;
   border-right: 0px !important;
-
-  :global(.ant-menu-item-icon) {
-    i {
-      font-size: 18px !important;
-    }
-  }
-
-  &.menu-wrapper {
-    :global(.ant-menu-item:hover),
-    :global(.ant-menu-submenu:hover) {
-      i {
-        transition: all 0.2s ease-in-out;
-        transform: scale(1.2, 1.2);
-      }
-    }
-  }
 
   :global(li.ant-menu-item.ant-menu-item-selected),
   :global(li.ant-menu-submenu.ant-menu-item-selected) {
@@ -125,36 +119,34 @@ button.sidenav-button {
     overflow-wrap: break-word !important;
     padding-bottom: 0px;
 
-    i {
-      color: var(--paragraph);
-    }
-
     :active,
     :link,
     :focus,
     :visited {
       background: none;
     }
-
-    :hover {
-      color: var(--title) !important;
-    }
   }
 
   &.closed {
-    :global(.ant-menu-item:hover),
-    :global(.ant-menu-submenu:hover) {
+    :global(.ant-menu-item-icon) {
       i {
-        transition: all 0.2s ease-in-out;
-        transform: scale(1.2, 1.2);
+        font-size: 18px;
       }
     }
 
-    :global(span.ant-menu-title-content) {
-      display: none !important;
+    :global(.ant-menu-item:hover),
+    :global(.ant-menu-submenu:hover) {
+      i {
+        transition: all 0.2s ease-in-out !important;
+        transform: scale(1.2, 1.2) !important;
+      }
     }
 
     :global(i.ant-menu-submenu-arrow) {
+      display: none !important;
+    }
+
+    :global(span.ant-menu-title-content) {
       display: none !important;
     }
   }
@@ -189,55 +181,9 @@ button.sidenav-button {
   }
 }
 
-.hide-submenu {
-  display: none;
-}
-
-.ant-menu-inline-collapsed-tooltip {
-  display: none;
-}
-
 .app-icons {
   border-radius: 50%;
   width: 25px;
   height: 25px;
   transform: translate(-18%, 0%);
-}
-
-.submenu-wrapper {
-  padding-left: 24px;
-
-  &.wrapper-hidden {
-    padding-left: 0px;
-  }
-}
-
-// @@@ TODO: remove
-.sub-menu {
-  :global(li.ant-menu-item),
-  :global(li.ant-menu-submenu) {
-    background: none;
-    color: var(--paragraph);
-    height: unset !important;
-    min-height: 30px !important;
-    line-height: normal !important;
-    margin: 10px 0 !important;
-    overflow-wrap: break-word !important;
-    padding-bottom: 0px;
-
-    i {
-      color: var(--paragraph);
-    }
-
-    :active,
-    :link,
-    :focus,
-    :visited {
-      background: none;
-    }
-
-    :hover {
-      color: var(--title) !important;
-    }
-  }
 }

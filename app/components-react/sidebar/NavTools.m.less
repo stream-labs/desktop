@@ -2,38 +2,15 @@
 @import '../../styles/mixins';
 @import '../../styles/badges';
 
-body:last-child {
-  :global(div.ant-tooltip) {
-    display: none;
-  }
-}
-
-body > div > div {
-  :global(div.ant-menu-submenu.ant-menu-submenu-popup.ant-menu) {
-    display: none;
-  }
-}
-
 .bottom-nav {
   margin-bottom: 10px !important;
   justify-self: flex-end;
   border-right: 0px !important;
   border-top: 2px solid var(--nav-divider);
 
-  :global(.ant-menu-item-icon) {
-    i:not(.link-badge) {
-      font-size: 18px !important;
-    }
-  }
-
   :global(li.ant-menu-item.ant-menu-item-selected),
   :global(li.ant-menu-submenu.ant-menu-item-selected) {
     background: none;
-    color: var(--paragraph) !important;
-
-    i:not(.platform-logo) {
-      color: var(--paragraph) !important;
-    }
 
     &::after {
       display: none;
@@ -51,24 +28,22 @@ body > div > div {
     overflow-wrap: break-word !important;
     padding-bottom: 0px;
 
-    i {
-      color: var(--paragraph);
-    }
-
     :active,
     :link,
     :focus,
     :visited {
       background: none;
     }
-
-    :hover {
-      color: var(--title) !important;
-    }
   }
 
   &.closed {
     border-top: 0px;
+
+    :global(.ant-menu-item-icon) {
+      i:not(.link-badge) {
+        font-size: 18px;
+      }
+    }
 
     :global(.ant-menu-item:hover),
     :global(.ant-menu-submenu:hover) {
@@ -89,11 +64,6 @@ body > div > div {
       }
     }
 
-    :global(div.ant-menu-submenu-title) {
-      margin: 20px 0;
-      overflow: visible;
-    }
-
     :global(span.ant-menu-title-content) {
       display: none !important;
     }
@@ -112,20 +82,6 @@ body > div > div {
       padding-bottom: 0px;
       white-space: normal !important;
     }
-  }
-
-  :global(div.ant-menu-submenu-title) {
-    height: unset !important;
-    min-height: 30px !important;
-    line-height: normal !important;
-    margin: 5px 0;
-  }
-
-  :global(span.ant-menu-title-content) {
-    overflow: unset !important;
-    text-overflow: unset !important;
-    white-space: normal !important;
-    overflow-wrap: break-word;
   }
 }
 
@@ -176,67 +132,64 @@ body > div > div {
   &.login-closed::before {
     width: 30px;
   }
-}
 
-.login > span {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
+  .platform-logo {
+    margin-right: 10px;
 
-  &:hover {
-    color: var(--title);
-    i:not(.platform-logo) {
-      transform: scale(1.2, 1.2);
-      transition: all 0.2s ease-in-out;
+    &-twitch {
+      color: var(--twitch) !important;
+    }
+    &-youtube {
+      color: var(--youtube) !important;
+    }
+    &-facebook {
+      color: var(--facebook) !important;
+    }
+    &-trovo {
+      width: 15px;
+      height: 15px;
+    }
+    &-tiktok {
+      color: var(--tiktok) !important;
+    }
+    &-streamlabs {
+      color: var(--teal) !important;
+    }
+    &-default {
+      color: var(--logged-in) !important;
     }
   }
-}
 
-.platform-logo {
-  margin-right: 10px;
+  .username {
+    margin-bottom: 0px;
+    flex-grow: 1;
+    line-height: 20px;
+    margin: 2px 0 0 0;
+  }
 
-  &-twitch {
-    color: var(--twitch) !important;
+  .login-arrow {
+    justify-self: flex-end;
+    margin-left: 5px;
+    transform: scaleX(-1);
+    -moz-transform: scaleX(-1);
+    -webkit-transform: scaleX(-1);
+    -ms-transform: scaleX(-1);
+    transition: all 0.2s ease-in-out;
   }
-  &-youtube {
-    color: var(--youtube) !important;
-  }
-  &-facebook {
-    color: var(--facebook) !important;
-  }
-  &-trovo {
-    width: 15px;
-    height: 15px;
-  }
-  &-tiktok {
-    color: var(--tiktok) !important;
-  }
-  &-streamlabs {
-    color: var(--teal) !important;
-  }
-  &-default {
-    color: var(--logged-in) !important;
-  }
-}
 
-.username {
-  margin-bottom: 0px;
-  flex-grow: 1;
-  line-height: 20px;
-  margin: 2px 0 0 0;
-}
+  > span {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
 
-.login-arrow {
-  justify-self: flex-end;
-  margin-left: 5px;
-  transform: scaleX(-1);
-  -moz-transform: scaleX(-1);
-  -webkit-transform: scaleX(-1);
-  -ms-transform: scaleX(-1);
-}
-
-.hide-submenu {
-  display: none;
+    &:hover {
+      color: var(--title);
+      i:not(.platform-logo) {
+        transform: scale(1.2, 1.2);
+        transition: all 0.4s ease;
+      }
+    }
+  }
 }
 
 .logged-out {
