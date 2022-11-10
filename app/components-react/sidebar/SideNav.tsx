@@ -63,7 +63,7 @@ export default function SideNav() {
   }
 
   function navigateToStudioTab(tabId: string, trackingTarget: string, key: string) {
-    if (currentTab !== tabs[tabId]) {
+    if (currentMenuItem !== key) {
       NavigationService.actions.navigate('Studio', { trackingTarget });
       LayoutService.actions.setCurrentTab(tabId);
       setCurrentMenuItem(key);
