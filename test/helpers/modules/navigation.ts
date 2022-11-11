@@ -2,5 +2,5 @@ import { click, focusMain } from './core';
 
 export async function showPage(page: string) {
   await focusMain();
-  await click(`.side-nav div[title="${page}"]`);
+  await click(`.side-nav li[title="${page}"]`);
 }
