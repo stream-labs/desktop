@@ -219,20 +219,19 @@ export default function SideNav() {
   const themeAuditEnabled = featureIsEnabled(EAvailableFeatures.themeAudit);
 
   return (
-    <Layout hasSider className="sidenav">
+    <Layout hasSider className="side-nav">
       <Sider
         collapsible
         collapsed={!isOpen}
         trigger={null}
         className={cx(
-          styles.sidenav,
           styles.sidenavSider,
           !isOpen && styles.siderClosed,
           !leftDock && styles.noLeftDock,
         )}
         ref={sider}
       >
-        <Scrollable className={cx(styles.sidenav, styles.sidenavScroll)}>
+        <Scrollable className={cx(styles.sidenavScroll)}>
           <Menu
             key={ENavName.TopNav}
             forceSubMenuRender
@@ -439,7 +438,6 @@ export default function SideNav() {
       <Button
         type="primary"
         className={cx(
-          styles.sidenav,
           styles.sidenavButton,
           !isOpen && styles.flipped,
           isOpen && styles.siderOpen,
