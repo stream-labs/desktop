@@ -1,8 +1,12 @@
-import { StatefulService, InitAfter, ViewHandler, mutation } from 'services/core';
-import { PersistentStatefulService } from 'services/core/persistent-stateful-service';
+import { PersistentStatefulService, InitAfter, ViewHandler, mutation } from 'services/core';
+import {
+  TDualOutputPlatformSettings,
+  DualOutputPlatformSettings,
+  EDualOutputPlatform,
+  TOutputDisplayType,
+  IDualOutputPlatformSetting,
+} from './dual-output-data';
 import * as obs from '../../../obs-api';
-
-export type TOutputDisplayType = 'horizontal' | 'vertical';
 
 // @@@ TODO: export?
 // interface IDualOutput {
@@ -10,6 +14,7 @@ export type TOutputDisplayType = 'horizontal' | 'vertical';
 // }
 
 interface IDualOutputServiceState {
+  platformSettings: TDualOutputPlatformSettings;
   horizontalContext: obs.IVideo;
   verticalContext: obs.IVideo;
   isHorizontalActive: boolean;
@@ -29,11 +34,20 @@ class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
   get isVerticalActive() {
     return this.state.isVerticalActive;
   }
+
+  get platformSettings() {
+    return this.state.platformSettings;
+  }
+
+  get platformSettingsList(): IDualOutputPlatformSetting[] {
+    return Object.values(this.state.platformSettings);
+  }
 }
 
 @InitAfter('UserService')
-export class DualOutputService extends StatefulService<IDualOutputServiceState> {
-  static initialState: IDualOutputServiceState = {
+export class DualOutputService extends PersistentStatefulService<IDualOutputServiceState> {
+  static defaultState: IDualOutputServiceState = {
+    platformSettings: DualOutputPlatformSettings,
     horizontalContext: null,
     verticalContext: null,
     dualOutputMode: false,
@@ -79,6 +93,10 @@ export class DualOutputService extends StatefulService<IDualOutputServiceState> 
     this.TOGGLE_HORIZONTAL_VISIBILITY(status);
   }
 
+  updatePlatformSetting(platform: EDualOutputPlatform | string, setting: TOutputDisplayType) {
+    this.UPDATE_PLATFORM_SETTING(platform, setting);
+  }
+
   @mutation()
   private SET_DUAL_OUTPUT_MODE(status: boolean) {
     this.state.dualOutputMode = status;
@@ -121,5 +139,16 @@ export class DualOutputService extends StatefulService<IDualOutputServiceState> 
     } else {
       this.state.isVerticalActive = status;
     }
+  }
+
+  @mutation()
+  private UPDATE_PLATFORM_SETTING(
+    platform: EDualOutputPlatform | string,
+    setting: TOutputDisplayType,
+  ) {
+    this.state.platformSettings[platform] = {
+      ...this.state.platformSettings[platform],
+      setting,
+    };
   }
 }

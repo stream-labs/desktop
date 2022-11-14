@@ -172,5 +172,13 @@
   "Step 2: Ensure the \"Confirm stream title and game before going live\" option is checked in the <general>General</general> settings tab.": "Step 2: Ensure the \"Confirm stream title and game before going live\" option is checked in the <general>General</general> settings tab.",
   "Step 3: Select which platforms you are streaming to when you hit \"Go Live\".": "Step 3: Select which platforms you are streaming to when you hit \"Go Live\".",
   "New features coming soon!": "New features coming soon!",
-  "Stream to multiple platforms at once with <ultra>Streamlabs Ultra</ultra>.": "Stream to multiple platforms at once with <ultra>Streamlabs Ultra</ultra>."
+  "Stream to multiple platforms at once with <ultra>Streamlabs Ultra</ultra>.": "Stream to multiple platforms at once with <ultra>Streamlabs Ultra</ultra>.",
+  "Dual Output": "Dual Output",
+  "Enable Dual Outputs (simultaneous horizontal and vertical Outputs)": "Enable Dual Outputs (simultaneous horizontal and vertical Outputs)",
+  "Dual Output Settings": "Dual Output Settings",
+  "Set your default output mode for each platform.": "Set your default output mode for each platform.",
+  "Set Dual Output Settings": "Set Dual Output Settings",
+  "Mode:": "Mode:",
+  "Landscape": "Landscape",
+  "Portrait": "Portrait"
 }
