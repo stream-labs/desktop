@@ -162,7 +162,7 @@ export default function BrowserView(p: BrowserViewProps) {
           justifyContent: 'center',
         }}
       >
-        <Spinner visible relative />
+        <Spinner visible pageLoader />
       </div>
     );
   }
