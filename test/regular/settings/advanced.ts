@@ -12,7 +12,7 @@ test('Populates advanced settings', async t => {
       'Process Priority': 'Normal',
       'Color Format': 'NV12 (8-bit, 4:2:0, 2 planes)',
       'YUV Color Space': 'Rec. 709',
-      'YUV Color Range': 'Limited',
+      'YUV Color Range': 'Partial',
       'Force GPU as render device': true,
       'Audio Monitoring Device': 'Default',
       'Disable Windows audio ducking': true,

@@ -228,8 +228,20 @@
   "FPSDen": "FPSDen",
   "Integer FPS Values": "Integer FPS Values",
   "Fractional FPS Values": "Fractional FPS Values",
+  "Full": "Full",
+  "Partial": "Partial",
+  "Above Normal": "Above Normal",
+  "Below Normal": "Below Normal",
+  "Idle": "Idle",
   "FPS Numerator": "FPS Numerator",
   "FPS Denominator": "FPS Denominator",
   "FPS Value": "FPS Value",
-  "The resolution must be in the format [width]x[height] (i.e. 1920x1080)": "The resolution must be in the format [width]x[height] (i.e. 1920x1080)"
+  "The resolution must be in the format [width]x[height] (i.e. 1920x1080)": "The resolution must be in the format [width]x[height] (i.e. 1920x1080)",
+  "Max Bitrate": "Max Bitrate",
+  "CQ Level": "CQ Level",
+  "Preset": "Preset",
+  "Look-ahead": "Look-ahead",
+  "Psycho Visual Tuning": "Psycho Visual Tuning",
+  "GPU": "GPU",
+  "Max B-frames": "Max B-frames"
 }
