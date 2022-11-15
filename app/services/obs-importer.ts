@@ -48,6 +48,9 @@ interface IOBSConfigSceneItem {
   bounds: IVec2;
   bounds_align: number;
   bounds_type: number;
+  blend_type: string;
+  blend_method: string;
+  scale_filter: string;
 }
 
 interface IOBSConfigSource {
@@ -66,6 +69,8 @@ interface IOBSConfigSource {
   monitoring_type: number;
   sync: number;
   flags: number;
+  deinterlace_mode: number;
+  deinterlace_field_order: number;
 }
 
 interface IOBSConfigTransition {
@@ -241,6 +246,8 @@ export class ObsImporterService extends StatefulService<{ progress: number; tota
                 propertiesManager,
                 propertiesManagerSettings,
                 channel: sourceJSON.channel !== 0 ? sourceJSON.channel : void 0,
+                deinterlaceMode: sourceJSON.deinterlace_mode,
+                deinterlaceFieldOrder: sourceJSON.deinterlace_field_order,
               },
             );
 
@@ -344,6 +351,90 @@ export class ObsImporterService extends StatefulService<{ progress: number; tota
                   }
                 }
 
+                let blendingMode: obs.EBlendingMode;
+                switch (item.blend_type) {
+                  case 'normal': {
+                    blendingMode = obs.EBlendingMode.Normal;
+                    break;
+                  }
+                  case 'additive': {
+                    blendingMode = obs.EBlendingMode.Additive;
+                    break;
+                  }
+                  case 'subtract': {
+                    blendingMode = obs.EBlendingMode.Substract;
+                    break;
+                  }
+                  case 'screen': {
+                    blendingMode = obs.EBlendingMode.Screen;
+                    break;
+                  }
+                  case 'multiply': {
+                    blendingMode = obs.EBlendingMode.Multiply;
+                    break;
+                  }
+                  case 'lighten': {
+                    blendingMode = obs.EBlendingMode.Lighten;
+                    break;
+                  }
+                  case 'darken': {
+                    blendingMode = obs.EBlendingMode.Darken;
+                    break;
+                  }
+                  default: {
+                    blendingMode = obs.EBlendingMode.Normal;
+                    break;
+                  }
+                }
+
+                let blendingMethod: obs.EBlendingMethod;
+                switch (item.blend_method) {
+                  case 'default': {
+                    blendingMethod = obs.EBlendingMethod.Default;
+                    break;
+                  }
+                  case 'srgb_off': {
+                    blendingMethod = obs.EBlendingMethod.SrgbOff;
+                    break;
+                  }
+                  default: {
+                    blendingMethod = obs.EBlendingMethod.Default;
+                    break;
+                  }
+                }
+
+                let scaleFilter: obs.EScaleType;
+                switch (item.scale_filter) {
+                  case 'disable': {
+                    scaleFilter = obs.EScaleType.Disable;
+                    break;
+                  }
+                  case 'point': {
+                    scaleFilter = obs.EScaleType.Point;
+                    break;
+                  }
+                  case 'bilinear': {
+                    scaleFilter = obs.EScaleType.Bilinear;
+                    break;
+                  }
+                  case 'bicubic': {
+                    scaleFilter = obs.EScaleType.Bicubic;
+                    break;
+                  }
+                  case 'lanczos': {
+                    scaleFilter = obs.EScaleType.Lanczos;
+                    break;
+                  }
+                  case 'area': {
+                    scaleFilter = obs.EScaleType.Area;
+                    break;
+                  }
+                  default: {
+                    scaleFilter = obs.EScaleType.Disable;
+                    break;
+                  }
+                }
+
                 sceneItem.setSettings({
                   visible: item.visible,
                   transform: {
@@ -351,6 +442,9 @@ export class ObsImporterService extends StatefulService<{ progress: number; tota
                     scale,
                     position: pos,
                   },
+                  blendingMode,
+                  blendingMethod,
+                  scaleFilter,
                 });
               }
             });

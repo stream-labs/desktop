@@ -1,4 +1,5 @@
 {
   "Twitch Category": "Twitch 類別",
-  "Twitch Tags": "Twitch 標記"
+  "Twitch Tags": "Twitch 標記",
+  "Warning! Editing tags in Streamlabs will overwrite tags in Twitch. To use Twitch's new custom tags, you must edit your tags in the Twitch dashboard directly until Twitch provides third parties access to editing the new custom tags.": "警告！在 Streamlabs 中編輯標籤會覆寫 Twitch 中的標籤。若要使用 Twitch 的新自訂標籤，您必須直接在 Twitch 儀表板編輯您的標籤，直到 Twitch 允許第三方可使用對新標籤的編輯功能為止。"
 }

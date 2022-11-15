@@ -15,6 +15,7 @@ import { UsageStatisticsService } from 'services/usage-statistics';
 import fs from 'fs-extra';
 import path from 'path';
 import { AppService } from './app';
+import * as obs from '../../obs-api';
 
 // Maps to --background
 const THEME_BACKGROUNDS = {
@@ -165,6 +166,7 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
     this.setSettings(this.runMigrations(this.state, CustomizationService.migrations));
     this.setLiveDockCollapsed(true); // livedock is always collapsed on app start
     this.ensureCrashDumpFolder();
+    this.setObsTheme();
 
     this.userService.userLoginFinished.subscribe(() => this.setInitialLegacyAlertboxState());
 
@@ -203,6 +205,7 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
   }
 
   setTheme(theme: string) {
+    obs.NodeObs.OBS_content_setDayTheme(['day-theme', 'prime-light'].includes(theme));
     return this.setSettings({ theme });
   }
 
@@ -248,6 +251,10 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
 
   togglePerformanceMode() {
     this.setSettings({ performanceMode: !this.state.performanceMode });
+  }
+
+  setObsTheme() {
+    obs.NodeObs.OBS_content_setDayTheme(!this.isDarkTheme);
   }
 
   get themeOptions() {

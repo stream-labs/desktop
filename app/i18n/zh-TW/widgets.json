@@ -186,5 +186,7 @@
   "font_family_tooltip": "要使用於文字的 Google 字型。請造訪 https://fonts.google.com 尋找一個字型！常用的字型包括：Open Sans、Roboto、Oswald、Lato 和 Droid Sans。",
   "Something went wrong while applying settings": "套用錯誤時發生某些錯誤",
   "Superchat Goal": "超級聊天室目標",
-  "YouTube Superchats": "YouTube 超級聊天室"
+  "YouTube Superchats": "YouTube 超級聊天室",
+  "Custom Widget": "Custom Widget",
+  "Use HTML, CSS, and JavaScript to create a widget with custom functionality": "Use HTML, CSS, and JavaScript to create a widget with custom functionality"
 }

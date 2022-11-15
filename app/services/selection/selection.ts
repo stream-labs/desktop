@@ -11,8 +11,11 @@ import {
   ISceneItemSettings,
   ISceneItemNode,
   IPartialTransform,
+  EScaleType,
+  EBlendingMode,
+  EBlendingMethod,
 } from 'services/scenes';
-import { Source } from 'services/sources';
+import { EDeinterlaceFieldOrder, EDeinterlaceMode, Source } from 'services/sources';
 import { Rect } from 'util/rect';
 import { AnchorPoint, AnchorPositions, CenteringAxis } from 'util/ScalableRectangle';
 import { ISelectionState, TNodesList } from './index';
@@ -156,6 +159,31 @@ export class Selection {
   isSceneFolder(): boolean {
     const rootNodes = this.getRootNodes();
     return rootNodes.length === 1 && rootNodes[0].sceneNodeType === 'folder';
+  }
+
+  isScaleFilterSelected(filter: EScaleType): boolean {
+    const items = this.getItems().filter(item => item.scaleFilter === filter);
+    return items.length > 0;
+  }
+
+  isBlendingModeSelected(mode: EBlendingMode): boolean {
+    const items = this.getItems().filter(item => item.blendingMode === mode);
+    return items.length > 0;
+  }
+
+  isBlendingMethodSelected(method: EBlendingMethod): boolean {
+    const items = this.getItems().filter(item => item.blendingMethod === method);
+    return items.length > 0;
+  }
+
+  isDeinterlacingModeSelected(mode: EDeinterlaceMode): boolean {
+    const items = this.getItems().filter(item => item.source.deinterlaceMode === mode);
+    return items.length > 0;
+  }
+
+  isDeinterlacingFieldOrderSelected(order: EDeinterlaceFieldOrder): boolean {
+    const items = this.getItems().filter(item => item.source.deinterlaceFieldOrder === order);
+    return items.length > 0;
   }
 
   getVisualItems(): SceneItem[] {
@@ -432,6 +460,26 @@ export class Selection {
 
   resetTransform() {
     this.getItems().forEach(item => item.resetTransform());
+  }
+
+  setScaleFilter(filter: EScaleType) {
+    this.getItems().forEach(item => item.setScaleFilter(filter));
+  }
+
+  setBlendingMode(mode: EBlendingMode) {
+    this.getItems().forEach(item => item.setBlendingMode(mode));
+  }
+
+  setBlendingMethod(method: EBlendingMethod) {
+    this.getItems().forEach(item => item.setBlendingMethod(method));
+  }
+
+  setDeinterlaceMode(mode: EDeinterlaceMode) {
+    this.getItems().forEach(item => item.source.setDeinterlaceMode(mode));
+  }
+
+  setDeinterlaceFieldOrder(order: EDeinterlaceFieldOrder) {
+    this.getItems().forEach(item => item.source.setDeinterlaceFieldOrder(order));
   }
 
   /**

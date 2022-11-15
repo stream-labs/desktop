@@ -1,10 +1,18 @@
 import { Module, EApiPermissions, apiMethod, apiEvent, IApiContext } from './module';
-import { SourcesService, TSourceType, Source, TPropertiesManager } from 'services/sources';
+import {
+  SourcesService,
+  TSourceType,
+  Source,
+  TPropertiesManager,
+  EDeinterlaceMode,
+  EDeinterlaceFieldOrder,
+} from 'services/sources';
 import { Inject } from 'services/core/injector';
 import { Subject } from 'rxjs';
 import { PlatformAppsService } from 'services/platform-apps';
 import { ScenesService } from 'services/scenes';
 import { AudioService, IAudioSource } from 'services/audio';
+import path from 'path';
 
 interface ISourceFlags {
   audio: boolean;
@@ -31,6 +39,8 @@ interface ISource {
   muted?: boolean;
   volume?: number;
   monitoringType?: TMonitoringType;
+  deinterlaceMode: EDeinterlaceMode;
+  deinterlaceFieldOrder: EDeinterlaceFieldOrder;
 }
 
 export class SourcesModule extends Module {
@@ -215,6 +225,8 @@ export class SourcesModule extends Module {
         width: source.width,
         height: source.height,
       },
+      deinterlaceMode: source.deinterlaceMode,
+      deinterlaceFieldOrder: source.deinterlaceFieldOrder,
     };
 
     if (source.getPropertiesManagerType() === 'platformApp') {

@@ -37,6 +37,7 @@ type TAnalyticsEvent =
   | 'Highlighter'
   | 'Hardware'
   | 'WebcamUse'
+  | 'MicrophoneUse'
   | 'GuestCam';
 
 interface IAnalyticsEvent {

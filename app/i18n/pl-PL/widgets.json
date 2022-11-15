@@ -186,5 +186,7 @@
   "font_family_tooltip": "Czcionki Google do używania w tekście. Odwiedź stronę https://fonts.google.com, aby znaleźć swoją ulubioną czcionkę! Popularne czcionki: Open Sans, Roboto, Oswald, Lato i Droid Sans.",
   "Something went wrong while applying settings": "Coś poszło nie tak podczas zastosowywania ustawień",
   "Superchat Goal": "Cel super czatu",
-  "YouTube Superchats": "Super czaty na YouTube"
+  "YouTube Superchats": "Super czaty na YouTube",
+  "Custom Widget": "Custom Widget",
+  "Use HTML, CSS, and JavaScript to create a widget with custom functionality": "Use HTML, CSS, and JavaScript to create a widget with custom functionality"
 }

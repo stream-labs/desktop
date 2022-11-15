@@ -1,4 +1,4 @@
-import React, { HTMLAttributes } from 'react';
+import React, { CSSProperties, HTMLAttributes } from 'react';
 import * as pageComponents from './pages';
 import { useObsSettings } from './useObsSettings';
 import { ObsFormGroup } from '../../obs/ObsForm';
@@ -32,9 +32,11 @@ export function ObsGenericSettingsForm() {
 /**
  * A section layout for settings
  */
-export function ObsSettingsSection(p: HTMLAttributes<unknown> & { title?: string }) {
+export function ObsSettingsSection(
+  p: HTMLAttributes<unknown> & { title?: string; style?: CSSProperties },
+) {
   return (
-    <div className="section">
+    <div className="section" style={p.style}>
       {p.title && <h2>{p.title}</h2>}
       <div className="section-content">
         <Form layout="vertical">{p.children}</Form>

@@ -186,5 +186,7 @@
   "font_family_tooltip": "La police Google à utiliser pour le texte. Visitez http://google.com/fonts pour trouver celle qui vous convient! Polices populaires: Open Sans, Roboto, Oswald, Lato, Droid Sans.",
   "Something went wrong while applying settings": "Un problème est survenu lors de l'application des paramètres",
   "Superchat Goal": "Objectif super chat",
-  "YouTube Superchats": "Super chats YouTube"
+  "YouTube Superchats": "Super chats YouTube",
+  "Custom Widget": "Custom Widget",
+  "Use HTML, CSS, and JavaScript to create a widget with custom functionality": "Use HTML, CSS, and JavaScript to create a widget with custom functionality"
 }

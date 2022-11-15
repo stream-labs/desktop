@@ -266,4 +266,9 @@ export const SourceDisplayData = (): { [key: string]: ISourceDisplayData } => ({
     description: $t('Invite a guest to join your stream from a web browser.'),
     icon: 'icon-team-2',
   },
+  wasapi_process_output_capture: {
+    name: $t('Application Audio Capture (BETA)'),
+    description: $t('Capture the audio coming from a specific application.'),
+    icon: 'fas fa-user',
+  },
 });

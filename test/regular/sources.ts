@@ -126,8 +126,8 @@ test('Create/Remove Image Slideshow and view Source Properties', async t => {
   await waitForDisplayed('label=Visibility Behavior');
   await waitForDisplayed('label=Slide Mode');
   await waitForDisplayed('label=Transition');
-  await waitForDisplayed('label=Time Between Slides (milliseconds)');
-  await waitForDisplayed('label=Transition Speed (milliseconds)');
+  await waitForDisplayed('label=Time Between Slides');
+  await waitForDisplayed('label=Transition Speed');
   await waitForDisplayed('label=Bounding Size/Aspect Ratio');
   await waitForDisplayed('label=Image Files');
 

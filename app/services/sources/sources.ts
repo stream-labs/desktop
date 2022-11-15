@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import Vue from 'vue';
 import { Subject } from 'rxjs';
 import cloneDeep from 'lodash/cloneDeep';
-import { IObsListOption, TObsValue } from 'components/obs/inputs/ObsInput';
+import { IObsListOption, TObsValue, IObsListInput } from 'components/obs/inputs/ObsInput';
 import { mutation, StatefulService, ViewHandler } from 'services/core/stateful-service';
 import * as obs from '../../../obs-api';
 import { Inject } from 'services/core/injector';
@@ -39,8 +39,10 @@ import { SourceFiltersService } from 'services/source-filters';
 import { VideoService } from 'services/video';
 import { CustomizationService } from '../customization';
 import { EAvailableFeatures, IncrementalRolloutService } from '../incremental-rollout';
-import { EMonitoringType } from '../../../obs-api';
+import { EMonitoringType, EDeinterlaceMode, EDeinterlaceFieldOrder } from '../../../obs-api';
 import { GuestCamService } from 'services/guest-cam';
+
+export { EDeinterlaceMode, EDeinterlaceFieldOrder } from '../../../obs-api';
 
 const AudioFlag = obs.ESourceOutputFlags.Audio;
 const VideoFlag = obs.ESourceOutputFlags.Video;
@@ -89,6 +91,7 @@ export const windowsSources: TSourceType[] = [
   'vlc_source',
   'soundtrack_source',
   'mediasoupconnector',
+  'wasapi_process_output_capture',
 ];
 
 /**
@@ -226,6 +229,8 @@ export class SourcesService extends StatefulService<ISourcesState> {
     channel?: number;
     isTemporary?: boolean;
     propertiesManagerType?: TPropertiesManager;
+    deinterlaceMode?: EDeinterlaceMode;
+    deinterlaceFieldOrder?: EDeinterlaceFieldOrder;
   }) {
     const id = addOptions.id;
     const sourceModel: ISource = {
@@ -252,6 +257,9 @@ export class SourcesService extends StatefulService<ISourcesState> {
 
       forceHidden: false,
       forceMuted: false,
+
+      deinterlaceMode: addOptions.deinterlaceMode,
+      deinterlaceFieldOrder: addOptions.deinterlaceFieldOrder,
     };
 
     if (addOptions.isTemporary) {
@@ -339,6 +347,8 @@ export class SourcesService extends StatefulService<ISourcesState> {
       channel: options.channel,
       isTemporary: options.isTemporary,
       propertiesManagerType: managerType,
+      deinterlaceMode: options.deinterlaceMode || EDeinterlaceMode.Disable,
+      deinterlaceFieldOrder: options.deinterlaceFieldOrder || EDeinterlaceFieldOrder.Top,
     });
     const source = this.views.getSource(id)!;
     const muted = obsInput.muted;
@@ -382,6 +392,32 @@ export class SourcesService extends StatefulService<ISourcesState> {
       manager: new managerKlass(obsInput, options.propertiesManagerSettings || {}, id),
       type: managerType,
     };
+
+    // Needs to happen after properties manager creation, otherwise we can't fetch props
+    if (type === 'wasapi_input_capture') {
+      const props = source.getPropertiesFormData();
+      const deviceProp = props.find(p => p.name === 'device_id');
+
+      if (deviceProp && deviceProp.value === 'default') {
+        const defaultDeviceNameProp = props.find(p => p.name === 'device_name');
+
+        if (defaultDeviceNameProp) {
+          this.usageStatisticsService.recordAnalyticsEvent('MicrophoneUse', {
+            device: defaultDeviceNameProp.description,
+          });
+        }
+      } else if (deviceProp && deviceProp.type === 'OBS_PROPERTY_LIST') {
+        const deviceOption = (deviceProp as IObsListInput<string>).options.find(
+          opt => opt.value === deviceProp.value,
+        );
+
+        if (deviceOption) {
+          this.usageStatisticsService.recordAnalyticsEvent('MicrophoneUse', {
+            device: deviceOption.description,
+          });
+        }
+      }
+    }
 
     this.sourceAdded.next(source.state);
 
@@ -550,6 +586,7 @@ export class SourcesService extends StatefulService<ISourcesState> {
       { description: 'Display Capture', value: 'display_capture' },
       { description: 'Soundtrack source', value: 'soundtrack_source' },
       { description: 'Collab Cam', value: 'mediasoupconnector' },
+      { description: 'Application Audio Capture (BETA)', value: 'wasapi_process_output_capture' },
     ];
 
     const availableAllowlistedTypes = allowlistedTypes.filter(type =>
@@ -718,6 +755,7 @@ export class SourcesService extends StatefulService<ISourcesState> {
       // TipJar
       'ViewerCount',
       'GameWidget',
+      'CustomWidget',
     ];
     const isLegacyAlertbox = this.customizationService.state.legacyAlertbox;
     if (isLegacyAlertbox) reactWidgets = reactWidgets.filter(w => w !== 'AlertBox');
