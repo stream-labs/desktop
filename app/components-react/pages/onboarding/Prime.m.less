@@ -1,3 +1,5 @@
+@import "../../../styles/colors.less";
+
 .prime-title {
   color: var(--prime);
   background: var(--prime-semi);
@@ -8,14 +10,13 @@
 }
 
 .card-container {
-  height: 450px;
   width: 350px;
   margin: 10px;
-  padding: 32px;
   border-radius: 8px;
   background: var(--section);
   color: var(--paragraph);
   position: relative;
+  overflow: hidden;
 
   h1 {
     margin-bottom: 8px;
@@ -38,33 +39,65 @@
   }
 }
 
+.header {
+  padding-top: 16px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.row {
+  padding: 12px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-bottom: 1px solid var(--background);
+}
+
+.button {
+  border-radius: 4px;
+  margin: 16px;
+  text-align: center;
+  padding: 14px;
+  background: var(--button);
+}
+
 .prime-card-container {
-  background: var(--prime);
-  color: var(--section);
+  color: var(--title);
+  border: 2px solid transparent;
+  background: linear-gradient(var(--background), var(--background)) padding-box, var(--ultra) border-box;
 
   h1 {
-    color: var(--section);
+    background: var(--ultra);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    width: 80px;
   }
 }
 
+.prime-header {
+  background: var(--black);
+}
+
 .prime-row {
-  margin-bottom: 12px;
+  border-bottom: 1px solid rgba(127,127,127,0.3)
+}
+
+.prime-backing {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--ultra);
+  opacity: 0.08;
 }
 
 .prime-button {
-  width: 80%;
-  border-radius: 4px;
-  margin-top: auto;
-  text-align: center;
-  background: var(--background);
-  color: var(--title);
-  padding: 8px;
-  position: absolute;
-  bottom: 16px;
-}
-
-.free-button {
-  background: var(--button);
+  background: var(--ultra);
+  color: var(--section);
 }
 
 .expiration-container {

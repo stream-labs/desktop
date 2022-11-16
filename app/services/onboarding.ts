@@ -196,7 +196,7 @@ class OnboardingViews extends ViewHandler<IOnboardingServiceState> {
       steps.push(ONBOARDING_STEPS()[EOnboardingSteps.Optimize]);
     }
 
-    if (userViews.isLoggedIn && !userViews.isPrime) {
+    if (true || (userViews.isLoggedIn && !userViews.isPrime)) {
       steps.push(ONBOARDING_STEPS()[EOnboardingSteps.Prime]);
     }
 
@@ -323,14 +323,14 @@ export class OnboardingService extends StatefulService<IOnboardingServiceState> 
 
   startOnboardingIfRequired() {
     // Useful for testing in dev env
-    if (Utils.env.SLD_FORCE_ONBOARDING_STEP) {
-      this.start();
-      return true;
-    }
+    // if (Utils.env.SLD_FORCE_ONBOARDING_STEP) {
+    //   this.start();
+    //   return true;
+    // }
 
-    if (localStorage.getItem(this.localStorageKey)) {
-      return false;
-    }
+    // if (localStorage.getItem(this.localStorageKey)) {
+    //   return false;
+    // }
 
     this.start();
     return true;
