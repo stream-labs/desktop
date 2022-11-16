@@ -41,12 +41,12 @@ export function Prime() {
       { text: $t('Basic Features') },
     ],
     prime: [
-      { text: $t('Access to All Overlays and Themes %{themeNumber}', { themeNumber: '(1000+)' }) },
+      { text: $t('Access to All Overlays and Themes (%{themeNumber})', { themeNumber: '1000+' }) },
       { text: 'check' },
       { text: 'check' },
       { text: 'check' },
       { text: $t('Add Up To 4 Guests or Cameras') },
-      { text: $t('Access Full App Library %{appNumber}', { appNumber: '(60+)' }) },
+      { text: $t('Access Full App Library (%{appNumber})', { appNumber: '60+' }) },
       { text: $t('Custom Tip Page and Domain') },
       { text: '10GB' },
       { text: $t('Custom Named Chatbot') },
@@ -72,7 +72,7 @@ export function Prime() {
             <div className={styles.tableHeader} key={header.text}>
               <i className={header.icon} />
               <span>{header.text}</span>
-              {header.whisper && <div className={styles.headerWhisper}>{header.whisper}</div>}
+              {header.whisper && <div className={styles.whisper}>{header.whisper}</div>}
             </div>
           ))}
         </div>
@@ -98,7 +98,7 @@ export function Prime() {
           <div className={cx(styles.header, styles.primeHeader)}>
             <h1>
               <i className="icon-ultra" />
-              {$t('ultra')}
+              ultra
             </h1>
             <span style={{ marginBottom: 8, display: 'inline-block' }}>
               {$t('Includes everything in Starter plus:')}
