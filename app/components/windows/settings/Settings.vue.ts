@@ -18,7 +18,7 @@ import VirtualWebcamSettings from './VirtualWebcamSettings';
 import { MagicLinkService } from 'services/magic-link';
 import { UserService } from 'services/user';
 import Scrollable from 'components/shared/Scrollable';
-import { ObsSettings, PlatformLogo } from 'components/shared/ReactComponentList';
+import { ObsSettings, PlatformLogo, UltraIcon } from 'components/shared/ReactComponentList';
 import { $t } from 'services/i18n';
 import { debounce } from 'lodash-decorators';
 import * as remote from '@electron/remote';
@@ -41,6 +41,7 @@ import Utils from '../../../services/utils';
     Scrollable,
     PlatformLogo,
     ObsSettings,
+    UltraIcon,
   },
 })
 export default class Settings extends Vue {

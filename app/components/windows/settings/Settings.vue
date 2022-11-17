@@ -34,7 +34,7 @@
           >
             {{ $t(category) }}
           </NavItem>
-          <NavItem v-if="!isPrime && isLoggedIn" key="Prime" to="Ultra" ico="icon-ultra">
+          <NavItem v-if="!isPrime && isLoggedIn" key="Prime" to="Ultra" :ultra="true">
             Ultra
           </NavItem>
           <div
