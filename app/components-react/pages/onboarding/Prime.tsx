@@ -7,32 +7,33 @@ import styles from './Prime.m.less';
 import cx from 'classnames';
 import { Services } from 'components-react/service-provider';
 import { useWatchVuex } from 'components-react/hooks';
+import UltraIcon from 'components-react/shared/UltraIcon';
 
 export function Prime() {
   const { MagicLinkService, UserService } = Services;
   const { next } = useModule(OnboardingModule);
   const tableHeaders = [
     { text: $t('Themes and Overlays'), icon: 'icon-themes' },
-    { text: $t('Alerts and Widgets'), icon: 'icon-themes' },
-    { text: $t('Streamlabs Desktop'), icon: 'icon-themes' },
-    { text: $t('Multistream'), icon: 'icon-themes' },
-    { text: $t('Collab Cam'), icon: 'icon-themes' },
-    { text: $t('Desktop App Store'), icon: 'icon-themes' },
-    { text: $t('Tips'), icon: 'icon-themes' },
-    { text: $t('Storage'), icon: 'icon-themes' },
-    { text: $t('Cloudbot'), icon: 'icon-themes' },
+    { text: $t('Alerts and Widgets'), icon: 'icon-alert-box' },
+    { text: $t('Streamlabs Desktop'), icon: 'icon-desktop' },
+    { text: $t('Multistream'), icon: 'icon-multistream' },
+    { text: $t('Collab Cam'), icon: 'icon-team-2' },
+    { text: $t('Desktop App Store'), icon: 'icon-store' },
+    { text: $t('Tips'), icon: 'icon-donation-settings' },
+    { text: $t('Storage'), icon: 'icon-cloud-backup' },
+    { text: $t('Cloudbot'), icon: 'icon-cloudbot' },
     {
       text: $t('All Streamlabs Pro Tools'),
-      icon: 'icon-themes',
+      icon: 'icon-streamlabs',
       whisper: $t('Console, Crossclip, Oslo, Willow & Melon'),
     },
   ];
   const primeMetadata = {
     standard: [
       { text: $t('Access to Free Overlays and Themes') },
-      { text: 'check' },
-      { text: 'check' },
-      { text: 'dash' },
+      { text: '✓', key: 'check1' },
+      { text: '✓', key: 'check2' },
+      { text: '—' },
       { text: $t('Add 1 Guest') },
       { text: $t('Limited Free Apps') },
       { text: $t('No-fee Tipping') },
@@ -42,9 +43,9 @@ export function Prime() {
     ],
     prime: [
       { text: $t('Access to All Overlays and Themes (%{themeNumber})', { themeNumber: '1000+' }) },
-      { text: 'check' },
-      { text: 'check' },
-      { text: 'check' },
+      { text: '✓', key: 'check1' },
+      { text: '✓', key: 'check2' },
+      { text: '✓', key: 'check3' },
       { text: $t('Add Up To 4 Guests or Cameras') },
       { text: $t('Access Full App Library (%{appNumber})', { appNumber: '60+' }) },
       { text: $t('Custom Tip Page and Domain') },
@@ -87,7 +88,7 @@ export function Prime() {
             </span>
           </div>
           {primeMetadata.standard.map(data => (
-            <div className={styles.row} key={data.text}>
+            <div className={styles.row} key={data.key || data.text}>
               <span>{data.text}</span>
             </div>
           ))}
@@ -97,15 +98,15 @@ export function Prime() {
           <div className={styles.primeBacking} />
           <div className={cx(styles.header, styles.primeHeader)}>
             <h1>
-              <i className="icon-ultra" />
-              ultra
+              <UltraIcon type="night" />
+              Ultra
             </h1>
             <span style={{ marginBottom: 8, display: 'inline-block' }}>
               {$t('Includes everything in Starter plus:')}
             </span>
           </div>
           {primeMetadata.prime.map(data => (
-            <div className={cx(styles.row, styles.primeRow)} key={data.text}>
+            <div className={cx(styles.row, styles.primeRow)} key={data.key || data.text}>
               <span>{data.text}</span>
             </div>
           ))}
