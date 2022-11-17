@@ -7,6 +7,7 @@ import { IMediaGalleryFile, IMediaGalleryInfo } from 'services/media-gallery';
 import { $t } from 'services/i18n';
 import { ModalLayout } from 'components-react/shared/ModalLayout';
 import Scrollable from 'components-react/shared/Scrollable';
+import UltraIcon from 'components-react/shared/UltraIcon';
 import { Services } from 'components-react/service-provider';
 import { useSubscription } from 'components-react/hooks/useSubscription';
 import { useVuex } from 'components-react/hooks';
@@ -247,7 +248,16 @@ export default function MediaGallery() {
                   headStyle={{ position: 'absolute', padding: 0, border: 'none', right: '8px' }}
                   extra={[
                     file.prime ? (
-                      <i className="icon-ultra" key="prime" />
+                      <UltraIcon
+                        type={Services.CustomizationService.isDarkTheme ? 'night' : 'day'}
+                        key="prime"
+                        style={{
+                          display: 'inline-block',
+                          height: '12px',
+                          width: '12px',
+                          marginRight: '5px',
+                        }}
+                      />
                     ) : (
                       <i className="icon-copy" onClick={() => handleCopy(file.href)} key="copy" />
                     ),

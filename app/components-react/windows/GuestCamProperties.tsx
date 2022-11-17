@@ -5,6 +5,7 @@ import { useVuex } from 'components-react/hooks';
 import { Spinner } from 'components-react/pages/Loader';
 import { Services } from 'components-react/service-provider';
 import Display from 'components-react/shared/Display';
+import UltraIcon from 'components-react/shared/UltraIcon';
 import { CheckboxInput, ListInput, SliderInput, TextInput } from 'components-react/shared/inputs';
 import Form from 'components-react/shared/inputs/Form';
 import { ModalLayout } from 'components-react/shared/ModalLayout';
@@ -377,7 +378,14 @@ export default function GuestCamProperties() {
                     style={{ marginLeft: 8, color: 'var(--prime)', cursor: 'pointer' }}
                     onClick={() => MagicLinkService.actions.linkToPrime('desktop-collab-cam')}
                   >
-                    <i className="icon-ultra" />
+                    <UltraIcon
+                      style={{
+                        fill: 'var(--prime)',
+                        display: 'inline-block',
+                        height: '12px',
+                        width: '12px',
+                      }}
+                    />
                     <b style={{ marginLeft: 5 }}>{$t('Upgrade for more Guests')}</b>
                   </span>
                 )}

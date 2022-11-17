@@ -98,7 +98,7 @@ export function Prime() {
           <div className={styles.primeBacking} />
           <div className={cx(styles.header, styles.primeHeader)}>
             <h1>
-              <UltraIcon type="night" />
+              <UltraIcon type="night" style={{ marginRight: '5px' }} />
               Ultra
             </h1>
             <span style={{ marginBottom: 8, display: 'inline-block' }}>
