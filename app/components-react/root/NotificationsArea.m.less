@@ -6,7 +6,6 @@
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  height: 100%;
 }
 
 .notifications__container {
@@ -17,14 +16,6 @@
     position: relative;
     height: 30px;
     top: 0;
-  }
-
-  :global(.ant-message-notice) {
-    padding: 0;
-  }
-
-  :global(.ant-message-notice-content) {
-    padding: 4px 16px;
   }
 }
 
@@ -41,10 +32,12 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  position: absolute;
 
   :global(.ant-message-notice-content) {
     padding: 0;
-    margin: 5px;
+    box-shadow: none;
+    background: transparent;
   }
 
   &.info {
@@ -66,7 +59,7 @@
     cursor: pointer;
   }
 
-  span[role=img] {
+  span[role='img'] {
     display: none;
   }
 }
@@ -75,9 +68,6 @@
   cursor: pointer;
   white-space: nowrap;
   margin-right: 10px;
-  height: 100%;
-  display: flex;
-  align-items: center;
 
   &::before {
     content: '|';
