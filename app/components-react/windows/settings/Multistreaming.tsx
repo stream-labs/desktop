@@ -4,6 +4,8 @@ import { Services } from '../../service-provider';
 import { $t } from '../../../services/i18n';
 import { ObsSettingsSection } from './ObsSettings';
 import Translate from 'components-react/shared/Translate';
+import UltraIcon from 'components-react/shared/UltraIcon';
+import ButtonHighlighted from 'components-react/shared/ButtonHighlighted';
 import * as remote from '@electron/remote';
 
 export function MultistreamingSettings() {
@@ -26,10 +28,24 @@ export function MultistreamingSettings() {
       <ObsSettingsSection title={$t('Multistreaming')}>
         {shouldShowPrime ? (
           <div style={{ marginBottom: '16px' }}>
-            <a style={{ color: 'var(--prime)' }} onClick={upgradeToPrime}>
-              <i style={{ color: 'var(--prime)' }} className="icon-prime" />
-              {$t('Stream to multiple platforms with Prime')}
-            </a>
+            <Translate message="Stream to multiple platforms at once with <ultra>Streamlabs Ultra</ultra>.">
+              <u slot="ultra" />
+            </Translate>
+            <ButtonHighlighted
+              onClick={upgradeToPrime}
+              filled
+              text={$t('Upgrade to Ultra')}
+              icon={
+                <UltraIcon
+                  style={{
+                    display: 'inline-block',
+                    height: '12px',
+                    width: '12px',
+                    marginRight: '5px',
+                  }}
+                />
+              }
+            />
           </div>
         ) : (
           <div style={{ marginBottom: '16px' }}>

@@ -47,6 +47,14 @@ button.highlighted {
     background: linear-gradient(0deg, #ffffff, #ffffff) padding-box,
       linear-gradient(123.53deg, #2de8b0 0%, #cbe953 48.8%, #ffab48 75.86%, #ff5151 100%) border-box !important;
     border: 2px solid transparent !important;
-    pointer-events: none !important;
+  }
+
+  &.filled,
+  &.filled:hover,
+  &.filled:active,
+  &.filled:focus,
+  &.filled:visited {
+    background: linear-gradient(123.53deg, #52ecbe 0%, #d4f2a3 48.8%, #fdfef7 75.86%, #fffbfa 100%)
+      padding-box !important;
   }
 }
