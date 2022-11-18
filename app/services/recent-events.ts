@@ -375,7 +375,7 @@ class RecentEventsViews extends ViewHandler<IRecentEventsState> {
       });
     }
     if (event.sub_type === 'primepaidupgrade') {
-      return $t('has converted from an Prime Gaming sub to a %{tier} sub', {
+      return $t('has converted from a Prime Gaming sub to a %{tier} sub', {
         tier: subscriptionMap(event.sub_plan),
       });
     }
