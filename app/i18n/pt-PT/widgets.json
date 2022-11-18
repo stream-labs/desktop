@@ -186,5 +186,7 @@
   "font_family_tooltip": "O tipo de letra Google usado para o texto. Visite http://fonts.google.com para escolher um! Os tipos de letra mais populares incluem: Open Sans, Roboto, Oswald, Lato e Droid Sans.",
   "Something went wrong while applying settings": "Ocorreu um erro ao aplicar as definições",
   "Superchat Goal": "Objetivo do Superchat",
-  "YouTube Superchats": "Superchats do YouTube"
+  "YouTube Superchats": "Superchats do YouTube",
+  "Custom Widget": "Custom Widget",
+  "Use HTML, CSS, and JavaScript to create a widget with custom functionality": "Use HTML, CSS, and JavaScript to create a widget with custom functionality"
 }

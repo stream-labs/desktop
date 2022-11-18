@@ -39,5 +39,12 @@
   "Unassigned": "Unassigned",
   "Are you sure you want to disconnect %{guestName}?": "Are you sure you want to disconnect %{guestName}?",
   "If you want to prevent this guest from rejoining, you should also regenerate your invite link.": "If you want to prevent this guest from rejoining, you should also regenerate your invite link.",
-  "Regenerate Link": "Regenerate Link"
+  "Regenerate Link": "Regenerate Link",
+  "Guests": "Guests",
+  "Upgrade for more Guests": "Upgrade for more Guests",
+  "Share Video Source (Optional)": "Share Video Source (Optional)",
+  "Stop Sharing": "Stop Sharing",
+  "Collab Cam requires a source": "Collab Cam requires a source",
+  "At least one Collab Cam source is required to use Collab Cam. Would you like to add one now?": "At least one Collab Cam source is required to use Collab Cam. Would you like to add one now?",
+  "You now have access to Collab Cam!": "You now have access to Collab Cam!"
 }
