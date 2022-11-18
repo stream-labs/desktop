@@ -87,7 +87,7 @@ function ActionButton() {
   const { currentStep, next, processing } = useModule(OnboardingModule);
 
   if (currentStep.hideButton) return null;
-  const isPrimeStep = currentStep.label === $t('Prime');
+  const isPrimeStep = currentStep.label === $t('Ultra');
   return (
     <button
       className={cx('button button--action', commonStyles.onboardingButton, {
@@ -96,7 +96,7 @@ function ActionButton() {
       onClick={() => next()}
       disabled={processing}
     >
-      {isPrimeStep ? $t('Go Prime') : $t('Continue')}
+      {isPrimeStep ? $t('Go Ultra') : $t('Continue')}
     </button>
   );
 }

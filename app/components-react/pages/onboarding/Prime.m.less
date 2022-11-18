@@ -1,3 +1,5 @@
+@import "../../../styles/colors.less";
+
 .prime-title {
   color: var(--prime);
   background: var(--prime-semi);
@@ -7,15 +9,30 @@
   font-weight: 700;
 }
 
+.headers-container {
+  border-top: 1px solid var(--border);
+  width: 250px;
+  margin-top: 48px;
+  margin-right: 20px;
+}
+
+.table-header {
+  padding: 12px;
+  border-bottom: 1px solid var(--border);
+
+  i {
+    margin-right: 8px;
+  }
+}
+
 .card-container {
-  height: 450px;
   width: 350px;
-  margin: 10px;
-  padding: 32px;
+  margin: 0 20px;
   border-radius: 8px;
   background: var(--section);
   color: var(--paragraph);
   position: relative;
+  overflow: hidden;
 
   h1 {
     margin-bottom: 8px;
@@ -38,65 +55,72 @@
   }
 }
 
-.prime-card-container {
-  background: var(--prime);
-  color: var(--section);
+.header {
+  padding-top: 16px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  border-bottom: 1px solid var(--background);
 
-  h1 {
-    color: var(--section);
+  span {
+    font-size: 13px;
   }
 }
 
-.prime-row {
-  margin-bottom: 12px;
+.row {
+  padding: 12px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-bottom: 1px solid var(--background);
 }
 
-.prime-button {
-  width: 80%;
+.button {
   border-radius: 4px;
-  margin-top: auto;
+  margin: 16px;
   text-align: center;
-  background: var(--background);
-  color: var(--title);
-  padding: 8px;
-  position: absolute;
-  bottom: 16px;
-}
-
-.free-button {
+  padding: 14px;
   background: var(--button);
 }
 
-.expiration-container {
-  width: 40%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin: auto;
-  margin-top: 48px;
-  text-align: center;
-  height: auto !important;
+.prime-card-container {
+  color: var(--title);
+  border: 2px solid transparent;
+  background: linear-gradient(var(--background), var(--background)) padding-box, var(--ultra) border-box;
+
+  h1 {
+    background: var(--ultra);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    width: 80px;
+    font-weight: 700;
+  }
 }
 
-.expiration-list {
-  display: flex;
-  height: 180px;
-  width: 600px;
-  padding: 24px;
-  flex-direction: column;
-  flex-wrap: wrap;
-  text-align: left;
-  background: var(--section);
-  border-radius: 8px;
+.prime-header {
+  background: var(--black);
+  border-bottom: none;
+}
 
-  i {
-    margin-right: 8px;
-  }
+.prime-row {
+  border-bottom: 1px solid rgba(127,127,127,0.3)
+}
 
-  .prime-row {
-    width: 33%;
-  }
+.prime-backing {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--ultra);
+  opacity: 0.08;
+}
 
+.prime-button {
+  background: var(--ultra);
+  color: var(--section);
 }
 
 .whisper {

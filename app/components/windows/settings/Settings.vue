@@ -34,15 +34,8 @@
           >
             {{ $t(category) }}
           </NavItem>
-          <NavItem
-            v-if="!isPrime && isLoggedIn"
-            key="Prime"
-            to="Prime"
-            ico="icon-prime"
-            :icoStyles="{ color: 'var(--prime)' }"
-            :style="{ color: 'var(--prime)' }"
-          >
-            Prime
+          <NavItem v-if="!isPrime && isLoggedIn" key="Prime" to="Ultra" :ultra="true">
+            Ultra
           </NavItem>
           <div
             class="settings-auth"
