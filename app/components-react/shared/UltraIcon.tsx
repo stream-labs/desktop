@@ -158,7 +158,7 @@ export default function UltraIcon({ type, className, style }: IUltraIcon) {
     );
   }
 
-  // return simple icon by default
+  // return night icon by default
   return (
     <svg
       width="15"

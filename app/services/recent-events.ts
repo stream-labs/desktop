@@ -152,7 +152,7 @@ const subscriptionMap = (subPlan: string) => {
     '1000': $t('Tier 1'),
     '2000': $t('Tier 2'),
     '3000': $t('Tier 3'),
-    Prime: $t('Ultra'),
+    Prime: $t('Prime'),
   }[subPlan];
 };
 
@@ -171,12 +171,12 @@ const filterName = (key: string): string => {
     filter_subscription_9_months: $t('9 Months'),
     filter_subscription_12_months: $t('12 Months'),
     filter_subscription_minimum_enabled: $t('Min. Months'),
-    primesub: $t('Ultra'),
+    primesub: $t('Prime'),
     resub: $t('Resubs'),
     resub_tier_1: $t('Tier 1'),
     resub_tier_2: $t('Tier 2'),
     resub_tier_3: $t('Tier 3'),
-    resub_prime: $t('Ultra'),
+    resub_prime: $t('Prime'),
     gifted_sub: $t('Gifted'),
     host: $t('Hosts'),
     bits: $t('Bits'),
@@ -375,7 +375,7 @@ class RecentEventsViews extends ViewHandler<IRecentEventsState> {
       });
     }
     if (event.sub_type === 'primepaidupgrade') {
-      return $t('has converted from an Ultra Gaming sub to a %{tier} sub', {
+      return $t('has converted from an Prime Gaming sub to a %{tier} sub', {
         tier: subscriptionMap(event.sub_plan),
       });
     }
@@ -835,7 +835,7 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
       return false;
     }
 
-    if (!this.state.filterConfig.resub_prime && event.sub_plan.toString() === 'Ultra') {
+    if (!this.state.filterConfig.resub_prime && event.sub_plan.toString() === 'Prime') {
       return false;
     }
 
