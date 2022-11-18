@@ -47,7 +47,7 @@ export function AppearanceSettings() {
     isLoggedIn,
     isPrime,
     toggleApp,
-    swapApp,
+    replaceApp,
     toggleSidebarSubMenu,
     toggleMenuItem,
     setCompactView,
@@ -64,7 +64,7 @@ export function AppearanceSettings() {
     isLoggedIn: UserService.views.isLoggedIn,
     isPrime: UserService.views.isPrime,
     toggleApp: SideNavService.actions.toggleApp,
-    swapApp: SideNavService.actions.swapApp,
+    replaceApp: SideNavService.actions.replaceApp,
     toggleSidebarSubMenu: SideNavService.actions.toggleSidebarSubmenu,
     toggleMenuItem: SideNavService.actions.toggleMenuItem,
     setCompactView: SideNavService.actions.setCompactView,
@@ -244,7 +244,7 @@ export function AppearanceSettings() {
                     className={styles.appsDropdown}
                     onChange={value => {
                       const selectedApp = allEnabledApps.find(selected => selected?.name === value);
-                      selectedApp && swapApp(selectedApp, index);
+                      selectedApp && replaceApp(selectedApp, index);
                     }}
                     value={app?.name ?? ''}
                     disabled={!isLoggedIn || index + 1 > apps.length}

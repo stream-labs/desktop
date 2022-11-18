@@ -50,8 +50,7 @@ export default function SideNav() {
     }
 
     if (type) {
-      // eslint-disable-next-line object-shorthand
-      NavigationService.actions.navigate(page, { type: type });
+      NavigationService.actions.navigate(page, { type });
     } else {
       NavigationService.actions.navigate(page);
     }

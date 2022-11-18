@@ -176,9 +176,9 @@ export class SideNavService extends PersistentStatefulService<ISideNavServiceSta
     this.TOGGLE_APP(appId);
   }
 
-  swapApp(newApp: IAppMenuItem, index: number) {
+  replaceApp(newApp: IAppMenuItem, index: number) {
     // add/update apps
-    this.SWAP_APP(newApp, index);
+    this.REPLACE_APP(newApp, index);
   }
 
   @mutation()
@@ -281,7 +281,7 @@ export class SideNavService extends PersistentStatefulService<ISideNavServiceSta
   }
 
   @mutation()
-  private SWAP_APP(newApp: IAppMenuItem, index: number) {
+  private REPLACE_APP(newApp: IAppMenuItem, index: number) {
     const updatedApps = this.state.apps.map((app, i) => {
       if (i === index) return newApp;
 
