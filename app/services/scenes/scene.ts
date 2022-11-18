@@ -11,6 +11,9 @@ import {
   SceneItemFolder,
   ISceneItemNode,
   isItem,
+  EScaleType,
+  EBlendingMode,
+  EBlendingMethod,
 } from './index';
 import Utils from 'services/utils';
 import * as obs from '../../../obs-api';
@@ -361,8 +364,11 @@ export class Scene {
         y: sceneNode.y == null ? 0 : sceneNode.y,
         locked: sceneNode.locked,
         rotation: sceneNode.rotation || 0,
-        streamVisible: sceneNode.streamVisible,
-        recordingVisible: sceneNode.recordingVisible,
+        streamVisible: sceneNode.streamVisible!,
+        recordingVisible: sceneNode.recordingVisible!,
+        scaleFilter: sceneNode.scaleFilter!,
+        blendingMode: sceneNode.blendingMode!,
+        blendingMethod: sceneNode.blendingMethod,
       });
       return true;
     });
@@ -516,6 +522,9 @@ export class Scene {
       locked: false,
       streamVisible: true,
       recordingVisible: true,
+      scaleFilter: EScaleType.Disable,
+      blendingMode: EBlendingMode.Normal,
+      blendingMethod: EBlendingMethod.Default,
     });
   }
 

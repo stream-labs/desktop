@@ -6,6 +6,8 @@ import {
   TPropertiesManager,
   macSources,
   windowsSources,
+  EDeinterlaceMode,
+  EDeinterlaceFieldOrder,
 } from 'services/sources';
 import { AudioService } from 'services/audio';
 import { Inject } from '../../core/injector';
@@ -44,6 +46,9 @@ export interface ISourceInfo {
   audioMixers?: number;
   monitoringType?: obs.EMonitoringType;
   mixerHidden?: boolean;
+
+  deinterlaceMode?: EDeinterlaceMode;
+  deinterlaceFieldOrder?: EDeinterlaceFieldOrder;
 
   filters: {
     items: IFilterInfo[];
@@ -123,6 +128,8 @@ export class SourcesNode extends Node<ISchema, {}> {
             volume: obsInput.volume,
             channel: source.channel,
             muted: source.muted,
+            deinterlaceMode: source.deinterlaceMode,
+            deinterlaceFieldOrder: source.deinterlaceFieldOrder,
             filters: {
               items: filters,
             },
@@ -223,6 +230,8 @@ export class SourcesNode extends Node<ISchema, {}> {
         settings: source.settings,
         volume: source.volume,
         syncOffset: source.syncOffset,
+        deinterlaceMode: source.deinterlaceMode || EDeinterlaceMode.Disable,
+        deinterlaceFieldOrder: source.deinterlaceFieldOrder || EDeinterlaceFieldOrder.Top,
         filters: source.filters.items
           .filter(filter => {
             if (filter.type === 'face_mask_filter') {
@@ -283,6 +292,8 @@ export class SourcesNode extends Node<ISchema, {}> {
         channel: sourceInfo.channel,
         propertiesManager: sourceInfo.propertiesManager,
         propertiesManagerSettings: sourceInfo.propertiesManagerSettings || {},
+        deinterlaceMode: sourceInfo.deinterlaceMode,
+        deinterlaceFieldOrder: sourceInfo.deinterlaceFieldOrder,
       });
 
       if (source.audioMixers) {
