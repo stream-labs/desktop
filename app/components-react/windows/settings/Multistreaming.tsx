@@ -37,7 +37,9 @@ export function MultistreamingSettings() {
               text={$t('Upgrade to Ultra')}
               icon={
                 <UltraIcon
+                  type="simple"
                   style={{
+                    fill: '#09161D',
                     display: 'inline-block',
                     height: '12px',
                     width: '12px',
