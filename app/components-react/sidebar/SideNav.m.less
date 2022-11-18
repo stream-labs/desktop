@@ -2,12 +2,8 @@
 @import '../../styles/mixins';
 @import '../../styles/badges';
 
-:global(div.ant-tooltip) {
-  display: none;
-}
-
-:global(div.ant-menu-submenu.ant-menu-submenu-popup.ant-menu) {
-  display: none;
+:global(.ant-tooltip.ant-menu-inline-collapsed-tooltip) {
+  display: none !important;
 }
 
 .sidenav-sider {
@@ -159,6 +155,10 @@ button.sidenav-button {
       padding-bottom: 0px;
       white-space: normal !important;
     }
+  }
+
+  :global(.ant-menu-submenu-vertical .ant-menu-submenu-popup) {
+    display: none !important;
   }
 }
 

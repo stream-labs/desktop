@@ -243,6 +243,7 @@ export default function SideNav() {
             )}
             defaultOpenKeys={openMenuItems && openMenuItems}
             defaultSelectedKeys={[EMenuItem.Editor]}
+            getPopupContainer={triggerNode => triggerNode}
           >
             {menuItems.map((menuItem: IParentMenuItem) => {
               if (

@@ -124,6 +124,7 @@ export default function SideNav() {
         mode="inline"
         className={cx(styles.bottomNav, !isOpen && styles.closed, isOpen && styles.open)}
         defaultOpenKeys={openMenuItems && openMenuItems}
+        getPopupContainer={triggerNode => triggerNode}
       >
         {menuItems.map((menuItem: IParentMenuItem) => {
           if (isDevMode && menuItem.title === EMenuItem.DevTools) {
