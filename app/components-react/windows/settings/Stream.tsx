@@ -439,8 +439,20 @@ function CustomDestinationList() {
           {shouldShowPrimeLabel ? (
             <ButtonHighlighted
               onClick={addCustomDest}
+              filled
               text={$t('Ultra')}
-              icon={<UltraIcon type="day" style={{ marginRight: '5px' }} />}
+              icon={
+                <UltraIcon
+                  type="simple"
+                  style={{
+                    fill: '#09161D',
+                    display: 'inline-block',
+                    height: '12px',
+                    width: '12px',
+                    marginRight: '5px',
+                  }}
+                />
+              }
             />
           ) : (
             <div className={css.prime} />

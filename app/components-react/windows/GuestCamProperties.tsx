@@ -375,12 +375,11 @@ export default function GuestCamProperties() {
                 </span>
                 {shouldShowPrimeUpgrade && (
                   <span
-                    style={{ marginLeft: 8, color: 'var(--prime)', cursor: 'pointer' }}
+                    style={{ marginLeft: 8, cursor: 'pointer' }}
                     onClick={() => MagicLinkService.actions.linkToPrime('desktop-collab-cam')}
                   >
                     <UltraIcon
                       style={{
-                        fill: 'var(--prime)',
                         display: 'inline-block',
                         height: '12px',
                         width: '12px',

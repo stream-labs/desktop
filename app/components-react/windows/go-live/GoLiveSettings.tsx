@@ -12,6 +12,8 @@ import PlatformSettings from './PlatformSettings';
 import TwitterInput from './Twitter';
 import OptimizedProfileSwitcher from './OptimizedProfileSwitcher';
 import Spinner from '../../shared/Spinner';
+import ButtonHighlighted from '../../shared/ButtonHighlighted';
+import UltraIcon from '../../shared/UltraIcon';
 import GoLiveError from './GoLiveError';
 
 const PlusIcon = PlusOutlined as Function;
@@ -68,9 +70,26 @@ export default function GoLiveSettings() {
           {/*ADD DESTINATION BUTTON*/}
           {shouldShowAddDestButton && (
             <a className={styles.addDestinationBtn} onClick={addDestination}>
-              <PlusIcon />
-              {$t('Add Destination')}{' '}
-              {shouldShowPrimeLabel && <b className={styles.prime}>ultra</b>}
+              <PlusIcon style={{ paddingLeft: '17px', fontSize: '24px' }} />
+              {$t('Add Destination')}
+              {shouldShowPrimeLabel && (
+                <ButtonHighlighted
+                  filled
+                  text={$t('Ultra')}
+                  icon={
+                    <UltraIcon
+                      type="simple"
+                      style={{
+                        fill: '#09161D',
+                        display: 'inline-block',
+                        height: '12px',
+                        width: '12px',
+                        marginRight: '5px',
+                      }}
+                    />
+                  }
+                />
+              )}
             </a>
           )}
         </Col>
