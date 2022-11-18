@@ -9,6 +9,6 @@ export async function skipOnboarding() {
     await clickIfDisplayed('div=Start Fresh');
     await clickButton('Skip');
     await clickIfDisplayed('button=Skip');
-    await clickIfDisplayed('div=Choose Free');
+    await clickIfDisplayed('div=Current Plan');
   });
 }
