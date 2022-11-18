@@ -1,4 +1,4 @@
-@import "../../../styles/index.less";
+@import '../../../styles/index.less';
 
 .go-live-settings {
   height: 100%;
@@ -18,7 +18,7 @@
   h2 {
     .margin-top(2);
   }
-  [data-type="bool"] {
+  [data-type='bool'] {
     width: 100% !important;
   }
 }
@@ -44,7 +44,7 @@
   margin-top: 6px;
   margin-right: 8px;
 
-  [data-type="toggle"] {
+  [data-type='toggle'] {
     margin-top: 2px;
     margin-left: 8px;
   }
@@ -54,21 +54,17 @@
   width: 100%;
   border: 1px dashed var(--border);
   border-radius: 4px;
-  line-height: 58px;
-  display: block;
+  min-height: 58px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
   text-align: center;
   position: relative;
   transition: border 0.3s, box-shadow 0.3s;
   &:hover {
     border-color: (var(--button));
     box-shadow: 0 0 50px rgba(255, 255, 255, 0.1) inset;
-  }
-  span {
-    position: absolute;
-    left: 19px;
-    top: 17px;
-    font-size: 24px !important;
-    opacity: 0.6;
   }
 }
 

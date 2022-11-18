@@ -205,7 +205,6 @@ function MyCommunity(p: { platforms: ICommunityReach[] }) {
         {p.platforms.map(platform => (
           <PlatformCard platform={platform} key={platform.icon} />
         ))}
-        {!UserService.views.isPrime && <MultistreamCard />}
       </div>
     </div>
   );
