@@ -9,6 +9,7 @@ import { useVuex } from '../hooks';
 import styles from './SideNav.m.less';
 import * as remote from '@electron/remote';
 import { Badge } from 'antd';
+import UltraIcon from 'components-react/shared/UltraIcon';
 
 export default function SideNav() {
   const {
@@ -18,6 +19,7 @@ export default function SideNav() {
     NavigationService,
     MagicLinkService,
     UsageStatisticsService,
+    CustomizationService,
   } = Services;
 
   const isDevMode = Utils.isDevMode();
@@ -102,10 +104,14 @@ export default function SideNav() {
         <div
           className={cx(styles.cell, styles.primeCell)}
           onClick={upgradeToPrime}
-          title={$t('Get Prime')}
+          title={$t('Get Ultra')}
         >
           <Badge count={<i className={cx('icon-pop-out-3', styles.linkBadge)} />}>
-            <i className="icon-prime" />
+            {CustomizationService.isDarkTheme ? (
+              <UltraIcon type="night" />
+            ) : (
+              <UltraIcon type="day" />
+            )}
           </Badge>
         </div>
       )}
