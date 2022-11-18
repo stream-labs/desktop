@@ -323,13 +323,7 @@ export default function SideNav() {
                   <SubMenu
                     key={menuItem.key}
                     title={menuTitles(menuItem.title)}
-                    icon={
-                      menuItem?.icon && (
-                        // <div>
-                        <i className={menuItem.icon} />
-                        // </div>
-                      )
-                    }
+                    icon={menuItem?.icon && <i className={menuItem.icon} />}
                     onTitleClick={() => {
                       menuItem?.subMenuItems[0]?.target &&
                         !isOpen &&
