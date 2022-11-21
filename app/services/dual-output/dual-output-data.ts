@@ -48,14 +48,8 @@ export const platformLabels = (platform: EDualOutputPlatform | string) =>
     [EDualOutputPlatform.Trovo]: $t('Trovo'),
   }[platform]);
 
-// @@@ TODO: needed for display toggles?
-// export const displayLabels = (display: TOutputDisplayType | string) => ({
-//   [TOutputDisplayType.Horizontal]: $t('Horizontal'),
-//   [TOutputDisplayType.Vertical]: $t('Vertical'),
-// }[display]);
-
-export const settingLabels = (setting: TOutputDisplayType | string) =>
+export const displayLabels = (display: TOutputDisplayType | string) =>
   ({
-    [TOutputDisplayType.Horizontal]: $t('Landscape'),
-    [TOutputDisplayType.Vertical]: $t('Portrait'),
-  }[setting]);
+    [TOutputDisplayType.Horizontal]: $t('Horizontal'),
+    [TOutputDisplayType.Vertical]: $t('Vertical'),
+  }[display]);

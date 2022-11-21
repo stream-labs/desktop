@@ -1,0 +1,75 @@
+span.light-shadow {
+  :global(div.ant-tooltip) {
+    filter: drop-shadow(0 0 0.5rem var(--tooltip-hover)) !important;
+
+    :global(div.ant-tooltip-content div.ant-tooltip-arrow) {
+      position: absolute;
+      width: 12px;
+      height: 12px;
+      z-index: 1;
+
+      :global(.ant-tooltip-arrow-content) {
+        position: relative;
+        width: 12px;
+        height: 12px;
+        z-index: 1;
+      }
+    }
+
+    // @@@ TODO: fix arrow positioning on tooltips
+    &:global(.ant-tooltip-placement-topLeft) div.ant-tooltip-arrow {
+      bottom: -2px;
+      right: -12px;
+    }
+    &:global(.ant-tooltip-placement-top) div.ant-tooltip-arrow {
+      bottom: -2px;
+    }
+
+    &:global(.ant-tooltip-placement-topRight) div.ant-tooltip-arrow {
+      bottom: -2px;
+      right: 12px;
+    }
+
+    &:global(.ant-tooltip-placement-leftTop) div.ant-tooltip-arrow {
+      bottom: -12px;
+      right: -2px;
+    }
+
+    &:global(.ant-tooltip-placement-leftBottom) div.ant-tooltip-arrow {
+      bottom: 6px;
+      right: -2px;
+    }
+
+    &:global(.ant-tooltip-placement-left) div.ant-tooltip-arrow {
+      right: -2px;
+    }
+
+    &:global(.ant-tooltip-placement-bottomLeft) div.ant-tooltip-arrow {
+      right: -12px;
+      top: -2px;
+    }
+
+    div.ant-tooltip-placement-bottom .ant-tooltip-arrow {
+      top: -2px;
+    }
+
+    &:global(.ant-tooltip-placement-bottomRight) div.ant-tooltip-arrow {
+      right: 12px;
+      top: -2px;
+    }
+
+    &:global(.ant-tooltip-placement-rightTop) div.ant-tooltip-arrow {
+      bottom: 12px;
+      left: -2px;
+    }
+
+    &:global(.ant-tooltip-placement-right) div.ant-tooltip-arrow {
+      left: -2px;
+    }
+
+    &:global(.ant-tooltip-placement-rightBottom) div.ant-tooltip-arrow {
+      top: 12px;
+      left: -2px;
+    }
+  }
+}

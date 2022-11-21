@@ -179,6 +179,6 @@
   "Set your default output mode for each platform.": "Set your default output mode for each platform.",
   "Set Dual Output Settings": "Set Dual Output Settings",
   "Mode:": "Mode:",
-  "Landscape": "Landscape",
-  "Portrait": "Portrait"
+  "Horizontal": "Horizontal",
+  "Set up your resolution for your vertical output in the video tab of settings by clicking on \"Vertical Output\"": "Set up your resolution for your vertical output in the video tab of settings by clicking on \"Vertical Output\""
 }

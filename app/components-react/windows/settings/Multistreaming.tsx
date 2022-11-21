@@ -3,29 +3,38 @@ import { useVuex } from 'components-react/hooks';
 import { Services } from '../../service-provider';
 import { $t } from 'services/i18n';
 import { ObsSettingsSection } from './ObsSettings';
-import { Tooltip } from 'antd';
-import { RadioInput } from 'components-react/shared/inputs/RadioInput';
+import { RadioInput, SwitchInput } from 'components-react/shared/inputs';
 import PlatformLogo from 'components-react/shared/PlatformLogo';
 import Translate from 'components-react/shared/Translate';
 import UltraIcon from 'components-react/shared/UltraIcon';
 import ButtonHighlighted from 'components-react/shared/ButtonHighlighted';
+import Tooltip from 'components-react/shared/Tooltip';
 import { TPlatform } from 'services/platforms';
 import {
   IDualOutputPlatformSetting,
-  // dualOutputSettings,
-  settingLabels,
-  EDualOutputPlatform,
+  displayLabels,
   TOutputDisplayType,
   platformLabels,
 } from '../../../services/dual-output';
+import styles from './Multistreaming.m.less';
+import cx from 'classnames';
 import * as remote from '@electron/remote';
 
 export function MultistreamingSettings() {
   const { UserService, MagicLinkService, DualOutputService } = Services;
 
-  const { isLoggedIn, isPrime, platformSettingsList, updatePlatformSetting } = useVuex(() => ({
+  const {
+    isLoggedIn,
+    isPrime,
+    dualOutputMode,
+    toggleDualOutputMode,
+    platformSettingsList,
+    updatePlatformSetting,
+  } = useVuex(() => ({
     isLoggedIn: UserService.views.isLoggedIn,
     isPrime: UserService.views.isPrime,
+    dualOutputMode: DualOutputService.views.dualOutputMode,
+    toggleDualOutputMode: DualOutputService.actions.toggleDualOutputMode,
     platformSettingsList: DualOutputService.views.platformSettingsList,
     updatePlatformSetting: DualOutputService.actions.updatePlatformSetting,
   }));
@@ -40,17 +49,17 @@ export function MultistreamingSettings() {
   const dualOutputSettings = [
     {
       label:
-        settingLabels(TOutputDisplayType.Horizontal) ?? (TOutputDisplayType.Horizontal as string),
+        displayLabels(TOutputDisplayType.Horizontal) ?? (TOutputDisplayType.Horizontal as string),
       value: TOutputDisplayType.Horizontal as string,
     },
     {
-      label: settingLabels(TOutputDisplayType.Vertical) ?? (TOutputDisplayType.Vertical as string),
+      label: displayLabels(TOutputDisplayType.Vertical) ?? (TOutputDisplayType.Vertical as string),
       value: TOutputDisplayType.Vertical as string,
     },
   ];
 
   return (
-    <div>
+    <div className="multistreaming-wrapper">
       <ObsSettingsSection title={$t('Multistreaming')}>
         {shouldShowPrime ? (
           <div style={{ marginBottom: '16px' }}>
@@ -76,7 +85,7 @@ export function MultistreamingSettings() {
             />
           </div>
         ) : (
-          <div style={{ marginBottom: '16px' }}>
+          <div className={styles.wrapper}>
             {$t('Go live on multiple platforms at once with Multistreaming.')}
             <ul>
               <li>
@@ -85,47 +94,54 @@ export function MultistreamingSettings() {
                 </Translate>
               </li>
               <li>
-                {/* eslint-disable-next-line no-useless-escape */}
                 <Translate
                   message={
-                    'Step 2: Ensure the \"Confirm stream title and game before going live\" option is checked in the <general>General</general> settings tab."'
+                    'Step 2: Ensure the "Confirm stream title and game before going live" option is checked in the <general>General</general> settings tab."'
                   }
                 >
                   <u slot="general" />
                 </Translate>
               </li>
               <li>
-                {/* eslint-disable-next-line no-useless-escape */}
                 {$t('Step 3: Select which platforms you are streaming to when you hit \"Go Live\".')}
               </li>
             </ul>
           </div>
         )}
       </ObsSettingsSection>
-      <ObsSettingsSection title={$t('Dual Output')} style={{ paddingBottom: '24px' }}>
-        <div className="do-description" style={{ marginBottom: '12px' }}>
-          {/* @@@ TODO: Add toggle */}
+      <ObsSettingsSection title={$t('Dual Output')} style={{ paddingBottom: '30px' }}>
+        <div className={styles.doDescription}>
+          {/* @@@ TODO: Refactor to use sidenav switch button */}
+          <SwitchInput value={dualOutputMode} onChange={toggleDualOutputMode} />
           {$t('Enable Dual Outputs (simultaneous horizontal and vertical Outputs)')}{' '}
-          <Tooltip title={'Temp Tooltip Text 1'}>
+          <Tooltip
+            title={
+              'Set up your resolution for your vertical output in the video tab of settings by clicking on \"Vertical Output\"'
+            }
+            className={styles.doTooltip}
+            placement="bottom"
+            lightShadow
+          >
             <i className="icon-information" />
           </Tooltip>
         </div>
 
-        <div className="do-settings" style={{ display: 'flex', flexDirection: 'column' }}>
-          <h2 style={{ marginTop: '12px' }}>{$t('Dual Output Settings')}</h2>
-          <div className="do-description" style={{ marginBottom: '12px' }}>
+        <div className={styles.doSettings}>
+          <h2>{$t('Dual Output Settings')}</h2>
+          <div className={styles.doDescription}>
             {$t('Set your default output mode for each platform.')}{' '}
-            <Tooltip title={'Temp Tooltip Text 2'}>
+            <Tooltip
+              title={'Temp Tooltip Text 2'}
+              className={styles.doTooltip}
+              placement="top"
+              lightShadow
+            >
               <i className="icon-information" />
             </Tooltip>
           </div>
 
           {platformSettingsList.map((option: IDualOutputPlatformSetting) => (
-            <div
-              key={option.platform}
-              className="do-platform-settings"
-              style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}
-            >
+            <div key={option.platform} className={styles.doPlatformSettings}>
               <DualOutputSettingsLabel
                 label={(platformLabels(option.platform) ?? option.platform) as string}
                 platform={option.platform}
@@ -150,17 +166,10 @@ export function MultistreamingSettings() {
 
 function DualOutputSettingsLabel(p: { label: string; platform: string }) {
   return (
-    <div
-      className="do-settings-wrapper"
-      style={{ display: 'flex', width: '200px', alignItems: 'center' }}
-    >
+    <div className={styles.doSettingsWrapper}>
       <PlatformLogo platform={p.platform as TPlatform} size="small" />
-      <span className="do-settings-label" style={{ flexGrow: 1, marginLeft: '10px' }}>
-        {p.label}
-      </span>
-      <span className="mode" style={{ justifySelf: 'flex-end', marginRight: '30px' }}>
-        {$t('Mode:')}
-      </span>
+      <span className={styles.doSettingsLabel}>{p.label}</span>
+      <span className={styles.modeLabel}>{$t('Mode:')}</span>
     </div>
   );
 }

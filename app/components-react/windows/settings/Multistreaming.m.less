@@ -1,0 +1,51 @@
+@import '../../../styles/index.less';
+@import '../../../styles/mixins';
+
+.wrapper {
+  margin-bottom: 16px;
+}
+
+.prime {
+  color: var(--prime);
+}
+
+.do-description {
+  padding-bottom: 16px;
+  display: flex;
+  align-items: center;
+  flex-direction: row;
+}
+
+.do-tooltip {
+  margin-left: 10px;
+}
+
+.do-settings {
+  display: flex;
+  flex-direction: column;
+
+  h2 {
+    margin-top: 12px;
+  }
+}
+.do-platform-settings {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.do-settings-wrapper {
+  display: flex;
+  width: 200px;
+  align-items: center;
+
+  .do-settings-label {
+    flex-grow: 1;
+    margin-left: 10px;
+  }
+
+  .mode-label {
+    justify-self: flex-end;
+    margin-right: 30px;
+  }
+}
