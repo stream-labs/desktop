@@ -19,6 +19,7 @@ import {
 } from 'services/side-nav';
 import PlatformLogo from 'components-react/shared/PlatformLogo';
 import SubMenu from 'components-react/shared/SubMenu';
+import MenuItem from 'components-react/shared/MenuItem';
 
 export default function SideNav() {
   const {
@@ -129,18 +130,18 @@ export default function SideNav() {
         {menuItems.map((menuItem: IParentMenuItem) => {
           if (isDevMode && menuItem.title === EMenuItem.DevTools) {
             return (
-              <Menu.Item
+              <MenuItem
                 key={menuItem.key}
                 title={menuItem.title}
                 icon={<i className="icon-developer" />}
                 onClick={openDevTools}
               >
                 {menuItem.title}
-              </Menu.Item>
+              </MenuItem>
             );
           } else if (isLoggedIn && !isPrime && menuItem.title === EMenuItem.GetPrime) {
             return (
-              <Menu.Item
+              <MenuItem
                 key={menuItem.key}
                 title={menuTitles(menuItem.title)}
                 icon={
@@ -154,7 +155,7 @@ export default function SideNav() {
                 className={styles.badgeScale}
               >
                 {menuTitles(menuItem.title)}
-              </Menu.Item>
+              </MenuItem>
             );
           } else if (isLoggedIn && menuItem.title === EMenuItem.Dashboard) {
             return (
@@ -175,19 +176,19 @@ export default function SideNav() {
                 applystyles={+isOpen}
               >
                 {menuItem?.subMenuItems.map((subMenuItem: IMenuItem) => (
-                  <Menu.Item
+                  <MenuItem
                     key={subMenuItem.key}
                     title={menuTitles(subMenuItem.title)}
                     onClick={() => throttledOpenDashboard(subMenuItem?.type)}
                   >
                     {menuTitles(subMenuItem.title)}
-                  </Menu.Item>
+                  </MenuItem>
                 ))}
               </SubMenu>
             );
           } else if (menuItem.title === EMenuItem.GetHelp) {
             return (
-              <Menu.Item
+              <MenuItem
                 key={menuItem.key}
                 title={menuTitles(menuItem.title)}
                 icon={
@@ -200,22 +201,22 @@ export default function SideNav() {
                 onClick={() => openHelp()}
               >
                 {menuTitles(menuItem.title)}
-              </Menu.Item>
+              </MenuItem>
             );
           } else if (menuItem.title === EMenuItem.Settings) {
             return (
-              <Menu.Item
+              <MenuItem
                 key={menuItem.key}
                 title={menuTitles(menuItem.title)}
                 icon={<i className={menuItem?.icon} />}
                 onClick={openSettingsWindow}
               >
                 {menuTitles(menuItem.title)}
-              </Menu.Item>
+              </MenuItem>
             );
           } else if (menuItem.title === EMenuItem.Login) {
             return (
-              <Menu.Item
+              <MenuItem
                 key={menuItem.key}
                 title={!isLoggedIn ? menuTitles(menuItem.title) : $t('Log Out')}
                 className={cx(styles.login, !isOpen && styles.loginClosed)}
@@ -241,7 +242,7 @@ export default function SideNav() {
                     </>
                   )
                 )}
-              </Menu.Item>
+              </MenuItem>
             );
           }
         })}

@@ -23,6 +23,7 @@ import Scrollable from 'components-react/shared/Scrollable';
 import HelpTip from 'components-react/shared/HelpTip';
 import NewBadge from 'components-react/shared/NewBadge';
 import SubMenu from 'components-react/shared/SubMenu';
+import MenuItem from 'components-react/shared/MenuItem';
 import { EDismissable } from 'services/dismissables';
 
 const { Sider } = Layout;
@@ -260,7 +261,7 @@ export default function SideNav() {
                 // don't translate tab title because the user has set it
                 return showCustomEditor && !isOpen && !compactView ? (
                   studioTabs.map(tab => (
-                    <Menu.Item
+                    <MenuItem
                       key={tab.key}
                       className={cx(
                         !isOpen && styles.closed,
@@ -276,7 +277,7 @@ export default function SideNav() {
                       onClick={() => navigateToStudioTab(tab.target, tab.trackingTarget, tab.key)}
                     >
                       {tab.title}
-                    </Menu.Item>
+                    </MenuItem>
                   ))
                 ) : (
                   <SubMenu
@@ -296,7 +297,7 @@ export default function SideNav() {
                     applystyles={+isOpen}
                   >
                     {studioTabs.map(tab => (
-                      <Menu.Item
+                      <MenuItem
                         key={`sub-${tab.key}`}
                         className={cx(
                           (([EMenuItemKey.Editor as string, tab?.key, `sub-${tab?.key}`].includes(
@@ -313,7 +314,7 @@ export default function SideNav() {
                         }
                       >
                         {tab.title}
-                      </Menu.Item>
+                      </MenuItem>
                     ))}
                   </SubMenu>
                 );
@@ -337,32 +338,32 @@ export default function SideNav() {
                     applystyles={+isOpen}
                   >
                     {menuItem?.subMenuItems?.map((subMenuItem: IMenuItem) => (
-                      <Menu.Item
+                      <MenuItem
                         key={subMenuItem.key}
                         className={currentMenuItem === subMenuItem?.key && styles.active}
                         title={menuTitles(subMenuItem.title)}
                         onClick={() => handleNavigation(subMenuItem)}
                       >
                         {menuTitles(subMenuItem.title)}
-                      </Menu.Item>
+                      </MenuItem>
                     ))}
                     {menuItem.title === EMenuItem.AppStore &&
                       enabledApps.map(
                         app =>
                           app && (
-                            <Menu.Item
+                            <MenuItem
                               key={app?.id}
                               className={cx(currentMenuItem === app?.id && styles.active)}
                               title={app.manifest?.name}
                               onClick={() => app?.id && navigateApp(app?.id)}
                             >
                               {app.manifest?.name}
-                            </Menu.Item>
+                            </MenuItem>
                           ),
                       )}
                   </SubMenu>
                 ) : (
-                  <Menu.Item
+                  <MenuItem
                     key={menuItem.key}
                     className={cx(
                       !isOpen && styles.closed,
@@ -376,7 +377,7 @@ export default function SideNav() {
                     }}
                   >
                     {menuTitles(menuItem.title)}
-                  </Menu.Item>
+                  </MenuItem>
                 );
               }
             })}
@@ -387,7 +388,7 @@ export default function SideNav() {
                 app =>
                   app &&
                   app?.isActive && (
-                    <Menu.Item
+                    <MenuItem
                       key={app?.id}
                       className={cx(
                         !isOpen && styles.closed,
@@ -405,7 +406,7 @@ export default function SideNav() {
                       onClick={() => app?.id && navigateApp(app?.id)}
                     >
                       {app?.name}
-                    </Menu.Item>
+                    </MenuItem>
                   ),
               )}
           </Menu>
