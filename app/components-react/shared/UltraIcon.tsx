@@ -17,7 +17,7 @@ interface IUltraIcon {
  */
 export default function UltraIcon({ type, className, style }: IUltraIcon) {
   const { isDarkTheme } = useVuex(() => ({
-    isDarkTheme: Services.CustomizationService.isDarkTheme,
+    isDarkTheme: Services.CustomizationService.views.isDarkTheme,
   }));
 
   if (type === 'badge') {
