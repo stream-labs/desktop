@@ -19,17 +19,15 @@ export default function SideNav() {
     NavigationService,
     MagicLinkService,
     UsageStatisticsService,
-    DualOutputService,
   } = Services;
 
   const isDevMode = Utils.isDevMode();
 
-  const { studioMode, isLoggedIn, isPrime, dualOutputMode } = useVuex(
+  const { studioMode, isLoggedIn, isPrime } = useVuex(
     () => ({
       studioMode: TransitionsService.views.studioMode,
       isLoggedIn: UserService.views.isLoggedIn,
       isPrime: UserService.views.isPrime,
-      dualOutputMode: DualOutputService.views.dualOutputMode,
     }),
     false,
   );
@@ -57,12 +55,6 @@ export default function SideNav() {
     } else {
       TransitionsService.actions.enableStudioMode();
     }
-  }
-
-  function toggleDualOutput() {
-    // @@@ TODO: record analytics
-    // UsageStatisticsService.actions.recordClick('NavTools', 'dual-output-mode');
-    DualOutputService.actions.toggleDualOutputMode();
   }
 
   async function openDashboard(page?: string) {
@@ -149,13 +141,6 @@ export default function SideNav() {
         title={$t('Studio Mode')}
       >
         <i className="icon-studio-mode-3" />
-      </div>
-      <div
-        className={cx(styles.cell, { [styles.toggleOn]: dualOutputMode })}
-        onClick={toggleDualOutput}
-        title={$t('Dual Output Mode')}
-      >
-        <i className="icon-two-columns-50-50" />
       </div>
       <div className={styles.cell} onClick={openHelp} title={$t('Get Help')}>
         <Badge count={<i className={cx('icon-pop-out-3', styles.linkBadge)} />}>
