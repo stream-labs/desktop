@@ -55,7 +55,7 @@ export function AppearanceSettings() {
           <div style={{ marginBottom: '16px' }}>
             <a onClick={upgradeToPrime}>
               <UltraIcon
-                type={Services.CustomizationService.isDarkTheme ? 'night' : 'day'}
+                type={CustomizationService.isDarkTheme ? 'night' : 'day'}
                 style={{
                   display: 'inline-block',
                   height: '12px',

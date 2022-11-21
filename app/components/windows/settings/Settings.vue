@@ -34,7 +34,13 @@
           >
             {{ $t(category) }}
           </NavItem>
-          <NavItem v-if="!isPrime && isLoggedIn" key="Prime" to="Ultra" :ultra="true">
+          <NavItem
+            v-if="!isPrime && isLoggedIn"
+            key="Prime"
+            to="Ultra"
+            :ultra="true"
+            :class="{ disabled: searchStr && !searchResultPages.includes('ultra') }"
+          >
             Ultra
           </NavItem>
           <div
