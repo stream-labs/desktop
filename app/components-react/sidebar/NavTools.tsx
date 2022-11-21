@@ -19,7 +19,6 @@ export default function SideNav() {
     NavigationService,
     MagicLinkService,
     UsageStatisticsService,
-    CustomizationService,
   } = Services;
 
   const isDevMode = Utils.isDevMode();
@@ -107,11 +106,7 @@ export default function SideNav() {
           title={$t('Get Ultra')}
         >
           <Badge count={<i className={cx('icon-pop-out-3', styles.linkBadge)} />}>
-            {CustomizationService.isDarkTheme ? (
-              <UltraIcon type="night" />
-            ) : (
-              <UltraIcon type="day" />
-            )}
+            <UltraIcon />
           </Badge>
         </div>
       )}
