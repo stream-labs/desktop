@@ -180,5 +180,6 @@
   "Set Dual Output Settings": "Set Dual Output Settings",
   "Mode:": "Mode:",
   "Horizontal": "Horizontal",
-  "Set up your resolution for your vertical output in the video tab of settings by clicking on \"Vertical Output\"": "Set up your resolution for your vertical output in the video tab of settings by clicking on \"Vertical Output\""
+  "Set up your resolution for each orientation in the Video Settings tab.": " Set up your resolution for each orientation in the Video Settings tab.",
+  "You can select which one stream with in the Go Live window.": "You can select which one stream with in the Go Live window."
 }

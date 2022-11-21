@@ -96,7 +96,7 @@ export function MultistreamingSettings() {
               <li>
                 <Translate
                   message={
-                    'Step 2: Ensure the "Confirm stream title and game before going live" option is checked in the <general>General</general> settings tab."'
+                    'Step 2: Ensure the \"Confirm stream title and game before going live\" option is checked in the <general>General</general> settings tab."'
                   }
                 >
                   <u slot="general" />
@@ -115,9 +115,7 @@ export function MultistreamingSettings() {
           <SwitchInput value={dualOutputMode} onChange={toggleDualOutputMode} />
           {$t('Enable Dual Outputs (simultaneous horizontal and vertical Outputs)')}{' '}
           <Tooltip
-            title={
-              'Set up your resolution for your vertical output in the video tab of settings by clicking on \"Vertical Output\"'
-            }
+            title={$t('Set up your resolution for each orientation in the Video Settings tab.')}
             className={styles.doTooltip}
             placement="bottom"
             lightShadow
@@ -131,7 +129,7 @@ export function MultistreamingSettings() {
           <div className={styles.doDescription}>
             {$t('Set your default output mode for each platform.')}{' '}
             <Tooltip
-              title={'Temp Tooltip Text 2'}
+              title={$t('You can select which one stream with in the Go Live window.')}
               className={styles.doTooltip}
               placement="top"
               lightShadow
