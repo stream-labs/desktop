@@ -249,7 +249,6 @@ export default function MediaGallery() {
                   extra={[
                     file.prime ? (
                       <UltraIcon
-                        type={Services.CustomizationService.isDarkTheme ? 'night' : 'day'}
                         key="prime"
                         style={{
                           display: 'inline-block',

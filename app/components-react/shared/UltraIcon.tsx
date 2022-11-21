@@ -1,5 +1,6 @@
 import React, { CSSProperties } from 'react';
 import { Services } from '../service-provider';
+import { useVuex } from 'components-react/hooks';
 import cx from 'classnames';
 
 type TUltraIcon = 'badge' | 'day' | 'night' | 'simple';
@@ -15,6 +16,10 @@ interface IUltraIcon {
  * when displaying the icon with multicolor styling.
  */
 export default function UltraIcon({ type, className, style }: IUltraIcon) {
+  const { isDarkTheme } = useVuex(() => ({
+    isDarkTheme: Services.CustomizationService.isDarkTheme,
+  }));
+
   if (type === 'badge') {
     return (
       <svg
@@ -58,7 +63,7 @@ export default function UltraIcon({ type, className, style }: IUltraIcon) {
     );
   }
 
-  if (type === 'day' || (!type && !Services.CustomizationService.isDarkTheme)) {
+  if (type === 'day' || (!type && !isDarkTheme)) {
     return (
       <svg
         width="15"
@@ -66,7 +71,7 @@ export default function UltraIcon({ type, className, style }: IUltraIcon) {
         viewBox="0 0 15 15"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
-        className={cx('ultra-icon', className)}
+        className={cx('ultra-icon', 'ultra-icon-day', className)}
         style={style}
       >
         <path
@@ -100,7 +105,7 @@ export default function UltraIcon({ type, className, style }: IUltraIcon) {
     );
   }
 
-  if (type === 'night' || (!type && Services.CustomizationService.isDarkTheme)) {
+  if (type === 'night' || (!type && isDarkTheme)) {
     return (
       <svg
         width="15"
@@ -108,7 +113,7 @@ export default function UltraIcon({ type, className, style }: IUltraIcon) {
         viewBox="0 0 15 15"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
-        className={cx('ultra-icon', className)}
+        className={cx('ultra-icon', 'ultra-icon-night', className)}
         style={style}
       >
         <path
