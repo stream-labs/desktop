@@ -210,7 +210,11 @@ export default class Settings extends Vue {
   }
 
   onSearchCompletedHandler(foundPages: string[]) {
-    this.searchResultPages = foundPages;
+    if (!this.userService.views.isPrime && this.includeUltra(this.searchStr)) {
+      this.searchResultPages = [...foundPages, 'ultra'];
+    } else {
+      this.searchResultPages = foundPages;
+    }
     // if there are not search results for the current page than switch to the first found page
     if (foundPages.length && !foundPages.includes(this.categoryName)) {
       this.categoryName = foundPages[0];
@@ -223,6 +227,17 @@ export default class Settings extends Vue {
     } else {
       this.debouncedSearchInput(str);
     }
+  }
+
+  includeUltra(str: string) {
+    if (str.length < 6 && str.toLowerCase().startsWith('u')) {
+      for (let i = 0; i < 'ultra'.length + 1; i++) {
+        if ('ultra'.slice(0, i) === str) {
+          return true;
+        }
+      }
+    }
+    return false;
   }
 
   @debounce(300)
