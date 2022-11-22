@@ -231,5 +231,8 @@
   "FPS Numerator": "FPS Numerator",
   "FPS Denominator": "FPS Denominator",
   "FPS Value": "FPS Value",
-  "The resolution must be in the format [width]x[height] (i.e. 1920x1080)": "The resolution must be in the format [width]x[height] (i.e. 1920x1080)"
+  "The resolution must be in the format [width]x[height] (i.e. 1920x1080)": "The resolution must be in the format [width]x[height] (i.e. 1920x1080)",
+  "Custom": "Custom",
+  "Custom Base Resolution": "Custom Base Resolution",
+  "Custom Output Resolution": "Custom Output Resolution"
 }
