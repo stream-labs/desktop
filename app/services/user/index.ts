@@ -850,7 +850,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
       return validatePlatformResult;
     }
 
-    if (!this.sideNavService.views.hasLegacyMenu) {
+    if (!this.sideNavService.views.hasLegacyMenu && !this.views.auth.hasRelogged) {
       this.sideNavService.setNewUserLogin();
     } else if (
       this.sideNavService.views.hasLegacyMenu &&
