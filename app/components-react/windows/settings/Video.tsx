@@ -49,8 +49,12 @@ class VideoSettingsModule {
   }
 
   state = injectState({
-    customBaseRes: !this.baseResOptions.find(opt => opt.value === this.values.outputRes),
-    customOutputRes: !this.outputResOptions.find(opt => opt.value === this.values.outputRes),
+    customBaseRes: !this.baseResOptions.find(
+      opt => opt.value === this.service.videoSettingsValues.outputRes,
+    ),
+    customOutputRes: !this.outputResOptions.find(
+      opt => opt.value === this.service.videoSettingsValues.outputRes,
+    ),
   });
 
   get metadata() {
