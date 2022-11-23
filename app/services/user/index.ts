@@ -526,8 +526,6 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
 
     if (!linkedPlatforms) return;
 
-    if (linkedPlatforms.force_login_required) return true;
-
     if (linkedPlatforms.user_id) {
       this.writeUserIdFile(linkedPlatforms.user_id);
       this.SET_USER(linkedPlatforms.user_id, linkedPlatforms.created_at);
@@ -597,6 +595,8 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     } else {
       this.UNLINK_SLID();
     }
+
+    if (linkedPlatforms.force_login_required) return true;
   }
 
   fetchLinkedPlatforms() {
