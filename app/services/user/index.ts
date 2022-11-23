@@ -825,7 +825,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
       try {
         await this.clearForceLoginStatus();
 
-        if (!isOnStartup) {
+        if (isOnStartup) {
           this.SET_IS_RELOG(true);
           this.LOGOUT();
           await remote.dialog.showMessageBox({
