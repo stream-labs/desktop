@@ -1,8 +1,8 @@
 import * as remote from '@electron/remote';
 import React from 'react';
-import { useModule } from 'slap';
+import { useModule, injectState } from 'slap';
 import { Services } from '../../service-provider';
-import FormFactory from 'components-react/shared/inputs/FormFactory';
+import FormFactory, { TInputValue } from 'components-react/shared/inputs/FormFactory';
 import * as obs from '../../../../obs-api';
 import { $t } from 'services/i18n';
 import styles from './Common.m.less';
@@ -41,25 +41,53 @@ const FPS_OPTIONS = [
 class VideoSettingsModule {
   service = Services.VideoSettingsService;
 
-  get values() {
-    return this.service.videoSettingsValues;
+  get values(): Dictionary<TInputValue> {
+    const vals = this.service.videoSettingsValues;
+    const baseRes = this.state?.customBaseRes ? 'custom' : vals.baseRes;
+    const outputRes = this.state?.customOutputRes ? 'custom' : vals.outputRes;
+    return { ...vals, baseRes, outputRes };
   }
+
+  state = injectState({
+    customBaseRes: !this.baseResOptions.find(
+      opt => opt.value === this.service.videoSettingsValues.baseRes,
+    ),
+    customOutputRes: !this.outputResOptions.find(
+      opt => opt.value === this.service.videoSettingsValues.outputRes,
+    ),
+  });
 
   get metadata() {
     return {
       baseRes: {
-        type: 'autocomplete',
+        type: 'list',
         label: $t('Base (Canvas) Resolution'),
-        options: CANVAS_RES_OPTIONS.concat(this.monitorResolutions),
-        rules: [this.resolutionValidator],
-        onChange: (val: string) => this.setResolution('baseRes', val),
+        options: this.baseResOptions,
+        onChange: (val: string) => this.selectResolution('baseRes', val),
+        children: {
+          customBaseRes: {
+            type: 'text',
+            label: $t('Custom Base Resolution'),
+            rules: [this.resolutionValidator],
+            onChange: (val: string) => this.setResolution('baseRes', val),
+            displayed: this.state.customBaseRes,
+          },
+        },
       },
       outputRes: {
-        type: 'autocomplete',
+        type: 'list',
         label: $t('Output (Scaled) Resolution'),
-        options: OUTPUT_RES_OPTIONS,
-        rules: [this.resolutionValidator],
-        onChange: (val: string) => this.setResolution('outputRes', val),
+        options: this.outputResOptions,
+        onChange: (val: string) => this.selectResolution('outputRes', val),
+        children: {
+          customOutputRes: {
+            type: 'text',
+            label: $t('Custom Output Resolution'),
+            rules: [this.resolutionValidator],
+            onChange: (val: string) => this.setResolution('outputRes', val),
+            displayed: this.state.customOutputRes,
+          },
+        },
       },
       scaleType: {
         type: 'list',
@@ -112,12 +140,20 @@ class VideoSettingsModule {
     };
   }
 
+  get baseResOptions() {
+    return CANVAS_RES_OPTIONS.concat(this.monitorResolutions).concat([
+      { label: $t('Custom'), value: 'custom' },
+    ]);
+  }
+
   get outputResOptions() {
     const baseRes = `${this.service.state.videoContext.baseWidth}x${this.service.state.videoContext.baseHeight}`;
     if (!OUTPUT_RES_OPTIONS.find(opt => opt.value === baseRes)) {
-      return [{ label: baseRes, value: baseRes }].concat(OUTPUT_RES_OPTIONS);
+      return [{ label: baseRes, value: baseRes }]
+        .concat(OUTPUT_RES_OPTIONS)
+        .concat([{ label: $t('Custom'), value: 'custom' }]);
     }
-    return OUTPUT_RES_OPTIONS;
+    return OUTPUT_RES_OPTIONS.concat([{ label: $t('Custom'), value: 'custom' }]);
   }
 
   get monitorResolutions() {
@@ -143,6 +179,23 @@ class VideoSettingsModule {
     const prefix = key === 'baseRes' ? 'base' : 'output';
     this.service.actions.setVideoSetting(`${prefix}Width`, Number(width));
     this.service.actions.setVideoSetting(`${prefix}Height`, Number(height));
+  }
+
+  selectResolution(key: string, value: string) {
+    if (value === 'custom') {
+      this.setCustomResolution(key, true);
+    } else {
+      this.setCustomResolution(key, false);
+      this.setResolution(key, value);
+    }
+  }
+
+  setCustomResolution(key: string, value: boolean) {
+    if (key === 'baseRes') {
+      this.state.setCustomBaseRes(value);
+    } else {
+      this.state.setCustomOutputRes(value);
+    }
   }
 
   setFPSType(value: obs.EFPSType) {

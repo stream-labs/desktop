@@ -6,7 +6,7 @@ import { TInputType, TSlobsInputProps } from './inputs';
 import Form, { useForm } from './Form';
 import { TInputMetadata } from './metadata';
 
-type TInputValue = string | number | boolean;
+export type TInputValue = string | number | boolean;
 
 const componentTable: {
   [k in TInputType]?: React.FunctionComponent<TSlobsInputProps<{}, TInputValue>>;
