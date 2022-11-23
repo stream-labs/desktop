@@ -821,20 +821,22 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
 
     const forceRelogin = await this.updateLinkedPlatforms();
 
-    if (isOnStartup && forceRelogin) {
+    if (forceRelogin) {
       try {
         await this.clearForceLoginStatus();
 
-        this.SET_IS_RELOG(true);
-        this.LOGOUT();
-        await remote.dialog.showMessageBox({
-          title: 'Streamlabs Desktop',
-          message: $t(
-            'Your login has expired. Please reauthenticate to continue using Streamlabs Desktop.',
-          ),
-        });
-        this.showLogin();
-        return;
+        if (!isOnStartup) {
+          this.SET_IS_RELOG(true);
+          this.LOGOUT();
+          await remote.dialog.showMessageBox({
+            title: 'Streamlabs Desktop',
+            message: $t(
+              'Your login has expired. Please reauthenticate to continue using Streamlabs Desktop.',
+            ),
+          });
+          this.showLogin();
+          return;
+        }
       } catch (e: unknown) {
         console.error('Error forcing relog');
         // Intentional that if something goes wrong here, we continue as normal,
