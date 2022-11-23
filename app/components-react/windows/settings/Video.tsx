@@ -45,7 +45,13 @@ class VideoSettingsModule {
     const vals = this.service.videoSettingsValues;
     const baseRes = this.state?.customBaseRes ? 'custom' : vals.baseRes;
     const outputRes = this.state?.customOutputRes ? 'custom' : vals.outputRes;
-    return { ...vals, baseRes, outputRes };
+    return {
+      ...vals,
+      baseRes,
+      outputRes,
+      customBaseRes: this.state.customBaseResValue,
+      customOutputRes: this.state.customOutputResValue,
+    };
   }
 
   state = injectState({
@@ -55,6 +61,8 @@ class VideoSettingsModule {
     customOutputRes: !this.outputResOptions.find(
       opt => opt.value === this.service.videoSettingsValues.outputRes,
     ),
+    customBaseResValue: '',
+    customOutputResValue: '',
   });
 
   get metadata() {
@@ -175,10 +183,18 @@ class VideoSettingsModule {
   }
 
   setResolution(key: string, value: string) {
-    const [width, height] = value.split('x');
-    const prefix = key === 'baseRes' ? 'base' : 'output';
-    this.service.actions.setVideoSetting(`${prefix}Width`, Number(width));
-    this.service.actions.setVideoSetting(`${prefix}Height`, Number(height));
+    if (key === 'outputRes') {
+      this.state.setCustomOutputResValue(value);
+    } else if (key === 'baseRes') {
+      this.state.setCustomBaseResValue(value);
+    }
+
+    if (this.resolutionValidator.pattern.test(value)) {
+      const [width, height] = value.split('x');
+      const prefix = key === 'baseRes' ? 'base' : 'output';
+      this.service.actions.setVideoSetting(`${prefix}Width`, Number(width));
+      this.service.actions.setVideoSetting(`${prefix}Height`, Number(height));
+    }
   }
 
   selectResolution(key: string, value: string) {
