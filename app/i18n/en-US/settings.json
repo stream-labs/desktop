@@ -120,7 +120,7 @@
   "Stream Key": "Stream Key",
   "You can not change these settings when you're live": "You can not change these settings when you're live",
   "This feature is intended for overlay designers to export their work for our Theme Store. Not all sources will be exported, use at your own risk.": "This feature is intended for overlay designers to export their work for our Theme Store. Not all sources will be exported, use at your own risk.",
-  "Change the look of Streamlabs Desktop with Prime": "Change the look of Streamlabs Desktop with Prime",
+  "Change the look of Streamlabs Desktop with Ultra": "Change the look of Streamlabs Desktop with Ultra",
   "Virtual Webcam": "Virtual Webcam",
   "unlinked": "unlinked",
   "Unlink": "Unlink",
@@ -237,6 +237,9 @@
   "FPS Denominator": "FPS Denominator",
   "FPS Value": "FPS Value",
   "The resolution must be in the format [width]x[height] (i.e. 1920x1080)": "The resolution must be in the format [width]x[height] (i.e. 1920x1080)",
+  "Custom": "Custom",
+  "Custom Base Resolution": "Custom Base Resolution",
+  "Custom Output Resolution": "Custom Output Resolution",
   "Max Bitrate": "Max Bitrate",
   "CQ Level": "CQ Level",
   "Preset": "Preset",
@@ -244,4 +247,3 @@
   "Psycho Visual Tuning": "Psycho Visual Tuning",
   "GPU": "GPU",
   "Max B-frames": "Max B-frames"
-}

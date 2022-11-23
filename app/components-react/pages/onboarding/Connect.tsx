@@ -63,7 +63,9 @@ export function Connect() {
         )}
         {isRelog && (
           <h3 style={{ marginBottom: '16px' }}>
-            Your login has expired. Please re-login to continue using Streamlabs
+            {$t(
+              'Your login has expired. Please reauthenticate to continue using Streamlabs Desktop.',
+            )}
           </h3>
         )}
         <div className={styles.signupButtons}>
@@ -177,7 +179,7 @@ export class LoginModule {
           type: 'error',
           message: $t(
             'Twitch requires two factor authentication to be enabled on your account in order to stream to Twitch. ' +
-            'Please enable two factor authentication and try again.',
+              'Please enable two factor authentication and try again.',
           ),
           title: $t('Twitch Authentication Error'),
           buttons: [$t('Enable Two Factor Authentication'), $t('Dismiss')],

@@ -16,6 +16,8 @@ import { TextInput } from '../../shared/inputs';
 import { ButtonGroup } from '../../shared/ButtonGroup';
 import { FormInstance } from 'antd/lib/form';
 import { injectFormBinding, injectState, mutation, useModule } from 'slap';
+import UltraIcon from 'components-react/shared/UltraIcon';
+import ButtonHighlighted from 'components-react/shared/ButtonHighlighted';
 import { useVuex } from 'components-react/hooks';
 import Translate from 'components-react/shared/Translate';
 import * as remote from '@electron/remote';
@@ -66,6 +68,9 @@ class StreamSettingsModule {
   }
   private get magicLinkService() {
     return Services.MagicLinkService;
+  }
+  private get customizationService() {
+    return Services.CustomizationService;
   }
 
   // DEFINE MUTATIONS
@@ -165,6 +170,10 @@ class StreamSettingsModule {
 
   get customDestinations() {
     return this.streamingView.savedSettings.customDestinations;
+  }
+
+  get isDarkTheme() {
+    return this.customizationService.isDarkTheme;
   }
 
   platformMerge(platform: TPlatform) {
@@ -404,7 +413,13 @@ function Platform(p: { platform: TPlatform }) {
  * Renders a custom destinations list
  */
 function CustomDestinationList() {
-  const { isPrime, customDestinations, editCustomDestMode, addCustomDest } = useStreamSettings();
+  const {
+    isPrime,
+    customDestinations,
+    editCustomDestMode,
+    addCustomDest,
+    isDarkTheme,
+  } = useStreamSettings();
   const shouldShowPrimeLabel = !isPrime;
   const destinations = customDestinations;
   const isEditMode = editCustomDestMode !== false;
@@ -420,8 +435,25 @@ function CustomDestinationList() {
         <a className={css.addDestinationBtn} onClick={addCustomDest}>
           <i className="fa fa-plus" />
           <span>{$t('Add Destination')}</span>
+
           {shouldShowPrimeLabel ? (
-            <b className={css.prime}>prime</b>
+            <ButtonHighlighted
+              onClick={addCustomDest}
+              filled
+              text={$t('Ultra')}
+              icon={
+                <UltraIcon
+                  type="simple"
+                  style={{
+                    fill: '#09161D',
+                    display: 'inline-block',
+                    height: '12px',
+                    width: '12px',
+                    marginRight: '5px',
+                  }}
+                />
+              }
+            />
           ) : (
             <div className={css.prime} />
           )}
