@@ -22,8 +22,6 @@ export class VideoSettingsService extends StatefulService<{ videoContext: obs.IV
     return {
       baseRes: `${context.baseWidth}x${context.baseHeight}`,
       outputRes: `${context.outputWidth}x${context.outputHeight}`,
-      customBaseRes: `${context.baseWidth}x${context.baseHeight}`,
-      customOutputRes: `${context.outputWidth}x${context.outputHeight}`,
       scaleType: context.scaleType,
       fpsType: context.fpsType,
       fpsCom: `${context.fpsNum}-${context.fpsDen}`,
