@@ -993,6 +993,10 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
       throw new Error('Account merging can only be performed while logged in');
     }
 
+    // Ensure scene collections are updated before the migration begins
+    await this.sceneCollectionsService.save();
+    await this.sceneCollectionsService.safeSync();
+
     this.SET_AUTH_STATE(EAuthProcessState.Loading);
     const onWindowShow = () => this.SET_AUTH_STATE(EAuthProcessState.Idle);
 
