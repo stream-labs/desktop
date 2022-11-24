@@ -818,9 +818,13 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     return jfetch<unknown>(request);
   }
 
-  async reauthenticate() {
+  async reauthenticate(onStartup?: boolean) {
     this.SET_IS_RELOG(true);
-    this.LOGOUT();
+    if (onStartup) {
+      this.LOGOUT();
+    } else {
+      await this.logOut();
+    }
     await remote.dialog.showMessageBox({
       title: 'Streamlabs Desktop',
       message: $t(
@@ -845,7 +849,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
         await this.clearForceLoginStatus();
 
         if (isOnStartup) {
-          await this.reauthenticate();
+          await this.reauthenticate(true);
           return;
         }
       } catch (e: unknown) {
