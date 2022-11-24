@@ -410,6 +410,13 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     if (this.views.isPartialSLAuth) {
       this.LOGOUT();
     }
+
+    this.websocketService.socketEvent.subscribe(async event => {
+      if (event.type === 'slid.force_logout') {
+        await this.clearForceLoginStatus();
+        await this.reauthenticate();
+      }
+    });
   }
 
   get views() {
@@ -811,6 +818,18 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     return jfetch<unknown>(request);
   }
 
+  async reauthenticate() {
+    this.SET_IS_RELOG(true);
+    this.LOGOUT();
+    await remote.dialog.showMessageBox({
+      title: 'Streamlabs Desktop',
+      message: $t(
+        'Your login has expired. Please reauthenticate to continue using Streamlabs Desktop.',
+      ),
+    });
+    this.showLogin();
+  }
+
   @RunInLoadingMode()
   private async login(service: IPlatformService, auth?: IUserAuth, isOnStartup = false) {
     if (!auth) auth = this.state.auth;
@@ -826,15 +845,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
         await this.clearForceLoginStatus();
 
         if (isOnStartup) {
-          this.SET_IS_RELOG(true);
-          this.LOGOUT();
-          await remote.dialog.showMessageBox({
-            title: 'Streamlabs Desktop',
-            message: $t(
-              'Your login has expired. Please reauthenticate to continue using Streamlabs Desktop.',
-            ),
-          });
-          this.showLogin();
+          await this.reauthenticate();
           return;
         }
       } catch (e: unknown) {
