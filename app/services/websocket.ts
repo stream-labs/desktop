@@ -118,7 +118,7 @@ interface ISafeModeDisabledSocketEvent {
 
 interface ISLIDMerged {
   type: 'slid.force_logout';
-  for: 'slid';
+  for: string;
 }
 
 export class WebsocketService extends Service {
