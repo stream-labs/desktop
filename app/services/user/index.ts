@@ -410,6 +410,13 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     if (this.views.isPartialSLAuth) {
       this.LOGOUT();
     }
+
+    this.websocketService.socketEvent.subscribe(async event => {
+      if (event.type === 'slid.force_logout') {
+        await this.clearForceLoginStatus();
+        await this.reauthenticate();
+      }
+    });
   }
 
   get views() {
@@ -811,6 +818,22 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     return jfetch<unknown>(request);
   }
 
+  async reauthenticate(onStartup?: boolean) {
+    this.SET_IS_RELOG(true);
+    if (onStartup) {
+      this.LOGOUT();
+    } else {
+      await this.logOut();
+    }
+    await remote.dialog.showMessageBox({
+      title: 'Streamlabs Desktop',
+      message: $t(
+        'Your login has expired. Please reauthenticate to continue using Streamlabs Desktop.',
+      ),
+    });
+    this.showLogin();
+  }
+
   @RunInLoadingMode()
   private async login(service: IPlatformService, auth?: IUserAuth, isOnStartup = false) {
     if (!auth) auth = this.state.auth;
@@ -826,15 +849,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
         await this.clearForceLoginStatus();
 
         if (isOnStartup) {
-          this.SET_IS_RELOG(true);
-          this.LOGOUT();
-          await remote.dialog.showMessageBox({
-            title: 'Streamlabs Desktop',
-            message: $t(
-              'Your login has expired. Please reauthenticate to continue using Streamlabs Desktop.',
-            ),
-          });
-          this.showLogin();
+          await this.reauthenticate(true);
           return;
         }
       } catch (e: unknown) {
@@ -977,6 +992,10 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     if (!this.isLoggedIn) {
       throw new Error('Account merging can only be performed while logged in');
     }
+
+    // Ensure scene collections are updated before the migration begins
+    await this.sceneCollectionsService.save();
+    await this.sceneCollectionsService.safeSync();
 
     this.SET_AUTH_STATE(EAuthProcessState.Loading);
     const onWindowShow = () => this.SET_AUTH_STATE(EAuthProcessState.Idle);
