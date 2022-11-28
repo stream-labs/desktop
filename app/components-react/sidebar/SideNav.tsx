@@ -294,7 +294,6 @@ export default function SideNav() {
                       !isOpen && styles.closed,
                       !isOpen && currentMenuItem === menuItem.key && styles.active,
                     )}
-                    applystyles={+isOpen}
                   >
                     {studioTabs.map(tab => (
                       <MenuItem
@@ -312,6 +311,7 @@ export default function SideNav() {
                         onClick={() =>
                           navigateToStudioTab(tab.target, tab.trackingTarget, `sub-${tab.key}`)
                         }
+                        type="submenu"
                       >
                         {tab.title}
                       </MenuItem>
@@ -335,7 +335,6 @@ export default function SideNav() {
                       !isOpen && styles.closed,
                       currentMenuItem === menuItem.key && styles.active,
                     )}
-                    applystyles={+isOpen}
                   >
                     {menuItem?.subMenuItems?.map((subMenuItem: IMenuItem) => (
                       <MenuItem
@@ -343,8 +342,10 @@ export default function SideNav() {
                         className={currentMenuItem === subMenuItem?.key && styles.active}
                         title={menuTitles(subMenuItem.title)}
                         onClick={() => handleNavigation(subMenuItem)}
+                        type="submenu"
                       >
                         {menuTitles(subMenuItem.title)}
+                        {'LONGLONGLONG'}
                       </MenuItem>
                     ))}
                     {menuItem.title === EMenuItem.AppStore &&
@@ -356,8 +357,10 @@ export default function SideNav() {
                               className={cx(currentMenuItem === app?.id && styles.active)}
                               title={app.manifest?.name}
                               onClick={() => app?.id && navigateApp(app?.id)}
+                              type="submenu"
                             >
                               {app.manifest?.name}
+                              {'LONGLONGLONG'}
                             </MenuItem>
                           ),
                       )}
@@ -377,6 +380,7 @@ export default function SideNav() {
                     }}
                   >
                     {menuTitles(menuItem.title)}
+                    {'LONGLONGLONG'}
                   </MenuItem>
                 );
               }
