@@ -729,7 +729,7 @@ export class StreamingService
 
   splitFile() {
     if (this.state.recordingStatus === ERecordingState.Recording) {
-      obs.NodeObs.OBS_service_splitFile();
+      this.outputsService.outputs.recording.splitFile();
     }
   }
 
@@ -986,7 +986,7 @@ export class StreamingService
           status: 'wrote',
           code: info.code,
         });
-        this.replayBufferFileWrite.next(obs.NodeObs.OBS_service_getLastReplay());
+        this.replayBufferFileWrite.next(this.outputsService.outputs.replay.lastFile());
       }
     }
 
