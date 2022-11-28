@@ -1,6 +1,6 @@
 import { Inject, mutation, StatefulService, InitAfter } from 'services/core';
 import * as obs from '../../../obs-api';
-import { SettingsManagerService } from 'app-services';
+import { SettingsManagerService, StreamingService } from 'app-services';
 import { $t } from 'services/i18n';
 
 interface IOutputServiceState {
@@ -19,6 +19,7 @@ const REPLAY_PROPERTIES = ['prefix', 'suffix'];
 @InitAfter('VideoSettingsService')
 export class OutputsService extends StatefulService<IOutputServiceState> {
   @Inject() settingsManagerService: SettingsManagerService;
+  @Inject() streamingService: StreamingService;
 
   static initialState = {
     stream: {},
@@ -75,6 +76,7 @@ export class OutputsService extends StatefulService<IOutputServiceState> {
     } else {
       this.createSimpleOutputs();
     }
+    this.connectSignals();
 
     this.migrateSettings();
   }
@@ -119,10 +121,18 @@ export class OutputsService extends StatefulService<IOutputServiceState> {
     this.outputs.replay = obs.SimpleReplayBufferFactory.create();
   }
 
+  connectSignals() {
+    Object.values(this.outputs).forEach(output => {
+      output.signalHandler = (signal: obs.EOutputSignal) =>
+        this.streamingService.handleOBSOutputSignal(signal);
+    });
+  }
+
   setAdvanced(value: boolean) {
     if (this.advancedMode === value) return;
 
     value ? this.createAdvancedOutputs() : this.createSimpleOutputs();
+    this.connectSignals();
     this.advancedMode = value;
   }
 
