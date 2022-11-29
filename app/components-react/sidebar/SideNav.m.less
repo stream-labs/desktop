@@ -40,6 +40,12 @@
       display: none;
     }
   }
+
+  :global(div.ant-menu.ant-menu-sub.ant-menu-inline),
+  :global(span.ant-menu-title-content) {
+    visibility: hidden;
+    opacity: 0;
+  }
 }
 
 .sidenav-scroll {
@@ -141,8 +147,10 @@ button.sidenav-button {
       display: none !important;
     }
 
+    :global(div.ant-menu.ant-menu-sub.ant-menu-inline),
     :global(span.ant-menu-title-content) {
-      display: none !important;
+      visibility: hidden;
+      opacity: 0;
     }
 
     .app-icons {
@@ -185,6 +193,14 @@ button.sidenav-button {
 
     :global(div.ant-menu-submenu-title) {
       padding-left: 16px !important;
+    }
+
+    :global(div.ant-menu.ant-menu-sub.ant-menu-inline),
+    :global(span.ant-menu-title-content) {
+      visibility: visible !important;
+      opacity: 1 !important;
+      overflow: visible;
+      transition: visibility 0s, opacity 0.5s linear;
     }
   }
 
