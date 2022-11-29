@@ -78,12 +78,12 @@ export class Display {
   // @@@ position + size and adds padding where needed
 
   constructor(public name: string, options: IDisplayOptions = {}) {
-    console.log('DISPLAY options ', options);
+    // console.log('DISPLAY options ', options);
 
-    this.context = this.videoService.createContext(); // why does this.videoService.actions.createContext() return void?
-    if (options.type === 'horizontal') {
-      this.videoService.updateContext(this.context);
-    }
+    // this.context = this.videoService.createContext(); // why does this.videoService.actions.createContext() return void?
+    // if (options.type === 'horizontal') {
+    //   this.videoService.updateContext(this.context);
+    // }
     //   this.context.video = {
     //     fpsNum: 120,
     //     fpsDen: 2,
@@ -113,9 +113,9 @@ export class Display {
     //   };
     // }
 
-    console.log('now context.video ', this.context.video);
+    // console.log('now context.video ', this.context.video);
 
-    console.log('DISPLAY context ', this.context);
+    // console.log('DISPLAY context ', this.context);
     this.sourceId = options.sourceId;
     this.electronWindowId = options.electronWindowId || remote.getCurrentWindow().id;
     this.slobsWindowId = options.slobsWindowId || Utils.getCurrentUrlParams().windowId;
@@ -452,27 +452,27 @@ export class VideoService extends Service {
   }
 
   createContext() {
-    const context = obs.VideoFactory.create();
-    console.log('VIDEOSERVICE created ', context);
-    return context;
+    // const context = obs.VideoFactory.create();
+    // console.log('VIDEOSERVICE created ', context);
+    // return context;
   }
 
   updateContext(context: obs.IVideo) {
-    context.video = {
-      fpsNum: 120,
-      fpsDen: 2,
-      baseWidth: 3840,
-      baseHeight: 2160,
-      outputWidth: 3840,
-      outputHeight: 2160,
-      outputFormat: obs.EVideoFormat.I420,
-      colorspace: obs.EColorSpace.CS709,
-      range: obs.ERangeType.Full,
-      scaleType: obs.EScaleType.Lanczos,
-      fpsType: obs.EFPSType.Fractional,
-    };
+    // context.video = {
+    //   fpsNum: 120,
+    //   fpsDen: 2,
+    //   baseWidth: 3840,
+    //   baseHeight: 2160,
+    //   outputWidth: 3840,
+    //   outputHeight: 2160,
+    //   outputFormat: obs.EVideoFormat.I420,
+    //   colorspace: obs.EColorSpace.CS709,
+    //   range: obs.ERangeType.Full,
+    //   scaleType: obs.EScaleType.Lanczos,
+    //   fpsType: obs.EFPSType.Fractional,
+    // };
 
-    this.setBaseResolution({ width: context.video.baseWidth, height: context.video.baseHeight });
+    // this.setBaseResolution({ width: context.video.baseWidth, height: context.video.baseHeight });
 
     return context;
   }
