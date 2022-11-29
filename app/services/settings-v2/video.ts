@@ -5,6 +5,10 @@ import { mutation, StatefulService } from '../core/stateful-service';
 import * as obs from '../../../obs-api';
 import { SettingsManagerService } from 'services/settings-manager';
 
+export function invalidFps(num: number, den: number) {
+  return num / den > 1000 || num / den < 1;
+}
+
 @InitAfter('UserService')
 export class VideoSettingsService extends StatefulService<{ videoContext: obs.IVideo }> {
   @Inject() settingsManagerService: SettingsManagerService;
@@ -36,11 +40,14 @@ export class VideoSettingsService extends StatefulService<{ videoContext: obs.IV
   }
 
   migrateSettings() {
-    Object.keys(this.videoSettings).forEach(
-      (key: keyof obs.IAdvancedStreaming | keyof obs.ISimpleStreaming) => {
-        this.SET_VIDEO_SETTING(key, this.videoSettings[key]);
-      },
-    );
+    Object.keys(this.videoSettings).forEach((key: keyof obs.IVideo) => {
+      this.SET_VIDEO_SETTING(key, this.videoSettings[key]);
+    });
+
+    if (invalidFps(this.state.videoContext.fpsNum, this.state.videoContext.fpsDen)) {
+      this.setVideoSetting('fpsNum', 30);
+      this.setVideoSetting('fpsDen', 1);
+    }
   }
 
   establishVideoContext() {
