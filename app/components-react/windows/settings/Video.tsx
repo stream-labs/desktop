@@ -210,7 +210,7 @@ class VideoSettingsModule {
       callback(
         $t(
           'This number is too large for a FPS Numerator of %{fpsNum}, please decrease it or increase the Numerator',
-          { fpsDen: this.values.fpsNum },
+          { fpsNum: this.values.fpsNum },
         ),
       );
     } else {
