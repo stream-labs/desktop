@@ -117,7 +117,7 @@
   "Very High": "Very High",
   "Apps": "Apps",
   "Finish": "Finish",
-  "Get Prime": "Get Prime",
+  "Get Ultra": "Get Ultra",
   "System error message:": "System error message:",
   "List is empty": "List is empty",
   "Not selected": "Not selected",
@@ -151,5 +151,6 @@
   "Apps Store Home": "Apps Store Home",
   "Dashboard Home": "Dashboard Home",
   "Alert Box Library": "Alert Box Library",
-  "Alert Box Settings": "Alert Box Settings"
+  "Alert Box Settings": "Alert Box Settings",
+  "Upgrade to Ultra": "Upgrade to Ultra"
 }

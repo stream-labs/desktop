@@ -20,6 +20,7 @@ import {
 import PlatformLogo from 'components-react/shared/PlatformLogo';
 import SubMenu from 'components-react/shared/SubMenu';
 import MenuItem from 'components-react/shared/MenuItem';
+import UltraIcon from 'components-react/shared/UltraIcon';
 
 export default function SideNav() {
   const {
@@ -147,7 +148,7 @@ export default function SideNav() {
                 icon={
                   <div>
                     <Badge count={<i className={cx('icon-pop-out-3', styles.linkBadge)} />}>
-                      <i className={menuItem.icon} />
+                      <UltraIcon />
                     </Badge>
                   </div>
                 }

@@ -13,6 +13,7 @@ import styles from './Appearance.m.less';
 import cx from 'classnames';
 import { EAppPageSlot } from 'services/platform-apps';
 import Scrollable from 'components-react/shared/Scrollable';
+import UltraIcon from 'components-react/shared/UltraIcon';
 
 const { Option } = Select;
 
@@ -123,10 +124,18 @@ export function AppearanceSettings() {
       <ObsSettingsSection>
         <ListInput {...bind.theme} label={'Theme'} options={CustomizationService.themeOptions} />
         {shouldShowPrime && (
-          <div className={styles.primeContainer}>
-            <a className={styles.primeContainer} onClick={upgradeToPrime}>
-              <i className={cx('icon-prime', styles.primeContainer)} />
-              {$t('Change the look of Streamlabs Desktop with Prime')}
+          <div style={{ marginBottom: '16px' }}>
+            <a onClick={upgradeToPrime}>
+              <UltraIcon
+                type={CustomizationService.isDarkTheme ? 'night' : 'day'}
+                style={{
+                  display: 'inline-block',
+                  height: '12px',
+                  width: '12px',
+                  marginRight: '5px',
+                }}
+              />
+              {$t('Change the look of Streamlabs Desktop with Ultra')}
             </a>
           </div>
         )}

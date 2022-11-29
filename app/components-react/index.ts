@@ -63,6 +63,7 @@ import PlatformAppPageView from './shared/PlatformAppPageView';
 import PlatformAppPopOut from './windows/PlatformAppPopOut';
 import RecentEventsWindow from './windows/RecentEvents';
 import NewBadge from './shared/NewBadge';
+import UltraIcon from './shared/UltraIcon';
 
 // list of React components to be used inside Vue components
 export const components = {
@@ -130,4 +131,5 @@ export const components = {
   PlatformAppPageView,
   PlatformAppPopOut,
   NewBadge,
+  UltraIcon,
 };

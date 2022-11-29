@@ -40,8 +40,8 @@ test('Onboarding steps', async t => {
   await makeScreenshots(t, 'Optimization progress');
 
   await (await app.client.$('h1=Choose your Streamlabs plan')).waitForDisplayed({ timeout: 15000 });
-  await makeScreenshots(t, 'Prime');
-  await (await app.client.$('div=Choose Free')).click();
+  await makeScreenshots(t, 'Ultra');
+  await (await app.client.$('div=Current Plan')).click();
 
   // success?
   await (await app.client.$('span=Sources')).waitForDisplayed({ timeout: 60000 });
