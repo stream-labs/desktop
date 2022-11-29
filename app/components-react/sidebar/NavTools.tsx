@@ -137,6 +137,7 @@ export default function SideNav() {
                 onClick={openDevTools}
               >
                 {menuItem.title}
+                {'LONGLONGLONGLONGLONG'}
               </MenuItem>
             );
           } else if (isLoggedIn && !isPrime && menuItem.title === EMenuItem.GetPrime) {
@@ -155,6 +156,7 @@ export default function SideNav() {
                 className={styles.badgeScale}
               >
                 {menuTitles(menuItem.title)}
+                {'LONGLONGLONGLONGLONG'}
               </MenuItem>
             );
           } else if (isLoggedIn && menuItem.title === EMenuItem.Dashboard) {
@@ -165,7 +167,7 @@ export default function SideNav() {
                 icon={
                   <div>
                     <Badge count={<i className={cx('icon-pop-out-3', styles.linkBadge)} />}>
-                      <i className={menuItem.icon} />
+                      <i className={cx(menuItem.icon, 'small')} />
                     </Badge>
                   </div>
                 }
@@ -181,6 +183,7 @@ export default function SideNav() {
                     onClick={() => throttledOpenDashboard(subMenuItem?.type)}
                   >
                     {menuTitles(subMenuItem.title)}
+                    {'LONGLONGLONGLONGLONG'}
                   </MenuItem>
                 ))}
               </SubMenu>
@@ -200,6 +203,7 @@ export default function SideNav() {
                 onClick={() => openHelp()}
               >
                 {menuTitles(menuItem.title)}
+                {'LONGLONGLONGLONGLONG'}
               </MenuItem>
             );
           } else if (menuItem.title === EMenuItem.Settings) {
@@ -211,6 +215,7 @@ export default function SideNav() {
                 onClick={openSettingsWindow}
               >
                 {menuTitles(menuItem.title)}
+                {'LONGLONGLONGLONGLONG'}
               </MenuItem>
             );
           } else if (menuItem.title === EMenuItem.Login) {
@@ -218,7 +223,7 @@ export default function SideNav() {
               <MenuItem
                 key={menuItem.key}
                 title={!isLoggedIn ? menuTitles(menuItem.title) : $t('Log Out')}
-                className={cx(styles.login, !isOpen && styles.loginClosed)}
+                className={cx(styles.login)}
                 icon={!isOpen && <i className="icon-user" />}
                 onClick={() => (isLoggedIn ? handleShowModal(true) : handleAuth())}
               >

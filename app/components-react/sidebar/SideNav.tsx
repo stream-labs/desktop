@@ -230,7 +230,7 @@ export default function SideNav() {
               } else if (menuItem.title === EMenuItem.Editor && loggedIn && studioTabs.length > 1) {
                 // handle editor tabs
                 return showCustomEditor && !isOpen && !compactView ? (
-                  <EditorTabs />
+                  <EditorTabs key="editor-tabs" />
                 ) : (
                   <SubMenu
                     key={menuItem.key}

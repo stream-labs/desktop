@@ -513,6 +513,34 @@
   .app-menu-item {
     padding-left: 40px !important;
   }
+
+  :global(li.ant-menu-item),
+  :global(li.ant-menu-submenu) {
+    background: none;
+    color: var(--paragraph);
+    height: unset !important;
+    min-height: 30px !important;
+    line-height: normal !important;
+    margin: 10px 0 !important;
+    overflow-wrap: break-word !important;
+    padding-bottom: 0px;
+
+    :active,
+    :link,
+    :focus,
+    :visited {
+      background: none;
+    }
+  }
+
+  :global(li.ant-menu-item.ant-menu-item-selected),
+  :global(li.ant-menu-submenu.ant-menu-item-selected) {
+    background: none;
+
+    &::after {
+      display: none;
+    }
+  }
 }
 
 .sidenav-scroll {
@@ -595,34 +623,34 @@ button.sidenav-button {
   flex: 1 1 auto;
   border-right: 0px !important;
 
-  :global(li.ant-menu-item.ant-menu-item-selected),
-  :global(li.ant-menu-submenu.ant-menu-item-selected) {
-    background: none;
+  // :global(li.ant-menu-item.ant-menu-item-selected),
+  // :global(li.ant-menu-submenu.ant-menu-item-selected) {
+  //   background: none;
 
-    &::after {
-      display: none;
-    }
-  }
+  //   &::after {
+  //     display: none;
+  //   }
+  // }
 
-  :global(li.ant-menu-item),
-  :global(li.ant-menu-submenu) {
-    background: none;
-    color: var(--paragraph);
-    height: unset !important;
-    min-height: 34px !important;
-    line-height: normal !important;
-    margin: 10px 0 !important;
-    overflow-wrap: break-word !important;
-    text-overflow: unset;
-    padding-bottom: 0px;
+  // :global(li.ant-menu-item),
+  // :global(li.ant-menu-submenu) {
+  //   background: none;
+  //   color: var(--paragraph);
+  //   height: unset !important;
+  //   min-height: 34px !important;
+  //   line-height: normal !important;
+  //   margin: 10px 0 !important;
+  //   overflow-wrap: break-word !important;
+  //   text-overflow: unset;
+  //   padding-bottom: 0px;
 
-    :active,
-    :link,
-    :focus,
-    :visited {
-      background: none;
-    }
-  }
+  //   :active,
+  //   :link,
+  //   :focus,
+  //   :visited {
+  //     background: none;
+  //   }
+  // }
 
   &.closed {
     :global(.ant-menu-item-icon) {
@@ -665,6 +693,7 @@ button.sidenav-button {
     :global(div.ant-menu-submenu-title) {
       align-items: center;
       display: flex;
+      overflow: visible;
     }
   }
 
@@ -679,6 +708,7 @@ button.sidenav-button {
     }
 
     .app-icons {
+      border-radius: 50%;
       width: 17px;
       height: 17px;
     }
