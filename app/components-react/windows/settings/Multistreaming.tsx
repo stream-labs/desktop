@@ -58,7 +58,6 @@ export function MultistreamingSettings() {
                 </Translate>
               </li>
               <li>
-                {/* eslint-disable-next-line no-useless-escape */}
                 <Translate
                   message={
                     'Step 2: Ensure the "Confirm stream title and game before going live" option is checked in the <general>General</general> settings tab."'
@@ -68,7 +67,6 @@ export function MultistreamingSettings() {
                 </Translate>
               </li>
               <li>
-                {/* eslint-disable-next-line no-useless-escape */}
                 {$t('Step 3: Select which platforms you are streaming to when you hit "Go Live".')}
               </li>
             </ul>
