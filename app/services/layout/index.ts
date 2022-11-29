@@ -8,6 +8,7 @@ import { $t } from 'services/i18n';
 import uuid from 'uuid/v4';
 import { LAYOUT_DATA, ELEMENT_DATA, ELayout, ELayoutElement } from './layout-data';
 import { UsageStatisticsService } from 'services/usage-statistics';
+import { menuTitles } from 'services/side-nav/menu-data';
 
 export { ELayout, ELayoutElement };
 
@@ -42,6 +43,17 @@ class LayoutViews extends ViewHandler<ILayoutServiceState> {
     return Object.keys(this.currentTab.slottedElements).filter(
       key => this.currentTab.slottedElements[key].slot,
     );
+  }
+
+  get studioTabs() {
+    return Object.keys(this.state.tabs).map((tab, i) => ({
+      key: tab,
+      target: tab,
+      title:
+        i === 0 || !this.state.tabs[tab].name ? menuTitles('Editor') : this.state.tabs[tab].name,
+      icon: this.state.tabs[tab].icon,
+      trackingTarget: tab === 'default' ? 'editor' : 'custom',
+    }));
   }
 
   elementTitle(element: ELayoutElement) {

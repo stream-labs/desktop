@@ -1,6 +1,6 @@
 import { ViewHandler, InitAfter, PersistentStatefulService, Inject } from 'services/core';
 import { mutation } from 'services/core/stateful-service';
-import { UserService, AppService, DismissablesService } from 'app-services';
+import { UserService, AppService, DismissablesService, LayoutService } from 'app-services';
 import { EDismissable } from 'services/dismissables';
 import {
   TMenuItems,
@@ -67,6 +67,10 @@ class SideNavViews extends ViewHandler<ISideNavServiceState> {
       return keys;
     }, []);
   }
+
+  getMenuItemData(name: ENavName, menuItem: EMenuItem) {
+    return this.state[name].menuItems.find(item => item.title === menuItem);
+  }
 }
 
 @InitAfter('UserService')
@@ -74,6 +78,7 @@ export class SideNavService extends PersistentStatefulService<ISideNavServiceSta
   @Inject() userService: UserService;
   @Inject() appService: AppService;
   @Inject() dismissablesService: DismissablesService;
+  @Inject() layoutService: LayoutService;
 
   static defaultState: ISideNavServiceState = {
     isOpen: false,
@@ -129,7 +134,10 @@ export class SideNavService extends PersistentStatefulService<ISideNavServiceSta
       }
     }
 
-    this.state.currentMenuItem = EMenuItemKey.Editor;
+    this.state.currentMenuItem =
+      this.layoutService.state.currentTab !== 'default'
+        ? this.layoutService.state.currentTab
+        : EMenuItemKey.Editor;
   }
 
   get views() {

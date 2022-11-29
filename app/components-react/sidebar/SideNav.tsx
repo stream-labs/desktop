@@ -26,6 +26,7 @@ import NewBadge from 'components-react/shared/NewBadge';
 import SubMenu from 'components-react/shared/SubMenu';
 import MenuItem from 'components-react/shared/MenuItem';
 import AppsNav from './AppsNav';
+import EditorTabs from './EditorTabs';
 
 const { Sider } = Layout;
 
@@ -56,23 +57,6 @@ export default function SideNav() {
     } else {
       NavigationService.actions.navigate(page);
     }
-  }
-
-  function navigateApp(appId: string, key?: string) {
-    NavigationService.actions.navigate('PlatformAppMainPage', { appId });
-    setCurrentMenuItem(key ?? appId);
-  }
-
-  function navigateToStudioTab(tabId: string, trackingTarget: string, key: string) {
-    if (currentMenuItem !== key) {
-      NavigationService.actions.navigate('Studio', { trackingTarget });
-      LayoutService.actions.setCurrentTab(tabId);
-      setCurrentMenuItem(key);
-    }
-  }
-
-  function iconSrc(appId: string, path: string) {
-    return PlatformAppsService.views.getAssetUrl(appId, path) || undefined;
   }
 
   function toggleStudioMode() {
@@ -116,10 +100,7 @@ export default function SideNav() {
     currentMenuItem,
     setCurrentMenuItem,
     tabs,
-    currentTab,
     leftDock,
-    apps,
-    enabledApps,
     loggedIn,
     menu,
     compactView,
@@ -138,16 +119,7 @@ export default function SideNav() {
     currentMenuItem: SideNavService.views.currentMenuItem,
     setCurrentMenuItem: SideNavService.actions.setCurrentMenuItem,
     tabs: LayoutService.state.tabs,
-    currentTab: LayoutService.views.currentTab,
     leftDock: CustomizationService.state.leftDock,
-    apps: SideNavService.views.apps,
-    enabledApps: PlatformAppsService.views.enabledApps
-      .filter(app => {
-        return !!app.manifest.pages.find(page => {
-          return page.slot === EAppPageSlot.TopNav;
-        });
-      })
-      .sort((a, b) => (a.manifest?.name > b.manifest?.name ? 1 : -1)),
     loggedIn: UserService.views.isLoggedIn,
     menu: SideNavService.views.state[ENavName.TopNav],
     compactView: SideNavService.views.compactView,
@@ -256,30 +228,9 @@ export default function SideNav() {
                 // skip Theme Audit if not enabled
                 return null;
               } else if (menuItem.title === EMenuItem.Editor && loggedIn && studioTabs.length > 1) {
-                // if closed, show editor tabs in sidenav
-                // which can be toggled to show or hide
-                // otherwise, show editor tabs in submenu
-                // don't translate tab title because the user has set it
+                // handle editor tabs
                 return showCustomEditor && !isOpen && !compactView ? (
-                  studioTabs.map(tab => (
-                    <MenuItem
-                      key={tab.key}
-                      className={cx(
-                        !isOpen && styles.closed,
-                        (([EMenuItemKey.Editor as string, tab?.key, `sub-${tab?.key}`].includes(
-                          currentMenuItem,
-                        ) &&
-                          currentTab === tabs[tab?.key]) ||
-                          currentMenuItem === tab?.key) &&
-                          styles.active,
-                      )}
-                      title={tab.title}
-                      icon={<i className={tab.icon} />}
-                      onClick={() => navigateToStudioTab(tab.target, tab.trackingTarget, tab.key)}
-                    >
-                      {tab.title}
-                    </MenuItem>
-                  ))
+                  <EditorTabs />
                 ) : (
                   <SubMenu
                     key={menuItem.key}
@@ -296,27 +247,7 @@ export default function SideNav() {
                       !isOpen && currentMenuItem === menuItem.key && styles.active,
                     )}
                   >
-                    {studioTabs.map(tab => (
-                      <MenuItem
-                        key={`sub-${tab.key}`}
-                        className={cx(
-                          (([EMenuItemKey.Editor as string, tab?.key, `sub-${tab?.key}`].includes(
-                            currentMenuItem,
-                          ) &&
-                            currentTab === tabs[tab?.key]) ||
-                            currentMenuItem === `sub-${tab?.key}`) &&
-                            styles.active,
-                        )}
-                        title={tab.title}
-                        icon={<i className={tab.icon} />}
-                        onClick={() =>
-                          navigateToStudioTab(tab.target, tab.trackingTarget, `sub-${tab.key}`)
-                        }
-                        type="submenu"
-                      >
-                        {tab.title}
-                      </MenuItem>
-                    ))}
+                    <EditorTabs type="submenu" />
                   </SubMenu>
                 );
               } else {
