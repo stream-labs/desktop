@@ -1,7 +1,43 @@
+// @import '../../styles/index';
+// @import '../../styles/mixins';
+
+// .submenu-wrapper {
+//   :global(li.ant-menu-submenu) {
+//     // height: unset !important;
+//     // min-height: 34px !important;
+//     // line-height: normal !important;
+//     // margin: 10px 0 !important;
+//     // overflow-wrap: break-word !important;
+//     // padding-bottom: 0px;
+//   }
+
+//   :global(span.ant-menu-title-content) {
+//     flex: unset;
+//     overflow: visible;
+//     word-break: break-word;
+//     // white-space: normal; // enables text to wrap
+//   }
+
+//   :global(div.ant-menu-submenu-title) {
+//     overflow: hidden;
+//     height: 34px;
+//     line-height: 34px;
+//     min-height: 34px;
+//   }
+
+//   :global(li.ant-menu-item:last-child) {
+//     margin-bottom: 0px !important;
+//   }
+// }
+
 @import '../../styles/index';
 @import '../../styles/mixins';
 
 .submenu-wrapper {
+  :global(li.ant-menu-item) {
+    padding-left: 40px !important;
+  }
+
   :global(span.ant-menu-title-content) {
     overflow: visible;
     text-overflow: unset;
@@ -12,6 +48,7 @@
     height: unset;
     line-height: unset;
     min-height: 30px;
+    text-overflow: unset;
   }
 
   :global(li.ant-menu-item:last-child) {

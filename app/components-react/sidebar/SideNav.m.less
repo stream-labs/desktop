@@ -509,6 +509,10 @@
   width: 100%;
   overflow: visible;
   transition: width 300ms;
+
+  .app-menu-item {
+    padding-left: 40px !important;
+  }
 }
 
 .sidenav-scroll {
@@ -609,6 +613,7 @@ button.sidenav-button {
     line-height: normal !important;
     margin: 10px 0 !important;
     overflow-wrap: break-word !important;
+    text-overflow: unset;
     padding-bottom: 0px;
 
     :active,
@@ -648,6 +653,18 @@ button.sidenav-button {
       width: 25px;
       height: 25px;
       transform: translate(-18%, 0%);
+      transition: width 0.15s ease-in-out, height 0.15s ease-in-out;
+
+      &:hover {
+        transition: transform 0.2s ease-in-out;
+        transform: scale(1.1, 1.1) translate(-15%, 0%);
+      }
+    }
+
+    :global(li.ant-menu-item),
+    :global(div.ant-menu-submenu-title) {
+      align-items: center;
+      display: flex;
     }
   }
 
@@ -664,6 +681,10 @@ button.sidenav-button {
     .app-icons {
       width: 17px;
       height: 17px;
+    }
+
+    :global(div.ant-menu-submenu-title) {
+      padding-left: 16px !important;
     }
   }
 

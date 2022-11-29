@@ -7,7 +7,7 @@ interface IMenuProps extends MenuItemProps {
   title?: string;
   className?: string;
   style?: CSSProperties;
-  type?: 'item' | 'submenu';
+  type?: 'item' | 'submenu' | 'app';
 }
 
 export default function Menutem(p: IMenuProps) {
@@ -17,7 +17,12 @@ export default function Menutem(p: IMenuProps) {
     <div title={title} className={styles.menuitemWrapper} style={style}>
       <Menu.Item
         {...p}
-        className={cx(p?.className, type === 'submenu' && styles.submenuItem)}
+        className={cx(
+          p?.className,
+          type === 'item' && styles.rootMenuItem,
+          type === 'submenu' && styles.submenuItem,
+          type === 'app' && styles.appSidenavItem,
+        )}
         title={false}
       >
         {p.children}

@@ -13,6 +13,7 @@ import {
 } from 'services/side-nav';
 import { EAvailableFeatures } from 'services/incremental-rollout';
 import { EAppPageSlot } from 'services/platform-apps';
+import { EDismissable } from 'services/dismissables';
 import { $t } from 'services/i18n';
 import { Services } from 'components-react/service-provider';
 import { useVuex } from 'components-react/hooks';
@@ -24,7 +25,7 @@ import HelpTip from 'components-react/shared/HelpTip';
 import NewBadge from 'components-react/shared/NewBadge';
 import SubMenu from 'components-react/shared/SubMenu';
 import MenuItem from 'components-react/shared/MenuItem';
-import { EDismissable } from 'services/dismissables';
+import AppsNav from './AppsNav';
 
 const { Sider } = Layout;
 
@@ -323,7 +324,7 @@ export default function SideNav() {
                 return menuItem.hasOwnProperty('subMenuItems') ? (
                   <SubMenu
                     key={menuItem.key}
-                    title={menuTitles(menuItem.title)}
+                    title={`${menuTitles(menuItem.title)}LONGLONGLONGLONG`}
                     icon={menuItem?.icon && <i className={menuItem.icon} />}
                     onTitleClick={() => {
                       menuItem?.subMenuItems[0]?.target &&
@@ -348,22 +349,7 @@ export default function SideNav() {
                         {'LONGLONGLONG'}
                       </MenuItem>
                     ))}
-                    {menuItem.title === EMenuItem.AppStore &&
-                      enabledApps.map(
-                        app =>
-                          app && (
-                            <MenuItem
-                              key={app?.id}
-                              className={cx(currentMenuItem === app?.id && styles.active)}
-                              title={app.manifest?.name}
-                              onClick={() => app?.id && navigateApp(app?.id)}
-                              type="submenu"
-                            >
-                              {app.manifest?.name}
-                              {'LONGLONGLONG'}
-                            </MenuItem>
-                          ),
-                      )}
+                    {menuItem.title === EMenuItem.AppStore && <AppsNav type="enabled" />}
                   </SubMenu>
                 ) : (
                   <MenuItem
@@ -385,34 +371,10 @@ export default function SideNav() {
                 );
               }
             })}
-            {loggedIn &&
-              !compactView &&
+            {loggedIn && !compactView && (
               // apps shown in sidebar
-              apps.map(
-                app =>
-                  app &&
-                  app?.isActive && (
-                    <MenuItem
-                      key={app?.id}
-                      className={cx(
-                        !isOpen && styles.closed,
-                        isOpen && styles.open,
-                        currentMenuItem === app?.id && styles.active,
-                      )}
-                      title={app?.name}
-                      icon={
-                        app?.icon && app?.id ? (
-                          <img src={iconSrc(app?.id, app?.icon)} className={styles.appIcons} />
-                        ) : (
-                          <i className="icon-integrations" />
-                        )
-                      }
-                      onClick={() => app?.id && navigateApp(app?.id)}
-                    >
-                      {app?.name}
-                    </MenuItem>
-                  ),
-              )}
+              <AppsNav />
+            )}
           </Menu>
 
           {/* show the bottom navigation menu */}
