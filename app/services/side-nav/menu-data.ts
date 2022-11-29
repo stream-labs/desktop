@@ -82,7 +82,7 @@ export enum EMenuItem {
   Highlighter = 'Highlighter',
   ThemeAudit = 'Theme Audit',
   DevTools = 'Dev Tools',
-  GetPrime = 'Get Prime',
+  GetPrime = 'Get Ultra',
   Dashboard = 'Dashboard',
   GetHelp = 'Get Help',
   Settings = 'Settings',
