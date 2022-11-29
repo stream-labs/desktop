@@ -219,7 +219,7 @@
   "Automatic File Splitting": "Automatic File Splitting",
   "Split Time (MB)": "Split Time (MB)",
   "Reset timestamps at the beginning of each split file": "Reset timestamps at the beginning of each split file",
-  "slidConnectMessage": "Setup or Connect a <b>Streamlabs ID</b> to access all products from Streamlabs with one single login.",
+  "slidConnectMessage": "Setup or Connect a <b>Streamlabs ID</b> to access all products from Streamlabs with one single login. (This may require you to re-login)",
   "Streamlabs ID": "Streamlabs ID",
   "Update Password": "Update Password",
   "Update Two-factor Auth": "Update Two-factor Auth",

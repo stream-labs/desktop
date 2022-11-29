@@ -256,8 +256,8 @@ export function getWidgetsConfig(host: string, token: string): Record<TWidgetTyp
         height: 700,
       },
 
-      url: `https://${host}/widgets/custom-widget/${token}`,
-      previewUrl: `https://${host}/widgets/custom-widget/${token}`,
+      url: `https://${host}/widgets/custom-widget?token=${token}`,
+      previewUrl: `https://${host}/widgets/custom-widget?token=${token}`,
       dataFetchUrl: `https://${host}/api/v5/slobs/widget/customwidget`,
       settingsSaveUrl: `https://${host}/api/v5/slobs/widget/customwidget`,
       settingsUpdateEvent: 'customWidgetSettingsUpdate',
