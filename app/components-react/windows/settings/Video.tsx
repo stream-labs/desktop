@@ -1,10 +1,12 @@
 import * as remote from '@electron/remote';
-import React from 'react';
+import React, { useState } from 'react';
 import { useModule } from 'slap';
 import { Services } from '../../service-provider';
 import FormFactory from 'components-react/shared/inputs/FormFactory';
 import * as obs from '../../../../obs-api';
 import { $t } from 'services/i18n';
+import { Select } from 'antd';
+import Tooltip from 'components-react/shared/Tooltip';
 import styles from './Common.m.less';
 
 const CANVAS_RES_OPTIONS = [
@@ -170,14 +172,78 @@ class VideoSettingsModule {
 export function VideoSettings() {
   const { values, metadata, onChange } = useModule(VideoSettingsModule);
 
+  const [orientation, setOrientation] = useState('both');
+
+  const orientationOptions = [
+    {
+      value: 'horizontal',
+      label: $t('Horizontal'),
+    },
+    {
+      value: 'vertical',
+      label: $t('Vertical'),
+    },
+    {
+      value: 'both',
+      label: $t('Dual Output (Simultaneous Horizontal and Vertical Outputs)'),
+    },
+  ];
+
   return (
-    <div className={styles.formSection}>
-      <FormFactory
-        values={values}
-        metadata={metadata}
-        onChange={onChange}
-        formOptions={{ layout: 'vertical' }}
-      />
+    <div className={styles.videoSettings}>
+      <div className={styles.videoSettingsHeader}>
+        <div className={styles.headingWrapper}>
+          <h3>{$t('Video Output Orientation')}</h3>
+          <Tooltip
+            title={$t('Dual Output can be enabled in the Multistreaming settings tab.')}
+            placement="right"
+            lightShadow
+          >
+            <i className="icon-information" />
+          </Tooltip>
+        </div>
+
+        <Select
+          defaultValue="both"
+          style={{ width: '100%' }}
+          onChange={value => setOrientation(value)}
+          options={orientationOptions}
+        />
+      </div>
+
+      {['horizontal', 'both'].includes(orientation) && (
+        <>
+          <div className={styles.outputHeader}>
+            <i className="icon-phone-case" />
+            <h1>{$t('Horizontal Output')}</h1>
+          </div>
+          <div className={styles.formSection}>
+            <FormFactory
+              values={values}
+              metadata={metadata}
+              onChange={onChange}
+              formOptions={{ layout: 'vertical' }}
+            />
+          </div>
+        </>
+      )}
+
+      {['vertical', 'both'].includes(orientation) && (
+        <>
+          <div className={styles.outputHeader}>
+            <i className="icon-desktop" />
+            <h1>{$t('Vertical Output')}</h1>
+          </div>
+          <div className={styles.formSection}>
+            <FormFactory
+              values={values}
+              metadata={metadata}
+              onChange={onChange}
+              formOptions={{ layout: 'vertical' }}
+            />
+          </div>
+        </>
+      )}
     </div>
   );
 }
