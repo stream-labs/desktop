@@ -12,7 +12,6 @@ import {
   menuTitles,
 } from 'services/side-nav';
 import { EAvailableFeatures } from 'services/incremental-rollout';
-import { EAppPageSlot } from 'services/platform-apps';
 import { EDismissable } from 'services/dismissables';
 import { $t } from 'services/i18n';
 import { Services } from 'components-react/service-provider';
@@ -35,7 +34,6 @@ export default function SideNav() {
     CustomizationService,
     NavigationService,
     UserService,
-    PlatformAppsService,
     IncrementalRolloutService,
     UsageStatisticsService,
     SideNavService,
@@ -255,7 +253,7 @@ export default function SideNav() {
                 return menuItem.hasOwnProperty('subMenuItems') ? (
                   <SubMenu
                     key={menuItem.key}
-                    title={`${menuTitles(menuItem.title)}LONGLONGLONGLONG`}
+                    title={menuTitles(menuItem.title)}
                     icon={menuItem?.icon && <i className={menuItem.icon} />}
                     onTitleClick={() => {
                       menuItem?.subMenuItems[0]?.target &&
@@ -277,7 +275,6 @@ export default function SideNav() {
                         type="submenu"
                       >
                         {menuTitles(subMenuItem.title)}
-                        {'LONGLONGLONG'}
                       </MenuItem>
                     ))}
                     {menuItem.title === EMenuItem.AppStore && <AppsNav type="enabled" />}
@@ -297,7 +294,6 @@ export default function SideNav() {
                     }}
                   >
                     {menuTitles(menuItem.title)}
-                    {'LONGLONGLONG'}
                   </MenuItem>
                 );
               }
