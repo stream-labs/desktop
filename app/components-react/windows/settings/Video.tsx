@@ -268,7 +268,11 @@ class VideoSettingsModule {
   }
 
   setFPS(key: 'fpsNum' | 'fpsDen', value: string) {
-    this.state.state[key] = Number(value);
+    if (key === 'fpsNum') {
+      this.state.setFpsNum(Number(value));
+    } else {
+      this.state.setFpsDen(Number(value));
+    }
 
     if (!invalidFps(this.state.fpsNum, this.state.fpsDen)) {
       this.service.actions.setVideoSetting(key, Number(value));
