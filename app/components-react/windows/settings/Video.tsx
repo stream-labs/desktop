@@ -210,7 +210,7 @@ class VideoSettingsModule {
       callback(
         $t(
           'This number is too large for a FPS Numerator of %{fpsNum}, please decrease it or increase the Numerator',
-          { fpsDen: this.values.fpsNum },
+          { fpsNum: this.values.fpsNum },
         ),
       );
     } else {
@@ -268,7 +268,11 @@ class VideoSettingsModule {
   }
 
   setFPS(key: 'fpsNum' | 'fpsDen', value: string) {
-    this.state.state[key] = Number(value);
+    if (key === 'fpsNum') {
+      this.state.setFpsNum(Number(value));
+    } else {
+      this.state.setFpsDen(Number(value));
+    }
 
     if (!invalidFps(this.state.fpsNum, this.state.fpsDen)) {
       this.service.actions.setVideoSetting(key, Number(value));
