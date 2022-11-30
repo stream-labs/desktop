@@ -17,7 +17,6 @@ import {
   platformLabels,
 } from '../../../services/dual-output';
 import styles from './Multistreaming.m.less';
-import cx from 'classnames';
 import * as remote from '@electron/remote';
 
 export function MultistreamingSettings() {

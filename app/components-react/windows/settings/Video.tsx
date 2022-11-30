@@ -172,7 +172,7 @@ class VideoSettingsModule {
 export function VideoSettings() {
   const { values, metadata, onChange } = useModule(VideoSettingsModule);
 
-  const [orientation, setOrientation] = useState('both');
+  const [orientation, setOrientation] = useState('all');
 
   const orientationOptions = [
     {
@@ -184,7 +184,7 @@ export function VideoSettings() {
       label: $t('Vertical'),
     },
     {
-      value: 'both',
+      value: 'all',
       label: $t('Dual Output (Simultaneous Horizontal and Vertical Outputs)'),
     },
   ];
@@ -204,14 +204,14 @@ export function VideoSettings() {
         </div>
 
         <Select
-          defaultValue="both"
+          defaultValue="all"
           style={{ width: '100%' }}
           onChange={value => setOrientation(value)}
           options={orientationOptions}
         />
       </div>
 
-      {['horizontal', 'both'].includes(orientation) && (
+      {['horizontal', 'all'].includes(orientation) && (
         <>
           <div className={styles.outputHeader}>
             <i className="icon-phone-case" />
@@ -228,7 +228,7 @@ export function VideoSettings() {
         </>
       )}
 
-      {['vertical', 'both'].includes(orientation) && (
+      {['vertical', 'all'].includes(orientation) && (
         <>
           <div className={styles.outputHeader}>
             <i className="icon-desktop" />
