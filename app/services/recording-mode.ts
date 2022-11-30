@@ -1,4 +1,6 @@
-import { Inject, mutation, PersistentStatefulService, ViewHandler } from 'services/core';
+import Vue from 'vue';
+import moment from 'moment';
+import { Inject, mutation, PersistentStatefulService, ViewHandler, Service } from 'services/core';
 import { SourcesService } from './sources';
 import { $t } from './i18n';
 import { ELayout, ELayoutElement, LayoutService } from './layout';
@@ -6,12 +8,21 @@ import { ScenesService } from './scenes';
 import { EObsSimpleEncoder, SettingsService } from './settings';
 import { AnchorPoint, ScalableRectangle } from 'util/ScalableRectangle';
 import { VideoService } from './video';
+import { ENotificationType, NotificationsService } from 'services/notifications';
 import { DefaultHardwareService } from './hardware';
 import { RunInLoadingMode } from './app/app-decorators';
 import { byOS, OS } from 'util/operating-systems';
+import { JsonrpcService } from './api/jsonrpc';
+import { WindowsService, StreamingService } from 'app-services';
+
+interface IRecordingEntry {
+  timestamp: string;
+  filename: string;
+}
 
 interface IRecordingModeState {
   enabled: boolean;
+  recordingHistory: Dictionary<IRecordingEntry>;
 }
 
 class RecordingModeViews extends ViewHandler<IRecordingModeState> {
@@ -27,9 +38,13 @@ export class RecordingModeService extends PersistentStatefulService<IRecordingMo
   @Inject() private sourcesService: SourcesService;
   @Inject() private videoService: VideoService;
   @Inject() private defaultHardwareService: DefaultHardwareService;
+  @Inject() private notificationsService: NotificationsService;
+  @Inject() private jsonrpcService: JsonrpcService;
+  @Inject() private windowsService: WindowsService;
 
   static defaultState: IRecordingModeState = {
     enabled: false,
+    recordingHistory: {},
   };
 
   get views() {
@@ -124,6 +139,34 @@ export class RecordingModeService extends PersistentStatefulService<IRecordingMo
     }, 10 * 1000);
   }
 
+  addRecordingEntry(filename: string) {
+    const timestamp = moment().format();
+    this.ADD_RECORDING_ENTRY(timestamp, filename);
+    this.notificationsService.actions.push({
+      type: ENotificationType.SUCCESS,
+      message: $t('A new Recording has been completed. Click for more info'),
+      action: this.jsonrpcService.createRequest(
+        Service.getResourceId(this),
+        'showRecordingHistory',
+      ),
+    });
+  }
+
+  pruneRecordingEntries() {
+    const oneMonthAgo = moment().subtract(30, 'days');
+    const prunedEntries = {};
+    Object.keys(this.state.recordingHistory).forEach(timestamp => {
+      if (moment(timestamp).isAfter(oneMonthAgo)) {
+        prunedEntries[timestamp] = this.state.recordingHistory[timestamp];
+      }
+    });
+    this.SET_RECORDING_ENTRIES(prunedEntries);
+  }
+
+  showRecordingHistory() {
+    // this.windowsService.actions.showWindow({});
+  }
+
   private setRecordingEncoder() {
     const encoderPriority: EObsSimpleEncoder[] = [
       EObsSimpleEncoder.jim_nvenc,
@@ -146,6 +189,16 @@ export class RecordingModeService extends PersistentStatefulService<IRecordingMo
     this.settingsService.setSettingsPatch({
       Output: { RecEncoder: bestEncoder, RecFormat: 'mp4' },
     });
+  }
+
+  @mutation()
+  private ADD_RECORDING_ENTRY(timestamp: string, filename: string) {
+    Vue.set(this.state.recordingHistory, timestamp, { timestamp, filename });
+  }
+
+  @mutation()
+  private SET_RECORDING_ENTRIES(entries: Dictionary<IRecordingEntry>) {
+    this.state.recordingHistory = entries;
   }
 
   @mutation()
