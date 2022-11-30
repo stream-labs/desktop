@@ -11,6 +11,7 @@ class SettingsManagerViews extends ViewHandler<{}> {}
 
 export class SettingsManagerService extends Service {
   get videoSettings() {
-    return obs.VideoFactory.legacySettings;
+    const context = obs.VideoFactory.create();
+    return context;
   }
 }

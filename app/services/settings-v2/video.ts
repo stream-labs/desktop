@@ -5,12 +5,21 @@ import { mutation, StatefulService } from '../core/stateful-service';
 import * as obs from '../../../obs-api';
 import { SettingsManagerService } from 'services/settings-manager';
 
+interface IVideoSettings {
+  videoContext: obs.IVideo;
+  allVideoSettings: obs.IVideoInfo;
+  horizontalVideoSettings: obs.IVideoInfo;
+  verticalVideoSettings: obs.IVideoInfo;
+}
 @InitAfter('UserService')
-export class VideoSettingsService extends StatefulService<{ videoContext: obs.IVideo }> {
+export class VideoSettingsService extends StatefulService<IVideoSettings> {
   @Inject() settingsManagerService: SettingsManagerService;
 
   initialState = {
     videoContext: null as obs.IVideo,
+    allVideoSettings: null as obs.IVideoInfo,
+    horizontalVideoSettings: null as obs.IVideoInfo,
+    verticalVideoSettings: null as obs.IVideoInfo,
   };
 
   init() {
@@ -18,16 +27,17 @@ export class VideoSettingsService extends StatefulService<{ videoContext: obs.IV
   }
 
   get videoSettingsValues() {
-    const context = this.state.videoContext;
+    const settings = this.state.allVideoSettings;
+
     return {
-      baseRes: `${context.baseWidth}x${context.baseHeight}`,
-      outputRes: `${context.outputWidth}x${context.outputHeight}`,
-      scaleType: context.scaleType,
-      fpsType: context.fpsType,
-      fpsCom: `${context.fpsNum}-${context.fpsDen}`,
-      fpsNum: context.fpsNum,
-      fpsDen: context.fpsDen,
-      fpsInt: context.fpsNum,
+      baseRes: `${settings.baseWidth}x${settings.baseHeight}`,
+      outputRes: `${settings.outputWidth}x${settings.outputHeight}`,
+      scaleType: settings.scaleType,
+      fpsType: settings.fpsType,
+      fpsCom: `${settings.fpsNum}-${settings.fpsDen}`,
+      fpsNum: settings.fpsNum,
+      fpsDen: settings.fpsDen,
+      fpsInt: settings.fpsNum,
     };
   }
 
@@ -36,26 +46,36 @@ export class VideoSettingsService extends StatefulService<{ videoContext: obs.IV
   }
 
   migrateSettings() {
-    Object.keys(this.videoSettings).forEach(
+    this.state.videoContext = this.videoSettings;
+    Object.keys(this.videoSettings.legacySettings).forEach(
       (key: keyof obs.IAdvancedStreaming | keyof obs.ISimpleStreaming) => {
-        this.SET_VIDEO_SETTING(key, this.videoSettings[key]);
+        this.SET_VIDEO_SETTING(key, this.videoSettings.legacySettings[key]);
       },
     );
+    console.log('this.state.videoContext 2 ', this.state.videoContext);
   }
 
   establishVideoContext() {
+    const context = obs.VideoFactory.create();
     if (this.state.videoContext) return;
 
     this.SET_VIDEO_CONTEXT();
 
+    console.log('this.state.videoContext ', this.state.videoContext);
+
     this.migrateSettings();
-    obs.VideoFactory.videoContext = this.state.videoContext;
+    context.video = this.state.videoContext.video;
+    context.legacySettings = this.state.videoContext.legacySettings;
+
+    context.destroy();
   }
 
   @debounce(200)
   updateObsSettings() {
-    obs.VideoFactory.videoContext = this.state.videoContext;
-    obs.VideoFactory.legacySettings = this.state.videoContext;
+    const context = obs.VideoFactory.create();
+    // context.video = this.state.allVideoSettings;
+    this.state.videoContext.video = { ...this.state.allVideoSettings };
+    context.destroy();
   }
 
   setVideoSetting(key: string, value: unknown) {
@@ -70,6 +90,9 @@ export class VideoSettingsService extends StatefulService<{ videoContext: obs.IV
 
   @mutation()
   SET_VIDEO_SETTING(key: string, value: unknown) {
-    this.state.videoContext[key] = value;
+    if (key === 'baseWidth') console.log('baseWidth ', key);
+    if (key === 'baseHeight') console.log('baseHeight ', key);
+    this.state.allVideoSettings = { ...this.state.allVideoSettings, [key]: value };
+    // this.state.videoContext.video[key] = value;
   }
 }

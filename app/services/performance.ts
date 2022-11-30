@@ -196,21 +196,27 @@ export class PerformanceService extends StatefulService<IPerformanceState> {
    * Capture some analytics for the entire duration of a stream
    */
   startStreamQualityMonitoring() {
-    this.streamStartSkippedFrames = obs.VideoFactory.skippedFrames;
+    const context = obs.VideoFactory.create();
+
+    this.streamStartSkippedFrames = context.skippedFrames;
     this.streamStartLaggedFrames = obs.Global.laggedFrames;
     this.streamStartRenderedFrames = obs.Global.totalFrames;
-    this.streamStartEncodedFrames = obs.VideoFactory.encodedFrames;
+    this.streamStartEncodedFrames = context.encodedFrames;
     this.streamStartTime = new Date();
+
+    context.destroy();
   }
 
   stopStreamQualityMonitoring() {
+    const context = obs.VideoFactory.create();
+
     const streamLagged =
       ((obs.Global.laggedFrames - this.streamStartLaggedFrames) /
         (obs.Global.totalFrames - this.streamStartRenderedFrames)) *
       100;
     const streamSkipped =
-      ((obs.VideoFactory.skippedFrames - this.streamStartSkippedFrames) /
-        (obs.VideoFactory.encodedFrames - this.streamStartEncodedFrames)) *
+      ((context.skippedFrames - this.streamStartSkippedFrames) /
+        (context.encodedFrames - this.streamStartEncodedFrames)) *
       100;
     const streamDropped = this.state.percentageDroppedFrames;
     const streamDuration = new Date().getTime() - this.streamStartTime.getTime();
@@ -221,6 +227,8 @@ export class PerformanceService extends StatefulService<IPerformanceState> {
       streamDropped,
       streamDuration,
     });
+
+    context.destroy();
   }
 
   /* Monitor frame rate statistics
@@ -228,11 +236,13 @@ export class PerformanceService extends StatefulService<IPerformanceState> {
   /  Dispatch notifications when thresholds are crossed */
   private monitorAndUpdateStats() {
     /* Fetch variables only once. */
+    const context = obs.VideoFactory.create();
+
     const currentStats: IMonitorState = {
       framesLagged: obs.Global.laggedFrames,
       framesRendered: obs.Global.totalFrames,
-      framesSkipped: obs.VideoFactory.skippedFrames,
-      framesEncoded: obs.VideoFactory.encodedFrames,
+      framesSkipped: context.skippedFrames,
+      framesEncoded: context.encodedFrames,
     };
 
     const nextStats = this.nextStats(currentStats);
@@ -251,6 +261,8 @@ export class PerformanceService extends StatefulService<IPerformanceState> {
       numberEncodedFrames: currentStats.framesEncoded,
       numberRenderedFrames: currentStats.framesRendered,
     });
+
+    context.destroy();
   }
 
   nextStats(currentStats: IMonitorState): INextStats {

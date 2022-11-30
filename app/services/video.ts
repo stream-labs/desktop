@@ -451,12 +451,6 @@ export class VideoService extends Service {
     obs.NodeObs.OBS_content_setDrawGuideLines(name, drawGuideLines);
   }
 
-  createContext() {
-    // const context = obs.VideoFactory.create();
-    // console.log('VIDEOSERVICE created ', context);
-    // return context;
-  }
-
   updateContext(context: obs.IVideo) {
     // context.video = {
     //   fpsNum: 120,
