@@ -41,41 +41,36 @@ export class VideoSettingsService extends StatefulService<IVideoSettings> {
     };
   }
 
-  get videoSettings() {
-    return this.settingsManagerService.videoSettings;
+  get videoContext() {
+    return this.state.videoContext;
   }
 
+  // @@@ TODO: Refactor for persistence
+  // get videoSettings() {
+  //   return this.settingsManagerService.videoSettings;
+  // }
+
   migrateSettings() {
-    this.state.videoContext = this.videoSettings;
-    Object.keys(this.videoSettings.legacySettings).forEach(
+    this.state.allVideoSettings = this.state.videoContext.video;
+    Object.keys(this.state.videoContext.legacySettings).forEach(
       (key: keyof obs.IAdvancedStreaming | keyof obs.ISimpleStreaming) => {
-        this.SET_VIDEO_SETTING(key, this.videoSettings.legacySettings[key]);
+        this.SET_VIDEO_SETTING(key, this.state.videoContext.legacySettings[key]);
       },
     );
-    console.log('this.state.videoContext 2 ', this.state.videoContext);
   }
 
   establishVideoContext() {
-    const context = obs.VideoFactory.create();
     if (this.state.videoContext) return;
 
     this.SET_VIDEO_CONTEXT();
 
-    console.log('this.state.videoContext ', this.state.videoContext);
-
     this.migrateSettings();
-    context.video = this.state.videoContext.video;
-    context.legacySettings = this.state.videoContext.legacySettings;
-
-    context.destroy();
+    this.state.videoContext.video = this.state.allVideoSettings;
   }
 
   @debounce(200)
   updateObsSettings() {
-    const context = obs.VideoFactory.create();
-    // context.video = this.state.allVideoSettings;
-    this.state.videoContext.video = { ...this.state.allVideoSettings };
-    context.destroy();
+    this.state.videoContext.video = this.state.allVideoSettings;
   }
 
   setVideoSetting(key: string, value: unknown) {
@@ -83,9 +78,14 @@ export class VideoSettingsService extends StatefulService<IVideoSettings> {
     this.updateObsSettings();
   }
 
+  shutdown() {
+    this.state.videoContext.destroy();
+  }
+
   @mutation()
   SET_VIDEO_CONTEXT() {
-    this.state.videoContext = {} as obs.IVideo;
+    this.state.videoContext = obs.VideoFactory.create();
+    this.state.allVideoSettings = {} as obs.IVideoInfo;
   }
 
   @mutation()
@@ -93,6 +93,5 @@ export class VideoSettingsService extends StatefulService<IVideoSettings> {
     if (key === 'baseWidth') console.log('baseWidth ', key);
     if (key === 'baseHeight') console.log('baseHeight ', key);
     this.state.allVideoSettings = { ...this.state.allVideoSettings, [key]: value };
-    // this.state.videoContext.video[key] = value;
   }
 }

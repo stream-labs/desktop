@@ -10,8 +10,9 @@ from the backend.
 class SettingsManagerViews extends ViewHandler<{}> {}
 
 export class SettingsManagerService extends Service {
-  get videoSettings() {
-    const context = obs.VideoFactory.create();
-    return context;
-  }
+  // @@@ TODO: Refactor for persisting video settings
+  // get videoSettings() {
+  //   const context = obs.VideoFactory.create();
+  //   return context;
+  // }
 }
