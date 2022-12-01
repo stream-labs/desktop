@@ -54,6 +54,7 @@ class VideoSettingsModule {
       customOutputRes: this.state.customOutputResValue,
       fpsNum: this.state.fpsNum,
       fpsDen: this.state.fpsDen,
+      fpsInt: this.state.fpsInt,
     };
   }
 
@@ -68,6 +69,7 @@ class VideoSettingsModule {
     customOutputResValue: '',
     fpsNum: this.service.videoSettingsValues.fpsNum,
     fpsDen: this.service.videoSettingsValues.fpsDen,
+    fpsInt: this.service.videoSettingsValues.fpsNum,
   });
 
   get metadata() {
@@ -136,21 +138,37 @@ class VideoSettingsModule {
             type: 'number',
             label: $t('FPS Value'),
             onChange: (val: string) => this.setIntegerFPS(val),
-            rules: [{ max: 1000 }],
+            rules: [{ max: 1000, min: 1, message: $t('FPS Value must be between 1 and 1000') }],
             displayed: this.values.fpsType === obs.EFPSType.Integer,
           },
           fpsNum: {
             type: 'number',
             label: $t('FPS Numerator'),
             onChange: (val: string) => this.setFPS('fpsNum', val),
-            rules: [{ validator: this.fpsNumValidator.bind(this) }, { min: 1 }],
+            rules: [
+              { validator: this.fpsNumValidator.bind(this) },
+              {
+                min: 1,
+                message: $t('%{fieldName} must be greater than 0', {
+                  fieldName: $t('FPS Numerator'),
+                }),
+              },
+            ],
             displayed: this.values.fpsType === obs.EFPSType.Fractional,
           },
           fpsDen: {
             type: 'number',
             label: $t('FPS Denominator'),
             onChange: (val: string) => this.setFPS('fpsDen', val),
-            rules: [{ validator: this.fpsDenValidator.bind(this) }, { min: 1 }],
+            rules: [
+              { validator: this.fpsDenValidator.bind(this) },
+              {
+                min: 1,
+                message: $t('%{fieldName} must be greater than 0', {
+                  fieldName: $t('FPS Denominator'),
+                }),
+              },
+            ],
             displayed: this.values.fpsType === obs.EFPSType.Fractional,
           },
         },
@@ -263,8 +281,11 @@ class VideoSettingsModule {
   }
 
   setIntegerFPS(value: string) {
-    this.service.actions.setVideoSetting('fpsNum', Number(value));
-    this.service.actions.setVideoSetting('fpsDen', 1);
+    this.state.setFpsInt(Number(value));
+    if (Number(value) > 0 && Number(value) < 1001) {
+      this.service.actions.setVideoSetting('fpsNum', Number(value));
+      this.service.actions.setVideoSetting('fpsDen', 1);
+    }
   }
 
   setFPS(key: 'fpsNum' | 'fpsDen', value: string) {
@@ -274,7 +295,7 @@ class VideoSettingsModule {
       this.state.setFpsDen(Number(value));
     }
 
-    if (!invalidFps(this.state.fpsNum, this.state.fpsDen)) {
+    if (!invalidFps(this.state.fpsNum, this.state.fpsDen) && Number(value) > 0) {
       this.service.actions.setVideoSetting(key, Number(value));
     }
   }
