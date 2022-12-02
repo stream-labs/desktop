@@ -39,7 +39,7 @@ class RecordingModeViews extends ViewHandler<IRecordingModeState> {
 
   get sortedRecordings() {
     return Object.values(this.state.recordingHistory).sort((a, b) =>
-      moment(a.timestamp).isAfter(moment(b.timestamp)) ? 1 : -1,
+      moment(a.timestamp).isAfter(moment(b.timestamp)) ? -1 : 1,
     );
   }
 
@@ -182,7 +182,11 @@ export class RecordingModeService extends PersistentStatefulService<IRecordingMo
   }
 
   showRecordingHistory() {
-    // this.windowsService.actions.showWindow({});
+    this.windowsService.actions.showWindow({
+      componentName: 'RecordingHistory',
+      title: $t('Recording History'),
+      size: { width: 450, height: 600 },
+    });
   }
 
   async uploadToYoutube(filename: string) {
