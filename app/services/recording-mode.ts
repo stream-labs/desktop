@@ -29,6 +29,16 @@ class RecordingModeViews extends ViewHandler<IRecordingModeState> {
   get isRecordingModeEnabled() {
     return this.state.enabled;
   }
+
+  get sortedRecordings() {
+    return Object.values(this.state.recordingHistory).sort((a, b) =>
+      moment(a.timestamp).isAfter(moment(b.timestamp)) ? 1 : -1,
+    );
+  }
+
+  formattedTimestamp(timestamp: string) {
+    return moment(timestamp).fromNow();
+  }
 }
 
 export class RecordingModeService extends PersistentStatefulService<IRecordingModeState> {
@@ -166,6 +176,8 @@ export class RecordingModeService extends PersistentStatefulService<IRecordingMo
   showRecordingHistory() {
     // this.windowsService.actions.showWindow({});
   }
+
+  uploadToYoutube(filename: string) {}
 
   private setRecordingEncoder() {
     const encoderPriority: EObsSimpleEncoder[] = [
