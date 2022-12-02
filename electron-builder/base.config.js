@@ -39,6 +39,7 @@ const base = {
     extraFiles: ['LICENSE', 'AGREEMENT', 'shared-resources/**/*', '!shared-resources/README'],
     rfc3161TimeStampServer: 'http://timestamp.digicert.com',
     timeStampServer: 'http://timestamp.digicert.com',
+    signDlls: true,
     async sign(config) {
       if (process.env.SLOBS_NO_SIGN) return;
 
