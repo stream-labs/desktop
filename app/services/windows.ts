@@ -148,6 +148,7 @@ export function getComponents() {
     WidgetWindow,
     CustomCodeWindow,
     SourceShowcase,
+    RecordingHistory,
   };
 }
 
