@@ -47,6 +47,14 @@ class VideoSettingsModule {
     return this.service.videoSettingsValues;
   }
 
+  get horizontalValues() {
+    return this.service.horizontalSettingsValues;
+  }
+
+  get verticalValues() {
+    return this.service.verticalSettingsValues;
+  }
+
   get metadata() {
     return {
       baseRes: {
@@ -170,7 +178,9 @@ class VideoSettingsModule {
 }
 
 export function VideoSettings() {
-  const { values, metadata, onChange } = useModule(VideoSettingsModule);
+  const { values, horizontalValues, verticalValues, metadata, onChange } = useModule(
+    VideoSettingsModule,
+  );
 
   const [orientation, setOrientation] = useState('all');
 
@@ -219,7 +229,7 @@ export function VideoSettings() {
           </div>
           <div className={styles.formSection}>
             <FormFactory
-              values={values}
+              values={orientation === 'all' ? values : horizontalValues}
               metadata={metadata}
               onChange={onChange}
               formOptions={{ layout: 'vertical' }}
@@ -236,7 +246,7 @@ export function VideoSettings() {
           </div>
           <div className={styles.formSection}>
             <FormFactory
-              values={values}
+              values={orientation === 'all' ? values : verticalValues}
               metadata={metadata}
               onChange={onChange}
               formOptions={{ layout: 'vertical' }}
