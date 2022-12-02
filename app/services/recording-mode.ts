@@ -1,5 +1,6 @@
 import Vue from 'vue';
 import moment from 'moment';
+import * as Sentry from '@sentry/browser';
 import { Inject, mutation, PersistentStatefulService, ViewHandler, Service } from 'services/core';
 import { SourcesService } from './sources';
 import { $t } from './i18n';
@@ -13,7 +14,13 @@ import { DefaultHardwareService } from './hardware';
 import { RunInLoadingMode } from './app/app-decorators';
 import { byOS, OS } from 'util/operating-systems';
 import { JsonrpcService } from './api/jsonrpc';
-import { WindowsService, StreamingService } from 'app-services';
+import { WindowsService, StreamingService, UsageStatisticsService } from 'app-services';
+import { getPlatformService } from 'services/platforms';
+import {
+  IYoutubeVideoUploadOptions,
+  IYoutubeUploadResponse,
+} from 'services/platforms/youtube/uploader';
+import { YoutubeService } from 'services/platforms/youtube';
 
 interface IRecordingEntry {
   timestamp: string;
@@ -50,6 +57,7 @@ export class RecordingModeService extends PersistentStatefulService<IRecordingMo
   @Inject() private defaultHardwareService: DefaultHardwareService;
   @Inject() private notificationsService: NotificationsService;
   @Inject() private jsonrpcService: JsonrpcService;
+  @Inject() private usageStatisticsService: UsageStatisticsService;
   @Inject() private windowsService: WindowsService;
 
   static defaultState: IRecordingModeState = {
@@ -177,7 +185,51 @@ export class RecordingModeService extends PersistentStatefulService<IRecordingMo
     // this.windowsService.actions.showWindow({});
   }
 
-  uploadToYoutube(filename: string) {}
+  async uploadToYoutube(filename: string) {
+    const yt = getPlatformService('youtube') as YoutubeService;
+
+    const { cancel, complete } = yt.uploader.uploadVideo(
+      filename,
+      { title: filename, description: '', privacyStatus: 'private' },
+      progress => {
+        // this.SET_UPLOAD_INFO({
+        //   uploadedBytes: progress.uploadedBytes,
+        //   totalBytes: progress.totalBytes,
+        // });
+      },
+    );
+
+    // this.cancelFunction = cancel;
+    let result: IYoutubeUploadResponse | null = null;
+
+    try {
+      result = await complete;
+    } catch (e: unknown) {
+      Sentry.withScope(scope => {
+        scope.setTag('feature', 'recording-history');
+        console.error('Got error uploading YT video', e);
+      });
+
+      // this.SET_UPLOAD_INFO({ error: true });
+      this.usageStatisticsService.recordAnalyticsEvent('RecordingHistory', {
+        type: 'UploadError',
+      });
+    }
+
+    // this.cancelFunction = null;
+    // this.SET_UPLOAD_INFO({
+    //   uploading: false,
+    //   cancelRequested: false,
+    //   videoId: result ? result.id : null,
+    // });
+
+    if (result) {
+      this.usageStatisticsService.recordAnalyticsEvent('RecordingHistory', {
+        type: 'UploadSuccess',
+        privacy: 'private',
+      });
+    }
+  }
 
   private setRecordingEncoder() {
     const encoderPriority: EObsSimpleEncoder[] = [

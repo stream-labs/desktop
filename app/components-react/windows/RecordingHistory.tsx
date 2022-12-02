@@ -40,7 +40,12 @@ export default function RecordingHistory() {
             <Tooltip title={$t('Show in folder')}>
               <span>{recording.filename}</span>
             </Tooltip>
-            <PlatformLogo onClick={() => uploadToYoutube(recording.filename)} platform="youtube" />
+            <Tooltip title={$t('Upload to YouTube')}>
+              <PlatformLogo
+                onClick={() => uploadToYoutube(recording.filename)}
+                platform="youtube"
+              />
+            </Tooltip>
           </div>
         ))}
       </div>
