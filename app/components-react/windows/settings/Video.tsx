@@ -191,9 +191,15 @@ class VideoSettingsModule {
 }
 
 export function VideoSettings() {
-  const { values, horizontalValues, verticalValues, metadata, onChange } = useModule(
-    VideoSettingsModule,
-  );
+  const {
+    values,
+    horizontalValues,
+    verticalValues,
+    metadata,
+    horizontalMetadata,
+    verticalMetadata,
+    onChange,
+  } = useModule(VideoSettingsModule);
 
   const [orientation, setOrientation] = useState('default');
 
@@ -243,7 +249,7 @@ export function VideoSettings() {
           <div className={styles.formSection}>
             <FormFactory
               values={orientation === 'default' ? values : horizontalValues}
-              metadata={metadata}
+              metadata={orientation === 'default' ? metadata : horizontalMetadata}
               onChange={val => onChange(val, orientation as TDisplayType)}
               formOptions={{ layout: 'vertical' }}
             />
@@ -260,7 +266,7 @@ export function VideoSettings() {
           <div className={styles.formSection}>
             <FormFactory
               values={orientation === 'default' ? values : verticalValues}
-              metadata={metadata}
+              metadata={orientation === ' default' ? metadata : verticalMetadata}
               onChange={val => onChange(val, orientation as TDisplayType)}
               formOptions={{ layout: 'vertical' }}
             />
