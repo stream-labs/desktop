@@ -15,6 +15,9 @@ export enum EMenuItemKey {
   GetHelp = 'get-help',
   Settings = 'settings',
   Login = 'login',
+}
+
+export enum ESubMenuItemKey {
   Scene = 'browse-overlays',
   AlertBoxLibrary = 'alertbox-library',
   Widget = 'browse-overlays-widgets',
@@ -56,7 +59,6 @@ export interface IMenuItem {
   key: TSideNavItem;
   target?: TSideNavItem; // optional because menu item could be a toggle
   type?: TExternalLinkType | string;
-  title: string;
   trackingTarget?: string;
   icon?: string;
   isExpanded: boolean;
@@ -73,218 +75,170 @@ export enum ENavName {
   BottomNav = 'bottom-nav',
 }
 
-export enum EMenuItem {
-  Editor = 'Editor',
-  LayoutEditor = 'Layout Editor',
-  StudioMode = 'Studio Mode',
-  Themes = 'Themes',
-  AppStore = 'App Store',
-  Highlighter = 'Highlighter',
-  ThemeAudit = 'Theme Audit',
-  DevTools = 'Dev Tools',
-  GetPrime = 'Get Ultra',
-  Dashboard = 'Dashboard',
-  GetHelp = 'Get Help',
-  Settings = 'Settings',
-  Login = 'Login',
-}
-
-export enum ESubMenuItem {
-  Scene = 'Scene',
-  AlertBoxLibrary = 'Alert Box Library',
-  Widget = 'Widget',
-  Sites = 'Sites',
-  AppsStoreHome = 'Apps Store Home',
-  AppsManager = 'Apps Manager',
-  DashboardHome = 'Dashboard Home',
-  Cloudbot = 'Cloudbot',
-  AlertBoxSettings = 'Alert Box',
-  Widgets = 'Widgets',
-  TipSettings = 'Tip Settings',
-  Multistream = 'Multistream',
-}
-
-export const menuTitles = (item: EMenuItem | ESubMenuItem | string) => {
+export const menuTitles = (item: EMenuItemKey | ESubMenuItemKey | string) => {
   return {
-    [EMenuItem.Editor]: $t('Editor'),
-    [EMenuItem.LayoutEditor]: $t('Layout Editor'),
-    [EMenuItem.StudioMode]: $t('Studio Mode'),
-    [EMenuItem.Themes]: $t('Themes'),
-    [EMenuItem.AppStore]: $t('App Store'),
-    [EMenuItem.Highlighter]: $t('Highlighter'),
-    [EMenuItem.ThemeAudit]: $t('Theme Audit'),
-    [EMenuItem.DevTools]: 'Dev Tools',
-    [EMenuItem.GetPrime]: $t('Get Ultra'),
-    [EMenuItem.Dashboard]: $t('Dashboard'),
-    [EMenuItem.GetHelp]: $t('Get Help'),
-    [EMenuItem.Settings]: $t('Settings'),
-    [EMenuItem.Login]: $t('Login'),
-    [ESubMenuItem.Scene]: $t('Scene'),
-    [ESubMenuItem.AlertBoxLibrary]: $t('Alert Box Library'),
-    [ESubMenuItem.Widget]: $t('Widget'),
-    [ESubMenuItem.Sites]: $t('Sites'),
-    [ESubMenuItem.AppsStoreHome]: $t('Apps Store Home'),
-    [ESubMenuItem.AppsManager]: $t('Apps Manager'),
-    [ESubMenuItem.DashboardHome]: $t('Dashboard Home'),
-    [ESubMenuItem.Cloudbot]: $t('Cloudbot'),
-    [ESubMenuItem.AlertBoxSettings]: $t('Alert Box Settings'),
-    [ESubMenuItem.Widgets]: $t('Widgets'),
-    [ESubMenuItem.TipSettings]: $t('Tip Settings'),
-    [ESubMenuItem.Multistream]: $t('Multistream'),
+    [EMenuItemKey.Editor]: $t('Editor'),
+    [EMenuItemKey.LayoutEditor]: $t('Layout Editor'),
+    [EMenuItemKey.StudioMode]: $t('Studio Mode'),
+    [EMenuItemKey.Themes]: $t('Themes'),
+    [EMenuItemKey.AppStore]: $t('App Store'),
+    [EMenuItemKey.Highlighter]: $t('Highlighter'),
+    [EMenuItemKey.ThemeAudit]: $t('Theme Audit'),
+    [EMenuItemKey.DevTools]: 'Dev Tools',
+    [EMenuItemKey.GetPrime]: $t('Get Ultra'),
+    [EMenuItemKey.Dashboard]: $t('Dashboard'),
+    [EMenuItemKey.GetHelp]: $t('Get Help'),
+    [EMenuItemKey.Settings]: $t('Settings'),
+    [EMenuItemKey.Login]: $t('Login'),
+    [ESubMenuItemKey.Scene]: $t('Scene'),
+    [ESubMenuItemKey.AlertBoxLibrary]: $t('Alert Box Library'),
+    [ESubMenuItemKey.Widget]: $t('Widget'),
+    [ESubMenuItemKey.Sites]: $t('Sites'),
+    [ESubMenuItemKey.AppsStoreHome]: $t('Apps Store Home'),
+    [ESubMenuItemKey.AppsManager]: $t('Apps Manager'),
+    [ESubMenuItemKey.DashboardHome]: $t('Dashboard Home'),
+    [ESubMenuItemKey.Cloudbot]: $t('Cloudbot'),
+    [ESubMenuItemKey.AlertBoxSettings]: $t('Alert Box Settings'),
+    [ESubMenuItemKey.Widgets]: $t('Widgets'),
+    [ESubMenuItemKey.TipSettings]: $t('Tip Settings'),
+    [ESubMenuItemKey.Multistream]: $t('Multistream'),
   }[item];
 };
 
 export const SideBarTopNavData = (): IMenu => ({
   name: ENavName.TopNav,
   menuItems: [
-    SideNavMenuItems()[EMenuItem.Editor],
-    SideNavMenuItems()[EMenuItem.LayoutEditor],
-    SideNavMenuItems()[EMenuItem.StudioMode],
-    SideNavMenuItems()[EMenuItem.Themes],
-    SideNavMenuItems()[EMenuItem.AppStore],
-    SideNavMenuItems()[EMenuItem.Highlighter],
-    SideNavMenuItems()[EMenuItem.ThemeAudit],
+    SideNavMenuItems()[EMenuItemKey.Editor],
+    SideNavMenuItems()[EMenuItemKey.LayoutEditor],
+    SideNavMenuItems()[EMenuItemKey.StudioMode],
+    SideNavMenuItems()[EMenuItemKey.Themes],
+    SideNavMenuItems()[EMenuItemKey.AppStore],
+    SideNavMenuItems()[EMenuItemKey.Highlighter],
+    SideNavMenuItems()[EMenuItemKey.ThemeAudit],
   ],
 });
 
 export const SideBarBottomNavData = (): IMenu => ({
   name: ENavName.BottomNav,
   menuItems: [
-    SideNavMenuItems()[EMenuItem.DevTools],
-    SideNavMenuItems()[EMenuItem.GetPrime],
-    SideNavMenuItems()[EMenuItem.Dashboard],
-    SideNavMenuItems()[EMenuItem.GetHelp],
-    SideNavMenuItems()[EMenuItem.Settings],
-    SideNavMenuItems()[EMenuItem.Login],
+    SideNavMenuItems()[EMenuItemKey.DevTools],
+    SideNavMenuItems()[EMenuItemKey.GetPrime],
+    SideNavMenuItems()[EMenuItemKey.Dashboard],
+    SideNavMenuItems()[EMenuItemKey.GetHelp],
+    SideNavMenuItems()[EMenuItemKey.Settings],
+    SideNavMenuItems()[EMenuItemKey.Login],
   ],
 });
 
 export type TMenuItems = {
-  [MenuItem in EMenuItem]: IMenuItem | IParentMenuItem;
+  [MenuItem in Partial<EMenuItemKey>]: IMenuItem | IParentMenuItem;
 };
 
-// the key for primary menu items must be the title
-// so that the menu can apply open menu items on startup
 export const SideNavMenuItems = (): TMenuItems => ({
-  [EMenuItem.Editor]: {
+  [EMenuItemKey.Editor]: {
     key: EMenuItemKey.Editor,
     target: 'Studio',
-    title: EMenuItem.Editor,
     trackingTarget: 'editor',
     icon: 'icon-studio',
     isActive: true,
     isExpanded: false,
   },
-  [EMenuItem.LayoutEditor]: {
+  [EMenuItemKey.LayoutEditor]: {
     key: EMenuItemKey.LayoutEditor,
     target: 'LayoutEditor',
-    title: EMenuItem.LayoutEditor,
     trackingTarget: 'layout-editor',
     icon: 'fas fa-th-large',
     isActive: true,
     isExpanded: false,
   },
-  [EMenuItem.StudioMode]: {
+  [EMenuItemKey.StudioMode]: {
     key: EMenuItemKey.StudioMode,
-    title: EMenuItem.StudioMode,
     icon: 'icon-studio-mode-3',
     isActive: true,
     isExpanded: false,
   },
-  [EMenuItem.Themes]: {
+  [EMenuItemKey.Themes]: {
     key: EMenuItemKey.Themes,
     target: 'BrowseOverlays',
-    title: EMenuItem.Themes,
     trackingTarget: 'themes',
     icon: 'icon-themes',
     subMenuItems: [
-      SideBarSubMenuItems()[ESubMenuItem.Scene],
-      SideBarSubMenuItems()[ESubMenuItem.AlertBoxLibrary],
-      SideBarSubMenuItems()[ESubMenuItem.Widget],
-      SideBarSubMenuItems()[ESubMenuItem.Sites],
+      SideBarSubMenuItems()[ESubMenuItemKey.Scene],
+      SideBarSubMenuItems()[ESubMenuItemKey.AlertBoxLibrary],
+      SideBarSubMenuItems()[ESubMenuItemKey.Widget],
+      SideBarSubMenuItems()[ESubMenuItemKey.Sites],
     ],
     isActive: true,
     isExpanded: false,
   },
 
-  [EMenuItem.AppStore]: {
+  [EMenuItemKey.AppStore]: {
     key: EMenuItemKey.AppStore,
     target: 'PlatformAppStore',
-    title: EMenuItem.AppStore,
     trackingTarget: 'app-store',
     icon: 'icon-store',
     subMenuItems: [
-      SideBarSubMenuItems()[ESubMenuItem.AppsStoreHome],
-      SideBarSubMenuItems()[ESubMenuItem.AppsManager],
+      SideBarSubMenuItems()[ESubMenuItemKey.AppsStoreHome],
+      SideBarSubMenuItems()[ESubMenuItemKey.AppsManager],
     ],
     isActive: true,
     isExpanded: false,
   },
-  [EMenuItem.Highlighter]: {
+  [EMenuItemKey.Highlighter]: {
     key: EMenuItemKey.Highlighter,
     target: 'Highlighter',
     icon: 'icon-highlighter',
-    title: EMenuItem.Highlighter,
     trackingTarget: 'highlighter',
     isActive: true,
     isExpanded: false,
   },
-  [EMenuItem.ThemeAudit]: {
+  [EMenuItemKey.ThemeAudit]: {
     key: EMenuItemKey.ThemeAudit,
     target: 'ThemeAudit',
     icon: 'fas fa-exclamation-triangle',
-    title: EMenuItem.ThemeAudit,
     trackingTarget: 'themeaudit',
-    isActive: true, // showing/hiding is handled in the SideNav component
     isExpanded: false,
   },
-  [EMenuItem.DevTools]: {
+  [EMenuItemKey.DevTools]: {
     key: EMenuItemKey.DevTools,
-    title: EMenuItem.DevTools,
     trackingTarget: 'devtools',
     icon: 'icon-developer',
-    isActive: true, // showing/hiding is handled in the SideNav component
     isExpanded: false,
   },
-  [EMenuItem.GetPrime]: {
+  [EMenuItemKey.GetPrime]: {
     key: EMenuItemKey.GetPrime,
-    title: EMenuItem.GetPrime,
     icon: 'icon-prime',
     isActive: true,
     isExpanded: false,
   },
-  [EMenuItem.Dashboard]: {
+  [EMenuItemKey.Dashboard]: {
     key: EMenuItemKey.Dashboard,
-    title: EMenuItem.Dashboard,
     icon: 'icon-dashboard',
     isActive: true,
     subMenuItems: [
-      SideBarSubMenuItems()[ESubMenuItem.DashboardHome],
-      SideBarSubMenuItems()[ESubMenuItem.Cloudbot],
-      SideBarSubMenuItems()[ESubMenuItem.AlertBoxSettings],
-      SideBarSubMenuItems()[ESubMenuItem.Widgets],
-      SideBarSubMenuItems()[ESubMenuItem.TipSettings],
-      SideBarSubMenuItems()[ESubMenuItem.Multistream],
+      SideBarSubMenuItems()[ESubMenuItemKey.DashboardHome],
+      SideBarSubMenuItems()[ESubMenuItemKey.Cloudbot],
+      SideBarSubMenuItems()[ESubMenuItemKey.AlertBoxSettings],
+      SideBarSubMenuItems()[ESubMenuItemKey.Widgets],
+      SideBarSubMenuItems()[ESubMenuItemKey.TipSettings],
+      SideBarSubMenuItems()[ESubMenuItemKey.Multistream],
     ],
     isExpanded: false,
   },
-  [EMenuItem.GetHelp]: {
+  [EMenuItemKey.GetHelp]: {
     key: EMenuItemKey.GetHelp,
-    title: EMenuItem.GetHelp,
     icon: 'icon-question',
     isActive: true,
     isExpanded: false,
   },
-  [EMenuItem.Settings]: {
+  [EMenuItemKey.Settings]: {
     key: EMenuItemKey.Settings,
-    title: EMenuItem.Settings,
     icon: 'icon-settings',
     isActive: true,
     isExpanded: false,
   },
-  [EMenuItem.Login]: {
+  [EMenuItemKey.Login]: {
     key: EMenuItemKey.Login,
-    title: EMenuItem.Login,
     icon: 'icon-user',
     isActive: true,
     isExpanded: false,
@@ -292,95 +246,83 @@ export const SideNavMenuItems = (): TMenuItems => ({
 });
 
 type TSubMenuItems = {
-  [MenuItem in ESubMenuItem]: IMenuItem | IParentMenuItem;
+  [MenuItem in ESubMenuItemKey]: IMenuItem | IParentMenuItem;
 };
 
 export const SideBarSubMenuItems = (): TSubMenuItems => ({
-  [ESubMenuItem.Scene]: {
-    key: EMenuItemKey.Scene,
+  [ESubMenuItemKey.Scene]: {
+    key: ESubMenuItemKey.Scene,
     target: 'BrowseOverlays',
     type: 'overlays',
-    title: ESubMenuItem.Scene,
     trackingTarget: 'themes',
     isExpanded: false,
   },
-  [ESubMenuItem.AlertBoxLibrary]: {
-    key: EMenuItemKey.AlertBoxLibrary,
+  [ESubMenuItemKey.AlertBoxLibrary]: {
+    key: ESubMenuItemKey.AlertBoxLibrary,
     target: 'AlertboxLibrary',
-    title: ESubMenuItem.AlertBoxLibrary,
     trackingTarget: 'alertbox-library',
     isExpanded: false,
   },
-  [ESubMenuItem.Widget]: {
-    key: EMenuItemKey.Widget,
+  [ESubMenuItemKey.Widget]: {
+    key: ESubMenuItemKey.Widget,
     target: 'BrowseOverlays',
     type: 'widget-themes',
-    title: ESubMenuItem.Widget,
     trackingTarget: 'themes',
     isExpanded: false,
   },
-  [ESubMenuItem.Sites]: {
-    key: EMenuItemKey.Sites,
+  [ESubMenuItemKey.Sites]: {
+    key: ESubMenuItemKey.Sites,
     target: 'BrowseOverlays',
     type: 'site-themes',
-    title: ESubMenuItem.Sites,
     trackingTarget: 'themes',
     isActive: false,
     isExpanded: false,
   },
-  [ESubMenuItem.AppsStoreHome]: {
-    key: EMenuItemKey.AppsStoreHome,
+  [ESubMenuItemKey.AppsStoreHome]: {
+    key: ESubMenuItemKey.AppsStoreHome,
     target: 'PlatformAppStore',
-    title: ESubMenuItem.AppsStoreHome,
     trackingTarget: 'app-store',
     isExpanded: false,
   },
-  [ESubMenuItem.AppsManager]: {
-    key: EMenuItemKey.AppsManager,
+  [ESubMenuItemKey.AppsManager]: {
+    key: ESubMenuItemKey.AppsManager,
     target: 'PlatformAppStore',
-    title: ESubMenuItem.AppsManager,
     type: 'profile',
     trackingTarget: 'app-store',
     isExpanded: false,
   },
-  [ESubMenuItem.DashboardHome]: {
-    key: EMenuItemKey.DashboardHome,
-    title: ESubMenuItem.DashboardHome,
+  [ESubMenuItemKey.DashboardHome]: {
+    key: ESubMenuItemKey.DashboardHome,
     trackingTarget: 'dashboard',
     isExpanded: false,
   },
-  [ESubMenuItem.Cloudbot]: {
-    key: EMenuItemKey.Cloudbot,
+  [ESubMenuItemKey.Cloudbot]: {
+    key: ESubMenuItemKey.Cloudbot,
     type: 'cloudbot',
-    title: ESubMenuItem.Cloudbot,
     trackingTarget: 'dashboard',
     isExpanded: false,
   },
-  [ESubMenuItem.AlertBoxSettings]: {
-    key: EMenuItemKey.AlertBoxSettings,
+  [ESubMenuItemKey.AlertBoxSettings]: {
+    key: ESubMenuItemKey.AlertBoxSettings,
     type: 'alertbox',
-    title: ESubMenuItem.AlertBoxSettings,
     trackingTarget: 'dashboard',
     isExpanded: false,
   },
-  [ESubMenuItem.Widgets]: {
-    key: EMenuItemKey.Widgets,
+  [ESubMenuItemKey.Widgets]: {
+    key: ESubMenuItemKey.Widgets,
     type: 'widgets',
-    title: ESubMenuItem.Widgets,
     trackingTarget: 'dashboard',
     isExpanded: false,
   },
-  [ESubMenuItem.TipSettings]: {
-    key: EMenuItemKey.TipSettings,
+  [ESubMenuItemKey.TipSettings]: {
+    key: ESubMenuItemKey.TipSettings,
     type: 'tipping/settings',
-    title: ESubMenuItem.TipSettings,
     trackingTarget: 'dashboard',
     isExpanded: false,
   },
-  [ESubMenuItem.Multistream]: {
-    key: EMenuItemKey.Multistream,
+  [ESubMenuItemKey.Multistream]: {
+    key: ESubMenuItemKey.Multistream,
     type: 'multistream',
-    title: ESubMenuItem.Multistream,
     trackingTarget: 'dashboard',
     isExpanded: false,
   },

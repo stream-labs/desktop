@@ -5,7 +5,7 @@ import { TAppPage } from 'services/navigation';
 import {
   ENavName,
   EMenuItemKey,
-  EMenuItem,
+  ESubMenuItemKey,
   IMenuItem,
   IParentMenuItem,
   TExternalLinkType,
@@ -70,10 +70,10 @@ export default function SideNav() {
     // when opening/closing the navbar swap the submenu current menu item
     // to correctly display selected color
     const subMenuItems = {
-      [EMenuItemKey.Themes]: EMenuItemKey.Scene,
-      [EMenuItemKey.Scene]: EMenuItemKey.Themes,
-      [EMenuItemKey.AppStore]: EMenuItemKey.AppsStoreHome,
-      [EMenuItemKey.AppsStoreHome]: EMenuItemKey.AppStore,
+      [EMenuItemKey.Themes]: ESubMenuItemKey.Scene,
+      [ESubMenuItemKey.Scene]: EMenuItemKey.Themes,
+      [EMenuItemKey.AppStore]: ESubMenuItemKey.AppsStoreHome,
+      [ESubMenuItemKey.AppsStoreHome]: EMenuItemKey.AppStore,
     };
     if (Object.keys(subMenuItems).includes(currentMenuItem as EMenuItemKey)) {
       setCurrentMenuItem(subMenuItems[currentMenuItem]);
@@ -81,7 +81,7 @@ export default function SideNav() {
   }
 
   function handleNavigation(menuItem: IMenuItem, key?: string) {
-    if (menuItem.title === EMenuItem.StudioMode) {
+    if (menuItem.key === EMenuItemKey.StudioMode) {
       // if studio mode, toggle studio mode
       toggleStudioMode();
       return;
@@ -157,18 +157,18 @@ export default function SideNav() {
 
   const menuItems = useMemo(() => {
     if (!loggedIn) {
-      return menu.menuItems.filter(menuItem => menuItem.title === EMenuItem.Editor);
+      return menu.menuItems.filter(menuItem => menuItem.key === EMenuItemKey.Editor);
     }
     return !compactView
       ? menu.menuItems
       : menu.menuItems.filter((menuItem: IMenuItem) => {
           if (
             [
-              EMenuItem.Editor,
-              EMenuItem.Themes,
-              EMenuItem.AppStore,
-              EMenuItem.Highlighter,
-            ].includes(menuItem.title as EMenuItem)
+              EMenuItemKey.Editor,
+              EMenuItemKey.Themes,
+              EMenuItemKey.AppStore,
+              EMenuItemKey.Highlighter,
+            ].includes(menuItem.key as EMenuItemKey)
           ) {
             return menuItem;
           }
@@ -213,26 +213,30 @@ export default function SideNav() {
               !isOpen && styles.siderClosed && styles.closed,
             )}
             defaultOpenKeys={openMenuItems && openMenuItems}
-            defaultSelectedKeys={[EMenuItem.Editor]}
+            defaultSelectedKeys={[EMenuItemKey.Editor]}
             getPopupContainer={triggerNode => triggerNode}
           >
             {menuItems.map((menuItem: IParentMenuItem) => {
               if (
                 !menuItem?.isActive ||
-                (menuItem.title === EMenuItem.ThemeAudit && !themeAuditEnabled)
+                (menuItem.key === EMenuItemKey.ThemeAudit && !themeAuditEnabled)
               ) {
                 // skip inactive menu items
                 // skip legacy menu items for new users
                 // skip Theme Audit if not enabled
                 return null;
-              } else if (menuItem.title === EMenuItem.Editor && loggedIn && studioTabs.length > 1) {
+              } else if (
+                menuItem.key === EMenuItemKey.Editor &&
+                loggedIn &&
+                studioTabs.length > 1
+              ) {
                 // handle editor tabs
                 return showCustomEditor && !isOpen && !compactView ? (
                   <EditorTabs key="editor-tabs" />
                 ) : (
                   <SubMenu
                     key={menuItem.key}
-                    title={menuTitles(menuItem.title)}
+                    title={menuTitles(menuItem.key)}
                     icon={menuItem?.icon && <i className={menuItem.icon} />}
                     onTitleClick={() => {
                       !isOpen &&
@@ -253,7 +257,7 @@ export default function SideNav() {
                 return menuItem.hasOwnProperty('subMenuItems') ? (
                   <SubMenu
                     key={menuItem.key}
-                    title={menuTitles(menuItem.title)}
+                    title={menuTitles(menuItem.key)}
                     icon={menuItem?.icon && <i className={menuItem.icon} />}
                     onTitleClick={() => {
                       menuItem?.subMenuItems[0]?.target &&
@@ -270,30 +274,30 @@ export default function SideNav() {
                       <MenuItem
                         key={subMenuItem.key}
                         className={currentMenuItem === subMenuItem?.key && styles.active}
-                        title={menuTitles(subMenuItem.title)}
+                        title={menuTitles(subMenuItem.key)}
                         onClick={() => handleNavigation(subMenuItem)}
                         type="submenu"
                       >
-                        {menuTitles(subMenuItem.title)}
+                        {menuTitles(subMenuItem.key)}
                       </MenuItem>
                     ))}
-                    {menuItem.title === EMenuItem.AppStore && <AppsNav type="enabled" />}
+                    {menuItem.key === EMenuItemKey.AppStore && <AppsNav type="enabled" />}
                   </SubMenu>
                 ) : (
                   <MenuItem
                     key={menuItem.key}
                     className={cx(
                       !isOpen && styles.closed,
-                      menuItem.title === EMenuItem.StudioMode && studioMode && styles.studioMode,
+                      menuItem.key === EMenuItemKey.StudioMode && studioMode && styles.studioMode,
                       currentMenuItem === menuItem.key && styles.active,
                     )}
-                    title={menuTitles(menuItem.title)}
+                    title={menuTitles(menuItem.key)}
                     icon={menuItem?.icon && <i className={menuItem.icon} />}
                     onClick={() => {
                       handleNavigation(menuItem);
                     }}
                   >
-                    {menuTitles(menuItem.title)}
+                    {menuTitles(menuItem.key)}
                   </MenuItem>
                 );
               }

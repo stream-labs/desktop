@@ -7,7 +7,7 @@ import { getDefined } from '../../../util/properties-type-guards';
 import { ObsSettingsSection } from './ObsSettings';
 import * as remote from '@electron/remote';
 import { injectFormBinding, useModule } from 'slap';
-import { ENavName, EMenuItem, IAppMenuItem, menuTitles } from 'services/side-nav';
+import { ENavName, EMenuItemKey, IAppMenuItem, menuTitles } from 'services/side-nav';
 import { useVuex } from 'components-react/hooks';
 import styles from './Appearance.m.less';
 import cx from 'classnames';
@@ -183,10 +183,10 @@ export function AppearanceSettings() {
         <Row className={styles.sidenavSettings}>
           <Col flex={1} className={styles.menuControls}>
             <SwitchInput
-              label={menuTitles(EMenuItem.Editor)}
+              label={menuTitles(EMenuItemKey.Editor)}
               layout="horizontal"
-              onChange={() => toggleMenuItem(ENavName.TopNav, EMenuItem.Editor)}
-              value={menuItemStatus[EMenuItem.Editor]}
+              onChange={() => toggleMenuItem(ENavName.TopNav, EMenuItemKey.Editor)}
+              value={menuItemStatus[EMenuItemKey.Editor]}
               disabled={!isLoggedIn || compactView}
             />
             <SwitchInput
@@ -197,31 +197,31 @@ export function AppearanceSettings() {
               disabled={!isLoggedIn || compactView}
             />
             <SwitchInput
-              label={menuTitles(EMenuItem.StudioMode)}
+              label={menuTitles(EMenuItemKey.StudioMode)}
               layout="horizontal"
-              onChange={() => toggleMenuItem(ENavName.TopNav, EMenuItem.StudioMode)}
-              value={menuItemStatus[EMenuItem.StudioMode]}
+              onChange={() => toggleMenuItem(ENavName.TopNav, EMenuItemKey.StudioMode)}
+              value={menuItemStatus[EMenuItemKey.StudioMode]}
               disabled={!isLoggedIn || compactView}
             />
             <SwitchInput
-              label={menuTitles(EMenuItem.LayoutEditor)}
+              label={menuTitles(EMenuItemKey.LayoutEditor)}
               layout="horizontal"
-              onChange={() => toggleMenuItem(ENavName.TopNav, EMenuItem.LayoutEditor)}
-              value={menuItemStatus[EMenuItem.LayoutEditor]}
+              onChange={() => toggleMenuItem(ENavName.TopNav, EMenuItemKey.LayoutEditor)}
+              value={menuItemStatus[EMenuItemKey.LayoutEditor]}
               disabled={!isLoggedIn || compactView}
             />
             <SwitchInput
-              label={menuTitles(EMenuItem.Themes)}
+              label={menuTitles(EMenuItemKey.Themes)}
               layout="horizontal"
-              onChange={() => toggleMenuItem(ENavName.TopNav, EMenuItem.Themes)}
-              value={menuItemStatus[EMenuItem.Themes]}
+              onChange={() => toggleMenuItem(ENavName.TopNav, EMenuItemKey.Themes)}
+              value={menuItemStatus[EMenuItemKey.Themes]}
               disabled={!isLoggedIn || compactView}
             />
             <SwitchInput
-              label={menuTitles(EMenuItem.Highlighter)}
+              label={menuTitles(EMenuItemKey.Highlighter)}
               layout="horizontal"
-              onChange={() => toggleMenuItem(ENavName.TopNav, EMenuItem.Highlighter)}
-              value={menuItemStatus[EMenuItem.Highlighter]}
+              onChange={() => toggleMenuItem(ENavName.TopNav, EMenuItemKey.Highlighter)}
+              value={menuItemStatus[EMenuItemKey.Highlighter]}
               disabled={!isLoggedIn || compactView}
             />
           </Col>
@@ -230,10 +230,10 @@ export function AppearanceSettings() {
           <Col flex={5}>
             <Scrollable style={{ height: '100%', right: '5px' }} snapToWindowEdge>
               <SwitchInput
-                label={menuTitles(EMenuItem.AppStore)}
+                label={menuTitles(EMenuItemKey.AppStore)}
                 layout="horizontal"
-                onChange={() => toggleMenuItem(ENavName.TopNav, EMenuItem.AppStore)}
-                value={menuItemStatus[EMenuItem.AppStore]}
+                onChange={() => toggleMenuItem(ENavName.TopNav, EMenuItemKey.AppStore)}
+                value={menuItemStatus[EMenuItemKey.AppStore]}
                 disabled={!isLoggedIn || compactView}
               />
 

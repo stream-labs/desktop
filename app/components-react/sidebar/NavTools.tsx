@@ -9,14 +9,7 @@ import { useVuex } from '../hooks';
 import styles from './NavTools.m.less';
 import * as remote from '@electron/remote';
 import { Badge, Button, Form, Menu, Modal } from 'antd';
-import {
-  EMenuItem,
-  EMenuItemKey,
-  ENavName,
-  IMenuItem,
-  IParentMenuItem,
-  menuTitles,
-} from 'services/side-nav';
+import { EMenuItemKey, ENavName, IMenuItem, IParentMenuItem, menuTitles } from 'services/side-nav';
 import PlatformLogo from 'components-react/shared/PlatformLogo';
 import SubMenu from 'components-react/shared/SubMenu';
 import MenuItem from 'components-react/shared/MenuItem';
@@ -129,22 +122,22 @@ export default function SideNav() {
         getPopupContainer={triggerNode => triggerNode}
       >
         {menuItems.map((menuItem: IParentMenuItem) => {
-          if (isDevMode && menuItem.title === EMenuItem.DevTools) {
+          if (isDevMode && menuItem.key === EMenuItemKey.DevTools) {
             return (
               <MenuItem
                 key={menuItem.key}
-                title={menuItem.title}
+                title={menuTitles(menuItem.key)}
                 icon={<i className="icon-developer" />}
                 onClick={openDevTools}
               >
-                {menuItem.title}
+                {menuTitles(menuItem.key)}
               </MenuItem>
             );
-          } else if (isLoggedIn && !isPrime && menuItem.title === EMenuItem.GetPrime) {
+          } else if (isLoggedIn && !isPrime && menuItem.key === EMenuItemKey.GetPrime) {
             return (
               <MenuItem
                 key={menuItem.key}
-                title={menuTitles(menuItem.title)}
+                title={menuTitles(menuItem.key)}
                 icon={
                   <div>
                     <Badge count={<i className={cx('icon-pop-out-3', styles.linkBadge)} />}>
@@ -155,14 +148,14 @@ export default function SideNav() {
                 onClick={upgradeToPrime}
                 className={styles.badgeScale}
               >
-                {menuTitles(menuItem.title)}
+                {menuTitles(menuItem.key)}
               </MenuItem>
             );
-          } else if (isLoggedIn && menuItem.title === EMenuItem.Dashboard) {
+          } else if (isLoggedIn && menuItem.key === EMenuItemKey.Dashboard) {
             return (
               <SubMenu
                 key={menuItem.key}
-                title={menuTitles(menuItem.title)}
+                title={menuTitles(menuItem.key)}
                 icon={
                   <div>
                     <Badge count={<i className={cx('icon-pop-out-3', styles.linkBadge)} />}>
@@ -178,19 +171,19 @@ export default function SideNav() {
                 {menuItem?.subMenuItems.map((subMenuItem: IMenuItem) => (
                   <MenuItem
                     key={subMenuItem.key}
-                    title={menuTitles(subMenuItem.title)}
+                    title={menuTitles(subMenuItem.key)}
                     onClick={() => throttledOpenDashboard(subMenuItem?.type)}
                   >
-                    {menuTitles(subMenuItem.title)}
+                    {menuTitles(subMenuItem.key)}
                   </MenuItem>
                 ))}
               </SubMenu>
             );
-          } else if (menuItem.title === EMenuItem.GetHelp) {
+          } else if (menuItem.key === EMenuItemKey.GetHelp) {
             return (
               <MenuItem
                 key={menuItem.key}
-                title={menuTitles(menuItem.title)}
+                title={menuTitles(menuItem.key)}
                 icon={
                   <div>
                     <Badge count={<i className={cx('icon-pop-out-3', styles.linkBadge)} />}>
@@ -200,31 +193,31 @@ export default function SideNav() {
                 }
                 onClick={() => openHelp()}
               >
-                {menuTitles(menuItem.title)}
+                {menuTitles(menuItem.key)}
               </MenuItem>
             );
-          } else if (menuItem.title === EMenuItem.Settings) {
+          } else if (menuItem.key === EMenuItemKey.Settings) {
             return (
               <MenuItem
                 key={menuItem.key}
-                title={menuTitles(menuItem.title)}
+                title={menuTitles(menuItem.key)}
                 icon={<i className={menuItem?.icon} />}
                 onClick={openSettingsWindow}
               >
-                {menuTitles(menuItem.title)}
+                {menuTitles(menuItem.key)}
               </MenuItem>
             );
-          } else if (menuItem.title === EMenuItem.Login) {
+          } else if (menuItem.key === EMenuItemKey.Login) {
             return (
               <MenuItem
                 key={menuItem.key}
-                title={!isLoggedIn ? menuTitles(menuItem.title) : $t('Log Out')}
+                title={!isLoggedIn ? menuTitles(menuItem.key) : $t('Log Out')}
                 className={cx(styles.login)}
                 icon={!isOpen && <i className="icon-user" />}
                 onClick={() => (isLoggedIn ? handleShowModal(true) : handleAuth())}
               >
                 {!isLoggedIn ? (
-                  <span className={styles.loggedOut}>{menuTitles(menuItem.title)}</span>
+                  <span className={styles.loggedOut}>{menuTitles(menuItem.key)}</span>
                 ) : (
                   isOpen && (
                     <>

@@ -4,7 +4,7 @@ import { UserService, AppService, DismissablesService, LayoutService } from 'app
 import { EDismissable } from 'services/dismissables';
 import {
   TMenuItems,
-  EMenuItem,
+  EMenuItemKey,
   IMenuItem,
   SideNavMenuItems,
   ENavName,
@@ -12,7 +12,6 @@ import {
   IAppMenuItem,
   SideBarTopNavData,
   SideBarBottomNavData,
-  EMenuItemKey,
 } from './menu-data';
 
 interface ISideNavServiceState {
@@ -38,7 +37,7 @@ class SideNavViews extends ViewHandler<ISideNavServiceState> {
 
   get menuItemStatus() {
     return this.state[ENavName.TopNav].menuItems.reduce((menuItems, menuItem) => {
-      return { ...menuItems, [menuItem.title]: menuItem.isActive };
+      return { ...menuItems, [menuItem.key]: menuItem.isActive };
     }, {});
   }
 
@@ -68,8 +67,8 @@ class SideNavViews extends ViewHandler<ISideNavServiceState> {
     }, []);
   }
 
-  getMenuItemData(name: ENavName, menuItem: EMenuItem) {
-    return this.state[name].menuItems.find(item => item.title === menuItem);
+  getMenuItemData(name: ENavName, menuItemKey: EMenuItemKey) {
+    return this.state[name].menuItems.find(item => item.key === menuItemKey);
   }
 }
 
@@ -174,9 +173,9 @@ export class SideNavService extends PersistentStatefulService<ISideNavServiceSta
     this.TOGGLE_SIDEBAR_SUBMENU();
   }
 
-  toggleMenuItem(navName: ENavName, menuItemName: EMenuItem) {
+  toggleMenuItem(navName: ENavName, menuItemKey: EMenuItemKey) {
     // show/hide menu items
-    this.TOGGLE_MENU_ITEM(navName, menuItemName);
+    this.TOGGLE_MENU_ITEM(navName, menuItemKey);
   }
 
   toggleApp(appId: string) {
@@ -202,21 +201,21 @@ export class SideNavService extends PersistentStatefulService<ISideNavServiceSta
     this.state[ENavName.TopNav] = {
       ...this.state[ENavName.TopNav],
       menuItems: [
-        { ...SideNavMenuItems()[EMenuItem.Editor], isActive: true },
-        { ...SideNavMenuItems()[EMenuItem.LayoutEditor], isActive: false },
-        { ...SideNavMenuItems()[EMenuItem.StudioMode], isActive: false },
-        { ...SideNavMenuItems()[EMenuItem.Themes], isActive: true },
-        { ...SideNavMenuItems()[EMenuItem.AppStore], isActive: true },
-        { ...SideNavMenuItems()[EMenuItem.Highlighter], isActive: true },
-        { ...SideNavMenuItems()[EMenuItem.ThemeAudit], isActive: true },
+        { ...SideNavMenuItems()[EMenuItemKey.Editor], isActive: true },
+        { ...SideNavMenuItems()[EMenuItemKey.LayoutEditor], isActive: false },
+        { ...SideNavMenuItems()[EMenuItemKey.StudioMode], isActive: false },
+        { ...SideNavMenuItems()[EMenuItemKey.Themes], isActive: true },
+        { ...SideNavMenuItems()[EMenuItemKey.AppStore], isActive: true },
+        { ...SideNavMenuItems()[EMenuItemKey.Highlighter], isActive: true },
+        { ...SideNavMenuItems()[EMenuItemKey.ThemeAudit], isActive: true },
       ],
     };
 
     this.state[ENavName.BottomNav] = {
       ...this.state[ENavName.BottomNav],
       menuItems: this.state[ENavName.BottomNav].menuItems.map((menuItem: IMenuItem) => {
-        if (menuItem.title === EMenuItem.Dashboard) {
-          return { ...this.state.menuItems[EMenuItem.Dashboard], isExpanded: true };
+        if (menuItem.key === EMenuItemKey.Dashboard) {
+          return { ...this.state.menuItems[EMenuItemKey.Dashboard], isExpanded: true };
         }
         return menuItem;
       }),
@@ -230,25 +229,37 @@ export class SideNavService extends PersistentStatefulService<ISideNavServiceSta
 
     this.state.menuItems = {
       ...this.state.menuItems,
-      [EMenuItem.Editor]: { ...this.state.menuItems[EMenuItem.Editor], isActive: true },
-      [EMenuItem.Themes]: { ...this.state.menuItems[EMenuItem.Themes], isActive: true },
-      [EMenuItem.AppStore]: { ...this.state.menuItems[EMenuItem.AppStore], isActive: true },
-      [EMenuItem.Highlighter]: { ...this.state.menuItems[EMenuItem.Highlighter], isActive: true },
-      [EMenuItem.LayoutEditor]: { ...this.state.menuItems[EMenuItem.LayoutEditor], isActive: true },
-      [EMenuItem.StudioMode]: { ...this.state.menuItems[EMenuItem.StudioMode], isActive: true },
-      [EMenuItem.ThemeAudit]: { ...this.state.menuItems[EMenuItem.ThemeAudit], isActive: true },
+      [EMenuItemKey.Editor]: { ...this.state.menuItems[EMenuItemKey.Editor], isActive: true },
+      [EMenuItemKey.Themes]: { ...this.state.menuItems[EMenuItemKey.Themes], isActive: true },
+      [EMenuItemKey.AppStore]: { ...this.state.menuItems[EMenuItemKey.AppStore], isActive: true },
+      [EMenuItemKey.Highlighter]: {
+        ...this.state.menuItems[EMenuItemKey.Highlighter],
+        isActive: true,
+      },
+      [EMenuItemKey.LayoutEditor]: {
+        ...this.state.menuItems[EMenuItemKey.LayoutEditor],
+        isActive: true,
+      },
+      [EMenuItemKey.StudioMode]: {
+        ...this.state.menuItems[EMenuItemKey.StudioMode],
+        isActive: true,
+      },
+      [EMenuItemKey.ThemeAudit]: {
+        ...this.state.menuItems[EMenuItemKey.ThemeAudit],
+        isActive: true,
+      },
     };
 
     this.state[ENavName.TopNav] = {
       ...this.state[ENavName.TopNav],
       menuItems: [
-        { ...this.state.menuItems[EMenuItem.Editor], isActive: true },
-        { ...this.state.menuItems[EMenuItem.LayoutEditor], isActive: true },
-        { ...this.state.menuItems[EMenuItem.StudioMode], isActive: true },
-        { ...this.state.menuItems[EMenuItem.Themes], isActive: true },
-        { ...this.state.menuItems[EMenuItem.AppStore], isActive: true },
-        { ...this.state.menuItems[EMenuItem.Highlighter], isActive: true },
-        { ...this.state.menuItems[EMenuItem.ThemeAudit], isActive: true },
+        { ...this.state.menuItems[EMenuItemKey.Editor], isActive: true },
+        { ...this.state.menuItems[EMenuItemKey.LayoutEditor], isActive: true },
+        { ...this.state.menuItems[EMenuItemKey.StudioMode], isActive: true },
+        { ...this.state.menuItems[EMenuItemKey.Themes], isActive: true },
+        { ...this.state.menuItems[EMenuItemKey.AppStore], isActive: true },
+        { ...this.state.menuItems[EMenuItemKey.Highlighter], isActive: true },
+        { ...this.state.menuItems[EMenuItemKey.ThemeAudit], isActive: true },
       ],
     };
   }
@@ -266,12 +277,12 @@ export class SideNavService extends PersistentStatefulService<ISideNavServiceSta
   }
 
   @mutation()
-  private TOGGLE_MENU_ITEM(navName: ENavName, menuItemName: EMenuItem) {
+  private TOGGLE_MENU_ITEM(navName: ENavName, menuItemKey: EMenuItemKey) {
     // toggle boolean value
     this.state[navName].menuItems.find(
-      (menuItem: IMenuItem) => menuItem.title === menuItemName,
+      (menuItem: IMenuItem) => menuItem.key === menuItemKey,
     ).isActive = !this.state[navName].menuItems.find(
-      (menuItem: IMenuItem) => menuItem.title === menuItemName,
+      (menuItem: IMenuItem) => menuItem.key === menuItemKey,
     ).isActive;
   }
 
