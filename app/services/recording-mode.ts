@@ -14,12 +14,9 @@ import { DefaultHardwareService } from './hardware';
 import { RunInLoadingMode } from './app/app-decorators';
 import { byOS, OS } from 'util/operating-systems';
 import { JsonrpcService } from './api/jsonrpc';
-import { WindowsService, StreamingService, UsageStatisticsService } from 'app-services';
+import { WindowsService, UsageStatisticsService } from 'app-services';
 import { getPlatformService } from 'services/platforms';
-import {
-  IYoutubeVideoUploadOptions,
-  IYoutubeUploadResponse,
-} from 'services/platforms/youtube/uploader';
+import { IYoutubeUploadResponse } from 'services/platforms/youtube/uploader';
 import { YoutubeService } from 'services/platforms/youtube';
 
 interface IRecordingEntry {
@@ -27,9 +24,15 @@ interface IRecordingEntry {
   filename: string;
 }
 
+export interface IUploadInfo {
+  uploadedBytes?: number;
+  totalBytes?: number;
+}
+
 interface IRecordingModeState {
   enabled: boolean;
   recordingHistory: Dictionary<IRecordingEntry>;
+  uploadInfo: IUploadInfo;
 }
 
 class RecordingModeViews extends ViewHandler<IRecordingModeState> {
@@ -63,7 +66,10 @@ export class RecordingModeService extends PersistentStatefulService<IRecordingMo
   static defaultState: IRecordingModeState = {
     enabled: false,
     recordingHistory: {},
+    uploadInfo: {} as IUploadInfo,
   };
+
+  cancelFunction = () => {};
 
   get views() {
     return new RecordingModeViews(this.state);
@@ -197,14 +203,14 @@ export class RecordingModeService extends PersistentStatefulService<IRecordingMo
       filename,
       { title: filename, description: '', privacyStatus: 'private' },
       progress => {
-        // this.SET_UPLOAD_INFO({
-        //   uploadedBytes: progress.uploadedBytes,
-        //   totalBytes: progress.totalBytes,
-        // });
+        this.SET_UPLOAD_INFO({
+          uploadedBytes: progress.uploadedBytes,
+          totalBytes: progress.totalBytes,
+        });
       },
     );
 
-    // this.cancelFunction = cancel;
+    this.cancelFunction = cancel;
     let result: IYoutubeUploadResponse | null = null;
 
     try {
@@ -215,18 +221,12 @@ export class RecordingModeService extends PersistentStatefulService<IRecordingMo
         console.error('Got error uploading YT video', e);
       });
 
-      // this.SET_UPLOAD_INFO({ error: true });
       this.usageStatisticsService.recordAnalyticsEvent('RecordingHistory', {
         type: 'UploadError',
       });
     }
 
-    // this.cancelFunction = null;
-    // this.SET_UPLOAD_INFO({
-    //   uploading: false,
-    //   cancelRequested: false,
-    //   videoId: result ? result.id : null,
-    // });
+    this.cancelFunction = () => {};
 
     if (result) {
       this.usageStatisticsService.recordAnalyticsEvent('RecordingHistory', {
@@ -273,5 +273,10 @@ export class RecordingModeService extends PersistentStatefulService<IRecordingMo
   @mutation()
   private SET_RECORDING_MODE(val: boolean) {
     this.state.enabled = val;
+  }
+
+  @mutation()
+  private SET_UPLOAD_INFO(info: Partial<IUploadInfo>) {
+    this.state.uploadInfo = { ...this.state.uploadInfo, ...info };
   }
 }

@@ -5,14 +5,25 @@ import { inject, useModule } from 'slap';
 import { $t } from 'services/i18n';
 import { ModalLayout } from 'components-react/shared/ModalLayout';
 import PlatformLogo from 'components-react/shared/PlatformLogo';
-import { RecordingModeService } from 'app-services';
+import { RecordingModeService, UserService } from 'app-services';
 import styles from './RecordingHistory.m.less';
+import AutoProgressBar from 'components-react/shared/AutoProgressBar';
+import { IUploadInfo } from 'services/recording-mode';
 
 class RecordingHistoryModule {
   private RecordingModeService = inject(RecordingModeService);
+  private UserService = inject(UserService);
 
   get recordings() {
     return this.RecordingModeService.views.sortedRecordings;
+  }
+
+  get hasYoutube() {
+    return this.UserService.views.linkedPlatforms.includes('youtube');
+  }
+
+  get uploadInfo() {
+    return this.RecordingModeService.state.uploadInfo;
   }
 
   formattedTimestamp(timestamp: string) {
@@ -26,10 +37,14 @@ class RecordingHistoryModule {
   showFile(filename: string) {
     remote.shell.showItemInFolder(filename);
   }
+
+  cancelUpload() {
+    this.RecordingModeService.cancelFunction();
+  }
 }
 
 export default function RecordingHistory() {
-  const { recordings, formattedTimestamp, uploadToYoutube, showFile } = useModule(
+  const { recordings, hasYoutube, formattedTimestamp, uploadToYoutube, showFile } = useModule(
     RecordingHistoryModule,
   );
 
@@ -45,15 +60,44 @@ export default function RecordingHistory() {
                 {recording.filename}
               </span>
             </Tooltip>
-            <Tooltip title={$t('Upload to YouTube')}>
-              <PlatformLogo
-                onClick={() => uploadToYoutube(recording.filename)}
-                platform="youtube"
-              />
-            </Tooltip>
+            {hasYoutube && (
+              <Tooltip title={$t('Upload to YouTube')}>
+                <PlatformLogo
+                  onClick={() => uploadToYoutube(recording.filename)}
+                  platform="youtube"
+                />
+              </Tooltip>
+            )}
           </div>
         ))}
       </div>
+      <ExportModal />
     </ModalLayout>
+  );
+}
+
+function ExportModal() {
+  const { uploadInfo, cancelUpload } = useModule(RecordingHistoryModule);
+  const { uploadedBytes, totalBytes } = uploadInfo;
+
+  if (!uploadedBytes || !totalBytes) return <></>;
+  return (
+    <div className={styles.modalBackdrop}>
+      <ModalLayout
+        hideFooter
+        wrapperStyle={{
+          width: '300px',
+          height: '200px',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+        }}
+      >
+        <AutoProgressBar percent={uploadedBytes / totalBytes} timeTarget={1000 * 60} />
+        <button className="button button--default" onClick={cancelUpload}>
+          {$t('Cancel')}
+        </button>
+      </ModalLayout>
+    </div>
   );
 }
