@@ -71,6 +71,11 @@ export class RecordingModeService extends PersistentStatefulService<IRecordingMo
 
   cancelFunction = () => {};
 
+  cancelUpload() {
+    this.cancelFunction();
+    this.SET_UPLOAD_INFO({});
+  }
+
   get views() {
     return new RecordingModeViews(this.state);
   }
@@ -276,7 +281,7 @@ export class RecordingModeService extends PersistentStatefulService<IRecordingMo
   }
 
   @mutation()
-  private SET_UPLOAD_INFO(info: Partial<IUploadInfo>) {
-    this.state.uploadInfo = { ...this.state.uploadInfo, ...info };
+  private SET_UPLOAD_INFO(info: IUploadInfo) {
+    this.state.uploadInfo = info;
   }
 }

@@ -31,7 +31,7 @@ class RecordingHistoryModule {
   }
 
   uploadToYoutube(filename: string) {
-    return this.RecordingModeService.actions.uploadToYoutube(filename);
+    this.RecordingModeService.actions.uploadToYoutube(filename);
   }
 
   showFile(filename: string) {
@@ -39,7 +39,7 @@ class RecordingHistoryModule {
   }
 
   cancelUpload() {
-    this.RecordingModeService.cancelFunction();
+    this.RecordingModeService.actions.cancelUpload();
   }
 }
 
@@ -61,11 +61,10 @@ export default function RecordingHistory() {
               </span>
             </Tooltip>
             {hasYoutube && (
-              <Tooltip title={$t('Upload to YouTube')}>
-                <PlatformLogo
-                  onClick={() => uploadToYoutube(recording.filename)}
-                  platform="youtube"
-                />
+              <Tooltip title={$t('Upload to YouTube')} placement="left">
+                <div onClick={() => uploadToYoutube(recording.filename)}>
+                  <PlatformLogo platform="youtube" />
+                </div>
               </Tooltip>
             )}
           </div>
@@ -87,10 +86,13 @@ function ExportModal() {
         hideFooter
         wrapperStyle={{
           width: '300px',
-          height: '200px',
+          height: '100px',
+        }}
+        bodyStyle={{
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
+          width: '100%',
         }}
       >
         <AutoProgressBar percent={uploadedBytes / totalBytes} timeTarget={1000 * 60} />
