@@ -159,7 +159,8 @@ export class RecordingModeService extends PersistentStatefulService<IRecordingMo
 
   addRecordingEntry(filename: string) {
     const timestamp = moment().format();
-    this.ADD_RECORDING_ENTRY(timestamp, filename);
+    const parsedFilename = byOS({ [OS.Mac]: filename, [OS.Windows]: filename.replace(/\//, '\\') });
+    this.ADD_RECORDING_ENTRY(timestamp, parsedFilename);
     this.notificationsService.actions.push({
       type: ENotificationType.SUCCESS,
       message: $t('A new Recording has been completed. Click for more info'),
