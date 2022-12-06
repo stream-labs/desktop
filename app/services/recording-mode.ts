@@ -69,6 +69,10 @@ export class RecordingModeService extends PersistentStatefulService<IRecordingMo
     uploadInfo: {} as IUploadInfo,
   };
 
+  static filter(state: IRecordingModeState) {
+    return { ...state, uploadInfo: {} };
+  }
+
   cancelFunction = () => {};
 
   cancelUpload() {
@@ -232,6 +236,7 @@ export class RecordingModeService extends PersistentStatefulService<IRecordingMo
     }
 
     this.cancelFunction = () => {};
+    this.SET_UPLOAD_INFO({});
 
     if (result) {
       this.usageStatisticsService.recordAnalyticsEvent('RecordingHistory', {

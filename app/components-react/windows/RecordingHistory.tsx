@@ -8,7 +8,6 @@ import PlatformLogo from 'components-react/shared/PlatformLogo';
 import { RecordingModeService, UserService } from 'app-services';
 import styles from './RecordingHistory.m.less';
 import AutoProgressBar from 'components-react/shared/AutoProgressBar';
-import { IUploadInfo } from 'services/recording-mode';
 
 class RecordingHistoryModule {
   private RecordingModeService = inject(RecordingModeService);
