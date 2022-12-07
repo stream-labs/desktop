@@ -198,6 +198,7 @@ export default function FeaturesNav() {
             >
               {menuItem?.subMenuItems?.map((subMenuItem: IMenuItem) => (
                 <FeaturesNavItem
+                  key={subMenuItem.key}
                   isSubMenuItem={true}
                   menuItem={subMenuItem}
                   handleNavigation={handleNavigation}
@@ -210,7 +211,13 @@ export default function FeaturesNav() {
           );
         } else {
           // otherwise, display menu item
-          return <FeaturesNavItem menuItem={menuItem} handleNavigation={handleNavigation} />;
+          return (
+            <FeaturesNavItem
+              key={menuItem.key}
+              menuItem={menuItem}
+              handleNavigation={handleNavigation}
+            />
+          );
         }
       })}
 
@@ -238,7 +245,6 @@ function FeaturesNavItem(p: {
 
   return (
     <MenuItem
-      key={menuItem.key}
       className={cx(
         !isSubMenuItem && !isOpen && styles.closed,
         !isSubMenuItem &&

@@ -121,10 +121,11 @@ export default function SideNav() {
       >
         {menuItems.map((menuItem: IParentMenuItem) => {
           if (isDevMode && menuItem.key === EMenuItemKey.DevTools) {
-            return <NavToolsItem menuItem={menuItem} onClick={openDevTools} />;
+            return <NavToolsItem key={menuItem.key} menuItem={menuItem} onClick={openDevTools} />;
           } else if (isLoggedIn && !isPrime && menuItem.key === EMenuItemKey.GetPrime) {
             return (
               <NavToolsItem
+                key={menuItem.key}
                 menuItem={menuItem}
                 icon={
                   <div>
@@ -168,6 +169,7 @@ export default function SideNav() {
           } else if (menuItem.key === EMenuItemKey.GetHelp) {
             return (
               <NavToolsItem
+                key={menuItem.key}
                 menuItem={menuItem}
                 icon={
                   <div>
@@ -180,10 +182,13 @@ export default function SideNav() {
               />
             );
           } else if (menuItem.key === EMenuItemKey.Settings) {
-            return <NavToolsItem menuItem={menuItem} onClick={openSettingsWindow} />;
+            return (
+              <NavToolsItem key={menuItem.key} menuItem={menuItem} onClick={openSettingsWindow} />
+            );
           } else if (menuItem.key === EMenuItemKey.Login) {
             return (
               <LoginMenuItem
+                key={menuItem.key}
                 menuItem={menuItem}
                 handleAuth={handleAuth}
                 handleShowModal={handleShowModal}
@@ -210,7 +215,6 @@ function NavToolsItem(p: {
   const { menuItem, icon, className, onClick } = p;
   return (
     <MenuItem
-      key={menuItem.key}
       title={menuTitles(menuItem.key)}
       icon={icon ? icon : <i className={menuItem?.icon} />}
       className={className}
@@ -265,7 +269,6 @@ function LoginMenuItem(p: {
 
   return (
     <MenuItem
-      key={menuItem.key}
       title={!isLoggedIn ? menuTitles(menuItem.key) : $t('Log Out')}
       className={cx(styles.login)}
       icon={!isOpen && <i className="icon-user" />}
