@@ -39,11 +39,7 @@ export function MultistreamingSettings() {
                 <UltraIcon
                   type="simple"
                   style={{
-                    fill: '#09161D',
-                    display: 'inline-block',
-                    height: '12px',
-                    width: '12px',
-                    marginRight: '5px',
+                    marginRight: '8px',
                   }}
                 />
               }
@@ -62,7 +58,7 @@ export function MultistreamingSettings() {
                 {/* eslint-disable-next-line no-useless-escape */}
                 <Translate
                   message={
-                    'Step 2: Ensure the \"Confirm stream title and game before going live\" option is checked in the <general>General</general> settings tab."'
+                    'Step 2: Ensure the "Confirm stream title and game before going live" option is checked in the <general>General</general> settings tab."'
                   }
                 >
                   <u slot="general" />
@@ -70,7 +66,7 @@ export function MultistreamingSettings() {
               </li>
               <li>
                 {/* eslint-disable-next-line no-useless-escape */}
-                {$t('Step 3: Select which platforms you are streaming to when you hit \"Go Live\".')}
+                {$t('Step 3: Select which platforms you are streaming to when you hit "Go Live".')}
               </li>
             </ul>
           </div>
