@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { CSSProperties, useState } from 'react';
 import cx from 'classnames';
 import electron from 'electron';
 import Utils from 'services/utils';
@@ -30,7 +30,6 @@ export default function SideNav() {
   const {
     isLoggedIn,
     isPrime,
-    platform,
     menuItems,
     isOpen,
     openMenuItems,
@@ -40,7 +39,6 @@ export default function SideNav() {
     () => ({
       isLoggedIn: UserService.views.isLoggedIn,
       isPrime: UserService.views.isPrime,
-      platform: UserService.views.auth?.platforms[UserService.views.auth?.primaryPlatform],
       menuItems: SideNavService.views.state[ENavName.BottomNav].menuItems,
       isOpen: SideNavService.views.isOpen,
       openMenuItems: SideNavService.views.getExpandedMenuItems(ENavName.BottomNav),
@@ -123,21 +121,11 @@ export default function SideNav() {
       >
         {menuItems.map((menuItem: IParentMenuItem) => {
           if (isDevMode && menuItem.key === EMenuItemKey.DevTools) {
-            return (
-              <MenuItem
-                key={menuItem.key}
-                title={menuTitles(menuItem.key)}
-                icon={<i className="icon-developer" />}
-                onClick={openDevTools}
-              >
-                {menuTitles(menuItem.key)}
-              </MenuItem>
-            );
+            return <NavToolsItem menuItem={menuItem} onClick={openDevTools} />;
           } else if (isLoggedIn && !isPrime && menuItem.key === EMenuItemKey.GetPrime) {
             return (
-              <MenuItem
-                key={menuItem.key}
-                title={menuTitles(menuItem.key)}
+              <NavToolsItem
+                menuItem={menuItem}
                 icon={
                   <div>
                     <Badge count={<i className={cx('icon-pop-out-3', styles.linkBadge)} />}>
@@ -147,9 +135,7 @@ export default function SideNav() {
                 }
                 onClick={upgradeToPrime}
                 className={styles.badgeScale}
-              >
-                {menuTitles(menuItem.key)}
-              </MenuItem>
+              />
             );
           } else if (isLoggedIn && menuItem.key === EMenuItemKey.Dashboard) {
             return (
@@ -181,9 +167,8 @@ export default function SideNav() {
             );
           } else if (menuItem.key === EMenuItemKey.GetHelp) {
             return (
-              <MenuItem
-                key={menuItem.key}
-                title={menuTitles(menuItem.key)}
+              <NavToolsItem
+                menuItem={menuItem}
                 icon={
                   <div>
                     <Badge count={<i className={cx('icon-pop-out-3', styles.linkBadge)} />}>
@@ -192,50 +177,17 @@ export default function SideNav() {
                   </div>
                 }
                 onClick={() => openHelp()}
-              >
-                {menuTitles(menuItem.key)}
-              </MenuItem>
+              />
             );
           } else if (menuItem.key === EMenuItemKey.Settings) {
-            return (
-              <MenuItem
-                key={menuItem.key}
-                title={menuTitles(menuItem.key)}
-                icon={<i className={menuItem?.icon} />}
-                onClick={openSettingsWindow}
-              >
-                {menuTitles(menuItem.key)}
-              </MenuItem>
-            );
+            return <NavToolsItem menuItem={menuItem} onClick={openSettingsWindow} />;
           } else if (menuItem.key === EMenuItemKey.Login) {
             return (
-              <MenuItem
-                key={menuItem.key}
-                title={!isLoggedIn ? menuTitles(menuItem.key) : $t('Log Out')}
-                className={cx(styles.login)}
-                icon={!isOpen && <i className="icon-user" />}
-                onClick={() => (isLoggedIn ? handleShowModal(true) : handleAuth())}
-              >
-                {!isLoggedIn ? (
-                  <span className={styles.loggedOut}>{menuTitles(menuItem.key)}</span>
-                ) : (
-                  isOpen && (
-                    <>
-                      {platform && (
-                        <PlatformLogo
-                          platform={platform?.type!}
-                          className={cx(
-                            styles.platformLogo,
-                            styles[`platform-logo-${platform?.type ?? 'default'}`],
-                          )}
-                        />
-                      )}
-                      <span className={styles.username}>{platform?.username || $t('Log Out')}</span>
-                      <i className={cx('icon-logout', styles.loginArrow)} />
-                    </>
-                  )
-                )}
-              </MenuItem>
+              <LoginMenuItem
+                menuItem={menuItem}
+                handleAuth={handleAuth}
+                handleShowModal={handleShowModal}
+              />
             );
           }
         })}
@@ -246,6 +198,26 @@ export default function SideNav() {
         handleShowModal={handleShowModal}
       />
     </>
+  );
+}
+
+function NavToolsItem(p: {
+  menuItem: IMenuItem;
+  icon?: React.ReactElement;
+  className?: string;
+  onClick: () => void;
+}) {
+  const { menuItem, icon, className, onClick } = p;
+  return (
+    <MenuItem
+      key={menuItem.key}
+      title={menuTitles(menuItem.key)}
+      icon={icon ? icon : <i className={menuItem?.icon} />}
+      className={className}
+      onClick={onClick}
+    >
+      {menuTitles(menuItem.key)}
+    </MenuItem>
   );
 }
 
@@ -271,5 +243,53 @@ function LogoutModal(p: {
         </div>
       </Form>
     </Modal>
+  );
+}
+
+function LoginMenuItem(p: {
+  menuItem: IMenuItem;
+  handleAuth: () => void;
+  handleShowModal: (status: boolean) => void;
+}) {
+  const { menuItem, handleAuth, handleShowModal } = p;
+  const { UserService, SideNavService } = Services;
+
+  const { isLoggedIn, platform, isOpen } = useVuex(
+    () => ({
+      isLoggedIn: UserService.views.isLoggedIn,
+      platform: UserService.views.auth?.platforms[UserService.views.auth?.primaryPlatform],
+      isOpen: SideNavService.views.isOpen,
+    }),
+    false,
+  );
+
+  return (
+    <MenuItem
+      key={menuItem.key}
+      title={!isLoggedIn ? menuTitles(menuItem.key) : $t('Log Out')}
+      className={cx(styles.login)}
+      icon={!isOpen && <i className="icon-user" />}
+      onClick={() => (isLoggedIn ? handleShowModal(true) : handleAuth())}
+    >
+      {!isLoggedIn ? (
+        <span className={styles.loggedOut}>{menuTitles(menuItem.key)}</span>
+      ) : (
+        isOpen && (
+          <>
+            {platform && (
+              <PlatformLogo
+                platform={platform?.type!}
+                className={cx(
+                  styles.platformLogo,
+                  styles[`platform-logo-${platform?.type ?? 'default'}`],
+                )}
+              />
+            )}
+            <span className={styles.username}>{platform?.username || $t('Log Out')}</span>
+            <i className={cx('icon-logout', styles.loginArrow)} />
+          </>
+        )
+      )}
+    </MenuItem>
   );
 }

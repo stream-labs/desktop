@@ -1,70 +1,23 @@
-import React, { useLayoutEffect, useRef, useMemo } from 'react';
+import React, { useLayoutEffect, useRef } from 'react';
 import ResizeObserver from 'resize-observer-polyfill';
 import cx from 'classnames';
-import { TAppPage } from 'services/navigation';
-import {
-  ENavName,
-  EMenuItemKey,
-  ESubMenuItemKey,
-  IMenuItem,
-  IParentMenuItem,
-  TExternalLinkType,
-  menuTitles,
-} from 'services/side-nav';
-import { EAvailableFeatures } from 'services/incremental-rollout';
+import { EMenuItemKey, ESubMenuItemKey } from 'services/side-nav';
 import { EDismissable } from 'services/dismissables';
 import { $t } from 'services/i18n';
 import { Services } from 'components-react/service-provider';
 import { useVuex } from 'components-react/hooks';
 import NavTools from './NavTools';
 import styles from './SideNav.m.less';
-import { Menu, Layout, Button } from 'antd';
+import { Layout, Button } from 'antd';
 import Scrollable from 'components-react/shared/Scrollable';
 import HelpTip from 'components-react/shared/HelpTip';
 import NewBadge from 'components-react/shared/NewBadge';
-import SubMenu from 'components-react/shared/SubMenu';
-import MenuItem from 'components-react/shared/MenuItem';
-import AppsNav from './AppsNav';
-import EditorTabs from './EditorTabs';
+import FeaturesNav from './FeaturesNav';
 
 const { Sider } = Layout;
 
 export default function SideNav() {
-  const {
-    CustomizationService,
-    NavigationService,
-    UserService,
-    IncrementalRolloutService,
-    UsageStatisticsService,
-    SideNavService,
-    LayoutService,
-    TransitionsService,
-    WindowsService,
-    DismissablesService,
-  } = Services;
-
-  function navigate(page: TAppPage, trackingTarget?: string, type?: TExternalLinkType | string) {
-    if (!UserService.views.isLoggedIn && page !== 'Studio') return;
-
-    if (trackingTarget) {
-      UsageStatisticsService.actions.recordClick('SideNav2', trackingTarget);
-    }
-
-    if (type) {
-      NavigationService.actions.navigate(page, { type });
-    } else {
-      NavigationService.actions.navigate(page);
-    }
-  }
-
-  function toggleStudioMode() {
-    UsageStatisticsService.actions.recordClick('NavTools', 'studio-mode');
-    if (studioMode) {
-      TransitionsService.actions.disableStudioMode();
-    } else {
-      TransitionsService.actions.enableStudioMode();
-    }
-  }
+  const { CustomizationService, SideNavService, WindowsService, DismissablesService } = Services;
 
   function updateSubMenu() {
     // when opening/closing the navbar swap the submenu current menu item
@@ -80,53 +33,21 @@ export default function SideNav() {
     }
   }
 
-  function handleNavigation(menuItem: IMenuItem, key?: string) {
-    if (menuItem.key === EMenuItemKey.StudioMode) {
-      // if studio mode, toggle studio mode
-      toggleStudioMode();
-      return;
-    } else if (menuItem?.target && menuItem?.type) {
-      navigate(menuItem?.target as TAppPage, menuItem?.trackingTarget, menuItem?.type);
-    } else if (menuItem?.target) {
-      navigate(menuItem?.target as TAppPage, menuItem?.trackingTarget);
-    }
-    setCurrentMenuItem(key ?? menuItem.key);
-  }
-
   const {
-    featureIsEnabled,
     currentMenuItem,
     setCurrentMenuItem,
-    tabs,
     leftDock,
-    loggedIn,
-    menu,
-    compactView,
     isOpen,
     toggleMenuStatus,
-    openMenuItems,
-    expandMenuItem,
-    studioMode,
-    showCustomEditor,
     updateStyleBlockers,
     dismiss,
     showNewBadge,
   } = useVuex(() => ({
-    featureIsEnabled: (feature: EAvailableFeatures) =>
-      IncrementalRolloutService.views.featureIsEnabled(feature),
     currentMenuItem: SideNavService.views.currentMenuItem,
     setCurrentMenuItem: SideNavService.actions.setCurrentMenuItem,
-    tabs: LayoutService.state.tabs,
     leftDock: CustomizationService.state.leftDock,
-    loggedIn: UserService.views.isLoggedIn,
-    menu: SideNavService.views.state[ENavName.TopNav],
-    compactView: SideNavService.views.compactView,
     isOpen: SideNavService.views.isOpen,
     toggleMenuStatus: SideNavService.actions.toggleMenuStatus,
-    openMenuItems: SideNavService.views.getExpandedMenuItems(ENavName.TopNav),
-    expandMenuItem: SideNavService.actions.expandMenuItem,
-    studioMode: TransitionsService.views.studioMode,
-    showCustomEditor: SideNavService.views.showCustomEditor,
     updateStyleBlockers: WindowsService.actions.updateStyleBlockers,
     dismiss: DismissablesService.actions.dismiss,
     showNewBadge:
@@ -155,40 +76,6 @@ export default function SideNav() {
     }
   }, [sider]);
 
-  const menuItems = useMemo(() => {
-    if (!loggedIn) {
-      return menu.menuItems.filter(menuItem => menuItem.key === EMenuItemKey.Editor);
-    }
-    return !compactView
-      ? menu.menuItems
-      : menu.menuItems.filter((menuItem: IMenuItem) => {
-          if (
-            [
-              EMenuItemKey.Editor,
-              EMenuItemKey.Themes,
-              EMenuItemKey.AppStore,
-              EMenuItemKey.Highlighter,
-            ].includes(menuItem.key as EMenuItemKey)
-          ) {
-            return menuItem;
-          }
-        });
-  }, [compactView, menu, loggedIn]);
-
-  const studioTabs = Object.keys(tabs).map((tab, i) => ({
-    key: tab,
-    target: tab,
-    title: i === 0 || !tabs[tab].name ? menuTitles('Editor') : tabs[tab].name,
-    icon: tabs[tab].icon,
-    trackingTarget: tab === 'default' ? 'editor' : 'custom',
-  }));
-
-  /*
-   * Theme audit will only ever be enabled on individual accounts or enabled
-   * via command line flag. Not for general use.
-   */
-  const themeAuditEnabled = featureIsEnabled(EAvailableFeatures.themeAudit);
-
   return (
     <Layout hasSider className="side-nav">
       <Sider
@@ -203,127 +90,14 @@ export default function SideNav() {
         ref={sider}
       >
         <Scrollable className={cx(styles.sidenavScroll)}>
-          <Menu
-            key={ENavName.TopNav}
-            forceSubMenuRender
-            mode="inline"
-            className={cx(
-              styles.topNav,
-              isOpen && styles.open,
-              !isOpen && styles.siderClosed && styles.closed,
-            )}
-            defaultOpenKeys={openMenuItems && openMenuItems}
-            defaultSelectedKeys={[EMenuItemKey.Editor]}
-            getPopupContainer={triggerNode => triggerNode}
-          >
-            {menuItems.map((menuItem: IParentMenuItem) => {
-              if (
-                !menuItem?.isActive ||
-                (menuItem.key === EMenuItemKey.ThemeAudit && !themeAuditEnabled)
-              ) {
-                // skip inactive menu items
-                // skip legacy menu items for new users
-                // skip Theme Audit if not enabled
-                return null;
-              } else if (
-                menuItem.key === EMenuItemKey.Editor &&
-                loggedIn &&
-                studioTabs.length > 1
-              ) {
-                // handle editor tabs
-                return showCustomEditor && !isOpen && !compactView ? (
-                  <EditorTabs key="editor-tabs" />
-                ) : (
-                  <SubMenu
-                    key={menuItem.key}
-                    title={menuTitles(menuItem.key)}
-                    icon={menuItem?.icon && <i className={menuItem.icon} />}
-                    onTitleClick={() => {
-                      !isOpen &&
-                        menuItem?.subMenuItems[0]?.target &&
-                        handleNavigation(menuItem?.subMenuItems[0], menuItem.key);
-                      expandMenuItem(ENavName.TopNav, menuItem.key as EMenuItemKey);
-                    }}
-                    className={cx(
-                      !isOpen && styles.closed,
-                      !isOpen && currentMenuItem === menuItem.key && styles.active,
-                    )}
-                  >
-                    <EditorTabs type="submenu" />
-                  </SubMenu>
-                );
-              } else {
-                // otherwise, show a menu item or a menu item with a submenu
-                return menuItem.hasOwnProperty('subMenuItems') ? (
-                  <SubMenu
-                    key={menuItem.key}
-                    title={menuTitles(menuItem.key)}
-                    icon={menuItem?.icon && <i className={menuItem.icon} />}
-                    onTitleClick={() => {
-                      menuItem?.subMenuItems[0]?.target &&
-                        !isOpen &&
-                        handleNavigation(menuItem?.subMenuItems[0], menuItem.key);
-                      expandMenuItem(ENavName.TopNav, menuItem.key as EMenuItemKey);
-                    }}
-                    className={cx(
-                      !isOpen && styles.closed,
-                      currentMenuItem === menuItem.key && styles.active,
-                    )}
-                  >
-                    {menuItem?.subMenuItems?.map((subMenuItem: IMenuItem) => (
-                      <MenuItem
-                        key={subMenuItem.key}
-                        className={currentMenuItem === subMenuItem?.key && styles.active}
-                        title={menuTitles(subMenuItem.key)}
-                        onClick={() => handleNavigation(subMenuItem)}
-                        type="submenu"
-                      >
-                        {menuTitles(subMenuItem.key)}
-                      </MenuItem>
-                    ))}
-                    {menuItem.key === EMenuItemKey.AppStore && <AppsNav type="enabled" />}
-                  </SubMenu>
-                ) : (
-                  <MenuItem
-                    key={menuItem.key}
-                    className={cx(
-                      !isOpen && styles.closed,
-                      menuItem.key === EMenuItemKey.StudioMode && studioMode && styles.studioMode,
-                      currentMenuItem === menuItem.key && styles.active,
-                    )}
-                    title={menuTitles(menuItem.key)}
-                    icon={menuItem?.icon && <i className={menuItem.icon} />}
-                    onClick={() => {
-                      handleNavigation(menuItem);
-                    }}
-                  >
-                    {menuTitles(menuItem.key)}
-                  </MenuItem>
-                );
-              }
-            })}
-            {loggedIn && !compactView && (
-              // apps shown in sidebar
-              <AppsNav />
-            )}
-          </Menu>
+          {/* top navigation menu */}
+          <FeaturesNav />
 
-          {/* show the bottom navigation menu */}
+          {/* bottom navigation menu */}
           <NavTools />
         </Scrollable>
-        <HelpTip
-          title={$t('Login')}
-          dismissableKey={EDismissable.LoginPrompt}
-          position={{ top: 'calc(100vh - 175px)', left: '80px' }}
-          arrowPosition="bottom"
-          style={{ position: 'absolute' }}
-        >
-          <div>
-            {$t(
-              'Gain access to additional features by logging in with your preferred streaming platform.',
-            )}
-          </div>
-        </HelpTip>
+
+        <LoginHelpTip />
       </Sider>
 
       {/* this button toggles the menu open and close */}
@@ -353,5 +127,23 @@ export default function SideNav() {
         style={{ left: 'calc(100% / 20px)', top: 'calc(100% / 2)' }}
       />
     </Layout>
+  );
+}
+
+function LoginHelpTip() {
+  return (
+    <HelpTip
+      title={$t('Login')}
+      dismissableKey={EDismissable.LoginPrompt}
+      position={{ top: 'calc(100vh - 175px)', left: '80px' }}
+      arrowPosition="bottom"
+      style={{ position: 'absolute' }}
+    >
+      <div>
+        {$t(
+          'Gain access to additional features by logging in with your preferred streaming platform.',
+        )}
+      </div>
+    </HelpTip>
   );
 }
