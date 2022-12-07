@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import { FormProps } from 'antd/lib/form';
 import debounce from 'lodash/debounce';
+import cloneDeep from 'lodash/cloneDeep';
 import * as inputs from './inputList';
 import { TInputType, TSlobsInputProps } from './inputs';
 import Form, { useForm } from './Form';
@@ -31,7 +32,7 @@ export default function FormFactory(p: {
 }) {
   const form = useForm();
 
-  useMemo(() => form.setFieldsValue(p.values), []);
+  useMemo(() => form.setFieldsValue(cloneDeep(p.values)), []);
 
   return (
     <Form
