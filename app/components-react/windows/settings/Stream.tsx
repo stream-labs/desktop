@@ -441,18 +441,7 @@ function CustomDestinationList() {
               onClick={addCustomDest}
               filled
               text={$t('Ultra')}
-              icon={
-                <UltraIcon
-                  type="simple"
-                  style={{
-                    fill: '#09161D',
-                    display: 'inline-block',
-                    height: '12px',
-                    width: '12px',
-                    marginRight: '5px',
-                  }}
-                />
-              }
+              icon={<UltraIcon type="simple" />}
             />
           ) : (
             <div className={css.prime} />
