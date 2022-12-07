@@ -65,8 +65,8 @@ class VideoSettingsModule {
     customOutputRes: !this.outputResOptions.find(
       opt => opt.value === this.service.videoSettingsValues.outputRes,
     ),
-    customBaseResValue: '',
-    customOutputResValue: '',
+    customBaseResValue: this.service.videoSettingsValues.baseRes,
+    customOutputResValue: this.service.videoSettingsValues.outputRes,
     fpsNum: this.service.videoSettingsValues.fpsNum,
     fpsDen: this.service.videoSettingsValues.fpsDen,
     fpsInt: this.service.videoSettingsValues.fpsNum,
@@ -259,6 +259,7 @@ class VideoSettingsModule {
   selectResolution(key: string, value: string) {
     if (value === 'custom') {
       this.setCustomResolution(key, true);
+      this.setResolution(key, '');
     } else {
       this.setCustomResolution(key, false);
       this.setResolution(key, value);
