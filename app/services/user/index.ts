@@ -428,7 +428,11 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     this.websocketService.socketEvent.subscribe(async event => {
       if (event.type === 'slid.force_logout') {
         await this.clearForceLoginStatus();
-        await this.reauthenticate();
+        await this.reauthenticate(false, {
+          message: $t(
+            "You've merged a Streamlabs ID to your account, please log back in to ensure you have the right credentials.",
+          ),
+        });
       }
     });
   }
@@ -832,7 +836,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     return jfetch<unknown>(request);
   }
 
-  async reauthenticate(onStartup?: boolean) {
+  async reauthenticate(onStartup?: boolean, msgConfig?: Partial<Electron.MessageBoxOptions>) {
     this.SET_IS_RELOG(true);
     if (onStartup) {
       this.LOGOUT();
@@ -844,6 +848,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
       message: $t(
         'Your login has expired. Please reauthenticate to continue using Streamlabs Desktop.',
       ),
+      ...msgConfig,
     });
     this.showLogin();
   }
@@ -888,10 +893,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     }
 
     if (validatePlatformResult === EPlatformCallResult.TwitchScopeMissing) {
-      await this.logOut();
-      this.showLogin();
-
-      remote.dialog.showMessageBox(remote.getCurrentWindow(), {
+      this.reauthenticate(true, {
         type: 'warning',
         title: 'Twitch Error',
         message: $t(

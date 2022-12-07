@@ -6,6 +6,7 @@ import FormFactory, { TInputValue } from 'components-react/shared/inputs/FormFac
 import * as obs from '../../../../obs-api';
 import { $t } from 'services/i18n';
 import styles from './Common.m.less';
+import { invalidFps } from 'services/settings-v2/video';
 
 const CANVAS_RES_OPTIONS = [
   { label: '1920x1080', value: '1920x1080' },
@@ -51,6 +52,9 @@ class VideoSettingsModule {
       outputRes,
       customBaseRes: this.state.customBaseResValue,
       customOutputRes: this.state.customOutputResValue,
+      fpsNum: this.state.fpsNum,
+      fpsDen: this.state.fpsDen,
+      fpsInt: this.state.fpsInt,
     };
   }
 
@@ -63,6 +67,9 @@ class VideoSettingsModule {
     ),
     customBaseResValue: '',
     customOutputResValue: '',
+    fpsNum: this.service.videoSettingsValues.fpsNum,
+    fpsDen: this.service.videoSettingsValues.fpsDen,
+    fpsInt: this.service.videoSettingsValues.fpsNum,
   });
 
   get metadata() {
@@ -131,16 +138,37 @@ class VideoSettingsModule {
             type: 'number',
             label: $t('FPS Value'),
             onChange: (val: string) => this.setIntegerFPS(val),
+            rules: [{ max: 1000, min: 1, message: $t('FPS Value must be between 1 and 1000') }],
             displayed: this.values.fpsType === obs.EFPSType.Integer,
           },
           fpsNum: {
             type: 'number',
             label: $t('FPS Numerator'),
+            onChange: (val: string) => this.setFPS('fpsNum', val),
+            rules: [
+              { validator: this.fpsNumValidator.bind(this) },
+              {
+                min: 1,
+                message: $t('%{fieldName} must be greater than 0', {
+                  fieldName: $t('FPS Numerator'),
+                }),
+              },
+            ],
             displayed: this.values.fpsType === obs.EFPSType.Fractional,
           },
           fpsDen: {
             type: 'number',
             label: $t('FPS Denominator'),
+            onChange: (val: string) => this.setFPS('fpsDen', val),
+            rules: [
+              { validator: this.fpsDenValidator.bind(this) },
+              {
+                min: 1,
+                message: $t('%{fieldName} must be greater than 0', {
+                  fieldName: $t('FPS Denominator'),
+                }),
+              },
+            ],
             displayed: this.values.fpsType === obs.EFPSType.Fractional,
           },
         },
@@ -180,6 +208,32 @@ class VideoSettingsModule {
       message: $t('The resolution must be in the format [width]x[height] (i.e. 1920x1080)'),
       pattern: /^[0-9]+x[0-9]+$/,
     };
+  }
+
+  fpsNumValidator(rule: unknown, value: string, callback: Function) {
+    if (Number(value) / Number(this.values.fpsDen) > 1000) {
+      callback(
+        $t(
+          'This number is too large for a FPS Denominator of %{fpsDen}, please decrease it or increase the Denominator',
+          { fpsDen: this.values.fpsDen },
+        ),
+      );
+    } else {
+      callback();
+    }
+  }
+
+  fpsDenValidator(rule: unknown, value: string, callback: Function) {
+    if (Number(this.values.fpsNum) / Number(value) < 1) {
+      callback(
+        $t(
+          'This number is too large for a FPS Numerator of %{fpsNum}, please decrease it or increase the Numerator',
+          { fpsNum: this.values.fpsNum },
+        ),
+      );
+    } else {
+      callback();
+    }
   }
 
   setResolution(key: string, value: string) {
@@ -227,8 +281,23 @@ class VideoSettingsModule {
   }
 
   setIntegerFPS(value: string) {
-    this.service.actions.setVideoSetting('fpsNum', Number(value));
-    this.service.actions.setVideoSetting('fpsDen', 1);
+    this.state.setFpsInt(Number(value));
+    if (Number(value) > 0 && Number(value) < 1001) {
+      this.service.actions.setVideoSetting('fpsNum', Number(value));
+      this.service.actions.setVideoSetting('fpsDen', 1);
+    }
+  }
+
+  setFPS(key: 'fpsNum' | 'fpsDen', value: string) {
+    if (key === 'fpsNum') {
+      this.state.setFpsNum(Number(value));
+    } else {
+      this.state.setFpsDen(Number(value));
+    }
+
+    if (!invalidFps(this.state.fpsNum, this.state.fpsDen) && Number(value) > 0) {
+      this.service.actions.setVideoSetting(key, Number(value));
+    }
   }
 
   onChange(key: string) {
