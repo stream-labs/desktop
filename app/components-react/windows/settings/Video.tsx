@@ -198,7 +198,12 @@ class VideoSettingsModule {
     displays.forEach(display => {
       const size = display.size;
       const res = `${size.width}x${size.height}`;
-      if (!resOptions.find(opt => opt.value === res)) resOptions.push({ label: res, value: res });
+      if (
+        !resOptions.find(opt => opt.value === res) &&
+        !CANVAS_RES_OPTIONS.find(opt => opt.value === res)
+      ) {
+        resOptions.push({ label: res, value: res });
+      }
     });
     return resOptions;
   }
