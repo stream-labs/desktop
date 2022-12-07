@@ -65,8 +65,8 @@ class VideoSettingsModule {
     customOutputRes: !this.outputResOptions.find(
       opt => opt.value === this.service.videoSettingsValues.outputRes,
     ),
-    customBaseResValue: '',
-    customOutputResValue: '',
+    customBaseResValue: this.service.videoSettingsValues.baseRes,
+    customOutputResValue: this.service.videoSettingsValues.outputRes,
     fpsNum: this.service.videoSettingsValues.fpsNum,
     fpsDen: this.service.videoSettingsValues.fpsDen,
     fpsInt: this.service.videoSettingsValues.fpsNum,
@@ -198,7 +198,12 @@ class VideoSettingsModule {
     displays.forEach(display => {
       const size = display.size;
       const res = `${size.width}x${size.height}`;
-      if (!resOptions.find(opt => opt.value === res)) resOptions.push({ label: res, value: res });
+      if (
+        !resOptions.find(opt => opt.value === res) &&
+        !CANVAS_RES_OPTIONS.find(opt => opt.value === res)
+      ) {
+        resOptions.push({ label: res, value: res });
+      }
     });
     return resOptions;
   }
@@ -254,6 +259,7 @@ class VideoSettingsModule {
   selectResolution(key: string, value: string) {
     if (value === 'custom') {
       this.setCustomResolution(key, true);
+      this.setResolution(key, '');
     } else {
       this.setCustomResolution(key, false);
       this.setResolution(key, value);
