@@ -551,6 +551,12 @@ export class StreamingService
         pitch: this.nicoliveCommentSynthesizerService.pitch,
         rate: this.nicoliveCommentSynthesizerService.rate,
         volume: this.nicoliveCommentSynthesizerService.volume,
+        max_seconds: this.nicoliveCommentSynthesizerService.maxTime,
+        engine: {
+          normal: this.nicoliveCommentSynthesizerService.normal,
+          operator: this.nicoliveCommentSynthesizerService.operator,
+          system: this.nicoliveCommentSynthesizerService.system,
+        }
       },
       compact_mode: {
         auto_compact_mode: this.customizationService.state.autoCompactMode,
