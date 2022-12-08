@@ -25,6 +25,7 @@ import WasapiOutputIcon from '../../../media/images/wasapi-output-icon.svg';
 import MonitorCaptureIcon from '../../../media/images/monitor-capture-icon.svg';
 import NdiSourceIcon from '../../../media/images/ndi-icon.svg';
 import BlackmagicSourceIcon from '../../../media/images/blackmagic-icon.svg';
+import NVoiceCharacterSourceIcon from '../../../media/images/nvoice-character-source-icon.svg';
 
 type TInspectableSource = TSourceType;
 
@@ -52,6 +53,7 @@ interface ISelectSourceOptions {
     MonitorCaptureIcon,
     NdiSourceIcon,
     BlackmagicSourceIcon,
+    NVoiceCharacterSourceIcon,
   },
 })
 export default class SourcesShowcase extends Vue {
@@ -67,6 +69,10 @@ export default class SourcesShowcase extends Vue {
       propertiesManager: managerType,
       propertiesManagerSettings: {},
     });
+  }
+
+  selectNVoiceCharacterSource() {
+    this.selectSource('browser_source', { propertiesManager: 'nvoice-character' });
   }
 
   inspectedSource: TInspectableSource = null;
@@ -85,11 +91,14 @@ export default class SourcesShowcase extends Vue {
   }
 
   selectInspectedSource() {
-    if (
-      this.sourcesService.getAvailableSourcesTypes().includes(this.inspectedSource as TSourceType)
-    ) {
-      this.selectSource(this.inspectedSource as TSourceType);
-    }
+    if (this.inspectedSource === 'nvoice_character') {
+      this.selectNVoiceCharacterSource();
+    } else
+      if (
+        this.sourcesService.getAvailableSourcesTypes().includes(this.inspectedSource as TSourceType)
+      ) {
+        this.selectSource(this.inspectedSource as TSourceType);
+      }
   }
 
   get availableSources() {

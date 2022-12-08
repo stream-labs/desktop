@@ -4,7 +4,7 @@ import fs from 'fs';
 import path from 'path';
 import { ScenesService } from 'services/scenes';
 import { SourcesService } from 'services/sources';
-import { TSourceType } from 'services/sources/sources-api';
+import { TPropertiesManager, TSourceType } from 'services/sources/sources-api';
 import { SourceFiltersService, TSourceFilterType } from 'services/source-filters';
 import { TransitionsService, ETransitionType } from 'services/transitions';
 import { AudioService } from 'services/audio';
@@ -12,6 +12,7 @@ import { Inject } from 'services/core/injector';
 import { SceneCollectionsService } from 'services/scene-collections';
 import * as obs from '../../obs-api';
 import { SettingsService } from 'services/settings';
+import defaultTo from 'lodash/defaultTo';
 
 interface Source {
   name?: string;
@@ -47,11 +48,16 @@ interface IOBSConfigSource {
   settings: {
     shutdown?: boolean;
     items?: IOBSConfigSceneItem[];
+    url?: string;
   };
   channel?: number;
   muted: boolean;
   volume: number;
   filters: IOBSConfigFilter[];
+  mixers: number;
+  monitoring_type: number;
+  sync: number;
+  flags: number;
 }
 
 interface IOBSConfigTransition {
@@ -174,6 +180,7 @@ export class ObsImporterService extends Service {
 
         if (isSourceAvailable) {
           if (sourceJSON.id !== 'scene') {
+            const propertiesManager: TPropertiesManager = 'default';
             if (sourceJSON.id === 'browser_source') {
               sourceJSON.settings.shutdown = true;
             }
@@ -184,13 +191,25 @@ export class ObsImporterService extends Service {
               sourceJSON.id,
               sourceJSON.settings,
               {
+                propertiesManager,
                 channel: sourceJSON.channel !== 0 ? sourceJSON.channel : void 0,
               },
             );
 
             if (source.audio) {
+              const defaultMonitoring =
+                source.type === 'browser_source'
+                  ? obs.EMonitoringType.MonitoringOnly
+                  : obs.EMonitoringType.None;
+
               this.audioService.getSource(source.sourceId).setMuted(sourceJSON.muted);
               this.audioService.getSource(source.sourceId).setMul(sourceJSON.volume);
+              this.audioService.getSource(source.sourceId).setSettings({
+                audioMixers: defaultTo(sourceJSON.mixers, 255),
+                monitoringType: defaultTo(sourceJSON.monitoring_type, defaultMonitoring),
+                syncOffset: defaultTo(sourceJSON.sync / 1000000, 0),
+                forceMono: !!(sourceJSON.flags & obs.ESourceFlags.ForceMono),
+              });
             }
 
             // Adding the filters

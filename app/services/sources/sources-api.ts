@@ -105,10 +105,11 @@ export type TSourceType =
   | 'openvr_capture'
   | 'liv_capture'
   | 'ovrstream_dc_source'
-  | 'vlc_source';
+  | 'vlc_source'
+  | 'nvoice_character';
 
 // Register new properties manager here
-export type TPropertiesManager = 'default';
+export type TPropertiesManager = 'default' | 'nvoice-character';
 
 export interface ISourcesState {
   sources: Dictionary<ISource>;

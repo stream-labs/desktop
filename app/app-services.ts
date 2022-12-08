@@ -41,6 +41,7 @@ export { FileManagerService } from 'services/file-manager';
 export { ProtocolLinksService } from 'services/protocol-links';
 export { ProjectorService } from 'services/projector';
 export { I18nService } from 'services/i18n';
+export { NVoiceCharacterService } from 'services/nvoice-character';
 
 // ONLINE SERVICES
 export { UserService } from './services/user';

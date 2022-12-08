@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 const { VueLoaderPlugin } = require('vue-loader');
 const { WebpackManifestPlugin } = require('webpack-manifest-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');

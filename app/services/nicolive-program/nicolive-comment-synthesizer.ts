@@ -6,6 +6,7 @@ import { WrappedChat } from './WrappedChat';
 import { getDisplayText } from './ChatMessage/displaytext';
 import { AddComponent } from './ChatMessage/ChatComponentType';
 import { NVoiceClientService } from './n-voice-client';
+import { Server } from 'socket.io';
 
 export type Speech = {
   text: string;
@@ -69,6 +70,8 @@ export class NicoliveCommentSynthesizerService extends StatefulService<ICommentS
     return this.currentPlaying ? this.getSynthesizer(this.currentPlayingId) : null;
   }
 
+  io: Server;
+
   init(): void {
     /*
     // 後から追加された属性がなければ追加する
@@ -92,6 +95,19 @@ export class NicoliveCommentSynthesizerService extends StatefulService<ICommentS
       },
     });
     this.nVoice = new NVoiceSynthesizer(this.nVoiceClientService);
+    try {
+      this.io = new Server(3000, {
+        transports: ['polling'],
+        cors: {
+          origin: '*',
+        }
+      });
+      this.io.on('connection', (socket) => {
+        console.log(socket.conn.remoteAddress, 'connected');
+      });
+    } catch (e) {
+      console.error('socket.io constructor error', e);
+    }
   }
 
   private dictionary = new ParaphraseDictionary();
@@ -178,6 +194,10 @@ export class NicoliveCommentSynthesizerService extends StatefulService<ICommentS
     }, () => {
       this.currentPlayingId = null;
       onend();
+    }, (phoneme) => {
+      if (this.io) {
+        this.io.emit('phoneme', phoneme);
+      }
     });
   }
 
@@ -271,7 +291,7 @@ export class NicoliveCommentSynthesizerService extends StatefulService<ICommentS
 }
 
 export interface ISpeechSynthesizer {
-  speakText(speech: Speech, onstart: () => void, onend: () => void): void;
+  speakText(speech: Speech, onstart: () => void, onend: () => void, onPhoneme?: (phoneme: string) => void): void;
   speaking: boolean;
   cancelSpeak(): void;
   waitForSpeakEnd(): Promise<void>;
@@ -347,6 +367,7 @@ export class NVoiceSynthesizer implements ISpeechSynthesizer {
     speech: Speech,
     onstart: () => void,
     onend: () => void,
+    onPhoneme?: (phoneme: string) => void,
   ) {
     if (!speech || speech.text === '') {
       return;
@@ -361,6 +382,9 @@ export class NVoiceSynthesizer implements ISpeechSynthesizer {
       maxTime: speech.nVoice.maxTime,
       phonemeCallback: (phoneme: string) => {
         console.log(phoneme); // DEBUG
+        if (onPhoneme) {
+          onPhoneme(phoneme);
+        }
       },
     }).then(async (r) => {
       if (r === null) {
