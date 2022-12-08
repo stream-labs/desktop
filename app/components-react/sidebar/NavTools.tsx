@@ -1,4 +1,4 @@
-import React, { CSSProperties, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import cx from 'classnames';
 import electron from 'electron';
 import Utils from 'services/utils';
@@ -213,14 +213,17 @@ function NavToolsItem(p: {
   onClick: () => void;
 }) {
   const { menuItem, icon, className, onClick } = p;
+  const title = useMemo(() => {
+    return menuTitles(menuItem.key);
+  }, [menuItem]);
   return (
     <MenuItem
-      title={menuTitles(menuItem.key)}
-      icon={icon ? icon : <i className={menuItem?.icon} />}
+      title={title}
+      icon={icon ?? <i className={menuItem?.icon} />}
       className={className}
       onClick={onClick}
     >
-      {menuTitles(menuItem.key)}
+      {title}
     </MenuItem>
   );
 }

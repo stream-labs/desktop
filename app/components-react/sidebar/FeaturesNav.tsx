@@ -251,6 +251,10 @@ function FeaturesNavItem(p: {
     }
   };
 
+  const title = useMemo(() => {
+    return menuTitles(menuItem.key);
+  }, [menuItem]);
+
   return (
     <MenuItem
       className={cx(
@@ -261,13 +265,13 @@ function FeaturesNavItem(p: {
           styles.studioMode,
         currentMenuItem === menuItem.key && styles.active,
       )}
-      title={menuTitles(menuItem.key)}
+      title={title}
       icon={setIcon()}
       onClick={() => {
         handleNavigation(menuItem);
       }}
     >
-      {menuTitles(menuItem.key)}
+      {title}
     </MenuItem>
   );
 }
