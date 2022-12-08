@@ -19,6 +19,7 @@
     color: var(--paragraph);
     height: unset !important;
     min-height: 30px !important;
+    min-width: 200px !important;
     line-height: normal !important;
     margin: 10px 0 !important;
     overflow-wrap: break-word !important;
@@ -30,6 +31,17 @@
     :visited {
       background: none;
     }
+
+    svg {
+      fill: var(--paragraph);
+      width: 14px;
+      height: 14px;
+    }
+  }
+
+  :global(li.ant-menu-item):not(.active):hover svg,
+  :global(li.ant-menu-submenu):not(.active):hover svg {
+    fill: var(--title) !important;
   }
 
   :global(li.ant-menu-item.ant-menu-item-selected),
@@ -137,7 +149,8 @@ button.sidenav-button {
 
     :global(.ant-menu-item:hover),
     :global(.ant-menu-submenu:hover) {
-      i {
+      i,
+      svg {
         transition: all 0.2s ease-in-out !important;
         transform: scale(1.2, 1.2) !important;
       }
@@ -183,6 +196,10 @@ button.sidenav-button {
       overflow-wrap: break-word !important;
       padding-bottom: 0px;
       white-space: normal !important;
+
+      svg {
+        margin-right: 10px;
+      }
     }
 
     .app-icons {
@@ -224,5 +241,9 @@ button.sidenav-button {
 
   i {
     color: var(--icon-active) !important;
+  }
+
+  svg {
+    fill: var(--icon-active) !important;
   }
 }
