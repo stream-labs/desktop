@@ -36,8 +36,6 @@ import { AppService } from 'services/app';
 import { UsageStatisticsService } from 'services/usage-statistics';
 import { StreamingService } from 'services/streaming';
 import { NotificationsService, ENotificationType } from 'services/notifications';
-import { SideNavService } from 'app-services';
-import { DismissablesService, EDismissable } from 'services/dismissables';
 import { JsonrpcService } from 'services/api/jsonrpc';
 import * as remote from '@electron/remote';
 
@@ -286,8 +284,6 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   @Inject() private usageStatisticsService: UsageStatisticsService;
   @Inject() private notificationsService: NotificationsService;
   @Inject() private jsonrpcService: JsonrpcService;
-  @Inject() private sideNavService: SideNavService;
-  @Inject() private dismissablesService: DismissablesService;
 
   @mutation()
   LOGIN(auth: IUserAuth) {
@@ -907,16 +903,6 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
       return validatePlatformResult;
     }
 
-    if (!this.sideNavService.views.hasLegacyMenu && !this.views.auth.hasRelogged) {
-      this.sideNavService.setNewUserLogin();
-    } else if (
-      this.sideNavService.views.hasLegacyMenu &&
-      this.dismissablesService.views.shouldShow(EDismissable.NewSideNav)
-    ) {
-      this.sideNavService.setLegacyView();
-    }
-
-    this.dismissablesService.dismiss(EDismissable.LoginPrompt);
     this.userLoginFinished.next();
   }
 

@@ -93,13 +93,56 @@ export class SideNavService extends PersistentStatefulService<ISideNavServiceSta
 
   init() {
     super.init();
+    this.userService.userLoginFinished.subscribe(() => this.handleUserLogin());
 
-    const loggedIn = this.userService.views.isLoggedIn;
+    this.handleDismissables();
+
+    this.state.currentMenuItem =
+      this.layoutService.state.currentTab !== 'default'
+        ? this.layoutService.state.currentTab
+        : EMenuItemKey.Editor;
+  }
+
+  get views() {
+    return new SideNavViews(this.state);
+  }
+
+  toggleMenuStatus() {
+    this.OPEN_CLOSE_MENU();
+  }
+
+  setCurrentMenuItem(key: EMenuItemKey | string) {
+    this.SET_CURRENT_MENU_ITEM(key);
+  }
+
+  setCompactView(isCompact: boolean) {
+    this.SET_COMPACT_VIEW(isCompact);
+  }
+
+  handleUserLogin() {
+    const registrationDate = this.userService.state.createdAt;
 
     // TODO: set Date to specific date
-    const legacyMenu =
-      this.userService.state.createdAt &&
-      this.userService.state.createdAt < new Date('October 12, 2022').valueOf();
+    const legacyMenu = registrationDate < new Date('December 8, 2022').valueOf();
+
+    if (!legacyMenu && !this.state.compactView) {
+      if (!this.state.compactView) {
+        this.SET_NEW_USER_LOGIN();
+      }
+    } else if (
+      this.state.hasLegacyMenu &&
+      this.dismissablesService.views.shouldShow(EDismissable.NewSideNav)
+    ) {
+      this.SET_LEGACY_VIEW();
+    }
+
+    this.dismissablesService.dismiss(EDismissable.LoginPrompt);
+  }
+
+  handleDismissables() {
+    const loggedIn = this.userService.views.isLoggedIn;
+    const registrationDate = this.userService.state.createdAt;
+    const legacyMenu = registrationDate < new Date('December 8, 2022').valueOf();
 
     if (loggedIn) {
       this.dismissablesService.dismiss(EDismissable.LoginPrompt);
@@ -132,35 +175,6 @@ export class SideNavService extends PersistentStatefulService<ISideNavServiceSta
         this.dismissablesService.dismiss(EDismissable.CustomMenuSettings);
       }
     }
-
-    this.state.currentMenuItem =
-      this.layoutService.state.currentTab !== 'default'
-        ? this.layoutService.state.currentTab
-        : EMenuItemKey.Editor;
-  }
-
-  get views() {
-    return new SideNavViews(this.state);
-  }
-
-  toggleMenuStatus() {
-    this.OPEN_CLOSE_MENU();
-  }
-
-  setCurrentMenuItem(key: EMenuItemKey | string) {
-    this.SET_CURRENT_MENU_ITEM(key);
-  }
-
-  setCompactView(isCompact: boolean) {
-    this.SET_COMPACT_VIEW(isCompact);
-  }
-
-  setNewUserLogin() {
-    this.SET_NEW_USER_LOGIN();
-  }
-
-  setLegacyView() {
-    this.SET_LEGACY_VIEW();
   }
 
   expandMenuItem(navName: ENavName, key: EMenuItemKey) {
@@ -197,6 +211,7 @@ export class SideNavService extends PersistentStatefulService<ISideNavServiceSta
   private SET_NEW_USER_LOGIN() {
     // compact view with menu items expanded
     this.state.isOpen = true;
+    this.state.hasLegacyMenu = false;
 
     this.state[ENavName.TopNav] = {
       ...this.state[ENavName.TopNav],
