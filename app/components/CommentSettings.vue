@@ -81,6 +81,7 @@
           <div class="row input-heading">
             <label for="system-select">システムメッセージ</label>
             <button class="button button--secondary" :disabled="!enabled" @click="testSpeechPlay(system)">
+              <i class="icon-speaker"></i>
               読み上げテスト
             </button>
           </div>
@@ -104,6 +105,7 @@
           <div class="row input-heading">
             <label for="normal-select">視聴者コメント</label>
             <button class="button button--secondary" :disabled="!enabled" @click="testSpeechPlay(normal)">
+              <i class="icon-speaker"></i>
               読み上げテスト
             </button>
           </div>
@@ -131,6 +133,7 @@
               :disabled="!enabled"
               @click="testSpeechPlay(operator)"
             >
+              <i class="icon-speaker"></i>
               読み上げテスト
             </button>
           </div>
@@ -218,18 +221,33 @@ select {
 
 .multiselect {
   height: 64px;
+  margin-bottom: 8px;
 }
 
 & /deep/ .multiselect__tags {
   height: 100%;
+  overflow: hidden;
+  position: relative;
+  box-shadow: inset 0 0 0 1px var(--color-border-light);
 
   [data-type="webSpeech"] & {
-    background-color: var(--color-brand-windows);
+    background: url(../../media/images/windows_bg.png) center no-repeat / 100% auto;
   }
 
-  // キャラデザが決まるまでの暫定対応
   [data-type="nVoice"] & {
-    background: url(../../media/images/denpa.png) var(--color-brand-nvoice) right center no-repeat / 200px auto;
+    background: url(../../media/images/nvoice_bg.png) center no-repeat / 100% auto;
+
+    &:after {
+      content: '';
+      position: absolute;
+      top: -64px;
+      right: -37px;
+      width: 414px;
+      height: 415px;
+      background: url(../../media/images/nvoice.png) no-repeat center/ 100% auto;
+      opacity: .9;
+      filter: drop-shadow(4px 4px 12px rgba(@black, 0.3));
+    }
   }
 }
 
@@ -245,10 +263,10 @@ select {
 & /deep/ .multiselect__input {
   height: 64px;
   padding: 0 16px;
-  font-weight: @font-weight-bold;
   color: var(--color-text-light);
-  background: linear-gradient(270deg, rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0.25) 100%);
-  text-shadow: 0px 0px 4px rgba(0, 0, 0, 0.25);
+  border: none;
+  background: transparent;
+  text-shadow: 0px 0px 4px rgba(@black, 0.25);
 
   &:hover {
     border-color: var(--color-border-light);

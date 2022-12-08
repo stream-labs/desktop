@@ -2,8 +2,8 @@
   <div class="setting-section">
     <div class="section">
       <div class="speech-engine-heading" data-type="nVoice">
-        <p class="speech-engine-heading-label">N Voice</p>
-        <span class="speech-engine-heading-text">テキスト</span>
+        <p class="speech-engine-heading-label">N Voice 琴詠ニア</p>
+        <span class="speech-engine-heading-text">ニコニコから生まれた素直な声が特徴の音声合成エンジン</span>
       </div>
       <div class="input-label section-heading">
         <label>音声設定</label>
@@ -34,14 +34,15 @@
           :disabled="!enabled"
           @click="testSpeechPlay('nVoice')"
         >
+          <i class="icon-speaker"></i>
           読み上げテスト
         </button>
       </div>
     </div>
     <div class="section">
       <div class="speech-engine-heading" data-type="windows">
-        <p class="speech-engine-heading-label">Windows</p>
-        <span class="speech-engine-heading-text">テキスト</span>
+        <p class="speech-engine-heading-label">Windowsの音声合成</p>
+        <span class="speech-engine-heading-text">Windowsの設定で選択されている音声合成エンジン</span>
       </div>
       <div class="input-label section-heading">
         <label>音声設定</label>
@@ -70,6 +71,7 @@
           :disabled="!enabled"
           @click="testSpeechPlay('webSpeech')"
         >
+          <i class="icon-speaker"></i>
           読み上げテスト
         </button>
       </div>
@@ -84,56 +86,48 @@
 .speech-engine-heading {
   margin: -16px -16px 16px;
   padding: 16px;
+  height: 80px;
   border-radius: 4px 4px 0 0;
   display: flex;
   flex-direction: column;
+  justify-content: center;
   position: relative;
   overflow: hidden;
+  box-shadow: inset 0 0 0 1px var(--color-border-light);
 
-  &:before {
-    position: absolute;
-    top: 0;
-    left: 0;
-    content: '';
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(270deg, rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0.25) 100%);
+  &[data-type="windows"] {
+    background: url(../../media/images/windows_bg.png) center no-repeat / 100% auto;
   }
 
-  // キャラデザが決まるまでの暫定対応
   &[data-type="nVoice"] {
-    background-color: var(--color-brand-nvoice);
+    background: url(../../media/images/nvoice_bg.png) center no-repeat / 100% auto;
 
     &:after {
       content: '';
       position: absolute;
-      top: 50%;
-      right: 0;
-      transform: translateY(-50%);
-      width: 100%;
-      height: 100%;
-      background: url(../../media/images/pulse.png) repeat-x right center/ 60px auto;
-      opacity: .3;
+      top: -59px;
+      right: -46px;
+      width: 432px;
+      height: 433px;
+      background: url(../../media/images/nvoice.png) no-repeat center/ 100% auto;
+      opacity: .9;
+      filter: drop-shadow(4px 4px 12px rgba(@black, 0.3));
     }
-  }
-
-  &[data-type="windows"] {
-    background-color: var(--color-brand-windows);
   }
 }
 
 .speech-engine-heading-label {
-  font-size: @font-size6;
+  font-size: @font-size4;
   font-weight: @font-weight-bold;
   color: var(--color-text-light);
-  margin: 0;
+  margin: 0 0 4px 0;
   z-index: 1;
 }
 
 .speech-engine-heading-text {
   font-size: @font-size2;
   color: var(--color-text-light);
-  text-shadow: 0px 0px 4px rgba(0, 0, 0, 0.25);
+  text-shadow: 0px 0px 4px rgba(@black, 0.25);
   z-index: 1;
 }
 
