@@ -5,7 +5,9 @@ import cx from 'classnames';
 import { Services } from 'components-react/service-provider';
 import UltraIcon from 'components-react/shared/UltraIcon';
 
-export function UltraComparison(p: { onSkip?: () => void } = { onSkip: () => {} }) {
+export function UltraComparison(
+  p: { onSkip?: () => void; condensed?: boolean } = { onSkip: () => {} },
+) {
   const { MagicLinkService } = Services;
   const tableHeaders = [
     { text: $t('Themes and Overlays'), icon: 'icon-themes' },
@@ -37,7 +39,11 @@ export function UltraComparison(p: { onSkip?: () => void } = { onSkip: () => {} 
       { text: $t('Basic Features') },
     ],
     prime: [
-      { text: $t('Access to All Overlays and Themes (%{themeNumber})', { themeNumber: '1000+' }) },
+      {
+        text: p.condensed
+          ? $t('Access to All Overlays and Themes')
+          : $t('Access to All Overlays and Themes (%{themeNumber})', { themeNumber: '1000+' }),
+      },
       { text: '✓', key: 'check1' },
       { text: '✓', key: 'check2' },
       { text: '✓', key: 'check3' },
@@ -55,8 +61,15 @@ export function UltraComparison(p: { onSkip?: () => void } = { onSkip: () => {} 
   }
 
   return (
-    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <div className={styles.headersContainer}>
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        fontSize: p.condensed ? '10px' : undefined,
+      }}
+    >
+      <div className={cx(styles.headersContainer, { [styles.condensed]: p.condensed })}>
         {tableHeaders.map(header => (
           <div className={styles.tableHeader} key={header.text}>
             <i className={header.icon} />
@@ -65,14 +78,19 @@ export function UltraComparison(p: { onSkip?: () => void } = { onSkip: () => {} 
           </div>
         ))}
       </div>
-      <div className={styles.cardContainer} onClick={p.onSkip}>
+      <div
+        className={cx(styles.cardContainer, { [styles.condensed]: p.condensed })}
+        onClick={p.onSkip}
+      >
         <div className={styles.header}>
           <h1>
             <i className="icon-streamlabs" />
             {$t('Starter')}
           </h1>
           <span style={{ marginBottom: 8, display: 'inline-block' }}>
-            {$t('Everything you need to go live. Always and forever free.')}
+            {p.condensed
+              ? $t('Always and forever free')
+              : $t('Everything you need to go live. Always and forever free.')}
           </span>
         </div>
         {primeMetadata.standard.map(data => (
@@ -82,7 +100,12 @@ export function UltraComparison(p: { onSkip?: () => void } = { onSkip: () => {} 
         ))}
         <div className={styles.button}>{$t('Current Plan')}</div>
       </div>
-      <div className={cx(styles.cardContainer, styles.primeCardContainer)} onClick={linkToPrime}>
+      <div
+        className={cx(styles.cardContainer, styles.primeCardContainer, {
+          [styles.condensed]: p.condensed,
+        })}
+        onClick={linkToPrime}
+      >
         <div className={styles.primeBacking} />
         <div className={cx(styles.header, styles.primeHeader)}>
           <h1>
@@ -90,7 +113,9 @@ export function UltraComparison(p: { onSkip?: () => void } = { onSkip: () => {} 
             Ultra
           </h1>
           <span style={{ marginBottom: 8, display: 'inline-block' }}>
-            {$t('Includes everything in Starter plus:')}
+            {p.condensed
+              ? $t('Everything in Starter plus:')
+              : $t('Includes everything in Starter plus:')}
           </span>
         </div>
         {primeMetadata.prime.map(data => (

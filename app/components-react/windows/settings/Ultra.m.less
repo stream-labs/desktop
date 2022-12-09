@@ -1,6 +1,16 @@
 .product-list-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
   > h2, span {
     position: relative;
+    text-align: center;
+    color: var(--title);
+  }
+
+  h2 {
+    font-size: 32px;
   }
 }
 
@@ -9,6 +19,7 @@
   height: 50%;
   width: 100%;
   position: absolute;
+  margin-top: -10px;
 }
 
 .product-grid {
@@ -20,12 +31,35 @@
 }
 
 .product-card {
-  height: 160px;
+  height: 200px;
   width: 100%;
   border-radius: 8px;
   background: var(--section);
-}
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: 12px;
+  padding: 8px;
 
-.explore {
-  color: var(--teal);
+  img {
+    height: 40px;
+    width: 40px;
+  }
+
+  span {
+    margin-top: 8px;
+    text-align: center;
+  }
+
+  .title {
+    color: var(--title);
+  }
+
+  &.has-link:hover {
+    cursor: pointer;
+  }
+
+  .explore {
+    color: var(--teal);
+  }
 }
