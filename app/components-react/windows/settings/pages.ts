@@ -14,3 +14,4 @@ export * from './RemoteControl';
 export * from './GameOverlay';
 export * from './Support';
 export * from './Experimental';
+export * from './Ultra';

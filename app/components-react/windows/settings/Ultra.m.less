@@ -1,0 +1,31 @@
+.product-list-container {
+  > h2, span {
+    position: relative;
+  }
+}
+
+.color-block {
+  background: linear-gradient(180deg, transparent 0%, var(--background) 100%), var(--ultra);
+  height: 50%;
+  width: 100%;
+  position: absolute;
+}
+
+.product-grid {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  gap: 16px;
+  padding: 16px;
+}
+
+.product-card {
+  height: 160px;
+  width: 100%;
+  border-radius: 8px;
+  background: var(--section);
+}
+
+.explore {
+  color: var(--teal);
+}
