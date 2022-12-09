@@ -149,6 +149,10 @@ export class NicoliveCommentSynthesizerService extends StatefulService<ICommentS
     }, synthId);
   }
 
+  async speakTextSimple(speech: Speech) {
+    this.speakText(speech, () => { }, () => {});
+  }
+
   async speakText(
     speech: Speech,
     onstart: () => void,

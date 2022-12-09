@@ -31,11 +31,7 @@ export default class SpeechEngineSettings extends Vue {
 
       speech.synthesizer = synthId;
 
-      service.speakText(
-        speech,
-        () => { },
-        () => { },
-      );
+      service.speakTextSimple(speech);
     }
   }
 
