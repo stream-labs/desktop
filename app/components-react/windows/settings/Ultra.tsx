@@ -81,7 +81,7 @@ export function Ultra() {
         </span>
         <div className={styles.productGrid}>
           {products.map(product => (
-            <ProductCard {...product} />
+            <ProductCard {...product} key={product.title} />
           ))}
         </div>
       </div>
