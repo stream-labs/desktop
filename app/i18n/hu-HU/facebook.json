@@ -1,11 +1,11 @@
 {
   "You can access your Facebook Streamer Dashboard here.": "You can access your Facebook Streamer Dashboard here.",
-  "Create a Page": "Create a Page",
+  "Create a Page": "Oldal létrehozása",
   "Facebook Setup": "Facebook Setup",
   "Streamer Dashboard": "Streamer Dashboard",
   "Share": "Share",
   "Like": "Like",
-  "Step": "Lépés",
+  "Step 3:": "3. lépés:",
   "Create a Facebook Gaming page to get started.": "Create a Facebook Gaming page to get started.",
   "Create a Gaming Page": "Create a Gaming Page",
   "All of your scenes, sources, and settings will be preserved.": "All of your scenes, sources, and settings will be preserved.",
@@ -23,7 +23,7 @@
   "Scheduled Video": "Scheduled Video",
   "Make sure the Streamlabs app is added to your Group.": "Make sure the Streamlabs app is added to your Group.",
   "Click here to verify.": "Click here to verify.",
-  "Facebook Game": "Facebook Game",
+  "Facebook Game": "Facebook játék",
   "You can stream to your timeline and groups now": "You can stream to your timeline and groups now",
   "Please log-out and log-in again to get these new features": "Please log-out and log-in again to get these new features",
   "Re-login now": "Re-login now",
@@ -32,5 +32,6 @@
   "Privacy": "Adatvédelem",
   "FBPrivacyWarning": "The granted privacy level may be limited for your Facebook account. Check the \"Who can see you use this business integration\" section for the Streamlabs integration <link>here</link>",
   "Only Me": "Csak én",
-  "Do not change privacy settings": "Do not change privacy settings"
+  "Do not change privacy settings": "Do not change privacy settings",
+  "Install %{overlayName}": "%{overlayName} telepítése"
 }

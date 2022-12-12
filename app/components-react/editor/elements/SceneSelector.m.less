@@ -15,6 +15,22 @@
     top: 0 !important;
     height: 100%;
   }
+
+  :global(.active) {
+    color: var(--icon-active);
+  }
+
+  :global(.disabled) {
+    opacity: 0.7;
+
+    &:hover {
+      cursor: not-allowed;
+    }
+  }
+
+  :global(.icon-add-circle) {
+    margin-right: auto;
+  }
 }
 
 :global(.no-top-padding) {
@@ -25,7 +41,7 @@
 }
 
 .active-scene-container {
-  margin-right: auto;
+  margin-right: 4px;
   font-weight: 500;
   font-size: 16px;
   color: var(--title);
@@ -38,7 +54,13 @@
   }
 }
 
-.active-scene {
+.sources-header:extend(.active-scene-container) {
+  &:hover {
+    cursor: default;
+  }
+}
+
+.active-scene, .source-title {
   display: block;
   overflow: hidden;
   white-space: nowrap;
@@ -48,6 +70,7 @@
 .scenes-container {
   background: var(--section);
   border-radius: 4px;
+  height: 100%;
 
   &:global(.os-host) {
     overflow: hidden !important;
@@ -61,6 +84,11 @@
     display: none;
   }
 
+  :global(.ant-tree-title) {
+    display: block;
+    width: 100%;
+  }
+
   :global(.ant-tree-treenode), :global(.ant-tree-node-content-wrapper) {
     width: 100%;
     transition: all 0s !important;
@@ -69,6 +97,7 @@
 
   :global(.ant-tree-node-content-wrapper) {
     padding-left: 16px !important;
+    display: flex;
   }
 
   :global(.ant-tree-node-selected) {
@@ -86,6 +115,11 @@
   padding: 8px;
   border-radius: 4px;
   height: 100%;
+
+  .whisper {
+    font-size: 10px;
+    opacity: 0.7;
+  }
 }
 
 .dropdown-item {
@@ -111,4 +145,78 @@
       cursor: not-allowed;
     }
   }
+}
+
+.source-icons {
+  display: flex;
+  align-items: center;
+  margin-right: 16px;
+
+  i {
+    margin-left: 8px;
+  }
+}
+
+.source-title-container {
+  display: flex;
+  align-items: center;
+
+  > i {
+    margin-right: 8px;
+    opacity: 0;
+  }
+
+  :global(.fa-signal) {
+    opacity: 1;
+    color: var(--teal);
+  }
+
+  :global(.icon-lock), :global(.icon-hide), :global(.icon-broadcast), :global(.icon-studio) {
+    opacity: 0.7;
+  }
+
+  &:hover {
+    i {
+      opacity: 1;
+    }
+  }
+}
+
+.source-title {
+  margin-right: auto;
+}
+
+.sources-container {
+  :global(.ant-tree-switcher) {
+    width: 0;
+    display: block;
+    z-index: 1;
+    left: 10px;
+  }
+
+  :global(.ant-tree-node-content-wrapper) {
+    padding-left: 32px !important;
+    display: flex;
+  }
+
+  :global(.ant-tree-title) {
+    display: block;
+    width: 100%;
+  }
+
+  :global(.fa-folder) {
+    &:hover {
+      &::before {
+        content: "\f07c";
+      }
+      color: var(--title);
+    }
+  }
+}
+
+.tree-mask {
+  width: 100%;
+  height: 100%;
+  z-index: 100;
+  position: absolute;
 }

@@ -42,6 +42,11 @@ export class AlertboxLibrary extends ReactComponent {}
 export class BrowseOverlays extends ReactComponent {}
 
 @Component({
+  props: { name: { default: 'Browser' }, wrapperStyles: { default: () => ({ height: '100%' }) } },
+})
+export class Browser extends ReactComponent {}
+
+@Component({
   props: {
     name: { default: 'BrowserView' },
     componentProps: { default: () => ({ src: '' }) },
@@ -77,6 +82,15 @@ export class Display extends ReactComponent {}
 
 @Component({
   props: {
+    name: { default: 'DisplayElement' },
+    wrapperStyles: { default: () => ({ height: '100%' }) },
+    mins: { default: () => ({ x: 0, y: 0 }) },
+  },
+})
+export class DisplayElement extends ReactComponent {}
+
+@Component({
+  props: {
     name: { default: 'EditStreamWindow' },
     wrapperStyles: { default: () => ({ height: '100%' }) },
   },
@@ -98,6 +112,14 @@ export class GoLiveWindow extends ReactComponent {}
   },
 })
 export class Grow extends ReactComponent {}
+
+@Component({
+  props: {
+    name: { default: 'GuestCamProperties' },
+    wrapperStyles: { default: () => ({ height: '100%' }) },
+  },
+})
+export class GuestCamProperties extends ReactComponent {}
 
 @Component({
   props: {
@@ -133,6 +155,14 @@ export class LegacyEvents extends ReactComponent {}
 
 @Component({
   props: {
+    name: { default: 'ManageSceneCollections' },
+    wrapperStyles: { default: () => ({ height: '100%' }) },
+  },
+})
+export class ManageSceneCollections extends ReactComponent {}
+
+@Component({
+  props: {
     name: { default: 'MediaGallery' },
     wrapperStyles: { default: () => ({ height: '100%' }) },
   },
@@ -164,21 +194,16 @@ export class NameFolder extends ReactComponent {}
 })
 export class NameScene extends ReactComponent {}
 
-@Component({
-  props: { name: { default: 'News' }, wrapperStyles: { default: () => ({ height: '100%' }) } },
-})
-export class News extends ReactComponent {}
+@Component({ props: { name: { default: 'NotificationsArea' } } })
+export class NotificationsArea extends ReactComponent {}
 
 @Component({
   props: {
-    name: { default: 'Notifications' },
+    name: { default: 'NotificationsAndNews' },
     wrapperStyles: { default: () => ({ height: '100%' }) },
   },
 })
-export class Notifications extends ReactComponent {}
-
-@Component({ props: { name: { default: 'NotificationsArea' } } })
-export class NotificationsArea extends ReactComponent {}
+export class NotificationsAndNews extends ReactComponent {}
 
 @Component({
   props: {
@@ -255,6 +280,14 @@ export class RecentEvents extends ReactComponent<{ isOverlay?: boolean }> {}
 
 @Component({
   props: {
+    name: { default: 'RecentEventsWindow' },
+    wrapperStyles: { default: () => ({ height: '100%' }) },
+  },
+})
+export class RecentEventsWindow extends ReactComponent {}
+
+@Component({
+  props: {
     name: { default: 'RecordingPreview' },
     wrapperStyles: { default: () => ({ height: '100%' }) },
     mins: { default: () => ({ x: 0, y: 0 }) },
@@ -295,6 +328,15 @@ export class StreamPreview extends ReactComponent {}
   },
 })
 export class SceneSelector extends ReactComponent {}
+
+@Component({
+  props: {
+    name: { default: 'SourceSelector' },
+    wrapperStyles: { default: () => ({ height: '100%' }) },
+    mins: { default: () => ({ x: 200, y: 120 }) },
+  },
+})
+export class SourceSelector extends ReactComponent {}
 
 @Component({
   props: {
@@ -386,6 +428,14 @@ export class TitleBar extends ReactComponent {}
 
 @Component({
   props: {
+    name: { default: 'WelcomeToPrime' },
+    wrapperStyles: { default: () => ({ height: '100%' }) },
+  },
+})
+export class WelcomeToPrime extends ReactComponent {}
+
+@Component({
+  props: {
     name: { default: 'WidgetWindow' },
     wrapperStyles: { default: () => ({ height: '100%' }) },
   },
@@ -399,3 +449,9 @@ export class WidgetWindow extends ReactComponent {}
   },
 })
 export class CustomCodeWindow extends ReactComponent {}
+
+@Component({ props: { name: { default: 'UltraIcon' } } })
+export class UltraIcon extends ReactComponent<{
+  type?: string;
+  className?: string;
+}> {}

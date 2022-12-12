@@ -9,7 +9,7 @@
   "has gifted a sub (%{tier}) to": "hat ein Abonnement (%{tier}) geschenkt für",
   "has resubscribed (%{tier}) for %{months} months": "hat %{months} Monate lang wiederholt abonniert (%{tier})",
   "has subscribed (%{tier})": "hat abonniert (%{tier})",
-  "has converted from a Prime Gaming sub to a %{tier} sub": "has converted from a Prime Gaming sub to a %{tier} sub",
+  "has converted from a Prime Gaming sub to a %{tier} sub": "hat das Prime Gaming-Abo in ein %{tier}-Abo umgewandelt",
   "has subscribed": "hat abonniert",
   "has used": "hat verwendet",
   "has hosted you with %{viewers} viewers": "hat Sie gehostet mit %{viewers} Zuschauern",
@@ -25,7 +25,7 @@
   "has become a supporter": "ist Unterstützer geworden",
   "has been a supporter for %{months} months": "ist seit %{months} Monaten Unterstützer",
   "has shared": "hat geteilt",
-  "has superchatted": "hat einen Super Chat gepostet:",
+  "has superchatted": "hat einen Super Chat gepostet",
   "has pledged on Patreon": "hat ein Versprechen auf Patreon gegeben",
   "has donated to Extra Life": "hat auf ExtraLife gespendet",
   "has donated to Tiltify": "hat auf Tiltify gespendet",
@@ -75,9 +75,9 @@
   "Disable Safe Mode": "Der sichere Modus ist deaktiviert",
   "Something went wrong disabling Safe Mode": "Fehler beim Deaktivieren des sicheren Modus",
   "Automatically disable Safe Mode": "Sicheren Modus automatisch deaktivieren",
-  "Disable after <duration></duration> minutes": "Nach &lt;duration&gt;&lt;/duration&gt; Minuten deaktivieren",
-  "has resubscribed": "has resubscribed",
-  "has gifted a sub to": "has gifted a sub to",
-  "has resubscribed for %{streak} months in a row! (%{months} total)": "has resubscribed for %{streak} months in a row! (%{months} total)",
-  "has resubscribed for %{months} months": "has resubscribed for %{months} months"
+  "Disable after <duration></duration> minutes": "Nach <duration></duration> Minuten deaktivieren",
+  "has resubscribed": "hat erneut abonniert",
+  "has gifted a sub to": "hat ein Abonnement geschenkt für",
+  "has resubscribed for %{streak} months in a row! (%{months} total)": "hat %{streak} Monate lang ununterbrochen wiederholt abonniert! (Insgesamt %{months})",
+  "has resubscribed for %{months} months": "hat %{months} Monate lang wiederholt abonniert"
 }

@@ -7,7 +7,7 @@ import cx from 'classnames';
 import { $t } from 'services/i18n';
 import * as stepComponents from './steps';
 import Utils from 'services/utils';
-import {IOnboardingStep, ONBOARDING_STEPS} from 'services/onboarding';
+import { IOnboardingStep, ONBOARDING_STEPS } from 'services/onboarding';
 import Scrollable from 'components-react/shared/Scrollable';
 
 export default function Onboarding() {
@@ -51,9 +51,7 @@ export default function Onboarding() {
 }
 
 function TopBar() {
-  const { stepIndex, preboardingOffset, singletonStep, steps } = useModule(
-    OnboardingModule,
-  );
+  const { stepIndex, preboardingOffset, singletonStep, steps } = useModule(OnboardingModule);
 
   if (stepIndex < preboardingOffset || singletonStep) {
     return <div />;
@@ -89,7 +87,7 @@ function ActionButton() {
   const { currentStep, next, processing } = useModule(OnboardingModule);
 
   if (currentStep.hideButton) return null;
-  const isPrimeStep = currentStep.label === $t('Prime');
+  const isPrimeStep = currentStep.label === $t('Ultra');
   return (
     <button
       className={cx('button button--action', commonStyles.onboardingButton, {
@@ -98,7 +96,7 @@ function ActionButton() {
       onClick={() => next()}
       disabled={processing}
     >
-      {isPrimeStep ? $t('Go Prime') : $t('Continue')}
+      {isPrimeStep ? $t('Go Ultra') : $t('Continue')}
     </button>
   );
 }
@@ -113,8 +111,12 @@ export class OnboardingModule {
     return Services.OnboardingService;
   }
 
-  get ReocrdingModeService() {
+  get RecordingModeService() {
     return Services.RecordingModeService;
+  }
+
+  get UserService() {
+    return Services.UserService;
   }
 
   get steps() {
@@ -139,8 +141,8 @@ export class OnboardingModule {
   }
 
   setRecordingMode() {
-    this.ReocrdingModeService.setRecordingMode(true);
-    this.ReocrdingModeService.setUpRecordingFirstTimeSetup();
+    this.RecordingModeService.setRecordingMode(true);
+    this.RecordingModeService.setUpRecordingFirstTimeSetup();
   }
 
   setImportFromObs() {
@@ -155,13 +157,17 @@ export class OnboardingModule {
   next(isSkip = false) {
     if (this.state.processing) return;
 
+    if (this.OnboardingService.state.options.isLogin && this.UserService.views.isPartialSLAuth) {
+      return;
+    }
+
     if (
-      this.ReocrdingModeService.views.isRecordingModeEnabled &&
+      this.RecordingModeService.views.isRecordingModeEnabled &&
       this.currentStep.component === 'HardwareSetup' &&
       !this.OnboardingService.state.options.isHardware &&
       !isSkip
     ) {
-      this.ReocrdingModeService.actions.addRecordingWebcam();
+      this.RecordingModeService.actions.addRecordingWebcam();
     }
 
     if (this.state.stepIndex >= this.steps.length - 1 || this.singletonStep) {

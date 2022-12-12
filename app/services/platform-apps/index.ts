@@ -3,7 +3,7 @@ import { lazyModule } from 'util/lazy-module';
 import path from 'path';
 import fs from 'fs';
 import { Subject } from 'rxjs';
-import { WindowsService } from 'services/windows';
+import { IWindowOptions, WindowsService } from 'services/windows';
 import { Inject } from 'services/core/injector';
 import { EApiPermissions } from './api/modules/module';
 import { VideoService } from 'services/video';
@@ -70,6 +70,11 @@ export enum EAppPageSlot {
    * The background slot is never mounted anywhere
    */
   Background = 'background',
+
+  /**
+   * Auxillary slot for functionality handled in a different window
+   */
+  PopOut = 'pop_out',
 }
 
 interface IAppPage {
@@ -105,6 +110,7 @@ interface IProductionAppResponse {
   is_beta: boolean;
   manifest: IAppManifest;
   name: string;
+  delisted?: boolean;
   screenshots: string[];
   version: string;
 }
@@ -120,6 +126,7 @@ export interface ILoadedApp {
   appUrl?: string;
   devPort?: number;
   enabled: boolean;
+  delisted?: boolean;
   icon?: string;
 }
 
@@ -148,6 +155,10 @@ class PlatformAppsViews extends ViewHandler<IPlatformAppServiceState> {
 
   get enabledApps() {
     return this.state.loadedApps.filter(app => app.enabled);
+  }
+
+  getDelisted(appId: string) {
+    return this.getApp(appId).delisted;
   }
 }
 
@@ -246,6 +257,7 @@ export class PlatformAppsService extends StatefulService<IPlatformAppServiceStat
         appToken: app.app_token,
         poppedOutSlots: [],
         icon: app.icon,
+        delisted: app.delisted,
         enabled: !(unpackedVersionLoaded || disabledApps.includes(app.id_hash)),
       });
     });
@@ -596,7 +608,7 @@ export class PlatformAppsService extends StatefulService<IPlatformAppServiceStat
     return this.state.loadedApps.filter(app => !app.unpacked);
   }
 
-  popOutAppPage(appId: string, pageSlot: EAppPageSlot) {
+  popOutAppPage(appId: string, pageSlot: EAppPageSlot, windowOptions?: Partial<IWindowOptions>) {
     const app = this.views.getApp(appId);
     if (!app || !app.enabled) return;
 
@@ -613,6 +625,7 @@ export class PlatformAppsService extends StatefulService<IPlatformAppServiceStat
         size: this.getPagePopOutSize(appId, pageSlot),
         x: mousePos.x,
         y: mousePos.y,
+        ...windowOptions,
       },
       windowId,
     );

@@ -1,6 +1,6 @@
 {
   "Overlay, Widget, and Site Themes": "Superpositions, widget et thèmes de site",
-  "Fully customize your stream and your website to represent your brand; or pick from thousands of our pre-made themes. Either way, your stream will look amazing and it's all included with Prime.": "Personnalisez complètement votre stream et votre site web pour présenter votre marque, ou sélectionnez l’un des thèmes créés pour vous. Quel que soit votre choix, votre stream sera exceptionnel et tout est inclus avec Prime.",
+  "Fully customize your stream and your website to represent your brand; or pick from thousands of our pre-made themes. Either way, your stream will look amazing and it's all included with Prime.": "Personnalisez entièrement votre stream et votre site Web pour présenter votre marque, ou sélectionnez l’un des thèmes créés pour vous. Quel que soit votre choix, votre stream sera exceptionnel et tout est inclus avec Prime.",
   "View Themes": "Afficher les thèmes",
   "Every App is FREE": "Chaque application est GRATUITE",
   "We've curated a list of diverse and feature rich applications to give you more control, automation, better analytics, and new ways to interact with your audience.": "Nous avons conservé une liste d’applications diverses dotées de nombreuses fonctions pour vous offrir davantage de contrôle, d’automatisation et de nouveaux moyens d’interagir avec votre public.",
@@ -15,7 +15,7 @@
   "Resubscribe to Prime": "Se réabonner à Prime",
   "No Thanks": "Non merci",
   "Choose your Streamlabs plan": "Choisissez votre abonnement Streamlabs",
-  "Choose Prime to enjoy everything from Starter plus themes and much more.": "Choisissez Prime pour profiter de tout, du pack Démarrage aux thèmes, et bien plus encore.",
+  "Choose Prime to enjoy everything from Starter plus themes and much more.": "Choisissez Prime pour profiter de tout, du pack Starter aux thèmes, et bien plus encore.",
   "Go Live to a single platform": "Diffusez en direct sur une seule plate-forme",
   "Alerts & Tipping": "Alertes et dons",
   "Unlimited Themes & Overlays": "Thèmes et superpositions illimités",
@@ -24,9 +24,9 @@
   "Custom Alerts & Tipping": "Alertes et dons personnalisés",
   "App Store Apps are FREE": "Les applications de l'App Store sont GRATUITES",
   "Custom Merch Store": "Boutique marchand personnalisée",
-  "Starter": "Démarrage",
+  "Starter": "Starter",
   "Free": "Gratuit",
-  "Choose Starter": "Choisir Démarrage",
+  "Choose Starter": "Choisir Starter",
   "From $12/mo, billed annually": "À partir de 12€/mois, facturé à l'année",
   "Choose Prime": "Choisir Prime",
   "Your Benefits Are Expiring Soon": "Vos avantages vont bientôt expirer",
@@ -36,9 +36,10 @@
   "Stream Overlays": "Superpositions de stream",
   "Multistream": "Multistream",
   "Premium Merch": "Merch Premium",
-  "Alert Box Themes": "Thèmes Alertbox",
+  "Alert Box Themes": "Thèmes de la fenêtre d'alerte",
   "All Apps Included Free": "Toutes les applications sont incluses gratuitement",
   "Thumbnail & Panel Maker": "Créateur de miniatures et de panneaux",
   "Prime Mobile Streaming": "Streaming mobile Prime",
-  "Your credit card expires soon. Click here to retain your Prime benefits": "Votre carte de crédit va bientôt expirer. Cliquez ici pour conserver vos avantages Prime"
+  "Your credit card expires soon. Click here to retain your Prime benefits": "Votre carte de crédit va bientôt expirer. Cliquez ici pour conserver vos avantages Prime",
+  "News": "Actualités"
 }

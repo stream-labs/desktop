@@ -9,7 +9,7 @@
   "Monitor and Output": "Мониторинг и вывод звука",
   "Stream Track": "Транслировать дорожку",
   "Stream Tracks": "Транслировать дорожки",
-  "Rec. Tracks": "Зап. дорожки",
+  "Rec. Tracks": "Зап. Дорожки",
   "Advanced Audio Settings": "Дополнительные настройки звука",
   "Volume ( % )": "Громкость (%)",
   "Sync Offset": "Сдвиг синхронизации",
@@ -32,8 +32,15 @@
   "Source Settings": "Настройки источника",
   "Audio Tracks": "Звуковые дорожки",
   "Designates which tracks are being recorded": "Указывает на то, какие дорожки записываются",
-  "Your Stream and VOD Track are the same. This may result in unexpected audio behavior, go to Global Settings to change.": "Your Stream and VOD Track are the same. This may result in unexpected audio behavior, go to Global Settings to change.",
-  "Streaming Track": "Streaming Track",
-  "Enable Twitch VOD Track": "Enable Twitch VOD Track",
-  "Twitch VOD Track": "Twitch VOD Track"
+  "Your Stream and VOD Track are the same. This may result in unexpected audio behavior, go to Global Settings to change.": "Дорожки трансляции и записи VOD совпадают. Это может привести к сбоям в работе аудио. Изменить это можно в глобальных настройках.",
+  "Streaming Track": "Дорожка трансляции",
+  "Enable Twitch VOD Track": "Включить дорожку записи VOD для Twitch",
+  "Twitch VOD Track": "Дорожка записи VOD для Twitch",
+  "Sample Rate (requires a restart)": "Интервал выборки (необходим перезапуск)",
+  "Channels (requires a restart)": "Каналы (необходим перезапуск)",
+  "Desktop Audio Device 1": "Основное устройство воспроизведения 1",
+  "Desktop Audio Device 2": "Основное устройство воспроизведения 2",
+  "Mic/Auxiliary Device 1": "Микрофон/дополнительное устройство 1",
+  "Mic/Auxiliary Device 2": "Микрофон/дополнительное устройство 2",
+  "Mic/Auxiliary Device 3": "Микрофон/дополнительное устройство 3"
 }

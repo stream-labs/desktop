@@ -2,8 +2,10 @@ import React, { useRef, useEffect } from 'react';
 import * as remote from '@electron/remote';
 import { EAppPageSlot } from 'services/platform-apps';
 import Utils from 'services/utils';
-import { useRenderInterval, useVuex } from 'components-react/hooks';
+import { useVuex } from 'components-react/hooks';
 import { Services } from 'components-react/service-provider';
+import { $t } from 'services/i18n';
+import styles from './PlatformAppPageView.m.less';
 
 export default function PlatformAppPageView(p: {
   appId: string;
@@ -18,8 +20,9 @@ export default function PlatformAppPageView(p: {
   let currentSize: IVec2 | null;
   let containerId: string | null;
 
-  const { hideStyleBlockers } = useVuex(() => ({
+  const { hideStyleBlockers, delisted } = useVuex(() => ({
     hideStyleBlockers: WindowsService.state[Utils.getWindowId()].hideStyleBlockers,
+    delisted: PlatformAppsService.views.getDelisted(p.appId),
   }));
 
   useEffect(() => {
@@ -82,10 +85,26 @@ export default function PlatformAppPageView(p: {
     );
   }
 
+  function goToUninstall() {
+    remote.shell.openExternal(
+      'https://streamlabs.com/content-hub/post/how-to-uninstall-apps-from-streamlabs-desktop',
+    );
+  }
+
   return (
-    <div
-      style={{ display: 'flex', flexDirection: 'column', width: '100%', ...p.style }}
-      ref={appContainer}
-    />
+    <>
+      {delisted && (
+        <div onClick={goToUninstall} className={styles.delistContainer}>
+          <i className="icon-error" />
+          {$t(
+            "The developer has ended support for this app. The app may continue to work, but it won't recieve any updates. If you wish to uninstall, please follow the directions here.",
+          )}
+        </div>
+      )}
+      <div
+        style={{ display: 'flex', flexDirection: 'column', width: '100%', ...p.style }}
+        ref={appContainer}
+      />
+    </>
   );
 }

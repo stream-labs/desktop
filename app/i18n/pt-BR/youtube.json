@@ -29,7 +29,7 @@
   "Does not support: Closed captions, 1440p, and 4k resolutions": "Não suporta: Legendas ocultas, resoluções 1440p e 4k",
   "Enable DVR": "Habilitar DVR",
   "Additional Settings": "Configurações adicionais",
-  "Open Youtube Studio": "Abrir Youtube Studio",
+  "Open Youtube Studio": "Abrir YouTube Studio",
   "360° video": "Vídeo 360°",
   "Enable Auto-start": "Ativar início automático",
   "Enable Auto-stop": "Ativar parada automática",
@@ -37,7 +37,7 @@
   "Enabling auto-start will automatically start the stream when you start sending data from your streaming software": "Ativar o início automático iniciará automaticamente a transmissão quando você começar a enviar dados do seu software de transmissão",
   "Enabling auto-stop will automatically stop the stream when you stop sending data from your streaming software": "Ativar a parada automática iniciará automaticamente a transmissão quando você começar a enviar dados do seu software de transmissão",
   "DVR controls enable the viewer to control the video playback experience by pausing, rewinding, or fast forwarding content": "Os controles de DVR permitem que o visualizador controle a experiência de reprodução de vídeo pausando, retrocedendo ou avançando rapidamente o conteúdo",
-  "Auto-start is disabled for your broadcast. You should manually publish your stream from Youtube Studio": "O início automático está desativado para a sua transmissão. Você deve publicar manualmente seu stream do Youtube Studio",
+  "Auto-start is disabled for your broadcast. You should manually publish your stream from Youtube Studio": "O início automático está desativado para a sua transmissão. Você deve publicar manualmente seu stream do YouTube Studio",
   "Made for kids": "Feito para crianças",
   "Features like personalized ads and live chat won't be available on live streams made for kids.": "Recursos como anúncios personalizados e bate-papo ao vivo não estarão disponíveis em transmissões ao vivo destinadas a crianças.",
   "Try our new thumbnail editor": "Experimente nosso novo editor de miniaturas"

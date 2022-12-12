@@ -89,7 +89,7 @@
   "Link": "Bağlantı",
   "Description": "Açıklama",
   "OBSInit.UnknownError": "Streamlabs başlatılırken bilinmeyen bir hatayla karşılaşıldı.",
-  "OBSInit.ModuleNotFoundError": "Sisteminizde DirectX bulunamadı. Lütfen &lt;https://www.microsoft.com/en-us/download/details.aspx?id=35?&gt; adresinden makineniz için en son DirectX sürümünü yükleyin ve tekrar deneyin.",
+  "OBSInit.ModuleNotFoundError": "Sisteminizde DirectX bulunamadı. Lütfen <https://www.microsoft.com/en-us/download/details.aspx?id=35?> adresinden makineniz için en son DirectX sürümünü yükleyin ve tekrar deneyin.",
   "OBSInit.NotSupportedError": "Streamlabs başlatılamadı. Video sürücüleriniz güncel olmayabilir veya Streamlabs Desktop sisteminizde desteklenmiyor olabilir.",
   "Log Out": "Çıkış Yap",
   "Layout Editor": "Düzen Editörü",

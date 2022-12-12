@@ -14,7 +14,7 @@ import * as remote from '@electron/remote';
  * store in the SelectionService, and selecting items
  * actually selects them in OBS.
  */
-@ServiceHelper()
+@ServiceHelper('SelectionService')
 export class GlobalSelection extends Selection {
   @Inject() selectionService: SelectionService;
   @Inject() editorCommandsService: EditorCommandsService;
@@ -73,12 +73,22 @@ export class GlobalSelection extends Selection {
       });
   }
 
-  select(items: TNodesList) {
+  /**
+   * Selects items in the global selection
+   * @param items The list of items to select
+   * @param sync Whether to select synchronously (use only to resolve race conditions)
+   * @returns the global selection
+   */
+  select(items: TNodesList, sync = false) {
     if (this.isFrozen) {
       throw new Error('Attempted to modify frozen selection');
     }
 
-    this.selectionService.actions.select(items);
+    if (sync) {
+      this.selectionService.select(items);
+    } else {
+      this.selectionService.actions.select(items);
+    }
 
     return this;
   }

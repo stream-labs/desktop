@@ -21,10 +21,12 @@ import {
   EditStreamWindow,
   IconLibraryProperties,
   ScreenCaptureProperties,
+  GuestCamProperties,
   SharedComponentsLibrary,
   SourceProperties,
   RenameSource,
   AdvancedStatistics,
+  ManageSceneCollections,
   WidgetWindow,
   CustomCodeWindow,
   SafeMode,
@@ -34,22 +36,20 @@ import {
   MediaGallery,
   Projector,
   AddSource,
-  News,
-  Notifications,
+  WelcomeToPrime,
+  NotificationsAndNews,
   PlatformAppPopOut,
+  RecentEventsWindow,
 } from 'components/shared/ReactComponentList';
 
 import SourcePropertiesDeprecated from 'components/windows/SourceProperties.vue';
 import Troubleshooter from 'components/windows/Troubleshooter.vue';
 import Blank from 'components/windows/Blank.vue';
-import ManageSceneCollections from 'components/windows/ManageSceneCollections.vue';
-import RecentEvents from 'components/windows/RecentEvents.vue';
 import GameOverlayEventFeed from 'components/windows/GameOverlayEventFeed';
 import EditTransform from 'components/windows/EditTransform';
 import EventFilterMenu from 'components/windows/EventFilterMenu';
 import OverlayPlaceholder from 'components/windows/OverlayPlaceholder';
 import BrowserSourceInteraction from 'components/windows/BrowserSourceInteraction';
-import WelcomeToPrime from 'components/windows/WelcomeToPrime';
 
 import BitGoal from 'components/widgets/goal/BitGoal';
 import DonationGoal from 'components/widgets/goal/DonationGoal';
@@ -102,11 +102,11 @@ export function getComponents() {
     SourceFilters,
     Blank,
     AdvancedAudio,
-    Notifications,
+    NotificationsAndNews,
     Troubleshooter,
     ManageSceneCollections,
     Projector,
-    RecentEvents,
+    RecentEvents: RecentEventsWindow,
     MediaGallery,
     PlatformAppPopOut,
     EditTransform,
@@ -142,11 +142,11 @@ export function getComponents() {
     EditStreamWindow,
     IconLibraryProperties,
     ScreenCaptureProperties,
+    GuestCamProperties,
     SharedComponentsLibrary,
     WidgetWindow,
     CustomCodeWindow,
     SourceShowcase,
-    News,
   };
 }
 

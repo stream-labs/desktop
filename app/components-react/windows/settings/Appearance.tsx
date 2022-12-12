@@ -6,6 +6,7 @@ import { getDefined } from '../../../util/properties-type-guards';
 import { ObsSettingsSection } from './ObsSettings';
 import * as remote from '@electron/remote';
 import { injectFormBinding, useModule } from 'slap';
+import UltraIcon from 'components-react/shared/UltraIcon';
 
 export function AppearanceSettings() {
   const { CustomizationService, WindowsService, UserService, MagicLinkService } = Services;
@@ -52,9 +53,17 @@ export function AppearanceSettings() {
         <ListInput {...bind.theme} label={'Theme'} options={CustomizationService.themeOptions} />
         {shouldShowPrime && (
           <div style={{ marginBottom: '16px' }}>
-            <a style={{ color: 'var(--prime)' }} onClick={upgradeToPrime}>
-              <i style={{ color: 'var(--prime)' }} className="icon-prime" />
-              {$t('Change the look of Streamlabs Desktop with Prime')}
+            <a onClick={upgradeToPrime}>
+              <UltraIcon
+                type={CustomizationService.isDarkTheme ? 'night' : 'day'}
+                style={{
+                  display: 'inline-block',
+                  height: '12px',
+                  width: '12px',
+                  marginRight: '5px',
+                }}
+              />
+              {$t('Change the look of Streamlabs Desktop with Ultra')}
             </a>
           </div>
         )}

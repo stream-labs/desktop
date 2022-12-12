@@ -247,7 +247,8 @@ addStyle(`
     transition: 0.1s linear background-color;
   }
   .slobs-chat-highlight-unpin:hover {
-    background-color: #31C3A2;
+    background-color: #80F5D2;
+    color: #09161D;
   }
   .chat-line__message {
     position: relative;

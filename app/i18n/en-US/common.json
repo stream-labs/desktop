@@ -117,7 +117,7 @@
   "Very High": "Very High",
   "Apps": "Apps",
   "Finish": "Finish",
-  "Get Prime": "Get Prime",
+  "Get Ultra": "Get Ultra",
   "System error message:": "System error message:",
   "List is empty": "List is empty",
   "Not selected": "Not selected",
@@ -139,5 +139,7 @@
   "Click here": "Click here",
   "More Info": "More Info",
   "Revert Changes": "Revert Changes",
-  "Animations": "Animations"
+  "Animations": "Animations",
+  "Multistreaming": "Multistreaming",
+  "Upgrade to Ultra": "Upgrade to Ultra"
 }

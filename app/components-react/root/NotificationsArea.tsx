@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Badge, Tooltip } from 'antd';
+import { injectState, useModule } from 'slap';
+import { Badge, message, Tooltip } from 'antd';
 import moment from 'moment';
 import cx from 'classnames';
-import { useVuex, useRenderInterval } from '../hooks';
 import cloneDeep from 'lodash/cloneDeep';
 import { Services } from '../service-provider';
 import { ENotificationType, INotification, ENotificationSubType } from 'services/notifications';
@@ -10,49 +10,120 @@ import { $t } from 'services/i18n';
 import styles from './NotificationsArea.m.less';
 const notificationAudio = require('../../../media/sound/ding.wav');
 
-interface IUiNotification extends INotification {
-  outdated?: boolean;
+class NotificationsModule {
+  currentNotif: INotification | null = null;
+  notifQueue = cloneDeep(Services.NotificationsService.state.notifications);
+
+  audio = new Audio(notificationAudio);
+
+  readyToPlay = false;
+
+  setReadyToPlay() {
+    if (this.readyToPlay) return;
+
+    this.readyToPlay = true;
+    this.playNext();
+  }
+
+  // Add Notification to queue if one is playing, otherwise play it
+  addNotif(notif: INotification) {
+    if (this.currentNotif || !this.readyToPlay) {
+      this.notifQueue.push(notif);
+    } else {
+      this.playNotif(notif);
+    }
+  }
+
+  playNotif(notif: INotification) {
+    if (!this.settings.enabled) return;
+    this.currentNotif = notif;
+    if (this.settings.playSound) this.audio.play();
+
+    message
+      .info({
+        content: <MessageNode notif={notif} />,
+        duration: notif.lifeTime === -1 ? 0 : notif.lifeTime / 1000,
+        key: `${notif.message}${notif.date}`,
+        onClick: () => this.clickNotif(),
+        className: cx(styles.notification, {
+          [styles.info]: notif.type === 'INFO',
+          [styles.warning]: notif.type === 'WARNING',
+          [styles.success]: notif.type === 'SUCCESS',
+          [styles.hasAction]: notif.action,
+        }),
+      })
+      .then(() => this.playNext());
+  }
+
+  // Play next Notification in the queue, otherwise clear the current Notification
+  playNext() {
+    if (this.currentNotif) {
+      message.destroy();
+    }
+    if (this.notifQueue.length > 0) {
+      this.playNotif(this.notifQueue.shift() as INotification);
+    } else {
+      this.currentNotif = null;
+    }
+  }
+
+  // Remove already ready Notifications captured via subscription from the queue
+  clearQueueOfRead(ids: number[]) {
+    this.notifQueue = this.notifQueue.filter(notif => !ids.includes(notif.id));
+    if (this.currentNotif && ids.includes(this.currentNotif.id)) this.playNext();
+  }
+
+  get unreadWarnings() {
+    return Services.NotificationsService.views.getUnread(ENotificationType.WARNING);
+  }
+
+  get unreadNotifs() {
+    return Services.NotificationsService.views.getUnread();
+  }
+
+  get settings() {
+    return Services.NotificationsService.state.settings;
+  }
+
+  clickNotif() {
+    if (!this.currentNotif) return;
+    if (this.currentNotif.action) {
+      Services.NotificationsService.actions.applyAction(this.currentNotif.id);
+      Services.NotificationsService.actions.markAsRead(this.currentNotif.id);
+    } else {
+      Services.NotificationsService.actions.showNotifications();
+    }
+    this.playNext();
+  }
+}
+
+function useNotifications() {
+  return useModule(NotificationsModule);
 }
 
 export default function NotificationsArea() {
   const { NotificationsService, AnnouncementsService } = Services;
 
-  const [showExtendedNotifications, setShowExtendedNotifications] = useState(true);
-  const [canShowNextNotif, setCanShowNextNotif] = useState(true);
-  const [notificationQueue, setNotificationQueue] = useState(() => {
-    if (NotificationsService.state.notifications) {
-      return cloneDeep(NotificationsService.state.notifications);
-    }
-    return [];
-  });
-  const [notifications, setNotifications] = useState([] as IUiNotification[]);
-
-  const { unreadWarnings, unreadNotifs, settings } = useVuex(() => ({
-    unreadWarnings: NotificationsService.views.getUnread(ENotificationType.WARNING).length,
-    unreadNotifs: NotificationsService.views.getUnread(),
-    settings: NotificationsService.state.settings,
-  }));
+  const {
+    unreadWarnings,
+    unreadNotifs,
+    settings,
+    addNotif,
+    playNext,
+    clearQueueOfRead,
+    setReadyToPlay,
+  } = useNotifications();
 
   const notificationsContainer = useRef<HTMLDivElement>(null);
-
-  const notifyAudio = useRef(new Audio(notificationAudio));
+  const [showExtendedNotifications, setShowExtendedNotifications] = useState(true);
 
   const showNotificationsTooltip = $t('Click to open your Notifications window');
   const showUnreadNotificationsTooltip = $t('Click to read your unread Notifications');
 
   useEffect(() => {
-    if (notificationQueue) {
-      checkQueue();
-    }
+    const notifPushedSub = NotificationsService.notificationPushed.subscribe(addNotif);
+    const notifReadSub = NotificationsService.notificationRead.subscribe(clearQueueOfRead);
 
-    const notifPushedSub = NotificationsService.notificationPushed.subscribe(notif => {
-      onNotificationHandler(notif);
-    });
-    const notifReadSub = NotificationsService.notificationRead.subscribe(notif => {
-      onNotificationsReadHandler(notif);
-    });
-
-    const refreshNotifsInterval = window.setInterval(checkQueue, 5000);
     const resizeInterval = window.setInterval(() => {
       if (!notificationsContainer.current) return;
       setShowExtendedNotifications(notificationsContainer.current?.offsetWidth >= 150);
@@ -61,156 +132,64 @@ export default function NotificationsArea() {
     return () => {
       notifPushedSub.unsubscribe();
       notifReadSub.unsubscribe();
-      clearInterval(refreshNotifsInterval);
       clearInterval(resizeInterval);
     };
   }, []);
 
-  function fromNow(time: number): string {
-    return moment(time).fromNow();
-  }
-
-  function checkQueue() {
-    hideOutdated();
-
-    if (notificationQueue.length > 0) {
-      const notif = notificationQueue[0];
-      setNotificationQueue(notificationQueue.slice(1));
-      showNotification(notif);
-      setCanShowNextNotif(false);
-    } else {
-      setCanShowNextNotif(true);
-    }
-  }
-
-  function onNotificationsReadHandler(ids: number[]) {
-    // remove read notifications from queue
-    setNotificationQueue(
-      notificationQueue.filter(notify => {
-        return ids.includes(notify.id);
-      }),
-    );
-    setNotifications(
-      notifications.map(notif => ({
-        ...notif,
-        outdated: ids.includes(notif.id) ? true : notif.outdated,
-      })),
-    );
-  }
-
-  function showNotification(notif: INotification) {
-    if (!settings.enabled || !notif.playSound) return;
-    notifyAudio.current.play();
-
-    setNotifications(notifications.filter(note => !note.outdated));
-
-    // setup order of appearing elements to have a correct animation
-    requestAnimationFrame(() => {
-      setNotifications(
-        notifications.map((n, i) => ({ ...n, outdated: i === 0 ? true : n.outdated })),
-      );
-
-      requestAnimationFrame(() => {
-        setNotifications([...notifications, { ...notif, outdated: false }]);
-        if (notif.lifeTime !== -1) window.setTimeout(() => hideOutdated(), notif.lifeTime);
-      });
+  useEffect(() => {
+    message.config({
+      getContainer: () => notificationsContainer.current as HTMLElement,
+      maxCount: showExtendedNotifications ? 1 : 0,
     });
-  }
-
-  function onNotificationHandler(notif: INotification) {
-    if (
-      [
-        ENotificationSubType.DROPPED,
-        ENotificationSubType.LAGGED,
-        ENotificationSubType.SKIPPED,
-      ].includes(notif.subType)
-    ) {
-      return;
-    }
-    setNotificationQueue([...notificationQueue, notif]);
-    if (canShowNextNotif) checkQueue();
-  }
+    setReadyToPlay();
+  }, [showExtendedNotifications]);
 
   function showNotifications() {
     NotificationsService.actions.showNotifications();
-  }
-
-  function showNews() {
-    if (
-      unreadNotifs.every(notif => notif.subType === ENotificationSubType.NEWS) ||
-      unreadNotifs.length === 0
-    ) {
-      AnnouncementsService.actions.openNewsWindow();
-    } else {
-      showNotifications();
-    }
-  }
-
-  function onNotificationClickHandler(id: number) {
-    const notif = notifications.find(notif => notif.id === id);
-    if (!notif || notif.outdated) return;
-    NotificationsService.applyAction(id);
-    NotificationsService.markAsRead(id);
-    notif.outdated = true;
-  }
-
-  function hideOutdated() {
-    notifications.forEach(uiNotif => {
-      const notif = NotificationsService.views.getNotification(uiNotif.id);
-      if (!notif) return;
-      const now = Date.now();
-      if (!notif.unread || (notif.lifeTime !== -1 && now - notif.date > notif.lifeTime)) {
-        uiNotif.outdated = true;
-      }
-    });
   }
 
   if (!settings.enabled) return <></>;
 
   return (
     <div className={cx(styles.notificationsArea, 'flex--grow')}>
-      {unreadWarnings > 0 && (
+      {unreadWarnings.length > 0 && (
         <Tooltip placement="right" title={showUnreadNotificationsTooltip}>
           <div
             className={cx(styles.notificationsCounter, styles.notificationsCounterWarning)}
             onClick={showNotifications}
           >
-            <Badge dot={unreadWarnings > 0} color="red">
+            <Badge dot={unreadWarnings.length > 0} color="red">
               <i className="fa fa-exclamation-triangle" />
-              {unreadWarnings}
+              {unreadWarnings.length}
             </Badge>
           </div>
         </Tooltip>
       )}
-      {!unreadWarnings && (
+      {unreadWarnings.length < 1 && (
         <Tooltip placement="right" title={showNotificationsTooltip}>
-          <div className={styles.notificationsCounter} onClick={showNews}>
+          <div className={styles.notificationsCounter} onClick={showNotifications}>
             <Badge dot={unreadNotifs.length > 0}>
               <i className="icon-notifications" />
             </Badge>
           </div>
         </Tooltip>
       )}
-      <div className={cx(styles.notificationsContainer, 'flex--grow')} ref={notificationsContainer}>
-        {notifications.map(
-          notif =>
-            showExtendedNotifications && (
-              <div
-                key={`${notif.message}${notif.date}`}
-                className={cx(styles.notification, {
-                  [styles.info]: notif.type === 'INFO',
-                  [styles.warning]: notif.type === 'WARNING',
-                  [styles.success]: notif.type === 'SUCCESS',
-                  [styles.hasAction]: notif.action && !notif.outdated,
-                  [styles.outdated]: notif.outdated,
-                })}
-                onClick={() => onNotificationClickHandler(notif.id)}
-              >
-                {notif.message} {notif.showTime && <span> {fromNow(notif.date)}</span>}
-              </div>
-            ),
-        )}
-      </div>
+      <div
+        className={cx(styles.notificationsContainer, 'flex--grow')}
+        ref={notificationsContainer}
+      />
     </div>
+  );
+}
+
+function MessageNode(p: { notif: INotification }) {
+  function fromNow(time: number): string {
+    return moment(time).fromNow();
+  }
+
+  return (
+    <>
+      {p.notif.message} {p.notif.showTime && <span> {fromNow(p.notif.date)}</span>}
+    </>
   );
 }

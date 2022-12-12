@@ -11,13 +11,21 @@
 .notifications__container {
   position: relative;
   height: 30px;
+
+  :global(.ant-message) {
+    position: relative;
+    height: 30px;
+    top: 0;
+  }
 }
 
-.notification {
+:global(.ant-message-notice).notification {
   .padding-left();
   .padding-right();
   .radius();
 
+  padding-top: 0;
+  padding-bottom: 0;
   height: 30px;
   max-width: 100%;
   line-height: 30px;
@@ -25,7 +33,12 @@
   overflow: hidden;
   text-overflow: ellipsis;
   position: absolute;
-  animation: notify-appears 0.3s;
+
+  :global(.ant-message-notice-content) {
+    padding: 0;
+    box-shadow: none;
+    background: transparent;
+  }
 
   &.info {
     background-color: var(--icon-semi);
@@ -38,16 +51,17 @@
   }
 
   &.success {
-    background-color: var(--teal-semi);
-    color: var(--teal);
+    background-color: var(--new-badge);
+    color: var(--new-badge-text);
   }
 
   &.has-action {
     cursor: pointer;
   }
 
-  &.outdated {
-    animation: notify-disappears 1s forwards;
+
+  span[role=img] {
+    display: none;
   }
 }
 
@@ -73,28 +87,5 @@
 
   .fa {
     color: var(--warning);
-  }
-}
-
-@keyframes notify-appears {
-  from {
-    opacity: 0;
-    top: 50px;
-  }
-
-  to {
-    opacity: 1;
-    top: 0;
-  }
-}
-
-@keyframes notify-disappears {
-  from {
-    opacity: 1;
-  }
-
-  to {
-    opacity: 0;
-    display: none;
   }
 }

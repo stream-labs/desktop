@@ -10,17 +10,17 @@
   "If none of these worked, lower your bitrate": "Si aucune de ces solutions ne fonctionne, réduisez votre vitesse de transmission",
   "Streamlabs has detected skipped frames": "Streamlabs a détecté des images ignorées",
   "Some frames have not been encoded.": "Certaines images n'ont pas été encodées.",
-  "This problem is usually due to high CPU usage or unsuitable encoder settings.": "Ce problème est généralement dû à une utilisation élevée de l'UC ou à des paramètres d'encodeur inappropriés.",
+  "This problem is usually due to high CPU usage or unsuitable encoder settings.": "Ce problème est généralement dû à une utilisation élevée du CPU ou à des paramètres d'encodeur inappropriés.",
   "Lower your encoder settings (preset)": "Réduisez les paramètres de votre encodeur (préconfigurés)",
-  "Ensure that you don't have any other applications open that are heavy on your CPU": "Assurez-vous que vous n'avez aucune autre application ouverte qui utilise beaucoup d'UC",
+  "Ensure that you don't have any other applications open that are heavy on your CPU": "Assurez-vous que vous n'avez aucune autre application ouverte qui utilise beaucoup de CPU",
   "Enable performance mode in the Editor context menu": "Activez le mode performance dans le menu contextuel de l'éditeur",
   "Streamlabs has detected lagged frames": "Streamlabs a détecté des images décalées",
   "Some frames took too long to get rendered.": "Certaines images ont pris trop de temps pour être rendues.",
-  "Usually the problem is related to your game using up too many GPU resources.": "Généralement, le problème est dû à une utilisation excessive d'UC par votre jeu.",
+  "Usually the problem is related to your game using up too many GPU resources.": "Généralement, le problème est dû à une utilisation excessive du CPU par votre jeu.",
   "When this happens, Streamlabs does not have any resources left over to render frames.": "Lorsque cela se produit, Streamlabs n'a pas les ressources pour restituer les images.",
   "Cap your in-game framerate": "Fixer une limite à la fréquence d'images dans le jeu",
   "Enable VSync in your game": "Activer VSync dans votre jeu",
   "Disable FreeSync or GSync in your Driver": "Désactiver FreeSync ou GSync dans votre pilote",
   "Lower graphics settings until you stop lagging frames": "Réduisez les paramètres graphiques jusqu'à ce qu'il n'y ait plus d'images retardées",
-  "Disable hardware decoding under any media sources(This will slightly increase cpu over gpu)": "Désactiver le décodage matériel sur toutes les sources multimédia (cela augmentera légèrement l'UC par rapport au GPU)"
+  "Disable hardware decoding under any media sources(This will slightly increase cpu over gpu)": "Désactiver le décodage matériel sur toutes les sources multimédia (cela augmentera légèrement le CPU par rapport au GPU)"
 }

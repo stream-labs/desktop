@@ -3,7 +3,7 @@ import { TExecutionContext } from './spectron';
 import { WidgetsService, WidgetType } from '../../app/services/widgets';
 import { SourcesService } from '../../app/services/sources';
 import { getApiClient } from './api-client';
-import {focusChild} from "./modules/core";
+import { focusChild } from './modules/core';
 
 export async function waitForWidgetSettingsSync(t: TExecutionContext) {
   await sleep(2000);
@@ -31,6 +31,7 @@ export enum EWidgetType {
   SponsorBanner = 13,
   MediaShare = 14,
   SubGoal = 15,
+  CustomWidget = 16,
 }
 
 /**

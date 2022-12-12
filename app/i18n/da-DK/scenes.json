@@ -6,7 +6,6 @@
   "There needs to be at least one scene.": "Der skal være mindst én scene.",
   "Projector:": "Projektor:",
   "Projector: Output": "Projektor: Udgang",
-  "Manage All": "Administrer alle",
   "This is where your Scene Collections live. Clicking the title will dropdown a menu where you can view & manage.": "Her finder du dine scener. Ved at klikke på titlen vises der en menu hvor du kan se og administrere scenerne.",
   "Are you sure you want to remove %{collectionName}?": "Er du sikker på at du vil fjerne %{collectionName}?",
   "Create Scene Projector": "Opret sceneprojektor",
@@ -38,7 +37,17 @@
   "Rename Folder": "Omdøb mappe",
   "Name Folder": "Navngiv mappe",
   "Switch Scenes": "Skift scener",
-  "Failed to load scene collection.  A new one will be created instead.": "Scenesamlingen kunne ikke indlæses. I stedet oprettes en ny.",
+  "Failed to load scene collection.  A new one will be created instead.": "Scenesamlingen kunne ikke indlæses.  I stedet oprettes en ny.",
   "New Scene": "Ny scene",
-  "Projector": "Projektor"
+  "Projector": "Projektor",
+  "Your Scene Collections:": "Samlinger af dine scener:",
+  "Add New Scene Collection:": "Tilføj ny samling af scener:",
+  "Search Scene Collections": "Søg i samlinger af scener",
+  "Start fresh and build from scratch": "Start på en frisk og begynd fra bunden",
+  "Load existing scenes from OBS": "Indlæs eksisterende scener fra OBS",
+  "Template": "Skabelon",
+  "Choose a template from our theme library": "Vælg en skabelon fra vores temabibliotek",
+  "Enter a Scene Collection Name": "Indtast et navn til en scenesamling",
+  "Copy of %{collectionName}": "Kopi af %{collectionName}",
+  "Your Scene Collections": "Samlinger af dine scener"
 }

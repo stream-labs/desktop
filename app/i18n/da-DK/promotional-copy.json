@@ -1,6 +1,6 @@
 {
   "Overlay, Widget, and Site Themes": "Overlay, widget og temaer til websted",
-  "Fully customize your stream and your website to represent your brand; or pick from thousands of our pre-made themes. Either way, your stream will look amazing and it's all included with Prime.": "Tilpas din stream og dit websted fuldt ud for at repræsentere dit brand; eller vælg blandt tusinder af vores foruddannede temaer. Uanset hvad, vil din stream vil se fantastisk ud, og det hele er inkluderet i Prime.",
+  "Fully customize your stream and your website to represent your brand; or pick from thousands of our pre-made themes. Either way, your stream will look amazing and it's all included with Prime.": "Tilpas din stream og dit websted fuldt ud for at repræsentere dit brand, eller vælg blandt tusindvis af vores temaer. Uanset hvad, vil din stream vil se fantastisk ud, og det hele er inkluderet i Prime.",
   "View Themes": "Se temaer",
   "Every App is FREE": "Hver app er GRATIS",
   "We've curated a list of diverse and feature rich applications to give you more control, automation, better analytics, and new ways to interact with your audience.": "Vi har samlet en liste med forskellige programmer, der indeholder mange funktioner, så du får mere kontrol, automatisering, bedre analyse og nye måder at interagere med dit publikum.",
@@ -11,7 +11,7 @@
   "Classic Theme": "Klassisk tema",
   "Prime Theme": "Prime-tema",
   "Your access to Prime themes and other benefits will expire soon": "Din adgang til Prime-temaer og andre fordele udløber snart",
-  "Thank you for being a valued member of Streamlabs. We just wanted to check in and see if you’d like to give Prime another shot.": "Tak fordi du er medlem af Streamlabs. Vi ville bare høre om du har lyst til at prøve Prime igen.",
+  "Thank you for being a valued member of Streamlabs. We just wanted to check in and see if you’d like to give Prime another shot.": "Tak, fordi du er et vigtigt medlem hos Streamlabs. Vi ville bare høre, om du har lyst til at prøve Prime igen.",
   "Resubscribe to Prime": "Abonner på Prime igen",
   "No Thanks": "Nej tak",
   "Choose your Streamlabs plan": "Vælg et Streamlabs-abonnement",
@@ -31,7 +31,7 @@
   "Choose Prime": "Vælg Prime",
   "Your Benefits Are Expiring Soon": "Dine fordele udløber snart",
   "Your will lose access to the following Prime benefits if you don’t resubscribe:": "Du mister adgang til følgende Prime-fordele hvis du ikke forlænger dit abonnement:",
-  "Thank you for being a valued member of Streamlabs. We just wanted to check in to see if you’ve had a chance to explore all Prime has to offer.": "Tak fordi du er medlem af Streamlabs. Vi ville bare høre om du har haft tid til at se på Prime-fordelene.",
+  "Thank you for being a valued member of Streamlabs. We just wanted to check in to see if you’ve had a chance to explore all Prime has to offer.": "Tak, fordi du er et vigtigt medlem hos Streamlabs. Vi ville bare høre om du har haft tid til at se på Prime-fordelene.",
   "Continue Prime": "Fortsæt med Prime",
   "Stream Overlays": "Stream-overlays",
   "Multistream": "Multistream",
@@ -40,5 +40,6 @@
   "All Apps Included Free": "Alle apps inkluderet gratis",
   "Thumbnail & Panel Maker": "Editor til miniaturebilleder og paneler",
   "Prime Mobile Streaming": "Prime-mobilstreaming",
-  "Your credit card expires soon. Click here to retain your Prime benefits": "Dit kreditkort udløber snart. Klik her for at bevare dine Prime-fordele"
+  "Your credit card expires soon. Click here to retain your Prime benefits": "Dit kreditkort udløber snart. Klik her, for at bevare dine Prime-fordele",
+  "News": "Nyheder"
 }

@@ -66,6 +66,8 @@ interface ITwitchServiceState extends IPlatformState {
   settings: ITwitchStartStreamOptions;
 }
 
+const UNLISTED_GAME_CATEGORY = { id: '0', name: 'Unlisted', box_art_url: '' };
+
 @InheritMutations()
 export class TwitchService
   extends BasePlatformService<ITwitchServiceState>
@@ -270,10 +272,12 @@ export class TwitchService
       this.getHasUpdateTagsPermission(),
     ]);
 
-    let tags: TTwitchTag[] = [];
-    if (hasUpdateTagsPermission) {
+    let tags: TTwitchTag[] = this.state.settings.tags ?? [];
+
+    if (hasUpdateTagsPermission && this.state.availableTags.length === 0) {
       [tags] = await Promise.all([this.getStreamTags(), this.getAllTags()]);
     }
+
     this.SET_PREPOPULATED(true);
     this.SET_STREAM_SETTINGS({ tags, title: channelInfo.title, game: channelInfo.game });
   }
@@ -310,8 +314,10 @@ export class TwitchService
   }
 
   async putChannelInfo({ title, game, tags = [] }: ITwitchStartStreamOptions): Promise<void> {
-    let gameId;
-    if (game) {
+    let gameId = '';
+    const isUnlisted = game === UNLISTED_GAME_CATEGORY.name;
+    if (isUnlisted) gameId = '0';
+    if (game && !isUnlisted) {
       gameId = await this.requestTwitch<{ data: { id: string }[] }>(
         `${this.apiBase}/helix/games?name=${encodeURIComponent(game)}`,
       ).then(json => json.data[0].id);
@@ -331,11 +337,21 @@ export class TwitchService
     const gamesResponse = await platformAuthorizedRequest<{
       data: { id: string; name: string; box_art_url: string }[];
     }>('twitch', `${this.apiBase}/helix/search/categories?query=${searchString}`);
-    if (!gamesResponse.data) return [];
-    return gamesResponse.data.map(g => ({ id: g.id, name: g.name, image: g.box_art_url }));
+    const data = gamesResponse.data || [];
+
+    const shouldIncludeUnlisted =
+      searchString.toLowerCase() === 'unlisted'.substring(0, searchString.length);
+
+    if (shouldIncludeUnlisted) {
+      data.push(UNLISTED_GAME_CATEGORY);
+    }
+
+    return data.map(g => ({ id: g.id, name: g.name, image: g.box_art_url }));
   }
 
   async fetchGame(name: string): Promise<IGame> {
+    if (name === UNLISTED_GAME_CATEGORY.name) return UNLISTED_GAME_CATEGORY;
+
     const gamesResponse = await platformAuthorizedRequest<{
       data: { id: string; name: string; box_art_url: string }[];
     }>('twitch', `${this.apiBase}/helix/games?name=${encodeURIComponent(name)}`);
@@ -386,7 +402,7 @@ export class TwitchService
   }
 
   hasScope(scope: TTwitchOAuthScope): Promise<boolean> {
-    // eslint-disable-next-line prettier/prettier
+    // prettier-ignore
     return platformAuthorizedRequest('twitch', 'https://id.twitch.tv/oauth2/validate').then(
       (response: ITwitchOAuthValidateResponse) => response.scopes.includes(scope),
     );

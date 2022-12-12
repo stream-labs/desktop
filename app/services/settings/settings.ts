@@ -25,6 +25,8 @@ import { byOS, getOS, OS } from 'util/operating-systems';
 import { UsageStatisticsService } from 'services/usage-statistics';
 import { SceneCollectionsService } from 'services/scene-collections';
 import * as remote from '@electron/remote';
+import fs from 'fs';
+import path from 'path';
 
 export interface ISettingsValues {
   General: {
@@ -57,6 +59,7 @@ export interface ISettingsValues {
     TrackIndex?: string;
     VodTrackEnabled?: boolean;
     VodTrackIndex?: string;
+    keyint_sec?: number;
   };
   Video: {
     Base: string;
@@ -187,6 +190,15 @@ export class SettingsService extends StatefulService<ISettingsServiceState> {
     this.loadSettingsIntoStore();
     this.ensureValidEncoder();
     this.sceneCollectionsService.collectionSwitched.subscribe(() => this.refreshAudioSettings());
+
+    // TODO: Remove in a week
+    try {
+      if (fs.existsSync(path.join(this.appService.appDataDirectory, 'HADisable'))) {
+        this.usageStatisticsService.recordFeatureUsage('HardwareAccelDisabled');
+      }
+    } catch (e: unknown) {
+      console.error('Error fetching hardware acceleration state', e);
+    }
   }
 
   private fetchSettingsFromObs(categoryName: string): ISettingsCategory {
@@ -289,6 +301,8 @@ export class SettingsService extends StatefulService<ISettingsServiceState> {
 
   getCategories(): string[] {
     let categories: string[] = obs.NodeObs.OBS_settings_getListCategories();
+    // insert 'Multistreaming' after 'General'
+    categories.splice(1, 0, 'Multistreaming');
     categories = categories.concat([
       'Scene Collections',
       'Notifications',
@@ -441,6 +455,7 @@ export class SettingsService extends StatefulService<ISettingsServiceState> {
 
   setSettings(categoryName: string, settingsData: ISettingsSubCategory[]) {
     if (categoryName === 'Audio') this.setAudioSettings([settingsData.pop()]);
+    if (categoryName === 'Video') return;
 
     const dataToSave = [];
 

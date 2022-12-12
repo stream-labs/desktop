@@ -64,6 +64,7 @@ const fallbackDictionary = {
   ...require('./en-US/trovo.json'),
   ...require('./en-US/widget-game.json'),
   ...require('./en-US/loader.json'),
+  ...require('./en-US/guest-cam.json'),
 };
 
 export default fallbackDictionary;

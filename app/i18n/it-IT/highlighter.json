@@ -27,7 +27,7 @@
   "Replay Duration": "Durata riproduzione",
   "Set a hotkey to capture replays": "Imposta un tasto di scelta rapida per acquisire le riproduzioni",
   "Capture a replay": "Acquisisci una riproduzione",
-  "highlighterHotkeyInstructions": "Avvia lo streaming e premi &lt;b&gt;%{bindingStr}&lt;/b&gt; per acquisire una riproduzione. Controlla qui dopo il tuo stream.",
+  "highlighterHotkeyInstructions": "Avvia lo streaming e premi <b>%{bindingStr}</b> per acquisire una riproduzione. Controlla qui dopo il tuo stream.",
   "Start streaming and capture a replay. Check back here after your stream.": "Avvia lo streaming e acquisisci una riproduzione. Controlla qui dopo il tuo stream.",
   "Or, import a clip from your computer": "Oppure importa una clip dal tuo computer",
   "Disable clip": "Disattiva clip",
