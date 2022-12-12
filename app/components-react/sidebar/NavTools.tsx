@@ -51,9 +51,9 @@ export default function SideNav() {
   const [dashboardOpening, setDashboardOpening] = useState(false);
   const [showModal, setShowModal] = useState(false);
 
-  function openSettingsWindow() {
-    UsageStatisticsService.actions.recordClick('SideNav2', 'settings');
-    SettingsService.actions.showSettings();
+  function openSettingsWindow(type?: string, category?: string) {
+    UsageStatisticsService.actions.recordClick('SideNav2', type ?? 'settings');
+    SettingsService.actions.showSettings(category);
   }
 
   function openDevTools() {
@@ -155,15 +155,11 @@ export default function SideNav() {
                   expandMenuItem(ENavName.BottomNav, menuItem.key as EMenuItemKey);
                 }}
               >
-                {menuItem?.subMenuItems.map((subMenuItem: IMenuItem) => (
-                  <MenuItem
-                    key={subMenuItem.key}
-                    title={menuTitles(subMenuItem.key)}
-                    onClick={() => throttledOpenDashboard(subMenuItem?.type)}
-                  >
-                    {menuTitles(subMenuItem.key)}
-                  </MenuItem>
-                ))}
+                <DashboardSubMenu
+                  subMenuItems={menuItem?.subMenuItems}
+                  throttledOpenDashboard={throttledOpenDashboard}
+                  openSettingsWindow={openSettingsWindow}
+                />
               </SubMenu>
             );
           } else if (menuItem.key === EMenuItemKey.GetHelp) {
@@ -183,7 +179,11 @@ export default function SideNav() {
             );
           } else if (menuItem.key === EMenuItemKey.Settings) {
             return (
-              <NavToolsItem key={menuItem.key} menuItem={menuItem} onClick={openSettingsWindow} />
+              <NavToolsItem
+                key={menuItem.key}
+                menuItem={menuItem}
+                onClick={() => openSettingsWindow()}
+              />
             );
           } else if (menuItem.key === EMenuItemKey.Login) {
             return (
@@ -225,6 +225,35 @@ function NavToolsItem(p: {
     >
       {title}
     </MenuItem>
+  );
+}
+
+function DashboardSubMenu(p: {
+  subMenuItems: IMenuItem[];
+  throttledOpenDashboard: (type?: string) => void;
+  openSettingsWindow: (type: string, category: string) => void;
+}) {
+  const { subMenuItems, throttledOpenDashboard, openSettingsWindow } = p;
+
+  function handleNavigation(type?: string) {
+    if (type === 'multistream') {
+      openSettingsWindow(type, 'Multistreaming');
+    } else {
+      throttledOpenDashboard(type);
+    }
+  }
+  return (
+    <>
+      {subMenuItems.map((subMenuItem: IMenuItem) => (
+        <MenuItem
+          key={subMenuItem.key}
+          title={menuTitles(subMenuItem.key)}
+          onClick={() => handleNavigation(subMenuItem?.type)}
+        >
+          {menuTitles(subMenuItem.key)}
+        </MenuItem>
+      ))}
+    </>
   );
 }
 
