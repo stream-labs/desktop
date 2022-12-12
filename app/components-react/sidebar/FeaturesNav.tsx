@@ -145,7 +145,7 @@ export default function FeaturesNav() {
     >
       {menuItems.map((menuItem: IParentMenuItem) => {
         if (
-          !menuItem?.isActive ||
+          (menuItem.key !== EMenuItemKey.Editor && !menuItem?.isActive) ||
           (menuItem.key === EMenuItemKey.ThemeAudit && !themeAuditEnabled)
         ) {
           // skip inactive menu items

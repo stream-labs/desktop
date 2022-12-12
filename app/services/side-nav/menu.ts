@@ -182,14 +182,14 @@ export class SideNavService extends PersistentStatefulService<ISideNavServiceSta
     this.EXPAND_MENU_ITEM(navName, key);
   }
 
-  toggleSidebarSubmenu() {
+  toggleSidebarSubmenu(status?: boolean) {
     // show/hide submenus shown at the parent level
-    this.TOGGLE_SIDEBAR_SUBMENU();
+    this.TOGGLE_SIDEBAR_SUBMENU(status);
   }
 
-  toggleMenuItem(navName: ENavName, menuItemKey: EMenuItemKey) {
+  toggleMenuItem(navName: ENavName, menuItemKey: EMenuItemKey, status?: boolean) {
     // show/hide menu items
-    this.TOGGLE_MENU_ITEM(navName, menuItemKey);
+    this.TOGGLE_MENU_ITEM(navName, menuItemKey, status);
   }
 
   toggleApp(appId: string) {
@@ -285,15 +285,28 @@ export class SideNavService extends PersistentStatefulService<ISideNavServiceSta
   }
 
   @mutation()
-  private TOGGLE_SIDEBAR_SUBMENU() {
+  private TOGGLE_SIDEBAR_SUBMENU(status?: boolean) {
     // currently only the custom editor needs to
     // have the option to show/hide in the sidebar
-    this.state.showCustomEditor = !this.state.showCustomEditor;
+    if (status) {
+      this.state.showCustomEditor = status;
+    } else {
+      this.state.showCustomEditor = !this.state.showCustomEditor;
+    }
+
+    if (!this.state.showCustomEditor) {
+      this.state.currentMenuItem = EMenuItemKey.Editor;
+    }
   }
 
   @mutation()
-  private TOGGLE_MENU_ITEM(navName: ENavName, menuItemKey: EMenuItemKey) {
+  private TOGGLE_MENU_ITEM(navName: ENavName, menuItemKey: EMenuItemKey, status?: boolean) {
     // toggle boolean value
+    if (status) {
+      this.state[navName].menuItems.find(
+        (menuItem: IMenuItem) => menuItem.key === menuItemKey,
+      ).isActive = status;
+    }
     this.state[navName].menuItems.find(
       (menuItem: IMenuItem) => menuItem.key === menuItemKey,
     ).isActive = !this.state[navName].menuItems.find(
