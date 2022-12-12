@@ -60,12 +60,12 @@ export default function EditorTabs(p: IEditorTabs) {
           className={cx(
             (currentMenuItem === tab.key || currentMenuItem === `sub-${tab.key}`) && styles.active,
           )}
-          title={tab.title}
+          title={tab?.title ?? 'Editor'}
           icon={<i className={tab.icon} />}
           onClick={() => navigateToStudioTab(tab.target, tab.trackingTarget, `sub-${tab.key}`)}
           type="submenu"
         >
-          {tab.title}
+          {tab?.title ?? 'Editor'}
         </MenuItem>
       ))}
     </>
