@@ -79,7 +79,6 @@ export class StreamingService
   @Inject() private notificationsService: NotificationsService;
   @Inject() private userService: UserService;
   @Inject() private videoEncodingOptimizationService: VideoEncodingOptimizationService;
-  @Inject() private customizationService: CustomizationService;
   @Inject() private restreamService: RestreamService;
   @Inject() private hostsService: HostsService;
   @Inject() private twitterService: TwitterService;
@@ -961,6 +960,7 @@ export class StreamingService
         [EOBSOutputSignal.Starting]: ERecordingState.Starting,
         [EOBSOutputSignal.Stop]: ERecordingState.Offline,
         [EOBSOutputSignal.Stopping]: ERecordingState.Stopping,
+        [EOBSOutputSignal.Wrote]: ERecordingState.Wrote,
       } as Dictionary<ERecordingState>)[info.signal];
 
       // We received a signal we didn't recognize
@@ -972,6 +972,14 @@ export class StreamingService
           status: nextState,
           code: info.code,
         });
+      }
+
+      if (info.signal === EOBSOutputSignal.Wrote) {
+        const filename = obs.NodeObs.OBS_service_getLastRecording();
+        this.recordingModeService.addRecordingEntry(filename);
+        // Wrote signals come after Offline, so we return early here
+        // to not falsely set our state out of Offline
+        return;
       }
 
       this.SET_RECORDING_STATUS(nextState, time);
