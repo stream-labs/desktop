@@ -94,6 +94,14 @@ export default function BrowserView(p: BrowserViewProps) {
     }
   }
 
+  useEffect(() => {
+    if (!loading && browserView.current && hideStyleBlockers) {
+      remote.getCurrentWindow().removeBrowserView(browserView.current);
+    } else if (!loading && browserView.current && !hideStyleBlockers) {
+      remote.getCurrentWindow().addBrowserView(browserView.current);
+    }
+  }, [hideStyleBlockers]);
+
   function checkResize() {
     if (loading) return;
     if (!sizeContainer.current) return;

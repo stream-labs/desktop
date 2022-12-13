@@ -10,7 +10,6 @@ import { GuestApiHandler } from 'util/guest-api-handler';
 import { IDownloadProgress } from 'util/requests';
 import { Services } from 'components-react/service-provider';
 import { useVuex } from 'components-react/hooks';
-import Spinner from 'components-react/shared/Spinner';
 
 export default function AlertboxLibrary(p: { params: { id?: string } }) {
   const {
@@ -22,12 +21,10 @@ export default function AlertboxLibrary(p: { params: { id?: string } }) {
     WidgetsService,
     ScenesService,
     MagicLinkService,
-    WindowsService,
   } = Services;
 
-  const { libraryUrl, hideStyleBlockers } = useVuex(() => ({
+  const { libraryUrl } = useVuex(() => ({
     libraryUrl: UserService.views.alertboxLibraryUrl(p.params?.id),
-    hideStyleBlockers: WindowsService.state.main.hideStyleBlockers,
   }));
 
   function onBrowserViewReady(view: Electron.BrowserView) {
@@ -79,7 +76,7 @@ export default function AlertboxLibrary(p: { params: { id?: string } }) {
     });
   }
 
-  return !hideStyleBlockers ? (
+  return (
     <BrowserView
       style={{ position: 'absolute', top: '0', left: '0', right: '0', bottom: '0' }}
       src={libraryUrl}
@@ -87,7 +84,5 @@ export default function AlertboxLibrary(p: { params: { id?: string } }) {
       setLocale
       onReady={onBrowserViewReady}
     />
-  ) : (
-    <Spinner />
   );
 }

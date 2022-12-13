@@ -9,8 +9,6 @@ import { GuestApiHandler } from 'util/guest-api-handler';
 import { IDownloadProgress } from 'util/requests';
 import * as remote from '@electron/remote';
 import { Services } from 'components-react/service-provider';
-import { useVuex } from 'components-react/hooks';
-import Spinner from 'components-react/shared/Spinner';
 
 export default function BrowseOverlays(p: {
   params: { type?: 'overlay' | 'widget-themes' | 'site-themes'; id?: string };
@@ -26,13 +24,7 @@ export default function BrowseOverlays(p: {
     NotificationsService,
     JsonrpcService,
     RestreamService,
-    WindowsService,
   } = Services;
-
-  const { hideStyleBlockers } = useVuex(() => ({
-    hideStyleBlockers: WindowsService.state.main.hideStyleBlockers,
-  }));
-
   const [downloading, setDownloading] = useState(false);
 
   function onBrowserViewReady(view: Electron.BrowserView) {
@@ -131,15 +123,14 @@ export default function BrowseOverlays(p: {
       ),
     });
   }
-  return !hideStyleBlockers ? (
+  return (
     <BrowserView
       onReady={onBrowserViewReady}
       src={UserService.views.overlaysUrl(p.params?.type, p.params?.id)}
-      style={{ width: '100%' }}
+      style={{ position: 'absolute', top: 0, right: 0, bottom: 0, left: 0 }}
+      // style={{ width: '100%' }}
       enableGuestApi
       setLocale
     />
-  ) : (
-    <Spinner />
   );
 }
