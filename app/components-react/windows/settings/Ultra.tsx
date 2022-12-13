@@ -1,4 +1,5 @@
 import React from 'react';
+import * as remote from '@electron/remote';
 import cx from 'classnames';
 import { UltraComparison } from 'components-react/shared/UltraComparison';
 import styles from './Ultra.m.less';
@@ -91,8 +92,14 @@ export function Ultra() {
 }
 
 function ProductCard(p: IProductInfo) {
+  function linkToProduct() {
+    if (!p.link) return;
+
+    remote.shell.openExternal(p.link);
+  }
+
   return (
-    <div className={cx(styles.productCard, { [styles.hasLink]: !!p.link })}>
+    <div className={cx(styles.productCard, { [styles.hasLink]: !!p.link })} onClick={linkToProduct}>
       <img src={$i(`images/products/${p.image}`)} />
       <span className={styles.title}>{p.title}</span>
       <span>{p.description}</span>
