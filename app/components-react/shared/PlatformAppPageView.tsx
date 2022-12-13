@@ -102,7 +102,6 @@ export default function PlatformAppPageView(p: {
         </div>
       )}
       <div
-        className="platform-app"
         style={{
           display: !hideStyleBlockers ? 'flex' : 'none',
           flexDirection: 'column',
