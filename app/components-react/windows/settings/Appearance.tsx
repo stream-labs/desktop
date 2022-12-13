@@ -39,8 +39,7 @@ export function AppearanceSettings() {
   }
 
   async function upgradeToPrime() {
-    const link = await MagicLinkService.getDashboardMagicLink('prime-marketing', 'slobs-ui-themes');
-    remote.shell.openExternal(link);
+    MagicLinkService.linkToPrime('slobs-ui-themes');
   }
 
   const shouldShowPrime = UserService.views.isLoggedIn && !UserService.views.isPrime;

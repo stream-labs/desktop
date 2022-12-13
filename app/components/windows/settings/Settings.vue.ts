@@ -103,11 +103,7 @@ export default class Settings extends Vue {
   }
 
   set categoryName(val: string) {
-    if (val === 'Ultra') {
-      this.magicLinkService.actions.linkToPrime('slobs-settings');
-    } else {
-      this.internalCategoryName = val;
-    }
+    this.internalCategoryName = val;
   }
 
   get isPrime() {
@@ -138,6 +134,7 @@ export default class Settings extends Vue {
       // 'VirtualWebcam',
       'Game Overlay',
       'Get Support',
+      'Ultra',
     ];
     if (Utils.isDevMode()) pages.push('Experimental');
     return pages;
