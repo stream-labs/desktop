@@ -5,6 +5,7 @@ import MenuItem from 'components-react/shared/MenuItem';
 import { useVuex } from 'components-react/hooks';
 import cx from 'classnames';
 import { EMenuItemKey, ENavName } from 'services/side-nav';
+import { $t } from 'services/i18n';
 
 interface IEditorTabs {
   type?: 'root' | 'submenu';
@@ -14,6 +15,7 @@ export default function EditorTabs(p: IEditorTabs) {
   const { NavigationService, SideNavService, LayoutService } = Services;
   const { type = 'root' } = p;
 
+  const defaultTitle = $t('Editor');
   const {
     currentMenuItem,
     setCurrentMenuItem,
@@ -21,7 +23,7 @@ export default function EditorTabs(p: IEditorTabs) {
     isOpen,
     showCustomEditor,
     toggleSidebarSubmenu,
-    toggleMenuItem,
+    setMenuItemStatus,
     editorToggled,
   } = useVuex(() => ({
     currentMenuItem:
@@ -34,7 +36,7 @@ export default function EditorTabs(p: IEditorTabs) {
     isOpen: SideNavService.views.isOpen,
     showCustomEditor: SideNavService.views.showCustomEditor,
     toggleSidebarSubmenu: SideNavService.actions.toggleSidebarSubmenu,
-    toggleMenuItem: SideNavService.actions.toggleMenuItem,
+    setMenuItemStatus: SideNavService.actions.setMenuItemStatus,
     editorToggled: SideNavService.views.getMenuItemData(ENavName.TopNav, EMenuItemKey.Editor)
       ?.isActive,
   }));
@@ -50,7 +52,7 @@ export default function EditorTabs(p: IEditorTabs) {
       if (tabId !== 'default' && !showCustomEditor) {
         toggleSidebarSubmenu(true);
       } else if (tabId === 'default' && !editorToggled) {
-        toggleMenuItem(ENavName.TopNav, EMenuItemKey.Editor, true);
+        setMenuItemStatus(ENavName.TopNav, EMenuItemKey.Editor, true);
       }
     }
   }
@@ -72,7 +74,7 @@ export default function EditorTabs(p: IEditorTabs) {
               currentMenuItem === `sub-${tab.key}`) &&
               styles.active,
           )}
-          title={tab.title}
+          title={tab.title ?? defaultTitle}
           icon={<i className={tab.icon} />}
           onClick={() => navigateToStudioTab(tab.target, tab.trackingTarget, tab.key)}
         >
@@ -88,12 +90,12 @@ export default function EditorTabs(p: IEditorTabs) {
           className={cx(
             (currentMenuItem === tab.key || currentMenuItem === `sub-${tab.key}`) && styles.active,
           )}
-          title={tab?.title ?? 'Editor'}
+          title={tab?.title ?? defaultTitle}
           icon={<i className={tab.icon} />}
           onClick={() => navigateToStudioTab(tab.target, tab.trackingTarget, `sub-${tab.key}`)}
           type="submenu"
         >
-          {tab?.title ?? 'Editor'}
+          {tab?.title ?? defaultTitle}
         </MenuItem>
       ))}
     </>

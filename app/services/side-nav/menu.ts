@@ -187,9 +187,14 @@ export class SideNavService extends PersistentStatefulService<ISideNavServiceSta
     this.TOGGLE_SIDEBAR_SUBMENU(status);
   }
 
-  toggleMenuItem(navName: ENavName, menuItemKey: EMenuItemKey, status?: boolean) {
+  setMenuItemStatus(navName: ENavName, menuItemKey: EMenuItemKey, status?: boolean) {
     // show/hide menu items
-    this.TOGGLE_MENU_ITEM(navName, menuItemKey, status);
+    this.SET_MENU_ITEM_STATUS(navName, menuItemKey, status);
+  }
+
+  toggleMenuItem(navName: ENavName, menuItemKey: EMenuItemKey) {
+    // show/hide menu items
+    this.TOGGLE_MENU_ITEM(navName, menuItemKey);
   }
 
   toggleApp(appId: string) {
@@ -300,18 +305,28 @@ export class SideNavService extends PersistentStatefulService<ISideNavServiceSta
   }
 
   @mutation()
-  private TOGGLE_MENU_ITEM(navName: ENavName, menuItemKey: EMenuItemKey, status?: boolean) {
+  private TOGGLE_MENU_ITEM(navName: ENavName, menuItemKey: EMenuItemKey) {
     // toggle boolean value
-    if (status) {
-      this.state[navName].menuItems.find(
-        (menuItem: IMenuItem) => menuItem.key === menuItemKey,
-      ).isActive = status;
-    }
     this.state[navName].menuItems.find(
       (menuItem: IMenuItem) => menuItem.key === menuItemKey,
     ).isActive = !this.state[navName].menuItems.find(
       (menuItem: IMenuItem) => menuItem.key === menuItemKey,
     ).isActive;
+  }
+
+  @mutation()
+  private SET_MENU_ITEM_STATUS(navName: ENavName, menuItemKey: EMenuItemKey, status: boolean) {
+    this.state[navName] = {
+      ...this.state[navName],
+      menuItems: [
+        ...this.state[navName].menuItems.map(menuItem => {
+          if (menuItem.key === menuItemKey) {
+            return { ...menuItem, isActive: status };
+          }
+          return menuItem;
+        }),
+      ],
+    };
   }
 
   @mutation()
