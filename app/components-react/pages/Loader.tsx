@@ -41,11 +41,11 @@ export default function Loader() {
 
   function lifecycle() {
     function loopRandomText() {
-      const randomIndex = Math.floor(Math.random() * loadingStrings.length);
+      const randomIndex = Math.floor(Math.random() * loadingStrings().length);
       if (loaderText === loadingStrings()[randomIndex]) {
         loopRandomText();
       } else {
-        setLoaderText(loadingStrings[randomIndex]);
+        setLoaderText(loadingStrings()[randomIndex]);
       }
     }
     loopRandomText();

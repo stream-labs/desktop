@@ -5,9 +5,13 @@ import cx from 'classnames';
 import { Services } from 'components-react/service-provider';
 import UltraIcon from 'components-react/shared/UltraIcon';
 
-export function UltraComparison(
-  p: { onSkip?: () => void; condensed?: boolean } = { onSkip: () => {} },
-) {
+interface IUltraComparisonProps {
+  onSkip?: () => void;
+  condensed?: boolean;
+  refl: string;
+}
+
+export function UltraComparison(p: IUltraComparisonProps) {
   const { MagicLinkService } = Services;
   const tableHeaders = [
     { text: $t('Themes and Overlays'), icon: 'icon-themes' },
@@ -57,7 +61,7 @@ export function UltraComparison(
   };
 
   function linkToPrime() {
-    MagicLinkService.actions.linkToPrime('slobs-onboarding');
+    MagicLinkService.actions.linkToPrime(p.refl);
   }
 
   return (
