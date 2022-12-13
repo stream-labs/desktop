@@ -102,7 +102,13 @@ export default function PlatformAppPageView(p: {
         </div>
       )}
       <div
-        style={{ display: 'flex', flexDirection: 'column', width: '100%', ...p.style }}
+        className="platform-app"
+        style={{
+          display: !hideStyleBlockers ? 'flex' : 'none',
+          flexDirection: 'column',
+          width: '100%',
+          ...p.style,
+        }}
         ref={appContainer}
       />
     </>
