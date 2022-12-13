@@ -4,6 +4,8 @@ import BrowserView from 'components-react/shared/BrowserView';
 import { GuestApiHandler } from 'util/guest-api-handler';
 import * as remote from '@electron/remote';
 import { Services } from 'components-react/service-provider';
+import { useVuex } from 'components-react/hooks';
+import Spinner from 'components-react/shared/Spinner';
 
 export default function PlatformAppStore(p: { params: { appId?: string; type?: string } }) {
   const { UserService, PlatformAppsService, PlatformAppStoreService, NavigationService } = Services;
@@ -23,6 +25,10 @@ export default function PlatformAppStore(p: { params: { appId?: string; type?: s
     });
   }
 
+  const { hideStyleBlockers } = useVuex(() => ({
+    hideStyleBlockers: Services.WindowsService.state.main.hideStyleBlockers,
+  }));
+
   async function onPaypalAuthSuccess(callback: Function) {
     PlatformAppStoreService.actions.bindsPaypalSuccessCallback(callback);
   }
@@ -39,12 +45,14 @@ export default function PlatformAppStore(p: { params: { appId?: string; type?: s
     NavigationService.actions.navigate('PlatformAppMainPage', { appId });
   }
 
-  return (
+  return !hideStyleBlockers ? (
     <BrowserView
       style={{ position: 'absolute', top: 0, right: 0, bottom: 0, left: 0 }}
       src={UserService.views.appStoreUrl(p.params)}
       onReady={onBrowserViewReady}
       enableGuestApi
     />
+  ) : (
+    <Spinner />
   );
 }
