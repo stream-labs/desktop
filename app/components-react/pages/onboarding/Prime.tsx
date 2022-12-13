@@ -19,7 +19,7 @@ export function Prime() {
   return (
     <div style={{ width: '100%' }}>
       <h1 className={commonStyles.titleContainer}>{$t('Choose your Streamlabs plan')}</h1>
-      <UltraComparison onSkip={next} />
+      <UltraComparison onSkip={next} refl="slobs-onboarding" />
     </div>
   );
 }
