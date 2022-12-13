@@ -135,6 +135,7 @@ export default function BrowseOverlays(p: {
     <BrowserView
       onReady={onBrowserViewReady}
       src={UserService.views.overlaysUrl(p.params?.type, p.params?.id)}
+      style={{ width: '100%' }}
       enableGuestApi
       setLocale
     />
