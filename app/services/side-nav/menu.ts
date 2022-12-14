@@ -254,15 +254,7 @@ export class SideNavService extends PersistentStatefulService<ISideNavServiceSta
   private TOGGLE_SIDEBAR_SUBMENU(status?: boolean) {
     // currently only the custom editor needs to
     // have the option to show/hide in the sidebar
-    if (status) {
-      this.state.showCustomEditor = status;
-    } else {
-      this.state.showCustomEditor = !this.state.showCustomEditor;
-    }
-
-    if (!this.state.showCustomEditor) {
-      this.state.currentMenuItem = EMenuItemKey.Editor;
-    }
+    this.state.showCustomEditor = status ?? !this.state.showCustomEditor;
   }
 
   @mutation()

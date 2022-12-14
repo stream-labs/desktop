@@ -51,7 +51,7 @@ export default function EditorTabs(p: IEditorTabs) {
       // if the active editor screen is not the default editor screen
       if (tabId !== 'default' && !showCustomEditor) {
         toggleSidebarSubmenu(true);
-      } else if (tabId === 'default' && !editorToggled) {
+      } else if (tabId === 'default' && !editorToggled && isOpen) {
         toggleMenuItem(ENavName.TopNav, EMenuItemKey.Editor, true);
       }
     }

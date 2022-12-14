@@ -172,14 +172,14 @@ export default function FeaturesNav() {
                 title={menuTitles(menuItem.key)}
                 icon={menuItem?.icon && <i className={menuItem.icon} />}
                 onTitleClick={() => {
-                  !isOpen &&
-                    menuItem?.subMenuItems[0]?.target &&
-                    handleNavigation(menuItem?.subMenuItems[0], menuItem.key);
+                  !isOpen && handleNavigation(menuItem, menuItem.key);
                   expandMenuItem(ENavName.TopNav, menuItem.key as EMenuItemKey);
                 }}
                 className={cx(
                   !isOpen && styles.closed,
-                  !isOpen && currentMenuItem === menuItem.key && styles.active,
+                  !isOpen &&
+                    (currentMenuItem === menuItem.key || currentMenuItem === 'sub-default') &&
+                    styles.active,
                 )}
               >
                 <EditorTabs type="submenu" />
