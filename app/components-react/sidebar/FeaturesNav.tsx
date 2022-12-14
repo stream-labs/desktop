@@ -115,6 +115,14 @@ export default function FeaturesNav() {
         });
   }, [compactView, menu, loggedIn]);
 
+  const layoutEditorItem = useMemo(() => {
+    return menu.menuItems.find(menuItem => menuItem.key === EMenuItemKey.LayoutEditor);
+  }, []);
+
+  const studioModeItem = useMemo(() => {
+    return menu.menuItems.find(menuItem => menuItem.key === EMenuItemKey.StudioMode);
+  }, []);
+
   const studioTabs = Object.keys(tabs).map((tab, i) => ({
     key: tab,
     target: tab,
@@ -175,6 +183,23 @@ export default function FeaturesNav() {
                 )}
               >
                 <EditorTabs type="submenu" />
+                {layoutEditorItem && (
+                  <FeaturesNavItem
+                    key={layoutEditorItem.key}
+                    isSubMenuItem={true}
+                    menuItem={layoutEditorItem}
+                    handleNavigation={handleNavigation}
+                  />
+                )}
+                {studioModeItem && (
+                  <FeaturesNavItem
+                    key={studioModeItem.key}
+                    isSubMenuItem={true}
+                    menuItem={studioModeItem}
+                    handleNavigation={handleNavigation}
+                    className={studioMode && styles.active}
+                  />
+                )}
               </SubMenu>
             );
           }
@@ -211,12 +236,20 @@ export default function FeaturesNav() {
           );
         } else {
           // otherwise, display menu item
+
+          const isHidden =
+            isOpen &&
+            (menuItem.key === EMenuItemKey.LayoutEditor ||
+              menuItem.key === EMenuItemKey.StudioMode);
+
           return (
-            <FeaturesNavItem
-              key={menuItem.key}
-              menuItem={menuItem}
-              handleNavigation={handleNavigation}
-            />
+            !isHidden && (
+              <FeaturesNavItem
+                key={menuItem.key}
+                menuItem={menuItem}
+                handleNavigation={handleNavigation}
+              />
+            )
           );
         }
       })}
@@ -233,9 +266,10 @@ function FeaturesNavItem(p: {
   isSubMenuItem?: boolean;
   menuItem: IMenuItem | IParentMenuItem;
   handleNavigation: (menuItem: IMenuItem, key?: string) => void;
+  className?: string;
 }) {
   const { SideNavService, TransitionsService } = Services;
-  const { isSubMenuItem, menuItem, handleNavigation } = p;
+  const { isSubMenuItem, menuItem, handleNavigation, className } = p;
 
   const { currentMenuItem, isOpen, studioMode } = useVuex(() => ({
     currentMenuItem: SideNavService.views.currentMenuItem,
@@ -243,13 +277,13 @@ function FeaturesNavItem(p: {
     studioMode: TransitionsService.views.studioMode,
   }));
 
-  const setIcon = () => {
+  function setIcon() {
     if (menuItem.key === EMenuItemKey.Highlighter) {
       return <HighlighterIcon />;
     } else if (menuItem?.icon) {
       return <i className={menuItem?.icon} />;
     }
-  };
+  }
 
   const title = useMemo(() => {
     return menuTitles(menuItem.key);
@@ -258,6 +292,7 @@ function FeaturesNavItem(p: {
   return (
     <MenuItem
       className={cx(
+        className,
         !isSubMenuItem && !isOpen && styles.closed,
         !isSubMenuItem &&
           menuItem.key === EMenuItemKey.StudioMode &&
