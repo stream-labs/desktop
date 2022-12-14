@@ -198,6 +198,7 @@ export const SideNavMenuItems = (): TMenuItems => ({
     icon: 'fas fa-exclamation-triangle',
     trackingTarget: 'themeaudit',
     isExpanded: false,
+    isActive: true,
   },
   [EMenuItemKey.DevTools]: {
     key: EMenuItemKey.DevTools,

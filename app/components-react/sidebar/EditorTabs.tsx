@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Services } from 'components-react/service-provider';
 import styles from './SideNav.m.less';
 import MenuItem from 'components-react/shared/MenuItem';
@@ -23,7 +23,7 @@ export default function EditorTabs(p: IEditorTabs) {
     isOpen,
     showCustomEditor,
     toggleSidebarSubmenu,
-    setMenuItemStatus,
+    toggleMenuItem,
     editorToggled,
   } = useVuex(() => ({
     currentMenuItem:
@@ -36,7 +36,7 @@ export default function EditorTabs(p: IEditorTabs) {
     isOpen: SideNavService.views.isOpen,
     showCustomEditor: SideNavService.views.showCustomEditor,
     toggleSidebarSubmenu: SideNavService.actions.toggleSidebarSubmenu,
-    setMenuItemStatus: SideNavService.actions.setMenuItemStatus,
+    toggleMenuItem: SideNavService.actions.toggleMenuItem,
     editorToggled: SideNavService.views.getMenuItemData(ENavName.TopNav, EMenuItemKey.Editor)
       ?.isActive,
   }));
@@ -52,12 +52,14 @@ export default function EditorTabs(p: IEditorTabs) {
       if (tabId !== 'default' && !showCustomEditor) {
         toggleSidebarSubmenu(true);
       } else if (tabId === 'default' && !editorToggled) {
-        setMenuItemStatus(ENavName.TopNav, EMenuItemKey.Editor, true);
+        toggleMenuItem(ENavName.TopNav, EMenuItemKey.Editor, true);
       }
     }
   }
 
-  const rootTabs = editorToggled ? studioTabs : studioTabs.filter(tab => tab.key !== 'default');
+  const rootTabs = useMemo(() => {
+    return editorToggled ? studioTabs : studioTabs.filter(tab => tab.key !== 'default');
+  }, [editorToggled, studioTabs]);
 
   // if closed, show editor tabs in sidenav when tab is toggled on
   // show all editor tabs in submenu
