@@ -6,17 +6,8 @@ import {
   TOutputDisplayType,
   IDualOutputPlatformSetting,
 } from './dual-output-data';
-import * as obs from '../../../obs-api';
-
-// @@@ TODO: export?
-// interface IDualOutput {
-//   dualOutputMode: boolean;
-// }
-
 interface IDualOutputServiceState {
   platformSettings: TDualOutputPlatformSettings;
-  horizontalContext: obs.IVideo;
-  verticalContext: obs.IVideo;
   isHorizontalActive: boolean;
   isVerticalActive: boolean;
   dualOutputMode: boolean;
@@ -48,33 +39,16 @@ class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
 export class DualOutputService extends PersistentStatefulService<IDualOutputServiceState> {
   static defaultState: IDualOutputServiceState = {
     platformSettings: DualOutputPlatformSettings,
-    horizontalContext: null,
-    verticalContext: null,
     dualOutputMode: false,
     isHorizontalActive: true,
     isVerticalActive: true,
   };
-
-  // @@@ TODO: maybe
-  // @Inject() private transitionsService: TransitionsService;
-
   get views() {
     return new DualOutputViews(this.state);
   }
 
   init() {
     super.init();
-
-    // console.log('initiating dual output');
-
-    // this.state.horizontalContext = obs.VideoFactory.create();
-    // this.state.verticalContext = obs.VideoFactory.create();
-
-    // console.log('horizontalContext ', this.state.horizontalContext);
-    // console.log('verticalContext ', this.state.verticalContext);
-
-    // const tmp = new obs.OBSHandler();
-    // // await obs.reserveUser();
   }
 
   toggleDualOutputMode() {
