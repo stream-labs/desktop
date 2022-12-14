@@ -302,7 +302,7 @@ function LoginMenuItem(p: {
   return (
     <MenuItem
       title={!isLoggedIn ? menuTitles(menuItem.key) : $t('Log Out')}
-      className={cx(styles.login)}
+      className={cx(styles.login, !isOpen && styles.loginClosed)}
       icon={!isOpen && <i className="icon-user" />}
       onClick={() => (isLoggedIn ? handleShowModal(true) : handleAuth())}
     >
