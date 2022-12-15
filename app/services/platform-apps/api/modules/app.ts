@@ -71,11 +71,16 @@ export class AppModule extends Module {
     windowOptions?: Pick<IWindowOptions, TAllowableWindowOptions>,
   ) {
     if (slot === EAppPageSlot.Background) return;
+    let size;
+
+    if (windowOptions.width && windowOptions.height) {
+      size = { width: windowOptions.width, height: windowOptions.height };
+    }
 
     this.platformAppsService.popOutAppPage(ctx.app.id, slot, {
       resizable: windowOptions.resizable,
       title: windowOptions.title,
-      size: { width: windowOptions.width, height: windowOptions.height },
+      size,
     });
   }
 }

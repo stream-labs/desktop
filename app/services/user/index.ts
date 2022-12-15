@@ -115,6 +115,7 @@ interface ILinkedPlatformsResponse {
   streamlabs_account?: ILinkedPlatform;
   user_id: number;
   created_at: string;
+  widget_token: string;
 
   /**
    * When the server sends this back as true, we must force
@@ -362,6 +363,13 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     Vue.delete(this.state.auth, 'slid');
   }
 
+  @mutation()
+  private SET_WIDGET_TOKEN(token: string) {
+    if (this.state.auth) {
+      this.state.auth.widgetToken = token;
+    }
+  }
+
   /**
    * Checks for v1 auth schema and migrates if needed
    */
@@ -410,6 +418,17 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     if (this.views.isPartialSLAuth) {
       this.LOGOUT();
     }
+
+    this.websocketService.socketEvent.subscribe(async event => {
+      if (event.type === 'slid.force_logout') {
+        await this.clearForceLoginStatus();
+        await this.reauthenticate(false, {
+          message: $t(
+            "You've merged a Streamlabs ID to your account, please log back in to ensure you have the right credentials.",
+          ),
+        });
+      }
+    });
   }
 
   get views() {
@@ -529,6 +548,13 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     if (linkedPlatforms.user_id) {
       this.writeUserIdFile(linkedPlatforms.user_id);
       this.SET_USER(linkedPlatforms.user_id, linkedPlatforms.created_at);
+    }
+
+    if (
+      linkedPlatforms.widget_token &&
+      linkedPlatforms.widget_token !== this.state.auth?.widgetToken
+    ) {
+      this.SET_WIDGET_TOKEN(linkedPlatforms.widget_token);
     }
 
     // TODO: Could metaprogram this a bit more
@@ -811,6 +837,23 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     return jfetch<unknown>(request);
   }
 
+  async reauthenticate(onStartup?: boolean, msgConfig?: Partial<Electron.MessageBoxOptions>) {
+    this.SET_IS_RELOG(true);
+    if (onStartup) {
+      this.LOGOUT();
+    } else {
+      await this.logOut();
+    }
+    await remote.dialog.showMessageBox({
+      title: 'Streamlabs Desktop',
+      message: $t(
+        'Your login has expired. Please reauthenticate to continue using Streamlabs Desktop.',
+      ),
+      ...msgConfig,
+    });
+    this.showLogin();
+  }
+
   @RunInLoadingMode()
   private async login(service: IPlatformService, auth?: IUserAuth, isOnStartup = false) {
     if (!auth) auth = this.state.auth;
@@ -826,15 +869,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
         await this.clearForceLoginStatus();
 
         if (isOnStartup) {
-          this.SET_IS_RELOG(true);
-          this.LOGOUT();
-          await remote.dialog.showMessageBox({
-            title: 'Streamlabs Desktop',
-            message: $t(
-              'Your login has expired. Please reauthenticate to continue using Streamlabs Desktop.',
-            ),
-          });
-          this.showLogin();
+          await this.reauthenticate(true);
           return;
         }
       } catch (e: unknown) {
@@ -859,10 +894,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     }
 
     if (validatePlatformResult === EPlatformCallResult.TwitchScopeMissing) {
-      await this.logOut();
-      this.showLogin();
-
-      remote.dialog.showMessageBox(remote.getCurrentWindow(), {
+      this.reauthenticate(true, {
         type: 'warning',
         title: 'Twitch Error',
         message: $t(
@@ -977,6 +1009,10 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     if (!this.isLoggedIn) {
       throw new Error('Account merging can only be performed while logged in');
     }
+
+    // Ensure scene collections are updated before the migration begins
+    await this.sceneCollectionsService.save();
+    await this.sceneCollectionsService.safeSync();
 
     this.SET_AUTH_STATE(EAuthProcessState.Loading);
     const onWindowShow = () => this.SET_AUTH_STATE(EAuthProcessState.Idle);

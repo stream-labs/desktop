@@ -10,6 +10,10 @@ interface IVideoSettingsServiceState {
   forceGPU: boolean;
 }
 
+export function invalidFps(num: number, den: number) {
+  return num / den > 1000 || num / den < 1;
+}
+
 @InitAfter('UserService')
 export class VideoSettingsService extends StatefulService<IVideoSettingsServiceState> {
   @Inject() settingsManagerService: SettingsManagerService;
@@ -52,13 +56,15 @@ export class VideoSettingsService extends StatefulService<IVideoSettingsServiceS
   }
 
   migrateSettings() {
-    Object.keys(this.videoSettings).forEach(
-      (key: keyof obs.IAdvancedStreaming | keyof obs.ISimpleStreaming) => {
-        this.SET_VIDEO_SETTING(key, this.videoSettings[key]);
-      },
-    );
-
+    Object.keys(this.videoSettings).forEach((key: keyof obs.IVideo) => {
+      this.SET_VIDEO_SETTING(key, this.videoSettings[key]);
+    });
     this.SET_FORCE_GPU(this.settingsManagerService.forceGPURRendering);
+
+    if (invalidFps(this.state.videoContext.fpsNum, this.state.videoContext.fpsDen)) {
+      this.setVideoSetting('fpsNum', 30);
+      this.setVideoSetting('fpsDen', 1);
+    }
   }
 
   establishVideoContext() {
