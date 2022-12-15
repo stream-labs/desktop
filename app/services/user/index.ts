@@ -115,6 +115,7 @@ interface ILinkedPlatformsResponse {
   streamlabs_account?: ILinkedPlatform;
   user_id: number;
   created_at: string;
+  widget_token: string;
 
   /**
    * When the server sends this back as true, we must force
@@ -362,6 +363,13 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     Vue.delete(this.state.auth, 'slid');
   }
 
+  @mutation()
+  private SET_WIDGET_TOKEN(token: string) {
+    if (this.state.auth) {
+      this.state.auth.widgetToken = token;
+    }
+  }
+
   /**
    * Checks for v1 auth schema and migrates if needed
    */
@@ -540,6 +548,13 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     if (linkedPlatforms.user_id) {
       this.writeUserIdFile(linkedPlatforms.user_id);
       this.SET_USER(linkedPlatforms.user_id, linkedPlatforms.created_at);
+    }
+
+    if (
+      linkedPlatforms.widget_token &&
+      linkedPlatforms.widget_token !== this.state.auth?.widgetToken
+    ) {
+      this.SET_WIDGET_TOKEN(linkedPlatforms.widget_token);
     }
 
     // TODO: Could metaprogram this a bit more
