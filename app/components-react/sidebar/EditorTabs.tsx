@@ -70,11 +70,13 @@ export default function EditorTabs(p: IEditorTabs) {
         <MenuItem
           key={tab.key}
           className={cx(
-            !isOpen && styles.closed,
-            (currentMenuItem === EMenuItemKey.Editor ||
-              currentMenuItem === tab.key ||
-              currentMenuItem === `sub-${tab.key}`) &&
-              styles.active,
+            { [styles.closed]: !isOpen },
+            {
+              [styles.active]:
+                currentMenuItem === EMenuItemKey.Editor ||
+                currentMenuItem === tab.key ||
+                currentMenuItem === `sub-${tab.key}`,
+            },
           )}
           title={tab.title ?? defaultTitle}
           icon={<i className={tab.icon} />}

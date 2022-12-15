@@ -176,10 +176,12 @@ export default function FeaturesNav() {
                   expandMenuItem(ENavName.TopNav, menuItem.key as EMenuItemKey);
                 }}
                 className={cx(
-                  !isOpen && styles.closed,
-                  !isOpen &&
-                    (currentMenuItem === menuItem.key || currentMenuItem === 'sub-default') &&
-                    styles.active,
+                  { [styles.closed]: !isOpen },
+                  {
+                    [styles.active]:
+                      !isOpen &&
+                      (currentMenuItem === menuItem.key || currentMenuItem === 'sub-default'),
+                  },
                 )}
               >
                 <EditorTabs type="submenu" />

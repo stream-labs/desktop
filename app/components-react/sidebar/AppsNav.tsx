@@ -74,8 +74,8 @@ export default function AppsNav(p: IAppsNav) {
             <MenuItem
               key={app?.id}
               className={cx(
-                !isOpen && styles.closed,
-                isOpen && styles.open,
+                { [styles.closed]: !isOpen },
+                { [styles.open]: isOpen },
                 currentMenuItem === app?.id && styles.active,
               )}
               title={app?.name}
@@ -102,10 +102,9 @@ export default function AppsNav(p: IAppsNav) {
           app && (
             <MenuItem
               key={`sub-${app?.id}`}
-              className={cx(
-                styles.appMenuItem,
-                currentMenuItem === `sub-${app?.id}` && styles.active,
-              )}
+              className={cx(styles.appMenuItem, {
+                [styles.active]: currentMenuItem === `sub-${app?.id}`,
+              })}
               title={app.manifest?.name}
               onClick={() => app?.id && navigateApp(app?.id, `sub-${app?.id}`)}
               type="submenu"

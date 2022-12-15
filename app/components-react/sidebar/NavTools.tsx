@@ -115,7 +115,7 @@ export default function SideNav() {
         key={ENavName.BottomNav}
         forceSubMenuRender
         mode="inline"
-        className={cx(styles.bottomNav, !isOpen && styles.closed, isOpen && styles.open)}
+        className={cx(styles.bottomNav, { [styles.closed]: !isOpen }, { [styles.open]: isOpen })}
         defaultOpenKeys={openMenuItems && openMenuItems}
         getPopupContainer={triggerNode => triggerNode}
       >
@@ -302,7 +302,7 @@ function LoginMenuItem(p: {
   return (
     <MenuItem
       title={!isLoggedIn ? menuTitles(menuItem.key) : $t('Log Out')}
-      className={cx(styles.login, !isOpen && styles.loginClosed)}
+      className={cx(styles.login, { [styles.loginClosed]: !isOpen })}
       icon={!isOpen && <i className="icon-user" />}
       onClick={() => (isLoggedIn ? handleShowModal(true) : handleAuth())}
     >

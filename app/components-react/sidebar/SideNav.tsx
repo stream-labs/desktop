@@ -84,8 +84,8 @@ export default function SideNav() {
         trigger={null}
         className={cx(
           styles.sidenavSider,
-          !isOpen && styles.siderClosed,
-          !leftDock && styles.noLeftDock,
+          { [styles.siderClosed]: !isOpen },
+          { [styles.noLeftDock]: !leftDock },
         )}
         ref={sider}
       >
@@ -105,9 +105,9 @@ export default function SideNav() {
         type="primary"
         className={cx(
           styles.sidenavButton,
-          !isOpen && styles.flipped,
-          isOpen && styles.siderOpen,
-          leftDock && styles.leftDock,
+          { [styles.flipped]: !isOpen },
+          { [styles.siderOpen]: isOpen },
+          { [styles.leftDock]: leftDock },
         )}
         onClick={() => {
           showNewBadge && dismiss(EDismissable.NewSideNav);
