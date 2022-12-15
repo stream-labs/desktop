@@ -17,6 +17,7 @@ import { PlatformContainerManager, getPageUrl, getAssetUrl } from './container-m
 import { NavigationService } from 'services/navigation';
 import { InitAfter } from '../core';
 import * as remote from '@electron/remote';
+import { SideNavService } from 'app-services';
 
 const DEV_PORT = 8081;
 
@@ -182,6 +183,7 @@ export class PlatformAppsService extends StatefulService<IPlatformAppServiceStat
 
   appLoad = new Subject<ILoadedApp>();
   appUnload = new Subject<string>();
+  allAppsLoaded = new Subject<ILoadedApp[]>();
 
   /**
    * Signals all listening app sources that the provided
@@ -209,6 +211,8 @@ export class PlatformAppsService extends StatefulService<IPlatformAppServiceStat
           this.loadUnpackedApp(data.appPath, data.appToken);
         }
       }
+
+      this.allAppsLoaded.next();
     });
 
     this.userService.userLogout.subscribe(() => {

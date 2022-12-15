@@ -1,6 +1,13 @@
 import { ViewHandler, InitAfter, PersistentStatefulService, Inject } from 'services/core';
 import { mutation } from 'services/core/stateful-service';
-import { UserService, AppService, DismissablesService, LayoutService } from 'app-services';
+import {
+  UserService,
+  AppService,
+  DismissablesService,
+  LayoutService,
+  PlatformAppsService,
+} from 'app-services';
+import { ILoadedApp } from 'services/platform-apps';
 import { EDismissable } from 'services/dismissables';
 import {
   TMenuItems,
@@ -73,11 +80,13 @@ class SideNavViews extends ViewHandler<ISideNavServiceState> {
 }
 
 @InitAfter('UserService')
+@InitAfter('PlatformAppsService')
 export class SideNavService extends PersistentStatefulService<ISideNavServiceState> {
   @Inject() userService: UserService;
   @Inject() appService: AppService;
   @Inject() dismissablesService: DismissablesService;
   @Inject() layoutService: LayoutService;
+  @Inject() platformAppsService: PlatformAppsService;
 
   static defaultState: ISideNavServiceState = {
     isOpen: false,
@@ -96,6 +105,7 @@ export class SideNavService extends PersistentStatefulService<ISideNavServiceSta
     this.userService.userLoginFinished.subscribe(() => this.handleUserLogin());
 
     this.handleDismissables();
+    this.platformAppsService.allAppsLoaded.subscribe(() => this.updateAllApps());
 
     this.state.currentMenuItem =
       this.layoutService.state.currentTab !== 'default'
@@ -196,6 +206,10 @@ export class SideNavService extends PersistentStatefulService<ISideNavServiceSta
     this.TOGGLE_MENU_ITEM(navName, menuItemKey, status);
   }
 
+  updateAllApps() {
+    this.UPDATE_ALL_APPS(this.platformAppsService.views.enabledApps);
+  }
+
   toggleApp(appId: string) {
     // show hide apps in menu
     this.TOGGLE_APP(appId);
@@ -286,6 +300,15 @@ export class SideNavService extends PersistentStatefulService<ISideNavServiceSta
         }),
       ],
     };
+  }
+
+  @mutation()
+  private UPDATE_ALL_APPS(currentApps: ILoadedApp[]) {
+    this.state.apps = this.state.apps.map(app => {
+      const activeApp = currentApps.find(currentApp => currentApp.id === app?.id);
+      if (!activeApp) return null;
+      return app;
+    });
   }
 
   @mutation()
