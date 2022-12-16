@@ -7,15 +7,32 @@ interface IOutputServiceState {
   stream: obs.ISimpleStreaming | obs.IAdvancedStreaming;
   recording: obs.ISimpleRecording | obs.IAdvancedRecording;
   replay: obs.ISimpleReplayBuffer | obs.IAdvancedReplayBuffer;
+  videoEncoder: obs.IVideoEncoder;
   advancedMode: boolean;
 }
 
 type TOutputType = 'stream' | 'recording' | 'replay';
 
 // Since the legacySettings api does not send deep objects we must set which properties are expected
-const STREAM_PROPERTIES = ['delay', 'reconnect', 'network'];
-const RECORDING_PROPERTIES = ['fileFormat', 'overwrite'];
-const REPLAY_PROPERTIES = ['prefix', 'suffix'];
+const STREAM_PROPERTIES = [
+  'delay',
+  'reconnect',
+  'network',
+  'videoEncoder',
+  'service',
+  'enforceServiceBitrate',
+  'enableTwitchVod',
+];
+const RECORDING_PROPERTIES = [
+  'fileFormat',
+  'overwrite',
+  'videoEncoder',
+  'format',
+  'path',
+  'noSpace',
+  'muxerSettings',
+];
+const REPLAY_PROPERTIES = ['prefix', 'suffix', 'duration', 'usesStream'];
 
 @InitAfter('VideoSettingsService')
 export class OutputsService extends StatefulService<IOutputServiceState> {
@@ -26,14 +43,16 @@ export class OutputsService extends StatefulService<IOutputServiceState> {
     stream: {} as obs.ISimpleStreaming | obs.IAdvancedStreaming,
     recording: {} as obs.ISimpleRecording | obs.IAdvancedRecording,
     replay: {} as obs.ISimpleReplayBuffer | obs.IAdvancedReplayBuffer,
+    videoEncoder: {} as obs.IVideoEncoder,
     advancedMode: false,
   };
 
-  outputs: Omit<IOutputServiceState, 'advancedMode'> = {
+  outputs: Omit<IOutputServiceState, 'advancedMode' | 'videoEncoder'> = {
     stream: null,
     recording: null,
     replay: null,
   };
+
   activeOutputs: string[] = [];
 
   get streamSettings() {
@@ -76,9 +95,8 @@ export class OutputsService extends StatefulService<IOutputServiceState> {
     } else {
       this.createSimpleOutputs();
     }
-    this.connectSignals();
-
     this.migrateSettings();
+    this.connectSignals();
   }
 
   migrateSettings() {
