@@ -92,7 +92,10 @@ export function Ultra() {
 }
 
 function ProductCard(p: IProductInfo) {
+  const { UsageStatisticsService } = Services;
+
   function linkToProduct() {
+    UsageStatisticsService.actions.recordClick('SettingsUltraPage', p.title);
     if (!p.link) return;
 
     remote.shell.openExternal(p.link);
