@@ -1,3 +1,4 @@
+import { Subject } from 'rxjs';
 import { Inject, mutation, StatefulService, InitAfter } from 'services/core';
 import * as obs from '../../../obs-api';
 import { SettingsManagerService, StreamingService } from 'app-services';
@@ -54,6 +55,8 @@ export class OutputsService extends StatefulService<IOutputServiceState> {
   };
 
   activeOutputs: string[] = [];
+
+  advancedModeChanged = new Subject<boolean>();
 
   get streamSettings() {
     return this.state.advancedMode
@@ -142,7 +145,7 @@ export class OutputsService extends StatefulService<IOutputServiceState> {
   connectSignals() {
     Object.values(this.outputs).forEach(output => {
       output.signalHandler = (signal: obs.EOutputSignal) =>
-        this.streamingService.handleOBSOutputSignal(signal);
+        this.streamingService.actions.handleOBSOutputSignal(signal);
     });
   }
 
@@ -152,6 +155,7 @@ export class OutputsService extends StatefulService<IOutputServiceState> {
     value ? this.createAdvancedOutputs() : this.createSimpleOutputs();
     this.connectSignals();
     this.SET_ADVANCED_MODE(value);
+    this.advancedModeChanged.next(value);
   }
 
   setStreamSetting(key: keyof obs.IAdvancedStreaming | keyof obs.ISimpleStreaming, value: unknown) {

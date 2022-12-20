@@ -3,7 +3,7 @@ import { ISettingsSubCategory, SettingsService } from 'services/settings';
 import { VideoSettingsService } from 'services/settings-v2/video';
 import { Inject } from 'services/core/injector';
 import { Dictionary } from 'vuex';
-import { AudioService } from 'app-services';
+import { AudioService, OutputsService } from 'app-services';
 
 /**
  * list of encoders for simple mode
@@ -182,6 +182,7 @@ export class OutputSettingsService extends Service {
   @Inject() private settingsService: SettingsService;
   @Inject() private audioService: AudioService;
   @Inject() private videoSettingsService: VideoSettingsService;
+  @Inject() private outputsService: OutputsService;
 
   /**
    * returns unified settings for the Streaming and Recording encoder
@@ -386,6 +387,9 @@ export class OutputSettingsService extends Service {
     }
 
     if (settingsPatch.replayBuffer) this.setReplayBufferSettings(settingsPatch.replayBuffer);
+
+    // TODO: Remove. Hack to make sure output settings propogate before fully ported.
+    this.outputsService.actions.migrateSettings();
   }
 
   private setReplayBufferSettings(replayBufferSettings: Partial<IReplayBufferSettings>) {
