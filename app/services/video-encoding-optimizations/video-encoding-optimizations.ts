@@ -58,10 +58,7 @@ export class VideoEncodingOptimizationService extends PersistentStatefulService<
     canSeeOptimizedProfile: null,
   };
 
-  private previousSettings: {
-    video: any;
-    output: any;
-  };
+  private previousSettings: any;
   private isUsingEncodingOptimizations = false;
 
   @Inject() private settingsService: SettingsService;
@@ -93,14 +90,13 @@ export class VideoEncodingOptimizationService extends PersistentStatefulService<
     const settings = this.outputSettingsService.getSettings().streaming;
     const profiles = await this.fetchAvailableGameProfiles(game);
 
-    // We don't have settings for jim_nvenc encoder in DB
-    // use settings for nvenc instead
-    const encoder =
-      settings.encoder === EEncoderFamily.jim_nvenc ? EEncoderFamily.nvenc : settings.encoder;
+    if (settings.encoder != EEncoderFamily.x264 &&
+      settings.encoder != EEncoderFamily.obs_x264)
+        return null;
 
     const filteredProfiles = profiles.filter(profile => {
       return (
-        profile.encoder === encoder &&
+        profile.encoder === EEncoderFamily.x264 &&
         profile.bitrateMax >= settings.bitrate &&
         profile.bitrateMin <= settings.bitrate &&
         (!settings.preset || settings.preset === profile.presetIn)
@@ -165,38 +161,15 @@ export class VideoEncodingOptimizationService extends PersistentStatefulService<
   }
 
   applyProfile(encoderProfile: IEncoderProfile) {
-    this.previousSettings = {
-      output: cloneDeep(this.settingsService.state.Output.formData),
-      video: cloneDeep(this.settingsService.state.Video.formData),
-    };
+    this.previousSettings = cloneDeep(this.settingsService.state.Output.formData),;
+
     this.SAVE_LAST_SELECTED_PROFILE(encoderProfile);
     const currentSettings = this.outputSettingsService.getSettings();
-    const newStreamingSettings: Partial<IStreamingEncoderSettings> = {
-      encoder: encoderProfile.encoder,
-      encoderOptions: encoderProfile.options,
-      preset: encoderProfile.presetOut,
-      rescaleOutput: false, // prevent using the rescaled resolution from encoder settings
-      bitrate: currentSettings.streaming.bitrate,
-    };
 
-    // change the resolution only if user didn't set a custom one or if not using tiktok
-    if (
-      !currentSettings.streaming.hasCustomResolution &&
-      this.userService.platformType !== 'tiktok'
-    ) {
-      newStreamingSettings.outputResolution = encoderProfile.resolutionOut;
-    }
-
-    console.log('Apply encoder settings', newStreamingSettings);
-
-    // apply new streaming settings
-    // also migrate simple settings to advanced settings if the current mode is Simple
-    this.outputSettingsService.setSettings({
-      mode: 'Advanced',
-      streaming: newStreamingSettings,
-      recording: currentSettings.recording,
-      replayBuffer: currentSettings.replayBuffer,
-    });
+    if (currentSettings.mode === 'Simple')
+      this.settingsService.setSettingValue('Output', 'x264Settings', encoderProfile.options)
+    else if (currentSettings.mode === 'Advanced')
+      this.settingsService.setSettingValue('Output', 'x264opts', encoderProfile.options)
 
     this.isUsingEncodingOptimizations = true;
   }
@@ -217,11 +190,7 @@ export class VideoEncodingOptimizationService extends PersistentStatefulService<
   }
 
   private restorePreviousValues() {
-    // clear encoderOptions settings
-    this.outputSettingsService.setSettings({ streaming: { encoderOptions: '' } });
-
-    this.settingsService.setSettings('Output', this.previousSettings.output);
-    this.settingsService.setSettings('Video', this.previousSettings.video);
+    this.settingsService.setSettings('Output', this.previousSettings);
   }
 
   @mutation()

@@ -34,6 +34,7 @@ enum EObsAdvancedEncoder {
  */
 export enum EEncoderFamily {
   x264 = 'x264',
+  obs_x264 = 'obs_x264',
   qsv = 'qsv',
   nvenc = 'nvenc',
   jim_nvenc = 'jim_nvenc',
@@ -93,8 +94,6 @@ interface IOutputSettingsPatch {
   mode?: TOutputSettingsMode;
   inputResolution?: string;
   streaming?: Partial<IStreamingEncoderSettings>;
-  recording?: Partial<IRecordingEncoderSettings>;
-  replayBuffer?: Partial<IReplayBufferSettings>;
 }
 
 export interface IEncoderSettings {
@@ -117,8 +116,6 @@ export interface IRecordingEncoderSettings extends IEncoderSettings {
 
 export interface IStreamingEncoderSettings extends IEncoderSettings {
   preset: string;
-  rescaleOutput: boolean;
-  hasCustomResolution: boolean;
   encoderOptions: string;
 }
 
@@ -160,10 +157,11 @@ export function obsEncoderToEncoderFamily(
   obsEncoder: EObsAdvancedEncoder | EObsSimpleEncoder,
 ): EEncoderFamily {
   switch (obsEncoder) {
-    case EObsAdvancedEncoder.obs_x264:
     case EObsSimpleEncoder.x264:
     case EObsSimpleEncoder.x264_lowcpu:
       return EEncoderFamily.x264;
+    case EObsAdvancedEncoder.obs_x264:
+      return EEncoderFamily.obs_x264;
     case EObsSimpleEncoder.qsv:
     case EObsAdvancedEncoder.obs_qsv11:
       return EEncoderFamily.qsv;
@@ -227,7 +225,7 @@ export class OutputSettingsService extends Service {
     };
   }
 
-  private getStreamingEncoderSettings(
+  getStreamingEncoderSettings(
     output: ISettingsSubCategory[],
     video: ISettingsSubCategory[],
   ): IStreamingEncoderSettings {
@@ -285,8 +283,6 @@ export class OutputSettingsService extends Service {
       bitrate,
       outputResolution,
       encoderOptions,
-      rescaleOutput,
-      hasCustomResolution,
       rateControl,
     };
   }
@@ -380,21 +376,6 @@ export class OutputSettingsService extends Service {
     if (settingsPatch.streaming) {
       this.setStreamingEncoderSettings(currentSettings, settingsPatch.streaming);
     }
-
-    if (settingsPatch.recording) {
-      this.setRecordingEncoderSettings(currentSettings, settingsPatch.recording);
-    }
-
-    if (settingsPatch.replayBuffer) this.setReplayBufferSettings(settingsPatch.replayBuffer);
-  }
-
-  private setReplayBufferSettings(replayBufferSettings: Partial<IReplayBufferSettings>) {
-    if (replayBufferSettings.enabled != null) {
-      this.settingsService.setSettingValue('Output', 'RecRB', replayBufferSettings.enabled);
-    }
-    if (replayBufferSettings.time != null) {
-      this.settingsService.setSettingValue('Output', 'RecRBTime', replayBufferSettings.time);
-    }
   }
 
   private setStreamingEncoderSettings(
@@ -431,16 +412,13 @@ export class OutputSettingsService extends Service {
       );
     }
 
-    if (settingsPatch.encoderOptions !== void 0 && encoder === 'x264') {
+    if (settingsPatch.encoderOptions !== void 0 &&
+      (encoder === 'x264' || encoder === 'obs_x264')) {
       this.settingsService.setSettingValue(
         'Output',
         encoderFieldsMap[encoder].encoderOptions,
         settingsPatch.encoderOptions,
       );
-    }
-
-    if (settingsPatch.rescaleOutput !== void 0) {
-      this.settingsService.setSettingValue('Output', 'Rescale', settingsPatch.rescaleOutput);
     }
 
     if (settingsPatch.bitrate !== void 0) {
@@ -449,36 +427,6 @@ export class OutputSettingsService extends Service {
       } else {
         this.settingsService.setSettingValue('Output', 'VBitrate', settingsPatch.bitrate);
       }
-    }
-  }
-
-  private setRecordingEncoderSettings(
-    currentSettings: IOutputSettings,
-    settingsPatch: Partial<IRecordingEncoderSettings>,
-  ) {
-    const mode = currentSettings.mode;
-    if (settingsPatch.format) {
-      this.settingsService.setSettingValue('Output', 'RecFormat', settingsPatch.format);
-    }
-
-    if (settingsPatch.path) {
-      this.settingsService.setSettingValue(
-        'Output',
-        mode === 'Simple' ? 'FilePath' : 'RecFilePath',
-        settingsPatch.path,
-      );
-    }
-
-    if (settingsPatch.encoder) {
-      this.settingsService.setSettingValue(
-        'Output',
-        'RecEncoder',
-        simpleEncoderToAdvancedEncoder(settingsPatch.encoder),
-      );
-    }
-
-    if (settingsPatch.bitrate) {
-      this.settingsService.setSettingValue('Output', 'Recbitrate', settingsPatch.bitrate);
     }
   }
 }
