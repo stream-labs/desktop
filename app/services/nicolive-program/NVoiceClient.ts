@@ -6,7 +6,10 @@ import { createInterface } from "readline";
 export function getNVoicePath(): string {
   // import/require構文を使うとビルド時に展開してしまうが、
   // バイナリファイルを実行時に参照するために実行時のrequireでロードする必要がある
-  return window['require']('@n-air-app/n-voice-package').getNVoicePath();
+  const nVoicePath = window['require']('@n-air-app/n-voice-package')
+    .getNVoicePath()
+    .replace('app.asar', 'app.asar.unpacked'); // ビルドしたpackageでは展開パスは置換する必要がある
+  return nVoicePath;
 }
 
 class CallbackReceiver {
