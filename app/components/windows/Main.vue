@@ -140,7 +140,7 @@
 
 .main-loading {
   position: absolute;
-  top: 30px;
+  top: 0px;
   bottom: 0;
   left: 0;
   right: 0;
