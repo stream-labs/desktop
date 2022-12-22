@@ -26,6 +26,7 @@ import { AudioService } from '../audio';
 import uuid from 'uuid/v4';
 import SourceProperties from 'components/windows/SourceProperties.vue';
 import { UserService } from 'services/user';
+import { NVoiceCharacterTypes } from 'services/nvoice-character';
 
 const AudioFlag = obs.ESourceOutputFlags.Audio;
 const VideoFlag = obs.ESourceOutputFlags.Video;
@@ -350,8 +351,8 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
     // 'scene' is not an obs input type so we have to set it manually
     availableWhitelistedType.push('scene');
 
-    // 'nvoice_character' is not an obs input type so we have to set it manually
-    availableWhitelistedType.push('nvoice_character');
+    // 'near' is not an obs input type so we have to set it manually
+    availableWhitelistedType.push(...(NVoiceCharacterTypes as unknown as TSourceType[]));
 
     const availableWhitelistedSourceType = availableWhitelistedType.map(value => ({
       value,

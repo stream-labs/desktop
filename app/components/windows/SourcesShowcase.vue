@@ -143,9 +143,9 @@
       </add-source-info>
 
       <add-source-info
-        v-if="inspectedSource === 'nvoice_character'"
-        @clickAdd="selectNVoiceCharacterSource()"
-        sourceType="nvoice_character"
+        v-if="inspectedSource === 'near'"
+        @clickAdd="selectNVoiceCharacterSource('near')"
+        sourceType="near"
         key="16"
       >
         <NVoiceCharacterSourceIcon slot="media" />

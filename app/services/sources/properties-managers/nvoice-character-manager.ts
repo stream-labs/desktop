@@ -1,9 +1,10 @@
 import { NVoiceCharacterService } from "app-services";
-import { Inject } from "vue-property-decorator";
+import { Inject } from "services/core/injector";
+import { NVoiceCharacterType, NVoiceCharacterTypes } from "services/nvoice-character";
 import { PropertiesManager } from "./properties-manager";
 
 export interface INVoiceCharacterSettings {
-
+  nVoiceCharacterType: NVoiceCharacterType;
 }
 
 export class NVoiceCharacterManager extends PropertiesManager {
@@ -14,17 +15,15 @@ export class NVoiceCharacterManager extends PropertiesManager {
   settings: INVoiceCharacterSettings;
 
   applySettings(settings: Dictionary<any>) {
-    // this.settings.widgetType = parseInt(settings.widgetType, 10);
-    // this.setWidgetType(this.settings.widgetType);
+    this.settings.nVoiceCharacterType = NVoiceCharacterTypes.includes(settings.nVoiceCharacterType) && settings.nVoiceCharacterType || 'near';
+    this.setNVoiceCharacterType(this.settings.nVoiceCharacterType);
   }
 
-  /*
-  setNVoiceCharacterType(type: WidgetType) {
-    const url = this.nvoiceCharacterService.getUrl(type);
+  setNVoiceCharacterType(type: NVoiceCharacterType) {
+    const url = this.nVoiceCharacterService.getUrl(type);
 
     if (this.obsSource.settings['url'] !== url) {
       this.obsSource.update({ url });
     }
   }
-  */
 }

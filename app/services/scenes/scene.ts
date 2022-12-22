@@ -156,6 +156,10 @@ export class Scene {
     // Newly added sources are immediately active
     this.selectionService.select(sceneItemId);
 
+    if (options.initialTransform) {
+      sceneItem.setTransform(options.initialTransform);
+    }
+
     this.scenesService.itemAdded.next(sceneItem.getModel());
     return sceneItem;
   }

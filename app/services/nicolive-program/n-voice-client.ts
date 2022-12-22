@@ -1,7 +1,6 @@
 // N Voice Client Service
 
 import electron from 'electron';
-import { existsSync, readFileSync, unlinkSync } from 'fs';
 import { join } from "path";
 import { StatefulService } from "services/core/stateful-service";
 import { $t } from "services/i18n";

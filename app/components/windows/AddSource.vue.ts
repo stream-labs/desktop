@@ -8,7 +8,7 @@ import ModalLayout from 'components/ModalLayout.vue';
 import Selector from 'components/Selector.vue';
 import Display from 'components/shared/Display.vue';
 import { $t } from 'services/i18n';
-import { NVoiceCharacterService } from 'services/nvoice-character';
+import { NVoiceCharacterService, NVoiceCharacterType } from 'services/nvoice-character';
 
 @Component({
   components: { ModalLayout, Selector, Display },
@@ -42,7 +42,8 @@ export default class AddSource extends Vue {
 
   mounted() {
     if (this.sourceAddOptions.propertiesManager === 'nvoice-character') {
-      this.name = this.sourcesService.suggestName($t('source-props.nvoice_character.name'));
+      const type = this.sourceAddOptions.propertiesManagerSettings.nVoiceCharacterType || 'near';
+      this.name = this.sourcesService.suggestName($t(`source-props.${type}.name`));
     } else {
       const sourceType =
         this.sourceType &&
@@ -73,25 +74,33 @@ export default class AddSource extends Vue {
     if (!this.name) {
       this.error = $t('sources.sourceNameIsRequired');
     } else {
-      let source: ISourceApi;
+      let s: {
+        source: ISourceApi;
+        options: ISourceAddOptions;
+      };
+
       if (this.sourceAddOptions.propertiesManager === 'nvoice-character') {
-        source = this.nVoiceCharacterService.createNVoiceCharacterSource(this.name);
+        const type: NVoiceCharacterType = this.sourceAddOptions.propertiesManagerSettings.nVoiceCharacterType || 'near';
+        s = this.nVoiceCharacterService.createNVoiceCharacterSource(type, this.name);
       } else {
-        source = this.sourcesService.createSource(
-          this.name,
-          this.sourceType,
-          {}, // IPCがundefinedをnullに変換するのでデフォルト値は使わない
-          {
-            propertiesManager: this.sourceAddOptions.propertiesManager,
-            propertiesManagerSettings: this.sourceAddOptions.propertiesManagerSettings,
-          },
-        );
+        s = {
+          source: this.sourcesService.createSource(
+            this.name,
+            this.sourceType,
+            {}, // IPCがundefinedをnullに変換するのでデフォルト値は使わない
+            {
+              propertiesManager: this.sourceAddOptions.propertiesManager,
+              propertiesManagerSettings: this.sourceAddOptions.propertiesManagerSettings,
+            },
+          ),
+          options: {}
+        };
       }
 
-      this.scenesService.activeScene.addSource(source.sourceId);
+      this.scenesService.activeScene.addSource(s.source.sourceId, s.options);
 
-      if (source.hasProps()) {
-        this.sourcesService.showSourceProperties(source.sourceId);
+      if (s.source.hasProps()) {
+        this.sourcesService.showSourceProperties(s.source.sourceId);
       } else {
         this.close();
       }

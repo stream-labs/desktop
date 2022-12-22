@@ -26,11 +26,14 @@ import MonitorCaptureIcon from '../../../media/images/monitor-capture-icon.svg';
 import NdiSourceIcon from '../../../media/images/ndi-icon.svg';
 import BlackmagicSourceIcon from '../../../media/images/blackmagic-icon.svg';
 import NVoiceCharacterSourceIcon from '../../../media/images/nvoice-character-source-icon.svg';
+import { NVoiceCharacterType, NVoiceCharacterTypes } from 'services/nvoice-character';
+import { omit } from 'lodash';
 
-type TInspectableSource = TSourceType;
+type TInspectableSource = TSourceType | NVoiceCharacterType;
 
 interface ISelectSourceOptions {
   propertiesManager?: TPropertiesManager;
+  nVoiceCharacterType?: NVoiceCharacterType;
 }
 
 @Component({
@@ -64,15 +67,16 @@ export default class SourcesShowcase extends Vue {
 
   selectSource(sourceType: TSourceType, options: ISelectSourceOptions = {}) {
     const managerType = options.propertiesManager || 'default';
+    const propertiesManagerSettings: Dictionary<any> = { ...omit(options, 'propertiesManager') };
 
     this.sourcesService.showAddSource(sourceType, {
+      propertiesManagerSettings,
       propertiesManager: managerType,
-      propertiesManagerSettings: {},
     });
   }
 
-  selectNVoiceCharacterSource() {
-    this.selectSource('browser_source', { propertiesManager: 'nvoice-character' });
+  selectNVoiceCharacterSource(type: NVoiceCharacterType) {
+    this.selectSource('browser_source', { propertiesManager: 'nvoice-character', nVoiceCharacterType: type });
   }
 
   inspectedSource: TInspectableSource = null;
@@ -91,8 +95,8 @@ export default class SourcesShowcase extends Vue {
   }
 
   selectInspectedSource() {
-    if (this.inspectedSource === 'nvoice_character') {
-      this.selectNVoiceCharacterSource();
+    if (NVoiceCharacterTypes.includes(this.inspectedSource as NVoiceCharacterType)) {
+      this.selectNVoiceCharacterSource(this.inspectedSource as NVoiceCharacterType);
     } else
       if (
         this.sourcesService.getAvailableSourcesTypes().includes(this.inspectedSource as TSourceType)

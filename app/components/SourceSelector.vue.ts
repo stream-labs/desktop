@@ -25,7 +25,7 @@ const sourceIconMap = {
   openvr_capture: 'icon-vr-google',
   liv_capture: 'icon-vr-google',
   ndi_source: 'icon-NDI',
-  nvoice_character: 'icon-nvoice-character',
+  near: 'icon-near',
   'decklink-input': 'icon-blackmagic',
 };
 
@@ -73,6 +73,10 @@ export default class SourceSelector extends Vue {
       return 'icon-folder';
     }
     const sourceDetails = this.sourcesService.getSource(sourceId).getComparisonDetails();
+    if (sourceDetails.propertiesManager === 'nvoice-character') {
+      return sourceIconMap[sourceDetails.nVoiceCharacterType || 'near'];
+    }
+
     return sourceIconMap[sourceDetails.type] || 'icon-file';
   }
 
