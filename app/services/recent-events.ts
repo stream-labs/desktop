@@ -389,9 +389,7 @@ class RecentEventsViews extends ViewHandler<IRecentEventsState> {
   }
 
   get spinWheelExists(): boolean {
-    return !!this.widgetsService
-      .getWidgetSources()
-      .find(source => source.type === WidgetType.SpinWheel);
+    return !!this.widgetsService.widgetSources.find(source => source.type === WidgetType.SpinWheel);
   }
 }
 

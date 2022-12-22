@@ -100,6 +100,10 @@ export class WidgetsService
     return new WidgetsServiceViews(this.state);
   }
 
+  get widgetSources(): WidgetSource[] {
+    return Object.keys(this.state.widgetSources).map(id => this.getWidgetSource(id));
+  }
+
   createWidget(type: WidgetType, name?: string): SceneItem {
     if (!this.userService.isLoggedIn) return;
 
@@ -154,10 +158,6 @@ export class WidgetsService
     );
 
     return item;
-  }
-
-  getWidgetSources(): WidgetSource[] {
-    return Object.keys(this.state.widgetSources).map(id => this.getWidgetSource(id));
   }
 
   getWidgetSource(sourceId: string): WidgetSource {
