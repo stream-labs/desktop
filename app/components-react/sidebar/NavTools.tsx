@@ -84,15 +84,16 @@ export default function SideNav() {
 
   async function upgradeToPrime() {
     UsageStatisticsService.actions.recordClick('SideNav2', 'prime');
-    try {
-      const link = await MagicLinkService.getDashboardMagicLink(
-        'prime-marketing',
-        'slobs-side-nav',
-      );
-      remote.shell.openExternal(link);
-    } catch (e: unknown) {
-      console.error('Error generating dashboard magic link', e);
-    }
+    // try {
+    //   const link = await MagicLinkService.getDashboardMagicLink(
+    //     'prime-marketing',
+    //     'slobs-side-nav',
+    //   );
+    //   remote.shell.openExternal(link);
+    // } catch (e: unknown) {
+    //   console.error('Error generating dashboard magic link', e);
+    // }
+    MagicLinkService.linkToPrime('slobs-side-nav');
   }
 
   const handleAuth = () => {

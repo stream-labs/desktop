@@ -63,6 +63,7 @@ import PlatformAppPageView from './shared/PlatformAppPageView';
 import PlatformAppPopOut from './windows/PlatformAppPopOut';
 import RecentEventsWindow from './windows/RecentEvents';
 import NewBadge from './shared/NewBadge';
+import RecordingHistory from './windows/RecordingHistory';
 import UltraIcon from './shared/UltraIcon';
 
 // list of React components to be used inside Vue components
@@ -120,6 +121,7 @@ export const components = {
   SceneSelector: createRoot(SceneSelector),
   AddSource,
   SourceSelector: createRoot(SourceSelector),
+  RecordingHistory: createRoot(RecordingHistory),
   RecentEventsWindow,
   SideNav,
   WelcomeToPrime,
