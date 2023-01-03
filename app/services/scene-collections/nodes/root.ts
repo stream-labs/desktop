@@ -8,12 +8,18 @@ import { VideoService } from 'services/video';
 import { StreamingService } from 'services/streaming';
 import { OS } from 'util/operating-systems';
 import { GuestCamNode } from './guest-cam';
+import { VideoSettingsService } from 'services/settings-v2/video';
 
 interface ISchema {
   baseResolution: {
     width: number;
     height: number;
   };
+  // contexts: {
+  //   default: IVideoSettingsFormatted;
+  //   horizontal: IVideoSettingsFormatted;
+  //   vertical: IVideoSettingsFormatted;
+  // };
   selectiveRecording?: boolean;
   sources: SourcesNode;
   scenes: ScenesNode;
@@ -31,6 +37,7 @@ export class RootNode extends Node<ISchema, {}> {
 
   @Inject() videoService: VideoService;
   @Inject() streamingService: StreamingService;
+  @Inject() videoSettingsService: VideoSettingsService;
 
   async save(): Promise<void> {
     const sources = new SourcesNode();
@@ -51,6 +58,11 @@ export class RootNode extends Node<ISchema, {}> {
       transitions,
       hotkeys,
       guestCam,
+      // contexts: this.videoSettingsService.contexts,
+      // baseResolution: {
+      //   width: this.videoSettingsService.state['default'].baseWidth,
+      //   height: this.videoSettingsService.state['default'].baseHeight,
+      // },
       baseResolution: this.videoService.baseResolution,
       selectiveRecording: this.streamingService.state.selectiveRecording,
       operatingSystem: process.platform as OS,
@@ -58,6 +70,16 @@ export class RootNode extends Node<ISchema, {}> {
   }
 
   async load(): Promise<void> {
+    // @@@ put duplication here?
+    // @@@ BASE RESOLUTION
+    // console.log(
+    //   'this.videoSettingsService.defaultBaseResolution ',
+    //   this.videoSettingsService.defaultBaseResolution,
+    // );
+
+    // console.log('this.data.contexts ', this.data.contexts);
+
+    // this.videoService.setContexts(this.data.contexts);
     this.videoService.setBaseResolution(this.data.baseResolution);
     this.streamingService.setSelectiveRecording(!!this.data.selectiveRecording);
 

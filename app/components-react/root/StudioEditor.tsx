@@ -4,6 +4,7 @@ import styles from './StudioEditor.m.less';
 import { Services } from 'components-react/service-provider';
 import cx from 'classnames';
 import Display from 'components-react/shared/Display';
+import DualOutputDisplay from 'components-react/shared/DualOutputDisplay';
 import { $t } from 'services/i18n';
 import { ERenderingMode } from '../../../obs-api';
 import { Tooltip } from 'antd';
@@ -36,8 +37,6 @@ export default function StudioEditor() {
   const studioModeTransitionName = useMemo(() => TransitionsService.getStudioTransitionName(), [
     v.studioMode,
   ]);
-
-  // @@@ TODO: updateStyleBlockers() for smoother transition when rendering vertical display?
 
   // Track vertical orientation for placeholder
   useEffect(() => {
@@ -194,50 +193,7 @@ export default function StudioEditor() {
                 {/* @@@ TEMP PADDING COLOR */}
               </div>
             )}
-            {v.dualOutputMode && v.isHorizontalActive && (
-              <div
-                className={cx(styles.dualOutputDisplayContainer)}
-                style={{ cursor: v.cursor }}
-                onMouseDown={eventHandlers.onMouseDown}
-                onMouseUp={eventHandlers.onMouseUp}
-                onMouseEnter={eventHandlers.onMouseEnter}
-                onMouseMove={eventHandlers.onMouseMove}
-                onDoubleClick={eventHandlers.onMouseDblClick}
-                onContextMenu={eventHandlers.onContextMenu}
-              >
-                <Display
-                  type="horizontal"
-                  drawUI={true}
-                  paddingSize={10}
-                  paddingColor={{ r: 255, g: 238, b: 0 }} // @@@ temp
-                  onOutputResize={eventHandlers.onOutputResize}
-                  renderingMode={ERenderingMode.OBS_MAIN_RENDERING}
-                  sourceId={v.studioMode ? studioModeTransitionName : v.activeSceneId}
-                />
-              </div>
-            )}
-            {v.dualOutputMode && v.isVerticalActive && (
-              <div
-                className={cx(styles.dualOutputDisplayContainer)}
-                style={{ cursor: v.cursor }}
-                onMouseDown={eventHandlers.onMouseDown}
-                onMouseUp={eventHandlers.onMouseUp}
-                onMouseEnter={eventHandlers.onMouseEnter}
-                onMouseMove={eventHandlers.onMouseMove}
-                onDoubleClick={eventHandlers.onMouseDblClick}
-                onContextMenu={eventHandlers.onContextMenu}
-              >
-                <Display
-                  type="vertical"
-                  drawUI={true}
-                  paddingSize={10}
-                  paddingColor={{ r: 255, g: 0, b: 0 }} // @@@ temp
-                  onOutputResize={eventHandlers.onOutputResize}
-                  renderingMode={ERenderingMode.OBS_MAIN_RENDERING}
-                  sourceId={v.studioMode ? studioModeTransitionName : v.activeSceneId}
-                />
-              </div>
-            )}
+            {v.dualOutputMode && <DualOutputDisplay eventHandlers={eventHandlers} />}
           </div>
         </div>
       )}

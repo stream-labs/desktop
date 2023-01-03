@@ -1,6 +1,6 @@
 import { Service } from './core/service';
 import { StatefulService, InitAfter, mutation } from 'services/core';
-import { SettingsService } from './settings';
+import { ISettingsSubCategory, SettingsService } from './settings';
 import * as obs from '../../obs-api';
 import { Inject } from './core/injector';
 import Utils from './utils';
@@ -8,10 +8,17 @@ import { WindowsService } from './windows';
 import { ScalableRectangle } from '../util/ScalableRectangle';
 import { Subscription } from 'rxjs';
 import { SelectionService } from 'services/selection';
+import {
+  VideoSettingsService,
+  TDisplayType,
+  IVideoSettingsFormatted,
+  ESettingsVideoProperties,
+} from 'services/settings-v2/video';
 import { byOS, OS, getOS } from 'util/operating-systems';
 import * as remote from '@electron/remote';
 import { onUnload } from 'util/unload';
 import { ScenesService } from './api/external-api/resources';
+import { capitalize } from 'lodash';
 
 // TODO: There are no typings for nwr
 let nwr: any;
@@ -73,49 +80,7 @@ export class Display {
 
   type?: TDisplayType;
 
-  context?: obs.IVideo;
-
-  // @@@ position + size and adds padding where needed
-
   constructor(public name: string, options: IDisplayOptions = {}) {
-    // console.log('DISPLAY options ', options);
-
-    // this.context = this.videoService.createContext(); // why does this.videoService.actions.createContext() return void?
-    // if (options.type === 'horizontal') {
-    //   this.videoService.updateContext(this.context);
-    // }
-    //   this.context.video = {
-    //     fpsNum: 120,
-    //     fpsDen: 2,
-    //     baseWidth: 3840,
-    //     baseHeight: 2160,
-    //     outputWidth: 3840,
-    //     outputHeight: 2160,
-    //     outputFormat: obs.EVideoFormat.I420,
-    //     colorspace: obs.EColorSpace.CS709,
-    //     range: obs.ERangeType.Full,
-    //     scaleType: obs.EScaleType.Lanczos,
-    //     fpsType: obs.EFPSType.Fractional,
-    //   };
-    // } else if (options.type === 'vertical') {
-    //   this.context.video = {
-    //     fpsNum: 120,
-    //     fpsDen: 2,
-    //     baseWidth: 1300,
-    //     baseHeight: 2000,
-    //     outputWidth: 1300,
-    //     outputHeight: 2000,
-    //     outputFormat: obs.EVideoFormat.I420,
-    //     colorspace: obs.EColorSpace.CS709,
-    //     range: obs.ERangeType.Full,
-    //     scaleType: obs.EScaleType.Lanczos,
-    //     fpsType: obs.EFPSType.Fractional,
-    //   };
-    // }
-
-    // console.log('now context.video ', this.context.video);
-
-    // console.log('DISPLAY context ', this.context);
     this.sourceId = options.sourceId;
     this.electronWindowId = options.electronWindowId || remote.getCurrentWindow().id;
     this.slobsWindowId = options.slobsWindowId || Utils.getCurrentUrlParams().windowId;
@@ -128,11 +93,11 @@ export class Display {
     this.currentScale = this.windowsService.state[this.slobsWindowId].scaleFactor;
 
     this.type = options.type ?? 'default';
-
     this.videoService.actions.createOBSDisplay(
       this.electronWindowId,
       name,
       this.renderingMode,
+      // this.type,
       this.sourceId,
     );
 
@@ -336,19 +301,11 @@ export class Display {
     this.videoService.actions.setOBSDisplayDrawGuideLines(this.name, enabled);
   }
 }
-
-export type TDisplayType = 'default' | 'horizontal' | 'vertical';
-interface IVideoServiceState {
-  type?: TDisplayType;
-  horizontalContext: obs.IVideo;
-  verticalContext: obs.IVideo;
-
-  // sourceId: string | null;
-}
 @InitAfter('UserService')
 export class VideoService extends Service {
   @Inject() settingsService: SettingsService;
   @Inject() scenesService: ScenesService;
+  @Inject() videoSettingsService: VideoSettingsService;
 
   init() {
     this.settingsService.loadSettingsIntoStore();
@@ -372,7 +329,12 @@ export class VideoService extends Service {
   }
 
   get baseResolution() {
-    const [widthStr, heightStr] = this.settingsService.views.values.Video.Base.split('x');
+    console.log(
+      'this.videoSettingsService ',
+      this.settingsService.views.values.Vertical.Base.split('x'),
+    );
+    const [widthStr, heightStr] = this.settingsService.views.values.Vertical.Base.split('x');
+    // const [widthStr, heightStr] = this.settingsService.views.values.Video.Base.split('x');
     const width = parseInt(widthStr, 10);
     const height = parseInt(heightStr, 10);
     return {
@@ -389,6 +351,33 @@ export class VideoService extends Service {
     );
   }
 
+  // setContexts(contexts: {
+  //   default: IVideoSettingsFormatted;
+  //   horizontal: IVideoSettingsFormatted;
+  //   vertical: IVideoSettingsFormatted;
+  // }) {
+  //   for (const displayName in contexts) {
+  //     if (displayName === 'default') {
+  //       // if it's the default display, only update the base resolution
+  //       this.settingsService.setSettingValue('Video', 'Base', contexts[displayName].baseRes);
+  //     } else {
+  //       // format property names for settings
+  //       // @@@ maybe format the property names when getting object
+  //       const display: unknown[] = [];
+  //       for (const property in contexts[displayName]) {
+  //         const formattedName = ESettingsVideoProperties[property];
+  //         console.log('formattedName ', formattedName);
+  //         display.push({ [formattedName]: contexts[displayName][property] });
+  //         console.log('display ', display);
+  //       }
+  //       this.settingsService.setSettings(
+  //         capitalize(displayName),
+  //         display as ISettingsSubCategory[],
+  //       );
+  //     }
+  //   }
+  // }
+
   /**
    * @warning DO NOT USE THIS METHOD. Use the Display class instead
    */
@@ -396,10 +385,12 @@ export class VideoService extends Service {
     electronWindowId: number,
     name: string,
     remderingMode: number,
+    // type: TDisplayType,
     sourceId?: string,
   ) {
     const electronWindow = remote.BrowserWindow.fromId(electronWindowId);
 
+    // if (sourceId && !['horizontal', 'vertical'].includes(type)) {
     if (sourceId) {
       obs.NodeObs.OBS_content_createSourcePreviewDisplay(
         electronWindow.getNativeWindowHandle(),
@@ -449,26 +440,6 @@ export class VideoService extends Service {
 
   setOBSDisplayDrawGuideLines(name: string, drawGuideLines: boolean) {
     obs.NodeObs.OBS_content_setDrawGuideLines(name, drawGuideLines);
-  }
-
-  updateContext(context: obs.IVideo) {
-    // context.video = {
-    //   fpsNum: 120,
-    //   fpsDen: 2,
-    //   baseWidth: 3840,
-    //   baseHeight: 2160,
-    //   outputWidth: 3840,
-    //   outputHeight: 2160,
-    //   outputFormat: obs.EVideoFormat.I420,
-    //   colorspace: obs.EColorSpace.CS709,
-    //   range: obs.ERangeType.Full,
-    //   scaleType: obs.EScaleType.Lanczos,
-    //   fpsType: obs.EFPSType.Fractional,
-    // };
-
-    // this.setBaseResolution({ width: context.video.baseWidth, height: context.video.baseHeight });
-
-    return context;
   }
 
   /**
