@@ -186,5 +186,7 @@
   "font_family_tooltip": "用于文本的 Google 字体。访问 https://fonts.google.com 找到自己的字体！流行的字体有：Open Sans、Roboto、Oswald、Lato、Droid Sans。",
   "Something went wrong while applying settings": "应用设置时出错",
   "Superchat Goal": "超级留言目标",
-  "YouTube Superchats": "YouTube 超级留言"
+  "YouTube Superchats": "YouTube 超级留言",
+  "Custom Widget": "Custom Widget",
+  "Use HTML, CSS, and JavaScript to create a widget with custom functionality": "Use HTML, CSS, and JavaScript to create a widget with custom functionality"
 }

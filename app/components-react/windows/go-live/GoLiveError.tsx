@@ -73,13 +73,13 @@ export default function GoLiveError() {
     return (
       <MessageLayout
         type={'error'}
-        message={$t('Multistreaming to these platforms requires Prime')}
+        message={$t('Multistreaming to these platforms requires Ultra')}
       >
         <button
           className="button button--prime"
           onClick={() => MagicLinkService.actions.linkToPrime('slobs-multistream')}
         >
-          {$t('Become a Prime member')}
+          {$t('Become a Ultra member')}
         </button>
       </MessageLayout>
     );

@@ -3,6 +3,7 @@ import { IObsListOption, TObsFormData } from 'components/obs/inputs/ObsInput';
 import { WidgetType } from 'services/widgets';
 import { Observable } from 'rxjs';
 import { IAudioSource } from 'services/audio';
+import { EDeinterlaceFieldOrder, EDeinterlaceMode } from 'obs-studio-node';
 
 export interface ISource {
   sourceId: string;
@@ -34,6 +35,8 @@ export interface ISource {
    * This is mainly meant to support Guest Cam
    */
   forceMuted: boolean;
+  deinterlaceMode?: EDeinterlaceMode;
+  deinterlaceFieldOrder?: EDeinterlaceFieldOrder;
 }
 
 /**
@@ -100,6 +103,8 @@ export interface ISourceAddOptions<TPropertiesManagerSettings = Dictionary<any>>
   audioSettings?: Partial<IAudioSource>;
   isTemporary?: boolean;
   guestCamStreamId?: string; // Automatically assign a guest to this source after creation
+  deinterlaceMode?: EDeinterlaceMode;
+  deinterlaceFieldOrder?: EDeinterlaceFieldOrder;
 }
 
 export type TSourceType =
@@ -131,7 +136,8 @@ export type TSourceType =
   | 'audio_line'
   | 'syphon-input'
   | 'soundtrack_source'
-  | 'mediasoupconnector';
+  | 'mediasoupconnector'
+  | 'wasapi_process_output_capture';
 
 // Register new properties managers here
 export type TPropertiesManager =

@@ -38,6 +38,7 @@ export enum WidgetType {
   ChatHighlight = 21,
   SuperchatGoal = 22,
   GameWidget = 23,
+  CustomWidget = 24,
 }
 
 export const WidgetTesters: IWidgetTester[] = [
@@ -676,5 +677,13 @@ export const WidgetDisplayData = (platform?: string): { [x: number]: IWidgetDisp
     supportList: [],
     platforms: new Set(['twitch', 'youtube']),
     icon: 'icon-face-masks',
+  },
+  [WidgetType.CustomWidget]: {
+    name: $t('Custom Widget'),
+    description: $t('Use HTML, CSS, and JavaScript to create a widget with custom functionality'),
+    demoVideo: false,
+    demoFilename: '', // do not show an image
+    supportList: [],
+    icon: 'icon-developer',
   },
 });

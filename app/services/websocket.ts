@@ -21,7 +21,8 @@ export type TSocketEvent =
   | IUnpauseEventQueueSocketEvent
   | IPrimeSubEvent
   | ISafeModeEnabledSocketEvent
-  | ISafeModeDisabledSocketEvent;
+  | ISafeModeDisabledSocketEvent
+  | ISLIDMerged;
 
 interface IStreamlabelsSocketEvent {
   type: 'streamlabels';
@@ -113,6 +114,11 @@ export interface ISafeModeEnabledSocketEvent {
 interface ISafeModeDisabledSocketEvent {
   type: 'safeModeDisabled';
   message: {};
+}
+
+interface ISLIDMerged {
+  type: 'slid.force_logout';
+  for: string;
 }
 
 export class WebsocketService extends Service {

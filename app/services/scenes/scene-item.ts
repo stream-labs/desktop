@@ -33,6 +33,9 @@ import { assertIsDefined } from '../../util/properties-type-guards';
  * all of the information about that source, and
  * how it fits in to the given scene
  */
+
+export { EScaleType, EBlendingMode, EBlendingMethod } from '../../../obs-api';
+
 @ServiceHelper('ScenesService')
 export class SceneItem extends SceneItemNode {
   sourceId: string;
@@ -54,6 +57,9 @@ export class SceneItem extends SceneItemNode {
   locked: boolean;
   streamVisible: boolean;
   recordingVisible: boolean;
+  scaleFilter: obs.EScaleType;
+  blendingMode: obs.EBlendingMode;
+  blendingMethod: obs.EBlendingMethod;
 
   sceneNodeType: TSceneNodeType = 'item';
 
@@ -126,6 +132,9 @@ export class SceneItem extends SceneItemNode {
       visible: this.visible,
       streamVisible: this.streamVisible,
       recordingVisible: this.recordingVisible,
+      scaleFilter: this.scaleFilter,
+      blendingMode: this.blendingMode,
+      blendingMethod: this.blendingMethod,
     };
   }
 
@@ -194,6 +203,18 @@ export class SceneItem extends SceneItemNode {
       this.getObsSceneItem().recordingVisible = newSettings.recordingVisible;
     }
 
+    if (changed.scaleFilter !== void 0) {
+      this.getObsSceneItem().scaleFilter = newSettings.scaleFilter;
+    }
+
+    if (changed.blendingMode !== void 0) {
+      this.getObsSceneItem().blendingMode = newSettings.blendingMode;
+    }
+
+    if (changed.blendingMethod !== void 0) {
+      this.getObsSceneItem().blendingMethod = newSettings.blendingMethod;
+    }
+
     this.UPDATE({ sceneItemId: this.sceneItemId, ...changed });
 
     this.scenesService.itemUpdated.next(this.getModel());
@@ -256,6 +277,9 @@ export class SceneItem extends SceneItemNode {
       locked: !!customSceneItem.locked,
       streamVisible: !!customSceneItem.streamVisible,
       recordingVisible: !!customSceneItem.recordingVisible,
+      scaleFilter: customSceneItem.scaleFilter,
+      blendingMode: customSceneItem.blendingMode,
+      blendingMethod: customSceneItem.blendingMethod,
     });
   }
 
@@ -373,6 +397,18 @@ export class SceneItem extends SceneItemNode {
     return this.getScene()
       .getItems()
       .findIndex(sceneItemModel => sceneItemModel.id === this.id);
+  }
+
+  setScaleFilter(scaleFilter: obs.EScaleType): void {
+    this.setSettings({ scaleFilter });
+  }
+
+  setBlendingMode(blendingMode: obs.EBlendingMode): void {
+    this.setSettings({ blendingMode });
+  }
+
+  setBlendingMethod(blendingMethod: obs.EBlendingMethod): void {
+    this.setSettings({ blendingMethod });
   }
 
   /**

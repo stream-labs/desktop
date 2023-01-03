@@ -18,7 +18,7 @@ import VirtualWebcamSettings from './VirtualWebcamSettings';
 import { MagicLinkService } from 'services/magic-link';
 import { UserService } from 'services/user';
 import Scrollable from 'components/shared/Scrollable';
-import { ObsSettings, PlatformLogo } from 'components/shared/ReactComponentList';
+import { ObsSettings, PlatformLogo, UltraIcon } from 'components/shared/ReactComponentList';
 import { $t } from 'services/i18n';
 import { debounce } from 'lodash-decorators';
 import * as remote from '@electron/remote';
@@ -41,6 +41,7 @@ import Utils from '../../../services/utils';
     Scrollable,
     PlatformLogo,
     ObsSettings,
+    UltraIcon,
   },
 })
 export default class Settings extends Vue {
@@ -55,6 +56,7 @@ export default class Settings extends Vue {
   searchResultPages: string[] = [];
   icons: Dictionary<string> = {
     General: 'icon-overview',
+    Multistreaming: 'icon-multistream',
     Stream: 'fas fa-globe',
     Output: 'fas fa-microchip',
     Video: 'fas fa-film',
@@ -101,11 +103,7 @@ export default class Settings extends Vue {
   }
 
   set categoryName(val: string) {
-    if (val === 'Prime') {
-      this.magicLinkService.actions.linkToPrime('slobs-settings');
-    } else {
-      this.internalCategoryName = val;
-    }
+    this.internalCategoryName = val;
   }
 
   get isPrime() {
@@ -122,10 +120,11 @@ export default class Settings extends Vue {
   get reactPages() {
     const pages = [
       'General',
+      'Multistreaming',
       'Stream',
       // 'Output',
       'Audio',
-      // 'Video',
+      'Video',
       // 'Hotkeys',
       'Advanced',
       // 'SceneCollections',
@@ -135,6 +134,7 @@ export default class Settings extends Vue {
       // 'VirtualWebcam',
       'Game Overlay',
       'Get Support',
+      'Ultra',
     ];
     if (Utils.isDevMode()) pages.push('Experimental');
     return pages;
@@ -207,7 +207,11 @@ export default class Settings extends Vue {
   }
 
   onSearchCompletedHandler(foundPages: string[]) {
-    this.searchResultPages = foundPages;
+    if (!this.userService.views.isPrime && this.includeUltra(this.searchStr)) {
+      this.searchResultPages = [...foundPages, 'ultra'];
+    } else {
+      this.searchResultPages = foundPages;
+    }
     // if there are not search results for the current page than switch to the first found page
     if (foundPages.length && !foundPages.includes(this.categoryName)) {
       this.categoryName = foundPages[0];
@@ -220,6 +224,17 @@ export default class Settings extends Vue {
     } else {
       this.debouncedSearchInput(str);
     }
+  }
+
+  includeUltra(str: string) {
+    if (str.length < 6 && str.toLowerCase().startsWith('u')) {
+      for (let i = 0; i < 'ultra'.length + 1; i++) {
+        if ('ultra'.slice(0, i) === str) {
+          return true;
+        }
+      }
+    }
+    return false;
   }
 
   @debounce(300)

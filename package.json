@@ -4,7 +4,7 @@
   "description": "Streamlabs streaming software",
   "author": "General Workings, Inc.",
   "license": "GPL-3.0",
-  "version": "1.11.2",
+  "version": "1.12.5",
   "main": "main.js",
   "scripts": {
     "compile": "yarn clear && yarn compile:updater && yarn webpack-cli --progress --config ./webpack.dev.config.js",
@@ -156,7 +156,6 @@
     "eslint-plugin-vue": "6.1.2",
     "execa": "5.0.0",
     "fetch-mock": "7.7.3",
-    "ffmpeg-ffprobe-static": "4.3.1-rc.6",
     "file-loader": "1.1.11",
     "fuse.js": "3.4.6",
     "gl-transitions": "1.43.0",

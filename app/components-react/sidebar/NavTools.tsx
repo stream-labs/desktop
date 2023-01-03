@@ -9,6 +9,7 @@ import { useVuex } from '../hooks';
 import styles from './SideNav.m.less';
 import * as remote from '@electron/remote';
 import { Badge } from 'antd';
+import UltraIcon from 'components-react/shared/UltraIcon';
 
 export default function SideNav() {
   const {
@@ -80,15 +81,7 @@ export default function SideNav() {
 
   async function upgradeToPrime() {
     UsageStatisticsService.actions.recordClick('NavTools', 'prime');
-    try {
-      const link = await MagicLinkService.getDashboardMagicLink(
-        'prime-marketing',
-        'slobs-side-nav',
-      );
-      remote.shell.openExternal(link);
-    } catch (e: unknown) {
-      console.error('Error generating dashboard magic link', e);
-    }
+    MagicLinkService.linkToPrime('slobs-side-nav');
   }
 
   return (
@@ -102,10 +95,10 @@ export default function SideNav() {
         <div
           className={cx(styles.cell, styles.primeCell)}
           onClick={upgradeToPrime}
-          title={$t('Get Prime')}
+          title={$t('Get Ultra')}
         >
           <Badge count={<i className={cx('icon-pop-out-3', styles.linkBadge)} />}>
-            <i className="icon-prime" />
+            <UltraIcon />
           </Badge>
         </div>
       )}

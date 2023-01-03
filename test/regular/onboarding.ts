@@ -46,12 +46,12 @@ test('Go through the onboarding and autoconfig', async t => {
   t.true(await (await app.client.$('button=Start')).isExisting());
   await (await app.client.$('button=Start')).click();
 
-  // await (await t.context.app.client.$('div=Choose Free')).waitForDisplayed({ timeout: 60000 });
+  await (await t.context.app.client.$('div=Current Plan')).waitForDisplayed({ timeout: 60000 });
   // Skip purchasing prime
-  // if (await (await t.context.app.client.$('div=Choose Free')).isExisting()) {
-  //   await (await t.context.app.client.$('div=Choose Free')).click();
-  //   await sleep(1000);
-  // }
+  if (await (await t.context.app.client.$('div=Current Plan')).isExisting()) {
+    await (await t.context.app.client.$('div=Current Plan')).click();
+    await sleep(1000);
+  }
 
   await (await app.client.$('span=Sources')).waitForDisplayed({ timeout: 60000 });
   // success?
