@@ -4,9 +4,14 @@ import BrowserView from 'components-react/shared/BrowserView';
 import { GuestApiHandler } from 'util/guest-api-handler';
 import * as remote from '@electron/remote';
 import { Services } from 'components-react/service-provider';
-
 export default function PlatformAppStore(p: { params: { appId?: string; type?: string } }) {
-  const { UserService, PlatformAppsService, PlatformAppStoreService, NavigationService } = Services;
+  const {
+    UserService,
+    PlatformAppsService,
+    PlatformAppStoreService,
+    NavigationService,
+    SideNavService,
+  } = Services;
 
   function onBrowserViewReady(view: Electron.BrowserView) {
     new GuestApiHandler().exposeApi(view.webContents.id, {
@@ -21,6 +26,12 @@ export default function PlatformAppStore(p: { params: { appId?: string; type?: s
         view.webContents.openDevTools();
       }
     });
+
+    // reload apps after uninstall
+    view.webContents.session.webRequest.onCompleted(
+      { urls: ['https://platform.streamlabs.com/api/v1/app/*/uninstall'] },
+      () => Promise.resolve(() => PlatformAppsService.actions.refreshProductionApps()),
+    );
   }
 
   async function onPaypalAuthSuccess(callback: Function) {
@@ -33,6 +44,12 @@ export default function PlatformAppStore(p: { params: { appId?: string; type?: s
 
   async function reloadProductionApps() {
     PlatformAppsService.actions.loadProductionApps();
+  }
+
+  async function refreshProductionApps() {
+    PlatformAppsService.actions.unloadAllApps();
+    PlatformAppsService.actions.loadProductionApps();
+    SideNavService.actions.updateAllApps();
   }
 
   async function navigateToApp(appId: string) {

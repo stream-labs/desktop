@@ -25,6 +25,7 @@ export function AppearanceSettings() {
     MagicLinkService,
     SideNavService,
     PlatformAppsService,
+    LayoutService,
   } = Services;
 
   const { bind } = useModule(() => {
@@ -47,6 +48,7 @@ export function AppearanceSettings() {
     showCustomEditor,
     isLoggedIn,
     isPrime,
+    currentTab,
     toggleApp,
     replaceApp,
     toggleSidebarSubMenu,
@@ -64,6 +66,7 @@ export function AppearanceSettings() {
     showCustomEditor: SideNavService.views.showCustomEditor,
     isLoggedIn: UserService.views.isLoggedIn,
     isPrime: UserService.views.isPrime,
+    currentTab: LayoutService.state.currentTab,
     toggleApp: SideNavService.actions.toggleApp,
     replaceApp: SideNavService.actions.replaceApp,
     toggleSidebarSubMenu: SideNavService.actions.toggleSidebarSubmenu,
@@ -186,14 +189,16 @@ export function AppearanceSettings() {
               layout="horizontal"
               onChange={() => toggleMenuItem(ENavName.TopNav, EMenuItemKey.Editor)}
               value={menuItemStatus[EMenuItemKey.Editor]}
-              disabled={!isLoggedIn || compactView}
+              disabled={!isLoggedIn || compactView || currentTab === 'default'}
             />
             <SwitchInput
               label={$t('Custom Editor')}
               layout="horizontal"
               onChange={() => toggleSidebarSubMenu()}
               value={isLoggedIn && showCustomEditor}
-              disabled={!isLoggedIn || compactView}
+              disabled={
+                !isLoggedIn || compactView || (currentTab !== 'default' && showCustomEditor)
+              }
             />
             <SwitchInput
               label={menuTitles(EMenuItemKey.StudioMode)}
