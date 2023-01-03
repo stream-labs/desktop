@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { CSSProperties } from 'react';
 import cx from 'classnames';
 import { EDismissable } from 'services/dismissables';
 import { Services } from 'components-react/service-provider';
@@ -15,10 +15,12 @@ interface IHelpTipProps {
     right?: string;
   };
   tipPosition?: 'left' | 'right';
+  arrowPosition?: 'top' | 'bottom';
+  style?: CSSProperties;
 }
 
 export default function HelpTip(props: React.PropsWithChildren<IHelpTipProps>) {
-  const p = { tipPosition: 'left', ...props };
+  const p = { tipPosition: 'left', arrowPosition: 'top', ...props };
 
   const { DismissablesService } = Services;
 
@@ -34,17 +36,26 @@ export default function HelpTip(props: React.PropsWithChildren<IHelpTipProps>) {
 
   return (
     <div className={styles.helpTip} style={p.position}>
-      <div
-        className={cx(styles.helpTipArrow, {
-          [styles.helpTipArrowRight]: p.tipPosition === 'right',
-        })}
-      />
+      {p.arrowPosition === 'top' && (
+        <div
+          className={cx(styles.helpTipArrow, {
+            [styles.helpTipArrowRight]: p.tipPosition === 'right',
+          })}
+        />
+      )}
       <i onClick={closeHelpTip} className={cx(styles.helpTipClose, 'icon-close')} />
       <div className={styles.helpTipTitle}>
         <i className="fa fa-info-circle" />
         {p.title}
       </div>
       <div className={styles.helpTipBody}>{p.children}</div>
+      {p.arrowPosition === 'bottom' && (
+        <div
+          className={cx(styles.helpTipArrow, styles.helpTipArrowBottom, {
+            [styles.helpTipArrowRight]: p.tipPosition === 'right',
+          })}
+        />
+      )}
     </div>
   );
 }
