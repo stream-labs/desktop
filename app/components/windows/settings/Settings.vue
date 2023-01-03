@@ -32,7 +32,16 @@
             :ico="icons[category]"
             :class="{ disabled: searchStr && !searchResultPages.includes(category) }"
           >
-            {{ $t(category) }}
+            <div :style="{ display: 'flex' }" @click="dismiss(category)">
+              {{ $t(category) }}
+              <NewBadge
+                v-if="
+                  dismissables[category] &&
+                  dismissablesService.views.shouldShow(dismissables[category])
+                "
+                :componentProps="{ dismissableKey: 'custom_menu_settings' }"
+              />
+            </div>
           </NavItem>
           <NavItem
             v-if="isLoggedIn"
@@ -103,6 +112,7 @@
 
 <style lang="less" scoped>
 @import '../../../styles/index';
+@import '../../../styles/badges';
 
 .settings {
   & /deep/ h2 {
@@ -117,13 +127,15 @@
   height: 100%;
 
   .search {
-    width: 177px;
+    width: 100%;
     .margin-left(2);
     .margin-bottom(2);
     & /deep/ input {
       padding-left: 30px;
+      width: calc(100% - 30px);
     }
     & /deep/ .fa {
+      position: absolute;
       left: 0;
       right: auto;
       pointer-events: none;

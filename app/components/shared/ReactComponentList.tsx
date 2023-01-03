@@ -458,6 +458,8 @@ export class WidgetWindow extends ReactComponent {}
 })
 export class CustomCodeWindow extends ReactComponent {}
 
+@Component({ props: { name: { default: 'NewBadge' } } })
+export class NewBadge extends ReactComponent {}
 @Component({ props: { name: { default: 'UltraIcon' } } })
 export class UltraIcon extends ReactComponent<{
   type?: string;

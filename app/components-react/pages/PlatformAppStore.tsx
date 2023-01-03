@@ -5,7 +5,7 @@ import { GuestApiHandler } from 'util/guest-api-handler';
 import * as remote from '@electron/remote';
 import { Services } from 'components-react/service-provider';
 
-export default function PlatformAppStore(p: { params: { appId?: string } }) {
+export default function PlatformAppStore(p: { params: { appId?: string; type?: string } }) {
   const { UserService, PlatformAppsService, PlatformAppStoreService, NavigationService } = Services;
 
   function onBrowserViewReady(view: Electron.BrowserView) {
@@ -42,7 +42,7 @@ export default function PlatformAppStore(p: { params: { appId?: string } }) {
   return (
     <BrowserView
       style={{ position: 'absolute', top: 0, right: 0, bottom: 0, left: 0 }}
-      src={UserService.views.appStoreUrl(p.params?.appId)}
+      src={UserService.views.appStoreUrl(p.params)}
       onReady={onBrowserViewReady}
       enableGuestApi
     />

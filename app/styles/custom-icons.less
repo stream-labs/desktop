@@ -5,17 +5,9 @@
   font-style: normal;
 }
 
-@font-face {
-  font-family: 'ultra';
-  src: url('../../media/fonts/ultra.woff') format('woff');
-  font-weight: normal;
-  font-style: normal;
-}
-
-[class^='icon-'],
-[class*=' icon-'] {
+[class^="icon-"], [class*=" icon-"] {
   /* use !important to prevent issues with browser extensions that change fonts */
-  font-family: 'icomoon', 'ultra' !important;
+  font-family: 'icomoon' !important;
   speak: never;
   font-style: normal;
   font-weight: normal;
@@ -28,6 +20,9 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+/**
+ * icomoon icons
+ */
 .icon-tiktok:before {
   content: '\e9f9';
 }
@@ -777,11 +772,4 @@
 }
 .icon-twitch:before {
   content: '\e9c4';
-}
-
-/**
- * ultra icon
- */
-.icon-ultra:before {
-  content: '\e9fb';
 }

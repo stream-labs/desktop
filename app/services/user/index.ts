@@ -230,22 +230,32 @@ class UserViews extends ViewHandler<IUserServiceState> {
     return url;
   }
 
-  appStoreUrl(appId?: string) {
+  appStoreUrl(params?: { appId?: string | undefined; type?: string | undefined }) {
     const host = this.hostsService.platform;
     const token = this.auth.apiToken;
     const nightMode = this.customizationServiceViews.isDarkTheme ? 'night' : 'day';
     let url = `https://${host}/slobs-store`;
 
-    if (appId) {
-      url = `${url}/app/${appId}`;
+    if (params?.appId) {
+      url = `${url}/app/${params?.appId}`;
+    }
+    if (params?.type) {
+      url = `${url}/${params?.type}`;
     }
 
     return `${url}?token=${token}&mode=${nightMode}`;
   }
 
-  overlaysUrl(type?: 'overlay' | 'widget-theme', id?: string) {
+  overlaysUrl(type?: 'overlay' | 'widget-themes' | 'site-themes', id?: string) {
     const uiTheme = this.customizationServiceViews.isDarkTheme ? 'night' : 'day';
-    let url = `https://${this.hostsService.streamlabs}/library?mode=${uiTheme}&slobs`;
+
+    let url = `https://${this.hostsService.streamlabs}/library`;
+
+    if (type && !id) {
+      url += `/${type}`;
+    }
+
+    url += `?mode=${uiTheme}&slobs`;
 
     if (this.isLoggedIn) {
       url += `&oauth_token=${this.auth.apiToken}`;

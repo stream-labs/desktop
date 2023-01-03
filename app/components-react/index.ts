@@ -62,6 +62,7 @@ import PlatformAppMainPage from './pages/PlatformAppMainPage';
 import PlatformAppPageView from './shared/PlatformAppPageView';
 import PlatformAppPopOut from './windows/PlatformAppPopOut';
 import RecentEventsWindow from './windows/RecentEvents';
+import NewBadge from './shared/NewBadge';
 import RecordingHistory from './windows/RecordingHistory';
 import UltraIcon from './shared/UltraIcon';
 
@@ -131,5 +132,6 @@ export const components = {
   PlatformAppMainPage,
   PlatformAppPageView,
   PlatformAppPopOut,
+  NewBadge,
   UltraIcon,
 };
