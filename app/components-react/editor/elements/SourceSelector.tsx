@@ -20,10 +20,10 @@ import styles from './SceneSelector.m.less';
 import Scrollable from 'components-react/shared/Scrollable';
 import HelpTip from 'components-react/shared/HelpTip';
 import Translate from 'components-react/shared/Translate';
+import { DualOutputSourceSelector } from './DualOutputSourceSelector';
 import { WidgetsService } from '../../../app-services';
 import { GuestCamService } from 'app-services';
 import { DualOutputService } from 'services/dual-output';
-
 interface ISourceMetadata {
   id: string;
   title: string;
@@ -613,17 +613,10 @@ const TreeNode = React.forwardRef(
         {p.canShowActions && (
           <>
             {p.isGuestCamActive && <i className="fa fa-signal" />}
-            {/* @@@ HERE TODO: 1. font icons. 2. show hide functionality. 3. remove logic from custom widget and repush */}
             {p.isDualOutputActive && (
-              <i
-                onClick={p.toggleVerticalVisibility}
-                className={p.isVerticalActive ? 'icon-phone-case' : 'icon-phone-case-hide'}
-              />
-            )}
-            {p.isDualOutputActive && (
-              <i
-                onClick={p.toggleHorizontalVisibility}
-                className={p.isHorizontalActive ? 'icon-desktop' : 'icon-desktop-hide'}
+              <DualOutputSourceSelector
+                isVisible={p.isVisible}
+                toggleVisibility={p.toggleVisibility}
               />
             )}
             {p.selectiveRecordingEnabled && (
