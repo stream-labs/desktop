@@ -13,18 +13,29 @@ interface IOutputServiceState {
 }
 
 type TOutputType = 'stream' | 'recording' | 'replay';
+type TStreamProperties = Array<keyof obs.IAdvancedStreaming | keyof obs.ISimpleStreaming>;
+type TRecordingProperties = Array<keyof obs.IAdvancedRecording | keyof obs.ISimpleRecording>;
+type TReplayProperties = Array<keyof obs.IAdvancedReplayBuffer | keyof obs.ISimpleReplayBuffer>;
 
 // Since the legacySettings api does not send deep objects we must set which properties are expected
-const STREAM_PROPERTIES = [
+const STREAM_PROPERTIES: TStreamProperties = [
   'delay',
   'reconnect',
   'network',
   'videoEncoder',
   'service',
   'enforceServiceBitrate',
-  'enableTwitchVod',
+  'enableTwitchVOD',
 ];
-const RECORDING_PROPERTIES = [
+const SIMPLE_STREAM_PROPERTIES: TStreamProperties = ['audioEncoder', 'customEncSettings'];
+const ADV_STREAM_PROPERTIES: TStreamProperties = [
+  'audioTrack',
+  'twitchTrack',
+  'rescaling',
+  'outputWidth',
+  'outputHeight',
+];
+const RECORDING_PROPERTIES: TRecordingProperties = [
   'fileFormat',
   'overwrite',
   'videoEncoder',
@@ -33,7 +44,16 @@ const RECORDING_PROPERTIES = [
   'noSpace',
   'muxerSettings',
 ];
-const REPLAY_PROPERTIES = ['prefix', 'suffix', 'duration', 'usesStream'];
+const SIMPLE_RECORDING_PROPERTIES: TRecordingProperties = ['quality', 'audioEncoder', 'lowCPU'];
+const ADV_RECORDING_PROPERTIES: TRecordingProperties = [
+  'mixer',
+  'rescaling',
+  'outputWidth',
+  'outputHeight',
+  'useStreamEncoders',
+];
+const REPLAY_PROPERTIES: TReplayProperties = ['prefix', 'suffix', 'duration', 'usesStream'];
+const ADV_REPLAY_PROPERTIES: TReplayProperties = ['mixer'];
 
 @InitAfter('VideoSettingsService')
 export class OutputsService extends StatefulService<IOutputServiceState> {
@@ -100,24 +120,37 @@ export class OutputsService extends StatefulService<IOutputServiceState> {
     }
     this.migrateSettings();
     this.connectSignals();
+
+    console.log(this.outputs.stream);
   }
 
   migrateSettings() {
-    STREAM_PROPERTIES.forEach((key: keyof obs.IAdvancedStreaming | keyof obs.ISimpleStreaming) => {
-      this.setStreamSetting(key, this.streamSettings[key]);
-    });
+    this.migrateStreamProperties(STREAM_PROPERTIES);
+    this.migrateRecordingProperties(RECORDING_PROPERTIES);
+    this.migrateReplayProperties(REPLAY_PROPERTIES);
 
-    RECORDING_PROPERTIES.forEach(
-      (key: keyof obs.IAdvancedRecording | keyof obs.ISimpleRecording) => {
-        this.setRecordingSetting(key, this.recordingSettings[key]);
-      },
-    );
+    if (this.state.advancedMode) {
+      this.migrateStreamProperties(ADV_STREAM_PROPERTIES);
+      this.migrateRecordingProperties(ADV_RECORDING_PROPERTIES);
+      this.migrateReplayProperties(ADV_REPLAY_PROPERTIES);
+    } else {
+      this.migrateStreamProperties(SIMPLE_STREAM_PROPERTIES);
+      this.migrateRecordingProperties(SIMPLE_RECORDING_PROPERTIES);
+    }
+  }
 
-    REPLAY_PROPERTIES.forEach(
-      (key: keyof obs.IAdvancedReplayBuffer | keyof obs.ISimpleReplayBuffer) => {
-        this.setReplaySetting(key, this.replaySettings[key]);
-      },
-    );
+  migrateStreamProperties(keys: Array<keyof obs.IAdvancedStreaming | keyof obs.ISimpleStreaming>) {
+    keys.forEach(key => this.setStreamSetting(key, this.streamSettings[key]));
+  }
+  migrateRecordingProperties(
+    keys: Array<keyof obs.IAdvancedRecording | keyof obs.ISimpleRecording>,
+  ) {
+    keys.forEach(key => this.setRecordingSetting(key, this.recordingSettings[key]));
+  }
+  migrateReplayProperties(
+    keys: Array<keyof obs.IAdvancedReplayBuffer | keyof obs.ISimpleReplayBuffer>,
+  ) {
+    keys.forEach(key => this.setReplaySetting(key, this.replaySettings[key]));
   }
 
   createAdvancedOutputs() {
