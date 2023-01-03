@@ -27,8 +27,8 @@ import { SceneCollectionsService } from 'services/scene-collections';
 import * as remote from '@electron/remote';
 import fs from 'fs';
 import path from 'path';
+import { VideoSettingsService } from 'app-services';
 
-// @@@ HERE
 export interface ISettingsValues {
   General: {
     KeepRecordingWhenStreamStops: boolean;
@@ -62,16 +62,9 @@ export interface ISettingsValues {
     VodTrackIndex?: string;
     keyint_sec?: number;
   };
-  Video: {
-    Base: string;
-    Output: string;
-    ScaleType: string;
-    FPSType: string;
-    FPSCommon: string;
-    FPSInt: number;
-    FPSNum: number;
-    FPSDen: number;
-  };
+  Video: ISettingsVideoInfo; // default video context
+  Horizontal: ISettingsVideoInfo;
+  Vertical: ISettingsVideoInfo;
   Audio: Dictionary<TObsValue>;
   Advanced: {
     DelayEnable: boolean;
@@ -83,6 +76,17 @@ export interface ISettingsValues {
     NewSocketLoopEnable: boolean;
     LowLatencyEnable: boolean;
   };
+}
+
+interface ISettingsVideoInfo {
+  Base: string;
+  Output: string;
+  ScaleType: string;
+  FPSType: string;
+  FPSCommon: string;
+  FPSInt: number;
+  FPSNum: number;
+  FPSDen: number;
 }
 
 export interface ISettingsSubCategory {
@@ -179,6 +183,7 @@ export class SettingsService extends StatefulService<ISettingsServiceState> {
   @Inject() private usageStatisticsService: UsageStatisticsService;
   @Inject() private sceneCollectionsService: SceneCollectionsService;
   @Inject() private hardwareService: HardwareService;
+  @Inject() private videoSettingsService: VideoSettingsService;
 
   @Inject()
   private videoEncodingOptimizationService: VideoEncodingOptimizationService;
@@ -270,6 +275,9 @@ export class SettingsService extends StatefulService<ISettingsServiceState> {
       settingsFormData[categoryName] = this.fetchSettingsFromObs(categoryName);
     });
     this.SET_SETTINGS(settingsFormData);
+
+    // dual output settings are not stored in OBS, so set them from persisted settings
+    this.setDualOutputSettings(settingsFormData);
   }
 
   /**
@@ -538,6 +546,57 @@ export class SettingsService extends StatefulService<ISettingsServiceState> {
         source.setName(displayName);
       }
     });
+  }
+
+  private setDualOutputSettings(settingsData: ISettingsServiceState) {
+    if (this.state.hasOwnProperty('Horizontal')) return;
+    if (this.state.hasOwnProperty('Vertical')) return;
+
+    // create two empty arrays to push onto
+    const horizontalParams: IObsInput<TObsValue>[] = [];
+    const verticalParams: IObsInput<TObsValue>[] = [];
+
+    // get dual output settings from video settings service
+    const horizontalSettings = this.videoSettingsService.dualOutputSettings['horizontal'];
+    const verticalSettings = this.videoSettingsService.dualOutputSettings['vertical'];
+
+    // for every param, update param with dual output setting
+    settingsData['Video'].formData[0].parameters.forEach((parameter: IObsInput<TObsValue>) => {
+      horizontalParams.push({
+        ...parameter,
+        currentValue: horizontalSettings[parameter.name],
+        value: horizontalSettings[parameter.name],
+      });
+
+      verticalParams.push({
+        ...parameter,
+        currentValue: verticalSettings[parameter.name],
+        value: verticalSettings[parameter.name],
+      });
+    });
+
+    const horizontalOutputData = {
+      type: ESettingsCategoryType.Untabbed,
+      formData: [
+        {
+          nameSubCategory: 'Untitled',
+          parameters: horizontalParams,
+        },
+      ],
+    };
+    const verticalOutputData = {
+      type: ESettingsCategoryType.Untabbed,
+      formData: [
+        {
+          nameSubCategory: 'Untitled',
+          parameters: verticalParams,
+        },
+      ],
+    };
+
+    // add to state
+    this.PATCH_SETTINGS('Horizontal', horizontalOutputData);
+    this.PATCH_SETTINGS('Vertical', verticalOutputData);
   }
 
   private ensureValidEncoder() {

@@ -1,11 +1,9 @@
-import React, { useLayoutEffect, useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useVuex } from '../hooks';
 import { Services } from '../service-provider';
-import { Display as OBSDisplay, TDisplayType } from '../../services/video';
+import { Display as OBSDisplay } from '../../services/video';
+import { TDisplayType } from 'services/settings-v2/video';
 import uuid from 'uuid/v4';
-
-// @@REFERENCE
-
 interface DisplayProps {
   sourceId?: string;
   paddingSize?: number;
@@ -19,7 +17,7 @@ interface DisplayProps {
 }
 
 export default function Display(props: DisplayProps) {
-  const { VideoService, CustomizationService } = Services;
+  const { CustomizationService, VideoSettingsService } = Services;
 
   const p = {
     paddingSize: 0,
@@ -32,7 +30,7 @@ export default function Display(props: DisplayProps) {
   const v = useVuex(
     () => ({
       paddingColor: CustomizationService.views.displayBackground,
-      baseResolution: VideoService.baseResolution,
+      baseResolution: VideoSettingsService.actions.getBaseResolution(p.type),
     }),
     false,
   );
@@ -42,9 +40,6 @@ export default function Display(props: DisplayProps) {
 
   useEffect(updateDisplay, [p.sourceId, v.paddingColor]);
   useEffect(refreshOutputRegion, [v.baseResolution]);
-  // why not useLayoutEffect?
-  // useLayoutEffect(updateDisplay, [p.sourceId, v.paddingColor]);
-  // useLayoutEffect(refreshOutputRegion, [v.baseResolution]);
 
   function refreshOutputRegion() {
     if (!obsDisplay.current) return;
@@ -76,7 +71,6 @@ export default function Display(props: DisplayProps) {
   }
 
   function updateDisplay() {
-    // why destroying and creating every time?
     destroyDisplay();
     createDisplay();
 

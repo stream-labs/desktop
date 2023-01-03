@@ -45,6 +45,28 @@ interface IVideoSettings {
   horizontal: obs.IVideoInfo;
   vertical: obs.IVideoInfo;
 }
+
+export interface IVideoSettingsFormatted {
+  baseRes: string;
+  outputRes: string;
+  scaleType: obs.EScaleType;
+  fpsType: obs.EFPSType;
+  fpsCom: string;
+  fpsNum: number;
+  fpsDen: number;
+  fpsInt: number;
+}
+
+export enum ESettingsVideoProperties {
+  'baseRes' = 'Base',
+  'outputRes' = 'Output',
+  'scaleType' = 'ScaleType',
+  'fpsType' = 'FPSType',
+  'fpsCom' = 'FPSCommon',
+  'fpsNum' = 'FPSNum',
+  'fpsDen' = 'FPSDen',
+  'fpsInt' = 'FPSInt',
+}
 @InitAfter('UserService')
 export class VideoSettingsService extends StatefulService<IVideoSettings> {
   @Inject() settingsManagerService: SettingsManagerService;
@@ -63,10 +85,21 @@ export class VideoSettingsService extends StatefulService<IVideoSettings> {
   }
 
   get values() {
+    return this.contexts;
+  }
+
+  get contexts() {
     return {
       default: this.videoSettingsValues,
       horizontal: this.horizontalSettingsValues,
       vertical: this.verticalSettingsValues,
+    };
+  }
+
+  get dualOutputSettings() {
+    return {
+      horizontal: this.formatDualOutputSettings('horizontal'),
+      vertical: this.formatDualOutputSettings('vertical'),
     };
   }
 
@@ -82,6 +115,13 @@ export class VideoSettingsService extends StatefulService<IVideoSettings> {
     return this.formatVideoSettings('vertical');
   }
 
+  get defaultBaseResolution() {
+    return {
+      width: this.videoContext.video.baseWidth,
+      height: this.videoContext.video.baseHeight,
+    };
+  }
+
   get videoContext() {
     return this.state.videoContext;
   }
@@ -90,6 +130,14 @@ export class VideoSettingsService extends StatefulService<IVideoSettings> {
   // get videoSettings() {
   //   return this.settingsManagerService.videoSettings;
   // }
+
+  getBaseResolution(display: TDisplayType = 'default') {
+    console.log(
+      `${display} display`,
+      `${this.state[display].baseWidth}x${this.state[display].baseHeight}`,
+    );
+    return `${this.state[display].baseWidth}x${this.state[display].baseHeight}`;
+  }
 
   formatVideoSettings(display: TDisplayType = 'default') {
     const settings = this.state[display];
@@ -103,6 +151,21 @@ export class VideoSettingsService extends StatefulService<IVideoSettings> {
       fpsNum: settings.fpsNum,
       fpsDen: settings.fpsDen,
       fpsInt: settings.fpsNum,
+    };
+  }
+
+  formatDualOutputSettings(display: TDisplayType) {
+    const settings = this.state[display];
+
+    return {
+      Base: `${settings.baseWidth}x${settings.baseHeight}`,
+      Output: `${settings.outputWidth}x${settings.outputHeight}`,
+      ScaleType: settings.scaleType,
+      FPSType: settings.fpsType,
+      FPSCommon: `${settings.fpsNum}-${settings.fpsDen}`,
+      FPSNum: settings.fpsNum,
+      FPSDen: settings.fpsDen,
+      FPSInt: settings.fpsNum,
     };
   }
 
@@ -170,6 +233,8 @@ export class VideoSettingsService extends StatefulService<IVideoSettings> {
   }
 
   shutdown() {
+    // delete temporary scenes
+    // this.scenesService.create (or something)
     this.state.videoContext.destroy();
     this.state.horizontalContext.destroy();
     this.state.verticalContext.destroy();
@@ -187,181 +252,9 @@ export class VideoSettingsService extends StatefulService<IVideoSettings> {
 
   @mutation()
   SET_VIDEO_SETTING(key: string, value: unknown, display: TDisplayType = 'default') {
-    console.log('----------> DISPLAY ', display);
-    if (key === 'baseWidth') console.log('baseWidth ', key);
-    if (key === 'baseHeight') console.log('baseHeight ', key);
-
-    console.log('display', display);
-
     this.state[display] = {
       ...this.state[display],
       [key]: value,
     };
   }
 }
-
-//   videoSettingsValues() {
-//     const settings = this.state.default;
-
-//     return {
-//       baseRes: `${settings.baseWidth}x${settings.baseHeight}`,
-//       outputRes: `${settings.outputWidth}x${settings.outputHeight}`,
-//       scaleType: settings.scaleType,
-//       fpsType: settings.fpsType,
-//       fpsCom: `${settings.fpsNum}-${settings.fpsDen}`,
-//       fpsNum: settings.fpsNum,
-//       fpsDen: settings.fpsDen,
-//       fpsInt: settings.fpsNum,
-//     };
-//   }
-
-//   // get defaultSettingsValues() {
-//   //   return {
-//   //     baseRes: `${this.state.default.baseWidth}x${this.state.default.baseHeight}`,
-//   //     outputRes: `${this.state.default.outputWidth}x${this.state.default.outputHeight}`,
-//   //     scaleType: this.state.default.scaleType,
-//   //     fpsType: this.state.default.fpsType,
-//   //     fpsCom: `${this.state.default.fpsNum}-${this.state.default.fpsDen}`,
-//   //     fpsNum: this.state.default.fpsNum,
-//   //     fpsDen: this.state.default.fpsDen,
-//   //     fpsInt: this.state.default.fpsNum,
-//   //   };
-//   //   // return this.videoSettingsValues('default');
-//   // }
-
-//   // get horizontalSettingsValues() {
-//   //   return {
-//   //     baseRes: `${this.state.horizontal.baseWidth}x${this.state.horizontal.baseHeight}`,
-//   //     outputRes: `${this.state.horizontal.outputWidth}x${this.state.horizontal.outputHeight}`,
-//   //     scaleType: this.state.horizontal.scaleType,
-//   //     fpsType: this.state.horizontal.fpsType,
-//   //     fpsCom: `${this.state.horizontal.fpsNum}-${this.state.horizontal.fpsDen}`,
-//   //     fpsNum: this.state.horizontal.fpsNum,
-//   //     fpsDen: this.state.horizontal.fpsDen,
-//   //     fpsInt: this.state.horizontal.fpsNum,
-//   //   };
-//   //   // return this.videoSettingsValues('horizontal');
-//   // }
-
-//   // get verticalSettingsValues() {
-//   //   return {
-//   //     baseRes: `${this.state.vertical.baseWidth}x${this.state.vertical.baseHeight}`,
-//   //     outputRes: `${this.state.vertical.outputWidth}x${this.state.vertical.outputHeight}`,
-//   //     scaleType: this.state.vertical.scaleType,
-//   //     fpsType: this.state.vertical.fpsType,
-//   //     fpsCom: `${this.state.vertical.fpsNum}-${this.state.vertical.fpsDen}`,
-//   //     fpsNum: this.state.vertical.fpsNum,
-//   //     fpsDen: this.state.vertical.fpsDen,
-//   //     fpsInt: this.state.vertical.fpsNum,
-//   //   };
-//   //   // return this.videoSettingsValues('vertical');
-//   // }
-
-//   // videoSettingsValues(display?: string) {
-//   //   const settings = this.state[`${display ?? 'default'}VideoSettings`];
-
-//   //   return {
-//   //     baseRes: `${settings.baseWidth}x${settings.baseHeight}`,
-//   //     outputRes: `${settings.outputWidth}x${settings.outputHeight}`,
-//   //     scaleType: settings.scaleType,
-//   //     fpsType: settings.fpsType,
-//   //     fpsCom: `${settings.fpsNum}-${settings.fpsDen}`,
-//   //     fpsNum: settings.fpsNum,
-//   //     fpsDen: settings.fpsDen,
-//   //     fpsInt: settings.fpsNum,
-//   //   };
-//   // }
-
-//   get videoContext() {
-//     return this.state.videoContext;
-//   }
-
-//   // @@@ TODO: Refactor for persistence
-//   // get videoSettings() {
-//   //   return this.settingsManagerService.videoSettings;
-//   // }
-
-//   migrateSettings() {
-//     // @@@ TODO: Remove assignment of dummy data when persistence is implemented
-//     // this.state.horizontalContext.legacySettings = horizontalData;
-//     // this.state.verticalContext.legacySettings = verticalData;
-//     // ^^^
-
-//     // default video settings
-//     this.state.default = this.state.videoContext.video;
-//     Object.keys(this.state.videoContext.legacySettings).forEach(
-//       (key: keyof obs.IAdvancedStreaming | keyof obs.ISimpleStreaming) => {
-//         this.SET_VIDEO_SETTING(key, this.state.videoContext.legacySettings[key]);
-//       },
-//     );
-
-//     // horizontal video settings
-//     this.state.horizontal = this.state.horizontalContext.video;
-//     Object.keys(this.state.horizontalContext.legacySettings).forEach(
-//       (key: keyof obs.IAdvancedStreaming | keyof obs.ISimpleStreaming) => {
-//         this.SET_VIDEO_SETTING(key, this.state.horizontalContext.legacySettings[key], 'horizontal');
-//       },
-//     );
-
-//     // vertical video settings
-//     this.state.vertical = this.state.verticalContext.video;
-//     Object.keys(this.state.verticalContext.legacySettings).forEach(
-//       (key: keyof obs.IAdvancedStreaming | keyof obs.ISimpleStreaming) => {
-//         this.SET_VIDEO_SETTING(key, this.state.verticalContext.legacySettings[key], 'vertical');
-//       },
-//     );
-//   }
-
-//   establishVideoContext() {
-//     if (this.state.videoContext) return;
-
-//     this.SET_VIDEO_CONTEXT();
-
-//     this.migrateSettings();
-//     this.state.videoContext.video = this.state.default;
-//     this.state.horizontalContext.video = this.state.horizontal;
-//     this.state.verticalContext.video = this.state.vertical;
-//   }
-
-//   @debounce(200)
-//   updateObsSettings(display: string) {
-//     this.state.videoContext.video = this.state.default;
-//     // if (display === 'default') {
-//     //   this.state.videoContext.video = this.state.default;
-//     //   console.log('this.state.videoContext.video ', this.state.videoContext.video);
-//     // } else {
-//     //   const context = `${display}Context`;
-//     //   const setting = `${display}VideoSettings`;
-//     //   this.state[context].video = this.state[setting];
-//     //   console.log('this.state[context].video ', this.state[context].video);
-//     // }
-//   }
-
-//   // @debounce(200)
-//   // updateHorizontalObsSettings() {
-//   //   this.state.horizontalContext.video = this.state.horizontal;
-//   // }
-
-//   // @debounce(200)
-//   // updateVerticalObsSettings() {
-//   //   this.state.verticalContext.video = this.state.vertical;
-//   // }
-
-//   setVideoSetting(key: string, value: unknown, display?: string) {
-//     this.SET_VIDEO_SETTING(key, value, display);
-//     this.updateObsSettings(display ?? 'default');
-//   }
-
-//   @mutation()
-//   SET_VIDEO_SETTING(key: string, value: unknown, display?: string) {
-//     console.log('----------> DISPLAY ', display);
-//     if (key === 'baseWidth') console.log('baseWidth ', key);
-//     if (key === 'baseHeight') console.log('baseHeight ', key);
-//     const propertyName = `${display ?? 'default'}VideoSettings`;
-//     console.log('propertyName', propertyName);
-//     this.state[propertyName] = {
-//       ...this.state[propertyName],
-//       [key]: value,
-//     };
-//   }
-// }

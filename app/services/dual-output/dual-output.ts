@@ -1,4 +1,4 @@
-import { PersistentStatefulService, InitAfter, ViewHandler, mutation } from 'services/core';
+import { PersistentStatefulService, InitAfter, Inject, ViewHandler, mutation } from 'services/core';
 import {
   TDualOutputPlatformSettings,
   DualOutputPlatformSettings,
@@ -6,12 +6,19 @@ import {
   TOutputDisplayType,
   IDualOutputPlatformSetting,
 } from './dual-output-data';
+import { ScenesService } from 'services/scenes';
+import { CopyNodesCommand } from 'services/editor-commands/commands';
 interface IDualOutputServiceState {
   platformSettings: TDualOutputPlatformSettings;
   isHorizontalActive: boolean;
   isVerticalActive: boolean;
   dualOutputMode: boolean;
+  horizontalSceneId: string;
+  verticalSceneId: string;
+  // nodeMap: Dictionary @@@ HERE writing map for nodes so that horizontal and vertical nodes toggle correctly
 }
+
+export type TDualOutputDisplayType = 'horizontal' | 'vertical';
 
 class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
   get dualOutputMode() {
@@ -33,15 +40,28 @@ class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
   get platformSettingsList(): IDualOutputPlatformSetting[] {
     return Object.values(this.state.platformSettings);
   }
+
+  get horizontalSceneId() {
+    return this.state.horizontalSceneId;
+  }
+
+  get verticalSceneId() {
+    return this.state.verticalSceneId;
+  }
 }
 
 @InitAfter('UserService')
+@InitAfter('ScenesService')
 export class DualOutputService extends PersistentStatefulService<IDualOutputServiceState> {
+  @Inject() private scenesService: ScenesService;
+
   static defaultState: IDualOutputServiceState = {
     platformSettings: DualOutputPlatformSettings,
     dualOutputMode: false,
     isHorizontalActive: true,
     isVerticalActive: true,
+    horizontalSceneId: null,
+    verticalSceneId: null,
   };
   get views() {
     return new DualOutputViews(this.state);
@@ -69,6 +89,33 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
 
   updatePlatformSetting(platform: EDualOutputPlatform | string, setting: TOutputDisplayType) {
     this.UPDATE_PLATFORM_SETTING(platform, setting);
+  }
+
+  setTemporaryScenes(sceneId: string) {
+    // @@@ TODO: delete the line below when removing temporary scenes when changing active scene is implemented
+    if (['horizontal', 'vertical'].includes(sceneId.split('_')[2])) return;
+
+    const nodesToCopy = this.scenesService.views.getScene(sceneId).getSelection().selectAll();
+
+    const horizontalScene = this.scenesService.createScene(`${sceneId}_horizontal`, {
+      sceneId: `${sceneId}_horizontal`,
+      makeActive: false,
+    });
+    const verticalScene = this.scenesService.createScene(`${sceneId}_vertical`, {
+      sceneId: `${sceneId}_vertical`,
+      makeActive: false,
+    });
+
+    console.log('horizontalScene ', horizontalScene.state);
+    console.log('verticalScene ', verticalScene.state);
+
+    const horizontalCopyNodesCommand = new CopyNodesCommand(nodesToCopy, horizontalScene.state.id);
+    horizontalCopyNodesCommand.execute();
+
+    const verticalCopyNodesCommand = new CopyNodesCommand(nodesToCopy, verticalScene.state.id);
+    verticalCopyNodesCommand.execute();
+
+    this.SET_TEMPORARY_SCENES(horizontalScene.state.id, verticalScene.state.id);
   }
 
   @mutation()
@@ -124,5 +171,11 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
       ...this.state.platformSettings[platform],
       setting,
     };
+  }
+
+  @mutation()
+  private SET_TEMPORARY_SCENES(horizontalSceneId: string, verticalSceneId: string) {
+    this.state.horizontalSceneId = horizontalSceneId;
+    this.state.verticalSceneId = verticalSceneId;
   }
 }
