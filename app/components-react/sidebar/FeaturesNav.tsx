@@ -160,7 +160,7 @@ export default function FeaturesNav() {
           // skip legacy menu items for new users
           // skip Theme Audit if not enabled
           return null;
-        } else if (menuItem.key === EMenuItemKey.Editor && loggedIn && studioTabs.length > 1) {
+        } else if (menuItem.key === EMenuItemKey.Editor && loggedIn) {
           // if there are multiple editor screens and the menu is closed, show them in the sidebar
           // if there are multiple editor screens and the menu is open, show them in a submenu
           if (showCustomEditor && !isOpen && !compactView) {
