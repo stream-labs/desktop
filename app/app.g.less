@@ -1,17 +1,17 @@
-@import './styles/foundation';
-@import '../node_modules/overlayscrollbars/css/OverlayScrollbars.css';
-@import '../node_modules/vue-multiselect/dist/vue-multiselect.min.css';
-@import './styles/index';
-@import './styles/checkboxes';
-@import './styles/tables';
-@import './styles/buttons';
-@import './styles/classes';
-@import './styles/custom-icons';
-@import './styles/inputs';
-@import './styles/sl-vue-tree';
-@import './styles/tooltips';
-@import './styles/animations';
-@import './styles/loader.less';
+@import "./styles/foundation";
+@import "../node_modules/overlayscrollbars/css/OverlayScrollbars.css";
+@import "../node_modules/vue-multiselect/dist/vue-multiselect.min.css";
+@import "./styles/index";
+@import "./styles/checkboxes";
+@import "./styles/tables";
+@import "./styles/buttons";
+@import "./styles/classes";
+@import "./styles/custom-icons";
+@import "./styles/inputs";
+@import "./styles/sl-vue-tree";
+@import "./styles/tooltips";
+@import "./styles/animations";
+@import "./styles/loader.less";
 
 :not(input):not(textarea),
 :not(input):not(textarea)::after,
@@ -45,7 +45,7 @@
 h1 {
   .weight(@bold);
 
-  font-family: 'Roboto', sans-serif;
+  font-family: "Roboto", sans-serif;
   font-size: 20px;
   color: var(--title);
   margin-bottom: 24px;
@@ -55,7 +55,7 @@ h2 {
   .weight(@medium);
   .margin-bottom(3);
 
-  font-family: 'Roboto', sans-serif;
+  font-family: "Roboto", sans-serif;
   font-size: 16px;
   color: var(--title);
 }
@@ -63,7 +63,7 @@ h2 {
 h3 {
   .weight(@medium);
 
-  font-family: 'Roboto', sans-serif;
+  font-family: "Roboto", sans-serif;
   font-size: 14px;
   color: var(--title);
 }
@@ -72,7 +72,7 @@ h4 {
   .weight(@medium);
   .margin-bottom(2);
 
-  font-family: 'Roboto', sans-serif;
+  font-family: "Roboto", sans-serif;
   font-size: 14px;
   color: var(--title);
 }
@@ -186,7 +186,7 @@ a,
 .search-input {
   position: relative;
 
-  input[type='text'] {
+  input[type=text] {
     .radius();
 
     background: transparent;
@@ -210,7 +210,7 @@ a,
 }
 
 .search-input--trans {
-  input[type='text'] {
+  input[type=text] {
     border-bottom: 1px solid transparent;
     border-radius: 0;
 
@@ -237,10 +237,9 @@ a,
 .slide-open__menu {
   position: absolute;
   background: var(--background);
-  right: calc(~'100% + 20px');
+  right: calc(~"100% + 20px");
   align-self: center;
   display: flex;
-  z-index: 1011;
   top: -6px;
   .padding-h-sides();
   .radius();
@@ -250,6 +249,10 @@ a,
     max-height: 32px;
     white-space: nowrap;
   }
+}
+
+.slide-open__menu.top-visible {
+  z-index: 1011;
 }
 
 .tabs {

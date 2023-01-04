@@ -24,7 +24,7 @@ export default function TestWidgets(p: { testers?: string[] }) {
       </a>
       <Animation transitionName="ant-slide-right">
         {slideOpen && (
-          <div className="slide-open__menu">
+          <div className="slide-open__menu top-visible">
             {widgetTesters.map(tester => (
               <button
                 className="button button--trans"
