@@ -1,17 +1,17 @@
-@import "./styles/foundation";
-@import "../node_modules/overlayscrollbars/css/OverlayScrollbars.css";
-@import "../node_modules/vue-multiselect/dist/vue-multiselect.min.css";
-@import "./styles/index";
-@import "./styles/checkboxes";
-@import "./styles/tables";
-@import "./styles/buttons";
-@import "./styles/classes";
-@import "./styles/custom-icons";
-@import "./styles/inputs";
-@import "./styles/sl-vue-tree";
-@import "./styles/tooltips";
-@import "./styles/animations";
-@import "./styles/loader.less";
+@import './styles/foundation';
+@import '../node_modules/overlayscrollbars/css/OverlayScrollbars.css';
+@import '../node_modules/vue-multiselect/dist/vue-multiselect.min.css';
+@import './styles/index';
+@import './styles/checkboxes';
+@import './styles/tables';
+@import './styles/buttons';
+@import './styles/classes';
+@import './styles/custom-icons';
+@import './styles/inputs';
+@import './styles/sl-vue-tree';
+@import './styles/tooltips';
+@import './styles/animations';
+@import './styles/loader.less';
 
 :not(input):not(textarea),
 :not(input):not(textarea)::after,
@@ -186,7 +186,7 @@ a,
 .search-input {
   position: relative;
 
-  input[type=text] {
+  input[type='text'] {
     .radius();
 
     background: transparent;
@@ -210,7 +210,7 @@ a,
 }
 
 .search-input--trans {
-  input[type=text] {
+  input[type='text'] {
     border-bottom: 1px solid transparent;
     border-radius: 0;
 
@@ -240,7 +240,7 @@ a,
   right: calc(~'100% + 20px');
   align-self: center;
   display: flex;
-  z-index: 10;
+  z-index: 1011;
   top: -6px;
   .padding-h-sides();
   .radius();
@@ -319,7 +319,9 @@ a,
         background: transparent;
       }
 
-      &::after { color: var(--paragraph); }
+      &::after {
+        color: var(--paragraph);
+      }
     }
   }
 }
@@ -463,9 +465,9 @@ select {
   transition: all 0.3s ease;
 }
 
-
-.zoom-enter-active, .zoom-leave-active {
-  transition: transform .3s, opacity .5s;
+.zoom-enter-active,
+.zoom-leave-active {
+  transition: transform 0.3s, opacity 0.5s;
 }
 .zoom-enter {
   opacity: 0;
@@ -477,9 +479,15 @@ select {
   transform: translateX(-100%);
 }
 
-.checkboxdone-enter-active {transition: width 0.3s;}
-.checkboxdone-enter {width: 0;}
-.checkboxdone-enter-to {width: 16px;}
+.checkboxdone-enter-active {
+  transition: width 0.3s;
+}
+.checkboxdone-enter {
+  width: 0;
+}
+.checkboxdone-enter-to {
+  width: 16px;
+}
 
 .v--modal-overlay {
   background: var(--modal-overlay);
