@@ -18,27 +18,25 @@ export default function TestWidgets(p: { testers?: string[] }) {
   }
 
   return (
-    <>
-      <div className="slide-open">
-        <a className="slide-open__open link" onClick={() => setSlideOpen(!slideOpen)}>
-          {$t('Test Widgets')}
-        </a>
-        <Animation transitionName="ant-slide-right">
-          {slideOpen && (
-            <div className="slide-open__menu">
-              {widgetTesters.map(tester => (
-                <button
-                  className="button button--trans"
-                  key={tester.name}
-                  onClick={() => test(tester.name)}
-                >
-                  {$t(tester.name)}
-                </button>
-              ))}
-            </div>
-          )}
-        </Animation>
-      </div>
-    </>
+    <div className="slide-open">
+      <a className="slide-open__open link" onClick={() => setSlideOpen(!slideOpen)}>
+        {$t('Test Widgets')}
+      </a>
+      <Animation transitionName="ant-slide-right">
+        {slideOpen && (
+          <div className="slide-open__menu">
+            {widgetTesters.map(tester => (
+              <button
+                className="button button--trans"
+                key={tester.name}
+                onClick={() => test(tester.name)}
+              >
+                {$t(tester.name)}
+              </button>
+            ))}
+          </div>
+        )}
+      </Animation>
+    </div>
   );
 }
