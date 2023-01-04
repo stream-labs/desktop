@@ -40,6 +40,7 @@ import { ApplicationMenuService } from 'services/application-menu';
 import { KeyListenerService } from 'services/key-listener';
 import { MetricsService } from '../metrics';
 import { SettingsService } from '../settings';
+import { DualOutputService } from 'services/dual-output';
 import { OS, getOS } from 'util/operating-systems';
 import * as remote from '@electron/remote';
 
@@ -92,6 +93,7 @@ export class AppService extends StatefulService<IAppState> {
   @Inject() private settingsService: SettingsService;
   @Inject() private usageStatisticsService: UsageStatisticsService;
   @Inject() private videoSettingsService: VideoSettingsService;
+  @Inject() private dualOutputService: DualOutputService;
 
   static initialState: IAppState = {
     loading: true,
@@ -190,12 +192,13 @@ export class AppService extends StatefulService<IAppState> {
       this.windowsService.shutdown();
       this.ipcServerService.stopListening();
       await this.userService.flushUserSession();
+      this.dualOutputService.shutdown();
       await this.sceneCollectionsService.deinitialize();
       this.performanceService.stop();
       this.transitionsService.shutdown();
+      this.videoSettingsService.shutdown();
       await this.gameOverlayService.destroy();
       await this.fileManagerService.flushAll();
-      this.videoSettingsService.shutdown();
       obs.NodeObs.RemoveSourceCallback();
       obs.NodeObs.OBS_service_removeCallback();
       obs.IPC.disconnect();

@@ -26,7 +26,7 @@ export default function DualOutputDisplay(p: { eventHandlers: IDisplayEventHandl
     horizontalSceneId: DualOutputService.views.horizontalSceneId,
     verticalSceneId: DualOutputService.views.verticalSceneId,
     cursor: EditorService.state.cursor,
-    setTemporaryScenes: DualOutputService.actions.setTemporaryScenes,
+    setDualOutputScenes: DualOutputService.actions.setDualOutputScenes,
   }));
 
   v;
@@ -34,20 +34,11 @@ export default function DualOutputDisplay(p: { eventHandlers: IDisplayEventHandl
   useEffect(() => {
     /**
      * We need a separate scene to render differences in each display
-     * so for dual output, we need to create additional duplicate scenes temporarily.
-     * We only need to check one of the dual output scene ids
-     * because the temporary scenes are created at the same time.
+     * so for dual output, we need to create temporary scenes
+     * that render in each display.
      */
-    if (v.horizontalSceneId || v.verticalSceneId) {
-      const activeSceneUid = v.activeSceneId.split('_')[1];
-      const horizontalSceneUid = v.horizontalSceneId.split('_')[1];
-      const verticalSceneUid = v.verticalSceneId.split('_')[1];
-      if (activeSceneUid !== horizontalSceneUid || activeSceneUid !== verticalSceneUid) {
-        v.setTemporaryScenes(v.activeSceneId);
-      }
-    } else {
-      v.setTemporaryScenes(v.activeSceneId);
-    }
+
+    v.setDualOutputScenes(v.activeSceneId);
   }, [v.activeSceneId]);
 
   return !!v.horizontalSceneId && !!v.verticalSceneId ? (

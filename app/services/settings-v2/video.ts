@@ -233,8 +233,6 @@ export class VideoSettingsService extends StatefulService<IVideoSettings> {
   }
 
   shutdown() {
-    // delete temporary scenes
-    // this.scenesService.create (or something)
     this.state.videoContext.destroy();
     this.state.horizontalContext.destroy();
     this.state.verticalContext.destroy();

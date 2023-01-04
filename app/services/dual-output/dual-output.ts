@@ -48,10 +48,15 @@ class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
   get verticalSceneId() {
     return this.state.verticalSceneId;
   }
+
+  get hasDualOutputScenes() {
+    return this.state.horizontalSceneId || this.state.verticalSceneId;
+  }
 }
 
 @InitAfter('UserService')
 @InitAfter('ScenesService')
+// @@@ maybe @InitAfter('SourcesService')
 export class DualOutputService extends PersistentStatefulService<IDualOutputServiceState> {
   @Inject() private scenesService: ScenesService;
 
@@ -71,12 +76,8 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
     super.init();
   }
 
-  toggleDualOutputMode() {
-    this.TOGGLE_DUAL_OUTPUT_MODE();
-  }
-
-  setDualOutputMode(status: boolean) {
-    this.SET_DUAL_OUTPUT_MODE(status);
+  toggleDualOutputMode(status?: boolean) {
+    this.TOGGLE_DUAL_OUTPUT_MODE(status);
   }
 
   toggleVerticalVisibility(status?: boolean) {
@@ -91,9 +92,12 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
     this.UPDATE_PLATFORM_SETTING(platform, setting);
   }
 
-  setTemporaryScenes(sceneId: string) {
-    // @@@ TODO: delete the line below when removing temporary scenes when changing active scene is implemented
-    if (['horizontal', 'vertical'].includes(sceneId.split('_')[2])) return;
+  setDualOutputScenes(sceneId: string) {
+    if (this.views.hasDualOutputScenes) {
+      // For performance, we only want one set of dual output scenes active at any time
+      // so when the user changes the active scene, we destroy the dual output scenes
+      this.destroyDualOutputScenes();
+    }
 
     const nodesToCopy = this.scenesService.views.getScene(sceneId).getSelection().selectAll();
 
@@ -106,39 +110,38 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
       makeActive: false,
     });
 
-    console.log('horizontalScene ', horizontalScene.state);
-    console.log('verticalScene ', verticalScene.state);
-
     const horizontalCopyNodesCommand = new CopyNodesCommand(nodesToCopy, horizontalScene.state.id);
     horizontalCopyNodesCommand.execute();
 
     const verticalCopyNodesCommand = new CopyNodesCommand(nodesToCopy, verticalScene.state.id);
     verticalCopyNodesCommand.execute();
 
-    this.SET_TEMPORARY_SCENES(horizontalScene.state.id, verticalScene.state.id);
+    if (!this.state.dualOutputMode) {
+      this.toggleDualOutputMode(true);
+    }
+    this.SET_DUAL_OUTPUT_SCENES(horizontalScene.state.id, verticalScene.state.id);
   }
 
-  @mutation()
-  private SET_DUAL_OUTPUT_MODE(status: boolean) {
-    this.state.dualOutputMode = status;
-    this.state.isHorizontalActive = status;
-    this.state.isVerticalActive = status;
+  destroyDualOutputScenes() {
+    if (this.views.hasDualOutputScenes) {
+      // remove dual output scenes
+      this.scenesService.removeScene(this.state.horizontalSceneId, true);
+      this.scenesService.removeScene(this.state.verticalSceneId, true);
+      // reset data for dual output scenes
+      this.REMOVE_DUAL_OUTPUT_SCENES();
+    }
+  }
+
+  shutdown() {
+    this.destroyDualOutputScenes();
   }
 
   @mutation()
   private TOGGLE_DUAL_OUTPUT_MODE(status?: boolean) {
-    // console.log('toggle horizontalContext ', this.state.horizontalContext);
-    // console.log('toggle verticalContext ', this.state.verticalContext);
     if (typeof status === 'undefined') {
       this.state.dualOutputMode = !this.state.dualOutputMode;
     } else {
       this.state.dualOutputMode = status;
-    }
-
-    if (this.state.dualOutputMode === false) {
-      // reset so both displays will always show when dual output is toggled on
-      this.state.isVerticalActive = true;
-      this.state.isHorizontalActive = true;
     }
   }
 
@@ -174,8 +177,20 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
   }
 
   @mutation()
-  private SET_TEMPORARY_SCENES(horizontalSceneId: string, verticalSceneId: string) {
-    this.state.horizontalSceneId = horizontalSceneId;
-    this.state.verticalSceneId = verticalSceneId;
+  private SET_DUAL_OUTPUT_SCENES(horizontalSceneId: string, verticalSceneId: string) {
+    this.state = {
+      ...this.state,
+      horizontalSceneId,
+      verticalSceneId,
+    };
+  }
+
+  @mutation()
+  private REMOVE_DUAL_OUTPUT_SCENES() {
+    this.state = {
+      ...this.state,
+      horizontalSceneId: null,
+      verticalSceneId: null,
+    };
   }
 }

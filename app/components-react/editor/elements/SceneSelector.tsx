@@ -25,6 +25,7 @@ function SceneSelector() {
     SourceFiltersService,
     ProjectorService,
     EditorCommandsService,
+    DualOutputService,
   } = Services;
 
   const { treeSort } = useTree(true);
@@ -113,6 +114,10 @@ function SceneSelector() {
         }
 
         EditorCommandsService.actions.executeCommand('RemoveSceneCommand', scene.id);
+
+        if (DualOutputService.views.hasDualOutputScenes) {
+          DualOutputService.actions.destroyDualOutputScenes();
+        }
       });
   }
 
