@@ -64,7 +64,11 @@
     </div>
     <ModalWrapper :renderFn="modalOptions.renderFn" />
     <transition name="loader">
-      <div class="main-loading" v-if="!uiReady || showLoadingSpinner">
+      <div
+        class="main-loading"
+        :class="{ 'initial-loading': !uiReady }"
+        v-if="!uiReady || showLoadingSpinner"
+      >
         <custom-loader></custom-loader>
       </div>
     </transition>
@@ -163,6 +167,10 @@
   /deep/ .s-loader__bg {
     top: 30px;
   }
+}
+
+.initial-loading {
+  top: 0px !important;
 }
 
 .loader-enter-active,
