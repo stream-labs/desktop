@@ -17,7 +17,6 @@ import {
   platformLabels,
 } from '../../../services/dual-output';
 import styles from './Multistreaming.m.less';
-import * as remote from '@electron/remote';
 
 export function MultistreamingSettings() {
   const { UserService, MagicLinkService, DualOutputService } = Services;
@@ -110,7 +109,7 @@ export function MultistreamingSettings() {
       <ObsSettingsSection title={$t('Dual Output')} style={{ paddingBottom: '30px' }}>
         <div className={styles.doDescription}>
           {/* @@@ TODO: Refactor to use sidenav switch button */}
-          <SwitchInput value={dualOutputMode} onChange={toggleDualOutputMode} />
+          <SwitchInput value={dualOutputMode} layout="horizontal" onChange={toggleDualOutputMode} />
           {$t('Enable Dual Outputs (simultaneous horizontal and vertical Outputs)')}{' '}
           <Tooltip
             title={$t('Set up your resolution for each orientation in the Video Settings tab.')}
