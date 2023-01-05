@@ -33,6 +33,10 @@ export class CopyNodesCommand extends Command {
     this.description = $t('Paste %{nodeName}', { nodeName: nodes[0] ? nodes[0].name : '' });
   }
 
+  get idsMap() {
+    return this.nodeIdsMap;
+  }
+
   execute() {
     const scene = this.scenesService.views.getScene(this.destSceneId);
     const insertedNodes: TSceneNode[] = [];

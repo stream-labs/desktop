@@ -8,6 +8,11 @@ import {
 } from './dual-output-data';
 import { ScenesService } from 'services/scenes';
 import { CopyNodesCommand } from 'services/editor-commands/commands';
+
+interface IDualOutputNodeIds {
+  horizontal: string;
+  vertical: string;
+}
 interface IDualOutputServiceState {
   platformSettings: TDualOutputPlatformSettings;
   isHorizontalActive: boolean;
@@ -15,7 +20,8 @@ interface IDualOutputServiceState {
   dualOutputMode: boolean;
   horizontalSceneId: string;
   verticalSceneId: string;
-  // nodeMap: Dictionary @@@ HERE writing map for nodes so that horizontal and vertical nodes toggle correctly
+  horizontalNodeMap: Dictionary<string>;
+  verticalNodeMap: Dictionary<string>;
 }
 
 export type TDualOutputDisplayType = 'horizontal' | 'vertical';
@@ -67,6 +73,8 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
     isVerticalActive: true,
     horizontalSceneId: null,
     verticalSceneId: null,
+    horizontalNodeMap: null,
+    verticalNodeMap: null,
   };
   get views() {
     return new DualOutputViews(this.state);
@@ -128,6 +136,8 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
     const verticalCopyNodesCommand = new CopyNodesCommand(nodesToCopy, verticalScene.state.id);
     verticalCopyNodesCommand.execute();
 
+    this.SET_NODE_MAPS(horizontalCopyNodesCommand.idsMap, verticalCopyNodesCommand.idsMap);
+
     if (!this.state.dualOutputMode) {
       this.toggleDualOutputMode(true);
     }
@@ -141,6 +151,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
       this.scenesService.removeScene(this.state.verticalSceneId, true);
       // reset data for dual output scenes
       this.REMOVE_DUAL_OUTPUT_SCENES();
+      this.SET_NODE_MAPS();
     }
   }
 
@@ -190,19 +201,27 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
 
   @mutation()
   private SET_DUAL_OUTPUT_SCENES(horizontalSceneId: string, verticalSceneId: string) {
-    this.state = {
-      ...this.state,
-      horizontalSceneId,
-      verticalSceneId,
-    };
+    this.state.horizontalSceneId = horizontalSceneId;
+    this.state.verticalSceneId = verticalSceneId;
   }
 
   @mutation()
   private REMOVE_DUAL_OUTPUT_SCENES() {
-    this.state = {
-      ...this.state,
-      horizontalSceneId: null,
-      verticalSceneId: null,
-    };
+    this.state.horizontalSceneId = null;
+    this.state.verticalSceneId = null;
+  }
+
+  @mutation()
+  private SET_NODE_MAPS(
+    horizontalNodeMap?: Dictionary<string>,
+    verticalNodeMap?: Dictionary<string>,
+  ) {
+    if (!horizontalNodeMap || !verticalNodeMap) {
+      this.state.horizontalNodeMap = null;
+      this.state.verticalNodeMap = null;
+    } else {
+      this.state.horizontalNodeMap = horizontalNodeMap;
+      this.state.verticalNodeMap = verticalNodeMap;
+    }
   }
 }
