@@ -1,8 +1,7 @@
-import React, { MouseEvent, useEffect } from 'react';
+import React, { MouseEvent, useLayoutEffect } from 'react';
 import { useVuex } from '../hooks';
 import { Services } from '../service-provider';
 import { ERenderingMode } from '../../../obs-api';
-import { TDualOutputDisplayType } from 'services/dual-output';
 import Display from 'components-react/shared/Display';
 import Spinner from 'components-react/shared/Spinner';
 import styles from '../root/StudioEditor.m.less';
@@ -29,9 +28,7 @@ export default function DualOutputDisplay(p: { eventHandlers: IDisplayEventHandl
     setDualOutputScenes: DualOutputService.actions.setDualOutputScenes,
   }));
 
-  v;
-
-  useEffect(() => {
+  useLayoutEffect(() => {
     /**
      * We need a separate scene to render differences in each display
      * so for dual output, we need to create temporary scenes

@@ -95,8 +95,20 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
   setDualOutputScenes(sceneId: string) {
     if (this.views.hasDualOutputScenes) {
       // For performance, we only want one set of dual output scenes active at any time
-      // so when the user changes the active scene, we destroy the dual output scenes
-      this.destroyDualOutputScenes();
+      // so when the user changes the active scene, we destroy the dual output scenes.
+
+      // Determine if this is a change in the active scene
+      // We only need to check one of the dual output scene ids
+      // because they are created at the same time from the same active scene.
+      const lastIndex = this.state.horizontalSceneId.lastIndexOf('_');
+      this.state.horizontalSceneId.slice(0, lastIndex - 2);
+      const currentSceneId = this.state.horizontalSceneId.slice(0, lastIndex - 2);
+
+      if (currentSceneId === sceneId) {
+        return;
+      } else {
+        this.destroyDualOutputScenes();
+      }
     }
 
     const nodesToCopy = this.scenesService.views.getScene(sceneId).getSelection().selectAll();
