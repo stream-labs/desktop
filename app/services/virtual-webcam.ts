@@ -13,7 +13,7 @@ const PLUGIN_PLIST_PATH =
   '/Library/CoreMediaIO/Plug-Ins/DAL/vcam-plugin.plugin/Contents/Info.plist';
 
 const INTERNAL_PLIST_PATH =
-  'node_modules/obs-studio-node/data/obs-plugins/slobs-virtual-cam/Info.plist';
+  'node_modules/obs-studio-node/PlugIns/slobs-virtual-cam.plugin/Contents/MacOS/Info.plist';
 
 export enum EVirtualWebcamPluginInstallStatus {
   Installed = 'installed',
