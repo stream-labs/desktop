@@ -194,7 +194,10 @@ class StreamSettingsModule {
       return;
     }
 
-    this.fixUrl();
+    if (!this.state.customDestForm.url.includes('?')) {
+      // if the url contains parameters, don't add a trailing /
+      this.fixUrl();
+    }
 
     const destinations = cloneDeep(this.customDestinations);
     const isUpdateMode = typeof this.state.editCustomDestMode === 'number';

@@ -20,6 +20,7 @@ import { $t } from '../../../services/i18n';
 import { IStreamError } from '../../../services/streaming/stream-error';
 import { IGoLiveSettings } from '../../../services/streaming';
 import { injectState, useModule, mutation } from 'slap';
+import styles from './StreamScheduler.m.less';
 
 /**
  * Represents a single stream event
@@ -171,7 +172,10 @@ class StreamSchedulerModule {
       const broadcasts = await ytActions.return.fetchBroadcasts();
       return broadcasts.map(broadcast => convertYTBroadcastToEvent(broadcast));
     } catch (e: unknown) {
-      message.error($t('Failed to load YouTube events'));
+      message.error({
+        content: $t('Failed to load YouTube events'),
+        className: styles.schedulerError,
+      });
       return [];
     }
   }
@@ -184,7 +188,10 @@ class StreamSchedulerModule {
       const liveVideos = await fbActions.return.fetchAllVideos();
       return liveVideos.map(video => convertFBLiveVideoToEvent(video));
     } catch (e: unknown) {
-      message.error($t('Failed to load Facebook events'));
+      message.error({
+        content: $t('Failed to load Facebook events'),
+        className: styles.schedulerError,
+      });
       return [];
     }
   }
@@ -231,7 +238,10 @@ class StreamSchedulerModule {
     const time = selectedTime || this.state.time;
     const isPastDate = time < today;
     if (isPastDate) {
-      message.error($t('You can not schedule to a past date'));
+      message.error({
+        content: $t('You can not schedule to a past date'),
+        className: styles.schedulerError,
+      });
       return;
     }
     this.state.selectedPlatform = platform;
@@ -270,7 +280,10 @@ class StreamSchedulerModule {
     try {
       await this.form.validateFields();
     } catch (e: unknown) {
-      message.error($t('Invalid settings. Please check the form'));
+      message.error({
+        content: $t('Invalid settings. Please check the form'),
+        className: styles.schedulerError,
+      });
       return false;
     }
 
@@ -356,13 +369,17 @@ class StreamSchedulerModule {
    */
   private handleError(err: IStreamError) {
     if (this.state.selectedPlatform === 'facebook') {
-      message.error(
-        $t(
+      message.error({
+        content: $t(
           'Please schedule no further than 7 days in advance and no sooner than 10 minutes in advance.',
         ),
-      );
+        className: styles.schedulerError,
+      });
     } else {
-      message.error($t('Can not schedule the stream for the given date/time'));
+      message.error({
+        content: $t('Can not schedule the stream for the given date/time'),
+        className: styles.schedulerError,
+      });
     }
     this.hideLoader();
   }

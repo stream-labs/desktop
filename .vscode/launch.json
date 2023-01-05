@@ -11,7 +11,10 @@
         "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron"
       },
       "runtimeArgs": [".", "--remote-debugging-port=9222"],
-      "cwd": "${workspaceRoot}"
+      "cwd": "${workspaceRoot}",
+      "env": {
+        "SLOBS_PRODUCTION_DEBUG": "true"
+      }
     },
     {
       "type": "chrome",
@@ -20,12 +23,32 @@
       "port": 9222,
       "webRoot": "${workspaceRoot}",
       "sourceMaps": true
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Launch with DevTools",
+      "protocol": "inspector",
+      "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron.cmd",
+      "osx": {
+        "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron"
+      },
+      "runtimeArgs": [".", "--remote-debugging-port=9222"],
+      "cwd": "${workspaceRoot}",
+      "env": {
+        "SLOBS_PRODUCTION_DEBUG": "true"
+      }
     }
   ],
   "compounds": [
     {
       "name": "Electron All",
       "configurations": ["Launch", "Attach to Chrome"],
+      "stopAll": true
+    },
+    {
+      "name": "Electron All DevTools",
+      "configurations": ["Launch with DevTools", "Attach to Chrome"],
       "stopAll": true
     }
   ]

@@ -66,9 +66,6 @@ export function Optimize() {
           });
         }
       } else if (progress.event === 'done') {
-        // We also default on video encoding optimizations
-        VideoEncodingOptimizationService.actions.useOptimizedProfile(true);
-
         setProcessing(false);
         sub.unsubscribe();
         next();

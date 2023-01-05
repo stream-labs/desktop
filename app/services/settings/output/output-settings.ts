@@ -1,5 +1,6 @@
 import { Service } from 'services/core/service';
 import { ISettingsSubCategory, SettingsService } from 'services/settings';
+import { VideoSettingsService } from 'services/settings-v2/video';
 import { Inject } from 'services/core/injector';
 import { Dictionary } from 'vuex';
 import { AudioService } from 'app-services';
@@ -180,6 +181,7 @@ export function obsEncoderToEncoderFamily(
 export class OutputSettingsService extends Service {
   @Inject() private settingsService: SettingsService;
   @Inject() private audioService: AudioService;
+  @Inject() private videoSettingsService: VideoSettingsService;
 
   /**
    * returns unified settings for the Streaming and Recording encoder
@@ -370,7 +372,9 @@ export class OutputSettingsService extends Service {
     const currentSettings = this.getSettings();
 
     if (settingsPatch.inputResolution) {
-      this.settingsService.setSettingValue('Video', 'Base', settingsPatch.inputResolution);
+      const [width, height] = settingsPatch.inputResolution.split('x');
+      this.videoSettingsService.setVideoSetting('baseWidth', Number(width));
+      this.videoSettingsService.setVideoSetting('baseHeight', Number(height));
     }
 
     if (settingsPatch.streaming) {

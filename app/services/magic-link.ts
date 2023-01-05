@@ -20,6 +20,11 @@ export class MagicLinkService extends Service {
   async getDashboardMagicLink(subPage = '', source?: string) {
     const token = (await this.fetchNewToken()).login_token;
     const sourceString = source ? `&refl=${source}` : '';
+    if (subPage === 'multistream') {
+      // TODO: remove this if statement when multistream settings are implemented
+      return `https://${this.hostsService.streamlabs}/content-hub/post/how-to-multistream-the-ultimate-guide-to-multistreaming?login_token=${token}`;
+    }
+
     return `https://${this.hostsService.streamlabs}/slobs/magic/dashboard?login_token=${token}&r=${
       subPage ?? ''
     }${sourceString}`;

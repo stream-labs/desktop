@@ -14,7 +14,11 @@
         'main-contents--onboarding': page === 'Onboarding',
       }"
     >
-      <side-nav v-if="page !== 'Onboarding' && !showLoadingSpinner" :locked="applicationLoading" />
+      <side-nav
+        v-if="page !== 'Onboarding' && !showLoadingSpinner"
+        :locked="applicationLoading"
+        class="sidenav"
+      />
       <div class="live-dock-wrapper" v-if="renderDock && leftDock">
         <live-dock :onLeft="true" />
         <resize-bar
@@ -60,7 +64,11 @@
     </div>
     <ModalWrapper :renderFn="modalOptions.renderFn" />
     <transition name="loader">
-      <div class="main-loading" v-if="!uiReady || showLoadingSpinner">
+      <div
+        class="main-loading"
+        :class="{ 'initial-loading': !uiReady }"
+        v-if="!uiReady || showLoadingSpinner"
+      >
         <custom-loader></custom-loader>
       </div>
     </transition>
@@ -83,6 +91,13 @@
 
 <style lang="less" scoped>
 @import '../../styles/index';
+
+.sidenav {
+  min-height: 100%;
+  height: 100%;
+  display: flex;
+  flex-grow: 1;
+}
 
 .main {
   display: flex;
@@ -152,6 +167,10 @@
   /deep/ .s-loader__bg {
     top: 30px;
   }
+}
+
+.initial-loading {
+  top: 0px !important;
 }
 
 .loader-enter-active,

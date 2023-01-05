@@ -4,6 +4,7 @@ import { Inject } from 'services';
 import { StreamSettingsService } from 'services/settings/streaming';
 import { getPlatformService } from 'services/platforms';
 import { TwitchService } from 'services/platforms/twitch';
+import { VideoSettingsService } from 'services/settings-v2/video';
 import { Subject } from 'rxjs';
 
 export type TConfigEvent = 'starting_step' | 'progress' | 'stopping_step' | 'error' | 'done';
@@ -22,6 +23,7 @@ export interface IConfigProgress {
 
 export class AutoConfigService extends Service {
   @Inject() streamSettingsService: StreamSettingsService;
+  @Inject() videoSettingsService: VideoSettingsService;
 
   configProgress = new Subject<IConfigProgress>();
 
@@ -71,6 +73,7 @@ export class AutoConfigService extends Service {
 
     if (progress.event === 'done') {
       obs.NodeObs.TerminateAutoConfig();
+      this.videoSettingsService.migrateSettings();
     }
   }
 }

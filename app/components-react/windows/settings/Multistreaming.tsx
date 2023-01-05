@@ -39,8 +39,7 @@ export function MultistreamingSettings() {
   }));
 
   async function upgradeToPrime() {
-    const link = await MagicLinkService.getDashboardMagicLink('prime-marketing', 'slobs-ui-themes');
-    remote.shell.openExternal(link);
+    MagicLinkService.linkToPrime('slobs-multistream');
   }
 
   const shouldShowPrime = isLoggedIn && !isPrime;

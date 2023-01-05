@@ -1,173 +1,120 @@
-import ResizeObserver from 'resize-observer-polyfill';
-import React, { useState, useRef, useEffect } from 'react';
-import cx from 'classnames';
-import { EAppPageSlot, ILoadedApp } from '../../services/platform-apps';
-import styles from './AppsNav.m.less';
-import { Services } from '../service-provider';
-import { useVuex } from '../hooks';
-import { Menu } from 'util/menus/Menu';
+import React from 'react';
+import styles from './SideNav.m.less';
+import { useVuex } from 'components-react/hooks';
 import { $t } from 'services/i18n';
+import { Services } from 'components-react/service-provider';
+import MenuItem from 'components-react/shared/MenuItem';
+import { EAppPageSlot } from 'services/platform-apps';
+import { Menu } from 'util/menus/Menu';
+import cx from 'classnames';
+interface IAppsNav {
+  type?: 'enabled' | 'selected';
+}
 
-/**
- * The default amount the nav bar should scroll when clicking the scroll arrow buttons.
- */
-const DEFAULT_SCROLL_DELTA = 43;
+export default function AppsNav(p: IAppsNav) {
+  const { NavigationService, PlatformAppsService, SideNavService } = Services;
+  const { type = 'selected' } = p;
 
-export default function AppsNav() {
-  const { PlatformAppsService, NavigationService } = Services;
-
-  const { currentPage, navApps, selectedApp } = useVuex(() => ({
-    currentPage: NavigationService.state.currentPage,
-    navApps: PlatformAppsService.views.enabledApps.filter(app => {
-      return !!app.manifest.pages.find(page => {
-        return page.slot === EAppPageSlot.TopNav;
-      });
-    }),
-    selectedApp: NavigationService.state.params.appId,
+  const { currentMenuItem, apps, isOpen, navigateApp, enabledApps } = useVuex(() => ({
+    currentMenuItem: SideNavService.views.currentMenuItem,
+    apps: SideNavService.views.apps,
+    isOpen: SideNavService.views.isOpen,
+    navigateApp: NavigationService.actions.navigateApp,
+    enabledApps: PlatformAppsService.views.enabledApps
+      .filter(app => {
+        return !!app.manifest.pages.find(page => {
+          return page.slot === EAppPageSlot.TopNav;
+        });
+      })
+      .sort((a, b) => (a.manifest?.name > b.manifest?.name ? 1 : -1)),
   }));
 
-  const [upArrowVisible, setUpArrowVisible] = useState(false);
-  const [downArrowVisible, setDownArrowVisible] = useState(false);
-
-  const scroll = useRef<HTMLDivElement>(null);
-
-  const resizeObserver = new ResizeObserver((entries: ResizeObserverEntry[]) => {
-    entries.forEach(entry => {
-      if (entry.target.clientHeight) {
-        handleScroll();
-      }
-    });
-  });
-
-  useEffect(handleScroll, [navApps]);
-
-  useEffect(() => {
-    if (!scroll.current) return;
-    resizeObserver.observe(scroll.current);
-
-    return () => {
-      if (!scroll.current) return;
-      resizeObserver.unobserve(scroll.current);
-    };
-  }, [scroll.current]);
-
-  function isSelectedApp(appId: string) {
-    return currentPage === 'PlatformAppMainPage' && selectedApp === appId;
+  function iconSrc(appId: string, path: string) {
+    return PlatformAppsService.views.getAssetUrl(appId, path) || undefined;
   }
 
-  function isPopOutAllowed(app: ILoadedApp) {
-    const topNavPage = app.manifest.pages.find(page => page.slot === EAppPageSlot.TopNav);
+  /**
+   * Handle pop out app window
+   */
+
+  function isPopOutAllowed(appId: string) {
+    const app = enabledApps.find(app => app.id === appId);
+    const topNavPage = app?.manifest.pages.find(page => page.slot === EAppPageSlot.TopNav);
     if (!topNavPage) return false;
 
     // Default result is true
     return topNavPage.allowPopout == null ? true : topNavPage.allowPopout;
   }
 
-  function popOut(app: ILoadedApp) {
-    if (!isPopOutAllowed(app)) return;
-    PlatformAppsService.actions.popOutAppPage(app.id, EAppPageSlot.TopNav);
+  function popOut(appId: string) {
+    if (!isPopOutAllowed(appId)) return;
+    PlatformAppsService.actions.popOutAppPage(appId, EAppPageSlot.TopNav);
   }
 
-  function refreshApp(appId: string) {
-    PlatformAppsService.actions.refreshApp(appId);
-  }
-
-  function navigateApp(appId: string) {
-    NavigationService.actions.navigate('PlatformAppMainPage', { appId });
-  }
-
-  function iconSrc(appId: string, path: string) {
-    return PlatformAppsService.views.getAssetUrl(appId, path) || undefined;
-  }
-
-  function scrollUp() {
-    scrollNav(-DEFAULT_SCROLL_DELTA);
-  }
-
-  function scrollDown() {
-    scrollNav(DEFAULT_SCROLL_DELTA);
-  }
-
-  function handleScroll() {
-    const el = scroll.current;
-    if (!el) return;
-    if (el.scrollTop > 0) {
-      setUpArrowVisible(true);
-    } else {
-      setUpArrowVisible(false);
-    }
-    if (el.scrollHeight - el.scrollTop === el.clientHeight) {
-      setDownArrowVisible(false);
-    } else if (el.scrollHeight > el.clientHeight) {
-      setDownArrowVisible(true);
-    }
-  }
-
-  function scrollNav(vertical: number) {
-    scroll.current && scroll.current.scrollBy({ top: vertical, behavior: 'smooth' });
-  }
-
-  function refreshIcon(app: ILoadedApp) {
-    return (
-      app.unpacked && (
-        <div className={styles.refreshIcon} onClick={() => refreshApp(app.id)}>
-          <i className="icon-repeat" />
-        </div>
-      )
-    );
-  }
-
-  function showContextMenu(e: React.MouseEvent, app: ILoadedApp) {
+  function showContextMenu(e: React.MouseEvent, appId: string) {
     e.preventDefault();
     e.stopPropagation();
 
-    if (!isPopOutAllowed(app)) return;
+    if (!isPopOutAllowed(appId)) return;
 
     const menu = new Menu();
     menu.append({
       label: $t('Pop Out'),
-      click: () => popOut(app),
+      click: () => popOut(appId),
     });
     menu.popup();
   }
 
-  return (
-    <div className={styles.container}>
-      <div className={styles.scroll} ref={scroll} onScroll={handleScroll}>
-        {navApps.map(app => (
-          <div
-            style={{ position: 'relative' }}
-            key={app.id}
-            onContextMenu={e => showContextMenu(e, app)}
-          >
-            {<div className={cx(styles.activeApp, { [styles.active]: isSelectedApp(app.id) })} />}
-            <div
-              title={app.manifest.name}
-              onClick={() => navigateApp(app.id)}
-              draggable
-              onDragEnd={() => popOut(app)}
-              className={styles.appTab}
-            >
-              {app.manifest.icon ? (
-                <img src={iconSrc(app.id, app.manifest.icon)} />
-              ) : (
-                <i className="icon-integrations" />
+  return type === 'selected' ? (
+    <>
+      {apps.map(
+        app =>
+          app &&
+          app?.isActive && (
+            <MenuItem
+              key={app?.id}
+              className={cx(
+                !isOpen && styles.closed,
+                isOpen && styles.open,
+                currentMenuItem === app?.id && styles.active,
               )}
-            </div>
-            {refreshIcon(app)}
-          </div>
-        ))}
-      </div>
-      {upArrowVisible && (
-        <div className={cx(styles.arrow, styles.up)} onClick={scrollUp}>
-          <i className="icon-down" />
-        </div>
+              title={app?.name}
+              icon={
+                app?.icon && app?.id ? (
+                  <img src={iconSrc(app?.id, app?.icon)} className={styles.appIcons} />
+                ) : (
+                  <i className="icon-integrations" />
+                )
+              }
+              onClick={() => app?.id && navigateApp(app?.id)}
+              type="app"
+              onContextMenu={e => showContextMenu(e, app?.id)}
+            >
+              {app?.name}
+            </MenuItem>
+          ),
       )}
-      {downArrowVisible && (
-        <div className={cx(styles.arrow, styles.down)} onClick={scrollDown}>
-          <i className="icon-down" />
-        </div>
+    </>
+  ) : (
+    <>
+      {enabledApps.map(
+        app =>
+          app && (
+            <MenuItem
+              key={`sub-${app?.id}`}
+              className={cx(
+                styles.appMenuItem,
+                currentMenuItem === `sub-${app?.id}` && styles.active,
+              )}
+              title={app.manifest?.name}
+              onClick={() => app?.id && navigateApp(app?.id, `sub-${app?.id}`)}
+              type="submenu"
+              onContextMenu={e => showContextMenu(e, app?.id)}
+            >
+              {app.manifest?.name}
+            </MenuItem>
+          ),
       )}
-    </div>
+    </>
   );
 }

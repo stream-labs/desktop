@@ -67,6 +67,10 @@ export enum ESettingsVideoProperties {
   'fpsDen' = 'FPSDen',
   'fpsInt' = 'FPSInt',
 }
+export function invalidFps(num: number, den: number) {
+  return num / den > 1000 || num / den < 1;
+}
+
 @InitAfter('UserService')
 export class VideoSettingsService extends StatefulService<IVideoSettings> {
   @Inject() settingsManagerService: SettingsManagerService;
@@ -131,7 +135,7 @@ export class VideoSettingsService extends StatefulService<IVideoSettings> {
   //   return this.settingsManagerService.videoSettings;
   // }
 
-  getBaseResolution(display: TDisplayType = 'default') {
+  getBaseResolution(display = 'default' as TDisplayType) {
     console.log(
       `${display} display`,
       `${this.state[display].baseWidth}x${this.state[display].baseHeight}`,
@@ -139,7 +143,7 @@ export class VideoSettingsService extends StatefulService<IVideoSettings> {
     return `${this.state[display].baseWidth}x${this.state[display].baseHeight}`;
   }
 
-  formatVideoSettings(display: TDisplayType = 'default') {
+  formatVideoSettings(display = 'default' as TDisplayType) {
     const settings = this.state[display];
 
     return {
@@ -170,7 +174,7 @@ export class VideoSettingsService extends StatefulService<IVideoSettings> {
   }
 
   migrateSettings() {
-    // @@@ TODO: Remove use of dummy data when persistence is implemented
+    // @@@ TODO: Remove use of horizontal and vertical dummy data when persistence is implemented
 
     this.state.default = this.state.videoContext.video;
     Object.keys(this.state.videoContext.legacySettings).forEach(
@@ -179,11 +183,31 @@ export class VideoSettingsService extends StatefulService<IVideoSettings> {
       },
     );
 
+    Object.keys(this.state.videoContext.video).forEach((key: keyof obs.IVideo) => {
+      this.SET_VIDEO_SETTING(key, this.state.videoContext.video[key]);
+      if (
+        invalidFps(
+          this.state.horizontalContext.video.fpsNum,
+          this.state.horizontalContext.video.fpsDen,
+        )
+      ) {
+        this.createDefaultFps();
+      }
+    });
+
     // horizontal video settings
     this.state.horizontal = this.state.horizontalContext.video;
     Object.keys(horizontalData).forEach(
       (key: keyof obs.IAdvancedStreaming | keyof obs.ISimpleStreaming) => {
         this.SET_VIDEO_SETTING(key, horizontalData[key], 'horizontal');
+        if (
+          invalidFps(
+            this.state.horizontalContext.video.fpsNum,
+            this.state.horizontalContext.video.fpsDen,
+          )
+        ) {
+          this.createDefaultFps('horizontal');
+        }
       },
     );
 
@@ -192,8 +216,44 @@ export class VideoSettingsService extends StatefulService<IVideoSettings> {
     Object.keys(verticalData).forEach(
       (key: keyof obs.IAdvancedStreaming | keyof obs.ISimpleStreaming) => {
         this.SET_VIDEO_SETTING(key, verticalData[key], 'vertical');
+        if (
+          invalidFps(
+            this.state.verticalContext.video.fpsNum,
+            this.state.verticalContext.video.fpsDen,
+          )
+        ) {
+          this.createDefaultFps('vertical');
+        }
       },
     );
+
+    /**
+     * @@@ The below is the original code from 01/05 merge master into branch
+     *     that was refactored above.
+     *     TODO: remove comment once functionality confirmed
+     */
+
+    // CURRENT
+    // this.state.default = this.state.videoContext.video;
+    // Object.keys(this.state.videoContext.legacySettings).forEach(
+    //   (key: keyof obs.IAdvancedStreaming | keyof obs.ISimpleStreaming) => {
+    //     this.SET_VIDEO_SETTING(key, this.state.videoContext.legacySettings[key]);
+    //   },
+    // );
+
+    // INCOMING
+    // Object.keys(this.videoSettings).forEach((key: keyof obs.IVideo) => {
+    //   this.SET_VIDEO_SETTING(key, this.videoSettings[key]);
+    // });
+
+    // if (invalidFps(this.state.videoContext.fpsNum, this.state.videoContext.fpsDen)) {
+    //   this.setVideoSetting('fpsNum', 30);
+    //   this.setVideoSetting('fpsDen', 1);
+    // }
+  }
+  createDefaultFps(display = 'default' as TDisplayType) {
+    this.setVideoSetting('fpsNum', 30, display);
+    this.setVideoSetting('fpsDen', 1, display);
   }
 
   establishVideoContext() {
@@ -206,7 +266,7 @@ export class VideoSettingsService extends StatefulService<IVideoSettings> {
   }
 
   @debounce(200)
-  updateObsSettings(display: TDisplayType = 'default') {
+  updateObsSettings(display = 'default' as TDisplayType) {
     // this.state.videoContext.video = this.state.default;
     switch (display) {
       case 'default': {
@@ -227,9 +287,13 @@ export class VideoSettingsService extends StatefulService<IVideoSettings> {
     }
   }
 
-  setVideoSetting(key: string, value: unknown, display: TDisplayType) {
+  setVideoSetting(key: string, value: unknown, display: TDisplayType = 'default') {
     this.SET_VIDEO_SETTING(key, value, display);
-    this.updateObsSettings();
+
+    //@@@ TODO: Refactor to update settings for dual output displays
+    if (display === 'default') {
+      this.updateObsSettings();
+    }
   }
 
   shutdown() {

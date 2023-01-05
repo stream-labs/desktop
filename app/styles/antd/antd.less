@@ -111,3 +111,9 @@ body {
   }
 }
 
+// change text color on solid background radio buttons
+div.ant-radio-group-solid {
+  > label.ant-radio-button-wrapper-checked:not(.ant-radio-button-wrapper-disabled) {
+    color: var(--action-button-text) !important;
+  }
+}
