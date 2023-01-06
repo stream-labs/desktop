@@ -93,7 +93,7 @@ export const menuTitles = (item: EMenuItemKey | ESubMenuItemKey | string) => {
     [ESubMenuItemKey.Scene]: $t('Scene'),
     [ESubMenuItemKey.AlertBoxLibrary]: $t('Alert Box Library'),
     [ESubMenuItemKey.Widget]: $t('Widget'),
-    [ESubMenuItemKey.Sites]: $t('Sites'),
+    [ESubMenuItemKey.Sites]: $t('Creator Sites'),
     [ESubMenuItemKey.AppsStoreHome]: $t('Apps Store Home'),
     [ESubMenuItemKey.AppsManager]: $t('Apps Manager'),
     [ESubMenuItemKey.DashboardHome]: $t('Dashboard Home'),
