@@ -35,6 +35,14 @@ class WidgetsServiceViews extends ViewHandler<IWidgetSourcesState> {
     return this.getServiceViews(UserService);
   }
 
+  get widgetSources(): WidgetSource[] {
+    return Object.keys(this.state.widgetSources).map(id => this.getWidgetSource(id));
+  }
+
+  getWidgetSource(sourceId: string): WidgetSource {
+    return this.state.widgetSources[sourceId] ? new WidgetSource(sourceId) : null;
+  }
+
   // hack since in the current iteration HostsService cannot have views be fetched
   @Inject() hostsService: HostsService;
 
@@ -100,8 +108,8 @@ export class WidgetsService
     return new WidgetsServiceViews(this.state);
   }
 
-  get widgetSources(): WidgetSource[] {
-    return Object.keys(this.state.widgetSources).map(id => this.getWidgetSource(id));
+  getWidgetSource(sourceId: string): WidgetSource {
+    return this.state.widgetSources[sourceId] ? new WidgetSource(sourceId) : null;
   }
 
   createWidget(type: WidgetType, name?: string): SceneItem {
@@ -160,10 +168,6 @@ export class WidgetsService
     return item;
   }
 
-  getWidgetSource(sourceId: string): WidgetSource {
-    return this.state.widgetSources[sourceId] ? new WidgetSource(sourceId) : null;
-  }
-
   getWidgetUrl(type: WidgetType) {
     if (!this.userService.isLoggedIn || !WidgetDefinitions[type]) return;
     return WidgetDefinitions[type].url(this.hostsService.streamlabs, this.userService.widgetToken);
@@ -209,7 +213,7 @@ export class WidgetsService
     this.previewSourceWatchers[previewSourceId] = this.sourcesService.sourceUpdated.subscribe(
       sourceModel => {
         if (sourceModel.sourceId !== sourceId) return;
-        const widget = this.getWidgetSource(sourceId);
+        const widget = this.views.getWidgetSource(sourceId);
         const source = widget.getSource();
         const newPreviewSettings = cloneDeep(source.getSettings());
         delete newPreviewSettings.shutdown;
@@ -283,7 +287,7 @@ export class WidgetsService
 
   private unregister(sourceId: string) {
     if (!this.state.widgetSources[sourceId]) return;
-    const widgetSource = this.getWidgetSource(sourceId);
+    const widgetSource = this.views.getWidgetSource(sourceId);
     if (widgetSource.previewSourceId) widgetSource.destroyPreviewSource();
     this.REMOVE_WIDGET_SOURCE(sourceId);
   }

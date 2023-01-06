@@ -108,7 +108,7 @@ export class ChatService extends Service {
   }
 
   hasChatHighlightWidget(): boolean {
-    return !!this.widgetsService.widgetSources.find(
+    return !!this.widgetsService.views.widgetSources.find(
       source => source.type === WidgetType.ChatHighlight,
     );
   }
