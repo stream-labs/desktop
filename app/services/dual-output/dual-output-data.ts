@@ -7,14 +7,18 @@ export enum EDualOutputPlatform {
   Trovo = 'trovo',
 }
 
-export enum TOutputDisplayType {
+// Add display type options by adding
+// additional display type names to the enum below
+export enum EOutputDisplayType {
   Horizontal = 'horizontal',
   Vertical = 'vertical',
 }
 
+export type TDualOutputDisplayType = EOutputDisplayType.Horizontal | EOutputDisplayType.Vertical;
+
 export interface IDualOutputPlatformSetting {
   platform: string;
-  setting: TOutputDisplayType;
+  setting: EOutputDisplayType;
 }
 
 export type TDualOutputPlatformSettings = {
@@ -24,19 +28,19 @@ export type TDualOutputPlatformSettings = {
 export const DualOutputPlatformSettings: TDualOutputPlatformSettings = {
   [EDualOutputPlatform.Twitch]: {
     platform: EDualOutputPlatform.Twitch,
-    setting: TOutputDisplayType.Horizontal,
+    setting: EOutputDisplayType.Horizontal,
   },
   [EDualOutputPlatform.Facebook]: {
     platform: EDualOutputPlatform.Facebook,
-    setting: TOutputDisplayType.Horizontal,
+    setting: EOutputDisplayType.Horizontal,
   },
   [EDualOutputPlatform.YouTube]: {
     platform: EDualOutputPlatform.YouTube,
-    setting: TOutputDisplayType.Horizontal,
+    setting: EOutputDisplayType.Horizontal,
   },
   [EDualOutputPlatform.Trovo]: {
     platform: EDualOutputPlatform.Trovo,
-    setting: TOutputDisplayType.Horizontal,
+    setting: EOutputDisplayType.Horizontal,
   },
 };
 
@@ -48,8 +52,8 @@ export const platformLabels = (platform: EDualOutputPlatform | string) =>
     [EDualOutputPlatform.Trovo]: $t('Trovo'),
   }[platform]);
 
-export const displayLabels = (display: TOutputDisplayType | string) =>
+export const displayLabels = (display: EOutputDisplayType | string) =>
   ({
-    [TOutputDisplayType.Horizontal]: $t('Horizontal'),
-    [TOutputDisplayType.Vertical]: $t('Vertical'),
+    [EOutputDisplayType.Horizontal]: $t('Horizontal'),
+    [EOutputDisplayType.Vertical]: $t('Vertical'),
   }[display]);

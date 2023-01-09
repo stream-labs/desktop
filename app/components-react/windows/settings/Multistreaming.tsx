@@ -13,7 +13,7 @@ import { TPlatform } from 'services/platforms';
 import {
   IDualOutputPlatformSetting,
   displayLabels,
-  TOutputDisplayType,
+  EOutputDisplayType,
   platformLabels,
 } from '../../../services/dual-output';
 import styles from './Multistreaming.m.less';
@@ -46,12 +46,12 @@ export function MultistreamingSettings() {
   const dualOutputSettings = [
     {
       label:
-        displayLabels(TOutputDisplayType.Horizontal) ?? (TOutputDisplayType.Horizontal as string),
-      value: TOutputDisplayType.Horizontal as string,
+        displayLabels(EOutputDisplayType.Horizontal) ?? (EOutputDisplayType.Horizontal as string),
+      value: EOutputDisplayType.Horizontal as string,
     },
     {
-      label: displayLabels(TOutputDisplayType.Vertical) ?? (TOutputDisplayType.Vertical as string),
-      value: TOutputDisplayType.Vertical as string,
+      label: displayLabels(EOutputDisplayType.Vertical) ?? (EOutputDisplayType.Vertical as string),
+      value: EOutputDisplayType.Vertical as string,
     },
   ];
 
@@ -148,7 +148,7 @@ export function MultistreamingSettings() {
                 nomargin
                 defaultValue="horizontal"
                 options={dualOutputSettings}
-                onChange={val => updatePlatformSetting(option.platform, val as TOutputDisplayType)}
+                onChange={val => updatePlatformSetting(option.platform, val as EOutputDisplayType)}
                 value={option.setting}
               />
             </div>
