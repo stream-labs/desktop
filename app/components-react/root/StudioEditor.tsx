@@ -8,7 +8,6 @@ import DualOutputDisplay from 'components-react/shared/DualOutputDisplay';
 import { $t } from 'services/i18n';
 import { ERenderingMode } from '../../../obs-api';
 import { Tooltip } from 'antd';
-// import DualOutputDisplay from 'components-react/shared/DualOutputDisplay';
 
 export default function StudioEditor() {
   const {
@@ -25,8 +24,6 @@ export default function StudioEditor() {
     cursor: EditorService.state.cursor,
     studioMode: TransitionsService.state.studioMode,
     dualOutputMode: DualOutputService.views.dualOutputMode,
-    isHorizontalActive: DualOutputService.views.isHorizontalActive,
-    isVerticalActive: DualOutputService.views.isVerticalActive,
     activeSceneId: ScenesService.views.activeSceneId,
   }));
   const displayEnabled = !v.hideStyleBlockers && !v.performanceMode;
