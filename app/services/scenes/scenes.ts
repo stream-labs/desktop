@@ -14,6 +14,7 @@ import namingHelpers from 'util/NamingHelpers';
 import uuid from 'uuid/v4';
 import { ViewHandler } from 'services/core';
 import { DualOutputService } from 'services/dual-output';
+// import { ISceneItem } from 'services/scenes';
 
 export type TSceneNodeModel = ISceneItem | ISceneItemFolder;
 
@@ -210,8 +211,12 @@ class ScenesViews extends ViewHandler<IScenesState> {
     }
     return null;
   }
-}
 
+  getNodeVisibility(sceneNodeId: string): boolean {
+    const nodeModel: TSceneNode = this.getSceneNode(sceneNodeId);
+    return nodeModel instanceof SceneItem ? nodeModel?.visible : null;
+  }
+}
 export class ScenesService extends StatefulService<IScenesState> {
   @Inject() private dualOutputService: DualOutputService;
 
