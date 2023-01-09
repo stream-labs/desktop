@@ -603,7 +603,7 @@ export class StreamingService
 
     this.powerSaveId = remote.powerSaveBlocker.start('prevent-display-sleep');
 
-    this.outputsService.outputs.stream.start();
+    this.outputsService.startOutput('stream');
 
     const recordWhenStreaming = this.streamSettingsService.settings.recordWhenStreaming;
 
@@ -674,7 +674,7 @@ export class StreamingService
         remote.powerSaveBlocker.stop(this.powerSaveId);
       }
 
-      this.outputsService.outputs.stream.stop(false);
+      this.outputsService.endOutput('stream', false);
 
       const keepRecording = this.streamSettingsService.settings.keepRecordingWhenStreamStops;
       if (!keepRecording && this.state.recordingStatus === ERecordingState.Recording) {
@@ -717,12 +717,12 @@ export class StreamingService
 
   toggleRecording() {
     if (this.state.recordingStatus === ERecordingState.Recording) {
-      this.outputsService.outputs.recording.stop();
+      this.outputsService.endOutput('recording');
       return;
     }
 
     if (this.state.recordingStatus === ERecordingState.Offline) {
-      this.outputsService.outputs.recording.start();
+      this.outputsService.startOutput('recording');
       return;
     }
   }
@@ -736,14 +736,14 @@ export class StreamingService
   startReplayBuffer() {
     if (this.state.replayBufferStatus !== EReplayBufferState.Offline) return;
     this.usageStatisticsService.recordFeatureUsage('ReplayBuffer');
-    this.outputsService.outputs.replay.start();
+    this.outputsService.startOutput('replay');
   }
 
   stopReplayBuffer() {
     if (this.state.replayBufferStatus === EReplayBufferState.Running) {
-      this.outputsService.outputs.replay.stop(false);
+      this.outputsService.endOutput('replay', false);
     } else if (this.state.replayBufferStatus === EReplayBufferState.Stopping) {
-      this.outputsService.outputs.replay.stop(true);
+      this.outputsService.endOutput('replay', true);
     }
   }
 
