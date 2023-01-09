@@ -2,11 +2,13 @@ import { Command } from './command';
 import { Selection } from 'services/selection';
 import { Inject } from 'services/core';
 import { ScenesService, TSceneNode } from 'services/scenes';
+import { DualOutputService } from 'services/dual-output';
 import compact from 'lodash/compact';
 import { $t } from 'services/i18n';
 
 export class CopyNodesCommand extends Command {
   @Inject() scenesService: ScenesService;
+  @Inject() dualOutputService: DualOutputService;
 
   description: string;
 
@@ -94,6 +96,10 @@ export class CopyNodesCommand extends Command {
         .map(origNodeId => this.nodeIdsMap[origNodeId]),
     );
     scene.setNodesOrder(order.concat(initialNodeOrder));
+
+    if (this.dualOutputService.views.dualOutputMode) {
+      this.dualOutputService.actions.setNodeMap(scene.id, this.idsMap);
+    }
 
     return insertedNodes;
   }
