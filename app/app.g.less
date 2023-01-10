@@ -45,7 +45,7 @@
 h1 {
   .weight(@bold);
 
-  font-family: "Roboto", sans-serif;
+  font-family: 'Roboto', sans-serif;
   font-size: 20px;
   color: var(--title);
   margin-bottom: 24px;
@@ -55,7 +55,7 @@ h2 {
   .weight(@medium);
   .margin-bottom(3);
 
-  font-family: "Roboto", sans-serif;
+  font-family: 'Roboto', sans-serif;
   font-size: 16px;
   color: var(--title);
 }
@@ -63,7 +63,7 @@ h2 {
 h3 {
   .weight(@medium);
 
-  font-family: "Roboto", sans-serif;
+  font-family: 'Roboto', sans-serif;
   font-size: 14px;
   color: var(--title);
 }
@@ -72,7 +72,7 @@ h4 {
   .weight(@medium);
   .margin-bottom(2);
 
-  font-family: "Roboto", sans-serif;
+  font-family: 'Roboto', sans-serif;
   font-size: 14px;
   color: var(--title);
 }
@@ -237,9 +237,10 @@ a,
 .slide-open__menu {
   position: absolute;
   background: var(--background);
-  right: calc(~"100% + 20px");
+  right: calc(~'100% + 20px');
   align-self: center;
   display: flex;
+  z-index: 10;
   top: -6px;
   .padding-h-sides();
   .radius();
@@ -318,9 +319,7 @@ a,
         background: transparent;
       }
 
-      &::after {
-        color: var(--paragraph);
-      }
+      &::after { color: var(--paragraph); }
     }
   }
 }
@@ -464,9 +463,9 @@ select {
   transition: all 0.3s ease;
 }
 
-.zoom-enter-active,
-.zoom-leave-active {
-  transition: transform 0.3s, opacity 0.5s;
+
+.zoom-enter-active, .zoom-leave-active {
+  transition: transform .3s, opacity .5s;
 }
 .zoom-enter {
   opacity: 0;
@@ -478,15 +477,9 @@ select {
   transform: translateX(-100%);
 }
 
-.checkboxdone-enter-active {
-  transition: width 0.3s;
-}
-.checkboxdone-enter {
-  width: 0;
-}
-.checkboxdone-enter-to {
-  width: 16px;
-}
+.checkboxdone-enter-active {transition: width 0.3s;}
+.checkboxdone-enter {width: 0;}
+.checkboxdone-enter-to {width: 16px;}
 
 .v--modal-overlay {
   background: var(--modal-overlay);
