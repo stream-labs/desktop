@@ -1,32 +1,54 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { inject, injectState, injectWatch, mutation, useModule } from 'slap';
+import React, { useMemo } from 'react';
 import { Services } from 'components-react/service-provider';
 import { useVuex } from 'components-react/hooks';
 
-export function DualOutputSourceSelector(x: {
-  toggleVisibility: (ev: unknown) => void;
-  isVisible: boolean;
-}) {
-  const { DualOutputService } = Services;
+// @@@ TODO: Refactor to use a module that extends the Source Selector Module for reactivity
+// @@@ TODO: Refactor to expand this component to handle applying changes from updates to sources
+
+export function DualOutputSourceSelector(p: { nodeId: string }) {
+  const { DualOutputService, ScenesService, EditorCommandsService } = Services;
 
   const v = useVuex(() => ({
-    isHorizontalActive: DualOutputService.views.isHorizontalActive,
-    isVerticalActive: DualOutputService.views.isVerticalActive,
-    toggleHorizontalVisibility: DualOutputService.actions.toggleHorizontalVisibility,
-    toggleVerticalVisibility: DualOutputService.actions.toggleVerticalVisibility,
+    horizontalSceneId: DualOutputService.views.horizontalSceneId,
+    verticalSceneId: DualOutputService.views.verticalSceneId,
+    horizontalScene: DualOutputService.views.horizontalScene,
+    verticalScene: DualOutputService.views.verticalScene,
+    horizontalNodeId: DualOutputService.views.getHorizontalNodeId(p.nodeId),
+    verticalNodeId: DualOutputService.views.getVerticalNodeId(p.nodeId),
+    isHorizontalVisible: ScenesService.views.getNodeVisibility(
+      DualOutputService.views.horizontalSceneId,
+    ),
+    isVerticalVisible: ScenesService.views.getNodeVisibility(
+      DualOutputService.views.verticalSceneId,
+    ),
+    getSceneNode: ScenesService.views.getSceneNode,
   }));
+
+  function toggleVisibility(sceneId: string, sceneNodeId: string) {
+    const selection = ScenesService.views.getScene(sceneId)?.getSelection(sceneNodeId);
+    const visible = !selection?.isVisible();
+
+    if (selection) {
+      EditorCommandsService.actions.executeCommand('HideItemsCommand', selection, !visible);
+    }
+  }
+
   return (
     <>
-      {/* @@@ HERE TODO: 1. update font and font icons.*/}
+      {/* @@@ TODO: update font and font icons.*/}
 
       <i
-        onClick={() => v.toggleVerticalVisibility(!v.isVerticalActive)}
-        className={v.isVerticalActive ? 'icon-phone-case' : 'icon-phone-case-hide'}
+        onClick={() => {
+          toggleVisibility(v.horizontalSceneId, v.horizontalNodeId);
+        }}
+        className={v.isVerticalVisible ? 'icon-phone-case' : 'icon-phone-case-hide'}
       />
 
       <i
-        onClick={() => v.toggleHorizontalVisibility(!v.isHorizontalActive)}
-        className={v.isHorizontalActive ? 'icon-desktop' : 'icon-desktop-hide'}
+        onClick={() => {
+          toggleVisibility(v.verticalSceneId, v.verticalNodeId);
+        }}
+        className={v.isHorizontalVisible ? 'icon-desktop' : 'icon-desktop-hide'}
       />
     </>
   );

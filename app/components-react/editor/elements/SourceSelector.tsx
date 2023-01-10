@@ -34,8 +34,6 @@ interface ISourceMetadata {
   isRecordingVisible: boolean;
   isGuestCamActive: boolean;
   isDualOutputActive: boolean;
-  isHorizontalActive: boolean;
-  isVerticalActive: boolean;
   isFolder: boolean;
   canShowActions: boolean;
   parentId?: string;
@@ -86,15 +84,11 @@ class SourceSelectorModule {
               canShowActions={sceneNode.canShowActions}
               toggleVisibility={() => this.toggleVisibility(sceneNode.id)}
               toggleLock={() => this.toggleLock(sceneNode.id)}
-              toggleHorizontalVisibility={() => this.toggleHorizontalVisibility()}
-              toggleVerticalVisibility={() => this.toggleVerticalVisibility()}
               selectiveRecordingEnabled={this.selectiveRecordingEnabled}
               isStreamVisible={sceneNode.isStreamVisible}
               isRecordingVisible={sceneNode.isRecordingVisible}
               isGuestCamActive={sceneNode.isGuestCamActive}
               isDualOutputActive={sceneNode.isDualOutputActive}
-              isHorizontalActive={sceneNode.isHorizontalActive}
-              isVerticalActive={sceneNode.isVerticalActive}
               cycleSelectiveRecording={() => this.cycleSelectiveRecording(sceneNode.id)}
               ref={this.nodeRefs[sceneNode.id]}
               onDoubleClick={() => this.sourceProperties(sceneNode.id)}
@@ -127,8 +121,6 @@ class SourceSelectorModule {
         );
       });
       const isDualOutputActive = this.isDualOutputActive;
-      const isHorizontalActive = this.isHorizontalActive;
-      const isVerticalActive = this.isVerticalActive;
 
       const isFolder = !isItem(node);
       return {
@@ -141,8 +133,6 @@ class SourceSelectorModule {
         isStreamVisible,
         isGuestCamActive,
         isDualOutputActive,
-        isHorizontalActive,
-        isVerticalActive,
         parentId: node.parentId,
         canShowActions: itemsForNode.length > 0,
         isFolder,
@@ -328,14 +318,6 @@ class SourceSelectorModule {
     return this.dualOutputService.state.dualOutputMode;
   }
 
-  get isHorizontalActive() {
-    return this.dualOutputService.state.isHorizontalActive;
-  }
-
-  get isVerticalActive() {
-    return this.dualOutputService.state.isVerticalActive;
-  }
-
   watchSelected = injectWatch(() => this.lastSelectedId, this.expandSelectedFolders);
 
   async expandSelectedFolders() {
@@ -364,14 +346,6 @@ class SourceSelectorModule {
     const selection = this.scene.getSelection(sceneNodeId);
     const visible = !selection.isVisible();
     this.editorCommandsService.actions.executeCommand('HideItemsCommand', selection, !visible);
-  }
-
-  toggleHorizontalVisibility() {
-    this.dualOutputService.actions.toggleHorizontalVisibility();
-  }
-
-  toggleVerticalVisibility() {
-    this.dualOutputService.actions.toggleVerticalVisibility();
   }
 
   // Required for performance. Using Selection is too slow (Service Helpers)
@@ -576,13 +550,9 @@ const TreeNode = React.forwardRef(
       selectiveRecordingEnabled: boolean;
       isGuestCamActive: boolean;
       isDualOutputActive: boolean;
-      isHorizontalActive: boolean;
-      isVerticalActive: boolean;
       canShowActions: boolean;
       toggleVisibility: (ev: unknown) => unknown;
       toggleLock: (ev: unknown) => unknown;
-      toggleHorizontalVisibility: (ev: unknown) => unknown;
-      toggleVerticalVisibility: (ev: unknown) => unknown;
       cycleSelectiveRecording: (ev: unknown) => void;
       onDoubleClick: () => void;
       removeSource: () => void;
@@ -613,12 +583,7 @@ const TreeNode = React.forwardRef(
         {p.canShowActions && (
           <>
             {p.isGuestCamActive && <i className="fa fa-signal" />}
-            {p.isDualOutputActive && (
-              <DualOutputSourceSelector
-                isVisible={p.isVisible}
-                toggleVisibility={p.toggleVisibility}
-              />
-            )}
+            {p.isDualOutputActive && <DualOutputSourceSelector nodeId={p.id} />}
             {p.selectiveRecordingEnabled && (
               <Tooltip title={selectiveRecordingMetadata().tooltip} placement="left">
                 <i

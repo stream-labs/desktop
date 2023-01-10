@@ -3,40 +3,34 @@ import {
   TDualOutputPlatformSettings,
   DualOutputPlatformSettings,
   EDualOutputPlatform,
-  TOutputDisplayType,
+  EOutputDisplayType,
+  TDualOutputDisplayType,
   IDualOutputPlatformSetting,
 } from './dual-output-data';
-import { ScenesService } from 'services/scenes';
+import { ScenesService, TSceneNode } from 'services/scenes';
+import { SceneCollectionsService } from 'services/scene-collections';
 import { CopyNodesCommand } from 'services/editor-commands/commands';
 
+// @@@ TODO: Refactor dictionaries to Dictionary<<Record<string, TSceneNode>> to allow for multiple settings profiles?
 interface IDualOutputNodeIds {
   horizontal: string;
   vertical: string;
 }
 interface IDualOutputServiceState {
   platformSettings: TDualOutputPlatformSettings;
-  isHorizontalActive: boolean;
-  isVerticalActive: boolean;
   dualOutputMode: boolean;
   horizontalSceneId: string;
   verticalSceneId: string;
   horizontalNodeMap: Dictionary<string>;
   verticalNodeMap: Dictionary<string>;
+  horizontalNodes: TSceneNode[];
+  verticalNodes: TSceneNode[];
 }
 
-export type TDualOutputDisplayType = 'horizontal' | 'vertical';
-
 class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
+  @Inject() private scenesService: ScenesService;
   get dualOutputMode() {
     return this.state.dualOutputMode;
-  }
-
-  get isHorizontalActive() {
-    return this.state.isHorizontalActive;
-  }
-
-  get isVerticalActive() {
-    return this.state.isVerticalActive;
   }
 
   get platformSettings() {
@@ -55,52 +49,85 @@ class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
     return this.state.verticalSceneId;
   }
 
+  get horizontalScene() {
+    return this.getServiceViews(ScenesService).getScene(this.state.horizontalSceneId);
+  }
+
+  get verticalScene() {
+    return this.getServiceViews(ScenesService).getScene(this.state.verticalSceneId);
+  }
+
   get hasDualOutputScenes() {
-    return this.state.horizontalSceneId || this.state.verticalSceneId;
+    return this.state.horizontalSceneId && this.state.verticalSceneId;
+  }
+
+  get hasNodeMaps() {
+    return this.state.horizontalNodeMap && this.state.verticalNodeMap;
+  }
+
+  getHorizontalNodeId(activeSceneNodeId: string) {
+    return this.hasNodeMaps && this.state.horizontalNodeMap[activeSceneNodeId];
+  }
+
+  getVerticalNodeId(activeSceneNodeId: string) {
+    return this.hasNodeMaps && this.state.verticalNodeMap[activeSceneNodeId];
   }
 }
 
 @InitAfter('UserService')
 @InitAfter('ScenesService')
-// @@@ maybe @InitAfter('SourcesService')
+@InitAfter('SourcesService')
+@InitAfter('SceneCollectionsService')
 export class DualOutputService extends PersistentStatefulService<IDualOutputServiceState> {
   @Inject() private scenesService: ScenesService;
+  @Inject() private sceneCollectionsService: SceneCollectionsService;
 
   static defaultState: IDualOutputServiceState = {
     platformSettings: DualOutputPlatformSettings,
     dualOutputMode: false,
-    isHorizontalActive: true,
-    isVerticalActive: true,
     horizontalSceneId: null,
     verticalSceneId: null,
     horizontalNodeMap: null,
     verticalNodeMap: null,
+    horizontalNodes: null,
+    verticalNodes: null,
   };
+
   get views() {
     return new DualOutputViews(this.state);
   }
 
   init() {
     super.init();
+
+    this.sceneCollectionsService.collectionInitialized.subscribe(() => {
+      if (this.state.dualOutputMode) {
+        this.setDualOutputScenes(this.scenesService.views.activeSceneId);
+      }
+    });
+
+    this.scenesService.sceneRemoved.subscribe(() => {
+      if (this.state.dualOutputMode) {
+        this.destroyDualOutputScenes();
+      }
+    });
+
+    this.scenesService.sceneSwitched.subscribe(scene => {
+      if (this.state.dualOutputMode) {
+        this.setDualOutputScenes(this.scenesService.views.activeSceneId);
+      }
+    });
   }
 
   toggleDualOutputMode(status?: boolean) {
     this.TOGGLE_DUAL_OUTPUT_MODE(status);
   }
 
-  toggleVerticalVisibility(status?: boolean) {
-    this.TOGGLE_VERTICAL_VISIBILITY(status);
-  }
-
-  toggleHorizontalVisibility(status?: boolean) {
-    this.TOGGLE_HORIZONTAL_VISIBILITY(status);
-  }
-
-  updatePlatformSetting(platform: EDualOutputPlatform | string, setting: TOutputDisplayType) {
+  updatePlatformSetting(platform: EDualOutputPlatform | string, setting: TDualOutputDisplayType) {
     this.UPDATE_PLATFORM_SETTING(platform, setting);
   }
 
-  setDualOutputScenes(sceneId: string) {
+  async setDualOutputScenes(sceneId: string) {
     if (this.views.hasDualOutputScenes) {
       // For performance, we only want one set of dual output scenes active at any time
       // so when the user changes the active scene, we destroy the dual output scenes.
@@ -119,23 +146,34 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
       }
     }
 
-    const nodesToCopy = this.scenesService.views.getScene(sceneId).getSelection().selectAll();
+    // get active scene nodes
+    const activeScene = this.scenesService.views.getScene(sceneId);
+    const nodesToCopy = activeScene.getSelection().selectAll();
 
+    // create scenes
     const horizontalScene = this.scenesService.createScene(`${sceneId}_horizontal`, {
+      duplicateSourcesFromScene: activeScene.id,
       sceneId: `${sceneId}_horizontal`,
       makeActive: false,
     });
     const verticalScene = this.scenesService.createScene(`${sceneId}_vertical`, {
+      duplicateSourcesFromScene: activeScene.id,
       sceneId: `${sceneId}_vertical`,
       makeActive: false,
     });
 
+    /**
+     * @@@ TODO: determine how different sources are or are not shared
+     * to determine if the dual output scenes need to have their own sources created for certain scene items
+     */
+
+    // copy nodes from active scene
     const horizontalCopyNodesCommand = new CopyNodesCommand(nodesToCopy, horizontalScene.state.id);
     horizontalCopyNodesCommand.execute();
-
     const verticalCopyNodesCommand = new CopyNodesCommand(nodesToCopy, verticalScene.state.id);
     verticalCopyNodesCommand.execute();
 
+    // update state
     this.SET_NODE_MAPS(horizontalCopyNodesCommand.idsMap, verticalCopyNodesCommand.idsMap);
 
     if (!this.state.dualOutputMode) {
@@ -144,15 +182,30 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
     this.SET_DUAL_OUTPUT_SCENES(horizontalScene.state.id, verticalScene.state.id);
   }
 
+  attachNodesToMap(nodes: TSceneNode[], nodeMap: Dictionary<string>) {
+    return nodes.reduce((mappedNodes, node) => {
+      const id = Object.keys(nodeMap).find(key => nodeMap[key] === node.id);
+      return { ...mappedNodes, [id]: { [node.id]: node } };
+    }, {});
+  }
+
+  setNodeMap(sceneId: string, nodeMap: Dictionary<string>) {
+    this.SET_NODE_MAP(sceneId, nodeMap);
+  }
+
   destroyDualOutputScenes() {
     if (this.views.hasDualOutputScenes) {
       // remove dual output scenes
       this.scenesService.removeScene(this.state.horizontalSceneId, true);
       this.scenesService.removeScene(this.state.verticalSceneId, true);
       // reset data for dual output scenes
-      this.REMOVE_DUAL_OUTPUT_SCENES();
-      this.SET_NODE_MAPS();
+      this.resetDualOutputDisplays();
     }
+  }
+
+  resetDualOutputDisplays() {
+    this.REMOVE_DUAL_OUTPUT_SCENES();
+    this.RESET_NODE_MAPS();
   }
 
   shutdown() {
@@ -169,29 +222,9 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
   }
 
   @mutation()
-  private TOGGLE_HORIZONTAL_VISIBILITY(status?: boolean) {
-    // console.log('horizontal ', status);
-    if (typeof status === 'undefined' || 'null') {
-      this.state.isHorizontalActive = !this.state.isHorizontalActive;
-    } else {
-      this.state.isHorizontalActive = status;
-    }
-  }
-
-  @mutation()
-  private TOGGLE_VERTICAL_VISIBILITY(status?: boolean) {
-    // console.log('vertical ', status);
-    if (typeof status === 'undefined' || 'null') {
-      this.state.isVerticalActive = !this.state.isVerticalActive;
-    } else {
-      this.state.isVerticalActive = status;
-    }
-  }
-
-  @mutation()
   private UPDATE_PLATFORM_SETTING(
     platform: EDualOutputPlatform | string,
-    setting: TOutputDisplayType,
+    setting: TDualOutputDisplayType,
   ) {
     this.state.platformSettings[platform] = {
       ...this.state.platformSettings[platform],
@@ -222,6 +255,21 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
     } else {
       this.state.horizontalNodeMap = horizontalNodeMap;
       this.state.verticalNodeMap = verticalNodeMap;
+    }
+  }
+
+  @mutation()
+  private RESET_NODE_MAPS() {
+    this.state.horizontalNodeMap = null;
+    this.state.verticalNodeMap = null;
+  }
+
+  @mutation()
+  private SET_NODE_MAP(sceneId: string, nodeMap: Dictionary<string>) {
+    const display = sceneId.split('_').pop();
+
+    if (Object.values<string>(EOutputDisplayType).includes(display)) {
+      this.state[`${display}NodeMap`] = nodeMap;
     }
   }
 }

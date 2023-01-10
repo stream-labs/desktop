@@ -14,7 +14,6 @@ import namingHelpers from 'util/NamingHelpers';
 import uuid from 'uuid/v4';
 import { ViewHandler } from 'services/core';
 import { DualOutputService } from 'services/dual-output';
-// import { ISceneItem } from 'services/scenes';
 
 export type TSceneNodeModel = ISceneItem | ISceneItemFolder;
 
