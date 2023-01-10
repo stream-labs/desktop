@@ -108,6 +108,11 @@ export class WidgetsService
     return new WidgetsServiceViews(this.state);
   }
 
+  // This is only here to get the obs-importer test working until I can figure out why.
+  get widgetSources(): WidgetSource[] {
+    return Object.keys(this.state.widgetSources).map(id => this.getWidgetSource(id));
+  }
+
   getWidgetSource(sourceId: string): WidgetSource {
     return this.state.widgetSources[sourceId] ? new WidgetSource(sourceId) : null;
   }
