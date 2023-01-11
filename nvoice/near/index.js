@@ -2,8 +2,11 @@
 
 const href = window.location.href;
 const params = new URLSearchParams(href.split('?')[1]);
-const host = params.get('host') || 'http://localhost:3000';
+const host = `http://localhost:${params.get('port') || 3000}`;
 const socket = io(host);
+
+const debug = document.getElementById('debug');
+// debug.textContent = 'host: ' + host;
 
 const image = document.getElementById('image');
 

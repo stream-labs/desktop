@@ -7,6 +7,8 @@ import { getDisplayText } from './ChatMessage/displaytext';
 import { AddComponent } from './ChatMessage/ChatComponentType';
 import { NVoiceClientService } from './n-voice-client';
 import { Server } from 'socket.io';
+import { createServer } from 'http';
+import { NVoiceCharacterService } from 'services/nvoice-character';
 
 export type Speech = {
   text: string;
@@ -37,6 +39,7 @@ interface ICommentSynthesizerState {
 export class NicoliveCommentSynthesizerService extends StatefulService<ICommentSynthesizerState> {
   @Inject('NicoliveProgramStateService') stateService: NicoliveProgramStateService;
   @Inject() nVoiceClientService: NVoiceClientService;
+  @Inject() nVoiceCharacterService: NVoiceCharacterService;
 
   static initialState: ICommentSynthesizerState = {
     enabled: true,
@@ -96,7 +99,15 @@ export class NicoliveCommentSynthesizerService extends StatefulService<ICommentS
     });
     this.nVoice = new NVoiceSynthesizer(this.nVoiceClientService);
     try {
-      this.io = new Server(3000, {
+      const server = createServer();
+      server.listen(() => {
+        const address = server.address();
+        if (typeof address === 'object') {
+          console.log('NVoiceCommentSynthesizerService: socket.io listening on', address.port);
+          this.nVoiceCharacterService.updateSocketIoPort(address.port);
+        }
+      });
+      this.io = new Server(server, {
         transports: ['polling'],
         cors: {
           origin: '*',
@@ -166,7 +177,7 @@ export class NicoliveCommentSynthesizerService extends StatefulService<ICommentS
   }
 
   async speakTextSimple(speech: Speech) {
-    this.speakText(speech, () => { }, () => {});
+    this.speakText(speech, () => { }, () => { });
   }
 
   async speakText(
