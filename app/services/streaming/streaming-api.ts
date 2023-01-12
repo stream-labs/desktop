@@ -50,6 +50,7 @@ export interface IStreamInfo {
     tiktok: TGoLiveChecklistItemState;
     trovo: TGoLiveChecklistItemState;
     setupMultistream: TGoLiveChecklistItemState;
+    setupDualOutput: TGoLiveChecklistItemState;
     startVideoTransmission: TGoLiveChecklistItemState;
     postTweet: TGoLiveChecklistItemState;
   };

@@ -120,6 +120,7 @@ export class StreamingService
         tiktok: 'not-started',
         trovo: 'not-started',
         setupMultistream: 'not-started',
+        setupDualOutput: 'not-started',
         startVideoTransmission: 'not-started',
         postTweet: 'not-started',
       },

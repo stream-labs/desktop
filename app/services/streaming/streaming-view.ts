@@ -9,6 +9,7 @@ import {
 import { StreamSettingsService } from '../settings/streaming';
 import { UserService } from '../user';
 import { RestreamService } from '../restream';
+import { DualOutputService } from '../dual-output';
 import { getPlatformService, TPlatform, TPlatformCapability } from '../platforms';
 import { TwitterService } from '../../app-services';
 import cloneDeep from 'lodash/cloneDeep';
@@ -41,6 +42,10 @@ export class StreamInfoView<T extends Object> extends ViewHandler<T> {
 
   private get twitterView() {
     return this.getServiceViews(TwitterService);
+  }
+
+  private get dualOutputView() {
+    return this.getServiceViews(DualOutputService);
   }
 
   private get streamingState() {
@@ -150,6 +155,10 @@ export class StreamInfoView<T extends Object> extends ViewHandler<T> {
       (this.enabledPlatforms.length > 1 ||
         this.settings.customDestinations.filter(dest => dest.enabled).length > 0)
     );
+  }
+
+  get isDualOutputMode(): boolean {
+    return this.dualOutputView.dualOutputMode;
   }
 
   get isMidStreamMode(): boolean {
