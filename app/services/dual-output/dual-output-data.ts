@@ -7,8 +7,6 @@ export enum EDualOutputPlatform {
   Trovo = 'trovo',
 }
 
-// Add display type options by adding
-// additional display type names to the enum below
 export enum EOutputDisplayType {
   Horizontal = 'horizontal',
   Vertical = 'vertical',
