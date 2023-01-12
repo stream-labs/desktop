@@ -109,7 +109,7 @@ export class RestreamService extends StatefulService<IRestreamState> {
   }
 
   get shouldGoLiveWithRestream() {
-    return this.streamInfo.isMultiplatformMode;
+    return this.streamInfo.isMultiplatformMode || this.streamInfo.isDualOutputMode;
   }
 
   fetchUserSettings(): Promise<IUserSettingsResponse> {
