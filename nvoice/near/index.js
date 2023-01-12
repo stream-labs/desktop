@@ -3,6 +3,7 @@
 const href = window.location.href;
 const params = new URLSearchParams(href.split('?')[1]);
 const host = `http://localhost:${params.get('port') || 3000}`;
+// eslint-disable-next-line no-undef
 const socket = io(host);
 
 const debug = document.getElementById('debug');

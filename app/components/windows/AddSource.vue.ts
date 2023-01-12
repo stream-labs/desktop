@@ -21,10 +21,14 @@ export default class AddSource extends Vue {
 
   name = '';
   error = '';
+  // @ts-ignore: ts2729: use before initialization
+
   sourceType = this.windowsService.getChildWindowQueryParams().sourceType as TSourceType;
+  // @ts-ignore: ts2729: use before initialization
   sourceAddOptions = this.windowsService.getChildWindowQueryParams()
     .sourceAddOptions as ISourceAddOptions;
 
+  // @ts-ignore: ts2729: use before initialization
   sources = this.sourcesService.getSources().filter(source => {
     return (
       source.isSameType({
