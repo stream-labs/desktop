@@ -11,6 +11,20 @@ const debug = document.getElementById('debug');
 
 const image = document.getElementById('image');
 
+let active = false;
+function setActive(a) {
+  if (active !== a) {
+    active = a;
+    socket.emit('active', active);
+  }
+}
+
+setActive(document.visibilityState === 'visible');
+addEventListener('visibilitychange', () => {
+  console.log('visibilitychange', document.visibilityState);
+  setActive(document.visibilityState === 'visible');
+});
+
 let t;
 function timer_set() {
   t = setTimeout(1000, () => {
@@ -26,6 +40,10 @@ function timer_reset() {
 }
 
 socket.on('phoneme', (phoneme) => {
+  if (!active) {
+    return;
+  }
+  console.log('phoneme', phoneme);
   switch (phoneme) {
     case 'a':
       image.src = 'a.png';

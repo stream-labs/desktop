@@ -114,7 +114,13 @@ export class NicoliveCommentSynthesizerService extends StatefulService<ICommentS
         }
       });
       this.io.on('connection', (socket) => {
-        console.log(socket.conn.remoteAddress, 'connected');
+        console.log('NicoliveCommentSynthesizerService Socket', socket.id, 'connected'); // DEBUG
+        socket.conn.on('active', (active) => {
+          console.log('NicoliveCommentSynthesizerService Socket', socket.id, 'active', active); // DEBUG
+        });
+        socket.conn.on('close', () => {
+          console.log('NicoliveCommentSynthesizerService Socket', socket.id, 'closed'); // DEBUG
+        })
       });
     } catch (e) {
       console.error('socket.io constructor error', e);
