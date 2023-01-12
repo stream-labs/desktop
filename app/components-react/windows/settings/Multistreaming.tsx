@@ -92,6 +92,8 @@ export function MultistreamingSettings() {
               </li>
               <li>
                 <Translate
+                  // ignore \" for intl translation
+                  // prettier-ignore
                   message={
                     'Step 2: Ensure the \"Confirm stream title and game before going live\" option is checked in the <general>General</general> settings tab."'
                   }
@@ -100,7 +102,11 @@ export function MultistreamingSettings() {
                 </Translate>
               </li>
               <li>
-                {$t('Step 3: Select which platforms you are streaming to when you hit \"Go Live\".')}
+                {
+                  // ignore \" for intl translation
+                  // prettier-ignore
+                  $t('Step 3: Select which platforms you are streaming to when you hit \"Go Live\".')
+                }
               </li>
             </ul>
           </div>
