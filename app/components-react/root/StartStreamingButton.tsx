@@ -122,6 +122,10 @@ export default function StartStreamingButton(p: { disabled?: boolean }) {
       return true;
     }
 
+    if (StreamingService.views.isDualOutputMode) {
+      return true;
+    }
+
     if (primaryPlatform === 'twitch') {
       // For Twitch, we can show the Go Live window even with protected mode off
       // This is mainly for legacy reasons.
