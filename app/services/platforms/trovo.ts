@@ -90,11 +90,7 @@ export class TrovoService
         server: this.rtmpServer,
       });
     }
-    if (this.userService.views.isPrime && this.dualOutputService.views.dualOutputMode) {
-      this.UPDATE_STREAM_SETTINGS({
-        dualOutputDisplay: this.dualOutputService.views.getPlatformDisplay('trovo'),
-      });
-    }
+    this.confirmDualOutput('trovo');
     await this.putChannelInfo(trSettings);
   }
 

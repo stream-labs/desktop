@@ -227,12 +227,6 @@ export class FacebookService
   async beforeGoLive(options: IGoLiveSettings) {
     const fbOptions = getDefined(options.platforms.facebook);
 
-    if (this.userService.views.isPrime && this.dualOutputService.views.dualOutputMode) {
-      this.UPDATE_STREAM_SETTINGS({
-        dualOutputDisplay: this.dualOutputService.views.getPlatformDisplay('facebook'),
-      });
-    }
-
     let liveVideo: IFacebookLiveVideo;
     if (fbOptions.liveVideoId) {
       // start streaming to a scheduled video
@@ -262,6 +256,8 @@ export class FacebookService
     this.SET_STREAM_DASHBOARD_URL(`https://facebook.com/live/producer/${liveVideo.video.id}`);
     this.UPDATE_STREAM_SETTINGS({ ...fbOptions, liveVideoId: liveVideo.id });
     this.SET_VIDEO_ID(liveVideo.video.id);
+
+    this.confirmDualOutput('facebook');
 
     // send selected pageId to streamlabs.com
     if (fbOptions.destinationType === 'page') {

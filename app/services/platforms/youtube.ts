@@ -311,11 +311,9 @@ export class YoutubeService
         streamType: 'rtmp_common',
         server: 'rtmp://a.rtmp.youtube.com/live2',
       });
-    } else if (this.userService.views.isPrime && this.dualOutputService.views.dualOutputMode) {
-      this.UPDATE_STREAM_SETTINGS({
-        dualOutputDisplay: this.dualOutputService.views.getPlatformDisplay('youtube'),
-      });
     }
+
+    this.confirmDualOutput('youtube');
 
     this.UPDATE_STREAM_SETTINGS({ ...ytSettings, broadcastId: broadcast.id });
     this.SET_STREAM_ID(stream.id);

@@ -182,15 +182,19 @@ export class TwitchService
       }
     }
 
-    if (this.userService.views.isPrime && this.dualOutputService.views.dualOutputMode) {
-      this.UPDATE_STREAM_SETTINGS({
-        dualOutputDisplay: this.dualOutputService.views.getPlatformDisplay('twitch'),
-      });
-    }
+    this.confirmDualOutput('twitch');
 
     if (goLiveSettings) {
       const channelInfo = goLiveSettings?.platforms.twitch;
       if (channelInfo) await this.putChannelInfo(channelInfo);
+    }
+  }
+
+  checkForDualOutput() {
+    if (this.userService.views.isPrime && this.dualOutputService.views.dualOutputMode) {
+      this.UPDATE_STREAM_SETTINGS({
+        dualOutputDisplay: this.dualOutputService.views.getPlatformDisplay('twitch'),
+      });
     }
   }
 

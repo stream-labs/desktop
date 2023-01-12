@@ -116,6 +116,14 @@ export abstract class BasePlatformService<T extends IPlatformState> extends Stat
     return Promise.resolve({});
   }
 
+  confirmDualOutput(platform: TPlatform) {
+    if (this.userService.views.isPrime && this.dualOutputService.views.dualOutputMode) {
+      this.UPDATE_STREAM_SETTINGS({
+        dualOutputDisplay: this.dualOutputService.views.getPlatformDisplay(platform),
+      });
+    }
+  }
+
   @mutation()
   protected SET_VIEWERS_COUNT(viewers: number) {
     this.state.viewersCount = viewers;
