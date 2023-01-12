@@ -15,6 +15,7 @@ import { WindowsService } from 'services/windows';
 import { I18nService } from 'services/i18n';
 import { throwStreamError } from 'services/streaming/stream-error';
 import { BasePlatformService } from './base-platform';
+import { TDualOutputDisplayType } from 'services/dual-output';
 import { assertIsDefined, getDefined } from 'util/properties-type-guards';
 import Utils from '../utils';
 import { YoutubeUploader } from './youtube/uploader';
@@ -38,6 +39,7 @@ export interface IYoutubeStartStreamOptions extends IExtraBroadcastSettings {
   description: string;
   privacyStatus?: 'private' | 'public' | 'unlisted';
   scheduledStartTime?: number;
+  dualOutputDisplay?: TDualOutputDisplayType;
 }
 
 /**
@@ -147,6 +149,7 @@ interface IExtraBroadcastSettings {
   projection?: 'rectangular' | '360';
   latencyPreference?: 'normal' | 'low' | 'ultraLow';
   selfDeclaredMadeForKids?: boolean;
+  dualOutputDisplay?: TDualOutputDisplayType;
 }
 
 type TStreamStatus = 'active' | 'created' | 'error' | 'inactive' | 'ready';
@@ -199,6 +202,7 @@ export class YoutubeService
       privacyStatus: 'public',
       selfDeclaredMadeForKids: false,
       thumbnail: '',
+      dualOutputDisplay: undefined,
     },
   };
 
@@ -306,6 +310,10 @@ export class YoutubeService
         key: streamKey,
         streamType: 'rtmp_common',
         server: 'rtmp://a.rtmp.youtube.com/live2',
+      });
+    } else if (this.userService.views.isPrime && this.dualOutputService.views.dualOutputMode) {
+      this.UPDATE_STREAM_SETTINGS({
+        dualOutputDisplay: this.dualOutputService.views.getPlatformDisplay('youtube'),
       });
     }
 

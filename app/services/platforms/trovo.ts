@@ -1,5 +1,6 @@
 import { InheritMutations, mutation } from '../core';
 import { BasePlatformService } from './base-platform';
+import { TDualOutputDisplayType } from 'services/dual-output';
 import {
   IGame,
   IPlatformRequest,
@@ -23,6 +24,7 @@ interface ITrovoServiceState extends IPlatformState {
 export interface ITrovoStartStreamOptions {
   title: string;
   game: string;
+  dualOutputDisplay?: TDualOutputDisplayType;
 }
 
 interface ITrovoChannelInfo {
@@ -45,7 +47,7 @@ export class TrovoService
   implements IPlatformService {
   static initialState: ITrovoServiceState = {
     ...BasePlatformService.initialState,
-    settings: { title: '', game: '' },
+    settings: { title: '', game: '', dualOutputDisplay: undefined },
     userInfo: { userId: '', channelId: '' },
     channelInfo: { gameId: '', gameName: '', gameImage: '' },
   };
@@ -86,6 +88,11 @@ export class TrovoService
         streamType: 'rtmp_custom',
         key,
         server: this.rtmpServer,
+      });
+    }
+    if (this.userService.views.isPrime && this.dualOutputService.views.dualOutputMode) {
+      this.UPDATE_STREAM_SETTINGS({
+        dualOutputDisplay: this.dualOutputService.views.getPlatformDisplay('trovo'),
       });
     }
     await this.putChannelInfo(trSettings);

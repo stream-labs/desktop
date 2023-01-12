@@ -9,6 +9,7 @@ import { IGoLiveSettings } from 'services/streaming';
 import { throwStreamError } from 'services/streaming/stream-error';
 import { BasePlatformService } from './base-platform';
 import { WindowsService } from '../windows';
+import { TDualOutputDisplayType } from 'services/dual-output';
 import { assertIsDefined, getDefined } from '../../util/properties-type-guards';
 import { flatten } from 'lodash';
 import * as remote from '@electron/remote';
@@ -81,6 +82,7 @@ export interface IFacebookStartStreamOptions {
   liveVideoId?: string;
   privacy?: { value: TFacebookStreamPrivacy };
   plannedStartTime?: number;
+  dualOutputDisplay?: TDualOutputDisplayType;
 }
 
 export type TDestinationType = 'me' | 'page' | 'group' | '';
@@ -108,6 +110,7 @@ const initialState: IFacebookServiceState = {
     description: '',
     game: '',
     privacy: { value: 'EVERYONE' },
+    dualOutputDisplay: undefined,
   },
 };
 
@@ -223,6 +226,12 @@ export class FacebookService
 
   async beforeGoLive(options: IGoLiveSettings) {
     const fbOptions = getDefined(options.platforms.facebook);
+
+    if (this.userService.views.isPrime && this.dualOutputService.views.dualOutputMode) {
+      this.UPDATE_STREAM_SETTINGS({
+        dualOutputDisplay: this.dualOutputService.views.getPlatformDisplay('facebook'),
+      });
+    }
 
     let liveVideo: IFacebookLiveVideo;
     if (fbOptions.liveVideoId) {

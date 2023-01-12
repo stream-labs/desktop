@@ -7,6 +7,7 @@ import { IStreamError } from './stream-error';
 import { ICustomStreamDestination } from '../settings/streaming';
 import { ITiktokStartStreamOptions } from '../platforms/tiktok';
 import { ITrovoStartStreamOptions } from '../platforms/trovo';
+import { TDualOutputDisplayType } from 'services/dual-output';
 
 export enum EStreamingState {
   Offline = 'offline',
@@ -80,6 +81,7 @@ export interface IGoLiveSettings extends IStreamSettings {
 export interface IPlatformFlags {
   enabled: boolean;
   useCustomFields: boolean;
+  dualOutputDisplay?: TDualOutputDisplayType;
 }
 
 export interface IStreamingServiceState {

@@ -10,6 +10,7 @@ import {
 import { ScenesService, TSceneNode } from 'services/scenes';
 import { SceneCollectionsService } from 'services/scene-collections';
 import { CopyNodesCommand } from 'services/editor-commands/commands';
+import { TPlatform } from 'services/platforms';
 
 // @@@ TODO: Refactor dictionaries to Dictionary<<Record<string, TSceneNode>> to allow for multiple settings profiles?
 interface IDualOutputNodeIds {
@@ -63,6 +64,10 @@ class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
 
   get hasNodeMaps() {
     return this.state.horizontalNodeMap && this.state.verticalNodeMap;
+  }
+
+  getPlatformDisplay(platform: TPlatform) {
+    return this.state.platformSettings[platform].setting;
   }
 
   getHorizontalNodeId(activeSceneNodeId: string) {

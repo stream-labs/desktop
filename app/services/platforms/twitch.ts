@@ -12,7 +12,7 @@ import { authorizedHeaders, jfetch } from 'util/requests';
 import { UserService } from 'services/user';
 import { getAllTags, getStreamTags, TTwitchTag, updateTags } from './twitch/tags';
 import { TTwitchOAuthScope } from './twitch/scopes';
-import { platformAuthorizedRequest, platformRequest } from './utils';
+import { platformAuthorizedRequest } from './utils';
 import { CustomizationService } from 'services/customization';
 import { assertIsDefined } from 'util/properties-type-guards';
 import { IGoLiveSettings } from 'services/streaming';
@@ -20,10 +20,12 @@ import { InheritMutations, mutation } from 'services/core';
 import { throwStreamError, TStreamErrorType } from 'services/streaming/stream-error';
 import { BasePlatformService } from './base-platform';
 import Utils from '../utils';
+import { TDualOutputDisplayType } from 'services/dual-output';
 
 export interface ITwitchStartStreamOptions {
   title: string;
   game?: string;
+  dualOutputDisplay?: TDualOutputDisplayType;
   tags?: TTwitchTag[];
 }
 
@@ -84,6 +86,7 @@ export class TwitchService
     settings: {
       title: '',
       game: '',
+      dualOutputDisplay: undefined,
       tags: [],
     },
   };
@@ -177,6 +180,12 @@ export class TwitchService
           server: 'auto',
         });
       }
+    }
+
+    if (this.userService.views.isPrime && this.dualOutputService.views.dualOutputMode) {
+      this.UPDATE_STREAM_SETTINGS({
+        dualOutputDisplay: this.dualOutputService.views.getPlatformDisplay('twitch'),
+      });
     }
 
     if (goLiveSettings) {
