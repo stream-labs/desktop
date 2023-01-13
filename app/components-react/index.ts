@@ -65,6 +65,7 @@ import RecentEventsWindow from './windows/RecentEvents';
 import NewBadge from './shared/NewBadge';
 import RecordingHistory from './windows/RecordingHistory';
 import UltraIcon from './shared/UltraIcon';
+import EditTransform from './windows/EditTransform';
 
 // list of React components to be used inside Vue components
 export const components = {
@@ -134,4 +135,5 @@ export const components = {
   PlatformAppPopOut,
   NewBadge,
   UltraIcon,
+  EditTransform,
 };
