@@ -22,12 +22,12 @@ export default class PlatformAppProperties extends Vue {
     return this.source.getPropertiesManagerSettings() as IPlatformAppManagerSettings;
   }
 
-  navigateApp(appId: string) {
+  navigateApp() {
     this.navigationService.navigate('PlatformAppMainPage', {
       appId: this.appId,
       sourceId: this.source.sourceId,
     });
-    this.sideNavService.setCurrentMenuItem(appId);
+    this.sideNavService.setCurrentMenuItem(this.appId);
     this.windowsService.closeChildWindow();
   }
 
