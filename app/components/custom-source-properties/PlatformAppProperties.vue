@@ -2,7 +2,7 @@
 <div class="platform-app-properties">
   <div v-if="app">
     <p>This source is managed by {{ appName }}</p>
-    <button @click="navigateApp" class="button button--default">
+    <button @click="() => navigateApp(appId)" class="button button--default">
       Open App Settings
     </button>
     <div v-if="isUnpacked" class="platform-app-properties-dev-controls">
