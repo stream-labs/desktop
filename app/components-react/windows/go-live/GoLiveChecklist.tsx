@@ -21,6 +21,7 @@ export default function GoLiveChecklist(p: HTMLAttributes<unknown>) {
     enabledPlatforms,
     lifecycle,
     isMultiplatformMode,
+    isDualOutputMode,
     checklist,
     warning,
     getPlatformDisplayName,
@@ -28,7 +29,6 @@ export default function GoLiveChecklist(p: HTMLAttributes<unknown>) {
     shouldShowOptimizedProfile,
     shouldPostTweet,
   } = useGoLiveSettings().extend(module => ({
-
     get shouldShowOptimizedProfile() {
       return VideoEncodingOptimizationService.state.useOptimizedProfile && !module.isUpdateMode;
     },
@@ -70,7 +70,13 @@ export default function GoLiveChecklist(p: HTMLAttributes<unknown>) {
           {/* RESTREAM */}
           {!isUpdateMode &&
             isMultiplatformMode &&
+            !isDualOutputMode &&
             renderCheck($t('Configure the Multistream service'), checklist.setupMultistream)}
+
+          {/* DUAL OUTPUT */}
+          {!isUpdateMode &&
+            isDualOutputMode &&
+            renderCheck($t('Configure the Dual Output service'), checklist.setupDualOutput)}
 
           {/* OPTIMIZED PROFILE */}
           {shouldShowOptimizedProfile &&

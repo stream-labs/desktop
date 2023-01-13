@@ -320,6 +320,39 @@ export class StreamingService
       }
     }
 
+    // setup dual output
+    if (this.views.isDualOutputMode) {
+      // dual output also uses the Restream service
+      // so check if the Restream service is available
+      let ready = false;
+      try {
+        await this.runCheck(
+          'setupDualOutput',
+          async () => (ready = await this.restreamService.checkStatus()),
+        );
+      } catch (e: unknown) {
+        console.error('Unable to proceed with dual output. Error fetching restreaming service', e);
+      }
+      // Assume restream is down
+      if (!ready) {
+        this.setError('DUAL_OUTPUT_RESTREAM_DISABLED');
+        return;
+      }
+
+      // update dual output settings
+      try {
+        await this.runCheck('setupDualOutput', async () => {
+          // enable restream on the backend side
+          if (!this.restreamService.state.enabled) await this.restreamService.setEnabled(true);
+          await this.restreamService.beforeGoLive();
+        });
+      } catch (e: unknown) {
+        console.error('Unable to proceed with dual output. Failed to setup restream', e);
+        this.setError('DUAL_OUTPUT_SETUP_FAILED');
+        return;
+      }
+    }
+
     // apply optimized settings
     const optimizer = this.videoEncodingOptimizationService;
     if (optimizer.state.useOptimizedProfile && settings.optimizedProfile) {

@@ -129,7 +129,11 @@ export default function StartStreamingButton(p: { disabled?: boolean }) {
     if (primaryPlatform === 'twitch') {
       // For Twitch, we can show the Go Live window even with protected mode off
       // This is mainly for legacy reasons.
-      return StreamingService.views.isMultiplatformMode || updateStreamInfoOnLive;
+      return (
+        StreamingService.views.isMultiplatformMode ||
+        StreamingService.views.isDualOutputMode ||
+        updateStreamInfoOnLive
+      );
     } else {
       return (
         StreamSettingsService.state.protectedModeEnabled &&
