@@ -391,7 +391,7 @@
     "name": "LIV Client Capture"
   },
   "near": {
-    "name": "KOTOYOMI Near(仮)",
-    "description": "シーンにN Voiceの音声に合わせてコメントを読み上げるキャラクターを追加します(仮)"
+    "name": "KOTOYOMI Near",
+    "description": "Add a character to your scene that reads comments to the \"N Voice\" voice."
   }
 }
