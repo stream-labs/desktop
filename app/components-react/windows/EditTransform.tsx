@@ -7,7 +7,7 @@ import { $t } from 'services/i18n';
 import { AnchorPositions, AnchorPoint } from 'util/ScalableRectangle';
 import { useVuex } from 'components-react/hooks';
 import { NumberInput } from 'components-react/shared/inputs';
-import Form from 'components-react/shared/inputs/Form';
+import Form, { useForm } from 'components-react/shared/inputs/Form';
 
 const dirMap = (dir: string) =>
   ({
@@ -24,16 +24,25 @@ export default function EditTransform() {
   // // We only care about the attributes of the rectangle not the functionality
   const [rect, setRect] = useState({ ...selection.getBoundingRect() });
   const transform = selection.getItems()[0].transform;
+  const form = useForm();
 
   useEffect(() => {
     const subscription = SourcesService.sourceRemoved.subscribe(cancel);
     return subscription.unsubscribe;
   });
 
-  function setCrop(cropEdge: keyof ICrop) {
-    return (value: number) => {
-      // if (await this.$refs.validForm.validateAndGetErrorsCount()) return;
+  async function invalidForm() {
+    try {
+      await form.validateFields();
+    } catch (errorInfo: unknown) {
+      return true;
+    }
+    return false;
+  }
 
+  function setCrop(cropEdge: keyof ICrop) {
+    return async (value: number) => {
+      if (await invalidForm()) return;
       EditorCommandsService.actions.executeCommand('CropItemsCommand', selection, {
         [cropEdge]: Number(value),
       });
@@ -41,8 +50,8 @@ export default function EditTransform() {
   }
 
   function setPos(dir: string) {
-    return (value: number) => {
-      // if (await this.$refs.validForm.validateAndGetErrorsCount()) return;
+    return async (value: number) => {
+      if (await invalidForm()) return;
       const delta = Number(value) - Math.round(rect[dir]);
 
       EditorCommandsService.actions.executeCommand('MoveItemsCommand', selection, {
@@ -55,8 +64,8 @@ export default function EditTransform() {
   }
 
   function setScale(dir: string) {
-    return (value: number) => {
-      // if (await this.$refs.validForm.validateAndGetErrorsCount()) return;
+    return async (value: number) => {
+      if (await invalidForm()) return;
       if (Number(value) === rect[dir]) return;
       const scale = Number(value) / rect[dir];
       const scaleX = dir === 'width' ? scale : 1;
@@ -89,7 +98,7 @@ export default function EditTransform() {
 
   return (
     <ModalLayout footer={<Footer reset={reset} cancel={cancel} />}>
-      <Form>
+      <Form form={form}>
         <CoordinateInput
           title={$t('Position')}
           datapoints={['x', 'y']}
