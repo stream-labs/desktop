@@ -60,6 +60,8 @@ class CommandLineClient {
   private terminateReject: (reason?: unknown) => void;
   private terminated: Promise<number>;
 
+  private terminateCallbacks: (() => void)[] = [];
+
   constructor(
     private subprocess: ChildProcess,
     private log: (...args: unknown[]) => void,
@@ -73,7 +75,20 @@ class CommandLineClient {
     this.terminated = new Promise<number>((resolve, reject) => {
       this.terminateResolve = resolve;
       this.terminateReject = reject;
+    }).finally(() => {
+      this.terminateCallbacks.forEach((callback) => callback());
     });
+  }
+
+  /**
+  * register callback to be called on terminated
+  * @returns cancel function
+  */
+  onTerminate(callback: () => void): (() => void) {
+    this.terminateCallbacks.push(callback);
+    return () => {
+      this.terminateCallbacks = this.terminateCallbacks.filter((c) => c !== callback);
+    };
   }
 
   get pid() {
@@ -248,6 +263,7 @@ export class NVoiceClient {
         if (!started) {
           this.options.onError(new Error(`n-voice-engine start failed! ${code}`));
         }
+        this.commandLineClient = undefined; // 落ちたときは次回、起動を試みる
       });
       this.commandLineClient = client;
       const r = await this.waitOkNg(client);
@@ -266,10 +282,15 @@ export class NVoiceClient {
   // ok か ng が来るまで待って、来たらその後の文字列を返す
   waitOkNg(client: CommandLineClient): Promise<string[]> {
     return new Promise((resolve, reject) => {
+      // waitOkNg中に engineが落ちたら、rejectする
+      const cancelWatchingTerminate = client.onTerminate(() => {
+        reject(new Error(`n-voice-engine exited: ${client.exitCode}`));
+      });
       client.waitLine((data: string) => {
         const [first, ...rest] = data.split(' ');
         switch (first) {
           case 'ok':
+            cancelWatchingTerminate();
             resolve(rest);
             return true;
 
@@ -277,6 +298,7 @@ export class NVoiceClient {
             {
               const code = rest[0];
               const title = ErrorCodes[code];
+              cancelWatchingTerminate();
               reject(new Error(`code ${code}: ${title}`));
               return true;
             }
@@ -310,7 +332,13 @@ export class NVoiceClient {
       // ignore empty text
       return { wave: null, labels: [] };
     }
-    await this._command('talk', speed.toString(), sjis, toShiftJisBase64(filename));
+    try {
+      await this._command('talk', speed.toString(), sjis, toShiftJisBase64(filename));
+    } catch (e) {
+      console.error('talk exception', e);
+      return { wave: null, labels: [] };
+    }
+
     const wave = existsSync(filename) ? readFileSync(filename) : null;
     if (wave) {
       unlinkSync(filename);
