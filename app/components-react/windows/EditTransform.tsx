@@ -29,7 +29,7 @@ export default function EditTransform() {
   useEffect(() => {
     const subscription = SourcesService.sourceRemoved.subscribe(cancel);
     return subscription.unsubscribe;
-  });
+  }, []);
 
   async function invalidForm() {
     try {
@@ -130,12 +130,15 @@ function CoordinateInput(p: {
     <InputWrapper label={p.title}>
       <div style={{ display: 'flex' }}>
         {p.datapoints.map((dir: string) => (
-          <NumberInput
-            value={p.rect[dir]}
-            step={1}
-            onInput={p.handleInput(dir)}
-            min={['width', 'height'].includes(dir) ? 1 : undefined}
-          />
+          <div style={{ marginLeft: '8px' }} key={dir}>
+            <NumberInput
+              value={Math.floor(p.rect[dir])}
+              step={1}
+              onInput={p.handleInput(dir)}
+              min={['width', 'height'].includes(dir) ? 1 : undefined}
+              nowrap
+            />
+          </div>
         ))}
       </div>
     </InputWrapper>
@@ -148,7 +151,11 @@ function RotateInput(p: { handleInput: (val: number) => void }) {
       <button className="button button--default" onClick={() => p.handleInput(90)}>
         {$t('Rotate 90 Degrees CW')}
       </button>
-      <button className="button button--default" onClick={() => p.handleInput(-90)}>
+      <button
+        className="button button--default"
+        style={{ marginLeft: '8px' }}
+        onClick={() => p.handleInput(-90)}
+      >
         {$t('Rotate 90 Degrees CCW')}
       </button>
     </InputWrapper>
@@ -161,18 +168,29 @@ function CropInput(p: {
 }) {
   return (
     <InputWrapper label={$t('Crop')}>
-      {['left', 'right', 'top', 'bottom'].map((dir: keyof ICrop) => (
-        <div style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
-          <NumberInput
-            value={p.transform.crop[dir]}
-            onInput={p.handleInput(dir)}
-            min={0}
-            step={1}
-            nowrap
-          />
-          <span style={{ marginLeft: '8px' }}>{dirMap(dir)}</span>
-        </div>
-      ))}
+      <div style={{ display: 'flex' }}>
+        {['left', 'right', 'top', 'bottom'].map((dir: keyof ICrop) => (
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              marginBottom: '8px',
+              marginLeft: '8px',
+              width: '100px',
+            }}
+            key={dir}
+          >
+            <NumberInput
+              value={p.transform.crop[dir]}
+              onInput={p.handleInput(dir)}
+              min={0}
+              step={1}
+              nowrap
+            />
+            <span style={{ marginLeft: '8px' }}>{dirMap(dir)}</span>
+          </div>
+        ))}
+      </div>
     </InputWrapper>
   );
 }
@@ -183,7 +201,7 @@ function Footer(p: { reset: () => void; cancel: () => void }) {
       <button className="button button--default" onClick={p.reset}>
         {$t('Reset')}
       </button>
-      <button className="button button--action" onClick={p.cancel}>
+      <button className="button button--action" style={{ marginLeft: '8px' }} onClick={p.cancel}>
         {$t('Done')}
       </button>
     </>
