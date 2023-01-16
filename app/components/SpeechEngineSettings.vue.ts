@@ -50,8 +50,7 @@ export default class SpeechEngineSettings extends Vue {
   }
   get maxTimeCandidates(): number[] {
     return [
-      // TODO
-      1, 2, 3, 4, 5, 6, 7,
+      3, 3.5, 4, 4.5, 5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9, 9.5, 10,
     ];
   }
   get maxTimeDefault(): number {
