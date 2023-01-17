@@ -22,7 +22,7 @@ export default function PlatformAppPopOut() {
     <PlatformAppPageView
       appId={params.appId}
       pageSlot={params.pageSlot}
-      style={{ height: '95%', width: '100%' }}
+      style={{ height: 'calc(100% - 53px)', width: '100%' }}
     />
   );
 }
