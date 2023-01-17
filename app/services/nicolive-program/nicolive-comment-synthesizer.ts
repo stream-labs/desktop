@@ -9,6 +9,7 @@ import { NVoiceClientService } from './n-voice-client';
 import { Server } from 'socket.io';
 import { createServer } from 'http';
 import { NVoiceCharacterService } from 'services/nvoice-character';
+import { sleep } from 'util/sleep';
 
 export type Speech = {
   text: string;
@@ -70,7 +71,7 @@ export class NicoliveCommentSynthesizerService extends StatefulService<ICommentS
 
   currentPlayingId: SynthesizerId | null = null;
   currentPlaying(): ISpeechSynthesizer | null {
-    return this.currentPlaying ? this.getSynthesizer(this.currentPlayingId) : null;
+    return this.currentPlayingId ? this.getSynthesizer(this.currentPlayingId) : null;
   }
 
   io: Server;
@@ -182,15 +183,28 @@ export class NicoliveCommentSynthesizerService extends StatefulService<ICommentS
     }, synthId);
   }
 
-  async speakTextSimple(speech: Speech) {
-    this.speakText(speech, () => { }, () => { });
+  async startSpeakingSimple(speech: Speech) {
+    // empty anonymous functions must be created in this service
+    await this.startSpeaking(speech, () => { }, () => { });
   }
 
-  async speakText(
+  async startTestSpeech(text: string, synthId: SynthesizerId) {
+    console.log('testSpeech', text, synthId); // DEBUG
+    const speech = this.makeSimpleTextSpeech(text, synthId);
+    if (speech) {
+      if (this.speaking) {
+        this.cancelSpeak();
+        await sleep(200);
+      }
+      await this.startSpeakingSimple(speech);
+    }
+  }
+
+  async startSpeaking(
     speech: Speech,
     onstart: () => void,
     onend: () => void,
-  ): Promise<void> {
+  ) {
     if (!this.enabled) {
       return;
     }
@@ -200,7 +214,7 @@ export class NicoliveCommentSynthesizerService extends StatefulService<ICommentS
 
     if (this.currentPlayingId !== null) {
       if (this.currentPlayingId !== toPlay) {
-        this.currentPlaying()?.waitForSpeakEnd();
+        await this.currentPlaying()?.waitForSpeakEnd();
       }
     }
 
@@ -219,10 +233,12 @@ export class NicoliveCommentSynthesizerService extends StatefulService<ICommentS
   }
 
   get speaking(): boolean {
-    return this.currentPlaying()?.speaking || false;
+    return this.currentPlayingId !== null; // DEBUG
+    // return this.currentPlaying()?.speaking || false;
   }
 
   cancelSpeak() {
+    console.log('cancelSpeak(): currentPlaying', this.currentPlaying()); // DEBUG
     this.currentPlaying()?.cancelSpeak();
   }
   private setEnabled(enabled: boolean) {
@@ -421,7 +437,7 @@ export class NVoiceSynthesizer implements ISpeechSynthesizer {
   }
 
   get speaking(): boolean {
-    return this._cancel !== undefined;
+    return this._cancel !== undefined; // playPromise があるなら再生中だが、cancelできるのはこっちで困った
   }
 
   async waitForSpeakEnd(): Promise<void> {
