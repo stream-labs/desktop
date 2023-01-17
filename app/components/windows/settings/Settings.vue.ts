@@ -8,7 +8,6 @@ import GenericFormGroups from 'components/obs/inputs/GenericFormGroups.vue';
 import { WindowsService } from 'services/windows';
 import { ISettingsSubCategory, SettingsService } from 'services/settings/index';
 import DeveloperSettings from './DeveloperSettings';
-import InstalledApps from 'components/InstalledApps.vue';
 import Hotkeys from './Hotkeys.vue';
 import OverlaySettings from './OverlaySettings';
 import NotificationsSettings from './NotificationsSettings.vue';
@@ -24,6 +23,7 @@ import {
   PlatformLogo,
   NewBadge,
   UltraIcon,
+  InstalledApps,
 } from 'components/shared/ReactComponentList';
 import { $t } from 'services/i18n';
 import { debounce } from 'lodash-decorators';
