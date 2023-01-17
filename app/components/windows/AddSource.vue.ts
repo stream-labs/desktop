@@ -28,13 +28,22 @@ export default class AddSource extends Vue {
   sourceAddOptions = this.windowsService.getChildWindowQueryParams()
     .sourceAddOptions as ISourceAddOptions;
 
+  get nVoiceCharacterType(): NVoiceCharacterType {
+    return this.sourceAddOptions.propertiesManagerSettings.nVoiceCharacterType || 'near';
+  }
+
   // @ts-ignore: ts2729: use before initialization
   sources = this.sourcesService.getSources().filter(source => {
+    const comparison = {
+      type: this.sourceType,
+      propertiesManager: this.sourceAddOptions.propertiesManager,
+    };
     return (
-      source.isSameType({
-        type: this.sourceType,
-        propertiesManager: this.sourceAddOptions.propertiesManager,
-      }) && source.sourceId !== this.scenesService.activeSceneId
+      source.isSameType(
+        comparison.propertiesManager === 'nvoice-character'
+          ? { ...comparison, nVoiceCharacterType: this.nVoiceCharacterType }
+          : comparison,
+      ) && source.sourceId !== this.scenesService.activeSceneId
     );
   });
 
