@@ -1,19 +1,19 @@
 <template>
   <div class="setting-section">
     <div class="section">
-        <div class="input-label section-heading">
-          <label>フィルター設定</label>
-        </div>
-        <div class="input-container">
-          <div class="input-wrapper">
-            <div class="row">
-              <div class="name">匿名(184)のコメントを表示</div>
-              <div class="value">
-                <input type="checkbox" v-model="showAnonymous" class="toggle-button" />
-              </div>
+      <div class="input-label section-heading">
+        <label>フィルター設定</label>
+      </div>
+      <div class="input-container">
+        <div class="input-wrapper">
+          <div class="row">
+            <div class="name">匿名(184)のコメントを表示</div>
+            <div class="value">
+              <input type="checkbox" v-model="showAnonymous" class="toggle-button" />
             </div>
           </div>
         </div>
+      </div>
     </div>
     <div class="section">
       <div class="input-label section-heading">
@@ -23,7 +23,9 @@
         <div class="input-wrapper">
           <div class="row">
             <div class="name">コメントを読み上げる</div>
-            <div class="value"><input type="checkbox" v-model="enabled" class="toggle-button" /></div>
+            <div class="value">
+              <input type="checkbox" v-model="enabled" class="toggle-button" />
+            </div>
           </div>
         </div>
       </div>
@@ -31,7 +33,11 @@
     <div class="section">
       <div class="input-label section-heading">
         <label>音声設定</label>
-        <button class="button--text section-heading-button" :disabled="!enabled" @click="resetVoice">
+        <button
+          class="button--text section-heading-button"
+          :disabled="!enabled"
+          @click="resetVoice"
+        >
           設定リセット
         </button>
       </div>
@@ -54,7 +60,9 @@
         <div class="input-wrapper">
           <div class="row">
             <div class="name">音量</div>
-            <div class="value">{{ volume }}<span v-if="volume == volumeDefault">（既定）</span></div>
+            <div class="value">
+              {{ volume }}<span v-if="volume == volumeDefault">（既定）</span>
+            </div>
           </div>
           <VueSlider
             class="slider"
@@ -72,7 +80,11 @@
     <div class="section">
       <div class="input-label section-heading">
         <label>振り分け設定</label>
-        <button class="button--text section-heading-button" :disabled="!enabled" @click="resetAssignment">
+        <button
+          class="button--text section-heading-button"
+          :disabled="!enabled"
+          @click="resetAssignment"
+        >
           設定リセット
         </button>
       </div>
@@ -80,7 +92,11 @@
         <div class="input-wrapper">
           <div class="row input-heading">
             <label for="system-select">システムメッセージ</label>
-            <button class="button button--secondary" :disabled="!enabled" @click="testSpeechPlay(system)">
+            <button
+              class="button button--secondary"
+              :disabled="!enabled"
+              @click="testSpeechPlay(system)"
+            >
               <i class="icon-speaker"></i>
               読み上げテスト
             </button>
@@ -95,7 +111,7 @@
             :data-type="system"
           >
             <template slot="option" slot-scope="o">
-              {{ synthName(o.option) }}<span v-if="o.option == operatorDefault">（既定）</span>
+              {{ synthName(o.option) }}<span v-if="o.option == systemDefault">（既定）</span>
             </template>
           </multiselect>
         </div>
@@ -104,7 +120,11 @@
         <div class="input-wrapper">
           <div class="row input-heading">
             <label for="normal-select">視聴者コメント</label>
-            <button class="button button--secondary" :disabled="!enabled" @click="testSpeechPlay(normal)">
+            <button
+              class="button button--secondary"
+              :disabled="!enabled"
+              @click="testSpeechPlay(normal)"
+            >
               <i class="icon-speaker"></i>
               読み上げテスト
             </button>
@@ -190,7 +210,7 @@ select {
   .button {
     margin-bottom: 0;
     margin-left: auto;
-  };
+  }
 }
 
 .slider-wrapper {
@@ -230,11 +250,11 @@ select {
   position: relative;
   box-shadow: inset 0 0 0 1px var(--color-border-light);
 
-  [data-type="webSpeech"] & {
+  [data-type='webSpeech'] & {
     background: url(../../media/images/windows_bg.png) center no-repeat / 100% auto;
   }
 
-  [data-type="nVoice"] & {
+  [data-type='nVoice'] & {
     background: url(../../media/images/nvoice_bg.png) center no-repeat / 100% auto;
 
     &:after {
@@ -245,7 +265,7 @@ select {
       width: 414px;
       height: 415px;
       background: url(../../media/images/nvoice.png) no-repeat center/ 100% auto;
-      opacity: .9;
+      opacity: 0.9;
       filter: drop-shadow(4px 4px 12px rgba(@black, 0.3));
     }
   }
