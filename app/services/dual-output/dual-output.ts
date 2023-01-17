@@ -11,7 +11,6 @@ import { ScenesService, TSceneNode } from 'services/scenes';
 import { SceneCollectionsService } from 'services/scene-collections';
 import { VideoSettingsService } from 'services/settings-v2/video';
 import { CopyNodesCommand } from 'services/editor-commands/commands';
-import { Subject } from 'rxjs';
 import { TPlatform } from 'services/platforms';
 
 // @@@ TODO: Refactor dictionaries to Dictionary<<Record<string, TSceneNode>> to allow for multiple settings profiles?
@@ -101,8 +100,6 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
     verticalNodes: null,
   };
 
-  dualOutputServiceInitiated = new Subject();
-
   get views() {
     return new DualOutputViews(this.state);
   }
@@ -127,8 +124,6 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
         this.setDualOutputScenes(this.scenesService.views.activeSceneId);
       }
     });
-
-    this.dualOutputServiceInitiated.next();
   }
 
   toggleDualOutputMode(status: boolean) {
@@ -196,7 +191,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
     this.SET_NODE_MAPS(horizontalCopyNodesCommand.idsMap, verticalCopyNodesCommand.idsMap);
 
     if (!this.state.dualOutputMode) {
-      this.toggleDualOutputMode(true);
+      this.TOGGLE_DUAL_OUTPUT_MODE(true);
     }
     this.SET_DUAL_OUTPUT_SCENES(horizontalScene.state.id, verticalScene.state.id);
   }

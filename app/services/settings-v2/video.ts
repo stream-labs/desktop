@@ -92,19 +92,17 @@ export class VideoSettingsService extends StatefulService<IVideoSettings> {
 
   initialState = {
     videoContext: null as obs.IVideo,
-    horizontalContext: null as obs.IVideo,
-    verticalContext: null as obs.IVideo,
+    horizontalContext: undefined as obs.IVideo,
+    verticalContext: undefined as obs.IVideo,
     default: null as obs.IVideoInfo,
-    horizontal: null as obs.IVideoInfo,
-    vertical: null as obs.IVideoInfo,
+    horizontal: undefined as obs.IVideoInfo,
+    vertical: undefined as obs.IVideoInfo,
   };
 
   init() {
     this.establishVideoContext();
 
-    this.dualOutputService.dualOutputServiceInitiated.subscribe();
     if (this.dualOutputService.views.dualOutputMode) {
-      console.log(this.dualOutputService.views.dualOutputMode);
       this.establishVideoContext('horizontal');
       this.establishVideoContext('vertical');
     }
@@ -160,6 +158,11 @@ export class VideoSettingsService extends StatefulService<IVideoSettings> {
   // get videoSettings() {
   //   return this.settingsManagerService.videoSettings;
   // }
+
+  getVideoContext(display: TDisplayType) {
+    const contextName = contextNameMap[display];
+    return this.state[contextName];
+  }
 
   getBaseResolution(display: TDisplayType = 'default') {
     return `${this.state[display].baseWidth}x${this.state[display].baseHeight}`;
@@ -218,7 +221,7 @@ export class VideoSettingsService extends StatefulService<IVideoSettings> {
     //   });
     // }
 
-    const contextName = display === 'default' ? 'videoContext' : `${display}Context`;
+    const contextName = contextNameMap[display];
 
     if (display === 'default') {
       this.state.default = this.state.videoContext.video;
@@ -286,19 +289,23 @@ export class VideoSettingsService extends StatefulService<IVideoSettings> {
 
     if (this.state[contextName]) return;
 
-    const context = obs.VideoFactory.create();
-    this.SET_VIDEO_CONTEXT(display, context);
+    this.state[contextName] = obs.VideoFactory.create();
+    this.state[display] = {} as obs.IVideoInfo;
     this.migrateSettings(display);
     this.state[contextName].video = this.state[display];
   }
 
   destroyVideoContext(display: TDisplayType = 'default') {
+    const contextName = contextNameMap[display];
+    if (this.state[contextName]) {
+      const context: obs.IVideo = this.state[contextName];
+      context.destroy();
+    }
     this.DESTROY_VIDEO_CONTEXT(display);
   }
 
   @debounce(200)
   updateObsSettings(display: TDisplayType = 'default') {
-    // this.state.videoContext.video = this.state.default;
     switch (display) {
       case 'default': {
         this.state.videoContext.video = this.state.default;
@@ -328,25 +335,20 @@ export class VideoSettingsService extends StatefulService<IVideoSettings> {
   }
 
   shutdown() {
-    this.state.videoContext.destroy();
-    this.state.horizontalContext.destroy();
-    this.state.verticalContext.destroy();
-  }
-
-  @mutation()
-  SET_VIDEO_CONTEXT(display: TDisplayType = 'default', context: obs.IVideo) {
-    const contextName = contextNameMap[display];
-    this.state[contextName] = context;
-    this.state[display] = {} as obs.IVideoInfo;
+    displays.forEach(display => {
+      const contextName = contextNameMap[display];
+      const context = this.state[contextName];
+      if (context) {
+        context.destroy();
+      }
+    });
   }
 
   @mutation()
   DESTROY_VIDEO_CONTEXT(display: TDisplayType = 'default') {
     const contextName = contextNameMap[display];
-    if (this.state[contextName]) {
-      console.log(this.state[contextName]);
-      this.state[contextName].destroy();
-    }
+    this.state[contextName] = undefined as obs.IVideo;
+    this.state[display] = undefined as obs.IVideoInfo;
   }
 
   @mutation()
