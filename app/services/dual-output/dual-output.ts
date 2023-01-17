@@ -9,7 +9,9 @@ import {
 } from './dual-output-data';
 import { ScenesService, TSceneNode } from 'services/scenes';
 import { SceneCollectionsService } from 'services/scene-collections';
+import { VideoSettingsService } from 'services/settings-v2/video';
 import { CopyNodesCommand } from 'services/editor-commands/commands';
+import { Subject } from 'rxjs';
 import { TPlatform } from 'services/platforms';
 
 // @@@ TODO: Refactor dictionaries to Dictionary<<Record<string, TSceneNode>> to allow for multiple settings profiles?
@@ -86,6 +88,7 @@ class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
 export class DualOutputService extends PersistentStatefulService<IDualOutputServiceState> {
   @Inject() private scenesService: ScenesService;
   @Inject() private sceneCollectionsService: SceneCollectionsService;
+  @Inject() private videoSettingsService: VideoSettingsService;
 
   static defaultState: IDualOutputServiceState = {
     platformSettings: DualOutputPlatformSettings,
@@ -97,6 +100,8 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
     horizontalNodes: null,
     verticalNodes: null,
   };
+
+  dualOutputServiceInitiated = new Subject();
 
   get views() {
     return new DualOutputViews(this.state);
@@ -122,9 +127,18 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
         this.setDualOutputScenes(this.scenesService.views.activeSceneId);
       }
     });
+
+    this.dualOutputServiceInitiated.next();
   }
 
-  toggleDualOutputMode(status?: boolean) {
+  toggleDualOutputMode(status: boolean) {
+    if (!status) {
+      this.videoSettingsService.destroyVideoContext('horizontal');
+      this.videoSettingsService.destroyVideoContext('vertical');
+    } else {
+      this.videoSettingsService.establishVideoContext('horizontal');
+      this.videoSettingsService.establishVideoContext('vertical');
+    }
     this.TOGGLE_DUAL_OUTPUT_MODE(status);
   }
 
@@ -219,11 +233,8 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
 
   @mutation()
   private TOGGLE_DUAL_OUTPUT_MODE(status?: boolean) {
-    if (typeof status === 'undefined') {
-      this.state.dualOutputMode = !this.state.dualOutputMode;
-    } else {
-      this.state.dualOutputMode = status;
-    }
+    // @@@ TODO add error handling check to make sure both contexts were created correctly
+    this.state.dualOutputMode = status;
   }
 
   @mutation()

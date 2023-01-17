@@ -114,7 +114,11 @@ export function MultistreamingSettings() {
       <ObsSettingsSection title={$t('Dual Output')} style={{ paddingBottom: '30px' }}>
         <div className={styles.doDescription}>
           {/* @@@ TODO: Refactor to use sidenav switch button */}
-          <SwitchInput value={dualOutputMode} layout="horizontal" onChange={toggleDualOutputMode} />
+          <SwitchInput
+            value={dualOutputMode}
+            layout="horizontal"
+            onChange={() => toggleDualOutputMode(!dualOutputMode)}
+          />
           {$t('Enable Dual Outputs (simultaneous horizontal and vertical Outputs)')}{' '}
           <Tooltip
             title={$t('Set up your resolution for each orientation in the Video Settings tab.')}

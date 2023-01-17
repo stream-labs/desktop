@@ -14,6 +14,7 @@ import {
   IVideoSettingsFormatted,
   ESettingsVideoProperties,
 } from 'services/settings-v2/video';
+import { DualOutputService } from './dual-output';
 import { byOS, OS, getOS } from 'util/operating-systems';
 import * as remote from '@electron/remote';
 import { onUnload } from 'util/unload';
@@ -92,12 +93,12 @@ export class Display {
 
     this.currentScale = this.windowsService.state[this.slobsWindowId].scaleFactor;
 
-    this.type = options.type ?? 'default';
+    this.type = options?.type ?? 'default';
     this.videoService.actions.createOBSDisplay(
       this.electronWindowId,
       name,
       this.renderingMode,
-      // this.type,
+      this.type,
       this.sourceId,
     );
 
@@ -306,6 +307,7 @@ export class VideoService extends Service {
   @Inject() settingsService: SettingsService;
   @Inject() scenesService: ScenesService;
   @Inject() videoSettingsService: VideoSettingsService;
+  @Inject() dualOutputService: DualOutputService;
 
   init() {
     this.settingsService.loadSettingsIntoStore();
@@ -329,19 +331,56 @@ export class VideoService extends Service {
   }
 
   get baseResolution() {
-    console.log(
-      'this.videoSettingsService ',
-      this.settingsService.views.values.Vertical.Base.split('x'),
-    );
-    const [widthStr, heightStr] = this.settingsService.views.values.Vertical.Base.split('x');
-    // const [widthStr, heightStr] = this.settingsService.views.values.Video.Base.split('x');
+    const [widthStr, heightStr] = this.settingsService.views.values.Video.Base.split('x');
     const width = parseInt(widthStr, 10);
     const height = parseInt(heightStr, 10);
+
+    console.log(this.settingsService.views.values.Video.Base);
     return {
       width,
       height,
     };
   }
+
+  // getScreenRectangle(display?: TDisplayType) {
+  //   if (!display) {
+  //     return new ScalableRectangle({
+  //       x: 0,
+  //       y: 0,
+  //       width: this.baseWidth,
+  //       height: this.baseHeight,
+  //     });
+  //   }
+  //   return new ScalableRectangle({
+  //     x: 0,
+  //     y: 0,
+  //     width: this.getBaseWidth(display),
+  //     height: this.getBaseHeight(display),
+  //   });
+  // }
+
+  // getBaseWidth(display: TDisplayType) {
+  //   return this.getBaseResolution(display).width;
+  // }
+
+  // getBaseHeight(display: TDisplayType) {
+  //   return this.getBaseResolution(display).height;
+  // }
+
+  // getBaseResolution(display: TDisplayType) {
+  //   // console.log(
+  //   //   'this.videoSettingsService ',
+  //   //   this.settingsService.views.values.Vertical.Base.split('x'),
+  //   // );
+  //   const [widthStr, heightStr] = this.videoSettingsService.getBaseResolution(display).split('x');
+  //   // const [widthStr, heightStr] = this.settingsService.views.values.Video.Base.split('x');
+  //   const width = parseInt(widthStr, 10);
+  //   const height = parseInt(heightStr, 10);
+  //   return {
+  //     width,
+  //     height,
+  //   };
+  // }
 
   setBaseResolution(resolution: { width: number; height: number }) {
     this.settingsService.setSettingValue(
@@ -384,14 +423,24 @@ export class VideoService extends Service {
   createOBSDisplay(
     electronWindowId: number,
     name: string,
-    remderingMode: number,
-    // type: TDisplayType,
+    renderingMode: number,
+    type: TDisplayType,
     sourceId?: string,
   ) {
     const electronWindow = remote.BrowserWindow.fromId(electronWindowId);
 
-    // if (sourceId && !['horizontal', 'vertical'].includes(type)) {
-    if (sourceId) {
+    // add check for dual output
+    if (this.dualOutputService.views.dualOutputMode) {
+      const context = this.videoSettingsService.contexts[type];
+      if (context) {
+        obs.NodeObs.OBS_content_createDisplay(
+          electronWindow.getNativeWindowHandle(),
+          name,
+          renderingMode,
+          context,
+        );
+      }
+    } else if (sourceId) {
       obs.NodeObs.OBS_content_createSourcePreviewDisplay(
         electronWindow.getNativeWindowHandle(),
         sourceId,
@@ -401,7 +450,7 @@ export class VideoService extends Service {
       obs.NodeObs.OBS_content_createDisplay(
         electronWindow.getNativeWindowHandle(),
         name,
-        remderingMode,
+        renderingMode,
       );
     }
   }
