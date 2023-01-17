@@ -114,6 +114,10 @@ export type TSourceType =
 // Register new properties manager here
 export type TPropertiesManager = 'default' | 'nvoice-character';
 
+export function isNoAudioPropertiesManagerType(propertiesManagerType: TPropertiesManager): boolean {
+  return ['nvoice-character'].includes(propertiesManagerType);
+}
+
 export interface ISourcesState {
   sources: Dictionary<ISource>;
   temporarySources: Dictionary<ISource>;
