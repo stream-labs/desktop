@@ -45,7 +45,6 @@ export class EmoteWallModule extends WidgetModule<IEmoteWallState> {
       combo_required: {
         type: 'switch',
         label: $t('Combo Required'),
-
         children: {
           combo_count: metadata.slider({
             label: $t('Combo Count'),
