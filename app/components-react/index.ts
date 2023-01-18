@@ -54,6 +54,7 @@ import SideNav from './sidebar/SideNav';
 import WelcomeToPrime from './windows/WelcomeToPrime';
 import Notifications from './windows/notifications/Notifications';
 import NotificationsAndNews from './windows/notifications';
+import Blank from './windows/Blank';
 import PlatformMerge from './pages/PlatformMerge';
 import AlertboxLibrary from './pages/AlertboxLibrary';
 import PlatformAppStore from './pages/PlatformAppStore';
@@ -134,4 +135,5 @@ export const components = {
   PlatformAppPopOut,
   NewBadge,
   UltraIcon,
+  Blank,
 };

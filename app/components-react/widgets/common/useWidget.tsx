@@ -203,7 +203,7 @@ export class WidgetModule<TWidgetState extends IWidgetState = IWidgetState> {
    * Returns a Widget class
    */
   private get widget() {
-    return this.widgetsService.getWidgetSource(this.state.sourceId);
+    return this.widgetsService.views.getWidgetSource(this.state.sourceId);
   }
 
   get config(): IWidgetConfig {
