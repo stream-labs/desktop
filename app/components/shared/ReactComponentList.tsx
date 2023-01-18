@@ -33,6 +33,9 @@ export class AdvancedStatistics extends ReactComponent {}
 })
 export class AlertboxLibrary extends ReactComponent {}
 
+@Component({ props: { name: { default: 'Blank' } } })
+export class Blank extends ReactComponent {}
+
 @Component({
   props: {
     name: { default: 'BrowseOverlays' },
