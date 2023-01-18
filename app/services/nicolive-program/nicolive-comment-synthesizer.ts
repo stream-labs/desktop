@@ -14,9 +14,9 @@ import { sleep } from 'util/sleep';
 export type Speech = {
   text: string;
   synthesizer: SynthesizerId;
-  pitch?: number;
+  rate: number; // 速度
   webSpeech?: {
-    rate: number;
+    pitch?: number; // 声の高さ
   },
   volume?: number;
   nVoice?: {
@@ -26,8 +26,8 @@ export type Speech = {
 
 interface ICommentSynthesizerState {
   enabled: boolean;
-  pitch: number; // SpeechSynthesisUtterance.pitch; 0.1(lowest) to 2(highest) (default: 1)
-  rate: number; // SpeechSynthesisUtterence.rate; 0.1(lowest) to 10(highest); default:1, only for web speech
+  pitch: number; // SpeechSynthesisUtterance.pitch; 0.1(lowest) to 2(highest) (default: 1), only for web speech
+  rate: number; // SpeechSynthesisUtterence.rate; 0.1(lowest) to 10(highest); default:1
   volume: number; // SpeechSynthesisUtterance.volume; 0.1(lowest) to 1(highest)
   maxTime: number; // nVoice max time in seconds
   selector: {
@@ -160,11 +160,11 @@ export class NicoliveCommentSynthesizerService extends StatefulService<ICommentS
       return null;
     }
     return {
-      pitch: this.state.pitch,
+      rate: this.state.rate,
       synthesizer,
       volume: this.state.volume,
       webSpeech: {
-        rate: this.state.rate,
+        pitch: this.state.pitch,
       },
       nVoice: {
         maxTime: this.state.maxTime,
@@ -354,8 +354,8 @@ export class WebSpeechSynthesizer implements ISpeechSynthesizer {
     }
 
     const uttr = new SpeechSynthesisUtterance(speech.text);
-    uttr.pitch = speech.pitch || 1;
-    uttr.rate = speech.webSpeech?.rate || 1;
+    uttr.pitch = speech.webSpeech?.pitch || 1; // tone
+    uttr.rate = speech.rate || 1; // speed
     uttr.volume = speech.volume || 1;
     uttr.onstart = onstart;
     uttr.onend = () => {
@@ -410,7 +410,7 @@ export class NVoiceSynthesizer implements ISpeechSynthesizer {
       await this._playPromise;
     }
     this._playPromise = this.nVoiceClientService.talk(speech.text, {
-      speed: speech.pitch,
+      speed: speech.rate,
       volume: speech.volume,
       maxTime: speech.nVoice.maxTime,
       phonemeCallback: (phoneme: string) => {
