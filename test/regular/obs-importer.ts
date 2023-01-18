@@ -90,6 +90,6 @@ test('OBS Importer', async t => {
 
   t.deepEqual(
     [EWidgetType.DonationGoal, EWidgetType.EventList, EWidgetType.AlertBox],
-    widgetsService.getWidgetSources().map(widget => (widget.type as unknown) as EWidgetType),
+    widgetsService.widgetSources.map(widget => (widget.type as unknown) as EWidgetType),
   );
 });
