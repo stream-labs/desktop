@@ -410,7 +410,7 @@ export class NVoiceSynthesizer implements ISpeechSynthesizer {
       await this._playPromise;
     }
     this._playPromise = this.nVoiceClientService.talk(speech.text, {
-      speed: speech.rate,
+      speed: 1 / (speech.rate || 1),
       volume: speech.volume,
       maxTime: speech.nVoice.maxTime,
       phonemeCallback: (phoneme: string) => {
