@@ -1,5 +1,5 @@
 import { mutation, StatefulService } from 'services/core/stateful-service';
-import { Inject } from 'services/core/injector';
+import { InitAfter, Inject } from 'services/core';
 import { NicoliveProgramStateService, SynthesizerId } from './state';
 import { ParaphraseDictionary } from './ParaphraseDictionary';
 import { WrappedChat } from './WrappedChat';
@@ -37,6 +37,7 @@ interface ICommentSynthesizerState {
   };
 }
 
+@InitAfter('NicoliveProgramStateService')
 export class NicoliveCommentSynthesizerService extends StatefulService<ICommentSynthesizerState> {
   @Inject('NicoliveProgramStateService') stateService: NicoliveProgramStateService;
   @Inject() nVoiceClientService: NVoiceClientService;
@@ -87,6 +88,8 @@ export class NicoliveCommentSynthesizerService extends StatefulService<ICommentS
       });
     }
     */
+    this.setState({ ...NicoliveCommentSynthesizerService.initialState, ...this.stateService.state.speechSynthesizerSettings });
+
     this.stateService.updated.subscribe({
       next: persistentState => {
         const newState =
