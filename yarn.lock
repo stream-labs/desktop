@@ -1961,10 +1961,10 @@
   resolved "https://registry.yarnpkg.com/@leichtgewicht/ip-codec/-/ip-codec-2.0.4.tgz#b2ac626d6cb9c8718ab459166d4bb405b8ffa78b"
   integrity sha512-Hcv+nVC0kZnQ3tD9GVu5xSMR4VVYOteQIr/hwFPVEvPdlXqgGEuRjiheChHgdM+JyqdgNcmzZOX/tnl0JOiI7A==
 
-"@n-air-app/n-voice-package@^0.0.22":
-  version "0.0.22"
-  resolved "https://npm.pkg.github.com/download/@n-air-app/n-voice-package/0.0.22/7273a76f3d0d7a2157937b86bb2cd969f3df5a6b#7273a76f3d0d7a2157937b86bb2cd969f3df5a6b"
-  integrity sha512-jkCMxRTTvXGEDJ/3/rPEs9tLjlLJYA+HKUejdrw1fFncMZrYYrizp9E8LhBhuZhmGO/8CdxdeQBZMbu2g5o1sw==
+"@n-air-app/n-voice-package@^0.0.23":
+  version "0.0.23"
+  resolved "https://npm.pkg.github.com/download/@n-air-app/n-voice-package/0.0.23/f85b65408acd4affdea7d8bca2eed98d8cb0e7dd#f85b65408acd4affdea7d8bca2eed98d8cb0e7dd"
+  integrity sha512-N9E4whQnUltCl8NpzuaE1MymART6oGy2iaaaUkxF4CcdxhiRSx0UqMTkAdlcC06mxp4YPsQRFiyHxZGrpwctaw==
   dependencies:
     "@rollup/plugin-babel" "^6.0.3"
     "@types/node" "^18.6.3"
