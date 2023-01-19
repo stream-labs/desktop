@@ -65,18 +65,25 @@ export default class SourcesShowcase extends Vue {
   @Inject() scenesService: ScenesService;
   @Inject() windowsService: WindowsService;
 
-  selectSource(sourceType: TSourceType, options: ISelectSourceOptions = {}) {
-    const managerType = options.propertiesManager || 'default';
-    const propertiesManagerSettings: Dictionary<any> = { ...omit(options, 'propertiesManager') };
+  selectSource(sourceType: TInspectableSource, options: ISelectSourceOptions = {}) {
+    if (NVoiceCharacterTypes.includes(sourceType as NVoiceCharacterType)) {
+      const propertiesManagerSettings: Dictionary<any> = {
+        NVoiceCharacterType: sourceType as NVoiceCharacterType,
+        ...omit(options, 'propertiesManager'),
+      };
+      this.sourcesService.showAddSource('browser_source', {
+        propertiesManagerSettings,
+        propertiesManager: 'nvoice-character',
+      });
+    } else {
+      const propertiesManager = options.propertiesManager || 'default';
+      const propertiesManagerSettings: Dictionary<any> = { ...omit(options, 'propertiesManager') };
 
-    this.sourcesService.showAddSource(sourceType, {
-      propertiesManagerSettings,
-      propertiesManager: managerType,
-    });
-  }
-
-  selectNVoiceCharacterSource(type: NVoiceCharacterType) {
-    this.selectSource('browser_source', { propertiesManager: 'nvoice-character', nVoiceCharacterType: type });
+      this.sourcesService.showAddSource(sourceType as TSourceType, {
+        propertiesManagerSettings,
+        propertiesManager,
+      });
+    }
   }
 
   inspectedSource: TInspectableSource = null;
@@ -95,14 +102,7 @@ export default class SourcesShowcase extends Vue {
   }
 
   selectInspectedSource() {
-    if (NVoiceCharacterTypes.includes(this.inspectedSource as NVoiceCharacterType)) {
-      this.selectNVoiceCharacterSource(this.inspectedSource as NVoiceCharacterType);
-    } else
-      if (
-        this.sourcesService.getAvailableSourcesTypes().includes(this.inspectedSource as TSourceType)
-      ) {
-        this.selectSource(this.inspectedSource as TSourceType);
-      }
+    this.selectSource(this.inspectedSource);
   }
 
   get availableSources() {
