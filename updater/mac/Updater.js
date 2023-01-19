@@ -18,6 +18,13 @@ class Updater {
   }
 
   run() {
+    const osVersion = require('os').release();
+    if (osVersion && Number(osVersion.substring(0, 2)) < 19) {
+      this.startApp();
+      this.finished = true;
+      if (this.browserWindow) this.browserWindow.close();
+    }
+
     this.updateState = {};
 
     this.bindListeners();
