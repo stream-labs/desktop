@@ -94,6 +94,7 @@ export class Display {
     this.currentScale = this.windowsService.state[this.slobsWindowId].scaleFactor;
 
     this.type = options?.type ?? 'default';
+
     this.videoService.actions.createOBSDisplay(
       this.electronWindowId,
       name,
@@ -249,7 +250,7 @@ export class Display {
         nwr.destroyWindow(this.name);
         nwr.destroyIOSurface(this.name);
       }
-      // this.videoService.destroyContext(); // @@@ where/when should we destroy the context?
+
       this.displayDestroyed = true;
     }
   }
@@ -335,7 +336,6 @@ export class VideoService extends Service {
     const width = parseInt(widthStr, 10);
     const height = parseInt(heightStr, 10);
 
-    console.log(this.settingsService.views.values.Video.Base);
     return {
       width,
       height,
@@ -433,6 +433,7 @@ export class VideoService extends Service {
     if (this.dualOutputService.views.dualOutputMode) {
       const context = this.videoSettingsService.contexts[type];
       if (context) {
+        console.log('creating display for context ', context);
         obs.NodeObs.OBS_content_createDisplay(
           electronWindow.getNativeWindowHandle(),
           name,

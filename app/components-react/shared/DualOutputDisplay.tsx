@@ -22,23 +22,11 @@ export default function DualOutputDisplay(p: { eventHandlers: IDisplayEventHandl
   const { DualOutputService, EditorService, EditorCommandsService, ScenesService } = Services;
   const v = useVuex(() => ({
     activeSceneId: ScenesService.views.activeSceneId,
-    horizontalSceneId: DualOutputService.views.horizontalSceneId,
-    verticalSceneId: DualOutputService.views.verticalSceneId,
+    hasDualOutputScenes: DualOutputService.views.hasDualOutputScenes,
     cursor: EditorService.state.cursor,
-    setDualOutputScenes: DualOutputService.actions.setDualOutputScenes,
   }));
 
-  useLayoutEffect(() => {
-    /**
-     * We need a separate scene to render differences in each display
-     * so for dual output, we need to create temporary scenes
-     * that render in each display.
-     */
-
-    v.setDualOutputScenes(v.activeSceneId);
-  }, [v.activeSceneId]);
-
-  return !!v.horizontalSceneId && !!v.verticalSceneId ? (
+  return v.hasDualOutputScenes ? (
     <>
       <div
         className={cx(styles.dualOutputDisplayContainer)}
@@ -57,7 +45,6 @@ export default function DualOutputDisplay(p: { eventHandlers: IDisplayEventHandl
           paddingColor={{ r: 255, g: 238, b: 0 }} // @@@ temp
           onOutputResize={p.eventHandlers.onOutputResize}
           renderingMode={ERenderingMode.OBS_MAIN_RENDERING}
-          sourceId={v.horizontalSceneId}
         />
       </div>
 
@@ -78,7 +65,6 @@ export default function DualOutputDisplay(p: { eventHandlers: IDisplayEventHandl
           paddingColor={{ r: 255, g: 0, b: 0 }} // @@@ temp
           onOutputResize={p.eventHandlers.onOutputResize}
           renderingMode={ERenderingMode.OBS_MAIN_RENDERING}
-          sourceId={v.verticalSceneId}
         />
       </div>
     </>
