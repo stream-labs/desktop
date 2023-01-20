@@ -15,7 +15,7 @@ import { WindowsService } from 'services/windows';
 import { I18nService } from 'services/i18n';
 import { throwStreamError } from 'services/streaming/stream-error';
 import { BasePlatformService } from './base-platform';
-import { TDualOutputDisplayType } from 'services/dual-output';
+import { TDisplayType } from 'services/settings-v2/video';
 import { assertIsDefined, getDefined } from 'util/properties-type-guards';
 import Utils from '../utils';
 import { YoutubeUploader } from './youtube/uploader';
@@ -39,7 +39,7 @@ export interface IYoutubeStartStreamOptions extends IExtraBroadcastSettings {
   description: string;
   privacyStatus?: 'private' | 'public' | 'unlisted';
   scheduledStartTime?: number;
-  dualOutputDisplay?: TDualOutputDisplayType;
+  display?: TDisplayType;
 }
 
 /**
@@ -149,7 +149,7 @@ interface IExtraBroadcastSettings {
   projection?: 'rectangular' | '360';
   latencyPreference?: 'normal' | 'low' | 'ultraLow';
   selfDeclaredMadeForKids?: boolean;
-  dualOutputDisplay?: TDualOutputDisplayType;
+  display?: TDisplayType;
 }
 
 type TStreamStatus = 'active' | 'created' | 'error' | 'inactive' | 'ready';
@@ -202,7 +202,7 @@ export class YoutubeService
       privacyStatus: 'public',
       selfDeclaredMadeForKids: false,
       thumbnail: '',
-      dualOutputDisplay: undefined,
+      display: undefined,
     },
   };
 
@@ -277,6 +277,7 @@ export class YoutubeService
 
   async beforeGoLive(settings: IGoLiveSettings) {
     const ytSettings = getDefined(settings.platforms.youtube);
+
     const streamToScheduledBroadcast = !!ytSettings.broadcastId;
     // update selected LiveBroadcast with new title and description
     // or create a new LiveBroadcast if there are no broadcasts selected
@@ -313,11 +314,11 @@ export class YoutubeService
       });
     }
 
-    this.confirmDualOutput('youtube');
-
     this.UPDATE_STREAM_SETTINGS({ ...ytSettings, broadcastId: broadcast.id });
     this.SET_STREAM_ID(stream.id);
     this.SET_STREAM_KEY(streamKey);
+
+    this.confirmDualOutput('youtube');
   }
 
   /**

@@ -13,6 +13,7 @@ import { FacebookService } from './platforms/facebook';
 import { TiktokService } from './platforms/tiktok';
 import { TrovoService } from './platforms/trovo';
 import * as remote from '@electron/remote';
+import { VideoSettingsService, TDisplayType } from './settings-v2/video';
 
 interface IRestreamTarget {
   id: number;
@@ -48,6 +49,7 @@ export class RestreamService extends StatefulService<IRestreamState> {
   @Inject() facebookService: FacebookService;
   @Inject() tiktokService: TiktokService;
   @Inject() trovoService: TrovoService;
+  @Inject() videoSettingsService: VideoSettingsService;
 
   settings: IUserSettingsResponse;
 
@@ -184,6 +186,7 @@ export class RestreamService extends StatefulService<IRestreamState> {
         return {
           platform: platform as TPlatform,
           streamKey: getPlatformService(platform).state.streamKey,
+          display: getPlatformService(platform).state.settings.display,
         };
       }),
       ...this.streamInfo.savedSettings.customDestinations
@@ -211,7 +214,13 @@ export class RestreamService extends StatefulService<IRestreamState> {
     );
   }
 
-  async createTargets(targets: { platform: TPlatform | 'relay'; streamKey: string }[]) {
+  async createTargets(
+    targets: {
+      platform: TPlatform | 'relay';
+      streamKey: string;
+      display?: TDisplayType;
+    }[],
+  ) {
     const headers = authorizedHeaders(
       this.userService.apiToken,
       new Headers({ 'Content-Type': 'application/json' }),
@@ -226,9 +235,13 @@ export class RestreamService extends StatefulService<IRestreamState> {
           dcProtection: false,
           idleTimeout: 30,
           label: `${target.platform} target`,
+          video:
+            target.hasOwnProperty('display') &&
+            this.videoSettingsService.actions.getVideoContext(target.display),
         };
       }),
     );
+    console.log('targets ', targets);
     const request = new Request(url, { headers, body, method: 'POST' });
     const res = await fetch(request);
     if (!res.ok) throw await res.json();

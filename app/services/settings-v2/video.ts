@@ -5,6 +5,8 @@ import { mutation, StatefulService } from '../core/stateful-service';
 import * as obs from '../../../obs-api';
 import { SettingsManagerService } from 'services/settings-manager';
 import { DualOutputService } from 'services/dual-output';
+import { ScenesService } from 'services/scenes';
+import { Subject } from 'rxjs';
 
 // @@@ TODO: Remove dummy data when persistence is implemented
 const horizontalData = {
@@ -58,6 +60,7 @@ interface IVideoSettings {
   default: obs.IVideoInfo;
   horizontal: obs.IVideoInfo;
   vertical: obs.IVideoInfo;
+  // outputIdMap: { [key: string]: number } // @@@ TODO: map outputId to context when created. Key is context name
 }
 
 export interface IVideoSettingsFormatted {
@@ -89,23 +92,19 @@ export function invalidFps(num: number, den: number) {
 export class VideoSettingsService extends StatefulService<IVideoSettings> {
   @Inject() settingsManagerService: SettingsManagerService;
   @Inject() dualOutputService: DualOutputService;
+  @Inject() scenesService: ScenesService;
 
   initialState = {
     videoContext: null as obs.IVideo,
-    horizontalContext: undefined as obs.IVideo,
-    verticalContext: undefined as obs.IVideo,
+    horizontalContext: null as obs.IVideo,
+    verticalContext: null as obs.IVideo,
     default: null as obs.IVideoInfo,
-    horizontal: undefined as obs.IVideoInfo,
-    vertical: undefined as obs.IVideoInfo,
+    horizontal: null as obs.IVideoInfo,
+    vertical: null as obs.IVideoInfo,
   };
 
   init() {
     this.establishVideoContext();
-
-    if (this.dualOutputService.views.dualOutputMode) {
-      this.establishVideoContext('horizontal');
-      this.establishVideoContext('vertical');
-    }
   }
 
   get values() {
@@ -152,6 +151,10 @@ export class VideoSettingsService extends StatefulService<IVideoSettings> {
 
   get videoContext() {
     return this.state.videoContext;
+  }
+
+  get hasAdditionalContexts() {
+    return !!this.state.horizontalContext && !!this.state.verticalContext;
   }
 
   // @@@ TODO: Refactor for persistence
@@ -347,8 +350,8 @@ export class VideoSettingsService extends StatefulService<IVideoSettings> {
   @mutation()
   DESTROY_VIDEO_CONTEXT(display: TDisplayType = 'default') {
     const contextName = contextNameMap[display];
-    this.state[contextName] = undefined as obs.IVideo;
-    this.state[display] = undefined as obs.IVideoInfo;
+    this.state[contextName] = null as obs.IVideo;
+    this.state[display] = null as obs.IVideoInfo;
   }
 
   @mutation()

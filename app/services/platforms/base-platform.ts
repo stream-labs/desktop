@@ -119,7 +119,7 @@ export abstract class BasePlatformService<T extends IPlatformState> extends Stat
   confirmDualOutput(platform: TPlatform) {
     if (this.userService.views.isPrime && this.dualOutputService.views.dualOutputMode) {
       this.UPDATE_STREAM_SETTINGS({
-        dualOutputDisplay: this.dualOutputService.views.getPlatformDisplay(platform),
+        display: this.dualOutputService.views.getPlatformDisplay(platform),
       });
     }
   }
@@ -146,6 +146,7 @@ export abstract class BasePlatformService<T extends IPlatformState> extends Stat
 
   @mutation()
   protected UPDATE_STREAM_SETTINGS(settingsPatch: Partial<TStartStreamOptions>) {
+    // console.log('settingsPatch ', settingsPatch);
     this.state.settings = { ...this.state.settings, ...settingsPatch };
   }
 }

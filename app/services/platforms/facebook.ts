@@ -9,7 +9,7 @@ import { IGoLiveSettings } from 'services/streaming';
 import { throwStreamError } from 'services/streaming/stream-error';
 import { BasePlatformService } from './base-platform';
 import { WindowsService } from '../windows';
-import { TDualOutputDisplayType } from 'services/dual-output';
+import { TDisplayType } from 'services/settings-v2/video';
 import { assertIsDefined, getDefined } from '../../util/properties-type-guards';
 import { flatten } from 'lodash';
 import * as remote from '@electron/remote';
@@ -82,7 +82,7 @@ export interface IFacebookStartStreamOptions {
   liveVideoId?: string;
   privacy?: { value: TFacebookStreamPrivacy };
   plannedStartTime?: number;
-  dualOutputDisplay?: TDualOutputDisplayType;
+  display?: TDisplayType;
 }
 
 export type TDestinationType = 'me' | 'page' | 'group' | '';
@@ -110,7 +110,7 @@ const initialState: IFacebookServiceState = {
     description: '',
     game: '',
     privacy: { value: 'EVERYONE' },
-    dualOutputDisplay: undefined,
+    display: undefined,
   },
 };
 
@@ -257,13 +257,13 @@ export class FacebookService
     this.UPDATE_STREAM_SETTINGS({ ...fbOptions, liveVideoId: liveVideo.id });
     this.SET_VIDEO_ID(liveVideo.video.id);
 
-    this.confirmDualOutput('facebook');
-
     // send selected pageId to streamlabs.com
     if (fbOptions.destinationType === 'page') {
       assertIsDefined(fbOptions.pageId);
       await this.postPage(fbOptions.pageId);
     }
+
+    this.confirmDualOutput('facebook');
   }
 
   /**

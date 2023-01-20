@@ -4,10 +4,12 @@ import { IPlatformCapabilityResolutionPreset, IPlatformState, TPlatformCapabilit
 import { IGoLiveSettings } from '../streaming';
 import { WidgetType } from '../widgets';
 import { getDefined } from '../../util/properties-type-guards';
+import { TDisplayType } from 'services/settings-v2/video';
 
 export interface ITiktokStartStreamOptions {
   serverUrl: string;
   streamKey: string;
+  display?: TDisplayType;
 }
 
 interface ITiktokServiceState extends IPlatformState {

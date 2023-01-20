@@ -20,12 +20,12 @@ import { InheritMutations, mutation } from 'services/core';
 import { throwStreamError, TStreamErrorType } from 'services/streaming/stream-error';
 import { BasePlatformService } from './base-platform';
 import Utils from '../utils';
-import { TDualOutputDisplayType } from 'services/dual-output';
+import { TDisplayType } from 'services/settings-v2/video';
 
 export interface ITwitchStartStreamOptions {
   title: string;
   game?: string;
-  dualOutputDisplay?: TDualOutputDisplayType;
+  display?: TDisplayType;
   tags?: TTwitchTag[];
 }
 
@@ -86,7 +86,7 @@ export class TwitchService
     settings: {
       title: '',
       game: '',
-      dualOutputDisplay: undefined,
+      display: undefined,
       tags: [],
     },
   };
@@ -190,12 +190,9 @@ export class TwitchService
     }
   }
 
-  checkForDualOutput() {
-    if (this.userService.views.isPrime && this.dualOutputService.views.dualOutputMode) {
-      this.UPDATE_STREAM_SETTINGS({
-        dualOutputDisplay: this.dualOutputService.views.getPlatformDisplay('twitch'),
-      });
-    }
+  handleUnattendedMode(): undefined {
+    this.confirmDualOutput('twitch');
+    return undefined;
   }
 
   async validatePlatform() {
