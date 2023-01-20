@@ -29,6 +29,7 @@ export type TInputMetadata<T = string> =
   | INumberMetadata
   | ISliderMetadata
   | ITextBoolMetadata
+  | ICheckboxGroupMetadata
   | IListMetadata<T>;
 
 interface IBaseMetadata {
@@ -40,10 +41,15 @@ interface IBaseMetadata {
   onChange?: (value: unknown) => void;
   children?: Dictionary<TInputMetadata<unknown>>;
   displayed?: boolean;
+  name?: string;
 }
 
 interface ITextMetadata extends IBaseMetadata {
   value?: string;
+}
+
+export interface ICheckboxGroupMetadata extends IBaseMetadata {
+  children: Dictionary<ITextBoolMetadata>;
 }
 
 interface INumberMetadata extends IBaseMetadata {

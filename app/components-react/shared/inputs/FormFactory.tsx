@@ -18,6 +18,7 @@ const componentTable: {
   checkbox: inputs.CheckboxInput,
   list: inputs.ListInput,
   autocomplete: inputs.AutocompleteInput,
+  checkboxGroup: inputs.CheckboxGroup,
 };
 
 interface IFormMetadata {
@@ -59,11 +60,11 @@ function FormInput(p: {
   values: Dictionary<TInputValue>;
   onChange: (key: string) => (value: TInputValue) => void;
 }) {
-  const children = p.metadata.children;
+  const { children, type } = p.metadata;
 
-  if (!p.metadata.type) return <></>;
+  if (!type) return <></>;
 
-  const Input = componentTable[p.metadata.type];
+  const Input = componentTable[type];
 
   return (
     <>
@@ -74,6 +75,7 @@ function FormInput(p: {
         onChange={p.metadata.onChange || p.onChange(p.id)}
       />
       {!!children &&
+        type !== 'checkboxGroup' &&
         Object.keys(children)
           .filter(childKey => children[childKey].displayed)
           .map(childKey => (
