@@ -66,7 +66,9 @@ class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
   }
 
   get hasDualOutputScenes() {
-    return this.state.horizontalScene && this.state.verticalScene;
+    console.log('this.state.horizontalScene ', this.state.horizontalScene);
+    console.log('this.state.verticalScene ', this.state.verticalScene);
+    return !!this.state.horizontalScene && !!this.state.verticalScene;
   }
 
   get hasNodeMaps() {
@@ -132,13 +134,13 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
       }
     });
 
-    this.scenesService.sceneSwitched.subscribe(scene => {
-      if (this.state.dualOutputMode) {
-        // @@@ TODO: handle switching scenes
-        this.destroyOutputScenes();
-        this.createOutputScenes(['horizontal', 'vertical'], this.scenesService.views.activeSceneId);
-      }
-    });
+    // this.scenesService.sceneSwitched.subscribe(scene => {
+    //   if (this.state.dualOutputMode) {
+    //     // @@@ TODO: handle switching scenes
+    //     this.destroyOutputScenes();
+    //     this.createOutputScenes(['horizontal', 'vertical'], this.scenesService.views.activeSceneId);
+    //   }
+    // });
   }
 
   toggleDualOutputMode(status: boolean) {
@@ -158,6 +160,8 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
       }
     } else {
       const created = this.createOutputScenes(['horizontal', 'vertical']);
+      console.log('horizontal ', this.state.horizontalScene);
+      console.log('vertical ', this.state.verticalScene);
 
       if (created) {
         this.TOGGLE_DUAL_OUTPUT_MODE(status);
@@ -224,7 +228,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
       sceneItem.visible = true;
     });
 
-    this.state[`${display}Scene`] = scene;
+    this.SET_DUAL_OUTPUT_SCENE(display, scene);
 
     return true;
   }
@@ -236,8 +240,6 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
       // @@@ HERE, says this.state.defaultSource is an invalid argument?
       obs.Global.setOutputSource(0, this.state.defaultSource);
       // obs.Global.setOutputSource(0, null);
-
-      const scene: obs.IScene = this.state['horizontalScene'];
 
       this.RESET_SCENE('horizontal');
     }
@@ -273,6 +275,11 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
       ...this.state.platformSettings[platform],
       setting,
     };
+  }
+
+  @mutation()
+  private SET_DUAL_OUTPUT_SCENE(display: TDisplayType, scene: obs.IScene) {
+    this.state[`${display}Scene`] = scene;
   }
 
   @mutation()
