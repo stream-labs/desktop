@@ -20,21 +20,21 @@ class Updater {
   run() {
     const osVersion = require('os').release();
     if (osVersion && Number(osVersion.substring(0, 2)) < 19) {
-      autoUpdater.channel = `desktopDeprecated-${this.channel}`;
-
       dialog.showMessageBoxSync({
         message:
-          'You are on an outdated version of macOS. Please update macOS to continue receiving updates for Streamlabs Desktop. Your current version is unsupported and may stop working.',
-        type: 'warning',
+          'You are on a very old version of macOS. Please update macOS to continue using Streamlabs Desktop. Your current version is outdated and is no longer compatible with Streamlabs services.',
+        type: 'error',
       });
-    } else {
-      // Redirect to new channel for Streamlabs Desktop
-      autoUpdater.channel = `desktop-${this.channel}`;
+      app.exit();
+      return;
     }
 
     this.updateState = {};
 
     this.bindListeners();
+
+    // Redirect to new channel for Streamlabs Desktop
+    autoUpdater.channel = `desktop-${this.channel}`;
 
     autoUpdater.checkForUpdates().catch(() => {
       // This usually means there is no internet connection.
