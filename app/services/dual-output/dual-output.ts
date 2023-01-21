@@ -143,34 +143,32 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
     // });
   }
 
-  toggleDualOutputMode(status: boolean) {
-    if (!status) {
-      console.log('destroying');
-      // @@@ TODO: Refactor to mirror createOutputScenes logic
-      this.videoSettingsService.destroyVideoContext('horizontal');
-      this.videoSettingsService.destroyVideoContext('vertical');
+  async toggleDualOutputMode(status: boolean) {
+    try {
+      if (!status) {
+        // @@@ TODO: Refactor to mirror createOutputScenes logic
+        this.videoSettingsService.destroyVideoContext('horizontal');
+        this.videoSettingsService.destroyVideoContext('vertical');
 
-      if (!this.videoSettingsService.hasAdditionalContexts) {
-        const destroyed = this.destroyOutputScenes();
-        if (destroyed) {
-          console.log('toggling ', status);
+        if (!this.videoSettingsService.hasAdditionalContexts) {
+          const destroyed = this.destroyOutputScenes();
+          if (destroyed) {
+            this.TOGGLE_DUAL_OUTPUT_MODE(status);
+            return true;
+          }
+        }
+      } else {
+        const created = this.createOutputScenes(['horizontal', 'vertical']);
+        if (created) {
           this.TOGGLE_DUAL_OUTPUT_MODE(status);
-          // return true;
+          return true;
         }
       }
-    } else {
-      const created = this.createOutputScenes(['horizontal', 'vertical']);
-      console.log('horizontal ', this.state.horizontalScene);
-      console.log('vertical ', this.state.verticalScene);
-
-      if (created) {
-        this.TOGGLE_DUAL_OUTPUT_MODE(status);
-        // return true;
-      }
+    } catch (error: unknown) {
+      console.error('Error toggling Dual Output mode: ', error);
+      return false;
     }
-
-    // @@@ TODO: frontend error handling for failure to create dual output scenes
-    // return false;
+    return false;
   }
 
   updatePlatformSetting(platform: EDualOutputPlatform | string, setting: TDualOutputDisplayType) {
@@ -181,21 +179,8 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
     return displays.reduce((created: boolean, display: TDisplayType) => {
       this.videoSettingsService.establishVideoContext(display);
 
-      created = this.createOutputScene(display, sceneId);
-
-      return created;
+      return this.createOutputScene(display, sceneId);
     }, false);
-
-    // return displays.reduce((created: boolean, display: TDisplayType) => {
-    //   this.videoSettingsService.contextCreated.subscribe(displayName => {
-    //     console.log('in next');
-
-    //     created = this.createOutputScene(displayName);
-    //   });
-    //   this.videoSettingsService.establishVideoContext(display);
-
-    //   return created;
-    // }, false);
   }
 
   createOutputScene(display: TDisplayType, changedSceneId?: string) {
@@ -241,29 +226,45 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
       obs.Global.setOutputSource(0, this.state.defaultSource);
       // obs.Global.setOutputSource(0, null);
 
-      this.RESET_SCENE('horizontal');
+      this.resetScene('horizontal');
     }
     if (this.state.verticalScene) {
       console.log('releasing vertical scene');
 
       // @@@ TODO: should this be set to this.state.defaultSource?
       obs.Global.setOutputSource(1, null);
-
-      this.RESET_SCENE('vertical');
     }
 
     return !(this.state.horizontalScene && this.state.verticalScene);
   }
 
+  resetScene(display: TDisplayType) {
+    const scene: obs.IScene = this.state[`${display}Scene`];
+
+    const obsSceneItems = scene.getItems();
+    obsSceneItems.forEach((sceneItem: obs.ISceneItem) => {
+      sceneItem.source.release();
+      sceneItem.remove();
+    });
+
+    scene.release();
+
+    this.RESET_SCENE(display);
+  }
+
   shutdown() {
     console.log('shutting down');
 
-    this.destroyOutputScenes();
+    try {
+      this.destroyOutputScenes();
+    } catch (error: unknown) {
+      console.error('Error shutting down Dual Output Service ', error);
+    }
   }
 
   @mutation()
-  private TOGGLE_DUAL_OUTPUT_MODE(status?: boolean) {
-    this.state = { ...this.state, dualOutputMode: status };
+  private TOGGLE_DUAL_OUTPUT_MODE(status: boolean) {
+    this.state.dualOutputMode = status;
   }
 
   @mutation()
@@ -284,16 +285,6 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
 
   @mutation()
   private RESET_SCENE(display: TDisplayType) {
-    const scene: obs.IScene = this.state[`${display}Scene`];
-
-    const obsSceneItems = scene.getItems();
-
-    obsSceneItems.forEach((sceneItem: obs.ISceneItem) => {
-      sceneItem.source.release();
-      sceneItem.remove();
-    });
-
-    scene.release();
     this.state[`${display}Scene`] = null as obs.IScene;
   }
 

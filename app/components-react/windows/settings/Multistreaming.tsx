@@ -9,6 +9,7 @@ import Translate from 'components-react/shared/Translate';
 import UltraIcon from 'components-react/shared/UltraIcon';
 import ButtonHighlighted from 'components-react/shared/ButtonHighlighted';
 import Tooltip from 'components-react/shared/Tooltip';
+import { message } from 'antd';
 import { TPlatform } from 'services/platforms';
 import {
   IDualOutputPlatformSetting,
@@ -21,18 +22,11 @@ import styles from './Multistreaming.m.less';
 export function MultistreamingSettings() {
   const { UserService, MagicLinkService, DualOutputService } = Services;
 
-  const {
-    isLoggedIn,
-    isPrime,
-    dualOutputMode,
-    toggleDualOutputMode,
-    platformSettingsList,
-    updatePlatformSetting,
-  } = useVuex(() => ({
+  const v = useVuex(() => ({
     isLoggedIn: UserService.views.isLoggedIn,
     isPrime: UserService.views.isPrime,
     dualOutputMode: DualOutputService.views.dualOutputMode,
-    toggleDualOutputMode: DualOutputService.actions.toggleDualOutputMode,
+    toggleDualOutputMode: DualOutputService.actions.return.toggleDualOutputMode,
     platformSettingsList: DualOutputService.views.platformSettingsList,
     updatePlatformSetting: DualOutputService.actions.updatePlatformSetting,
   }));
@@ -41,7 +35,7 @@ export function MultistreamingSettings() {
     MagicLinkService.linkToPrime('slobs-multistream');
   }
 
-  const shouldShowPrime = isLoggedIn && !isPrime;
+  const shouldShowPrime = v.isLoggedIn && !v.isPrime;
 
   const dualOutputSettings = [
     {
@@ -113,11 +107,18 @@ export function MultistreamingSettings() {
       </ObsSettingsSection>
       <ObsSettingsSection title={$t('Dual Output')} style={{ paddingBottom: '30px' }}>
         <div className={styles.doDescription}>
-          {/* @@@ TODO: Refactor to use sidenav switch button */}
           <SwitchInput
-            value={dualOutputMode}
+            value={v.dualOutputMode}
             layout="horizontal"
-            onChange={() => toggleDualOutputMode(!dualOutputMode)}
+            onChange={async () => {
+              const toggled = await v.toggleDualOutputMode(!v.dualOutputMode);
+              if (!toggled) {
+                message.error({
+                  content: 'Error toggling Dual Output Mode',
+                  duration: 2,
+                });
+              }
+            }}
           />
           {$t('Enable Dual Outputs (simultaneous horizontal and vertical Outputs)')}{' '}
           <Tooltip
@@ -144,7 +145,7 @@ export function MultistreamingSettings() {
             </Tooltip>
           </div>
 
-          {platformSettingsList.map((option: IDualOutputPlatformSetting) => (
+          {v.platformSettingsList.map((option: IDualOutputPlatformSetting) => (
             <div key={option.platform} className={styles.doPlatformSettings}>
               <DualOutputSettingsLabel
                 label={(platformLabels(option.platform) ?? option.platform) as string}
@@ -158,7 +159,7 @@ export function MultistreamingSettings() {
                 defaultValue="horizontal"
                 options={dualOutputSettings}
                 onChange={val =>
-                  updatePlatformSetting(option.platform, val as TDualOutputDisplayType)
+                  v.updatePlatformSetting(option.platform, val as TDualOutputDisplayType)
                 }
                 value={option.setting}
               />
