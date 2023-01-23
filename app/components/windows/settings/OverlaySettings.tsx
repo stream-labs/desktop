@@ -62,7 +62,7 @@ export default class OverlaySettings extends Vue {
   async loadOverlay() {
     const chosenPath = (
       await remote.dialog.showOpenDialog({
-        filters: [{ name: 'Overlay File', extensions: ['overlay'] }],
+        filters: [{ name: 'Overlay File', extensions: ['overlay', 'json'] }],
       })
     ).filePaths;
 
