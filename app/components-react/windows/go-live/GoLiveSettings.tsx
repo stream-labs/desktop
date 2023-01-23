@@ -33,8 +33,15 @@ export default function GoLiveSettings() {
     isLoading,
     canAddDestinations,
     shouldShowPrimeLabel,
+    canUseOptimizedProfile,
   } = useGoLiveSettings().extend(module => {
-    const { RestreamService, SettingsService, UserService, MagicLinkService } = Services;
+    const {
+      RestreamService,
+      SettingsService,
+      UserService,
+      MagicLinkService,
+      VideoEncodingOptimizationService,
+    } = Services;
 
     return {
       get canAddDestinations() {
@@ -53,6 +60,10 @@ export default function GoLiveSettings() {
       },
 
       shouldShowPrimeLabel: !RestreamService.state.grandfathered,
+
+      canUseOptimizedProfile:
+        VideoEncodingOptimizationService.state.canSeeOptimizedProfile ||
+        VideoEncodingOptimizationService.state.useOptimizedProfile,
     };
   });
 
@@ -93,7 +104,7 @@ export default function GoLiveSettings() {
             {/*EXTRAS*/}
             <Section isSimpleMode={!isAdvancedMode} title={$t('Extras')}>
               <TwitterInput />
-              <OptimizedProfileSwitcher />
+              {!!canUseOptimizedProfile && <OptimizedProfileSwitcher />}
             </Section>
           </Scrollable>
         )}

@@ -33,6 +33,9 @@ export class AdvancedStatistics extends ReactComponent {}
 })
 export class AlertboxLibrary extends ReactComponent {}
 
+@Component({ props: { name: { default: 'Blank' } } })
+export class Blank extends ReactComponent {}
+
 @Component({
   props: {
     name: { default: 'BrowseOverlays' },
@@ -288,6 +291,14 @@ export class RecentEventsWindow extends ReactComponent {}
 
 @Component({
   props: {
+    name: { default: 'RecordingHistory' },
+    wrapperStyles: { default: () => ({ height: '100%' }) },
+  },
+})
+export class RecordingHistory extends ReactComponent {}
+
+@Component({
+  props: {
     name: { default: 'RecordingPreview' },
     wrapperStyles: { default: () => ({ height: '100%' }) },
     mins: { default: () => ({ x: 0, y: 0 }) },
@@ -450,6 +461,8 @@ export class WidgetWindow extends ReactComponent {}
 })
 export class CustomCodeWindow extends ReactComponent {}
 
+@Component({ props: { name: { default: 'NewBadge' } } })
+export class NewBadge extends ReactComponent {}
 @Component({ props: { name: { default: 'UltraIcon' } } })
 export class UltraIcon extends ReactComponent<{
   type?: string;

@@ -115,6 +115,7 @@ interface ILinkedPlatformsResponse {
   streamlabs_account?: ILinkedPlatform;
   user_id: number;
   created_at: string;
+  widget_token: string;
 
   /**
    * When the server sends this back as true, we must force
@@ -229,22 +230,32 @@ class UserViews extends ViewHandler<IUserServiceState> {
     return url;
   }
 
-  appStoreUrl(appId?: string) {
+  appStoreUrl(params?: { appId?: string | undefined; type?: string | undefined }) {
     const host = this.hostsService.platform;
     const token = this.auth.apiToken;
     const nightMode = this.customizationServiceViews.isDarkTheme ? 'night' : 'day';
     let url = `https://${host}/slobs-store`;
 
-    if (appId) {
-      url = `${url}/app/${appId}`;
+    if (params?.appId) {
+      url = `${url}/app/${params?.appId}`;
+    }
+    if (params?.type) {
+      url = `${url}/${params?.type}`;
     }
 
     return `${url}?token=${token}&mode=${nightMode}`;
   }
 
-  overlaysUrl(type?: 'overlay' | 'widget-theme', id?: string) {
+  overlaysUrl(type?: 'overlay' | 'widget-themes' | 'site-themes', id?: string) {
     const uiTheme = this.customizationServiceViews.isDarkTheme ? 'night' : 'day';
-    let url = `https://${this.hostsService.streamlabs}/library?mode=${uiTheme}&slobs`;
+
+    let url = `https://${this.hostsService.streamlabs}/library`;
+
+    if (type && !id) {
+      url += `/${type}`;
+    }
+
+    url += `?mode=${uiTheme}&slobs`;
 
     if (this.isLoggedIn) {
       url += `&oauth_token=${this.auth.apiToken}`;
@@ -360,6 +371,13 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   @mutation()
   private UNLINK_SLID() {
     Vue.delete(this.state.auth, 'slid');
+  }
+
+  @mutation()
+  private SET_WIDGET_TOKEN(token: string) {
+    if (this.state.auth) {
+      this.state.auth.widgetToken = token;
+    }
   }
 
   /**
@@ -540,6 +558,13 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     if (linkedPlatforms.user_id) {
       this.writeUserIdFile(linkedPlatforms.user_id);
       this.SET_USER(linkedPlatforms.user_id, linkedPlatforms.created_at);
+    }
+
+    if (
+      linkedPlatforms.widget_token &&
+      linkedPlatforms.widget_token !== this.state.auth?.widgetToken
+    ) {
+      this.SET_WIDGET_TOKEN(linkedPlatforms.widget_token);
     }
 
     // TODO: Could metaprogram this a bit more
