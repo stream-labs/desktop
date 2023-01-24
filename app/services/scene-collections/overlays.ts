@@ -57,24 +57,29 @@ export class OverlaysPersistenceService extends Service {
   }
 
   async loadOverlay(overlayFilePath: string) {
+    const isJson = path.parse(overlayFilePath).ext === 'json';
     const overlayName = path.parse(overlayFilePath).name;
     const assetsPath = path.join(this.overlaysDirectory, overlayName);
 
     this.ensureOverlaysDirectory();
 
-    await new Promise<void>(async (resolve, reject) => {
-      // import of extractZip takes to much time on startup, so import it dynamically
-      const extractZip = (await importExtractZip()).default;
-      extractZip(overlayFilePath, { dir: assetsPath }, err => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve();
-        }
-      });
-    });
+    let configPath = overlayFilePath;
 
-    const configPath = path.join(assetsPath, 'config.json');
+    if (!isJson) {
+      await new Promise<void>(async (resolve, reject) => {
+        // import of extractZip takes to much time on startup, so import it dynamically
+        const extractZip = (await importExtractZip()).default;
+        extractZip(overlayFilePath, { dir: assetsPath }, err => {
+          if (err) {
+            reject(err);
+          } else {
+            resolve();
+          }
+        });
+      });
+      configPath = path.join(assetsPath, 'config.json');
+    }
+
     const data = fs.readFileSync(configPath).toString();
     const root = parse(data, NODE_TYPES);
     await root.load({ assetsPath });
