@@ -128,13 +128,12 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
       }
     });
 
-    // this.scenesService.sceneSwitched.subscribe(scene => {
-    //   if (this.state.dualOutputMode) {
-    //     // @@@ TODO: handle switching scenes
-    //     this.destroyOutputScenes();
-    //     this.createOutputScenes(['horizontal', 'vertical'], this.scenesService.views.activeSceneId);
-    //   }
-    // });
+    this.scenesService.sceneSwitched.subscribe(() => {
+      if (this.state.dualOutputMode) {
+        this.destroyOutputScenes(['horizontal', 'vertical']);
+        this.createOutputScenes(['horizontal', 'vertical'], this.scenesService.views.activeSceneId);
+      }
+    });
   }
 
   async toggleDualOutputMode(status: boolean) {
