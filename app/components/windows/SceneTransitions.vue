@@ -96,7 +96,7 @@
       </modal>
       <modal name="connection-settings" :height="550">
         <div class="connection-settings-modal">
-          <connection-settings :connection-id="inspectedConnection" />
+          <connection-settings :componentProps="{ connectionId: inspectedConnection }" />
           <button
             class="button button--action transition-done"
             @click="dismissModal('connection-settings')"
