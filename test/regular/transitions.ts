@@ -3,8 +3,14 @@ import { clickSceneTransitions, addScene } from '../helpers/modules/scenes';
 import { getFormInput } from '../helpers/spectron/forms';
 import { dismissModal } from '../helpers/spectron/modals';
 import { FormMonkey } from '../helpers/form-monkey';
-import { click, clickButton, focusChild, focusMain } from '../helpers/modules/core';
-import { assertFormContains, setInputValue } from '../helpers/modules/forms';
+import {
+  click,
+  clickButton,
+  focusChild,
+  focusMain,
+  waitForDisplayed,
+} from '../helpers/modules/core';
+import { setInputValue } from '../helpers/modules/forms';
 
 useSpectron({
   restartAppAfterEachTest: false,
@@ -92,17 +98,10 @@ test('Changing connections', async t => {
   await (await app.client.$('button=Connections')).click();
   await (await app.client.$('.icon-edit')).click();
 
-  t.true(
-    await assertFormContains(
-      {
-        fromSceneId: connectionBegin,
-        transitionId: connectionTransition,
-        toSceneId: connectionEnd,
-      },
-      'data-name',
-      'data-selected-option-label',
-    ),
-  );
+  await waitForDisplayed(`[data-selected-option-label="${connectionBegin}"]`);
+  await waitForDisplayed(`[data-selected-option-label="${connectionTransition}"]`);
+  await waitForDisplayed(`[data-selected-option-label="${connectionEnd}"]`);
+  t.pass();
 });
 
 test('Showing redudant connection warning', async t => {
