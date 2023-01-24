@@ -112,16 +112,7 @@ export class OutputsService extends StatefulService<IOutputServiceState> {
 
   init() {
     this.SET_ADVANCED_MODE(this.settingsManagerService.simpleStreamSettings.useAdvanced);
-
-    if (this.state.advancedMode) {
-      this.createAdvancedOutputs();
-    } else {
-      this.createSimpleOutputs();
-    }
-    this.migrateSettings();
-    this.connectSignals();
-
-    console.log(this.outputs.recording);
+    this.prepOutputs(this.state.advancedMode);
   }
 
   migrateSettings() {
@@ -149,6 +140,13 @@ export class OutputsService extends StatefulService<IOutputServiceState> {
 
   migrateReplayProperties(keys: TReplayProperty[]) {
     keys.forEach(key => this.setReplaySetting(key, this.replaySettings[key]));
+  }
+
+  prepOutputs(advancedMode: boolean) {
+    advancedMode ? this.createAdvancedOutputs() : this.createSimpleOutputs();
+    this.migrateSettings();
+    this.connectSignals();
+    this.connectReferences();
   }
 
   createAdvancedOutputs() {
@@ -180,11 +178,16 @@ export class OutputsService extends StatefulService<IOutputServiceState> {
     });
   }
 
+  connectReferences() {
+    this.outputs.recording.streaming = this.outputs.stream;
+    this.outputs.replay.streaming = this.outputs.stream;
+    this.outputs.replay.recording = this.outputs.recording;
+  }
+
   setAdvanced(value: boolean) {
     if (this.state.advancedMode === value) return;
 
-    value ? this.createAdvancedOutputs() : this.createSimpleOutputs();
-    this.connectSignals();
+    this.prepOutputs(value);
     this.SET_ADVANCED_MODE(value);
     this.advancedModeChanged.next(value);
   }
