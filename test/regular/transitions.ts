@@ -4,6 +4,7 @@ import { getFormInput } from '../helpers/spectron/forms';
 import { dismissModal } from '../helpers/spectron/modals';
 import { FormMonkey } from '../helpers/form-monkey';
 import { click, clickButton, focusChild, focusMain } from '../helpers/modules/core';
+import { assertFormContains, setInputValue } from '../helpers/modules/forms';
 
 useSpectron({
   restartAppAfterEachTest: false,
@@ -79,12 +80,10 @@ test('Changing connections', async t => {
   await dismissModal(t);
   await (await app.client.$('button=Connections')).click();
   await (await app.client.$('button=Add Connection')).click();
-  const form = new FormMonkey(t);
-  await form.fillByTitles({
-    'Beginning Scene': connectionBegin,
-    'Scene Transition': connectionTransition,
-    'Ending Scene': connectionEnd,
-  });
+  await setInputValue('[name="fromSceneId"]', connectionBegin);
+  await setInputValue('[name="transitionId"]', connectionTransition);
+  await setInputValue('[name="toSceneId"]', connectionEnd);
+
   await (await t.context.app.client.$('button=Done')).click();
   await focusMain();
   await clickSceneTransitions();
@@ -94,11 +93,15 @@ test('Changing connections', async t => {
   await (await app.client.$('.icon-edit')).click();
 
   t.true(
-    await form.includesByTitles({
-      'Beginning Scene': connectionBegin,
-      'Scene Transition': connectionTransition,
-      'Ending Scene': connectionEnd,
-    }),
+    await assertFormContains(
+      {
+        fromSceneId: connectionBegin,
+        transitionId: connectionTransition,
+        toSceneId: connectionEnd,
+      },
+      'name',
+      'data-selected-option-label',
+    ),
   );
 });
 
