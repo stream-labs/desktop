@@ -23,7 +23,7 @@ export default function StudioEditor() {
     performanceMode: CustomizationService.state.performanceMode,
     cursor: EditorService.state.cursor,
     studioMode: TransitionsService.state.studioMode,
-    dualOutputMode: DualOutputService.views.dualOutputMode,
+    showDualOutputDisplays: DualOutputService.views.showDualOutputDisplays,
     activeSceneId: ScenesService.views.activeSceneId,
   }));
   const displayEnabled = !v.hideStyleBlockers && !v.performanceMode;
@@ -159,11 +159,11 @@ export default function StudioEditor() {
       {displayEnabled && (
         <div className={cx(styles.studioModeContainer, { [styles.stacked]: studioModeStacked })}>
           {v.studioMode && <StudioModeControls stacked={studioModeStacked} />}
-          {v.dualOutputMode && <DualOutputControls stacked={studioModeStacked} />}
+          {v.showDualOutputDisplays && <DualOutputControls stacked={studioModeStacked} />}
           <div
             className={cx(styles.studioDisplayContainer, { [styles.stacked]: studioModeStacked })}
           >
-            {!v.dualOutputMode && (
+            {!v.showDualOutputDisplays && (
               <div
                 className={cx(styles.studioEditorDisplayContainer, 'noselect')}
                 style={{ cursor: v.cursor }}
@@ -184,13 +184,13 @@ export default function StudioEditor() {
                 />
               </div>
             )}
-            {!v.dualOutputMode && v.studioMode && (
+            {!v.showDualOutputDisplays && v.studioMode && (
               <div className={styles.studioModeDisplayContainer}>
                 <Display paddingSize={10} paddingColor={{ r: 0, g: 255, b: 0 }} />
                 {/* @@@ TEMP PADDING COLOR */}
               </div>
             )}
-            {v.dualOutputMode && <DualOutputDisplay eventHandlers={eventHandlers} />}
+            {v.showDualOutputDisplays && <DualOutputDisplay eventHandlers={eventHandlers} />}
           </div>
         </div>
       )}

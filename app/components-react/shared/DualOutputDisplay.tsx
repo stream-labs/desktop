@@ -1,4 +1,4 @@
-import React, { MouseEvent, useLayoutEffect } from 'react';
+import React, { MouseEvent } from 'react';
 import { useVuex } from '../hooks';
 import { Services } from '../service-provider';
 import { ERenderingMode } from '../../../obs-api';
@@ -19,7 +19,7 @@ interface IDisplayEventHandlers {
 }
 
 export default function DualOutputDisplay(p: { eventHandlers: IDisplayEventHandlers }) {
-  const { DualOutputService, EditorService, EditorCommandsService, ScenesService } = Services;
+  const { DualOutputService, EditorService, ScenesService } = Services;
   const v = useVuex(() => ({
     activeSceneId: ScenesService.views.activeSceneId,
     hasDualOutputScenes: DualOutputService.views.hasDualOutputScenes,

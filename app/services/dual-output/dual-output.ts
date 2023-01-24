@@ -22,13 +22,10 @@ interface IDualOutputNodeIds {
 interface IDualOutputServiceState {
   platformSettings: TDualOutputPlatformSettings;
   dualOutputMode: boolean;
-  defaultSource: obs.ISource;
   horizontalSceneId: string;
   verticalSceneId: string;
   horizontalScene: obs.IScene;
   verticalScene: obs.IScene;
-  horizontalSource: obs.ISource;
-  verticalSource: obs.ISource;
   horizontalNodeMap: Dictionary<string>;
   verticalNodeMap: Dictionary<string>;
   horizontalNodes: TSceneNode[];
@@ -36,7 +33,6 @@ interface IDualOutputServiceState {
 }
 
 class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
-  @Inject() private scenesService: ScenesService;
   get dualOutputMode() {
     return this.state.dualOutputMode;
   }
@@ -66,9 +62,11 @@ class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
   }
 
   get hasDualOutputScenes() {
-    console.log('this.state.horizontalScene ', this.state.horizontalScene);
-    console.log('this.state.verticalScene ', this.state.verticalScene);
     return !!this.state.horizontalScene && !!this.state.verticalScene;
+  }
+
+  get showDualOutputDisplays() {
+    return this.state.dualOutputMode && !!this.state.horizontalScene && !!this.state.verticalScene;
   }
 
   get hasNodeMaps() {
@@ -101,13 +99,10 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
   static defaultState: IDualOutputServiceState = {
     platformSettings: DualOutputPlatformSettings,
     dualOutputMode: false,
-    defaultSource: null as obs.ISource,
     horizontalSceneId: null,
     verticalSceneId: null,
     horizontalScene: null as obs.IScene,
     verticalScene: null as obs.IScene,
-    horizontalSource: null as obs.ISource,
-    verticalSource: null as obs.ISource,
     horizontalNodeMap: null,
     verticalNodeMap: null,
     horizontalNodes: null,
@@ -124,13 +119,12 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
     this.sceneCollectionsService.collectionInitialized.subscribe(() => {
       if (this.state.dualOutputMode) {
         this.createOutputScenes(['horizontal', 'vertical']);
-        this.state.defaultSource = obs.Global.getOutputSource(0);
       }
     });
 
     this.scenesService.sceneRemoved.subscribe(() => {
       if (this.state.dualOutputMode) {
-        this.destroyOutputScenes();
+        this.destroyOutputScenes(['horizontal', 'vertical']);
       }
     });
 
@@ -146,16 +140,10 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
   async toggleDualOutputMode(status: boolean) {
     try {
       if (!status) {
-        // @@@ TODO: Refactor to mirror createOutputScenes logic
-        this.videoSettingsService.destroyVideoContext('horizontal');
-        this.videoSettingsService.destroyVideoContext('vertical');
-
-        if (!this.videoSettingsService.hasAdditionalContexts) {
-          const destroyed = this.destroyOutputScenes();
-          if (destroyed) {
-            this.TOGGLE_DUAL_OUTPUT_MODE(status);
-            return true;
-          }
+        const destroyed = this.destroyOutputScenes(['horizontal', 'vertical']);
+        if (destroyed) {
+          this.TOGGLE_DUAL_OUTPUT_MODE(status);
+          return true;
         }
       } else {
         const created = this.createOutputScenes(['horizontal', 'vertical']);
@@ -177,24 +165,23 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
 
   createOutputScenes(displays: TDisplayType[], sceneId?: string) {
     return displays.reduce((created: boolean, display: TDisplayType) => {
-      this.videoSettingsService.establishVideoContext(display);
+      const contextEstablished = this.videoSettingsService.establishVideoContext(display);
+      const sceneCreated = this.createOutputScene(display, sceneId);
 
-      return this.createOutputScene(display, sceneId);
-    }, false);
+      if (!contextEstablished || !sceneCreated) {
+        created = false;
+      }
+
+      return created;
+    }, true);
   }
 
   createOutputScene(display: TDisplayType, changedSceneId?: string) {
-    // @@@ TODO: determine how to deal with the output ids
-    // for now, just assign horizontal to 0 and vertical to 1
-    const outputId = display === 'horizontal' ? 0 : 1;
-
     const sceneId = changedSceneId ?? this.scenesService.views.activeSceneId;
     const scene = obs.SceneFactory.fromName(sceneId);
 
     // if obs does not return a scene, we should not toggle on dual output
     if (!scene) return false;
-
-    obs.Global.setOutputSource(outputId, scene);
 
     const obsSceneItems = scene.getItems();
 
@@ -215,31 +202,27 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
 
     this.SET_DUAL_OUTPUT_SCENE(display, scene);
 
-    return true;
+    const sceneName = `${display}Scene`;
+
+    return !!this.state[sceneName];
   }
 
-  destroyOutputScenes() {
-    if (this.state.horizontalScene) {
-      console.log('releasing horizontal scene');
+  destroyOutputScenes(displays: TDisplayType[]) {
+    return displays.reduce((destroyed: boolean, display: TDisplayType) => {
+      const contextDestroyed = this.videoSettingsService.destroyVideoContext(display);
+      const sceneReset = this.resetScene(display);
 
-      // @@@ HERE, says this.state.defaultSource is an invalid argument?
-      obs.Global.setOutputSource(0, this.state.defaultSource);
-      // obs.Global.setOutputSource(0, null);
+      if (!contextDestroyed || !sceneReset) {
+        destroyed = false;
+      }
 
-      this.resetScene('horizontal');
-    }
-    if (this.state.verticalScene) {
-      console.log('releasing vertical scene');
-
-      // @@@ TODO: should this be set to this.state.defaultSource?
-      obs.Global.setOutputSource(1, null);
-    }
-
-    return !(this.state.horizontalScene && this.state.verticalScene);
+      return destroyed;
+    }, true);
   }
 
   resetScene(display: TDisplayType) {
-    const scene: obs.IScene = this.state[`${display}Scene`];
+    const sceneName = `${display}Scene`;
+    const scene: obs.IScene = this.state[sceneName];
 
     const obsSceneItems = scene.getItems();
     obsSceneItems.forEach((sceneItem: obs.ISceneItem) => {
@@ -250,15 +233,17 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
     scene.release();
 
     this.RESET_SCENE(display);
+
+    return !this.state[sceneName];
   }
 
   shutdown() {
-    console.log('shutting down');
-
-    try {
-      this.destroyOutputScenes();
-    } catch (error: unknown) {
-      console.error('Error shutting down Dual Output Service ', error);
+    if (this.state.dualOutputMode) {
+      try {
+        this.destroyOutputScenes(['horizontal', 'vertical']);
+      } catch (error: unknown) {
+        console.error('Error shutting down Dual Output Service ', error);
+      }
     }
   }
 

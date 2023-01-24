@@ -296,6 +296,8 @@ export class VideoSettingsService extends StatefulService<IVideoSettings> {
     this.state[display] = {} as obs.IVideoInfo;
     this.migrateSettings(display);
     this.state[contextName].video = this.state[display];
+
+    return !!this.state[contextName];
   }
 
   destroyVideoContext(display: TDisplayType = 'default') {
@@ -305,6 +307,8 @@ export class VideoSettingsService extends StatefulService<IVideoSettings> {
       context.destroy();
     }
     this.DESTROY_VIDEO_CONTEXT(display);
+
+    return !this.state[contextName];
   }
 
   @debounce(200)
