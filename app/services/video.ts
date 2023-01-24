@@ -434,24 +434,37 @@ export class VideoService extends Service {
       const context = this.videoSettingsService.contexts[type];
       if (context) {
         console.log('creating display for context ', context);
-        obs.NodeObs.OBS_content_createDisplay(
-          electronWindow.getNativeWindowHandle(),
-          name,
-          renderingMode,
-          context,
-        );
+        if (sourceId) {
+          obs.NodeObs.OBS_content_createSourcePreviewDisplay(
+            electronWindow.getNativeWindowHandle(),
+            sourceId,
+            name,
+            false,
+            context,
+          );
+        } else {
+          obs.NodeObs.OBS_content_createDisplay(
+            electronWindow.getNativeWindowHandle(),
+            name,
+            renderingMode,
+            false,
+            context,
+          );
+        }
       }
     } else if (sourceId) {
       obs.NodeObs.OBS_content_createSourcePreviewDisplay(
         electronWindow.getNativeWindowHandle(),
         sourceId,
         name,
+        false,
       );
     } else {
       obs.NodeObs.OBS_content_createDisplay(
         electronWindow.getNativeWindowHandle(),
         name,
         renderingMode,
+        false,
       );
     }
   }
