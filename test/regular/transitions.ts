@@ -80,9 +80,9 @@ test('Changing connections', async t => {
   await dismissModal(t);
   await (await app.client.$('button=Connections')).click();
   await (await app.client.$('button=Add Connection')).click();
-  await setInputValue('[name="fromSceneId"]', connectionBegin);
-  await setInputValue('[name="transitionId"]', connectionTransition);
-  await setInputValue('[name="toSceneId"]', connectionEnd);
+  await setInputValue('[data-name="fromSceneId"]', connectionBegin);
+  await setInputValue('[data-name="transitionId"]', connectionTransition);
+  await setInputValue('[data-name="toSceneId"]', connectionEnd);
 
   await (await t.context.app.client.$('button=Done')).click();
   await focusMain();
@@ -99,7 +99,7 @@ test('Changing connections', async t => {
         transitionId: connectionTransition,
         toSceneId: connectionEnd,
       },
-      'name',
+      'data-name',
       'data-selected-option-label',
     ),
   );
