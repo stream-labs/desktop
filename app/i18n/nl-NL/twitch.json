@@ -1,5 +1,5 @@
 {
-  "Twitch Category": "Twitch Category",
-  "Twitch Tags": "Twitch Tags",
-  "Warning! Editing tags in Streamlabs will overwrite tags in Twitch. To use Twitch's new custom tags, you must edit your tags in the Twitch dashboard directly until Twitch provides third parties access to editing the new custom tags.": "Warning! Editing tags in Streamlabs will overwrite tags in Twitch. To use Twitch's new custom tags, you must edit your tags in the Twitch dashboard directly until Twitch provides third parties access to editing the new custom tags."
+  "Twitch Category": "Twitch-categorie",
+  "Twitch Tags": "Twitch-tags",
+  "Warning! Editing tags in Streamlabs will overwrite tags in Twitch. To use Twitch's new custom tags, you must edit your tags in the Twitch dashboard directly until Twitch provides third parties access to editing the new custom tags.": "Waarschuwing! Bij het bewerken van tags in Streamlabs worden tags in Twitch overschreven. Om de nieuwe aangepaste tags van Twitch te gebruiken, moet u uw tags rechtstreeks in het Twitch-dashboard bewerken totdat Twitch derden toegang geeft tot het bewerken van de nieuwe aangepaste tags."
 }
