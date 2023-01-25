@@ -165,7 +165,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
   createOutputScenes(displays: TDisplayType[], sceneId?: string) {
     return displays.reduce((created: boolean, display: TDisplayType) => {
       const contextEstablished = this.videoSettingsService.establishVideoContext(display);
-      const sceneCreated = this.createOutputScene(display, sceneId);
+      const sceneCreated = this.createDualOutputScene(display, sceneId);
 
       if (!contextEstablished || !sceneCreated) {
         created = false;
@@ -175,12 +175,22 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
     }, true);
   }
 
+  createDualOutputScene(display: TDisplayType, changedSceneId?: string) {
+    const scene = this.createOutputScene(display, changedSceneId);
+    if (!scene) return false;
+
+    this.SET_DUAL_OUTPUT_SCENE(display, scene);
+
+    const sceneName = `${display}Scene`;
+    return !!this.state[sceneName];
+  }
+
   createOutputScene(display: TDisplayType, changedSceneId?: string) {
     const sceneId = changedSceneId ?? this.scenesService.views.activeSceneId;
     const scene = obs.SceneFactory.fromName(sceneId);
 
-    // if obs does not return a scene, we should not toggle on dual output
-    if (!scene) return false;
+    // if obs does not return a scene, we cannot add sources
+    if (!scene) return null;
 
     const obsSceneItems = scene.getItems();
 
@@ -199,15 +209,12 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
       sceneItem.visible = true;
     });
 
-    this.SET_DUAL_OUTPUT_SCENE(display, scene);
-
-    const sceneName = `${display}Scene`;
-
-    return !!this.state[sceneName];
+    return scene;
   }
 
   destroyOutputScenes(displays: TDisplayType[]) {
-    return displays.reduce((destroyed: boolean, display: TDisplayType) => {
+    // destroy contexts and scenes
+    const destroyed = displays.reduce((destroyed: boolean, display: TDisplayType) => {
       const contextDestroyed = this.videoSettingsService.destroyVideoContext(display);
       const sceneReset = this.resetScene(display);
 
@@ -217,23 +224,70 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
 
       return destroyed;
     }, true);
+
+    // in order for the default context to show a scene in single output mode
+    // we need to add input sources onto a scene for the default context
+    if (destroyed) {
+      const context = this.videoSettingsService.contexts.default;
+
+      // the default context is created on startup so there should always be a default context
+      // the below is just a safeguard against errors from possible issues with the default context
+      if (!context) {
+        this.videoSettingsService.establishVideoContext('default');
+      }
+      // const scene = this.createOutputScene('default');
+      const scene = this.resetSceneFromActiveScene();
+
+      return !!scene;
+    } else {
+      // if the scenes were not destroyed successfully, prevent dual output from toggling off
+      return false;
+    }
   }
 
   resetScene(display: TDisplayType) {
     const sceneName = `${display}Scene`;
     const scene: obs.IScene = this.state[sceneName];
 
+    // if there is no scene, it has already been destroyed or was not created correctly
+    // this prevents an error being thrown when attempting to get items
+    if (!scene) return true;
+
     const obsSceneItems = scene.getItems();
     obsSceneItems.forEach((sceneItem: obs.ISceneItem) => {
       sceneItem.source.release();
       sceneItem.remove();
     });
-
     scene.release();
 
     this.RESET_SCENE(display);
 
     return !this.state[sceneName];
+  }
+
+  resetSceneFromActiveScene() {
+    const scene = this.scenesService.views
+      .getScene(this.scenesService.views.activeSceneId)
+      .getObsScene();
+
+    if (!scene) return false;
+
+    const obsSceneItems = scene.getItems();
+
+    obsSceneItems.forEach(sceneItem => {
+      // create source using input factory
+      const source = obs.InputFactory.create(
+        sceneItem.source.id,
+        sceneItem.source.name,
+        sceneItem.source.settings,
+      );
+
+      scene.add(source);
+      sceneItem.video = this.videoSettingsService.contexts['default'];
+
+      // @@@ TODO: set scene item settings according to persisted settings. For now, just set to visible
+      sceneItem.visible = true;
+    });
   }
 
   shutdown() {
