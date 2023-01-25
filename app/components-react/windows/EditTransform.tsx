@@ -98,7 +98,7 @@ export default function EditTransform() {
 
   return (
     <ModalLayout footer={<Footer reset={reset} cancel={cancel} />}>
-      <Form form={form}>
+      <Form form={form} layout="horizontal">
         <CoordinateInput
           title={$t('Position')}
           datapoints={['x', 'y']}
@@ -168,15 +168,12 @@ function CropInput(p: {
 }) {
   return (
     <InputWrapper label={$t('Crop')}>
-      <div style={{ display: 'flex' }}>
+      <div>
         {['left', 'right', 'top', 'bottom'].map((dir: keyof ICrop) => (
           <div
             style={{
-              display: 'flex',
-              alignItems: 'center',
               marginBottom: '8px',
               marginLeft: '8px',
-              width: '100px',
             }}
             key={dir}
           >
