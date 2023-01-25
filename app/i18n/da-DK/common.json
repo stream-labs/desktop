@@ -117,7 +117,7 @@
   "Very High": "Meget høj",
   "Apps": "Apps",
   "Finish": "Afslut",
-  "Get Prime": "Få Prime",
+  "Get Ultra": "Get Ultra",
   "System error message:": "Systemfejlmeddelelse:",
   "List is empty": "Listen er tom",
   "Not selected": "Ikke valgt",
@@ -139,5 +139,18 @@
   "Click here": "Klik her",
   "More Info": "Flere oplysninger",
   "Revert Changes": "Annuller ændringer",
-  "Animations": "Animationer"
+  "Animations": "Animationer",
+  "Multistreaming": "Multistreaming",
+  "Alert Box": "Notifikationsboks",
+  "Widget": "Widget",
+  "Creator Sites": "Websteder for indholdsskabere",
+  "Apps Manager": "Apps Manager",
+  "Theme Audit": "Theme Audit",
+  "Login": "Log ind",
+  "Tip Settings": "Drikkepenge indstillinger",
+  "Apps Store Home": "Apps Store Home",
+  "Dashboard Home": "Dashboard Home",
+  "Alert Box Library": "Bibliotek for notifikationsbokse",
+  "Alert Box Settings": "Alert Box Settings",
+  "Upgrade to Ultra": "Upgrade to Ultra"
 }
