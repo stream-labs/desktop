@@ -246,7 +246,7 @@ export class VideoSettingsService extends StatefulService<IVideoSettings> {
       const data = display === 'horizontal' ? horizontalData : verticalData;
 
       this.state[display] = this.state[contextName].video;
-      Object.keys(horizontalData).forEach(
+      Object.keys(data).forEach(
         (key: keyof obs.IAdvancedStreaming | keyof obs.ISimpleStreaming) => {
           this.SET_VIDEO_SETTING(key, data[key], display);
           if (

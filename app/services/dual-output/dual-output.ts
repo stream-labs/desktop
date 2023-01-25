@@ -235,8 +235,8 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
       if (!context) {
         this.videoSettingsService.establishVideoContext('default');
       }
-      // const scene = this.createOutputScene('default');
-      const scene = this.resetSceneFromActiveScene();
+      const scene = this.createOutputScene('default');
+      // const scene = this.resetSceneFromActiveScene();
 
       return !!scene;
     } else {
