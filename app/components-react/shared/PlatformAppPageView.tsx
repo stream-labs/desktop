@@ -42,7 +42,7 @@ export default function PlatformAppPageView(p: {
       unmountContainer();
       clearInterval(interval);
     };
-  }, []);
+  }, [hideStyleBlockers]);
 
   async function mountContainer() {
     containerId = await PlatformAppsService.actions.return.mountContainer(
