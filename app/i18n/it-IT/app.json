@@ -5,5 +5,6 @@
   "Grant Permissions": "Concedi autorizzazioni",
   "Streamlabs needs additional permissions. Grant permissions in the pop-up dialogs to continue.": "Streamlabs necessita di autorizzazioni aggiuntive. Concedi le autorizzazioni nelle finestre di dialogo a comparsa per continuare.",
   "Microphone": "Microfono",
-  "Webcam": "Webcam"
+  "Webcam": "Webcam",
+  "You've merged a Streamlabs ID to your account, please log back in to ensure you have the right credentials.": "You've merged a Streamlabs ID to your account, please log back in to ensure you have the right credentials."
 }
