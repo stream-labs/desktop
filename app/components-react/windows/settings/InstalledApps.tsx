@@ -5,11 +5,14 @@ import { Services } from 'components-react/service-provider';
 import { ILoadedApp } from 'services/platform-apps';
 import { $t } from 'services/i18n';
 import styles from './InstalledApps.m.less';
+import { useVuex } from 'components-react/hooks';
 
 export default function InstalledApps() {
   const { PlatformAppsService } = Services;
 
-  const installedApps = PlatformAppsService.productionApps;
+  const { installedApps } = useVuex(() => ({
+    installedApps: PlatformAppsService.views.productionApps,
+  }));
   const enabledInstalledAppIds = installedApps.filter(app => app.enabled).map(app => app.id);
 
   function isEnabled(appId: string) {
