@@ -221,7 +221,6 @@ export default class CommentViewer extends Vue {
   }
 
   openCommentSettings() {
-    // TODO コメント設定タブに移動する
     this.settingsService.showSettings('Comment');
   }
 }
