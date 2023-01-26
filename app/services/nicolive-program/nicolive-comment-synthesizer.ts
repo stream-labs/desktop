@@ -1,15 +1,17 @@
-import { mutation, StatefulService } from 'services/core/stateful-service';
-import { InitAfter, Inject } from 'services/core';
-import { NicoliveProgramStateService, SynthesizerId } from './state';
-import { ParaphraseDictionary } from './ParaphraseDictionary';
-import { WrappedChat } from './WrappedChat';
-import { getDisplayText } from './ChatMessage/displaytext';
-import { AddComponent } from './ChatMessage/ChatComponentType';
-import { NVoiceClientService } from './n-voice-client';
-import { Server } from 'socket.io';
 import { createServer } from 'http';
+import { InitAfter, Inject } from 'services/core';
+import { mutation, StatefulService } from 'services/core/stateful-service';
 import { NVoiceCharacterService } from 'services/nvoice-character';
-import { sleep } from 'util/sleep';
+import { Server } from 'socket.io';
+import { AddComponent } from './ChatMessage/ChatComponentType';
+import { getDisplayText } from './ChatMessage/displaytext';
+import { NVoiceClientService } from './n-voice-client';
+import { ParaphraseDictionary } from './ParaphraseDictionary';
+import { ISpeechSynthesizer } from './speech/ISpeechSynthesizer';
+import { NVoiceSynthesizer } from './speech/NVoiceSynthesizer';
+import { WebSpeechSynthesizer } from './speech/WebSpeechSynthesizer';
+import { NicoliveProgramStateService, SynthesizerId } from './state';
+import { WrappedChat } from './WrappedChat';
 
 export type Speech = {
   text: string;
@@ -102,6 +104,7 @@ export class NicoliveCommentSynthesizerService extends StatefulService<ICommentS
       },
     });
     this.nVoice = new NVoiceSynthesizer(this.nVoiceClientService);
+    // TODO このサーバーたてるあたりはリファクタで外に出す
     try {
       const server = createServer();
       server.listen(() => {
@@ -188,17 +191,13 @@ export class NicoliveCommentSynthesizerService extends StatefulService<ICommentS
 
   async startSpeakingSimple(speech: Speech) {
     // empty anonymous functions must be created in this service
-    await this.startSpeaking(speech, () => { }, () => { });
+    await this.startSpeaking(speech, () => { }, () => { }, true);
   }
 
   async startTestSpeech(text: string, synthId: SynthesizerId) {
     console.log('testSpeech', text, synthId); // DEBUG
     const speech = this.makeSimpleTextSpeech(text, synthId);
     if (speech) {
-      if (this.speaking) {
-        this.cancelSpeak();
-        await sleep(200);
-      }
       await this.startSpeakingSimple(speech);
     }
   }
@@ -207,6 +206,7 @@ export class NicoliveCommentSynthesizerService extends StatefulService<ICommentS
     speech: Speech,
     onstart: () => void,
     onend: () => void,
+    cancelBeforeSpeaking = false,
   ) {
     if (!this.enabled) {
       return;
@@ -217,22 +217,30 @@ export class NicoliveCommentSynthesizerService extends StatefulService<ICommentS
 
     if (this.currentPlayingId !== null) {
       if (this.currentPlayingId !== toPlay) {
-        await this.currentPlaying()?.waitForSpeakEnd();
+        if (cancelBeforeSpeaking) {
+          await this.currentPlaying()?.cancelSpeak();
+        } else {
+          await this.currentPlaying()?.waitForSpeakEnd();
+        }
       }
     }
 
+    const playing = this.currentPlaying();
     this.currentPlayingId = toPlay;
+    const force = cancelBeforeSpeaking && playing && playing.speaking;
+    console.log(`${speech.text}: speakText`); // DEBUG
     toPlaySynth.speakText(speech, () => {
       onstart();
       this.currentPlayingId = toPlay;
     }, () => {
       this.currentPlayingId = null;
       onend();
-    }, (phoneme) => {
-      if (this.io) {
-        this.io.emit('phoneme', phoneme);
-      }
-    });
+    }, force,
+      (phoneme) => {
+        if (this.io) {
+          this.io.emit('phoneme', phoneme);
+        }
+      });
   }
 
   get speaking(): boolean {
@@ -240,9 +248,9 @@ export class NicoliveCommentSynthesizerService extends StatefulService<ICommentS
     // return this.currentPlaying()?.speaking || false;
   }
 
-  cancelSpeak() {
+  async cancelSpeak() {
     console.log('cancelSpeak(): currentPlaying', this.currentPlaying()); // DEBUG
-    this.currentPlaying()?.cancelSpeak();
+    await this.currentPlaying()?.cancelSpeak();
   }
   private setEnabled(enabled: boolean) {
     this.setState({ enabled });
@@ -324,134 +332,4 @@ export class NicoliveCommentSynthesizerService extends StatefulService<ICommentS
     this.state = nextState;
   }
 
-}
-
-export interface ISpeechSynthesizer {
-  speakText(speech: Speech, onstart: () => void, onend: () => void, onPhoneme?: (phoneme: string) => void): void;
-  speaking: boolean;
-  cancelSpeak(): void;
-  waitForSpeakEnd(): Promise<void>;
-}
-
-export class WebSpeechSynthesizer implements ISpeechSynthesizer {
-  get available(): boolean {
-    return window.speechSynthesis !== undefined;
-  }
-
-  private speakingPromise: Promise<void> | null = null;
-  private speakingResolve: () => void | null = null;
-  private speakingCounter: number = 0;
-
-  speakText(
-    speech: Speech,
-    onstart: () => void,
-    onend: () => void,
-  ) {
-    if (!speech || speech.text === '' || !this.available) {
-      return;
-    }
-    if (!this.speakingPromise) {
-      this.speakingPromise = new Promise((resolve) => {
-        this.speakingResolve = resolve;
-      });
-    }
-
-    const uttr = new SpeechSynthesisUtterance(speech.text);
-    uttr.pitch = speech.webSpeech?.pitch || 1; // tone
-    uttr.rate = speech.rate || 1; // speed
-    uttr.volume = speech.volume || 1;
-    uttr.onstart = onstart;
-    uttr.onend = () => {
-      if (--this.speakingCounter === 0) {
-        this.speakingResolve();
-        this.speakingPromise = null;
-        this.speakingResolve = null;
-      }
-      onend();
-    }
-    speechSynthesis.speak(uttr);
-    this.speakingCounter++;
-  }
-
-  get speaking(): boolean {
-    return this.available && speechSynthesis.speaking;
-  }
-
-  async waitForSpeakEnd(): Promise<void> {
-    if (!this.speakingPromise) {
-      return;
-    }
-    return this.speakingPromise;
-  }
-
-  cancelSpeak() {
-    if (!this.available) {
-      return;
-    }
-    speechSynthesis.cancel();
-  }
-}
-
-
-export class NVoiceSynthesizer implements ISpeechSynthesizer {
-  constructor(private nVoiceClientService: NVoiceClientService) { }
-
-  private _cancel: () => void | undefined;
-  private _playPromise: Promise<void> | undefined;
-
-  async speakText(
-    speech: Speech,
-    onstart: () => void,
-    onend: () => void,
-    onPhoneme?: (phoneme: string) => void,
-  ) {
-    if (!speech || speech.text === '') {
-      return;
-    }
-
-    if (this._playPromise) {
-      await this._playPromise;
-    }
-    this._playPromise = this.nVoiceClientService.talk(speech.text, {
-      speed: 1 / (speech.rate || 1),
-      volume: speech.volume,
-      maxTime: speech.nVoice.maxTime,
-      phonemeCallback: (phoneme: string) => {
-        console.log(phoneme); // DEBUG
-        if (onPhoneme) {
-          onPhoneme(phoneme);
-        }
-      },
-    }).then(async (r) => {
-      if (r === null) {
-        // no sound
-        return;
-      }
-      const { cancel, speaking } = r;
-      this._cancel = cancel;
-      onstart();
-      await speaking;
-      this._cancel = undefined;
-      onend();
-      this._playPromise = undefined;
-    }, error => {
-      console.error(`NVoiceSynthesizer: text:${JSON.stringify(speech.text)} -> ${error}`);
-    });
-  }
-
-  get speaking(): boolean {
-    return this._cancel !== undefined; // playPromise があるなら再生中だが、cancelできるのはこっちで困った
-  }
-
-  async waitForSpeakEnd(): Promise<void> {
-    if (this._playPromise) {
-      await this._playPromise;
-    }
-  }
-
-  cancelSpeak() {
-    if (this._cancel) {
-      this._cancel();
-    }
-  }
 }

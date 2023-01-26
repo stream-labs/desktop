@@ -5,7 +5,7 @@ import { join } from "path";
 import { StatefulService } from "services/core/stateful-service";
 import { $t } from "services/i18n";
 import { sleep } from 'util/sleep';
-import { getNVoicePath, NVoiceClient } from './NVoiceClient';
+import { getNVoicePath, NVoiceClient } from './speech/NVoiceClient';
 
 /** play audio from Buffer as wave file.
  * @return .cancel function to stop playing.
@@ -78,8 +78,7 @@ export class NVoiceClientService extends StatefulService<INVoiceClientState> {
     const tempDir = electron.remote.app.getPath('temp');
     const wavFileName = join(tempDir, `n-voice-talk-${this.index}.wav`);
     this.index++;
-    // TODO transaction
-    await client.set_max_time(options.maxTime); // TODO 変わらないときは省略したい
+    await client.set_max_time(options.maxTime);
     const { wave, labels } = await client.talk(options.speed, text, wavFileName);
     if (!wave) {
       // なにも発音しないときは無視
@@ -94,7 +93,7 @@ export class NVoiceClientService extends StatefulService<INVoiceClientState> {
     }
 
     const startTime = Date.now();
-    console.log('start playing'); // DEBUG
+    console.log(`${text}: start playing`); // DEBUG
     const { cancel, done } = await playAudio(wave, options.volume);
     let phonemeCancel = false;
     if (options.phonemeCallback) {
@@ -115,7 +114,7 @@ export class NVoiceClientService extends StatefulService<INVoiceClientState> {
       phonemeLoop();
     }
     this.speaking = done;
-    console.log('play started'); // DEBUG
+    console.log(`${text}: play started`); // DEBUG
     return {
       cancel: () => { phonemeCancel = true; cancel() },
       speaking: this.speaking,
