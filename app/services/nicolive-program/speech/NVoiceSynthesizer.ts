@@ -18,52 +18,42 @@ export class NVoiceSynthesizer implements ISpeechSynthesizer {
     if (this._playing) {
       return;
     }
-    console.log('run queue', this._playQueue.map(i => i.label)); // DEBUG
     const next = this._playQueue.shift();
     if (next) {
       const { start, label } = next;
-      console.log('queue after shift', this._playQueue.map(i => i.label)); // DEBUG
       if (start) {
         let earlyCancel = false;
         let resolveSpeaking2: () => void = () => { };
         const speaking2 = new Promise<void>((resolve) => { resolveSpeaking2 = resolve; });
         speaking2.then(() => {
-          console.log(`${label}: _playing = null`); // DEBUG
           this._playing = null;
           this.runQueue();
         });
         this._playing = {
           cancel: async () => {
             this._playing.cancel = async () => { await speaking2; };
-            console.log(`${label}: early cancel`); // DEBUG
             earlyCancel = true;
             await speaking2;
           },
           speaking: speaking2,
         };
-        console.log(`${label}: start playing(1)`); // DEBUG
         start().then(({ cancel, speaking }) => {
           if (earlyCancel) {
-            console.log(`${label}: early cancel applied`); // DEBUG
             cancel().then(() => {
-              console.log(`${label}: early cancel applied -> resolveSpeaking2`); // DEBUG
               resolveSpeaking2();
             });
           } else {
             this._playing = {
               cancel: async () => {
                 this._playing.cancel = async () => { await speaking2; };
-                console.log(`${label}: cancel playing`); // DEBUG
                 await cancel();
                 await speaking2;
               },
               speaking: speaking.then(() => {
-                console.log(`${label}: play complete -> resolveSpeaking2`); // DEBUG
                 resolveSpeaking2();
               }
               )
             };
-            console.log(`${label}: start playing(2)`); // DEBUG
           }
         });
       }
@@ -73,7 +63,6 @@ export class NVoiceSynthesizer implements ISpeechSynthesizer {
   }
   private async _cancelQueue() {
     // 実行中のものはキャンセルし、キューに残っているものは削除する
-    console.log('cancel queue', !!this._playing, this._playQueue); // DEBUG
     this._playQueue = [];
     if (this._playing) {
       await this._playing.cancel();
@@ -110,7 +99,6 @@ export class NVoiceSynthesizer implements ISpeechSynthesizer {
         })();
         return {
           cancel: async () => {
-            console.log('キャンセル実行'); // DEBUG
             r.cancel();
             await r.speaking;
           },
@@ -124,7 +112,6 @@ export class NVoiceSynthesizer implements ISpeechSynthesizer {
       this._cancelQueue();
     }
     this._playQueue.push({ start, label: speech.text });
-    console.log('after push queue', this._playing, this._playQueue.map(i => i.label)); // DEBUG
     this.runQueue();
   }
 
