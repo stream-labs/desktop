@@ -108,9 +108,9 @@ export class ChatService extends Service {
   }
 
   hasChatHighlightWidget(): boolean {
-    return !!this.widgetsService
-      .getWidgetSources()
-      .find(source => source.type === WidgetType.ChatHighlight);
+    return !!this.widgetsService.views.widgetSources.find(
+      source => source.type === WidgetType.ChatHighlight,
+    );
   }
 
   async mountChat(electronWindowId: number) {

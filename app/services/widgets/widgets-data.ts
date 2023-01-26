@@ -130,6 +130,27 @@ export const WidgetTesters: IWidgetTester[] = [
     },
     platforms: ['facebook'],
   },
+  {
+    name: 'Merch',
+    url(host, platform) {
+      return `https://${host}/api/v5/slobs/test/streamlabs/merch`;
+    },
+    platforms: ['youtube'],
+  },
+  {
+    name: 'Cloudbot Redeem',
+    url(host, platform) {
+      return `https://${host}/api/v5/slobs/test/streamlabs/loyalty_store_redemption`;
+    },
+    platforms: ['youtube'],
+  },
+  {
+    name: 'SL Ultra Gift',
+    url(host, platform) {
+      return `https://${host}/api/v5/slobs/test/streamlabs/prime_sub_gift`;
+    },
+    platforms: ['youtube'],
+  },
 ];
 
 export const WidgetDefinitions: { [x: number]: IWidget } = {
