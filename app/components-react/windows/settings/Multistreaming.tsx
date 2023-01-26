@@ -38,11 +38,7 @@ export function MultistreamingSettings() {
                 <UltraIcon
                   type="simple"
                   style={{
-                    fill: '#09161D',
-                    display: 'inline-block',
-                    height: '12px',
-                    width: '12px',
-                    marginRight: '5px',
+                    marginRight: '8px',
                   }}
                 />
               }
