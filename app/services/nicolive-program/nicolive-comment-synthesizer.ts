@@ -1,12 +1,11 @@
-import { createServer } from 'http';
 import { InitAfter, Inject } from 'services/core';
 import { mutation, StatefulService } from 'services/core/stateful-service';
 import { NVoiceCharacterService } from 'services/nvoice-character';
-import { Server } from 'socket.io';
 import { AddComponent } from './ChatMessage/ChatComponentType';
 import { getDisplayText } from './ChatMessage/displaytext';
 import { NVoiceClientService } from './n-voice-client';
 import { ParaphraseDictionary } from './ParaphraseDictionary';
+import { PhonemeServer } from './PhonemeServer';
 import { ISpeechSynthesizer } from './speech/ISpeechSynthesizer';
 import { NVoiceSynthesizer } from './speech/NVoiceSynthesizer';
 import { WebSpeechSynthesizer } from './speech/WebSpeechSynthesizer';
@@ -77,7 +76,7 @@ export class NicoliveCommentSynthesizerService extends StatefulService<ICommentS
     return this.currentPlayingId ? this.getSynthesizer(this.currentPlayingId) : null;
   }
 
-  io: Server;
+  phonemeServer: PhonemeServer;
 
   init(): void {
     /*
@@ -104,34 +103,12 @@ export class NicoliveCommentSynthesizerService extends StatefulService<ICommentS
       },
     });
     this.nVoice = new NVoiceSynthesizer(this.nVoiceClientService);
-    // TODO このサーバーたてるあたりはリファクタで外に出す
-    try {
-      const server = createServer();
-      server.listen(() => {
-        const address = server.address();
-        if (typeof address === 'object') {
-          console.log('NVoiceCommentSynthesizerService: socket.io listening on', address.port);
-          this.nVoiceCharacterService.updateSocketIoPort(address.port);
-        }
-      });
-      this.io = new Server(server, {
-        transports: ['polling'],
-        cors: {
-          origin: '*',
-        }
-      });
-      this.io.on('connection', (socket) => {
-        console.log('NicoliveCommentSynthesizerService Socket', socket.id, 'connected'); // DEBUG
-        socket.conn.on('active', (active) => {
-          console.log('NicoliveCommentSynthesizerService Socket', socket.id, 'active', active); // DEBUG
-        });
-        socket.conn.on('close', () => {
-          console.log('NicoliveCommentSynthesizerService Socket', socket.id, 'closed'); // DEBUG
-        })
-      });
-    } catch (e) {
-      console.error('socket.io constructor error', e);
-    }
+
+    this.phonemeServer = new PhonemeServer({
+      onPortAssigned: (port) => {
+        this.nVoiceCharacterService.updateSocketIoPort(port);
+      }
+    });
   }
 
   private dictionary = new ParaphraseDictionary();
@@ -227,23 +204,24 @@ export class NicoliveCommentSynthesizerService extends StatefulService<ICommentS
     const playing = this.currentPlaying();
     this.currentPlayingId = toPlay;
     const force = cancelBeforeSpeaking && playing && playing.speaking;
-    toPlaySynth.speakText(speech, () => {
-      onstart();
-      this.currentPlayingId = toPlay;
-    }, () => {
-      this.currentPlayingId = null;
-      onend();
-    }, force,
+    toPlaySynth.speakText(
+      speech,
+      () => {
+        onstart();
+        this.currentPlayingId = toPlay;
+      },
+      () => {
+        this.currentPlayingId = null;
+        onend();
+      },
+      force,
       (phoneme) => {
-        if (this.io) {
-          this.io.emit('phoneme', phoneme);
-        }
+        this.phonemeServer?.emitPhoneme(phoneme);
       });
   }
 
   get speaking(): boolean {
-    return this.currentPlayingId !== null; // DEBUG
-    // return this.currentPlaying()?.speaking || false;
+    return this.currentPlayingId !== null;
   }
 
   async cancelSpeak() {
