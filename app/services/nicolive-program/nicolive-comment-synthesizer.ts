@@ -195,7 +195,6 @@ export class NicoliveCommentSynthesizerService extends StatefulService<ICommentS
   }
 
   async startTestSpeech(text: string, synthId: SynthesizerId) {
-    console.log('testSpeech', text, synthId); // DEBUG
     const speech = this.makeSimpleTextSpeech(text, synthId);
     if (speech) {
       await this.startSpeakingSimple(speech);
@@ -228,7 +227,6 @@ export class NicoliveCommentSynthesizerService extends StatefulService<ICommentS
     const playing = this.currentPlaying();
     this.currentPlayingId = toPlay;
     const force = cancelBeforeSpeaking && playing && playing.speaking;
-    console.log(`${speech.text}: speakText`); // DEBUG
     toPlaySynth.speakText(speech, () => {
       onstart();
       this.currentPlayingId = toPlay;
@@ -249,7 +247,6 @@ export class NicoliveCommentSynthesizerService extends StatefulService<ICommentS
   }
 
   async cancelSpeak() {
-    console.log('cancelSpeak(): currentPlaying', this.currentPlaying()); // DEBUG
     await this.currentPlaying()?.cancelSpeak();
   }
   private setEnabled(enabled: boolean) {
