@@ -299,12 +299,6 @@ export class ScenesService extends StatefulService<IScenesState> {
   }
 
   canRemoveScene() {
-    if (this.dualOutputService.views.hasDualOutputScenes) {
-      // if dual output scenes have been created,
-      // they will be in the array of scenes
-      // but hidden from the list of scenes in the scene selector
-      return Object.keys(this.state.scenes).length > 3;
-    }
     return Object.keys(this.state.scenes).length > 1;
   }
 
