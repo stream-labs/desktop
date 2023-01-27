@@ -3,6 +3,7 @@ import { ScenesService } from 'services/scenes';
 import { SourcesService, TSourceType } from 'services/sources';
 import { TransitionsService } from 'services/transitions';
 import { KeyListenerService } from 'services/key-listener';
+import { MarkersService } from 'services/markers';
 import { Inject } from 'services/core/injector';
 import { StatefulService, mutation, ServiceHelper } from 'services';
 import defer from 'lodash/defer';
@@ -43,6 +44,10 @@ function getRecentEventsService(): RecentEventsService {
   return RecentEventsService.instance;
 }
 
+function getMarkersService(): MarkersService {
+  return MarkersService.instance;
+}
+
 const isAudio = (sourceId: string) => {
   const source = getSourcesService().views.getSource(sourceId);
 
@@ -70,7 +75,7 @@ const processObsHotkey = (isKeyDown: boolean) => (itemId: string, hotkeyId: numb
   obs.NodeObs.OBS_API_ProcessHotkeyStatus(hotkeyId, isKeyDown);
 };
 
-type THotkeyType = 'GENERAL' | 'SCENE' | 'SCENE_ITEM' | 'SOURCE';
+type THotkeyType = 'GENERAL' | 'SCENE' | 'SCENE_ITEM' | 'SOURCE' | 'MARKER';
 
 /**
  * Represents the key bound to a hotkey action
@@ -328,6 +333,29 @@ const SCENE_ITEM_ACTIONS: HotkeyGroup = {
   },
 };
 
+const MARKERS_ACTIONS: HotkeyGroup = {
+  MARKER_1: {
+    name: 'MARKER_1',
+    description: () => getMarkersService().views.getLabel('MARKER_1'),
+    down: () => getMarkersService().actions.addMarker('MARKER_1'),
+  },
+  MARKER_2: {
+    name: 'MARKER_2',
+    description: () => getMarkersService().views.getLabel('MARKER_1'),
+    down: () => getMarkersService().actions.addMarker('MARKER_1'),
+  },
+  MARKER_3: {
+    name: 'MARKER_3',
+    description: () => getMarkersService().views.getLabel('MARKER_1'),
+    down: () => getMarkersService().actions.addMarker('MARKER_1'),
+  },
+  MARKER_4: {
+    name: 'MARKER_4',
+    description: () => getMarkersService().views.getLabel('MARKER_1'),
+    down: () => getMarkersService().actions.addMarker('MARKER_1'),
+  },
+};
+
 /**
  * All possible hotkeys should be defined in this object.
  * All information about the hotkey and its behavior is
@@ -342,6 +370,7 @@ const ACTIONS: HotkeyGroup = {
   ...SOURCE_ACTIONS,
   ...SCENE_ACTIONS,
   ...SCENE_ITEM_ACTIONS,
+  ...MARKERS_ACTIONS,
 };
 
 /**
@@ -355,6 +384,7 @@ export interface IHotkey {
   sourceId?: string;
   sceneItemId?: string;
   hotkeyId?: number;
+  isMarker?: boolean;
 }
 
 /**
@@ -365,6 +395,7 @@ export interface IHotkeysSet {
   general: IHotkey[];
   sources: Dictionary<IHotkey[]>;
   scenes: Dictionary<IHotkey[]>;
+  markers: IHotkey[];
 }
 
 interface IHotkeysServiceState {
@@ -452,6 +483,16 @@ export class HotkeysService extends StatefulService<IHotkeysServiceState> {
       });
     });
 
+    Object.values(MARKERS_ACTIONS).forEach(action => {
+      const hotkey: IHotkey = {
+        actionName: action.name,
+        bindings: [],
+        isMarker: true,
+      };
+      hotkeys[getHotkeyHash(hotkey)] = hotkey;
+      addedHotkeys.add(action.name);
+    });
+
     const obsHotkeys: OBSHotkey[] = obs.NodeObs.OBS_API_QueryHotkeys();
 
     obsHotkeys
@@ -522,10 +563,13 @@ export class HotkeysService extends StatefulService<IHotkeysServiceState> {
       if (sceneHotkeys.length) scenesHotkeys[scene.id] = sceneHotkeys;
     });
 
+    const markersHotkeys = this.getHotkeys().filter(hotkey => hotkey.type === 'MARKER');
+
     return {
       general: this.serializeHotkeys(this.getGeneralHotkeys()),
       sources: this.serializeHotkeys(sourcesHotkeys),
       scenes: this.serializeHotkeys(scenesHotkeys),
+      markers: this.serializeHotkeys(markersHotkeys),
     };
   }
 
@@ -551,6 +595,7 @@ export class HotkeysService extends StatefulService<IHotkeysServiceState> {
       general: [],
       sources: {},
       scenes: {},
+      markers: [],
     });
   }
 
@@ -699,6 +744,7 @@ export class Hotkey implements IHotkey {
   sceneId?: string;
   sourceId?: string;
   sceneItemId?: string;
+  isMarker?: boolean;
   bindings: IBinding[];
 
   type: THotkeyType;
@@ -718,6 +764,8 @@ export class Hotkey implements IHotkey {
       this.type = 'SCENE_ITEM';
     } else if (this.sceneId) {
       this.type = 'SCENE';
+    } else if (this.isMarker) {
+      this.type = 'MARKER';
     } else {
       this.type = 'GENERAL';
     }
