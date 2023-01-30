@@ -7,7 +7,7 @@ import { TInputType, TSlobsInputProps } from './inputs';
 import Form, { useForm } from './Form';
 import { TInputMetadata } from './metadata';
 
-export type TInputValue = string | number | boolean;
+export type TInputValue = string | number | boolean | IRGBColor;
 
 const componentTable: {
   [k in TInputType]?: React.FunctionComponent<TSlobsInputProps<{}, TInputValue>>;
@@ -20,6 +20,8 @@ const componentTable: {
   switch: inputs.SwitchInput,
   autocomplete: inputs.AutocompleteInput,
   checkboxGroup: inputs.CheckboxGroup,
+  textarea: inputs.TextAreaInput,
+  color: inputs.ColorInput,
 };
 
 interface IFormMetadata {

@@ -1,9 +1,7 @@
 import React from 'react';
 import { IWidgetCommonState, useWidget, WidgetModule } from './common/useWidget';
 import { WidgetLayout } from './common/WidgetLayout';
-import InputWrapper from '../shared/inputs/InputWrapper';
 import { $t } from '../../services/i18n';
-import { SliderInput, SwitchInput } from '../shared/inputs';
 import { metadata } from '../shared/inputs/metadata';
 import FormFactory from 'components-react/shared/inputs/FormFactory';
 
