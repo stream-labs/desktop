@@ -14,7 +14,14 @@ export const CheckboxGroup = InputComponent((p: TCheckboxGroupProps) => {
 
         return (
           <React.Fragment key={inputKey}>
-            <CheckboxInput {...meta} onChange={p.onChange} value={p.values[inputKey] as boolean} />
+            <CheckboxInput
+              {...meta}
+              onChange={p.onChange}
+              value={p.values[inputKey] as boolean}
+              data-name={inputKey}
+              data-value={p.values[inputKey] as boolean}
+              data-role="input"
+            />
           </React.Fragment>
         );
       })}
