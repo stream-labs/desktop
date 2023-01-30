@@ -148,6 +148,14 @@ export class IconLibraryProperties extends ReactComponent {}
 
 @Component({
   props: {
+    name: { default: 'InstalledApps' },
+    wrapperStyles: { default: () => ({ height: '100%' }) },
+  },
+})
+export class InstalledApps extends ReactComponent {}
+
+@Component({
+  props: {
     name: { default: 'LegacyEvents' },
     wrapperStyles: { default: () => ({ height: '100%' }) },
     componentProps: { default: () => ({ onPopout: () => {} }) },
