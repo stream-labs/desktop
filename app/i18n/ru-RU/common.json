@@ -117,7 +117,7 @@
   "Very High": "Очень высокий",
   "Apps": "Приложения",
   "Finish": "Готово",
-  "Get Prime": "Приобрести подписку Prime",
+  "Get Ultra": "Get Ultra",
   "System error message:": "Сообщение о системной ошибке:",
   "List is empty": "Список пуст",
   "Not selected": "Не выбрано",
@@ -139,5 +139,18 @@
   "Click here": "Нажмите здесь",
   "More Info": "Узнать больше",
   "Revert Changes": "Отменить изменения",
-  "Animations": "Анимации"
+  "Animations": "Анимации",
+  "Multistreaming": "Многопоточная трансляция",
+  "Alert Box": "Оповещения",
+  "Widget": "Widget",
+  "Creator Sites": "Авторские сайты",
+  "Apps Manager": "Apps Manager",
+  "Theme Audit": "Theme Audit",
+  "Login": "Логин",
+  "Tip Settings": "Настройки чаевых",
+  "Apps Store Home": "Apps Store Home",
+  "Dashboard Home": "Dashboard Home",
+  "Alert Box Library": "Библиотека оповещений",
+  "Alert Box Settings": "Alert Box Settings",
+  "Upgrade to Ultra": "Upgrade to Ultra"
 }

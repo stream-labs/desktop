@@ -16,5 +16,14 @@
   "Font Size": "Rozmiar czcionki",
   "Muted Chatters": "Wyciszeni czatujący",
   "Hide Commands": "Ukryj polecenia",
-  "Background Color": "Kolor tła"
+  "Background Color": "Kolor tła",
+  "Show Platform Icons": "Show Platform Icons",
+  "Theme": "Motyw",
+  "Badges": "Odznaki",
+  "Extra Emotes": "Dodatkowe emotikony",
+  "Chat Delay": "Chat Delay",
+  "Disable Message Animations": "Disable Message Animations",
+  "Hide Characters": "Hide Characters",
+  "Hide Common Chat Bots": "Ukryj znane boty na czacie",
+  "Hide commands starting with `!`": "Ukryj komendy zaczynające się od \"!\""
 }

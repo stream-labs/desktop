@@ -117,7 +117,7 @@
   "Very High": "Velmi vysoká",
   "Apps": "Aplikace",
   "Finish": "Dokončit",
-  "Get Prime": "Získat Prime",
+  "Get Ultra": "Get Ultra",
   "System error message:": "Zpráva systémové chyby:",
   "List is empty": "Seznam je prázdný",
   "Not selected": "Nevybráno",
@@ -139,5 +139,18 @@
   "Click here": "Klikněte zde",
   "More Info": "Další informace",
   "Revert Changes": "Vrátit změny",
-  "Animations": "Animace"
+  "Animations": "Animace",
+  "Multistreaming": "Multistreaming",
+  "Alert Box": "Alert Box",
+  "Widget": "Widget",
+  "Creator Sites": "Stránky tvůrců",
+  "Apps Manager": "Apps Manager",
+  "Theme Audit": "Theme Audit",
+  "Login": "Přihlášení",
+  "Tip Settings": "Nastavení tipů",
+  "Apps Store Home": "Apps Store Home",
+  "Dashboard Home": "Dashboard Home",
+  "Alert Box Library": "Knihovna Alert Box",
+  "Alert Box Settings": "Alert Box Settings",
+  "Upgrade to Ultra": "Upgrade to Ultra"
 }

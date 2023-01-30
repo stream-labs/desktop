@@ -5,5 +5,6 @@
   "Grant Permissions": "허가",
   "Streamlabs needs additional permissions. Grant permissions in the pop-up dialogs to continue.": "Streamlabs에 추가적인 허가가 필요합니다. 계속하시려면 팝업 대화창을 승인하세요.",
   "Microphone": "마이크",
-  "Webcam": "웹캠"
+  "Webcam": "웹캠",
+  "You've merged a Streamlabs ID to your account, please log back in to ensure you have the right credentials.": "You've merged a Streamlabs ID to your account, please log back in to ensure you have the right credentials."
 }

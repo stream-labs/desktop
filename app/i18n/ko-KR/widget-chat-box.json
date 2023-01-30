@@ -16,5 +16,14 @@
   "Font Size": "폰트 사이즈",
   "Muted Chatters": "음소거된 채터",
   "Hide Commands": "명령 숨김",
-  "Background Color": "백그라운드 색상"
+  "Background Color": "백그라운드 색상",
+  "Show Platform Icons": "Show Platform Icons",
+  "Theme": "테마",
+  "Badges": "배지",
+  "Extra Emotes": "추가 이모티콘",
+  "Chat Delay": "Chat Delay",
+  "Disable Message Animations": "Disable Message Animations",
+  "Hide Characters": "Hide Characters",
+  "Hide Common Chat Bots": "일반 Chatbot 숨김",
+  "Hide commands starting with `!`": "'!'로 시작하는 명령어 숨김"
 }

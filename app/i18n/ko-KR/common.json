@@ -117,7 +117,7 @@
   "Very High": "아주 높음",
   "Apps": "앱",
   "Finish": "종료",
-  "Get Prime": "Prime 이용하기",
+  "Get Ultra": "Get Ultra",
   "System error message:": "시스템 오류 메시지:",
   "List is empty": "빈 목록",
   "Not selected": "선택되지 않음",
@@ -139,5 +139,18 @@
   "Click here": "여기를 클릭",
   "More Info": "추가 정보",
   "Revert Changes": "변경 취소",
-  "Animations": "애니메이션"
+  "Animations": "애니메이션",
+  "Multistreaming": "멀티스트리밍",
+  "Alert Box": "알림 상자",
+  "Widget": "Widget",
+  "Creator Sites": "크리에이터 사이트",
+  "Apps Manager": "Apps Manager",
+  "Theme Audit": "Theme Audit",
+  "Login": "로그인",
+  "Tip Settings": "팁 설정",
+  "Apps Store Home": "Apps Store Home",
+  "Dashboard Home": "Dashboard Home",
+  "Alert Box Library": "알림 상자 라이브러리",
+  "Alert Box Settings": "Alert Box Settings",
+  "Upgrade to Ultra": "Upgrade to Ultra"
 }
