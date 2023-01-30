@@ -89,7 +89,10 @@ export class NicoliveCommentSynthesizerService extends StatefulService<ICommentS
       });
     }
     */
-    this.setState({ ...NicoliveCommentSynthesizerService.initialState, ...this.stateService.state.speechSynthesizerSettings });
+    this.setState({
+      ...NicoliveCommentSynthesizerService.initialState,
+      ...(this.stateService.state.speechSynthesizerSettings ? this.stateService.state.speechSynthesizerSettings : {}),
+    });
 
     this.stateService.updated.subscribe({
       next: persistentState => {

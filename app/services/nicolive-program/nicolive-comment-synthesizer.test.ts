@@ -10,14 +10,20 @@ const setup = createSetupFunction({
       updated: {
         subscribe() { }, // TODO state
       },
+      state: {
+      },
+      updateSpeechSynthesizerSettings() { },
     },
     NVoiceClientService: {
+    },
+    NVoiceCharacterService: {
     },
   },
 });
 
 jest.mock('services/nicolive-program/state', () => ({ NicoliveProgramStateService: {} }));
 jest.mock('services/nicolive-program/n-voice-client', () => ({ NVoiceClientService: {} }));
+jest.mock('services/nvoice-character', () => ({ NVoiceCharacterService: {} }));
 
 beforeEach(() => {
   jest.doMock('services/core/stateful-service');
@@ -39,9 +45,9 @@ test('makeSpeech', async () => {
 
   jest.spyOn(instance as any, 'state', 'get').mockReturnValue({
     enabled: true,
-    pitch: testPitch,
+    rate: testRate,
     webSpeech: {
-      rate: testRate,
+      pitch: testPitch,
     },
     nVoice: {
       maxTime: 4,
@@ -73,9 +79,9 @@ test('makeSpeech', async () => {
   expect(instance.makeSpeech(makeChat('test'))).toEqual({
     text: 'test',
     synthesizer: 'nVoice',
-    pitch: testPitch,
+    rate: testRate,
     webSpeech: {
-      rate: undefined,
+      pitch: undefined,
     },
     nVoice: {
       maxTime: undefined,
@@ -86,7 +92,7 @@ test('makeSpeech', async () => {
 
 test('WebSpeechSynthesizer', async () => {
   setup();
-  const { WebSpeechSynthesizer } = require('./nicolive-comment-synthesizer');
+  const { WebSpeechSynthesizer } = require('./speech/WebSpeechSynthesizer');
 
   jest.mock('./nicolive-comment-synthesizer', () => ({
     ...jest.requireActual('./nicolive-comment-synthesizer'),
