@@ -116,7 +116,7 @@ export class NicoliveCommentSynthesizerService extends StatefulService<ICommentS
 
   private dictionary = new ParaphraseDictionary();
 
-  makeSpeechText(chat: WrappedChat, engine: 'webSpeech' | 'nVoice'): string {
+  makeSpeechText(chat: WrappedChat, engine: SynthesizerId): string {
     if (!chat.value || !chat.value.content) {
       return '';
     }

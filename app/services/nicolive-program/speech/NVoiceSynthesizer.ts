@@ -1,7 +1,7 @@
+import { WaitNotify } from '../../../util/WaitNotify';
 import { NVoiceClientService } from '../n-voice-client';
-import { WaitNotify } from './WaitNotify';
-import { ISpeechSynthesizer } from './ISpeechSynthesizer';
 import { Speech } from '../nicolive-comment-synthesizer';
+import { ISpeechSynthesizer } from './ISpeechSynthesizer';
 
 
 export class NVoiceSynthesizer implements ISpeechSynthesizer {
