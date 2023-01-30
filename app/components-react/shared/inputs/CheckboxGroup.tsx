@@ -9,10 +9,14 @@ type TCheckboxGroupProps = TSlobsInputProps<ICheckboxGroupMetadata, boolean>;
 export const CheckboxGroup = InputComponent((p: TCheckboxGroupProps) => {
   return (
     <InputWrapper label={p.label} rules={p.rules} name={p.name}>
-      {Object.keys(p.children).map(key => {
-        const meta = p.children[key];
+      {Object.keys(p.children).map(inputKey => {
+        const meta = p.children[inputKey];
 
-        return <CheckboxInput key={key} {...meta} onChange={p.onChange} />;
+        return (
+          <React.Fragment key={inputKey}>
+            <CheckboxInput {...meta} onChange={p.onChange} value={p.values[inputKey] as boolean} />
+          </React.Fragment>
+        );
       })}
     </InputWrapper>
   );

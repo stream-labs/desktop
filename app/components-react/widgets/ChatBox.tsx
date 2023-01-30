@@ -3,35 +3,33 @@ import { IWidgetCommonState, useWidget, WidgetModule } from './common/useWidget'
 import { WidgetLayout } from './common/WidgetLayout';
 import { $t } from '../../services/i18n';
 import { metadata } from '../shared/inputs/metadata';
-import FormFactory, { TInputValue } from 'components-react/shared/inputs/FormFactory';
-
-interface IChatBoxSettings extends Dictionary<TInputValue> {
-  theme: string;
-  always_show_messages: boolean;
-  message_hide_delay: number;
-  message_show_delay: number;
-  disable_message_animations: boolean;
-  show_platform_icons: boolean;
-  show_moderator_icons: boolean;
-  show_subscriber_icons: boolean;
-  show_turbo_icons: boolean;
-  show_premium_icons: boolean;
-  show_bits_icons: boolean;
-  show_coin_icons: boolean;
-  show_bttv_emotes: boolean;
-  show_franker_emotes: boolean;
-  show_7tv_emotes: boolean;
-  text_color: string;
-  text_size: number;
-  background_color: string;
-  hide_common_chat_bots: boolean;
-  hide_commands: boolean;
-  muted_chatters: string;
-}
+import FormFactory from 'components-react/shared/inputs/FormFactory';
 
 interface IChatBoxState extends IWidgetCommonState {
   data: {
-    settings: IChatBoxSettings;
+    settings: {
+      theme: string;
+      always_show_messages: boolean;
+      message_hide_delay: number;
+      message_show_delay: number;
+      disable_message_animations: boolean;
+      show_platform_icons: boolean;
+      show_moderator_icons: boolean;
+      show_subscriber_icons: boolean;
+      show_turbo_icons: boolean;
+      show_premium_icons: boolean;
+      show_bits_icons: boolean;
+      show_coin_icons: boolean;
+      show_bttv_emotes: boolean;
+      show_franker_emotes: boolean;
+      show_7tv_emotes: boolean;
+      text_color: string;
+      text_size: number;
+      background_color: string;
+      hide_common_chat_bots: boolean;
+      hide_commands: boolean;
+      muted_chatters: string;
+    };
   };
 }
 
@@ -69,7 +67,7 @@ export class ChatBoxModule extends WidgetModule<IChatBoxState> {
         min: 0,
         max: 6000,
       }),
-      disable_message_animations: metadata.bool({ label: $t('Disable Message Animations') }),
+      disable_message_animations: metadata.switch({ label: $t('Disable Message Animations') }),
       show_platform_icons: metadata.switch({ label: $t('Show Platform Icons') }),
       show_badges: {
         type: 'checkboxGroup',
@@ -115,8 +113,13 @@ export class ChatBoxModule extends WidgetModule<IChatBoxState> {
     };
   }
 
-  protected patchBeforeSend(settings: IChatBoxState) {
-    // settings.
+  // The server sends and recieves these duration fields at different precision
+  protected patchBeforeSend(settings: IChatBoxState['data']['settings']) {
+    return {
+      ...settings,
+      message_hide_delay: Math.floor(settings.message_hide_delay / 1000),
+      message_show_delay: Math.floor(settings.message_show_delay / 1000),
+    };
   }
 }
 

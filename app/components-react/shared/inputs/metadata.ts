@@ -1,4 +1,5 @@
 import { Rule } from 'antd/lib/form';
+import { TInputValue } from './FormFactory';
 
 /**
  * Metadata generator for inputs
@@ -60,6 +61,7 @@ interface ITextMetadata extends IBaseMetadata {
 
 export interface ICheckboxGroupMetadata extends IBaseMetadata {
   children: Dictionary<ITextBoolMetadata>;
+  values: Dictionary<TInputValue>;
 }
 
 interface INumberMetadata extends IBaseMetadata {

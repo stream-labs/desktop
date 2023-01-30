@@ -75,6 +75,7 @@ function FormInput(p: {
         {...p.metadata}
         name={p.id}
         value={p.values[p.id]}
+        values={type === 'checkboxGroup' && p.values}
         onChange={p.metadata.onChange || p.onChange(p.id)}
       />
       {!!children &&

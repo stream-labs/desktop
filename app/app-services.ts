@@ -96,7 +96,6 @@ export { GuestCamService } from 'services/guest-cam';
 // WIDGETS
 export { WidgetSource, WidgetsService } from './services/widgets';
 export { BitGoalService } from 'services/widgets/settings/bit-goal';
-export { ChatBoxService } from 'services/widgets/settings/chat-box';
 export { DonationGoalService } from 'services/widgets/settings/donation-goal';
 export { FollowerGoalService } from 'services/widgets/settings/follower-goal';
 export { StarsGoalService } from 'services/widgets/settings/stars-goal';
