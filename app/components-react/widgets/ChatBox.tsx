@@ -3,26 +3,41 @@ import { IWidgetCommonState, useWidget, WidgetModule } from './common/useWidget'
 import { WidgetLayout } from './common/WidgetLayout';
 import { $t } from '../../services/i18n';
 import { metadata } from '../shared/inputs/metadata';
-import FormFactory from 'components-react/shared/inputs/FormFactory';
+import FormFactory, { TInputValue } from 'components-react/shared/inputs/FormFactory';
+
+interface IChatBoxSettings extends Dictionary<TInputValue> {
+  theme: string;
+  always_show_messages: boolean;
+  message_hide_delay: number;
+  message_show_delay: number;
+  disable_message_animations: boolean;
+  show_platform_icons: boolean;
+  show_moderator_icons: boolean;
+  show_subscriber_icons: boolean;
+  show_turbo_icons: boolean;
+  show_premium_icons: boolean;
+  show_bits_icons: boolean;
+  show_coin_icons: boolean;
+  show_bttv_emotes: boolean;
+  show_franker_emotes: boolean;
+  show_7tv_emotes: boolean;
+  text_color: string;
+  text_size: number;
+  background_color: string;
+  hide_common_chat_bots: boolean;
+  hide_commands: boolean;
+  muted_chatters: string;
+}
 
 interface IChatBoxState extends IWidgetCommonState {
   data: {
-    settings: {
-      combo_count: number;
-      combo_required: boolean;
-      combo_timeframe: number; // milliseconds
-      emote_animation_duration: number; // milliseconds
-      emote_scale: number;
-      enabled: boolean;
-      ignore_duplicates: boolean;
-    };
+    settings: IChatBoxSettings;
   };
 }
 
 export function ChatBox() {
   const { isLoading, settings, meta, updateSetting } = useChatBox();
 
-  // use 1 column layout
   return (
     <WidgetLayout>
       {!isLoading && <FormFactory metadata={meta} values={settings} onChange={updateSetting} />}
@@ -34,6 +49,7 @@ export class ChatBoxModule extends WidgetModule<IChatBoxState> {
   get meta() {
     return {
       theme: metadata.list({
+        label: $t('Theme'),
         options: [
           { label: 'Clean', value: 'clean' },
           { label: 'Boxed', value: 'boxed' },
@@ -42,17 +58,18 @@ export class ChatBoxModule extends WidgetModule<IChatBoxState> {
           { label: 'Chunky', value: 'chunky' },
         ],
       }),
-      always_show_messages: metadata.bool({ label: $t('Always Show Messages') }),
-      message_hide_delay: metadata.slider({
+      always_show_messages: metadata.switch({ label: $t('Always Show Messages') }),
+      message_hide_delay: metadata.seconds({
+        label: $t('Hide Delay'),
         min: 0,
-        max: 200,
-        step: 1,
+        max: 200000,
       }),
-      message_show_delay: metadata.slider({
+      message_show_delay: metadata.seconds({
+        label: $t('Chat Delay'),
         min: 0,
-        max: 6,
-        step: 1,
+        max: 6000,
       }),
+      disable_message_animations: metadata.bool({ label: $t('Disable Message Animations') }),
       show_platform_icons: metadata.switch({ label: $t('Show Platform Icons') }),
       show_badges: {
         type: 'checkboxGroup',
@@ -80,15 +97,26 @@ export class ChatBoxModule extends WidgetModule<IChatBoxState> {
         tooltip: $t('A hex code for the base text color.'),
       }),
       text_size: metadata.fontSize({ label: $t('Font Size'), min: 10, max: 80 }),
-      muted_chatters: metadata.textarea({ label: $t('Muted Chatters') }),
-      hide_commands: metadata.switch({ label: $t('Hide Commands') }),
       background_color: metadata.color({
         label: $t('Background Color'),
         tooltip: $t(
           'A hex code for the widget background. This is for preview purposes only. It will not be shown in your stream.',
         ),
       }),
+      hide_characters: {
+        type: 'checkboxGroup',
+        label: $t('Hide Characters'),
+        children: {
+          hide_common_chat_bots: metadata.bool({ label: $t('Hide Common Chat Bots') }),
+          hide_commands: metadata.bool({ label: $t('Hide commands starting with `!`') }),
+        },
+      },
+      muted_chatters: metadata.textarea({ label: $t('Muted Chatters') }),
     };
+  }
+
+  protected patchBeforeSend(settings: IChatBoxState) {
+    // settings.
   }
 }
 
