@@ -97,10 +97,6 @@ export class CopyNodesCommand extends Command {
     );
     scene.setNodesOrder(order.concat(initialNodeOrder));
 
-    if (this.dualOutputService.views.dualOutputMode) {
-      this.dualOutputService.actions.setNodeMap(scene.id, this.idsMap);
-    }
-
     return insertedNodes;
   }
 

@@ -140,6 +140,7 @@ export interface ISceneItemNode {
   sceneNodeType: TSceneNodeType;
   parentId?: string;
   isRemoved?: boolean;
+  output?: obs.IVideo;
 }
 
 export interface ISceneItemFolder extends ISceneItemNode {
@@ -182,6 +183,12 @@ class ScenesViews extends ViewHandler<IScenesState> {
       if (sceneItem) return sceneItem;
     }
     return null;
+  }
+
+  getSceneItemsBySceneId(sceneId: string): SceneItem[] {
+    const scene: Scene = this.scenes[sceneId];
+    if (!scene) return null;
+    return scene.getItems();
   }
 
   /**
