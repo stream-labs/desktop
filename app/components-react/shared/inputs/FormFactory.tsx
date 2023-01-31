@@ -17,6 +17,7 @@ const componentTable: {
   slider: inputs.SliderInput,
   checkbox: inputs.CheckboxInput,
   list: inputs.ListInput,
+  switch: inputs.SwitchInput,
   autocomplete: inputs.AutocompleteInput,
 };
 
