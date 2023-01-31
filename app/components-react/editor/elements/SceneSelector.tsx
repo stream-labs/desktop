@@ -116,7 +116,7 @@ function SceneSelector() {
         EditorCommandsService.actions.executeCommand('RemoveSceneCommand', scene.id);
 
         if (DualOutputService.views.hasDualOutputScenes) {
-          DualOutputService.actions.destroyOutputScenes(['horizontal', 'vertical']);
+          DualOutputService.actions.destroySceneNodes(['horizontal', 'vertical']);
         }
       });
   }

@@ -186,7 +186,7 @@ class ScenesViews extends ViewHandler<IScenesState> {
   }
 
   getSceneItemsBySceneId(sceneId: string): SceneItem[] {
-    const scene: Scene = this.scenes[sceneId];
+    const scene: Scene = this.getScene(sceneId);
     if (!scene) return null;
     return scene.getItems();
   }

@@ -315,7 +315,7 @@ class SourceSelectorModule {
   }
 
   get isDualOutputActive() {
-    return this.dualOutputService.state.dualOutputMode;
+    return this.dualOutputService.views.showDualOutputDisplays;
   }
 
   watchSelected = injectWatch(() => this.lastSelectedId, this.expandSelectedFolders);
@@ -583,7 +583,9 @@ const TreeNode = React.forwardRef(
         {p.canShowActions && (
           <>
             {p.isGuestCamActive && <i className="fa fa-signal" />}
-            {p.isDualOutputActive && <DualOutputSourceSelector nodeId={p.id} />}
+            {p.isDualOutputActive && (
+              <DualOutputSourceSelector nodeId={p.id} toggleVisibility={p.toggleVisibility} />
+            )}
             {p.selectiveRecordingEnabled && (
               <Tooltip title={selectiveRecordingMetadata().tooltip} placement="left">
                 <i
