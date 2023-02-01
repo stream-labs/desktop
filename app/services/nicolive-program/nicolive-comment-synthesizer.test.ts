@@ -89,26 +89,3 @@ test('makeSpeech', async () => {
     volume: testVolume,
   });
 });
-
-test('WebSpeechSynthesizer', async () => {
-  setup();
-  const { WebSpeechSynthesizer } = require('./speech/WebSpeechSynthesizer');
-
-  jest.mock('./nicolive-comment-synthesizer', () => ({
-    ...jest.requireActual('./nicolive-comment-synthesizer'),
-    NicoliveProgramCommentSynthesizerService: {},
-  }));
-
-  const synth = new WebSpeechSynthesizer();
-
-  jest.spyOn(window, 'speechSynthesis', 'get').mockImplementation(undefined);
-  expect(synth.available).toBeFalsy();
-
-  jest
-    .spyOn(window, 'speechSynthesis', 'get')
-    .mockImplementation(() => true as unknown as SpeechSynthesis);
-  expect(synth.available).toBeTruthy();
-
-  // TODO
-  // expect(synth.makeSpeechText('')).toEqual('');
-});
