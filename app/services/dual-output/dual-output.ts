@@ -112,9 +112,8 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
   async toggleDualOutputMode(status: boolean) {
     try {
       if (!status) {
-        // const destroyed = this.destroySceneNodes(['horizontal', 'vertical'], 'horizontal');
-        this.forceResetOfScene('horizontal');
-        const destroyed = false; // temp
+        const destroyed = this.destroySceneNodes(['horizontal', 'vertical'], 'horizontal');
+
         if (destroyed) {
           this.TOGGLE_DUAL_OUTPUT_MODE(status);
           return true;
@@ -253,22 +252,19 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
   }
 
   forceResetOfScene(display: TDisplayType) {
-    console.log('force reset');
-    const displayContext = this.videoSettingsService.contexts[display];
+    const nodesMap = this.state.nodeMaps[display];
+    const nodesToReassign = Object.keys(nodesMap);
 
     const { activeSceneId } = this.scenesService.views;
 
     const sceneNodes = this.scenesService.views.getSceneItemsBySceneId(activeSceneId);
-    console.log('all sceneNodes', sceneNodes);
+
     sceneNodes.forEach((sceneItem: SceneItem) => {
-      console.log('sceneItem ', sceneItem);
-      if (sceneItem.output === displayContext) {
-        console.log('forcing ', sceneItem);
+      if (nodesToReassign.includes(sceneItem.id)) {
         const setting: IPartialSettings = { output: this.videoSettingsService.contexts.default };
         sceneItem.setSettings(setting);
       } else {
-        console.log('would be removing');
-        // sceneItem.remove();
+        sceneItem.remove();
       }
     });
   }
@@ -281,7 +277,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
 
         // if the scene nodes are not successfully removed by iterating over the node maps
         // force the scene to remove all dual output nodes by iterating over the scene items
-        // if (!destroyed) this.forceResetOfScene('horizontal');
+        if (!destroyed) this.forceResetOfScene('horizontal');
       } catch (error: unknown) {
         console.error('Error shutting down Dual Output Service ', error);
       }
