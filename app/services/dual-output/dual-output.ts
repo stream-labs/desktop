@@ -46,6 +46,19 @@ class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
     return this.state.dualOutputMode && this.hasDualOutputScenes;
   }
 
+  get dualOutputNodeIds() {
+    return this.getNodeIds(['vertical']);
+  }
+
+  getNodeIds(displays: TDisplayType[]) {
+    return displays.reduce((ids: string[], display: TDisplayType) => {
+      const nodeMap = this.state.nodeMaps[display];
+      const aggregatedIds = Object.values(nodeMap).concat(ids);
+
+      return aggregatedIds;
+    }, []);
+  }
+
   getPlatformDisplay(platform: TPlatform) {
     return this.state.platformSettings[platform].setting;
   }

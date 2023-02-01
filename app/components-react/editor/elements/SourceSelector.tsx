@@ -74,6 +74,7 @@ class SourceSelectorModule {
         if (sceneNode.isFolder) {
           children = getTreeNodes(nodeData.filter(n => n.parentId === sceneNode.id));
         }
+
         return {
           title: (
             <TreeNode
@@ -108,7 +109,13 @@ class SourceSelectorModule {
   }
 
   get nodeData(): ISourceMetadata[] {
-    return this.scene.getNodes().map(node => {
+    const nodes = !this.isDualOutputActive
+      ? this.scene.getNodes()
+      : this.scene
+          .getNodes()
+          .filter(node => !this.dualOutputService.views.dualOutputNodeIds.includes(node.id));
+
+    return nodes.map(node => {
       const itemsForNode = this.getItemsForNode(node.id);
       const isVisible = itemsForNode.some(i => i.visible);
       const isLocked = itemsForNode.every(i => i.locked);
