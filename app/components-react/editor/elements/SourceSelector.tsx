@@ -39,7 +39,7 @@ interface ISourceMetadata {
   parentId?: string;
 }
 
-class SourceSelectorModule {
+export class SourceSelectorModule {
   private scenesService = inject(ScenesService);
   private sourcesService = inject(SourcesService);
   private widgetsService = inject(WidgetsService);
@@ -109,6 +109,7 @@ class SourceSelectorModule {
   }
 
   get nodeData(): ISourceMetadata[] {
+    // filter out scene items created for dual output mode
     const nodes = !this.isDualOutputActive
       ? this.scene.getNodes()
       : this.scene
@@ -590,9 +591,7 @@ const TreeNode = React.forwardRef(
         {p.canShowActions && (
           <>
             {p.isGuestCamActive && <i className="fa fa-signal" />}
-            {p.isDualOutputActive && (
-              <DualOutputSourceSelector nodeId={p.id} toggleVisibility={p.toggleVisibility} />
-            )}
+            {p.isDualOutputActive && <DualOutputSourceSelector nodeId={p.id} />}
             {p.selectiveRecordingEnabled && (
               <Tooltip title={selectiveRecordingMetadata().tooltip} placement="left">
                 <i
