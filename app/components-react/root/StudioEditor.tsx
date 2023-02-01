@@ -177,7 +177,6 @@ export default function StudioEditor() {
                 <Display
                   drawUI={true}
                   paddingSize={10}
-                  paddingColor={{ r: 0, g: 51, b: 255 }} // @@@ temp
                   onOutputResize={eventHandlers.onOutputResize}
                   renderingMode={ERenderingMode.OBS_MAIN_RENDERING}
                   sourceId={v.studioMode ? studioModeTransitionName : v.activeSceneId}
@@ -186,8 +185,7 @@ export default function StudioEditor() {
             )}
             {!v.showDualOutputDisplays && v.studioMode && (
               <div className={styles.studioModeDisplayContainer}>
-                <Display paddingSize={10} paddingColor={{ r: 0, g: 255, b: 0 }} />
-                {/* @@@ TEMP PADDING COLOR */}
+                <Display paddingSize={10} />
               </div>
             )}
             {v.showDualOutputDisplays && <DualOutputDisplay eventHandlers={eventHandlers} />}

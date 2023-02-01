@@ -42,7 +42,6 @@ export default function DualOutputDisplay(p: { eventHandlers: IDisplayEventHandl
           type="horizontal"
           drawUI={true}
           paddingSize={10}
-          paddingColor={{ r: 255, g: 238, b: 0 }} // @@@ temp
           onOutputResize={p.eventHandlers.onOutputResize}
           renderingMode={ERenderingMode.OBS_MAIN_RENDERING}
         />
@@ -62,7 +61,6 @@ export default function DualOutputDisplay(p: { eventHandlers: IDisplayEventHandl
           type="vertical"
           drawUI={true}
           paddingSize={10}
-          paddingColor={{ r: 255, g: 0, b: 0 }} // @@@ temp
           onOutputResize={p.eventHandlers.onOutputResize}
           renderingMode={ERenderingMode.OBS_MAIN_RENDERING}
         />

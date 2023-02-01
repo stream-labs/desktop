@@ -12,7 +12,6 @@ interface DisplayProps {
   onOutputResize?: (region: IRectangle) => void;
   clickHandler?: (event: React.MouseEvent) => void;
   style?: React.CSSProperties;
-  paddingColor?: IRGBColor; // @@@ temp
   type?: TDisplayType;
 }
 
@@ -55,8 +54,7 @@ export default function Display(props: DisplayProps) {
     obsDisplay.current = new OBSDisplay(displayId, {
       sourceId: p.sourceId,
       paddingSize: p.paddingSize,
-      paddingColor: p.paddingColor, // @@@ temp
-      // paddingColor: v.paddingColor, // @@@ temp
+      paddingColor: v.paddingColor,
       renderingMode: p.renderingMode,
       type: p.type,
     });
