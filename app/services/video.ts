@@ -433,7 +433,6 @@ export class VideoService extends Service {
     if (this.dualOutputService.views.dualOutputMode) {
       const context = this.videoSettingsService.contexts[type];
       if (context) {
-        console.log('creating display for context ', context);
         if (sourceId) {
           obs.NodeObs.OBS_content_createSourcePreviewDisplay(
             electronWindow.getNativeWindowHandle(),

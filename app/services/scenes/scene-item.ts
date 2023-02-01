@@ -63,6 +63,8 @@ export class SceneItem extends SceneItemNode {
 
   sceneNodeType: TSceneNodeType = 'item';
 
+  output?: obs.IVideo;
+
   // Some computed attributes
 
   get scaledWidth(): number {
@@ -135,6 +137,7 @@ export class SceneItem extends SceneItemNode {
       scaleFilter: this.scaleFilter,
       blendingMode: this.blendingMode,
       blendingMethod: this.blendingMethod,
+      output: this.output,
     };
   }
 
@@ -213,6 +216,10 @@ export class SceneItem extends SceneItemNode {
 
     if (changed.blendingMethod !== void 0) {
       this.getObsSceneItem().blendingMethod = newSettings.blendingMethod;
+    }
+
+    if (changed.output !== void 0) {
+      this.getObsSceneItem().video = newSettings.output;
     }
 
     this.UPDATE({ sceneItemId: this.sceneItemId, ...changed });

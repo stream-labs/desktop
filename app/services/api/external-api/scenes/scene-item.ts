@@ -12,6 +12,7 @@ import { Source, SourcesService } from 'services/api/external-api/sources';
 import { getExternalNodeModel, ISceneNodeModel, SceneNode } from './scene-node';
 import Utils from '../../../utils';
 import { Inject, ServiceHelper } from '../../../core';
+import * as obs from 'obs-studio-node';
 
 /**
  * Serialized representation of {@link SceneItem}.
@@ -35,6 +36,7 @@ export interface ISceneItemSettings {
   scaleFilter: EScaleType;
   blendingMode: EBlendingMode;
   blendingMethod: EBlendingMethod;
+  output?: obs.IVideo;
 }
 
 /**
@@ -169,6 +171,7 @@ export class SceneItem extends SceneNode implements ISceneItemActions, ISceneIte
   blendingMode: EBlendingMode;
   blendingMethod: EBlendingMethod;
   resourceId: string;
+  output?: obs.IVideo;
 
   constructor(public sceneId: string, public nodeId: string, sourceId: string) {
     super(sceneId, nodeId);
@@ -270,5 +273,6 @@ export function getExternalSceneItemModel(
     scaleFilter: internalModel.scaleFilter,
     blendingMode: internalModel.blendingMode,
     blendingMethod: internalModel.blendingMethod,
+    output: internalModel.output,
   };
 }

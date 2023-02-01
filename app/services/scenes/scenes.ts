@@ -83,6 +83,7 @@ export interface ISceneItemSettings {
   scaleFilter: EScaleType;
   blendingMode: EBlendingMode;
   blendingMethod: EBlendingMethod;
+  output?: obs.IVideo;
 }
 
 export interface IPartialSettings {
@@ -94,6 +95,7 @@ export interface IPartialSettings {
   scaleFilter?: EScaleType;
   blendingMode?: EBlendingMode;
   blendingMethod?: EBlendingMethod;
+  output?: obs.IVideo; // for obs.ISceneItem, this property is video
 }
 
 export interface ISceneItem extends ISceneItemSettings, ISceneItemNode {
@@ -104,6 +106,7 @@ export interface ISceneItem extends ISceneItemSettings, ISceneItemNode {
   scaleFilter: EScaleType;
   blendingMode: EBlendingMode;
   blendingMethod: EBlendingMethod;
+  output?: obs.IVideo; // for obs.ISceneItem, this property is video
 }
 
 export interface ISceneItemActions {
@@ -140,7 +143,7 @@ export interface ISceneItemNode {
   sceneNodeType: TSceneNodeType;
   parentId?: string;
   isRemoved?: boolean;
-  output?: obs.IVideo;
+  // video?: obs.IVideo;
 }
 
 export interface ISceneItemFolder extends ISceneItemNode {
