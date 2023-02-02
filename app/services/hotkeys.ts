@@ -534,14 +534,12 @@ export class HotkeysService extends StatefulService<IHotkeysServiceState> {
   // Only works for general hotkeys for now
   applyGeneralHotkey(hotkey: IHotkey) {
     const set = this.getHotkeysSet();
-    console.log(set);
     set.general.forEach(h => {
       if (h.actionName === hotkey.actionName) {
         h.bindings = hotkey.bindings;
       }
     });
     this.applyHotkeySet(set);
-    console.log(set);
   }
 
   getHotkeys(): Hotkey[] {
@@ -606,6 +604,7 @@ export class HotkeysService extends StatefulService<IHotkeysServiceState> {
     Object.keys(hotkeySet.sources).forEach(sourceId =>
       hotkeys.push(...hotkeySet.sources[sourceId]),
     );
+    hotkeys.push(...hotkeySet.markers);
     this.setHotkeys(hotkeys);
     this.bindHotkeys();
   }
@@ -630,6 +629,10 @@ export class HotkeysService extends StatefulService<IHotkeysServiceState> {
 
   getSceneItemHotkeys(sceneItemId: string): Hotkey[] {
     return this.getHotkeys().filter(hotkey => hotkey.sceneItemId === sceneItemId);
+  }
+
+  getMarkerHotkeys(): Hotkey[] {
+    return this.getHotkeys().filter(hotkey => hotkey.type === 'MARKER');
   }
 
   unregisterAll() {
