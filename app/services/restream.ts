@@ -219,6 +219,7 @@ export class RestreamService extends StatefulService<IRestreamState> {
     await this.createTargets(newTargets);
   }
 
+  // %%% CAUSING PROBLEMS VVV
   // async setupAdvancedIngest() {
   //   const ingest = (await this.fetchIngest()).server;
   //   // We need to move OBS to custom ingest mode before we can set the server
@@ -245,33 +246,7 @@ export class RestreamService extends StatefulService<IRestreamState> {
   //   verticalStream.outputHeight = this.videoSettingsService.contexts.vertical.video.baseHeight;
   // }
 
-  // async setupAdvancedTargets() {
-  //   // // delete existing targets
-  //   const targets = await this.fetchTargets();
-  //   const promises = targets.map(t => this.deleteTarget(t.id));
-  //   await Promise.all(promises);
-  //   // // setup new targets
-  //   const newTargets = [
-  //     ...this.streamInfo.enabledPlatforms.map(platform => {
-  //       return {
-  //         platform: platform as TPlatform,
-  //         streamKey: getPlatformService(platform).state.streamKey,
-  //         video: getPlatformService(platform).state.settings.video,
-  //       };
-  //     }),
-  //     ...this.streamInfo.savedSettings.customDestinations
-  //       .filter(dest => dest.enabled)
-  //       .map(dest => ({ platform: 'relay' as 'relay', streamKey: `${dest.url}${dest.streamKey}` })),
-  //   ];
-  //   // // treat tiktok as a custom destination
-  //   // const tikTokTarget = newTargets.find(t => t.platform === 'tiktok');
-  //   // if (tikTokTarget) {
-  //   //   const ttSettings = this.tiktokService.state.settings;
-  //   //   tikTokTarget.platform = 'relay';
-  //   //   tikTokTarget.streamKey = `${ttSettings.serverUrl}/${ttSettings.streamKey}`;
-  //   // }
-  //   await this.createTargets(newTargets);
-  // }
+  // %%% CAUSING PROBLEMS ^^^
 
   checkStatus(): Promise<boolean> {
     const url = `https://${this.host}/api/v1/rst/util/status`;
