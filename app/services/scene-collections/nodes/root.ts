@@ -9,18 +9,16 @@ import { StreamingService } from 'services/streaming';
 import { OS } from 'util/operating-systems';
 import { GuestCamNode } from './guest-cam';
 import { VideoSettingsService } from 'services/settings-v2/video';
+import { DualOutputService } from 'services/dual-output';
 
 interface ISchema {
   baseResolution: {
     width: number;
     height: number;
   };
-  // contexts: {
-  //   default: IVideoSettingsFormatted;
-  //   horizontal: IVideoSettingsFormatted;
-  //   vertical: IVideoSettingsFormatted;
-  // };
+
   selectiveRecording?: boolean;
+  dualOutputMode?: boolean;
   sources: SourcesNode;
   scenes: ScenesNode;
   hotkeys?: HotkeysNode;
@@ -38,6 +36,7 @@ export class RootNode extends Node<ISchema, {}> {
   @Inject() videoService: VideoService;
   @Inject() streamingService: StreamingService;
   @Inject() videoSettingsService: VideoSettingsService;
+  @Inject() dualOutputService: DualOutputService;
 
   async save(): Promise<void> {
     const sources = new SourcesNode();
@@ -65,6 +64,7 @@ export class RootNode extends Node<ISchema, {}> {
       // },
       baseResolution: this.videoService.baseResolution,
       selectiveRecording: this.streamingService.state.selectiveRecording,
+      dualOutputMode: this.dualOutputService.state.dualOutputMode,
       operatingSystem: process.platform as OS,
     };
   }
@@ -82,6 +82,7 @@ export class RootNode extends Node<ISchema, {}> {
     // this.videoService.setContexts(this.data.contexts);
     this.videoService.setBaseResolution(this.data.baseResolution);
     this.streamingService.setSelectiveRecording(!!this.data.selectiveRecording);
+    this.streamingService.setDualOutputMode(this.data.dualOutputMode);
 
     await this.data.transitions.load();
     await this.data.sources.load({});

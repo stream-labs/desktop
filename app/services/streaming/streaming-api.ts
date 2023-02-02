@@ -93,6 +93,7 @@ export interface IStreamingServiceState {
   replayBufferStatus: EReplayBufferState;
   replayBufferStatusTime: string;
   selectiveRecording: boolean;
+  dualOutputMode: boolean;
   info: IStreamInfo;
 }
 

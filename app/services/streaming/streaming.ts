@@ -107,6 +107,7 @@ export class StreamingService
     replayBufferStatus: EReplayBufferState.Offline,
     replayBufferStatusTime: new Date().toISOString(),
     selectiveRecording: false,
+    dualOutputMode: false,
     info: {
       settings: null,
       lifecycle: 'empty',
@@ -605,6 +606,15 @@ export class StreamingService
 
     this.SET_SELECTIVE_RECORDING(enabled);
     obs.Global.multipleRendering = enabled;
+  }
+
+  setDualOutputMode(enabled: boolean) {
+    // Dual output cannot be toggled while live
+    if (this.state.streamingStatus !== EStreamingState.Offline) return;
+
+    if (enabled) this.usageStatisticsService.recordFeatureUsage('DualOutput');
+
+    this.SET_DUAL_OUTPUT_MODE(enabled);
   }
 
   /**
@@ -1229,6 +1239,11 @@ export class StreamingService
   @mutation()
   private SET_SELECTIVE_RECORDING(enabled: boolean) {
     this.state.selectiveRecording = enabled;
+  }
+
+  @mutation()
+  private SET_DUAL_OUTPUT_MODE(enabled: boolean) {
+    this.state.dualOutputMode = enabled;
   }
 
   @mutation()

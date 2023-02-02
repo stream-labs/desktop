@@ -8,12 +8,13 @@ import {
 } from './dual-output-data';
 import { ScenesService, SceneItem, IPartialSettings } from 'services/scenes';
 import { TDisplayType, VideoSettingsService } from 'services/settings-v2/video';
+import { StreamingService } from 'services/streaming';
 import { SceneCollectionsService } from 'services/scene-collections';
-import { RemoveItemCommand } from 'services/editor-commands/commands';
 import { TPlatform } from 'services/platforms';
 import { Subject } from 'rxjs';
 
 interface IDualOutputServiceState {
+  convertedDefaultDisplay: TDisplayType;
   platformSettings: TDualOutputPlatformSettings;
   dualOutputMode: boolean;
   nodeMaps: { [display in TDisplayType as string]: Dictionary<string> };
@@ -24,6 +25,10 @@ class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
 
   get dualOutputMode() {
     return this.state.dualOutputMode;
+  }
+
+  get convertedDefaultDisplay() {
+    return this.state.convertedDefaultDisplay;
   }
 
   get platformSettings() {
@@ -85,8 +90,10 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
   @Inject() private scenesService: ScenesService;
   @Inject() private sceneCollectionsService: SceneCollectionsService;
   @Inject() private videoSettingsService: VideoSettingsService;
+  @Inject() private streamingService: StreamingService;
 
   static defaultState: IDualOutputServiceState = {
+    convertedDefaultDisplay: 'horizontal',
     platformSettings: DualOutputPlatformSettings,
     dualOutputMode: false,
     nodeMaps: null,
@@ -109,14 +116,14 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
 
     this.scenesService.sceneRemoved.subscribe(() => {
       if (this.state.dualOutputMode) {
-        this.destroySceneNodes(['horizontal', 'vertical'], 'horizontal');
+        this.setDualOutputMode(false);
       }
     });
 
     this.scenesService.sceneSwitched.subscribe(() => {
       if (this.state.dualOutputMode && this.views.hasDualOutputScenes) {
         console.log('switching');
-        this.destroySceneNodes(['horizontal', 'vertical'], 'horizontal');
+        this.restoreScene(this.state.convertedDefaultDisplay);
         this.mapSceneNodes(['horizontal', 'vertical'], this.scenesService.views.activeSceneId);
       }
     });
@@ -125,16 +132,13 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
   async toggleDualOutputMode(status: boolean) {
     try {
       if (!status) {
-        const destroyed = this.destroySceneNodes(['horizontal', 'vertical'], 'horizontal');
-
-        if (destroyed) {
-          this.TOGGLE_DUAL_OUTPUT_MODE(status);
-          return true;
-        }
+        this.restoreScene(this.state.convertedDefaultDisplay);
+        this.setDualOutputMode(status);
+        return true;
       } else {
         const created = this.mapSceneNodes(['horizontal', 'vertical']);
         if (created) {
-          this.TOGGLE_DUAL_OUTPUT_MODE(status);
+          this.setDualOutputMode(status);
           return true;
         }
       }
@@ -143,6 +147,11 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
       console.error('Error toggling Dual Output mode: ', error);
       return false;
     }
+  }
+
+  setDualOutputMode(status: boolean) {
+    this.TOGGLE_DUAL_OUTPUT_MODE(status);
+    this.streamingService.actions.setDualOutputMode(!this.streamingService.state.dualOutputMode);
   }
 
   mapSceneNodes(displays: TDisplayType[], sceneId?: string) {
@@ -262,6 +271,28 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
     } else {
       return false;
     }
+  }
+
+  restoreScene(display: TDisplayType) {
+    if (this.state.nodeMaps) {
+      const nodesMap = this.state.nodeMaps[display];
+      const nodesToReassign = Object.keys(nodesMap);
+
+      const sceneNodes = this.scenesService.views.getSceneItemsBySceneId(
+        this.scenesService.views.activeSceneId,
+      );
+
+      sceneNodes.forEach((sceneItem: SceneItem) => {
+        if (nodesToReassign.includes(sceneItem.id)) {
+          const setting: IPartialSettings = { output: this.videoSettingsService.contexts.default };
+          sceneItem.setSettings(setting);
+        } else {
+          sceneItem.remove();
+        }
+      });
+    }
+
+    this.state.nodeMaps = null;
   }
 
   forceResetOfScene(display: TDisplayType) {
