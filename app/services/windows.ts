@@ -41,13 +41,13 @@ import {
   PlatformAppPopOut,
   RecentEventsWindow,
   RecordingHistory,
+  EditTransform,
   Blank,
 } from 'components/shared/ReactComponentList';
 
 import SourcePropertiesDeprecated from 'components/windows/SourceProperties.vue';
 import Troubleshooter from 'components/windows/Troubleshooter.vue';
 import GameOverlayEventFeed from 'components/windows/GameOverlayEventFeed';
-import EditTransform from 'components/windows/EditTransform';
 import EventFilterMenu from 'components/windows/EventFilterMenu';
 import OverlayPlaceholder from 'components/windows/OverlayPlaceholder';
 import BrowserSourceInteraction from 'components/windows/BrowserSourceInteraction';
@@ -60,7 +60,6 @@ import SupporterGoal from 'components/widgets/goal/SupporterGoal';
 import SubscriberGoal from 'components/widgets/goal/SubscriberGoal';
 import FollowerGoal from 'components/widgets/goal/FollowerGoal';
 import CharityGoal from 'components/widgets/goal/CharityGoal';
-import ChatBox from 'components/widgets/ChatBox.vue';
 import StreamBoss from 'components/widgets/StreamBoss.vue';
 import Credits from 'components/widgets/Credits.vue';
 import EventList from 'components/widgets/EventList.vue';
@@ -122,7 +121,6 @@ export function getComponents() {
     SubscriberGoal,
     SuperchatGoal,
     CharityGoal,
-    ChatBox,
     Credits,
     EventList,
     TipJar,

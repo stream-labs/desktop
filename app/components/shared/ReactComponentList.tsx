@@ -102,6 +102,14 @@ export class EditStreamWindow extends ReactComponent {}
 
 @Component({
   props: {
+    name: { default: 'EditTransform' },
+    wrapperStyles: { default: () => ({ height: '100%' }) },
+  },
+})
+export class EditTransform extends ReactComponent {}
+
+@Component({
+  props: {
     name: { default: 'GoLiveWindow' },
     wrapperStyles: { default: () => ({ height: '100%' }) },
   },
