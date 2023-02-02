@@ -1,14 +1,34 @@
 import { WaitNotify } from '../../../util/WaitNotify';
-import { NVoiceClientService } from '../n-voice-client';
 import { Speech } from '../nicolive-comment-synthesizer';
 import { ISpeechSynthesizer } from './ISpeechSynthesizer';
 
 
-export class NVoiceSynthesizer implements ISpeechSynthesizer {
-  constructor(private nVoiceClientService: NVoiceClientService) { }
+export interface INVoiceTalker {
+  talk(
+    text: string,
+    options: {
+      speed: number;
+      volume: number;
+      maxTime: number;
+      phonemeCallback?: (phoneme: string) => void,
+    },
+  ): Promise<{ cancel: () => void; speaking: Promise<void> } | null>;
+}
 
-  private _playQueue: { start: (() => Promise<{ cancel: () => Promise<void>; speaking: Promise<void>; }>); label: string; }[] = [];
-  private _playing: { cancel: () => Promise<void>; speaking: Promise<void>; } | null = null;
+export class NVoiceSynthesizer implements ISpeechSynthesizer {
+  constructor(private nVoiceTalker: INVoiceTalker) { }
+
+  private _playQueue: {
+    start: (() => Promise<{
+      cancel: () => Promise<void>;
+      speaking: Promise<void>;
+    } | null>); label: string;
+  }[] = [];
+  private _playing: {
+    cancel: () => Promise<void>;
+    speaking: Promise<void>;
+    state: 'preparing' | 'playing';
+  } | null = null;
   private runQueue() {
     setTimeout(() => this._runQueue(), 0);
   }
@@ -36,24 +56,30 @@ export class NVoiceSynthesizer implements ISpeechSynthesizer {
             await speaking2;
           },
           speaking: speaking2,
+          state: 'preparing',
         };
-        start().then(({ cancel, speaking }) => {
-          if (earlyCancel) {
-            cancel().then(() => {
-              resolveSpeaking2();
-            });
+        start().then((r) => {
+          if (!r) {
+            resolveSpeaking2();
           } else {
-            this._playing = {
-              cancel: async () => {
-                this._playing.cancel = async () => { await speaking2; };
-                await cancel();
-                await speaking2;
-              },
-              speaking: speaking.then(() => {
+            const { cancel, speaking } = r;
+            if (earlyCancel) {
+              cancel().then(() => {
                 resolveSpeaking2();
-              }
-              )
-            };
+              });
+            } else {
+              this._playing = {
+                cancel: async () => {
+                  this._playing.cancel = async () => { await speaking2; };
+                  await cancel();
+                  await speaking2;
+                },
+                speaking: speaking.then(() => {
+                  resolveSpeaking2();
+                }),
+                state: 'playing',
+              };
+            }
           }
         });
       }
@@ -77,10 +103,10 @@ export class NVoiceSynthesizer implements ISpeechSynthesizer {
   ) {
     const start = async () => {
       try {
-        const r = await this.nVoiceClientService.talk(speech.text, {
+        const r = await this.nVoiceTalker.talk(speech.text, {
           speed: 1 / (speech.rate || 1),
           volume: speech.volume,
-          maxTime: speech.nVoice.maxTime,
+          maxTime: speech.nVoice?.maxTime,
           phonemeCallback: (phoneme: string) => {
             console.log(phoneme); // DEBUG
             if (onPhoneme) {
@@ -128,5 +154,15 @@ export class NVoiceSynthesizer implements ISpeechSynthesizer {
 
   async cancelSpeak() {
     await this._cancelQueue();
+  }
+
+  // for testing
+  get playState(): 'preparing' | 'playing' | null {
+    return this._playing ? this._playing.state : null;
+  }
+
+  // for testing
+  get queueLength(): number {
+    return this._playQueue.length;
   }
 }

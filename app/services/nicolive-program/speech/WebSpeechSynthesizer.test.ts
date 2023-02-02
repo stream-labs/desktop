@@ -19,7 +19,7 @@ describe('WebSpeechSynthesizer', () => {
     ['test', true, 1, 1],
     ['', false, 0, 0],
     ['', true, 0, 0],
-  ])(`speakText(%o)`, async (text: string, force: boolean, numSpeak: number, numCancel: number) => {
+  ])(`speakText(%s force:%s speak:%i cancel:%i)`, async (text: string, force: boolean, numSpeak: number, numCancel: number) => {
     const speakMock = jest.fn();
     const cancelMock = jest.fn();
     jest.spyOn(window, 'speechSynthesis', 'get').mockImplementation(() => ({

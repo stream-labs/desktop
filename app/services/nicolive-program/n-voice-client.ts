@@ -6,6 +6,7 @@ import { StatefulService } from "services/core/stateful-service";
 import { $t } from "services/i18n";
 import { sleep } from 'util/sleep';
 import { getNVoicePath, NVoiceClient } from './speech/NVoiceClient';
+import { INVoiceTalker } from './speech/NVoiceSynthesizer';
 
 /** play audio from Buffer as wave file.
  * @return .cancel function to stop playing.
@@ -58,7 +59,7 @@ async function showError(err: Error): Promise<void> {
   );
 }
 
-export class NVoiceClientService extends StatefulService<INVoiceClientState> {
+export class NVoiceClientService extends StatefulService<INVoiceClientState> implements INVoiceTalker {
 
   static initialState: INVoiceClientState = {
     enabled: true,
