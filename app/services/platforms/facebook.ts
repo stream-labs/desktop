@@ -9,10 +9,10 @@ import { IGoLiveSettings } from 'services/streaming';
 import { throwStreamError } from 'services/streaming/stream-error';
 import { BasePlatformService } from './base-platform';
 import { WindowsService } from '../windows';
-import { TDisplayType } from 'services/settings-v2/video';
 import { assertIsDefined, getDefined } from '../../util/properties-type-guards';
 import { flatten } from 'lodash';
 import * as remote from '@electron/remote';
+import { IVideo } from 'obs-studio-node';
 
 interface IFacebookPage {
   access_token: string;
@@ -82,7 +82,7 @@ export interface IFacebookStartStreamOptions {
   liveVideoId?: string;
   privacy?: { value: TFacebookStreamPrivacy };
   plannedStartTime?: number;
-  display?: TDisplayType;
+  video?: IVideo;
 }
 
 export type TDestinationType = 'me' | 'page' | 'group' | '';
@@ -110,7 +110,7 @@ const initialState: IFacebookServiceState = {
     description: '',
     game: '',
     privacy: { value: 'EVERYONE' },
-    display: undefined,
+    video: undefined,
   },
 };
 

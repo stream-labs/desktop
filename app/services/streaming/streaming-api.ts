@@ -7,7 +7,7 @@ import { IStreamError } from './stream-error';
 import { ICustomStreamDestination } from '../settings/streaming';
 import { ITiktokStartStreamOptions } from '../platforms/tiktok';
 import { ITrovoStartStreamOptions } from '../platforms/trovo';
-import { TDisplayType } from 'services/settings-v2/video';
+import { IVideo } from 'obs-studio-node';
 
 export enum EStreamingState {
   Offline = 'offline',
@@ -82,7 +82,7 @@ export interface IGoLiveSettings extends IStreamSettings {
 export interface IPlatformFlags {
   enabled: boolean;
   useCustomFields: boolean;
-  display?: TDisplayType;
+  video?: IVideo;
 }
 
 export interface IStreamingServiceState {

@@ -14,6 +14,7 @@ import { DualOutputService } from 'services/dual-output';
 import { IFacebookStartStreamOptions } from './facebook';
 import { StreamSettingsService } from '../settings/streaming';
 import * as remote from '@electron/remote';
+import { VideoSettingsService } from 'services/settings-v2/video';
 
 const VIEWER_COUNT_UPDATE_INTERVAL = 60 * 1000;
 
@@ -34,6 +35,7 @@ export abstract class BasePlatformService<T extends IPlatformState> extends Stat
   @Inject() protected hostsService: HostsService;
   @Inject() protected streamSettingsService: StreamSettingsService;
   @Inject() protected dualOutputService: DualOutputService;
+  @Inject() protected videoSettingsService: VideoSettingsService;
   abstract readonly platform: TPlatform;
 
   abstract capabilities: Set<TPlatformCapability>;
@@ -118,8 +120,10 @@ export abstract class BasePlatformService<T extends IPlatformState> extends Stat
 
   confirmDualOutput(platform: TPlatform) {
     if (this.userService.views.isPrime && this.dualOutputService.views.dualOutputMode) {
+      const display = this.dualOutputService.views.getPlatformDisplay(platform);
+      const context = this.videoSettingsService.contexts[display];
       this.UPDATE_STREAM_SETTINGS({
-        display: this.dualOutputService.views.getPlatformDisplay(platform),
+        video: context,
       });
     }
   }
@@ -146,7 +150,6 @@ export abstract class BasePlatformService<T extends IPlatformState> extends Stat
 
   @mutation()
   protected UPDATE_STREAM_SETTINGS(settingsPatch: Partial<TStartStreamOptions>) {
-    // console.log('settingsPatch ', settingsPatch);
     this.state.settings = { ...this.state.settings, ...settingsPatch };
   }
 }

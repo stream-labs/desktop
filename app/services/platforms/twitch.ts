@@ -20,12 +20,12 @@ import { InheritMutations, mutation } from 'services/core';
 import { throwStreamError, TStreamErrorType } from 'services/streaming/stream-error';
 import { BasePlatformService } from './base-platform';
 import Utils from '../utils';
-import { TDisplayType } from 'services/settings-v2/video';
+import { IVideo } from 'obs-studio-node';
 
 export interface ITwitchStartStreamOptions {
   title: string;
   game?: string;
-  display?: TDisplayType;
+  video?: IVideo;
   tags?: TTwitchTag[];
 }
 
@@ -86,7 +86,7 @@ export class TwitchService
     settings: {
       title: '',
       game: '',
-      display: undefined,
+      video: undefined,
       tags: [],
     },
   };

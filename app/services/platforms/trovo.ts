@@ -1,6 +1,5 @@
 import { InheritMutations, mutation } from '../core';
 import { BasePlatformService } from './base-platform';
-import { TDisplayType } from 'services/settings-v2/video';
 import {
   IGame,
   IPlatformRequest,
@@ -14,6 +13,7 @@ import { platformAuthorizedRequest } from './utils';
 import { IGoLiveSettings } from '../streaming';
 import { getDefined } from '../../util/properties-type-guards';
 import Utils from '../utils';
+import { IVideo } from 'obs-studio-node';
 
 interface ITrovoServiceState extends IPlatformState {
   settings: ITrovoStartStreamOptions;
@@ -24,7 +24,7 @@ interface ITrovoServiceState extends IPlatformState {
 export interface ITrovoStartStreamOptions {
   title: string;
   game: string;
-  display?: TDisplayType;
+  video?: IVideo;
 }
 
 interface ITrovoChannelInfo {
@@ -47,7 +47,7 @@ export class TrovoService
   implements IPlatformService {
   static initialState: ITrovoServiceState = {
     ...BasePlatformService.initialState,
-    settings: { title: '', game: '', display: undefined },
+    settings: { title: '', game: '', video: undefined },
     userInfo: { userId: '', channelId: '' },
     channelInfo: { gameId: '', gameName: '', gameImage: '' },
   };

@@ -13,12 +13,14 @@ import { FacebookService } from './platforms/facebook';
 import { TiktokService } from './platforms/tiktok';
 import { TrovoService } from './platforms/trovo';
 import * as remote from '@electron/remote';
+import * as obs from 'obs-studio-node';
 import { VideoSettingsService, TDisplayType } from './settings-v2/video';
 
 interface IRestreamTarget {
   id: number;
   platform: TPlatform;
   streamKey: string;
+  video?: obs.IVideo;
 }
 
 interface IRestreamState {
@@ -160,6 +162,10 @@ export class RestreamService extends StatefulService<IRestreamState> {
     await Promise.all([this.setupIngest(), this.setupTargets()]);
   }
 
+  // async beforeDualOutputGoLive() {
+  //   await Promise.all([this.setupAdvancedIngest(), this.setupAdvancedTargets()]);
+  // }
+
   async setupIngest() {
     const ingest = (await this.fetchIngest()).server;
 
@@ -186,7 +192,7 @@ export class RestreamService extends StatefulService<IRestreamState> {
         return {
           platform: platform as TPlatform,
           streamKey: getPlatformService(platform).state.streamKey,
-          display: getPlatformService(platform).state.settings.display,
+          video: getPlatformService(platform).state.settings.video,
         };
       }),
       ...this.streamInfo.savedSettings.customDestinations
@@ -205,6 +211,60 @@ export class RestreamService extends StatefulService<IRestreamState> {
     await this.createTargets(newTargets);
   }
 
+  // async setupAdvancedIngest() {
+  //   const ingest = (await this.fetchIngest()).server;
+  //   // We need to move OBS to custom ingest mode before we can set the server
+  //   this.streamSettingsService.setSettings({
+  //     streamType: 'rtmp_custom',
+  //   });
+  //   this.streamSettingsService.setSettings({
+  //     key: this.settings.streamKey,
+  //     server: ingest,
+  //   });
+
+  //   // setup first context
+  //   const horizontalStream = obs.AdvancedStreamingFactory.create();
+  //   horizontalStream.video = this.videoSettingsService.contexts.horizontal;
+
+  //   // VVV settings from test
+  //   horizontalStream.outputWidth = this.videoSettingsService.contexts.horizontal.video.baseWidth;
+  //   horizontalStream.outputHeight = this.videoSettingsService.contexts.horizontal.video.baseHeight;
+
+  //   // setup second context
+  //   const verticalStream = obs.AdvancedStreamingFactory.create();
+  //   verticalStream.video = this.videoSettingsService.contexts.vertical;
+  //   verticalStream.outputWidth = this.videoSettingsService.contexts.vertical.video.baseWidth;
+  //   verticalStream.outputHeight = this.videoSettingsService.contexts.vertical.video.baseHeight;
+  // }
+
+  // async setupAdvancedTargets() {
+  //   // // delete existing targets
+  //   const targets = await this.fetchTargets();
+  //   const promises = targets.map(t => this.deleteTarget(t.id));
+  //   await Promise.all(promises);
+  //   // // setup new targets
+  //   const newTargets = [
+  //     ...this.streamInfo.enabledPlatforms.map(platform => {
+  //       return {
+  //         platform: platform as TPlatform,
+  //         streamKey: getPlatformService(platform).state.streamKey,
+  //         video: getPlatformService(platform).state.settings.video,
+  //       };
+  //     }),
+  //     ...this.streamInfo.savedSettings.customDestinations
+  //       .filter(dest => dest.enabled)
+  //       .map(dest => ({ platform: 'relay' as 'relay', streamKey: `${dest.url}${dest.streamKey}` })),
+  //   ];
+  //   // // treat tiktok as a custom destination
+  //   // const tikTokTarget = newTargets.find(t => t.platform === 'tiktok');
+  //   // if (tikTokTarget) {
+  //   //   const ttSettings = this.tiktokService.state.settings;
+  //   //   tikTokTarget.platform = 'relay';
+  //   //   tikTokTarget.streamKey = `${ttSettings.serverUrl}/${ttSettings.streamKey}`;
+  //   // }
+  //   await this.createTargets(newTargets);
+  // }
+
   checkStatus(): Promise<boolean> {
     const url = `https://${this.host}/api/v1/rst/util/status`;
     const request = new Request(url);
@@ -218,7 +278,7 @@ export class RestreamService extends StatefulService<IRestreamState> {
     targets: {
       platform: TPlatform | 'relay';
       streamKey: string;
-      display?: TDisplayType;
+      video?: obs.IVideo;
     }[],
   ) {
     const headers = authorizedHeaders(
@@ -235,9 +295,7 @@ export class RestreamService extends StatefulService<IRestreamState> {
           dcProtection: false,
           idleTimeout: 30,
           label: `${target.platform} target`,
-          video:
-            target.hasOwnProperty('display') &&
-            this.videoSettingsService.actions.getVideoContext(target.display),
+          video: target.hasOwnProperty('video') && target.video,
         };
       }),
     );

@@ -21,6 +21,7 @@ import Utils from '../utils';
 import { YoutubeUploader } from './youtube/uploader';
 import { lazyModule } from 'util/lazy-module';
 import * as remote from '@electron/remote';
+import { IVideo } from 'obs-studio-node';
 import pick from 'lodash/pick';
 
 interface IYoutubeServiceState extends IPlatformState {
@@ -39,7 +40,7 @@ export interface IYoutubeStartStreamOptions extends IExtraBroadcastSettings {
   description: string;
   privacyStatus?: 'private' | 'public' | 'unlisted';
   scheduledStartTime?: number;
-  display?: TDisplayType;
+  video?: IVideo;
 }
 
 /**
@@ -149,7 +150,7 @@ interface IExtraBroadcastSettings {
   projection?: 'rectangular' | '360';
   latencyPreference?: 'normal' | 'low' | 'ultraLow';
   selfDeclaredMadeForKids?: boolean;
-  display?: TDisplayType;
+  video?: IVideo;
 }
 
 type TStreamStatus = 'active' | 'created' | 'error' | 'inactive' | 'ready';
@@ -202,7 +203,7 @@ export class YoutubeService
       privacyStatus: 'public',
       selfDeclaredMadeForKids: false,
       thumbnail: '',
-      display: undefined,
+      video: undefined,
     },
   };
 
