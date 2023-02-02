@@ -218,61 +218,6 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
     }
   }
 
-  destroySceneNodes(displays: TDisplayType[], displayToDefault: TDisplayType) {
-    const destroyed = displays.reduce((destroyed: boolean, display: TDisplayType) => {
-      const assignToDefault = display === displayToDefault;
-      const sceneNodesDestroyed = this.destroySceneNodesByNodeMap(display, assignToDefault);
-
-      if (!sceneNodesDestroyed) {
-        destroyed = false;
-      } else {
-        const contextDestroyed = this.videoSettingsService.destroyVideoContext(display);
-        if (!contextDestroyed) {
-          destroyed = false;
-        }
-      }
-      return destroyed;
-    }, true);
-    return this.sceneItemsDestroyed.subscribe(() => destroyed);
-  }
-
-  destroySceneNodesByNodeMap(display: TDisplayType, assignToDefault: boolean) {
-    const nodeMap = this.state.nodeMaps[display];
-    if (!nodeMap) {
-      return false;
-    }
-    const displayNodeIds = Object.keys(nodeMap);
-    if (!displayNodeIds) return false;
-    if (assignToDefault) {
-      // assign scene items to the default context for the default display
-      const resetSceneItemOutput = displayNodeIds.reduce((reset: boolean, sceneNodeId: string) => {
-        const node = this.scenesService.views.getSceneItem(sceneNodeId);
-        if (!node) {
-          reset = false;
-        } else {
-          node.setSettings({ output: this.videoSettingsService.contexts.default });
-        }
-        return reset;
-      }, true);
-      if (!resetSceneItemOutput) return false;
-    } else {
-      displayNodeIds.forEach(sceneNodeId => {
-        const node = this.scenesService.views.getSceneItem(sceneNodeId);
-        if (!node) return false;
-        node.remove();
-        // const removeItemCommand = new RemoveItemCommand(sceneNodeId);
-        // removeItemCommand.execute();
-      });
-    }
-
-    if (nodeMap[display]) {
-      this.DESTROY_DISPLAY_NODE_MAP(display);
-      return true;
-    } else {
-      return false;
-    }
-  }
-
   restoreScene(display: TDisplayType) {
     if (this.state.nodeMaps) {
       const nodesMap = this.state.nodeMaps[display];
@@ -292,44 +237,8 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
       });
     }
 
-    this.state.nodeMaps = null;
-  }
+    this.videoSettingsService.resetToDefaultContext();
 
-  forceResetOfScene(display: TDisplayType) {
-    const nodesMap = this.state.nodeMaps[display];
-    const nodesToReassign = Object.keys(nodesMap);
-
-    const { activeSceneId } = this.scenesService.views;
-
-    const sceneNodes = this.scenesService.views.getSceneItemsBySceneId(activeSceneId);
-
-    sceneNodes.forEach((sceneItem: SceneItem) => {
-      if (nodesToReassign.includes(sceneItem.id)) {
-        const setting: IPartialSettings = { output: this.videoSettingsService.contexts.default };
-        sceneItem.setSettings(setting);
-      } else {
-        sceneItem.remove();
-      }
-    });
-  }
-
-  shutdown() {
-    if (this.state.dualOutputMode) {
-      try {
-        // this.forceResetOfScene('horizontal');
-        const destroyed = this.destroySceneNodes(['horizontal', 'vertical'], 'horizontal');
-
-        // if the scene nodes are not successfully removed by iterating over the node maps
-        // force the scene to remove all dual output nodes by iterating over the scene items
-        if (!destroyed) this.forceResetOfScene('horizontal');
-      } catch (error: unknown) {
-        console.error('Error shutting down Dual Output Service ', error);
-      }
-    }
-
-    // if something goes wrong when destroying the scene nodes
-    // to prevent errors on startup, always remove the node maps
-    // regardless of whether or not the dual output nodes were successfully destroyed
     this.state.nodeMaps = null;
   }
 

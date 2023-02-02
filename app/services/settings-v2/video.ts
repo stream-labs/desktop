@@ -311,6 +311,14 @@ export class VideoSettingsService extends StatefulService<IVideoSettings> {
     return !this.state[contextName];
   }
 
+  resetToDefaultContext() {
+    for (const context in this.contexts) {
+      if (context !== 'default') {
+        this.destroyVideoContext(context as TDisplayType);
+      }
+    }
+  }
+
   @debounce(200)
   updateObsSettings(display: TDisplayType = 'default') {
     switch (display) {
