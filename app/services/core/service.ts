@@ -7,6 +7,7 @@ import { Subject } from 'rxjs';
 const singleton = Symbol('singleton');
 const singletonEnforcer = Symbol('singletonEnforcer');
 const instances: Service[] = [];
+const proxies: Service[] = [];
 
 /**
  * Makes all functions return a Promise and sets other types to never
@@ -90,7 +91,14 @@ export abstract class Service {
 
   static get instance() {
     const instance = !this.hasInstance ? Service.createInstance(this) : this[singleton];
-    return this.proxyFn ? this.proxyFn(instance) : instance;
+
+    if (this.proxyFn) {
+      if (!proxies[this.name]) proxies[this.name] = this.proxyFn(instance);
+
+      return proxies[this.name];
+    } else {
+      return instance;
+    }
   }
 
   static get hasInstance(): boolean {

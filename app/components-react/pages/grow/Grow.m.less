@@ -5,7 +5,8 @@
   display: flex;
   position: relative;
 
-  :global(.ant-modal-wrap), :global(.ant-modal-mask) {
+  :global(.ant-modal-wrap),
+  :global(.ant-modal-mask) {
     position: absolute;
   }
 
@@ -28,6 +29,7 @@
   padding: 16px;
   margin: 24px;
   margin-left: 0;
+  word-break: break-word;
 }
 
 .card-header {
@@ -47,15 +49,24 @@
   flex-direction: column;
   justify-content: space-between;
   height: 100%;
-
+  flex-grow: 1;
+  width: min-content;
   footer {
     display: flex;
   }
 
   button {
-    margin-right: 16px;
+    margin-right: 10px;
     max-width: 200px;
   }
+}
+
+.card-image {
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  overflow: hidden;
+  border-radius: 10px;
 }
 
 .whisper {

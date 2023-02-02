@@ -36,7 +36,10 @@ type TAnalyticsEvent =
   | 'AppStart'
   | 'Highlighter'
   | 'Hardware'
-  | 'WebcamUse';
+  | 'WebcamUse'
+  | 'MicrophoneUse'
+  | 'GuestCam'
+  | 'RecordingHistory';
 
 interface IAnalyticsEvent {
   product: string;

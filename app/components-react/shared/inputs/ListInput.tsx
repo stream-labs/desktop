@@ -19,6 +19,7 @@ const ANT_SELECT_FEATURES = [
   'onSelect',
   'allowClear',
   'defaultActiveFirstOption',
+  'listHeight',
 ] as const;
 
 // define custom props
@@ -46,7 +47,7 @@ export interface IListOption<TValue> {
   label: string;
   value: TValue;
   description?: string; // TODO
-  image?: string;
+  image?: string | ReactNode;
 }
 
 export const ListInput = InputComponent(<T extends any>(p: TListInputProps<T>) => {
@@ -156,7 +157,12 @@ function renderOptionWithImage<T>(opt: IListOption<T>, inputProps: ICustomListPr
   return (
     <Row gutter={8} align="middle" wrap={false}>
       <Col>
-        {src && <img src={src} alt="" style={imageStyle} />}
+        {src &&
+          (typeof src === 'string' ? (
+            <img src={src} alt="" style={imageStyle} />
+          ) : (
+            <div>{src}</div>
+          ))}
         {!src && <div style={imageStyle} />}
       </Col>
       <Col>{opt.label}</Col>
@@ -174,7 +180,12 @@ function renderLabelWithImage<T>(opt: IListOption<T>) {
   return (
     <Row gutter={8}>
       <Col>
-        {src && <img src={src} alt="" style={imageStyle} />}
+        {src &&
+          (typeof src === 'string' ? (
+            <img src={src} alt="" style={imageStyle} />
+          ) : (
+            <div>{src}</div>
+          ))}
         {!src && <div style={imageStyle} />}
       </Col>
       <Col>{opt.label}</Col>

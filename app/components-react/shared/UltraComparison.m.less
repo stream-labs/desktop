@@ -1,0 +1,136 @@
+.prime-title {
+  color: var(--prime);
+  background: var(--prime-semi);
+  border-radius: 4px;
+  padding: 4px;
+  line-height: 32px;
+  font-weight: 700;
+}
+
+.headers-container {
+  border-top: 1px solid var(--border);
+  width: 250px;
+  margin-top: 48px;
+  margin-right: 20px;
+
+  &.condensed {
+    margin-right: 0;
+    margin-top: 55px;
+  }
+}
+
+.table-header {
+  padding: 12px;
+  border-bottom: 1px solid var(--border);
+
+  i {
+    margin-right: 8px;
+  }
+}
+
+.card-container {
+  width: 350px;
+  margin: 0 20px;
+  border-radius: 8px;
+  background: var(--section);
+  color: var(--paragraph);
+  position: relative;
+  overflow: hidden;
+
+  h1 {
+    margin-bottom: 8px;
+    color: var(--title);
+  }
+
+  strong {
+    font-size: 16px;
+    margin-bottom: 24px;
+    display: block;
+    color: var(--title);
+  }
+
+  &:hover {
+    cursor: pointer;
+  }
+
+  i {
+    margin-right: 8px;
+  }
+
+  &.condensed {
+    margin: 0 4px;
+  }
+}
+
+.header {
+  padding-top: 16px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  border-bottom: 1px solid var(--background);
+
+  span {
+    font-size: 13px;
+  }
+}
+
+.row {
+  padding: 12px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-bottom: 1px solid var(--background);
+}
+
+.button {
+  border-radius: 4px;
+  margin: 16px;
+  text-align: center;
+  padding: 14px;
+  background: var(--button);
+}
+
+.prime-card-container {
+  color: var(--title);
+  border: 2px solid transparent;
+  background: linear-gradient(var(--background), var(--background)) padding-box, var(--ultra) border-box;
+
+  h1 {
+    background: var(--ultra);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    width: 80px;
+    font-weight: 700;
+  }
+}
+
+.prime-header {
+  background: var(--black);
+  border-bottom: none;
+}
+
+.prime-row {
+  border-bottom: 1px solid rgba(127,127,127,0.3)
+}
+
+.prime-backing {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--ultra);
+  opacity: 0.08;
+}
+
+.prime-button {
+  background: var(--ultra);
+  color: var(--section);
+}
+
+.whisper {
+  font-style: italic;
+  opacity: 0.7;
+}

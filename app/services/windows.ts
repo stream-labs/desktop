@@ -21,11 +21,12 @@ import {
   EditStreamWindow,
   IconLibraryProperties,
   ScreenCaptureProperties,
+  GuestCamProperties,
   SharedComponentsLibrary,
   SourceProperties,
-  PerformanceMetrics,
   RenameSource,
   AdvancedStatistics,
+  ManageSceneCollections,
   WidgetWindow,
   CustomCodeWindow,
   SafeMode,
@@ -35,22 +36,21 @@ import {
   MediaGallery,
   Projector,
   AddSource,
-  News,
+  WelcomeToPrime,
+  NotificationsAndNews,
   PlatformAppPopOut,
+  RecentEventsWindow,
+  RecordingHistory,
+  EditTransform,
+  Blank,
 } from 'components/shared/ReactComponentList';
 
 import SourcePropertiesDeprecated from 'components/windows/SourceProperties.vue';
-import Notifications from 'components/windows/Notifications.vue';
 import Troubleshooter from 'components/windows/Troubleshooter.vue';
-import Blank from 'components/windows/Blank.vue';
-import ManageSceneCollections from 'components/windows/ManageSceneCollections.vue';
-import RecentEvents from 'components/windows/RecentEvents.vue';
 import GameOverlayEventFeed from 'components/windows/GameOverlayEventFeed';
-import EditTransform from 'components/windows/EditTransform';
 import EventFilterMenu from 'components/windows/EventFilterMenu';
 import OverlayPlaceholder from 'components/windows/OverlayPlaceholder';
 import BrowserSourceInteraction from 'components/windows/BrowserSourceInteraction';
-import WelcomeToPrime from 'components/windows/WelcomeToPrime';
 
 import BitGoal from 'components/widgets/goal/BitGoal';
 import DonationGoal from 'components/widgets/goal/DonationGoal';
@@ -60,9 +60,7 @@ import SupporterGoal from 'components/widgets/goal/SupporterGoal';
 import SubscriberGoal from 'components/widgets/goal/SubscriberGoal';
 import FollowerGoal from 'components/widgets/goal/FollowerGoal';
 import CharityGoal from 'components/widgets/goal/CharityGoal';
-import ChatBox from 'components/widgets/ChatBox.vue';
 import StreamBoss from 'components/widgets/StreamBoss.vue';
-import DonationTicker from 'components/widgets/DonationTicker.vue';
 import Credits from 'components/widgets/Credits.vue';
 import EventList from 'components/widgets/EventList.vue';
 import TipJar from 'components/widgets/TipJar.vue';
@@ -71,7 +69,6 @@ import MediaShare from 'components/widgets/MediaShare';
 import AlertBox from 'components/widgets/AlertBox.vue';
 import SpinWheel from 'components/widgets/SpinWheel.vue';
 import Poll from 'components/widgets/Poll';
-import EmoteWall from 'components/widgets/EmoteWall';
 import ChatHighlight from 'components/widgets/ChatHighlight';
 import SuperchatGoal from 'components/widgets/goal/SuperchatGoal';
 
@@ -103,11 +100,11 @@ export function getComponents() {
     SourceFilters,
     Blank,
     AdvancedAudio,
-    Notifications,
+    NotificationsAndNews,
     Troubleshooter,
     ManageSceneCollections,
     Projector,
-    RecentEvents,
+    RecentEvents: RecentEventsWindow,
     MediaGallery,
     PlatformAppPopOut,
     EditTransform,
@@ -124,8 +121,6 @@ export function getComponents() {
     SubscriberGoal,
     SuperchatGoal,
     CharityGoal,
-    ChatBox,
-    DonationTicker,
     Credits,
     EventList,
     TipJar,
@@ -136,18 +131,18 @@ export function getComponents() {
     AlertBox,
     SpinWheel,
     Poll,
-    EmoteWall,
     ChatHighlight,
     WelcomeToPrime,
     GoLiveWindow,
     EditStreamWindow,
     IconLibraryProperties,
     ScreenCaptureProperties,
+    GuestCamProperties,
     SharedComponentsLibrary,
     WidgetWindow,
     CustomCodeWindow,
     SourceShowcase,
-    News,
+    RecordingHistory,
   };
 }
 

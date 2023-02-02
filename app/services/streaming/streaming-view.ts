@@ -170,7 +170,7 @@ export class StreamInfoView<T extends Object> extends ViewHandler<T> {
    * Chat url of a primary platform
    */
   get chatUrl(): string {
-    if (!this.userView.auth) return '';
+    if (!this.userView.isLoggedIn || !this.userView.auth) return '';
     return getPlatformService(this.userView.auth.primaryPlatform).chatUrl;
   }
 

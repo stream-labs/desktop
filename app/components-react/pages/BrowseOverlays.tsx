@@ -9,10 +9,9 @@ import { GuestApiHandler } from 'util/guest-api-handler';
 import { IDownloadProgress } from 'util/requests';
 import * as remote from '@electron/remote';
 import { Services } from 'components-react/service-provider';
-import { useVuex } from 'components-react/hooks';
 
 export default function BrowseOverlays(p: {
-  params: { type?: 'overlay' | 'widget-theme'; id?: string };
+  params: { type?: 'overlay' | 'widget-themes' | 'site-themes'; id?: string };
 }) {
   const {
     UserService,
@@ -26,7 +25,6 @@ export default function BrowseOverlays(p: {
     JsonrpcService,
     RestreamService,
   } = Services;
-
   const [downloading, setDownloading] = useState(false);
 
   function onBrowserViewReady(view: Electron.BrowserView) {
@@ -125,12 +123,11 @@ export default function BrowseOverlays(p: {
       ),
     });
   }
-
   return (
     <BrowserView
-      style={{ position: 'absolute', top: 0, right: 0, bottom: 0, left: 0 }}
       onReady={onBrowserViewReady}
       src={UserService.views.overlaysUrl(p.params?.type, p.params?.id)}
+      style={{ position: 'absolute', top: 0, right: 0, bottom: 0, left: 0 }}
       enableGuestApi
       setLocale
     />

@@ -29,7 +29,7 @@
   "Does not support: Closed captions, 1440p, and 4k resolutions": "Nie obsługuje: zamkniętych podpisów, rozdzielczości 1440p i 4k",
   "Enable DVR": "Włącz DVR",
   "Additional Settings": "Ustawienia dodatkowe",
-  "Open Youtube Studio": "Otwórz Youtube Studio",
+  "Open Youtube Studio": "Otwórz YouTube Studio",
   "360° video": "Wideo 360°",
   "Enable Auto-start": "Włącz Auto-start",
   "Enable Auto-stop": "Włącz Auto-stop",
@@ -37,7 +37,7 @@
   "Enabling auto-start will automatically start the stream when you start sending data from your streaming software": "Włączenie funkcji automatycznego uruchamiania (auto-start) spowoduje automatyczne uruchomienie przekazu strumieniowego po rozpoczęciu wysyłania danych z oprogramowania transmisyjnego",
   "Enabling auto-stop will automatically stop the stream when you stop sending data from your streaming software": "Włączenie funkcji automatycznego zatrzymywania (auto-stop) spowoduje automatyczne zatrzymanie przekazu strumieniowego po zakończeniu wysyłania danych z oprogramowania transmisyjnego",
   "DVR controls enable the viewer to control the video playback experience by pausing, rewinding, or fast forwarding content": "Kontrolery DVR umożliwiają widzowi sterowanie odtwarzaniem wideo poprzez wstrzymywanie, przewijanie lub szybkie przewijanie do przodu",
-  "Auto-start is disabled for your broadcast. You should manually publish your stream from Youtube Studio": "Auto-start jest dla Twojej transmisji wyłączony. Powinieneś ręcznie opublikować swój przekaz strumieniowy z Youtube Studio",
+  "Auto-start is disabled for your broadcast. You should manually publish your stream from Youtube Studio": "Auto-start jest dla Twojej transmisji wyłączony. Powinieneś ręcznie opublikować swój przekaz strumieniowy z YouTube Studio",
   "Made for kids": "Stworzone dla dzieci",
   "Features like personalized ads and live chat won't be available on live streams made for kids.": "Funkcje, takie jak spersonalizowane reklamy i czat na żywo nie będą dostępne w przekazach strumieniowych na żywo przygotowanych dla dzieci.",
   "Try our new thumbnail editor": "Wypróbuj nasz nowy edytor miniatur"

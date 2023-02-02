@@ -83,7 +83,7 @@
           </table>
         </div>
       </tabs>
-      <modal name="transition-settings" :height="550">
+      <modal name="transition-settings" :height="600">
         <scrollable className="transition-settings-modal">
           <transition-settings :transition-id="inspectedTransition" />
           <button

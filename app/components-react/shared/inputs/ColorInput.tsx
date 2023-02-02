@@ -10,7 +10,6 @@ import { Services } from '../../service-provider';
 import { HexColorPicker, RgbaColorPicker } from 'react-colorful';
 import { findDOMNode } from 'react-dom';
 import { getDefined } from '../../../util/properties-type-guards';
-import Utils from "../../../services/utils";
 
 interface IRGBAColor {
   r: number;

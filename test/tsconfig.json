@@ -37,7 +37,8 @@
       "socket.io-client",
       "tapable",
       "uuid",
-      "vue-tsx-support"
+      "vue-tsx-support",
+      "webdriverio/async",
     ]
   },
   "exclude": [

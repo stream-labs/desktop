@@ -10,11 +10,7 @@ import { TAlertType } from '../../../services/widgets/alerts-config';
 import { alertAsync } from '../../modals';
 import { onUnload } from 'util/unload';
 import merge from 'lodash/merge';
-import {
-  GetUseModuleResult, injectFormBinding,
-  injectState,
-  useModule,
-} from 'slap';
+import { GetUseModuleResult, injectFormBinding, injectState, useModule } from 'slap';
 import { IWidgetConfig } from '../../../services/widgets/widgets-config';
 
 /**
@@ -39,9 +35,8 @@ export interface IWidgetCommonState {
 export interface IWidgetState {
   data: {
     settings: any;
-  }
+  };
 }
-
 
 /**
  * Default state for all widgets
@@ -53,7 +48,7 @@ export const DEFAULT_WIDGET_STATE: IWidgetCommonState = {
   previewSourceId: '',
   isPreviewVisible: false,
   selectedTab: 'general',
-  type: '' as any as WidgetType,
+  type: ('' as any) as WidgetType,
   widgetData: {
     data: {
       settings: {},
@@ -61,7 +56,7 @@ export const DEFAULT_WIDGET_STATE: IWidgetCommonState = {
   },
   prevSettings: {},
   canRevert: false,
-  browserSourceProps: null as any as TObsFormData,
+  browserSourceProps: (null as any) as TObsFormData,
 } as IWidgetCommonState;
 
 /**
@@ -203,7 +198,7 @@ export class WidgetModule<TWidgetState extends IWidgetState = IWidgetState> {
    * Returns a Widget class
    */
   private get widget() {
-    return this.widgetsService.getWidgetSource(this.state.sourceId);
+    return this.widgetsService.views.getWidgetSource(this.state.sourceId);
   }
 
   get config(): IWidgetConfig {
@@ -231,6 +226,11 @@ export class WidgetModule<TWidgetState extends IWidgetState = IWidgetState> {
     this.setSettings(newSettings);
     // send setting to the server
     await this.saveSettings(newSettings);
+  }
+
+  // Update setting compatible with FormFactory
+  updateSetting(key: string) {
+    return (value: any) => this.updateSettings({ [key]: value });
   }
 
   /**
@@ -337,15 +337,16 @@ export class WidgetModule<TWidgetState extends IWidgetState = IWidgetState> {
   }
 }
 
-export type WidgetParams = { sourceId?: string; shouldCreatePreviewSource?: boolean; selectedTab?: string }
+export type WidgetParams = {
+  sourceId?: string;
+  shouldCreatePreviewSource?: boolean;
+  selectedTab?: string;
+};
 
 /**
  * Have to be called in the root widget component
  */
-export function useWidgetRoot<T extends typeof WidgetModule>(
-  Module: T,
-  params: WidgetParams,
-) {
+export function useWidgetRoot<T extends typeof WidgetModule>(Module: T, params: WidgetParams) {
   return useModule(Module, [params] as any, 'WidgetModule');
 }
 

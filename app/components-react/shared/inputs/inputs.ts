@@ -11,9 +11,9 @@ import { CheckboxChangeEvent } from 'antd/lib/checkbox';
 import { $t } from '../../../services/i18n';
 import pick from 'lodash/pick';
 import isEqual from 'lodash/isEqual';
-import * as InputComponents from './index';
+import * as InputComponents from './inputList';
 
-type TInputType =
+export type TInputType =
   | 'code'
   | 'color'
   | 'card'
@@ -22,6 +22,7 @@ type TInputType =
   | 'number'
   | 'toggle'
   | 'checkbox'
+  | 'autocomplete'
   | 'list'
   | 'mediaurl'
   | 'audiourl'
@@ -31,7 +32,8 @@ type TInputType =
   | 'slider'
   | 'image'
   | 'time'
-  | 'file';
+  | 'file'
+  | 'checkboxGroup';
 
 export type TInputLayout = 'horizontal' | 'vertical' | 'inline';
 

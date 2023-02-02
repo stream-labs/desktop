@@ -9,7 +9,7 @@
   "has gifted a sub (%{tier}) to": "har givet et abonnement (%{tier}) til",
   "has resubscribed (%{tier}) for %{months} months": "har abonneret igen (%{tier}) i %{months} måneder",
   "has subscribed (%{tier})": "har abonneret (%{tier})",
-  "has converted from a Prime Gaming sub to a %{tier} sub": "has converted from a Prime Gaming sub to a %{tier} sub",
+  "has converted from a Prime Gaming sub to a %{tier} sub": "har konverteret fra et Prime Gaming-abonnement til et %{tier}-abonnement",
   "has subscribed": "har abonneret",
   "has used": "har brugt",
   "has hosted you with %{viewers} viewers": "har været vært for dig med %{viewers} seere",
@@ -75,9 +75,9 @@
   "Disable Safe Mode": "Deaktiver fejlsikret tilstand",
   "Something went wrong disabling Safe Mode": "Noget gik galt med at aktivere sikker tilstand",
   "Automatically disable Safe Mode": "Deaktiver fejlsikret tilstand automatisk",
-  "Disable after <duration></duration> minutes": "Deaktiver efter &lt;duration&gt;&lt;/duration&gt; minutter",
-  "has resubscribed": "has resubscribed",
-  "has gifted a sub to": "has gifted a sub to",
-  "has resubscribed for %{streak} months in a row! (%{months} total)": "has resubscribed for %{streak} months in a row! (%{months} total)",
-  "has resubscribed for %{months} months": "has resubscribed for %{months} months"
+  "Disable after <duration></duration> minutes": "Deaktiver efter <duration></duration> minutter",
+  "has resubscribed": "har forlænget abonnement",
+  "has gifted a sub to": "har givet et abonnement til",
+  "has resubscribed for %{streak} months in a row! (%{months} total)": "har forlænget abonnement i %{streak} måneder i træk (%{months} i alt)",
+  "has resubscribed for %{months} months": "har forlænget abonnement i %{months} måneder"
 }

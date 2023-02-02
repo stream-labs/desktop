@@ -14,7 +14,7 @@
   "Volume ( % )": "Volume ( % )",
   "Sync Offset": "Sync Offset",
   "Mixer": "Mixer",
-  "Monitor audio levels. If the bars are moving you are outputting audio.": "Pantau level audio. Jika bar bergerak, Anda harus outputting audio.",
+  "Monitor audio levels. If the bars are moving you are outputting audio.": "Pantau level audio. Jika bar bergerak, Anda akan menghasilkan audio.",
   "Muted": "Muted",
   "Hide in Mixer": "Sembunyikan di Mixer",
   "Show in Mixer": "Tampilkan di Mixer",
@@ -32,8 +32,15 @@
   "Source Settings": "Pengaturan Sumber",
   "Audio Tracks": "Track Audio",
   "Designates which tracks are being recorded": "Tetapkan track manakah yang sedang direkam",
-  "Your Stream and VOD Track are the same. This may result in unexpected audio behavior, go to Global Settings to change.": "Your Stream and VOD Track are the same. This may result in unexpected audio behavior, go to Global Settings to change.",
-  "Streaming Track": "Streaming Track",
-  "Enable Twitch VOD Track": "Enable Twitch VOD Track",
-  "Twitch VOD Track": "Twitch VOD Track"
+  "Your Stream and VOD Track are the same. This may result in unexpected audio behavior, go to Global Settings to change.": "Stream dan VOD Track Anda itu sama. Hal ini dapat menyebabkan perilaku audio yang tidak terduga, bukalah Pengaturan Global untuk melakukan perubahan.",
+  "Streaming Track": "Track Streaming",
+  "Enable Twitch VOD Track": "Mengaktifkan Track Twitch VOD",
+  "Twitch VOD Track": "Track Twitch VOD",
+  "Sample Rate (requires a restart)": "Sample Rate (memerlukan mulai ulang)",
+  "Channels (requires a restart)": "Channel (memerlukan mulai ulang)",
+  "Desktop Audio Device 1": "Perangkat Audio Desktop 1",
+  "Desktop Audio Device 2": "Perangkat Audio Desktop 2",
+  "Mic/Auxiliary Device 1": "Perangkat Mic/Bantu 1",
+  "Mic/Auxiliary Device 2": "Perangkat Mic/Bantu 2",
+  "Mic/Auxiliary Device 3": "Perangkat Mic/Bantu 3"
 }

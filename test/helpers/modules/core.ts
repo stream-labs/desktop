@@ -5,10 +5,11 @@
 import { getContext } from '../spectron';
 import { getApiClient } from '../api-client';
 import { WindowsService } from '../../../app/services/windows';
+import { ClickOptions, WaitForOptions } from 'webdriverio';
 
 export type TSelectorOrEl = string | WebdriverIO.Element;
 
-export function getClient(): WebdriverIO.BrowserObject {
+export function getClient(): WebdriverIO.Browser {
   return getContext().context.app.client;
 }
 
@@ -30,7 +31,7 @@ export function selectButton(buttonText: string) {
 
 // CLICK SHORTCUTS
 
-export async function click(selectorOrEl: TSelectorOrEl, options?: WebdriverIO.ClickOptions) {
+export async function click(selectorOrEl: TSelectorOrEl, options?: ClickOptions) {
   const $el = await select(selectorOrEl);
   await $el.waitForClickable();
   await $el.click(options);
@@ -57,32 +58,23 @@ export async function clickTab(tabText: string) {
 
 // OTHER SHORTCUTS
 
-export async function isDisplayed(
-  selectorOrEl: TSelectorOrEl,
-  waitForOptions?: WebdriverIO.WaitForOptions,
-) {
+export async function isDisplayed(selectorOrEl: TSelectorOrEl, waitForOptions?: WaitForOptions) {
   if (waitForOptions) {
     try {
       await waitForDisplayed(selectorOrEl, waitForOptions);
       return true;
-    } catch (e) {
+    } catch (e: unknown) {
       return false;
     }
   }
   return await (await select(selectorOrEl)).isDisplayed();
 }
 
-export async function waitForDisplayed(
-  selectorOrEl: TSelectorOrEl,
-  options?: WebdriverIO.WaitForOptions,
-) {
+export async function waitForDisplayed(selectorOrEl: TSelectorOrEl, options?: WaitForOptions) {
   await (await select(selectorOrEl)).waitForDisplayed(options);
 }
 
-export async function waitForClickable(
-  selectorOrEl: TSelectorOrEl,
-  options?: WebdriverIO.WaitForOptions,
-) {
+export async function waitForClickable(selectorOrEl: TSelectorOrEl, options?: WaitForOptions) {
   await (await select(selectorOrEl)).waitForClickable(options);
 }
 
@@ -90,10 +82,7 @@ export function waitForText(text: string) {
   return waitForDisplayed(`*="${text}"`);
 }
 
-export async function waitForEnabled(
-  selectorOrEl: TSelectorOrEl,
-  options?: WebdriverIO.WaitForOptions,
-) {
+export async function waitForEnabled(selectorOrEl: TSelectorOrEl, options?: WaitForOptions) {
   await (await select(selectorOrEl)).waitForEnabled(options);
 }
 

@@ -116,6 +116,8 @@ function ObsInput(p: IObsInputProps) {
 
       if (textVal.multiline) {
         return <TextAreaInput {...inputProps} debounce={300} />;
+      } else if (textVal.infoField) {
+        return <InputWrapper>{textVal.description}</InputWrapper>;
       } else {
         return <TextInput {...inputProps} isPassword={inputProps.masked} />;
       }
@@ -128,7 +130,7 @@ function ObsInput(p: IObsInputProps) {
         }
         return {
           value: opt.value,
-          label: $translateIfExist(opt.description),
+          label: opt.description,
         };
       });
       return <ListInput {...inputProps} options={options} allowClear={false} />;

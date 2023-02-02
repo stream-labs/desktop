@@ -9,6 +9,12 @@ export enum EDismissable {
   RecentEventsHelpTip = 'recent_events_help_tip',
   FacebookNeedPermissionsTip = 'facebook_need_permissions_tip',
   HighlighterNotification = 'highlighter_notification',
+  GuestCamFirstTimeModal = 'guest_cam_first_time',
+  SourceSelectorFolders = 'source_selector_folders',
+  CollabCamRollout = 'collab_cam_rollout',
+  NewSideNav = 'new_side_nav',
+  CustomMenuSettings = 'custom_menu_settings',
+  LoginPrompt = 'login_prompt',
 }
 
 interface IDismissablesServiceState {

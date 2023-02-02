@@ -61,8 +61,12 @@ export class VirtualWebcamService extends StatefulService<IVirtualWebcamServiceS
           });
       },
       [OS.Windows]: async () => {
-        if (obs.NodeObs.OBS_service_isVirtualCamPluginInstalled()) {
+        const result = obs.NodeObs.OBS_service_isVirtualCamPluginInstalled();
+
+        if (result === obs.EVcamInstalledStatus.Installed) {
           return EVirtualWebcamPluginInstallStatus.Installed;
+        } else if (result === obs.EVcamInstalledStatus.LegacyInstalled) {
+          return EVirtualWebcamPluginInstallStatus.Outdated;
         } else {
           return EVirtualWebcamPluginInstallStatus.NotPresent;
         }

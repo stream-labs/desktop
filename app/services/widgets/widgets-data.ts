@@ -38,6 +38,7 @@ export enum WidgetType {
   ChatHighlight = 21,
   SuperchatGoal = 22,
   GameWidget = 23,
+  CustomWidget = 24,
 }
 
 export const WidgetTesters: IWidgetTester[] = [
@@ -128,6 +129,27 @@ export const WidgetTesters: IWidgetTester[] = [
       return `https://${host}/api/v5/slobs/test/${platform}_account/like`;
     },
     platforms: ['facebook'],
+  },
+  {
+    name: 'Merch',
+    url(host, platform) {
+      return `https://${host}/api/v5/slobs/test/streamlabs/merch`;
+    },
+    platforms: ['youtube'],
+  },
+  {
+    name: 'Cloudbot Redeem',
+    url(host, platform) {
+      return `https://${host}/api/v5/slobs/test/streamlabs/loyalty_store_redemption`;
+    },
+    platforms: ['youtube'],
+  },
+  {
+    name: 'SL Ultra Gift',
+    url(host, platform) {
+      return `https://${host}/api/v5/slobs/test/streamlabs/prime_sub_gift`;
+    },
+    platforms: ['youtube'],
   },
 ];
 
@@ -464,8 +486,8 @@ export const WidgetDisplayData = (platform?: string): { [x: number]: IWidgetDisp
   [WidgetType.AlertBox]: {
     name: $t('Alertbox'),
     description: $t('Thanks viewers with notification popups.'),
-    demoVideo: true,
-    demoFilename: 'source-alertbox.mp4',
+    demoVideo: false,
+    demoFilename: 'source-alertbox.gif',
     supportList: [$t('Donations'), $t('Subscriptions'), $t('Follows'), $t('Bits'), $t('Hosts')],
     icon: 'fas fa-bell',
     shortDesc: $t('Dynamic, live alerts'),
@@ -548,24 +570,24 @@ export const WidgetDisplayData = (platform?: string): { [x: number]: IWidgetDisp
   [WidgetType.DonationTicker]: {
     name: $t('Tip Ticker'),
     description: $t('Show off your most recent donations to your viewers.'),
-    demoVideo: true,
-    demoFilename: 'source-donation-ticker.mp4',
+    demoVideo: false,
+    demoFilename: 'source-tip-ticker.png',
     supportList: [$t('Donations')],
     icon: 'fas fa-ellipsis-h',
   },
   [WidgetType.ChatBox]: {
     name: $t('Chatbox'),
     description: $t("Include your channel's chat into your stream."),
-    demoVideo: true,
-    demoFilename: 'source-chatbox.mp4',
-    supportList: [$t('Twitch chat'), $t('YouTube chat'), $t('Facebook chat')],
+    demoVideo: false,
+    demoFilename: 'source-chatbox.png',
+    supportList: [$t('Twitch chat'), $t('YouTube chat'), $t('Facebook chat'), $t('Trovo chat')],
     icon: 'fas fa-comments',
   },
   [WidgetType.EventList]: {
     name: $t('Event List'),
     description: $t("Include your channel's most recent events into your stream."),
-    demoVideo: true,
-    demoFilename: 'source-eventlist.mp4',
+    demoVideo: false,
+    demoFilename: 'source-eventlist.png',
     supportList: [
       $t('Donations'),
       $t('Subscriptions'),
@@ -580,8 +602,8 @@ export const WidgetDisplayData = (platform?: string): { [x: number]: IWidgetDisp
   [WidgetType.TipJar]: {
     name: $t('The Jar'),
     description: $t('The jar that catches bits, tips, and more.'),
-    demoVideo: true,
-    demoFilename: 'source-jar.mp4',
+    demoVideo: false,
+    demoFilename: 'source-jar.png',
     supportList: [$t('Donations'), $t('Subscriptions'), $t('Follows'), $t('Bits'), $t('Hosts')],
     icon: 'fas fa-beer',
   },
@@ -590,22 +612,22 @@ export const WidgetDisplayData = (platform?: string): { [x: number]: IWidgetDisp
     description: $t('Show off your viewers from multiple platforms.'),
     demoVideo: false,
     demoFilename: 'source-viewer-count.png',
-    supportList: ['YouTube', 'Twitch', 'Facebook'],
+    supportList: ['YouTube', 'Twitch', 'Facebook', 'Trovo'],
     icon: 'fas fa-eye',
   },
   [WidgetType.StreamBoss]: {
     name: $t('Stream Boss'),
     description: $t('Battle with bits to be the boss of the stream!'),
     demoVideo: false,
-    demoFilename: 'streamboss-source.png',
+    demoFilename: 'source-streamboss.png',
     supportList: [$t('Twitch Bits')],
     icon: 'fas fa-gavel',
   },
   [WidgetType.Credits]: {
     name: $t('Credits'),
     description: $t('Rolling credits to play at the end of your stream.'),
-    demoVideo: true,
-    demoFilename: 'source-credits.mp4',
+    demoVideo: false,
+    demoFilename: 'source-credits.png',
     supportList: [$t('New Followers'), $t('New Subscribers'), $t('Cheers'), $t('Donations')],
     platforms: new Set(['twitch', 'youtube']),
     icon: 'fas fa-align-center',
@@ -623,8 +645,8 @@ export const WidgetDisplayData = (platform?: string): { [x: number]: IWidgetDisp
   [WidgetType.SpinWheel]: {
     name: $t('Spin Wheel'),
     description: $t('Spin the wheel to make a decision.'),
-    demoVideo: true,
-    demoFilename: 'source-wheel.mp4',
+    demoVideo: false,
+    demoFilename: 'source-wheel.png',
     supportList: [$t('The streamer manually triggers a spin anytime while they are live.')],
     icon: 'fas fa-chart-pie',
   },
@@ -636,7 +658,7 @@ export const WidgetDisplayData = (platform?: string): { [x: number]: IWidgetDisp
         ' Media will only play through this media share widget.',
     ),
     demoVideo: false,
-    demoFilename: 'source-sponsor-banner.png',
+    demoFilename: 'media.png',
     supportList: [],
     icon: 'icon-share',
   },
@@ -674,7 +696,15 @@ export const WidgetDisplayData = (platform?: string): { [x: number]: IWidgetDisp
     demoVideo: false,
     demoFilename: 'game-widget.png',
     supportList: [],
-    platforms: new Set(['twitch']),
+    platforms: new Set(['twitch', 'youtube']),
     icon: 'icon-face-masks',
+  },
+  [WidgetType.CustomWidget]: {
+    name: $t('Custom Widget'),
+    description: $t('Use HTML, CSS, and JavaScript to create a widget with custom functionality'),
+    demoVideo: false,
+    demoFilename: '', // do not show an image
+    supportList: [],
+    icon: 'icon-developer',
   },
 });

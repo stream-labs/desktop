@@ -9,7 +9,7 @@
   "Monitor and Output": "Overvåg og udsend lyd",
   "Stream Track": "Stream spor",
   "Stream Tracks": "Stream spor",
-  "Rec. Tracks": "Optag spor",
+  "Rec. Tracks": "Optagelse Spor",
   "Advanced Audio Settings": "Avancerede lydindstillinger",
   "Volume ( % )": "Lydstyrke (%)",
   "Sync Offset": "Synkroniseringsforskydning",
@@ -32,8 +32,15 @@
   "Source Settings": "Kildeindstillinger",
   "Audio Tracks": "Lydspor",
   "Designates which tracks are being recorded": "Angiver, hvilke spor der bliver optaget",
-  "Your Stream and VOD Track are the same. This may result in unexpected audio behavior, go to Global Settings to change.": "Your Stream and VOD Track are the same. This may result in unexpected audio behavior, go to Global Settings to change.",
-  "Streaming Track": "Streaming Track",
-  "Enable Twitch VOD Track": "Enable Twitch VOD Track",
-  "Twitch VOD Track": "Twitch VOD Track"
+  "Your Stream and VOD Track are the same. This may result in unexpected audio behavior, go to Global Settings to change.": "Du har samme Stream- og VOD-lydspor. Dette kan resultere i, at lyden agerer uventet. Gå til Globale indstillinger for at ændre det.",
+  "Streaming Track": "Streamer lydspor",
+  "Enable Twitch VOD Track": "Aktivér Twitch VOD-lydspor",
+  "Twitch VOD Track": "Twitch VOD-lydspor",
+  "Sample Rate (requires a restart)": "Samplerate (kræver genstart)",
+  "Channels (requires a restart)": "Kanaler (kræver genstart)",
+  "Desktop Audio Device 1": "Computerlydenhed 1",
+  "Desktop Audio Device 2": "Computerlydenhed 2",
+  "Mic/Auxiliary Device 1": "Mikrofon/Aux-enhed 1",
+  "Mic/Auxiliary Device 2": "Mikrofon/Aux-enhed 2",
+  "Mic/Auxiliary Device 3": "Mikrofon/Aux-enhed 3"
 }

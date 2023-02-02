@@ -35,7 +35,7 @@ export interface ISourceModel {
  * renaming the source or updating settings and properties form data. For more
  * scene related operations see {@link SceneNode} and {@link Scene}.
  */
-@ServiceHelper()
+@ServiceHelper('SourcesService')
 export class Source implements ISourceModel, ISerializable {
   @Inject('SourcesService') private internalSourcesService: InternalSourcesService;
   @Fallback() private source: InternalSource;

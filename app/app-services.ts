@@ -56,6 +56,9 @@ export { MetricsService } from 'services/metrics';
 export { HighlighterService } from 'services/highlighter';
 export { DiagnosticsService } from 'services/diagnostics';
 export { RecordingModeService } from 'services/recording-mode';
+export { SideNavService } from 'services/side-nav';
+export { VideoSettingsService } from 'services/settings-v2/video';
+export { SettingsManagerService } from 'services/settings-manager';
 
 // ONLINE SERVICES
 export { UserService } from './services/user';
@@ -88,11 +91,11 @@ export { ChatService } from 'services/chat';
 export { RecentEventsService } from 'services/recent-events';
 export { MagicLinkService } from 'services/magic-link';
 export { GrowService } from 'services/grow/grow';
+export { GuestCamService } from 'services/guest-cam';
 
 // WIDGETS
 export { WidgetSource, WidgetsService } from './services/widgets';
 export { BitGoalService } from 'services/widgets/settings/bit-goal';
-export { ChatBoxService } from 'services/widgets/settings/chat-box';
 export { DonationGoalService } from 'services/widgets/settings/donation-goal';
 export { FollowerGoalService } from 'services/widgets/settings/follower-goal';
 export { StarsGoalService } from 'services/widgets/settings/stars-goal';
@@ -122,6 +125,7 @@ import { EditorCommandsService } from './services/editor-commands';
 import { EditorService } from 'services/editor';
 import { PerformanceService } from './services/performance';
 import { SourcesService } from './services/sources';
+import { SelectionService } from './services/selection';
 import { StreamingService } from './services/streaming';
 import { StreamSettingsService } from './services/settings/streaming';
 import { RestreamService } from './services/restream';
@@ -165,7 +169,7 @@ import { SpinWheelService } from 'services/widgets/settings/spin-wheel';
 import { LayoutService } from './services/layout';
 import { ProjectorService } from './services/projector';
 import { ObsImporterService } from 'services/obs-importer';
-import { DefaultHardwareService } from 'services/hardware';
+import { DefaultHardwareService, HardwareService } from 'services/hardware';
 import { AutoConfigService } from 'services/auto-config';
 import { MacPermissionsService } from 'services/mac-permissions';
 import { IncrementalRolloutService } from './services/incremental-rollout';
@@ -173,6 +177,11 @@ import { RecordingModeService } from 'services/recording-mode';
 import { JsonrpcService } from 'services/api/jsonrpc';
 import { OverlaysPersistenceService } from 'services/scene-collections/overlays';
 import { PlatformAppStoreService } from 'services/platform-app-store';
+import { GameOverlayService } from 'services/game-overlay';
+import { GuestCamService } from 'services/guest-cam';
+import { SideNavService } from './services/side-nav';
+import { VideoSettingsService } from 'services/settings-v2/video';
+import { SettingsManagerService } from 'services/settings-manager';
 
 export const AppServices = {
   AppService,
@@ -187,6 +196,7 @@ export const AppServices = {
   EditorService,
   PerformanceService,
   SourcesService,
+  SelectionService,
   PatchNotesService,
   VideoService,
   ChatService,
@@ -234,4 +244,10 @@ export const AppServices = {
   JsonrpcService,
   OverlaysPersistenceService,
   PlatformAppStoreService,
+  GameOverlayService,
+  GuestCamService,
+  HardwareService,
+  SideNavService,
+  VideoSettingsService,
+  SettingsManagerService,
 };

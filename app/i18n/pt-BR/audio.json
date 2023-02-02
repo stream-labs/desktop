@@ -9,7 +9,7 @@
   "Monitor and Output": "Monitorar e enviar áudio",
   "Stream Track": "Faixa de transmissão",
   "Stream Tracks": "Faixas de transmissão",
-  "Rec. Tracks": "Faixas de gravação",
+  "Rec. Tracks": "Rec. Faixas",
   "Advanced Audio Settings": "Propriedades de áudio avançadas",
   "Volume ( % )": "Volume (%)",
   "Sync Offset": "Atraso de sincronização",
@@ -32,8 +32,15 @@
   "Source Settings": "Configurações da fonte",
   "Audio Tracks": "Faixas de áudio",
   "Designates which tracks are being recorded": "Indica quais faixas estão sendo gravadas",
-  "Your Stream and VOD Track are the same. This may result in unexpected audio behavior, go to Global Settings to change.": "Your Stream and VOD Track are the same. This may result in unexpected audio behavior, go to Global Settings to change.",
-  "Streaming Track": "Streaming Track",
-  "Enable Twitch VOD Track": "Enable Twitch VOD Track",
-  "Twitch VOD Track": "Twitch VOD Track"
+  "Your Stream and VOD Track are the same. This may result in unexpected audio behavior, go to Global Settings to change.": "A trilha de sua transmissão e de seu VOD é a mesma. Isso pode resultar em comportamento inesperado de áudio, vá para Configurações globais para alterar.",
+  "Streaming Track": "Trilha de transmissão",
+  "Enable Twitch VOD Track": "Habilitar trilha de VOD Twitch",
+  "Twitch VOD Track": "Trilha de VOD Twitch",
+  "Sample Rate (requires a restart)": "Taxa de amostragem (requer reinício)",
+  "Channels (requires a restart)": "Canais (requer reinício)",
+  "Desktop Audio Device 1": "Dispositivo de áudio de área de trabalho 1",
+  "Desktop Audio Device 2": "Dispositivo de áudio de área de trabalho 2",
+  "Mic/Auxiliary Device 1": "Dispositivo de microfone/auxiliar 1",
+  "Mic/Auxiliary Device 2": "Dispositivo de microfone/auxiliar 2",
+  "Mic/Auxiliary Device 3": "Dispositivo de microfone/auxiliar 3"
 }

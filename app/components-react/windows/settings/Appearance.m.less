@@ -1,0 +1,48 @@
+@import '../../../styles/index';
+
+.container {
+  margin-bottom: 3px;
+}
+
+.prime-container {
+  margin-bottom: 16px;
+}
+
+.prime {
+  color: var(--prime);
+}
+
+.sidenav-settings {
+  padding-bottom: 16px;
+
+  .menu-controls {
+    :global(div.ant-form-item-control-input) {
+      min-height: 39px;
+    }
+  }
+}
+
+.apps-selector {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.apps-dropdown {
+  width: 70%;
+}
+
+.extra-margin {
+  margin-bottom: 16px;
+}
+
+.settings-checkbox .ant-checkbox-inner::after {
+  background-color: var(--checkbox) !important;
+  border-color: var(--checkbox) !important;
+
+  &:hover {
+    border-color: var(--checkbox) !important;
+  }
+}

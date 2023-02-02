@@ -13,7 +13,7 @@ import { useWidgetRoot, WidgetModule } from './useWidget';
 // StarsGoal
 // SubGoal
 // SubscriberGoal
-// ChatBox
+import { ChatBox, ChatBoxModule } from '../ChatBox';
 // ChatHighlight
 // Credits
 import { DonationTicker, DonationTickerModule } from '../DonationTicker';
@@ -27,12 +27,12 @@ import { EmoteWall, EmoteWallModule } from '../EmoteWall';
 // TipJar
 import { GameWidget, GameWidgetModule } from '../GameWidget';
 import { ViewerCount, ViewerCountModule } from '../ViewerCount';
+import { CustomWidget, CustomWidgetModule } from '../CustomWidget';
 import { useSubscription } from '../../hooks/useSubscription';
 
 // define list of Widget components and modules
 export const components = {
   AlertBox: [AlertBox, AlertBoxModule],
-  // TODO: define other widgets here to avoid merge conflicts
   // BitGoal
   // DonationGoal
   // CharityGoal
@@ -40,7 +40,7 @@ export const components = {
   // StarsGoal
   // SubGoal
   // SubscriberGoal
-  // ChatBox
+  ChatBox: [ChatBox, ChatBoxModule],
   // ChatHighlight
   // Credits
   DonationTicker: [DonationTicker, DonationTickerModule],
@@ -54,6 +54,7 @@ export const components = {
   // TipJar
   ViewerCount: [ViewerCount, ViewerCountModule],
   GameWidget: [GameWidget, GameWidgetModule],
+  CustomWidget: [CustomWidget, CustomWidgetModule],
 };
 
 /**

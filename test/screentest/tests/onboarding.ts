@@ -40,11 +40,11 @@ test('Onboarding steps', async t => {
   await makeScreenshots(t, 'Optimization progress');
 
   await (await app.client.$('h1=Choose your Streamlabs plan')).waitForDisplayed({ timeout: 15000 });
-  await makeScreenshots(t, 'Prime');
-  await (await app.client.$('div=Choose Free')).click();
+  await makeScreenshots(t, 'Ultra');
+  await (await app.client.$('div=Current Plan')).click();
 
   // success?
-  await (await app.client.$('h2=Sources')).waitForDisplayed({ timeout: 60000 });
+  await (await app.client.$('span=Sources')).waitForDisplayed({ timeout: 60000 });
   await makeScreenshots(t, 'Onboarding completed');
   t.pass();
 });
@@ -76,7 +76,7 @@ test('OBS Importer', async t => {
   await (await client.$('h2=Start')).click();
 
   // success?
-  await (await client.$('h2=Sources')).waitForDisplayed({ timeout: 60000 });
+  await (await client.$('span=Sources')).waitForDisplayed({ timeout: 60000 });
   await makeScreenshots(t, 'Import from OBS is completed');
   t.pass();
 });

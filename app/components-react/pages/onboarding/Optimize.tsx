@@ -66,9 +66,6 @@ export function Optimize() {
           });
         }
       } else if (progress.event === 'done') {
-        // We also default on video encoding optimizations
-        VideoEncodingOptimizationService.actions.useOptimizedProfile(true);
-
         setProcessing(false);
         sub.unsubscribe();
         next();
@@ -101,7 +98,7 @@ export function Optimize() {
           onClick={optimize}
           style={{ margin: 'auto', marginTop: 24 }}
         >
-          <h2>{$t('Start')}</h2>
+          <h2 style={{ color: 'var(--action-button-text)' }}>{$t('Start')}</h2>
         </button>
       )}
     </div>

@@ -2,22 +2,12 @@
   width: 100%;
   height: 100%;
   padding: 24px;
-  padding-top: 64px;
   background: var(--section);
 
-  .image-container {
-    min-height: 200px;
-    overflow: hidden;
-    position: relative;
-  }
-
-  img, video {
+  img,
+  video {
     width: 100%;
     height: auto;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
   }
 }
 
@@ -28,13 +18,11 @@
 .source-tag {
   background: var(--section-alt);
   border-radius: 4px;
-  height: 32px;
-  padding-top: 6px;
-  padding-left: 8px;
-  padding-right: 8px;
-  overflow: hidden;
-  white-space: nowrap;
+  height: 100%;
+  padding: 6px 8px;
+  overflow-wrap: break-word;
   text-overflow: ellipsis;
+  min-height: 56px;
 
   i {
     margin-right: 8px;
@@ -52,5 +40,12 @@
 }
 
 .source-tag.essential {
-  height: 64px;
+  min-height: 56px;
+}
+
+.source-tag.exclude-wrap {
+  height: 32px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }

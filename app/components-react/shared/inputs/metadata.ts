@@ -1,30 +1,67 @@
+import { Rule } from 'antd/lib/form';
+import { TInputValue } from './FormFactory';
+
 /**
  * Metadata generator for inputs
  * Provides some presets and helps with typechecking
  */
 export const metadata = {
-  text: (options: ITextMetadata) => options,
-  number: (options: INumberMetadata) => options,
-  slider: (options: ISliderMetadata) => options,
-  bool: (options: ITextBoolMetadata) => options,
-  list: <T>(options: IListMetadata<T>) => options,
   any: (options: IAnyMetadata) => options,
+  text: (options: ITextMetadata) => ({ ...options, type: 'text' }),
+  textarea: (options: ITextMetadata) => ({ ...options, type: 'textarea' }),
+  number: (options: INumberMetadata) => ({ ...options, type: 'number' }),
+  slider: (options: ISliderMetadata) => ({ ...options, type: 'slider' }),
+  bool: (options: ITextBoolMetadata) => ({ ...options, type: 'checkbox' }),
+  switch: (options: ITextBoolMetadata) => ({ ...options, type: 'switch' }),
+  list: <T>(options: IListMetadata<T>) => ({ ...options, type: 'list' }),
+  color: (options: IBaseMetadata) => ({ ...options, type: 'color' }),
+  fontSize: (options: ISliderMetadata) => ({
+    min: 8,
+    max: 80,
+    step: 1,
+    ...options,
+    type: 'slider',
+  }),
+  autocomplete: <T>(options: IListMetadata<T>) => ({
+    ...options,
+    type: 'autocomplete',
+  }),
   seconds: (options: ISliderMetadata) => ({
     min: 0,
     step: 1000,
     tipFormatter: (ms: number) => `${ms / 1000}s`,
     ...options,
+    type: 'slider',
   }),
 };
+
+export type TInputMetadata<T = string> =
+  | ITextMetadata
+  | INumberMetadata
+  | ISliderMetadata
+  | ITextBoolMetadata
+  | ICheckboxGroupMetadata
+  | IListMetadata<T>;
 
 interface IBaseMetadata {
   label?: string;
   tooltip?: string;
   required?: boolean;
+  type?: string;
+  rules?: Rule[];
+  onChange?: (value: unknown) => void;
+  children?: Dictionary<TInputMetadata<unknown>>;
+  displayed?: boolean;
+  name?: string;
 }
 
 interface ITextMetadata extends IBaseMetadata {
   value?: string;
+}
+
+export interface ICheckboxGroupMetadata extends IBaseMetadata {
+  children: Dictionary<ITextBoolMetadata>;
+  values: Dictionary<TInputValue>;
 }
 
 interface INumberMetadata extends IBaseMetadata {
@@ -49,6 +86,7 @@ interface IAnyMetadata extends IBaseMetadata {
   value?: any;
 }
 
-interface IListMetadata<T = string> extends IBaseMetadata {
+export interface IListMetadata<T = string> extends IBaseMetadata {
   value?: T;
+  options?: { label: string; value: T }[];
 }

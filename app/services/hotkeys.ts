@@ -161,6 +161,11 @@ const GENERAL_ACTIONS: HotkeyGroup = {
     description: () => $t('Save Replay'),
     down: () => getStreamingService().saveReplay(),
   },
+  SPLIT_FILE: {
+    name: 'SPLIT_FILE',
+    description: () => $t('Split Recording File'),
+    down: () => getStreamingService().splitFile(),
+  },
   TOGGLE_OVERLAY: {
     name: 'TOGGLE_OVERLAY',
     description: () => $t('Toggle in-game overlay'),
@@ -688,7 +693,7 @@ export class HotkeysService extends StatefulService<IHotkeysServiceState> {
 /**
  * Represents a single bindable hotkey
  */
-@ServiceHelper()
+@ServiceHelper('HotkeysService')
 export class Hotkey implements IHotkey {
   actionName: string;
   sceneId?: string;

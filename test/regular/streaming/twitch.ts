@@ -122,3 +122,12 @@ test('Twitch Tags', async t => {
 
   t.pass();
 });
+
+test('Streaming to Twitch unlisted category', async t => {
+  await logIn('twitch');
+  await goLive({
+    title: 'SLOBS Test unlisted Stream',
+    twitchGame: 'Unlisted',
+  });
+  t.pass();
+});
