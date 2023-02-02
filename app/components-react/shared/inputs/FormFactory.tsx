@@ -7,7 +7,7 @@ import { TInputType, TSlobsInputProps } from './inputs';
 import Form, { useForm } from './Form';
 import { TInputMetadata } from './metadata';
 
-export type TInputValue = string | number | boolean;
+export type TInputValue = string | number | boolean | IRGBColor;
 
 const componentTable: {
   [k in TInputType]?: React.FunctionComponent<TSlobsInputProps<{}, TInputValue>>;
@@ -19,6 +19,9 @@ const componentTable: {
   list: inputs.ListInput,
   switch: inputs.SwitchInput,
   autocomplete: inputs.AutocompleteInput,
+  checkboxGroup: inputs.CheckboxGroup,
+  textarea: inputs.TextAreaInput,
+  color: inputs.ColorInput,
 };
 
 interface IFormMetadata {
@@ -60,11 +63,11 @@ function FormInput(p: {
   values: Dictionary<TInputValue>;
   onChange: (key: string) => (value: TInputValue) => void;
 }) {
-  const children = p.metadata.children;
+  const { children, type } = p.metadata;
 
-  if (!p.metadata.type) return <></>;
+  if (!type) return <></>;
 
-  const Input = componentTable[p.metadata.type];
+  const Input = componentTable[type];
 
   return (
     <>
@@ -72,9 +75,11 @@ function FormInput(p: {
         {...p.metadata}
         name={p.id}
         value={p.values[p.id]}
+        values={type === 'checkboxGroup' && p.values}
         onChange={p.metadata.onChange || p.onChange(p.id)}
       />
       {!!children &&
+        type !== 'checkboxGroup' &&
         Object.keys(children)
           .filter(childKey => children[childKey].displayed)
           .map(childKey => (
