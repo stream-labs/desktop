@@ -194,7 +194,7 @@ export class RestreamService extends StatefulService<IRestreamState> {
         return {
           platform: platform as TPlatform,
           streamKey: getPlatformService(platform).state.streamKey,
-          video: getPlatformService(platform).state.settings.video,
+          video: this.dualOutputService.views.getPlatformContext(platform), // @@@ TODO if this is the correct approach to apply contexts, remove from respective beforeGoLive functions
         };
       }),
       ...this.streamInfo.savedSettings.customDestinations
@@ -206,13 +206,6 @@ export class RestreamService extends StatefulService<IRestreamState> {
         })),
     ];
 
-    // @@@ TODO apply dual output video contexts here instead of the respective platform's before go live?
-    // if (this.dualOutputService.views.dualOutputMode) {
-    //   const twitchTarget = newTargets.find(t => t.platform === 'twitch');
-    //   const display = this.dualOutputService.views.getPlatformDisplay('twitch');
-    //   twitchTarget.video = this.videoSettingsService.contexts[display];
-    // }
-
     // treat tiktok as a custom destination
     const tikTokTarget = newTargets.find(t => t.platform === 'tiktok');
     if (tikTokTarget) {
@@ -220,6 +213,8 @@ export class RestreamService extends StatefulService<IRestreamState> {
       tikTokTarget.platform = 'relay';
       tikTokTarget.streamKey = `${ttSettings.serverUrl}/${ttSettings.streamKey}`;
     }
+
+    console.log('newTargets ', newTargets);
 
     await this.createTargets(newTargets);
   }

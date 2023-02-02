@@ -22,6 +22,7 @@ interface IDualOutputServiceState {
 
 class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
   @Inject() private scenesService: ScenesService;
+  @Inject() private videoSettingsService: VideoSettingsService;
 
   get dualOutputMode() {
     return this.state.dualOutputMode;
@@ -66,6 +67,11 @@ class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
 
   getPlatformDisplay(platform: TPlatform) {
     return this.state.platformSettings[platform].setting;
+  }
+
+  getPlatformContext(platform: TPlatform) {
+    const display = this.getPlatformDisplay(platform);
+    return this.videoSettingsService.contexts[display];
   }
 
   getDisplayNodeMap(display: TDisplayType) {
