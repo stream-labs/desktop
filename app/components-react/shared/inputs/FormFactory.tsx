@@ -68,6 +68,9 @@ function FormInput(p: {
   if (!type) return <></>;
 
   const Input = componentTable[type];
+  let handleChange = p.onChange(p.id);
+  if (type === 'checkboxGroup') handleChange = p.onChange;
+  if (p.metadata.onChange) handleChange = p.metadata.onChange;
 
   return (
     <>
@@ -76,7 +79,7 @@ function FormInput(p: {
         name={p.id}
         value={p.values[p.id]}
         values={type === 'checkboxGroup' && p.values}
-        onChange={p.metadata.onChange || p.onChange(p.id)}
+        onChange={handleChange}
       />
       {!!children &&
         type !== 'checkboxGroup' &&
