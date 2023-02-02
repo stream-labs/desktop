@@ -13,7 +13,7 @@ import { useWidgetRoot, WidgetModule } from './useWidget';
 // StarsGoal
 // SubGoal
 // SubscriberGoal
-// ChatBox
+import { ChatBox, ChatBoxModule } from '../ChatBox';
 // ChatHighlight
 // Credits
 import { DonationTicker, DonationTickerModule } from '../DonationTicker';
@@ -33,7 +33,6 @@ import { useSubscription } from '../../hooks/useSubscription';
 // define list of Widget components and modules
 export const components = {
   AlertBox: [AlertBox, AlertBoxModule],
-  // TODO: define other widgets here to avoid merge conflicts
   // BitGoal
   // DonationGoal
   // CharityGoal
@@ -41,7 +40,7 @@ export const components = {
   // StarsGoal
   // SubGoal
   // SubscriberGoal
-  // ChatBox
+  ChatBox: [ChatBox, ChatBoxModule],
   // ChatHighlight
   // Credits
   DonationTicker: [DonationTicker, DonationTickerModule],

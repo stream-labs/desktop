@@ -9,6 +9,7 @@ import { UserService } from 'services/user';
 import { SettingsService } from './settings';
 import { byOS, OS } from 'util/operating-systems';
 import { GuestCamService } from './guest-cam';
+import { SideNavService, ESideNavKey, ProtocolLinkKeyMap } from './side-nav';
 
 function protocolHandler(base: string) {
   return (target: any, methodName: string, descriptor: PropertyDescriptor) => {
@@ -34,6 +35,7 @@ export class ProtocolLinksService extends Service {
   @Inject() userService: UserService;
   @Inject() settingsService: SettingsService;
   @Inject() guestCamService: GuestCamService;
+  @Inject() sideNavService: SideNavService;
 
   // Maps base URL components to handler function names
   private handlers: Dictionary<string>;
@@ -80,6 +82,11 @@ export class ProtocolLinksService extends Service {
         type: parts[1],
         id: parts[2],
       });
+      const menuItem =
+        ProtocolLinkKeyMap[parts[1]] ?? this.sideNavService.views.isOpen
+          ? ESideNavKey.Scene
+          : ESideNavKey.Themes;
+      this.sideNavService.setCurrentMenuItem(menuItem);
     }
   }
 
@@ -91,6 +98,7 @@ export class ProtocolLinksService extends Service {
 
     if (match) {
       this.navigationService.navigate('AlertboxLibrary', { id: match[1] });
+      this.sideNavService.setCurrentMenuItem(ESideNavKey.AlertBoxLibrary);
     }
   }
 
@@ -108,9 +116,11 @@ export class ProtocolLinksService extends Service {
     const appId = info.path.replace('/', '');
 
     if (this.platformAppsService.views.getApp(appId)) {
-      this.navigationService.navigateApp(appId);
+      this.navigationService.navigate('PlatformAppMainPage', { appId });
+      this.sideNavService.setCurrentMenuItem(appId);
     } else {
       this.navigationService.navigate('PlatformAppStore', { appId });
+      this.sideNavService.setCurrentMenuItem(ESideNavKey.AppsStoreHome);
     }
   }
 
