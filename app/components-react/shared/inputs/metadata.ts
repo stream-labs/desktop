@@ -62,6 +62,7 @@ interface ITextMetadata extends IBaseMetadata {
 export interface ICheckboxGroupMetadata extends IBaseMetadata {
   children: Dictionary<ITextBoolMetadata>;
   values: Dictionary<TInputValue>;
+  onChange: (key: string) => (value: boolean) => void;
 }
 
 interface INumberMetadata extends IBaseMetadata {
