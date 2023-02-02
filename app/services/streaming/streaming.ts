@@ -272,6 +272,7 @@ export class StreamingService
       try {
         // don't update settings for twitch in unattendedMode
         const settingsForPlatform = platform === 'twitch' && unattendedMode ? undefined : settings;
+
         await this.runCheck(platform, () => service.beforeGoLive(settingsForPlatform));
       } catch (e: unknown) {
         console.error('Error running beforeGoLive for plarform', e);
@@ -329,7 +330,7 @@ export class StreamingService
       try {
         await this.runCheck(
           'setupDualOutput',
-          async () => (ready = await this.restreamService.checkStatus()),
+          async () => (ready = await this.restreamService.checkStatus()), // @@@ TODO is the correct thing to be checking?
         );
       } catch (e: unknown) {
         console.error('Unable to proceed with dual output. Error fetching restreaming service', e);
@@ -344,8 +345,9 @@ export class StreamingService
       try {
         await this.runCheck('setupDualOutput', async () => {
           // enable restream on the backend side
-          if (!this.restreamService.state.enabled) await this.restreamService.setEnabled(true);
-          await this.restreamService.beforeGoLive();
+          // if (!this.restreamService.state.enabled) await this.restreamService.setEnabled(true);
+          // await this.restreamService.beforeGoLive();
+          await this.restreamService.beforeDualOutputGoLive();
         });
       } catch (e: unknown) {
         console.error('Unable to proceed with dual output. Failed to setup restream', e);

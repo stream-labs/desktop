@@ -14,7 +14,8 @@ import { TiktokService } from './platforms/tiktok';
 import { TrovoService } from './platforms/trovo';
 import * as remote from '@electron/remote';
 import * as obs from 'obs-studio-node';
-import { VideoSettingsService, TDisplayType } from './settings-v2/video';
+import { VideoSettingsService } from './settings-v2/video';
+import { DualOutputService } from './dual-output';
 
 interface IRestreamTarget {
   id: number;
@@ -52,6 +53,7 @@ export class RestreamService extends StatefulService<IRestreamState> {
   @Inject() tiktokService: TiktokService;
   @Inject() trovoService: TrovoService;
   @Inject() videoSettingsService: VideoSettingsService;
+  @Inject() dualOutputService: DualOutputService;
 
   settings: IUserSettingsResponse;
 
@@ -162,9 +164,9 @@ export class RestreamService extends StatefulService<IRestreamState> {
     await Promise.all([this.setupIngest(), this.setupTargets()]);
   }
 
-  // async beforeDualOutputGoLive() {
-  //   await Promise.all([this.setupAdvancedIngest(), this.setupAdvancedTargets()]);
-  // }
+  async beforeDualOutputGoLive() {
+    await Promise.all([this.setupIngest(), this.setupTargets()]);
+  }
 
   async setupIngest() {
     const ingest = (await this.fetchIngest()).server;
@@ -197,8 +199,19 @@ export class RestreamService extends StatefulService<IRestreamState> {
       }),
       ...this.streamInfo.savedSettings.customDestinations
         .filter(dest => dest.enabled)
-        .map(dest => ({ platform: 'relay' as 'relay', streamKey: `${dest.url}${dest.streamKey}` })),
+        .map(dest => ({
+          platform: 'relay' as 'relay',
+          streamKey: `${dest.url}${dest.streamKey}`,
+          video: dest?.video,
+        })),
     ];
+
+    // @@@ TODO apply dual output video contexts here instead of the respective platform's before go live?
+    // if (this.dualOutputService.views.dualOutputMode) {
+    //   const twitchTarget = newTargets.find(t => t.platform === 'twitch');
+    //   const display = this.dualOutputService.views.getPlatformDisplay('twitch');
+    //   twitchTarget.video = this.videoSettingsService.contexts[display];
+    // }
 
     // treat tiktok as a custom destination
     const tikTokTarget = newTargets.find(t => t.platform === 'tiktok');
@@ -299,7 +312,7 @@ export class RestreamService extends StatefulService<IRestreamState> {
         };
       }),
     );
-    console.log('targets ', targets);
+
     const request = new Request(url, { headers, body, method: 'POST' });
     const res = await fetch(request);
     if (!res.ok) throw await res.json();

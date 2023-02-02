@@ -10,6 +10,7 @@ import { TwitchService } from 'services/platforms/twitch';
 import { PlatformAppsService } from 'services/platform-apps';
 import { IGoLiveSettings, IPlatformFlags } from 'services/streaming';
 import Vue from 'vue';
+import { IVideo } from 'obs-studio-node';
 
 interface ISavedGoLiveSettings {
   platforms: {
@@ -26,6 +27,7 @@ export interface ICustomStreamDestination {
   url: string;
   streamKey?: string;
   enabled: boolean;
+  video?: IVideo;
 }
 
 /**
