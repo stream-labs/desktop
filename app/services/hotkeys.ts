@@ -341,18 +341,18 @@ const MARKERS_ACTIONS: HotkeyGroup = {
   },
   MARKER_2: {
     name: 'MARKER_2',
-    description: () => getMarkersService().views.getLabel('MARKER_1'),
-    down: () => getMarkersService().actions.addMarker('MARKER_1'),
+    description: () => getMarkersService().views.getLabel('MARKER_2'),
+    down: () => getMarkersService().actions.addMarker('MARKER_2'),
   },
   MARKER_3: {
     name: 'MARKER_3',
-    description: () => getMarkersService().views.getLabel('MARKER_1'),
-    down: () => getMarkersService().actions.addMarker('MARKER_1'),
+    description: () => getMarkersService().views.getLabel('MARKER_3'),
+    down: () => getMarkersService().actions.addMarker('MARKER_3'),
   },
   MARKER_4: {
     name: 'MARKER_4',
-    description: () => getMarkersService().views.getLabel('MARKER_1'),
-    down: () => getMarkersService().actions.addMarker('MARKER_1'),
+    description: () => getMarkersService().views.getLabel('MARKER_4'),
+    down: () => getMarkersService().actions.addMarker('MARKER_4'),
   },
 };
 
