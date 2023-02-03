@@ -108,7 +108,6 @@ export class NVoiceSynthesizer implements ISpeechSynthesizer {
           volume: speech.volume,
           maxTime: speech.nVoice?.maxTime,
           phonemeCallback: (phoneme: string) => {
-            console.log(phoneme); // DEBUG
             if (onPhoneme) {
               onPhoneme(phoneme);
             }

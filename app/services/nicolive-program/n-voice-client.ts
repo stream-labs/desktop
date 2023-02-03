@@ -86,15 +86,11 @@ export class NVoiceClientService extends StatefulService<INVoiceClientState> imp
       return null;
     }
 
-    console.log('NVoiceClientService.talk label:\n', labels); // DEBUG
-
     if (this.speaking) {
-      console.log('waiting previous speaking'); // DEBUG
       await this.speaking;
     }
 
     const startTime = Date.now();
-    console.log(`${text}: start playing`); // DEBUG
     const { cancel, done } = await playAudio(wave, options.volume);
     let phonemeCancel = false;
     if (options.phonemeCallback) {
@@ -115,7 +111,6 @@ export class NVoiceClientService extends StatefulService<INVoiceClientState> imp
       phonemeLoop();
     }
     this.speaking = done;
-    console.log(`${text}: play started`); // DEBUG
     return {
       cancel: () => { phonemeCancel = true; cancel() },
       speaking: this.speaking,

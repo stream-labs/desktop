@@ -77,7 +77,6 @@ export class NVoiceCharacterService extends StatefulService<INVoiceCharacterSour
       const url = this.getUrl(type, port);
       // URLを更新する
       (this.sourcesService.propertiesManagers[sourceId].manager as NVoiceCharacterManager).setNVoiceCharacterType(type);
-      console.log(` - sourceId:${sourceId}, type:${type}, url:${url}`); // DEBUG
     }
   }
 
@@ -86,7 +85,6 @@ export class NVoiceCharacterService extends StatefulService<INVoiceCharacterSour
       ? dirname(electron.remote.app.getPath('exe'))
       : electron.remote.app.getAppPath();
     const url = 'file://' + path.join(appPath, 'nvoice', type, `index.html?port=${port || this.state.port}`);
-    console.log(`getUrl(${type}, ${port}) => ${url}`); // DEBUG
     return url;
   }
 

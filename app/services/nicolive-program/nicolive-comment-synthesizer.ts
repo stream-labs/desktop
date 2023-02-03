@@ -79,16 +79,6 @@ export class NicoliveCommentSynthesizerService extends StatefulService<ICommentS
   phonemeServer: PhonemeServer;
 
   init(): void {
-    /*
-    // 後から追加された属性がなければ追加する
-    if (this.state.selector === undefined || this.state.maxTime === undefined) {
-      console.log('NicoliveCommentSynthesizerService: init', this.state); // DEBUG
-      this.SET_STATE({
-        ...NicoliveCommentSynthesizerService.initialState.selector,
-        ...this.state,
-      });
-    }
-    */
     this.setState({
       ...NicoliveCommentSynthesizerService.initialState,
       ...(this.stateService.state.speechSynthesizerSettings ? this.stateService.state.speechSynthesizerSettings : {}),

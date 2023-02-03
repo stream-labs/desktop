@@ -20,16 +20,6 @@ export class PhonemeServer {
           origin: '*',
         }
       });
-      this.io.on('connection', (socket) => {
-        console.log('PhonemeServer Socket', socket.id, 'connected'); // DEBUG
-        socket.conn.on('active', (active) => {
-          console.log('PhonemeServer Socket', socket.id, 'active', active); // DEBUG
-        });
-        socket.conn.on('close', () => {
-          console.log('PhonemeServer Socket', socket.id, 'closed'); // DEBUG
-        });
-      });
-
     } catch (e) {
       console.error('socket.io constructor error', e);
     }

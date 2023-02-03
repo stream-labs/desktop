@@ -107,7 +107,6 @@ class CommandLineClient {
 
   async run(label: string): Promise<void> {
     return new Promise((resolve, reject) => {
-      console.log('run started'); // DEBUG
       const rl = createInterface({
         input: this.stdout,
         terminal: false,
@@ -168,7 +167,6 @@ class CommandLineClient {
 async function StartNVoice(enginePath: string, dictionaryPath: string, userDictionary: string, modelPath: string, extraVoicesPath: string, cwd: string): Promise<CommandLineClient> {
   const log = ((...args: unknown[]) => { console.log(...args); });
 
-  console.log('StartNVoice', { enginePath, dictionaryPath, userDictionary, modelPath, extraVoicesPath, cwd }); // DEBUG
   const client = new CommandLineClient(
     spawn(enginePath, [dictionaryPath, userDictionary, modelPath, extraVoicesPath], { stdio: 'pipe', cwd }),
     log,
@@ -312,7 +310,6 @@ export class NVoiceClient {
 
   async _command(command: Command, ...args: string[]): Promise<string[]> {
     await this.startNVoice();
-    console.log('send', command, args); // DEBUG
     try {
       await this.commandLineClient.send([command, ...args].join(' '));
       return await this.waitOkNg(this.commandLineClient);
