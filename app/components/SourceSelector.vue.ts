@@ -25,7 +25,7 @@ const sourceIconMap = {
   openvr_capture: 'icon-vr-google',
   liv_capture: 'icon-vr-google',
   ndi_source: 'icon-NDI',
-  near: 'icon-near',
+  near: 'icon-nvoice-character-source',
   'decklink-input': 'icon-blackmagic',
 };
 
