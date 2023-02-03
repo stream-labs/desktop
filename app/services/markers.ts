@@ -1,16 +1,10 @@
 import fs from 'fs';
 import path from 'path';
-import { Inject, PersistentStatefulService, ViewHandler } from 'services/core';
+import { Inject, mutation, PersistentStatefulService, ViewHandler } from 'services/core';
 import { UsageStatisticsService } from './usage-statistics';
 import { $t } from './i18n';
 import { StreamingService } from './streaming';
-import { SettingsService } from './settings';
 import { ENotificationType, NotificationsService } from './notifications';
-
-interface ILoginTokenResponse {
-  login_token: string;
-  expires_at: number;
-}
 
 interface IMarkersServiceState {
   MARKER_1: string;
@@ -27,10 +21,9 @@ class MarkersServiceViews extends ViewHandler<IMarkersServiceState> {
 }
 
 export class MarkersService extends PersistentStatefulService<IMarkersServiceState> {
-  @Inject() streamingService: StreamingService;
-  @Inject() settingsService: SettingsService;
-  @Inject() notificationsService: NotificationsService;
-  @Inject() usageStatisticsService: UsageStatisticsService;
+  @Inject() private streamingService: StreamingService;
+  @Inject() private notificationsService: NotificationsService;
+  @Inject() private usageStatisticsService: UsageStatisticsService;
 
   static defaultState: IMarkersServiceState = {
     MARKER_1: 'Marker 1',
@@ -49,10 +42,11 @@ export class MarkersService extends PersistentStatefulService<IMarkersServiceSta
     return Object.keys(this.markers).length > 0;
   }
 
-  addMarker(label: string) {
+  addMarker(id: string) {
     if (!this.streamingService.views.isRecording) return;
+    const label = this.views.getLabel(id);
     const timestamp = this.streamingService.formattedDurationInCurrentRecordingState;
-    this.markers[timestamp] = this.views.getLabel(label);
+    this.markers[timestamp] = label;
 
     this.notificationsService.push({
       type: ENotificationType.SUCCESS,
@@ -87,5 +81,14 @@ export class MarkersService extends PersistentStatefulService<IMarkersServiceSta
     fs.writeFile(`${directory}_markers.csv`, fileBuffer, () => {});
 
     this.markers = {};
+  }
+
+  setMarkerName(marker: string, value: string) {
+    this.SET_MARKER_NAME(marker, value);
+  }
+
+  @mutation()
+  private SET_MARKER_NAME(marker: string, value: string) {
+    this.state[marker] = value;
   }
 }
