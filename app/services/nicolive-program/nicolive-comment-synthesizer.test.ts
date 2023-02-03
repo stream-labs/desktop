@@ -8,7 +8,7 @@ const setup = createSetupFunction({
   injectee: {
     NicoliveProgramStateService: {
       updated: {
-        subscribe() { }, // TODO state
+        subscribe() { },
       },
       state: {
       },
