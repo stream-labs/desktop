@@ -78,9 +78,9 @@ export class MarkersService extends PersistentStatefulService<IMarkersServiceSta
     const content = this.tableHeader + this.tableContents;
     const blob = new Blob([content], { type: 'text/csv;charset=utf-8;' });
     const fileBuffer = Buffer.from(await blob.arrayBuffer());
-    fs.writeFile(`${directory}_markers.csv`, fileBuffer, () => {});
-
-    this.markers = {};
+    fs.writeFile(`${directory}_markers.csv`, fileBuffer, () => {
+      this.markers = {};
+    });
   }
 
   setMarkerName(marker: string, value: string) {
