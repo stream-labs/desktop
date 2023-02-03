@@ -1,4 +1,5 @@
 import fs from 'fs';
+import path from 'path';
 import { Inject, PersistentStatefulService, ViewHandler } from 'services/core';
 import { UsageStatisticsService } from './usage-statistics';
 import { $t } from './i18n';
@@ -29,6 +30,7 @@ export class MarkersService extends PersistentStatefulService<IMarkersServiceSta
   @Inject() streamingService: StreamingService;
   @Inject() settingsService: SettingsService;
   @Inject() notificationsService: NotificationsService;
+  @Inject() usageStatisticsService: UsageStatisticsService;
 
   static defaultState: IMarkersServiceState = {
     MARKER_1: 'Marker 1',
@@ -43,17 +45,22 @@ export class MarkersService extends PersistentStatefulService<IMarkersServiceSta
     return new MarkersServiceViews(this.state);
   }
 
+  get hasMarkers() {
+    return Object.keys(this.markers).length > 0;
+  }
+
   addMarker(label: string) {
-    console.log(label, this.streamingService.formattedDurationInCurrentRecordingState);
     if (!this.streamingService.views.isRecording) return;
     const timestamp = this.streamingService.formattedDurationInCurrentRecordingState;
-    this.markers[timestamp] = label;
+    this.markers[timestamp] = this.views.getLabel(label);
 
     this.notificationsService.push({
       type: ENotificationType.SUCCESS,
       message: $t('Marker %{label} added at %{timestamp}', { label, timestamp }),
       lifeTime: 1000,
     });
+
+    this.usageStatisticsService.recordFeatureUsage('Markers');
   }
 
   get tableHeader() {
@@ -62,20 +69,23 @@ export class MarkersService extends PersistentStatefulService<IMarkersServiceSta
 
   get tableContents() {
     const markers = Object.keys(this.markers).sort((a, b) => (a < b ? -1 : 0));
-    return markers
-      .map((marker, i) => this.prepareRow(marker, this.markers[marker], i + 1))
-      .join('\n');
+    return markers.map((marker, i) => this.prepareRow(marker, i + 1)).join('\n');
   }
 
-  prepareRow(timestamp: string, label: string, number: number) {
+  prepareRow(timestamp: string, number: number) {
+    const label = this.markers[timestamp];
     return `${number},${timestamp}:00,${timestamp}:01,,,,0,"","${label}",blue,`;
   }
 
   async exportCsv(filename: string) {
-    const path = this.settingsService.views.recPath + `\\${filename}_markers.csv`;
+    if (!this.hasMarkers) return;
+    const parsedFilename = path.parse(filename);
+    const directory = path.join(parsedFilename.dir, parsedFilename.name);
     const content = this.tableHeader + this.tableContents;
     const blob = new Blob([content], { type: 'text/csv;charset=utf-8;' });
     const fileBuffer = Buffer.from(await blob.arrayBuffer());
-    fs.writeFile(path, fileBuffer, () => {});
+    fs.writeFile(`${directory}_markers.csv`, fileBuffer, () => {});
+
+    this.markers = {};
   }
 }

@@ -44,6 +44,8 @@ import { StreamInfoView } from './streaming-view';
 import { GrowService } from 'services/grow/grow';
 import * as remote from '@electron/remote';
 import { RecordingModeService } from 'services/recording-mode';
+import { MarkersService } from 'services/markers';
+import { byOS, OS } from 'util/operating-systems';
 
 enum EOBSOutputType {
   Streaming = 'streaming',
@@ -84,6 +86,7 @@ export class StreamingService
   @Inject() private twitterService: TwitterService;
   @Inject() private growService: GrowService;
   @Inject() private recordingModeService: RecordingModeService;
+  @Inject() private markersService: MarkersService;
 
   streamingStatusChange = new Subject<EStreamingState>();
   recordingStatusChange = new Subject<ERecordingState>();
@@ -976,7 +979,12 @@ export class StreamingService
 
       if (info.signal === EOBSOutputSignal.Wrote) {
         const filename = obs.NodeObs.OBS_service_getLastRecording();
-        this.recordingModeService.addRecordingEntry(filename);
+        const parsedFilename = byOS({
+          [OS.Mac]: filename,
+          [OS.Windows]: filename.replace(/\//, '\\'),
+        });
+        this.recordingModeService.actions.addRecordingEntry(parsedFilename);
+        this.markersService.actions.exportCsv(parsedFilename);
         // Wrote signals come after Offline, so we return early here
         // to not falsely set our state out of Offline
         return;
