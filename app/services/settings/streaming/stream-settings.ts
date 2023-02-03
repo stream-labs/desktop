@@ -11,6 +11,7 @@ import { PlatformAppsService } from 'services/platform-apps';
 import { IGoLiveSettings, IPlatformFlags } from 'services/streaming';
 import Vue from 'vue';
 import { IVideo } from 'obs-studio-node';
+import { DualOutputService } from 'services/dual-output';
 
 interface ISavedGoLiveSettings {
   platforms: {
@@ -98,6 +99,7 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
   @Inject() private userService: UserService;
   @Inject() private platformAppsService: PlatformAppsService;
   @Inject() private streamSettingsService: StreamSettingsService;
+  @Inject() private dualOutputService: DualOutputService;
 
   static defaultState: IStreamSettingsState = {
     protectedModeEnabled: true,
@@ -144,13 +146,21 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
     // save settings related to "Settings->Stream" window
     let streamFormData = cloneDeep(this.views.obsStreamSettings);
 
+    console.log('streamFormData ', streamFormData);
+
     streamFormData.forEach(subCategory => {
       subCategory.parameters.forEach(parameter => {
         if (parameter.name === 'streamType' && patch.streamType !== void 0) {
           parameter.value = patch.streamType;
+
           // we should immediately save the streamType in OBS if it's changed
           // otherwise OBS will not save 'key' and 'server' values
           this.settingsService.setSettings('Stream', streamFormData);
+
+          // if dual output mode, apply settings to the second stream
+          if (this.dualOutputService.views.dualOutputMode) {
+            this.settingsService.setSettings('StreamSecond', streamFormData);
+          }
         }
       });
     });
@@ -178,6 +188,11 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
       });
     });
     this.settingsService.setSettings('Stream', streamFormData);
+
+    // if dual output mode, apply settings to the second stream
+    if (this.dualOutputService.views.dualOutputMode) {
+      this.settingsService.setSettings('StreamSecond', streamFormData);
+    }
   }
 
   setGoLiveSettings(settingsPatch: Partial<IGoLiveSettings>) {
@@ -186,9 +201,16 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
     if (settingsPatch.platforms) {
       const pickedFields: (keyof IPlatformFlags)[] = ['enabled', 'useCustomFields'];
       const platforms: Dictionary<IPlatformFlags> = {};
-      Object.keys(settingsPatch.platforms).map(
-        platform => (platforms[platform] = pick(settingsPatch.platforms![platform], pickedFields)),
-      );
+      Object.keys(settingsPatch.platforms).map(platform => {
+        const platformSettings = pick(settingsPatch.platforms![platform], pickedFields);
+
+        if (this.dualOutputService.views.dualOutputMode) {
+          platformSettings.video = this.dualOutputService.views.getPlatformContext(
+            platform as TPlatform,
+          ); // @@@ TODO remove from respective beforeGoLive functions
+        }
+        return (platforms[platform] = platformSettings);
+      });
       patch.platforms = platforms as ISavedGoLiveSettings['platforms'];
     }
     console.log('update settings', settingsPatch);

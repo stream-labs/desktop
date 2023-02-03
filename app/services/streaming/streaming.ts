@@ -29,7 +29,7 @@ import {
   NotificationsService,
 } from 'services/notifications';
 import { VideoEncodingOptimizationService } from 'services/video-encoding-optimizations';
-import { CustomizationService } from 'services/customization';
+import { VideoSettingsService } from 'services/settings-v2/video';
 import { StreamSettingsService } from '../settings/streaming';
 import { RestreamService } from 'services/restream';
 import Utils from 'services/utils';
@@ -84,6 +84,7 @@ export class StreamingService
   @Inject() private twitterService: TwitterService;
   @Inject() private growService: GrowService;
   @Inject() private recordingModeService: RecordingModeService;
+  @Inject() private videoSettingsService: VideoSettingsService;
 
   streamingStatusChange = new Subject<EStreamingState>();
   recordingStatusChange = new Subject<ERecordingState>();
@@ -324,16 +325,27 @@ export class StreamingService
 
     // setup dual output
     if (this.views.isDualOutputMode) {
+      // check for more than one active platform using canvas
+
+      // if so, multistream just that stream
+
+      // treat it like two different desktops <--- *****
+
       // dual output also uses the Restream service
       // so check if the Restream service is available
+      // @@@ TODO fix dual output errors
+      //   update dual output settings
+
+      // @@@ TODO: ONLY TURN ON RESTREAM IF MULTIPLE ACTIVE PLATFORMS NEED TO USE THE SAME CONTEXT
       let ready = false;
+
       try {
         await this.runCheck(
           'setupDualOutput',
-          async () => (ready = await this.restreamService.checkStatus()), // @@@ TODO is the correct thing to be checking?
+          async () => (ready = await this.restreamService.checkStatus()),
         );
       } catch (e: unknown) {
-        console.error('Unable to proceed with dual output. Error fetching restreaming service', e);
+        console.error('Error fetching restreaming service for dual output', e);
       }
       // Assume restream is down
       if (!ready) {
@@ -341,13 +353,12 @@ export class StreamingService
         return;
       }
 
-      // update dual output settings
       try {
         await this.runCheck('setupDualOutput', async () => {
-          // enable restream on the backend side
-          // if (!this.restreamService.state.enabled) await this.restreamService.setEnabled(true);
-          // await this.restreamService.beforeGoLive();
-          await this.restreamService.beforeDualOutputGoLive();
+          // enable restream on the backend side\
+          if (!this.restreamService.state.enabled) await this.restreamService.setEnabled(true);
+          await this.restreamService.beforeGoLive();
+          // return Promise.resolve(true);
         });
       } catch (e: unknown) {
         console.error('Unable to proceed with dual output. Failed to setup restream', e);
@@ -657,7 +668,23 @@ export class StreamingService
 
     this.powerSaveId = remote.powerSaveBlocker.start('prevent-display-sleep');
 
-    obs.NodeObs.OBS_service_startStreaming();
+    if (this.views.isDualOutputMode) {
+      const horizontalContext = this.videoSettingsService.contexts.horizontal;
+      const verticalContext = this.videoSettingsService.contexts.vertical;
+
+      console.log('setVideoInfo horizontalContext ', horizontalContext);
+      console.log('setVideoInfo verticalContext ', verticalContext);
+
+      obs.NodeObs.OBS_service_setVideoInfo(horizontalContext, 0);
+      obs.NodeObs.OBS_service_setVideoInfo(verticalContext, 1);
+
+      obs.NodeObs.OBS_service_startStreaming();
+      obs.NodeObs.OBS_service_startStreamingSecond();
+      // @@@ TODO: setSettings platform settings for each stream with platform settings in stream-settings.ts
+      // streamFormData: platforms: { ... } --> this.settingsService.setSettings('StreamSecond', streamFormData);
+    } else {
+      obs.NodeObs.OBS_service_startStreaming();
+    }
 
     const recordWhenStreaming = this.streamSettingsService.settings.recordWhenStreaming;
 
@@ -729,6 +756,10 @@ export class StreamingService
       }
 
       obs.NodeObs.OBS_service_stopStreaming(false);
+
+      if (this.views.isDualOutputMode) {
+        obs.NodeObs.OBS_service_stopStreamingSecond(false);
+      }
 
       const keepRecording = this.streamSettingsService.settings.keepRecordingWhenStreamStops;
       if (!keepRecording && this.state.recordingStatus === ERecordingState.Recording) {

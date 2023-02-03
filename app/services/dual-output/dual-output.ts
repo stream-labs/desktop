@@ -200,9 +200,11 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
       // if it's the first display, just assign the scene item's output to a context
       const context = this.videoSettingsService.contexts[display];
 
+      console.log('creating node for ', display, 'context with ', context);
+
       if (!context) return false;
 
-      sceneItem.setSettings({ output: context });
+      sceneItem.setSettings({ output: context }, display);
 
       // in preparation for unlimited display profiles
       // create a node map entry even though the key and value are the same
@@ -214,10 +216,12 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
       const copiedSceneItem = scene.addSource(sceneItem.sourceId);
       const context = this.videoSettingsService.contexts[display];
 
+      console.log('creating node for ', display, 'context with ', context);
+
       if (!copiedSceneItem || !context) return false;
 
       const settings: IPartialSettings = { ...sceneItem.getSettings(), output: context };
-      copiedSceneItem.setSettings(settings);
+      copiedSceneItem.setSettings(settings, display);
 
       this.SET_NODE_MAP_ITEM(display, sceneItem.id, copiedSceneItem.id);
       return true;
@@ -233,14 +237,30 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
         this.scenesService.views.activeSceneId,
       );
 
+      console.log('nodesToReassign ', nodesToReassign);
+
+      console.log('sceneNodes before ', sceneNodes);
+
+      const defaultContext = this.videoSettingsService.contexts.default;
+
       sceneNodes.forEach((sceneItem: SceneItem) => {
         if (nodesToReassign.includes(sceneItem.id)) {
-          const setting: IPartialSettings = { output: this.videoSettingsService.contexts.default };
-          sceneItem.setSettings(setting);
+          console.log('reassigning sceneItem.id ', sceneItem.id);
+          const setting: IPartialSettings = { output: defaultContext };
+          sceneItem.setSettings(setting, display);
+
+          console.log('model is now', sceneItem.getModel());
         } else {
+          console.log('removing ', sceneItem.id);
           sceneItem.remove();
         }
       });
+
+      // @@@ TODO: remove, just confirming correct removal
+      const sceneNodes2 = this.scenesService.views.getSceneItemsBySceneId(
+        this.scenesService.views.activeSceneId,
+      );
+      console.log('sceneNodes2 after ', sceneNodes2);
     }
 
     this.videoSettingsService.resetToDefaultContext();

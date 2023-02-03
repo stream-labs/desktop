@@ -14,6 +14,7 @@ import namingHelpers from 'util/NamingHelpers';
 import uuid from 'uuid/v4';
 import { ViewHandler } from 'services/core';
 import { DualOutputService } from 'services/dual-output';
+import { TDisplayType } from 'services/settings-v2/video';
 
 export type TSceneNodeModel = ISceneItem | ISceneItemFolder;
 
@@ -143,7 +144,7 @@ export interface ISceneItemNode {
   sceneNodeType: TSceneNodeType;
   parentId?: string;
   isRemoved?: boolean;
-  // video?: obs.IVideo;
+  output?: obs.IVideo;
 }
 
 export interface ISceneItemFolder extends ISceneItemNode {
@@ -279,6 +280,12 @@ export class ScenesService extends StatefulService<IScenesState> {
     const sanitizedOrder = order.filter(id => this.state.scenes[id]);
     this.state.displayOrder = sanitizedOrder;
   }
+
+  // @mutation()
+  // private SET_CONTEXT(display: TDisplayType) {
+  // @@@ TODO: is it better to set video property here?
+  //   this.state.
+  // }
 
   createScene(name: string, options: ISceneCreateOptions = {}) {
     // Get an id to identify the scene on the frontend

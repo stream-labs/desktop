@@ -28,6 +28,7 @@ import { Rect } from '../../util/rect';
 import { TSceneNodeType } from './scenes';
 import { ServiceHelper, ExecuteInWorkerProcess } from 'services/core';
 import { assertIsDefined } from '../../util/properties-type-guards';
+import { VideoSettingsService, TDisplayType } from 'services/settings-v2/video';
 /**
  * A SceneItem is a source that contains
  * all of the information about that source, and
@@ -85,6 +86,7 @@ export class SceneItem extends SceneItemNode {
   @Inject() protected scenesService: ScenesService;
   @Inject() private sourcesService: SourcesService;
   @Inject() private videoService: VideoService;
+  @Inject() private videoSettingsService: VideoSettingsService;
 
   constructor(sceneId: string, sceneItemId: string, sourceId: string) {
     super();
@@ -142,7 +144,7 @@ export class SceneItem extends SceneItemNode {
   }
 
   @ExecuteInWorkerProcess()
-  setSettings(patch: IPartialSettings) {
+  setSettings(patch: IPartialSettings, display?: TDisplayType) {
     // update only changed settings to reduce the amount of IPC calls
     const obsSceneItem = this.getObsSceneItem();
     const changed = Utils.getChangedParams(this.state, patch);
@@ -219,7 +221,9 @@ export class SceneItem extends SceneItemNode {
     }
 
     if (changed.output !== void 0) {
-      this.getObsSceneItem().video = newSettings.output;
+      console.log('setting video ', newSettings.output);
+      // this.getObsSceneItem().video = newSettings.output;
+      this.getObsSceneItem().video = this.videoSettingsService.contexts[display];
     }
 
     this.UPDATE({ sceneItemId: this.sceneItemId, ...changed });

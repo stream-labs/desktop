@@ -194,7 +194,7 @@ export class RestreamService extends StatefulService<IRestreamState> {
         return {
           platform: platform as TPlatform,
           streamKey: getPlatformService(platform).state.streamKey,
-          video: this.dualOutputService.views.getPlatformContext(platform), // @@@ TODO if this is the correct approach to apply contexts, remove from respective beforeGoLive functions
+          video: this.dualOutputService.views.getPlatformContext(platform), // @@@ TODO remove from respective beforeGoLive functions
         };
       }),
       ...this.streamInfo.savedSettings.customDestinations
@@ -218,35 +218,6 @@ export class RestreamService extends StatefulService<IRestreamState> {
 
     await this.createTargets(newTargets);
   }
-
-  // %%% CAUSING PROBLEMS VVV
-  // async setupAdvancedIngest() {
-  //   const ingest = (await this.fetchIngest()).server;
-  //   // We need to move OBS to custom ingest mode before we can set the server
-  //   this.streamSettingsService.setSettings({
-  //     streamType: 'rtmp_custom',
-  //   });
-  //   this.streamSettingsService.setSettings({
-  //     key: this.settings.streamKey,
-  //     server: ingest,
-  //   });
-
-  //   // setup first context
-  //   const horizontalStream = obs.AdvancedStreamingFactory.create();
-  //   horizontalStream.video = this.videoSettingsService.contexts.horizontal;
-
-  //   // VVV settings from test
-  //   horizontalStream.outputWidth = this.videoSettingsService.contexts.horizontal.video.baseWidth;
-  //   horizontalStream.outputHeight = this.videoSettingsService.contexts.horizontal.video.baseHeight;
-
-  //   // setup second context
-  //   const verticalStream = obs.AdvancedStreamingFactory.create();
-  //   verticalStream.video = this.videoSettingsService.contexts.vertical;
-  //   verticalStream.outputWidth = this.videoSettingsService.contexts.vertical.video.baseWidth;
-  //   verticalStream.outputHeight = this.videoSettingsService.contexts.vertical.video.baseHeight;
-  // }
-
-  // %%% CAUSING PROBLEMS ^^^
 
   checkStatus(): Promise<boolean> {
     const url = `https://${this.host}/api/v1/rst/util/status`;
