@@ -73,7 +73,7 @@
     ]
   },
   "dependencies": {
-    "@n-air-app/n-voice-package": "^0.0.23",
+    "@n-air-app/n-voice-package": "^1.0.0",
     "@sentry/browser": "^6.11.0",
     "@sentry/integrations": "^6.11.0",
     "archiver": "^3.0.0",
