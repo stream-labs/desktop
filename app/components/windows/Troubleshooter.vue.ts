@@ -16,6 +16,7 @@ export default class Troubleshooter extends Vue {
   @Inject() private settingsService: ISettingsServiceApi;
   @Inject() private windowsService: WindowsService;
 
+  // @ts-ignore: ts2729: use before initialization
   issueCode = this.windowsService.getChildWindowQueryParams().issueCode as TIssueCode;
 
   get issue(): INotification {

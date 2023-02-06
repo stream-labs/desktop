@@ -11,8 +11,9 @@ import { VideoNode } from './video';
 import { SceneSourceNode } from './scene';
 import { AudioService } from 'services/audio';
 import * as obs from '../../../../../obs-api';
+import { NVoiceCharacterNode } from './nvoice-character';
 
-type TContent = ImageNode | TextNode | WebcamNode | VideoNode | SceneSourceNode;
+type TContent = ImageNode | TextNode | WebcamNode | VideoNode | SceneSourceNode | NVoiceCharacterNode;
 
 interface IFilterInfo {
   name: string;
@@ -186,6 +187,8 @@ export class SlotsNode extends ArrayNode<TSlotSchema, IContext, TSceneNode> {
         this.scenesService.createScene(obj.name, { sceneId });
       }
       sceneItem = context.scene.addSource(sceneId);
+    } else if (obj.content instanceof NVoiceCharacterNode) {
+      // TODO ここはいつ呼ばれるのか
     }
 
     this.adjustTransform(sceneItem, obj);

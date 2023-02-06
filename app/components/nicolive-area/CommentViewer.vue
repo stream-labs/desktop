@@ -9,7 +9,7 @@
       <i
         class="icon-settings icon-btn"
         v-tooltip.bottom="settingsTooltip"
-        @click="isSettingsOpened = true"
+        @click="openCommentSettings"
       ></i>
     </div>
     <div class="content">
@@ -74,11 +74,6 @@
       class="overlay"
       @close="isFilterOpened = false"
       v-if="isFilterOpened && !isCompactMode"
-    />
-    <comment-settings
-      class="overlay"
-      @close="isSettingsOpened = false"
-      v-if="isSettingsOpened && !isCompactMode"
     />
   </div>
 </template>

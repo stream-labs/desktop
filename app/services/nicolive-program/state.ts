@@ -1,12 +1,22 @@
 import { PersistentStatefulService } from 'services/core/persistent-stateful-service';
 import { mutation } from '../core/stateful-service';
 import { Subject, BehaviorSubject, Observable } from 'rxjs';
+import { $t } from 'services/i18n';
+
+export const SynthesizerIds = ['webSpeech', 'nVoice'] as const;
+export type SynthesizerId = typeof SynthesizerIds[number];
 
 type SpeechSynthesizerSettingsState = {
   enabled: boolean;
   pitch: number;
   rate: number;
   volume: number;
+  maxTime?: number;
+  selector: {
+    normal: SynthesizerId;
+    operator: SynthesizerId;
+    system: SynthesizerId;
+  };
 };
 
 interface IState {

@@ -389,5 +389,9 @@
   },
   "liv_capture": {
     "name": "LIV Client Capture"
+  },
+  "near": {
+    "name": "琴詠ニア",
+    "description": "シーンにN Voiceの音声に合わせてコメントを読み上げるキャラクターを追加します"
   }
 }

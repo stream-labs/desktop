@@ -25,11 +25,15 @@ import WasapiOutputIcon from '../../../media/images/wasapi-output-icon.svg';
 import MonitorCaptureIcon from '../../../media/images/monitor-capture-icon.svg';
 import NdiSourceIcon from '../../../media/images/ndi-icon.svg';
 import BlackmagicSourceIcon from '../../../media/images/blackmagic-icon.svg';
+import NVoiceCharacterSourceIcon from '../../../media/images/nvoice-character-source-icon.svg';
+import { NVoiceCharacterType, NVoiceCharacterTypes } from 'services/nvoice-character';
+import { omit } from 'lodash';
 
-type TInspectableSource = TSourceType;
+type TInspectableSource = TSourceType | NVoiceCharacterType;
 
 interface ISelectSourceOptions {
   propertiesManager?: TPropertiesManager;
+  nVoiceCharacterType?: NVoiceCharacterType;
 }
 
 @Component({
@@ -52,6 +56,7 @@ interface ISelectSourceOptions {
     MonitorCaptureIcon,
     NdiSourceIcon,
     BlackmagicSourceIcon,
+    NVoiceCharacterSourceIcon,
   },
 })
 export default class SourcesShowcase extends Vue {
@@ -60,13 +65,25 @@ export default class SourcesShowcase extends Vue {
   @Inject() scenesService: ScenesService;
   @Inject() windowsService: WindowsService;
 
-  selectSource(sourceType: TSourceType, options: ISelectSourceOptions = {}) {
-    const managerType = options.propertiesManager || 'default';
+  selectSource(sourceType: TInspectableSource, options: ISelectSourceOptions = {}) {
+    if (NVoiceCharacterTypes.includes(sourceType as NVoiceCharacterType)) {
+      const propertiesManagerSettings: Dictionary<any> = {
+        NVoiceCharacterType: sourceType as NVoiceCharacterType,
+        ...omit(options, 'propertiesManager'),
+      };
+      this.sourcesService.showAddSource('browser_source', {
+        propertiesManagerSettings,
+        propertiesManager: 'nvoice-character',
+      });
+    } else {
+      const propertiesManager = options.propertiesManager || 'default';
+      const propertiesManagerSettings: Dictionary<any> = { ...omit(options, 'propertiesManager') };
 
-    this.sourcesService.showAddSource(sourceType, {
-      propertiesManager: managerType,
-      propertiesManagerSettings: {},
-    });
+      this.sourcesService.showAddSource(sourceType as TSourceType, {
+        propertiesManagerSettings,
+        propertiesManager,
+      });
+    }
   }
 
   inspectedSource: TInspectableSource = null;
@@ -85,11 +102,7 @@ export default class SourcesShowcase extends Vue {
   }
 
   selectInspectedSource() {
-    if (
-      this.sourcesService.getAvailableSourcesTypes().includes(this.inspectedSource as TSourceType)
-    ) {
-      this.selectSource(this.inspectedSource as TSourceType);
-    }
+    this.selectSource(this.inspectedSource);
   }
 
   get availableSources() {

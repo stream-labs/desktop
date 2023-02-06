@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import { Subject, Subscription, Observable } from 'rxjs';
 import { mutation, StatefulService, ServiceHelper, InitAfter, Inject } from 'services/core';
-import { SourcesService, ISource, Source } from 'services/sources';
+import { SourcesService, ISource, Source, isNoAudioPropertiesManagerType } from 'services/sources';
 import { ScenesService } from 'services/scenes';
 import * as obs from '../../../obs-api';
 import Utils from 'services/utils';
@@ -58,18 +58,20 @@ export class AudioService extends StatefulService<IAudioSourcesState> implements
   protected init() {
     this.sourcesService.sourceAdded.subscribe(sourceModel => {
       const source = this.sourcesService.getSource(sourceModel.sourceId);
-      if (!source.audio) return;
+      const useAudio = source.audio && !isNoAudioPropertiesManagerType(source.propertiesManagerType);
+      if (!useAudio) return;
       this.createAudioSource(source);
     });
 
     this.sourcesService.sourceUpdated.subscribe(source => {
       const audioSource = this.getSource(source.sourceId);
+      const useAudio = source.audio && !isNoAudioPropertiesManagerType(source.propertiesManagerType);
 
-      if (!audioSource && source.audio) {
+      if (!audioSource && useAudio) {
         this.createAudioSource(this.sourcesService.getSource(source.sourceId));
       }
 
-      if (audioSource && !source.audio) {
+      if (audioSource && !useAudio) {
         this.removeAudioSource(source.sourceId);
       }
     });

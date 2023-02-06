@@ -6,4 +6,6 @@ export const CategoryIcons: Dictionary<string> = {
   Audio: 'icon-speaker',
   Hotkeys: 'icon-keyborad',
   Advanced: 'icon-details-setting',
+  Comment: 'icon-comment-setting',
+  SpeechEngine: 'icon-speech-engine',
 };

@@ -8,6 +8,7 @@ import ModalLayout from 'components/ModalLayout.vue';
 import Selector from 'components/Selector.vue';
 import Display from 'components/shared/Display.vue';
 import { $t } from 'services/i18n';
+import { NVoiceCharacterService, NVoiceCharacterType } from 'services/nvoice-character';
 
 @Component({
   components: { ModalLayout, Selector, Display },
@@ -16,19 +17,33 @@ export default class AddSource extends Vue {
   @Inject() sourcesService: ISourcesServiceApi;
   @Inject() scenesService: ScenesService;
   @Inject() windowsService: WindowsService;
+  @Inject() nVoiceCharacterService: NVoiceCharacterService;
 
   name = '';
   error = '';
+  // @ts-ignore: ts2729: use before initialization
+
   sourceType = this.windowsService.getChildWindowQueryParams().sourceType as TSourceType;
+  // @ts-ignore: ts2729: use before initialization
   sourceAddOptions = this.windowsService.getChildWindowQueryParams()
     .sourceAddOptions as ISourceAddOptions;
 
+  get nVoiceCharacterType(): NVoiceCharacterType {
+    return this.sourceAddOptions.propertiesManagerSettings.nVoiceCharacterType || 'near';
+  }
+
+  // @ts-ignore: ts2729: use before initialization
   sources = this.sourcesService.getSources().filter(source => {
+    const comparison = {
+      type: this.sourceType,
+      propertiesManager: this.sourceAddOptions.propertiesManager,
+    };
     return (
-      source.isSameType({
-        type: this.sourceType,
-        propertiesManager: this.sourceAddOptions.propertiesManager,
-      }) && source.sourceId !== this.scenesService.activeSceneId
+      source.isSameType(
+        comparison.propertiesManager === 'nvoice-character'
+          ? { ...comparison, nVoiceCharacterType: this.nVoiceCharacterType }
+          : comparison,
+      ) && source.sourceId !== this.scenesService.activeSceneId
     );
   });
 
@@ -39,13 +54,18 @@ export default class AddSource extends Vue {
   selectedSourceId = this.sources[0] ? this.sources[0].sourceId : null;
 
   mounted() {
-    const sourceType =
-      this.sourceType &&
-      this.sourcesService
-        .getAvailableSourcesTypesList()
-        .find(sourceTypeDef => sourceTypeDef.value === this.sourceType);
+    if (this.sourceAddOptions.propertiesManager === 'nvoice-character') {
+      const type = this.sourceAddOptions.propertiesManagerSettings.nVoiceCharacterType || 'near';
+      this.name = this.sourcesService.suggestName($t(`source-props.${type}.name`));
+    } else {
+      const sourceType =
+        this.sourceType &&
+        this.sourcesService
+          .getAvailableSourcesTypesList()
+          .find(sourceTypeDef => sourceTypeDef.value === this.sourceType);
 
-    this.name = this.sourcesService.suggestName(this.sourceType && sourceType.description);
+      this.name = this.sourcesService.suggestName(this.sourceType && sourceType.description);
+    }
   }
 
   addExisting() {
@@ -67,20 +87,33 @@ export default class AddSource extends Vue {
     if (!this.name) {
       this.error = $t('sources.sourceNameIsRequired');
     } else {
-      const source: ISourceApi = this.sourcesService.createSource(
-        this.name,
-        this.sourceType,
-        {}, // IPCがundefinedをnullに変換するのでデフォルト値は使わない
-        {
-          propertiesManager: this.sourceAddOptions.propertiesManager,
-          propertiesManagerSettings: this.sourceAddOptions.propertiesManagerSettings,
-        },
-      );
+      let s: {
+        source: ISourceApi;
+        options: ISourceAddOptions;
+      };
 
-      this.scenesService.activeScene.addSource(source.sourceId);
+      if (this.sourceAddOptions.propertiesManager === 'nvoice-character') {
+        const type: NVoiceCharacterType = this.sourceAddOptions.propertiesManagerSettings.nVoiceCharacterType || 'near';
+        s = this.nVoiceCharacterService.createNVoiceCharacterSource(type, this.name);
+      } else {
+        s = {
+          source: this.sourcesService.createSource(
+            this.name,
+            this.sourceType,
+            {}, // IPCがundefinedをnullに変換するのでデフォルト値は使わない
+            {
+              propertiesManager: this.sourceAddOptions.propertiesManager,
+              propertiesManagerSettings: this.sourceAddOptions.propertiesManagerSettings,
+            },
+          ),
+          options: {}
+        };
+      }
 
-      if (source.hasProps()) {
-        this.sourcesService.showSourceProperties(source.sourceId);
+      this.scenesService.activeScene.addSource(s.source.sourceId, s.options);
+
+      if (s.source.hasProps()) {
+        this.sourcesService.showSourceProperties(s.source.sourceId);
       } else {
         this.close();
       }

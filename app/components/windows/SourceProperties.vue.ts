@@ -27,6 +27,7 @@ export default class SourceProperties extends Vue {
   @Inject()
   windowsService: WindowsService;
 
+  // @ts-ignore: ts2729: use before initialization
   source = this.sourcesService.getSource(this.sourceId);
   properties: TObsFormData = [];
   initialProperties: TObsFormData = [];
@@ -39,9 +40,9 @@ export default class SourceProperties extends Vue {
   }
 
   get sourceId() {
-      // このビューはoneOffWindow と childWindow どちらからも開かれる可能性があるため
-      // どちらか有効な方のクエリパラメータから sourceId を取得する
-      return this.windowsService.getWindowOptions(this.windowId).sourceId || this.windowsService.getChildWindowQueryParams().sourceId;
+    // このビューはoneOffWindow と childWindow どちらからも開かれる可能性があるため
+    // どちらか有効な方のクエリパラメータから sourceId を取得する
+    return this.windowsService.getWindowOptions(this.windowId).sourceId || this.windowsService.getChildWindowQueryParams().sourceId;
   }
 
   mounted() {
@@ -74,7 +75,7 @@ export default class SourceProperties extends Vue {
   }
 
   closeWindow() {
-    if(this.sourceId.startsWith("window_capture")) {
+    if (this.sourceId.startsWith("window_capture")) {
       this.sourcesService.closeSourcePropertiesWindow();
     } else {
       this.windowsService.closeChildWindow();

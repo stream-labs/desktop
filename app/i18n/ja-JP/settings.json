@@ -604,6 +604,12 @@
       }
     }
   },
+  "Comment": {
+    "name": "コメント設定"
+  },
+  "SpeechEngine": {
+    "name": "音声エンジン"
+  },
   "listPlaceholder": "選択してください",
   "resolutionPlaceholder": "選択するか、値を入力してください",
   "addFiles": "ファイルを追加する",
@@ -648,5 +654,9 @@
     "activate": "コンパクトモード自動化設定をONにする",
     "setting": "配信中に自動でコンパクトモードに切り替える",
     "showDialog": "コンパクトモード自動化設定ダイアログを表示する"
+  },
+  "synthId": {
+    "webSpeech": "Windowsの音声合成",
+    "nVoice": "N Voice 琴詠ニア"
   }
 }

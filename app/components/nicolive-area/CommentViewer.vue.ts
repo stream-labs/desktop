@@ -5,7 +5,6 @@ import { NicoliveCommentViewerService } from 'services/nicolive-program/nicolive
 import { WrappedChat, WrappedChatWithComponent } from 'services/nicolive-program/WrappedChat';
 import CommentForm from './CommentForm.vue';
 import CommentFilter from './CommentFilter.vue';
-import CommentSettings from './CommentSettings.vue';
 import { ChatMessage } from 'services/nicolive-program/ChatMessage';
 import { Menu } from 'util/menus/Menu';
 import { clipboard } from 'electron';
@@ -20,6 +19,7 @@ import EmotionComment from './comment/EmotionComment.vue';
 import { ChatComponentType } from 'services/nicolive-program/ChatMessage/ChatComponentType';
 import { CustomizationService } from 'services/customization';
 import NAirLogo from '../../../media/images/n-air-logo.svg';
+import { ISettingsServiceApi } from 'services/settings';
 
 const componentMap: { [type in ChatComponentType]: Vue.Component } = {
   common: CommonComment,
@@ -33,7 +33,6 @@ const componentMap: { [type in ChatComponentType]: Vue.Component } = {
   components: {
     CommentForm,
     CommentFilter,
-    CommentSettings,
     CommonComment,
     NicoadComment,
     GiftComment,
@@ -54,6 +53,8 @@ export default class CommentViewer extends Vue {
 
   @Inject() private customizationService: CustomizationService;
 
+  @Inject() private settingsService: ISettingsServiceApi;
+
   @Prop({ default: false }) showProgramCreatedNotice: boolean;
 
   get isCompactMode(): boolean {
@@ -69,7 +70,6 @@ export default class CommentViewer extends Vue {
 
   isFilterOpened = false;
 
-  isSettingsOpened = false;
   isLatestVisible = true;
 
   get pinnedComment(): WrappedChat | null {
@@ -218,5 +218,9 @@ export default class CommentViewer extends Vue {
       };
       scrollEl.scrollBy(opt);
     }
+  }
+
+  openCommentSettings() {
+    this.settingsService.showSettings('Comment');
   }
 }

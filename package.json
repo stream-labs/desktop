@@ -8,6 +8,9 @@
   },
   "version": "1.1.20210826-unstable.1",
   "main": "main.js",
+  "engines": {
+    "npm": "please-use-yarn"
+  },
   "scripts": {
     "compile": "yarn clear && webpack-cli --progress --mode development",
     "compile:ci": "yarn clear && webpack-cli --mode development",
@@ -70,6 +73,7 @@
     ]
   },
   "dependencies": {
+    "@n-air-app/n-voice-package": "^1.0.0",
     "@sentry/browser": "^6.11.0",
     "@sentry/integrations": "^6.11.0",
     "archiver": "^3.0.0",
@@ -84,6 +88,7 @@
     "eslint-loader": "^4.0.2",
     "font-manager": "https://github.com/stream-labs/font-manager/releases/download/v1.0.8electron6/iojs-v6.0.3-font-manager.tar.gz",
     "fuse.js": "^3.2.0",
+    "iconv-lite": "^0.6.3",
     "lodash": "^4.17.4",
     "lodash-decorators": "^4.3.1",
     "moment": "^2.17.1",
@@ -99,6 +104,7 @@
     "rxjs": "^6.5.3",
     "semver": "^5.5.1",
     "sl-vue-tree": "https://github.com/stream-labs/sl-vue-tree",
+    "socket.io": "^4.5.3",
     "socket.io-client": "2.1.1",
     "sockjs": "^0.3.19",
     "sockjs-client": "^1.1.4",

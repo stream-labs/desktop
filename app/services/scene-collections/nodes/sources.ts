@@ -1,6 +1,6 @@
 import { Node } from './node';
 import { HotkeysNode } from './hotkeys';
-import { SourcesService, TSourceType, TPropertiesManager } from 'services/sources';
+import { SourcesService, TSourceType, TPropertiesManager, isNoAudioPropertiesManagerType } from 'services/sources';
 import { FontLibraryService } from 'services/font-library';
 import { AudioService } from 'services/audio';
 import { Inject } from '../../core/injector';
@@ -260,7 +260,9 @@ export class SourcesNode extends Node<ISchema, {}> {
         }
       }
 
-      if (source.audioMixers) {
+      const useAudio = !isNoAudioPropertiesManagerType(sourceInfo.propertiesManager);
+
+      if (useAudio && source.audioMixers) {
         this.audioService
           .getSource(sourceInfo.id)
           .setMul(sourceInfo.volume != null ? sourceInfo.volume : 1);

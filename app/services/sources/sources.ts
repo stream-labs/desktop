@@ -9,6 +9,7 @@ import { Inject } from 'services/core/injector';
 import namingHelpers from 'util/NamingHelpers';
 import { WindowsService } from 'services/windows';
 import { DefaultManager } from './properties-managers/default-manager';
+import { NVoiceCharacterManager } from './properties-managers/nvoice-character-manager';
 import { ScenesService, ISceneItem } from 'services/scenes';
 import {
   IActivePropertyManager,
@@ -24,6 +25,8 @@ import { $t } from 'services/i18n';
 import { AudioService } from '../audio';
 import uuid from 'uuid/v4';
 import SourceProperties from 'components/windows/SourceProperties.vue';
+import { UserService } from 'services/user';
+import { NVoiceCharacterTypes } from 'services/nvoice-character';
 
 const AudioFlag = obs.ESourceOutputFlags.Audio;
 const VideoFlag = obs.ESourceOutputFlags.Video;
@@ -32,6 +35,7 @@ const DoNotDuplicateFlag = obs.ESourceOutputFlags.DoNotDuplicate;
 
 export const PROPERTIES_MANAGER_TYPES = {
   default: DefaultManager,
+  'nvoice-character': NVoiceCharacterManager,
 };
 
 interface IObsSourceCallbackInfo {
@@ -56,6 +60,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
   @Inject() private scenesService: ScenesService;
   @Inject() private windowsService: WindowsService;
   @Inject() private audioService: AudioService;
+  @Inject() private userService: UserService;
 
   /**
    * Maps a source id to a property manager
@@ -346,6 +351,9 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
     // 'scene' is not an obs input type so we have to set it manually
     availableWhitelistedType.push('scene');
 
+    // 'near' is not an obs input type so we have to set it manually
+    availableWhitelistedType.push(...(NVoiceCharacterTypes as unknown as TSourceType[]));
+
     const availableWhitelistedSourceType = availableWhitelistedType.map(value => ({
       value,
       description: $t(`source-props.${value}.name`),
@@ -462,6 +470,11 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
 
   showSourceProperties(sourceId: string) {
     const source = this.getSource(sourceId);
+    if (!source) {
+      console.warn('source is null');
+      return;
+    }
+
     const baseConfig = {
       componentName: 'SourceProperties',
       title: $t('sources.propertyWindowTitle', { sourceName: source.name }),

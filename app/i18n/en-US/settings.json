@@ -604,6 +604,12 @@
       }
     }
   },
+  "Comment": {
+    "name": "Comment Settings"
+  },
+  "SpeechEngine": {
+    "name": "Speech Engine"
+  },
   "listPlaceholder": "Select Option",
   "resolutionPlaceholder": "Select Option or Type New Value",
   "addFiles": "Add files",
@@ -648,5 +654,9 @@
     "activate": "Turn on",
     "setting": "Automatically switch to the compact mode in streaming",
     "showDialog": "Show the Compact Mode Automation Settings dialog."
+  },
+  "synthId": {
+    "webSpeech": "Windows SpeechSynthesizer",
+    "nVoice": "N Voice / KOTOYOMI Near"
   }
 }

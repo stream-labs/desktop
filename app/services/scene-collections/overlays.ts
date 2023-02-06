@@ -20,6 +20,7 @@ import { ScenesService } from 'services/scenes';
 import { SelectionService } from 'services/selection';
 import uuid from 'uuid/v4';
 import { SceneSourceNode } from './nodes/overlays/scene';
+import { NVoiceCharacterNode } from './nodes/overlays/nvoice-character';
 
 const NODE_TYPES = {
   RootNode,
@@ -29,6 +30,7 @@ const NODE_TYPES = {
   TextNode,
   WebcamNode,
   VideoNode,
+  NVoiceCharacterNode,
   TransitionNode,
   SceneSourceNode,
 };

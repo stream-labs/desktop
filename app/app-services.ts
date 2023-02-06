@@ -41,6 +41,7 @@ export { FileManagerService } from 'services/file-manager';
 export { ProtocolLinksService } from 'services/protocol-links';
 export { ProjectorService } from 'services/projector';
 export { I18nService } from 'services/i18n';
+export { NVoiceCharacterService } from 'services/nvoice-character';
 
 // ONLINE SERVICES
 export { UserService } from './services/user';
@@ -59,6 +60,7 @@ export { NicoliveCommentViewerService } from 'services/nicolive-program/nicolive
 export { NicoliveCommentFilterService } from 'services/nicolive-program/nicolive-comment-filter';
 export { NicoliveCommentLocalFilterService } from 'services/nicolive-program/nicolive-comment-local-filter';
 export { NicoliveCommentSynthesizerService } from 'services/nicolive-program/nicolive-comment-synthesizer';
+export { NVoiceClientService } from 'services/nicolive-program/n-voice-client';
 
 export { IncrementalRolloutService } from 'services/incremental-rollout';
 export { CrashReporterService } from 'services/crash-reporter';

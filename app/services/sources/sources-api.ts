@@ -3,6 +3,8 @@ import { IObsListOption, TObsFormData } from 'components/obs/inputs/ObsInput';
 import { Observable } from 'rxjs';
 import { IAudioSource } from '../audio';
 import * as obs from '../../../obs-api';
+import { NVoiceCharacterType } from 'services/nvoice-character';
+import { IPartialTransform } from 'services/scenes';
 
 export interface ISource extends IResource {
   sourceId: string;
@@ -28,6 +30,7 @@ export interface ISource extends IResource {
 export interface ISourceComparison {
   type: TSourceType;
   propertiesManager: TPropertiesManager;
+  nVoiceCharacterType?: NVoiceCharacterType;
 }
 
 export interface ISourceApi extends ISource {
@@ -83,6 +86,7 @@ export interface ISourceAddOptions<TPropertiesManagerSettings = Dictionary<any>>
   propertiesManagerSettings?: Dictionary<any>;
   audioSettings?: Partial<IAudioSource>;
   isTemporary?: boolean;
+  initialTransform?: IPartialTransform;
 }
 
 export type TSourceType =
@@ -108,7 +112,11 @@ export type TSourceType =
   | 'vlc_source';
 
 // Register new properties manager here
-export type TPropertiesManager = 'default';
+export type TPropertiesManager = 'default' | 'nvoice-character';
+
+export function isNoAudioPropertiesManagerType(propertiesManagerType: TPropertiesManager): boolean {
+  return ['nvoice-character'].includes(propertiesManagerType);
+}
 
 export interface ISourcesState {
   sources: Dictionary<ISource>;

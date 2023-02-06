@@ -1,6 +1,6 @@
 import { StreamingService } from 'services/streaming';
 import { ScenesService } from 'services/scenes';
-import { SourcesService } from 'services/sources';
+import { isNoAudioPropertiesManagerType, SourcesService } from 'services/sources';
 import { TransitionsService } from 'services/transitions';
 import { KeyListenerService } from 'services/key-listener';
 import { StatefulService, mutation, ServiceHelper, Inject } from './core';
@@ -312,6 +312,7 @@ export class HotkeysService extends StatefulService<IHotkeysServiceState> {
   getHotkeysSet(): IHotkeysSet {
     const sourcesHotkeys: Dictionary<Hotkey[]> = {};
     this.sourcesService.getSources().forEach(source => {
+      if (isNoAudioPropertiesManagerType(source.getPropertiesManagerType())) return;
       const sourceHotkeys = this.getSourceHotkeys(source.sourceId);
       if (sourceHotkeys.length) sourcesHotkeys[source.sourceId] = sourceHotkeys;
     });

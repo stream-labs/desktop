@@ -13,7 +13,7 @@ const config = {
     'main.js',
     'obs-api',
   ],
-  extraFiles: ['scene-presets', 'LICENSE', 'AGREEMENT.sjis'],
+  extraFiles: ['scene-presets', 'nvoice', 'LICENSE', 'AGREEMENT.sjis'],
   detectUpdateChannel: false,
   publish: {
     provider: 'generic',

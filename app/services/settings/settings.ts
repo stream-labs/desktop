@@ -167,6 +167,10 @@ export class SettingsService
   getCategories(): string[] {
     let categories: string[] = obs.NodeObs.OBS_settings_getListCategories();
 
+    if (this.userService.isLoggedIn()) {
+      categories = categories.concat(['Comment', 'SpeechEngine']);
+    }
+
     if (Utils.isDevMode()) {
       categories = categories.concat('Developer');
     }

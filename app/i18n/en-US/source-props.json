@@ -389,5 +389,9 @@
   },
   "liv_capture": {
     "name": "LIV Client Capture"
+  },
+  "near": {
+    "name": "KOTOYOMI Near",
+    "description": "Add a character to your scene that reads comments to the \"N Voice\" voice."
   }
 }

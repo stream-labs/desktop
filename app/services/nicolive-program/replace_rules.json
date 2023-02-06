@@ -46,10 +46,12 @@
       "replacement": "チャンネル"
     },
     {
+      "onlyFor": "webSpeech",
       "text": "行った",
       "replacement": "イッタ"
     },
     {
+      "onlyFor": "webSpeech",
       "text": "ニコ生",
       "replacement": "ニコナマ"
     },
@@ -94,10 +96,12 @@
       "replacement": "びっくりはてな"
     },
     {
+      "onlyFor": "webSpeech",
       "text": "初見",
       "replacement": "しょけん"
     },
     {
+      "onlyFor": "webSpeech",
       "text": "古参",
       "replacement": "こさん"
     },
@@ -110,10 +114,12 @@
       "replacement": "あらがきゆい"
     },
     {
+      "onlyFor": "webSpeech",
       "text": "流行っている",
       "replacement": "はやっている"
     },
     {
+      "onlyFor": "webSpeech",
       "text": "行って",
       "replacement": "イッテ"
     },
@@ -158,38 +164,47 @@
       "replacement": "ヨット"
     },
     {
+      "onlyFor": "webSpeech",
       "text": "初戦",
       "replacement": "しょせん"
     },
     {
+      "onlyFor": "webSpeech",
       "text": "筋トレ",
       "replacement": "きんとれ"
     },
     {
+      "onlyFor": "webSpeech",
       "text": "一巡",
       "replacement": "いちじゅん"
     },
     {
+      "onlyFor": "webSpeech",
       "text": "経験値",
       "replacement": "けいけんち"
     },
     {
+      "onlyFor": "webSpeech",
       "text": "魔導士",
       "replacement": "まどうし"
     },
     {
+      "onlyFor": "webSpeech",
       "text": "暴れた",
       "replacement": "あばれた"
     },
     {
+      "onlyFor": "webSpeech",
       "text": "巡目",
       "replacement": "じゅんめ"
     },
     {
+      "onlyFor": "webSpeech",
       "text": "間に合う",
       "replacement": "まにあう"
     },
     {
+      "onlyFor": "webSpeech",
       "text": "相変わらず",
       "replacement": "あいかわらず"
     },
