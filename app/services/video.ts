@@ -428,35 +428,16 @@ export class VideoService extends Service {
     sourceId?: string,
   ) {
     const electronWindow = remote.BrowserWindow.fromId(electronWindowId);
+    const context = type ? this.videoSettingsService.contexts[type] : undefined;
 
-    // add check for dual output
-    if (this.dualOutputService.views.dualOutputMode) {
-      const context = this.videoSettingsService.contexts[type];
-      if (context) {
-        if (sourceId) {
-          obs.NodeObs.OBS_content_createSourcePreviewDisplay(
-            electronWindow.getNativeWindowHandle(),
-            sourceId,
-            name,
-            false,
-            context,
-          );
-        } else {
-          obs.NodeObs.OBS_content_createDisplay(
-            electronWindow.getNativeWindowHandle(),
-            name,
-            renderingMode,
-            false,
-            context,
-          );
-        }
-      }
-    } else if (sourceId) {
+    if (sourceId) {
+      const context = type ? this.videoSettingsService.contexts[type] : undefined;
       obs.NodeObs.OBS_content_createSourcePreviewDisplay(
         electronWindow.getNativeWindowHandle(),
         sourceId,
         name,
         false,
+        context,
       );
     } else {
       obs.NodeObs.OBS_content_createDisplay(
@@ -464,6 +445,7 @@ export class VideoService extends Service {
         name,
         renderingMode,
         false,
+        context,
       );
     }
   }
