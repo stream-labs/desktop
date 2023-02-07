@@ -1,4 +1,5 @@
 import { $t } from 'services/i18n';
+import { TPlatform } from 'services/platforms';
 
 export enum EDualOutputPlatform {
   Twitch = 'twitch',
@@ -15,30 +16,34 @@ export enum EOutputDisplayType {
 export type TDualOutputDisplayType = EOutputDisplayType.Horizontal | EOutputDisplayType.Vertical;
 
 export interface IDualOutputPlatformSetting {
-  platform: string;
-  setting: EOutputDisplayType;
+  platform: TPlatform;
+  display: EOutputDisplayType;
 }
 
 export type TDualOutputPlatformSettings = {
   [Platform in EDualOutputPlatform]: IDualOutputPlatformSetting;
 };
 
+export type TDisplayPlatforms = {
+  [Display in EOutputDisplayType]: TPlatform[];
+};
+
 export const DualOutputPlatformSettings: TDualOutputPlatformSettings = {
   [EDualOutputPlatform.Twitch]: {
     platform: EDualOutputPlatform.Twitch,
-    setting: EOutputDisplayType.Horizontal,
+    display: EOutputDisplayType.Horizontal,
   },
   [EDualOutputPlatform.Facebook]: {
     platform: EDualOutputPlatform.Facebook,
-    setting: EOutputDisplayType.Horizontal,
+    display: EOutputDisplayType.Horizontal,
   },
   [EDualOutputPlatform.YouTube]: {
     platform: EDualOutputPlatform.YouTube,
-    setting: EOutputDisplayType.Horizontal,
+    display: EOutputDisplayType.Horizontal,
   },
   [EDualOutputPlatform.Trovo]: {
     platform: EDualOutputPlatform.Trovo,
-    setting: EOutputDisplayType.Horizontal,
+    display: EOutputDisplayType.Horizontal,
   },
 };
 

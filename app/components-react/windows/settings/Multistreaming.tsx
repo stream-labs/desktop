@@ -161,7 +161,7 @@ export function MultistreamingSettings() {
                 onChange={val =>
                   v.updatePlatformSetting(option.platform, val as TDualOutputDisplayType)
                 }
-                value={option.setting}
+                value={option.display}
               />
             </div>
           ))}

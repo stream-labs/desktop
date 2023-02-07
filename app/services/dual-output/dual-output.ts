@@ -1,5 +1,6 @@
 import { PersistentStatefulService, InitAfter, Inject, ViewHandler, mutation } from 'services/core';
 import {
+  TDisplayPlatforms,
   TDualOutputPlatformSettings,
   DualOutputPlatformSettings,
   EDualOutputPlatform,
@@ -15,6 +16,7 @@ import { Subject } from 'rxjs';
 
 interface IDualOutputServiceState {
   convertedDefaultDisplay: TDisplayType;
+  displays: TDisplayType[];
   platformSettings: TDualOutputPlatformSettings;
   dualOutputMode: boolean;
   nodeMaps: { [display in TDisplayType as string]: Dictionary<string> };
@@ -56,6 +58,22 @@ class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
     return this.getNodeIds(['vertical']);
   }
 
+  get displays() {
+    return this.state.displays;
+  }
+
+  get displayPlatforms() {
+    return Object.entries(this.state.platformSettings).reduce(
+      (displayPlatforms: TDisplayPlatforms, [key, val]: [string, IDualOutputPlatformSetting]) => {
+        if (val) {
+          displayPlatforms[val.display].push(val.platform);
+        }
+        return displayPlatforms;
+      },
+      { horizontal: [], vertical: [] },
+    );
+  }
+
   getNodeIds(displays: TDisplayType[]) {
     return displays.reduce((ids: string[], display: TDisplayType) => {
       const nodeMap = this.state.nodeMaps[display];
@@ -66,7 +84,7 @@ class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
   }
 
   getPlatformDisplay(platform: TPlatform) {
-    return this.state.platformSettings[platform].setting;
+    return this.state.platformSettings[platform].display;
   }
 
   getPlatformContext(platform: TPlatform) {
@@ -100,6 +118,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
 
   static defaultState: IDualOutputServiceState = {
     convertedDefaultDisplay: 'horizontal',
+    displays: ['horizontal', 'vertical'],
     platformSettings: DualOutputPlatformSettings,
     dualOutputMode: false,
     nodeMaps: null,
@@ -268,18 +287,18 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
     this.state.nodeMaps = null;
   }
 
-  updatePlatformSetting(platform: EDualOutputPlatform | string, setting: TDualOutputDisplayType) {
-    this.UPDATE_PLATFORM_SETTING(platform, setting);
+  updatePlatformSetting(platform: EDualOutputPlatform | string, display: TDualOutputDisplayType) {
+    this.UPDATE_PLATFORM_SETTING(platform, display);
   }
 
   @mutation()
   private UPDATE_PLATFORM_SETTING(
     platform: EDualOutputPlatform | string,
-    setting: TDualOutputDisplayType,
+    display: TDualOutputDisplayType,
   ) {
     this.state.platformSettings[platform] = {
       ...this.state.platformSettings[platform],
-      setting,
+      display,
     };
   }
 
