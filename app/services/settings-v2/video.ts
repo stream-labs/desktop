@@ -6,7 +6,6 @@ import * as obs from '../../../obs-api';
 import { SettingsManagerService } from 'services/settings-manager';
 import { DualOutputService } from 'services/dual-output';
 import { ScenesService } from 'services/scenes';
-import { Subject } from 'rxjs';
 
 // @@@ TODO: Remove dummy data when persistence is implemented
 const horizontalData = {
@@ -257,6 +256,8 @@ export class VideoSettingsService extends StatefulService<IVideoSettings> {
         },
       );
     }
+
+    console.log('this.contexts', this.contexts);
 
     /**
      * @@@ The below is the original code from 01/05 merge master into branch

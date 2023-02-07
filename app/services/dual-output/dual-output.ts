@@ -262,6 +262,26 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
 
       const defaultContext = this.videoSettingsService.contexts.default;
 
+      const horizontalContext = this.videoSettingsService.contexts.horizontal;
+      const verticalContext = this.videoSettingsService.contexts.vertical;
+      console.log('defaultContext ', defaultContext);
+      console.log('horizontalContext ', horizontalContext);
+      console.log('verticalContext ', verticalContext);
+      console.log('defaultContext JSON ', JSON.stringify(defaultContext));
+      console.log('horizontalContext JSON ', JSON.stringify(horizontalContext));
+      console.log('verticalContext JSON', JSON.stringify(verticalContext));
+
+      console.log('no JSON' + this.videoSettingsService.contexts.default);
+      console.log('no JSON' + this.videoSettingsService.contexts.vertical);
+      console.log('no JSON' + this.videoSettingsService.contexts.horizontal);
+      console.log('partial settings ' + JSON.stringify(this.videoSettingsService.contexts.default));
+      console.log(
+        'partial settings ' + JSON.stringify(this.videoSettingsService.contexts.vertical),
+      );
+      console.log(
+        'partial settings ' + JSON.stringify(this.videoSettingsService.contexts.horizontal),
+      );
+
       sceneNodes.forEach((sceneItem: SceneItem) => {
         if (nodesToReassign.includes(sceneItem.id)) {
           console.log('reassigning sceneItem.id ', sceneItem.id);

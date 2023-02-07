@@ -221,9 +221,10 @@ export class SceneItem extends SceneItemNode {
     }
 
     if (changed.output !== void 0) {
-      console.log('setting video ', newSettings.output);
+      console.log('setting obs scene item video ', this.videoSettingsService.contexts[display]);
       // this.getObsSceneItem().video = newSettings.output;
-      this.getObsSceneItem().video = this.videoSettingsService.contexts[display];
+      const context = this.videoSettingsService.contexts[display];
+      this.getObsSceneItem().video = context;
     }
 
     this.UPDATE({ sceneItemId: this.sceneItemId, ...changed });
