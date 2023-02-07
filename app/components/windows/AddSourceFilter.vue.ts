@@ -18,8 +18,11 @@ export default class AddSourceFilter extends Vue {
   @Inject('SourceFiltersService')
   filtersService: SourceFiltersService;
 
+  // @ts-ignore: ts2729: use before initialization
   sourceId: string = this.windowsService.getChildWindowQueryParams().sourceId;
+  // @ts-ignore: ts2729: use before initialization
   form = this.filtersService.getAddNewFormData(this.sourceId);
+  // @ts-ignore: ts2729: use before initialization
   availableTypes = this.filtersService.getTypesForSource(this.sourceId);
   error = '';
 

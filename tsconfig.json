@@ -30,6 +30,6 @@
     "node_modules"
   ],
   "include": [
-    "./app/**/*.ts"
+    "./app/**/*"
   ]
 }

@@ -1,6 +1,7 @@
 const { VueLoaderPlugin } = require('vue-loader');
 const { WebpackManifestPlugin } = require('webpack-manifest-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+const ESLintPlugin = require('eslint-webpack-plugin');
 
 const path = require('path');
 const TerserPlugin = require('terser-webpack-plugin');
@@ -22,6 +23,7 @@ plugins.push(
 // plugins.push(new CleanWebpackPlugin());
 
 plugins.push(new VueLoaderPlugin());
+plugins.push(new ESLintPlugin({ extensions: ['js', 'ts'] }));
 
 module.exports = {
   entry: {
@@ -99,11 +101,6 @@ module.exports = {
         test: /\.ts$/,
         loader: 'ts-loader',
         exclude: /node_modules|vue\/src/,
-      },
-      {
-        test: /\.ts$/,
-        enforce: 'pre',
-        loader: 'eslint-loader',
       },
       {
         test: /\.js$/,
