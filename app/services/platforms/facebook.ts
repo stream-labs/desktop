@@ -243,7 +243,10 @@ export class FacebookService
     // setup stream key and new settings
     const streamUrl = liveVideo.stream_url;
     const streamKey = streamUrl.slice(streamUrl.lastIndexOf('/') + 1);
-    if (!this.streamingService.views.isMultiplatformMode) {
+    if (
+      !this.streamingService.views.isMultiplatformMode &&
+      !this.streamingService.views.isDualOutputMode
+    ) {
       this.streamSettingsService.setSettings({
         key: streamKey,
         platform: 'facebook',

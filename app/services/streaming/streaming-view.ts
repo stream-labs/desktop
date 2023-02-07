@@ -76,6 +76,10 @@ export class StreamInfoView<T extends Object> extends ViewHandler<T> {
     return this.settings.platforms;
   }
 
+  get displays() {
+    return this.dualOutputView.displays;
+  }
+
   get checklist() {
     return this.info.checklist;
   }
@@ -153,12 +157,21 @@ export class StreamInfoView<T extends Object> extends ViewHandler<T> {
     return (
       this.protectedModeEnabled &&
       (this.enabledPlatforms.length > 1 ||
-        this.settings.customDestinations.filter(dest => dest.enabled).length > 0)
+        this.settings.customDestinations.filter(dest => dest.enabled).length > 0) &&
+      !this.isDualOutputMode
     );
   }
 
   get isDualOutputMode(): boolean {
     return this.dualOutputView.dualOutputMode;
+  }
+
+  get displayPlatforms() {
+    return this.dualOutputView.displayPlatforms;
+  }
+
+  getPlatformDisplay(platform: TPlatform) {
+    return this.dualOutputView.getPlatformDisplay(platform);
   }
 
   get isMidStreamMode(): boolean {

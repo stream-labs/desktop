@@ -306,7 +306,10 @@ export class YoutubeService
     // setup key and platform type in the OBS settings
     const streamKey = stream.cdn.ingestionInfo.streamName;
 
-    if (!this.streamingService.views.isMultiplatformMode) {
+    if (
+      !this.streamingService.views.isMultiplatformMode &&
+      !this.streamingService.views.isDualOutputMode
+    ) {
       this.streamSettingsService.setSettings({
         platform: 'youtube',
         key: streamKey,
