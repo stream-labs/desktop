@@ -48,6 +48,14 @@ export interface ISettingsValues {
     streamType: string;
     service: string;
     server: string;
+    video?: obs.IVideo;
+  };
+  StreamSecond: {
+    key: string;
+    streamType: string;
+    service: string;
+    server: string;
+    video?: obs.IVideo;
   };
   Output: {
     Mode: string;
