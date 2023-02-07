@@ -7,7 +7,7 @@ import { sleep } from '../sleep';
 
 // save names of all running tests to use them in the retrying mechanism
 const pendingTests: string[] = [];
-export const test: TestInterface<ITestContext> = new Proxy(avaTest, {
+export const test: TestInterface<ITestContext> = new Proxy(avaTest as TestInterface<ITestContext>, {
   apply: (target, thisArg, args) => {
     const testName = args[0];
     pendingTests.push(testName);

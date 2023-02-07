@@ -12,7 +12,7 @@ console.log('branches to compare:', branches);
 const images = fs.readdirSync(`${CONFIG.dist}/${newBranchName}`);
 
 interface IState {
-  regressions: {[imageName: string]: IRegression};
+  regressions: { [imageName: string]: IRegression };
   branches: string[];
   totalScreens: number;
   changedScreens: number;
@@ -38,7 +38,7 @@ interface IParsedImage {
   diff: any;
 }
 
-const parsedImages: {[imageName: string]: IParsedImage } = {};
+const parsedImages: { [imageName: string]: IParsedImage } = {};
 
 (async function main() {
 
@@ -57,7 +57,7 @@ const parsedImages: {[imageName: string]: IParsedImage } = {};
 
   console.log('read images...');
 
-  await new Promise(resolve => {
+  await new Promise<void>(resolve => {
     let parsedImagesCount = 0;
 
     const doneReading = (count: number) => {
