@@ -26,7 +26,7 @@
   "The Google Font to use for the text. Visit http://google.com/fonts to find one! Popular Fonts include: Open Sans, Roboto, Oswald, Lato, and Droid Sans.": "O tipo de letra Google usado para o texto. Visite http://google.com/fonts para escolher um! Os tipos de letra mais populares incluem: Open Sans, Roboto, Oswald, Lato e Droid Sans.",
   "A hex code for the base text color.": "Um código hex para a cor do texto base.",
   "A hex code for the widget background. This is for preview purposes only. It will not be shown in your stream.": "Um código hex para o fundo do widget. Isto serve apenas para pré-visualizações. Não será mostrado na sua transmissão.",
-  "Note: This background color is for preview purposes only. It will not be shown in your stream.": "Nota: Esta cor de fundo serve apenas para pré-visualizações. Não será mostrada na sua transmissão.",
+  "Note: This background color is for preview purposes only. It will not be shown in your stream.": "Nota: Esta cor de fundo é apenas para pré-visualização. Não será mostrado na sua transmissão.",
   "Please login to configure widget": "Inicie sessão para configurar o widget",
   "Enable Custom Code": "Ativar código personalizado",
   "Sources and Settings": "Fontes e definições",
@@ -97,7 +97,7 @@
   "Stars": "Estrelas",
   "Supporters": "Apoiantes",
   "Note: This background color is for preview purposes only.It will not be shown in your stream.": "Nota: Esta cor de fundo é apenas para pré-visualização. Não será mostrada na sua transmissão.",
-  "This background color is for preview purposes only. It will not be shown in your stream.": "Esta cor de fundo é apenas para pré-visualização. Não será mostrada na sua transmissão.",
+  "This background color is for preview purposes only. It will not be shown in your stream.": "Esta cor de fundo é apenas para pré-visualização. Não será mostrado na sua transmissão.",
   "Invalid JSON": "JSON inválido",
   "Increment Amount": "Valor de incremento",
   "Overkill Multiplier": "Multiplicador de overkill",
@@ -183,10 +183,10 @@
   "Play Alert": "Reproduzir alerta",
   "Browser Settings": "Definições do browser",
   "Custom Code": "Código personalizado",
-  "font_family_tooltip": "O tipo de letra Google usado para o texto. Visite http://fonts.google.com para escolher um! Os tipos de letra mais populares incluem: Open Sans, Roboto, Oswald, Lato e Droid Sans.",
+  "font_family_tooltip": "O tipo de letra Google usado para o texto. Aceda a http://google.com/fonts para encontrar uma! Tipo de letra populares: Open Sans, Roboto, Oswald, Lato, Droid Sans.",
   "Something went wrong while applying settings": "Ocorreu um erro ao aplicar as definições",
   "Superchat Goal": "Objetivo do Superchat",
   "YouTube Superchats": "Superchats do YouTube",
-  "Custom Widget": "Custom Widget",
-  "Use HTML, CSS, and JavaScript to create a widget with custom functionality": "Use HTML, CSS, and JavaScript to create a widget with custom functionality"
+  "Custom Widget": "Widget personalizado",
+  "Use HTML, CSS, and JavaScript to create a widget with custom functionality": "Use HTML, CSS e JavaScript para criar um widget com funcionalidade personalizada"
 }
