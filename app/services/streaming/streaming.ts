@@ -109,6 +109,7 @@ export class StreamingService
     replayBufferStatusTime: new Date().toISOString(),
     selectiveRecording: false,
     dualOutputMode: false,
+    // video: null, // @@@ TODO <-- should this property be added?
     info: {
       settings: null,
       lifecycle: 'empty',
@@ -276,18 +277,7 @@ export class StreamingService
 
         await this.runCheck(platform, () => service.beforeGoLive(settingsForPlatform));
       } catch (e: unknown) {
-        console.error('Error running beforeGoLive for plarform', e);
-        // cast all PLATFORM_REQUEST_FAILED errors to SETTINGS_UPDATE_FAILED
-        if (e instanceof StreamError) {
-          e.type =
-            (e.type as TStreamErrorType) === 'PLATFORM_REQUEST_FAILED'
-              ? 'SETTINGS_UPDATE_FAILED'
-              : e.type || 'UNKNOWN_ERROR';
-          this.setError(e, platform);
-        } else {
-          this.setError('SETTINGS_UPDATE_FAILED', platform);
-        }
-        return;
+        this.handleSetupPlatformError(e, platform);
       }
     }
 
@@ -325,45 +315,71 @@ export class StreamingService
 
     // setup dual output
     if (this.views.isDualOutputMode) {
-      // check for more than one active platform using canvas
+      const displayPlatforms = this.views.displayPlatforms;
+      // @@@ do I need to setup single stream first?
 
-      // if so, multistream just that stream
-
-      // treat it like two different desktops <--- *****
-
-      // dual output also uses the Restream service
-      // so check if the Restream service is available
-      // @@@ TODO fix dual output errors
-      //   update dual output settings
-
-      // @@@ TODO: ONLY TURN ON RESTREAM IF MULTIPLE ACTIVE PLATFORMS NEED TO USE THE SAME CONTEXT
-      let ready = false;
-
-      try {
-        await this.runCheck(
-          'setupDualOutput',
-          async () => (ready = await this.restreamService.checkStatus()),
-        );
-      } catch (e: unknown) {
-        console.error('Error fetching restreaming service for dual output', e);
-      }
-      // Assume restream is down
-      if (!ready) {
-        this.setError('DUAL_OUTPUT_RESTREAM_DISABLED');
-        return;
+      const platformsToRestream: TPlatform[] = [];
+      for (const display in displayPlatforms) {
+        if (displayPlatforms[display].length > 1) {
+          // create array of active platforms
+          platformsToRestream.concat(displayPlatforms[display]);
+        }
       }
 
-      try {
-        await this.runCheck('setupDualOutput', async () => {
-          // enable restream on the backend side\
-          if (!this.restreamService.state.enabled) await this.restreamService.setEnabled(true);
-          await this.restreamService.beforeGoLive();
-          // return Promise.resolve(true);
+      if (platformsToRestream.length) {
+        console.log('restream');
+        // remove from platforms object the platforms to restream
+        // so that we only have platforms to single streaming left
+        platformsToRestream.forEach(restreamPlatform => {
+          const indexOfPlatform = platforms.indexOf(restreamPlatform);
+          platforms.splice(indexOfPlatform, 1);
         });
-      } catch (e: unknown) {
-        console.error('Unable to proceed with dual output. Failed to setup restream', e);
-        this.setError('DUAL_OUTPUT_SETUP_FAILED');
-        return;
+
+        // setup restream on platformsToRestream
+        // check the Restream service is available
+        let ready = false;
+        try {
+          await this.runCheck(
+            'setupMultistream',
+            async () => (ready = await this.restreamService.checkStatus()),
+          );
+        } catch (e: unknown) {
+          console.error('Error fetching restreaming service', e);
+        }
+        // Assume restream is down
+        if (!ready) {
+          this.setError('DUAL_OUTPUT_RESTREAM_DISABLED');
+          return;
+        }
+
+        // update restream settings
+        try {
+          await this.runCheck('setupMultistream', async () => {
+            // enable restream on the backend side
+            if (!this.restreamService.state.enabled) await this.restreamService.setEnabled(true);
+            await this.restreamService.beforeDualOutputGoLive(platformsToRestream);
+          });
+        } catch (e: unknown) {
+          console.error('Failed to setup restream', e);
+          this.setError('DUAL_OUTPUT_SETUP_FAILED');
+          return;
+        }
+        console.log('platforms ', platforms);
+      }
+
+      // for single streaming, just assign context to platform(s)
+      if (platforms.length) {
+        // the only platforms remaining on this array
+        // will be the ones to single stream because
+        // the ones to multistream were removed in the previous if statement
+        platforms.forEach(async platform => {
+          const service = getPlatformService(platform);
+          try {
+            await Promise.resolve(service.setContext(platform));
+          } catch (e: unknown) {
+            this.handleSetupPlatformError(e, platform);
+          }
+        });
       }
     }
 
@@ -415,6 +431,21 @@ export class StreamingService
       this.createGameAssociation(this.views.game);
       this.recordAfterStreamStartAnalytics(settings);
     }
+  }
+
+  handleSetupPlatformError(e: unknown, platform: TPlatform) {
+    console.error('Error running beforeGoLive for platform', e);
+    // cast all PLATFORM_REQUEST_FAILED errors to SETTINGS_UPDATE_FAILED
+    if (e instanceof StreamError) {
+      e.type =
+        (e.type as TStreamErrorType) === 'PLATFORM_REQUEST_FAILED'
+          ? 'SETTINGS_UPDATE_FAILED'
+          : e.type || 'UNKNOWN_ERROR';
+      this.setError(e, platform);
+    } else {
+      this.setError('SETTINGS_UPDATE_FAILED', platform);
+    }
+    return;
   }
 
   private recordAfterStreamStartAnalytics(settings: IGoLiveSettings) {
@@ -474,18 +505,7 @@ export class StreamingService
       try {
         await this.runCheck(platform, () => service.putChannelInfo(newSettings));
       } catch (e: unknown) {
-        console.error('Error running putChannelInfo for platform', e);
-        // cast all PLATFORM_REQUEST_FAILED errors to SETTINGS_UPDATE_FAILED
-        if (e instanceof StreamError) {
-          e.type =
-            (e.type as TStreamErrorType) === 'PLATFORM_REQUEST_FAILED'
-              ? 'SETTINGS_UPDATE_FAILED'
-              : e.type || 'UNKNOWN_ERROR';
-          this.setError(e, platform);
-        } else {
-          this.setError('SETTINGS_UPDATE_FAILED', platform);
-        }
-        return false;
+        return this.handleUpdatePlatformError(e, platform);
       }
     }
 
@@ -494,6 +514,21 @@ export class StreamingService
     // finish the 'runChecklist' step
     this.UPDATE_STREAM_INFO({ lifecycle });
     return true;
+  }
+
+  handleUpdatePlatformError(e: unknown, platform: TPlatform) {
+    console.error('Error running putChannelInfo for platform', e);
+    // cast all PLATFORM_REQUEST_FAILED errors to SETTINGS_UPDATE_FAILED
+    if (e instanceof StreamError) {
+      e.type =
+        (e.type as TStreamErrorType) === 'PLATFORM_REQUEST_FAILED'
+          ? 'SETTINGS_UPDATE_FAILED'
+          : e.type || 'UNKNOWN_ERROR';
+      this.setError(e, platform);
+    } else {
+      this.setError('SETTINGS_UPDATE_FAILED', platform);
+    }
+    return false;
   }
 
   /**
@@ -678,12 +713,12 @@ export class StreamingService
       obs.NodeObs.OBS_service_setVideoInfo(horizontalContext, 0);
       obs.NodeObs.OBS_service_setVideoInfo(verticalContext, 1);
 
-      obs.NodeObs.OBS_service_startStreaming();
-      obs.NodeObs.OBS_service_startStreamingSecond();
+      obs.NodeObs.OBS_service_startStreaming(0);
+      obs.NodeObs.OBS_service_startStreaming(1);
       // @@@ TODO: setSettings platform settings for each stream with platform settings in stream-settings.ts
       // streamFormData: platforms: { ... } --> this.settingsService.setSettings('StreamSecond', streamFormData);
     } else {
-      obs.NodeObs.OBS_service_startStreaming();
+      obs.NodeObs.OBS_service_startStreaming(0);
     }
 
     const recordWhenStreaming = this.streamSettingsService.settings.recordWhenStreaming;
@@ -755,10 +790,11 @@ export class StreamingService
         remote.powerSaveBlocker.stop(this.powerSaveId);
       }
 
-      obs.NodeObs.OBS_service_stopStreaming(false);
-
       if (this.views.isDualOutputMode) {
-        obs.NodeObs.OBS_service_stopStreamingSecond(false);
+        obs.NodeObs.OBS_service_stopStreaming(false, 0);
+        obs.NodeObs.OBS_service_stopStreaming(false, 1);
+      } else {
+        obs.NodeObs.OBS_service_stopStreaming(false);
       }
 
       const keepRecording = this.streamSettingsService.settings.keepRecordingWhenStreamStops;
@@ -781,7 +817,12 @@ export class StreamingService
     }
 
     if (this.state.streamingStatus === EStreamingState.Ending) {
-      obs.NodeObs.OBS_service_stopStreaming(true);
+      if (this.views.isDualOutputMode) {
+        obs.NodeObs.OBS_service_stopStreaming(true, 0);
+        obs.NodeObs.OBS_service_stopStreaming(true, 1);
+      } else {
+        obs.NodeObs.OBS_service_stopStreaming(true);
+      }
       return Promise.resolve();
     }
   }

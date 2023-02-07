@@ -18,6 +18,8 @@ interface ISavedGoLiveSettings {
     twitch?: IPlatformFlags;
     facebook?: IPlatformFlags;
     youtube?: IPlatformFlags;
+    trovo?: IPlatformFlags;
+    tiktok?: IPlatformFlags;
   };
   customDestinations?: ICustomStreamDestination[];
   advancedMode: boolean;
@@ -80,6 +82,7 @@ interface IStreamSettings extends IStreamSettingsState {
   keepReplayBufferStreamStops: boolean;
   delayEnable: boolean;
   delaySec: number;
+  video?: IVideo;
 }
 
 const platformToServiceNameMap: { [key in TPlatform]: string } = {
@@ -127,7 +130,8 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
   /**
    * setup all stream-settings via single object
    */
-  setSettings(patch: Partial<IStreamSettings>) {
+  setSettings(patch: Partial<IStreamSettings>, context?: number) {
+    const streamName = !context || context === 0 ? 'Stream' : 'StreamSecond';
     // save settings to localStorage
     const localStorageSettings: (keyof IStreamSettingsState)[] = [
       'protectedModeEnabled',
@@ -136,6 +140,7 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
       'description',
       'warnNoVideoSources',
       'goLiveSettings',
+      // 'video', ? to save context to local storage?
     ];
     localStorageSettings.forEach(prop => {
       if (prop in patch) {
@@ -145,6 +150,16 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
 
     // save settings related to "Settings->Stream" window
     let streamFormData = cloneDeep(this.views.obsStreamSettings);
+    if (context !== null) {
+      const contextName = context === 0 ? 'horizontal' : 'vertical';
+
+      // @@@ TODO working here <-- is there where I should be adding the context to the streams?
+      // streamFormData.push({nameSubCategory: 'Untitled', parameters: [{}]})
+      // streamFormData = [
+      //   ...streamFormData,
+      //   { video: this.videoSettingsService.contexts[contextName] },
+      // ];
+    }
 
     console.log('streamFormData ', streamFormData);
 
@@ -155,12 +170,10 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
 
           // we should immediately save the streamType in OBS if it's changed
           // otherwise OBS will not save 'key' and 'server' values
-          this.settingsService.setSettings('Stream', streamFormData);
 
-          // if dual output mode, apply settings to the second stream
-          if (this.dualOutputService.views.dualOutputMode) {
-            this.settingsService.setSettings('StreamSecond', streamFormData);
-          }
+          this.settingsService.setSettings(streamName, streamFormData);
+          // this.settingsService.setSettings('Stream', streamFormData);
+          // this.settingsService.setSettings('StreamSecond', streamFormData);
         }
       });
     });
@@ -187,12 +200,7 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
         }
       });
     });
-    this.settingsService.setSettings('Stream', streamFormData);
-
-    // if dual output mode, apply settings to the second stream
-    if (this.dualOutputService.views.dualOutputMode) {
-      this.settingsService.setSettings('StreamSecond', streamFormData);
-    }
+    this.settingsService.setSettings(streamName, streamFormData);
   }
 
   setGoLiveSettings(settingsPatch: Partial<IGoLiveSettings>) {
@@ -247,11 +255,13 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
       keepReplayBufferStreamStops: obsGeneralSettings.KeepReplayBufferStreamStops,
       delayEnable: obsAdvancedSettings.DelayEnable,
       delaySec: obsAdvancedSettings.DelaySec,
+      video: obsStreamSettings.video,
     };
   }
 
-  setObsStreamSettings(formData: ISettingsSubCategory[]) {
-    this.settingsService.setSettings('Stream', formData);
+  setObsStreamSettings(formData: ISettingsSubCategory[], context?: number) {
+    const streamName = !context || context === 0 ? 'Stream' : 'StreamSecond';
+    this.settingsService.setSettings(streamName, formData);
   }
 
   get protectedModeEnabled(): boolean {

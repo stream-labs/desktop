@@ -50,6 +50,7 @@ export interface IObsInput<TValueType> {
   visible?: boolean;
   masked?: boolean;
   type: TObsType;
+  video?: obs.IVideo; // @@@ TODO <--- do I need to add this to the inputs? Or does assigning to the scene items handle this
 }
 
 export declare type TObsFormData = (IObsInput<TObsValue> | IObsListInput<TObsValue>)[];

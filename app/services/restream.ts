@@ -164,8 +164,8 @@ export class RestreamService extends StatefulService<IRestreamState> {
     await Promise.all([this.setupIngest(), this.setupTargets()]);
   }
 
-  async beforeDualOutputGoLive() {
-    await Promise.all([this.setupIngest(), this.setupTargets()]);
+  async beforeDualOutputGoLive(platforms: TPlatform[]) {
+    await Promise.all([this.setupIngest(), this.setupDualOutputTargets(platforms)]);
   }
 
   async setupIngest() {
@@ -190,13 +190,10 @@ export class RestreamService extends StatefulService<IRestreamState> {
 
     // setup new targets
     const newTargets = [
-      ...this.streamInfo.enabledPlatforms.map(platform => {
-        return {
-          platform: platform as TPlatform,
-          streamKey: getPlatformService(platform).state.streamKey,
-          video: this.dualOutputService.views.getPlatformContext(platform), // @@@ TODO remove from respective beforeGoLive functions
-        };
-      }),
+      ...this.streamInfo.enabledPlatforms.map(platform => ({
+        platform: platform as TPlatform,
+        streamKey: getPlatformService(platform).state.streamKey,
+      })),
       ...this.streamInfo.savedSettings.customDestinations
         .filter(dest => dest.enabled)
         .map(dest => ({
@@ -215,6 +212,27 @@ export class RestreamService extends StatefulService<IRestreamState> {
     }
 
     console.log('newTargets ', newTargets);
+
+    await this.createTargets(newTargets);
+  }
+
+  async setupDualOutputTargets(platforms: TPlatform[]) {
+    // delete existing targets
+    // @@@ TODO: should I not do this?
+    const targets = await this.fetchTargets();
+    const promises = targets.map(t => this.deleteTarget(t.id));
+    await Promise.all(promises);
+
+    // setup new targets
+    const newTargets = [
+      ...platforms.map(platform => ({
+        platform: platform as TPlatform,
+        streamKey: getPlatformService(platform).state.streamKey,
+        video: this.dualOutputService.views.getPlatformContext(platform),
+      })),
+    ];
+
+    console.log('dual output newTargets ', newTargets);
 
     await this.createTargets(newTargets);
   }
