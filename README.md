@@ -39,6 +39,14 @@ Node-gypでは、ネイティブアドオンをインストールするために
 こちらからダウンロードできます：<https://www.python.org/>
 
 ### インストール
+1. [N Voice](https://github.com/n-air-app/n-voice-package) のモジュールが GitHub Repository を使っているため、GitHubの[Personal Access token(classic)を read:packages スコープをつけて作成](https://github.com/settings/tokens)し、npm login する。
+
+```shell
+npm login --scope=@n-air-app --registry=https://npm.pkg.github.com
+> Username: USERNAME (of GitHub)
+> Password: TOKEN (GitHub Personal Access Token(classic) with read:packages scope)
+```
+
 1.yarnを介してすべての node モジュールをインストールする。
 
 ```
@@ -60,7 +68,7 @@ yarn start
 ## ライセンス
 N Air本体はGPLv3で公開しています。
 
-N Airには外部の多くのオープンソースを利用しております。それらに関しては各パッケージのライセンス条項を御確認ください。
+N Airには外部の多くのソフトウェアを利用しております。それらに関しては各パッケージのライセンス条項を御確認ください。
 
 ## Special Thanks
 This Open Source Program is forked from Streamlabs OBS, a software originally created by Streamlabs.
