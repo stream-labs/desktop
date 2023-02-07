@@ -140,7 +140,7 @@ export class NicoliveClient {
    */
   private async fetchSession(): Promise<string> {
     const { session } = remote.getCurrentWebContents();
-    return new Promise((resolve, reject) =>
+    return new Promise((resolve, reject) => {
       session.cookies.get(
         { url: 'https://.nicovideo.jp', name: 'user_session' },
         (err, cookies) => {
@@ -148,8 +148,8 @@ export class NicoliveClient {
           if (cookies.length < 1) return reject(new NotLoggedInError());
           resolve(cookies[0].value);
         },
-      ),
-    );
+      );
+    });
   }
 
   private get(url: string | URL, options: RequestInit = {}): Promise<Response> {

@@ -178,7 +178,7 @@ export class WindowSizeService extends StatefulService<IWindowSizeState> {
     const [width, height] = win.getSize();
     let nextHeight = height;
     const nextMinWidth = WindowSizeService.WINDOW_MIN_WIDTH[nextState];
-    const INT32_MAX = Math.pow(2, 31) - 1; // BIG ENOUGH VALUE (0が指定したいが、一度0以外を指定すると0に再設定できないため)
+    const INT32_MAX = 2 ** 31 - 1; // BIG ENOUGH VALUE (0が指定したいが、一度0以外を指定すると0に再設定できないため)
     const nextMaxWidth = nextState === PanelState.COMPACT ? nextMinWidth : INT32_MAX;
     let nextWidth = width;
     let nextMaximize = lastMaximized;

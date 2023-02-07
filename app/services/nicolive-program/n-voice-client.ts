@@ -32,7 +32,7 @@ async function playAudio(buffer: Buffer, volume: number = 1.0): Promise<{ cancel
         resolve();
       }
     }
-    return audio.play();
+    audio.play();
   }).finally(() => {
     completed = true;
     URL.revokeObjectURL(url);

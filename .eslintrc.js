@@ -116,6 +116,7 @@ module.exports = {
       files: ['*.ts', '*.tsx'],
       rules: {
         'no-undef': OFF,
+        'default-param-last': OFF,
       },
     }
   ]
