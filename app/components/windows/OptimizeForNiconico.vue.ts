@@ -25,7 +25,7 @@ export default class OptimizeNiconico extends Vue {
   @Inject() settingsService: SettingsService;
 
   settings: OptimizedSettings =
-    // @ts-ignore: ts2729: use before initialization
+    // @ts-expect-error: ts2729: use before initialization
     this.windowsService.getChildWindowQueryParams() as any as OptimizedSettings;
   icons = CategoryIcons;
 

@@ -1,7 +1,7 @@
 import { Component } from 'vue-property-decorator';
 import Vue from 'vue';
 import uuid from 'uuid';
-// @ts-ignore
+// @ts-expect-error
 import { ErrorField } from 'vee-validate';
 import { BaseInput } from './BaseInput';
 import { IInputMetadata } from './index';

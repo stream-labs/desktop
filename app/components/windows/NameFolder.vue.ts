@@ -17,7 +17,7 @@ export default class NameFolder extends Vue {
     renameId?: string;
     itemsToGroup?: string[];
     parentId?: string;
-    // @ts-ignore: ts2729: use before initialization
+    // @ts-expect-error: ts2729: use before initialization
   } = this.windowsService.getChildWindowQueryParams();
 
   name = '';

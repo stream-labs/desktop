@@ -27,7 +27,7 @@ export default class SourceProperties extends Vue {
   @Inject()
   windowsService: WindowsService;
 
-  // @ts-ignore: ts2729: use before initialization
+  // @ts-expect-error: ts2729: use before initialization
   source = this.sourcesService.getSource(this.sourceId);
   properties: TObsFormData = [];
   initialProperties: TObsFormData = [];

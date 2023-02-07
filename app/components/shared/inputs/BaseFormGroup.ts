@@ -1,6 +1,6 @@
 import { Prop } from 'vue-property-decorator';
 import Vue from 'vue';
-// @ts-ignore
+// @ts-expect-error
 import { ErrorField } from 'vee-validate';
 import { EInputType, IInputMetadata } from './index';
 import { BaseInput } from './BaseInput';

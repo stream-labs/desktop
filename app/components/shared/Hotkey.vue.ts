@@ -18,7 +18,7 @@ export default class HotkeyComponent extends Vue {
   @Prop()
   hotkey: Hotkey;
 
-  // @ts-ignore: ts2729: use before initialization
+  // @ts-expect-error: ts2729: use before initialization
   description = this.hotkey.description;
   bindings: IKeyedBinding[] = [];
 
