@@ -17,14 +17,14 @@
   "Muted Chatters": "Wyciszeni czatujący",
   "Hide Commands": "Ukryj polecenia",
   "Background Color": "Kolor tła",
-  "Show Platform Icons": "Show Platform Icons",
+  "Show Platform Icons": "Pokaż ikony platform",
   "Theme": "Motyw",
   "Badges": "Odznaki",
   "Extra Emotes": "Dodatkowe emotikony",
-  "Chat Delay": "Chat Delay",
+  "Chat Delay": "Opóźnienie czatu",
   "Hide Delay": "Hide Delay",
-  "Disable Message Animations": "Disable Message Animations",
-  "Hide Characters": "Hide Characters",
+  "Disable Message Animations": "Wyłącz animacje wiadomości",
+  "Hide Characters": "Ukryj znaki",
   "Hide Common Chat Bots": "Ukryj znane boty na czacie",
-  "Hide commands starting with `!`": "Ukryj komendy zaczynające się od \"!\""
+  "Hide commands starting with `!`": "Ukryj komendy zaczynające się od „!”"
 }
