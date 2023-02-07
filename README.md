@@ -47,13 +47,13 @@ npm login --scope=@n-air-app --registry=https://npm.pkg.github.com
 > Password: TOKEN (GitHub Personal Access Token(classic) with read:packages scope)
 ```
 
-1.yarnを介してすべての node モジュールをインストールする。
+2. yarnを介してすべての node モジュールをインストールする。
 
 ```
 yarn install
 ```
 
-2.webpackを使用してアセットをコンパイルする。
+3. webpackを使用してアセットをコンパイルする。
 
 ```
 yarn compile
