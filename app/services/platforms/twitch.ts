@@ -10,7 +10,7 @@ import { HostsService } from 'services/hosts';
 import { Inject } from 'services/core/injector';
 import { authorizedHeaders, jfetch } from 'util/requests';
 import { UserService } from 'services/user';
-import { getAllTags, getStreamTags, TTwitchTag, updateTags } from './twitch/tags';
+import { getStreamTags, TTwitchTag, updateTags } from './twitch/tags';
 import { TTwitchOAuthScope } from './twitch/scopes';
 import { platformAuthorizedRequest, platformRequest } from './utils';
 import { CustomizationService } from 'services/customization';
@@ -24,12 +24,12 @@ import Utils from '../utils';
 export interface ITwitchStartStreamOptions {
   title: string;
   game?: string;
-  tags?: TTwitchTag[];
+  tags?: string[];
 }
 
 export interface ITwitchChannelInfo extends ITwitchStartStreamOptions {
   hasUpdateTagsPermission: boolean;
-  availableTags: TTwitchTag[];
+  availableTags: string[];
 }
 
 interface ITWitchChannelResponse {
@@ -62,7 +62,7 @@ interface ITwitchOAuthValidateResponse {
 interface ITwitchServiceState extends IPlatformState {
   hasUpdateTagsPermission: boolean;
   hasPollsPermission: boolean;
-  availableTags: TTwitchTag[];
+  availableTags: string[];
   settings: ITwitchStartStreamOptions;
 }
 
@@ -129,7 +129,12 @@ export class TwitchService
 
   get authUrl() {
     const host = this.hostsService.streamlabs;
-    const scopes: TTwitchOAuthScope[] = ['channel_read', 'channel_editor', 'user:edit:broadcast'];
+    const scopes: TTwitchOAuthScope[] = [
+      'channel_read',
+      'channel_editor',
+      'user:edit:broadcast',
+      'channel:manage:broadcast',
+    ];
 
     const query =
       `_=${Date.now()}&skip_splash=true&external=electron&twitch&force_verify&` +
@@ -156,6 +161,10 @@ export class TwitchService
 
   get username(): string {
     return this.userService.state.auth?.platforms?.twitch?.username || '';
+  }
+
+  get tags(): string[] {
+    return this.state.settings.tags;
   }
 
   async beforeGoLive(goLiveSettings?: IGoLiveSettings) {
@@ -272,20 +281,14 @@ export class TwitchService
       this.getHasUpdateTagsPermission(),
     ]);
 
-    let tags: TTwitchTag[] = this.state.settings.tags ?? [];
+    let tags: string[] = this.state.settings.tags ?? [];
 
     if (hasUpdateTagsPermission && this.state.availableTags.length === 0) {
-      [tags] = await Promise.all([this.getStreamTags(), this.getAllTags()]);
+      tags = await Promise.resolve(this.getStreamTags());
     }
 
     this.SET_PREPOPULATED(true);
     this.SET_STREAM_SETTINGS({ tags, title: channelInfo.title, game: channelInfo.game });
-  }
-
-  @mutation()
-  private SET_AVAILABLE_TAGS(tags: TTwitchTag[]) {
-    this.state.availableTags = tags;
-    this.state.hasUpdateTagsPermission = true;
   }
 
   @mutation()
@@ -375,19 +378,13 @@ export class TwitchService
     return `https://twitch.tv/${this.username}`;
   }
 
-  async getAllTags(): Promise<void> {
-    // Fetch stream tags once per session as they're unlikely to change that often
-    if (this.state.availableTags.length) return;
-    this.SET_AVAILABLE_TAGS(await getAllTags());
-  }
-
-  getStreamTags(): Promise<TTwitchTag[]> {
+  getStreamTags(): Promise<string[]> {
     assertIsDefined(this.twitchId);
     return getStreamTags(this.twitchId);
   }
 
-  async setStreamTags(tags: TTwitchTag[]) {
-    const hasPermission = await this.hasScope('user:edit:broadcast');
+  async setStreamTags(tags: string[]) {
+    const hasPermission = await this.hasScope('channel:manage:broadcast');
 
     if (!hasPermission) {
       return false;
