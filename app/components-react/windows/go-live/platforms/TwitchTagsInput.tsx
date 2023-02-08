@@ -7,24 +7,29 @@ import keyBy from 'lodash/keyBy';
 import { IListOption } from '../../../shared/inputs/ListInput';
 import { Row, Col, Tag } from 'antd';
 import { I18nService } from '../../../../services/i18n';
+import { useVuex } from 'components-react/hooks';
 
-type TTwitchTagsInputProps = TSlobsInputProps<{}, TTwitchTag[]>;
+type TTwitchTagsInputProps = TSlobsInputProps<{}, string[]>;
 
 export function TwitchTagsInput(p: TTwitchTagsInputProps) {
-  const s = useOnCreate(() => {
-    const state = Services.TwitchService.state;
-    const avalableTags = state.availableTags;
-    const disabled = !state.hasUpdateTagsPermission;
-    const locale = I18nService.instance.state.locale;
-    const translatedTags = prepareOptions(locale, avalableTags);
-    const tagsMap = keyBy(translatedTags, 'tag_id');
-    return { disabled, translatedTags, tagsMap };
-  });
+  // const s = useOnCreate(() => {
+  //   const state = Services.TwitchService.state;
+  //   const avalableTags = state.availableTags;
+  //   const disabled = !state.hasUpdateTagsPermission;
+  //   const locale = I18nService.instance.state.locale;
+  //   const translatedTags = prepareOptions(locale, avalableTags);
+  //   const tagsMap = keyBy(translatedTags, 'tag_id');
+  //   return { disabled, tags };
+  // });
 
-  const options: IListOption<string>[] = s.translatedTags.map(tag => ({
-    label: tag.name,
-    value: tag.tag_id,
-    description: tag.description,
+  const v = useVuex(() => ({
+    tags: Services.TwitchService.state.settings.tags,
+  }));
+
+  const options: IListOption<string>[] = v.tags!.map(tag => ({
+    label: tag,
+    value: tag,
+    description: tag,
   }));
 
   function render() {
@@ -32,9 +37,9 @@ export function TwitchTagsInput(p: TTwitchTagsInputProps) {
       <TagsInput
         name="twitchTags"
         label={p.label}
-        value={p.value && p.value.map(tag => tag.tag_id)}
+        value={v.tags && v.tags.map(tag => tag)}
         max={5}
-        onChange={values => p.onChange && p.onChange(values.map(tagName => s.tagsMap[tagName]))}
+        // onChange={values => p.onChange && p.onChange(values.map(tagName => s.tagsMap[tagName]))}
         options={options}
         tagRender={(tagProps, tag) => (
           <Tag {...tagProps} color="#9146FF">
