@@ -220,11 +220,8 @@ export class SceneItem extends SceneItemNode {
       this.getObsSceneItem().blendingMethod = newSettings.blendingMethod;
     }
 
-    if (changed.output !== void 0) {
-      console.log('setting obs scene item video ', this.videoSettingsService.contexts[display]);
-      // this.getObsSceneItem().video = newSettings.output;
-      const context = this.videoSettingsService.contexts[display];
-      this.getObsSceneItem().video = context;
+    if (changed.output !== void 0 || patch.hasOwnProperty('output')) {
+      this.getObsSceneItem().video = newSettings.output;
     }
 
     this.UPDATE({ sceneItemId: this.sceneItemId, ...changed });

@@ -74,6 +74,10 @@ class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
     );
   }
 
+  get nodeMaps() {
+    return this.state.nodeMaps;
+  }
+
   getNodeIds(displays: TDisplayType[]) {
     return displays.reduce((ids: string[], display: TDisplayType) => {
       const nodeMap = this.state.nodeMaps[display];
@@ -147,12 +151,15 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
 
     this.scenesService.sceneSwitched.subscribe(() => {
       if (this.state.dualOutputMode && this.views.hasDualOutputScenes) {
-        console.log('switching');
         this.restoreScene(this.state.convertedDefaultDisplay);
         this.mapSceneNodes(['horizontal', 'vertical'], this.scenesService.views.activeSceneId);
       }
     });
   }
+
+  /**
+   * Create/destroy nodes for dual output when toggling on/off
+   */
 
   async toggleDualOutputMode(status: boolean) {
     try {
@@ -219,8 +226,6 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
       // if it's the first display, just assign the scene item's output to a context
       const context = this.videoSettingsService.contexts[display];
 
-      console.log('creating node for ', display, 'context with ', context);
-
       if (!context) return false;
 
       sceneItem.setSettings({ output: context }, display);
@@ -234,8 +239,6 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
       const scene = this.scenesService.views.getScene(sceneId);
       const copiedSceneItem = scene.addSource(sceneItem.sourceId);
       const context = this.videoSettingsService.contexts[display];
-
-      console.log('creating node for ', display, 'context with ', context);
 
       if (!copiedSceneItem || !context) return false;
 
@@ -256,56 +259,40 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
         this.scenesService.views.activeSceneId,
       );
 
-      console.log('nodesToReassign ', nodesToReassign);
-
-      console.log('sceneNodes before ', sceneNodes);
-
       const defaultContext = this.videoSettingsService.contexts.default;
-
-      const horizontalContext = this.videoSettingsService.contexts.horizontal;
-      const verticalContext = this.videoSettingsService.contexts.vertical;
-      console.log('defaultContext ', defaultContext);
-      console.log('horizontalContext ', horizontalContext);
-      console.log('verticalContext ', verticalContext);
-      console.log('defaultContext JSON ', JSON.stringify(defaultContext));
-      console.log('horizontalContext JSON ', JSON.stringify(horizontalContext));
-      console.log('verticalContext JSON', JSON.stringify(verticalContext));
-
-      console.log('no JSON' + this.videoSettingsService.contexts.default);
-      console.log('no JSON' + this.videoSettingsService.contexts.vertical);
-      console.log('no JSON' + this.videoSettingsService.contexts.horizontal);
-      console.log('partial settings ' + JSON.stringify(this.videoSettingsService.contexts.default));
-      console.log(
-        'partial settings ' + JSON.stringify(this.videoSettingsService.contexts.vertical),
-      );
-      console.log(
-        'partial settings ' + JSON.stringify(this.videoSettingsService.contexts.horizontal),
-      );
 
       sceneNodes.forEach((sceneItem: SceneItem) => {
         if (nodesToReassign.includes(sceneItem.id)) {
-          console.log('reassigning sceneItem.id ', sceneItem.id);
           const setting: IPartialSettings = { output: defaultContext };
           sceneItem.setSettings(setting, display);
-
-          console.log('model is now', sceneItem.getModel());
         } else {
-          console.log('removing ', sceneItem.id);
           sceneItem.remove();
         }
       });
-
-      // @@@ TODO: remove, just confirming correct removal
-      const sceneNodes2 = this.scenesService.views.getSceneItemsBySceneId(
-        this.scenesService.views.activeSceneId,
-      );
-      console.log('sceneNodes2 after ', sceneNodes2);
     }
 
     this.videoSettingsService.resetToDefaultContext();
 
     this.state.nodeMaps = null;
   }
+
+  /**
+   * Helper functions for adding and removing scene items in dual output mode
+   */
+
+  removeDualOutputNodes(nodeId: string) {
+    this.REMOVE_DUAL_OUTPUT_NODES(nodeId);
+  }
+
+  restoreNodesToMap(sceneItemId: string, nodeData: { id: string; display: TDisplayType }[]) {
+    nodeData.forEach(node => {
+      this.SET_NODE_MAP_ITEM(node.display, sceneItemId, node.id);
+    });
+  }
+
+  /**
+   * Settings for platforms to displays
+   */
 
   updatePlatformSetting(platform: EDualOutputPlatform | string, display: TDualOutputDisplayType) {
     this.UPDATE_PLATFORM_SETTING(platform, display);
@@ -344,6 +331,25 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
         [originalSceneNodeId]: copiedSceneNodeId,
       };
     }
+  }
+
+  @mutation()
+  private REMOVE_DUAL_OUTPUT_NODES(nodeId: string) {
+    const horizontalNodeId = this.state.nodeMaps['horizontal'][nodeId];
+    const verticalNodeId = this.state.nodeMaps['vertical'][nodeId];
+
+    // remove nodes from scene
+
+    let newMap = {};
+    for (const display in this.state.nodeMaps) {
+      newMap = {
+        ...newMap,
+        [display]: Object.entries(this.state.nodeMaps[display]).filter(
+          ([key, val]) => key !== nodeId,
+        ),
+      };
+    }
+    this.state.nodeMaps = newMap;
   }
 
   @mutation()
