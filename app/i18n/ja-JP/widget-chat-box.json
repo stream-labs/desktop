@@ -16,5 +16,15 @@
   "Font Size": "フォントサイズ",
   "Muted Chatters": "ミュートにしたチャッター",
   "Hide Commands": "コマンドを非表示",
-  "Background Color": "背景色"
+  "Background Color": "背景色",
+  "Show Platform Icons": "Show Platform Icons",
+  "Theme": "テーマ",
+  "Badges": "バッジ",
+  "Extra Emotes": "絵文字の追加",
+  "Chat Delay": "Chat Delay",
+  "Hide Delay": "Hide Delay",
+  "Disable Message Animations": "Disable Message Animations",
+  "Hide Characters": "Hide Characters",
+  "Hide Common Chat Bots": "チャットボットを非表示する",
+  "Hide commands starting with `!`": "”！”で始まるコマンドを隠す。"
 }

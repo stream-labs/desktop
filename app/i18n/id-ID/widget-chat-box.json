@@ -16,5 +16,15 @@
   "Font Size": "Ukuran Font",
   "Muted Chatters": "Mute Chatter",
   "Hide Commands": "Sembunyikan Perintah",
-  "Background Color": "Warna Latar Belakang"
+  "Background Color": "Warna Latar Belakang",
+  "Show Platform Icons": "Show Platform Icons",
+  "Theme": "Tema",
+  "Badges": "Lencana",
+  "Extra Emotes": "Emote Ekstra",
+  "Chat Delay": "Chat Delay",
+  "Hide Delay": "Hide Delay",
+  "Disable Message Animations": "Disable Message Animations",
+  "Hide Characters": "Hide Characters",
+  "Hide Common Chat Bots": "Sembunyikan Chat Bots Umum",
+  "Hide commands starting with `!`": "Sembunyikan perintah yang dimulai dengan ‘!’"
 }

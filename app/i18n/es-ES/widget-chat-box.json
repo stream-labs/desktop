@@ -16,5 +16,15 @@
   "Font Size": "Tamaño de fuente",
   "Muted Chatters": "Chateadores silenciados",
   "Hide Commands": "Ocultar comandos",
-  "Background Color": "Color de fondo"
+  "Background Color": "Color de fondo",
+  "Show Platform Icons": "Show Platform Icons",
+  "Theme": "Tema",
+  "Badges": "Insignias",
+  "Extra Emotes": "Emoticonos Extra",
+  "Chat Delay": "Chat Delay",
+  "Hide Delay": "Hide Delay",
+  "Disable Message Animations": "Disable Message Animations",
+  "Hide Characters": "Hide Characters",
+  "Hide Common Chat Bots": "Ocultar Bots de Chat común",
+  "Hide commands starting with `!`": "Ocultar comandos que empiecen por '!'"
 }

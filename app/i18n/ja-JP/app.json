@@ -5,5 +5,6 @@
   "Grant Permissions": "許可を付与する",
   "Streamlabs needs additional permissions. Grant permissions in the pop-up dialogs to continue.": "Streamlabs は追加の許可が必要です。ポップアップダイアログで許可を付与して、続行してください。",
   "Microphone": "マイク",
-  "Webcam": "ウェブカメラ"
+  "Webcam": "ウェブカメラ",
+  "You've merged a Streamlabs ID to your account, please log back in to ensure you have the right credentials.": "You've merged a Streamlabs ID to your account, please log back in to ensure you have the right credentials."
 }

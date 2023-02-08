@@ -117,7 +117,7 @@
   "Very High": "Très élevé",
   "Apps": "Applications",
   "Finish": "Terminer",
-  "Get Prime": "Obtenir Prime",
+  "Get Ultra": "Get Ultra",
   "System error message:": "Message d’erreur système:",
   "List is empty": "La liste est vide",
   "Not selected": "Non sélectionné",
@@ -139,5 +139,18 @@
   "Click here": "Cliquez ici",
   "More Info": "Plus d’informations",
   "Revert Changes": "Annuler les changements",
-  "Animations": "Animations"
+  "Animations": "Animations",
+  "Multistreaming": "Multistreaming",
+  "Alert Box": "Fenêtre d’alerte",
+  "Widget": "Widget",
+  "Creator Sites": "Creator Sites",
+  "Apps Manager": "Apps Manager",
+  "Theme Audit": "Theme Audit",
+  "Login": "Connexion",
+  "Tip Settings": "Paramètres de dons",
+  "Apps Store Home": "Apps Store Home",
+  "Dashboard Home": "Dashboard Home",
+  "Alert Box Library": "Bibliothèque Alert Box",
+  "Alert Box Settings": "Alert Box Settings",
+  "Upgrade to Ultra": "Upgrade to Ultra"
 }

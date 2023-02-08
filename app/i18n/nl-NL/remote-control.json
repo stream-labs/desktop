@@ -1,10 +1,10 @@
 {
-  "Show details": "Toon details",
-  "Hide details": "Verberg details",
+  "Show details": "Details weergeven",
+  "Hide details": "Details verbergen",
   "API token": "API-token",
   "Generate new": "Nieuwe genereren",
   "Port": "Poort",
   "IP addresses": "IP-adressen",
-  "Click to show": "Klik om te tonen",
-  "The free Streamlabs Controller app allows you to control Streamlabs Desktop from your iOS or Android device. Scan the QR code below to begin.": "The free Streamlabs Controller app allows you to control Streamlabs Desktop from your iOS or Android device. Scan the QR code below to begin."
+  "Click to show": "Klik om weer te geven",
+  "The free Streamlabs Controller app allows you to control Streamlabs Desktop from your iOS or Android device. Scan the QR code below to begin.": "Met de gratis Streamlabs Controller-app kunt u Streamlabs Desktop bedienen vanaf uw iOS- of Android-apparaat. Scan de QR-code hieronder om te beginnen."
 }

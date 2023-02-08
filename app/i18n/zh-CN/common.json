@@ -117,7 +117,7 @@
   "Very High": "非常高",
   "Apps": "应用程序",
   "Finish": "完成",
-  "Get Prime": "获取 Prime",
+  "Get Ultra": "Get Ultra",
   "System error message:": "系统错误信息：",
   "List is empty": "列表为空",
   "Not selected": "未选中的",
@@ -139,5 +139,18 @@
   "Click here": "点这",
   "More Info": "更多信息",
   "Revert Changes": "还原更改",
-  "Animations": "动画"
+  "Animations": "动画",
+  "Multistreaming": "多重直播",
+  "Alert Box": "提醒框",
+  "Widget": "Widget",
+  "Creator Sites": "创作者网站",
+  "Apps Manager": "Apps Manager",
+  "Theme Audit": "Theme Audit",
+  "Login": "登陆",
+  "Tip Settings": "小费设定",
+  "Apps Store Home": "Apps Store Home",
+  "Dashboard Home": "Dashboard Home",
+  "Alert Box Library": "提醒框库",
+  "Alert Box Settings": "Alert Box Settings",
+  "Upgrade to Ultra": "Upgrade to Ultra"
 }

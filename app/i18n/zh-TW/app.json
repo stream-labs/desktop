@@ -5,5 +5,6 @@
   "Grant Permissions": "授予權限",
   "Streamlabs needs additional permissions. Grant permissions in the pop-up dialogs to continue.": "Streamlabs 需要其他權限。請在彈出方塊中授予權限以繼續。",
   "Microphone": "麥克風",
-  "Webcam": "網路攝影機"
+  "Webcam": "網路攝影機",
+  "You've merged a Streamlabs ID to your account, please log back in to ensure you have the right credentials.": "You've merged a Streamlabs ID to your account, please log back in to ensure you have the right credentials."
 }

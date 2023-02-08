@@ -16,5 +16,15 @@
   "Font Size": "Размер шрифта",
   "Muted Chatters": "Отключенные пользователи чата",
   "Hide Commands": "Скрыть команды",
-  "Background Color": "Цвет фона"
+  "Background Color": "Цвет фона",
+  "Show Platform Icons": "Show Platform Icons",
+  "Theme": "Тема",
+  "Badges": "Значки",
+  "Extra Emotes": "Дополнительные эмоции",
+  "Chat Delay": "Chat Delay",
+  "Hide Delay": "Hide Delay",
+  "Disable Message Animations": "Disable Message Animations",
+  "Hide Characters": "Hide Characters",
+  "Hide Common Chat Bots": "Скрыть распространненых чат-ботов",
+  "Hide commands starting with `!`": "Скрыть команды, начинающиеся с '!'"
 }
