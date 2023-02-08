@@ -27,8 +27,10 @@ export default class ObsImport extends Vue {
 
   status: 'initial' | 'importing' | 'done' = 'initial';
 
+  // @ts-expect-error: ts2729: use before initialization
   sceneCollections = this.obsImporterService.getSceneCollections();
 
+  // @ts-expect-error: ts2729: use before initialization
   profiles = this.obsImporterService.getProfiles();
 
   selectedProfile = this.profiles[0] || '';

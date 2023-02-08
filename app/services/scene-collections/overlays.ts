@@ -53,7 +53,7 @@ export class OverlaysPersistenceService extends Service {
     const overlayPath = path.join(os.tmpdir(), overlayFilename);
     const fileStream = fs.createWriteStream(overlayPath);
 
-    await new Promise((resolve, reject) => {
+    await new Promise<void>((resolve, reject) => {
       https.get(url).on('response', response => {
         const totalSize = parseInt(response.headers['content-length'], 10);
         let downloaded = 0;
@@ -114,7 +114,7 @@ export class OverlaysPersistenceService extends Service {
     const output = fs.createWriteStream(overlayFilePath);
     const archive = archiver('zip', { zlib: { level: 9 } });
 
-    await new Promise(resolve => {
+    await new Promise<void>(resolve => {
       output.on('close', (err: any) => {
         resolve();
       });

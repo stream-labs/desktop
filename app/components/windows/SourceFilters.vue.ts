@@ -31,14 +31,17 @@ export default class SourceFilters extends Vue {
   @Inject() sourcesService: ISourcesServiceApi;
   @Inject() windowsService: WindowsService;
 
+  // @ts-expect-error: ts2729: use before initialization
   windowOptions = this.windowsService.getChildWindowQueryParams() as {
     sourceId: string;
     selectedFilterName: string;
   };
   sourceId = this.windowOptions.sourceId;
+  // @ts-expect-error: ts2729: use before initialization
   filters = this.sourceFiltersService.getFilters(this.sourceId);
   selectedFilterName =
     this.windowOptions.selectedFilterName || (this.filters[0] && this.filters[0].name) || null;
+  // @ts-expect-error: ts2729: use before initialization
   properties = this.sourceFiltersService.getPropertiesFormData(
     this.sourceId,
     this.selectedFilterName,

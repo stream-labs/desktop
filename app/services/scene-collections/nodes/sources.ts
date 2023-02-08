@@ -79,7 +79,7 @@ export class SourcesNode extends Node<ISchema, {}> {
       return new Promise(resolve => {
         const hotkeys = new HotkeysNode();
 
-        return hotkeys.save({ sourceId: source.sourceId }).then(() => {
+        hotkeys.save({ sourceId: source.sourceId }).then(() => {
           const audioSource = this.audioService.getSource(source.sourceId);
 
           const obsInput = source.getObsInput();

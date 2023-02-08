@@ -24,6 +24,7 @@ export default class AreaSwitcher extends Vue {
     return this.customizationService.state.compactMode;
   }
 
+  // @ts-expect-error: ts2729: use before initialization
   private selectedContent: IArea = this.contents.find(c => c.defaultSelected) ?? this.contents[0];
 
   get activeContent(): IArea {

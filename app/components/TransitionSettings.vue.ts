@@ -60,6 +60,7 @@ export default class SceneTransitions extends Vue {
     return this.transitionsService.getTransition(this.transitionId);
   }
 
+  // @ts-expect-error: ts2729: use before initialization
   properties = this.transitionsService.getPropertiesFormData(this.transitionId);
 
   saveProperties(props: TObsFormData) {

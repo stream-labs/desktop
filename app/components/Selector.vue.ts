@@ -21,6 +21,7 @@ export default class Selector extends Vue {
   @Prop({ default: true, type: Boolean })
   draggable: boolean;
 
+  // @ts-expect-error: ts2729: use before initialization
   draggableSelector: string = this.draggable ? '.selector-item' : 'none';
 
   handleChange(change: any) {

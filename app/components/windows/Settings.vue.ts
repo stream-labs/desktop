@@ -48,7 +48,7 @@ export default class Settings extends Vue {
 
   categoryName: string = 'General';
   settingsData: ISettingsSubCategory[] = [];
-  // @ts-ignore: ts2729: use before initialization
+  // @ts-expect-error: ts2729: use before initialization
   categoryNames = this.settingsService.getCategories();
   userSubscription: Subscription;
   icons = CategoryIcons;

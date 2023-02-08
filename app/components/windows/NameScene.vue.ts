@@ -31,6 +31,7 @@ export default class NameScene extends Vue {
     sceneToDuplicate?: string; // id of scene
     rename?: string; // id of scene
     itemsToGroup?: string[];
+    // @ts-expect-error: ts2729: use before initialization
   } = this.windowsService.getChildWindowQueryParams();
 
   mounted() {

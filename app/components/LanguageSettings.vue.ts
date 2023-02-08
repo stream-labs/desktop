@@ -12,6 +12,7 @@ import electron from 'electron';
 export default class LanguageSettings extends Vue {
   @Inject() private i18nService: I18nServiceApi;
 
+  // @ts-expect-error: ts2729: use before initialization
   settings = this.i18nService.getLocaleFormData();
 
   private async save(data: TObsFormData) {

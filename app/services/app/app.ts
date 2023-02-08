@@ -210,7 +210,7 @@ export class AppService extends StatefulService<IAppState> {
 
       // This is kind of ugly, but it gives the browser time to paint before
       // we do long blocking operations with OBS.
-      await new Promise(resolve => setTimeout(resolve, 200));
+      await new Promise(resolve => { setTimeout(resolve, 200) });
 
       //TODO await this.sceneCollectionsService.disableAutoSave();
     }

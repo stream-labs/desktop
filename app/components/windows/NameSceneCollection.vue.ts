@@ -21,6 +21,7 @@ export default class NameSceneCollection extends Vue {
   @Inject() sceneCollectionsService: SceneCollectionsService;
   @Inject() windowsService: WindowsService;
 
+  // @ts-expect-error: ts2729: use before initialization
   options: INameSceneCollectionOptions = this.windowsService.getChildWindowQueryParams();
 
   mounted() {

@@ -110,4 +110,14 @@ module.exports = {
 
     'no-use-before-declare': OFF,
   },
+  // https://teratail.com/questions/295406
+  overrides: [
+    {
+      files: ['*.ts', '*.tsx'],
+      rules: {
+        'no-undef': OFF,
+        'default-param-last': OFF,
+      },
+    }
+  ]
 };

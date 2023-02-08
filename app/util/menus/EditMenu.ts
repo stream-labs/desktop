@@ -34,6 +34,7 @@ export class EditMenu extends Menu {
   @Inject() private audioService: AudioService;
   @Inject() private monitorCaptureCroppingService: MonitorCaptureCroppingService;
 
+  // @ts-expect-error: ts2729: use before initialization
   private scene = this.scenesService.getScene(this.options.selectedSceneId);
   private source: Source;
 

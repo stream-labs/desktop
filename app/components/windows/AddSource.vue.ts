@@ -21,10 +21,10 @@ export default class AddSource extends Vue {
 
   name = '';
   error = '';
-  // @ts-ignore: ts2729: use before initialization
+  // @ts-expect-error: ts2729: use before initialization
 
   sourceType = this.windowsService.getChildWindowQueryParams().sourceType as TSourceType;
-  // @ts-ignore: ts2729: use before initialization
+  // @ts-expect-error: ts2729: use before initialization
   sourceAddOptions = this.windowsService.getChildWindowQueryParams()
     .sourceAddOptions as ISourceAddOptions;
 
@@ -32,7 +32,7 @@ export default class AddSource extends Vue {
     return this.sourceAddOptions.propertiesManagerSettings.nVoiceCharacterType || 'near';
   }
 
-  // @ts-ignore: ts2729: use before initialization
+  // @ts-expect-error: ts2729: use before initialization
   sources = this.sourcesService.getSources().filter(source => {
     const comparison = {
       type: this.sourceType,

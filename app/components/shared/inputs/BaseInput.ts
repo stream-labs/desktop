@@ -17,6 +17,7 @@ export class BaseInput<TValueType, TMetadataType extends IInputMetadata> extends
   /**
    * uuid serves to link input field and validator message
    */
+  // @ts-expect-error: ts2729: use before initialization
   readonly uuid = (this.metadata && this.metadata.uuid) || uuid();
 
   emitInput(eventData: TValueType, event?: any) {
