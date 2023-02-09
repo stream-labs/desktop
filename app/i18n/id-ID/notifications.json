@@ -23,5 +23,6 @@
   "A new Recording has been completed. Click for more info": "Recording baru telah selesai. Klik untuk informasi selengkapnya",
   "Recording History": "Riwayat Recording",
   "Show in folder": "Tampilkan di folder",
-  "Recordings": "Recording"
+  "Recordings": "Recording",
+  "Marker %{label} added at %{timestamp}": "Marker %{label} added at %{timestamp}"
 }
