@@ -23,5 +23,6 @@
   "A new Recording has been completed. Click for more info": "Uma nova gravação foi concluída. Clique para obter mais informações",
   "Recording History": "Gravando histórico",
   "Show in folder": "Exibir na pasta",
-  "Recordings": "Gravações"
+  "Recordings": "Gravações",
+  "Marker %{label} added at %{timestamp}": "Marker %{label} added at %{timestamp}"
 }
