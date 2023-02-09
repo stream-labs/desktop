@@ -10,7 +10,7 @@ import { HostsService } from 'services/hosts';
 import { Inject } from 'services/core/injector';
 import { authorizedHeaders, jfetch } from 'util/requests';
 import { UserService } from 'services/user';
-import { getStreamTags, TTwitchTag, updateTags } from './twitch/tags';
+import { getStreamTags } from './twitch/tags';
 import { TTwitchOAuthScope } from './twitch/scopes';
 import { platformAuthorizedRequest, platformRequest } from './utils';
 import { CustomizationService } from 'services/customization';
@@ -24,18 +24,11 @@ import Utils from '../utils';
 export interface ITwitchStartStreamOptions {
   title: string;
   game?: string;
-  tags?: string[];
+  tags: string[];
 }
 
 export interface ITwitchChannelInfo extends ITwitchStartStreamOptions {
   hasUpdateTagsPermission: boolean;
-  availableTags: string[];
-}
-
-interface ITWitchChannelResponse {
-  status: string;
-  game: string;
-  stream_key: string;
 }
 
 /**
@@ -62,7 +55,6 @@ interface ITwitchOAuthValidateResponse {
 interface ITwitchServiceState extends IPlatformState {
   hasUpdateTagsPermission: boolean;
   hasPollsPermission: boolean;
-  availableTags: string[];
   settings: ITwitchStartStreamOptions;
 }
 
@@ -80,7 +72,6 @@ export class TwitchService
     ...BasePlatformService.initialState,
     hasUpdateTagsPermission: false,
     hasPollsPermission: false,
-    availableTags: [],
     settings: {
       title: '',
       game: '',
@@ -123,6 +114,8 @@ export class TwitchService
 
         // Check for updated polls scopes
         this.validatePollsScope();
+        // Check for updated tags scopes
+        this.validateTagsScope();
       }
     });
   }
@@ -271,29 +264,23 @@ export class TwitchService
    * prepopulate channel info and save it to the store
    */
   async prepopulateInfo(): Promise<void> {
-    const [channelInfo, hasUpdateTagsPermission] = await Promise.all([
+    const [channelInfo] = await Promise.all([
       this.requestTwitch<{ data: { title: string; game_name: string }[] }>(
         `${this.apiBase}/helix/channels?broadcaster_id=${this.twitchId}`,
       ).then(json => ({
         title: json.data[0].title,
         game: json.data[0].game_name,
       })),
-      this.getHasUpdateTagsPermission(),
     ]);
 
     let tags: string[] = this.state.settings.tags ?? [];
 
-    if (hasUpdateTagsPermission && this.state.availableTags.length === 0) {
+    if (this.state.hasUpdateTagsPermission) {
       tags = await Promise.resolve(this.getStreamTags());
     }
 
     this.SET_PREPOPULATED(true);
     this.SET_STREAM_SETTINGS({ tags, title: channelInfo.title, game: channelInfo.game });
-  }
-
-  @mutation()
-  private SET_HAS_POLLS_PERMISSION(hasPollsPermission: boolean) {
-    this.state.hasPollsPermission = hasPollsPermission;
   }
 
   fetchUserInfo() {
@@ -325,13 +312,14 @@ export class TwitchService
         `${this.apiBase}/helix/games?name=${encodeURIComponent(game)}`,
       ).then(json => json.data[0].id);
     }
+    const hasPermission = await this.hasScope('channel:manage:broadcast');
+    const scopedTags = hasPermission ? tags : undefined;
     await Promise.all([
       this.requestTwitch({
         url: `${this.apiBase}/helix/channels?broadcaster_id=${this.twitchId}`,
         method: 'PATCH',
-        body: JSON.stringify({ game_id: gameId, title }),
+        body: JSON.stringify({ game_id: gameId, title, tags: scopedTags }),
       }),
-      this.setStreamTags(tags),
     ]);
     this.SET_STREAM_SETTINGS({ title, game, tags });
   }
@@ -383,14 +371,9 @@ export class TwitchService
     return getStreamTags(this.twitchId);
   }
 
-  async setStreamTags(tags: string[]) {
-    const hasPermission = await this.hasScope('channel:manage:broadcast');
-
-    if (!hasPermission) {
-      return false;
-    }
-    assertIsDefined(this.twitchId);
-    return updateTags()(tags)(this.twitchId);
+  async validateTagsScope() {
+    const hasTagsScope = await this.hasScope('channel:manage:broadcast');
+    this.SET_HAS_TAGS_PERMISSION(hasTagsScope);
   }
 
   async validatePollsScope() {
@@ -403,13 +386,6 @@ export class TwitchService
     return platformAuthorizedRequest('twitch', 'https://id.twitch.tv/oauth2/validate').then(
       (response: ITwitchOAuthValidateResponse) => response.scopes.includes(scope),
     );
-  }
-
-  async getHasUpdateTagsPermission() {
-    // if available tags are loaded then the user has permissions
-    if (this.state.availableTags.length) return true;
-    // otherwise make a request to Twitch
-    return await this.hasScope('user:edit:broadcast');
   }
 
   getHeaders(req: IPlatformRequest, authorized = false): ITwitchRequestHeaders {
@@ -426,5 +402,15 @@ export class TwitchService
 
   get liveDockEnabled(): boolean {
     return true;
+  }
+
+  @mutation()
+  private SET_HAS_POLLS_PERMISSION(hasPollsPermission: boolean) {
+    this.state.hasPollsPermission = hasPollsPermission;
+  }
+
+  @mutation()
+  private SET_HAS_TAGS_PERMISSION(hasUpdateTagsPermission: boolean) {
+    this.state.hasUpdateTagsPermission = hasUpdateTagsPermission;
   }
 }

@@ -79,13 +79,6 @@ const requestTags = (cursor: string): Observable<IPaginatedResponse> =>
  * @param headers Request headers
  * @see {ITwitchRequestHeaders}
  */
-// export const getStreamTags = (broadcasterId: string): Promise<TTwitchTag[]> =>
-//   (getPlatformService('twitch') as TwitchService)
-//     .requestTwitch<TTwitchTagsResponse>(
-//       `https://api.twitch.tv/helix/streams/tags?broadcaster_id=${broadcasterId}`,
-//     )
-//     .then(res => res.data.filter(tag => !tag.is_auto));
-
 export const getStreamTags = (broadcasterId: string): Promise<string[]> =>
   (getPlatformService('twitch') as TwitchService)
     .requestTwitch<TTwitchStreamResponse>(
@@ -147,18 +140,3 @@ export const prepareOptions = (
 
   return [];
 };
-
-/**
- * Update stream tags
- *
- * Replace the set of stream tags with the given tag list `tag_id`'s.
- *
- * @returns Function that takes the list of tags to update and returns a promise of the request.
- * @see {ITwitchRequestHeaders}
- */
-export const updateTags = () => (tags: string[]) => (streamId: string) =>
-  platformAuthorizedRequest('twitch', {
-    url: `https://api.twitch.tv/helix/channels?broadcaster_id=${streamId}`,
-    method: 'PATCH',
-    body: JSON.stringify({ tags: [] }),
-  });
