@@ -4,7 +4,7 @@ import * as obs from '../../../obs-api';
 import { Inject } from 'services/core/injector';
 import moment from 'moment';
 import padStart from 'lodash/padStart';
-import { IOutputSettings, OutputSettingsService } from 'services/settings';
+import { IOutputSettings, OutputSettingsService, SettingsService } from 'services/settings';
 import { WindowsService } from 'services/windows';
 import { Subject } from 'rxjs';
 import {
@@ -85,6 +85,7 @@ export class StreamingService
   @Inject() private growService: GrowService;
   @Inject() private recordingModeService: RecordingModeService;
   @Inject() private videoSettingsService: VideoSettingsService;
+  @Inject() private settingsService: SettingsService;
 
   streamingStatusChange = new Subject<EStreamingState>();
   recordingStatusChange = new Subject<ERecordingState>();
@@ -318,68 +319,61 @@ export class StreamingService
       const displayPlatforms = this.views.displayPlatforms;
       // @@@ do I need to setup single stream first?
 
-      const platformsToRestream: TPlatform[] = [];
+      const platformsToSingleStream: TPlatform[] = [];
       for (const display in displayPlatforms) {
+        // if (displayPlatforms[display].length > 1) {
+        //   // create array of active platforms
+        //   platformsToRestream.concat(displayPlatforms[display]);
+        // }
         if (displayPlatforms[display].length > 1) {
-          // create array of active platforms
-          platformsToRestream.concat(displayPlatforms[display]);
-        }
-      }
+          console.log('restream');
+          // contexts are set in beforeDualOutputGoLive
 
-      if (platformsToRestream.length) {
-        console.log('restream');
-        // remove from platforms object the platforms to restream
-        // so that we only have platforms to single streaming left
-        platformsToRestream.forEach(restreamPlatform => {
-          const indexOfPlatform = platforms.indexOf(restreamPlatform);
-          platforms.splice(indexOfPlatform, 1);
-        });
+          // setup restream on platformsToRestream
+          // check the Restream service is available
+          let ready = false;
+          try {
+            await this.runCheck(
+              'setupDualOutput',
+              async () => (ready = await this.restreamService.checkStatus()),
+            );
+          } catch (e: unknown) {
+            console.error('Error fetching restreaming service', e);
+          }
+          // Assume restream is down
+          if (!ready) {
+            this.setError('DUAL_OUTPUT_RESTREAM_DISABLED');
+            return;
+          }
 
-        // setup restream on platformsToRestream
-        // check the Restream service is available
-        let ready = false;
-        try {
-          await this.runCheck(
-            'setupMultistream',
-            async () => (ready = await this.restreamService.checkStatus()),
-          );
-        } catch (e: unknown) {
-          console.error('Error fetching restreaming service', e);
-        }
-        // Assume restream is down
-        if (!ready) {
-          this.setError('DUAL_OUTPUT_RESTREAM_DISABLED');
-          return;
-        }
-
-        // update restream settings
-        try {
-          await this.runCheck('setupMultistream', async () => {
-            // enable restream on the backend side
-            if (!this.restreamService.state.enabled) await this.restreamService.setEnabled(true);
-            await this.restreamService.beforeDualOutputGoLive(platformsToRestream);
-          });
-        } catch (e: unknown) {
-          console.error('Failed to setup restream', e);
-          this.setError('DUAL_OUTPUT_SETUP_FAILED');
-          return;
-        }
-        console.log('platforms ', platforms);
-      }
-
-      // for single streaming, just assign context to platform(s)
-      if (platforms.length) {
-        // the only platforms remaining on this array
-        // will be the ones to single stream because
-        // the ones to multistream were removed in the previous if statement
-        platforms.forEach(async platform => {
+          // update restream settings
+          try {
+            await this.runCheck('setupDualOutput', async () => {
+              // enable restream on the backend side
+              if (!this.restreamService.state.enabled) await this.restreamService.setEnabled(true);
+              const contextId = displayPlatforms[display] === 'horizontal' ? 0 : 1;
+              await this.restreamService.beforeDualOutputGoLive(
+                displayPlatforms[display],
+                contextId,
+              );
+            });
+          } catch (e: unknown) {
+            console.error('Failed to setup restream', e);
+            this.setError('DUAL_OUTPUT_SETUP_FAILED');
+            return;
+          }
+          console.log('platforms ', platforms);
+        } else {
+          // set single stream for the display
+          const platform = displayPlatforms[display];
           const service = getPlatformService(platform);
           try {
+            // setSettings here???
             await Promise.resolve(service.setContext(platform));
           } catch (e: unknown) {
             this.handleSetupPlatformError(e, platform);
           }
-        });
+        }
       }
     }
 
@@ -706,6 +700,8 @@ export class StreamingService
     if (this.views.isDualOutputMode) {
       const horizontalContext = this.videoSettingsService.contexts.horizontal;
       const verticalContext = this.videoSettingsService.contexts.vertical;
+
+      // this.settingsService.actions.setContexts();
 
       console.log('setVideoInfo horizontalContext ', horizontalContext);
       console.log('setVideoInfo verticalContext ', verticalContext);

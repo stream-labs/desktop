@@ -164,8 +164,11 @@ export class RestreamService extends StatefulService<IRestreamState> {
     await Promise.all([this.setupIngest(), this.setupTargets()]);
   }
 
-  async beforeDualOutputGoLive(platforms: TPlatform[]) {
-    await Promise.all([this.setupIngest(), this.setupDualOutputTargets(platforms)]);
+  async beforeDualOutputGoLive(platforms: TPlatform[], context: number) {
+    await Promise.all([
+      this.setupDualOutputIngest(context),
+      this.setupDualOutputTargets(platforms),
+    ]);
   }
 
   async setupIngest() {
@@ -180,6 +183,28 @@ export class RestreamService extends StatefulService<IRestreamState> {
       key: this.settings.streamKey,
       server: ingest,
     });
+  }
+
+  async setupDualOutputIngest(context: number) {
+    const ingest = (await this.fetchIngest()).server;
+
+    console.log('setting up for context ', context);
+
+    // We need to move OBS to custom ingest mode before we can set the server
+    this.streamSettingsService.setSettings(
+      {
+        streamType: 'rtmp_custom',
+      },
+      context,
+    );
+
+    this.streamSettingsService.setSettings(
+      {
+        key: this.settings.streamKey,
+        server: ingest,
+      },
+      context,
+    );
   }
 
   async setupTargets() {

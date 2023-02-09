@@ -12,6 +12,7 @@ import { IGoLiveSettings, IPlatformFlags } from 'services/streaming';
 import Vue from 'vue';
 import { IVideo } from 'obs-studio-node';
 import { DualOutputService } from 'services/dual-output';
+import { VideoSettingsService } from 'services/settings-v2/video';
 
 interface ISavedGoLiveSettings {
   platforms: {
@@ -83,6 +84,7 @@ interface IStreamSettings extends IStreamSettingsState {
   delayEnable: boolean;
   delaySec: number;
   video?: IVideo;
+  videoSecond?: IVideo;
 }
 
 const platformToServiceNameMap: { [key in TPlatform]: string } = {
@@ -103,6 +105,7 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
   @Inject() private platformAppsService: PlatformAppsService;
   @Inject() private streamSettingsService: StreamSettingsService;
   @Inject() private dualOutputService: DualOutputService;
+  @Inject() private videoSettingsService: VideoSettingsService;
 
   static defaultState: IStreamSettingsState = {
     protectedModeEnabled: true,
@@ -148,22 +151,38 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
       }
     });
 
+    // const video: ISettingsSubCategory = {
+    //   nameSubCategory: 'Untitled',
+    //   codeSubCategory: 'Untitled',
+    //   parameters: { video: this.videoSettingsService.contexts.horizontal },
+    // };
+
+    // const videoSecond = {
+    //   nameSubCategory: 'Untitled',
+    //   codeSubCategory: 'Untitled',
+    //   parameters: { video: this.videoSettingsService.contexts.vertical },
+    // };
+
     // save settings related to "Settings->Stream" window
     let streamFormData = cloneDeep(this.views.obsStreamSettings);
-    if (context !== null) {
-      const contextName = context === 0 ? 'horizontal' : 'vertical';
+    // let streamFormData = [...cloneDeep(this.views.obsStreamSettings), { video }];
+    // let streamSecondFormData = [...cloneDeep(this.views.obsStreamSettings), { video: videoSecond }];
 
-      // @@@ TODO working here <-- is there where I should be adding the context to the streams?
-      // streamFormData.push({nameSubCategory: 'Untitled', parameters: [{}]})
-      // streamFormData = [
-      //   ...streamFormData,
-      //   { video: this.videoSettingsService.contexts[contextName] },
-      // ];
-    }
+    // if (context !== null) {
+    //   const contextName = context === 0 ? 'horizontal' : 'vertical';
+
+    // @@@ TODO working here <-- is there where I should be adding the context to the streams?
+    // streamFormData.push({nameSubCategory: 'Untitled', parameters: [{}]})
+    // streamFormData = [
+    //   ...streamFormData,
+    //   { video: this.videoSettingsService.contexts[contextName] },
+    // ];
+    // }
 
     console.log('streamFormData ', streamFormData);
 
     streamFormData.forEach(subCategory => {
+      console.log('subCategory ', subCategory);
       subCategory.parameters.forEach(parameter => {
         if (parameter.name === 'streamType' && patch.streamType !== void 0) {
           parameter.value = patch.streamType;
@@ -171,9 +190,30 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
           // we should immediately save the streamType in OBS if it's changed
           // otherwise OBS will not save 'key' and 'server' values
 
+          // if (context !== null) {
+          //   const contextName = context === 0 ? 'horizontal' : 'vertical';
+
+          //   const video = {
+          //     ...parameter,
+          //     value: this.videoSettingsService.contexts[contextName],
+          //   };
+
+          //   streamFormData = [...streamFormData, video];
+          // }
+
+          console.log('new streamFormData ', streamFormData);
+
           this.settingsService.setSettings(streamName, streamFormData);
           // this.settingsService.setSettings('Stream', streamFormData);
+          // this.settingsService.setSettings('StreamSecond', streamSecondFormData);
           // this.settingsService.setSettings('StreamSecond', streamFormData);
+        }
+        if (context !== null) {
+          const contextName = context === 0 ? 'horizontal' : 'vertical';
+          parameter.video = this.videoSettingsService.contexts[contextName];
+          console.log('new streamFormData ', streamFormData);
+
+          this.settingsService.setSettings(streamName, streamFormData);
         }
       });
     });
@@ -232,6 +272,7 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
    */
   get settings(): IStreamSettings {
     const obsStreamSettings = this.settingsService.views.values.Stream;
+    const obsStreamSecondSettings = this.settingsService.views.values.StreamSecond;
     const obsGeneralSettings = this.settingsService.views.values.General;
     const obsAdvancedSettings = this.settingsService.views.values.Advanced;
 
@@ -256,6 +297,7 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
       delayEnable: obsAdvancedSettings.DelayEnable,
       delaySec: obsAdvancedSettings.DelaySec,
       video: obsStreamSettings.video,
+      videoSecond: obsStreamSecondSettings.video,
     };
   }
 
@@ -370,11 +412,16 @@ class StreamSettingsView extends ViewHandler<IStreamSettingsState> {
     return this.getServiceViews(SettingsService).state.Stream.formData;
   }
 
+  get obsStreamSecondSettings(): ISettingsSubCategory[] {
+    return this.getServiceViews(SettingsService).state.StreamSecond.formData;
+  }
+
   /**
    * obtain stream settings in a single object
    */
   get settings(): IStreamSettings {
     const obsStreamSettings = this.settingsViews.values.Stream;
+    const obsStreamSecondSettings = this.settingsViews.values.StreamSecond;
     const obsGeneralSettings = this.settingsViews.values.General;
     const obsAdvancedSettings = this.settingsViews.values.Advanced;
 
@@ -398,6 +445,8 @@ class StreamSettingsView extends ViewHandler<IStreamSettingsState> {
       keepReplayBufferStreamStops: obsGeneralSettings.KeepReplayBufferStreamStops,
       delayEnable: obsAdvancedSettings.DelayEnable,
       delaySec: obsAdvancedSettings.DelaySec,
+      video: obsStreamSettings.video,
+      videoSecond: obsStreamSecondSettings.video,
     };
   }
 }

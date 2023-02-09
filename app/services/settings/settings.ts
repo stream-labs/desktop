@@ -177,6 +177,10 @@ class SettingsViews extends ViewHandler<ISettingsServiceState> {
   get advancedAudioSettings() {
     return this.state.Advanced.formData.find(data => data.nameSubCategory === 'Audio');
   }
+
+  get streamSettings() {
+    return this.state.Stream;
+  }
 }
 
 export class SettingsService extends StatefulService<ISettingsServiceState> {
@@ -285,7 +289,7 @@ export class SettingsService extends StatefulService<ISettingsServiceState> {
     this.SET_SETTINGS(settingsFormData);
 
     // dual output settings are not stored in OBS, so set them from persisted settings
-    this.setDualOutputSettings(settingsFormData);
+    // this.setDualOutputSettings(settingsFormData);
   }
 
   /**
@@ -605,6 +609,49 @@ export class SettingsService extends StatefulService<ISettingsServiceState> {
     // add to state
     this.PATCH_SETTINGS('Horizontal', horizontalOutputData);
     this.PATCH_SETTINGS('Vertical', verticalOutputData);
+  }
+
+  // @@@ WIP: function to add contexts to dual output displays right before going live
+  setContexts() {
+    // get dual output contexts from video settings service
+    const horizontalContext = this.videoSettingsService.contexts.horizontal;
+    const verticalContext = this.videoSettingsService.contexts.vertical;
+
+    // for every param, update param with dual output setting
+    const params = this.views.streamSettings.formData;
+
+    // interface ISettingsCategory {
+    //   type: ESettingsCategoryType;
+    //   formData: ISettingsSubCategory[];
+    // }
+
+    console.log('[...params] ', [...params][0]);
+
+    const streamData = {
+      type: ESettingsCategoryType.Untabbed,
+      formData: [...params],
+      // formData: [
+      //   ...params,
+      //   {
+      //     nameSubCategory: 'Untitled',
+      //     parameters: { ...params, video: horizontalContext },
+      //   },
+      // ],
+      // formData: [
+      //   {
+      //     nameSubCategory: 'Untitled',
+      //     parameters: { ...params, video: horizontalContext },
+      //   },
+      // ],
+    };
+    const streamSecondData = {
+      type: ESettingsCategoryType.Untabbed,
+      formData: [...params],
+    };
+
+    // add to state
+    this.PATCH_SETTINGS('Stream', streamData);
+    this.PATCH_SETTINGS('StreamSecond', streamSecondData);
   }
 
   private ensureValidEncoder() {
