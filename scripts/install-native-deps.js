@@ -74,11 +74,19 @@ async function runScript() {
     const root = JSON.parse(jsonData.toString());
     const dependecies = root.root;
     let os = '';
+    let arch = '';
 
     if (process.platform === 'win32') {
       os = 'win64';
     } else if (process.platform === 'darwin') {
       os = 'osx';
+      if (process.arch == 'arm64') {
+        arch = '-arm64';
+      } else if (process.arch == 'x64') {
+        arch = '-x86_64';
+      } else {
+        throw 'CPU architecture not supported.';  
+      }
     } else {
       throw 'Platform not supported.';
     }
@@ -109,6 +117,7 @@ async function runScript() {
         let fileName = dependency['archive'];
         fileName = fileName.replace('[VERSION]', moduleVersion);
         fileName = fileName.replace('[OS]', os);
+        fileName = fileName.replace('[ARCH]', arch);
 
         const url = dependency['url'] + fileName;
         const filePath = path.join(process.cwd(), fileName);
