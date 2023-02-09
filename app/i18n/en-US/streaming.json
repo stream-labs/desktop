@@ -145,6 +145,8 @@
   "Failed to update platform settings": "Failed to update platform settings",
   "The Multistream server is temporarily unavailable": "The Multistream server is temporarily unavailable",
   "Failed to configure the Multistream server": "Failed to configure the Multistream server",
+  "Failed to configure the Dual Output service": "Failed to configure the Dual Output service",
+  "The Multistream server is temporarily unavailable for Dual Output": "The Multistream server is temporarily unavailable for Dual Output",
   "Your YouTube account is not enabled for live streaming": "Your YouTube account is not enabled for live streaming",
   "Failed to publish the YouTube broadcast": "Failed to publish the YouTube broadcast",
   "Failed to post the Tweet": "Failed to post the Tweet",

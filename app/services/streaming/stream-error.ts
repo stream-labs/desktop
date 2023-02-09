@@ -42,7 +42,7 @@ export const errorTypes = {
   },
   DUAL_OUTPUT_RESTREAM_DISABLED: {
     get message() {
-      return $t('The Multistream server is temporarily unavailable for dual output');
+      return $t('The Multistream server is temporarily unavailable for Dual Output');
     },
   },
   DUAL_OUTPUT_SETUP_FAILED: {
