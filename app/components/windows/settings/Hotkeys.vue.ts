@@ -18,6 +18,7 @@ interface IAugmentedHotkeySet {
   general: IAugmentedHotkey[];
   sources: Dictionary<IAugmentedHotkey[]>;
   scenes: Dictionary<IAugmentedHotkey[]>;
+  markers: IAugmentedHotkey[];
 }
 
 @Component({
@@ -85,6 +86,7 @@ export default class Hotkeys extends Vue {
           return hotkey;
         });
       }),
+      markers: this.hotkeySet.markers,
     };
   }
 
@@ -94,6 +96,7 @@ export default class Hotkeys extends Vue {
         general: this.filterHotkeys(this.augmentedHotkeySet.general),
         sources: mapValues(this.augmentedHotkeySet.sources, hotkeys => this.filterHotkeys(hotkeys)),
         scenes: mapValues(this.augmentedHotkeySet.scenes, hotkeys => this.filterHotkeys(hotkeys)),
+        markers: this.filterHotkeys(this.augmentedHotkeySet.markers),
       };
     }
 
