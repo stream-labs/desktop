@@ -30,12 +30,14 @@ export type TTagsInputProps<TValue> = TSlobsInputProps<
 >;
 
 export const TagsInput = InputComponent(<T extends any[]>(p: TTagsInputProps<T>) => {
-  const { inputAttrs, wrapperAttrs, forceUpdate } = useInput('tags', p);
+  const { inputAttrs, wrapperAttrs } = useInput('tags', p);
   const options = p.options || [];
   const tagsMap = useMemo(() => keyBy(options, 'value'), [options]);
 
   function renderTag(tagProps: TagProps) {
-    const tag = tagsMap[tagProps['value']];
+    const tag = p.options
+      ? tagsMap[tagProps['value']]
+      : { label: tagProps['value'], value: tagProps['value'] };
     if (p.tagRender) {
       return p.tagRender(tagProps, tag);
     }
@@ -63,7 +65,7 @@ export const TagsInput = InputComponent(<T extends any[]>(p: TTagsInputProps<T>)
     inputAttrs.onChange(values as any);
   }
 
-  const displayValue = (inputAttrs.value || []).map((val: string) => tagsMap[val].label);
+  const displayValue = (inputAttrs.value || []).map((val: string) => tagsMap[val]?.label);
 
   return (
     <InputWrapper {...wrapperAttrs}>
