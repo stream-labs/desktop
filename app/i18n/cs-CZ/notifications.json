@@ -23,5 +23,6 @@
   "A new Recording has been completed. Click for more info": "Byla dokončena nová Nahrávka. Klikněte pro bližší informace",
   "Recording History": "Historie nahrávek",
   "Show in folder": "Zobrazit ve složce",
-  "Recordings": "Nahrávky"
+  "Recordings": "Nahrávky",
+  "Marker %{label} added at %{timestamp}": "Marker %{label} added at %{timestamp}"
 }
