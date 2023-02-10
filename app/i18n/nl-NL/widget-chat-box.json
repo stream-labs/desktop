@@ -17,14 +17,14 @@
   "Muted Chatters": "Gedempte chatters",
   "Hide Commands": "Opdrachten verbergen",
   "Background Color": "Achtergrondkleur",
-  "Show Platform Icons": "Show Platform Icons",
+  "Show Platform Icons": "Platform-pictogrammen weergeven",
   "Theme": "Thema",
   "Badges": "Badges",
-  "Extra Emotes": "Extra Emotes",
-  "Chat Delay": "Chat Delay",
+  "Extra Emotes": "Extra emotes",
+  "Chat Delay": "Chatvertraging",
   "Hide Delay": "Hide Delay",
-  "Disable Message Animations": "Disable Message Animations",
-  "Hide Characters": "Hide Characters",
-  "Hide Common Chat Bots": "Verberg veelgebruikte Chat Bots",
-  "Hide commands starting with `!`": "Verberg commands die starten met '!'"
+  "Disable Message Animations": "Berichtanimaties uitschakelen",
+  "Hide Characters": "Tekens verbergen",
+  "Hide Common Chat Bots": "Veelgebruikte chatbots verbergen",
+  "Hide commands starting with `!`": "Opdrachten verbergen die starten met '!'"
 }

@@ -104,7 +104,7 @@
   "Overkill Min Health": "過剰なミニヘルス",
   "Min. Sparks": "最小 Spark",
   "Min. Embers": "最小 Ember",
-  "The smallest amount of bits a cheer must have for an event to be shown. Setting this to 0 will make every cheer trigger an event.": "イベントを表示するために必要な最小ビット数。 これを0に設定すると、すべてのチアーがイベントを引き起こします。",
+  "The smallest amount of bits a cheer must have for an event to be shown. Setting this to 0 will make every cheer trigger an event.": "イベントを表示するために必要な最小ビット数。これを 0 に設定すると、すべてのチアーがイベントを引き起こします。",
   "Bounce In": "バウンスイン",
   "Bounce In Down": "バウンスインダウン",
   "Bounce In Left": "バウンスインレフト",
@@ -183,10 +183,10 @@
   "Play Alert": "アラートを再生",
   "Browser Settings": "ブラウザ設定",
   "Custom Code": "カスタムコード",
-  "font_family_tooltip": "テキストに使用する Google フォント。https://fonts.google.com にアクセスしてフォントを検索しましょう！人気のあるフォント：Open Sans、Roboto、Oswald、Lato、Droid Sans。",
+  "font_family_tooltip": "テキストに使用する Google フォント。http://google.com/fonts にアクセスしてフォントを検索しましょう！人気のあるフォント：Open Sans、Roboto、Oswald、Lato、および Droid Sans",
   "Something went wrong while applying settings": "設定の適用中に、問題が発生しました",
   "Superchat Goal": "スーパーチャット目標",
   "YouTube Superchats": "YouTube スーパーチャット",
-  "Custom Widget": "Custom Widget",
-  "Use HTML, CSS, and JavaScript to create a widget with custom functionality": "Use HTML, CSS, and JavaScript to create a widget with custom functionality"
+  "Custom Widget": "カスタム ウィジェット",
+  "Use HTML, CSS, and JavaScript to create a widget with custom functionality": "HTML、CSS、および JavaScript を使って、カスタム機能でウィジェットを作成"
 }

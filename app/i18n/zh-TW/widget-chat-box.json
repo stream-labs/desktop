@@ -17,14 +17,14 @@
   "Muted Chatters": "閒聊靜音",
   "Hide Commands": "隱藏命令",
   "Background Color": "背景顏色",
-  "Show Platform Icons": "Show Platform Icons",
+  "Show Platform Icons": "顯示平台圖示",
   "Theme": "主題",
   "Badges": "徽章",
   "Extra Emotes": "額外表情符號",
-  "Chat Delay": "Chat Delay",
+  "Chat Delay": "聊天室延遲",
   "Hide Delay": "Hide Delay",
-  "Disable Message Animations": "Disable Message Animations",
-  "Hide Characters": "Hide Characters",
+  "Disable Message Animations": "停用訊息動畫",
+  "Hide Characters": "隱藏字元",
   "Hide Common Chat Bots": "隱藏常見聊天機器人",
-  "Hide commands starting with `!`": "隱藏以 “！” 開頭的指令"
+  "Hide commands starting with `!`": "隱藏以「！」開頭的指令"
 }

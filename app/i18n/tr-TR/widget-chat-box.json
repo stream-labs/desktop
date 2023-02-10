@@ -17,14 +17,14 @@
   "Muted Chatters": "Sesi Kapatılmış Sohbetçiler",
   "Hide Commands": "Komutları Gizle",
   "Background Color": "Arka Plan Rengi",
-  "Show Platform Icons": "Show Platform Icons",
+  "Show Platform Icons": "Platform Simgelerini Göster",
   "Theme": "Tema",
   "Badges": "Rozetler",
   "Extra Emotes": "Ekstra İfadeler",
-  "Chat Delay": "Chat Delay",
+  "Chat Delay": "Sohbet Gecikmesi",
   "Hide Delay": "Hide Delay",
-  "Disable Message Animations": "Disable Message Animations",
-  "Hide Characters": "Hide Characters",
+  "Disable Message Animations": "Mesaj Animasyonlarını Devre Dışı Bırak",
+  "Hide Characters": "Karakterleri Gizle",
   "Hide Common Chat Bots": "Genel sohbet robotlarını gizleyin",
   "Hide commands starting with `!`": "'!' ile başlayan komutlarını gizle"
 }
