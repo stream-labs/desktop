@@ -77,7 +77,6 @@ interface IPlatformCapabilityDescription {
 }
 
 interface IPlatformCapabilityTags {
-  getAllTags: () => Promise<Tag[]>;
   getStreamTags: () => Promise<Tag[]>;
   setStreamTags: () => Promise<any>;
 }

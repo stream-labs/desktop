@@ -66,7 +66,8 @@ test('Multistream advanced mode', async t => {
     customEnabled: true,
     title: 'twitch title',
     twitchGame: 'Fortnite',
-    twitchTags: ['100%'],
+    // TODO: Re-enable after reauthing userpool
+    // twitchTags: ['100%'],
   });
 
   const youtubeForm = useForm('youtube-settings');
