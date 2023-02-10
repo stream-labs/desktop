@@ -95,7 +95,8 @@ test('Migrate the twitch account to the protected mode', async t => {
   t.true(await isDisplayed('button=Use recommended settings'), 'Protected mode should be disabled');
 });
 
-test('Twitch Tags', async t => {
+// TODO: Re-enable after reauthing userpool
+test.skip('Twitch Tags', async t => {
   await logIn('twitch');
   await focusChild();
 
