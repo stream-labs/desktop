@@ -273,12 +273,7 @@ export class TwitchService
       })),
     ]);
 
-    let tags: string[] = this.state.settings.tags ?? [];
-
-    if (this.state.hasUpdateTagsPermission) {
-      tags = await Promise.resolve(this.getStreamTags());
-    }
-
+    const tags: string[] = this.state.settings.tags ?? [];
     this.SET_PREPOPULATED(true);
     this.SET_STREAM_SETTINGS({ tags, title: channelInfo.title, game: channelInfo.game });
   }

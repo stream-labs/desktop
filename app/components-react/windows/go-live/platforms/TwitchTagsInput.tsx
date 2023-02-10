@@ -27,6 +27,14 @@ export function TwitchTagsInput(p: TTwitchTagsInputProps) {
     );
   }
 
+  function specialCharacterValidator(rule: unknown, value: string[], callback: Function) {
+    if (value.some(tag => !/^[a-zA-Z0-9]*$/.test(tag))) {
+      callback($t('Do not include special characters or spaces in your tag'));
+    } else {
+      callback();
+    }
+  }
+
   return (
     <TagsInput
       name="twitchTags"
@@ -40,6 +48,7 @@ export function TwitchTagsInput(p: TTwitchTagsInputProps) {
           {tag.label}
         </Tag>
       )}
+      rules={[{ validator: specialCharacterValidator }]}
     />
   );
 }
