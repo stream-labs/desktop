@@ -175,6 +175,11 @@ class SettingsViews extends ViewHandler<ISettingsServiceState> {
   get advancedAudioSettings() {
     return this.state.Advanced.formData.find(data => data.nameSubCategory === 'Audio');
   }
+
+  // @@@ TMP just for logging
+  get all() {
+    return this.state;
+  }
 }
 
 export class SettingsService extends StatefulService<ISettingsServiceState> {
@@ -605,48 +610,13 @@ export class SettingsService extends StatefulService<ISettingsServiceState> {
     this.PATCH_SETTINGS('Vertical', verticalOutputData);
   }
 
-  // @@@ WIP: function to update stream data before going live?
-  setDualOutputStreamData() {
-  //   // get dual output contexts from video settings service
-  //   const horizontalContext = this.videoSettingsService.contexts.horizontal;
-  //   const verticalContext = this.videoSettingsService.contexts.vertical;
-
-  //   // for every param, update param with dual output setting
-  //   const params = this.views.streamSettings.formData;
-
-  //   // interface ISettingsCategory {
-  //   //   type: ESettingsCategoryType;
-  //   //   formData: ISettingsSubCategory[];
-  //   // }
-
-  //   console.log('[...params] ', [...params][0]);
-
-  //   const streamData = {
-  //     type: ESettingsCategoryType.Untabbed,
-  //     formData: [...params],
-  //     // formData: [
-  //     //   ...params,
-  //     //   {
-  //     //     nameSubCategory: 'Untitled',
-  //     //     parameters: { ...params, video: horizontalContext },
-  //     //   },
-  //     // ],
-  //     // formData: [
-  //     //   {
-  //     //     nameSubCategory: 'Untitled',
-  //     //     parameters: { ...params, video: horizontalContext },
-  //     //   },
-  //     // ],
-  //   };
-  //   const streamSecondData = {
-  //     type: ESettingsCategoryType.Untabbed,
-  //     formData: [...params],
-  //   };
-
-  //   // add to state
-  //   this.PATCH_SETTINGS('Stream', streamData);
-  //   this.PATCH_SETTINGS('StreamSecond', streamSecondData);
-  // }
+  // @@@ WIP: function to guarantee use of single stream servers
+  // in dual output mode
+  setDualOutputSingleStreamData() {
+    //   // add to state
+    //   this.PATCH_SETTINGS('Stream', streamData);
+    //   this.PATCH_SETTINGS('StreamSecond', streamSecondData);
+  }
 
   private ensureValidEncoder() {
     if (getOS() === OS.Mac) return;

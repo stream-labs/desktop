@@ -166,8 +166,8 @@ export class StreamInfoView<T extends Object> extends ViewHandler<T> {
     return this.dualOutputView.dualOutputMode;
   }
 
-  get displayPlatforms() {
-    return this.dualOutputView.displayPlatforms;
+  get activeDisplayPlatforms() {
+    return this.dualOutputView.activeDisplayPlatforms;
   }
 
   getPlatformDisplay(platform: TPlatform) {

@@ -243,7 +243,6 @@ export class RestreamService extends StatefulService<IRestreamState> {
 
   async setupDualOutputTargets(platforms: TPlatform[]) {
     // delete existing targets
-    // @@@ TODO: should I not do this?
     const targets = await this.fetchTargets();
     const promises = targets.map(t => this.deleteTarget(t.id));
     await Promise.all(promises);

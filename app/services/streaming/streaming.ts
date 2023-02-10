@@ -315,8 +315,7 @@ export class StreamingService
 
     // setup dual output
     if (this.views.isDualOutputMode) {
-      const displayPlatforms = this.views.displayPlatforms;
-      // @@@ do I need to setup single stream first?
+      const displayPlatforms = this.views.activeDisplayPlatforms;
 
       const platformsToSingleStream: TPlatform[] = [];
       for (const display in displayPlatforms) {
@@ -362,16 +361,21 @@ export class StreamingService
             return;
           }
           console.log('platforms ', platforms);
+          const settingsAll = this.settingsService.views.all;
+          console.log('after setup restream this.settingsService.views.all ', settingsAll);
         } else {
           // set single stream for the display
           const platform = displayPlatforms[display];
           const service = getPlatformService(platform);
           try {
-            // setSettings here???
-            await Promise.resolve(service.setContext(platform));
+            await this.runCheck('setupDualOutput', async () => {
+              await Promise.resolve(service.setContext(platform));
+            });
           } catch (e: unknown) {
             this.handleSetupPlatformError(e, platform);
           }
+          const settingsAll = this.settingsService.views.all;
+          console.log('just before this.settingsService.views.all ', settingsAll);
         }
       }
     }
@@ -700,18 +704,14 @@ export class StreamingService
       const horizontalContext = this.videoSettingsService.contexts.horizontal;
       const verticalContext = this.videoSettingsService.contexts.vertical;
 
-      // @@@ TODO: confirm servers
-
-      console.log('setVideoInfo horizontalContext ', horizontalContext);
-      console.log('setVideoInfo verticalContext ', verticalContext);
+      // check if we need to force apply single stream settings?
+      // this.settingsService.actions.setDualOutputSingleStreamData();
 
       obs.NodeObs.OBS_service_setVideoInfo(horizontalContext, 0);
       obs.NodeObs.OBS_service_setVideoInfo(verticalContext, 1);
 
       obs.NodeObs.OBS_service_startStreaming(0);
       obs.NodeObs.OBS_service_startStreaming(1);
-      // @@@ TODO: setSettings platform settings for each stream with platform settings in stream-settings.ts
-      // streamFormData: platforms: { ... } --> this.settingsService.setSettings('StreamSecond', streamFormData);
     } else {
       obs.NodeObs.OBS_service_startStreaming(0);
     }
@@ -1034,6 +1034,8 @@ export class StreamingService
         eventMetadata.streamType = streamSettings.streamType;
         eventMetadata.platform = streamSettings.platform;
         eventMetadata.server = streamSettings.server;
+
+        // @@ TODO -- stream settings here???
 
         this.usageStatisticsService.recordEvent('stream_start', eventMetadata);
         this.usageStatisticsService.recordAnalyticsEvent('StreamingStatus', {

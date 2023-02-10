@@ -25,6 +25,7 @@ interface IDualOutputServiceState {
 class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
   @Inject() private scenesService: ScenesService;
   @Inject() private videoSettingsService: VideoSettingsService;
+  @Inject() private streamingService: StreamingService;
 
   get dualOutputMode() {
     return this.state.dualOutputMode;
@@ -62,10 +63,11 @@ class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
     return this.state.displays;
   }
 
-  get displayPlatforms() {
+  get activeDisplayPlatforms() {
+    const enabledPlatforms = this.streamingService.views.enabledPlatforms;
     return Object.entries(this.state.platformSettings).reduce(
       (displayPlatforms: TDisplayPlatforms, [key, val]: [string, IDualOutputPlatformSetting]) => {
-        if (val) {
+        if (val && enabledPlatforms.includes(val.platform)) {
           displayPlatforms[val.display].push(val.platform);
         }
         return displayPlatforms;
