@@ -83,8 +83,6 @@ interface IStreamSettings extends IStreamSettingsState {
   keepReplayBufferStreamStops: boolean;
   delayEnable: boolean;
   delaySec: number;
-  video?: IVideo;
-  videoSecond?: IVideo;
 }
 
 const platformToServiceNameMap: { [key in TPlatform]: string } = {
@@ -208,13 +206,6 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
           // this.settingsService.setSettings('StreamSecond', streamSecondFormData);
           // this.settingsService.setSettings('StreamSecond', streamFormData);
         }
-        if (context !== null) {
-          const contextName = context === 0 ? 'horizontal' : 'vertical';
-          parameter.video = this.videoSettingsService.contexts[contextName];
-          console.log('new streamFormData ', streamFormData);
-
-          this.settingsService.setSettings(streamName, streamFormData);
-        }
       });
     });
 
@@ -272,7 +263,6 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
    */
   get settings(): IStreamSettings {
     const obsStreamSettings = this.settingsService.views.values.Stream;
-    const obsStreamSecondSettings = this.settingsService.views.values.StreamSecond;
     const obsGeneralSettings = this.settingsService.views.values.General;
     const obsAdvancedSettings = this.settingsService.views.values.Advanced;
 
@@ -296,8 +286,6 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
       keepReplayBufferStreamStops: obsGeneralSettings.KeepReplayBufferStreamStops,
       delayEnable: obsAdvancedSettings.DelayEnable,
       delaySec: obsAdvancedSettings.DelaySec,
-      video: obsStreamSettings.video,
-      videoSecond: obsStreamSecondSettings.video,
     };
   }
 
@@ -421,7 +409,6 @@ class StreamSettingsView extends ViewHandler<IStreamSettingsState> {
    */
   get settings(): IStreamSettings {
     const obsStreamSettings = this.settingsViews.values.Stream;
-    const obsStreamSecondSettings = this.settingsViews.values.StreamSecond;
     const obsGeneralSettings = this.settingsViews.values.General;
     const obsAdvancedSettings = this.settingsViews.values.Advanced;
 
@@ -445,8 +432,6 @@ class StreamSettingsView extends ViewHandler<IStreamSettingsState> {
       keepReplayBufferStreamStops: obsGeneralSettings.KeepReplayBufferStreamStops,
       delayEnable: obsAdvancedSettings.DelayEnable,
       delaySec: obsAdvancedSettings.DelaySec,
-      video: obsStreamSettings.video,
-      videoSecond: obsStreamSecondSettings.video,
     };
   }
 }

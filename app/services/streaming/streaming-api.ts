@@ -95,7 +95,6 @@ export interface IStreamingServiceState {
   selectiveRecording: boolean;
   dualOutputMode: boolean;
   info: IStreamInfo;
-  video?: IVideo;
 }
 
 export interface IStreamingServiceApi {

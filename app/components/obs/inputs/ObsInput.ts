@@ -30,13 +30,12 @@ export declare type TObsType =
   | 'OBS_PROPERTY_EDITABLE_LIST'
   | 'OBS_PROPERTY_BUTTON'
   | 'OBS_PROPERTY_BITMASK'
-  | 'OBS_INPUT_RESOLUTION_LIST'
-  | 'OBS_PROPERTY_CONTEXT';
+  | 'OBS_INPUT_RESOLUTION_LIST';
 
 /**
  * OBS values that frontend application can change
  */
-export declare type TObsValue = number | string | boolean | IObsFont | TObsStringList | TObsContext;
+export declare type TObsValue = number | string | boolean | IObsFont | TObsStringList;
 
 /**
  * common interface for OBS objects properties
@@ -51,17 +50,12 @@ export interface IObsInput<TValueType> {
   visible?: boolean;
   masked?: boolean;
   type: TObsType;
-  video?: obs.IVideo; // @@@ TODO <--- do I need to add this to the inputs? Or does assigning to the scene items handle this
 }
 
 export declare type TObsFormData = (IObsInput<TObsValue> | IObsListInput<TObsValue>)[];
 
 export interface IObsListInput<TValue> extends IObsInput<TValue> {
   options: IObsListOption<TValue>[];
-}
-
-export interface TObsContext extends IObsInput<obs.IVideo> {
-  video: obs.IVideo;
 }
 
 export interface IObsListOption<TValue> {

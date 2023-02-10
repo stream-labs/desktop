@@ -110,7 +110,6 @@ export class StreamingService
     replayBufferStatusTime: new Date().toISOString(),
     selectiveRecording: false,
     dualOutputMode: false,
-    // video: null, // @@@ TODO <-- should this property be added?
     info: {
       settings: null,
       lifecycle: 'empty',
@@ -701,7 +700,7 @@ export class StreamingService
       const horizontalContext = this.videoSettingsService.contexts.horizontal;
       const verticalContext = this.videoSettingsService.contexts.vertical;
 
-      // this.settingsService.actions.setContexts();
+      // @@@ TODO: confirm servers
 
       console.log('setVideoInfo horizontalContext ', horizontalContext);
       console.log('setVideoInfo verticalContext ', verticalContext);
