@@ -80,7 +80,11 @@ async function runScript() {
       os = 'win64';
     } else if (process.platform === 'darwin') {
       os = 'osx';
-      if (process.arch == 'arm64') {
+      if (process.env.npm_config_arch == 'arm64') {
+        arch = '-arm64';
+      } else if (process.env.npm_config_arch == 'x64') {
+        arch = '-x86_64';
+      } else if (process.arch == 'arm64') {
         arch = '-arm64';
       } else if (process.arch == 'x64') {
         arch = '-x86_64';
