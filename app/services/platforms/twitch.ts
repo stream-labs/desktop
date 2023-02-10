@@ -10,7 +10,7 @@ import { HostsService } from 'services/hosts';
 import { Inject } from 'services/core/injector';
 import { authorizedHeaders, jfetch } from 'util/requests';
 import { UserService } from 'services/user';
-import { getAllTags, getStreamTags, TTwitchTag, updateTags } from './twitch/tags';
+import { getStreamTags } from './twitch/tags';
 import { TTwitchOAuthScope } from './twitch/scopes';
 import { platformAuthorizedRequest, platformRequest } from './utils';
 import { CustomizationService } from 'services/customization';
@@ -24,18 +24,11 @@ import Utils from '../utils';
 export interface ITwitchStartStreamOptions {
   title: string;
   game?: string;
-  tags?: TTwitchTag[];
+  tags: string[];
 }
 
 export interface ITwitchChannelInfo extends ITwitchStartStreamOptions {
   hasUpdateTagsPermission: boolean;
-  availableTags: TTwitchTag[];
-}
-
-interface ITWitchChannelResponse {
-  status: string;
-  game: string;
-  stream_key: string;
 }
 
 /**
@@ -62,7 +55,6 @@ interface ITwitchOAuthValidateResponse {
 interface ITwitchServiceState extends IPlatformState {
   hasUpdateTagsPermission: boolean;
   hasPollsPermission: boolean;
-  availableTags: TTwitchTag[];
   settings: ITwitchStartStreamOptions;
 }
 
@@ -80,7 +72,6 @@ export class TwitchService
     ...BasePlatformService.initialState,
     hasUpdateTagsPermission: false,
     hasPollsPermission: false,
-    availableTags: [],
     settings: {
       title: '',
       game: '',
@@ -123,13 +114,20 @@ export class TwitchService
 
         // Check for updated polls scopes
         this.validatePollsScope();
+        // Check for updated tags scopes
+        this.validateTagsScope();
       }
     });
   }
 
   get authUrl() {
     const host = this.hostsService.streamlabs;
-    const scopes: TTwitchOAuthScope[] = ['channel_read', 'channel_editor', 'user:edit:broadcast'];
+    const scopes: TTwitchOAuthScope[] = [
+      'channel_read',
+      'channel_editor',
+      'user:edit:broadcast',
+      'channel:manage:broadcast',
+    ];
 
     const query =
       `_=${Date.now()}&skip_splash=true&external=electron&twitch&force_verify&` +
@@ -156,6 +154,10 @@ export class TwitchService
 
   get username(): string {
     return this.userService.state.auth?.platforms?.twitch?.username || '';
+  }
+
+  get tags(): string[] {
+    return this.state.settings.tags;
   }
 
   async beforeGoLive(goLiveSettings?: IGoLiveSettings) {
@@ -262,35 +264,23 @@ export class TwitchService
    * prepopulate channel info and save it to the store
    */
   async prepopulateInfo(): Promise<void> {
-    const [channelInfo, hasUpdateTagsPermission] = await Promise.all([
+    const [channelInfo] = await Promise.all([
       this.requestTwitch<{ data: { title: string; game_name: string }[] }>(
         `${this.apiBase}/helix/channels?broadcaster_id=${this.twitchId}`,
       ).then(json => ({
         title: json.data[0].title,
         game: json.data[0].game_name,
       })),
-      this.getHasUpdateTagsPermission(),
     ]);
 
-    let tags: TTwitchTag[] = this.state.settings.tags ?? [];
+    let tags: string[] = this.state.settings.tags ?? [];
 
-    if (hasUpdateTagsPermission && this.state.availableTags.length === 0) {
-      [tags] = await Promise.all([this.getStreamTags(), this.getAllTags()]);
+    if (this.state.hasUpdateTagsPermission) {
+      tags = await Promise.resolve(this.getStreamTags());
     }
 
     this.SET_PREPOPULATED(true);
     this.SET_STREAM_SETTINGS({ tags, title: channelInfo.title, game: channelInfo.game });
-  }
-
-  @mutation()
-  private SET_AVAILABLE_TAGS(tags: TTwitchTag[]) {
-    this.state.availableTags = tags;
-    this.state.hasUpdateTagsPermission = true;
-  }
-
-  @mutation()
-  private SET_HAS_POLLS_PERMISSION(hasPollsPermission: boolean) {
-    this.state.hasPollsPermission = hasPollsPermission;
   }
 
   fetchUserInfo() {
@@ -322,13 +312,14 @@ export class TwitchService
         `${this.apiBase}/helix/games?name=${encodeURIComponent(game)}`,
       ).then(json => json.data[0].id);
     }
+    const hasPermission = await this.hasScope('channel:manage:broadcast');
+    const scopedTags = hasPermission ? tags : undefined;
     await Promise.all([
       this.requestTwitch({
         url: `${this.apiBase}/helix/channels?broadcaster_id=${this.twitchId}`,
         method: 'PATCH',
-        body: JSON.stringify({ game_id: gameId, title }),
+        body: JSON.stringify({ game_id: gameId, title, tags: scopedTags }),
       }),
-      this.setStreamTags(tags),
     ]);
     this.SET_STREAM_SETTINGS({ title, game, tags });
   }
@@ -375,25 +366,14 @@ export class TwitchService
     return `https://twitch.tv/${this.username}`;
   }
 
-  async getAllTags(): Promise<void> {
-    // Fetch stream tags once per session as they're unlikely to change that often
-    if (this.state.availableTags.length) return;
-    this.SET_AVAILABLE_TAGS(await getAllTags());
-  }
-
-  getStreamTags(): Promise<TTwitchTag[]> {
+  getStreamTags(): Promise<string[]> {
     assertIsDefined(this.twitchId);
     return getStreamTags(this.twitchId);
   }
 
-  async setStreamTags(tags: TTwitchTag[]) {
-    const hasPermission = await this.hasScope('user:edit:broadcast');
-
-    if (!hasPermission) {
-      return false;
-    }
-    assertIsDefined(this.twitchId);
-    return updateTags()(tags)(this.twitchId);
+  async validateTagsScope() {
+    const hasTagsScope = await this.hasScope('channel:manage:broadcast');
+    this.SET_HAS_TAGS_PERMISSION(hasTagsScope);
   }
 
   async validatePollsScope() {
@@ -406,13 +386,6 @@ export class TwitchService
     return platformAuthorizedRequest('twitch', 'https://id.twitch.tv/oauth2/validate').then(
       (response: ITwitchOAuthValidateResponse) => response.scopes.includes(scope),
     );
-  }
-
-  async getHasUpdateTagsPermission() {
-    // if available tags are loaded then the user has permissions
-    if (this.state.availableTags.length) return true;
-    // otherwise make a request to Twitch
-    return await this.hasScope('user:edit:broadcast');
   }
 
   getHeaders(req: IPlatformRequest, authorized = false): ITwitchRequestHeaders {
@@ -429,5 +402,15 @@ export class TwitchService
 
   get liveDockEnabled(): boolean {
     return true;
+  }
+
+  @mutation()
+  private SET_HAS_POLLS_PERMISSION(hasPollsPermission: boolean) {
+    this.state.hasPollsPermission = hasPollsPermission;
+  }
+
+  @mutation()
+  private SET_HAS_TAGS_PERMISSION(hasUpdateTagsPermission: boolean) {
+    this.state.hasUpdateTagsPermission = hasUpdateTagsPermission;
   }
 }
