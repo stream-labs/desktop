@@ -1,0 +1,160 @@
+import { sleep } from "util/sleep";
+import { QueueRunner } from "./QueueRunner";
+
+class Task {
+  completePrepare: (skip: boolean) => void;
+  completeRun: () => void;
+  start: () => Promise<null | { cancel: () => Promise<void>, running: Promise<void> }>;
+  state: 'idle' | 'preparing' | 'running' | 'completed' | 'canceled' = 'idle';
+
+  constructor(startCallback: ((task: Task) => void) = undefined) {
+    const prepare = new Promise<boolean>((resolve) => {
+      this.completePrepare = (skip) => {
+        resolve(skip);
+      };
+    });
+    const run = new Promise<void>((resolve) => {
+      this.completeRun = () => {
+        resolve();
+        this.state = 'completed';
+      };
+    });
+    this.start = async () => {
+      this.state = 'preparing';
+      if (startCallback) {
+        startCallback(this);
+      };
+      return prepare.then((skip) => {
+        if (skip) {
+          return null;
+        } else {
+          this.state = 'running';
+          return {
+            cancel: async () => {
+              this.completeRun();
+              await run;
+              this.state = 'canceled';
+            },
+            running: run,
+          };
+        }
+      });
+    };
+  }
+}
+
+describe('QueueRunner', () => {
+  test('empty', async () => {
+    const queue = new QueueRunner();
+    expect(queue.length).toBe(0);
+    expect(queue.state).toBe(null);
+    expect(queue.running).toBe(false);
+  });
+
+  test('normal lifecycle', async () => {
+    const queue = new QueueRunner();
+    const task = new Task();
+
+    queue.add(task.start, 'one');
+    expect(queue.length).toBe(1);
+    expect(queue.state).toBe(null);
+    expect(queue.running).toBe(true);
+    queue.runNext();
+    await sleep(0);
+    expect(queue.length).toBe(0);
+    expect(queue.state).toBe('preparing');
+    expect(queue.running).toBe(true);
+    task.completePrepare(false);
+    await sleep(0);
+    expect(queue.length).toBe(0);
+    expect(queue.state).toBe('running');
+    expect(queue.running).toBe(true);
+    task.completeRun();
+    await queue.waitUntilFinished();
+    expect(queue.length).toBe(0);
+    expect(queue.state).toBe(null);
+    expect(queue.running).toBe(false);
+  });
+
+  test('normal skip', async () => {
+    const queue = new QueueRunner();
+    const task = new Task();
+
+    queue.add(task.start, 'one');
+    expect(queue.length).toBe(1);
+    expect(queue.state).toBe(null);
+    expect(queue.running).toBe(true);
+    queue.runNext();
+    await sleep(0);
+    expect(queue.length).toBe(0);
+    expect(queue.state).toBe('preparing');
+    expect(queue.running).toBe(true);
+    task.completePrepare(true);
+    await queue.waitUntilFinished();
+    expect(queue.length).toBe(0);
+    expect(queue.state).toBe(null);
+    expect(queue.running).toBe(false);
+  });
+
+  test('early cancel', async () => {
+    const queue = new QueueRunner();
+    const task = new Task();
+    queue.add(task.start, 'one');
+    expect(queue.length).toBe(1);
+    queue.cancel();
+    await queue.waitUntilFinished();
+    expect(task.state).toBe('idle');
+    expect(queue.length).toBe(0);
+    expect(queue.state).toBe(null);
+    expect(queue.running).toBe(false);
+  });
+
+  test('cancel while preparing', async () => {
+    const queue = new QueueRunner();
+    const task = new Task();
+    queue.add(task.start, 'one');
+    queue.runNext();
+    await sleep(0);
+    expect(task.state).toBe('preparing');
+    queue.cancel();
+    task.completePrepare(false);
+    await queue.waitUntilFinished();
+    expect(task.state).toBe('canceled');
+    expect(queue.length).toBe(0);
+    expect(queue.state).toBe(null);
+    expect(queue.running).toBe(false);
+  });
+
+  test('cancel while running', async () => {
+    const queue = new QueueRunner();
+    const task = new Task();
+    queue.add(task.start, 'one');
+    queue.runNext();
+    await sleep(0);
+    task.completePrepare(false);
+    await sleep(0);
+    expect(task.state).toBe('running');
+    queue.cancel();
+    await queue.waitUntilFinished();
+    expect(task.state).toBe('canceled');
+    expect(queue.length).toBe(0);
+    expect(queue.state).toBe(null);
+    expect(queue.running).toBe(false);
+  });
+
+  test('run sequentially', async () => {
+    const queue = new QueueRunner();
+    const results: number[] = [];
+    for (const n of [1, 2, 3]) {
+      const task = new Task(t => {
+        results.push(n);
+        t.completePrepare(false);
+        t.completeRun();
+      });
+      queue.add(task.start, n.toString());
+    }
+    queue.runNext();
+    await queue.waitUntilFinished();
+    expect(results).toEqual([1, 2, 3]);
+  });
+});
