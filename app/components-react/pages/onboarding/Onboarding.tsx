@@ -43,7 +43,7 @@ export default function Onboarding() {
               {$t('Skip')}
             </button>
           )}
-          {<ActionButton />}
+          <ActionButton />
         </div>
       )}
     </div>
@@ -113,6 +113,10 @@ export class OnboardingModule {
 
   get RecordingModeService() {
     return Services.RecordingModeService;
+  }
+
+  get UsageStatisticsService() {
+    return Services.UsageStatisticsService;
   }
 
   get UserService() {
