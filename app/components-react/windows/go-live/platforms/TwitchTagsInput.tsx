@@ -50,6 +50,8 @@ export function TwitchTagsInput(p: TTwitchTagsInputProps) {
       )}
       rules={[{ validator: specialCharacterValidator }]}
       placeholder={$t('For example: "Speedrunning" or "FirstPlaythrough"')}
+      tokenSeparators={[' ', ',']}
+      dropdownStyle={{ display: 'none' }}
     />
   );
 }
