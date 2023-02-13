@@ -79,7 +79,7 @@ export const TagsInput = InputComponent(<T extends any[]>(p: TTagsInputProps<T>)
         allowClear
         onChange={val => onChangeHandler((val as unknown) as T)}
         tagRender={renderTag}
-        placeholder={$t('Start typing to search')}
+        placeholder={p.placeholder || $t('Start typing to search')}
         dropdownRender={dropdownRender}
         data-value={JSON.stringify(inputAttrs.value)}
         data-display-value={JSON.stringify(displayValue)}
