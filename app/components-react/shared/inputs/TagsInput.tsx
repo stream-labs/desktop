@@ -20,6 +20,8 @@ interface ICustomTagsProps<TValue> extends Omit<ICustomListProps<SingleType<TVal
   ) => ReactElement<typeof Tag>;
   options?: IListOption<SingleType<TValue>>[];
   mode?: 'tags' | 'multiple';
+  tokenSeparators?: string[];
+  dropdownStyle?: React.CSSProperties;
 }
 
 export type TTagsInputProps<TValue> = TSlobsInputProps<
@@ -30,7 +32,7 @@ export type TTagsInputProps<TValue> = TSlobsInputProps<
 >;
 
 export const TagsInput = InputComponent(<T extends any[]>(p: TTagsInputProps<T>) => {
-  const { inputAttrs, wrapperAttrs } = useInput('tags', p);
+  const { inputAttrs, wrapperAttrs } = useInput('tags', p, ['tokenSeparators', 'dropdownStyle']);
   const options = p.options || [];
   const tagsMap = useMemo(() => keyBy(options, 'value'), [options]);
 
