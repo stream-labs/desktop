@@ -49,6 +49,8 @@ export function TwitchTagsInput(p: TTwitchTagsInputProps) {
         </Tag>
       )}
       rules={[{ validator: specialCharacterValidator }]}
+      tokenSeparators={[' ', ',']}
+      dropdownStyle={{ display: 'none' }}
     />
   );
 }
