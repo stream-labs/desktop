@@ -27,8 +27,8 @@ export function TwitchTagsInput(p: TTwitchTagsInputProps) {
     );
   }
 
-  function specialCharacterValidator(rule: unknown, value: string[], callback: Function) {
-    if (value.some(tag => !/^[a-zA-Z0-9]*$/.test(tag))) {
+  function specialCharacterValidator(rule: unknown, values: string[], callback: Function) {
+    if (values.some(tag => !/^[a-zA-Z0-9]*$/.test(tag))) {
       callback($t('Do not include special characters or spaces in your tag'));
     } else {
       callback();
@@ -49,6 +49,7 @@ export function TwitchTagsInput(p: TTwitchTagsInputProps) {
         </Tag>
       )}
       rules={[{ validator: specialCharacterValidator }]}
+      placeholder={$t('For example: "Speedrunning" or "FirstPlaythrough"')}
       tokenSeparators={[' ', ',']}
       dropdownStyle={{ display: 'none' }}
     />
