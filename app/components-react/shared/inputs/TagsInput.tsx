@@ -20,6 +20,8 @@ interface ICustomTagsProps<TValue> extends Omit<ICustomListProps<SingleType<TVal
   ) => ReactElement<typeof Tag>;
   options?: IListOption<SingleType<TValue>>[];
   mode?: 'tags' | 'multiple';
+  tokenSeparators?: string[];
+  dropdownStyle?: React.CSSProperties;
 }
 
 export type TTagsInputProps<TValue> = TSlobsInputProps<
@@ -30,7 +32,7 @@ export type TTagsInputProps<TValue> = TSlobsInputProps<
 >;
 
 export const TagsInput = InputComponent(<T extends any[]>(p: TTagsInputProps<T>) => {
-  const { inputAttrs, wrapperAttrs } = useInput('tags', p);
+  const { inputAttrs, wrapperAttrs } = useInput('tags', p, ['tokenSeparators', 'dropdownStyle']);
   const options = p.options || [];
   const tagsMap = useMemo(() => keyBy(options, 'value'), [options]);
 
@@ -77,7 +79,7 @@ export const TagsInput = InputComponent(<T extends any[]>(p: TTagsInputProps<T>)
         allowClear
         onChange={val => onChangeHandler((val as unknown) as T)}
         tagRender={renderTag}
-        placeholder={$t('Start typing to search')}
+        placeholder={p.placeholder || $t('Start typing to search')}
         dropdownRender={dropdownRender}
         data-value={JSON.stringify(inputAttrs.value)}
         data-display-value={JSON.stringify(displayValue)}
