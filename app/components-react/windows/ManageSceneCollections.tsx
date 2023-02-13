@@ -23,10 +23,14 @@ export default function ManageSceneCollections() {
     SceneCollectionsService,
     ObsImporterService,
     NavigationService,
+    UserService,
   } = Services;
   const [query, setQuery] = useState('');
 
-  const { collections } = useVuex(() => ({ collections: SceneCollectionsService.collections }));
+  const { collections, isLoggedIn } = useVuex(() => ({
+    collections: SceneCollectionsService.collections,
+    isLoggedIn: UserService.views.isLoggedIn,
+  }));
 
   function close() {
     SceneCollectionsService.stateService.flushManifestFile();
@@ -57,8 +61,10 @@ export default function ManageSceneCollections() {
   }
 
   function goToThemes() {
-    NavigationService.actions.navigate('BrowseOverlays');
-    WindowsService.actions.closeChildWindow();
+    if (isLoggedIn) {
+      NavigationService.actions.navigate('BrowseOverlays');
+      WindowsService.actions.closeChildWindow();
+    }
   }
 
   return (
@@ -94,10 +100,18 @@ export default function ManageSceneCollections() {
               <strong>{$t('Import')}</strong>
               <p>{$t('Load existing scenes from OBS')}</p>
             </button>
-            <button onClick={goToThemes} className={cx('button', styles.button, styles.lg)}>
+            <button
+              disabled={!isLoggedIn}
+              onClick={goToThemes}
+              className={cx('button', styles.button, styles.lg)}
+            >
               <div>
                 <strong>{$t('Template')}</strong>
-                <p>{$t('Choose a template from our theme library')}</p>
+                {isLoggedIn ? (
+                  <p>{$t('Choose a template from our theme library')}</p>
+                ) : (
+                  <p>{$t('Log in to choose a template from our theme library')}</p>
+                )}
               </div>
               <img src={$i('images/prime-themes.png')} />
             </button>
