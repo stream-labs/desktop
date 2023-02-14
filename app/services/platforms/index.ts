@@ -189,7 +189,7 @@ export interface IPlatformService {
     useToken?: boolean | string,
   ) => Dictionary<string | undefined>;
 
-  setContext: (platform: TPlatform) => void;
+  confirmDualOutput: (platform: TPlatform) => void;
 
   liveDockEnabled: boolean;
 

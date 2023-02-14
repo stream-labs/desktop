@@ -162,7 +162,6 @@ export class TwitchService
   }
 
   async beforeGoLive(goLiveSettings?: IGoLiveSettings) {
-    this.confirmDualOutput('twitch');
     if (
       this.streamSettingsService.protectedModeEnabled &&
       this.streamSettingsService.isSafeToModifyStreamKey()
@@ -190,6 +189,8 @@ export class TwitchService
       const channelInfo = goLiveSettings?.platforms.twitch;
       if (channelInfo) await this.putChannelInfo(channelInfo);
     }
+
+    this.confirmDualOutput('twitch');
   }
 
   async validatePlatform() {
