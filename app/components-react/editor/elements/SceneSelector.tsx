@@ -182,22 +182,25 @@ function SceneSelector() {
         </Tooltip>
 
         <Tooltip title={$t('Toggle Dual Output Mode.')} placement="bottomRight">
-          <SwitchInput
-            value={DualOutputService.views.dualOutputMode}
-            layout="horizontal"
-            onChange={async () => {
-              const toggled = await DualOutputService.actions.return.toggleDualOutputMode(
-                !DualOutputService.views.dualOutputMode,
-              );
-              if (!toggled) {
-                message.error({
-                  content: $t('Error toggling Dual Output Mode'),
-                  duration: 2,
-                });
-              }
-            }}
-            style={{ marginRight: '0px !important' }}
-          />
+          <div>
+            {/* extra div to allow tooltip hover to render */}
+            <SwitchInput
+              value={DualOutputService.views.dualOutputMode}
+              layout="horizontal"
+              onChange={async () => {
+                const toggled = await DualOutputService.actions.return.toggleDualOutputMode(
+                  !DualOutputService.views.dualOutputMode,
+                );
+                if (!toggled) {
+                  message.error({
+                    content: $t('Error toggling Dual Output Mode'),
+                    duration: 2,
+                  });
+                }
+              }}
+              style={{ marginRight: '0px !important' }}
+            />
+          </div>
         </Tooltip>
       </div>
       <Scrollable style={{ height: '100%' }} className={styles.scenesContainer}>

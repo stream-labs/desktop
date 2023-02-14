@@ -49,7 +49,5 @@
   "Choose a template from our theme library": "Choose a template from our theme library",
   "Enter a Scene Collection Name": "Enter a Scene Collection Name",
   "Copy of %{collectionName}": "Copy of %{collectionName}",
-  "Your Scene Collections": "Your Scene Collections",
-  "Toggle Dual Output Mode.": "Toggle Dual Output Mode.",
-  "Error toggling Dual Output Mode": "Error toggling Dual Output Mode"
+  "Your Scene Collections": "Your Scene Collections"
 }

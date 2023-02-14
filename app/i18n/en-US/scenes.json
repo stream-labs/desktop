@@ -54,5 +54,7 @@
   "Horizontal Output": "Horizontal Output",
   "Vertical Output": "Vertical Output",
   "Arrange your sources here to where you want them to be viewed on any platform you mark as being streamed with a vertical output.": "Arrange your sources here to where you want them to be viewed on any platform you mark as being streamed with a vertical output.",
-  "Arrange your sources here to where you want them to be viewed on any platform you mark as being streamed  with a horizontal output.": "Arrange your sources here to where you want them to be viewed on any platform you mark as being streamed  with a horizontal output."
+  "Arrange your sources here to where you want them to be viewed on any platform you mark as being streamed  with a horizontal output.": "Arrange your sources here to where you want them to be viewed on any platform you mark as being streamed  with a horizontal output.",
+  "Toggle Dual Output Mode.": "Toggle Dual Output Mode.",
+  "Error toggling Dual Output Mode": "Error toggling Dual Output Mode"
 }
