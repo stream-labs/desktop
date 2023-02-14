@@ -77,9 +77,11 @@ export default function ManageSceneCollections() {
   function upgradeToPrime() {
     UsageStatisticsService.actions.recordClick('ManageSceneCollections', 'prime');
     if (isLoggedIn) {
-      MagicLinkService.linkToPrime('slobs-side-nav');
+      MagicLinkService.linkToPrime('slobs-scene-collections');
     } else {
-      remote.shell.openExternal('https://streamlabs.com/ultra?checkout=1&refl=slobs-side-nav');
+      remote.shell.openExternal(
+        'https://streamlabs.com/ultra?checkout=1&refl=slobs-scene-collections',
+      );
     }
   }
 
