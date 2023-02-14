@@ -48,7 +48,7 @@ describe('QueueRunner', () => {
     const queue = new QueueRunner();
     expect(queue.length).toBe(0);
     expect(queue.state).toBe(null);
-    expect(queue.running).toBe(false);
+    expect(queue.isRunning).toBe(false);
   });
 
   test('normal lifecycle', async () => {
@@ -58,22 +58,22 @@ describe('QueueRunner', () => {
     queue.add(task.start, 'one');
     expect(queue.length).toBe(1);
     expect(queue.state).toBe(null);
-    expect(queue.running).toBe(true);
+    expect(queue.isRunning).toBe(true);
     queue.runNext();
     await sleep(0);
     expect(queue.length).toBe(0);
     expect(queue.state).toBe('preparing');
-    expect(queue.running).toBe(true);
+    expect(queue.isRunning).toBe(true);
     task.completePrepare(false);
     await sleep(0);
     expect(queue.length).toBe(0);
     expect(queue.state).toBe('running');
-    expect(queue.running).toBe(true);
+    expect(queue.isRunning).toBe(true);
     task.completeRun();
     await queue.waitUntilFinished();
     expect(queue.length).toBe(0);
     expect(queue.state).toBe(null);
-    expect(queue.running).toBe(false);
+    expect(queue.isRunning).toBe(false);
   });
 
   test('normal skip', async () => {
@@ -83,17 +83,17 @@ describe('QueueRunner', () => {
     queue.add(task.start, 'one');
     expect(queue.length).toBe(1);
     expect(queue.state).toBe(null);
-    expect(queue.running).toBe(true);
+    expect(queue.isRunning).toBe(true);
     queue.runNext();
     await sleep(0);
     expect(queue.length).toBe(0);
     expect(queue.state).toBe('preparing');
-    expect(queue.running).toBe(true);
+    expect(queue.isRunning).toBe(true);
     task.completePrepare(true);
     await queue.waitUntilFinished();
     expect(queue.length).toBe(0);
     expect(queue.state).toBe(null);
-    expect(queue.running).toBe(false);
+    expect(queue.isRunning).toBe(false);
   });
 
   test('early cancel', async () => {
@@ -106,7 +106,7 @@ describe('QueueRunner', () => {
     expect(task.state).toBe('idle');
     expect(queue.length).toBe(0);
     expect(queue.state).toBe(null);
-    expect(queue.running).toBe(false);
+    expect(queue.isRunning).toBe(false);
   });
 
   test('cancel while preparing', async () => {
@@ -122,7 +122,7 @@ describe('QueueRunner', () => {
     expect(task.state).toBe('canceled');
     expect(queue.length).toBe(0);
     expect(queue.state).toBe(null);
-    expect(queue.running).toBe(false);
+    expect(queue.isRunning).toBe(false);
   });
 
   test('cancel while running', async () => {
@@ -139,7 +139,7 @@ describe('QueueRunner', () => {
     expect(task.state).toBe('canceled');
     expect(queue.length).toBe(0);
     expect(queue.state).toBe(null);
-    expect(queue.running).toBe(false);
+    expect(queue.isRunning).toBe(false);
   });
 
   test('run sequentially', async () => {

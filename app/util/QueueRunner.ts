@@ -1,6 +1,6 @@
 import { WaitNotify } from "./WaitNotify";
 
-type StartFunc = () => Promise<{
+export type StartFunc = () => Promise<{
   cancel: () => Promise<void>;
   running: Promise<void>;
 } | null>;
@@ -20,8 +20,12 @@ export class QueueRunner {
     setTimeout(() => this._run(), 0);
   }
   private nextNotifier = new WaitNotify();
+  private debug: boolean;
 
-  constructor(private debug = false) {
+  constructor(options: {
+    debug?: boolean;
+  } = {}) {
+    this.debug = options.debug || false;
   }
 
   private async _run() {
@@ -100,12 +104,12 @@ export class QueueRunner {
     }
   }
 
-  get running(): boolean {
+  get isRunning(): boolean {
     return this.runningState !== null || this.queue.length > 0;
   }
 
   async waitUntilFinished(): Promise<void> {
-    if (!this.running) {
+    if (!this.isRunning) {
       return;
     }
     return this.nextNotifier.wait();

@@ -1,6 +1,7 @@
 import { InitAfter, Inject } from 'services/core';
 import { mutation, StatefulService } from 'services/core/stateful-service';
 import { NVoiceCharacterService } from 'services/nvoice-character';
+import { QueueRunner } from 'util/QueueRunner';
 import { AddComponent } from './ChatMessage/ChatComponentType';
 import { getDisplayText } from './ChatMessage/displaytext';
 import { NVoiceClientService } from './n-voice-client';
@@ -38,6 +39,8 @@ interface ICommentSynthesizerState {
   };
 }
 
+const NUM_COMMENTS_TO_SKIP = 5;
+
 @InitAfter('NicoliveProgramStateService')
 export class NicoliveCommentSynthesizerService extends StatefulService<ICommentSynthesizerState> {
   @Inject('NicoliveProgramStateService') stateService: NicoliveProgramStateService;
@@ -71,10 +74,7 @@ export class NicoliveCommentSynthesizerService extends StatefulService<ICommentS
     }
   }
 
-  currentPlayingId: SynthesizerId | null = null;
-  currentPlaying(): ISpeechSynthesizer | null {
-    return this.currentPlayingId ? this.getSynthesizer(this.currentPlayingId) : null;
-  }
+  private queue = new QueueRunner();
 
   phonemeServer: PhonemeServer;
 
@@ -184,44 +184,37 @@ export class NicoliveCommentSynthesizerService extends StatefulService<ICommentS
     const toPlay = speech.synthesizer;
     const toPlaySynth = this.getSynthesizer(toPlay);
 
-    if (this.currentPlayingId !== null) {
-      if (this.currentPlayingId !== toPlay) {
-        if (cancelBeforeSpeaking) {
-          await this.currentPlaying()?.cancelSpeak();
-        } else {
-          await this.currentPlaying()?.waitForSpeakEnd();
-        }
-      }
+    if (cancelBeforeSpeaking) {
+      this.queue.cancel();
+    } else if (this.queue.length >= NUM_COMMENTS_TO_SKIP) {
+      // コメント溜まりすぎスキップ
+      // TODO 飛ばした発言
+      this.queue.cancel();
     }
 
-    const playing = this.currentPlaying();
-    this.currentPlayingId = toPlay;
-    const force = cancelBeforeSpeaking && playing && playing.speaking;
-    toPlaySynth.speakText(
-      speech,
-      () => {
-        onstart();
-        this.currentPlayingId = toPlay;
-      },
-      () => {
-        this.currentPlayingId = null;
-        onend();
-      },
-      force,
-      (phoneme) => {
-        this.phonemeServer?.emitPhoneme(phoneme);
-      });
+    this.queue.add(
+      toPlaySynth.speakText(
+        speech,
+        () => {
+          onstart();
+        },
+        () => {
+          onend();
+        },
+        (phoneme) => {
+          this.phonemeServer?.emitPhoneme(phoneme);
+        },
+      ),
+      speech.text,
+    );
+    this.queue.runNext();
   }
 
-  get speaking(): boolean {
-    return this.currentPlayingId !== null;
-  }
-
-  async cancelSpeak() {
-    await this.currentPlaying()?.cancelSpeak();
-  }
   private setEnabled(enabled: boolean) {
     this.setState({ enabled });
+    if (!enabled) {
+      this.queue.cancel();
+    }
   }
   get enabled(): boolean {
     return this.state.enabled;
