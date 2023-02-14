@@ -720,9 +720,11 @@ export class StreamingService
         obs.NodeObs.OBS_service_startStreaming(0);
         obs.NodeObs.OBS_service_startStreaming(1);
       } else {
-        const horizontalContext = this.videoSettingsService.contexts.horizontal;
-        obs.NodeObs.OBS_service_setVideoInfo(horizontalContext, 0);
-        obs.NodeObs.OBS_service_startStreaming(0);
+        const platform = this.views.enabledPlatforms[0];
+        const contextData = this.views.getPlatformContextData(platform);
+        const horizontalContext = this.videoSettingsService.contexts[contextData.display];
+        obs.NodeObs.OBS_service_setVideoInfo(horizontalContext, contextData.displayId);
+        obs.NodeObs.OBS_service_startStreaming(contextData.displayId);
       }
     } else {
       console.log('hitting the else ', this.settingsService.views.all);
@@ -799,9 +801,13 @@ export class StreamingService
       }
 
       if (this.views.isDualOutputMode) {
-        obs.NodeObs.OBS_service_stopStreaming(false, 0);
         if (this.views.enabledPlatforms.length > 1) {
+          obs.NodeObs.OBS_service_stopStreaming(false, 0);
           obs.NodeObs.OBS_service_stopStreaming(false, 1);
+        } else {
+          const platform = this.views.enabledPlatforms[0];
+          const contextData = this.views.getPlatformContextData(platform);
+          obs.NodeObs.OBS_service_stopStreaming(false, contextData.displayId);
         }
       } else {
         obs.NodeObs.OBS_service_stopStreaming(false);

@@ -97,6 +97,10 @@ export class StreamInfoView<T extends Object> extends ViewHandler<T> {
     return getPlatformService(platform).displayName;
   }
 
+  getPlatformContextData(platform: TPlatform) {
+    return this.dualOutputView.getPlatformContextData(platform);
+  }
+
   // REMOVE
   get warning(): string {
     return this.info.warning;
