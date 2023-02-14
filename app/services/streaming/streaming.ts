@@ -312,10 +312,11 @@ export class StreamingService
         return;
       }
     }
-
     // setup dual output
     if (this.views.isDualOutputMode) {
       const displayPlatforms = this.views.activeDisplayPlatforms;
+
+      console.log('displayPlatforms ', displayPlatforms);
 
       const platformsToSingleStream: TPlatform[] = [];
       for (const display in displayPlatforms) {
@@ -365,17 +366,20 @@ export class StreamingService
           console.log('after setup restream this.settingsService.views.all ', settingsAll);
         } else {
           // set single stream for the display
-          const platform = displayPlatforms[display];
-          const service = getPlatformService(platform);
-          try {
-            await this.runCheck('setupDualOutput', async () => {
-              await Promise.resolve(service.setContext(platform));
-            });
-          } catch (e: unknown) {
-            this.handleSetupPlatformError(e, platform);
+          if (displayPlatforms[display].length > 0) {
+            const platform = displayPlatforms[display][0];
+            const service = getPlatformService(platform);
+            try {
+              await this.runCheck('setupDualOutput', async () => {
+                service.confirmDualOutput(platform);
+                return Promise.resolve();
+              });
+            } catch (e: unknown) {
+              this.handleSetupPlatformError(e, platform);
+            }
+            const settingsAll = this.settingsService.views.all;
+            console.log('just before this.settingsService.views.all ', settingsAll);
           }
-          const settingsAll = this.settingsService.views.all;
-          console.log('just before this.settingsService.views.all ', settingsAll);
         }
       }
     }
@@ -701,19 +705,28 @@ export class StreamingService
     this.powerSaveId = remote.powerSaveBlocker.start('prevent-display-sleep');
 
     if (this.views.isDualOutputMode) {
-      const horizontalContext = this.videoSettingsService.contexts.horizontal;
-      const verticalContext = this.videoSettingsService.contexts.vertical;
+      // @@@ TODO add check for multiple platforms active. If not, don't start second stream
 
-      // check if we need to force apply single stream settings?
-      // this.settingsService.actions.setDualOutputSingleStreamData();
+      if (this.views.enabledPlatforms.length > 1) {
+        const horizontalContext = this.videoSettingsService.contexts.horizontal;
+        const verticalContext = this.videoSettingsService.contexts.vertical;
 
-      obs.NodeObs.OBS_service_setVideoInfo(horizontalContext, 0);
-      obs.NodeObs.OBS_service_setVideoInfo(verticalContext, 1);
+        // check if we need to force apply single stream settings?
+        // this.settingsService.actions.setDualOutputSingleStreamData();
 
-      obs.NodeObs.OBS_service_startStreaming(0);
-      obs.NodeObs.OBS_service_startStreaming(1);
+        obs.NodeObs.OBS_service_setVideoInfo(horizontalContext, 0);
+        obs.NodeObs.OBS_service_setVideoInfo(verticalContext, 1);
+
+        obs.NodeObs.OBS_service_startStreaming(0);
+        obs.NodeObs.OBS_service_startStreaming(1);
+      } else {
+        const horizontalContext = this.videoSettingsService.contexts.horizontal;
+        obs.NodeObs.OBS_service_setVideoInfo(horizontalContext, 0);
+        obs.NodeObs.OBS_service_startStreaming(0);
+      }
     } else {
-      obs.NodeObs.OBS_service_startStreaming(0);
+      console.log('hitting the else ', this.settingsService.views.all);
+      obs.NodeObs.OBS_service_startStreaming();
     }
 
     const recordWhenStreaming = this.streamSettingsService.settings.recordWhenStreaming;
@@ -787,7 +800,9 @@ export class StreamingService
 
       if (this.views.isDualOutputMode) {
         obs.NodeObs.OBS_service_stopStreaming(false, 0);
-        obs.NodeObs.OBS_service_stopStreaming(false, 1);
+        if (this.views.enabledPlatforms.length > 1) {
+          obs.NodeObs.OBS_service_stopStreaming(false, 1);
+        }
       } else {
         obs.NodeObs.OBS_service_stopStreaming(false);
       }
@@ -1004,6 +1019,7 @@ export class StreamingService
 
     const time = new Date().toISOString();
 
+    // @@@ TODO HERE!!!
     if (info.type === EOBSOutputType.Streaming) {
       if (info.signal === EOBSOutputSignal.Start) {
         this.SET_STREAMING_STATUS(EStreamingState.Live, time);
