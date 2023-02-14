@@ -114,7 +114,7 @@ export function MultistreamingSettings() {
               const toggled = await v.toggleDualOutputMode(!v.dualOutputMode);
               if (!toggled) {
                 message.error({
-                  content: 'Error toggling Dual Output Mode',
+                  content: $t('Error toggling Dual Output Mode'),
                   duration: 2,
                 });
               }

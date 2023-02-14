@@ -7,6 +7,7 @@ import { Menu } from 'util/menus/Menu';
 import { getOS } from 'util/operating-systems';
 import { Services } from 'components-react/service-provider';
 import { useVuex } from 'components-react/hooks';
+import { SwitchInput } from 'components-react/shared/inputs';
 import HelpTip from 'components-react/shared/HelpTip';
 import Scrollable from 'components-react/shared/Scrollable';
 import { useTree, IOnDropInfo } from 'components-react/hooks/useTree';
@@ -16,6 +17,7 @@ import { ERenderingMode } from '../../../../obs-api';
 import styles from './SceneSelector.m.less';
 import useBaseElement from './hooks';
 import { IScene } from 'services/scenes';
+import { message } from 'antd';
 
 function SceneSelector() {
   const {
@@ -25,6 +27,7 @@ function SceneSelector() {
     SourceFiltersService,
     ProjectorService,
     EditorCommandsService,
+    DualOutputService,
   } = Services;
 
   const { treeSort } = useTree(true);
@@ -176,6 +179,25 @@ function SceneSelector() {
 
         <Tooltip title={$t('Edit Scene Transitions.')} placement="bottomRight">
           <i className="icon-transition icon-button icon-button--lg" onClick={showTransitions} />
+        </Tooltip>
+
+        <Tooltip title={$t('Toggle Dual Output Mode.')} placement="bottomRight">
+          <SwitchInput
+            value={DualOutputService.views.dualOutputMode}
+            layout="horizontal"
+            onChange={async () => {
+              const toggled = await DualOutputService.actions.return.toggleDualOutputMode(
+                !DualOutputService.views.dualOutputMode,
+              );
+              if (!toggled) {
+                message.error({
+                  content: $t('Error toggling Dual Output Mode'),
+                  duration: 2,
+                });
+              }
+            }}
+            style={{ marginRight: '0px !important' }}
+          />
         </Tooltip>
       </div>
       <Scrollable style={{ height: '100%' }} className={styles.scenesContainer}>
