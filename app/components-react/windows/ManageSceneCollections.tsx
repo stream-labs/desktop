@@ -14,6 +14,10 @@ import { getOS, OS } from 'util/operating-systems';
 import styles from './ManageSceneCollections.m.less';
 import { TextInput } from 'components-react/shared/inputs';
 import { useVuex } from 'components-react/hooks';
+import Translate from 'components-react/shared/Translate';
+import UltraIcon from 'components-react/shared/UltraIcon';
+import ButtonHighlighted from 'components-react/shared/ButtonHighlighted';
+import * as remote from '@electron/remote';
 
 const { Sider, Content } = Layout;
 
@@ -22,11 +26,18 @@ export default function ManageSceneCollections() {
     WindowsService,
     SceneCollectionsService,
     ObsImporterService,
+    MagicLinkService,
     NavigationService,
+    UsageStatisticsService,
+    UserService,
   } = Services;
   const [query, setQuery] = useState('');
 
-  const { collections } = useVuex(() => ({ collections: SceneCollectionsService.collections }));
+  const { collections, isLoggedIn, isPrime } = useVuex(() => ({
+    collections: SceneCollectionsService.collections,
+    isLoggedIn: UserService.views.isLoggedIn,
+    isPrime: UserService.views.isPrime,
+  }));
 
   function close() {
     SceneCollectionsService.stateService.flushManifestFile();
@@ -57,8 +68,21 @@ export default function ManageSceneCollections() {
   }
 
   function goToThemes() {
-    NavigationService.actions.navigate('BrowseOverlays');
-    WindowsService.actions.closeChildWindow();
+    if (isLoggedIn) {
+      NavigationService.actions.navigate('BrowseOverlays');
+      WindowsService.actions.closeChildWindow();
+    }
+  }
+
+  function upgradeToPrime() {
+    UsageStatisticsService.actions.recordClick('ManageSceneCollections', 'prime');
+    if (isLoggedIn) {
+      MagicLinkService.linkToPrime('slobs-scene-collections');
+    } else {
+      remote.shell.openExternal(
+        'https://streamlabs.com/ultra?checkout=1&refl=slobs-scene-collections',
+      );
+    }
   }
 
   return (
@@ -94,13 +118,51 @@ export default function ManageSceneCollections() {
               <strong>{$t('Import')}</strong>
               <p>{$t('Load existing scenes from OBS')}</p>
             </button>
-            <button onClick={goToThemes} className={cx('button', styles.button, styles.lg)}>
+            <button
+              disabled={!isLoggedIn}
+              onClick={goToThemes}
+              className={cx('button', styles.button, styles.lg)}
+            >
               <div>
                 <strong>{$t('Template')}</strong>
-                <p>{$t('Choose a template from our theme library')}</p>
+                {isLoggedIn ? (
+                  <p>{$t('Choose a template from our theme library')}</p>
+                ) : (
+                  <p>{$t('Log in to choose a template from our theme library')}</p>
+                )}
               </div>
               <img src={$i('images/prime-themes.png')} />
             </button>
+            {!isPrime && (
+              <div onClick={upgradeToPrime} className={cx('button', styles.button, styles.lg)}>
+                <div className={styles.ultra}>
+                  <strong>{$t('Ultra')}</strong>
+                  <p>
+                    <Translate message="Upgrade your stream with premium themes with <ultra>Streamlabs Ultra</ultra>.">
+                      <u slot="ultra" />
+                    </Translate>
+                  </p>
+                  <ButtonHighlighted
+                    onClick={upgradeToPrime}
+                    filled
+                    text={$t('Upgrade to Ultra')}
+                    icon={
+                      <UltraIcon
+                        type="simple"
+                        style={{
+                          fill: '#09161D',
+                          display: 'inline-block',
+                          height: '12px',
+                          width: '12px',
+                          marginRight: '5px',
+                        }}
+                      />
+                    }
+                    style={{ margin: 'auto' }}
+                  />
+                </div>
+              </div>
+            )}
           </div>
         </Content>
       </Layout>
