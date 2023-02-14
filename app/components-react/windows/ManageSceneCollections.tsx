@@ -75,7 +75,7 @@ export default function ManageSceneCollections() {
   }
 
   function upgradeToPrime() {
-    UsageStatisticsService.actions.recordClick('SideNav2', 'prime');
+    UsageStatisticsService.actions.recordClick('ManageSceneCollections', 'prime');
     if (isLoggedIn) {
       MagicLinkService.linkToPrime('slobs-side-nav');
     } else {
