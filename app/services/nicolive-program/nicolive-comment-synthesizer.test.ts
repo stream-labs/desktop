@@ -1,4 +1,6 @@
+import { QueueRunner } from 'util/QueueRunner';
 import { createSetupFunction } from 'util/test-setup';
+import type { ICommentSynthesizerState, Speech } from './nicolive-comment-synthesizer';
 import { WrappedChat } from './WrappedChat';
 
 type NicoliveCommentSynthesizerService =
@@ -28,37 +30,39 @@ jest.mock('services/nvoice-character', () => ({ NVoiceCharacterService: {} }));
 beforeEach(() => {
   jest.doMock('services/core/stateful-service');
   jest.doMock('services/core/injector');
+  jest.doMock('util/QueueRunner');
+  jest.doMock('./speech/NVoiceSynthesizer');
+  jest.doMock('./speech/WebSpeechSynthesizer');
 });
 
 afterEach(() => {
   jest.resetModules();
 });
 
+const testPitch = 0.2;
+const testRate = 0.4;
+const testVolume = 0.6;
+const testMaxTime = 4;
+
+const mockedState: ICommentSynthesizerState = {
+  enabled: true,
+  rate: testRate,
+  pitch: testPitch,
+  maxTime: testMaxTime,
+  volume: testVolume,
+  selector: {
+    normal: 'nVoice',
+    operator: 'webSpeech',
+    system: 'webSpeech',
+  },
+};
+
 test('makeSpeech', async () => {
   setup();
   const { NicoliveCommentSynthesizerService } = require('./nicolive-comment-synthesizer');
   const instance = NicoliveCommentSynthesizerService.instance as NicoliveCommentSynthesizerService;
 
-  const testPitch = 0.2;
-  const testRate = 0.4;
-  const testVolume = 0.6;
-
-  jest.spyOn(instance as any, 'state', 'get').mockReturnValue({
-    enabled: true,
-    rate: testRate,
-    webSpeech: {
-      pitch: testPitch,
-    },
-    nVoice: {
-      maxTime: 4,
-    },
-    volume: testVolume,
-    selector: {
-      normal: 'nVoice',
-      operator: 'webSpeech',
-      system: 'webSpeech',
-    },
-  });
+  jest.spyOn(instance, 'state', 'get').mockReturnValue(mockedState);
 
   // 辞書変換しない
   jest
@@ -81,11 +85,57 @@ test('makeSpeech', async () => {
     synthesizer: 'nVoice',
     rate: testRate,
     webSpeech: {
-      pitch: undefined,
+      pitch: testPitch,
     },
     nVoice: {
-      maxTime: undefined,
+      maxTime: testMaxTime,
     },
     volume: testVolume,
   });
 });
+
+
+test.each([
+  ['normal', false, false, 0, 1],
+  ['cancelBeforeSpeaking', true, false, 1, 1],
+  ['NUM_COMMENTS_TO_SKIP', false, true, 1, 1],
+])('queueToSpeech %s cancelBeforeSpeaking:%s filled:%s cancel:%d add:%d',
+  async (name: string, cancelBeforeSpeaking: boolean, filled: boolean, numCancel: number, numAdd: number) => {
+    setup();
+    const { NicoliveCommentSynthesizerService } = require('./nicolive-comment-synthesizer');
+    const instance = NicoliveCommentSynthesizerService.instance as NicoliveCommentSynthesizerService;
+    jest.spyOn(instance, 'state', 'get').mockReturnValue(mockedState);
+
+    (instance.getSynthesizer('nVoice').speakText as jest.Mock)
+      .mockImplementation((speech: Speech, onstart: () => void, onend: () => void) => {
+        return async () => async () => {
+          onstart();
+          onend();
+          return {
+            cancel: async () => { },
+            running: Promise.resolve(),
+          };
+        }
+      });
+
+    const queue = instance.queue as jest.Mocked<QueueRunner>;
+
+    const onstart = jest.fn();
+    const onend = jest.fn();
+    const speech: Speech = {
+      text: 'test',
+      synthesizer: 'nVoice',
+      rate: testRate,
+      volume: testVolume,
+    };
+
+    Object.defineProperty(queue, 'length', { get: () => filled ? instance.NUM_COMMENTS_TO_SKIP : 0 });
+    expect(queue.cancel).toBeCalledTimes(0);
+    expect(queue.add).toBeCalledTimes(0);
+    await instance.queueToSpeech(speech, onstart, onend, cancelBeforeSpeaking);
+    expect(queue.cancel).toBeCalledTimes(numCancel);
+    expect(queue.add).toBeCalledTimes(numAdd);
+    if (numAdd) {
+      expect(queue.add).toBeCalledWith(expect.anything(), speech.text);
+    }
+  });

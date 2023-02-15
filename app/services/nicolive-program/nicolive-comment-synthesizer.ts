@@ -26,7 +26,7 @@ export type Speech = {
   }
 };
 
-interface ICommentSynthesizerState {
+export interface ICommentSynthesizerState {
   enabled: boolean;
   pitch: number; // SpeechSynthesisUtterance.pitch; 0.1(lowest) to 2(highest) (default: 1), only for web speech
   rate: number; // SpeechSynthesisUtterence.rate; 0.1(lowest) to 10(highest); default:1
@@ -38,8 +38,6 @@ interface ICommentSynthesizerState {
     system: SynthesizerId;
   };
 }
-
-const NUM_COMMENTS_TO_SKIP = 5;
 
 @InitAfter('NicoliveProgramStateService')
 export class NicoliveCommentSynthesizerService extends StatefulService<ICommentSynthesizerState> {
@@ -60,6 +58,9 @@ export class NicoliveCommentSynthesizerService extends StatefulService<ICommentS
     }
   };
 
+  // この数すでにキューに溜まっている場合は破棄してから追加する
+  NUM_COMMENTS_TO_SKIP = 5;
+
   // delegate synth
   webSpeech = new WebSpeechSynthesizer();
   nVoice: NVoiceSynthesizer;
@@ -74,7 +75,7 @@ export class NicoliveCommentSynthesizerService extends StatefulService<ICommentS
     }
   }
 
-  private queue = new QueueRunner();
+  queue = new QueueRunner();
 
   phonemeServer: PhonemeServer;
 
@@ -161,7 +162,7 @@ export class NicoliveCommentSynthesizerService extends StatefulService<ICommentS
 
   async startSpeakingSimple(speech: Speech) {
     // empty anonymous functions must be created in this service
-    await this.startSpeaking(speech, () => { }, () => { }, true);
+    await this.queueToSpeech(speech, () => { }, () => { }, true);
   }
 
   async startTestSpeech(text: string, synthId: SynthesizerId) {
@@ -171,7 +172,7 @@ export class NicoliveCommentSynthesizerService extends StatefulService<ICommentS
     }
   }
 
-  async startSpeaking(
+  async queueToSpeech(
     speech: Speech,
     onstart: () => void,
     onend: () => void,
@@ -186,7 +187,7 @@ export class NicoliveCommentSynthesizerService extends StatefulService<ICommentS
 
     if (cancelBeforeSpeaking) {
       this.queue.cancel();
-    } else if (this.queue.length >= NUM_COMMENTS_TO_SKIP) {
+    } else if (this.queue.length >= this.NUM_COMMENTS_TO_SKIP) {
       // コメント溜まりすぎスキップ
       // TODO 飛ばした発言
       this.queue.cancel();
