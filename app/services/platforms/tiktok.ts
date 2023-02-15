@@ -51,17 +51,16 @@ export class TiktokService
     return this.userService.views.state.auth?.platforms?.facebook?.token;
   }
 
-  async beforeGoLive(goLiveSettings: IGoLiveSettings) {
+  async beforeGoLive(goLiveSettings: IGoLiveSettings, context?: number) {
     const ttSettings = getDefined(goLiveSettings.platforms.tiktok);
     if (
-      !this.streamingService.views.isMultiplatformMode &&
-      !this.streamingService.views.isDualOutputMode
+      !this.streamingService.views.isMultiplatformMode
     ) {
       this.streamSettingsService.setSettings({
         streamType: 'rtmp_custom',
         key: ttSettings.streamKey,
         server: ttSettings.serverUrl,
-      });
+      }, context);
     }
     this.SET_STREAM_SETTINGS(ttSettings);
   }

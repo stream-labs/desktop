@@ -80,19 +80,18 @@ export class TrovoService
     return this.userService.state.auth?.platforms?.trovo?.username || '';
   }
 
-  async beforeGoLive(goLiveSettings: IGoLiveSettings) {
+  async beforeGoLive(goLiveSettings: IGoLiveSettings, context?: number) {
     const trSettings = getDefined(goLiveSettings.platforms.trovo);
 
     const key = this.state.streamKey;
     if (
-      !this.streamingService.views.isMultiplatformMode &&
-      !this.streamingService.views.isDualOutputMode
+      !this.streamingService.views.isMultiplatformMode 
     ) {
       this.streamSettingsService.setSettings({
         streamType: 'rtmp_custom',
         key,
         server: this.rtmpServer,
-      });
+      }, context);
     }
 
     await this.putChannelInfo(trSettings);

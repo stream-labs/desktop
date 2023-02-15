@@ -161,7 +161,7 @@ export class TwitchService
     return this.userService.state.auth?.platforms?.twitch?.username || '';
   }
 
-  async beforeGoLive(goLiveSettings?: IGoLiveSettings) {
+  async beforeGoLive(goLiveSettings?: IGoLiveSettings, context?: number) {
     if (
       this.streamSettingsService.protectedModeEnabled &&
       this.streamSettingsService.isSafeToModifyStreamKey()
@@ -173,15 +173,14 @@ export class TwitchService
       }
       this.SET_STREAM_KEY(key);
       if (
-        !this.streamingService.views.isMultiplatformMode &&
-        !this.streamingService.views.isDualOutputMode
+        !this.streamingService.views.isMultiplatformMode  
       ) {
         this.streamSettingsService.setSettings({
           key,
           platform: 'twitch',
           streamType: 'rtmp_common',
           server: 'auto',
-        });
+        }, context);
       }
     }
 

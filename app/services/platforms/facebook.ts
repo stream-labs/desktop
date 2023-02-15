@@ -224,7 +224,7 @@ export class FacebookService
     return this.state.streamDashboardUrl;
   }
 
-  async beforeGoLive(options: IGoLiveSettings) {
+  async beforeGoLive(options: IGoLiveSettings, context?: number) {
     const fbOptions = getDefined(options.platforms.facebook);
 
     let liveVideo: IFacebookLiveVideo;
@@ -252,7 +252,7 @@ export class FacebookService
         platform: 'facebook',
         streamType: 'rtmp_common',
         server: 'rtmps://rtmp-api.facebook.com:443/rtmp/',
-      });
+      }, context);
     }
     this.SET_STREAM_KEY(streamKey);
     this.SET_STREAM_PAGE_URL(`https://facebook.com/${liveVideo.permalink_url}`);
