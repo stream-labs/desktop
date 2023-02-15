@@ -75,7 +75,7 @@ export function PrimaryPlatformSelect() {
     const result = await confirmAsync({
       title: $t('Log Out?'),
       content: $t(
-        'Streamlabs Desktop requires that you have a connected streaming account in order to use all of its features. By skipping this step, you will be logged out and some features may be unavailable.',
+        'Streamlabs Desktop requires that you have a connected platform account in order to use all of its features. By skipping this step, you will be logged out and some features may be unavailable.',
       ),
       okText: $t('Log Out'),
     });
@@ -100,7 +100,7 @@ export function PrimaryPlatformSelect() {
           <h1 className={commonStyles.titleContainer}>{$t('Select a Primary Platform')}</h1>
           <p style={{ marginBottom: 30, maxWidth: 400, textAlign: 'center' }}>
             {$t(
-              'Your Streamlabs account has multiple connected streaming platforms. Please select the primary platform you will be streaming to using Streamlabs Desktop.',
+              'Your Streamlabs account has multiple connected content platforms. Please select the primary platform you will be streaming to using Streamlabs Desktop.',
             )}
           </p>
           <Form layout="inline" style={{ width: 300 }}>
@@ -127,10 +127,10 @@ export function PrimaryPlatformSelect() {
   return (
     <div className={styles.pageContainer}>
       <div className={styles.container}>
-        <h1 className={commonStyles.titleContainer}>{$t('Connect a Streaming Platform')}</h1>
+        <h1 className={commonStyles.titleContainer}>{$t('Connect a Content Platform')}</h1>
         <p style={{ marginBottom: 80 }}>
           {$t(
-            'Streamlabs Desktop requires you to connect a streaming platform to your Streamlabs account',
+            'Streamlabs Desktop requires you to connect a content platform to your Streamlabs account',
           )}
         </p>
         <div className={styles.signupButtons}>
