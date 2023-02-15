@@ -17,14 +17,24 @@
     margin-right: 0;
     margin-top: 55px;
   }
+
+  &.custom {
+    margin-top: 0;
+  }
 }
 
 .table-header {
   padding: 12px;
   border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
 
   i {
     margin-right: 8px;
+  }
+
+  i:global(.icon-question) {
+    margin-left: auto;
   }
 }
 
