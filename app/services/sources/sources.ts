@@ -508,6 +508,7 @@ export class SourcesService extends StatefulService<ISourcesState> {
 
   private onSceneItemRemovedHandler(sceneItemState: ISceneItem) {
     // remove source if it has been removed from the all scenes
+    if (this.dualOutputService.views.dualOutputMode) return;
     const source = this.views.getSource(sceneItemState.sourceId);
     if (!source) return;
 

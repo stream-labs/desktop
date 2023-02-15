@@ -6,6 +6,8 @@ import { Source } from 'services/sources';
 import { ReorderNodesCommand, EPlaceType } from './reorder-nodes';
 import { $t } from 'services/i18n';
 import { ISceneItemSettings } from 'services/api/external-api/scenes';
+import { DualOutputService } from 'services/dual-output';
+import { TDisplayType } from 'services/settings-v2/video';
 
 // Removing and recreating a source is a very complex event.
 // We can save a lot of time by leveraging the scene collection system.
@@ -23,6 +25,7 @@ class SourceReviver extends SourcesNode {
 
 export class RemoveItemCommand extends Command {
   @Inject() private scenesService: ScenesService;
+  @Inject() private dualOutputService: DualOutputService;
 
   private sceneId: string;
   private sourceId: string;
@@ -31,6 +34,7 @@ export class RemoveItemCommand extends Command {
   private reorderNodesSubcommand: ReorderNodesCommand;
 
   private settings: ISceneItemSettings;
+  private dualOutputNodeData: { id: string; display: TDisplayType }[];
 
   constructor(private sceneItemId: string) {
     super();
@@ -70,6 +74,30 @@ export class RemoveItemCommand extends Command {
       await this.sourceReviver.save({});
     }
 
+    if (this.dualOutputService.views.dualOutputMode) {
+      this.dualOutputNodeData = [];
+      // if the item was removed in dual output mode
+      // we need to destroy the dual output nodes as well
+      const { nodeMaps } = this.dualOutputService.views;
+      for (const display in nodeMaps) {
+        // this.dualOutputNodeData.push({
+        //   id: nodeMaps[display][this.sceneItemId],
+        //   display: display as TDisplayType,
+        // });
+        const nodeId = nodeMaps[display][this.sceneItemId];
+        this.scenesService.views.getScene(this.sceneId).removeItem(nodeId);
+        this.dualOutputNodeData.push({
+          id: nodeId,
+          display: display as TDisplayType,
+        });
+      }
+      // this.dualOutputNodeData.forEach(dualOutputNode => {
+      //   const node = this.scenesService.views.getSceneItem(dualOutputNode.id);
+      //   node.remove();
+      // });
+      this.dualOutputService.actions.removeDualOutputNodes(this.sceneItemId);
+    }
+
     item.remove();
   }
 
@@ -84,5 +112,18 @@ export class RemoveItemCommand extends Command {
 
     this.reorderNodesSubcommand.rollback();
     item.setSettings(this.settings);
+
+    if (this.dualOutputNodeData.length) {
+      // if the scene item was deleted in dual output mode
+      // restore the dual output scene items as well
+      this.dualOutputNodeData.forEach((dualOutputNode, index: number) => {
+        const item = scene.addSource(this.sourceId, { id: dualOutputNode.id, select: false });
+
+        // this.reorderNodesSubcommand.rollback();
+        item.setSettings(this.settings);
+      });
+    }
+
+    this.dualOutputService.actions.removeDualOutputNodes(this.sceneItemId);
   }
 }
