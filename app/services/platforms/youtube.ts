@@ -276,7 +276,7 @@ export class YoutubeService
     this.state.liveStreamingEnabled = enabled;
   }
 
-  async beforeGoLive(settings: IGoLiveSettings) {
+  async beforeGoLive(settings: IGoLiveSettings, context?: number) {
     const ytSettings = getDefined(settings.platforms.youtube);
 
     const streamToScheduledBroadcast = !!ytSettings.broadcastId;
@@ -307,15 +307,14 @@ export class YoutubeService
     const streamKey = stream.cdn.ingestionInfo.streamName;
 
     if (
-      !this.streamingService.views.isMultiplatformMode &&
-      !this.streamingService.views.isDualOutputMode
+      !this.streamingService.views.isMultiplatformMode  
     ) {
       this.streamSettingsService.setSettings({
         platform: 'youtube',
         key: streamKey,
         streamType: 'rtmp_common',
         server: 'rtmp://a.rtmp.youtube.com/live2',
-      });
+      }, context);
     }
 
     this.UPDATE_STREAM_SETTINGS({ ...ytSettings, broadcastId: broadcast.id });

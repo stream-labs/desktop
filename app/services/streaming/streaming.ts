@@ -275,7 +275,9 @@ export class StreamingService
         // don't update settings for twitch in unattendedMode
         const settingsForPlatform = platform === 'twitch' && unattendedMode ? undefined : settings;
 
-        await this.runCheck(platform, () => service.beforeGoLive(settingsForPlatform));
+        const displayPlatforms = this.views.activeDisplayPlatforms;
+        const contextId = platform === 'twitch' ? 1 : 0;
+        await this.runCheck(platform, () => service.beforeGoLive(settingsForPlatform, contextId));
       } catch (e: unknown) {
         this.handleSetupPlatformError(e, platform);
       }
@@ -718,6 +720,10 @@ export class StreamingService
         obs.NodeObs.OBS_service_setVideoInfo(verticalContext, 1);
 
         obs.NodeObs.OBS_service_startStreaming(0);
+        // sleep for 1 second to allow the first stream to start before starting the second
+        // better to replace with waiting for signal from obs about first stream starting successfully
+        await new Promise(resolve => setTimeout(resolve, 1000));
+
         obs.NodeObs.OBS_service_startStreaming(1);
       } else {
         const platform = this.views.enabledPlatforms[0];
