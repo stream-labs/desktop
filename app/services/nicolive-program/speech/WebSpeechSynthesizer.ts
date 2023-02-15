@@ -16,7 +16,7 @@ export class WebSpeechSynthesizer implements ISpeechSynthesizer {
     onstart: () => void,
     onend: () => void,
   ) {
-    return async () => {
+    return async () => async () => {
       if (!speech || speech.text === '' || !this.available) {
         return null;
       }

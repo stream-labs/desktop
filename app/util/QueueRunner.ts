@@ -4,12 +4,17 @@ export type StartFunc = () => Promise<{
   cancel: () => Promise<void>;
   running: Promise<void>;
 } | null>;
+export type PrepareFunc = () => Promise<StartFunc | null>;
 
 export class QueueRunner {
   private queue: {
-    start: StartFunc;
+    prepare: PrepareFunc;
     label: string;
   }[] = [];
+  private preparing: {
+    preparing: Promise<StartFunc>;
+    label: string;
+  } | null = null;
   private runningState: {
     cancel: () => Promise<void>;
     running: Promise<void>;
@@ -19,7 +24,7 @@ export class QueueRunner {
   runNext() {
     setTimeout(() => this._run(), 0);
   }
-  private nextNotifier = new WaitNotify();
+  private finishNotifier = new WaitNotify();
   private debug: boolean;
 
   constructor(options: {
@@ -29,106 +34,144 @@ export class QueueRunner {
   }
 
   private async _run() {
-    if (this.runningState) {
-      return;
-    }
-    const next = this.queue.shift();
-    if (next) {
-      const { start, label } = next;
-      if (start) {
-        let earlyCancel = false;
-        let resolveRunning2: () => void = () => { };
-        const running2 = new Promise<void>((resolve) => { resolveRunning2 = resolve; });
-        running2.then(() => {
-          if (this.debug) {
-            console.log(`QueueRunner: finished ${label}`);
-          }
-          this.runningState = null;
-          this.runNext();
-        });
-        this.runningState = {
-          cancel: async () => {
-            this.runningState.cancel = async () => { await running2; };
-            earlyCancel = true;
-            await running2;
-          },
-          running: running2,
-          state: 'preparing',
+    if (!this.preparing) {
+      const next = this.queue.shift();
+      if (next) {
+        const { prepare, label } = next;
+        const preparing = prepare();
+        this.preparing = {
+          preparing,
+          label,
         };
-        if (this.debug) {
-          console.log(`QueueRunner: preparing ${label}`);
-        }
-        start().then((r) => {
-          if (!r) {
+        preparing.then((start) => {
+          if (!start) {
+            this.preparing = null;
             if (this.debug) {
-              console.log(`QueueRunner: not started ${label}`);
+              console.log(`QueueRunner: prepared null ${label}`);
             }
-            resolveRunning2();
+            this.runNext();
           } else {
-            const { cancel, running: speaking } = r;
-            if (earlyCancel) {
-              if (this.debug) {
-                console.log(`QueueRunner: early cancel ${label}`);
-              }
-              cancel().then(() => {
-                resolveRunning2();
-              });
-            } else {
-              if (this.debug) {
-                console.log(`QueueRunner: running ${label}`);
-              }
-              this.runningState = {
-                cancel: async () => {
-                  this.runningState.cancel = async () => { await running2; };
-                  await cancel();
-                  await running2;
-                },
-                running: speaking.then(() => {
-                  resolveRunning2();
-                }),
-                state: 'running',
-              };
+            if (this.debug) {
+              console.log(`QueueRunner: prepared ${label}`);
+            }
+            if (!this.runningState) {
+              this.runNext();
             }
           }
         });
+      } else {
+        if (!this.runningState) {
+          this.finishNotifier.notify();
+        }
       }
-    } else {
-      this.nextNotifier.notify();
+    }
+    if (!this.runningState && this.preparing) {
+      const { preparing, label } = this.preparing;
+      this.preparing = null;
+      let earlyCancel = false;
+      let resolveRunning2: () => void = () => { };
+      const running2 = new Promise<void>((resolve) => { resolveRunning2 = resolve; });
+      running2.then(() => {
+        if (this.debug) {
+          console.log(`QueueRunner: finished ${label}`);
+        }
+        this.runningState = null;
+        this.runNext();
+      });
+      this.runningState = {
+        cancel: async () => {
+          this.runningState.cancel = async () => { await running2; };
+          earlyCancel = true;
+          await running2;
+        },
+        running: running2,
+        state: 'preparing',
+      };
+      if (this.debug) {
+        console.log(`QueueRunner: preparing ${label}`);
+      }
+      preparing.then((start) => {
+        return start ? start() : null;
+      }).then((r) => {
+        if (!r) {
+          if (this.debug) {
+            console.log(`QueueRunner: not started ${label}`);
+          }
+          resolveRunning2();
+        } else {
+          const { cancel, running: speaking } = r;
+          if (earlyCancel) {
+            if (this.debug) {
+              console.log(`QueueRunner: early cancel ${label}`);
+            }
+            cancel().then(() => {
+              resolveRunning2();
+            });
+          } else {
+            if (this.debug) {
+              console.log(`QueueRunner: running ${label}`);
+            }
+            this.runningState = {
+              cancel: async () => {
+                this.runningState.cancel = async () => { await running2; };
+                await cancel();
+                await running2;
+              },
+              running: speaking.then(() => {
+                resolveRunning2();
+              }),
+              state: 'running',
+            };
+          }
+        }
+      });
     }
   }
+
   async cancel() {
     // 実行中のものはキャンセルし、キューに残っているものは削除する
     this.queue = [];
+    if (this.preparing) {
+      this.preparing = null;
+    }
     if (this.runningState) {
       await this.runningState.cancel();
     }
   }
 
   get isRunning(): boolean {
-    return this.runningState !== null || this.queue.length > 0;
+    return this.runningState !== null || this.preparing !== null || this.queue.length > 0;
   }
 
   async waitUntilFinished(): Promise<void> {
     if (!this.isRunning) {
       return;
     }
-    return this.nextNotifier.wait();
+    return this.finishNotifier.wait();
   }
 
   /**
    * 
-   * @param start 準備を開始する関数。準備が完了したら、キャンセル関数と実行中のPromiseをobjectで返す。実行を開始しなかったらnullを返す。
+   * @param prepare 準備を開始する関数。準備が完了したら、キャンセル関数と実行中のPromiseをobjectで返す。実行を開始しなかったらnullを返す。
    * @param label デバッグ表示用のラベル
    */
-  add(start: StartFunc, label: string) {
-    this.queue.push({ start, label });
+  add(prepare: PrepareFunc, label: string) {
+    if (prepare) {
+      this.queue.push({ prepare, label });
+    }
   }
 
   get state(): 'preparing' | 'running' | null {
-    return this.runningState ? this.runningState.state : null;
+    if (this.runningState) {
+      return this.runningState.state;
+    }
+    if (this.preparing) {
+      return 'preparing';
+    }
+    return null;
   }
 
   get length(): number {
-    return this.queue.length;
+    return this.queue.length + (this.preparing ? 1 : 0);
   }
 }

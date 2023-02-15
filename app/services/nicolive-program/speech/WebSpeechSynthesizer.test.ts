@@ -37,8 +37,9 @@ describe('WebSpeechSynthesizer', () => {
       rate: 0.5,
       volume: 0.5,
     };
-    const start = synth.speakText(speech, onstart, onend);
-    const running = start();
+    const prepare = synth.speakText(speech, onstart, onend);
+    const start = await prepare();
+    const running = start ? start() : null;
 
     expect(cancelMock).toBeCalledTimes(numCancel);
     expect(speakMock).toBeCalledTimes(numSpeak);

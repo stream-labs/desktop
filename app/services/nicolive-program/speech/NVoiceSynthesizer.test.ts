@@ -13,10 +13,10 @@ describe('NVoiceSynthesizer', async () => {
     const talkMock = jest.fn(async (text, options) => {
       await preparePromise;
       if (text) {
-        return {
+        return async () => ({
           cancel: cancelMock,
           speaking: speakingPromise,
-        };
+        });
       } else {
         return null;
       }
@@ -35,8 +35,8 @@ describe('NVoiceSynthesizer', async () => {
       volume: 0.5,
     };
 
-    const start = synth.speakText(speech, onstart, onend, onPhoneme);
-    const running = start();
+    const prepare = synth.speakText(speech, onstart, onend, onPhoneme);
+    const running = prepare().then(start => start ? start() : null);
 
     expect(talkMock).toBeCalledTimes(1);
     if (talkMock.mock.calls[0].length > 0) {

@@ -1,10 +1,10 @@
 import { sleep } from "util/sleep";
-import { QueueRunner } from "./QueueRunner";
+import { QueueRunner, StartFunc } from "./QueueRunner";
 
 class Task {
   completePrepare: (skip: boolean) => void;
   completeRun: () => void;
-  start: () => Promise<null | { cancel: () => Promise<void>, running: Promise<void> }>;
+  prepare: () => Promise<StartFunc | null>;
   state: 'idle' | 'preparing' | 'running' | 'completed' | 'canceled' = 'idle';
 
   constructor(startCallback: ((task: Task) => void) = undefined) {
@@ -19,7 +19,7 @@ class Task {
         this.state = 'completed';
       };
     });
-    this.start = async () => {
+    this.prepare = async () => async () => {
       this.state = 'preparing';
       if (startCallback) {
         startCallback(this);
@@ -55,7 +55,7 @@ describe('QueueRunner', () => {
     const queue = new QueueRunner();
     const task = new Task();
 
-    queue.add(task.start, 'one');
+    queue.add(task.prepare, 'one');
     expect(queue.length).toBe(1);
     expect(queue.state).toBe(null);
     expect(queue.isRunning).toBe(true);
@@ -80,7 +80,7 @@ describe('QueueRunner', () => {
     const queue = new QueueRunner();
     const task = new Task();
 
-    queue.add(task.start, 'one');
+    queue.add(task.prepare, 'one');
     expect(queue.length).toBe(1);
     expect(queue.state).toBe(null);
     expect(queue.isRunning).toBe(true);
@@ -99,7 +99,7 @@ describe('QueueRunner', () => {
   test('early cancel', async () => {
     const queue = new QueueRunner();
     const task = new Task();
-    queue.add(task.start, 'one');
+    queue.add(task.prepare, 'one');
     expect(queue.length).toBe(1);
     queue.cancel();
     await queue.waitUntilFinished();
@@ -112,7 +112,7 @@ describe('QueueRunner', () => {
   test('cancel while preparing', async () => {
     const queue = new QueueRunner();
     const task = new Task();
-    queue.add(task.start, 'one');
+    queue.add(task.prepare, 'one');
     queue.runNext();
     await sleep(0);
     expect(task.state).toBe('preparing');
@@ -128,7 +128,7 @@ describe('QueueRunner', () => {
   test('cancel while running', async () => {
     const queue = new QueueRunner();
     const task = new Task();
-    queue.add(task.start, 'one');
+    queue.add(task.prepare, 'one');
     queue.runNext();
     await sleep(0);
     task.completePrepare(false);
@@ -151,7 +151,7 @@ describe('QueueRunner', () => {
         t.completePrepare(false);
         t.completeRun();
       });
-      queue.add(task.start, n.toString());
+      queue.add(task.prepare, n.toString());
     }
     queue.runNext();
     await queue.waitUntilFinished();

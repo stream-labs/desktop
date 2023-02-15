@@ -11,7 +11,7 @@ export interface INVoiceTalker {
       maxTime: number;
       phonemeCallback?: (phoneme: string) => void,
     },
-  ): Promise<{ cancel: () => void; speaking: Promise<void> } | null>;
+  ): Promise<() => Promise<{ cancel: () => void; speaking: Promise<void> } | null>>;
 }
 
 export class NVoiceSynthesizer implements ISpeechSynthesizer {
@@ -25,7 +25,7 @@ export class NVoiceSynthesizer implements ISpeechSynthesizer {
   ) {
     return async () => {
       try {
-        const r = await this.nVoiceTalker.talk(speech.text, {
+        const start = await this.nVoiceTalker.talk(speech.text, {
           speed: 1 / (speech.rate || 1),
           volume: speech.volume,
           maxTime: speech.nVoice?.maxTime,
@@ -35,22 +35,28 @@ export class NVoiceSynthesizer implements ISpeechSynthesizer {
             }
           },
         });
-        if (r === null) {
-          // no sound
-          return;
+        if (!start) {
+          return null;
         }
-        (async () => {
-          onstart();
-          await r.speaking;
-          onend();
-        })();
-        return {
-          cancel: async () => {
-            r.cancel();
+        return async () => {
+          const r = await start();
+          if (r === null) {
+            // no sound
+            return null;
+          }
+          (async () => {
+            onstart();
             await r.speaking;
-          },
-          running: r.speaking,
-        };
+            onend();
+          })();
+          return {
+            cancel: async () => {
+              r.cancel();
+              await r.speaking;
+            },
+            running: r.speaking,
+          };
+        }
       } catch (error) {
         console.error(`NVoiceSynthesizer: text:${JSON.stringify(speech.text)} -> ${error}`);
       }
