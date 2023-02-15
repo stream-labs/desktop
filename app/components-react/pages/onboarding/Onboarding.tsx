@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import styles from './Onboarding.m.less';
 import commonStyles from './Common.m.less';
 import { Services } from 'components-react/service-provider';
@@ -11,7 +11,13 @@ import { IOnboardingStep, ONBOARDING_STEPS } from 'services/onboarding';
 import Scrollable from 'components-react/shared/Scrollable';
 
 export default function Onboarding() {
-  const { currentStep, next, processing, finish } = useModule(OnboardingModule);
+  const { currentStep, next, processing, finish, UsageStatisticsService } = useModule(
+    OnboardingModule,
+  );
+
+  useEffect(() => {
+    UsageStatisticsService.actions.recordShown('Onboarding', currentStep.component);
+  }, [currentStep.component]);
 
   // TODO: Onboarding service needs a refactor away from step index-based.
   // In the meantime, if we run a render cycle and step index is greater
@@ -43,7 +49,7 @@ export default function Onboarding() {
               {$t('Skip')}
             </button>
           )}
-          {<ActionButton />}
+          <ActionButton />
         </div>
       )}
     </div>
@@ -115,6 +121,10 @@ export class OnboardingModule {
     return Services.RecordingModeService;
   }
 
+  get UsageStatisticsService() {
+    return Services.UsageStatisticsService;
+  }
+
   get UserService() {
     return Services.UserService;
   }
@@ -150,6 +160,7 @@ export class OnboardingModule {
   }
 
   finish() {
+    this.UsageStatisticsService.actions.recordShown('Onboarding', 'completed');
     this.OnboardingService.actions.finish();
   }
 

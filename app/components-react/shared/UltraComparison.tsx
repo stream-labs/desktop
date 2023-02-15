@@ -4,16 +4,29 @@ import styles from './UltraComparison.m.less';
 import cx from 'classnames';
 import { Services } from 'components-react/service-provider';
 import UltraIcon from 'components-react/shared/UltraIcon';
+import { Tooltip } from 'antd';
+
+interface ITableHeader {
+  text: string;
+  icon: string;
+  tooltip?: string;
+  whisper?: string;
+}
 
 interface IUltraComparisonProps {
   onSkip?: () => void;
   condensed?: boolean;
+  tableHeaders?: ITableHeader[];
+  tableData?: {
+    standard: { text: string; key?: string }[];
+    prime: { text: string; key?: string }[];
+  };
   refl: string;
 }
 
 export function UltraComparison(p: IUltraComparisonProps) {
   const { MagicLinkService } = Services;
-  const tableHeaders = [
+  const tableHeaders = p.tableHeaders || [
     { text: $t('Themes and Overlays'), icon: 'icon-themes' },
     { text: $t('Alerts and Widgets'), icon: 'icon-alert-box' },
     { text: $t('Streamlabs Desktop'), icon: 'icon-desktop' },
@@ -29,7 +42,7 @@ export function UltraComparison(p: IUltraComparisonProps) {
       whisper: $t('Console, Crossclip, Oslo, Willow & Melon'),
     },
   ];
-  const primeMetadata = {
+  const tableData = p.tableData || {
     standard: [
       { text: $t('Access to Free Overlays and Themes') },
       { text: '✓', key: 'check1' },
@@ -73,13 +86,14 @@ export function UltraComparison(p: IUltraComparisonProps) {
         fontSize: p.condensed ? '10px' : undefined,
       }}
     >
-      <div className={cx(styles.headersContainer, { [styles.condensed]: p.condensed })}>
+      <div
+        className={cx(styles.headersContainer, {
+          [styles.condensed]: p.condensed,
+          [styles.custom]: p.tableHeaders,
+        })}
+      >
         {tableHeaders.map(header => (
-          <div className={styles.tableHeader} key={header.text}>
-            <i className={header.icon} />
-            <span>{header.text}</span>
-            {header.whisper && <div className={styles.whisper}>{header.whisper}</div>}
-          </div>
+          <TableHeader header={header} key={header.text} />
         ))}
       </div>
       <div
@@ -97,7 +111,7 @@ export function UltraComparison(p: IUltraComparisonProps) {
               : $t('Everything you need to go live. Always and forever free.')}
           </span>
         </div>
-        {primeMetadata.standard.map(data => (
+        {tableData.standard.map(data => (
           <div className={styles.row} key={data.key || data.text}>
             <span>{data.text}</span>
           </div>
@@ -122,7 +136,7 @@ export function UltraComparison(p: IUltraComparisonProps) {
               : $t('Includes everything in Starter plus:')}
           </span>
         </div>
-        {primeMetadata.prime.map(data => (
+        {tableData.prime.map(data => (
           <div className={cx(styles.row, styles.primeRow)} key={data.key || data.text}>
             <span>{data.text}</span>
           </div>
@@ -131,4 +145,23 @@ export function UltraComparison(p: IUltraComparisonProps) {
       </div>
     </div>
   );
+}
+
+function TableHeader(p: { header: ITableHeader }) {
+  const cell = (
+    <div className={styles.tableHeader} key={p.header.text}>
+      <i className={p.header.icon} />
+      <span>{p.header.text}</span>
+      {p.header.whisper && <div className={styles.whisper}>{p.header.whisper}</div>}
+      {p.header.tooltip && <i className="icon-question" />}
+    </div>
+  );
+
+  if (p.header.tooltip) {
+    return (
+      <Tooltip title={p.header.tooltip} placement="right">
+        {cell}
+      </Tooltip>
+    );
+  } else return cell;
 }
