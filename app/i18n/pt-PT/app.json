@@ -6,5 +6,8 @@
   "Streamlabs needs additional permissions. Grant permissions in the pop-up dialogs to continue.": "O Streamlabs requer permissões adicionais. Conceda permissões na caixa de diálogo de pop-up para continuar.",
   "Microphone": "Microfone",
   "Webcam": "Câmara Web",
-  "You've merged a Streamlabs ID to your account, please log back in to ensure you have the right credentials.": "You've merged a Streamlabs ID to your account, please log back in to ensure you have the right credentials."
+  "You've merged a Streamlabs ID to your account, please log back in to ensure you have the right credentials.": "You've merged a Streamlabs ID to your account, please log back in to ensure you have the right credentials.",
+  "Enable Live Streaming?": "Ativar transmissão ao vivo?",
+  "Streamlabs is currently in recording mode, which hides live streaming features. Would you like to enable live streaming features? You can disable them again in General settings.": "Streamlabs is currently in recording mode, which hides live streaming features. Would you like to enable live streaming features? You can disable them again in General settings.",
+  "Enable Streaming": "Enable Streaming"
 }
