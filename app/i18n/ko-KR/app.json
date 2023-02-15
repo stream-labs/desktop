@@ -6,5 +6,8 @@
   "Streamlabs needs additional permissions. Grant permissions in the pop-up dialogs to continue.": "Streamlabs에 추가적인 허가가 필요합니다. 계속하시려면 팝업 대화창을 승인하세요.",
   "Microphone": "마이크",
   "Webcam": "웹캠",
-  "You've merged a Streamlabs ID to your account, please log back in to ensure you have the right credentials.": "You've merged a Streamlabs ID to your account, please log back in to ensure you have the right credentials."
+  "You've merged a Streamlabs ID to your account, please log back in to ensure you have the right credentials.": "You've merged a Streamlabs ID to your account, please log back in to ensure you have the right credentials.",
+  "Enable Live Streaming?": "라이브 스트리밍 활성화?",
+  "Streamlabs is currently in recording mode, which hides live streaming features. Would you like to enable live streaming features? You can disable them again in General settings.": "Streamlabs is currently in recording mode, which hides live streaming features. Would you like to enable live streaming features? You can disable them again in General settings.",
+  "Enable Streaming": "Enable Streaming"
 }
