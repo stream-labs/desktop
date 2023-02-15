@@ -1,4 +1,3 @@
-import { VideoService } from "app-services";
 import electron from "electron";
 import path, { dirname } from 'path';
 import { $t } from 'services/i18n';
@@ -7,6 +6,7 @@ import { InitAfter, Inject, mutation, StatefulService } from "./core";
 import { ISceneNodeAddOptions } from "./scenes";
 import { ISourceApi, SourcesService } from "./sources";
 import { NVoiceCharacterManager } from "./sources/properties-managers/nvoice-character-manager";
+import { VideoService } from "./video";
 
 // NVoiceのキャラクターの種類を定義
 export const NVoiceCharacterTypes = ['near'] as const;
