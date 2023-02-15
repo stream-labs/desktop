@@ -213,13 +213,13 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
     const sceneNodes = this.scenesService.views.getSceneItemsBySceneId(sceneId);
     if (!sceneNodes) return false;
     return sceneNodes.reduce((created: boolean, sceneItem: SceneItem) => {
-      const nodeCreated = this.createOrAssignOutputNode(
+      const nodeCreatedId = this.createOrAssignOutputNode(
         sceneItem,
         display,
         isFirstDisplay,
         sceneId,
       );
-      if (!nodeCreated) {
+      if (!nodeCreatedId) {
         created = false;
       }
       return created;
@@ -236,27 +236,27 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
       // if it's the first display, just assign the scene item's output to a context
       const context = this.videoSettingsService.contexts[display];
 
-      if (!context) return false;
+      if (!context) return null;
 
       sceneItem.setSettings({ output: context }, display);
 
       // in preparation for unlimited display profiles
       // create a node map entry even though the key and value are the same
       this.SET_NODE_MAP_ITEM(display, sceneItem.id, sceneItem.id);
-      return true;
+      return sceneItem.id;
     } else {
       // if it's not the first display, copy the scene item
       const scene = this.scenesService.views.getScene(sceneId);
       const copiedSceneItem = scene.addSource(sceneItem.sourceId);
       const context = this.videoSettingsService.contexts[display];
 
-      if (!copiedSceneItem || !context) return false;
+      if (!copiedSceneItem || !context) return null;
 
       const settings: IPartialSettings = { ...sceneItem.getSettings(), output: context };
       copiedSceneItem.setSettings(settings, display);
 
       this.SET_NODE_MAP_ITEM(display, sceneItem.id, copiedSceneItem.id);
-      return true;
+      return sceneItem.id;
     }
   }
 
