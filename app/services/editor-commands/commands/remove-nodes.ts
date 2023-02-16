@@ -34,7 +34,6 @@ export class RemoveNodesCommand extends Command {
     });
 
     for (const item of this.selection.getItems()) {
-      // @@@ HERE remove item?
       const subCommand = new RemoveItemCommand(item.id);
       await subCommand.execute();
       this.removeItemSubCommands.push(subCommand);

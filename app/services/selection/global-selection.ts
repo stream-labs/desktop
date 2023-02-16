@@ -70,6 +70,10 @@ export class GlobalSelection extends Selection {
       .then(({ response }) => {
         if (!response) return;
         this.editorCommandsService.executeCommand('RemoveNodesCommand', this.clone());
+        // }).then(() => {
+        //   if (this.dualOutputService.views.dualOutputMode) {
+        //     this.dualOutputService.actions.removeDualOutputNodes(this.sceneItemId);
+        //   }
       });
   }
 

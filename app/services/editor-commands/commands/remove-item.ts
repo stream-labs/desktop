@@ -74,29 +74,26 @@ export class RemoveItemCommand extends Command {
       await this.sourceReviver.save({});
     }
 
-    if (this.dualOutputService.views.dualOutputMode) {
-      this.dualOutputNodeData = [];
-      // if the item was removed in dual output mode
-      // we need to destroy the dual output nodes as well
-      const { nodeMaps } = this.dualOutputService.views;
-      for (const display in nodeMaps) {
-        // this.dualOutputNodeData.push({
-        //   id: nodeMaps[display][this.sceneItemId],
-        //   display: display as TDisplayType,
-        // });
-        const nodeId = nodeMaps[display][this.sceneItemId];
-        this.scenesService.views.getScene(this.sceneId).removeItem(nodeId);
-        this.dualOutputNodeData.push({
-          id: nodeId,
-          display: display as TDisplayType,
-        });
-      }
-      // this.dualOutputNodeData.forEach(dualOutputNode => {
-      //   const node = this.scenesService.views.getSceneItem(dualOutputNode.id);
-      //   node.remove();
-      // });
-      this.dualOutputService.actions.removeDualOutputNodes(this.sceneItemId);
-    }
+    // if (this.dualOutputService.views.dualOutputMode) {
+    //   // this.dualOutputNodeData = [];
+    //   // if the item was removed in dual output mode
+    //   // we need to destroy the dual output nodes as well
+    //   const { nodeMaps } = this.dualOutputService.views;
+    //   console.log('remove nodeMaps ', nodeMaps);
+    //   for (const display in nodeMaps) {
+    //     // this.dualOutputNodeData.push({
+    //     //   id: nodeMaps[display][this.sceneItemId],
+    //     //   display: display as TDisplayType,
+    //     // });
+    //     const nodeId = nodeMaps[display][this.sceneItemId];
+    //     this.scenesService.views.getScene(this.sceneId).removeItem(nodeId);
+    //   }
+    //   // this.dualOutputNodeData.forEach(dualOutputNode => {
+    //   //   const node = this.scenesService.views.getSceneItem(dualOutputNode.id);
+    //   //   node.remove();
+    //   // });
+    //   this.dualOutputService.actions.removeDualOutputNodes(this.sceneItemId);
+    // }
 
     item.remove();
   }
@@ -116,14 +113,20 @@ export class RemoveItemCommand extends Command {
     if (this.dualOutputNodeData.length) {
       // if the scene item was deleted in dual output mode
       // restore the dual output scene items as well
-      this.dualOutputNodeData.forEach((dualOutputNode, index: number) => {
-        const item = scene.addSource(this.sourceId, { id: dualOutputNode.id, select: false });
+      // the scene item id doesn't matter for the dualOutputNodes
+      // so just create new ones
+      this.dualOutputNodeData = [];
 
-        // this.reorderNodesSubcommand.rollback();
-        item.setSettings(this.settings);
+      ['horizontal', 'vertical'].map((display: TDisplayType, index: number) => {
+        Promise.resolve(
+          this.dualOutputService.actions.return.createOrAssignOutputNode(
+            item,
+            display,
+            index === 0,
+            this.sceneId,
+          ),
+        ).then(id => this.dualOutputNodeData.push({ id, display }));
       });
     }
-
-    this.dualOutputService.actions.removeDualOutputNodes(this.sceneItemId);
   }
 }
