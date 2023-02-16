@@ -67,7 +67,7 @@ interface IOBSOutputSignalInfo {
   signal: EOBSOutputSignal;
   code: obs.EOutputCode;
   error: string;
-  service: number;
+  service: string;
 }
 
 export class StreamingService
