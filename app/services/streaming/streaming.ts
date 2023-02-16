@@ -67,6 +67,7 @@ interface IOBSOutputSignalInfo {
   signal: EOBSOutputSignal;
   code: obs.EOutputCode;
   error: string;
+  service: number;
 }
 
 export class StreamingService
@@ -132,6 +133,7 @@ export class StreamingService
 
   init() {
     obs.NodeObs.OBS_service_connectOutputSignals((info: IOBSOutputSignalInfo) => {
+      console.log('info ', info);
       this.handleOBSOutputSignal(info);
     });
 
@@ -728,8 +730,8 @@ export class StreamingService
       } else {
         const platform = this.views.enabledPlatforms[0];
         const contextData = this.views.getPlatformContextData(platform);
-        const horizontalContext = this.videoSettingsService.contexts[contextData.display];
-        obs.NodeObs.OBS_service_setVideoInfo(horizontalContext, contextData.displayId);
+        const context = this.videoSettingsService.contexts[contextData.display];
+        obs.NodeObs.OBS_service_setVideoInfo(context, contextData.displayId);
         obs.NodeObs.OBS_service_startStreaming(contextData.displayId);
       }
     } else {
