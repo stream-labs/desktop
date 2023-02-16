@@ -5,6 +5,8 @@ import { $t } from 'services/i18n';
 
 export const SynthesizerIds = ['webSpeech', 'nVoice'] as const;
 export type SynthesizerId = typeof SynthesizerIds[number];
+export const SynthesizerSelectors = [...SynthesizerIds, 'ignore'] as const;
+export type SynthesizerSelector = typeof SynthesizerSelectors[number];
 
 type SpeechSynthesizerSettingsState = {
   enabled: boolean;
@@ -13,9 +15,9 @@ type SpeechSynthesizerSettingsState = {
   volume: number;
   maxTime?: number;
   selector: {
-    normal: SynthesizerId;
-    operator: SynthesizerId;
-    system: SynthesizerId;
+    normal: SynthesizerSelector;
+    operator: SynthesizerSelector;
+    system: SynthesizerSelector;
   };
 };
 

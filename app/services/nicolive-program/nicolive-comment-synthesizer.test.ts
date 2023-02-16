@@ -75,6 +75,9 @@ test('makeSpeech', async () => {
   // 空文字列を与えるとnullが返ってくる
   expect(instance.makeSpeech(makeChat(''))).toBeNull();
 
+  // ignore 設定の時はnullが返ってくる
+  expect(instance.makeSpeech(makeChat('test'), 'ignore')).toBeNull();
+
   // stateの設定値を反映している
   expect(instance.makeSpeech(makeChat('test'))).toEqual({
     text: 'test',

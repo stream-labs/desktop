@@ -9,7 +9,7 @@ import { PhonemeServer } from './PhonemeServer';
 import { ISpeechSynthesizer } from './speech/ISpeechSynthesizer';
 import { NVoiceSynthesizer } from './speech/NVoiceSynthesizer';
 import { WebSpeechSynthesizer } from './speech/WebSpeechSynthesizer';
-import { NicoliveProgramStateService, SynthesizerId } from './state';
+import { NicoliveProgramStateService, SynthesizerId, SynthesizerSelector } from './state';
 import { WrappedChat } from './WrappedChat';
 
 export type Speech = {
@@ -32,9 +32,9 @@ interface ICommentSynthesizerState {
   volume: number; // SpeechSynthesisUtterance.volume; 0.1(lowest) to 1(highest)
   maxTime: number; // nVoice max time in seconds
   selector: {
-    normal: SynthesizerId;
-    operator: SynthesizerId;
-    system: SynthesizerId;
+    normal: SynthesizerSelector;
+    operator: SynthesizerSelector;
+    system: SynthesizerSelector;
   };
 }
 
@@ -117,7 +117,7 @@ export class NicoliveCommentSynthesizerService extends StatefulService<ICommentS
     return converted;
   }
 
-  private selectSpeechSynthesizer(chat: WrappedChat): SynthesizerId {
+  private selectSpeechSynthesizer(chat: WrappedChat): SynthesizerSelector {
     switch (chat.type) {
       case 'normal':
         return this.state.selector.normal;
@@ -128,8 +128,11 @@ export class NicoliveCommentSynthesizerService extends StatefulService<ICommentS
     }
   }
 
-  makeSpeech(chat: WrappedChat, synthId?: SynthesizerId): Speech | null {
+  makeSpeech(chat: WrappedChat, synthId?: SynthesizerSelector): Speech | null {
     const synthesizer = synthId || this.selectSpeechSynthesizer(chat);
+    if (synthesizer === 'ignore') {
+      return null;
+    }
 
     const r = this.makeSpeechText(chat, synthesizer);
     if (r === '') {
@@ -271,22 +274,22 @@ export class NicoliveCommentSynthesizerService extends StatefulService<ICommentS
   }
 
   // selector accessor
-  get normal(): SynthesizerId {
+  get normal(): SynthesizerSelector {
     return this.state.selector.normal;
   }
-  set normal(s: SynthesizerId) {
+  set normal(s: SynthesizerSelector) {
     this.setState({ selector: { ...this.state.selector, normal: s } });
   }
-  get operator(): SynthesizerId {
+  get operator(): SynthesizerSelector {
     return this.state.selector.operator;
   }
-  set operator(s: SynthesizerId) {
+  set operator(s: SynthesizerSelector) {
     this.setState({ selector: { ...this.state.selector, operator: s } });
   }
-  get system(): SynthesizerId {
+  get system(): SynthesizerSelector {
     return this.state.selector.system;
   }
-  set system(s: SynthesizerId) {
+  set system(s: SynthesizerSelector) {
     this.setState({ selector: { ...this.state.selector, system: s } });
   }
 

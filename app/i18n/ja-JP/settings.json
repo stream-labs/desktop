@@ -657,6 +657,7 @@
   },
   "synthId": {
     "webSpeech": "Windowsの音声合成",
-    "nVoice": "N Voice 琴詠ニア"
+    "nVoice": "N Voice 琴詠ニア",
+    "ignore": "読み上げない"
   }
 }

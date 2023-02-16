@@ -1,8 +1,7 @@
 import { Inject } from 'services/core/injector';
 import { NicoliveCommentLocalFilterService } from 'services/nicolive-program/nicolive-comment-local-filter';
 import { NicoliveCommentSynthesizerService } from 'services/nicolive-program/nicolive-comment-synthesizer';
-import { SynthesizerId, SynthesizerIds } from 'services/nicolive-program/state';
-import { sleep } from 'util/sleep';
+import { SynthesizerId, SynthesizerSelector, SynthesizerSelectors } from 'services/nicolive-program/state';
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import VueSlider from 'vue-slider-component';
@@ -77,37 +76,37 @@ export default class CommentSettings extends Vue {
     this.resetVolume();
   }
 
-  get synthIds(): readonly SynthesizerId[] {
-    return SynthesizerIds;
+  get synthIds(): readonly SynthesizerSelector[] {
+    return SynthesizerSelectors;
   }
   synthName(id: SynthesizerId): string {
     return this.$t(`settings.synthId.${id}`) as string;
   }
-  get normal(): SynthesizerId {
+  get normal(): SynthesizerSelector {
     return this.nicoliveCommentSynthesizerService.normal;
   }
-  set normal(s: SynthesizerId) {
+  set normal(s: SynthesizerSelector) {
     this.nicoliveCommentSynthesizerService.normal = s;
   }
-  get normalDefault(): SynthesizerId {
+  get normalDefault(): SynthesizerSelector {
     return NicoliveCommentSynthesizerService.initialState.selector.normal;
   }
-  get operator(): SynthesizerId {
+  get operator(): SynthesizerSelector {
     return this.nicoliveCommentSynthesizerService.operator;
   }
-  set operator(s: SynthesizerId) {
+  set operator(s: SynthesizerSelector) {
     this.nicoliveCommentSynthesizerService.operator = s;
   }
-  get operatorDefault(): SynthesizerId {
+  get operatorDefault(): SynthesizerSelector {
     return NicoliveCommentSynthesizerService.initialState.selector.operator;
   }
-  get system(): SynthesizerId {
+  get system(): SynthesizerSelector {
     return this.nicoliveCommentSynthesizerService.system;
   }
-  set system(s: SynthesizerId) {
+  set system(s: SynthesizerSelector) {
     this.nicoliveCommentSynthesizerService.system = s;
   }
-  get systemDefault(): SynthesizerId {
+  get systemDefault(): SynthesizerSelector {
     return NicoliveCommentSynthesizerService.initialState.selector.system;
   }
 
