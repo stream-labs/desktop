@@ -50,6 +50,18 @@ export class AutoConfigService extends Service {
     obs.NodeObs.StartBandwidthTest();
   }
 
+  async startRecording() {
+    obs.NodeObs.InitializeAutoConfig(
+      (progress: IConfigProgress) => {
+        this.handleProgress(progress);
+        this.configProgress.next(progress);
+      },
+      { continent: '', service_name: '' },
+    );
+
+    obs.NodeObs.StartRecordingEncoderTest();
+  }
+
   handleProgress(progress: IConfigProgress) {
     if (progress.event === 'stopping_step') {
       if (progress.description === 'bandwidth_test') {
