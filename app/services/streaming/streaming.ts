@@ -718,21 +718,21 @@ export class StreamingService
         // check if we need to force apply single stream settings?
         // this.settingsService.actions.setDualOutputSingleStreamData();
 
-        obs.NodeObs.OBS_service_setVideoInfo(horizontalContext, 0);
-        obs.NodeObs.OBS_service_setVideoInfo(verticalContext, 1);
+        obs.NodeObs.OBS_service_setVideoInfo(horizontalContext, 'horizontal');
+        obs.NodeObs.OBS_service_setVideoInfo(verticalContext, 'vertical');
 
-        obs.NodeObs.OBS_service_startStreaming(0);
+        obs.NodeObs.OBS_service_startStreaming('horizontal');
         // sleep for 1 second to allow the first stream to start before starting the second
         // better to replace with waiting for signal from obs about first stream starting successfully
         await new Promise(resolve => setTimeout(resolve, 1000));
 
-        obs.NodeObs.OBS_service_startStreaming(1);
+        obs.NodeObs.OBS_service_startStreaming('vertical');
       } else {
         const platform = this.views.enabledPlatforms[0];
-        const contextData = this.views.getPlatformContextData(platform);
-        const context = this.videoSettingsService.contexts[contextData.display];
-        obs.NodeObs.OBS_service_setVideoInfo(context, contextData.displayId);
-        obs.NodeObs.OBS_service_startStreaming(contextData.displayId);
+        const display = this.views.getPlatformDisplay(platform);
+        const context = this.videoSettingsService.contexts[display];
+        obs.NodeObs.OBS_service_setVideoInfo(context, display);
+        obs.NodeObs.OBS_service_startStreaming(display);
       }
     } else {
       console.log('hitting the else ', this.settingsService.views.all);
@@ -810,12 +810,12 @@ export class StreamingService
 
       if (this.views.isDualOutputMode) {
         if (this.views.enabledPlatforms.length > 1) {
-          obs.NodeObs.OBS_service_stopStreaming(false, 0);
-          obs.NodeObs.OBS_service_stopStreaming(false, 1);
+          obs.NodeObs.OBS_service_stopStreaming(false, 'horizontal');
+          obs.NodeObs.OBS_service_stopStreaming(false, 'vertical');
         } else {
           const platform = this.views.enabledPlatforms[0];
-          const contextData = this.views.getPlatformContextData(platform);
-          obs.NodeObs.OBS_service_stopStreaming(false, contextData.displayId);
+          const display = this.views.getPlatformDisplay(platform);
+          obs.NodeObs.OBS_service_stopStreaming(false, display);
         }
       } else {
         obs.NodeObs.OBS_service_stopStreaming(false);
@@ -842,8 +842,8 @@ export class StreamingService
 
     if (this.state.streamingStatus === EStreamingState.Ending) {
       if (this.views.isDualOutputMode) {
-        obs.NodeObs.OBS_service_stopStreaming(true, 0);
-        obs.NodeObs.OBS_service_stopStreaming(true, 1);
+        obs.NodeObs.OBS_service_stopStreaming(true, 'horizontal');
+        obs.NodeObs.OBS_service_stopStreaming(true, 'vertical');
       } else {
         obs.NodeObs.OBS_service_stopStreaming(true);
       }

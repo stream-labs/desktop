@@ -100,14 +100,6 @@ class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
     return this.videoSettingsService.contexts[display];
   }
 
-  getPlatformContextData(platform: TPlatform) {
-    const display = this.getPlatformDisplay(platform);
-    return {
-      display,
-      displayId: display === 'vertical' ? 1 : 0,
-    };
-  }
-
   getDisplayNodeMap(display: TDisplayType) {
     return this.state.nodeMaps[display];
   }
