@@ -195,6 +195,11 @@ class ScenesViews extends ViewHandler<IScenesState> {
     return scene.getItems();
   }
 
+  hasSceneItems(sceneId: string): boolean {
+    const sceneItems = this.getSceneItemsBySceneId(sceneId);
+    return this.getSceneItemsBySceneId(sceneId).length > 0;
+  }
+
   /**
    * Returns an array of all scene items across all scenes
    * referencing the given source id.

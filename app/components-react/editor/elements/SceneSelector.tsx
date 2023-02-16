@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import cx from 'classnames';
-import { Dropdown, Tooltip, Tree } from 'antd';
+import { Dropdown, Tooltip, Tree, message } from 'antd';
 import { DownOutlined } from '@ant-design/icons';
 import * as remote from '@electron/remote';
 import { Menu } from 'util/menus/Menu';
@@ -17,7 +17,6 @@ import { ERenderingMode } from '../../../../obs-api';
 import styles from './SceneSelector.m.less';
 import useBaseElement from './hooks';
 import { IScene } from 'services/scenes';
-import { message } from 'antd';
 
 function SceneSelector() {
   const {
@@ -29,6 +28,11 @@ function SceneSelector() {
     EditorCommandsService,
     DualOutputService,
   } = Services;
+
+  const v = useVuex(() => ({
+    dualOutputMode: DualOutputService.views.dualOutputMode,
+    toggleDualOutputMode: DualOutputService.actions.return.toggleDualOutputMode,
+  }));
 
   const { treeSort } = useTree(true);
 
@@ -185,12 +189,10 @@ function SceneSelector() {
           <div>
             {/* extra div to allow tooltip hover to render */}
             <SwitchInput
-              value={DualOutputService.views.dualOutputMode}
+              value={v.dualOutputMode}
               layout="horizontal"
               onChange={async () => {
-                const toggled = await DualOutputService.actions.return.toggleDualOutputMode(
-                  !DualOutputService.views.dualOutputMode,
-                );
+                const toggled = await v.toggleDualOutputMode(!v.dualOutputMode);
                 if (!toggled) {
                   message.error({
                     content: $t('Error toggling Dual Output Mode'),

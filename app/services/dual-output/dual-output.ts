@@ -44,11 +44,13 @@ class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
   }
 
   get hasDualOutputScenes() {
-    return (
-      this.state.nodeMaps &&
-      (this.state.nodeMaps.hasOwnProperty('horizontal') ||
-        this.state.nodeMaps.hasOwnProperty('vertical'))
-    );
+    if (!this.state.nodeMaps) return false;
+    for (const display in this.state.nodeMaps) {
+      if (!this.state.nodeMaps.hasOwnProperty(display)) {
+        return false;
+      }
+    }
+    return true;
   }
 
   get showDualOutputDisplays() {
@@ -118,6 +120,13 @@ class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
     const nodeId = this.getDisplayNodeId(display, defaultNodeId);
     return this.scenesService.views.getNodeVisibility(nodeId);
   }
+
+  getDualOutputNodeIds(sceneItemId: string) {
+    return [
+      this.state.nodeMaps['horizontal'][sceneItemId],
+      this.state.nodeMaps['vertical'][sceneItemId],
+    ];
+  }
 }
 
 @InitAfter('UserService')
@@ -149,7 +158,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
 
     this.sceneCollectionsService.collectionInitialized.subscribe(() => {
       if (this.state.dualOutputMode) {
-        this.mapSceneNodes(['horizontal', 'vertical']);
+        this.mapSceneNodes(this.state.displays);
       }
     });
 
@@ -162,7 +171,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
     this.scenesService.sceneSwitched.subscribe(() => {
       if (this.state.dualOutputMode && this.views.hasDualOutputScenes) {
         this.restoreScene(this.state.convertedDefaultDisplay);
-        this.mapSceneNodes(['horizontal', 'vertical'], this.scenesService.views.activeSceneId);
+        this.mapSceneNodes(this.state.displays, this.scenesService.views.activeSceneId);
       }
     });
   }
@@ -172,13 +181,23 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
    */
 
   async toggleDualOutputMode(status: boolean) {
+    if (!this.scenesService.views.hasSceneItems(this.scenesService.views.activeSceneId)) {
+      this.state.displays.forEach(async display => {
+        this.videoSettingsService.establishVideoContext(display);
+        this.SET_EMPTY_NODE_MAP(display);
+      });
+
+      this.setDualOutputMode(status);
+      return true;
+    }
+
     try {
       if (!status) {
         this.restoreScene(this.state.convertedDefaultDisplay);
         this.setDualOutputMode(status);
         return true;
       } else {
-        const created = this.mapSceneNodes(['horizontal', 'vertical']);
+        const created = this.mapSceneNodes(this.state.displays);
         if (created) {
           this.setDualOutputMode(status);
           return true;
@@ -325,6 +344,14 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
   }
 
   @mutation()
+  private SET_EMPTY_NODE_MAP(display: TDisplayType) {
+    if (!this.state.nodeMaps) {
+      this.state.nodeMaps = {};
+    }
+    this.state.nodeMaps[display] = {};
+  }
+
+  @mutation()
   private SET_NODE_MAP_ITEM(
     display: TDisplayType,
     originalSceneNodeId: string,
@@ -332,22 +359,15 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
   ) {
     if (!this.state.nodeMaps) {
       this.state.nodeMaps = {};
-      this.state.nodeMaps[display] = {
-        [originalSceneNodeId]: copiedSceneNodeId,
-      };
-    } else {
-      this.state.nodeMaps[display] = {
-        ...this.state.nodeMaps[display],
-        [originalSceneNodeId]: copiedSceneNodeId,
-      };
     }
+    this.state.nodeMaps[display] = {
+      ...this.state.nodeMaps[display],
+      [originalSceneNodeId]: copiedSceneNodeId,
+    };
   }
 
   @mutation()
   private REMOVE_DUAL_OUTPUT_NODES(nodeId: string) {
-    const horizontalNodeId = this.state.nodeMaps['horizontal'][nodeId];
-    const verticalNodeId = this.state.nodeMaps['vertical'][nodeId];
-
     // remove nodes from scene
 
     let newMap = {};
@@ -360,16 +380,5 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
       };
     }
     this.state.nodeMaps = newMap;
-  }
-
-  @mutation()
-  private DESTROY_DISPLAY_NODE_MAP(display: TDisplayType) {
-    const { nodeMaps } = this.state;
-    if (Object.keys(nodeMaps).length === 1) {
-      // if there is only one nodeMap, reset the nodeMaps property
-      this.state.nodeMaps = null;
-    } else {
-      delete this.state.nodeMaps[display];
-    }
   }
 }
