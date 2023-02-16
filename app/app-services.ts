@@ -65,6 +65,7 @@ export { MarkersService } from 'services/markers';
 export { UserService } from './services/user';
 export { YoutubeService } from 'services/platforms/youtube';
 export { TwitchService } from 'services/platforms/twitch';
+export { TwitchTagsService } from 'services/platforms/twitch/index';
 export { FacebookService } from 'services/platforms/facebook';
 export { TiktokService } from 'services/platforms/tiktok';
 export { TrovoService } from 'services/platforms/trovo';
@@ -135,6 +136,7 @@ import { TwitterService } from './services/integrations/twitter';
 import { SettingsService } from './services/settings';
 import { UserService } from './services/user';
 import { TwitchService } from './services/platforms/twitch';
+import { TwitchTagsService } from './services/platforms/twitch/index';
 import { TrovoService } from './services/platforms/trovo';
 import { YoutubeService } from './services/platforms/youtube';
 import { FacebookService } from './services/platforms/facebook';
@@ -211,6 +213,7 @@ export const AppServices = {
   FacebookService,
   UserService,
   TwitchService,
+  TwitchTagsService,
   TrovoService,
   DismissablesService,
   HighlighterService,
