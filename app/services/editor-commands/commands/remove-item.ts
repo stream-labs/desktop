@@ -34,7 +34,7 @@ export class RemoveItemCommand extends Command {
   private reorderNodesSubcommand: ReorderNodesCommand;
 
   private settings: ISceneItemSettings;
-  private dualOutputNodeData: { id: string; display: TDisplayType }[];
+  private dualOutputVerticalNodeId: string;
 
   constructor(private sceneItemId: string) {
     super();
@@ -74,28 +74,20 @@ export class RemoveItemCommand extends Command {
       await this.sourceReviver.save({});
     }
 
-    // if (this.dualOutputService.views.dualOutputMode) {
-    //   // this.dualOutputNodeData = [];
-    //   // if the item was removed in dual output mode
-    //   // we need to destroy the dual output nodes as well
-    //   const { nodeMaps } = this.dualOutputService.views;
-    //   console.log('remove nodeMaps ', nodeMaps);
-    //   for (const display in nodeMaps) {
-    //     // this.dualOutputNodeData.push({
-    //     //   id: nodeMaps[display][this.sceneItemId],
-    //     //   display: display as TDisplayType,
-    //     // });
-    //     const nodeId = nodeMaps[display][this.sceneItemId];
-    //     this.scenesService.views.getScene(this.sceneId).removeItem(nodeId);
-    //   }
-    //   // this.dualOutputNodeData.forEach(dualOutputNode => {
-    //   //   const node = this.scenesService.views.getSceneItem(dualOutputNode.id);
-    //   //   node.remove();
-    //   // });
-    //   this.dualOutputService.actions.removeDualOutputNodes(this.sceneItemId);
-    // }
+    if (this.dualOutputService.views.dualOutputMode) {
+      console.log('dual output mode');
+
+      const verticalNodeId = this.dualOutputService.views.nodeMaps.vertical[item.id];
+      const verticalNode = this.scenesService.views.getSceneItem(verticalNodeId);
+      verticalNode.remove();
+
+      this.dualOutputVerticalNodeId = verticalNodeId;
+
+      this.dualOutputService.actions.removeDualOutputNodes(this.sceneItemId);
+    }
 
     item.remove();
+    console.log('called');
   }
 
   async rollback() {
@@ -110,23 +102,20 @@ export class RemoveItemCommand extends Command {
     this.reorderNodesSubcommand.rollback();
     item.setSettings(this.settings);
 
-    if (this.dualOutputNodeData.length) {
+    if (this.dualOutputService.views.dualOutputMode && this.dualOutputVerticalNodeId) {
       // if the scene item was deleted in dual output mode
       // restore the dual output scene items as well
       // the scene item id doesn't matter for the dualOutputNodes
       // so just create new ones
-      this.dualOutputNodeData = [];
 
-      ['horizontal', 'vertical'].map((display: TDisplayType, index: number) => {
-        Promise.resolve(
-          this.dualOutputService.actions.return.createOrAssignOutputNode(
-            item,
-            display,
-            index === 0,
-            this.sceneId,
-          ),
-        ).then(id => this.dualOutputNodeData.push({ id, display }));
+      const verticalItem = scene.addSource(this.sourceId, {
+        id: this.dualOutputVerticalNodeId,
+        select: false,
       });
+
+      verticalItem.setSettings(this.settings);
+
+      this.dualOutputService.restoreNodesToMap(item.id, verticalItem.id);
     }
   }
 }

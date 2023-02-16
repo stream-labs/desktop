@@ -144,7 +144,7 @@ export class SceneItem extends SceneItemNode {
   }
 
   @ExecuteInWorkerProcess()
-  setSettings(patch: IPartialSettings, display?: TDisplayType) {
+  setSettings(patch: IPartialSettings) {
     // update only changed settings to reduce the amount of IPC calls
     const obsSceneItem = this.getObsSceneItem();
     const changed = Utils.getChangedParams(this.state, patch);

@@ -253,11 +253,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
   ) {
     if (isFirstDisplay) {
       // if it's the first display, just assign the scene item's output to a context
-      const context = this.videoSettingsService.contexts[display];
-
-      if (!context) return null;
-
-      sceneItem.setSettings({ output: context }, display);
+      this.assignNodeContext(sceneItem, display);
 
       // in preparation for unlimited display profiles
       // create a node map entry even though the key and value are the same
@@ -272,11 +268,19 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
       if (!copiedSceneItem || !context) return null;
 
       const settings: IPartialSettings = { ...sceneItem.getSettings(), output: context };
-      copiedSceneItem.setSettings(settings, display);
+      copiedSceneItem.setSettings(settings);
 
       this.SET_NODE_MAP_ITEM(display, sceneItem.id, copiedSceneItem.id);
       return sceneItem.id;
     }
+  }
+
+  assignNodeContext(sceneItem: SceneItem, display: TDisplayType) {
+    const context = this.videoSettingsService.contexts[display];
+    if (!context) return null;
+
+    sceneItem.setSettings({ output: context });
+    return sceneItem.id;
   }
 
   restoreScene(display: TDisplayType) {
@@ -293,7 +297,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
       sceneNodes.forEach((sceneItem: SceneItem) => {
         if (nodesToReassign.includes(sceneItem.id)) {
           const setting: IPartialSettings = { output: defaultContext };
-          sceneItem.setSettings(setting, display);
+          sceneItem.setSettings(setting);
         } else {
           sceneItem.remove();
         }
@@ -313,10 +317,9 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
     this.REMOVE_DUAL_OUTPUT_NODES(nodeId);
   }
 
-  restoreNodesToMap(sceneItemId: string, nodeData: { id: string; display: TDisplayType }[]) {
-    nodeData.forEach(node => {
-      this.SET_NODE_MAP_ITEM(node.display, sceneItemId, node.id);
-    });
+  restoreNodesToMap(sceneItemId: string, verticalSceneItemId: string) {
+    this.SET_NODE_MAP_ITEM('horizontal', sceneItemId, sceneItemId);
+    this.SET_NODE_MAP_ITEM('vertical', sceneItemId, verticalSceneItemId);
   }
 
   /**

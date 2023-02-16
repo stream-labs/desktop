@@ -13,7 +13,7 @@ export class CreateNewItemCommand extends Command {
   private sourceId: string;
   private sceneItemId: string;
 
-  private dualOutputNodeData: { id: string; display: TDisplayType }[];
+  private dualOutputVerticalNodeId: string;
 
   description: string;
 
@@ -38,18 +38,16 @@ export class CreateNewItemCommand extends Command {
       .createAndAddSource(this.name, this.type, this.settings, this.options);
 
     if (this.dualOutputService.views.dualOutputMode) {
-      this.dualOutputNodeData = [];
+      this.dualOutputService.actions.assignNodeContext(item, 'horizontal');
 
-      ['horizontal', 'vertical'].map((display: TDisplayType, index: number) => {
-        Promise.resolve(
-          this.dualOutputService.actions.return.createOrAssignOutputNode(
-            item,
-            display,
-            index === 0,
-            this.sceneId,
-          ),
-        ).then(id => this.dualOutputNodeData.push({ id, display }));
-      });
+      Promise.resolve(
+        this.dualOutputService.actions.return.createOrAssignOutputNode(
+          item,
+          'vertical',
+          false,
+          this.sceneId,
+        ),
+      ).then(id => (this.dualOutputVerticalNodeId = id));
     }
 
     this.sourceId = item.sourceId;
@@ -61,10 +59,10 @@ export class CreateNewItemCommand extends Command {
   rollback() {
     this.scenesService.views.getScene(this.sceneId).removeItem(this.sceneItemId);
 
-    if (this.dualOutputService.views.dualOutputMode) {
-      this.dualOutputNodeData.map(node => {
-        this.scenesService.views.getScene(this.sceneId).removeItem(node.id);
-      });
+    if (this.dualOutputService.views.dualOutputMode && this.dualOutputVerticalNodeId) {
+      this.scenesService.views.getScene(this.sceneId).removeItem(this.dualOutputVerticalNodeId);
+
+      this.dualOutputService.removeDualOutputNodes(this.sceneItemId);
     }
   }
 }
