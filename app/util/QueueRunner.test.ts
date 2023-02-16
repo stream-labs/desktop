@@ -143,7 +143,9 @@ describe('QueueRunner', () => {
   });
 
   test('run sequentially', async () => {
-    const queue = new QueueRunner();
+    const queue = new QueueRunner({
+      log: ({ state, label }) => console.log(`QueueRunner: ${state} ${label}`),
+    });
     const results: number[] = [];
     for (const n of [1, 2, 3]) {
       const task = new Task(t => {

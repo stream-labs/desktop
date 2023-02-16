@@ -25,12 +25,18 @@ export class QueueRunner {
     setTimeout(() => this._run(), 0);
   }
   private finishNotifier = new WaitNotify();
-  private debug: boolean;
+  private logCallback: (obj: { state: string, label: string }) => void;
 
   constructor(options: {
-    debug?: boolean;
+    log?: (obj: { state: string, label: string }) => void;
   } = {}) {
-    this.debug = options.debug || false;
+    this.logCallback = options.log || undefined;
+  }
+
+  log(state: string, label: string) {
+    if (this.logCallback) {
+      this.logCallback({ state, label });
+    }
   }
 
   private async _run() {
@@ -46,14 +52,10 @@ export class QueueRunner {
         preparing.then((start) => {
           if (!start) {
             this.preparing = null;
-            if (this.debug) {
-              console.log(`QueueRunner: prepared null ${label}`);
-            }
+            this.log('prepared null', label);
             this.runNext();
           } else {
-            if (this.debug) {
-              console.log(`QueueRunner: prepared ${label}`);
-            }
+            this.log('prepared', label);
             if (!this.runningState) {
               this.runNext();
             }
@@ -72,9 +74,7 @@ export class QueueRunner {
       let resolveRunning2: () => void = () => { };
       const running2 = new Promise<void>((resolve) => { resolveRunning2 = resolve; });
       running2.then(() => {
-        if (this.debug) {
-          console.log(`QueueRunner: finished ${label}`);
-        }
+        this.log('finished', label);
         this.runningState = null;
         this.runNext();
       });
@@ -87,30 +87,22 @@ export class QueueRunner {
         running: running2,
         state: 'preparing',
       };
-      if (this.debug) {
-        console.log(`QueueRunner: preparing ${label}`);
-      }
+      this.log('preparing', label);
       preparing.then((start) => {
         return start ? start() : null;
       }).then((r) => {
         if (!r) {
-          if (this.debug) {
-            console.log(`QueueRunner: not started ${label}`);
-          }
+          this.log('not started', label);
           resolveRunning2();
         } else {
           const { cancel, running: speaking } = r;
           if (earlyCancel) {
-            if (this.debug) {
-              console.log(`QueueRunner: early cancel ${label}`);
-            }
+            this.log('early cancel', label);
             cancel().then(() => {
               resolveRunning2();
             });
           } else {
-            if (this.debug) {
-              console.log(`QueueRunner: running ${label}`);
-            }
+            this.log('running', label);
             this.runningState = {
               cancel: async () => {
                 this.runningState.cancel = async () => { await running2; };
