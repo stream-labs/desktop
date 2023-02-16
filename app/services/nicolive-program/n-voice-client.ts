@@ -74,7 +74,7 @@ export class NVoiceClientService extends StatefulService<INVoiceClientState> imp
   private index = 0;
   private speaking: Promise<void> | undefined;
 
-  async talk(text: string, options: { speed: number; volume: number; maxTime: number; phonemeCallback?: (phoneme: string) => void }): Promise<{ cancel: () => void; speaking: Promise<void> } | null> {
+  async talk(text: string, options: { speed: number; volume: number; maxTime: number; phonemeCallback?: (phoneme: string) => void }): Promise<null | (() => Promise<{ cancel: () => void; speaking: Promise<void> } | null>)> {
     const client = this.client;
     const tempDir = electron.remote.app.getPath('temp');
     const wavFileName = join(tempDir, `n-voice-talk-${this.index}.wav`);
@@ -86,34 +86,36 @@ export class NVoiceClientService extends StatefulService<INVoiceClientState> imp
       return null;
     }
 
-    if (this.speaking) {
-      await this.speaking;
-    }
-
-    const startTime = Date.now();
-    const { cancel, done } = await playAudio(wave, options.volume);
-    let phonemeCancel = false;
-    if (options.phonemeCallback) {
-      const phonemeLoop = async () => {
-        for (const label of labels) {
-          const elapsed = Date.now() - startTime;
-          const start = label.start * 1000;
-          if (start > elapsed) {
-            await sleep(start - elapsed);
-          }
-          if (phonemeCancel) {
-            break;
-          }
-          options.phonemeCallback(label.phoneme);
-        }
-        options.phonemeCallback(''); // done
+    return async () => {
+      if (this.speaking) {
+        await this.speaking;
       }
-      phonemeLoop();
+
+      const startTime = Date.now();
+      const { cancel, done } = await playAudio(wave, options.volume);
+      let phonemeCancel = false;
+      if (options.phonemeCallback) {
+        const phonemeLoop = async () => {
+          for (const label of labels) {
+            const elapsed = Date.now() - startTime;
+            const start = label.start * 1000;
+            if (start > elapsed) {
+              await sleep(start - elapsed);
+            }
+            if (phonemeCancel) {
+              break;
+            }
+            options.phonemeCallback(label.phoneme);
+          }
+          options.phonemeCallback(''); // done
+        }
+        phonemeLoop();
+      }
+      this.speaking = done;
+      return {
+        cancel: () => { phonemeCancel = true; cancel() },
+        speaking: done,
+      };
     }
-    this.speaking = done;
-    return {
-      cancel: () => { phonemeCancel = true; cancel() },
-      speaking: this.speaking,
-    };
   }
 };

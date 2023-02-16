@@ -15,11 +15,9 @@ describe('WebSpeechSynthesizer', () => {
   });
 
   test.each([
-    ['test', false, 1, 0],
-    ['test', true, 1, 1],
-    ['', false, 0, 0],
-    ['', true, 0, 0],
-  ])(`speakText(%s force:%s speak:%i cancel:%i)`, async (text: string, force: boolean, numSpeak: number, numCancel: number) => {
+    ['test', 1, 0],
+    ['', 0, 0],
+  ])(`speakText(%s speak:%i cancel:%i)`, async (text: string, numSpeak: number, numCancel: number) => {
     const speakMock = jest.fn();
     const cancelMock = jest.fn();
     jest.spyOn(window, 'speechSynthesis', 'get').mockImplementation(() => ({
@@ -39,7 +37,9 @@ describe('WebSpeechSynthesizer', () => {
       rate: 0.5,
       volume: 0.5,
     };
-    synth.speakText(speech, onstart, onend, force);
+    const prepare = synth.speakText(speech, onstart, onend);
+    const start = await prepare();
+    const running = start ? start() : null;
 
     expect(cancelMock).toBeCalledTimes(numCancel);
     expect(speakMock).toBeCalledTimes(numSpeak);
@@ -58,6 +58,10 @@ describe('WebSpeechSynthesizer', () => {
       expect(onend).toBeCalledTimes(0);
       utterance.onend({} as SpeechSynthesisEvent);
       expect(onend).toBeCalledTimes(1);
+    }
+    const result = await running;
+    if (result) {
+      await result.running;
     }
   });
 

@@ -216,7 +216,7 @@ export class NicoliveCommentViewerService extends StatefulService<INicoliveComme
     for (const chat of values) {
       const speech = this.nicoliveCommentSynthesizerService.makeSpeech(chat);
       if (speech) {
-        this.nicoliveCommentSynthesizerService.startSpeaking(
+        this.nicoliveCommentSynthesizerService.queueToSpeech(
           speech,
           () => {
             this.SET_STATE({

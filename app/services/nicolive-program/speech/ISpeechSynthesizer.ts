@@ -1,3 +1,4 @@
+import { PrepareFunc } from 'util/QueueRunner';
 import { Speech } from '../nicolive-comment-synthesizer';
 
 
@@ -6,10 +7,6 @@ export interface ISpeechSynthesizer {
     speech: Speech,
     onstart: () => void,
     onend: () => void,
-    force?: boolean,
     onPhoneme?: (phoneme: string) => void,
-  ): void;
-  speaking: boolean;
-  cancelSpeak(): Promise<void>;
-  waitForSpeakEnd(): Promise<void>;
+  ): PrepareFunc;
 }

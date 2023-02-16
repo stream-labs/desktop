@@ -1,6 +1,5 @@
-import { NVoiceCharacterService } from "app-services";
 import { Inject } from "services/core/injector";
-import { NVoiceCharacterType, NVoiceCharacterTypes } from "services/nvoice-character";
+import { NVoiceCharacterService, NVoiceCharacterType, NVoiceCharacterTypes } from "services/nvoice-character";
 import { PropertiesManager } from "./properties-manager";
 
 export interface INVoiceCharacterSettings {

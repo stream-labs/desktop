@@ -2,15 +2,9 @@ import { sleep } from 'util/sleep';
 import { Speech } from '../nicolive-comment-synthesizer';
 import { NVoiceSynthesizer } from './NVoiceSynthesizer';
 
-type CancelType = 'none' | 'early' | 'playing';
 describe('NVoiceSynthesizer', async () => {
-  test.each([
-    ['test', 1, 'none'],
-    ['test', 1, 'early'],
-    ['test', 1, 'playing'],
-    ['', 0, 'none'],
-    // TODO forceのテスト
-  ])(`speakText(%s speak:%i cancel:%s)`, async (text: string, numSpeak: number, cancel: CancelType) => {
+  test('speakText', async () => {
+
     const cancelMock = jest.fn(async () => { });
     let resolvePrepare: () => void;
     const preparePromise = new Promise<void>((resolve) => { resolvePrepare = resolve });
@@ -19,10 +13,10 @@ describe('NVoiceSynthesizer', async () => {
     const talkMock = jest.fn(async (text, options) => {
       await preparePromise;
       if (text) {
-        return {
+        return async () => ({
           cancel: cancelMock,
           speaking: speakingPromise,
-        };
+        });
       } else {
         return null;
       }
@@ -33,24 +27,16 @@ describe('NVoiceSynthesizer', async () => {
     const onPhoneme = jest.fn();
     const speech: Speech = {
       synthesizer: 'nVoice',
-      text,
+      text: 'test',
       nVoice: {
         maxTime: 4,
       },
       rate: 0.5,
       volume: 0.5,
     };
-    expect(synth.speaking).toBeFalsy();
 
-    synth.speakText(speech, onstart, onend, false, onPhoneme);
-    expect(synth.speaking).toBeTruthy();
-    expect(synth.queueLength).toBe(1);
-    expect(synth.playState).toBeNull();
-
-    await sleep(0); // wait for start queue
-    expect(synth.speaking).toBeTruthy();
-    expect(synth.queueLength).toBe(0);
-    expect(synth.playState).toBe('preparing');
+    const prepare = synth.speakText(speech, onstart, onend, onPhoneme);
+    const running = prepare().then(start => start ? start() : null);
 
     expect(talkMock).toBeCalledTimes(1);
     if (talkMock.mock.calls[0].length > 0) {
@@ -62,51 +48,18 @@ describe('NVoiceSynthesizer', async () => {
       expect(optionsArg.maxTime).toEqual(speech.nVoice.maxTime);
     }
 
-    switch (cancel) {
-      case 'none':
-      case 'playing':
-        resolvePrepare();
-        await sleep(0);
-        if (numSpeak > 0) {
-          expect(synth.playState).toBe('playing');
-          expect(cancelMock).toBeCalledTimes(0);
-          expect(onstart).toBeCalledTimes(numSpeak);
-          expect(onend).toBeCalledTimes(0);
+    resolvePrepare();
+    const result = await running;
+    expect(result).not.toBeNull();
+    expect(cancelMock).toBeCalledTimes(0);
+    expect(onstart).toBeCalledTimes(1);
+    expect(onend).toBeCalledTimes(0);
 
-          if (cancel === 'playing') {
-            synth.cancelSpeak();
-            expect(cancelMock).toBeCalledTimes(1);
-          }
-
-          resolveSpeaking();
-          await sleep(0);
-          expect(onend).toBeCalledTimes(1);
-          expect(synth.queueLength).toBe(0);
-          expect(synth.playState).toBeNull();
-          expect(synth.speaking).toBeFalsy();
-        } else {
-          expect(synth.queueLength).toBe(0);
-          expect(synth.playState).toBeNull();
-          expect(synth.speaking).toBeFalsy();
-        }
-        break;
-
-      case 'early':
-        synth.cancelSpeak();
-        resolvePrepare();
-        await sleep(0);
-        expect(cancelMock).toBeCalledTimes(1);
-        expect(onstart).toBeCalledTimes(1);
-        expect(onend).toBeCalledTimes(0);
-        resolveSpeaking();
-        await sleep(0);
-        expect(onend).toBeCalledTimes(1);
-        expect(synth.queueLength).toBe(0);
-        expect(synth.playState).toBeNull();
-        expect(synth.speaking).toBeFalsy();
-        break;
-    }
+    resolveSpeaking();
+    await sleep(0);
+    expect(onend).toBeCalledTimes(1);
+    await result.running;
   });
 
+  test.todo('cancel');
 });
-
