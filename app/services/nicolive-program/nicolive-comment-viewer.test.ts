@@ -42,12 +42,12 @@ test('接続先情報が来たら接続する', () => {
   const stateChange = new Subject();
   const clientSubject = new Subject();
   jest.doMock('./MessageServerClient', () => ({
-    ...jest.requireActual('./MessageServerClient'),
+    ...(jest.requireActual('./MessageServerClient') as {}),
     MessageServerClient: class MessageServerClient {
       connect() {
         return clientSubject;
       }
-      requestLatestMessages() {}
+      requestLatestMessages() { }
     },
   }));
   setup({ injectee: { NicoliveProgramService: { stateChange } } });
@@ -69,7 +69,7 @@ test('接続先情報が欠けていたら接続しない', () => {
       connect() {
         return clientSubject;
       }
-      requestLatestMessages() {}
+      requestLatestMessages() { }
     },
   }));
   setup({ injectee: { NicoliveProgramService: { stateChange } } });
@@ -88,12 +88,12 @@ test('/disconnectが流れてきたらunsubscribeする', () => {
   const clientSubject = new Subject();
   jest.doMock('./MessageServerClient', () => {
     return {
-      ...jest.requireActual('./MessageServerClient'),
+      ...(jest.requireActual('./MessageServerClient') as {}),
       MessageServerClient: class MessageServerClient {
         connect() {
           return clientSubject;
         }
-        requestLatestMessages() {}
+        requestLatestMessages() { }
       },
     };
   });
@@ -123,12 +123,12 @@ function connectionSetup() {
   const stateChange = new Subject();
   const clientSubject = new Subject();
   jest.doMock('./MessageServerClient', () => ({
-    ...jest.requireActual('./MessageServerClient'),
+    ...(jest.requireActual('./MessageServerClient') as {}),
     MessageServerClient: class MessageServerClient {
       connect() {
         return clientSubject;
       }
-      requestLatestMessages() {}
+      requestLatestMessages() { }
     },
   }));
   setup({ injectee: { NicoliveProgramService: { stateChange } } });
