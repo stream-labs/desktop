@@ -95,7 +95,7 @@ export class QueueRunner {
           this.log('not started', label);
           resolveRunning2();
         } else {
-          const { cancel, running: speaking } = r;
+          const { cancel, running } = r;
           if (earlyCancel) {
             this.log('early cancel', label);
             cancel().then(() => {
@@ -109,7 +109,7 @@ export class QueueRunner {
                 await cancel();
                 await running2;
               },
-              running: speaking.then(() => {
+              running: running.then(() => {
                 resolveRunning2();
               }),
               state: 'running',
