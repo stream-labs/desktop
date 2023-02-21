@@ -2042,15 +2042,15 @@
   resolved "https://registry.yarnpkg.com/@leichtgewicht/ip-codec/-/ip-codec-2.0.4.tgz#b2ac626d6cb9c8718ab459166d4bb405b8ffa78b"
   integrity sha512-Hcv+nVC0kZnQ3tD9GVu5xSMR4VVYOteQIr/hwFPVEvPdlXqgGEuRjiheChHgdM+JyqdgNcmzZOX/tnl0JOiI7A==
 
-"@n-air-app/n-voice-package@^1.0.0":
-  version "1.0.0"
-  resolved "https://npm.pkg.github.com/download/@n-air-app/n-voice-package/1.0.0/8aa84627bf03b5e475a949b160d9004647cd2d80#8aa84627bf03b5e475a949b160d9004647cd2d80"
-  integrity sha512-aBRAtp4kBk6FPGqRJnH71mhQkZatBKTY1vPdKNQwAd8Qd3vz79Wd7yQ88hXygwrtHOkH23cv5ulJBhqCt8nB9w==
+"@n-air-app/n-voice-package@^1.0.1":
+  version "1.0.1"
+  resolved "https://npm.pkg.github.com/download/@n-air-app/n-voice-package/1.0.1/b717fc5c92d424368c8d0bbaff0cf7f459f55459#b717fc5c92d424368c8d0bbaff0cf7f459f55459"
+  integrity sha512-RQi8X/Gq66ybE7DEPsvAWVKnVvh7wyylcn3ZlbnNhnh+Y4XoGdKgVqbEczIWbpKZLlo4/yaL7d7qI3Pn+WB4ow==
   dependencies:
     "@rollup/plugin-babel" "^6.0.3"
     "@rollup/plugin-terser" "^0.4.0"
     "@types/node" "^18.11.19"
-    rollup "^3.14.0"
+    rollup "^3.17.2"
     rollup-plugin-typescript2 "^0.34.1"
     typescript "^4.9.5"
 
@@ -13828,10 +13828,10 @@ rollup-plugin-typescript2@^0.34.1:
     semver "^7.3.7"
     tslib "^2.4.0"
 
-rollup@^3.14.0:
-  version "3.14.0"
-  resolved "https://registry.yarnpkg.com/rollup/-/rollup-3.14.0.tgz#f5925255f3b6e8de1dba3916d7619c7da5708d95"
-  integrity sha512-o23sdgCLcLSe3zIplT9nQ1+r97okuaiR+vmAPZPTDYB7/f3tgWIYNyiQveMsZwshBT0is4eGax/HH83Q7CG+/Q==
+rollup@^3.17.2:
+  version "3.17.2"
+  resolved "https://registry.yarnpkg.com/rollup/-/rollup-3.17.2.tgz#a4ecd29c488672a0606e41ef57474fad715750a9"
+  integrity sha512-qMNZdlQPCkWodrAZ3qnJtvCAl4vpQ8q77uEujVCCbC/6CLB7Lcmvjq7HyiOSnf4fxTT9XgsE36oLHJBH49xjqA==
   optionalDependencies:
     fsevents "~2.3.2"
 
