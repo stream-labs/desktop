@@ -28,7 +28,7 @@ class SettingsManagerServiceViews extends ViewHandler<ISettingsManagerServiceSta
 }
 
 export class SettingsManagerService extends PersistentStatefulService<ISettingsManagerServiceState> {
-  defaultState = {
+  static defaultState = {
     videoSettings: {
       defaultVideoSetting: 'default', // setting for default horizontal display pulled directly from obs so not persisted
       defaultVertical: verticalDisplayData, // setting for default vertical display

@@ -12,6 +12,7 @@ import { TDisplayType, VideoSettingsService } from 'services/settings-v2/video';
 import { StreamingService } from 'services/streaming';
 import { SceneCollectionsService } from 'services/scene-collections';
 import { TPlatform } from 'services/platforms';
+import { ReorderNodesCommand, EPlaceType } from 'services/editor-commands/commands/reorder-nodes';
 import { Subject } from 'rxjs';
 
 interface IDualOutputServiceState {
@@ -261,6 +262,13 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
 
       const settings: IPartialSettings = { ...sceneItem.getSettings(), output: context };
       copiedSceneItem.setSettings(settings);
+
+      const reorderNodesSubcommand = new ReorderNodesCommand(
+        scene.getSelection(copiedSceneItem.id),
+        sceneItem.id,
+        EPlaceType.Before,
+      );
+      reorderNodesSubcommand.execute();
 
       this.SET_NODE_MAP_ITEM(display, sceneItem.id, copiedSceneItem.id);
       return sceneItem.id;

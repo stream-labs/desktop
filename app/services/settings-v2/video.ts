@@ -206,6 +206,7 @@ export class VideoSettingsService extends StatefulService<IVideoSettings> {
 
     if (display === 'default') {
       // if this the default display is the horizontal display, get the settings from obs
+      // @@@ TODO: handle vertical being the default display
       this.state.default = this.state.videoContext.video;
       Object.keys(this.state.videoContext.legacySettings).forEach(
         (key: keyof obs.IAdvancedStreaming | keyof obs.ISimpleStreaming) => {
