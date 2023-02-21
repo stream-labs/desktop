@@ -1,18 +1,56 @@
-import { Service, ViewHandler } from 'services/core';
-import * as obs from '../../obs-api';
+import { ViewHandler, PersistentStatefulService } from 'services/core';
+import { mutation } from 'services/core/stateful-service';
+import {
+  TDefaultVideoSetting,
+  IVideoSettings,
+  horizontalDisplayData,
+  verticalDisplayData,
+} from './settings-v2';
 
-/*
-Eventually this service will be in charge of storing and managing settings profiles
-once the new persistant storage system is finalized. For now it just retrieves settings
-from the backend.
-*/
+interface ISettingsManagerServiceState {
+  videoSettings: {
+    defaultVideoSetting: TDefaultVideoSetting;
+    defaultHorizontal: IVideoSettings;
+    defaultVertical: IVideoSettings;
+    horizontal: IVideoSettings;
+    vertical: IVideoSettings;
+  };
+}
 
-class SettingsManagerViews extends ViewHandler<{}> {}
+class SettingsManagerServiceViews extends ViewHandler<ISettingsManagerServiceState> {
+  get videoSettings() {
+    return this.state.videoSettings;
+  }
 
-export class SettingsManagerService extends Service {
-  // @@@ TODO: Refactor for persisting video settings
-  // get videoSettings() {
-  //   const context = obs.VideoFactory.create();
-  //   return context;
-  // }
+  get defaultVideoSetting() {
+    return this.state.videoSettings.defaultVideoSetting;
+  }
+}
+
+export class SettingsManagerService extends PersistentStatefulService<ISettingsManagerServiceState> {
+  defaultState = {
+    videoSettings: {
+      defaultVideoSetting: 'default', // setting for default horizontal display pulled directly from obs so not persisted
+      defaultVertical: verticalDisplayData, // setting for default vertical display
+      horizontal: horizontalDisplayData, // setting for dual output horizontal display
+      vertical: verticalDisplayData, // setting for dual output vertical display
+    },
+  };
+
+  init() {
+    super.init();
+  }
+
+  get views() {
+    return new SettingsManagerServiceViews(this.state);
+  }
+
+  setDefaultDisplay(displaySetting: 'default' | 'defaultVertical') {
+    this.SET_DEFAULT_DISPLAY(displaySetting);
+  }
+
+  @mutation()
+  private SET_DEFAULT_DISPLAY(displaySetting: 'default' | 'defaultVertical') {
+    this.state.videoSettings.defaultVideoSetting = displaySetting;
+  }
 }

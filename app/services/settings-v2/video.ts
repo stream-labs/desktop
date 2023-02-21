@@ -4,38 +4,13 @@ import { InitAfter } from 'services/core';
 import { mutation, StatefulService } from '../core/stateful-service';
 import * as obs from '../../../obs-api';
 import { SettingsManagerService } from 'services/settings-manager';
+import {
+  horizontalDisplayData,
+  verticalDisplayData,
+  TDefaultVideoSetting,
+} from './default-settings-data';
 import { DualOutputService } from 'services/dual-output';
 import { ScenesService } from 'services/scenes';
-
-// @@@ TODO: Remove dummy data when persistence is implemented
-const horizontalData = {
-  fpsNum: 120,
-  fpsDen: 2,
-  baseWidth: 3840,
-  baseHeight: 2160,
-  outputWidth: 1920,
-  outputHeight: 1080,
-  outputFormat: obs.EVideoFormat.I420,
-  colorspace: obs.EColorSpace.CS709,
-  range: obs.ERangeType.Full,
-  scaleType: obs.EScaleType.Lanczos,
-  fpsType: obs.EFPSType.Fractional,
-};
-
-const verticalData = {
-  fpsNum: 60,
-  fpsDen: 2,
-  baseWidth: 400,
-  baseHeight: 700,
-  outputWidth: 400,
-  outputHeight: 700,
-  outputFormat: obs.EVideoFormat.I420,
-  colorspace: obs.EColorSpace.CS709,
-  range: obs.ERangeType.Full,
-  scaleType: obs.EScaleType.Lanczos,
-  fpsType: obs.EFPSType.Fractional,
-};
-// ^^^
 
 /**
  * Display Types
@@ -52,7 +27,7 @@ const contextNameMap: Record<TDisplayType, string> = {
   vertical: 'verticalContext',
 };
 
-interface IVideoSettings {
+export interface IVideoSettings {
   videoContext: obs.IVideo;
   horizontalContext: obs.IVideo;
   verticalContext: obs.IVideo;
@@ -88,6 +63,7 @@ export function invalidFps(num: number, den: number) {
 }
 
 @InitAfter('UserService')
+@InitAfter('SettingsManagerService')
 export class VideoSettingsService extends StatefulService<IVideoSettings> {
   @Inject() settingsManagerService: SettingsManagerService;
   @Inject() dualOutputService: DualOutputService;
@@ -156,10 +132,13 @@ export class VideoSettingsService extends StatefulService<IVideoSettings> {
     return !!this.state.horizontalContext && !!this.state.verticalContext;
   }
 
-  // @@@ TODO: Refactor for persistence
-  // get videoSettings() {
-  //   return this.settingsManagerService.videoSettings;
-  // }
+  get videoSettings() {
+    console.log(
+      'this.settingsManagerService.views.videoSettings ',
+      this.settingsManagerService.views.videoSettings,
+    );
+    return this.settingsManagerService.views.videoSettings;
+  }
 
   getVideoContext(display: TDisplayType) {
     const contextName = contextNameMap[display];
@@ -226,6 +205,7 @@ export class VideoSettingsService extends StatefulService<IVideoSettings> {
     const contextName = contextNameMap[display];
 
     if (display === 'default') {
+      // if this the default display is the horizontal display, get the settings from obs
       this.state.default = this.state.videoContext.video;
       Object.keys(this.state.videoContext.legacySettings).forEach(
         (key: keyof obs.IAdvancedStreaming | keyof obs.ISimpleStreaming) => {
@@ -241,8 +221,9 @@ export class VideoSettingsService extends StatefulService<IVideoSettings> {
         }
       });
     } else {
-      // currently uses dummy data but will be refactored to use persisted data
-      const data = display === 'horizontal' ? horizontalData : verticalData;
+      // if dual output mode is active, apply settings from the settings manager
+      const data =
+        display === 'horizontal' ? this.videoSettings.horizontal : this.videoSettings.vertical;
 
       this.state[display] = this.state[contextName].video;
       Object.keys(data).forEach(
@@ -283,6 +264,7 @@ export class VideoSettingsService extends StatefulService<IVideoSettings> {
     //   this.setVideoSetting('fpsDen', 1);
     // }
   }
+
   createDefaultFps(display: TDisplayType = 'default') {
     this.setVideoSetting('fpsNum', 30, display);
     this.setVideoSetting('fpsDen', 1, display);
