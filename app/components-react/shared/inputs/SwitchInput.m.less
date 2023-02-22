@@ -1,9 +1,27 @@
 @import '../../../styles/index';
 
-.horizontal-item {
-  margin: 0 !important;
+div.horizontal-switch-wrapper {
+  margin: 0;
+
+  &&.ant-row.ant-form-item {
+    margin-bottom: unset;
+  }
+
+  :global(div.ant-form-item-control-input) {
+    min-height: unset !important;
+  }
 }
 
-.horizontal {
-  margin: 0 10px 0 0 !important;
+.horizontal-switch {
+  margin: 0;
+
+  button.ant-switch-small {
+    min-width: 34px;
+    height: 20px;
+    width: 20px;
+  }
+
+  .ant-switch-small.ant-switch-handle {
+    min-height: unset;
+  }
 }

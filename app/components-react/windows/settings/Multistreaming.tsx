@@ -25,8 +25,6 @@ export function MultistreamingSettings() {
   const v = useVuex(() => ({
     isLoggedIn: UserService.views.isLoggedIn,
     isPrime: UserService.views.isPrime,
-    dualOutputMode: DualOutputService.views.dualOutputMode,
-    toggleDualOutputMode: DualOutputService.actions.return.toggleDualOutputMode,
     platformSettingsList: DualOutputService.views.platformSettingsList,
     updatePlatformSetting: DualOutputService.actions.updatePlatformSetting,
   }));
@@ -39,11 +37,11 @@ export function MultistreamingSettings() {
 
   const dualOutputSettings = [
     {
-      label: displayLabels('horizontal') ?? 'horizontal',
+      label: displayLabels('horizontal') ?? 'Horizontal',
       value: 'horizontal',
     },
     {
-      label: displayLabels('vertical') ?? 'vertical',
+      label: displayLabels('vertical') ?? 'Vertical',
       value: 'vertical',
     },
   ];
@@ -106,37 +104,11 @@ export function MultistreamingSettings() {
         )}
       </ObsSettingsSection>
       <ObsSettingsSection title={$t('Dual Output')} style={{ paddingBottom: '30px' }}>
-        <div className={styles.doDescription}>
-          <SwitchInput
-            value={v.dualOutputMode}
-            layout="horizontal"
-            onChange={async () => {
-              const toggled = await v.toggleDualOutputMode(!v.dualOutputMode);
-              if (!toggled) {
-                message.error({
-                  content: $t('Error toggling Dual Output Mode'),
-                  duration: 2,
-                });
-              }
-            }}
-          />
-          {$t('Enable Dual Outputs (simultaneous horizontal and vertical Outputs)')}{' '}
-          <Tooltip
-            title={$t('Set up your resolution for each orientation in the Video Settings tab.')}
-            className={styles.doTooltip}
-            placement="bottom"
-            lightShadow
-          >
-            <i className="icon-information" />
-          </Tooltip>
-        </div>
-
         <div className={styles.doSettings}>
-          <h2>{$t('Dual Output Settings')}</h2>
           <div className={styles.doDescription}>
             {$t('Set your default output mode for each platform.')}{' '}
             <Tooltip
-              title={$t('You can select which one stream with in the Go Live window.')}
+              title={$t('You can select which one to stream with in the Go Live window.')}
               className={styles.doTooltip}
               placement="top"
               lightShadow
