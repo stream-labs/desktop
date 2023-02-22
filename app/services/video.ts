@@ -8,12 +8,7 @@ import { WindowsService } from './windows';
 import { ScalableRectangle } from '../util/ScalableRectangle';
 import { Subscription } from 'rxjs';
 import { SelectionService } from 'services/selection';
-import {
-  VideoSettingsService,
-  TDisplayType,
-  IVideoSettingsFormatted,
-  ESettingsVideoProperties,
-} from 'services/settings-v2/video';
+import { VideoSettingsService, TDisplayType } from 'services/settings-v2/video';
 import { DualOutputService } from './dual-output';
 import { byOS, OS, getOS } from 'util/operating-systems';
 import * as remote from '@electron/remote';
@@ -391,9 +386,9 @@ export class VideoService extends Service {
   }
 
   // setContexts(contexts: {
-  //   default: IVideoSettingsFormatted;
-  //   horizontal: IVideoSettingsFormatted;
-  //   vertical: IVideoSettingsFormatted;
+  //   default: IVideoSettingFormatted;
+  //   horizontal: IVideoSettingFormatted;
+  //   vertical: IVideoSettingFormatted;
   // }) {
   //   for (const displayName in contexts) {
   //     if (displayName === 'default') {

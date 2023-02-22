@@ -190,5 +190,6 @@
   "You can select which one to stream with in the Go Live window.": "You can select which one to stream with in the Go Live window.",
   "Video Output Orientation": "Video Output Orientation",
   "Dual Output (Simultaneous Horizontal and Vertical Outputs)": "Dual Output (Simultaneous Horizontal and Vertical Outputs)",
-  "Dual Output can be enabled in the Multistreaming settings tab.": "Dual Output can be enabled in the Multistreaming settings tab."
+  "Dual Output can be enabled in the Editor.": "Dual Output can be enabled in the Editor.",
+  "Select default display orientation:": "Select default display orientation:"
 }
