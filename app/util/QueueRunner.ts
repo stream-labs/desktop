@@ -120,12 +120,17 @@ export class QueueRunner {
     }
   }
 
-  async cancel() {
-    // 実行中のものはキャンセルし、キューに残っているものは削除する
+  async cancelQueue() {
+    // 実行中のものはキャンセルしない
     this.queue = [];
     if (this.preparing) {
       this.preparing = null;
     }
+  }
+
+  async cancel() {
+    // 実行中のものはキャンセルし、キューに残っているものは削除する
+    this.cancelQueue();
     if (this.runningState) {
       await this.runningState.cancel();
     }

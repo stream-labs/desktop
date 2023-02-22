@@ -159,4 +159,24 @@ describe('QueueRunner', () => {
     await queue.waitUntilFinished();
     expect(results).toEqual([1, 2, 3]);
   });
+
+  test('cancelQueue', async () => {
+    const queue = new QueueRunner();
+    const task = new Task();
+    queue.add(task.prepare, 'one');
+    task.completePrepare(false);
+    const task2 = new Task();
+    queue.add(task2.prepare, 'two');
+    expect(queue.length).toBe(2);
+    queue.runNext();
+    await sleep(0);
+    expect(task.state).toBe('running');
+    expect(queue.isRunning).toBe(true);
+    queue.cancelQueue();
+    expect(task.state).toBe('running');
+    expect(queue.length).toBe(0);
+    task.completeRun();
+    await queue.waitUntilFinished();
+    expect(queue.isRunning).toBe(false);
+  });
 });
