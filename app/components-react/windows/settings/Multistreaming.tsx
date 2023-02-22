@@ -3,13 +3,12 @@ import { useVuex } from 'components-react/hooks';
 import { Services } from '../../service-provider';
 import { $t } from 'services/i18n';
 import { ObsSettingsSection } from './ObsSettings';
-import { RadioInput, SwitchInput } from 'components-react/shared/inputs';
+import { RadioInput } from 'components-react/shared/inputs';
 import PlatformLogo from 'components-react/shared/PlatformLogo';
 import Translate from 'components-react/shared/Translate';
 import UltraIcon from 'components-react/shared/UltraIcon';
 import ButtonHighlighted from 'components-react/shared/ButtonHighlighted';
 import Tooltip from 'components-react/shared/Tooltip';
-import { message } from 'antd';
 import { TPlatform } from 'services/platforms';
 import {
   IDualOutputPlatformSetting,
