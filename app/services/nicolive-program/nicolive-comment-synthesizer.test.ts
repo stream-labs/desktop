@@ -99,11 +99,17 @@ test('makeSpeech', async () => {
 
 
 test.each([
-  ['normal', false, false, 0, 1],
-  ['cancelBeforeSpeaking', true, false, 1, 1],
-  ['NUM_COMMENTS_TO_SKIP', false, true, 1, 1],
+  ['normal', false, false, 0, 0, 1],
+  ['cancelBeforeSpeaking', true, false, 1, 0, 1],
+  ['NUM_COMMENTS_TO_SKIP', false, true, 0, 1, 1],
 ])('queueToSpeech %s cancelBeforeSpeaking:%s filled:%s cancel:%d add:%d',
-  async (name: string, cancelBeforeSpeaking: boolean, filled: boolean, numCancel: number, numAdd: number) => {
+  async (name: string,
+    cancelBeforeSpeaking: boolean,
+    filled: boolean,
+    numCancel: number,
+    numCancelQueue: number,
+    numAdd: number,
+  ) => {
     setup();
     const { NicoliveCommentSynthesizerService } = require('./nicolive-comment-synthesizer');
     const instance = NicoliveCommentSynthesizerService.instance as NicoliveCommentSynthesizerService;
@@ -137,6 +143,7 @@ test.each([
     expect(queue.add).toBeCalledTimes(0);
     await instance.queueToSpeech(speech, onstart, onend, cancelBeforeSpeaking);
     expect(queue.cancel).toBeCalledTimes(numCancel);
+    expect(queue.cancelQueue).toBeCalledTimes(numCancelQueue);
     expect(queue.add).toBeCalledTimes(numAdd);
     if (numAdd) {
       expect(queue.add).toBeCalledWith(expect.anything(), speech.text);
