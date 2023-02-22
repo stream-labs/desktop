@@ -193,7 +193,7 @@ export class NicoliveCommentSynthesizerService extends StatefulService<ICommentS
     } else if (this.queue.length >= this.NUM_COMMENTS_TO_SKIP) {
       // コメント溜まりすぎスキップ
       // TODO 飛ばした発言
-      this.queue.cancel();
+      this.queue.cancelQueue();
     }
 
     this.queue.add(
