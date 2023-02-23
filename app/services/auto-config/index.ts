@@ -53,7 +53,10 @@ export class AutoConfigService extends Service {
   async startRecording() {
     obs.NodeObs.InitializeAutoConfig(
       (progress: IConfigProgress) => {
-        this.handleProgress(progress);
+        if (progress.event === 'stopping_step') {
+          obs.NodeObs.TerminateAutoConfig();
+          this.videoSettingsService.migrateSettings();
+        }
         this.configProgress.next(progress);
       },
       { continent: '', service_name: '' },
