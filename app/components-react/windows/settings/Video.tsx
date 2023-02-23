@@ -1,5 +1,5 @@
 import * as remote from '@electron/remote';
-import React, { useState } from 'react';
+import React from 'react';
 import { useModule, injectState } from 'slap';
 import { useVuex } from 'components-react/hooks';
 import { Services } from '../../service-provider';
@@ -7,8 +7,6 @@ import FormFactory, { TInputValue } from 'components-react/shared/inputs/FormFac
 import * as obs from '../../../../obs-api';
 import { $t } from 'services/i18n';
 import { Tabs } from 'antd';
-import { RadioInput } from 'components-react/shared/inputs';
-import Tooltip from 'components-react/shared/Tooltip';
 import styles from './Common.m.less';
 import { TDisplayType, invalidFps } from 'services/settings-v2/video';
 
@@ -344,8 +342,7 @@ export function VideoSettings() {
   } = useModule(VideoSettingsModule);
 
   const v = useVuex(() => ({
-    defaultDisplay: Services.SettingsManagerService.views.videoSettings.defaultVideoSetting,
-    setDefaultDisplay: Services.SettingsManagerService.setDefaultDisplay,
+    defaultDisplay: Services.SettingsManagerService.views.videoSettings.defaultDisplay,
   }));
 
   const orientationOptions = [
@@ -361,34 +358,10 @@ export function VideoSettings() {
 
   return (
     <div className={styles.videoSettings}>
-      <div className={styles.videoSettingsHeader}>
-        <div className={styles.headingWrapper}>
-          <h3>{$t('Video Output Orientation')}</h3>
-          <Tooltip
-            title={$t('Dual Output can be enabled in the Editor.')}
-            placement="right"
-            lightShadow
-          >
-            <i className="icon-information" />
-          </Tooltip>
-        </div>
-
-        <RadioInput
-          label={$t('Select default display orientation:') as string}
-          direction="horizontal"
-          nolabel
-          nomargin
-          defaultValue={v.defaultDisplay}
-          options={orientationOptions}
-          onChange={val => v.setDefaultDisplay(val as TDisplayType)}
-          value={v.defaultDisplay}
-        />
-      </div>
-
       <Tabs defaultActiveKey={v.defaultDisplay}>
         <Tabs.TabPane tab={$t('Horizontal')} key="horizontal">
           <div className={styles.outputHeader}>
-            <i className="icon-phone-case" />
+            <i className="icon-desktop" />
             <h1>{$t('Horizontal Output')}</h1>
           </div>
           <div className={styles.formSection}>
@@ -402,7 +375,7 @@ export function VideoSettings() {
         </Tabs.TabPane>
         <Tabs.TabPane tab={$t('Vertical')} key="vertical">
           <div className={styles.outputHeader}>
-            <i className="icon-desktop" />
+            <i className="icon-phone-case" />
             <h1>{$t('Vertical Output')}</h1>
           </div>
           <div className={styles.formSection}>
