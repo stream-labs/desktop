@@ -329,9 +329,11 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
   setVideoSetting(key: string, value: unknown, display: TDisplayType = 'horizontal') {
     this.SET_VIDEO_SETTING(key, value, display);
 
-    //@@@ TODO: Refactor to update settings for dual output displays
     if (display === 'horizontal') {
       this.updateObsSettings();
+    } else if (display === 'vertical') {
+      // if the display is vertical, also update the persisted settings
+      this.settingsManagerService.setVideoSetting({ [key]: value });
     }
   }
 

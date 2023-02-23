@@ -14,6 +14,7 @@ import { SceneCollectionsService } from 'services/scene-collections';
 import { TPlatform } from 'services/platforms';
 import { ReorderNodesCommand, EPlaceType } from 'services/editor-commands/commands/reorder-nodes';
 import { Subject } from 'rxjs';
+import { SettingsManagerService } from 'services/settings-manager';
 
 interface IDualOutputServiceState {
   convertedDefaultDisplay: TDisplayType;
@@ -27,9 +28,13 @@ class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
   @Inject() private scenesService: ScenesService;
   @Inject() private videoSettingsService: VideoSettingsService;
   @Inject() private streamingService: StreamingService;
+  @Inject() private settingsManagerService: SettingsManagerService;
 
-  get dualOutputMode() {
-    return this.state.dualOutputMode;
+  get dualOutputMode(): boolean {
+    return (
+      this.settingsManagerService.views.activeDisplays.horizontal &&
+      this.settingsManagerService.views.activeDisplays.vertical
+    );
   }
 
   get convertedDefaultDisplay() {
@@ -55,7 +60,7 @@ class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
   }
 
   get showDualOutputDisplays() {
-    return this.state.dualOutputMode && this.hasDualOutputScenes;
+    return this.dualOutputMode && this.hasDualOutputScenes;
   }
 
   get dualOutputNodeIds() {
@@ -150,19 +155,19 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
     super.init();
 
     this.sceneCollectionsService.collectionInitialized.subscribe(() => {
-      if (this.state.dualOutputMode) {
+      if (this.views.dualOutputMode) {
         this.mapSceneNodes(this.state.displays);
       }
     });
 
     this.scenesService.sceneRemoved.subscribe(() => {
-      if (this.state.dualOutputMode) {
+      if (this.views.dualOutputMode) {
         this.setDualOutputMode(false);
       }
     });
 
     this.scenesService.sceneSwitched.subscribe(() => {
-      if (this.state.dualOutputMode && this.views.hasDualOutputScenes) {
+      if (this.views.dualOutputMode && this.views.hasDualOutputScenes) {
         this.restoreScene(this.state.convertedDefaultDisplay);
         this.mapSceneNodes(this.state.displays, this.scenesService.views.activeSceneId);
       }

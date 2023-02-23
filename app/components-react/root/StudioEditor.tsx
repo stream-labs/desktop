@@ -17,6 +17,7 @@ export default function StudioEditor() {
     TransitionsService,
     DualOutputService,
     ScenesService,
+    SettingsManagerService,
   } = Services;
   const v = useVuex(() => ({
     hideStyleBlockers: WindowsService.state.main.hideStyleBlockers,
@@ -24,6 +25,8 @@ export default function StudioEditor() {
     cursor: EditorService.state.cursor,
     studioMode: TransitionsService.state.studioMode,
     showDualOutputDisplays: DualOutputService.views.showDualOutputDisplays,
+    showHorizontalDisplay: SettingsManagerService.views.activeDisplays.horizontal,
+    showVerticalDisplay: SettingsManagerService.views.activeDisplays.vertical,
     activeSceneId: ScenesService.views.activeSceneId,
   }));
   const displayEnabled = !v.hideStyleBlockers && !v.performanceMode;
@@ -163,7 +166,39 @@ export default function StudioEditor() {
           <div
             className={cx(styles.studioDisplayContainer, { [styles.stacked]: studioModeStacked })}
           >
-            {!v.showDualOutputDisplays && (
+            {v.showHorizontalDisplay && (
+              <div
+                className={cx(styles.studioEditorDisplayContainer, 'noselect')}
+                style={{ cursor: v.cursor }}
+                onMouseDown={eventHandlers.onMouseDown}
+                onMouseUp={eventHandlers.onMouseUp}
+                onMouseEnter={eventHandlers.onMouseEnter}
+                onMouseMove={eventHandlers.onMouseMove}
+                onDoubleClick={eventHandlers.onMouseDblClick}
+                onContextMenu={eventHandlers.onContextMenu}
+              >
+                <Display
+                  drawUI={true}
+                  paddingSize={10}
+                  onOutputResize={eventHandlers.onOutputResize}
+                  renderingMode={ERenderingMode.OBS_MAIN_RENDERING}
+                  sourceId={v.studioMode ? studioModeTransitionName : v.activeSceneId}
+                />
+              </div>
+            )}
+            {!v.showDualOutputDisplays && v.showHorizontalDisplay && v.studioMode && (
+              <div className={styles.studioModeDisplayContainer}>
+                <Display paddingSize={10} />
+              </div>
+            )}
+            {v.showVerticalDisplay && <DualOutputDisplay eventHandlers={eventHandlers} />}
+            {!v.showDualOutputDisplays && v.showVerticalDisplay && v.studioMode && (
+              <div className={styles.studioModeDisplayContainer}>
+                <Display paddingSize={10} />
+              </div>
+            )}
+
+            {/* {!v.showDualOutputDisplays && (
               <div
                 className={cx(styles.studioEditorDisplayContainer, 'noselect')}
                 style={{ cursor: v.cursor }}
@@ -188,7 +223,7 @@ export default function StudioEditor() {
                 <Display paddingSize={10} />
               </div>
             )}
-            {v.showDualOutputDisplays && <DualOutputDisplay eventHandlers={eventHandlers} />}
+            {v.showDualOutputDisplays && <DualOutputDisplay eventHandlers={eventHandlers} />} */}
           </div>
         </div>
       )}
