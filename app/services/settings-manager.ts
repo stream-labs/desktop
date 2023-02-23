@@ -1,20 +1,15 @@
 import { ViewHandler, PersistentStatefulService } from 'services/core';
 import { mutation } from 'services/core/stateful-service';
-import {
-  IVideoSetting,
-  horizontalDisplayData,
-  verticalDisplayData,
-  TDisplayType,
-} from './settings-v2';
-import * as obs from 'obs-studio-node';
+import { IVideoSetting, verticalDisplayData, TDisplayType } from './settings-v2';
+import { IVideoInfo } from 'obs-studio-node';
 
 interface ISettingsManagerServiceState {
   videoSettings: {
-    defaultVideoSetting: TDisplayType;
-    defaultHorizontal: obs.IVideoInfo;
-    defaultVertical: obs.IVideoInfo;
-    horizontal: obs.IVideoInfo;
-    vertical: obs.IVideoInfo;
+    vertical: IVideoInfo;
+    activeDisplays: {
+      horizontal: boolean;
+      vertical: boolean;
+    };
   };
 }
 
@@ -23,18 +18,19 @@ class SettingsManagerServiceViews extends ViewHandler<ISettingsManagerServiceSta
     return this.state.videoSettings;
   }
 
-  get defaultVideoSetting() {
-    return this.state.videoSettings.defaultVideoSetting;
+  get activeDisplays() {
+    return this.state.videoSettings.activeDisplays;
   }
 }
 
 export class SettingsManagerService extends PersistentStatefulService<ISettingsManagerServiceState> {
   static defaultState = {
     videoSettings: {
-      defaultVideoSetting: 'horizontal', // setting for default horizontal display pulled directly from obs so not persisted
-      defaultVertical: verticalDisplayData, // setting for default vertical display
-      horizontal: horizontalDisplayData, // setting for dual output horizontal display
-      vertical: verticalDisplayData, // setting for dual output vertical display
+      vertical: verticalDisplayData, // get settings for horizontal display from obs directly
+      activeDisplays: {
+        horizontal: true,
+        vertical: false,
+      },
     },
   };
 
@@ -46,8 +42,12 @@ export class SettingsManagerService extends PersistentStatefulService<ISettingsM
     return new SettingsManagerServiceViews(this.state);
   }
 
-  setDefaultDisplay(displaySetting: TDisplayType) {
-    this.SET_DEFAULT_DISPLAY(displaySetting);
+  /**
+   * VIDEO SETTINGS FUNCTIONS
+   */
+
+  setDisplayActive(status: boolean, display?: TDisplayType) {
+    this.SET_DISPLAY_ACTIVE(status, display);
   }
 
   setVideoSetting(setting: Partial<IVideoSetting>, display?: TDisplayType) {
@@ -55,12 +55,33 @@ export class SettingsManagerService extends PersistentStatefulService<ISettingsM
   }
 
   @mutation()
-  private SET_DEFAULT_DISPLAY(displaySetting: TDisplayType) {
-    this.state.videoSettings.defaultVideoSetting = displaySetting;
+  private SET_DISPLAY_ACTIVE(status: boolean, display: TDisplayType = 'horizontal') {
+    const otherDisplay = display === 'horizontal' ? 'vertical' : 'horizontal';
+
+    if (
+      status === false &&
+      this.state.videoSettings.activeDisplays[display] &&
+      !this.state.videoSettings.activeDisplays[otherDisplay]
+    ) {
+      // if not dual output mode, swap the active displays
+      this.state.videoSettings.activeDisplays = {
+        ...this.state.videoSettings.activeDisplays,
+        [display]: status,
+        [otherDisplay]: !status,
+      };
+    } else {
+      this.state.videoSettings.activeDisplays = {
+        ...this.state.videoSettings.activeDisplays,
+        [display]: status,
+      };
+    }
   }
 
   @mutation()
   private SET_VIDEO_SETTING(setting: Partial<IVideoSetting>, display: TDisplayType = 'vertical') {
-    this.state.videoSettings[display] = { ...this.state.videoSettings[display], setting };
+    this.state.videoSettings.activeDisplays = {
+      ...this.state.videoSettings.activeDisplays,
+      [display]: setting,
+    };
   }
 }

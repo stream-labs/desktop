@@ -1,7 +1,6 @@
 import * as remote from '@electron/remote';
 import React from 'react';
 import { useModule, injectState } from 'slap';
-import { useVuex } from 'components-react/hooks';
 import { Services } from '../../service-provider';
 import FormFactory, { TInputValue } from 'components-react/shared/inputs/FormFactory';
 import * as obs from '../../../../obs-api';
@@ -341,10 +340,6 @@ export function VideoSettings() {
     onChange,
   } = useModule(VideoSettingsModule);
 
-  const v = useVuex(() => ({
-    defaultDisplay: Services.SettingsManagerService.views.videoSettings.defaultDisplay,
-  }));
-
   const orientationOptions = [
     {
       value: 'horizontal',
@@ -358,7 +353,7 @@ export function VideoSettings() {
 
   return (
     <div className={styles.videoSettings}>
-      <Tabs defaultActiveKey={v.defaultDisplay}>
+      <Tabs defaultActiveKey="horizontal">
         <Tabs.TabPane tab={$t('Horizontal')} key="horizontal">
           <div className={styles.outputHeader}>
             <i className="icon-desktop" />

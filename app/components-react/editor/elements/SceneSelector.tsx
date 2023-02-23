@@ -26,12 +26,13 @@ function SceneSelector() {
     SourceFiltersService,
     ProjectorService,
     EditorCommandsService,
-    DualOutputService,
+    SettingsManagerService,
   } = Services;
 
   const v = useVuex(() => ({
-    dualOutputMode: DualOutputService.views.dualOutputMode,
-    toggleDualOutputMode: DualOutputService.actions.return.toggleDualOutputMode,
+    isHorizontal: SettingsManagerService.views.activeDisplays.horizontal,
+    isVertical: SettingsManagerService.views.activeDisplays.vertical,
+    setDisplayActive: SettingsManagerService.actions.setDisplayActive,
   }));
 
   const { treeSort } = useTree(true);
@@ -181,28 +182,26 @@ function SceneSelector() {
           <i className="icon-add-circle icon-button icon-button--lg" onClick={addScene} />
         </Tooltip>
 
-        <Tooltip title={$t('Edit Scene Transitions.')} placement="bottomRight">
-          <i className="icon-transition icon-button icon-button--lg" onClick={showTransitions} />
+        <Tooltip title={$t('Show horizontal display.')} placement="bottomRight">
+          <i
+            onClick={() => v.setDisplayActive(!v.isHorizontal, 'horizontal')}
+            className={cx('icon-desktop icon-button icon-button--lg', {
+              active: v.isHorizontal,
+            })}
+          />
         </Tooltip>
 
-        <Tooltip title={$t('Toggle Dual Output Mode.')} placement="bottomRight">
-          <div>
-            {/* extra div to allow tooltip hover to render */}
-            <SwitchInput
-              value={v.dualOutputMode}
-              layout="horizontal"
-              onChange={async () => {
-                const toggled = await v.toggleDualOutputMode(!v.dualOutputMode);
-                if (!toggled) {
-                  message.error({
-                    content: $t('Error toggling Dual Output Mode'),
-                    duration: 2,
-                  });
-                }
-              }}
-              style={{ marginRight: '0px !important' }}
-            />
-          </div>
+        <Tooltip title={$t('Show vertical display.')} placement="bottomRight">
+          <i
+            onClick={() => v.setDisplayActive(!v.isVertical, 'vertical')}
+            className={cx('icon-phone-case icon-button icon-button--lg', {
+              active: v.isVertical,
+            })}
+          />
+        </Tooltip>
+
+        <Tooltip title={$t('Edit Scene Transitions.')} placement="bottomRight">
+          <i className="icon-transition icon-button icon-button--lg" onClick={showTransitions} />
         </Tooltip>
       </div>
       <Scrollable style={{ height: '100%' }} className={styles.scenesContainer}>
