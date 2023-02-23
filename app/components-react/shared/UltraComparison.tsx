@@ -105,18 +105,19 @@ export function UltraComparison(p: IUltraComparisonProps) {
             <i className="icon-streamlabs" />
             {$t('Starter')}
           </h1>
+          <h2>{$t('Free')}</h2>
           <span style={{ marginBottom: 8, display: 'inline-block' }}>
             {p.condensed
               ? $t('Always and forever free')
               : $t('Everything you need to go live. Always and forever free.')}
           </span>
+          <div className={styles.button}>{$t('Choose Starter')}</div>
         </div>
         {tableData.standard.map(data => (
           <div className={styles.row} key={data.key || data.text}>
             <span>{data.text}</span>
           </div>
         ))}
-        <div className={styles.button}>{$t('Current Plan')}</div>
       </div>
       <div
         className={cx(styles.cardContainer, styles.primeCardContainer, {
@@ -130,18 +131,24 @@ export function UltraComparison(p: IUltraComparisonProps) {
             <UltraIcon type="night" style={{ marginRight: '5px' }} />
             Ultra
           </h1>
+          <h2>
+            {$t('%{monthlyPrice}/mo or %{yearlyPrice}/year', {
+              monthlyPrice: '$19',
+              yearlyPrice: '$149',
+            })}
+          </h2>
           <span style={{ marginBottom: 8, display: 'inline-block' }}>
             {p.condensed
               ? $t('Everything in Starter plus:')
               : $t('Includes everything in Starter plus:')}
           </span>
+          <div className={cx(styles.button, styles.primeButton)}>{$t('Choose Ultra')}</div>
         </div>
         {tableData.prime.map(data => (
           <div className={cx(styles.row, styles.primeRow)} key={data.key || data.text}>
             <span>{data.text}</span>
           </div>
         ))}
-        <div className={cx(styles.button, styles.primeButton)}>{$t('Choose Ultra')}</div>
       </div>
     </div>
   );
@@ -151,8 +158,10 @@ function TableHeader(p: { header: ITableHeader }) {
   const cell = (
     <div className={styles.tableHeader} key={p.header.text}>
       <i className={p.header.icon} />
-      <span>{p.header.text}</span>
-      {p.header.whisper && <div className={styles.whisper}>{p.header.whisper}</div>}
+      <span style={{ display: 'flex', flexDirection: 'column' }}>
+        {p.header.text}
+        {p.header.whisper && <div className={styles.whisper}>{p.header.whisper}</div>}
+      </span>
       {p.header.tooltip && <i className="icon-question" />}
     </div>
   );

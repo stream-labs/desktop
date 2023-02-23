@@ -10,11 +10,9 @@ import { HostsService } from 'services/hosts';
 import { Inject } from 'services/core/injector';
 import { authorizedHeaders, jfetch } from 'util/requests';
 import { UserService } from 'services/user';
-import { getStreamTags } from './twitch/tags';
-import { TTwitchOAuthScope } from './twitch/scopes';
-import { platformAuthorizedRequest, platformRequest } from './utils';
+import { TTwitchOAuthScope, TwitchTagsService } from './twitch/index';
+import { platformAuthorizedRequest } from './utils';
 import { CustomizationService } from 'services/customization';
-import { assertIsDefined } from 'util/properties-type-guards';
 import { IGoLiveSettings } from 'services/streaming';
 import { InheritMutations, mutation } from 'services/core';
 import { throwStreamError, TStreamErrorType } from 'services/streaming/stream-error';
@@ -67,6 +65,7 @@ export class TwitchService
   @Inject() hostsService: HostsService;
   @Inject() userService: UserService;
   @Inject() customizationService: CustomizationService;
+  @Inject() twitchTagsService: TwitchTagsService;
 
   static initialState: ITwitchServiceState = {
     ...BasePlatformService.initialState,
@@ -273,7 +272,9 @@ export class TwitchService
       })),
     ]);
 
-    const tags: string[] = this.state.settings.tags ?? [];
+    const tags: string[] = this.twitchTagsService.views.hasTags
+      ? this.twitchTagsService.views.tags
+      : [];
     this.SET_PREPOPULATED(true);
     this.SET_STREAM_SETTINGS({ tags, title: channelInfo.title, game: channelInfo.game });
   }
@@ -307,6 +308,7 @@ export class TwitchService
         `${this.apiBase}/helix/games?name=${encodeURIComponent(game)}`,
       ).then(json => json.data[0].id);
     }
+    this.twitchTagsService.actions.setTags(tags);
     const hasPermission = await this.hasScope('channel:manage:broadcast');
     const scopedTags = hasPermission ? tags : undefined;
     await Promise.all([
@@ -359,11 +361,6 @@ export class TwitchService
 
   get streamPageUrl() {
     return `https://twitch.tv/${this.username}`;
-  }
-
-  getStreamTags(): Promise<string[]> {
-    assertIsDefined(this.twitchId);
-    return getStreamTags(this.twitchId);
   }
 
   async validateTagsScope() {

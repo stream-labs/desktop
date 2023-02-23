@@ -178,6 +178,7 @@ class UserViews extends ViewHandler<IUserServiceState> {
   }
 
   get isPrime() {
+    if (!this.isLoggedIn) return false;
     return this.state.isPrime;
   }
 
