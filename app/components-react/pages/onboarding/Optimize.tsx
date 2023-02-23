@@ -14,7 +14,7 @@ interface IConfigStepPresentation {
 }
 
 export function Optimize() {
-  const { AutoConfigService, VideoEncodingOptimizationService } = Services;
+  const { AutoConfigService, RecordingModeService } = Services;
   const [optimizing, setOptimizing] = useState(false);
   const [stepInfo, setStepInfo] = useState<IConfigStepPresentation | null>(null);
   const steps = [
@@ -74,7 +74,9 @@ export function Optimize() {
       }
     });
 
-    AutoConfigService.start();
+    RecordingModeService.views.isRecordingModeEnabled
+      ? AutoConfigService.actions.startRecording()
+      : AutoConfigService.actions.start();
   }
 
   return (
