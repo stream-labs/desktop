@@ -24,7 +24,7 @@ import PlatformLogo from '../../shared/PlatformLogo';
 import { DownloadOutlined } from '@ant-design/icons';
 import { alertAsync, confirmAsync } from '../../modals';
 import { I18nService, WHITE_LIST } from '../../../services/i18n';
-import { pick } from 'lodash';
+import pick from 'lodash/pick';
 import { DemoForm } from './DemoForm';
 import { CodeInput } from '../../shared/inputs/CodeInput';
 import { injectState, merge, useModule, injectFormBinding } from 'slap';
