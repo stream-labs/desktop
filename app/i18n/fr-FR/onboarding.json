@@ -1,7 +1,7 @@
 {
   "We are improving our backend systems. As part of the migration process, we will need to you log in again. If you have any questions, you can": "Nous améliorons nos systèmes principaux. Dans le cadre du processus de migration, vous devez vous authentifier à nouveau. Si vous avez des questions, vous pouvez",
   "contact support.": "Contacter l'assistance",
-  "Sign in with your streaming account to get started with Streamlabs": "Connectez-vous avec votre compte de streaming pour commencer à utiliser Streamlabs",
+  "Sign in with your content platform to get started with Streamlabs": "Sign in with your content platform to get started with Streamlabs",
   "Select an OBS profile to import": "Sélectionnez un profil OBS à importer",
   "Import from OBS Studio": "Importer depuis OBS Studio",
   "Start Fresh": "Commencer de zéro",
@@ -132,5 +132,10 @@
   "Pro Upgrade": "Mise à niveau vers Pro",
   "Current Plan": "Forfait actuel",
   "Includes everything in Starter plus:": "Inclut l'ensemble du contenu disponible dans Starter, ainsi que:",
-  "Your login has expired. Please reauthenticate to continue using Streamlabs Desktop.": "Votre connexion a expiré. Veuillez vous reconnecter pour continuer d'utiliser Streamlabs Desktop."
+  "Your login has expired. Please reauthenticate to continue using Streamlabs Desktop.": "Votre connexion a expiré. Veuillez vous reconnecter pour continuer d'utiliser Streamlabs Desktop.",
+  "Select a Primary Platform": "Select a Primary Platform",
+  "Connect a Content Platform": "Connect a Content Platform",
+  "Streamlabs Desktop requires that you have a connected platform account in order to use all of its features. By skipping this step, you will be logged out and some features may be unavailable.": "Streamlabs Desktop requires that you have a connected platform account in order to use all of its features. By skipping this step, you will be logged out and some features may be unavailable.",
+  "Your Streamlabs account has multiple connected content platforms. Please select the primary platform you will be streaming to using Streamlabs Desktop.": "Your Streamlabs account has multiple connected content platforms. Please select the primary platform you will be streaming to using Streamlabs Desktop.",
+  "Streamlabs Desktop requires you to connect a content platform to your Streamlabs account": "Streamlabs Desktop requires you to connect a content platform to your Streamlabs account"
 }

@@ -17,7 +17,7 @@
   "Hide %{sourceName}": "Masquer %{sourceName}",
   "Show %{sourceName}": "Afficher %{sourceName}",
   "Move %{sourceName}": "Déplacer %{sourceName}",
-  "Mute %{sourceName}": "Désactiver le son de %{sourceName}",
+  "Mute %{sourceName}": "Couper le son de %{sourceName}",
   "Unmute %{sourceName}": "Activer le son de %{sourceName}",
   "Nudge %{sourceName}": "Décaler %{sourceName}",
   "Paste %{filterName}": "Coller %{filterName}",
