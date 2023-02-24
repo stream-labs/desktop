@@ -71,11 +71,7 @@ export default function useBaseElement(
     return belowMins ? <BelowMinWarning /> : element;
   }
 
-  function renderVertical() {
-    return belowMins ? <BelowMinWarning /> : element;
-  }
-
-  return { renderElement, renderVertical };
+  return { renderElement };
 }
 
 function BelowMinWarning() {

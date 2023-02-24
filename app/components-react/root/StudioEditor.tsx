@@ -8,8 +8,13 @@ import DualOutputDisplay from 'components-react/shared/DualOutputDisplay';
 import { $t } from 'services/i18n';
 import { ERenderingMode } from '../../../obs-api';
 import { Tooltip } from 'antd';
+import { TDisplayType } from 'services/settings-v2';
 
-export default function StudioEditor() {
+interface IStudioEditor {
+  display: TDisplayType;
+}
+
+export default function StudioEditor(p: IStudioEditor) {
   const {
     WindowsService,
     CustomizationService,
@@ -24,7 +29,9 @@ export default function StudioEditor() {
     performanceMode: CustomizationService.state.performanceMode,
     cursor: EditorService.state.cursor,
     studioMode: TransitionsService.state.studioMode,
-    showDualOutputDisplays: DualOutputService.views.showDualOutputDisplays,
+    showDualOutputDisplays:
+      SettingsManagerService.views.activeDisplays.horizontal &&
+      SettingsManagerService.views.activeDisplays.vertical,
     showHorizontalDisplay: SettingsManagerService.views.activeDisplays.horizontal,
     showVerticalDisplay: SettingsManagerService.views.activeDisplays.vertical,
     activeSceneId: ScenesService.views.activeSceneId,
@@ -162,11 +169,13 @@ export default function StudioEditor() {
       {displayEnabled && (
         <div className={cx(styles.studioModeContainer, { [styles.stacked]: studioModeStacked })}>
           {v.studioMode && <StudioModeControls stacked={studioModeStacked} />}
-          {v.showDualOutputDisplays && <DualOutputControls stacked={studioModeStacked} />}
+          {v.showDualOutputDisplays && (
+            <DualOutputControls stacked={studioModeStacked} display={p.display} />
+          )}
           <div
             className={cx(styles.studioDisplayContainer, { [styles.stacked]: studioModeStacked })}
           >
-            {v.showHorizontalDisplay && (
+            {p.display === 'horizontal' && (
               <div
                 className={cx(styles.studioEditorDisplayContainer, 'noselect')}
                 style={{ cursor: v.cursor }}
@@ -178,15 +187,38 @@ export default function StudioEditor() {
                 onContextMenu={eventHandlers.onContextMenu}
               >
                 <Display
+                  type="horizontal"
                   drawUI={true}
                   paddingSize={10}
                   onOutputResize={eventHandlers.onOutputResize}
                   renderingMode={ERenderingMode.OBS_MAIN_RENDERING}
-                  sourceId={v.studioMode ? studioModeTransitionName : v.activeSceneId}
+                  // sourceId={v.studioMode && !v.showDualOutputDisplays ? studioModeTransitionName : v.activeSceneId}
                 />
               </div>
             )}
-            {!v.showDualOutputDisplays && v.showHorizontalDisplay && v.studioMode && (
+            {p.display === 'vertical' && (
+              <div
+                className={cx(styles.studioEditorDisplayContainer, 'noselect')}
+                style={{ cursor: v.cursor }}
+                onMouseDown={eventHandlers.onMouseDown}
+                onMouseUp={eventHandlers.onMouseUp}
+                onMouseEnter={eventHandlers.onMouseEnter}
+                onMouseMove={eventHandlers.onMouseMove}
+                onDoubleClick={eventHandlers.onMouseDblClick}
+                onContextMenu={eventHandlers.onContextMenu}
+              >
+                <Display
+                  type="vertical"
+                  drawUI={true}
+                  paddingSize={10}
+                  onOutputResize={eventHandlers.onOutputResize}
+                  renderingMode={ERenderingMode.OBS_MAIN_RENDERING}
+                  // sourceId={v.studioMode && !v.showDualOutputDisplays ? studioModeTransitionName : v.activeSceneId}
+                />
+              </div>
+            )}
+
+            {/* {!v.showDualOutputDisplays && v.showHorizontalDisplay && v.studioMode && (
               <div className={styles.studioModeDisplayContainer}>
                 <Display paddingSize={10} />
               </div>
@@ -196,7 +228,7 @@ export default function StudioEditor() {
               <div className={styles.studioModeDisplayContainer}>
                 <Display paddingSize={10} />
               </div>
-            )}
+            )} */}
 
             {/* {!v.showDualOutputDisplays && (
               <div
@@ -297,7 +329,7 @@ function StudioModeControls(p: { stacked: boolean }) {
   );
 }
 
-function DualOutputControls(p: { stacked: boolean }) {
+function DualOutputControls(p: { stacked: boolean; display: TDisplayType }) {
   // const { TransitionsService } = Services;
   const horizontalTooltipText = $t(
     'Arrange your sources here to where you want them to be viewed on any platform you mark as being streamed  with a horizontal output.',
@@ -306,20 +338,30 @@ function DualOutputControls(p: { stacked: boolean }) {
     'Arrange your sources here to where you want them to be viewed on any platform you mark as being streamed with a vertical output.',
   );
 
+  const control = {
+    horizontal: {
+      icon: 'icon-desktop',
+      tooltip: horizontalTooltipText,
+      title: $t('Horizontal Output'),
+    },
+    vertical: {
+      icon: 'icon-phone-case',
+      tooltip: verticalTooltipText,
+      title: $t('Vertical Output'),
+    },
+  };
+
   return (
     <div className={cx(styles.dualOutputModeControls, { [styles.stacked]: p.stacked })}>
       <div className={styles.dualOutputModeDetails}>
-        <i className="icon-desktop" />
-        <span>{$t('Horizontal Output')}</span>
-        <Tooltip title={horizontalTooltipText} placement="right" className={styles.dualOutputTip}>
-          <i className="icon-information" />
-        </Tooltip>
-      </div>
-
-      <div className={styles.dualOutputModeDetails}>
-        <i className="icon-phone-case" />
-        <span>{$t('Vertical Output')}</span>
-        <Tooltip title={verticalTooltipText} placement="right" className={styles.dualOutputTip}>
+        <i className={control[p.display].icon} />
+        <span>{control[p.display].title}</span>
+        <Tooltip
+          title={control[p.display].tooltip}
+          placement="right"
+          className={styles.dualOutputTip}
+          overlayInnerStyle={{ minWidth: '280px' }}
+        >
           <i className="icon-information" />
         </Tooltip>
       </div>
