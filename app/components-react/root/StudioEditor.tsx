@@ -4,7 +4,7 @@ import styles from './StudioEditor.m.less';
 import { Services } from 'components-react/service-provider';
 import cx from 'classnames';
 import Display from 'components-react/shared/Display';
-import DualOutputDisplay from 'components-react/shared/DualOutputDisplay';
+// import DualOutputDisplay from 'components-react/shared/DualOutputDisplay';
 import { $t } from 'services/i18n';
 import { ERenderingMode } from '../../../obs-api';
 import { Tooltip } from 'antd';
@@ -330,13 +330,8 @@ function StudioModeControls(p: { stacked: boolean }) {
 }
 
 function DualOutputControls(p: { stacked: boolean; display: TDisplayType }) {
-  // const { TransitionsService } = Services;
-  const horizontalTooltipText = $t(
-    'Arrange your sources here to where you want them to be viewed on any platform you mark as being streamed  with a horizontal output.',
-  );
-  const verticalTooltipText = $t(
-    'Arrange your sources here to where you want them to be viewed on any platform you mark as being streamed with a vertical output.',
-  );
+  const horizontalTooltipText = $t('Arrange sources here for a horizontal scene layout.');
+  const verticalTooltipText = $t('Arrange sources here for a vertical scene layout.');
 
   const control = {
     horizontal: {
@@ -358,9 +353,11 @@ function DualOutputControls(p: { stacked: boolean; display: TDisplayType }) {
         <span>{control[p.display].title}</span>
         <Tooltip
           title={control[p.display].tooltip}
-          placement="right"
+          placement="rightBottom"
           className={styles.dualOutputTip}
-          overlayInnerStyle={{ minWidth: '280px' }}
+          // setting the widths below prevents the text from wrapping
+          // and prevents the tooltip from showing underneath the editor screen
+          overlayInnerStyle={{ minWidth: p.display === 'horizontal' ? '332px' : '316px' }}
         >
           <i className="icon-information" />
         </Tooltip>
