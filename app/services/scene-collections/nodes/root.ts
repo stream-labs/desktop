@@ -8,13 +8,21 @@ import { VideoService } from 'services/video';
 import { StreamingService } from 'services/streaming';
 import { OS } from 'util/operating-systems';
 import { GuestCamNode } from './guest-cam';
-import { VideoSettingsService } from 'services/settings-v2/video';
+import { TDisplayType, VideoSettingsService } from 'services/settings-v2/video';
 import { DualOutputService } from 'services/dual-output';
+import { SettingsManagerService } from 'services/settings-manager';
 
 interface ISchema {
+  defaultDisplay: TDisplayType;
   baseResolution: {
-    width: number;
-    height: number;
+    horizontal: {
+      width: number;
+      height: number;
+    };
+    vertical: {
+      width: number;
+      height: number;
+    };
   };
 
   selectiveRecording?: boolean;
@@ -37,6 +45,7 @@ export class RootNode extends Node<ISchema, {}> {
   @Inject() streamingService: StreamingService;
   @Inject() videoSettingsService: VideoSettingsService;
   @Inject() dualOutputService: DualOutputService;
+  @Inject() settingsManagerService: SettingsManagerService;
 
   async save(): Promise<void> {
     const sources = new SourcesNode();
@@ -58,11 +67,12 @@ export class RootNode extends Node<ISchema, {}> {
       hotkeys,
       guestCam,
       // contexts: this.videoSettingsService.contexts,
-      // baseResolution: {
-      //   width: this.videoSettingsService.state['default'].baseWidth,
-      //   height: this.videoSettingsService.state['default'].baseHeight,
-      // },
-      baseResolution: this.videoService.baseResolution,
+      defaultDisplay: this.settingsManagerService.views.videoSettings.defaultDisplay,
+      baseResolution: {
+        horizontal: this.videoService.baseResolution.horizontal,
+        vertical: this.videoService.baseResolution.vertical,
+      },
+      // baseResolution: this.videoService.baseResolution,
       selectiveRecording: this.streamingService.state.selectiveRecording,
       dualOutputMode: this.dualOutputService.state.dualOutputMode,
       operatingSystem: process.platform as OS,
@@ -80,7 +90,7 @@ export class RootNode extends Node<ISchema, {}> {
     // console.log('this.data.contexts ', this.data.contexts);
 
     // this.videoService.setContexts(this.data.contexts);
-    this.videoService.setBaseResolution(this.data.baseResolution);
+    this.videoService.setBaseResolution(this.data.baseResolution[this.data.defaultDisplay]);
     this.streamingService.setSelectiveRecording(!!this.data.selectiveRecording);
     this.streamingService.setDualOutputMode(this.data.dualOutputMode);
 

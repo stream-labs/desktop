@@ -372,27 +372,27 @@ export class SceneItem extends SceneItemNode {
     });
   }
 
-  stretchToScreen() {
+  stretchToScreen(display?: TDisplayType) {
     const rect = new ScalableRectangle(this.rectangle);
-    rect.stretchAcross(this.videoService.getScreenRectangle());
+    rect.stretchAcross(this.videoService.getScreenRectangle(display));
     this.setRect(rect);
   }
 
-  fitToScreen() {
+  fitToScreen(display?: TDisplayType) {
     const rect = new ScalableRectangle(this.rectangle);
-    rect.fitTo(this.videoService.getScreenRectangle());
+    rect.fitTo(this.videoService.getScreenRectangle(display));
     this.setRect(rect);
   }
 
-  centerOnScreen() {
+  centerOnScreen(display?: TDisplayType) {
     const rect = new ScalableRectangle(this.rectangle);
-    rect.centerOn(this.videoService.getScreenRectangle());
+    rect.centerOn(this.videoService.getScreenRectangle(display));
     this.setRect(rect);
   }
 
-  centerOnAxis(axis: CenteringAxis) {
+  centerOnAxis(axis: CenteringAxis, display?: TDisplayType) {
     const rect = new ScalableRectangle(this.rectangle);
-    rect.centerOn(this.videoService.getScreenRectangle(), axis);
+    rect.centerOn(this.videoService.getScreenRectangle(display), axis);
     this.setRect(rect);
   }
 

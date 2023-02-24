@@ -5,6 +5,7 @@ import { IVideoInfo } from 'obs-studio-node';
 
 interface ISettingsManagerServiceState {
   videoSettings: {
+    defaultDisplay: TDisplayType;
     vertical: IVideoInfo;
     activeDisplays: {
       horizontal: boolean;
@@ -21,11 +22,21 @@ class SettingsManagerServiceViews extends ViewHandler<ISettingsManagerServiceSta
   get activeDisplays() {
     return this.state.videoSettings.activeDisplays;
   }
+
+  get defaultDisplay() {
+    const active = Object.entries(this.state.videoSettings.activeDisplays).map(([key, value]) => {
+      if (value === true) {
+        return { key };
+      }
+    });
+    return active.length > 1 ? null : active[0];
+  }
 }
 
 export class SettingsManagerService extends PersistentStatefulService<ISettingsManagerServiceState> {
   static defaultState = {
     videoSettings: {
+      defaultDisplay: 'horizontal',
       vertical: verticalDisplayData, // get settings for horizontal display from obs directly
       activeDisplays: {
         horizontal: true,
@@ -47,6 +58,7 @@ export class SettingsManagerService extends PersistentStatefulService<ISettingsM
    */
 
   setDisplayActive(status: boolean, display?: TDisplayType) {
+    console.log('this.views.defaultDisplay ', this.views.defaultDisplay);
     this.SET_DISPLAY_ACTIVE(status, display);
   }
 
@@ -75,6 +87,8 @@ export class SettingsManagerService extends PersistentStatefulService<ISettingsM
         [display]: status,
       };
     }
+
+    this.state.videoSettings.defaultDisplay = display;
   }
 
   @mutation()

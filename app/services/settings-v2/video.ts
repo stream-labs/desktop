@@ -141,12 +141,13 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
   }
 
   getBaseResolution(display: TDisplayType = 'horizontal') {
+    console.log('display ', display);
     return `${this.state[display].baseWidth}x${this.state[display].baseHeight}`;
   }
 
   formatVideoSettings(display: TDisplayType = 'horizontal') {
     let settings;
-    if (display === 'horizontal' || this.dualOutputService.views.dualOutputMode) {
+    if (display === 'horizontal') {
       settings = this.state[display];
     } else {
       settings = this.settingsManagerService.views.videoSettings.vertical;

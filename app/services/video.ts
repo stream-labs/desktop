@@ -15,6 +15,7 @@ import * as remote from '@electron/remote';
 import { onUnload } from 'util/unload';
 import { ScenesService } from './api/external-api/resources';
 import { capitalize } from 'lodash';
+import { SettingsManagerService } from './settings-manager';
 
 // TODO: There are no typings for nwr
 let nwr: any;
@@ -304,36 +305,52 @@ export class VideoService extends Service {
   @Inject() scenesService: ScenesService;
   @Inject() videoSettingsService: VideoSettingsService;
   @Inject() dualOutputService: DualOutputService;
+  @Inject() settingsManagerService: SettingsManagerService;
 
   init() {
     this.settingsService.loadSettingsIntoStore();
   }
 
-  getScreenRectangle() {
+  getScreenRectangle(display: TDisplayType = 'horizontal') {
     return new ScalableRectangle({
       x: 0,
       y: 0,
-      width: this.baseWidth,
-      height: this.baseHeight,
+      width: this.baseResolution[display].baseWidth,
+      height: this.baseResolution[display].baseHeight,
     });
   }
 
   get baseWidth() {
-    return this.baseResolution.width;
+    return this.baseResolution.horizontal.width;
   }
 
   get baseHeight() {
-    return this.baseResolution.height;
+    return this.baseResolution.horizontal.height;
   }
 
   get baseResolution() {
+    // const [widthStr, heightStr] = this.settingsService.views.values.Video.Base.split('x');
+    // const width = parseInt(widthStr, 10);
+    // const height = parseInt(heightStr, 10);
+
+    // return {
+    //   width,
+    //   height,
+    // };
+
     const [widthStr, heightStr] = this.settingsService.views.values.Video.Base.split('x');
     const width = parseInt(widthStr, 10);
     const height = parseInt(heightStr, 10);
 
     return {
-      width,
-      height,
+      horizontal: {
+        width,
+        height,
+      },
+      vertical: {
+        width: this.settingsManagerService.views.videoSettings.vertical.baseWidth,
+        height: this.settingsManagerService.views.videoSettings.vertical.baseHeight,
+      },
     };
   }
 

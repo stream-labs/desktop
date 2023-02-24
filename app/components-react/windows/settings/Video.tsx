@@ -45,12 +45,6 @@ class VideoSettingsModule {
     return Services.OnboardingService;
   }
 
-  get SettingsManagerService() {
-    return Services.SettingsManagerService;
-  }
-
-  displays = Object.keys(this.SettingsManagerService.views.activeDisplays);
-
   service = Services.VideoSettingsService;
 
   state = injectState({
@@ -146,10 +140,8 @@ class VideoSettingsModule {
 
   formatValues(display: TDisplayType) {
     const vals = this.service.values[display];
-    const baseRes = this.state[display].hasOwnProperty('customBaseRes') ? 'custom' : vals.baseRes;
-    const outputRes = this.state[display].hasOwnProperty('customOutputRes')
-      ? 'custom'
-      : vals.outputRes;
+    const baseRes = this.state[display]?.customBaseRes ? 'custom' : vals.baseRes;
+    const outputRes = this.state[display]?.outputRes ? 'custom' : vals.outputRes;
     return {
       ...vals,
       baseRes,
@@ -311,12 +303,20 @@ class VideoSettingsModule {
   }
 
   selectResolution(key: string, value: string, display: TDisplayType) {
+    console.log('value ', value);
     if (value === 'custom') {
       this.setCustomResolution(key, true, display);
       this.setResolution(key, '', display);
     } else {
       this.setCustomResolution(key, false, display);
       this.setResolution(key, value, display);
+    }
+
+    if (this.resolutionValidator.pattern.test(value)) {
+      const [width, height] = value.split('x');
+      const prefix = key === 'baseRes' ? 'base' : 'output';
+      this.service.actions.setVideoSetting(`${prefix}Width`, Number(width));
+      this.service.actions.setVideoSetting(`${prefix}Height`, Number(height));
     }
   }
 
@@ -328,10 +328,12 @@ class VideoSettingsModule {
   }
 
   setCustomResolution(key: string, value: boolean, display: TDisplayType) {
+    const setDisplay = display === 'horizontal' ? this.state.setHorizontal : this.state.setVertical;
+
     if (key === 'baseRes') {
-      this.state[display].setCustomBaseRes(value);
+      setDisplay({ ...this.state[display], customBaseRes: value });
     } else {
-      this.state[display].setCustomOutputRes(value);
+      setDisplay({ ...this.state[display], customOutputRes: value });
     }
   }
 
