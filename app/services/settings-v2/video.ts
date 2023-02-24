@@ -79,7 +79,7 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
 
   get values() {
     return {
-      default: this.videoSettingsValues,
+      // default: this.videoSettingsValues,
       horizontal: this.horizontalSettingsValues,
       vertical: this.verticalSettingsValues,
     };
@@ -100,9 +100,9 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
     };
   }
 
-  get videoSettingsValues() {
-    return this.formatVideoSettings('default');
-  }
+  // get videoSettingsValues() {
+  //   return this.formatVideoSettings('default');
+  // }
 
   get horizontalSettingsValues() {
     return this.formatVideoSettings('horizontal');
@@ -151,8 +151,6 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
     } else {
       settings = this.settingsManagerService.views.videoSettings.vertical;
     }
-
-    console.log('display ', display, ' settings ', settings);
 
     return {
       baseRes: `${settings.baseWidth}x${settings.baseHeight}`,
