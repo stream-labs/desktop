@@ -1,3 +1,5 @@
+import { Subject } from 'rxjs';
+import debounce from 'lodash/debounce';
 import { Service } from '../core/service';
 import * as obs from '../../../obs-api';
 import { Inject } from 'services';
@@ -5,7 +7,6 @@ import { StreamSettingsService } from 'services/settings/streaming';
 import { getPlatformService } from 'services/platforms';
 import { TwitchService } from 'services/platforms/twitch';
 import { VideoSettingsService } from 'services/settings-v2/video';
-import { Subject } from 'rxjs';
 
 export type TConfigEvent = 'starting_step' | 'progress' | 'stopping_step' | 'error' | 'done';
 
@@ -56,8 +57,8 @@ export class AutoConfigService extends Service {
         if (progress.event === 'stopping_step') {
           obs.NodeObs.TerminateAutoConfig();
           this.videoSettingsService.migrateSettings();
+          debounce(() => this.configProgress.next({ ...progress, event: 'done' }), 3000)();
         }
-        this.configProgress.next(progress);
       },
       { continent: '', service_name: '' },
     );
