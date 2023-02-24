@@ -24,13 +24,13 @@ export function DualOutputSourceSelector(p: { nodeId: string }) {
       {/* @@@ TODO: update font and font icons.*/}
 
       <i
-        onClick={() => toggleVisibility(v.verticalNodeId)}
-        className={v.isVerticalVisible ? 'icon-phone-case' : 'icon-phone-case-hide'}
+        onClick={() => toggleVisibility(v.horizontalNodeId)}
+        className={v.isHorizontalVisible ? 'icon-desktop' : 'icon-desktop-hide'}
       />
 
       <i
-        onClick={() => toggleVisibility(v.horizontalNodeId)}
-        className={v.isHorizontalVisible ? 'icon-desktop' : 'icon-desktop-hide'}
+        onClick={() => toggleVisibility(v.verticalNodeId)}
+        className={v.isVerticalVisible ? 'icon-phone-case' : 'icon-phone-case-hide'}
       />
     </>
   );
