@@ -58,18 +58,19 @@ export class GuestTrack extends MediasoupEntity {
     if (this.opts.kind !== 'video') return;
     if (!this.consumerId) return;
 
-    const totalStreams = this.guestCamService.consumer.guests.length;
+    const height = this.guestCamService.views.getSourceForGuest(this.opts.streamId).height;
+
     const highLayer = { spatialLayer: 2, temporalLayer: 2 };
     const midLayer = { spatialLayer: 1, temporalLayer: 2 };
     const lowLayer = { spatialLayer: 0, temporalLayer: 2 };
 
     let preferredLayer = highLayer;
 
-    if (totalStreams > 1) {
+    if (height < 720) {
       preferredLayer = midLayer;
     }
 
-    if (totalStreams > 3) {
+    if (height < 480) {
       preferredLayer = lowLayer;
     }
 
