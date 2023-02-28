@@ -28,7 +28,7 @@
             "name": "font-manager",
             "url": "https://slobs-font-manager.s3-us-west-2.amazonaws.com/",
             "archive": "font-manager-[VERSION]-[OS][ARCH].tar.gz",
-            "version": "1.2.5",
+            "version": "1.2.6",
             "win64": true,
             "osx": true
         },
@@ -52,7 +52,7 @@
             "name": "game_overlay",
             "url": "https://obs-studio-deployment.s3-us-west-2.amazonaws.com/",
             "archive": "game-overlay-[VERSION]-[OS].tar.gz",
-            "version": "0.0.58",
+            "version": "0.0.59",
             "win64": true,
             "osx": false
         },
