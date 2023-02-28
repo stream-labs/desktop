@@ -39,7 +39,11 @@ export interface IFacebookLiveVideo {
   permalink_url: string;
   video: { id: string };
   broadcast_start_time: string;
-  event_params?: { start_time?: number; cover?: string; status?: string };
+  event_params: {
+    start_time?: number;
+    cover?: string;
+    status?: 'UNPUBLISHED' | 'SCHEDULED_UNPUBLISHED' | 'LIVE_STOPPED' | 'LIVE';
+  };
 }
 
 /**
@@ -78,7 +82,11 @@ export interface IFacebookStartStreamOptions {
   description?: string;
   liveVideoId?: string;
   privacy?: { value: TFacebookStreamPrivacy };
-  event_params: { start_time?: number; cover?: string; status?: string };
+  event_params: {
+    start_time?: number;
+    cover?: string;
+    status?: 'UNPUBLISHED' | 'SCHEDULED_UNPUBLISHED' | 'LIVE_STOPPED' | 'LIVE';
+  };
 }
 
 export type TDestinationType = 'me' | 'page' | 'group' | '';
@@ -288,6 +296,7 @@ export class FacebookService
     }
     if (switchToLive) {
       data.status = 'LIVE_NOW';
+      data.event_params.status = 'LIVE_NOW';
     }
     const destinationId = this.views.getDestinationId(options);
     const token = this.views.getDestinationToken(options.destinationType, destinationId);
