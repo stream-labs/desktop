@@ -1,5 +1,10 @@
 build: off
 
+skip_commits:
+  files:
+    - .github/*
+    - README.md
+
 install:
   - ps: Install-Product node 16 x64
   - ps: Add-Content -Path "$env:userprofile\.npmrc" -Value "//npm.pkg.github.com/:_authToken=$env:github_token"
