@@ -139,7 +139,6 @@ export class FacebookService
     'chat',
     'game',
     'user-info',
-    'stream-schedule',
     'account-merging',
     'streamlabels',
     'themes',
