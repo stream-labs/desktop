@@ -37,11 +37,9 @@ export interface IFacebookLiveVideo {
   game: string;
   description: string;
   permalink_url: string;
-  planned_start_time: string;
+  video: { id: string };
   broadcast_start_time: string;
-  video: {
-    id: string;
-  };
+  event_params?: { start_time?: number; cover?: string; status?: string };
 }
 
 /**
@@ -80,7 +78,7 @@ export interface IFacebookStartStreamOptions {
   description?: string;
   liveVideoId?: string;
   privacy?: { value: TFacebookStreamPrivacy };
-  plannedStartTime?: number;
+  event_params: { start_time?: number; cover?: string; status?: string };
 }
 
 export type TDestinationType = 'me' | 'page' | 'group' | '';
@@ -107,6 +105,7 @@ const initialState: IFacebookServiceState = {
     title: '',
     description: '',
     game: '',
+    event_params: {},
     privacy: { value: 'EVERYONE' },
   },
 };
@@ -279,13 +278,13 @@ export class FacebookService
     options: IFacebookUpdateVideoOptions,
     switchToLive = false,
   ): Promise<IFacebookLiveVideo> {
-    const { title, description, game, privacy, plannedStartTime } = options;
-    const data: Dictionary<any> = { title, description };
+    const { title, description, game, privacy, event_params } = options;
+    const data: Dictionary<any> = { title, description, event_params };
     if (game) data.game_specs = { name: game };
 
-    if (plannedStartTime) {
+    if (event_params.start_time) {
       // convert plannedStartTime from milliseconds to seconds
-      data.planned_start_time = Math.round(new Date(plannedStartTime).getTime() / 1000);
+      data.event_params.start_time = Math.round(new Date(event_params.start_time).getTime() / 1000);
     }
     if (switchToLive) {
       data.status = 'LIVE_NOW';
@@ -467,8 +466,10 @@ export class FacebookService
     const data: Dictionary<any> = {
       title,
       description,
-      planned_start_time: Math.round(new Date(scheduledStartTime).getTime() / 1000),
-      status: 'SCHEDULED_UNPUBLISHED',
+      event_params: {
+        start_time: Math.round(new Date(scheduledStartTime).getTime() / 1000),
+        status: 'SCHEDULED_UNPUBLISHED',
+      },
     };
     if (game) data.game_specs = { name: game };
     const body = JSON.stringify(data);
@@ -495,7 +496,7 @@ export class FacebookService
 
     let videos = (
       await this.requestFacebook<{ data: IFacebookLiveVideo[] }>(
-        `${this.apiBase}/${destinationId}/live_videos?broadcast_status=["UNPUBLISHED","SCHEDULED_UNPUBLISHED"]&fields=title,description,status,planned_start_time,permalink_url,from${sourceParam}&since=${minDateUnix}&until=${maxDateUnix}`,
+        `${this.apiBase}/${destinationId}/live_videos?status=["UNPUBLISHED","SCHEDULED_UNPUBLISHED"]&fields=title,description,status,event_params,permalink_url,from${sourceParam}&since=${minDateUnix}&until=${maxDateUnix}`,
         token,
       )
     ).data;
@@ -503,9 +504,9 @@ export class FacebookService
     if (onlyUpcoming) {
       videos = videos.filter(v => {
         // some videos created in the new Live Producer don't have `planned_start_time`
-        if (!v.planned_start_time) return true;
+        if (!v.event_params?.start_time) return true;
 
-        const videoDate = new Date(v.planned_start_time).valueOf();
+        const videoDate = new Date(v.event_params.start_time).valueOf();
         return videoDate >= minDate && videoDate <= maxDate;
       });
     }
@@ -603,6 +604,7 @@ export class FacebookService
       description: video.description,
       pageId: destinationId,
       groupId: destinationId,
+      event_params: video.event_params,
     };
   }
 
