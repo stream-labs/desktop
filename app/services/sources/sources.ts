@@ -109,6 +109,7 @@ export const macSources: TSourceType[] = [
   'coreaudio_output_capture',
   'av_capture_input',
   'display_capture',
+  'screen_capture',
   'audio_line',
   'ndi_source',
   'vlc_source',

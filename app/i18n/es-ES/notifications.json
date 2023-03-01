@@ -20,8 +20,9 @@
   "Notifications & News": "Notificaciones",
   "News": "Noticias",
   "Notifications": "Notificaciones",
-  "A new Recording has been completed. Click for more info": "A new Recording has been completed. Click for more info",
-  "Recording History": "Recording History",
-  "Show in folder": "Show in folder",
-  "Recordings": "Recordings"
+  "A new Recording has been completed. Click for more info": "Se ha completado una nueva grabación. Hacer clic para más información",
+  "Recording History": "Historial de grabaciones",
+  "Show in folder": "Mostrar en carpeta",
+  "Recordings": "Grabaciones",
+  "Marker %{label} added at %{timestamp}": "Marker %{label} added at %{timestamp}"
 }
