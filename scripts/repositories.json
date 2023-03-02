@@ -3,24 +3,24 @@
         {
             "name": "obs-studio-node",
             "url": "https://s3-us-west-2.amazonaws.com/obsstudionodes3.streamlabs.com/",
-            "archive": "osn-[VERSION]-release-[OS][ARCH].tar.gz",
-            "version": "0.23.66",
+            "archive": "osn-[VERSION]-release-[OS].tar.gz",
+            "version": "0.23.65",
             "win64": true,
             "osx": true
         },
         {
             "name": "node-libuiohook",
             "url": "https://slobs-node-libuiohook.s3-us-west-2.amazonaws.com/",
-            "archive": "node-libuiohook-[VERSION]-[OS][ARCH].tar.gz",
-            "version": "1.1.13",
+            "archive": "node-libuiohook-[VERSION]-[OS].tar.gz",
+            "version": "1.1.12",
             "win64": true,
             "osx": true
         },
         {
             "name": "node-fontinfo",
             "url": "https://slobs-node-fontinfo.s3-us-west-2.amazonaws.com/",
-            "archive": "node-fontinfo-[VERSION]-[OS][ARCH].tar.gz",
-            "version": "1.1.8",
+            "archive": "node-fontinfo-[VERSION]-[OS].tar.gz",
+            "version": "1.1.7",
             "win64": true,
             "osx": true
         },
@@ -35,16 +35,16 @@
         {
             "name": "crash-handler",
             "url": "https://slobs-crash-handler.s3-us-west-2.amazonaws.com/",
-            "archive": "crash-handler-[VERSION]-[OS][ARCH].tar.gz",
-            "version": "1.2.15",
+            "archive": "crash-handler-[VERSION]-[OS].tar.gz",
+            "version": "1.2.14",
             "win64": true,
             "osx": true
         },
         {
             "name": "node-window-rendering",
             "url": "https://slobs-node-window-rendering.s3-us-west-2.amazonaws.com/",
-            "archive": "node-window-rendering-[VERSION]-[OS][ARCH].tar.gz",
-            "version": "1.0.18",
+            "archive": "node-window-rendering-[VERSION]-[OS].tar.gz",
+            "version": "1.0.17",
             "win64": false,
             "osx": true
         },
