@@ -448,7 +448,7 @@ class StreamSchedulerModule {
   setTime(time: number) {
     this.state.time = time;
     if (this.state.selectedPlatform === 'facebook') {
-      getDefined(this.state.platformSettings.facebook).plannedStartTime = time;
+      getDefined(this.state.platformSettings.facebook).event_params.start_time = time;
     } else {
       getDefined(this.state.platformSettings.youtube).scheduledStartTime = time;
     }
@@ -529,7 +529,9 @@ function convertFBLiveVideoToEvent(fbLiveVideo: IFacebookLiveVideoExtended): ISt
   return {
     platform: 'facebook',
     id: fbLiveVideo.id,
-    date: new Date(fbLiveVideo.planned_start_time || fbLiveVideo.broadcast_start_time).valueOf(),
+    date: new Date(
+      fbLiveVideo.event_params?.start_time || fbLiveVideo.broadcast_start_time,
+    ).valueOf(),
     title: fbLiveVideo.title,
     status: 'scheduled',
     facebook: {

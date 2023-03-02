@@ -53,13 +53,7 @@ export class AutoConfigService extends Service {
 
   async startRecording() {
     obs.NodeObs.InitializeAutoConfig(
-      (progress: IConfigProgress) => {
-        if (progress.event === 'stopping_step') {
-          obs.NodeObs.TerminateAutoConfig();
-          this.videoSettingsService.migrateSettings();
-          debounce(() => this.configProgress.next({ ...progress, event: 'done' }), 3000)();
-        }
-      },
+      (progress: IConfigProgress) => this.handleRecordingProgress(progress),
       { continent: '', service_name: '' },
     );
 
@@ -90,6 +84,18 @@ export class AutoConfigService extends Service {
     if (progress.event === 'done') {
       obs.NodeObs.TerminateAutoConfig();
       this.videoSettingsService.migrateSettings();
+    }
+  }
+
+  handleRecordingProgress(progress: IConfigProgress) {
+    if (progress.event === 'stopping_step') {
+      if (progress.description === 'recordingEncoder_test') {
+        obs.NodeObs.StartSaveSettings();
+      } else {
+        obs.NodeObs.TerminateAutoConfig();
+        this.videoSettingsService.migrateSettings();
+        debounce(() => this.configProgress.next({ ...progress, event: 'done' }), 1000)();
+      }
     }
   }
 }
