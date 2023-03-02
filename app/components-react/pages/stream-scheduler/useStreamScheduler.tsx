@@ -529,9 +529,7 @@ function convertFBLiveVideoToEvent(fbLiveVideo: IFacebookLiveVideoExtended): ISt
   return {
     platform: 'facebook',
     id: fbLiveVideo.id,
-    date: new Date(
-      fbLiveVideo.event_params?.start_time || fbLiveVideo.broadcast_start_time,
-    ).valueOf(),
+    date: new Date(fbLiveVideo.broadcast_start_time).valueOf(),
     title: fbLiveVideo.title,
     status: 'scheduled',
     facebook: {
