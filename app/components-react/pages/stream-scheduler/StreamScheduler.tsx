@@ -166,6 +166,13 @@ function EventSettingsModal() {
                 label: getPlatformDisplayName(platform),
               }))}
               onChange={platform => showNewEventModal(platform)}
+              description={
+                selectedPlatform === 'facebook'
+                  ? $t(
+                      'Please note that while you can schedule streams to Facebook, they will not appear on this calendar due to API limitations',
+                    )
+                  : undefined
+              }
             />
           )}
 
