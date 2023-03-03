@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/vue';
 import * as electron from 'electron';
 import moment from 'moment';
 import { Subject } from 'rxjs';
@@ -224,7 +225,13 @@ export class StreamingService
           );
         }
       } catch (e) {
-        console.error('StreamingService.toggleStreamAsync niconico', JSON.stringify(e));
+        Sentry.withScope(scope => {
+          scope.setLevel('error');
+          scope.setTag('service', 'StreamingService');
+          scope.setTag('method', 'toggleStreamingAsync');
+          scope.setFingerprint(['StreamingService', 'toggleStreamingAsync', 'niconico', 'exception']);
+          Sentry.captureException(e);
+        });
         let message: string;
         if (e instanceof Response) {
           if (e.status === 401) {
@@ -405,8 +412,13 @@ export class StreamingService
         const recordingSettings = this.settingsService.getRecordingSettings();
         if (recordingSettings) {
           // send Recording type to Sentry (どれぐらいURL出力が使われているかの比率を調査する)
-          console.error('Recording / recType:' + recordingSettings.recType);
-          console.log('Recording / path:' + JSON.stringify(recordingSettings.path));
+          Sentry.withScope(scope => {
+            scope.setLevel('info');
+            scope.setExtra('recType', recordingSettings.recType);
+            scope.setExtra('path', recordingSettings.path);
+            scope.setFingerprint(['recording', 'recType', recordingSettings.recType]);
+            Sentry.captureMessage('Recording / recType:' + recordingSettings.recType);
+          });
         }
       }
 

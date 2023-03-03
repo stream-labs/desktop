@@ -13,7 +13,7 @@ import {
   IPlatformService,
   IStreamingSetting,
 } from './platforms';
-import * as Sentry from '@sentry/browser';
+import * as Sentry from '@sentry/vue';
 import { AppService } from 'services/app';
 import { SceneCollectionsService } from 'services/scene-collections';
 import { Subject, Observable, merge } from 'rxjs';

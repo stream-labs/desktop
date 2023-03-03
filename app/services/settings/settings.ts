@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/vue';
 import cloneDeep from 'lodash/cloneDeep';
 import { StatefulService, mutation } from 'services/core/stateful-service';
 import {
@@ -580,19 +581,39 @@ export class SettingsService
       if (delta.length === 0) {
         // send to Sentry
         if (retry > 0) {
-          console.error(`optimizeForNiconico: リトライ ${retry} 回で救済`);
+          Sentry.withScope(scope => {
+            scope.setLevel('info');
+            scope.setTag('optimizeForNiconico', 'retry');
+            scope.setTag('retry', `${retry}`);
+            scope.setFingerprint(['optimizeForNiconico', 'retry', `${retry}`]);
+            Sentry.captureMessage('optimizeForNiconico: リトライで成功')
+          });
         } else {
-          console.error('optimizeForNiconico: 一発で成功');
+          Sentry.withScope(scope => {
+            scope.setLevel('info');
+            scope.setTag('optimizeForNiconico', 'success');
+            scope.setFingerprint(['optimizeForNiconico', 'success']);
+            Sentry.captureMessage('optimizeForNiconico: 一発で成功')
+          });
         }
         return;
       }
-      console.info(
-        `optimizeForNiconico: #${retry}: optimization setting is not set perfectly: `,
-        JSON.stringify(delta),
-      );
+      Sentry.withScope(scope => {
+        scope.setLevel('warning');
+        scope.setTag('optimizeForNiconico', 'partial');
+        scope.setTag('retry', `${retry}`);
+        scope.setFingerprint(['optimizeForNiconico', 'partial']);
+        scope.setExtra('delta', delta);
+        Sentry.captureMessage(`optimizeForNiconico: optimization setting is not set perfectly`);
+      });
     }
     // send to Sentry
-    console.error('optimizeForNiconico: 最適化リトライ満了したが設定できなかった');
+    Sentry.withScope(scope => {
+      scope.setLevel('error');
+      scope.setTag('optimizeForNiconico', 'failed');
+      scope.setFingerprint(['optimizeForNiconico', 'failed']);
+      Sentry.captureMessage('optimizeForNiconico: 最適化リトライ満了したが設定できなかった');
+    });
   }
 
   private findSubCategory(

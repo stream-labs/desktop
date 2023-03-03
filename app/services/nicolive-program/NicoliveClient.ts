@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/vue';
 import { remote, ipcRenderer } from 'electron';
 import {
   ProgramSchedules,
@@ -553,6 +554,12 @@ export class NicoliveClient {
           resolve(CreateResult.RESERVED);
           win.close();
         } else if (!NicoliveClient.isAllowedURL(url)) {
+          Sentry.withScope(scope => {
+            scope.setLevel('warning');
+            scope.setExtra('url', url);
+            scope.setFingerprint(['createProgram', 'did-navigate', url]);
+            Sentry.captureMessage('createProgram did-navigate to unexpected URL');
+          });
           resolve(CreateResult.OTHER);
           remote.shell.openExternal(url);
           win.close();
@@ -560,7 +567,19 @@ export class NicoliveClient {
       });
       ipcRenderer.send('window-preventLogout', win.id);
       ipcRenderer.send('window-preventNewWindow', win.id);
-      win.loadURL('https://live.nicovideo.jp/create');
+      const url = 'https://live.nicovideo.jp/create';
+      win.loadURL(url)?.catch(
+        error => {
+          if (error instanceof Error) {
+            Sentry.withScope(scope => {
+              scope.setLevel('warning');
+              scope.setExtra('url', url);
+              scope.setFingerprint(['createProgram', 'loadURL', url]);
+              Sentry.captureException(error);
+            });
+          }
+        }
+      );
     });
   }
 
@@ -583,6 +602,13 @@ export class NicoliveClient {
           resolve(EditResult.EDITED);
           win.close();
         } else if (!NicoliveClient.isAllowedURL(url)) {
+          Sentry.withScope(scope => {
+            scope.setLevel('warning');
+            scope.setExtra('url', url);
+            scope.setTag('programID', programID);
+            scope.setFingerprint(['editProgram', 'did-navigate', url]);
+            Sentry.captureMessage('editProgram did-navigate to unexpected URL');
+          });
           resolve(EditResult.OTHER);
           remote.shell.openExternal(url);
           win.close();
@@ -590,7 +616,20 @@ export class NicoliveClient {
       });
       ipcRenderer.send('window-preventLogout', win.id);
       ipcRenderer.send('window-preventNewWindow', win.id);
-      win.loadURL(`https://live.nicovideo.jp/edit/${programID}`);
+      const url = `https://live.nicovideo.jp/edit/${programID}`;
+      win.loadURL(url)?.catch(
+        error => {
+          if (error instanceof Error) {
+            Sentry.withScope(scope => {
+              scope.setLevel('warning');
+              scope.setExtra('url', url);
+              scope.setTag('programID', programID);
+              scope.setFingerprint(['editProgram', 'loadURL', url]);
+              Sentry.captureException(error);
+            });
+          }
+        }
+      );
     });
   }
 }

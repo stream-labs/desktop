@@ -259,7 +259,7 @@ if (!gotTheLock) {
     );
     crashHandler.registerProcess(pid, false);
 
-    const Raven = require('raven');
+    const SentryElectron = require('@sentry/electron');
 
     function handleFinishedReport() {
       dialog.showErrorBox(
@@ -276,11 +276,13 @@ if (!gotTheLock) {
         ? { project: '5372801', key: '819e76e51864453aafd28c6d0473881f' } // crash-reporter-unstable
         : { project: '1520076', key: 'd965eea4b2254c2b9f38d2346fb8a472' }; // crash-reporter
 
-      Raven.config(`https://${params.key}@o170115.ingest.sentry.io/${params.project}`, {
+      SentryElectron.init({
+        dsn: `https://${params.key}@o170115.ingest.sentry.io/${params.project}`,
         release: process.env.NAIR_VERSION,
-      }).install(function (err, initialErr, eventId) {
-        handleFinishedReport();
       });
+
+      // TODO
+      // handleFinishedReport();
 
       crashReporter.start({
         productName: 'n-air-app',

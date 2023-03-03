@@ -13,8 +13,7 @@ import { WindowsService } from './services/windows';
 import { AppService } from './services/app';
 import Utils from './services/utils';
 import electron from 'electron';
-import * as Sentry from '@sentry/browser';
-import * as Integrations from '@sentry/integrations';
+import * as Sentry from '@sentry/vue';
 import VTooltip from 'v-tooltip';
 import Toasted from 'vue-toasted';
 import VueI18n from 'vue-i18n';
@@ -109,6 +108,7 @@ if ((isProduction || process.env.NAIR_REPORT_TO_SENTRY) && !electron.remote.proc
   const sentryDsn = getSentryDsn(sentryParam);
   console.log(`Sentry DSN: ${sentryDsn}`);
   Sentry.init({
+    Vue,
     dsn: sentryDsn,
     release: nAirVersion,
     sampleRate: /* isPreview ? */ 1.0 /* : 0.1 */,
@@ -135,7 +135,6 @@ if ((isProduction || process.env.NAIR_REPORT_TO_SENTRY) && !electron.remote.proc
 
       return event;
     },
-    integrations: [new Integrations.Vue({ Vue })],
   });
 
   const oldConsoleError = console.error;
@@ -149,7 +148,7 @@ if ((isProduction || process.env.NAIR_REPORT_TO_SENTRY) && !electron.remote.proc
       }
 
       scope.setExtra('console-args', JSON.stringify(params, null, 2));
-      Sentry.captureMessage(msg, Sentry.Severity.Error);
+      Sentry.captureMessage(msg, 'error');
     });
   };
 }
