@@ -30,7 +30,6 @@ export interface ICustomListProps<TValue> {
   labelRender?: (opt: IListOption<TValue>) => ReactNode;
   onBeforeSearch?: (searchStr: string) => unknown;
   options?: IListOption<TValue>[];
-  description?: string;
 }
 
 // define a type for the component's props
@@ -103,7 +102,6 @@ export const ListInput = InputComponent(<T extends any>(p: TListInputProps<T>) =
       >
         {options && options.map((opt, ind) => renderOption(opt, ind, p))}
       </Select>
-      {p.description && <span className="whisper">{p.description}</span>}
     </InputWrapper>
   );
 });
