@@ -47,9 +47,10 @@ function getSentryCrashReportUrl(p: SentryParams): string {
 
 // This is the development DSN
 let sentryParam: SentryParams = {
-  organization: sentryOrg,
-  project: '1262580',
-  key: '1cb5cdf6a93c466dad570861b8c82b61',
+  // Akihiko Koizuka n-air-dev
+  organization: 'o159526',
+  project: '1222027',
+  key: '9264887647bb4b108355c6bef3a9bb5d',
 };
 
 if (isProduction) {

@@ -264,9 +264,7 @@ if (!gotTheLock) {
   }
 
   if (pjson.env === 'production' || process.env.NAIR_REPORT_TO_SENTRY) {
-    const params = process.env.NAIR_UNSTABLE
-      ? { organization: 'o170115', project: '5372801', key: '819e76e51864453aafd28c6d0473881f' } // crash-reporter-unstable
-      : { organization: 'o170115', project: '1520076', key: 'd965eea4b2254c2b9f38d2346fb8a472' }; // crash-reporter
+    const params = { organization: 'o159526', project: '1222027', key: '9264887647bb4b108355c6bef3a9bb5d', }; // koizuka
 
     process.on('uncaughtException', (error) => {
       console.log('uncaughtException', error);
