@@ -43,14 +43,15 @@ export class AutoConfigService extends Service {
           platforms: {
             youtube: {
               enabled: true,
-              useCustomFields: true,
+              useCustomFields: false,
               title: 'bandwidthTest',
               description: 'badwidthTest',
+              privacyStatus: 'private',
+              categoryId: '1',
             },
           },
           advancedMode: true,
           customDestinations: [],
-          prepopulateOptions: { youtube: { privacyStatus: 'private' } },
         });
       }
     } catch (e: unknown) {
