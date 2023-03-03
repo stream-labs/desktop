@@ -1,3 +1,6 @@
+import moment from 'moment';
+import flatten from 'lodash/flatten';
+import * as remote from '@electron/remote';
 import { mutation, InheritMutations, ViewHandler } from '../core/stateful-service';
 import { IPlatformService, IGame, TPlatformCapability, IPlatformRequest, IPlatformState } from '.';
 import { HostsService } from 'services/hosts';
@@ -10,8 +13,6 @@ import { throwStreamError } from 'services/streaming/stream-error';
 import { BasePlatformService } from './base-platform';
 import { WindowsService } from '../windows';
 import { assertIsDefined, getDefined } from '../../util/properties-type-guards';
-import flatten from 'lodash/flatten';
-import * as remote from '@electron/remote';
 
 interface IFacebookPage {
   access_token: string;
@@ -29,8 +30,17 @@ interface IFacebookGroup {
   administrator: boolean;
 }
 
+interface IFacebookEvent {
+  description: string;
+  name: string;
+  start_time: string;
+  id: string;
+}
+
+type TFacebookStatus = 'UNPUBLISHED' | 'SCHEDULED_UNPUBLISHED' | 'LIVE_STOPPED' | 'LIVE';
+
 export interface IFacebookLiveVideo {
-  status: 'UNPUBLISHED' | 'SCHEDULED_UNPUBLISHED' | 'LIVE_STOPPED' | 'LIVE';
+  status: TFacebookStatus;
   id: string;
   stream_url: string;
   title: string;
@@ -39,11 +49,7 @@ export interface IFacebookLiveVideo {
   permalink_url: string;
   video: { id: string };
   broadcast_start_time: string;
-  event_params: {
-    start_time?: number;
-    cover?: string;
-    status?: 'UNPUBLISHED' | 'SCHEDULED_UNPUBLISHED' | 'LIVE_STOPPED' | 'LIVE';
-  };
+  event_params: { start_time?: number; cover?: string; status?: TFacebookStatus };
 }
 
 /**
@@ -82,11 +88,7 @@ export interface IFacebookStartStreamOptions {
   description?: string;
   liveVideoId?: string;
   privacy?: { value: TFacebookStreamPrivacy };
-  event_params: {
-    start_time?: number;
-    cover?: string;
-    status?: 'UNPUBLISHED' | 'SCHEDULED_UNPUBLISHED' | 'LIVE_STOPPED' | 'LIVE';
-  };
+  event_params: { start_time?: number; cover?: string; status?: TFacebookStatus };
 }
 
 export type TDestinationType = 'me' | 'page' | 'group' | '';
@@ -493,8 +495,6 @@ export class FacebookService
     const timeRange = 1000 * 60 * 60 * 24;
     const maxDate = Date.now() + timeRange;
     const minDate = Date.now() - timeRange;
-    const maxDateUnix = Math.floor(maxDate / 1000);
-    const minDateUnix = Math.floor(minDate / 1000);
     const token = this.views.getDestinationToken(destinationType, destinationId);
     let sourceParam = '';
     if (destinationType === 'page' || destinationType === 'me') {
@@ -504,8 +504,8 @@ export class FacebookService
     }
 
     let videos = (
-      await this.requestFacebook<{ data: IFacebookLiveVideo[] }>(
-        `${this.apiBase}/${destinationId}/live_videos?status=["UNPUBLISHED","SCHEDULED_UNPUBLISHED"]&fields=title,description,status,event_params,permalink_url,from${sourceParam}&since=${minDateUnix}&until=${maxDateUnix}`,
+      await this.requestFacebook<{ data: IFacebookEvent[] }>(
+        `${this.apiBase}/${destinationId}/events`,
         token,
       )
     ).data;
@@ -513,13 +513,27 @@ export class FacebookService
     if (onlyUpcoming) {
       videos = videos.filter(v => {
         // some videos created in the new Live Producer don't have `planned_start_time`
-        if (!v.event_params?.start_time) return true;
+        if (!v.start_time) return true;
 
-        const videoDate = new Date(v.event_params.start_time).valueOf();
+        const videoDate = new Date(v.start_time).valueOf();
         return videoDate >= minDate && videoDate <= maxDate;
       });
     }
-    return videos;
+    return videos.map(v => ({
+      id: v.id,
+      title: v.name,
+      stream_url: '',
+      permalink_url: '',
+      event_params: {
+        start_time: moment(v.start_time).unix(),
+        status: 'SCHEDULED_UNPUBLISHED',
+      },
+      description: v.description,
+      status: 'SCHEDULED_UNPUBLISHED',
+      game: '',
+      video: { id: v.id },
+      broadcast_start_time: v.start_time,
+    }));
   }
 
   /**
@@ -528,38 +542,6 @@ export class FacebookService
   async fetchAllVideos(onlyUpcoming = false): Promise<IFacebookLiveVideoExtended[]> {
     // perform all requests simultaneously
     const requests: Promise<IFacebookLiveVideoExtended[]>[] = [];
-
-    // fetch videos from the timeline and groups
-    if (this.state.grantedPermissions.includes('publish_video')) {
-      const destinationType = 'me';
-      const destinationId = 'me';
-      requests.push(
-        this.fetchScheduledVideos(destinationType, destinationId, onlyUpcoming).then(videos =>
-          videos.map(video => ({
-            ...video,
-            destinationType,
-            destinationId,
-          })),
-        ),
-      );
-    }
-
-    // fetch videos from group
-    if (this.state.grantedPermissions.includes('publish_to_groups')) {
-      const destinationType = 'group';
-      this.state.facebookGroups.forEach(group => {
-        const destinationId = group.id;
-        requests.push(
-          this.fetchScheduledVideos(destinationType, destinationId, onlyUpcoming).then(videos =>
-            videos.map(video => ({
-              ...video,
-              destinationType,
-              destinationId,
-            })),
-          ),
-        );
-      });
-    }
 
     // fetch videos from pages
     this.state.facebookPages.forEach(page => {
