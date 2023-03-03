@@ -3,48 +3,48 @@
         {
             "name": "obs-studio-node",
             "url": "https://s3-us-west-2.amazonaws.com/obsstudionodes3.streamlabs.com/",
-            "archive": "osn-[VERSION]-release-[OS].tar.gz",
-            "version": "0.23.65",
+            "archive": "osn-[VERSION]-release-[OS][ARCH].tar.gz",
+            "version": "0.23.66",
             "win64": true,
             "osx": true
         },
         {
             "name": "node-libuiohook",
             "url": "https://slobs-node-libuiohook.s3-us-west-2.amazonaws.com/",
-            "archive": "node-libuiohook-[VERSION]-[OS].tar.gz",
-            "version": "1.1.12",
+            "archive": "node-libuiohook-[VERSION]-[OS][ARCH].tar.gz",
+            "version": "1.1.13",
             "win64": true,
             "osx": true
         },
         {
             "name": "node-fontinfo",
             "url": "https://slobs-node-fontinfo.s3-us-west-2.amazonaws.com/",
-            "archive": "node-fontinfo-[VERSION]-[OS].tar.gz",
-            "version": "1.1.7",
+            "archive": "node-fontinfo-[VERSION]-[OS][ARCH].tar.gz",
+            "version": "1.1.8",
             "win64": true,
             "osx": true
         },
         {
             "name": "font-manager",
             "url": "https://slobs-font-manager.s3-us-west-2.amazonaws.com/",
-            "archive": "font-manager-[VERSION]-[OS].tar.gz",
-            "version": "1.2.4",
+            "archive": "font-manager-[VERSION]-[OS][ARCH].tar.gz",
+            "version": "1.2.5",
             "win64": true,
             "osx": true
         },
         {
             "name": "crash-handler",
             "url": "https://slobs-crash-handler.s3-us-west-2.amazonaws.com/",
-            "archive": "crash-handler-[VERSION]-[OS].tar.gz",
-            "version": "1.2.14",
+            "archive": "crash-handler-[VERSION]-[OS][ARCH].tar.gz",
+            "version": "1.2.15",
             "win64": true,
             "osx": true
         },
         {
             "name": "node-window-rendering",
             "url": "https://slobs-node-window-rendering.s3-us-west-2.amazonaws.com/",
-            "archive": "node-window-rendering-[VERSION]-[OS].tar.gz",
-            "version": "1.0.17",
+            "archive": "node-window-rendering-[VERSION]-[OS][ARCH].tar.gz",
+            "version": "1.0.18",
             "win64": false,
             "osx": true
         },
