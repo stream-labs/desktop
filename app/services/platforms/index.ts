@@ -6,6 +6,7 @@ import { TTwitchOAuthScope } from './twitch/index';
 import { IGoLiveSettings } from 'services/streaming';
 import { WidgetType } from '../widgets';
 import { ITrovoStartStreamOptions, TrovoService } from './trovo';
+import { TDisplayType } from 'services/settings-v2';
 
 export type Tag = string;
 export interface IGame {

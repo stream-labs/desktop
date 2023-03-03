@@ -24,6 +24,8 @@ interface IRestreamTarget {
   video?: obs.IVideo;
 }
 
+export type TOutputOrientation = 'landscape' | 'portrait';
+
 interface IRestreamState {
   /**
    * Whether this user has restream enabled
@@ -186,11 +188,11 @@ export class RestreamService extends StatefulService<IRestreamState> {
     await Promise.all([this.setupIngest(), this.setupTargets()]);
   }
 
-  async beforeDualOutputGoLive(platforms: TPlatform[], context: number) {
-    await Promise.all([
-      this.setupDualOutputIngest(context),
-      this.setupDualOutputTargets(platforms),
-    ]);
+  async beforeDualOutputGoLive(platforms: TPlatform[], context: number, mode?: TOutputOrientation) {
+    // await Promise.all([
+    //   this.setupDualOutputIngest(context, mode),
+    //   this.setupDualOutputTargets(platforms),
+    // ]);
   }
 
   async setupIngest() {
@@ -207,11 +209,10 @@ export class RestreamService extends StatefulService<IRestreamState> {
     });
   }
 
-  async setupDualOutputIngest(context: number) {
-    const mode = context === 0 ? 'landscape' : 'portrait';
+  async setupDualOutputIngest(context: number, mode?: TOutputOrientation) {
     const ingest = (await this.fetchIngest()).server;
     // const settings = context === 1 ? await this.fetchUserSettings(mode) : this.settings;
-    const settings = await this.fetchUserSettings(mode);
+    const settings = mode ? await this.fetchUserSettings(mode) : this.settings;
 
     console.log('setting up for context ', context);
     console.log('settings.streamKey ', settings.streamKey);

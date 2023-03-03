@@ -29,9 +29,9 @@ import {
   NotificationsService,
 } from 'services/notifications';
 import { VideoEncodingOptimizationService } from 'services/video-encoding-optimizations';
-import { VideoSettingsService } from 'services/settings-v2/video';
+import { TDisplayType, VideoSettingsService } from 'services/settings-v2/video';
 import { StreamSettingsService } from '../settings/streaming';
-import { RestreamService } from 'services/restream';
+import { RestreamService, TOutputOrientation } from 'services/restream';
 import Utils from 'services/utils';
 import cloneDeep from 'lodash/cloneDeep';
 import isEqual from 'lodash/isEqual';
@@ -280,8 +280,7 @@ export class StreamingService
         // don't update settings for twitch in unattendedMode
         const settingsForPlatform = platform === 'twitch' && unattendedMode ? undefined : settings;
 
-        const displayPlatforms = this.views.activeDisplayPlatforms;
-        const contextId = platform === 'twitch' ? 1 : 0;
+        const contextId = this.views.getPlatformContext(platform);
         await this.runCheck(platform, () => service.beforeGoLive(settingsForPlatform, contextId));
       } catch (e: unknown) {
         this.handleSetupPlatformError(e, platform);
@@ -324,78 +323,159 @@ export class StreamingService
       const displayPlatforms = this.views.activeDisplayPlatforms;
 
       console.log('displayPlatforms ', displayPlatforms);
+      const actions: Promise<void>[] = [];
 
-      const platformsToSingleStream: TPlatform[] = [];
       for (const display in displayPlatforms) {
-        // if (displayPlatforms[display].length > 1) {
-        //   // create array of active platforms
-        //   platformsToRestream.concat(displayPlatforms[display]);
-        // }
         if (displayPlatforms[display].length > 1) {
           console.log('restream');
-          // contexts are set in beforeDualOutputGoLive
 
-          // setup restream on platformsToRestream
-          // check the Restream service is available
-          let ready = false;
-          try {
-            await this.runCheck(
-              'setupDualOutput',
-              async () => (ready = await this.restreamService.checkStatus()),
-            );
-          } catch (e: unknown) {
-            console.error('Error fetching restreaming service', e);
-          }
-          // Assume restream is down
-          if (!ready) {
-            this.setError('DUAL_OUTPUT_RESTREAM_DISABLED');
-            return;
-          }
+          actions.push(
+            this.handleSetupDualOutputRestream(displayPlatforms[display], display as TDisplayType),
+          );
 
           // update restream settings
-          try {
-            await this.runCheck('setupDualOutput', async () => {
-              // confirm context assignment on platforms
-              displayPlatforms[display].forEach((platform: TPlatform) => {
-                const service = getPlatformService(platform);
-                service.confirmDualOutput(platform);
-              });
-              // enable restream on the backend side
-              if (!this.restreamService.state.enabled) await this.restreamService.setEnabled(true);
-              const contextId = display === 'horizontal' ? 0 : 1;
-              console.log('contextId ', contextId);
-              await this.restreamService.beforeDualOutputGoLive(
-                displayPlatforms[display],
-                contextId,
-              );
-            });
-          } catch (e: unknown) {
-            console.error('Failed to setup restream', e);
-            this.setError('DUAL_OUTPUT_SETUP_FAILED');
-            return;
-          }
-          console.log('restream - displayPlatforms[display] ', displayPlatforms[display]);
-          const settingsAll = this.settingsService.views.all;
-          console.log('restream - after setup this.settingsService.views.all ', settingsAll);
+          // try {
+          //   await this.runCheck('setupDualOutput', async () => {
+          //     // confirm context assignment on platforms
+          //     return await this.handleSetupDualOutputRestream(
+          //       displayPlatforms[display],
+          //       display as TDisplayType,
+          //     );
+          //   });
+          // } catch (e: unknown) {
+          //   console.error('Failed to setup restream', e);
+          //   this.setError('DUAL_OUTPUT_SETUP_FAILED');
+          //   return;
+          // }
+          // console.log('restream - displayPlatforms[display] ', displayPlatforms[display]);
+          // const settingsAll = this.settingsService.views.all;
+          // console.log('restream - after setup this.settingsService.views.all ', settingsAll);
         } else {
           // set single stream for the display
           if (displayPlatforms[display].length > 0) {
-            const platform = displayPlatforms[display][0];
-            const service = getPlatformService(platform);
-            try {
-              await this.runCheck('setupDualOutput', async () => {
-                service.confirmDualOutput(platform);
-                return Promise.resolve();
-              });
-            } catch (e: unknown) {
-              this.handleSetupPlatformError(e, platform);
-            }
-            const settingsAll = this.settingsService.views.all;
-            console.log('single - after setup this.settingsService.views.all ', settingsAll);
+            actions.push(
+              this.handleSetupDualOutputStream(
+                displayPlatforms[display][0],
+                display as TDisplayType,
+              ),
+            );
+
+            // const platform = displayPlatforms[display][0];
+            // const service = getPlatformService(platform);
+            // try {
+            //   await this.runCheck('setupDualOutput', async () =>
+            //     service.confirmDualOutput(platform),
+            //   );
+            // } catch (e: unknown) {
+            //   this.handleSetupPlatformError(e, platform);
+            // }
+            // const settingsAll = this.settingsService.views.all;
+            // console.log('single - after setup this.settingsService.views.all ', settingsAll);
           }
         }
       }
+
+      try {
+        await this.runCheck('setupDualOutput', async () => {
+          console.log('resolve it all');
+
+          // check the Restream service is available
+          // let ready = false;
+          // try {
+          //   await this.runCheck(
+          //     'setupDualOutput',
+          //     async () => (ready = await this.restreamService.checkStatus()),
+          //   );
+          // } catch (e: unknown) {
+          //   console.error('Error fetching restreaming service', e);
+          // }
+          // // Assume restream is down
+          // if (!ready) {
+          //   this.setError('DUAL_OUTPUT_RESTREAM_DISABLED');
+          //   return;
+          // }
+
+          return Promise.all(actions);
+        });
+      } catch (e: unknown) {
+        this.setError('DUAL_OUTPUT_SETUP_FAILED');
+        return;
+      }
     }
+    // if (this.views.isDualOutputMode) {
+    //   const displayPlatforms = this.views.activeDisplayPlatforms;
+
+    //   console.log('displayPlatforms ', displayPlatforms);
+
+    //   const platformsToSingleStream: TPlatform[] = [];
+    //   for (const display in displayPlatforms) {
+    //     if (displayPlatforms[display].length > 1) {
+    //       console.log('restream');
+
+    //       if (!this.restreamService.state.enabled) {
+    //         try {
+    //           await this.runCheck('setupDualOutput', async () => {
+    //             const ready = await this.restreamService.checkStatus();
+    //             if (ready) {
+    //               await this.restreamService.setEnabled(true);
+    //             }
+    //           });
+    //         } catch (e: unknown) {
+    //           console.error('Error fetching restreaming service', e);
+    //         }
+    //         // Assume restream is down
+    //         if (!ready) {
+    //           this.setError('DUAL_OUTPUT_RESTREAM_DISABLED');
+    //           return;
+    //         }
+    //       }
+
+    //       // update restream settings
+    //       try {
+    //         await this.runCheck('setupDualOutput', async () => {
+    //           // confirm context assignment on platforms
+    //           displayPlatforms[display].forEach((platform: TPlatform) => {
+    //             const service = getPlatformService(platform);
+    //             service.confirmDualOutput(platform);
+    //           });
+    //           // enable restream on the backend side
+
+    //           const contextId = display === 'horizontal' ? 0 : 1;
+    //           const mode = display === 'horizontal' ? 'landscape' : 'portrait';
+    //           console.log('contextId ', contextId);
+    //           await this.restreamService.beforeDualOutputGoLive(
+    //             displayPlatforms[display],
+    //             contextId,
+    //             platforms.length > 3 ? (mode as TOutputOrientation) : undefined,
+    //           );
+    //         });
+    //       } catch (e: unknown) {
+    //         console.error('Failed to setup restream', e);
+    //         this.setError('DUAL_OUTPUT_SETUP_FAILED');
+    //         return;
+    //       }
+    //       console.log('restream - displayPlatforms[display] ', displayPlatforms[display]);
+    //       const settingsAll = this.settingsService.views.all;
+    //       console.log('restream - after setup this.settingsService.views.all ', settingsAll);
+    //     } else {
+    //       // set single stream for the display
+    //       if (displayPlatforms[display].length > 0) {
+    //         const platform = displayPlatforms[display][0];
+    //         const service = getPlatformService(platform);
+    //         try {
+    //           await this.runCheck('setupDualOutput', async () => {
+    //             service.confirmDualOutput(platform);
+    //             return Promise.resolve();
+    //           });
+    //         } catch (e: unknown) {
+    //           this.handleSetupPlatformError(e, platform);
+    //         }
+    //         const settingsAll = this.settingsService.views.all;
+    //         console.log('single - after setup this.settingsService.views.all ', settingsAll);
+    //       }
+    //     }
+    //   }
+    // }
 
     // apply optimized settings
     const optimizer = this.videoEncodingOptimizationService;
@@ -460,6 +540,61 @@ export class StreamingService
       this.setError('SETTINGS_UPDATE_FAILED', platform);
     }
     return;
+  }
+
+  async handleSetupDualOutputRestream(platforms: TPlatform[], display: TDisplayType) {
+    // confirm or enable restream
+    if (!this.restreamService.state.enabled) {
+      let ready = false;
+      try {
+        ready = await this.restreamService.checkStatus();
+      } catch (e: unknown) {
+        console.error('Error fetching restreaming service', e);
+      }
+      // Assume restream is down
+      if (!ready) {
+        this.setError('RESTREAM_DISABLED');
+        return;
+      }
+      await this.restreamService.setEnabled(true);
+    }
+
+    // setup restream
+    platforms.forEach((platform: TPlatform) => {
+      const service = getPlatformService(platform);
+      service.confirmDualOutput(platform);
+    });
+
+    const contextId = display === 'horizontal' ? 0 : 1;
+    console.log('contextId ', contextId);
+    return await this.restreamService.beforeDualOutputGoLive(platforms, contextId);
+  }
+
+  async handleSetupDualOutputStream(platform: TPlatform, display: TDisplayType) {
+    const service = getPlatformService(platform);
+    service.confirmDualOutput(platform);
+
+    console.log('service ', service);
+
+    const settingsAll = this.settingsService.views.all;
+    console.log('single - after setup this.settingsService.views.all ', settingsAll);
+
+    const contextId = display === 'horizontal' ? 0 : 1;
+    service.beforeGoLive(this.views.savedSettings, contextId);
+
+    console.log('getPlatformSettings ', this.views.getPlatformSettings(platform));
+
+    // get settings
+
+    // this.streamSettingsService.setSettings(
+    //   //   {
+    //   //     key: service.key,
+    //   //     server: ingest,
+    //   //   },
+    //   contextId,
+    // );
+
+    return Promise.resolve();
   }
 
   private recordAfterStreamStartAnalytics(settings: IGoLiveSettings) {
@@ -570,6 +705,7 @@ export class StreamingService
     this.SET_CHECKLIST_ITEM(checkName, 'pending');
     try {
       if (cb) await cb();
+      console.log('done ', checkName);
       this.SET_CHECKLIST_ITEM(checkName, 'done');
     } catch (e: unknown) {
       this.SET_CHECKLIST_ITEM(checkName, 'failed');

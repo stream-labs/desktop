@@ -84,14 +84,15 @@ export class TrovoService
     const trSettings = getDefined(goLiveSettings.platforms.trovo);
 
     const key = this.state.streamKey;
-    if (
-      !this.streamingService.views.isMultiplatformMode 
-    ) {
-      this.streamSettingsService.setSettings({
-        streamType: 'rtmp_custom',
-        key,
-        server: this.rtmpServer,
-      }, context);
+    if (!this.streamingService.views.isMultiplatformMode) {
+      this.streamSettingsService.setSettings(
+        {
+          streamType: 'rtmp_custom',
+          key,
+          server: this.rtmpServer,
+        },
+        context,
+      );
     }
 
     await this.putChannelInfo(trSettings);

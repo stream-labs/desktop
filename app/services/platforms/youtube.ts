@@ -306,15 +306,16 @@ export class YoutubeService
     // setup key and platform type in the OBS settings
     const streamKey = stream.cdn.ingestionInfo.streamName;
 
-    if (
-      !this.streamingService.views.isMultiplatformMode  
-    ) {
-      this.streamSettingsService.setSettings({
-        platform: 'youtube',
-        key: streamKey,
-        streamType: 'rtmp_common',
-        server: 'rtmp://a.rtmp.youtube.com/live2',
-      }, context);
+    if (!this.streamingService.views.isMultiplatformMode) {
+      this.streamSettingsService.setSettings(
+        {
+          platform: 'youtube',
+          key: streamKey,
+          streamType: 'rtmp_common',
+          server: 'rtmp://a.rtmp.youtube.com/live2',
+        },
+        context,
+      );
     }
 
     this.UPDATE_STREAM_SETTINGS({ ...ytSettings, broadcastId: broadcast.id });

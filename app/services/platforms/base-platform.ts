@@ -14,7 +14,7 @@ import { DualOutputService } from 'services/dual-output';
 import { IFacebookStartStreamOptions } from './facebook';
 import { StreamSettingsService } from '../settings/streaming';
 import * as remote from '@electron/remote';
-import { VideoSettingsService } from 'services/settings-v2/video';
+import { TDisplayType, VideoSettingsService } from 'services/settings-v2/video';
 
 const VIEWER_COUNT_UPDATE_INTERVAL = 60 * 1000;
 
@@ -122,6 +122,15 @@ export abstract class BasePlatformService<T extends IPlatformState> extends Stat
     if (this.dualOutputService.views.dualOutputMode) {
       const display = this.dualOutputService.views.getPlatformDisplay(platform);
       const context = this.videoSettingsService.contexts[display];
+
+      // const contextNumber = display === 'horizontal' ? 0 : 1;
+      // this.streamSettingsService.setSettings(
+      //   {
+      //     key: this.state.streamKey,
+      //     server: this.state.rtmpServer,
+      //   },
+      //   contextNumber,
+      // );
       this.UPDATE_STREAM_SETTINGS({
         video: context,
       });

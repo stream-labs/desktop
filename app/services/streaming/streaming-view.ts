@@ -97,6 +97,10 @@ export class StreamInfoView<T extends Object> extends ViewHandler<T> {
     return getPlatformService(platform).displayName;
   }
 
+  getPlatformContext(platform: TPlatform): number {
+    return this.dualOutputView.getPlatformContext(platform) === 'horizontal' ? 0 : 1;
+  }
+
   // REMOVE
   get warning(): string {
     return this.info.warning;
