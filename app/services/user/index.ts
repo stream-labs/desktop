@@ -178,7 +178,8 @@ class UserViews extends ViewHandler<IUserServiceState> {
   }
 
   get isPrime() {
-    return this.state.isPrime;
+    return true;
+    // return this.state.isPrime;
   }
 
   get platform() {
@@ -649,7 +650,8 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   }
 
   get isPrime() {
-    return this.state.isPrime;
+    return true;
+    // return this.state.isPrime;
   }
 
   async setPrimeStatus() {
