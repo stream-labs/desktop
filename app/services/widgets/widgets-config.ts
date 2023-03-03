@@ -8,7 +8,8 @@ export type TWidgetType =
   | WidgetType.GameWidget
   | WidgetType.EmoteWall
   | WidgetType.DonationTicker
-  | WidgetType.CustomWidget;
+  | WidgetType.CustomWidget
+  | WidgetType.ChatBox;
 
 export interface IWidgetConfig {
   type: TWidgetType;
@@ -175,9 +176,30 @@ export function getWidgetsConfig(host: string, token: string): Record<TWidgetTyp
     //
     // },
 
-    // ChatBox: {
-    //
-    // },
+    [WidgetType.ChatBox]: {
+      type: WidgetType.ChatBox,
+
+      defaultTransform: {
+        width: 600,
+        height: 600,
+        x: 0,
+        y: 0.5,
+        anchor: AnchorPoint.West,
+      },
+
+      settingsWindowSize: {
+        width: 850,
+        height: 700,
+      },
+
+      url: `https://${host}/widgets/chat-box/v1/${token}`,
+      previewUrl: `https://${host}/widgets/chat-box/v1/${token}?simulate=1`,
+      dataFetchUrl: `https://${host}/api/v5/slobs/widget/chatbox`,
+      settingsSaveUrl: `https://${host}/api/v5/slobs/widget/chatbox`,
+      settingsUpdateEvent: 'chatBoxSettingsUpdate',
+      customCodeAllowed: true,
+      customFieldsAllowed: true,
+    },
 
     // ChatHighlight: {
     //

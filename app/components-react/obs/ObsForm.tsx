@@ -22,7 +22,7 @@ import {
   TextInput,
   TInputLayout,
 } from '../shared/inputs';
-import { cloneDeep } from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
 import { Button } from 'antd';
 import InputWrapper from '../shared/inputs/InputWrapper';
 import { $t, $translateIfExist } from '../../services/i18n';

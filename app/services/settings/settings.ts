@@ -60,6 +60,7 @@ export interface ISettingsValues {
     RecRB?: boolean;
     RecRBTime?: number;
     RecFormat: string;
+    RecFilePath: string;
     RecTracks?: number;
     RecEncoder?: string;
     RecQuality?: string;
@@ -145,6 +146,10 @@ class SettingsViews extends ViewHandler<ISettingsServiceState> {
   get recFormat() {
     if (!this.isAdvancedOutput) return;
     return this.values.Output.RecFormat;
+  }
+
+  get recPath() {
+    return this.values.Output.RecFilePath;
   }
 
   get recordingTracks() {

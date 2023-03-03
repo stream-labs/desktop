@@ -24,6 +24,12 @@
         :hotkeys="sourceHotkeys"
         :isSearch="!!searchString || scanning"
       />
+      <h2>Markers</h2>
+      <hotkey-group
+        v-if="filteredHotkeySet.markers.length > 0"
+        :hotkeys="filteredHotkeySet.markers"
+        :isSearch="!!searchString || scanning"
+      />
     </div>
   </div>
 </template>

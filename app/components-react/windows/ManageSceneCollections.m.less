@@ -23,10 +23,13 @@
       opacity: 0.8;
       color: var(--title);
     }
+
+    &.button:disabled {
+      pointer-events: none;
+    }
   }
 
   .button.lg {
-    grid-row: 2 / span 1;
     grid-column: 1 / span 2;
     display: flex;
     justify-content: space-evenly;
@@ -38,6 +41,14 @@
       margin-left: 16px;
     }
   }
+}
+
+.ultra {
+  flex-direction: column;
+  align-items: center;
+  display: flex;
+  text-align: center;
+  font-weight: 500;
 }
 
 .collection-node {

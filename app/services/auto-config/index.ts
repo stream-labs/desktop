@@ -1,3 +1,5 @@
+import { Subject } from 'rxjs';
+import debounce from 'lodash/debounce';
 import { Service } from '../core/service';
 import * as obs from '../../../obs-api';
 import { Inject } from 'services';
@@ -5,7 +7,6 @@ import { StreamSettingsService } from 'services/settings/streaming';
 import { getPlatformService } from 'services/platforms';
 import { TwitchService } from 'services/platforms/twitch';
 import { VideoSettingsService } from 'services/settings-v2/video';
-import { Subject } from 'rxjs';
 
 export type TConfigEvent = 'starting_step' | 'progress' | 'stopping_step' | 'error' | 'done';
 
@@ -50,6 +51,15 @@ export class AutoConfigService extends Service {
     obs.NodeObs.StartBandwidthTest();
   }
 
+  async startRecording() {
+    obs.NodeObs.InitializeAutoConfig(
+      (progress: IConfigProgress) => this.handleRecordingProgress(progress),
+      { continent: '', service_name: '' },
+    );
+
+    obs.NodeObs.StartRecordingEncoderTest();
+  }
+
   handleProgress(progress: IConfigProgress) {
     if (progress.event === 'stopping_step') {
       if (progress.description === 'bandwidth_test') {
@@ -74,6 +84,18 @@ export class AutoConfigService extends Service {
     if (progress.event === 'done') {
       obs.NodeObs.TerminateAutoConfig();
       this.videoSettingsService.migrateSettings();
+    }
+  }
+
+  handleRecordingProgress(progress: IConfigProgress) {
+    if (progress.event === 'stopping_step') {
+      if (progress.description === 'recordingEncoder_test') {
+        obs.NodeObs.StartSaveSettings();
+      } else {
+        obs.NodeObs.TerminateAutoConfig();
+        this.videoSettingsService.migrateSettings();
+        debounce(() => this.configProgress.next({ ...progress, event: 'done' }), 1000)();
+      }
     }
   }
 }

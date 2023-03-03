@@ -44,7 +44,6 @@
             </div>
           </NavItem>
           <NavItem
-            v-if="isLoggedIn"
             key="Prime"
             to="Ultra"
             :ultra="true"

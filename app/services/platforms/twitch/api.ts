@@ -8,6 +8,7 @@ export type TTwitchOAuthScope =
   | 'user:edit:broadcast'
   | 'user:read:broadcast'
   | 'channel:manage:polls'
+  | 'channel:manage:broadcast'
   // Twitch API v5
   | 'channel_check_subscription'
   | 'channel_commercial'

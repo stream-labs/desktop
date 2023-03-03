@@ -29,7 +29,8 @@ export interface ICustomListProps<TValue> {
   optionRender?: (opt: IListOption<TValue>) => ReactNode;
   labelRender?: (opt: IListOption<TValue>) => ReactNode;
   onBeforeSearch?: (searchStr: string) => unknown;
-  options: IListOption<TValue>[];
+  options?: IListOption<TValue>[];
+  description?: string;
 }
 
 // define a type for the component's props
@@ -80,7 +81,7 @@ export const ListInput = InputComponent(<T extends any>(p: TListInputProps<T>) =
     return $el.closest('.os-content, body')! as HTMLElement;
   }
 
-  const selectedOption = options.find(opt => opt.value === p.value);
+  const selectedOption = options?.find(opt => opt.value === p.value);
 
   return (
     <InputWrapper {...wrapperAttrs} extra={selectedOption?.description}>
@@ -102,6 +103,7 @@ export const ListInput = InputComponent(<T extends any>(p: TListInputProps<T>) =
       >
         {options && options.map((opt, ind) => renderOption(opt, ind, p))}
       </Select>
+      {p.description && <span className="whisper">{p.description}</span>}
     </InputWrapper>
   );
 });

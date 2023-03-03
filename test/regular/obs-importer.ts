@@ -59,7 +59,7 @@ test('OBS Importer', async t => {
 
   await waitForDisplayed('h1=Optimize');
   await (await t.context.app.client.$('button=Skip')).click();
-  await (await t.context.app.client.$('div=Current Plan')).click();
+  await (await t.context.app.client.$('div=Choose Starter')).click();
 
   await waitForDisplayed('[data-name=SceneSelector]');
 
@@ -90,6 +90,6 @@ test('OBS Importer', async t => {
 
   t.deepEqual(
     [EWidgetType.DonationGoal, EWidgetType.EventList, EWidgetType.AlertBox],
-    widgetsService.getWidgetSources().map(widget => (widget.type as unknown) as EWidgetType),
+    widgetsService.widgetSources.map(widget => (widget.type as unknown) as EWidgetType),
   );
 });

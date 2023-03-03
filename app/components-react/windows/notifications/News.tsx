@@ -28,7 +28,7 @@ export default function News() {
         if (item.link === 'Settings') {
           SettingsService.showSettings(item.params?.category);
         } else {
-          NavigationService.navigate(item.link as TAppPage);
+          NavigationService.navigate(item.link as TAppPage, item.params);
         }
       } else {
         shell.openExternal(item.link);

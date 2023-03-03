@@ -33,6 +33,9 @@ export class AdvancedStatistics extends ReactComponent {}
 })
 export class AlertboxLibrary extends ReactComponent {}
 
+@Component({ props: { name: { default: 'Blank' } } })
+export class Blank extends ReactComponent {}
+
 @Component({
   props: {
     name: { default: 'BrowseOverlays' },
@@ -99,6 +102,14 @@ export class EditStreamWindow extends ReactComponent {}
 
 @Component({
   props: {
+    name: { default: 'EditTransform' },
+    wrapperStyles: { default: () => ({ height: '100%' }) },
+  },
+})
+export class EditTransform extends ReactComponent {}
+
+@Component({
+  props: {
     name: { default: 'GoLiveWindow' },
     wrapperStyles: { default: () => ({ height: '100%' }) },
   },
@@ -142,6 +153,14 @@ export class Loader extends ReactComponent {}
   },
 })
 export class IconLibraryProperties extends ReactComponent {}
+
+@Component({
+  props: {
+    name: { default: 'InstalledApps' },
+    wrapperStyles: { default: () => ({ height: '100%' }) },
+  },
+})
+export class InstalledApps extends ReactComponent {}
 
 @Component({
   props: {

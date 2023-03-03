@@ -32,6 +32,8 @@ export enum ESubMenuItemKey {
   Multistream = 'dashboard-multistream',
 }
 
+export const ESideNavKey = { ...EMenuItemKey, ...ESubMenuItemKey };
+
 export type TExternalLinkType =
   | 'overlay'
   | 'widget-theme'
@@ -41,6 +43,12 @@ export type TExternalLinkType =
   | 'widgets'
   | 'tipping/methods'
   | 'multistream';
+
+export const ProtocolLinkKeyMap = {
+  ['overlay']: ESubMenuItemKey.Scene,
+  ['widget-theme']: ESubMenuItemKey.Widget,
+  ['site-theme']: ESubMenuItemKey.Sites,
+};
 
 type TSideNavItem = TAppPage | TExternalLinkType | 'NavTools' | 'WidgetWindow' | string;
 
@@ -93,7 +101,7 @@ export const menuTitles = (item: EMenuItemKey | ESubMenuItemKey | string) => {
     [ESubMenuItemKey.Scene]: $t('Scene'),
     [ESubMenuItemKey.AlertBoxLibrary]: $t('Alert Box Library'),
     [ESubMenuItemKey.Widget]: $t('Widget'),
-    [ESubMenuItemKey.Sites]: $t('Sites'),
+    [ESubMenuItemKey.Sites]: $t('Creator Sites'),
     [ESubMenuItemKey.AppsStoreHome]: $t('Apps Store Home'),
     [ESubMenuItemKey.AppsManager]: $t('Apps Manager'),
     [ESubMenuItemKey.DashboardHome]: $t('Dashboard Home'),
