@@ -34,5 +34,5 @@
   "Only Me": "自分のみ",
   "Do not change privacy settings": "プライバシー設定を変更しない",
   "Install %{overlayName}": "%{overlayName} をインストール",
-  "Please note that while you can schedule streams to Facebook, they will not appear on this calendar due to API limitations": "Please note that while you can schedule streams to Facebook, they will not appear on this calendar due to API limitations"
+  "Please note that while you can schedule streams to Facebook, some will not appear on this calendar due to API limitations": "Please note that while you can schedule streams to Facebook, some will not appear on this calendar due to API limitations"
 }
