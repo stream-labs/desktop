@@ -4,7 +4,7 @@ import styles from './StudioEditor.m.less';
 import { Services } from 'components-react/service-provider';
 import cx from 'classnames';
 import Display from 'components-react/shared/Display';
-// import DualOutputDisplay from 'components-react/shared/DualOutputDisplay';
+import DualOutputDisplay from 'components-react/shared/DualOutputDisplay';
 import { $t } from 'services/i18n';
 import { ERenderingMode } from '../../../obs-api';
 import { Tooltip } from 'antd';
@@ -175,7 +175,7 @@ export default function StudioEditor(p: IStudioEditor) {
           <div
             className={cx(styles.studioDisplayContainer, { [styles.stacked]: studioModeStacked })}
           >
-            {p.display === 'horizontal' && (
+            {!v.showDualOutputDisplays && p.display === 'horizontal' && (
               <div
                 className={cx(styles.studioEditorDisplayContainer, 'noselect')}
                 style={{ cursor: v.cursor }}
@@ -187,16 +187,19 @@ export default function StudioEditor(p: IStudioEditor) {
                 onContextMenu={eventHandlers.onContextMenu}
               >
                 <Display
-                  type="horizontal"
                   drawUI={true}
                   paddingSize={10}
                   onOutputResize={eventHandlers.onOutputResize}
                   renderingMode={ERenderingMode.OBS_MAIN_RENDERING}
-                  // sourceId={v.studioMode && !v.showDualOutputDisplays ? studioModeTransitionName : v.activeSceneId}
+                  sourceId={
+                    v.studioMode && !v.showDualOutputDisplays
+                      ? studioModeTransitionName
+                      : v.activeSceneId
+                  }
                 />
               </div>
             )}
-            {p.display === 'vertical' && (
+            {!v.showDualOutputDisplays && p.display === 'vertical' && (
               <div
                 className={cx(styles.studioEditorDisplayContainer, 'noselect')}
                 style={{ cursor: v.cursor }}
@@ -213,49 +216,25 @@ export default function StudioEditor(p: IStudioEditor) {
                   paddingSize={10}
                   onOutputResize={eventHandlers.onOutputResize}
                   renderingMode={ERenderingMode.OBS_MAIN_RENDERING}
-                  // sourceId={v.studioMode && !v.showDualOutputDisplays ? studioModeTransitionName : v.activeSceneId}
+                  sourceId={
+                    v.studioMode && !v.showDualOutputDisplays
+                      ? studioModeTransitionName
+                      : v.activeSceneId
+                  }
                 />
               </div>
             )}
-
-            {/* {!v.showDualOutputDisplays && v.showHorizontalDisplay && v.studioMode && (
+            {!v.showDualOutputDisplays && v.showHorizontalDisplay && v.studioMode && (
               <div className={styles.studioModeDisplayContainer}>
                 <Display paddingSize={10} />
               </div>
             )}
-            {v.showVerticalDisplay && <DualOutputDisplay eventHandlers={eventHandlers} />}
+            {v.showDualOutputDisplays && <DualOutputDisplay eventHandlers={eventHandlers} />}
             {!v.showDualOutputDisplays && v.showVerticalDisplay && v.studioMode && (
               <div className={styles.studioModeDisplayContainer}>
                 <Display paddingSize={10} />
               </div>
-            )} */}
-
-            {/* {!v.showDualOutputDisplays && (
-              <div
-                className={cx(styles.studioEditorDisplayContainer, 'noselect')}
-                style={{ cursor: v.cursor }}
-                onMouseDown={eventHandlers.onMouseDown}
-                onMouseUp={eventHandlers.onMouseUp}
-                onMouseEnter={eventHandlers.onMouseEnter}
-                onMouseMove={eventHandlers.onMouseMove}
-                onDoubleClick={eventHandlers.onMouseDblClick}
-                onContextMenu={eventHandlers.onContextMenu}
-              >
-                <Display
-                  drawUI={true}
-                  paddingSize={10}
-                  onOutputResize={eventHandlers.onOutputResize}
-                  renderingMode={ERenderingMode.OBS_MAIN_RENDERING}
-                  sourceId={v.studioMode ? studioModeTransitionName : v.activeSceneId}
-                />
-              </div>
             )}
-            {!v.showDualOutputDisplays && v.studioMode && (
-              <div className={styles.studioModeDisplayContainer}>
-                <Display paddingSize={10} />
-              </div>
-            )}
-            {v.showDualOutputDisplays && <DualOutputDisplay eventHandlers={eventHandlers} />} */}
           </div>
         </div>
       )}
@@ -357,7 +336,22 @@ function DualOutputControls(p: { stacked: boolean; display: TDisplayType }) {
           className={styles.dualOutputTip}
           // setting the widths below prevents the text from wrapping
           // and prevents the tooltip from showing underneath the editor screen
-          overlayInnerStyle={{ minWidth: p.display === 'horizontal' ? '332px' : '316px' }}
+          overlayInnerStyle={{ minWidth: '332px' }}
+        >
+          <i className="icon-information" />
+        </Tooltip>
+      </div>
+
+      <div className={styles.dualOutputModeDetails}>
+        <i className={control.vertical.icon} />
+        <span>{control.vertical.title}</span>
+        <Tooltip
+          title={control.vertical.tooltip}
+          placement="rightBottom"
+          className={styles.dualOutputTip}
+          // setting the widths below prevents the text from wrapping
+          // and prevents the tooltip from showing underneath the editor screen
+          overlayInnerStyle={{ minWidth: '316px' }}
         >
           <i className="icon-information" />
         </Tooltip>

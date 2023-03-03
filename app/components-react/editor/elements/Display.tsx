@@ -29,17 +29,23 @@ export default function Display() {
   );
 
   return (
-    <div ref={containerRef} style={{ height: '100%', display: 'flex', flexDirection: 'row' }}>
-      {v.showHorizontal && (
-        <div ref={horizontalRef} style={{ height: '100%', width }}>
-          {renderElement()}
-        </div>
-      )}
-      {v.showVertical && (
-        <div ref={verticalRef} style={{ height: '100%', width }}>
-          {renderVertical()}
-        </div>
-      )}
+    <div ref={containerRef} style={{ height: '100%' }}>
+      {renderElement()}
     </div>
   );
+
+  // return (
+  //   <div ref={containerRef} style={{ height: '100%', display: 'flex', flexDirection: 'row' }}>
+  //     {v.showHorizontal && (
+  //       <div ref={horizontalRef} style={{ height: '100%', width }}>
+  //         {renderElement()}
+  //       </div>
+  //     )}
+  //     {v.showVertical && (
+  //       <div ref={verticalRef} style={{ height: '100%', width }}>
+  //         {renderVertical()}
+  //       </div>
+  //     )}
+  //   </div>
+  // );
 }
