@@ -210,6 +210,10 @@ class UserViews extends ViewHandler<IUserServiceState> {
     return this.isLoggedIn && this.platform.type === 'facebook';
   }
 
+  get isYoutubeAuthed() {
+    return this.isLoggedIn && this.platform.type === 'youtube';
+  }
+
   get hasSLID() {
     return !!this.auth.slid;
   }
