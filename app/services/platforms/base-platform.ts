@@ -126,6 +126,8 @@ export abstract class BasePlatformService<T extends IPlatformState> extends Stat
         video: context,
       });
     }
+
+    console.log('platform ', platform, 'this.state ', this.state);
   }
 
   @mutation()

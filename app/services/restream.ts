@@ -118,9 +118,31 @@ export class RestreamService extends StatefulService<IRestreamState> {
     return this.streamInfo.isMultiplatformMode || this.streamInfo.isDualOutputMode;
   }
 
-  fetchUserSettings(): Promise<IUserSettingsResponse> {
+  fetchUserSettings(mode?: 'landscape' | 'portrait'): Promise<IUserSettingsResponse> {
     const headers = authorizedHeaders(this.userService.apiToken);
-    const url = `https://${this.host}/api/v1/rst/user/settings`;
+
+    // const url =
+    //   mode === 'portrait'
+    //     ? 'https://beta.streamlabs.com/api/v1/rst/user/settings?mode=portrait'
+    //     : `https://${this.host}/api/v1/rst/user/settings`;
+
+    let url;
+    switch (mode) {
+      case 'landscape': {
+        url = 'https://beta.streamlabs.com/api/v1/rst/user/settings';
+        break;
+      }
+      case 'portrait': {
+        url = 'https://beta.streamlabs.com/api/v1/rst/user/settings?mode=portrait';
+        break;
+      }
+      default: {
+        url = `https://${this.host}/api/v1/rst/user/settings`;
+      }
+    }
+
+    console.log('url ', url);
+
     const request = new Request(url, { headers });
 
     return jfetch(request);
@@ -186,9 +208,13 @@ export class RestreamService extends StatefulService<IRestreamState> {
   }
 
   async setupDualOutputIngest(context: number) {
+    const mode = context === 0 ? 'landscape' : 'portrait';
     const ingest = (await this.fetchIngest()).server;
+    // const settings = context === 1 ? await this.fetchUserSettings(mode) : this.settings;
+    const settings = await this.fetchUserSettings(mode);
 
     console.log('setting up for context ', context);
+    console.log('settings.streamKey ', settings.streamKey);
 
     // We need to move OBS to custom ingest mode before we can set the server
     this.streamSettingsService.setSettings(
@@ -200,7 +226,7 @@ export class RestreamService extends StatefulService<IRestreamState> {
 
     this.streamSettingsService.setSettings(
       {
-        key: this.settings.streamKey,
+        key: settings.streamKey,
         server: ingest,
       },
       context,

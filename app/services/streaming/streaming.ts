@@ -355,9 +355,15 @@ export class StreamingService
           // update restream settings
           try {
             await this.runCheck('setupDualOutput', async () => {
+              // confirm context assignment on platforms
+              displayPlatforms[display].forEach((platform: TPlatform) => {
+                const service = getPlatformService(platform);
+                service.confirmDualOutput(platform);
+              });
               // enable restream on the backend side
               if (!this.restreamService.state.enabled) await this.restreamService.setEnabled(true);
-              const contextId = displayPlatforms[display] === 'horizontal' ? 0 : 1;
+              const contextId = display === 'horizontal' ? 0 : 1;
+              console.log('contextId ', contextId);
               await this.restreamService.beforeDualOutputGoLive(
                 displayPlatforms[display],
                 contextId,
@@ -368,9 +374,9 @@ export class StreamingService
             this.setError('DUAL_OUTPUT_SETUP_FAILED');
             return;
           }
-          console.log('platforms ', platforms);
+          console.log('restream - displayPlatforms[display] ', displayPlatforms[display]);
           const settingsAll = this.settingsService.views.all;
-          console.log('after setup restream this.settingsService.views.all ', settingsAll);
+          console.log('restream - after setup this.settingsService.views.all ', settingsAll);
         } else {
           // set single stream for the display
           if (displayPlatforms[display].length > 0) {
@@ -385,7 +391,7 @@ export class StreamingService
               this.handleSetupPlatformError(e, platform);
             }
             const settingsAll = this.settingsService.views.all;
-            console.log('just before this.settingsService.views.all ', settingsAll);
+            console.log('single - after setup this.settingsService.views.all ', settingsAll);
           }
         }
       }
