@@ -45,7 +45,7 @@ export class AutoConfigService extends Service {
               enabled: true,
               useCustomFields: false,
               title: 'bandwidthTest',
-              description: 'badwidthTest',
+              description: 'bandwidthTest',
               privacyStatus: 'private',
               categoryId: '1',
             },
