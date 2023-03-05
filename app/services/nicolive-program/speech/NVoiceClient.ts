@@ -160,9 +160,7 @@ class CommandLineClient {
   }
 }
 
-// API document https://docs.google.com/document/d/1sy2mzxtJJwcMpqQ2oPWt7qclyXmptoOnXvQywrzzg8Q/edit#
-
-// 参考: https://github.com/seiren-voice/desktop-application/blob/main/electron/CommandLineClient.ts
+// API document https://github.com/n-air-app/n-voice-package/tree/main/n-voice/doc
 
 async function StartNVoice(enginePath: string, dictionaryPath: string, userDictionary: string, modelPath: string, extraVoicesPath: string, cwd: string): Promise<CommandLineClient> {
   const log = ((...args: unknown[]) => { console.log(...args); });
