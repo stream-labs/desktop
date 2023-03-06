@@ -8,6 +8,6 @@ export SENTRY_PROJECT=$(jq -r .name < ${BASEDIR}package.json)
 RELEASE=$(jq -r .version < ${BASEDIR}package.json)
 echo Release: $RELEASE
 
-$SENTRY_CLI releases files $RELEASE upload-sourcemaps ${BASEDIR}bundles/ || exit 1
+$SENTRY_CLI releases files $RELEASE upload-sourcemaps ${BASEDIR}bundles/ ${BASEDIR}main.js || exit 1
 $SENTRY_CLI releases new $RELEASE || exit 1
 
