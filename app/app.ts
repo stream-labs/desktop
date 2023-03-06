@@ -125,7 +125,8 @@ if ((isProduction || process.env.NAIR_REPORT_TO_SENTRY) && !electron.remote.proc
 
       if (event.exception && event.exception.values[0].stacktrace) {
         event.exception.values[0].stacktrace.frames.forEach(frame => {
-          frame.filename = /* 'app:///' + */ normalize(frame.filename);
+          frame.abs_path = '~/' + normalize(frame.abs_path);
+          frame.filename = normalize(frame.filename);
         });
       }
 
