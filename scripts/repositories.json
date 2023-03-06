@@ -4,7 +4,7 @@
             "name": "obs-studio-node",
             "url": "https://s3-us-west-2.amazonaws.com/obsstudionodes3.streamlabs.com/",
             "archive": "osn-[VERSION]-release-[OS][ARCH].tar.gz",
-            "version": "0.23.66",
+            "version": "0.23.71",
             "win64": true,
             "osx": true
         },
@@ -28,7 +28,7 @@
             "name": "font-manager",
             "url": "https://slobs-font-manager.s3-us-west-2.amazonaws.com/",
             "archive": "font-manager-[VERSION]-[OS][ARCH].tar.gz",
-            "version": "1.2.5",
+            "version": "1.2.6",
             "win64": true,
             "osx": true
         },
@@ -36,7 +36,7 @@
             "name": "crash-handler",
             "url": "https://slobs-crash-handler.s3-us-west-2.amazonaws.com/",
             "archive": "crash-handler-[VERSION]-[OS][ARCH].tar.gz",
-            "version": "1.2.15",
+            "version": "1.2.16",
             "win64": true,
             "osx": true
         },
@@ -52,7 +52,7 @@
             "name": "game_overlay",
             "url": "https://obs-studio-deployment.s3-us-west-2.amazonaws.com/",
             "archive": "game-overlay-[VERSION]-[OS].tar.gz",
-            "version": "0.0.58",
+            "version": "0.0.59",
             "win64": true,
             "osx": false
         },
