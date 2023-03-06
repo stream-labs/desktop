@@ -141,7 +141,7 @@ test.each([
     Object.defineProperty(queue, 'length', { get: () => filled ? instance.NUM_COMMENTS_TO_SKIP : 0 });
     expect(queue.cancel).toBeCalledTimes(0);
     expect(queue.add).toBeCalledTimes(0);
-    await instance.queueToSpeech(speech, onstart, onend, cancelBeforeSpeaking);
+    instance.queueToSpeech(speech, onstart, onend, cancelBeforeSpeaking);
     expect(queue.cancel).toBeCalledTimes(numCancel);
     expect(queue.cancelQueue).toBeCalledTimes(numCancelQueue);
     expect(queue.add).toBeCalledTimes(numAdd);
