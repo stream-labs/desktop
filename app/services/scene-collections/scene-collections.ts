@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/vue';
 import { Service } from 'services/core/service';
 import { Inject } from 'services/core/injector';
 import { RootNode } from './nodes/root';
@@ -209,9 +210,9 @@ export class SceneCollectionsService extends Service implements ISceneCollection
   /**
    * This is a safe method that will load the requested scene collection.
    * It is responsible for cleaning up and saving any existing config,
-   * setting the app in the apropriate loading state, and updating the state
+   * setting the app in the appropriate loading state, and updating the state
    * and server.
-   * @param id The id of the colleciton to load
+   * @param id The id of the collection to load
    * @param shouldAttemptRecovery whether a new copy of the file should
    * be downloaded from the server if loading fails.
    */
@@ -223,7 +224,13 @@ export class SceneCollectionsService extends Service implements ISceneCollection
       await this.setActiveCollection(id);
       await this.readCollectionDataAndLoadIntoApplicationState(id);
     } catch (e) {
-      console.error('Error loading collection!', e);
+      Sentry.withScope(scope => {
+        scope.setLevel('error');
+        scope.setTag('service', 'SceneCollectionsService');
+        scope.setTag('method', 'load');
+        scope.setTag('collectionId', id)
+        Sentry.captureException(e);
+      });
 
       console.warn(`Unsuccessful recovery of scene collection ${id} attempted`);
       alert($t('scenes.failedToLoadSceneCollection'));
@@ -354,7 +361,14 @@ export class SceneCollectionsService extends Service implements ISceneCollection
       this.setupDefaultAudio();
     } catch (e) {
       // We tried really really hard :(
-      console.error('Overlay installation failed', e);
+      Sentry.withScope(scope => {
+        scope.setLevel('error');
+        scope.setTag('service', 'SceneCollectionsService');
+        scope.setTag('method', 'loadOverlay');
+        scope.setExtra('filePath', filePath);
+        scope.setExtra('name', name);
+        Sentry.captureException(e);
+      });
     }
 
     this.collectionLoaded = true;
