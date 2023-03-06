@@ -331,6 +331,8 @@ export class ChatService extends Service {
           );
         }
         if (this.hasChatHighlightWidget()) {
+          // Uncomment to debug chat-highlight-script.js
+          // this.chatView.webContents.openDevTools({ mode: 'detach' });
           setTimeout(() => {
             if (!this.chatView) return;
             const chatHighlightScript = require('!!raw-loader!./widgets/settings/chat-highlight-script.js');
