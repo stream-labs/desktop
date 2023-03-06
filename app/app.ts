@@ -181,16 +181,6 @@ document.addEventListener('DOMContentLoaded', () => {
       if (Utils.isChildWindow()) {
         ipcRenderer.on('closeWindow', () => windowsService.closeChildWindow());
       }
-
-      /* TODO
-      if (usingSentry) {
-        const userService = getResource<UserService>('UserService');
-
-        const ctx = userService.getSentryContext();
-        if (ctx) setSentryContext(ctx);
-        userService.sentryContext.subscribe(setSentryContext);
-      }
-      */
     }
 
     // setup VueI18n plugin
