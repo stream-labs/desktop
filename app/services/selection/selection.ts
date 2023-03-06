@@ -94,7 +94,9 @@ export class SelectionService extends StatefulService<ISelectionState> {
 
   @shortcut('Delete')
   remove() {
-    const name = this.getLastSelected().name;
+    const last = this.getLastSelected();
+    if (!last) return;
+    const name = last.name;
     electron.remote.dialog
       .showMessageBox(electron.remote.getCurrentWindow(), {
         type: 'warning',

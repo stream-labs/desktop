@@ -766,15 +766,13 @@ export class SettingsService
     settingsData[0].parameters.forEach((deviceForm, ind) => {
       const channel = ind + 1;
       const isOutput = [E_AUDIO_CHANNELS.OUTPUT_1, E_AUDIO_CHANNELS.OUTPUT_2].includes(channel);
+      const device = audioDevices.find(device => device.id === deviceForm.value);
       const source = this.sourcesService.getSources().find(source => source.channel === channel);
 
       if (source && deviceForm.value === null) {
-        if (deviceForm.value === null) {
-          this.sourcesService.removeSource(source.sourceId);
-          return;
-        }
-      } else if (deviceForm.value !== null) {
-        const device = audioDevices.find(device => device.id === deviceForm.value);
+        this.sourcesService.removeSource(source.sourceId);
+        return;
+      } else if (device && deviceForm.value !== null) {
         const displayName = device.id === 'default' ? deviceForm.name : device.description;
 
         if (!source) {
@@ -785,9 +783,10 @@ export class SettingsService
             { channel },
           );
         } else {
-          source.setName(displayName);
           source.updateSettings({ device_id: deviceForm.value, name: displayName });
         }
+
+        source.setName(displayName);
       }
     });
   }
