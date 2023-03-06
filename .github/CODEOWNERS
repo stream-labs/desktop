@@ -3,3 +3,9 @@
 
 # planners
 app/i18n/ @yushinakatani @Shunsuke-Yanazawa
+
+# designers
+*.vue @yusukess @kechino
+*.css @yusukess @kechino
+app/styles/ @yusukess @kechino
+media/images/ @yusukess @kechino
