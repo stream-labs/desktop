@@ -60,14 +60,26 @@ export class SettingsManagerService extends PersistentStatefulService<ISettingsM
    */
 
   toggleDisplay(status: boolean, display?: TDisplayType) {
-    console.log('this.views.defaultDisplay ', this.views.defaultDisplay);
-
-    if (status === true && display === 'vertical') {
+    if (
+      this.state.videoSettings.activeDisplays.horizontal &&
+      this.state.videoSettings.activeDisplays.vertical
+    ) {
+      // toggle off dual output mode
+      this.setDisplayActive(status, display);
+    } else if (display === 'horizontal' && status === false) {
+      // toggle off horizontal display
+      this.dualOutputService.sceneItemsConfirmed.subscribe(() => {
+        this.setDisplayActive(status, display);
+      });
+      this.dualOutputService.actions.toggleDualOutputMode();
+    } else if (display === 'vertical' && status === true) {
+      // toggle on vertical display
       this.dualOutputService.sceneItemsConfirmed.subscribe(() => {
         this.setDisplayActive(status, display);
       });
       this.dualOutputService.actions.toggleDualOutputMode();
     } else {
+      // toggle on dual output mode
       this.setDisplayActive(status, display);
     }
   }
