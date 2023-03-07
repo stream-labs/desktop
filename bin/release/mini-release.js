@@ -287,7 +287,9 @@ async function runScript({
 
   if (enableUploadToSentry) {
     info('uploading to sentry...');
-    uploadToSentry(sentry.organization, sentry.project, newVersion, path.resolve('.', 'bundles'));
+    uploadToSentry(sentry.organization, sentry.project, newVersion,
+      [path.resolve('.', 'bundles'), path.resolve('.', 'main.js')].join(' '),
+    );
   } else {
     info('uploading to sentry: SKIP');
   }

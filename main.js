@@ -243,6 +243,42 @@ if (!gotTheLock) {
     mainWindow.webContents.openDevTools({ mode: 'undocked' });
   }
 
+  const SentryElectron = require('@sentry/electron/main');
+
+  function handleFinishedReport() {
+    // 先にsentryへの送信flushを開始する
+    const flush = SentryElectron.flush(3000).catch(error => {
+      console.error(error);
+    });
+
+    dialog.showErrorBox(
+      '予期せぬエラー',
+      '予期しないエラーが発生したため、アプリケーションをシャットダウンします。ご不便をおかけして申し訳ありません。\n' +
+      'この件に関する情報はデバッグ目的で送信されました。不具合を解決するためにご協力いただきありがとうございます。',
+    );
+
+    // ダイアログが閉じたら終了
+    flush.finally(() => {
+      app.exit();
+    });
+  }
+
+  if (pjson.env === 'production' || process.env.NAIR_REPORT_TO_SENTRY) {
+    const params = process.env.NAIR_UNSTABLE
+      ? { organization: 'o170115', project: '5372801', key: '819e76e51864453aafd28c6d0473881f' } // crash-reporter-unstable
+      : { organization: 'o170115', project: '1520076', key: 'd965eea4b2254c2b9f38d2346fb8a472' }; // crash-reporter
+
+    process.on('uncaughtException', (error) => {
+      console.log('uncaughtException', error);
+      handleFinishedReport();
+    });
+
+    SentryElectron.init({
+      dsn: `https://${params.key}@${params.organization}.ingest.sentry.io/${params.project}`,
+      release: process.env.NAIR_VERSION,
+    });
+  }
+
   // eslint-disable-next-line no-inner-declarations
   function startApp() {
     const isDevMode = process.env.NODE_ENV !== 'production' && process.env.NODE_ENV !== 'test';
@@ -258,42 +294,6 @@ if (!gotTheLock) {
       crashHandlerLogPath,
     );
     crashHandler.registerProcess(pid, false);
-
-    const Raven = require('raven');
-
-    function handleFinishedReport() {
-      dialog.showErrorBox(
-        '予期せぬエラー',
-        '予期しないエラーが発生したため、アプリケーションをシャットダウンします。ご不便をおかけして申し訳ありません。\n' +
-        'この件に関する情報はデバッグ目的で送信されました。不具合を解決するためにご協力いただきありがとうございます。',
-      );
-
-      app.exit();
-    }
-
-    if (pjson.env === 'production') {
-      const params = process.env.NAIR_UNSTABLE
-        ? { project: '5372801', key: '819e76e51864453aafd28c6d0473881f' } // crash-reporter-unstable
-        : { project: '1520076', key: 'd965eea4b2254c2b9f38d2346fb8a472' }; // crash-reporter
-
-      Raven.config(`https://${params.key}@o170115.ingest.sentry.io/${params.project}`, {
-        release: process.env.NAIR_VERSION,
-      }).install(function (err, initialErr, eventId) {
-        handleFinishedReport();
-      });
-
-      crashReporter.start({
-        productName: 'n-air-app',
-        companyName: 'n-air-app',
-        submitURL:
-          `https://o170115.ingest.sentry.io/api/${params.project}/minidump/` +
-          `?sentry_key=${params.key}`,
-        extra: {
-          'sentry[release]': pjson.version,
-          processType: 'main',
-        },
-      });
-    }
 
     const mainWindowState = windowStateKeeper({
       defaultWidth: 1600,

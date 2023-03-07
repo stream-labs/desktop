@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/vue';
 import { IObsInput, IObsListInput, TObsFormData, TObsValue } from 'components/obs/inputs/ObsInput';
 import { $t } from 'services/i18n';
 import { ISettingsSubCategory } from './settings-api';
@@ -506,9 +507,15 @@ class OptKeyProperty {
 
   value(v: any): string {
     if (v === undefined) {
-      console.error(
-        `value(undefined): ${i18nPath('settings', this.category, this.subCategory, this.setting)}`,
-      );
+      Sentry.withScope(scope => {
+        scope.setLevel('info');
+        scope.setTag('key', this.key);
+        scope.setExtra('category', this.category);
+        scope.setExtra('subCategory', this.subCategory);
+        scope.setExtra('setting', this.setting);
+        scope.setFingerprint(['OptKeyProperty', 'value(undefined)', this.key, this.category, this.subCategory, this.setting]);
+        Sentry.captureMessage(`OptKeyProperty: value(undefined): ${i18nPath('settings', this.category, this.subCategory, this.setting)}`);
+      });
       return;
     }
     if (this.lookupValueName) {

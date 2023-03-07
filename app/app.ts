@@ -13,8 +13,7 @@ import { WindowsService } from './services/windows';
 import { AppService } from './services/app';
 import Utils from './services/utils';
 import electron from 'electron';
-import * as Sentry from '@sentry/browser';
-import * as Integrations from '@sentry/integrations';
+import * as Sentry from '@sentry/vue';
 import VTooltip from 'v-tooltip';
 import Toasted from 'vue-toasted';
 import VueI18n from 'vue-i18n';
@@ -109,6 +108,7 @@ if ((isProduction || process.env.NAIR_REPORT_TO_SENTRY) && !electron.remote.proc
   const sentryDsn = getSentryDsn(sentryParam);
   console.log(`Sentry DSN: ${sentryDsn}`);
   Sentry.init({
+    Vue,
     dsn: sentryDsn,
     release: nAirVersion,
     sampleRate: /* isPreview ? */ 1.0 /* : 0.1 */,
@@ -125,7 +125,8 @@ if ((isProduction || process.env.NAIR_REPORT_TO_SENTRY) && !electron.remote.proc
 
       if (event.exception && event.exception.values[0].stacktrace) {
         event.exception.values[0].stacktrace.frames.forEach(frame => {
-          frame.filename = /* 'app:///' + */ normalize(frame.filename);
+          frame.abs_path = '~/' + normalize(frame.abs_path);
+          frame.filename = normalize(frame.filename);
         });
       }
 
@@ -135,7 +136,6 @@ if ((isProduction || process.env.NAIR_REPORT_TO_SENTRY) && !electron.remote.proc
 
       return event;
     },
-    integrations: [new Integrations.Vue({ Vue })],
   });
 
   const oldConsoleError = console.error;
@@ -149,7 +149,7 @@ if ((isProduction || process.env.NAIR_REPORT_TO_SENTRY) && !electron.remote.proc
       }
 
       scope.setExtra('console-args', JSON.stringify(params, null, 2));
-      Sentry.captureMessage(msg, Sentry.Severity.Error);
+      Sentry.captureMessage(msg, 'error');
     });
   };
 }
@@ -181,16 +181,6 @@ document.addEventListener('DOMContentLoaded', () => {
       if (Utils.isChildWindow()) {
         ipcRenderer.on('closeWindow', () => windowsService.closeChildWindow());
       }
-
-      /* TODO
-      if (usingSentry) {
-        const userService = getResource<UserService>('UserService');
-
-        const ctx = userService.getSentryContext();
-        if (ctx) setSentryContext(ctx);
-        userService.sentryContext.subscribe(setSentryContext);
-      }
-      */
     }
 
     // setup VueI18n plugin

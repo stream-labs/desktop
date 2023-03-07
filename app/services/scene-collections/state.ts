@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/vue'
 import { StatefulService, mutation } from 'services/core/stateful-service';
 import { ISceneCollectionsManifestEntry } from '.';
 import Vue from 'vue';
@@ -48,19 +49,26 @@ export class SceneCollectionsStateService extends StatefulService<ISceneCollecti
     try {
       sceneCollectionsManifest = await this._loadManifestFile();
     } catch (e) {
-      console.warn('Error loading manifest file from disk(original):', e);
+      const scope = new Sentry.Scope();
+      scope.setTag('service', 'SceneCollectionsStateService');
+      scope.setTag('method', 'loadManifestFile');
+      scope.setExtra('load-error', e);
+
       try {
         // バックアップから読み込み
         sceneCollectionsManifest = await this._loadManifestFile(true);
 
         // sentryに結果を送信（元のエラーはbreadcrumbで拾う）
         if (sceneCollectionsManifest) {
-          console.error('Recovered from backup');
+          scope.setLevel('info');
+          Sentry.captureMessage('Recovered from backup', scope);
         } else {
-          console.error('Backup of manifest file is absent');
+          scope.setLevel('warning');
+          Sentry.captureMessage('Backup of manifest file is absent', scope);
         }
       } catch (backupError) {
-        console.error('Error loading manifest file from disk(backup):', backupError);
+        scope.setLevel('error');
+        Sentry.captureException(backupError, scope)
       }
     }
 

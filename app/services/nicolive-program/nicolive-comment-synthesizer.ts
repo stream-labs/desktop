@@ -163,19 +163,19 @@ export class NicoliveCommentSynthesizerService extends StatefulService<ICommentS
     }, synthId);
   }
 
-  async startSpeakingSimple(speech: Speech) {
+  startSpeakingSimple(speech: Speech) {
     // empty anonymous functions must be created in this service
-    await this.queueToSpeech(speech, () => { }, () => { }, true);
+    this.queueToSpeech(speech, () => { }, () => { }, true);
   }
 
-  async startTestSpeech(text: string, synthId: SynthesizerId) {
+  startTestSpeech(text: string, synthId: SynthesizerId) {
     const speech = this.makeSimpleTextSpeech(text, synthId);
     if (speech) {
-      await this.startSpeakingSimple(speech);
+      this.startSpeakingSimple(speech);
     }
   }
 
-  async queueToSpeech(
+  queueToSpeech(
     speech: Speech,
     onstart: () => void,
     onend: () => void,

@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/vue';
 import { Service } from 'services/core/service';
 import path from 'path';
 import fs from 'fs';
@@ -155,7 +156,16 @@ export class FileManagerService extends Service {
         file.locked = false;
         await this.flush(filePath, tries - 1);
       } else {
-        console.error(`Ran out of retries writing ${filePath}`);
+        Sentry.withScope(scope => {
+          scope.setLevel('error');
+          scope.setTag('service', 'FileManagerService');
+          scope.setTag('method', 'flush');
+          scope.setTag('tries', tries);
+          scope.setExtra('filePath', filePath);
+          scope.setExtra('fileVersion', version);
+          scope.setFingerprint(['FileManagerService', 'flush', 'RunOutOfRetries']);
+          Sentry.captureMessage('Ran out of retries writing file');
+        });
       }
     }
   }
