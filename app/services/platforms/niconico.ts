@@ -66,7 +66,7 @@ export class NiconicoService extends Service implements IPlatformService {
     const request = new Request(url, { credentials: 'same-origin' });
 
     const response = await fetch(request);
-    if (response.status === 401) {
+    if (response.status === 400 || response.status === 401) {
       return '';
     }
     const response_1 = await handleErrors(response); // !response.ok を例外にする
