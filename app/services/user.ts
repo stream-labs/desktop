@@ -100,6 +100,9 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
           this.LOGOUT();
           this.userLogout.next();
         }
+      }).catch((e) => {
+        // offline や Internal Server Error などのときなので記録するだけ
+        console.warn('validateLogin: error=' + JSON.stringify(e));
       });
     }
 
