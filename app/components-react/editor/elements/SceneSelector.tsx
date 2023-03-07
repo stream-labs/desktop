@@ -32,7 +32,7 @@ function SceneSelector() {
   const v = useVuex(() => ({
     isHorizontal: SettingsManagerService.views.activeDisplays.horizontal,
     isVertical: SettingsManagerService.views.activeDisplays.vertical,
-    setDisplayActive: SettingsManagerService.actions.setDisplayActive,
+    toggleDisplay: SettingsManagerService.actions.toggleDisplay,
   }));
 
   const { treeSort } = useTree(true);
@@ -184,7 +184,7 @@ function SceneSelector() {
 
         <Tooltip title={$t('Show horizontal display.')} placement="bottomRight">
           <i
-            onClick={() => v.setDisplayActive(!v.isHorizontal, 'horizontal')}
+            onClick={() => v.toggleDisplay(!v.isHorizontal, 'horizontal')}
             className={cx('icon-desktop icon-button icon-button--lg', {
               active: v.isHorizontal,
             })}
@@ -193,7 +193,7 @@ function SceneSelector() {
 
         <Tooltip title={$t('Show vertical display.')} placement="bottomRight">
           <i
-            onClick={() => v.setDisplayActive(!v.isVertical, 'vertical')}
+            onClick={() => v.toggleDisplay(!v.isVertical, 'vertical')}
             className={cx('icon-phone-case icon-button icon-button--lg', {
               active: v.isVertical,
             })}

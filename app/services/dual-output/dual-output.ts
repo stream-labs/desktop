@@ -22,6 +22,7 @@ interface IDualOutputServiceState {
   platformSettings: TDualOutputPlatformSettings;
   dualOutputMode: boolean;
   nodeMaps: { [display in TDisplayType as string]: Dictionary<string> };
+  sceneNodeMaps: { [sceneId: string]: Dictionary<string> };
 }
 
 class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
@@ -71,6 +72,18 @@ class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
     return this.state.displays;
   }
 
+  get contextsToStream() {
+    return Object.entries(this.activeDisplayPlatforms).reduce(
+      (contextNames: TDisplayType[], [key, value]: [TDisplayType, TPlatform[]]) => {
+        if (value.length > 0) {
+          contextNames.push(key as TDisplayType);
+        }
+        return contextNames;
+      },
+      [],
+    );
+  }
+
   get activeDisplayPlatforms() {
     const enabledPlatforms = this.streamingService.views.enabledPlatforms;
     return Object.entries(this.state.platformSettings).reduce(
@@ -86,6 +99,10 @@ class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
 
   get nodeMaps() {
     return this.state.nodeMaps;
+  }
+
+  get sceneNodeMaps() {
+    return this.state.sceneNodeMaps;
   }
 
   getNodeIds(displays: TDisplayType[]) {
@@ -143,8 +160,10 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
     platformSettings: DualOutputPlatformSettings,
     dualOutputMode: false,
     nodeMaps: null,
+    sceneNodeMaps: {},
   };
 
+  sceneItemsConfirmed = new Subject();
   sceneItemsDestroyed = new Subject();
 
   get views() {
@@ -162,7 +181,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
 
     this.scenesService.sceneRemoved.subscribe(() => {
       if (this.views.dualOutputMode) {
-        this.setDualOutputMode(false);
+        // this.setDualOutputMode(false);
       }
     });
 
@@ -178,40 +197,21 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
    * Create/destroy nodes for dual output when toggling on/off
    */
 
-  async toggleDualOutputMode(status: boolean) {
-    if (!this.scenesService.views.hasSceneItems(this.scenesService.views.activeSceneId)) {
-      this.state.displays.forEach(async display => {
-        this.videoSettingsService.establishVideoContext(display);
-        this.SET_EMPTY_NODE_MAP(display);
-      });
-
-      this.setDualOutputMode(status);
-      return true;
-    }
-
-    try {
-      if (!status) {
-        this.restoreScene(this.state.convertedDefaultDisplay);
-        this.setDualOutputMode(status);
-        return true;
-      } else {
-        const created = this.mapSceneNodes(this.state.displays);
-        if (created) {
-          this.setDualOutputMode(status);
-          return true;
-        }
+  toggleDualOutputMode() {
+    if (!this.state.sceneNodeMaps.hasOwnProperty(this.scenesService.views.activeSceneId)) {
+      try {
+        this.mapSceneNodes(this.state.displays);
+      } catch (error: unknown) {
+        console.error('Error toggling Dual Output mode: ', error);
       }
-      return false;
-    } catch (error: unknown) {
-      console.error('Error toggling Dual Output mode: ', error);
-      return false;
     }
+    this.sceneItemsConfirmed.next();
   }
 
-  setDualOutputMode(status: boolean) {
-    this.TOGGLE_DUAL_OUTPUT_MODE(status);
-    this.streamingService.actions.setDualOutputMode(!this.streamingService.state.dualOutputMode);
-  }
+  // setDualOutputMode(status: boolean) {
+  //   this.TOGGLE_DUAL_OUTPUT_MODE(status);
+  //   this.streamingService.actions.setDualOutputMode(!this.streamingService.state.dualOutputMode);
+  // }
 
   mapSceneNodes(displays: TDisplayType[], sceneId?: string) {
     const sceneToMapId = sceneId ?? this.scenesService.views.activeSceneId;
@@ -255,7 +255,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
 
       // in preparation for unlimited display profiles
       // create a node map entry even though the key and value are the same
-      this.SET_NODE_MAP_ITEM(display, sceneItem.id, sceneItem.id);
+      this.SET_NODE_MAP_ITEM(display, sceneItem.id, sceneItem.id, sceneId);
       return sceneItem.id;
     } else {
       // if it's not the first display, copy the scene item
@@ -275,7 +275,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
       );
       reorderNodesSubcommand.execute();
 
-      this.SET_NODE_MAP_ITEM(display, sceneItem.id, copiedSceneItem.id);
+      this.SET_NODE_MAP_ITEM(display, sceneItem.id, copiedSceneItem.id, sceneId);
       return sceneItem.id;
     }
   }
@@ -364,6 +364,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
     display: TDisplayType,
     originalSceneNodeId: string,
     copiedSceneNodeId: string,
+    sceneId?: string,
   ) {
     if (!this.state.nodeMaps) {
       this.state.nodeMaps = {};
@@ -372,6 +373,16 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
       ...this.state.nodeMaps[display],
       [originalSceneNodeId]: copiedSceneNodeId,
     };
+
+    if (display === 'vertical') {
+      if (!this.state.sceneNodeMaps.hasOwnProperty(sceneId)) {
+        this.state.sceneNodeMaps[sceneId] = {};
+      }
+      this.state.nodeMaps[sceneId] = {
+        ...this.state.nodeMaps[sceneId],
+        [originalSceneNodeId]: copiedSceneNodeId,
+      };
+    }
   }
 
   @mutation()

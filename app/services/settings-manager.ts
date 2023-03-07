@@ -1,7 +1,8 @@
-import { ViewHandler, PersistentStatefulService } from 'services/core';
+import { ViewHandler, PersistentStatefulService, Inject } from 'services/core';
 import { mutation } from 'services/core/stateful-service';
 import { IVideoSetting, verticalDisplayData, TDisplayType } from './settings-v2';
 import { IVideoInfo } from 'obs-studio-node';
+import { DualOutputService } from './dual-output';
 
 interface ISettingsManagerServiceState {
   videoSettings: {
@@ -34,6 +35,7 @@ class SettingsManagerServiceViews extends ViewHandler<ISettingsManagerServiceSta
 }
 
 export class SettingsManagerService extends PersistentStatefulService<ISettingsManagerServiceState> {
+  @Inject() private dualOutputService: DualOutputService;
   static defaultState = {
     videoSettings: {
       defaultDisplay: 'horizontal',
@@ -57,19 +59,30 @@ export class SettingsManagerService extends PersistentStatefulService<ISettingsM
    * VIDEO SETTINGS FUNCTIONS
    */
 
-  setDisplayActive(status: boolean, display?: TDisplayType) {
+  toggleDisplay(status: boolean, display?: TDisplayType) {
     console.log('this.views.defaultDisplay ', this.views.defaultDisplay);
-    this.SET_DISPLAY_ACTIVE(status, display);
+
+    if (status === true && display === 'vertical') {
+      this.dualOutputService.sceneItemsConfirmed.subscribe(() => {
+        this.setDisplayActive(status, display);
+      });
+      this.dualOutputService.actions.toggleDualOutputMode();
+    } else {
+      this.setDisplayActive(status, display);
+    }
   }
 
   setVideoSetting(setting: Partial<IVideoSetting>, display?: TDisplayType) {
     this.SET_VIDEO_SETTING(setting, display);
   }
 
+  private setDisplayActive(status: boolean, display: TDisplayType = 'horizontal') {
+    this.SET_DISPLAY_ACTIVE(status, display);
+  }
+
   @mutation()
   private SET_DISPLAY_ACTIVE(status: boolean, display: TDisplayType = 'horizontal') {
     const otherDisplay = display === 'horizontal' ? 'vertical' : 'horizontal';
-
     if (
       status === false &&
       this.state.videoSettings.activeDisplays[display] &&
