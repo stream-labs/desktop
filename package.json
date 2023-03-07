@@ -1,12 +1,12 @@
 {
-  "name": "n-air-dev",
+  "name": "n-air-app",
   "description": "Streaming application for niconico",
   "author": "DWANGO Co.,Ltd.",
   "license": "GPL-3.0",
   "//": {
     "version": "0.11.2"
   },
-  "version": "1.1.20230306-unstable.1",
+  "version": "1.1.20210826-unstable.1",
   "main": "main.js",
   "engines": {
     "npm": "please-use-yarn"
