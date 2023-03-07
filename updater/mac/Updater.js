@@ -14,7 +14,11 @@ class Updater {
   // orphan the main process in the background.
   constructor(startApp, channel) {
     this.startApp = startApp;
-    this.channel = channel;
+    if (process.arch === 'arm64') {
+      this.channel = 'arm64-' + channel;
+    } else {
+      this.channel = channel;
+    }
   }
 
   run() {
