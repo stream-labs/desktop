@@ -68,6 +68,24 @@ class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
     return this.getNodeIds(['vertical']);
   }
 
+  get hasVerticalNodes() {
+    return this.state.sceneNodeMaps.hasOwnProperty(this.scenesService.views.activeSceneId);
+  }
+
+  get verticalNodeIds(): string[] {
+    const activeSceneId = this.scenesService.views.activeSceneId;
+
+    if (!this.hasVerticalNodes) return;
+
+    return Object.entries(this.state.sceneNodeMaps[activeSceneId]).reduce(
+      (nodeIds: string[], [key, value]: [string, string]) => {
+        nodeIds.push(key);
+        return nodeIds;
+      },
+      [],
+    );
+  }
+
   get displays() {
     return this.state.displays;
   }
@@ -127,13 +145,17 @@ class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
     return this.state.nodeMaps[display];
   }
 
-  getDisplayNodeId(display: TDisplayType, defaultNodeId: string) {
-    return this.state.nodeMaps[display][defaultNodeId];
+  getDisplayNodeId(defaultNodeId: string) {
+    return this.state.sceneNodeMaps[this.scenesService.views.activeSceneId][defaultNodeId];
   }
 
-  getDisplayNodeVisibility(display: TDisplayType, defaultNodeId: string) {
-    const nodeId = this.getDisplayNodeId(display, defaultNodeId);
-    return this.scenesService.views.getNodeVisibility(nodeId);
+  getDisplayNodeVisibility(defaultNodeId: string, display?: TDisplayType) {
+    if (display === 'horizontal') {
+      return this.scenesService.views.getNodeVisibility(defaultNodeId);
+    } else {
+      const nodeId = this.getDisplayNodeId(defaultNodeId);
+      return this.scenesService.views.getNodeVisibility(nodeId);
+    }
   }
 
   getDualOutputNodeIds(sceneItemId: string) {
@@ -375,11 +397,8 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
     };
 
     if (display === 'vertical') {
-      if (!this.state.sceneNodeMaps.hasOwnProperty(sceneId)) {
-        this.state.sceneNodeMaps[sceneId] = {};
-      }
-      this.state.nodeMaps[sceneId] = {
-        ...this.state.nodeMaps[sceneId],
+      this.state.sceneNodeMaps[sceneId] = {
+        ...this.state.sceneNodeMaps[sceneId],
         [originalSceneNodeId]: copiedSceneNodeId,
       };
     }

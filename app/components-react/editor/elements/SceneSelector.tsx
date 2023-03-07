@@ -7,7 +7,6 @@ import { Menu } from 'util/menus/Menu';
 import { getOS } from 'util/operating-systems';
 import { Services } from 'components-react/service-provider';
 import { useVuex } from 'components-react/hooks';
-import { SwitchInput } from 'components-react/shared/inputs';
 import HelpTip from 'components-react/shared/HelpTip';
 import Scrollable from 'components-react/shared/Scrollable';
 import { useTree, IOnDropInfo } from 'components-react/hooks/useTree';

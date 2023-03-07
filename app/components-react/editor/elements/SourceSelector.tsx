@@ -24,6 +24,7 @@ import { DualOutputSourceSelector } from './DualOutputSourceSelector';
 import { WidgetsService } from '../../../app-services';
 import { GuestCamService } from 'app-services';
 import { DualOutputService } from 'services/dual-output';
+import { SettingsManagerService } from 'services/settings-manager';
 interface ISourceMetadata {
   id: string;
   title: string;
@@ -49,6 +50,7 @@ export class SourceSelectorModule {
   private audioService = inject(AudioService);
   private guestCamService = inject(GuestCamService);
   private dualOutputService = inject(DualOutputService);
+  private settingsManagerService = inject(SettingsManagerService);
 
   sourcesTooltip = $t('The building blocks of your scene. Also contains widgets.');
   addSourceTooltip = $t('Add a new Source to your Scene. Includes widgets.');
@@ -110,11 +112,7 @@ export class SourceSelectorModule {
 
   get nodeData(): ISourceMetadata[] {
     // filter out scene items created for dual output mode
-    const nodes = !this.isDualOutputActive
-      ? this.scene.getNodes()
-      : this.scene
-          .getNodes()
-          .filter(node => !this.dualOutputService.views.dualOutputNodeIds.includes(node.id));
+    const nodes = this.filterNodes();
 
     return nodes.map(node => {
       const itemsForNode = this.getItemsForNode(node.id);
@@ -146,6 +144,25 @@ export class SourceSelectorModule {
         isFolder,
       };
     });
+  }
+
+  filterNodes(): TSceneNode[] {
+    let nodes;
+    if (
+      this.dualOutputService.views.dualOutputMode ||
+      (this.settingsManagerService.views.activeDisplays.horizontal &&
+        this.dualOutputService.views.hasVerticalNodes)
+    ) {
+      const verticalNodeIds = this.dualOutputService.views.verticalNodeIds;
+      nodes = this.scene.getNodes().filter(node => !verticalNodeIds.includes(node.id));
+    }
+
+    if (this.settingsManagerService.views.activeDisplays.vertical) {
+      const verticalNodeIds = this.dualOutputService.views.verticalNodeIds;
+      nodes = this.scene.getNodes().filter(node => verticalNodeIds.includes(node.id));
+    }
+
+    return nodes ?? this.scene.getNodes();
   }
 
   // TODO: Clean this up.  These only access state, no helpers

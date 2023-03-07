@@ -11,12 +11,13 @@ export function DualOutputSourceSelector(p: { nodeId: string }) {
   const { toggleVisibility } = useModule(SourceSelectorModule);
   const { DualOutputService, ScenesService } = Services;
 
+  const horizontalNodeId = p.nodeId;
+
   const v = useVuex(() => ({
     showDualOutputDisplays: DualOutputService.views.showDualOutputDisplays,
-    horizontalNodeId: DualOutputService.views.getDisplayNodeId('horizontal', p.nodeId),
-    verticalNodeId: DualOutputService.views.getDisplayNodeId('vertical', p.nodeId),
-    isHorizontalVisible: DualOutputService.views.getDisplayNodeVisibility('horizontal', p.nodeId),
-    isVerticalVisible: DualOutputService.views.getDisplayNodeVisibility('vertical', p.nodeId),
+    verticalNodeId: DualOutputService.views.getDisplayNodeId(p.nodeId),
+    isHorizontalVisible: ScenesService.views.getNodeVisibility(p.nodeId),
+    isVerticalVisible: DualOutputService.views.getDisplayNodeVisibility(p.nodeId, 'vertical'),
   }));
 
   return (
@@ -24,7 +25,7 @@ export function DualOutputSourceSelector(p: { nodeId: string }) {
       {/* @@@ TODO: update font and font icons.*/}
 
       <i
-        onClick={() => toggleVisibility(v.horizontalNodeId)}
+        onClick={() => toggleVisibility(horizontalNodeId)}
         className={v.isHorizontalVisible ? 'icon-desktop' : 'icon-desktop-hide'}
       />
 
