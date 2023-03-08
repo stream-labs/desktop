@@ -7,7 +7,7 @@ const setup = createSetupFunction({
     UserService: {},
     StreamingService: {
       streamingStatusChange: {
-        subscribe() {},
+        subscribe() { },
       },
     },
     WindowsService: {},
@@ -82,12 +82,23 @@ test('setupStreamSettingsでストリーム情報がとれた場合', async () =
       name: 'key1',
     }),
   );
-  instance.client.fetchMaxBitrate = jest.fn((programId: string) => Promise.resolve(6000));
+  instance.client.fetchMaxQuality = jest.fn((programId: string) => Promise.resolve({
+    bitrate: 6000,
+    height: 720,
+    fps: 30,
+  }));
 
   const result = await instance.setupStreamSettings('lv12345');
-  expect(result.url).toBe('url1');
-  expect(result.key).toBe('key1');
-  expect(result.bitrate).toBe(6000);
+  expect(result).toEqual({
+    url: 'url1',
+    key: 'key1',
+    quality: {
+      bitrate: 6000,
+      height: 720,
+      fps: 30,
+    },
+  })
+
   expect(setSettings).toHaveBeenCalledTimes(1);
   expect(setSettings.mock.calls[0]).toMatchSnapshot();
 });
@@ -123,13 +134,21 @@ test('setupStreamSettingsで番組取得にリトライで成功する場合', a
       name: 'key1',
     }),
   );
-  instance.client.fetchMaxBitrate = jest.fn((programId: string) => Promise.resolve(6000));
+  instance.client.fetchMaxQuality = jest.fn((programId: string) => Promise.resolve({
+    bitrate: 6000,
+    height: 720,
+    fps: 30,
+  }));
 
   const result = await instance.setupStreamSettings();
   expect(result).toEqual({
     url: 'url1',
     key: 'key1',
-    bitrate: 6000,
+    quality: {
+      bitrate: 6000,
+      height: 720,
+      fps: 30,
+    },
   });
   expect(setSettings).toHaveBeenCalledTimes(1);
   expect(setSettings.mock.calls[0]).toMatchSnapshot();
