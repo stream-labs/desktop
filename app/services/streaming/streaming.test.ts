@@ -92,7 +92,8 @@ const createInjectee = ({
   NicoliveProgramService: {
     state: {
       programID: '',
-    }
+    },
+    fetchProgram: noop,
   },
 });
 

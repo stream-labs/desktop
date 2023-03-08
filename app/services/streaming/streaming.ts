@@ -218,6 +218,10 @@ export class StreamingService
         if (streamKey === '') {
           return this.showNotBroadcastingMessageBox();
         }
+
+        // [番組情報を取得]してニコ生パネルを更新する
+        await this.nicoliveProgramService.fetchProgram();
+
         if (this.customizationService.optimizeForNiconico) {
           return this.optimizeForNiconicoAndStartStreaming(
             setting,
