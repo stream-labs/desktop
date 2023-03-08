@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/vue';
 import { FailedResult, NotLoggedInError } from './NicoliveClient';
 import { $t } from 'services/i18n';
 import { remote } from 'electron';
@@ -8,7 +9,7 @@ export class NicoliveFailure {
     public method: string,
     public reason: string,
     public additionalMessage: string = '',
-  ) {}
+  ) { }
 
   static fromClientError(method: string, res: FailedResult) {
     if (res.value instanceof NotLoggedInError) {
@@ -58,6 +59,17 @@ function fallbackToX00(reason: string): string {
 }
 
 export async function openErrorDialogFromFailure(failure: NicoliveFailure): Promise<void> {
+  Sentry.withScope(scope => {
+    scope.setLevel('warning');
+    scope.setExtra('failure', failure);
+    scope.setTag('module', 'nicolive-program');
+    scope.setTag('function', 'openErrorDialogFromFailure');
+    scope.setTag('failure.type', failure.type);
+    scope.setTag('failure.method', failure.method);
+    scope.setTag('failure.reason', failure.reason);
+    Sentry.captureMessage(`openErrorDialogFromFailure ${failure.type} ${failure.method} ${failure.reason}`);
+  });
+
   if (failure.type === 'logic') {
     return openErrorDialog({
       title: $t(`nicolive-program.errors.logic.${failure.method}.${failure.reason}.title`),
