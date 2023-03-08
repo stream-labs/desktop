@@ -6,6 +6,8 @@ import { OptimizeSettings, SettingsKeyAccessor, OptimizationKey, EncoderType } f
 export function getBestSettingsForNiconico(
   options: {
     bitrate: number;
+    height: number;
+    fps: number;
     useHardwareEncoder?: boolean;
   },
   settings: SettingsKeyAccessor,
@@ -14,20 +16,29 @@ export function getBestSettingsForNiconico(
   let resolution: string;
   if (options.bitrate >= 6000) {
     audioBitrate = 192;
-    resolution = '1280x720';
   } else if (options.bitrate >= 2000) {
     audioBitrate = 192;
-    resolution = '800x450';
   } else if (options.bitrate >= 1000) {
     audioBitrate = 96;
-    resolution = '800x450';
   } else if (options.bitrate >= 384) {
     audioBitrate = 48;
-    resolution = '512x288';
   } else {
     audioBitrate = 48;
-    resolution = '512x288';
   }
+
+  switch (options.height) {
+    case 720:
+      resolution = '1280x720';
+      break;
+    case 450:
+      resolution = '800x450';
+      break;
+    case 288:
+    default:
+      resolution = '512x288';
+      break;
+  }
+
 
   let encoderSettings: OptimizeSettings = {
     encoder: EncoderType.x264,
@@ -68,7 +79,7 @@ export function getBestSettingsForNiconico(
     audioBitrate: audioBitrate.toString(10),
     quality: resolution,
     fpsType: 'Common FPS Values',
-    fpsCommon: '30',
+    fpsCommon: `${options.fps || 30}`,
     audioSampleRate: 48000,
   };
 
