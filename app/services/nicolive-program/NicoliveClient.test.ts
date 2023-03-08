@@ -1,7 +1,7 @@
 import * as fetchMock from 'fetch-mock';
 import { WrappedResult } from './NicoliveClient';
 import { Communities, Community } from './ResponseTypes';
-const { NicoliveClient } = require('./NicoliveClient');
+const { NicoliveClient, parseMaxQuality } = require('./NicoliveClient');
 
 jest.mock('services/i18n', () => ({
   $t: (x: any) => x,
@@ -10,6 +10,26 @@ jest.mock('util/menus/Menu', () => ({}));
 
 afterEach(() => {
   fetchMock.reset();
+});
+
+describe('parseMaxQuality', () => {
+  const fallback = { bitrate: 192, height: 288, fps: 30 };
+  test.each([
+    ['6Mbps720p', 6000, 720, 30],
+    ['2Mbps450p', 2000, 450, 30],
+    ['1Mbps450p', 1000, 450, 30],
+    ['384kbps288p', 384, 288, 30],
+    ['192kbps288p', 192, 288, 30],
+    ['8Mbps1080p60fps', 8000, 1080, 60],
+    ['invalid', fallback.bitrate, fallback.height, fallback.fps],
+  ])(`%s => %d kbps, %d x %d`, (maxQuality, bitrate, height, fps) => {
+    expect(parseMaxQuality(maxQuality, fallback)).toEqual({
+      bitrate,
+      height,
+      fps,
+    });
+  }
+  );
 });
 
 test('constructor', () => {
@@ -231,7 +251,7 @@ function setupMock() {
     loadURL(url: string) {
       this.url = url;
       for (const cb of this.webContentsCallbacks) {
-        cb({ preventDefault() {} }, url);
+        cb({ preventDefault() { } }, url);
       }
     }
     close = jest.fn().mockImplementation(() => {
@@ -263,7 +283,7 @@ function setupMock() {
       },
     },
     ipcRenderer: {
-      send() {},
+      send() { },
     },
   }));
 

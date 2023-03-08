@@ -61,6 +61,27 @@ export function isOk<T>(result: WrappedResult<T>): result is SucceededResult<T> 
 
 export class NotLoggedInError { }
 
+type Quality = {
+  bitrate: number;
+  height: number;
+  fps: number;
+}
+
+export function parseMaxQuality(maxQuality: string, fallback: Quality): Quality {
+  try {
+    const match = maxQuality.match(/(\d+)([Mk])bps(\d+)p((\d+)fps)?/);
+
+    return {
+      bitrate: parseInt(match[1], 10) * (match[2] === 'M' ? 1000 : 1),
+      height: parseInt(match[3], 10),
+      fps: parseInt(match[5], 10) || 30,
+    };
+  } catch (e) {
+    console.warn('Failed to parse max quality', maxQuality, e)
+    return fallback;
+  }
+}
+
 export class NicoliveClient {
   static live2BaseURL = 'https://live2.nicovideo.jp';
   static publicBaseURL = 'https://public.api.nicovideo.jp';
@@ -510,26 +531,14 @@ export class NicoliveClient {
       .then(json => json.data);
   }
 
-  async fetchMaxBitrate(programId: string): Promise<number> {
+  async fetchMaxQuality(programId: string): Promise<Quality> {
+    const fallback: Quality = { bitrate: 192, height: 288, fps: 30 } as const;
     const programInformation = await this.fetchProgram(programId);
     if (!isOk(programInformation)) {
-      return 192;
+      return fallback;
     }
-    switch (programInformation.value.streamSetting.maxQuality) {
-      case '6Mbps720p':
-        return 6000;
-      case '2Mbps450p':
-        return 2000;
-      case '1Mbps450p':
-        return 1000;
-      case '384kbps288p':
-        return 384;
-      case '192kbps288p':
-        return 192;
-      default:
-        // 来ないはず
-        return 192;
-    }
+
+    return parseMaxQuality(programInformation.value.streamSetting.maxQuality, fallback);
   }
 
   /** 番組作成画面を開いて結果を返す */

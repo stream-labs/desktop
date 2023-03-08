@@ -3,7 +3,11 @@ import { NiconicoService } from './niconico';
 export type IStreamingSetting = {
   url: string;
   key: string;
-  bitrate: number | undefined;
+  quality: {
+    bitrate: number;
+    height: number;
+    fps: number;
+  } | undefined;
 };
 
 // All platform services should implement

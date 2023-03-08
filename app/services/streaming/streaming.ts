@@ -349,7 +349,7 @@ export class StreamingService
     streamingSetting: IStreamingSetting,
     mustShowDialog: boolean,
   ) {
-    if (streamingSetting.bitrate === undefined) {
+    if (streamingSetting.quality === undefined) {
       return new Promise(resolve => {
         electron.remote.dialog
           .showMessageBox(electron.remote.getCurrentWindow(), {
@@ -363,7 +363,9 @@ export class StreamingService
       });
     }
     const settings = this.settingsService.diffOptimizedSettings({
-      bitrate: streamingSetting.bitrate,
+      bitrate: streamingSetting.quality.bitrate,
+      height: streamingSetting.quality.height,
+      fps: streamingSetting.quality.fps,
       useHardwareEncoder: this.customizationService.optimizeWithHardwareEncoder,
     });
     if (Object.keys(settings.delta).length > 0 || mustShowDialog) {

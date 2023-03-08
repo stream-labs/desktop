@@ -548,6 +548,8 @@ export class SettingsService
 
   diffOptimizedSettings(options: {
     bitrate: number;
+    height: number;
+    fps: number;
     useHardwareEncoder?: boolean;
   }): OptimizedSettings {
     const accessor = new SettingsKeyAccessor(this);
