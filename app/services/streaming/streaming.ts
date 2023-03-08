@@ -275,16 +275,17 @@ export class StreamingService
     // update channel settings for each platform
     const platforms = this.views.enabledPlatforms;
     for (const platform of platforms) {
-      const service = getPlatformService(platform);
-      try {
-        // don't update settings for twitch in unattendedMode
-        const settingsForPlatform = platform === 'twitch' && unattendedMode ? undefined : settings;
+      await this.handleSetupSinglePlatform(platform, unattendedMode, settings);
+      // const service = getPlatformService(platform);
+      // try {
+      //   // don't update settings for twitch in unattendedMode
+      //   const settingsForPlatform = platform === 'twitch' && unattendedMode ? undefined : settings;
 
-        const contextId = this.views.getPlatformContext(platform);
-        await this.runCheck(platform, () => service.beforeGoLive(settingsForPlatform, contextId));
-      } catch (e: unknown) {
-        this.handleSetupPlatformError(e, platform);
-      }
+      //   const contextId = this.views.getPlatformContext(platform);
+      //   await this.runCheck(platform, () => service.beforeGoLive(settingsForPlatform, contextId));
+      // } catch (e: unknown) {
+      //   this.handleSetupPlatformError(e, platform);
+      // }
     }
 
     // setup restream
@@ -329,9 +330,23 @@ export class StreamingService
         if (displayPlatforms[display].length > 1) {
           console.log('restream');
 
-          actions.push(
-            this.handleSetupDualOutputRestream(displayPlatforms[display], display as TDisplayType),
-          );
+          try {
+            await this.runCheck('setupDualOutput', async () => {
+              // confirm context assignment on platforms
+              return await this.handleSetupDualOutputRestream(
+                displayPlatforms[display],
+                display as TDisplayType,
+              );
+            });
+          } catch (e: unknown) {
+            console.error('Failed to setup restream', e);
+            this.setError('DUAL_OUTPUT_SETUP_FAILED');
+            return;
+          }
+
+          // actions.push(
+          //   this.handleSetupDualOutputRestream(displayPlatforms[display], display as TDisplayType),
+          // );
 
           // update restream settings
           // try {
@@ -353,12 +368,45 @@ export class StreamingService
         } else {
           // set single stream for the display
           if (displayPlatforms[display].length > 0) {
-            actions.push(
-              this.handleSetupDualOutputStream(
-                displayPlatforms[display][0],
-                display as TDisplayType,
-              ),
-            );
+            if (display === 'vertical') {
+              try {
+                await this.runCheck('setupDualOutput', async () => {
+                  // confirm context assignment on platforms
+                  return await this.handleSetupSinglePlatform(
+                    displayPlatforms[display][0],
+                    unattendedMode,
+                    settings,
+                    1,
+                  );
+                });
+              } catch (e: unknown) {
+                console.error('Failed to setup restream', e);
+                this.setError('DUAL_OUTPUT_SETUP_FAILED');
+                return;
+              }
+              // actions.push(
+              //   this.handleSetupSinglePlatform(
+              //     displayPlatforms[display][0],
+              //     unattendedMode,
+              //     settings,
+              //     1,
+              //   ),
+              // );
+            } else {
+              try {
+                await this.runCheck('setupDualOutput', async () => {
+                  // confirm context assignment on platforms
+                  return await this.handleSetupDualOutputStream(
+                    displayPlatforms[display],
+                    display as TDisplayType,
+                  );
+                });
+              } catch (e: unknown) {
+                console.error('Failed to setup restream', e);
+                this.setError('DUAL_OUTPUT_SETUP_FAILED');
+                return;
+              }
+            }
 
             // const platform = displayPlatforms[display][0];
             // const service = getPlatformService(platform);
@@ -375,32 +423,41 @@ export class StreamingService
         }
       }
 
-      try {
-        await this.runCheck('setupDualOutput', async () => {
-          console.log('resolve it all');
+      // return Promise.resolve();
 
-          // check the Restream service is available
-          // let ready = false;
-          // try {
-          //   await this.runCheck(
-          //     'setupDualOutput',
-          //     async () => (ready = await this.restreamService.checkStatus()),
-          //   );
-          // } catch (e: unknown) {
-          //   console.error('Error fetching restreaming service', e);
-          // }
-          // // Assume restream is down
-          // if (!ready) {
-          //   this.setError('DUAL_OUTPUT_RESTREAM_DISABLED');
-          //   return;
-          // }
+      // try {
+      //   await this.runCheck('setupDualOutput', async () => {
+      //     console.log('resolve it all');
 
-          return Promise.all(actions);
-        });
-      } catch (e: unknown) {
-        this.setError('DUAL_OUTPUT_SETUP_FAILED');
-        return;
-      }
+      //     // check the Restream service is available
+      //     // let ready = false;
+      //     // try {
+      //     //   await this.runCheck(
+      //     //     'setupDualOutput',
+      //     //     async () => (ready = await this.restreamService.checkStatus()),
+      //     //   );
+      //     // } catch (e: unknown) {
+      //     //   console.error('Error fetching restreaming service', e);
+      //     // }
+      //     // // Assume restream is down
+      //     // if (!ready) {
+      //     //   this.setError('DUAL_OUTPUT_RESTREAM_DISABLED');
+      //     //   return;
+      //     // }
+
+      //     return Promise.allSettled(actions);
+      //     // return actions.pipe(action => action()).next(() => Promise.resolve());
+
+      //     // return Promise.resolve();
+      //     // return actions.forEach(
+      //     //   async (action: () => Promise<void>) => await Promise.resolve(action),
+      //     // );
+      //   });
+
+      // } catch (e: unknown) {
+      //   this.setError('DUAL_OUTPUT_SETUP_FAILED');
+      //   return;
+      // }
     }
     // if (this.views.isDualOutputMode) {
     //   const displayPlatforms = this.views.activeDisplayPlatforms;
@@ -527,6 +584,24 @@ export class StreamingService
     }
   }
 
+  async handleSetupSinglePlatform(
+    platform: TPlatform,
+    unattendedMode: boolean,
+    settings: IGoLiveSettings,
+    context?: number,
+  ) {
+    const service = getPlatformService(platform);
+    try {
+      // don't update settings for twitch in unattendedMode
+      const settingsForPlatform = platform === 'twitch' && unattendedMode ? undefined : settings;
+
+      const contextId = context ?? this.views.getPlatformContext(platform);
+      await this.runCheck(platform, () => service.beforeGoLive(settingsForPlatform, contextId));
+    } catch (e: unknown) {
+      this.handleSetupPlatformError(e, platform);
+    }
+  }
+
   handleSetupPlatformError(e: unknown, platform: TPlatform) {
     console.error('Error running beforeGoLive for platform', e);
     // cast all PLATFORM_REQUEST_FAILED errors to SETTINGS_UPDATE_FAILED
@@ -543,6 +618,7 @@ export class StreamingService
   }
 
   async handleSetupDualOutputRestream(platforms: TPlatform[], display: TDisplayType) {
+    console.log('setup restream');
     // confirm or enable restream
     if (!this.restreamService.state.enabled) {
       let ready = false;
@@ -571,28 +647,55 @@ export class StreamingService
   }
 
   async handleSetupDualOutputStream(platform: TPlatform, display: TDisplayType) {
+    console.log('setup stream');
     const service = getPlatformService(platform);
+    console.log('service ', service);
     service.confirmDualOutput(platform);
 
-    console.log('service ', service);
+    // const contextId = display === 'horizontal' ? 0 : 1;
 
-    const settingsAll = this.settingsService.views.all;
-    console.log('single - after setup this.settingsService.views.all ', settingsAll);
+    // if (display === 'horizontal') {
+    //   console.log('context horizontal');
 
-    const contextId = display === 'horizontal' ? 0 : 1;
-    service.beforeGoLive(this.views.savedSettings, contextId);
+    //   service.confirmDualOutput(platform);
+    // } else {
+    //   console.log('context vertical');
+    //   console.log('this.views.savedSettings ', this.views.savedSettings);
 
-    console.log('getPlatformSettings ', this.views.getPlatformSettings(platform));
+    //   await service.beforeGoLive(this.views.savedSettings, 1);
+    // }
+
+    // await service.beforeGoLive(this.views.savedSettings, contextId);
+
+    // console.log('getPlatformSettings ', this.views.savedSettings);
 
     // get settings
 
+    // console.log('putting ', {
+    //   key: service.state.streamKey,
+    //   server: service.state.server,
+    // });
+
+    // const ingest = (await this.restreamService.fetchIngest()).server;
+
     // this.streamSettingsService.setSettings(
-    //   //   {
-    //   //     key: service.key,
-    //   //     server: ingest,
-    //   //   },
+    //   {
+    //     streamType: 'rtmp_custom',
+    //   },
     //   contextId,
     // );
+
+    // this.streamSettingsService.setSettings(
+    //   {
+    //     key: service.getStreamSettings().key,
+    //     server: ingest,
+    //   },
+    //   contextId,
+    // );
+
+    const settingsAll = this.settingsService.views.all;
+
+    console.log('single - after setup this.settingsService.views.all ', settingsAll);
 
     return Promise.resolve();
   }
@@ -856,22 +959,126 @@ export class StreamingService
     if (this.views.isDualOutputMode) {
       // @@@ TODO add check for multiple platforms active. If not, don't start second stream
 
-      if (this.views.enabledPlatforms.length > 1) {
-        const horizontalContext = this.videoSettingsService.contexts.horizontal;
-        const verticalContext = this.videoSettingsService.contexts.vertical;
+      const displayPlatforms = this.views.activeDisplayPlatforms;
 
-        // check if we need to force apply single stream settings?
-        // this.settingsService.actions.setDualOutputSingleStreamData();
+      console.log('displayPlatforms ', displayPlatforms);
+      const actions: Promise<void>[] = [];
 
-        obs.NodeObs.OBS_service_setVideoInfo(horizontalContext, 'horizontal');
-        obs.NodeObs.OBS_service_setVideoInfo(verticalContext, 'vertical');
+      if (this.views.isDualOutputMode) {
+        // let continue = false;
+        console.log('contextsToStream ', this.views.contextsToStream);
 
-        obs.NodeObs.OBS_service_startStreaming('horizontal');
+        if (this.views.contextsToStream.length > 1) {
+          this.streamingStatusChange.subscribe((status: EStreamingState) => {
+            if (status === EStreamingState.Live) {
+              const context = this.videoSettingsService.contexts.vertical;
+              obs.NodeObs.OBS_service_setVideoInfo(context, 'vertical');
+              obs.NodeObs.OBS_service_startStreaming('vertical');
+            }
+          });
+
+          const context = this.videoSettingsService.contexts['horizontal'];
+          obs.NodeObs.OBS_service_setVideoInfo(context, 'horizontal');
+          obs.NodeObs.OBS_service_startStreaming('horizontal');
+        } else {
+          const contextName = this.views.contextsToStream[0];
+          const context = this.videoSettingsService.contexts[contextName];
+          obs.NodeObs.OBS_service_setVideoInfo(context, contextName);
+          obs.NodeObs.OBS_service_startStreaming(contextName);
+        }
+        // this.views.contextsToStream.forEach(async (contextName: TDisplayType, index: number) => {
+        // this.streamInfoChanged.subscribe(async (info: StreamInfoView<any>) => {
+        //   if (info.signal === EStreamingState.Live || info.error) {
+        //     return Promise.resolve();
+        //   }
+        // });
+
+        // this.streamingStatusChange.subscribe(async (status: EStreamingState) => {
+        //   if (status) {
+        //     return Promise.resolve();
+        //   }
+        // });
+
+        // this.startStreamResolved.subscribe(async (info: IOBSOutputSignalInfo) => {
+        //   const context = this.videoSettingsService.contexts[contextName];
+        //   obs.NodeObs.OBS_service_setVideoInfo(context, contextName);
+        //   obs.NodeObs.OBS_service_startStreaming(contextName);
+        //   await new Promise(resolve => setTimeout(resolve, 1000));
+        //   if (info.signal === EOBSOutputSignal.Starting || info.error) {
+        //     const context = this.videoSettingsService.contexts.vertical;
+        //     obs.NodeObs.OBS_service_setVideoInfo(context, contextName);
+        //     obs.NodeObs.OBS_service_startStreaming('vertical');
+        //     return Promise.resolve();
+        //   }
+        // });
+
+        // if (index === 0) {
+        //   const context = this.videoSettingsService.contexts[contextName];
+        //   obs.NodeObs.OBS_service_setVideoInfo(context, contextName);
+        //   obs.NodeObs.OBS_service_startStreaming(contextName);
+        // } else {
+        //   this.startStreamResolved.subscribe(async (info: IOBSOutputSignalInfo) => {
+        //     if (info.signal === EOBSOutputSignal.Starting || info.error) {
+        //       const context = this.videoSettingsService.contexts[contextName];
+        //       obs.NodeObs.OBS_service_setVideoInfo(context, contextName);
+        //       obs.NodeObs.OBS_service_startStreaming(contextName);
+        //       return Promise.resolve();
+        //     }
+        //   });
+        // }
+
+        // if (index === 0) {
+        //   const context = this.videoSettingsService.contexts[contextName];
+        //   obs.NodeObs.OBS_service_setVideoInfo(context, contextName);
+        //   obs.NodeObs.OBS_service_startStreaming(contextName);
+        // } else {
+        // this.streamInfoChanged.subscribe(info => {
+        //   if (info.streamingStatus === EStreamingState.Live || info.error) {
+        //     break;
+        //     Promise.resolve(true)
+        //   }
+        // });
+        // }
+
+        // await this.finishStartStreaming();
+        // return Promise.resolve();
+
+        // this.startStreamResolved.subscribe(success => {
+        //   if (success) {
+        //     const context = this.videoSettingsService.contexts[contextName];
+        //     obs.NodeObs.OBS_service_setVideoInfo(context, contextName);
+        //     obs.NodeObs.OBS_service_startStreaming(contextName);
+        //   }
+        // });
+
+        // await
+
+        // const context = this.videoSettingsService.contexts[contextName];
+        // obs.NodeObs.OBS_service_setVideoInfo(context, contextName);
+        // obs.NodeObs.OBS_service_startStreaming(contextName);
+
         // sleep for 1 second to allow the first stream to start before starting the second
         // better to replace with waiting for signal from obs about first stream starting successfully
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        // await new Promise(resolve => {
+        //   // this.views.streamingStatus === EStreamingState.Live;
+        //   setTimeout(resolve, 1000);
+        // });
+        // }
+        // const horizontalContext = this.videoSettingsService.contexts.horizontal;
+        // const verticalContext = this.videoSettingsService.contexts.vertical;
 
-        obs.NodeObs.OBS_service_startStreaming('vertical');
+        // // check if we need to force apply single stream settings?
+        // // this.settingsService.actions.setDualOutputSingleStreamData();
+
+        // obs.NodeObs.OBS_service_setVideoInfo(horizontalContext, 'horizontal');
+        // obs.NodeObs.OBS_service_setVideoInfo(verticalContext, 'vertical');
+
+        // obs.NodeObs.OBS_service_startStreaming('horizontal');
+        // // sleep for 1 second to allow the first stream to start before starting the second
+        // // better to replace with waiting for signal from obs about first stream starting successfully
+        // await new Promise(resolve => setTimeout(resolve, 1000));
+
+        // obs.NodeObs.OBS_service_startStreaming('vertical');
       } else {
         const platform = this.views.enabledPlatforms[0];
         const display = this.views.getPlatformDisplay(platform);
@@ -880,7 +1087,7 @@ export class StreamingService
         obs.NodeObs.OBS_service_startStreaming(display);
       }
     } else {
-      console.log('hitting the else ', this.settingsService.views.all);
+      console.log('-------------------- hitting the else ', this.settingsService.views.all);
       obs.NodeObs.OBS_service_startStreaming();
     }
 
@@ -954,14 +1161,17 @@ export class StreamingService
       }
 
       if (this.views.isDualOutputMode) {
-        if (this.views.enabledPlatforms.length > 1) {
-          obs.NodeObs.OBS_service_stopStreaming(false, 'horizontal');
-          obs.NodeObs.OBS_service_stopStreaming(false, 'vertical');
-        } else {
-          const platform = this.views.enabledPlatforms[0];
-          const display = this.views.getPlatformDisplay(platform);
-          obs.NodeObs.OBS_service_stopStreaming(false, display);
-        }
+        this.views.contextsToStream.forEach(async (contextName: TDisplayType) => {
+          obs.NodeObs.OBS_service_stopStreaming(false, contextName);
+        });
+        // if (this.views.enabledPlatforms.length > 1) {
+        //   obs.NodeObs.OBS_service_stopStreaming(false, 'horizontal');
+        //   obs.NodeObs.OBS_service_stopStreaming(false, 'vertical');
+        // } else {
+        //   const platform = this.views.enabledPlatforms[0];
+        //   const display = this.views.getPlatformDisplay(platform);
+        //   obs.NodeObs.OBS_service_stopStreaming(false, display);
+        // }
       } else {
         obs.NodeObs.OBS_service_stopStreaming(false);
       }
@@ -987,8 +1197,9 @@ export class StreamingService
 
     if (this.state.streamingStatus === EStreamingState.Ending) {
       if (this.views.isDualOutputMode) {
-        obs.NodeObs.OBS_service_stopStreaming(true, 'horizontal');
-        obs.NodeObs.OBS_service_stopStreaming(true, 'vertical');
+        this.views.contextsToStream.forEach(async (contextName: TDisplayType) => {
+          obs.NodeObs.OBS_service_stopStreaming(false, contextName);
+        });
       } else {
         obs.NodeObs.OBS_service_stopStreaming(true);
       }
@@ -1406,6 +1617,7 @@ export class StreamingService
         .catch(() => {
           this.outputErrorOpen = false;
         });
+      this.streamingStatusChange.unsubscribe();
       this.windowsService.actions.closeChildWindow();
     }
   }

@@ -123,20 +123,10 @@ export abstract class BasePlatformService<T extends IPlatformState> extends Stat
       const display = this.dualOutputService.views.getPlatformDisplay(platform);
       const context = this.videoSettingsService.contexts[display];
 
-      // const contextNumber = display === 'horizontal' ? 0 : 1;
-      // this.streamSettingsService.setSettings(
-      //   {
-      //     key: this.state.streamKey,
-      //     server: this.state.rtmpServer,
-      //   },
-      //   contextNumber,
-      // );
       this.UPDATE_STREAM_SETTINGS({
         video: context,
       });
     }
-
-    console.log('platform ', platform, 'this.state ', this.state);
   }
 
   @mutation()
