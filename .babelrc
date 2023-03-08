@@ -4,13 +4,18 @@
       "@babel/preset-env",
       {
         "targets": {
-          "electron": "2.0.8"
+          "electron": "6.1.11"
         }
       }
     ]
   ],
   "plugins": [
-    ["@babel/plugin-proposal-decorators", { "legacy": true }],
+    [
+      "@babel/plugin-proposal-decorators",
+      {
+        "legacy": true
+      }
+    ],
     "@babel/plugin-proposal-class-properties",
     "@babel/plugin-proposal-export-namespace-from",
     "@babel/plugin-proposal-function-sent",
