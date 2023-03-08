@@ -5,18 +5,14 @@ import FeedbackSuccess from './FeedbackSuccess';
 
 export default function FeedbackWindow() {
   const [formComplete, setFormComplete] = useState(false);
-  const [score, setScore] = useState(0);
+  const [score, setScore] = useState(-1);
   const [comment, setComment] = useState('');
   const [canContact, setCanContact] = useState(false);
 
   return (
-    <ModalLayout hideFooter={formComplete}>
+    <ModalLayout hideFooter={formComplete} onOk={() => setFormComplete(true)}>
       {formComplete ? (
-        <FeedbackForm
-          setFormComplete={setFormComplete}
-          setScore={setScore}
-          setComment={setComment}
-        />
+        <FeedbackForm setScore={setScore} setComment={setComment} score={score} comment={comment} />
       ) : (
         <FeedbackSuccess score={score} setCanContact={setCanContact} />
       )}
