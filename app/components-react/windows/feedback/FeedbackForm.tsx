@@ -31,11 +31,11 @@ export default function FeedbackForm(p: {
 function ScoreInput(p: { value: number; onChange: (value: number) => void }) {
   return (
     <div>
-      <div>
+      <div className={styles.scoreContainer}>
         {[...Array(10).keys()].map(key => (
           <div
             key={key}
-            className={cx({
+            className={cx(styles.score, {
               [styles.green]: key > 8,
               [styles.yellow]: key > 6,
               [styles.red]: key < 7,
