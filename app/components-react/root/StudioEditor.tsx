@@ -4,37 +4,29 @@ import styles from './StudioEditor.m.less';
 import { Services } from 'components-react/service-provider';
 import cx from 'classnames';
 import Display from 'components-react/shared/Display';
-import DualOutputDisplay from 'components-react/shared/DualOutputDisplay';
 import { $t } from 'services/i18n';
 import { ERenderingMode } from '../../../obs-api';
 import { Tooltip } from 'antd';
-import { TDisplayType } from 'services/settings-v2';
 
-interface IStudioEditor {
-  display: TDisplayType;
-}
-
-export default function StudioEditor(p: IStudioEditor) {
+export default function StudioEditor() {
   const {
     WindowsService,
     CustomizationService,
     EditorService,
     TransitionsService,
-    DualOutputService,
     ScenesService,
     SettingsManagerService,
+    VideoSettingsService,
   } = Services;
   const v = useVuex(() => ({
     hideStyleBlockers: WindowsService.state.main.hideStyleBlockers,
     performanceMode: CustomizationService.state.performanceMode,
     cursor: EditorService.state.cursor,
     studioMode: TransitionsService.state.studioMode,
-    showDualOutputDisplays:
-      SettingsManagerService.views.activeDisplays.horizontal &&
-      SettingsManagerService.views.activeDisplays.vertical,
     showHorizontalDisplay: SettingsManagerService.views.activeDisplays.horizontal,
     showVerticalDisplay: SettingsManagerService.views.activeDisplays.vertical,
     activeSceneId: ScenesService.views.activeSceneId,
+    verticalContextActive: VideoSettingsService.contexts.vertical,
   }));
   const displayEnabled = !v.hideStyleBlockers && !v.performanceMode;
   const placeholderRef = useRef<HTMLDivElement>(null);
@@ -44,6 +36,11 @@ export default function StudioEditor(p: IStudioEditor) {
   const studioModeTransitionName = useMemo(() => TransitionsService.getStudioTransitionName(), [
     v.studioMode,
   ]);
+
+  const sourceId = useMemo(() => {
+    const dualOutputMode = v.showHorizontalDisplay && v.showVerticalDisplay;
+    return v.studioMode && !dualOutputMode ? studioModeTransitionName : undefined;
+  }, [v.showHorizontalDisplay, v.showVerticalDisplay, v.studioMode]);
 
   // Track vertical orientation for placeholder
   useEffect(() => {
@@ -169,13 +166,13 @@ export default function StudioEditor(p: IStudioEditor) {
       {displayEnabled && (
         <div className={cx(styles.studioModeContainer, { [styles.stacked]: studioModeStacked })}>
           {v.studioMode && <StudioModeControls stacked={studioModeStacked} />}
-          {v.showDualOutputDisplays && (
-            <DualOutputControls stacked={studioModeStacked} display={p.display} />
+          {v.showHorizontalDisplay && v.showVerticalDisplay && (
+            <DualOutputControls stacked={studioModeStacked} />
           )}
           <div
             className={cx(styles.studioDisplayContainer, { [styles.stacked]: studioModeStacked })}
           >
-            {!v.showDualOutputDisplays && p.display === 'horizontal' && (
+            {v.showHorizontalDisplay && (
               <div
                 className={cx(styles.studioEditorDisplayContainer, 'noselect')}
                 style={{ cursor: v.cursor }}
@@ -187,19 +184,16 @@ export default function StudioEditor(p: IStudioEditor) {
                 onContextMenu={eventHandlers.onContextMenu}
               >
                 <Display
+                  type={v.verticalContextActive ? 'horizontal' : undefined}
                   drawUI={true}
                   paddingSize={10}
                   onOutputResize={eventHandlers.onOutputResize}
                   renderingMode={ERenderingMode.OBS_MAIN_RENDERING}
-                  sourceId={
-                    v.studioMode && !v.showDualOutputDisplays
-                      ? studioModeTransitionName
-                      : v.activeSceneId
-                  }
+                  sourceId={sourceId}
                 />
               </div>
             )}
-            {!v.showDualOutputDisplays && p.display === 'vertical' && (
+            {v.showVerticalDisplay && (
               <div
                 className={cx(styles.studioEditorDisplayContainer, 'noselect')}
                 style={{ cursor: v.cursor }}
@@ -216,23 +210,18 @@ export default function StudioEditor(p: IStudioEditor) {
                   paddingSize={10}
                   onOutputResize={eventHandlers.onOutputResize}
                   renderingMode={ERenderingMode.OBS_MAIN_RENDERING}
-                  sourceId={
-                    v.studioMode && !v.showDualOutputDisplays
-                      ? studioModeTransitionName
-                      : v.activeSceneId
-                  }
+                  sourceId={sourceId}
                 />
               </div>
             )}
-            {!v.showDualOutputDisplays && v.showHorizontalDisplay && v.studioMode && (
+            {v.showHorizontalDisplay && !v.showVerticalDisplay && v.studioMode && (
               <div className={styles.studioModeDisplayContainer}>
-                <Display paddingSize={10} />
+                <Display paddingSize={10} type="horizontal" />
               </div>
             )}
-            {v.showDualOutputDisplays && <DualOutputDisplay eventHandlers={eventHandlers} />}
-            {!v.showDualOutputDisplays && v.showVerticalDisplay && v.studioMode && (
+            {!v.showHorizontalDisplay && v.showVerticalDisplay && v.studioMode && (
               <div className={styles.studioModeDisplayContainer}>
-                <Display paddingSize={10} />
+                <Display paddingSize={10} type="vertical" />
               </div>
             )}
           </div>
@@ -308,50 +297,33 @@ function StudioModeControls(p: { stacked: boolean }) {
   );
 }
 
-function DualOutputControls(p: { stacked: boolean; display: TDisplayType }) {
-  const horizontalTooltipText = $t('Arrange sources here for a horizontal scene layout.');
-  const verticalTooltipText = $t('Arrange sources here for a vertical scene layout.');
-
-  const control = {
-    horizontal: {
-      icon: 'icon-desktop',
-      tooltip: horizontalTooltipText,
-      title: $t('Horizontal Output'),
-    },
-    vertical: {
-      icon: 'icon-phone-case',
-      tooltip: verticalTooltipText,
-      title: $t('Vertical Output'),
-    },
-  };
+function DualOutputControls(p: { stacked: boolean }) {
+  const horizontalTooltipText = $t('Arrange horizontal scene layout.');
+  const verticalTooltipText = $t('Arrange vertical scene layout.');
 
   return (
     <div className={cx(styles.dualOutputModeControls, { [styles.stacked]: p.stacked })}>
       <div className={styles.dualOutputModeDetails}>
-        <i className={control[p.display].icon} />
-        <span>{control[p.display].title}</span>
+        <i className="icon-desktop" />
+        <span>{$t('Horizontal Output')}</span>
         <Tooltip
-          title={control[p.display].tooltip}
-          placement="rightBottom"
+          title={horizontalTooltipText}
+          placement="right"
+          overlayInnerStyle={{ width: '223px' }}
           className={styles.dualOutputTip}
-          // setting the widths below prevents the text from wrapping
-          // and prevents the tooltip from showing underneath the editor screen
-          overlayInnerStyle={{ minWidth: '332px' }}
         >
           <i className="icon-information" />
         </Tooltip>
       </div>
 
       <div className={styles.dualOutputModeDetails}>
-        <i className={control.vertical.icon} />
-        <span>{control.vertical.title}</span>
+        <i className="icon-phone-case" />
+        <span>{$t('Vertical Output')}</span>
         <Tooltip
-          title={control.vertical.tooltip}
-          placement="rightBottom"
+          title={verticalTooltipText}
+          placement="right"
+          overlayInnerStyle={{ width: '203px' }}
           className={styles.dualOutputTip}
-          // setting the widths below prevents the text from wrapping
-          // and prevents the tooltip from showing underneath the editor screen
-          overlayInnerStyle={{ minWidth: '316px' }}
         >
           <i className="icon-information" />
         </Tooltip>

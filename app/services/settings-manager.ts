@@ -71,13 +71,13 @@ export class SettingsManagerService extends PersistentStatefulService<ISettingsM
       this.dualOutputService.sceneItemsConfirmed.subscribe(() => {
         this.setDisplayActive(status, display);
       });
-      this.dualOutputService.actions.toggleDualOutputMode();
+      this.dualOutputService.actions.confirmOrCreateVerticalNodes();
     } else if (display === 'vertical' && status === true) {
       // toggle on vertical display
       this.dualOutputService.sceneItemsConfirmed.subscribe(() => {
         this.setDisplayActive(status, display);
       });
-      this.dualOutputService.actions.toggleDualOutputMode();
+      this.dualOutputService.actions.confirmOrCreateVerticalNodes();
     } else {
       // toggle on dual output mode
       this.setDisplayActive(status, display);
@@ -88,7 +88,7 @@ export class SettingsManagerService extends PersistentStatefulService<ISettingsM
     this.SET_VIDEO_SETTING(setting, display);
   }
 
-  private setDisplayActive(status: boolean, display: TDisplayType = 'horizontal') {
+  private setDisplayActive(status: boolean, display: TDisplayType) {
     this.SET_DISPLAY_ACTIVE(status, display);
   }
 

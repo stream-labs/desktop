@@ -147,22 +147,23 @@ export class SourceSelectorModule {
   }
 
   filterNodes(): TSceneNode[] {
-    let nodes;
-    if (
-      this.dualOutputService.views.dualOutputMode ||
-      (this.settingsManagerService.views.activeDisplays.horizontal &&
-        this.dualOutputService.views.hasVerticalNodes)
-    ) {
-      const verticalNodeIds = this.dualOutputService.views.verticalNodeIds;
-      nodes = this.scene.getNodes().filter(node => !verticalNodeIds.includes(node.id));
+    const verticalNodeIds = this.dualOutputService.views.verticalNodeIds;
+
+    if (verticalNodeIds) {
+      if (this.dualOutputService.views.dualOutputMode) {
+        return this.scene.getNodes().filter(node => !verticalNodeIds.includes(node.id));
+      }
+
+      if (this.settingsManagerService.views.activeDisplays.horizontal) {
+        return this.scene.getNodes().filter(node => !verticalNodeIds.includes(node.id));
+      }
+
+      if (this.settingsManagerService.views.activeDisplays.vertical) {
+        return this.scene.getNodes().filter(node => verticalNodeIds.includes(node.id));
+      }
     }
 
-    if (this.settingsManagerService.views.activeDisplays.vertical) {
-      const verticalNodeIds = this.dualOutputService.views.verticalNodeIds;
-      nodes = this.scene.getNodes().filter(node => verticalNodeIds.includes(node.id));
-    }
-
-    return nodes ?? this.scene.getNodes();
+    return this.scene.getNodes();
   }
 
   // TODO: Clean this up.  These only access state, no helpers

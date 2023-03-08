@@ -150,9 +150,6 @@ export class SceneCollectionsService extends Service implements ISceneCollection
    * Generally called on application shutdown.
    */
   async deinitialize() {
-    if (this.dualOutputService.views.dualOutputMode) {
-      this.dualOutputService.restoreScene(this.dualOutputService.views.convertedDefaultDisplay);
-    }
     await this.disableAutoSave();
     await this.save();
     await this.deloadCurrentApplicationState();

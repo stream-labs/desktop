@@ -75,6 +75,9 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
 
   init() {
     this.establishVideoContext();
+    if (this.settingsManagerService.views.activeDisplays.vertical) {
+      this.establishVideoContext('vertical');
+    }
   }
 
   get values() {
@@ -141,7 +144,6 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
   }
 
   getBaseResolution(display: TDisplayType = 'horizontal') {
-    console.log('display ', display);
     return `${this.state[display].baseWidth}x${this.state[display].baseHeight}`;
   }
 

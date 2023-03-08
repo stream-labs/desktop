@@ -77,12 +77,8 @@ class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
 
     if (!this.hasVerticalNodes) return;
 
-    return Object.entries(this.state.sceneNodeMaps[activeSceneId]).reduce(
-      (nodeIds: string[], [key, value]: [string, string]) => {
-        nodeIds.push(key);
-        return nodeIds;
-      },
-      [],
+    return Object.entries(this.state.sceneNodeMaps[activeSceneId]).map(
+      ([key, value]: [string, string]) => value,
     );
   }
 
@@ -174,7 +170,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
   @Inject() private scenesService: ScenesService;
   @Inject() private sceneCollectionsService: SceneCollectionsService;
   @Inject() private videoSettingsService: VideoSettingsService;
-  @Inject() private streamingService: StreamingService;
+  @Inject() private settingsManagerService: SettingsManagerService;
 
   static defaultState: IDualOutputServiceState = {
     convertedDefaultDisplay: 'horizontal',
@@ -196,50 +192,85 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
     super.init();
 
     this.sceneCollectionsService.collectionInitialized.subscribe(() => {
-      if (this.views.dualOutputMode) {
-        this.mapSceneNodes(this.state.displays);
-      }
-    });
-
-    this.scenesService.sceneRemoved.subscribe(() => {
-      if (this.views.dualOutputMode) {
-        // this.setDualOutputMode(false);
+      if (
+        this.scenesService.views.getSceneItemsBySceneId(this.scenesService.views.activeSceneId)
+          .length > 0
+      ) {
+        this.confirmOrCreateVerticalNodes();
       }
     });
 
     this.scenesService.sceneSwitched.subscribe(() => {
-      if (this.views.dualOutputMode && this.views.hasDualOutputScenes) {
-        this.restoreScene(this.state.convertedDefaultDisplay);
-        this.mapSceneNodes(this.state.displays, this.scenesService.views.activeSceneId);
+      // if (
+      //   this.settingsManagerService.views.activeDisplays.vertical &&
+      //   !this.videoSettingsService.contexts.vertical
+      // ) {
+      //   this.videoSettingsService.establishVideoContext('vertical');
+      // }
+
+      if (
+        this.scenesService.views.getSceneItemsBySceneId(this.scenesService.views.activeSceneId)
+          .length > 0
+      ) {
+        this.confirmOrCreateVerticalNodes();
       }
+
+      // if (this.views.hasVerticalNodes) {
+      //   this.assignSceneNodes();
+      // } else if (this.settingsManagerService.views.activeDisplays.vertical) {
+      //   this.confirmOrCreateVerticalNodes();
+      // }
     });
   }
 
   /**
-   * Create/destroy nodes for dual output when toggling on/off
+   * Create or confirm nodes for vertical output when toggling vertical display
    */
 
-  toggleDualOutputMode() {
+  confirmOrCreateVerticalNodes() {
     if (!this.state.sceneNodeMaps.hasOwnProperty(this.scenesService.views.activeSceneId)) {
       try {
-        this.mapSceneNodes(this.state.displays);
+        this.mapSceneNodes(this.views.displays);
+      } catch (error: unknown) {
+        console.error('Error toggling Dual Output mode: ', error);
+      }
+    } else {
+      try {
+        this.assignSceneNodes();
       } catch (error: unknown) {
         console.error('Error toggling Dual Output mode: ', error);
       }
     }
+
+    if (!this.videoSettingsService.contexts.vertical) {
+      this.videoSettingsService.establishVideoContext('vertical');
+    }
+
     this.sceneItemsConfirmed.next();
   }
 
-  // setDualOutputMode(status: boolean) {
-  //   this.TOGGLE_DUAL_OUTPUT_MODE(status);
-  //   this.streamingService.actions.setDualOutputMode(!this.streamingService.state.dualOutputMode);
-  // }
+  assignSceneNodes() {
+    const activeSceneId = this.scenesService.views.activeSceneId;
+    const sceneItems = this.scenesService.views.getSceneItemsBySceneId(activeSceneId);
+    const verticalNodeIds = this.views.verticalNodeIds;
+
+    if (!this.videoSettingsService.contexts.vertical) {
+      this.videoSettingsService.establishVideoContext('vertical');
+    }
+
+    sceneItems.forEach(sceneItem => {
+      const context = verticalNodeIds.includes(sceneItem.id) ? 'vertical' : 'horizontal';
+      this.assignNodeContext(sceneItem, context);
+    });
+  }
 
   mapSceneNodes(displays: TDisplayType[], sceneId?: string) {
     const sceneToMapId = sceneId ?? this.scenesService.views.activeSceneId;
     return displays.reduce((created: boolean, display: TDisplayType, index) => {
       const isFirstDisplay = index === 0;
-      this.videoSettingsService.establishVideoContext(display);
+      if (!this.videoSettingsService.contexts[display]) {
+        this.videoSettingsService.establishVideoContext(display);
+      }
       const nodesCreated = this.createOutputNodes(sceneToMapId, display, isFirstDisplay);
       if (!nodesCreated) {
         created = false;
@@ -275,7 +306,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
       // if it's the first display, just assign the scene item's output to a context
       this.assignNodeContext(sceneItem, display);
 
-      // in preparation for unlimited display profiles
+      // @@@ TODO: Remove
       // create a node map entry even though the key and value are the same
       this.SET_NODE_MAP_ITEM(display, sceneItem.id, sceneItem.id, sceneId);
       return sceneItem.id;
@@ -388,6 +419,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
     copiedSceneNodeId: string,
     sceneId?: string,
   ) {
+    // @@@ TODO Remove
     if (!this.state.nodeMaps) {
       this.state.nodeMaps = {};
     }
