@@ -437,7 +437,7 @@ function Events() {
             ...scheduledVideos.map(v => ({
               label: `${v.title} ${
                 v.event_params?.start_time
-                  ? moment(new Date(v.event_params.start_time)).calendar()
+                  ? moment(new Date(v.event_params.start_time * 1000)).calendar()
                   : ''
               }`,
               value: v.id,
