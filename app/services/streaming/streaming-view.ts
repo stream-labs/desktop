@@ -16,6 +16,7 @@ import cloneDeep from 'lodash/cloneDeep';
 import difference from 'lodash/difference';
 import { Services } from '../../components-react/service-provider';
 import { getDefined } from '../../util/properties-type-guards';
+import { TDisplayType } from 'services/settings-v2';
 
 /**
  * The stream info view is responsible for keeping
@@ -97,8 +98,8 @@ export class StreamInfoView<T extends Object> extends ViewHandler<T> {
     return getPlatformService(platform).displayName;
   }
 
-  getPlatformContext(platform: TPlatform): number {
-    return this.dualOutputView.getPlatformContext(platform) === 'horizontal' ? 0 : 1;
+  getPlatformContext(platform: TPlatform): TDisplayType {
+    return this.dualOutputView.getPlatformContext(platform);
   }
 
   // REMOVE
