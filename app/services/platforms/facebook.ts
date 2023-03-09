@@ -13,6 +13,7 @@ import { assertIsDefined, getDefined } from '../../util/properties-type-guards';
 import flatten from 'lodash/flatten';
 import * as remote from '@electron/remote';
 import { IVideo } from 'obs-studio-node';
+import { TDisplayType } from 'services/settings-v2';
 
 interface IFacebookPage {
   access_token: string;
@@ -231,7 +232,7 @@ export class FacebookService
     return this.state.streamDashboardUrl;
   }
 
-  async beforeGoLive(options: IGoLiveSettings, context?: number) {
+  async beforeGoLive(options: IGoLiveSettings, context?: TDisplayType) {
     const fbOptions = getDefined(options.platforms.facebook);
 
     let liveVideo: IFacebookLiveVideo;

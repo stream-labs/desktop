@@ -14,7 +14,7 @@ import { TiktokService } from './platforms/tiktok';
 import { TrovoService } from './platforms/trovo';
 import * as remote from '@electron/remote';
 import * as obs from 'obs-studio-node';
-import { VideoSettingsService } from './settings-v2/video';
+import { VideoSettingsService, TDisplayType } from './settings-v2/video';
 import { DualOutputService } from './dual-output';
 
 interface IRestreamTarget {
@@ -188,11 +188,15 @@ export class RestreamService extends StatefulService<IRestreamState> {
     await Promise.all([this.setupIngest(), this.setupTargets()]);
   }
 
-  async beforeDualOutputGoLive(platforms: TPlatform[], context: number, mode?: TOutputOrientation) {
-    // await Promise.all([
-    //   this.setupDualOutputIngest(context, mode),
-    //   this.setupDualOutputTargets(platforms),
-    // ]);
+  async beforeDualOutputGoLive(
+    platforms: TPlatform[],
+    context: TDisplayType,
+    mode?: TOutputOrientation,
+  ) {
+    await Promise.all([
+      this.setupDualOutputIngest(context, mode),
+      this.setupDualOutputTargets(platforms),
+    ]);
   }
 
   async setupIngest() {
@@ -209,7 +213,7 @@ export class RestreamService extends StatefulService<IRestreamState> {
     });
   }
 
-  async setupDualOutputIngest(context: number, mode?: TOutputOrientation) {
+  async setupDualOutputIngest(context: TDisplayType, mode?: TOutputOrientation) {
     const ingest = (await this.fetchIngest()).server;
     // const settings = context === 1 ? await this.fetchUserSettings(mode) : this.settings;
     const settings = mode ? await this.fetchUserSettings(mode) : this.settings;
@@ -408,9 +412,11 @@ export class RestreamService extends StatefulService<IRestreamState> {
       },
     });
 
-    this.customizationService.settingsChanged.subscribe(changed => {
-      this.handleSettingsChanged(changed);
-    });
+    this.customizationService.settingsChanged.subscribe(
+      (changed: Partial<ICustomizationServiceState>) => {
+        this.handleSettingsChanged(changed);
+      },
+    );
 
     this.chatView.webContents.loadURL(this.chatUrl);
 

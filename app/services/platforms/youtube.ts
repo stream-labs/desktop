@@ -276,7 +276,7 @@ export class YoutubeService
     this.state.liveStreamingEnabled = enabled;
   }
 
-  async beforeGoLive(settings: IGoLiveSettings, context?: number) {
+  async beforeGoLive(settings: IGoLiveSettings, context?: TDisplayType) {
     const ytSettings = getDefined(settings.platforms.youtube);
 
     const streamToScheduledBroadcast = !!ytSettings.broadcastId;

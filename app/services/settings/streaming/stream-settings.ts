@@ -12,7 +12,7 @@ import { IGoLiveSettings, IPlatformFlags } from 'services/streaming';
 import Vue from 'vue';
 import { IVideo } from 'obs-studio-node';
 import { DualOutputService } from 'services/dual-output';
-import { VideoSettingsService } from 'services/settings-v2/video';
+import { TDisplayType } from 'services/settings-v2/video';
 
 interface ISavedGoLiveSettings {
   platforms: {
@@ -103,7 +103,6 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
   @Inject() private platformAppsService: PlatformAppsService;
   @Inject() private streamSettingsService: StreamSettingsService;
   @Inject() private dualOutputService: DualOutputService;
-  @Inject() private videoSettingsService: VideoSettingsService;
 
   static defaultState: IStreamSettingsState = {
     protectedModeEnabled: true,
@@ -131,8 +130,8 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
   /**
    * setup all stream-settings via single object
    */
-  setSettings(patch: Partial<IStreamSettings>, context?: number) {
-    const streamName = !context || context === 0 ? 'Stream' : 'StreamSecond';
+  setSettings(patch: Partial<IStreamSettings>, context?: TDisplayType) {
+    const streamName = !context || context === 'horizontal' ? 'Stream' : 'StreamSecond';
     // save settings to localStorage
     const localStorageSettings: (keyof IStreamSettingsState)[] = [
       'protectedModeEnabled',
@@ -141,7 +140,6 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
       'description',
       'warnNoVideoSources',
       'goLiveSettings',
-      // 'video', ? to save context to local storage?
     ];
     localStorageSettings.forEach(prop => {
       if (prop in patch) {
@@ -149,35 +147,8 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
       }
     });
 
-    // const video: ISettingsSubCategory = {
-    //   nameSubCategory: 'Untitled',
-    //   codeSubCategory: 'Untitled',
-    //   parameters: { video: this.videoSettingsService.contexts.horizontal },
-    // };
-
-    // const videoSecond = {
-    //   nameSubCategory: 'Untitled',
-    //   codeSubCategory: 'Untitled',
-    //   parameters: { video: this.videoSettingsService.contexts.vertical },
-    // };
-
     // save settings related to "Settings->Stream" window
     let streamFormData = cloneDeep(this.views.obsStreamSettings);
-    // let streamFormData = [...cloneDeep(this.views.obsStreamSettings), { video }];
-    // let streamSecondFormData = [...cloneDeep(this.views.obsStreamSettings), { video: videoSecond }];
-
-    // if (context !== null) {
-    //   const contextName = context === 0 ? 'horizontal' : 'vertical';
-
-    // @@@ TODO working here <-- is there where I should be adding the context to the streams?
-    // streamFormData.push({nameSubCategory: 'Untitled', parameters: [{}]})
-    // streamFormData = [
-    //   ...streamFormData,
-    //   { video: this.videoSettingsService.contexts[contextName] },
-    // ];
-    // }
-
-    console.log('streamFormData ', streamFormData);
 
     streamFormData.forEach(subCategory => {
       console.log('subCategory ', subCategory);
@@ -188,23 +159,7 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
           // we should immediately save the streamType in OBS if it's changed
           // otherwise OBS will not save 'key' and 'server' values
 
-          // if (context !== null) {
-          //   const contextName = context === 0 ? 'horizontal' : 'vertical';
-
-          //   const video = {
-          //     ...parameter,
-          //     value: this.videoSettingsService.contexts[contextName],
-          //   };
-
-          //   streamFormData = [...streamFormData, video];
-          // }
-
-          console.log('new streamFormData ', streamFormData);
-
           this.settingsService.setSettings(streamName, streamFormData);
-          // this.settingsService.setSettings('Stream', streamFormData);
-          // this.settingsService.setSettings('StreamSecond', streamSecondFormData);
-          // this.settingsService.setSettings('StreamSecond', streamFormData);
         }
       });
     });
@@ -213,6 +168,7 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
     const mustUpdateObsSettings = Object.keys(patch).find(key =>
       ['platform', 'key', 'server'].includes(key),
     );
+    console.log('mustUpdateObsSettings ', mustUpdateObsSettings);
     if (!mustUpdateObsSettings) return;
     streamFormData = cloneDeep(this.views.obsStreamSettings);
 
@@ -231,6 +187,8 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
         }
       });
     });
+
+    console.log('updating service streamFormData ', streamFormData);
     this.settingsService.setSettings(streamName, streamFormData);
   }
 

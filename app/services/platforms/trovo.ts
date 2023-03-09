@@ -14,6 +14,7 @@ import { IGoLiveSettings } from '../streaming';
 import { getDefined } from '../../util/properties-type-guards';
 import Utils from '../utils';
 import { IVideo } from 'obs-studio-node';
+import { TDisplayType } from 'services/settings-v2';
 
 interface ITrovoServiceState extends IPlatformState {
   settings: ITrovoStartStreamOptions;
@@ -80,7 +81,7 @@ export class TrovoService
     return this.userService.state.auth?.platforms?.trovo?.username || '';
   }
 
-  async beforeGoLive(goLiveSettings: IGoLiveSettings, context?: number) {
+  async beforeGoLive(goLiveSettings: IGoLiveSettings, context?: TDisplayType) {
     const trSettings = getDefined(goLiveSettings.platforms.trovo);
 
     const key = this.state.streamKey;

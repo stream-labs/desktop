@@ -19,6 +19,7 @@ import { throwStreamError, TStreamErrorType } from 'services/streaming/stream-er
 import { BasePlatformService } from './base-platform';
 import Utils from '../utils';
 import { IVideo } from 'obs-studio-node';
+import { TDisplayType } from 'services/settings-v2';
 
 export interface ITwitchStartStreamOptions {
   title: string;
@@ -162,7 +163,7 @@ export class TwitchService
     return this.state.settings.tags;
   }
 
-  async beforeGoLive(goLiveSettings?: IGoLiveSettings, context?: number) {
+  async beforeGoLive(goLiveSettings?: IGoLiveSettings, context?: TDisplayType) {
     if (
       this.streamSettingsService.protectedModeEnabled &&
       this.streamSettingsService.isSafeToModifyStreamKey()
