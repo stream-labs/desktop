@@ -7,7 +7,8 @@
   justify-content: flex-end;
 
   > div:last-child {
-    margin-left: 10px !important;
+    top: 44px !important;
+    height: calc(100% - 44px);
   }
 
   :global(.ant-dropdown) {
@@ -30,10 +31,12 @@
   :global(.icon-add-circle) {
     margin-right: auto;
   }
+}
 
-  .icon-phone-case,
-  .icon-desktop {
-    margin-right: 10px;
+:global(.no-top-padding) {
+  .top-container > div:last-child {
+    top: 32px !important;
+    height: calc(100% - 32px);
   }
 }
 

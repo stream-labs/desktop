@@ -15,15 +15,19 @@ import { SettingsManagerService } from 'services/settings-manager';
 interface ISchema {
   defaultDisplay: TDisplayType;
   baseResolution: {
-    horizontal: {
-      width: number;
-      height: number;
-    };
-    vertical: {
-      width: number;
-      height: number;
-    };
+    width: number;
+    height: number;
   };
+  // baseResolution: {
+  //   horizontal: {
+  //     width: number;
+  //     height: number;
+  //   };
+  //   vertical: {
+  //     width: number;
+  //     height: number;
+  //   };
+  // };
 
   selectiveRecording?: boolean;
   dualOutputMode?: boolean;
@@ -68,11 +72,11 @@ export class RootNode extends Node<ISchema, {}> {
       guestCam,
       // contexts: this.videoSettingsService.contexts,
       defaultDisplay: this.settingsManagerService.views.videoSettings.defaultDisplay,
-      baseResolution: {
-        horizontal: this.videoService.baseResolution.horizontal,
-        vertical: this.videoService.baseResolution.vertical,
-      },
-      // baseResolution: this.videoService.baseResolution,
+      // baseResolution: {
+      //   horizontal: this.videoService.baseResolution.horizontal,
+      //   vertical: this.videoService.baseResolution.vertical,
+      // },
+      baseResolution: this.videoService.baseResolution,
       selectiveRecording: this.streamingService.state.selectiveRecording,
       dualOutputMode: this.dualOutputService.state.dualOutputMode,
       operatingSystem: process.platform as OS,
@@ -90,7 +94,7 @@ export class RootNode extends Node<ISchema, {}> {
     // console.log('this.data.contexts ', this.data.contexts);
 
     // this.videoService.setContexts(this.data.contexts);
-    this.videoService.setBaseResolution(this.data.baseResolution[this.data.defaultDisplay]);
+    this.videoService.setBaseResolution(this.data.baseResolution);
     this.streamingService.setSelectiveRecording(!!this.data.selectiveRecording);
     this.streamingService.setDualOutputMode(this.data.dualOutputMode);
 

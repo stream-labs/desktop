@@ -320,38 +320,46 @@ export class VideoService extends Service {
     });
   }
 
+  // get baseWidth() {
+  //   return this.baseResolution.horizontal.width;
+  // }
+
+  // get baseHeight() {
+  //   return this.baseResolution.horizontal.height;
+  // }
+
   get baseWidth() {
-    return this.baseResolution.horizontal.width;
+    return this.baseResolution.width;
   }
 
   get baseHeight() {
-    return this.baseResolution.horizontal.height;
+    return this.baseResolution.height;
   }
 
   get baseResolution() {
-    // const [widthStr, heightStr] = this.settingsService.views.values.Video.Base.split('x');
-    // const width = parseInt(widthStr, 10);
-    // const height = parseInt(heightStr, 10);
-
-    // return {
-    //   width,
-    //   height,
-    // };
-
     const [widthStr, heightStr] = this.settingsService.views.values.Video.Base.split('x');
     const width = parseInt(widthStr, 10);
     const height = parseInt(heightStr, 10);
 
     return {
-      horizontal: {
-        width,
-        height,
-      },
-      vertical: {
-        width: this.settingsManagerService.views.videoSettings.vertical.baseWidth,
-        height: this.settingsManagerService.views.videoSettings.vertical.baseHeight,
-      },
+      width,
+      height,
     };
+
+    // const [widthStr, heightStr] = this.settingsService.views.values.Video.Base.split('x');
+    // const width = parseInt(widthStr, 10);
+    // const height = parseInt(heightStr, 10);
+
+    // return {
+    //   horizontal: {
+    //     width,
+    //     height,
+    //   },
+    //   vertical: {
+    //     width: this.settingsManagerService.views.videoSettings.vertical.baseWidth,
+    //     height: this.settingsManagerService.views.videoSettings.vertical.baseHeight,
+    //   },
+    // };
   }
 
   // getScreenRectangle(display?: TDisplayType) {
