@@ -7,7 +7,7 @@ import {
   TDualOutputDisplayType,
   IDualOutputPlatformSetting,
 } from './dual-output-data';
-import { ScenesService, SceneItem, IPartialSettings } from 'services/scenes';
+import { ScenesService, SceneItem, IPartialSettings, IScene } from 'services/scenes';
 import { TDisplayType, VideoSettingsService } from 'services/settings-v2/video';
 import { StreamingService } from 'services/streaming';
 import { SceneCollectionsService } from 'services/scene-collections';
@@ -200,26 +200,25 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
       }
     });
 
-    this.scenesService.sceneSwitched.subscribe(() => {
-      // if (
-      //   this.settingsManagerService.views.activeDisplays.vertical &&
-      //   !this.videoSettingsService.contexts.vertical
-      // ) {
-      //   this.videoSettingsService.establishVideoContext('vertical');
-      // }
-
+    this.sceneCollectionsService.collectionSwitched.subscribe(() => {
       if (
         this.scenesService.views.getSceneItemsBySceneId(this.scenesService.views.activeSceneId)
           .length > 0
       ) {
         this.confirmOrCreateVerticalNodes();
       }
+    });
 
-      // if (this.views.hasVerticalNodes) {
-      //   this.assignSceneNodes();
-      // } else if (this.settingsManagerService.views.activeDisplays.vertical) {
-      //   this.confirmOrCreateVerticalNodes();
-      // }
+    this.scenesService.sceneAdded.subscribe((scene: IScene) => {
+      if (this.videoSettingsService.contexts.vertical) {
+        this.assignSceneNodes(scene.id);
+      }
+    });
+
+    this.scenesService.sceneSwitched.subscribe((scene: IScene) => {
+      if (this.scenesService.views.getSceneItemsBySceneId(scene.id).length > 0) {
+        this.confirmOrCreateVerticalNodes(scene.id);
+      }
     });
   }
 
@@ -227,8 +226,10 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
    * Create or confirm nodes for vertical output when toggling vertical display
    */
 
-  confirmOrCreateVerticalNodes() {
-    if (!this.state.sceneNodeMaps.hasOwnProperty(this.scenesService.views.activeSceneId)) {
+  confirmOrCreateVerticalNodes(sceneId?: string) {
+    if (
+      !this.state.sceneNodeMaps.hasOwnProperty(sceneId ?? this.scenesService.views.activeSceneId)
+    ) {
       try {
         this.mapSceneNodes(this.views.displays);
       } catch (error: unknown) {
@@ -249,9 +250,9 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
     this.sceneItemsConfirmed.next();
   }
 
-  assignSceneNodes() {
+  assignSceneNodes(sceneId?: string) {
     const activeSceneId = this.scenesService.views.activeSceneId;
-    const sceneItems = this.scenesService.views.getSceneItemsBySceneId(activeSceneId);
+    const sceneItems = this.scenesService.views.getSceneItemsBySceneId(sceneId ?? activeSceneId);
     const verticalNodeIds = this.views.verticalNodeIds;
 
     if (!this.videoSettingsService.contexts.vertical) {
