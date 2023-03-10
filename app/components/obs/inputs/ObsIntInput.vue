@@ -11,7 +11,7 @@
         :value="value.value"
         @mousewheel="onMouseWheelHandler"
         :disabled="value.enabled == false"
-        @input="updateValue($event.target.value)"
+        @change="updateValue($event.target.value)"
       />
       <div class="arrows" @mousewheel="onMouseWheelHandler">
         <div class="arrow arrow-up" @click="increment">
