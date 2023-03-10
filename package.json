@@ -36,7 +36,9 @@
     "test:unit": "yarn test:unit:app && yarn test:unit:bin",
     "test:unit:app": "jest --silent --config ./jest.config.js",
     "test:unit:bin": "jest --silent --config ./jest.bin-config.js",
-    "lint": "eslint \"{app,guest-api,obs-api,updater}/**/*.ts\" main.js",
+    "lint:js": "eslint --ext .js,.vue --ignore-path .gitignore .",
+    "lint:style": "stylelint **/*.{vue,css,less} --ignore-path .gitignore .",
+    "lint": "eslint \"{app,guest-api,obs-api,updater}/**/*.ts\" main.js&&yarn lint:js&&yarn lint:style",
     "clear": "shx rm -rf bundles/media",
     "typedoc": "typedoc --out docs/dist ./app/services --mode modules --theme ./docs/theme --readme ./docs/README.md --ignoreCompilerErrors --excludePrivate --excludeExternals --hideGenerator",
     "compile-tests": "tsc -p test",
@@ -60,8 +62,12 @@
     "arrowParens": "avoid"
   },
   "lint-staged": {
-    "*.ts": [
+    "*.{ts,js,vue}": [
       "eslint --fix",
+      "git add"
+    ],
+    "*.{css,less,vue}": [
+      "stylelint --fix",
       "git add"
     ],
     "app/i18n/*/*.json": [
@@ -190,11 +196,19 @@
     "npm-run-all": "^4.1.5",
     "pixelmatch": "^4.0.2",
     "pngjs": "^3.3.1",
+    "postcss": "^8.4.21",
+    "postcss-html": "^1.5.0",
+    "postcss-less": "^6.0.0",
     "prettier": "^2.3.2",
     "prettier-eslint": "^13.0.0",
     "shx": "^0.3.3",
     "spectron": "^8.0.0",
     "style-loader": "^0.23.1",
+    "stylelint": "^14.16.1",
+    "stylelint-config-prettier": "^9.0.5",
+    "stylelint-config-recess-order": "^3.1.0",
+    "stylelint-config-standard": "^29.0.0",
+    "stylelint-less": "^1.0.6",
     "terser-webpack-plugin": "^4.2.3",
     "ts-jest": "^26.5.6",
     "ts-loader": "^8.3.0",

@@ -8,7 +8,7 @@ module.exports = {
     es6: true,
     'jest/globals': true,
   },
-  extends: ['plugin:vue/essential', 'airbnb-base', 'prettier'],
+  extends: ['plugin:vue/essential', 'airbnb-base', 'eslint:recommended', 'prettier'],
   globals: {
     Atomics: 'readonly',
     SharedArrayBuffer: 'readonly',
@@ -118,6 +118,6 @@ module.exports = {
         'no-undef': OFF,
         'default-param-last': OFF,
       },
-    }
-  ]
+    },
+  ],
 };

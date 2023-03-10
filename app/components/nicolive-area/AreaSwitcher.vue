@@ -32,7 +32,7 @@
 <script lang="ts" src="./AreaSwitcher.vue.ts"></script>
 
 <style lang="less" scoped>
-@import '../../styles/index';
+@import url('../../styles/index');
 
 .container {
   position: relative;
@@ -41,48 +41,47 @@
 }
 
 .header {
-  z-index: @z-index-default-content;
   position: absolute;
   top: 0;
   left: 0;
-
+  z-index: @z-index-default-content;
   height: 40px;
 }
 
 .indicator {
   .transition;
+
   display: flex;
   align-items: center;
-  font-size: @font-size4;
-  color: var(--color-text-light);
   height: 32px;
-  line-height: 32px;
-  margin: 8px;
   padding: 8px;
-  border-radius: 4px;
+  margin: 8px;
+  font-size: @font-size4;
+  line-height: 32px;
+  color: var(--color-text-light);
   cursor: pointer;
+  border-radius: 4px;
 
   &:hover {
     background-color: var(--color-button-tertiary-hover);
   }
 
   > i {
-    font-size: @font-size1;
     margin-left: 8px;
+    font-size: @font-size1;
   }
 }
 
 .contentContainer {
-  flex-grow: 1;
-
   display: flex;
   flex-direction: column;
+  flex-grow: 1;
 }
 
 .popper {
   .popper-styling;
-  width: 320px;
 
+  width: 320px;
   padding: 0;
   margin-left: 8px;
 
@@ -90,13 +89,13 @@
     margin: 0;
 
     & > .item {
-      text-align: left;
       position: relative;
-      padding: 0 16px;
-      height: 64px;
       display: flex;
       flex-direction: column;
       justify-content: center;
+      height: 64px;
+      padding: 0 16px;
+      text-align: left;
       cursor: pointer;
 
       &.active {
@@ -109,14 +108,14 @@
     }
 
     .item-name {
+      margin: 0 0 4px;
       font-size: @font-size4;
-      margin: 0 0 4px 0;
       color: var(--color-text-light);
     }
 
     .item-text {
-      font-size: @font-size2;
       margin: 0;
+      font-size: @font-size2;
       color: var(--color-text);
     }
   }

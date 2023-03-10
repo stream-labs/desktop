@@ -1,33 +1,34 @@
-@import "./styles/index";
-@import "./styles/buttons";
-@import "./styles/classes";
-@import "./styles/custom-icons";
-@import "./styles/inputs";
-@import "./styles/tooltips";
-@import '~codemirror/lib/codemirror.css';
+@import url('./styles/index');
+@import url('./styles/buttons');
+@import url('./styles/classes');
+@import url('./styles/custom-icons');
+@import url('./styles/inputs');
+@import url('./styles/tooltips');
+@import url('~codemirror/lib/codemirror.css');
 
 body {
-  color: var(--color-text);
-  font-size: @font-size4;
   font-family: @font-family;
+  font-size: @font-size4;
   font-weight: @font-weight-normal;
+  color: var(--color-text);
 }
 
-:not(input):not(textarea),
-:not(input):not(textarea)::after,
-:not(input):not(textarea)::before {
-    -webkit-user-select: none;
-    user-select: none;
+:not(input, textarea),
+:not(input, textarea)::after,
+:not(input, textarea)::before {
+  user-select: none;
 }
 
 .main {
-  background: var(--color-bg-secondary);
   color: var(--color-text);
+  background: var(--color-bg-secondary);
 }
 
 a {
   .transition;
+
   text-decoration: underline;
+
   &:hover,
   &:focus {
     color: var(--color-text-light);
@@ -37,8 +38,8 @@ a {
 // Layout
 .page-container {
   display: flex;
-  flex-grow: 1;
   flex-direction: column;
+  flex-grow: 1;
   max-width: 1920px;
   margin: 0 auto;
 }
@@ -51,13 +52,13 @@ h3 {
 }
 
 h4 {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
   font-size: @font-size4;
   color: var(--color-text-light);
   .letter-spacing;
   .semibold;
-  margin-bottom: 20px;
-  display: flex;
-  align-items: center;
 
   i {
     margin-right: 8px;
@@ -65,25 +66,26 @@ h4 {
 }
 
 .label--essential {
+  padding: 0 4px;
+  margin-left: 10px;
+  font-size: 9px;
+  line-height: 16px;
+  color: var(--color-text-light);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
   background: @accent;
   .radius;
   .semibold;
-  text-transform: uppercase;
-  font-size: 9px;
-  color: var(--color-text-light);
-  letter-spacing: .5px;
-  padding: 0px 4px;
-  margin-left: 10px;
-  line-height: 16px
 }
 
 .link {
   .semibold;
   .transition;
-  color: var(--color-text);
-  text-decoration: none;
+
   display: flex;
   align-items: center;
+  color: var(--color-text);
+  text-decoration: none;
 
   &:not(:disabled):hover {
     color: var(--color-text-light);
@@ -102,8 +104,8 @@ h4 {
 
 .link--underlined {
   span {
+    font-weight: @font-weight-normal;
     text-decoration: underline;
-    font-weight:@font-weight-normal;
   }
 }
 
@@ -112,9 +114,9 @@ h4 {
 }
 
 .link--uppercase {
-  text-transform: uppercase;
-  letter-spacing: .7px;
   font-size: @font-size2;
+  text-transform: uppercase;
+  letter-spacing: 0.7px;
 }
 
 .label--icon {
@@ -125,9 +127,9 @@ h4 {
   position: relative;
 
   select {
-    font-size: @font-size4;
-    margin: 0;
     padding: 0 32px 0 8px;
+    margin: 0;
+    font-size: @font-size4;
 
     option {
       color: @navy;
@@ -137,8 +139,8 @@ h4 {
 
 .select-carot {
   position: absolute;
-  right: 8px;
   top: 10px;
+  right: 8px;
   font-size: @font-size1;
   color: var(--color-text-light);
 }
@@ -153,9 +155,9 @@ h4 {
   }
 
   .multiselect__input {
+    color: var(--color-text-light);
     background: var(--color-input-bg);
     border-color: transparent;
-    color: var(--color-text-light);
   }
 
   .multiselect__content {
@@ -167,12 +169,12 @@ h4 {
 .search-input {
   position: relative;
 
-  input[type=text] {
-    background: transparent;
-    border: none;
+  input[type='text'] {
     padding: 0 32px 0 8px;
     font-size: @font-size4;
     color: var(--color-text);
+    background: transparent;
+    border: none;
     .radius;
     .transition;
 
@@ -191,15 +193,15 @@ h4 {
 }
 
 .search-input--trans {
-  input[type=text] {
+  input[type='text'] {
     border-bottom: 1px solid transparent;
     border-radius: 0;
 
     &:focus,
     &:active {
-      background: transparent;
       color: @white;
-      border-bottom: 1px solid rgba(255,255,255,.14);
+      background: transparent;
+      border-bottom: 1px solid rgb(255 255 255 / 14%);
     }
   }
 
@@ -217,40 +219,40 @@ h4 {
 
 .slide-open__menu {
   position: absolute;
-  background-color: var(--color-bg-secondary);
   right: calc(~'100% + 20px');
   bottom: -10px;
-  padding: 0 12px;
-  display: flex;
   z-index: 10;
+  display: flex;
+  padding: 0 12px;
+  background-color: var(--color-bg-secondary);
   .radius;
   .shadow;
 }
 
 .tabs {
-  background: transparent;
   padding: 0;
+  background: transparent;
 }
 
 .tab-button {
+  position: relative;
   height: 54px;
   margin-right: 16px;
-  text-transform: uppercase;
   font-size: @font-size2;
-  .semibold;
-  letter-spacing: .7px;
   color: var(--color-text);
-  position: relative;
+  text-transform: uppercase;
+  letter-spacing: 0.7px;
+  .semibold;
   .transition;
 
-  &:after {
+  &::after {
+    position: absolute;
+    bottom: 0;
+    left: 0;
     display: block;
-    content: '';
     width: 100%;
     height: 2px;
-    position: absolute;
-    left: 0;
-    bottom: 0;
+    content: '';
     background-color: transparent;
   }
 
@@ -262,6 +264,7 @@ h4 {
 
   &:hover {
     color: var(--color-text-light);
+
     i {
       color: var(--color-text-light);
     }
@@ -270,7 +273,7 @@ h4 {
   &.active {
     color: var(--color-text-active);
 
-    &:after {
+    &::after {
       background-color: var(--color-text-active);
     }
 
@@ -282,6 +285,7 @@ h4 {
 
 select {
   .radius;
+
   height: @item-generic-size;
 }
 
@@ -301,9 +305,9 @@ th {
   padding-right: 20px;
 
   .input-container {
+    display: block;
     width: 100%;
     margin-bottom: 0;
-    display: block;
   }
 
   .input-label {
@@ -316,12 +320,12 @@ th {
 }
 
 th {
+  padding-bottom: 8px;
+  font-size: @font-size2;
   color: var(--color-text-dark);
   text-transform: uppercase;
-  .semibold;
   letter-spacing: 1.5px;
-  font-size: @font-size2;
-  padding-bottom: 8px;
+  .semibold;
 }
 
 // Scrolls
@@ -347,23 +351,22 @@ th {
 // Vue transitions
 .slide-fade-enter-active,
 .slide-fade-leave-active {
-  transition: all .3s ease;
+  transition: all 0.3s ease;
 }
 
 .slide-fade-enter,
 .slide-fade-leave-to {
-  transform: translateX(20px);
   opacity: 0;
+  transform: translateX(20px);
 }
 
 .fade-enter-active {
-  transition: all .4s ease;
+  transition: all 0.4s ease;
 }
 
 .fade-leave-active {
-  transition: all .2s ease;
+  transition: all 0.2s ease;
 }
-
 
 .fade-enter,
 .fade-leave-to {
@@ -371,7 +374,7 @@ th {
 }
 
 .v--modal-overlay {
-  background: rgba(0, 0, 0, 0.3);
+  background: rgb(0 0 0 / 30%);
 }
 
 .v--modal {
