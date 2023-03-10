@@ -10,7 +10,7 @@ import { Component, Prop, Watch } from 'vue-property-decorator';
 class WrapperProps<TComponentProps> {
   name?: string = null;
   componentProps?: TComponentProps = null;
-  wrapperStyles?: Dictionary<string> = { height: '100%' };
+  wrapperStyles?: Dictionary<string> = null;
   // Hack to allow custom layout components to size properly
   mins?: IVec2 = null;
 }
@@ -27,6 +27,10 @@ export default class ReactComponent<TComponentProps = {}> extends TsxComponent<
   };
 
   @Prop() mins: IVec2;
+
+  get wrapperStyle() {
+    return { height: '100%', ...this.props.wrapperStyles };
+  }
 
   mounted() {
     const className = this.props.name;
@@ -56,6 +60,6 @@ export default class ReactComponent<TComponentProps = {}> extends TsxComponent<
   }
 
   render() {
-    return <div class="react" ref="container" style={this.props.wrapperStyles}></div>;
+    return <div class="react" ref="container" style={this.wrapperStyle}></div>;
   }
 }

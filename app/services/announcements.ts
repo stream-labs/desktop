@@ -54,6 +54,7 @@ export class AnnouncementsService extends PersistentStatefulService<{
   init() {
     super.init();
     this.userService.userLogin.subscribe(() => this.fetchLatestNews());
+    this.openFeedbackForm();
   }
 
   get bannersExist() {

@@ -299,6 +299,7 @@ export class ThemeAudit extends ReactComponent {}
   props: {
     name: { default: 'TitleBar' },
     componentProps: { default: () => ({ windowId: '' }) },
+    wrapperStyles: { default: () => ({ height: 'auto' }) },
   },
 })
 export class TitleBar extends ReactComponent {}
