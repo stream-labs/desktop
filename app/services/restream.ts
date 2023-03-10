@@ -13,12 +13,18 @@ import { FacebookService } from './platforms/facebook';
 import { TiktokService } from './platforms/tiktok';
 import { TrovoService } from './platforms/trovo';
 import * as remote from '@electron/remote';
+import * as obs from 'obs-studio-node';
+import { VideoSettingsService, TDisplayType } from './settings-v2/video';
+import { GreenService } from './green';
 
 interface IRestreamTarget {
   id: number;
   platform: TPlatform;
   streamKey: string;
+  video?: obs.IVideo;
 }
+
+export type TOutputOrientation = 'landscape' | 'portrait';
 
 interface IRestreamState {
   /**
@@ -48,6 +54,8 @@ export class RestreamService extends StatefulService<IRestreamState> {
   @Inject() facebookService: FacebookService;
   @Inject() tiktokService: TiktokService;
   @Inject() trovoService: TrovoService;
+  @Inject() videoSettingsService: VideoSettingsService;
+  @Inject() greenService: GreenService;
 
   settings: IUserSettingsResponse;
 
@@ -109,12 +117,27 @@ export class RestreamService extends StatefulService<IRestreamState> {
   }
 
   get shouldGoLiveWithRestream() {
-    return this.streamInfo.isMultiplatformMode;
+    return this.streamInfo.isMultiplatformMode || this.streamInfo.isGreen;
   }
 
-  fetchUserSettings(): Promise<IUserSettingsResponse> {
+  fetchUserSettings(mode?: 'landscape' | 'portrait'): Promise<IUserSettingsResponse> {
     const headers = authorizedHeaders(this.userService.apiToken);
-    const url = `https://${this.host}/api/v1/rst/user/settings`;
+
+    let url;
+    switch (mode) {
+      case 'landscape': {
+        url = 'https://beta.streamlabs.com/api/v1/rst/user/settings';
+        break;
+      }
+      case 'portrait': {
+        url = 'https://beta.streamlabs.com/api/v1/rst/user/settings?mode=portrait';
+        break;
+      }
+      default: {
+        url = `https://${this.host}/api/v1/rst/user/settings`;
+      }
+    }
+
     const request = new Request(url, { headers });
 
     return jfetch(request);
@@ -158,6 +181,14 @@ export class RestreamService extends StatefulService<IRestreamState> {
     await Promise.all([this.setupIngest(), this.setupTargets()]);
   }
 
+  async beforeGreenGoLive(
+    platforms: TPlatform[],
+    context: TDisplayType,
+    mode?: TOutputOrientation,
+  ) {
+    await Promise.all([this.setupGreenIngest(context, mode), this.setupGreenTargets(platforms)]);
+  }
+
   async setupIngest() {
     const ingest = (await this.fetchIngest()).server;
 
@@ -172,6 +203,27 @@ export class RestreamService extends StatefulService<IRestreamState> {
     });
   }
 
+  async setupGreenIngest(context: TDisplayType, mode?: TOutputOrientation) {
+    const ingest = (await this.fetchIngest()).server;
+    const settings = mode ? await this.fetchUserSettings(mode) : this.settings;
+
+    // We need to move OBS to custom ingest mode before we can set the server
+    this.streamSettingsService.setSettings(
+      {
+        streamType: 'rtmp_custom',
+      },
+      context,
+    );
+
+    this.streamSettingsService.setSettings(
+      {
+        key: settings.streamKey,
+        server: ingest,
+      },
+      context,
+    );
+  }
+
   async setupTargets() {
     // delete existing targets
     const targets = await this.fetchTargets();
@@ -180,15 +232,17 @@ export class RestreamService extends StatefulService<IRestreamState> {
 
     // setup new targets
     const newTargets = [
-      ...this.streamInfo.enabledPlatforms.map(platform => {
-        return {
-          platform: platform as TPlatform,
-          streamKey: getPlatformService(platform).state.streamKey,
-        };
-      }),
+      ...this.streamInfo.enabledPlatforms.map(platform => ({
+        platform: platform as TPlatform,
+        streamKey: getPlatformService(platform).state.streamKey,
+      })),
       ...this.streamInfo.savedSettings.customDestinations
         .filter(dest => dest.enabled)
-        .map(dest => ({ platform: 'relay' as 'relay', streamKey: `${dest.url}${dest.streamKey}` })),
+        .map(dest => ({
+          platform: 'relay' as 'relay',
+          streamKey: `${dest.url}${dest.streamKey}`,
+          video: dest?.video,
+        })),
     ];
 
     // treat tiktok as a custom destination
@@ -202,6 +256,24 @@ export class RestreamService extends StatefulService<IRestreamState> {
     await this.createTargets(newTargets);
   }
 
+  async setupGreenTargets(platforms: TPlatform[]) {
+    // delete existing targets
+    const targets = await this.fetchTargets();
+    const promises = targets.map(t => this.deleteTarget(t.id));
+    await Promise.all(promises);
+
+    // setup new targets
+    const newTargets = [
+      ...platforms.map(platform => ({
+        platform: platform as TPlatform,
+        streamKey: getPlatformService(platform).state.streamKey,
+        video: this.greenService.views.getPlatformContext(platform),
+      })),
+    ];
+
+    await this.createTargets(newTargets);
+  }
+
   checkStatus(): Promise<boolean> {
     const url = `https://${this.host}/api/v1/rst/util/status`;
     const request = new Request(url);
@@ -211,7 +283,13 @@ export class RestreamService extends StatefulService<IRestreamState> {
     );
   }
 
-  async createTargets(targets: { platform: TPlatform | 'relay'; streamKey: string }[]) {
+  async createTargets(
+    targets: {
+      platform: TPlatform | 'relay';
+      streamKey: string;
+      video?: obs.IVideo;
+    }[],
+  ) {
     const headers = authorizedHeaders(
       this.userService.apiToken,
       new Headers({ 'Content-Type': 'application/json' }),
@@ -226,9 +304,11 @@ export class RestreamService extends StatefulService<IRestreamState> {
           dcProtection: false,
           idleTimeout: 30,
           label: `${target.platform} target`,
+          video: target.hasOwnProperty('video') && target.video,
         };
       }),
     );
+
     const request = new Request(url, { headers, body, method: 'POST' });
     const res = await fetch(request);
     if (!res.ok) throw await res.json();
@@ -314,9 +394,11 @@ export class RestreamService extends StatefulService<IRestreamState> {
       },
     });
 
-    this.customizationService.settingsChanged.subscribe(changed => {
-      this.handleSettingsChanged(changed);
-    });
+    this.customizationService.settingsChanged.subscribe(
+      (changed: Partial<ICustomizationServiceState>) => {
+        this.handleSettingsChanged(changed);
+      },
+    );
 
     this.chatView.webContents.loadURL(this.chatUrl);
 

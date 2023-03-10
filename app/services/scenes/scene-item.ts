@@ -215,6 +215,10 @@ export class SceneItem extends SceneItemNode {
       this.getObsSceneItem().blendingMethod = newSettings.blendingMethod;
     }
 
+    if (changed.output !== void 0 || patch.hasOwnProperty('output')) {
+      this.getObsSceneItem().video = newSettings.output;
+    }
+
     this.UPDATE({ sceneItemId: this.sceneItemId, ...changed });
 
     this.scenesService.itemUpdated.next(this.getModel());

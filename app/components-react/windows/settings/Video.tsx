@@ -183,7 +183,7 @@ class VideoSettingsModule {
   }
 
   get outputResOptions() {
-    const baseRes = `${this.service.state.videoContext.baseWidth}x${this.service.state.videoContext.baseHeight}`;
+    const baseRes = `${this.service.state.horizontalContext.video.baseWidth}x${this.service.state.horizontalContext.video.baseHeight}`;
     if (!OUTPUT_RES_OPTIONS.find(opt => opt.value === baseRes)) {
       return [{ label: baseRes, value: baseRes }]
         .concat(OUTPUT_RES_OPTIONS)

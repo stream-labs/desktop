@@ -13,7 +13,7 @@ import { throwStreamError } from 'services/streaming/stream-error';
 import { BasePlatformService } from './base-platform';
 import { WindowsService } from '../windows';
 import { assertIsDefined, getDefined } from '../../util/properties-type-guards';
-
+import { TDisplayType } from 'services/settings-v2';
 interface IFacebookPage {
   access_token: string;
   name: string;
@@ -230,7 +230,7 @@ export class FacebookService
     return this.state.streamDashboardUrl;
   }
 
-  async beforeGoLive(options: IGoLiveSettings) {
+  async beforeGoLive(options: IGoLiveSettings, context?: TDisplayType) {
     const fbOptions = getDefined(options.platforms.facebook);
 
     let liveVideo: IFacebookLiveVideo;
@@ -250,12 +250,15 @@ export class FacebookService
     const streamUrl = liveVideo.stream_url;
     const streamKey = streamUrl.slice(streamUrl.lastIndexOf('/') + 1);
     if (!this.streamingService.views.isMultiplatformMode) {
-      this.streamSettingsService.setSettings({
-        key: streamKey,
-        platform: 'facebook',
-        streamType: 'rtmp_common',
-        server: 'rtmps://rtmp-api.facebook.com:443/rtmp/',
-      });
+      this.streamSettingsService.setSettings(
+        {
+          key: streamKey,
+          platform: 'facebook',
+          streamType: 'rtmp_common',
+          server: 'rtmps://rtmp-api.facebook.com:443/rtmp/',
+        },
+        context,
+      );
     }
     this.SET_STREAM_KEY(streamKey);
     this.SET_STREAM_PAGE_URL(`https://facebook.com/${liveVideo.permalink_url}`);
@@ -268,6 +271,8 @@ export class FacebookService
       assertIsDefined(fbOptions.pageId);
       await this.postPage(fbOptions.pageId);
     }
+
+    this.confirmGreen('facebook');
   }
 
   /**

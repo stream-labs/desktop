@@ -4,6 +4,7 @@ import { IPlatformCapabilityResolutionPreset, IPlatformState, TPlatformCapabilit
 import { IGoLiveSettings } from '../streaming';
 import { WidgetType } from '../widgets';
 import { getDefined } from '../../util/properties-type-guards';
+import { TDisplayType } from 'services/settings-v2';
 
 export interface ITiktokStartStreamOptions {
   serverUrl: string;
@@ -49,16 +50,20 @@ export class TiktokService
     return this.userService.views.state.auth?.platforms?.facebook?.token;
   }
 
-  async beforeGoLive(goLiveSettings: IGoLiveSettings) {
+  async beforeGoLive(goLiveSettings: IGoLiveSettings, context?: TDisplayType) {
     const ttSettings = getDefined(goLiveSettings.platforms.tiktok);
     if (!this.streamingService.views.isMultiplatformMode) {
-      this.streamSettingsService.setSettings({
-        streamType: 'rtmp_custom',
-        key: ttSettings.streamKey,
-        server: ttSettings.serverUrl,
-      });
+      this.streamSettingsService.setSettings(
+        {
+          streamType: 'rtmp_custom',
+          key: ttSettings.streamKey,
+          server: ttSettings.serverUrl,
+        },
+        context,
+      );
     }
     this.SET_STREAM_SETTINGS(ttSettings);
+    this.confirmGreen('tiktok');
   }
 
   /**

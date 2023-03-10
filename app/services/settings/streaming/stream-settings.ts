@@ -9,6 +9,8 @@ import cloneDeep from 'lodash/cloneDeep';
 import { TwitchService } from 'services/platforms/twitch';
 import { PlatformAppsService } from 'services/platform-apps';
 import { IGoLiveSettings, IPlatformFlags } from 'services/streaming';
+import { TDisplayType } from 'services/settings-v2/video';
+import { IVideo } from 'obs-studio-node';
 import Vue from 'vue';
 
 interface ISavedGoLiveSettings {
@@ -26,6 +28,7 @@ export interface ICustomStreamDestination {
   url: string;
   streamKey?: string;
   enabled: boolean;
+  video?: IVideo;
 }
 
 /**
@@ -123,7 +126,8 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
   /**
    * setup all stream-settings via single object
    */
-  setSettings(patch: Partial<IStreamSettings>) {
+  setSettings(patch: Partial<IStreamSettings>, context?: TDisplayType) {
+    const streamName = !context || context === 'horizontal' ? 'Stream' : 'StreamSecond';
     // save settings to localStorage
     const localStorageSettings: (keyof IStreamSettingsState)[] = [
       'protectedModeEnabled',
@@ -143,12 +147,15 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
     let streamFormData = cloneDeep(this.views.obsStreamSettings);
 
     streamFormData.forEach(subCategory => {
+      console.log('subCategory ', subCategory);
       subCategory.parameters.forEach(parameter => {
         if (parameter.name === 'streamType' && patch.streamType !== void 0) {
           parameter.value = patch.streamType;
+
           // we should immediately save the streamType in OBS if it's changed
           // otherwise OBS will not save 'key' and 'server' values
-          this.settingsService.setSettings('Stream', streamFormData);
+
+          this.settingsService.setSettings(streamName, streamFormData);
         }
       });
     });
@@ -157,6 +164,7 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
     const mustUpdateObsSettings = Object.keys(patch).find(key =>
       ['platform', 'key', 'server'].includes(key),
     );
+
     if (!mustUpdateObsSettings) return;
     streamFormData = cloneDeep(this.views.obsStreamSettings);
 
@@ -175,7 +183,8 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
         }
       });
     });
-    this.settingsService.setSettings('Stream', streamFormData);
+
+    this.settingsService.setSettings(streamName, streamFormData);
   }
 
   setGoLiveSettings(settingsPatch: Partial<IGoLiveSettings>) {
@@ -189,7 +198,7 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
       );
       patch.platforms = platforms as ISavedGoLiveSettings['platforms'];
     }
-    console.log('update settings', settingsPatch);
+
     this.setSettings({
       goLiveSettings: { ...this.state.goLiveSettings, ...settingsPatch } as IGoLiveSettings,
     });

@@ -31,7 +31,7 @@ import {
 import { VideoEncodingOptimizationService } from 'services/video-encoding-optimizations';
 import { CustomizationService } from 'services/customization';
 import { StreamSettingsService } from '../settings/streaming';
-import { RestreamService } from 'services/restream';
+import { RestreamService, TOutputOrientation } from 'services/restream';
 import Utils from 'services/utils';
 import cloneDeep from 'lodash/cloneDeep';
 import isEqual from 'lodash/isEqual';
@@ -46,6 +46,7 @@ import * as remote from '@electron/remote';
 import { RecordingModeService } from 'services/recording-mode';
 import { MarkersService } from 'services/markers';
 import { byOS, OS } from 'util/operating-systems';
+import { TDisplayType, VideoSettingsService } from 'services/settings-v2';
 
 enum EOBSOutputType {
   Streaming = 'streaming',
@@ -87,6 +88,7 @@ export class StreamingService
   @Inject() private growService: GrowService;
   @Inject() private recordingModeService: RecordingModeService;
   @Inject() private markersService: MarkersService;
+  @Inject() private videoSettingsService: VideoSettingsService;
 
   streamingStatusChange = new Subject<EStreamingState>();
   recordingStatusChange = new Subject<ERecordingState>();
@@ -123,6 +125,7 @@ export class StreamingService
         tiktok: 'not-started',
         trovo: 'not-started',
         setupMultistream: 'not-started',
+        setupGreen: 'not-started',
         startVideoTransmission: 'not-started',
         postTweet: 'not-started',
       },
@@ -273,20 +276,11 @@ export class StreamingService
       try {
         // don't update settings for twitch in unattendedMode
         const settingsForPlatform = platform === 'twitch' && unattendedMode ? undefined : settings;
-        await this.runCheck(platform, () => service.beforeGoLive(settingsForPlatform));
+
+        const context = this.views.getPlatformDisplay(platform);
+        await this.runCheck(platform, () => service.beforeGoLive(settingsForPlatform, context));
       } catch (e: unknown) {
-        console.error('Error running beforeGoLive for plarform', e);
-        // cast all PLATFORM_REQUEST_FAILED errors to SETTINGS_UPDATE_FAILED
-        if (e instanceof StreamError) {
-          e.type =
-            (e.type as TStreamErrorType) === 'PLATFORM_REQUEST_FAILED'
-              ? 'SETTINGS_UPDATE_FAILED'
-              : e.type || 'UNKNOWN_ERROR';
-          this.setError(e, platform);
-        } else {
-          this.setError('SETTINGS_UPDATE_FAILED', platform);
-        }
-        return;
+        this.handleSetupPlatformError(e, platform);
       }
     }
 
@@ -319,6 +313,61 @@ export class StreamingService
         console.error('Failed to setup restream', e);
         this.setError('RESTREAM_SETUP_FAILED');
         return;
+      }
+    }
+
+    // setup green
+    if (this.views.isGreen) {
+      const displayPlatforms = this.views.activeDisplayPlatforms;
+
+      for (const display in displayPlatforms) {
+        if (displayPlatforms[display].length > 1) {
+          let ready = false;
+          try {
+            await this.runCheck(
+              'setupGreen',
+              async () => (ready = await this.restreamService.checkStatus()),
+            );
+          } catch (e: unknown) {
+            console.error('Error fetching restreaming service', e);
+          }
+          // Assume restream is down
+          if (!ready) {
+            this.setError('RESTREAM_DISABLED');
+            return;
+          }
+
+          // update restream settings
+          try {
+            await this.runCheck('setupGreen', async () => {
+              // enable restream on the backend side
+              if (!this.restreamService.state.enabled) await this.restreamService.setEnabled(true);
+              await this.restreamService.beforeGreenGoLive(
+                displayPlatforms[display],
+                display as TDisplayType,
+                display as TOutputOrientation,
+              );
+            });
+          } catch (e: unknown) {
+            console.error('Failed to setup restream', e);
+            this.setError('RESTREAM_SETUP_FAILED');
+            return;
+          }
+        } else {
+          // set single stream for the display
+          if (displayPlatforms[display].length > 0) {
+            const platform = displayPlatforms[display][0];
+            const service = getPlatformService(platform);
+            try {
+              await this.runCheck('setupGreen', async () => {
+                service.confirmGreen(platform);
+                return Promise.resolve();
+              });
+            } catch (e: unknown) {
+              this.handleSetupPlatformError(e, platform);
+            }
+          }
+        }
       }
     }
 
@@ -370,6 +419,21 @@ export class StreamingService
       this.createGameAssociation(this.views.game);
       this.recordAfterStreamStartAnalytics(settings);
     }
+  }
+
+  private handleSetupPlatformError(e: unknown, platform: TPlatform) {
+    console.error('Error running beforeGoLive for platform', e);
+    // cast all PLATFORM_REQUEST_FAILED errors to SETTINGS_UPDATE_FAILED
+    if (e instanceof StreamError) {
+      e.type =
+        (e.type as TStreamErrorType) === 'PLATFORM_REQUEST_FAILED'
+          ? 'SETTINGS_UPDATE_FAILED'
+          : e.type || 'UNKNOWN_ERROR';
+      this.setError(e, platform);
+    } else {
+      this.setError('SETTINGS_UPDATE_FAILED', platform);
+    }
+    return;
   }
 
   private recordAfterStreamStartAnalytics(settings: IGoLiveSettings) {
@@ -614,7 +678,25 @@ export class StreamingService
 
     this.powerSaveId = remote.powerSaveBlocker.start('prevent-display-sleep');
 
-    obs.NodeObs.OBS_service_startStreaming();
+    if (this.views.isGreen) {
+      if (this.views.enabledPlatforms.length > 1) {
+        this.views.contextsToStream.forEach(async (contextName: string) => {
+          const context = this.videoSettingsService.contexts[contextName];
+          obs.NodeObs.OBS_service_setVideoInfo(context, contextName);
+          obs.NodeObs.OBS_service_startStreaming(contextName);
+
+          await new Promise(resolve => setTimeout(resolve, 1000));
+        });
+      } else {
+        const platform = this.views.enabledPlatforms[0];
+        const display = this.views.getPlatformDisplay(platform);
+        const context = this.videoSettingsService.contexts[display];
+        obs.NodeObs.OBS_service_setVideoInfo(context, display);
+        obs.NodeObs.OBS_service_startStreaming(display);
+      }
+    } else {
+      obs.NodeObs.OBS_service_startStreaming();
+    }
 
     const recordWhenStreaming = this.streamSettingsService.settings.recordWhenStreaming;
 
@@ -685,7 +767,23 @@ export class StreamingService
         remote.powerSaveBlocker.stop(this.powerSaveId);
       }
 
-      obs.NodeObs.OBS_service_stopStreaming(false);
+      // obs.NodeObs.OBS_service_stopStreaming(false);
+
+      if (this.views.isGreen) {
+        if (this.views.enabledPlatforms.length > 1) {
+          this.views.contextsToStream.forEach(async (contextName: string) => {
+            obs.NodeObs.OBS_service_stopStreaming(false, contextName);
+
+            return Promise.resolve();
+          });
+        } else {
+          const platform = this.views.enabledPlatforms[0];
+          const display = this.views.getPlatformDisplay(platform);
+          obs.NodeObs.OBS_service_stopStreaming(false, display);
+        }
+      } else {
+        obs.NodeObs.OBS_service_stopStreaming(false);
+      }
 
       const keepRecording = this.streamSettingsService.settings.keepRecordingWhenStreamStops;
       if (!keepRecording && this.state.recordingStatus === ERecordingState.Recording) {
@@ -707,7 +805,23 @@ export class StreamingService
     }
 
     if (this.state.streamingStatus === EStreamingState.Ending) {
-      obs.NodeObs.OBS_service_stopStreaming(true);
+      if (this.views.isGreen) {
+        if (this.views.enabledPlatforms.length > 1) {
+          this.views.contextsToStream.forEach(async (contextName: string) => {
+            obs.NodeObs.OBS_service_stopStreaming(true, contextName);
+
+            return Promise.resolve();
+          });
+        } else {
+          const platform = this.views.enabledPlatforms[0];
+          const display = this.views.getPlatformDisplay(platform);
+          obs.NodeObs.OBS_service_stopStreaming(true, display);
+        }
+      } else {
+        obs.NodeObs.OBS_service_stopStreaming(true);
+      }
+
+      // obs.NodeObs.OBS_service_stopStreaming(true);
       return Promise.resolve();
     }
   }

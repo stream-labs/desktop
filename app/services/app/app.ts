@@ -41,6 +41,7 @@ import { MetricsService } from '../metrics';
 import { SettingsService } from '../settings';
 import { OS, getOS } from 'util/operating-systems';
 import * as remote from '@electron/remote';
+import { VideoSettingsService } from 'services/settings-v2/video';
 
 interface IAppState {
   loading: boolean;
@@ -90,6 +91,7 @@ export class AppService extends StatefulService<IAppState> {
   @Inject() private metricsService: MetricsService;
   @Inject() private settingsService: SettingsService;
   @Inject() private usageStatisticsService: UsageStatisticsService;
+  @Inject() private videoSettingsService: VideoSettingsService;
 
   static initialState: IAppState = {
     loading: true,
@@ -191,6 +193,7 @@ export class AppService extends StatefulService<IAppState> {
       await this.sceneCollectionsService.deinitialize();
       this.performanceService.stop();
       this.transitionsService.shutdown();
+      this.videoSettingsService.shutdown();
       await this.gameOverlayService.destroy();
       await this.fileManagerService.flushAll();
       obs.NodeObs.RemoveSourceCallback();
