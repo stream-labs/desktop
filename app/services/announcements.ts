@@ -169,13 +169,18 @@ export class AnnouncementsService extends PersistentStatefulService<{
   }
 
   openNewsWindow() {
-    this.windowsService.showWindow({
+    this.windowsService.actions.showWindow({
       componentName: 'NotificationsAndNews',
       title: $t('Notifications & News'),
-      size: {
-        width: 500,
-        height: 600,
-      },
+      size: { width: 500, height: 600 },
+    });
+  }
+
+  openFeedbackForm() {
+    this.windowsService.actions.showWindow({
+      componentName: 'FeedbackWindow',
+      title: $t(''),
+      size: { width: 600, height: 600 },
     });
   }
 

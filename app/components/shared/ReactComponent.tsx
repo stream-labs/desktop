@@ -10,7 +10,7 @@ import { Component, Prop, Watch } from 'vue-property-decorator';
 class WrapperProps<TComponentProps> {
   name?: string = null;
   componentProps?: TComponentProps = null;
-  wrapperStyles?: Dictionary<string> = null;
+  wrapperStyles?: Dictionary<string> = { height: '100%' };
   // Hack to allow custom layout components to size properly
   mins?: IVec2 = null;
 }

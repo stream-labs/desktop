@@ -1,59 +1,31 @@
 import { Component } from 'vue-property-decorator';
 import ReactComponent from './ReactComponent';
 
-@Component({
-  props: {
-    name: { default: 'AddSource' },
-    wrapperStyles: { default: () => ({ height: '100%' }) },
-  },
-})
+@Component({ props: { name: { default: 'AddSource' } } })
 export class AddSource extends ReactComponent {}
 
-@Component({
-  props: {
-    name: { default: 'AdvancedAudio' },
-    wrapperStyles: { default: () => ({ height: '100%' }) },
-  },
-})
+@Component({ props: { name: { default: 'AdvancedAudio' } } })
 export class AdvancedAudio extends ReactComponent {}
 
-@Component({
-  props: {
-    name: { default: 'AdvancedStatistics' },
-    wrapperStyles: { default: () => ({ height: '100%' }) },
-  },
-})
+@Component({ props: { name: { default: 'AdvancedStatistics' } } })
 export class AdvancedStatistics extends ReactComponent {}
 
-@Component({
-  props: {
-    name: { default: 'AlertboxLibrary' },
-    wrapperStyles: { default: () => ({ height: '100%' }) },
-  },
-})
+@Component({ props: { name: { default: 'AlertboxLibrary' } } })
 export class AlertboxLibrary extends ReactComponent {}
 
 @Component({ props: { name: { default: 'Blank' } } })
 export class Blank extends ReactComponent {}
 
-@Component({
-  props: {
-    name: { default: 'BrowseOverlays' },
-    wrapperStyles: { default: () => ({ height: '100%' }) },
-  },
-})
+@Component({ props: { name: { default: 'BrowseOverlays' } } })
 export class BrowseOverlays extends ReactComponent {}
 
-@Component({
-  props: { name: { default: 'Browser' }, wrapperStyles: { default: () => ({ height: '100%' }) } },
-})
+@Component({ props: { name: { default: 'Browser' } } })
 export class Browser extends ReactComponent {}
 
 @Component({
   props: {
     name: { default: 'BrowserView' },
     componentProps: { default: () => ({ src: '' }) },
-    wrapperStyles: { default: () => ({ height: '100%' }) },
   },
 })
 export class BrowserView extends ReactComponent {}
@@ -72,7 +44,6 @@ export class Chat extends ReactComponent {}
 @Component({
   props: {
     name: { default: 'Display' },
-    wrapperStyles: { default: () => ({ height: '100%' }) },
     componentProps: {
       default: () => ({
         paddingSize: 0,
@@ -86,32 +57,23 @@ export class Display extends ReactComponent {}
 @Component({
   props: {
     name: { default: 'DisplayElement' },
-    wrapperStyles: { default: () => ({ height: '100%' }) },
     mins: { default: () => ({ x: 0, y: 0 }) },
   },
 })
 export class DisplayElement extends ReactComponent {}
 
-@Component({
-  props: {
-    name: { default: 'EditStreamWindow' },
-    wrapperStyles: { default: () => ({ height: '100%' }) },
-  },
-})
+@Component({ props: { name: { default: 'EditStreamWindow' } } })
 export class EditStreamWindow extends ReactComponent {}
 
-@Component({
-  props: {
-    name: { default: 'EditTransform' },
-    wrapperStyles: { default: () => ({ height: '100%' }) },
-  },
-})
+@Component({ props: { name: { default: 'EditTransform' } } })
 export class EditTransform extends ReactComponent {}
+
+@Component({ props: { name: { default: 'FeedbackWindow' } } })
+export class FeedbackWindow extends ReactComponent {}
 
 @Component({
   props: {
     name: { default: 'GoLiveWindow' },
-    wrapperStyles: { default: () => ({ height: '100%' }) },
   },
 })
 export class GoLiveWindow extends ReactComponent {}
@@ -124,20 +86,10 @@ export class GoLiveWindow extends ReactComponent {}
 })
 export class Grow extends ReactComponent {}
 
-@Component({
-  props: {
-    name: { default: 'GuestCamProperties' },
-    wrapperStyles: { default: () => ({ height: '100%' }) },
-  },
-})
+@Component({ props: { name: { default: 'GuestCamProperties' } } })
 export class GuestCamProperties extends ReactComponent {}
 
-@Component({
-  props: {
-    name: { default: 'Highlighter' },
-    componentProps: { default: () => ({}) },
-  },
-})
+@Component({ props: { name: { default: 'Highlighter' } } })
 export class Highlighter extends ReactComponent {}
 
 @Component({ props: { name: { default: 'LayoutEditor' } } })
@@ -146,26 +98,15 @@ export class LayoutEditor extends ReactComponent {}
 @Component({ props: { name: { default: 'Loader' } } })
 export class Loader extends ReactComponent {}
 
-@Component({
-  props: {
-    name: { default: 'IconLibraryProperties' },
-    wrapperStyles: { default: () => ({ height: '100%' }) },
-  },
-})
+@Component({ props: { name: { default: 'IconLibraryProperties' } } })
 export class IconLibraryProperties extends ReactComponent {}
 
-@Component({
-  props: {
-    name: { default: 'InstalledApps' },
-    wrapperStyles: { default: () => ({ height: '100%' }) },
-  },
-})
+@Component({ props: { name: { default: 'InstalledApps' } } })
 export class InstalledApps extends ReactComponent {}
 
 @Component({
   props: {
     name: { default: 'LegacyEvents' },
-    wrapperStyles: { default: () => ({ height: '100%' }) },
     componentProps: { default: () => ({ onPopout: () => {} }) },
     mins: { default: () => ({ x: 360, y: 150 }) },
   },
@@ -175,53 +116,31 @@ export class LegacyEvents extends ReactComponent {}
 @Component({
   props: {
     name: { default: 'ManageSceneCollections' },
-    wrapperStyles: { default: () => ({ height: '100%' }) },
   },
 })
 export class ManageSceneCollections extends ReactComponent {}
 
-@Component({
-  props: {
-    name: { default: 'MediaGallery' },
-    wrapperStyles: { default: () => ({ height: '100%' }) },
-  },
-})
+@Component({ props: { name: { default: 'MediaGallery' } } })
 export class MediaGallery extends ReactComponent {}
 
 @Component({
   props: {
     name: { default: 'MiniFeed' },
-    wrapperStyles: { default: () => ({ height: '100%' }) },
     mins: { default: () => ({ x: 330, y: 90 }) },
   },
 })
 export class MiniFeed extends ReactComponent {}
 
-@Component({
-  props: {
-    name: { default: 'NameFolder' },
-    wrapperStyles: { default: () => ({ height: '100%' }) },
-  },
-})
+@Component({ props: { name: { default: 'NameFolder' } } })
 export class NameFolder extends ReactComponent {}
 
-@Component({
-  props: {
-    name: { default: 'NameScene' },
-    wrapperStyles: { default: () => ({ height: '100%' }) },
-  },
-})
+@Component({ props: { name: { default: 'NameScene' } } })
 export class NameScene extends ReactComponent {}
 
 @Component({ props: { name: { default: 'NotificationsArea' } } })
 export class NotificationsArea extends ReactComponent {}
 
-@Component({
-  props: {
-    name: { default: 'NotificationsAndNews' },
-    wrapperStyles: { default: () => ({ height: '100%' }) },
-  },
-})
+@Component({ props: { name: { default: 'NotificationsAndNews' } } })
 export class NotificationsAndNews extends ReactComponent {}
 
 @Component({
@@ -232,11 +151,7 @@ export class NotificationsAndNews extends ReactComponent {}
 })
 export class ObsSettings extends ReactComponent {}
 
-@Component({
-  props: {
-    name: { default: 'Onboarding' },
-  },
-})
+@Component({ props: { name: { default: 'Onboarding' } } })
 export class Onboarding extends ReactComponent {}
 
 @Component({ props: { name: { default: 'PatchNotes' } } })
@@ -257,10 +172,7 @@ export class PlatformAppPageView extends ReactComponent {}
 export class PlatformAppMainPage extends ReactComponent {}
 
 @Component({
-  props: {
-    name: { default: 'PlatformAppPopOut' },
-    wrapperStyles: { default: () => ({ height: '100%' }) },
-  },
+  props: { name: { default: 'PlatformAppPopOut' } },
 })
 export class PlatformAppPopOut extends ReactComponent {}
 
@@ -275,73 +187,43 @@ export class PlatformLogo extends ReactComponent<{
   unwrapped?: boolean;
 }> {}
 
-@Component({
-  props: {
-    name: { default: 'PlatformMerge' },
-    wrapperStyles: { default: () => ({ height: '100%' }) },
-  },
-})
+@Component({ props: { name: { default: 'PlatformMerge' } } })
 export class PlatformMerge extends ReactComponent {}
 
-@Component({
-  props: { name: { default: 'Projector' }, wrapperStyles: { default: () => ({ height: '100%' }) } },
-})
+@Component({ props: { name: { default: 'Projector' } } })
 export class Projector extends ReactComponent {}
 
 @Component({
   props: {
     name: { default: 'RecentEvents' },
-    wrapperStyles: { default: () => ({ height: '100%' }) },
     componentProps: { default: () => ({ isOverlay: false }) },
   },
 })
 export class RecentEvents extends ReactComponent<{ isOverlay?: boolean }> {}
 
-@Component({
-  props: {
-    name: { default: 'RecentEventsWindow' },
-    wrapperStyles: { default: () => ({ height: '100%' }) },
-  },
-})
+@Component({ props: { name: { default: 'RecentEventsWindow' } } })
 export class RecentEventsWindow extends ReactComponent {}
 
-@Component({
-  props: {
-    name: { default: 'RecordingHistory' },
-    wrapperStyles: { default: () => ({ height: '100%' }) },
-  },
-})
+@Component({ props: { name: { default: 'RecordingHistory' } } })
 export class RecordingHistory extends ReactComponent {}
 
 @Component({
   props: {
     name: { default: 'RecordingPreview' },
-    wrapperStyles: { default: () => ({ height: '100%' }) },
     mins: { default: () => ({ x: 0, y: 0 }) },
   },
 })
 export class RecordingPreview extends ReactComponent {}
 
-@Component({
-  props: {
-    name: { default: 'RenameSource' },
-    wrapperStyles: { default: () => ({ height: '100%' }) },
-  },
-})
+@Component({ props: { name: { default: 'RenameSource' } } })
 export class RenameSource extends ReactComponent {}
 
-@Component({
-  props: {
-    name: { default: 'SafeMode' },
-    wrapperStyles: { default: () => ({ height: '100%' }) },
-  },
-})
+@Component({ props: { name: { default: 'SafeMode' } } })
 export class SafeMode extends ReactComponent {}
 
 @Component({
   props: {
     name: { default: 'StreamPreview' },
-    wrapperStyles: { default: () => ({ height: '100%' }) },
     mins: { default: () => ({ x: 0, y: 0 }) },
   },
 })
@@ -350,7 +232,6 @@ export class StreamPreview extends ReactComponent {}
 @Component({
   props: {
     name: { default: 'SceneSelector' },
-    wrapperStyles: { default: () => ({ height: '100%' }) },
     mins: { default: () => ({ x: 200, y: 120 }) },
   },
 })
@@ -359,56 +240,25 @@ export class SceneSelector extends ReactComponent {}
 @Component({
   props: {
     name: { default: 'SourceSelector' },
-    wrapperStyles: { default: () => ({ height: '100%' }) },
     mins: { default: () => ({ x: 200, y: 120 }) },
   },
 })
 export class SourceSelector extends ReactComponent {}
 
-@Component({
-  props: {
-    name: { default: 'SideNav' },
-    wrapperStyles: { default: () => ({ height: '100%' }) },
-  },
-})
+@Component({ props: { name: { default: 'SideNav' } } })
 export class SideNav extends ReactComponent {}
 
-@Component({
-  props: {
-    name: { default: 'SourceProperties' },
-    wrapperStyles: { default: () => ({ height: '100%' }) },
-  },
-})
+@Component({ props: { name: { default: 'SourceProperties' } } })
 export class SourceProperties extends ReactComponent {}
 
-@Component({
-  props: {
-    name: { default: 'ScreenCaptureProperties' },
-    wrapperStyles: { default: () => ({ height: '100%' }) },
-  },
-})
+@Component({ props: { name: { default: 'ScreenCaptureProperties' } } })
 export class ScreenCaptureProperties extends ReactComponent {}
-@Component({
-  props: {
-    name: { default: 'SharedComponentsLibrary' },
-    wrapperStyles: { default: () => ({ height: '100%' }) },
-  },
-})
+@Component({ props: { name: { default: 'SharedComponentsLibrary' } } })
 export class SharedComponentsLibrary extends ReactComponent {}
 
-@Component({
-  props: {
-    name: { default: 'SourceFilters' },
-    wrapperStyles: { default: () => ({ height: '100%' }) },
-  },
-})
+@Component({ props: { name: { default: 'SourceFilters' } } })
 export class SourceFilters extends ReactComponent {}
-@Component({
-  props: {
-    name: { default: 'SourceShowcase' },
-    wrapperStyles: { default: () => ({ height: '100%' }) },
-  },
-})
+@Component({ props: { name: { default: 'SourceShowcase' } } })
 export class SourceShowcase extends ReactComponent {}
 
 @Component({ props: { name: { default: 'StartStreamingButton' } } })
@@ -453,28 +303,13 @@ export class ThemeAudit extends ReactComponent {}
 })
 export class TitleBar extends ReactComponent {}
 
-@Component({
-  props: {
-    name: { default: 'WelcomeToPrime' },
-    wrapperStyles: { default: () => ({ height: '100%' }) },
-  },
-})
+@Component({ props: { name: { default: 'WelcomeToPrime' } } })
 export class WelcomeToPrime extends ReactComponent {}
 
-@Component({
-  props: {
-    name: { default: 'WidgetWindow' },
-    wrapperStyles: { default: () => ({ height: '100%' }) },
-  },
-})
+@Component({ props: { name: { default: 'WidgetWindow' } } })
 export class WidgetWindow extends ReactComponent {}
 
-@Component({
-  props: {
-    name: { default: 'CustomCodeWindow' },
-    wrapperStyles: { default: () => ({ height: '100%' }) },
-  },
-})
+@Component({ props: { name: { default: 'CustomCodeWindow' } } })
 export class CustomCodeWindow extends ReactComponent {}
 
 @Component({ props: { name: { default: 'NewBadge' } } })
