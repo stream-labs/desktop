@@ -2518,15 +2518,15 @@
   resolved "https://registry.yarnpkg.com/@leichtgewicht/ip-codec/-/ip-codec-2.0.4.tgz#b2ac626d6cb9c8718ab459166d4bb405b8ffa78b"
   integrity sha512-Hcv+nVC0kZnQ3tD9GVu5xSMR4VVYOteQIr/hwFPVEvPdlXqgGEuRjiheChHgdM+JyqdgNcmzZOX/tnl0JOiI7A==
 
-"@n-air-app/n-voice-package@^1.0.1":
-  version "1.0.1"
-  resolved "https://npm.pkg.github.com/download/@n-air-app/n-voice-package/1.0.1/b717fc5c92d424368c8d0bbaff0cf7f459f55459#b717fc5c92d424368c8d0bbaff0cf7f459f55459"
-  integrity sha512-RQi8X/Gq66ybE7DEPsvAWVKnVvh7wyylcn3ZlbnNhnh+Y4XoGdKgVqbEczIWbpKZLlo4/yaL7d7qI3Pn+WB4ow==
+"@n-air-app/n-voice-package@^1.0.2":
+  version "1.0.2"
+  resolved "https://npm.pkg.github.com/download/@n-air-app/n-voice-package/1.0.2/3ad9bb4da017848de7a399c171bb971a5f987e52#3ad9bb4da017848de7a399c171bb971a5f987e52"
+  integrity sha512-E9TsrIhqoX8p6ZGeg9j0s3+fIZMoQONxlPt2nw1ctZGpMnK4O5IO6hug9wWg5oLG4C3gYV763Yem7p8NIb2EqQ==
   dependencies:
     "@rollup/plugin-babel" "^6.0.3"
     "@rollup/plugin-terser" "^0.4.0"
-    "@types/node" "^18.11.19"
-    rollup "^3.17.2"
+    "@types/node" "^18.14.6"
+    rollup "^3.18.0"
     rollup-plugin-typescript2 "^0.34.1"
     typescript "^4.9.5"
 
@@ -3127,10 +3127,10 @@
   resolved "https://registry.yarnpkg.com/@types/node/-/node-10.17.58.tgz#10682f6016fd866725c36d22ce6bbbd029bf4545"
   integrity sha512-Dn5RBxLohjdHFj17dVVw3rtrZAeXeWg+LQfvxDIW/fdPkSiuQk7h3frKMYtsQhtIW42wkErDcy9UMVxhGW4O7w==
 
-"@types/node@^18.11.19":
-  version "18.11.19"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-18.11.19.tgz#35e26df9ec441ab99d73e99e9aca82935eea216d"
-  integrity sha512-YUgMWAQBWLObABqrvx8qKO1enAvBUdjZOAWQ5grBAkp5LQv45jBvYKZ3oFS9iKRCQyFjqw6iuEa1vmFqtxYLZw==
+"@types/node@^18.14.6":
+  version "18.15.1"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-18.15.1.tgz#41dc2bf78e8085a250d4670d95edb7fba621dd29"
+  integrity sha512-U2TWca8AeHSmbpi314QBESRk7oPjSZjDsR+c+H4ECC1l+kFgpZf8Ydhv3SJpPy51VyZHHqxlb6mTTqYNNRVAIw==
 
 "@types/normalize-package-data@^2.4.0":
   version "2.4.0"
@@ -14682,10 +14682,10 @@ rollup-plugin-typescript2@^0.34.1:
     semver "^7.3.7"
     tslib "^2.4.0"
 
-rollup@^3.17.2:
-  version "3.17.2"
-  resolved "https://registry.yarnpkg.com/rollup/-/rollup-3.17.2.tgz#a4ecd29c488672a0606e41ef57474fad715750a9"
-  integrity sha512-qMNZdlQPCkWodrAZ3qnJtvCAl4vpQ8q77uEujVCCbC/6CLB7Lcmvjq7HyiOSnf4fxTT9XgsE36oLHJBH49xjqA==
+rollup@^3.18.0:
+  version "3.19.1"
+  resolved "https://registry.yarnpkg.com/rollup/-/rollup-3.19.1.tgz#2b3a31ac1ff9f3afab2e523fa687fef5b0ee20fc"
+  integrity sha512-lAbrdN7neYCg/8WaoWn/ckzCtz+jr70GFfYdlf50OF7387HTg+wiuiqJRFYawwSPpqfqDNYqK7smY/ks2iAudg==
   optionalDependencies:
     fsevents "~2.3.2"
 

@@ -79,7 +79,7 @@
     ]
   },
   "dependencies": {
-    "@n-air-app/n-voice-package": "^1.0.1",
+    "@n-air-app/n-voice-package": "^1.0.2",
     "@sentry/electron": "^4.3.0",
     "@sentry/vue": "^7.40.0",
     "archiver": "^3.0.0",
