@@ -42,10 +42,6 @@
       "replacement": "チュウ"
     },
     {
-      "text": "CH",
-      "replacement": "チャンネル"
-    },
-    {
       "onlyFor": "webSpeech",
       "text": "行った",
       "replacement": "イッタ"
