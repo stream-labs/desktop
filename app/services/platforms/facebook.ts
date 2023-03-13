@@ -274,7 +274,7 @@ export class FacebookService
       await this.postPage(fbOptions.pageId);
     }
 
-    this.confirmDualOutput('facebook');
+    this.confirmDualOutput(context);
   }
 
   /**

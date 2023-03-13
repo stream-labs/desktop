@@ -173,6 +173,7 @@ export class RestreamService extends StatefulService<IRestreamState> {
       this.userService.apiToken,
       new Headers({ 'Content-Type': 'application/json' }),
     );
+    // const url = 'https://beta.streamlabs.com/api/v1/rst/user/settings';
     const url = `https://${this.host}/api/v1/rst/user/settings`;
     const body = JSON.stringify({
       enabled,
@@ -180,6 +181,8 @@ export class RestreamService extends StatefulService<IRestreamState> {
       idleTimeout: 30,
     });
     const request = new Request(url, { headers, body, method: 'PUT' });
+
+    console.log('restream enabled');
 
     return jfetch(request);
   }

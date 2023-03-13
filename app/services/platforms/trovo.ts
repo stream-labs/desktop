@@ -98,7 +98,7 @@ export class TrovoService
 
     await this.putChannelInfo(trSettings);
 
-    this.confirmDualOutput('trovo');
+    this.confirmDualOutput(context);
   }
 
   fetchNewToken(): Promise<void> {

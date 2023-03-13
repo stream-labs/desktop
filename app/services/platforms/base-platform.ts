@@ -118,13 +118,12 @@ export abstract class BasePlatformService<T extends IPlatformState> extends Stat
     return Promise.resolve({});
   }
 
-  confirmDualOutput(platform: TPlatform) {
+  confirmDualOutput(context: TDisplayType) {
     if (this.dualOutputService.views.dualOutputMode) {
-      const display = this.dualOutputService.views.getPlatformDisplay(platform);
-      const context = this.videoSettingsService.contexts[display];
+      const contextSettings = this.videoSettingsService.contexts[context];
 
       this.UPDATE_STREAM_SETTINGS({
-        video: context,
+        video: contextSettings,
       });
     }
   }

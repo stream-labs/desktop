@@ -65,6 +65,7 @@ export class TiktokService
       );
     }
     this.SET_STREAM_SETTINGS(ttSettings);
+    this.confirmDualOutput(context);
   }
 
   /**
