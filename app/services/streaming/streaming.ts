@@ -56,6 +56,7 @@ enum EOBSOutputSignal {
   Start = 'start',
   Stopping = 'stopping',
   Stop = 'stop',
+  Deactivate = 'deactivate',
   Reconnect = 'reconnect',
   ReconnectSuccess = 'reconnect_success',
   Wrote = 'wrote',
@@ -93,6 +94,7 @@ export class StreamingService
   replayBufferStatusChange = new Subject<EReplayBufferState>();
   replayBufferFileWrite = new Subject<string>();
   streamInfoChanged = new Subject<StreamInfoView<any>>();
+  signalInfoChanged = new Subject<IOBSOutputSignalInfo>();
 
   // Dummy subscription for stream deck
   streamingStateChange = new Subject<void>();
@@ -134,6 +136,7 @@ export class StreamingService
   init() {
     obs.NodeObs.OBS_service_connectOutputSignals((info: IOBSOutputSignalInfo) => {
       console.log('info ', info);
+      this.signalInfoChanged.next(info);
       this.handleOBSOutputSignal(info);
     });
 
@@ -779,10 +782,36 @@ export class StreamingService
       const settingsAll = this.settingsService.views.all;
       console.log('just before starting streams ', settingsAll);
 
-      if (this.views.enabledPlatforms.length > 1) {
+      if (this.views.enabledPlatforms.length > 1 && this.views.contextsToStream.length > 1) {
         // if (this.views.contextsToStream.length > 1) {
+        console.log('1a contextsToStream ', this.views.contextsToStream);
         const horizontalContext = this.videoSettingsService.contexts.horizontal;
         const verticalContext = this.videoSettingsService.contexts.vertical;
+
+        // VVV WORKS
+        obs.NodeObs.OBS_service_setVideoInfo(horizontalContext, 'horizontal');
+        obs.NodeObs.OBS_service_setVideoInfo(verticalContext, 'vertical');
+
+        this.signalInfoChanged.subscribe((signalInfo: IOBSOutputSignalInfo) => {
+          if (signalInfo.error) {
+            obs.NodeObs.OBS_service_stopStreaming(true, 'horizontal');
+            obs.NodeObs.OBS_service_stopStreaming(true, 'vertical');
+          }
+
+          if (signalInfo.signal === EOBSOutputSignal.Start) {
+            obs.NodeObs.OBS_service_startStreaming('vertical');
+            console.log('LIVE');
+          }
+        });
+
+        obs.NodeObs.OBS_service_startStreaming('horizontal');
+        // sleep for 1 second to allow the first stream to start before starting the second
+        // better to replace with waiting for signal from obs about first stream starting successfully
+        await new Promise(resolve => setTimeout(resolve, 1000));
+
+        console.log('UNSUBSCRIBE LIVE');
+
+        this.signalInfoChanged.complete();
         //   obs.NodeObs.OBS_service_setVideoInfo(horizontalContext, 'horizontal');
         //   obs.NodeObs.OBS_service_setVideoInfo(verticalContext, 'vertical');
 
@@ -861,24 +890,6 @@ export class StreamingService
         // check if we need to force apply single stream settings?
         // this.settingsService.actions.setDualOutputSingleStreamData();
 
-        // VVV WORKS
-        obs.NodeObs.OBS_service_setVideoInfo(horizontalContext, 'horizontal');
-        obs.NodeObs.OBS_service_setVideoInfo(verticalContext, 'vertical');
-
-        this.streamingStatusChange.subscribe(async (streamStatus: EStreamingState) => {
-          if (streamStatus === EStreamingState.Live) {
-            obs.NodeObs.OBS_service_startStreaming('vertical');
-            console.log('LIVE');
-            return Promise.resolve();
-          }
-        });
-
-        obs.NodeObs.OBS_service_startStreaming('horizontal');
-        // sleep for 1 second to allow the first stream to start before starting the second
-        // better to replace with waiting for signal from obs about first stream starting successfully
-        await new Promise(resolve => setTimeout(resolve, 1000));
-
-        console.log('UNSUBSCRIBE');
         // this.streamingStatusChange.unsubscribe();
       } else {
         const platform = this.views.enabledPlatforms[0];
@@ -961,11 +972,45 @@ export class StreamingService
         remote.powerSaveBlocker.stop(this.powerSaveId);
       }
 
-      this.views.contextsToStream.forEach(async (contextName: string) => {
-        obs.NodeObs.OBS_service_stopStreaming(false, contextName);
+      if (this.views.contextsToStream.length > 1) {
+        console.log('1a contextsToStream ', this.views.contextsToStream);
+        this.streamingStatusChange.subscribe((streamInfo: EStreamingState) => {
+          if (streamInfo === EStreamingState.Offline) {
+            obs.NodeObs.OBS_service_stopStreaming(false, 'vertical');
+            console.log('STOPPED 1');
+          }
+        });
+        // this.signalInfoChanged.subscribe((signalInfo: IOBSOutputSignalInfo) => {
+        //   // if (signalInfo.error) return;
+        //   if (
+        //     [
+        //       EOBSOutputSignal.Stop,
+        //       EOBSOutputSignal.Deactivate,
+        //       EOBSOutputSignal.Reconnect,
+        //     ].includes(signalInfo.signal)
+        //   ) {
+        //     obs.NodeObs.OBS_service_stopStreaming(false, 'vertical');
+        //     console.log('STOPPED 1');
+        //   }
+        // });
 
-        return Promise.resolve();
-      });
+        obs.NodeObs.OBS_service_stopStreaming(false, 'horizontal');
+        // sleep for 1 second to allow the first stream to start before starting the second
+        // better to replace with waiting for signal from obs about first stream starting successfully
+        await new Promise(resolve => setTimeout(resolve, 1000));
+
+        console.log('UNSUBSCRIBE STOP 1');
+        // this.signalInfoChanged.complete();
+        this.streamingStatusChange.complete();
+
+        // current safeguard
+      } else {
+        console.log('1 contextsToStream ', this.views.contextsToStream);
+        const contextName = this.views.contextsToStream[0];
+        console.log('stopping 1 ', contextName);
+
+        obs.NodeObs.OBS_service_stopStreaming(false, contextName);
+      }
 
       // if (this.views.isDualOutputMode) {
       //   if (this.views.enabledPlatforms.length > 1) {
@@ -1005,13 +1050,33 @@ export class StreamingService
     }
 
     if (this.state.streamingStatus === EStreamingState.Ending) {
-      this.streamingStatusChange.unsubscribe();
+      if (this.views.contextsToStream.length > 1) {
+        obs.NodeObs.OBS_service_stopStreaming(true, 'horizontal');
+        obs.NodeObs.OBS_service_stopStreaming(true, 'vertical');
+        console.log('2a contextsToStream ', this.views.contextsToStream);
+        // this.signalInfoChanged.subscribe((signalInfo: IOBSOutputSignalInfo) => {
+        //   // if (signalInfo.error) return;
+        //   if (signalInfo.signal === EOBSOutputSignal.Deactivated) {
+        //     obs.NodeObs.OBS_service_stopStreaming(false, 'vertical');
+        //     console.log('STOPPED 2');
+        //   }
+        // });
 
-      this.views.contextsToStream.forEach(async (contextName: string) => {
-        obs.NodeObs.OBS_service_stopStreaming(false, contextName);
+        // obs.NodeObs.OBS_service_stopStreaming(false, 'horizontal');
+        // // sleep for 1 second to allow the first stream to start before starting the second
+        // // better to replace with waiting for signal from obs about first stream starting successfully
+        // await new Promise(resolve => setTimeout(resolve, 1000));
 
-        return Promise.resolve();
-      });
+        // console.log('UNSUBSCRIBE STOP 2');
+        // this.signalInfoChanged.complete();
+        // this.streamingStatusChange.unsubscribe();
+      } else {
+        console.log('2 contextsToStream ', this.views.contextsToStream);
+        const contextName = this.views.contextsToStream[0];
+
+        console.log('stopping 2 ', contextName);
+        obs.NodeObs.OBS_service_stopStreaming(true, contextName);
+      }
       // if (this.views.isDualOutputMode) {
       //   obs.NodeObs.OBS_service_stopStreaming(true, 'horizontal');
       //   obs.NodeObs.OBS_service_stopStreaming(true, 'vertical');
@@ -1224,7 +1289,7 @@ export class StreamingService
         this.SET_STREAMING_STATUS(EStreamingState.Live, time);
         this.resolveStartStreaming();
         this.streamingStatusChange.next(EStreamingState.Live);
-        this.streamingStatusChange.unsubscribe();
+        // this.streamingStatusChange.unsubscribe();
 
         let streamEncoderInfo: Partial<IOutputSettings> = {};
         let game: string = '';
@@ -1276,7 +1341,6 @@ export class StreamingService
         this.sendStreamEndEvent();
         this.SET_STREAMING_STATUS(EStreamingState.Ending, time);
         this.streamingStatusChange.next(EStreamingState.Ending);
-        this.streamingStatusChange.unsubscribe();
       } else if (info.signal === EOBSOutputSignal.Reconnect) {
         this.SET_STREAMING_STATUS(EStreamingState.Reconnecting);
         this.streamingStatusChange.next(EStreamingState.Reconnecting);
@@ -1284,7 +1348,6 @@ export class StreamingService
       } else if (info.signal === EOBSOutputSignal.ReconnectSuccess) {
         this.SET_STREAMING_STATUS(EStreamingState.Live);
         this.streamingStatusChange.next(EStreamingState.Live);
-        this.streamingStatusChange.unsubscribe();
         this.clearReconnectingNotification();
       }
     } else if (info.type === EOBSOutputType.Recording) {

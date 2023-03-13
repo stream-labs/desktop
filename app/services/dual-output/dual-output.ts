@@ -89,7 +89,7 @@ class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
   get contextsToStream() {
     return Object.entries(this.activeDisplayPlatforms).reduce(
       (contextNames: TDisplayType[], [key, value]: [TDisplayType, TPlatform[]]) => {
-        if (value.length > 0) {
+        if (value.length) {
           contextNames.push(key as TDisplayType);
         }
         return contextNames;
