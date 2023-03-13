@@ -346,6 +346,10 @@ export class NVoiceClient {
   ): Promise<string[]> {
     await this.startNVoice();
     try {
+      Sentry.addBreadcrumb({
+        category: 'n-voice-engine',
+        message: `${command} ${args.map(a => a.value).join(' ')}`,
+      });
       await this.commandLineClient.send(
         [
           command,
