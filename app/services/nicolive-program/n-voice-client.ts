@@ -1,9 +1,10 @@
 // N Voice Client Service
 
+import * as Sentry from '@sentry/vue';
 import electron from 'electron';
-import { join } from "path";
-import { StatefulService } from "services/core/stateful-service";
-import { $t } from "services/i18n";
+import { join } from 'path';
+import { StatefulService } from 'services/core/stateful-service';
+import { $t } from 'services/i18n';
 import { sleep } from 'util/sleep';
 import { getNVoicePath, NVoiceClient } from './speech/NVoiceClient';
 import { INVoiceTalker } from './speech/NVoiceSynthesizer';
@@ -12,7 +13,10 @@ import { INVoiceTalker } from './speech/NVoiceSynthesizer';
  * @return .cancel function to stop playing.
  * @return .done promise to wait until playing is completed.
  */
-async function playAudio(buffer: Buffer, volume: number = 1.0): Promise<{ cancel: () => void; done: Promise<void> }> {
+async function playAudio(
+  buffer: Buffer,
+  volume: number = 1.0,
+): Promise<{ cancel: () => void; done: Promise<void> }> {
   const url = URL.createObjectURL(new Blob([buffer]));
   let cancel: () => void;
 
@@ -26,13 +30,25 @@ async function playAudio(buffer: Buffer, volume: number = 1.0): Promise<{ cancel
     audio.addEventListener('ended', () => {
       resolve();
     });
+    const playPromise = audio.play();
     cancel = () => {
       if (!completed) {
-        audio.pause();
-        resolve();
+        playPromise
+          .then(() => {
+            audio.pause();
+          })
+          .catch(err => {
+            Sentry.withScope(scope => {
+              scope.setLevel('error');
+              scope.setTag('in', 'playAudio:cancel');
+              Sentry.captureException(err);
+            });
+          })
+          .finally(() => {
+            resolve();
+          });
       }
-    }
-    audio.play();
+    };
   }).finally(() => {
     completed = true;
     URL.revokeObjectURL(url);
@@ -48,19 +64,18 @@ interface INVoiceClientState {
 }
 
 async function showError(err: Error): Promise<void> {
-  await electron.remote.dialog.showMessageBox(
-    electron.remote.getCurrentWindow(),
-    {
-      type: 'error',
-      message: err.toString(),
-      buttons: [$t('common.close')],
-      noLink: true,
-    }
-  );
+  await electron.remote.dialog.showMessageBox(electron.remote.getCurrentWindow(), {
+    type: 'error',
+    message: err.toString(),
+    buttons: [$t('common.close')],
+    noLink: true,
+  });
 }
 
-export class NVoiceClientService extends StatefulService<INVoiceClientState> implements INVoiceTalker {
-
+export class NVoiceClientService
+  extends StatefulService<INVoiceClientState>
+  implements INVoiceTalker
+{
   static initialState: INVoiceClientState = {
     enabled: true,
   };
@@ -74,7 +89,15 @@ export class NVoiceClientService extends StatefulService<INVoiceClientState> imp
   private index = 0;
   private speaking: Promise<void> | undefined;
 
-  async talk(text: string, options: { speed: number; volume: number; maxTime: number; phonemeCallback?: (phoneme: string) => void }): Promise<null | (() => Promise<{ cancel: () => void; speaking: Promise<void> } | null>)> {
+  async talk(
+    text: string,
+    options: {
+      speed: number;
+      volume: number;
+      maxTime: number;
+      phonemeCallback?: (phoneme: string) => void;
+    },
+  ): Promise<null | (() => Promise<{ cancel: () => void; speaking: Promise<void> } | null>)> {
     const client = this.client;
     const tempDir = electron.remote.app.getPath('temp');
     const wavFileName = join(tempDir, `n-voice-talk-${this.index}.wav`);
@@ -108,14 +131,17 @@ export class NVoiceClientService extends StatefulService<INVoiceClientState> imp
             options.phonemeCallback(label.phoneme);
           }
           options.phonemeCallback(''); // done
-        }
+        };
         phonemeLoop();
       }
       this.speaking = done;
       return {
-        cancel: () => { phonemeCancel = true; cancel() },
+        cancel: () => {
+          phonemeCancel = true;
+          cancel();
+        },
         speaking: done,
       };
-    }
+    };
   }
-};
+}
