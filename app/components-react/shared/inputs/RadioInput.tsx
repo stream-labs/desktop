@@ -12,6 +12,7 @@ type TRadioInputProps = TSlobsInputProps<
     options: { value: string; label: string; description?: string; defaultValue?: string }[];
     buttons?: boolean;
     direction?: 'vertical' | 'horizontal';
+    disabled?: boolean;
   },
   string,
   {}
@@ -31,6 +32,7 @@ export const RadioInput = InputComponent((p: TRadioInputProps) => {
           options={p.options}
           optionType="button"
           buttonStyle="solid"
+          disabled={p.disabled}
         />
       )}
       {!p.buttons && (
@@ -42,7 +44,7 @@ export const RadioInput = InputComponent((p: TRadioInputProps) => {
           <Space direction={p?.direction ?? 'vertical'}>
             {p.options.map(option => {
               return (
-                <Radio key={option.value} value={option.value}>
+                <Radio key={option.value} value={option.value} disabled={p.disabled}>
                   {option.label}
                   {option.description && <br />}
                   {option.description && <span style={{ fontSize: 12 }}>{option.description}</span>}

@@ -19,13 +19,14 @@ import {
 import styles from './Multistreaming.m.less';
 
 export function MultistreamingSettings() {
-  const { UserService, MagicLinkService, DualOutputService } = Services;
+  const { UserService, MagicLinkService, DualOutputService, StreamingService } = Services;
 
   const v = useVuex(() => ({
     isLoggedIn: UserService.views.isLoggedIn,
     isPrime: UserService.views.isPrime,
     platformSettingsList: DualOutputService.views.platformSettingsList,
     updatePlatformSetting: DualOutputService.actions.updatePlatformSetting,
+    isMidStreamMode: StreamingService.views.isMidStreamMode,
   }));
 
   async function upgradeToPrime() {
@@ -133,6 +134,7 @@ export function MultistreamingSettings() {
                   v.updatePlatformSetting(option.platform, val as TDualOutputDisplayType)
                 }
                 value={option.display}
+                disabled={v.isMidStreamMode}
               />
             </div>
           ))}
