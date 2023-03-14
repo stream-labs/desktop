@@ -32,6 +32,7 @@ function SceneSelector() {
     isHorizontal: SettingsManagerService.views.activeDisplays.horizontal,
     isVertical: SettingsManagerService.views.activeDisplays.vertical,
     toggleDisplay: SettingsManagerService.actions.toggleDisplay,
+    studioMode: TransitionsService.views.studioMode,
   }));
 
   const { treeSort } = useTree(true);
@@ -130,6 +131,13 @@ function SceneSelector() {
     setShowDropdown(false);
   }
 
+  function showErrorMessage() {
+    message.error({
+      content: $t('Cannot toggle dual output in Studio Mode.'),
+      className: styles.toggleError,
+    });
+  }
+
   const DropdownMenu = (
     <div className={cx(styles.dropdownContainer, 'react')}>
       <div className={styles.dropdownItem} onClick={manageCollections} style={{ marginTop: '6px' }}>
@@ -183,7 +191,13 @@ function SceneSelector() {
 
         <Tooltip title={$t('Show horizontal display.')} placement="bottomRight">
           <i
-            onClick={() => v.toggleDisplay(!v.isHorizontal, 'horizontal')}
+            onClick={() => {
+              if (v.studioMode && v.isVertical) {
+                showErrorMessage();
+              } else {
+                v.toggleDisplay(!v.isHorizontal, 'horizontal');
+              }
+            }}
             className={cx('icon-desktop icon-button icon-button--lg', {
               active: v.isHorizontal,
             })}
@@ -192,7 +206,13 @@ function SceneSelector() {
 
         <Tooltip title={$t('Show vertical display.')} placement="bottomRight">
           <i
-            onClick={() => v.toggleDisplay(!v.isVertical, 'vertical')}
+            onClick={() => {
+              if (v.studioMode && v.isHorizontal) {
+                showErrorMessage();
+              } else {
+                v.toggleDisplay(!v.isVertical, 'vertical');
+              }
+            }}
             className={cx('icon-phone-case icon-button icon-button--lg', {
               active: v.isVertical,
             })}
