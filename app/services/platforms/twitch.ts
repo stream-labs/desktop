@@ -192,7 +192,7 @@ export class TwitchService
       if (channelInfo) await this.putChannelInfo(channelInfo);
     }
 
-    this.confirmDualOutput(context);
+    this.setPlatformContext(context);
   }
 
   async validatePlatform() {

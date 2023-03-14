@@ -11,11 +11,10 @@ import { ScenesService, SceneItem, IPartialSettings, IScene } from 'services/sce
 import { TDisplayType, VideoSettingsService } from 'services/settings-v2/video';
 import { StreamingService } from 'services/streaming';
 import { SceneCollectionsService } from 'services/scene-collections';
-import { TPlatform } from 'services/platforms';
+import { getPlatformService, TPlatform } from 'services/platforms';
 import { ReorderNodesCommand, EPlaceType } from 'services/editor-commands/commands/reorder-nodes';
 import { Subject } from 'rxjs';
 import { SettingsManagerService } from 'services/settings-manager';
-
 interface IDualOutputServiceState {
   convertedDefaultDisplay: TDisplayType;
   displays: TDisplayType[];
@@ -170,7 +169,6 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
   @Inject() private scenesService: ScenesService;
   @Inject() private sceneCollectionsService: SceneCollectionsService;
   @Inject() private videoSettingsService: VideoSettingsService;
-  @Inject() private settingsManagerService: SettingsManagerService;
 
   static defaultState: IDualOutputServiceState = {
     convertedDefaultDisplay: 'horizontal',
@@ -385,7 +383,9 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
    * Settings for platforms to displays
    */
 
-  updatePlatformSetting(platform: EDualOutputPlatform | string, display: TDualOutputDisplayType) {
+  updatePlatformSetting(platform: TPlatform, display: TDualOutputDisplayType) {
+    const service = getPlatformService(platform);
+    service.setPlatformContext(display);
     this.UPDATE_PLATFORM_SETTING(platform, display);
   }
 

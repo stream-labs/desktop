@@ -322,7 +322,7 @@ export class YoutubeService
     this.SET_STREAM_ID(stream.id);
     this.SET_STREAM_KEY(streamKey);
 
-    this.confirmDualOutput(context);
+    this.setPlatformContext(context);
   }
 
   /**
