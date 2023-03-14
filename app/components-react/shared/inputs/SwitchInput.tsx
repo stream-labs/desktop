@@ -27,7 +27,7 @@ export const SwitchInput = InputComponent((p: TSwitchInputProps) => {
       <Form.Item
         colon={false}
         aria-label={p.label}
-        className={cx(styles.horizontalSwitchWrapper)}
+        className={styles.horizontalItem}
         style={p.style}
       >
         <Switch
@@ -35,7 +35,7 @@ export const SwitchInput = InputComponent((p: TSwitchInputProps) => {
           size="small"
           {...inputAttrs}
           ref={p.inputRef}
-          className={cx(styles.horizontalSwitch)}
+          className={cx(styles.horizontal)}
         />
         {p.label}
       </Form.Item>
