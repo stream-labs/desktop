@@ -1,7 +1,8 @@
-import { ChildProcess, spawn } from "child_process";
-import { existsSync, readdirSync, readFileSync, unlinkSync } from "fs";
-import { basename, join } from "path";
-import { createInterface } from "readline";
+import * as Sentry from '@sentry/vue';
+import { ChildProcess, spawn } from 'child_process';
+import { existsSync, readdirSync, readFileSync, unlinkSync } from 'fs';
+import { basename, join } from 'path';
+import { createInterface } from 'readline';
 
 export function getNVoicePath(): string {
   // import/require構文を使うとビルド時に展開してしまうが、
@@ -70,24 +71,28 @@ class CommandLineClient {
     this.stdout = this.subprocess.stdout;
     this.stderr = this.subprocess.stderr;
 
-    this.terminateResolve = () => { /* do nothing */ };
-    this.terminateReject = () => { /* do nothing */ };
+    this.terminateResolve = () => {
+      /* do nothing */
+    };
+    this.terminateReject = () => {
+      /* do nothing */
+    };
     this.terminated = new Promise<number>((resolve, reject) => {
       this.terminateResolve = resolve;
       this.terminateReject = reject;
     }).finally(() => {
-      this.terminateCallbacks.forEach((callback) => callback());
+      this.terminateCallbacks.forEach(callback => callback());
     });
   }
 
   /**
-  * register callback to be called on terminated
-  * @returns cancel function
-  */
-  onTerminate(callback: () => void): (() => void) {
+   * register callback to be called on terminated
+   * @returns cancel function
+   */
+  onTerminate(callback: () => void): () => void {
     this.terminateCallbacks.push(callback);
     return () => {
-      this.terminateCallbacks = this.terminateCallbacks.filter((c) => c !== callback);
+      this.terminateCallbacks = this.terminateCallbacks.filter(c => c !== callback);
     };
   }
 
@@ -127,12 +132,12 @@ class CommandLineClient {
       };
       rl.on('line', onLine);
 
-      this.subprocess.on('error', (err) => {
+      this.subprocess.on('error', err => {
         console.log('subprocess.error', err);
         reject(err);
         this.terminateReject(err);
       });
-      this.subprocess.on('close', (code) => {
+      this.subprocess.on('close', code => {
         this.log(`${label} terminated: ${code}`);
         this.terminateResolve(code || -1);
       });
@@ -142,7 +147,7 @@ class CommandLineClient {
   }
 
   async send(line: string): Promise<void> {
-    await new Promise((resolve) => {
+    await new Promise(resolve => {
       this.log(`<- ${line}`);
       this.subprocess.stdin.write(line + '\n', resolve);
     });
@@ -162,11 +167,23 @@ class CommandLineClient {
 
 // API document https://github.com/n-air-app/n-voice-package/tree/main/n-voice/doc
 
-async function StartNVoice(enginePath: string, dictionaryPath: string, userDictionary: string, modelPath: string, extraVoicesPath: string, cwd: string): Promise<CommandLineClient> {
-  const log = ((...args: unknown[]) => { console.log(...args); });
+async function StartNVoice(
+  enginePath: string,
+  dictionaryPath: string,
+  userDictionary: string,
+  modelPath: string,
+  extraVoicesPath: string,
+  cwd: string,
+): Promise<CommandLineClient> {
+  const log = (...args: unknown[]) => {
+    console.log(...args);
+  };
 
   const client = new CommandLineClient(
-    spawn(enginePath, [dictionaryPath, userDictionary, modelPath, extraVoicesPath], { stdio: 'pipe', cwd }),
+    spawn(enginePath, [dictionaryPath, userDictionary, modelPath, extraVoicesPath], {
+      stdio: 'pipe',
+      cwd,
+    }),
     log,
     true, // options.showStdout,
   );
@@ -189,7 +206,7 @@ type Command =
   | 'annotated_talk'
   | 'max_time'
   | 'set_max_time'
-  | 'test'
+  | 'test';
 
 const ErrorCodes: { [code: number]: string } = {
   1: 'invalid argument',
@@ -223,14 +240,26 @@ function loadLabelFile(filename: string): Label[] {
   return result;
 }
 
+class NVoiceEngineError extends Error {
+  constructor(public code: string) {
+    const title = ErrorCodes[code];
+    super(`${code}: ${title}`);
+
+    this.name = new.target.name;
+    Object.setPrototypeOf(this, new.target.prototype);
+  }
+}
+
 const supportedProtocolVersion = '1.0.0';
 export class NVoiceClient {
   private commandLineClient: CommandLineClient | undefined;
 
-  constructor(readonly options: {
-    baseDir: string;
-    onError: (err: Error) => void;
-  }) {
+  constructor(
+    readonly options: {
+      baseDir: string;
+      onError: (err: Error) => void;
+    },
+  ) {
     console.log(`NVoiceClient: baseDir: ${this.options.baseDir}`);
   }
 
@@ -247,13 +276,20 @@ export class NVoiceClient {
       const dictionaryPath = 'open_jtalk_dic_shift_jis-1.11';
       const userDictionary = 'user.dic';
 
-      const models = readdirSync(baseDir).filter(s => /.*\.pt$/.test(s))
+      const models = readdirSync(baseDir).filter(s => /.*\.pt$/.test(s));
       if (models.length !== 1) {
         throw new Error('model file found: ' + models.join(', '));
       }
       const cwd = baseDir;
-      const extraVoicesPath = 'n-voice_extra-voices'
-      const client = await StartNVoice(enginePath, dictionaryPath, userDictionary, models[0], extraVoicesPath, cwd);
+      const extraVoicesPath = 'n-voice_extra-voices';
+      const client = await StartNVoice(
+        enginePath,
+        dictionaryPath,
+        userDictionary,
+        models[0],
+        extraVoicesPath,
+        cwd,
+      );
       let started = false;
       client.waitExit().then(code => {
         if (!started) {
@@ -290,14 +326,12 @@ export class NVoiceClient {
             resolve(rest);
             return true;
 
-          case 'ng':
-            {
-              const code = rest[0];
-              const title = ErrorCodes[code];
-              cancelWatchingTerminate();
-              reject(new Error(`code ${code}: ${title}`));
-              return true;
-            }
+          case 'ng': {
+            const code = rest[0];
+            cancelWatchingTerminate();
+            reject(new NVoiceEngineError(code));
+            return true;
+          }
 
           default:
             return false;
@@ -306,13 +340,49 @@ export class NVoiceClient {
     });
   }
 
-  async _command(command: Command, ...args: string[]): Promise<string[]> {
+  async _command(
+    command: Command,
+    ...args: { label: string; value: string; encoder?: (value: string) => string }[]
+  ): Promise<string[]> {
     await this.startNVoice();
     try {
-      await this.commandLineClient.send([command, ...args].join(' '));
+      Sentry.addBreadcrumb({
+        category: 'n-voice-engine',
+        message: `${command} ${args.map(a => a.value).join(' ')}`,
+      });
+      await this.commandLineClient.send(
+        [
+          command,
+          ...args.map(a => {
+            if (a.encoder) {
+              return a.encoder(a.value);
+            } else {
+              return a.value;
+            }
+          }),
+        ].join(' '),
+      );
       return await this.waitOkNg(this.commandLineClient);
     } catch (err) {
-      throw new Error(`${err}: ${command} ${args.join(' ')}`);
+      Sentry.withScope(scope => {
+        scope.setLevel('error');
+        if (err instanceof NVoiceEngineError) {
+          scope.setTag('NVoiceEngineError.code', err.code);
+          for (const a of args) {
+            scope.setTag(`${command}.${a.label}`, a.value);
+          }
+          switch (err.code) {
+            case '401': // テキスト解析失敗
+              scope.setLevel('warning');
+              break;
+          }
+          scope.setFingerprint([command, 'NVoiceEngineError', err.code]);
+        } else {
+          scope.setFingerprint([command]);
+        }
+        Sentry.captureException(err);
+        throw err;
+      });
     }
   }
 
@@ -321,16 +391,35 @@ export class NVoiceClient {
     return r[0];
   }
 
-  async talk(speed: number, text: string, filename: string): Promise<{ wave: Buffer | null, labels: Label[] }> {
-    const sjis = toShiftJisBase64(text);
-    if (sjis === '') {
+  async talk(
+    speed: number,
+    text: string,
+    filename: string,
+  ): Promise<{ wave: Buffer | null; labels: Label[] }> {
+    if (text === '') {
       // ignore empty text
       return { wave: null, labels: [] };
     }
     try {
-      await this._command('talk', speed.toString(), sjis, toShiftJisBase64(filename));
-    } catch (e) {
-      console.error('talk exception', e);
+      await this._command(
+        'talk',
+        {
+          label: 'speed',
+          value: speed.toString(),
+        },
+        {
+          label: 'text',
+          value: text,
+          encoder: toShiftJisBase64,
+        },
+        {
+          label: 'filename',
+          value: filename,
+          encoder: toShiftJisBase64,
+        },
+      );
+    } catch (err) {
+      // TODO エラー内容によってはユーザーに伝えるか?
       return { wave: null, labels: [] };
     }
 
@@ -348,7 +437,10 @@ export class NVoiceClient {
   }
 
   async set_max_time(seconds: number): Promise<void> {
-    await this._command('set_max_time', seconds.toString());
+    await this._command('set_max_time', {
+      label: 'seconds',
+      value: seconds.toString(),
+    });
   }
 
   loaded(): boolean {

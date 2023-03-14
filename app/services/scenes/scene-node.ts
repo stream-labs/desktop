@@ -13,6 +13,7 @@ import {
   TSceneNode,
 } from './index';
 import { SelectionService } from 'services/selection';
+import { assertIsDefined } from 'util/properties-type-guards';
 
 export function isFolder(node: SceneItemNode): node is SceneItemFolder {
   return node.sceneNodeType === 'folder';
@@ -36,7 +37,9 @@ export abstract class SceneItemNode implements ISceneItemNode {
   @Inject() protected selectionService: SelectionService;
 
   getScene(): Scene {
-    return this.scenesService.getScene(this.sceneId);
+    const scene = this.scenesService.getScene(this.sceneId);
+    assertIsDefined(scene);
+    return scene;
   }
 
   get childrenIds(): string[] {

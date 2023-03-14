@@ -19,6 +19,7 @@ import {
 } from './index';
 import { SceneItemNode } from './scene-node';
 import { TSceneNodeType } from './scenes';
+import { assertIsDefined } from 'util/properties-type-guards';
 /**
  * A SceneItem is a source that contains
  * all of the information about that source, and
@@ -76,6 +77,7 @@ export class SceneItem extends SceneItemNode {
     const sceneItemState = this.scenesService.state.scenes[sceneId].nodes.find(item => {
       return item.id === sceneItemId;
     }) as ISceneItem;
+    assertIsDefined(sceneItemState);
     const sourceState = this.sourcesService.state.sources[sourceId];
     this.state = sceneItemState;
     Utils.applyProxy(this, sourceState);
@@ -87,11 +89,15 @@ export class SceneItem extends SceneItemNode {
   }
 
   getScene(): Scene {
-    return this.scenesService.getScene(this.sceneId);
+    const scene = this.scenesService.getScene(this.sceneId);
+    assertIsDefined(scene);
+    return scene;
   }
 
   get source() {
-    return this.sourcesService.getSource(this.sourceId);
+    const source = this.sourcesService.getSource(this.sourceId);
+    assertIsDefined(source);
+    return source;
   }
 
   getSource() {

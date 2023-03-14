@@ -2,8 +2,9 @@ import * as electron from 'electron';
 import { EStreamingState, ERecordingState } from './streaming-api';
 
 import { createSetupFunction } from 'util/test-setup';
+import { RequestError } from 'util/RequestError';
 
-function noop(..._args: any[]) { }
+function noop(..._args: any[]) {}
 
 jest.mock('services/core/stateful-service');
 jest.mock('services/core/injector');
@@ -44,7 +45,7 @@ const createInjectee = ({
       bitrate: '',
       sampleRate: 48000,
       rateControl: null,
-    }
+    },
   }),
   WarnBeforeStartingStream = false,
   WarnBeforeStoppingStream = false,
@@ -87,8 +88,7 @@ const createInjectee = ({
   WindowsService: {
     showWindow,
   },
-  NicoliveCommentSynthesizerService: {
-  },
+  NicoliveCommentSynthesizerService: {},
   NicoliveProgramService: {
     state: {
       programID: '',
@@ -739,10 +739,7 @@ test('toggleStreamingAsyncでstreamingStatusがoffline、ニコニコにログ�
     injectee: createInjectee({
       isNiconicoLoggedIn: true,
       updateStreamSettings: () => {
-        throw new Response('HTTPError', {
-          statusText: 'Internal Server Error(stub)',
-          status: 500,
-        });
+        throw new RequestError(500, 'updateStreamSettings dummy URL');
       },
     }),
     state: {

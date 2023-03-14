@@ -9,6 +9,7 @@ import { TSceneNodeType } from './scenes';
 
 import { SceneItemNode } from './scene-node';
 import { ISceneItemFolder } from '.';
+import { assertIsDefined } from 'util/properties-type-guards';
 
 @ServiceHelper()
 export class SceneItemFolder extends SceneItemNode {
@@ -28,7 +29,7 @@ export class SceneItemFolder extends SceneItemNode {
     const state = this.scenesService.state.scenes[sceneId].nodes.find(item => {
       return item.id === id;
     });
-
+    assertIsDefined(state);
     Utils.applyProxy(this, state);
     this.state = state as ISceneItemFolder;
   }
@@ -64,7 +65,9 @@ export class SceneItemFolder extends SceneItemNode {
   }
 
   getScene(): Scene {
-    return this.scenesService.getScene(this.sceneId);
+    const scene = this.scenesService.getScene(this.sceneId);
+    assertIsDefined(scene);
+    return scene;
   }
 
   /**

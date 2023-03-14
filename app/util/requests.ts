@@ -1,6 +1,7 @@
 // Helper methods for making HTTP requests
 
 import fs from 'fs';
+import { RequestError } from './RequestError';
 
 /**
  * Passing this function as your first "then" handler when making
@@ -11,7 +12,7 @@ import fs from 'fs';
  */
 export function handleErrors(response: Response): Promise<Response> {
   if (response.ok) return Promise.resolve(response);
-  return Promise.reject(response);
+  return Promise.reject(new RequestError(response.status, response.url));
 }
 
 export function requiresToken() {
@@ -20,7 +21,7 @@ export function requiresToken() {
     return {
       ...descriptor,
       value(...args: any[]) {
-        return original.apply(target.constructor.instance, args).catch((error: Response) => {
+        return original.apply(target.constructor.instance, args).catch((error: RequestError) => {
           if (error.status === 401) {
             return target.fetchNewToken().then(() => {
               return original.apply(target.constructor.instance, args);

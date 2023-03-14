@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/vue';
 import electron from 'electron';
 import { AppService } from 'services/app';
 import { CompactModeService } from 'services/compact-mode';
@@ -98,6 +99,13 @@ export default class Main extends Vue {
 
   onDropHandler(event: DragEvent) {
     const files = event.dataTransfer.files;
+    if (!this.scenesService.activeScene) {
+      Sentry.captureMessage(
+        'Attempted to add files to a scene when no scene was active',
+        'warning',
+      );
+      return;
+    }
 
     let fi = files.length;
     while (fi--) {

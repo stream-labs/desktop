@@ -19,6 +19,7 @@ import { uniqBy } from 'lodash';
 import { TSceneNodeInfo } from 'services/scene-collections/nodes/scene-items';
 import * as fs from 'fs';
 import uuid from 'uuid/v4';
+import { assertIsDefined } from 'util/properties-type-guards';
 
 export type TSceneNode = SceneItem | SceneItemFolder;
 
@@ -42,7 +43,9 @@ export class Scene {
   private readonly state: IScene;
 
   constructor(sceneId: string) {
+    if (!sceneId) console.trace('undefined sceneId');
     this.state = this.scenesService.state.scenes[sceneId];
+    assertIsDefined(this.state);
     Utils.applyProxy(this, this.state);
   }
 
@@ -317,7 +320,9 @@ export class Scene {
     if (newDestNode) {
       this.placeAfter(sourceNodeId, newDestNode.id);
     } else if (destNode.parentId) {
-      this.getNode(sourceNodeId).setParent(destNode.parentId); // place to the top of folder
+      const sourceNode = this.getNode(sourceNodeId);
+      assertIsDefined(sourceNode);
+      sourceNode.setParent(destNode.parentId); // place to the top of folder
     } else {
       this.placeAfter(sourceNodeId); // place to the top of scene
     }
@@ -447,7 +452,10 @@ export class Scene {
    * returns the source linked to scene
    */
   getSource(): Source {
-    return this.sourcesService.getSource(this.id);
+    // scene must always have a linked source
+    const source = this.sourcesService.getSource(this.id);
+    assertIsDefined(source);
+    return source;
   }
 
   getResourceId() {
