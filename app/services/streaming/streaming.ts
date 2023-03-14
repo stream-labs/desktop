@@ -68,7 +68,7 @@ interface IOBSOutputSignalInfo {
   signal: EOBSOutputSignal;
   code: obs.EOutputCode;
   error: string;
-  service: string;
+  service: string; // 'default' | 'vertical'
 }
 
 export class StreamingService
@@ -281,7 +281,7 @@ export class StreamingService
         const settingsForPlatform = platform === 'twitch' && unattendedMode ? undefined : settings;
 
         if (!settingsForPlatform) {
-          service.confirmDualOutput(this.views.getPlatformContext(platform));
+          service.setPlatformContext(this.views.getPlatformContext(platform));
         }
 
         const context = this.views.getPlatformDisplay(platform);
@@ -355,10 +355,16 @@ export class StreamingService
             await this.runCheck('setupDualOutput', async () => {
               // enable restream on the backend side
               if (!this.restreamService.state.enabled) await this.restreamService.setEnabled(true);
+
+              console.log('displayPlatforms[display] ', displayPlatforms[display]);
+              console.log('display ', display);
+
+              const mode: TOutputOrientation = display === 'horizontal' ? 'landscape' : 'portrait';
+              console.log('mode ', mode);
               await this.restreamService.beforeDualOutputGoLive(
                 displayPlatforms[display],
                 display as TDisplayType,
-                display as TOutputOrientation,
+                mode,
               );
             });
           } catch (e: unknown) {
@@ -373,23 +379,25 @@ export class StreamingService
           if (displayPlatforms[display].length === 1) {
             const platform = displayPlatforms[display][0];
             const service = getPlatformService(platform);
+            console.log('SINGLE DUAL OUTPUT');
             console.log('display ', display);
             console.log('platform ', platform);
             console.log('service ', service);
 
-            try {
-              // don't update settings for twitch in unattendedMode
-              const settingsForPlatform =
-                platform === 'twitch' && unattendedMode ? undefined : settings;
+            // try {
+            //   // don't update settings for twitch in unattendedMode
+            //   const settingsForPlatform =
+            //     platform === 'twitch' && unattendedMode ? undefined : settings;
 
-              const context = this.views.getPlatformDisplay(platform);
-              console.log('platform ', platform, 'settings ', settingsForPlatform);
-              await this.runCheck('setupDualOutput', async () =>
-                service.beforeGoLive(settings, context),
-              );
-            } catch (e: unknown) {
-              this.handleSetupPlatformError(e, platform);
-            }
+            //   const context = this.views.getPlatformDisplay(platform);
+            //   console.log('context ', context);
+            //   console.log('platform ', platform, 'settings ', settings);
+            //   await this.runCheck('setupDualOutput', async () =>
+            //     service.beforeGoLive(settingsForPlatform, context),
+            //   );
+            // } catch (e: unknown) {
+            //   this.handleSetupPlatformError(e, platform);
+            // }
           }
 
           const settingsAll = this.settingsService.views.all;
@@ -494,7 +502,7 @@ export class StreamingService
   //     await this.runCheck(platform, () => {
   //       service.beforeGoLive(settingsForPlatform, platformContext);
   //       if (this.views.isDualOutputMode || platformContext === 'vertical') {
-  //         service.confirmDualOutput(platform);
+  //         service.setPlatformContext(platform);
   //       }
   //       return Promise.resolve();
   //     });
@@ -763,7 +771,7 @@ export class StreamingService
     if (this.views.isDualOutputMode) {
       // @@@ TODO add check for multiple platforms active. If not, don't start second stream
 
-      const settingsAll = this.settingsService.views.all;
+      const settingsAll = this.settingsService.views.values;
       console.log('just before starting streams ', settingsAll);
 
       if (this.views.enabledPlatforms.length > 1 && this.views.contextsToStream.length > 1) {
@@ -776,26 +784,28 @@ export class StreamingService
         obs.NodeObs.OBS_service_setVideoInfo(horizontalContext, 'horizontal');
         obs.NodeObs.OBS_service_setVideoInfo(verticalContext, 'vertical');
 
-        this.signalInfoChanged.subscribe((signalInfo: IOBSOutputSignalInfo) => {
-          if (signalInfo.code !== 0) {
-            console.log('error code ', signalInfo.code);
-            obs.NodeObs.OBS_service_stopStreaming(true, 'horizontal');
-            obs.NodeObs.OBS_service_stopStreaming(true, 'vertical');
-          }
+        const signalChanged = this.signalInfoChanged.subscribe(
+          (signalInfo: IOBSOutputSignalInfo) => {
+            if (signalInfo.service === 'default') {
+              if (signalInfo.code !== 0) {
+                console.log('error code ', signalInfo.code);
+                obs.NodeObs.OBS_service_stopStreaming(true, 'horizontal');
+                obs.NodeObs.OBS_service_stopStreaming(true, 'vertical');
+              }
 
-          if (signalInfo.signal === EOBSOutputSignal.Start) {
-            obs.NodeObs.OBS_service_startStreaming('vertical');
-            console.log('LIVE');
-          }
-        });
+              if (signalInfo.signal === EOBSOutputSignal.Start) {
+                obs.NodeObs.OBS_service_startStreaming('vertical');
+                console.log('LIVE');
+                signalChanged.unsubscribe();
+                console.log('UNSUBSCRIBE LIVE');
+              }
+            }
+          },
+        );
 
         obs.NodeObs.OBS_service_startStreaming('horizontal');
-        // sleep for 1 second to allow the first stream to stop
+        // sleep for 1 second to allow the first stream to start
         await new Promise(resolve => setTimeout(resolve, 1000));
-
-        console.log('UNSUBSCRIBE LIVE');
-
-        this.signalInfoChanged.complete();
       } else {
         const platform = this.views.enabledPlatforms[0];
         const display = this.views.getPlatformDisplay(platform);
@@ -878,27 +888,23 @@ export class StreamingService
       }
 
       if (this.views.contextsToStream.length > 1) {
-        console.log('1a contextsToStream ', this.views.contextsToStream);
-        this.streamingStatusChange.subscribe((streamInfo: EStreamingState) => {
-          if (streamInfo === EStreamingState.Offline) {
-            obs.NodeObs.OBS_service_stopStreaming(false, 'vertical');
-            console.log('STOPPED 1');
-          }
-        });
+        const signalChanged = this.signalInfoChanged.subscribe(
+          (signalInfo: IOBSOutputSignalInfo) => {
+            if (
+              signalInfo.service === 'default' &&
+              signalInfo.signal === EOBSOutputSignal.Deactivate
+            ) {
+              obs.NodeObs.OBS_service_stopStreaming(false, 'vertical');
+              signalChanged.unsubscribe();
+            }
+          },
+        );
 
         obs.NodeObs.OBS_service_stopStreaming(false, 'horizontal');
         // sleep for 1 second to allow the first stream to stop
         await new Promise(resolve => setTimeout(resolve, 1000));
-
-        console.log('UNSUBSCRIBE STOP 1');
-        this.streamingStatusChange.complete();
-
-        // current safeguard
       } else {
-        console.log('1 contextsToStream ', this.views.contextsToStream);
         const contextName = this.views.contextsToStream[0];
-        console.log('stopping 1 ', contextName);
-
         obs.NodeObs.OBS_service_stopStreaming(false, contextName);
       }
 
@@ -925,12 +931,8 @@ export class StreamingService
       if (this.views.contextsToStream.length > 1) {
         obs.NodeObs.OBS_service_stopStreaming(true, 'horizontal');
         obs.NodeObs.OBS_service_stopStreaming(true, 'vertical');
-        console.log('2a contextsToStream ', this.views.contextsToStream);
       } else {
-        console.log('2 contextsToStream ', this.views.contextsToStream);
         const contextName = this.views.contextsToStream[0];
-
-        console.log('stopping 2 ', contextName);
         obs.NodeObs.OBS_service_stopStreaming(true, contextName);
       }
       return Promise.resolve();
@@ -1921,7 +1923,7 @@ export class StreamingService
 //       await this.runCheck(platform, () => {
 //         service.beforeGoLive(settingsForPlatform, platformContext);
 //         if (this.views.isDualOutputMode || platformContext === 'vertical') {
-//           service.confirmDualOutput(platform);
+//           service.setPlatformContext(platform);
 //         }
 //         return Promise.resolve();
 //       });
@@ -1968,7 +1970,7 @@ export class StreamingService
 //     // setup restream
 //     platforms.forEach((platform: TPlatform) => {
 //       const service = getPlatformService(platform);
-//       service.confirmDualOutput(platform);
+//       service.setPlatformContext(platform);
 //     });
 
 //     return await this.restreamService.beforeDualOutputGoLive(platforms, display);
@@ -1978,12 +1980,12 @@ export class StreamingService
 //     console.log('setup stream');
 //     const service = getPlatformService(platform);
 //     console.log('service ', service);
-//     service.confirmDualOutput(platform);
+//     service.setPlatformContext(platform);
 
 //     if (display === 'horizontal') {
 //       console.log('context horizontal');
 
-//       service.confirmDualOutput(platform);
+//       service.setPlatformContext(platform);
 //     } else {
 //       console.log('context vertical');
 //       console.log('this.views.savedSettings ', this.views.savedSettings);
