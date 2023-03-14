@@ -1,4 +1,10 @@
-const { parseVersion, getVersionContext, validateVersionContext, generateNewVersion } = require('./patchNote');
+const {
+  parseVersion,
+  getVersionContext,
+  validateVersionContext,
+  generateNewVersion,
+  generateNotesTsContent,
+} = require('./patchNote');
 
 const fixtures = {
   public: {
@@ -153,43 +159,56 @@ test('ふたつのVersionContextが同じか否か判定できる', () => {
 });
 
 test('次のバージョンを生成する(当日、publicでstable)', () => {
-  expect(generateNewVersion({ previousVersion: fixtures.public.stable, now: TODAY })).toMatchInlineSnapshot(
-    `"1.0.20190826-3"`
-  );
+  expect(
+    generateNewVersion({ previousVersion: fixtures.public.stable, now: TODAY }),
+  ).toMatchInlineSnapshot(`"1.0.20190826-3"`);
 });
 test('次のバージョンを生成する(当日、publicでunstable)', () => {
-  expect(generateNewVersion({ previousVersion: fixtures.public.unstable, now: TODAY })).toMatchInlineSnapshot(
-    `"1.0.20190826-unstable.3"`
-  );
+  expect(
+    generateNewVersion({ previousVersion: fixtures.public.unstable, now: TODAY }),
+  ).toMatchInlineSnapshot(`"1.0.20190826-unstable.3"`);
 });
 test('次のバージョンを生成する(当日、internalでstable)', () => {
-  expect(generateNewVersion({ previousVersion: fixtures.internal.stable, now: TODAY })).toMatchInlineSnapshot(
-    `"1.0.20190826-3d"`
-  );
+  expect(
+    generateNewVersion({ previousVersion: fixtures.internal.stable, now: TODAY }),
+  ).toMatchInlineSnapshot(`"1.0.20190826-3d"`);
 });
 test('次のバージョンを生成する(当日、internalでunstable)', () => {
-  expect(generateNewVersion({ previousVersion: fixtures.internal.unstable, now: TODAY })).toMatchInlineSnapshot(
-    `"1.0.20190826-unstable.3d"`
-  );
+  expect(
+    generateNewVersion({ previousVersion: fixtures.internal.unstable, now: TODAY }),
+  ).toMatchInlineSnapshot(`"1.0.20190826-unstable.3d"`);
 });
 
 test('次のバージョンを生成する(別日、publicでstable)', () => {
-  expect(generateNewVersion({ previousVersion: fixtures.public.stable, now: TOMORROW })).toMatchInlineSnapshot(
-    `"1.0.20190827-1"`
-  );
+  expect(
+    generateNewVersion({ previousVersion: fixtures.public.stable, now: TOMORROW }),
+  ).toMatchInlineSnapshot(`"1.0.20190827-1"`);
 });
 test('次のバージョンを生成する(別日、publicでunstable)', () => {
-  expect(generateNewVersion({ previousVersion: fixtures.public.unstable, now: TOMORROW })).toMatchInlineSnapshot(
-    `"1.0.20190827-unstable.1"`
-  );
+  expect(
+    generateNewVersion({ previousVersion: fixtures.public.unstable, now: TOMORROW }),
+  ).toMatchInlineSnapshot(`"1.0.20190827-unstable.1"`);
 });
 test('次のバージョンを生成する(別日、internalでstable)', () => {
-  expect(generateNewVersion({ previousVersion: fixtures.internal.stable, now: TOMORROW })).toMatchInlineSnapshot(
-    `"1.0.20190827-1d"`
-  );
+  expect(
+    generateNewVersion({ previousVersion: fixtures.internal.stable, now: TOMORROW }),
+  ).toMatchInlineSnapshot(`"1.0.20190827-1d"`);
 });
 test('次のバージョンを生成する(別日、internalでunstable)', () => {
-  expect(generateNewVersion({ previousVersion: fixtures.internal.unstable, now: TOMORROW })).toMatchInlineSnapshot(
-    `"1.0.20190827-unstable.1d"`
-  );
+  expect(
+    generateNewVersion({ previousVersion: fixtures.internal.unstable, now: TOMORROW }),
+  ).toMatchInlineSnapshot(`"1.0.20190827-unstable.1d"`);
+});
+
+test('patch-noteに引用符があったらエスケープされる', () => {
+  expect(generateNotesTsContent('version', 'title', 'a"b"c')).toBe(`import { IPatchNotes } from '.';
+
+export const notes: IPatchNotes = {
+  version: 'version',
+  title: 'title',
+  notes: [
+    "a\\"b\\"c",
+  ]
+};
+`);
 });

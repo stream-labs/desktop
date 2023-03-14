@@ -2,16 +2,13 @@
 
 const fs = require('fs');
 const moment = require('moment');
-const {
-  info,
-  error,
-  executeCmd,
-} = require('./prompt');
+const { info, error, executeCmd } = require('./prompt');
 const { getTagCommitId } = require('./util');
 
 // previous tag should be following rule:
 //  v{major}.{minor}.{yyyymmdd}-[{channel}.]{ord}[internalMark]
-const VERSION_REGEXP = /(?<major>\d+)\.(?<minor>\d+)\.(?<date>\d{8})-((?<channel>\w+)\.)?(?<ord>\d+)(?<internalMark>d)?/;
+const VERSION_REGEXP =
+  /(?<major>\d+)\.(?<minor>\d+)\.(?<date>\d{8})-((?<channel>\w+)\.)?(?<ord>\d+)(?<internalMark>d)?/;
 
 function parseVersion(tag) {
   const result = VERSION_REGEXP.exec(tag);
@@ -52,28 +49,16 @@ function isSameVersionContext(a, b) {
   return a.channel === b.channel && a.environment === b.environment;
 }
 
-function validateVersionContext({
-  versionTag,
-  releaseEnvironment,
-  releaseChannel,
-}) {
+function validateVersionContext({ versionTag, releaseEnvironment, releaseChannel }) {
   const { channel, environment } = getVersionContext(versionTag);
 
-  if (
-    releaseChannel !== channel
-    || releaseEnvironment !== environment
-  ) {
+  if (releaseChannel !== channel || releaseEnvironment !== environment) {
     throw new Error('invalid version context');
   }
 }
 
-function generateNewVersion({
-  previousVersion,
-  now = Date.now(),
-}) {
-  const {
-    major, minor, date, channel, ord, internalMark
-  } = parseVersion(previousVersion);
+function generateNewVersion({ previousVersion, now = Date.now() }) {
+  const { major, minor, date, channel, ord, internalMark } = parseVersion(previousVersion);
 
   const today = moment(now).format('YYYYMMDD');
   const newOrd = date === today ? parseInt(ord, 10) + 1 : 1;
@@ -112,7 +97,7 @@ function gitLog(previousVersion) {
   return executeCmd(`git log --oneline --merges v${previousVersion}..`, { silent: true }).stdout;
 }
 
-async function collectPullRequestMerges({ octokit, owner, repo }, previousVersion, { addAuthor } ) {
+async function collectPullRequestMerges({ octokit, owner, repo }, previousVersion, { addAuthor }) {
   const merges = gitLog(previousVersion);
 
   const promises = [];
@@ -126,7 +111,7 @@ async function collectPullRequestMerges({ octokit, owner, repo }, previousVersio
       octokit.pullRequests.get({ owner, repo, pull_number: pullNumber }).catch(e => {
         info(e);
         return { data: {} };
-      })
+      }),
     );
   }
 
@@ -182,10 +167,10 @@ export const notes: IPatchNotes = {
   title: '${title}',
   notes: [
 ${notes
-      .trim()
-      .split('\n')
-      .map(s => `    '${s}',`)
-      .join('\n')}
+  .trim()
+  .split('\n')
+  .map(s => `    ${JSON.stringify(s)},`)
+  .join('\n')}
   ]
 };
 `;
@@ -193,12 +178,7 @@ ${notes
   return patchNote;
 }
 
-function updateNotesTs({
-  title,
-  version,
-  notes,
-  filePath
-}) {
+function updateNotesTs({ title, version, notes, filePath }) {
   const generatedPatchNote = generateNotesTsContent(title, version, notes);
 
   fs.writeFileSync(filePath, generatedPatchNote);
@@ -209,9 +189,7 @@ function updateNotesTs({
  * @param {string} param0.patchNoteFileName
  * @returns {{version: string, notes: string}}
  */
-function readPatchNote({
-  patchNoteFileName,
-}) {
+function readPatchNote({ patchNoteFileName }) {
   const patchNote = readPatchNoteFile(patchNoteFileName);
 
   if (!patchNote) {
@@ -241,4 +219,5 @@ module.exports = {
   collectPullRequestMerges,
   updateNotesTs,
   readPatchNote,
+  generateNotesTsContent,
 };
