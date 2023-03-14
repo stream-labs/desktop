@@ -14,9 +14,13 @@ class ObsBitMaskInput extends ObsInput<IObsBitmaskInput> {
 
   mounted() {
     this.updateFlags();
+    // workaround: avoid using @Watch decorator, use $watch instead
+    // see:
+    //   https://github.com/kaorun343/vue-property-decorator/issues/247,
+    //   https://github.com/kaorun343/vue-property-decorator/issues/228
+    this.$watch('value', this.updateFlags);
   }
 
-  @Watch('value')
   updateFlags() {
     this.flags = Utils.numberToBinnaryArray(this.value.value, this.value.size).reverse();
   }
