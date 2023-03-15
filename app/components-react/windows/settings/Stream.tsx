@@ -22,6 +22,15 @@ import { useVuex } from 'components-react/hooks';
 import Translate from 'components-react/shared/Translate';
 import * as remote from '@electron/remote';
 
+function censorWord(str: string) {
+  return str[0] + '*'.repeat(str.length - 2) + str.slice(-1);
+}
+
+function censorEmail(str: string) {
+  const parts = str.split('@');
+  return censorWord(parts[0]) + '@' + censorWord(parts[1]);
+}
+
 /**
  * A Redux module for components in the StreamSetting window
  */
@@ -317,7 +326,7 @@ function SLIDBlock() {
           {hasSLID ? (
             <div>
               Streamlabs <br />
-              <b>{username}</b>
+              {username && <b>{censorEmail(username)}</b>}
             </div>
           ) : (
             <Translate message={$t('slidConnectMessage')} />
