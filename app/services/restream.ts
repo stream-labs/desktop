@@ -100,6 +100,10 @@ export class RestreamService extends StatefulService<IRestreamState> {
     return this.hostsService.streamlabs;
   }
 
+  get url() {
+    return this.videoSettingsService.contexts.vertical ? 'beta.streamlabs.com' : this.host;
+  }
+
   get chatUrl() {
     const hasFBTarget = this.streamInfo.enabledPlatforms.includes('facebook');
     let fbParams = '';
@@ -187,8 +191,8 @@ export class RestreamService extends StatefulService<IRestreamState> {
     return jfetch(request);
   }
 
-  async beforeGoLive() {
-    await Promise.all([this.setupIngest(), this.setupTargets()]);
+  async beforeGoLive(context?: TDisplayType) {
+    await Promise.all([this.setupIngest(context), this.setupTargets()]);
   }
 
   async beforeDualOutputGoLive(
@@ -202,18 +206,24 @@ export class RestreamService extends StatefulService<IRestreamState> {
     ]);
   }
 
-  async setupIngest() {
+  async setupIngest(context?: TDisplayType) {
     const ingest = (await this.fetchIngest()).server;
 
     // We need to move OBS to custom ingest mode before we can set the server
-    this.streamSettingsService.setSettings({
-      streamType: 'rtmp_custom',
-    });
+    this.streamSettingsService.setSettings(
+      {
+        streamType: 'rtmp_custom',
+      },
+      context,
+    );
 
-    this.streamSettingsService.setSettings({
-      key: this.settings.streamKey,
-      server: ingest,
-    });
+    this.streamSettingsService.setSettings(
+      {
+        key: this.settings.streamKey,
+        server: ingest,
+      },
+      context,
+    );
   }
 
   async setupDualOutputIngest(context: TDisplayType, mode?: TOutputOrientation) {

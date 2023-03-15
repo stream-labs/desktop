@@ -384,8 +384,8 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
    */
 
   updatePlatformSetting(platform: TPlatform, display: TDualOutputDisplayType) {
-    const service = getPlatformService(platform);
-    service.setPlatformContext(display);
+    // const service = getPlatformService(platform);
+    // service.setPlatformContext(display);
     this.UPDATE_PLATFORM_SETTING(platform, display);
   }
 

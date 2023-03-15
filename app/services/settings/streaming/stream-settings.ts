@@ -151,7 +151,7 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
     let streamFormData = cloneDeep(this.views.obsStreamSettings);
 
     streamFormData.forEach(subCategory => {
-      console.log('subCategory ', subCategory);
+      // console.log('subCategory ', subCategory);
       subCategory.parameters.forEach(parameter => {
         if (parameter.name === 'streamType' && patch.streamType !== void 0) {
           parameter.value = patch.streamType;
@@ -159,7 +159,7 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
           // we should immediately save the streamType in OBS if it's changed
           // otherwise OBS will not save 'key' and 'server' values
 
-          console.log('set in first setSettings loop');
+          // console.log('set in first setSettings loop');
 
           this.settingsService.setSettings(streamName, streamFormData);
         }
@@ -170,7 +170,7 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
     const mustUpdateObsSettings = Object.keys(patch).find(key =>
       ['platform', 'key', 'server'].includes(key),
     );
-    console.log('mustUpdateObsSettings ', mustUpdateObsSettings);
+    // console.log('mustUpdateObsSettings ', mustUpdateObsSettings);
     // if (!mustUpdateObsSettings || streamName === 'StreamSecond') return;
     // streamFormData = cloneDeep(this.views.obsStreamSettings);
 
@@ -194,7 +194,7 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
       });
     });
 
-    console.log('updating service streamFormData ', streamFormData);
+    // console.log('updating service streamFormData ', streamFormData);
     this.settingsService.setSettings(streamName, streamFormData);
   }
 

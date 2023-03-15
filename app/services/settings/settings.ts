@@ -501,8 +501,8 @@ export class SettingsService extends StatefulService<ISettingsServiceState> {
       }
     }
 
-    console.log('----> SETTINGS categoryName ', categoryName);
-    console.log('----> dataToSave ', dataToSave);
+    // console.log('----> SETTINGS categoryName ', categoryName);
+    // console.log('----> dataToSave ', dataToSave);
 
     obs.NodeObs.OBS_settings_saveSettings(categoryName, dataToSave);
     this.loadSettingsIntoStore();
