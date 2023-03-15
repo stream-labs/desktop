@@ -26,6 +26,7 @@ function SceneSelector() {
     ProjectorService,
     EditorCommandsService,
     SettingsManagerService,
+    StreamingService,
   } = Services;
 
   const v = useVuex(() => ({
@@ -33,6 +34,7 @@ function SceneSelector() {
     isVertical: SettingsManagerService.views.activeDisplays.vertical,
     toggleDisplay: SettingsManagerService.actions.toggleDisplay,
     studioMode: TransitionsService.views.studioMode,
+    isMidStreamMode: StreamingService.views.isMidStreamMode,
   }));
 
   const { treeSort } = useTree(true);
@@ -131,9 +133,16 @@ function SceneSelector() {
     setShowDropdown(false);
   }
 
-  function showErrorMessage() {
+  function showStudioModeErrorMessage() {
     message.error({
       content: $t('Cannot toggle dual output in Studio Mode.'),
+      className: styles.toggleError,
+    });
+  }
+
+  function showToggleDisplayErrorMessage() {
+    message.error({
+      content: $t('Cannot change displays while live.'),
       className: styles.toggleError,
     });
   }
@@ -192,8 +201,10 @@ function SceneSelector() {
         <Tooltip title={$t('Show horizontal display.')} placement="bottomRight">
           <i
             onClick={() => {
-              if (v.studioMode && v.isVertical) {
-                showErrorMessage();
+              if (v.isMidStreamMode) {
+                showToggleDisplayErrorMessage();
+              } else if (v.studioMode && v.isVertical) {
+                showStudioModeErrorMessage();
               } else {
                 v.toggleDisplay(!v.isHorizontal, 'horizontal');
               }
@@ -207,8 +218,10 @@ function SceneSelector() {
         <Tooltip title={$t('Show vertical display.')} placement="bottomRight">
           <i
             onClick={() => {
-              if (v.studioMode && v.isHorizontal) {
-                showErrorMessage();
+              if (v.isMidStreamMode) {
+                showToggleDisplayErrorMessage();
+              } else if (v.studioMode && v.isHorizontal) {
+                showStudioModeErrorMessage();
               } else {
                 v.toggleDisplay(!v.isVertical, 'vertical');
               }
