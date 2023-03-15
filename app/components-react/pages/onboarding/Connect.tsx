@@ -201,7 +201,7 @@ export class LoginModule {
     const result = await this.UserService.finishSLAuth(primaryPlatform);
 
     if (result === EPlatformCallResult.TwitchScopeMissing) {
-      await remote.dialog.showMessageBox({
+      await remote.dialog.showMessageBox(remote.getCurrentWindow(), {
         type: 'warning',
         message: $t(
           'Streamlabs requires additional permissions from your Twitch account. Please log in with Twitch to continue.',
