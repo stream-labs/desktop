@@ -14,7 +14,7 @@ export function DualOutputSourceSelector(p: { nodeId: string }) {
   const horizontalNodeId = p.nodeId;
 
   const v = useVuex(() => ({
-    showDualOutputDisplays: DualOutputService.views.showDualOutputDisplays,
+    showDualOutputDisplays: DualOutputService.views.dualOutputMode,
     verticalNodeId: DualOutputService.views.getDisplayNodeId(p.nodeId),
     isHorizontalVisible: ScenesService.views.getNodeVisibility(p.nodeId),
     isVerticalVisible: DualOutputService.views.getDisplayNodeVisibility(p.nodeId, 'vertical'),

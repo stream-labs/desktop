@@ -341,7 +341,7 @@ export class SourceSelectorModule {
   }
 
   get isDualOutputActive() {
-    return this.dualOutputService.views.showDualOutputDisplays;
+    return this.dualOutputService.views.dualOutputMode;
   }
 
   watchSelected = injectWatch(() => this.lastSelectedId, this.expandSelectedFolders);
