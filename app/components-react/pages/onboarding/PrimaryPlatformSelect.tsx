@@ -52,6 +52,13 @@ export function PrimaryPlatformSelect() {
 
   // There's probably a better way to do this
   useEffect(() => {
+    // If user has exactly one streaming platform linked, we can proceed straight
+    // to a logged in state.
+    if (UserService.views.linkedPlatforms.length === 1) {
+      selectPrimary(UserService.views.linkedPlatforms[0]);
+      return;
+    }
+
     if (linkedPlatforms.length) {
       setSelectedPlatform(linkedPlatforms[0]);
     }
@@ -86,10 +93,10 @@ export function PrimaryPlatformSelect() {
     }
   }
 
-  async function selectPrimary() {
-    if (!selectedPlatform) return;
+  async function selectPrimary(primary?: TPlatform) {
+    if (!selectedPlatform && !primary) return;
 
-    await finishSLAuth(selectedPlatform as TPlatform);
+    await finishSLAuth(primary ?? (selectedPlatform as TPlatform));
     if (isLogin) OnboardingService.actions.finish();
   }
 
@@ -114,7 +121,7 @@ export function PrimaryPlatformSelect() {
             />
           </Form>
           <div style={{ width: 400, marginTop: 30, textAlign: 'center' }}>
-            <Button type="primary" disabled={loading} onClick={selectPrimary}>
+            <Button type="primary" disabled={loading} onClick={() => selectPrimary()}>
               {loading && <i className="fas fa-spinner fa-spin" />}
               {$t('Continue')}
             </Button>
