@@ -909,16 +909,21 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     }
 
     if (validatePlatformResult === EPlatformCallResult.TwitchScopeMissing) {
-      this.reauthenticate(true, {
-        type: 'warning',
-        title: 'Twitch Error',
-        message: $t(
-          $t(
-            'Streamlabs requires additional permissions from your Twitch account. Please log in with Twitch to continue.',
+      // If this is an SLID login, then we'll handle the merge in the LoginModule
+      // Btw - have kind of mixed responsibilities here between the LoginModule and
+      // the user service login method.  Should clean up at some point.
+      if (!this.views.auth.slid) {
+        this.reauthenticate(true, {
+          type: 'warning',
+          title: 'Twitch Error',
+          message: $t(
+            $t(
+              'Streamlabs requires additional permissions from your Twitch account. Please log in with Twitch to continue.',
+            ),
           ),
-        ),
-        buttons: [$t('Refresh Login')],
-      });
+          buttons: [$t('Refresh Login')],
+        });
+      }
 
       return validatePlatformResult;
     }
@@ -978,12 +983,6 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
 
     // Find out if the user has any additional platforms linked
     await this.updateLinkedPlatforms();
-
-    // If user has exactly one streaming platform linked, we can proceed straight
-    // to a logged in state.
-    if (this.views.linkedPlatforms.length === 1) {
-      await this.finishSLAuth(this.views.linkedPlatforms[0]);
-    }
   }
 
   /**
@@ -1014,8 +1013,10 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     const service = getPlatformService(primaryPlatform);
 
     this.SET_AUTH_STATE(EAuthProcessState.Loading);
-    await this.login(service);
+    const result = await this.login(service);
     this.SET_AUTH_STATE(EAuthProcessState.Idle);
+
+    return result;
   }
 
   async startSLMerge(): Promise<EPlatformCallResult> {
