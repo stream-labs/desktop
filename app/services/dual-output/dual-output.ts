@@ -44,22 +44,12 @@ class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
     return Object.values(this.state.platformSettings);
   }
 
-  get hasDualOutputScenes() {
-    if (!this.state.nodeMaps) return false;
-    for (const display in this.state.nodeMaps) {
-      if (!this.state.nodeMaps.hasOwnProperty(display)) {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  get showDualOutputDisplays() {
-    return this.dualOutputMode && this.hasDualOutputScenes;
-  }
-
   get dualOutputNodeIds() {
     return this.getNodeIds(['vertical']);
+  }
+
+  get hasVerticalContext(): boolean {
+    return !!this.videoSettingsService.contexts.vertical;
   }
 
   get hasVerticalNodes() {

@@ -300,18 +300,34 @@ export class StreamingService
     // show the GoLive checklist
     this.UPDATE_STREAM_INFO({ lifecycle: 'runChecklist' });
 
-    // update channel settings for each platform
+    // all platforms to stream
     const platforms = this.views.enabledPlatforms;
 
-    // assign platform settings
+    /**
+     * SET PLATFORM STREAM SETTINGS
+     */
 
-    for (const platform of platforms) {
-      await this.handleSetupPlatform(platform, settings, this.views.hasVerticalContext);
+    if (this.views.hasVerticalContext) {
+      // if the vertical context has been established
+      // the scene nodes will only show in the stream if the platform
+      // has been assigned a context
+
+      for (const platform of platforms) {
+        console.log(' * HAS VERTICAL CONTEXT ', platform);
+        await this.setPlatformSettings(platform, settings, unattendedMode, true);
+      }
+    } else {
+      // setup default single stream
+      for (const platform of platforms) {
+        console.log(' * NO VERTICAL CONTEXT ', platform);
+        await this.setPlatformSettings(platform, settings, unattendedMode, false);
+      }
     }
 
-    // setup restream
-    if (this.views.isMultiplatformMode) {
-      console.log('**** MULTIPLATFORM **** ');
+    if (this.views.isMultiplatformMode && this.views.contextsToStream.length < 2) {
+      // setup restream
+      console.log(' * SINGLE OUTPUT MULTISTREAM');
+
       // check the Restream service is available
       let ready = false;
       try {
@@ -350,15 +366,13 @@ export class StreamingService
         try {
           await this.runCheck('setupDualOutput', async () => await Promise.resolve());
         } catch (e: unknown) {
-          console.error('Failed to setup restream', e);
+          console.error('Failed to setup dual output', e);
           this.setError('DUAL_OUTPUT_SETUP_FAILED');
           return;
         }
       }
-    }
-
-    // setup dual output
-    if (this.views.hasVerticalContext && this.views.contextsToStream.length > 1) {
+    } else {
+      // setup dual output mode
       console.log('**** DUALOUTPUT **** ');
       const displayPlatforms = this.views.activeDisplayPlatforms;
 
@@ -368,7 +382,7 @@ export class StreamingService
           console.log(
             '    * RESTREAM displayPlatforms[display] ',
             displayPlatforms[display],
-            ' to ',
+            'on ',
             display,
           );
 
@@ -394,20 +408,17 @@ export class StreamingService
             await this.runCheck('setupDualOutput', async () => {
               // enable restream on the backend side
               if (!this.restreamService.state.enabled) await this.restreamService.setEnabled(true);
-              console.log('RESTREAM DUAL OUTPUT');
+              console.log('    * RESTREAM DUAL OUTPUT');
 
-              if (display === 'horizontal') {
-                await this.restreamService.beforeGoLive();
-              } else {
-                const mode: TOutputOrientation =
-                  display === 'horizontal' ? 'landscape' : 'portrait';
-
-                await this.restreamService.beforeDualOutputGoLive(
-                  displayPlatforms[display],
-                  display as TDisplayType,
-                  mode,
-                );
+              const mode: TOutputOrientation = display === 'horizontal' ? 'landscape' : 'portrait';
+              if (mode === 'landscape' && !this.views.restreamAllDisplays) {
+                await this.restreamService.beforeGoLive('horizontal');
               }
+              await this.restreamService.beforeDualOutputGoLive(
+                displayPlatforms[display],
+                display as TDisplayType,
+                mode,
+              );
             });
           } catch (e: unknown) {
             console.error('Failed to setup restream', e);
@@ -415,18 +426,36 @@ export class StreamingService
             return;
           }
         } else {
-          if (displayPlatforms[display].length === 1 && displayPlatforms[display][0] === 'twitch') {
-            // because in unattended mode twitch is handled differently
-            // ensure the context is set for twitch in dual output mode
-            console.log('    * SINGLE displayPlatforms[display] ', displayPlatforms[display]);
-            await this.handleSetupPlatform('twitch', settings, false, true);
+          if (displayPlatforms[display].length === 1) {
+            console.log(
+              '    * SINGLE displayPlatforms[display] ',
+              displayPlatforms[display],
+              ' on ',
+              display,
+            );
+
+            const platform = displayPlatforms[display][0];
+            if (platform === 'twitch') {
+              const service = getPlatformService(platform);
+              try {
+                const context = this.views.getPlatformDisplay(platform);
+                console.log('    * SINGLE context ', context);
+                console.log('    * SINGLE platform ', platform, 'settings ', settings);
+                await this.runCheck('setupDualOutput', async () =>
+                  service.beforeGoLive(settings, context),
+                );
+              } catch (e: unknown) {
+                this.handleSetupPlatformError(e, platform);
+              }
+            }
           }
         }
       }
+
       try {
         await this.runCheck('setupDualOutput', async () => await Promise.resolve());
       } catch (e: unknown) {
-        console.error('Failed to setup restream', e);
+        console.error('Failed to setup dual output', e);
         this.setError('DUAL_OUTPUT_SETUP_FAILED');
         return;
       }
@@ -482,6 +511,29 @@ export class StreamingService
     }
   }
 
+  async setPlatformSettings(
+    platform: TPlatform,
+    settings: any,
+    unattendedMode: boolean,
+    forceSetContext: boolean = false,
+  ) {
+    const service = getPlatformService(platform);
+    try {
+      // don't update settings for twitch in unattendedMode
+      const settingsForPlatform =
+        !forceSetContext && platform === 'twitch' && unattendedMode ? undefined : settings;
+
+      if (settingsForPlatform) {
+        const context = this.views.getPlatformDisplay(platform);
+        await this.runCheck(platform, () => service.beforeGoLive(settingsForPlatform, context));
+      } else {
+        await this.runCheck(platform, () => service.beforeGoLive(settingsForPlatform));
+      }
+    } catch (e: unknown) {
+      this.handleSetupPlatformError(e, platform);
+    }
+  }
+
   handleSetupPlatformError(e: unknown, platform: TPlatform) {
     console.error('Error running beforeGoLive for platform', e);
     // cast all PLATFORM_REQUEST_FAILED errors to SETTINGS_UPDATE_FAILED
@@ -496,37 +548,6 @@ export class StreamingService
     }
     return;
   }
-
-  // async handleSetupSinglePlatform(
-  //   platform: TPlatform,
-  //   unattendedMode: boolean,
-  //   settings: IGoLiveSettings,
-  //   context?: TDisplayType,
-  // ) {
-  //   const service = getPlatformService(platform);
-  //   const platformContext = context ?? this.views.getPlatformContext(platform);
-
-  //   console.log('settings ', settings);
-
-  //   try {
-  //     // don't update settings for twitch in unattendedMode
-  //     const settingsForPlatform = platform === 'twitch' && unattendedMode ? undefined : settings;
-
-  //     console.log('platform ', platform);
-
-  //     await this.runCheck(platform, () => {
-  //       service.beforeGoLive(settingsForPlatform, platformContext);
-  //       if (this.views.isDualOutputMode || platformContext === 'vertical') {
-  //         service.setPlatformContext(platform);
-  //       }
-  //       return Promise.resolve();
-  //     });
-  //   } catch (e: unknown) {
-  //     this.handleSetupPlatformError(e, platform);
-  //   }
-
-  //   return Promise.resolve();
-  // }
 
   private recordAfterStreamStartAnalytics(settings: IGoLiveSettings) {
     if (settings.customDestinations.filter(dest => dest.enabled).length) {
