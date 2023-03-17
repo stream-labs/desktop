@@ -410,12 +410,22 @@ export class StreamingService
               if (!this.restreamService.state.enabled) await this.restreamService.setEnabled(true);
               console.log('    * RESTREAM DUAL OUTPUT');
 
-              const mode: TOutputOrientation = display === 'horizontal' ? 'landscape' : 'portrait';
-              await this.restreamService.beforeDualOutputGoLive(
-                displayPlatforms[display],
-                display as TDisplayType,
-                mode,
-              );
+              const restreamAll = displayPlatforms.horizontal.length > 1;
+              if (restreamAll) {
+                const mode: TOutputOrientation =
+                  display === 'horizontal' ? 'landscape' : 'portrait';
+                await this.restreamService.beforeDualOutputGoLive(
+                  displayPlatforms[display],
+                  display as TDisplayType,
+                  mode,
+                );
+              } else {
+                // do not add mode if only one display should be multistreamed
+                await this.restreamService.beforeDualOutputGoLive(
+                  displayPlatforms[display],
+                  display as TDisplayType,
+                );
+              }
             });
           } catch (e: unknown) {
             console.error('Failed to setup restream', e);
