@@ -101,7 +101,8 @@ export class RestreamService extends StatefulService<IRestreamState> {
   }
 
   get url() {
-    return this.videoSettingsService.contexts.vertical ? 'beta.streamlabs.com' : this.host;
+    return this.host;
+    // return this.videoSettingsService.contexts.vertical ? 'beta.streamlabs.com' : this.host;
   }
 
   get chatUrl() {
@@ -127,11 +128,6 @@ export class RestreamService extends StatefulService<IRestreamState> {
   fetchUserSettings(mode?: 'landscape' | 'portrait'): Promise<IUserSettingsResponse> {
     const headers = authorizedHeaders(this.userService.apiToken);
 
-    // const url =
-    //   mode === 'portrait'
-    //     ? 'https://beta.streamlabs.com/api/v1/rst/user/settings?mode=portrait'
-    //     : `https://${this.host}/api/v1/rst/user/settings`;
-
     let url;
     switch (mode) {
       case 'landscape': {
@@ -146,8 +142,6 @@ export class RestreamService extends StatefulService<IRestreamState> {
         url = `https://${this.host}/api/v1/rst/user/settings`;
       }
     }
-
-    console.log('url ', url);
 
     const request = new Request(url, { headers });
 
@@ -177,7 +171,6 @@ export class RestreamService extends StatefulService<IRestreamState> {
       this.userService.apiToken,
       new Headers({ 'Content-Type': 'application/json' }),
     );
-    // const url = 'https://beta.streamlabs.com/api/v1/rst/user/settings';
     const url = `https://${this.host}/api/v1/rst/user/settings`;
     const body = JSON.stringify({
       enabled,
@@ -185,8 +178,6 @@ export class RestreamService extends StatefulService<IRestreamState> {
       idleTimeout: 30,
     });
     const request = new Request(url, { headers, body, method: 'PUT' });
-
-    console.log('restream enabled');
 
     return jfetch(request);
   }

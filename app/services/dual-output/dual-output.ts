@@ -16,7 +16,6 @@ import { ReorderNodesCommand, EPlaceType } from 'services/editor-commands/comman
 import { Subject } from 'rxjs';
 import { SettingsManagerService } from 'services/settings-manager';
 interface IDualOutputServiceState {
-  convertedDefaultDisplay: TDisplayType;
   displays: TDisplayType[];
   platformSettings: TDualOutputPlatformSettings;
   dualOutputMode: boolean;
@@ -35,10 +34,6 @@ class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
       this.settingsManagerService.views.activeDisplays.horizontal &&
       this.settingsManagerService.views.activeDisplays.vertical
     );
-  }
-
-  get convertedDefaultDisplay() {
-    return this.state.convertedDefaultDisplay;
   }
 
   get platformSettings() {
@@ -71,6 +66,10 @@ class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
     return this.state.sceneNodeMaps.hasOwnProperty(this.scenesService.views.activeSceneId);
   }
 
+  get hasVerticalContext() {
+    return !!this.videoSettingsService.contexts.vertical;
+  }
+
   get verticalNodeIds(): string[] {
     const activeSceneId = this.scenesService.views.activeSceneId;
 
@@ -88,6 +87,7 @@ class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
   get contextsToStream() {
     return Object.entries(this.activeDisplayPlatforms).reduce(
       (contextNames: TDisplayType[], [key, value]: [TDisplayType, TPlatform[]]) => {
+        console.log('value');
         if (value.length) {
           contextNames.push(key as TDisplayType);
         }
@@ -171,7 +171,6 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
   @Inject() private videoSettingsService: VideoSettingsService;
 
   static defaultState: IDualOutputServiceState = {
-    convertedDefaultDisplay: 'horizontal',
     displays: ['horizontal', 'vertical'],
     platformSettings: DualOutputPlatformSettings,
     dualOutputMode: false,
