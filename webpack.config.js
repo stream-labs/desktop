@@ -60,7 +60,7 @@ module.exports = {
     },
   },
 
-  devtool: 'cheap-module-source-map', // source-map',
+  devtool: 'source-map',
 
   target: 'electron-renderer',
 
@@ -76,12 +76,12 @@ module.exports = {
     // Not actually a native addons, but for one reason or another
     // we don't want them compiled in our webpack bundle.
     'aws-sdk': 'require("aws-sdk")',
-    'asar': 'require("asar")',
+    asar: 'require("asar")',
     'backtrace-node': 'require("backtrace-node")',
     'node-fontinfo': 'require("node-fontinfo")',
     'socket.io-client': 'require("socket.io-client")',
-    'rimraf': 'require("rimraf")',
-    'request': 'require("request")',
+    rimraf: 'require("rimraf")',
+    request: 'require("request")',
   },
 
   module: {

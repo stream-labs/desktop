@@ -119,14 +119,18 @@ if ((isProduction || process.env.NAIR_REPORT_TO_SENTRY) && !electron.remote.proc
       // isn't that great, so we do this hack.
       // Some discussion here: https://github.com/getsentry/sentry/issues/2708
       const normalize = (filename: string) => {
-        const splitArray = filename.split('/');
-        return splitArray[splitArray.length - 1];
+        const splitArray = filename.split(/[/\\]/);
+        return '~/' + splitArray[splitArray.length - 1];
       };
 
       if (event.exception && event.exception.values[0].stacktrace) {
         event.exception.values[0].stacktrace.frames.forEach(frame => {
-          frame.abs_path = '~/' + normalize(frame.abs_path);
-          frame.filename = normalize(frame.filename);
+          if (frame.abs_path) {
+            frame.abs_path = normalize(frame.abs_path);
+          }
+          if (frame.filename) {
+            frame.filename = normalize(frame.filename);
+          }
         });
       }
 
