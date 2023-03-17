@@ -183,7 +183,7 @@ export class StreamInfoView<T extends Object> extends ViewHandler<T> {
     return this.settingsManagerView.activeDisplays;
   }
 
-  get contextsToStream() {
+  get contextsToStream(): TDisplayType[] {
     return this.dualOutputView.contextsToStream;
   }
 

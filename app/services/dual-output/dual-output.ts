@@ -48,10 +48,6 @@ class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
     return this.getNodeIds(['vertical']);
   }
 
-  get hasVerticalContext(): boolean {
-    return !!this.videoSettingsService.contexts.vertical;
-  }
-
   get hasVerticalNodes() {
     return this.state.sceneNodeMaps.hasOwnProperty(this.scenesService.views.activeSceneId);
   }
@@ -74,12 +70,11 @@ class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
     return this.state.displays;
   }
 
-  get contextsToStream() {
+  get contextsToStream(): TDisplayType[] {
     return Object.entries(this.activeDisplayPlatforms).reduce(
       (contextNames: TDisplayType[], [key, value]: [TDisplayType, TPlatform[]]) => {
-        console.log('value');
         if (value.length) {
-          contextNames.push(key as TDisplayType);
+          contextNames.push(key);
         }
         return contextNames;
       },

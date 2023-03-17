@@ -835,12 +835,7 @@ export class StreamingService
     } else {
       // start single output
       console.log('---- SETTINGS ---- ', this.settingsService.views.values);
-      console.log('this.views.activeDisplays.vertical ', this.views.activeDisplays.vertical);
-      console.log(
-        'this.views.contextsToStream.includes[vertical] ',
-        this.views.contextsToStream.includes['vertical'],
-      );
-      if (this.views.activeDisplays.vertical && this.views.contextsToStream.includes['vertical']) {
+      if (this.views.activeDisplays.vertical && this.views.contextsToStream.includes('vertical')) {
         obs.NodeObs.OBS_service_setVideoInfo(
           this.videoSettingsService.contexts.vertical,
           'vertical',
@@ -946,7 +941,7 @@ export class StreamingService
       } else {
         if (
           this.views.activeDisplays.vertical &&
-          this.views.contextsToStream.includes['vertical']
+          this.views.contextsToStream.includes('vertical')
         ) {
           obs.NodeObs.OBS_service_stopStreaming(false, 'vertical');
         } else {
