@@ -101,8 +101,9 @@ export class RestreamService extends StatefulService<IRestreamState> {
   }
 
   get url() {
-    return this.host;
-    // return this.videoSettingsService.contexts.vertical ? 'beta.streamlabs.com' : this.host;
+    // return this.host;
+    // return 'beta.streamlabs.com';
+    return this.videoSettingsService.contexts.vertical ? 'beta.streamlabs.com' : this.host;
   }
 
   get chatUrl() {
@@ -131,7 +132,7 @@ export class RestreamService extends StatefulService<IRestreamState> {
     let url;
     switch (mode) {
       case 'landscape': {
-        url = 'https://beta.streamlabs.com/api/v1/rst/user/settings';
+        url = 'https://beta.streamlabs.com/api/v1/rst/user/settings?mode=landscape';
         break;
       }
       case 'portrait': {
@@ -139,6 +140,7 @@ export class RestreamService extends StatefulService<IRestreamState> {
         break;
       }
       default: {
+        // url = 'https://beta.streamlabs.com/api/v1/rst/user/settings';
         url = `https://${this.host}/api/v1/rst/user/settings`;
       }
     }
@@ -220,7 +222,7 @@ export class RestreamService extends StatefulService<IRestreamState> {
   async setupDualOutputIngest(context: TDisplayType, mode?: TOutputOrientation) {
     const ingest = (await this.fetchIngest()).server;
     // const settings = context === 1 ? await this.fetchUserSettings(mode) : this.settings;
-    const settings = mode ? await this.fetchUserSettings(mode) : this.settings;
+    const settings = mode === 'portrait' ? await this.fetchUserSettings(mode) : this.settings;
 
     console.log('    * RESTREAM context ', context);
     console.log('    * RESTREAM settings.streamKey ', settings.streamKey);

@@ -411,9 +411,6 @@ export class StreamingService
               console.log('    * RESTREAM DUAL OUTPUT');
 
               const mode: TOutputOrientation = display === 'horizontal' ? 'landscape' : 'portrait';
-              if (mode === 'landscape' && !this.views.restreamAllDisplays) {
-                await this.restreamService.beforeGoLive('horizontal');
-              }
               await this.restreamService.beforeDualOutputGoLive(
                 displayPlatforms[display],
                 display as TDisplayType,
