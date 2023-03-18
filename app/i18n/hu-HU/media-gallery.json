@@ -5,7 +5,7 @@
   "Sounds": "Hangok",
   "Drag & Drop Upload": "Húz & Kidob Feltöltés",
   "Copy URL": "URL másolása",
-  "Browse the Gallery": "Browse the Gallery",
+  "Browse the Gallery": "Böngéssz a galériában",
   "Cancel": "Mégse",
   "OK": "OK",
   "Select": "Választ",
@@ -29,7 +29,7 @@
   "No Sound": "Nincs hang",
   "No Media": "Nincs média",
   "Change Link": "Link megváltoztatása",
-  "Pick From Gallery": "Pick From Gallery",
-  "Clear Link": "Clear Link",
+  "Pick From Gallery": "Válassz a galériából",
+  "Clear Link": "Link törlése",
   "Media URL": "Média URL"
 }
