@@ -123,6 +123,10 @@ export class StreamingService
   }
 
   private async showNotBroadcastingMessageBox() {
+    Sentry.addBreadcrumb({
+      category: 'streaming',
+      message: 'showNotBroadcastingMessageBox',
+    });
     return new Promise(resolve => {
       electron.remote.dialog
         .showMessageBox(electron.remote.getCurrentWindow(), {
@@ -277,7 +281,10 @@ export class StreamingService
 
       this.powerSaveId = electron.remote.powerSaveBlocker.start('prevent-display-sleep');
       obs.NodeObs.OBS_service_startStreaming();
-
+      Sentry.addBreadcrumb({
+        category: 'stream',
+        message: 'Start streaming',
+      });
       return;
     }
 
@@ -296,6 +303,10 @@ export class StreamingService
       }
 
       obs.NodeObs.OBS_service_stopStreaming(false);
+      Sentry.addBreadcrumb({
+        category: 'stream',
+        message: 'Stop streaming',
+      });
 
       const keepRecording = this.settingsService.state.General.KeepRecordingWhenStreamStops;
       if (!keepRecording && this.state.recordingStatus === ERecordingState.Recording) {
@@ -311,6 +322,10 @@ export class StreamingService
 
     if (this.state.streamingStatus === EStreamingState.Ending) {
       obs.NodeObs.OBS_service_stopStreaming(true);
+      Sentry.addBreadcrumb({
+        category: 'stream',
+        message: 'Stop streaming',
+      });
       return;
     }
   }
@@ -350,6 +365,13 @@ export class StreamingService
     mustShowDialog: boolean,
   ) {
     if (streamingSetting.quality === undefined) {
+      Sentry.withScope(scope => {
+        scope.setLevel('error');
+        scope.setTag('service', 'StreamingService');
+        scope.setTag('method', 'optimizeForNiconicoAndStartStreaming');
+        scope.setFingerprint(['StreamingService', 'optimizeForNiconicoAndStartStreaming', 'niconico', 'exception']);
+        Sentry.captureException(new Error('StreamingSetting.quality is undefined'));
+      });
       return new Promise(resolve => {
         electron.remote.dialog
           .showMessageBox(electron.remote.getCurrentWindow(), {
@@ -405,6 +427,10 @@ export class StreamingService
   toggleRecording() {
     if (this.state.recordingStatus === ERecordingState.Recording) {
       obs.NodeObs.OBS_service_stopRecording();
+      Sentry.addBreadcrumb({
+        category: 'record',
+        message: 'Stop recording',
+      });
       return;
     }
 
@@ -429,6 +455,10 @@ export class StreamingService
       }
 
       obs.NodeObs.OBS_service_startRecording();
+      Sentry.addBreadcrumb({
+        category: 'record',
+        message: 'Start recording',
+      });
       return;
     }
   }
@@ -437,13 +467,25 @@ export class StreamingService
     if (this.state.replayBufferStatus !== EReplayBufferState.Offline) return;
 
     obs.NodeObs.OBS_service_startReplayBuffer();
+    Sentry.addBreadcrumb({
+      category: 'replay',
+      message: 'Start replay buffer',
+    });
   }
 
   stopReplayBuffer() {
     if (this.state.replayBufferStatus === EReplayBufferState.Running) {
       obs.NodeObs.OBS_service_stopReplayBuffer(false);
+      Sentry.addBreadcrumb({
+        category: 'replay',
+        message: 'Stop replay buffer(running)',
+      });
     } else if (this.state.replayBufferStatus === EReplayBufferState.Stopping) {
       obs.NodeObs.OBS_service_stopReplayBuffer(true);
+      Sentry.addBreadcrumb({
+        category: 'replay',
+        message: 'Stop replay buffer(stopping)',
+      });
     }
   }
 
@@ -452,6 +494,10 @@ export class StreamingService
       this.SET_REPLAY_BUFFER_STATUS(EReplayBufferState.Saving);
       this.replayBufferStatusChange.next(EReplayBufferState.Saving);
       obs.NodeObs.OBS_service_processReplayBufferHotkey();
+      Sentry.addBreadcrumb({
+        category: 'replay',
+        message: 'Save replay',
+      });
     }
   }
 
