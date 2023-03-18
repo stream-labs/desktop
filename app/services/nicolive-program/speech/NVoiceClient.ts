@@ -342,7 +342,7 @@ export class NVoiceClient {
 
   async _command(
     command: Command,
-    ...args: { label: string; value: string; encoder?: (value: string) => string }[]
+    ...args: { label: string; value: string; encoder?: (value: string) => string, sentryExtra?: boolean }[]
   ): Promise<string[]> {
     await this.startNVoice();
     try {
@@ -369,7 +369,11 @@ export class NVoiceClient {
         if (err instanceof NVoiceEngineError) {
           scope.setTag('NVoiceEngineError.code', err.code);
           for (const a of args) {
-            scope.setTag(`${command}.${a.label}`, a.value);
+            if (a.sentryExtra) {
+              scope.setExtra(a.label, a.value);
+            } else {
+              scope.setTag(`${command}.${a.label}`, a.value);
+            }
           }
           switch (err.code) {
             case '401': // テキスト解析失敗
@@ -416,6 +420,7 @@ export class NVoiceClient {
           label: 'filename',
           value: filename,
           encoder: toShiftJisBase64,
+          sentryExtra: true,
         },
       );
     } catch (err) {
