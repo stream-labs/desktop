@@ -150,7 +150,11 @@ export class FileManagerService extends Service {
 
       file.locked = false;
       file.dirty = false;
-      console.debug(`Wrote file ${filePath} version ${version}`);
+      Sentry.addBreadcrumb({
+        category: 'wrote-file',
+        message: `${filePath} version ${version}`,
+        level: 'debug',
+      });
     } catch (e) {
       if (tries > 0) {
         file.locked = false;
