@@ -420,9 +420,9 @@ export class StreamingService
           // send Recording type to Sentry (どれぐらいURL出力が使われているかの比率を調査する)
           Sentry.withScope(scope => {
             scope.setLevel('info');
-            scope.setExtra('recType', recordingSettings.recType);
+            scope.setTag('recType', recordingSettings.recType);
             scope.setExtra('path', recordingSettings.path);
-            scope.setFingerprint(['recording', 'recType', recordingSettings.recType]);
+            scope.setFingerprint(['Recording']);
             Sentry.captureMessage('Recording / recType:' + recordingSettings.recType);
           });
         }
