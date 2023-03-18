@@ -243,7 +243,17 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
       },
     });
 
+    Sentry.addBreadcrumb({
+      category: 'authWindow.open',
+      message: platform,
+    });
+
     authWindow.webContents.on('did-navigate', async (e, url) => {
+      Sentry.addBreadcrumb({
+        category: 'authWindow.did-navigate',
+        message: url,
+      });
+
       const parsed = this.parseAuthFromUrl(url);
       console.log('parsed = ' + JSON.stringify(parsed)); // DEBUG
 
@@ -260,6 +270,10 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     });
 
     authWindow.once('close', () => {
+      Sentry.addBreadcrumb({
+        category: 'authWindow.close',
+        message: platform,
+      });
       onAuthClose();
     });
 

@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/vue';
 // This singleton class provides a renderer-space API
 // for spawning various child windows.
 import { cloneDeep } from 'lodash';
@@ -147,6 +148,11 @@ export class WindowsService extends StatefulService<IWindowsState> {
   }
 
   showWindow(options: Partial<IWindowOptions>) {
+    Sentry.addBreadcrumb({
+      category: 'showWindow',
+      message: options.componentName,
+    });
+
     // Don't center the window if it's the same component
     // This prevents "snapping" behavior when navigating settings
     if (options.componentName !== this.state.child.componentName) options.center = true;
@@ -198,6 +204,11 @@ export class WindowsService extends StatefulService<IWindowsState> {
    * @return the window id of the created window
    */
   createOneOffWindow(options: Partial<IWindowOptions & { limitMinimumSize?: boolean }>, windowId?: string): string {
+    Sentry.addBreadcrumb({
+      category: 'createOneOffWindow',
+      message: options.componentName,
+    });
+
     windowId = windowId || uuid();
 
     if (this.windows[windowId]) {
