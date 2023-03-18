@@ -280,7 +280,16 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     addClipboardMenu(authWindow);
 
     authWindow.setMenu(null);
-    authWindow.loadURL(service.authUrl);
+    authWindow.loadURL(service.authUrl).catch(error => {
+      if (error instanceof Error) {
+        Sentry.withScope(scope => {
+          scope.setLevel('warning');
+          scope.setExtra('url', service.authUrl);
+          scope.setFingerprint(['startAuth', 'loadURL', service.authUrl]);
+          Sentry.captureException(error);
+        });
+      }
+    });
   }
 
   /**
