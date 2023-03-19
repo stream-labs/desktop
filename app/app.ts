@@ -235,6 +235,10 @@ document.addEventListener('DOMContentLoaded', () => {
       },
     });
 
+    Sentry.configureScope(scope => {
+      scope.setTag('windowId', windowId);
+    });
+
     setupGlobalContextMenuForEditableElement();
   });
 });
