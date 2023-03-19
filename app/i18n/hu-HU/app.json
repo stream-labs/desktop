@@ -1,5 +1,5 @@
 {
-  "You have been logged out": "You have been logged out",
+  "You have been logged out": "Ki lettél jelentkezve",
   "This element is too small to be displayed": "Ez az elem túl kicsi, hogy megjeleníthető legyen",
   "This element requires Selective Recording to be enabled": "This element requires Selective Recording to be enabled",
   "Grant Permissions": "Grant Permissions",
@@ -7,7 +7,7 @@
   "Microphone": "Mikrofon",
   "Webcam": "Webkamera",
   "You've merged a Streamlabs ID to your account, please log back in to ensure you have the right credentials.": "You've merged a Streamlabs ID to your account, please log back in to ensure you have the right credentials.",
-  "Enable Live Streaming?": "Enable Live Streaming?",
+  "Enable Live Streaming?": "Élő közvetítés engedélyezése?",
   "Streamlabs is currently in recording mode, which hides live streaming features. Would you like to enable live streaming features? You can disable them again in General settings.": "Streamlabs is currently in recording mode, which hides live streaming features. Would you like to enable live streaming features? You can disable them again in General settings.",
-  "Enable Streaming": "Enable Streaming"
+  "Enable Streaming": "Közvetítés engedélyezése"
 }
