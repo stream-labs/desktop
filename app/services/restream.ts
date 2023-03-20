@@ -97,13 +97,14 @@ export class RestreamService extends StatefulService<IRestreamState> {
   }
 
   get host() {
+    // return 'beta.streamlabs.com';
+    console.log('HOST this.hostsService.streamlabs ', this.hostsService.streamlabs);
     return this.hostsService.streamlabs;
   }
 
   get url() {
-    // return this.host;
-    // return 'beta.streamlabs.com';
-    return this.videoSettingsService.contexts.vertical ? 'beta.streamlabs.com' : this.host;
+    return this.host;
+    // return this.videoSettingsService.contexts.vertical ? 'beta.streamlabs.com' : this.host;
   }
 
   get chatUrl() {
@@ -119,7 +120,7 @@ export class RestreamService extends StatefulService<IRestreamState> {
         fbParams += `&fbToken=${token}`;
       }
     }
-    return `https://streamlabs.com/embed/chat?oauth_token=${this.userService.apiToken}${fbParams}`;
+    return `https://${this.host}/embed/chat?oauth_token=${this.userService.apiToken}${fbParams}`;
   }
 
   get shouldGoLiveWithRestream() {
@@ -132,18 +133,19 @@ export class RestreamService extends StatefulService<IRestreamState> {
     let url;
     switch (mode) {
       case 'landscape': {
-        url = 'https://beta.streamlabs.com/api/v1/rst/user/settings?mode=landscape';
+        url = `https://${this.host}/api/v1/rst/user/settings?mode=landscape`;
         break;
       }
       case 'portrait': {
-        url = 'https://beta.streamlabs.com/api/v1/rst/user/settings?mode=portrait';
+        url = `https://${this.host}/api/v1/rst/user/settings?mode=portrait`;
         break;
       }
       default: {
-        // url = 'https://beta.streamlabs.com/api/v1/rst/user/settings';
         url = `https://${this.host}/api/v1/rst/user/settings`;
       }
     }
+
+    console.log('url ', url);
 
     const request = new Request(url, { headers });
 
@@ -174,11 +176,19 @@ export class RestreamService extends StatefulService<IRestreamState> {
       new Headers({ 'Content-Type': 'application/json' }),
     );
     const url = `https://${this.host}/api/v1/rst/user/settings`;
+    console.log('enabled url ', url);
     const body = JSON.stringify({
       enabled,
       dcProtection: false,
       idleTimeout: 30,
     });
+    console.log('enabled body JSON ', body);
+    console.log('enabled body ', {
+      enabled,
+      dcProtection: false,
+      idleTimeout: 30,
+    });
+
     const request = new Request(url, { headers, body, method: 'PUT' });
 
     return jfetch(request);
@@ -193,10 +203,7 @@ export class RestreamService extends StatefulService<IRestreamState> {
     context: TDisplayType,
     mode?: TOutputOrientation,
   ) {
-    await Promise.all([
-      this.setupDualOutputIngest(context, mode),
-      this.setupDualOutputTargets(platforms),
-    ]);
+    await Promise.all([this.setupDualOutputIngest(context, mode), this.setupTargets()]);
   }
 
   async setupIngest(context?: TDisplayType) {
@@ -222,7 +229,7 @@ export class RestreamService extends StatefulService<IRestreamState> {
   async setupDualOutputIngest(context: TDisplayType, mode?: TOutputOrientation) {
     const ingest = (await this.fetchIngest()).server;
     // const settings = context === 1 ? await this.fetchUserSettings(mode) : this.settings;
-    const settings = mode === 'portrait' ? await this.fetchUserSettings(mode) : this.settings;
+    const settings = mode ? await this.fetchUserSettings(mode) : this.settings;
 
     console.log('    * RESTREAM context ', context);
     console.log('    * RESTREAM settings.streamKey ', settings.streamKey);
@@ -252,16 +259,27 @@ export class RestreamService extends StatefulService<IRestreamState> {
 
     // setup new targets
     const newTargets = [
-      ...this.streamInfo.enabledPlatforms.map(platform => ({
-        platform: platform as TPlatform,
-        streamKey: getPlatformService(platform).state.streamKey,
-      })),
+      ...this.streamInfo.enabledPlatforms.map(platform => {
+        console.log(
+          'this.dualOutputService.views.getPlatformContext(dest.name as TPlatform) ',
+          this.dualOutputService.views.getPlatformContextName(platform as TPlatform),
+        );
+        return {
+          platform: platform as TPlatform,
+          streamKey: getPlatformService(platform).state.streamKey,
+          mode:
+            this.dualOutputService.views.getPlatformContextName(platform as TPlatform) ??
+            'landscape',
+        };
+      }),
       ...this.streamInfo.savedSettings.customDestinations
         .filter(dest => dest.enabled)
         .map(dest => ({
           platform: 'relay' as 'relay',
           streamKey: `${dest.url}${dest.streamKey}`,
-          video: dest?.video,
+          mode:
+            this.dualOutputService.views.getPlatformContextName(dest.name as TPlatform) ??
+            'landscape',
         })),
     ];
 
@@ -271,33 +289,39 @@ export class RestreamService extends StatefulService<IRestreamState> {
       const ttSettings = this.tiktokService.state.settings;
       tikTokTarget.platform = 'relay';
       tikTokTarget.streamKey = `${ttSettings.serverUrl}/${ttSettings.streamKey}`;
+      // @@@ add mode
     }
 
-    await this.createTargets(newTargets);
+    await this.createTargets(newTargets as any);
   }
 
-  async setupDualOutputTargets(platforms: TPlatform[]) {
-    // delete existing targets
-    const targets = await this.fetchTargets();
-    const promises = targets.map(t => this.deleteTarget(t.id));
-    await Promise.all(promises);
+  // async setupDualOutputTargets(platforms: TPlatform[]) {
+  //   // delete existing targets
+  //   const targets = await this.fetchTargets();
+  //   console.log('targets ', targets);
+  //   const promises = targets.map(t => this.deleteTarget(t.id));
+  //   const resolved = await Promise.all(promises);
+  //   // await Promise.all(promises);
+  //   console.log('resolved ', resolved);
 
-    // setup new targets
-    const newTargets = [
-      ...platforms.map(platform => ({
-        platform: platform as TPlatform,
-        streamKey: getPlatformService(platform).state.streamKey,
-        video: this.dualOutputService.views.getPlatformContext(platform),
-      })),
-    ];
+  //   // setup new targets
+  //   const newTargets = [
+  //     ...platforms.map(platform => ({
+  //       platform: platform as TPlatform,
+  //       streamKey: getPlatformService(platform).state.streamKey,
+  //       video: this.dualOutputService.views.getPlatformContextName(platform),
+  //     })),
+  //   ];
 
-    console.log('    * RESTREAM newTargets ', newTargets);
+  //   console.log('    * RESTREAM newTargets ', newTargets);
 
-    await this.createTargets(newTargets);
-  }
+  //   // @@@ DEAL WITH LATER
+  //   await this.createTargets(newTargets as any);
+  // }
 
   checkStatus(): Promise<boolean> {
     const url = `https://${this.host}/api/v1/rst/util/status`;
+    console.log('check url ', url);
     const request = new Request(url);
 
     return jfetch<{ name: string; status: boolean }[]>(request).then(
@@ -317,8 +341,9 @@ export class RestreamService extends StatefulService<IRestreamState> {
       new Headers({ 'Content-Type': 'application/json' }),
     );
     const url = `https://${this.host}/api/v1/rst/targets`;
+    console.log('create url ', url);
     const body = JSON.stringify(
-      targets.map(target => {
+      targets.map((target: any) => {
         return {
           platform: target.platform,
           streamKey: target.streamKey,
@@ -326,7 +351,7 @@ export class RestreamService extends StatefulService<IRestreamState> {
           dcProtection: false,
           idleTimeout: 30,
           label: `${target.platform} target`,
-          video: target.hasOwnProperty('video') && target.video,
+          mode: target.mode,
         };
       }),
     );
@@ -334,7 +359,7 @@ export class RestreamService extends StatefulService<IRestreamState> {
     console.log('body ', body);
     console.log(
       'body obj ',
-      targets.map(target => {
+      targets.map((target: any) => {
         return {
           platform: target.platform,
           streamKey: target.streamKey,
@@ -342,7 +367,7 @@ export class RestreamService extends StatefulService<IRestreamState> {
           dcProtection: false,
           idleTimeout: 30,
           label: `${target.platform} target`,
-          video: target.hasOwnProperty('video') && target.video,
+          mode: target.mode,
         };
       }),
     );

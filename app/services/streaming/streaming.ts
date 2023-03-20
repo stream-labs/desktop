@@ -314,7 +314,7 @@ export class StreamingService
 
       for (const platform of platforms) {
         console.log(' * HAS VERTICAL CONTEXT ', platform);
-        await this.setPlatformSettings(platform, settings, unattendedMode, true);
+        await this.setPlatformSettings(platform, settings, unattendedMode, true); // forcing context to be set
       }
     } else {
       // setup default single stream
@@ -407,25 +407,29 @@ export class StreamingService
           try {
             await this.runCheck('setupDualOutput', async () => {
               // enable restream on the backend side
-              if (!this.restreamService.state.enabled) await this.restreamService.setEnabled(true);
+              console.log(
+                'this.restreamService.state.enabled ',
+                this.restreamService.state.enabled,
+              );
+              // if (!this.restreamService.state.enabled) await this.restreamService.setEnabled(true);
+              await this.restreamService.setEnabled(true);
               console.log('    * RESTREAM DUAL OUTPUT');
 
-              const restreamAll = displayPlatforms.horizontal.length > 1;
-              if (restreamAll) {
-                const mode: TOutputOrientation =
-                  display === 'horizontal' ? 'landscape' : 'portrait';
-                await this.restreamService.beforeDualOutputGoLive(
-                  displayPlatforms[display],
-                  display as TDisplayType,
-                  mode,
-                );
-              } else {
-                // do not add mode if only one display should be multistreamed
-                await this.restreamService.beforeDualOutputGoLive(
-                  displayPlatforms[display],
-                  display as TDisplayType,
-                );
-              }
+              // const restreamAll = displayPlatforms.horizontal.length > 1;
+              // if (restreamAll) {
+              const mode: TOutputOrientation = display === 'horizontal' ? 'landscape' : 'portrait';
+              await this.restreamService.beforeDualOutputGoLive(
+                displayPlatforms[display],
+                display as TDisplayType,
+                mode,
+              );
+              // } else {
+              //   // do not add mode if only one display should be multistreamed
+              //   await this.restreamService.beforeDualOutputGoLive(
+              //     displayPlatforms[display],
+              //     display as TDisplayType,
+              //   );
+              // }
             });
           } catch (e: unknown) {
             console.error('Failed to setup restream', e);
@@ -532,6 +536,7 @@ export class StreamingService
 
       if (settingsForPlatform) {
         const context = this.views.getPlatformDisplay(platform);
+        console.log(' context ', context, 'for platform ', platform);
         await this.runCheck(platform, () => service.beforeGoLive(settingsForPlatform, context));
       } else {
         await this.runCheck(platform, () => service.beforeGoLive(settingsForPlatform));
@@ -815,6 +820,7 @@ export class StreamingService
     if (this.views.contextsToStream.length > 1 && this.views.enabledPlatforms.length > 1) {
       // start dual output
       console.log('---- SETTINGS ---- ', this.settingsService.views.values);
+      console.log('**** START STREAM');
 
       const horizontalContext = this.videoSettingsService.contexts.horizontal;
       const verticalContext = this.videoSettingsService.contexts.vertical;
@@ -930,6 +936,7 @@ export class StreamingService
       }
 
       if (this.views.contextsToStream.length > 1 && this.views.enabledPlatforms.length > 1) {
+        console.log('**** STOP STREAM');
         const signalChanged = this.signalInfoChanged.subscribe(
           (signalInfo: IOBSOutputSignalInfo) => {
             if (

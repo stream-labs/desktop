@@ -121,6 +121,10 @@ class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
     return this.videoSettingsService.contexts[display];
   }
 
+  getPlatformContextName(platform: TPlatform) {
+    return this.getPlatformDisplay(platform) === 'horizontal' ? 'landscape' : 'portrait';
+  }
+
   getDisplayNodeMap(display: TDisplayType) {
     return this.state.nodeMaps[display];
   }
