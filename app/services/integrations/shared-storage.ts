@@ -1,3 +1,4 @@
+import fs from 'fs';
 import { Service, Inject } from 'services/core';
 import { UserService } from 'services/user';
 import { authorizedHeaders, jfetch } from 'util/requests';
@@ -49,12 +50,56 @@ export class SharedStorageService extends Service {
       const uploadInfo = await this.prepareUpload(video);
       if (uploadInfo.isMultipart) {
       } else {
-        this.uploadS3File(uploadInfo.uploadUrls[0]);
+        this.uploadS3File(uploadInfo);
       }
     } catch (e: unknown) {
       console.error(e);
     }
   }
 
-  async uploadS3File(url: string) {}
+  async uploadS3File(uploadInfo: IPrepareResponse) {
+    const name = uploadInfo.file.original_filename;
+    const headers = authorizedHeaders(this.userService.apiToken);
+
+    fs.readFile('', async (err: unknown, data: Buffer) => {
+      const file = new File([data], name, { type: uploadInfo.file.mime_type });
+      const body = new FormData();
+      body.append('uploads[]', file);
+
+      try {
+        return await jfetch(uploadInfo.uploadUrls[0], { headers, body, method: 'PUT' });
+      } catch (e: unknown) {
+        console.error(e);
+      }
+    });
+  }
+}
+
+interface IUploaderOptions {
+  onProgress: (progress: any) => void;
+  onError?: (e: unknown) => void;
+  uploadUrl: string;
+  isMultipart?: boolean;
+}
+
+class Uploader {
+  uploadedSize = 0;
+  aborted = false;
+  onProgress = (progress: any) => {};
+  onError = (e: unknown) => {};
+  uploadUrl = '';
+  isMultipart = false;
+
+  constructor(opts: IUploaderOptions) {
+    this.onProgress = opts.onProgress;
+    this.onError = opts.onError;
+    this.uploadUrl = opts.uploadUrl;
+    this.isMultipart = opts.isMultipart;
+  }
+
+  start() {
+    this.initialize();
+  }
+
+  initialize() {}
 }
