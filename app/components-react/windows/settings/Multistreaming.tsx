@@ -142,7 +142,7 @@ export function MultistreamingSettings() {
       </ObsSettingsSection>
       {v.isMidStreamMode && (
         <div className="section section--warning">
-          {$t("You can not change these settings when you're live.")}
+          {$t("You cannot change these settings when you're live.")}
         </div>
       )}
     </div>
