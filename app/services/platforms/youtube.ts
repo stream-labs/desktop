@@ -23,6 +23,7 @@ import { lazyModule } from 'util/lazy-module';
 import * as remote from '@electron/remote';
 import { IVideo } from 'obs-studio-node';
 import pick from 'lodash/pick';
+import { TOutputOrientation } from 'services/restream';
 
 interface IYoutubeServiceState extends IPlatformState {
   liveStreamingEnabled: boolean;
@@ -40,7 +41,7 @@ export interface IYoutubeStartStreamOptions extends IExtraBroadcastSettings {
   description: string;
   privacyStatus?: 'private' | 'public' | 'unlisted';
   scheduledStartTime?: number;
-  video?: IVideo;
+  mode?: TOutputOrientation;
 }
 
 /**

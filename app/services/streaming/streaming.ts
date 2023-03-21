@@ -407,29 +407,11 @@ export class StreamingService
           try {
             await this.runCheck('setupDualOutput', async () => {
               // enable restream on the backend side
-              console.log(
-                'this.restreamService.state.enabled ',
-                this.restreamService.state.enabled,
-              );
-              // if (!this.restreamService.state.enabled) await this.restreamService.setEnabled(true);
-              await this.restreamService.setEnabled(true);
+              if (!this.restreamService.state.enabled) await this.restreamService.setEnabled(true);
               console.log('    * RESTREAM DUAL OUTPUT');
 
-              // const restreamAll = displayPlatforms.horizontal.length > 1;
-              // if (restreamAll) {
               const mode: TOutputOrientation = display === 'horizontal' ? 'landscape' : 'portrait';
-              await this.restreamService.beforeDualOutputGoLive(
-                displayPlatforms[display],
-                display as TDisplayType,
-                mode,
-              );
-              // } else {
-              //   // do not add mode if only one display should be multistreamed
-              //   await this.restreamService.beforeDualOutputGoLive(
-              //     displayPlatforms[display],
-              //     display as TDisplayType,
-              //   );
-              // }
+              await this.restreamService.beforeGoLive(display as TDisplayType, mode);
             });
           } catch (e: unknown) {
             console.error('Failed to setup restream', e);
@@ -443,22 +425,8 @@ export class StreamingService
               displayPlatforms[display],
               ' on ',
               display,
+              'not updated',
             );
-
-            const platform = displayPlatforms[display][0];
-            if (platform === 'twitch') {
-              const service = getPlatformService(platform);
-              try {
-                const context = this.views.getPlatformDisplay(platform);
-                console.log('    * SINGLE context ', context);
-                console.log('    * SINGLE platform ', platform, 'settings ', settings);
-                await this.runCheck('setupDualOutput', async () =>
-                  service.beforeGoLive(settings, context),
-                );
-              } catch (e: unknown) {
-                this.handleSetupPlatformError(e, platform);
-              }
-            }
           }
         }
       }

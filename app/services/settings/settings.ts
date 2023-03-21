@@ -289,11 +289,31 @@ export class SettingsService extends StatefulService<ISettingsServiceState> {
     const settingsFormData = {};
     this.getCategories().forEach(categoryName => {
       settingsFormData[categoryName] = this.fetchSettingsFromObs(categoryName);
+      if (['Stream', 'StreamSecond'].includes(categoryName)) {
+        console.log(
+          'fetchSettingsFromObs(',
+          categoryName,
+          ') returned ',
+          settingsFormData[categoryName],
+        );
+
+        // @@@ TODO: remove. temporary and janky: force set the server to auto if the service is twitch
+        settingsFormData[categoryName].formData[1].parameters.forEach(
+          (parameter: IObsInput<unknown>) => {
+            if (parameter.name === 'service' && parameter.value === 'Twitch') {
+              settingsFormData[categoryName].formData[1].parameters.forEach(
+                (param: IObsInput<unknown>) => {
+                  if (param.name === 'server') {
+                    param.value = 'auto';
+                  }
+                },
+              );
+            }
+          },
+        );
+      }
     });
     this.SET_SETTINGS(settingsFormData);
-
-    // dual output settings are not stored in OBS, so set them from persisted settings
-    // this.setDualOutputSettings(settingsFormData);
   }
 
   /**
@@ -565,65 +585,6 @@ export class SettingsService extends StatefulService<ISettingsServiceState> {
         source.setName(displayName);
       }
     });
-  }
-
-  private setDualOutputSettings(settingsData: ISettingsServiceState) {
-    if (this.state.hasOwnProperty('Horizontal')) return;
-    if (this.state.hasOwnProperty('Vertical')) return;
-
-    // create two empty arrays to push onto
-    const horizontalParams: IObsInput<TObsValue>[] = [];
-    const verticalParams: IObsInput<TObsValue>[] = [];
-
-    // get dual output settings from video settings service
-    const horizontalSettings = this.videoSettingsService.dualOutputSettings['horizontal'];
-    const verticalSettings = this.videoSettingsService.dualOutputSettings['vertical'];
-
-    // for every param, update param with dual output setting
-    settingsData['Video'].formData[0].parameters.forEach((parameter: IObsInput<TObsValue>) => {
-      horizontalParams.push({
-        ...parameter,
-        currentValue: horizontalSettings[parameter.name],
-        value: horizontalSettings[parameter.name],
-      });
-
-      verticalParams.push({
-        ...parameter,
-        currentValue: verticalSettings[parameter.name],
-        value: verticalSettings[parameter.name],
-      });
-    });
-
-    const horizontalOutputData = {
-      type: ESettingsCategoryType.Untabbed,
-      formData: [
-        {
-          nameSubCategory: 'Untitled',
-          parameters: horizontalParams,
-        },
-      ],
-    };
-    const verticalOutputData = {
-      type: ESettingsCategoryType.Untabbed,
-      formData: [
-        {
-          nameSubCategory: 'Untitled',
-          parameters: verticalParams,
-        },
-      ],
-    };
-
-    // add to state
-    this.PATCH_SETTINGS('Horizontal', horizontalOutputData);
-    this.PATCH_SETTINGS('Vertical', verticalOutputData);
-  }
-
-  // @@@ WIP: function to guarantee use of single stream servers
-  // in dual output mode
-  setDualOutputSingleStreamData() {
-    //   // add to state
-    //   this.PATCH_SETTINGS('Stream', streamData);
-    //   this.PATCH_SETTINGS('StreamSecond', streamSecondData);
   }
 
   private ensureValidEncoder() {

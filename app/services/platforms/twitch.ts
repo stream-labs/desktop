@@ -20,11 +20,13 @@ import { BasePlatformService } from './base-platform';
 import Utils from '../utils';
 import { IVideo } from 'obs-studio-node';
 import { TDisplayType } from 'services/settings-v2';
+import { TOutputOrientation } from 'services/restream';
 
 export interface ITwitchStartStreamOptions {
   title: string;
   game?: string;
   video?: IVideo;
+  mode?: TOutputOrientation;
   tags: string[];
 }
 
@@ -78,6 +80,7 @@ export class TwitchService
       title: '',
       game: '',
       video: undefined,
+      mode: undefined,
       tags: [],
     },
   };

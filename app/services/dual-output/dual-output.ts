@@ -15,6 +15,7 @@ import { getPlatformService, TPlatform } from 'services/platforms';
 import { ReorderNodesCommand, EPlaceType } from 'services/editor-commands/commands/reorder-nodes';
 import { Subject } from 'rxjs';
 import { SettingsManagerService } from 'services/settings-manager';
+import { TOutputOrientation } from 'services/restream';
 interface IDualOutputServiceState {
   displays: TDisplayType[];
   platformSettings: TDualOutputPlatformSettings;
@@ -121,7 +122,7 @@ class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
     return this.videoSettingsService.contexts[display];
   }
 
-  getPlatformContextName(platform: TPlatform) {
+  getPlatformContextName(platform: TPlatform): TOutputOrientation {
     return this.getPlatformDisplay(platform) === 'horizontal' ? 'landscape' : 'portrait';
   }
 

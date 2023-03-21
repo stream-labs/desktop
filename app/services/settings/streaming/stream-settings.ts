@@ -13,6 +13,7 @@ import Vue from 'vue';
 import { IVideo } from 'obs-studio-node';
 import { DualOutputService } from 'services/dual-output';
 import { TDisplayType } from 'services/settings-v2/video';
+import { TOutputOrientation } from 'services/restream';
 
 interface ISavedGoLiveSettings {
   platforms: {
@@ -31,7 +32,7 @@ export interface ICustomStreamDestination {
   url: string;
   streamKey?: string;
   enabled: boolean;
-  video?: IVideo;
+  mode?: TOutputOrientation;
 }
 
 /**
@@ -158,8 +159,6 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
 
           // we should immediately save the streamType in OBS if it's changed
           // otherwise OBS will not save 'key' and 'server' values
-
-          // console.log('set in first setSettings loop');
 
           this.settingsService.setSettings(streamName, streamFormData);
         }

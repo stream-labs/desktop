@@ -14,6 +14,7 @@ import flatten from 'lodash/flatten';
 import * as remote from '@electron/remote';
 import { IVideo } from 'obs-studio-node';
 import { TDisplayType } from 'services/settings-v2';
+import { TOutputOrientation } from 'services/restream';
 
 interface IFacebookPage {
   access_token: string;
@@ -84,7 +85,7 @@ export interface IFacebookStartStreamOptions {
   description?: string;
   liveVideoId?: string;
   privacy?: { value: TFacebookStreamPrivacy };
-  video?: IVideo;
+  mode?: TOutputOrientation;
   event_params: {
     start_time?: number;
     cover?: string;
@@ -118,7 +119,7 @@ const initialState: IFacebookServiceState = {
     game: '',
     event_params: {},
     privacy: { value: 'EVERYONE' },
-    video: undefined,
+    mode: undefined,
   },
 };
 

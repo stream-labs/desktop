@@ -6,11 +6,12 @@ import { WidgetType } from '../widgets';
 import { getDefined } from '../../util/properties-type-guards';
 import { IVideo } from 'obs-studio-node';
 import { TDisplayType } from 'services/settings-v2';
+import { TOutputOrientation } from 'services/restream';
 
 export interface ITiktokStartStreamOptions {
   serverUrl: string;
   streamKey: string;
-  video?: IVideo;
+  mode?: TOutputOrientation;
 }
 
 interface ITiktokServiceState extends IPlatformState {

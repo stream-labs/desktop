@@ -15,6 +15,7 @@ import { getDefined } from '../../util/properties-type-guards';
 import Utils from '../utils';
 import { IVideo } from 'obs-studio-node';
 import { TDisplayType } from 'services/settings-v2';
+import { TOutputOrientation } from 'services/restream';
 
 interface ITrovoServiceState extends IPlatformState {
   settings: ITrovoStartStreamOptions;
@@ -25,7 +26,7 @@ interface ITrovoServiceState extends IPlatformState {
 export interface ITrovoStartStreamOptions {
   title: string;
   game: string;
-  video?: IVideo;
+  mode?: TOutputOrientation;
 }
 
 interface ITrovoChannelInfo {
@@ -48,7 +49,7 @@ export class TrovoService
   implements IPlatformService {
   static initialState: ITrovoServiceState = {
     ...BasePlatformService.initialState,
-    settings: { title: '', game: '', video: undefined },
+    settings: { title: '', game: '', mode: undefined },
     userInfo: { userId: '', channelId: '' },
     channelInfo: { gameId: '', gameName: '', gameImage: '' },
   };
