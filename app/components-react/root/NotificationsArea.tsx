@@ -198,7 +198,7 @@ export default function NotificationsArea() {
         </Tooltip>
       )}
       <div className={cx(styles.notificationsContainer, 'flex--grow')} ref={notificationsContainer}>
-        {true && <YTError />}
+        {ytDisabled && <YTError />}
       </div>
     </div>
   );
