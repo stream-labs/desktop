@@ -1,13 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { injectState, useModule } from 'slap';
+import { useModule } from 'slap';
 import { Badge, message, Tooltip } from 'antd';
 import moment from 'moment';
 import cx from 'classnames';
 import cloneDeep from 'lodash/cloneDeep';
 import { Services } from '../service-provider';
-import { ENotificationType, INotification, ENotificationSubType } from 'services/notifications';
+import { ENotificationType, INotification } from 'services/notifications';
 import { $t } from 'services/i18n';
 import styles from './NotificationsArea.m.less';
+import { useVuex } from 'components-react/hooks';
 const notificationAudio = require('../../../media/sound/ding.wav');
 
 class NotificationsModule {
@@ -85,6 +86,13 @@ class NotificationsModule {
     return Services.NotificationsService.state.settings;
   }
 
+  get ytDisabled() {
+    return (
+      Services.UserService.views.platform?.type === 'youtube' &&
+      !Services.YoutubeService.state.liveStreamingEnabled
+    );
+  }
+
   clickNotif() {
     if (!this.currentNotif) return;
     if (this.currentNotif.action) {
@@ -97,25 +105,21 @@ class NotificationsModule {
   }
 }
 
-function useNotifications() {
-  return useModule(NotificationsModule);
-}
-
 export default function NotificationsArea() {
-  const { NotificationsService, AnnouncementsService } = Services;
+  const { NotificationsService, UserService, YoutubeService } = Services;
 
   const {
     unreadWarnings,
     unreadNotifs,
     settings,
+    ytDisabled,
     addNotif,
-    playNext,
     clearQueueOfRead,
     setReadyToPlay,
-  } = useNotifications();
+  } = useModule(NotificationsModule);
 
   const notificationsContainer = useRef<HTMLDivElement>(null);
-  const [showExtendedNotifications, setShowExtendedNotifications] = useState(true);
+  const [showExtendedNotifications, setShowExtendedNotifications] = useState(false);
 
   const showNotificationsTooltip = $t('Click to open your Notifications window');
   const showUnreadNotificationsTooltip = $t('Click to read your unread Notifications');
@@ -125,7 +129,8 @@ export default function NotificationsArea() {
     const notifReadSub = NotificationsService.notificationRead.subscribe(clearQueueOfRead);
 
     const resizeInterval = window.setInterval(() => {
-      if (!notificationsContainer.current) return;
+      if (!notificationsContainer.current || ytDisabled) return;
+      if (notificationsContainer.current?.offsetWidth >= 150 === showExtendedNotifications) return;
       setShowExtendedNotifications(notificationsContainer.current?.offsetWidth >= 150);
     }, 1000);
 
