@@ -120,21 +120,17 @@ class NotificationsModule {
 }
 
 export default function NotificationsArea() {
-  const { NotificationsService, UserService, YoutubeService } = Services;
+  const { NotificationsService } = Services;
 
   const {
     unreadWarnings,
     unreadNotifs,
     settings,
     ytDisabled,
-    platform,
-    confirmYoutubeEnabled,
     addNotif,
     clearQueueOfRead,
     setReadyToPlay,
   } = useModule(NotificationsModule);
-
-  useEffect(confirmYoutubeEnabled, [platform]);
 
   const notificationsContainer = useRef<HTMLDivElement>(null);
   const [showExtendedNotifications, setShowExtendedNotifications] = useState(false);
@@ -162,10 +158,10 @@ export default function NotificationsArea() {
   useEffect(() => {
     message.config({
       getContainer: () => notificationsContainer.current as HTMLElement,
-      maxCount: showExtendedNotifications ? 1 : 0,
+      maxCount: 1,
     });
     setReadyToPlay();
-  }, [showExtendedNotifications]);
+  }, []);
 
   function showNotifications() {
     NotificationsService.actions.showNotifications();
@@ -197,7 +193,12 @@ export default function NotificationsArea() {
           </div>
         </Tooltip>
       )}
-      <div className={cx(styles.notificationsContainer, 'flex--grow')} ref={notificationsContainer}>
+      <div
+        className={cx(styles.notificationsContainer, 'flex--grow', {
+          [styles.hideNotifs]: !showExtendedNotifications,
+        })}
+        ref={notificationsContainer}
+      >
         {ytDisabled && <YTError />}
       </div>
     </div>
@@ -220,7 +221,7 @@ function YTError() {
   const { confirmYoutubeEnabled, openYoutubeEnable } = useModule(NotificationsModule);
 
   return (
-    <div className={cx('ant-message-notice', styles.notification, styles.warning)}>
+    <div className={cx('ant-message-notice', styles.notification, styles.warning, styles.ytError)}>
       <i className="fa fa-exclamation-triangle" />
       <span>{$t('YouTube account not enabled for live streaming')}</span>
       <button className={cx('button', styles.alertButton)} onClick={openYoutubeEnable}>
