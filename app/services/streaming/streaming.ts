@@ -690,22 +690,19 @@ export class StreamingService
       // sleep for 1 second to allow the first stream to start
       await new Promise(resolve => setTimeout(resolve, 1000));
     } else {
-      // if (this.views.activeDisplays.green && this.views.contextsToStream.includes('green')) {
-      //   obs.NodeObs.OBS_service_setVideoInfo(
-      //     this.videoSettingsService.contexts.green,
-      //     'green',
-      //   );
-      //   obs.NodeObs.OBS_service_startStreaming('green');
-      // } else if (this.views.activeDisplays.horizontal && this.views.hasGreenContext) {
-      //   // if the green context is active, explicitly set the horizontal context info
-      //   obs.NodeObs.OBS_service_setVideoInfo(
-      //     this.videoSettingsService.contexts.horizontal,
-      //     'horizontal',
-      //   );
-      //   obs.NodeObs.OBS_service_startStreaming('horizontal');
-      // } else {
-      obs.NodeObs.OBS_service_startStreaming();
-      // }
+      if (this.views.activeDisplays.green && this.views.contextsToStream.includes('green')) {
+        obs.NodeObs.OBS_service_setVideoInfo(this.videoSettingsService.contexts.green, 'green');
+        obs.NodeObs.OBS_service_startStreaming('green');
+      } else if (this.views.activeDisplays.horizontal && this.views.hasGreenContext) {
+        // if the green context is active, explicitly set the horizontal context info
+        obs.NodeObs.OBS_service_setVideoInfo(
+          this.videoSettingsService.contexts.horizontal,
+          'horizontal',
+        );
+        obs.NodeObs.OBS_service_startStreaming('horizontal');
+      } else {
+        obs.NodeObs.OBS_service_startStreaming();
+      }
     }
 
     const recordWhenStreaming = this.streamSettingsService.settings.recordWhenStreaming;

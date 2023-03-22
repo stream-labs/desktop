@@ -7,34 +7,44 @@ import {
   IGreenPlatformSetting,
 } from './green-data';
 import { ScenesService, SceneItem, IPartialSettings } from 'services/scenes';
-import { TDisplayType, VideoSettingsService } from 'services/settings-v2/video';
+import {
+  TDisplayType,
+  VideoSettingsService,
+  IVideoSetting,
+  greenDisplayData,
+} from 'services/settings-v2';
 import { StreamingService } from 'services/streaming';
 import { SceneCollectionsService } from 'services/scene-collections';
 import { TPlatform } from 'services/platforms';
 import { ReorderNodesCommand, EPlaceType } from 'services/editor-commands/commands/reorder-nodes';
 import { Subject } from 'rxjs';
-import { SettingsManagerService } from 'services/settings-manager';
 import { TOutputOrientation } from 'services/restream';
+import { IVideoInfo } from 'obs-studio-node';
 
+interface IDisplayVideoSettings {
+  defaultDisplay: TDisplayType;
+  green: IVideoInfo;
+  activeDisplays: {
+    horizontal: boolean;
+    green: boolean;
+  };
+}
 interface IGreenServiceState {
   displays: TDisplayType[];
   platformSettings: TGreenPlatformSettings;
   greenMode: boolean;
   nodeMaps: { [display in TDisplayType as string]: Dictionary<string> };
   sceneNodeMaps: { [sceneId: string]: Dictionary<string> };
+  videoSettings: IDisplayVideoSettings;
 }
 
 class GreenViews extends ViewHandler<IGreenServiceState> {
   @Inject() private scenesService: ScenesService;
   @Inject() private videoSettingsService: VideoSettingsService;
   @Inject() private streamingService: StreamingService;
-  @Inject() private settingsManagerService: SettingsManagerService;
 
   get greenMode(): boolean {
-    return (
-      this.settingsManagerService.views.activeDisplays.horizontal &&
-      this.settingsManagerService.views.activeDisplays.green
-    );
+    return this.activeDisplays.horizontal && this.activeDisplays.green;
   }
 
   get platformSettings() {
@@ -110,6 +120,23 @@ class GreenViews extends ViewHandler<IGreenServiceState> {
     return this.state.sceneNodeMaps;
   }
 
+  get videoSettings(): IDisplayVideoSettings {
+    return this.state.videoSettings;
+  }
+
+  get activeDisplays() {
+    return this.state.videoSettings.activeDisplays;
+  }
+
+  get defaultDisplay() {
+    const active = Object.entries(this.state.videoSettings.activeDisplays).map(([key, value]) => {
+      if (value === true) {
+        return { key };
+      }
+    });
+    return active.length > 1 ? null : active[0];
+  }
+
   getNodeIds(displays: TDisplayType[]) {
     return displays.reduce((ids: string[], display: TDisplayType) => {
       const nodeMap = this.state.nodeMaps[display];
@@ -172,6 +199,14 @@ export class GreenService extends PersistentStatefulService<IGreenServiceState> 
     greenMode: false,
     nodeMaps: null,
     sceneNodeMaps: {},
+    videoSettings: {
+      defaultDisplay: 'horizontal',
+      green: greenDisplayData, // get settings for horizontal display from obs directly
+      activeDisplays: {
+        horizontal: true,
+        green: false,
+      },
+    },
   };
 
   sceneItemsConfirmed = new Subject();
@@ -362,6 +397,39 @@ export class GreenService extends PersistentStatefulService<IGreenServiceState> 
   }
 
   /**
+   * Helper functions to manage displays
+   */
+
+  toggleDisplay(status: boolean, display?: TDisplayType) {
+    if (
+      this.state.videoSettings.activeDisplays.horizontal &&
+      this.state.videoSettings.activeDisplays.green
+    ) {
+      this.setDisplayActive(status, display);
+    } else if (display === 'horizontal' && status === false) {
+      this.sceneItemsConfirmed.subscribe(() => {
+        this.setDisplayActive(status, display);
+      });
+      this.confirmOrCreateGreenNodes();
+    } else if (display === 'green' && status === true) {
+      this.sceneItemsConfirmed.subscribe(() => {
+        this.setDisplayActive(status, display);
+      });
+      this.confirmOrCreateGreenNodes();
+    } else {
+      this.setDisplayActive(status, display);
+    }
+  }
+
+  setVideoSetting(setting: Partial<IVideoSetting>, display?: TDisplayType) {
+    this.SET_VIDEO_SETTING(setting, display);
+  }
+
+  private setDisplayActive(status: boolean, display: TDisplayType) {
+    this.SET_DISPLAY_ACTIVE(status, display);
+  }
+
+  /**
    * Helper functions for adding and removing scene items in Green mode
    */
 
@@ -441,5 +509,36 @@ export class GreenService extends PersistentStatefulService<IGreenServiceState> 
       };
     }
     this.state.nodeMaps = newMap;
+  }
+
+  @mutation()
+  private SET_DISPLAY_ACTIVE(status: boolean, display: TDisplayType = 'horizontal') {
+    const otherDisplay = display === 'horizontal' ? 'green' : 'horizontal';
+    if (
+      status === false &&
+      this.state.videoSettings.activeDisplays[display] &&
+      !this.state.videoSettings.activeDisplays[otherDisplay]
+    ) {
+      this.state.videoSettings.activeDisplays = {
+        ...this.state.videoSettings.activeDisplays,
+        [display]: status,
+        [otherDisplay]: !status,
+      };
+    } else {
+      this.state.videoSettings.activeDisplays = {
+        ...this.state.videoSettings.activeDisplays,
+        [display]: status,
+      };
+    }
+
+    this.state.videoSettings.defaultDisplay = display;
+  }
+
+  @mutation()
+  private SET_VIDEO_SETTING(setting: Partial<IVideoSetting>, display: TDisplayType = 'green') {
+    this.state.videoSettings.activeDisplays = {
+      ...this.state.videoSettings.activeDisplays,
+      [display]: setting,
+    };
   }
 }

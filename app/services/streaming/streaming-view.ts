@@ -168,6 +168,14 @@ export class StreamInfoView<T extends Object> extends ViewHandler<T> {
     return Services.GreenService.views.contextsToStream;
   }
 
+  get activeDisplays() {
+    return Services.GreenService.views.activeDisplays;
+  }
+
+  get hasGreenContext() {
+    return !!Services.VideoSettingsService.contexts.green;
+  }
+
   getPlatformDisplay(platform: TPlatform) {
     return Services.GreenService.views.getPlatformDisplay(platform);
   }

@@ -3,7 +3,7 @@ import { Inject } from 'services/core/injector';
 import { InitAfter } from 'services/core';
 import { mutation, StatefulService } from '../core/stateful-service';
 import * as obs from '../../../obs-api';
-import { SettingsManagerService } from 'services/settings-manager';
+import { GreenService } from 'services/green';
 
 /**
  * Display Types
@@ -35,10 +35,9 @@ export interface IVideoSetting {
 }
 
 @InitAfter('UserService')
-@InitAfter('SettingsManagerService')
 @InitAfter('SceneCollectionsService')
 export class VideoSettingsService extends StatefulService<IVideoSetting> {
-  @Inject() settingsManagerService: SettingsManagerService;
+  @Inject() greenService: GreenService;
 
   initialState = {
     defaultContext: null as obs.IVideo,
@@ -51,7 +50,7 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
 
   init() {
     this.establishVideoContext();
-    if (this.settingsManagerService.views.activeDisplays.green) {
+    if (this.greenService.views.activeDisplays.green) {
       this.establishVideoContext('green');
     }
   }
@@ -91,7 +90,7 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
   }
 
   get videoSettings() {
-    return this.settingsManagerService.views.videoSettings;
+    return this.greenService.views.videoSettings;
   }
 
   migrateSettings(display?: TDisplayType) {
@@ -194,7 +193,7 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
     } else if (display === 'green') {
       // if the display is green, also update the persisted settings
       this.updateObsSettings('green');
-      this.settingsManagerService.setVideoSetting({ [key]: value });
+      this.greenService.setVideoSetting({ [key]: value });
     }
   }
 
