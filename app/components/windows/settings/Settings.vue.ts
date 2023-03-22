@@ -185,8 +185,8 @@ export default class Settings extends Vue {
       .getCategories()
       .filter(
         category =>
-          !category.toLowerCase().startsWith('stream', 0) ||
-          (category.toLowerCase().startsWith('stream', 0) && category.length < 7),
+          !category.toLowerCase().startsWith('stream') ||
+          (category.toLowerCase().startsWith('stream') && category.length < 7),
       );
   }
 

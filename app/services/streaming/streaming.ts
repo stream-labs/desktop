@@ -767,8 +767,6 @@ export class StreamingService
         remote.powerSaveBlocker.stop(this.powerSaveId);
       }
 
-      // obs.NodeObs.OBS_service_stopStreaming(false);
-
       if (this.views.isGreen) {
         if (this.views.enabledPlatforms.length > 1) {
           this.views.contextsToStream.forEach(async (contextName: string) => {
@@ -820,8 +818,6 @@ export class StreamingService
       } else {
         obs.NodeObs.OBS_service_stopStreaming(true);
       }
-
-      // obs.NodeObs.OBS_service_stopStreaming(true);
       return Promise.resolve();
     }
   }

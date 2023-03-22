@@ -220,7 +220,20 @@ export interface IUserInfo {
   username?: string;
 }
 
-export type TPlatform = 'twitch' | 'youtube' | 'facebook' | 'tiktok' | 'trovo';
+export enum EPlatform {
+  Twitch = 'twitch',
+  Facebook = 'facebook',
+  YouTube = 'youtube',
+  Tiktok = 'tiktok',
+  Trovo = 'trovo',
+}
+
+export type TPlatform =
+  | EPlatform.Twitch
+  | EPlatform.Facebook
+  | EPlatform.YouTube
+  | EPlatform.Tiktok
+  | EPlatform.Trovo;
 
 export function getPlatformService(platform: TPlatform): IPlatformService {
   return {

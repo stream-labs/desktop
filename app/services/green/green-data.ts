@@ -1,12 +1,5 @@
 import { $t } from 'services/i18n';
-import { TPlatform } from 'services/platforms';
-
-export enum EGreenPlatform {
-  Twitch = 'twitch',
-  Facebook = 'facebook',
-  YouTube = 'youtube',
-  Trovo = 'trovo',
-}
+import { EPlatform, TPlatform } from 'services/platforms';
 
 export enum EOutputDisplayType {
   Horizontal = 'horizontal',
@@ -21,7 +14,7 @@ export interface IGreenPlatformSetting {
 }
 
 export type TGreenPlatformSettings = {
-  [Platform in EGreenPlatform]: IGreenPlatformSetting;
+  [Platform in EPlatform]: IGreenPlatformSetting;
 };
 
 export type TDisplayPlatforms = {
@@ -29,30 +22,34 @@ export type TDisplayPlatforms = {
 };
 
 export const GreenPlatformSettings: TGreenPlatformSettings = {
-  [EGreenPlatform.Twitch]: {
-    platform: EGreenPlatform.Twitch,
+  [EPlatform.Twitch]: {
+    platform: EPlatform.Twitch,
     display: EOutputDisplayType.Horizontal,
   },
-  [EGreenPlatform.Facebook]: {
-    platform: EGreenPlatform.Facebook,
+  [EPlatform.Facebook]: {
+    platform: EPlatform.Facebook,
     display: EOutputDisplayType.Horizontal,
   },
-  [EGreenPlatform.YouTube]: {
-    platform: EGreenPlatform.YouTube,
+  [EPlatform.YouTube]: {
+    platform: EPlatform.YouTube,
     display: EOutputDisplayType.Horizontal,
   },
-  [EGreenPlatform.Trovo]: {
-    platform: EGreenPlatform.Trovo,
+  [EPlatform.Trovo]: {
+    platform: EPlatform.Trovo,
     display: EOutputDisplayType.Horizontal,
+  },
+  [EPlatform.Tiktok]: {
+    platform: EPlatform.Tiktok,
+    display: EOutputDisplayType.Green,
   },
 };
 
-export const platformLabels = (platform: EGreenPlatform | string) =>
+export const platformLabels = (platform: EPlatform | string) =>
   ({
-    [EGreenPlatform.Twitch]: $t('Twitch'),
-    [EGreenPlatform.Facebook]: $t('Facebook'),
-    [EGreenPlatform.YouTube]: $t('YouTube'),
-    [EGreenPlatform.Trovo]: $t('Trovo'),
+    [EPlatform.Twitch]: $t('Twitch'),
+    [EPlatform.Facebook]: $t('Facebook'),
+    [EPlatform.YouTube]: $t('YouTube'),
+    [EPlatform.Trovo]: $t('Trovo'),
   }[platform]);
 
 export const displayLabels = (display: EOutputDisplayType | string) =>

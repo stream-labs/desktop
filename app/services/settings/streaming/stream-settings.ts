@@ -147,7 +147,6 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
     let streamFormData = cloneDeep(this.views.obsStreamSettings);
 
     streamFormData.forEach(subCategory => {
-      console.log('subCategory ', subCategory);
       subCategory.parameters.forEach(parameter => {
         if (parameter.name === 'streamType' && patch.streamType !== void 0) {
           parameter.value = patch.streamType;

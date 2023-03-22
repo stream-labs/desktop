@@ -94,10 +94,6 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
     return this.settingsManagerService.views.videoSettings;
   }
 
-  getBaseResolution(display: TDisplayType = 'horizontal') {
-    return `${this.state[display].baseWidth}x${this.state[display].baseHeight}`;
-  }
-
   migrateSettings(display?: TDisplayType) {
     const contextName = contextNameMap[display];
 
@@ -157,7 +153,7 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
     }
     this.DESTROY_VIDEO_CONTEXT(display);
 
-    return !this.state[contextName];
+    return !!this.state[contextName];
   }
 
   createDefaultFps(display: TDisplayType = 'horizontal') {

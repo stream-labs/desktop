@@ -3,15 +3,14 @@ import {
   TDisplayPlatforms,
   TGreenPlatformSettings,
   GreenPlatformSettings,
-  EGreenPlatform,
   TGreenDisplayType,
   IGreenPlatformSetting,
 } from './green-data';
-import { ScenesService, SceneItem, IPartialSettings, IScene } from 'services/scenes';
+import { ScenesService, SceneItem, IPartialSettings } from 'services/scenes';
 import { TDisplayType, VideoSettingsService } from 'services/settings-v2/video';
 import { StreamingService } from 'services/streaming';
 import { SceneCollectionsService } from 'services/scene-collections';
-import { TPlatform } from 'services/platforms';
+import { TPlatform, EPlatform } from 'services/platforms';
 import { ReorderNodesCommand, EPlaceType } from 'services/editor-commands/commands/reorder-nodes';
 import { Subject } from 'rxjs';
 import { SettingsManagerService } from 'services/settings-manager';
@@ -374,12 +373,12 @@ export class GreenService extends PersistentStatefulService<IGreenServiceState> 
    * Settings for platforms to displays
    */
 
-  updatePlatformSetting(platform: EGreenPlatform | string, display: TGreenDisplayType) {
+  updatePlatformSetting(platform: EPlatform | string, display: TGreenDisplayType) {
     this.UPDATE_PLATFORM_SETTING(platform, display);
   }
 
   @mutation()
-  private UPDATE_PLATFORM_SETTING(platform: EGreenPlatform | string, display: TGreenDisplayType) {
+  private UPDATE_PLATFORM_SETTING(platform: EPlatform | string, display: TGreenDisplayType) {
     this.state.platformSettings[platform] = {
       ...this.state.platformSettings[platform],
       display,
