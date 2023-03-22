@@ -59,6 +59,7 @@ enum EOBSOutputSignal {
   Start = 'start',
   Stopping = 'stopping',
   Stop = 'stop',
+  Deactivate = 'deactivate',
   Reconnect = 'reconnect',
   ReconnectSuccess = 'reconnect_success',
   Wrote = 'wrote',
@@ -70,6 +71,7 @@ interface IOBSOutputSignalInfo {
   signal: EOBSOutputSignal;
   code: obs.EOutputCode;
   error: string;
+  service: string; // 'default' | 'green'
 }
 
 export class StreamingService
@@ -95,6 +97,7 @@ export class StreamingService
   replayBufferStatusChange = new Subject<EReplayBufferState>();
   replayBufferFileWrite = new Subject<string>();
   streamInfoChanged = new Subject<StreamInfoView<any>>();
+  signalInfoChanged = new Subject<IOBSOutputSignalInfo>();
 
   // Dummy subscription for stream deck
   streamingStateChange = new Subject<void>();
@@ -342,30 +345,14 @@ export class StreamingService
             await this.runCheck('setupGreen', async () => {
               // enable restream on the backend side
               if (!this.restreamService.state.enabled) await this.restreamService.setEnabled(true);
-              await this.restreamService.beforeGreenGoLive(
-                displayPlatforms[display],
-                display as TDisplayType,
-                display as TOutputOrientation,
-              );
+
+              const mode: TOutputOrientation = display === 'horizontal' ? 'landscape' : 'portrait';
+              await this.restreamService.beforeGoLive(display as TDisplayType, mode);
             });
           } catch (e: unknown) {
             console.error('Failed to setup restream', e);
             this.setError('RESTREAM_SETUP_FAILED');
             return;
-          }
-        } else {
-          // set single stream for the display
-          if (displayPlatforms[display].length > 0) {
-            const platform = displayPlatforms[display][0];
-            const service = getPlatformService(platform);
-            try {
-              await this.runCheck('setupGreen', async () => {
-                service.confirmGreen(platform);
-                return Promise.resolve();
-              });
-            } catch (e: unknown) {
-              this.handleSetupPlatformError(e, platform);
-            }
           }
         }
       }
@@ -678,24 +665,47 @@ export class StreamingService
 
     this.powerSaveId = remote.powerSaveBlocker.start('prevent-display-sleep');
 
-    if (this.views.isGreen) {
-      if (this.views.enabledPlatforms.length > 1) {
-        this.views.contextsToStream.forEach(async (contextName: string) => {
-          const context = this.videoSettingsService.contexts[contextName];
-          obs.NodeObs.OBS_service_setVideoInfo(context, contextName);
-          obs.NodeObs.OBS_service_startStreaming(contextName);
+    if (this.views.contextsToStream.length > 1 && this.views.enabledPlatforms.length > 1) {
+      const horizontalContext = this.videoSettingsService.contexts.horizontal;
+      const greenContext = this.videoSettingsService.contexts.green;
 
-          await new Promise(resolve => setTimeout(resolve, 1000));
-        });
-      } else {
-        const platform = this.views.enabledPlatforms[0];
-        const display = this.views.getPlatformDisplay(platform);
-        const context = this.videoSettingsService.contexts[display];
-        obs.NodeObs.OBS_service_setVideoInfo(context, display);
-        obs.NodeObs.OBS_service_startStreaming(display);
-      }
+      obs.NodeObs.OBS_service_setVideoInfo(horizontalContext, 'horizontal');
+      obs.NodeObs.OBS_service_setVideoInfo(greenContext, 'green');
+
+      const signalChanged = this.signalInfoChanged.subscribe((signalInfo: IOBSOutputSignalInfo) => {
+        if (signalInfo.service === 'default') {
+          if (signalInfo.code !== 0) {
+            obs.NodeObs.OBS_service_stopStreaming(true, 'horizontal');
+            obs.NodeObs.OBS_service_stopStreaming(true, 'green');
+          }
+
+          if (signalInfo.signal === EOBSOutputSignal.Start) {
+            obs.NodeObs.OBS_service_startStreaming('green');
+            signalChanged.unsubscribe();
+          }
+        }
+      });
+
+      obs.NodeObs.OBS_service_startStreaming('horizontal');
+      // sleep for 1 second to allow the first stream to start
+      await new Promise(resolve => setTimeout(resolve, 1000));
     } else {
+      // if (this.views.activeDisplays.green && this.views.contextsToStream.includes('green')) {
+      //   obs.NodeObs.OBS_service_setVideoInfo(
+      //     this.videoSettingsService.contexts.green,
+      //     'green',
+      //   );
+      //   obs.NodeObs.OBS_service_startStreaming('green');
+      // } else if (this.views.activeDisplays.horizontal && this.views.hasGreenContext) {
+      //   // if the green context is active, explicitly set the horizontal context info
+      //   obs.NodeObs.OBS_service_setVideoInfo(
+      //     this.videoSettingsService.contexts.horizontal,
+      //     'horizontal',
+      //   );
+      //   obs.NodeObs.OBS_service_startStreaming('horizontal');
+      // } else {
       obs.NodeObs.OBS_service_startStreaming();
+      // }
     }
 
     const recordWhenStreaming = this.streamSettingsService.settings.recordWhenStreaming;
@@ -767,20 +777,28 @@ export class StreamingService
         remote.powerSaveBlocker.stop(this.powerSaveId);
       }
 
-      if (this.views.isGreen) {
-        if (this.views.enabledPlatforms.length > 1) {
-          this.views.contextsToStream.forEach(async (contextName: string) => {
-            obs.NodeObs.OBS_service_stopStreaming(false, contextName);
+      if (this.views.contextsToStream.length > 1 && this.views.enabledPlatforms.length > 1) {
+        const signalChanged = this.signalInfoChanged.subscribe(
+          (signalInfo: IOBSOutputSignalInfo) => {
+            if (
+              signalInfo.service === 'default' &&
+              signalInfo.signal === EOBSOutputSignal.Deactivate
+            ) {
+              obs.NodeObs.OBS_service_stopStreaming(false, 'green');
+              signalChanged.unsubscribe();
+            }
+          },
+        );
 
-            return Promise.resolve();
-          });
-        } else {
-          const platform = this.views.enabledPlatforms[0];
-          const display = this.views.getPlatformDisplay(platform);
-          obs.NodeObs.OBS_service_stopStreaming(false, display);
-        }
+        obs.NodeObs.OBS_service_stopStreaming(false, 'horizontal');
+
+        await new Promise(resolve => setTimeout(resolve, 1000));
       } else {
-        obs.NodeObs.OBS_service_stopStreaming(false);
+        // if (this.views.activeDisplays.green && this.views.contextsToStream.includes('green')) {
+        //   obs.NodeObs.OBS_service_stopStreaming(false, 'green');
+        // } else {
+        obs.NodeObs.OBS_service_stopStreaming(false, 'horizontal');
+        // }
       }
 
       const keepRecording = this.streamSettingsService.settings.keepRecordingWhenStreamStops;
@@ -803,20 +821,12 @@ export class StreamingService
     }
 
     if (this.state.streamingStatus === EStreamingState.Ending) {
-      if (this.views.isGreen) {
-        if (this.views.enabledPlatforms.length > 1) {
-          this.views.contextsToStream.forEach(async (contextName: string) => {
-            obs.NodeObs.OBS_service_stopStreaming(true, contextName);
-
-            return Promise.resolve();
-          });
-        } else {
-          const platform = this.views.enabledPlatforms[0];
-          const display = this.views.getPlatformDisplay(platform);
-          obs.NodeObs.OBS_service_stopStreaming(true, display);
-        }
+      if (this.views.contextsToStream.length > 1) {
+        obs.NodeObs.OBS_service_stopStreaming(true, 'horizontal');
+        obs.NodeObs.OBS_service_stopStreaming(true, 'green');
       } else {
-        obs.NodeObs.OBS_service_stopStreaming(true);
+        const contextName = this.views.contextsToStream[0];
+        obs.NodeObs.OBS_service_stopStreaming(true, contextName);
       }
       return Promise.resolve();
     }

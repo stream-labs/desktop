@@ -1,5 +1,5 @@
 import { $t } from 'services/i18n';
-import { EPlatform, TPlatform } from 'services/platforms';
+import { TPlatform } from 'services/platforms';
 
 export enum EOutputDisplayType {
   Horizontal = 'horizontal',
@@ -14,7 +14,7 @@ export interface IGreenPlatformSetting {
 }
 
 export type TGreenPlatformSettings = {
-  [Platform in EPlatform]: IGreenPlatformSetting;
+  [Platform in TPlatform]: IGreenPlatformSetting;
 };
 
 export type TDisplayPlatforms = {
@@ -22,34 +22,34 @@ export type TDisplayPlatforms = {
 };
 
 export const GreenPlatformSettings: TGreenPlatformSettings = {
-  [EPlatform.Twitch]: {
-    platform: EPlatform.Twitch,
+  ['twitch']: {
+    platform: 'twitch',
     display: EOutputDisplayType.Horizontal,
   },
-  [EPlatform.Facebook]: {
-    platform: EPlatform.Facebook,
+  ['facebook']: {
+    platform: 'facebook',
     display: EOutputDisplayType.Horizontal,
   },
-  [EPlatform.YouTube]: {
-    platform: EPlatform.YouTube,
+  ['youtube']: {
+    platform: 'youtube',
     display: EOutputDisplayType.Horizontal,
   },
-  [EPlatform.Trovo]: {
-    platform: EPlatform.Trovo,
+  ['trovo']: {
+    platform: 'trovo',
     display: EOutputDisplayType.Horizontal,
   },
-  [EPlatform.Tiktok]: {
-    platform: EPlatform.Tiktok,
+  ['tiktok']: {
+    platform: 'tiktok',
     display: EOutputDisplayType.Green,
   },
 };
 
-export const platformLabels = (platform: EPlatform | string) =>
+export const platformLabels = (platform: TPlatform | string) =>
   ({
-    [EPlatform.Twitch]: $t('Twitch'),
-    [EPlatform.Facebook]: $t('Facebook'),
-    [EPlatform.YouTube]: $t('YouTube'),
-    [EPlatform.Trovo]: $t('Trovo'),
+    ['twitch']: $t('Twitch'),
+    ['facebook']: $t('Facebook'),
+    ['youtube']: $t('YouTube'),
+    ['trovo']: $t('Trovo'),
   }[platform]);
 
 export const displayLabels = (display: EOutputDisplayType | string) =>

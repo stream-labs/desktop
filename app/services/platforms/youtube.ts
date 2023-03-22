@@ -23,6 +23,7 @@ import * as remote from '@electron/remote';
 import pick from 'lodash/pick';
 import { TDisplayType } from 'services/settings-v2';
 import { IVideo } from 'obs-studio-node';
+import { TOutputOrientation } from 'services/restream';
 
 interface IYoutubeServiceState extends IPlatformState {
   liveStreamingEnabled: boolean;
@@ -40,7 +41,7 @@ export interface IYoutubeStartStreamOptions extends IExtraBroadcastSettings {
   description: string;
   privacyStatus?: 'private' | 'public' | 'unlisted';
   scheduledStartTime?: number;
-  video?: IVideo;
+  mode?: TOutputOrientation;
 }
 
 /**
@@ -202,6 +203,7 @@ export class YoutubeService
       privacyStatus: 'public',
       selfDeclaredMadeForKids: false,
       thumbnail: '',
+      mode: undefined,
     },
   };
 
@@ -319,7 +321,7 @@ export class YoutubeService
     this.SET_STREAM_ID(stream.id);
     this.SET_STREAM_KEY(streamKey);
 
-    this.confirmGreen('youtube');
+    this.setPlatformContext('youtube');
   }
 
   /**

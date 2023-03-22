@@ -14,6 +14,7 @@ import { BasePlatformService } from './base-platform';
 import { WindowsService } from '../windows';
 import { assertIsDefined, getDefined } from '../../util/properties-type-guards';
 import { TDisplayType } from 'services/settings-v2';
+import { TOutputOrientation } from 'services/restream';
 interface IFacebookPage {
   access_token: string;
   name: string;
@@ -88,6 +89,7 @@ export interface IFacebookStartStreamOptions {
   description?: string;
   liveVideoId?: string;
   privacy?: { value: TFacebookStreamPrivacy };
+  mode?: TOutputOrientation;
   event_params: { start_time?: number; cover?: string; status?: TFacebookStatus };
 }
 
@@ -115,6 +117,7 @@ const initialState: IFacebookServiceState = {
     title: '',
     description: '',
     game: '',
+    mode: undefined,
     event_params: {},
     privacy: { value: 'EVERYONE' },
   },
@@ -272,7 +275,7 @@ export class FacebookService
       await this.postPage(fbOptions.pageId);
     }
 
-    this.confirmGreen('facebook');
+    this.setPlatformContext('facebook');
   }
 
   /**

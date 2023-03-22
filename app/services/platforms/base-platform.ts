@@ -119,13 +119,12 @@ export abstract class BasePlatformService<T extends IPlatformState> extends Stat
     return Promise.resolve({});
   }
 
-  confirmGreen(platform: TPlatform) {
+  setPlatformContext(platform: TPlatform) {
     if (this.greenService.views.greenMode) {
-      const display = this.greenService.views.getPlatformDisplay(platform);
-      const context = this.videoSettingsService.contexts[display];
+      const mode = this.greenService.views.getPlatformContextName(platform);
 
       this.UPDATE_STREAM_SETTINGS({
-        video: context,
+        mode,
       });
     }
   }

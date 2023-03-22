@@ -10,8 +10,8 @@ import { TwitchService } from 'services/platforms/twitch';
 import { PlatformAppsService } from 'services/platform-apps';
 import { IGoLiveSettings, IPlatformFlags } from 'services/streaming';
 import { TDisplayType } from 'services/settings-v2/video';
-import { IVideo } from 'obs-studio-node';
 import Vue from 'vue';
+import { TOutputOrientation } from 'services/restream';
 
 interface ISavedGoLiveSettings {
   platforms: {
@@ -28,7 +28,7 @@ export interface ICustomStreamDestination {
   url: string;
   streamKey?: string;
   enabled: boolean;
-  video?: IVideo;
+  mode?: TOutputOrientation;
 }
 
 /**

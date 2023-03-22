@@ -20,12 +20,13 @@ import { BasePlatformService } from './base-platform';
 import Utils from '../utils';
 import { IVideo } from 'obs-studio-node';
 import { TDisplayType } from 'services/settings-v2';
+import { TOutputOrientation } from 'services/restream';
 
 export interface ITwitchStartStreamOptions {
   title: string;
   game?: string;
   tags: string[];
-  video?: IVideo;
+  mode?: TOutputOrientation;
 }
 
 export interface ITwitchChannelInfo extends ITwitchStartStreamOptions {
@@ -78,6 +79,7 @@ export class TwitchService
       title: '',
       game: '',
       tags: [],
+      mode: undefined,
     },
   };
 
@@ -191,7 +193,7 @@ export class TwitchService
       if (channelInfo) await this.putChannelInfo(channelInfo);
     }
 
-    this.confirmGreen('twitch');
+    this.setPlatformContext('twitch');
   }
 
   async validatePlatform() {

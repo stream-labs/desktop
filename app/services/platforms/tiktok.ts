@@ -5,10 +5,12 @@ import { IGoLiveSettings } from '../streaming';
 import { WidgetType } from '../widgets';
 import { getDefined } from '../../util/properties-type-guards';
 import { TDisplayType } from 'services/settings-v2';
+import { TOutputOrientation } from 'services/restream';
 
 export interface ITiktokStartStreamOptions {
   serverUrl: string;
   streamKey: string;
+  mode?: TOutputOrientation;
 }
 
 interface ITiktokServiceState extends IPlatformState {
@@ -63,7 +65,7 @@ export class TiktokService
       );
     }
     this.SET_STREAM_SETTINGS(ttSettings);
-    this.confirmGreen('tiktok');
+    this.setPlatformContext('tiktok');
   }
 
   /**

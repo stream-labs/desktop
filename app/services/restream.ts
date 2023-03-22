@@ -177,33 +177,11 @@ export class RestreamService extends StatefulService<IRestreamState> {
     return jfetch(request);
   }
 
-  async beforeGoLive() {
-    await Promise.all([this.setupIngest(), this.setupTargets()]);
+  async beforeGoLive(context?: TDisplayType, mode?: TOutputOrientation) {
+    await Promise.all([this.setupIngest(context, mode), this.setupTargets(!!mode)]);
   }
 
-  async beforeGreenGoLive(
-    platforms: TPlatform[],
-    context: TDisplayType,
-    mode?: TOutputOrientation,
-  ) {
-    await Promise.all([this.setupGreenIngest(context, mode), this.setupGreenTargets(platforms)]);
-  }
-
-  async setupIngest() {
-    const ingest = (await this.fetchIngest()).server;
-
-    // We need to move OBS to custom ingest mode before we can set the server
-    this.streamSettingsService.setSettings({
-      streamType: 'rtmp_custom',
-    });
-
-    this.streamSettingsService.setSettings({
-      key: this.settings.streamKey,
-      server: ingest,
-    });
-  }
-
-  async setupGreenIngest(context: TDisplayType, mode?: TOutputOrientation) {
+  async setupIngest(context?: TDisplayType, mode?: TOutputOrientation) {
     const ingest = (await this.fetchIngest()).server;
     const settings = mode ? await this.fetchUserSettings(mode) : this.settings;
 
@@ -224,7 +202,7 @@ export class RestreamService extends StatefulService<IRestreamState> {
     );
   }
 
-  async setupTargets() {
+  async setupTargets(isGreenMode?: boolean) {
     // delete existing targets
     const targets = await this.fetchTargets();
     const promises = targets.map(t => this.deleteTarget(t.id));
@@ -232,17 +210,34 @@ export class RestreamService extends StatefulService<IRestreamState> {
 
     // setup new targets
     const newTargets = [
-      ...this.streamInfo.enabledPlatforms.map(platform => ({
-        platform: platform as TPlatform,
-        streamKey: getPlatformService(platform).state.streamKey,
-      })),
+      ...this.streamInfo.enabledPlatforms.map(platform =>
+        isGreenMode
+          ? {
+              platform,
+              streamKey: getPlatformService(platform).state.streamKey,
+              mode: this.greenService.views.getPlatformContextName(platform) ?? 'landscape',
+            }
+          : {
+              platform,
+              streamKey: getPlatformService(platform).state.streamKey,
+            },
+      ),
       ...this.streamInfo.savedSettings.customDestinations
         .filter(dest => dest.enabled)
-        .map(dest => ({
-          platform: 'relay' as 'relay',
-          streamKey: `${dest.url}${dest.streamKey}`,
-          video: dest?.video,
-        })),
+        .map(dest =>
+          isGreenMode
+            ? {
+                platform: 'relay' as 'relay',
+                streamKey: `${dest.url}${dest.streamKey}`,
+                mode:
+                  this.greenService.views.getPlatformContextName(dest.name as TPlatform) ??
+                  'landscape',
+              }
+            : {
+                platform: 'relay' as 'relay',
+                streamKey: `${dest.url}${dest.streamKey}`,
+              },
+        ),
     ];
 
     // treat tiktok as a custom destination
@@ -252,24 +247,6 @@ export class RestreamService extends StatefulService<IRestreamState> {
       tikTokTarget.platform = 'relay';
       tikTokTarget.streamKey = `${ttSettings.serverUrl}/${ttSettings.streamKey}`;
     }
-
-    await this.createTargets(newTargets);
-  }
-
-  async setupGreenTargets(platforms: TPlatform[]) {
-    // delete existing targets
-    const targets = await this.fetchTargets();
-    const promises = targets.map(t => this.deleteTarget(t.id));
-    await Promise.all(promises);
-
-    // setup new targets
-    const newTargets = [
-      ...platforms.map(platform => ({
-        platform: platform as TPlatform,
-        streamKey: getPlatformService(platform).state.streamKey,
-        video: this.greenService.views.getPlatformContext(platform),
-      })),
-    ];
 
     await this.createTargets(newTargets);
   }
@@ -287,7 +264,7 @@ export class RestreamService extends StatefulService<IRestreamState> {
     targets: {
       platform: TPlatform | 'relay';
       streamKey: string;
-      video?: obs.IVideo;
+      mode?: TOutputOrientation;
     }[],
   ) {
     const headers = authorizedHeaders(
@@ -304,7 +281,7 @@ export class RestreamService extends StatefulService<IRestreamState> {
           dcProtection: false,
           idleTimeout: 30,
           label: `${target.platform} target`,
-          video: target.hasOwnProperty('video') && target.video,
+          mode: target?.mode,
         };
       }),
     );

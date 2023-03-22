@@ -85,17 +85,16 @@ export class TrovoService
     if (!this.streamingService.views.isMultiplatformMode) {
       this.streamSettingsService.setSettings(
         {
+          streamType: 'rtmp_custom',
           key,
-          platform: 'facebook',
-          streamType: 'rtmp_common',
-          server: 'rtmps://rtmp-api.facebook.com:443/rtmp/',
+          server: this.rtmpServer,
         },
         context,
       );
     }
     await this.putChannelInfo(trSettings);
 
-    this.confirmGreen('trovo');
+    this.setPlatformContext('trovo');
   }
 
   fetchNewToken(): Promise<void> {

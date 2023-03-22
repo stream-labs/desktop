@@ -187,7 +187,7 @@ export interface IPlatformService {
     useToken?: boolean | string,
   ) => Dictionary<string | undefined>;
 
-  confirmGreen?: (platform: TPlatform) => void;
+  setPlatformContext?: (platform: TPlatform) => void;
 
   liveDockEnabled: boolean;
 
@@ -220,20 +220,7 @@ export interface IUserInfo {
   username?: string;
 }
 
-export enum EPlatform {
-  Twitch = 'twitch',
-  Facebook = 'facebook',
-  YouTube = 'youtube',
-  Tiktok = 'tiktok',
-  Trovo = 'trovo',
-}
-
-export type TPlatform =
-  | EPlatform.Twitch
-  | EPlatform.Facebook
-  | EPlatform.YouTube
-  | EPlatform.Tiktok
-  | EPlatform.Trovo;
+export type TPlatform = 'twitch' | 'facebook' | 'youtube' | 'tiktok' | 'trovo';
 
 export function getPlatformService(platform: TPlatform): IPlatformService {
   return {
