@@ -122,7 +122,11 @@ export default function StudioFooterComponent() {
             <div className={styles.platformError}>
               <i className="fa fa-exclamation-triangle" />
               <span>{$t('YouTube account not enabled for live streaming')}</span>
-              <button className="button alert-button" onClick={openYoutubeEnable}>
+              <button
+                className="button alert-button"
+                style={{ marginRight: '8px' }}
+                onClick={openYoutubeEnable}
+              >
                 {$t('Fix')}
               </button>
               <button className="button alert-button" onClick={confirmYoutubeEnabled}>
