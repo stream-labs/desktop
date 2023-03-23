@@ -19,6 +19,22 @@
   }
 }
 
+.hide_notifs .notification {
+  display: none;
+
+  &.yt-error {
+    display: block;
+  }
+}
+
+.alert-button {
+  min-height: 30px !important;
+  height: 30px;
+  background-color: rgba(251, 72, 76, 0.36) !important;
+  margin: 0 4px !important;
+  font-size: 12px;
+}
+
 :global(.ant-message-notice).notification {
   .padding-left();
   .padding-right();
