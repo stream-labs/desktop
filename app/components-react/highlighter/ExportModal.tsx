@@ -63,7 +63,7 @@ export default function ExportModal(p: { close: () => void }) {
   useEffect(dismissError, []);
 
   if (exportInfo.exporting) return <ExportProgress />;
-  if (!exportInfo.exported) return <ExportOptions />;
+  if (!exportInfo.exported) return <ExportOptions close={p.close} />;
   return <YoutubeUpload defaultTitle={videoName} close={p.close} />;
 }
 
@@ -106,7 +106,7 @@ function ExportProgress() {
   );
 }
 
-function ExportOptions() {
+function ExportOptions(p: { close: () => void }) {
   const { UsageStatisticsService } = Services;
   const {
     exportInfo,
