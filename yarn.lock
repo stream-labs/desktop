@@ -1739,25 +1739,22 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@electron/get@npm:^1.13.0":
-  version: 1.14.1
-  resolution: "@electron/get@npm:1.14.1"
+"@electron/get@npm:^2.0.0":
+  version: 2.0.2
+  resolution: "@electron/get@npm:2.0.2"
   dependencies:
     debug: ^4.1.1
     env-paths: ^2.2.0
     fs-extra: ^8.1.0
     global-agent: ^3.0.0
-    global-tunnel-ng: ^2.7.1
-    got: ^9.6.0
+    got: ^11.8.5
     progress: ^2.0.3
     semver: ^6.2.0
     sumchecker: ^3.0.1
   dependenciesMeta:
     global-agent:
       optional: true
-    global-tunnel-ng:
-      optional: true
-  checksum: 21fec5e82bbee8f9fa183b46e05675b137c3130c7999d3b2b34a0047d1a06ec3c76347b9bbdb9911ba9b2123697804e360a15dda9db614c0226d5d4dcc4d6d15
+  checksum: 900845cc0b31b54761fc9b0ada2dea1e999e59aacc48999d53903bcb7c9a0a7356b5fe736cf610b2a56c5a21f5a3c0e083b2ed2b7e52c36a4d0f420d4b5ec268
   languageName: node
   linkType: hard
 
@@ -2474,10 +2471,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:^14.6.2":
-  version: 14.17.15
-  resolution: "@types/node@npm:14.17.15"
-  checksum: e0840304db236027e822ef1e149de433afd20d2553699cdc2ce651d107a77646c6eaaeaec8c348eabdc05169440dbc2cf069791bef65ca4b6e5ee4412e69c898
+"@types/node@npm:^16.11.26":
+  version: 16.18.18
+  resolution: "@types/node@npm:16.18.18"
+  checksum: 021936e4fcd5cb038cd5d2d26328c7c0bf501d15793e48a12501129cf8770cbbe9a6936fcb64eeb10a102ff273c2606b75c1635a5834abd786014c98c112aaee
   languageName: node
   linkType: hard
 
@@ -6597,16 +6594,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"electron@npm:17.4.1":
-  version: 17.4.1
-  resolution: "electron@npm:17.4.1"
+"electron@npm:22.3.3":
+  version: 22.3.3
+  resolution: "electron@npm:22.3.3"
   dependencies:
-    "@electron/get": ^1.13.0
-    "@types/node": ^14.6.2
-    extract-zip: ^1.0.3
+    "@electron/get": ^2.0.0
+    "@types/node": ^16.11.26
+    extract-zip: ^2.0.1
   bin:
     electron: cli.js
-  checksum: 7f70989d52620beaeb4f83a5608f68e9381714718950e1cf5e0581e8ec1325ba0d15227228c0a25a4e68c466a1338d74f05ca47edd8909df708a1bd17db93eec
+  checksum: a32b92f32f39bc8f4bee9f514724e970b2f8701fd3202bf237cb7619dde409471e3205a6f970a1c2f5896fec0ed05bb8241d2d90de4f4b34f15cb1919333b7d9
   languageName: node
   linkType: hard
 
@@ -7303,7 +7300,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"extract-zip@npm:2.0.1, extract-zip@npm:^2.0.0":
+"extract-zip@npm:2.0.1, extract-zip@npm:^2.0.0, extract-zip@npm:^2.0.1":
   version: 2.0.1
   resolution: "extract-zip@npm:2.0.1"
   dependencies:
@@ -7320,7 +7317,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"extract-zip@npm:^1.0.3, extract-zip@npm:^1.6.7":
+"extract-zip@npm:^1.6.7":
   version: 1.6.7
   resolution: "extract-zip@npm:1.6.7"
   dependencies:
@@ -8285,6 +8282,25 @@ __metadata:
     p-cancelable: ^2.0.0
     responselike: ^2.0.0
   checksum: 3b6db107d9765470b18e4cb22f7c7400381be7425b9be5823f0168d6c21b5d6b28b023c0b3ee208f73f6638c3ce251948ca9b54a1e8f936d3691139ac202d01b
+  languageName: node
+  linkType: hard
+
+"got@npm:^11.8.5":
+  version: 11.8.6
+  resolution: "got@npm:11.8.6"
+  dependencies:
+    "@sindresorhus/is": ^4.0.0
+    "@szmarczak/http-timer": ^4.0.5
+    "@types/cacheable-request": ^6.0.1
+    "@types/responselike": ^1.0.0
+    cacheable-lookup: ^5.0.3
+    cacheable-request: ^7.0.2
+    decompress-response: ^6.0.0
+    http2-wrapper: ^1.0.0-beta.5.2
+    lowercase-keys: ^2.0.0
+    p-cancelable: ^2.0.0
+    responselike: ^2.0.0
+  checksum: bbc783578a8d5030c8164ef7f57ce41b5ad7db2ed13371e1944bef157eeca5a7475530e07c0aaa71610d7085474d0d96222c9f4268d41db333a17e39b463f45d
   languageName: node
   linkType: hard
 
@@ -14428,7 +14444,7 @@ __metadata:
     css-element-queries: 1.2.3
     css-loader: 2.1.1
     dotenv: 8.2.0
-    electron: 17.4.1
+    electron: 22.3.3
     electron-builder: 22.14.5
     electron-devtools-installer: 3.1.1
     electron-notarize: 1.0.0

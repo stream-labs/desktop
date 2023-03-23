@@ -712,16 +712,6 @@ ipcMain.on('webContents-preventNavigation', (e, id) => {
   });
 });
 
-ipcMain.on('webContents-preventPopup', (e, id) => {
-  const contents = webContents.fromId(id);
-
-  if (contents.isDestroyed()) return;
-
-  contents.on('new-window', e => {
-    e.preventDefault();
-  });
-});
-
 ipcMain.on('webContents-bindYTChat', (e, id) => {
   const contents = webContents.fromId(id);
 
