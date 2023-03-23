@@ -29,7 +29,6 @@ export abstract class SceneItemNode implements ISceneItemNode {
   abstract sceneNodeType: TSceneNodeType;
   resourceId: string;
   sceneId: string;
-  output?: obs.IVideo;
 
   private _resourceId: string;
 

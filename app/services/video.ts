@@ -315,8 +315,8 @@ export class VideoService extends Service {
     return new ScalableRectangle({
       x: 0,
       y: 0,
-      width: this.baseResolution[display].baseWidth,
-      height: this.baseResolution[display].baseHeight,
+      width: this.baseResolutions[display].baseWidth,
+      height: this.baseResolutions[display].baseHeight,
     });
   }
 
@@ -328,6 +328,24 @@ export class VideoService extends Service {
   //   return this.baseResolution.horizontal.height;
   // }
 
+  get baseResolutions() {
+    const horizontalWidth = this.videoSettingsService.state.horizontal.baseWidth;
+    const horizontalHeight = this.videoSettingsService.state.horizontal.baseHeight;
+
+    const verticalWidth = this.videoSettingsService.state.vertical.baseWidth;
+    const verticalHeight = this.videoSettingsService.state.vertical.baseHeight;
+    return {
+      horizontal: {
+        baseWidth: horizontalWidth,
+        baseHeight: horizontalHeight,
+      },
+      vertical: {
+        baseWidth: verticalWidth,
+        baseHeight: verticalHeight,
+      },
+    };
+  }
+
   get baseWidth() {
     return this.baseResolution.width;
   }
@@ -337,10 +355,12 @@ export class VideoService extends Service {
   }
 
   get baseResolution() {
-    const [widthStr, heightStr] = this.settingsService.views.values.Video.Base.split('x');
-    const width = parseInt(widthStr, 10);
-    const height = parseInt(heightStr, 10);
+    // const [widthStr, heightStr] = this.settingsService.views.values.Video.Base.split('x');
+    // const width = parseInt(widthStr, 10);
+    // const height = parseInt(heightStr, 10);
 
+    const width = this.videoSettingsService.state.horizontal.baseWidth;
+    const height = this.videoSettingsService.state.horizontal.baseHeight;
     return {
       width,
       height,

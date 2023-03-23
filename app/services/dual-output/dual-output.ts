@@ -306,7 +306,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
 
       if (!copiedSceneItem || !context) return null;
 
-      const settings: IPartialSettings = { ...sceneItem.getSettings(), output: context };
+      const settings: IPartialSettings = { ...sceneItem.getSettings(), output: context, display };
       copiedSceneItem.setSettings(settings);
 
       const reorderNodesSubcommand = new ReorderNodesCommand(
@@ -342,7 +342,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
 
       sceneNodes.forEach((sceneItem: SceneItem) => {
         if (nodesToReassign.includes(sceneItem.id)) {
-          const setting: IPartialSettings = { output: defaultContext };
+          const setting: IPartialSettings = { output: defaultContext, display };
           sceneItem.setSettings(setting);
         } else {
           sceneItem.remove();

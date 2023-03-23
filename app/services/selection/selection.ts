@@ -512,23 +512,23 @@ export class Selection {
   }
 
   stretchToScreen() {
-    this.getItems().forEach(item => item.stretchToScreen());
+    this.getItems().forEach(item => item.stretchToScreen(item.display));
   }
 
   fitToScreen() {
-    this.getItems().forEach(item => item.fitToScreen());
+    this.getItems().forEach(item => item.fitToScreen(item.display));
   }
 
   centerOnScreen() {
-    this.getItems().forEach(item => item.centerOnScreen());
+    this.getItems().forEach(item => item.centerOnScreen(item.display));
   }
 
   centerOnHorizontal() {
-    this.getItems().forEach(item => item.centerOnAxis(CenteringAxis.X));
+    this.getItems().forEach(item => item.centerOnAxis(CenteringAxis.X, item.display));
   }
 
   centerOnVertical() {
-    this.getItems().forEach(item => item.centerOnAxis(CenteringAxis.Y));
+    this.getItems().forEach(item => item.centerOnAxis(CenteringAxis.Y, item.display));
   }
 
   rotate(deg: number) {

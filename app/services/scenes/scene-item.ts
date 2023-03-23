@@ -65,6 +65,7 @@ export class SceneItem extends SceneItemNode {
   sceneNodeType: TSceneNodeType = 'item';
 
   output?: obs.IVideo;
+  display?: TDisplayType;
 
   // Some computed attributes
 

@@ -13,6 +13,7 @@ import { getExternalNodeModel, ISceneNodeModel, SceneNode } from './scene-node';
 import Utils from '../../../utils';
 import { Inject, ServiceHelper } from '../../../core';
 import * as obs from 'obs-studio-node';
+import { TDisplayType } from 'services/settings-v2';
 
 /**
  * Serialized representation of {@link SceneItem}.
@@ -37,6 +38,7 @@ export interface ISceneItemSettings {
   blendingMode: EBlendingMode;
   blendingMethod: EBlendingMethod;
   output?: obs.IVideo;
+  display?: TDisplayType;
 }
 
 /**
@@ -171,7 +173,6 @@ export class SceneItem extends SceneNode implements ISceneItemActions, ISceneIte
   blendingMode: EBlendingMode;
   blendingMethod: EBlendingMethod;
   resourceId: string;
-  output?: obs.IVideo;
 
   constructor(public sceneId: string, public nodeId: string, sourceId: string) {
     super(sceneId, nodeId);
@@ -211,23 +212,25 @@ export class SceneItem extends SceneNode implements ISceneItemActions, ISceneIte
   }
 
   flipX(): void {
+    // return this.sceneItem.flipX(this.sceneItem.display);
     return this.sceneItem.flipX();
   }
 
   flipY(): void {
+    // return this.sceneItem.flipY(this.sceneItem.display);
     return this.sceneItem.flipY();
   }
 
   stretchToScreen(): void {
-    return this.sceneItem.stretchToScreen();
+    return this.sceneItem.stretchToScreen(this.sceneItem.display);
   }
 
   fitToScreen(): void {
-    return this.sceneItem.fitToScreen();
+    return this.sceneItem.fitToScreen(this.sceneItem.display);
   }
 
   centerOnScreen(): void {
-    return this.sceneItem.centerOnScreen();
+    return this.sceneItem.centerOnScreen(this.sceneItem.display);
   }
 
   rotate(deg: number): void {
@@ -247,10 +250,12 @@ export class SceneItem extends SceneNode implements ISceneItemActions, ISceneIte
    */
   setScale(newScaleModel: IVec2, origin?: IVec2): void {
     return this.sceneItem.setScale(newScaleModel, origin);
+    // return this.sceneItem.setScale(newScaleModel, origin, this.sceneItem.display);
   }
 
   setContentCrop(): void {
     return this.sceneItem.setContentCrop();
+    // return this.sceneItem.setContentCrop(this.sceneItem.display);
   }
 }
 
@@ -274,5 +279,6 @@ export function getExternalSceneItemModel(
     blendingMode: internalModel.blendingMode,
     blendingMethod: internalModel.blendingMethod,
     output: internalModel.output,
+    display: internalModel.display,
   };
 }
