@@ -10,9 +10,4 @@ import * as obs from '../../obs-api';
 
 class SettingsManagerViews extends ViewHandler<{}> {}
 
-export class SettingsManagerService extends Service {
-  @Inject() private greenService: GreenService;
-  get videoSettings() {
-    return this.greenService.views.videoSettings;
-  }
-}
+export class SettingsManagerService extends Service {}
