@@ -89,7 +89,7 @@ export class Display {
 
     this.currentScale = this.windowsService.state[this.slobsWindowId].scaleFactor;
 
-    this.type = options?.type ?? 'default';
+    this.type = options?.type ?? 'horizontal';
 
     this.videoService.actions.createOBSDisplay(
       this.electronWindowId,
@@ -300,6 +300,7 @@ export class Display {
   }
 }
 @InitAfter('UserService')
+@InitAfter('VideoSettingsService')
 export class VideoService extends Service {
   @Inject() settingsService: SettingsService;
   @Inject() scenesService: ScenesService;
@@ -470,8 +471,9 @@ export class VideoService extends Service {
     const electronWindow = remote.BrowserWindow.fromId(electronWindowId);
     const context = type ? this.videoSettingsService.contexts[type] : undefined;
 
+    console.log('this.videoSettingsService.contexts ', this.videoSettingsService.contexts[type]);
+
     if (sourceId) {
-      const context = type ? this.videoSettingsService.contexts[type] : undefined;
       obs.NodeObs.OBS_content_createSourcePreviewDisplay(
         electronWindow.getNativeWindowHandle(),
         sourceId,
