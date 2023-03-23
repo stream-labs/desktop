@@ -184,10 +184,6 @@ class GreenViews extends ViewHandler<IGreenServiceState> {
   }
 }
 
-@InitAfter('UserService')
-@InitAfter('ScenesService')
-@InitAfter('SceneCollectionsService')
-@InitAfter('VideoSettingsService')
 export class GreenService extends PersistentStatefulService<IGreenServiceState> {
   @Inject() private scenesService: ScenesService;
   @Inject() private sceneCollectionsService: SceneCollectionsService;
