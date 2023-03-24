@@ -16,5 +16,15 @@
   "Font Size": "Betűméret",
   "Muted Chatters": "Elrejtett üzenetek",
   "Hide Commands": "Parancsok elrejtése",
-  "Background Color": "Háttérszín"
+  "Background Color": "Háttérszín",
+  "Show Platform Icons": "Show Platform Icons",
+  "Theme": "Téma",
+  "Badges": "Jelvények",
+  "Extra Emotes": "Extra emotikonok",
+  "Chat Delay": "Chat Delay",
+  "Hide Delay": "Hide Delay",
+  "Disable Message Animations": "Disable Message Animations",
+  "Hide Characters": "Hide Characters",
+  "Hide Common Chat Bots": "Általános chat Botok elrejtése",
+  "Hide commands starting with `!`": "\"!\" jellel kezdődő parancsok elrejtése"
 }

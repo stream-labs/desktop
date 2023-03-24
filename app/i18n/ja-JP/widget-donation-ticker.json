@@ -14,5 +14,10 @@
   "Manage List": "リストを管理",
   "Font Settings": "フォント設定",
   "A hex color for the text of the": "テキストの 16 進数の色",
-  "token": "トークン"
+  "token": "トークン",
+  "Each donation that shows in the donation ticker will be in this format. Available tokens:": "Each donation that shows in the donation ticker will be in this format. Available tokens:",
+  "The maximum amount of donations to show in the ticker. Must be a number greater than 0.": "ティッカーに表示する寄付金の最大の量。0 より大きい数値である必要があります。",
+  "How fast the ticker should scroll between 1 (fastest) and 10 (slowest). Set to 0 for no scrolling.": "ティッカーが1（最速）から10（最速）までスクロールする速度。 スクロールしない場合は0に設定してください。",
+  "The font size in pixels. Reasonable size typically ranges between 24px and 48px.": "フォント サイズ（ピクセル単位）。妥当なサイズは通常、24px～48px の範囲になります。",
+  "How thick to make the font. The value should range between 300 (thinnest) and 900 (thickest)": "How thick to make the font. The value should range between 300 (thinnest) and 900 (thickest)"
 }

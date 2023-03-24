@@ -36,11 +36,11 @@
   "Streaming Track": "Streaming Track",
   "Enable Twitch VOD Track": "Twitch VOD sáv engedélyezése",
   "Twitch VOD Track": "Twitch VOD sáv",
-  "Sample Rate (requires a restart)": "Sample Rate (requires a restart)",
-  "Channels (requires a restart)": "Channels (requires a restart)",
-  "Desktop Audio Device 1": "Desktop Audio Device 1",
-  "Desktop Audio Device 2": "Desktop Audio Device 2",
-  "Mic/Auxiliary Device 1": "Mic/Auxiliary Device 1",
-  "Mic/Auxiliary Device 2": "Mic/Auxiliary Device 2",
-  "Mic/Auxiliary Device 3": "Mic/Auxiliary Device 3"
+  "Sample Rate (requires a restart)": "Mintavételezés (újraindítást igényel)",
+  "Channels (requires a restart)": "Csatornák (újraindítást igényel)",
+  "Desktop Audio Device 1": "1. asztal audio",
+  "Desktop Audio Device 2": "2. asztal audio",
+  "Mic/Auxiliary Device 1": "1. mikrofon/aux hang",
+  "Mic/Auxiliary Device 2": "2. mikrofon/aux hang",
+  "Mic/Auxiliary Device 3": "3. mikrofon/aux hang"
 }

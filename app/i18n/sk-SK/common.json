@@ -117,7 +117,7 @@
   "Very High": "Very High",
   "Apps": "Apps",
   "Finish": "Finish",
-  "Get Prime": "Get Prime",
+  "Get Ultra": "Get Ultra",
   "System error message:": "System error message:",
   "List is empty": "List is empty",
   "Not selected": "Not selected",
@@ -139,5 +139,18 @@
   "Click here": "Click here",
   "More Info": "More Info",
   "Revert Changes": "Revert Changes",
-  "Animations": "Animations"
+  "Animations": "Animations",
+  "Multistreaming": "Multistreaming",
+  "Alert Box": "Alert Box",
+  "Widget": "Widget",
+  "Creator Sites": "Creator Sites",
+  "Apps Manager": "Apps Manager",
+  "Theme Audit": "Theme Audit",
+  "Login": "Prihlásiť sa",
+  "Tip Settings": "Tip Settings",
+  "Apps Store Home": "Apps Store Home",
+  "Dashboard Home": "Dashboard Home",
+  "Alert Box Library": "Alert Box Library",
+  "Alert Box Settings": "Alert Box Settings",
+  "Upgrade to Ultra": "Upgrade to Ultra"
 }

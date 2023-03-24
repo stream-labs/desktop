@@ -1,6 +1,6 @@
 {
   "Roll Credits": "Credits abspielen",
-  "Includes": "Beinhaltet",
+  "Includes": "Enthält",
   "Show Followers": "Follower anzeigen",
   "Show Subscribers": "Abonnenten anzeigen",
   "Show donations": "Spenden anzeigen",
@@ -17,7 +17,7 @@
   "Credit Title": "Credit-Titel",
   "Credit Subtitle": "Credit-Untertitel",
   "When the credits roll, this will be the format of the subtitle. Available tokens: ": "Format des Unterrtitels beim Abspielen der Credits. Verfügbare Token: ",
-  "Theme": "Design",
+  "Theme": "Thema",
   "Background Color": "Hintergrundfarbe",
   "Font": "Schriftart",
   "Font Size": "Schriftgröße",

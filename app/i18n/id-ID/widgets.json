@@ -12,7 +12,7 @@
   "Give your viewers a subscriber target to help you reach": "Berikan target pelanggan kepada pemirsa untuk membantu Anda mencapai",
   "Show off how many viewers you have from multiple platforms": "Tampilkan seberapa banyak pemirsa yang Anda miliki dari beberapa platform",
   "Give your viewers an opportunity of becoming a boss": "Berikan kesempatan kepada pemirsa Anda untuk menjadi boss",
-  "Rolling credits at the end of your stream": "Kredit bergulir di akhir streaming Anda.",
+  "Rolling credits at the end of your stream": "Kredit bergulir di akhir streaming Anda",
   "Add %{widgetscount} Widgets": "Tambahkan %{widgetscount} Widget",
   "Rather do this manually?": "Ingin melakukannya secara manual?",
   "Setup later": "Atur nanti",
@@ -104,7 +104,7 @@
   "Overkill Min Health": "Kesehatan Min. Overkill",
   "Min. Sparks": "Min. Sparks",
   "Min. Embers": "Min. Embers",
-  "The smallest amount of bits a cheer must have for an event to be shown. Setting this to 0 will make every cheer trigger an event.": "Jumlah terkecil bits yang harus dimiliki cheer agar acara ditampilkan. Mengaturnya ke angka 0 akan menjadikan setiap cheer memicu sebuah acara.",
+  "The smallest amount of bits a cheer must have for an event to be shown. Setting this to 0 will make every cheer trigger an event.": "Jumlah terkecil bit yang harus dimiliki cheer agar acara ditampilkan. Menetapkannya ke angka 0 akan menjadikan setiap cheer memicu sebuah acara.",
   "Bounce In": "Memantul Masuk",
   "Bounce In Down": "Memantul Masuk Bawah",
   "Bounce In Left": "Memantul Masuk Kiri",
@@ -183,10 +183,10 @@
   "Play Alert": "Mainkan Peringatan",
   "Browser Settings": "Pengaturan Browser",
   "Custom Code": "Kode Khusus",
-  "font_family_tooltip": "Google Font yang digunakan untuk teks. Buka https://fonts.google.com untuk menemukan one! Font Populer: Open Sans, Roboto, Oswald, Lato, Droid Sans.",
+  "font_family_tooltip": "Google Font yang digunakan untuk teks. Buka https://fonts.google.com untuk menemukannya! Font Populer: Open Sans, Roboto, Oswald, Lato, Droid Sans.",
   "Something went wrong while applying settings": "Ada yang salah ketika menerapkan pengaturan",
   "Superchat Goal": "Target Super Chat",
   "YouTube Superchats": "Super Chat YouTube",
-  "Custom Widget": "Custom Widget",
-  "Use HTML, CSS, and JavaScript to create a widget with custom functionality": "Use HTML, CSS, and JavaScript to create a widget with custom functionality"
+  "Custom Widget": "Widget Khusus",
+  "Use HTML, CSS, and JavaScript to create a widget with custom functionality": "Gunakan HTML, CSS, dan JavaScript untuk membuat sebuah widget dengan fungsionalitas khusus"
 }

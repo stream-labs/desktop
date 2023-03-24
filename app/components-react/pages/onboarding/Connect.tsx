@@ -197,8 +197,24 @@ export class LoginModule {
     }
   }
 
-  finishSLAuth(primaryPlatform?: TPlatform) {
-    return this.UserService.finishSLAuth(primaryPlatform);
+  async finishSLAuth(primaryPlatform?: TPlatform) {
+    const result = await this.UserService.finishSLAuth(primaryPlatform);
+
+    if (result === EPlatformCallResult.TwitchScopeMissing) {
+      await remote.dialog.showMessageBox(remote.getCurrentWindow(), {
+        type: 'warning',
+        message: $t(
+          'Streamlabs requires additional permissions from your Twitch account. Please log in with Twitch to continue.',
+        ),
+        title: 'Twitch Error',
+        buttons: [$t('Refresh Login')],
+      });
+
+      // Initiate a Twitch merge to get permissions
+      await this.authPlatform('twitch', () => {}, true);
+    }
+
+    return result;
   }
 
   @mutation()

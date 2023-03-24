@@ -26,7 +26,7 @@
   "Expander": "Расширитель",
   "Shader": "Шейдер",
   "HDR Tone Mapping (Override)": "Тональная компрессия HDR (корректировка вручную)",
-  "NVIDIA Background Removal": "NVIDIA Background Removal",
+  "NVIDIA Background Removal": "Удаление фона (NVIDIA)",
   "No settings are available for this filter": "Для этого фильтра нет доступных настроек",
   "Visual Presets": "Визуальные предустановки",
   "None": "Нет",

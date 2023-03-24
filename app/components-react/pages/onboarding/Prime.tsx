@@ -23,8 +23,8 @@ export function Prime() {
         { text: $t('Storage'), icon: 'icon-cloud-backup' },
         { text: $t('Custom Branding'), icon: 'icon-creator-site' },
         {
-          text: 'Crossclip',
-          icon: 'icon-streamlabs',
+          text: 'Cross Clip',
+          icon: 'icon-editor-7',
           tooltip: $t('Format Clips for TikTok, Shorts, etc'),
         },
         { text: 'Oslo', icon: 'icon-streamlabs', tooltip: $t('Collaborative Video Editing') },
