@@ -16,6 +16,7 @@ import { mutation } from './core';
 import { byOS, OS } from 'util/operating-systems';
 import { TcpServerService } from './api/tcp-server';
 import { Subject } from 'rxjs';
+import { TDisplayType } from './settings-v2';
 
 // @@REUSE: MAGIC
 
@@ -54,6 +55,7 @@ export interface IMouseEvent {
   metaKey: boolean;
   button: number;
   buttons: number;
+  display?: TDisplayType;
 }
 
 export class EditorService extends StatefulService<IEditorServiceState> {
@@ -232,6 +234,8 @@ export class EditorService extends StatefulService<IEditorServiceState> {
   }
 
   handleMouseEnter(event: IMouseEvent) {
+    if (event.display && !this.getOverSources(event)) return;
+
     if (event.buttons !== 1) {
       this.dragHandler = null;
       this.resizeRegion = null;
@@ -422,18 +426,23 @@ export class EditorService extends StatefulService<IEditorServiceState> {
   }
 
   updateCursor(event: IMouseEvent) {
+    console.log('\n---\nthis.dragHandler ', this.dragHandler);
+    console.log('this.resizeRegion ', this.resizeRegion);
+
     if (this.dragHandler) {
       this.setCursor('-webkit-grabbing');
     } else if (this.resizeRegion) {
       this.setCursor(this.resizeRegion.cursor);
     } else {
       const overResize = this.isOverResize(event);
+      console.log('overResize ', overResize);
 
       if (overResize) {
         this.setCursor(overResize.cursor);
       } else {
         const overSource = this.getOverSources(event)[0];
 
+        console.log('overSource ', overSource);
         if (overSource) {
           this.setCursor('-webkit-grab');
         } else {
@@ -441,6 +450,7 @@ export class EditorService extends StatefulService<IEditorServiceState> {
         }
       }
     }
+    console.log('\n---\n');
   }
 
   /**
@@ -486,6 +496,7 @@ export class EditorService extends StatefulService<IEditorServiceState> {
    * given source
    */
   isOverSource(event: IMouseEvent, source: SceneItem) {
+    if (event.display !== source.display) return false;
     const rect = new ScalableRectangle(source.rectangle);
     rect.normalize();
 
@@ -506,6 +517,11 @@ export class EditorService extends StatefulService<IEditorServiceState> {
   isOverResize(event: IMouseEvent) {
     if (this.activeSources.length > 0) {
       return this.resizeRegions.find(region => {
+        console.log(
+          'RESIZE event.display !== region.item.display ',
+          event.display !== region.item.display,
+        );
+        if (event.display !== region.item.display) return false;
         return this.isOverBox(event, region.x, region.y, region.width, region.height);
       });
     }
