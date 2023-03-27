@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/vue';
 import { Service } from './core/service';
 import {
   TObsFormData,
@@ -208,7 +209,17 @@ export class SourceFiltersService extends Service {
 
   getPropertiesFormData(sourceId: string, filterName: string): TObsFormData {
     if (!filterName) return [];
-    const formData = getPropertiesFormData(this.getObsFilter(sourceId, filterName));
+    const filter = this.getObsFilter(sourceId, filterName);
+    if (!filter) {
+      Sentry.withScope(scope => {
+        scope.setLevel('error');
+        scope.setExtra('sourceId', sourceId);
+        scope.setExtra('filterName', filterName);
+        Sentry.captureException(new Error('Filter not found'));
+      });
+      return [];
+    }
+    const formData = getPropertiesFormData(filter);
 
     // サイドチェーンのトリガーにする音声ソースがIDしかもらえないので、名前に変換する
     formData.forEach((input: any) => {

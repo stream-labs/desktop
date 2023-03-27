@@ -809,10 +809,9 @@ export class SettingsService
             { channel },
           );
         } else {
+          source.setName(displayName);
           source.updateSettings({ device_id: deviceForm.value, name: displayName });
         }
-
-        source.setName(displayName);
       }
     });
   }
