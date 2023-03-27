@@ -513,7 +513,7 @@ class OptKeyProperty {
         scope.setTag('optimization.key', this.key);
         scope.setTag('settings.path', path);
         scope.setFingerprint(['OptKeyProperty', 'value(undefined)']);
-        Sentry.captureMessage(`OptKeyProperty: value(undefined): ${i18nPath('settings', this.category, this.subCategory, this.setting)}`);
+        Sentry.captureMessage(`OptKeyProperty: value(undefined): ${path}`);
       });
       return;
     }
