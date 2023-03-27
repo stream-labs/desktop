@@ -25,6 +25,8 @@ module.exports = {
     'generator-star-spacing': OFF,
     indent: OFF,
 
+    'vue/multi-word-component-names': OFF,
+
     // "variable-name": [ERROR, "ban-keywords", "check-format", "allow-leading-underscore", "allow-pascal-case"], // We do imports where our files are suffixed .vue and this rule would expect we import as e.g. MainVue
     'import-name': OFF,
     // TODO: fix instances instead
