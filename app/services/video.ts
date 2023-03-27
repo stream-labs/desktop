@@ -330,11 +330,25 @@ export class VideoService extends Service {
   // }
 
   get baseResolutions() {
-    const horizontalWidth = this.videoSettingsService.state.horizontal.baseWidth;
-    const horizontalHeight = this.videoSettingsService.state.horizontal.baseHeight;
+    const horizontalWidth =
+      this.videoSettingsService.contexts.horizontal?.video.baseWidth ??
+      this.videoSettingsService.state.horizontal.baseWidth;
+    const horizontalHeight =
+      this.videoSettingsService.contexts.horizontal?.video.baseHeight ??
+      this.videoSettingsService.state.horizontal.baseHeight;
 
-    const verticalWidth = this.videoSettingsService.state.vertical.baseWidth;
-    const verticalHeight = this.videoSettingsService.state.vertical.baseHeight;
+    const verticalWidth =
+      this.videoSettingsService.contexts.vertical?.video.baseWidth ??
+      this.videoSettingsService.state.vertical.baseWidth;
+    const verticalHeight =
+      this.videoSettingsService.contexts.vertical?.video.baseHeight ??
+      this.videoSettingsService.state.vertical.baseHeight;
+
+    // const horizontalWidth = this.videoSettingsService.state.horizontal.baseWidth;
+    // const horizontalHeight = this.videoSettingsService.state.horizontal.baseHeight;
+
+    // const verticalWidth = this.videoSettingsService.state.vertical.baseWidth;
+    // const verticalHeight = this.videoSettingsService.state.vertical.baseHeight;
     return {
       horizontal: {
         baseWidth: horizontalWidth,
@@ -423,11 +437,31 @@ export class VideoService extends Service {
   //   };
   // }
 
-  setBaseResolution(resolution: { width: number; height: number }) {
+  // setBaseResolution(resolution: { width: number; height: number }) {
+  //   this.settingsService.setSettingValue(
+  //     'Video',
+  //     'Base',
+  //     `${resolution.width}x${resolution.height}`,
+  //   );
+  // }
+
+  setBaseResolutions(
+    resolutions: {
+      horizontal: {
+        width: number;
+        height: number;
+      };
+      vertical: {
+        width: number;
+        height: number;
+      };
+    },
+    defaultDisplay: TDisplayType = 'horizontal',
+  ) {
     this.settingsService.setSettingValue(
       'Video',
       'Base',
-      `${resolution.width}x${resolution.height}`,
+      `${resolutions[defaultDisplay].width}x${resolutions[defaultDisplay].height}`,
     );
   }
 

@@ -18,16 +18,16 @@ interface ISchema {
     width: number;
     height: number;
   };
-  // baseResolution: {
-  //   horizontal: {
-  //     width: number;
-  //     height: number;
-  //   };
-  //   vertical: {
-  //     width: number;
-  //     height: number;
-  //   };
-  // };
+  baseResolutions: {
+    horizontal: {
+      width: number;
+      height: number;
+    };
+    vertical: {
+      width: number;
+      height: number;
+    };
+  };
 
   selectiveRecording?: boolean;
   dualOutputMode?: boolean;
@@ -72,10 +72,16 @@ export class RootNode extends Node<ISchema, {}> {
       guestCam,
       // contexts: this.videoSettingsService.contexts,
       defaultDisplay: this.settingsManagerService.views.videoSettings.defaultDisplay,
-      // baseResolution: {
-      //   horizontal: this.videoService.baseResolution.horizontal,
-      //   vertical: this.videoService.baseResolution.vertical,
-      // },
+      baseResolutions: {
+        horizontal: {
+          width: this.videoService.baseResolutions.horizontal.baseWidth,
+          height: this.videoService.baseResolutions.horizontal.baseHeight,
+        },
+        vertical: {
+          width: this.videoService.baseResolutions.vertical?.baseWidth,
+          height: this.videoService.baseResolutions.vertical?.baseHeight,
+        },
+      },
       baseResolution: this.videoService.baseResolution,
       selectiveRecording: this.streamingService.state.selectiveRecording,
       dualOutputMode: this.dualOutputService.state.dualOutputMode,
@@ -94,7 +100,8 @@ export class RootNode extends Node<ISchema, {}> {
     // console.log('this.data.contexts ', this.data.contexts);
 
     // this.videoService.setContexts(this.data.contexts);
-    this.videoService.setBaseResolution(this.data.baseResolution);
+    // this.videoService.setBaseResolution(this.data.baseResolution);
+    this.videoService.setBaseResolutions(this.data.baseResolutions);
     this.streamingService.setSelectiveRecording(!!this.data.selectiveRecording);
     this.streamingService.setDualOutputMode(this.data.dualOutputMode);
 
