@@ -67,7 +67,8 @@ export async function openErrorDialogFromFailure(failure: NicoliveFailure): Prom
     scope.setTag('failure.type', failure.type);
     scope.setTag('failure.method', failure.method);
     scope.setTag('failure.reason', failure.reason);
-    Sentry.captureMessage(`openErrorDialogFromFailure ${failure.type} ${failure.method} ${failure.reason}`);
+    scope.setFingerprint(['openErrorDialogFromFailure']);
+    Sentry.captureMessage(`openErrorDialogFromFailure`);
   });
 
   if (failure.type === 'logic') {

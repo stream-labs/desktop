@@ -507,14 +507,13 @@ class OptKeyProperty {
 
   value(v: any): string {
     if (v === undefined) {
+      const path = i18nPath('settings', this.category, this.subCategory, this.setting);
       Sentry.withScope(scope => {
         scope.setLevel('info');
-        scope.setTag('key', this.key);
-        scope.setExtra('category', this.category);
-        scope.setExtra('subCategory', this.subCategory);
-        scope.setExtra('setting', this.setting);
-        scope.setFingerprint(['OptKeyProperty', 'value(undefined)', this.key, this.category, this.subCategory, this.setting]);
-        Sentry.captureMessage(`OptKeyProperty: value(undefined): ${i18nPath('settings', this.category, this.subCategory, this.setting)}`);
+        scope.setTag('optimization.key', this.key);
+        scope.setTag('settings.path', path);
+        scope.setFingerprint(['OptKeyProperty', 'value(undefined)']);
+        Sentry.captureMessage(`OptKeyProperty: value(undefined): ${path}`);
       });
       return;
     }

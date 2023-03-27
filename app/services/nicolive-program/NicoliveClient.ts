@@ -552,10 +552,17 @@ export class NicoliveClient {
         nativeWindowOpen: true,
       },
     });
+    Sentry.addBreadcrumb({
+      category: 'createProgram.open',
+    });
     return new Promise<CreateResult>((resolve, _reject) => {
       addClipboardMenu(win);
       win.on('closed', () => resolve(CreateResult.OTHER));
       win.webContents.on('did-navigate', (_event, url) => {
+        Sentry.addBreadcrumb({
+          category: 'createProgram.did-navigate',
+          message: url,
+        });
         if (NicoliveClient.isProgramPage(url)) {
           resolve(CreateResult.CREATED);
           win.close();
@@ -589,6 +596,12 @@ export class NicoliveClient {
           }
         }
       );
+    }).then(result => {
+      Sentry.addBreadcrumb({
+        category: 'createProgram.close',
+        message: result,
+      });
+      return result;
     });
   }
 
@@ -603,6 +616,11 @@ export class NicoliveClient {
         nativeWindowOpen: true,
       },
     });
+    Sentry.addBreadcrumb({
+      category: 'editProgram.open',
+      message: programID,
+    });
+
     return new Promise<EditResult>((resolve, _reject) => {
       addClipboardMenu(win);
       win.on('closed', () => resolve(EditResult.OTHER));
