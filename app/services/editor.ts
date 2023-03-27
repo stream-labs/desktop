@@ -16,7 +16,7 @@ import { mutation } from './core';
 import { byOS, OS } from 'util/operating-systems';
 import { TcpServerService } from './api/tcp-server';
 import { Subject } from 'rxjs';
-import { TDisplayType } from './settings-v2';
+import { TDisplayType, VideoSettingsService } from './settings-v2';
 
 // @@REUSE: MAGIC
 
@@ -67,6 +67,7 @@ export class EditorService extends StatefulService<IEditorServiceState> {
   @Inject() private customizationService: CustomizationService;
   @Inject() private editorCommandsService: EditorCommandsService;
   @Inject() private tcpServerService: TcpServerService;
+  @Inject() private videoSettingsService: VideoSettingsService;
 
   /**
    * emit this event when drag or resize have been finished
@@ -135,6 +136,16 @@ export class EditorService extends StatefulService<IEditorServiceState> {
   }
 
   startDragging(event: IMouseEvent) {
+    console.log('\nobj ', {
+      displaySize: {
+        x: this.renderedWidth,
+        y: this.renderedHeight,
+      },
+      displayOffset: {
+        x: this.renderedOffsetX,
+        y: this.renderedOffsetY,
+      },
+    });
     this.dragHandler = new DragHandler(event, {
       displaySize: {
         x: this.renderedWidth,
@@ -468,7 +479,11 @@ export class EditorService extends StatefulService<IEditorServiceState> {
     // We don't need to adjust mac coordinates for scale factor
     const factor = byOS({ [OS.Windows]: this.windowsService.state.main.scaleFactor, [OS.Mac]: 1 });
 
-    const mouse = this.convertVectorToBaseSpace(event.offsetX * factor, event.offsetY * factor);
+    const mouse = this.convertVectorToBaseSpace(
+      event.offsetX * factor,
+      event.offsetY * factor,
+      event.display,
+    );
 
     const box = { x, y, width, height };
 
@@ -530,7 +545,14 @@ export class EditorService extends StatefulService<IEditorServiceState> {
   // Size (width & height) is a scalar value, and
   // only needs to be scaled when converting between
   // spaces.
-  convertScalarToBaseSpace(x: number, y: number) {
+  convertScalarToBaseSpace(x: number, y: number, display?: TDisplayType) {
+    if (display) {
+      return {
+        x: (x * this.videoSettingsService.contexts[display].video.baseWidth) / this.renderedWidth,
+        y: (y * this.videoSettingsService.contexts[display].video.baseHeight) / this.renderedHeight,
+      };
+    }
+
     return {
       x: (x * this.baseWidth) / this.renderedWidth,
       y: (y * this.baseHeight) / this.renderedHeight,
@@ -539,11 +561,11 @@ export class EditorService extends StatefulService<IEditorServiceState> {
 
   // Position is a vector value. When converting between
   // spaces, we have to add positional offsets.
-  convertVectorToBaseSpace(x: number, y: number) {
+  convertVectorToBaseSpace(x: number, y: number, display?: TDisplayType) {
     const movedX = x - this.renderedOffsetX;
     const movedY = y - this.renderedOffsetY;
 
-    return this.convertScalarToBaseSpace(movedX, movedY);
+    return this.convertScalarToBaseSpace(movedX, movedY, display);
   }
 
   // getters
