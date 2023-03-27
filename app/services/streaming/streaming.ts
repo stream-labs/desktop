@@ -305,7 +305,7 @@ export class StreamingService
       obs.NodeObs.OBS_service_stopStreaming(false);
       Sentry.addBreadcrumb({
         category: 'stream',
-        message: 'Stop streaming',
+        message: `Stop streaming from ${this.state.streamingStatus}`,
       });
 
       const keepRecording = this.settingsService.state.General.KeepRecordingWhenStreamStops;
@@ -324,7 +324,7 @@ export class StreamingService
       obs.NodeObs.OBS_service_stopStreaming(true);
       Sentry.addBreadcrumb({
         category: 'stream',
-        message: 'Stop streaming',
+        message: `Stop streaming from ${this.state.streamingStatus}`,
       });
       return;
     }
