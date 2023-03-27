@@ -94,7 +94,7 @@
   "You must select a game": "Vous devez sélectionner un jeu",
   "Please schedule no further than 7 days in advance and no sooner than 10 minutes in advance.": "Merci de ne pas planifier plus de 7 jours et moins de 10 minutes à l'avance.",
   "No Sources": "Aucune source",
-  "Enable Multistream": "Activer le multiflux",
+  "Enable Multistream": "Activer le multistream",
   "Multistream allows you to stream to multiple platforms simultaneously.": "Multistream vous permet de diffuser en continu sur plusieurs plateformes simultanément.",
   "Multistream": "Multistream",
   "Your Twitch login is expired. Please log in again to continue using Streamlabs": "Votre connexion Twitch a expiré. Reconnectez-vous pour continuer à utiliser Streamlabs",
