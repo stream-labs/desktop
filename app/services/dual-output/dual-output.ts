@@ -325,7 +325,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
     const context = this.videoSettingsService.contexts[display];
     if (!context) return null;
 
-    sceneItem.setSettings({ output: context });
+    sceneItem.setSettings({ output: context, display });
     return sceneItem.id;
   }
 
@@ -338,7 +338,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
         this.scenesService.views.activeSceneId,
       );
 
-      const defaultContext = this.videoSettingsService.contexts.default;
+      const defaultContext = this.videoSettingsService.contexts.horizontal;
 
       sceneNodes.forEach((sceneItem: SceneItem) => {
         if (nodesToReassign.includes(sceneItem.id)) {

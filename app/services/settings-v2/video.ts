@@ -68,7 +68,6 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
 
   get values() {
     return {
-      // default: this.videoSettingsValues,
       horizontal: this.horizontalSettingsValues,
       vertical: this.verticalSettingsValues,
     };
@@ -100,7 +99,7 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
   }
 
   get hasAdditionalContexts() {
-    return !!this.contexts.horizontal && !!this.contexts.vertical;
+    return !!this.state.horizontal && !!this.state.vertical;
   }
 
   get videoSettings() {
@@ -149,7 +148,7 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
     //   });
     // }
 
-    if (display === 'default' || display === 'horizontal') {
+    if (display === 'horizontal') {
       // if this the default display is the horizontal display, get the settings from obs
       // @@@ TODO: handle vertical being the default display
       this.state.horizontal = this.contexts.horizontal.video;

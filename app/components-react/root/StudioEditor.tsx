@@ -27,7 +27,7 @@ export default function StudioEditor() {
     showHorizontalDisplay: SettingsManagerService.views.activeDisplays.horizontal,
     showVerticalDisplay: SettingsManagerService.views.activeDisplays.vertical,
     activeSceneId: ScenesService.views.activeSceneId,
-    verticalContextActive: VideoSettingsService.contexts.vertical,
+    hasAdditionalContexts: VideoSettingsService.hasAdditionalContexts,
   }));
   const displayEnabled = !v.hideStyleBlockers && !v.performanceMode;
   const placeholderRef = useRef<HTMLDivElement>(null);
@@ -113,14 +113,14 @@ export default function StudioEditor() {
     let moveInFlight = false;
     let lastMoveEvent: React.MouseEvent | null = null;
 
-    function onMouseMove(event: React.MouseEvent) {
+    function onMouseMove(event: React.MouseEvent, display?: TDisplayType) {
       if (moveInFlight) {
         lastMoveEvent = event;
         return;
       }
 
       moveInFlight = true;
-      EditorService.actions.return.handleMouseMove(getMouseEvent(event)).then(() => {
+      EditorService.actions.return.handleMouseMove(getMouseEvent(event, display)).then(() => {
         moveInFlight = false;
 
         if (lastMoveEvent) {
@@ -179,22 +179,26 @@ export default function StudioEditor() {
                 className={cx(styles.studioEditorDisplayContainer, 'noselect')}
                 style={{ cursor: v.cursor }}
                 onMouseDown={(event: React.MouseEvent) =>
-                  v.verticalContextActive
+                  v.hasAdditionalContexts
                     ? eventHandlers.onMouseDown(event, 'horizontal')
                     : eventHandlers.onMouseDown(event)
                 }
                 onMouseUp={eventHandlers.onMouseUp}
                 onMouseEnter={(event: React.MouseEvent) =>
-                  v.verticalContextActive
+                  v.hasAdditionalContexts
                     ? eventHandlers.onMouseEnter(event, 'horizontal')
                     : eventHandlers.onMouseEnter(event)
                 }
-                onMouseMove={eventHandlers.onMouseMove}
+                onMouseMove={(event: React.MouseEvent) =>
+                  v.hasAdditionalContexts
+                    ? eventHandlers.onMouseMove(event, 'horizontal')
+                    : eventHandlers.onMouseMove(event)
+                }
                 onDoubleClick={eventHandlers.onMouseDblClick}
                 onContextMenu={eventHandlers.onContextMenu}
               >
                 <Display
-                  type={v.verticalContextActive ? 'horizontal' : undefined}
+                  type={v.hasAdditionalContexts ? 'horizontal' : undefined}
                   drawUI={true}
                   paddingSize={10}
                   onOutputResize={eventHandlers.onOutputResize}
@@ -214,7 +218,9 @@ export default function StudioEditor() {
                 onMouseEnter={(event: React.MouseEvent) =>
                   eventHandlers.onMouseEnter(event, 'vertical')
                 }
-                onMouseMove={eventHandlers.onMouseMove}
+                onMouseMove={(event: React.MouseEvent) =>
+                  eventHandlers.onMouseMove(event, 'vertical')
+                }
                 onDoubleClick={eventHandlers.onMouseDblClick}
                 onContextMenu={eventHandlers.onContextMenu}
               >

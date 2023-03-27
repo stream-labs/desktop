@@ -234,7 +234,7 @@ export class EditorService extends StatefulService<IEditorServiceState> {
   }
 
   handleMouseEnter(event: IMouseEvent) {
-    if (event.display && !this.getOverSources(event)) return;
+    console.log('entered ', event);
 
     if (event.buttons !== 1) {
       this.dragHandler = null;
@@ -496,6 +496,8 @@ export class EditorService extends StatefulService<IEditorServiceState> {
    * given source
    */
   isOverSource(event: IMouseEvent, source: SceneItem) {
+    console.log('isOverSource event.display ', event.display);
+    console.log('isOverSource source.display ', source.display);
     if (event.display !== source.display) return false;
     const rect = new ScalableRectangle(source.rectangle);
     rect.normalize();
@@ -517,10 +519,6 @@ export class EditorService extends StatefulService<IEditorServiceState> {
   isOverResize(event: IMouseEvent) {
     if (this.activeSources.length > 0) {
       return this.resizeRegions.find(region => {
-        console.log(
-          'RESIZE event.display !== region.item.display ',
-          event.display !== region.item.display,
-        );
         if (event.display !== region.item.display) return false;
         return this.isOverBox(event, region.x, region.y, region.width, region.height);
       });
