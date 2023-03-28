@@ -201,7 +201,7 @@
     "postcss-less": "^6.0.0",
     "prettier": "^2.3.2",
     "prettier-eslint": "^13.0.0",
-    "shx": "^0.3.3",
+    "shx": "^0.3.4",
     "spectron": "^8.0.0",
     "style-loader": "^0.23.1",
     "stylelint": "^14.16.1",
