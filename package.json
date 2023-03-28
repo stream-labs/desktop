@@ -214,7 +214,7 @@
     "ts-loader": "^8.3.0",
     "typedoc": "^0.9.0",
     "typescript": "^4.9.5",
-    "vue-loader": "^15.9.8",
+    "vue-loader": "^15.10.1",
     "vue-svg-loader": "^0.12.0",
     "vue-template-compiler": "^2.7.10",
     "webpack": "^4.46.0",
