@@ -184,7 +184,7 @@
     "file-loader": "^3.0.1",
     "husky": "^2.3.0",
     "jest": "^26.6.3",
-    "js-yaml": "^3.8.3",
+    "js-yaml": "^3.14.1",
     "less": "^3.9.0",
     "less-loader": "^5.0.0",
     "lint-staged": "^8.1.7",
