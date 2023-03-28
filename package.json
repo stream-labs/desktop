@@ -130,7 +130,8 @@
     "vue-spinner": "^1.0.4",
     "vue-toasted": "^1.1.24",
     "vuedraggable": "^2.24.3",
-    "vuex": "^3.0.1"
+    "vuex": "^3.0.1",
+    "xml2js": "^0.4.23"
   },
   "devDependencies": {
     "@babel/core": "^7.21.3",
@@ -155,7 +156,7 @@
     "@types/urijs": "1.19.1",
     "@types/uuid": "^3.4.10",
     "@types/webdriverio": "^4.13.0",
-    "@types/xml2js": "^0.4.3",
+    "@types/xml2js": "^0.4.11",
     "@typescript-eslint/eslint-plugin": "^5.51.0",
     "@typescript-eslint/parser": "^5.51.0",
     "@webpack-cli/serve": "^1.6.0",
