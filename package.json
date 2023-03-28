@@ -96,7 +96,7 @@
     "iconv-lite": "^0.6.3",
     "lodash": "^4.17.4",
     "lodash-decorators": "^4.3.1",
-    "moment": "^2.17.1",
+    "moment": "^2.29.4",
     "node-fontinfo": "https://github.com/stream-labs/node-fontinfo/releases/download/v0.0.12electron6/iojs-v6.0.3-node-fontinfo.tar.gz",
     "node-libuiohook": "https://github.com/stream-labs/node-libuiohook/releases/download/v0.0.14/iojs-v6.0.3-node-libuiohook.tar.gz",
     "obs-studio-node": "https://obsstudionodes3.streamlabs.com/obs-studio-node-0.6.36-iojs-v6.0.3-release.tar.gz",
