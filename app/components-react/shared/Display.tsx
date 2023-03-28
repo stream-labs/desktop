@@ -29,8 +29,8 @@ export default function Display(props: DisplayProps) {
   const v = useVuex(
     () => ({
       paddingColor: CustomizationService.views.displayBackground,
-      baseResolution: `${VideoSettingsService.state[p.type ?? 'horizontal'].baseWidth}x${
-        VideoSettingsService.state[p.type ?? 'horizontal'].baseHeight
+      baseResolution: `${VideoSettingsService.contexts[p.type ?? 'horizontal']?.video.baseWidth}x${
+        VideoSettingsService.contexts[p.type ?? 'horizontal']?.video.baseHeight
       }`,
     }),
     false,

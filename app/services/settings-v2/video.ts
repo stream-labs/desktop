@@ -48,24 +48,23 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
   };
 
   get videoSettingsValues() {
-    const context = this.state.horizontal;
+    const context = this.contexts.horizontal;
     return {
-      baseRes: `${context.baseWidth}x${context.baseHeight}`,
-      outputRes: `${context.outputWidth}x${context.outputHeight}`,
-      scaleType: context.scaleType,
-      fpsType: context.fpsType,
-      fpsCom: `${context.fpsNum}-${context.fpsDen}`,
-      fpsNum: context.fpsNum,
-      fpsDen: context.fpsDen,
-      fpsInt: context.fpsNum,
+      baseRes: `${context?.video.baseWidth}x${context?.video.baseHeight}`,
+      outputRes: `${context?.video.outputWidth}x${context?.video.outputHeight}`,
+      scaleType: context?.video.scaleType,
+      fpsType: context?.video.fpsType,
+      fpsCom: `${context?.video.fpsNum}-${context?.video.fpsDen}`,
+      fpsNum: context?.video.fpsNum,
+      fpsDen: context?.video.fpsDen,
+      fpsInt: context?.video.fpsNum,
     };
   }
-
   get baseResolution() {
-    const context = this.state.horizontal;
+    const context = this.contexts.horizontal;
     return {
-      width: context.baseWidth,
-      height: context.baseHeight,
+      width: context?.video.baseWidth,
+      height: context?.video.baseHeight,
     };
   }
 
