@@ -80,7 +80,6 @@ module.exports = {
     'node-fontinfo': 'require("node-fontinfo")',
     'socket.io-client': 'require("socket.io-client")',
     rimraf: 'require("rimraf")',
-    request: 'require("request")',
   },
 
   module: {
