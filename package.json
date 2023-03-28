@@ -150,7 +150,7 @@
     "@types/base64-js": "^1.2.5",
     "@types/fetch-mock": "^7.2.3",
     "@types/jest": "^26.0.24",
-    "@types/lodash": "^4.14.115",
+    "@types/lodash": "^4.14.192",
     "@types/node": "^10.17.58",
     "@types/request": "^2.47.0",
     "@types/semver": "^7.3.13",
