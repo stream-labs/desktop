@@ -157,7 +157,7 @@
     "@types/semver": "^5.5.0",
     "@types/socket.io-client": "^1.4.31",
     "@types/urijs": "1.19.1",
-    "@types/uuid": "^3.4.3",
+    "@types/uuid": "^3.4.10",
     "@types/webdriverio": "^4.13.0",
     "@types/xml2js": "^0.4.3",
     "@typescript-eslint/eslint-plugin": "^5.51.0",
