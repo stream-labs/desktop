@@ -216,7 +216,7 @@ export class SceneItem extends SceneItemNode {
     }
 
     if (changed.output !== void 0 || patch.hasOwnProperty('output')) {
-      this.getObsSceneItem().video = newSettings.output;
+      this.getObsSceneItem().video = newSettings.output as obs.IVideo;
     }
 
     this.UPDATE({ sceneItemId: this.sceneItemId, ...changed });
