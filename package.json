@@ -162,7 +162,7 @@
     "@webpack-cli/serve": "^1.6.0",
     "@xkeshi/vue-qrcode": "^0.3.0",
     "ava": "^3.0.0",
-    "babel-loader": "^8.0.6",
+    "babel-loader": "^8.3.0",
     "babel-preset-vue": "^2.0.2",
     "circular-dependency-plugin": "^3.0.0",
     "clean-webpack-plugin": "^4.0.0",
