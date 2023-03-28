@@ -128,7 +128,7 @@
     "vue-popperjs": "^1.2.2",
     "vue-property-decorator": "^7.0.0",
     "vue-slider-component": "^3.2.24",
-    "vue-spinner": "^1.0.3",
+    "vue-spinner": "^1.0.4",
     "vue-toasted": "^1.1.24",
     "vuedraggable": "^2.24.3",
     "vuex": "^3.0.1"
