@@ -101,7 +101,7 @@
     "node-libuiohook": "https://github.com/stream-labs/node-libuiohook/releases/download/v0.0.14/iojs-v6.0.3-node-libuiohook.tar.gz",
     "obs-studio-node": "https://obsstudionodes3.streamlabs.com/obs-studio-node-0.6.36-iojs-v6.0.3-release.tar.gz",
     "progress": "^2.0.3",
-    "recursive-readdir": "^2.2.2",
+    "recursive-readdir": "^2.2.3",
     "reflect-metadata": "^0.1.13",
     "request": "^2.85.0",
     "rimraf": "^2.6.1",
