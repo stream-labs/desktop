@@ -366,32 +366,6 @@ export class GreenService extends PersistentStatefulService<IGreenServiceState> 
     return sceneItem.id;
   }
 
-  restoreScene(display: TDisplayType) {
-    if (this.state.nodeMaps) {
-      const nodesMap = this.state.nodeMaps[display];
-      const nodesToReassign = Object.keys(nodesMap);
-
-      const sceneNodes = this.scenesService.views.getSceneItemsBySceneId(
-        this.scenesService.views.activeSceneId,
-      );
-
-      const horizontalContext = this.videoSettingsService.contexts.horizontal;
-
-      sceneNodes.forEach((sceneItem: SceneItem) => {
-        if (nodesToReassign.includes(sceneItem.id)) {
-          const setting: IPartialSettings = { output: horizontalContext };
-          sceneItem.setSettings(setting);
-        } else {
-          sceneItem.remove();
-        }
-      });
-    }
-
-    this.videoSettingsService.resetToDefaultContext();
-
-    this.state.nodeMaps = null;
-  }
-
   /**
    * Helper functions to manage displays
    */
