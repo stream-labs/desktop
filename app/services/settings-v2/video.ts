@@ -78,14 +78,14 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
 
   migrateSettings(display?: TDisplayType) {
     if (display === 'horizontal') {
-      this.state.horizontal = this.contexts.horizontal.video;
+      this.SET_VIDEO_CONTEXT(display, this.contexts[display].video);
       Object.keys(this.contexts.horizontal.legacySettings).forEach((key: keyof obs.IVideo) => {
         this.SET_VIDEO_SETTING(key, this.contexts.horizontal.legacySettings[key]);
       });
     } else {
       const data = this.videoSettings.green;
 
-      this.state[display] = this.contexts[display].video;
+      this.SET_VIDEO_CONTEXT(display, this.contexts[display].video);
       Object.keys(data).forEach(
         (key: keyof obs.IAdvancedStreaming | keyof obs.ISimpleStreaming) => {
           this.SET_VIDEO_SETTING(key, data[key], display);
@@ -102,7 +102,7 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
     if (this.contexts[display]) return;
 
     this.contexts[display] = obs.VideoFactory.create();
-    this.state[display] = {} as obs.IVideoInfo;
+    this.SET_VIDEO_CONTEXT(display);
     this.migrateSettings(display);
     this.contexts[display].video = this.state[display];
 
@@ -116,7 +116,7 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
     }
 
     this.contexts[display] = null as obs.IVideo;
-    this.state[display] = null as obs.IVideoInfo;
+    this.REMOVE_CONTEXT(display);
 
     return !!this.contexts[display];
   }
@@ -167,5 +167,19 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
       ...this.state[display],
       [key]: value,
     };
+  }
+
+  @mutation()
+  SET_VIDEO_CONTEXT(display: TDisplayType = 'horizontal', settings?: obs.IVideoInfo) {
+    if (settings) {
+      this.state[display] = settings;
+    } else {
+      this.state[display] = {} as obs.IVideoInfo;
+    }
+  }
+
+  @mutation()
+  REMOVE_CONTEXT(display: TDisplayType) {
+    this.state[display] = null as obs.IVideoInfo;
   }
 }
