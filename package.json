@@ -113,7 +113,7 @@
     "sockjs": "^0.3.19",
     "sockjs-client": "^1.1.4",
     "systeminformation": "^4.1.6",
-    "traverse": "^0.6.6",
+    "traverse": "^0.6.7",
     "unzip-stream": "^0.2.1",
     "urijs": "1.19.1",
     "uuid": "^3.3.2",
