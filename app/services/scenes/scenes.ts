@@ -183,9 +183,9 @@ class ScenesViews extends ViewHandler<IScenesState> {
     return null;
   }
 
-  getSceneItemsBySceneId(sceneId: string): SceneItem[] | null {
+  getSceneItemsBySceneId(sceneId: string) {
     const scene: Scene = this.getScene(sceneId);
-    if (!scene) return null;
+    if (!scene) return;
     return scene.getItems();
   }
 
@@ -216,9 +216,9 @@ class ScenesViews extends ViewHandler<IScenesState> {
     return null;
   }
 
-  getNodeVisibility(sceneNodeId: string): boolean {
-    const nodeModel: TSceneNode | null = this.getSceneNode(sceneNodeId);
-    return nodeModel instanceof SceneItem ? nodeModel?.visible : false;
+  getNodeVisibility(sceneNodeId: string) {
+    const nodeModel: TSceneNode = this.getSceneNode(sceneNodeId);
+    return nodeModel instanceof SceneItem ? nodeModel?.visible : null;
   }
 }
 
