@@ -103,7 +103,7 @@
     "progress": "^2.0.3",
     "recursive-readdir": "^2.2.3",
     "reflect-metadata": "^0.1.13",
-    "rimraf": "^2.6.1",
+    "rimraf": "^2.7.1",
     "rxjs": "^6.5.3",
     "semver": "^7.3.8",
     "sl-vue-tree": "https://github.com/stream-labs/sl-vue-tree",
