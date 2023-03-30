@@ -27,6 +27,9 @@ interface IProgress {
 export class SharedStorageService extends Service {
   @Inject() userService: UserService;
 
+  id: string;
+  cancel: () => void;
+
   get host() {
     return 'https://api-id.streamlabs.dev';
   }
@@ -38,13 +41,21 @@ export class SharedStorageService extends Service {
   ) {
     try {
       const uploadInfo = await this.prepareUpload(filepath);
-      if (uploadInfo.isMultipart) {
-      } else {
-        this.uploadS3File(uploadInfo, filepath);
+      this.id = uploadInfo.file.id;
+      const uploaded = await this.uploadS3File(uploadInfo, filepath, onProgress, onError);
+      if (uploaded) {
+        return await this.generateShare();
       }
     } catch (e: unknown) {
       console.error(e);
     }
+  }
+
+  async cancelUpload() {
+    if (!this.id || !this.cancel) return;
+    const url = `${this.host}/storage/v1/temporary-files/${this.id}`;
+    const headers = authorizedHeaders(this.userService.apiToken);
+    return await jfetch(new Request(url, { headers, method: 'DELETE' }));
   }
 
   private async prepareUpload(filepath: string): Promise<IPrepareResponse> {
@@ -71,15 +82,25 @@ export class SharedStorageService extends Service {
     onError?: (error: unknown) => void,
   ) {
     try {
-      return await new Uploader({
+      const uploader = new Uploader({
         fileInfo: uploadInfo,
         filepath,
         onProgress,
         onError,
-      }).start();
+      });
+      this.cancel = uploader.cancel;
+      return await uploader.start();
     } catch (e: unknown) {
       console.error(e);
     }
+  }
+
+  private async generateShare(): Promise<{ id: string }> {
+    if (!this.id) return;
+    const url = `${this.host}/storage/v1/temporary-shares/`;
+    const headers = authorizedHeaders(this.userService.apiToken);
+    const body = JSON.stringify({ temporary_file_id: this.id, type: 'video' });
+    return await jfetch(new Request(url, { method: 'POST', headers, body }));
   }
 }
 
@@ -103,6 +124,7 @@ class Uploader {
   size = 0;
   type = '';
   filepath = '';
+  cancelRequested = false;
 
   constructor(opts: IUploaderOptions) {
     this.onProgress = opts.onProgress;
@@ -127,15 +149,17 @@ class Uploader {
         });
       });
 
-      this.initialize(file);
+      await this.uploadChunks(file);
+      return true;
     } catch (e: unknown) {
       this.onError(e);
     }
   }
 
-  async initialize(file: number) {
+  async uploadChunks(file: number) {
     try {
       for (const url of this.uploadUrls) {
+        if (this.cancelRequested) return;
         await this.uploadChunk(url, file);
       }
     } catch (e: unknown) {
@@ -185,5 +209,9 @@ class Uploader {
       totalBytes: this.size,
       uploadedBytes: this.uploadedSize,
     });
+  }
+
+  cancel() {
+    this.cancelRequested = true;
   }
 }

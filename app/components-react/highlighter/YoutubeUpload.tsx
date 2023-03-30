@@ -12,7 +12,7 @@ import { $t } from 'services/i18n';
 import * as remote from '@electron/remote';
 
 // Source: https://stackoverflow.com/questions/10420352/converting-file-size-in-bytes-to-human-readable-string/10420404
-function humanFileSize(bytes: number, si: boolean) {
+export function humanFileSize(bytes: number, si: boolean) {
   const thresh = si ? 1000 : 1024;
   if (Math.abs(bytes) < thresh) {
     return bytes + ' B';
