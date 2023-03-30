@@ -129,7 +129,7 @@ class Uploader {
 
       this.initialize(file);
     } catch (e: unknown) {
-      return e;
+      this.onError(e);
     }
   }
 
@@ -139,7 +139,7 @@ class Uploader {
         await this.uploadChunk(url, file);
       }
     } catch (e: unknown) {
-      return e;
+      this.onError(e);
     }
   }
 

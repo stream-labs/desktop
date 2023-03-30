@@ -29,6 +29,7 @@ import { DismissablesService, EDismissable } from 'services/dismissables';
 import { ENotificationType, NotificationsService } from 'services/notifications';
 import { JsonrpcService } from 'services/api/jsonrpc';
 import { NavigationService } from 'services/navigation';
+import { SharedStorageService } from 'services/integrations/shared-storage';
 import * as remote from '@electron/remote';
 
 export interface IClip {
@@ -336,6 +337,7 @@ export class HighlighterService extends StatefulService<IHighligherState> {
   @Inject() notificationsService: NotificationsService;
   @Inject() jsonrpcService: JsonrpcService;
   @Inject() navigationService: NavigationService;
+  @Inject() sharedStorageService: SharedStorageService;
 
   /**
    * A dictionary of actual clip classes.
@@ -1002,7 +1004,21 @@ export class HighlighterService extends StatefulService<IHighligherState> {
     }
   }
 
-  async uploadStorage(options: any) {}
+  async uploadStorage() {
+    this.sharedStorageService.actions.uploadFile(
+      this.views.exportInfo.file,
+      progress => {
+        this.SET_UPLOAD_INFO({
+          uploadedBytes: progress.uploadedBytes,
+          totalBytes: progress.totalBytes,
+        });
+      },
+      error => {
+        this.SET_UPLOAD_INFO({ error: true });
+        console.error(error);
+      },
+    );
+  }
 
   /**
    * Will cancel the currently in progress upload
