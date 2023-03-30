@@ -1,12 +1,8 @@
 import fs from 'fs';
+import path from 'path';
 import { Service, Inject } from 'services/core';
 import { UserService } from 'services/user';
 import { authorizedHeaders, jfetch } from 'util/requests';
-
-interface IVideoFile {
-  name: string;
-  size: number;
-}
 
 interface IPrepareResponse {
   file: {
@@ -23,6 +19,11 @@ interface IPrepareResponse {
   isMultipart: boolean;
 }
 
+interface IProgress {
+  totalBytes: number;
+  uploadedBytes: number;
+}
+
 export class SharedStorageService extends Service {
   @Inject() userService: UserService;
 
@@ -30,12 +31,30 @@ export class SharedStorageService extends Service {
     return 'https://api-id.streamlabs.dev';
   }
 
-  async prepareUpload(video: IVideoFile): Promise<IPrepareResponse> {
+  async uploadFile(
+    filepath: string,
+    onProgress?: (progress: IProgress) => void,
+    onError?: (error: unknown) => void,
+  ) {
+    try {
+      const uploadInfo = await this.prepareUpload(filepath);
+      if (uploadInfo.isMultipart) {
+      } else {
+        this.uploadS3File(uploadInfo, filepath);
+      }
+    } catch (e: unknown) {
+      console.error(e);
+    }
+  }
+
+  private async prepareUpload(filepath: string): Promise<IPrepareResponse> {
     const url = `${this.host}/storage/v1/temporary-files`;
     const headers = authorizedHeaders(this.userService.apiToken);
     const body = new FormData();
-    body.append('name', video.name);
-    body.append('size', String(video.size));
+    const name = path.basename(filepath);
+    const size = fs.lstatSync(filepath).size;
+    body.append('name', name);
+    body.append('size', String(size));
     body.append('mime_type', 'video/mpeg');
 
     try {
@@ -45,25 +64,18 @@ export class SharedStorageService extends Service {
     }
   }
 
-  async uploadFile(video: IVideoFile, onProgress?: (progress: any) => void) {
-    try {
-      const uploadInfo = await this.prepareUpload(video);
-      if (uploadInfo.isMultipart) {
-      } else {
-        this.uploadS3File(uploadInfo, video.name);
-      }
-    } catch (e: unknown) {
-      console.error(e);
-    }
-  }
-
-  private async uploadS3File(uploadInfo: IPrepareResponse, filepath: string) {
+  private async uploadS3File(
+    uploadInfo: IPrepareResponse,
+    filepath: string,
+    onProgress?: (progress: IProgress) => void,
+    onError?: (error: unknown) => void,
+  ) {
     try {
       return await new Uploader({
         fileInfo: uploadInfo,
         filepath,
-        onProgress: () => {},
-        onError: () => {},
+        onProgress,
+        onError,
       }).start();
     } catch (e: unknown) {
       console.error(e);
@@ -74,7 +86,7 @@ export class SharedStorageService extends Service {
 interface IUploaderOptions {
   fileInfo: IPrepareResponse;
   filepath: string;
-  onProgress: (progress: any) => void;
+  onProgress?: (progress: IProgress) => void;
   onError?: (e: unknown) => void;
 }
 
@@ -83,7 +95,7 @@ class Uploader {
 
   uploadedSize = 0;
   aborted = false;
-  onProgress = (progress: any) => {};
+  onProgress = (progress: IProgress) => {};
   onError = (e: unknown) => {};
   uploadUrls: string[] = [];
   isMultipart = false;
@@ -104,22 +116,28 @@ class Uploader {
   }
 
   async start() {
-    const file = await new Promise<number>((resolve, reject) => {
-      fs.open(this.filepath, 'r', (err, fd) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(fd);
-        }
+    try {
+      const file = await new Promise<number>((resolve, reject) => {
+        fs.open(this.filepath, 'r', (err, fd) => {
+          if (err) {
+            reject(err);
+          } else {
+            resolve(fd);
+          }
+        });
       });
-    });
 
-    this.initialize(file);
+      this.initialize(file);
+    } catch (e: unknown) {
+      return e;
+    }
   }
 
   async initialize(file: number) {
     try {
-      await Promise.all(this.uploadUrls.map(url => this.uploadChunk(url, file)));
+      for (const url of this.uploadUrls) {
+        await this.uploadChunk(url, file);
+      }
     } catch (e: unknown) {
       return e;
     }
@@ -155,7 +173,7 @@ class Uploader {
 
     this.uploadedSize += chunkSize;
 
-    const result = await fetch(
+    await fetch(
       new Request(url, {
         method: 'PUT',
         headers,
@@ -167,15 +185,5 @@ class Uploader {
       totalBytes: this.size,
       uploadedBytes: this.uploadedSize,
     });
-
-    // 308 means we need to keep uploading
-    if (result.status === 308) {
-      return false;
-    } else if ([200, 201].includes(result.status)) {
-      // Final upload call contains info about the created video
-      return (await result.json()) as { id: string };
-    } else {
-      throw new Error(`Got unexpected video chunk upload status ${result.status}`);
-    }
   }
 }
