@@ -934,7 +934,7 @@ export class HighlighterService extends StatefulService<IHighligherState> {
 
   cancelFunction: (() => void) | null = null;
 
-  async upload(options: IYoutubeVideoUploadOptions) {
+  async uploadYoutube(options: IYoutubeVideoUploadOptions) {
     if (!this.userService.state.auth?.platforms.youtube) {
       throw new Error('Cannot upload without YT linked');
     }
@@ -1001,6 +1001,8 @@ export class HighlighterService extends StatefulService<IHighligherState> {
       });
     }
   }
+
+  async uploadStorage(options: any) {}
 
   /**
    * Will cancel the currently in progress upload

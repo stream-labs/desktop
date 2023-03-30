@@ -45,61 +45,137 @@ export class SharedStorageService extends Service {
     }
   }
 
-  async uploadFile(video: IVideoFile) {
+  async uploadFile(video: IVideoFile, onProgress?: (progress: any) => void) {
     try {
       const uploadInfo = await this.prepareUpload(video);
       if (uploadInfo.isMultipart) {
       } else {
-        this.uploadS3File(uploadInfo);
+        this.uploadS3File(uploadInfo, video.name);
       }
     } catch (e: unknown) {
       console.error(e);
     }
   }
 
-  async uploadS3File(uploadInfo: IPrepareResponse) {
-    const name = uploadInfo.file.original_filename;
-    const headers = authorizedHeaders(this.userService.apiToken);
-
-    fs.readFile('', async (err: unknown, data: Buffer) => {
-      const file = new File([data], name, { type: uploadInfo.file.mime_type });
-      const body = new FormData();
-      body.append('uploads[]', file);
-
-      try {
-        return await jfetch(uploadInfo.uploadUrls[0], { headers, body, method: 'PUT' });
-      } catch (e: unknown) {
-        console.error(e);
-      }
-    });
+  private async uploadS3File(uploadInfo: IPrepareResponse, filepath: string) {
+    try {
+      return await new Uploader({
+        fileInfo: uploadInfo,
+        filepath,
+        onProgress: () => {},
+        onError: () => {},
+      }).start();
+    } catch (e: unknown) {
+      console.error(e);
+    }
   }
 }
 
 interface IUploaderOptions {
+  fileInfo: IPrepareResponse;
+  filepath: string;
   onProgress: (progress: any) => void;
   onError?: (e: unknown) => void;
-  uploadUrl: string;
-  isMultipart?: boolean;
 }
 
 class Uploader {
+  @Inject() userService: UserService;
+
   uploadedSize = 0;
   aborted = false;
   onProgress = (progress: any) => {};
   onError = (e: unknown) => {};
-  uploadUrl = '';
+  uploadUrls: string[] = [];
   isMultipart = false;
+  chunkSize: number = null;
+  size = 0;
+  type = '';
+  filepath = '';
 
   constructor(opts: IUploaderOptions) {
     this.onProgress = opts.onProgress;
     this.onError = opts.onError;
-    this.uploadUrl = opts.uploadUrl;
-    this.isMultipart = opts.isMultipart;
+    this.uploadUrls = opts.fileInfo.uploadUrls;
+    this.isMultipart = opts.fileInfo.isMultipart;
+    this.size = opts.fileInfo.file.size;
+    this.chunkSize = this.isMultipart ? Math.round(this.size / this.uploadUrls.length) : this.size;
+    this.type = opts.fileInfo.file.mime_type;
+    this.filepath = opts.filepath;
   }
 
-  start() {
-    this.initialize();
+  async start() {
+    const file = await new Promise<number>((resolve, reject) => {
+      fs.open(this.filepath, 'r', (err, fd) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(fd);
+        }
+      });
+    });
+
+    this.initialize(file);
   }
 
-  initialize() {}
+  async initialize(file: number) {
+    try {
+      await Promise.all(this.uploadUrls.map(url => this.uploadChunk(url, file)));
+    } catch (e: unknown) {
+      return e;
+    }
+  }
+
+  async uploadChunk(url: string, file: number) {
+    const chunkSize = Math.min(this.size - this.uploadedSize, this.chunkSize);
+    const readBuffer = Buffer.alloc(chunkSize);
+    const bytesRead = await new Promise<number>((resolve, reject) => {
+      fs.read(file, readBuffer, 0, chunkSize, null, (err, bytesRead) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(bytesRead);
+        }
+      });
+    });
+
+    if (bytesRead !== chunkSize) {
+      // Something went wrong, we didn't read as many bytes as expected
+      throw new Error(
+        `Did not read expected number of bytes from video, Expected: ${chunkSize} Actual: ${bytesRead}`,
+      );
+    }
+
+    const headers = authorizedHeaders(this.userService.apiToken);
+    headers.append('Content-Type', this.type);
+    headers.append(
+      'Content-Range',
+      `bytes ${this.uploadedSize}-${this.uploadedSize + chunkSize - 1}/${this.size}`,
+    );
+    headers.append('X-Upload-Content-Type', this.type);
+
+    this.uploadedSize += chunkSize;
+
+    const result = await fetch(
+      new Request(url, {
+        method: 'PUT',
+        headers,
+        body: new Blob([readBuffer]),
+      }),
+    );
+
+    this.onProgress({
+      totalBytes: this.size,
+      uploadedBytes: this.uploadedSize,
+    });
+
+    // 308 means we need to keep uploading
+    if (result.status === 308) {
+      return false;
+    } else if ([200, 201].includes(result.status)) {
+      // Final upload call contains info about the created video
+      return (await result.json()) as { id: string };
+    } else {
+      throw new Error(`Got unexpected video chunk upload status ${result.status}`);
+    }
+  }
 }

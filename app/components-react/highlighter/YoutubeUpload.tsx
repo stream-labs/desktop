@@ -162,7 +162,7 @@ export default function YoutubeUpload(props: { defaultTitle: string; close: () =
               type="primary"
               onClick={() => {
                 UsageStatisticsService.actions.recordFeatureUsage('HighlighterUpload');
-                HighlighterService.actions.upload({
+                HighlighterService.actions.uploadYoutube({
                   title,
                   description,
                   privacyStatus: privacy as TPrivacyStatus,

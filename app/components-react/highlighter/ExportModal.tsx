@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { EExportStep, TFPS, TResolution, TPreset } from 'services/highlighter';
 import { Services } from 'components-react/service-provider';
-import { useVuex } from 'components-react/hooks';
-import { FileInput, TextInput } from 'components-react/shared/inputs';
+import { FileInput, TextInput, ListInput } from 'components-react/shared/inputs';
 import Form from 'components-react/shared/inputs/Form';
 import path from 'path';
 import { Button, Progress, Alert } from 'antd';
@@ -11,6 +10,7 @@ import { RadioInput } from 'components-react/shared/inputs/RadioInput';
 import { confirmAsync } from 'components-react/modals';
 import { $t } from 'services/i18n';
 import { injectState, useModule } from 'slap';
+import CrossClipUpload from './CrossClipUpload';
 
 class ExportModule {
   get service() {
@@ -64,7 +64,7 @@ export default function ExportModal(p: { close: () => void }) {
 
   if (exportInfo.exporting) return <ExportProgress />;
   if (!exportInfo.exported) return <ExportOptions close={p.close} />;
-  return <YoutubeUpload defaultTitle={videoName} close={p.close} />;
+  return <PlatformSelect onClose={p.close} />;
 }
 
 function ExportProgress() {
@@ -228,6 +228,28 @@ function ExportOptions(p: { close: () => void }) {
           </Button>
         </div>
       </Form>
+    </div>
+  );
+}
+
+function PlatformSelect(p: { onClose: () => void }) {
+  const [platform, setPlatform] = useState('');
+  const { videoName } = useModule(ExportModule);
+
+  return (
+    <div>
+      <ListInput
+        label={$t('Upload To')}
+        value={platform}
+        onInput={setPlatform}
+        layout="horizontal"
+        options={[
+          { label: 'YouTube', value: 'youtube' },
+          { label: 'Cross Clip', value: 'crossclip' },
+        ]}
+      />
+      {platform === 'youtube' && <YoutubeUpload defaultTitle={videoName} close={p.onClose} />}
+      {platform === 'crossclip' && <CrossClipUpload onClose={p.onClose} />}
     </div>
   );
 }
