@@ -24,7 +24,7 @@
         :max="1"
         :interval="0.01"
         @input="onSliderChangeHandler"
-        tooltip="false"
+        tooltip="none"
       />
       <div class="controls">
         <i
@@ -55,7 +55,7 @@
 <script lang="ts" src="./MixerItem.vue.ts"></script>
 
 <style lang="less" scoped>
-@import '../styles/index';
+@import url('../styles/index');
 
 .mixer-item {
   position: relative;
@@ -68,8 +68,8 @@
   }
 
   .db-value {
-    font-size: @font-size2;
     width: 60px;
+    font-size: @font-size2;
     text-align: right;
   }
 
