@@ -20,7 +20,7 @@ export function extractPlatform(streamingURL: string): string {
 
     return streamingURL;
   } catch (e) {
-    console.warn(`extractPlatform(${JSON.stringify(streamingURL)}): URL failed`, e);
+    console.warn(`extractPlatform(${JSON.stringify(streamingURL)}): URL() failed`, e);
     return streamingURL;
   }
 }
