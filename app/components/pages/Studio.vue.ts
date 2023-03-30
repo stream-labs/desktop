@@ -34,7 +34,7 @@ export default class Studio extends Vue {
 
   mounted() {
     this.sizeCheckInterval = window.setInterval(() => {
-      if (this.studioMode) {
+      if (this.studioMode && this.$refs.studioModeContainer) {
         const rect = this.$refs.studioModeContainer.getBoundingClientRect();
 
         if (rect.width / rect.height > 16 / 9) {
