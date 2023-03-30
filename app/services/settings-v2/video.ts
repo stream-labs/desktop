@@ -4,6 +4,7 @@ import { InitAfter } from 'services/core';
 import { mutation, StatefulService } from '../core/stateful-service';
 import * as obs from '../../../obs-api';
 import { GreenService } from 'services/green';
+import { SettingsService } from 'services/settings';
 
 /**
  * Display Types
@@ -24,9 +25,9 @@ export interface IVideoSetting {
   green: obs.IVideoInfo;
 }
 
-@InitAfter('SceneCollectionsService')
 export class VideoSettingsService extends StatefulService<IVideoSetting> {
   @Inject() greenService: GreenService;
+  @Inject() settingsService: SettingsService;
 
   initialState = {
     default: null as obs.IVideoInfo,
@@ -48,23 +49,27 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
   };
 
   get videoSettingsValues() {
-    const context = this.contexts.horizontal;
+    const context = this.state.horizontal;
+
     return {
-      baseRes: `${context?.video.baseWidth}x${context?.video.baseHeight}`,
-      outputRes: `${context?.video.outputWidth}x${context?.video.outputHeight}`,
-      scaleType: context?.video.scaleType,
-      fpsType: context?.video.fpsType,
-      fpsCom: `${context?.video.fpsNum}-${context?.video.fpsDen}`,
-      fpsNum: context?.video.fpsNum,
-      fpsDen: context?.video.fpsDen,
-      fpsInt: context?.video.fpsNum,
+      baseRes: `${context.baseWidth}x${context.baseHeight}`,
+      outputRes: `${context.outputWidth}x${context.outputHeight}`,
+      scaleType: context.scaleType,
+      fpsType: context.fpsType,
+      fpsCom: `${context.fpsNum}-${context.fpsDen}`,
+      fpsNum: context.fpsNum,
+      fpsDen: context.fpsDen,
+      fpsInt: context.fpsNum,
     };
   }
   get baseResolution() {
-    const context = this.contexts.horizontal;
+    const context = this.state.horizontal;
+
+    const [widthStr, heightStr] = this.settingsService.views.values.Video.Base.split('x');
+
     return {
-      width: context?.video.baseWidth,
-      height: context?.video.baseHeight,
+      width: context?.baseWidth ?? parseInt(widthStr, 10),
+      height: context?.baseHeight ?? parseInt(heightStr, 10),
     };
   }
 

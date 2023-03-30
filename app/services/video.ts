@@ -322,8 +322,8 @@ export class VideoService extends Service {
   }
 
   get baseResolution() {
-    const width = this.videoSettingsService.state.horizontal.baseWidth;
-    const height = this.videoSettingsService.state.horizontal.baseHeight;
+    const width = this.videoSettingsService.baseResolution.width;
+    const height = this.videoSettingsService.baseResolution.height;
 
     return {
       width,
