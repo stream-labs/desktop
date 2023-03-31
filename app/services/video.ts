@@ -7,14 +7,13 @@ import Utils from './utils';
 import { WindowsService } from './windows';
 import { ScalableRectangle } from '../util/ScalableRectangle';
 import { Subscription } from 'rxjs';
-import { SelectionService } from 'services/selection';
+import { SelectionService, ISelectionState } from 'services/selection';
 import { VideoSettingsService, TDisplayType } from 'services/settings-v2/video';
 import { DualOutputService } from './dual-output';
 import { byOS, OS, getOS } from 'util/operating-systems';
 import * as remote from '@electron/remote';
 import { onUnload } from 'util/unload';
 import { ScenesService } from './api/external-api/resources';
-import { capitalize } from 'lodash';
 import { SettingsManagerService } from './settings-manager';
 
 // TODO: There are no typings for nwr
@@ -108,9 +107,11 @@ export class Display {
     }
 
     // also sync girdlines when selection changes
-    this.selectionSubscription = this.selectionService.updated.subscribe(state => {
-      this.switchGridlines(state.selectedIds.length <= 1);
-    });
+    this.selectionSubscription = this.selectionService.updated.subscribe(
+      (state: ISelectionState) => {
+        this.switchGridlines(state.selectedIds.length <= 1);
+      },
+    );
 
     if (options.paddingColor) {
       this.videoService.actions.setOBSDisplayPaddingColor(
@@ -321,42 +322,16 @@ export class VideoService extends Service {
     });
   }
 
-  // get baseWidth() {
-  //   return this.baseResolution.horizontal.width;
-  // }
-
-  // get baseHeight() {
-  //   return this.baseResolution.horizontal.height;
-  // }
-
   get baseResolutions() {
-    const horizontalWidth =
-      this.videoSettingsService.contexts.horizontal?.video.baseWidth ??
-      this.videoSettingsService.state.horizontal.baseWidth;
-    const horizontalHeight =
-      this.videoSettingsService.contexts.horizontal?.video.baseHeight ??
-      this.videoSettingsService.state.horizontal.baseHeight;
-
-    const verticalWidth =
-      this.videoSettingsService.contexts.vertical?.video.baseWidth ??
-      this.videoSettingsService.state.vertical.baseWidth;
-    const verticalHeight =
-      this.videoSettingsService.contexts.vertical?.video.baseHeight ??
-      this.videoSettingsService.state.vertical.baseHeight;
-
-    // const horizontalWidth = this.videoSettingsService.state.horizontal.baseWidth;
-    // const horizontalHeight = this.videoSettingsService.state.horizontal.baseHeight;
-
-    // const verticalWidth = this.videoSettingsService.state.vertical.baseWidth;
-    // const verticalHeight = this.videoSettingsService.state.vertical.baseHeight;
+    const baseResolutions = this.videoSettingsService.baseResolutions;
     return {
       horizontal: {
-        baseWidth: horizontalWidth,
-        baseHeight: horizontalHeight,
+        baseWidth: baseResolutions.horizontal.baseWidth,
+        baseHeight: baseResolutions.horizontal.baseHeight,
       },
       vertical: {
-        baseWidth: verticalWidth,
-        baseHeight: verticalHeight,
+        baseWidth: baseResolutions.vertical.baseWidth,
+        baseHeight: baseResolutions.vertical.baseHeight,
       },
     };
   }
@@ -370,127 +345,31 @@ export class VideoService extends Service {
   }
 
   get baseResolution() {
-    // const [widthStr, heightStr] = this.settingsService.views.values.Video.Base.split('x');
-    // const width = parseInt(widthStr, 10);
-    // const height = parseInt(heightStr, 10);
-
-    const width = this.videoSettingsService.state.horizontal.baseWidth;
-    const height = this.videoSettingsService.state.horizontal.baseHeight;
+    const width = this.videoSettingsService.baseResolutions.horizontal.baseWidth;
+    const height = this.videoSettingsService.baseResolutions.horizontal.baseHeight;
     return {
       width,
       height,
     };
-
-    // const [widthStr, heightStr] = this.settingsService.views.values.Video.Base.split('x');
-    // const width = parseInt(widthStr, 10);
-    // const height = parseInt(heightStr, 10);
-
-    // return {
-    //   horizontal: {
-    //     width,
-    //     height,
-    //   },
-    //   vertical: {
-    //     width: this.settingsManagerService.views.videoSettings.vertical.baseWidth,
-    //     height: this.settingsManagerService.views.videoSettings.vertical.baseHeight,
-    //   },
-    // };
   }
 
-  // getScreenRectangle(display?: TDisplayType) {
-  //   if (!display) {
-  //     return new ScalableRectangle({
-  //       x: 0,
-  //       y: 0,
-  //       width: this.baseWidth,
-  //       height: this.baseHeight,
-  //     });
-  //   }
-  //   return new ScalableRectangle({
-  //     x: 0,
-  //     y: 0,
-  //     width: this.getBaseWidth(display),
-  //     height: this.getBaseHeight(display),
-  //   });
-  // }
-
-  // getBaseWidth(display: TDisplayType) {
-  //   return this.getBaseResolution(display).width;
-  // }
-
-  // getBaseHeight(display: TDisplayType) {
-  //   return this.getBaseResolution(display).height;
-  // }
-
-  // getBaseResolution(display: TDisplayType) {
-  //   // console.log(
-  //   //   'this.videoSettingsService ',
-  //   //   this.settingsService.views.values.Vertical.Base.split('x'),
-  //   // );
-  //   const [widthStr, heightStr] = this.videoSettingsService.getBaseResolution(display).split('x');
-  //   // const [widthStr, heightStr] = this.settingsService.views.values.Video.Base.split('x');
-  //   const width = parseInt(widthStr, 10);
-  //   const height = parseInt(heightStr, 10);
-  //   return {
-  //     width,
-  //     height,
-  //   };
-  // }
-
-  // setBaseResolution(resolution: { width: number; height: number }) {
-  //   this.settingsService.setSettingValue(
-  //     'Video',
-  //     'Base',
-  //     `${resolution.width}x${resolution.height}`,
-  //   );
-  // }
-
-  setBaseResolutions(
-    resolutions: {
-      horizontal: {
-        width: number;
-        height: number;
-      };
-      vertical: {
-        width: number;
-        height: number;
-      };
-    },
-    defaultDisplay: TDisplayType = 'horizontal',
-  ) {
+  setBaseResolutions(resolutions: {
+    horizontal: {
+      baseWidth: number;
+      baseHeight: number;
+    };
+    vertical: {
+      baseWidth: number;
+      baseHeight: number;
+    };
+  }) {
+    const display = this.settingsManagerService.views.defaultDisplay ?? 'horizontal';
     this.settingsService.setSettingValue(
       'Video',
       'Base',
-      `${resolutions[defaultDisplay].width}x${resolutions[defaultDisplay].height}`,
+      `${resolutions[display].baseWidth}x${resolutions[display].baseHeight}`,
     );
   }
-
-  // setContexts(contexts: {
-  //   default: IVideoSettingFormatted;
-  //   horizontal: IVideoSettingFormatted;
-  //   vertical: IVideoSettingFormatted;
-  // }) {
-  //   for (const displayName in contexts) {
-  //     if (displayName === 'default') {
-  //       // if it's the default display, only update the base resolution
-  //       this.settingsService.setSettingValue('Video', 'Base', contexts[displayName].baseRes);
-  //     } else {
-  //       // format property names for settings
-  //       // @@@ maybe format the property names when getting object
-  //       const display: unknown[] = [];
-  //       for (const property in contexts[displayName]) {
-  //         const formattedName = ESettingsVideoProperties[property];
-  //         console.log('formattedName ', formattedName);
-  //         display.push({ [formattedName]: contexts[displayName][property] });
-  //         console.log('display ', display);
-  //       }
-  //       this.settingsService.setSettings(
-  //         capitalize(displayName),
-  //         display as ISettingsSubCategory[],
-  //       );
-  //     }
-  //   }
-  // }
 
   /**
    * @warning DO NOT USE THIS METHOD. Use the Display class instead
@@ -504,8 +383,6 @@ export class VideoService extends Service {
   ) {
     const electronWindow = remote.BrowserWindow.fromId(electronWindowId);
     const context = type ? this.videoSettingsService.contexts[type] : undefined;
-
-    console.log('this.videoSettingsService.contexts ', this.videoSettingsService.contexts[type]);
 
     if (sourceId) {
       obs.NodeObs.OBS_content_createSourcePreviewDisplay(

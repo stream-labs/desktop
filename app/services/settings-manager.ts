@@ -1,12 +1,17 @@
 import { ViewHandler, PersistentStatefulService, Inject } from 'services/core';
 import { mutation } from 'services/core/stateful-service';
-import { IVideoSetting, verticalDisplayData, TDisplayType } from './settings-v2';
+import {
+  IVideoSetting,
+  verticalDisplayData,
+  TDisplayType,
+  VideoSettingsService,
+} from './settings-v2';
 import { IVideoInfo } from 'obs-studio-node';
 import { DualOutputService } from './dual-output';
+import { VideoService } from './video';
 
 interface ISettingsManagerServiceState {
   videoSettings: {
-    defaultDisplay: TDisplayType;
     vertical: IVideoInfo;
     activeDisplays: {
       horizontal: boolean;
@@ -25,20 +30,30 @@ class SettingsManagerServiceViews extends ViewHandler<ISettingsManagerServiceSta
   }
 
   get defaultDisplay() {
-    const active = Object.entries(this.state.videoSettings.activeDisplays).map(([key, value]) => {
-      if (value === true) {
-        return { key };
-      }
-    });
+    console.log(
+      'this.state.videoSettings.activeDisplays ',
+      this.state.videoSettings.activeDisplays,
+    );
+    const active: TDisplayType[] = Object.entries(this.state.videoSettings.activeDisplays).reduce(
+      (displays: TDisplayType[], [key, value]: [TDisplayType, boolean]) => {
+        if (value) {
+          displays.push(key);
+        }
+        return displays;
+      },
+      [],
+    );
     return active.length > 1 ? null : active[0];
   }
 }
 
 export class SettingsManagerService extends PersistentStatefulService<ISettingsManagerServiceState> {
   @Inject() private dualOutputService: DualOutputService;
+  @Inject() videoService: VideoService;
+  @Inject() videoSettingsService: VideoSettingsService;
+
   static defaultState = {
     videoSettings: {
-      defaultDisplay: 'horizontal',
       vertical: verticalDisplayData, // get settings for horizontal display from obs directly
       activeDisplays: {
         horizontal: true,
@@ -112,8 +127,6 @@ export class SettingsManagerService extends PersistentStatefulService<ISettingsM
         [display]: status,
       };
     }
-
-    this.state.videoSettings.defaultDisplay = display;
   }
 
   @mutation()

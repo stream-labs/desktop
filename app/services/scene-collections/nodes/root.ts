@@ -13,19 +13,14 @@ import { DualOutputService } from 'services/dual-output';
 import { SettingsManagerService } from 'services/settings-manager';
 
 interface ISchema {
-  defaultDisplay: TDisplayType;
-  baseResolution: {
-    width: number;
-    height: number;
-  };
   baseResolutions: {
     horizontal: {
-      width: number;
-      height: number;
+      baseWidth: number;
+      baseHeight: number;
     };
     vertical: {
-      width: number;
-      height: number;
+      baseWidth: number;
+      baseHeight: number;
     };
   };
 
@@ -70,19 +65,7 @@ export class RootNode extends Node<ISchema, {}> {
       transitions,
       hotkeys,
       guestCam,
-      // contexts: this.videoSettingsService.contexts,
-      defaultDisplay: this.settingsManagerService.views.videoSettings.defaultDisplay,
-      baseResolutions: {
-        horizontal: {
-          width: this.videoService.baseResolutions.horizontal.baseWidth,
-          height: this.videoService.baseResolutions.horizontal.baseHeight,
-        },
-        vertical: {
-          width: this.videoService.baseResolutions.vertical?.baseWidth,
-          height: this.videoService.baseResolutions.vertical?.baseHeight,
-        },
-      },
-      baseResolution: this.videoService.baseResolution,
+      baseResolutions: this.videoSettingsService.baseResolutions,
       selectiveRecording: this.streamingService.state.selectiveRecording,
       dualOutputMode: this.dualOutputService.state.dualOutputMode,
       operatingSystem: process.platform as OS,
@@ -90,17 +73,6 @@ export class RootNode extends Node<ISchema, {}> {
   }
 
   async load(): Promise<void> {
-    // @@@ put duplication here?
-    // @@@ BASE RESOLUTION
-    // console.log(
-    //   'this.videoSettingsService.defaultBaseResolution ',
-    //   this.videoSettingsService.defaultBaseResolution,
-    // );
-
-    // console.log('this.data.contexts ', this.data.contexts);
-
-    // this.videoService.setContexts(this.data.contexts);
-    // this.videoService.setBaseResolution(this.data.baseResolution);
     this.videoService.setBaseResolutions(this.data.baseResolutions);
     this.streamingService.setSelectiveRecording(!!this.data.selectiveRecording);
     this.streamingService.setDualOutputMode(this.data.dualOutputMode);
@@ -124,9 +96,6 @@ export class RootNode extends Node<ISchema, {}> {
       this.data.transitions = this.data['transition'];
     }
 
-    // Added baseResolution in version 3
-    if (version < 3) {
-      this.data.baseResolution = this.videoService.baseResolution;
-    }
+    this.data.baseResolutions = this.videoService.baseResolutions;
   }
 }
