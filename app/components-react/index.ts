@@ -88,7 +88,7 @@ export const components = {
   Display,
   TitleBar,
   Chat,
-  Highlighter,
+  Highlighter: createRoot(Highlighter),
   Grow,
   Loader,
   PlatformLogo,

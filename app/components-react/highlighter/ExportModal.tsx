@@ -237,7 +237,7 @@ function PlatformSelect(p: { onClose: () => void }) {
   const { videoName } = useModule(ExportModule);
 
   return (
-    <div>
+    <Form>
       <ListInput
         label={$t('Upload To')}
         value={platform}
@@ -250,6 +250,6 @@ function PlatformSelect(p: { onClose: () => void }) {
       />
       {platform === 'youtube' && <YoutubeUpload defaultTitle={videoName} close={p.onClose} />}
       {platform === 'crossclip' && <CrossClipUpload onClose={p.onClose} />}
-    </div>
+    </Form>
   );
 }

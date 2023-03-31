@@ -135,6 +135,7 @@ class Uploader {
     this.chunkSize = this.isMultipart ? Math.round(this.size / this.uploadUrls.length) : this.size;
     this.type = opts.fileInfo.file.mime_type;
     this.filepath = opts.filepath;
+    this.cancel = this.cancel.bind(this);
   }
 
   async start() {
