@@ -372,9 +372,8 @@ export class TcpServerService
       // Hang up anything that looks like an HTTP request
       if (req[0] !== '{' && req.match(/HTTP/)) {
         this.disconnectClient(client.id);
+        return;
       }
-
-      return;
     }
 
     requests.forEach(requestString => {
