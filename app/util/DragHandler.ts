@@ -99,8 +99,9 @@ export class DragHandler {
     this.centerSnapping = this.settingsService.views.values.General.CenterSnapping;
 
     // Load some attributes about the video canvas
-    this.baseWidth = this.videoService.baseWidth;
-    this.baseHeight = this.videoService.baseHeight;
+    const baseRes = this.videoService.baseResolutions[startEvent.display];
+    this.baseWidth = baseRes.width;
+    this.baseHeight = baseRes.height;
     this.displaySize = options.displaySize;
     this.displayOffset = options.displayOffset;
 
@@ -194,16 +195,21 @@ export class DragHandler {
   }
 
   private mousePositionInCanvasSpace(event: IMouseEvent): IVec2 {
-    return this.pageSpaceToCanvasSpace({
-      x: event.pageX - this.displayOffset.x,
-      y: event.pageY - this.displayOffset.y,
-    });
+    return this.pageSpaceToCanvasSpace(
+      {
+        x: event.pageX - this.displayOffset.x,
+        y: event.pageY - this.displayOffset.y,
+      },
+      event.display,
+    );
   }
 
-  private pageSpaceToCanvasSpace(vec: IVec2) {
+  private pageSpaceToCanvasSpace(vec: IVec2, display = 'horizontal') {
+    const baseWidth = this.videoService.baseResolutions[display].baseWidth;
+    const baseHeight = this.videoService.baseResolutions[display].baseHeight;
     return {
-      x: (vec.x * this.scaleFactor * this.baseWidth) / this.displaySize.x,
-      y: (vec.y * this.scaleFactor * this.baseHeight) / this.displaySize.y,
+      x: (vec.x * this.scaleFactor * baseWidth) / this.displaySize.x,
+      y: (vec.y * this.scaleFactor * baseHeight) / this.displaySize.y,
     };
   }
 

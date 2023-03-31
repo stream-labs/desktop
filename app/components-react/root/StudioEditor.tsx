@@ -113,7 +113,7 @@ export default function StudioEditor() {
     let moveInFlight = false;
     let lastMoveEvent: React.MouseEvent | null = null;
 
-    function onMouseMove(event: React.MouseEvent, display?: TDisplayType) {
+    function onMouseMove(event: React.MouseEvent, display: TDisplayType) {
       if (moveInFlight) {
         lastMoveEvent = event;
         return;
@@ -124,7 +124,7 @@ export default function StudioEditor() {
         moveInFlight = false;
 
         if (lastMoveEvent) {
-          onMouseMove(lastMoveEvent);
+          onMouseMove(lastMoveEvent, display);
           lastMoveEvent = null;
         }
       });
@@ -135,7 +135,7 @@ export default function StudioEditor() {
         EditorService.actions.handleOutputResize(rect);
       },
 
-      onMouseDown(event: React.MouseEvent, display?: TDisplayType) {
+      onMouseDown(event: React.MouseEvent, display: TDisplayType) {
         EditorService.actions.handleMouseDown(getMouseEvent(event, display));
       },
 
@@ -143,7 +143,7 @@ export default function StudioEditor() {
         EditorService.actions.handleMouseUp(getMouseEvent(event));
       },
 
-      onMouseEnter(event: React.MouseEvent, display?: TDisplayType) {
+      onMouseEnter(event: React.MouseEvent, display: TDisplayType) {
         EditorService.actions.handleMouseEnter(getMouseEvent(event, display));
       },
 
@@ -179,20 +179,14 @@ export default function StudioEditor() {
                 className={cx(styles.studioEditorDisplayContainer, 'noselect')}
                 style={{ cursor: v.cursor }}
                 onMouseDown={(event: React.MouseEvent) =>
-                  v.hasAdditionalContexts
-                    ? eventHandlers.onMouseDown(event, 'horizontal')
-                    : eventHandlers.onMouseDown(event)
+                  eventHandlers.onMouseDown(event, 'horizontal')
                 }
                 onMouseUp={eventHandlers.onMouseUp}
                 onMouseEnter={(event: React.MouseEvent) =>
-                  v.hasAdditionalContexts
-                    ? eventHandlers.onMouseEnter(event, 'horizontal')
-                    : eventHandlers.onMouseEnter(event)
+                  eventHandlers.onMouseEnter(event, 'horizontal')
                 }
                 onMouseMove={(event: React.MouseEvent) =>
-                  v.hasAdditionalContexts
-                    ? eventHandlers.onMouseMove(event, 'horizontal')
-                    : eventHandlers.onMouseMove(event)
+                  eventHandlers.onMouseMove(event, 'horizontal')
                 }
                 onDoubleClick={eventHandlers.onMouseDblClick}
                 onContextMenu={eventHandlers.onContextMenu}

@@ -136,16 +136,6 @@ export class EditorService extends StatefulService<IEditorServiceState> {
   }
 
   startDragging(event: IMouseEvent) {
-    console.log('\nobj ', {
-      displaySize: {
-        x: this.renderedWidth,
-        y: this.renderedHeight,
-      },
-      displayOffset: {
-        x: this.renderedOffsetX,
-        y: this.renderedOffsetY,
-      },
-    });
     this.dragHandler = new DragHandler(event, {
       displaySize: {
         x: this.renderedWidth,
@@ -245,8 +235,6 @@ export class EditorService extends StatefulService<IEditorServiceState> {
   }
 
   handleMouseEnter(event: IMouseEvent) {
-    console.log('entered ', event);
-
     if (event.buttons !== 1) {
       this.dragHandler = null;
       this.resizeRegion = null;
@@ -259,7 +247,7 @@ export class EditorService extends StatefulService<IEditorServiceState> {
     const mousePosX = event.offsetX * factor - this.renderedOffsetX;
     const mousePosY = event.offsetY * factor - this.renderedOffsetY;
 
-    const converted = this.convertScalarToBaseSpace(mousePosX, mousePosY);
+    const converted = this.convertScalarToBaseSpace(mousePosX, mousePosY, event.display);
 
     if (this.resizeRegion) {
       const name = this.resizeRegion.name;
@@ -437,23 +425,18 @@ export class EditorService extends StatefulService<IEditorServiceState> {
   }
 
   updateCursor(event: IMouseEvent) {
-    console.log('\n---\nthis.dragHandler ', this.dragHandler);
-    console.log('this.resizeRegion ', this.resizeRegion);
-
     if (this.dragHandler) {
       this.setCursor('-webkit-grabbing');
     } else if (this.resizeRegion) {
       this.setCursor(this.resizeRegion.cursor);
     } else {
       const overResize = this.isOverResize(event);
-      console.log('overResize ', overResize);
 
       if (overResize) {
         this.setCursor(overResize.cursor);
       } else {
         const overSource = this.getOverSources(event)[0];
 
-        console.log('overSource ', overSource);
         if (overSource) {
           this.setCursor('-webkit-grab');
         } else {
@@ -461,7 +444,6 @@ export class EditorService extends StatefulService<IEditorServiceState> {
         }
       }
     }
-    console.log('\n---\n');
   }
 
   /**
@@ -511,8 +493,6 @@ export class EditorService extends StatefulService<IEditorServiceState> {
    * given source
    */
   isOverSource(event: IMouseEvent, source: SceneItem) {
-    console.log('isOverSource event.display ', event.display);
-    console.log('isOverSource source.display ', source.display);
     if (event.display !== source.display) return false;
     const rect = new ScalableRectangle(source.rectangle);
     rect.normalize();
@@ -545,17 +525,10 @@ export class EditorService extends StatefulService<IEditorServiceState> {
   // Size (width & height) is a scalar value, and
   // only needs to be scaled when converting between
   // spaces.
-  convertScalarToBaseSpace(x: number, y: number, display?: TDisplayType) {
-    if (display) {
-      return {
-        x: (x * this.videoSettingsService.contexts[display].video.baseWidth) / this.renderedWidth,
-        y: (y * this.videoSettingsService.contexts[display].video.baseHeight) / this.renderedHeight,
-      };
-    }
-
+  convertScalarToBaseSpace(x: number, y: number, display: TDisplayType) {
     return {
-      x: (x * this.baseWidth) / this.renderedWidth,
-      y: (y * this.baseHeight) / this.renderedHeight,
+      x: (x * this.baseResolutions[display].baseWidth) / this.renderedWidth,
+      y: (y * this.baseResolutions[display].baseHeight) / this.renderedHeight,
     };
   }
 
@@ -599,6 +572,9 @@ export class EditorService extends StatefulService<IEditorServiceState> {
     return this.videoService.baseHeight;
   }
 
+  get baseResolutions() {
+    return this.videoSettingsService.baseResolutions;
+  }
   // Using a computed property since it is cached
   get resizeRegions(): IResizeRegion[] {
     let regions: IResizeRegion[] = [];
@@ -614,7 +590,11 @@ export class EditorService extends StatefulService<IEditorServiceState> {
     const renderedRegionRadius = 5;
     // We don't need to adjust mac coordinates for scale factor
     const factor = byOS({ [OS.Windows]: this.windowsService.state.main.scaleFactor, [OS.Mac]: 1 });
-    const regionRadius = (renderedRegionRadius * factor * this.baseWidth) / this.renderedWidth;
+    const regionRadius =
+      (renderedRegionRadius *
+        factor *
+        this.baseResolutions[item.display ?? 'horizontal'].baseWidth) /
+      this.renderedWidth;
     const width = regionRadius * 2;
     const height = regionRadius * 2;
 

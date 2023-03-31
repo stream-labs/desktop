@@ -290,13 +290,6 @@ export class SettingsService extends StatefulService<ISettingsServiceState> {
     this.getCategories().forEach(categoryName => {
       settingsFormData[categoryName] = this.fetchSettingsFromObs(categoryName);
       if (['Stream', 'StreamSecond'].includes(categoryName)) {
-        console.log(
-          'fetchSettingsFromObs(',
-          categoryName,
-          ') returned ',
-          settingsFormData[categoryName],
-        );
-
         // @@@ TODO: remove. temporary and janky: force set the server to auto if the service is twitch
         settingsFormData[categoryName].formData[1].parameters.forEach(
           (parameter: IObsInput<unknown>) => {
