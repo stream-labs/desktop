@@ -357,7 +357,7 @@ export class SourceSelectorModule {
       this.state.expandedFoldersIds.concat(node.getPath().slice(0, -1)),
     );
 
-    this.nodeRefs[this.lastSelectedId].current.scrollIntoView({ behavior: 'smooth' });
+    this.nodeRefs[this.lastSelectedId]?.current.scrollIntoView({ behavior: 'smooth' });
   }
 
   get activeItemIds() {
