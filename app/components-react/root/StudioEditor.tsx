@@ -131,8 +131,8 @@ export default function StudioEditor() {
     }
 
     return {
-      onOutputResize(rect: IRectangle) {
-        EditorService.actions.handleOutputResize(rect);
+      onOutputResize(rect: IRectangle, display: TDisplayType) {
+        EditorService.actions.handleOutputResize(rect, display);
       },
 
       onMouseDown(event: React.MouseEvent, display: TDisplayType) {
@@ -195,7 +195,9 @@ export default function StudioEditor() {
                   type={v.hasAdditionalContexts ? 'horizontal' : undefined}
                   drawUI={true}
                   paddingSize={10}
-                  onOutputResize={eventHandlers.onOutputResize}
+                  onOutputResize={(rect: IRectangle) =>
+                    eventHandlers.onOutputResize(rect, 'horizontal')
+                  }
                   renderingMode={ERenderingMode.OBS_MAIN_RENDERING}
                   sourceId={sourceId}
                 />
@@ -222,7 +224,9 @@ export default function StudioEditor() {
                   type="vertical"
                   drawUI={true}
                   paddingSize={10}
-                  onOutputResize={eventHandlers.onOutputResize}
+                  onOutputResize={(rect: IRectangle) =>
+                    eventHandlers.onOutputResize(rect, 'vertical')
+                  }
                   renderingMode={ERenderingMode.OBS_MAIN_RENDERING}
                   sourceId={sourceId}
                 />

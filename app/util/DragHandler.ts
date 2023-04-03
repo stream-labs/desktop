@@ -100,8 +100,9 @@ export class DragHandler {
 
     // Load some attributes about the video canvas
     const baseRes = this.videoService.baseResolutions[startEvent.display];
-    this.baseWidth = baseRes.width;
-    this.baseHeight = baseRes.height;
+    this.baseWidth = baseRes.baseWidth;
+    this.baseHeight = baseRes.baseHeight;
+
     this.displaySize = options.displaySize;
     this.displayOffset = options.displayOffset;
 
