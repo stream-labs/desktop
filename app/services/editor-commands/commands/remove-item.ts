@@ -7,7 +7,7 @@ import { ReorderNodesCommand, EPlaceType } from './reorder-nodes';
 import { $t } from 'services/i18n';
 import { ISceneItemSettings } from 'services/api/external-api/scenes';
 import { DualOutputService } from 'services/dual-output';
-import { TDisplayType } from 'services/settings-v2/video';
+import { VideoSettingsService } from 'services/settings-v2';
 
 // Removing and recreating a source is a very complex event.
 // We can save a lot of time by leveraging the scene collection system.
@@ -26,15 +26,19 @@ class SourceReviver extends SourcesNode {
 export class RemoveItemCommand extends Command {
   @Inject() private scenesService: ScenesService;
   @Inject() private dualOutputService: DualOutputService;
+  @Inject() private videoSettingsService: VideoSettingsService;
 
   private sceneId: string;
   private sourceId: string;
   private sourceReviver: SourceReviver;
 
   private reorderNodesSubcommand: ReorderNodesCommand;
+  private reorderDualOutputNodesSubcommand: ReorderNodesCommand;
 
   private settings: ISceneItemSettings;
+
   private dualOutputVerticalNodeId: string;
+  private dualOutputNodeSettings: ISceneItemSettings;
 
   constructor(private sceneItemId: string) {
     super();
@@ -63,6 +67,31 @@ export class RemoveItemCommand extends Command {
     );
     this.reorderNodesSubcommand.execute();
 
+    // If the scene has vertical nodes, we need to remove the corresponding vertical node
+    if (this.dualOutputService.views.hasVerticalNodes) {
+      console.log('removing vertical node');
+      this.dualOutputVerticalNodeId = this.dualOutputService.views.getDisplayNodeId(
+        this.sceneItemId,
+      );
+      console.log('dualOutputVerticalNodeId ', this.dualOutputVerticalNodeId);
+      const verticalSceneItem = this.scenesService.views.getSceneItem(
+        this.dualOutputVerticalNodeId,
+      );
+      this.dualOutputNodeSettings = verticalSceneItem.getSettings();
+
+      console.log('verticalSceneItem ', verticalSceneItem);
+
+      this.reorderDualOutputNodesSubcommand = new ReorderNodesCommand(
+        scene.getSelection(this.dualOutputVerticalNodeId),
+        void 0,
+        EPlaceType.After,
+      );
+      this.reorderDualOutputNodesSubcommand.execute();
+
+      verticalSceneItem.remove();
+      this.dualOutputService.actions.removeDualOutputNodes(this.sceneItemId);
+    }
+
     // If this was the last item using this source, the underlying source
     // will automatically be removed. In this case, we need to store enough
     // information to bring it back intio existence in the rollback function.
@@ -72,18 +101,6 @@ export class RemoveItemCommand extends Command {
     ) {
       this.sourceReviver = new SourceReviver(item.source);
       await this.sourceReviver.save({});
-    }
-
-    if (this.dualOutputService.views.dualOutputMode) {
-      console.log('dual output mode');
-
-      const verticalNodeId = this.dualOutputService.views.nodeMaps.vertical[item.id];
-      const verticalNode = this.scenesService.views.getSceneItem(verticalNodeId);
-      verticalNode.remove();
-
-      this.dualOutputVerticalNodeId = verticalNodeId;
-
-      this.dualOutputService.actions.removeDualOutputNodes(this.sceneItemId);
     }
 
     item.remove();
@@ -97,25 +114,38 @@ export class RemoveItemCommand extends Command {
 
     const scene = this.scenesService.views.getScene(this.sceneId);
 
-    const item = scene.addSource(this.sourceId, { id: this.sceneItemId, select: false });
+    if (this.dualOutputVerticalNodeId) {
+      // if the scene has vertical node items, restore the vertical nodes as well
 
-    this.reorderNodesSubcommand.rollback();
-    item.setSettings(this.settings);
+      // horizontal scene item
+      const item = scene.addSource(this.sourceId, { id: this.sceneItemId, select: false });
+      const horizontalContext = this.videoSettingsService.contexts.horizontal;
+      item.setSettings({ ...this.settings, output: horizontalContext, display: 'horizontal' });
 
-    if (this.dualOutputService.views.dualOutputMode && this.dualOutputVerticalNodeId) {
-      // if the scene item was deleted in dual output mode
-      // restore the dual output scene items as well
-      // the scene item id doesn't matter for the dualOutputNodes
-      // so just create new ones
-
+      // vertical scene item
       const verticalItem = scene.addSource(this.sourceId, {
         id: this.dualOutputVerticalNodeId,
         select: false,
       });
+      const verticalContext = this.videoSettingsService.contexts.vertical;
+      verticalItem.setSettings({
+        ...this.dualOutputNodeSettings,
+        output: verticalContext,
+        display: 'vertical',
+      });
 
-      verticalItem.setSettings(this.settings);
+      // reorder both
+      this.reorderNodesSubcommand.rollback();
+      this.reorderDualOutputNodesSubcommand.rollback();
 
-      this.dualOutputService.restoreNodesToMap(item.id, verticalItem.id);
+      // restore entry to node map
+      this.dualOutputService.restoreNodesToMap(this.sceneItemId, this.dualOutputVerticalNodeId);
+    } else {
+      // otherwise, just create horizontal item
+      const item = scene.addSource(this.sourceId, { id: this.sceneItemId, select: false });
+
+      this.reorderNodesSubcommand.rollback();
+      item.setSettings(this.settings);
     }
   }
 }

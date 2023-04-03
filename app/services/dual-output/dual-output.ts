@@ -12,7 +12,8 @@ import { TDisplayType, VideoSettingsService } from 'services/settings-v2/video';
 import { StreamingService } from 'services/streaming';
 import { SceneCollectionsService } from 'services/scene-collections';
 import { getPlatformService, TPlatform } from 'services/platforms';
-import { ReorderNodesCommand, EPlaceType } from 'services/editor-commands/commands/reorder-nodes';
+import { EPlaceType } from 'services/editor-commands/commands/reorder-nodes';
+import { EditorCommandsService } from 'services/editor-commands';
 import { Subject } from 'rxjs';
 import { SettingsManagerService } from 'services/settings-manager';
 import { TOutputOrientation } from 'services/restream';
@@ -157,6 +158,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
   @Inject() private scenesService: ScenesService;
   @Inject() private sceneCollectionsService: SceneCollectionsService;
   @Inject() private videoSettingsService: VideoSettingsService;
+  @Inject() private editorCommandsService: EditorCommandsService;
 
   static defaultState: IDualOutputServiceState = {
     displays: ['horizontal', 'vertical'],
@@ -289,6 +291,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
     sceneId?: string,
   ) {
     if (isFirstDisplay) {
+      console.log('dualOutput ASSIGNING HORIZONTAL CONTEXT');
       // if it's the first display, just assign the scene item's output to a context
       this.assignNodeContext(sceneItem, display);
 
@@ -297,6 +300,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
       this.SET_NODE_MAP_ITEM(display, sceneItem.id, sceneItem.id, sceneId);
       return sceneItem.id;
     } else {
+      console.log('dualOutput CREATING VERTICAL NODE');
       // if it's not the first display, copy the scene item
       const scene = this.scenesService.views.getScene(sceneId);
       const copiedSceneItem = scene.addSource(sceneItem.sourceId);
@@ -307,15 +311,16 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
       const settings: IPartialSettings = { ...sceneItem.getSettings(), output: context, display };
       copiedSceneItem.setSettings(settings);
 
-      const reorderNodesSubcommand = new ReorderNodesCommand(
-        scene.getSelection(copiedSceneItem.id),
-        sceneItem.id,
+      const selection = scene.getSelection(copiedSceneItem.id);
+      this.editorCommandsService.executeCommand(
+        'ReorderNodesCommand',
+        selection,
+        copiedSceneItem.id,
         EPlaceType.Before,
       );
-      reorderNodesSubcommand.execute();
 
       this.SET_NODE_MAP_ITEM(display, sceneItem.id, copiedSceneItem.id, sceneId);
-      return sceneItem.id;
+      return copiedSceneItem.id;
     }
   }
 

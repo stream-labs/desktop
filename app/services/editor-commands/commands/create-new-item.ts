@@ -37,7 +37,7 @@ export class CreateNewItemCommand extends Command {
       .getScene(this.sceneId)
       .createAndAddSource(this.name, this.type, this.settings, this.options);
 
-    if (this.dualOutputService.views.dualOutputMode) {
+    if (this.dualOutputService.views.hasVerticalNodes) {
       this.dualOutputService.actions.assignNodeContext(item, 'horizontal');
 
       Promise.resolve(
@@ -59,7 +59,7 @@ export class CreateNewItemCommand extends Command {
   rollback() {
     this.scenesService.views.getScene(this.sceneId).removeItem(this.sceneItemId);
 
-    if (this.dualOutputService.views.dualOutputMode && this.dualOutputVerticalNodeId) {
+    if (this.dualOutputVerticalNodeId) {
       this.scenesService.views.getScene(this.sceneId).removeItem(this.dualOutputVerticalNodeId);
 
       this.dualOutputService.removeDualOutputNodes(this.sceneItemId);
