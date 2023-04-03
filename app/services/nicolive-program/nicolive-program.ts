@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/vue';
 import { BehaviorSubject } from 'rxjs';
 import { Inject } from 'services/core/injector';
 import { mutation, StatefulService } from 'services/core/stateful-service';
@@ -236,6 +237,11 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
 
       if (!programSchedule) {
         this.setState({ status: 'end' });
+        Sentry.addBreadcrumb({
+          category: 'program',
+          message: 'suitable program not found',
+          data: { schedulesResponse: schedulesResponse.value },
+        });
         throw NicoliveFailure.fromConditionalError('fetchProgram', 'no_suitable_program');
       }
       const { nicoliveProgramId, socialGroupId } = programSchedule;
