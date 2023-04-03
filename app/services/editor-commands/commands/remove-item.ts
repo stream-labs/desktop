@@ -89,7 +89,7 @@ export class RemoveItemCommand extends Command {
       this.reorderDualOutputNodesSubcommand.execute();
 
       verticalSceneItem.remove();
-      this.dualOutputService.actions.removeDualOutputNodes(this.sceneItemId);
+      this.dualOutputService.actions.removeVerticalNodes(this.sceneItemId);
     }
 
     // If this was the last item using this source, the underlying source
