@@ -549,7 +549,7 @@ export class EditorService extends StatefulService<IEditorServiceState> {
   // Size (width & height) is a scalar value, and
   // only needs to be scaled when converting between
   // spaces.
-  convertScalarToBaseSpace(x: number, y: number, display: TDisplayType) {
+  convertScalarToBaseSpace(x: number, y: number, display: TDisplayType = 'horizontal') {
     return {
       x: (x * this.baseResolutions[display].baseWidth) / this.renderedWidths[display],
       y: (y * this.baseResolutions[display].baseHeight) / this.renderedHeights[display],
