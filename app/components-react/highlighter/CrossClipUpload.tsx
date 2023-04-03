@@ -8,9 +8,10 @@ import { $t } from 'services/i18n';
 export default function CrossClipUpload(p: { onClose: () => void }) {
   const { UserService, HighlighterService } = Services;
 
-  const { uploadInfo, exportInfo } = useVuex(() => ({
+  const { uploadInfo, exportInfo, hasSLID } = useVuex(() => ({
     uploadInfo: HighlighterService.views.uploadInfo,
     exportInfo: HighlighterService.views.exportInfo,
+    hasSLID: !!UserService.views.auth?.slid?.id,
   }));
 
   function getUploadProgress() {
@@ -50,5 +51,12 @@ export default function CrossClipUpload(p: { onClose: () => void }) {
   }, []);
 
   if (uploadInfo.uploading) return getUploadProgress();
-  return <button>{$t('Upload')}</button>;
+  return (
+    <button
+      className="button button--action"
+      onClick={() => HighlighterService.actions.uploadStorage()}
+    >
+      {$t('Upload')}
+    </button>
+  );
 }

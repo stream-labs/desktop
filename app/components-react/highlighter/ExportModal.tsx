@@ -233,7 +233,7 @@ function ExportOptions(p: { close: () => void }) {
 }
 
 function PlatformSelect(p: { onClose: () => void }) {
-  const [platform, setPlatform] = useState('');
+  const [platform, setPlatform] = useState('youtube');
   const { videoName } = useModule(ExportModule);
 
   return (
@@ -241,7 +241,7 @@ function PlatformSelect(p: { onClose: () => void }) {
       <ListInput
         label={$t('Upload To')}
         value={platform}
-        onInput={setPlatform}
+        onChange={setPlatform}
         layout="horizontal"
         options={[
           { label: 'YouTube', value: 'youtube' },

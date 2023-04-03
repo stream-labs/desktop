@@ -1,3 +1,4 @@
+import { HostsService } from 'app-services';
 import fs from 'fs';
 import path from 'path';
 import { Service, Inject } from 'services/core';
@@ -26,12 +27,13 @@ interface IProgress {
 
 export class SharedStorageService extends Service {
   @Inject() userService: UserService;
+  @Inject() hostsService: HostsService;
 
   id: string;
   cancel: () => void;
 
   get host() {
-    return 'https://api-id.streamlabs.dev';
+    return this.hostsService.streamlabs;
   }
 
   async uploadFile(
@@ -42,13 +44,25 @@ export class SharedStorageService extends Service {
     try {
       const uploadInfo = await this.prepareUpload(filepath);
       this.id = uploadInfo.file.id;
-      const uploaded = await this.uploadS3File(uploadInfo, filepath, onProgress, onError);
+      const { uploaded, reqBody } = await this.uploadS3File(
+        uploadInfo,
+        filepath,
+        onProgress,
+        onError,
+      );
       if (uploaded) {
+        await this.completeUpload(reqBody);
         return await this.generateShare();
       }
     } catch (e: unknown) {
       console.error(e);
     }
+  }
+
+  async completeUpload(body: { parts?: { number: number; tag: string }[] }) {
+    const url = `${this.host}/storage/v1/temporary-files/${this.id}/complete`;
+    const headers = authorizedHeaders(this.userService.apiToken);
+    return await jfetch(new Request(url, { headers, method: 'POST', body: JSON.stringify(body) }));
   }
 
   async cancelUpload() {
@@ -125,6 +139,7 @@ class Uploader {
   type = '';
   filepath = '';
   cancelRequested = false;
+  parts: { number: number; tag: string }[] = [];
 
   constructor(opts: IUploaderOptions) {
     this.onProgress = opts.onProgress;
@@ -151,7 +166,8 @@ class Uploader {
       });
 
       await this.uploadChunks(file);
-      return true;
+      const reqBody = this.isMultipart ? { parts: this.parts } : {};
+      return { uploaded: true, reqBody };
     } catch (e: unknown) {
       this.onError(e);
     }
@@ -198,13 +214,15 @@ class Uploader {
 
     this.uploadedSize += chunkSize;
 
-    await fetch(
+    const result: { eTag: string } = await jfetch(
       new Request(url, {
         method: 'PUT',
         headers,
         body: new Blob([readBuffer]),
       }),
     );
+
+    this.parts.push({ number: this.parts.length + 1, tag: result.eTag });
 
     this.onProgress({
       totalBytes: this.size,
