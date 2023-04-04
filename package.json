@@ -39,7 +39,8 @@
     "postinstall": "node ./scripts/postinstall.js",
     "tail-obs-logs": "node bin/tail-obs-logs.js",
     "generate-agreement": "cat BASEAGREEMENT > AGREEMENT && yarn licenses generate-disclaimer >> AGREEMENT",
-    "generate-agreement:mac": "cat BASEAGREEMENT > license_en.txt && yarn licenses generate-disclaimer >> license_en.txt"
+    "generate-agreement:mac": "cat BASEAGREEMENT > license_en.txt && yarn licenses generate-disclaimer >> license_en.txt",
+    "beta": "SLD_USE_BETA=true electron ."
   },
   "prettier": {
     "singleQuote": true,
