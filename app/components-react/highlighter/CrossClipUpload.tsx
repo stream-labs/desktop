@@ -14,7 +14,7 @@ export default function CrossClipUpload(p: { onClose: () => void }) {
     hasSLID: !!UserService.views.auth?.slid?.id,
   }));
 
-  function getUploadProgress() {
+  function UploadProgress() {
     return (
       <div>
         <h2>{$t('Upload Progress')}</h2>
@@ -50,7 +50,8 @@ export default function CrossClipUpload(p: { onClose: () => void }) {
     return () => HighlighterService.actions.dismissError();
   }, []);
 
-  if (uploadInfo.uploading) return getUploadProgress();
+  if (!hasSLID) return <GetSLID />;
+  if (uploadInfo.uploading) return <UploadProgress />;
   return (
     <button
       className="button button--action"
@@ -59,4 +60,8 @@ export default function CrossClipUpload(p: { onClose: () => void }) {
       {$t('Upload')}
     </button>
   );
+}
+
+function GetSLID() {
+  return <div></div>;
 }
