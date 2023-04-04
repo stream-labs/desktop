@@ -415,7 +415,6 @@ export class TcpServerService
         // processing requests that don't look will well formed JSON RPC calls.
         // Without this check, it is possible to send normal HTTP requests
         // from an unprivileged web page and make calls to this API.
-        console.log('DISCONNECTING ROGUE CLIENT');
         this.disconnectClient(client.id);
         return;
       }
