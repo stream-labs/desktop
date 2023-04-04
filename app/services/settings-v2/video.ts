@@ -82,15 +82,20 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
   }
 
   migrateSettings(display?: TDisplayType) {
+    this.SET_VIDEO_CONTEXT(display, true);
+
     if (display === 'horizontal') {
-      this.SET_VIDEO_CONTEXT(display, this.contexts[display].video);
-      Object.keys(this.contexts.horizontal.legacySettings).forEach((key: keyof obs.IVideo) => {
-        this.SET_VIDEO_SETTING(key, this.contexts.horizontal.legacySettings[key]);
+      Object.keys(this.contexts.horizontal.legacySettings).forEach(
+        (key: keyof obs.IAdvancedStreaming | keyof obs.ISimpleStreaming) => {
+          this.SET_VIDEO_SETTING(key, this.contexts.horizontal.legacySettings[key]);
+        },
+      );
+      Object.keys(this.contexts.horizontal.video).forEach((key: keyof obs.IVideo) => {
+        this.SET_VIDEO_SETTING(key, this.contexts.horizontal.video[key]);
       });
     } else {
       const data = this.videoSettings.green;
 
-      this.SET_VIDEO_CONTEXT(display, this.contexts[display].video);
       Object.keys(data).forEach(
         (key: keyof obs.IAdvancedStreaming | keyof obs.ISimpleStreaming) => {
           this.SET_VIDEO_SETTING(key, data[key], display);
@@ -107,7 +112,7 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
     if (this.contexts[display]) return;
 
     this.contexts[display] = obs.VideoFactory.create();
-    this.SET_VIDEO_CONTEXT(display);
+    this.SET_VIDEO_CONTEXT(display, true);
     this.migrateSettings(display);
     this.contexts[display].video = this.state[display];
 
@@ -175,9 +180,9 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
   }
 
   @mutation()
-  SET_VIDEO_CONTEXT(display: TDisplayType = 'horizontal', settings?: obs.IVideoInfo) {
-    if (settings) {
-      this.state[display] = settings;
+  SET_VIDEO_CONTEXT(display: TDisplayType = 'horizontal', reset?: boolean) {
+    if (!reset) {
+      this.state[display] = this.contexts[display].video;
     } else {
       this.state[display] = {} as obs.IVideoInfo;
     }
