@@ -1,12 +1,14 @@
 import React, { useEffect } from 'react';
+import * as remote from '@electron/remote';
 import { Progress } from 'antd';
 import { Services } from 'components-react/service-provider';
 import { useVuex } from 'components-react/hooks';
 import { humanFileSize } from './YoutubeUpload';
 import { $t } from 'services/i18n';
+import Translate from 'components-react/shared/Translate';
 
 export default function CrossClipUpload(p: { onClose: () => void }) {
-  const { UserService, HighlighterService } = Services;
+  const { UserService, HighlighterService, OnboardingService } = Services;
 
   const { uploadInfo, exportInfo, hasSLID } = useVuex(() => ({
     uploadInfo: HighlighterService.views.uploadInfo,
@@ -45,12 +47,16 @@ export default function CrossClipUpload(p: { onClose: () => void }) {
     );
   }
 
+  function connectSLID() {
+    OnboardingService.actions.start({ isLogin: true });
+  }
+
   // Clear all errors when this component unmounts
   useEffect(() => {
     return () => HighlighterService.actions.dismissError();
   }, []);
 
-  if (!hasSLID) return <GetSLID />;
+  if (!hasSLID) return <GetSLID onClick={connectSLID} />;
   if (uploadInfo.uploading) return <UploadProgress />;
   return (
     <button
@@ -62,6 +68,18 @@ export default function CrossClipUpload(p: { onClose: () => void }) {
   );
 }
 
-function GetSLID() {
-  return <div></div>;
+function GetSLID(p: { onClick: () => void }) {
+  function signUp() {
+    remote.shell.openExternal('https://id.streamlabs.com/register');
+  }
+
+  return (
+    <div>
+      <h2>{$t('This feature requires a Streamlabs ID')}</h2>
+      <button onClick={signUp}>{$t('Sign up for Streamlabs ID')}</button>
+      <Translate message="Already have a Streamlabs ID? <link>Login</link>">
+        <a slot="link" onClick={p.onClick} />
+      </Translate>
+    </div>
+  );
 }
