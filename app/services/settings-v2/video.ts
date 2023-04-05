@@ -81,7 +81,7 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
     return this.greenService.views.videoSettings;
   }
 
-  migrateSettings(display?: TDisplayType) {
+  migrateSettings(display: TDisplayType = 'horizontal') {
     this.SET_VIDEO_CONTEXT(display, true);
 
     if (display === 'horizontal') {
