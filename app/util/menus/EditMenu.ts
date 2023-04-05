@@ -19,6 +19,10 @@ import * as remote from '@electron/remote';
 import { ProjectorMenu } from './ProjectorMenu';
 import { FiltersMenu } from './FiltersMenu';
 import { AudioService } from 'services/audio';
+import { ScaleFilteringMenu } from './ScaleFilteringMenu';
+import { BlendingModeMenu } from './BlendingModeMenu';
+import { BlendingMethodMenu } from './BlendingMethodMenu';
+import { DeinterlacingModeMenu } from './DeinterlacingModeMenu';
 
 interface IEditMenuOptions {
   selectedSourceId?: string;
@@ -108,7 +112,33 @@ export class EditMenu extends Menu {
         submenu: this.groupSubmenu().menu,
       });
 
+      this.append({ type: 'separator' });
+
+      this.append({
+        label: $t('Scale Filtering'),
+        submenu: this.scaleFilteringSubmenu().menu,
+      });
+
+      this.append({
+        label: $t('Blending Mode'),
+        submenu: this.blendingModeSubmenu().menu,
+      });
+
+      this.append({
+        label: $t('Blending Method'),
+        submenu: this.blendingMethodSubmenu().menu,
+      });
+
       if (selectedItem && isItem(selectedItem)) {
+        if (selectedItem.getSource().async) {
+          this.append({
+            label: $t('Deinterlacing'),
+            submenu: this.deinterlacingSubmenu().menu,
+          });
+
+          this.append({ type: 'separator' });
+        }
+
         const visibilityLabel = selectedItem.visible ? $t('Hide') : $t('Show');
         const streamVisLabel = selectedItem.streamVisible
           ? $t('Hide on Stream')
@@ -354,5 +384,21 @@ export class EditMenu extends Menu {
 
   private projectorSubmenu() {
     return new ProjectorMenu();
+  }
+
+  private scaleFilteringSubmenu() {
+    return new ScaleFilteringMenu();
+  }
+
+  private blendingModeSubmenu() {
+    return new BlendingModeMenu();
+  }
+
+  private blendingMethodSubmenu() {
+    return new BlendingMethodMenu();
+  }
+
+  private deinterlacingSubmenu() {
+    return new DeinterlacingModeMenu();
   }
 }

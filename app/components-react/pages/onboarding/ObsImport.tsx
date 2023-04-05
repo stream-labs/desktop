@@ -1,11 +1,10 @@
-import { useModule } from 'components-react/hooks/useModule';
+import { injectState, useModule, mutation } from 'slap';
 import { alertAsync } from 'components-react/modals';
 import { Services } from 'components-react/service-provider';
 import AutoProgressBar from 'components-react/shared/AutoProgressBar';
 import { ListInput } from 'components-react/shared/inputs';
 import Form from 'components-react/shared/inputs/Form';
 import KevinSvg from 'components-react/shared/KevinSvg';
-import { mutation } from 'components-react/store';
 import React from 'react';
 import { $t } from 'services/i18n';
 import commonStyles from './Common.m.less';
@@ -13,7 +12,7 @@ import styles from './ObsImport.m.less';
 import { OnboardingModule } from './Onboarding';
 
 export function ObsImport() {
-  const { importing, percent } = useModule(ObsImportModule).select();
+  const { importing, percent } = useModule(ObsImportModule);
 
   return (
     <div style={{ width: '100%' }}>
@@ -40,10 +39,10 @@ export function ObsImport() {
 }
 
 function PreImport() {
-  const { setProcessing, next } = useModule(OnboardingModule).select();
+  const { setProcessing, next } = useModule(OnboardingModule);
   const { profiles, selectedProfile, setSelectedProfile, startImport } = useModule(
     ObsImportModule,
-  ).select();
+  );
 
   return (
     <div>
@@ -129,12 +128,12 @@ function FeatureCards() {
 }
 
 class ObsImportModule {
-  state = {
+  state = injectState({
     profiles: [] as string[],
     selectedProfile: '' as string | null,
     importing: false,
     percent: 0,
-  };
+  });
 
   init() {
     // Intentionally synchronous

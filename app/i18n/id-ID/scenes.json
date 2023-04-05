@@ -6,7 +6,6 @@
   "There needs to be at least one scene.": "Memerlukan setidaknya satu scene.",
   "Projector:": "Proyektor:",
   "Projector: Output": "Proyektor: Output",
-  "Manage All": "Kelola Semua",
   "This is where your Scene Collections live. Clicking the title will dropdown a menu where you can view & manage.": "Ini adalah tempat Koleksi Scene Anda live. Memeriksa judul akan mengeluarkan menu yang bisa Anda lihat & kelola.",
   "Are you sure you want to remove %{collectionName}?": "Anda yakin ingin menghapus %{collectionName}?",
   "Create Scene Projector": "Buat Proyektor Scene",
@@ -38,7 +37,17 @@
   "Rename Folder": "Ganti Nama Folder",
   "Name Folder": "Beri Nama Folder",
   "Switch Scenes": "Berganti Scene",
-  "Failed to load scene collection.  A new one will be created instead.": "Gagal untuk memuat koleksi scene. Koleksi baru akan dibuat.",
+  "Failed to load scene collection.  A new one will be created instead.": "Gagal untuk memuat koleksi scene.  Koleksi baru akan dibuat.",
   "New Scene": "Scene Baru",
-  "Projector": "Proyektor"
+  "Projector": "Proyektor",
+  "Your Scene Collections:": "Koleksi Scene Anda:",
+  "Add New Scene Collection:": "Tambah Koleksi Scene Baru:",
+  "Search Scene Collections": "Cari Koleksi Scene",
+  "Start fresh and build from scratch": "Mulai yang baru dan bangun dari nol",
+  "Load existing scenes from OBS": "Memuat scene yang ada dari OBS",
+  "Template": "Templat",
+  "Choose a template from our theme library": "Pilih sebuah templat dari perpustakaan tema kami",
+  "Enter a Scene Collection Name": "Masukkan Nama Koleksi Scene",
+  "Copy of %{collectionName}": "Salinan dari %{collectionName}",
+  "Your Scene Collections": "Koleksi Scene Anda"
 }

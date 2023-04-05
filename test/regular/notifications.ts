@@ -33,7 +33,7 @@ test('Clicking notifications', async t => {
 
   await click('.footer .fa-exclamation-triangle');
   await focusChild();
-  await click('.has-action');
+  await click('[data-name=hasAction]');
 
   await waitForDisplayed('h4=What does this mean?');
   t.pass();

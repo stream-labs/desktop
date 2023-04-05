@@ -89,7 +89,7 @@
   "Link": "链接",
   "Description": "描述",
   "OBSInit.UnknownError": "初始化 Streamlabs 时遇到未知错误。",
-  "OBSInit.ModuleNotFoundError": "在您的系统上找不到 DirectX。请在此处 &lt;https://www.microsoft.com/en-us/download/details.aspx?id=35?&gt;为您的计算机安装最新版本的 DirectX 并重试。",
+  "OBSInit.ModuleNotFoundError": "在您的系统上找不到 DirectX。请在此处 <https://www.microsoft.com/en-us/download/details.aspx?id=35?>为您的计算机安装最新版本的 DirectX 并重试。",
   "OBSInit.NotSupportedError": "未能初始化 Streamlabs。您的视频驱动程序可能已过期，或者您的系统可能不支持 Streamlabs Desktop。",
   "Log Out": "登出",
   "Layout Editor": "布局编辑器",

@@ -8,6 +8,7 @@ import { $t } from 'services/i18n';
 import uuid from 'uuid/v4';
 import { LAYOUT_DATA, ELEMENT_DATA, ELayout, ELayoutElement } from './layout-data';
 import { UsageStatisticsService } from 'services/usage-statistics';
+import { menuTitles } from 'services/side-nav/menu-data';
 
 export { ELayout, ELayoutElement };
 
@@ -22,7 +23,6 @@ interface ILayoutState {
   slottedElements: { [Element in ELayoutElement]?: { slot: LayoutSlot; src?: string } };
   resizes: { bar1: number; bar2?: number };
 }
-
 interface ILayoutServiceState {
   currentTab: string;
   tabs: {
@@ -43,6 +43,17 @@ class LayoutViews extends ViewHandler<ILayoutServiceState> {
     return Object.keys(this.currentTab.slottedElements).filter(
       key => this.currentTab.slottedElements[key].slot,
     );
+  }
+
+  get studioTabs() {
+    return Object.keys(this.state.tabs).map((tab, i) => ({
+      key: tab,
+      target: tab,
+      title:
+        i === 0 || !this.state.tabs[tab].name ? menuTitles('Editor') : this.state.tabs[tab].name,
+      icon: this.state.tabs[tab].icon,
+      trackingTarget: tab === 'default' ? 'editor' : 'custom',
+    }));
   }
 
   elementTitle(element: ELayoutElement) {
@@ -131,6 +142,7 @@ export class LayoutService extends PersistentStatefulService<ILayoutServiceState
     if (!this.state.tabs.default.name) {
       this.SET_TAB_NAME('default', $t('Editor'));
     }
+
     if (
       this.customizationService.state.legacyEvents &&
       isEqual(this.state, LayoutService.defaultState)
@@ -215,6 +227,20 @@ export class LayoutService extends PersistentStatefulService<ILayoutServiceState
 
   @mutation()
   SET_SLOTS(slottedElements: { [key in ELayoutElement]?: { slot: LayoutSlot } }) {
+    // This is necessary because of the reversed data model of this service's state,
+    // combined with the way persistent stateful service does a deep merge of default
+    // state. If we don't explicitly set elements contained in the default state to null
+    // then we will get multiple elements assigned to a slot on next restart.
+    if (LayoutService.defaultState.tabs[this.state.currentTab]) {
+      Object.keys(LayoutService.defaultState.tabs[this.state.currentTab].slottedElements).forEach(
+        el => {
+          if (!slottedElements[el]) {
+            slottedElements[el] = { slot: null };
+          }
+        },
+      );
+    }
+
     Vue.set(this.state.tabs[this.state.currentTab], 'slottedElements', slottedElements);
   }
 

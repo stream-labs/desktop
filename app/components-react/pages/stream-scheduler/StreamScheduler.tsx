@@ -10,8 +10,6 @@ import { ListInput, TimeInput } from '../../shared/inputs';
 import Form, { useForm } from '../../shared/inputs/Form';
 import { confirmAsync } from '../../modals';
 import { IStreamEvent, useStreamScheduler } from './useStreamScheduler';
-import { Services } from '../../service-provider';
-import { getDefined } from '../../../util/properties-type-guards';
 import Scrollable from '../../shared/Scrollable';
 
 /**
@@ -159,16 +157,25 @@ function EventSettingsModal() {
         <Spin spinning={isLoading}>
           {/* PLATFORM SELECTOR */}
           {canChangePlatform && (
-            <ListInput
-              label={$t('Platform')}
-              name="platform"
-              value={selectedPlatform}
-              options={platforms.map(platform => ({
-                value: platform,
-                label: getPlatformDisplayName(platform),
-              }))}
-              onChange={platform => showNewEventModal(platform)}
-            />
+            <>
+              <ListInput
+                label={$t('Platform')}
+                name="platform"
+                value={selectedPlatform}
+                options={platforms.map(platform => ({
+                  value: platform,
+                  label: getPlatformDisplayName(platform),
+                }))}
+                onChange={platform => showNewEventModal(platform)}
+              />
+              {selectedPlatform === 'facebook' && (
+                <span className="whisper">
+                  {$t(
+                    'Please note that while you can schedule streams to Facebook, some will not appear on this calendar due to API limitations',
+                  )}
+                </span>
+              )}
+            </>
           )}
 
           {/* TIME PICKER */}

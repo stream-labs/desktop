@@ -29,6 +29,7 @@ const {
   crashReporter,
   dialog,
   webContents,
+  desktopCapturer,
 } = require('electron');
 const path = require('path');
 const rimraf = require('rimraf');
@@ -301,20 +302,24 @@ async function startApp() {
       handleFinishedReport();
     });
 
-    crashReporter.start({
-      productName: 'streamlabs-obs',
-      companyName: 'streamlabs',
-      ignoreSystemCrashHandler: true,
-      submitURL: process.env.SLOBS_PREVIEW
-        ? pjson.sentryBackendClientPreviewURL
-        : pjson.sentryBackendClientURL,
-      extra: {
-        processType: 'main',
-      },
-      globalExtra: {
-        'sentry[release]': pjson.version,
-      },
-    });
+    const submitURL = process.env.SLOBS_PREVIEW
+      ? pjson.sentryBackendClientPreviewURL
+      : pjson.sentryBackendClientURL;
+
+    if (submitURL) {
+      crashReporter.start({
+        productName: 'streamlabs-obs',
+        companyName: 'streamlabs',
+        ignoreSystemCrashHandler: true,
+        submitURL,
+        extra: {
+          processType: 'main',
+        },
+        globalExtra: {
+          'sentry[release]': pjson.version,
+        },
+      });
+    }
   }
 
   workerWindow = new BrowserWindow({
@@ -417,7 +422,7 @@ async function startApp() {
 
   workerWindow.on('closed', () => {
     session.defaultSession.flushStorageData();
-    session.defaultSession.cookies.flushStore(() => app.quit());
+    session.defaultSession.cookies.flushStore().then(() => app.quit());
   });
 
   // Pre-initialize the child window
@@ -802,3 +807,5 @@ function measure(msg, time) {
   if (delta > 2000) console.log('------------------');
   console.log(msg, delta + 'ms');
 }
+
+ipcMain.handle('DESKTOP_CAPTURER_GET_SOURCES', (event, opts) => desktopCapturer.getSources(opts));

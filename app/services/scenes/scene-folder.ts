@@ -11,7 +11,7 @@ import { ServiceHelper } from 'services/core';
 import compact from 'lodash/compact';
 import { assertIsDefined } from '../../util/properties-type-guards';
 
-@ServiceHelper()
+@ServiceHelper('ScenesService')
 export class SceneItemFolder extends SceneItemNode {
   name: string;
   sceneNodeType: TSceneNodeType = 'folder';

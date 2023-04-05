@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 import NavMenu from './NavMenu.vue';
+import { UltraIcon } from 'components/shared/ReactComponentList';
 
 interface INavMenu {
   value: string;
@@ -8,10 +9,11 @@ interface INavMenu {
   isChild: boolean;
 }
 
-@Component({})
+@Component({ components: { UltraIcon } })
 export default class NavItem extends Vue {
   @Prop() to: string;
   @Prop() ico: string;
+  @Prop() ultra: boolean;
   @Prop({
     default: () => {
       return {};

@@ -89,7 +89,7 @@
   "Link": "Link",
   "Description": "Beschreibung",
   "OBSInit.UnknownError": "Bei der Initialisierung von Streamlabs kam es zu einem unbekannten Fehler.",
-  "OBSInit.ModuleNotFoundError": "DirectX wurde auf dem System nicht gefunden. Bitte installieren Sie neueste Version von DirectX für Ihren Computer: &lt;https://www.microsoft.com/en-us/download/details.aspx?id=35?&gt;. Versuchen Sie es anschließend erneut.",
+  "OBSInit.ModuleNotFoundError": "DirectX wurde auf dem System nicht gefunden. Bitte installieren Sie neueste Version von DirectX für Ihren Computer: <https://www.microsoft.com/en-us/download/details.aspx?id=35?>. Versuchen Sie es anschließend erneut.",
   "OBSInit.NotSupportedError": "Streamlabs konnte nicht initialisiert werden. Entweder sind Ihre Videotreiber veraltet oder Streamlabs Desktop wird eventuell nicht von Ihrem System unterstützt.",
   "Log Out": "Abmelden",
   "Layout Editor": "Layout-Editor",

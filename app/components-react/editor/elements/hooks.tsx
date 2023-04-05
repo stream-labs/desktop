@@ -2,13 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { $t } from 'services/i18n';
 import styles from './BaseElement.m.less';
 import Scrollable from 'components-react/shared/Scrollable';
-import { useModule } from '../../hooks/useModule';
-import { mutation } from '../../store';
+import { useModule, injectState, mutation } from 'slap';
 
 class BaseElementModule {
-  state = {
+  state = injectState({
     sizeWatcherInterval: 0,
-  };
+  });
 
   sizeWatcherCallbacks: Function[] = [];
 
@@ -47,7 +46,7 @@ export default function useBaseElement(
   const [height, setHeight] = useState(0);
   const [width, setWidth] = useState(0);
 
-  const { addSizeWatcher, removeSizeWatcher } = useModule(BaseElementModule).select();
+  const { addSizeWatcher, removeSizeWatcher } = useModule(BaseElementModule);
 
   useEffect(() => {
     const sizeWatcher = () => {

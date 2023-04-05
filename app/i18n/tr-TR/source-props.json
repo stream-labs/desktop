@@ -1,8 +1,8 @@
 {
  "Image": "Görüntü",
- "Color Source": "Renk Kaynağı",
+ "Color Block": "Renk Bloğu",
  "Browser Source": "Tarayıcı Kaynağı",
- "Media Source": "Medya Kaynağı",
+ "Media File": "Medya Dosyası",
  "Image Slide Show": "Görüntü Slayt Gösterisi",
  "Text (GDI+)": "Metin (GDI+)",
  "Text (FreeType 2)": "Metin (FreeType 2)",

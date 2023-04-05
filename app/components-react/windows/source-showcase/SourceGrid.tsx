@@ -8,10 +8,11 @@ import { WidgetDisplayData, WidgetType } from 'services/widgets';
 import { TSourceType } from 'services/sources';
 import { getPlatformService } from 'services/platforms';
 import { $i } from 'services/utils';
-import { byOS, OS } from 'util/operating-systems';
-import { $t } from 'services/i18n';
+import { byOS, getOS, OS } from 'util/operating-systems';
+import { $t, I18nService } from 'services/i18n';
 import SourceTag from './SourceTag';
 import { useSourceShowcaseSettings } from './useSourceShowcase';
+import { EAvailableFeatures } from 'services/incremental-rollout';
 
 export default function SourceGrid(p: { activeTab: string }) {
   const {
@@ -20,6 +21,7 @@ export default function SourceGrid(p: { activeTab: string }) {
     ScenesService,
     WindowsService,
     CustomizationService,
+    IncrementalRolloutService,
   } = Services;
 
   const { demoMode, designerMode, isLoggedIn, linkedPlatforms, primaryPlatform } = useVuex(() => ({
@@ -29,6 +31,16 @@ export default function SourceGrid(p: { activeTab: string }) {
     linkedPlatforms: UserService.views.linkedPlatforms,
     primaryPlatform: UserService.views.platform?.type,
   }));
+
+  /**
+   * English and languages with logographic writing systems
+   * generally have shorter strings so we prevent those cards from wrapping.
+   */
+
+  const i18nService = I18nService.instance as I18nService;
+  const locale = i18nService.state.locale;
+  const excludedLanguages = ['en', 'ko', 'zh']; // add i18n prefixes here to exclude languages from wrapping
+  const excludeWrap = excludedLanguages.includes(locale.split('-')[0]);
 
   const { availableAppSources } = useSourceShowcaseSettings();
 
@@ -56,17 +68,24 @@ export default function SourceGrid(p: { activeTab: string }) {
     [],
   );
 
-  const availableSources = useMemo(
-    () =>
-      SourcesService.getAvailableSourcesTypesList().filter(type => {
-        // Freetype on windows is hidden
-        if (type.value === 'text_ft2_source' && byOS({ [OS.Windows]: true, [OS.Mac]: false })) {
-          return;
-        }
-        return !(type.value === 'scene' && ScenesService.views.scenes.length <= 1);
-      }),
-    [],
-  );
+  const availableSources = useMemo(() => {
+    const guestCamAvailable =
+      IncrementalRolloutService.views.featureIsEnabled(EAvailableFeatures.guestCamBeta) ||
+      IncrementalRolloutService.views.featureIsEnabled(EAvailableFeatures.guestCaProduction);
+
+    return SourcesService.getAvailableSourcesTypesList().filter(type => {
+      // Freetype on windows is hidden
+      if (type.value === 'text_ft2_source' && byOS({ [OS.Windows]: true, [OS.Mac]: false })) {
+        return;
+      }
+
+      if (type.value === 'mediasoupconnector' && !guestCamAvailable) {
+        return false;
+      }
+
+      return !(type.value === 'scene' && ScenesService.views.scenes.length <= 1);
+    });
+  }, []);
 
   const essentialSources = useMemo(() => {
     const essentialDefaults = availableSources.filter(source =>
@@ -116,14 +135,25 @@ export default function SourceGrid(p: { activeTab: string }) {
               <PageHeader style={{ paddingLeft: 0 }} title={$t('Essential Sources')} />
             </Col>
             {essentialSources.essentialDefaults.map(source => (
-              <SourceTag key={source.value} type={source.value} essential />
+              <SourceTag
+                key={source.value}
+                type={source.value}
+                essential
+                excludeWrap={excludeWrap}
+              />
             ))}
             {isLoggedIn &&
               essentialSources.essentialWidgets.map(widgetType => (
-                <SourceTag key={widgetType} type={widgetType} essential />
+                <SourceTag key={widgetType} type={widgetType} essential excludeWrap={excludeWrap} />
               ))}
             {isLoggedIn && (
-              <SourceTag key="streamlabel" name={$t('Stream Label')} type="streamlabel" essential />
+              <SourceTag
+                key="streamlabel"
+                name={$t('Stream Label')}
+                type="streamlabel"
+                essential
+                excludeWrap={excludeWrap}
+              />
             )}
           </>
         )}
@@ -133,11 +163,21 @@ export default function SourceGrid(p: { activeTab: string }) {
               <PageHeader style={{ paddingLeft: 0 }} title={$t('General Sources')} />
             </Col>
             {availableSources.filter(filterEssential).map(source => (
-              <SourceTag key={source.value} type={source.value} />
+              <SourceTag key={source.value} type={source.value} excludeWrap={excludeWrap} />
             ))}
-            <SourceTag key="replay" name={$t('Instant Replay')} type="replay" />
+            <SourceTag
+              key="replay"
+              name={$t('Instant Replay')}
+              type="replay"
+              excludeWrap={excludeWrap}
+            />
             {designerMode && (
-              <SourceTag key="icon_library" name={$t('Custom Icon')} type={'icon_library'} />
+              <SourceTag
+                key="icon_library"
+                name={$t('Custom Icon')}
+                type={'icon_library'}
+                excludeWrap={excludeWrap}
+              />
             )}
           </>
         )}
@@ -157,10 +197,15 @@ export default function SourceGrid(p: { activeTab: string }) {
             ) : (
               <>
                 {iterableWidgetTypes.filter(filterEssential).map(widgetType => (
-                  <SourceTag key={widgetType} type={widgetType} />
+                  <SourceTag key={widgetType} type={widgetType} excludeWrap={excludeWrap} />
                 ))}
                 {p.activeTab !== 'all' && (
-                  <SourceTag key="streamlabel" name={$t('Stream Label')} type="streamlabel" />
+                  <SourceTag
+                    key="streamlabel"
+                    name={$t('Stream Label')}
+                    type="streamlabel"
+                    excludeWrap={excludeWrap}
+                  />
                 )}
               </>
             )}
@@ -178,6 +223,7 @@ export default function SourceGrid(p: { activeTab: string }) {
                 type="app_source"
                 appId={app.appId}
                 appSourceId={app.source.id}
+                excludeWrap={excludeWrap}
               />
             ))}
           </>

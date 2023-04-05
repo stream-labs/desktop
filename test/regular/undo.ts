@@ -35,9 +35,9 @@ test('Creating some sources with undo/redo', async t => {
 
   const sceneBuilder = new SceneBuilder(await getApiClient());
 
-  await addSource('Color Source', 'Color Source');
-  await addSource('Color Source', 'Color Source 2');
-  await addSource('Color Source', 'Color Source 3');
+  await addSource('Color Block', 'Color Source');
+  await addSource('Color Block', 'Color Source 2');
+  await addSource('Color Block', 'Color Source 3');
 
   t.true(
     sceneBuilder.isEqualTo(
@@ -114,7 +114,7 @@ test('Deleting a scene with undo/redo', async t => {
   sceneBuilder.build(sketch);
 
   await focusMain();
-  await clickRemoveScene();
+  await clickRemoveScene('New Scene');
 
   t.true(sceneBuilder.isEqualTo(''));
 

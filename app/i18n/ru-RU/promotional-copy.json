@@ -1,6 +1,6 @@
 {
   "Overlay, Widget, and Site Themes": "Темы оверлеев, виджетов и сайтов",
-  "Fully customize your stream and your website to represent your brand; or pick from thousands of our pre-made themes. Either way, your stream will look amazing and it's all included with Prime.": "Полностью персонализируйте трансляцию и веб-сайт, чтобы представить свой бренд, или выберите одну из тысяч готовых тем. Благодаря этим возможностям, доступным в Prime, ваша трансляция будет выглядеть великолепно.",
+  "Fully customize your stream and your website to represent your brand; or pick from thousands of our pre-made themes. Either way, your stream will look amazing and it's all included with Prime.": "Полностью персонализируйте трансляцию и сайт, чтобы они соответствовали вашему бренду, или выберите одну из тысяч готовых тем. Ваша трансляция будет выглядеть великолепно в любом случае, и все эти возможности доступны в Prime.",
   "View Themes": "Просмотреть темы",
   "Every App is FREE": "Все приложения БЕСПЛАТНЫ",
   "We've curated a list of diverse and feature rich applications to give you more control, automation, better analytics, and new ways to interact with your audience.": "Мы подготовили список разнообразных приложений с широкими возможностями для улучшения управления, автоматизации и сбора аналитических данных, а также для использования новых способов взаимодействия с аудиторией.",
@@ -31,7 +31,7 @@
   "Choose Prime": "Выбрать Prime",
   "Your Benefits Are Expiring Soon": "Срок действия ваших преимуществ скоро истекает",
   "Your will lose access to the following Prime benefits if you don’t resubscribe:": "Если вы не подпишетесь снова, то потеряете доступ к следующим преимуществам Prime:",
-  "Thank you for being a valued member of Streamlabs. We just wanted to check in to see if you’ve had a chance to explore all Prime has to offer.": "Спасибо за активное участие в жизни Streamlabs. Может, вы все же захотите попробовать все возможности Prime?",
+  "Thank you for being a valued member of Streamlabs. We just wanted to check in to see if you’ve had a chance to explore all Prime has to offer.": "Спасибо за активное участие в жизни Streamlabs. Возможно, вы все же захотите попробовать все возможности Prime?",
   "Continue Prime": "Продолжить с Prime",
   "Stream Overlays": "Наложения для трансляций",
   "Multistream": "Мульти трансляция",
@@ -40,5 +40,6 @@
   "All Apps Included Free": "Все приложения бесплатны",
   "Thumbnail & Panel Maker": "Редактор миниатюр и панелей",
   "Prime Mobile Streaming": "Трансляция Prime с мобильного устройства",
-  "Your credit card expires soon. Click here to retain your Prime benefits": "Срок действия вашей банковской карты скоро истекает. Нажмите здесь, чтобы не потерять преимущества Prime."
+  "Your credit card expires soon. Click here to retain your Prime benefits": "Срок действия вашей банковской карты скоро истекает. Нажмите здесь, чтобы не потерять преимущества Prime.",
+  "News": "Новости"
 }

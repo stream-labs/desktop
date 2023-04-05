@@ -36,7 +36,10 @@ type TAnalyticsEvent =
   | 'AppStart'
   | 'Highlighter'
   | 'Hardware'
-  | 'WebcamUse';
+  | 'WebcamUse'
+  | 'MicrophoneUse'
+  | 'GuestCam'
+  | 'RecordingHistory';
 
 interface IAnalyticsEvent {
   product: string;
@@ -205,8 +208,8 @@ export class UsageStatisticsService extends Service {
     this.recordAnalyticsEvent('Click', { component, target });
   }
 
-  recordShown(component: string) {
-    this.recordAnalyticsEvent('Shown', { component });
+  recordShown(component: string, target?: string) {
+    this.recordAnalyticsEvent('Shown', { component, target });
   }
 
   /**

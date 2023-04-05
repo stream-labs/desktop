@@ -228,7 +228,9 @@ export class TcpServerService
         });
       });
     });
-    return addresses;
+
+    // Sort IPv4 before IPv6
+    return addresses.sort((a, b) => parseInt(a.family[3], 10) - parseInt(b.family[3], 10));
   }
 
   generateToken(): string {
@@ -365,6 +367,15 @@ export class TcpServerService
     }
 
     const requests = data.split('\n');
+
+    for (const req of requests) {
+      // Hang up anything that looks like an HTTP request
+      if (req[0] !== '{' && req.match(/HTTP/)) {
+        this.disconnectClient(client.id);
+        return;
+      }
+    }
+
     requests.forEach(requestString => {
       if (!requestString) return;
       try {
@@ -445,6 +456,21 @@ export class TcpServerService
   }
 
   private hadleTcpServerDirectives(client: IClient, request: IJsonRpcRequest) {
+    // Prevent access to certain particularly sensitive services
+    const protectedResources = ['FileManagerService'];
+
+    if (protectedResources.includes(request.params.resource)) {
+      this.sendResponse(
+        client,
+        this.jsonrpcService.createError(request, {
+          code: E_JSON_RPC_ERROR.INTERNAL_JSON_RPC_ERROR,
+          message: 'The requested resource is not available.',
+        }),
+      );
+
+      return true;
+    }
+
     // handle auth
     if (request.method === 'auth' && request.params.resource === 'TcpServerService') {
       if (this.state.token && request.params.args[0] === this.state.token) {

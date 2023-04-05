@@ -1,5 +1,5 @@
 import { Tooltip } from 'antd';
-import { useModule } from 'components-react/hooks/useModule';
+import { useModule } from 'slap';
 import KevinSvg from 'components-react/shared/KevinSvg';
 import React from 'react';
 import { $t } from 'services/i18n';
@@ -10,7 +10,7 @@ import ObsSvg from './ObsSvg';
 import { OnboardingModule } from './Onboarding';
 
 export function FreshOrImport() {
-  const { setImportFromObs, next } = useModule(OnboardingModule).select();
+  const { setImportFromObs, next } = useModule(OnboardingModule);
 
   const optionsMetadata = [
     {
@@ -42,7 +42,7 @@ export function FreshOrImport() {
         <SvgBackground />
         <img src={$i('images/onboarding/splash.png')} />
       </div>
-      <h1 className={styles.title}>{$t('Welcome to Streamlabs')}</h1>
+      <h1 className={styles.title}>{$t('1-Click Import from OBS')}</h1>
       <div className={styles.optionContainer}>
         {optionsMetadata.map(data => (
           <Tooltip title={data.description} placement="bottom" key={data.title}>
@@ -51,8 +51,14 @@ export function FreshOrImport() {
               onClick={() => data.onClick()}
               style={{ background: `var(${data.color})` }}
             >
-              <h2>{data.title}</h2>
               {data.image}
+              <h2
+                style={{
+                  color: data.color === '--teal' ? 'var(--action-button-text)' : undefined,
+                }}
+              >
+                {data.title}
+              </h2>
             </div>
           </Tooltip>
         ))}

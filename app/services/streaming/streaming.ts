@@ -43,6 +43,9 @@ import { assertIsDefined, getDefined } from 'util/properties-type-guards';
 import { StreamInfoView } from './streaming-view';
 import { GrowService } from 'services/grow/grow';
 import * as remote from '@electron/remote';
+import { RecordingModeService } from 'services/recording-mode';
+import { MarkersService } from 'services/markers';
+import { byOS, OS } from 'util/operating-systems';
 
 enum EOBSOutputType {
   Streaming = 'streaming',
@@ -78,11 +81,12 @@ export class StreamingService
   @Inject() private notificationsService: NotificationsService;
   @Inject() private userService: UserService;
   @Inject() private videoEncodingOptimizationService: VideoEncodingOptimizationService;
-  @Inject() private customizationService: CustomizationService;
   @Inject() private restreamService: RestreamService;
   @Inject() private hostsService: HostsService;
   @Inject() private twitterService: TwitterService;
   @Inject() private growService: GrowService;
+  @Inject() private recordingModeService: RecordingModeService;
+  @Inject() private markersService: MarkersService;
 
   streamingStatusChange = new Subject<EStreamingState>();
   recordingStatusChange = new Subject<ERecordingState>();
@@ -173,7 +177,7 @@ export class StreamingService
         // primary platform is always available to stream into
         // prime users are eligeble for streaming to any platform
         let primeRequired = false;
-        if (!this.views.checkPrimaryPlatform(platform) && !this.userService.isPrime) {
+        if (!this.views.isPrimaryPlatform(platform) && !this.userService.isPrime) {
           const primaryPlatform = this.userService.state.auth?.primaryPlatform;
 
           // grandfathared users allowed to stream primary + FB
@@ -644,6 +648,8 @@ export class StreamingService
 
   async toggleStreaming(options?: TStartStreamOptions, force = false) {
     if (this.state.streamingStatus === EStreamingState.Offline) {
+      if (this.recordingModeService.views.isRecordingModeEnabled) return;
+
       // in the "force" mode just try to start streaming without updating channel info
       if (force) {
         await this.finishStartStreaming();
@@ -729,6 +735,12 @@ export class StreamingService
     if (this.state.recordingStatus === ERecordingState.Offline) {
       obs.NodeObs.OBS_service_startRecording();
       return;
+    }
+  }
+
+  splitFile() {
+    if (this.state.recordingStatus === ERecordingState.Recording) {
+      obs.NodeObs.OBS_service_splitFile();
     }
   }
 
@@ -951,7 +963,11 @@ export class StreamingService
         [EOBSOutputSignal.Starting]: ERecordingState.Starting,
         [EOBSOutputSignal.Stop]: ERecordingState.Offline,
         [EOBSOutputSignal.Stopping]: ERecordingState.Stopping,
+        [EOBSOutputSignal.Wrote]: ERecordingState.Wrote,
       } as Dictionary<ERecordingState>)[info.signal];
+
+      // We received a signal we didn't recognize
+      if (!nextState) return;
 
       if (info.signal === EOBSOutputSignal.Start) {
         this.usageStatisticsService.recordFeatureUsage('Recording');
@@ -959,6 +975,19 @@ export class StreamingService
           status: nextState,
           code: info.code,
         });
+      }
+
+      if (info.signal === EOBSOutputSignal.Wrote) {
+        const filename = obs.NodeObs.OBS_service_getLastRecording();
+        const parsedFilename = byOS({
+          [OS.Mac]: filename,
+          [OS.Windows]: filename.replace(/\//, '\\'),
+        });
+        this.recordingModeService.actions.addRecordingEntry(parsedFilename);
+        this.markersService.actions.exportCsv(parsedFilename);
+        // Wrote signals come after Offline, so we return early here
+        // to not falsely set our state out of Offline
+        return;
       }
 
       this.SET_RECORDING_STATUS(nextState, time);

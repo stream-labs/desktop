@@ -10,6 +10,7 @@ import { $t } from 'services/i18n';
 import { useSourceShowcaseSettings } from './useSourceShowcase';
 import styles from './SourceShowcase.m.less';
 import SourceGrid from './SourceGrid';
+import Scrollable from 'components-react/shared/Scrollable';
 
 const { Content, Sider } = Layout;
 
@@ -95,26 +96,26 @@ function SideBar() {
       collapsedWidth={0}
     >
       <div className={styles.preview}>
-        {displayData?.demoFilename && (
-          <div className={styles.imageContainer}>
-            {displayData?.demoVideo && (
-              <video autoPlay loop key={previewSrc}>
-                <source src={previewSrc} />
-              </video>
-            )}
-            {!displayData?.demoVideo && <img src={previewSrc} />}
-          </div>
-        )}
-        <h2>{displayData?.name}</h2>
-        <div>{displayData?.description}</div>
-        {displayData?.supportList?.length > 0 && (
-          <div className={styles.supportHeader}>{$t('Supports:')}</div>
-        )}
-        <ul style={{ fontSize: '13px' }}>
-          {displayData?.supportList?.map(support => (
-            <li key={support}>{support}</li>
+        {displayData?.demoFilename &&
+          (displayData?.demoVideo ? (
+            <video autoPlay loop key={previewSrc}>
+              <source src={previewSrc} />
+            </video>
+          ) : (
+            <img src={previewSrc} />
           ))}
-        </ul>
+        <Scrollable style={{ height: '100%' }}>
+          <h2 style={{ marginTop: '24px' }}>{displayData?.name}</h2>
+          <div>{displayData?.description}</div>
+          {displayData?.supportList?.length > 0 && (
+            <div className={styles.supportHeader}>{$t('Supports:')}</div>
+          )}
+          <ul style={{ fontSize: '13px' }}>
+            {displayData?.supportList?.map(support => (
+              <li key={support}>{support}</li>
+            ))}
+          </ul>
+        </Scrollable>
       </div>
     </Sider>
   );

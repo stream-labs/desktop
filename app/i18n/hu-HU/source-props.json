@@ -1,8 +1,8 @@
 {
  "Image": "Kép",
- "Color Source": "Színforrás",
+ "Color Block": "Color Block",
  "Browser Source": "Böngésző Forrás",
- "Media Source": "Média Forrás",
+ "Media File": "Media File",
  "Image Slide Show": "Képvetítő",
  "Text (GDI+)": "Szöveg (GDI+)",
  "Text (FreeType 2)": "Szöveg (FreeType2)",

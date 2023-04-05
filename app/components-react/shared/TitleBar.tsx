@@ -15,10 +15,13 @@ export default function TitleBar(props: { windowId: string }) {
 
   const isMaximizable = remote.getCurrentWindow().isMaximizable() !== false;
   const isMac = byOS({ [OS.Windows]: false, [OS.Mac]: true });
-  const v = useVuex(() => ({
-    theme: CustomizationService.views.currentTheme,
-    title: WindowsService.state[props.windowId]?.title,
-  }));
+  const v = useVuex(
+    () => ({
+      theme: CustomizationService.views.currentTheme,
+      title: WindowsService.state[props.windowId]?.title,
+    }),
+    false,
+  );
 
   const isDev = useMemo(() => Utils.isDevMode(), []);
 

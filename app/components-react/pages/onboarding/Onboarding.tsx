@@ -1,18 +1,23 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import styles from './Onboarding.m.less';
 import commonStyles from './Common.m.less';
 import { Services } from 'components-react/service-provider';
-import { useModule } from 'components-react/hooks/useModule';
+import { injectState, useModule, mutation } from 'slap';
 import cx from 'classnames';
-import { mutation } from 'components-react/store';
 import { $t } from 'services/i18n';
 import * as stepComponents from './steps';
 import Utils from 'services/utils';
-import { ONBOARDING_STEPS } from 'services/onboarding';
+import { IOnboardingStep, ONBOARDING_STEPS } from 'services/onboarding';
 import Scrollable from 'components-react/shared/Scrollable';
 
 export default function Onboarding() {
-  const { currentStep, next, processing, finish } = useModule(OnboardingModule).select();
+  const { currentStep, next, processing, finish, UsageStatisticsService } = useModule(
+    OnboardingModule,
+  );
+
+  useEffect(() => {
+    UsageStatisticsService.actions.recordShown('Onboarding', currentStep.component);
+  }, [currentStep.component]);
 
   // TODO: Onboarding service needs a refactor away from step index-based.
   // In the meantime, if we run a render cycle and step index is greater
@@ -38,13 +43,13 @@ export default function Onboarding() {
           {!currentStep.hideSkip && (
             <button
               className={cx('button button--trans', commonStyles.onboardingButton)}
-              onClick={next}
+              onClick={() => next(true)}
               disabled={processing}
             >
               {$t('Skip')}
             </button>
           )}
-          {<ActionButton />}
+          <ActionButton />
         </div>
       )}
     </div>
@@ -52,13 +57,10 @@ export default function Onboarding() {
 }
 
 function TopBar() {
-  const { stepIndex, preboardingOffset, singletonStep, steps } = useModule(
-    OnboardingModule,
-  ).select();
+  const { stepIndex, preboardingOffset, singletonStep, steps } = useModule(OnboardingModule);
 
   if (stepIndex < preboardingOffset || singletonStep) {
-    // TODO: Remove styles?
-    return <div className={styles.topBarContainer} />;
+    return <div />;
   }
 
   const offset = preboardingOffset;
@@ -88,10 +90,10 @@ function TopBar() {
 }
 
 function ActionButton() {
-  const { currentStep, next, processing } = useModule(OnboardingModule).select();
+  const { currentStep, next, processing } = useModule(OnboardingModule);
 
   if (currentStep.hideButton) return null;
-  const isPrimeStep = currentStep.label === $t('Prime');
+  const isPrimeStep = currentStep.label === $t('Ultra');
   return (
     <button
       className={cx('button button--action', commonStyles.onboardingButton, {
@@ -100,19 +102,31 @@ function ActionButton() {
       onClick={() => next()}
       disabled={processing}
     >
-      {isPrimeStep ? $t('Go Prime') : $t('Continue')}
+      {isPrimeStep ? $t('Go Ultra') : $t('Continue')}
     </button>
   );
 }
 
 export class OnboardingModule {
-  state = {
+  state = injectState({
     stepIndex: 0,
     processing: false,
-  };
+  });
 
   get OnboardingService() {
     return Services.OnboardingService;
+  }
+
+  get RecordingModeService() {
+    return Services.RecordingModeService;
+  }
+
+  get UsageStatisticsService() {
+    return Services.UsageStatisticsService;
+  }
+
+  get UserService() {
+    return Services.UserService;
   }
 
   get steps() {
@@ -123,7 +137,7 @@ export class OnboardingModule {
     return this.OnboardingService.views.singletonStep;
   }
 
-  get currentStep() {
+  get currentStep(): IOnboardingStep {
     // Useful for testing in development
     if (Utils.env.SLD_FORCE_ONBOARDING_STEP) {
       return ONBOARDING_STEPS()[Utils.env.SLD_FORCE_ONBOARDING_STEP];
@@ -136,17 +150,36 @@ export class OnboardingModule {
     return this.steps.filter(step => step.isPreboarding).length;
   }
 
+  setRecordingMode() {
+    this.RecordingModeService.setRecordingMode(true);
+    this.RecordingModeService.setUpRecordingFirstTimeSetup();
+  }
+
   setImportFromObs() {
     this.OnboardingService.setObsImport(true);
   }
 
   finish() {
+    this.UsageStatisticsService.actions.recordShown('Onboarding', 'completed');
     this.OnboardingService.actions.finish();
   }
 
   @mutation()
-  next() {
+  next(isSkip = false) {
     if (this.state.processing) return;
+
+    if (this.OnboardingService.state.options.isLogin && this.UserService.views.isPartialSLAuth) {
+      return;
+    }
+
+    if (
+      this.RecordingModeService.views.isRecordingModeEnabled &&
+      this.currentStep.component === 'HardwareSetup' &&
+      !this.OnboardingService.state.options.isHardware &&
+      !isSkip
+    ) {
+      this.RecordingModeService.actions.addRecordingWebcam();
+    }
 
     if (this.state.stepIndex >= this.steps.length - 1 || this.singletonStep) {
       return this.finish();

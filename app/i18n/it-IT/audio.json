@@ -9,7 +9,7 @@
   "Monitor and Output": "Monitoraggio e output",
   "Stream Track": "Riproduci traccia in streaming",
   "Stream Tracks": "Riproduci tracce in streaming",
-  "Rec. Tracks": "Tracce registrate",
+  "Rec. Tracks": "Rec. Tracce",
   "Advanced Audio Settings": "Impostazioni audio avanzate",
   "Volume ( % )": "Volume (%)",
   "Sync Offset": "Sincronizza offset",
@@ -32,8 +32,15 @@
   "Source Settings": "Impostazioni sorgente",
   "Audio Tracks": "Tracce audio",
   "Designates which tracks are being recorded": "Indica quali tracce sono registrate",
-  "Your Stream and VOD Track are the same. This may result in unexpected audio behavior, go to Global Settings to change.": "Your Stream and VOD Track are the same. This may result in unexpected audio behavior, go to Global Settings to change.",
-  "Streaming Track": "Streaming Track",
-  "Enable Twitch VOD Track": "Enable Twitch VOD Track",
-  "Twitch VOD Track": "Twitch VOD Track"
+  "Your Stream and VOD Track are the same. This may result in unexpected audio behavior, go to Global Settings to change.": "Il tuo streaming e la traccia VOD sono uguali. In questo caso potrebbero verificarsi comportamenti audio inaspettati. Vai su Impostazioni generali per cambiare.",
+  "Streaming Track": "Traccia streaming",
+  "Enable Twitch VOD Track": "Abilita Traccia Twitch VOD",
+  "Twitch VOD Track": "Traccia Twitch VOD",
+  "Sample Rate (requires a restart)": "Frequenza d’esempio (richiede il riavvio)",
+  "Channels (requires a restart)": "Canali (richiede il riavvio)",
+  "Desktop Audio Device 1": "Dispositivo audio desktop 1",
+  "Desktop Audio Device 2": "Dispositivo audio desktop 2",
+  "Mic/Auxiliary Device 1": "Microfono/Dispositivo ausiliario 1",
+  "Mic/Auxiliary Device 2": "Microfono/Dispositivo ausiliario 2",
+  "Mic/Auxiliary Device 3": "Microfono/Dispositivo ausiliario 3"
 }

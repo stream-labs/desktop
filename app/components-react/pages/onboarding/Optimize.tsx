@@ -1,4 +1,4 @@
-import { useModule } from 'components-react/hooks/useModule';
+import { useModule } from 'slap';
 import { Services } from 'components-react/service-provider';
 import AutoProgressBar from 'components-react/shared/AutoProgressBar';
 import React, { useState } from 'react';
@@ -14,7 +14,7 @@ interface IConfigStepPresentation {
 }
 
 export function Optimize() {
-  const { AutoConfigService, VideoEncodingOptimizationService } = Services;
+  const { AutoConfigService, RecordingModeService } = Services;
   const [optimizing, setOptimizing] = useState(false);
   const [stepInfo, setStepInfo] = useState<IConfigStepPresentation | null>(null);
   const steps = [
@@ -30,7 +30,7 @@ export function Optimize() {
   ];
   const percentage =
     optimizing && stepInfo ? (steps.indexOf(stepInfo.description) + 1) / steps.length : 0;
-  const { setProcessing, next } = useModule(OnboardingModule).select();
+  const { setProcessing, next } = useModule(OnboardingModule);
 
   function summaryForStep(progress: IConfigProgress) {
     return {
@@ -66,9 +66,6 @@ export function Optimize() {
           });
         }
       } else if (progress.event === 'done') {
-        // We also default on video encoding optimizations
-        VideoEncodingOptimizationService.actions.useOptimizedProfile(true);
-
         setProcessing(false);
         sub.unsubscribe();
         next();
@@ -77,7 +74,9 @@ export function Optimize() {
       }
     });
 
-    AutoConfigService.start();
+    RecordingModeService.views.isRecordingModeEnabled
+      ? AutoConfigService.actions.startRecording()
+      : AutoConfigService.actions.start();
   }
 
   return (
@@ -101,7 +100,7 @@ export function Optimize() {
           onClick={optimize}
           style={{ margin: 'auto', marginTop: 24 }}
         >
-          <h2>{$t('Start')}</h2>
+          <h2 style={{ color: 'var(--action-button-text)' }}>{$t('Start')}</h2>
         </button>
       )}
     </div>

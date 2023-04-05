@@ -12,6 +12,8 @@ import PlatformSettings from './PlatformSettings';
 import TwitterInput from './Twitter';
 import OptimizedProfileSwitcher from './OptimizedProfileSwitcher';
 import Spinner from '../../shared/Spinner';
+import ButtonHighlighted from '../../shared/ButtonHighlighted';
+import UltraIcon from '../../shared/UltraIcon';
 import GoLiveError from './GoLiveError';
 
 const PlusIcon = PlusOutlined as Function;
@@ -23,35 +25,51 @@ const PlusIcon = PlusOutlined as Function;
  * - Extras settings
  **/
 export default function GoLiveSettings() {
-  const { RestreamService, SettingsService, UserService, MagicLinkService } = Services;
-
   const {
+    addDestination,
     isAdvancedMode,
     protectedModeEnabled,
     error,
     isLoading,
     canAddDestinations,
-  } = useGoLiveSettings().selectExtra(module => {
-    const linkedPlatforms = module.linkedPlatforms;
-    const customDestinations = module.customDestinations;
+    shouldShowPrimeLabel,
+    canUseOptimizedProfile,
+  } = useGoLiveSettings().extend(module => {
+    const {
+      RestreamService,
+      SettingsService,
+      UserService,
+      MagicLinkService,
+      VideoEncodingOptimizationService,
+    } = Services;
+
     return {
-      canAddDestinations: linkedPlatforms.length + customDestinations.length < 5,
+      get canAddDestinations() {
+        const linkedPlatforms = module.state.linkedPlatforms;
+        const customDestinations = module.state.customDestinations;
+        return linkedPlatforms.length + customDestinations.length < 5;
+      },
+
+      addDestination() {
+        // open the stream settings or prime page
+        if (UserService.views.isPrime) {
+          SettingsService.actions.showSettings('Stream');
+        } else {
+          MagicLinkService.linkToPrime('slobs-multistream');
+        }
+      },
+
+      shouldShowPrimeLabel: !RestreamService.state.grandfathered,
+
+      canUseOptimizedProfile:
+        VideoEncodingOptimizationService.state.canSeeOptimizedProfile ||
+        VideoEncodingOptimizationService.state.useOptimizedProfile,
     };
   });
 
   const shouldShowSettings = !error && !isLoading;
-  const shouldShowPrimeLabel = !RestreamService.state.grandfathered;
   const shouldShowLeftCol = protectedModeEnabled;
   const shouldShowAddDestButton = canAddDestinations;
-
-  function addDestination() {
-    // open the stream settings or prime page
-    if (UserService.views.isPrime) {
-      SettingsService.actions.showSettings('Stream');
-    } else {
-      MagicLinkService.linkToPrime('slobs-multistream');
-    }
-  }
 
   return (
     <Row gutter={16} style={{ height: 'calc(100% + 24px)' }}>
@@ -63,9 +81,26 @@ export default function GoLiveSettings() {
           {/*ADD DESTINATION BUTTON*/}
           {shouldShowAddDestButton && (
             <a className={styles.addDestinationBtn} onClick={addDestination}>
-              <PlusIcon />
-              {$t('Add Destination')}{' '}
-              {shouldShowPrimeLabel && <b className={styles.prime}>prime</b>}
+              <PlusIcon style={{ paddingLeft: '17px', fontSize: '24px' }} />
+              {$t('Add Destination')}
+              {shouldShowPrimeLabel && (
+                <ButtonHighlighted
+                  filled
+                  text={$t('Ultra')}
+                  icon={
+                    <UltraIcon
+                      type="simple"
+                      style={{
+                        fill: '#09161D',
+                        display: 'inline-block',
+                        height: '12px',
+                        width: '12px',
+                        marginRight: '5px',
+                      }}
+                    />
+                  }
+                />
+              )}
             </a>
           )}
         </Col>
@@ -84,7 +119,7 @@ export default function GoLiveSettings() {
             {/*EXTRAS*/}
             <Section isSimpleMode={!isAdvancedMode} title={$t('Extras')}>
               <TwitterInput />
-              <OptimizedProfileSwitcher />
+              {!!canUseOptimizedProfile && <OptimizedProfileSwitcher />}
             </Section>
           </Scrollable>
         )}

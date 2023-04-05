@@ -4,7 +4,7 @@ import {
   focusChild,
   getFocusedWindowId,
   useChildWindow,
-  useMainWindow
+  useMainWindow,
 } from '../core';
 import { mkdtemp } from 'fs-extra';
 import { tmpdir } from 'os';
@@ -52,10 +52,7 @@ export async function setTemporaryRecordingPath(): Promise<string> {
 export async function setOutputResolution(resolution: string) {
   const [width, height] = resolution.split('x');
   await showSettingsWindow('Video', async () => {
-    await clickButton('Use Custom');
-    const form = new FormMonkey(getContext());
-    await form.fill({ width, height });
-    await clickButton('Apply');
+    await setInputValue('[data-name="outputRes"]', `${width}x${height}`);
     await clickButton('Done');
   });
 }

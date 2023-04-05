@@ -195,7 +195,30 @@ export function useForm(name?: string) {
     return String(value);
   }
 
-  return { readForm, readFields, fillForm, assertFormContains, getInput };
+  async function assertInputOptions(name: string, expectedValue: string, options: string[]) {
+    await assertFormContains({ [name]: expectedValue });
+    const input = (await getInput(name)) as inputControllers.ListInputController<string>;
+    for (const opt of options) {
+      if (!(await input.hasOption(opt))) {
+        throw new Error(`Expected input "${name}" to have option "${opt}" but it did not`);
+      }
+    }
+  }
+
+  return { readForm, readFields, fillForm, assertFormContains, assertInputOptions, getInput };
+}
+
+export async function setInputValue(selector: string, value: string) {
+  const client = getClient();
+  const $el = await client.$(selector);
+
+  await $el.waitForDisplayed();
+  await $el.click();
+  await ((client.keys(['Control', 'a']) as any) as Promise<any>); // select all
+  await ((client.keys('Control') as any) as Promise<any>); // release ctrl key
+  await ((client.keys('Backspace') as any) as Promise<any>); // clear
+  await $el.click(); // click again if it's a list input
+  await ((client.keys(value) as any) as Promise<any>); // type text
 }
 
 /**

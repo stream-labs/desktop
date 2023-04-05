@@ -23,6 +23,10 @@
   user-select: text;
 }
 
+::selection {
+  background: var(--button) !important;
+}
+
 .main {
   background: var(--background);
   color: var(--paragraph);
@@ -88,6 +92,11 @@ label {
   color: var(--action-button-text);
   padding: 0 4px;
   line-height: 16px;
+}
+
+.whisper {
+  font-style: italic;
+  opacity: 0.7;
 }
 
 a,

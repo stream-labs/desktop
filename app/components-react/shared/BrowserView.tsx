@@ -18,6 +18,7 @@ interface BrowserViewProps {
   enableGuestApi?: boolean;
   onReady?: (view: any) => void;
   className?: string;
+  style?: React.CSSProperties;
 }
 
 export default function BrowserView(p: BrowserViewProps) {
@@ -93,6 +94,14 @@ export default function BrowserView(p: BrowserViewProps) {
     }
   }
 
+  useEffect(() => {
+    if (!loading && browserView.current && hideStyleBlockers) {
+      remote.getCurrentWindow().removeBrowserView(browserView.current);
+    } else if (!loading && browserView.current && !hideStyleBlockers) {
+      remote.getCurrentWindow().addBrowserView(browserView.current);
+    }
+  }, [hideStyleBlockers]);
+
   function checkResize() {
     if (loading) return;
     if (!sizeContainer.current) return;
@@ -145,11 +154,18 @@ export default function BrowserView(p: BrowserViewProps) {
 
   if (loading) {
     return (
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <Spinner />
+      <div
+        style={{
+          display: 'flex',
+          flexGrow: 1,
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <Spinner visible pageLoader />
       </div>
     );
   }
 
-  return <div style={{ height: '100%' }} ref={sizeContainer} className={p.className} />;
+  return <div style={{ height: '100%', ...p.style }} ref={sizeContainer} className={p.className} />;
 }

@@ -2,11 +2,13 @@ import { click, clickButton, clickIfDisplayed, isDisplayed, useMainWindow } from
 
 export async function skipOnboarding() {
   await useMainWindow(async () => {
-    if (!(await isDisplayed('span=Skip'))) return;
+    if (!(await isDisplayed('h2=Live Streaming'))) return;
+    await click('h2=Live Streaming');
+    await click('button=Continue');
     await click('span=Skip');
     await clickIfDisplayed('div=Start Fresh');
     await clickButton('Skip');
-    await clickButton('Skip');
-    await clickIfDisplayed('div=Choose Free');
+    await clickIfDisplayed('button=Skip');
+    await clickIfDisplayed('div=Choose Starter');
   });
 }

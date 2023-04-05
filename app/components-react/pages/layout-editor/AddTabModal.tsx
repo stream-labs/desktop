@@ -53,7 +53,7 @@ export default function AddTabModal() {
   }
 
   return (
-    <ModalLayout footer={<Footer />} wrapperStyle={{ width: '410px', height: '350px' }}>
+    <ModalLayout footer={<Footer />} wrapperStyle={{ width: '390px', height: '270px' }}>
       <Form>
         <CardInput
           value={icon}
@@ -69,7 +69,7 @@ export default function AddTabModal() {
           label={$t('Name')}
           value={name}
           onChange={setName}
-          style={{ marginTop: '8px' }}
+          style={{ marginTop: '10px', marginLeft: '-80px', marginRight: '3px' }}
           uncontrolled={false}
         />
       </Form>

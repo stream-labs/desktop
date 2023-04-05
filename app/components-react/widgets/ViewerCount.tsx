@@ -1,17 +1,11 @@
 import React from 'react';
-import { IWidgetState, useWidget, WidgetModule } from './common/useWidget';
+import { IWidgetCommonState, useWidget, WidgetModule } from './common/useWidget';
 import { WidgetLayout } from './common/WidgetLayout';
 import InputWrapper from '../shared/inputs/InputWrapper';
 import { $t } from '../../services/i18n';
-import {
-  CheckboxInput,
-  ColorInput,
-  createBinding,
-  FontFamilyInput,
-  FontSizeInput,
-} from '../shared/inputs';
+import { CheckboxInput, ColorInput, FontFamilyInput, FontSizeInput } from '../shared/inputs';
 
-interface IViewerCountState extends IWidgetState {
+interface IViewerCountState extends IWidgetCommonState {
   data: {
     settings: {
       font: string;
@@ -50,11 +44,6 @@ export function ViewerCount() {
 }
 
 export class ViewerCountModule extends WidgetModule<IViewerCountState> {
-  bind = createBinding(
-    () => this.settings,
-    statePatch => this.updateSettings(statePatch),
-  );
-
   patchAfterFetch(data: any): IViewerCountState {
     // transform platform types to simple booleans
     return {

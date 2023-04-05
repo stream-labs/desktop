@@ -4,8 +4,7 @@ import { makeScreenshots, useScreentest } from '../screenshoter';
 import { SettingsService } from '../../../app/services/settings';
 import { logIn, logOut } from '../../helpers/spectron/user';
 import { sleep } from '../../helpers/sleep';
-import {closeWindow, focusChild} from "../../helpers/modules/core";
-
+import { closeWindow, focusChild } from '../../helpers/modules/core';
 
 useSpectron({ restartAppAfterEachTest: false });
 useScreentest();
@@ -14,6 +13,15 @@ test('Settings General', async t => {
   const client = await getApiClient();
   const settingsService = client.getResource<SettingsService>('SettingsService');
   settingsService.showSettings();
+  await focusChild();
+  t.pass();
+});
+
+test('Settings Multistreaming', async t => {
+  const client = await getApiClient();
+  const settingsService = client.getResource<SettingsService>('SettingsService');
+  await sleep(1000);
+  settingsService.showSettings('Multistreaming');
   await focusChild();
   t.pass();
 });

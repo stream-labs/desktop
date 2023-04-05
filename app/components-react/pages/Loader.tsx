@@ -1,22 +1,38 @@
 import React, { useEffect, useState } from 'react';
 import SvgContainer from 'components-react/shared/SvgContainer';
+import { $t } from 'services/i18n';
 
-const loadingStrings = [
-  'Initiating doggo petting engine...',
-  'Compiling food pic library...',
-  'Calibrating RNG blame threshold...',
-  'Dropping fire mixtape...',
-  'Reticulating emoji splines...',
-  'Waking up 24/7 support team...',
-  'Asking the stream gods for perfect settings...',
-  'Powering up the clouds...',
-  'Constructing additional widgets...',
-  "Remembering all your chatters' names...",
-  'Executing good vibes protocol...',
-  'Submitting mod thank-you notes...',
-  'Expanding audience reach with multistream...',
-  'Crafting perfect VOD with selective recording...',
-  'Calculating multistream hype multiplier coefficient...',
+const loadingStrings = () => [
+  // TODO: Add string to translation system and initialize i18n service earlier
+  // Basic Feature Usage
+  'You can edit the sounds of your stream alerts from the alertbox properties menu.',
+  'You can access our theme library from the left sidebar.',
+  'Our 24/7 support staff is available at Discord.gg/stream.',
+  'Sources are what we call media like text, images, video & audio feeds.',
+  'Undo works in the Editor. Just hit Ctrl + Z!',
+  'The sources listed at the top of your sources pane will be layered the highest in your editor.',
+  'Studio Mode is a powerful way to curate a professional-quality stream.',
+  'Cloudbot is a chatbot that can help you moderate your stream.',
+  'The Remote Control feature lets you control your active scene in real-time from your phone.',
+  'Set Hotkeys from your settings to control your stream with your keyboard.',
+  'With Game Overlay you can view chat messages while gaming without switching screens.',
+  'The editor is fully customizable. Try repositioning things from the Layout Editor.',
+  'Studio Mode allows you to customize a scene while you are live before your viewers can see it.',
+  'With the Highlighter, you can save clips during your stream and publish them to YouTube.',
+  "You can login to Streamlabs from any device, and we'll load your scenes from the cloud.",
+  'As your scenes get more complex, try managing your sources in folders.',
+  'To fine-tune the positioning of a source, select it from the editor then press any arrow key.',
+  'Right-click a source, then choose "Properties" to view its advanced settings.',
+  'You can position your chat panel to be either on the left or right side of your screen.',
+  'Right-click on your camera source to add filters to your webcam.',
+  'You can add and edit stinger transitions by clicking the settings cog near your scene collections.',
+  'To crop your webcam, press Alt then drag the bounding box.',
+  'Widgets are dynamic, interactive overlays you can add to your scene.',
+
+  // Prime Feature Usage
+  'Our App Store contains advanced technology to take your stream to the next level.',
+  'With multi-stream, you can stream to YouTube, Twitch, Trovo, and Facebook at the same time.',
+  'You can customize the design of your tip page from the Theme Library.',
 ];
 
 export default function Loader() {
@@ -25,15 +41,15 @@ export default function Loader() {
 
   function lifecycle() {
     function loopRandomText() {
-      const randomIndex = Math.floor(Math.random() * loadingStrings.length);
-      if (loaderText === loadingStrings[randomIndex]) {
+      const randomIndex = Math.floor(Math.random() * loadingStrings().length);
+      if (loaderText === loadingStrings()[randomIndex]) {
         loopRandomText();
       } else {
-        setLoaderText(loadingStrings[randomIndex]);
+        setLoaderText(loadingStrings()[randomIndex]);
       }
     }
     loopRandomText();
-    const interval = setInterval(loopRandomText, 4000);
+    const interval = setInterval(loopRandomText, 5000);
 
     return function cleanup() {
       clearInterval(interval);

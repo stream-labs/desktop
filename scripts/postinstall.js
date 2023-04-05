@@ -14,6 +14,3 @@ const antdlibSettings = JSON.parse(fs.readFileSync(antdLibSettingsPath, 'utf8'))
 delete antdlibSettings.module;
 antdlibSettings.main = 'dist/antd.min.js';
 fs.writeFileSync(antdLibSettingsPath, JSON.stringify(antdlibSettings, null, 2));
-
-// force Spectron to use a ChromeDriver version from package.json
-rimraf.sync(path.resolve('./node_modules/spectron/node_modules/electron-chromedriver'));

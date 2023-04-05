@@ -1,17 +1,16 @@
 import cloneDeep from 'lodash/cloneDeep';
 import { Services } from 'components-react/service-provider';
 import { ELayoutElement, ELayout, LayoutSlot } from 'services/layout';
-import { useModule } from 'components-react/hooks/useModule';
-import { mutation } from 'components-react/store';
+import { injectState, mutation, useModule } from 'slap';
 
 class LayoutEditorModule {
-  state = {
+  state = injectState({
     currentLayout: this.layoutService.views.currentTab.currentLayout || ELayout.Default,
     slottedElements: cloneDeep(this.layoutService.views.currentTab.slottedElements) || {},
     browserUrl:
       this.layoutService.views.currentTab.slottedElements[ELayoutElement.Browser]?.src || '',
     showModal: false,
-  };
+  });
 
   private get layoutService() {
     return Services.LayoutService;
@@ -23,18 +22,8 @@ class LayoutEditorModule {
 
   setCurrentTab(tab: string) {
     this.layoutService.actions.setCurrentTab(tab);
-    this.setCurrentLayout(this.layoutService.state.tabs[tab].currentLayout);
+    this.state.setCurrentLayout(this.layoutService.state.tabs[tab].currentLayout);
     this.setSlottedElements(cloneDeep(this.layoutService.state.tabs[tab].slottedElements));
-  }
-
-  @mutation()
-  setCurrentLayout(layout: ELayout) {
-    this.state.currentLayout = layout;
-  }
-
-  @mutation()
-  setBrowserUrl(url: string) {
-    this.state.browserUrl = url;
   }
 
   @mutation()
@@ -43,12 +32,7 @@ class LayoutEditorModule {
   ) {
     this.state.slottedElements = elements;
     if (!elements[ELayoutElement.Browser]) return;
-    this.setBrowserUrl(elements[ELayoutElement.Browser]?.src || '');
-  }
-
-  @mutation()
-  setShowModal(bool: boolean) {
-    this.state.showModal = bool;
+    this.state.setBrowserUrl(elements[ELayoutElement.Browser]?.src || '');
   }
 
   handleElementDrag(event: React.DragEvent<HTMLDivElement>, el: ELayoutElement) {
@@ -81,5 +65,5 @@ class LayoutEditorModule {
 }
 
 export function useLayoutEditor() {
-  return useModule(LayoutEditorModule).select();
+  return useModule(LayoutEditorModule);
 }

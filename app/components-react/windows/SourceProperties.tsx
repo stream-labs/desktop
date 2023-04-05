@@ -2,11 +2,11 @@ import React, { useMemo, useState } from 'react';
 import { Services } from '../service-provider';
 import { IObsFormProps, ObsForm } from '../obs/ObsForm';
 import { TObsFormData } from '../../components/obs/inputs/ObsInput';
-import { useSelector } from '../store';
 import { ModalLayout } from '../shared/ModalLayout';
 import Display from '../shared/Display';
 import { assertIsDefined } from '../../util/properties-type-guards';
 import { useSubscription } from '../hooks/useSubscription';
+import { useVuex } from '../hooks';
 
 export default function SourceProperties() {
   const {
@@ -26,7 +26,7 @@ export default function SourceProperties() {
   const [properties, setProperties] = useState(() =>
     source ? source.getPropertiesFormData() : [],
   );
-  const hideStyleBlockers = useSelector(() => WindowsService.state.child.hideStyleBlockers);
+  const hideStyleBlockers = useVuex(() => WindowsService.state.child.hideStyleBlockers);
 
   // close the window if the source has been deleted
   useSubscription(SourcesService.sourceRemoved, removedSource => {

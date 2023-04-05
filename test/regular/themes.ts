@@ -55,6 +55,6 @@ test.skip('Installing a theme', async (t: TExecutionContext) => {
 
   // Should've populated sources (this checks Starting Soon scene sources)
   for (const source of ['Starting']) {
-    t.true(await isDisplayed(`span.item-title=${source}`), `Source ${source} should exist`);
+    t.true(await isDisplayed(`[data-name="${source}"]`), `Source ${source} should exist`);
   }
 });

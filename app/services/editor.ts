@@ -362,6 +362,10 @@ export class EditorService extends StatefulService<IEditorServiceState> {
     let scaleXDelta = 1;
     let scaleYDelta = 1;
     const rect = this.selectionService.views.globalSelection.getBoundingRect();
+    if (!rect) {
+      // the source has been unselected/removed
+      return;
+    }
     const anchorPosition = rect.getOffsetFromOrigin(AnchorPositions[opts.anchor]);
 
     // resizeRegion is opposite the anchor point

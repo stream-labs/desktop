@@ -9,7 +9,7 @@
   "Monitor and Output": "Monitorování a výstup",
   "Stream Track": "Stopa streamu",
   "Stream Tracks": "Stopy streamu",
-  "Rec. Tracks": "Zaznamenané stopy",
+  "Rec. Tracks": "Zazn. Stopy",
   "Advanced Audio Settings": "Pokročilá nastavení zvuku",
   "Volume ( % )": "Hlasitost (%)",
   "Sync Offset": "Posun synchronizace",
@@ -32,8 +32,15 @@
   "Source Settings": "Nastavení zdroje",
   "Audio Tracks": "Zvukové stopy",
   "Designates which tracks are being recorded": "Označuje, které stopy se zaznamenávají",
-  "Your Stream and VOD Track are the same. This may result in unexpected audio behavior, go to Global Settings to change.": "Your Stream and VOD Track are the same. This may result in unexpected audio behavior, go to Global Settings to change.",
-  "Streaming Track": "Streaming Track",
-  "Enable Twitch VOD Track": "Enable Twitch VOD Track",
-  "Twitch VOD Track": "Twitch VOD Track"
+  "Your Stream and VOD Track are the same. This may result in unexpected audio behavior, go to Global Settings to change.": "Váš stream a VOD stopa jsou stejné. To může mít za následek neočekávané chování zvuku – přejděte do Globálních nastavení a změňte je.",
+  "Streaming Track": "Stopa streamování",
+  "Enable Twitch VOD Track": "Povolit VOD stopu Twitch",
+  "Twitch VOD Track": "VOD stopa Twitch",
+  "Sample Rate (requires a restart)": "Vzorkovací frekvence (vyžaduje restartování)",
+  "Channels (requires a restart)": "Kanály (vyžaduje restartování)",
+  "Desktop Audio Device 1": "Stolní audiozařízení 1",
+  "Desktop Audio Device 2": "Stolní audiozařízení 2",
+  "Mic/Auxiliary Device 1": "Mikrofon / pomocné zařízení 1",
+  "Mic/Auxiliary Device 2": "Mikrofon / pomocné zařízení 2",
+  "Mic/Auxiliary Device 3": "Mikrofon / pomocné zařízení 3"
 }

@@ -186,5 +186,7 @@
   "font_family_tooltip": "Google Font để sử dụng cho văn bản. Truy cập vào https://fonts.google.com để tìm thêm. Phông chữ phổ biến: Open Sans, Roboto, Oswald, Lato, Droid Sans.",
   "Something went wrong while applying settings": "Something went wrong while applying settings",
   "Superchat Goal": "Superchat Goal",
-  "YouTube Superchats": "YouTube Superchats"
+  "YouTube Superchats": "YouTube Superchats",
+  "Custom Widget": "Custom Widget",
+  "Use HTML, CSS, and JavaScript to create a widget with custom functionality": "Use HTML, CSS, and JavaScript to create a widget with custom functionality"
 }

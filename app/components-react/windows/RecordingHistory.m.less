@@ -1,0 +1,47 @@
+@import "../../styles/index.less";
+
+.recordings-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.recording {
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid var(--border);
+  padding: 8px;
+
+  :global(.fa-youtube):hover {
+    cursor: pointer;
+  }
+}
+
+.filename {
+  text-align: right;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  display: block;
+  margin-left: auto;
+  margin-right: 8px;
+  overflow: hidden;
+  direction: rtl;
+
+  &:hover {
+    cursor: pointer;
+    text-decoration: underline;
+  }
+}
+
+.modal-backdrop {
+  background: var(--modal-overlay);
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  z-index: 10;
+  top: 0;
+  margin-left: -24px;
+
+  & > div {
+    .center();
+  }
+}

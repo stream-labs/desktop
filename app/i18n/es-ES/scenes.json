@@ -6,7 +6,6 @@
   "There needs to be at least one scene.": "Debe haber al menos una escena.",
   "Projector:": "Proyector:",
   "Projector: Output": "Proyector: Salida",
-  "Manage All": "Gestionar todo",
   "This is where your Scene Collections live. Clicking the title will dropdown a menu where you can view & manage.": "Aquí se encuentran sus colecciones de escenas. Al hacer clic en el título se abrirá un menú desplegable para ver y gestionar.",
   "Are you sure you want to remove %{collectionName}?": "¿Confirma que desea quitar %{collectionName}?",
   "Create Scene Projector": "Crear proyector de escenas",
@@ -38,7 +37,17 @@
   "Rename Folder": "Cambiar nombre de carpeta",
   "Name Folder": "Asignar nombrar a carpeta",
   "Switch Scenes": "Cambiar de escena",
-  "Failed to load scene collection.  A new one will be created instead.": "No se pudo cargar la colección de escenas. Se creará una nueva.",
+  "Failed to load scene collection.  A new one will be created instead.": "No se pudo cargar la colección de escenas.  Se creará una nueva.",
   "New Scene": "Escena nueva",
-  "Projector": "Proyector"
+  "Projector": "Proyector",
+  "Your Scene Collections:": "Sus colecciones de escenas:",
+  "Add New Scene Collection:": "Agregar nueva colección de escenas:",
+  "Search Scene Collections": "Gestionar colecciones de escenas",
+  "Start fresh and build from scratch": "Empezar de nuevo y crear desde cero",
+  "Load existing scenes from OBS": "Cargar escena existente de OBS",
+  "Template": "Plantilla",
+  "Choose a template from our theme library": "Elija una plantilla de nuestra biblioteca de temas",
+  "Enter a Scene Collection Name": "Introduzca un nombre de colección de escenas",
+  "Copy of %{collectionName}": "Copia de %{collectionName}",
+  "Your Scene Collections": "Sus colecciones de escenas"
 }

@@ -15,6 +15,7 @@ export enum ENotificationSubType {
   DROPPED = 'DROPPED',
   LAGGED = 'LAGGED',
   SKIPPED = 'SKIPPED',
+  NEWS = 'NEWS',
 }
 
 export interface INotificationsSettings {

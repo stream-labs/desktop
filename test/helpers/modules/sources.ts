@@ -1,42 +1,53 @@
 // Source helper functions
-import { focusMain, focusChild, closeWindow } from './core';
-import { click, clickButton, isDisplayed, select, waitForDisplayed } from './core';
+import {
+  focusMain,
+  focusChild,
+  closeWindow,
+  click,
+  clickButton,
+  isDisplayed,
+  select,
+  waitForDisplayed,
+} from './core';
+import { setInputValue } from './forms/form';
 import { dialogDismiss } from '../spectron/dialog';
 import { contextMenuClick } from '../spectron/context-menu';
 
 async function clickSourceAction(selector: string) {
-  const $el = await (await (await select('h2=Sources')).$('..')).$(selector);
+  const $el = await (await select('[data-name=sourcesControls]')).$(selector);
   await $el.click();
 }
 
 export async function clickAddSource() {
-  await clickSourceAction('.icon-add');
+  await clickSourceAction('.icon-add-circle');
 }
 
-export async function clickRemoveSource() {
-  await clickSourceAction('.icon-subtract');
+export async function clickRemoveSource(name: string) {
+  const $el = await (await select(`[data-name="${name}"]`)).$('.icon-trash');
+  await $el.click();
   await dialogDismiss('OK');
 }
 
-export async function clickSourceProperties() {
-  await clickSourceAction('.icon-settings');
+export async function clickSourceProperties(name: string) {
+  const $el = await (await select(`[data-name="${name}"]`)).$('.icon-settings');
+  await $el.click();
 }
 
 export async function selectSource(name: string) {
-  await click(`.item-title=${name}`);
+  await click(`[data-name="${name}"]`);
 }
 
 export async function selectTestSource() {
-  await click('.item-title*=__');
+  await click('[data-name*=__]');
 }
 
 export async function rightClickSource(name: string) {
-  await (await select(`.item-title=${name}`)).click({ button: 'right' });
+  await (await select(`[data-name="${name}"]`)).click({ button: 'right' });
 }
 
 export async function openSourceProperties(name: string) {
   await selectSource(name);
-  await clickSourceProperties();
+  await clickSourceProperties(name);
 }
 
 export async function addSource(
@@ -53,12 +64,15 @@ export async function addSource(
   await click(`[data-name="${type}"]`);
 
   await clickButton('Add Source');
-  const isInputVisible = await isDisplayed('input', { timeout: 200, interval: 100 });
+  const isInputVisible = await isDisplayed('[data-name=newSourceName]', {
+    timeout: 200,
+    interval: 100,
+  });
   if (!isInputVisible) {
-    await click('[data-type="toggle"]');
-    await waitForDisplayed('input');
+    await click('[data-type=switch]');
+    await waitForDisplayed('[data-name=newSourceName]');
   }
-  await (await select('input')).setValue(name);
+  await setInputValue('[data-name=newSourceName]', name);
 
   await clickButton('Add Source');
 
@@ -77,7 +91,7 @@ export async function addExistingSource(type: string, name: string) {
   await focusChild();
   await click(`div=${type}`);
   await clickButton('Add Source');
-  await click(`div=${name}`);
+  await click(`span=${name}`);
   await clickButton('Add Source');
 }
 
@@ -89,16 +103,16 @@ export async function openRenameWindow(sourceName: string) {
 }
 
 export async function sourceIsExisting(sourceName: string) {
-  return await isDisplayed(`.item-title=${sourceName}`);
+  return await isDisplayed(`[data-name="${sourceName}"]`);
 }
 
 export async function waitForSourceExist(sourceName: string, invert = false) {
-  return (await select(`.item-title=${sourceName}`)).waitForExist({
+  return (await select(`[data-name="${sourceName}"]`)).waitForExist({
     timeout: 5000,
     reverse: invert,
   });
 }
 
 export async function testSourceExists() {
-  return (await select('.item-title*=__')).isExisting();
+  return (await select('[data-name*=__]')).isExisting();
 }

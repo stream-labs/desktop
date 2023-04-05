@@ -178,6 +178,6 @@ export async function waitForElectronInstancesExist() {
       tasks = await getElectronInstances();
       timeleft -= interval;
     } while (tasks.length || timeleft < 0);
-    resolve();
+    resolve(null);
   });
 }

@@ -1,13 +1,11 @@
 import React from 'react';
-import { IWidgetState, useWidget, WidgetModule } from './common/useWidget';
+import { IWidgetCommonState, useWidget, WidgetModule } from './common/useWidget';
 import { WidgetLayout } from './common/WidgetLayout';
-import InputWrapper from '../shared/inputs/InputWrapper';
 import { $t } from '../../services/i18n';
-import { createBinding, SliderInput, SwitchInput } from '../shared/inputs';
-import { IEmoteWallSettings } from 'services/widgets/settings/emote-wall';
 import { metadata } from '../shared/inputs/metadata';
+import FormFactory from 'components-react/shared/inputs/FormFactory';
 
-interface IEmoteWallState extends IWidgetState {
+interface IEmoteWallState extends IWidgetCommonState {
   data: {
     settings: {
       combo_count: number;
@@ -22,49 +20,46 @@ interface IEmoteWallState extends IWidgetState {
 }
 
 export function EmoteWall() {
-  const { isLoading, bind, isComboRequired } = useEmoteWall();
-  const secondsFormatter = metadata.seconds({ min: 1000, max: 60000 });
+  const { isLoading, settings, meta, updateSetting } = useEmoteWall();
 
   // use 1 column layout
   return (
     <WidgetLayout>
-      {!isLoading && (
-        <>
-          <SwitchInput label={$t('Enabled')} {...bind.enabled} />
-          <SliderInput
-            label={$t('Duration')}
-            {...secondsFormatter}
-            {...bind.emote_animation_duration}
-          />
-          <SliderInput label={$t('Emote Scale')} min={1} max={10} {...bind.emote_scale} />
-
-          <SwitchInput label={$t('Combo Required')} {...bind.combo_required} />
-          {isComboRequired && (
-            <InputWrapper nowrap={true}>
-              <SliderInput label={$t('Combo Count')} min={2} max={100} {...bind.combo_count} />
-              <SliderInput
-                label={$t('Combo Timeframe')}
-                {...secondsFormatter}
-                {...bind.combo_timeframe}
-              />
-            </InputWrapper>
-          )}
-
-          <SwitchInput label={$t('Ignore Duplicates')} {...bind.ignore_duplicates} />
-        </>
-      )}
+      {!isLoading && <FormFactory metadata={meta} values={settings} onChange={updateSetting} />}
     </WidgetLayout>
   );
 }
 
 export class EmoteWallModule extends WidgetModule<IEmoteWallState> {
-  bind = createBinding(
-    () => this.settings,
-    statePatch => this.updateSettings(statePatch),
-  );
-
   get isComboRequired() {
     return this.settings?.combo_required;
+  }
+
+  get meta() {
+    return {
+      enabled: { type: 'switch', label: $t('Enabled') },
+      emote_animation_duration: metadata.seconds({ label: $t('Duration'), min: 1000, max: 60000 }),
+      emote_scale: metadata.slider({ label: $t('Emote Scale'), min: 1, max: 10 }),
+      combo_required: {
+        type: 'switch',
+        label: $t('Combo Required'),
+        children: {
+          combo_count: metadata.slider({
+            label: $t('Combo Count'),
+            min: 2,
+            max: 100,
+            displayed: this.settings?.combo_required,
+          }),
+          combo_timeframe: metadata.seconds({
+            label: $t('Combo Timeframe'),
+            min: 1000,
+            max: 60000,
+            displayed: this.settings?.combo_required,
+          }),
+        },
+      },
+      ignore_duplicates: { type: 'switch', label: $t('Ignore Duplicates') },
+    };
   }
 }
 

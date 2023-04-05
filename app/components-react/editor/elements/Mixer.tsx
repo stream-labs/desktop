@@ -51,7 +51,11 @@ export default function Mixer() {
             <h2 className="studio-controls__label">{$t('Mixer')}</h2>
           </Tooltip>
           <Tooltip title={$t('Open advanced audio settings')} placement="left">
-            <i className="icon-settings icon-button" onClick={showAdvancedSettings} />
+            <i
+              className="icon-settings icon-button"
+              role="show-advanced-audio"
+              onClick={showAdvancedSettings}
+            />
           </Tooltip>
         </div>
         <Scrollable

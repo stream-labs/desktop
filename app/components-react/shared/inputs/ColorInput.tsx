@@ -2,7 +2,7 @@ import React, { ChangeEvent, RefObject, useEffect, useRef, useState } from 'reac
 import { TSlobsInputProps, useInput } from './inputs';
 import { Button, Input, Popover } from 'antd';
 import InputWrapper from './InputWrapper';
-import { omit } from 'lodash';
+import omit from 'lodash/omit';
 import { getOS, OS } from '../../../util/operating-systems';
 import { $t } from '../../../services/i18n';
 import { loadColorPicker } from '../../../util/slow-imports';
@@ -10,7 +10,6 @@ import { Services } from '../../service-provider';
 import { HexColorPicker, RgbaColorPicker } from 'react-colorful';
 import { findDOMNode } from 'react-dom';
 import { getDefined } from '../../../util/properties-type-guards';
-import Utils from "../../../services/utils";
 
 interface IRGBAColor {
   r: number;

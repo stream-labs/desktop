@@ -63,7 +63,7 @@ test('Form inputs', async t => {
     { name: 'name', title: 'Name', value: 'John Doe', displayValue: 'John Doe' },
     { name: 'gender', title: 'Gender', value: 'male', displayValue: 'Male' },
     { name: 'age', title: 'Age', value: '20', displayValue: '20' },
-    { name: 'city', title: 'City', value: 'C', displayValue: 'Cairo' },
+    { name: 'city', title: 'City', value: 'Cairo', displayValue: 'Cairo' },
     { name: 'weight', title: 'Weight', value: 100, displayValue: 100 },
     {
       name: 'colors',

@@ -1,5 +1,4 @@
 import React from 'react';
-import { useModule } from '../../hooks/useModule';
 import { $t } from '../../../services/i18n';
 import { ICustomStreamDestination } from '../../../services/settings/streaming';
 import { EStreamingState } from '../../../services/streaming';
@@ -8,22 +7,38 @@ import cloneDeep from 'lodash/cloneDeep';
 import namingHelpers from '../../../util/NamingHelpers';
 import { Services } from '../../service-provider';
 import { ObsGenericSettingsForm } from './ObsSettings';
-import { mutation } from '../../store';
 import css from './Stream.m.less';
 import cx from 'classnames';
 import { Button, message, Tooltip } from 'antd';
 import PlatformLogo from '../../shared/PlatformLogo';
 import Form, { useForm } from '../../shared/inputs/Form';
-import { createBinding, TextInput } from '../../shared/inputs';
+import { TextInput } from '../../shared/inputs';
 import { ButtonGroup } from '../../shared/ButtonGroup';
 import { FormInstance } from 'antd/lib/form';
+import { injectFormBinding, injectState, mutation, useModule } from 'slap';
+import UltraIcon from 'components-react/shared/UltraIcon';
+import ButtonHighlighted from 'components-react/shared/ButtonHighlighted';
+import { useVuex } from 'components-react/hooks';
+import Translate from 'components-react/shared/Translate';
+import * as remote from '@electron/remote';
+
+function censorWord(str: string) {
+  return str[0] + '*'.repeat(str.length - 2) + str.slice(-1);
+}
+
+function censorEmail(str: string) {
+  const parts = str.split('@');
+  return censorWord(parts[0]) + '@' + censorWord(parts[1]);
+}
 
 /**
  * A Redux module for components in the StreamSetting window
  */
 class StreamSettingsModule {
+  constructor(private form: FormInstance) {}
+
   // DEFINE A STATE
-  state = {
+  state = injectState({
     // false = edit mode off
     // true = add custom destination mode
     // number = edit custom destination mode where number is the index of the destination
@@ -36,7 +51,12 @@ class StreamSettingsModule {
       streamKey: '',
       enabled: false,
     } as ICustomStreamDestination,
-  };
+  });
+
+  bind = injectFormBinding(
+    () => this.state.customDestForm,
+    patch => this.updateCustomDestForm(patch),
+  );
 
   // INJECT SERVICES
 
@@ -57,6 +77,9 @@ class StreamSettingsModule {
   }
   private get magicLinkService() {
     return Services.MagicLinkService;
+  }
+  private get customizationService() {
+    return Services.CustomizationService;
   }
 
   // DEFINE MUTATIONS
@@ -82,7 +105,6 @@ class StreamSettingsModule {
     this.state.editCustomDestMode = true;
   }
 
-  @mutation()
   removeCustomDest(ind: number) {
     const destinations = cloneDeep(this.customDestinations);
     destinations.splice(ind, 1);
@@ -159,9 +181,8 @@ class StreamSettingsModule {
     return this.streamingView.savedSettings.customDestinations;
   }
 
-  private form: FormInstance;
-  setForm(form: FormInstance) {
-    this.form = form;
+  get isDarkTheme() {
+    return this.customizationService.isDarkTheme;
   }
 
   platformMerge(platform: TPlatform) {
@@ -182,7 +203,10 @@ class StreamSettingsModule {
       return;
     }
 
-    this.fixUrl();
+    if (!this.state.customDestForm.url.includes('?')) {
+      // if the url contains parameters, don't add a trailing /
+      this.fixUrl();
+    }
 
     const destinations = cloneDeep(this.customDestinations);
     const isUpdateMode = typeof this.state.editCustomDestMode === 'number';
@@ -206,13 +230,14 @@ class StreamSettingsModule {
 
 // wrap the module into a React hook
 function useStreamSettings() {
-  return useModule(StreamSettingsModule).select();
+  return useModule(StreamSettingsModule);
 }
 
 /**
  * A root component for StreamSettings
  */
 export function StreamSettings() {
+  const form = useForm();
   const {
     platforms,
     protectedModeEnabled,
@@ -220,13 +245,15 @@ export function StreamSettings() {
     disableProtectedMode,
     needToShowWarning,
     enableProtectedMode,
-  } = useStreamSettings();
+  } = useModule(StreamSettingsModule, [form]);
 
   return (
     <div>
       {/* account info */}
       {protectedModeEnabled && (
         <div>
+          <h2>{$t('Streamlabs ID')}</h2>
+          <SLIDBlock />
           <h2>{$t('Stream Destinations')}</h2>
           {platforms.map(platform => (
             <Platform key={platform} platform={platform} />
@@ -274,6 +301,65 @@ export function StreamSettings() {
 
 StreamSettings.page = 'Stream';
 
+function SLIDBlock() {
+  const { UserService } = Services;
+  const { hasSLID, username } = useVuex(() => ({
+    hasSLID: UserService.views.hasSLID,
+    username: UserService.views.auth?.slid?.username,
+  }));
+
+  function openPasswordLink() {
+    remote.shell.openExternal('https://id.streamlabs.com/security/password?companyId=streamlabs');
+  }
+
+  function openTwoFactorLink() {
+    remote.shell.openExternal('https://id.streamlabs.com/security/tfa?companyId=streamlabs');
+  }
+
+  return (
+    <div className="section">
+      <div className="flex">
+        <div className="margin-right--20" style={{ width: '50px' }}>
+          <PlatformLogo className={css.platformLogo} size="medium" platform="streamlabs" />
+        </div>
+        <div>
+          {hasSLID ? (
+            <div>
+              Streamlabs <br />
+              {username && <b>{censorEmail(username)}</b>}
+            </div>
+          ) : (
+            <Translate message={$t('slidConnectMessage')} />
+          )}
+        </div>
+        {!hasSLID && (
+          <Button type="primary" onClick={() => UserService.actions.startSLMerge()}>
+            {$t('Setup')}
+          </Button>
+        )}
+      </div>
+      {hasSLID && (
+        <div
+          style={{ margin: '10px -16px', height: 2, backgroundColor: 'var(--background)' }}
+        ></div>
+      )}
+      {hasSLID && (
+        <div style={{ display: 'flex', justifyContent: 'right' }}>
+          <a
+            style={{ fontWeight: 400, marginRight: 10, textDecoration: 'underline' }}
+            onClick={openPasswordLink}
+          >
+            {$t('Update Password')}
+          </a>
+          <a style={{ fontWeight: 400, textDecoration: 'underline' }} onClick={openTwoFactorLink}>
+            {$t('Update Two-factor Auth')}
+          </a>
+        </div>
+      )}
+    </div>
+  );
+}
+
 /**
  * Renders a Platform placeholder
  */
@@ -281,16 +367,16 @@ function Platform(p: { platform: TPlatform }) {
   const platform = p.platform;
   const { UserService, StreamingService } = Services;
   const { canEditSettings, platformMerge, platformUnlink } = useStreamSettings();
-  const isMerged = StreamingService.views.checkPlatformLinked(platform);
+  const isMerged = StreamingService.views.isPlatformLinked(platform);
   const username = UserService.state.auth!.platforms[platform]?.username;
   const platformName = getPlatformService(platform).displayName;
-  const isPrimary = StreamingService.views.checkPrimaryPlatform(platform);
+  const isPrimary = StreamingService.views.isPrimaryPlatform(platform);
   const shouldShowPrimaryBtn = isPrimary;
   const shouldShowConnectBtn = !isMerged && canEditSettings;
   const shouldShowUnlinkBtn = !isPrimary && isMerged && canEditSettings;
 
   return (
-    <div className="section flex">
+    <div className="section flex" style={{ marginBottom: 16 }}>
       <div className="margin-right--20" style={{ width: '50px' }}>
         <PlatformLogo className={css.platformLogo} size="medium" platform={platform} />
       </div>
@@ -339,12 +425,19 @@ function Platform(p: { platform: TPlatform }) {
  * Renders a custom destinations list
  */
 function CustomDestinationList() {
-  const { isPrime, customDestinations, editCustomDestMode, addCustomDest } = useStreamSettings();
+  const {
+    isPrime,
+    customDestinations,
+    editCustomDestMode,
+    addCustomDest,
+    isDarkTheme,
+  } = useStreamSettings();
   const shouldShowPrimeLabel = !isPrime;
   const destinations = customDestinations;
   const isEditMode = editCustomDestMode !== false;
   const shouldShowAddForm = editCustomDestMode === true;
   const canAddMoreDestinations = destinations.length < 2;
+
   return (
     <div>
       {destinations.map((dest, ind) => (
@@ -354,8 +447,25 @@ function CustomDestinationList() {
         <a className={css.addDestinationBtn} onClick={addCustomDest}>
           <i className="fa fa-plus" />
           <span>{$t('Add Destination')}</span>
+
           {shouldShowPrimeLabel ? (
-            <b className={css.prime}>prime</b>
+            <ButtonHighlighted
+              onClick={addCustomDest}
+              filled
+              text={$t('Ultra')}
+              icon={
+                <UltraIcon
+                  type="simple"
+                  style={{
+                    fill: '#09161D',
+                    display: 'inline-block',
+                    height: '12px',
+                    width: '12px',
+                    marginRight: '5px',
+                  }}
+                />
+              }
+            />
           ) : (
             <div className={css.prime} />
           )}
@@ -413,16 +523,7 @@ function CustomDestination(p: { destination: ICustomStreamDestination; ind: numb
  * Renders an ADD/EDIT form for the custom destination
  */
 function CustomDestForm() {
-  const {
-    saveCustomDest,
-    stopEditing,
-    customDestForm,
-    updateCustomDestForm,
-    setForm,
-  } = useStreamSettings();
-  const form = useForm();
-  setForm(form);
-  const bind = createBinding(customDestForm, updateCustomDestForm);
+  const { saveCustomDest, stopEditing, bind } = useStreamSettings();
 
   return (
     <Form name="customDestForm">

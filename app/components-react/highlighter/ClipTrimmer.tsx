@@ -110,7 +110,7 @@ export default function ClipTrimmer(props: { clip: IClip }) {
     } else {
       isScrubbing.current = false;
       const timelineWidth = timelineRef.current!.offsetWidth - 40;
-      const timelineOffset = timelineRef.current!.getBoundingClientRect().left;
+      const timelineOffset = timelineRef.current!.getBoundingClientRect().left + 20;
       playAt(((e.clientX - timelineOffset) / timelineWidth) * props.clip.duration!);
     }
   }

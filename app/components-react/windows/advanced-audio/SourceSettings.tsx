@@ -51,17 +51,24 @@ export default function AdvancedAudio() {
 function PanelHeader(p: { source: AudioSource }) {
   const { EditorCommandsService, SettingsService } = Services;
 
-  const { isAdvancedOutput, recordingTracks, streamTrack, vodTrackEnabled, vodTrack } = useVuex(
-    () => ({
-      isAdvancedOutput: SettingsService.views.isAdvancedOutput,
-      streamTrack: SettingsService.views.streamTrack,
-      recordingTracks: SettingsService.views.recordingTracks,
-      vodTrackEnabled: SettingsService.views.vodTrackEnabled,
-      vodTrack: SettingsService.views.vodTrack,
-    }),
-  );
+  const {
+    isAdvancedOutput,
+    recordingTracks,
+    streamTrack,
+    vodTrackEnabled,
+    vodTrack,
+    muted,
+  } = useVuex(() => ({
+    isAdvancedOutput: SettingsService.views.isAdvancedOutput,
+    streamTrack: SettingsService.views.streamTrack,
+    recordingTracks: SettingsService.views.recordingTracks,
+    vodTrackEnabled: SettingsService.views.vodTrackEnabled,
+    vodTrack: SettingsService.views.vodTrack,
+    // Hack to make muted property reactive
+    muted: p.source.muted,
+  }));
 
-  const { name, mixerHidden, muted, fader, audioMixers, sourceId } = p.source;
+  const { name, mixerHidden, fader, audioMixers, sourceId } = p.source;
 
   const [trackFlags, setTrackFlags] = useState(
     Utils.numberToBinnaryArray(audioMixers, 6).reverse(),
@@ -293,14 +300,23 @@ function DeviceInputs(p: { source: Source }) {
     setStatefulSettings({ ...statefulSettings, [name]: value });
   }
 
+  const input = p.source.type === 'wasapi_process_output_capture' ?
+    <ListInput
+      label={$t('Window')}
+      options={deviceOptions}
+      value={statefulSettings.window}
+      onChange={value => handleInput('window', value)}
+    /> :
+    <ListInput
+      label={$t('Device')}
+      options={deviceOptions}
+      value={statefulSettings.device_id}
+      onChange={value => handleInput('device_id', value)}
+    />
+
   return (
     <>
-      <ListInput
-        label={$t('Device')}
-        options={deviceOptions}
-        value={statefulSettings.device_id}
-        onChange={value => handleInput('device_id', value)}
-      />
+      { input }
       <SwitchInput
         label={$t('Use Device Timestamps')}
         value={statefulSettings.use_device_timing}

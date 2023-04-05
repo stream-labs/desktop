@@ -89,7 +89,7 @@
   "Link": "Propojit",
   "Description": "Popis",
   "OBSInit.UnknownError": "Při inicializaci Streamlabs došlo k neznámé chybě.",
-  "OBSInit.ModuleNotFoundError": "Ve vašem počítači se nepodařilo najít rozhraní DirectX. Nejnovější verzi DirectX pro svůj počítač nainstalujte z adresy &lt;https://www.microsoft.com/en-us/download/details.aspx?id=35?&gt; a akci opakujte.",
+  "OBSInit.ModuleNotFoundError": "Ve vašem počítači se nepodařilo najít rozhraní DirectX. Nejnovější verzi DirectX pro svůj počítač nainstalujte z adresy <https://www.microsoft.com/en-us/download/details.aspx?id=35?> a akci opakujte.",
   "OBSInit.NotSupportedError": "Streamlabs se nepodařilo inicializovat. Vaše ovladače videa mohou být zastaralé nebo software Streamlabs Desktop nemusí být vaším systémem podporován.",
   "Log Out": "Odhlásit se",
   "Layout Editor": "Editor rozložení",

@@ -2,14 +2,12 @@ import { ITwitchStartStreamOptions, TwitchService } from './twitch';
 import { IYoutubeStartStreamOptions, YoutubeService } from './youtube';
 import { FacebookService, IFacebookStartStreamOptions } from './facebook';
 import { ITiktokStartStreamOptions, TiktokService } from './tiktok';
-import { TTwitchTag } from './twitch/tags';
-import { TTwitchOAuthScope } from './twitch/scopes';
+import { TTwitchOAuthScope } from './twitch/index';
 import { IGoLiveSettings } from 'services/streaming';
 import { WidgetType } from '../widgets';
 import { ITrovoStartStreamOptions, TrovoService } from './trovo';
-import { Partial } from 'lodash-decorators';
 
-export type Tag = TTwitchTag;
+export type Tag = string;
 export interface IGame {
   id: string;
   name: string;
@@ -77,7 +75,6 @@ interface IPlatformCapabilityDescription {
 }
 
 interface IPlatformCapabilityTags {
-  getAllTags: () => Promise<Tag[]>;
   getStreamTags: () => Promise<Tag[]>;
   setStreamTags: () => Promise<any>;
 }
@@ -206,38 +203,6 @@ export interface IPlatformService {
   unlink: () => void;
 
   state: IPlatformState;
-}
-
-export interface IUserAuth {
-  widgetToken: string;
-  apiToken: string; // Streamlabs API Token
-
-  /**
-   * Old key from when SLOBS only supported a single platform account
-   * @deprecated Use `platforms` instead
-   */
-  platform?: IPlatformAuth;
-
-  /**
-   * The primary platform used for chat, go live window, etc
-   */
-  primaryPlatform: TPlatform;
-
-  /**
-   * New key that supports multiple logged in platforms
-   */
-  platforms: { [platform in TPlatform]?: IPlatformAuth };
-
-  /**
-   * Session partition used to separate cookies associated
-   * with this user login.
-   */
-  partition?: string;
-
-  /**
-   * Whether re-login has been forced
-   */
-  hasRelogged: boolean;
 }
 
 export interface IPlatformAuth {

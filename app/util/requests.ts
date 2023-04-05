@@ -66,7 +66,7 @@ export async function downloadFile(
         const fileStream = fs.createWriteStream(dstPath);
         let bytesWritten = 0;
 
-        const readStream = ({ done, value }: { done: boolean; value: Uint8Array }) => {
+        const readStream = ({ done, value }: { done: boolean; value?: Uint8Array }) => {
           if (done) {
             fileStream.end((err: Error) => {
               if (err) {

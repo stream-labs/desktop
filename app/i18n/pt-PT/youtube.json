@@ -29,7 +29,7 @@
   "Does not support: Closed captions, 1440p, and 4k resolutions": "Não suportado. Legendas, 1440p e resoluções 4K",
   "Enable DVR": "Ativar DVR",
   "Additional Settings": "Definições adicionais",
-  "Open Youtube Studio": "Abrir o Youtube Studio",
+  "Open Youtube Studio": "Abrir o YouTube Studio",
   "360° video": "Vídeo de 360º",
   "Enable Auto-start": "Ativar início automático",
   "Enable Auto-stop": "Ativar paragem automática",
@@ -37,7 +37,7 @@
   "Enabling auto-start will automatically start the stream when you start sending data from your streaming software": "Se ativar o início automático, a transmissão é iniciada automaticamente quando começar a enviar dados do seu software de transmissão",
   "Enabling auto-stop will automatically stop the stream when you stop sending data from your streaming software": "Se ativar a paragem automática, a transmissão é parada automaticamente quando parar de enviar dados do seu software de transmissão",
   "DVR controls enable the viewer to control the video playback experience by pausing, rewinding, or fast forwarding content": "Os controlos de DVR permitem que o espetador controle a experiência de reprodução de vídeo colocando em pausa, retrocedendo ou avançando no conteúdo",
-  "Auto-start is disabled for your broadcast. You should manually publish your stream from Youtube Studio": "O início automático está desativado para a sua transmissão. Deve publicar manualmente a sua transmissão a partir do Youtube Studio",
+  "Auto-start is disabled for your broadcast. You should manually publish your stream from Youtube Studio": "O início automático está desativado para a sua transmissão. Deve publicar manualmente a sua transmissão a partir do YouTube Studio",
   "Made for kids": "Criado para crianças",
   "Features like personalized ads and live chat won't be available on live streams made for kids.": "As funcionalidades, como os anúncios personalizados e o chat ao vivo, não estarão disponíveis nas transmissões ao vivo criadas para crianças.",
   "Try our new thumbnail editor": "Experimente o nosso novo editor de miniaturas"

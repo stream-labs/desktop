@@ -6,6 +6,7 @@ import { PlatformAppsService } from 'services/platform-apps';
 import { Inject } from 'services/core/injector';
 import { IPlatformAppManagerSettings } from 'services/sources/properties-managers/platform-app-manager';
 import { WindowsService } from 'services/windows';
+import { SideNavService } from 'services/side-nav';
 import electron from 'electron';
 
 @Component({})
@@ -15,6 +16,7 @@ export default class PlatformAppProperties extends Vue {
   @Inject() navigationService: NavigationService;
   @Inject() platformAppsService: PlatformAppsService;
   @Inject() windowsService: WindowsService;
+  @Inject() sideNavService: SideNavService;
 
   get managerSettings() {
     return this.source.getPropertiesManagerSettings() as IPlatformAppManagerSettings;
@@ -25,6 +27,7 @@ export default class PlatformAppProperties extends Vue {
       appId: this.appId,
       sourceId: this.source.sourceId,
     });
+    this.sideNavService.setCurrentMenuItem(this.appId);
     this.windowsService.closeChildWindow();
   }
 

@@ -1,5 +1,5 @@
 import { test, useSpectron } from '../../helpers/spectron';
-import { assertOptions } from '../../helpers/spectron/assertions';
+import { useForm } from '../../helpers/modules/forms/form';
 import { showSettingsWindow } from '../../helpers/modules/settings/settings';
 
 useSpectron();
@@ -7,26 +7,30 @@ useSpectron();
 test('Populates video settings', async t => {
   await showSettingsWindow('Video');
 
-  await assertOptions(t, 'ScaleType', 'Bicubic (Sharpened scaling, 16 samples)', [
-    'Bilinear (Fastest, but blurry if scaling)',
-    'Bicubic (Sharpened scaling, 16 samples)',
-    'Lanczos (Sharpened scaling, 32 samples)',
-  ]);
+  const { assertInputOptions } = useForm();
 
-  await assertOptions(t, 'FPSType', 'Common FPS Values', [
-    'Common FPS Values',
-    'Integer FPS Value',
-    'Fractional FPS Value',
-  ]);
+  await t.notThrowsAsync(async () => {
+    await assertInputOptions('scaleType', 'Bicubic (Sharpened scaling, 16 samples)', [
+      'Bilinear (Fastest, but blurry if scaling)',
+      'Bicubic (Sharpened scaling, 16 samples)',
+      'Lanczos (Sharpened scaling, 32 samples)',
+    ]);
 
-  await assertOptions(t, 'FPSCommon', '30', [
-    '10',
-    '20',
-    '24 NTSC',
-    '29.97',
-    '30',
-    '48',
-    '59.94',
-    '60',
-  ]);
+    await assertInputOptions('fpsType', 'Common FPS Values', [
+      'Common FPS Values',
+      'Integer FPS Values',
+      'Fractional FPS Values',
+    ]);
+
+    await assertInputOptions('fpsCom', '30', [
+      '10',
+      '20',
+      '24 NTSC',
+      '29.97',
+      '30',
+      '48',
+      '59.94',
+      '60',
+    ]);
+  });
 });

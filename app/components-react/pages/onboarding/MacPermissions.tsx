@@ -1,4 +1,4 @@
-import { useModule } from 'components-react/hooks/useModule';
+import { useModule } from 'slap';
 import { Services } from 'components-react/service-provider';
 import React, { useEffect, useState } from 'react';
 import { $t } from 'services/i18n';
@@ -7,7 +7,7 @@ import { OnboardingModule } from './Onboarding';
 
 export function MacPermissions() {
   const { MacPermissionsService } = Services;
-  const { next } = useModule(OnboardingModule).select();
+  const { next } = useModule(OnboardingModule);
   const [permissions, setPermissions] = useState(() =>
     MacPermissionsService.getPermissionsStatus(),
   );
@@ -34,20 +34,20 @@ export function MacPermissions() {
         <div>
           {$t('Microphone')}
           {permissions.micPermission && (
-            <i className="fa fa-check" style={{ marginLeft: '8px', color: '#31C3A2' }} />
+            <i className="fa fa-check" style={{ marginLeft: '8px', color: '#80F5D2' }} />
           )}
         </div>
         <div>
           {$t('Webcam')}
           {permissions.webcamPermission && (
-            <i className="fa fa-check" style={{ marginLeft: '8px', color: '#31C3A2' }} />
+            <i className="fa fa-check" style={{ marginLeft: '8px', color: '#80F5D2' }} />
           )}
         </div>
       </div>
       <button
         className="button button--action"
         style={{ float: 'right' }}
-        onClick={next}
+        onClick={() => next()}
         disabled={!permissions.webcamPermission || !permissions.micPermission}
       >
         {$t('Continue')}

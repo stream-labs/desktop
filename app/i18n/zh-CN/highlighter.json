@@ -27,7 +27,7 @@
   "Replay Duration": "回放持续时间",
   "Set a hotkey to capture replays": "设置热键以录制回放",
   "Capture a replay": "录制回放",
-  "highlighterHotkeyInstructions": "开始直播并按下 &lt;b&gt;%{bindingStr}&lt;/b&gt;录制回放。在直播后回来查看。",
+  "highlighterHotkeyInstructions": "开始直播并按下 <b>%{bindingStr}</b>录制回放。在直播后回来查看。",
   "Start streaming and capture a replay. Check back here after your stream.": "开始直播并录制回放。在直播后回来查看。",
   "Or, import a clip from your computer": "或者，从您的电脑导入剪辑",
   "Disable clip": "禁用剪辑",

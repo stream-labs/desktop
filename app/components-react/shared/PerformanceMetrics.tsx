@@ -15,14 +15,17 @@ export default function PerformanceMetrics(props: {
 }) {
   const { CustomizationService, PerformanceService } = Services;
 
-  const v = useVuex(() => ({
-    pinnedStats: CustomizationService.views.pinnedStatistics,
-    cpuPercent: PerformanceService.views.cpuPercent,
-    frameRate: PerformanceService.views.frameRate,
-    droppedFrames: PerformanceService.views.droppedFrames,
-    percentDropped: PerformanceService.views.percentDropped,
-    bandwidth: PerformanceService.views.bandwidth,
-  }));
+  const v = useVuex(
+    () => ({
+      pinnedStats: CustomizationService.views.pinnedStatistics,
+      cpuPercent: PerformanceService.views.cpuPercent,
+      frameRate: PerformanceService.views.frameRate,
+      droppedFrames: PerformanceService.views.droppedFrames,
+      percentDropped: PerformanceService.views.percentDropped,
+      bandwidth: PerformanceService.views.bandwidth,
+    }),
+    false,
+  );
 
   function showAttribute(attribute: string) {
     return props.mode === 'full' || v.pinnedStats[attribute];
@@ -87,7 +90,9 @@ export default function PerformanceMetrics(props: {
             >
               <i className={cx(styles.performanceMetricIcon, data.icon)} />
               <span className={styles.performanceMetric}>
-                <span className={styles.performanceMetricValue}>{data.value}</span>
+                <span className={styles.performanceMetricValue} role={`metric-${attribute}`}>
+                  {data.value}
+                </span>
                 {showLabel(attribute) && (
                   <span className={styles.performanceMetricLabel}> {data.label}</span>
                 )}

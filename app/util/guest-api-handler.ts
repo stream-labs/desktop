@@ -197,7 +197,7 @@ export class GuestApiHandler {
     method: RequestHandlerMethod,
     args: any[],
     request: IGuestApiRequest,
-    contents: electron.webContents,
+    contents: Electron.WebContents,
   ) {
     method(...args)
       .then(result => {

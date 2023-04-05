@@ -89,7 +89,7 @@
   "Link": "Link",
   "Description": "Beskrivelse",
   "OBSInit.UnknownError": "Der opstod en ukendt fejl under start af Streamlabs.",
-  "OBSInit.ModuleNotFoundError": "DirectX er ikke installeret på computeren. Installer den seneste version af DirectX fra , og prøv igen.",
+  "OBSInit.ModuleNotFoundError": "DirectX er ikke installeret på computeren. Installer den seneste version af DirectX fra <https://www.microsoft.com/en-us/download/details.aspx?id=35?>, og prøv igen.",
   "OBSInit.NotSupportedError": "Streamlabs kunne ikke startes. Dine videoenheder er muligvis forældede, eller Streamlabs Desktop understøttes muligvis ikke på dit system.",
   "Log Out": "Log ud",
   "Layout Editor": "Layoutredigering",

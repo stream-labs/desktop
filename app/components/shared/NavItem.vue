@@ -1,24 +1,25 @@
 <template>
-<li
-  class="nav-item"
-  :class="{ active: to === value, disabled: enabled === false, 'nav-item--child': isSubItem }"
-  @click="onClickHandler"
->
-  <i v-if="ico" :class="ico" @click="onIconClickHandler" :style="icoStyles"></i>
-  <div class="nav-item__content">
-    <slot></slot>
-    <div v-if="expanded" class="nav-item__children">
-      <slot name='children'></slot>
+  <li
+    class="nav-item"
+    :class="{ active: to === value, disabled: enabled === false, 'nav-item--child': isSubItem }"
+    @click="onClickHandler"
+  >
+    <UltraIcon v-if="ultra" class="ultra-icon" @click="onIconClickHandler" />
+    <i v-if="ico" :class="ico" @click="onIconClickHandler" :style="icoStyles"></i>
+    <div class="nav-item__content">
+      <slot></slot>
+      <div v-if="expanded" class="nav-item__children">
+        <slot name="children"></slot>
+      </div>
     </div>
-  </div>
-  <i v-if="expandable" :class="expanded ? 'icon-subtract' : 'icon-add'" />
-</li>
+    <i v-if="expandable" :class="expanded ? 'icon-subtract' : 'icon-add'" />
+  </li>
 </template>
 
 <script lang="ts" src="./NavItem.vue.ts"></script>
 
 <style lang="less" scoped>
-@import "../../styles/index";
+@import '../../styles/index';
 
 .nav-item {
   .margin-bottom();
@@ -67,6 +68,13 @@
     left: -24px;
     width: 16px;
     padding: 3px 0;
+  }
+
+  .ultra-icon {
+    position: relative;
+    margin-right: -16px;
+    left: -24px;
+    width: 16px;
   }
 }
 

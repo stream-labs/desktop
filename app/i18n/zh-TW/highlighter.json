@@ -27,7 +27,7 @@
   "Replay Duration": "重播片段持續時間",
   "Set a hotkey to capture replays": "設定擷取重播片段的熱鍵",
   "Capture a replay": "擷取重播片段",
-  "highlighterHotkeyInstructions": "開始直播並按下 &lt;b&gt;%{bindingStr}&lt;/b&gt; 以擷取重播片段。在完成直播後請回到這裡查看。",
+  "highlighterHotkeyInstructions": "開始直播並按下 <b>%{bindingStr}</b> 以擷取重播片段。在完成直播後請回到這裡查看。",
   "Start streaming and capture a replay. Check back here after your stream.": "開始直播並擷取重播片段。在完成直播後請回到這裡查看。",
   "Or, import a clip from your computer": "或是從您的電腦匯入短片",
   "Disable clip": "停用短片",

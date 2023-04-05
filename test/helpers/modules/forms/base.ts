@@ -1,6 +1,6 @@
 import { SpectronClient } from 'spectron';
 import { getClient, select, TSelectorOrEl } from '../core';
-import {sleep} from "../../sleep";
+import { sleep } from '../../sleep';
 
 /**
  * A base class for all input controllers
@@ -20,12 +20,12 @@ export abstract class BaseInputController<TValue> {
   /**
    * Set the input value
    */
-  abstract async setValue(value: TValue): Promise<string | Error | void>;
+  abstract setValue(value: TValue): Promise<string | Error | void>;
 
   /**
    * Get the current input value
    */
-  abstract async getValue(): Promise<TValue>;
+  abstract getValue(): Promise<TValue>;
 
   /**
    * Set the display value

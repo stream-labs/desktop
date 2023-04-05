@@ -6,7 +6,13 @@ import { WidgetsService } from '../../app/services/widgets';
 import { EWidgetType } from '../helpers/widget-helpers';
 import { FormMonkey } from '../helpers/form-monkey';
 import { ExecutionContext } from 'ava';
-import { click, focusChild, focusMain, waitForDisplayed } from '../helpers/modules/core';
+import {
+  click,
+  focusChild,
+  focusMain,
+  isDisplayed,
+  waitForDisplayed,
+} from '../helpers/modules/core';
 import { logIn } from '../helpers/spectron/user';
 import { sleep } from '../helpers/sleep';
 
@@ -39,6 +45,10 @@ test('OBS Importer', async t => {
 
   const client = t.context.app.client;
 
+  if (!(await isDisplayed('h2=Live Streaming'))) return;
+  await click('h2=Live Streaming');
+  await click('button=Continue');
+
   await logIn(t, 'twitch', { prime: false }, false, true);
   await sleep(1000);
   await (await t.context.app.client.$('span=Skip')).click();
@@ -49,7 +59,7 @@ test('OBS Importer', async t => {
 
   await waitForDisplayed('h1=Optimize');
   await (await t.context.app.client.$('button=Skip')).click();
-  await (await t.context.app.client.$('div=Choose Free')).click();
+  await (await t.context.app.client.$('div=Choose Starter')).click();
 
   await waitForDisplayed('[data-name=SceneSelector]');
 
@@ -80,6 +90,6 @@ test('OBS Importer', async t => {
 
   t.deepEqual(
     [EWidgetType.DonationGoal, EWidgetType.EventList, EWidgetType.AlertBox],
-    widgetsService.getWidgetSources().map(widget => (widget.type as unknown) as EWidgetType),
+    widgetsService.widgetSources.map(widget => (widget.type as unknown) as EWidgetType),
   );
 });

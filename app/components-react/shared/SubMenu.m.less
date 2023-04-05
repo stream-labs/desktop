@@ -1,0 +1,25 @@
+@import '../../styles/index';
+@import '../../styles/mixins';
+
+.submenu-wrapper {
+  :global(li.ant-menu-item) {
+    padding-left: 40px !important;
+  }
+
+  :global(span.ant-menu-title-content) {
+    overflow: visible;
+    text-overflow: unset;
+    white-space: normal;
+  }
+
+  :global(div.ant-menu-submenu-title) {
+    height: unset;
+    line-height: unset;
+    min-height: 30px;
+    text-overflow: unset;
+  }
+
+  :global(li.ant-menu-item:last-child) {
+    margin-bottom: 0px !important;
+  }
+}

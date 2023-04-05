@@ -5,7 +5,7 @@
   "Streamer Dashboard": "Streamer skrivebord",
   "Share": "Del",
   "Like": "Synes godt om",
-  "Step": "Trin",
+  "Step 3:": "Trin 3:",
   "Create a Facebook Gaming page to get started.": "Opret en Facebook-gamingside for at komme i gang.",
   "Create a Gaming Page": "Opret en gamingside",
   "All of your scenes, sources, and settings will be preserved.": "Alle dine scener, kilder og indstillinger bevares.",
@@ -14,7 +14,7 @@
   "Connect": "Tilslut",
   "Install Your Theme": "Installer dit tema",
   "Install": "Installer",
-  "facebookGamingWarning": "For at få den bedste oplevelse med Facebook Gaming skal du &lt;create-page-link&gt;oprette en Gaming Video Creator-side&lt;/create-page-link&gt;",
+  "facebookGamingWarning": "For at få den bedste oplevelse med Facebook Gaming skal du <create-page-link>oprette en Gaming Video Creator-side</create-page-link>",
   "Facebook Destination": "Facebook-destination",
   "Share to Your Timeline": "Del på din tidslinje",
   "Share to a Page You Manage": "Del til en side du administrerer",
@@ -30,7 +30,8 @@
   "Please reconnect Facebook to get these new features": "Tilslut til Facebook igen for at kunne bruge de nye funktioner",
   "Reconnect now": "Tilslut igen nu",
   "Privacy": "Beskyttelse af personlige oplysninger",
-  "FBPrivacyWarning": "Det tilladte niveau for beskyttelse af personlige oplysninger kan være begrænset for din Facebook-konto. Du kan læse om Streamlabs-integrationen under \"Hvem kan se at du bruger denne integration\" &lt;link&gt;her&lt;/link&gt;",
+  "FBPrivacyWarning": "Det tilladte fortrolighedsniveau kan være begrænset for din Facebook-konto. Se afsnittet \"Hvem kan se, at du bruger denne virksomhedsintegration\" for Streamlabs-integrationen <link>her </link>",
   "Only Me": "Kun mig",
-  "Do not change privacy settings": "Ændr ikke indstillinger for beskyttelse af personlige oplysninger"
+  "Do not change privacy settings": "Ændr ikke indstillinger for beskyttelse af personlige oplysninger",
+  "Install %{overlayName}": "Installer %{overlayName}"
 }

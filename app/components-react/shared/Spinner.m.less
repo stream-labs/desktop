@@ -17,8 +17,24 @@
   }
 
   &.hasVisibleSpinner .spinner {
-   transition: opacity 300ms;
-   visibility: visible;
-   opacity: 1;
+    transition: opacity 300ms;
+    visibility: visible;
+    opacity: 1;
+  }
+}
+
+.spinner-relative:extend(.container) {
+  position: relative !important;
+
+  :global(.s-bars) {
+    min-width: 15px !important;
+  }
+}
+
+.page-loader:extend(.container) {
+  position: relative !important;
+
+  :global(.s-bars) {
+    min-width: 50px !important;
   }
 }
