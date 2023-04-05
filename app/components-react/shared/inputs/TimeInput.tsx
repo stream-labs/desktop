@@ -20,7 +20,23 @@ export const TimeInput = InputComponent((p: TTimeInputProps) => {
   });
 
   function onChange(moment: Moment) {
-    inputAttrs.onChange(moment?.valueOf() || 0);
+    /*
+       Workaround for having a user-inputted time in the input causing the original date to be reset
+       I'm not sure how much of https://ant.design/docs/react/use-custom-date-library#timepicker has been
+       done, but it seems like this input does not behave correctly, and I'd assume is due to parsing.
+    */
+    const isParsed = (moment as any)?._f === undefined;
+
+    const val = isParsed
+      ? moment
+      : // If the moment is not parsed, it's a user-inputted time, so we need to preserve the original date
+        value
+          .clone()
+          .set('hours', moment.hours())
+          .set('minutes', moment.minutes())
+          .set('seconds', 0);
+
+    inputAttrs.onChange(val.valueOf() || 0);
   }
 
   return (
