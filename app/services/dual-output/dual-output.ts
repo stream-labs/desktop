@@ -37,6 +37,10 @@ class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
     );
   }
 
+  get shouldCreateVerticalNode(): boolean {
+    return this.settingsManagerService.views.activeDisplays.vertical || this.hasVerticalNodes;
+  }
+
   get platformSettings() {
     return this.state.platformSettings;
   }
@@ -117,8 +121,8 @@ class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
   }
 
   getVerticalNodeId(defaultNodeId: string) {
-    console.log('this.state.sceneNodeMaps ', this.state.sceneNodeMaps);
-    return this.state.sceneNodeMaps[this.scenesService.views.activeSceneId][defaultNodeId];
+    const activeSceneId: string = this.scenesService.views.activeSceneId;
+    return this.hasVerticalNodes ? this.sceneNodeMaps[activeSceneId][defaultNodeId] : undefined;
   }
 
   getDisplayNodeVisibility(defaultNodeId: string, display?: TDisplayType) {

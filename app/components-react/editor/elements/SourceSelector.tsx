@@ -368,7 +368,8 @@ export class SourceSelectorModule {
     return this.selectionService.views.globalSelection.getItems();
   }
 
-  toggleVisibility(sceneNodeId: string) {
+  toggleVisibility(sceneNodeId: string | undefined) {
+    if (!sceneNodeId) return;
     const selection = this.scene.getSelection(sceneNodeId);
     const visible = !selection.isVisible();
     this.editorCommandsService.actions.executeCommand('HideItemsCommand', selection, !visible);

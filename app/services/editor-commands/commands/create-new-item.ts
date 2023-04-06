@@ -37,7 +37,7 @@ export class CreateNewItemCommand extends Command {
       .getScene(this.sceneId)
       .createAndAddSource(this.name, this.type, this.settings, this.options);
 
-    if (this.dualOutputService.views.hasVerticalNodes) {
+    if (this.dualOutputService.views.shouldCreateVerticalNode) {
       this.dualOutputService.actions.assignNodeContext(item, 'horizontal');
 
       Promise.resolve(

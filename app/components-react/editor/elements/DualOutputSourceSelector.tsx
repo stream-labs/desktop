@@ -31,10 +31,12 @@ export function DualOutputSourceSelector(p: { nodeId: string }) {
         className={v.isHorizontalVisible ? 'icon-desktop' : 'icon-desktop-hide'}
       />
 
-      <i
-        onClick={() => toggleVisibility(v.verticalNodeId)}
-        className={v.isVerticalVisible ? 'icon-phone-case' : 'icon-phone-case-hide'}
-      />
+      {v.verticalNodeId && (
+        <i
+          onClick={() => toggleVisibility(v.verticalNodeId)}
+          className={v.isVerticalVisible ? 'icon-phone-case' : 'icon-phone-case-hide'}
+        />
+      )}
     </>
   );
 }
