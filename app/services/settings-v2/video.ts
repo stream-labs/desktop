@@ -75,10 +75,6 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
   };
 
   get values() {
-    console.log('values ', {
-      horizontal: this.formatVideoSettings('horizontal'),
-      vertical: this.formatVideoSettings('vertical'),
-    });
     return {
       horizontal: this.formatVideoSettings('horizontal'),
       vertical: this.formatVideoSettings('vertical'),
@@ -130,10 +126,6 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
   }
 
   get videoSettings() {
-    console.log(
-      'this.settingsManagerService.views.videoSettings ',
-      this.settingsManagerService.views.videoSettings,
-    );
     return this.settingsManagerService.views.videoSettings;
   }
 
@@ -146,26 +138,7 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
   }
 
   formatVideoSettings(display: TDisplayType = 'horizontal') {
-    // let settings;
-    // if (display === 'horizontal') {
-    //   settings = this.state[display];
-    // } else {
-    //   settings = this.settingsManagerService.views.videoSettings.vertical;
-    // }
-
-    console.log('this.state ', this.state);
     const settings = this.state[display];
-
-    // console.log('returning formatting ', {
-    //   baseRes: `${settings.baseWidth}x${settings.baseHeight}`,
-    //   outputRes: `${settings.outputWidth}x${settings.outputHeight}`,
-    //   scaleType: settings.scaleType,
-    //   fpsType: settings.fpsType,
-    //   fpsCom: `${settings.fpsNum}-${settings.fpsDen}`,
-    //   fpsNum: settings.fpsNum,
-    //   fpsDen: settings.fpsDen,
-    //   fpsInt: settings.fpsNum,
-    // });
 
     return {
       baseRes: `${settings.baseWidth}x${settings.baseHeight}`,
@@ -181,12 +154,8 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
 
   migrateSettings(display?: TDisplayType) {
     if (display === 'horizontal') {
-      console.log('setting horizontal settings ', this.contexts[display].video);
       this.SET_VIDEO_CONTEXT(display, this.contexts[display].video);
-      console.log(
-        'this.contexts.horizontal.legacySettings ',
-        this.contexts.horizontal.legacySettings,
-      );
+
       Object.keys(this.contexts.horizontal.legacySettings).forEach((key: keyof obs.IVideo) => {
         this.SET_VIDEO_SETTING(key, this.contexts.horizontal.legacySettings[key]);
       });
@@ -195,9 +164,6 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
       });
     } else {
       const data = this.settingsManagerService.views.videoSettings.vertical;
-
-      console.log('setting vertical settings ', data);
-      console.log('setting vertical settings ', this.contexts[display].video);
       this.SET_VIDEO_CONTEXT(display, this.contexts[display].video);
       Object.keys(data).forEach(
         (key: keyof obs.IAdvancedStreaming | keyof obs.ISimpleStreaming) => {
@@ -209,8 +175,6 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
     if (invalidFps(this.contexts[display].video.fpsNum, this.contexts[display].video.fpsDen)) {
       this.createDefaultFps(display);
     }
-
-    console.log('this.state', display, ', ', this.state[display]);
   }
 
   establishVideoContext(display: TDisplayType = 'horizontal') {
@@ -272,10 +236,9 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
 
   setVideoSetting(key: string, value: unknown, display: TDisplayType = 'horizontal') {
     this.SET_VIDEO_SETTING(key, value, display);
+    this.updateObsSettings(display);
 
-    if (display === 'horizontal') {
-      this.updateObsSettings();
-    } else if (display === 'vertical') {
+    if (display === 'vertical') {
       // if the display is vertical, also update the persisted settings
       this.settingsManagerService.setVideoSetting({ [key]: value });
     }

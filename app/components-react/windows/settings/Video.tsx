@@ -6,7 +6,7 @@ import FormFactory, { TInputValue } from 'components-react/shared/inputs/FormFac
 import * as obs from '../../../../obs-api';
 import { $t } from 'services/i18n';
 import styles from './Common.m.less';
-import { invalidFps } from 'services/settings-v2/video';
+import { invalidFps, TDisplayType } from 'services/settings-v2/video';
 
 const CANVAS_RES_OPTIONS = [
   { label: '1920x1080', value: '1920x1080' },
@@ -42,8 +42,15 @@ const FPS_OPTIONS = [
 class VideoSettingsModule {
   service = Services.VideoSettingsService;
 
+  get display(): TDisplayType {
+    return this.state.display;
+  }
+
   get values(): Dictionary<TInputValue> {
-    const vals = this.service.values.horizontal;
+    const display = this.state.display;
+    console.log('TOP this.service.values ', this.service.values);
+    console.log('TOP this.service.values ', this.service.values[display]);
+    const vals = this.service.values[display];
     const baseRes = this.state?.customBaseRes ? 'custom' : vals.baseRes;
     const outputRes = this.state?.customOutputRes ? 'custom' : vals.outputRes;
     return {
@@ -59,6 +66,7 @@ class VideoSettingsModule {
   }
 
   state = injectState({
+    display: 'horizontal' as TDisplayType,
     customBaseRes: !this.baseResOptions.find(
       opt => opt.value === this.service.values.horizontal.baseRes,
     ),
@@ -242,6 +250,7 @@ class VideoSettingsModule {
   }
 
   setResolution(key: string, value: string) {
+    const display = this.state.display;
     if (key === 'outputRes') {
       this.state.setCustomOutputResValue(value);
     } else if (key === 'baseRes') {
@@ -251,8 +260,8 @@ class VideoSettingsModule {
     if (this.resolutionValidator.pattern.test(value)) {
       const [width, height] = value.split('x');
       const prefix = key === 'baseRes' ? 'base' : 'output';
-      this.service.actions.setVideoSetting(`${prefix}Width`, Number(width));
-      this.service.actions.setVideoSetting(`${prefix}Height`, Number(height));
+      this.service.actions.setVideoSetting(`${prefix}Width`, Number(width), display);
+      this.service.actions.setVideoSetting(`${prefix}Height`, Number(height), display);
     }
   }
 
@@ -275,26 +284,30 @@ class VideoSettingsModule {
   }
 
   setFPSType(value: obs.EFPSType) {
-    this.service.actions.setVideoSetting('fpsType', value);
-    this.service.actions.setVideoSetting('fpsNum', 30);
-    this.service.actions.setVideoSetting('fpsDen', 1);
+    const display = this.state.display;
+    this.service.actions.setVideoSetting('fpsType', value, display);
+    this.service.actions.setVideoSetting('fpsNum', 30, display);
+    this.service.actions.setVideoSetting('fpsDen', 1, display);
   }
 
   setCommonFPS(value: string) {
+    const display = this.state.display;
     const [fpsNum, fpsDen] = value.split('-');
-    this.service.actions.setVideoSetting('fpsNum', Number(fpsNum));
-    this.service.actions.setVideoSetting('fpsDen', Number(fpsDen));
+    this.service.actions.setVideoSetting('fpsNum', Number(fpsNum), display);
+    this.service.actions.setVideoSetting('fpsDen', Number(fpsDen), display);
   }
 
   setIntegerFPS(value: string) {
+    const display = this.state.display;
     this.state.setFpsInt(Number(value));
     if (Number(value) > 0 && Number(value) < 1001) {
-      this.service.actions.setVideoSetting('fpsNum', Number(value));
-      this.service.actions.setVideoSetting('fpsDen', 1);
+      this.service.actions.setVideoSetting('fpsNum', Number(value), display);
+      this.service.actions.setVideoSetting('fpsDen', 1, display);
     }
   }
 
   setFPS(key: 'fpsNum' | 'fpsDen', value: string) {
+    const display = this.state.display;
     if (key === 'fpsNum') {
       this.state.setFpsNum(Number(value));
     } else {
@@ -302,20 +315,49 @@ class VideoSettingsModule {
     }
 
     if (!invalidFps(this.state.fpsNum, this.state.fpsDen) && Number(value) > 0) {
-      this.service.actions.setVideoSetting(key, Number(value));
+      this.service.actions.setVideoSetting(key, Number(value), display);
     }
   }
 
   onChange(key: string) {
-    return (val: unknown) => this.service.actions.setVideoSetting(key, val);
+    return (val: unknown) => this.service.actions.setVideoSetting(key, val, this.state.display);
+  }
+
+  setDisplay(display: TDisplayType) {
+    this.state.setDisplay(display);
+
+    const customBaseRes = !this.baseResOptions.find(
+      opt => opt.value === this.service.values[display].baseRes,
+    );
+    const customOutputRes = !this.outputResOptions.find(
+      opt => opt.value === this.service.values[display].outputRes,
+    );
+    this.state.setCustomBaseRes(customBaseRes);
+    this.state.setCustomOutputRes(customOutputRes);
+    this.state.setCustomBaseResValue(this.service.values[display].baseRes);
+    this.state.setCustomOutputResValue(this.service.values[display].outputRes);
+    this.state.setFpsNum(this.service.values[display].fpsNum);
+    this.state.setFpsDen(this.service.values[display].fpsDen);
+    this.state.setFpsInt(this.service.values[display].fpsInt);
   }
 }
 
 export function VideoSettings() {
-  const { values, metadata, onChange } = useModule(VideoSettingsModule);
+  const { values, metadata, onChange, setDisplay } = useModule(VideoSettingsModule);
 
   return (
     <div className={styles.formSection}>
+      <>
+        <div className={styles.outputHeader}>
+          <i className="icon-phone-case" onClick={() => setDisplay('horizontal')} />
+          <h1>{$t('Horizontal Output')}</h1>
+        </div>
+
+        <div className={styles.outputHeader}>
+          <i className="icon-desktop" onClick={() => setDisplay('vertical')} />
+          <h1>{$t('Vertical Output')}</h1>
+        </div>
+      </>
       <FormFactory
         values={values}
         metadata={metadata}
