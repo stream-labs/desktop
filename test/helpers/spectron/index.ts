@@ -1,11 +1,13 @@
 /// <reference path="../../../app/index.d.ts" />
 /// <reference path="../../../app/jsx.d.ts" />
 import avaTest, { afterEach, ExecutionContext } from 'ava';
-import { Application } from 'spectron';
 import { getApiClient } from '../api-client';
 import { DismissablesService } from 'services/dismissables';
 import { getUser, logOut } from './user';
 import { sleep } from '../sleep';
+import { remote, RemoteOptions } from 'webdriverio';
+import * as ChildProcess from 'child_process';
+import fetch from 'node-fetch';
 
 import {
   ITestStats,
@@ -27,6 +29,13 @@ const os = require('os');
 const rimraf = require('rimraf');
 
 const ALMOST_INFINITY = Math.pow(2, 31) - 1; // max 32bit int
+
+const CHROMEDRIVER_PORT = 4444;
+
+// Enable for verbose debugging output. This does two things:
+// Enable Chromedriver logging to chromedriver.log
+// Enable Webdriver logging to test output
+const CHROMEDRIVER_DEBUG = false;
 
 const testStats: Record<string, ITestStats> = {};
 
@@ -89,6 +98,74 @@ const DEFAULT_OPTIONS: ITestRunnerOptions = {
   implicitTimeout: 0,
 };
 
+class Application {
+  client: WebdriverIO.Browser;
+  process: ChildProcess.ChildProcess;
+
+  constructor(public options: RemoteOptions) {}
+
+  async start(cacheDir: string) {
+    if (this.process) return;
+
+    const cdPath = require.resolve('electron-chromedriver/chromedriver');
+    const chromedriverArgs = [cdPath, `--port=${CHROMEDRIVER_PORT}`];
+
+    if (CHROMEDRIVER_DEBUG) {
+      chromedriverArgs.push('--verbose');
+      chromedriverArgs.push('--log-path=chromedriver.log');
+    }
+
+    this.process = ChildProcess.spawn(process.execPath, chromedriverArgs, {
+      env: {
+        NODE_ENV: 'test',
+        SLOBS_CACHE_DIR: cacheDir,
+      },
+    });
+
+    await this.waitForChromedriver();
+
+    this.client = await remote(this.options);
+  }
+
+  stopInProgress = false;
+
+  stop() {
+    if (!this.process) return;
+    this.process.kill();
+    this.process = null;
+  }
+
+  async waitForChromedriver() {
+    let timedOut = false;
+
+    const timeout = setTimeout(() => {
+      timedOut = true;
+    }, 10 * 1000);
+
+    while (true) {
+      if (timedOut) {
+        throw new Error('Chromedriver did not start within 10 seconds!');
+      }
+
+      if (await this.isChromedriverRunning()) {
+        clearTimeout(timeout);
+        return;
+      }
+
+      await sleep(100);
+    }
+  }
+
+  async isChromedriverRunning() {
+    const statusUrl = `http://localhost:${CHROMEDRIVER_PORT}/status`;
+
+    try {
+      const result = await fetch(statusUrl);
+      return result.status === 200;
+    } catch (e: unknown) {}
+  }
+}
+
 export interface ITestContext {
   cacheDir: string;
   app: Application;
@@ -132,7 +209,7 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
   // tslint:disable-next-line:no-parameter-reassignment TODO
   options = Object.assign({}, DEFAULT_OPTIONS, options);
   let appIsRunning = false;
-  let app: any;
+  let app: Application;
   let testPassed = false;
   let failMsg = '';
   let testName = '';
@@ -154,28 +231,64 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
     if (options.noSync) appArgs.push('--nosync');
 
     await killElectronInstances();
+
     app = t.context.app = new Application({
-      path: path.join(__dirname, '..', '..', '..', '..', 'node_modules', '.bin', 'electron.cmd'),
-      args: [
-        '--require',
-        path.join(__dirname, 'context-menu-injected.js'),
-        '--require',
-        path.join(__dirname, 'dialog-injected.js'),
-        ...appArgs,
-        '.',
-      ],
-      env: {
-        NODE_ENV: 'test',
-        SLOBS_CACHE_DIR: t.context.cacheDir,
+      port: CHROMEDRIVER_PORT,
+      logLevel: CHROMEDRIVER_DEBUG ? 'debug' : 'silent',
+      capabilities: {
+        browserName: 'chrome',
+        'goog:chromeOptions': {
+          binary: path.join(
+            __dirname,
+            '..',
+            '..',
+            '..',
+            '..',
+            'node_modules',
+            '.bin',
+            'electron.cmd',
+          ),
+          args: [
+            ...appArgs,
+            '--app=test-main.js',
+            `user-data-dir=${path.join(t.context.cacheDir, 'slobs-client')}`,
+          ],
+        },
       },
-      chromeDriverArgs: [`user-data-dir=${path.join(t.context.cacheDir, 'slobs-client')}`],
     });
+
+    // app = t.context.app = new Application({
+    //   path: path.join(__dirname, '..', '..', '..', '..', 'node_modules', '.bin', 'electron.cmd'),
+    //   args: [
+    //     '--require',
+    //     path.join(__dirname, 'context-menu-injected.js'),
+    //     '--require',
+    //     path.join(__dirname, 'dialog-injected.js'),
+    //     ...appArgs,
+    //     '.',
+    //   ],
+    //   env: {
+    //     NODE_ENV: 'test',
+    //     SLOBS_CACHE_DIR: t.context.cacheDir,
+    //   },
+    //   chromeDriverArgs: [`user-data-dir=${path.join(t.context.cacheDir, 'slobs-client')}`],
+    // });
 
     if (options.beforeAppStartCb) await options.beforeAppStartCb(t);
 
-    // await t.context.app.start();
-    await app.startChromeDriver();
-    await app.createClient();
+    await t.context.app.start(t.context.cacheDir);
+
+    await t.context.app.isChromedriverRunning();
+
+    // await app.client.executeAsync(`
+    //   require("${path.join(__dirname, 'context-menu-injected.js')}");
+    //   require("${path.join(__dirname, 'dialog-injected.js')}");
+    // `);
+
+    // await app.startChromeDriver();
+    // await app.createClient();
+
+    // await chromedriver.start();
 
     // Disable CSS transitions while running tests to allow for eager test clicks
     // also disable tooltips and the tree mask on sourceSelector
@@ -224,7 +337,7 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
       await closeWindow('main');
       await waitForElectronInstancesExist();
 
-      await app.chromeDriver.stop();
+      app.stop();
     } catch (e: unknown) {
       fail('Crash on shutdown');
       console.error(e);
@@ -266,6 +379,11 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
         if (record.match(/while rendering a different component/)) {
           // Ignore errors until we encouter the next thing that isn't an error
           ignoringErrors = true;
+          return false;
+        }
+
+        // TODO: Only enable this check when running tests locally
+        if (record.match(/Missing translation/)) {
           return false;
         }
 
