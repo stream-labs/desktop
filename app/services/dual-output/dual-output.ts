@@ -117,6 +117,7 @@ class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
   }
 
   getVerticalNodeId(defaultNodeId: string) {
+    console.log('this.state.sceneNodeMaps ', this.state.sceneNodeMaps);
     return this.state.sceneNodeMaps[this.scenesService.views.activeSceneId][defaultNodeId];
   }
 
@@ -342,6 +343,10 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
     copiedSceneNodeId: string,
     sceneId: string,
   ) {
+    if (!this.state.sceneNodeMaps.hasOwnProperty(sceneId)) {
+      this.state.sceneNodeMaps[sceneId] = {};
+    }
+
     this.state.sceneNodeMaps[sceneId] = {
       ...this.state.sceneNodeMaps[sceneId],
       [originalSceneNodeId]: copiedSceneNodeId,
