@@ -76,7 +76,9 @@ function GetSLID(p: { onClick: () => void }) {
   return (
     <div>
       <h2>{$t('This feature requires a Streamlabs ID')}</h2>
-      <button onClick={signUp}>{$t('Sign up for Streamlabs ID')}</button>
+      <button className="button button--action" onClick={signUp}>
+        {$t('Sign up for Streamlabs ID')}
+      </button>
       <Translate message="Already have a Streamlabs ID? <link>Login</link>">
         <a slot="link" onClick={p.onClick} />
       </Translate>

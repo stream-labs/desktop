@@ -236,7 +236,6 @@ export default function YoutubeUpload(props: { defaultTitle: string; close: () =
 
   return (
     <div>
-      <h2>{$t('Upload to YouTube')}</h2>
       {!v.uploadInfo.uploading && !v.uploadInfo.videoId && getYoutubeForm()}
       {v.youtubeLinked && v.uploadInfo.uploading && getUploadProgress()}
       {v.youtubeLinked && v.uploadInfo.videoId && getUploadDone()}

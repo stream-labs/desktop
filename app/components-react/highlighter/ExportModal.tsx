@@ -238,11 +238,13 @@ function PlatformSelect(p: { onClose: () => void }) {
 
   return (
     <Form>
+      <h1 style={{ display: 'inline', marginRight: '16px', position: 'relative', top: '3px' }}>
+        {$t('Upload To')}
+      </h1>
       <ListInput
-        label={$t('Upload To')}
         value={platform}
         onChange={setPlatform}
-        layout="horizontal"
+        nowrap
         options={[
           { label: 'YouTube', value: 'youtube' },
           { label: 'Cross Clip', value: 'crossclip' },
