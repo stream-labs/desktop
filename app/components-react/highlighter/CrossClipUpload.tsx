@@ -6,6 +6,7 @@ import { useVuex } from 'components-react/hooks';
 import { humanFileSize } from './YoutubeUpload';
 import { $t } from 'services/i18n';
 import Translate from 'components-react/shared/Translate';
+import styles from './ExportModal.m.less';
 
 export default function CrossClipUpload(p: { onClose: () => void }) {
   const { UserService, HighlighterService, OnboardingService } = Services;
@@ -74,14 +75,20 @@ function GetSLID(p: { onClick: () => void }) {
   }
 
   return (
-    <div>
-      <h2>{$t('This feature requires a Streamlabs ID')}</h2>
-      <button className="button button--action" onClick={signUp}>
+    <div className={styles.crossclipContainer}>
+      <h2 className={styles.signUpTitle}>{$t('This feature requires a Streamlabs ID')}</h2>
+      <button
+        className="button button--action"
+        style={{ width: '300px', margin: '32px' }}
+        onClick={signUp}
+      >
         {$t('Sign up for Streamlabs ID')}
       </button>
-      <Translate message="Already have a Streamlabs ID? <link>Login</link>">
-        <a slot="link" onClick={p.onClick} />
-      </Translate>
+      <span className={styles.login}>
+        <Translate message="Already have a Streamlabs ID? <link>Login</link>">
+          <a slot="link" onClick={p.onClick} />
+        </Translate>
+      </span>
     </div>
   );
 }
