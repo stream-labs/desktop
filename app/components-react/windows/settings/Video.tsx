@@ -259,7 +259,6 @@ class VideoSettingsModule {
   selectResolution(key: string, value: string) {
     if (value === 'custom') {
       this.setCustomResolution(key, true);
-      this.setResolution(key, '');
     } else {
       this.setCustomResolution(key, false);
       this.setResolution(key, value);
@@ -321,6 +320,7 @@ export function VideoSettings() {
         metadata={metadata}
         onChange={onChange}
         formOptions={{ layout: 'vertical' }}
+        name="video-settings"
       />
     </div>
   );

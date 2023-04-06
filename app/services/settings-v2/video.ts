@@ -85,11 +85,6 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
     this.SET_VIDEO_CONTEXT(display, true);
 
     if (display === 'horizontal') {
-      Object.keys(this.contexts.horizontal.legacySettings).forEach(
-        (key: keyof obs.IAdvancedStreaming | keyof obs.ISimpleStreaming) => {
-          this.SET_VIDEO_SETTING(key, this.contexts.horizontal.legacySettings[key]);
-        },
-      );
       Object.keys(this.contexts.horizontal.video).forEach((key: keyof obs.IVideo) => {
         this.SET_VIDEO_SETTING(key, this.contexts.horizontal.video[key]);
       });
@@ -173,10 +168,7 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
 
   @mutation()
   SET_VIDEO_SETTING(key: string, value: unknown, display: TDisplayType = 'horizontal') {
-    this.state[display] = {
-      ...this.state[display],
-      [key]: value,
-    };
+    this.state[display][key] = value;
   }
 
   @mutation()
