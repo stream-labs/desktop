@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import * as remote from '@electron/remote';
 import { Progress } from 'antd';
+import cx from 'classnames';
 import { Services } from 'components-react/service-provider';
 import { useVuex } from 'components-react/hooks';
 import { humanFileSize } from './YoutubeUpload';
@@ -11,9 +12,8 @@ import styles from './ExportModal.m.less';
 export default function CrossClipUpload(p: { onClose: () => void }) {
   const { UserService, HighlighterService, OnboardingService } = Services;
 
-  const { uploadInfo, exportInfo, hasSLID } = useVuex(() => ({
+  const { uploadInfo, hasSLID } = useVuex(() => ({
     uploadInfo: HighlighterService.views.uploadInfo,
-    exportInfo: HighlighterService.views.exportInfo,
     hasSLID: !!UserService.views.auth?.slid?.id,
   }));
 
@@ -60,12 +60,14 @@ export default function CrossClipUpload(p: { onClose: () => void }) {
   if (!hasSLID) return <GetSLID onClick={connectSLID} />;
   if (uploadInfo.uploading) return <UploadProgress />;
   return (
-    <button
-      className="button button--action"
-      onClick={() => HighlighterService.actions.uploadStorage()}
-    >
-      {$t('Upload')}
-    </button>
+    <div className={styles.crossclipContainer}>
+      <button
+        className={cx('button button--action', styles.uploadButton)}
+        onClick={() => HighlighterService.actions.uploadStorage()}
+      >
+        {$t('Upload')}
+      </button>
+    </div>
   );
 }
 
