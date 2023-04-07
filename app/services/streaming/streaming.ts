@@ -224,7 +224,21 @@ export class StreamingService
         }
 
         // [番組情報を取得]してニコ生パネルを更新する
-        await this.nicoliveProgramService.fetchProgram();
+        try {
+          // ここまで来ている段階で配信情報は揃っていて、
+          // この fetchProgram はニコ生パネルの情報更新だけを目的に呼んでいる
+          await this.nicoliveProgramService.fetchProgram();
+        } catch (e) {
+          // 例外が発生するのはチャンネル配信をしようとしてユーザー生番組が見つからないケースであり
+          // チャンネルのためにそのまま配信開始を続行する
+          Sentry.withScope(scope => {
+            scope.setLevel('info');
+            scope.setTag('service', 'StreamingService');
+            scope.setTag('method', 'fetchProgram');
+            scope.setFingerprint(['StreamingService', 'fetchProgram', 'niconico', 'exception']);
+            Sentry.captureException(e);
+          })
+        }
 
         if (this.customizationService.optimizeForNiconico) {
           return this.optimizeForNiconicoAndStartStreaming(
