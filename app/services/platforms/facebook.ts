@@ -44,11 +44,14 @@ export interface IFacebookLiveVideo {
   id: string;
   stream_url: string;
   title: string;
+  /** @deprecated: doesn't exist on their API docs  */
   game: string;
   description: string;
   permalink_url: string;
   video: { id: string };
   broadcast_start_time: string;
+  planned_start_time?: string;
+  /** custom fields we've created */
   event_params: { start_time?: number; cover?: string; status?: TFacebookStatus };
 }
 
