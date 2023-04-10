@@ -12,7 +12,7 @@ import { $t } from '../../../../services/i18n';
 import BroadcastInput from './BroadcastInput';
 import InputWrapper from '../../../shared/inputs/InputWrapper';
 import Form from '../../../shared/inputs/Form';
-import {IYoutubeStartStreamOptions, YoutubeService} from '../../../../services/platforms/youtube';
+import { IYoutubeStartStreamOptions, YoutubeService } from '../../../../services/platforms/youtube';
 import PlatformSettingsLayout, { IPlatformComponentParams } from './PlatformSettingsLayout';
 import { assertIsDefined } from '../../../../util/properties-type-guards';
 import * as remote from '@electron/remote';
@@ -41,7 +41,6 @@ export const YoutubeEditStreamInfo = InputComponent((p: IPlatformComponentParams
   );
 
   const { broadcastsQuery } = useModule(() => {
-
     const youtube = inject(YoutubeService);
 
     async function fetchBroadcasts() {
@@ -123,56 +122,59 @@ export const YoutubeEditStreamInfo = InputComponent((p: IPlatformComponentParams
   function renderOptionalFields() {
     return (
       <div key="optional">
-        <ListInput
-          {...bind.privacyStatus}
-          label={$t('Privacy')}
-          options={[
-            {
-              value: 'public',
-              label: $t('Public'),
-              description: $t('Anyone can search for and view'),
-            },
-            {
-              value: 'unlisted',
-              label: $t('Unlisted'),
-              description: $t('Anyone with the link can view'),
-            },
-            { value: 'private', label: $t('Private'), description: $t('Only you can view') },
-          ]}
-        />
-        <ListInput
-          {...bind.categoryId}
-          label={$t('Category')}
-          showSearch
-          options={Services.YoutubeService.state.categories.map(category => ({
-            value: category.id,
-            label: category.snippet.title,
-          }))}
-        />
-        <ImageInput
-          label={$t('Thumbnail')}
-          maxFileSize={2 * 1024 * 1024} // 2 mb
-          extra={<a onClick={openThumbnailsEditor}>{$t('Try our new thumbnail editor')}</a>}
-          {...bind.thumbnail}
-        />
+        {!isMidStreamMode && (
+          <>
+            <ListInput
+              {...bind.privacyStatus}
+              label={$t('Privacy')}
+              options={[
+                {
+                  value: 'public',
+                  label: $t('Public'),
+                  description: $t('Anyone can search for and view'),
+                },
+                {
+                  value: 'unlisted',
+                  label: $t('Unlisted'),
+                  description: $t('Anyone with the link can view'),
+                },
+                { value: 'private', label: $t('Private'), description: $t('Only you can view') },
+              ]}
+            />
+            <ListInput
+              {...bind.categoryId}
+              label={$t('Category')}
+              showSearch
+              options={Services.YoutubeService.state.categories.map(category => ({
+                value: category.id,
+                label: category.snippet.title,
+              }))}
+            />
+            <ImageInput
+              label={$t('Thumbnail')}
+              maxFileSize={2 * 1024 * 1024} // 2 mb
+              extra={<a onClick={openThumbnailsEditor}>{$t('Try our new thumbnail editor')}</a>}
+              {...bind.thumbnail}
+            />
 
-        <ListInput
-          label={$t('Stream Latency')}
-          tooltip={$t('latencyTooltip')}
-          options={[
-            { value: 'normal', label: $t('Normal Latency') },
-            { value: 'low', label: $t('Low-latency') },
-            {
-              value: 'ultraLow',
-              label: $t('Ultra low-latency'),
-              description: $t('Does not support: Closed captions, 1440p, and 4k resolutions'),
-            },
-          ]}
-          {...bind.latencyPreference}
-        />
-
+            <ListInput
+              label={$t('Stream Latency')}
+              tooltip={$t('latencyTooltip')}
+              options={[
+                { value: 'normal', label: $t('Normal Latency') },
+                { value: 'low', label: $t('Low-latency') },
+                {
+                  value: 'ultraLow',
+                  label: $t('Ultra low-latency'),
+                  description: $t('Does not support: Closed captions, 1440p, and 4k resolutions'),
+                },
+              ]}
+              {...bind.latencyPreference}
+            />
+          </>
+        )}
         <InputWrapper label={$t('Additional Settings')}>
-          {!isScheduleMode && (
+          {!isScheduleMode && !isMidStreamMode && (
             <CheckboxInput
               {...bind.enableAutoStart}
               label={$t('Enable Auto-start')}
@@ -197,18 +199,22 @@ export const YoutubeEditStreamInfo = InputComponent((p: IPlatformComponentParams
               'DVR controls enable the viewer to control the video playback experience by pausing, rewinding, or fast forwarding content',
             )}
           />
-          <CheckboxInput
-            label={$t('360° video')}
-            value={is360video}
-            onChange={projectionChangeHandler}
-          />
-          <CheckboxInput label={$t('Made for kids')} {...bind.selfDeclaredMadeForKids} />
-          {shouldShowSafeForKidsWarn && (
-            <p>
-              {$t(
-                "Features like personalized ads and live chat won't be available on live streams made for kids.",
+          {!isMidStreamMode && (
+            <>
+              <CheckboxInput
+                label={$t('360° video')}
+                value={is360video}
+                onChange={projectionChangeHandler}
+              />
+              <CheckboxInput label={$t('Made for kids')} {...bind.selfDeclaredMadeForKids} />
+              {shouldShowSafeForKidsWarn && (
+                <p>
+                  {$t(
+                    "Features like personalized ads and live chat won't be available on live streams made for kids.",
+                  )}
+                </p>
               )}
-            </p>
+            </>
           )}
         </InputWrapper>
       </div>
