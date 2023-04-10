@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import GenericForm from './GenericForm';
 import AdvancedOutputTabs from './AdvancedOutputTabs.vue';
+import { DualOutputToggle, Tabs } from 'components/shared/ReactComponentList';
 import { Component, Prop, Watch } from 'vue-property-decorator';
 import { ISettingsSubCategory, SettingsService, ESettingsCategoryType } from 'services/settings';
 import { Inject } from 'services/core/injector';
@@ -13,7 +14,7 @@ class GenericFormGroupProps {
 }
 
 @Component({
-  components: { AdvancedOutputTabs, GenericForm },
+  components: { AdvancedOutputTabs, DualOutputToggle, GenericForm, Tabs },
   props: createProps(GenericFormGroupProps),
 })
 export default class GenericFormGroups extends TsxComponent<GenericFormGroupProps> {
@@ -22,6 +23,7 @@ export default class GenericFormGroups extends TsxComponent<GenericFormGroupProp
   collapsedGroups: Dictionary<boolean> = {};
 
   isAdvancedOutput = false;
+  isDualOutputMode = false;
 
   created() {
     this.updateIsAdvancedOutput();

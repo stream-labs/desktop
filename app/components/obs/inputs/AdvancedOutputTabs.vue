@@ -1,5 +1,8 @@
 <template>
   <div>
+    <h2>{{ $t('Output') }}</h2>
+    <DualOutputToggle />
+    <DualOutputTabs />
     <div class="section">
       <div class="section-content">
         <div class="standalone-properties">

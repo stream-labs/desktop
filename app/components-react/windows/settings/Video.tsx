@@ -6,7 +6,7 @@ import FormFactory, { TInputValue } from 'components-react/shared/inputs/FormFac
 import * as obs from '../../../../obs-api';
 import { $t } from 'services/i18n';
 import styles from './Common.m.less';
-import { DualOutputTabs } from 'components-react/shared/Tabs';
+import Tabs from 'components-react/shared/Tabs';
 import { invalidFps, TDisplayType } from 'services/settings-v2/video';
 
 const CANVAS_RES_OPTIONS = [
@@ -347,7 +347,7 @@ export function VideoSettings() {
   return (
     <div className={styles.formSection}>
       <h2>{$t('Video')}</h2>
-      <DualOutputTabs onChange={setDisplay} />
+      <Tabs onChange={setDisplay} />
       <FormFactory
         values={values}
         metadata={metadata}

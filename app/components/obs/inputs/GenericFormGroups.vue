@@ -1,6 +1,9 @@
 <template>
   <AdvancedOutputTabs v-model="props.value" v-if="isAdvancedOutput" @input="onInputHandler" />
   <div class="form-groups" v-else>
+    <h2>{{ $t('Output') }}</h2>
+    <DualOutputToggle />
+    <Tabs />
     <div
       class="section"
       v-for="(formGroup, groupIndex) in props.value"
@@ -11,7 +14,7 @@
       <h2
         class="section-title section-title--dropdown"
         v-if="formGroup.nameSubCategory !== 'Untitled'"
-        @click="toggleGroup(groupIndex);"
+        @click="toggleGroup(groupIndex)"
       >
         <i class="fa fa-plus section-title__icon" v-show="collapsedGroups[groupIndex]"></i>
         <i class="fa fa-minus section-title__icon" v-show="!collapsedGroups[groupIndex]"></i>

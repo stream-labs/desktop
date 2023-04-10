@@ -11,6 +11,7 @@ import { DualOutputService } from './dual-output';
 import { VideoService } from './video';
 
 interface ISettingsManagerServiceState {
+  isHorizontalDefault: boolean;
   videoSettings: {
     vertical: IVideoInfo;
     activeDisplays: {
@@ -45,6 +46,14 @@ class SettingsManagerServiceViews extends ViewHandler<ISettingsManagerServiceSta
     );
     return active.length > 1 ? null : active[0];
   }
+
+  get isHorizontalActive() {
+    return this.state.videoSettings.activeDisplays.horizontal;
+  }
+
+  get isVerticalActive() {
+    return this.state.videoSettings.activeDisplays.vertical;
+  }
 }
 
 export class SettingsManagerService extends PersistentStatefulService<ISettingsManagerServiceState> {
@@ -53,6 +62,7 @@ export class SettingsManagerService extends PersistentStatefulService<ISettingsM
   @Inject() videoSettingsService: VideoSettingsService;
 
   static defaultState = {
+    isHorizontalDefault: true,
     videoSettings: {
       vertical: verticalDisplayData, // get settings for horizontal display from obs directly
       activeDisplays: {
@@ -74,12 +84,10 @@ export class SettingsManagerService extends PersistentStatefulService<ISettingsM
    * VIDEO SETTINGS FUNCTIONS
    */
 
-  toggleDisplay(status: boolean, display?: TDisplayType) {
-    if (
-      this.state.videoSettings.activeDisplays.horizontal &&
-      this.state.videoSettings.activeDisplays.vertical
-    ) {
+  toggleDisplay(status: boolean, display: TDisplayType) {
+    if (this.views.isHorizontalActive && this.views.isVerticalActive) {
       // toggle off dual output mode
+
       this.setDisplayActive(status, display);
     } else if (display === 'horizontal' && status === false) {
       // toggle off horizontal display
@@ -96,6 +104,19 @@ export class SettingsManagerService extends PersistentStatefulService<ISettingsM
     } else {
       // toggle on dual output mode
       this.setDisplayActive(status, display);
+      if (display === 'vertical') {
+      }
+    }
+  }
+
+  toggleDualOutputMode() {
+    if (this.views.isHorizontalActive && !this.views.isVerticalActive) {
+      this.setDisplayActive(true, 'vertical');
+    } else if (this.views.isVerticalActive && !this.views.isHorizontalActive) {
+      this.setDisplayActive(true, 'horizontal');
+    } else {
+      // otherwise, toggle off dual output mode
+      this.setDisplayActive(false, this.state.isHorizontalDefault ? 'vertical' : 'horizontal');
     }
   }
 
@@ -116,6 +137,12 @@ export class SettingsManagerService extends PersistentStatefulService<ISettingsM
       !this.state.videoSettings.activeDisplays[otherDisplay]
     ) {
       // if not dual output mode, swap the active displays
+
+      this.state = {
+        ...this.state,
+        isHorizontalDefault: display === 'horizontal',
+      };
+
       this.state.videoSettings.activeDisplays = {
         ...this.state.videoSettings.activeDisplays,
         [display]: status,

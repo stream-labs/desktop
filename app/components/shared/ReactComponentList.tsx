@@ -93,6 +93,11 @@ export class Display extends ReactComponent {}
 export class DisplayElement extends ReactComponent {}
 
 @Component({
+  props: { name: { default: 'DualOutputToggle' } },
+})
+export class DualOutputToggle extends ReactComponent {}
+
+@Component({
   props: {
     name: { default: 'EditStreamWindow' },
     wrapperStyles: { default: () => ({ height: '100%' }) },
@@ -433,6 +438,11 @@ export class StudioEditor extends ReactComponent {}
   },
 })
 export class StudioFooter extends ReactComponent {}
+
+@Component({
+  props: { name: { default: 'Tabs' } },
+})
+export class Tabs extends ReactComponent {}
 
 @Component({
   props: {
