@@ -1,13 +1,13 @@
-import { useSpectron, test } from '../../helpers/spectron';
+import { useWebdriver, test } from '../../helpers/webdriver';
 import { disableGifAnimations, makeScreenshots, useScreentest } from '../screenshoter';
-import { logIn } from '../../helpers/spectron/user';
+import { logIn } from '../../helpers/webdriver/user';
 import { spawnSync } from 'child_process';
 import { sleep } from '../../helpers/sleep';
 import { focusMain } from '../../helpers/modules/core';
 const path = require('path');
 const _7z = require('7zip')['7z'];
 
-useSpectron({ skipOnboarding: false });
+useWebdriver({ skipOnboarding: false });
 useScreentest();
 
 test('Onboarding steps', async t => {

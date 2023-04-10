@@ -24,7 +24,7 @@ const electron = require('electron');
     return found.submenu ?? found;
   }
 
-  electron.ipcMain.on('__SPECTRON_FAKE_CONTEXT_MENU', (e, label) => {
+  electron.ipcMain.on('__WEBDRIVER_FAKE_CONTEXT_MENU', (e, label) => {
     if (typeof label === 'string') {
       getItem(currentMenu, label).click();
     } else if (Array.isArray(label)) {
@@ -58,7 +58,7 @@ const electron = require('electron');
     });
   };
 
-  electron.ipcMain.on('__SPECTRON_FAKE_MESSAGE_BOX', (e, buttonLabel) => {
+  electron.ipcMain.on('__WEBDRIVER_FAKE_MESSAGE_BOX', (e, buttonLabel) => {
     currentButtons.forEach((button, index) => {
       if (button === buttonLabel) currentCb({ response: index });
     });
@@ -74,7 +74,7 @@ const electron = require('electron');
     });
   };
 
-  electron.ipcMain.on('__SPECTRON_FAKE_SAVE_DIALOG', (e, filePath) => {
+  electron.ipcMain.on('__WEBDRIVER_FAKE_SAVE_DIALOG', (e, filePath) => {
     currentCb({ filePath });
   });
 })();

@@ -1,11 +1,11 @@
-import { useSpectron, test, TExecutionContext } from '../../helpers/spectron';
+import { useWebdriver, test, TExecutionContext } from '../../helpers/webdriver';
 import { getApiClient } from '../../helpers/api-client';
 import { makeScreenshots, useScreentest } from '../screenshoter';
 import { ScenesService } from 'services/api/external-api/scenes';
 import { TransitionsService } from 'services/transitions';
 import { focusChild } from '../../helpers/modules/core';
 
-useSpectron({ restartAppAfterEachTest: false });
+useWebdriver({ restartAppAfterEachTest: false });
 useScreentest();
 
 test('Transitions', async (t: TExecutionContext) => {

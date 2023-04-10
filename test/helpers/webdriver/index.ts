@@ -205,7 +205,7 @@ export async function debugPause() {
   await new Promise(() => {});
 }
 
-export function useSpectron(options: ITestRunnerOptions = {}) {
+export function useWebdriver(options: ITestRunnerOptions = {}) {
   // tslint:disable-next-line:no-parameter-reassignment TODO
   options = Object.assign({}, DEFAULT_OPTIONS, options);
   let appIsRunning = false;

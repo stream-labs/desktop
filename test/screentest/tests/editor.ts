@@ -1,10 +1,10 @@
-import { useSpectron, test } from '../../helpers/spectron';
+import { useWebdriver, test } from '../../helpers/webdriver';
 import { getApiClient } from '../../helpers/api-client';
 import { ISourcesServiceApi } from '../../../app/services/sources/sources-api';
 import { useScreentest } from '../screenshoter';
 import { ScenesService } from '../../../app/services/api/external-api/scenes';
 
-useSpectron({ restartAppAfterEachTest: false });
+useWebdriver({ restartAppAfterEachTest: false });
 useScreentest();
 
 test('Editor without sources', async t => {

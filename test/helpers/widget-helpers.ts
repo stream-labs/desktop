@@ -1,5 +1,5 @@
 import { sleep } from './sleep';
-import { TExecutionContext } from './spectron';
+import { TExecutionContext } from './webdriver';
 import { WidgetsService, WidgetType } from '../../app/services/widgets';
 import { SourcesService } from '../../app/services/sources';
 import { getApiClient } from './api-client';

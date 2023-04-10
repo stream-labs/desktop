@@ -2,7 +2,7 @@
  * The core module provides methods for the most frequent actions
  */
 
-import { getContext } from '../spectron';
+import { getContext } from '../webdriver';
 import { getApiClient } from '../api-client';
 import { WindowsService } from '../../../app/services/windows';
 import { ClickOptions, WaitForOptions } from 'webdriverio';

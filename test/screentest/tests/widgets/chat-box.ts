@@ -1,10 +1,10 @@
-import { afterAppStart, test, useSpectron } from '../../../helpers/spectron';
-import { logIn } from '../../../helpers/spectron/user';
+import { afterAppStart, test, useWebdriver } from '../../../helpers/webdriver';
+import { logIn } from '../../../helpers/webdriver/user';
 import { fillForm } from '../../../helpers/form-monkey';
 import { addWidget, EWidgetType, waitForWidgetSettingsSync } from '../../../helpers/widget-helpers';
 import { useScreentest } from '../../screenshoter';
 
-useSpectron({ restartAppAfterEachTest: false });
+useWebdriver({ restartAppAfterEachTest: false });
 useScreentest();
 afterAppStart(async t => {
   await logIn(t);
