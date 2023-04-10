@@ -1,12 +1,12 @@
-import { test, useSpectron } from '../../helpers/spectron';
+import { test, useWebdriver } from '../../helpers/webdriver';
 import { addSource, openSourceProperties } from '../../helpers/modules/sources';
-import { logIn } from '../../helpers/spectron/user';
+import { logIn } from '../../helpers/webdriver/user';
 import { assertFormContains, fillForm } from '../../helpers/modules/forms';
 import { waitForWidgetSettingsSync } from '../../helpers/widget-helpers';
 import { clickButton, focusChild, focusMain, waitForDisplayed } from '../../helpers/modules/core';
 import { sleep } from '../../helpers/sleep';
 
-useSpectron();
+useWebdriver();
 
 // TODO: Fix test for react
 test.skip('Chatbox Settings', async t => {

@@ -1,4 +1,3 @@
-import { SpectronClient } from 'spectron';
 import { getClient, select, TSelectorOrEl } from '../core';
 import { sleep } from '../../sleep';
 
@@ -6,7 +5,7 @@ import { sleep } from '../../sleep';
  * A base class for all input controllers
  */
 export abstract class BaseInputController<TValue> {
-  protected client: SpectronClient;
+  protected client: WebdriverIO.Browser;
 
   constructor(private selectorOrEl: TSelectorOrEl, public name: string) {}
 

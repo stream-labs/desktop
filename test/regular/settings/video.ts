@@ -1,8 +1,8 @@
-import { test, useSpectron } from '../../helpers/spectron';
+import { test, useWebdriver } from '../../helpers/webdriver';
 import { useForm } from '../../helpers/modules/forms/form';
 import { showSettingsWindow } from '../../helpers/modules/settings/settings';
 
-useSpectron();
+useWebdriver();
 
 test('Populates video settings', async t => {
   await showSettingsWindow('Video');

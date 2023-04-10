@@ -19,29 +19,31 @@ export default function LegacyEvents(p: { onPopout: () => void }) {
   }
 
   function handleBrowserViewReady(view: Electron.BrowserView) {
-    electron.ipcRenderer.send('webContents-preventPopup', view.webContents.id);
-
-    view.webContents.on('new-window', async (e, url) => {
-      const match = url.match(/dashboard\/([^\/^\?]*)/);
+    view.webContents.setWindowOpenHandler(details => {
+      const match = details.url.match(/dashboard\/([^\/^\?]*)/);
 
       if (match && match[1] === 'recent-events') {
         popoutRecentEvents();
       } else if (match) {
         // Prevent spamming our API
-        if (magicLinkDisabled.current) return;
+        if (magicLinkDisabled.current) return { action: 'deny' };
         magicLinkDisabled.current = true;
 
-        try {
-          const link = await MagicLinkService.actions.return.getDashboardMagicLink(match[1]);
-          remote.shell.openExternal(link);
-        } catch (e: unknown) {
-          console.error('Error generating dashboard magic link', e);
-        }
+        MagicLinkService.actions.return
+          .getDashboardMagicLink(match[1])
+          .then(link => {
+            remote.shell.openExternal(link);
+          })
+          .catch(e => {
+            console.error('Error generating dashboard magic link', e);
+          });
 
         magicLinkDisabled.current = false;
       } else {
-        remote.shell.openExternal(url);
+        remote.shell.openExternal(details.url);
       }
+
+      return { action: 'deny' };
     });
   }
 

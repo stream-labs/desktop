@@ -1,6 +1,6 @@
-import { getContext } from '../spectron';
+import { getContext } from '../webdriver';
 import { TPlatform } from '../../../app/services/platforms';
-import { ITestUserFeatures, logIn as userLogin } from '../spectron/user';
+import { ITestUserFeatures, logIn as userLogin } from '../webdriver/user';
 
 export function logIn(
   platform: TPlatform = 'twitch',

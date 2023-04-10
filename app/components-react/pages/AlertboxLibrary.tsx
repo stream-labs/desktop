@@ -32,14 +32,14 @@ export default function AlertboxLibrary(p: { params: { id?: string } }) {
       installWidgets,
     });
 
-    electron.ipcRenderer.send('webContents-preventPopup', view.webContents.id);
-
-    view.webContents.on('new-window', (e, url) => {
-      const protocol = urlLib.parse(url).protocol;
+    view.webContents.setWindowOpenHandler(details => {
+      const protocol = urlLib.parse(details.url).protocol;
 
       if (protocol === 'http:' || protocol === 'https:') {
-        remote.shell.openExternal(url);
+        remote.shell.openExternal(details.url);
       }
+
+      return { action: 'deny' };
     });
   }
 

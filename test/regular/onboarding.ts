@@ -1,9 +1,9 @@
-import { test, useSpectron } from '../helpers/spectron';
-import { logIn } from '../helpers/spectron/user';
+import { test, useWebdriver } from '../helpers/webdriver';
+import { logIn } from '../helpers/webdriver/user';
 import { sleep } from '../helpers/sleep';
 import { click, focusMain, isDisplayed } from '../helpers/modules/core';
 
-useSpectron({ skipOnboarding: false });
+useWebdriver({ skipOnboarding: false });
 
 test('Go through the onboarding and autoconfig', async t => {
   const app = t.context.app;
