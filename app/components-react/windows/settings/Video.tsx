@@ -345,16 +345,18 @@ export function VideoSettings() {
   const { values, metadata, onChange, setDisplay } = useModule(VideoSettingsModule);
 
   return (
-    <div className={styles.formSection}>
+    <>
       <h2>{$t('Video')}</h2>
       <Tabs onChange={setDisplay} />
-      <FormFactory
-        values={values}
-        metadata={metadata}
-        onChange={onChange}
-        formOptions={{ layout: 'vertical' }}
-      />
-    </div>
+      <div className={styles.formSection}>
+        <FormFactory
+          values={values}
+          metadata={metadata}
+          onChange={onChange}
+          formOptions={{ layout: 'vertical' }}
+        />
+      </div>
+    </>
   );
 }
 
