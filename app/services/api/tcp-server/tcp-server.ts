@@ -368,15 +368,7 @@ export class TcpServerService
 
     const requests = data.split('\n');
 
-    for (const req of requests) {
-      // Hang up anything that looks like an HTTP request
-      if (req[0] !== '{' && req.match(/HTTP/)) {
-        this.disconnectClient(client.id);
-        return;
-      }
-    }
-
-    requests.forEach(requestString => {
+    for (const requestString of requests) {
       if (!requestString) return;
       try {
         const request: IJsonRpcRequest = JSON.parse(requestString);
@@ -417,8 +409,16 @@ export class TcpServerService
               'by a single newline character LF ( ASCII code 10)',
           }),
         );
+
+        // Disconnect and stop processing requests
+        // IMPORTANT: For security reasons it is important we immediately stop
+        // processing requests that don't look will well formed JSON RPC calls.
+        // Without this check, it is possible to send normal HTTP requests
+        // from an unprivileged web page and make calls to this API.
+        this.disconnectClient(client.id);
+        return;
       }
-    });
+    }
   }
 
   private onServiceEventHandler(event: IJsonRpcResponse<IJsonRpcEvent>) {
