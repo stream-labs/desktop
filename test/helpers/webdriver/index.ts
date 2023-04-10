@@ -257,38 +257,11 @@ export function useWebdriver(options: ITestRunnerOptions = {}) {
       },
     });
 
-    // app = t.context.app = new Application({
-    //   path: path.join(__dirname, '..', '..', '..', '..', 'node_modules', '.bin', 'electron.cmd'),
-    //   args: [
-    //     '--require',
-    //     path.join(__dirname, 'context-menu-injected.js'),
-    //     '--require',
-    //     path.join(__dirname, 'dialog-injected.js'),
-    //     ...appArgs,
-    //     '.',
-    //   ],
-    //   env: {
-    //     NODE_ENV: 'test',
-    //     SLOBS_CACHE_DIR: t.context.cacheDir,
-    //   },
-    //   chromeDriverArgs: [`user-data-dir=${path.join(t.context.cacheDir, 'slobs-client')}`],
-    // });
-
     if (options.beforeAppStartCb) await options.beforeAppStartCb(t);
 
     await t.context.app.start(t.context.cacheDir);
 
     await t.context.app.isChromedriverRunning();
-
-    // await app.client.executeAsync(`
-    //   require("${path.join(__dirname, 'context-menu-injected.js')}");
-    //   require("${path.join(__dirname, 'dialog-injected.js')}");
-    // `);
-
-    // await app.startChromeDriver();
-    // await app.createClient();
-
-    // await chromedriver.start();
 
     // Disable CSS transitions while running tests to allow for eager test clicks
     // also disable tooltips and the tree mask on sourceSelector
