@@ -6,6 +6,7 @@ import FormFactory, { TInputValue } from 'components-react/shared/inputs/FormFac
 import * as obs from '../../../../obs-api';
 import { $t } from 'services/i18n';
 import styles from './Common.m.less';
+import { DualOutputTabs } from 'components-react/shared/Tabs';
 import { invalidFps, TDisplayType } from 'services/settings-v2/video';
 
 const CANVAS_RES_OPTIONS = [
@@ -48,8 +49,6 @@ class VideoSettingsModule {
 
   get values(): Dictionary<TInputValue> {
     const display = this.state.display;
-    console.log('TOP this.service.values ', this.service.values);
-    console.log('TOP this.service.values ', this.service.values[display]);
     const vals = this.service.values[display];
     const baseRes = this.state?.customBaseRes ? 'custom' : vals.baseRes;
     const outputRes = this.state?.customOutputRes ? 'custom' : vals.outputRes;
@@ -347,17 +346,8 @@ export function VideoSettings() {
 
   return (
     <div className={styles.formSection}>
-      <>
-        <div className={styles.outputHeader}>
-          <i className="icon-phone-case" onClick={() => setDisplay('horizontal')} />
-          <h1>{$t('Horizontal Output')}</h1>
-        </div>
-
-        <div className={styles.outputHeader}>
-          <i className="icon-desktop" onClick={() => setDisplay('vertical')} />
-          <h1>{$t('Vertical Output')}</h1>
-        </div>
-      </>
+      <h2>{$t('Video')}</h2>
+      <DualOutputTabs onChange={setDisplay} />
       <FormFactory
         values={values}
         metadata={metadata}
