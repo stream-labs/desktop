@@ -4,13 +4,14 @@ import { TextInput } from 'components-react/shared/inputs';
 import { Services } from '../service-provider';
 import { ModalLayout } from '../shared/ModalLayout';
 import { $t } from '../../services/i18n';
+import { useChildWindowParams } from 'components-react/hooks';
 
 export default function RenameSource() {
   const { SourcesService, WindowsService, EditorCommandsService } = Services;
 
   const form = useForm();
 
-  const options = useMemo(() => WindowsService.getChildWindowQueryParams(), []);
+  const options = useChildWindowParams();
 
   const [name, setName] = useState(
     () => SourcesService.views.getSource(options.sourceId)?.name || '',
