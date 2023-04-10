@@ -261,8 +261,6 @@ export function useWebdriver(options: ITestRunnerOptions = {}) {
 
     await t.context.app.start(t.context.cacheDir);
 
-    await t.context.app.isChromedriverRunning();
-
     // Disable CSS transitions while running tests to allow for eager test clicks
     // also disable tooltips and the tree mask on sourceSelector
     const disableTransitionsCode = `
