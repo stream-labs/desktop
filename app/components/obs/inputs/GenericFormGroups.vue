@@ -1,9 +1,7 @@
 <template>
   <AdvancedOutputTabs v-model="props.value" v-if="isAdvancedOutput" @input="onInputHandler" />
   <div class="form-groups" v-else>
-    <h2>{{ $t('Output') }}</h2>
-    <DualOutputToggle />
-    <Tabs />
+    <OutputSettingsHeader />
     <div
       class="section"
       v-for="(formGroup, groupIndex) in props.value"

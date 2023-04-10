@@ -1,8 +1,6 @@
 <template>
   <div>
-    <h2>{{ $t('Output') }}</h2>
-    <DualOutputToggle />
-    <DualOutputTabs />
+    <OutputSettingsHeader />
     <div class="section">
       <div class="section-content">
         <div class="standalone-properties">

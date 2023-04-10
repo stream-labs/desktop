@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import GenericForm from './GenericForm';
 import AdvancedOutputTabs from './AdvancedOutputTabs.vue';
-import { DualOutputToggle, Tabs } from 'components/shared/ReactComponentList';
+import { OutputSettingsHeader } from 'components/shared/ReactComponentList';
 import { Component, Prop, Watch } from 'vue-property-decorator';
 import { ISettingsSubCategory, SettingsService, ESettingsCategoryType } from 'services/settings';
 import { Inject } from 'services/core/injector';
@@ -14,7 +14,7 @@ class GenericFormGroupProps {
 }
 
 @Component({
-  components: { AdvancedOutputTabs, DualOutputToggle, GenericForm, Tabs },
+  components: { AdvancedOutputTabs, OutputSettingsHeader, GenericForm },
   props: createProps(GenericFormGroupProps),
 })
 export default class GenericFormGroups extends TsxComponent<GenericFormGroupProps> {

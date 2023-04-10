@@ -68,8 +68,7 @@ import RecordingHistory from './windows/RecordingHistory';
 import UltraIcon from './shared/UltraIcon';
 import EditTransform from './windows/EditTransform';
 import InstalledApps from './windows/settings/InstalledApps';
-import Tabs from './shared/Tabs';
-import DualOutputToggle from './shared/DualOutputToggle';
+import OutputSettingsHeader from './shared/OutputSettingsHeader';
 
 // list of React components to be used inside Vue components
 export const components = {
@@ -142,6 +141,5 @@ export const components = {
   EditTransform,
   InstalledApps,
   Blank,
-  Tabs,
-  DualOutputToggle,
+  OutputSettingsHeader,
 };

@@ -93,9 +93,9 @@ export class Display extends ReactComponent {}
 export class DisplayElement extends ReactComponent {}
 
 @Component({
-  props: { name: { default: 'DualOutputToggle' } },
+  props: { name: { default: 'OutputSettingsHeader' } },
 })
-export class DualOutputToggle extends ReactComponent {}
+export class OutputSettingsHeader extends ReactComponent {}
 
 @Component({
   props: {
@@ -438,11 +438,6 @@ export class StudioEditor extends ReactComponent {}
   },
 })
 export class StudioFooter extends ReactComponent {}
-
-@Component({
-  props: { name: { default: 'Tabs' } },
-})
-export class Tabs extends ReactComponent {}
 
 @Component({
   props: {
