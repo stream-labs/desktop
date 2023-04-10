@@ -21,7 +21,6 @@ class ObsSettingsModule {
     }
   }
 
-
   private get settingsService() {
     return Services.SettingsService;
   }
@@ -32,6 +31,13 @@ class ObsSettingsModule {
 
   get settingsFormData() {
     return this.settingsService.state[this.state.page]?.formData ?? [];
+  }
+
+  get streamSettingsFormData() {
+    return [
+      this.settingsService.state[this.state.page]?.formData ?? [],
+      this.settingsService.state['StreamSecond']?.formData ?? [],
+    ];
   }
 }
 

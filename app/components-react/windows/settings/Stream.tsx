@@ -6,7 +6,7 @@ import { getPlatformService, TPlatform } from '../../../services/platforms';
 import cloneDeep from 'lodash/cloneDeep';
 import namingHelpers from '../../../util/NamingHelpers';
 import { Services } from '../../service-provider';
-import { ObsGenericSettingsForm } from './ObsSettings';
+import { ObsStreamSettingsForm } from './ObsSettings';
 import css from './Stream.m.less';
 import cx from 'classnames';
 import { Button, message, Tooltip } from 'antd';
@@ -285,7 +285,7 @@ export function StreamSettings() {
       )}
 
       {/* OBS settings */}
-      {!protectedModeEnabled && canEditSettings && <ObsGenericSettingsForm />}
+      {!protectedModeEnabled && canEditSettings && <ObsStreamSettingsForm />}
     </div>
   );
 }

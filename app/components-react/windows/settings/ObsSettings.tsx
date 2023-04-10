@@ -30,6 +30,24 @@ export function ObsGenericSettingsForm() {
 }
 
 /**
+ * Renders generic inputs from OBS
+ */
+export function ObsStreamSettingsForm() {
+  const { streamSettingsFormData, saveSettings } = useObsSettings();
+
+  return (
+    <>
+      {streamSettingsFormData.map((stream, index) => (
+        <>
+          {index === 0 ? 'Horizontal' : 'Vertical'}
+          <ObsFormGroup value={stream} onChange={newSettings => saveSettings(newSettings)} />
+        </>
+      ))}
+    </>
+  );
+}
+
+/**
  * A section layout for settings
  */
 export function ObsSettingsSection(
