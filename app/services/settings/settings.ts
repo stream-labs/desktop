@@ -70,8 +70,6 @@ export interface ISettingsValues {
     keyint_sec?: number;
   };
   Video: ISettingsVideoInfo; // default video context
-  Horizontal: ISettingsVideoInfo;
-  Vertical: ISettingsVideoInfo;
   Audio: Dictionary<TObsValue>;
   Advanced: {
     DelayEnable: boolean;
