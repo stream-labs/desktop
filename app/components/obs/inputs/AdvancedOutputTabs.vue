@@ -1,6 +1,5 @@
 <template>
   <div>
-    <OutputSettingsHeader />
     <div class="section">
       <div class="section-content">
         <div class="standalone-properties">

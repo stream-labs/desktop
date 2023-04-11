@@ -2,10 +2,9 @@ import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 import { ISettingsSubCategory } from 'services/settings';
 import Tabs, { ITab } from 'components/Tabs.vue';
-import { OutputSettingsHeader } from 'components/shared/ReactComponentList';
 import GenericForm from './GenericForm';
 
-@Component({ components: { OutputSettingsHeader, GenericForm, Tabs } })
+@Component({ components: { GenericForm, Tabs } })
 export default class AdvancedOutputTabs extends Vue {
   @Prop() value: ISettingsSubCategory[];
   currentTab: string = 'Streaming';

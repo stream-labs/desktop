@@ -93,11 +93,6 @@ export class Display extends ReactComponent {}
 export class DisplayElement extends ReactComponent {}
 
 @Component({
-  props: { name: { default: 'OutputSettingsHeader' } },
-})
-export class OutputSettingsHeader extends ReactComponent {}
-
-@Component({
   props: {
     name: { default: 'EditStreamWindow' },
     wrapperStyles: { default: () => ({ height: '100%' }) },

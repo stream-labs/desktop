@@ -1,7 +1,6 @@
 <template>
   <AdvancedOutputTabs v-model="props.value" v-if="isAdvancedOutput" @input="onInputHandler" />
   <div class="form-groups" v-else>
-    <OutputSettingsHeader />
     <div
       class="section"
       v-for="(formGroup, groupIndex) in props.value"
