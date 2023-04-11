@@ -1005,7 +1005,7 @@ export class HighlighterService extends StatefulService<IHighligherState> {
   }
 
   async uploadStorage() {
-    const shareInfo = await this.sharedStorageService.actions.return.uploadFile(
+    const { cancel, complete } = await this.sharedStorageService.actions.return.uploadFile(
       this.views.exportInfo.file,
       progress => {
         this.SET_UPLOAD_INFO({
@@ -1018,7 +1018,10 @@ export class HighlighterService extends StatefulService<IHighligherState> {
         console.error(error);
       },
     );
-    console.log(shareInfo);
+    this.cancelFunction = cancel;
+    const { id } = await complete;
+
+    console.log(id);
   }
 
   /**

@@ -31,9 +31,10 @@ export class SharedStorageService extends Service {
 
   id: string;
   cancel: () => void;
+  uploader: S3Uploader;
 
   get host() {
-    return this.hostsService.streamlabs;
+    return `${this.hostsService.streamlabs}/api/v5/slobs/streamlabs-storage`;
   }
 
   async uploadFile(
@@ -44,12 +45,22 @@ export class SharedStorageService extends Service {
     try {
       const uploadInfo = await this.prepareUpload(filepath);
       this.id = uploadInfo.file.id;
-      const { uploaded, reqBody } = await this.uploadS3File(
-        uploadInfo,
+      this.uploader = new S3Uploader({
+        fileInfo: uploadInfo,
         filepath,
         onProgress,
         onError,
-      );
+      });
+      this.cancel = this.uploader.cancel;
+      return { cancel: this.cancel, complete: this.performUpload() };
+    } catch (e: unknown) {
+      console.error(e);
+    }
+  }
+
+  async performUpload() {
+    try {
+      const { uploaded, reqBody } = await this.uploadS3File();
       if (uploaded) {
         await this.completeUpload(reqBody);
         return await this.generateShare();
@@ -69,6 +80,9 @@ export class SharedStorageService extends Service {
     if (!this.id || !this.cancel) return;
     const url = `${this.host}/storage/v1/temporary-files/${this.id}`;
     const headers = authorizedHeaders(this.userService.apiToken);
+    this.cancel();
+    this.id = undefined;
+    this.cancel = undefined;
     return await jfetch(new Request(url, { headers, method: 'DELETE' }));
   }
 
@@ -89,21 +103,9 @@ export class SharedStorageService extends Service {
     }
   }
 
-  private async uploadS3File(
-    uploadInfo: IPrepareResponse,
-    filepath: string,
-    onProgress?: (progress: IProgress) => void,
-    onError?: (error: unknown) => void,
-  ) {
+  private async uploadS3File() {
     try {
-      const uploader = new Uploader({
-        fileInfo: uploadInfo,
-        filepath,
-        onProgress,
-        onError,
-      });
-      this.cancel = uploader.cancel;
-      return await uploader.start();
+      return await this.uploader.start();
     } catch (e: unknown) {
       console.error(e);
     }
@@ -125,7 +127,7 @@ interface IUploaderOptions {
   onError?: (e: unknown) => void;
 }
 
-class Uploader {
+class S3Uploader {
   @Inject() userService: UserService;
 
   uploadedSize = 0;
