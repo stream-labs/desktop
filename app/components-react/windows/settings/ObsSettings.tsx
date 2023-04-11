@@ -1,7 +1,9 @@
 import React, { CSSProperties, HTMLAttributes } from 'react';
+import { $t } from 'services/i18n';
 import * as pageComponents from './pages';
 import { useObsSettings } from './useObsSettings';
 import { ObsFormGroup } from '../../obs/ObsForm';
+import { Tabs } from 'antd';
 import Form from '../../shared/inputs/Form';
 import css from './ObsSettings.m.less';
 
@@ -37,12 +39,21 @@ export function ObsStreamSettingsForm() {
 
   return (
     <>
-      {streamSettingsFormData.map((stream, index) => (
-        <>
-          {index === 0 ? 'Horizontal' : 'Vertical'}
-          <ObsFormGroup value={stream} onChange={newSettings => saveSettings(newSettings)} />
-        </>
-      ))}
+      <h2>{$t('Stream')}</h2>
+      <Tabs defaultActiveKey="horizontal">
+        <Tabs.TabPane tab={$t('Horizontal')} key="horizontal">
+          <ObsFormGroup
+            value={streamSettingsFormData.Stream}
+            onChange={newSettings => saveSettings(newSettings)}
+          />
+        </Tabs.TabPane>
+        <Tabs.TabPane tab={$t('Vertical')} key="vertical">
+          <ObsFormGroup
+            value={streamSettingsFormData.StreamSecond}
+            onChange={newSettings => saveSettings(newSettings)}
+          />
+        </Tabs.TabPane>
+      </Tabs>
     </>
   );
 }
