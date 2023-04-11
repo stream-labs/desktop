@@ -32,8 +32,8 @@ class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
 
   get dualOutputMode(): boolean {
     return (
-      this.settingsManagerService.views.isHorizontalActive &&
-      this.settingsManagerService.views.isVerticalActive
+      this.settingsManagerService.views.activeDisplays.horizontal &&
+      this.settingsManagerService.views.activeDisplays.vertical
     );
   }
 
