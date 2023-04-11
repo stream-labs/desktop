@@ -1,6 +1,8 @@
 import Vue from 'vue';
 import VueSlider from 'vue-slider-component';
 import { Component, Prop } from 'vue-property-decorator';
+import ResizeSensor from 'css-element-queries/src/ResizeSensor';
+import { debounce } from 'lodash-decorators';
 
 @Component({
   components: { VueSlider },
@@ -16,6 +18,20 @@ export default class SliderInput extends Vue {
   @Prop() dotSize: number;
   @Prop() sliderStyle: object;
   @Prop() usePercentages: boolean;
+
+  $refs: { slider: any };
+
+  mounted() {
+    // Hack to prevent transitions from messing up slider width
+    setTimeout(() => {
+      this.onResizeHandler();
+    }, 500);
+
+    // eslint-disable-next-line no-new
+    new ResizeSensor(this.$el, () => {
+      this.onResizeHandler();
+    });
+  }
 
   updateValue(value: number) {
     this.$emit('input', this.roundNumber(value));
@@ -35,5 +51,10 @@ export default class SliderInput extends Vue {
     let formattedValue = String(value);
     if (this.usePercentages) formattedValue = Math.round(value * 100) + '%';
     return formattedValue;
+  }
+
+  @debounce(500)
+  private onResizeHandler() {
+    if (this.$refs.slider) this.$refs.slider.refresh();
   }
 }

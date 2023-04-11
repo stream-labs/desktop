@@ -24,7 +24,7 @@
         :max="1"
         :interval="0.01"
         @input="onSliderChangeHandler"
-        tooltip="none"
+        tooltip="false"
       />
       <div class="controls">
         <i

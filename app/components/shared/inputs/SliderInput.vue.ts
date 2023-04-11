@@ -17,15 +17,25 @@ export default class SliderInput extends BaseInput<number, ISliderMetadata> {
 
   usePercentages: boolean;
   interval: number;
+  isFullyMounted = false;
+
+  $refs: { slider: any };
 
   mounted() {
     // setup defaults
     this.interval = this.options.interval || 1;
     this.usePercentages = this.options.usePercentages || false;
+
+    // Hack to prevent transitions from messing up slider width
+    setTimeout(() => {
+      if (this.$refs.slider) this.$refs.slider.refresh();
+      this.isFullyMounted = true;
+    }, 500);
   }
 
   @throttle(500)
   updateValue(value: number) {
+    if (!this.isFullyMounted) return;
     this.emitInput(this.roundNumber(value));
   }
 
