@@ -1,5 +1,5 @@
-import { test, TExecutionContext, useSpectron } from '../helpers/spectron';
-import { logIn } from '../helpers/spectron/user';
+import { test, TExecutionContext, useWebdriver } from '../helpers/webdriver';
+import { logIn } from '../helpers/webdriver/user';
 import { sleep } from '../helpers/sleep';
 import { FormMonkey } from '../helpers/form-monkey';
 import { sceneExisting } from '../helpers/modules/scenes';
@@ -11,7 +11,7 @@ import {
   waitForDisplayed,
 } from '../helpers/modules/core';
 
-useSpectron();
+useWebdriver();
 
 const OVERLAY_NAME = 'Portals';
 const OVERLAY_SCENES = ['Live Scene', 'Starting Soon', 'Be Right Back', 'Offline'];

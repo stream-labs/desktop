@@ -526,10 +526,14 @@ function convertYTBroadcastToEvent(ytBroadcast: IYoutubeLiveBroadcast): IStreamE
  * Converts FB liveVideo to IStreamEvent
  */
 function convertFBLiveVideoToEvent(fbLiveVideo: IFacebookLiveVideoExtended): IStreamEvent {
+  // Videos "just" created don't seem to have `broadcast_start_time`, fallback to planned.
+  const date = fbLiveVideo.broadcast_start_time || fbLiveVideo.planned_start_time;
+  assertIsDefined(date);
+
   return {
     platform: 'facebook',
     id: fbLiveVideo.id,
-    date: new Date(fbLiveVideo.broadcast_start_time).valueOf(),
+    date: new Date(date).valueOf(),
     title: fbLiveVideo.title,
     status: 'scheduled',
     facebook: {

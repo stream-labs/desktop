@@ -10,8 +10,8 @@ import {
   waitForDisplayed,
 } from './core';
 import { setInputValue } from './forms/form';
-import { dialogDismiss } from '../spectron/dialog';
-import { contextMenuClick } from '../spectron/context-menu';
+import { dialogDismiss } from '../webdriver/dialog';
+import { contextMenuClick } from '../webdriver/context-menu';
 
 async function clickSourceAction(selector: string) {
   const $el = await (await select('[data-name=sourcesControls]')).$(selector);

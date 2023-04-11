@@ -1,4 +1,4 @@
-import { TExecutionContext, useSpectron, test } from '../../helpers/spectron';
+import { TExecutionContext, useWebdriver, test } from '../../helpers/webdriver';
 import { getApiClient } from '../../helpers/api-client';
 import {
   IStreamingServiceApi,
@@ -6,9 +6,9 @@ import {
   ERecordingState,
 } from '../../../app/services/streaming/streaming-api';
 import { SettingsService } from '../../../app/services/settings';
-import { reserveUserFromPool } from '../../helpers/spectron/user';
+import { reserveUserFromPool } from '../../helpers/webdriver/user';
 
-useSpectron({ restartAppAfterEachTest: true });
+useWebdriver({ restartAppAfterEachTest: true });
 
 test('Streaming to Twitch via API', async t => {
   const streamKey = (await reserveUserFromPool(t, 'twitch')).streamKey;

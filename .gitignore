@@ -30,3 +30,4 @@ license_en.txt
 !.yarn/releases
 !.yarn/sdks
 !.yarn/versions
+chromedriver.log

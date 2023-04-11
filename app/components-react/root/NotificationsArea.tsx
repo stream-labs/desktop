@@ -86,11 +86,25 @@ class NotificationsModule {
     return Services.NotificationsService.state.settings;
   }
 
+  get platform() {
+    return Services.UserService.views.platform?.type;
+  }
+
   get ytDisabled() {
     return (
       Services.UserService.views.platform?.type === 'youtube' &&
       !Services.YoutubeService.state.liveStreamingEnabled
     );
+  }
+
+  openYoutubeEnable() {
+    Services.YoutubeService.actions.openYoutubeEnable();
+  }
+
+  confirmYoutubeEnabled() {
+    if (this.platform === 'youtube') {
+      Services.YoutubeService.actions.prepopulateInfo();
+    }
   }
 
   clickNotif() {
@@ -106,7 +120,7 @@ class NotificationsModule {
 }
 
 export default function NotificationsArea() {
-  const { NotificationsService, UserService, YoutubeService } = Services;
+  const { NotificationsService } = Services;
 
   const {
     unreadWarnings,
@@ -144,10 +158,10 @@ export default function NotificationsArea() {
   useEffect(() => {
     message.config({
       getContainer: () => notificationsContainer.current as HTMLElement,
-      maxCount: showExtendedNotifications ? 1 : 0,
+      maxCount: 1,
     });
     setReadyToPlay();
-  }, [showExtendedNotifications]);
+  }, []);
 
   function showNotifications() {
     NotificationsService.actions.showNotifications();
@@ -180,9 +194,13 @@ export default function NotificationsArea() {
         </Tooltip>
       )}
       <div
-        className={cx(styles.notificationsContainer, 'flex--grow')}
+        className={cx(styles.notificationsContainer, 'flex--grow', {
+          [styles.hideNotifs]: !showExtendedNotifications,
+        })}
         ref={notificationsContainer}
-      />
+      >
+        {ytDisabled && <YTError />}
+      </div>
     </div>
   );
 }
@@ -196,5 +214,22 @@ function MessageNode(p: { notif: INotification }) {
     <>
       {p.notif.message} {p.notif.showTime && <span> {fromNow(p.notif.date)}</span>}
     </>
+  );
+}
+
+function YTError() {
+  const { confirmYoutubeEnabled, openYoutubeEnable } = useModule(NotificationsModule);
+
+  return (
+    <div className={cx('ant-message-notice', styles.notification, styles.warning, styles.ytError)}>
+      <i className="fa fa-exclamation-triangle" />
+      <span>{$t('YouTube account not enabled for live streaming')}</span>
+      <button className={cx('button', styles.alertButton)} onClick={openYoutubeEnable}>
+        {$t('Fix')}
+      </button>
+      <button className={cx('button', styles.alertButton)} onClick={confirmYoutubeEnabled}>
+        {$t("I'm set up")}
+      </button>
+    </div>
   );
 }

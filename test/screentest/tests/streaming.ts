@@ -1,16 +1,16 @@
-import { skipCheckingErrorsInLog, test, useSpectron } from '../../helpers/spectron';
-import { logIn } from '../../helpers/spectron/user';
+import { skipCheckingErrorsInLog, test, useWebdriver } from '../../helpers/webdriver';
+import { logIn } from '../../helpers/webdriver/user';
 import { fillForm, selectTitle } from '../../helpers/form-monkey';
 import { makeScreenshots, useScreentest } from '../screenshoter';
 import { TPlatform } from '../../../app/services/platforms';
-import { fetchMock, installFetchMock, resetFetchMock } from '../../helpers/spectron/network';
+import { fetchMock, installFetchMock, resetFetchMock } from '../../helpers/webdriver/network';
 import { getApiClient } from '../../helpers/api-client';
 import { ScenesService } from 'services/api/external-api/scenes';
 import { sleep } from '../../helpers/sleep';
 import { prepareToGoLive } from '../../helpers/modules/streaming';
 import { focusChild, focusMain } from '../../helpers/modules/core';
 
-useSpectron();
+useWebdriver();
 useScreentest();
 
 async function addColorSource() {

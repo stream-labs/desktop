@@ -367,7 +367,8 @@ export class TcpServerService
     }
 
     const requests = data.split('\n');
-    requests.forEach(requestString => {
+
+    for (const requestString of requests) {
       if (!requestString) return;
       try {
         const request: IJsonRpcRequest = JSON.parse(requestString);
@@ -408,8 +409,16 @@ export class TcpServerService
               'by a single newline character LF ( ASCII code 10)',
           }),
         );
+
+        // Disconnect and stop processing requests
+        // IMPORTANT: For security reasons it is important we immediately stop
+        // processing requests that don't look will well formed JSON RPC calls.
+        // Without this check, it is possible to send normal HTTP requests
+        // from an unprivileged web page and make calls to this API.
+        this.disconnectClient(client.id);
+        return;
       }
-    });
+    }
   }
 
   private onServiceEventHandler(event: IJsonRpcResponse<IJsonRpcEvent>) {
@@ -447,6 +456,21 @@ export class TcpServerService
   }
 
   private hadleTcpServerDirectives(client: IClient, request: IJsonRpcRequest) {
+    // Prevent access to certain particularly sensitive services
+    const protectedResources = ['FileManagerService'];
+
+    if (protectedResources.includes(request.params.resource)) {
+      this.sendResponse(
+        client,
+        this.jsonrpcService.createError(request, {
+          code: E_JSON_RPC_ERROR.INTERNAL_JSON_RPC_ERROR,
+          message: 'The requested resource is not available.',
+        }),
+      );
+
+      return true;
+    }
+
     // handle auth
     if (request.method === 'auth' && request.params.resource === 'TcpServerService') {
       if (this.state.token && request.params.args[0] === this.state.token) {

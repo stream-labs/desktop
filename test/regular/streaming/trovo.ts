@@ -1,8 +1,8 @@
-import { test, useSpectron } from '../../helpers/spectron';
+import { test, useWebdriver } from '../../helpers/webdriver';
 import { logIn } from '../../helpers/modules/user';
 import { chatIsVisible, goLive, stopStream } from '../../helpers/modules/streaming';
 
-useSpectron();
+useWebdriver();
 
 // TODO add testing accounts for Trovo
 test.skip('Streaming to Trovo', async t => {

@@ -1,6 +1,6 @@
 // Source helper functions
 import { rightClickSource } from './sources';
-import { contextMenuClick } from '../spectron/context-menu';
+import { contextMenuClick } from '../webdriver/context-menu';
 import { click, clickButton, focusChild, focusMain, select } from './core';
 import { useForm } from './forms';
 

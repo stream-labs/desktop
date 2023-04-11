@@ -553,7 +553,7 @@ export class YoutubeService
     const contentDetails: Dictionary<any> = {
       enableAutoStart: isMidStreamMode
         ? broadcast.contentDetails.enableAutoStart
-        : params.enableAutoStop,
+        : params.enableAutoStart,
       enableAutoStop: params.enableAutoStop,
       enableDvr: params.enableDvr,
       enableEmbed: broadcast.contentDetails.enableEmbed,
