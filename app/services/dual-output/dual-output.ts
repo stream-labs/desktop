@@ -11,7 +11,7 @@ import { ScenesService, SceneItem, IPartialSettings, IScene } from 'services/sce
 import { TDisplayType, VideoSettingsService } from 'services/settings-v2/video';
 import { StreamingService } from 'services/streaming';
 import { SceneCollectionsService } from 'services/scene-collections';
-import { getPlatformService, TPlatform } from 'services/platforms';
+import { TPlatform } from 'services/platforms';
 import { EPlaceType } from 'services/editor-commands/commands/reorder-nodes';
 import { EditorCommandsService } from 'services/editor-commands';
 import { Subject } from 'rxjs';
@@ -20,7 +20,7 @@ import { TOutputOrientation } from 'services/restream';
 interface IDualOutputServiceState {
   displays: TDisplayType[];
   platformSettings: TDualOutputPlatformSettings;
-  dualOutputMode: boolean;
+  showDualOutput: boolean;
   sceneNodeMaps: { [sceneId: string]: Dictionary<string> };
 }
 
@@ -35,6 +35,10 @@ class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
       this.settingsManagerService.views.activeDisplays.horizontal &&
       this.settingsManagerService.views.activeDisplays.vertical
     );
+  }
+
+  get showDualOutput(): boolean {
+    return this.state.showDualOutput;
   }
 
   get shouldCreateVerticalNode(): boolean {
@@ -146,7 +150,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
   static defaultState: IDualOutputServiceState = {
     displays: ['horizontal', 'vertical'],
     platformSettings: DualOutputPlatformSettings,
-    dualOutputMode: false,
+    showDualOutput: false,
     sceneNodeMaps: {},
   };
 
@@ -189,6 +193,14 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
         this.confirmOrCreateVerticalNodes(scene.id);
       }
     });
+  }
+
+  /**
+   * Edit dual output display settings
+   */
+
+  async setShowDualOutput() {
+    this.SET_SHOW_DUAL_OUTPUT();
   }
 
   /**
@@ -364,5 +376,13 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
     const { entry, ...sceneNodeMap } = this.state.sceneNodeMaps[sceneId];
 
     this.state.sceneNodeMaps = { ...this.state.sceneNodeMaps, [sceneId]: sceneNodeMap };
+  }
+
+  @mutation()
+  private SET_SHOW_DUAL_OUTPUT() {
+    this.state = {
+      ...this.state,
+      showDualOutput: !this.state.showDualOutput,
+    };
   }
 }

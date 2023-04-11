@@ -27,6 +27,7 @@ function SceneSelector() {
     EditorCommandsService,
     SettingsManagerService,
     StreamingService,
+    DualOutputService,
   } = Services;
 
   const v = useVuex(() => ({
@@ -35,6 +36,7 @@ function SceneSelector() {
     toggleDisplay: SettingsManagerService.actions.toggleDisplay,
     studioMode: TransitionsService.views.studioMode,
     isMidStreamMode: StreamingService.views.isMidStreamMode,
+    showDualOutput: DualOutputService.views.showDualOutput,
   }));
 
   const { treeSort } = useTree(true);
@@ -198,39 +200,43 @@ function SceneSelector() {
           <i className="icon-add-circle icon-button icon-button--lg" onClick={addScene} />
         </Tooltip>
 
-        <Tooltip title={$t('Show horizontal display.')} placement="bottomRight">
-          <i
-            onClick={() => {
-              if (v.isMidStreamMode) {
-                showToggleDisplayErrorMessage();
-              } else if (v.studioMode && v.isVertical) {
-                showStudioModeErrorMessage();
-              } else {
-                v.toggleDisplay(!v.isHorizontal, 'horizontal');
-              }
-            }}
-            className={cx('icon-desktop icon-button icon-button--lg', {
-              active: v.isHorizontal,
-            })}
-          />
-        </Tooltip>
+        {v.showDualOutput && (
+          <Tooltip title={$t('Show horizontal display.')} placement="bottomRight">
+            <i
+              onClick={() => {
+                if (v.isMidStreamMode) {
+                  showToggleDisplayErrorMessage();
+                } else if (v.studioMode && v.isVertical) {
+                  showStudioModeErrorMessage();
+                } else {
+                  v.toggleDisplay(!v.isHorizontal, 'horizontal');
+                }
+              }}
+              className={cx('icon-desktop icon-button icon-button--lg', {
+                active: v.isHorizontal,
+              })}
+            />
+          </Tooltip>
+        )}
 
-        <Tooltip title={$t('Show vertical display.')} placement="bottomRight">
-          <i
-            onClick={() => {
-              if (v.isMidStreamMode) {
-                showToggleDisplayErrorMessage();
-              } else if (v.studioMode && v.isHorizontal) {
-                showStudioModeErrorMessage();
-              } else {
-                v.toggleDisplay(!v.isVertical, 'vertical');
-              }
-            }}
-            className={cx('icon-phone-case icon-button icon-button--lg', {
-              active: v.isVertical,
-            })}
-          />
-        </Tooltip>
+        {v.showDualOutput && (
+          <Tooltip title={$t('Show vertical display.')} placement="bottomRight">
+            <i
+              onClick={() => {
+                if (v.isMidStreamMode) {
+                  showToggleDisplayErrorMessage();
+                } else if (v.studioMode && v.isHorizontal) {
+                  showStudioModeErrorMessage();
+                } else {
+                  v.toggleDisplay(!v.isVertical, 'vertical');
+                }
+              }}
+              className={cx('icon-phone-case icon-button icon-button--lg', {
+                active: v.isVertical,
+              })}
+            />
+          </Tooltip>
+        )}
 
         <Tooltip title={$t('Edit Scene Transitions.')} placement="bottomRight">
           <i className="icon-transition icon-button icon-button--lg" onClick={showTransitions} />

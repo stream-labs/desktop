@@ -67,7 +67,7 @@ export class RootNode extends Node<ISchema, {}> {
       guestCam,
       baseResolutions: this.videoSettingsService.baseResolutions,
       selectiveRecording: this.streamingService.state.selectiveRecording,
-      dualOutputMode: this.dualOutputService.state.dualOutputMode,
+      dualOutputMode: this.dualOutputService.views.dualOutputMode,
       operatingSystem: process.platform as OS,
     };
   }
