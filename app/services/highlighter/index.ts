@@ -1005,6 +1005,8 @@ export class HighlighterService extends StatefulService<IHighligherState> {
   }
 
   async uploadStorage() {
+    this.SET_UPLOAD_INFO({ uploading: true, cancelRequested: false, error: false });
+
     const { cancel, complete } = await this.sharedStorageService.actions.return.uploadFile(
       this.views.exportInfo.file,
       progress => {
@@ -1020,6 +1022,15 @@ export class HighlighterService extends StatefulService<IHighligherState> {
     );
     this.cancelFunction = cancel;
     const { id } = await complete;
+
+    this.cancelFunction = null;
+    this.SET_UPLOAD_INFO({ uploading: false, cancelRequested: false, videoId: id });
+
+    if (id) {
+      this.usageStatisticsService.recordAnalyticsEvent('Highlighter', {
+        type: 'SharedStorageUploadSuccess',
+      });
+    }
 
     console.log(id);
   }
