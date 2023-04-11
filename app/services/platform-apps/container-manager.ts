@@ -197,7 +197,8 @@ export class PlatformContainerManager {
         contextIsolation: true,
         nodeIntegration: false,
         partition: this.getAppPartition(app),
-        preload: path.resolve(remote.app.getAppPath(), 'bundles', 'guest-api'),
+        preload: path.resolve(remote.app.getAppPath(), 'bundles', 'guest-api.js'),
+        sandbox: false,
       },
     });
 

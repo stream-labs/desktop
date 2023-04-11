@@ -149,7 +149,8 @@ export class ChatService extends Service {
         partition,
         nodeIntegration: false,
         contextIsolation: true,
-        preload: path.resolve(remote.app.getAppPath(), 'bundles', 'guest-api'),
+        preload: path.resolve(remote.app.getAppPath(), 'bundles', 'guest-api.js'),
+        sandbox: false,
       },
     });
 
