@@ -126,7 +126,7 @@
     "vue-multiselect": "https://github.com/stream-labs/vue-multiselect.git",
     "vue-popperjs": "^2.3.0",
     "vue-property-decorator": "^7.0.0",
-    "vue-slider-component": "^3.2.24",
+    "vue-slider-component": "^2.7.7",
     "vue-spinner": "^1.0.4",
     "vue-toasted": "^1.1.24",
     "vuedraggable": "^2.24.3",
