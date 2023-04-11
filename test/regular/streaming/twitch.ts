@@ -12,14 +12,14 @@ import {
 } from '../../helpers/modules/streaming';
 import { showSettingsWindow } from '../../helpers/modules/settings/settings';
 import { clickButton, focusChild, isDisplayed, waitForDisplayed } from '../../helpers/modules/core';
-import { restartApp, test, useSpectron } from '../../helpers/spectron';
-import { reserveUserFromPool } from '../../helpers/spectron/user';
+import { restartApp, test, useWebdriver } from '../../helpers/webdriver';
+import { reserveUserFromPool } from '../../helpers/webdriver/user';
 import { getApiClient } from '../../helpers/api-client';
 import { StreamSettingsService } from '../../../app/services/settings/streaming';
 import { assertFormContains, fillForm } from '../../helpers/modules/forms';
 import { logIn } from '../../helpers/modules/user';
 
-useSpectron();
+useWebdriver();
 
 test('Streaming to Twitch', async t => {
   await logIn('twitch', { multistream: false });

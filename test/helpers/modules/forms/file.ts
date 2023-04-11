@@ -1,6 +1,6 @@
 import { BaseInputController } from './base';
 import { click } from '../core';
-import { dialogSelectPath } from '../../spectron/dialog';
+import { dialogSelectPath } from '../../webdriver/dialog';
 
 export class FileInputController extends BaseInputController<string> {
   async setValue(filePath: string) {

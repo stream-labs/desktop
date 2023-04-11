@@ -33,5 +33,6 @@
   "FBPrivacyWarning": "The granted privacy level may be limited for your Facebook account. Check the \"Who can see you use this business integration\" section for the Streamlabs integration <link>here</link>",
   "Only Me": "Only Me",
   "Do not change privacy settings": "Do not change privacy settings",
-  "Install %{overlayName}": "Install %{overlayName}"
+  "Install %{overlayName}": "Install %{overlayName}",
+  "Please note that while you can schedule streams to Facebook, some will not appear on this calendar due to API limitations": "Please note that while you can schedule streams to Facebook, some will not appear on this calendar due to API limitations"
 }

@@ -9,11 +9,11 @@ import {
 import { fillForm, useForm } from '../../helpers/modules/forms';
 import { click, clickButton, isDisplayed, waitForDisplayed } from '../../helpers/modules/core';
 import { logIn } from '../../helpers/modules/user';
-import { releaseUserInPool, reserveUserFromPool } from '../../helpers/spectron/user';
+import { releaseUserInPool, reserveUserFromPool } from '../../helpers/webdriver/user';
 import { showSettingsWindow } from '../../helpers/modules/settings/settings';
-import { test, useSpectron } from '../../helpers/spectron';
+import { test, useWebdriver } from '../../helpers/webdriver';
 
-useSpectron();
+useWebdriver();
 
 test('Multistream default mode', async t => {
   // login to via Twitch because it doesn't have strict rate limits

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Menu } from 'antd';
 import * as remote from '@electron/remote';
 import cx from 'classnames';
@@ -26,10 +26,17 @@ export default function AddSource() {
     AudioService,
   } = Services;
 
-  const sourceType = WindowsService.getChildWindowQueryParams().sourceType as TSourceType;
-  const sourceAddOptions = (WindowsService.getChildWindowQueryParams().sourceAddOptions || {
-    propertiesManagerSettings: {},
-  }) as ISourceAddOptions;
+  const sourceType = useMemo(
+    () => WindowsService.getChildWindowQueryParams().sourceType as TSourceType,
+    [],
+  );
+  const sourceAddOptions = useMemo(
+    () =>
+      (WindowsService.getChildWindowQueryParams().sourceAddOptions || {
+        propertiesManagerSettings: {},
+      }) as ISourceAddOptions,
+    [],
+  );
   const widgetType = sourceAddOptions.propertiesManagerSettings?.widgetType;
 
   const { platform, activeScene, sources } = useVuex(() => ({

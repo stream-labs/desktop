@@ -6,7 +6,7 @@ import { focusWindow } from '../modules/core';
  */
 export async function installFetchMock(t: TExecutionContext) {
   await focusWindow('worker');
-  await t.context.app.webContents.executeJavaScript(`
+  await t.context.app.client.execute(`
     window.fetchMock = require('fetch-mock');
     0; // Prevent returning a value that cannot be serialized
   `);
@@ -17,7 +17,7 @@ export async function installFetchMock(t: TExecutionContext) {
  */
 export async function fetchMock(t: TExecutionContext, regExp: RegExp, code: number) {
   await focusWindow('worker');
-  await t.context.app.webContents.executeJavaScript(`
+  await t.context.app.client.execute(`
     fetchMock.mock(${regExp.toString()}, ${code});
     0; // Prevent returning a value that cannot be serialized
   `);
@@ -28,7 +28,7 @@ export async function fetchMock(t: TExecutionContext, regExp: RegExp, code: numb
  */
 export async function resetFetchMock(t: TExecutionContext) {
   await focusWindow('worker');
-  await t.context.app.webContents.executeJavaScript(`
+  await t.context.app.client.execute(`
     fetchMock.reset();
     0; // Prevent returning a value that cannot be serialized
   `);

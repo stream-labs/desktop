@@ -1,4 +1,4 @@
-// Tools for dealing with forms in spectron
+// Tools for dealing with forms in webdriver
 
 import { TExecutionContext } from './index';
 import { getClient, waitForDisplayed } from '../modules/core';

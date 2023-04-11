@@ -1,8 +1,8 @@
-import { test, useSpectron } from '../../helpers/spectron';
+import { test, useWebdriver } from '../../helpers/webdriver';
 import { showSettingsWindow } from '../../helpers/modules/settings/settings';
 import { clickButton, clickTab, focusChild } from '../../helpers/modules/core';
 import { useForm } from '../../helpers/modules/forms';
-useSpectron();
+useWebdriver();
 
 /**
  * Test shared input components
