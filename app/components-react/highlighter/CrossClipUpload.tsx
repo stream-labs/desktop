@@ -1,13 +1,13 @@
 import React, { useEffect } from 'react';
 import * as remote from '@electron/remote';
-import { Progress } from 'antd';
 import cx from 'classnames';
 import { Services } from 'components-react/service-provider';
 import { useVuex } from 'components-react/hooks';
-import { humanFileSize } from './YoutubeUpload';
 import { $t } from 'services/i18n';
 import Translate from 'components-react/shared/Translate';
+import UploadProgress from './UploadProgress';
 import styles from './ExportModal.m.less';
+import VideoPreview from './VideoPreview';
 
 export default function CrossClipUpload(p: { onClose: () => void }) {
   const { UserService, HighlighterService, OnboardingService } = Services;
@@ -16,37 +16,6 @@ export default function CrossClipUpload(p: { onClose: () => void }) {
     uploadInfo: HighlighterService.views.uploadInfo,
     hasSLID: !!UserService.views.auth?.slid?.id,
   }));
-
-  function UploadProgress() {
-    return (
-      <div>
-        <h2>{$t('Upload Progress')}</h2>
-        <Progress
-          percent={Math.round((uploadInfo.uploadedBytes / uploadInfo.totalBytes) * 100)}
-          trailColor="var(--section)"
-          status={uploadInfo.cancelRequested ? 'exception' : 'normal'}
-        />
-        {!uploadInfo.cancelRequested && (
-          <div>
-            {$t('Uploading: %{uploadedBytes}/%{totalBytes}', {
-              uploadedBytes: humanFileSize(uploadInfo.uploadedBytes, false),
-              totalBytes: humanFileSize(uploadInfo.totalBytes, false),
-            })}
-          </div>
-        )}
-        {uploadInfo.cancelRequested && <span>{$t('Canceling...')}</span>}
-        <br />
-        <button
-          className="button button--soft-warning"
-          onClick={() => HighlighterService.actions.cancelUpload()}
-          style={{ marginTop: '16px' }}
-          disabled={uploadInfo.cancelRequested}
-        >
-          {$t('Cancel')}
-        </button>
-      </div>
-    );
-  }
 
   function connectSLID() {
     OnboardingService.actions.start({ isLogin: true });
@@ -61,6 +30,7 @@ export default function CrossClipUpload(p: { onClose: () => void }) {
   if (uploadInfo.uploading) return <UploadProgress />;
   return (
     <div className={styles.crossclipContainer}>
+      <VideoPreview />
       <button
         className={cx('button button--action', styles.uploadButton)}
         onClick={() => HighlighterService.actions.uploadStorage()}

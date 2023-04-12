@@ -11,6 +11,7 @@ import { confirmAsync } from 'components-react/modals';
 import { $t } from 'services/i18n';
 import { injectState, useModule } from 'slap';
 import CrossClipUpload from './CrossClipUpload';
+import { useVuex } from 'components-react/hooks';
 
 class ExportModule {
   get service() {
@@ -233,8 +234,12 @@ function ExportOptions(p: { close: () => void }) {
 }
 
 function PlatformSelect(p: { onClose: () => void }) {
-  const [platform, setPlatform] = useState('youtube');
   const { videoName } = useModule(ExportModule);
+  const { UserService } = Services;
+  const { isYoutubeLinked } = useVuex(() => ({
+    isYoutubeLinked: !!UserService.state.auth?.platforms.youtube,
+  }));
+  const [platform, setPlatform] = useState(() => (isYoutubeLinked ? 'youtube' : 'crossclip'));
 
   return (
     <Form>
