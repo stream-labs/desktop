@@ -78,9 +78,7 @@ class GreenViews extends ViewHandler<IGreenServiceState> {
 
     if (!this.hasGreenNodes) return;
 
-    return Object.entries(this.state.sceneNodeMaps[activeSceneId]).map(
-      ([key, value]: [string, string]) => value,
-    );
+    return Object.values(this.state.sceneNodeMaps[activeSceneId]);
   }
 
   get displays() {
