@@ -1,6 +1,11 @@
 import { Node } from './node';
 import { HotkeysNode } from './hotkeys';
-import { SourcesService, TSourceType, TPropertiesManager, isNoAudioPropertiesManagerType } from 'services/sources';
+import {
+  SourcesService,
+  TSourceType,
+  TPropertiesManager,
+  isNoAudioPropertiesManagerType,
+} from 'services/sources';
 import { FontLibraryService } from 'services/font-library';
 import { AudioService } from 'services/audio';
 import { Inject } from '../../core/injector';
@@ -231,6 +236,8 @@ export class SourcesNode extends Node<ISchema, {}> {
           };
         }),
         syncOffset: { sec: 0, nsec: 0 }, // streamlabs v0.16.3 にはないが無いとコンパイルエラーが出る
+        deinterlaceMode: source.deinterlaceMode || obs.EDeinterlaceMode.Disable, //* https://github.com/stream-labs/desktop/blob/36d3339590283ca070f0300ba87734da9481a291/app/services/scene-collections/nodes/sources.ts#L233
+        deinterlaceFieldOrder: source.deinterlaceFieldOrder || obs.EDeinterlaceFieldOrder.Top, //*
       };
     });
 

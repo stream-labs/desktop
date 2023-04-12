@@ -339,7 +339,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
       'wasapi_output_capture',
       'decklink-input',
       'ndi_source',
-      'openvr_capture',
+      //*不要      'openvr_capture',
       'liv_capture',
       'ovrstream_dc_source',
       'vlc_source',
@@ -482,7 +482,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
       size: {
         width: 600,
         height: 600,
-      }
+      },
     };
 
     // HACK: childWindow で表示してしまうとウィンドウキャプチャでクラッシュするので OneOffWindow で代替している
@@ -492,7 +492,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
       ? this.closeSourcePropertiesWindow()
       : Promise.resolve()
     ).then(() => {
-      if (!sourceId.startsWith("window_capture")) {
+      if (!sourceId.startsWith('window_capture')) {
         this.windowsService.showWindow(baseConfig);
         return;
       }
