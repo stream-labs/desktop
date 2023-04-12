@@ -34,6 +34,12 @@ export class MagicLinkService extends Service {
     }${sourceString}`;
   }
 
+  async getMergeUrl(platform: string) {
+    const token = (await this.fetchNewToken()).login_token;
+
+    return `https://${this.hostsService.streamlabs}/slobs/magic/merge/${platform}_account?login_token=${token}`;
+  }
+
   private fetchNewToken(): Promise<ILoginTokenResponse> {
     const headers = authorizedHeaders(this.userService.apiToken);
     const request = new Request(
