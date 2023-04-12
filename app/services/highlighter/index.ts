@@ -1021,10 +1021,15 @@ export class HighlighterService extends StatefulService<IHighligherState> {
       },
     );
     this.cancelFunction = cancel;
-    const { id } = await complete;
-
-    this.cancelFunction = null;
-    this.SET_UPLOAD_INFO({ uploading: false, cancelRequested: false, videoId: id });
+    let id;
+    try {
+      const result = await complete;
+      id = result.id;
+      this.cancelFunction = null;
+      this.SET_UPLOAD_INFO({ uploading: false, cancelRequested: false, videoId: id });
+    } catch (e: unknown) {
+      this.SET_UPLOAD_INFO({ uploading: false, error: true });
+    }
 
     if (id) {
       this.usageStatisticsService.recordAnalyticsEvent('Highlighter', {

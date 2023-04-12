@@ -34,7 +34,7 @@ export class SharedStorageService extends Service {
   uploader: S3Uploader;
 
   get host() {
-    return `${this.hostsService.streamlabs}/api/v5/slobs/streamlabs-storage`;
+    return `https://${this.hostsService.streamlabs}/api/v5/slobs/streamlabs-storage`;
   }
 
   async uploadFile(
@@ -72,7 +72,10 @@ export class SharedStorageService extends Service {
 
   async completeUpload(body: { parts?: { number: number; tag: string }[] }) {
     const url = `${this.host}/storage/v1/temporary-files/${this.id}/complete`;
-    const headers = authorizedHeaders(this.userService.apiToken);
+    const headers = authorizedHeaders(
+      this.userService.apiToken,
+      new Headers({ 'Content-Type': 'application/json' }),
+    );
     return await jfetch(new Request(url, { headers, method: 'POST', body: JSON.stringify(body) }));
   }
 
@@ -114,7 +117,10 @@ export class SharedStorageService extends Service {
   private async generateShare(): Promise<{ id: string }> {
     if (!this.id) return;
     const url = `${this.host}/storage/v1/temporary-shares/`;
-    const headers = authorizedHeaders(this.userService.apiToken);
+    const headers = authorizedHeaders(
+      this.userService.apiToken,
+      new Headers({ 'Content-Type': 'application/json' }),
+    );
     const body = JSON.stringify({ temporary_file_id: this.id, type: 'video' });
     return await jfetch(new Request(url, { method: 'POST', headers, body }));
   }
@@ -206,17 +212,12 @@ class S3Uploader {
       );
     }
 
-    const headers = authorizedHeaders(this.userService.apiToken);
+    const headers = new Headers();
     headers.append('Content-Type', this.type);
-    headers.append(
-      'Content-Range',
-      `bytes ${this.uploadedSize}-${this.uploadedSize + chunkSize - 1}/${this.size}`,
-    );
-    headers.append('X-Upload-Content-Type', this.type);
 
     this.uploadedSize += chunkSize;
 
-    const result: { eTag: string } = await jfetch(
+    const result = await fetch(
       new Request(url, {
         method: 'PUT',
         headers,
@@ -224,7 +225,9 @@ class S3Uploader {
       }),
     );
 
-    this.parts.push({ number: this.parts.length + 1, tag: result.eTag });
+    const tag = result.headers.get('ETag').replace(/"/g, '');
+
+    this.parts.push({ number: this.parts.length + 1, tag });
 
     this.onProgress({
       totalBytes: this.size,
