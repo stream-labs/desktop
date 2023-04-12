@@ -108,7 +108,7 @@ export function Ultra() {
           },
           { text: '✓', key: 'check1' },
           { text: '✓', key: 'check2' },
-          { text: $t('Add Up To 4 Guests or Cameras') },
+          { text: $t('Add Up To 11 Guests or Cameras') },
           { text: $t('Custom Tip Page and Domain') },
           { text: '10GB' },
           { text: $t('YouTube Thumbnail Maker, Creator Sites') },
