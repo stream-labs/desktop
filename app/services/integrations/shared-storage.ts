@@ -155,7 +155,9 @@ class S3Uploader {
     this.uploadUrls = opts.fileInfo.uploadUrls;
     this.isMultipart = opts.fileInfo.isMultipart;
     this.size = opts.fileInfo.file.size;
-    this.chunkSize = this.isMultipart ? Math.round(this.size / this.uploadUrls.length) : this.size;
+    this.chunkSize = this.isMultipart
+      ? Math.max(Math.round(this.size / this.uploadUrls.length), 1024 * 1024 * 5)
+      : this.size;
     this.type = opts.fileInfo.file.mime_type;
     this.filepath = opts.filepath;
     this.cancel = this.cancel.bind(this);
