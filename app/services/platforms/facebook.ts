@@ -292,8 +292,13 @@ export class FacebookService
     switchToLive = false,
   ): Promise<IFacebookLiveVideo> {
     const { title, description, game, privacy, event_params } = options;
-    const data: Dictionary<any> = { title, description, event_params };
+    const data: Dictionary<any> = { title, description };
+
     if (game) data.game_specs = { name: game };
+
+    if (Object.keys(event_params).length) {
+      data.event_params = event_params;
+    }
 
     if (event_params.start_time) {
       // convert plannedStartTime from milliseconds to seconds
