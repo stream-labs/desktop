@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useMemo } from 'react';
 import cx from 'classnames';
 import { Dropdown, Tooltip, Tree, message } from 'antd';
 import { DownOutlined } from '@ant-design/icons';
@@ -54,6 +54,16 @@ function SceneSelector() {
     activeCollection: SceneCollectionsService.activeCollection,
     collections: SceneCollectionsService.collections,
   }));
+
+  const horizontalTooltip = useMemo(
+    () => (v.isHorizontal ? $t('Hide horizontal display.') : $t('Show horizontal display.')),
+    [v.isHorizontal],
+  );
+
+  const verticalTooltip = useMemo(
+    () => (v.isVertical ? $t('Hide vertical display.') : $t('Show vertical display.')),
+    [v.isVertical],
+  );
 
   function showContextMenu(info: { event: React.MouseEvent }) {
     info.event.preventDefault();
@@ -201,7 +211,7 @@ function SceneSelector() {
         </Tooltip>
 
         {v.showDualOutput && (
-          <Tooltip title={$t('Show horizontal display.')} placement="bottomRight">
+          <Tooltip title={horizontalTooltip} placement="bottomRight">
             <i
               onClick={() => {
                 if (v.isMidStreamMode) {
@@ -220,7 +230,7 @@ function SceneSelector() {
         )}
 
         {v.showDualOutput && (
-          <Tooltip title={$t('Show vertical display.')} placement="bottomRight">
+          <Tooltip title={verticalTooltip} placement="bottomRight">
             <i
               onClick={() => {
                 if (v.isMidStreamMode) {

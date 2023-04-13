@@ -316,35 +316,16 @@ function StudioModeControls(p: { stacked: boolean }) {
 }
 
 function DualOutputControls(p: { stacked: boolean }) {
-  const horizontalTooltipText = $t('Arrange horizontal scene layout.');
-  const verticalTooltipText = $t('Arrange vertical scene layout.');
-
   return (
     <div className={cx(styles.dualOutputModeControls, { [styles.stacked]: p.stacked })}>
       <div className={styles.dualOutputModeDetails}>
         <i className="icon-desktop" />
         <span>{$t('Horizontal Output')}</span>
-        <Tooltip
-          title={horizontalTooltipText}
-          placement="right"
-          overlayInnerStyle={{ width: '223px' }}
-          className={styles.dualOutputTip}
-        >
-          <i className="icon-information" />
-        </Tooltip>
       </div>
 
       <div className={styles.dualOutputModeDetails}>
         <i className="icon-phone-case" />
         <span>{$t('Vertical Output')}</span>
-        <Tooltip
-          title={verticalTooltipText}
-          placement="right"
-          overlayInnerStyle={{ width: '203px' }}
-          className={styles.dualOutputTip}
-        >
-          <i className="icon-information" />
-        </Tooltip>
       </div>
     </div>
   );
