@@ -94,7 +94,6 @@ export interface IPartialSettings {
   scaleFilter?: EScaleType;
   blendingMode?: EBlendingMode;
   blendingMethod?: EBlendingMethod;
-  output?: obs.IVideo; // for obs.ISceneItem, this property is video
 }
 
 export interface ISceneItem extends ISceneItemSettings, ISceneItemNode {
@@ -102,7 +101,6 @@ export interface ISceneItem extends ISceneItemSettings, ISceneItemNode {
   sourceId: string;
   obsSceneItemId: number;
   sceneNodeType: 'item';
-  output?: obs.IVideo; // for obs.ISceneItem, this property is video
 }
 
 export interface ISceneItemActions {
@@ -183,11 +181,6 @@ class ScenesViews extends ViewHandler<IScenesState> {
     return null;
   }
 
-  getSceneItemsBySceneId(sceneId: string): SceneItem[] {
-    const scene: Scene | null = this.getScene(sceneId);
-    return scene ? scene.getItems() : ([] as SceneItem[]);
-  }
-
   /**
    * Returns an array of all scene items across all scenes
    * referencing the given source id.
@@ -213,11 +206,6 @@ class ScenesViews extends ViewHandler<IScenesState> {
       if (sceneNode) return sceneNode;
     }
     return null;
-  }
-
-  getNodeVisibility(sceneNodeId: string) {
-    const nodeModel: TSceneNode | null = this.getSceneNode(sceneNodeId);
-    return nodeModel instanceof SceneItem ? nodeModel?.visible : null;
   }
 }
 

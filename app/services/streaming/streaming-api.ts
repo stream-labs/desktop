@@ -49,7 +49,6 @@ export interface IStreamInfo {
     tiktok: TGoLiveChecklistItemState;
     trovo: TGoLiveChecklistItemState;
     setupMultistream: TGoLiveChecklistItemState;
-    setupGreen: TGoLiveChecklistItemState;
     startVideoTransmission: TGoLiveChecklistItemState;
     postTweet: TGoLiveChecklistItemState;
   };

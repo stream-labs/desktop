@@ -2,8 +2,8 @@ import React, { useEffect, useRef } from 'react';
 import { useVuex } from '../hooks';
 import { Services } from '../service-provider';
 import { Display as OBSDisplay } from '../../services/video';
-import { TDisplayType } from 'services/settings-v2/video';
 import uuid from 'uuid/v4';
+
 interface DisplayProps {
   sourceId?: string;
   paddingSize?: number;
@@ -12,11 +12,10 @@ interface DisplayProps {
   onOutputResize?: (region: IRectangle) => void;
   clickHandler?: (event: React.MouseEvent) => void;
   style?: React.CSSProperties;
-  type?: TDisplayType;
 }
 
 export default function Display(props: DisplayProps) {
-  const { CustomizationService, VideoSettingsService } = Services;
+  const { VideoService, CustomizationService } = Services;
 
   const p = {
     paddingSize: 0,
@@ -26,14 +25,13 @@ export default function Display(props: DisplayProps) {
     ...props,
   };
 
-  const v = useVuex(() => {
-    const videoSettings = VideoSettingsService.contexts[p.type ?? 'horizontal']?.video;
-
-    return {
+  const v = useVuex(
+    () => ({
       paddingColor: CustomizationService.views.displayBackground,
-      baseResolution: `${videoSettings?.baseWidth}x${videoSettings?.baseHeight}`,
-    };
-  }, false);
+      baseResolution: VideoService.baseResolution,
+    }),
+    false,
+  );
 
   const obsDisplay = useRef<OBSDisplay | null>(null);
   const displayEl = useRef<HTMLDivElement>(null);
@@ -57,7 +55,6 @@ export default function Display(props: DisplayProps) {
       paddingSize: p.paddingSize,
       paddingColor: v.paddingColor,
       renderingMode: p.renderingMode,
-      type: p.type,
     });
     obsDisplay.current.setShoulddrawUI(p.drawUI);
     obsDisplay.current.onOutputResize(region => p.onOutputResize(region));
@@ -82,12 +79,7 @@ export default function Display(props: DisplayProps) {
     <div
       className="display"
       ref={displayEl}
-      style={{
-        height: '100%',
-        backgroundColor: 'var(--section)',
-        flexGrow: 1,
-        ...p.style,
-      }}
+      style={{ height: '100%', backgroundColor: 'var(--section)', flexGrow: 1, ...p.style }}
       onClick={onClickHandler}
     />
   );

@@ -13,8 +13,7 @@ import { throwStreamError } from 'services/streaming/stream-error';
 import { BasePlatformService } from './base-platform';
 import { WindowsService } from '../windows';
 import { assertIsDefined, getDefined } from '../../util/properties-type-guards';
-import { TDisplayType } from 'services/settings-v2';
-import { TOutputOrientation } from 'services/restream';
+
 interface IFacebookPage {
   access_token: string;
   name: string;
@@ -92,7 +91,6 @@ export interface IFacebookStartStreamOptions {
   description?: string;
   liveVideoId?: string;
   privacy?: { value: TFacebookStreamPrivacy };
-  mode?: TOutputOrientation;
   event_params: { start_time?: number; cover?: string; status?: TFacebookStatus };
 }
 
@@ -120,7 +118,6 @@ const initialState: IFacebookServiceState = {
     title: '',
     description: '',
     game: '',
-    mode: undefined,
     event_params: {},
     privacy: { value: 'EVERYONE' },
   },
@@ -236,7 +233,7 @@ export class FacebookService
     return this.state.streamDashboardUrl;
   }
 
-  async beforeGoLive(options: IGoLiveSettings, context?: TDisplayType) {
+  async beforeGoLive(options: IGoLiveSettings) {
     const fbOptions = getDefined(options.platforms.facebook);
 
     let liveVideo: IFacebookLiveVideo;
@@ -256,15 +253,12 @@ export class FacebookService
     const streamUrl = liveVideo.stream_url;
     const streamKey = streamUrl.slice(streamUrl.lastIndexOf('/') + 1);
     if (!this.streamingService.views.isMultiplatformMode) {
-      this.streamSettingsService.setSettings(
-        {
-          key: streamKey,
-          platform: 'facebook',
-          streamType: 'rtmp_common',
-          server: 'rtmps://rtmp-api.facebook.com:443/rtmp/',
-        },
-        context,
-      );
+      this.streamSettingsService.setSettings({
+        key: streamKey,
+        platform: 'facebook',
+        streamType: 'rtmp_common',
+        server: 'rtmps://rtmp-api.facebook.com:443/rtmp/',
+      });
     }
     this.SET_STREAM_KEY(streamKey);
     this.SET_STREAM_PAGE_URL(`https://facebook.com/${liveVideo.permalink_url}`);
@@ -277,8 +271,6 @@ export class FacebookService
       assertIsDefined(fbOptions.pageId);
       await this.postPage(fbOptions.pageId);
     }
-
-    this.setPlatformContext('facebook');
   }
 
   /**

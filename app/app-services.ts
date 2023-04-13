@@ -94,7 +94,6 @@ export { RecentEventsService } from 'services/recent-events';
 export { MagicLinkService } from 'services/magic-link';
 export { GrowService } from 'services/grow/grow';
 export { GuestCamService } from 'services/guest-cam';
-export { GreenService } from 'services/green';
 
 // WIDGETS
 export { WidgetSource, WidgetsService } from './services/widgets';
@@ -187,7 +186,6 @@ import { SideNavService } from './services/side-nav';
 import { VideoSettingsService } from 'services/settings-v2/video';
 import { SettingsManagerService } from 'services/settings-manager';
 import { MarkersService } from 'services/markers';
-import { GreenService } from 'services/green';
 
 export const AppServices = {
   AppService,
@@ -258,5 +256,4 @@ export const AppServices = {
   VideoSettingsService,
   SettingsManagerService,
   MarkersService,
-  GreenService,
 };

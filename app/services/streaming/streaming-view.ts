@@ -156,30 +156,6 @@ export class StreamInfoView<T extends Object> extends ViewHandler<T> {
     return this.streamingState.streamingStatus !== 'offline';
   }
 
-  get isGreen(): boolean {
-    return Services.VideoSettingsService.isGreen;
-  }
-
-  get activeDisplayPlatforms() {
-    return Services.GreenService.views.activeDisplayPlatforms;
-  }
-
-  get contextsToStream() {
-    return Services.GreenService.views.contextsToStream;
-  }
-
-  get activeDisplays() {
-    return Services.GreenService.views.activeDisplays;
-  }
-
-  get hasGreenContext() {
-    return !!Services.VideoSettingsService.contexts.green;
-  }
-
-  getPlatformDisplay(platform: TPlatform) {
-    return Services.GreenService.views.getPlatformDisplay(platform);
-  }
-
   /**
    * Returns total viewer count for all enabled platforms
    */
