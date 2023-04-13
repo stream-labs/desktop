@@ -2,9 +2,8 @@ import React from 'react';
 import { useVuex } from 'components-react/hooks';
 import { Services } from '../../service-provider';
 import { $t } from 'services/i18n';
-import { message } from 'antd';
 import { ObsSettingsSection } from './ObsSettings';
-import { RadioInput, SwitchInput } from 'components-react/shared/inputs';
+import { RadioInput } from 'components-react/shared/inputs';
 import PlatformLogo from 'components-react/shared/PlatformLogo';
 import Translate from 'components-react/shared/Translate';
 import UltraIcon from 'components-react/shared/UltraIcon';
@@ -26,8 +25,6 @@ export function MultistreamingSettings() {
     isLoggedIn: UserService.views.isLoggedIn,
     isPrime: UserService.views.isPrime,
     platformSettingsList: DualOutputService.views.platformSettingsList,
-    dualOutputMode: DualOutputService.views.dualOutputMode,
-    showDualOutput: DualOutputService.views.showDualOutput,
     setShowDualOutput: DualOutputService.actions.setShowDualOutput,
     updatePlatformSetting: DualOutputService.actions.updatePlatformSetting,
     isMidStreamMode: StreamingService.views.isMidStreamMode,
@@ -108,31 +105,6 @@ export function MultistreamingSettings() {
         )}
       </ObsSettingsSection>
       <ObsSettingsSection title={$t('Dual Output')} style={{ paddingBottom: '30px' }}>
-        <div className={styles.doDescription}>
-          <SwitchInput
-            value={v.showDualOutput}
-            layout="horizontal"
-            onChange={() => {
-              if (!v.dualOutputMode) {
-                v.setShowDualOutput();
-              } else {
-                message.error({
-                  content: 'Cannot hide dual output toggles in dual output mode.',
-                  duration: 2,
-                });
-              }
-            }}
-          />
-          {$t('Enable Dual Outputs (simultaneous horizontal and vertical Outputs)')}{' '}
-          <Tooltip
-            title={$t('Set up your resolution for each orientation in the Video Settings tab.')}
-            className={styles.doTooltip}
-            placement="bottom"
-            lightShadow
-          >
-            <i className="icon-information" />
-          </Tooltip>
-        </div>
         <div className={styles.doSettings}>
           <div className={styles.doDescription}>
             {$t('Set your default output mode for each platform.')}{' '}

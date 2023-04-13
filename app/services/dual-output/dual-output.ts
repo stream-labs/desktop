@@ -199,7 +199,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
    * Edit dual output display settings
    */
 
-  async setShowDualOutput() {
+  setShowDualOutput() {
     this.SET_SHOW_DUAL_OUTPUT();
   }
 

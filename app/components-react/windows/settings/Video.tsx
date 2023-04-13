@@ -1,8 +1,11 @@
 import * as remote from '@electron/remote';
 import React from 'react';
+import { message } from 'antd';
 import { useModule, injectState } from 'slap';
 import { Services } from '../../service-provider';
 import FormFactory, { TInputValue } from 'components-react/shared/inputs/FormFactory';
+import { CheckboxInput } from 'components-react/shared/inputs';
+import Tooltip from 'components-react/shared/Tooltip';
 import * as obs from '../../../../obs-api';
 import { $t } from 'services/i18n';
 import styles from './Common.m.less';
@@ -13,6 +16,9 @@ const CANVAS_RES_OPTIONS = [
   { label: '1920x1080', value: '1920x1080' },
   { label: '1280x720', value: '1280x720' },
 ];
+
+// @@@ TODO: add vertical canvas options
+const VERTICAL_CANVAS_OPTIONS = [{ label: '540x960', value: '540x960' }];
 
 const OUTPUT_RES_OPTIONS = [
   { label: '1920x1080', value: '1920x1080' },
@@ -27,6 +33,9 @@ const OUTPUT_RES_OPTIONS = [
   { label: '698x392', value: '698x392' },
   { label: '640x360', value: '640x360' },
 ];
+
+// @@@ TODO: add vertical output res options
+const VERTICAL_OUTPUT_RES_OPTIONS = [{ label: '540x960', value: '540x960' }];
 
 const FPS_OPTIONS = [
   { label: '10', value: '10-1' },
@@ -66,6 +75,7 @@ class VideoSettingsModule {
 
   state = injectState({
     display: 'horizontal' as TDisplayType,
+    showDualOutputSettings: Services.DualOutputService.views.showDualOutput,
     customBaseRes: !this.baseResOptions.find(
       opt => opt.value === this.service.values.horizontal.baseRes,
     ),
@@ -184,12 +194,20 @@ class VideoSettingsModule {
   }
 
   get baseResOptions() {
+    if (this.state?.display === 'vertical') {
+      return VERTICAL_CANVAS_OPTIONS;
+    }
+
     return CANVAS_RES_OPTIONS.concat(this.monitorResolutions).concat([
       { label: $t('Custom'), value: 'custom' },
     ]);
   }
 
   get outputResOptions() {
+    if (this.state?.display === 'vertical') {
+      return VERTICAL_OUTPUT_RES_OPTIONS;
+    }
+
     const baseRes = `${this.service.state.horizontal.baseWidth}x${this.service.state.horizontal.baseHeight}`;
     if (!OUTPUT_RES_OPTIONS.find(opt => opt.value === baseRes)) {
       return [{ label: baseRes, value: baseRes }]
@@ -339,15 +357,55 @@ class VideoSettingsModule {
     this.state.setFpsDen(this.service.values[display].fpsDen);
     this.state.setFpsInt(this.service.values[display].fpsInt);
   }
+
+  setShowDualOutput() {
+    if (Services.DualOutputService.views.dualOutputMode) {
+      message.error({
+        content: 'Cannot hide dual output toggles in dual output mode.',
+        duration: 2,
+      });
+    } else {
+      Services.DualOutputService.actions.setShowDualOutput();
+      this.state.setShowDualOutputSettings(!this.state.showDualOutputSettings);
+    }
+  }
 }
 
 export function VideoSettings() {
-  const { values, metadata, onChange, setDisplay } = useModule(VideoSettingsModule);
+  const {
+    values,
+    metadata,
+    showDualOutputSettings,
+    onChange,
+    setDisplay,
+    setShowDualOutput,
+  } = useModule(VideoSettingsModule);
 
   return (
     <>
-      <h2>{$t('Video')}</h2>
-      <Tabs onChange={setDisplay} />
+      <div className={styles.videoSettingsHeader}>
+        <h2>{$t('Video')}</h2>
+        <div className={styles.doToggle}>
+          {/* THIS CHECKBOX TOGGLES DUAL OUTPUT MODE FOR THE ENTIRE APP */}
+          <CheckboxInput
+            value={showDualOutputSettings}
+            onChange={setShowDualOutput}
+            className={styles.doCheckbox}
+          />
+          {$t('Enable Dual Output')}
+          <Tooltip
+            title={$t(
+              'Stream to horizontal and vertical platforms simultaneously. Recordings will be in horizontal only.',
+            )}
+            className={styles.doTooltip}
+            placement="bottom"
+            lightShadow
+          >
+            <i className="icon-information" />
+          </Tooltip>
+        </div>
+      </div>
+      {showDualOutputSettings && <Tabs onChange={setDisplay} />}
       <div className={styles.formSection}>
         <FormFactory
           values={values}
