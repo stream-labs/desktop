@@ -1,9 +1,9 @@
-import styles from '../GoLive.m.less';
+import styles from './DualOutputGoLive.m.less';
 import { WindowsService } from 'app-services';
 import { ModalLayout } from 'components-react/shared/ModalLayout';
 import { Button } from 'antd';
 import { Services } from 'components-react/service-provider';
-import GoLiveSettings from '../GoLiveSettings';
+import DualOutputGoLiveSettings from './DualOutputGoLiveSettings';
 import React from 'react';
 import { $t } from 'services/i18n';
 import GoLiveChecklist from '../GoLiveChecklist';
@@ -27,8 +27,7 @@ export default function DualOutputGoLiveWindow() {
   const shouldShowChecklist = ['runChecklist', 'live'].includes(lifecycle);
 
   return (
-    <ModalLayout footer={<ModalFooter />}>
-      {'DUAL OUTPUT GO LIVE!'}
+    <ModalLayout footer={<ModalFooter />} className={styles.dualOutputGoLive}>
       <Form
         form={form!}
         style={{ position: 'relative', height: '100%' }}
@@ -37,7 +36,7 @@ export default function DualOutputGoLiveWindow() {
       >
         <Animation transitionName={shouldShowChecklist ? 'slideright' : ''}>
           {/* STEP 1 - FILL OUT THE SETTINGS FORM */}
-          {shouldShowSettings && <GoLiveSettings key={'settings'} />}
+          {shouldShowSettings && <DualOutputGoLiveSettings key={'settings'} />}
 
           {/* STEP 2 - RUN THE CHECKLIST */}
           {shouldShowChecklist && <GoLiveChecklist className={styles.page} key={'checklist'} />}

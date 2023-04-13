@@ -16,6 +16,7 @@ type TProps = {
   hideFooter?: boolean;
   scrollable?: boolean;
   wrapperStyle?: React.CSSProperties;
+  className?: string;
 } & Pick<ModalProps, 'footer' | 'onOk' | 'okText' | 'bodyStyle' | 'confirmLoading' | 'onCancel'>;
 
 // calculate OS dependent styles
@@ -78,7 +79,7 @@ export function ModalLayout(p: TProps) {
 
   return (
     <div
-      className={cx('ant-modal-content', v.currentTheme)}
+      className={cx('ant-modal-content', v.currentTheme, p.className)}
       style={{ ...wrapperStyles, ...p.wrapperStyle }}
     >
       {p.fixedChild && <div style={fixedStyles}>{p.fixedChild}</div>}
