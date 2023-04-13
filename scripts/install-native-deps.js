@@ -89,7 +89,7 @@ async function runScript() {
       } else if (process.arch == 'x64') {
         arch = '-x86_64';
       } else {
-        throw 'CPU architecture not supported.';  
+        throw 'CPU architecture not supported.';
       }
     } else {
       throw 'Platform not supported.';

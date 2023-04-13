@@ -1,6 +1,6 @@
 {
-  "Successfully saved %{filename}": "%{filename} sauvegardé",
-  "Successfully loaded %{filename}.overlay": "%{filename}.overlay chargé",
+  "Successfully saved %{filename}": "%{filename} sauvegardé avec succès",
+  "Successfully loaded %{filename}.overlay": "%{filename}.overlay chargé avec succès",
   "This is an experimental feature.  Use at your own risk.": "Cette fonctionnalité est expérimentale. Vous l'utilisez à vos propres risques.",
   "Export Overlay File": "Exporter un fichier de superposition",
   "Import Overlay File": "Importer un fichier de superposition",

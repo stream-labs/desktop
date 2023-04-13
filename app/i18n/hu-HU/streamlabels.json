@@ -5,15 +5,15 @@
   "Item Separator": "Tétel Elválasztó",
   "Item Limit": "Tétel Korlát",
   "Duration (seconds)": "Időtartam (másodperc)",
-  "Show Clock": "Óra Megjelenítése",
+  "Show Clock": "Óra megjelenítése",
   "Always, show 0:00 when inactive": "Mindig, mutasson 0:00-t mikor inaktív",
   "Hide when inactive": "Inaktivitás esetén elrejtés",
   "Show Count": "Számláló Mutatása",
   "Always, show 0 when inactive": "Mindig, mutasson 0-át, mikor inaktív",
-  "Show Latest": "Legújabb Megjelenítése",
+  "Show Latest": "Legújabb megjelenítése",
   "Always, show last person when inactive": "Mindig, mutassa az utolsó személyt mikor inaktív",
   "Include Resubs": "Tartalmazza az Újra Feliratkozásokat is",
   "Preview": "Előnézet",
   "Tokens: %{tokenList}": "Tokenek: %{tokenList}",
-  "Note: Actual label text may take up to 60 seconds to update": "Note: Actual label text may take up to 60 seconds to update"
+  "Note: Actual label text may take up to 60 seconds to update": "Megjegyzés: A címke tényleges szövegének frissítése akár 60 másodpercig is eltarthat"
 }
