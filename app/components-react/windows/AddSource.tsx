@@ -8,7 +8,7 @@ import { $t } from 'services/i18n';
 import { ModalLayout } from 'components-react/shared/ModalLayout';
 import Display from 'components-react/shared/Display';
 import { Services } from 'components-react/service-provider';
-import { useVuex } from 'components-react/hooks';
+import { useChildWindowParams, useVuex } from 'components-react/hooks';
 import styles from './AddSource.m.less';
 import { TextInput, SwitchInput } from 'components-react/shared/inputs';
 import Form, { useForm } from 'components-react/shared/inputs/Form';
@@ -26,17 +26,10 @@ export default function AddSource() {
     AudioService,
   } = Services;
 
-  const sourceType = useMemo(
-    () => WindowsService.getChildWindowQueryParams().sourceType as TSourceType,
-    [],
-  );
-  const sourceAddOptions = useMemo(
-    () =>
-      (WindowsService.getChildWindowQueryParams().sourceAddOptions || {
-        propertiesManagerSettings: {},
-      }) as ISourceAddOptions,
-    [],
-  );
+  const sourceType = useChildWindowParams('sourceType') as TSourceType;
+  const sourceAddOptions = (useChildWindowParams('sourceAddOptions') || {
+    propertiesManagerSettings: {},
+  }) as ISourceAddOptions;
   const widgetType = sourceAddOptions.propertiesManagerSettings?.widgetType;
 
   const { platform, activeScene, sources } = useVuex(() => ({
