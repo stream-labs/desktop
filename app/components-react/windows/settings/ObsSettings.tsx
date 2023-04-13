@@ -32,33 +32,6 @@ export function ObsGenericSettingsForm() {
 }
 
 /**
- * Renders generic inputs from OBS
- */
-export function ObsStreamSettingsForm() {
-  const { streamSettingsFormData, saveSettings } = useObsSettings();
-
-  return (
-    <>
-      <h2>{$t('Stream')}</h2>
-      <Tabs defaultActiveKey="horizontal">
-        <Tabs.TabPane tab={$t('Horizontal')} key="horizontal">
-          <ObsFormGroup
-            value={streamSettingsFormData.Stream}
-            onChange={newSettings => saveSettings(newSettings)}
-          />
-        </Tabs.TabPane>
-        <Tabs.TabPane tab={$t('Vertical')} key="vertical">
-          <ObsFormGroup
-            value={streamSettingsFormData.StreamSecond}
-            onChange={newSettings => saveSettings(newSettings)}
-          />
-        </Tabs.TabPane>
-      </Tabs>
-    </>
-  );
-}
-
-/**
  * A section layout for settings
  */
 export function ObsSettingsSection(

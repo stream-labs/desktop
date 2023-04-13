@@ -32,13 +32,6 @@ class ObsSettingsModule {
   get settingsFormData() {
     return this.settingsService.state[this.state.page]?.formData ?? [];
   }
-
-  get streamSettingsFormData() {
-    return {
-      Stream: this.settingsService.state[this.state.page]?.formData ?? [],
-      StreamSecond: this.settingsService.state['StreamSecond']?.formData ?? [],
-    };
-  }
 }
 
 // wrap the module in a hook
