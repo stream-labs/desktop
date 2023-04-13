@@ -5,7 +5,7 @@ import { ModalLayout } from 'components-react/shared/ModalLayout';
 import { Button, Menu, Modal } from 'antd';
 import Scrollable from 'components-react/shared/Scrollable';
 import { ListInput, TextInput } from 'components-react/shared/inputs';
-import { useVuex } from 'components-react/hooks';
+import { useChildWindowParams, useVuex } from 'components-react/hooks';
 import Form, { useForm } from 'components-react/shared/inputs/Form';
 import { TObsFormData } from 'components/obs/inputs/ObsInput';
 import { ObsForm } from 'components-react/obs/ObsForm';
@@ -26,7 +26,7 @@ const FilterMenuContainer = forwardRef<HTMLUListElement>((props, ref) => {
 
 export default function SourceFilters() {
   const { WindowsService, SourceFiltersService, SourcesService, EditorCommandsService } = Services;
-  const sourceId = useMemo(() => WindowsService.getChildWindowQueryParams().sourceId, []);
+  const sourceId = useChildWindowParams('sourceId');
   const { filters, isVisual, preset } = useVuex(() => ({
     filters: SourceFiltersService.views.filtersBySourceId(sourceId),
     isVisual: !!SourcesService.views.getSource(sourceId)?.video,
