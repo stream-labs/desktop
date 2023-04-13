@@ -81,14 +81,6 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
     };
   }
 
-  // get horizontalSettingsValues() {
-  //   return this.formatVideoSettings('horizontal');
-  // }
-
-  // get verticalSettingsValues() {
-  //   return this.formatVideoSettings('vertical');
-  // }
-
   get defaultBaseResolution() {
     const display = this.settingsManagerService.views.defaultDisplay;
     return {
@@ -138,17 +130,18 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
   }
 
   formatVideoSettings(display: TDisplayType = 'horizontal') {
-    const settings = this.state[display];
+    const settings =
+      this.state[display] ?? this.settingsManagerService.views.videoSettings.vertical;
 
     return {
-      baseRes: `${settings.baseWidth}x${settings.baseHeight}`,
-      outputRes: `${settings.outputWidth}x${settings.outputHeight}`,
-      scaleType: settings.scaleType,
-      fpsType: settings.fpsType,
-      fpsCom: `${settings.fpsNum}-${settings.fpsDen}`,
-      fpsNum: settings.fpsNum,
-      fpsDen: settings.fpsDen,
-      fpsInt: settings.fpsNum,
+      baseRes: `${settings?.baseWidth}x${settings?.baseHeight}`,
+      outputRes: `${settings?.outputWidth}x${settings?.outputHeight}`,
+      scaleType: settings?.scaleType,
+      fpsType: settings?.fpsType,
+      fpsCom: `${settings?.fpsNum}-${settings?.fpsDen}`,
+      fpsNum: settings?.fpsNum,
+      fpsDen: settings?.fpsDen,
+      fpsInt: settings?.fpsNum,
     };
   }
 
