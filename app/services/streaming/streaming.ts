@@ -30,6 +30,7 @@ import {
 } from 'services/notifications';
 import { VideoEncodingOptimizationService } from 'services/video-encoding-optimizations';
 import { VideoSettingsService, TDisplayType } from 'services/settings-v2/video';
+import { DualOutputService } from 'services/dual-output';
 import { StreamSettingsService } from '../settings/streaming';
 import { RestreamService, TOutputOrientation } from 'services/restream';
 import Utils from 'services/utils';
@@ -88,6 +89,7 @@ export class StreamingService
   @Inject() private recordingModeService: RecordingModeService;
   @Inject() private videoSettingsService: VideoSettingsService;
   @Inject() private settingsService: SettingsService;
+  @Inject() private dualOutputService: DualOutputService;
 
   streamingStatusChange = new Subject<EStreamingState>();
   recordingStatusChange = new Subject<ERecordingState>();
@@ -1024,15 +1026,28 @@ export class StreamingService
     const height = this.views.linkedPlatforms.length > 1 ? 750 : 650;
     const width = 900;
 
-    this.windowsService.showWindow({
-      componentName: 'GoLiveWindow',
-      title: $t('Go Live'),
-      size: {
-        height,
-        width,
-      },
-      queryParams: prepopulateOptions,
-    });
+    // if dual output mode, show the dual output go live window
+    if (this.dualOutputService.views.showDualOutput) {
+      this.windowsService.showWindow({
+        componentName: 'DualOutputGoLiveWindow',
+        title: $t('Go Live'),
+        size: {
+          height,
+          width,
+        },
+        queryParams: prepopulateOptions,
+      });
+    } else {
+      this.windowsService.showWindow({
+        componentName: 'GoLiveWindow',
+        title: $t('Go Live'),
+        size: {
+          height,
+          width,
+        },
+        queryParams: prepopulateOptions,
+      });
+    }
   }
 
   showEditStream() {

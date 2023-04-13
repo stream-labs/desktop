@@ -94,6 +94,14 @@ export class DisplayElement extends ReactComponent {}
 
 @Component({
   props: {
+    name: { default: 'DualOutputGoLiveWindow' },
+    wrapperStyles: { default: () => ({ height: '100%' }) },
+  },
+})
+export class DualOutputGoLiveWindow extends ReactComponent {}
+
+@Component({
+  props: {
     name: { default: 'EditStreamWindow' },
     wrapperStyles: { default: () => ({ height: '100%' }) },
   },
