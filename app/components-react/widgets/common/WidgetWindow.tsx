@@ -29,6 +29,7 @@ import { GameWidget, GameWidgetModule } from '../GameWidget';
 import { ViewerCount, ViewerCountModule } from '../ViewerCount';
 import { CustomWidget, CustomWidgetModule } from '../CustomWidget';
 import { useSubscription } from '../../hooks/useSubscription';
+import { useChildWindowParams } from 'components-react/hooks';
 
 // define list of Widget components and modules
 export const components = {
@@ -61,11 +62,11 @@ export const components = {
  * Renders a widget window by given sourceId from window's query params
  */
 export function WidgetWindow() {
-  const { WindowsService, WidgetsService } = Services;
+  const { WidgetsService } = Services;
+  const { sourceId, widgetType } = useChildWindowParams();
 
   // take the source id and widget's component from the window's params
-  const { sourceId, Module, WidgetSettingsComponent } = useOnCreate(() => {
-    const { sourceId, widgetType } = WindowsService.getChildWindowQueryParams();
+  const { Module, WidgetSettingsComponent } = useOnCreate(() => {
     const [WidgetSettingsComponent, Module] = components[widgetType];
     return { sourceId, Module, WidgetSettingsComponent };
   });
