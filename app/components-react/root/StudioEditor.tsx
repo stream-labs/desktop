@@ -8,6 +8,7 @@ import { $t } from 'services/i18n';
 import { ERenderingMode } from '../../../obs-api';
 import { Tooltip } from 'antd';
 import { TDisplayType } from 'services/settings-v2';
+import { DualOutputService } from 'app-services';
 
 export default function StudioEditor() {
   const {
@@ -18,14 +19,19 @@ export default function StudioEditor() {
     ScenesService,
     SettingsManagerService,
     VideoSettingsService,
+    DualOutputService,
   } = Services;
   const v = useVuex(() => ({
     hideStyleBlockers: WindowsService.state.main.hideStyleBlockers,
     performanceMode: CustomizationService.state.performanceMode,
     cursor: EditorService.state.cursor,
     studioMode: TransitionsService.state.studioMode,
-    showHorizontalDisplay: SettingsManagerService.views.activeDisplays.horizontal,
-    showVerticalDisplay: SettingsManagerService.views.activeDisplays.vertical,
+    showHorizontalDisplay:
+      SettingsManagerService.views.activeDisplays.horizontal ||
+      !DualOutputService.views.showDualOutput,
+    showVerticalDisplay:
+      SettingsManagerService.views.activeDisplays.vertical &&
+      DualOutputService.views.showDualOutput,
     activeSceneId: ScenesService.views.activeSceneId,
     hasAdditionalContexts: VideoSettingsService.hasAdditionalContexts,
   }));

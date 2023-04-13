@@ -1,6 +1,5 @@
 import * as remote from '@electron/remote';
 import React from 'react';
-import { message } from 'antd';
 import { useModule, injectState } from 'slap';
 import { Services } from '../../service-provider';
 import FormFactory, { TInputValue } from 'components-react/shared/inputs/FormFactory';
@@ -370,15 +369,8 @@ class VideoSettingsModule {
   }
 
   setShowDualOutput() {
-    if (Services.DualOutputService.views.dualOutputMode) {
-      message.error({
-        content: 'Cannot hide dual output toggles in dual output mode.',
-        duration: 2,
-      });
-    } else {
-      Services.DualOutputService.actions.setShowDualOutput();
-      this.state.setShowDualOutputSettings(!this.state.showDualOutputSettings);
-    }
+    Services.DualOutputService.actions.setShowDualOutput();
+    this.state.setShowDualOutputSettings(!this.state.showDualOutputSettings);
   }
 }
 
