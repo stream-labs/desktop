@@ -13,6 +13,8 @@ import { HostsService } from 'services/hosts';
 import { IFacebookStartStreamOptions } from './facebook';
 import { StreamSettingsService } from '../settings/streaming';
 import * as remote from '@electron/remote';
+import { GreenService } from 'services/green';
+import { VideoSettingsService } from 'services/settings-v2';
 
 const VIEWER_COUNT_UPDATE_INTERVAL = 60 * 1000;
 
@@ -32,6 +34,9 @@ export abstract class BasePlatformService<T extends IPlatformState> extends Stat
   @Inject() protected userService: UserService;
   @Inject() protected hostsService: HostsService;
   @Inject() protected streamSettingsService: StreamSettingsService;
+  @Inject() protected greenService: GreenService;
+  @Inject() protected videoSettingsService: VideoSettingsService;
+
   abstract readonly platform: TPlatform;
 
   abstract capabilities: Set<TPlatformCapability>;
@@ -112,6 +117,16 @@ export abstract class BasePlatformService<T extends IPlatformState> extends Stat
 
   fetchUserInfo() {
     return Promise.resolve({});
+  }
+
+  setPlatformContext(platform: TPlatform) {
+    if (this.greenService.views.greenMode) {
+      const mode = this.greenService.views.getPlatformContextName(platform);
+
+      this.UPDATE_STREAM_SETTINGS({
+        mode,
+      });
+    }
   }
 
   @mutation()
