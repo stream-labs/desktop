@@ -1028,7 +1028,11 @@ export class HighlighterService extends StatefulService<IHighligherState> {
       this.cancelFunction = null;
       this.SET_UPLOAD_INFO({ uploading: false, cancelRequested: false, videoId: id });
     } catch (e: unknown) {
-      this.SET_UPLOAD_INFO({ uploading: false, error: true });
+      if (this.views.uploadInfo.cancelRequested) {
+        console.log('The upload was canceled');
+      } else {
+        this.SET_UPLOAD_INFO({ uploading: false, error: true });
+      }
     }
 
     if (id) {

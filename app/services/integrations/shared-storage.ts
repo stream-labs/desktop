@@ -52,21 +52,19 @@ export class SharedStorageService extends Service {
         onError,
       });
       this.cancel = this.uploader.cancel;
-      return { cancel: this.cancel, complete: this.performUpload() };
+      return { cancel: this.cancelUpload, complete: this.performUpload() };
     } catch (e: unknown) {
-      console.error(e);
+      onError(e);
     }
   }
 
   async performUpload() {
-    try {
-      const { uploaded, reqBody } = await this.uploadS3File();
-      if (uploaded) {
-        await this.completeUpload(reqBody);
-        return await this.generateShare();
-      }
-    } catch (e: unknown) {
-      console.error(e);
+    const { uploaded, reqBody } = await this.uploadS3File();
+    if (uploaded) {
+      await this.completeUpload(reqBody);
+      return await this.generateShare();
+    } else {
+      return Promise.reject('The upload was canceled');
     }
   }
 
@@ -98,20 +96,11 @@ export class SharedStorageService extends Service {
     body.append('name', name);
     body.append('size', String(size));
     body.append('mime_type', 'video/mpeg');
-
-    try {
-      return await jfetch(new Request(url, { headers, body, method: 'POST' }));
-    } catch (e: unknown) {
-      console.error(e);
-    }
+    return await jfetch(new Request(url, { headers, body, method: 'POST' }));
   }
 
   private async uploadS3File() {
-    try {
-      return await this.uploader.start();
-    } catch (e: unknown) {
-      console.error(e);
-    }
+    return await this.uploader.start();
   }
 
   private async generateShare(): Promise<{ id: string }> {
@@ -175,9 +164,9 @@ class S3Uploader {
         });
       });
 
-      await this.uploadChunks(file);
+      const uploaded = await this.uploadChunks(file);
       const reqBody = this.isMultipart ? { parts: this.parts } : {};
-      return { uploaded: true, reqBody };
+      return { uploaded, reqBody };
     } catch (e: unknown) {
       this.onError(e);
     }
@@ -186,9 +175,10 @@ class S3Uploader {
   async uploadChunks(file: number) {
     try {
       for (const url of this.uploadUrls) {
-        if (this.cancelRequested) return;
+        if (this.cancelRequested) return false;
         await this.uploadChunk(url, file);
       }
+      return true;
     } catch (e: unknown) {
       this.onError(e);
     }
