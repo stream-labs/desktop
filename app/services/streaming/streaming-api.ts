@@ -110,6 +110,12 @@ export interface IStreamingServiceApi {
   recordingStatusChange: Observable<ERecordingState>;
 
   /**
+   * Subscribe to be notified when the state
+   * of the streaming output changes.
+   */
+  replayBufferStatusChange: Observable<EReplayBufferState>;
+
+  /**
    * This subscription receives no events and
    * will be removed in a future version.
    * @deprecated

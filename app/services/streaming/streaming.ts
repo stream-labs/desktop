@@ -800,6 +800,7 @@ export class StreamingService
 
       const keepRecording = this.streamSettingsService.settings.keepRecordingWhenStreamStops;
       if (!keepRecording && this.state.recordingStatus === ERecordingState.Recording) {
+        console.log('toggling recording');
         this.toggleRecording();
       }
 
