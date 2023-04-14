@@ -8,8 +8,6 @@ import { VideoService } from 'services/video';
 import { StreamingService } from 'services/streaming';
 import { OS } from 'util/operating-systems';
 import { GuestCamNode } from './guest-cam';
-import { VideoSettingsService } from 'services/settings-v2/video';
-import { SettingsService } from 'services/settings';
 
 interface ISchema {
   baseResolution: {
@@ -33,8 +31,6 @@ export class RootNode extends Node<ISchema, {}> {
 
   @Inject() videoService: VideoService;
   @Inject() streamingService: StreamingService;
-  @Inject() videoSettingsService: VideoSettingsService;
-  @Inject() settingsService: SettingsService;
 
   async save(): Promise<void> {
     const sources = new SourcesNode();
@@ -55,7 +51,7 @@ export class RootNode extends Node<ISchema, {}> {
       transitions,
       hotkeys,
       guestCam,
-      baseResolution: this.videoSettingsService.baseResolution,
+      baseResolution: this.videoService.baseResolution,
       selectiveRecording: this.streamingService.state.selectiveRecording,
       operatingSystem: process.platform as OS,
     };

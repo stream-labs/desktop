@@ -33,7 +33,6 @@ export default function FormFactory(p: {
   onChange: (key: string) => (value: TInputValue) => void;
   values: Dictionary<TInputValue>;
   formOptions?: FormProps;
-  name?: string;
 }) {
   const form = useForm();
 
@@ -42,7 +41,6 @@ export default function FormFactory(p: {
   return (
     <Form
       {...p.formOptions}
-      name={p.name}
       form={form}
       onFieldsChange={() => debounce(form.validateFields, 500)()}
     >

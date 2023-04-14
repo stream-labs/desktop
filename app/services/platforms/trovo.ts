@@ -13,7 +13,6 @@ import { platformAuthorizedRequest } from './utils';
 import { IGoLiveSettings } from '../streaming';
 import { getDefined } from '../../util/properties-type-guards';
 import Utils from '../utils';
-import { TDisplayType } from 'services/settings-v2';
 
 interface ITrovoServiceState extends IPlatformState {
   settings: ITrovoStartStreamOptions;
@@ -79,22 +78,17 @@ export class TrovoService
     return this.userService.state.auth?.platforms?.trovo?.username || '';
   }
 
-  async beforeGoLive(goLiveSettings: IGoLiveSettings, context?: TDisplayType) {
+  async beforeGoLive(goLiveSettings: IGoLiveSettings) {
     const trSettings = getDefined(goLiveSettings.platforms.trovo);
     const key = this.state.streamKey;
     if (!this.streamingService.views.isMultiplatformMode) {
-      this.streamSettingsService.setSettings(
-        {
-          streamType: 'rtmp_custom',
-          key,
-          server: this.rtmpServer,
-        },
-        context,
-      );
+      this.streamSettingsService.setSettings({
+        streamType: 'rtmp_custom',
+        key,
+        server: this.rtmpServer,
+      });
     }
     await this.putChannelInfo(trSettings);
-
-    this.setPlatformContext('trovo');
   }
 
   fetchNewToken(): Promise<void> {

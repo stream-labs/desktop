@@ -6,11 +6,10 @@ import Utils from './utils';
 import { WindowsService } from './windows';
 import { ScalableRectangle } from '../util/ScalableRectangle';
 import { Subscription } from 'rxjs';
-import { ISelectionState, SelectionService } from 'services/selection';
+import { SelectionService } from 'services/selection';
 import { byOS, OS, getOS } from 'util/operating-systems';
 import * as remote from '@electron/remote';
 import { onUnload } from 'util/unload';
-import { TDisplayType, VideoSettingsService } from './settings-v2';
 
 // TODO: There are no typings for nwr
 let nwr: any;
@@ -29,7 +28,6 @@ export interface IDisplayOptions {
   slobsWindowId?: string;
   paddingColor?: IRGBColor;
   renderingMode?: number;
-  type?: TDisplayType;
 }
 
 export class Display {
@@ -70,8 +68,6 @@ export class Display {
 
   cancelUnload: () => void;
 
-  type?: TDisplayType;
-
   constructor(public name: string, options: IDisplayOptions = {}) {
     this.sourceId = options.sourceId;
     this.electronWindowId = options.electronWindowId || remote.getCurrentWindow().id;
@@ -84,13 +80,10 @@ export class Display {
 
     this.currentScale = this.windowsService.state[this.slobsWindowId].scaleFactor;
 
-    this.type = options?.type ?? 'horizontal';
-
     this.videoService.actions.createOBSDisplay(
       this.electronWindowId,
       name,
       this.renderingMode,
-      this.type,
       this.sourceId,
     );
 
@@ -103,11 +96,9 @@ export class Display {
     }
 
     // also sync girdlines when selection changes
-    this.selectionSubscription = this.selectionService.updated.subscribe(
-      (state: ISelectionState) => {
-        this.switchGridlines(state.selectedIds.length <= 1);
-      },
-    );
+    this.selectionSubscription = this.selectionService.updated.subscribe(state => {
+      this.switchGridlines(state.selectedIds.length <= 1);
+    });
 
     if (options.paddingColor) {
       this.videoService.actions.setOBSDisplayPaddingColor(
@@ -298,7 +289,6 @@ export class Display {
 
 export class VideoService extends Service {
   @Inject() settingsService: SettingsService;
-  @Inject() videoSettingsService: VideoSettingsService;
 
   init() {
     this.settingsService.loadSettingsIntoStore();
@@ -322,8 +312,9 @@ export class VideoService extends Service {
   }
 
   get baseResolution() {
-    const width = this.videoSettingsService.baseResolution.width;
-    const height = this.videoSettingsService.baseResolution.height;
+    const [widthStr, heightStr] = this.settingsService.views.values.Video.Base.split('x');
+    const width = parseInt(widthStr, 10);
+    const height = parseInt(heightStr, 10);
 
     return {
       width,
@@ -345,29 +336,22 @@ export class VideoService extends Service {
   createOBSDisplay(
     electronWindowId: number,
     name: string,
-    renderingMode: number,
-    type: TDisplayType,
+    remderingMode: number,
     sourceId?: string,
   ) {
     const electronWindow = remote.BrowserWindow.fromId(electronWindowId);
-    const context = type ? this.videoSettingsService.contexts[type] : undefined;
 
     if (sourceId) {
-      const context = type ? this.videoSettingsService.contexts[type] : undefined;
       obs.NodeObs.OBS_content_createSourcePreviewDisplay(
         electronWindow.getNativeWindowHandle(),
         sourceId,
         name,
-        false,
-        context,
       );
     } else {
       obs.NodeObs.OBS_content_createDisplay(
         electronWindow.getNativeWindowHandle(),
         name,
-        renderingMode,
-        false,
-        context,
+        remderingMode,
       );
     }
   }
