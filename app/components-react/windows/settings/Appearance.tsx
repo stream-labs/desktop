@@ -58,7 +58,7 @@ export function AppearanceSettings() {
     compactView: SideNavService.views.compactView,
     menuItemStatus: SideNavService.views.menuItemStatus,
     apps: PlatformAppsService.views.enabledApps.filter(app => {
-      return !!app.manifest.pages.find(page => {
+      return !!app?.manifest?.pages.find(page => {
         return page.slot === EAppPageSlot.TopNav;
       });
     }),
