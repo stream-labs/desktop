@@ -77,11 +77,11 @@ test('Multistream advanced mode', async t => {
     description: 'youtube description',
   });
 
-  const facebookForm = useForm('trovo-settings');
-  await facebookForm.fillForm({
+  const trovoForm = useForm('trovo-settings');
+  await trovoForm.fillForm({
     customEnabled: true,
     trovoGame: 'DOOM',
-    title: 'facebook title',
+    title: 'trovo title',
   });
 
   await submit();
