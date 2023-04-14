@@ -183,7 +183,7 @@ class VideoSettingsModule {
   }
 
   get outputResOptions() {
-    const baseRes = `${this.service.state.videoContext.baseWidth}x${this.service.state.videoContext.baseHeight}`;
+    const baseRes = `${this.service.state.horizontal.baseWidth}x${this.service.state.horizontal.baseHeight}`;
     if (!OUTPUT_RES_OPTIONS.find(opt => opt.value === baseRes)) {
       return [{ label: baseRes, value: baseRes }]
         .concat(OUTPUT_RES_OPTIONS)
@@ -259,7 +259,6 @@ class VideoSettingsModule {
   selectResolution(key: string, value: string) {
     if (value === 'custom') {
       this.setCustomResolution(key, true);
-      this.setResolution(key, '');
     } else {
       this.setCustomResolution(key, false);
       this.setResolution(key, value);
@@ -321,6 +320,7 @@ export function VideoSettings() {
         metadata={metadata}
         onChange={onChange}
         formOptions={{ layout: 'vertical' }}
+        name="video-settings"
       />
     </div>
   );

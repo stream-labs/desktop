@@ -18,11 +18,15 @@ import { InheritMutations, mutation } from 'services/core';
 import { throwStreamError, TStreamErrorType } from 'services/streaming/stream-error';
 import { BasePlatformService } from './base-platform';
 import Utils from '../utils';
+import { IVideo } from 'obs-studio-node';
+import { TDisplayType } from 'services/settings-v2';
+import { TOutputOrientation } from 'services/restream';
 
 export interface ITwitchStartStreamOptions {
   title: string;
   game?: string;
   tags: string[];
+  mode?: TOutputOrientation;
 }
 
 export interface ITwitchChannelInfo extends ITwitchStartStreamOptions {
@@ -75,6 +79,7 @@ export class TwitchService
       title: '',
       game: '',
       tags: [],
+      mode: undefined,
     },
   };
 
@@ -159,7 +164,7 @@ export class TwitchService
     return this.state.settings.tags;
   }
 
-  async beforeGoLive(goLiveSettings?: IGoLiveSettings) {
+  async beforeGoLive(goLiveSettings?: IGoLiveSettings, context?: TDisplayType) {
     if (
       this.streamSettingsService.protectedModeEnabled &&
       this.streamSettingsService.isSafeToModifyStreamKey()
@@ -171,12 +176,15 @@ export class TwitchService
       }
       this.SET_STREAM_KEY(key);
       if (!this.streamingService.views.isMultiplatformMode) {
-        this.streamSettingsService.setSettings({
-          key,
-          platform: 'twitch',
-          streamType: 'rtmp_common',
-          server: 'auto',
-        });
+        this.streamSettingsService.setSettings(
+          {
+            key,
+            platform: 'twitch',
+            streamType: 'rtmp_common',
+            server: 'auto',
+          },
+          context,
+        );
       }
     }
 
@@ -184,6 +192,8 @@ export class TwitchService
       const channelInfo = goLiveSettings?.platforms.twitch;
       if (channelInfo) await this.putChannelInfo(channelInfo);
     }
+
+    this.setPlatformContext('twitch');
   }
 
   async validatePlatform() {
