@@ -1,5 +1,6 @@
 import { Service } from 'services/core/service';
 import { Inject } from 'services/core/injector';
+import { InitAfter } from 'services/core/index';
 import { SceneCollectionsServerApiService } from 'services/scene-collections/server-api';
 import { RootNode } from './nodes/root';
 import { SourcesNode, ISourceInfo } from './nodes/sources';
@@ -36,7 +37,7 @@ import { StreamingService, EStreamingState } from 'services/streaming';
 import { DefaultHardwareService } from 'services/hardware';
 import { byOS, OS, getOS } from 'util/operating-systems';
 import Utils from 'services/utils';
-import { OutputSettingsService } from '../settings';
+import { VideoSettingsService } from 'services/settings-v2';
 import * as remote from '@electron/remote';
 import { GuestCamNode } from './nodes/guest-cam';
 
@@ -70,6 +71,8 @@ const DEFAULT_COLLECTION_NAME = 'Scenes';
  * - Completely asynchronous
  * - Server side backup
  */
+
+@InitAfter('VideoSettingsService')
 export class SceneCollectionsService extends Service implements ISceneCollectionsServiceApi {
   @Inject('SceneCollectionsServerApiService')
   serverApi: SceneCollectionsServerApiService;
@@ -86,7 +89,7 @@ export class SceneCollectionsService extends Service implements ISceneCollection
   @Inject() transitionsService: TransitionsService;
   @Inject() streamingService: StreamingService;
   @Inject() private defaultHardwareService: DefaultHardwareService;
-  @Inject() private outputSettingsService: OutputSettingsService;
+  @Inject() private videoSettingsService: VideoSettingsService;
 
   collectionAdded = new Subject<ISceneCollectionsManifestEntry>();
   collectionRemoved = new Subject<ISceneCollectionsManifestEntry>();
@@ -108,7 +111,8 @@ export class SceneCollectionsService extends Service implements ISceneCollection
 
   /**
    * Does not use the standard init function so we can have asynchronous
-   * initialization.
+   * initialization. We need to wait for one video context to be initialized
+   * before loading the active scene collection or risk potential crashes.
    */
   async initialize() {
     await this.stateService.loadManifestFile();
