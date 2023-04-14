@@ -80,7 +80,7 @@ test('Multistream advanced mode', async t => {
   const trovoForm = useForm('trovo-settings');
   await trovoForm.fillForm({
     customEnabled: true,
-    trovoGame: 'DOOM',
+    trovoGame: 'Doom',
     title: 'trovo title',
   });
 
