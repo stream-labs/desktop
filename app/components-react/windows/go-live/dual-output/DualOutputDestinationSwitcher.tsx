@@ -7,10 +7,12 @@ import { ICustomStreamDestination } from 'services/settings/streaming';
 import { Services } from 'components-react/service-provider';
 import { SwitchInput } from 'components-react/shared/inputs';
 import PlatformLogo from 'components-react/shared/PlatformLogo';
+import InfoBadge from 'components-react/shared/InfoBadge';
 import { assertIsDefined } from 'util/properties-type-guards';
 import { useDebounce } from 'components-react/hooks';
 import { useGoLiveSettings } from '../useGoLiveSettings';
 import { alertAsync } from 'components-react/modals';
+import Translate from 'components-react/shared/Translate';
 
 /**
  * Allows enabling/disabling platforms and custom destinations for the stream
@@ -44,6 +46,14 @@ export function DualOutputDestinationSwitcher() {
 
   return (
     <div>
+      <InfoBadge
+        content={
+          <Translate message="<dualoutput>Dual Output</dualoutput> is enabled - you must stream to one horizontal and one vertical platform.">
+            <u slot="dualoutput" />
+          </Translate>
+        }
+        hasMargin={true}
+      />
       {linkedPlatforms.map(platform => (
         <DestinationSwitcher
           key={platform}
