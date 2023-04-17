@@ -1,7 +1,7 @@
 {
   "Twitch Category": "Twitch 카테고리",
   "Twitch Tags": "Twitch 태그",
-  "You need to re-login to access Twitch tags": "You need to re-login to access Twitch tags",
-  "Do not include special characters or spaces in your tag": "Do not include special characters or spaces in your tag",
-  "For example: \"Speedrunning\" or \"FirstPlaythrough\"": "For example: \"Speedrunning\" or \"FirstPlaythrough\""
+  "You need to re-login to access Twitch tags": "Twitch 태그를 이용하려면 다시 로그인",
+  "Do not include special characters or spaces in your tag": "태그에 특수문자 또는 띄어쓰기 사용 불가",
+  "For example: \"Speedrunning\" or \"FirstPlaythrough\"": "예시: \"Speedrunning\" 또는 \"FirstPlaythrough\""
 }
