@@ -151,4 +151,14 @@ export interface IStreamingServiceApi {
    * Toggle the recording state
    */
   toggleRecording(): void;
+
+  /**
+   * Start replay buffer state
+   */
+  startReplayBuffer(): void;
+
+  /**
+   * Stop replay buffer state
+   */
+  stopReplayBuffer(): void;
 }
