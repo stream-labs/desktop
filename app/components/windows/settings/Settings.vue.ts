@@ -8,7 +8,6 @@ import GenericFormGroups from 'components/obs/inputs/GenericFormGroups.vue';
 import { WindowsService } from 'services/windows';
 import { ISettingsSubCategory, SettingsService } from 'services/settings/index';
 import DeveloperSettings from './DeveloperSettings';
-import Hotkeys from './Hotkeys.vue';
 import OverlaySettings from './OverlaySettings';
 import NotificationsSettings from './NotificationsSettings.vue';
 import SearchablePages from 'components/shared/SearchablePages';
@@ -24,6 +23,7 @@ import {
   NewBadge,
   UltraIcon,
   InstalledApps,
+  Hotkeys,
 } from 'components/shared/ReactComponentList';
 import { $t } from 'services/i18n';
 import { debounce } from 'lodash-decorators';
@@ -137,7 +137,7 @@ export default class Settings extends Vue {
       // 'Output',
       'Audio',
       'Video',
-      // 'Hotkeys',
+      'Hotkeys',
       'Advanced',
       // 'SceneCollections',
       // 'Notifications',
@@ -159,7 +159,6 @@ export default class Settings extends Vue {
   get shouldShowVuePage() {
     if (this.reactPages.includes(this.categoryName)) return false;
     return ![
-      'Hotkeys',
       'Stream',
       'API',
       'Overlays',
