@@ -1,7 +1,7 @@
 {
   "We are improving our backend systems. As part of the migration process, we will need to you log in again. If you have any questions, you can": "We verbeteren onze backendsystemen. Als onderdeel van het migratieproces vragen we u om opnieuw in te loggen. Heeft u vragen, neem dan",
   "contact support.": "contact op met ondersteuning.",
-  "Sign in with your content platform to get started with Streamlabs": "Sign in with your content platform to get started with Streamlabs",
+  "Sign in with your content platform to get started with Streamlabs": "Meld u aan bij uw contentplatform om aan de slag te gaan met Streamlabs",
   "Select an OBS profile to import": "Selecteer een OBS-profiel om te importeren",
   "Import from OBS Studio": "Importeren uit OBS Studio",
   "Start Fresh": "Helemaal opnieuw beginnen",
@@ -117,7 +117,7 @@
   "Tips": "Fooien",
   "Storage": "Opslag",
   "All Streamlabs Pro Tools": "Alle Streamlabs Pro-tools",
-  "Console, Cross Clip, Oslo, Willow & Melon": "Console, Cross Clip, Oslo, Willow & Melon",
+  "Console, Cross Clip, Oslo, Willow & Melon": "Console, Cross Clip, Oslo, Willow en Melon",
   "Access to Free Overlays and Themes": "Toegang tot gratis overlays en thema's",
   "Add 1 Guest": "Eén gast toevoegen",
   "Limited Free Apps": "Beperkte gratis apps",
@@ -133,9 +133,9 @@
   "Current Plan": "Huidig abonnement",
   "Includes everything in Starter plus:": "Omvat alles in Starter, plus:",
   "Your login has expired. Please reauthenticate to continue using Streamlabs Desktop.": "Uw aanmelding is verlopen. Verifieer opnieuw om Streamlabs Desktop te blijven gebruiken.",
-  "Select a Primary Platform": "Select a Primary Platform",
-  "Connect a Content Platform": "Connect a Content Platform",
-  "Streamlabs Desktop requires that you have a connected platform account in order to use all of its features. By skipping this step, you will be logged out and some features may be unavailable.": "Streamlabs Desktop requires that you have a connected platform account in order to use all of its features. By skipping this step, you will be logged out and some features may be unavailable.",
-  "Your Streamlabs account has multiple connected content platforms. Please select the primary platform you will be streaming to using Streamlabs Desktop.": "Your Streamlabs account has multiple connected content platforms. Please select the primary platform you will be streaming to using Streamlabs Desktop.",
-  "Streamlabs Desktop requires you to connect a content platform to your Streamlabs account": "Streamlabs Desktop requires you to connect a content platform to your Streamlabs account"
+  "Select a Primary Platform": "Selecteer een primair platform",
+  "Connect a Content Platform": "Maak verbinding met een contentplatform",
+  "Streamlabs Desktop requires that you have a connected platform account in order to use all of its features. By skipping this step, you will be logged out and some features may be unavailable.": "Voor Streamlabs Desktop moet u een verbonden platformaccount hebben om alle functies te kunnen gebruiken. Als u deze stap overslaat, wordt u afgemeld en is het mogelijk dat sommige functies niet beschikbaar zijn.",
+  "Your Streamlabs account has multiple connected content platforms. Please select the primary platform you will be streaming to using Streamlabs Desktop.": "Uw Streamlabs-account heeft meerdere verbonden contentplatforms. Selecteer het primaire platform waarnaar u met Streamlabs Desktop wilt streamen.",
+  "Streamlabs Desktop requires you to connect a content platform to your Streamlabs account": "Voor Streamlabs Desktop moet u een contentplatform verbinden met uw Streamlabs-account"
 }
