@@ -241,9 +241,11 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
     }
   }
 
-  getStudioTransitionName() {
+  get studioTransitionName(): string | undefined {
     if (this.studioModeTransition) {
-      return this.studioModeTransition.name;
+      return this.studioModeTransition?.name;
+    } else {
+      return undefined;
     }
   }
 
