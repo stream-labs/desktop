@@ -24,5 +24,5 @@
   "Recording History": "녹화 정보",
   "Show in folder": "폴더에 표시",
   "Recordings": "녹화",
-  "Marker %{label} added at %{timestamp}": "Marker %{label} added at %{timestamp}"
+  "Marker %{label} added at %{timestamp}": "%{timestamp}에 마커 %{label} 추가 완료"
 }
