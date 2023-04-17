@@ -1,7 +1,7 @@
 {
   "Twitch Category": "Categoría de Twitch",
   "Twitch Tags": "Etiquetas de Twitch",
-  "You need to re-login to access Twitch tags": "You need to re-login to access Twitch tags",
-  "Do not include special characters or spaces in your tag": "Do not include special characters or spaces in your tag",
-  "For example: \"Speedrunning\" or \"FirstPlaythrough\"": "For example: \"Speedrunning\" or \"FirstPlaythrough\""
+  "You need to re-login to access Twitch tags": "Debes reiniciar sesión para acceder a las etiquetas de Twitch",
+  "Do not include special characters or spaces in your tag": "No incluyas caracteres especiales ni espacios en la etiqueta",
+  "For example: \"Speedrunning\" or \"FirstPlaythrough\"": "Por ejemplo: \"Pruebadevelocidad\" o \"PrimerJuego\""
 }
