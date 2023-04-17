@@ -9,6 +9,7 @@ module.exports = {
     // ルールは随時追加する
     'selector-class-pattern': null,
     'no-descending-specificity': null,
+    'selector-not-notation': 'simple',
   },
   overrides: [
     {
