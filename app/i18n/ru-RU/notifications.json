@@ -24,5 +24,5 @@
   "Recording History": "История записей",
   "Show in folder": "Показать в папке",
   "Recordings": "Записи",
-  "Marker %{label} added at %{timestamp}": "Marker %{label} added at %{timestamp}"
+  "Marker %{label} added at %{timestamp}": "Маркер %{label} добавлен в %{timestamp}"
 }
