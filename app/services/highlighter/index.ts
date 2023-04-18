@@ -3,6 +3,7 @@ import path from 'path';
 import Vue from 'vue';
 import fs from 'fs-extra';
 import url from 'url';
+import * as remote from '@electron/remote';
 import { EStreamingState, StreamingService } from 'services/streaming';
 import { getPlatformService } from 'services/platforms';
 import { UserService } from 'services/user';
@@ -30,7 +31,6 @@ import { ENotificationType, NotificationsService } from 'services/notifications'
 import { JsonrpcService } from 'services/api/jsonrpc';
 import { NavigationService } from 'services/navigation';
 import { SharedStorageService } from 'services/integrations/shared-storage';
-import * as remote from '@electron/remote';
 
 export interface IClip {
   path: string;
@@ -1041,7 +1041,7 @@ export class HighlighterService extends StatefulService<IHighligherState> {
       });
     }
 
-    console.log(id);
+    return id;
   }
 
   /**

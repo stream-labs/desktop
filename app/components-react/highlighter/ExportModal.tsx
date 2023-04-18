@@ -10,7 +10,7 @@ import { RadioInput } from 'components-react/shared/inputs/RadioInput';
 import { confirmAsync } from 'components-react/modals';
 import { $t } from 'services/i18n';
 import { injectState, useModule } from 'slap';
-import CrossClipUpload from './CrossClipUpload';
+import StorageUpload from './StorageUpload';
 import { useVuex } from 'components-react/hooks';
 
 class ExportModule {
@@ -256,7 +256,7 @@ function PlatformSelect(p: { onClose: () => void }) {
         ]}
       />
       {platform === 'youtube' && <YoutubeUpload defaultTitle={videoName} close={p.onClose} />}
-      {platform === 'crossclip' && <CrossClipUpload onClose={p.onClose} />}
+      {platform !== 'youtube' && <StorageUpload onClose={p.onClose} platform={platform} />}
     </Form>
   );
 }

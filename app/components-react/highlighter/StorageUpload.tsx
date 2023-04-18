@@ -8,8 +8,9 @@ import Translate from 'components-react/shared/Translate';
 import UploadProgress from './UploadProgress';
 import styles from './ExportModal.m.less';
 import VideoPreview from './VideoPreview';
+import { TextInput } from 'components-react/shared/inputs/TextInput';
 
-export default function CrossClipUpload(p: { onClose: () => void }) {
+export default function CrossClipUpload(p: { onClose: () => void; platform: string }) {
   const { UserService, HighlighterService, OnboardingService } = Services;
 
   const { uploadInfo, hasSLID } = useVuex(() => ({
@@ -19,6 +20,11 @@ export default function CrossClipUpload(p: { onClose: () => void }) {
 
   function connectSLID() {
     OnboardingService.actions.start({ isLogin: true });
+  }
+
+  async function uploadCrossclip() {
+    const id = await HighlighterService.actions.return.uploadStorage();
+    // remote.shell.openExternal(`https://crossclip.streamlabs.com/storage/${id}`);
   }
 
   // Clear all errors when this component unmounts
@@ -31,12 +37,15 @@ export default function CrossClipUpload(p: { onClose: () => void }) {
   return (
     <div className={styles.crossclipContainer}>
       <VideoPreview />
-      <button
-        className={cx('button button--action', styles.uploadButton)}
-        onClick={() => HighlighterService.actions.uploadStorage()}
-      >
-        {$t('Upload')}
-      </button>
+      {!uploadInfo.videoId && (
+        <button
+          className={cx('button button--action', styles.uploadButton)}
+          onClick={uploadCrossclip}
+        >
+          {$t('Upload')}
+        </button>
+      )}
+      {!!uploadInfo.videoId && <TextInput value={uploadInfo.videoId} />}
     </div>
   );
 }
