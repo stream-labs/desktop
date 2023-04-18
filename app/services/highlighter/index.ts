@@ -1025,8 +1025,6 @@ export class HighlighterService extends StatefulService<IHighligherState> {
     try {
       const result = await complete;
       id = result.id;
-      this.cancelFunction = null;
-      this.SET_UPLOAD_INFO({ uploading: false, cancelRequested: false, videoId: id });
     } catch (e: unknown) {
       if (this.views.uploadInfo.cancelRequested) {
         console.log('The upload was canceled');
@@ -1034,6 +1032,8 @@ export class HighlighterService extends StatefulService<IHighligherState> {
         this.SET_UPLOAD_INFO({ uploading: false, error: true });
       }
     }
+    this.cancelFunction = null;
+    this.SET_UPLOAD_INFO({ uploading: false, cancelRequested: false, videoId: id || null });
 
     if (id) {
       this.usageStatisticsService.recordAnalyticsEvent('Highlighter', {

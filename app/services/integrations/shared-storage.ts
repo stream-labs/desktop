@@ -52,7 +52,7 @@ export class SharedStorageService extends Service {
         onError,
       });
       this.cancel = this.uploader.cancel;
-      return { cancel: this.cancelUpload, complete: this.performUpload() };
+      return { cancel: this.cancelUpload.bind(this), complete: this.performUpload() };
     } catch (e: unknown) {
       onError(e);
     }
