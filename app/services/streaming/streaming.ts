@@ -850,6 +850,8 @@ export class StreamingService
     }
 
     if (this.state.recordingStatus === ERecordingState.Offline) {
+      this.outputSettingsService.confirmFilePath();
+
       obs.NodeObs.OBS_service_startRecording();
       return;
     }
@@ -862,7 +864,10 @@ export class StreamingService
   }
 
   startReplayBuffer() {
+    this.outputSettingsService.confirmFilePath();
+
     if (this.state.replayBufferStatus !== EReplayBufferState.Offline) return;
+
     this.usageStatisticsService.recordFeatureUsage('ReplayBuffer');
     obs.NodeObs.OBS_service_startReplayBuffer();
   }

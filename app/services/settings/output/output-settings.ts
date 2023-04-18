@@ -1,9 +1,11 @@
 import { Service } from 'services/core/service';
 import { ISettingsSubCategory, SettingsService } from 'services/settings';
 import { VideoSettingsService } from 'services/settings-v2/video';
+import { HighlighterService } from 'services/highlighter';
 import { Inject } from 'services/core/injector';
 import { Dictionary } from 'vuex';
 import { AudioService } from 'app-services';
+import { parse } from 'path';
 
 /**
  * list of encoders for simple mode
@@ -182,6 +184,7 @@ export class OutputSettingsService extends Service {
   @Inject() private settingsService: SettingsService;
   @Inject() private audioService: AudioService;
   @Inject() private videoSettingsService: VideoSettingsService;
+  @Inject() private highlighterService: HighlighterService;
 
   /**
    * returns unified settings for the Streaming and Recording encoder
@@ -359,6 +362,39 @@ export class OutputSettingsService extends Service {
       rateControl,
       isSameAsStream,
     };
+  }
+
+  confirmFilePath() {
+    const output = this.settingsService.state.Output.formData;
+    const mode: TOutputSettingsMode = this.settingsService.findSettingValue(
+      output,
+      'Untitled',
+      'Mode',
+    );
+
+    const path =
+      mode === 'Simple'
+        ? this.settingsService.findSettingValue(output, 'Recording', 'FilePath')
+        : this.settingsService.findSettingValue(output, 'Recording', 'RecFilePath');
+
+    if (!!path || path === void 0) {
+      // if the path is undefined, the app will freeze
+      // so default to the highlighter export file path
+
+      const parsed = parse(this.highlighterService.views.exportInfo.file);
+      const filePath = parsed.dir;
+
+      output.forEach(subcategory => {
+        subcategory.parameters.forEach(setting => {
+          if (mode === 'Simple' && setting.name === 'FilePath') {
+            setting.value = filePath;
+          } else if (setting.name === 'RecFilePath') {
+            setting.value = filePath;
+          }
+        });
+      });
+      this.settingsService.setSettings('Output', output);
+    }
   }
 
   /**
