@@ -14,6 +14,7 @@ import { isUrl } from '../util/requests';
 import { getOS, OS } from 'util/operating-systems';
 import { UsageStatisticsService } from './usage-statistics';
 import { SourcesService } from 'services/sources';
+import { VideoSettingsService } from './settings-v2';
 
 export const TRANSITION_DURATION_MAX = 2_000_000_000;
 
@@ -110,6 +111,7 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
   @Inject() sceneCollectionsService: SceneCollectionsService;
   @Inject() usageStatisticsService: UsageStatisticsService;
   @Inject() sourcesService: SourcesService;
+  @Inject() videoSettingsService: VideoSettingsService;
 
   get views() {
     return new TransitionsViews(this.state);
@@ -150,6 +152,11 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
   init() {
     this.sceneCollectionsService.collectionWillSwitch.subscribe(() => {
       this.disableStudioMode();
+    });
+
+    const establishedContext = this.videoSettingsService.establishedContext.subscribe(() => {
+      if (!this.studioModeTransition) this.createStudioModeTransition();
+      establishedContext.unsubscribe();
     });
   }
 
