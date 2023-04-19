@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import Animate from 'rc-animate';
+import { Collapse } from 'antd';
 import cx from 'classnames';
 import { IHotkey } from 'services/hotkeys';
 import Hotkey from './Hotkey';
@@ -13,52 +13,62 @@ interface HotkeyGroupProps extends CommonProps {
   isSearch: boolean;
 }
 
-interface HeaderProps extends CommonProps {
-  isCollapsible: boolean;
-  collapsed: boolean;
-  handleClick: () => void;
-}
+interface HeaderProps extends CommonProps {}
+
+const { Panel } = Collapse;
 
 const getHotkeyUniqueId = (hotkey: IHotkey) => {
   return hotkey.actionName + hotkey.sceneId + hotkey.sceneItemId + hotkey.sourceId;
 };
 
-function Header({ title, isCollapsible, collapsed, handleClick }: HeaderProps) {
-  return title ? (
-    <h2 className="section-title section-title--dropdown" onClick={handleClick}>
-      {isCollapsible && collapsed ? <i className="fa fa-plus section-title__icon" /> : null}
-      {isCollapsible && !collapsed ? <i className="fa fa-minus section-title__icon" /> : null}
+function Header({ title }: HeaderProps) {
+  return (
+    <h2
+      className="section-title section-title--dropdown"
+      style={{ display: 'inline-block', verticalAlign: '-2px' }}
+    >
       {title}
     </h2>
-  ) : null;
+  );
 }
 
 export default function HotkeyGroup(props: HotkeyGroupProps) {
   const { hotkeys, title, isSearch } = props;
-  const [collapsed, setCollapsed] = useState(true);
   const isCollapsible = !!(title && !isSearch);
 
-  const toggleCollapsed = () => {
-    setCollapsed(collapsed => !collapsed);
-  };
+  const headerProps = { title };
 
-  const headerProps = { title, isCollapsible, collapsed, handleClick: toggleCollapsed };
+  const header = <Header {...headerProps} />;
+  const hotkeyContent = (
+    <div className={cx({ 'section-content--opened': !!title }, 'section-content')}>
+      {hotkeys.map(hotkey => (
+        <div key={getHotkeyUniqueId(hotkey)}>
+          <Hotkey hotkey={hotkey} />
+        </div>
+      ))}
+    </div>
+  );
 
   return (
     <div className="section">
-      <Header {...headerProps} />
-      {/* TODO: not sure whether this matches Vue's expand */}
-      <Animate transitionName="slidedown">
-        {(!isCollapsible || !collapsed) && (
-          <div className={cx({ 'section-content--opened': !!title }, 'section-content')}>
-            {hotkeys.map(hotkey => (
-              <div key={getHotkeyUniqueId(hotkey)}>
-                <Hotkey hotkey={hotkey} />
-              </div>
-            ))}
-          </div>
-        )}
-      </Animate>
+      {!isCollapsible ? (
+        hotkeyContent
+      ) : (
+        <Collapse
+          expandIcon={({ isActive }) => (
+            <i
+              className={cx('fa', 'section-title-icon', {
+                'fa-minus': isActive,
+                'fa-plus': !isActive,
+              })}
+            />
+          )}
+        >
+          <Panel header={header} key="1">
+            {hotkeyContent}
+          </Panel>
+        </Collapse>
+      )}
     </div>
   );
 }
