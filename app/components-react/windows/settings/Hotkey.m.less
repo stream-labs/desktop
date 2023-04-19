@@ -3,13 +3,13 @@
 .hotkey {
   display: flex;
   flex-direction: row;
-  .margin-bottom(3);
 }
 
 // TODO: we rather have flexbox handle all this, but this is porting ;)
 .hotkey-bindings {
   display: flex;
   flex: 1;
+  flex-wrap: wrap;
 
   /* hotkey description coming from child component `HotkeyBinding` */
   :global(.ant-form-item-label1) {
@@ -52,7 +52,8 @@
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-  flex: 1
+  flex: 1;
+  margin-bottom: 24px;
 }
 
 .hotkey-controls {
