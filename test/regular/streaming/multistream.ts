@@ -25,8 +25,8 @@ test('Multistream default mode', async t => {
   // enable all platforms
   await fillForm({
     twitch: true,
-    facebook: true,
     youtube: true,
+    trovo: true,
   });
   await waitForSettingsWindowLoaded();
 
@@ -54,8 +54,8 @@ test('Multistream advanced mode', async t => {
   // enable all platforms
   await fillForm({
     twitch: true,
-    facebook: true,
     youtube: true,
+    trovo: true,
   });
 
   await switchAdvancedMode();
@@ -77,12 +77,11 @@ test('Multistream advanced mode', async t => {
     description: 'youtube description',
   });
 
-  const facebookForm = useForm('facebook-settings');
-  await facebookForm.fillForm({
+  const trovoForm = useForm('trovo-settings');
+  await trovoForm.fillForm({
     customEnabled: true,
-    facebookGame: 'DOOM',
-    title: 'facebook title',
-    description: 'facebook description',
+    trovoGame: 'Doom',
+    title: 'trovo title',
   });
 
   await submit();

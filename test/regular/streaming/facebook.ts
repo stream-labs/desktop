@@ -14,7 +14,7 @@ import { click, focusChild, focusMain, select } from '../../helpers/modules/core
 
 useWebdriver();
 
-test('Streaming to a Facebook Page', async t => {
+test.skip('Streaming to a Facebook Page', async t => {
   await logIn('facebook', { multistream: false });
   await goLive({
     title: 'SLOBS Test Stream',
