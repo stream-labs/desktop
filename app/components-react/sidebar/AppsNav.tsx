@@ -22,7 +22,7 @@ export default function AppsNav(p: IAppsNav) {
     navigateApp: NavigationService.actions.navigateApp,
     enabledApps: PlatformAppsService.views.enabledApps
       .filter(app => {
-        return !!app.manifest.pages.find(page => {
+        return !!app?.manifest?.pages.find(page => {
           return page.slot === EAppPageSlot.TopNav;
         });
       })
