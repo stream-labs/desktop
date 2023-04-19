@@ -445,7 +445,7 @@ function CustomDestinationList() {
       ))}
       {!isEditMode && canAddMoreDestinations && (
         <a className={css.addDestinationBtn} onClick={addCustomDest}>
-          <i className="fa fa-plus" />
+          <i className={cx('fa fa-plus', css.plus)} />
           <span>{$t('Add Destination')}</span>
 
           {shouldShowPrimeLabel ? (

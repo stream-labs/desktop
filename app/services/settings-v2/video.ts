@@ -5,6 +5,7 @@ import { mutation, StatefulService } from '../core/stateful-service';
 import * as obs from '../../../obs-api';
 import { GreenService } from 'services/green';
 import { SettingsService } from 'services/settings';
+import { Subject } from 'rxjs';
 
 /**
  * Display Types
@@ -35,8 +36,11 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
     green: null as obs.IVideoInfo,
   };
 
+  establishedContext = new Subject();
+
   init() {
     this.establishVideoContext();
+    this.establishedContext.next();
     if (this.greenService.views.activeDisplays.green) {
       this.establishVideoContext('green');
     }
@@ -62,6 +66,7 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
       fpsInt: context.fpsNum,
     };
   }
+
   get baseResolution() {
     const context = this.state.horizontal;
 

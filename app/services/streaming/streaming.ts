@@ -863,6 +863,7 @@ export class StreamingService
 
   startReplayBuffer() {
     if (this.state.replayBufferStatus !== EReplayBufferState.Offline) return;
+
     this.usageStatisticsService.recordFeatureUsage('ReplayBuffer');
     obs.NodeObs.OBS_service_startReplayBuffer();
   }

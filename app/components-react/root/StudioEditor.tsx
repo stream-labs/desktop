@@ -20,7 +20,7 @@ export default function StudioEditor() {
   const studioModeRef = useRef<HTMLDivElement>(null);
   const [studioModeStacked, setStudioModeStacked] = useState(false);
   const [verticalPlaceholder, setVerticalPlaceholder] = useState(false);
-  const studioModeTransitionName = useMemo(() => TransitionsService.getStudioTransitionName(), [
+  const studioModeTransitionName = useMemo(() => TransitionsService.studioTransitionName, [
     v.studioMode,
   ]);
 
