@@ -2,7 +2,6 @@ import React from 'react';
 import { InputComponent, TSlobsInputProps } from './inputs';
 import InputWrapper from './InputWrapper';
 import { Radio, Space } from 'antd';
-import cx from 'classnames';
 
 type TRadioInputProps = TSlobsInputProps<
   {
@@ -13,6 +12,7 @@ type TRadioInputProps = TSlobsInputProps<
     buttons?: boolean;
     direction?: 'vertical' | 'horizontal';
     disabled?: boolean;
+    className?: string;
   },
   string,
   {}
@@ -33,6 +33,7 @@ export const RadioInput = InputComponent((p: TRadioInputProps) => {
           optionType="button"
           buttonStyle="solid"
           disabled={p.disabled}
+          className={p.className}
         />
       )}
       {!p.buttons && (
@@ -40,6 +41,7 @@ export const RadioInput = InputComponent((p: TRadioInputProps) => {
           value={p.value}
           defaultValue={p.defaultValue}
           onChange={e => p.onChange && p.onChange(e.target.value)}
+          className={p.className}
         >
           <Space direction={p?.direction ?? 'vertical'}>
             {p.options.map(option => {

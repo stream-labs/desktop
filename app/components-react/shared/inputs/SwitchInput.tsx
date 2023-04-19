@@ -24,18 +24,14 @@ export const SwitchInput = InputComponent((p: TSwitchInputProps) => {
    */
   return wrapperAttrs?.layout === 'horizontal' ? (
     <InputWrapper {...{ wrapperAttrs, nowrap: true }}>
-      <Form.Item
-        colon={false}
-        aria-label={p.label}
-        className={styles.horizontalItem}
-        style={p.style}
-      >
+      <Form.Item colon={false} aria-label={p.label} style={p.style}>
         <Switch
           checked={inputAttrs.value}
           size="small"
           {...inputAttrs}
           ref={p.inputRef}
-          className={cx(styles.horizontal)}
+          className={cx(styles.horizontal, styles.horizontalItem)}
+          checkedChildren={<i className="check-mark" />}
         />
         {p.label}
       </Form.Item>

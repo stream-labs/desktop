@@ -3,7 +3,7 @@ import styles from './DualOutputGoLive.m.less';
 import Scrollable from 'components-react/shared/Scrollable';
 import { Services } from 'components-react/service-provider';
 import { useGoLiveSettings } from '../useGoLiveSettings';
-import { DualOutputDestinationSwitcher } from './DualOutputDestinationSwitcher';
+import { DualOutputDestinationSwitcher } from './DualOutputDestinationSwitchers';
 import { $t } from 'services/i18n';
 import { Row, Col } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
@@ -71,31 +71,33 @@ export default function DualOutputGoLiveSettings() {
     <Row gutter={16} className={styles.settingsRow}>
       {/*LEFT COLUMN*/}
       <Col span={8} className={styles.leftColumn}>
-        {/*DESTINATION SWITCHERS*/}
-        <DualOutputDestinationSwitcher />
-        {/*ADD DESTINATION BUTTON*/}
-        <a className={styles.addDestinationBtn} onClick={addDestination}>
-          <PlusIcon style={{ paddingLeft: '17px', fontSize: '24px' }} />
-          {$t('Add Destination')}
-          {shouldShowPrimeLabel && (
-            <ButtonHighlighted
-              filled
-              text={$t('Ultra')}
-              icon={
-                <UltraIcon
-                  type="simple"
-                  style={{
-                    fill: '#09161D',
-                    display: 'inline-block',
-                    height: '12px',
-                    width: '12px',
-                    marginRight: '5px',
-                  }}
-                />
-              }
-            />
-          )}
-        </a>
+        <Scrollable style={{ height: '100%' }}>
+          {/*DESTINATION SWITCHERS*/}
+          <DualOutputDestinationSwitcher />
+          {/*ADD DESTINATION BUTTON*/}
+          <a className={styles.addDestinationBtn} onClick={addDestination}>
+            <PlusIcon style={{ paddingLeft: '17px', fontSize: '24px' }} />
+            {$t('Add Destination')}
+            {shouldShowPrimeLabel && (
+              <ButtonHighlighted
+                filled
+                text={$t('Ultra')}
+                icon={
+                  <UltraIcon
+                    type="simple"
+                    style={{
+                      fill: '#09161D',
+                      display: 'inline-block',
+                      height: '12px',
+                      width: '12px',
+                      marginRight: '5px',
+                    }}
+                  />
+                }
+              />
+            )}
+          </a>
+        </Scrollable>
       </Col>
 
       {/*RIGHT COLUMN*/}
