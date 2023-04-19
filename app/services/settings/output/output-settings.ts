@@ -364,39 +364,6 @@ export class OutputSettingsService extends Service {
     };
   }
 
-  confirmFilePath() {
-    const output = this.settingsService.state.Output.formData;
-    const mode: TOutputSettingsMode = this.settingsService.findSettingValue(
-      output,
-      'Untitled',
-      'Mode',
-    );
-
-    const path =
-      mode === 'Simple'
-        ? this.settingsService.findSettingValue(output, 'Recording', 'FilePath')
-        : this.settingsService.findSettingValue(output, 'Recording', 'RecFilePath');
-
-    if (!!path || path === void 0) {
-      // if the path is undefined, the app will freeze
-      // so default to the highlighter export file path
-
-      const parsed = parse(this.highlighterService.views.exportInfo.file);
-      const filePath = parsed.dir;
-
-      output.forEach(subcategory => {
-        subcategory.parameters.forEach(setting => {
-          if (mode === 'Simple' && setting.name === 'FilePath') {
-            setting.value = filePath;
-          } else if (setting.name === 'RecFilePath') {
-            setting.value = filePath;
-          }
-        });
-      });
-      this.settingsService.setSettings('Output', output);
-    }
-  }
-
   /**
    * This method helps to simplify tuning the encoder's settings
    * This method can patch ONLY Advanced settings

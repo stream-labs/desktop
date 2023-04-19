@@ -870,10 +870,8 @@ export class StreamingService
 
   stopReplayBuffer() {
     if (this.state.replayBufferStatus === EReplayBufferState.Running) {
-      this.outputSettingsService.confirmFilePath();
       obs.NodeObs.OBS_service_stopReplayBuffer(false);
     } else if (this.state.replayBufferStatus === EReplayBufferState.Stopping) {
-      this.outputSettingsService.confirmFilePath();
       obs.NodeObs.OBS_service_stopReplayBuffer(true);
     }
   }

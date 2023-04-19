@@ -82,40 +82,6 @@ test('Recording via API', async (t: TExecutionContext) => {
   t.is(recordingStatus, ERecordingState.Offline);
 });
 
-test('Sets replay buffer output filepath if undefined', async (t: TExecutionContext) => {
-  const client = await getApiClient();
-  const streamingService = client.getResource<IStreamingServiceApi>('StreamingService');
-  const settingsService = client.getResource<SettingsService>('SettingsService');
-
-  const outputSettings = settingsService.state.Output.formData;
-  outputSettings.forEach(subcategory => {
-    subcategory.parameters.forEach(setting => {
-      if (['FilePath', 'RecFilePath'].includes(setting.name)) setting.value = undefined;
-    });
-  });
-
-  settingsService.setSettings('Output', outputSettings);
-
-  let replayBufferStatus = streamingService.getModel().replayBufferStatus;
-
-  streamingService.replayBufferStatusChange.subscribe(() => void 0);
-
-  t.is(replayBufferStatus, EReplayBufferState.Offline);
-
-  streamingService.startReplayBuffer();
-
-  replayBufferStatus = (await client.fetchNextEvent()).data;
-  t.is(replayBufferStatus, EReplayBufferState.Running);
-
-  streamingService.stopReplayBuffer();
-
-  replayBufferStatus = (await client.fetchNextEvent()).data;
-  t.is(replayBufferStatus, EReplayBufferState.Stopping);
-
-  replayBufferStatus = (await client.fetchNextEvent()).data;
-  t.is(replayBufferStatus, EReplayBufferState.Offline);
-});
-
 // TODO: Fix this test
 test.skip('Recording and Replay Buffer', async (t: TExecutionContext) => {
   const user = await reserveUserFromPool(t, 'twitch');
