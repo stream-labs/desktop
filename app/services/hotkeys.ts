@@ -548,7 +548,6 @@ export class HotkeysService extends StatefulService<IHotkeysServiceState> {
   }
 
   getHotkeysSet(): IHotkeysSet {
-    console.log('getHotkeysSet');
     const sourcesHotkeys: Dictionary<Hotkey[]> = {};
     this.sourcesService.views.getSources().forEach(source => {
       const sourceHotkeys = this.getSourceHotkeys(source.sourceId);
