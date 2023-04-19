@@ -20,3 +20,4 @@ jobs:
         env:
           BUNDLEMON_PROJECT_ID: 61b93ac52424c30009117f11
           CI_COMMIT_SHA: ${{github.event.pull_request.head.sha || github.sha}}
+          NODE_OPTIONS: --openssl-legacy-provider
