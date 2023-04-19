@@ -23,6 +23,7 @@ import Translate from 'components-react/shared/Translate';
 import * as remote from '@electron/remote';
 
 function censorWord(str: string) {
+  if (str.length < 3) return str;
   return str[0] + '*'.repeat(str.length - 2) + str.slice(-1);
 }
 
