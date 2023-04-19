@@ -22,10 +22,25 @@ export default function CrossClipUpload(p: { onClose: () => void; platform: stri
     OnboardingService.actions.start({ isLogin: true });
   }
 
-  async function uploadCrossclip() {
-    const id = await HighlighterService.actions.return.uploadStorage();
-    // remote.shell.openExternal(`https://crossclip.streamlabs.com/storage/${id}`);
+  function uploadStorage() {
+    HighlighterService.actions.uploadStorage();
   }
+
+  function getPlatformLink(id: string) {
+    if (p.platform === 'crossclip') {
+      return `https://crossclip.streamlabs.com/storage/${id}`;
+    }
+    if (p.platform === 'typestudio') {
+      return `https://type-mvp-development.web.app/storage/${id}`;
+    }
+    return '';
+  }
+
+  useEffect(() => {
+    if (uploadInfo.videoId) {
+      remote.shell.openExternal(getPlatformLink(uploadInfo.videoId));
+    }
+  }, [uploadInfo.videoId]);
 
   // Clear all errors when this component unmounts
   useEffect(() => {
@@ -40,7 +55,7 @@ export default function CrossClipUpload(p: { onClose: () => void; platform: stri
       {!uploadInfo.videoId && (
         <button
           className={cx('button button--action', styles.uploadButton)}
-          onClick={uploadCrossclip}
+          onClick={uploadStorage}
         >
           {$t('Upload')}
         </button>

@@ -253,6 +253,7 @@ function PlatformSelect(p: { onClose: () => void }) {
         options={[
           { label: 'YouTube', value: 'youtube' },
           { label: 'Cross Clip', value: 'crossclip' },
+          { label: 'Type Studio', value: 'typestudio' },
         ]}
       />
       {platform === 'youtube' && <YoutubeUpload defaultTitle={videoName} close={p.onClose} />}
