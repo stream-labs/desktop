@@ -5,15 +5,15 @@ import { $t } from 'services/i18n';
 import styles from './DualOutputGoLive.m.less';
 import { ICustomStreamDestination } from 'services/settings/streaming';
 import { Services } from 'components-react/service-provider';
-import { SwitchInput, RadioInput } from 'components-react/shared/inputs';
+import { SwitchInput } from 'components-react/shared/inputs';
 import PlatformLogo from 'components-react/shared/PlatformLogo';
 import InfoBadge from 'components-react/shared/InfoBadge';
+import DisplaySelector from 'components-react/shared/DisplaySelector';
 import { assertIsDefined } from 'util/properties-type-guards';
 import { useDebounce } from 'components-react/hooks';
 import { useGoLiveSettings } from '../useGoLiveSettings';
 import { alertAsync } from 'components-react/modals';
 import Translate from 'components-react/shared/Translate';
-import { displayLabels, platformLabels, TDualOutputDisplayType } from 'services/dual-output';
 
 /**
  * Allows enabling/disabling platforms and custom destinations for the stream
@@ -165,22 +165,8 @@ function DestinationSwitcher(p: IDestinationSwitcherProps) {
     }
   })();
 
-  const dualOutputSettings = [
-    {
-      label: displayLabels('horizontal') ?? 'Horizontal',
-      value: 'horizontal',
-    },
-    {
-      label: displayLabels('vertical') ?? 'Vertical',
-      value: 'vertical',
-    },
-  ];
-
   const platformKey = title.toLowerCase() as TPlatform;
 
-  const platformSetting = Services.DualOutputService.views.platformSettings[platformKey];
-
-  console.log('platformSetting ', platformSetting);
   return (
     <div
       ref={containerRef}
@@ -197,47 +183,12 @@ function DestinationSwitcher(p: IDestinationSwitcherProps) {
           </div>
           {/* SWITCH */}
           <Switch />
-          {/* <SwitchInput
-            className={styles.platformSwitch}
-            onChange={onClickHandler}
-            checkedChildren={<i className="check-mark" />}
-          /> */}
         </div>
       </div>
       <div className={styles.platformDisplay}>
         <span className={styles.label}>{`${$t('Output')}:`}</span>
-        <RadioInput
-          label={(platformLabels(platformKey) ?? platformKey) as string}
-          direction="horizontal"
-          className={styles.displaySelector}
-          nolabel
-          nomargin
-          defaultValue="horizontal"
-          options={dualOutputSettings}
-          onChange={val =>
-            Services.DualOutputService.actions.updatePlatformSetting(
-              platformKey,
-              val as TDualOutputDisplayType,
-            )
-          }
-          value={platformSetting?.display}
-          disabled={Services.StreamingService.views.isMidStreamMode}
-        />
+        <DisplaySelector platform={platformKey} nolabel nomargin />
       </div>
-      {/* <div className={cx(styles.colInput)}>
-        <Switch />
-      </div> */}
-
-      {/* PLATFORM LOGO */}
-      {/* <div className="logo margin-right--20">
-        <Logo />
-      </div> */}
-
-      {/* PLATFORM TITLE AND ACCOUNT/URL */}
-      {/* <div className={styles.colAccount}>
-        <span className={styles.platformName}>{title}</span> <br />
-        {description} <br />
-      </div> */}
     </div>
   );
 }

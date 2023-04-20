@@ -1,12 +1,5 @@
 import { $t } from 'services/i18n';
-import { TPlatform } from 'services/platforms';
-
-export enum EDualOutputPlatform {
-  Twitch = 'twitch',
-  Facebook = 'facebook',
-  YouTube = 'youtube',
-  Trovo = 'trovo',
-}
+import { TPlatform, EPlatform, platformList } from 'services/platforms';
 
 export enum EOutputDisplayType {
   Horizontal = 'horizontal',
@@ -18,10 +11,11 @@ export type TDualOutputDisplayType = EOutputDisplayType.Horizontal | EOutputDisp
 export interface IDualOutputPlatformSetting {
   platform: TPlatform;
   display: EOutputDisplayType;
+  canUpdate: boolean;
 }
 
 export type TDualOutputPlatformSettings = {
-  [Platform in EDualOutputPlatform]: IDualOutputPlatformSetting;
+  [Platform in EPlatform]: IDualOutputPlatformSetting;
 };
 
 export type TDisplayPlatforms = {
@@ -29,31 +23,32 @@ export type TDisplayPlatforms = {
 };
 
 export const DualOutputPlatformSettings: TDualOutputPlatformSettings = {
-  [EDualOutputPlatform.Twitch]: {
-    platform: EDualOutputPlatform.Twitch,
+  [EPlatform.Twitch]: {
+    platform: EPlatform.Twitch,
     display: EOutputDisplayType.Horizontal,
+    canUpdate: true,
   },
-  [EDualOutputPlatform.Facebook]: {
-    platform: EDualOutputPlatform.Facebook,
+  [EPlatform.YouTube]: {
+    platform: EPlatform.YouTube,
     display: EOutputDisplayType.Horizontal,
+    canUpdate: true,
   },
-  [EDualOutputPlatform.YouTube]: {
-    platform: EDualOutputPlatform.YouTube,
+  [EPlatform.Facebook]: {
+    platform: EPlatform.Facebook,
     display: EOutputDisplayType.Horizontal,
+    canUpdate: true,
   },
-  [EDualOutputPlatform.Trovo]: {
-    platform: EDualOutputPlatform.Trovo,
+  [EPlatform.TikTok]: {
+    platform: EPlatform.TikTok,
+    display: EOutputDisplayType.Vertical,
+    canUpdate: false,
+  },
+  [EPlatform.Trovo]: {
+    platform: EPlatform.Trovo,
     display: EOutputDisplayType.Horizontal,
+    canUpdate: true,
   },
 };
-
-export const platformLabels = (platform: EDualOutputPlatform | string) =>
-  ({
-    [EDualOutputPlatform.Twitch]: $t('Twitch'),
-    [EDualOutputPlatform.Facebook]: $t('Facebook'),
-    [EDualOutputPlatform.YouTube]: $t('YouTube'),
-    [EDualOutputPlatform.Trovo]: $t('Trovo'),
-  }[platform]);
 
 export const displayLabels = (display: EOutputDisplayType | string) =>
   ({

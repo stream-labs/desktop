@@ -3,7 +3,6 @@ import {
   TDisplayPlatforms,
   TDualOutputPlatformSettings,
   DualOutputPlatformSettings,
-  EDualOutputPlatform,
   TDualOutputDisplayType,
   IDualOutputPlatformSetting,
 } from './dual-output-data';
@@ -343,10 +342,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
   }
 
   @mutation()
-  private UPDATE_PLATFORM_SETTING(
-    platform: EDualOutputPlatform | string,
-    display: TDualOutputDisplayType,
-  ) {
+  private UPDATE_PLATFORM_SETTING(platform: TPlatform | string, display: TDualOutputDisplayType) {
     this.state.platformSettings[platform] = {
       ...this.state.platformSettings[platform],
       display,

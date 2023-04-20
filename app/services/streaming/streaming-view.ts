@@ -10,7 +10,7 @@ import { StreamSettingsService } from '../settings/streaming';
 import { UserService } from '../user';
 import { RestreamService } from '../restream';
 import { DualOutputService } from '../dual-output';
-import { getPlatformService, TPlatform, TPlatformCapability } from '../platforms';
+import { getPlatformService, TPlatform, TPlatformCapability, platformList } from '../platforms';
 import { SettingsManagerService, TwitterService } from '../../app-services';
 import cloneDeep from 'lodash/cloneDeep';
 import difference from 'lodash/difference';
@@ -98,10 +98,6 @@ export class StreamInfoView<T extends Object> extends ViewHandler<T> {
     return getPlatformService(platform).displayName;
   }
 
-  getPlatformContext(platform: TPlatform): TDisplayType {
-    return this.dualOutputView.getPlatformContext(platform);
-  }
-
   // REMOVE
   get warning(): string {
     return this.info.warning;
@@ -111,8 +107,7 @@ export class StreamInfoView<T extends Object> extends ViewHandler<T> {
    * Returns a sorted list of all platforms (linked and unlinked)
    */
   get allPlatforms(): TPlatform[] {
-    const allPlatforms: TPlatform[] = ['twitch', 'facebook', 'youtube', 'tiktok', 'trovo'];
-    return this.getSortedPlatforms(allPlatforms);
+    return this.getSortedPlatforms(platformList);
   }
 
   /**
