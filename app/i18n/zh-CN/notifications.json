@@ -24,5 +24,5 @@
   "Recording History": "录制历史",
   "Show in folder": "在文件夹中显示",
   "Recordings": "录制",
-  "Marker %{label} added at %{timestamp}": "Marker %{label} added at %{timestamp}"
+  "Marker %{label} added at %{timestamp}": "标记 %{label} 添加于 %{timestamp}"
 }
