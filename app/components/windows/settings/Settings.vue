@@ -84,11 +84,9 @@
         >
           <Hotkeys
             v-if="page === 'Hotkeys'"
-            :componentProps="{
-              highlightSearch,
-              scanning,
-              globalSearchStr: scanning ? '' : searchStr,
-            }"
+            :highlightSearch="highlightSearch"
+            :scanning="scanning"
+            :globalSearchStr="scanning ? '' : searchStr"
           />
           <developer-settings v-if="page === 'Developer'" />
           <installed-apps v-if="page === 'Installed Apps'" />
