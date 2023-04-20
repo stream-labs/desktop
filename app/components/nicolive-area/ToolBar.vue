@@ -1,18 +1,17 @@
 <template>
   <div class="tool-bar">
-
     <div class="reservation-timer" v-if="programStatus === 'reserved'">
       番組開始まで {{ format(-programCurrentTime) }}
     </div>
     <div class="elapsed-time" v-else>
       <div class="program-time">
-        <time>{{ format(programCurrentTime) }}</time> / 
+        <time>{{ format(programCurrentTime) }}</time> /
         <time>{{ format(programTotalTime) }}</time>
       </div>
     </div>
 
     <div class="side-bar">
-      <popper 
+      <popper
         trigger="click"
         :options="{ placement: 'bottom-end' }"
         @show="showPopupMenu = true"
@@ -35,23 +34,44 @@
               <button
                 class="manual-extention link"
                 @click="extendProgram"
-                :disabled="autoExtensionEnabled || isExtending || !isProgramExtendable || programStatus === 'reserved'"
-              >30分延長</button>
+                :disabled="
+                  autoExtensionEnabled ||
+                  isExtending ||
+                  !isProgramExtendable ||
+                  programStatus === 'reserved'
+                "
+              >
+                30分延長
+              </button>
             </li>
           </ul>
         </div>
-        <button class="button--circle button--secondary button--extention" v-tooltip.bottom="extentionTooltip" :class="{ 'is-show': showPopupMenu, 'active': autoExtensionEnabled }" slot="reference">
+        <button
+          class="button--circle button--secondary button--extention"
+          v-tooltip.bottom="extentionTooltip"
+          :class="{ 'is-show': showPopupMenu, active: autoExtensionEnabled }"
+          slot="reference"
+        >
           <i class="icon-extention"></i>
         </button>
       </popper>
-    
-      <button @click="fetchProgram" :disabled="isFetching" v-tooltip.bottom="fetchTooltip" class="button--circle button--secondary">
+
+      <button
+        @click="fetchProgram"
+        :disabled="isFetching"
+        v-tooltip.bottom="fetchTooltip"
+        class="button--circle button--secondary"
+      >
         <i class="icon-reload"></i>
       </button>
 
       <div class="program-button">
         <button
-          v-if="programStatus === 'onAir' || programStatus === 'reserved'"
+          v-if="
+            programStatus === 'onAir' ||
+            programStatus === 'reserved' ||
+            (programStatus === 'test' && selectedButton === 'end')
+          "
           @click="endProgram"
           :disabled="isEnding || programStatus === 'reserved'"
           class="button button--end-program button--live"
@@ -66,29 +86,59 @@
         >
           番組作成
         </button>
-        <button
-          v-else
-          @click="startProgram"
-          :disabled="isStarting"
-          class="button button--action"
-        >
+        <button v-else @click="startProgram" :disabled="isStarting" class="button button--action">
           番組開始
         </button>
+        <popper
+          trigger="click"
+          :options="{ placement: 'bottom-end' }"
+          @show="showButtonSelector = true"
+          @hide="showButtonSelector = false"
+        >
+          <div class="popper">
+            <ul class="popup-menu-list">
+              <li class="popup-menu-item">
+                <button
+                  :class="{ 'button-selector': true, current: selectedButton === 'start' }"
+                  @click="selectButton('start')"
+                >
+                  番組開始
+                </button>
+              </li>
+              <li class="popup-menu-item">
+                <button
+                  :class="{ 'button-selector': true, current: selectedButton === 'end' }"
+                  @click="selectButton('end')"
+                >
+                  番組終了
+                </button>
+              </li>
+            </ul>
+          </div>
+          <button
+            class="button--circle button--secondary button--extention"
+            v-tooltip.bottom="startButtonSelectorTooltip"
+            :class="{ 'is-show': showPopupMenu, active: showButtonSelector }"
+            slot="reference"
+          >
+            <i class="icon-button-selector"></i>
+          </button>
+        </popper>
       </div>
     </div>
   </div>
 </template>
 <script lang="ts" src="./ToolBar.vue.ts"></script>
 <style lang="less" scoped>
-@import '../../styles/index';
+@import url('../../styles/index');
 
 .tool-bar {
+  position: relative;
   display: flex;
   align-items: center;
   height: 64px;
   padding: 0 16px;
   background-color: var(--color-bg-quinary);
-  position: relative;
 }
 
 .elapsed-time {
@@ -109,6 +159,7 @@
 
 .popper {
   .popper-styling();
+
   width: 160px;
 }
 
@@ -117,9 +168,9 @@
 }
 
 .auto-extention {
-  margin-left: auto;
-  padding-left: 16px;
   z-index: 2;
+  padding-left: 16px;
+  margin-left: auto;
 }
 
 .button--circle {
@@ -133,8 +184,13 @@
   }
 }
 
+.button-selector {
+  &.current {
+    background-color: @accent;
+  }
+}
+
 .program-button {
   margin-left: 16px;
 }
-
 </style>

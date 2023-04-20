@@ -22,8 +22,15 @@ export default class ToolBar extends Vue {
   // TODO: 後で言語ファイルに移動する
   fetchTooltip = '番組再取得';
   extentionTooltip = '延長設定';
+  startButtonSelectorTooltip = '配信開始/終了ボタンを選択';
 
   showPopupMenu: boolean = false;
+  selectedButton: 'start' | 'end' = 'start';
+  showButtonSelector: boolean = false;
+
+  selectButton(button: 'start' | 'end') {
+    this.selectedButton = button;
+  }
 
   get isOnAir(): boolean {
     return this.nicoliveProgramService.state.status === 'onAir';
@@ -47,6 +54,7 @@ export default class ToolBar extends Vue {
       }
     } finally {
       this.isCreating = false;
+      this.selectButton('start');
     }
   }
 
