@@ -217,6 +217,14 @@ export class GreenService extends PersistentStatefulService<IGreenServiceState> 
       this.assignSceneNodes();
     });
 
+    this.sceneCollectionsService.collectionSwitched.subscribe(() => {
+      this.assignSceneNodes();
+    });
+
+    this.sceneCollectionsService.collectionAdded.subscribe(() => {
+      this.assignSceneNodes();
+    });
+
     this.scenesService.sceneAdded.subscribe((scene: IScene) => {
       this.assignSceneNodes(scene.id);
     });
