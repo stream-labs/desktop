@@ -24,5 +24,5 @@
   "Recording History": "錄影歷史記錄",
   "Show in folder": "在資料夾中顯示",
   "Recordings": "錄影",
-  "Marker %{label} added at %{timestamp}": "Marker %{label} added at %{timestamp}"
+  "Marker %{label} added at %{timestamp}": "標記 %{label} 已新增於 %{timestamp}"
 }

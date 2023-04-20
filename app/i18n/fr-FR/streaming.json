@@ -76,7 +76,7 @@
   "Enable Two Factor Authentication": "Activer l'authentification à deux facteurs",
   "Dismiss": "Ignorer",
   "It looks like you haven't added any video sources yet, so you will only be outputting a black screen.": "Il semble que vous n'avez pas encore ajouté de source vidéo. Vous allez simplement obtenir un écran noir.",
-  "Are you sure you want to do this?": "Êtes-vous sûr de vouloir faire cela?",
+  "Are you sure you want to do this?": "Êtes-vous sûr de vouloir exécuter cette opération?",
   "You can add sources by clicking the + icon near the Sources box at any time": "Vous pouvez ajouter des sources en cliquant sur l'icône + en regard de la zone Sources à tout moment",
   "Tweet to let your followers know you're going live": "Tweetez pour que vos followers sachent que vous passez en direct",
   "Optimized encoding provides better quality and/or lower cpu/gpu usage. Depending on the game, resolution may be changed for a better quality of experience": "L'encodage optimisé offre une meilleure qualité et/ou une utilisation réduite du processeur/gpu. Selon le jeu, la résolution peut être modifiée pour une meilleure expérience.",
@@ -94,13 +94,13 @@
   "You must select a game": "Vous devez sélectionner un jeu",
   "Please schedule no further than 7 days in advance and no sooner than 10 minutes in advance.": "Merci de ne pas planifier plus de 7 jours et moins de 10 minutes à l'avance.",
   "No Sources": "Aucune source",
-  "Enable Multistream": "Activer le multistream",
+  "Enable Multistream": "Activer le multiflux",
   "Multistream allows you to stream to multiple platforms simultaneously.": "Multistream vous permet de diffuser en continu sur plusieurs plateformes simultanément.",
   "Multistream": "Multistream",
   "Your Twitch login is expired. Please log in again to continue using Streamlabs": "Votre connexion Twitch a expiré. Reconnectez-vous pour continuer à utiliser Streamlabs",
   "Refresh Login": "Actualiser la connexion",
   "%{platform} Settings": "Paramètres de %{platform}",
-  "Update settings for %{platform}": "Mise à jour des paramètres pour %{platform}",
+  "Update settings for %{platform}": "Mettre à jour les paramètres pour %{platform}",
   "Link to the %{platform} page has been copied to your clipboard": "Le lien vers la page %{platform} a été copié dans votre presse-papiers",
   "Failed to fetch settings from %{platformName}": "Échec de la récupération des paramètres de %{platformName}",
   "Failed to update settings for %{platformName}": "Échec de la mise à jour des paramètres pour %{platformName}",
@@ -176,5 +176,5 @@
   "Step 3: Select which platforms you are streaming to when you hit \"Go Live\".": "Étape 3: sélectionnez les plates-formes sur lesquelles vous allez streamer avant de cliquer sur \"Diffuser en direct\".",
   "New features coming soon!": "De nouvelles fonctionnalités arriveront très bientôt!",
   "Stream to multiple platforms at once with <ultra>Streamlabs Ultra</ultra>.": "Streamez sur plusieurs plates-formes simultanément avec <ultra>Streamlabs Ultra</ultra>.",
-  "Upgrade your stream with premium themes with <ultra>Streamlabs Ultra</ultra>.": "Upgrade your stream with premium themes with <ultra>Streamlabs Ultra</ultra>."
+  "Upgrade your stream with premium themes with <ultra>Streamlabs Ultra</ultra>.": "Améliorez vos streams grâce aux thèmes premium de <ultra>Streamlabs Ultra</ultra>."
 }

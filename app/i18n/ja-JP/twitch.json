@@ -1,7 +1,7 @@
 {
   "Twitch Category": "Twitch カテゴリ",
   "Twitch Tags": "Twitch タグ",
-  "You need to re-login to access Twitch tags": "You need to re-login to access Twitch tags",
-  "Do not include special characters or spaces in your tag": "Do not include special characters or spaces in your tag",
-  "For example: \"Speedrunning\" or \"FirstPlaythrough\"": "For example: \"Speedrunning\" or \"FirstPlaythrough\""
+  "You need to re-login to access Twitch tags": "Twitch タグにアクセスするには再ログインが必要です",
+  "Do not include special characters or spaces in your tag": "タグには特殊文字や空白文字を含めないでください",
+  "For example: \"Speedrunning\" or \"FirstPlaythrough\"": "例：「Speedrunning」、「FirstPlaythrough」"
 }

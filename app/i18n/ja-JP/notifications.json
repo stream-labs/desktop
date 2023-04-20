@@ -24,5 +24,5 @@
   "Recording History": "録画履歴",
   "Show in folder": "フォルダーに表示",
   "Recordings": "録画",
-  "Marker %{label} added at %{timestamp}": "Marker %{label} added at %{timestamp}"
+  "Marker %{label} added at %{timestamp}": "マーカー %{label} が %{timestamp} に追加されました"
 }

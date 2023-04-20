@@ -1,7 +1,7 @@
 {
   "Twitch Category": "Категория Twitch",
   "Twitch Tags": "Теги для Twitch",
-  "You need to re-login to access Twitch tags": "You need to re-login to access Twitch tags",
-  "Do not include special characters or spaces in your tag": "Do not include special characters or spaces in your tag",
-  "For example: \"Speedrunning\" or \"FirstPlaythrough\"": "For example: \"Speedrunning\" or \"FirstPlaythrough\""
+  "You need to re-login to access Twitch tags": "Авторизуйтесь повторно, чтобы получить доступ к тегам Twitch",
+  "Do not include special characters or spaces in your tag": "Не добавляйте в теги специальные символы и пробелы",
+  "For example: \"Speedrunning\" or \"FirstPlaythrough\"": "Например: «Скоростноепрохождение» или «Первоепрохождение»"
 }
