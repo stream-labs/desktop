@@ -6,7 +6,7 @@ import {
   TGreenDisplayType,
   IGreenPlatformSetting,
 } from './green-data';
-import { ScenesService, SceneItem, IPartialSettings } from 'services/scenes';
+import { ScenesService, SceneItem, IPartialSettings, IScene } from 'services/scenes';
 import {
   TDisplayType,
   VideoSettingsService,
@@ -213,35 +213,22 @@ export class GreenService extends PersistentStatefulService<IGreenServiceState> 
   init() {
     super.init();
 
-    // this.sceneCollectionsService.collectionInitialized.subscribe(() => {
-    //   if (
-    //     this.scenesService.views.getSceneItemsBySceneId(this.scenesService.views.activeSceneId)
-    //       .length > 0
-    //   ) {
-    //     this.confirmOrCreateGreenNodes();
-    //   }
-    // });
+    this.sceneCollectionsService.collectionInitialized.subscribe(() => {
+      this.assignSceneNodes();
+    });
 
-    // this.sceneCollectionsService.collectionSwitched.subscribe(() => {
-    //   if (
-    //     this.scenesService.views.getSceneItemsBySceneId(this.scenesService.views.activeSceneId)
-    //       .length > 0
-    //   ) {
-    //     this.confirmOrCreateGreenNodes();
-    //   }
-    // });
+    this.scenesService.sceneAdded.subscribe((scene: IScene) => {
+      this.assignSceneNodes(scene.id);
+    });
 
-    // this.scenesService.sceneAdded.subscribe((scene: IScene) => {
-    //   if (this.videoSettingsService.contexts.green) {
-    //     this.assignSceneNodes(scene.id);
-    //   }
-    // });
+    this.scenesService.sceneSwitched.subscribe((scene: IScene) => {
+      this.assignSceneNodes(scene.id);
+    });
 
-    // this.scenesService.sceneSwitched.subscribe((scene: IScene) => {
-    //   if (this.scenesService.views.getSceneItemsBySceneId(scene.id).length > 0) {
-    //     this.confirmOrCreateGreenNodes(scene.id);
-    //   }
-    // });
+    this.scenesService.itemAdded.subscribe(item => {
+      const sceneItem = this.scenesService.views.getSceneItem(item.sceneItemId);
+      this.assignNodeContext(sceneItem, 'horizontal');
+    });
   }
 
   /**
@@ -275,16 +262,8 @@ export class GreenService extends PersistentStatefulService<IGreenServiceState> 
   assignSceneNodes(sceneId?: string) {
     const activeSceneId = this.scenesService.views.activeSceneId;
     const sceneItems = this.scenesService.views.getSceneItemsBySceneId(sceneId ?? activeSceneId);
-    const greenNodeIds = this.views.greenNodeIds;
 
-    if (!this.videoSettingsService.contexts.green) {
-      this.videoSettingsService.establishVideoContext('green');
-    }
-
-    sceneItems.forEach(sceneItem => {
-      const context = greenNodeIds.includes(sceneItem.id) ? 'green' : 'horizontal';
-      this.assignNodeContext(sceneItem, context);
-    });
+    sceneItems.forEach(sceneItem => this.assignNodeContext(sceneItem, 'horizontal'));
   }
 
   mapSceneNodes(displays: TDisplayType[], sceneId?: string) {
