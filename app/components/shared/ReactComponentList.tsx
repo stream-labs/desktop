@@ -484,3 +484,21 @@ export class UltraIcon extends ReactComponent<{
   type?: string;
   className?: string;
 }> {}
+
+@Component({
+  props: {
+    name: { default: 'Hotkeys' },
+    componentProps: {
+      default: () => ({
+        globalSearchStr: '',
+        highlightSearch: () => {},
+        scanning: false,
+      }),
+    },
+  },
+})
+export class Hotkeys extends ReactComponent<{
+  globalSearchStr: string;
+  highlightSearch: (searchStr: string) => void;
+  scanning: boolean;
+}> {}
