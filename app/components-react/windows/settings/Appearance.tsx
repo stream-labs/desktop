@@ -75,7 +75,7 @@ export function AppearanceSettings() {
   }));
 
   function openFFZSettings() {
-    WindowsService.createOneOffWindow(
+    WindowsService.actions.createOneOffWindow(
       {
         componentName: 'FFZSettings',
         title: $t('FrankerFaceZ Settings'),
@@ -90,7 +90,7 @@ export function AppearanceSettings() {
   }
 
   async function upgradeToPrime() {
-    MagicLinkService.linkToPrime('slobs-ui-themes');
+    MagicLinkService.actions.linkToPrime('slobs-ui-themes');
   }
 
   const shouldShowPrime = isLoggedIn && !isPrime;
