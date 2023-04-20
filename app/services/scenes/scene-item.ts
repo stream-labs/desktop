@@ -63,6 +63,8 @@ export class SceneItem extends SceneItemNode {
 
   sceneNodeType: TSceneNodeType = 'item';
 
+  output?: obs.IVideo;
+
   // Some computed attributes
 
   get scaledWidth(): number {
