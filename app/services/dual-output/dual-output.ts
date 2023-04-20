@@ -48,10 +48,6 @@ class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
     return this.state.platformSettings;
   }
 
-  get platformSettingsList(): IDualOutputPlatformSetting[] {
-    return Object.values(this.state.platformSettings);
-  }
-
   get hasVerticalNodes() {
     return this.state.sceneNodeMaps.hasOwnProperty(this.scenesService.views.activeSceneId);
   }
