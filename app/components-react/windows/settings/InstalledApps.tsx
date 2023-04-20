@@ -32,7 +32,7 @@ export default function InstalledApps() {
   }
 
   function noUnpackedVersionLoaded(appId: string) {
-    return !PlatformAppsService.enabledApps.find(app => app.id === appId && app.unpacked);
+    return !PlatformAppsService.views.enabledApps.find(app => app.id === appId && app.unpacked);
   }
 
   return (
