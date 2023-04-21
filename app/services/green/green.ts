@@ -23,6 +23,7 @@ import { IVideoInfo } from 'obs-studio-node';
 
 interface IDisplayVideoSettings {
   defaultDisplay: TDisplayType;
+  horizontal: IVideoInfo;
   green: IVideoInfo;
   activeDisplays: {
     horizontal: boolean;
@@ -195,6 +196,7 @@ export class GreenService extends PersistentStatefulService<IGreenServiceState> 
     sceneNodeMaps: {},
     videoSettings: {
       defaultDisplay: 'horizontal',
+      horizontal: null as IVideoInfo,
       green: greenDisplayData, // get settings for horizontal display from obs directly
       activeDisplays: {
         horizontal: true,
@@ -376,7 +378,7 @@ export class GreenService extends PersistentStatefulService<IGreenServiceState> 
     }
   }
 
-  setVideoSetting(setting: Partial<IVideoSetting>, display?: TDisplayType) {
+  setVideoSetting(setting: Partial<IVideoInfo>, display?: TDisplayType) {
     this.SET_VIDEO_SETTING(setting, display);
   }
 
@@ -490,10 +492,10 @@ export class GreenService extends PersistentStatefulService<IGreenServiceState> 
   }
 
   @mutation()
-  private SET_VIDEO_SETTING(setting: Partial<IVideoSetting>, display: TDisplayType = 'green') {
-    this.state.videoSettings.activeDisplays = {
-      ...this.state.videoSettings.activeDisplays,
-      [display]: setting,
+  private SET_VIDEO_SETTING(setting: Partial<IVideoInfo>, display: TDisplayType = 'green') {
+    this.state.videoSettings[display] = {
+      ...this.state.videoSettings[display],
+      ...setting,
     };
   }
 }
