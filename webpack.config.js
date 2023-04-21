@@ -4,7 +4,6 @@ const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const ESLintPlugin = require('eslint-webpack-plugin');
 
 const path = require('path');
-const TerserPlugin = require('terser-webpack-plugin');
 
 const plugins = [];
 
@@ -35,6 +34,13 @@ module.exports = {
     filename: '[name].js',
     publicPath: '/bundles/',
   },
+
+  cache: {
+    type: 'filesystem',
+    buildDependencies: {
+      config: [__filename],
+    },
+  }, // if probrem, clean node_modules/.cache
 
   devServer: {
     static: {
@@ -80,6 +86,9 @@ module.exports = {
     'node-fontinfo': 'require("node-fontinfo")',
     'socket.io-client': 'require("socket.io-client")',
     rimraf: 'require("rimraf")',
+
+    'utf-8-validate': 'utf-8-validate',
+    bufferutil: 'bufferutil',
   },
 
   module: {
@@ -162,7 +171,6 @@ module.exports = {
       name: 'vendors~renderer',
     },
     chunkIds: 'named',
-    minimizer: [new TerserPlugin({ sourceMap: true, terserOptions: { mangle: false } })],
   },
 
   plugins,

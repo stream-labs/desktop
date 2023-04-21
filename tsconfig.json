@@ -2,11 +2,7 @@
   "compileOnSave": false,
   "compilerOptions": {
     "target": "es5",
-    "lib": [
-      "dom",
-      "es7",
-      "es2017"
-    ],
+    "lib": ["dom", "es7", "es2017"],
     "module": "es2015",
     "moduleResolution": "node",
     "isolatedModules": false,
@@ -22,14 +18,10 @@
     "sourceRoot": "/",
     "allowJs": false,
     "strictNullChecks": false,
-    "emitDecoratorMetadata": true,
+    "emitDecoratorMetadata": false,
     "downlevelIteration": true,
     "baseUrl": "./app"
   },
-  "exclude": [
-    "node_modules"
-  ],
-  "include": [
-    "./app/**/*"
-  ]
+  "exclude": ["node_modules"],
+  "include": ["./app/**/*"]
 }
