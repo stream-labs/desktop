@@ -81,11 +81,10 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
     };
   }
 
-  get defaultBaseResolution() {
-    const display = this.greenService.views.defaultDisplay.key;
+  get baseResolution() {
     return {
-      width: this.contexts[display].video.baseWidth,
-      height: this.contexts[display].video.baseHeight,
+      width: this.contexts.horizontal.video.baseWidth,
+      height: this.contexts.horizontal.video.baseHeight,
     };
   }
 

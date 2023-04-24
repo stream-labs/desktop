@@ -55,7 +55,7 @@ export class RootNode extends Node<ISchema, {}> {
       transitions,
       hotkeys,
       guestCam,
-      baseResolution: this.videoService.baseResolution,
+      baseResolution: this.videoSettingsService.baseResolution,
       selectiveRecording: this.streamingService.state.selectiveRecording,
       operatingSystem: process.platform as OS,
     };
