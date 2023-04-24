@@ -32,7 +32,6 @@ const {
   desktopCapturer,
 } = require('electron');
 const path = require('path');
-const rimraf = require('rimraf');
 const remote = require('@electron/remote/main');
 
 // Game overlay is Windows only
@@ -46,7 +45,16 @@ if (process.env.SLOBS_CACHE_DIR) {
 app.setPath('userData', path.join(app.getPath('appData'), 'slobs-client'));
 
 if (process.argv.includes('--clearCacheDir')) {
-  rimraf.sync(app.getPath('userData'));
+  try {
+    // This could block for a while, but should ensure that the crash handler
+    // is no longer able to interfere with cache removal.
+    fs.rmSync(app.getPath('userData'), {
+      force: true,
+      recursive: true,
+      maxRetries: 5,
+      retryDelay: 500,
+    });
+  } catch (e) {}
 }
 
 // This ensures that only one copy of our app can run at once.
