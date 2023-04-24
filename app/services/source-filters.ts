@@ -174,13 +174,13 @@ export class SourceFiltersService extends Service {
   getFilters(sourceId: string): ISourceFilter[] {
     return this.sourcesService
       .getSource(sourceId)
-      .getObsInput()
+      ?.getObsInput()
       .filters.map(obsFilter => ({
         visible: obsFilter.enabled,
         name: obsFilter.name,
         type: obsFilter.id as TSourceFilterType,
         settings: obsFilter.settings,
-      }));
+      })) || [];
   }
 
   setVisibility(sourceId: string, filterName: string, visible: boolean) {
