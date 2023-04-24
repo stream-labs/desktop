@@ -81,13 +81,6 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
     };
   }
 
-  get baseResolution() {
-    return {
-      width: this.contexts.horizontal.video.baseWidth,
-      height: this.contexts.horizontal.video.baseHeight,
-    };
-  }
-
   get baseResolutions() {
     const [widthStr, heightStr] = this.settingsService.views.values.Video.Base.split('x');
     const horizontalWidth = parseInt(widthStr, 10);
