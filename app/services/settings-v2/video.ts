@@ -150,7 +150,6 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
     // if this is the first time starting the app
     // set default settings for horizontal context
     if (!this.greenService.views.videoSettings.horizontal) {
-      console.log('setting horizontal');
       Object.keys(this.contexts.horizontal.legacySettings).forEach((key: keyof obs.IVideoInfo) => {
         this.SET_VIDEO_SETTING(key, this.contexts.horizontal.legacySettings[key]);
         this.greenService.setVideoSetting(
@@ -163,7 +162,6 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
         this.greenService.setVideoSetting({ [key]: this.contexts.horizontal.video[key] }, display);
       });
     } else {
-      console.log('applying');
       const data = this.greenService.views.videoSettings[display];
 
       Object.keys(data).forEach((key: keyof obs.IVideoInfo) => {
