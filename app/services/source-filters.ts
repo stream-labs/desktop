@@ -222,7 +222,7 @@ export class SourceFiltersService extends Service {
     const formData = getPropertiesFormData(filter);
 
     // サイドチェーンのトリガーにする音声ソースがIDしかもらえないので、名前に変換する
-    formData.forEach((input: any) => {
+    formData?.forEach((input: any) => {
       if (input.name === 'sidechain_source') {
         (input as IObsListInput<string>).options.forEach(option => {
           if (option.value === 'none') return;
