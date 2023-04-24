@@ -144,7 +144,7 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
     };
   }
 
-  migrateSettings(display?: TDisplayType) {
+  migrateSettings(display: TDisplayType = 'horizontal') {
     this.SET_VIDEO_CONTEXT(display, this.contexts[display].video);
 
     // if this is the first time starting the app

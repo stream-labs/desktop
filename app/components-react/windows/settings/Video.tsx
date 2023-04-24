@@ -355,6 +355,7 @@ export function VideoSettings() {
             metadata={metadata}
             onChange={onChange}
             formOptions={{ layout: 'vertical' }}
+            name="video-settings"
           />
         </div>
       </div>
