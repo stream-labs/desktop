@@ -215,19 +215,7 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
 
   @debounce(200)
   updateObsSettings(display: TDisplayType = 'horizontal') {
-    switch (display) {
-      case 'horizontal': {
-        this.contexts.horizontal.video = this.state.horizontal;
-        break;
-      }
-      case 'green': {
-        this.contexts.green.video = this.state.green;
-        break;
-      }
-      default: {
-        this.contexts.horizontal.video = this.state.horizontal;
-      }
-    }
+    this.contexts[display].video = this.state[display];
   }
 
   setVideoSetting(key: string, value: unknown, display: TDisplayType = 'horizontal') {

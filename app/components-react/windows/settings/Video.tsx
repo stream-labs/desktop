@@ -346,18 +346,16 @@ export function VideoSettings() {
 
   return (
     <>
-      <div className={styles.videoSettingsHeader}>
-        <h2>{$t('Video')}</h2>
+      <h2>{$t('Video')}</h2>
 
-        <div className={styles.formSection}>
-          <FormFactory
-            values={values}
-            metadata={metadata}
-            onChange={onChange}
-            formOptions={{ layout: 'vertical' }}
-            name="video-settings"
-          />
-        </div>
+      <div className={styles.formSection}>
+        <FormFactory
+          values={values}
+          metadata={metadata}
+          onChange={onChange}
+          formOptions={{ layout: 'vertical' }}
+          name="video-settings"
+        />
       </div>
     </>
   );
