@@ -15,7 +15,7 @@
           <program-statistics class="program-area-item" />
           <area-switcher class="switch-area" :contents="contents">
             <template v-slot:commentViewer
-              ><comment-viewer :showProgramCreatedNotice="isShownCreatedNotice"
+              ><comment-viewer :showPlaceholder="showPlaceholder"
             /></template>
             <template v-slot:description><program-description /></template>
           </area-switcher>
@@ -60,7 +60,7 @@
 
 <script lang="ts" src="./NicoliveArea.vue.ts"></script>
 <style lang="less" scoped>
-@import '../../styles/index';
+@import url('../../styles/index');
 
 .root {
   display: flex;
@@ -95,24 +95,24 @@
 }
 
 .nicolive-area-container {
-  width: @nicolive-area-width;
   display: flex;
   flex-direction: column;
   flex-grow: 1;
   align-items: center;
+  width: @nicolive-area-width;
   background-color: var(--color-bg-quinary);
 }
 
 .program-area {
-  width: 100%;
   display: flex;
   flex-direction: column;
   flex-grow: 1;
   justify-content: center;
+  width: 100%;
 
   &.isCreate {
-    padding: 16px;
     align-items: center;
+    padding: 16px;
   }
 }
 
@@ -120,17 +120,16 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-
-  font-size: @font-size4;
-  color: var(--color-text);
-  line-height: 24px;
-  text-align: center;
   margin-bottom: 24px;
+  font-size: @font-size4;
+  line-height: 24px;
+  color: var(--color-text);
+  text-align: center;
 
   i {
-    color: var(--color-text-dark);
-    font-size: 88px;
     margin-bottom: 16px;
+    font-size: 88px;
+    color: var(--color-text-dark);
   }
 }
 
@@ -154,8 +153,8 @@
 }
 
 .switch-area {
-  flex-grow: 1;
   flex-basis: 0;
+  flex-grow: 1;
 }
 
 .devider {
@@ -164,31 +163,32 @@
   margin: 16px 0;
 
   .devider-label {
-    font-size: @font-size2;
     padding: 0 8px;
+    font-size: @font-size2;
     color: var(--color-text-dark);
   }
 
-  &:before,
-  &:after {
-    content: '';
-    height: 1px;
+  &::before,
+  &::after {
     flex-grow: 1;
+    height: 1px;
+    content: '';
     background-color: var(--color-text-dark);
   }
 }
 
 .footer {
   .dividing-border;
+
+  position: relative;
   display: flex;
-  justify-content: space-between;
+  flex: 0 0 auto;
   flex-direction: row;
   align-items: center;
-  position: relative;
-  padding: 0 16px;
+  justify-content: space-between;
   max-width: none;
   height: 32px;
-  flex: 0 0 auto;
+  padding: 0 16px;
   background-color: var(--color-bg-secondary);
 }
 </style>

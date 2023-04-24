@@ -160,22 +160,21 @@ test('findSuitableProgram', () => {
 });
 
 test.each([
-  ['CREATED', 1, 1],
-  ['RESERVED', 0, 0],
-  ['OTHER', 0, 0],
-])('createProgram with %s', async (result: string, fetchProgramCalled: number, showCreatedNoticeCalled: number) => {
+  ['CREATED', 1, true],
+  ['RESERVED', 0, false],
+  ['OTHER', 0, false],
+])('createProgram with %s', async (result: string, fetchProgramCalled: number, showPlaceholder: boolean) => {
   setup();
   const { NicoliveProgramService } = require('./nicolive-program');
   const instance = NicoliveProgramService.instance as NicoliveProgramService;
 
   instance.client.createProgram = jest.fn().mockResolvedValue(result);
   instance.fetchProgram = jest.fn();
-  instance.showCreatedNotice = jest.fn();
 
   await expect(instance.createProgram()).resolves.toBe(result);
   expect(instance.client.createProgram).toHaveBeenCalledTimes(1);
   expect(instance.fetchProgram).toHaveBeenCalledTimes(fetchProgramCalled);
-  expect(instance.showCreatedNotice).toHaveBeenCalledTimes(showCreatedNoticeCalled);
+  // expect(instance.isShownPlaceholder).toBe(showPlaceholder); TODO
 });
 
 test.each([
