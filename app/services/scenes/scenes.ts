@@ -3,6 +3,7 @@ import uniqBy from 'lodash/uniqBy';
 import without from 'lodash/without';
 import { Subject } from 'rxjs';
 import { mutation, StatefulService } from 'services/core/stateful-service';
+import { InitAfter } from 'services/core';
 import { TransitionsService } from 'services/transitions';
 import { WindowsService } from 'services/windows';
 import { Scene, SceneItem, TSceneNode, EScaleType, EBlendingMode, EBlendingMethod } from './index';
@@ -14,6 +15,7 @@ import namingHelpers from 'util/NamingHelpers';
 import uuid from 'uuid/v4';
 import { ViewHandler } from 'services/core';
 import { lazyModule } from 'util/lazy-module';
+import { VideoSettingsService } from 'services/settings-v2';
 
 export type TSceneNodeModel = ISceneItem | ISceneItemFolder;
 
@@ -221,6 +223,7 @@ class ScenesViews extends ViewHandler<IScenesState> {
   }
 }
 
+@InitAfter('GreenService')
 export class ScenesService extends StatefulService<IScenesState> {
   static initialState: IScenesState = {
     activeSceneId: '',
@@ -242,6 +245,7 @@ export class ScenesService extends StatefulService<IScenesState> {
   @Inject() private windowsService: WindowsService;
   @Inject() private sourcesService: SourcesService;
   @Inject() private transitionsService: TransitionsService;
+  @Inject() private videoSettingsService: VideoSettingsService;
 
   @mutation()
   private ADD_SCENE(id: string, name: string) {
@@ -291,7 +295,11 @@ export class ScenesService extends StatefulService<IScenesState> {
         .reverse()
         .forEach(item => {
           const newItem = newScene.addSource(item.sourceId);
-          newItem.setSettings(item.getSettings());
+          const settings = {
+            ...item.getSettings(),
+            output: this.videoSettingsService.contexts.horizontal,
+          };
+          newItem.setSettings(settings);
         });
     }
 
