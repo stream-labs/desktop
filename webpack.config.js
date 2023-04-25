@@ -2,6 +2,7 @@ const { VueLoaderPlugin } = require('vue-loader');
 const { WebpackManifestPlugin } = require('webpack-manifest-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const ESLintPlugin = require('eslint-webpack-plugin');
+const TerserPlugin = require('terser-webpack-plugin');
 
 const path = require('path');
 
@@ -171,6 +172,9 @@ module.exports = {
       name: 'vendors~renderer',
     },
     chunkIds: 'named',
+    minimizer: [
+      new TerserPlugin({ sourceMap: true, parallel: true, terserOptions: { mangle: false } }),
+    ],
   },
 
   plugins,
