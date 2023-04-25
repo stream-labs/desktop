@@ -157,7 +157,7 @@ export class StreamInfoView<T extends Object> extends ViewHandler<T> {
   }
 
   get isGreen(): boolean {
-    return Services.VideoSettingsService.isGreen;
+    return Services.GreenService.views.greenMode;
   }
 
   get activeDisplayPlatforms() {
