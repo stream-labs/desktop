@@ -172,9 +172,7 @@ module.exports = {
       name: 'vendors~renderer',
     },
     chunkIds: 'named',
-    minimizer: [
-      new TerserPlugin({ sourceMap: true, parallel: true, terserOptions: { mangle: false } }),
-    ],
+    minimizer: [new TerserPlugin({ sourceMap: true, terserOptions: { mangle: false } })],
   },
 
   plugins,
