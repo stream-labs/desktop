@@ -26,6 +26,8 @@ import uuid from 'uuid/v4';
 import { SceneNode } from '../api/external-api/scenes';
 import compact from 'lodash/compact';
 import { assertIsDefined } from 'util/properties-type-guards';
+// import { GreenService } from 'services/green';
+import { VideoSettingsService } from 'services/settings-v2';
 
 export type TSceneNode = SceneItem | SceneItemFolder;
 
@@ -45,6 +47,8 @@ export class Scene {
   @Inject() private scenesService: ScenesService;
   @Inject() private sourcesService: SourcesService;
   @Inject() private selectionService: SelectionService;
+  // @Inject() private greenService: GreenService;
+  @Inject() private videoSettingsService: VideoSettingsService;
 
   readonly state: IScene;
 
@@ -173,6 +177,11 @@ export class Scene {
     this.ADD_SOURCE_TO_SCENE(sceneItemId, source.sourceId, obsSceneItem.id);
     const sceneItem = this.getItem(sceneItemId)!;
 
+    const context = this.videoSettingsService.contexts.horizontal;
+    if (!context) return null;
+    console.log('assigned');
+    sceneItem.setSettings({ output: context });
+
     // Default is to select
     if (options.select == null) options.select = true;
     if (options.select) this.selectionService.views.globalSelection.select(sceneItemId);
@@ -180,6 +189,9 @@ export class Scene {
     if (options.initialTransform) {
       sceneItem.setTransform(options.initialTransform);
     }
+
+    // this.greenService.actions.assignNodeContext(sceneItem, 'horizontal');
+    console.log('sceneItem ', sceneItem.getModel());
 
     this.scenesService.itemAdded.next(sceneItem.getModel());
     return sceneItem;
@@ -347,6 +359,8 @@ export class Scene {
   addSources(nodes: TSceneNodeInfo[]) {
     const arrayItems: (ISceneItemInfo & obs.ISceneItemInfo)[] = [];
 
+    // const context = this.videoSettingsService.contexts.horizontal;
+
     // tslint:disable-next-line:no-parameter-reassignment TODO
     nodes = nodes.filter(sceneNode => {
       if (sceneNode.sceneNodeType === 'folder') return true;
@@ -369,6 +383,7 @@ export class Scene {
         scaleFilter: sceneNode.scaleFilter!,
         blendingMode: sceneNode.blendingMode!,
         blendingMethod: sceneNode.blendingMethod,
+        // output: context,
       });
       return true;
     });
@@ -383,6 +398,7 @@ export class Scene {
       } else {
         this.ADD_SOURCE_TO_SCENE(nodeModel.id, nodeModel.sourceId, obsSceneItems[itemIndex].id);
         const item = this.getItem(nodeModel.id)!;
+        // @@@
         item.loadItemAttributes(nodeModel);
         itemIndex++;
       }
