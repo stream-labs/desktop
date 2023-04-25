@@ -3,7 +3,6 @@ import uniqBy from 'lodash/uniqBy';
 import without from 'lodash/without';
 import { Subject } from 'rxjs';
 import { mutation, StatefulService } from 'services/core/stateful-service';
-import { InitAfter } from 'services/core';
 import { TransitionsService } from 'services/transitions';
 import { WindowsService } from 'services/windows';
 import { Scene, SceneItem, TSceneNode, EScaleType, EBlendingMode, EBlendingMethod } from './index';
@@ -13,7 +12,7 @@ import * as obs from '../../../obs-api';
 import { $t } from 'services/i18n';
 import namingHelpers from 'util/NamingHelpers';
 import uuid from 'uuid/v4';
-import { ViewHandler } from 'services/core';
+import { InitAfter, ViewHandler } from 'services/core';
 import { lazyModule } from 'util/lazy-module';
 import { VideoSettingsService } from 'services/settings-v2';
 

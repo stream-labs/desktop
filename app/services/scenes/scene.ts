@@ -177,7 +177,7 @@ export class Scene {
 
     // assign context to scene item
     const context = this.videoSettingsService.contexts.horizontal;
-    sceneItem.getObsSceneItem().video = context as obs.IVideo;
+    obsSceneItem.video = context as obs.IVideo;
 
     // Default is to select
     if (options.select == null) options.select = true;
