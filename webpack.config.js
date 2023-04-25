@@ -41,7 +41,7 @@ module.exports = {
     buildDependencies: {
       config: [__filename],
     },
-  }, // if probrem, clean node_modules/.cache
+  }, // if problem, clean node_modules/.cache
 
   devServer: {
     static: {
