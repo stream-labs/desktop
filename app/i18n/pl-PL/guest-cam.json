@@ -46,5 +46,6 @@
   "Stop Sharing": "Zatrzymaj udostępnianie",
   "Collab Cam requires a source": "Funkcja współpracy przez Collab Cam wymaga źródła",
   "At least one Collab Cam source is required to use Collab Cam. Would you like to add one now?": "Przynajmniej jedno źródło Collab Cam jest niezbędne do użytkowania funkcji Collab Cam. Czy chcesz teraz je dodać?",
-  "You now have access to Collab Cam!": "Nie masz dostępu do funkcji Collab Cam!"
+  "You now have access to Collab Cam!": "Nie masz dostępu do funkcji Collab Cam!",
+  "You must be logged in to use Collab Cam.": "You must be logged in to use Collab Cam."
 }
