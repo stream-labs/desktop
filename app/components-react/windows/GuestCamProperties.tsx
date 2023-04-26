@@ -84,6 +84,10 @@ class GuestCamModule {
     return this.GuestCamService.views.screenshareSourceId;
   }
 
+  get loggedIn() {
+    return this.UserService.views.isLoggedIn;
+  }
+
   get videoProducerSourceOptions() {
     const videoSourceType = byOS({ [OS.Windows]: 'dshow_input', [OS.Mac]: 'av_capture_input' });
 
@@ -284,6 +288,7 @@ export default function GuestCamProperties() {
     sourceExists,
     produceOk,
     regeneratingLink,
+    loggedIn,
     regenerateLink,
     truncateName,
     disconnectFromHost,
@@ -309,6 +314,19 @@ export default function GuestCamProperties() {
     } else {
       return $t('Start Collab Cam');
     }
+  }
+
+  if (!loggedIn) {
+    return (
+      <ModalLayout>
+        <Alert
+          type="error"
+          showIcon={true}
+          closable={false}
+          message={<div>{$t('You must be logged in to use Collab Cam.')}</div>}
+        />
+      </ModalLayout>
+    );
   }
 
   return (
