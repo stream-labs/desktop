@@ -23,6 +23,7 @@ import { IVideoInfo } from 'obs-studio-node';
 
 interface IDisplayVideoSettings {
   defaultDisplay: TDisplayType;
+  horizontal: IVideoInfo;
   green: IVideoInfo;
   activeDisplays: {
     horizontal: boolean;
@@ -195,6 +196,7 @@ export class GreenService extends PersistentStatefulService<IGreenServiceState> 
     sceneNodeMaps: {},
     videoSettings: {
       defaultDisplay: 'horizontal',
+      horizontal: null as IVideoInfo,
       green: greenDisplayData, // get settings for horizontal display from obs directly
       activeDisplays: {
         horizontal: true,
@@ -212,31 +214,6 @@ export class GreenService extends PersistentStatefulService<IGreenServiceState> 
 
   init() {
     super.init();
-
-    this.sceneCollectionsService.collectionInitialized.subscribe(() => {
-      this.assignSceneNodes();
-    });
-
-    this.sceneCollectionsService.collectionSwitched.subscribe(() => {
-      this.assignSceneNodes();
-    });
-
-    this.sceneCollectionsService.collectionAdded.subscribe(() => {
-      this.assignSceneNodes();
-    });
-
-    this.scenesService.sceneAdded.subscribe((scene: IScene) => {
-      this.assignSceneNodes(scene.id);
-    });
-
-    this.scenesService.sceneSwitched.subscribe((scene: IScene) => {
-      this.assignSceneNodes(scene.id);
-    });
-
-    this.scenesService.itemAdded.subscribe(item => {
-      const sceneItem = this.scenesService.views.getSceneItem(item.sceneItemId);
-      this.assignNodeContext(sceneItem, 'horizontal');
-    });
   }
 
   /**
@@ -376,7 +353,7 @@ export class GreenService extends PersistentStatefulService<IGreenServiceState> 
     }
   }
 
-  setVideoSetting(setting: Partial<IVideoSetting>, display?: TDisplayType) {
+  setVideoSetting(setting: Partial<IVideoInfo>, display?: TDisplayType) {
     this.SET_VIDEO_SETTING(setting, display);
   }
 
@@ -490,10 +467,10 @@ export class GreenService extends PersistentStatefulService<IGreenServiceState> 
   }
 
   @mutation()
-  private SET_VIDEO_SETTING(setting: Partial<IVideoSetting>, display: TDisplayType = 'green') {
-    this.state.videoSettings.activeDisplays = {
-      ...this.state.videoSettings.activeDisplays,
-      [display]: setting,
+  private SET_VIDEO_SETTING(setting: Partial<IVideoInfo>, display: TDisplayType = 'green') {
+    this.state.videoSettings[display] = {
+      ...this.state.videoSettings[display],
+      ...setting,
     };
   }
 }
