@@ -399,6 +399,12 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
         });
       }
     });
+
+    this.userService.userLogout.subscribe(() => {
+      this.SET_MAX_GUESTS(2);
+      this.SET_PRODUCE_OK(false);
+      this.cleanUpSocketConnection();
+    });
   }
 
   findDefaultSources() {
