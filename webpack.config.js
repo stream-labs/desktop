@@ -88,8 +88,8 @@ module.exports = {
     'socket.io-client': 'require("socket.io-client")',
     rimraf: 'require("rimraf")',
 
-    'utf-8-validate': 'utf-8-validate',
-    bufferutil: 'bufferutil',
+    'utf-8-validate': 'require("utf-8-validate")',
+    bufferutil: 'require("bufferutil")',
   },
 
   module: {
