@@ -70,8 +70,9 @@ export default function SourceGrid(p: { activeTab: string }) {
 
   const availableSources = useMemo(() => {
     const guestCamAvailable =
-      IncrementalRolloutService.views.featureIsEnabled(EAvailableFeatures.guestCamBeta) ||
-      IncrementalRolloutService.views.featureIsEnabled(EAvailableFeatures.guestCaProduction);
+      (IncrementalRolloutService.views.featureIsEnabled(EAvailableFeatures.guestCamBeta) ||
+        IncrementalRolloutService.views.featureIsEnabled(EAvailableFeatures.guestCaProduction)) &&
+      UserService.views.isLoggedIn;
 
     return SourcesService.getAvailableSourcesTypesList().filter(type => {
       // Freetype on windows is hidden
