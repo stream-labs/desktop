@@ -18,7 +18,6 @@ export default class Login extends Vue {
   mounted() {
     if (this.loggedIn) {
       if (!this.dismissablesService.shouldShow(EDismissable.LoginHelpTip)) {
-        console.log('reset login tooltip');
         this.dismissablesService.reset(EDismissable.LoginHelpTip);
       }
     }
