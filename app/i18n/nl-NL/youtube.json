@@ -29,7 +29,7 @@
   "Does not support: Closed captions, 1440p, and 4k resolutions": "Geen ondersteuning voor: Gesloten ondertiteling, 1440p en 4k-resolutie",
   "Enable DVR": "DVR inschakelen",
   "Additional Settings": "Aanvullende instellingen",
-  "Open Youtube Studio": "Youtube Studio openen",
+  "Open Youtube Studio": "YouTube Studio openen",
   "360° video": "360° video",
   "Enable Auto-start": "Automatisch starten inschakelen",
   "Enable Auto-stop": "Automatisch stoppen inschakelen",
@@ -37,7 +37,7 @@
   "Enabling auto-start will automatically start the stream when you start sending data from your streaming software": "Als u automatisch starten inschakelt, wordt de stream automatisch gestart wanneer u start met het verzenden van gegevens vanuit uw streamingsoftware.",
   "Enabling auto-stop will automatically stop the stream when you stop sending data from your streaming software": "Als u automatisch stoppen inschakelt, wordt de stream automatisch gestopt wanneer u stopt met het verzenden van gegevens vanuit uw streamingsoftware.",
   "DVR controls enable the viewer to control the video playback experience by pausing, rewinding, or fast forwarding content": "Met DVR-bediening kan de kijker het afspelen van de video regelen door te pauzeren, terug te spoelen of vooruit te spoelen.",
-  "Auto-start is disabled for your broadcast. You should manually publish your stream from Youtube Studio": "Automatisch starten is uitgeschakeld voor uw uitzending. U moet uw stream handmatig publiceren vanuit Youtube Studio",
+  "Auto-start is disabled for your broadcast. You should manually publish your stream from Youtube Studio": "Automatisch starten is uitgeschakeld voor uw uitzending. U moet uw stream handmatig publiceren vanuit YouTube Studio",
   "Made for kids": "Made for kids",
   "Features like personalized ads and live chat won't be available on live streams made for kids.": "Functies zoals gepersonaliseerde advertenties en live chat zijn niet beschikbaar in livestreams voor kinderen.",
   "Try our new thumbnail editor": "Probeer onze nieuwe miniatuureditor"
