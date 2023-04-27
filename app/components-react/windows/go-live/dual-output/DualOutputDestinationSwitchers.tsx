@@ -46,7 +46,7 @@ export function DualOutputDestinationSwitcher() {
   }
 
   return (
-    <div>
+    <>
       <InfoBadge
         content={
           <Translate message="<dualoutput>Dual Output</dualoutput> is enabled - you must stream to one horizontal and one vertical platform.">
@@ -72,7 +72,7 @@ export function DualOutputDestinationSwitcher() {
           onChange={enabled => switchCustomDestination(ind, enabled)}
         />
       ))}
-    </div>
+    </>
   );
 }
 
