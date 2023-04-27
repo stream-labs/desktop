@@ -1,7 +1,7 @@
 import electron from 'electron';
 import { CompactModeService } from 'services/compact-mode';
 import { Inject } from 'services/core/injector';
-import { EDismissable } from 'services/dismissables';
+import { DismissablesService, EDismissable } from 'services/dismissables';
 import { $t } from 'services/i18n';
 import { UserService } from 'services/user';
 import Vue from 'vue';
@@ -12,6 +12,16 @@ import HelpTip from './shared/HelpTip.vue';
 export default class Login extends Vue {
   @Inject() userService: UserService;
   @Inject() compactModeService: CompactModeService;
+
+  @Inject() dismissablesService: DismissablesService;
+
+  mounted() {
+    if (this.loggedIn) {
+      if (!this.dismissablesService.shouldShow(EDismissable.LoginHelpTip)) {
+        this.dismissablesService.reset(EDismissable.LoginHelpTip);
+      }
+    }
+  }
 
   get loggedIn() {
     return this.userService.isLoggedIn();

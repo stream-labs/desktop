@@ -8,7 +8,12 @@
     </a>
   </div>
   <div v-else>
-    <a v-if="!isCompactMode" class="link help_tip_content" @click="login" :title="$t('common.login')">
+    <a
+      v-if="!isCompactMode"
+      class="link help_tip_content"
+      @click="login"
+      :title="$t('common.login')"
+    >
       <i class="icon-log-in"></i>
       <help-tip :dismissable-key="loginHelpTipDismissable" mode="login">
         <div slot="title">
@@ -25,29 +30,29 @@
 <script lang="ts" src="./Login.vue.ts"></script>
 
 <style lang="less" scoped>
-@import '../styles/index';
+@import url('../styles/index');
 
 .login__status {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  flex-direction: column;
 }
 
 .user__profile {
-  height: 40px;
-  width: 48px;
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 48px;
+  height: 40px;
 
   .user__thumbnail {
     display: flex;
     align-items: center;
     width: 24px;
     height: 24px;
-    border-radius: 50%;
     background-color: @text-secondary;
+    border-radius: 50%;
   }
 }
 
