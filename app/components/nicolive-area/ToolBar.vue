@@ -97,31 +97,39 @@
         >
           <div class="popper">
             <ul class="popup-menu-list">
-              <li class="popup-menu-item">
+              <li class="item">
                 <button
                   :class="{ 'button-selector': true, current: selectedButton === 'start' }"
                   @click="selectButton('start')"
                 >
-                  番組開始
+                  <span class="item-name">番組開始</span>
+                  <span class="item-text">番組を開始して視聴者に公開します</span>
                 </button>
               </li>
-              <li class="popup-menu-item">
+              <li class="item">
                 <button
                   :class="{ 'button-selector': true, current: selectedButton === 'end' }"
                   @click="selectButton('end')"
                 >
-                  番組終了
+                  <span class="item-name">番組終了</span>
+                  <span class="item-text">番組を視聴者に公開せず終了します</span>
                 </button>
               </li>
             </ul>
           </div>
           <button
-            class="button--circle button--secondary button--extention"
+            class="button button--select-menu"
             v-tooltip.bottom="startButtonSelectorTooltip"
-            :class="{ 'is-show': showPopupMenu, active: showButtonSelector }"
+            v-show="programStatus === 'test'"
+            :class="{
+              'is-show': showPopupMenu,
+              active: showButtonSelector,
+              'button--action': selectedButton === 'start',
+              'button--end-program button--live': selectedButton === 'end',
+            }"
             slot="reference"
           >
-            <i class="icon-button-selector"></i>
+            <i class="icon-drop-down-arrow"></i>
           </button>
         </popper>
       </div>
@@ -158,9 +166,11 @@
 }
 
 .popper {
-  .popper-styling();
+  .popper-styling;
 
-  width: 160px;
+  width: 240px;
+  padding: 0;
+  margin: 0 0 8px 8px;
 }
 
 .toggle-button {
@@ -185,12 +195,58 @@
 }
 
 .button-selector {
-  &.current {
-    background-color: @accent;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  padding: 8px 16px;
+
+  .item-name {
+    font-size: @font-size4;
+    line-height: 1.6;
+    color: var(--color-text-light);
+  }
+
+  .item-text {
+    margin: 0;
+    font-size: @font-size2;
+    line-height: 1.6;
+    color: var(--color-text);
+  }
+
+  &.current,
+  &:hover {
+    .bg-hover();
   }
 }
 
 .program-button {
+  display: flex;
+  width: 120px;
   margin-left: 16px;
+  overflow: hidden;
+  .radius();
+
+  .button {
+    border-radius: 0;
+
+    &:first-child {
+      flex-grow: 1;
+    }
+  }
+}
+
+.button--select-menu {
+  height: 100%;
+  padding: 0 12px;
+  border-width: 0 0 0 1px;
+  border-left-color: var(--color-button-label);
+  border-left-width: 1px;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+
+  i {
+    margin: 0;
+    font-size: @font-size1;
+  }
 }
 </style>
