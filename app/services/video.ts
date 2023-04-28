@@ -350,10 +350,9 @@ export class VideoService extends Service {
     sourceId?: string,
   ) {
     const electronWindow = remote.BrowserWindow.fromId(electronWindowId);
-    const context = type ? this.videoSettingsService.contexts[type] : undefined;
+    const context = this.videoSettingsService.contexts[type];
 
     if (sourceId) {
-      const context = type ? this.videoSettingsService.contexts[type] : undefined;
       obs.NodeObs.OBS_content_createSourcePreviewDisplay(
         electronWindow.getNativeWindowHandle(),
         sourceId,
