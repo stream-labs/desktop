@@ -16,7 +16,7 @@ export function TrovoEditStreamInfo(p: IPlatformComponentParams<'trovo'>) {
   const bind = createBinding(trSettings, updatedSettings => updateSettings(updatedSettings));
 
   return (
-    <Form name="twitch-settings">
+    <Form name="trovo-settings">
       <PlatformSettingsLayout
         layoutMode={p.layoutMode}
         commonFields={

@@ -11,7 +11,7 @@ import InputWrapper from 'components-react/shared/inputs/InputWrapper';
 import Form from 'components-react/shared/inputs/Form';
 import { TObsValue, IObsListInput, TObsFormData } from 'components/obs/inputs/ObsInput';
 import { Services } from 'components-react/service-provider';
-import { useVuex } from 'components-react/hooks';
+import { useChildWindowParams, useVuex } from 'components-react/hooks';
 import { AudioSource } from 'services/audio';
 import { Source } from 'services/sources';
 import { $t } from 'services/i18n';
@@ -23,10 +23,7 @@ const { Panel } = Collapse;
 export default function AdvancedAudio() {
   const { AudioService, WindowsService } = Services;
 
-  const initialSource = useMemo<string>(
-    () => WindowsService.getChildWindowQueryParams().sourceId || '',
-    [],
-  );
+  const initialSource = useChildWindowParams('sourceId') || '';
   const [expandedSource, setExpandedSource] = useState(initialSource);
 
   const { audioSources } = useVuex(() => ({
@@ -300,23 +297,26 @@ function DeviceInputs(p: { source: Source }) {
     setStatefulSettings({ ...statefulSettings, [name]: value });
   }
 
-  const input = p.source.type === 'wasapi_process_output_capture' ?
-    <ListInput
-      label={$t('Window')}
-      options={deviceOptions}
-      value={statefulSettings.window}
-      onChange={value => handleInput('window', value)}
-    /> :
-    <ListInput
-      label={$t('Device')}
-      options={deviceOptions}
-      value={statefulSettings.device_id}
-      onChange={value => handleInput('device_id', value)}
-    />
+  const input =
+    p.source.type === 'wasapi_process_output_capture' ? (
+      <ListInput
+        label={$t('Window')}
+        options={deviceOptions}
+        value={statefulSettings.window}
+        onChange={value => handleInput('window', value)}
+      />
+    ) : (
+      <ListInput
+        label={$t('Device')}
+        options={deviceOptions}
+        value={statefulSettings.device_id}
+        onChange={value => handleInput('device_id', value)}
+      />
+    );
 
   return (
     <>
-      { input }
+      {input}
       <SwitchInput
         label={$t('Use Device Timestamps')}
         value={statefulSettings.use_device_timing}

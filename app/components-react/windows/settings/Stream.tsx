@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { $t } from '../../../services/i18n';
 import { ICustomStreamDestination } from '../../../services/settings/streaming';
 import { EStreamingState } from '../../../services/streaming';
@@ -23,6 +23,7 @@ import Translate from 'components-react/shared/Translate';
 import * as remote from '@electron/remote';
 
 function censorWord(str: string) {
+  if (str.length < 3) return str;
   return str[0] + '*'.repeat(str.length - 2) + str.slice(-1);
 }
 
@@ -369,7 +370,7 @@ function Platform(p: { platform: TPlatform }) {
   const { canEditSettings, platformMerge, platformUnlink } = useStreamSettings();
   const isMerged = StreamingService.views.isPlatformLinked(platform);
   const username = UserService.state.auth!.platforms[platform]?.username;
-  const platformName = getPlatformService(platform).displayName;
+  const platformName = useMemo(() => getPlatformService(platform).displayName, []);
   const isPrimary = StreamingService.views.isPrimaryPlatform(platform);
   const shouldShowPrimaryBtn = isPrimary;
   const shouldShowConnectBtn = !isMerged && canEditSettings;

@@ -1,3 +1,4 @@
+import { useChildWindowParams } from 'components-react/hooks';
 import { Services } from 'components-react/service-provider';
 import { TextInput } from 'components-react/shared/inputs';
 import Form, { useForm } from 'components-react/shared/inputs/Form';
@@ -14,7 +15,7 @@ export default function NameScene() {
     sceneToDuplicate?: string; // id of scene
     rename?: string; // id of scene
     itemsToGroup?: string[];
-  } = useMemo(() => WindowsService.getChildWindowQueryParams(), []);
+  } = useChildWindowParams();
   const [name, setName] = useState(() => {
     if (options.rename) {
       return ScenesService.views.getScene(options.rename)?.name ?? '';

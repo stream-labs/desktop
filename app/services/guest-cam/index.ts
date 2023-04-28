@@ -399,6 +399,12 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
         });
       }
     });
+
+    this.userService.userLogout.subscribe(() => {
+      this.SET_MAX_GUESTS(2);
+      this.SET_PRODUCE_OK(false);
+      this.cleanUpSocketConnection();
+    });
   }
 
   findDefaultSources() {
@@ -536,9 +542,9 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
     }
   }
 
-  setProduceOk() {
+  async setProduceOk() {
     this.SET_PRODUCE_OK(true);
-
+    await this.cleanUpSocketConnection();
     this.startListeningForGuests();
 
     // If a guest is already connected and we are not yet producing, start doing so now.
