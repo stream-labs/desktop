@@ -10,6 +10,12 @@ module.exports = {
     'selector-class-pattern': null,
     'no-descending-specificity': null,
     'selector-not-notation': 'simple',
+    'font-family-no-missing-generic-family-keyword': [
+      true,
+      {
+        ignoreFontFamilies: 'n-air',
+      },
+    ],
   },
   overrides: [
     {

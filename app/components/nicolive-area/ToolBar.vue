@@ -32,7 +32,7 @@
             </li>
             <li class="popup-menu-item">
               <button
-                class="manual-extention link"
+                class="manual-extension link"
                 @click="extendProgram"
                 :disabled="
                   autoExtensionEnabled ||
@@ -47,12 +47,12 @@
           </ul>
         </div>
         <button
-          class="button--circle button--secondary button--extention"
-          v-tooltip.bottom="extentionTooltip"
+          class="button--circle button--secondary button--extension"
+          v-tooltip.bottom="extensionTooltip"
           :class="{ 'is-show': showPopupMenu, active: autoExtensionEnabled }"
           slot="reference"
         >
-          <i class="icon-extention"></i>
+          <i class="icon-extension"></i>
         </button>
       </popper>
 
@@ -177,7 +177,7 @@
   margin-left: auto;
 }
 
-.auto-extention {
+.auto-extension {
   z-index: 2;
   padding-left: 16px;
   margin-left: auto;
@@ -187,7 +187,7 @@
   margin-left: 16px;
 }
 
-.button--extention {
+.button--extension {
   i {
     margin-bottom: 1px;
     margin-left: 2px;
