@@ -62,11 +62,11 @@
         </button>
       </div>
       <div class="created-notice" v-if="showPlaceholder">
-        <NAirLogo class="created-notice-logo" aria-hidden="true" />
-        <div class="created-notice-body">
-          <p class="created-notice-large">番組の作成に成功しました！</p>
-          <p class="created-notice-small">番組を開始して視聴者に配信を届けましょう</p>
-        </div>
+        <p class="created-notice-large">配信準備状態です</p>
+        <p class="created-notice-small">
+          番組開始前の確認を行うことができます。<br />&#91; 番組開始 &#93;
+          をクリックすると視聴者に公開されます。
+        </p>
       </div>
     </div>
     <comment-form class="comment-form" />
@@ -228,42 +228,30 @@
 
 .created-notice {
   position: absolute;
-  bottom: 16px;
-  left: 16px;
+  top: 50%;
+  left: 50%;
   z-index: @z-index-expand-content; // AreaSwitcherのheaderより大きく
   display: flex;
+  flex-direction: column;
   align-items: center;
-  width: calc(100% - 32px);
-  padding: 8px 12px;
-  background-color: var(--color-bg-quaternary);
-  .radius;
-  .shadow;
-}
-
-.created-notice-logo {
-  width: 48px;
-  height: 48px;
-  margin-right: 12px;
-}
-
-.created-notice-body {
-  display: grid;
-  grid-gap: 4px;
-  gap: 4px;
+  width: fit-content;
+  padding: 8px;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
 }
 
 .created-notice-large {
   margin: 0;
-  font-size: @font-size2;
+  font-size: @font-size4;
   font-weight: @font-weight-bold;
-  line-height: 1.5;
-  color: var(--color-text-light);
+  color: var(--color-text);
+  text-align: center;
 }
 
 .created-notice-small {
-  margin: 0;
+  margin-top: 4px;
   font-size: @font-size2;
-  line-height: 1.5;
   color: var(--color-text);
+  text-align: center;
 }
 </style>
