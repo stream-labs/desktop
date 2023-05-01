@@ -33,6 +33,7 @@ const {
 } = require('electron');
 const path = require('path');
 const remote = require('@electron/remote/main');
+const fs = require('fs');
 
 // Game overlay is Windows only
 let overlay;
@@ -65,7 +66,6 @@ if (!gotTheLock) {
   return;
 }
 
-const fs = require('fs');
 const bootstrap = require('./updater/build/bootstrap.js');
 const bundleUpdater = require('./updater/build/bundle-updater.js');
 const uuid = require('uuid/v4');
