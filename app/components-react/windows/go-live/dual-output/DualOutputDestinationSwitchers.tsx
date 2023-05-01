@@ -18,7 +18,7 @@ import Translate from 'components-react/shared/Translate';
 /**
  * Allows enabling/disabling platforms and custom destinations for the stream
  */
-export function DualOutputDestinationSwitcher() {
+export function DualOutputDestinationSwitchers() {
   const {
     linkedPlatforms,
     enabledPlatforms,

@@ -3,7 +3,6 @@ import styles from './DualOutputGoLive.m.less';
 import Scrollable from 'components-react/shared/Scrollable';
 import { Services } from 'components-react/service-provider';
 import { useGoLiveSettings } from '../useGoLiveSettings';
-import { DualOutputDestinationSwitcher } from './DualOutputDestinationSwitchers';
 import { $t } from 'services/i18n';
 import { Row, Col } from 'antd';
 import { Section } from '../Section';
@@ -12,7 +11,8 @@ import TwitterInput from '../Twitter';
 import OptimizedProfileSwitcher from '../OptimizedProfileSwitcher';
 import Spinner from 'components-react/shared/Spinner';
 import GoLiveError from '../GoLiveError';
-import DualOutputDestinationButton from './DualOutputDestinationButton';
+import UserSettingsUltra from './UserSettingsUltra';
+import UserSettingsNonUltra from './UserSettingsNonUltra';
 
 /**
  * Renders settings for starting the stream
@@ -21,33 +21,12 @@ import DualOutputDestinationButton from './DualOutputDestinationButton';
  * - Extras settings
  **/
 export default function DualOutputGoLiveSettings() {
-  const { isAdvancedMode, isLoading, canUseOptimizedProfile } = useGoLiveSettings().extend(
+  const { isAdvancedMode, isLoading, isPrime, canUseOptimizedProfile } = useGoLiveSettings().extend(
     module => {
-      const {
-        RestreamService,
-        SettingsService,
-        UserService,
-        MagicLinkService,
-        VideoEncodingOptimizationService,
-      } = Services;
+      const { UserService, VideoEncodingOptimizationService } = Services;
 
       return {
-        get canAddDestinations() {
-          const linkedPlatforms = module.state.linkedPlatforms;
-          const customDestinations = module.state.customDestinations;
-          return linkedPlatforms.length + customDestinations.length < 5;
-        },
-
-        addDestination() {
-          // open the stream settings or prime page
-          if (UserService.views.isPrime) {
-            SettingsService.actions.showSettings('Stream');
-          } else {
-            MagicLinkService.linkToPrime('slobs-multistream');
-          }
-        },
-
-        shouldShowPrimeLabel: !RestreamService.state.grandfathered,
+        isPrime: UserService.views.isPrime,
 
         canUseOptimizedProfile:
           VideoEncodingOptimizationService.state.canSeeOptimizedProfile ||
@@ -61,10 +40,8 @@ export default function DualOutputGoLiveSettings() {
       {/*LEFT COLUMN*/}
       <Col span={8} className={styles.leftColumn}>
         <Scrollable style={{ height: '100%' }}>
-          {/*DESTINATION SWITCHERS*/}
-          <DualOutputDestinationSwitcher />
-          {/*ADD DESTINATION BUTTON*/}
-          <DualOutputDestinationButton />
+          {isPrime && <UserSettingsUltra />}
+          {!isPrime && <UserSettingsNonUltra />}
         </Scrollable>
       </Col>
 
