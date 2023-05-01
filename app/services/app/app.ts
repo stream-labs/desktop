@@ -113,7 +113,6 @@ export class AppService extends StatefulService<IAppState> {
 
       crashHandler.unregisterProcess(this.pid);
 
-      //* ipc云々はあるがstopはコールないらしい      obs.NodeObs.StopCrashHandler();
       obs.IPC.disconnect();
 
       electron.ipcRenderer.send('shutdownComplete');
@@ -165,14 +164,11 @@ export class AppService extends StatefulService<IAppState> {
   @track({ event: 'app_close' })
   private shutdownHandler() {
     this.START_LOADING();
-    //* こちらも obs.NodeObs.StopCrashHandler();
-
-    //* remove    this.ipcServerService.stopListening();
     this.tcpServerService.stopListening();
 
     window.setTimeout(async () => {
-      obs.NodeObs.InitShutdownSequence(); //* add
-      this.crashReporterService.beginShutdown(); //* move to here
+      obs.NodeObs.InitShutdownSequence();
+      this.crashReporterService.beginShutdown();
       // await this.userService.flushUserSession();
       await this.sceneCollectionsService.deinitialize();
       this.performanceMonitorService.stop();

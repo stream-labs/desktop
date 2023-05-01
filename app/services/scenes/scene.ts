@@ -348,10 +348,10 @@ export class Scene {
         y: item.y == null ? 0 : item.y,
         locked: item.locked,
         rotation: item.rotation || 0,
-        streamVisible: true, //* どこか設定画面から来る値 デフォルト値 https://github.com/stream-labs/desktop/blob/36d3339590283ca070f0300ba87734da9481a291/app/services/scenes/scene.ts#L523
-        recordingVisible: true, //* どこか設定画面から来る値
-        scaleFilter: obs.EScaleType.Disable, //* どこか設定画面から来る値 デフォルト値
-        blendingMode: obs.EBlendingMode.Normal, //* どこか設定画面から来る値 デフォルト値
+        streamVisible: true,
+        recordingVisible: true,
+        scaleFilter: obs.EScaleType.Disable,
+        blendingMode: obs.EBlendingMode.Normal,
       });
       return true;
     });

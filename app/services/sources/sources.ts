@@ -339,7 +339,6 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
       'wasapi_output_capture',
       'decklink-input',
       'ndi_source',
-      //*不要      'openvr_capture',
       'liv_capture',
       'ovrstream_dc_source',
       'vlc_source',
