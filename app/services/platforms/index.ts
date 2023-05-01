@@ -92,7 +92,7 @@ interface IPlatformCapabilityScopeValidation {
 }
 
 interface IPlatformCapabilityAccountMerging {
-  getMergeUrl: () => Promise<string>;
+  mergeUrl: string;
 }
 
 export interface IPlatformCapabilityResolutionPreset {
@@ -191,8 +191,8 @@ export interface IPlatformService {
   readonly apiBase: string;
   readonly platform: TPlatform;
   readonly displayName: string;
+  readonly mergeUrl: string;
   readonly streamPageUrl: string;
-  getMergeUrl: () => Promise<string>;
   readonly chatUrl: string;
 
   /**
