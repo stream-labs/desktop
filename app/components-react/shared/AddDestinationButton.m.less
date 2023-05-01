@@ -15,25 +15,33 @@
 
   button.add-destination-btn {
     width: 100%;
-    border: 1px solid var(--dropdown-bg);
-    border-radius: 4px;
-    min-height: 58px;
     flex-direction: row;
     justify-content: center;
     align-items: center;
     text-align: center;
-    transition: border 0.3s, box-shadow 0.3s;
-    background: var(--dropdown-bg);
     position: relative;
-
-    &:hover {
-      border-color: (var(--button));
-      box-shadow: 0 0 50px rgba(255, 255, 255, 0.1) inset;
-    }
+    margin: auto;
 
     &:global(.ant-btn) {
       display: flex;
-      font-weight: 600;
+      font-weight: 500;
+      padding: 20px 10px;
+      background: var(--dropdown-bg);
+
+      &:hover {
+        transition: 0.3s !important;
+      }
+
+      &.default {
+        min-height: 58px;
+        transition: box-shadow 0.3s;
+        border: 1px solid var(--dropdown-bg);
+        border-radius: 4px;
+
+        &:hover {
+          box-shadow: 0 0 50px rgba(255, 255, 255, 0.1) inset;
+        }
+      }
     }
 
     i.add-destination-icon {
@@ -45,46 +53,14 @@
       display: flex;
       align-items: center;
     }
-  }
 
-  .ultra-btn {
-    font-weight: 800;
-    color: var(--prime-button);
-    // margin: 5px 16px 5px 5px;
-    padding: 10px;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-    border-radius: 6px;
-    position: relative;
-    border: 2px solid transparent;
-    z-index: 0;
+    &.ultra-btn {
+      justify-content: space-between;
 
-    &::after {
-      content: '';
-      position: absolute;
-      top: 0;
-      right: 0;
-      bottom: 0;
-      left: 0;
-      z-index: -1;
-      margin: -5px;
-      border-radius: inherit;
-      opacity: 0.05;
-      background-image: linear-gradient(
-        123.53deg,
-        #2de8b0 0%,
-        #cbe953 48.8%,
-        #ffab48 75.86%,
-        #ff5151 100%
-      );
-    }
-
-    &:global(.ant-btn) {
-      background: linear-gradient(0deg, #ffffff, #ffffff) padding-box,
-        linear-gradient(123.53deg, #2de8b0 0%, #cbe953 48.8%, #ffab48 75.86%, #ff5151 100%)
-          border-box;
+      .ultra-icon {
+        height: 15px;
+        width: 15px;
+      }
     }
   }
 }

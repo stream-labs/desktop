@@ -5,10 +5,11 @@ import { useGoLiveSettings } from 'components-react/windows/go-live/useGoLiveSet
 import { Button } from 'antd';
 import { ButtonGroup } from 'components-react/shared/ButtonGroup';
 import UltraIcon from './UltraIcon';
+import ButtonHighlighted from './ButtonHighlighted';
 import styles from './AddDestinationButton.m.less';
 import cx from 'classnames';
-
 interface IAddDestinationButtonProps {
+  type?: 'default' | 'ultra';
   text?: string;
   className?: string;
   style?: CSSProperties;
@@ -28,7 +29,8 @@ export default function AddDestinationButton(p: IAddDestinationButtonProps) {
         }
       },
 
-      shouldShowPrimeLabel: !RestreamService.state.grandfathered,
+      shouldShowPrimeLabel:
+        p.type === 'ultra' || (!RestreamService.state.grandfathered && !UserService.views.isPrime),
     };
   });
 
@@ -39,35 +41,31 @@ export default function AddDestinationButton(p: IAddDestinationButtonProps) {
       direction="vertical"
       size="middle"
     >
-      {/* {shouldShowPrimeLabel && ( */}
-      <Button
-        className={cx(styles.addDestinationBtn, p.className, styles.ultraBtn)}
-        onClick={addDestination}
-      >
-        <div className={styles.btnText}>
-          <i className={cx('icon-add', styles.addDestinationIcon)} />
-          {$t('Add Destination with Ultra')}
-        </div>
-        <UltraIcon
-          type="simple"
-          style={{
-            fill: '#09161D',
-            display: 'inline-block',
-            height: '12px',
-            width: '12px',
-            marginRight: '5px',
-          }}
-        />
-      </Button>
-      {/* )} */}
-      {/* {!shouldShowPrimeLabel && ( */}
-      <Button className={cx(styles.addDestinationBtn, p.className)} onClick={addDestination} block>
-        <div className={styles.btnText}>
-          <i className={cx('icon-add', styles.addDestinationIcon)} />
-          {$t('Add Destination')}
-        </div>
-      </Button>
-      {/* )} */}
+      {shouldShowPrimeLabel && (
+        <ButtonHighlighted
+          faded
+          className={cx(styles.addDestinationBtn, p.className, styles.ultraBtn)}
+          onClick={addDestination}
+        >
+          <div className={styles.btnText}>
+            <i className={cx('icon-add', styles.addDestinationIcon)} />
+            {$t('Add Destination with Ultra')}
+          </div>
+          <UltraIcon type="night" className={styles.ultraIcon} />
+        </ButtonHighlighted>
+      )}
+      {!shouldShowPrimeLabel && (
+        <Button
+          className={cx(styles.addDestinationBtn, styles.default, p.className)}
+          onClick={addDestination}
+          block
+        >
+          <div className={styles.btnText}>
+            <i className={cx('icon-add', styles.addDestinationIcon)} />
+            {$t('Add Destination')}
+          </div>
+        </Button>
+      )}
     </ButtonGroup>
   );
 }
