@@ -92,5 +92,7 @@
   "An error occurred while mixing audio": "An error occurred while mixing audio",
   "Edit your replays with Highlighter, a free editor built in to Streamlabs.": "Edit your replays with Highlighter, a free editor built in to Streamlabs.",
   "Upload To": "Upload To",
-  "Upload": "Upload"
+  "Upload": "Upload",
+  "This feature requires a Streamlabs ID": "This feature requires a Streamlabs ID",
+  "Sign up for Streamlabs ID": "Sign up for Streamlabs ID"
 }
