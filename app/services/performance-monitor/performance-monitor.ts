@@ -66,8 +66,8 @@ export class PerformanceMonitorService extends StatefulService<IMonitorState> {
     const currentStats: IMonitorState = {
       framesLagged: obs.Global.laggedFrames,
       framesRendered: obs.Global.totalFrames,
-      framesSkipped: obs.Video.skippedFrames,
-      framesEncoded: obs.Video.encodedFrames,
+      framesSkipped: obs.VideoFactory.skippedFrames, //* https://github.com/stream-labs/desktop/blob/36d3339590283ca070f0300ba87734da9481a291/app/services/performance.ts#L234
+      framesEncoded: obs.VideoFactory.encodedFrames, //*
     };
 
     const {
