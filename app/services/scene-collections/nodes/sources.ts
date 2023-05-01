@@ -235,9 +235,9 @@ export class SourcesNode extends Node<ISchema, {}> {
             enabled: filter.enabled === void 0 ? true : filter.enabled,
           };
         }),
-        syncOffset: { sec: 0, nsec: 0 }, // streamlabs v0.16.3 にはないが無いとコンパイルエラーが出る
-        deinterlaceMode: source.deinterlaceMode || obs.EDeinterlaceMode.Disable, //* https://github.com/stream-labs/desktop/blob/36d3339590283ca070f0300ba87734da9481a291/app/services/scene-collections/nodes/sources.ts#L233
-        deinterlaceFieldOrder: source.deinterlaceFieldOrder || obs.EDeinterlaceFieldOrder.Top, //*
+        syncOffset: { sec: 0, nsec: 0 },
+        deinterlaceMode: source.deinterlaceMode || obs.EDeinterlaceMode.Disable,
+        deinterlaceFieldOrder: source.deinterlaceFieldOrder || obs.EDeinterlaceFieldOrder.Top,
       };
     });
 
