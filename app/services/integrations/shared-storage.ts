@@ -105,7 +105,7 @@ export class SharedStorageService extends Service {
 
   private async generateShare(): Promise<{ id: string }> {
     if (!this.id) return;
-    const url = `${this.host}/storage/v1/temporary-shares/`;
+    const url = `${this.host}/storage/v1/temporary-shares`;
     const headers = authorizedHeaders(
       this.userService.apiToken,
       new Headers({ 'Content-Type': 'application/json' }),
