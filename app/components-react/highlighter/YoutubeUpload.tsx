@@ -3,30 +3,14 @@ import { Services } from 'components-react/service-provider';
 import { useVuex } from 'components-react/hooks';
 import { TextInput, TextAreaInput } from 'components-react/shared/inputs';
 import Form from 'components-react/shared/inputs/Form';
-import path from 'path';
 import { Button, Progress, Tooltip, Alert } from 'antd';
 import { RadioInput } from 'components-react/shared/inputs/RadioInput';
 import { TPrivacyStatus } from 'services/platforms/youtube/uploader';
 import electron from 'electron';
 import { $t } from 'services/i18n';
 import * as remote from '@electron/remote';
-
-// Source: https://stackoverflow.com/questions/10420352/converting-file-size-in-bytes-to-human-readable-string/10420404
-function humanFileSize(bytes: number, si: boolean) {
-  const thresh = si ? 1000 : 1024;
-  if (Math.abs(bytes) < thresh) {
-    return bytes + ' B';
-  }
-  const units = si
-    ? ['kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
-    : ['KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB'];
-  let u = -1;
-  do {
-    bytes /= thresh;
-    ++u;
-  } while (Math.abs(bytes) >= thresh && u < units.length - 1);
-  return bytes.toFixed(1) + ' ' + units[u];
-}
+import VideoPreview from './VideoPreview';
+import UploadProgress from './UploadProgress';
 
 export default function YoutubeUpload(props: { defaultTitle: string; close: () => void }) {
   const [title, setTitle] = useState(props.defaultTitle);
@@ -39,7 +23,6 @@ export default function YoutubeUpload(props: { defaultTitle: string; close: () =
     uploadInfo: HighlighterService.views.uploadInfo,
     exportInfo: HighlighterService.views.exportInfo,
   }));
-  const filename = path.parse(v.exportInfo.file).base;
 
   // Clear all errors when this component unmounts
   useEffect(() => {
@@ -103,45 +86,7 @@ export default function YoutubeUpload(props: { defaultTitle: string; close: () =
               </button>
             </div>
           )}
-          <div
-            style={{
-              width: 300,
-              marginLeft: 24,
-              marginBottom: 24,
-              display: 'flex',
-              flexDirection: 'column',
-            }}
-          >
-            <video
-              src={HighlighterService.views.getCacheBustingUrl(v.exportInfo.file)}
-              controls
-              style={{
-                width: '100%',
-                borderTopRightRadius: 8,
-                borderTopLeftRadius: 8,
-                outline: 'none',
-              }}
-            />
-            <div
-              style={{
-                borderBottomLeftRadius: 8,
-                borderBottomRightRadius: 8,
-                background: 'var(--section)',
-                fontWeight: 800,
-                padding: 12,
-              }}
-            >
-              {filename}
-              <br />
-              <a
-                onClick={() => {
-                  remote.shell.showItemInFolder(v.exportInfo.file);
-                }}
-              >
-                {$t('Open file location')}
-              </a>
-            </div>
-          </div>
+          <VideoPreview />
         </div>
         {v.uploadInfo.error && (
           <Alert
@@ -162,7 +107,7 @@ export default function YoutubeUpload(props: { defaultTitle: string; close: () =
               type="primary"
               onClick={() => {
                 UsageStatisticsService.actions.recordFeatureUsage('HighlighterUpload');
-                HighlighterService.actions.upload({
+                HighlighterService.actions.uploadYoutube({
                   title,
                   description,
                   privacyStatus: privacy as TPrivacyStatus,
@@ -173,37 +118,6 @@ export default function YoutubeUpload(props: { defaultTitle: string; close: () =
             </Button>
           )}
         </div>
-      </div>
-    );
-  }
-
-  function getUploadProgress() {
-    return (
-      <div>
-        <h2>{$t('Upload Progress')}</h2>
-        <Progress
-          percent={Math.round((v.uploadInfo.uploadedBytes / v.uploadInfo.totalBytes) * 100)}
-          trailColor="var(--section)"
-          status={v.uploadInfo.cancelRequested ? 'exception' : 'normal'}
-        />
-        {!v.uploadInfo.cancelRequested && (
-          <div>
-            {$t('Uploading: %{uploadedBytes}/%{totalBytes}', {
-              uploadedBytes: humanFileSize(v.uploadInfo.uploadedBytes, false),
-              totalBytes: humanFileSize(v.uploadInfo.totalBytes, false),
-            })}
-          </div>
-        )}
-        {v.uploadInfo.cancelRequested && <span>{$t('Canceling...')}</span>}
-        <br />
-        <button
-          className="button button--soft-warning"
-          onClick={() => HighlighterService.actions.cancelUpload()}
-          style={{ marginTop: '16px' }}
-          disabled={v.uploadInfo.cancelRequested}
-        >
-          {$t('Cancel')}
-        </button>
       </div>
     );
   }
@@ -236,9 +150,8 @@ export default function YoutubeUpload(props: { defaultTitle: string; close: () =
 
   return (
     <div>
-      <h2>{$t('Upload to YouTube')}</h2>
       {!v.uploadInfo.uploading && !v.uploadInfo.videoId && getYoutubeForm()}
-      {v.youtubeLinked && v.uploadInfo.uploading && getUploadProgress()}
+      {v.youtubeLinked && v.uploadInfo.uploading && <UploadProgress />}
       {v.youtubeLinked && v.uploadInfo.videoId && getUploadDone()}
     </div>
   );
