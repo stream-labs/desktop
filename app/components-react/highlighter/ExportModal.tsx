@@ -12,6 +12,7 @@ import { $t } from 'services/i18n';
 import { injectState, useModule } from 'slap';
 import StorageUpload from './StorageUpload';
 import { useVuex } from 'components-react/hooks';
+import { EAvailableFeatures } from 'services/incremental-rollout';
 
 class ExportModule {
   get service() {
@@ -235,27 +236,28 @@ function ExportOptions(p: { close: () => void }) {
 
 function PlatformSelect(p: { onClose: () => void }) {
   const { videoName } = useModule(ExportModule);
-  const { UserService } = Services;
+  const { UserService, IncrementalRolloutService } = Services;
   const { isYoutubeLinked } = useVuex(() => ({
     isYoutubeLinked: !!UserService.state.auth?.platforms.youtube,
   }));
   const [platform, setPlatform] = useState(() => (isYoutubeLinked ? 'youtube' : 'crossclip'));
+
+  const platformOptions = IncrementalRolloutService.views.availableFeatures.includes(
+    EAvailableFeatures.sharedStorage,
+  )
+    ? [
+        { label: 'YouTube', value: 'youtube' },
+        { label: 'Cross Clip', value: 'crossclip' },
+        { label: 'Type Studio', value: 'typestudio' },
+      ]
+    : [{ label: 'YouTube', value: 'youtube' }];
 
   return (
     <Form>
       <h1 style={{ display: 'inline', marginRight: '16px', position: 'relative', top: '3px' }}>
         {$t('Upload To')}
       </h1>
-      <ListInput
-        value={platform}
-        onChange={setPlatform}
-        nowrap
-        options={[
-          { label: 'YouTube', value: 'youtube' },
-          { label: 'Cross Clip', value: 'crossclip' },
-          { label: 'Type Studio', value: 'typestudio' },
-        ]}
-      />
+      <ListInput value={platform} onChange={setPlatform} nowrap options={platformOptions} />
       {platform === 'youtube' && <YoutubeUpload defaultTitle={videoName} close={p.onClose} />}
       {platform !== 'youtube' && <StorageUpload onClose={p.onClose} platform={platform} />}
     </Form>
