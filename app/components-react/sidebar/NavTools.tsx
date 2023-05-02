@@ -79,7 +79,9 @@ export default function SideNav() {
 
   function openHelp() {
     UsageStatisticsService.actions.recordClick('SideNav2', 'help');
-    remote.shell.openExternal('https://howto.streamlabs.com/');
+    remote.shell.openExternal(
+      'https://streamlabs.com/content-hub/support/support-streamlabs-desktop',
+    );
   }
 
   async function upgradeToPrime() {
