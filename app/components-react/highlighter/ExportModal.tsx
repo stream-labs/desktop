@@ -58,7 +58,7 @@ class ExportModule {
 }
 
 export default function ExportModal(p: { close: () => void }) {
-  const { exportInfo, dismissError, videoName } = useModule(ExportModule);
+  const { exportInfo, dismissError } = useModule(ExportModule);
 
   // Clear all errors when this component unmounts
   useEffect(dismissError, []);

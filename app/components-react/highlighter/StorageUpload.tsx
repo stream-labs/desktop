@@ -8,7 +8,6 @@ import Translate from 'components-react/shared/Translate';
 import UploadProgress from './UploadProgress';
 import styles from './ExportModal.m.less';
 import VideoPreview from './VideoPreview';
-import { TextInput } from 'components-react/shared/inputs/TextInput';
 
 export default function CrossClipUpload(p: { onClose: () => void; platform: string }) {
   const { UserService, HighlighterService, OnboardingService } = Services;
@@ -31,7 +30,7 @@ export default function CrossClipUpload(p: { onClose: () => void; platform: stri
       return `https://crossclip.streamlabs.com/storage/${id}`;
     }
     if (p.platform === 'typestudio') {
-      return `https://type-mvp-development.web.app/storage/${id}`;
+      return `https://app.typestudio.co/storage/${id}`;
     }
     return '';
   }
@@ -39,6 +38,7 @@ export default function CrossClipUpload(p: { onClose: () => void; platform: stri
   useEffect(() => {
     if (uploadInfo.videoId) {
       remote.shell.openExternal(getPlatformLink(uploadInfo.videoId));
+      p.onClose();
     }
   }, [uploadInfo.videoId]);
 
@@ -60,7 +60,6 @@ export default function CrossClipUpload(p: { onClose: () => void; platform: stri
           {$t('Upload')}
         </button>
       )}
-      {!!uploadInfo.videoId && <TextInput value={uploadInfo.videoId} />}
     </div>
   );
 }
