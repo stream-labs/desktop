@@ -394,6 +394,18 @@ export class HighlighterService extends StatefulService<IHighligherState> {
   }
 
   @mutation()
+  CLEAR_UPLOAD() {
+    this.state.upload = {
+      uploading: false,
+      uploadedBytes: 0,
+      totalBytes: 0,
+      cancelRequested: false,
+      videoId: null,
+      error: false,
+    };
+  }
+
+  @mutation()
   SET_TRANSITION_INFO(transitionInfo: Partial<ITransitionInfo>) {
     this.state.transition = {
       ...this.state.transition,
@@ -1052,5 +1064,9 @@ export class HighlighterService extends StatefulService<IHighligherState> {
       this.SET_UPLOAD_INFO({ cancelRequested: true });
       this.cancelFunction();
     }
+  }
+
+  clearUpload() {
+    this.CLEAR_UPLOAD();
   }
 }
