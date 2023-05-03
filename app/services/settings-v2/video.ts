@@ -220,6 +220,10 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
   shutdown() {
     displays.forEach(display => {
       if (this.contexts[display]) {
+        // save settings as legacy settings
+        obs.Video.legacySettings = this.state[display];
+
+        // destroy context
         this.contexts[display].destroy();
         this.contexts[display] = null as obs.IVideo;
         this.DESTROY_VIDEO_CONTEXT(display);
