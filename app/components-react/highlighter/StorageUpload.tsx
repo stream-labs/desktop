@@ -38,6 +38,7 @@ export default function CrossClipUpload(p: { onClose: () => void; platform: stri
   useEffect(() => {
     if (uploadInfo.videoId) {
       remote.shell.openExternal(getPlatformLink(uploadInfo.videoId));
+      HighlighterService.actions.clearUpload();
       p.onClose();
     }
   }, [uploadInfo.videoId]);
