@@ -12,10 +12,17 @@
   font-style: normal;
 }
 
+@font-face {
+  font-family: 'trovo';
+  src: url('../../media/fonts/trovo.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+
 [class^='icon-'],
 [class*=' icon-'] {
   /* use !important to prevent issues with browser extensions that change fonts */
-  font-family: 'icomoon', 'dual' !important;
+  font-family: 'icomoon', 'dual', 'trovo' !important;
   speak: never;
   font-style: normal;
   font-weight: normal;
@@ -786,4 +793,7 @@
 }
 .icon-desktop-hide:before {
   content: '\e9fd';
+}
+.icon-trovo:before {
+  content: '\e9fe';
 }

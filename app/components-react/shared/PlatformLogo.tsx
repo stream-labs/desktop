@@ -12,7 +12,9 @@ interface IProps {
   platform: TPlatform | 'nimotv' | 'dlive' | 'streamlabs';
   size?: keyof typeof sizeMap | number;
   color?: string;
+  nocolor?: boolean;
   unwrapped?: boolean;
+  trovo?: boolean;
 }
 
 export default function PlatformLogo(p: IProps & HTMLAttributes<unknown>) {
@@ -35,12 +37,18 @@ export default function PlatformLogo(p: IProps & HTMLAttributes<unknown>) {
   const colorStyle = p.color ? { color: p.color } : undefined;
   const style = { ...sizeStyle, ...colorStyle };
   return (
-    <i
-      className={cx(iconForPlatform(), css[p.platform], p.className, {
-        // Trovo doesn't provide an SVG, so just use different colored PNGs
-        [css['trovo--black']]: p.platform === 'trovo' && p.color === 'black',
-      })}
-      style={style}
-    />
+    <>
+      {p.trovo ? (
+        <i className={cx('icon-trovo', p.className)} />
+      ) : (
+        <i
+          className={cx(iconForPlatform(), !p.nocolor && css[p.platform], p.className, {
+            // Trovo doesn't provide an SVG, so just use different colored PNGs
+            [css['trovo--black']]: p.platform === 'trovo' && p.color === 'black',
+          })}
+          style={style}
+        />
+      )}
+    </>
   );
 }
