@@ -208,7 +208,7 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
   @debounce(200)
   updateObsSettings(display: TDisplayType = 'horizontal') {
     this.contexts[display].video = this.state[display];
-    obs.Video.legacySettings = this.state[display];
+    this.contexts[display].legacySettings = this.state[display];
   }
 
   setVideoSetting(key: string, value: unknown, display: TDisplayType = 'horizontal') {
@@ -222,7 +222,7 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
     displays.forEach(display => {
       if (this.contexts[display]) {
         // save settings as legacy settings
-        obs.Video.legacySettings = this.state[display];
+        this.contexts[display].legacySettings = this.state[display];
 
         // destroy context
         this.contexts[display].destroy();
