@@ -1,4 +1,4 @@
-import React, { useRef, MouseEvent } from 'react';
+import React, { useRef, useMemo, MouseEvent, ForwardedRef } from 'react';
 import { getPlatformService, TPlatform } from 'services/platforms';
 import cx from 'classnames';
 import { $t } from 'services/i18n';
@@ -15,10 +15,14 @@ import { useGoLiveSettings } from '../useGoLiveSettings';
 import { alertAsync } from 'components-react/modals';
 import Translate from 'components-react/shared/Translate';
 
+interface IDualOutputDestinationsSwitchers {
+  type?: 'default' | 'ultra';
+}
+
 /**
  * Allows enabling/disabling platforms and custom destinations for the stream
  */
-export function DualOutputDestinationSwitchers() {
+export function DualOutputDestinationSwitchers(p: IDualOutputDestinationsSwitchers) {
   const {
     linkedPlatforms,
     enabledPlatforms,
@@ -40,7 +44,9 @@ export function DualOutputDestinationSwitchers() {
   }
 
   function togglePlatform(platform: TPlatform, enabled: boolean) {
-    enabledPlatformsRef.current = enabledPlatformsRef.current.filter(p => p !== platform);
+    enabledPlatformsRef.current = enabledPlatformsRef.current.filter(
+      (p: TPlatform) => p !== platform,
+    );
     if (enabled) enabledPlatformsRef.current.push(platform);
     emitSwitch();
   }
@@ -55,7 +61,7 @@ export function DualOutputDestinationSwitchers() {
         }
         hasMargin={true}
       />
-      {linkedPlatforms.map(platform => (
+      {linkedPlatforms.map((platform: TPlatform) => (
         <DestinationSwitcher
           key={platform}
           destination={platform}
@@ -64,14 +70,14 @@ export function DualOutputDestinationSwitchers() {
           isPrimary={isPrimaryPlatform(platform)}
         />
       ))}
-      {customDestinations?.map((dest, ind) => (
+      {/* {customDestinations?.map((dest, ind) => (
         <DestinationSwitcher
           key={ind}
           destination={dest}
           enabled={customDestinations[ind].enabled}
           onChange={enabled => switchCustomDestination(ind, enabled)}
         />
-      ))}
+      ))} */}
     </>
   );
 }
@@ -84,7 +90,7 @@ interface IDestinationSwitcherProps {
 }
 
 /**
- * Render a single switcher
+ * Render a single switcher card
  */
 function DestinationSwitcher(p: IDestinationSwitcherProps) {
   const switchInputRef = useRef<HTMLInputElement>(null);
@@ -92,7 +98,7 @@ function DestinationSwitcher(p: IDestinationSwitcherProps) {
   const platform = typeof p.destination === 'string' ? (p.destination as TPlatform) : null;
   const { RestreamService, MagicLinkService } = Services;
 
-  function onClickHandler(ev: MouseEvent) {
+  function onClickHandler() {
     if (p.isPrimary) {
       alertAsync(
         $t(
@@ -120,8 +126,8 @@ function DestinationSwitcher(p: IDestinationSwitcherProps) {
 
   const { title, description, Switch, Logo } = (() => {
     if (platform) {
-      // define slots for a platform switcher
       const { UserService } = Services;
+      // define slots for a platform switcher
       const service = getPlatformService(platform);
       const platformAuthData = UserService.state.auth?.platforms[platform];
       assertIsDefined(platformAuthData);
@@ -133,14 +139,11 @@ function DestinationSwitcher(p: IDestinationSwitcherProps) {
           <PlatformLogo platform={platform} className={styles[`platform-logo-${platform}`]} />
         ),
         Switch: () => (
-          <SwitchInput
-            inputRef={switchInputRef}
-            value={p.enabled}
-            name={platform}
-            disabled={p.isPrimary}
-            uncontrolled
-            className={styles.platformSwitch}
-            checkedChildren={<i className="icon-check-mark" />}
+          <ActionSwitch
+            ref={switchInputRef}
+            isPrimary={p.isPrimary}
+            enabled={p.enabled}
+            platform={platform}
           />
         ),
       };
@@ -152,14 +155,7 @@ function DestinationSwitcher(p: IDestinationSwitcherProps) {
         description: destination.url,
         Logo: () => <i className={cx(styles.destinationLogo, 'fa fa-globe')} />,
         Switch: () => (
-          <SwitchInput
-            inputRef={switchInputRef}
-            value={destination.enabled}
-            name={`destination_${destination.name}`}
-            uncontrolled
-            // className={styles.platformSwitch}
-            checkedChildren={<i className="icon-check-mark" />}
-          />
+          <ActionSwitch ref={switchInputRef} enabled={p.enabled} destination={destination} />
         ),
       };
     }
@@ -171,6 +167,7 @@ function DestinationSwitcher(p: IDestinationSwitcherProps) {
     <div
       ref={containerRef}
       className={cx(styles.platformSwitcher, { [styles.platformDisabled]: !p.enabled })}
+      onClick={onClickHandler}
     >
       <div className={styles.switcherHeader}>
         <div className={styles.platformInfoWrapper}>
@@ -181,7 +178,7 @@ function DestinationSwitcher(p: IDestinationSwitcherProps) {
             <span className={styles.platformName}>{title}</span>
             <span className={styles.platformUsername}>{description}</span>
           </div>
-          {/* SWITCH */}
+          {/* SWITCH OR CLOSE */}
           <Switch />
         </div>
       </div>
@@ -192,3 +189,54 @@ function DestinationSwitcher(p: IDestinationSwitcherProps) {
     </div>
   );
 }
+
+interface IActionSwitchProps {
+  isPrimary?: boolean | undefined;
+  enabled?: boolean;
+  platform?: TPlatform;
+  destination?: ICustomStreamDestination;
+}
+
+/**
+ * Render switch or close icon
+ */
+
+const ActionSwitch = React.forwardRef<HTMLInputElement, IActionSwitchProps>((p, ref) => {
+  const { UserService } = Services;
+  const isPrime = UserService.views.isPrime;
+
+  if (isPrime) {
+    if (p.platform) {
+      return (
+        <SwitchInput
+          inputRef={ref}
+          value={p.enabled}
+          name={p.platform}
+          disabled={p?.isPrimary}
+          uncontrolled
+          className={styles.platformSwitch}
+          checkedChildren={<i className="icon-check-mark" />}
+        />
+      );
+    } else {
+      const destination = p.destination;
+      return (
+        <SwitchInput
+          inputRef={ref}
+          value={destination?.enabled}
+          name={`destination_${destination?.name}`}
+          uncontrolled
+          className={styles.platformSwitch}
+          checkedChildren={<i className="icon-check-mark" />}
+        />
+      );
+    }
+  } else {
+    if (p.isPrimary) {
+      return <i className="icon-close" ref={ref} />;
+    } else {
+      // return empty div so that the click handler has a reference
+      return <div ref={ref} />;
+    }
+  }
+});

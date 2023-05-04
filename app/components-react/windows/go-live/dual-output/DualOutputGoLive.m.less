@@ -32,6 +32,7 @@
   .right-column {
     height: 100%;
     background-color: var(--background);
+    overflow: hidden;
 
     &:global(.ant-col.ant-col-16) {
       padding: 25px !important;
@@ -51,8 +52,10 @@
   transition: transform 0.05s;
   cursor: pointer;
 
-  // &.platform-disabled {
-  // }
+  .platform-disabled {
+    opacity: 0.7;
+    background: rgba(#2b383f, 0.3);
+  }
 
   .switcher-header {
     display: flex;
@@ -65,7 +68,7 @@
     display: flex;
     flex: 1;
     text-overflow: ellipsis;
-    overflow: hidden;
+    overflow: visible;
 
     .platform-logo {
       .margin();
@@ -162,19 +165,26 @@
   }
 }
 
-.platforms-dropdown {
+.platforms-selector {
   &:global(.ant-select) {
-    width: 100%;
+    width: calc(100% - 30px);
     text-align: left;
+    margin: 15px;
   }
+}
 
-  .icon {
-    margin-right: 10px;
-  }
+i.icon {
+  font-size: 18px;
+  margin-right: 10px;
+  color: var(--section);
+}
 
-  .add-other {
-    //
-  }
+i.selector-icon {
+  margin-right: 10px !important;
+  font-size: 15px !important;
+  width: 15px !important;
+  height: 15px !important;
+  color: var(--section) !important;
 }
 //
 
