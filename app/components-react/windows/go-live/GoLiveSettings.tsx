@@ -108,7 +108,7 @@ export default function GoLiveSettings() {
 
       {/*RIGHT COLUMN*/}
       <Col span={shouldShowLeftCol ? 16 : 24} style={{ height: '100%' }}>
-        <Spinner visible={isLoading} />
+        <Spinner visible={isLoading} relative />
         <GoLiveError />
         {shouldShowSettings && (
           <Scrollable style={{ height: '100%' }} snapToWindowEdge>

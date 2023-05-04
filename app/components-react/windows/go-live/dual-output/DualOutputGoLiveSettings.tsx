@@ -47,7 +47,7 @@ export default function DualOutputGoLiveSettings() {
 
       {/*RIGHT COLUMN*/}
       <Col span={16} className={styles.rightColumn}>
-        <Spinner visible={isLoading} />
+        <Spinner visible={isLoading} relative />
         <GoLiveError />
         <Scrollable style={{ height: '100%' }} snapToWindowEdge>
           {/*PLATFORM SETTINGS*/}
