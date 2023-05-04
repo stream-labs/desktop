@@ -542,9 +542,8 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
     }
   }
 
-  async setProduceOk() {
+  setProduceOk() {
     this.SET_PRODUCE_OK(true);
-    await this.cleanUpSocketConnection();
     this.startListeningForGuests();
 
     // If a guest is already connected and we are not yet producing, start doing so now.
