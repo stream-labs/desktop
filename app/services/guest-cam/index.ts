@@ -31,6 +31,7 @@ import { EStreamingState } from 'services/streaming';
 import Vue from 'vue';
 import { EDismissable } from 'services/dismissables';
 import { EAvailableFeatures } from 'services/incremental-rollout';
+import { assertIsDefined } from 'util/properties-type-guards';
 
 /**
  * This is in actuality a big data blob at runtime, the shape
@@ -545,7 +546,7 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
   async setProduceOk() {
     this.SET_PRODUCE_OK(true);
     await this.cleanUpSocketConnection();
-    this.startListeningForGuests();
+    await this.startListeningForGuests();
 
     // If a guest is already connected and we are not yet producing, start doing so now.
     // If we are joined as a guest, we should also start producing first.
@@ -835,7 +836,7 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
 
     if (this.state.guests.length === 0) {
       await this.cleanUpSocketConnection();
-      this.startListeningForGuests();
+      await this.startListeningForGuests();
     }
   }
 
@@ -848,7 +849,7 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
 
     this.SET_JOIN_AS_GUEST(null);
     await this.cleanUpSocketConnection();
-    this.startListeningForGuests();
+    await this.startListeningForGuests();
   }
 
   async cleanUpSocketConnection() {
@@ -906,6 +907,7 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
 
   sendWebRTCRequest(data: Object) {
     return new Promise(resolve => {
+      assertIsDefined(this.socket);
       this.socket.emit('webrtc', data, (result: Object) => {
         if (result && result['error']) {
           this.error(`Got error response from request ${data['type']}`);
