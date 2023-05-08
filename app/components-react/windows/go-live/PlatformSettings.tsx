@@ -21,20 +21,17 @@ export default function PlatformSettings() {
     getPlatformDisplayName,
     isLoading,
     updatePlatform,
-    platforms,
     commonFields,
     updateCommonFields,
     descriptionIsRequired,
     getPlatformSettings,
     isUpdateMode,
   } = useGoLiveSettings().extend(settings => ({
-
     get descriptionIsRequired() {
       const fbSettings = settings.state.platforms['facebook'];
       const descriptionIsRequired = fbSettings && fbSettings.enabled && !fbSettings.useCustomFields;
       return descriptionIsRequired;
-    }
-
+    },
   }));
 
   const shouldShowSettings = !error && !isLoading;
