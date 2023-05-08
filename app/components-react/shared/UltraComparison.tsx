@@ -39,7 +39,7 @@ export function UltraComparison(p: IUltraComparisonProps) {
     {
       text: $t('All Streamlabs Pro Tools'),
       icon: 'icon-streamlabs',
-      whisper: $t('Console, Cross Clip, Oslo, Willow & Melon'),
+      whisper: 'Console, Cross Clip, Video Editor, Willow & Melon',
     },
   ];
   const tableData = p.tableData || {
