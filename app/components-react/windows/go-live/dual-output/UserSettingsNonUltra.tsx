@@ -2,11 +2,9 @@ import React from 'react';
 import { Services } from 'components-react/service-provider';
 import { useGoLiveSettings } from '../useGoLiveSettings';
 import AddDestinationButton from 'components-react/shared/AddDestinationButton';
-import DualOutputPlatformSelector from './DualOutputPlatformSelector';
 import { NonUltraDestinationSwitchers } from './NonUltraDestinationSwitchers';
-
 export default function UserSettingsNonUltra() {
-  const { canAddDestinations } = useGoLiveSettings().extend(module => {
+  const { canAddDestinations, isLoading } = useGoLiveSettings().extend(module => {
     const { StreamingService } = Services;
 
     return {
@@ -25,9 +23,9 @@ export default function UserSettingsNonUltra() {
   return (
     <>
       {/*DESTINATION SWITCHERS*/}
-      <NonUltraDestinationSwitchers showSelector={canAddDestinations} />
+      {!isLoading && <NonUltraDestinationSwitchers showSelector={canAddDestinations} />}
       {/*ADD DESTINATION BUTTON*/}
-      {!canAddDestinations && <AddDestinationButton />}
+      {!isLoading && !canAddDestinations && <AddDestinationButton />}
     </>
   );
 }

@@ -1,11 +1,10 @@
-import React, { useRef, useMemo, MouseEvent, ForwardedRef } from 'react';
+import React, { useRef } from 'react';
 import { getPlatformService, TPlatform } from 'services/platforms';
 import cx from 'classnames';
 import { $t } from 'services/i18n';
 import styles from './DualOutputGoLive.m.less';
 import { ICustomStreamDestination } from 'services/settings/streaming';
 import { Services } from 'components-react/service-provider';
-import { SwitchInput } from 'components-react/shared/inputs';
 import PlatformLogo from 'components-react/shared/PlatformLogo';
 import InfoBadge from 'components-react/shared/InfoBadge';
 import DisplaySelector from 'components-react/shared/DisplaySelector';
@@ -33,21 +32,13 @@ export function NonUltraDestinationSwitchers(p: INonUltraDestinationSwitchers) {
   } = useGoLiveSettings();
   const enabledPlatformsRef = useRef(enabledPlatforms);
   enabledPlatformsRef.current = enabledPlatforms;
-  const addClassFunctionRef = useRef({ addClass: () => null });
-  // const addClassFunctionRef = useRef({ addClass: () => null });
+  const addClassFunctionRef = useRef({ addClass: () => undefined });
 
   const emitSwitch = useDebounce(500, () => {
-    console.log('enabledPlatformsRef.current 3', enabledPlatformsRef.current);
     switchPlatforms(enabledPlatformsRef.current);
-
-    console.log('switched');
   });
 
   function isEnabled(platform: TPlatform) {
-    console.log(
-      'enabledPlatformsRef.current.includes(platform) ',
-      enabledPlatformsRef.current.includes(platform),
-    );
     return enabledPlatformsRef.current.includes(platform);
   }
 
@@ -56,13 +47,9 @@ export function NonUltraDestinationSwitchers(p: INonUltraDestinationSwitchers) {
     enabledPlatformsRef.current = enabledPlatformsRef.current.filter(
       (p: TPlatform) => p !== platform,
     );
-    console.log('enabledPlatformsRef.current 1 ', enabledPlatformsRef.current);
     if (enabled) enabledPlatformsRef.current.push(platform);
-    console.log('enabledPlatformsRef.current 2 ', enabledPlatformsRef.current);
     emitSwitch();
   }
-
-  console.log('enabledPlatforms platforms ', enabledPlatforms);
 
   return (
     <>
@@ -92,18 +79,16 @@ export function NonUltraDestinationSwitchers(p: INonUltraDestinationSwitchers) {
           onChange={enabled => switchCustomDestination(ind, enabled)}
         />
       ))} */}
-      {/* <DualOutputPlatformSelector
-        ref={addClassFunctionRef}
-        platforms={enabledPlatformsRef.current}
-      /> */}
 
-      <DualOutputPlatformSelector
-        platforms={enabledPlatformsRef.current}
-        togglePlatform={platform => {
-          togglePlatform(platform, true);
-          addClassFunctionRef.current.addClass();
-        }}
-      />
+      {p.showSelector && (
+        <DualOutputPlatformSelector
+          platforms={enabledPlatformsRef.current}
+          togglePlatform={platform => {
+            togglePlatform(platform, true);
+            addClassFunctionRef.current.addClass();
+          }}
+        />
+      )}
     </>
   );
 }
@@ -121,6 +106,7 @@ interface IDestinationSwitcherProps {
  */
 
 // disable `func-call-spacing` and `no-spaced-func` rules
+// to pass back reference to addClass function
 // eslint-disable-next-line
 const DestinationSwitcher = React.forwardRef<{ addClass: () => void }, IDestinationSwitcherProps>(
   (p, ref) => {
@@ -131,17 +117,11 @@ const DestinationSwitcher = React.forwardRef<{ addClass: () => void }, IDestinat
         },
       };
     });
-    // const inputRef = useRef<HTMLInputElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
     const platform = typeof p.destination === 'string' ? (p.destination as TPlatform) : null;
-    const { RestreamService, MagicLinkService } = Services;
 
     function addClass() {
-      console.log('adding');
       containerRef.current?.classList.remove(styles.platformDisabled);
-
-      // p.onChange(true);
-      // containerRef.current?.classList.add(styles.platformDisabled);
     }
 
     function removeClass() {
@@ -153,38 +133,9 @@ const DestinationSwitcher = React.forwardRef<{ addClass: () => void }, IDestinat
         );
         return;
       }
-      console.log('removing');
       p.onChange(false);
       containerRef.current?.classList.add(styles.platformDisabled);
-
-      // containerRef.current?.classList.remove(styles.platformDisabled);
     }
-
-    // function onClickHandler(ev: MouseEvent) {
-    //   if (p.isPrimary) {
-    //     alertAsync(
-    //       $t(
-    //         'You cannot disable the platform you used to sign in to Streamlabs Desktop. Please sign in with a different platform to disable streaming to this destination.',
-    //       ),
-    //     );
-    //     return;
-    //   }
-    //   if (RestreamService.views.canEnableRestream) {
-    //     const enable = !p.enabled;
-    //     p.onChange(enable);
-    //     // always proxy the click to the SwitchInput
-    //     // so it can play a transition animation
-    //     // inputRef.current?.click();
-    //     // switch the container class without re-rendering to not stop the animation
-    //     if (enable) {
-    //       containerRef.current?.classList.remove(styles.platformDisabled);
-    //     } else {
-    //       addClass();
-    //     }
-    //   } else {
-    //     MagicLinkService.actions.linkToPrime('slobs-multistream');
-    //   }
-    // }
 
     const { title, description, CloseIcon, Logo } = (() => {
       if (platform) {
@@ -200,8 +151,7 @@ const DestinationSwitcher = React.forwardRef<{ addClass: () => void }, IDestinat
           Logo: () => (
             <PlatformLogo platform={platform} className={styles[`platform-logo-${platform}`]} />
           ),
-          CloseIcon: () => <i className="icon-close" onClick={removeClass} />,
-          // CloseIcon: () => <i className="icon-close" ref={inputRef} />,
+          CloseIcon: () => <i className="icon-close" onClick={ev => p.onChange} />,
         };
       } else {
         // define slots for a custom destination switcher
@@ -210,8 +160,7 @@ const DestinationSwitcher = React.forwardRef<{ addClass: () => void }, IDestinat
           title: destination.name,
           description: destination.url,
           Logo: () => <i className={cx(styles.destinationLogo, 'fa fa-globe')} />,
-          CloseIcon: () => <i className="icon-close" onClick={removeClass} />,
-          // CloseIcon: () => <i className="icon-close" ref={inputRef} />,
+          CloseIcon: () => <i className="icon-close" onClick={ev => p.onChange} />,
         };
       }
     })();
@@ -221,7 +170,9 @@ const DestinationSwitcher = React.forwardRef<{ addClass: () => void }, IDestinat
     return (
       <div
         ref={containerRef}
-        className={cx(styles.platformSwitcher, { [styles.platformDisabled]: !p.enabled })}
+        className={cx(styles.platformSwitcher, {
+          [styles.platformDisabled]: !p.enabled,
+        })}
         onClick={removeClass}
       >
         <div className={styles.switcherHeader}>

@@ -42,6 +42,7 @@ class GoLiveSettingsState extends StreamInfoView<IGoLiveSettingsState> {
    * Update settings for a specific platforms
    */
   updatePlatform(platform: TPlatform, patch: Partial<IGoLiveSettings['platforms'][TPlatform]>) {
+    console.log('--- updatePlatform platform ', platform);
     const updated = {
       platforms: {
         ...this.state.platforms,
@@ -56,6 +57,19 @@ class GoLiveSettingsState extends StreamInfoView<IGoLiveSettingsState> {
       this.updatePlatform(platform, { enabled: enabledPlatforms.includes(platform) });
     });
   }
+  // switchPlatforms(enabledPlatforms: TPlatform[], forceAll: boolean = false) {
+  //   if (forceAll) {
+  //     this.allLinkedPlatforms.forEach(platform => {
+  //       this.updatePlatform(platform, { enabled: enabledPlatforms.includes(platform) });
+  //     });
+  //   }
+
+  //   const platforms = forceAll ? this.allLinkedPlatforms : this.linkedPlatforms;
+
+  //   platforms.forEach(platform => {
+  //     this.updatePlatform(platform, { enabled: enabledPlatforms.includes(platform) });
+  //   });
+  // }
   /**
    * Enable/disable a custom ingest destinations
    */

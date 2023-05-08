@@ -4,7 +4,6 @@ import { TPlatform, platformLabels } from 'services/platforms';
 import { useGoLiveSettings } from '../useGoLiveSettings';
 import { Select } from 'antd';
 import PlatformLogo from 'components-react/shared/PlatformLogo';
-import { useDebounce } from 'components-react/hooks';
 import { Services } from 'components-react/service-provider';
 import styles from './DualOutputGoLive.m.less';
 import { ICustomStreamDestination } from 'services/settings/streaming';
@@ -13,13 +12,8 @@ import cx from 'classnames';
 const { Option } = Select;
 
 interface IPlatformSelectorProps {
-  // ref: React.ForwardedRef<() => void>;
   togglePlatform: (platform: TPlatform) => void;
   platforms?: TPlatform[];
-  // isPrimary?: boolean | undefined;
-  // enabled?: boolean;
-  // platform?: TPlatform;
-  // destination?: ICustomStreamDestination;
 }
 
 /**
@@ -27,19 +21,6 @@ interface IPlatformSelectorProps {
  */
 
 export default function DualOutputPlatformSelector(p: IPlatformSelectorProps) {
-  // return <>{p.platforms}</>;
-  // export default function DualOutputPlatformSelector() {
-  // React.useImperativeHandle(ref, () => {
-  //   return { platforms: ref };
-  // });
-  // const {
-  //   linkedPlatforms,
-  //   allEnabledPlatforms,
-  //   customDestinations,
-  //   switchPlatforms,
-  //   switchCustomDestination,
-  // } = useGoLiveSettings();
-
   const {
     linkedPlatforms,
     enabledPlatforms,
@@ -49,8 +30,6 @@ export default function DualOutputPlatformSelector(p: IPlatformSelectorProps) {
   const enabledPlatformsRef = useRef<TPlatform[]>(enabledPlatforms);
   enabledPlatformsRef.current = enabledPlatforms;
 
-  // const addClassFunctionRef = useRef(() => {});
-
   function showStreamSettings() {
     Services.SettingsService.actions.showSettings('Stream');
   }
@@ -58,28 +37,6 @@ export default function DualOutputPlatformSelector(p: IPlatformSelectorProps) {
   const displayed = useMemo(() => {
     return linkedPlatforms.filter(platform => !enabledPlatforms.includes(platform));
   }, [linkedPlatforms, enabledPlatforms]);
-
-  // const emitAdd = useDebounce(500, () => {
-  //   console.log('selector emitting ', enabledPlatformsRef.current);
-  //   switchPlatforms(enabledPlatformsRef.current);
-  // });
-
-  // const displayedPlatforms = useMemo(() => {
-  //   console.log('selector reacting');
-  //   const notEnabledPlatforms: string[] = linkedPlatforms.filter(
-  //     (platform: string) => !isEnabled(platform as TPlatform),
-  //   ) as string[];
-  //   const notEnabledDestinations: string[] = customDestinations.reduce(
-  //     (destinations: string[], destination: ICustomStreamDestination) => {
-  //       if (!destination.enabled) {
-  //         destinations.push(destination.name);
-  //       }
-  //       return destinations;
-  //     },
-  //     [],
-  //   );
-  //   return notEnabledPlatforms.concat(notEnabledDestinations);
-  // }, [linkedPlatforms, customDestinations]);
 
   const displayedPlatforms = useMemo(() => {
     const notEnabledPlatforms: string[] = linkedPlatforms.filter(
@@ -99,7 +56,6 @@ export default function DualOutputPlatformSelector(p: IPlatformSelectorProps) {
     return notEnabledPlatforms.concat(notEnabledDestinations);
   }, [linkedPlatforms, p.platforms, enabledPlatforms]);
 
-  // console.log('displayedPlatforms ', displayedPlatforms);
   function isEnabled(platform: TPlatform) {
     return enabledPlatforms.includes(platform);
   }
@@ -154,7 +110,6 @@ export default function DualOutputPlatformSelector(p: IPlatformSelectorProps) {
     },
   ];
 
-  // console.log('linkedPlatforms ', linkedPlatforms);
   return (
     <Select
       defaultValue={defaultLabel[0]}
@@ -165,11 +120,7 @@ export default function DualOutputPlatformSelector(p: IPlatformSelectorProps) {
           showStreamSettings();
         } else {
           // add destination to switchers
-          console.log('add destination ', option.value);
           if (linkedPlatforms.includes(option.value as TPlatform)) {
-            console.log('adding platform ', option.value);
-            // switchPlatforms([...allEnabledPlatforms, option.value as TPlatform]);
-
             p.togglePlatform(option.value as TPlatform);
             enabledPlatformsRef.current = enabledPlatformsRef.current.filter(
               platform => platform !== option.value,
@@ -191,7 +142,7 @@ export default function DualOutputPlatformSelector(p: IPlatformSelectorProps) {
           {option.label}
         </Option>
       ))}
-      <Option key="add" value="add">
+      <Option key="add" value="add" className={styles.optionBtn}>
         <i className={cx('icon-add-circle', styles.selectorIcon)} />
         {$t('Other')}
       </Option>
