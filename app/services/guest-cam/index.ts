@@ -911,7 +911,6 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
 
   sendWebRTCRequest(data: Object) {
     return new Promise(resolve => {
-      assertIsDefined(this.socket);
       this.socket.emit('webrtc', data, (result: Object) => {
         if (result && result['error']) {
           this.error(`Got error response from request ${data['type']}`);
