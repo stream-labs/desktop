@@ -1,6 +1,6 @@
 import React from 'react';
 import { useGoLiveSettings } from '../useGoLiveSettings';
-import { DualOutputDestinationSwitchers } from './DualOutputDestinationSwitchers';
+import { UltraDestinationSwitchers } from './UltraDestinationSwitchers';
 import AddDestinationButton from 'components-react/shared/AddDestinationButton';
 
 export default function UserSettingsUltra() {
@@ -18,7 +18,7 @@ export default function UserSettingsUltra() {
   return (
     <>
       {/*DESTINATION SWITCHERS*/}
-      <DualOutputDestinationSwitchers />
+      <UltraDestinationSwitchers />
       {/*ADD DESTINATION BUTTON*/}
       {shouldShowAddDestButton && <AddDestinationButton />}
     </>
