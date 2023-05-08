@@ -140,9 +140,7 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
     // if this is the first time starting the app
     // set default settings for horizontal context
     if (!this.greenService.views.videoSettings.horizontal) {
-
       const videoLegacy = this.contexts.horizontal.legacySettings;
-      console.log('Migrating video settings to new API ' + JSON.stringify(videoLegacy));
 
       if (videoLegacy.baseHeight === 0 || videoLegacy.baseWidth === 0) {
         Object.keys(this.contexts.horizontal.video).forEach((key: keyof obs.IVideoInfo) => {
