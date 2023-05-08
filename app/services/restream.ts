@@ -219,7 +219,7 @@ export class RestreamService extends StatefulService<IRestreamState> {
           ? {
               platform,
               streamKey: getPlatformService(platform).state.streamKey,
-              mode: this.dualOutputService.views.getPlatformContextName(platform) ?? 'landscape',
+              mode: this.dualOutputService.views.getPlatformMode(platform),
             }
           : {
               platform,
@@ -233,9 +233,7 @@ export class RestreamService extends StatefulService<IRestreamState> {
             ? {
                 platform: 'relay' as 'relay',
                 streamKey: `${dest.url}${dest.streamKey}`,
-                mode:
-                  this.dualOutputService.views.getPlatformContextName(dest.name as TPlatform) ??
-                  'landscape',
+                mode: this.dualOutputService.views.getMode(dest.display),
               }
             : {
                 platform: 'relay' as 'relay',

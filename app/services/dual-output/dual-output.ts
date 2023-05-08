@@ -108,8 +108,15 @@ class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
     return this.videoSettingsService.state[display];
   }
 
-  getPlatformContextName(platform: TPlatform): TOutputOrientation {
-    return this.getPlatformDisplay(platform) === 'horizontal' ? 'landscape' : 'portrait';
+  getPlatformMode(platform: TPlatform): TOutputOrientation {
+    const display = this.getPlatformDisplay(platform);
+    if (!display) return 'landscape';
+    return display === 'horizontal' ? 'landscape' : 'portrait';
+  }
+
+  getMode(display?: TDisplayType): TOutputOrientation {
+    if (!display) return 'landscape';
+    return display === 'horizontal' ? 'landscape' : 'portrait';
   }
 
   getHorizontalNodeId(verticalNodeId: string, sceneId: string) {

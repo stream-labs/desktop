@@ -13,7 +13,6 @@ import Vue from 'vue';
 import { IVideo } from 'obs-studio-node';
 import { DualOutputService } from 'services/dual-output';
 import { TDisplayType } from 'services/settings-v2/video';
-import { TOutputOrientation } from 'services/restream';
 
 interface ISavedGoLiveSettings {
   platforms: {
@@ -32,7 +31,8 @@ export interface ICustomStreamDestination {
   url: string;
   streamKey?: string;
   enabled: boolean;
-  mode?: TOutputOrientation;
+  display?: TDisplayType;
+  video?: IVideo;
 }
 
 /**
