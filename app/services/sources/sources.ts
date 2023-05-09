@@ -342,6 +342,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
       'liv_capture',
       'ovrstream_dc_source',
       'vlc_source',
+      'wasapi_process_output_capture',
     ];
 
     const availableWhitelistedType = whitelistedTypes.filter(type =>

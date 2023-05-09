@@ -393,5 +393,8 @@
   "near": {
     "name": "KOTOYOMI Near",
     "description": "Add a character to your scene that reads comments to the \"N Voice\" voice."
+  },
+  "wasapi_process_output_capture": {
+    "name": "Application Audio Capture (BETA)"
   }
 }
