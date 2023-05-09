@@ -4,7 +4,6 @@ import { IPlatformCapabilityResolutionPreset, IPlatformState, TPlatformCapabilit
 import { IGoLiveSettings } from '../streaming';
 import { WidgetType } from '../widgets';
 import { getDefined } from '../../util/properties-type-guards';
-import { IVideo } from 'obs-studio-node';
 import { TDisplayType } from 'services/settings-v2';
 import { TOutputOrientation } from 'services/restream';
 
@@ -66,7 +65,7 @@ export class TiktokService
       );
     }
     this.SET_STREAM_SETTINGS(ttSettings);
-    this.setPlatformContext(context);
+    this.setPlatformContext('tiktok');
   }
 
   /**

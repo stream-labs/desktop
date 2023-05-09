@@ -26,15 +26,17 @@ export default function Display(props: DisplayProps) {
     ...props,
   };
 
-  const v = useVuex(
-    () => ({
+  const v = useVuex(() => {
+    const videoSettings = VideoSettingsService.contexts[p.type ?? 'horizontal']?.video;
+
+    return {
       paddingColor: CustomizationService.views.displayBackground,
       baseResolution: `${VideoSettingsService.state[p.type ?? 'horizontal'].baseWidth}x${
         VideoSettingsService.state[p.type ?? 'horizontal'].baseHeight
       }`,
-    }),
-    false,
-  );
+      // baseResolution: `${videoSettings?.baseWidth}x${videoSettings?.baseHeight}`, // @@@ from incoming merge
+    };
+  }, false);
 
   const obsDisplay = useRef<OBSDisplay | null>(null);
   const displayEl = useRef<HTMLDivElement>(null);

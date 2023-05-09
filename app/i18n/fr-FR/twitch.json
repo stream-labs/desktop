@@ -1,5 +1,7 @@
 {
   "Twitch Category": "Catégorie Twitch",
   "Twitch Tags": "Tags Twitch",
-  "Warning! Editing tags in Streamlabs will overwrite tags in Twitch. To use Twitch's new custom tags, you must edit your tags in the Twitch dashboard directly until Twitch provides third parties access to editing the new custom tags.": "Attention Modifier les tags dans Streamlabs écrasera les tags dans Twitch. Pour utiliser les nouveaux tags personnalisés de Twitch, vous devez modifier vos tags dans le tableau de bord de Twitch directement jusqu'à ce que Twitch fournisse aux tiers un accès à la modification des nouveaux tags personnalisés."
+  "You need to re-login to access Twitch tags": "Vous devez vous reconnecter pour accéder aux tags Twitch",
+  "Do not include special characters or spaces in your tag": "N’incluez pas de caractères spéciaux ou d’espaces dans votre tag.",
+  "For example: \"Speedrunning\" or \"FirstPlaythrough\"": "Par exemple: \"Speedrunning\" ou \"FirstPlaythrough\"."
 }

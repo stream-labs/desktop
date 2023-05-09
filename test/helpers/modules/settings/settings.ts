@@ -11,7 +11,7 @@ import { tmpdir } from 'os';
 import * as path from 'path';
 import { setInputValue } from '../forms/base';
 import { FormMonkey } from '../../form-monkey';
-import { getContext } from '../../spectron';
+import { getContext } from '../../webdriver';
 
 /**
  * Open the settings window with a given category selected

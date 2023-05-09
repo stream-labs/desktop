@@ -157,23 +157,25 @@ function EventSettingsModal() {
         <Spin spinning={isLoading}>
           {/* PLATFORM SELECTOR */}
           {canChangePlatform && (
-            <ListInput
-              label={$t('Platform')}
-              name="platform"
-              value={selectedPlatform}
-              options={platforms.map(platform => ({
-                value: platform,
-                label: getPlatformDisplayName(platform),
-              }))}
-              onChange={platform => showNewEventModal(platform)}
-              description={
-                selectedPlatform === 'facebook'
-                  ? $t(
-                      'Please note that while you can schedule streams to Facebook, they will not appear on this calendar due to API limitations',
-                    )
-                  : undefined
-              }
-            />
+            <>
+              <ListInput
+                label={$t('Platform')}
+                name="platform"
+                value={selectedPlatform}
+                options={platforms.map(platform => ({
+                  value: platform,
+                  label: getPlatformDisplayName(platform),
+                }))}
+                onChange={platform => showNewEventModal(platform)}
+              />
+              {selectedPlatform === 'facebook' && (
+                <span className="whisper">
+                  {$t(
+                    'Please note that while you can schedule streams to Facebook, some will not appear on this calendar due to API limitations',
+                  )}
+                </span>
+              )}
+            </>
           )}
 
           {/* TIME PICKER */}

@@ -33,5 +33,6 @@
   "FBPrivacyWarning": "Poskytnutá úroveň ochrany soukromí může být omezena pro váš účet na Facebooku. Podívejte se do části „Kdo vidí, že používáte tuto firemní integraci“ pro integraci Streamlabs <link>zde</link>",
   "Only Me": "Jen já",
   "Do not change privacy settings": "Neměnit nastavení ochrany soukromí",
-  "Install %{overlayName}": "Instalovat %{overlayName}"
+  "Install %{overlayName}": "Instalovat %{overlayName}",
+  "Please note that while you can schedule streams to Facebook, some will not appear on this calendar due to API limitations": "Upozorňujeme, že ačkoli můžete plánovat streamy na Facebook, některé z nich se neobjeví v tomto kalendáři kvůli omezením API"
 }

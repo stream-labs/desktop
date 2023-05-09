@@ -12,9 +12,11 @@ import * as obs from '../../../obs-api';
 import { $t } from 'services/i18n';
 import namingHelpers from 'util/NamingHelpers';
 import uuid from 'uuid/v4';
-import { ViewHandler } from 'services/core';
 import { DualOutputService } from 'services/dual-output';
 import { TDisplayType } from 'services/settings-v2/video';
+import { InitAfter, ViewHandler } from 'services/core';
+import { lazyModule } from 'util/lazy-module';
+import { VideoSettingsService } from 'services/settings-v2';
 
 export type TSceneNodeModel = ISceneItem | ISceneItemFolder;
 
@@ -199,7 +201,7 @@ class ScenesViews extends ViewHandler<IScenesState> {
 
   hasSceneItems(sceneId: string): boolean {
     const sceneItems = this.getSceneItemsBySceneId(sceneId);
-    return this.getSceneItemsBySceneId(sceneId).length > 0;
+    return sceneItems.length > 0;
   }
 
   /**
@@ -229,11 +231,14 @@ class ScenesViews extends ViewHandler<IScenesState> {
     return null;
   }
 
-  getNodeVisibility(sceneNodeId: string): boolean {
-    const nodeModel: TSceneNode = this.getSceneNode(sceneNodeId);
+  getNodeVisibility(sceneNodeId: string) {
+    const nodeModel: TSceneNode | null = this.getSceneNode(sceneNodeId);
     return nodeModel instanceof SceneItem ? nodeModel?.visible : null;
   }
 }
+
+@InitAfter('GreenService')
+@InitAfter('DualOutputService')
 export class ScenesService extends StatefulService<IScenesState> {
   @Inject() private dualOutputService: DualOutputService;
 
@@ -257,6 +262,7 @@ export class ScenesService extends StatefulService<IScenesState> {
   @Inject() private windowsService: WindowsService;
   @Inject() private sourcesService: SourcesService;
   @Inject() private transitionsService: TransitionsService;
+  @Inject() private videoSettingsService: VideoSettingsService;
 
   @mutation()
   private ADD_SCENE(id: string, name: string) {
@@ -312,7 +318,11 @@ export class ScenesService extends StatefulService<IScenesState> {
         .reverse()
         .forEach(item => {
           const newItem = newScene.addSource(item.sourceId);
-          newItem.setSettings(item.getSettings());
+          const settings = {
+            ...item.getSettings(),
+            output: this.videoSettingsService.contexts.horizontal,
+          };
+          newItem.setSettings(settings);
         });
     }
 

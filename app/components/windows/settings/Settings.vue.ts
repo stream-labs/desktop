@@ -8,7 +8,6 @@ import GenericFormGroups from 'components/obs/inputs/GenericFormGroups.vue';
 import { WindowsService } from 'services/windows';
 import { ISettingsSubCategory, SettingsService } from 'services/settings/index';
 import DeveloperSettings from './DeveloperSettings';
-import Hotkeys from './Hotkeys.vue';
 import OverlaySettings from './OverlaySettings';
 import NotificationsSettings from './NotificationsSettings.vue';
 import SearchablePages from 'components/shared/SearchablePages';
@@ -18,12 +17,14 @@ import { MagicLinkService } from 'services/magic-link';
 import { UserService } from 'services/user';
 import { DismissablesService, EDismissable } from 'services/dismissables';
 import Scrollable from 'components/shared/Scrollable';
+import Hotkeys from './Hotkeys.vue';
 import {
   ObsSettings,
   PlatformLogo,
   NewBadge,
   UltraIcon,
   InstalledApps,
+  // Hotkeys,
 } from 'components/shared/ReactComponentList';
 import { $t } from 'services/i18n';
 import { debounce } from 'lodash-decorators';
@@ -159,7 +160,6 @@ export default class Settings extends Vue {
   get shouldShowVuePage() {
     if (this.reactPages.includes(this.categoryName)) return false;
     return ![
-      'Hotkeys',
       'Stream',
       'API',
       'Overlays',
@@ -185,11 +185,7 @@ export default class Settings extends Vue {
     // so hide these from the settings list
     return this.settingsService
       .getCategories()
-      .filter(
-        category =>
-          !category.toLowerCase().startsWith('stream', 0) ||
-          (category.toLowerCase().startsWith('stream', 0) && category.length < 7),
-      );
+      .filter(category => !category.toLowerCase().startsWith('stream') || category === 'Stream');
   }
 
   save(settingsData: ISettingsSubCategory[]) {

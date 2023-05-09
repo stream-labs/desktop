@@ -1,10 +1,10 @@
-import { test, useSpectron } from '../../helpers/spectron';
+import { test, useWebdriver } from '../../helpers/webdriver';
 import { addSource } from '../../helpers/modules/sources';
-import { logIn } from '../../helpers/spectron/user';
+import { logIn } from '../../helpers/webdriver/user';
 import { FormMonkey } from '../../helpers/form-monkey';
 import { waitForWidgetSettingsSync } from '../../helpers/widget-helpers';
 
-useSpectron();
+useWebdriver();
 
 test.skip('Set stream-boss health', async t => {
   if (!(await logIn(t))) return;

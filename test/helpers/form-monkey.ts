@@ -1,6 +1,6 @@
 import { sleep } from './sleep';
 import { cloneDeep, isMatch } from 'lodash';
-import { TExecutionContext } from './spectron';
+import { TExecutionContext } from './webdriver';
 import { click } from './modules/core';
 
 interface IUIInput {

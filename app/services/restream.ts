@@ -104,7 +104,7 @@ export class RestreamService extends StatefulService<IRestreamState> {
   }
 
   get chatUrl() {
-    const hasFBTarget = this.streamInfo.enabledPlatforms.includes('facebook');
+    const hasFBTarget = this.streamInfo.enabledPlatforms.includes('facebook' as TPlatform);
     let fbParams = '';
     if (hasFBTarget) {
       const fbView = this.facebookService.views;

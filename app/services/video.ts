@@ -7,14 +7,14 @@ import Utils from './utils';
 import { WindowsService } from './windows';
 import { ScalableRectangle } from '../util/ScalableRectangle';
 import { Subscription } from 'rxjs';
-import { SelectionService, ISelectionState } from 'services/selection';
-import { VideoSettingsService, TDisplayType } from 'services/settings-v2/video';
 import { DualOutputService } from './dual-output';
 import { byOS, OS, getOS } from 'util/operating-systems';
 import * as remote from '@electron/remote';
 import { onUnload } from 'util/unload';
 import { ScenesService } from './api/external-api/resources';
 import { SettingsManagerService } from './settings-manager';
+import { ISelectionState, SelectionService } from 'services/selection';
+import { TDisplayType, VideoSettingsService } from './settings-v2';
 
 // TODO: There are no typings for nwr
 let nwr: any;
@@ -324,6 +324,7 @@ export class VideoService extends Service {
 
   get baseResolutions() {
     const baseResolutions = this.videoSettingsService.baseResolutions;
+
     return {
       horizontal: {
         baseWidth: baseResolutions.horizontal.baseWidth,

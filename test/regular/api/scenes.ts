@@ -1,4 +1,4 @@
-import { useSpectron, test } from '../../helpers/spectron';
+import { useWebdriver, test } from '../../helpers/webdriver';
 import { getApiClient } from '../../helpers/api-client';
 import { SceneBuilder } from '../../helpers/scene-builder';
 import { sleep } from '../../helpers/sleep';
@@ -6,7 +6,7 @@ import { ScenesService } from '../../../app/services/api/external-api/scenes';
 
 const path = require('path');
 
-useSpectron({ restartAppAfterEachTest: false });
+useWebdriver({ restartAppAfterEachTest: false });
 
 test('The default scene exists', async t => {
   const client = await getApiClient();

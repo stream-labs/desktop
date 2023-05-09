@@ -1,12 +1,13 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import PlatformAppPageView from 'components-react/shared/PlatformAppPageView';
 import Util from 'services/utils';
 import { Services } from 'components-react/service-provider';
+import { useOneOffWindowParams } from 'components-react/hooks';
 
 export default function PlatformAppPopOut() {
   const { WindowsService, PlatformAppsService } = Services;
-  const windowId = Util.getCurrentUrlParams().windowId;
-  const params = WindowsService.getWindowOptions(windowId);
+  const windowId = useMemo(() => Util.getCurrentUrlParams().windowId, []);
+  const params = useOneOffWindowParams();
 
   useEffect(() => {
     const subscription = PlatformAppsService.appUnload.subscribe(appId => {

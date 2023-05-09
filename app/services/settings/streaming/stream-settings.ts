@@ -9,10 +9,11 @@ import cloneDeep from 'lodash/cloneDeep';
 import { TwitchService } from 'services/platforms/twitch';
 import { PlatformAppsService } from 'services/platform-apps';
 import { IGoLiveSettings, IPlatformFlags } from 'services/streaming';
+import { TDisplayType } from 'services/settings-v2/video';
 import Vue from 'vue';
 import { IVideo } from 'obs-studio-node';
 import { DualOutputService } from 'services/dual-output';
-import { TDisplayType } from 'services/settings-v2/video';
+import { TOutputOrientation } from 'services/restream';
 
 interface ISavedGoLiveSettings {
   platforms: {
@@ -33,6 +34,7 @@ export interface ICustomStreamDestination {
   enabled: boolean;
   display?: TDisplayType;
   video?: IVideo;
+  mode?: TOutputOrientation;
 }
 
 /**
@@ -169,9 +171,6 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
     const mustUpdateObsSettings = Object.keys(patch).find(key =>
       ['platform', 'key', 'server'].includes(key),
     );
-    // console.log('mustUpdateObsSettings ', mustUpdateObsSettings);
-    // if (!mustUpdateObsSettings || streamName === 'StreamSecond') return;
-    // streamFormData = cloneDeep(this.views.obsStreamSettings);
 
     if (!mustUpdateObsSettings) return;
     streamFormData =
@@ -193,7 +192,6 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
       });
     });
 
-    // console.log('updating service streamFormData ', streamFormData);
     this.settingsService.setSettings(streamName, streamFormData);
   }
 
@@ -215,7 +213,7 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
       });
       patch.platforms = platforms as ISavedGoLiveSettings['platforms'];
     }
-    console.log('update settings', settingsPatch);
+
     this.setSettings({
       goLiveSettings: { ...this.state.goLiveSettings, ...settingsPatch } as IGoLiveSettings,
     });

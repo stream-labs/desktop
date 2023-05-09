@@ -5,5 +5,9 @@
   "Grant Permissions": "授予权限",
   "Streamlabs needs additional permissions. Grant permissions in the pop-up dialogs to continue.": "Streamlabs 需要额外的权限。请在弹出对话框中授予权限以继续。",
   "Microphone": "麦克风",
-  "Webcam": "网络摄像头"
+  "Webcam": "网络摄像头",
+  "You've merged a Streamlabs ID to your account, please log back in to ensure you have the right credentials.": "您已将 Streamlabs ID 合并到您的帐户，请重新登录以确保您拥有正确的凭据。",
+  "Enable Live Streaming?": "启用直播？",
+  "Streamlabs is currently in recording mode, which hides live streaming features. Would you like to enable live streaming features? You can disable them again in General settings.": "Streamlabs 目前处于录制模式，已隐藏直播功能。是否启用直播功能？您可以在常规设置中再次禁用这些功能。",
+  "Enable Streaming": "启用直播"
 }

@@ -67,8 +67,6 @@ class VideoSettingsModule {
   }
 
   get values(): Dictionary<TInputValue> {
-    console.log('Video this.state ', this.state);
-    console.log('Video this.service.values ', this.service.values);
     const display = this.state.display;
     const vals = this.service.values[display];
     const baseRes = display !== 'vertical' && this.state?.customBaseRes ? 'custom' : vals.baseRes;
@@ -418,12 +416,14 @@ export function VideoSettings() {
         </div>
       </div>
       {showDualOutputSettings && <Tabs onChange={setDisplay} />}
+
       <div className={styles.formSection}>
         <FormFactory
           values={values}
           metadata={metadata}
           onChange={onChange}
           formOptions={{ layout: 'vertical' }}
+          name="video-settings"
         />
       </div>
     </>

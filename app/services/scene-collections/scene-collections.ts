@@ -36,7 +36,6 @@ import { StreamingService, EStreamingState } from 'services/streaming';
 import { DefaultHardwareService } from 'services/hardware';
 import { byOS, OS, getOS } from 'util/operating-systems';
 import Utils from 'services/utils';
-import { OutputSettingsService } from '../settings';
 import * as remote from '@electron/remote';
 import { GuestCamNode } from './nodes/guest-cam';
 import { DualOutputService } from 'services/dual-output';
@@ -88,7 +87,6 @@ export class SceneCollectionsService extends Service implements ISceneCollection
   @Inject() streamingService: StreamingService;
   @Inject() dualOutputService: DualOutputService;
   @Inject() private defaultHardwareService: DefaultHardwareService;
-  @Inject() private outputSettingsService: OutputSettingsService;
 
   collectionAdded = new Subject<ISceneCollectionsManifestEntry>();
   collectionRemoved = new Subject<ISceneCollectionsManifestEntry>();

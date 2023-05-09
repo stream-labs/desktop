@@ -16,5 +16,15 @@
   "Font Size": "Yazı Tipi Boyutu",
   "Muted Chatters": "Sesi Kapatılmış Sohbetçiler",
   "Hide Commands": "Komutları Gizle",
-  "Background Color": "Arka Plan Rengi"
+  "Background Color": "Arka Plan Rengi",
+  "Show Platform Icons": "Platform Simgelerini Göster",
+  "Theme": "Tema",
+  "Badges": "Rozetler",
+  "Extra Emotes": "Ekstra İfadeler",
+  "Chat Delay": "Sohbet Gecikmesi",
+  "Hide Delay": "Gecikmeyi Gizle",
+  "Disable Message Animations": "Mesaj Animasyonlarını Devre Dışı Bırak",
+  "Hide Characters": "Karakterleri Gizle",
+  "Hide Common Chat Bots": "Genel sohbet robotlarını gizleyin",
+  "Hide commands starting with `!`": "'!' ile başlayan komutlarını gizle"
 }

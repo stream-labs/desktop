@@ -8,9 +8,10 @@ import { VideoService } from 'services/video';
 import { StreamingService } from 'services/streaming';
 import { OS } from 'util/operating-systems';
 import { GuestCamNode } from './guest-cam';
-import { TDisplayType, VideoSettingsService } from 'services/settings-v2/video';
+import { VideoSettingsService } from 'services/settings-v2/video';
 import { DualOutputService } from 'services/dual-output';
 import { SettingsManagerService } from 'services/settings-manager';
+import { SettingsService } from 'services/settings';
 
 interface ISchema {
   baseResolutions: {
@@ -45,6 +46,7 @@ export class RootNode extends Node<ISchema, {}> {
   @Inject() videoSettingsService: VideoSettingsService;
   @Inject() dualOutputService: DualOutputService;
   @Inject() settingsManagerService: SettingsManagerService;
+  @Inject() settingsService: SettingsService;
 
   async save(): Promise<void> {
     const sources = new SourcesNode();

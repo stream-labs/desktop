@@ -3,7 +3,11 @@
   "This element is too small to be displayed": "Bu öge, görüntülenemeyecek kadar küçük",
   "This element requires Selective Recording to be enabled": "Bu ögenin etkinleştirilebilmesi için Seçilebilir Kayıt gerekli",
   "Grant Permissions": "İzin Ver",
-  "Streamlabs needs additional permissions. Grant permissions in the pop-up dialogs to continue.": "Streamlabs için ek izin gerekiyor. Devam etmek için açılan iletişim kutusunda izinleri sağlayın.",
+  "Streamlabs needs additional permissions. Grant permissions in the pop-up dialogs to continue.": "Streamlabs için ek izinler gerekiyor. Devam etmek için açılır pencere iletişim kutularında izinler verin",
   "Microphone": "Mikrofon",
-  "Webcam": "Kamera"
+  "Webcam": "Kamera",
+  "You've merged a Streamlabs ID to your account, please log back in to ensure you have the right credentials.": "Hesabınızla bir Streamlabs ID’yi birleştirdiniz. Doğru giriş bilgilerine sahip olduğunuzdan emin olmak için lütfen tekrar giriş yapın.",
+  "Enable Live Streaming?": "Canlı Yayın Etkinleştirilsin mi?",
+  "Streamlabs is currently in recording mode, which hides live streaming features. Would you like to enable live streaming features? You can disable them again in General settings.": "Streamlabs şu anda kayıt modunda. Bu nedenle, canlı yayın özellikleri gizleniyor. Canlı yayın özelliklerini etkinleştirmek ister misiniz? Bu özellikleri Genel ayarlardan tekrar devre dışı bırakabilirsiniz.",
+  "Enable Streaming": "Yayını Etkinleştir"
 }

@@ -26,8 +26,8 @@ export interface ITwitchStartStreamOptions {
   title: string;
   game?: string;
   video?: IVideo;
-  mode?: TOutputOrientation;
   tags: string[];
+  mode?: TOutputOrientation;
 }
 
 export interface ITwitchChannelInfo extends ITwitchStartStreamOptions {
@@ -82,6 +82,7 @@ export class TwitchService
       video: undefined,
       mode: undefined,
       tags: [],
+      mode: undefined,
     },
   };
 
@@ -195,7 +196,7 @@ export class TwitchService
       if (channelInfo) await this.putChannelInfo(channelInfo);
     }
 
-    this.setPlatformContext(context);
+    this.setPlatformContext('twitch');
   }
 
   async validatePlatform() {

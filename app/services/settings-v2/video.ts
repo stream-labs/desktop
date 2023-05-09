@@ -5,8 +5,10 @@ import { mutation, StatefulService } from '../core/stateful-service';
 import * as obs from '../../../obs-api';
 import { SettingsManagerService } from 'services/settings-manager';
 import { DualOutputService } from 'services/dual-output';
+import { GreenService } from 'services/green';
 import { ScenesService } from 'services/scenes';
 import { SettingsService } from 'services/settings';
+import { Subject } from 'rxjs';
 
 /**
  * Display Types
@@ -52,6 +54,7 @@ export function invalidFps(num: number, den: number) {
 export class VideoSettingsService extends StatefulService<IVideoSetting> {
   @Inject() settingsManagerService: SettingsManagerService;
   @Inject() dualOutputService: DualOutputService;
+  @Inject() greenService: GreenService;
   @Inject() scenesService: ScenesService;
   @Inject() settingsService: SettingsService;
 
@@ -61,8 +64,11 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
     vertical: null as obs.IVideoInfo,
   };
 
+  establishedContext = new Subject();
+
   init() {
     this.establishVideoContext();
+    this.establishedContext.next();
     if (this.settingsManagerService.views.activeDisplays.vertical) {
       this.establishVideoContext('vertical');
     }
@@ -164,11 +170,38 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
         },
       );
     }
-
-    if (invalidFps(this.contexts[display].video.fpsNum, this.contexts[display].video.fpsDen)) {
-      this.createDefaultFps(display);
-    }
   }
+
+  // @@@ incoming from merge
+  // migrateSettings(display: TDisplayType = 'horizontal') {
+  //   this.SET_VIDEO_CONTEXT(display, this.contexts[display].video);
+
+  //   // if this is the first time starting the app
+  //   // set default settings for horizontal context
+  //   if (!this.greenService.views.videoSettings.horizontal) {
+  //     Object.keys(this.contexts.horizontal.legacySettings).forEach((key: keyof obs.IVideoInfo) => {
+  //       this.SET_VIDEO_SETTING(key, this.contexts.horizontal.legacySettings[key]);
+  //       this.greenService.setVideoSetting(
+  //         { [key]: this.contexts.horizontal.legacySettings[key] },
+  //         display,
+  //       );
+  //     });
+  //     Object.keys(this.contexts.horizontal.video).forEach((key: keyof obs.IVideoInfo) => {
+  //       this.SET_VIDEO_SETTING(key, this.contexts.horizontal.video[key]);
+  //       this.greenService.setVideoSetting({ [key]: this.contexts.horizontal.video[key] }, display);
+  //     });
+  //   } else {
+  //     const data = this.greenService.views.videoSettings[display];
+
+  //     Object.keys(data).forEach((key: keyof obs.IVideoInfo) => {
+  //       this.SET_VIDEO_SETTING(key, data[key], display);
+  //     });
+  //   }
+
+  //   if (invalidFps(this.contexts[display].video.fpsNum, this.contexts[display].video.fpsDen)) {
+  //     this.createDefaultFps(display);
+  //   }
+  // }
 
   establishVideoContext(display: TDisplayType = 'horizontal') {
     if (this.contexts[display]) return;
@@ -178,6 +211,8 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
     this.migrateSettings(display);
     this.contexts[display].video = this.state[display];
     this.contexts[display].legacySettings = this.state[display];
+    obs.Video.video = this.state.horizontal;
+    obs.Video.legacySettings = this.state.horizontal;
 
     return !!this.contexts[display];
   }
@@ -209,28 +244,8 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
 
   @debounce(200)
   updateObsSettings(display: TDisplayType = 'horizontal') {
-    console.log('this.contexts.horizontal.video ', this.contexts.horizontal.video);
-    console.log(
-      'this.contexts.horizontal.legacySettings ',
-      this.contexts.horizontal.legacySettings,
-    );
-    console.log('this.state.horizontal ', this.state.horizontal);
-    switch (display) {
-      case 'horizontal': {
-        this.contexts.horizontal.video = this.state.horizontal;
-        this.contexts.horizontal.legacySettings = this.state.horizontal;
-        break;
-      }
-      case 'vertical': {
-        this.contexts.vertical.video = this.state.vertical;
-        this.contexts.vertical.legacySettings = this.state.vertical;
-        break;
-      }
-      default: {
-        this.contexts.horizontal.video = this.state.horizontal;
-        this.contexts.horizontal.legacySettings = this.state.horizontal;
-      }
-    }
+    this.contexts[display].video = this.state[display];
+    this.contexts[display].legacySettings = this.state[display];
   }
 
   setVideoSetting(key: string, value: unknown, display: TDisplayType = 'horizontal') {
@@ -241,13 +256,19 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
       // if the display is vertical, also update the persisted settings
       this.settingsManagerService.setVideoSetting({ [key]: value });
     }
+    // this.greenService.setVideoSetting({ [key]: value }, display);
   }
 
   shutdown() {
     displays.forEach(display => {
-      const context = this.contexts[display];
-      if (context) {
-        context.destroy();
+      if (this.contexts[display]) {
+        // save settings as legacy settings
+        this.contexts[display].legacySettings = this.state[display];
+
+        // destroy context
+        this.contexts[display].destroy();
+        this.contexts[display] = null as obs.IVideo;
+        this.DESTROY_VIDEO_CONTEXT(display);
       }
     });
   }

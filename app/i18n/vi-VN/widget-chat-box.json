@@ -16,5 +16,15 @@
   "Font Size": "Font Size",
   "Muted Chatters": "Tắt người chat",
   "Hide Commands": "Hide Commands",
-  "Background Color": "Màu nền"
+  "Background Color": "Màu nền",
+  "Show Platform Icons": "Show Platform Icons",
+  "Theme": "Theme",
+  "Badges": "Huy hiệu",
+  "Extra Emotes": "Emotes Thêm",
+  "Chat Delay": "Chat Delay",
+  "Hide Delay": "Hide Delay",
+  "Disable Message Animations": "Disable Message Animations",
+  "Hide Characters": "Hide Characters",
+  "Hide Common Chat Bots": "Ẩn Chat bot phổ biến",
+  "Hide commands starting with `!`": "Ẩn lệnh bắt đầu bằng '!'"
 }

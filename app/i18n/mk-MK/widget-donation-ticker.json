@@ -14,5 +14,10 @@
   "Manage List": "Manage List",
   "Font Settings": "Font Settings",
   "A hex color for the text of the": "A hex color for the text of the",
-  "token": "token"
+  "token": "token",
+  "Each donation that shows in the donation ticker will be in this format. Available tokens:": "Each donation that shows in the donation ticker will be in this format. Available tokens:",
+  "The maximum amount of donations to show in the ticker. Must be a number greater than 0.": "The maximum amount of donations to show in the ticker. Must be a number greater than 0.",
+  "How fast the ticker should scroll between 1 (fastest) and 10 (slowest). Set to 0 for no scrolling.": "How fast the ticker should scroll between 1 (fastest) and 10 (slowest). Set to 0 for no scrolling.",
+  "The font size in pixels. Reasonable size typically ranges between 24px and 48px.": "The font size in pixels. Reasonable size typically ranges between 24px and 48px.",
+  "How thick to make the font. The value should range between 300 (thinnest) and 900 (thickest)": "How thick to make the font. The value should range between 300 (thinnest) and 900 (thickest)"
 }

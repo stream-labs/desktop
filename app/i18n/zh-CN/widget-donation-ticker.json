@@ -14,5 +14,10 @@
   "Manage List": "管理名单",
   "Font Settings": "字体设置",
   "A hex color for the text of the": "文字的十六进制颜色",
-  "token": "令牌"
+  "token": "令牌",
+  "Each donation that shows in the donation ticker will be in this format. Available tokens:": "捐赠提示器中显示的每笔捐赠均将采用此格式。可用标记：",
+  "The maximum amount of donations to show in the ticker. Must be a number greater than 0.": "在提示器中显示的最高捐赠额。数字必须大于 0。",
+  "How fast the ticker should scroll between 1 (fastest) and 10 (slowest). Set to 0 for no scrolling.": "提示器滚动速度 1（最快） 到 10 （最慢）。设置为 0 表示不滚动。",
+  "The font size in pixels. Reasonable size typically ranges between 24px and 48px.": "以像素为单位的字体大小。合适的字号范围通常在 24px 和 48px 之间。",
+  "How thick to make the font. The value should range between 300 (thinnest) and 900 (thickest)": "字体的粗细。范围应在 300 (最细) 至 900 (最粗) 之间"
 }

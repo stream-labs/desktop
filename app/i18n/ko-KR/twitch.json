@@ -1,5 +1,7 @@
 {
   "Twitch Category": "Twitch 카테고리",
   "Twitch Tags": "Twitch 태그",
-  "Warning! Editing tags in Streamlabs will overwrite tags in Twitch. To use Twitch's new custom tags, you must edit your tags in the Twitch dashboard directly until Twitch provides third parties access to editing the new custom tags.": "경고! Streamlabs의 태그를 편집하면 Twitch 태그를 덮어씁니다. Twitch의 새로운 태그를 사용하려면 Twitch가 타사에 신규 커스텀 태그 편집에 대한 권한을 제공할 때까지 대시보드에서 직접 태그를 편집해야 합니다."
+  "You need to re-login to access Twitch tags": "Twitch 태그를 이용하려면 다시 로그인",
+  "Do not include special characters or spaces in your tag": "태그에 특수문자 또는 띄어쓰기 사용 불가",
+  "For example: \"Speedrunning\" or \"FirstPlaythrough\"": "예시: \"Speedrunning\" 또는 \"FirstPlaythrough\""
 }

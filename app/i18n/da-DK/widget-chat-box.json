@@ -16,5 +16,15 @@
   "Font Size": "Skriftstørrelse",
   "Muted Chatters": "Chatdeltagere der er gjort tavse",
   "Hide Commands": "Skjul kommandoer",
-  "Background Color": "Baggrundsfarve"
+  "Background Color": "Baggrundsfarve",
+  "Show Platform Icons": "Vis ikoner for platformen",
+  "Theme": "Tema",
+  "Badges": "Badges",
+  "Extra Emotes": "Ekstra humørikoner",
+  "Chat Delay": "Chatforsinkelse",
+  "Hide Delay": "Skjul forsinkelse",
+  "Disable Message Animations": "Deaktiver animationer af meddelelser",
+  "Hide Characters": "Skjul tegn",
+  "Hide Common Chat Bots": "Skjul udbredte chatbots",
+  "Hide commands starting with `!`": "Skjul kommandoer, der starter med '!'"
 }

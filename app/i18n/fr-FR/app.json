@@ -5,5 +5,9 @@
   "Grant Permissions": "Accorder les autorisations",
   "Streamlabs needs additional permissions. Grant permissions in the pop-up dialogs to continue.": "Streamlabs nécessite des autorisations supplémentaires. Accordez ces autorisations dans les fenêtres contextuelles pour continuer.",
   "Microphone": "Microphone",
-  "Webcam": "Webcam"
+  "Webcam": "Webcam",
+  "You've merged a Streamlabs ID to your account, please log back in to ensure you have the right credentials.": "Vous avez fusionné un Streamlabs ID avec votre compte. Reconnectez-vous pour vous assurer d’avoir les bons identifiants.",
+  "Enable Live Streaming?": "Activer la diffusion en direct?",
+  "Streamlabs is currently in recording mode, which hides live streaming features. Would you like to enable live streaming features? You can disable them again in General settings.": "Streamlabs est actuellement en mode d’enregistrement, ce qui masque les fonctionnalités de diffusion en direct. Souhaitez-vous activer les fonctionnalités de diffusion en direct? Vous pouvez les désactiver à nouveau dans les paramètres généraux.",
+  "Enable Streaming": "Activer le streaming"
 }

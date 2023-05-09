@@ -33,5 +33,6 @@
   "FBPrivacyWarning": "Выданный уровень доступа может быть ограничен для вашего аккаунта Facebook. Подробнее см. в меню Интеграции со Streamlabs <link>здесь</link> в разделе «Кто может видеть, что я использую эту рабочую интеграцию».",
   "Only Me": "Только для меня",
   "Do not change privacy settings": "Не изменять настройки конфиденциальности",
-  "Install %{overlayName}": "Установить %{overlayName}"
+  "Install %{overlayName}": "Установить %{overlayName}",
+  "Please note that while you can schedule streams to Facebook, some will not appear on this calendar due to API limitations": "Обратите внимание, что, несмотря на возможность планирования трансляций для Facebook, некоторые из них не будут отображаться в этом календаре ввиду ограничений API."
 }

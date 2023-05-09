@@ -28,7 +28,7 @@ import { Rect } from '../../util/rect';
 import { TSceneNodeType } from './scenes';
 import { ServiceHelper, ExecuteInWorkerProcess } from 'services/core';
 import { assertIsDefined } from '../../util/properties-type-guards';
-import { VideoSettingsService, TDisplayType } from 'services/settings-v2/video';
+import { VideoSettingsService, TDisplayType } from 'services/settings-v2';
 /**
  * A SceneItem is a source that contains
  * all of the information about that source, and
@@ -222,7 +222,7 @@ export class SceneItem extends SceneItemNode {
     }
 
     if (changed.output !== void 0 || patch.hasOwnProperty('output')) {
-      this.getObsSceneItem().video = newSettings.output;
+      this.getObsSceneItem().video = newSettings.output as obs.IVideo;
     }
 
     this.UPDATE({ sceneItemId: this.sceneItemId, ...changed });
@@ -274,6 +274,9 @@ export class SceneItem extends SceneItemNode {
     const visible = customSceneItem.visible;
     const position = { x: customSceneItem.x, y: customSceneItem.y };
     const crop = customSceneItem.crop;
+    const context = this.videoSettingsService.contexts.horizontal;
+
+    this.getObsSceneItem().video = context as obs.IVideo;
 
     this.UPDATE({
       visible,
@@ -290,6 +293,7 @@ export class SceneItem extends SceneItemNode {
       scaleFilter: customSceneItem.scaleFilter,
       blendingMode: customSceneItem.blendingMode,
       blendingMethod: customSceneItem.blendingMethod,
+      output: context,
     });
   }
 

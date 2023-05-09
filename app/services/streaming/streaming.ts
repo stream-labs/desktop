@@ -45,6 +45,8 @@ import { StreamInfoView } from './streaming-view';
 import { GrowService } from 'services/grow/grow';
 import * as remote from '@electron/remote';
 import { RecordingModeService } from 'services/recording-mode';
+import { MarkersService } from 'services/markers';
+import { byOS, OS } from 'util/operating-systems';
 
 enum EOBSOutputType {
   Streaming = 'streaming',
@@ -90,6 +92,7 @@ export class StreamingService
   @Inject() private videoSettingsService: VideoSettingsService;
   @Inject() private settingsService: SettingsService;
   @Inject() private dualOutputService: DualOutputService;
+  @Inject() private markersService: MarkersService;
 
   streamingStatusChange = new Subject<EStreamingState>();
   recordingStatusChange = new Subject<ERecordingState>();
@@ -129,6 +132,7 @@ export class StreamingService
         trovo: 'not-started',
         setupMultistream: 'not-started',
         setupDualOutput: 'not-started',
+        setupGreen: 'not-started', // @@@ remove
         startVideoTransmission: 'not-started',
         postTweet: 'not-started',
       },
@@ -403,6 +407,45 @@ export class StreamingService
         console.error('Failed to setup dual output', e);
         this.setError('DUAL_OUTPUT_SETUP_FAILED');
         return;
+      }
+    }
+
+    // setup green
+    if (this.views.isGreen) {
+      const displayPlatforms = this.views.activeDisplayPlatforms;
+
+      for (const display in displayPlatforms) {
+        if (displayPlatforms[display].length > 1) {
+          let ready = false;
+          try {
+            await this.runCheck(
+              'setupGreen',
+              async () => (ready = await this.restreamService.checkStatus()),
+            );
+          } catch (e: unknown) {
+            console.error('Error fetching restreaming service', e);
+          }
+          // Assume restream is down
+          if (!ready) {
+            this.setError('RESTREAM_DISABLED');
+            return;
+          }
+
+          // update restream settings
+          try {
+            await this.runCheck('setupGreen', async () => {
+              // enable restream on the backend side
+              if (!this.restreamService.state.enabled) await this.restreamService.setEnabled(true);
+
+              const mode: TOutputOrientation = display === 'horizontal' ? 'landscape' : 'portrait';
+              await this.restreamService.beforeGoLive(display as TDisplayType, mode);
+            });
+          } catch (e: unknown) {
+            console.error('Failed to setup restream', e);
+            this.setError('RESTREAM_SETUP_FAILED');
+            return;
+          }
+        }
       }
     }
 
@@ -948,6 +991,7 @@ export class StreamingService
 
   startReplayBuffer() {
     if (this.state.replayBufferStatus !== EReplayBufferState.Offline) return;
+
     this.usageStatisticsService.recordFeatureUsage('ReplayBuffer');
     obs.NodeObs.OBS_service_startReplayBuffer();
   }

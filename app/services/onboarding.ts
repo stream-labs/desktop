@@ -192,7 +192,7 @@ class OnboardingViews extends ViewHandler<IOnboardingServiceState> {
       steps.push(ONBOARDING_STEPS()[EOnboardingSteps.ThemeSelector]);
     }
 
-    if (userViews.isTwitchAuthed || recordingModeEnabled) {
+    if (userViews.isTwitchAuthed || userViews.isYoutubeAuthed || recordingModeEnabled) {
       steps.push(ONBOARDING_STEPS()[EOnboardingSteps.Optimize]);
     }
 

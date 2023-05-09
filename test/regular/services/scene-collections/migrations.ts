@@ -1,4 +1,4 @@
-import { test, useSpectron } from '../../../helpers/spectron';
+import { test, useWebdriver } from '../../../helpers/webdriver';
 import { sceneExisting } from '../../../helpers/modules/scenes';
 
 const fs = require('fs');
@@ -17,7 +17,7 @@ function copyFile(src: string, dest: string) {
   });
 }
 
-useSpectron({
+useWebdriver({
   beforeAppStartCb: async t => {
     const dataDir = path.resolve(__dirname, '..', '..', '..', '..', '..', 'test', 'data');
 

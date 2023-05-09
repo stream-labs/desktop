@@ -13,7 +13,6 @@ import { platformAuthorizedRequest } from './utils';
 import { IGoLiveSettings } from '../streaming';
 import { getDefined } from '../../util/properties-type-guards';
 import Utils from '../utils';
-import { IVideo } from 'obs-studio-node';
 import { TDisplayType } from 'services/settings-v2';
 import { TOutputOrientation } from 'services/restream';
 
@@ -99,7 +98,7 @@ export class TrovoService
 
     await this.putChannelInfo(trSettings);
 
-    this.setPlatformContext(context);
+    this.setPlatformContext('trovo');
   }
 
   fetchNewToken(): Promise<void> {

@@ -33,5 +33,6 @@
   "FBPrivacyWarning": "Level privasi yang diberikan mungkin terbatas untuk akun Facebook Anda. Bacalah bagian \"Siapa yang bisa melihat Anda menggunakan integrasi bisnis ini\" untuk integrasi Streamlabs <link>di sini</link>",
   "Only Me": "Hanya Saya",
   "Do not change privacy settings": "Jangan mengganti pengaturan privasi",
-  "Install %{overlayName}": "Instal %{overlayName}"
+  "Install %{overlayName}": "Instal %{overlayName}",
+  "Please note that while you can schedule streams to Facebook, some will not appear on this calendar due to API limitations": "Harap dicatat bahwa walaupun Anda bisa menjadwalkan streaming ke Facebook, beberapa tidak akan muncul di kalender ini karena keterbatasan API."
 }

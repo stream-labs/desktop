@@ -13,3 +13,18 @@ export const verticalDisplayData = {
   scaleType: EScaleType.Lanczos,
   fpsType: EFPSType.Fractional,
 };
+
+// @@@ refactor to remove
+export const greenDisplayData = {
+  fpsNum: 60,
+  fpsDen: 2,
+  baseWidth: 400,
+  baseHeight: 700,
+  outputWidth: 400,
+  outputHeight: 700,
+  outputFormat: EVideoFormat.I420,
+  colorspace: EColorSpace.CS709,
+  range: ERangeType.Full,
+  scaleType: EScaleType.Lanczos,
+  fpsType: EFPSType.Fractional,
+};

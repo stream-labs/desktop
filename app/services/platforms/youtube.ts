@@ -205,6 +205,7 @@ export class YoutubeService
       selfDeclaredMadeForKids: false,
       thumbnail: '',
       video: undefined,
+      mode: undefined,
     },
   };
 
@@ -323,7 +324,7 @@ export class YoutubeService
     this.SET_STREAM_ID(stream.id);
     this.SET_STREAM_KEY(streamKey);
 
-    this.setPlatformContext(context);
+    this.setPlatformContext('youtube');
   }
 
   /**
@@ -555,7 +556,7 @@ export class YoutubeService
     const contentDetails: Dictionary<any> = {
       enableAutoStart: isMidStreamMode
         ? broadcast.contentDetails.enableAutoStart
-        : params.enableAutoStop,
+        : params.enableAutoStart,
       enableAutoStop: params.enableAutoStop,
       enableDvr: params.enableDvr,
       enableEmbed: broadcast.contentDetails.enableEmbed,

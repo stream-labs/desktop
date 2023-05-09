@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { $t } from '../../../services/i18n';
 import { ICustomStreamDestination } from '../../../services/settings/streaming';
 import { EStreamingState } from '../../../services/streaming';
@@ -21,6 +21,16 @@ import ButtonHighlighted from 'components-react/shared/ButtonHighlighted';
 import { useVuex } from 'components-react/hooks';
 import Translate from 'components-react/shared/Translate';
 import * as remote from '@electron/remote';
+
+function censorWord(str: string) {
+  if (str.length < 3) return str;
+  return str[0] + '*'.repeat(str.length - 2) + str.slice(-1);
+}
+
+function censorEmail(str: string) {
+  const parts = str.split('@');
+  return censorWord(parts[0]) + '@' + censorWord(parts[1]);
+}
 
 /**
  * A Redux module for components in the StreamSetting window
@@ -317,7 +327,7 @@ function SLIDBlock() {
           {hasSLID ? (
             <div>
               Streamlabs <br />
-              <b>{username}</b>
+              {username && <b>{censorEmail(username)}</b>}
             </div>
           ) : (
             <Translate message={$t('slidConnectMessage')} />
@@ -360,7 +370,7 @@ function Platform(p: { platform: TPlatform }) {
   const { canEditSettings, platformMerge, platformUnlink } = useStreamSettings();
   const isMerged = StreamingService.views.isPlatformLinked(platform);
   const username = UserService.state.auth!.platforms[platform]?.username;
-  const platformName = getPlatformService(platform).displayName;
+  const platformName = useMemo(() => getPlatformService(platform).displayName, []);
   const isPrimary = StreamingService.views.isPrimaryPlatform(platform);
   const shouldShowPrimaryBtn = isPrimary;
   const shouldShowConnectBtn = !isMerged && canEditSettings;
@@ -436,7 +446,7 @@ function CustomDestinationList() {
       ))}
       {!isEditMode && canAddMoreDestinations && (
         <a className={css.addDestinationBtn} onClick={addCustomDest}>
-          <i className="fa fa-plus" />
+          <i className={cx('fa fa-plus', css.plus)} />
           <span>{$t('Add Destination')}</span>
 
           {shouldShowPrimeLabel ? (
@@ -444,18 +454,7 @@ function CustomDestinationList() {
               onClick={addCustomDest}
               filled
               text={$t('Ultra')}
-              icon={
-                <UltraIcon
-                  type="simple"
-                  style={{
-                    fill: '#09161D',
-                    display: 'inline-block',
-                    height: '12px',
-                    width: '12px',
-                    marginRight: '5px',
-                  }}
-                />
-              }
+              icon={<UltraIcon type="simple" />}
             />
           ) : (
             <div className={css.prime} />

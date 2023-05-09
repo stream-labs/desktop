@@ -188,7 +188,7 @@ export interface IPlatformService {
     useToken?: boolean | string,
   ) => Dictionary<string | undefined>;
 
-  setPlatformContext: (context: TDisplayType) => void;
+  setPlatformContext?: (platform: TPlatform) => void;
 
   liveDockEnabled: boolean;
 

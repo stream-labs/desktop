@@ -33,5 +33,6 @@
   "FBPrivacyWarning": "Det tilladte fortrolighedsniveau kan være begrænset for din Facebook-konto. Se afsnittet \"Hvem kan se, at du bruger denne virksomhedsintegration\" for Streamlabs-integrationen <link>her </link>",
   "Only Me": "Kun mig",
   "Do not change privacy settings": "Ændr ikke indstillinger for beskyttelse af personlige oplysninger",
-  "Install %{overlayName}": "Installer %{overlayName}"
+  "Install %{overlayName}": "Installer %{overlayName}",
+  "Please note that while you can schedule streams to Facebook, some will not appear on this calendar due to API limitations": "Bemærk, at selvom du kan planlægge streams til Facebook, vil nogle af dem ikke blive vist i denne kalender på grund af API-begrænsninger."
 }

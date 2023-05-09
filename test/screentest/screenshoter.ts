@@ -3,7 +3,7 @@ import { CustomizationService } from '../../app/services/customization';
 import { getConfigsVariations, getConfig } from './utils';
 import test from 'ava';
 import { sleep } from '../helpers/sleep';
-import { afterAppStart, TExecutionContext } from '../helpers/spectron';
+import { afterAppStart, TExecutionContext } from '../helpers/webdriver';
 import { PerformanceService } from '../../app/services/performance';
 import { IAudioServiceApi } from '../../app/services/audio';
 import { WindowsService } from '../../app/services/windows';

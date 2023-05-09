@@ -1,5 +1,5 @@
 import { FormMonkey } from '../helpers/form-monkey';
-import { useSpectron, test } from '../helpers/spectron';
+import { useWebdriver, test } from '../helpers/webdriver';
 import {
   addSource,
   clickRemoveSource,
@@ -17,7 +17,7 @@ import {
   waitForDisplayed,
 } from '../helpers/modules/core';
 
-useSpectron({ restartAppAfterEachTest: false });
+useWebdriver({ restartAppAfterEachTest: false });
 
 test('Create/Remove Color Source and view Source Properties', async t => {
   const sourceName = 'Color Source';
