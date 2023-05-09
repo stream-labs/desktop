@@ -109,7 +109,9 @@ export type TSourceType =
   | 'openvr_capture'
   | 'liv_capture'
   | 'ovrstream_dc_source'
-  | 'vlc_source';
+  | 'vlc_source'
+  | 'wasapi_process_output_capture'
+  ;
 
 // Register new properties manager here
 export type TPropertiesManager = 'default' | 'nvoice-character';
