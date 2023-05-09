@@ -145,7 +145,9 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
       if (videoLegacy.baseHeight === 0 || videoLegacy.baseWidth === 0) {
         Object.keys(this.contexts.horizontal.video).forEach((key: keyof obs.IVideoInfo) => {
           this.SET_VIDEO_SETTING(key, this.contexts.horizontal.video[key]);
-          this.greenService.setVideoSetting({ [key]: this.contexts.horizontal.video[key] }, display);
+          this.greenService.setVideoSetting(
+            { [key]: this.contexts.horizontal.video[key] },
+            display);
         });
       } else {
         Object.keys(videoLegacy).forEach((key: keyof obs.IVideoInfo) => {
