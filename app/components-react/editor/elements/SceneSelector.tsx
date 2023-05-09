@@ -36,7 +36,7 @@ function SceneSelector() {
     toggleDisplay: SettingsManagerService.actions.toggleDisplay,
     studioMode: TransitionsService.views.studioMode,
     isMidStreamMode: StreamingService.views.isMidStreamMode,
-    showDualOutput: DualOutputService.views.showDualOutput,
+    showDualOutput: DualOutputService.views.dualOutputMode,
   }));
 
   const { treeSort } = useTree(true);

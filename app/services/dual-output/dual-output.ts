@@ -19,7 +19,7 @@ import { TOutputOrientation } from 'services/restream';
 interface IDualOutputServiceState {
   displays: TDisplayType[];
   platformSettings: TDualOutputPlatformSettings;
-  showDualOutput: boolean;
+  dualOutputMode: boolean;
   sceneNodeMaps: { [sceneId: string]: Dictionary<string> };
 }
 
@@ -30,14 +30,7 @@ class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
   @Inject() private settingsManagerService: SettingsManagerService;
 
   get dualOutputMode(): boolean {
-    return (
-      this.settingsManagerService.views.activeDisplays.horizontal &&
-      this.settingsManagerService.views.activeDisplays.vertical
-    );
-  }
-
-  get showDualOutput(): boolean {
-    return this.state.showDualOutput;
+    return this.state.dualOutputMode;
   }
 
   get shouldCreateVerticalNode(): boolean {
@@ -152,7 +145,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
   static defaultState: IDualOutputServiceState = {
     displays: ['horizontal', 'vertical'],
     platformSettings: DualOutputPlatformSettings,
-    showDualOutput: false,
+    dualOutputMode: false,
     sceneNodeMaps: {},
   };
 
@@ -201,7 +194,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
    * Edit dual output display settings
    */
 
-  setShowDualOutput() {
+  setdualOutputMode() {
     this.SET_SHOW_DUAL_OUTPUT();
   }
 
@@ -381,7 +374,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
   private SET_SHOW_DUAL_OUTPUT() {
     this.state = {
       ...this.state,
-      showDualOutput: !this.state.showDualOutput,
+      dualOutputMode: !this.state.dualOutputMode,
     };
   }
 }

@@ -44,11 +44,7 @@ export default function GoLiveChecklist(p: HTMLAttributes<unknown>) {
   useEffect(() => {
     if (lifecycle === 'live' && !warning) {
       Utils.sleep(1000).then(() => {
-        if (
-          ['GoLiveWindow', 'DualOutputGoLiveWindow'].includes(
-            WindowsService.state.child.componentName,
-          )
-        ) {
+        if (WindowsService.state.child.componentName === 'GoLiveWindow') {
           WindowsService.actions.closeChildWindow();
         }
       });

@@ -4,6 +4,7 @@ import { ModalLayout } from '../../shared/ModalLayout';
 import { Button } from 'antd';
 import { Services } from '../../service-provider';
 import GoLiveSettings from './GoLiveSettings';
+import DualOutputGoLiveSettings from './dual-output/DualOutputGoLiveSettings';
 import React from 'react';
 import { $t } from '../../../services/i18n';
 import GoLiveChecklist from './GoLiveChecklist';
@@ -25,6 +26,7 @@ export default function GoLiveWindow() {
 
   const shouldShowSettings = ['empty', 'prepopulate', 'waitForNewSettings'].includes(lifecycle);
   const shouldShowChecklist = ['runChecklist', 'live'].includes(lifecycle);
+  const showDualOutput = Services.DualOutputService.views.dualOutputMode;
 
   return (
     <ModalLayout footer={<ModalFooter />}>
@@ -36,7 +38,8 @@ export default function GoLiveWindow() {
       >
         <Animation transitionName={shouldShowChecklist ? 'slideright' : ''}>
           {/* STEP 1 - FILL OUT THE SETTINGS FORM */}
-          {shouldShowSettings && <GoLiveSettings key={'settings'} />}
+          {shouldShowSettings && showDualOutput && <DualOutputGoLiveSettings key={'settings'} />}
+          {shouldShowSettings && !showDualOutput && <GoLiveSettings key={'settings'} />}
 
           {/* STEP 2 - RUN THE CHECKLIST */}
           {shouldShowChecklist && <GoLiveChecklist className={styles.page} key={'checklist'} />}
@@ -47,7 +50,6 @@ export default function GoLiveWindow() {
 }
 
 function ModalFooter() {
-
   const {
     error,
     lifecycle,

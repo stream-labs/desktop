@@ -25,6 +25,7 @@ interface IUltraDestinationSwitchers {
 export function UltraDestinationSwitchers(p: IUltraDestinationSwitchers) {
   const {
     enabledPlatforms,
+    linkedPlatforms,
     customDestinations,
     switchPlatforms,
     switchCustomDestination,
@@ -65,7 +66,7 @@ export function UltraDestinationSwitchers(p: IUltraDestinationSwitchers) {
         }
         hasMargin={true}
       />
-      {enabledPlatforms.map((platform: TPlatform) => (
+      {linkedPlatforms.map((platform: TPlatform) => (
         <DestinationSwitcher
           key={platform}
           destination={platform}

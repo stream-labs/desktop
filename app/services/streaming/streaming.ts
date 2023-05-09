@@ -137,7 +137,6 @@ export class StreamingService
 
   init() {
     obs.NodeObs.OBS_service_connectOutputSignals((info: IOBSOutputSignalInfo) => {
-      console.log('info ', info);
       this.signalInfoChanged.next(info);
       this.handleOBSOutputSignal(info);
     });
@@ -261,7 +260,9 @@ export class StreamingService
         const context = this.views.getPlatformDisplay(platform);
         await this.runCheck(platform, () => service.beforeGoLive(settingsForPlatform, context));
       } else {
-        await this.runCheck(platform, () => service.beforeGoLive(settingsForPlatform));
+        await this.runCheck(platform, () =>
+          service.beforeGoLive(settingsForPlatform, 'horizontal'),
+        );
       }
     } catch (e: unknown) {
       this.handleSetupPlatformError(e, platform);
@@ -309,26 +310,20 @@ export class StreamingService
      * SET PLATFORM STREAM SETTINGS
      */
 
-    if (this.views.hasVerticalContext) {
-      // if the vertical context has been established
-      // the scene nodes will only show in the stream if the platform
-      // has been assigned a context
+    if (this.views.isDualOutputMode) {
+      // in dual output mode, assign context by settings
 
       for (const platform of platforms) {
-        console.log(' * HAS VERTICAL CONTEXT ', platform);
         await this.setPlatformSettings(platform, settings, unattendedMode, true); // forcing context to be set
       }
     } else {
-      // setup default single stream
+      // in single output mode, assign context to 'horizontal' by default
       for (const platform of platforms) {
-        console.log(' * NO VERTICAL CONTEXT ', platform);
-        await this.setPlatformSettings(platform, settings, unattendedMode, false);
+        await this.setPlatformSettings(platform, { ...settings }, unattendedMode, false);
       }
     }
-
-    if (this.views.isMultiplatformMode && this.views.contextsToStream.length < 2) {
+    if (this.views.isMultiplatformMode) {
       // setup restream
-      console.log(' * SINGLE OUTPUT MULTISTREAM');
 
       // check the Restream service is available
       let ready = false;
@@ -351,7 +346,7 @@ export class StreamingService
         await this.runCheck('setupMultistream', async () => {
           // enable restream on the backend side
           if (!this.restreamService.state.enabled) await this.restreamService.setEnabled(true);
-          if (this.views.hasVerticalContext) {
+          if (this.views.isDualOutputMode) {
             const context = this.views.contextsToStream[0];
             await this.restreamService.beforeGoLive(context);
           } else {
@@ -363,32 +358,12 @@ export class StreamingService
         this.setError('RESTREAM_SETUP_FAILED');
         return;
       }
-
-      if (this.views.isDualOutputMode) {
-        try {
-          await this.runCheck('setupDualOutput', async () => await Promise.resolve());
-        } catch (e: unknown) {
-          console.error('Failed to setup dual output', e);
-          this.setError('DUAL_OUTPUT_SETUP_FAILED');
-          return;
-        }
-      }
     } else {
       // setup dual output mode
-      console.log('**** DUALOUTPUT **** ');
       const displayPlatforms = this.views.activeDisplayPlatforms;
 
       for (const display in displayPlatforms) {
-        console.log('  * display ', display);
         if (displayPlatforms[display].length > 1) {
-          console.log(
-            '    * RESTREAM displayPlatforms[display] ',
-            displayPlatforms[display],
-            'on ',
-            display,
-          );
-
-          // setup restream on platformsToRestream
           // check the Restream service is available
           let ready = false;
           try {
@@ -410,7 +385,6 @@ export class StreamingService
             await this.runCheck('setupDualOutput', async () => {
               // enable restream on the backend side
               if (!this.restreamService.state.enabled) await this.restreamService.setEnabled(true);
-              console.log('    * RESTREAM DUAL OUTPUT');
 
               const mode: TOutputOrientation = display === 'horizontal' ? 'landscape' : 'portrait';
               await this.restreamService.beforeGoLive(display as TDisplayType, mode);
@@ -419,16 +393,6 @@ export class StreamingService
             console.error('Failed to setup restream', e);
             this.setError('DUAL_OUTPUT_SETUP_FAILED');
             return;
-          }
-        } else {
-          if (displayPlatforms[display].length === 1) {
-            console.log(
-              '    * SINGLE displayPlatforms[display] ',
-              displayPlatforms[display],
-              ' on ',
-              display,
-              'not updated',
-            );
           }
         }
       }
@@ -494,7 +458,7 @@ export class StreamingService
 
   async setPlatformSettings(
     platform: TPlatform,
-    settings: any,
+    settings: IGoLiveSettings,
     unattendedMode: boolean,
     forceSetContext: boolean = false,
   ) {
@@ -504,13 +468,9 @@ export class StreamingService
       const settingsForPlatform =
         !forceSetContext && platform === 'twitch' && unattendedMode ? undefined : settings;
 
-      if (settingsForPlatform) {
-        const context = this.views.getPlatformDisplay(platform);
-        console.log(' context ', context, 'for platform ', platform);
-        await this.runCheck(platform, () => service.beforeGoLive(settingsForPlatform, context));
-      } else {
-        await this.runCheck(platform, () => service.beforeGoLive(settingsForPlatform));
-      }
+      const context = forceSetContext ? this.views.getPlatformDisplay(platform) : 'horizontal';
+
+      await this.runCheck(platform, () => service.beforeGoLive(settingsForPlatform, context));
     } catch (e: unknown) {
       this.handleSetupPlatformError(e, platform);
     }
@@ -787,10 +747,8 @@ export class StreamingService
     this.powerSaveId = remote.powerSaveBlocker.start('prevent-display-sleep');
 
     // start streaming
-    if (this.views.contextsToStream.length > 1 && this.views.enabledPlatforms.length > 1) {
+    if (this.views.isDualOutputMode) {
       // start dual output
-      console.log('---- SETTINGS ---- ', this.settingsService.views.values);
-      console.log('**** START STREAM');
 
       const horizontalContext = this.videoSettingsService.contexts.horizontal;
       const verticalContext = this.videoSettingsService.contexts.vertical;
@@ -817,15 +775,8 @@ export class StreamingService
       await new Promise(resolve => setTimeout(resolve, 1000));
     } else {
       // start single output
-      console.log('---- SETTINGS ---- ', this.settingsService.views.values);
-      if (this.views.activeDisplays.vertical && this.views.contextsToStream.includes('vertical')) {
-        obs.NodeObs.OBS_service_setVideoInfo(
-          this.videoSettingsService.contexts.vertical,
-          'vertical',
-        );
-        obs.NodeObs.OBS_service_startStreaming('vertical');
-      } else if (this.views.activeDisplays.horizontal && this.views.hasVerticalContext) {
-        // if the vertical context is active, explicitly set the horizontal context info
+      // if the vertical context is active, explicitly set the horizontal context info
+      if (this.views.activeDisplays.horizontal && this.views.hasVerticalContext) {
         obs.NodeObs.OBS_service_setVideoInfo(
           this.videoSettingsService.contexts.horizontal,
           'horizontal',
@@ -906,7 +857,6 @@ export class StreamingService
       }
 
       if (this.views.contextsToStream.length > 1 && this.views.enabledPlatforms.length > 1) {
-        console.log('**** STOP STREAM');
         const signalChanged = this.signalInfoChanged.subscribe(
           (signalInfo: IOBSOutputSignalInfo) => {
             if (
@@ -1026,28 +976,15 @@ export class StreamingService
     const height = this.views.linkedPlatforms.length > 1 ? 750 : 650;
     const width = 900;
 
-    // if dual output mode, show the dual output go live window
-    if (this.dualOutputService.views.showDualOutput) {
-      this.windowsService.showWindow({
-        componentName: 'DualOutputGoLiveWindow',
-        title: $t('Go Live'),
-        size: {
-          height,
-          width,
-        },
-        queryParams: prepopulateOptions,
-      });
-    } else {
-      this.windowsService.showWindow({
-        componentName: 'GoLiveWindow',
-        title: $t('Go Live'),
-        size: {
-          height,
-          width,
-        },
-        queryParams: prepopulateOptions,
-      });
-    }
+    this.windowsService.showWindow({
+      componentName: 'GoLiveWindow',
+      title: $t('Go Live'),
+      size: {
+        height,
+        width,
+      },
+      queryParams: prepopulateOptions,
+    });
   }
 
   showEditStream() {

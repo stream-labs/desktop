@@ -2,6 +2,7 @@ import * as remote from '@electron/remote';
 import React from 'react';
 import { useModule, injectState } from 'slap';
 import { Services } from '../../service-provider';
+import { message } from 'antd';
 import FormFactory, { TInputValue } from 'components-react/shared/inputs/FormFactory';
 import { CheckboxInput } from 'components-react/shared/inputs';
 import Tooltip from 'components-react/shared/Tooltip';
@@ -87,7 +88,7 @@ class VideoSettingsModule {
 
   state = injectState({
     display: 'horizontal' as TDisplayType,
-    showDualOutputSettings: Services.DualOutputService.views.showDualOutput,
+    showDualOutputSettings: Services.DualOutputService.views.dualOutputMode,
     customBaseRes: !this.baseResOptions.find(
       opt => opt.value === this.service.values.horizontal.baseRes,
     ),
@@ -371,8 +372,14 @@ class VideoSettingsModule {
   }
 
   setShowDualOutput() {
-    Services.DualOutputService.actions.setShowDualOutput();
-    this.state.setShowDualOutputSettings(!this.state.showDualOutputSettings);
+    if (Services.StreamingService.views.isMidStreamMode) {
+      message.error({
+        content: $t('Cannot toggle dual output while live.'),
+      });
+    } else {
+      Services.DualOutputService.actions.setdualOutputMode();
+      this.state.setShowDualOutputSettings(!this.state.showDualOutputSettings);
+    }
   }
 }
 

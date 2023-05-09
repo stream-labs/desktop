@@ -28,10 +28,10 @@ export default function StudioEditor() {
     studioMode: TransitionsService.state.studioMode,
     showHorizontalDisplay:
       SettingsManagerService.views.activeDisplays.horizontal ||
-      !DualOutputService.views.showDualOutput,
+      !DualOutputService.views.dualOutputMode,
     showVerticalDisplay:
       SettingsManagerService.views.activeDisplays.vertical &&
-      DualOutputService.views.showDualOutput,
+      DualOutputService.views.dualOutputMode,
     activeSceneId: ScenesService.views.activeSceneId,
     hasAdditionalContexts: VideoSettingsService.hasAdditionalContexts,
   }));

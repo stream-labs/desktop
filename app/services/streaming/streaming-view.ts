@@ -165,7 +165,7 @@ export class StreamInfoView<T extends Object> extends ViewHandler<T> {
       this.protectedModeEnabled &&
       (this.enabledPlatforms.length > 1 ||
         this.settings.customDestinations.filter(dest => dest.enabled).length > 0) &&
-      this.contextsToStream.length < 2
+      !this.isDualOutputMode
     );
   }
 
