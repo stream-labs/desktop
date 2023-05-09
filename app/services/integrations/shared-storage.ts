@@ -25,6 +25,11 @@ interface IProgress {
   uploadedBytes: number;
 }
 
+const PLATFORM_RULES = {
+  crossclip: { size: 1024 * 1024 * 1024, types: ['mp4'] },
+  typestudio: { size: 1024 * 1024 * 1024 * 3.4, types: ['mp4', 'mov', 'webm'] },
+};
+
 export class SharedStorageService extends Service {
   @Inject() userService: UserService;
   @Inject() hostsService: HostsService;
