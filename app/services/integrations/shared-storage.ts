@@ -123,8 +123,6 @@ interface IUploaderOptions {
 }
 
 class S3Uploader {
-  @Inject() userService: UserService;
-
   uploadedSize = 0;
   aborted = false;
   onProgress = (progress: IProgress) => {};
