@@ -500,7 +500,10 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
 
     this.log('io Config Result', ioConfigResult);
 
-    return { ioConfigResult, roomResult };
+    this.SET_HOST_NAME(ioConfigResult.host.name);
+    this.SET_MAX_GUESTS(ioConfigResult.host.maxGuests);
+
+    return ioConfigResult;
   }
 
   async startListeningForGuests() {
@@ -511,14 +514,7 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
 
       if (!this.userService.views.isLoggedIn) return;
 
-      const { ioConfigResult, roomResult } = await this.getSocketConfig();
-
-      this.SET_INVITE_HASH(roomResult.hash);
-
-      this.room = roomResult.room;
-
-      this.SET_HOST_NAME(ioConfigResult.host.name);
-      this.SET_MAX_GUESTS(ioConfigResult.host.maxGuests);
+      const ioConfigResult = await this.getSocketConfig();
 
       await this.openSocketConnection(ioConfigResult.url, ioConfigResult.token);
     });
@@ -694,7 +690,7 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
       // the disconnection was initiated by the server, we need to try to reconnect manually
       // assuming this is the behavior we get when token expires, before that, we should
       // regen the URL
-      this.getSocketConfig().then(({ ioConfigResult }) => {
+      this.getSocketConfig().then(ioConfigResult => {
         this.openSocketConnection(ioConfigResult.url, ioConfigResult.token);
       });
 
