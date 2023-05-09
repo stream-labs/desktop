@@ -11,7 +11,7 @@ import {
   TDisplayType,
   VideoSettingsService,
   IVideoSetting,
-  greenDisplayData,
+  verticalDisplayData,
 } from 'services/settings-v2';
 import { StreamingService } from 'services/streaming';
 import { SceneCollectionsService } from 'services/scene-collections';
@@ -24,16 +24,16 @@ import { IVideoInfo } from 'obs-studio-node';
 interface IDisplayVideoSettings {
   defaultDisplay: TDisplayType;
   horizontal: IVideoInfo;
-  green: IVideoInfo;
+  vertical: IVideoInfo;
   activeDisplays: {
     horizontal: boolean;
-    green: boolean;
+    vertical: boolean;
   };
 }
 interface IGreenServiceState {
   displays: TDisplayType[];
   platformSettings: TGreenPlatformSettings;
-  greenMode: boolean;
+  verticalMode: boolean;
   nodeMaps: { [display in TDisplayType as string]: Dictionary<string> };
   sceneNodeMaps: { [sceneId: string]: Dictionary<string> };
   videoSettings: IDisplayVideoSettings;
@@ -44,8 +44,8 @@ class GreenViews extends ViewHandler<IGreenServiceState> {
   @Inject() private videoSettingsService: VideoSettingsService;
   @Inject() private streamingService: StreamingService;
 
-  get greenMode(): boolean {
-    return this.activeDisplays.horizontal && this.activeDisplays.green;
+  get verticalMode(): boolean {
+    return this.activeDisplays.horizontal && this.activeDisplays.vertical;
   }
 
   get platformSettings() {
@@ -67,14 +67,14 @@ class GreenViews extends ViewHandler<IGreenServiceState> {
   }
 
   get showGreenDisplays() {
-    return this.greenMode && this.hasGreenScenes;
+    return this.verticalMode && this.hasGreenScenes;
   }
 
   get hasGreenNodes() {
     return this.state.sceneNodeMaps.hasOwnProperty(this.scenesService.views.activeSceneId);
   }
 
-  get greenNodeIds(): string[] {
+  get verticalNodeIds(): string[] {
     const activeSceneId = this.scenesService.views.activeSceneId;
 
     if (!this.hasGreenNodes) return;
@@ -86,30 +86,30 @@ class GreenViews extends ViewHandler<IGreenServiceState> {
     return this.state.displays;
   }
 
-  get contextsToStream() {
-    return Object.entries(this.activeDisplayPlatforms).reduce(
-      (contextNames: TDisplayType[], [key, value]: [TDisplayType, TPlatform[]]) => {
-        if (value.length > 0) {
-          contextNames.push(key as TDisplayType);
-        }
-        return contextNames;
-      },
-      [],
-    );
-  }
+  // get contextsToStream() {
+  //   return Object.entries(this.activeDisplayPlatforms).reduce(
+  //     (contextNames: TDisplayType[], [key, value]: [TDisplayType, TPlatform[]]) => {
+  //       if (value.length > 0) {
+  //         contextNames.push(key as TDisplayType);
+  //       }
+  //       return contextNames;
+  //     },
+  //     [],
+  //   );
+  // }
 
-  get activeDisplayPlatforms() {
-    const enabledPlatforms = this.streamingService.views.enabledPlatforms;
-    return Object.entries(this.state.platformSettings).reduce(
-      (displayPlatforms: TDisplayPlatforms, [key, val]: [string, IGreenPlatformSetting]) => {
-        if (val && enabledPlatforms.includes(val.platform)) {
-          displayPlatforms[val.display].push(val.platform);
-        }
-        return displayPlatforms;
-      },
-      { horizontal: [], green: [] },
-    );
-  }
+  // get activeDisplayPlatforms() {
+  //   const enabledPlatforms = this.streamingService.views.enabledPlatforms;
+  //   return Object.entries(this.state.platformSettings).reduce(
+  //     (displayPlatforms: TDisplayPlatforms, [key, val]: [string, any]) => {
+  //       if (val && enabledPlatforms.includes(val.platform)) {
+  //         displayPlatforms[val.display].push(val.platform);
+  //       }
+  //       return displayPlatforms;
+  //     },
+  //     { horizontal: [], vertical: [] },
+  //   );
+  // }
 
   get nodeMaps() {
     return this.state.nodeMaps;
@@ -174,7 +174,7 @@ class GreenViews extends ViewHandler<IGreenServiceState> {
   getGreenNodeIds(sceneItemId: string) {
     return [
       this.state.nodeMaps['horizontal'][sceneItemId],
-      this.state.nodeMaps['green'][sceneItemId],
+      this.state.nodeMaps['vertical'][sceneItemId],
     ];
   }
 
@@ -189,18 +189,18 @@ export class GreenService extends PersistentStatefulService<IGreenServiceState> 
   @Inject() private videoSettingsService: VideoSettingsService;
 
   static defaultState: IGreenServiceState = {
-    displays: ['horizontal', 'green'],
+    displays: ['horizontal', 'vertical'],
     platformSettings: GreenPlatformSettings,
-    greenMode: false,
+    verticalMode: false,
     nodeMaps: null,
     sceneNodeMaps: {},
     videoSettings: {
       defaultDisplay: 'horizontal',
       horizontal: null as IVideoInfo,
-      green: greenDisplayData, // get settings for horizontal display from obs directly
+      vertical: verticalDisplayData, // get settings for horizontal display from obs directly
       activeDisplays: {
         horizontal: true,
-        green: false,
+        vertical: false,
       },
     },
   };
@@ -217,7 +217,7 @@ export class GreenService extends PersistentStatefulService<IGreenServiceState> 
   }
 
   /**
-   * Create or confirm nodes for green output when toggling green display
+   * Create or confirm nodes for vertical output when toggling vertical display
    */
 
   confirmOrCreateGreenNodes(sceneId?: string) {
@@ -237,8 +237,8 @@ export class GreenService extends PersistentStatefulService<IGreenServiceState> 
       }
     }
 
-    if (!this.videoSettingsService.contexts.green) {
-      this.videoSettingsService.establishVideoContext('green');
+    if (!this.videoSettingsService.contexts.vertical) {
+      this.videoSettingsService.establishVideoContext('vertical');
     }
 
     this.sceneItemsConfirmed.next();
@@ -335,7 +335,7 @@ export class GreenService extends PersistentStatefulService<IGreenServiceState> 
   toggleDisplay(status: boolean, display?: TDisplayType) {
     if (
       this.state.videoSettings.activeDisplays.horizontal &&
-      this.state.videoSettings.activeDisplays.green
+      this.state.videoSettings.activeDisplays.vertical
     ) {
       this.setDisplayActive(status, display);
     } else if (display === 'horizontal' && status === false) {
@@ -343,7 +343,7 @@ export class GreenService extends PersistentStatefulService<IGreenServiceState> 
         this.setDisplayActive(status, display);
       });
       this.confirmOrCreateGreenNodes();
-    } else if (display === 'green' && status === true) {
+    } else if (display === 'vertical' && status === true) {
       this.sceneItemsConfirmed.subscribe(() => {
         this.setDisplayActive(status, display);
       });
@@ -369,9 +369,9 @@ export class GreenService extends PersistentStatefulService<IGreenServiceState> 
     this.REMOVE_DUAL_OUTPUT_NODES(nodeId);
   }
 
-  restoreNodesToMap(sceneItemId: string, greenSceneItemId: string) {
+  restoreNodesToMap(sceneItemId: string, verticalSceneItemId: string) {
     this.SET_NODE_MAP_ITEM('horizontal', sceneItemId, sceneItemId);
-    this.SET_NODE_MAP_ITEM('green', sceneItemId, greenSceneItemId);
+    this.SET_NODE_MAP_ITEM('vertical', sceneItemId, verticalSceneItemId);
   }
 
   /**
@@ -392,7 +392,7 @@ export class GreenService extends PersistentStatefulService<IGreenServiceState> 
 
   @mutation()
   private TOGGLE_DUAL_OUTPUT_MODE(status: boolean) {
-    this.state.greenMode = status;
+    this.state.verticalMode = status;
   }
 
   @mutation()
@@ -419,7 +419,7 @@ export class GreenService extends PersistentStatefulService<IGreenServiceState> 
       [originalSceneNodeId]: copiedSceneNodeId,
     };
 
-    if (display === 'green') {
+    if (display === 'vertical') {
       this.state.sceneNodeMaps[sceneId] = {
         ...this.state.sceneNodeMaps[sceneId],
         [originalSceneNodeId]: copiedSceneNodeId,
@@ -445,7 +445,7 @@ export class GreenService extends PersistentStatefulService<IGreenServiceState> 
 
   @mutation()
   private SET_DISPLAY_ACTIVE(status: boolean, display: TDisplayType = 'horizontal') {
-    const otherDisplay = display === 'horizontal' ? 'green' : 'horizontal';
+    const otherDisplay = display === 'horizontal' ? 'vertical' : 'horizontal';
     if (
       status === false &&
       this.state.videoSettings.activeDisplays[display] &&
@@ -467,7 +467,7 @@ export class GreenService extends PersistentStatefulService<IGreenServiceState> 
   }
 
   @mutation()
-  private SET_VIDEO_SETTING(setting: Partial<IVideoInfo>, display: TDisplayType = 'green') {
+  private SET_VIDEO_SETTING(setting: Partial<IVideoInfo>, display: TDisplayType = 'vertical') {
     this.state.videoSettings[display] = {
       ...this.state.videoSettings[display],
       ...setting,

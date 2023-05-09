@@ -13,9 +13,6 @@ import { throwStreamError } from 'services/streaming/stream-error';
 import { BasePlatformService } from './base-platform';
 import { WindowsService } from '../windows';
 import { assertIsDefined, getDefined } from '../../util/properties-type-guards';
-import flatten from 'lodash/flatten';
-import * as remote from '@electron/remote';
-import { IVideo } from 'obs-studio-node';
 import { TDisplayType } from 'services/settings-v2';
 import { TOutputOrientation } from 'services/restream';
 
@@ -127,7 +124,6 @@ const initialState: IFacebookServiceState = {
     mode: undefined,
     event_params: {},
     privacy: { value: 'EVERYONE' },
-    mode: undefined,
   },
 };
 

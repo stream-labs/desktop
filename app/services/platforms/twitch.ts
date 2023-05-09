@@ -82,7 +82,6 @@ export class TwitchService
       video: undefined,
       mode: undefined,
       tags: [],
-      mode: undefined,
     },
   };
 

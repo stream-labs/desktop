@@ -132,6 +132,10 @@ class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
       return this.scenesService.views.getNodeVisibility(nodeId);
     }
   }
+
+  getPlatformContextName(platform: TPlatform): TOutputOrientation {
+    return this.getPlatformDisplay(platform) === 'horizontal' ? 'landscape' : 'portrait';
+  }
 }
 
 @InitAfter('ScenesService')

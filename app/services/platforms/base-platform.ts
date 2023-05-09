@@ -37,7 +37,6 @@ export abstract class BasePlatformService<T extends IPlatformState> extends Stat
   @Inject() protected streamSettingsService: StreamSettingsService;
   @Inject() protected dualOutputService: DualOutputService;
   @Inject() protected videoSettingsService: VideoSettingsService;
-  @Inject() protected greenService: GreenService;
 
   abstract readonly platform: TPlatform;
 
@@ -122,8 +121,8 @@ export abstract class BasePlatformService<T extends IPlatformState> extends Stat
   }
 
   setPlatformContext(platform: TPlatform) {
-    if (this.greenService.views.greenMode) {
-      const mode = this.greenService.views.getPlatformContextName(platform);
+    if (this.dualOutputService.views.dualOutputMode) {
+      const mode = this.dualOutputService.views.getPlatformContextName(platform);
 
       this.UPDATE_STREAM_SETTINGS({
         mode,

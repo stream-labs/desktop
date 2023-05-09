@@ -275,7 +275,6 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
 
   @mutation()
   DESTROY_VIDEO_CONTEXT(display: TDisplayType = 'horizontal') {
-    this.contexts[display] = null as obs.IVideo;
     this.state[display] = null as obs.IVideoInfo;
   }
 
