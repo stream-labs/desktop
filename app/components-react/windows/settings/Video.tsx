@@ -19,10 +19,8 @@ const CANVAS_RES_OPTIONS = [
 
 // @@@ TODO: add vertical canvas options
 const VERTICAL_CANVAS_OPTIONS = [
+  { label: '720x1280', value: '720x1280' },
   { label: '1080x1920', value: '1080x1920' },
-  { label: '2160x3840', value: '2160x3840' },
-  { label: '412x732', value: '412x732' },
-  { label: '1440x3120', value: '1440x3120' },
 ];
 
 const OUTPUT_RES_OPTIONS = [
@@ -41,10 +39,8 @@ const OUTPUT_RES_OPTIONS = [
 
 // @@@ TODO: add vertical output res options
 const VERTICAL_OUTPUT_RES_OPTIONS = [
+  { label: '720x1280', value: '720x1280' },
   { label: '1080x1920', value: '1080x1920' },
-  { label: '2160x3840', value: '2160x3840' },
-  { label: '412x732', value: '412x732' },
-  { label: '1440x3120', value: '1440x3120' },
 ];
 
 const FPS_OPTIONS = [
