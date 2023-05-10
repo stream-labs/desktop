@@ -25,15 +25,14 @@ function SceneSelector() {
     SourceFiltersService,
     ProjectorService,
     EditorCommandsService,
-    SettingsManagerService,
     StreamingService,
     DualOutputService,
   } = Services;
 
   const v = useVuex(() => ({
-    isHorizontal: SettingsManagerService.views.activeDisplays.horizontal,
-    isVertical: SettingsManagerService.views.activeDisplays.vertical,
-    toggleDisplay: SettingsManagerService.actions.toggleDisplay,
+    isHorizontal: DualOutputService.views.activeDisplays.horizontal,
+    isVertical: DualOutputService.views.activeDisplays.vertical,
+    toggleDisplay: DualOutputService.actions.toggleDisplay,
     studioMode: TransitionsService.views.studioMode,
     isMidStreamMode: StreamingService.views.isMidStreamMode,
     showDualOutput: DualOutputService.views.dualOutputMode,

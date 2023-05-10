@@ -24,7 +24,6 @@ import { DualOutputSourceSelector } from './DualOutputSourceSelector';
 import { WidgetsService } from '../../../app-services';
 import { GuestCamService } from 'app-services';
 import { DualOutputService } from 'services/dual-output';
-import { SettingsManagerService } from 'services/settings-manager';
 interface ISourceMetadata {
   id: string;
   title: string;
@@ -50,7 +49,6 @@ export class SourceSelectorModule {
   private audioService = inject(AudioService);
   private guestCamService = inject(GuestCamService);
   private dualOutputService = inject(DualOutputService);
-  private settingsManagerService = inject(SettingsManagerService);
 
   sourcesTooltip = $t('The building blocks of your scene. Also contains widgets.');
   addSourceTooltip = $t('Add a new Source to your Scene. Includes widgets.');
@@ -154,11 +152,11 @@ export class SourceSelectorModule {
         return this.scene.getNodes().filter(node => !verticalNodeIds.includes(node.id));
       }
 
-      if (this.settingsManagerService.views.activeDisplays.horizontal) {
+      if (this.dualOutputService.views.activeDisplays.horizontal) {
         return this.scene.getNodes().filter(node => !verticalNodeIds.includes(node.id));
       }
 
-      if (this.settingsManagerService.views.activeDisplays.vertical) {
+      if (this.dualOutputService.views.activeDisplays.vertical) {
         return this.scene.getNodes().filter(node => verticalNodeIds.includes(node.id));
       }
     }

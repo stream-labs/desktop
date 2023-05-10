@@ -17,7 +17,6 @@ export default function StudioEditor() {
     EditorService,
     TransitionsService,
     ScenesService,
-    SettingsManagerService,
     VideoSettingsService,
     DualOutputService,
   } = Services;
@@ -27,11 +26,9 @@ export default function StudioEditor() {
     cursor: EditorService.state.cursor,
     studioMode: TransitionsService.state.studioMode,
     showHorizontalDisplay:
-      SettingsManagerService.views.activeDisplays.horizontal ||
-      !DualOutputService.views.dualOutputMode,
+      DualOutputService.views.activeDisplays.horizontal || !DualOutputService.views.dualOutputMode,
     showVerticalDisplay:
-      SettingsManagerService.views.activeDisplays.vertical &&
-      DualOutputService.views.dualOutputMode,
+      DualOutputService.views.activeDisplays.vertical && DualOutputService.views.dualOutputMode,
     activeSceneId: ScenesService.views.activeSceneId,
     hasAdditionalContexts: VideoSettingsService.hasAdditionalContexts,
   }));

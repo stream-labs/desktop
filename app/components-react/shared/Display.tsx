@@ -31,10 +31,7 @@ export default function Display(props: DisplayProps) {
 
     return {
       paddingColor: CustomizationService.views.displayBackground,
-      baseResolution: `${VideoSettingsService.state[p.type ?? 'horizontal'].baseWidth}x${
-        VideoSettingsService.state[p.type ?? 'horizontal'].baseHeight
-      }`,
-      // baseResolution: `${videoSettings?.baseWidth}x${videoSettings?.baseHeight}`, // @@@ from incoming merge
+      baseResolution: `${videoSettings?.baseWidth}x${videoSettings?.baseHeight}`,
     };
   }, false);
 

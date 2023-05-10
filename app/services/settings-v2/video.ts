@@ -3,7 +3,6 @@ import { Inject } from 'services/core/injector';
 import { InitAfter } from 'services/core';
 import { mutation, StatefulService } from '../core/stateful-service';
 import * as obs from '../../../obs-api';
-import { SettingsManagerService } from 'services/settings-manager';
 import { DualOutputService } from 'services/dual-output';
 import { GreenService } from 'services/green';
 import { ScenesService } from 'services/scenes';
@@ -52,7 +51,6 @@ export function invalidFps(num: number, den: number) {
 
 @InitAfter('ScenesService')
 export class VideoSettingsService extends StatefulService<IVideoSetting> {
-  @Inject() settingsManagerService: SettingsManagerService;
   @Inject() dualOutputService: DualOutputService;
   @Inject() greenService: GreenService;
   @Inject() scenesService: ScenesService;
@@ -69,7 +67,7 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
   init() {
     this.establishVideoContext();
     this.establishedContext.next();
-    if (this.settingsManagerService.views.activeDisplays.vertical) {
+    if (this.dualOutputService.views.activeDisplays.vertical) {
       this.establishVideoContext('vertical');
     }
   }
@@ -88,7 +86,7 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
   }
 
   get defaultBaseResolution() {
-    const display = this.settingsManagerService.views.defaultDisplay;
+    const display = this.dualOutputService.views.defaultDisplay;
     return {
       width: this.contexts[display].video.baseWidth,
       height: this.contexts[display].video.baseHeight,
@@ -100,8 +98,8 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
     const horizontalWidth = parseInt(widthStr, 10);
     const horizontalHeight = parseInt(heightStr, 10);
 
-    const verticalWidth = this.settingsManagerService.views.videoSettings.vertical.baseWidth;
-    const verticalHeight = this.settingsManagerService.views.videoSettings.vertical.baseHeight;
+    const verticalWidth = this.dualOutputService.views.videoSettings.vertical.baseWidth;
+    const verticalHeight = this.dualOutputService.views.videoSettings.vertical.baseHeight;
 
     return {
       horizontal: {
@@ -124,7 +122,7 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
   }
 
   get videoSettings() {
-    return this.settingsManagerService.views.videoSettings;
+    return this.dualOutputService.views.videoSettings;
   }
 
   getVideoContext(display: TDisplayType) {
@@ -136,8 +134,7 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
   }
 
   formatVideoSettings(display: TDisplayType = 'horizontal') {
-    const settings =
-      this.state[display] ?? this.settingsManagerService.views.videoSettings.vertical;
+    const settings = this.state[display] ?? this.dualOutputService.views.videoSettings.vertical;
 
     return {
       baseRes: `${settings?.baseWidth}x${settings?.baseHeight}`,
@@ -162,7 +159,7 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
         this.SET_VIDEO_SETTING(key, this.contexts.horizontal.video[key]);
       });
     } else {
-      const data = this.settingsManagerService.views.videoSettings.vertical;
+      const data = this.dualOutputService.views.videoSettings.vertical;
       this.SET_VIDEO_CONTEXT(display, this.contexts[display].video);
       Object.keys(data).forEach(
         (key: keyof obs.IAdvancedStreaming | keyof obs.ISimpleStreaming) => {
@@ -254,7 +251,7 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
 
     if (display === 'vertical') {
       // if the display is vertical, also update the persisted settings
-      this.settingsManagerService.setVideoSetting({ [key]: value });
+      this.dualOutputService.setVideoSetting({ [key]: value });
     }
     // this.greenService.setVideoSetting({ [key]: value }, display);
   }

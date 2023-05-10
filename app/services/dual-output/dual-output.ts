@@ -6,8 +6,9 @@ import {
   TDualOutputDisplayType,
   IDualOutputPlatformSetting,
 } from './dual-output-data';
+import { verticalDisplayData } from '../settings-v2/default-settings-data';
 import { ScenesService, SceneItem, IPartialSettings, IScene } from 'services/scenes';
-import { TDisplayType, VideoSettingsService } from 'services/settings-v2/video';
+import { IVideoSetting, TDisplayType, VideoSettingsService } from 'services/settings-v2/video';
 import { StreamingService } from 'services/streaming';
 import { SceneCollectionsService } from 'services/scene-collections';
 import { TPlatform } from 'services/platforms';
@@ -16,11 +17,22 @@ import { EditorCommandsService } from 'services/editor-commands';
 import { Subject } from 'rxjs';
 import { SettingsManagerService } from 'services/settings-manager';
 import { TOutputOrientation } from 'services/restream';
+import { IVideoInfo } from 'obs-studio-node';
+
+interface IDualOutputVideoSettings {
+  defaultDisplay: TDisplayType;
+  vertical: IVideoInfo;
+  activeDisplays: {
+    horizontal: boolean;
+    vertical: boolean;
+  };
+}
 interface IDualOutputServiceState {
   displays: TDisplayType[];
   platformSettings: TDualOutputPlatformSettings;
   dualOutputMode: boolean;
   sceneNodeMaps: { [sceneId: string]: Dictionary<string> };
+  videoSettings: IDualOutputVideoSettings;
 }
 
 class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
@@ -34,7 +46,7 @@ class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
   }
 
   get shouldCreateVerticalNode(): boolean {
-    return this.settingsManagerService.views.isVerticalActive || this.hasVerticalNodes;
+    return this.isVerticalActive || this.hasVerticalNodes;
   }
 
   get platformSettings() {
@@ -90,6 +102,26 @@ class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
 
   get sceneNodeMaps() {
     return this.state.sceneNodeMaps;
+  }
+
+  get videoSettings() {
+    return this.state.videoSettings;
+  }
+
+  get activeDisplays() {
+    return this.state.videoSettings.activeDisplays;
+  }
+
+  get defaultDisplay() {
+    return this.state.videoSettings.defaultDisplay;
+  }
+
+  get isHorizontalActive() {
+    return this.state.videoSettings.activeDisplays.horizontal;
+  }
+
+  get isVerticalActive() {
+    return this.state.videoSettings.activeDisplays.vertical;
   }
 
   getPlatformDisplay(platform: TPlatform) {
@@ -151,6 +183,14 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
     platformSettings: DualOutputPlatformSettings,
     dualOutputMode: false,
     sceneNodeMaps: {},
+    videoSettings: {
+      defaultDisplay: 'horizontal',
+      vertical: verticalDisplayData, // get settings for horizontal display from obs directly
+      activeDisplays: {
+        horizontal: true,
+        vertical: false,
+      },
+    },
   };
 
   sceneItemsConfirmed = new Subject();
@@ -163,35 +203,35 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
   init() {
     super.init();
 
-    this.sceneCollectionsService.collectionInitialized.subscribe(() => {
-      if (
-        this.scenesService.views.getSceneItemsBySceneId(this.scenesService.views.activeSceneId)
-          ?.length > 0
-      ) {
-        this.confirmOrCreateVerticalNodes();
-      }
-    });
+    // this.sceneCollectionsService.collectionInitialized.subscribe(() => {
+    //   if (
+    //     this.scenesService.views.getSceneItemsBySceneId(this.scenesService.views.activeSceneId)
+    //       ?.length > 0
+    //   ) {
+    //     this.confirmOrCreateVerticalNodes();
+    //   }
+    // });
 
-    this.sceneCollectionsService.collectionSwitched.subscribe(() => {
-      if (
-        this.scenesService.views.getSceneItemsBySceneId(this.scenesService.views.activeSceneId)
-          ?.length > 0
-      ) {
-        this.confirmOrCreateVerticalNodes();
-      }
-    });
+    // this.sceneCollectionsService.collectionSwitched.subscribe(() => {
+    //   if (
+    //     this.scenesService.views.getSceneItemsBySceneId(this.scenesService.views.activeSceneId)
+    //       ?.length > 0
+    //   ) {
+    //     this.confirmOrCreateVerticalNodes();
+    //   }
+    // });
 
-    this.scenesService.sceneAdded.subscribe((scene: IScene) => {
-      if (this.videoSettingsService.state.vertical) {
-        this.assignSceneNodes(scene.id);
-      }
-    });
+    // this.scenesService.sceneAdded.subscribe((scene: IScene) => {
+    //   if (this.videoSettingsService.state.vertical) {
+    //     this.assignSceneNodes(scene.id);
+    //   }
+    // });
 
-    this.scenesService.sceneSwitched.subscribe((scene: IScene) => {
-      if (this.scenesService.views.getSceneItemsBySceneId(scene.id)?.length > 0) {
-        this.confirmOrCreateVerticalNodes(scene.id);
-      }
-    });
+    // this.scenesService.sceneSwitched.subscribe((scene: IScene) => {
+    //   if (this.scenesService.views.getSceneItemsBySceneId(scene.id)?.length > 0) {
+    //     this.confirmOrCreateVerticalNodes(scene.id);
+    //   }
+    // });
   }
 
   /**
@@ -341,6 +381,52 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
     this.UPDATE_PLATFORM_SETTING(platform, display);
   }
 
+  /**
+   * Toggle display
+   */
+
+  toggleDisplay(status: boolean, display: TDisplayType) {
+    // swap default display if needed
+    if (!status) {
+      const otherDisplay = display === 'horizontal' ? 'vertical' : 'horizontal';
+      this.setDefaultDisplay(otherDisplay);
+    }
+
+    if (
+      this.state.videoSettings.activeDisplays.horizontal &&
+      this.state.videoSettings.activeDisplays.vertical
+    ) {
+      // toggle off dual output mode
+      this.setDisplayActive(false, display);
+    } else {
+      // toggle display
+      this.sceneItemsConfirmed.subscribe(() => {
+        this.setDisplayActive(status, display);
+      });
+      this.actions.confirmOrCreateVerticalNodes();
+    }
+  }
+
+  /**
+   * Update default display
+   */
+
+  setDefaultDisplay(display: TDisplayType) {
+    this.SET_DEFAULT_DISPLAY(display);
+  }
+
+  private setDisplayActive(status: boolean, display: TDisplayType) {
+    this.SET_DISPLAY_ACTIVE(status, display);
+  }
+
+  /**
+   * Update Video Settings
+   */
+
+  setVideoSetting(setting: Partial<IVideoSetting>, display?: TDisplayType) {
+    this.SET_VIDEO_SETTING(setting, display);
+  }
+
   @mutation()
   private UPDATE_PLATFORM_SETTING(platform: TPlatform | string, display: TDualOutputDisplayType) {
     this.state.platformSettings[platform] = {
@@ -380,5 +466,41 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
       ...this.state,
       dualOutputMode: !this.state.dualOutputMode,
     };
+  }
+
+  @mutation()
+  private SET_DISPLAY_ACTIVE(status: boolean, display: TDisplayType) {
+    const otherDisplay = display === 'horizontal' ? 'vertical' : 'horizontal';
+    if (
+      status === false &&
+      this.state.videoSettings.activeDisplays[display] &&
+      !this.state.videoSettings.activeDisplays[otherDisplay]
+    ) {
+      // if not dual output mode, swap the active displays
+
+      this.state.videoSettings.activeDisplays = {
+        ...this.state.videoSettings.activeDisplays,
+        [display]: status,
+        [otherDisplay]: !status,
+      };
+    } else {
+      this.state.videoSettings.activeDisplays = {
+        ...this.state.videoSettings.activeDisplays,
+        [display]: status,
+      };
+    }
+  }
+
+  @mutation()
+  private SET_VIDEO_SETTING(setting: Partial<IVideoSetting>, display: TDisplayType = 'vertical') {
+    this.state.videoSettings.activeDisplays = {
+      ...this.state.videoSettings.activeDisplays,
+      [display]: setting,
+    };
+  }
+
+  @mutation()
+  private SET_DEFAULT_DISPLAY(display: TDisplayType) {
+    this.state.videoSettings.defaultDisplay = display;
   }
 }

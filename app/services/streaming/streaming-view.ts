@@ -11,7 +11,7 @@ import { UserService } from '../user';
 import { RestreamService } from '../restream';
 import { DualOutputService } from '../dual-output';
 import { getPlatformService, TPlatform, TPlatformCapability, platformList } from '../platforms';
-import { SettingsManagerService, TwitterService } from '../../app-services';
+import { TwitterService } from '../../app-services';
 import cloneDeep from 'lodash/cloneDeep';
 import difference from 'lodash/difference';
 import { Services } from '../../components-react/service-provider';
@@ -47,10 +47,6 @@ export class StreamInfoView<T extends Object> extends ViewHandler<T> {
 
   private get dualOutputView() {
     return this.getServiceViews(DualOutputService);
-  }
-
-  private get settingsManagerView() {
-    return this.getServiceViews(SettingsManagerService);
   }
 
   private get streamingState() {
@@ -178,7 +174,7 @@ export class StreamInfoView<T extends Object> extends ViewHandler<T> {
   }
 
   get activeDisplays() {
-    return this.settingsManagerView.activeDisplays;
+    return this.dualOutputView.activeDisplays;
   }
 
   get contextsToStream(): TDisplayType[] {

@@ -12,7 +12,6 @@ import { byOS, OS, getOS } from 'util/operating-systems';
 import * as remote from '@electron/remote';
 import { onUnload } from 'util/unload';
 import { ScenesService } from './api/external-api/resources';
-import { SettingsManagerService } from './settings-manager';
 import { ISelectionState, SelectionService } from 'services/selection';
 import { TDisplayType, VideoSettingsService } from './settings-v2';
 
@@ -307,7 +306,6 @@ export class VideoService extends Service {
   @Inject() scenesService: ScenesService;
   @Inject() videoSettingsService: VideoSettingsService;
   @Inject() dualOutputService: DualOutputService;
-  @Inject() settingsManagerService: SettingsManagerService;
 
   init() {
     this.settingsService.loadSettingsIntoStore();
@@ -355,7 +353,7 @@ export class VideoService extends Service {
       baseHeight: number;
     };
   }) {
-    const display = this.settingsManagerService.views.defaultDisplay ?? 'horizontal';
+    const display = this.dualOutputService.views.defaultDisplay ?? 'horizontal';
     this.settingsService.setSettingValue(
       'Video',
       'Base',
