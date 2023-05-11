@@ -47,7 +47,7 @@ export class CreateNewItemCommand extends Command {
           false,
           this.sceneId,
         ),
-      ).then(id => (this.dualOutputVerticalNodeId = id));
+      ).then(node => (this.dualOutputVerticalNodeId = node.id));
     }
 
     this.sourceId = item.sourceId;

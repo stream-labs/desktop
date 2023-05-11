@@ -5,10 +5,12 @@ import { ScenesService, TSceneNode } from 'services/scenes';
 import { DualOutputService } from 'services/dual-output';
 import compact from 'lodash/compact';
 import { $t } from 'services/i18n';
+import { VideoSettingsService } from 'services/settings-v2';
 
 export class CopyNodesCommand extends Command {
   @Inject() scenesService: ScenesService;
   @Inject() dualOutputService: DualOutputService;
+  @Inject() videoSettingsService: VideoSettingsService;
 
   description: string;
 
@@ -69,7 +71,9 @@ export class CopyNodesCommand extends Command {
           this.sourceIdsMap != null ? this.sourceIdsMap[node.sourceId] : node.sourceId;
 
         const item = scene.addSource(sourceId, { id: this.nodeIdsMap[node.id] });
-        item.setSettings(node.getSettings());
+        const display = this.dualOutputService.views.getNodeDisplay(node.id, scene.id);
+        const context = this.videoSettingsService.contexts[display];
+        item.setSettings({ ...node.getSettings(), output: context, display });
         this.nodeIdsMap[node.id] = item.id;
         insertedNodes.push(item);
       }
@@ -95,7 +99,6 @@ export class CopyNodesCommand extends Command {
         .getNodesIds()
         .map(origNodeId => this.nodeIdsMap[origNodeId]),
     );
-    scene.setNodesOrder(order.concat(initialNodeOrder));
 
     return insertedNodes;
   }

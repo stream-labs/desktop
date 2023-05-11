@@ -53,6 +53,11 @@ export class RemoveItemCommand extends Command {
 
   async execute() {
     const item = this.scenesService.views.getSceneItem(this.sceneItemId);
+
+    // when removing a scene, the vertical node will have already been removed
+    // so this prevent an error by just return
+    if (!item) return;
+
     const scene = this.scenesService.views.getScene(item.sceneId);
     this.sceneId = item.sceneId;
     this.sourceId = item.sourceId;
@@ -157,7 +162,12 @@ export class RemoveItemCommand extends Command {
       this.reorderDualOutputNodesSubcommand.rollback();
 
       // restore entry to node map
-      this.dualOutputService.restoreNodesToMap(horizontalNodeId, verticalNodeId, this.sceneId);
+      this.dualOutputService.restoreNodesToMap(
+        this.dualOutputNodeDisplay,
+        horizontalNodeId,
+        verticalNodeId,
+        this.sceneId,
+      );
     } else {
       // otherwise, just create horizontal item
       const item = scene.addSource(this.sourceId, { id: this.sceneItemId, select: false });
