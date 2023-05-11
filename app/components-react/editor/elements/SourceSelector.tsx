@@ -90,6 +90,7 @@ export class SourceSelectorModule {
               isRecordingVisible={sceneNode.isRecordingVisible}
               isGuestCamActive={sceneNode.isGuestCamActive}
               isDualOutputActive={sceneNode.isDualOutputActive}
+              isFolder={sceneNode.isFolder}
               cycleSelectiveRecording={() => this.cycleSelectiveRecording(sceneNode.id)}
               ref={this.nodeRefs[sceneNode.id]}
               onDoubleClick={() => this.sourceProperties(sceneNode.id)}
@@ -276,6 +277,7 @@ export class SourceSelectorModule {
     this.sourcesService.actions.showSourceProperties(item.sourceId);
   }
 
+  // @@@
   determinePlacement(info: Parameters<Required<TreeProps>['onDrop']>[0]) {
     if (!info.dropToGap && !info.node.isLeaf) return EPlaceType.Inside;
     const dropPos = info.node.pos.split('-');
@@ -289,7 +291,20 @@ export class SourceSelectorModule {
       this.activeItemIds.length > 0 && this.activeItemIds.includes(info.dragNode.key as string)
         ? this.activeItemIds
         : (info.dragNodesKeys as string[]);
-    const nodesToDrop = this.scene.getSelection(targetNodes);
+
+    // if the scene has vertical nodes, they should be reordered as well
+    const verticalNodes: string[] = targetNodes.reduce((ids: string[], nodeId: string) => {
+      const verticalNodeId = this.dualOutputService.views.getVerticalNodeId(nodeId);
+      if (verticalNodeId) {
+        ids.push(verticalNodeId);
+      }
+      return ids;
+    }, []);
+
+    const nodesToDrop = verticalNodes
+      ? this.scene.getSelection(targetNodes.concat(verticalNodes))
+      : this.scene.getSelection(targetNodes);
+
     const destNode = this.scene.getNode(info.node.key as string);
     const placement = this.determinePlacement(info);
 
@@ -355,7 +370,7 @@ export class SourceSelectorModule {
       this.state.expandedFoldersIds.concat(node.getPath().slice(0, -1)),
     );
 
-    this.nodeRefs[this.lastSelectedId]?.current.scrollIntoView({ behavior: 'smooth' });
+    this.nodeRefs[this.lastSelectedId]?.current?.scrollIntoView({ behavior: 'smooth' });
   }
 
   get activeItemIds() {
@@ -571,6 +586,7 @@ const TreeNode = React.forwardRef(
       selectiveRecordingEnabled: boolean;
       isGuestCamActive: boolean;
       isDualOutputActive: boolean;
+      isFolder: boolean;
       canShowActions: boolean;
       toggleVisibility: (ev: unknown) => unknown;
       toggleLock: (ev: unknown) => unknown;
@@ -604,7 +620,7 @@ const TreeNode = React.forwardRef(
         {p.canShowActions && (
           <>
             {p.isGuestCamActive && <i className="fa fa-signal" />}
-            {p.isDualOutputActive && <DualOutputSourceSelector nodeId={p.id} />}
+            {p.isDualOutputActive && !p.isFolder && <DualOutputSourceSelector nodeId={p.id} />}
             {p.selectiveRecordingEnabled && (
               <Tooltip title={selectiveRecordingMetadata().tooltip} placement="left">
                 <i
@@ -614,7 +630,7 @@ const TreeNode = React.forwardRef(
               </Tooltip>
             )}
             <i onClick={p.toggleLock} className={p.isLocked ? 'icon-lock' : 'icon-unlock'} />
-            {!p.isDualOutputActive && (
+            {(!p.isDualOutputActive || p.isFolder) && (
               <i onClick={p.toggleVisibility} className={p.isVisible ? 'icon-view' : 'icon-hide'} />
             )}
           </>
