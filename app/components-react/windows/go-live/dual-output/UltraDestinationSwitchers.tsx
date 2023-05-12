@@ -1,4 +1,4 @@
-import React, { useRef, useMemo, MouseEvent, ForwardedRef } from 'react';
+import React, { useRef, MouseEvent } from 'react';
 import { getPlatformService, TPlatform } from 'services/platforms';
 import cx from 'classnames';
 import { $t } from 'services/i18n';
@@ -35,11 +35,8 @@ export function UltraDestinationSwitchers(p: IUltraDestinationSwitchers) {
   const enabledPlatformsRef = useRef(enabledPlatforms);
   enabledPlatformsRef.current = enabledPlatforms;
 
-  const emitSwitch = useDebounce(500, (platforms?: TPlatform[]) => {
-    if (platforms) {
-      enabledPlatformsRef.current = platforms;
-      switchPlatforms(platforms);
-    } else {
+  const emitSwitch = useDebounce(500, (setPlatforms?: boolean) => {
+    if (setPlatforms) {
       switchPlatforms(enabledPlatformsRef.current);
     }
   });
@@ -53,9 +50,13 @@ export function UltraDestinationSwitchers(p: IUltraDestinationSwitchers) {
       (p: TPlatform) => p !== platform,
     );
     if (enabled) enabledPlatformsRef.current.push(platform);
-    emitSwitch();
+    emitSwitch(true);
   }
 
+  function toggleDestination(index: number, enabled: boolean) {
+    // this timeout is to allow for the toggle animation
+    setTimeout(() => switchCustomDestination(index, enabled), 500);
+  }
   return (
     <>
       <InfoBadge
@@ -73,6 +74,14 @@ export function UltraDestinationSwitchers(p: IUltraDestinationSwitchers) {
           enabled={isEnabled(platform)}
           onChange={enabled => togglePlatform(platform, enabled)}
           isPrimary={isPrimaryPlatform(platform)}
+        />
+      ))}
+      {customDestinations?.map((dest, ind) => (
+        <DestinationSwitcher
+          key={ind}
+          destination={dest}
+          enabled={customDestinations[ind].enabled}
+          onChange={enabled => toggleDestination(ind, enabled)}
         />
       ))}
     </>
@@ -192,7 +201,7 @@ function DestinationSwitcher(p: IDestinationSwitcherProps) {
       </div>
       <div className={styles.platformDisplay}>
         <span className={styles.label}>{`${$t('Output')}:`}</span>
-        <DisplaySelector platform={platformKey} nolabel nomargin />
+        <DisplaySelector name={platformKey} nolabel nomargin />
       </div>
     </div>
   );

@@ -82,6 +82,9 @@ class StreamSettingsModule {
   private get customizationService() {
     return Services.CustomizationService;
   }
+  private get dualOutputService() {
+    return Services.DualOutputService;
+  }
 
   // DEFINE MUTATIONS
 
@@ -104,6 +107,11 @@ class StreamSettingsModule {
       enabled: false,
     };
     this.state.editCustomDestMode = true;
+
+    this.dualOutputService.actions.updateDestinationSetting(
+      this.suggestCustomDestName(),
+      'horizontal',
+    );
   }
 
   removeCustomDest(ind: number) {

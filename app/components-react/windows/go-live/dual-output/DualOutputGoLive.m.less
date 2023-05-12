@@ -59,6 +59,16 @@
     text-overflow: ellipsis;
     overflow: visible;
 
+    i:not(.close) {
+      font-size: 35px;
+      margin: 2px;
+    }
+
+    .close {
+      font-size: unset;
+      margin: unset;
+    }
+
     .platform-logo {
       .margin();
 
@@ -91,6 +101,10 @@
 
       .platform-username {
         color: var(--link);
+        overflow-wrap: break-word;
+        display: inline-block;
+        word-break: break-word;
+        white-space: pre-line;
       }
     }
   }

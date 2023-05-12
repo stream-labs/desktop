@@ -1,5 +1,6 @@
 import { $t } from 'services/i18n';
-import { TPlatform, EPlatform, platformList } from 'services/platforms';
+import { TPlatform, EPlatform } from 'services/platforms';
+import { TDisplayType } from 'services/settings-v2';
 
 export enum EOutputDisplayType {
   Horizontal = 'horizontal',
@@ -11,6 +12,12 @@ export type TDualOutputDisplayType = EOutputDisplayType.Horizontal | EOutputDisp
 export interface IDualOutputPlatformSetting {
   platform: TPlatform;
   display: EOutputDisplayType;
+  canUpdate: boolean;
+}
+
+export interface IDualOutputDestinationSetting {
+  destination: string;
+  display: TDisplayType;
   canUpdate: boolean;
 }
 

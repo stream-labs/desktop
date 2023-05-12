@@ -3,20 +3,21 @@ import {
   TDisplayPlatforms,
   TDualOutputPlatformSettings,
   DualOutputPlatformSettings,
-  TDualOutputDisplayType,
+  IDualOutputDestinationSetting,
   IDualOutputPlatformSetting,
 } from './dual-output-data';
 import { verticalDisplayData } from '../settings-v2/default-settings-data';
 import { ScenesService, SceneItem, IPartialSettings, IScene } from 'services/scenes';
 import { IVideoSetting, TDisplayType, VideoSettingsService } from 'services/settings-v2/video';
 import { StreamingService } from 'services/streaming';
-import { SceneCollectionsService } from 'services/scene-collections';
 import { TPlatform } from 'services/platforms';
 import { EPlaceType, ReorderNodesCommand } from 'services/editor-commands/commands/reorder-nodes';
 import { EditorCommandsService } from 'services/editor-commands';
 import { Subject } from 'rxjs';
 import { TOutputOrientation } from 'services/restream';
 import { IVideo, IVideoInfo } from 'obs-studio-node';
+import { StreamSettingsService } from 'app-services';
+import { ICustomStreamDestination } from 'services/settings/streaming';
 
 interface IDualOutputVideoSettings {
   defaultDisplay: TDisplayType;
@@ -29,6 +30,7 @@ interface IDualOutputVideoSettings {
 interface IDualOutputServiceState {
   displays: TDisplayType[];
   platformSettings: TDualOutputPlatformSettings;
+  destinationSettings: { [destination: string]: IDualOutputDestinationSetting };
   dualOutputMode: boolean;
   sceneNodeMaps: { [sceneId: string]: Dictionary<string> };
   videoSettings: IDualOutputVideoSettings;
@@ -53,6 +55,10 @@ class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
 
   get platformSettings() {
     return this.state.platformSettings;
+  }
+
+  get destinationSettings() {
+    return this.state.destinationSettings;
   }
 
   get hasVerticalNodes() {
@@ -199,16 +205,16 @@ class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
 }
 
 @InitAfter('ScenesService')
-// @InitAfter('SceneCollectionsService')
 export class DualOutputService extends PersistentStatefulService<IDualOutputServiceState> {
   @Inject() private scenesService: ScenesService;
   @Inject() private videoSettingsService: VideoSettingsService;
-  @Inject() private sceneCollectionsService: SceneCollectionsService;
   @Inject() private editorCommandsService: EditorCommandsService;
+  @Inject() private streamSettingsService: StreamSettingsService;
 
   static defaultState: IDualOutputServiceState = {
     displays: ['horizontal', 'vertical'],
     platformSettings: DualOutputPlatformSettings,
+    destinationSettings: {},
     dualOutputMode: false,
     sceneNodeMaps: {},
     videoSettings: {
@@ -230,6 +236,16 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
 
   init() {
     super.init();
+
+    // if the custom destinations do not have assigned displays, assign them on startup
+    this.streamSettingsService.streamSettingsInitiated.subscribe(
+      (customDestinations: ICustomStreamDestination[]) => {
+        customDestinations.forEach(destination => {
+          this.updateDestinationSetting(destination.name, 'horizontal');
+        });
+        this.streamSettingsService.streamSettingsInitiated.unsubscribe();
+      },
+    );
 
     // this.sceneCollectionsService.activeCollectionSet.subscribe(collection => {
     //   if (this.state.dualOutputMode) {
@@ -422,10 +438,12 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
    * Settings for platforms to displays
    */
 
-  updatePlatformSetting(platform: TPlatform, display: TDualOutputDisplayType) {
-    // const service = getPlatformService(platform);
-    // service.setPlatformContext(display);
+  updatePlatformSetting(platform: TPlatform | string, display: TDisplayType) {
     this.UPDATE_PLATFORM_SETTING(platform, display);
+  }
+
+  updateDestinationSetting(destination: string, display: TDisplayType) {
+    this.UPDATE_DESTINATION_SETTING(destination, display);
   }
 
   /**
@@ -475,11 +493,28 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
   }
 
   @mutation()
-  private UPDATE_PLATFORM_SETTING(platform: TPlatform | string, display: TDualOutputDisplayType) {
+  private UPDATE_PLATFORM_SETTING(platform: TPlatform | string, display: TDisplayType) {
     this.state.platformSettings[platform] = {
       ...this.state.platformSettings[platform],
       display,
     };
+  }
+
+  private UPDATE_DESTINATION_SETTING(destination: string, display: TDisplayType) {
+    if (!this.state.destinationSettings[destination]) {
+      // create settings
+      this.state.destinationSettings[destination] = {
+        destination,
+        display: 'horizontal' as TDisplayType,
+        canUpdate: true,
+      };
+    } else {
+      // update setting
+      this.state.destinationSettings[destination] = {
+        ...this.state.destinationSettings[destination],
+        display,
+      };
+    }
   }
 
   @mutation()

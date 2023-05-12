@@ -13,7 +13,7 @@ const { Option } = Select;
 
 interface IPlatformSelectorProps {
   togglePlatform: (platform: TPlatform) => void;
-  platforms?: TPlatform[];
+  switchDestination: (index: number) => void;
 }
 
 /**
@@ -21,40 +21,13 @@ interface IPlatformSelectorProps {
  */
 
 export default function DualOutputPlatformSelector(p: IPlatformSelectorProps) {
-  const {
-    linkedPlatforms,
-    enabledPlatforms,
-    customDestinations,
-    switchCustomDestination,
-  } = useGoLiveSettings();
+  const { linkedPlatforms, enabledPlatforms, customDestinations } = useGoLiveSettings();
   const enabledPlatformsRef = useRef<TPlatform[]>(enabledPlatforms);
   enabledPlatformsRef.current = enabledPlatforms;
 
   function showStreamSettings() {
     Services.SettingsService.actions.showSettings('Stream');
   }
-
-  const displayed = useMemo(() => {
-    return linkedPlatforms.filter(platform => !enabledPlatforms.includes(platform));
-  }, [linkedPlatforms, enabledPlatforms]);
-
-  const displayedPlatforms = useMemo(() => {
-    const notEnabledPlatforms: string[] = linkedPlatforms.filter(
-      // platform => !p.platforms?.includes(platform),
-      // platform => !enabledPlatformsRef.current.includes(platform),
-      platform => !isEnabled(platform),
-    );
-    const notEnabledDestinations: string[] = customDestinations.reduce(
-      (destinations: string[], destination: ICustomStreamDestination) => {
-        if (!destination.enabled) {
-          destinations.push(destination.name);
-        }
-        return destinations;
-      },
-      [],
-    );
-    return notEnabledPlatforms.concat(notEnabledDestinations);
-  }, [linkedPlatforms, p.platforms, enabledPlatforms]);
 
   function isEnabled(platform: TPlatform) {
     return enabledPlatforms.includes(platform);
@@ -78,26 +51,26 @@ export default function DualOutputPlatformSelector(p: IPlatformSelectorProps) {
         ),
       }));
 
-    const destinations = customDestinations.map((destination: ICustomStreamDestination) => ({
-      value: destination.name,
-      label: (
-        <>
-          <i className={cx(styles.icon, 'fa fa-globe')} />
-          {destination.name}
-        </>
-      ),
-    }));
+    const destinations = customDestinations
+      .filter(destination => !destination.enabled)
+      .map((destination: ICustomStreamDestination) => ({
+        value: destination.name,
+        label: (
+          <>
+            <i className={cx(styles.selectorIcon, 'fa fa-globe')} />
+            {destination.name}
+          </>
+        ),
+      }));
 
     return platforms.concat(destinations);
   }
-
-  // const options = formatOptions();
 
   const options = useMemo(() => {
     return formatOptions();
   }, [linkedPlatforms, enabledPlatforms, customDestinations]);
 
-  // // The first value of the selector does not change
+  // The first value of the selector does not change
   const defaultLabel = [
     {
       value: 'default',
@@ -121,14 +94,14 @@ export default function DualOutputPlatformSelector(p: IPlatformSelectorProps) {
         } else {
           // add destination to switchers
           if (linkedPlatforms.includes(option.value as TPlatform)) {
-            p.togglePlatform(option.value as TPlatform);
+            p?.togglePlatform(option.value as TPlatform);
             enabledPlatformsRef.current = enabledPlatformsRef.current.filter(
               platform => platform !== option.value,
             );
           } else {
             customDestinations.forEach((destination: ICustomStreamDestination, index: number) => {
               if (destination.name === option.value) {
-                switchCustomDestination(index, true);
+                p?.switchDestination(index);
               }
             });
           }

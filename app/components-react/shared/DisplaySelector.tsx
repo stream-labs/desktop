@@ -3,11 +3,12 @@ import { $t } from 'services/i18n';
 import { useVuex } from 'components-react/hooks';
 import { Services } from 'components-react/service-provider';
 import { RadioInput } from './inputs';
-import { displayLabels, TDualOutputDisplayType } from 'services/dual-output';
-import { TPlatform, platformLabels } from 'services/platforms';
+import { displayLabels } from 'services/dual-output';
+import { TDisplayType } from 'services/settings-v2';
+import { EPlatform, TPlatform, platformLabels, platformList } from 'services/platforms';
 
 interface IDisplaySelectorProps {
-  platform: TPlatform;
+  name: TPlatform | string;
   nolabel?: boolean;
   nomargin?: boolean;
   className?: string;
@@ -17,9 +18,15 @@ interface IDisplaySelectorProps {
 export default function DisplaySelector(p: IDisplaySelectorProps) {
   const { DualOutputService, StreamingService } = Services;
 
+  const isPlatform = platformList.includes(p.name as EPlatform);
+
   const v = useVuex(() => ({
-    updatePlatformSetting: DualOutputService.actions.updatePlatformSetting,
-    setting: DualOutputService.views.platformSettings[p.platform],
+    updateDisplay: isPlatform
+      ? DualOutputService.actions.updatePlatformSetting
+      : DualOutputService.actions.updateDestinationSetting,
+    setting: isPlatform
+      ? DualOutputService.views.platformSettings[p.name]
+      : DualOutputService.views.destinationSettings[p.name],
     isMidstreamMode: StreamingService.views.isMidStreamMode,
   }));
 
@@ -34,19 +41,21 @@ export default function DisplaySelector(p: IDisplaySelectorProps) {
     },
   ];
 
+  const label = isPlatform ? platformLabels(p.name) : p.name;
+
   return (
     <RadioInput
       className={p.className}
       style={p.style}
-      label={(platformLabels(p.platform) ?? p.platform) as string}
+      label={label}
       direction="horizontal"
       nolabel={p.nolabel ?? undefined}
       nomargin={p.nomargin ?? undefined}
       defaultValue="horizontal"
       options={displays}
-      onChange={val => v.updatePlatformSetting(p.platform, val as TDualOutputDisplayType)}
-      value={v.setting.display}
-      disabled={v.isMidstreamMode || !v.setting.canUpdate}
+      onChange={val => v.updateDisplay(p.name, val as TDisplayType)}
+      value={v.setting?.display ?? 'horizontal'}
+      disabled={v.isMidstreamMode || !v.setting?.canUpdate}
     />
   );
 }

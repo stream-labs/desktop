@@ -21,8 +21,6 @@ interface INonUltraDestinationSwitchers {
 
 export function NonUltraDestinationSwitchers(p: INonUltraDestinationSwitchers) {
   const {
-    // allLinkedPlatforms,
-    // linkedPlatforms,
     enabledPlatforms,
     customDestinations,
     switchPlatforms,
@@ -32,7 +30,7 @@ export function NonUltraDestinationSwitchers(p: INonUltraDestinationSwitchers) {
   } = useGoLiveSettings();
   const enabledPlatformsRef = useRef(enabledPlatforms);
   enabledPlatformsRef.current = enabledPlatforms;
-  const addClassFunctionRef = useRef({ addClass: () => undefined });
+  const destinationSwitcherRef = useRef({ addClass: () => undefined });
 
   const emitSwitch = useDebounce(500, () => {
     switchPlatforms(enabledPlatformsRef.current);
@@ -43,7 +41,6 @@ export function NonUltraDestinationSwitchers(p: INonUltraDestinationSwitchers) {
   }
 
   function togglePlatform(platform: TPlatform, enabled: boolean) {
-    console.log('platform ', platform);
     enabledPlatformsRef.current = enabledPlatformsRef.current.filter(
       (p: TPlatform) => p !== platform,
     );
@@ -63,7 +60,6 @@ export function NonUltraDestinationSwitchers(p: INonUltraDestinationSwitchers) {
       />
       {enabledPlatforms.map((platform: TPlatform) => (
         <DestinationSwitcher
-          ref={addClassFunctionRef}
           key={platform}
           destination={platform}
           enabled={isEnabled(platform)}
@@ -71,21 +67,27 @@ export function NonUltraDestinationSwitchers(p: INonUltraDestinationSwitchers) {
           isPrimary={isPrimaryPlatform(platform)}
         />
       ))}
-      {/* {customDestinations?.map((dest, ind) => (
-        <DestinationSwitcher
-          key={ind}
-          destination={dest}
-          enabled={customDestinations[ind].enabled}
-          onChange={enabled => switchCustomDestination(ind, enabled)}
-        />
-      ))} */}
+      {customDestinations
+        .filter(destination => destination.enabled)
+        .map((dest, index) => (
+          <DestinationSwitcher
+            key={index}
+            destination={dest}
+            destinationIndex={index}
+            enabled={customDestinations[index].enabled}
+            onChange={() => switchCustomDestination(index, false)}
+          />
+        ))}
 
       {p.showSelector && (
         <DualOutputPlatformSelector
-          platforms={enabledPlatformsRef.current}
           togglePlatform={platform => {
             togglePlatform(platform, true);
-            addClassFunctionRef.current.addClass();
+            destinationSwitcherRef.current.addClass();
+          }}
+          switchDestination={index => {
+            switchCustomDestination(index, true);
+            destinationSwitcherRef.current.addClass();
           }}
         />
       )}
@@ -94,8 +96,8 @@ export function NonUltraDestinationSwitchers(p: INonUltraDestinationSwitchers) {
 }
 
 interface IDestinationSwitcherProps {
-  // ref: React.ForwardedRef<{ addClass: () => void }>;
   destination: TPlatform | ICustomStreamDestination;
+  destinationIndex?: number; // for adding/removing custom destinations
   enabled: boolean;
   onChange: (enabled: boolean) => unknown;
   isPrimary?: boolean;
@@ -151,7 +153,7 @@ const DestinationSwitcher = React.forwardRef<{ addClass: () => void }, IDestinat
           Logo: () => (
             <PlatformLogo platform={platform} className={styles[`platform-logo-${platform}`]} />
           ),
-          CloseIcon: () => <i className="icon-close" onClick={ev => removeClass} />,
+          CloseIcon: () => <i className={cx('icon-close', styles.close)} onClick={removeClass} />,
         };
       } else {
         // define slots for a custom destination switcher
@@ -160,7 +162,7 @@ const DestinationSwitcher = React.forwardRef<{ addClass: () => void }, IDestinat
           title: destination.name,
           description: destination.url,
           Logo: () => <i className={cx(styles.destinationLogo, 'fa fa-globe')} />,
-          CloseIcon: () => <i className="icon-close" onClick={ev => removeClass} />,
+          CloseIcon: () => <i className={cx('icon-close', styles.close)} onClick={removeClass} />,
         };
       }
     })();
@@ -189,7 +191,7 @@ const DestinationSwitcher = React.forwardRef<{ addClass: () => void }, IDestinat
         </div>
         <div className={styles.platformDisplay}>
           <span className={styles.label}>{`${$t('Output')}:`}</span>
-          <DisplaySelector platform={platformKey} nolabel nomargin />
+          <DisplaySelector name={platformKey} nolabel nomargin />
         </div>
       </div>
     );
