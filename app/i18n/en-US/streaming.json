@@ -197,5 +197,6 @@
   "You cannot change these settings when you're live.": "You cannot change these settings when you're live.",
   "<dualoutput>Dual Output</dualoutput> is enabled - you must stream to one horizontal and one vertical platform.": "<dualoutput>Dual Output</dualoutput> is enabled - you must stream to one horizontal and one vertical platform.",
   "Other": "Other",
-  "Add Destination with Ultra": "Add Destination with Ultra"
+  "Add Destination with Ultra": "Add Destination with Ultra",
+  "Please log in to enable dual output. Would you like to log in now?": "Please log in to enable dual output. Would you like to log in now?"
 }

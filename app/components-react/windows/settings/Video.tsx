@@ -2,7 +2,7 @@ import * as remote from '@electron/remote';
 import React from 'react';
 import { useModule, injectState } from 'slap';
 import { Services } from '../../service-provider';
-import { message } from 'antd';
+import { Button, Form, Modal, message } from 'antd';
 import FormFactory, { TInputValue } from 'components-react/shared/inputs/FormFactory';
 import { CheckboxInput } from 'components-react/shared/inputs';
 import Tooltip from 'components-react/shared/Tooltip';
@@ -57,9 +57,14 @@ const FPS_OPTIONS = [
 
 class VideoSettingsModule {
   service = Services.VideoSettingsService;
+  userService = Services.UserService;
 
   get display(): TDisplayType {
     return this.state.display;
+  }
+
+  get isLoggedIn(): boolean {
+    return this.userService.isLoggedIn;
   }
 
   get values(): Dictionary<TInputValue> {
@@ -82,6 +87,7 @@ class VideoSettingsModule {
 
   state = injectState({
     display: 'horizontal' as TDisplayType,
+    showModal: false,
     showDualOutputSettings: Services.DualOutputService.views.dualOutputMode,
     customBaseRes: !this.baseResOptions.find(
       opt => opt.value === this.service.values.horizontal.baseRes,
@@ -375,6 +381,16 @@ class VideoSettingsModule {
       this.state.setShowDualOutputSettings(!this.state.showDualOutputSettings);
     }
   }
+
+  handleShowModal(status: boolean) {
+    Services.WindowsService.actions.updateStyleBlockers('child', status);
+    this.state.setShowModal(status);
+  }
+
+  handleAuth() {
+    Services.WindowsService.actions.closeChildWindow();
+    this.userService.actions.showLogin();
+  }
 }
 
 export function VideoSettings() {
@@ -382,9 +398,13 @@ export function VideoSettings() {
     values,
     metadata,
     showDualOutputSettings,
+    showModal,
+    isLoggedIn,
     onChange,
     setDisplay,
     setShowDualOutput,
+    handleShowModal,
+    handleAuth,
   } = useModule(VideoSettingsModule);
 
   return (
@@ -395,7 +415,7 @@ export function VideoSettings() {
           {/* THIS CHECKBOX TOGGLES DUAL OUTPUT MODE FOR THE ENTIRE APP */}
           <CheckboxInput
             value={showDualOutputSettings}
-            onChange={setShowDualOutput}
+            onChange={(val: boolean) => (isLoggedIn ? setShowDualOutput() : handleShowModal(val))}
             className={styles.doCheckbox}
           />
           {$t('Enable Dual Output')}
@@ -422,7 +442,37 @@ export function VideoSettings() {
           name="video-settings"
         />
       </div>
+      <LoginPromptModal
+        showModal={showModal}
+        handleAuth={handleAuth}
+        handleShowModal={handleShowModal}
+      />
     </>
+  );
+}
+
+function LoginPromptModal(p: {
+  showModal: boolean;
+  handleAuth: () => void;
+  handleShowModal: (status: boolean) => void;
+}) {
+  return (
+    <Modal
+      footer={null}
+      visible={p.showModal}
+      onCancel={() => p.handleShowModal(false)}
+      getContainer={false}
+      className={styles.confirmLogout}
+    >
+      <Form className={styles.confirmLogout}>
+        <h2>{$t('Login')}</h2>
+        {$t('Please log in to enable dual output. Would you like to log in now?')}
+        <div className={styles.buttons}>
+          <Button onClick={() => p.handleAuth()}>{$t('Yes')}</Button>
+          <Button onClick={() => p.handleShowModal(false)}>{$t('No')}</Button>
+        </div>
+      </Form>
+    </Modal>
   );
 }
 
