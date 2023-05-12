@@ -174,7 +174,6 @@ function DestinationSwitcher(p: IDestinationSwitcherProps) {
     <div
       ref={containerRef}
       className={cx(styles.platformSwitcher, { [styles.platformDisabled]: !p.enabled })}
-      onClick={onClickHandler}
     >
       <div className={styles.switcherHeader}>
         <div className={styles.platformInfoWrapper}>
@@ -185,7 +184,9 @@ function DestinationSwitcher(p: IDestinationSwitcherProps) {
             <span className={styles.platformName}>{title}</span>
             <span className={styles.platformUsername}>{description}</span>
           </div>
-          {/* SWITCH */}
+        </div>
+        {/* SWITCH */}
+        <div onClick={onClickHandler}>
           <Switch />
         </div>
       </div>

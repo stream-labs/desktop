@@ -13,6 +13,7 @@ import Animation from 'rc-animate';
 import { SwitchInput } from '../../shared/inputs';
 import { useGoLiveSettings, useGoLiveSettingsRoot } from './useGoLiveSettings';
 import { inject } from 'slap';
+import cx from 'classnames';
 
 export default function GoLiveWindow() {
   const { lifecycle, form } = useGoLiveSettingsRoot().extend(module => ({
@@ -26,10 +27,13 @@ export default function GoLiveWindow() {
 
   const shouldShowSettings = ['empty', 'prepopulate', 'waitForNewSettings'].includes(lifecycle);
   const shouldShowChecklist = ['runChecklist', 'live'].includes(lifecycle);
-  const showDualOutput = Services.DualOutputService.views.dualOutputMode;
+  const showDualOutput = shouldShowSettings && Services.DualOutputService.views.dualOutputMode;
 
   return (
-    <ModalLayout footer={<ModalFooter />}>
+    <ModalLayout
+      footer={<ModalFooter />}
+      className={cx({ [styles.dualOutputGoLive]: showDualOutput })}
+    >
       <Form
         form={form!}
         style={{ position: 'relative', height: '100%' }}
@@ -38,7 +42,7 @@ export default function GoLiveWindow() {
       >
         <Animation transitionName={shouldShowChecklist ? 'slideright' : ''}>
           {/* STEP 1 - FILL OUT THE SETTINGS FORM */}
-          {shouldShowSettings && showDualOutput && <DualOutputGoLiveSettings key={'settings'} />}
+          {showDualOutput && <DualOutputGoLiveSettings key={'settings'} />}
           {shouldShowSettings && !showDualOutput && <GoLiveSettings key={'settings'} />}
 
           {/* STEP 2 - RUN THE CHECKLIST */}

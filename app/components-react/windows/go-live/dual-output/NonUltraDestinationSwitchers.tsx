@@ -151,7 +151,7 @@ const DestinationSwitcher = React.forwardRef<{ addClass: () => void }, IDestinat
           Logo: () => (
             <PlatformLogo platform={platform} className={styles[`platform-logo-${platform}`]} />
           ),
-          CloseIcon: () => <i className="icon-close" onClick={ev => p.onChange} />,
+          CloseIcon: () => <i className="icon-close" onClick={ev => removeClass} />,
         };
       } else {
         // define slots for a custom destination switcher
@@ -160,7 +160,7 @@ const DestinationSwitcher = React.forwardRef<{ addClass: () => void }, IDestinat
           title: destination.name,
           description: destination.url,
           Logo: () => <i className={cx(styles.destinationLogo, 'fa fa-globe')} />,
-          CloseIcon: () => <i className="icon-close" onClick={ev => p.onChange} />,
+          CloseIcon: () => <i className="icon-close" onClick={ev => removeClass} />,
         };
       }
     })();
@@ -168,14 +168,13 @@ const DestinationSwitcher = React.forwardRef<{ addClass: () => void }, IDestinat
     const platformKey = title.toLowerCase() as TPlatform;
 
     return (
-      <div
-        ref={containerRef}
-        className={cx(styles.platformSwitcher, {
-          [styles.platformDisabled]: !p.enabled,
-        })}
-        onClick={removeClass}
-      >
-        <div className={styles.switcherHeader}>
+      <div className={styles.platformSwitcher}>
+        <div
+          ref={containerRef}
+          className={cx(styles.switcherHeader, {
+            [styles.platformDisabled]: !p.enabled,
+          })}
+        >
           <div className={styles.platformInfoWrapper}>
             {/* LOGO */}
             <Logo />

@@ -1,18 +1,6 @@
 @import '../../../../styles/index.less';
 @import '../GoLive.m.less';
 
-.dual-output-go-live {
-  height: 100%;
-  &:global(a) {
-    color: var(--teal);
-  }
-
-  :global(.ant-modal-body) {
-    background-color: var(--dark-background);
-    padding: 0px;
-  }
-}
-
 .settings-row {
   height: 100%;
   margin: 0px !important;
@@ -105,38 +93,38 @@
         color: var(--link);
       }
     }
+  }
 
-    .platform-switch {
-      justify-self: flex-end;
+  .platform-switch {
+    justify-self: flex-end;
+    color: var(--background);
+
+    :global(.ant-form-item-label) {
+      display: none;
+    }
+
+    :global(.ant-switch-small) {
+      min-width: 36px;
+      height: 21px;
+      line-height: 21px;
+    }
+
+    :global(.ant-switch-small .ant-switch-handle) {
+      width: 15px;
+      height: 15px;
+      top: 3px;
+      left: 3px;
+    }
+
+    :global(.ant-switch-small.ant-switch-checked .ant-switch-handle) {
+      left: calc(100% - 15px - 3px) !important;
+    }
+
+    :global(.ant-switch-inner i) {
       color: var(--background);
-
-      :global(.ant-form-item-label) {
-        display: none;
-      }
-
-      :global(.ant-switch-small) {
-        min-width: 36px;
-        height: 21px;
-        line-height: 21px;
-      }
-
-      :global(.ant-switch-small .ant-switch-handle) {
-        width: 15px;
-        height: 15px;
-        top: 3px;
-        left: 3px;
-      }
-
-      :global(.ant-switch-small.ant-switch-checked .ant-switch-handle) {
-        left: calc(100% - 15px - 3px) !important;
-      }
-
-      :global(.ant-switch-inner i) {
-        color: var(--background);
-        display: flex;
-        align-self: center;
-        padding-right: 2px;
-      }
+      display: flex;
+      align-self: center;
+      padding-right: 2px;
     }
   }
 
