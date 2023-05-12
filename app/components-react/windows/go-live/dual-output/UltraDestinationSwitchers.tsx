@@ -76,12 +76,12 @@ export function UltraDestinationSwitchers(p: IUltraDestinationSwitchers) {
           isPrimary={isPrimaryPlatform(platform)}
         />
       ))}
-      {customDestinations?.map((dest, ind) => (
+      {customDestinations?.map((destination: ICustomStreamDestination, index: number) => (
         <DestinationSwitcher
-          key={ind}
-          destination={dest}
-          enabled={customDestinations[ind].enabled}
-          onChange={enabled => toggleDestination(ind, enabled)}
+          key={index}
+          destination={destination}
+          enabled={customDestinations[index].enabled}
+          onChange={enabled => toggleDestination(index, enabled)}
         />
       ))}
     </>
@@ -177,8 +177,6 @@ function DestinationSwitcher(p: IDestinationSwitcherProps) {
     }
   })();
 
-  const platformKey = title.toLowerCase() as TPlatform;
-
   return (
     <div
       ref={containerRef}
@@ -201,7 +199,7 @@ function DestinationSwitcher(p: IDestinationSwitcherProps) {
       </div>
       <div className={styles.platformDisplay}>
         <span className={styles.label}>{`${$t('Output')}:`}</span>
-        <DisplaySelector name={platformKey} nolabel nomargin />
+        <DisplaySelector id={title} isPlatform={!!platform} nolabel nomargin />
       </div>
     </div>
   );

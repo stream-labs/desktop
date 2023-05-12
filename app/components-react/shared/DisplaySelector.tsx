@@ -1,4 +1,4 @@
-import React, { CSSProperties } from 'react';
+import React, { CSSProperties, useMemo } from 'react';
 import { $t } from 'services/i18n';
 import { useVuex } from 'components-react/hooks';
 import { Services } from 'components-react/service-provider';
@@ -8,7 +8,8 @@ import { TDisplayType } from 'services/settings-v2';
 import { EPlatform, TPlatform, platformLabels, platformList } from 'services/platforms';
 
 interface IDisplaySelectorProps {
-  name: TPlatform | string;
+  id: string;
+  isPlatform: boolean;
   nolabel?: boolean;
   nomargin?: boolean;
   className?: string;
@@ -18,17 +19,16 @@ interface IDisplaySelectorProps {
 export default function DisplaySelector(p: IDisplaySelectorProps) {
   const { DualOutputService, StreamingService } = Services;
 
-  const isPlatform = platformList.includes(p.name as EPlatform);
-
   const v = useVuex(() => ({
-    updateDisplay: isPlatform
-      ? DualOutputService.actions.updatePlatformSetting
-      : DualOutputService.actions.updateDestinationSetting,
-    setting: isPlatform
-      ? DualOutputService.views.platformSettings[p.name]
-      : DualOutputService.views.destinationSettings[p.name],
+    updatePlatformSetting: DualOutputService.actions.updatePlatformSetting,
+    updateDestinationSetting: DualOutputService.actions.updateDestinationSetting,
+    platformSettings: DualOutputService.views.platformSettings,
+    destinationSettings: DualOutputService.views.destinationSettings,
     isMidstreamMode: StreamingService.views.isMidStreamMode,
   }));
+
+  const label = p.isPlatform ? platformLabels(p.id) : p.id;
+  const setting = p.isPlatform ? v.platformSettings[p.id] : v.destinationSettings[p.id];
 
   const displays = [
     {
@@ -41,21 +41,21 @@ export default function DisplaySelector(p: IDisplaySelectorProps) {
     },
   ];
 
-  const label = isPlatform ? platformLabels(p.name) : p.name;
-
   return (
     <RadioInput
-      className={p.className}
-      style={p.style}
+      className={p?.className}
+      style={p?.style}
       label={label}
       direction="horizontal"
-      nolabel={p.nolabel ?? undefined}
-      nomargin={p.nomargin ?? undefined}
+      nolabel={p?.nolabel ?? undefined}
+      nomargin={p?.nomargin ?? undefined}
       defaultValue="horizontal"
       options={displays}
-      onChange={val => v.updateDisplay(p.name, val as TDisplayType)}
-      value={v.setting?.display ?? 'horizontal'}
-      disabled={v.isMidstreamMode || !v.setting?.canUpdate}
+      onChange={(val: TDisplayType) =>
+        p.isPlatform ? v.updatePlatformSetting(p.id, val) : v.updateDestinationSetting(p.id, val)
+      }
+      value={setting?.display ?? 'horizontal'}
+      disabled={v.isMidstreamMode}
     />
   );
 }

@@ -11,13 +11,12 @@ import { ScenesService, SceneItem, IPartialSettings, IScene } from 'services/sce
 import { IVideoSetting, TDisplayType, VideoSettingsService } from 'services/settings-v2/video';
 import { StreamingService } from 'services/streaming';
 import { TPlatform } from 'services/platforms';
-import { EPlaceType, ReorderNodesCommand } from 'services/editor-commands/commands/reorder-nodes';
+import { EPlaceType } from 'services/editor-commands/commands/reorder-nodes';
 import { EditorCommandsService } from 'services/editor-commands';
 import { Subject } from 'rxjs';
 import { TOutputOrientation } from 'services/restream';
-import { IVideo, IVideoInfo } from 'obs-studio-node';
-import { StreamSettingsService } from 'app-services';
-import { ICustomStreamDestination } from 'services/settings/streaming';
+import { IVideoInfo } from 'obs-studio-node';
+import { StreamSettingsService, ICustomStreamDestination } from 'services/settings/streaming';
 
 interface IDualOutputVideoSettings {
   defaultDisplay: TDisplayType;
@@ -30,7 +29,7 @@ interface IDualOutputVideoSettings {
 interface IDualOutputServiceState {
   displays: TDisplayType[];
   platformSettings: TDualOutputPlatformSettings;
-  destinationSettings: { [destination: string]: IDualOutputDestinationSetting };
+  destinationSettings: Dictionary<IDualOutputDestinationSetting>;
   dualOutputMode: boolean;
   sceneNodeMaps: { [sceneId: string]: Dictionary<string> };
   videoSettings: IDualOutputVideoSettings;
@@ -132,16 +131,6 @@ class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
     return this.state.videoSettings.activeDisplays.vertical;
   }
 
-  // @@@
-  getNodeIds(displays: TDisplayType[]) {
-    return displays.reduce((ids: string[], display: TDisplayType) => {
-      const nodeMap = this.state.sceneNodeMaps[display];
-      const aggregatedIds = Object.values(nodeMap).concat(ids);
-
-      return aggregatedIds;
-    }, []);
-  }
-
   getPlatformDisplay(platform: TPlatform) {
     return this.state.platformSettings[platform].display;
   }
@@ -210,6 +199,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
   @Inject() private videoSettingsService: VideoSettingsService;
   @Inject() private editorCommandsService: EditorCommandsService;
   @Inject() private streamSettingsService: StreamSettingsService;
+  @Inject() private streamingService: StreamingService;
 
   static defaultState: IDualOutputServiceState = {
     displays: ['horizontal', 'vertical'],
@@ -237,15 +227,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
   init() {
     super.init();
 
-    // if the custom destinations do not have assigned displays, assign them on startup
-    this.streamSettingsService.streamSettingsInitiated.subscribe(
-      (customDestinations: ICustomStreamDestination[]) => {
-        customDestinations.forEach(destination => {
-          this.updateDestinationSetting(destination.name, 'horizontal');
-        });
-        this.streamSettingsService.streamSettingsInitiated.unsubscribe();
-      },
-    );
+    this.confirmDestinationDisplays(this.streamingService.views.customDestinations);
 
     // this.sceneCollectionsService.activeCollectionSet.subscribe(collection => {
     //   if (this.state.dualOutputMode) {
@@ -438,12 +420,22 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
    * Settings for platforms to displays
    */
 
-  updatePlatformSetting(platform: TPlatform | string, display: TDisplayType) {
+  updatePlatformSetting(platform: string, display: TDisplayType) {
     this.UPDATE_PLATFORM_SETTING(platform, display);
   }
 
-  updateDestinationSetting(destination: string, display: TDisplayType) {
+  updateDestinationSetting(destination: string, display?: TDisplayType) {
     this.UPDATE_DESTINATION_SETTING(destination, display);
+  }
+
+  confirmDestinationDisplays(destinations: ICustomStreamDestination[]) {
+    if (destinations.length) {
+      destinations.forEach((destination: ICustomStreamDestination) => {
+        if (!this.state.destinationSettings[destination.name]) {
+          this.updateDestinationSetting(destination.name);
+        }
+      });
+    }
   }
 
   /**
@@ -494,25 +486,28 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
 
   @mutation()
   private UPDATE_PLATFORM_SETTING(platform: TPlatform | string, display: TDisplayType) {
-    this.state.platformSettings[platform] = {
-      ...this.state.platformSettings[platform],
-      display,
+    this.state.platformSettings = {
+      ...this.state.platformSettings,
+      [platform]: { ...this.state.platformSettings[platform], display },
     };
   }
 
-  private UPDATE_DESTINATION_SETTING(destination: string, display: TDisplayType) {
+  @mutation()
+  private UPDATE_DESTINATION_SETTING(destination: string, display: TDisplayType = 'horizontal') {
     if (!this.state.destinationSettings[destination]) {
-      // create settings
-      this.state.destinationSettings[destination] = {
-        destination,
-        display: 'horizontal' as TDisplayType,
-        canUpdate: true,
+      // create setting
+      this.state.destinationSettings = {
+        ...this.state.destinationSettings,
+        [destination]: {
+          destination,
+          display,
+        },
       };
     } else {
       // update setting
-      this.state.destinationSettings[destination] = {
-        ...this.state.destinationSettings[destination],
-        display,
+      this.state.destinationSettings = {
+        ...this.state.destinationSettings,
+        [destination]: { ...this.state.destinationSettings[destination], display },
       };
     }
   }

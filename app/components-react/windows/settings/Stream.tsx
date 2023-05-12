@@ -100,18 +100,14 @@ class StreamSettingsModule {
       this.magicLinkService.actions.linkToPrime('slobs-multistream');
       return;
     }
+    const name: string = this.suggestCustomDestName();
     this.state.customDestForm = {
-      name: this.suggestCustomDestName(),
+      name,
       streamKey: '',
       url: '',
       enabled: false,
     };
     this.state.editCustomDestMode = true;
-
-    this.dualOutputService.actions.updateDestinationSetting(
-      this.suggestCustomDestName(),
-      'horizontal',
-    );
   }
 
   removeCustomDest(ind: number) {
@@ -224,6 +220,7 @@ class StreamSettingsModule {
       destinations.splice(ind, 1, this.state.customDestForm);
     } else {
       destinations.push(this.state.customDestForm);
+      this.dualOutputService.actions.updateDestinationSetting(this.state.customDestForm.name);
     }
     this.streamSettingsService.setGoLiveSettings({ customDestinations: destinations });
     this.stopEditing();

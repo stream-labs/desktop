@@ -57,19 +57,7 @@ class GoLiveSettingsState extends StreamInfoView<IGoLiveSettingsState> {
       this.updatePlatform(platform, { enabled: enabledPlatforms.includes(platform) });
     });
   }
-  // switchPlatforms(enabledPlatforms: TPlatform[], forceAll: boolean = false) {
-  //   if (forceAll) {
-  //     this.allLinkedPlatforms.forEach(platform => {
-  //       this.updatePlatform(platform, { enabled: enabledPlatforms.includes(platform) });
-  //     });
-  //   }
 
-  //   const platforms = forceAll ? this.allLinkedPlatforms : this.linkedPlatforms;
-
-  //   platforms.forEach(platform => {
-  //     this.updatePlatform(platform, { enabled: enabledPlatforms.includes(platform) });
-  //   });
-  // }
   /**
    * Enable/disable a custom ingest destinations
    */

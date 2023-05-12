@@ -26,7 +26,6 @@ export function NonUltraDestinationSwitchers(p: INonUltraDestinationSwitchers) {
     switchPlatforms,
     switchCustomDestination,
     isPrimaryPlatform,
-    componentView,
   } = useGoLiveSettings();
   const enabledPlatformsRef = useRef(enabledPlatforms);
   enabledPlatformsRef.current = enabledPlatforms;
@@ -68,14 +67,14 @@ export function NonUltraDestinationSwitchers(p: INonUltraDestinationSwitchers) {
         />
       ))}
       {customDestinations
+        .map((destination: ICustomStreamDestination, index: number) => ({ ...destination, index }))
         .filter(destination => destination.enabled)
-        .map((dest, index) => (
+        .map(destination => (
           <DestinationSwitcher
-            key={index}
-            destination={dest}
-            destinationIndex={index}
-            enabled={customDestinations[index].enabled}
-            onChange={() => switchCustomDestination(index, false)}
+            key={destination.index}
+            destination={destination}
+            enabled={customDestinations[destination.index].enabled}
+            onChange={() => switchCustomDestination(destination.index, false)}
           />
         ))}
 
@@ -97,7 +96,6 @@ export function NonUltraDestinationSwitchers(p: INonUltraDestinationSwitchers) {
 
 interface IDestinationSwitcherProps {
   destination: TPlatform | ICustomStreamDestination;
-  destinationIndex?: number; // for adding/removing custom destinations
   enabled: boolean;
   onChange: (enabled: boolean) => unknown;
   isPrimary?: boolean;
@@ -166,9 +164,6 @@ const DestinationSwitcher = React.forwardRef<{ addClass: () => void }, IDestinat
         };
       }
     })();
-
-    const platformKey = title.toLowerCase() as TPlatform;
-
     return (
       <div className={styles.platformSwitcher}>
         <div
@@ -191,60 +186,9 @@ const DestinationSwitcher = React.forwardRef<{ addClass: () => void }, IDestinat
         </div>
         <div className={styles.platformDisplay}>
           <span className={styles.label}>{`${$t('Output')}:`}</span>
-          <DisplaySelector name={platformKey} nolabel nomargin />
+          <DisplaySelector id={title} isPlatform={!!platform} nolabel nomargin />
         </div>
       </div>
     );
   },
 );
-
-// interface IActionSwitchProps {
-//   isPrimary?: boolean | undefined;
-//   enabled?: boolean;
-//   platform?: TPlatform;
-//   destination?: ICustomStreamDestination;
-// }
-
-// /**
-//  * Render switch or close icon
-//  */
-
-// const ActionSwitch = React.forwardRef<HTMLInputElement, IActionSwitchProps>((p, ref) => {
-//   const { UserService } = Services;
-//   const isPrime = UserService.views.isPrime;
-
-//   if (isPrime) {
-//     if (p.platform) {
-//       return (
-//         <SwitchInput
-//           inputRef={ref}
-//           value={p.enabled}
-//           name={p.platform}
-//           disabled={p?.isPrimary}
-//           uncontrolled
-//           className={styles.platformSwitch}
-//           checkedChildren={<i className="icon-check-mark" />}
-//         />
-//       );
-//     } else {
-//       const destination = p.destination;
-//       return (
-//         <SwitchInput
-//           inputRef={ref}
-//           value={destination?.enabled}
-//           name={`destination_${destination?.name}`}
-//           uncontrolled
-//           className={styles.platformSwitch}
-//           checkedChildren={<i className="icon-check-mark" />}
-//         />
-//       );
-//     }
-//   } else {
-//     if (p.isPrimary) {
-//       return <i className="icon-close" ref={ref} />;
-//     } else {
-//       // return empty div so that the click handler has a reference
-//       return <div ref={ref} />;
-//     }
-//   }
-// });
