@@ -4,7 +4,7 @@ import { Tooltip } from 'antd';
 import { inject, useModule } from 'slap';
 import { $t } from 'services/i18n';
 import { ModalLayout } from 'components-react/shared/ModalLayout';
-import PlatformLogo from 'components-react/shared/PlatformLogo';
+import { ListInput } from 'components-react/shared/inputs';
 import { RecordingModeService, UserService } from 'app-services';
 import styles from './RecordingHistory.m.less';
 import AutoProgressBar from 'components-react/shared/AutoProgressBar';
@@ -21,8 +21,29 @@ class RecordingHistoryModule {
     return this.UserService.views.linkedPlatforms.includes('youtube');
   }
 
+  get hasSLID() {
+    return !!this.UserService.views.auth?.slid?.id;
+  }
+
   get uploadInfo() {
     return this.RecordingModeService.state.uploadInfo;
+  }
+
+  get uploadOptions() {
+    const opts = [];
+    if (this.hasYoutube) opts.push({ label: 'YouTube', value: 'youtube' });
+    if (this.hasSLID) {
+      opts.push({ label: 'Cross Clip', value: 'crossclip' });
+      opts.push({ label: 'TypeStudio', value: 'typestudio' });
+    }
+
+    return opts;
+  }
+
+  handleSelect(filename: string) {
+    return (value: string) => {
+      if (value === 'youtube') return this.uploadToYoutube(filename);
+    };
   }
 
   formattedTimestamp(timestamp: string) {
@@ -43,7 +64,7 @@ class RecordingHistoryModule {
 }
 
 export default function RecordingHistory() {
-  const { recordings, hasYoutube, formattedTimestamp, uploadToYoutube, showFile } = useModule(
+  const { recordings, formattedTimestamp, showFile, uploadOptions, handleSelect } = useModule(
     RecordingHistoryModule,
   );
 
@@ -54,18 +75,18 @@ export default function RecordingHistory() {
         {recordings.map(recording => (
           <div className={styles.recording} key={recording.timestamp}>
             <span>{formattedTimestamp(recording.timestamp)}</span>
+            {uploadOptions.length > 0 && (
+              <ListInput
+                onSelect={handleSelect(recording.filename)}
+                label={$t('Upload To')}
+                options={uploadOptions}
+              />
+            )}
             <Tooltip title={$t('Show in folder')}>
               <span onClick={() => showFile(recording.filename)} className={styles.filename}>
                 {recording.filename}
               </span>
             </Tooltip>
-            {hasYoutube && (
-              <Tooltip title={$t('Upload to YouTube')} placement="left">
-                <div onClick={() => uploadToYoutube(recording.filename)}>
-                  <PlatformLogo platform="youtube" />
-                </div>
-              </Tooltip>
-            )}
           </div>
         ))}
       </div>
