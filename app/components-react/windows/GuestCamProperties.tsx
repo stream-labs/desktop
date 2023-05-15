@@ -14,6 +14,7 @@ import { DismissablesService, EDismissable } from 'services/dismissables';
 import { EDeviceType } from 'services/hardware';
 import { $t } from 'services/i18n';
 import { SourcesService, TSourceType } from 'services/sources';
+import { ScenesService } from 'services/scenes';
 import { byOS, OS } from 'util/operating-systems';
 import { IGuest, GuestCamService } from 'services/guest-cam';
 import { inject, injectState, useModule } from 'slap';
@@ -29,6 +30,7 @@ import { EAvailableFeatures } from 'services/incremental-rollout';
 class GuestCamModule {
   private GuestCamService = inject(GuestCamService);
   private SourcesService = inject(SourcesService);
+  private ScenesService = inject(ScenesService);
   private AudioService = inject(AudioService);
   private EditorCommandsService = inject(EditorCommandsService);
   private DismissablesService = inject(DismissablesService);
@@ -110,14 +112,23 @@ class GuestCamModule {
   }
 
   get screenshareProducerSourceOptions() {
+    const noSources = { label: $t('None'), value: '' };
+
+    // TODO: consider moving to service
+    const scene = this.ScenesService.views.getScene(this.ScenesService.state.activeSceneId);
+
+    if (!scene) {
+      return [noSources];
+    }
+
+    const activeSceneSources = scene.getNestedSources().filter(sceneItem => sceneItem.video);
+
     return [
-      { label: $t('None'), value: '' },
-      ...this.SourcesService.views.sources
-        .filter(s => s.video)
-        .map(s => ({
-          label: s.name,
-          value: s.sourceId,
-        })),
+      noSources,
+      ...activeSceneSources.map(s => ({
+        label: s.name,
+        value: s.sourceId,
+      })),
     ];
   }
 
