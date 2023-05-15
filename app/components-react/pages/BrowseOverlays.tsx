@@ -37,11 +37,13 @@ export default function BrowseOverlays(p: {
       },
     });
 
-    view.webContents.setWindowOpenHandler(details => {
-      const protocol = urlLib.parse(details.url).protocol;
+    electron.ipcRenderer.send('webContents-preventPopup', view.webContents.id);
+
+    view.webContents.on('new-window', (e, url) => {
+      const protocol = urlLib.parse(url).protocol;
 
       if (protocol === 'http:' || protocol === 'https:') {
-        remote.shell.openExternal(details.url);
+        remote.shell.openExternal(url);
       }
 
       return { action: 'deny' };

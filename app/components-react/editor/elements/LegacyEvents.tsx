@@ -19,8 +19,10 @@ export default function LegacyEvents(p: { onPopout: () => void }) {
   }
 
   function handleBrowserViewReady(view: Electron.BrowserView) {
-    view.webContents.setWindowOpenHandler(details => {
-      const match = details.url.match(/dashboard\/([^\/^\?]*)/);
+    electron.ipcRenderer.send('webContents-preventPopup', view.webContents.id);
+
+    view.webContents.on('new-window', async (e, url) => {
+      const match = url.match(/dashboard\/([^\/^\?]*)/);
 
       if (match && match[1] === 'recent-events') {
         popoutRecentEvents();
@@ -40,7 +42,7 @@ export default function LegacyEvents(p: { onPopout: () => void }) {
 
         magicLinkDisabled.current = false;
       } else {
-        remote.shell.openExternal(details.url);
+        remote.shell.openExternal(url);
       }
 
       return { action: 'deny' };

@@ -201,6 +201,7 @@ export class ChatService extends Service {
   private bindWindowListener() {
     if (!this.chatView) return; // chat was already deinitialized
 
+    electron.ipcRenderer.send('webContents-preventPopup', this.chatView.webContents.id);
     if (this.userService.platformType === 'youtube') {
       // Preventing navigation has to be done in the main process
       ipcRenderer.send('webContents-bindYTChat', this.chatView.webContents.id);
@@ -226,8 +227,8 @@ export class ChatService extends Service {
       });
     }
 
-    this.chatView.webContents.setWindowOpenHandler(details => {
-      const parsedUrl = url.parse(details.url);
+    this.chatView.webContents.on('new-window', (evt, targetUrl) => {
+      const parsedUrl = url.parse(targetUrl);
       const protocol = parsedUrl.protocol;
 
       if (protocol === 'http:' || protocol === 'https:') {
@@ -250,7 +251,7 @@ export class ChatService extends Service {
             'ffz-settings',
           );
           // Recognize trovo login and perform in an embedded window
-        } else if (details.url === 'https://trovo.live/?openLogin=1') {
+        } else if (targetUrl === 'https://trovo.live/?openLogin=1') {
           const loginWindow = new remote.BrowserWindow({
             width: 600,
             height: 800,
@@ -276,9 +277,9 @@ export class ChatService extends Service {
           });
 
           loginWindow.removeMenu();
-          loginWindow.loadURL(details.url);
+          loginWindow.loadURL(targetUrl);
         } else {
-          remote.shell.openExternal(details.url);
+          remote.shell.openExternal(targetUrl);
         }
       }
 
