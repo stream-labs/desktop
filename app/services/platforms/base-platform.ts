@@ -14,8 +14,7 @@ import { DualOutputService } from 'services/dual-output';
 import { IFacebookStartStreamOptions } from './facebook';
 import { StreamSettingsService } from '../settings/streaming';
 import * as remote from '@electron/remote';
-import { TDisplayType, VideoSettingsService } from 'services/settings-v2/video';
-import { GreenService } from 'services/green';
+import { VideoSettingsService } from 'services/settings-v2/video';
 
 const VIEWER_COUNT_UPDATE_INTERVAL = 60 * 1000;
 

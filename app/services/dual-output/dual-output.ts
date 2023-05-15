@@ -18,8 +18,9 @@ import { TOutputOrientation } from 'services/restream';
 import { IVideoInfo } from 'obs-studio-node';
 import { StreamSettingsService, ICustomStreamDestination } from 'services/settings/streaming';
 
-interface IDualOutputVideoSettings {
+interface IDisplayVideoSettings {
   defaultDisplay: TDisplayType;
+  horizontal: IVideoInfo;
   vertical: IVideoInfo;
   activeDisplays: {
     horizontal: boolean;
@@ -32,7 +33,7 @@ interface IDualOutputServiceState {
   destinationSettings: Dictionary<IDualOutputDestinationSetting>;
   dualOutputMode: boolean;
   sceneNodeMaps: { [sceneId: string]: Dictionary<string> };
-  videoSettings: IDualOutputVideoSettings;
+  videoSettings: IDisplayVideoSettings;
 }
 
 class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
@@ -69,13 +70,9 @@ class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
   }
 
   get verticalNodeIds(): string[] {
-    const activeSceneId = this.activeSceneId;
-
     if (!this.hasVerticalNodes) return;
 
-    return Object.entries(this.state.sceneNodeMaps[activeSceneId]).map(
-      ([key, value]: [string, string]) => value,
-    );
+    return Object.values(this.state.sceneNodeMaps[this.activeSceneId]);
   }
 
   get displays() {
@@ -209,6 +206,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
     sceneNodeMaps: {},
     videoSettings: {
       defaultDisplay: 'horizontal',
+      horizontal: null,
       vertical: verticalDisplayData, // get settings for horizontal display from obs directly
       activeDisplays: {
         horizontal: true,
@@ -534,6 +532,22 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
     const { entry, ...sceneNodeMap } = this.state.sceneNodeMaps[sceneId];
 
     this.state.sceneNodeMaps = { ...this.state.sceneNodeMaps, [sceneId]: sceneNodeMap };
+  }
+
+  @mutation()
+  private REMOVE_DUAL_OUTPUT_NODES(nodeId: string) {
+    // remove all vertical nodes from scene
+
+    let newMap = {};
+    for (const display in this.state.sceneNodeMaps) {
+      newMap = {
+        ...newMap,
+        [display]: Object.entries(this.state.sceneNodeMaps[display]).filter(
+          ([key, val]) => key !== nodeId,
+        ),
+      };
+    }
+    this.state.sceneNodeMaps = newMap;
   }
 
   @mutation()

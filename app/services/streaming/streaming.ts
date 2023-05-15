@@ -132,7 +132,6 @@ export class StreamingService
         trovo: 'not-started',
         setupMultistream: 'not-started',
         setupDualOutput: 'not-started',
-        setupGreen: 'not-started', // @@@ remove
         startVideoTransmission: 'not-started',
         postTweet: 'not-started',
       },

@@ -51,7 +51,6 @@ export interface IStreamInfo {
     trovo: TGoLiveChecklistItemState;
     setupMultistream: TGoLiveChecklistItemState;
     setupDualOutput: TGoLiveChecklistItemState;
-    setupGreen: TGoLiveChecklistItemState; // refactor to merge with dual output
     startVideoTransmission: TGoLiveChecklistItemState;
     postTweet: TGoLiveChecklistItemState;
   };
