@@ -27,8 +27,9 @@ export default function DisplaySelector(p: IDisplaySelectorProps) {
     isMidstreamMode: StreamingService.views.isMidStreamMode,
   }));
 
+  const id = p.isPlatform ? p.id.toLowerCase() : p.id;
   const label = p.isPlatform ? platformLabels(p.id) : p.id;
-  const setting = p.isPlatform ? v.platformSettings[p.id] : v.destinationSettings[p.id];
+  const setting = p.isPlatform ? v.platformSettings[id] : v.destinationSettings[id];
 
   const displays = [
     {
@@ -52,7 +53,7 @@ export default function DisplaySelector(p: IDisplaySelectorProps) {
       defaultValue="horizontal"
       options={displays}
       onChange={(val: TDisplayType) =>
-        p.isPlatform ? v.updatePlatformSetting(p.id, val) : v.updateDestinationSetting(p.id, val)
+        p.isPlatform ? v.updatePlatformSetting(id, val) : v.updateDestinationSetting(id, val)
       }
       value={setting?.display ?? 'horizontal'}
       disabled={v.isMidstreamMode}

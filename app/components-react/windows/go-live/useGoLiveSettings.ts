@@ -193,6 +193,18 @@ export class GoLiveSettingsModule {
    * Validate the form and show an error message
    */
   async validate() {
+    if (
+      Services.DualOutputService.views.dualOutputMode &&
+      !Services.DualOutputService.views.canStreamDualOutput
+    ) {
+      message.error(
+        $t(
+          'To use Dual Output you must stream to at least one horizontal and one vertical platform.',
+        ),
+      );
+      return false;
+    }
+
     try {
       await getDefined(this.form).validateFields();
       return true;

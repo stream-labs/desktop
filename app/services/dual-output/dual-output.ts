@@ -125,6 +125,14 @@ class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
     );
   }
 
+  get canStreamDualOutput(): boolean {
+    // determine if both displays are selected for active platforms
+    return (
+      this.activeDisplayPlatforms.horizontal.length > 0 &&
+      this.activeDisplayPlatforms.vertical.length > 0
+    );
+  }
+
   get videoSettings() {
     return this.state.videoSettings;
   }
