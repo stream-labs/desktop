@@ -94,6 +94,7 @@ export class SceneCollectionsService extends Service implements ISceneCollection
   collectionWillSwitch = new Subject<void>();
   collectionUpdated = new Subject<ISceneCollectionsManifestEntry>();
   collectionInitialized = new Subject<void>();
+  collectionActivated = new Subject<ISceneCollectionsManifestEntry>();
 
   /**
    * Whether a valid collection is currently loaded.
@@ -208,6 +209,9 @@ export class SceneCollectionsService extends Service implements ISceneCollection
   async create(
     options: ISceneCollectionInternalCreateOptions = {},
   ): Promise<ISceneCollectionsManifestEntry> {
+    if (this.dualOutputService.views.dualOutputMode) {
+      this.dualOutputService.actions.setIsCollectionOrSceneLoading(true);
+    }
     await this.deloadCurrentApplicationState();
 
     const name = options.name || this.suggestName(DEFAULT_COLLECTION_NAME);
@@ -467,6 +471,10 @@ export class SceneCollectionsService extends Service implements ISceneCollection
     return this.stateService.activeCollection;
   }
 
+  get sceneNodeMaps() {
+    return this.stateService.sceneNodeMaps;
+  }
+
   /* PRIVATE ----------------------------------------------------- */
 
   /**
@@ -720,6 +728,11 @@ export class SceneCollectionsService extends Service implements ISceneCollection
           .makeSceneCollectionActive(collection.serverId)
           .catch(e => console.warn('Failed setting active collection'));
       }
+
+      if (!collection.sceneNodeMaps) {
+        collection.sceneNodeMaps = {};
+      }
+
       this.stateService.SET_ACTIVE_COLLECTION(id);
     }
   }
@@ -916,5 +929,36 @@ export class SceneCollectionsService extends Service implements ISceneCollection
 
   canSync(): boolean {
     return this.userService.isLoggedIn && !this.appService.state.argv.includes('--nosync');
+  }
+
+  /**
+   * Save a node map in the scene collection manifest for each scene
+   * so that the horizontal and vertical nodes for dual output mode
+   * can reference each other
+   */
+
+  createNodeMapEntry(sceneId: string, horizontalNodeId: string, verticalNodeId: string) {
+    const id = this.activeCollection.id;
+
+    if (!this.activeCollection.sceneNodeMaps[sceneId]) {
+      this.activeCollection.sceneNodeMaps[sceneId] = {};
+    }
+    this.activeCollection.sceneNodeMaps[sceneId] = {
+      ...this.activeCollection.sceneNodeMaps[sceneId],
+      [horizontalNodeId]: verticalNodeId,
+    };
+    // this.stateService.CREATE_NODE_MAP_ENTRY(id, sceneId, horizontalNodeId, verticalNodeId);
+  }
+
+  removeVerticalNode(sceneItemId: string, sceneId: string) {
+    const id = this.activeCollection.id;
+
+    const nodeMap = this.activeCollection.sceneNodeMaps[sceneId];
+    if (!nodeMap) return;
+    delete nodeMap[sceneItemId];
+
+    this.activeCollection.sceneNodeMaps[sceneId] = { ...nodeMap };
+
+    // this.stateService.REMOVE_VERTICAL_NODE(id, sceneItemId, sceneId);
   }
 }

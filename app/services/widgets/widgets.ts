@@ -366,7 +366,7 @@ export class WidgetsService
       widgetItem = scene.createAndAddSource(scene.name, 'browser_source');
     }
 
-    if (this.dualOutputService.views.hasVerticalNodes) {
+    if (this.dualOutputService.views.hasNodeMap()) {
       this.dualOutputService.views.displays.forEach(display => {
         // create widget
         this.createWidgetFromJSON(

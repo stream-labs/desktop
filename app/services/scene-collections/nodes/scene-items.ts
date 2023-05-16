@@ -11,6 +11,7 @@ import {
 import { HotkeysNode } from './hotkeys';
 import { SourcesService } from '../../sources';
 import { Inject } from '../../core/injector';
+import { TDisplayType } from 'services/settings-v2';
 
 interface ISchema {
   items: TSceneNodeInfo[];
@@ -33,6 +34,7 @@ export interface ISceneItemInfo extends ISceneNodeInfo {
   blendingMode?: EBlendingMode;
   blendingMethod?: EBlendingMethod;
   sceneNodeType: 'item';
+  display?: TDisplayType;
 }
 
 interface ISceneItemFolderInfo extends ISceneNodeInfo {

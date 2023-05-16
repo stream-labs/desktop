@@ -14,22 +14,26 @@ export function DualOutputSourceSelector(p: { nodeId: string }) {
   const horizontalNodeId = p.nodeId;
 
   const v = useVuex(() => ({
-    showDualOutputDisplays: DualOutputService.views.dualOutputMode,
+    hasVerticalNodes: DualOutputService.views.hasVerticalNodes,
     verticalNodeId: DualOutputService.views.getVerticalNodeId(p.nodeId),
     isHorizontalVisible: ScenesService.views.getNodeVisibility(p.nodeId),
-    isVerticalVisible: DualOutputService.views.getDisplayNodeVisibility(p.nodeId, 'vertical'),
+    isVerticalVisible: DualOutputService.views.hasVerticalNodes
+      ? ScenesService.views.getNodeVisibility(DualOutputService.views.activeSceneNodeMap[p.nodeId])
+      : undefined,
+    isLoading: DualOutputService.views.isLoading,
   }));
+
+  console.log('hasVerticalNodes ', v?.hasVerticalNodes);
+  console.log('verticalNodeId ', v?.verticalNodeId);
 
   return (
     <>
-      {/* @@@ TODO: update font and font icons.*/}
-
       <i
         onClick={() => toggleVisibility(horizontalNodeId)}
         className={v.isHorizontalVisible ? 'icon-desktop' : 'icon-desktop-hide'}
       />
 
-      {v.verticalNodeId && (
+      {!v?.isLoading && v?.hasVerticalNodes && v?.verticalNodeId && (
         <i
           onClick={() => toggleVisibility(v.verticalNodeId)}
           className={v.isVerticalVisible ? 'icon-phone-case' : 'icon-phone-case-hide'}

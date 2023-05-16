@@ -49,6 +49,7 @@ export interface ISceneItemInfo {
   scaleFilter?: EScaleType;
   blendingMode?: EBlendingMode;
   blendingMethod?: EBlendingMethod;
+  display?: TDisplayType;
 }
 
 export interface IScenesState {
@@ -199,11 +200,6 @@ class ScenesViews extends ViewHandler<IScenesState> {
     return scene.getItems();
   }
 
-  hasSceneItems(sceneId: string): boolean {
-    const sceneItems = this.getSceneItemsBySceneId(sceneId);
-    return sceneItems.length > 0;
-  }
-
   /**
    * Returns an array of all scene items across all scenes
    * referencing the given source id.
@@ -237,7 +233,6 @@ class ScenesViews extends ViewHandler<IScenesState> {
   }
 }
 
-@InitAfter('GreenService')
 @InitAfter('DualOutputService')
 export class ScenesService extends StatefulService<IScenesState> {
   @Inject() private dualOutputService: DualOutputService;
@@ -255,6 +250,7 @@ export class ScenesService extends StatefulService<IScenesState> {
   sceneAdded = new Subject<IScene>();
   sceneRemoved = new Subject<IScene>();
   sceneSwitched = new Subject<IScene>();
+  sceneWillSwitch = new Subject<IScene>();
   itemAdded = new Subject<ISceneItem & ISource>();
   itemRemoved = new Subject<ISceneItem & ISource>();
   itemUpdated = new Subject<ISceneItem & ISource>();
@@ -318,11 +314,20 @@ export class ScenesService extends StatefulService<IScenesState> {
         .reverse()
         .forEach(item => {
           const newItem = newScene.addSource(item.sourceId);
+          const display = item?.display ?? this.dualOutputService.views.getNodeDisplay(item.id, id);
+          const context = this.videoSettingsService.contexts[display];
           const settings = {
             ...item.getSettings(),
-            output: this.videoSettingsService.contexts.horizontal,
+            output: context,
+            display,
           };
           newItem.setSettings(settings);
+
+          // if we're creating the scene in dual output mode
+          // also create scene items for the vertical display
+          if (this.dualOutputService.views.dualOutputMode) {
+            this.dualOutputService.actions.createOrAssignOutputNode(newItem, 'vertical', false, id);
+          }
         });
     }
 
@@ -388,6 +393,7 @@ export class ScenesService extends StatefulService<IScenesState> {
     if (!scene) return false;
 
     const activeScene = this.views.activeScene;
+    this.sceneWillSwitch.next(activeScene?.getModel());
 
     this.MAKE_SCENE_ACTIVE(id);
 

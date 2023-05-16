@@ -17,6 +17,7 @@ import { Subject } from 'rxjs';
 import { TOutputOrientation } from 'services/restream';
 import { IVideoInfo } from 'obs-studio-node';
 import { StreamSettingsService, ICustomStreamDestination } from 'services/settings/streaming';
+import { SceneCollectionsService } from 'services/scene-collections';
 
 interface IDisplayVideoSettings {
   defaultDisplay: TDisplayType;
@@ -32,14 +33,15 @@ interface IDualOutputServiceState {
   platformSettings: TDualOutputPlatformSettings;
   destinationSettings: Dictionary<IDualOutputDestinationSetting>;
   dualOutputMode: boolean;
-  sceneNodeMaps: { [sceneId: string]: Dictionary<string> };
   videoSettings: IDisplayVideoSettings;
+  isLoading: boolean;
 }
 
 class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
   @Inject() private scenesService: ScenesService;
   @Inject() private videoSettingsService: VideoSettingsService;
   @Inject() private streamingService: StreamingService;
+  @Inject() private sceneCollectionsService: SceneCollectionsService;
 
   get activeSceneId(): string {
     return this.scenesService.views.activeSceneId;
@@ -47,6 +49,18 @@ class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
 
   get dualOutputMode(): boolean {
     return this.state.dualOutputMode;
+  }
+
+  get isLoading(): boolean {
+    return this.state.isLoading;
+  }
+
+  get sceneNodeMaps() {
+    return this.sceneCollectionsService.activeCollection.sceneNodeMaps;
+  }
+
+  get activeSceneNodeMap() {
+    return this.sceneCollectionsService.sceneNodeMaps[this.activeSceneId];
   }
 
   get shouldCreateVerticalNode(): boolean {
@@ -62,7 +76,7 @@ class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
   }
 
   get hasVerticalNodes() {
-    return !!this.state.sceneNodeMaps[this.activeSceneId];
+    return !!this.sceneNodeMaps[this.activeSceneId];
   }
 
   get hasVerticalContext() {
@@ -70,9 +84,13 @@ class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
   }
 
   get verticalNodeIds(): string[] {
-    if (!this.hasVerticalNodes) return;
+    console.log('this.activeSceneId ', this.activeSceneId);
+    console.log('this.sceneNodeMaps ', this.sceneNodeMaps);
+    if (!this.activeSceneNodeMap) return;
 
-    return Object.values(this.state.sceneNodeMaps[this.activeSceneId]);
+    console.log('Object.values(this.activeSceneNodeMap) ', Object.values(this.activeSceneNodeMap));
+    return Object.values(this.activeSceneNodeMap);
+    // return Object.entries(this.activeSceneNodeMap).map(([key, value]: [string, string]) => value);
   }
 
   get displays() {
@@ -102,10 +120,6 @@ class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
       },
       { horizontal: [], vertical: [] },
     );
-  }
-
-  get sceneNodeMaps() {
-    return this.state.sceneNodeMaps;
   }
 
   get videoSettings() {
@@ -149,15 +163,14 @@ class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
   }
 
   getHorizontalNodeId(verticalNodeId: string, sceneId: string) {
-    const sceneNodeMap = this.state.sceneNodeMaps[sceneId];
-    return Object.keys(sceneNodeMap).find(
-      horizontalNodeId => sceneNodeMap[horizontalNodeId] === verticalNodeId,
+    const sceneNodeMap = sceneId ? this.sceneNodeMaps[sceneId] : this.activeSceneNodeMap;
+    return Object.values(sceneNodeMap).find(
+      (horizontalNodeId: string) => sceneNodeMap[horizontalNodeId] === verticalNodeId,
     );
   }
 
-  getVerticalNodeId(defaultNodeId: string) {
-    const activeSceneId: string = this.activeSceneId;
-    return this.hasVerticalNodes ? this.sceneNodeMaps[activeSceneId][defaultNodeId] : undefined;
+  getVerticalNodeId(defaultNodeId: string): string {
+    return this.activeSceneNodeMap ? this.activeSceneNodeMap[defaultNodeId] : undefined;
   }
 
   getDisplayNodeVisibility(defaultNodeId: string, display?: TDisplayType) {
@@ -170,7 +183,7 @@ class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
   }
 
   getNodeDisplay(nodeId: string, sceneId: string) {
-    const sceneNodeMap = this.state.sceneNodeMaps[sceneId];
+    const sceneNodeMap = sceneId ? this.sceneNodeMaps[sceneId] : this.activeSceneNodeMap;
 
     if (sceneNodeMap && Object.values(sceneNodeMap).includes(nodeId)) {
       return 'vertical';
@@ -185,8 +198,8 @@ class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
     return this.getPlatformDisplay(platform) === 'horizontal' ? 'landscape' : 'portrait';
   }
 
-  hasNodeMap(sceneId: string) {
-    return this.state.sceneNodeMaps[sceneId];
+  hasNodeMap(sceneId?: string) {
+    return sceneId ? !!this.sceneNodeMaps[sceneId] : !!this.activeSceneNodeMap;
   }
 }
 
@@ -195,7 +208,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
   @Inject() private scenesService: ScenesService;
   @Inject() private videoSettingsService: VideoSettingsService;
   @Inject() private editorCommandsService: EditorCommandsService;
-  @Inject() private streamSettingsService: StreamSettingsService;
+  @Inject() private sceneCollectionsService: SceneCollectionsService;
   @Inject() private streamingService: StreamingService;
 
   static defaultState: IDualOutputServiceState = {
@@ -203,7 +216,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
     platformSettings: DualOutputPlatformSettings,
     destinationSettings: {},
     dualOutputMode: false,
-    sceneNodeMaps: {},
+    // sceneNodeMaps: {},
     videoSettings: {
       defaultDisplay: 'horizontal',
       horizontal: null,
@@ -213,10 +226,12 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
         vertical: false,
       },
     },
+    isLoading: false,
   };
 
   sceneItemsConfirmed = new Subject();
   sceneItemsDestroyed = new Subject();
+  sceneItemHandled = new Subject<number>();
 
   get views() {
     return new DualOutputViews(this.state);
@@ -227,6 +242,11 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
 
     this.confirmDestinationDisplays(this.streamingService.views.customDestinations);
 
+    this.sceneCollectionsService.collectionSwitched.subscribe(() => {
+      if (this.state.dualOutputMode) {
+        this.setIsCollectionOrSceneLoading(false);
+      }
+    });
     // this.sceneCollectionsService.activeCollectionSet.subscribe(collection => {
     //   if (this.state.dualOutputMode) {
     //     // collection.sceneNodeMaps
@@ -242,10 +262,39 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
     //   }
     // });
 
+    // this.sceneCollectionsService.collectionSwitched.subscribe(() => {
+    //   console.log('switched');
+    //   this.confirmOrCreateVerticalNodes();
+    // });
+
+    // this.sceneCollectionsService.collectionAdded.subscribe(collection => {
+    //   console.log('added');
+    //   this.confirmOrCreateVerticalNodes();
+    // });
+
+    // this.sceneCollectionsService.collectionInitialized.subscribe(() => {
+    //   console.log('collection init');
+    //   this.confirmOrCreateVerticalNodes();
+    // });
+
+    this.scenesService.sceneWillSwitch.subscribe(() => {
+      if (this.state.dualOutputMode && !this.state.isLoading) {
+        this.setIsCollectionOrSceneLoading(true);
+      }
+    });
+
     this.scenesService.sceneSwitched.subscribe(scene => {
+      console.log('scene switched');
+      // confirm scene collection node map is initiated ??
+
       // if the scene is not empty, handle vertical nodes
-      if (scene.nodes.length) {
+      if (scene?.nodes.length) {
+        console.log('------------ mapping this.views.sceneNodeMaps ', this.views.sceneNodeMaps);
         this.confirmOrCreateVerticalNodes(scene.id);
+      }
+
+      if (this.state.dualOutputMode) {
+        this.setIsCollectionOrSceneLoading(false);
       }
     });
 
@@ -276,6 +325,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
    */
 
   setdualOutputMode() {
+    this.confirmOrCreateVerticalNodes();
     this.SET_SHOW_DUAL_OUTPUT();
   }
 
@@ -284,19 +334,21 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
    */
 
   confirmOrCreateVerticalNodes(sceneId?: string) {
-    if (!this.videoSettingsService.contexts.vertical) {
+    if (this.state.dualOutputMode && !this.videoSettingsService.contexts.vertical) {
       this.videoSettingsService.establishVideoContext('vertical');
     }
-
-    const id = sceneId ?? this.views.activeSceneId;
-    if (!this.state.sceneNodeMaps[id]) {
+    console.log('sceneNodeMaps ', this.views.sceneNodeMaps);
+    console.log('activeCollection ', this.sceneCollectionsService.activeCollection);
+    if (!this.views.hasNodeMap(sceneId) && this.state.dualOutputMode) {
       try {
+        console.log('CREATING');
         this.createSceneNodes(this.views.displays);
       } catch (error: unknown) {
         console.error('Error toggling Dual Output mode: ', error);
       }
     } else {
       try {
+        console.log('ASSIGNING');
         this.assignSceneNodes();
       } catch (error: unknown) {
         console.error('Error toggling Dual Output mode: ', error);
@@ -307,22 +359,35 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
   }
 
   assignSceneNodes(sceneId?: string) {
-    if (!this.videoSettingsService.contexts.vertical) {
-      this.videoSettingsService.establishVideoContext('vertical');
+    // assign nodes to both contexts in dual output mode
+    if (this.state.dualOutputMode && this.views.hasNodeMap(sceneId)) {
+      if (!this.videoSettingsService.contexts.vertical) {
+        this.videoSettingsService.establishVideoContext('vertical');
+      }
+
+      const sceneToMapId = sceneId ?? this.views.activeSceneId;
+      const sceneItems = this.scenesService.views.getSceneItemsBySceneId(sceneToMapId);
+      const verticalNodeIds = this.views.verticalNodeIds;
+
+      sceneItems.forEach((sceneItem: SceneItem, index: number) => {
+        const display = verticalNodeIds?.includes(sceneItem.id) ? 'vertical' : 'horizontal';
+        this.assignNodeContext(sceneItem, display);
+        this.sceneItemHandled.next(index);
+      });
+    } else {
+      // only assign scene node context to horizontal nodes when dual output mode is off
+      const sceneToMapId = sceneId ?? this.views.activeSceneId;
+      const sceneItems = this.scenesService.views.getSceneItemsBySceneId(sceneToMapId);
+
+      sceneItems.forEach((sceneItem: SceneItem, index: number) => {
+        this.assignNodeContext(sceneItem, 'horizontal');
+        this.sceneItemHandled.next(index);
+      });
     }
-
-    const sceneToMapId = sceneId ?? this.views.activeSceneId;
-    const sceneItems = this.scenesService.views.getSceneItemsBySceneId(sceneToMapId);
-    const verticalNodeIds = this.views.verticalNodeIds;
-
-    sceneItems.forEach(sceneItem => {
-      const display = verticalNodeIds.includes(sceneItem.id) ? 'vertical' : 'horizontal';
-      this.assignNodeContext(sceneItem, display);
-    });
   }
 
   createSceneNodes(displays: TDisplayType[], sceneId?: string) {
-    if (!this.videoSettingsService.contexts.vertical) {
+    if (this.state.dualOutputMode && !this.videoSettingsService.contexts.vertical) {
       this.videoSettingsService.establishVideoContext('vertical');
     }
 
@@ -334,6 +399,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
       if (!nodesCreated) {
         created = false;
       }
+
       return created;
     }, true);
   }
@@ -341,7 +407,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
   createOutputNodes(sceneId: string, display: TDisplayType, isFirstDisplay: boolean) {
     const sceneNodes = this.scenesService.views.getSceneItemsBySceneId(sceneId);
     if (!sceneNodes) return false;
-    return sceneNodes.reduce((created: boolean, sceneItem: SceneItem) => {
+    return sceneNodes.reduce((created: boolean, sceneItem: SceneItem, index: number) => {
       const nodeCreatedId = this.createOrAssignOutputNode(
         sceneItem,
         display,
@@ -351,6 +417,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
       if (!nodeCreatedId) {
         created = false;
       }
+      this.sceneItemHandled.next(index);
       return created;
     }, true);
   }
@@ -384,7 +451,8 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
         EPlaceType.Before,
       );
 
-      this.SET_NODE_MAP_ITEM(display, sceneItem.id, copiedSceneItem.id, sceneId);
+      this.sceneCollectionsService.createNodeMapEntry(sceneId, sceneItem.id, copiedSceneItem.id);
+      // this.SET_NODE_MAP_ITEM(display, sceneItem.id, copiedSceneItem.id, sceneId);
       return copiedSceneItem;
     }
   }
@@ -401,8 +469,10 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
    * Helper functions for adding and removing scene items in dual output mode
    */
 
-  removeVerticalNode(nodeId: string, sceneId: string) {
-    this.REMOVE_VERTICAL_NODE(nodeId, sceneId);
+  removeVerticalNode(sceneId: string, nodeId: string) {
+    console.log('removing ', nodeId, ' from ', sceneId);
+    this.scenesService.views.getScene(sceneId).removeItem(nodeId);
+    this.sceneCollectionsService.removeVerticalNode(sceneId, nodeId);
   }
 
   restoreNodesToMap(
@@ -411,7 +481,12 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
     verticalSceneItemId: string,
     sceneId: string,
   ) {
-    this.SET_NODE_MAP_ITEM(display, horizontalSceneItemId, verticalSceneItemId, sceneId);
+    this.sceneCollectionsService.createNodeMapEntry(
+      sceneId,
+      horizontalSceneItemId,
+      verticalSceneItemId,
+    );
+    // this.SET_NODE_MAP_ITEM(display, horizontalSceneItemId, verticalSceneItemId, sceneId);
   }
 
   /**
@@ -482,6 +557,14 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
     this.SET_VIDEO_SETTING(setting, display);
   }
 
+  /**
+   * Update loading state to show loading animation
+   */
+
+  setIsCollectionOrSceneLoading(status: boolean) {
+    this.SET_IS_LOADING(status);
+  }
+
   @mutation()
   private UPDATE_PLATFORM_SETTING(platform: TPlatform | string, display: TDisplayType) {
     this.state.platformSettings = {
@@ -510,45 +593,45 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
     }
   }
 
-  @mutation()
-  private SET_NODE_MAP_ITEM(
-    display: TDisplayType,
-    originalSceneNodeId: string,
-    copiedSceneNodeId: string,
-    sceneId?: string,
-  ) {
-    if (display === 'vertical') {
-      this.state.sceneNodeMaps[sceneId] = {
-        ...this.state.sceneNodeMaps[sceneId],
-        [originalSceneNodeId]: copiedSceneNodeId,
-      };
-    }
-  }
+  // @mutation()
+  // private SET_NODE_MAP_ITEM(
+  //   display: TDisplayType,
+  //   originalSceneNodeId: string,
+  //   copiedSceneNodeId: string,
+  //   sceneId?: string,
+  // ) {
+  //   if (display === 'vertical') {
+  //     this.activeSceneNodeMap = {
+  //       ...this.activeSceneNodeMap,
+  //       [originalSceneNodeId]: copiedSceneNodeId,
+  //     };
+  //   }
+  // }
 
-  @mutation()
-  private REMOVE_VERTICAL_NODE(nodeId: string, sceneId: string) {
-    // remove nodes from scene map
+  // @mutation()
+  // private REMOVE_VERTICAL_NODE(nodeId: string, sceneId: string) {
+  //   // remove nodes from scene map
 
-    const { entry, ...sceneNodeMap } = this.state.sceneNodeMaps[sceneId];
+  //   const { entry, ...sceneNodeMap } = this.activeSceneNodeMap;
 
-    this.state.sceneNodeMaps = { ...this.state.sceneNodeMaps, [sceneId]: sceneNodeMap };
-  }
+  //   this.state.sceneNodeMaps = { ...this.state.sceneNodeMaps, [sceneId]: sceneNodeMap };
+  // }
 
-  @mutation()
-  private REMOVE_DUAL_OUTPUT_NODES(nodeId: string) {
-    // remove all vertical nodes from scene
+  // @mutation()
+  // private REMOVE_DUAL_OUTPUT_NODES(nodeId: string) {
+  //   // remove all vertical nodes from scene
 
-    let newMap = {};
-    for (const display in this.state.sceneNodeMaps) {
-      newMap = {
-        ...newMap,
-        [display]: Object.entries(this.state.sceneNodeMaps[display]).filter(
-          ([key, val]) => key !== nodeId,
-        ),
-      };
-    }
-    this.state.sceneNodeMaps = newMap;
-  }
+  //   let newMap = {};
+  //   for (const display in this.state.sceneNodeMaps) {
+  //     newMap = {
+  //       ...newMap,
+  //       [display]: Object.entries(this.state.sceneNodeMaps[display]).filter(
+  //         ([key, val]) => key !== nodeId,
+  //       ),
+  //     };
+  //   }
+  //   this.state.sceneNodeMaps = newMap;
+  // }
 
   @mutation()
   private SET_SHOW_DUAL_OUTPUT() {
@@ -592,5 +675,10 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
   @mutation()
   private SET_DEFAULT_DISPLAY(display: TDisplayType) {
     this.state.videoSettings.defaultDisplay = display;
+  }
+
+  @mutation()
+  private SET_IS_LOADING(status: boolean) {
+    this.state = { ...this.state, isLoading: status };
   }
 }

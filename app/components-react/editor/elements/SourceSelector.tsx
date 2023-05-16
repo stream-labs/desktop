@@ -146,7 +146,10 @@ export class SourceSelectorModule {
   }
 
   filterNodes(): TSceneNode[] {
+    console.log('before verticalNodeIds');
     const verticalNodeIds = this.dualOutputService.views.verticalNodeIds;
+
+    console.log('verticalNodeIds ', verticalNodeIds);
 
     if (verticalNodeIds) {
       if (this.dualOutputService.views.dualOutputMode) {
@@ -277,7 +280,6 @@ export class SourceSelectorModule {
     this.sourcesService.actions.showSourceProperties(item.sourceId);
   }
 
-  // @@@
   determinePlacement(info: Parameters<Required<TreeProps>['onDrop']>[0]) {
     if (!info.dropToGap && !info.node.isLeaf) return EPlaceType.Inside;
     const dropPos = info.node.pos.split('-');

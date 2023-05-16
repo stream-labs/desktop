@@ -39,6 +39,13 @@ export class SceneCollectionsStateService extends StatefulService<ISceneCollecti
     return this.collections.find(coll => coll.id === this.state.activeId);
   }
 
+  get sceneNodeMaps() {
+    if (!this.activeCollection?.sceneNodeMaps) {
+      this.activeCollection.sceneNodeMaps = {};
+    }
+    return this.activeCollection.sceneNodeMaps;
+  }
+
   /**
    * Loads the manifest file into the state for this service.
    */
@@ -190,6 +197,7 @@ export class SceneCollectionsStateService extends StatefulService<ISceneCollecti
       operatingSystem: os,
       deleted: false,
       needsRename: false,
+      sceneNodeMaps: {},
     });
   }
 
@@ -244,5 +252,34 @@ export class SceneCollectionsStateService extends StatefulService<ISceneCollecti
     Object.keys(state).forEach(key => {
       Vue.set(this.state, key, state[key]);
     });
+  }
+
+  @mutation()
+  CREATE_NODE_MAP_ENTRY(
+    collectionId: string,
+    sceneId: string,
+    horizontalNodeId: string,
+    verticalNodeId: string,
+  ) {
+    console.log('create horizontalNodeId ', horizontalNodeId);
+    this.state.collections.find(coll => coll.id === collectionId)[sceneId] = {
+      ...this.activeCollection.sceneNodeMaps[sceneId],
+      [horizontalNodeId]: verticalNodeId,
+    };
+  }
+
+  @mutation()
+  REMOVE_VERTICAL_NODE(collectionId: string, sceneItemId: string, sceneId: string) {
+    console.log('remove sceneId ', sceneId);
+    const nodeMap = this.state.collections.find(coll => coll.id === collectionId).sceneNodeMaps[
+      sceneId
+    ];
+    delete nodeMap[sceneItemId];
+
+    this.activeCollection.sceneNodeMaps[sceneId] = { ...nodeMap };
+    console.log(
+      'after remove this.activeCollection.sceneNodeMaps[sceneId] ',
+      this.activeCollection.sceneNodeMaps[sceneId],
+    );
   }
 }

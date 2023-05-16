@@ -52,9 +52,7 @@ export class CreateExistingItemCommand extends Command {
     this.scenesService.views.getScene(this.sceneId).removeItem(this.sceneItemId);
 
     if (this.dualOutputVerticalNodeId) {
-      this.scenesService.views.getScene(this.sceneId).removeItem(this.dualOutputVerticalNodeId);
-
-      this.dualOutputService.removeVerticalNode(this.sceneItemId, this.sceneId);
+      this.dualOutputService.removeVerticalNode(this.sceneId, this.sceneItemId);
     }
   }
 }

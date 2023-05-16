@@ -9,6 +9,8 @@ import { ERenderingMode } from '../../../obs-api';
 import { Tooltip } from 'antd';
 import { TDisplayType } from 'services/settings-v2';
 import { DualOutputService } from 'app-services';
+import ProgressBar from 'components-react/shared/ProgressBar';
+import DualOutputProgressBar from 'components-react/editor/elements/DualOutputProgressBar';
 
 export default function StudioEditor() {
   const {
@@ -31,6 +33,7 @@ export default function StudioEditor() {
       DualOutputService.views.activeDisplays.vertical && DualOutputService.views.dualOutputMode,
     activeSceneId: ScenesService.views.activeSceneId,
     hasAdditionalContexts: VideoSettingsService.hasAdditionalContexts,
+    isLoading: DualOutputService.views.isLoading,
   }));
   const displayEnabled = !v.hideStyleBlockers && !v.performanceMode;
   const placeholderRef = useRef<HTMLDivElement>(null);
@@ -177,7 +180,7 @@ export default function StudioEditor() {
           <div
             className={cx(styles.studioDisplayContainer, { [styles.stacked]: studioModeStacked })}
           >
-            {v.showHorizontalDisplay && (
+            {!v.isLoading && v.showHorizontalDisplay && (
               <div
                 className={cx(styles.studioEditorDisplayContainer, 'noselect')}
                 style={{ cursor: v.cursor }}
@@ -206,7 +209,7 @@ export default function StudioEditor() {
                 />
               </div>
             )}
-            {v.showVerticalDisplay && (
+            {!v.isLoading && v.showVerticalDisplay && (
               <div
                 className={cx(styles.studioEditorDisplayContainer, 'noselect')}
                 style={{ cursor: v.cursor }}
@@ -235,16 +238,17 @@ export default function StudioEditor() {
                 />
               </div>
             )}
-            {v.showHorizontalDisplay && !v.showVerticalDisplay && v.studioMode && (
+            {!v.isLoading && v.showHorizontalDisplay && !v.showVerticalDisplay && v.studioMode && (
               <div className={styles.studioModeDisplayContainer}>
                 <Display paddingSize={10} type="horizontal" />
               </div>
             )}
-            {!v.showHorizontalDisplay && v.showVerticalDisplay && v.studioMode && (
+            {!v.isLoading && !v.showHorizontalDisplay && v.showVerticalDisplay && v.studioMode && (
               <div className={styles.studioModeDisplayContainer}>
                 <Display paddingSize={10} type="vertical" />
               </div>
             )}
+            {v.isLoading && <DualOutputProgressBar sceneId={v.activeSceneId} />}
           </div>
         </div>
       )}

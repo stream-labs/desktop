@@ -37,6 +37,8 @@ export class RemoveItemCommand extends Command {
 
   private settings: ISceneItemSettings;
 
+  // the dual output node is the correllating node in a scene
+  // that has both horizontal and vertical nodes
   private dualOutputNodeId: string;
   private dualOutputNodeSettings: ISceneItemSettings;
   private dualOutputNodeDisplay: TDisplayType;
@@ -74,7 +76,7 @@ export class RemoveItemCommand extends Command {
     this.reorderNodesSubcommand.execute();
 
     // If the scene has vertical nodes, remove the corresponding vertical node
-    if (this.dualOutputService.views.hasVerticalNodes) {
+    if (this.dualOutputService.views.hasNodeMap()) {
       this.dualOutputNodeDisplay = this.dualOutputService.views.getVerticalNodeId(this.sceneItemId)
         ? 'horizontal'
         : 'vertical';
@@ -94,8 +96,6 @@ export class RemoveItemCommand extends Command {
       );
 
       this.reorderDualOutputNodesSubcommand.execute();
-
-      dualOutputSceneItem.remove();
 
       const nodeToRemoveId =
         this.dualOutputNodeDisplay === 'horizontal' ? this.sceneItemId : this.dualOutputNodeId;
@@ -161,13 +161,15 @@ export class RemoveItemCommand extends Command {
       this.reorderNodesSubcommand.rollback();
       this.reorderDualOutputNodesSubcommand.rollback();
 
-      // restore entry to node map
-      this.dualOutputService.restoreNodesToMap(
-        this.dualOutputNodeDisplay,
-        horizontalNodeId,
-        verticalNodeId,
-        this.sceneId,
-      );
+      if (this.dualOutputNodeDisplay === 'vertical') {
+        // restore entry to node map
+        this.dualOutputService.restoreNodesToMap(
+          this.dualOutputNodeDisplay,
+          horizontalNodeId,
+          verticalNodeId,
+          this.sceneId,
+        );
+      }
     } else {
       // otherwise, just create horizontal item
       const item = scene.addSource(this.sourceId, { id: this.sceneItemId, select: false });

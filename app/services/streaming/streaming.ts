@@ -818,16 +818,11 @@ export class StreamingService
       await new Promise(resolve => setTimeout(resolve, 1000));
     } else {
       // start single output
-      // if the vertical context is active, explicitly set the horizontal context info
-      if (this.views.activeDisplays.horizontal && this.views.hasVerticalContext) {
-        obs.NodeObs.OBS_service_setVideoInfo(
-          this.videoSettingsService.contexts.horizontal,
-          'horizontal',
-        );
-        obs.NodeObs.OBS_service_startStreaming('horizontal');
-      } else {
-        obs.NodeObs.OBS_service_startStreaming();
-      }
+      obs.NodeObs.OBS_service_setVideoInfo(
+        this.videoSettingsService.contexts.horizontal,
+        'horizontal',
+      );
+      obs.NodeObs.OBS_service_startStreaming('horizontal');
     }
 
     const recordWhenStreaming = this.streamSettingsService.settings.recordWhenStreaming;
