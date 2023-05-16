@@ -15,16 +15,15 @@ export function DualOutputSourceSelector(p: { nodeId: string }) {
 
   const v = useVuex(() => ({
     hasVerticalNodes: DualOutputService.views.hasVerticalNodes,
-    verticalNodeId: DualOutputService.views.getVerticalNodeId(p.nodeId),
+    verticalNodeId: DualOutputService.views.verticalNodeIds
+      ? DualOutputService.views.activeSceneNodeMap[p.nodeId]
+      : undefined,
     isHorizontalVisible: ScenesService.views.getNodeVisibility(p.nodeId),
     isVerticalVisible: DualOutputService.views.hasVerticalNodes
       ? ScenesService.views.getNodeVisibility(DualOutputService.views.activeSceneNodeMap[p.nodeId])
       : undefined,
     isLoading: DualOutputService.views.isLoading,
   }));
-
-  console.log('hasVerticalNodes ', v?.hasVerticalNodes);
-  console.log('verticalNodeId ', v?.verticalNodeId);
 
   return (
     <>
@@ -33,7 +32,7 @@ export function DualOutputSourceSelector(p: { nodeId: string }) {
         className={v.isHorizontalVisible ? 'icon-desktop' : 'icon-desktop-hide'}
       />
 
-      {!v?.isLoading && v?.hasVerticalNodes && v?.verticalNodeId && (
+      {!v?.isLoading && v?.verticalNodeId && (
         <i
           onClick={() => toggleVisibility(v.verticalNodeId)}
           className={v.isVerticalVisible ? 'icon-phone-case' : 'icon-phone-case-hide'}

@@ -182,6 +182,14 @@ export class SceneCollectionsStateService extends StatefulService<ISceneCollecti
     return path.join(this.collectionsDirectory, `${id}.json`);
   }
 
+  createNodeMapEntry(sceneId: string, horizontalNodeId: string, verticalNodeId: string) {
+    this.CREATE_NODE_MAP_ENTRY(sceneId, horizontalNodeId, verticalNodeId);
+  }
+
+  removeVerticalNode(sceneItemId: string, sceneId: string) {
+    this.REMOVE_VERTICAL_NODE(sceneItemId, sceneId);
+  }
+
   @mutation()
   SET_ACTIVE_COLLECTION(id: string) {
     this.state.activeId = id;
@@ -255,31 +263,22 @@ export class SceneCollectionsStateService extends StatefulService<ISceneCollecti
   }
 
   @mutation()
-  CREATE_NODE_MAP_ENTRY(
-    collectionId: string,
-    sceneId: string,
-    horizontalNodeId: string,
-    verticalNodeId: string,
-  ) {
-    console.log('create horizontalNodeId ', horizontalNodeId);
-    this.state.collections.find(coll => coll.id === collectionId)[sceneId] = {
-      ...this.activeCollection.sceneNodeMaps[sceneId],
+  CREATE_NODE_MAP_ENTRY(sceneId: string, horizontalNodeId: string, verticalNodeId: string) {
+    const activeId = this.state.activeId;
+    const coll = this.state.collections.find(coll => coll.id === activeId);
+    coll.sceneNodeMaps[sceneId] = {
+      ...coll.sceneNodeMaps[sceneId],
       [horizontalNodeId]: verticalNodeId,
     };
   }
 
   @mutation()
-  REMOVE_VERTICAL_NODE(collectionId: string, sceneItemId: string, sceneId: string) {
-    console.log('remove sceneId ', sceneId);
-    const nodeMap = this.state.collections.find(coll => coll.id === collectionId).sceneNodeMaps[
-      sceneId
-    ];
+  REMOVE_VERTICAL_NODE(sceneItemId: string, sceneId: string) {
+    const activeId = this.state.activeId;
+    const coll = this.state.collections.find(coll => coll.id === activeId);
+    const nodeMap = coll.sceneNodeMaps[sceneId];
     delete nodeMap[sceneItemId];
 
-    this.activeCollection.sceneNodeMaps[sceneId] = { ...nodeMap };
-    console.log(
-      'after remove this.activeCollection.sceneNodeMaps[sceneId] ',
-      this.activeCollection.sceneNodeMaps[sceneId],
-    );
+    coll.sceneNodeMaps[sceneId] = { ...nodeMap };
   }
 }

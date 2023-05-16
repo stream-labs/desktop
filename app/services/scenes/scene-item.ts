@@ -271,7 +271,6 @@ export class SceneItem extends SceneItemNode {
   }
 
   loadItemAttributes(customSceneItem: ISceneItemInfo) {
-    console.log('loading ', customSceneItem);
     const visible = customSceneItem.visible;
     const position = { x: customSceneItem.x, y: customSceneItem.y };
     const crop = customSceneItem.crop;

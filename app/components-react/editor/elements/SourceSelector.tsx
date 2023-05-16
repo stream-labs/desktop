@@ -146,10 +146,7 @@ export class SourceSelectorModule {
   }
 
   filterNodes(): TSceneNode[] {
-    console.log('before verticalNodeIds');
     const verticalNodeIds = this.dualOutputService.views.verticalNodeIds;
-
-    console.log('verticalNodeIds ', verticalNodeIds);
 
     if (verticalNodeIds) {
       if (this.dualOutputService.views.dualOutputMode) {

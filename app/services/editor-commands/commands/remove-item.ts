@@ -8,6 +8,7 @@ import { $t } from 'services/i18n';
 import { ISceneItemSettings } from 'services/api/external-api/scenes';
 import { DualOutputService } from 'services/dual-output';
 import { TDisplayType, VideoSettingsService } from 'services/settings-v2';
+import { SceneCollectionsService } from 'services/scene-collections';
 
 // Removing and recreating a source is a very complex event.
 // We can save a lot of time by leveraging the scene collection system.
@@ -27,6 +28,7 @@ export class RemoveItemCommand extends Command {
   @Inject() private scenesService: ScenesService;
   @Inject() private dualOutputService: DualOutputService;
   @Inject() private videoSettingsService: VideoSettingsService;
+  @Inject() private sceneCollectionsService: SceneCollectionsService;
 
   private sceneId: string;
   private sourceId: string;
@@ -97,10 +99,12 @@ export class RemoveItemCommand extends Command {
 
       this.reorderDualOutputNodesSubcommand.execute();
 
+      dualOutputSceneItem.remove();
+
       const nodeToRemoveId =
         this.dualOutputNodeDisplay === 'horizontal' ? this.sceneItemId : this.dualOutputNodeId;
 
-      this.dualOutputService.actions.removeVerticalNode(nodeToRemoveId, this.sceneId);
+      this.sceneCollectionsService.removeVerticalNode(nodeToRemoveId, this.sceneId);
     }
 
     // If this was the last item using this source, the underlying source
@@ -161,15 +165,12 @@ export class RemoveItemCommand extends Command {
       this.reorderNodesSubcommand.rollback();
       this.reorderDualOutputNodesSubcommand.rollback();
 
-      if (this.dualOutputNodeDisplay === 'vertical') {
-        // restore entry to node map
-        this.dualOutputService.restoreNodesToMap(
-          this.dualOutputNodeDisplay,
-          horizontalNodeId,
-          verticalNodeId,
-          this.sceneId,
-        );
-      }
+      // restore entry to node map
+      this.sceneCollectionsService.createNodeMapEntry(
+        this.sceneId,
+        horizontalNodeId,
+        verticalNodeId,
+      );
     } else {
       // otherwise, just create horizontal item
       const item = scene.addSource(this.sourceId, { id: this.sceneItemId, select: false });

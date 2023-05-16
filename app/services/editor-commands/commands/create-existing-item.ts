@@ -4,7 +4,7 @@ import { ScenesService } from 'services/scenes';
 import { DualOutputService } from 'services/dual-output';
 import { Inject } from 'services/core/injector';
 import { $t } from 'services/i18n';
-import { TDisplayType } from 'services/settings-v2/video';
+import { SceneCollectionsService } from 'services/scene-collections';
 
 /**
  * Creates an item from an existing source
@@ -13,6 +13,7 @@ export class CreateExistingItemCommand extends Command {
   @Inject() private sourcesService: SourcesService;
   @Inject() private scenesService: ScenesService;
   @Inject() private dualOutputService: DualOutputService;
+  @Inject() private sceneCollectionsService: SceneCollectionsService;
 
   private sceneItemId: string;
 
@@ -52,7 +53,8 @@ export class CreateExistingItemCommand extends Command {
     this.scenesService.views.getScene(this.sceneId).removeItem(this.sceneItemId);
 
     if (this.dualOutputVerticalNodeId) {
-      this.dualOutputService.removeVerticalNode(this.sceneId, this.sceneItemId);
+      this.scenesService.views.getScene(this.sceneId).removeItem(this.dualOutputVerticalNodeId);
+      this.sceneCollectionsService.removeVerticalNode(this.sceneId, this.sceneItemId);
     }
   }
 }

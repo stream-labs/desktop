@@ -938,27 +938,19 @@ export class SceneCollectionsService extends Service implements ISceneCollection
    */
 
   createNodeMapEntry(sceneId: string, horizontalNodeId: string, verticalNodeId: string) {
-    const id = this.activeCollection.id;
-
     if (!this.activeCollection.sceneNodeMaps[sceneId]) {
       this.activeCollection.sceneNodeMaps[sceneId] = {};
     }
-    this.activeCollection.sceneNodeMaps[sceneId] = {
-      ...this.activeCollection.sceneNodeMaps[sceneId],
-      [horizontalNodeId]: verticalNodeId,
-    };
-    // this.stateService.CREATE_NODE_MAP_ENTRY(id, sceneId, horizontalNodeId, verticalNodeId);
+
+    this.stateService.createNodeMapEntry(sceneId, horizontalNodeId, verticalNodeId);
   }
 
   removeVerticalNode(sceneItemId: string, sceneId: string) {
-    const id = this.activeCollection.id;
-
     const nodeMap = this.activeCollection.sceneNodeMaps[sceneId];
     if (!nodeMap) return;
     delete nodeMap[sceneItemId];
 
     this.activeCollection.sceneNodeMaps[sceneId] = { ...nodeMap };
-
-    // this.stateService.REMOVE_VERTICAL_NODE(id, sceneItemId, sceneId);
+    this.stateService.removeVerticalNode(sceneItemId, sceneId);
   }
 }
