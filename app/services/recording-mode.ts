@@ -14,7 +14,7 @@ import { DefaultHardwareService } from './hardware';
 import { RunInLoadingMode } from './app/app-decorators';
 import { byOS, OS } from 'util/operating-systems';
 import { JsonrpcService } from './api/jsonrpc';
-import { WindowsService, UsageStatisticsService } from 'app-services';
+import { WindowsService, UsageStatisticsService, SharedStorageService } from 'app-services';
 import { getPlatformService } from 'services/platforms';
 import { IYoutubeUploadResponse } from 'services/platforms/youtube/uploader';
 import { YoutubeService } from 'services/platforms/youtube';
@@ -62,6 +62,7 @@ export class RecordingModeService extends PersistentStatefulService<IRecordingMo
   @Inject() private jsonrpcService: JsonrpcService;
   @Inject() private usageStatisticsService: UsageStatisticsService;
   @Inject() private windowsService: WindowsService;
+  @Inject() private sharedStorageService: SharedStorageService;
 
   static defaultState: IRecordingModeState = {
     enabled: false,
@@ -230,7 +231,7 @@ export class RecordingModeService extends PersistentStatefulService<IRecordingMo
       });
 
       this.usageStatisticsService.recordAnalyticsEvent('RecordingHistory', {
-        type: 'UploadError',
+        type: 'UploadYouTubeError',
       });
     }
 
@@ -239,10 +240,48 @@ export class RecordingModeService extends PersistentStatefulService<IRecordingMo
 
     if (result) {
       this.usageStatisticsService.recordAnalyticsEvent('RecordingHistory', {
-        type: 'UploadSuccess',
+        type: 'UploadYouTubeSuccess',
         privacy: 'private',
       });
     }
+  }
+
+  async uploadToStorage(filename: string) {
+    const { cancel, complete } = await this.sharedStorageService.actions.return.uploadFile(
+      filename,
+      progress => {
+        this.SET_UPLOAD_INFO({
+          uploadedBytes: progress.uploadedBytes,
+          totalBytes: progress.totalBytes,
+        });
+      },
+    );
+    this.cancelFunction = cancel;
+    let id;
+    let result;
+    try {
+      result = await complete;
+    } catch (e: unknown) {
+      Sentry.withScope(scope => {
+        scope.setTag('feature', 'recording-history');
+        console.error('Got error uploading YT video', e);
+      });
+
+      this.usageStatisticsService.recordAnalyticsEvent('RecordingHistory', {
+        type: 'UploadStorageError',
+      });
+    }
+
+    this.cancelFunction = () => {};
+    this.SET_UPLOAD_INFO({});
+
+    if (result) {
+      this.usageStatisticsService.recordAnalyticsEvent('RecordingHistory', {
+        type: 'UploadStorageSuccess',
+      });
+    }
+
+    return id;
   }
 
   private setRecordingEncoder() {

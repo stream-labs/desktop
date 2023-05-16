@@ -41,8 +41,9 @@ class RecordingHistoryModule {
   }
 
   handleSelect(filename: string) {
-    return (value: string) => {
-      if (value === 'youtube') return this.uploadToYoutube(filename);
+    return (platform: string) => {
+      if (platform === 'youtube') return this.uploadToYoutube(filename);
+      this.uploadToStorage(filename, platform);
     };
   }
 
@@ -52,6 +53,21 @@ class RecordingHistoryModule {
 
   uploadToYoutube(filename: string) {
     this.RecordingModeService.actions.uploadToYoutube(filename);
+  }
+
+  getPlatformLink(platform: string, id: string) {
+    if (platform === 'crossclip') {
+      return `https://crossclip.streamlabs.com/storage/${id}`;
+    }
+    if (platform === 'typestudio') {
+      return `https://app.typestudio.co/storage/${id}`;
+    }
+    return '';
+  }
+
+  async uploadToStorage(filename: string, platform: string) {
+    const id = (await this.RecordingModeService.actions.return.uploadToStorage(filename)) || '';
+    remote.shell.openExternal(this.getPlatformLink(id, platform));
   }
 
   showFile(filename: string) {
