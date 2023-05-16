@@ -290,12 +290,6 @@ export class ScenesService extends StatefulService<IScenesState> {
     this.state.displayOrder = sanitizedOrder;
   }
 
-  // @mutation()
-  // private SET_CONTEXT(display: TDisplayType) {
-  // @@@ TODO: is it better to set video property here?
-  //   this.state.
-  // }
-
   createScene(name: string, options: ISceneCreateOptions = {}) {
     // Get an id to identify the scene on the frontend
     const id = options.sceneId || `scene_${uuid()}`;

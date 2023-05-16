@@ -148,18 +148,6 @@ export class EditorService extends StatefulService<IEditorServiceState> {
   }
 
   startDragging(event: IMouseEvent) {
-    // @@@ DISPLAYSIZE && DISPLAYOFFSET
-    // this.dragHandler = new DragHandler(event, {
-    //   displaySize: {
-    //     x: this.renderedWidth,
-    //     y: this.renderedHeight,
-    //   },
-    //   displayOffset: {
-    //     x: this.renderedOffsetX,
-    //     y: this.renderedOffsetY,
-    //   },
-    // });
-
     this.dragHandler = new DragHandler(event, {
       displaySize: {
         x: this.renderedWidths[event.display],

@@ -42,7 +42,6 @@ class GoLiveSettingsState extends StreamInfoView<IGoLiveSettingsState> {
    * Update settings for a specific platforms
    */
   updatePlatform(platform: TPlatform, patch: Partial<IGoLiveSettings['platforms'][TPlatform]>) {
-    console.log('--- updatePlatform platform ', platform);
     const updated = {
       platforms: {
         ...this.state.platforms,

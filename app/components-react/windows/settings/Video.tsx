@@ -17,7 +17,6 @@ const CANVAS_RES_OPTIONS = [
   { label: '1280x720', value: '1280x720' },
 ];
 
-// @@@ TODO: add vertical canvas options
 const VERTICAL_CANVAS_OPTIONS = [
   { label: '720x1280', value: '720x1280' },
   { label: '1080x1920', value: '1080x1920' },
@@ -37,7 +36,6 @@ const OUTPUT_RES_OPTIONS = [
   { label: '640x360', value: '640x360' },
 ];
 
-// @@@ TODO: add vertical output res options
 const VERTICAL_OUTPUT_RES_OPTIONS = [
   { label: '720x1280', value: '720x1280' },
   { label: '1080x1920', value: '1080x1920' },
@@ -379,6 +377,7 @@ class VideoSettingsModule {
     } else {
       Services.DualOutputService.actions.setdualOutputMode();
       this.state.setShowDualOutputSettings(!this.state.showDualOutputSettings);
+      Services.UsageStatisticsService.recordFeatureUsage('DualOutput');
     }
   }
 

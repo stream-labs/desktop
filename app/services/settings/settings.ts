@@ -178,11 +178,6 @@ class SettingsViews extends ViewHandler<ISettingsServiceState> {
   get advancedAudioSettings() {
     return this.state.Advanced.formData.find(data => data.nameSubCategory === 'Audio');
   }
-
-  // @@@ TMP just for logging
-  get all() {
-    return this.state;
-  }
 }
 
 export class SettingsService extends StatefulService<ISettingsServiceState> {
@@ -288,7 +283,7 @@ export class SettingsService extends StatefulService<ISettingsServiceState> {
     this.getCategories().forEach(categoryName => {
       settingsFormData[categoryName] = this.fetchSettingsFromObs(categoryName);
       if (['Stream', 'StreamSecond'].includes(categoryName)) {
-        // @@@ TODO: remove. temporary and janky: force set the server to auto if the service is twitch
+        // TODO: remove. Temporary and janky: force set the server to auto if the service is twitch
         settingsFormData[categoryName].formData[1].parameters.forEach(
           (parameter: IObsInput<unknown>) => {
             if (parameter.name === 'service' && parameter.value === 'Twitch') {
@@ -511,9 +506,6 @@ export class SettingsService extends StatefulService<ISettingsServiceState> {
         this.audioService.setSimpleTracks();
       }
     }
-
-    // console.log('----> SETTINGS categoryName ', categoryName);
-    // console.log('----> dataToSave ', dataToSave);
 
     obs.NodeObs.OBS_settings_saveSettings(categoryName, dataToSave);
     this.loadSettingsIntoStore();

@@ -22,7 +22,6 @@ interface IUsageApiData {
   data: string;
 }
 
-// @@@ TODO: Add analytics event for dual output mode?
 type TAnalyticsEvent =
   | 'PlatformLogin'
   | 'SocialShare'
@@ -206,7 +205,6 @@ export class UsageStatisticsService extends Service {
    * was clicked.
    */
   recordClick(component: string, target: string) {
-    // @@@ TODO: Are the analytics targets typed somewhere?
     this.recordAnalyticsEvent('Click', { component, target });
   }
 

@@ -4,9 +4,6 @@ import { useVuex } from 'components-react/hooks';
 import { useModule } from 'slap';
 import { SourceSelectorModule } from './SourceSelector';
 
-// @@@ TODO: Refactor to use a module that extends the Source Selector Module for reactivity
-// @@@ TODO: Refactor to expand this component to handle applying changes from updates to sources
-
 export function DualOutputSourceSelector(p: { nodeId: string }) {
   const { toggleVisibility } = useModule(SourceSelectorModule);
   const { DualOutputService, ScenesService } = Services;

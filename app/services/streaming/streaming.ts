@@ -409,46 +409,6 @@ export class StreamingService
       }
     }
 
-    // @@@ from merge
-    // setup green
-    // if (this.views.isGreen) {
-    //   const displayPlatforms = this.views.activeDisplayPlatforms;
-
-    //   for (const display in displayPlatforms) {
-    //     if (displayPlatforms[display].length > 1) {
-    //       let ready = false;
-    //       try {
-    //         await this.runCheck(
-    //           'setupGreen',
-    //           async () => (ready = await this.restreamService.checkStatus()),
-    //         );
-    //       } catch (e: unknown) {
-    //         console.error('Error fetching restreaming service', e);
-    //       }
-    //       // Assume restream is down
-    //       if (!ready) {
-    //         this.setError('RESTREAM_DISABLED');
-    //         return;
-    //       }
-
-    //       // update restream settings
-    //       try {
-    //         await this.runCheck('setupGreen', async () => {
-    //           // enable restream on the backend side
-    //           if (!this.restreamService.state.enabled) await this.restreamService.setEnabled(true);
-
-    //           const mode: TOutputOrientation = display === 'horizontal' ? 'landscape' : 'portrait';
-    //           await this.restreamService.beforeGoLive(display as TDisplayType, mode);
-    //         });
-    //       } catch (e: unknown) {
-    //         console.error('Failed to setup restream', e);
-    //         this.setError('RESTREAM_SETUP_FAILED');
-    //         return;
-    //       }
-    //     }
-    //   }
-    // }
-
     // apply optimized settings
     const optimizer = this.videoEncodingOptimizationService;
     if (optimizer.state.useOptimizedProfile && settings.optimizedProfile) {
@@ -1135,13 +1095,11 @@ export class StreamingService
 
     const time = new Date().toISOString();
 
-    // @@@ TODO HERE!!!
     if (info.type === EOBSOutputType.Streaming) {
       if (info.signal === EOBSOutputSignal.Start) {
         this.SET_STREAMING_STATUS(EStreamingState.Live, time);
         this.resolveStartStreaming();
         this.streamingStatusChange.next(EStreamingState.Live);
-        // this.streamingStatusChange.unsubscribe();
 
         let streamEncoderInfo: Partial<IOutputSettings> = {};
         let game: string = '';
@@ -1167,8 +1125,6 @@ export class StreamingService
         eventMetadata.streamType = streamSettings.streamType;
         eventMetadata.platform = streamSettings.platform;
         eventMetadata.server = streamSettings.server;
-
-        // @@ TODO -- stream settings here???
 
         this.usageStatisticsService.recordEvent('stream_start', eventMetadata);
         this.usageStatisticsService.recordAnalyticsEvent('StreamingStatus', {
