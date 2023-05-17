@@ -245,9 +245,9 @@ class GuestCamModule {
       .finally(() => this.state.setRegeneratingLink(false));
   }
 
-  truncateName(name: string) {
-    if (name.length > 10) {
-      return `${name.substring(0, 10)}...`;
+  truncateName(name: string, length = 10) {
+    if (name.length > length) {
+      return `${name.substring(0, length)}...`;
     }
 
     return name;
@@ -325,6 +325,18 @@ export default function GuestCamProperties() {
     } else {
       return $t('Start Collab Cam');
     }
+  }
+
+  function getGuestLabel(guest: IGuest) {
+    const name = truncateName(guest.remoteProducer.name);
+    const icon = guest.remoteProducer.type === 'screenshare' ? 'fa-desktop' : 'fa-user';
+
+    return (
+      <span>
+        <i className={`fa ${icon}`} style={{ marginRight: 8 }} />
+        {name}
+      </span>
+    );
   }
 
   if (!loggedIn) {
@@ -498,10 +510,7 @@ export default function GuestCamProperties() {
         </Tabs.TabPane>
         {guests.map(guest => {
           return (
-            <Tabs.TabPane
-              tab={truncateName(guest.remoteProducer.name)}
-              key={guest.remoteProducer.streamId}
-            >
+            <Tabs.TabPane tab={getGuestLabel(guest)} key={guest.remoteProducer.streamId}>
               <GuestPane guest={guest} />
             </Tabs.TabPane>
           );
