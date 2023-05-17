@@ -635,7 +635,7 @@ function GuestPane(p: { guest: IGuest }) {
 
   const { visible, setVisible, volume, setVolume, disconnect } = bindings;
 
-  async function onDisonnectClick() {
+  async function onDisconnectClick() {
     let regen = true;
     setHideDisplay(true);
     const confirmed = await confirmAsync({
@@ -705,7 +705,7 @@ function GuestPane(p: { guest: IGuest }) {
               <button
                 className="button button--soft-warning"
                 style={{ width: 160 }}
-                onClick={onDisonnectClick}
+                onClick={onDisconnectClick}
               >
                 {$t('Disconnect')}
               </button>
