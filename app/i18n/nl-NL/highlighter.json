@@ -90,5 +90,9 @@
   "An error occurred while reading %{file}": "Er is een fout opgetreden bij het lezen van %{file}",
   "An error occurred while reading audio from %{file}": "Er is een fout opgetreden bij het lezen van audio uit %{file}",
   "An error occurred while mixing audio": "Er is een fout opgetreden bij het mengen van audio",
-  "Edit your replays with Highlighter, a free editor built in to Streamlabs.": "Bewerk uw replays met Highlighter, een gratis editor ingebouwd in Streamlabs."
+  "Edit your replays with Highlighter, a free editor built in to Streamlabs.": "Bewerk uw replays met Highlighter, een gratis editor ingebouwd in Streamlabs.",
+  "Upload To": "Upload To",
+  "Upload": "Upload",
+  "This feature requires a Streamlabs ID": "This feature requires a Streamlabs ID",
+  "Sign up for Streamlabs ID": "Sign up for Streamlabs ID"
 }
