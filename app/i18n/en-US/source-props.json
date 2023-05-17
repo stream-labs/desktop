@@ -40,6 +40,9 @@
     "local_file": {
       "name": "Local file"
     },
+    "reroute_audio": {
+      "name": "Control audio via N Air"
+    },
     "refreshnocache": {
       "name": "Refresh cache of current page"
     },
