@@ -75,7 +75,7 @@ class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
   }
 
   get shouldCreateVerticalNode(): boolean {
-    return this.isVerticalActive || this.hasVerticalNodes;
+    return this.dualOutputMode || this.hasVerticalNodes;
   }
 
   get platformSettings() {
@@ -88,6 +88,12 @@ class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
 
   get hasVerticalContext() {
     return !!this.videoSettingsService.state.vertical;
+  }
+
+  get horizontalNodeIds(): string[] {
+    if (!this.activeSceneNodeMap) return;
+
+    return Object.keys(this.activeSceneNodeMap);
   }
 
   get verticalNodeIds(): string[] {
@@ -180,7 +186,11 @@ class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
     );
   }
 
-  getVerticalNodeId(defaultNodeId: string): string {
+  getVerticalNodeId(defaultNodeId: string, sceneId?: string): string {
+    if (sceneId) {
+      return this.sceneNodeMaps[sceneId][defaultNodeId];
+    }
+
     return this.activeSceneNodeMap ? this.activeSceneNodeMap[defaultNodeId] : undefined;
   }
 
@@ -193,7 +203,7 @@ class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
     }
   }
 
-  getNodeDisplay(nodeId: string, sceneId: string) {
+  getNodeDisplay(nodeId: string, sceneId?: string) {
     const sceneNodeMap = sceneId ? this.sceneNodeMaps[sceneId] : this.activeSceneNodeMap;
 
     if (sceneNodeMap && Object.values(sceneNodeMap).includes(nodeId)) {

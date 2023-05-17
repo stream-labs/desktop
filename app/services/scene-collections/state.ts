@@ -190,6 +190,10 @@ export class SceneCollectionsStateService extends StatefulService<ISceneCollecti
     this.REMOVE_VERTICAL_NODE(sceneItemId, sceneId);
   }
 
+  removeNodeMap(sceneId: string) {
+    this.REMOVE_NODE_MAP(sceneId);
+  }
+
   @mutation()
   SET_ACTIVE_COLLECTION(id: string) {
     this.state.activeId = id;
@@ -280,5 +284,14 @@ export class SceneCollectionsStateService extends StatefulService<ISceneCollecti
     delete nodeMap[sceneItemId];
 
     coll.sceneNodeMaps[sceneId] = { ...nodeMap };
+  }
+
+  @mutation()
+  REMOVE_NODE_MAP(sceneId: string) {
+    const activeId = this.state.activeId;
+    const coll = this.state.collections.find(coll => coll.id === activeId);
+    const nodeMaps = coll.sceneNodeMaps;
+    delete nodeMaps[sceneId];
+    coll.sceneNodeMaps = { ...nodeMaps };
   }
 }

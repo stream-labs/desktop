@@ -6,11 +6,13 @@ import { DualOutputService } from 'services/dual-output';
 import compact from 'lodash/compact';
 import { $t } from 'services/i18n';
 import { VideoSettingsService } from 'services/settings-v2';
+import { SceneCollectionsService } from 'services/scene-collections';
 
 export class CopyNodesCommand extends Command {
   @Inject() scenesService: ScenesService;
   @Inject() dualOutputService: DualOutputService;
   @Inject() videoSettingsService: VideoSettingsService;
+  @Inject() sceneCollectionsService: SceneCollectionsService;
 
   description: string;
 
@@ -29,6 +31,7 @@ export class CopyNodesCommand extends Command {
   constructor(
     private selection: Selection,
     private destSceneId: string,
+    private origSceneId?: string,
     private duplicateSources = false,
   ) {
     super();
@@ -71,7 +74,7 @@ export class CopyNodesCommand extends Command {
           this.sourceIdsMap != null ? this.sourceIdsMap[node.sourceId] : node.sourceId;
 
         const item = scene.addSource(sourceId, { id: this.nodeIdsMap[node.id] });
-        const display = this.dualOutputService.views.getNodeDisplay(node.id, scene.id);
+        const display = this.dualOutputService.views.getNodeDisplay(node.id, this.origSceneId);
         const context = this.videoSettingsService.contexts[display];
         item.setSettings({ ...node.getSettings(), output: context, display });
         this.nodeIdsMap[node.id] = item.id;
@@ -91,14 +94,35 @@ export class CopyNodesCommand extends Command {
       }
     });
 
-    // Recreate node order
+    // Recreate node order and node map, if it exists
     // Selection does not have canonical node order - scene does
     const order = compact(
       this.selection
         .getScene()
         .getNodesIds()
-        .map(origNodeId => this.nodeIdsMap[origNodeId]),
+        .map(origNodeId => {
+          if (
+            this.dualOutputService.views.getNodeDisplay(origNodeId, this.origSceneId) ===
+            'horizontal'
+          ) {
+            // determine if node is horizontal in original scene
+            // and get vertical node
+
+            const origVerticalNodeId = this.dualOutputService.views.getVerticalNodeId(origNodeId);
+            const newHorizontalNodeId = this.nodeIdsMap[origNodeId];
+            const newVerticalNodeId = this.nodeIdsMap[origVerticalNodeId];
+
+            this.sceneCollectionsService.createNodeMapEntry(
+              scene.id,
+              newHorizontalNodeId,
+              newVerticalNodeId,
+            );
+          }
+          return this.nodeIdsMap[origNodeId];
+        }),
     );
+
+    scene.setNodesOrder(order.concat(initialNodeOrder));
 
     return insertedNodes;
   }
@@ -113,5 +137,9 @@ export class CopyNodesCommand extends Command {
       const node = scene.getNode(nodeId);
       if (node) node.remove();
     });
+
+    if (this.dualOutputService.views.hasNodeMap(scene.id)) {
+      this.sceneCollectionsService.removeNodeMap(scene.id);
+    }
   }
 }

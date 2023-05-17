@@ -953,4 +953,8 @@ export class SceneCollectionsService extends Service implements ISceneCollection
     this.activeCollection.sceneNodeMaps[sceneId] = { ...nodeMap };
     this.stateService.removeVerticalNode(sceneItemId, sceneId);
   }
+
+  removeNodeMap(sceneId: string) {
+    this.stateService.removeNodeMap(sceneId);
+  }
 }

@@ -189,6 +189,7 @@ export class ClipboardService extends StatefulService<IClipboardState> {
           .getScene(this.state.itemsSceneId)
           .getSelection(this.state.sceneNodesIds),
         this.scenesService.views.activeSceneId,
+        this.state.itemsSceneId,
         duplicateSources,
       );
 
