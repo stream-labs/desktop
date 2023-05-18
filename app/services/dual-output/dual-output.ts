@@ -7,7 +7,7 @@ import {
   IDualOutputPlatformSetting,
 } from './dual-output-data';
 import { verticalDisplayData } from '../settings-v2/default-settings-data';
-import { ScenesService, SceneItem, IPartialSettings, IScene } from 'services/scenes';
+import { ScenesService, SceneItem, IPartialSettings } from 'services/scenes';
 import { IVideoSetting, TDisplayType, VideoSettingsService } from 'services/settings-v2/video';
 import { StreamingService } from 'services/streaming';
 import { TPlatform } from 'services/platforms';
@@ -16,11 +16,12 @@ import { EditorCommandsService } from 'services/editor-commands';
 import { Subject } from 'rxjs';
 import { TOutputOrientation } from 'services/restream';
 import { IVideoInfo } from 'obs-studio-node';
-import { StreamSettingsService, ICustomStreamDestination } from 'services/settings/streaming';
+import { ICustomStreamDestination } from 'services/settings/streaming';
 import {
   ISceneCollectionsManifestEntry,
   SceneCollectionsService,
 } from 'services/scene-collections';
+import { IncrementalRolloutService, EAvailableFeatures } from 'services/incremental-rollout';
 
 interface IDisplayVideoSettings {
   defaultDisplay: TDisplayType;
@@ -45,6 +46,7 @@ class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
   @Inject() private videoSettingsService: VideoSettingsService;
   @Inject() private streamingService: StreamingService;
   @Inject() private sceneCollectionsService: SceneCollectionsService;
+  @Inject() private incrementalRolloutService: IncrementalRolloutService;
 
   get activeSceneId(): string {
     return this.scenesService.views.activeSceneId;
@@ -151,6 +153,10 @@ class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
 
   get isVerticalActive() {
     return this.state.videoSettings.activeDisplays.vertical;
+  }
+
+  get shouldShowDualOutputCheckbox() {
+    return this.incrementalRolloutService.views.featureIsEnabled(EAvailableFeatures.dualOutput);
   }
 
   getPlatformDisplay(platform: TPlatform) {
