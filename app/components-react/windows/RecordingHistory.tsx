@@ -5,6 +5,7 @@ import { inject, useModule } from 'slap';
 import { $t } from 'services/i18n';
 import { ModalLayout } from 'components-react/shared/ModalLayout';
 import { ListInput } from 'components-react/shared/inputs';
+import { Form } from 'components-react/shared/inputs/Form';
 import { RecordingModeService, UserService } from 'app-services';
 import styles from './RecordingHistory.m.less';
 import AutoProgressBar from 'components-react/shared/AutoProgressBar';
@@ -91,18 +92,20 @@ export default function RecordingHistory() {
         {recordings.map(recording => (
           <div className={styles.recording} key={recording.timestamp}>
             <span>{formattedTimestamp(recording.timestamp)}</span>
-            {uploadOptions.length > 0 && (
-              <ListInput
-                onSelect={handleSelect(recording.filename)}
-                label={$t('Upload To')}
-                options={uploadOptions}
-              />
-            )}
             <Tooltip title={$t('Show in folder')}>
               <span onClick={() => showFile(recording.filename)} className={styles.filename}>
                 {recording.filename}
               </span>
             </Tooltip>
+            {uploadOptions.length > 0 && (
+              <Form>
+                <ListInput
+                  onSelect={handleSelect(recording.filename)}
+                  label={$t('Upload To')}
+                  options={uploadOptions}
+                />
+              </Form>
+            )}
           </div>
         ))}
       </div>
