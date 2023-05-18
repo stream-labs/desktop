@@ -1,6 +1,6 @@
 {
-  "Message Format": "Formato de mensaje",
-  "Max Donations": "Máximo de donaciones",
+  "Message Format": "Formato del mensaje",
+  "Max Donations": "Máx. de donaciones.",
   "Text Scroll Speed": "Velocidad de desplazamiento de texto",
   "Background Color": "Color de fondo",
   "Font": "Fuente",
@@ -8,11 +8,16 @@
   "Font Weight": "Grosor de fuente",
   "Text Color": "Color de texto",
   "Name Text Color": "Color de texto de nombre",
-  "Amount Text Color": "Color de cantidad de texto",
+  "Amount Text Color": "Color de texto de cantidad",
   "The name of the donator,": "El nombre del donante,",
-  "The amount that was donated": "La cantidad que se donó",
+  "The amount that was donated": "La cantidad donada",
   "Manage List": "Gestionar lista",
   "Font Settings": "Ajustes de fuente",
   "A hex color for the text of the": "Un color hexadecimal para el texto de",
-  "token": "token"
+  "token": "token",
+  "Each donation that shows in the donation ticker will be in this format. Available tokens:": "Cada donación mostrada en el teletipo de donaciones tendrá este formato. Tokens disponibles:",
+  "The maximum amount of donations to show in the ticker. Must be a number greater than 0.": "El número máximo de donaciones que mostrar en el teletipo. Debe ser un número mayor que 0.",
+  "How fast the ticker should scroll between 1 (fastest) and 10 (slowest). Set to 0 for no scrolling.": "La rapidez con la que debe desplazarse el teletipo, entre 1 (más rápido) y 10 (más lento). Con un valor 0 no hay desplazamiento.",
+  "The font size in pixels. Reasonable size typically ranges between 24px and 48px.": "El tamaño de la fuente en píxeles. El tamaño considerado normal suele estar entre 24 px y 48 px.",
+  "How thick to make the font. The value should range between 300 (thinnest) and 900 (thickest)": "El grosor aplicable a la fuente. El valor debe estar comprendido entre 300 (más fina) y 900 (más gruesa)"
 }

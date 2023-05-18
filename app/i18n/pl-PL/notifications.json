@@ -19,5 +19,10 @@
   "Streamlabs Desktop has updated! Click here to see what changed.": "Streamlabs Desktop został zaktualizowany! Kliknij tutaj, aby zobaczyć, co się zmieniło.",
   "Notifications & News": "Powiadomienia i aktualności",
   "News": "Aktualności",
-  "Notifications": "Powiadomienia"
+  "Notifications": "Powiadomienia",
+  "A new Recording has been completed. Click for more info": "Ukończono nowe Nagranie. Kliknij, aby uzyskać więcej informacji",
+  "Recording History": "Historia nagrań",
+  "Show in folder": "Pokaż w folderze",
+  "Recordings": "Nagrania",
+  "Marker %{label} added at %{timestamp}": "Marker %{label} dodany w %{timestamp}"
 }

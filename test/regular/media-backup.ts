@@ -1,17 +1,17 @@
-import { startApp, stopApp, test, useSpectron, skipCheckingErrorsInLog } from '../helpers/spectron';
+import { startApp, stopApp, test, useWebdriver, skipCheckingErrorsInLog } from '../helpers/webdriver';
 
 import { getApiClient } from '../helpers/api-client';
 const path = require('path');
 import fse = require('fs-extra');
 import fs = require('fs');
 import os = require('os');
-import { logIn } from '../helpers/spectron/user';
+import { logIn } from '../helpers/webdriver/user';
 import { SceneCollectionsService } from 'services/api/external-api/scene-collections';
 import { ScenesService } from '../../app/services/api/external-api/scenes';
 import { focusChild } from '../helpers/modules/core';
 import {sleep} from "../helpers/sleep";
 
-useSpectron({ noSync: false });
+useWebdriver({ noSync: false });
 
 test('Media backup', async t => {
   // sometimes this test causes a console error from Electron's code that is difficult to catch

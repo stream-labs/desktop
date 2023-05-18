@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Menu } from 'antd';
 import * as remote from '@electron/remote';
 import cx from 'classnames';

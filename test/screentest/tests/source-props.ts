@@ -1,4 +1,4 @@
-import { useSpectron, test, afterAppStart } from '../../helpers/spectron';
+import { useWebdriver, test, afterAppStart } from '../../helpers/webdriver';
 import { getApiClient } from '../../helpers/api-client';
 import { ISourcesServiceApi, TSourceType } from '../../../app/services/sources/sources-api';
 import { useScreentest } from '../screenshoter';
@@ -9,7 +9,7 @@ import { focusChild } from '../../helpers/modules/core';
 
 let showSourceProps: (name: string) => void;
 
-useSpectron({ restartAppAfterEachTest: false });
+useWebdriver({ restartAppAfterEachTest: false });
 useScreentest();
 afterAppStart(async t => {
   const types: TSourceType[] = [

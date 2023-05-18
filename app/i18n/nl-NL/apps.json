@@ -1,8 +1,8 @@
 {
-  "Vers": "Vers",
-  "Reload": "Herlaad",
-  "Unpacked vers loaded": "Unpacked vers loaded",
-  "You must unload unpacked version before enabling this app.": "You must unload unpacked version before enabling this app.",
-  "Pop Out": "Pop Out",
-  "The developer has ended support for this app. The app may continue to work, but it won't recieve any updates. If you wish to uninstall, please follow the directions here.": "The developer has ended support for this app. The app may continue to work, but it won't recieve any updates. If you wish to uninstall, please follow the directions here."
+  "Vers": "Versie",
+  "Reload": "Herladen",
+  "Unpacked vers loaded": "Niet-uitgepakte versie geladen",
+  "You must unload unpacked version before enabling this app.": "Verwijder eerst de niet-uitgepakte versie voordat u deze app inschakelt.",
+  "Pop Out": "Pop-uit",
+  "The developer has ended support for this app. The app may continue to work, but it won't recieve any updates. If you wish to uninstall, please follow the directions here.": "De ontwikkelaar heeft de ondersteuning voor deze app beëindigd. De app werkt misschien nog wel, maar krijgt geen updates meer. Wilt u de app verwijderen, volg dan hier de aanwijzingen."
 }

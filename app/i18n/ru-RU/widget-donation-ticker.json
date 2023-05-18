@@ -14,5 +14,10 @@
   "Manage List": "Управление списком",
   "Font Settings": "Настройки шрифта",
   "A hex color for the text of the": "Шестнадцатеричный цвет для текста",
-  "token": "токен"
+  "token": "токен",
+  "Each donation that shows in the donation ticker will be in this format. Available tokens:": "Каждое пожертвование, которое отображается в счетчике пожертвований, будет показано в таком формате. Доступные токены:",
+  "The maximum amount of donations to show in the ticker. Must be a number greater than 0.": "Максимальное количество пожертвований, которое может быть отображено в счетчике. Должно быть числом больше 0.",
+  "How fast the ticker should scroll between 1 (fastest) and 10 (slowest). Set to 0 for no scrolling.": "Как быстро счетчик должен прокручиваться по шкале от 1 (самое быстрое) до 10 (самое медленное). Укажите 0 для отмены прокрутки.",
+  "The font size in pixels. Reasonable size typically ranges between 24px and 48px.": "Размер шрифта в пикселях. Обычно используется размер 24–48 пикселей.",
+  "How thick to make the font. The value should range between 300 (thinnest) and 900 (thickest)": "Насколько жирным должен быть шрифт. Значение должно находиться между 300 (самый тонкий) и 900 (самый жирный)."
 }

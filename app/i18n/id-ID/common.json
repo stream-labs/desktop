@@ -117,7 +117,7 @@
   "Very High": "Sangat Tinggi",
   "Apps": "Aplikasi",
   "Finish": "Selesai",
-  "Get Prime": "Dapatkan Prime",
+  "Get Ultra": "Get Ultra",
   "System error message:": "Pesan kesalahan sistem:",
   "List is empty": "Daftar ini kosong",
   "Not selected": "Tidak terpilih",
@@ -139,5 +139,18 @@
   "Click here": "Klik di sini",
   "More Info": "Info Selengkapnya",
   "Revert Changes": "Membalikkan Perubahan",
-  "Animations": "Animasi"
+  "Animations": "Animasi",
+  "Multistreaming": "Multistreaming",
+  "Alert Box": "Kotak Peringatan",
+  "Widget": "Widget",
+  "Creator Sites": "Situs Kreator",
+  "Apps Manager": "Apps Manager",
+  "Theme Audit": "Audit Tema",
+  "Login": "Login",
+  "Tip Settings": "Pengaturan Tip",
+  "Apps Store Home": "Beranda Apps Store",
+  "Dashboard Home": "Beranda Dasbor",
+  "Alert Box Library": "Perpustakaan Kotak Peringatan",
+  "Alert Box Settings": "Pengaturan Kotak Peringatan",
+  "Upgrade to Ultra": "Upgrade versi ke Ultra"
 }

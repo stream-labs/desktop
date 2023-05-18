@@ -3,7 +3,11 @@
   "This element is too small to be displayed": "이 요소는 너무 작아 표시되지 않습니다",
   "This element requires Selective Recording to be enabled": "선택 녹화를 활성화하려면 이 요소가 필요합니다",
   "Grant Permissions": "허가",
-  "Streamlabs needs additional permissions. Grant permissions in the pop-up dialogs to continue.": "Streamlabs에 추가적인 허가가 필요합니다. 계속하시려면 팝업 대화창을 승인하세요.",
+  "Streamlabs needs additional permissions. Grant permissions in the pop-up dialogs to continue.": "Streamlabs에 추가 권한이 필요합니다. 계속하려면 팝업 창에서 권한을 부여하세요.",
   "Microphone": "마이크",
-  "Webcam": "웹캠"
+  "Webcam": "웹캠",
+  "You've merged a Streamlabs ID to your account, please log back in to ensure you have the right credentials.": "Streamlabs ID를 계정에 병합했습니다. 올바른 인증 정보를 보유하려면 다시 로그인하세요.",
+  "Enable Live Streaming?": "라이브 스트리밍을 활성화할까요?",
+  "Streamlabs is currently in recording mode, which hides live streaming features. Would you like to enable live streaming features? You can disable them again in General settings.": "Streamlabs가 현재 녹화 모드이기 때문에 라이브 스트리밍 기능이 감춰졌습니다. 라이브 스트리밍 기능을 활성화할까요? 일반 설정에서 다시 비활성화할 수 있습니다.",
+  "Enable Streaming": "스트리밍 활성화"
 }

@@ -3,7 +3,11 @@
   "This element is too small to be displayed": "Этот элемент слишком мал для отображения",
   "This element requires Selective Recording to be enabled": "Для этого элемента должна быть включена выборочная запись",
   "Grant Permissions": "Предоставить разрешения",
-  "Streamlabs needs additional permissions. Grant permissions in the pop-up dialogs to continue.": "Для Streamlabs требуются дополнительные разрешения. Чтобы продолжить, предоставьте разрешения во всплывающих диалоговых окнах.",
+  "Streamlabs needs additional permissions. Grant permissions in the pop-up dialogs to continue.": "Streamlabs требуются дополнительные разрешения. Чтобы продолжить, предоставьте разрешения во всплывающих диалоговых окнах.",
   "Microphone": "Микрофон",
-  "Webcam": "Веб-камера"
+  "Webcam": "Веб-камера",
+  "You've merged a Streamlabs ID to your account, please log back in to ensure you have the right credentials.": "Вы добавили Streamlabs ID в свою учетную запись. Повторите вход в систему, чтобы проверить правильность учетных данных.",
+  "Enable Live Streaming?": "Включить прямую трансляцию?",
+  "Streamlabs is currently in recording mode, which hides live streaming features. Would you like to enable live streaming features? You can disable them again in General settings.": "Streamlabs находится в режиме записи, который скрывает функции прямой трансляции. Включить функции прямой трансляции? Их можно будет отключить снова в основных настройках.",
+  "Enable Streaming": "Включить трансляцию"
 }

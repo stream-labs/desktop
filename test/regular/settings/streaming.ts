@@ -1,13 +1,13 @@
-import { test, useSpectron } from '../../helpers/spectron';
-import { logIn } from '../../helpers/spectron/user';
-import { getFormInput } from '../../helpers/spectron/forms';
+import { test, useWebdriver } from '../../helpers/webdriver';
+import { logIn } from '../../helpers/webdriver/user';
+import { getFormInput } from '../../helpers/webdriver/forms';
 import { goLive, stopStream } from '../../helpers/modules/streaming';
 import { FormMonkey } from '../../helpers/form-monkey';
 import { showSettingsWindow } from '../../helpers/modules/settings/settings';
 import { click } from '../../helpers/modules/core';
 import { assertFormContains, readFields, useForm } from '../../helpers/modules/forms';
 
-useSpectron();
+useWebdriver();
 
 test('Populates stream settings after go live', async t => {
   await logIn(t);

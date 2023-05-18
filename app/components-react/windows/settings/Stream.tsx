@@ -446,7 +446,7 @@ function CustomDestinationList() {
       ))}
       {!isEditMode && canAddMoreDestinations && (
         <a className={css.addDestinationBtn} onClick={addCustomDest}>
-          <i className="fa fa-plus" />
+          <i className={cx('fa fa-plus', css.plus)} />
           <span>{$t('Add Destination')}</span>
 
           {shouldShowPrimeLabel ? (
@@ -454,18 +454,7 @@ function CustomDestinationList() {
               onClick={addCustomDest}
               filled
               text={$t('Ultra')}
-              icon={
-                <UltraIcon
-                  type="simple"
-                  style={{
-                    fill: '#09161D',
-                    display: 'inline-block',
-                    height: '12px',
-                    width: '12px',
-                    marginRight: '5px',
-                  }}
-                />
-              }
+              icon={<UltraIcon type="simple" />}
             />
           ) : (
             <div className={css.prime} />

@@ -1,5 +1,7 @@
 {
   "Twitch Category": "Kategori Twitch",
   "Twitch Tags": "Twitch Tags",
-  "Warning! Editing tags in Streamlabs will overwrite tags in Twitch. To use Twitch's new custom tags, you must edit your tags in the Twitch dashboard directly until Twitch provides third parties access to editing the new custom tags.": "Peringatan! Mengedit tag di Streamlabs akan menimpa tag di Twitch. Untuk menggunakan tag khusus baru Twitch, Anda harus mengedit tag Anda langsung di dasbor Twitch sampai Twitch menyediakan akses pihak ketiga untuk mengedit tag khusus baru."
+  "You need to re-login to access Twitch tags": "Anda harus login kembali untuk mengakses tag Twitch",
+  "Do not include special characters or spaces in your tag": "Jangan sertakan karakter khusus atau spasi di tag Anda",
+  "For example: \"Speedrunning\" or \"FirstPlaythrough\"": "Misalnya: \"Speedrunning\" atau \"FirstPlaythrough\""
 }

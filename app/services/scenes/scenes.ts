@@ -12,8 +12,9 @@ import * as obs from '../../../obs-api';
 import { $t } from 'services/i18n';
 import namingHelpers from 'util/NamingHelpers';
 import uuid from 'uuid/v4';
-import { ViewHandler } from 'services/core';
+import { InitAfter, ViewHandler } from 'services/core';
 import { lazyModule } from 'util/lazy-module';
+import { VideoSettingsService } from 'services/settings-v2';
 
 export type TSceneNodeModel = ISceneItem | ISceneItemFolder;
 
@@ -94,6 +95,7 @@ export interface IPartialSettings {
   scaleFilter?: EScaleType;
   blendingMode?: EBlendingMode;
   blendingMethod?: EBlendingMethod;
+  output?: obs.IVideo; // for obs.ISceneItem, this property is video
 }
 
 export interface ISceneItem extends ISceneItemSettings, ISceneItemNode {
@@ -101,6 +103,7 @@ export interface ISceneItem extends ISceneItemSettings, ISceneItemNode {
   sourceId: string;
   obsSceneItemId: number;
   sceneNodeType: 'item';
+  output?: obs.IVideo; // for obs.ISceneItem, this property is video
 }
 
 export interface ISceneItemActions {
@@ -181,6 +184,11 @@ class ScenesViews extends ViewHandler<IScenesState> {
     return null;
   }
 
+  getSceneItemsBySceneId(sceneId: string): SceneItem[] {
+    const scene: Scene | null = this.getScene(sceneId);
+    return scene ? scene.getItems() : ([] as SceneItem[]);
+  }
+
   /**
    * Returns an array of all scene items across all scenes
    * referencing the given source id.
@@ -207,8 +215,14 @@ class ScenesViews extends ViewHandler<IScenesState> {
     }
     return null;
   }
+
+  getNodeVisibility(sceneNodeId: string) {
+    const nodeModel: TSceneNode | null = this.getSceneNode(sceneNodeId);
+    return nodeModel instanceof SceneItem ? nodeModel?.visible : null;
+  }
 }
 
+@InitAfter('GreenService')
 export class ScenesService extends StatefulService<IScenesState> {
   static initialState: IScenesState = {
     activeSceneId: '',
@@ -230,6 +244,7 @@ export class ScenesService extends StatefulService<IScenesState> {
   @Inject() private windowsService: WindowsService;
   @Inject() private sourcesService: SourcesService;
   @Inject() private transitionsService: TransitionsService;
+  @Inject() private videoSettingsService: VideoSettingsService;
 
   @mutation()
   private ADD_SCENE(id: string, name: string) {
@@ -279,7 +294,11 @@ export class ScenesService extends StatefulService<IScenesState> {
         .reverse()
         .forEach(item => {
           const newItem = newScene.addSource(item.sourceId);
-          newItem.setSettings(item.getSettings());
+          const settings = {
+            ...item.getSettings(),
+            output: this.videoSettingsService.contexts.horizontal,
+          };
+          newItem.setSettings(settings);
         });
     }
 

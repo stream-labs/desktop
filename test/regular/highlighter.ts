@@ -1,4 +1,4 @@
-import { test, useSpectron } from '../helpers/spectron';
+import { test, useWebdriver } from '../helpers/webdriver';
 import { sleep } from '../helpers/sleep';
 import { setTemporaryRecordingPath } from '../helpers/modules/settings/settings';
 import {
@@ -17,7 +17,7 @@ import { fillForm } from '../helpers/modules/forms';
 const path = require('path');
 const fs = require('fs');
 
-useSpectron();
+useWebdriver();
 
 test('Highlighter save and export', async t => {
   await logIn();

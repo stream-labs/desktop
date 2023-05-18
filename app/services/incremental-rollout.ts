@@ -18,6 +18,7 @@ export enum EAvailableFeatures {
   growTab = 'slobs--grow-tab',
   themeAudit = 'slobs--theme-audit',
   reactWidgets = 'slobs--react-widgets',
+  sharedStorage = 'slobs--shared-storage',
 
   /**
    * There are two flags because one is used for beta access and

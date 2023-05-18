@@ -556,10 +556,16 @@ export class TcpServerService
       if (!force && !this.forceRequests) return;
     }
 
-    this.log('send response', response);
+    if (!client.socket.writable) {
+      // prevent attempts to write to a closed socket
+
+      this.log('cannot write to closed socket to send response', response);
+      return;
+    }
 
     // unhandled exceptions completely destroy Rx.Observable subscription
     try {
+      this.log('send response', response);
       client.socket.write(`${JSON.stringify(response)}\n`);
     } catch (e: unknown) {
       // probably the client has been silently disconnected

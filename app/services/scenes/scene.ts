@@ -26,6 +26,7 @@ import uuid from 'uuid/v4';
 import { SceneNode } from '../api/external-api/scenes';
 import compact from 'lodash/compact';
 import { assertIsDefined } from 'util/properties-type-guards';
+import { VideoSettingsService } from 'services/settings-v2';
 
 export type TSceneNode = SceneItem | SceneItemFolder;
 
@@ -45,6 +46,7 @@ export class Scene {
   @Inject() private scenesService: ScenesService;
   @Inject() private sourcesService: SourcesService;
   @Inject() private selectionService: SelectionService;
+  @Inject() private videoSettingsService: VideoSettingsService;
 
   readonly state: IScene;
 
@@ -172,6 +174,10 @@ export class Scene {
 
     this.ADD_SOURCE_TO_SCENE(sceneItemId, source.sourceId, obsSceneItem.id);
     const sceneItem = this.getItem(sceneItemId)!;
+
+    // assign context to scene item
+    const context = this.videoSettingsService.contexts.horizontal;
+    obsSceneItem.video = context as obs.IVideo;
 
     // Default is to select
     if (options.select == null) options.select = true;

@@ -1,5 +1,7 @@
 {
   "Twitch Category": "Twitch 类别",
   "Twitch Tags": "Twitch 标签",
-  "Warning! Editing tags in Streamlabs will overwrite tags in Twitch. To use Twitch's new custom tags, you must edit your tags in the Twitch dashboard directly until Twitch provides third parties access to editing the new custom tags.": "警告！在 Streamlabs 中编辑标签将覆盖 Twitch 中的标签。要使用 Twitch 的新自定义标签，应直接在 Twitch 仪表板中编辑您的标签，直至 Twitch 为第三方提供编辑新自定义标签的访问权限。"
+  "You need to re-login to access Twitch tags": "您需要重新登录才能访问 Twitch 标签",
+  "Do not include special characters or spaces in your tag": "不要在标签中包含特殊字符或空格",
+  "For example: \"Speedrunning\" or \"FirstPlaythrough\"": "例如：“Speedrunning”或“FirstPlaythrough”"
 }

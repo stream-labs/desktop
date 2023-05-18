@@ -33,5 +33,6 @@
   "FBPrivacyWarning": "對於您的 Facebook 帳戶，授予的隱私權層級可能會受到限制。請在<link>這裡</link>查看 Streamlabs 整合的「誰可以看到您使用此業務整合」部分",
   "Only Me": "只有我",
   "Do not change privacy settings": "不要變更隱私設定",
-  "Install %{overlayName}": "安裝 %{overlayName}"
+  "Install %{overlayName}": "安裝 %{overlayName}",
+  "Please note that while you can schedule streams to Facebook, some will not appear on this calendar due to API limitations": "請注意，雖然你可以排程進行 Facebook 直播，但因為 API 限制，有些並不會出現在此排程時間表中"
 }
