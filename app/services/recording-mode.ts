@@ -263,7 +263,6 @@ export class RecordingModeService extends PersistentStatefulService<IRecordingMo
       },
     );
     this.cancelFunction = cancel;
-    let id;
     let result;
     try {
       result = await complete;
@@ -285,9 +284,8 @@ export class RecordingModeService extends PersistentStatefulService<IRecordingMo
       this.usageStatisticsService.recordAnalyticsEvent('RecordingHistory', {
         type: 'UploadStorageSuccess',
       });
+      return result.id;
     }
-
-    return id;
   }
 
   private setRecordingEncoder() {
