@@ -5,7 +5,7 @@ import { inject, useModule } from 'slap';
 import { $t } from 'services/i18n';
 import { ModalLayout } from 'components-react/shared/ModalLayout';
 import { ListInput } from 'components-react/shared/inputs';
-import { Form } from 'components-react/shared/inputs/Form';
+import Form from 'components-react/shared/inputs/Form';
 import { RecordingModeService, UserService } from 'app-services';
 import styles from './RecordingHistory.m.less';
 import AutoProgressBar from 'components-react/shared/AutoProgressBar';
@@ -67,8 +67,9 @@ class RecordingHistoryModule {
   }
 
   async uploadToStorage(filename: string, platform: string) {
-    const id = (await this.RecordingModeService.actions.return.uploadToStorage(filename)) || '';
-    remote.shell.openExternal(this.getPlatformLink(id, platform));
+    const id = await this.RecordingModeService.actions.return.uploadToStorage(filename);
+    if (!id) return;
+    remote.shell.openExternal(this.getPlatformLink(platform, id));
   }
 
   showFile(filename: string) {
@@ -98,7 +99,7 @@ export default function RecordingHistory() {
               </span>
             </Tooltip>
             {uploadOptions.length > 0 && (
-              <Form>
+              <Form className={styles.uploadForm}>
                 <ListInput
                   onSelect={handleSelect(recording.filename)}
                   label={$t('Upload To')}

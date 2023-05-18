@@ -74,6 +74,11 @@ export class RecordingModeService extends PersistentStatefulService<IRecordingMo
     return { ...state, uploadInfo: {} };
   }
 
+  init() {
+    super.init();
+    this.pruneRecordingEntries();
+  }
+
   cancelFunction = () => {};
 
   cancelUpload() {
@@ -187,6 +192,7 @@ export class RecordingModeService extends PersistentStatefulService<IRecordingMo
   }
 
   pruneRecordingEntries() {
+    if (Object.keys(this.state.recordingHistory).length < 30) return;
     const oneMonthAgo = moment().subtract(30, 'days');
     const prunedEntries = {};
     Object.keys(this.state.recordingHistory).forEach(timestamp => {
@@ -201,7 +207,7 @@ export class RecordingModeService extends PersistentStatefulService<IRecordingMo
     this.windowsService.actions.showWindow({
       componentName: 'RecordingHistory',
       title: $t('Recording History'),
-      size: { width: 450, height: 600 },
+      size: { width: 700, height: 600 },
     });
   }
 
