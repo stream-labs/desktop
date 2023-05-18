@@ -519,6 +519,8 @@
         "Partial": null,
         "Full": null
       },
+      "SdrWhiteLevel": { "name": null },
+      "HdrNominalPeakLevel": { "name": null },
       "ForceGPUAsRenderDevice": {
         "name": null
       }
@@ -530,6 +532,9 @@
         "Default": null
       },
       "DisableAudioDucking": {
+        "name": null
+      },
+      "LowLatencyAudioBuffering": {
         "name": null
       }
     },
