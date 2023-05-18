@@ -27,6 +27,7 @@ interface IRecordingEntry {
 export interface IUploadInfo {
   uploadedBytes?: number;
   totalBytes?: number;
+  error?: string;
 }
 
 interface IRecordingModeState {
@@ -252,7 +253,7 @@ export class RecordingModeService extends PersistentStatefulService<IRecordingMo
     }
   }
 
-  async uploadToStorage(filename: string) {
+  async uploadToStorage(filename: string, platform?: string) {
     const { cancel, complete } = await this.sharedStorageService.actions.return.uploadFile(
       filename,
       progress => {
@@ -261,6 +262,10 @@ export class RecordingModeService extends PersistentStatefulService<IRecordingMo
           totalBytes: progress.totalBytes,
         });
       },
+      (error: unknown) => {
+        this.SET_UPLOAD_INFO({ error: error.toString() });
+      },
+      platform,
     );
     this.cancelFunction = cancel;
     let result;
@@ -269,7 +274,7 @@ export class RecordingModeService extends PersistentStatefulService<IRecordingMo
     } catch (e: unknown) {
       Sentry.withScope(scope => {
         scope.setTag('feature', 'recording-history');
-        console.error('Got error uploading YT video', e);
+        console.error('Got error uploading Storage video', e);
       });
 
       this.usageStatisticsService.recordAnalyticsEvent('RecordingHistory', {

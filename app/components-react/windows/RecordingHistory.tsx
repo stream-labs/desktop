@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import * as remote from '@electron/remote';
-import { Tooltip } from 'antd';
+import { Tooltip, message } from 'antd';
 import { inject, useModule } from 'slap';
 import { $t } from 'services/i18n';
 import { ModalLayout } from 'components-react/shared/ModalLayout';
@@ -67,7 +67,7 @@ class RecordingHistoryModule {
   }
 
   async uploadToStorage(filename: string, platform: string) {
-    const id = await this.RecordingModeService.actions.return.uploadToStorage(filename);
+    const id = await this.RecordingModeService.actions.return.uploadToStorage(filename, platform);
     if (!id) return;
     remote.shell.openExternal(this.getPlatformLink(platform, id));
   }
@@ -82,9 +82,20 @@ class RecordingHistoryModule {
 }
 
 export default function RecordingHistory() {
-  const { recordings, formattedTimestamp, showFile, uploadOptions, handleSelect } = useModule(
-    RecordingHistoryModule,
-  );
+  const {
+    recordings,
+    formattedTimestamp,
+    showFile,
+    uploadOptions,
+    handleSelect,
+    uploadInfo,
+  } = useModule(RecordingHistoryModule);
+
+  useEffect(() => {
+    if (uploadInfo.error && typeof uploadInfo.error === 'string') {
+      message.warning(uploadInfo.error, 5);
+    }
+  }, [uploadInfo.error]);
 
   return (
     <ModalLayout hideFooter scrollable>
