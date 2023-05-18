@@ -73,7 +73,7 @@ export class Display {
 
   cancelUnload: () => void;
 
-  type?: TDisplayType;
+  type: TDisplayType;
 
   constructor(public name: string, options: IDisplayOptions = {}) {
     this.sourceId = options.sourceId;
@@ -87,7 +87,7 @@ export class Display {
 
     this.currentScale = this.windowsService.state[this.slobsWindowId].scaleFactor;
 
-    this.type = options?.type ?? 'horizontal';
+    this.type = options.type ?? 'horizontal';
 
     this.videoService.actions.createOBSDisplay(
       this.electronWindowId,
@@ -372,7 +372,11 @@ export class VideoService extends Service {
     sourceId?: string,
   ) {
     const electronWindow = remote.BrowserWindow.fromId(electronWindowId);
-    const context = type ? this.videoSettingsService.contexts[type] : undefined;
+
+    // the display must have a context, otherwise the sources will not identify
+    // which display they belong to
+    const context =
+      this.videoSettingsService.contexts[type] ?? this.videoSettingsService.contexts.horizontal;
 
     if (sourceId) {
       obs.NodeObs.OBS_content_createSourcePreviewDisplay(

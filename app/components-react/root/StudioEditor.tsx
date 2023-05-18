@@ -32,7 +32,6 @@ export default function StudioEditor() {
     showVerticalDisplay:
       DualOutputService.views.activeDisplays.vertical && DualOutputService.views.dualOutputMode,
     activeSceneId: ScenesService.views.activeSceneId,
-    hasAdditionalContexts: VideoSettingsService.hasAdditionalContexts,
     isLoading: DualOutputService.views.isLoading,
   }));
   const displayEnabled = !v.hideStyleBlockers && !v.performanceMode;
@@ -198,7 +197,7 @@ export default function StudioEditor() {
                 onContextMenu={eventHandlers.onContextMenu}
               >
                 <Display
-                  type={v.hasAdditionalContexts ? 'horizontal' : undefined}
+                  type="horizontal"
                   drawUI={true}
                   paddingSize={10}
                   onOutputResize={(rect: IRectangle) =>
