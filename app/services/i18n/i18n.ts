@@ -95,8 +95,8 @@ export class I18nService extends PersistentStatefulService<II18nState> implement
         electron.remote.dialog.showErrorBox(
           'N Air - Error',
           `${locale}向けの辞書ファイル読み込みに失敗しました。\n` +
-            `Failed to read the dictionary file for ${locale}.\n` +
-            e.message,
+          `Failed to read the dictionary file for ${locale}.\n` +
+          e.message,
         );
       });
     }
@@ -109,8 +109,8 @@ export class I18nService extends PersistentStatefulService<II18nState> implement
         electron.remote.dialog.showErrorBox(
           'N Air - Error',
           `${fallbackLocale}向けの辞書ファイル読み込みに失敗しました。\n` +
-            `Failed to read the dictionary file for ${fallbackLocale}.\n` +
-            e.message,
+          `Failed to read the dictionary file for ${fallbackLocale}.\n` +
+          e.message,
         );
       });
     }
@@ -199,7 +199,7 @@ export class I18nService extends PersistentStatefulService<II18nState> implement
     } catch (e) {
       let lineInfo = '';
       const posMatch = e.message.match(/ at position ([0-9]+)$/);
-      if (posMatch.length === 2) {
+      if (posMatch && posMatch.length === 2) {
         const pos = parseInt(posMatch[1], 10);
         let lineStart = 0;
         for (let line = 1; ; ++line) {

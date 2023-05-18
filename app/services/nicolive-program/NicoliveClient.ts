@@ -605,8 +605,19 @@ export class NicoliveClient {
     });
   }
 
+
+  private editProgramWindow: Electron.BrowserWindow = null;
+  private editProgramId = '';
+
   /** 番組編集画面を開いて結果を返す */
   async editProgram(programID: string): Promise<EditResult> {
+    if (this.editProgramWindow) {
+      if (this.editProgramId === programID) {
+        this.editProgramWindow.focus();
+        return EditResult.OTHER;
+      }
+      this.editProgramWindow.close();
+    }
     const win = new BrowserWindow({
       width: 1200,
       height: 900,
@@ -616,6 +627,8 @@ export class NicoliveClient {
         nativeWindowOpen: true,
       },
     });
+    this.editProgramWindow = win;
+    this.editProgramId = programID;
     Sentry.addBreadcrumb({
       category: 'editProgram.open',
       message: programID,
@@ -623,7 +636,11 @@ export class NicoliveClient {
 
     return new Promise<EditResult>((resolve, _reject) => {
       addClipboardMenu(win);
-      win.on('closed', () => resolve(EditResult.OTHER));
+      win.on('closed', () => {
+        this.editProgramWindow = null;
+        this.editProgramId = '';
+        resolve(EditResult.OTHER);
+      });
       win.webContents.on('did-navigate', (_event, url) => {
         if (NicoliveClient.isProgramPage(url) || NicoliveClient.isMyPage(url)) {
           resolve(EditResult.EDITED);
@@ -657,6 +674,12 @@ export class NicoliveClient {
           }
         }
       );
+    }).then(result => {
+      Sentry.addBreadcrumb({
+        category: 'editProgram.close',
+        message: result,
+      });
+      return result;
     });
   }
 }

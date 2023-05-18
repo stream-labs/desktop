@@ -53,9 +53,7 @@
         </ul>
         <ul class="popup-menu-list">
           <li class="popup-menu-item">
-            <a @click="editProgram" :disabled="isEditing" class="link"
-              ><i class="icon-edit"></i>番組を編集する</a
-            >
+            <a @click="editProgram" class="link"><i class="icon-edit"></i>番組を編集する</a>
           </li>
         </ul>
         <ul class="popup-menu-list">
@@ -85,18 +83,18 @@
 
 <script lang="ts" src="./ProgramInfo.vue.ts"></script>
 <style lang="less" scoped>
-@import '../../styles/index';
+@import url('../../styles/index');
 
 .program-info {
-  width: 100%;
   display: flex;
   align-items: center;
+  width: 100%;
   padding: 16px;
 }
 
 .program-info-description {
-  min-width: 0;
   flex-grow: 1;
+  min-width: 0;
 }
 
 .program-title {
@@ -107,10 +105,11 @@
 
 .program-title-link {
   .text-ellipsis;
-  color: var(--color-text-light);
+
+  display: inline-block;
   font-size: @font-size4;
   font-weight: @font-weight-bold;
-  display: inline-block;
+  color: var(--color-text-light);
 }
 
 .program-button {
@@ -123,50 +122,50 @@
   margin: 0;
 
   .icon-lock {
-    color: var(--color-text);
-    font-size: @font-size1;
     margin-right: 8px;
+    font-size: @font-size1;
+    color: var(--color-text);
   }
 }
 
 .community-name-link {
   .text-ellipsis;
-  font-size: @font-size2;
+
   display: inline-block;
+  font-size: @font-size2;
 }
 
 .community-icon {
-  margin-right: 16px;
-  flex-shrink: 0;
   position: relative;
+  flex-shrink: 0;
   width: 40px;
   height: 40px;
-  border-radius: 50%;
+  margin-right: 16px;
   border: 2px solid var(--color-border-accent);
+  border-radius: 50%;
 
   .community-thumbnail {
-    border-radius: 50%;
     position: absolute;
-    left: 50%;
     top: 50%;
-    transform: translate(-50%, -50%);
+    left: 50%;
     z-index: @z-index-default-content;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
   }
 
   &.is-onAir {
     border-color: var(--color-red);
 
-    &:before,
-    &:after {
-      content: '';
-      display: block;
+    &::before,
+    &::after {
       position: absolute;
-      border-radius: 50%;
-      background-color: var(--color-red);
-      left: 50%;
       top: 50%;
+      left: 50%;
+      display: block;
+      content: '';
+      background-color: var(--color-red);
+      border-radius: 50%;
       transform: translate(-50%, -50%);
-
       animation-duration: 6s;
       animation-iteration-count: infinite;
     }
@@ -183,19 +182,21 @@
 
 .popper {
   .popper-styling();
+
   width: 260px;
 }
 
 .indicator {
   .transition;
-  cursor: pointer;
-  border-radius: 50%;
-  width: 24px;
-  height: 24px;
+
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 24px;
+  height: 24px;
   margin-left: 16px;
+  cursor: pointer;
+  border-radius: 50%;
 
   i {
     font-size: @font-size1;
@@ -220,15 +221,15 @@
 
 @keyframes thumbnail-live-effect1 {
   0% {
-    opacity: 0.8;
     width: 40px;
     height: 40px;
+    opacity: 0.8;
   }
 
   40% {
-    opacity: 0;
     width: 50px;
     height: 50px;
+    opacity: 0;
   }
 
   100% {
@@ -238,15 +239,15 @@
 
 @keyframes thumbnail-live-effect2 {
   0% {
-    opacity: 0.8;
     width: 40px;
     height: 40px;
+    opacity: 0.8;
   }
 
   40% {
-    opacity: 0;
     width: 60px;
     height: 60px;
+    opacity: 0;
   }
 
   100% {

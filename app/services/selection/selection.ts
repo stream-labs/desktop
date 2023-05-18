@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/vue';
 import { uniq } from 'lodash';
 import electron from 'electron';
 import { mutation, StatefulService, ServiceHelper } from 'services/core';
@@ -136,6 +137,11 @@ export class SelectionService extends StatefulService<ISelectionState> {
     this.getSelection().select.call(this, items);
 
     const scene = this.getScene();
+    if (!scene) {
+      Sentry.captureMessage('Selection.select: no active scene', 'warning');
+      return;
+    }
+
     const activeObsIds = this.getItems().map(sceneItem => sceneItem.obsSceneItemId);
 
     // tell OBS which sceneItems are selected
