@@ -40,6 +40,9 @@
     "local_file": {
       "name": "ローカルファイル"
     },
+    "reroute_audio": {
+      "name": "N Airを介して音声を制御する"
+    },
     "refreshnocache": {
       "name": "キャッシュを消去して再読み込み"
     },
