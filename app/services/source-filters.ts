@@ -175,13 +175,13 @@ export class SourceFiltersService extends Service {
   getFilters(sourceId: string): ISourceFilter[] {
     return this.sourcesService
       .getSource(sourceId)
-      .getObsInput()
+      ?.getObsInput()
       .filters.map(obsFilter => ({
         visible: obsFilter.enabled,
         name: obsFilter.name,
         type: obsFilter.id as TSourceFilterType,
         settings: obsFilter.settings,
-      }));
+      })) || [];
   }
 
   setVisibility(sourceId: string, filterName: string, visible: boolean) {
@@ -223,7 +223,7 @@ export class SourceFiltersService extends Service {
     const formData = getPropertiesFormData(filter);
 
     // サイドチェーンのトリガーにする音声ソースがIDしかもらえないので、名前に変換する
-    formData.forEach((input: any) => {
+    formData?.forEach((input: any) => {
       if (input.name === 'sidechain_source') {
         (input as IObsListInput<string>).options.forEach(option => {
           if (option.value === 'none') return;

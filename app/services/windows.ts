@@ -204,12 +204,15 @@ export class WindowsService extends StatefulService<IWindowsState> {
    * @return the window id of the created window
    */
   createOneOffWindow(options: Partial<IWindowOptions & { limitMinimumSize?: boolean }>, windowId?: string): string {
+    windowId = windowId || uuid();
+
     Sentry.addBreadcrumb({
       category: 'createOneOffWindow',
       message: options.componentName,
+      data: {
+        windowId,
+      }
     });
-
-    windowId = windowId || uuid();
 
     if (this.windows[windowId]) {
       this.windows[windowId].restore();
@@ -233,6 +236,14 @@ export class WindowsService extends StatefulService<IWindowsState> {
       this.windowDestroyed.next(windowId);
       delete this.windows[windowId];
       this.DELETE_ONE_OFF_WINDOW(windowId);
+
+      Sentry.addBreadcrumb({
+        category: 'createOneOffWindow',
+        message: 'closed',
+        data: {
+          windowId,
+        }
+      });
     });
 
     this.updateScaleFactor(windowId);

@@ -99,17 +99,12 @@ export default class ProgramInfo extends Vue {
     return this.hostsService.getCommunityPageURL(this.communityID);
   }
 
-  isEditing: boolean = false;
   async editProgram() {
-    if (this.isEditing) throw new Error('editProgram is running');
     try {
-      this.isEditing = true;
       return await this.nicoliveProgramService.editProgram();
     } catch (e) {
       // TODO 失敗時にはユーザーに伝えるべき
       console.warn(e);
-    } finally {
-      this.isEditing = false;
     }
   }
 
