@@ -7,8 +7,6 @@
     "moduleResolution": "node",
     "isolatedModules": false,
     "experimentalDecorators": true,
-    "noImplicitAny": true,
-    "noImplicitThis": true,
     "removeComments": true,
     "suppressImplicitAnyIndexErrors": true,
     "allowSyntheticDefaultImports": true,
@@ -17,10 +15,18 @@
     "sourceMap": true,
     "sourceRoot": "/",
     "allowJs": false,
-    "strictNullChecks": false,
     "emitDecoratorMetadata": false,
     "downlevelIteration": true,
-    "baseUrl": "./app"
+    "baseUrl": "./app",
+
+    "alwaysStrict": true,
+    "noImplicitAny": true,
+    "noImplicitThis": true,
+    "strictBindCallApply": true,
+    "strictFunctionTypes": true,
+    "strictNullChecks": false,
+    "strictPropertyInitialization": false,
+    "useUnknownInCatchVariables": true
   },
   "exclude": ["node_modules"],
   "include": ["./app/**/*"]

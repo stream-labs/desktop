@@ -229,7 +229,7 @@ export class AppService extends StatefulService<IAppState> {
       try {
         returningValue = await result;
       } catch (e) {
-        error = e;
+        error = e as Error;
       }
       delete this.loadingPromises[promiseId];
     }

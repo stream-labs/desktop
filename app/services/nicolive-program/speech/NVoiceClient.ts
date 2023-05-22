@@ -306,7 +306,7 @@ export class NVoiceClient {
       started = true;
     } catch (err) {
       console.error(err);
-      this.options.onError(err);
+      this.options.onError(err as Error);
       // throw err;
     }
   }
@@ -342,7 +342,12 @@ export class NVoiceClient {
 
   async _command(
     command: Command,
-    ...args: { label: string; value: string; encoder?: (value: string) => string, sentryExtra?: boolean }[]
+    ...args: {
+      label: string;
+      value: string;
+      encoder?: (value: string) => string;
+      sentryExtra?: boolean;
+    }[]
   ): Promise<string[]> {
     await this.startNVoice();
     try {
