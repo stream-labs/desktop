@@ -32,7 +32,7 @@ export function InjectFromExternalApi(serviceName?: string): PropertyDecorator {
         return singletonInstance;
       },
     });
-  };
+  } as PropertyDecorator;
 }
 
 /**
@@ -47,7 +47,7 @@ export function Fallback(): PropertyDecorator {
         return this[key];
       },
     });
-  };
+  } as PropertyDecorator;
 }
 
 /**

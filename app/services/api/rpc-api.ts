@@ -59,7 +59,7 @@ export abstract class RpcApi extends Service {
     try {
       response = this.handleServiceRequest(request);
     } catch (e) {
-      this.requestErrors.push(e);
+      this.requestErrors.push(e as string);
     }
 
     if (this.requestErrors.length) response = this.onErrorsHandler(request, this.requestErrors);

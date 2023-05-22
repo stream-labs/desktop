@@ -58,10 +58,10 @@ export async function downloadFile(srcUrl: string, dstPath: string): Promise<voi
             resolve();
           } else {
             result = concatUint8Arrays(result, value);
-            reader.read().then(readStream);
+            reader.read().then(readStream as (value: ReadableStreamReadResult<any>) => void);
           }
         };
-        return reader.read().then(readStream);
+        return reader.read().then(readStream as (value: ReadableStreamReadResult<any>) => void);
       });
   });
 }

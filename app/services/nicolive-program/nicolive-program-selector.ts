@@ -1,5 +1,5 @@
 import { StatefulService, mutation } from 'services/core/stateful-service';
-import { NicoliveClient, isOk } from './NicoliveClient';
+import { FailedResult, NicoliveClient, isOk } from './NicoliveClient';
 import { OnairChannelData } from './ResponseTypes';
 import { NicoliveFailure, openErrorDialogFromFailure } from './NicoliveFailure';
 
@@ -8,21 +8,21 @@ import { NicoliveFailure, openErrorDialogFromFailure } from './NicoliveFailure';
  * 配列の並び順は表示順序.
  */
 export const providerTypes = ['channel', 'user'] as const;
-export type TProviderType = typeof providerTypes[number];
+export type TProviderType = (typeof providerTypes)[number];
 
 /**
  * 選択肢からなるステップ.
  * 配列の並び順はステップの順序.
  */
 export const selectionSteps = ['providerTypeSelect', 'channelSelect', 'programSelect'] as const;
-export type TSelectionStep = typeof selectionSteps[number];
+export type TSelectionStep = (typeof selectionSteps)[number];
 
 /**
  * 最後の「確認」を含めた全ステップ.
  * 配列の並び順はステップの順序.
  */
 export const steps = [...selectionSteps, 'confirm'] as const;
-export type TStep = typeof steps[number];
+export type TStep = (typeof steps)[number];
 
 /**
  * ステップ名をキーに, その順番(0, 1...)を値にしたオブジェクト.
@@ -91,7 +91,7 @@ export class NicoliveProgramSelectorService extends StatefulService<INicolivePro
           candidateChannels: onairChannelsResult.value,
         });
       } catch (error) {
-        await openErrorDialogFromFailure(error);
+        await openErrorDialogFromFailure(error as NicoliveFailure);
         this.SET_STATE({ isLoading: false });
       }
     } else {
@@ -114,7 +114,7 @@ export class NicoliveProgramSelectorService extends StatefulService<INicolivePro
         throw onairChannelProgramResult;
       }
     } catch (error) {
-      throw NicoliveFailure.fromClientError('fetchOnairChannelProgram', error);
+      throw NicoliveFailure.fromClientError('fetchOnairChannelProgram', error as FailedResult);
     }
   }
 
@@ -160,7 +160,7 @@ export class NicoliveProgramSelectorService extends StatefulService<INicolivePro
         isLoading: false,
       });
     } catch (error) {
-      await openErrorDialogFromFailure(error);
+      await openErrorDialogFromFailure(error as NicoliveFailure);
       this.SET_STATE({ isLoading: false });
     }
   }

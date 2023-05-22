@@ -21,7 +21,8 @@ export function $t(...args: any[]): string {
   // some tests try to call this function before dictionaries have been loaded
   if (!vueI18nInstance) return args[0];
 
-  return vueI18nInstance.t.call(I18nService.vueI18nInstance, ...args);
+  // @ts-ignore
+  return vueI18nInstance.t.call(I18nService.vueI18nInstance, ...args) as string;
 }
 
 /**
@@ -198,7 +199,7 @@ export class I18nService extends PersistentStatefulService<II18nState> implement
       }
     } catch (e) {
       let lineInfo = '';
-      const posMatch = e.message.match(/ at position ([0-9]+)$/);
+      const posMatch = (e as Error).message.match(/ at position ([0-9]+)$/);
       if (posMatch.length === 2) {
         const pos = parseInt(posMatch[1], 10);
         let lineStart = 0;
@@ -212,7 +213,7 @@ export class I18nService extends PersistentStatefulService<II18nState> implement
         }
       }
       throw new Error(
-        `in file: ${require('path').resolve(lastReadFilePath)}\n${e.message}${lineInfo}`,
+        `in file: ${require('path').resolve(lastReadFilePath)}\n${(e as Error).message}${lineInfo}`,
       );
     }
     rawJSON = '';

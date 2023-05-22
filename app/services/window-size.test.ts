@@ -247,6 +247,7 @@ describe('updateWindowSize', () => {
     [null, 'CLOSED', false],
     [null, 'OPENED', true],
     [null, 'OPENED', false],
+    //@ts-ignore
   ].map(([prev, next, smallerThanMinWidth]: [PanelState | null, PanelState, boolean]) => ({
     prev,
     next,
@@ -304,6 +305,7 @@ describe('updateWindowSize', () => {
     ['OPENED', 'CLOSED', true],
     ['OPENED', 'INACTIVE', true],
     ['CLOSED', 'INACTIVE', true],
+    //@ts-ignore
   ].map(([prev, next, isMaximized]: [PanelState, PanelState, boolean]) => ({
     prev,
     next,
@@ -365,6 +367,7 @@ describe('updateWindowSize', () => {
     ['COMPACT', 'CLOSED', false, false, false, false],
     ['COMPACT', 'OPENED', false, false, false, false],
   ].map(
+    //@ts-ignore
     ([prev, next, isMaximized, maximize, unmaximize, backupMaximized]: [
       PanelState,
       PanelState,
