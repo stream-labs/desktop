@@ -137,6 +137,7 @@ export class Guest extends MediasoupEntity {
 
     if (this.audioTrack) this.audioTrack.destroy();
     if (this.videoTrack) this.videoTrack.destroy();
+    if (this.screenshareTrack) this.screenshareTrack.destroy();
 
     super.destroy();
   }
