@@ -135,9 +135,11 @@ export class Guest extends MediasoupEntity {
       this.webrtcSubscription = null;
     }
 
-    if (this.audioTrack) this.audioTrack.destroy();
-    if (this.videoTrack) this.videoTrack.destroy();
-    if (this.screenshareTrack) this.screenshareTrack.destroy();
+    [this.audioTrack, this.videoTrack, this.screenshareTrack].forEach(track => {
+      if (track) {
+        track.destroy();
+      }
+    });
 
     super.destroy();
   }
