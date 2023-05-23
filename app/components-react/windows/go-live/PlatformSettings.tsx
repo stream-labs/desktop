@@ -15,6 +15,7 @@ import { TrovoEditStreamInfo } from './platforms/TrovoEditStreamInfo';
 export default function PlatformSettings() {
   const {
     isMultiplatformMode,
+    isDualOutputMode,
     error,
     isAdvancedMode,
     enabledPlatforms,
@@ -35,9 +36,10 @@ export default function PlatformSettings() {
   }));
 
   const shouldShowSettings = !error && !isLoading;
+  const canShowAdvancedMode = isMultiplatformMode || isDualOutputMode;
 
   let layoutMode: TLayoutMode;
-  if (isMultiplatformMode) {
+  if (canShowAdvancedMode) {
     layoutMode = isAdvancedMode ? 'multiplatformAdvanced' : 'multiplatformSimple';
   } else {
     layoutMode = 'singlePlatform';
@@ -62,7 +64,7 @@ export default function PlatformSettings() {
       {shouldShowSettings && (
         <div style={{ width: '100%' }}>
           {/*COMMON FIELDS*/}
-          {isMultiplatformMode && (
+          {canShowAdvancedMode && (
             <Section isSimpleMode={!isAdvancedMode} title={$t('Common Stream Settings')}>
               <CommonPlatformFields
                 descriptionIsRequired={descriptionIsRequired}

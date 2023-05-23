@@ -59,6 +59,7 @@ function ModalFooter() {
     lifecycle,
     checklist,
     isMultiplatformMode,
+    isDualOutputMode,
     goLive,
     isAdvancedMode,
     switchAdvancedMode,
@@ -78,7 +79,7 @@ function ModalFooter() {
   }));
 
   const shouldShowConfirm = ['prepopulate', 'waitForNewSettings'].includes(lifecycle);
-  const shouldShowAdvancedSwitch = shouldShowConfirm && isMultiplatformMode;
+  const shouldShowAdvancedSwitch = shouldShowConfirm && (isMultiplatformMode || isDualOutputMode);
   const shouldShowGoBackButton =
     lifecycle === 'runChecklist' && error && checklist.startVideoTransmission !== 'done';
 
