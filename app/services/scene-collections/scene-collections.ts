@@ -126,6 +126,12 @@ export class SceneCollectionsService extends Service implements ISceneCollection
           latestModified = collection.modified;
           latestId = collection.id;
         }
+
+        // before dual output, collections did not have the scene node map property
+        // so add it here on load
+        if (!collection.hasOwnProperty('sceneNodeMaps')) {
+          collection.sceneNodeMaps = {};
+        }
       });
 
       await this.load(latestId);
@@ -729,7 +735,7 @@ export class SceneCollectionsService extends Service implements ISceneCollection
           .catch(e => console.warn('Failed setting active collection'));
       }
 
-      if (!collection.sceneNodeMaps) {
+      if (!collection.hasOwnProperty('sceneNodeMaps')) {
         collection.sceneNodeMaps = {};
       }
 
@@ -938,20 +944,21 @@ export class SceneCollectionsService extends Service implements ISceneCollection
    */
 
   createNodeMapEntry(sceneId: string, horizontalNodeId: string, verticalNodeId: string) {
-    if (!this.activeCollection.sceneNodeMaps.hasOwnProperty(sceneId)) {
-      this.activeCollection.sceneNodeMaps = {
-        ...this.activeCollection.sceneNodeMaps,
-        [sceneId]: {},
-      };
+    if (!this.activeCollection) return;
+
+    if (!this.activeCollection?.sceneNodeMaps.hasOwnProperty(sceneId)) {
+      this.activeCollection.sceneNodeMaps[sceneId] = {};
     }
 
     this.stateService.createNodeMapEntry(sceneId, horizontalNodeId, verticalNodeId);
   }
 
   removeVerticalNode(sceneItemId: string, sceneId: string) {
-    if (!this.activeCollection.sceneNodeMaps.hasOwnProperty(sceneId)) return;
+    if (!this.activeCollection || !this.activeCollection?.sceneNodeMaps.hasOwnProperty(sceneId)) {
+      return;
+    }
 
-    const nodeMap = this.activeCollection.sceneNodeMaps[sceneId];
+    const nodeMap = this.activeCollection?.sceneNodeMaps[sceneId];
     delete nodeMap[sceneItemId];
 
     this.activeCollection.sceneNodeMaps[sceneId] = { ...nodeMap };

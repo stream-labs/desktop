@@ -40,10 +40,7 @@ export class SceneCollectionsStateService extends StatefulService<ISceneCollecti
   }
 
   get sceneNodeMaps() {
-    if (!this.activeCollection.hasOwnProperty('sceneNodeMaps')) {
-      this.activeCollection.sceneNodeMaps = {};
-    }
-    return this.activeCollection.sceneNodeMaps;
+    return this.activeCollection?.sceneNodeMaps;
   }
 
   /**

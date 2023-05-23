@@ -264,7 +264,10 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
 
     this.confirmDestinationDisplays(this.streamingService.views.customDestinations);
 
+    // we need to confirm that the scene collection has a node map
+    // because this is a new property added for dual output
     this.sceneCollectionsService.collectionSwitched.subscribe(() => {
+      this.confirmHasNodeMap();
       if (this.state.dualOutputMode) {
         this.setIsCollectionOrSceneLoading(false);
       }
@@ -289,14 +292,25 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
   }
 
   /**
+   * Confirm that the scene collection has a node map
+   */
+
+  confirmHasNodeMap() {
+    if (!this.sceneCollectionsService.activeCollection.hasOwnProperty('sceneNodeMaps')) {
+      this.sceneCollectionsService.activeCollection.sceneNodeMaps = {};
+    }
+  }
+
+  /**
    * Edit dual output display settings
    */
 
   setdualOutputMode() {
-    if (!this.state.dualOutputMode) {
+    this.SET_SHOW_DUAL_OUTPUT();
+
+    if (this.state.dualOutputMode) {
       this.confirmOrCreateVerticalNodes();
     }
-    this.SET_SHOW_DUAL_OUTPUT();
   }
 
   /**
