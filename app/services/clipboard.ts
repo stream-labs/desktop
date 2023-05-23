@@ -19,6 +19,8 @@ import { SceneCollectionsService } from 'services/scene-collections';
 import { EditorCommandsService } from 'services/editor-commands';
 import { IFilterData } from 'services/editor-commands/commands/paste-filters';
 import { NavigationService } from 'services/navigation';
+import { DualOutputService } from './dual-output';
+import { VideoSettingsService } from './settings-v2';
 import { byOS, OS } from 'util/operating-systems';
 const { clipboard } = electron;
 
@@ -146,6 +148,8 @@ export class ClipboardService extends StatefulService<IClipboardState> {
   @Inject() private sceneCollectionsService: SceneCollectionsService;
   @Inject() private editorCommandsService: EditorCommandsService;
   @Inject() private navigationService: NavigationService;
+  @Inject() private dualOutputService: DualOutputService;
+  @Inject() private videoSettingsService: VideoSettingsService;
 
   get views() {
     return new ClipboardViews(this.state);
@@ -358,7 +362,10 @@ export class ClipboardService extends StatefulService<IClipboardState> {
 
       // add sceneItem and apply settings
       const sceneItem = scene.addSource(sourceIdMap[itemModel.sourceId]);
-      sceneItem.setSettings(node.settings);
+
+      const display = this.dualOutputService.views.getNodeDisplay(sceneItem.id, scene.id);
+      const context = this.videoSettingsService.contexts[display];
+      sceneItem.setSettings({ ...node.settings, output: context, display });
 
       // set parent for item
       if (itemModel.parentId) sceneItem.setParent(folderIdMap[itemModel.parentId]);
