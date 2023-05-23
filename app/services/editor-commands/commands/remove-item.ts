@@ -79,40 +79,32 @@ export class RemoveItemCommand extends Command {
 
     // If the scene has vertical nodes, remove the corresponding vertical node
     if (this.dualOutputService.views.hasNodeMap()) {
-      this.dualOutputNodeDisplay = this.dualOutputService.views.getVerticalNodeId(
-        this.sceneItemId,
-        this.sceneId,
-      )
+      this.dualOutputNodeDisplay = this.dualOutputService.views.getVerticalNodeId(this.sceneItemId)
         ? 'horizontal'
         : 'vertical';
 
       this.dualOutputNodeId =
         this.dualOutputNodeDisplay === 'horizontal'
-          ? this.dualOutputService.views.getVerticalNodeId(this.sceneItemId, this.sceneId)
+          ? this.dualOutputService.views.getVerticalNodeId(this.sceneItemId)
           : this.dualOutputService.views.getHorizontalNodeId(this.sceneItemId, this.sceneId);
 
       const dualOutputSceneItem = this.scenesService.views.getSceneItem(this.dualOutputNodeId);
+      this.dualOutputNodeSettings = dualOutputSceneItem.getSettings();
 
-      // when a scene uses this command, it iterates over both the horizontal and vertical ones
-      // so vertical nodes may have already been deleted
-      if (dualOutputSceneItem) {
-        this.dualOutputNodeSettings = dualOutputSceneItem.getSettings();
+      this.reorderDualOutputNodesSubcommand = new ReorderNodesCommand(
+        scene.getSelection(this.dualOutputNodeId),
+        void 0,
+        EPlaceType.After,
+      );
 
-        this.reorderDualOutputNodesSubcommand = new ReorderNodesCommand(
-          scene.getSelection(this.dualOutputNodeId),
-          void 0,
-          EPlaceType.After,
-        );
+      this.reorderDualOutputNodesSubcommand.execute();
 
-        this.reorderDualOutputNodesSubcommand.execute();
+      dualOutputSceneItem.remove();
 
-        dualOutputSceneItem.remove();
+      const nodeToRemoveId =
+        this.dualOutputNodeDisplay === 'horizontal' ? this.sceneItemId : this.dualOutputNodeId;
 
-        const nodeToRemoveId =
-          this.dualOutputNodeDisplay === 'horizontal' ? this.sceneItemId : this.dualOutputNodeId;
-
-        this.sceneCollectionsService.removeVerticalNode(nodeToRemoveId, this.sceneId);
-      }
+      this.sceneCollectionsService.removeVerticalNode(nodeToRemoveId, this.sceneId);
     }
 
     // If this was the last item using this source, the underlying source
@@ -136,8 +128,7 @@ export class RemoveItemCommand extends Command {
 
     const scene = this.scenesService.views.getScene(this.sceneId);
 
-    // dual output node settings will only be set if the node was found when removing items
-    if (this.dualOutputNodeSettings) {
+    if (this.dualOutputNodeId) {
       // if the scene has vertical node items, restore both the horizontal and vertical nodes
       const horizontalNodeId =
         this.dualOutputNodeDisplay === 'horizontal' ? this.sceneItemId : this.dualOutputNodeId;
@@ -185,15 +176,7 @@ export class RemoveItemCommand extends Command {
       const item = scene.addSource(this.sourceId, { id: this.sceneItemId, select: false });
 
       this.reorderNodesSubcommand.rollback();
-
-      console.log('setting node settings for sceneItem ', item.id);
-      console.log('this.settings ', this.settings);
-      const horizontalContext = this.videoSettingsService.contexts.horizontal;
-      item.setSettings({
-        ...this.settings,
-        output: horizontalContext,
-        display: 'horizontal',
-      });
+      item.setSettings(this.settings);
     }
   }
 }
