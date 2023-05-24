@@ -61,12 +61,12 @@
           <i :class="speakingEnabled ? 'icon-speaker' : 'icon-mute'"></i>
         </button>
       </div>
-      <div class="created-notice" v-if="showProgramCreatedNotice">
-        <NAirLogo class="created-notice-logo" aria-hidden="true" />
-        <div class="created-notice-body">
-          <p class="created-notice-large">番組の作成に成功しました！</p>
-          <p class="created-notice-small">番組を開始して視聴者に配信を届けましょう</p>
-        </div>
+      <div class="created-notice" v-if="showPlaceholder">
+        <p class="created-notice-large">配信準備状態です</p>
+        <p class="created-notice-small">
+          番組開始前の確認を行うことができます。<br />&#91; 番組開始 &#93;
+          をクリックすると視聴者に公開されます。
+        </p>
       </div>
     </div>
     <comment-form class="comment-form" />
@@ -80,18 +80,18 @@
 
 <script lang="ts" src="./CommentViewer.vue.ts"></script>
 <style lang="less" scoped>
-@import '../../styles/index';
+@import url('../../styles/index');
 
 .container {
-  width: 100%;
-  flex-grow: 1;
   display: flex;
+  flex-grow: 1;
+  width: 100%;
   background-color: var(--color-bg-tertiary);
 }
 
 .header {
-  flex-shrink: 0;
   display: flex;
+  flex-shrink: 0;
   align-items: center;
   width: 100%;
   height: 48px;
@@ -108,65 +108,65 @@
 }
 
 .content {
-  flex-grow: 1;
   position: relative;
   display: flex;
   flex-direction: column;
+  flex-grow: 1;
 }
 
 .list {
   flex-grow: 1;
-  overflow-y: auto;
-  overflow-x: hidden;
   height: 0; // 100%がなぜか動かなくなったので workaround (Electron 6.1.11)
   padding-top: 8px;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 .row {
-  font-size: @font-size2;
-  height: 32px;
-  line-height: 32px;
   width: 100%;
+  height: 32px;
+  font-size: @font-size2;
+  line-height: 32px;
 }
 
 .sentinel {
-  pointer-events: none;
   height: 4px;
   margin-top: -4px;
+  pointer-events: none;
 }
 
 .pinned {
-  font-size: @font-size2;
   position: absolute;
   top: 8px;
-  left: 8px;
   right: 8px;
-  border: 1px solid var(--color-border-light);
-  background-color: var(--color-popper-bg-dark);
-  border-radius: 4px;
+  left: 8px;
+  z-index: @z-index-default-content;
   display: flex;
   padding: 12px 16px;
-  z-index: @z-index-default-content;
+  font-size: @font-size2;
+  background-color: var(--color-popper-bg-dark);
+  border: 1px solid var(--color-border-light);
+  border-radius: 4px;
 
   & > .comment-number {
+    flex-shrink: 0;
     font-weight: @font-weight-bold;
     color: @light-grey;
-    flex-shrink: 0;
   }
 
   & > .comment-body {
+    flex-grow: 1;
+    margin-left: 16px;
     font-weight: @font-weight-bold;
     color: @white;
-    margin-left: 16px;
-    flex-grow: 1;
     word-break: break-word;
   }
 
   & > .close {
-    height: 18px;
-    flex-shrink: 0;
     display: flex;
+    flex-shrink: 0;
     align-items: center;
+    height: 18px;
     margin-left: 16px;
 
     & > .icon-btn {
@@ -181,18 +181,18 @@
 
   display: flex;
   align-items: center;
-  font-size: @font-size2;
-  color: var(--color-button-label);
   height: 32px;
-  line-height: 32px;
   padding: 0 16px;
+  font-size: @font-size2;
+  line-height: 32px;
+  color: var(--color-button-label);
   text-align: center;
-  border-radius: 16px;
   cursor: pointer;
+  border-radius: 16px;
 
   > i {
-    font-size: @font-size1;
     margin-right: 8px;
+    font-size: @font-size1;
   }
 }
 
@@ -201,23 +201,23 @@
 }
 
 .overlay {
-  z-index: @z-index-expand-content; // AreaSwitcherのheaderより大きく
   position: absolute;
-  height: 100%;
+  z-index: @z-index-expand-content; // AreaSwitcherのheaderより大きく
   width: 100%;
+  height: 100%;
   background-color: var(--color-bg-tertiary);
 }
 
 .floating-wrapper {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: @z-index-default-content;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 16px;
-  position: absolute;
-  left: 0;
-  bottom: 0;
-  right: 0;
-  z-index: @z-index-default-content;
   pointer-events: none;
 
   button {
@@ -227,44 +227,31 @@
 }
 
 .created-notice {
-  display: flex;
-  align-items: center;
-  z-index: @z-index-expand-content; // AreaSwitcherのheaderより大きく
   position: absolute;
-  left: 16px;
-  bottom: 16px;
-
-  width: calc(100% - 32px);
-  .radius;
-  .shadow;
-  background-color: var(--color-bg-quaternary);
-  padding: 8px 12px;
-}
-
-.created-notice-logo {
-  width: 48px;
-  height: 48px;
-  margin-right: 12px;
-}
-
-.created-notice-body {
-  display: grid;
-  grid-gap: 4px;
-  gap: 4px;
+  top: 50%;
+  left: 50%;
+  z-index: @z-index-expand-content; // AreaSwitcherのheaderより大きく
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: fit-content;
+  padding: 8px;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
 }
 
 .created-notice-large {
-  color: var(--color-text-light);
-  font-size: @font-size2;
-  font-weight: @font-weight-bold;
-  line-height: 1.5;
   margin: 0;
+  font-size: @font-size4;
+  font-weight: @font-weight-bold;
+  color: var(--color-text);
+  text-align: center;
 }
 
 .created-notice-small {
+  margin-top: 4px;
   font-size: @font-size2;
   color: var(--color-text);
-  line-height: 1.5;
-  margin: 0;
+  text-align: center;
 }
 </style>
