@@ -72,7 +72,7 @@ module.exports = {
   target: 'electron-renderer',
 
   resolve: {
-    extensions: ['.js', '.ts'],
+    extensions: ['.js', '.ts', '.tsx'],
     modules: [path.resolve(__dirname, 'app'), 'node_modules'],
   },
 
@@ -109,6 +109,11 @@ module.exports = {
         test: /\.ts$/,
         loader: 'ts-loader',
         exclude: /node_modules|vue\/src/,
+      },
+      {
+        test: /\.tsx$/,
+        exclude: /node_modules|vue\/src/,
+        use: ['babel-loader', { loader: 'ts-loader' }],
       },
       {
         test: /\.js$/,

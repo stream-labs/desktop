@@ -79,5 +79,6 @@
   "Bicubic": "Bicubic",
   "Bilinear": "Bilinear",
   "Lanczos": "Lanczos",
-  "Area": "Area"
+  "Area": "Area",
+  "InteractTitle": "Interact: %{sourceName}"
 }
