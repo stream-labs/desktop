@@ -64,6 +64,16 @@ const schedules = {
 };
 
 const programs = {
+  test: {
+    status: schedules.test.status,
+    title: '番組タイトル',
+    description: '番組詳細情報',
+    beginAt: schedules.test.onAirBeginAt,
+    endAt: schedules.test.onAirEndAt,
+    vposBaseAt: schedules.test.vposBaseAt,
+    isMemberOnly: true,
+    rooms,
+  },
   onAir: {
     status: schedules.onAir.status,
     title: '番組タイトル',
@@ -160,10 +170,10 @@ test('findSuitableProgram', () => {
 });
 
 test.each([
-  ['CREATED', 1, true],
-  ['RESERVED', 0, false],
-  ['OTHER', 0, false],
-])('createProgram with %s', async (result: string, fetchProgramCalled: number, showPlaceholder: boolean) => {
+  ['CREATED', 1],
+  ['RESERVED', 0],
+  ['OTHER', 0],
+])('createProgram with %s', async (result: string, fetchProgramCalled: number) => {
   setup();
   const { NicoliveProgramService } = require('./nicolive-program');
   const instance = NicoliveProgramService.instance as NicoliveProgramService;
@@ -174,7 +184,6 @@ test.each([
   await expect(instance.createProgram()).resolves.toBe(result);
   expect(instance.client.createProgram).toHaveBeenCalledTimes(1);
   expect(instance.fetchProgram).toHaveBeenCalledTimes(fetchProgramCalled);
-  // expect(instance.isShownPlaceholder).toBe(showPlaceholder); TODO
 });
 
 test.each([
@@ -231,6 +240,65 @@ test('fetchProgramで結果が空ならエラー', async () => {
             ]
       `);
 });
+
+test('fetchProgram:testのときはshowPlaceholderをtrueにする', async () => {
+  setup();
+  const { NicoliveProgramService } = require('./nicolive-program');
+  const instance = NicoliveProgramService.instance as NicoliveProgramService;
+
+  instance.client.fetchProgramSchedules = jest
+    .fn()
+    .mockResolvedValue({ ok: true, value: [schedules.test] });
+  instance.client.fetchProgram = jest.fn().mockResolvedValue({ ok: true, value: programs.test });
+  instance.client.fetchCommunity = jest.fn().mockResolvedValue({
+    ok: true,
+    value: { name: 'community.name', icon: { url: { size_64x64: 'symbol url' } } },
+  } as WrappedResult<Community>);
+
+  (instance as any).setState = jest.fn();
+
+  await expect(instance.fetchProgram()).resolves.toBeUndefined();
+  expect(instance.client.fetchProgramSchedules).toHaveBeenCalledTimes(1);
+  expect(instance.client.fetchProgram).toHaveBeenCalledTimes(1);
+  expect(instance.client.fetchCommunity).toHaveBeenCalledTimes(1);
+  expect((instance as any).setState.mock.calls).toMatchInlineSnapshot(`
+    Array [
+      Array [
+        Object {
+          "isFetching": true,
+        },
+      ],
+      Array [
+        Object {
+          "communityID": "co1",
+          "communityName": "community.name",
+          "communitySymbol": "symbol url",
+          "description": "番組詳細情報",
+          "endTime": 150,
+          "isMemberOnly": true,
+          "programID": "lv1",
+          "roomThreadID": "hoge",
+          "roomURL": "https://example.com/lv1",
+          "startTime": 100,
+          "status": "test",
+          "title": "番組タイトル",
+          "vposBaseTime": 50,
+        },
+      ],
+      Array [
+        Object {
+          "showPlaceholder": true,
+        },
+      ],
+      Array [
+        Object {
+          "isFetching": false,
+        },
+      ],
+    ]
+  `);
+});
+
 
 test('fetchProgram:成功', async () => {
   setup();
