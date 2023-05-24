@@ -31,6 +31,7 @@ import { EStreamingState } from 'services/streaming';
 import Vue from 'vue';
 import { EDismissable } from 'services/dismissables';
 import { EAvailableFeatures } from 'services/incremental-rollout';
+import { assertIsDefined } from 'util/properties-type-guards';
 
 /**
  * This is in actuality a big data blob at runtime, the shape
@@ -471,6 +472,40 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
     });
   }
 
+  async getSocketConfig() {
+    const roomUrl = this.urlService.getStreamlabsApi('streamrooms/current');
+    const roomResult = await jfetch<IRoomResponse>(roomUrl, {
+      headers: authorizedHeaders(this.userService.views.auth.apiToken),
+    });
+
+    this.log('Room result', roomResult);
+
+    this.SET_INVITE_HASH(roomResult.hash);
+
+    this.room = roomResult.room;
+
+    let ioConfigResult: IIoConfigResponse;
+
+    if (Utils.env.SLD_GUEST_CAM_HASH ?? this.state.joinAsGuestHash) {
+      const url = this.urlService.getStreamlabsApi(
+        `streamrooms/io/config/${Utils.env.SLD_GUEST_CAM_HASH ?? this.state.joinAsGuestHash}`,
+      );
+      ioConfigResult = await jfetch<IIoConfigResponse>(url);
+    } else {
+      const ioConfigUrl = this.urlService.getStreamlabsApi('streamrooms/io/config');
+      ioConfigResult = await jfetch<IIoConfigResponse>(ioConfigUrl, {
+        headers: authorizedHeaders(this.userService.views.auth.apiToken),
+      });
+    }
+
+    this.log('io Config Result', ioConfigResult);
+
+    this.SET_HOST_NAME(ioConfigResult.host.name);
+    this.SET_MAX_GUESTS(ioConfigResult.host.maxGuests);
+
+    return ioConfigResult;
+  }
+
   async startListeningForGuests() {
     await this.socketMutex.do(async () => {
       if (!this.state.produceOk && !this.state.joinAsGuestHash) return;
@@ -479,35 +514,7 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
 
       if (!this.userService.views.isLoggedIn) return;
 
-      const roomUrl = this.urlService.getStreamlabsApi('streamrooms/current');
-      const roomResult = await jfetch<IRoomResponse>(roomUrl, {
-        headers: authorizedHeaders(this.userService.views.auth.apiToken),
-      });
-
-      this.log('Room result', roomResult);
-
-      this.SET_INVITE_HASH(roomResult.hash);
-
-      this.room = roomResult.room;
-
-      let ioConfigResult: IIoConfigResponse;
-
-      if (Utils.env.SLD_GUEST_CAM_HASH ?? this.state.joinAsGuestHash) {
-        const url = this.urlService.getStreamlabsApi(
-          `streamrooms/io/config/${Utils.env.SLD_GUEST_CAM_HASH ?? this.state.joinAsGuestHash}`,
-        );
-        ioConfigResult = await jfetch<IIoConfigResponse>(url);
-      } else {
-        const ioConfigUrl = this.urlService.getStreamlabsApi('streamrooms/io/config');
-        ioConfigResult = await jfetch<IIoConfigResponse>(ioConfigUrl, {
-          headers: authorizedHeaders(this.userService.views.auth.apiToken),
-        });
-      }
-
-      this.log('io Config Result', ioConfigResult);
-
-      this.SET_HOST_NAME(ioConfigResult.host.name);
-      this.SET_MAX_GUESTS(ioConfigResult.host.maxGuests);
+      const ioConfigResult = await this.getSocketConfig();
 
       await this.openSocketConnection(ioConfigResult.url, ioConfigResult.token);
     });
@@ -544,8 +551,12 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
 
   async setProduceOk() {
     this.SET_PRODUCE_OK(true);
-    await this.cleanUpSocketConnection();
-    this.startListeningForGuests();
+
+    // We've already called these methods once in `joinAsGuest`, avoid doing it again
+    if (!this.state.inviteHash) {
+      await this.cleanUpSocketConnection();
+      await this.startListeningForGuests();
+    }
 
     // If a guest is already connected and we are not yet producing, start doing so now.
     // If we are joined as a guest, we should also start producing first.
@@ -668,12 +679,23 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
     this.socket.on('connect_error', (e: any) => this.log('Connection Error', e));
     this.socket.on('connect_timeout', () => this.log('Connection Timeout'));
     this.socket.on('error', () => this.log('Socket Error'));
-    this.socket.on('disconnect', () => this.handleDisconnect());
+    this.socket.on('disconnect', this.handleDisconnect.bind(this));
     this.socket.on('webrtc', (e: TWebRTCSocketEvent) => this.onWebRTC(e));
   }
 
-  handleDisconnect() {
-    this.log('Socket Disconnected!');
+  handleDisconnect(reason: string) {
+    this.log('Socket Disconnected!', 'reason: ', reason);
+
+    if (reason === 'io server disconnect') {
+      // the disconnection was initiated by the server, we need to try to reconnect manually
+      // assuming this is the behavior we get when token expires, before that, we should
+      // regen the URL
+      this.getSocketConfig().then(ioConfigResult => {
+        this.openSocketConnection(ioConfigResult.url, ioConfigResult.token);
+      });
+
+      return;
+    }
 
     if (this.consumer) {
       this.consumer.destroy();
@@ -835,7 +857,7 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
 
     if (this.state.guests.length === 0) {
       await this.cleanUpSocketConnection();
-      this.startListeningForGuests();
+      await this.startListeningForGuests();
     }
   }
 
@@ -848,7 +870,7 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
 
     this.SET_JOIN_AS_GUEST(null);
     await this.cleanUpSocketConnection();
-    this.startListeningForGuests();
+    await this.startListeningForGuests();
   }
 
   async cleanUpSocketConnection() {
