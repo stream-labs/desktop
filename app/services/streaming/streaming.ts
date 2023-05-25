@@ -276,11 +276,10 @@ export class StreamingService
    * Make a transition to Live
    */
   async goLive(newSettings?: IGoLiveSettings) {
-    // don't interact with API in loged out mode and when protected mode is disabled
+    // don't interact with API in logged out mode and when protected mode is disabled
     if (
-      (!this.views.hasVerticalContext && !this.userService.isLoggedIn) ||
-      (!this.views.hasVerticalContext &&
-        !this.streamSettingsService.state.protectedModeEnabled &&
+      !this.userService.isLoggedIn ||
+      (!this.streamSettingsService.state.protectedModeEnabled &&
         this.userService.state.auth?.primaryPlatform !== 'twitch') // twitch is a special case
     ) {
       this.finishStartStreaming();
@@ -349,12 +348,7 @@ export class StreamingService
         await this.runCheck('setupMultistream', async () => {
           // enable restream on the backend side
           if (!this.restreamService.state.enabled) await this.restreamService.setEnabled(true);
-          if (this.views.isDualOutputMode) {
-            const context = this.views.contextsToStream[0];
-            await this.restreamService.beforeGoLive(context);
-          } else {
-            await this.restreamService.beforeGoLive();
-          }
+          await this.restreamService.beforeGoLive();
         });
       } catch (e: unknown) {
         console.error('Failed to setup restream', e);
@@ -778,11 +772,10 @@ export class StreamingService
       await new Promise(resolve => setTimeout(resolve, 1000));
     } else {
       // start single output
-      obs.NodeObs.OBS_service_setVideoInfo(
-        this.videoSettingsService.contexts.horizontal,
-        'horizontal',
-      );
-      obs.NodeObs.OBS_service_startStreaming('horizontal');
+      const horizontalContext = this.videoSettingsService.contexts.horizontal;
+      obs.NodeObs.OBS_service_setVideoInfo(horizontalContext, 'horizontal');
+
+      obs.NodeObs.OBS_service_startStreaming();
     }
 
     const recordWhenStreaming = this.streamSettingsService.settings.recordWhenStreaming;
@@ -854,7 +847,7 @@ export class StreamingService
         remote.powerSaveBlocker.stop(this.powerSaveId);
       }
 
-      if (this.views.contextsToStream.length > 1 && this.views.enabledPlatforms.length > 1) {
+      if (this.views.isDualOutputMode) {
         const signalChanged = this.signalInfoChanged.subscribe(
           (signalInfo: IOBSOutputSignalInfo) => {
             if (
@@ -871,14 +864,7 @@ export class StreamingService
         // sleep for 1 second to allow the first stream to stop
         await new Promise(resolve => setTimeout(resolve, 1000));
       } else {
-        if (
-          this.views.activeDisplays.vertical &&
-          this.views.contextsToStream.includes('vertical')
-        ) {
-          obs.NodeObs.OBS_service_stopStreaming(false, 'vertical');
-        } else {
-          obs.NodeObs.OBS_service_stopStreaming(false, 'horizontal');
-        }
+        obs.NodeObs.OBS_service_stopStreaming(false);
       }
 
       const keepRecording = this.streamSettingsService.settings.keepRecordingWhenStreamStops;
@@ -901,12 +887,11 @@ export class StreamingService
     }
 
     if (this.state.streamingStatus === EStreamingState.Ending) {
-      if (this.views.contextsToStream.length > 1) {
+      if (this.views.isDualOutputMode) {
         obs.NodeObs.OBS_service_stopStreaming(true, 'horizontal');
         obs.NodeObs.OBS_service_stopStreaming(true, 'vertical');
       } else {
-        const contextName = this.views.contextsToStream[0];
-        obs.NodeObs.OBS_service_stopStreaming(true, contextName);
+        obs.NodeObs.OBS_service_stopStreaming(true);
       }
       return Promise.resolve();
     }

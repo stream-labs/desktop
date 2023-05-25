@@ -102,18 +102,6 @@ class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
     return this.state.displays;
   }
 
-  get contextsToStream(): TDisplayType[] {
-    return Object.entries(this.activeDisplayPlatforms).reduce(
-      (contextNames: TDisplayType[], [key, value]: [TDisplayType, TPlatform[]]) => {
-        if (value.length) {
-          contextNames.push(key);
-        }
-        return contextNames;
-      },
-      [],
-    );
-  }
-
   get activeDisplayPlatforms() {
     const enabledPlatforms = this.streamingService.views.enabledPlatforms;
     return Object.entries(this.state.platformSettings).reduce(

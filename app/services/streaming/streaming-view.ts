@@ -166,7 +166,8 @@ export class StreamInfoView<T extends Object> extends ViewHandler<T> {
   }
 
   get isDualOutputMode(): boolean {
-    return this.dualOutputView.dualOutputMode;
+    // dual output mode is only available to logged in users
+    return this.dualOutputView.dualOutputMode && this.userView.isLoggedIn;
   }
 
   get activeDisplayPlatforms() {
@@ -175,10 +176,6 @@ export class StreamInfoView<T extends Object> extends ViewHandler<T> {
 
   get activeDisplays() {
     return this.dualOutputView.activeDisplays;
-  }
-
-  get contextsToStream(): TDisplayType[] {
-    return this.dualOutputView.contextsToStream;
   }
 
   get restreamAllDisplays() {
