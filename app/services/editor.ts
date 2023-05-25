@@ -55,7 +55,7 @@ export interface IMouseEvent {
   metaKey: boolean;
   button: number;
   buttons: number;
-  display?: TDisplayType;
+  display: TDisplayType;
 }
 
 export class EditorService extends StatefulService<IEditorServiceState> {

@@ -99,7 +99,7 @@ export default function StudioEditor() {
   // need to be redefined. It also ensures a single closure that never
   // changes for the moveInFlight piece of the mouseMove handler.
   const eventHandlers = useMemo(() => {
-    function getMouseEvent(event: React.MouseEvent, display?: TDisplayType) {
+    function getMouseEvent(event: React.MouseEvent, display: TDisplayType) {
       return {
         offsetX: event.nativeEvent.offsetX,
         offsetY: event.nativeEvent.offsetY,
@@ -144,16 +144,16 @@ export default function StudioEditor() {
         EditorService.actions.handleMouseDown(getMouseEvent(event, display));
       },
 
-      onMouseUp(event: React.MouseEvent) {
-        EditorService.actions.handleMouseUp(getMouseEvent(event));
+      onMouseUp(event: React.MouseEvent, display: TDisplayType) {
+        EditorService.actions.handleMouseUp(getMouseEvent(event, display));
       },
 
       onMouseEnter(event: React.MouseEvent, display: TDisplayType) {
         EditorService.actions.handleMouseEnter(getMouseEvent(event, display));
       },
 
-      onMouseDblClick(event: React.MouseEvent) {
-        EditorService.actions.handleMouseDblClick(getMouseEvent(event));
+      onMouseDblClick(event: React.MouseEvent, display: TDisplayType) {
+        EditorService.actions.handleMouseDblClick(getMouseEvent(event, display));
       },
 
       onMouseMove,
@@ -186,14 +186,18 @@ export default function StudioEditor() {
                 onMouseDown={(event: React.MouseEvent) =>
                   eventHandlers.onMouseDown(event, 'horizontal')
                 }
-                onMouseUp={eventHandlers.onMouseUp}
+                onMouseUp={(event: React.MouseEvent) =>
+                  eventHandlers.onMouseUp(event, 'horizontal')
+                }
                 onMouseEnter={(event: React.MouseEvent) =>
                   eventHandlers.onMouseEnter(event, 'horizontal')
                 }
                 onMouseMove={(event: React.MouseEvent) =>
                   eventHandlers.onMouseMove(event, 'horizontal')
                 }
-                onDoubleClick={eventHandlers.onMouseDblClick}
+                onDoubleClick={(event: React.MouseEvent) =>
+                  eventHandlers.onMouseDblClick(event, 'horizontal')
+                }
                 onContextMenu={eventHandlers.onContextMenu}
               >
                 <Display
@@ -215,14 +219,16 @@ export default function StudioEditor() {
                 onMouseDown={(event: React.MouseEvent) =>
                   eventHandlers.onMouseDown(event, 'vertical')
                 }
-                onMouseUp={eventHandlers.onMouseUp}
+                onMouseUp={(event: React.MouseEvent) => eventHandlers.onMouseUp(event, 'vertical')}
                 onMouseEnter={(event: React.MouseEvent) =>
                   eventHandlers.onMouseEnter(event, 'vertical')
                 }
                 onMouseMove={(event: React.MouseEvent) =>
                   eventHandlers.onMouseMove(event, 'vertical')
                 }
-                onDoubleClick={eventHandlers.onMouseDblClick}
+                onDoubleClick={(event: React.MouseEvent) =>
+                  eventHandlers.onMouseDblClick(event, 'vertical')
+                }
                 onContextMenu={eventHandlers.onContextMenu}
               >
                 <Display

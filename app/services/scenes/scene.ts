@@ -181,7 +181,10 @@ export class Scene {
     const display = this.dualOutputService.views.getNodeDisplay(sceneItem.id, this.state.id);
     const context = this.videoSettingsService.contexts[display];
     obsSceneItem.video = context as obs.IVideo;
-    sceneItem.display = display;
+
+    // must use this function so new scene items
+    // can be edited in the display
+    sceneItem.setSettings({ display });
 
     // Default is to select
     if (options.select == null) options.select = true;
