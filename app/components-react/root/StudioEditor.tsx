@@ -6,10 +6,7 @@ import cx from 'classnames';
 import Display from 'components-react/shared/Display';
 import { $t } from 'services/i18n';
 import { ERenderingMode } from '../../../obs-api';
-import { Tooltip } from 'antd';
 import { TDisplayType } from 'services/settings-v2';
-import { DualOutputService } from 'app-services';
-import ProgressBar from 'components-react/shared/ProgressBar';
 import DualOutputProgressBar from 'components-react/editor/elements/DualOutputProgressBar';
 
 export default function StudioEditor() {
@@ -19,7 +16,6 @@ export default function StudioEditor() {
     EditorService,
     TransitionsService,
     ScenesService,
-    VideoSettingsService,
     DualOutputService,
   } = Services;
   const v = useVuex(() => ({
@@ -328,6 +324,9 @@ function StudioModeControls(p: { stacked: boolean }) {
 }
 
 function DualOutputControls(p: { stacked: boolean }) {
+  function openSettingsWindow() {
+    Services.SettingsService.actions.showSettings('Video');
+  }
   return (
     <div className={cx(styles.dualOutputModeControls, { [styles.stacked]: p.stacked })}>
       <div className={styles.dualOutputModeDetails}>
@@ -339,6 +338,9 @@ function DualOutputControls(p: { stacked: boolean }) {
         <i className="icon-phone-case" />
         <span>{$t('Vertical Output')}</span>
       </div>
+      <a className={styles.manageLink} onClick={openSettingsWindow}>
+        {$t('Manage Dual Output')}
+      </a>
     </div>
   );
 }
