@@ -1,10 +1,8 @@
 import { debounce } from 'lodash-decorators';
 import { Inject } from 'services/core/injector';
-import { InitAfter } from 'services/core';
 import { mutation, StatefulService } from '../core/stateful-service';
 import * as obs from '../../../obs-api';
 import { DualOutputService } from 'services/dual-output';
-import { ScenesService } from 'services/scenes';
 import { SettingsService } from 'services/settings';
 import { Subject } from 'rxjs';
 
@@ -48,10 +46,8 @@ export function invalidFps(num: number, den: number) {
   return num / den > 1000 || num / den < 1;
 }
 
-@InitAfter('ScenesService')
 export class VideoSettingsService extends StatefulService<IVideoSetting> {
   @Inject() dualOutputService: DualOutputService;
-  @Inject() scenesService: ScenesService;
   @Inject() settingsService: SettingsService;
 
   initialState = {
@@ -81,6 +77,10 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
       horizontal: this.formatVideoSettings('horizontal'),
       vertical: this.formatVideoSettings('vertical'),
     };
+  }
+
+  get hasContext() {
+    return this.contexts.horizontal !== null;
   }
 
   get baseResolutions() {
@@ -130,10 +130,12 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
     // if this is the first time starting the app
     // set default settings for horizontal context
     const videoLegacy = this.contexts.horizontal.legacySettings;
+
     if (
       display === 'horizontal' &&
-      !this.dualOutputService.views.videoSettings.horizontal &&
-      (videoLegacy.baseHeight === 0 || videoLegacy.baseWidth === 0)
+      (!this.dualOutputService.views.videoSettings.horizontal ||
+        videoLegacy.baseHeight === 0 ||
+        videoLegacy.baseWidth === 0)
     ) {
       Object.keys(this.contexts.horizontal.video).forEach((key: keyof obs.IVideoInfo) => {
         this.SET_VIDEO_SETTING(key, this.contexts.horizontal.video[key]);

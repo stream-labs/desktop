@@ -546,7 +546,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
   private SET_VIDEO_SETTING(setting: Partial<IVideoSetting>, display: TDisplayType = 'vertical') {
     this.state.videoSettings[display] = {
       ...this.state.videoSettings[display],
-      setting,
+      ...setting,
     };
   }
 

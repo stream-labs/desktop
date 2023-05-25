@@ -5,6 +5,7 @@ import cloneDeep from 'lodash/cloneDeep';
 import { IObsListOption, TObsValue, IObsListInput } from 'components/obs/inputs/ObsInput';
 import { mutation, StatefulService, ViewHandler } from 'services/core/stateful-service';
 import * as obs from '../../../obs-api';
+import { InitAfter } from 'services/core';
 import { Inject } from 'services/core/injector';
 import namingHelpers from 'util/NamingHelpers';
 import { WindowsService } from 'services/windows';
@@ -166,6 +167,7 @@ class SourcesViews extends ViewHandler<ISourcesState> {
   }
 }
 
+@InitAfter('VideoSettingsService')
 export class SourcesService extends StatefulService<ISourcesState> {
   static initialState = {
     sources: {},
