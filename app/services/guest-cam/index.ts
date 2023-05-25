@@ -363,6 +363,14 @@ export class GuestCamService extends StatefulService<IGuestCamServiceState> {
       this.findDefaultSources();
     });
 
+    // Stop screen sharing if the user switches scenes as the source might not be available in the new scene
+    // TODO: consider checking if the source is in the new scene and don't stop sharing if so, might be expensive
+    this.scenesService.sceneSwitched.subscribe(() => {
+      if (this.views.screenshareSource) {
+        this.setScreenshareSource(null);
+      }
+    });
+
     this.streamingService.streamingStatusChange.subscribe(status => {
       if ([EStreamingState.Live, EStreamingState.Offline].includes(status)) {
         this.emitStreamingStatus();
