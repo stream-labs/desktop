@@ -101,7 +101,6 @@ export default class BrowserSourceInteraction extends TsxComponent<{}> {
   }
 
   render(h: Function) {
-    // 引数消せるはずなのだがちょっとまだわからない
     return (
       <ModalLayout showControls={false} contentStyles={{ padding: '0px' }}>
         <div
