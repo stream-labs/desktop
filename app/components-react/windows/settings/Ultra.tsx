@@ -48,10 +48,10 @@ export function Ultra() {
       link: 'https://melonapp.com/?refl=slobs-settings',
     },
     {
-      title: 'Oslo Editor Pro',
+      title: 'Video Editor Pro',
       description: $t('Professional video editing and collaboration tools'),
-      image: 'oslo.png',
-      link: 'http://oslo.io/?refl=slobs-settings',
+      image: 'video-editor.png',
+      link: 'http://streamlabs.com/video-editor?refl=slobs-settings',
     },
     {
       title: 'Streamlabs Cross Clip Pro',
@@ -84,7 +84,11 @@ export function Ultra() {
           icon: 'icon-editor-7',
           tooltip: $t('Format Clips for TikTok, Shorts, etc'),
         },
-        { text: 'Oslo', icon: 'icon-streamlabs', tooltip: $t('Collaborative Video Editing') },
+        {
+          text: 'Video Editor',
+          icon: 'icon-streamlabs',
+          tooltip: $t('Collaborative Video Editing'),
+        },
         { text: $t('Merch Store'), icon: 'icon-upperwear' },
       ],
       tableData: {
