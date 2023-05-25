@@ -2,11 +2,7 @@
   "compilerOptions": {
     "outDir": "../test-dist",
     "target": "es5",
-    "lib": [
-      "dom",
-      "es7",
-      "es2017"
-    ],
+    "lib": ["dom", "es7", "es2017"],
     "module": "commonjs",
     "sourceMap": true,
     "allowJs": true,
@@ -21,9 +17,8 @@
     "emitDecoratorMetadata": true,
     "downlevelIteration": true,
     "baseUrl": "../app",
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "jsx": "preserve"
   },
-  "exclude": [
-    "node_modules"
-  ]
+  "exclude": ["node_modules"]
 }
