@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import * as remote from '@electron/remote';
-import { Tooltip } from 'antd';
+import { Tooltip, message } from 'antd';
 import { inject, useModule } from 'slap';
 import { $t } from 'services/i18n';
 import { ModalLayout } from 'components-react/shared/ModalLayout';
-import PlatformLogo from 'components-react/shared/PlatformLogo';
+import { ListInput } from 'components-react/shared/inputs';
+import Form from 'components-react/shared/inputs/Form';
 import { RecordingModeService, UserService } from 'app-services';
 import styles from './RecordingHistory.m.less';
 import AutoProgressBar from 'components-react/shared/AutoProgressBar';
@@ -21,8 +22,30 @@ class RecordingHistoryModule {
     return this.UserService.views.linkedPlatforms.includes('youtube');
   }
 
+  get hasSLID() {
+    return !!this.UserService.views.auth?.slid?.id;
+  }
+
   get uploadInfo() {
     return this.RecordingModeService.state.uploadInfo;
+  }
+
+  get uploadOptions() {
+    const opts = [];
+    if (this.hasYoutube) opts.push({ label: 'YouTube', value: 'youtube' });
+    if (this.hasSLID) {
+      opts.push({ label: 'Cross Clip', value: 'crossclip' });
+      opts.push({ label: 'TypeStudio', value: 'typestudio' });
+    }
+
+    return opts;
+  }
+
+  handleSelect(filename: string) {
+    return (platform: string) => {
+      if (platform === 'youtube') return this.uploadToYoutube(filename);
+      this.uploadToStorage(filename, platform);
+    };
   }
 
   formattedTimestamp(timestamp: string) {
@@ -31,6 +54,22 @@ class RecordingHistoryModule {
 
   uploadToYoutube(filename: string) {
     this.RecordingModeService.actions.uploadToYoutube(filename);
+  }
+
+  getPlatformLink(platform: string, id: string) {
+    if (platform === 'crossclip') {
+      return `https://crossclip.streamlabs.com/storage/${id}`;
+    }
+    if (platform === 'typestudio') {
+      return `https://app.typestudio.co/storage/${id}`;
+    }
+    return '';
+  }
+
+  async uploadToStorage(filename: string, platform: string) {
+    const id = await this.RecordingModeService.actions.return.uploadToStorage(filename, platform);
+    if (!id) return;
+    remote.shell.openExternal(this.getPlatformLink(platform, id));
   }
 
   showFile(filename: string) {
@@ -43,9 +82,20 @@ class RecordingHistoryModule {
 }
 
 export default function RecordingHistory() {
-  const { recordings, hasYoutube, formattedTimestamp, uploadToYoutube, showFile } = useModule(
-    RecordingHistoryModule,
-  );
+  const {
+    recordings,
+    formattedTimestamp,
+    showFile,
+    uploadOptions,
+    handleSelect,
+    uploadInfo,
+  } = useModule(RecordingHistoryModule);
+
+  useEffect(() => {
+    if (uploadInfo.error && typeof uploadInfo.error === 'string') {
+      message.warning(uploadInfo.error, 5);
+    }
+  }, [uploadInfo.error]);
 
   return (
     <ModalLayout hideFooter scrollable>
@@ -59,12 +109,14 @@ export default function RecordingHistory() {
                 {recording.filename}
               </span>
             </Tooltip>
-            {hasYoutube && (
-              <Tooltip title={$t('Upload to YouTube')} placement="left">
-                <div onClick={() => uploadToYoutube(recording.filename)}>
-                  <PlatformLogo platform="youtube" />
-                </div>
-              </Tooltip>
+            {uploadOptions.length > 0 && (
+              <Form className={styles.uploadForm}>
+                <ListInput
+                  onSelect={handleSelect(recording.filename)}
+                  label={$t('Upload To')}
+                  options={uploadOptions}
+                />
+              </Form>
             )}
           </div>
         ))}
