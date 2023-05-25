@@ -40,7 +40,7 @@ export class GuestTrack extends MediasoupEntity {
   /**
    * Requests this track from the server
    */
-  private requestTrack() {
+  requestTrack() {
     this.sendWebRTCRequest({
       type: 'getConsumerTrack',
       data: {

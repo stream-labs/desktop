@@ -63,7 +63,7 @@ export class Guest extends MediasoupEntity {
           sourceId: this.sourceId,
         });
 
-        await this.screenshareTrack.connect();
+        this.screenshareTrack.requestTrack();
       }
 
       this.consumerCreatedReady();
@@ -97,6 +97,20 @@ export class Guest extends MediasoupEntity {
 
       await this.videoTrack.connect();
     }
+
+    if (this.opts.remoteProducer.type === 'screenshare') {
+      // Replace screenshare track as we need to reassign source ID
+      this.screenshareTrack = new GuestTrack({
+        kind: 'video',
+        trackId: this.opts.remoteProducer.videoId,
+        socketId: this.opts.remoteProducer.socketId,
+        streamId: this.opts.remoteProducer.streamId,
+        transportId: this.transportId,
+        sourceId: this.sourceId,
+      });
+
+      await this.screenshareTrack.connect();
+    }
   }
 
   get streamId() {
@@ -122,6 +136,11 @@ export class Guest extends MediasoupEntity {
       if (this.videoTrack) {
         this.videoTrack.destroy();
         this.videoTrack = null;
+      }
+
+      if (this.screenshareTrack) {
+        this.screenshareTrack.destroy();
+        this.screenshareTrack = null;
       }
 
       if (sourceId) await this.createTracks();
