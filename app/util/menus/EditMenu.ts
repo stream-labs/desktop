@@ -203,6 +203,18 @@ export class EditMenu extends Menu {
       });
     }
 
+    if (this.source) {
+      if (
+        this.source.type === 'browser_source' &&
+        this.source.propertiesManagerType === 'default'
+      ) {
+        this.append({
+          label: $t('common.Interact'),
+          click: () => this.sourcesService.showInteractWindow(this.source.sourceId),
+        });
+      }
+    }
+
     if (this.source && !isMultipleSelection) {
       this.append({
         id: 'Rename',

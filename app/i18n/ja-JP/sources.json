@@ -79,5 +79,6 @@
   "Bicubic": "バイキュービック",
   "Bilinear": "バイリニア",
   "Lanczos": "ランチョス",
-  "Area": "面積"
+  "Area": "面積",
+  "InteractTitle": "インタラクション：%{sourceName}"
 }

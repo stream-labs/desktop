@@ -18,6 +18,7 @@
     "emitDecoratorMetadata": false,
     "downlevelIteration": true,
     "baseUrl": "./app",
+    "jsx": "preserve",
 
     "alwaysStrict": true,
     "noImplicitAny": true,
