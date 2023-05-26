@@ -236,21 +236,17 @@ function ExportOptions(p: { close: () => void }) {
 
 function PlatformSelect(p: { onClose: () => void }) {
   const { videoName } = useModule(ExportModule);
-  const { UserService, IncrementalRolloutService } = Services;
+  const { UserService } = Services;
   const { isYoutubeLinked } = useVuex(() => ({
     isYoutubeLinked: !!UserService.state.auth?.platforms.youtube,
   }));
   const [platform, setPlatform] = useState(() => (isYoutubeLinked ? 'youtube' : 'crossclip'));
 
-  const platformOptions = IncrementalRolloutService.views.availableFeatures.includes(
-    EAvailableFeatures.sharedStorage,
-  )
-    ? [
-        { label: 'YouTube', value: 'youtube' },
-        { label: 'Cross Clip', value: 'crossclip' },
-        { label: 'Type Studio', value: 'typestudio' },
-      ]
-    : [{ label: 'YouTube', value: 'youtube' }];
+  const platformOptions = [
+    { label: 'YouTube', value: 'youtube' },
+    { label: 'Cross Clip', value: 'crossclip' },
+    { label: 'Type Studio', value: 'typestudio' },
+  ];
 
   return (
     <Form>
