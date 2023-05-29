@@ -32,16 +32,17 @@
 <script lang="ts" src="./Studio.vue.ts"></script>
 
 <style lang="less" scoped>
-@import '../../styles/index';
+@import url('../../styles/index');
 
 .studio-page {
   flex-direction: column;
 }
 
 .studio-mode-container {
-  flex-grow: 1;
   display: flex;
   flex-direction: column;
+  flex-grow: 1;
+  background-color: var(--color-bg-quinary);
 
   &.compact-mode {
     width: 448px;
@@ -53,8 +54,8 @@
 }
 
 .studio-display-container {
-  flex-grow: 1;
   display: flex;
+  flex-grow: 1;
   padding: @studio-display-padding;
 
   &.stacked {
@@ -63,8 +64,8 @@
 }
 
 .studio-mode-display-container {
-  flex-grow: 1;
   position: relative;
+  flex-grow: 1;
 }
 
 .studio-mode-display {
@@ -75,17 +76,18 @@
 
 .no-preview {
   position: relative;
-  flex-grow: 1;
-  background-color: @bg-tertiary;
   display: flex;
+  flex-grow: 1;
   align-items: center;
   justify-content: center;
+  background-color: @bg-tertiary;
 
   .message {
     max-width: 50%;
+
     .button {
-      margin-top: 20px;
       display: block;
+      margin-top: 20px;
     }
   }
 }
