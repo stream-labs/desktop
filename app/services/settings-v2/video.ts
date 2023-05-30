@@ -131,18 +131,10 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
     // set default settings for horizontal context
     const videoLegacy = this.contexts.horizontal.legacySettings;
 
-    if (
-      display === 'horizontal' &&
-      (!this.dualOutputService.views.videoSettings.horizontal ||
-        videoLegacy.baseHeight === 0 ||
-        videoLegacy.baseWidth === 0)
-    ) {
-      Object.keys(this.contexts.horizontal.video).forEach((key: keyof obs.IVideoInfo) => {
-        this.SET_VIDEO_SETTING(key, this.contexts.horizontal.video[key]);
-        this.dualOutputService.setVideoSetting(
-          { [key]: this.contexts.horizontal.video[key] },
-          'horizontal',
-        );
+    if (display === 'horizontal' && !this.dualOutputService.views.videoSettings.horizontal) {
+      Object.keys(videoLegacy).forEach((key: keyof obs.IVideoInfo) => {
+        this.SET_VIDEO_SETTING(key, videoLegacy[key]);
+        this.dualOutputService.setVideoSetting({ [key]: videoLegacy[key] }, 'horizontal');
       });
     } else {
       const settings = this.dualOutputService.views.videoSettings[display];
