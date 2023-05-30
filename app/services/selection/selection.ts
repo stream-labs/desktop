@@ -531,8 +531,8 @@ export class Selection {
     this.getItems().forEach(item => item.centerOnAxis(CenteringAxis.Y));
   }
 
-  rotate(deg: number) {
-    this.getItems().forEach(item => item.rotate(deg));
+  rotate(deg: number, isDelta = true) {
+    this.getItems().forEach(item => item.rotate(deg, isDelta));
   }
 
   setContentCrop() {
