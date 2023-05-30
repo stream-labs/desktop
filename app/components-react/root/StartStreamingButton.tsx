@@ -114,26 +114,22 @@ export default function StartStreamingButton(p: { disabled?: boolean }) {
 
     if (!primaryPlatform) return false;
 
-    if (
-      !!UserService.state.auth?.platforms &&
-      (StreamingService.views.isMultiplatformMode || StreamingService.views.isDualOutputMode) &&
-      Object.keys(UserService.state.auth?.platforms).length > 1
-    ) {
+    if (StreamingService.views.isDualOutputMode) {
       return true;
     }
 
-    if (StreamingService.views.isDualOutputMode) {
+    if (
+      !!UserService.state.auth?.platforms &&
+      StreamingService.views.isMultiplatformMode &&
+      Object.keys(UserService.state.auth?.platforms).length > 1
+    ) {
       return true;
     }
 
     if (primaryPlatform === 'twitch') {
       // For Twitch, we can show the Go Live window even with protected mode off
       // This is mainly for legacy reasons.
-      return (
-        StreamingService.views.isMultiplatformMode ||
-        StreamingService.views.isDualOutputMode ||
-        updateStreamInfoOnLive
-      );
+      return StreamingService.views.isMultiplatformMode || updateStreamInfoOnLive;
     } else {
       return (
         StreamSettingsService.state.protectedModeEnabled &&
