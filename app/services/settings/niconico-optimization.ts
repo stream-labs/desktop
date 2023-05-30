@@ -27,6 +27,9 @@ export function getBestSettingsForNiconico(
   }
 
   switch (options.height) {
+    case 1080:
+      resolution = '1920x1080';
+      break;
     case 720:
       resolution = '1280x720';
       break;
