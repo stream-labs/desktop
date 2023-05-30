@@ -27,7 +27,7 @@ import { SceneCollectionsService } from 'services/scene-collections';
 import * as remote from '@electron/remote';
 import fs from 'fs';
 import path from 'path';
-import { VideoSettingsService } from 'app-services';
+import { DualOutputService } from 'app-services';
 
 export interface ISettingsValues {
   General: {
@@ -192,7 +192,7 @@ export class SettingsService extends StatefulService<ISettingsServiceState> {
   @Inject() private usageStatisticsService: UsageStatisticsService;
   @Inject() private sceneCollectionsService: SceneCollectionsService;
   @Inject() private hardwareService: HardwareService;
-  @Inject() private videoSettingsService: VideoSettingsService;
+  @Inject() private dualOutputService: DualOutputService;
 
   @Inject()
   private videoEncodingOptimizationService: VideoEncodingOptimizationService;
@@ -282,21 +282,7 @@ export class SettingsService extends StatefulService<ISettingsServiceState> {
   //   const settingsFormData = {};
   //   this.getCategories().forEach(categoryName => {
   //     settingsFormData[categoryName] = this.fetchSettingsFromObs(categoryName);
-  //     if (['Stream', 'StreamSecond'].includes(categoryName)) {
-  //       // TODO: remove. Temporary and janky: force set the server to auto if the service is twitch
-  //       settingsFormData[categoryName].formData[1].parameters.forEach(
-  //         (parameter: IObsInput<unknown>) => {
-  //           if (parameter.name === 'service' && parameter.value === 'Twitch') {
-  //             settingsFormData[categoryName].formData[1].parameters.forEach(
-  //               (param: IObsInput<unknown>) => {
-  //                 if (param.name === 'server') {
-  //                   param.value = 'auto';
-  //                 }
-  //               },
-  //             );
-  //           }
-  //         },
-  //       );
+  //
   //     }
   //   });
   //   this.SET_SETTINGS(settingsFormData);
@@ -305,6 +291,26 @@ export class SettingsService extends StatefulService<ISettingsServiceState> {
     const settingsFormData = {};
     this.getCategories().forEach(categoryName => {
       settingsFormData[categoryName] = this.fetchSettingsFromObs(categoryName);
+      // This is janky but forces setting the server to auto if the service is twitch
+      // Otherwise the stream settings sent to obs will not update and the stream won't go live
+      if (
+        this.dualOutputService.views.dualOutputMode &&
+        ['Stream', 'StreamSecond'].includes(categoryName)
+      ) {
+        settingsFormData[categoryName].formData[1].parameters.forEach(
+          (parameter: IObsInput<unknown>) => {
+            if (parameter.name === 'service' && parameter.value === 'Twitch') {
+              settingsFormData[categoryName].formData[1].parameters.forEach(
+                (param: IObsInput<unknown>) => {
+                  if (param.name === 'server') {
+                    param.value = 'auto';
+                  }
+                },
+              );
+            }
+          },
+        );
+      }
     });
     this.SET_SETTINGS(settingsFormData);
   }
