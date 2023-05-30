@@ -298,6 +298,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
 
     if (this.state.dualOutputMode) {
       this.confirmOrCreateVerticalNodes();
+      this.toggleDisplay(true, 'vertical');
     }
   }
 
