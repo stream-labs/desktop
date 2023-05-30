@@ -16,6 +16,7 @@ export default function PlatformSettings() {
   const {
     isMultiplatformMode,
     isDualOutputMode,
+    settings,
     error,
     isAdvancedMode,
     enabledPlatforms,
@@ -25,7 +26,6 @@ export default function PlatformSettings() {
     commonFields,
     updateCommonFields,
     descriptionIsRequired,
-    getPlatformSettings,
     isUpdateMode,
   } = useGoLiveSettings().extend(settings => ({
     get descriptionIsRequired() {
@@ -50,7 +50,7 @@ export default function PlatformSettings() {
       isUpdateMode,
       layoutMode,
       get value() {
-        return getDefined(getPlatformSettings(platform));
+        return getDefined(settings.platforms[platform]);
       },
       onChange(newSettings) {
         updatePlatform(platform, newSettings);

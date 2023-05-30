@@ -111,7 +111,7 @@ export class StreamInfoView<T extends Object> extends ViewHandler<T> {
    */
   get linkedPlatforms(): TPlatform[] {
     if (!this.userView.state.auth) return [];
-    if (!this.userView.isPrime && this.isDualOutputMode) {
+    if (this.isDualOutputMode) {
       return this.allPlatforms.filter(p => this.isPlatformLinked(p));
     }
     if (!this.restreamView.canEnableRestream || !this.protectedModeEnabled) {
@@ -157,11 +157,11 @@ export class StreamInfoView<T extends Object> extends ViewHandler<T> {
   }
 
   get isMultiplatformMode(): boolean {
+    if (this.isDualOutputMode) return false;
     return (
       this.protectedModeEnabled &&
       (this.enabledPlatforms.length > 1 ||
-        this.settings.customDestinations.filter(dest => dest.enabled).length > 0) &&
-      !this.isDualOutputMode
+        this.settings.customDestinations.filter(dest => dest.enabled).length > 0)
     );
   }
 

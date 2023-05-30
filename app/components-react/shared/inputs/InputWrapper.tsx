@@ -10,6 +10,7 @@ type TInputWrapperProps = FormItemProps & {
   nolabel?: boolean;
   inputRef?: unknown;
   layout?: TInputLayout;
+  name?: string;
 };
 
 /**

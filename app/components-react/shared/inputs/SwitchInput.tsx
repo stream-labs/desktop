@@ -10,7 +10,7 @@ import cx from 'classnames';
 const ANT_SWITCH_FEATURES = ['checkedChildren', 'unCheckedChildren'] as const;
 
 export type TSwitchInputProps = TSlobsInputProps<
-  { inputRef?: React.Ref<HTMLInputElement>; style?: React.CSSProperties },
+  { inputRef?: React.Ref<HTMLInputElement>; style?: React.CSSProperties; name?: string },
   boolean,
   SwitchProps,
   ValuesOf<typeof ANT_SWITCH_FEATURES>
