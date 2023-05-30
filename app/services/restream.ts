@@ -248,7 +248,7 @@ export class RestreamService extends StatefulService<IRestreamState> {
       const ttSettings = this.tiktokService.state.settings;
       tikTokTarget.platform = 'relay';
       tikTokTarget.streamKey = `${ttSettings.serverUrl}/${ttSettings.streamKey}`;
-      tikTokTarget.mode = 'portrait';
+      tikTokTarget.mode = this.dualOutputService.views.getPlatformMode('tiktok');
     }
 
     await this.createTargets(newTargets);
