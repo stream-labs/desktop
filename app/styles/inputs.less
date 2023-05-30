@@ -1,14 +1,14 @@
-input[type=text],
-input[type=number],
-input[type=password],
+input[type='text'],
+input[type='number'],
+input[type='password'],
 textarea {
-  color: var(--color-text);
-  font-size: @font-size4;
   height: @item-generic-size;
+  margin-bottom: 0;
+  font-size: @font-size4;
+  color: var(--color-text);
+  background: var(--color-input-bg);
   border: 1px solid var(--color-border-light);
   border-radius: 4px;
-  background: var(--color-input-bg);
-  margin-bottom: 0;
 
   &::placeholder {
     color: var(--color-text-dark);
@@ -19,17 +19,17 @@ textarea {
   }
 
   &:focus {
-    box-shadow: none;
     background: var(--color-input-bg);
     border-color: var(--color-border-accent);
+    box-shadow: none;
   }
 
   &.input--transparent {
+    height: 20px;
+    padding: 0;
+    background: transparent;
     border: 0;
     border-bottom: 1px dashed var(--color-text-dark);
-    padding: 0;
-    height: 20px;
-    background: transparent;
     border-radius: 0;
   }
 
@@ -105,11 +105,11 @@ textarea {
 .input-wrapper--search {
   position: relative;
 
-  &:after {
-    content: @n-air--codepoint--search;
+  &::after {
     font-family: n-air;
-    .absolute(@top: 0, @right: 8px, @bottom: 0);
     line-height: @item-generic-size;
+    content: @n-air--codepoint--search;
+    .absolute(@top: 0, @right: 8px, @bottom: 0);
   }
 }
 
@@ -121,48 +121,60 @@ textarea {
   display: block;
   margin-bottom: 0;
 
-  input[type=checkbox] {
+  label {
+    padding-left: 24px;
+    font-size: @font-size4;
+    line-height: 20px;
+    color: var(--color-text);
+    cursor: pointer;
+
+    span {
+      color: var(--color-text);
+    }
+  }
+
+  input[type='checkbox'] {
     top: 2px;
-    margin: 0;
     width: 16px;
     height: 16px;
+    margin: 0;
 
     & ~ label {
-      &:before {
+      &::before {
         top: 2px;
         width: 16px;
         height: 16px;
-        border: 2px solid var(--color-input);
         background-color: transparent;
+        border: 2px solid var(--color-input);
       }
     }
 
     &:checked ~ label {
-      &:before {
-        border-color: var(--color-input-active);
+      &::before {
         background-color: var(--color-input-active);
+        border-color: var(--color-input-active);
       }
 
-      &:after {
-        content: @n-air--codepoint--check;
+      &::after {
         top: 4px;
         left: 2px;
         color: var(--color-bg-secondary);
+        content: @n-air--codepoint--check;
         background-color: transparent;
       }
     }
 
     label {
-      font-size: @font-size4;
-      color: var(--color-text);
-      line-height: 20px;
       padding-left: 24px;
+      font-size: @font-size4;
+      line-height: 20px;
+      color: var(--color-text);
       cursor: pointer;
     }
 
     &:disabled + label {
-      opacity: @opacity-disabled;
       cursor: not-allowed;
+      opacity: @opacity-disabled;
     }
   }
 
@@ -178,7 +190,7 @@ textarea {
     line-height: 20px;
     cursor: pointer;
 
-    &:before {
+    &::before {
       background: transparent;
       border-color: @grey;
     }
@@ -186,45 +198,45 @@ textarea {
 }
 
 .toggle-item {
+  position: relative;
   display: flex;
   align-items: center;
-  position: relative;
 }
 
 .toggle-label {
-  color: var(--color-text);
   margin-right: 16px;
+  color: var(--color-text);
 }
 
 .toggle-button {
+  position: relative;
   width: 32px;
   height: 20px;
   margin: 0;
   cursor: pointer;
   outline: none;
-  position: relative;
-  -webkit-appearance: inherit;
+  appearance: inherit;
 
-  &:before,
-  &:after {
-    content: '';
-    display: block;
-    .transition;
+  &::before,
+  &::after {
     position: absolute;
     top: 0;
     bottom: 0;
     left: 0;
+    display: block;
+    content: '';
+    .transition;
   }
 
-  &:before {
+  &::before {
     width: 32px;
-    height: 16px;;
+    height: 16px;
     margin: auto;
     background-color: var(--color-border-light);
     border-radius: 8px;
   }
 
-  &:after {
+  &::after {
     width: 20px;
     height: 20px;
     background-color: var(--color-text);
@@ -232,11 +244,11 @@ textarea {
   }
 
   &:checked {
-    &:before {
-        background-color: var(--color-primary-dark);
+    &::before {
+      background-color: var(--color-primary-dark);
     }
 
-    &:after {
+    &::after {
       left: 12px;
       background-color: var(--color-primary);
     }
@@ -244,48 +256,49 @@ textarea {
 }
 
 .multiselect {
-  min-height: @item-generic-size;
   width: 100%;
+  min-height: @item-generic-size;
 }
 
 .multiselect__select {
+  position: relative;
+  top: 0;
+  right: 0;
   z-index: 10;
-  padding: 0;
   width: auto;
   height: auto;
-  right: 0;
-  top: 0px;
+  padding: 0;
   line-height: @item-generic-size;
-  position: relative;
 
-  &:before {
-    font-family: n-air;
-    content: @n-air--codepoint--drop-down-arrow;
-    border: none;
-    font-size: @font-size1;
+  &::before {
     position: absolute;
     right: 12px;
+    font-family: n-air;
+    font-size: @font-size1;
     pointer-events: none;
+    content: @n-air--codepoint--drop-down-arrow;
+    border: none;
   }
 }
 
 .multiselect__tags {
-  padding: 0;
-  border: none;
   height: 0;
   min-height: 0;
+  padding: 0;
+  border: none;
   .radius;
 
-  input[type="text"] {
-    cursor: pointer;
+  input[type='text'] {
     width: 100%;
     padding-right: 32px;
+    cursor: pointer;
   }
 }
 
 .multiselect__input,
 .multiselect__single {
-  &:hover, &:focus {
+  &:hover,
+  &:focus {
     border-color: var(--color-border-accent);
   }
 }
@@ -296,35 +309,36 @@ textarea {
 
 .multiselect__content {
   .shadow;
+
+  position: absolute;
+  top: 40px;
+  z-index: @z-index-expand-content;
   width: 100%;
   max-height: 264px;
   margin: 0;
-  list-style-type: none;
-  border-radius: 4px;
-  background-color: var(--color-popper-bg-light);
-  z-index: @z-index-expand-content;
-  position: absolute;
-  top: 40px;
   overflow-y: auto;
+  list-style-type: none;
+  background-color: var(--color-popper-bg-light);
+  border-radius: 4px;
 }
 
 .multiselect__element {
-  font-size: @font-size4;
-  white-space: nowrap;
   display: inline-block;
   min-width: 100%;
+  font-size: @font-size4;
+  white-space: nowrap;
 }
 
 .multiselect__option {
-  padding: 0px 8px;
+  display: block;
   height: @item-generic-size;
   min-height: 0;
+  padding: 0 8px;
   line-height: @item-generic-size;
-  .transition;
-  display: block;
   cursor: pointer;
+  .transition;
 
-  &:after {
+  &::after {
     display: none;
   }
 }
@@ -333,17 +347,17 @@ textarea {
   color: var(--color-text-light);
   background: var(--color-bg-active);
 
-  &:after {
+  &::after {
     display: none;
   }
 }
 
 .multiselect__option--selected {
   font-weight: @font-weight-bold;
-  background: var(--color-primary);
   color: var(--color-black);
+  background: var(--color-primary);
 
-  &:after {
+  &::after {
     display: none;
   }
 }
@@ -367,7 +381,7 @@ textarea {
 }
 
 .input-wrapper--inverted {
-  input[type="text"] {
+  input[type='text'] {
     background: var(--color-input-bg);
   }
 
@@ -376,6 +390,6 @@ textarea {
   }
 }
 
-.custom-select-trigger:after {
+.custom-select-trigger::after {
   content: @n-air--codepoint--drop-down-arrow;
 }

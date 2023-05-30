@@ -55,7 +55,7 @@ export default class CommentViewer extends Vue {
 
   @Inject() private settingsService: ISettingsServiceApi;
 
-  @Prop({ default: false }) showProgramCreatedNotice: boolean;
+  @Prop({ default: false }) showPlaceholder: boolean;
 
   get isCompactMode(): boolean {
     return this.customizationService.state.compactMode;

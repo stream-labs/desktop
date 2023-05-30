@@ -31,7 +31,7 @@ type ProgramState = {
   comments: number;
   adPoint: number;
   giftPoint: number;
-  createdNoticeTimer: number;
+  showPlaceholder: boolean;
 };
 
 function getCommunityIconUrl(community: Community): string {
@@ -93,7 +93,7 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
     comments: 0,
     adPoint: 0,
     giftPoint: 0,
-    createdNoticeTimer: 0,
+    showPlaceholder: false,
   };
 
   static initialState: INicoliveProgramState = {
@@ -132,7 +132,11 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
   }
 
   private setState(partialState: Partial<INicoliveProgramState>) {
-    const nextState = { ...this.state, ...partialState };
+    const nextState = {
+      ...this.state,
+      ...partialState,
+      ...(partialState.status !== undefined && partialState.status !== 'test' ? { showPlaceholder: false } : {})
+    };
     this.refreshStatisticsPolling(this.state, nextState);
     this.refreshProgramStatusTimer(this.state, nextState);
     this.refreshAutoExtensionTimer(this.state, nextState);
@@ -196,23 +200,21 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
     return NicoliveProgramService.isProgramExtendable(this.state);
   }
 
-  get isShownCreatedNotice(): boolean {
-    return this.state.createdNoticeTimer !== 0;
+  get isShownPlaceholder(): boolean {
+    return this.state.showPlaceholder;
   }
 
-  showCreatedNotice() {
-    this.hideCreatedNotice();
+  showPlaceholder() {
     this.setState({
-      createdNoticeTimer: window.setTimeout(() => {
-        this.setState({ createdNoticeTimer: 0 });
-      }, CREATED_NOTICE_DURATION)
+      showPlaceholder: true,
     });
   }
 
-  hideCreatedNotice() {
-    if (this.state.createdNoticeTimer) {
-      window.clearTimeout(this.state.createdNoticeTimer);
-      this.setState({ createdNoticeTimer: 0 });
+  hidePlaceholder() {
+    if (this.state.showPlaceholder) {
+      this.setState({
+        showPlaceholder: false,
+      });
     }
   }
 
@@ -220,7 +222,6 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
     const result = await this.client.createProgram();
     if (result === 'CREATED') {
       await this.fetchProgram();
-      this.showCreatedNotice();
     }
     return result;
   }
@@ -287,6 +288,9 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
         roomURL: room ? room.webSocketUri : '',
         roomThreadID: room ? room.threadId : '',
       });
+      if (program.status === 'test') {
+        this.showPlaceholder();
+      }
     } finally {
       this.setState({ isFetching: false });
     }

@@ -39,7 +39,7 @@ export default class NicolivePanelRoot extends Vue {
   @Inject() private customizationService: CustomizationService;
 
   destroyed() {
-    this.nicoliveProgramService.hideCreatedNotice();
+    this.nicoliveProgramService.hidePlaceholder();
   }
 
   get contents() {
@@ -103,7 +103,7 @@ export default class NicolivePanelRoot extends Vue {
     return this.nicoliveProgramService.hasProgram;
   }
 
-  get isShownCreatedNotice(): boolean {
-    return this.nicoliveProgramService.isShownCreatedNotice;
+  get showPlaceholder(): boolean {
+    return this.nicoliveProgramService.isShownPlaceholder;
   }
 }

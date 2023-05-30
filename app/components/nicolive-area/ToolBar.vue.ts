@@ -21,9 +21,16 @@ export default class ToolBar extends Vue {
 
   // TODO: 後で言語ファイルに移動する
   fetchTooltip = '番組再取得';
-  extentionTooltip = '延長設定';
+  extensionTooltip = '延長設定';
+  startButtonSelectorTooltip = '配信開始/終了ボタンを選択';
 
   showPopupMenu: boolean = false;
+  selectedButton: 'start' | 'end' = 'start';
+  showButtonSelector: boolean = false;
+
+  selectButton(button: 'start' | 'end') {
+    this.selectedButton = button;
+  }
 
   get isOnAir(): boolean {
     return this.nicoliveProgramService.state.status === 'onAir';
@@ -47,6 +54,7 @@ export default class ToolBar extends Vue {
       }
     } finally {
       this.isCreating = false;
+      this.selectButton('start');
     }
   }
 
@@ -154,15 +162,14 @@ export default class ToolBar extends Vue {
       // もし配信開始してなかったら確認する
       if (!this.streamingService.isStreaming) {
         // TODO: 翻訳
-        const startStreaming = await remote.dialog.showMessageBox(
-          remote.getCurrentWindow(),
-          {
+        const startStreaming = await remote.dialog
+          .showMessageBox(remote.getCurrentWindow(), {
             type: 'warning',
             message: $t('program-info.start-streaming-confirmation'),
             buttons: [$t('streaming.goLive'), $t('program-info.later')],
             noLink: true,
-          },
-        ).then(value => value.response === 0);
+          })
+          .then(value => value.response === 0);
         if (startStreaming) {
           // 開始
           await this.streamingService.toggleStreamingAsync();
@@ -183,15 +190,14 @@ export default class ToolBar extends Vue {
     if (this.isEnding) throw new Error('endProgram is running');
     try {
       // TODO: 翻訳
-      const isOk = await remote.dialog.showMessageBox(
-        remote.getCurrentWindow(),
-        {
+      const isOk = await remote.dialog
+        .showMessageBox(remote.getCurrentWindow(), {
           type: 'warning',
           message: '番組を終了しますか？',
           buttons: ['終了する', $t('common.cancel')],
           noLink: true,
-        },
-      ).then(value => value.response === 0);
+        })
+        .then(value => value.response === 0);
 
       if (isOk) {
         return await this.nicoliveProgramService.endProgram();
