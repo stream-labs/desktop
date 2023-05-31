@@ -13,6 +13,12 @@ import { DualOutputService } from 'services/dual-output';
 import { SettingsService } from 'services/settings';
 
 interface ISchema {
+  // this is for backward compatibility with vanilla scene collections
+  baseResolution: {
+    baseWidth: number;
+    baseHeight: number;
+  };
+  // this is for scenes created with dual output
   baseResolutions: {
     horizontal: {
       baseWidth: number;
@@ -65,6 +71,7 @@ export class RootNode extends Node<ISchema, {}> {
       transitions,
       hotkeys,
       guestCam,
+      baseResolution: this.videoService.baseResolution,
       baseResolutions: this.videoSettingsService.baseResolutions,
       selectiveRecording: this.streamingService.state.selectiveRecording,
       dualOutputMode: this.dualOutputService.views.dualOutputMode,
@@ -95,7 +102,7 @@ export class RootNode extends Node<ISchema, {}> {
     if (version < 2) {
       this.data.transitions = this.data['transition'];
     }
-
+    this.data.baseResolution = this.videoService.baseResolution;
     this.data.baseResolutions = this.videoService.baseResolutions;
   }
 }
