@@ -44,7 +44,7 @@ interface ISchema {
 
 // This is the root node of the config file
 export class RootNode extends Node<ISchema, {}> {
-  schemaVersion = 3;
+  schemaVersion = 4;
 
   @Inject() videoService: VideoService;
   @Inject() streamingService: StreamingService;
@@ -102,7 +102,14 @@ export class RootNode extends Node<ISchema, {}> {
     if (version < 2) {
       this.data.transitions = this.data['transition'];
     }
-    this.data.baseResolution = this.videoService.baseResolution;
-    this.data.baseResolutions = this.videoService.baseResolutions;
+
+    // Added baseResolution in version 3
+    if (version < 3) {
+      this.data.baseResolution = this.videoService.baseResolution;
+    }
+    // Added multiple displays with individual base resolutions in version 4
+    if (version < 4) {
+      this.data.baseResolutions = this.videoService.baseResolutions;
+    }
   }
 }
