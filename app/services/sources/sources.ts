@@ -551,14 +551,6 @@ export class SourcesService extends StatefulService<ISourcesState> {
       resolvedSettings.device = this.defaultHardwareService.state.defaultVideoDevice;
     }
 
-    // TODO: Specifically for TikTok, we don't use auto mode on game capture
-    // for portrait resolutions, because auto mode will distort the game.
-    // We should remove this change when the backend team makes a change on their
-    // end to better scale the game capture in auto mode.
-    if (type === 'game_capture' && this.videoService.baseHeight > this.videoService.baseWidth) {
-      resolvedSettings.capture_mode = 'any_fullscreen';
-    }
-
     return resolvedSettings;
   }
 
