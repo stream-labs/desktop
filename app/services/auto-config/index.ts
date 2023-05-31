@@ -105,8 +105,7 @@ export class AutoConfigService extends Service {
 
     if (progress.event === 'done') {
       obs.NodeObs.TerminateAutoConfig();
-
-      this.videoSettingsService.migrateSettings();
+      this.videoSettingsService.loadLegacySettings();
     }
   }
 
@@ -117,7 +116,7 @@ export class AutoConfigService extends Service {
       } else {
         obs.NodeObs.TerminateAutoConfig();
 
-        this.videoSettingsService.migrateSettings();
+        this.videoSettingsService.loadLegacySettings();
         debounce(() => this.configProgress.next({ ...progress, event: 'done' }), 1000)();
       }
     }

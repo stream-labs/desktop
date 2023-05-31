@@ -101,12 +101,12 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
 
     return {
       horizontal: {
-        baseWidth: this.contexts.horizontal?.video.baseWidth ?? horizontalWidth,
-        baseHeight: this.contexts.horizontal?.video.baseHeight ?? horizontalHeight,
+        baseWidth: horizontalWidth ?? this.contexts.horizontal?.video.baseWidth,
+        baseHeight: horizontalHeight ?? this.contexts.horizontal?.video.baseHeight,
       },
       vertical: {
-        baseWidth: this.contexts.vertical?.video.baseWidth ?? verticalWidth,
-        baseHeight: this.contexts.vertical?.video.baseHeight ?? verticalHeight,
+        baseWidth: verticalWidth ?? this.contexts.vertical?.video.baseWidth,
+        baseHeight: verticalHeight ?? this.contexts.vertical?.video.baseHeight,
       },
     };
   }
@@ -126,17 +126,32 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
     };
   }
 
+  loadLegacySettings(display: TDisplayType = 'horizontal') {
+    const videoLegacy = this.contexts[display].legacySettings;
+    Object.keys(videoLegacy).forEach((key: keyof obs.IVideoInfo) => {
+      // on first login, the base width and height of legacy settings is zero
+      // so if that is the case, try to use the settings from the video property
+      if (
+        ['baseWidth', 'baseHeight'].includes(key) &&
+        videoLegacy[key] === 0 &&
+        !!this.contexts[display]?.video
+      ) {
+        const video = this.contexts[display]?.video;
+        this.SET_VIDEO_SETTING(key, videoLegacy[key]);
+        this.dualOutputService.setVideoSetting({ [key]: videoLegacy[key] }, 'horizontal');
+      }
+      this.SET_VIDEO_SETTING(key, videoLegacy[key]);
+      this.dualOutputService.setVideoSetting({ [key]: videoLegacy[key] }, 'horizontal');
+    });
+  }
+
   migrateSettings(display: TDisplayType = 'horizontal') {
     // if this is the first time starting the app
     // set default settings for horizontal context
-    const videoLegacy = this.contexts.horizontal.legacySettings;
-
     if (display === 'horizontal' && !this.dualOutputService.views.videoSettings.horizontal) {
-      Object.keys(videoLegacy).forEach((key: keyof obs.IVideoInfo) => {
-        this.SET_VIDEO_SETTING(key, videoLegacy[key]);
-        this.dualOutputService.setVideoSetting({ [key]: videoLegacy[key] }, 'horizontal');
-      });
+      this.loadLegacySettings(display);
     } else {
+      // otherwise, load them from the dual output service
       const settings = this.dualOutputService.views.videoSettings[display];
 
       Object.keys(settings).forEach((key: keyof obs.IVideoInfo) => {
