@@ -7,9 +7,7 @@ const sh = require('shelljs');
 const ProgressBar = require('progress');
 const { info, executeCmd, error } = require('./prompt');
 
-async function uploadS3File({
-  name, bucketName, filePath, keyPrefix
-}) {
+async function uploadS3File({ name, bucketName, filePath, keyPrefix }) {
   info(`Starting upload of ${name}...`);
 
   const stream = fs.createReadStream(filePath);
@@ -41,7 +39,11 @@ async function uploadS3File({
 }
 
 async function uploadToGithub({
-  octokit, url, pathname, name = path.basename(pathname), contentType
+  octokit,
+  url,
+  pathname,
+  name = path.basename(pathname),
+  contentType,
 }) {
   info(`uploading ${name} to github...`);
 
@@ -77,10 +79,21 @@ async function uploadToGithub({
   throw new Error('reached to a retry limit');
 }
 
+function getSentryCli() {
+  return path.resolve('bin', 'node_modules/.bin/sentry-cli');
+}
+
+function injectForSentry(artifactPath) {
+  const sentryCli = getSentryCli();
+  executeCmd(`${sentryCli} sourcemaps inject ${artifactPath}`);
+}
+
 function uploadToSentry(org, project, release, artifactPath) {
-  const sentryCli = path.resolve('bin', 'node_modules/.bin/sentry-cli');
+  const sentryCli = getSentryCli();
   executeCmd(`${sentryCli} releases -o ${org} -p ${project} new ${release}`);
-  executeCmd(`${sentryCli} releases -o ${org} -p ${project} files ${release} upload-sourcemaps ${artifactPath}`);
+  executeCmd(
+    `${sentryCli} sourcemaps -o ${org} -p ${project} --release=${release} upload ${artifactPath}`,
+  );
   executeCmd(`${sentryCli} releases -o ${org} -p ${project} finalize ${release}`);
 }
 
@@ -88,4 +101,5 @@ module.exports = {
   uploadS3File,
   uploadToGithub,
   uploadToSentry,
+  injectForSentry,
 };

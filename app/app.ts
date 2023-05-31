@@ -13,7 +13,8 @@ import { WindowsService } from './services/windows';
 import { AppService } from './services/app';
 import Utils from './services/utils';
 import electron from 'electron';
-import * as Sentry from '@sentry/vue';
+import * as Sentry from '@sentry/electron/renderer';
+import { init as sentryVueInit } from '@sentry/vue';
 import VTooltip from 'v-tooltip';
 import Toasted from 'vue-toasted';
 import VueI18n from 'vue-i18n';
@@ -108,39 +109,10 @@ if ((isProduction || process.env.NAIR_REPORT_TO_SENTRY) && !electron.remote.proc
   const sentryDsn = getSentryDsn(sentryParam);
   console.log(`Sentry DSN: ${sentryDsn}`);
   Sentry.init({
-    Vue,
     dsn: sentryDsn,
     release: nAirVersion,
     sampleRate: /* isPreview ? */ 1.0 /* : 0.1 */,
-    beforeSend: event => {
-      // Because our URLs are local files and not publicly
-      // accessible URLs, we simply truncate and send only
-      // the filename.  Unfortunately sentry's electron support
-      // isn't that great, so we do this hack.
-      // Some discussion here: https://github.com/getsentry/sentry/issues/2708
-      const normalize = (filename: string) => {
-        const splitArray = filename.split(/[/\\]/);
-        return '~/' + splitArray[splitArray.length - 1];
-      };
-
-      if (event.exception && event.exception.values[0].stacktrace) {
-        event.exception.values[0].stacktrace.frames.forEach(frame => {
-          if (frame.abs_path) {
-            frame.abs_path = normalize(frame.abs_path);
-          }
-          if (frame.filename) {
-            frame.filename = normalize(frame.filename);
-          }
-        });
-      }
-
-      if (event.request) {
-        event.request.url = normalize(event.request.url);
-      }
-
-      return event;
-    },
-  });
+  }, sentryVueInit);
 
   const oldConsoleError = console.error;
 
