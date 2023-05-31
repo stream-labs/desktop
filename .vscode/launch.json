@@ -5,54 +5,32 @@
       "type": "node",
       "request": "launch",
       "name": "Launch",
-      "protocol": "inspector",
       "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron.cmd",
-      // "osx": {
-      //   "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron"
-      // },
       "runtimeArgs": [".", "--remote-debugging-port=9222"],
       "cwd": "${workspaceRoot}",
       "env": {
+        "NAIR_UNSTABLE": "1",
         "SLOBS_PRODUCTION_DEBUG": "true"
-      }
+      },
+      "preLaunchTask": "npm: compile"
     },
     {
       "type": "chrome",
       "request": "attach",
-      "name": "Attach to Chrome",
+      "name": "Chrome",
       "port": 9222,
       "webRoot": "${workspaceRoot}",
       "sourceMaps": true,
       "sourceMapPathOverrides": {
-        "webpack:////${workspaceRoot}/app/*": "${workspaceRoot}/app/*"
+        "webpack://n-air-app/../../${workspaceRoot}/app/*": "${workspaceRoot}/app/*"
       },
       "resolveSourceMapLocations": ["${workspaceFolder}/**", "!**/node_modules/**"]
-    },
-    {
-      "type": "node",
-      "request": "launch",
-      "name": "Launch with DevTools",
-      "protocol": "inspector",
-      "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron.cmd",
-      // "osx": {
-      //   "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron"
-      // },
-      "runtimeArgs": [".", "--remote-debugging-port=9222"],
-      "cwd": "${workspaceRoot}",
-      "env": {
-        "SLOBS_PRODUCTION_DEBUG": "true"
-      }
     }
   ],
   "compounds": [
     {
-      "name": "Electron All",
-      "configurations": ["Launch", "Attach to Chrome"],
-      "stopAll": true
-    },
-    {
-      "name": "Electron All DevTools",
-      "configurations": ["Launch with DevTools", "Attach to Chrome"],
+      "name": "All",
+      "configurations": ["Launch", "Chrome"],
       "stopAll": true
     }
   ]
