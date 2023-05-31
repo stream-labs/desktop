@@ -105,14 +105,8 @@ export class AutoConfigService extends Service {
 
     if (progress.event === 'done') {
       obs.NodeObs.TerminateAutoConfig();
-      if (!this.videoSettingsService.hasContext) {
-        const established = this.videoSettingsService.establishedContext.subscribe(() => {
-          this.videoService.setBaseResolutions(this.videoSettingsService.baseResolutions);
-          established.unsubscribe();
-        });
-      } else {
-        this.videoSettingsService.migrateSettings();
-      }
+
+      this.videoSettingsService.migrateSettings();
     }
   }
 
@@ -122,15 +116,9 @@ export class AutoConfigService extends Service {
         obs.NodeObs.StartSaveSettings();
       } else {
         obs.NodeObs.TerminateAutoConfig();
-        if (!this.videoSettingsService.hasContext) {
-          const established = this.videoSettingsService.establishedContext.subscribe(() => {
-            debounce(() => this.configProgress.next({ ...progress, event: 'done' }), 1000)();
-            established.unsubscribe();
-          });
-        } else {
-          this.videoSettingsService.migrateSettings();
-          debounce(() => this.configProgress.next({ ...progress, event: 'done' }), 1000)();
-        }
+
+        this.videoSettingsService.migrateSettings();
+        debounce(() => this.configProgress.next({ ...progress, event: 'done' }), 1000)();
       }
     }
   }
