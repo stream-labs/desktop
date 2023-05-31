@@ -943,6 +943,10 @@ export class SceneCollectionsService extends Service implements ISceneCollection
    * can reference each other
    */
 
+  initNodeMap() {
+    this.activeCollection.sceneNodeMaps = {};
+  }
+
   createNodeMapEntry(sceneId: string, horizontalNodeId: string, verticalNodeId: string) {
     if (!this.activeCollection) return;
 

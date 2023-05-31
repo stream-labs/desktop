@@ -210,7 +210,8 @@ class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
   }
 
   hasNodeMap(sceneId?: string) {
-    return sceneId ? !!this.sceneNodeMaps[sceneId] : !!this.activeSceneNodeMap;
+    const nodeMap = sceneId ? this.sceneNodeMaps[sceneId] : this.activeSceneNodeMap;
+    return !!nodeMap && Object.keys(nodeMap).length > 0;
   }
 }
 
@@ -255,7 +256,11 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
     // we need to confirm that the scene collection has a node map
     // because this is a new property added for dual output
     this.sceneCollectionsService.collectionSwitched.subscribe(() => {
-      this.confirmHasNodeMap();
+      // confirm the scene collection has a node map
+      if (!this.sceneCollectionsService.activeCollection.hasOwnProperty('sceneNodeMaps')) {
+        this.sceneCollectionsService.initNodeMap();
+      }
+
       if (this.state.dualOutputMode) {
         this.setIsCollectionOrSceneLoading(false);
       }
@@ -277,16 +282,6 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
         this.setIsCollectionOrSceneLoading(false);
       }
     });
-  }
-
-  /**
-   * Confirm that the scene collection has a node map
-   */
-
-  confirmHasNodeMap() {
-    if (!this.sceneCollectionsService.activeCollection.hasOwnProperty('sceneNodeMaps')) {
-      this.sceneCollectionsService.activeCollection.sceneNodeMaps = {};
-    }
   }
 
   /**
