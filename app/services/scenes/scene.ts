@@ -26,7 +26,7 @@ import uuid from 'uuid/v4';
 import { SceneNode } from '../api/external-api/scenes';
 import compact from 'lodash/compact';
 import { assertIsDefined } from 'util/properties-type-guards';
-import { VideoSettingsService } from 'services/settings-v2';
+import { VideoSettingsService, TDisplayType } from 'services/settings-v2';
 import { DualOutputService } from 'services/dual-output';
 
 export type TSceneNode = SceneItem | SceneItemFolder;
@@ -174,17 +174,14 @@ export class Scene {
 
     if (source.forceHidden) obsSceneItem.visible = false;
 
-    this.ADD_SOURCE_TO_SCENE(sceneItemId, source.sourceId, obsSceneItem.id);
+    const display = this.dualOutputService.views.getNodeDisplay(sceneItemId, this.state.id);
+
+    this.ADD_SOURCE_TO_SCENE(sceneItemId, source.sourceId, obsSceneItem.id, display);
     const sceneItem = this.getItem(sceneItemId)!;
 
     // assign context to scene item
-    const display = this.dualOutputService.views.getNodeDisplay(sceneItem.id, this.state.id);
     const context = this.videoSettingsService.contexts[display];
     obsSceneItem.video = context as obs.IVideo;
-
-    // must use this function so new scene items
-    // can be edited in the display
-    sceneItem.setSettings({ display });
 
     // Default is to select
     if (options.select == null) options.select = true;
@@ -365,6 +362,9 @@ export class Scene {
       if (sceneNode.sceneNodeType === 'folder') return true;
       const source = this.sourcesService.views.getSource(sceneNode.sourceId);
       if (!source) return false;
+
+      const display = this.dualOutputService.views.getNodeDisplay(sceneNode.id, this.state.id);
+
       arrayItems.push({
         name: source.sourceId,
         id: sceneNode.id,
@@ -382,6 +382,7 @@ export class Scene {
         scaleFilter: sceneNode.scaleFilter!,
         blendingMode: sceneNode.blendingMode!,
         blendingMethod: sceneNode.blendingMethod,
+        display,
       });
       return true;
     });
@@ -391,10 +392,15 @@ export class Scene {
     // create folder and items
     let itemIndex = 0;
     nodes.forEach(nodeModel => {
+      const display = this.dualOutputService.views.getNodeDisplay(nodeModel.id, this.state.id);
+      const context = this.videoSettingsService.contexts[display];
+      const obsSceneItem = obsSceneItems[itemIndex];
+      obsSceneItem.video = context;
+
       if (nodeModel.sceneNodeType === 'folder') {
         this.createFolder(nodeModel.name, { id: nodeModel.id });
       } else {
-        this.ADD_SOURCE_TO_SCENE(nodeModel.id, nodeModel.sourceId, obsSceneItems[itemIndex].id);
+        this.ADD_SOURCE_TO_SCENE(nodeModel.id, nodeModel.sourceId, obsSceneItem.id, display);
         const item = this.getItem(nodeModel.id)!;
         item.loadItemAttributes(nodeModel);
         itemIndex++;
@@ -504,7 +510,12 @@ export class Scene {
   }
 
   @mutation()
-  private ADD_SOURCE_TO_SCENE(sceneItemId: string, sourceId: string, obsSceneItemId: number) {
+  private ADD_SOURCE_TO_SCENE(
+    sceneItemId: string,
+    sourceId: string,
+    obsSceneItemId: number,
+    display: TDisplayType,
+  ) {
     this.state.nodes.unshift({
       sceneItemId,
       sourceId,
@@ -538,6 +549,7 @@ export class Scene {
       scaleFilter: EScaleType.Disable,
       blendingMode: EBlendingMode.Normal,
       blendingMethod: EBlendingMethod.Default,
+      display,
     });
   }
 

@@ -275,7 +275,7 @@ export class SceneItem extends SceneItemNode {
     const position = { x: customSceneItem.x, y: customSceneItem.y };
     const crop = customSceneItem.crop;
     const display = this?.display ?? 'horizontal';
-    const context = this.videoSettingsService.contexts.horizontal;
+    const context = this.videoSettingsService.contexts[display];
 
     this.getObsSceneItem().video = context as obs.IVideo;
 
@@ -294,6 +294,7 @@ export class SceneItem extends SceneItemNode {
       scaleFilter: customSceneItem.scaleFilter,
       blendingMode: customSceneItem.blendingMode,
       blendingMethod: customSceneItem.blendingMethod,
+      display,
       output: context,
     });
   }
