@@ -137,11 +137,12 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
         !!this.contexts[display]?.video
       ) {
         const video = this.contexts[display]?.video;
+        this.SET_VIDEO_SETTING(key, video[key]);
+        this.dualOutputService.setVideoSetting({ [key]: video[key] }, 'horizontal');
+      } else {
         this.SET_VIDEO_SETTING(key, videoLegacy[key]);
         this.dualOutputService.setVideoSetting({ [key]: videoLegacy[key] }, 'horizontal');
       }
-      this.SET_VIDEO_SETTING(key, videoLegacy[key]);
-      this.dualOutputService.setVideoSetting({ [key]: videoLegacy[key] }, 'horizontal');
     });
   }
 
