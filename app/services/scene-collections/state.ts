@@ -191,6 +191,8 @@ export class SceneCollectionsStateService extends StatefulService<ISceneCollecti
     this.REMOVE_NODE_MAP(sceneId);
   }
 
+  confirmNodeMap(sceneId: string) {}
+
   @mutation()
   SET_ACTIVE_COLLECTION(id: string) {
     this.state.activeId = id;
@@ -267,7 +269,10 @@ export class SceneCollectionsStateService extends StatefulService<ISceneCollecti
   CREATE_NODE_MAP_ENTRY(sceneId: string, horizontalNodeId: string, verticalNodeId: string) {
     const activeId = this.state.activeId;
     const coll = this.state.collections.find(coll => coll.id === activeId);
+    // confirm or set node map
     if (!coll) return;
+    if (!coll.sceneNodeMaps) coll.sceneNodeMaps = {};
+    if (!coll.sceneNodeMaps[sceneId]) coll.sceneNodeMaps[sceneId] = {};
 
     coll.sceneNodeMaps[sceneId] = {
       ...coll.sceneNodeMaps[sceneId],
@@ -279,7 +284,9 @@ export class SceneCollectionsStateService extends StatefulService<ISceneCollecti
   REMOVE_VERTICAL_NODE(sceneItemId: string, sceneId: string) {
     const activeId = this.state.activeId;
     const coll = this.state.collections.find(coll => coll.id === activeId);
-    if (!coll) return;
+
+    // confirm existence of scene node map
+    if (!coll || !coll.sceneNodeMaps || !coll.sceneNodeMaps[sceneId]) return;
 
     const nodeMap = coll.sceneNodeMaps[sceneId];
     delete nodeMap[sceneItemId];
@@ -291,7 +298,9 @@ export class SceneCollectionsStateService extends StatefulService<ISceneCollecti
   REMOVE_NODE_MAP(sceneId: string) {
     const activeId = this.state.activeId;
     const coll = this.state.collections.find(coll => coll.id === activeId);
-    if (!coll) return;
+
+    // confirm existence of scene node map
+    if (!coll || !coll.sceneNodeMaps || !coll.sceneNodeMaps[sceneId]) return;
 
     const nodeMaps = coll.sceneNodeMaps;
     delete nodeMaps[sceneId];

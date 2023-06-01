@@ -944,6 +944,8 @@ export class SceneCollectionsService extends Service implements ISceneCollection
    */
 
   initNodeMap() {
+    if (!this.activeCollection) return;
+
     this.activeCollection.sceneNodeMaps = {};
   }
 
@@ -958,7 +960,11 @@ export class SceneCollectionsService extends Service implements ISceneCollection
   }
 
   removeVerticalNode(sceneItemId: string, sceneId: string) {
-    if (!this.activeCollection || !this.activeCollection?.sceneNodeMaps.hasOwnProperty(sceneId)) {
+    if (
+      !this.activeCollection ||
+      !this.activeCollection?.sceneNodeMaps ||
+      !this.activeCollection?.sceneNodeMaps.hasOwnProperty(sceneId)
+    ) {
       return;
     }
 
