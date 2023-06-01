@@ -76,7 +76,6 @@ export class CopyNodesCommand extends Command {
         if (this.display === 'vertical' || (hasNodeMap && display === 'horizontal')) {
           // when creating dual output nodes for a vanilla scene, the passed in display is set to vertical
           // if the scene has dual output nodes, add a node map entry only when copying a horizontal node
-
           this.sceneCollectionsService.createNodeMapEntry(this.destSceneId, node.id, folder.id);
         }
         insertedNodes.push(folder);
@@ -90,8 +89,13 @@ export class CopyNodesCommand extends Command {
         const context = this.videoSettingsService.contexts[display];
         item.setSettings({ ...node.getSettings(), output: context, display });
 
-        if (this.display === 'vertical') {
+        if (this.display === 'vertical' || (hasNodeMap && display === 'horizontal')) {
+          // position all of the nodes in the upper left corner of the vertical display
+          // so that all of the sources are visible
+          item.setTransform({ position: { x: 0, y: 0 } });
+
           // when creating dual output scene nodes, the passed in display is set to vertical
+          // if the scene has dual output nodes, add a node map entry only when copying a horizontal node
           this.sceneCollectionsService.createNodeMapEntry(this.destSceneId, node.id, item.id);
         }
 
