@@ -234,9 +234,14 @@ class ScenesViews extends ViewHandler<IScenesState> {
       return nodeModel?.visible;
     }
 
-    // to determine if a folder is visible, check the visibility of the child nodes
-    const scene = this.getScene(sceneId);
-    return scene.getItemsForNode(sceneNodeId).some(i => i.visible);
+    if (sceneId) {
+      // to determine if a folder is visible, check the visibility of the child nodes
+      const scene = this.getScene(sceneId);
+      if (!scene) return false;
+      return scene.getItemsForNode(sceneNodeId).some(i => i.visible);
+    }
+
+    return false;
   }
 }
 

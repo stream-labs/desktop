@@ -951,9 +951,14 @@ export class SceneCollectionsService extends Service implements ISceneCollection
 
   createNodeMapEntry(sceneId: string, horizontalNodeId: string, verticalNodeId: string) {
     if (!this.activeCollection) return;
-
+    if (!this.activeCollection.hasOwnProperty('sceneNodeMaps')) {
+      this.activeCollection.sceneNodeMaps = {};
+    }
     if (!this.activeCollection?.sceneNodeMaps.hasOwnProperty(sceneId)) {
-      this.activeCollection.sceneNodeMaps[sceneId] = {};
+      this.activeCollection.sceneNodeMaps = {
+        ...this.activeCollection.sceneNodeMaps,
+        [sceneId]: {},
+      };
     }
 
     this.stateService.createNodeMapEntry(sceneId, horizontalNodeId, verticalNodeId);
