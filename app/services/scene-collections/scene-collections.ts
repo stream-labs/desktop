@@ -954,7 +954,10 @@ export class SceneCollectionsService extends Service implements ISceneCollection
     if (!this.activeCollection.hasOwnProperty('sceneNodeMaps')) {
       this.activeCollection.sceneNodeMaps = {};
     }
-    if (!this.activeCollection?.sceneNodeMaps.hasOwnProperty(sceneId)) {
+    if (
+      this.activeCollection.sceneNodeMaps &&
+      !this.activeCollection?.sceneNodeMaps.hasOwnProperty(sceneId)
+    ) {
       this.activeCollection.sceneNodeMaps = {
         ...this.activeCollection.sceneNodeMaps,
         [sceneId]: {},
