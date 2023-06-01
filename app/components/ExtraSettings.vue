@@ -72,7 +72,7 @@
 <script lang="ts" src="./ExtraSettings.vue.ts"></script>
 
 <style lang="less">
-@import '../styles/index';
+@import url('../styles/index');
 
 .optional-item {
   margin-left: 24px;
@@ -80,27 +80,27 @@
 
 .cacheid-view {
   display: flex;
-  justify-content: start;
   align-items: center;
+  justify-content: flex-start;
   font-size: @font-size4;
 
   label {
-    cursor: pointer;
     display: flex;
-    height: @item-generic-size;
-    margin: 0;
-    padding: 0;
-    justify-content: start;
     align-items: center;
+    justify-content: flex-start;
+    height: @item-generic-size;
+    padding: 0;
+    margin: 0;
+    margin-bottom: 16px;
     color: var(--color-text-active);
+    cursor: pointer;
     border: 1px solid var(--color-input);
     border-radius: 4px;
-    margin-bottom: 16px;
 
     input[type='password'] {
-      font-family: 'Verdana', sans-serif;
-      font-size: 0;
       width: 332px;
+      font-family: Verdana, sans-serif;
+      font-size: 0;
       color: var(--color-text-light);
     }
 
@@ -109,13 +109,14 @@
 
       & ~ .view-button {
         .transition;
-        width: 36px;
-        cursor: pointer;
-        display: inline-block;
+
         position: relative;
-        text-align: center;
-        font-size: @font-size5;
+        display: inline-block;
+        width: 36px;
         padding: 0 8px;
+        font-size: @font-size5;
+        text-align: center;
+        cursor: pointer;
 
         &:hover {
           color: @white;
@@ -124,14 +125,17 @@
         .on {
           display: inline-block;
         }
+
         .off {
           display: none;
         }
       }
+
       &:checked ~ .view-button {
         .on {
           display: none;
         }
+
         .off {
           display: inline-block;
           color: var(--color-text-active);
@@ -139,23 +143,21 @@
       }
 
       & ~ input {
+        box-sizing: border-box;
+        width: 320px;
+        padding: 0 8px;
+        margin: 0;
+        font-family: Verdana, sans-serif;
+        font-size: @font-size4;
+        color: @text-primary;
+        color: var(--color-text-light);
+        text-align: center;
         cursor: default;
-        font-family: 'Verdana', sans-serif;
         background: none;
         border: none;
         border-radius: 0;
         outline: none;
-        -webkit-appearance: none;
-        -moz-appearance: none;
         appearance: none;
-        color: @text-primary;
-        text-align: center;
-        padding: 0 8px;
-        margin: 0;
-        box-sizing: border-box;
-        width: 320px;
-        color: var(--color-text-light);
-        font-size: @font-size4;
       }
 
       &:checked ~ input {
@@ -177,23 +179,24 @@
       background-color: var(--color-button-secondary-hover);
     }
 
-    &:before {
+    &::before {
       position: absolute;
       top: -8px;
       left: 16px;
-      transition: all 0s;
-      opacity: 0;
+      padding: 4px 8px;
+      color: @bg-secondary;
       content: 'Copied!';
       background-color: @text-primary;
-      color: @bg-secondary;
-      padding: 4px 8px;
       border-radius: 3px;
+      opacity: 0;
+      transition: all 0s;
     }
+
     &:active {
-      &:before {
-        transform: scale(1.2) translateY(-8px);
-        transition: all 0.3s;
+      &::before {
         opacity: 1;
+        transition: all 0.3s;
+        transform: scale(1.2) translateY(-8px);
       }
     }
   }
