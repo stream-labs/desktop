@@ -37,6 +37,7 @@ interface ISourceMetadata {
   isFolder: boolean;
   canShowActions: boolean;
   parentId?: string;
+  sceneId?: string;
 }
 
 export class SourceSelectorModule {
@@ -80,6 +81,7 @@ export class SourceSelectorModule {
             <TreeNode
               title={sceneNode.title}
               id={sceneNode.id}
+              sceneId={sceneNode.sceneId}
               isVisible={sceneNode.isVisible}
               isLocked={sceneNode.isLocked}
               canShowActions={sceneNode.canShowActions}
@@ -90,7 +92,6 @@ export class SourceSelectorModule {
               isRecordingVisible={sceneNode.isRecordingVisible}
               isGuestCamActive={sceneNode.isGuestCamActive}
               isDualOutputActive={sceneNode.isDualOutputActive}
-              isFolder={sceneNode.isFolder}
               cycleSelectiveRecording={() => this.cycleSelectiveRecording(sceneNode.id)}
               ref={this.nodeRefs[sceneNode.id]}
               onDoubleClick={() => this.sourceProperties(sceneNode.id)}
@@ -114,7 +115,7 @@ export class SourceSelectorModule {
     const nodes = this.filterNodes();
 
     return nodes.map(node => {
-      const itemsForNode = this.getItemsForNode(node.id);
+      const itemsForNode = this.scene.getItemsForNode(node.id);
       const isVisible = itemsForNode.some(i => i.visible);
       const isLocked = itemsForNode.every(i => i.locked);
       const isRecordingVisible = itemsForNode.every(i => i.recordingVisible);
@@ -139,6 +140,7 @@ export class SourceSelectorModule {
         isGuestCamActive,
         isDualOutputActive,
         parentId: node.parentId,
+        sceneId: node.sceneId,
         canShowActions: itemsForNode.length > 0,
         isFolder,
       };
@@ -387,22 +389,6 @@ export class SourceSelectorModule {
     this.editorCommandsService.actions.executeCommand('HideItemsCommand', selection, !visible);
   }
 
-  // Required for performance. Using Selection is too slow (Service Helpers)
-  getItemsForNode(sceneNodeId: string): ISceneItem[] {
-    const node = getDefined(this.scene.state.nodes.find(n => n.id === sceneNodeId));
-
-    if (node.sceneNodeType === 'item') {
-      return [node];
-    }
-
-    const children = this.scene.state.nodes.filter(n => n.parentId === sceneNodeId);
-    let childrenItems: ISceneItem[] = [];
-
-    children.forEach(c => (childrenItems = childrenItems.concat(this.getItemsForNode(c.id))));
-
-    return childrenItems;
-  }
-
   get selectiveRecordingEnabled() {
     return this.streamingService.state.selectiveRecording;
   }
@@ -578,6 +564,7 @@ const TreeNode = React.forwardRef(
     p: {
       title: string;
       id: string;
+      sceneId?: string;
       isLocked: boolean;
       isVisible: boolean;
       isStreamVisible: boolean;
@@ -585,7 +572,6 @@ const TreeNode = React.forwardRef(
       selectiveRecordingEnabled: boolean;
       isGuestCamActive: boolean;
       isDualOutputActive: boolean;
-      isFolder: boolean;
       canShowActions: boolean;
       toggleVisibility: (ev: unknown) => unknown;
       toggleLock: (ev: unknown) => unknown;
@@ -619,7 +605,9 @@ const TreeNode = React.forwardRef(
         {p.canShowActions && (
           <>
             {p.isGuestCamActive && <i className="fa fa-signal" />}
-            {p.isDualOutputActive && !p.isFolder && <DualOutputSourceSelector nodeId={p.id} />}
+            {p.isDualOutputActive && (
+              <DualOutputSourceSelector nodeId={p.id} sceneId={p?.sceneId} />
+            )}
             {p.selectiveRecordingEnabled && (
               <Tooltip title={selectiveRecordingMetadata().tooltip} placement="left">
                 <i
@@ -629,7 +617,7 @@ const TreeNode = React.forwardRef(
               </Tooltip>
             )}
             <i onClick={p.toggleLock} className={p.isLocked ? 'icon-lock' : 'icon-unlock'} />
-            {(!p.isDualOutputActive || p.isFolder) && (
+            {!p.isDualOutputActive && (
               <i onClick={p.toggleVisibility} className={p.isVisible ? 'icon-view' : 'icon-hide'} />
             )}
           </>

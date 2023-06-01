@@ -25,7 +25,7 @@ import * as path from 'path';
 import uuid from 'uuid/v4';
 import { SceneNode } from '../api/external-api/scenes';
 import compact from 'lodash/compact';
-import { assertIsDefined } from 'util/properties-type-guards';
+import { assertIsDefined, getDefined } from 'util/properties-type-guards';
 import { VideoSettingsService, TDisplayType } from 'services/settings-v2';
 import { DualOutputService } from 'services/dual-output';
 
@@ -141,6 +141,23 @@ export class Scene {
 
   getSelection(itemsList?: TNodesList): Selection {
     return new Selection(this.id, itemsList);
+  }
+
+  // Required for performance. Using Selection is too slow (Service Helpers)
+  getItemsForNode(sceneNodeId: string): ISceneItem[] {
+    const node = this.state.nodes.find(n => n.id === sceneNodeId);
+    if (!node) return [];
+
+    if (node.sceneNodeType === 'item') {
+      return [node];
+    }
+
+    const children = this.state.nodes.filter(n => n.parentId === sceneNodeId);
+    let childrenItems: ISceneItem[] = [];
+
+    children.forEach(c => (childrenItems = childrenItems.concat(this.getItemsForNode(c.id))));
+
+    return childrenItems;
   }
 
   setName(newName: string) {

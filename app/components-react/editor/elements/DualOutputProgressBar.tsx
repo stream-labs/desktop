@@ -13,7 +13,7 @@ export default function DualOutputProgressBar(p: { sceneId: string }) {
     total: ScenesService.views.getSceneItemsBySceneId(p.sceneId)?.length ?? 0,
   }));
 
-  useSubscription(DualOutputService.sceneItemHandled, index => setCurrent(index));
+  useSubscription(DualOutputService.sceneNodeHandled, index => setCurrent(index));
 
   return <ProgressBar current={current} total={v.total} />;
 }

@@ -141,6 +141,7 @@ export class SceneItem extends SceneItemNode {
       blendingMode: this.blendingMode,
       blendingMethod: this.blendingMethod,
       output: this.output,
+      display: this.display,
     };
   }
 

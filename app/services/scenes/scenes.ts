@@ -88,7 +88,7 @@ export interface ISceneItemSettings {
   blendingMode: EBlendingMode;
   blendingMethod: EBlendingMethod;
   output?: obs.IVideo;
-  // display?: TDisplayType;
+  display?: TDisplayType;
 }
 
 export interface IPartialSettings {
@@ -113,7 +113,6 @@ export interface ISceneItem extends ISceneItemSettings, ISceneItemNode {
   blendingMode: EBlendingMode;
   blendingMethod: EBlendingMethod;
   output?: obs.IVideo; // for obs.ISceneItem, this property is video
-  display?: TDisplayType;
 }
 
 export interface ISceneItemActions {
@@ -150,6 +149,7 @@ export interface ISceneItemNode {
   sceneNodeType: TSceneNodeType;
   parentId?: string;
   isRemoved?: boolean;
+  display?: TDisplayType;
 }
 
 export interface ISceneItemFolder extends ISceneItemNode {
@@ -227,9 +227,16 @@ class ScenesViews extends ViewHandler<IScenesState> {
     return null;
   }
 
-  getNodeVisibility(sceneNodeId: string) {
+  getNodeVisibility(sceneNodeId: string, sceneId?: string) {
     const nodeModel: TSceneNode | null = this.getSceneNode(sceneNodeId);
-    return nodeModel instanceof SceneItem ? nodeModel?.visible : null;
+
+    if (nodeModel instanceof SceneItem) {
+      return nodeModel?.visible;
+    }
+
+    // to determine if a folder is visible, check the visibility of the child nodes
+    const scene = this.getScene(sceneId);
+    return scene.getItemsForNode(sceneNodeId).some(i => i.visible);
   }
 }
 
