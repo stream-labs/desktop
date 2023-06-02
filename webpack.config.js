@@ -115,6 +115,14 @@ module.exports = {
               importLoaders: 1,
             },
           },
+          {
+            loader: 'postcss-loader',
+            options: {
+              postcssOptions: {
+                plugins: [require('autoprefixer')({ grid: true })],
+              },
+            },
+          },
         ],
       },
       {
@@ -125,6 +133,14 @@ module.exports = {
             loader: 'css-loader',
             options: {
               importLoaders: 1,
+            },
+          },
+          {
+            loader: 'postcss-loader',
+            options: {
+              postcssOptions: {
+                plugins: [require('autoprefixer')({ grid: true })],
+              },
             },
           },
           'less-loader',
