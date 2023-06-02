@@ -9,7 +9,12 @@
       },
       "problemMatcher": [],
       "label": "npm: compile",
-      "detail": "yarn clear && webpack-cli --progress --mode development"
+      "detail": "yarn clear && webpack-cli --progress --mode development",
+      "presentation": {
+        "reveal": "silent",
+        "revealProblems": "onProblem",
+        "close": true
+      }
     }
   ]
 }

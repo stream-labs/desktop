@@ -8,6 +8,7 @@ const stream = require('stream');
 const node_modules = path.join(process.cwd(), 'node_modules');
 
 const fetch = require('node-fetch');
+const { Console } = require('console');
 
 function log_info(msg) {
   //  sh.echo(colors.magenta(msg));
@@ -123,6 +124,19 @@ async function runScript() {
           return;
         }
 
+        // repositris.jsonで指定したダウンロードしたtar.gzのpackage.jsonでのversionが違うため、
+        // 既存判定が効かないのでメモをつけて回避をする
+        const checkFile = path.join(process.cwd(), dependency['name'], '__downloaded_url');
+        try {
+          const downloaded = fs.readFileSync(checkFile).toString();
+          if (downloaded === url) {
+            log_info(
+              'Target version is not in in-current version, but Required downloaded file URL is same, Skip',
+            );
+            return;
+          }
+        } catch {}
+
         sh.rm('-rf', path.join(node_modules, dependency['name']));
 
         log_info('Downloading ' + fileName);
@@ -130,6 +144,8 @@ async function runScript() {
         log_info('Installing ' + fileName);
         executeCmd('tar -xzvf ' + fileName, { silent: true });
         sh.rm(fileName);
+
+        fs.writeFileSync(checkFile, url);
       });
     await Promise.all(promises);
 

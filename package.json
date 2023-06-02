@@ -44,7 +44,7 @@
     "compile-tests": "tsc -p test",
     "screentest": "node test/screentest/runner.js",
     "version": "git add app/services/patch-notes/notes.ts",
-    "postinstall": "node ./scripts/install-native-deps.js",
+    "postinstall": "node --no-warnings ./scripts/install-native-deps.js",
     "clear:cache": "npx shx rm -rf node_module/.cache dist bundles test-dist"
   },
   "buildProductName": "N Air",
