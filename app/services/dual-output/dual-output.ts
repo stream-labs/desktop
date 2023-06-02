@@ -167,9 +167,9 @@ class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
     return display === 'horizontal' ? 'landscape' : 'portrait';
   }
 
-  getHorizontalNodeId(verticalNodeId: string, sceneId: string) {
+  getHorizontalNodeId(verticalNodeId: string, sceneId?: string) {
     const sceneNodeMap = sceneId ? this.sceneNodeMaps[sceneId] : this.activeSceneNodeMap;
-    return Object.values(sceneNodeMap).find(
+    return Object.keys(sceneNodeMap).find(
       (horizontalNodeId: string) => sceneNodeMap[horizontalNodeId] === verticalNodeId,
     );
   }

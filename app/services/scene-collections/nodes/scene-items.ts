@@ -1,17 +1,10 @@
 import { Node } from './node';
-import {
-  EBlendingMethod,
-  EBlendingMode,
-  EScaleType,
-  ISceneItemFolder,
-  Scene,
-  ScenesService,
-  TSceneNodeType,
-} from '../../scenes';
+import { EBlendingMethod, EBlendingMode, EScaleType, Scene, ScenesService } from '../../scenes';
 import { HotkeysNode } from './hotkeys';
 import { SourcesService } from '../../sources';
 import { Inject } from '../../core/injector';
-import { TDisplayType } from 'services/settings-v2';
+import { TDisplayType, VideoSettingsService } from 'services/settings-v2';
+import { DualOutputService } from 'services/dual-output';
 
 interface ISchema {
   items: TSceneNodeInfo[];
@@ -62,6 +55,12 @@ export class SceneItemsNode extends Node<ISchema, {}> {
 
   @Inject('ScenesService')
   scenesService: ScenesService;
+
+  @Inject('DualOutputService')
+  dualOutputService: DualOutputService;
+
+  @Inject('VideoSettingsService')
+  videoSettingsService: VideoSettingsService;
 
   getItems(context: IContext) {
     return context.scene.getNodes().slice().reverse();
@@ -136,6 +135,13 @@ export class SceneItemsNode extends Node<ISchema, {}> {
         if (item.recordingVisible == null) item.recordingVisible = true;
       }
     });
+
+    if (
+      this.dualOutputService.views.hasNodeMap(context.scene.id) &&
+      !this.videoSettingsService.contexts.vertical
+    ) {
+      this.videoSettingsService.establishVideoContext('vertical');
+    }
 
     context.scene.addSources(this.data.items);
 

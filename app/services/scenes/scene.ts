@@ -197,7 +197,8 @@ export class Scene {
     const sceneItem = this.getItem(sceneItemId)!;
 
     // assign context to scene item
-    const context = this.videoSettingsService.contexts[display];
+    const context =
+      this.videoSettingsService.contexts[display] ?? this.videoSettingsService.contexts.horizontal;
     obsSceneItem.video = context as obs.IVideo;
 
     // Default is to select
@@ -410,10 +411,7 @@ export class Scene {
     let itemIndex = 0;
     nodes.forEach(nodeModel => {
       const display = this.dualOutputService.views.getNodeDisplay(nodeModel.id, this.state.id);
-      const context = this.videoSettingsService.contexts[display];
       const obsSceneItem = obsSceneItems[itemIndex];
-      obsSceneItem.video = context;
-
       if (nodeModel.sceneNodeType === 'folder') {
         this.createFolder(nodeModel.name, { id: nodeModel.id });
       } else {
@@ -422,6 +420,12 @@ export class Scene {
         item.loadItemAttributes(nodeModel);
         itemIndex++;
       }
+
+      const context =
+        this.videoSettingsService.contexts[display] ??
+        this.videoSettingsService.contexts.horizontal;
+
+      obsSceneItem.video = context;
     });
 
     // add items to folders

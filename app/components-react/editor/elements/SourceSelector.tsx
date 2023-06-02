@@ -5,7 +5,7 @@ import { TreeProps } from 'rc-tree/lib/Tree';
 import cx from 'classnames';
 import { inject, injectState, injectWatch, mutation, useModule } from 'slap';
 import { SourcesService } from 'services/sources';
-import { ScenesService, ISceneItem, TSceneNode, isItem } from 'services/scenes';
+import { ScenesService, TSceneNode, isItem } from 'services/scenes';
 import { SelectionService } from 'services/selection';
 import { EditMenu } from 'util/menus/EditMenu';
 import { $t } from 'services/i18n';
@@ -292,20 +292,7 @@ export class SourceSelectorModule {
       this.activeItemIds.length > 0 && this.activeItemIds.includes(info.dragNode.key as string)
         ? this.activeItemIds
         : (info.dragNodesKeys as string[]);
-
-    // if the scene has vertical nodes, they should be reordered as well
-    const verticalNodes: string[] = targetNodes.reduce((ids: string[], nodeId: string) => {
-      const verticalNodeId = this.dualOutputService.views.getVerticalNodeId(nodeId);
-      if (verticalNodeId) {
-        ids.push(verticalNodeId);
-      }
-      return ids;
-    }, []);
-
-    const nodesToDrop = verticalNodes
-      ? this.scene.getSelection(targetNodes.concat(verticalNodes))
-      : this.scene.getSelection(targetNodes);
-
+    const nodesToDrop = this.scene.getSelection(targetNodes);
     const destNode = this.scene.getNode(info.node.key as string);
     const placement = this.determinePlacement(info);
 
@@ -318,6 +305,29 @@ export class SourceSelectorModule {
       destNode?.id,
       placement,
     );
+
+    // if the scene has vertical nodes, they should be reordered as well
+    if (this.dualOutputService.views.hasNodeMap(this.scene.id)) {
+      const verticalNodes = targetNodes.map(node =>
+        this.dualOutputService.views.getVerticalNodeId(node),
+      );
+      const verticalNodesToDrop = this.scene.getSelection(verticalNodes);
+      const verticalDestNodeId = this.dualOutputService.views.getVerticalNodeId(
+        info.node.key as string,
+      );
+      if (!verticalDestNodeId) return;
+      const verticalDestNode = this.scene.getNode(verticalDestNodeId);
+
+      if (!verticalNodesToDrop || !verticalDestNode) return;
+      if (verticalNodes.some(nodeId => nodeId === verticalDestNode.id)) return;
+
+      await this.editorCommandsService.actions.return.executeCommand(
+        'ReorderNodesCommand',
+        verticalNodesToDrop,
+        verticalDestNode?.id,
+        placement,
+      );
+    }
   }
 
   makeActive(info: { node: DataNode; nativeEvent: MouseEvent }) {
@@ -336,6 +346,10 @@ export class SourceSelectorModule {
       ids = this.nodeData
         .map(i => i.id)
         .slice(swapIdx ? idx2 : idx1, swapIdx ? idx1 + 1 : idx2 + 1);
+    }
+
+    if (this.isDualOutputActive) {
+      ids.push(this.dualOutputService.views.getVerticalNodeId(info.node.key as string));
     }
 
     this.selectionService.views.globalSelection.select(ids);
@@ -375,6 +389,24 @@ export class SourceSelectorModule {
   }
 
   get activeItemIds() {
+    if (this.dualOutputService.views.hasNodeMap(this.scene.id)) {
+      const selectedIds = this.selectionService.state.selectedIds;
+      const verticalNodeIds = this.dualOutputService.views.verticalNodeIds;
+
+      const horizontalNodeIds: string[] = verticalNodeIds.reduce((ids: string[], id: string) => {
+        // if the node is a vertical node, add the horizontal node id
+        if (
+          this.selectionService.state.selectedIds.includes(id) &&
+          this.dualOutputService.views.getHorizontalNodeId(id)
+        ) {
+          ids.push();
+        }
+        return ids;
+      }, []);
+
+      return selectedIds.concat(horizontalNodeIds);
+    }
+
     return this.selectionService.state.selectedIds;
   }
 
