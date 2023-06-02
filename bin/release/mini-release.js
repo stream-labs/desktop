@@ -17,7 +17,12 @@ const {
   updateNotesTs,
   readPatchNote,
 } = require('./scripts/patchNote');
-const { uploadS3File, uploadToGithub, uploadToSentry } = require('./scripts/uploadArtifacts');
+const {
+  uploadS3File,
+  uploadToGithub,
+  uploadToSentry,
+  injectForSentry,
+} = require('./scripts/uploadArtifacts');
 
 const pjson = JSON.parse(fs.readFileSync(path.resolve('./package.json'), 'utf-8'));
 
@@ -287,9 +292,10 @@ async function runScript({
 
   if (enableUploadToSentry) {
     info('uploading to sentry...');
-    uploadToSentry(sentry.organization, sentry.project, newVersion,
-      [path.resolve('.', 'bundles'), path.resolve('.', 'main.js')].join(' '),
-    );
+    executeCmd(`cp main.js bundles/`);
+    const bundles = path.resolve('.', 'bundles');
+    injectForSentry(bundles);
+    uploadToSentry(sentry.organization, sentry.project, newVersion, bundles);
   } else {
     info('uploading to sentry: SKIP');
   }
