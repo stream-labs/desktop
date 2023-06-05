@@ -60,10 +60,12 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
 
   init() {
     this.establishVideoContext();
-    this.establishedContext.next();
+
     if (this.dualOutputService.views.activeDisplays.vertical) {
       this.establishVideoContext('vertical');
     }
+
+    this.establishedContext.next();
   }
 
   contexts = {

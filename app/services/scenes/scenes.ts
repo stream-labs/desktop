@@ -269,6 +269,7 @@ export class ScenesService extends StatefulService<IScenesState> {
   itemAdded = new Subject<ISceneItem & ISource>();
   itemRemoved = new Subject<ISceneItem & ISource>();
   itemUpdated = new Subject<ISceneItem & ISource>();
+  sourcesAdded = new Subject();
 
   @Inject() private windowsService: WindowsService;
   @Inject() private sourcesService: SourcesService;

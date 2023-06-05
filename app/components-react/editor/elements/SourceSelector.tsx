@@ -308,13 +308,12 @@ export class SourceSelectorModule {
 
     // if the scene has vertical nodes, they should be reordered as well
     if (this.dualOutputService.views.hasNodeMap(this.scene.id)) {
+      const horizontalNodeId = destNode?.id ?? (info.node.key as string);
       const verticalNodes = targetNodes.map(node =>
         this.dualOutputService.views.getVerticalNodeId(node),
       );
       const verticalNodesToDrop = this.scene.getSelection(verticalNodes);
-      const verticalDestNodeId = this.dualOutputService.views.getVerticalNodeId(
-        info.node.key as string,
-      );
+      const verticalDestNodeId = this.dualOutputService.views.getVerticalNodeId(horizontalNodeId);
       if (!verticalDestNodeId) return;
       const verticalDestNode = this.scene.getNode(verticalDestNodeId);
 

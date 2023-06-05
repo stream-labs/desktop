@@ -273,6 +273,10 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
         this.setIsCollectionOrSceneLoading(false);
       }
     });
+
+    this.scenesService.sourcesAdded.subscribe((sceneId: string) => {
+      this.assignContexts(sceneId);
+    });
   }
 
   /**
@@ -360,6 +364,18 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
     this.setIsCollectionOrSceneLoading(false);
   }
 
+  assignContexts(sceneId: string) {
+    this.setIsCollectionOrSceneLoading(true);
+    const nodes = this.scenesService.views.getScene(sceneId).getNodes();
+
+    nodes.forEach(node => {
+      const display = this.views.getNodeDisplay(node.id, sceneId);
+      this.assignNodeContext(node, display);
+    });
+
+    this.setIsCollectionOrSceneLoading(false);
+  }
+
   createOrAssignOutputNode(
     sceneItem: SceneItem,
     display: TDisplayType,
@@ -395,14 +411,14 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
   }
 
   assignNodeContext(node: TSceneNode, display: TDisplayType) {
-    const context = this.videoSettingsService.contexts[display];
-    if (!context) return null;
-
     if (node.isItem()) {
+      const context = this.videoSettingsService.contexts[display];
+      if (!context) return null;
       node.setSettings({ output: context, display });
     } else {
-      node.output = context;
-      node.display = display;
+      // because folders just group scene items, they do not have their own output value
+      // set the display for toggling in the source selector
+      node.setDisplay(display);
     }
 
     return node.id;

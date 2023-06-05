@@ -14,6 +14,8 @@ import {
   TSceneNode,
   EBlendingMethod,
 } from 'services/scenes';
+import { TDisplayType } from 'services/settings-v2';
+import { IVideo } from 'obs-studio-node';
 import { Inject } from 'services/core/injector';
 import { Subject } from 'rxjs';
 
@@ -25,6 +27,9 @@ enum ESceneNodeType {
 interface INode {
   id: string;
   type: ESceneNodeType;
+  parentId?: string;
+  output?: IVideo;
+  display?: TDisplayType;
 }
 
 interface ITransform {
@@ -49,6 +54,7 @@ interface ISceneItem extends INode {
 
 interface ISceneItemFolder extends INode {
   type: ESceneNodeType.Folder;
+  sceneId?: string;
   name: string;
   childrenIds: string[];
 }

@@ -70,8 +70,7 @@ export class CopyNodesCommand extends Command {
         const display =
           this.display ?? this.dualOutputService.views.getNodeDisplay(node.id, this.origSceneId);
         const context = this.videoSettingsService.contexts[display];
-        folder.display = display;
-        folder.output = context;
+        folder.setDisplay(display);
 
         if (this.display === 'vertical' || (hasNodeMap && display === 'horizontal')) {
           // when creating dual output nodes for a vanilla scene, the passed in display is set to vertical

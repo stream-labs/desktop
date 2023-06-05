@@ -967,7 +967,7 @@ export class SceneCollectionsService extends Service implements ISceneCollection
     this.stateService.createNodeMapEntry(sceneId, horizontalNodeId, verticalNodeId);
   }
 
-  removeVerticalNode(sceneItemId: string, sceneId: string) {
+  removeVerticalNode(horizontalNodeId: string, sceneId: string) {
     if (
       !this.activeCollection ||
       !this.activeCollection?.sceneNodeMaps ||
@@ -977,10 +977,10 @@ export class SceneCollectionsService extends Service implements ISceneCollection
     }
 
     const nodeMap = this.activeCollection?.sceneNodeMaps[sceneId];
-    delete nodeMap[sceneItemId];
+    delete nodeMap[horizontalNodeId];
 
     this.activeCollection.sceneNodeMaps[sceneId] = { ...nodeMap };
-    this.stateService.removeVerticalNode(sceneItemId, sceneId);
+    this.stateService.removeVerticalNode(horizontalNodeId, sceneId);
   }
 
   removeNodeMap(sceneId: string) {

@@ -5,6 +5,7 @@ import { SourcesService } from '../../sources';
 import { Inject } from '../../core/injector';
 import { TDisplayType, VideoSettingsService } from 'services/settings-v2';
 import { DualOutputService } from 'services/dual-output';
+import { IVideo } from 'obs-studio-node';
 
 interface ISchema {
   items: TSceneNodeInfo[];
@@ -27,7 +28,6 @@ export interface ISceneItemInfo extends ISceneNodeInfo {
   blendingMode?: EBlendingMode;
   blendingMethod?: EBlendingMethod;
   sceneNodeType: 'item';
-  display?: TDisplayType;
 }
 
 interface ISceneItemFolderInfo extends ISceneNodeInfo {
@@ -39,6 +39,8 @@ interface ISceneItemFolderInfo extends ISceneNodeInfo {
 interface ISceneNodeInfo {
   id: string;
   sceneNodeType: 'item' | 'folder';
+  display?: TDisplayType;
+  output?: IVideo;
 }
 
 export type TSceneNodeInfo = ISceneItemInfo | ISceneItemFolderInfo;
@@ -72,6 +74,12 @@ export class SceneItemsNode extends Node<ISchema, {}> {
         const hotkeys = new HotkeysNode();
 
         if (sceneItem.isItem()) {
+          const display = this.dualOutputService.views.getNodeDisplay(
+            sceneItem.sceneItemId,
+            sceneItem.sceneId,
+          );
+          const context = this.videoSettingsService.contexts[display];
+
           hotkeys.save({ sceneItemId: sceneItem.sceneItemId }).then(() => {
             const transform = sceneItem.transform;
             resolve({
@@ -92,6 +100,8 @@ export class SceneItemsNode extends Node<ISchema, {}> {
               blendingMode: sceneItem.blendingMode,
               blendingMethod: sceneItem.blendingMethod,
               sceneNodeType: 'item',
+              display,
+              output: context,
             });
           });
         } else {

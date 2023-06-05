@@ -80,20 +80,43 @@ export class RootNode extends Node<ISchema, {}> {
   }
 
   async load(): Promise<void> {
-    this.videoService.setBaseResolutions(this.data.baseResolutions);
-    this.streamingService.setSelectiveRecording(!!this.data.selectiveRecording);
-    this.streamingService.setDualOutputMode(this.data.dualOutputMode);
+    if (!this.videoSettingsService.contexts.horizontal) {
+      const establishedContext = this.videoSettingsService.establishedContext.subscribe(
+        async () => {
+          this.videoService.setBaseResolutions(this.data.baseResolutions);
+          this.streamingService.setSelectiveRecording(!!this.data.selectiveRecording);
+          this.streamingService.setDualOutputMode(this.data.dualOutputMode);
 
-    await this.data.transitions.load();
-    await this.data.sources.load({});
-    await this.data.scenes.load({});
+          await this.data.transitions.load();
+          await this.data.sources.load({});
+          await this.data.scenes.load({});
 
-    if (this.data.hotkeys) {
-      await this.data.hotkeys.load({});
-    }
+          if (this.data.hotkeys) {
+            await this.data.hotkeys.load({});
+          }
 
-    if (this.data.guestCam) {
-      await this.data.guestCam.load();
+          if (this.data.guestCam) {
+            await this.data.guestCam.load();
+          }
+          establishedContext.unsubscribe();
+        },
+      );
+    } else {
+      this.videoService.setBaseResolutions(this.data.baseResolutions);
+      this.streamingService.setSelectiveRecording(!!this.data.selectiveRecording);
+      this.streamingService.setDualOutputMode(this.data.dualOutputMode);
+
+      await this.data.transitions.load();
+      await this.data.sources.load({});
+      await this.data.scenes.load({});
+
+      if (this.data.hotkeys) {
+        await this.data.hotkeys.load({});
+      }
+
+      if (this.data.guestCam) {
+        await this.data.guestCam.load();
+      }
     }
   }
 

@@ -10,7 +10,6 @@ import {
   ISceneItemFolder,
   SceneItemFolder,
   ISceneItemNode,
-  isItem,
   EScaleType,
   EBlendingMode,
   EBlendingMethod,
@@ -23,8 +22,6 @@ import { TSceneNodeInfo } from 'services/scene-collections/nodes/scene-items';
 import * as fs from 'fs';
 import * as path from 'path';
 import uuid from 'uuid/v4';
-import { SceneNode } from '../api/external-api/scenes';
-import compact from 'lodash/compact';
 import { assertIsDefined, getDefined } from 'util/properties-type-guards';
 import { VideoSettingsService, TDisplayType } from 'services/settings-v2';
 import { DualOutputService } from 'services/dual-output';
@@ -191,15 +188,16 @@ export class Scene {
 
     if (source.forceHidden) obsSceneItem.visible = false;
 
-    const display = this.dualOutputService.views.getNodeDisplay(sceneItemId, this.state.id);
+    const display =
+      options?.display ?? this.dualOutputService.views.getNodeDisplay(sceneItemId, this.state.id);
+    // assign context to scene item
+    const context =
+      this.videoSettingsService.contexts[display] ?? this.videoSettingsService.contexts.horizontal;
 
     this.ADD_SOURCE_TO_SCENE(sceneItemId, source.sourceId, obsSceneItem.id, display);
     const sceneItem = this.getItem(sceneItemId)!;
 
-    // assign context to scene item
-    const context =
-      this.videoSettingsService.contexts[display] ?? this.videoSettingsService.contexts.horizontal;
-    obsSceneItem.video = context as obs.IVideo;
+    sceneItem.setSettings({ ...sceneItem.getSettings(), display, output: context });
 
     // Default is to select
     if (options.select == null) options.select = true;
@@ -242,6 +240,7 @@ export class Scene {
       sceneNodeType: 'folder',
       sceneId: this.id,
       parentId: '',
+      display: options?.display,
     });
     return this.getFolder(id)!;
   }
@@ -381,8 +380,6 @@ export class Scene {
       const source = this.sourcesService.views.getSource(sceneNode.sourceId);
       if (!source) return false;
 
-      const display = this.dualOutputService.views.getNodeDisplay(sceneNode.id, this.state.id);
-
       arrayItems.push({
         name: source.sourceId,
         id: sceneNode.id,
@@ -400,7 +397,6 @@ export class Scene {
         scaleFilter: sceneNode.scaleFilter!,
         blendingMode: sceneNode.blendingMode!,
         blendingMethod: sceneNode.blendingMethod,
-        display,
       });
       return true;
     });
@@ -420,12 +416,6 @@ export class Scene {
         item.loadItemAttributes(nodeModel);
         itemIndex++;
       }
-
-      const context =
-        this.videoSettingsService.contexts[display] ??
-        this.videoSettingsService.contexts.horizontal;
-
-      obsSceneItem.video = context;
     });
 
     // add items to folders
@@ -433,6 +423,8 @@ export class Scene {
       if (nodeModel.sceneNodeType !== 'folder') return;
       this.getSelection(nodeModel.childrenIds).moveTo(this.id, nodeModel.id);
     });
+
+    this.scenesService.sourcesAdded.next(this.id);
   }
 
   canAddSource(sourceId: string): boolean {
