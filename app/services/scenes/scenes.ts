@@ -31,6 +31,7 @@ export interface ISceneNodeAddOptions {
   sourceAddOptions?: ISourceAddOptions;
   select?: boolean; // Immediately select this source
   initialTransform?: IPartialTransform;
+  display?: TDisplayType;
 }
 
 export interface ISceneItemInfo {
@@ -50,6 +51,7 @@ export interface ISceneItemInfo {
   blendingMode?: EBlendingMode;
   blendingMethod?: EBlendingMethod;
   display?: TDisplayType;
+  output?: obs.IVideo;
 }
 
 export interface IScenesState {
@@ -150,6 +152,7 @@ export interface ISceneItemNode {
   parentId?: string;
   isRemoved?: boolean;
   display?: TDisplayType;
+  output?: obs.IVideo;
 }
 
 export interface ISceneItemFolder extends ISceneItemNode {
