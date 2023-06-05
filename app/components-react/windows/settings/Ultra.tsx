@@ -42,10 +42,10 @@ export function Ultra() {
       link: 'https://streamlabs.com/console?refl=slobs-settings',
     },
     {
-      title: 'Melon App Pro',
+      title: 'Talk Studio Pro',
       description: $t('Stream and record with guests from your browser'),
-      image: 'melon.png',
-      link: 'https://melonapp.com/?refl=slobs-settings',
+      image: 'talk-studio.png',
+      link: 'https://streamlabs.com/talk-studio?refl=slobs-settings',
     },
     {
       title: 'Video Editor Pro',
@@ -54,7 +54,7 @@ export function Ultra() {
       link: 'http://streamlabs.com/video-editor?refl=slobs-settings',
     },
     {
-      title: 'Streamlabs Cross Clip Pro',
+      title: 'Cross Clip Pro',
       description: $t('Turn your VODs into must-see TikToks, Reels, and Shorts'),
       image: 'crossclip.png',
       link: 'https://crossclip.streamlabs.com/?refl=slobs-settings',
