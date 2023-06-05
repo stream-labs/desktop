@@ -24,5 +24,7 @@
   "Recording History": "録画履歴",
   "Show in folder": "フォルダーに表示",
   "Recordings": "録画",
-  "Marker %{label} added at %{timestamp}": "マーカー %{label} が %{timestamp} に追加されました"
+  "Marker %{label} added at %{timestamp}": "マーカー %{label} が %{timestamp} に追加されました",
+  "File is too large to upload": "File is too large to upload",
+  "File type %{extension} is not supported": "File type %{extension} is not supported"
 }
