@@ -129,30 +129,47 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
   }
 
   loadLegacySettings(display: TDisplayType = 'horizontal') {
-    const videoLegacy = this.contexts[display].legacySettings;
-    Object.keys(videoLegacy).forEach((key: keyof obs.IVideoInfo) => {
-      // on first login, the base width and height of legacy settings is zero
-      // so if that is the case, try to use the settings from the video property
-      if (
-        ['baseWidth', 'baseHeight'].includes(key) &&
-        videoLegacy[key] === 0 &&
-        !!this.contexts[display]?.video
-      ) {
-        const video = this.contexts[display]?.video;
-        this.SET_VIDEO_SETTING(key, video[key]);
-        this.dualOutputService.setVideoSetting({ [key]: video[key] }, 'horizontal');
-      } else {
-        this.SET_VIDEO_SETTING(key, videoLegacy[key]);
-        this.dualOutputService.setVideoSetting({ [key]: videoLegacy[key] }, 'horizontal');
-      }
-    });
+    // Ideally, the first time the user opens the app after the settings
+    // have migrated to being stored on the front end, load the settings from
+    // the legacy settings. Because the legacy settings are just values from basic.ini
+    // if the user is starting from a clean cache, there will be no such file.
+    // In that case, load from the video property.
+
+    // Additionally, because this service is loaded lazily, calling this function elsewhere
+    // before the service has been initiated will call the function twice.
+    // To prevent errors, just return if both properties are null because
+    // the function will be called again as a part of establishing the context.
+
+    const legacySettings = this.contexts[display].legacySettings;
+    const videoSettings = this.contexts[display].video;
+
+    if (!legacySettings && !videoSettings) return;
+
+    if (legacySettings?.baseHeight === 0 || legacySettings?.baseWidth === 0) {
+      // return if null for the same reason as above
+      if (!videoSettings) return;
+
+      Object.keys(videoSettings).forEach((key: keyof obs.IVideoInfo) => {
+        this.SET_VIDEO_SETTING(key, videoSettings[key]);
+        this.dualOutputService.setVideoSetting({ [key]: videoSettings[key] }, display);
+      });
+    } else {
+      // return if null for the same reason as above
+      if (!legacySettings) return;
+      Object.keys(legacySettings).forEach((key: keyof obs.IVideoInfo) => {
+        this.SET_VIDEO_SETTING(key, legacySettings[key]);
+        this.dualOutputService.setVideoSetting({ [key]: legacySettings[key] }, display);
+      });
+      this.contexts[display].video = this.contexts[display].legacySettings;
+    }
   }
 
   migrateSettings(display: TDisplayType = 'horizontal') {
     // if this is the first time starting the app
     // set default settings for horizontal context
     if (display === 'horizontal' && !this.dualOutputService.views.videoSettings.horizontal) {
-      this.loadLegacySettings(display);
+      this.loadLegacySettings();
+      this.contexts.horizontal.video = this.contexts.horizontal.legacySettings;
     } else {
       // otherwise, load them from the dual output service
       const settings = this.dualOutputService.views.videoSettings[display];
