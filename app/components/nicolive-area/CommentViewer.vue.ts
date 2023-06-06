@@ -87,7 +87,7 @@ export default class CommentViewer extends Vue {
     }
   }
 
-  pinnedItemComtent(item: WrappedChat): string {
+  pinnedItemContent(item: WrappedChat): string {
     return `${getContentWithFilter(item)}  (${this.getFormattedLiveTime(item.value)})`;
   }
 
