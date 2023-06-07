@@ -1,7 +1,7 @@
 import { HostsService } from 'app-services';
 import fs from 'fs';
 import path from 'path';
-import { Service, Inject } from 'services/core';
+import { Service, Inject, ViewHandler } from 'services/core';
 import { UserService } from 'services/user';
 import { authorizedHeaders, jfetch } from 'util/requests';
 import { $t } from 'services/i18n';
@@ -31,6 +31,18 @@ const PLATFORM_RULES = {
   typestudio: { size: 1024 * 1024 * 1024 * 3.4, types: ['.mp4', '.mov', '.webm'] },
 };
 
+class SharedStorageServiceViews extends ViewHandler<{}> {
+  getPlatformLink(platform: string, id: string) {
+    if (platform === 'crossclip') {
+      return `https://crossclip.streamlabs.com/storage/${id}`;
+    }
+    if (platform === 'typestudio') {
+      return `https://app.typestudio.co/storage/${id}`;
+    }
+    return '';
+  }
+}
+
 export class SharedStorageService extends Service {
   @Inject() userService: UserService;
   @Inject() hostsService: HostsService;
@@ -38,9 +50,14 @@ export class SharedStorageService extends Service {
   id: string;
   cancel: () => void;
   uploader: S3Uploader;
+  uploading = false;
 
   get host() {
     return `https://${this.hostsService.streamlabs}/api/v5/slobs/streamlabs-storage`;
+  }
+
+  get views() {
+    return new SharedStorageServiceViews({});
   }
 
   async uploadFile(
@@ -50,6 +67,10 @@ export class SharedStorageService extends Service {
     platform?: string,
   ) {
     try {
+      if (this.uploading) {
+        throw new Error($t('Upload already in progress'));
+      }
+      this.uploading = true;
       const uploadInfo = await this.prepareUpload(filepath, platform);
       this.id = uploadInfo.file.id;
       this.uploader = new S3Uploader({
@@ -120,6 +141,7 @@ export class SharedStorageService extends Service {
       body.append('mime_type', 'video/mpeg');
       return await jfetch(new Request(url, { headers, body, method: 'POST' }));
     } catch (e: unknown) {
+      this.uploading = false;
       return Promise.reject(e);
     }
   }
@@ -136,6 +158,7 @@ export class SharedStorageService extends Service {
       new Headers({ 'Content-Type': 'application/json' }),
     );
     const body = JSON.stringify({ temporary_file_id: this.id, type: 'video' });
+    this.uploading = false;
     return await jfetch(new Request(url, { method: 'POST', headers, body }));
   }
 }

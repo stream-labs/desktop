@@ -10,7 +10,7 @@ import styles from './ExportModal.m.less';
 import VideoPreview from './VideoPreview';
 
 export default function CrossClipUpload(p: { onClose: () => void; platform: string }) {
-  const { UserService, HighlighterService, OnboardingService } = Services;
+  const { UserService, HighlighterService, OnboardingService, SharedStorageService } = Services;
 
   const { uploadInfo, hasSLID } = useVuex(() => ({
     uploadInfo: HighlighterService.views.uploadInfo,
@@ -25,19 +25,11 @@ export default function CrossClipUpload(p: { onClose: () => void; platform: stri
     HighlighterService.actions.uploadStorage();
   }
 
-  function getPlatformLink(id: string) {
-    if (p.platform === 'crossclip') {
-      return `https://crossclip.streamlabs.com/storage/${id}`;
-    }
-    if (p.platform === 'typestudio') {
-      return `https://app.typestudio.co/storage/${id}`;
-    }
-    return '';
-  }
-
   useEffect(() => {
     if (uploadInfo.videoId) {
-      remote.shell.openExternal(getPlatformLink(uploadInfo.videoId));
+      remote.shell.openExternal(
+        SharedStorageService.views.getPlatformLink(p.platform, uploadInfo.videoId),
+      );
       HighlighterService.actions.clearUpload();
       p.onClose();
     }
