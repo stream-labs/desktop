@@ -26,7 +26,7 @@ export default function UploadProgress() {
   const { uploadInfo } = useVuex(() => ({ uploadInfo: HighlighterService.views.uploadInfo }));
 
   return (
-    <div>
+    <div style={{ marginTop: '16px' }}>
       <h2>{$t('Upload Progress')}</h2>
       <Progress
         percent={Math.round((uploadInfo.uploadedBytes / uploadInfo.totalBytes) * 100)}
