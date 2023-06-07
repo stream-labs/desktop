@@ -399,5 +399,8 @@
   },
   "wasapi_process_output_capture": {
     "name": "Application Audio Capture (BETA)"
+  },
+  "vlc_source": {
+    "name": "VLC Source"
   }
 }

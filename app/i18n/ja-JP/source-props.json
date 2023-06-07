@@ -398,6 +398,9 @@
     "description": "シーンにN Voiceの音声に合わせてコメントを読み上げるキャラクターを追加します"
   },
   "wasapi_process_output_capture": {
-    "name": "アプリケーション音声キャプチャ(β版)"
+    "name": "アプリ音声キャプチャ(β版)"
+  },
+  "vlc_source": {
+    "name": "VLCソース"
   }
 }
