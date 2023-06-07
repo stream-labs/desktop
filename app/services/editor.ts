@@ -3,12 +3,10 @@ import clamp from 'lodash/clamp';
 import { DragHandler } from 'util/DragHandler';
 import { Inject } from 'services/core/injector';
 import { Scene, SceneItem, ScenesService, TSceneNode } from 'services/scenes';
-import { VideoService } from 'services/video';
 import { EditMenu } from 'util/menus/EditMenu';
 import { AnchorPoint, AnchorPositions, ScalableRectangle } from 'util/ScalableRectangle';
 import { WindowsService } from 'services/windows';
 import { SelectionService, Selection } from 'services/selection';
-import { TransitionsService } from 'services/transitions';
 import { CustomizationService } from 'services/customization';
 import { v2 } from '../util/vec2';
 import { EditorCommandsService } from 'services/editor-commands';
@@ -61,9 +59,7 @@ export interface IMouseEvent {
 export class EditorService extends StatefulService<IEditorServiceState> {
   @Inject() private scenesService: ScenesService;
   @Inject() private windowsService: WindowsService;
-  @Inject() private videoService: VideoService;
   @Inject() private selectionService: SelectionService;
-  @Inject() private transitionsService: TransitionsService;
   @Inject() private customizationService: CustomizationService;
   @Inject() private editorCommandsService: EditorCommandsService;
   @Inject() private tcpServerService: TcpServerService;
@@ -551,6 +547,23 @@ export class EditorService extends StatefulService<IEditorServiceState> {
     const movedY = y - this.renderedOffsetYs[display];
 
     return this.convertScalarToBaseSpace(movedX, movedY, display);
+  }
+
+  // calculates the scale of sources for the vertical display
+  // so elements retain the same proportions as the horizontal display
+  calculateVerticalScale() {
+    const horizontalWidth = this.renderedWidths.horizontal;
+    const verticalWidth = this.renderedWidths.vertical;
+    const horizontalHeight = this.renderedHeights.horizontal;
+    const verticalHeight = this.renderedHeights.vertical;
+
+    const x = Math.max(horizontalWidth, verticalWidth) / Math.min(horizontalWidth, verticalWidth);
+    const y =
+      Math.max(horizontalHeight, verticalHeight) / Math.min(horizontalHeight, verticalHeight);
+    return {
+      x,
+      y,
+    };
   }
 
   // getters

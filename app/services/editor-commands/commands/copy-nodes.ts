@@ -5,6 +5,7 @@ import { ScenesService, TSceneNode } from 'services/scenes';
 import { TDisplayType, VideoSettingsService } from 'services/settings-v2';
 import { SceneCollectionsService } from 'services/scene-collections';
 import { DualOutputService } from 'services/dual-output';
+import { EditorService } from 'services/editor';
 import compact from 'lodash/compact';
 import { $t } from 'services/i18n';
 
@@ -13,6 +14,7 @@ export class CopyNodesCommand extends Command {
   @Inject() dualOutputService: DualOutputService;
   @Inject() videoSettingsService: VideoSettingsService;
   @Inject() sceneCollectionsService: SceneCollectionsService;
+  @Inject() editorService: EditorService;
 
   description: string;
 
@@ -89,9 +91,16 @@ export class CopyNodesCommand extends Command {
         item.setSettings({ ...node.getSettings(), output: context, display });
 
         if (this.display === 'vertical' || (hasNodeMap && display === 'horizontal')) {
-          // position all of the nodes in the upper left corner of the vertical display
-          // so that all of the sources are visible
-          item.setTransform({ position: { x: 0, y: 0 } });
+          if (item.type === 'game_capture') {
+            // to prevent scaling of the game capture in the vertical display
+            // set the initial scale based off of the horizontal display values
+            // const horizontalScale = convertScalarToBaseSpace
+            item.setScale(this.editorService.calculateVerticalScale());
+          } else {
+            // position all of the nodes in the upper left corner of the vertical display
+            // so that all of the sources are visible
+            item.setTransform({ position: { x: 0, y: 0 } });
+          }
 
           // when creating dual output scene nodes, the passed in display is set to vertical
           // if the scene has dual output nodes, add a node map entry only when copying a horizontal node

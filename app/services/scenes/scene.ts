@@ -188,8 +188,7 @@ export class Scene {
 
     if (source.forceHidden) obsSceneItem.visible = false;
 
-    const display =
-      options?.display ?? this.dualOutputService.views.getNodeDisplay(sceneItemId, this.state.id);
+    const display = options?.display ?? 'horizontal';
     // assign context to scene item
     const context =
       this.videoSettingsService.contexts[display] ?? this.videoSettingsService.contexts.horizontal;
