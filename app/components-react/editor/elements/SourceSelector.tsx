@@ -388,28 +388,55 @@ export class SourceSelectorModule {
   }
 
   get activeItemIds() {
-    if (this.dualOutputService.views.hasNodeMap(this.scene.id)) {
+    // because the source selector only works with the horizontal node ids
+    // convert vertical node ids to horizontal node ids, but only if the
+    // horizontal node is not also selected
+    if (this.isDualOutputActive) {
       const selectedIds = this.selectionService.state.selectedIds;
       const verticalNodeIds = this.dualOutputService.views.verticalNodeIds;
 
-      const horizontalNodeIds: string[] = verticalNodeIds.reduce((ids: string[], id: string) => {
-        // if the node is a vertical node, add the horizontal node id
-        if (
-          this.selectionService.state.selectedIds.includes(id) &&
-          this.dualOutputService.views.getHorizontalNodeId(id)
-        ) {
-          ids.push();
+      if (!verticalNodeIds) return selectedIds;
+
+      return selectedIds.reduce((ids: string[], id: string) => {
+        if (verticalNodeIds.includes(id)) {
+          const horizontalNodeId = this.dualOutputService.views.getHorizontalNodeId(id);
+          if (horizontalNodeId) ids.push(horizontalNodeId);
+        } else {
+          ids.push(id);
         }
         return ids;
       }, []);
-
-      return selectedIds.concat(horizontalNodeIds);
     }
 
     return this.selectionService.state.selectedIds;
   }
 
   get activeItems() {
+    if (this.isDualOutputActive) {
+      const selection = this.selectionService.views.globalSelection.getItems();
+      // in order for the source selector to correctly highlight when a vertical scene item is selected
+      // the horizontal node ids need to be added, but to prevent the item from being highlighted in the horizontal display
+      // filter and add them here instead of in the selection
+
+      // const items = selection.reduce((combinedItems: SceneItem[], item: SceneItem) => {
+      //   if (item.display === 'vertical') {
+      //     const verticalItemId = this.dualOutputService.views.getHorizontalNodeId(item.id);
+      //     if (verticalItemId) {
+      //       const verticalItem = this.scenesService;
+      //     }
+      //   }
+
+      //   combinedItems.push(item);
+      // }, []);
+      // @@@ HERE
+      // get the horizontal node ids
+      // get the selection
+      // get the items
+      // return the items
+
+      // const verticalNodeIds = selection.reduce()
+      // }, []);
+    }
     return this.selectionService.views.globalSelection.getItems();
   }
 
