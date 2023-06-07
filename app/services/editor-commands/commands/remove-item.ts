@@ -174,9 +174,10 @@ export class RemoveItemCommand extends Command {
     } else {
       // otherwise, just create horizontal item
       const item = scene.addSource(this.sourceId, { id: this.sceneItemId, select: false });
+      const context = this.videoSettingsService.contexts.horizontal;
+      item.setSettings({ ...this.settings, output: context, display: 'horizontal' });
 
       this.reorderNodesSubcommand.rollback();
-      item.setSettings(this.settings);
     }
   }
 }
