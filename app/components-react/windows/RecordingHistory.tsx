@@ -6,13 +6,14 @@ import { $t } from 'services/i18n';
 import { ModalLayout } from 'components-react/shared/ModalLayout';
 import { ListInput } from 'components-react/shared/inputs';
 import Form from 'components-react/shared/inputs/Form';
-import { RecordingModeService, UserService } from 'app-services';
+import { RecordingModeService, UserService, SharedStorageService } from 'app-services';
 import styles from './RecordingHistory.m.less';
 import AutoProgressBar from 'components-react/shared/AutoProgressBar';
 
 class RecordingHistoryModule {
   private RecordingModeService = inject(RecordingModeService);
   private UserService = inject(UserService);
+  private SharedStorageService = inject(SharedStorageService);
 
   get recordings() {
     return this.RecordingModeService.views.sortedRecordings;
@@ -56,20 +57,10 @@ class RecordingHistoryModule {
     this.RecordingModeService.actions.uploadToYoutube(filename);
   }
 
-  getPlatformLink(platform: string, id: string) {
-    if (platform === 'crossclip') {
-      return `https://crossclip.streamlabs.com/storage/${id}`;
-    }
-    if (platform === 'typestudio') {
-      return `https://app.typestudio.co/storage/${id}`;
-    }
-    return '';
-  }
-
   async uploadToStorage(filename: string, platform: string) {
     const id = await this.RecordingModeService.actions.return.uploadToStorage(filename, platform);
     if (!id) return;
-    remote.shell.openExternal(this.getPlatformLink(platform, id));
+    remote.shell.openExternal(this.SharedStorageService.views.getPlatformLink(platform, id));
   }
 
   showFile(filename: string) {
@@ -103,7 +94,7 @@ export default function RecordingHistory() {
       <div className={styles.recordingsContainer}>
         {recordings.map(recording => (
           <div className={styles.recording} key={recording.timestamp}>
-            <span>{formattedTimestamp(recording.timestamp)}</span>
+            <span style={{ marginRight: '8px' }}>{formattedTimestamp(recording.timestamp)}</span>
             <Tooltip title={$t('Show in folder')}>
               <span onClick={() => showFile(recording.filename)} className={styles.filename}>
                 {recording.filename}
