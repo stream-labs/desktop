@@ -24,5 +24,7 @@
   "Recording History": "Kayıt Geçmişi",
   "Show in folder": "Klasörde göster",
   "Recordings": "Kayıtlar",
-  "Marker %{label} added at %{timestamp}": "%{label} İşareti %{timestamp} itibariyle eklendi"
+  "Marker %{label} added at %{timestamp}": "%{label} İşareti %{timestamp} itibariyle eklendi",
+  "File is too large to upload": "File is too large to upload",
+  "File type %{extension} is not supported": "File type %{extension} is not supported"
 }

@@ -24,5 +24,7 @@
   "Recording History": "Gravando histórico",
   "Show in folder": "Exibir na pasta",
   "Recordings": "Gravações",
-  "Marker %{label} added at %{timestamp}": "Marcador %{label} adicionado às %{timestamp}"
+  "Marker %{label} added at %{timestamp}": "Marcador %{label} adicionado às %{timestamp}",
+  "File is too large to upload": "File is too large to upload",
+  "File type %{extension} is not supported": "File type %{extension} is not supported"
 }
