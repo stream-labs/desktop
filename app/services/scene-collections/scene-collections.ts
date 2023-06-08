@@ -943,10 +943,22 @@ export class SceneCollectionsService extends Service implements ISceneCollection
    * can reference each other
    */
 
-  initNodeMap() {
+  initNodeMaps(sceneNodeMap?: { [sceneId: string]: Dictionary<string> }) {
     if (!this.activeCollection) return;
 
-    this.activeCollection.sceneNodeMaps = {};
+    this.activeCollection.sceneNodeMaps = sceneNodeMap ?? {};
+  }
+
+  restoreNodeMap(sceneId: string, nodeMap?: Dictionary<string>) {
+    if (!this.activeCollection) return;
+    if (!this.activeCollection.hasOwnProperty('sceneNodeMaps')) {
+      this.activeCollection.sceneNodeMaps = {};
+    }
+
+    this.activeCollection.sceneNodeMaps = {
+      ...this.activeCollection.sceneNodeMaps,
+      [sceneId]: nodeMap ?? {},
+    };
   }
 
   createNodeMapEntry(sceneId: string, horizontalNodeId: string, verticalNodeId: string) {
@@ -967,7 +979,7 @@ export class SceneCollectionsService extends Service implements ISceneCollection
     this.stateService.createNodeMapEntry(sceneId, horizontalNodeId, verticalNodeId);
   }
 
-  removeVerticalNode(horizontalNodeId: string, sceneId: string) {
+  removeNodeMapEntry(horizontalNodeId: string, sceneId: string) {
     if (
       !this.activeCollection ||
       !this.activeCollection?.sceneNodeMaps ||
@@ -980,7 +992,7 @@ export class SceneCollectionsService extends Service implements ISceneCollection
     delete nodeMap[horizontalNodeId];
 
     this.activeCollection.sceneNodeMaps[sceneId] = { ...nodeMap };
-    this.stateService.removeVerticalNode(horizontalNodeId, sceneId);
+    this.stateService.removeNodeMapEntry(horizontalNodeId, sceneId);
   }
 
   removeNodeMap(sceneId: string) {

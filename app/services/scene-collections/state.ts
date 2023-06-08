@@ -183,7 +183,7 @@ export class SceneCollectionsStateService extends StatefulService<ISceneCollecti
     this.CREATE_NODE_MAP_ENTRY(sceneId, horizontalNodeId, verticalNodeId);
   }
 
-  removeVerticalNode(horizontalNodeId: string, sceneId: string) {
+  removeNodeMapEntry(horizontalNodeId: string, sceneId: string) {
     this.REMOVE_VERTICAL_NODE(horizontalNodeId, sceneId);
   }
 

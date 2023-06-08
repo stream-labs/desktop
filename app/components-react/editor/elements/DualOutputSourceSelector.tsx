@@ -14,7 +14,10 @@ export function DualOutputSourceSelector(p: { nodeId: string; sceneId?: string }
     verticalNodeId: DualOutputService.views.verticalNodeIds
       ? DualOutputService.views.activeSceneNodeMap[p.nodeId]
       : undefined,
-    isHorizontalVisible: ScenesService.views.getNodeVisibility(p.nodeId, p?.sceneId),
+    isHorizontalVisible:
+      !DualOutputService.views.isLoading && DualOutputService.views.hasVerticalNodes
+        ? ScenesService.views.getNodeVisibility(p.nodeId, p?.sceneId)
+        : undefined,
     isVerticalVisible:
       !DualOutputService.views.isLoading && DualOutputService.views.hasVerticalNodes
         ? ScenesService.views.getNodeVisibility(
@@ -22,15 +25,17 @@ export function DualOutputSourceSelector(p: { nodeId: string; sceneId?: string }
             p?.sceneId,
           )
         : undefined,
-    isLoading: DualOutputService.views.isLoading,
+    isLoading: DualOutputService.views.isLoading && !DualOutputService.views.hasVerticalNodes,
   }));
 
   return (
     <>
-      <i
-        onClick={() => toggleVisibility(horizontalNodeId)}
-        className={v.isHorizontalVisible ? 'icon-desktop' : 'icon-desktop-hide'}
-      />
+      {!v?.isLoading && (
+        <i
+          onClick={() => toggleVisibility(horizontalNodeId)}
+          className={v.isHorizontalVisible ? 'icon-desktop' : 'icon-desktop-hide'}
+        />
+      )}
 
       {!v?.isLoading && v?.verticalNodeId && (
         <i

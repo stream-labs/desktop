@@ -62,7 +62,7 @@ export class CreateNewItemCommand extends Command {
 
     if (this.dualOutputVerticalNodeId) {
       this.scenesService.views.getScene(this.sceneId).removeItem(this.dualOutputVerticalNodeId);
-      this.sceneCollectionsService.removeVerticalNode(this.sceneId, this.sceneItemId);
+      this.sceneCollectionsService.removeNodeMapEntry(this.sceneId, this.sceneItemId);
     }
   }
 }

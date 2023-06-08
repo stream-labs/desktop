@@ -58,10 +58,6 @@ export class RemoveItemCommand extends Command {
   async execute() {
     const item = this.scenesService.views.getSceneItem(this.sceneItemId);
 
-    // when removing a scene, the vertical node will have already been removed
-    // so this prevent an error by just return
-    if (!item) return;
-
     const scene = this.scenesService.views.getScene(item.sceneId);
     this.sceneId = item.sceneId;
     this.sourceId = item.sourceId;
@@ -78,34 +74,34 @@ export class RemoveItemCommand extends Command {
     this.reorderNodesSubcommand.execute();
 
     // If the scene has vertical nodes, remove the corresponding vertical node
-    if (this.dualOutputService.views.hasNodeMap()) {
-      this.dualOutputNodeDisplay = this.dualOutputService.views.getVerticalNodeId(this.sceneItemId)
-        ? 'horizontal'
-        : 'vertical';
+    // if (this.removeVertical && this.dualOutputService.views.hasNodeMap(this.sceneId)) {
+    //   this.dualOutputNodeDisplay = this.dualOutputService.views.getVerticalNodeId(this.sceneItemId)
+    //     ? 'horizontal'
+    //     : 'vertical';
 
-      this.dualOutputNodeId =
-        this.dualOutputNodeDisplay === 'horizontal'
-          ? this.dualOutputService.views.getVerticalNodeId(this.sceneItemId)
-          : this.dualOutputService.views.getHorizontalNodeId(this.sceneItemId, this.sceneId);
+    //   this.dualOutputNodeId =
+    //     this.dualOutputNodeDisplay === 'horizontal'
+    //       ? this.dualOutputService.views.getVerticalNodeId(this.sceneItemId)
+    //       : this.dualOutputService.views.getHorizontalNodeId(this.sceneItemId, this.sceneId);
 
-      const dualOutputSceneItem = this.scenesService.views.getSceneItem(this.dualOutputNodeId);
-      this.dualOutputNodeSettings = dualOutputSceneItem.getSettings();
+    //   const dualOutputSceneItem = this.scenesService.views.getSceneItem(this.dualOutputNodeId);
+    //   this.dualOutputNodeSettings = dualOutputSceneItem.getSettings();
 
-      this.reorderDualOutputNodesSubcommand = new ReorderNodesCommand(
-        scene.getSelection(this.dualOutputNodeId),
-        void 0,
-        EPlaceType.After,
-      );
+    //   this.reorderDualOutputNodesSubcommand = new ReorderNodesCommand(
+    //     scene.getSelection(this.dualOutputNodeId),
+    //     void 0,
+    //     EPlaceType.After,
+    //   );
 
-      this.reorderDualOutputNodesSubcommand.execute();
+    //   this.reorderDualOutputNodesSubcommand.execute();
 
-      dualOutputSceneItem.remove();
+    //   dualOutputSceneItem.remove();
 
-      const nodeToRemoveId =
-        this.dualOutputNodeDisplay === 'horizontal' ? this.sceneItemId : this.dualOutputNodeId;
+    //   const nodeToRemoveId =
+    //     this.dualOutputNodeDisplay === 'horizontal' ? this.sceneItemId : this.dualOutputNodeId;
 
-      this.sceneCollectionsService.removeVerticalNode(nodeToRemoveId, this.sceneId);
-    }
+    //   this.sceneCollectionsService.removeNodeMapEntry(nodeToRemoveId, this.sceneId);
+    // }
 
     // If this was the last item using this source, the underlying source
     // will automatically be removed. In this case, we need to store enough
@@ -122,62 +118,71 @@ export class RemoveItemCommand extends Command {
   }
 
   async rollback() {
+    // because this command removes both the horizontal and vertical scene nodes
+    // if this command has been used to remove a scene, the vertical nodes are
+    // if (!this.sourceId) return;
+
     if (this.sourceReviver) {
       await this.sourceReviver.load({});
     }
 
     const scene = this.scenesService.views.getScene(this.sceneId);
 
-    if (this.dualOutputNodeId) {
-      // if the scene has vertical node items, restore both the horizontal and vertical nodes
-      const horizontalNodeId =
-        this.dualOutputNodeDisplay === 'horizontal' ? this.sceneItemId : this.dualOutputNodeId;
-      const verticalNodeId =
-        this.dualOutputNodeDisplay === 'horizontal' ? this.dualOutputNodeId : this.sceneItemId;
+    // if (this.removeVertical && this.dualOutputService.views.hasNodeMap(this.sceneId)) {
+    //   // if the scene has vertical node items, restore both the horizontal and vertical nodes
+    //   const horizontalNodeId =
+    //     this.dualOutputNodeDisplay === 'horizontal' ? this.sceneItemId : this.dualOutputNodeId;
+    //   const verticalNodeId =
+    //     this.dualOutputNodeDisplay === 'horizontal' ? this.dualOutputNodeId : this.sceneItemId;
 
-      const horizontalSettings =
-        this.dualOutputNodeDisplay === 'horizontal' ? this.settings : this.dualOutputNodeSettings;
-      const verticalSettings =
-        this.dualOutputNodeDisplay === 'horizontal' ? this.dualOutputNodeSettings : this.settings;
+    //   const horizontalSettings =
+    //     this.dualOutputNodeDisplay === 'horizontal' ? this.settings : this.dualOutputNodeSettings;
+    //   const verticalSettings =
+    //     this.dualOutputNodeDisplay === 'horizontal' ? this.dualOutputNodeSettings : this.settings;
 
-      // vertical scene item
-      const verticalItem = scene.addSource(this.sourceId, { id: verticalNodeId, select: false });
-      const verticalContext = this.videoSettingsService.contexts.vertical;
-      verticalItem.setSettings({
-        ...verticalSettings,
-        output: verticalContext,
-        display: 'vertical',
-      });
+    //   // vertical scene item
+    //   const verticalItem = scene.addSource(this.sourceId, { id: verticalNodeId, select: false });
+    //   const verticalContext = this.videoSettingsService.contexts.vertical;
+    //   verticalItem.setSettings({
+    //     ...verticalSettings,
+    //     output: verticalContext,
+    //     display: 'vertical',
+    //   });
 
-      // horizontal scene item
-      const horizontalItem = scene.addSource(this.sourceId, {
-        id: horizontalNodeId,
-        select: false,
-      });
-      const horizontalContext = this.videoSettingsService.contexts.horizontal;
-      horizontalItem.setSettings({
-        ...horizontalSettings,
-        output: horizontalContext,
-        display: 'horizontal',
-      });
+    //   // horizontal scene item
+    //   const horizontalItem = scene.addSource(this.sourceId, {
+    //     id: horizontalNodeId,
+    //     select: false,
+    //   });
+    //   const horizontalContext = this.videoSettingsService.contexts.horizontal;
+    //   horizontalItem.setSettings({
+    //     ...horizontalSettings,
+    //     output: horizontalContext,
+    //     display: 'horizontal',
+    //   });
 
-      // reorder both
-      this.reorderNodesSubcommand.rollback();
-      this.reorderDualOutputNodesSubcommand.rollback();
+    //   // reorder both
+    //   this.reorderNodesSubcommand.rollback();
+    //   this.reorderDualOutputNodesSubcommand.rollback();
 
-      // restore entry to node map
-      this.sceneCollectionsService.createNodeMapEntry(
-        this.sceneId,
-        horizontalNodeId,
-        verticalNodeId,
-      );
-    } else {
-      // otherwise, just create horizontal item
-      const item = scene.addSource(this.sourceId, { id: this.sceneItemId, select: false });
-      const context = this.videoSettingsService.contexts.horizontal;
-      item.setSettings({ ...this.settings, output: context, display: 'horizontal' });
+    //   // restore entry to node map
+    //   this.sceneCollectionsService.createNodeMapEntry(
+    //     this.sceneId,
+    //     horizontalNodeId,
+    //     verticalNodeId,
+    //   );
+    // } else {
+    // otherwise, just create horizontal item
+    const item = scene.addSource(this.sourceId, { id: this.sceneItemId, select: false });
+    const display = item.display ?? 'horizontal';
+    const context = this.videoSettingsService.contexts[display];
+    item.setSettings({
+      ...this.settings,
+      output: context,
+      display,
+    });
 
-      this.reorderNodesSubcommand.rollback();
-    }
+    this.reorderNodesSubcommand.rollback();
+    // }
   }
 }

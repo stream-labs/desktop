@@ -169,13 +169,20 @@ class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
 
   getHorizontalNodeId(verticalNodeId: string, sceneId?: string) {
     const sceneNodeMap = sceneId ? this.sceneNodeMaps[sceneId] : this.activeSceneNodeMap;
+    if (!sceneNodeMap) return;
+
     return Object.keys(sceneNodeMap).find(
       (horizontalNodeId: string) => sceneNodeMap[horizontalNodeId] === verticalNodeId,
     );
   }
 
-  getVerticalNodeId(defaultNodeId: string): string {
-    return this.activeSceneNodeMap ? this.activeSceneNodeMap[defaultNodeId] : undefined;
+  getVerticalNodeId(horizontalNodeId: string, sceneId?: string): string {
+    const sceneNodeMap = sceneId ? this.sceneNodeMaps[sceneId] : this.activeSceneNodeMap;
+    if (!sceneNodeMap) return;
+
+    return Object.values(sceneNodeMap).find(
+      (verticalNodeId: string) => sceneNodeMap[horizontalNodeId] === verticalNodeId,
+    );
   }
 
   getVerticalNodeIds(sceneId: string): string[] {
@@ -198,6 +205,11 @@ class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
 
   getPlatformContextName(platform: TPlatform): TOutputOrientation {
     return this.getPlatformDisplay(platform) === 'horizontal' ? 'landscape' : 'portrait';
+  }
+
+  getSceneNodeMap(sceneId: string) {
+    const nodeMap = sceneId ? this.sceneNodeMaps[sceneId] : this.activeSceneNodeMap;
+    return nodeMap ?? {};
   }
 
   hasNodeMap(sceneId?: string) {
@@ -249,7 +261,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
     this.sceneCollectionsService.collectionSwitched.subscribe(() => {
       // confirm the scene collection has a node map
       if (!this.sceneCollectionsService.activeCollection.hasOwnProperty('sceneNodeMaps')) {
-        this.sceneCollectionsService.initNodeMap();
+        this.sceneCollectionsService.initNodeMaps();
       }
 
       if (this.state.dualOutputMode) {

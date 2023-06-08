@@ -92,10 +92,11 @@ export class CreateFolderCommand extends Command {
   rollback() {
     // remove vertical folder node and node map entry
     if (this.dualOutputService.views.hasNodeMap(this.sceneId)) {
-      this.scenesService.views.getScene(this.sceneId).removeFolder(this.verticalFolderId);
       if (this.dualOutputModeToFolderSubCommand) this.dualOutputModeToFolderSubCommand.rollback();
 
-      this.sceneCollectionsService.removeVerticalNode(this.folderId, this.sceneId);
+      this.scenesService.views.getScene(this.sceneId).removeFolder(this.verticalFolderId);
+
+      this.sceneCollectionsService.removeNodeMapEntry(this.folderId, this.sceneId);
     }
 
     // rollback command

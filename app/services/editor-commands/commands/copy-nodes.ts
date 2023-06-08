@@ -71,7 +71,6 @@ export class CopyNodesCommand extends Command {
         this.nodeIdsMap[node.id] = folder.id;
         const display =
           this.display ?? this.dualOutputService.views.getNodeDisplay(node.id, this.origSceneId);
-        const context = this.videoSettingsService.contexts[display];
         folder.setDisplay(display);
 
         if (this.display === 'vertical' || (hasNodeMap && display === 'horizontal')) {
