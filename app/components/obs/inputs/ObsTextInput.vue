@@ -1,6 +1,6 @@
 <template>
   <div :data-test="testingAnchor" class="input-container">
-    <div class="input-label">
+    <div class="input-label" v-if="!value.info">
       <label>{{ value.description }}</label>
     </div>
     <div class="input-wrapper" v-if="value.multiline">
@@ -11,6 +11,7 @@
         @change="onInputHandler"
       />
     </div>
+    <div class="input-wrapper" v-else-if="value.info">{{ value.description }}</div>
     <div class="input-wrapper" v-else>
       <input
         :type="textVisible ? 'text' : 'password'"
