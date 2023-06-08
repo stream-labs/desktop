@@ -307,6 +307,9 @@
       "RecMuxerCustom": {
         "name": "Muxerのカスタム設定"
       },
+      "RecSplitFile": {
+        "name": "自動ファイル分割"
+      },
       "MuxerCustom": {
         "name": "@:settings.Output.Recording.RecMuxerCustom.name"
       },

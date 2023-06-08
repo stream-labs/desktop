@@ -276,6 +276,12 @@
     },
     "window": {
       "name": "Window"
+    },
+    "user_placeholder_use": {
+      "name": "Customize placeholder"
+    },
+    "user_placeholder_image": {
+      "name": "Placeholder Image"
     }
   },
   "dshow_input": {

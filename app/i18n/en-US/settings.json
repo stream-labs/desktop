@@ -307,6 +307,10 @@
       "RecMuxerCustom": {
         "name": null
       },
+      "RecSplitFile": {
+        "name": null
+      },
+
       "MuxerCustom": {
         "name": "@:settings.Output.Recording.RecMuxerCustom.name"
       },

@@ -276,6 +276,12 @@
     },
     "window": {
       "name": "ウィンドウ"
+    },
+    "user_placeholder_use": {
+      "name": "プレースホームをカスタマイズ"
+    },
+    "user_placeholder_image": {
+      "name": "プレースホルダー画像"
     }
   },
   "dshow_input": {
