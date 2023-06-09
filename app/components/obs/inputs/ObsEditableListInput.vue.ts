@@ -59,19 +59,19 @@ class ObsEditableListProperty extends ObsInput<IObsEditableListInputValue> {
   }
 
   async showReplaceFileDialog() {
-    const files = await electron.remote.dialog.showOpenDialog({
+    const { filePaths } = await electron.remote.dialog.showOpenDialog({
       defaultPath: this.value.defaultPath,
       filters: this.value.filters,
       properties: ['openFile'],
     });
 
-    if (files) {
+    if (filePaths) {
       const activeIndex = _.indexOf(this.list, this.activeItem);
 
-      this.list[activeIndex] = files.filePaths[0];
+      this.list[activeIndex] = filePaths[0];
 
       // Preserve this item as active
-      this.activeItem = files.filePaths[0];
+      this.activeItem = this.list[activeIndex];
       this.setList(this.list);
     }
   }
