@@ -93,13 +93,12 @@ export class CopyNodesCommand extends Command {
           if (item.type === 'game_capture') {
             // to prevent scaling of the game capture in the vertical display
             // set the initial scale based off of the horizontal display values
-            // const horizontalScale = convertScalarToBaseSpace
             item.setScale(this.editorService.calculateVerticalScale());
-          } else {
-            // position all of the nodes in the upper left corner of the vertical display
-            // so that all of the sources are visible
-            item.setTransform({ position: { x: 0, y: 0 } });
           }
+
+          // position all of the nodes in the upper left corner of the vertical display
+          // so that all of the sources are visible
+          item.setTransform({ position: { x: 0, y: 0 } });
 
           // when creating dual output scene nodes, the passed in display is set to vertical
           // if the scene has dual output nodes, add a node map entry only when copying a horizontal node
