@@ -1078,10 +1078,13 @@ export class StreamingService
   private handleOBSOutputSignal(info: IOBSOutputSignalInfo) {
     console.debug('OBS Output signal: ', info);
 
+    const shouldResolve =
+      !this.views.isDualOutputMode || (this.views.isDualOutputMode && info.service === 'vertical');
+
     const time = new Date().toISOString();
 
     if (info.type === EOBSOutputType.Streaming) {
-      if (info.signal === EOBSOutputSignal.Start) {
+      if (info.signal === EOBSOutputSignal.Start && shouldResolve) {
         this.SET_STREAMING_STATUS(EStreamingState.Live, time);
         this.resolveStartStreaming();
         this.streamingStatusChange.next(EStreamingState.Live);
