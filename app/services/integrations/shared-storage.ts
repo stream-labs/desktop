@@ -1,9 +1,10 @@
 import { HostsService } from 'app-services';
 import fs from 'fs';
 import path from 'path';
-import { Service, Inject } from 'services/core';
+import { Service, Inject, ViewHandler } from 'services/core';
 import { UserService } from 'services/user';
 import { authorizedHeaders, jfetch } from 'util/requests';
+import { $t } from 'services/i18n';
 
 interface IPrepareResponse {
   file: {
@@ -25,6 +26,23 @@ interface IProgress {
   uploadedBytes: number;
 }
 
+const PLATFORM_RULES = {
+  crossclip: { size: 1024 * 1024 * 1024, types: ['.mp4'] },
+  typestudio: { size: 1024 * 1024 * 1024 * 3.4, types: ['.mp4', '.mov', '.webm'] },
+};
+
+class SharedStorageServiceViews extends ViewHandler<{}> {
+  getPlatformLink(platform: string, id: string) {
+    if (platform === 'crossclip') {
+      return `https://crossclip.streamlabs.com/storage/${id}`;
+    }
+    if (platform === 'typestudio') {
+      return `https://app.typestudio.co/storage/${id}`;
+    }
+    return '';
+  }
+}
+
 export class SharedStorageService extends Service {
   @Inject() userService: UserService;
   @Inject() hostsService: HostsService;
@@ -32,18 +50,28 @@ export class SharedStorageService extends Service {
   id: string;
   cancel: () => void;
   uploader: S3Uploader;
+  uploading = false;
 
   get host() {
     return `https://${this.hostsService.streamlabs}/api/v5/slobs/streamlabs-storage`;
+  }
+
+  get views() {
+    return new SharedStorageServiceViews({});
   }
 
   async uploadFile(
     filepath: string,
     onProgress?: (progress: IProgress) => void,
     onError?: (error: unknown) => void,
+    platform?: string,
   ) {
     try {
-      const uploadInfo = await this.prepareUpload(filepath);
+      if (this.uploading) {
+        throw new Error($t('Upload already in progress'));
+      }
+      this.uploading = true;
+      const uploadInfo = await this.prepareUpload(filepath, platform);
       this.id = uploadInfo.file.id;
       this.uploader = new S3Uploader({
         fileInfo: uploadInfo,
@@ -68,6 +96,21 @@ export class SharedStorageService extends Service {
     }
   }
 
+  validateFile(filepath: string, platform?: string) {
+    const stats = fs.lstatSync(filepath);
+    if (platform) {
+      if (stats.size > PLATFORM_RULES[platform].size) {
+        throw new Error($t('File is too large to upload'));
+      }
+      if (!PLATFORM_RULES[platform].types.includes(path.extname(filepath))) {
+        throw new Error(
+          $t('File type %{extension} is not supported', { extension: path.extname(filepath) }),
+        );
+      }
+    }
+    return { size: stats.size, name: path.basename(filepath) };
+  }
+
   async completeUpload(body: { parts?: { number: number; tag: string }[] }) {
     const url = `${this.host}/storage/v1/temporary-files/${this.id}/complete`;
     const headers = authorizedHeaders(
@@ -87,16 +130,20 @@ export class SharedStorageService extends Service {
     return await jfetch(new Request(url, { headers, method: 'DELETE' }));
   }
 
-  private async prepareUpload(filepath: string): Promise<IPrepareResponse> {
-    const url = `${this.host}/storage/v1/temporary-files`;
-    const headers = authorizedHeaders(this.userService.apiToken);
-    const body = new FormData();
-    const name = path.basename(filepath);
-    const size = fs.lstatSync(filepath).size;
-    body.append('name', name);
-    body.append('size', String(size));
-    body.append('mime_type', 'video/mpeg');
-    return await jfetch(new Request(url, { headers, body, method: 'POST' }));
+  private async prepareUpload(filepath: string, platform?: string): Promise<IPrepareResponse> {
+    try {
+      const { size, name } = this.validateFile(filepath, platform);
+      const url = `${this.host}/storage/v1/temporary-files`;
+      const headers = authorizedHeaders(this.userService.apiToken);
+      const body = new FormData();
+      body.append('name', name);
+      body.append('size', String(size));
+      body.append('mime_type', 'video/mpeg');
+      return await jfetch(new Request(url, { headers, body, method: 'POST' }));
+    } catch (e: unknown) {
+      this.uploading = false;
+      return Promise.reject(e);
+    }
   }
 
   private async uploadS3File() {
@@ -111,6 +158,7 @@ export class SharedStorageService extends Service {
       new Headers({ 'Content-Type': 'application/json' }),
     );
     const body = JSON.stringify({ temporary_file_id: this.id, type: 'video' });
+    this.uploading = false;
     return await jfetch(new Request(url, { method: 'POST', headers, body }));
   }
 }
@@ -123,8 +171,6 @@ interface IUploaderOptions {
 }
 
 class S3Uploader {
-  @Inject() userService: UserService;
-
   uploadedSize = 0;
   aborted = false;
   onProgress = (progress: IProgress) => {};

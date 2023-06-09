@@ -17,6 +17,8 @@ interface IStream {
   // associating a particular filter to a track.
   videoFilterId: string;
   audioFilterId: string;
+
+  screenShareId?: string;
 }
 
 interface RtpEncodingParameters {
@@ -119,7 +121,7 @@ export class Producer extends MediasoupEntity {
         this.transportId = videoProduceResult.produce_params.transportId;
       }
 
-      await this.sendWebRTCRequest({
+      const r = await this.sendWebRTCRequest<{ id: string }>({
         type: 'addProducerTrack',
         data: {
           streamId,
@@ -128,6 +130,11 @@ export class Producer extends MediasoupEntity {
           rtpParameters: videoProduceResult.produce_params.rtpParameters,
         },
       });
+
+      if (type === 'screenshare') {
+        const stream = this.streams.find(s => s.id === streamId);
+        stream.screenShareId = r.id;
+      }
 
       this.makeObsRequest('func_produce_result', 'true');
 
@@ -274,10 +281,21 @@ export class Producer extends MediasoupEntity {
 
     this.makeObsRequest('func_stop_producer', stream.videoFilterId);
     if (stream.audioSourceId) this.makeObsRequest('func_stop_producer', stream.audioFilterId);
-    this.sendWebRTCRequest({
-      type: 'closeProducerTrack',
-      data: { streamId: stream.id, producerTransportId: this.transportId },
-    });
+    if (stream.screenShareId) {
+      this.sendWebRTCRequest({
+        type: 'closeProducerTrack',
+        data: {
+          streamId: stream.id,
+          producerTransportId: this.transportId,
+          trackId: stream.screenShareId,
+        },
+      });
+    } else {
+      this.sendWebRTCRequest({
+        type: 'closeProducerTrack',
+        data: { streamId: stream.id, producerTransportId: this.transportId },
+      });
+    }
 
     this.streams = this.streams.filter(s => s.id !== streamId);
   }

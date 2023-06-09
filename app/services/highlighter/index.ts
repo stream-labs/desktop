@@ -1042,6 +1042,9 @@ export class HighlighterService extends StatefulService<IHighligherState> {
         console.log('The upload was canceled');
       } else {
         this.SET_UPLOAD_INFO({ uploading: false, error: true });
+        this.usageStatisticsService.recordAnalyticsEvent('Highlighter', {
+          type: 'SharedStorageUploadError',
+        });
       }
     }
     this.cancelFunction = null;
