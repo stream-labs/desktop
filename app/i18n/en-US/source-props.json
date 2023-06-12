@@ -404,9 +404,11 @@
     "description": "Add a character to your scene that reads comments to the \"N Voice\" voice."
   },
   "wasapi_process_output_capture": {
-    "name": "Application Audio Capture (BETA)"
+    "name": "Application Audio Capture (BETA)",
+    "description": "Capture the audio coming from a specific application."
   },
   "vlc_source": {
-    "name": "VLC Source"
+    "name": "VLC Source",
+    "description": "Add playlists of videos to your scene."
   }
 }

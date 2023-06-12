@@ -27,6 +27,8 @@ const sourceIconMap = {
   ndi_source: 'icon-NDI',
   near: 'icon-nvoice-character-source',
   'decklink-input': 'icon-blackmagic',
+  vlc_source: 'icon-media',
+  wasapi_process_output_capture: 'icon-display',
 };
 
 @Component({
@@ -103,10 +105,10 @@ export default class SourceSelector extends Vue {
     const sceneNode = this.scene.getNode(sceneNodeId);
     const menuOptions = sceneNode
       ? {
-        selectedSceneId: this.scene.id,
-        sceneNodeId,
-        showSceneItemMenu: true,
-      }
+          selectedSceneId: this.scene.id,
+          sceneNodeId,
+          showSceneItemMenu: true,
+        }
       : { selectedSceneId: this.scene.id };
 
     const menu = new EditMenu(menuOptions);
