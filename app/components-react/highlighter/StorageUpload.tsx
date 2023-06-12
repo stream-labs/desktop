@@ -57,7 +57,7 @@ export default function CrossClipUpload(p: { onClose: () => void; platform: stri
   );
 }
 
-function GetSLID(p: { onClick: () => void }) {
+export function GetSLID(p: { onClick: () => void }) {
   function signUp() {
     remote.shell.openExternal('https://id.streamlabs.com/register');
   }
