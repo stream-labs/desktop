@@ -1,19 +1,28 @@
 import React, { useEffect } from 'react';
+import cx from 'classnames';
 import * as remote from '@electron/remote';
-import { Tooltip, message } from 'antd';
-import { inject, useModule } from 'slap';
+import { Tooltip, Menu, Button, message, Dropdown } from 'antd';
+import { inject, injectState, useModule } from 'slap';
 import { $t } from 'services/i18n';
 import { ModalLayout } from 'components-react/shared/ModalLayout';
-import { ListInput } from 'components-react/shared/inputs';
-import Form from 'components-react/shared/inputs/Form';
-import { RecordingModeService, UserService, SharedStorageService } from 'app-services';
+import {
+  RecordingModeService,
+  UserService,
+  SharedStorageService,
+  OnboardingService,
+  WindowsService,
+} from 'app-services';
 import styles from './RecordingHistory.m.less';
 import AutoProgressBar from 'components-react/shared/AutoProgressBar';
+import { GetSLID } from 'components-react/highlighter/StorageUpload';
 
 class RecordingHistoryModule {
   private RecordingModeService = inject(RecordingModeService);
   private UserService = inject(UserService);
   private SharedStorageService = inject(SharedStorageService);
+  private OnboardingService = inject(OnboardingService);
+  private WindowsService = inject(WindowsService);
+  state = injectState({ showSLIDModal: false });
 
   get recordings() {
     return this.RecordingModeService.views.sortedRecordings;
@@ -32,21 +41,37 @@ class RecordingHistoryModule {
   }
 
   get uploadOptions() {
-    const opts = [];
-    if (this.hasYoutube) opts.push({ label: 'YouTube', value: 'youtube' });
-    if (this.hasSLID) {
-      opts.push({ label: 'Cross Clip', value: 'crossclip' });
-      opts.push({ label: 'TypeStudio', value: 'typestudio' });
+    const opts = [
+      {
+        label: $t('Convert to mobile-friendly short video'),
+        value: 'crossclip',
+        icon: 'icon-crossclip',
+      },
+      {
+        label: $t('Add subtitles, transcribe, and more'),
+        value: 'typestudio',
+        icon: 'icon-mic',
+      },
+    ];
+    if (this.hasYoutube) {
+      opts.push({ label: $t('YouTube (private video)'), value: 'youtube', icon: 'icon-youtube' });
     }
 
     return opts;
   }
 
-  handleSelect(filename: string) {
-    return (platform: string) => {
-      if (platform === 'youtube') return this.uploadToYoutube(filename);
+  connectSLID() {
+    this.OnboardingService.actions.start({ isLogin: true });
+    this.WindowsService.closeChildWindow();
+  }
+
+  handleSelect(filename: string, platform: string) {
+    if (platform === 'youtube') return this.uploadToYoutube(filename);
+    if (this.hasSLID) {
       this.uploadToStorage(filename, platform);
-    };
+    } else {
+      this.state.setShowSLIDModal(true);
+    }
   }
 
   formattedTimestamp(timestamp: string) {
@@ -88,10 +113,23 @@ export default function RecordingHistory() {
     }
   }, [uploadInfo.error]);
 
+  function MenuItems(p: { filename: string }) {
+    return (
+      <Menu className={styles.menu}>
+        {uploadOptions.map(opt => (
+          <Menu.Item key={opt.value} onClick={() => handleSelect(p.filename, opt.value)}>
+            <i className={opt.icon} />
+            <span style={{ marginLeft: 8 }}>{opt.label}</span>
+          </Menu.Item>
+        ))}
+      </Menu>
+    );
+  }
+
   return (
     <ModalLayout hideFooter scrollable>
       <h2>{$t('Recordings')}</h2>
-      <div className={styles.recordingsContainer}>
+      <div className={styles.recordingsContainer} id="recordingHistory">
         {recordings.map(recording => (
           <div className={styles.recording} key={recording.timestamp}>
             <span style={{ marginRight: '8px' }}>{formattedTimestamp(recording.timestamp)}</span>
@@ -101,19 +139,48 @@ export default function RecordingHistory() {
               </span>
             </Tooltip>
             {uploadOptions.length > 0 && (
-              <Form className={styles.uploadForm}>
-                <ListInput
-                  onSelect={handleSelect(recording.filename)}
-                  label={$t('Upload To')}
-                  options={uploadOptions}
-                />
-              </Form>
+              <Dropdown
+                overlay={<MenuItems filename={recording.filename} />}
+                placement="bottomRight"
+                getPopupContainer={() => document.getElementById('recordingHistory')!}
+              >
+                <Button className={cx('button button--default', styles.uploadButton)}>
+                  {$t('Upload To')}
+                  <i className="icon-dropdown" />
+                </Button>
+              </Dropdown>
             )}
           </div>
         ))}
       </div>
       <ExportModal />
+      <SLIDModal />
     </ModalLayout>
+  );
+}
+
+function SLIDModal() {
+  const { showSLIDModal, connectSLID } = useModule(RecordingHistoryModule);
+  if (!showSLIDModal) return <></>;
+
+  return (
+    <div className={styles.modalBackdrop}>
+      <ModalLayout
+        hideFooter
+        wrapperStyle={{
+          width: '450px',
+          height: '300px',
+        }}
+        bodyStyle={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          width: '100%',
+        }}
+      >
+        <GetSLID onClick={connectSLID} />
+      </ModalLayout>
+    </div>
   );
 }
 
