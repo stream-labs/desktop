@@ -53,6 +53,10 @@ class ExportModule {
     this.service.actions.cancelExport();
   }
 
+  async clearUpload() {
+    await this.service.actions.return.clearUpload();
+  }
+
   async fileExists(exportFile: string) {
     return await this.service.actions.return.fileExists(exportFile);
   }
@@ -235,12 +239,17 @@ function ExportOptions(p: { close: () => void }) {
 }
 
 function PlatformSelect(p: { onClose: () => void }) {
-  const { videoName } = useModule(ExportModule);
+  const { videoName, clearUpload } = useModule(ExportModule);
   const { UserService } = Services;
   const { isYoutubeLinked } = useVuex(() => ({
     isYoutubeLinked: !!UserService.state.auth?.platforms.youtube,
   }));
   const [platform, setPlatform] = useState(() => (isYoutubeLinked ? 'youtube' : 'crossclip'));
+
+  async function handlePlatformSelect(val: string) {
+    if (platform === 'youtube') await clearUpload();
+    setPlatform(val);
+  }
 
   const platformOptions = [
     { label: 'YouTube', value: 'youtube' },
@@ -253,7 +262,12 @@ function PlatformSelect(p: { onClose: () => void }) {
       <h1 style={{ display: 'inline', marginRight: '16px', position: 'relative', top: '3px' }}>
         {$t('Upload To')}
       </h1>
-      <ListInput value={platform} onChange={setPlatform} nowrap options={platformOptions} />
+      <ListInput
+        value={platform}
+        onChange={handlePlatformSelect}
+        nowrap
+        options={platformOptions}
+      />
       {platform === 'youtube' && <YoutubeUpload defaultTitle={videoName} close={p.onClose} />}
       {platform !== 'youtube' && <StorageUpload onClose={p.onClose} platform={platform} />}
     </Form>

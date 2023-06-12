@@ -9,7 +9,7 @@ import UploadProgress from './UploadProgress';
 import styles from './ExportModal.m.less';
 import VideoPreview from './VideoPreview';
 
-export default function CrossClipUpload(p: { onClose: () => void; platform: string }) {
+export default function StorageUpload(p: { onClose: () => void; platform: string }) {
   const { UserService, HighlighterService, OnboardingService, SharedStorageService } = Services;
 
   const { uploadInfo, hasSLID } = useVuex(() => ({
