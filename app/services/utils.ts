@@ -39,8 +39,8 @@ export default class Utils {
     return this.getWindowId() === 'child';
   }
 
-  static isDevMode() {
-    return process.env.NODE_ENV !== 'production';
+  static isDevMode(): boolean {
+    return process.env.NODE_ENV !== 'production' || !!process.env.NAIR_PRODUCTION_DEBUG;
   }
 
   static isUnstable(): boolean {
