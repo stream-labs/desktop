@@ -6,9 +6,6 @@ export enum EOutputDisplayType {
   Horizontal = 'horizontal',
   Vertical = 'vertical',
 }
-
-export type TDualOutputDisplayType = EOutputDisplayType.Horizontal | EOutputDisplayType.Vertical;
-
 export interface IDualOutputPlatformSetting {
   platform: TPlatform;
   display: EOutputDisplayType;

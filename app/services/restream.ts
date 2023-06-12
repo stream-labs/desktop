@@ -13,7 +13,6 @@ import { FacebookService } from './platforms/facebook';
 import { TiktokService } from './platforms/tiktok';
 import { TrovoService } from './platforms/trovo';
 import * as remote from '@electron/remote';
-import * as obs from 'obs-studio-node';
 import { VideoSettingsService, TDisplayType } from './settings-v2/video';
 import { DualOutputService } from './dual-output';
 

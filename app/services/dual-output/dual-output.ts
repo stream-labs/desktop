@@ -135,14 +135,6 @@ class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
     return this.state.videoSettings.defaultDisplay;
   }
 
-  get isHorizontalActive() {
-    return this.state.videoSettings.activeDisplays.horizontal;
-  }
-
-  get isVerticalActive() {
-    return this.state.videoSettings.activeDisplays.vertical;
-  }
-
   get shouldShowDualOutputCheckbox() {
     return this.incrementalRolloutService.views.featureIsEnabled(EAvailableFeatures.dualOutput);
   }
@@ -207,11 +199,6 @@ class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
     return this.getPlatformDisplay(platform) === 'horizontal' ? 'landscape' : 'portrait';
   }
 
-  getSceneNodeMap(sceneId: string) {
-    const nodeMap = sceneId ? this.sceneNodeMaps[sceneId] : this.activeSceneNodeMap;
-    return nodeMap ?? {};
-  }
-
   hasNodeMap(sceneId?: string) {
     const nodeMap = sceneId ? this.sceneNodeMaps[sceneId] : this.activeSceneNodeMap;
     return !!nodeMap && Object.keys(nodeMap).length > 0;
@@ -244,7 +231,6 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
   };
 
   sceneItemsConfirmed = new Subject();
-  sceneItemsDestroyed = new Subject();
   sceneNodeHandled = new Subject<number>();
 
   get views() {

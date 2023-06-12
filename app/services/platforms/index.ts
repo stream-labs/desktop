@@ -229,10 +229,8 @@ export enum EPlatform {
   Trovo = 'trovo',
 }
 
-// TODO: Refactor to use EPlatform enum
 export type TPlatform = 'twitch' | 'youtube' | 'facebook' | 'tiktok' | 'trovo';
 
-// platform list should be alphabetical
 export const platformList = [
   EPlatform.Facebook,
   EPlatform.TikTok,

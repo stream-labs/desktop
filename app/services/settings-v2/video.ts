@@ -51,7 +51,6 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
   @Inject() settingsService: SettingsService;
 
   initialState = {
-    default: null as obs.IVideoInfo,
     horizontal: null as obs.IVideoInfo,
     vertical: null as obs.IVideoInfo,
   };
@@ -69,7 +68,6 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
   }
 
   contexts = {
-    default: null as obs.IVideo,
     horizontal: null as obs.IVideo,
     vertical: null as obs.IVideo,
   };
@@ -79,10 +77,6 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
       horizontal: this.formatVideoSettings('horizontal'),
       vertical: this.formatVideoSettings('vertical'),
     };
-  }
-
-  get hasContext() {
-    return this.contexts.horizontal !== null;
   }
 
   get baseResolutions() {
@@ -197,18 +191,6 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
     this.contexts[display].legacySettings = this.state[display];
     obs.Video.video = this.state.horizontal;
     obs.Video.legacySettings = this.state.horizontal;
-
-    return !!this.contexts[display];
-  }
-
-  destroyVideoContext(display: TDisplayType = 'horizontal') {
-    if (this.contexts[display]) {
-      const context: obs.IVideo = this.contexts[display];
-      context.destroy();
-    }
-
-    this.contexts[display] = null as obs.IVideo;
-    this.REMOVE_CONTEXT(display);
 
     return !!this.contexts[display];
   }
