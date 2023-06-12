@@ -82,8 +82,10 @@ class RecordingHistoryModule {
     return this.RecordingModeService.views.formattedTimestamp(timestamp);
   }
 
-  uploadToYoutube(filename: string) {
-    this.RecordingModeService.actions.uploadToYoutube(filename);
+  async uploadToYoutube(filename: string) {
+    const id = await this.RecordingModeService.actions.return.uploadToYoutube(filename);
+    if (!id) return;
+    remote.shell.openExternal(`https://youtube.com/watch?v=${id}`);
   }
 
   async uploadToStorage(filename: string, platform: string) {

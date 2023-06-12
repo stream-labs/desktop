@@ -245,13 +245,14 @@ export class RecordingModeService extends PersistentStatefulService<IRecordingMo
     }
 
     this.cancelFunction = () => {};
-    this.SET_UPLOAD_INFO({ uploading: false });
+    this.CLEAR_UPLOAD_INFO();
 
     if (result) {
       this.usageStatisticsService.recordAnalyticsEvent('RecordingHistory', {
         type: 'UploadYouTubeSuccess',
         privacy: 'private',
       });
+      return result.id;
     }
   }
 
@@ -286,7 +287,7 @@ export class RecordingModeService extends PersistentStatefulService<IRecordingMo
     }
 
     this.cancelFunction = () => {};
-    this.SET_UPLOAD_INFO({ uploading: false });
+    this.CLEAR_UPLOAD_INFO();
 
     if (result) {
       this.usageStatisticsService.recordAnalyticsEvent('RecordingHistory', {
@@ -338,5 +339,10 @@ export class RecordingModeService extends PersistentStatefulService<IRecordingMo
   @mutation()
   private SET_UPLOAD_INFO(info: Partial<IUploadInfo>) {
     this.state.uploadInfo = { ...this.state.uploadInfo, ...info };
+  }
+
+  @mutation()
+  private CLEAR_UPLOAD_INFO() {
+    this.state.uploadInfo = { uploading: false };
   }
 }
