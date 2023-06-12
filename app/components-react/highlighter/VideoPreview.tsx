@@ -16,8 +16,7 @@ export default function VideoPreview() {
     <div
       style={{
         width: 300,
-        marginLeft: 24,
-        marginBottom: 24,
+        margin: 24,
         display: 'flex',
         flexDirection: 'column',
       }}
