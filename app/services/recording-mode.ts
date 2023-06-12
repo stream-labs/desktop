@@ -25,6 +25,7 @@ interface IRecordingEntry {
 }
 
 export interface IUploadInfo {
+  uploading: boolean;
   uploadedBytes?: number;
   totalBytes?: number;
   error?: string;
@@ -68,7 +69,7 @@ export class RecordingModeService extends PersistentStatefulService<IRecordingMo
   static defaultState: IRecordingModeState = {
     enabled: false,
     recordingHistory: {},
-    uploadInfo: {} as IUploadInfo,
+    uploadInfo: { uploading: false } as IUploadInfo,
   };
 
   static filter(state: IRecordingModeState) {
@@ -214,6 +215,7 @@ export class RecordingModeService extends PersistentStatefulService<IRecordingMo
 
   async uploadToYoutube(filename: string) {
     const yt = getPlatformService('youtube') as YoutubeService;
+    this.SET_UPLOAD_INFO({ uploading: true });
 
     const { cancel, complete } = yt.uploader.uploadVideo(
       filename,
@@ -243,7 +245,7 @@ export class RecordingModeService extends PersistentStatefulService<IRecordingMo
     }
 
     this.cancelFunction = () => {};
-    this.SET_UPLOAD_INFO({});
+    this.SET_UPLOAD_INFO({ uploading: false });
 
     if (result) {
       this.usageStatisticsService.recordAnalyticsEvent('RecordingHistory', {
@@ -254,6 +256,7 @@ export class RecordingModeService extends PersistentStatefulService<IRecordingMo
   }
 
   async uploadToStorage(filename: string, platform?: string) {
+    this.SET_UPLOAD_INFO({ uploading: true });
     const { cancel, complete } = await this.sharedStorageService.actions.return.uploadFile(
       filename,
       progress => {
@@ -283,7 +286,7 @@ export class RecordingModeService extends PersistentStatefulService<IRecordingMo
     }
 
     this.cancelFunction = () => {};
-    this.SET_UPLOAD_INFO({});
+    this.SET_UPLOAD_INFO({ uploading: false });
 
     if (result) {
       this.usageStatisticsService.recordAnalyticsEvent('RecordingHistory', {
@@ -333,7 +336,7 @@ export class RecordingModeService extends PersistentStatefulService<IRecordingMo
   }
 
   @mutation()
-  private SET_UPLOAD_INFO(info: IUploadInfo) {
-    this.state.uploadInfo = info;
+  private SET_UPLOAD_INFO(info: Partial<IUploadInfo>) {
+    this.state.uploadInfo = { ...this.state.uploadInfo, ...info };
   }
 }
