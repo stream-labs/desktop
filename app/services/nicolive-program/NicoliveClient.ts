@@ -1,24 +1,26 @@
 import * as Sentry from '@sentry/vue';
-import { remote, ipcRenderer } from 'electron';
-import {
-  ProgramSchedules,
-  ProgramInfo,
-  Segment,
-  Extension,
-  Statistics,
-  NicoadStatistics,
-  Communities,
-  CommonErrorResponse,
-  Community,
-  Filters,
-  FilterRecord,
-  OnairUserProgramData,
-  OnairChannelProgramData,
-  OnairChannelData,
-  BroadcastStreamData,
-} from './ResponseTypes';
+import { ipcRenderer, remote } from 'electron';
 import { addClipboardMenu } from 'util/addClipboardMenu';
 import { handleErrors } from 'util/requests';
+import {
+  BroadcastStreamData,
+  CommonErrorResponse,
+  Communities,
+  Community,
+  Extension,
+  FilterRecord,
+  Filters,
+  NicoadStatistics,
+  OnairChannelData,
+  OnairChannelProgramData,
+  OnairUserProgramData,
+  ProgramInfo,
+  ProgramSchedules,
+  Segment,
+  Statistics,
+  UserFollowStatus,
+  UserFollow
+} from './ResponseTypes';
 const { BrowserWindow } = remote;
 
 export enum CreateResult {
@@ -59,7 +61,7 @@ export function isOk<T>(result: WrappedResult<T>): result is SucceededResult<T> 
   return result.ok === true;
 }
 
-export class NotLoggedInError {}
+export class NotLoggedInError { }
 
 type Quality = {
   bitrate: number;
@@ -82,11 +84,43 @@ export function parseMaxQuality(maxQuality: string, fallback: Quality): Quality 
   }
 }
 
+export type KonomiTag = {
+  tag_id: {
+    value: string;
+  }
+  name: string;
+  followers_count: number;
+};
+type KonomiTags = {
+  konomi_tags: KonomiTag[];
+}
+
+function isValidUserFollowResponse(response: any): response is UserFollow {
+  if (typeof response !== 'object') return false;
+  if (!('meta' in response)) return false;
+  if (typeof response['meta'] !== 'object') return false;
+  if (!('status' in response['meta'])) return false;
+  if (typeof response['meta']['status'] !== 'number') return false;
+  return true;
+}
+
+function isValidUserFollowStatusResponse(response: any): response is UserFollowStatus {
+  if (!isValidUserFollowResponse(response)) return false;
+  if (response.meta.status !== 200) return false;
+  if (!('data' in response)) return false;
+  if (typeof response['data'] !== 'object') return false;
+  if (!('following' in (response as { data: any })['data'])) return false;
+  if (typeof (response as { data: any })['data']['following'] !== 'boolean') return false;
+  return true;
+}
+
 export class NicoliveClient {
   static live2BaseURL = 'https://live2.nicovideo.jp';
+  static live2ApiBaseURL = 'https://api.live2.nicovideo.jp';
   static publicBaseURL = 'https://public.api.nicovideo.jp';
   static nicoadBaseURL = 'https://api.nicoad.nicovideo.jp';
   static communityBaseURL = 'https://com.nicovideo.jp';
+  static userFollowBaseURL = 'https://user-follow-api.nicovideo.jp';
   private static frontendID = 134;
 
   static isProgramPage(url: string): boolean {
@@ -184,6 +218,10 @@ export class NicoliveClient {
 
   private put(url: string | URL, options: RequestInit = {}): Promise<Response> {
     return fetch(url.toString(), NicoliveClient.createRequest('PUT', options));
+  }
+
+  private delete(url: string | URL, options: RequestInit = {}): Promise<Response> {
+    return fetch(url.toString(), NicoliveClient.createRequest('DELETE', options));
   }
 
   /** ユーザごとの番組スケジュールを取得 */
@@ -387,6 +425,14 @@ export class NicoliveClient {
     } catch (err) {
       return NicoliveClient.wrapFetchError(err as Error);
     }
+  }
+
+  // 関心が別だが他の場所におく程の理由もないのでここにおく
+  /** ユーザーアイコンを取得 */
+  static getUserIconURL(userId: string, hash: string): string {
+    const dir = Math.floor(Number(userId) / 10000);
+    const url = `https://secure-dcdn.cdn.nimg.jp/nicoaccount/usericon/${dir}/${userId}.jpg?${hash}`
+    return url;
   }
 
   // 関心が別だが他の場所におく程の理由もないのでここにおく
@@ -678,5 +724,114 @@ export class NicoliveClient {
       });
       return result;
     });
+  }
+
+  // 関心が別だが他の場所におく程の理由もないのでここにおく
+  /**
+   * ユーザーの好みタグを取得する
+   * @param userId 
+   * @returns 
+   */
+  async fetchKonomiTags(userId: string): Promise<KonomiTag[]> {
+    const res = await this.post(
+      `${NicoliveClient.live2ApiBaseURL}/api/v1/konomiTags/GetFollowing`,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          'x-service-id': 'n-air-app',
+        },
+        body: JSON.stringify({ 'follower_id': { value: userId, type: 'USER' } }),
+      },
+    );
+    if (res.ok) {
+      const json = await res.json() as KonomiTags;
+      return json.konomi_tags;
+    }
+    throw new Error(`fetchKonomiTags failed: ${res.status} ${res.statusText}`);
+  }
+
+  static userFollowEndpoint(userId: string): string {
+    return `${NicoliveClient.userFollowBaseURL}/v1/user/followees/niconico-users/${userId}.json`;
+  }
+
+  /**
+   * ユーザーのフォロー状態を取得する
+   * @param userId 対象ユーザーID
+   * @returns フォロー中ならtrue
+   */
+  async fetchUserFollow(userId: string): Promise<boolean> {
+    const res = await this.get(
+      NicoliveClient.userFollowEndpoint(userId),
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          'x-frontend-id': NicoliveClient.frontendID.toString(10),
+        },
+      },
+    );
+    if (res.ok) {
+      const json = await res.json();
+      console.info('fetchUserFollow', json);
+      if (isValidUserFollowStatusResponse(json)) {
+        return json.data.following;
+      }
+    }
+    console.info('fetchUserFollow', userId, res); // DEBUG
+    throw new Error(`fetchUserFollow failed: ${res.status} ${res.statusText}`);
+  }
+
+
+  private prepareUserFollowApi() {
+    const session = remote.session;
+    session.defaultSession.webRequest.onBeforeSendHeaders(
+      { urls: [NicoliveClient.userFollowEndpoint('*')] },
+      (details, callback) => {
+        details.requestHeaders['Origin'] = null;
+        callback({ cancel: false, requestHeaders: details.requestHeaders });
+      },
+    );
+  }
+  /**
+   * ユーザーをフォローする
+   * @param userId 対象ユーザーID
+   */
+  async followUser(userId: string): Promise<void> {
+    this.prepareUserFollowApi();
+    const res = await this.post(
+      NicoliveClient.userFollowEndpoint(userId),
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          'x-frontend-id': NicoliveClient.frontendID.toString(10),
+          'X-Request-With': 'N Air',
+        },
+      },
+    );
+    if (!res.ok) {
+      console.info('followUser', userId, res, await res.json()); // DEBUG
+      throw new Error(`followUser failed: ${res.status} ${res.statusText}`);
+    }
+  }
+
+  /**
+   * ユーザーのフォローを解除する
+   * @param userId 対象ユーザーID
+   */
+  async unFollowUser(userId: string): Promise<void> {
+    this.prepareUserFollowApi();
+    const res = await this.delete(
+      NicoliveClient.userFollowEndpoint(userId),
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          'x-frontend-id': NicoliveClient.frontendID.toString(10),
+          'X-Request-With': 'N Air',
+        },
+      },
+    );
+    if (!res.ok) {
+      console.info('unFollowUser', userId, res, await res.json());
+      throw new Error(`unFollowUser failed: ${res.status} ${res.statusText}`);
+    }
   }
 }

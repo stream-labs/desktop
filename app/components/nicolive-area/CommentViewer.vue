@@ -15,7 +15,7 @@
     <div class="content">
       <div class="list" ref="scroll">
         <component
-          class="row"
+          :class="{ row: true, name: item.value.name }"
           v-for="item of items"
           :key="item.seqId"
           :is="componentMap[item.component]"
@@ -25,6 +25,7 @@
           :speaking="speakingSeqId === item.seqId"
           @pinned="pin(item)"
           @commentMenu="showCommentMenu(item)"
+          @commentUser="showUserInfo(item)"
         />
         <div class="sentinel" ref="sentinel"></div>
       </div>
@@ -127,6 +128,10 @@
   height: 32px;
   font-size: @font-size2;
   line-height: 32px;
+
+  &.name {
+    height: 64px;
+  }
 }
 
 .sentinel {

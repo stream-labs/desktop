@@ -1,22 +1,38 @@
 <template>
-  <div class="root" :class="[chat.type, { pseudoHover: commentMenuOpened }]" :title="computedTitle" :speaking="speaking" @dblclick="$emit('pinned')">
+  <div
+    class="root"
+    :class="[chat.type, { pseudoHover: commentMenuOpened }]"
+    :title="computedTitle"
+    :speaking="speaking"
+    @dblclick="$emit('pinned')"
+  >
     <div class="comment-number">{{ chat.value.no }}</div>
-    <div class="comment-body">{{ computedContent }}</div>
-    <div class="comment-misc" @click.stop="$emit('commentMenu')"><i class="icon-btn icon-ellipsis-vertical"></i></div>
+    <div class="comment-box">
+      <div class="comment-name-box" v-if="chat.value.name" @click.stop="$emit('commentUser')">
+        <img class="comment-icon" :src="userIconURL" />
+        <div class="comment-name">{{ chat.value.name }}</div>
+      </div>
+      <div class="comment-body">{{ computedContent }}</div>
+      <div class="comment-misc" @click.stop="$emit('commentMenu')">
+        <i class="icon-btn icon-ellipsis-vertical"></i>
+      </div>
+    </div>
   </div>
 </template>
 <script lang="ts" src="./CommonComment.vue.ts"></script>
 
 <style lang="less" scoped>
-@import "../../../styles/index";
-@import "./comment";
+@import url('../../../styles/index');
+@import url('./comment');
 
 .root {
   display: flex;
   flex-direction: row;
 
-  &:hover, &.pseudoHover {
+  &:hover,
+  &.pseudoHover {
     .bg-hover();
+
     & > .comment-misc {
       display: block;
     }
@@ -27,22 +43,47 @@
   .common__comment-number;
 }
 
+.comment-box {
+  display: flex;
+  flex-direction: column;
+}
+
+.comment-name-box {
+  display: flex;
+  flex: 1;
+  flex-direction: row;
+  align-items: center;
+  margin-left: 16px;
+}
+
+.comment-icon {
+  width: 16px;
+  height: 16px;
+  margin-right: 4px;
+}
+
+.comment-name {
+  color: var(--color-text-light);
+}
+
 .comment-body {
   .common__comment-body;
-    color: var(--color-text-light);
+
+  flex: 1;
+  color: var(--color-text-light);
 
   .operator & {
     color: var(--color-accent);
   }
 
-  [speaking=true] & {
+  [speaking='true'] & {
     color: var(--color-text-active);
   }
 }
 
 .comment-misc {
   .common__comment-misc;
+
   display: none;
 }
-
 </style>

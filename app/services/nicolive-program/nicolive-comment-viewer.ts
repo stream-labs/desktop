@@ -1,35 +1,37 @@
-import { Inject } from 'services/core/injector';
-import { NicoliveProgramService } from 'services/nicolive-program/nicolive-program';
-import { StatefulService, mutation } from 'services/core/stateful-service';
-import { Subscription, EMPTY, Observable, of, interval } from 'rxjs';
+import { EMPTY, Observable, Subscription, interval, of } from 'rxjs';
 import {
-  map,
-  distinctUntilChanged,
   bufferTime,
-  filter,
   catchError,
-  mergeMap,
-  groupBy,
-  mapTo,
+  distinctUntilChanged,
   endWith,
+  filter,
+  groupBy,
+  map,
+  mapTo,
+  mergeMap,
   tap,
 } from 'rxjs/operators';
+import { Inject } from 'services/core/injector';
+import { StatefulService, mutation } from 'services/core/stateful-service';
+import { CustomizationService } from 'services/customization';
+import { NicoliveCommentFilterService } from 'services/nicolive-program/nicolive-comment-filter';
+import { NicoliveProgramService } from 'services/nicolive-program/nicolive-program';
+import { WindowsService } from 'services/windows';
+import { AddComponent } from './ChatMessage/ChatComponentType';
+import { classify } from './ChatMessage/classifier';
+import { isOperatorCommand } from './ChatMessage/util';
 import {
+  IMessageServerClient,
+  MessageResponse,
   MessageServerClient,
   MessageServerConfig,
   isChatMessage,
   isThreadMessage,
-  IMessageServerClient,
-  MessageResponse,
 } from './MessageServerClient';
-import { classify } from './ChatMessage/classifier';
-import { isOperatorCommand } from './ChatMessage/util';
-import { NicoliveCommentFilterService } from 'services/nicolive-program/nicolive-comment-filter';
-import { NicoliveCommentSynthesizerService } from './nicolive-comment-synthesizer';
-import { AddComponent } from './ChatMessage/ChatComponentType';
+import { KonomiTag } from './NicoliveClient';
 import { WrappedChat, WrappedChatWithComponent } from './WrappedChat';
 import { NicoliveCommentLocalFilterService } from './nicolive-comment-local-filter';
-import { CustomizationService } from 'services/customization';
+import { NicoliveCommentSynthesizerService } from './nicolive-comment-synthesizer';
 
 function makeEmulatedChat(
   content: string,
@@ -78,6 +80,7 @@ export class NicoliveCommentViewerService extends StatefulService<INicoliveComme
   @Inject() private nicoliveCommentLocalFilterService: NicoliveCommentLocalFilterService;
   @Inject() private nicoliveCommentSynthesizerService: NicoliveCommentSynthesizerService;
   @Inject() private customizationService: CustomizationService;
+  @Inject() private windowsService: WindowsService;
 
   static initialState: INicoliveCommentViewerState = {
     messages: [],
@@ -207,6 +210,19 @@ export class NicoliveCommentViewerService extends StatefulService<INicoliveComme
       )
       .subscribe(values => this.onMessage(values.map(c => AddComponent(c))));
     this.client.requestLatestMessages();
+  }
+
+  showUserInfo(userId: string, userName: string, isPremium: boolean) {
+    this.windowsService.showWindow({
+      componentName: 'UserInfo',
+      title: `${userName} さんのユーザー情報`,
+      queryParams: { userId, userName, isPremium },
+      size: {
+        width: 600,
+        height: 600,
+      }
+    })
+
   }
 
   private queueToSpeech(values: WrappedChatWithComponent[]) {

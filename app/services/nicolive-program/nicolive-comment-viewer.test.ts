@@ -28,6 +28,9 @@ jest.mock('services/nicolive-program/nicolive-comment-local-filter', () => ({
 jest.mock('services/nicolive-program/nicolive-comment-synthesizer', () => ({
   NicoliveCommentSynthesizerService: {},
 }));
+jest.mock('services/windows', () => ({
+  WindowsService: {},
+}));
 
 beforeEach(() => {
   jest.doMock('services/core/stateful-service');
