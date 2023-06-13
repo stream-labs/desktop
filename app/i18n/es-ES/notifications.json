@@ -26,5 +26,6 @@
   "Recordings": "Grabaciones",
   "Marker %{label} added at %{timestamp}": "Marcador %{label} añadido a %{timestamp}",
   "File is too large to upload": "File is too large to upload",
-  "File type %{extension} is not supported": "File type %{extension} is not supported"
+  "File type %{extension} is not supported": "File type %{extension} is not supported",
+  "Upload already in progress": "Upload already in progress"
 }
