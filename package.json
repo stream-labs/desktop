@@ -41,7 +41,9 @@
     "tail-obs-logs": "node bin/tail-obs-logs.js",
     "generate-agreement": "cat BASEAGREEMENT > AGREEMENT && yarn licenses generate-disclaimer >> AGREEMENT",
     "generate-agreement:mac": "cat BASEAGREEMENT > license_en.txt && yarn licenses generate-disclaimer >> license_en.txt",
-    "beta": "SLD_USE_BETA=true electron ."
+    "beta": "SLD_USE_BETA=true electron .",
+    "qa": "rm -rf node_modules/ && yarn install && yarn compile && yarn start",
+    "qa:beta": "rm -rf node_modules/ && yarn install && yarn compile && yarn beta"
   },
   "prettier": {
     "singleQuote": true,

@@ -208,7 +208,7 @@ export class RecordingModeService extends PersistentStatefulService<IRecordingMo
     this.windowsService.actions.showWindow({
       componentName: 'RecordingHistory',
       title: $t('Recording History'),
-      size: { width: 700, height: 600 },
+      size: { width: 550, height: 600 },
     });
   }
 
