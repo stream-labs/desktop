@@ -26,5 +26,6 @@
   "Recordings": "录制",
   "Marker %{label} added at %{timestamp}": "标记 %{label} 添加于 %{timestamp}",
   "File is too large to upload": "File is too large to upload",
-  "File type %{extension} is not supported": "File type %{extension} is not supported"
+  "File type %{extension} is not supported": "File type %{extension} is not supported",
+  "Upload already in progress": "Upload already in progress"
 }

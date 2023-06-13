@@ -51,6 +51,7 @@ function ExtraSettings() {
     WindowsService,
     StreamlabelsService,
     RecordingModeService,
+    SettingsService,
   } = Services;
   const isLoggedIn = UserService.isLoggedIn;
   const isTwitch = isLoggedIn && getDefined(UserService.platform).type === 'twitch';
@@ -64,7 +65,14 @@ function ExtraSettings() {
     recordingMode: RecordingModeService.views.isRecordingModeEnabled,
     updateStreamInfoOnLive: CustomizationService.state.updateStreamInfoOnLive,
   }));
-  const canRunOptimizer = isTwitch && !isRecordingOrStreaming && protectedMode;
+  const canRunOptimizer =
+    // until advanced settings is integrated with the new backend
+    // users with advanced settings are not able run the auto-optimizer
+    // within the app
+    !SettingsService.advancedSettingEnabled() &&
+    isTwitch &&
+    !isRecordingOrStreaming &&
+    protectedMode;
 
   function restartStreamlabelsSession() {
     StreamlabelsService.restartSession().then(result => {
