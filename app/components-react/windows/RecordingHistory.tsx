@@ -66,6 +66,10 @@ class RecordingHistoryModule {
   }
 
   handleSelect(filename: string, platform: string) {
+    if (this.uploadInfo.uploading) {
+      message.error($t('Upload already in progress'), 5);
+      return;
+    }
     if (platform === 'youtube') return this.uploadToYoutube(filename);
     if (this.hasSLID) {
       this.uploadToStorage(filename, platform);
@@ -78,8 +82,10 @@ class RecordingHistoryModule {
     return this.RecordingModeService.views.formattedTimestamp(timestamp);
   }
 
-  uploadToYoutube(filename: string) {
-    this.RecordingModeService.actions.uploadToYoutube(filename);
+  async uploadToYoutube(filename: string) {
+    const id = await this.RecordingModeService.actions.return.uploadToYoutube(filename);
+    if (!id) return;
+    remote.shell.openExternal(`https://youtube.com/watch?v=${id}`);
   }
 
   async uploadToStorage(filename: string, platform: string) {
@@ -108,8 +114,13 @@ export default function RecordingHistory() {
   } = useModule(RecordingHistoryModule);
 
   useEffect(() => {
-    if (uploadInfo.error && typeof uploadInfo.error === 'string') {
-      message.warning(uploadInfo.error, 5);
+    if (
+      uploadInfo.error &&
+      typeof uploadInfo.error === 'string' &&
+      // We don't want to surface unexpected TS errors to the user
+      !/TypeError/.test(uploadInfo.error)
+    ) {
+      message.error(uploadInfo.error, 5);
     }
   }, [uploadInfo.error]);
 
