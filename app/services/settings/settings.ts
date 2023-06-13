@@ -277,42 +277,11 @@ export class SettingsService extends StatefulService<ISettingsServiceState> {
    * Can be called externally to ensure that you have the absolute latest settings
    * fetched from OBS directly.
    */
-  // loadSettingsIntoStore() {
-  //   // load configuration from nodeObs to state
-  //   const settingsFormData = {};
-  //   this.getCategories().forEach(categoryName => {
-  //     settingsFormData[categoryName] = this.fetchSettingsFromObs(categoryName);
-  //
-  //     }
-  //   });
-  //   this.SET_SETTINGS(settingsFormData);
   loadSettingsIntoStore() {
     // load configuration from nodeObs to state
     const settingsFormData = {};
     this.getCategories().forEach(categoryName => {
       settingsFormData[categoryName] = this.fetchSettingsFromObs(categoryName);
-      // This is janky but forces setting the server to auto if the service is twitch
-      // Otherwise the stream settings sent to obs will not update and the stream won't go live
-
-      // @@@ TODO: refactor for going live with Twitch
-      // if (
-      //   this.dualOutputService.views.dualOutputMode &&
-      //   ['Stream', 'StreamSecond'].includes(categoryName)
-      // ) {
-      //   settingsFormData[categoryName].formData[1].parameters.forEach(
-      //     (parameter: IObsInput<unknown>) => {
-      //       if (parameter.name === 'service' && parameter.value === 'Twitch') {
-      //         settingsFormData[categoryName].formData[1].parameters.forEach(
-      //           (param: IObsInput<unknown>) => {
-      //             if (param.name === 'server') {
-      //               param.value = 'auto';
-      //             }
-      //           },
-      //         );
-      //       }
-      //     },
-      //   );
-      // }
     });
     this.SET_SETTINGS(settingsFormData);
   }

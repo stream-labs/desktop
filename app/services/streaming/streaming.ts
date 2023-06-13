@@ -312,18 +312,13 @@ export class StreamingService
      * SET PLATFORM STREAM SETTINGS
      */
 
-    if (this.views.isDualOutputMode) {
-      // in dual output mode, assign context by settings
-
-      for (const platform of platforms) {
-        await this.setPlatformSettings(platform, settings, unattendedMode, true); // forcing context to be set
-      }
-    } else {
-      // in single output mode, assign context to 'horizontal' by default
-      for (const platform of platforms) {
-        await this.setPlatformSettings(platform, { ...settings }, unattendedMode, false);
-      }
+    for (const platform of platforms) {
+      await this.setPlatformSettings(platform, settings, unattendedMode);
     }
+
+    /**
+     * SET MULTISTREAM SETTINGS
+     */
     if (this.views.isMultiplatformMode) {
       // setup restream
 
@@ -355,9 +350,22 @@ export class StreamingService
         this.setError('RESTREAM_SETUP_FAILED');
         return;
       }
-    } else {
-      // setup dual output mode
+    }
+
+    /**
+     * SET DUAL OUTPUT SETTINGS
+     */
+    if (this.views.isDualOutputMode) {
+      // if needed, set up multistreaming for dual output
       const displayPlatforms = this.views.activeDisplayPlatforms;
+
+      // when setting up the restream server and targets, it automatically removes the server data from StreamSecond
+      // this is only an issue if the horizontal display is multistreaming and the vertical display is single streaming
+      // if this is the case, save the StreamSecond settings so that they can be restored after the restream servers are set up
+      const onlyMultistreamHorizontal =
+        displayPlatforms.horizontal.length > 1 && displayPlatforms.vertical.length < 2;
+      const secondStreamSettings =
+        onlyMultistreamHorizontal && this.settingsService.views.values.StreamSecond;
 
       for (const display in displayPlatforms) {
         if (displayPlatforms[display].length > 1) {
@@ -394,7 +402,15 @@ export class StreamingService
         }
       }
 
+      // finish setting up dual output
       try {
+        if (secondStreamSettings) {
+          // prevent an error from being thrown if the server is undefined
+          const server = secondStreamSettings?.server ?? 'auto';
+          this.settingsService.setSettingsPatch({
+            StreamSecond: { ...secondStreamSettings, server },
+          });
+        }
         await this.runCheck('setupDualOutput', async () => await Promise.resolve());
       } catch (e: unknown) {
         console.error('Failed to setup dual output', e);
@@ -457,15 +473,21 @@ export class StreamingService
     platform: TPlatform,
     settings: IGoLiveSettings,
     unattendedMode: boolean,
-    forceSetContext: boolean = false,
   ) {
     const service = getPlatformService(platform);
+
+    // in dual output mode, assign context by settings
+    // in single output mode, assign context to 'horizontal' by default
+    const context = this.views.isDualOutputMode
+      ? this.views.getPlatformDisplay(platform)
+      : 'horizontal';
+
     try {
       // don't update settings for twitch in unattendedMode
       const settingsForPlatform =
-        !forceSetContext && platform === 'twitch' && unattendedMode ? undefined : settings;
-
-      const context = forceSetContext ? this.views.getPlatformDisplay(platform) : 'horizontal';
+        !this.views.isDualOutputMode && platform === 'twitch' && unattendedMode
+          ? undefined
+          : settings;
 
       await this.runCheck(platform, () => service.beforeGoLive(settingsForPlatform, context));
     } catch (e: unknown) {
@@ -1121,7 +1143,7 @@ export class StreamingService
           service: streamSettings.service,
         });
         this.usageStatisticsService.recordFeatureUsage('Streaming');
-      } else if (info.signal === EOBSOutputSignal.Starting) {
+      } else if (info.signal === EOBSOutputSignal.Starting && shouldResolve) {
         this.SET_STREAMING_STATUS(EStreamingState.Starting, time);
         this.streamingStatusChange.next(EStreamingState.Starting);
       } else if (info.signal === EOBSOutputSignal.Stop) {

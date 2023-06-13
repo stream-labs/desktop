@@ -152,10 +152,6 @@ export class StreamInfoView<T extends Object> extends ViewHandler<T> {
     ) as TPlatform[];
   }
 
-  get hasVerticalContext(): boolean {
-    return this.dualOutputView.hasVerticalContext;
-  }
-
   get isMultiplatformMode(): boolean {
     if (this.isDualOutputMode) return false;
     return (
@@ -172,21 +168,6 @@ export class StreamInfoView<T extends Object> extends ViewHandler<T> {
 
   get activeDisplayPlatforms() {
     return this.dualOutputView.activeDisplayPlatforms;
-  }
-
-  get activeDisplays() {
-    return this.dualOutputView.activeDisplays;
-  }
-
-  get restreamAllDisplays() {
-    let shouldRestream = true;
-    for (const display in this.dualOutputView.activeDisplayPlatforms) {
-      if (!shouldRestream) return;
-      if (display.length < 2) {
-        shouldRestream = false;
-      }
-    }
-    return shouldRestream;
   }
 
   getPlatformDisplay(platform: TPlatform) {
