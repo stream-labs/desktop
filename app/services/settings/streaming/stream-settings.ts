@@ -151,7 +151,11 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
     });
 
     // save settings related to "Settings->Stream" window
-    let streamFormData = cloneDeep(this.views.obsStreamSettings);
+    // each context has their own settings
+    let streamFormData =
+      streamName === 'StreamSecond'
+        ? cloneDeep(this.views.obsStreamSecondSettings)
+        : cloneDeep(this.views.obsStreamSettings);
 
     streamFormData.forEach(subCategory => {
       subCategory.parameters.forEach(parameter => {
@@ -173,7 +177,9 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
 
     if (!mustUpdateObsSettings) return;
     streamFormData =
-      streamName === 'Stream' ? cloneDeep(this.views.obsStreamSettings) : streamFormData;
+      streamName === 'StreamSecond'
+        ? cloneDeep(this.views.obsStreamSecondSettings)
+        : cloneDeep(this.views.obsStreamSettings);
 
     streamFormData.forEach(subCategory => {
       subCategory.parameters.forEach(parameter => {

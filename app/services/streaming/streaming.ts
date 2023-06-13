@@ -243,10 +243,6 @@ export class StreamingService
     this.UPDATE_STREAM_INFO({ lifecycle: 'waitForNewSettings' });
   }
 
-  /**
-   * MOVE
-   */
-
   async handleSetupPlatform(
     platform: TPlatform,
     settings: IGoLiveSettings,
@@ -359,14 +355,6 @@ export class StreamingService
       // if needed, set up multistreaming for dual output
       const displayPlatforms = this.views.activeDisplayPlatforms;
 
-      // when setting up the restream server and targets, it automatically removes the server data from StreamSecond
-      // this is only an issue if the horizontal display is multistreaming and the vertical display is single streaming
-      // if this is the case, save the StreamSecond settings so that they can be restored after the restream servers are set up
-      const onlyMultistreamHorizontal =
-        displayPlatforms.horizontal.length > 1 && displayPlatforms.vertical.length < 2;
-      const secondStreamSettings =
-        onlyMultistreamHorizontal && this.settingsService.views.values.StreamSecond;
-
       for (const display in displayPlatforms) {
         if (displayPlatforms[display].length > 1) {
           // check the Restream service is available
@@ -404,13 +392,6 @@ export class StreamingService
 
       // finish setting up dual output
       try {
-        if (secondStreamSettings) {
-          // prevent an error from being thrown if the server is undefined
-          const server = secondStreamSettings?.server ?? 'auto';
-          this.settingsService.setSettingsPatch({
-            StreamSecond: { ...secondStreamSettings, server },
-          });
-        }
         await this.runCheck('setupDualOutput', async () => await Promise.resolve());
       } catch (e: unknown) {
         console.error('Failed to setup dual output', e);
