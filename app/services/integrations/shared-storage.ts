@@ -263,7 +263,7 @@ class S3Uploader {
       }),
     );
 
-    const tag = result.headers.get('ETag').replace(/"/g, '');
+    const tag = result?.headers?.get('ETag')?.replace(/"/g, '');
 
     this.parts.push({ number: this.parts.length + 1, tag });
 
