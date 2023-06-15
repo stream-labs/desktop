@@ -167,7 +167,6 @@ class SettingsViews extends ViewHandler<ISettingsServiceState> {
   }
 
   get advancedAudioSettings() {
-    console.log(this.state.Advanced.formData);
     return this.state.Advanced.formData.find(data => data.nameSubCategory === 'Audio');
   }
 
