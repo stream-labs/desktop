@@ -66,13 +66,8 @@ function ExtraSettings() {
     updateStreamInfoOnLive: CustomizationService.state.updateStreamInfoOnLive,
   }));
   const canRunOptimizer =
-    // until advanced settings is integrated with the new backend
-    // users with advanced settings are not able run the auto-optimizer
-    // within the app
-    !SettingsService.advancedSettingEnabled() &&
-    isTwitch &&
-    !isRecordingOrStreaming &&
-    protectedMode;
+    // HDR Settings are not compliant with the auto-optimizer
+    !SettingsService.views.hasHDRSettings && isTwitch && !isRecordingOrStreaming && protectedMode;
 
   function restartStreamlabelsSession() {
     StreamlabelsService.restartSession().then(result => {

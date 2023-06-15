@@ -167,7 +167,14 @@ class SettingsViews extends ViewHandler<ISettingsServiceState> {
   }
 
   get advancedAudioSettings() {
+    console.log(this.state.Advanced.formData);
     return this.state.Advanced.formData.find(data => data.nameSubCategory === 'Audio');
+  }
+
+  get hasHDRSettings() {
+    const advVideo = this.state.Advanced.formData.find(data => data.nameSubCategory === 'Video');
+    const colorSetting = advVideo.parameters.find(data => data.name === 'ColorFormat');
+    return ['P010', 'I010'].includes(colorSetting.value as string);
   }
 }
 
