@@ -12,7 +12,7 @@ import { Source, SourcesService } from 'services/api/external-api/sources';
 import { getExternalNodeModel, ISceneNodeModel, SceneNode } from './scene-node';
 import Utils from '../../../utils';
 import { Inject, ServiceHelper } from '../../../core';
-import * as obs from 'obs-studio-node';
+import { IVideo } from 'obs-studio-node';
 import { TDisplayType } from 'services/settings-v2';
 
 /**
@@ -37,7 +37,7 @@ export interface ISceneItemSettings {
   scaleFilter: EScaleType;
   blendingMode: EBlendingMode;
   blendingMethod: EBlendingMethod;
-  output?: obs.IVideo;
+  output?: IVideo;
   display?: TDisplayType;
 }
 

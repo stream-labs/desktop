@@ -6,7 +6,7 @@ import { Button, Form, Modal, message } from 'antd';
 import FormFactory, { TInputValue } from 'components-react/shared/inputs/FormFactory';
 import { CheckboxInput } from 'components-react/shared/inputs';
 import Tooltip from 'components-react/shared/Tooltip';
-import * as obs from '../../../../obs-api';
+import { EScaleType, EFPSType } from '../../../../obs-api';
 import { $t } from 'services/i18n';
 import styles from './Common.m.less';
 import Tabs from 'components-react/shared/Tabs';
@@ -139,20 +139,20 @@ class VideoSettingsModule {
         options: [
           {
             label: $t('Bilinear (Fastest, but blurry if scaling)'),
-            value: obs.EScaleType.Bilinear,
+            value: EScaleType.Bilinear,
           },
-          { label: $t('Bicubic (Sharpened scaling, 16 samples)'), value: obs.EScaleType.Bicubic },
-          { label: $t('Lanczos (Sharpened scaling, 32 samples)'), value: obs.EScaleType.Lanczos },
+          { label: $t('Bicubic (Sharpened scaling, 16 samples)'), value: EScaleType.Bicubic },
+          { label: $t('Lanczos (Sharpened scaling, 32 samples)'), value: EScaleType.Lanczos },
         ],
       },
       fpsType: {
         type: 'list',
         label: $t('FPS Type'),
-        onChange: (val: obs.EFPSType) => this.setFPSType(val),
+        onChange: (val: EFPSType) => this.setFPSType(val),
         options: [
-          { label: $t('Common FPS Values'), value: obs.EFPSType.Common },
-          { label: $t('Integer FPS Values'), value: obs.EFPSType.Integer },
-          { label: $t('Fractional FPS Values'), value: obs.EFPSType.Fractional },
+          { label: $t('Common FPS Values'), value: EFPSType.Common },
+          { label: $t('Integer FPS Values'), value: EFPSType.Integer },
+          { label: $t('Fractional FPS Values'), value: EFPSType.Fractional },
         ],
 
         children: {
@@ -161,14 +161,14 @@ class VideoSettingsModule {
             label: $t('Common FPS Values'),
             options: FPS_OPTIONS,
             onChange: (val: string) => this.setCommonFPS(val),
-            displayed: this.values.fpsType === obs.EFPSType.Common,
+            displayed: this.values.fpsType === EFPSType.Common,
           },
           fpsInt: {
             type: 'number',
             label: $t('FPS Value'),
             onChange: (val: string) => this.setIntegerFPS(val),
             rules: [{ max: 1000, min: 1, message: $t('FPS Value must be between 1 and 1000') }],
-            displayed: this.values.fpsType === obs.EFPSType.Integer,
+            displayed: this.values.fpsType === EFPSType.Integer,
           },
           fpsNum: {
             type: 'number',
@@ -183,7 +183,7 @@ class VideoSettingsModule {
                 }),
               },
             ],
-            displayed: this.values.fpsType === obs.EFPSType.Fractional,
+            displayed: this.values.fpsType === EFPSType.Fractional,
           },
           fpsDen: {
             type: 'number',
@@ -198,7 +198,7 @@ class VideoSettingsModule {
                 }),
               },
             ],
-            displayed: this.values.fpsType === obs.EFPSType.Fractional,
+            displayed: this.values.fpsType === EFPSType.Fractional,
           },
         },
       },
@@ -312,7 +312,7 @@ class VideoSettingsModule {
     }
   }
 
-  setFPSType(value: obs.EFPSType) {
+  setFPSType(value: EFPSType) {
     const display = this.state.display;
     this.service.actions.setVideoSetting('fpsType', value, display);
     this.service.actions.setVideoSetting('fpsNum', 30, display);

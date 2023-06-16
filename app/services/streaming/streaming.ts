@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import { mutation, StatefulService } from 'services/core/stateful-service';
-import * as obs from '../../../obs-api';
+import { EOutputCode, Global, NodeObs } from '../../../obs-api';
 import { Inject } from 'services/core/injector';
 import moment from 'moment';
 import padStart from 'lodash/padStart';
@@ -69,7 +69,7 @@ enum EOBSOutputSignal {
 interface IOBSOutputSignalInfo {
   type: EOBSOutputType;
   signal: EOBSOutputSignal;
-  code: obs.EOutputCode;
+  code: EOutputCode;
   error: string;
   service: string; // 'default' | 'vertical'
 }
@@ -139,7 +139,7 @@ export class StreamingService
   };
 
   init() {
-    obs.NodeObs.OBS_service_connectOutputSignals((info: IOBSOutputSignalInfo) => {
+    NodeObs.OBS_service_connectOutputSignals((info: IOBSOutputSignalInfo) => {
       this.signalInfoChanged.next(info);
       this.handleOBSOutputSignal(info);
     });
@@ -696,7 +696,7 @@ export class StreamingService
     if (enabled) this.usageStatisticsService.recordFeatureUsage('SelectiveRecording');
 
     this.SET_SELECTIVE_RECORDING(enabled);
-    obs.Global.multipleRendering = enabled;
+    Global.multipleRendering = enabled;
   }
 
   setDualOutputMode(enabled: boolean) {
@@ -753,32 +753,32 @@ export class StreamingService
       const horizontalContext = this.videoSettingsService.contexts.horizontal;
       const verticalContext = this.videoSettingsService.contexts.vertical;
 
-      obs.NodeObs.OBS_service_setVideoInfo(horizontalContext, 'horizontal');
-      obs.NodeObs.OBS_service_setVideoInfo(verticalContext, 'vertical');
+      NodeObs.OBS_service_setVideoInfo(horizontalContext, 'horizontal');
+      NodeObs.OBS_service_setVideoInfo(verticalContext, 'vertical');
 
       const signalChanged = this.signalInfoChanged.subscribe((signalInfo: IOBSOutputSignalInfo) => {
         if (signalInfo.service === 'default') {
           if (signalInfo.code !== 0) {
-            obs.NodeObs.OBS_service_stopStreaming(true, 'horizontal');
-            obs.NodeObs.OBS_service_stopStreaming(true, 'vertical');
+            NodeObs.OBS_service_stopStreaming(true, 'horizontal');
+            NodeObs.OBS_service_stopStreaming(true, 'vertical');
           }
 
           if (signalInfo.signal === EOBSOutputSignal.Start) {
-            obs.NodeObs.OBS_service_startStreaming('vertical');
+            NodeObs.OBS_service_startStreaming('vertical');
             signalChanged.unsubscribe();
           }
         }
       });
 
-      obs.NodeObs.OBS_service_startStreaming('horizontal');
+      NodeObs.OBS_service_startStreaming('horizontal');
       // sleep for 1 second to allow the first stream to start
       await new Promise(resolve => setTimeout(resolve, 1000));
     } else {
       // start single output
       const horizontalContext = this.videoSettingsService.contexts.horizontal;
-      obs.NodeObs.OBS_service_setVideoInfo(horizontalContext, 'horizontal');
+      NodeObs.OBS_service_setVideoInfo(horizontalContext, 'horizontal');
 
-      obs.NodeObs.OBS_service_startStreaming();
+      NodeObs.OBS_service_startStreaming();
     }
 
     const recordWhenStreaming = this.streamSettingsService.settings.recordWhenStreaming;
@@ -857,17 +857,17 @@ export class StreamingService
               signalInfo.service === 'default' &&
               signalInfo.signal === EOBSOutputSignal.Deactivate
             ) {
-              obs.NodeObs.OBS_service_stopStreaming(false, 'vertical');
+              NodeObs.OBS_service_stopStreaming(false, 'vertical');
               signalChanged.unsubscribe();
             }
           },
         );
 
-        obs.NodeObs.OBS_service_stopStreaming(false, 'horizontal');
+        NodeObs.OBS_service_stopStreaming(false, 'horizontal');
         // sleep for 1 second to allow the first stream to stop
         await new Promise(resolve => setTimeout(resolve, 1000));
       } else {
-        obs.NodeObs.OBS_service_stopStreaming(false);
+        NodeObs.OBS_service_stopStreaming(false);
       }
 
       const keepRecording = this.streamSettingsService.settings.keepRecordingWhenStreamStops;
@@ -891,10 +891,10 @@ export class StreamingService
 
     if (this.state.streamingStatus === EStreamingState.Ending) {
       if (this.views.isDualOutputMode) {
-        obs.NodeObs.OBS_service_stopStreaming(true, 'horizontal');
-        obs.NodeObs.OBS_service_stopStreaming(true, 'vertical');
+        NodeObs.OBS_service_stopStreaming(true, 'horizontal');
+        NodeObs.OBS_service_stopStreaming(true, 'vertical');
       } else {
-        obs.NodeObs.OBS_service_stopStreaming(true);
+        NodeObs.OBS_service_stopStreaming(true);
       }
       return Promise.resolve();
     }
@@ -916,19 +916,19 @@ export class StreamingService
 
   toggleRecording() {
     if (this.state.recordingStatus === ERecordingState.Recording) {
-      obs.NodeObs.OBS_service_stopRecording();
+      NodeObs.OBS_service_stopRecording();
       return;
     }
 
     if (this.state.recordingStatus === ERecordingState.Offline) {
-      obs.NodeObs.OBS_service_startRecording();
+      NodeObs.OBS_service_startRecording();
       return;
     }
   }
 
   splitFile() {
     if (this.state.recordingStatus === ERecordingState.Recording) {
-      obs.NodeObs.OBS_service_splitFile();
+      NodeObs.OBS_service_splitFile();
     }
   }
 
@@ -936,14 +936,14 @@ export class StreamingService
     if (this.state.replayBufferStatus !== EReplayBufferState.Offline) return;
 
     this.usageStatisticsService.recordFeatureUsage('ReplayBuffer');
-    obs.NodeObs.OBS_service_startReplayBuffer();
+    NodeObs.OBS_service_startReplayBuffer();
   }
 
   stopReplayBuffer() {
     if (this.state.replayBufferStatus === EReplayBufferState.Running) {
-      obs.NodeObs.OBS_service_stopReplayBuffer(false);
+      NodeObs.OBS_service_stopReplayBuffer(false);
     } else if (this.state.replayBufferStatus === EReplayBufferState.Stopping) {
-      obs.NodeObs.OBS_service_stopReplayBuffer(true);
+      NodeObs.OBS_service_stopReplayBuffer(true);
     }
   }
 
@@ -951,7 +951,7 @@ export class StreamingService
     if (this.state.replayBufferStatus === EReplayBufferState.Running) {
       this.SET_REPLAY_BUFFER_STATUS(EReplayBufferState.Saving);
       this.replayBufferStatusChange.next(EReplayBufferState.Saving);
-      obs.NodeObs.OBS_service_processReplayBufferHotkey();
+      NodeObs.OBS_service_processReplayBufferHotkey();
     }
   }
 
@@ -1170,7 +1170,7 @@ export class StreamingService
       }
 
       if (info.signal === EOBSOutputSignal.Wrote) {
-        const filename = obs.NodeObs.OBS_service_getLastRecording();
+        const filename = NodeObs.OBS_service_getLastRecording();
         this.recordingModeService.addRecordingEntry(filename);
         // Wrote signals come after Offline, so we return early here
         // to not falsely set our state out of Offline
@@ -1198,7 +1198,7 @@ export class StreamingService
           status: 'wrote',
           code: info.code,
         });
-        this.replayBufferFileWrite.next(obs.NodeObs.OBS_service_getLastReplay());
+        this.replayBufferFileWrite.next(NodeObs.OBS_service_getLastReplay());
       }
     }
 
@@ -1213,30 +1213,30 @@ export class StreamingService
       let linkToDriverInfo = false;
       let showNativeErrorMessage = false;
 
-      if (info.code === obs.EOutputCode.BadPath) {
+      if (info.code === EOutputCode.BadPath) {
         errorText = $t(
           'Invalid Path or Connection URL.  Please check your settings to confirm that they are valid.',
         );
-      } else if (info.code === obs.EOutputCode.ConnectFailed) {
+      } else if (info.code === EOutputCode.ConnectFailed) {
         errorText = $t(
           'Failed to connect to the streaming server.  Please check your internet connection.',
         );
-      } else if (info.code === obs.EOutputCode.Disconnected) {
+      } else if (info.code === EOutputCode.Disconnected) {
         errorText = $t(
           'Disconnected from the streaming server.  Please check your internet connection.',
         );
-      } else if (info.code === obs.EOutputCode.InvalidStream) {
+      } else if (info.code === EOutputCode.InvalidStream) {
         errorText = $t(
           'Could not access the specified channel or stream key. Please log out and back in to refresh your credentials. If the problem persists, there may be a problem connecting to the server.',
         );
-      } else if (info.code === obs.EOutputCode.NoSpace) {
+      } else if (info.code === EOutputCode.NoSpace) {
         errorText = $t('There is not sufficient disk space to continue recording.');
-      } else if (info.code === obs.EOutputCode.Unsupported) {
+      } else if (info.code === EOutputCode.Unsupported) {
         errorText =
           $t(
             'The output format is either unsupported or does not support more than one audio track.  ',
           ) + $t('Please check your settings and try again.');
-      } else if (info.code === obs.EOutputCode.OutdatedDriver) {
+      } else if (info.code === EOutputCode.OutdatedDriver) {
         linkToDriverInfo = true;
         errorText = $t(
           'An error occurred with the output. This is usually caused by out of date video drivers. Please ensure your Nvidia or AMD drivers are up to date and try again.',

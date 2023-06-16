@@ -1,7 +1,7 @@
 import { debounce } from 'lodash-decorators';
 import { Inject } from 'services/core/injector';
 import { mutation, StatefulService } from '../core/stateful-service';
-import * as obs from '../../../obs-api';
+import { IVideoInfo, EScaleType, EFPSType, IVideo, VideoFactory, Video } from '../../../obs-api';
 import { DualOutputService } from 'services/dual-output';
 import { SettingsService } from 'services/settings';
 import { Subject } from 'rxjs';
@@ -16,16 +16,16 @@ const displays = ['default', 'horizontal', 'vertical'] as const;
 export type TDisplayType = typeof displays[number];
 
 export interface IVideoSetting {
-  default: obs.IVideoInfo;
-  horizontal: obs.IVideoInfo;
-  vertical: obs.IVideoInfo;
+  default: IVideoInfo;
+  horizontal: IVideoInfo;
+  vertical: IVideoInfo;
 }
 
 export interface IVideoSettingFormatted {
   baseRes: string;
   outputRes: string;
-  scaleType: obs.EScaleType;
-  fpsType: obs.EFPSType;
+  scaleType: EScaleType;
+  fpsType: EFPSType;
   fpsCom: string;
   fpsNum: number;
   fpsDen: number;
@@ -51,8 +51,8 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
   @Inject() settingsService: SettingsService;
 
   initialState = {
-    horizontal: null as obs.IVideoInfo,
-    vertical: null as obs.IVideoInfo,
+    horizontal: null as IVideoInfo,
+    vertical: null as IVideoInfo,
   };
 
   establishedContext = new Subject();
@@ -68,8 +68,8 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
   }
 
   contexts = {
-    horizontal: null as obs.IVideo,
-    vertical: null as obs.IVideo,
+    horizontal: null as IVideo,
+    vertical: null as IVideo,
   };
 
   get values() {
@@ -143,14 +143,14 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
       // return if null for the same reason as above
       if (!videoSettings) return;
 
-      Object.keys(videoSettings).forEach((key: keyof obs.IVideoInfo) => {
+      Object.keys(videoSettings).forEach((key: keyof IVideoInfo) => {
         this.SET_VIDEO_SETTING(key, videoSettings[key]);
         this.dualOutputService.setVideoSetting({ [key]: videoSettings[key] }, display);
       });
     } else {
       // return if null for the same reason as above
       if (!legacySettings) return;
-      Object.keys(legacySettings).forEach((key: keyof obs.IVideoInfo) => {
+      Object.keys(legacySettings).forEach((key: keyof IVideoInfo) => {
         this.SET_VIDEO_SETTING(key, legacySettings[key]);
         this.dualOutputService.setVideoSetting({ [key]: legacySettings[key] }, display);
       });
@@ -168,7 +168,7 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
       // otherwise, load them from the dual output service
       const settings = this.dualOutputService.views.videoSettings[display];
 
-      Object.keys(settings).forEach((key: keyof obs.IVideoInfo) => {
+      Object.keys(settings).forEach((key: keyof IVideoInfo) => {
         this.SET_VIDEO_SETTING(key, settings[key], display);
       });
       this.contexts[display].video = settings;
@@ -184,13 +184,13 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
   establishVideoContext(display: TDisplayType = 'horizontal') {
     if (this.contexts[display]) return;
     this.SET_VIDEO_CONTEXT(display);
-    this.contexts[display] = obs.VideoFactory.create();
+    this.contexts[display] = VideoFactory.create();
     this.migrateSettings(display);
 
     this.contexts[display].video = this.state[display];
     this.contexts[display].legacySettings = this.state[display];
-    obs.Video.video = this.state.horizontal;
-    obs.Video.legacySettings = this.state.horizontal;
+    Video.video = this.state.horizontal;
+    Video.legacySettings = this.state.horizontal;
 
     return !!this.contexts[display];
   }
@@ -222,7 +222,7 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
 
         // destroy context
         this.contexts[display].destroy();
-        this.contexts[display] = null as obs.IVideo;
+        this.contexts[display] = null as IVideo;
         this.DESTROY_VIDEO_CONTEXT(display);
       }
     });
@@ -230,7 +230,7 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
 
   @mutation()
   DESTROY_VIDEO_CONTEXT(display: TDisplayType = 'horizontal') {
-    this.state[display] = null as obs.IVideoInfo;
+    this.state[display] = null as IVideoInfo;
   }
 
   @mutation()
@@ -242,16 +242,16 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
   }
 
   @mutation()
-  SET_VIDEO_CONTEXT(display: TDisplayType = 'horizontal', settings?: obs.IVideoInfo) {
+  SET_VIDEO_CONTEXT(display: TDisplayType = 'horizontal', settings?: IVideoInfo) {
     if (settings) {
       this.state[display] = settings;
     } else {
-      this.state[display] = {} as obs.IVideoInfo;
+      this.state[display] = {} as IVideoInfo;
     }
   }
 
   @mutation()
   REMOVE_CONTEXT(display: TDisplayType) {
-    this.state[display] = null as obs.IVideoInfo;
+    this.state[display] = null as IVideoInfo;
   }
 }
