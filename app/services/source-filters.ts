@@ -98,7 +98,7 @@ export class SourceFiltersService extends Service {
         audio: !!(obs.ESourceOutputFlags.Audio & flags),
         video: !!(obs.ESourceOutputFlags.Video & flags),
         async: !!(obs.ESourceOutputFlags.Async & flags),
-        type: type as TSourceFilterType,
+        type: listItem.value,
         description,
       });
     });
