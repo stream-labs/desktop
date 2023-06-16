@@ -239,6 +239,9 @@
     },
     "window": {
       "name": "Window"
+    },
+    "force_sdr": {
+      "name": "Force SDR"
     }
   },
   "game_capture": {
