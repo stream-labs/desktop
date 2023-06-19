@@ -552,6 +552,7 @@ export class NicoliveClient {
         nativeWindowOpen: true,
       },
     });
+    win.removeMenu();
     Sentry.addBreadcrumb({
       category: 'createProgram.open',
     });
@@ -627,6 +628,7 @@ export class NicoliveClient {
         nativeWindowOpen: true,
       },
     });
+    win.removeMenu();
     this.editProgramWindow = win;
     this.editProgramId = programID;
     Sentry.addBreadcrumb({
