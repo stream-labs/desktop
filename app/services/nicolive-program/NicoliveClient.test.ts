@@ -260,6 +260,7 @@ function setupMock() {
         cb(null);
       }
     });
+    removeMenu = jest.fn();
     options: any;
     constructor(options: any) {
       this.options = options;
@@ -293,6 +294,19 @@ function setupMock() {
 describe('webviews', () => {
   beforeEach(() => {
     jest.resetModules();
+  });
+
+  test('createProgramで removeMenuが呼ばれる', async () => {
+    const mock = setupMock();
+
+    const { NicoliveClient } = require('./NicoliveClient');
+    const client = new NicoliveClient();
+
+    // don't await
+    const result = expect(client.createProgram()).resolves.toBe('CREATED');
+    mock.browserWindow.loadURL(`https://live.nicovideo.jp/watch/${programID}`);
+    await result;
+    expect(mock.browserWindow.removeMenu).toHaveBeenCalled();
   });
 
   test('createProgramで番組ページへ遷移すると番組を作成したことになる', async () => {
@@ -351,6 +365,18 @@ describe('webviews', () => {
 
     await result;
     expect(mock.browserWindow.close).toHaveBeenCalled();
+  });
+
+  test('editProgramでremoveMenuが呼ばれる', async () => {
+    const mock = setupMock();
+
+    const { NicoliveClient } = require('./NicoliveClient');
+    const client = new NicoliveClient();
+
+    const result = expect(client.editProgram(programID)).resolves.toBe('EDITED');
+    mock.browserWindow.loadURL(`https://live.nicovideo.jp/watch/${programID}`);
+    await result;
+    expect(mock.browserWindow.removeMenu).toHaveBeenCalled();
   });
 
   test('editProgramで番組ページへ遷移すると番組を作成したことになる', async () => {
