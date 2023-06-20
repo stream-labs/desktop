@@ -30,6 +30,7 @@ export interface ISceneItemModel extends ISceneItemSettings, ISceneNodeModel {
  */
 export interface ISceneItemSettings {
   transform: ITransform;
+  readonly position?: IVec2;
   visible: boolean;
   locked: boolean;
   streamVisible: boolean;
