@@ -25,6 +25,8 @@ class GoLiveSettingsState extends StreamInfoView<IGoLiveSettingsState> {
     ...this.savedSettings,
   };
 
+  isUpdating: boolean;
+
   get settings(): IGoLiveSettingsState {
     return this.state;
   }
@@ -65,6 +67,41 @@ class GoLiveSettingsState extends StreamInfoView<IGoLiveSettingsState> {
     customDestinations[destInd].enabled = enabled;
     this.updateSettings({ customDestinations });
   }
+
+  /**
+   * Show/hide custom ingest destination card in go live window
+   */
+  toggleDestination(index: number, enabled: boolean) {
+    // this timeout is to allow for the toggle animation
+    setTimeout(() => this.switchCustomDestination(index, enabled), 500);
+  }
+
+  /**
+   * Get platform enabled status
+   */
+  isEnabled(platform: TPlatform) {
+    return this.enabledPlatforms.includes(platform);
+  }
+
+  /**
+   * Show/hide platform card in go live window
+   */
+  togglePlatform(platform: TPlatform, enabled: boolean) {
+    const platforms = enabled
+      ? [...this.enabledPlatforms, platform]
+      : this.enabledPlatforms.filter((p: TPlatform) => p !== platform);
+
+    // set timeout and loading status for toggle and settings animations
+    this.isUpdating = true;
+    this.updatePlatform(platform, { enabled });
+    setTimeout(() => {
+      this.switchPlatforms(platforms);
+      this.isUpdating = false;
+    }, 250);
+
+    return platforms;
+  }
+
   /**
    * Switch Advanced or Simple mode
    */
@@ -97,7 +134,7 @@ class GoLiveSettingsState extends StreamInfoView<IGoLiveSettingsState> {
 
   get isLoading() {
     const state = this.state;
-    return state.needPrepopulate || this.getViewFromState(state).isLoading;
+    return state.needPrepopulate || this.getViewFromState(state).isLoading || this.isUpdating;
   }
 
   getView() {
@@ -165,6 +202,9 @@ export class GoLiveSettingsModule {
     this.state.updateSettings(settings);
   }
 
+  /**
+   * Get go live settings
+   */
   getSettings() {
     return this.state.settings;
   }

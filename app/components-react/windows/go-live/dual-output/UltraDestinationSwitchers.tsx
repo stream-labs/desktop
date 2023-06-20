@@ -10,7 +10,6 @@ import PlatformLogo from 'components-react/shared/PlatformLogo';
 import InfoBadge from 'components-react/shared/InfoBadge';
 import DisplaySelector from 'components-react/shared/DisplaySelector';
 import { assertIsDefined } from 'util/properties-type-guards';
-import { useDebounce } from 'components-react/hooks';
 import { useGoLiveSettings } from '../useGoLiveSettings';
 import { alertAsync } from 'components-react/modals';
 import Translate from 'components-react/shared/Translate';
@@ -27,36 +26,14 @@ export function UltraDestinationSwitchers(p: IUltraDestinationSwitchers) {
     enabledPlatforms,
     linkedPlatforms,
     customDestinations,
-    switchPlatforms,
-    switchCustomDestination,
+    toggleDestination,
+    togglePlatform,
     isPrimaryPlatform,
-    componentView,
+    isEnabled,
   } = useGoLiveSettings();
   const enabledPlatformsRef = useRef(enabledPlatforms);
   enabledPlatformsRef.current = enabledPlatforms;
 
-  const emitSwitch = useDebounce(500, (setPlatforms?: boolean) => {
-    if (setPlatforms) {
-      switchPlatforms(enabledPlatformsRef.current);
-    }
-  });
-
-  function isEnabled(platform: TPlatform) {
-    return enabledPlatformsRef.current.includes(platform);
-  }
-
-  function togglePlatform(platform: TPlatform, enabled: boolean) {
-    enabledPlatformsRef.current = enabledPlatformsRef.current.filter(
-      (p: TPlatform) => p !== platform,
-    );
-    if (enabled) enabledPlatformsRef.current.push(platform);
-    emitSwitch(true);
-  }
-
-  function toggleDestination(index: number, enabled: boolean) {
-    // this timeout is to allow for the toggle animation
-    setTimeout(() => switchCustomDestination(index, enabled), 500);
-  }
   return (
     <>
       <InfoBadge
@@ -72,7 +49,12 @@ export function UltraDestinationSwitchers(p: IUltraDestinationSwitchers) {
           key={platform}
           destination={platform}
           enabled={isEnabled(platform)}
-          onChange={enabled => togglePlatform(platform, enabled)}
+          onChange={enabled => {
+            // timeout to allow for switch animation
+            setTimeout(() => {
+              enabledPlatformsRef.current = togglePlatform(platform, enabled);
+            }, 500);
+          }}
           isPrimary={isPrimaryPlatform(platform)}
         />
       ))}

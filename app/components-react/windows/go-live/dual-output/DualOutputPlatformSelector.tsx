@@ -12,7 +12,7 @@ import cx from 'classnames';
 const { Option } = Select;
 
 interface IPlatformSelectorProps {
-  togglePlatform: (platform: TPlatform) => void;
+  showSwitcher: (platform: TPlatform) => void;
   switchDestination: (index: number) => void;
 }
 
@@ -21,19 +21,19 @@ interface IPlatformSelectorProps {
  */
 
 export default function DualOutputPlatformSelector(p: IPlatformSelectorProps) {
-  const { linkedPlatforms, enabledPlatforms, customDestinations } = useGoLiveSettings();
-  const enabledPlatformsRef = useRef<TPlatform[]>(enabledPlatforms);
-  enabledPlatformsRef.current = enabledPlatforms;
+  const {
+    linkedPlatforms,
+    enabledPlatforms,
+    customDestinations,
+    isEnabled,
+    togglePlatform,
+  } = useGoLiveSettings();
 
   function showStreamSettings() {
     Services.SettingsService.actions.showSettings('Stream');
   }
 
-  function isEnabled(platform: TPlatform) {
-    return enabledPlatforms.includes(platform);
-  }
-
-  function formatOptions() {
+  const options = useMemo(() => {
     const platforms = linkedPlatforms
       .filter(platform => !isEnabled(platform as TPlatform))
       .map(platform => ({
@@ -64,10 +64,6 @@ export default function DualOutputPlatformSelector(p: IPlatformSelectorProps) {
       }));
 
     return platforms.concat(destinations);
-  }
-
-  const options = useMemo(() => {
-    return formatOptions();
   }, [linkedPlatforms, enabledPlatforms, customDestinations]);
 
   // The first value of the selector does not change
@@ -94,10 +90,8 @@ export default function DualOutputPlatformSelector(p: IPlatformSelectorProps) {
         } else {
           // add destination to switchers
           if (linkedPlatforms.includes(option.value as TPlatform)) {
-            p?.togglePlatform(option.value as TPlatform);
-            enabledPlatformsRef.current = enabledPlatformsRef.current.filter(
-              platform => platform !== option.value,
-            );
+            p.showSwitcher(option.value as TPlatform);
+            togglePlatform(option.value as TPlatform, true);
           } else {
             customDestinations.forEach((destination: ICustomStreamDestination, index: number) => {
               if (destination.name === option.value) {
