@@ -89,6 +89,8 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
     id: string;
     name: string;
     type: TSourceType;
+    width: number;
+    height: number;
     channel?: number;
     isTemporary?: boolean;
     propertiesManagerType?: TPropertiesManager;
@@ -108,8 +110,8 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
       doNotDuplicate: false,
 
       // Unscaled width and height
-      width: 0,
-      height: 0,
+      width: addOptions.width,
+      height: addOptions.height,
 
       muted: false,
       resourceId: 'Source' + JSON.stringify([id]),
@@ -169,6 +171,8 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
       id,
       name,
       type,
+      width: obsInput.width,
+      height: obsInput.height,
       channel: options.channel,
       isTemporary: options.isTemporary,
       propertiesManagerType: managerType,
