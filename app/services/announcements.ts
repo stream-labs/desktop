@@ -1,4 +1,4 @@
-import { PersistentStatefulService, mutation, InitAfter } from 'services/core/index';
+import { PersistentStatefulService, mutation, InitAfter, ViewHandler } from 'services/core/index';
 import { UserService } from './user';
 import { HostsService } from './hosts';
 import { Inject, Service } from 'services';
@@ -35,6 +35,12 @@ interface IAnnouncementsServiceState {
   lastReadId: number;
 }
 
+class AnnouncementsServiceViews extends ViewHandler<IAnnouncementsServiceState> {
+  get banner() {
+    return this.state.banner;
+  }
+}
+
 @InitAfter('UserService')
 export class AnnouncementsService extends PersistentStatefulService<IAnnouncementsServiceState> {
   @Inject() private hostsService: HostsService;
@@ -49,16 +55,20 @@ export class AnnouncementsService extends PersistentStatefulService<IAnnouncemen
   static defaultState: IAnnouncementsServiceState = {
     news: [],
     lastReadId: 145,
-    banner: {} as IAnnouncementsInfo,
+    banner: null,
   };
 
   static filter(state: IAnnouncementsServiceState) {
-    return { ...state, news: [] as IAnnouncementsInfo[], banner: {} };
+    return { ...state, news: [] as IAnnouncementsInfo[], banner: null as IAnnouncementsInfo };
   }
 
   init() {
     super.init();
     this.userService.userLogin.subscribe(() => this.fetchLatestNews());
+  }
+
+  get views() {
+    return new AnnouncementsServiceViews(this.state);
   }
 
   get bannersExist() {
@@ -71,12 +81,17 @@ export class AnnouncementsService extends PersistentStatefulService<IAnnouncemen
   }
 
   async getBanner() {
-    this.SET_BANNER(await this.fetchBanner());
+    console.log(await this.fetchBanner());
+    // this.SET_BANNER(await this.fetchBanner());
   }
 
   seenNews() {
     if (!this.bannersExist) return;
     this.SET_LATEST_READ(this.state.news[0].id);
+  }
+
+  clearBanner() {
+    this.SET_BANNER(null);
   }
 
   private get installDateProxyFilePath() {
@@ -213,7 +228,7 @@ export class AnnouncementsService extends PersistentStatefulService<IAnnouncemen
   }
 
   @mutation()
-  SET_BANNER(banner: IAnnouncementsInfo) {
+  SET_BANNER(banner: IAnnouncementsInfo | null) {
     this.state.banner = banner;
   }
 

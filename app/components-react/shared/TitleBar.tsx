@@ -9,6 +9,7 @@ import Utils from '../../services/utils';
 import KevinSvg from './KevinSvg';
 import styles from './TitleBar.m.less';
 import * as remote from '@electron/remote';
+import Banner from 'components-react/root/Banner';
 
 export default function TitleBar(props: { windowId: string }) {
   const { CustomizationService, StreamingService, WindowsService } = Services;
@@ -87,6 +88,7 @@ export default function TitleBar(props: { windowId: string }) {
           <i className={cx('icon-close', styles.titlebarAction)} onClick={close} />
         </div>
       )}
+      <Banner />
     </div>
   );
 }
