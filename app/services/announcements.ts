@@ -24,15 +24,19 @@ export interface IAnnouncementsInfo {
   thumbnail: string;
   link: string;
   linkTarget: 'external' | 'slobs';
+  type: 0 | 1;
   params?: { [key: string]: string };
   closeOnLink?: boolean;
 }
 
-@InitAfter('UserService')
-export class AnnouncementsService extends PersistentStatefulService<{
+interface IAnnouncementsServiceState {
   news: IAnnouncementsInfo[];
+  banner: IAnnouncementsInfo;
   lastReadId: number;
-}> {
+}
+
+@InitAfter('UserService')
+export class AnnouncementsService extends PersistentStatefulService<IAnnouncementsServiceState> {
   @Inject() private hostsService: HostsService;
   @Inject() private userService: UserService;
   @Inject() private appService: AppService;
@@ -42,13 +46,14 @@ export class AnnouncementsService extends PersistentStatefulService<{
   @Inject() private jsonrpcService: JsonrpcService;
   @Inject() private windowsService: WindowsService;
 
-  static defaultState: { news: IAnnouncementsInfo[]; lastReadId: number } = {
+  static defaultState: IAnnouncementsServiceState = {
     news: [],
     lastReadId: 145,
+    banner: {} as IAnnouncementsInfo,
   };
 
-  static filter(state: { news: IAnnouncementsInfo[]; lastReadId: number }) {
-    return { ...state, news: [] as IAnnouncementsInfo[] };
+  static filter(state: IAnnouncementsServiceState) {
+    return { ...state, news: [] as IAnnouncementsInfo[], banner: {} };
   }
 
   init() {
@@ -62,7 +67,11 @@ export class AnnouncementsService extends PersistentStatefulService<{
 
   async getNews() {
     if (this.bannersExist) return;
-    this.SET_BANNER(await this.fetchNews());
+    this.SET_NEWS(await this.fetchNews());
+  }
+
+  async getBanner() {
+    this.SET_BANNER(await this.fetchBanner());
   }
 
   seenNews() {
@@ -161,6 +170,20 @@ export class AnnouncementsService extends PersistentStatefulService<{
     }
   }
 
+  private async fetchBanner() {
+    const endpoint = `api/v5/slobs/announcement/get?clientId=${this.userService.getLocalUserId()}&locale=${
+      this.i18nService.state.locale
+    }`;
+    const req = this.formRequest(endpoint);
+
+    try {
+      const newState = await jfetch<IAnnouncementsInfo[]>(req);
+      return newState[0];
+    } catch (e: unknown) {
+      return null;
+    }
+  }
+
   private formRequest(endpoint: string, options: any = {}) {
     const host = this.hostsService.streamlabs;
     const headers = authorizedHeaders(this.userService.apiToken, options.headers);
@@ -180,13 +203,18 @@ export class AnnouncementsService extends PersistentStatefulService<{
   }
 
   @mutation()
-  SET_BANNER(banners: IAnnouncementsInfo[]) {
-    this.state.news = banners;
+  SET_NEWS(news: IAnnouncementsInfo[]) {
+    this.state.news = news;
   }
 
   @mutation()
-  CLEAR_BANNER() {
-    this.state = AnnouncementsService.initialState;
+  CLEAR_NEWS() {
+    this.state = AnnouncementsService.defaultState;
+  }
+
+  @mutation()
+  SET_BANNER(banner: IAnnouncementsInfo) {
+    this.state.banner = banner;
   }
 
   @mutation()
