@@ -183,6 +183,17 @@ class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
     return Object.values(this.sceneNodeMaps[sceneId]);
   }
 
+  getMissingSelectionNodeIds(nodeIds: string[], sceneId?: string) {
+    return nodeIds.reduce((missingNodeIds: string[], nodeId) => {
+      const matchingNodeId =
+        this.getVerticalNodeId(nodeId, sceneId) ?? this.getHorizontalNodeId(nodeId, sceneId);
+      if (matchingNodeId && !nodeIds.includes(matchingNodeId)) {
+        missingNodeIds.push(matchingNodeId);
+      }
+      return missingNodeIds;
+    }, []);
+  }
+
   getNodeDisplay(nodeId: string, sceneId: string) {
     const sceneNodeMap = sceneId ? this.sceneNodeMaps[sceneId] : this.activeSceneNodeMap;
 
@@ -355,8 +366,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
       'CopyNodesCommand',
       this.scenesService.views.getScene(sceneToMapId).getSelection(nodes),
       sceneToMapId,
-      this.views.activeSceneId,
-      true,
+      false,
       'vertical',
     );
     this.setIsCollectionOrSceneLoading(false);

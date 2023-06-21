@@ -2,19 +2,26 @@ import { Command } from './command';
 import { Selection } from 'services/selection';
 import { Inject } from 'services/core';
 import { ScenesService, TSceneNode } from 'services/scenes';
-import { TDisplayType, VideoSettingsService } from 'services/settings-v2';
-import { SceneCollectionsService } from 'services/scene-collections';
-import { DualOutputService } from 'services/dual-output';
-import { EditorService } from 'services/editor';
 import compact from 'lodash/compact';
 import { $t } from 'services/i18n';
+import { DualOutputService } from 'services/dual-output';
+import { TDisplayType, VideoSettingsService } from 'services/settings-v2';
+import { EditorService } from 'services/editor';
+import { SceneCollectionsService } from 'services/scene-collections';
 
+/**
+ * The copy nodes editor command has small variations when working with:
+ *  - a vanilla scene
+ *  - a dual output scene
+ *  - migrating a vanilla scene to a dual output scene
+ * To maximize readability, the code for this is not very DRY.
+ */
 export class CopyNodesCommand extends Command {
   @Inject() scenesService: ScenesService;
   @Inject() dualOutputService: DualOutputService;
   @Inject() videoSettingsService: VideoSettingsService;
-  @Inject() sceneCollectionsService: SceneCollectionsService;
   @Inject() editorService: EditorService;
+  @Inject() sceneCollectionsService: SceneCollectionsService;
 
   description: string;
 
@@ -30,10 +37,11 @@ export class CopyNodesCommand extends Command {
    */
   private nodeIdsMap: Dictionary<string> = {};
 
+  private hasNodeMap: boolean;
+
   constructor(
     private selection: Selection,
     private destSceneId: string,
-    private origSceneId?: string,
     private duplicateSources = false,
     private display?: TDisplayType,
   ) {
@@ -41,6 +49,7 @@ export class CopyNodesCommand extends Command {
     this.selection.freeze();
     const nodes = this.selection.getNodes();
     this.description = $t('Paste %{nodeName}', { nodeName: nodes[0] ? nodes[0].name : '' });
+    this.hasNodeMap = this.dualOutputService.views.hasNodeMap(this.selection.sceneId);
   }
 
   execute() {
@@ -49,7 +58,7 @@ export class CopyNodesCommand extends Command {
 
     const initialNodeOrder = scene.getNodesIds();
 
-    const hasNodeMap = this.dualOutputService.views.hasNodeMap(scene.id);
+    const isDualOutputMode = this.dualOutputService.views.dualOutputMode;
 
     // Duplicate necessary sources if needed
     if (this.duplicateSources) {
@@ -64,51 +73,108 @@ export class CopyNodesCommand extends Command {
       });
     }
 
-    // Create all nodes first
-    this.selection.getNodes().forEach(node => {
-      if (node.isFolder()) {
-        const folder = scene.createFolder(node.name, { id: this.nodeIdsMap[node.id] });
-        this.nodeIdsMap[node.id] = folder.id;
-        const display =
-          this.display ?? this.dualOutputService.views.getNodeDisplay(node.id, this.origSceneId);
-        folder.setDisplay(display);
+    if (isDualOutputMode && !this.hasNodeMap) {
+      // if the scene does not already have a node map it is a vanilla scene
+      // if it's dual output mode, copy all of the nodes and create a scene node map
+      // to migrate the vanilla scene to a dual output scene
 
-        if (this.display === 'vertical' || (hasNodeMap && display === 'horizontal')) {
-          // when creating dual output nodes for a vanilla scene, the passed in display is set to vertical
-          // if the scene has dual output nodes, add a node map entry only when copying a horizontal node
-          this.sceneCollectionsService.createNodeMapEntry(this.destSceneId, node.id, folder.id);
-        }
-        insertedNodes.push(folder);
-      } else {
-        const sourceId =
-          this.sourceIdsMap != null ? this.sourceIdsMap[node.sourceId] : node.sourceId;
+      // Create all nodes first
+      this.selection.getNodes().forEach(node => {
+        if (node.isFolder()) {
+          // add folder
+          const folder = scene.createFolder(node.name, { id: this.nodeIdsMap[node.id] });
+          this.nodeIdsMap[node.id] = folder.id;
 
-        const item = scene.addSource(sourceId, { id: this.nodeIdsMap[node.id] });
-        const display =
-          this.display ?? this.dualOutputService.views.getNodeDisplay(node.id, this.origSceneId);
-        const context = this.videoSettingsService.contexts[display];
-        item.setSettings({ ...node.getSettings(), output: context, display });
+          // assign display
+          const display =
+            this.display ??
+            this.dualOutputService.views.getNodeDisplay(node.id, this.selection.sceneId);
 
-        if (this.display === 'vertical' || (hasNodeMap && display === 'horizontal')) {
-          if (item.type === 'game_capture') {
-            // to prevent scaling of the game capture in the vertical display
-            // set the initial scale based off of the horizontal display values
-            item.setScale(this.editorService.calculateVerticalScale());
+          folder.setDisplay(display);
+          // if needed, create node map entry
+          if (this.display === 'vertical') {
+            // when creating dual output nodes for a vanilla scene, the passed in display is set to vertical
+            // if the scene has dual output nodes, add a node map entry only when copying a horizontal node
+            this.sceneCollectionsService.createNodeMapEntry(this.destSceneId, node.id, folder.id);
           }
 
-          // position all of the nodes in the upper left corner of the vertical display
-          // so that all of the sources are visible
-          item.setTransform({ position: { x: 0, y: 0 } });
+          this.nodeIdsMap[node.id] = folder.id;
+          insertedNodes.push(folder);
+        } else {
+          // add item
+          const sourceId =
+            this.sourceIdsMap != null ? this.sourceIdsMap[node.sourceId] : node.sourceId;
+          const item = scene.addSource(sourceId, { id: this.nodeIdsMap[node.id] });
 
-          // when creating dual output scene nodes, the passed in display is set to vertical
-          // if the scene has dual output nodes, add a node map entry only when copying a horizontal node
-          this.sceneCollectionsService.createNodeMapEntry(this.destSceneId, node.id, item.id);
+          // assign context and display
+          const display =
+            this.display ??
+            this.dualOutputService.views.getNodeDisplay(node.id, this.selection.sceneId);
+          const context = this.videoSettingsService.contexts[display];
+          item.setSettings({ ...node.getSettings(), output: context, display });
+
+          // if needed, create node map entry
+          if (this.display === 'vertical') {
+            if (item.type === 'game_capture') {
+              // to prevent scaling of the game capture in the vertical display
+              // set the initial scale based off of the horizontal display values
+              item.setScale(this.editorService.calculateVerticalScale());
+            }
+
+            // position all of the nodes in the upper left corner of the vertical display
+            // so that all of the sources are visible
+            item.setTransform({ position: { x: 0, y: 0 } });
+
+            // when creating dual output scene nodes, the passed in display is set to vertical
+            // if the scene has dual output nodes, add a node map entry only when copying a horizontal node
+            this.sceneCollectionsService.createNodeMapEntry(this.destSceneId, node.id, item.id);
+          }
+
+          // add to arrays for reordering
+          this.nodeIdsMap[node.id] = item.id;
+          insertedNodes.push(item);
         }
+      });
 
-        this.nodeIdsMap[node.id] = item.id;
-        insertedNodes.push(item);
-      }
-    });
+      this.hasNodeMap = true;
+    } else {
+      // otherwise, just copy all of the nodes without creating a node map
+      // the node map for dual output scenes will be handled when reordering the nodes
+
+      // in dual output mode, the user can select horizontal and vertical nodes independent of each other
+      // so confirm if dual output nodes should be included
+      this.selection.getNodes(isDualOutputMode).forEach(node => {
+        if (node.isFolder()) {
+          // add folder
+          const folder = scene.createFolder(node.name, { id: this.nodeIdsMap[node.id] });
+
+          // assign display
+          const display =
+            this.display ??
+            this.dualOutputService.views.getNodeDisplay(node.id, this.selection.sceneId);
+          folder.setDisplay(display);
+
+          this.nodeIdsMap[node.id] = folder.id;
+          insertedNodes.push(folder);
+        } else {
+          // add item
+          const sourceId =
+            this.sourceIdsMap != null ? this.sourceIdsMap[node.sourceId] : node.sourceId;
+          const item = scene.addSource(sourceId, { id: this.nodeIdsMap[node.id] });
+
+          // assign context and display
+          const display =
+            this.display ??
+            this.dualOutputService.views.getNodeDisplay(node.id, this.selection.sceneId);
+          const context = this.videoSettingsService.contexts[display];
+          item.setSettings({ ...node.getSettings(), output: context, display });
+
+          // add to arrays for reordering
+          this.nodeIdsMap[node.id] = item.id;
+          insertedNodes.push(item);
+        }
+      });
+    }
 
     // Recreate parent/child relationships
     this.selection.getNodes().forEach(node => {
@@ -124,30 +190,44 @@ export class CopyNodesCommand extends Command {
 
     // Recreate node order
     // Selection does not have canonical node order - scene does
-    const order = compact(
-      this.selection
-        .getScene()
-        .getNodesIds()
-        .map(origNodeId => {
-          if (
-            this.dualOutputService.views.getNodeDisplay(origNodeId, this.origSceneId) ===
-            'horizontal'
-          ) {
-            // determine if node is horizontal in original scene and get vertical node
-            const origVerticalNodeId = this.dualOutputService.views.getVerticalNodeId(origNodeId);
-            const newHorizontalNodeId = this.nodeIdsMap[origNodeId];
-            const newVerticalNodeId = this.nodeIdsMap[origVerticalNodeId];
+    if (this.hasNodeMap) {
+      // for dual output scenes, create node map while reordering nodes
+      const order = compact(
+        this.selection
+          .getScene()
+          .getNodesIds()
+          .map(origNodeId => {
+            if (
+              this.dualOutputService.views.getNodeDisplay(origNodeId, this.selection.sceneId) ===
+              'horizontal'
+            ) {
+              // determine if node is horizontal in original scene and get vertical node
+              const origVerticalNodeId = this.dualOutputService.views.getVerticalNodeId(
+                origNodeId,
+                this.selection.sceneId,
+              );
+              const newHorizontalNodeId = this.nodeIdsMap[origNodeId];
+              const newVerticalNodeId = this.nodeIdsMap[origVerticalNodeId];
 
-            this.sceneCollectionsService.createNodeMapEntry(
-              scene.id,
-              newHorizontalNodeId,
-              newVerticalNodeId,
-            );
-          }
-          return this.nodeIdsMap[origNodeId];
-        }),
-    );
-    scene.setNodesOrder(order.concat(initialNodeOrder));
+              this.sceneCollectionsService.createNodeMapEntry(
+                this.destSceneId,
+                newHorizontalNodeId,
+                newVerticalNodeId,
+              );
+            }
+            return this.nodeIdsMap[origNodeId];
+          }),
+      );
+      scene.setNodesOrder(order.concat(initialNodeOrder));
+    } else {
+      const order = compact(
+        this.selection
+          .getScene()
+          .getNodesIds()
+          .map(origNodeId => this.nodeIdsMap[origNodeId]),
+      );
+      scene.setNodesOrder(order.concat(initialNodeOrder));
+    }
 
     return insertedNodes;
   }

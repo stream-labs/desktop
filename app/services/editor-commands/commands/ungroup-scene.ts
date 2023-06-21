@@ -38,11 +38,7 @@ export class UngroupSceneCommand extends Command {
 
     this.copyNodesSubcommand =
       this.copyNodesSubcommand ||
-      new CopyNodesCommand(
-        sourceScene.getSelection().selectAll(),
-        this.destSceneId,
-        sourceScene.id,
-      );
+      new CopyNodesCommand(sourceScene.getSelection().selectAll(), this.destSceneId);
     this.copyNodesSubcommand.execute();
 
     this.removeItemSubcommand = this.removeItemSubcommand || new RemoveItemCommand(sourceItem.id);

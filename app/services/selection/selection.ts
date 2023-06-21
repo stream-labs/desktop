@@ -19,6 +19,7 @@ import { EDeinterlaceFieldOrder, EDeinterlaceMode, Source } from 'services/sourc
 import { Rect } from 'util/rect';
 import { AnchorPoint, AnchorPositions, CenteringAxis } from 'util/ScalableRectangle';
 import { ISelectionState, TNodesList } from './index';
+import { DualOutputService } from 'services/dual-output';
 
 /**
  * Helper for working with multiple sceneItems
@@ -26,6 +27,7 @@ import { ISelectionState, TNodesList } from './index';
 @ServiceHelper('SelectionService')
 export class Selection {
   @Inject() scenesService: ScenesService;
+  @Inject() dualOutputService: DualOutputService;
 
   _resourceId: string;
 
@@ -39,6 +41,7 @@ export class Selection {
   private _state: ISelectionState = {
     selectedIds: [],
     lastSelectedId: '',
+    missingDualOutputNodeIds: [],
   };
 
   protected get state() {
@@ -93,6 +96,18 @@ export class Selection {
       selectedIds.push(...(node as SceneItemFolder).getNestedNodesIds());
     });
 
+    if (this.dualOutputService.views.dualOutputMode) {
+      // in dual output mode, the user can select horizontal and vertical nodes independently of each other
+      // so confirm or add the corresponding node
+      const missingNodeIds: string[] = this.dualOutputService.views.getMissingSelectionNodeIds(
+        selectedIds,
+        this.sceneId,
+      );
+      if (missingNodeIds) {
+        this.setState({ missingDualOutputNodeIds: missingNodeIds });
+      }
+    }
+
     this.setState({ selectedIds });
 
     if (!this.state.selectedIds.includes(this.state.lastSelectedId)) {
@@ -131,10 +146,16 @@ export class Selection {
   /**
    * return nodes with the order as in the scene
    */
-  getNodes(): TSceneNode[] {
+  getNodes(includeDualOutputNodes?: boolean): TSceneNode[] {
     const scene = this.getScene();
     if (!this.getSize()) return [];
-    return scene.getNodes().filter(node => this.state.selectedIds.includes(node.id));
+
+    const nodes = scene.getNodes();
+    const ids = includeDualOutputNodes
+      ? this.state.selectedIds.concat(this.state.missingDualOutputNodeIds)
+      : this.state.selectedIds;
+
+    return nodes.filter(node => ids.includes(node.id));
   }
 
   /**
