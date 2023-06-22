@@ -70,6 +70,9 @@ export class NicoliveCommentFilterService extends StatefulService<INicoliveComme
   }
 
   async fetchFilters() {
+    if (process.env.DEV_SERVER) {
+      return;
+    }
     const result = await this.client.fetchFilters(this.programID);
     if (!isOk(result)) {
       throw NicoliveFailure.fromClientError('fetchFilters', result);
@@ -79,6 +82,9 @@ export class NicoliveCommentFilterService extends StatefulService<INicoliveComme
   }
 
   async addFilter(record: AddFilterRecord) {
+    if (process.env.DEV_SERVER) {
+      return;
+    }
     const result = await this.client.addFilters(this.programID, [record]);
     if (!isOk(result)) {
       throw NicoliveFailure.fromClientError('addFilters', result);
@@ -87,6 +93,9 @@ export class NicoliveCommentFilterService extends StatefulService<INicoliveComme
   }
 
   async deleteFilters(ids: number[]) {
+    if (process.env.DEV_SERVER) {
+      return;
+    }
     const result = await this.client.deleteFilters(this.programID, ids);
     if (!isOk(result)) {
       throw NicoliveFailure.fromClientError('deleteFilters', result);

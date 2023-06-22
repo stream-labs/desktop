@@ -62,6 +62,9 @@ export class NiconicoService extends Service implements IPlatformService {
   client: NicoliveClient = new NicoliveClient();
 
   async getUserId(): Promise<string> {
+    if (process.env.DEV_SERVER) {
+      return '19208'; // dummy user ID
+    }
     const url = `${this.hostsService.niconicoAccount}/api/public/v1/user/id.json`;
     const request = new Request(url, { credentials: 'same-origin' });
 
