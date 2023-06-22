@@ -16,8 +16,6 @@ import { TcpServerService } from './api/tcp-server';
 import { Subject } from 'rxjs';
 import { TDisplayType, VideoSettingsService } from './settings-v2';
 
-// @@REUSE: MAGIC
-
 // Examine scene items props
 // Examine second set of scene items for dual output
 interface IResizeRegion {
@@ -316,6 +314,8 @@ export class EditorService extends StatefulService<IEditorServiceState> {
   crop(x: number, y: number, options: IResizeOptions) {
     const source = this.resizeRegion.item;
     const rect = new ScalableRectangle(source.rectangle);
+    // const itemX = source.type === 'game_capture' ? source.size.x : x;
+    // const itemY = source.type === 'game_capture' ? source.size.y : y;
 
     rect.normalized(() => {
       rect.withAnchor(options.anchor, () => {
@@ -324,6 +324,8 @@ export class EditorService extends StatefulService<IEditorServiceState> {
           case AnchorPoint.East: {
             const croppableWidth = rect.width - rect.crop.right - 2;
             const distance = croppableWidth * rect.scaleX - (rect.x - x);
+
+            // const distance = croppableWidth * rect.scaleX - (rect.x - itemX);
             rect.crop.left = Math.round(clamp(distance / rect.scaleX, 0, croppableWidth));
             break;
           }
@@ -331,6 +333,8 @@ export class EditorService extends StatefulService<IEditorServiceState> {
           case AnchorPoint.West: {
             const croppableWidth = rect.width - rect.crop.left - 2;
             const distance = croppableWidth * rect.scaleX + (rect.x - x);
+
+            // const distance = croppableWidth * rect.scaleX + (rect.x - itemX);
             rect.crop.right = Math.round(clamp(distance / rect.scaleX, 0, croppableWidth));
             break;
           }
@@ -338,6 +342,8 @@ export class EditorService extends StatefulService<IEditorServiceState> {
           case AnchorPoint.South: {
             const croppableHeight = rect.height - rect.crop.bottom - 2;
             const distance = croppableHeight * rect.scaleY - (rect.y - y);
+
+            // const distance = croppableHeight * rect.scaleY - (rect.y - itemY);
             rect.crop.top = Math.round(clamp(distance / rect.scaleY, 0, croppableHeight));
             break;
           }
@@ -345,6 +351,8 @@ export class EditorService extends StatefulService<IEditorServiceState> {
           case AnchorPoint.North: {
             const croppableHeight = rect.height - rect.crop.top - 2;
             const distance = croppableHeight * rect.scaleY + (rect.y - y);
+
+            // const distance = croppableHeight * rect.scaleY + (rect.y - itemY);
             rect.crop.bottom = Math.round(clamp(distance / rect.scaleY, 0, croppableHeight));
             break;
           }
@@ -502,9 +510,12 @@ export class EditorService extends StatefulService<IEditorServiceState> {
    */
   isOverSource(event: IMouseEvent, source: SceneItem) {
     if (event.display !== source.display) return false;
+    console.log('source.rectangle ', source.rectangle);
     const rect = new ScalableRectangle(source.rectangle);
     rect.normalize();
 
+    // const scaledWidth = source.display !== 'vertical' ? rect.scaledWidth : source.size.x;
+    // const scaledHeight = source.display !== 'vertical' ? rect.scaledHeight : source.size.y;
     return this.isOverBox(event, rect.x, rect.y, rect.scaledWidth, rect.scaledHeight);
   }
 
@@ -522,6 +533,7 @@ export class EditorService extends StatefulService<IEditorServiceState> {
   isOverResize(event: IMouseEvent) {
     if (this.activeSources.length > 0) {
       return this.resizeRegions.find(region => {
+        console.log('region ', region);
         if (event.display !== region.item.display) return false;
         return this.isOverBox(event, region.x, region.y, region.width, region.height);
       });
@@ -551,15 +563,13 @@ export class EditorService extends StatefulService<IEditorServiceState> {
 
   // calculates the scale of sources for the vertical display
   // so elements retain the same proportions as the horizontal display
-  calculateVerticalScale() {
-    const horizontalWidth = this.renderedWidths.horizontal;
-    const verticalWidth = this.renderedWidths.vertical;
-    const horizontalHeight = this.renderedHeights.horizontal;
-    const verticalHeight = this.renderedHeights.vertical;
-
-    const x = Math.max(horizontalWidth, verticalWidth) / Math.min(horizontalWidth, verticalWidth);
+  calculateVerticalScale(itemSize: IVec2) {
+    const x =
+      Math.max(this.renderedWidths.horizontal, itemSize.x) /
+      Math.min(this.renderedWidths.horizontal, itemSize.x);
     const y =
-      Math.max(horizontalHeight, verticalHeight) / Math.min(horizontalHeight, verticalHeight);
+      Math.max(this.renderedHeights.vertical, itemSize.y) /
+      Math.min(this.renderedHeights.vertical, itemSize.y);
     return {
       x,
       y,
@@ -607,11 +617,22 @@ export class EditorService extends StatefulService<IEditorServiceState> {
     const renderedRegionRadius = 5;
     // We don't need to adjust mac coordinates for scale factor
     const factor = byOS({ [OS.Windows]: this.windowsService.state.main.scaleFactor, [OS.Mac]: 1 });
+
+    // const itemX =
+    //   item.type === 'game_capture'
+    //     ? item.size.x
+    //     : this.baseResolutions[item.display ?? 'horizontal'].baseWidth;
+    // const itemY =
+    //   item.type === 'game_capture'
+    //     ? item.size.y
+    //     : this.baseResolutions[item.display ?? 'horizontal'].baseHeight;
+    // const regionRadiusCalc = (renderedRegionRadius * factor * itemX) / itemY;
+    // console.log('calc ', regionRadiusCalc);
     const regionRadius =
       (renderedRegionRadius *
         factor *
         this.baseResolutions[item.display ?? 'horizontal'].baseWidth) /
-      this.renderedWidths[item.display ?? 'horizontal'];
+      this.baseResolutions[item.display ?? 'horizontal'].baseHeight;
     const width = regionRadius * 2;
     const height = regionRadius * 2;
 

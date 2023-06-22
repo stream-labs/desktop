@@ -116,9 +116,13 @@ export class CopyNodesCommand extends Command {
           // if needed, create node map entry
           if (this.display === 'vertical') {
             if (item.type === 'game_capture') {
+              console.log('game capture ', item);
+              console.log('size ', item.size);
+              console.log('position ', item.position);
               // to prevent scaling of the game capture in the vertical display
               // set the initial scale based off of the horizontal display values
-              item.setScale(this.editorService.calculateVerticalScale());
+
+              // item.setScale(this.editorService.calculateVerticalScale(item.size));
             }
 
             // position all of the nodes in the upper left corner of the vertical display

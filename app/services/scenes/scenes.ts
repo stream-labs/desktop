@@ -1,5 +1,4 @@
 import Vue from 'vue';
-import uniqBy from 'lodash/uniqBy';
 import without from 'lodash/without';
 import { Subject } from 'rxjs';
 import { mutation, StatefulService } from 'services/core/stateful-service';
@@ -8,14 +7,13 @@ import { WindowsService } from 'services/windows';
 import { Scene, SceneItem, TSceneNode, EScaleType, EBlendingMode, EBlendingMethod } from './index';
 import { ISource, SourcesService, ISourceAddOptions } from 'services/sources';
 import { Inject } from 'services/core/injector';
-import * as obs from '../../../obs-api';
+import { IVideo, SceneFactory } from '../../../obs-api';
 import { $t } from 'services/i18n';
 import namingHelpers from 'util/NamingHelpers';
 import uuid from 'uuid/v4';
 import { DualOutputService } from 'services/dual-output';
 import { TDisplayType } from 'services/settings-v2/video';
 import { InitAfter, ViewHandler } from 'services/core';
-import { lazyModule } from 'util/lazy-module';
 import { VideoSettingsService } from 'services/settings-v2';
 
 export type TSceneNodeModel = ISceneItem | ISceneItemFolder;
@@ -51,7 +49,7 @@ export interface ISceneItemInfo {
   blendingMode?: EBlendingMode;
   blendingMethod?: EBlendingMethod;
   display?: TDisplayType;
-  output?: obs.IVideo;
+  output?: IVideo;
 }
 
 export interface IScenesState {
@@ -89,7 +87,7 @@ export interface ISceneItemSettings {
   scaleFilter: EScaleType;
   blendingMode: EBlendingMode;
   blendingMethod: EBlendingMethod;
-  output?: obs.IVideo;
+  output?: IVideo;
   display?: TDisplayType;
 }
 
@@ -102,7 +100,7 @@ export interface IPartialSettings {
   scaleFilter?: EScaleType;
   blendingMode?: EBlendingMode;
   blendingMethod?: EBlendingMethod;
-  output?: obs.IVideo; // for obs.ISceneItem, this property is video
+  output?: IVideo; // for obs.ISceneItem, this property is video
   display?: TDisplayType;
 }
 
@@ -114,7 +112,9 @@ export interface ISceneItem extends ISceneItemSettings, ISceneItemNode {
   scaleFilter: EScaleType;
   blendingMode: EBlendingMode;
   blendingMethod: EBlendingMethod;
-  output?: obs.IVideo; // for obs.ISceneItem, this property is video
+  output?: IVideo; // for obs.ISceneItem, this property is video
+  position?: IVec2;
+  size?: IVec2;
 }
 
 export interface ISceneItemActions {
@@ -152,7 +152,7 @@ export interface ISceneItemNode {
   parentId?: string;
   isRemoved?: boolean;
   display?: TDisplayType;
-  output?: obs.IVideo;
+  output?: IVideo;
 }
 
 export interface ISceneItemFolder extends ISceneItemNode {
@@ -310,7 +310,7 @@ export class ScenesService extends StatefulService<IScenesState> {
     // Get an id to identify the scene on the frontend
     const id = options.sceneId || `scene_${uuid()}`;
     this.ADD_SCENE(id, name);
-    const obsScene = obs.SceneFactory.create(id);
+    const obsScene = SceneFactory.create(id);
     this.sourcesService.addSource(obsScene.source, name, { sourceId: id });
 
     if (options.duplicateSourcesFromScene) {

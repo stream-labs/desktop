@@ -193,7 +193,14 @@ export class Scene {
     const context =
       this.videoSettingsService.contexts[display] ?? this.videoSettingsService.contexts.horizontal;
 
-    this.ADD_SOURCE_TO_SCENE(sceneItemId, source.sourceId, obsSceneItem.id, display);
+    this.ADD_SOURCE_TO_SCENE(
+      sceneItemId,
+      source.sourceId,
+      obsSceneItem.id,
+      display,
+      obsSceneItem.position,
+      obsSceneItem.size,
+    );
     const sceneItem = this.getItem(sceneItemId)!;
 
     sceneItem.setSettings({ ...sceneItem.getSettings(), display, output: context });
@@ -410,7 +417,14 @@ export class Scene {
       if (nodeModel.sceneNodeType === 'folder') {
         this.createFolder(nodeModel.name, { id: nodeModel.id });
       } else {
-        this.ADD_SOURCE_TO_SCENE(nodeModel.id, nodeModel.sourceId, obsSceneItem.id, display);
+        this.ADD_SOURCE_TO_SCENE(
+          nodeModel.id,
+          nodeModel.sourceId,
+          obsSceneItem.id,
+          display,
+          obsSceneItem.position,
+          obsSceneItem.size,
+        );
         const item = this.getItem(nodeModel.id)!;
         item.loadItemAttributes(nodeModel);
         itemIndex++;
@@ -527,6 +541,8 @@ export class Scene {
     sourceId: string,
     obsSceneItemId: number,
     display: TDisplayType,
+    position: IVec2,
+    size: IVec2,
   ) {
     this.state.nodes.unshift({
       sceneItemId,
@@ -562,6 +578,8 @@ export class Scene {
       blendingMode: EBlendingMode.Normal,
       blendingMethod: EBlendingMethod.Default,
       display,
+      position,
+      size,
     });
   }
 

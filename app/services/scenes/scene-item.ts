@@ -29,6 +29,7 @@ import { TSceneNodeType } from './scenes';
 import { ServiceHelper, ExecuteInWorkerProcess } from 'services/core';
 import { assertIsDefined } from '../../util/properties-type-guards';
 import { VideoSettingsService, TDisplayType } from 'services/settings-v2';
+import { EditorService } from 'services/editor';
 /**
  * A SceneItem is a source that contains
  * all of the information about that source, and
@@ -66,6 +67,8 @@ export class SceneItem extends SceneItemNode {
 
   output?: obs.IVideo;
   display?: TDisplayType;
+  position: IVec2;
+  size: IVec2;
 
   // Some computed attributes
 
@@ -88,6 +91,7 @@ export class SceneItem extends SceneItemNode {
   @Inject() private sourcesService: SourcesService;
   @Inject() private videoService: VideoService;
   @Inject() private videoSettingsService: VideoSettingsService;
+  @Inject() private editorService: EditorService;
 
   constructor(sceneId: string, sceneItemId: string, sourceId: string) {
     super();
@@ -466,13 +470,30 @@ export class SceneItem extends SceneItemNode {
    * A rectangle representing this sceneItem
    */
   get rectangle(): IScalableRectangle {
+    // console.log('rectangle ', {
+    //   width: this.size.x,
+    //   height: this.size.y,
+    // });
+    // const width = this.type === 'game_capture' ? this.size.x : this.width;
+
+    // const height = this.type === 'game_capture' ? this.size.y : this.height;
+
+    const scale = this.editorService.calculateVerticalScale(this.size);
+    const scaleX = this.type === 'game_capture' ? scale.x : this.transform.scale.x;
+    const scaleY = this.type === 'game_capture' ? scale.y : this.transform.scale.y;
     return {
       x: this.transform.position.x,
       y: this.transform.position.y,
-      scaleX: this.transform.scale.x,
-      scaleY: this.transform.scale.y,
+      // scaleX: this.transform.scale.x,
+      // scaleY: this.transform.scale.y,
+      scaleX,
+      scaleY,
       width: this.width,
       height: this.height,
+      // width: this.size.x,
+      // height: this.size.y,
+      // width,
+      // height,
       crop: this.transform.crop,
       rotation: this.transform.rotation,
     };
