@@ -31,7 +31,7 @@ const loadingStrings = () => [
 
   // Prime Feature Usage
   'Our App Store contains advanced technology to take your stream to the next level.',
-  'With multi-stream, you can stream to YouTube, Twitch, Trovo, and Facebook at the same time.',
+  'With multi-stream, you can stream to YouTube, Trovo, and Facebook at the same time.',
   'You can customize the design of your tip page from the Theme Library.',
 ];
 
