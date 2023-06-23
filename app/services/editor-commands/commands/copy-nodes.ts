@@ -121,6 +121,9 @@ export class CopyNodesCommand extends Command {
             // so that all of the sources are visible
             item.setTransform({ position: { x: 0, y: 0 } });
 
+            // show all vertical scene items by default
+            item.setVisibility(true);
+
             // when creating dual output scene nodes, the passed in display is set to vertical
             // if the scene has dual output nodes, add a node map entry only when copying a horizontal node
             this.sceneCollectionsService.createNodeMapEntry(this.destSceneId, node.id, item.id);
