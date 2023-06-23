@@ -1,5 +1,5 @@
 import React, { CSSProperties, PropsWithChildren, HTMLAttributes } from 'react';
-import { Tooltip } from 'antd';
+import { Tooltip as AntdTooltip } from 'antd';
 import styles from './Tooltip.m.less';
 import cx from 'classnames';
 
@@ -26,14 +26,14 @@ interface ITooltipTipProps {
   content?: HTMLElement | boolean;
 }
 
-export default function ToolTip(props: PropsWithChildren<ITooltipTipProps>) {
+export default function Tooltip(props: PropsWithChildren<ITooltipTipProps>) {
   const { title, className, style, lightShadow, placement = 'bottom', content } = props;
 
   return (
     <div className={cx(styles.tooltipWrapper, className)}>
       <div className={cx(styles.tooltipArrow)} />
       {lightShadow ? (
-        <Tooltip
+        <AntdTooltip
           className={cx(lightShadow && styles.lightShadow)}
           placement={placement}
           title={title}
@@ -42,9 +42,9 @@ export default function ToolTip(props: PropsWithChildren<ITooltipTipProps>) {
         >
           {content}
           {{ ...props }.children}
-        </Tooltip>
+        </AntdTooltip>
       ) : (
-        <Tooltip
+        <AntdTooltip
           className={cx(lightShadow && styles.lightShadow)}
           placement={placement}
           title={title}
@@ -52,7 +52,7 @@ export default function ToolTip(props: PropsWithChildren<ITooltipTipProps>) {
         >
           {content}
           {{ ...props }.children}
-        </Tooltip>
+        </AntdTooltip>
       )}
     </div>
   );
