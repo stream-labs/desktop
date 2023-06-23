@@ -7,7 +7,6 @@ import { StreamSettingsService } from 'services/settings/streaming';
 import { getPlatformService } from 'services/platforms';
 import { TwitchService } from 'services/platforms/twitch';
 import { YoutubeService } from 'app-services';
-import { VideoService } from 'services/video';
 import { VideoSettingsService } from 'services/settings-v2/video';
 import { UserService } from 'services/user';
 
@@ -28,7 +27,6 @@ export interface IConfigProgress {
 export class AutoConfigService extends Service {
   @Inject() streamSettingsService: StreamSettingsService;
   @Inject() videoSettingsService: VideoSettingsService;
-  @Inject() videoService: VideoService;
   @Inject() userService: UserService;
 
   configProgress = new Subject<IConfigProgress>();

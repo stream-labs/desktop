@@ -1171,7 +1171,13 @@ export class StreamingService
 
       if (info.signal === EOBSOutputSignal.Wrote) {
         const filename = NodeObs.OBS_service_getLastRecording();
-        this.recordingModeService.addRecordingEntry(filename);
+        const parsedFilename = byOS({
+          [OS.Mac]: filename,
+          [OS.Windows]: filename.replace(/\//, '\\'),
+        });
+        this.recordingModeService.actions.addRecordingEntry(parsedFilename);
+        this.markersService.actions.exportCsv(parsedFilename);
+        this.recordingModeService.addRecordingEntry(parsedFilename);
         // Wrote signals come after Offline, so we return early here
         // to not falsely set our state out of Offline
         return;

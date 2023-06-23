@@ -214,12 +214,10 @@ export class SceneItem extends SceneNode implements ISceneItemActions, ISceneIte
   }
 
   flipX(): void {
-    // return this.sceneItem.flipX(this.sceneItem.display);
     return this.sceneItem.flipX();
   }
 
   flipY(): void {
-    // return this.sceneItem.flipY(this.sceneItem.display);
     return this.sceneItem.flipY();
   }
 
@@ -257,7 +255,6 @@ export class SceneItem extends SceneNode implements ISceneItemActions, ISceneIte
 
   setContentCrop(): void {
     return this.sceneItem.setContentCrop();
-    // return this.sceneItem.setContentCrop(this.sceneItem.display);
   }
 }
 

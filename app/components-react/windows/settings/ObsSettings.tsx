@@ -1,9 +1,7 @@
 import React, { CSSProperties, HTMLAttributes } from 'react';
-import { $t } from 'services/i18n';
 import * as pageComponents from './pages';
 import { useObsSettings } from './useObsSettings';
 import { ObsFormGroup } from '../../obs/ObsForm';
-import { Tabs } from 'antd';
 import Form from '../../shared/inputs/Form';
 import css from './ObsSettings.m.less';
 

@@ -1,3 +1,4 @@
+import Vue from 'vue';
 import * as obs from '../../../../obs-api';
 import {
   isEditableListProperty,

@@ -111,12 +111,14 @@ export class StreamInfoView<T extends Object> extends ViewHandler<T> {
    */
   get linkedPlatforms(): TPlatform[] {
     if (!this.userView.state.auth) return [];
-    if (this.isDualOutputMode) {
-      return this.allPlatforms.filter(p => this.isPlatformLinked(p));
-    }
-    if (!this.restreamView.canEnableRestream || !this.protectedModeEnabled) {
+
+    if (
+      (!this.restreamView.canEnableRestream || !this.protectedModeEnabled) &&
+      !this.isDualOutputMode
+    ) {
       return [this.userView.auth!.primaryPlatform];
     }
+
     return this.allPlatforms.filter(p => this.isPlatformLinked(p));
   }
 

@@ -139,7 +139,6 @@ export class SceneItem extends SceneItemNode {
   getIsAutoGameCapture(): boolean {
     if (this.type !== 'game_capture') return false;
     const settings = JSON.parse(this.getObsInputSettings());
-    console.log('settings.capture_mode === auto ', settings.capture_mode === 'auto');
 
     return settings.capture_mode === 'auto';
   }

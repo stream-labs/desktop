@@ -654,8 +654,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   }
 
   get isPrime() {
-    return true;
-    // return this.state.isPrime;
+    return this.state.isPrime;
   }
 
   async setPrimeStatus() {

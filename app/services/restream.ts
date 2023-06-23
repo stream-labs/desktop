@@ -98,10 +98,6 @@ export class RestreamService extends StatefulService<IRestreamState> {
     return this.hostsService.streamlabs;
   }
 
-  get url() {
-    return this.host;
-  }
-
   get chatUrl() {
     const hasFBTarget = this.streamInfo.enabledPlatforms.includes('facebook' as TPlatform);
     let fbParams = '';
