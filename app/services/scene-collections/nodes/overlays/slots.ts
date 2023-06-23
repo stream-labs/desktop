@@ -55,6 +55,8 @@ interface IItemSchema {
   filters?: IFilterInfo[];
 
   mixerHidden?: boolean;
+
+  visible?: boolean;
 }
 
 export interface IFolderSchema {
@@ -73,7 +75,7 @@ interface IContext {
 }
 
 export class SlotsNode extends ArrayNode<TSlotSchema, IContext, TSceneNode> {
-  schemaVersion = 1;
+  schemaVersion = 2;
 
   @Inject() videoService: VideoService;
   @Inject() sourceFiltersService: SourceFiltersService;
@@ -105,6 +107,7 @@ export class SlotsNode extends ArrayNode<TSlotSchema, IContext, TSceneNode> {
       scaleY: sceneNode.transform.scale.y / this.videoService.baseHeight,
       crop: sceneNode.transform.crop,
       rotation: sceneNode.transform.rotation,
+      visible: sceneNode.visible,
       filters: sceneNode.getObsInput().filters.map(filter => {
         filter.save();
 
@@ -347,6 +350,10 @@ export class SlotsNode extends ArrayNode<TSlotSchema, IContext, TSceneNode> {
         );
       });
     }
+
+    if (obj.visible) {
+      sceneItem.setVisibility(obj.visible);
+    }
   }
 
   adjustTransform(item: SceneItem, obj: IItemSchema) {
@@ -362,5 +369,15 @@ export class SlotsNode extends ArrayNode<TSlotSchema, IContext, TSceneNode> {
       crop: obj.crop,
       rotation: obj.rotation,
     });
+  }
+
+  migrate(version: number) {
+    if (version < 2) {
+      this.data.items.forEach(item => {
+        if (item.sceneNodeType === 'item') {
+          item.visible = true;
+        }
+      });
+    }
   }
 }
