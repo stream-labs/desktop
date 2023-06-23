@@ -130,19 +130,6 @@ export class SceneItem extends SceneItemNode {
     return this.source.getObsInput();
   }
 
-  @ExecuteInWorkerProcess()
-  getObsInputSettings(): string {
-    return JSON.stringify(this.source.getObsInput().settings);
-  }
-
-  // get isAutoGameCapture(): boolean {
-  getIsAutoGameCapture(): boolean {
-    if (this.type !== 'game_capture') return false;
-    const settings = JSON.parse(this.getObsInputSettings());
-
-    return settings.capture_mode === 'auto';
-  }
-
   getObsSceneItem(): obs.ISceneItem {
     return this.getScene().getObsScene().findItem(this.obsSceneItemId);
   }

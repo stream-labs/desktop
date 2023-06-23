@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import { Services } from 'components-react/service-provider';
 import { useVuex } from 'components-react/hooks';
 import { useModule } from 'slap';
@@ -6,8 +6,6 @@ import { SourceSelectorModule } from './SourceSelector';
 
 interface IDualOutputSourceSelector {
   nodeId: string;
-  isGameCapture: boolean;
-  isAutoGameCapture: boolean;
   sceneId?: string;
 }
 export function DualOutputSourceSelector(p: IDualOutputSourceSelector) {
@@ -32,27 +30,7 @@ export function DualOutputSourceSelector(p: IDualOutputSourceSelector) {
           )
         : undefined,
     isLoading: DualOutputService.views.isLoading && !DualOutputService.views.hasVerticalNodes,
-    isDualOutputMode: DualOutputService.views.dualOutputMode,
   }));
-
-  const showVerticalToggle = useMemo(() => {
-    // show/hide the vertical node for auto game capture
-    if (v.isDualOutputMode && p.isAutoGameCapture) {
-      // hide the vertical scene item
-      toggleVisibility(v.verticalNodeId, false);
-    } else if (v.isDualOutputMode && p.isGameCapture && !p.isAutoGameCapture) {
-      // match the vertical scene item to the horizontal scene item visibility
-      toggleVisibility(v.verticalNodeId, v?.isHorizontalVisible);
-    }
-
-    return !p.isAutoGameCapture && !v?.isLoading && v?.verticalNodeId;
-  }, [
-    p.isAutoGameCapture,
-    v.isDualOutputMode,
-    v.isLoading,
-    v?.verticalNodeId,
-    v?.isHorizontalVisible,
-  ]);
 
   return (
     <>
@@ -63,7 +41,7 @@ export function DualOutputSourceSelector(p: IDualOutputSourceSelector) {
         />
       )}
 
-      {showVerticalToggle && (
+      {!v?.isLoading && v?.verticalNodeId && (
         <i
           onClick={() => toggleVisibility(v.verticalNodeId)}
           className={v.isVerticalVisible ? 'icon-phone-case' : 'icon-phone-case-hide'}

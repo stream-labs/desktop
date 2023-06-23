@@ -504,9 +504,7 @@ export class EditorService extends StatefulService<IEditorServiceState> {
   isOverSource(event: IMouseEvent, source: SceneItem) {
     // obs connects all of the scene items to each display, but only renders those assigned to the display's context
     // prevent these other scene items from being selectable when they are the opposite context
-    // also prevent this for auto game capture for the vertical display
     if (event.display !== source.display) return false;
-    if (event.display === 'vertical' && source.getIsAutoGameCapture()) return false;
 
     const rect = new ScalableRectangle(source.rectangle);
     rect.normalize();
@@ -530,9 +528,8 @@ export class EditorService extends StatefulService<IEditorServiceState> {
       return this.resizeRegions.find(region => {
         // obs connects all of the scene items to each display, but only renders those assigned to the display's context
         // prevent these other scene items from being selectable when they are the opposite context
-        // also prevent this for auto game capture for the vertical display
         if (event.display !== region.item.display) return false;
-        if (event.display === 'vertical' && region.item.getIsAutoGameCapture()) return false;
+        if (event.display === 'vertical') return false;
 
         return this.isOverBox(event, region.x, region.y, region.width, region.height);
       });

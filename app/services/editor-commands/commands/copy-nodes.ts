@@ -8,7 +8,6 @@ import { DualOutputService } from 'services/dual-output';
 import { TDisplayType, VideoSettingsService } from 'services/settings-v2';
 import { EditorService } from 'services/editor';
 import { SceneCollectionsService } from 'services/scene-collections';
-import { SourcesService } from 'services/sources';
 
 /**
  * The copy nodes editor command has small variations when working with:
@@ -23,7 +22,6 @@ export class CopyNodesCommand extends Command {
   @Inject() videoSettingsService: VideoSettingsService;
   @Inject() editorService: EditorService;
   @Inject() sceneCollectionsService: SceneCollectionsService;
-  @Inject() sourcesService: SourcesService;
 
   description: string;
 
