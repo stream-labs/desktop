@@ -355,5 +355,6 @@
   "Set scale filter 'Bilinear'": "Set scale filter 'Bilinear'",
   "Set scale filter 'Lanczos'": "Set scale filter 'Lanczos'",
   "Set scale filter 'Area'": "Set scale filter 'Area'",
-  "Set scale filter 'Disable'": "Set scale filter 'Disable'"
+  "Set scale filter 'Disable'": "Set scale filter 'Disable'",
+  "Auto game capture is disabled in dual output mode.": "Auto game capture is disabled in dual output mode."
 }

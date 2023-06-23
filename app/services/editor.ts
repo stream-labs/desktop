@@ -314,8 +314,6 @@ export class EditorService extends StatefulService<IEditorServiceState> {
   crop(x: number, y: number, options: IResizeOptions) {
     const source = this.resizeRegion.item;
     const rect = new ScalableRectangle(source.rectangle);
-    // const itemX = source.type === 'game_capture' ? source.size.x : x;
-    // const itemY = source.type === 'game_capture' ? source.size.y : y;
 
     rect.normalized(() => {
       rect.withAnchor(options.anchor, () => {
@@ -325,7 +323,6 @@ export class EditorService extends StatefulService<IEditorServiceState> {
             const croppableWidth = rect.width - rect.crop.right - 2;
             const distance = croppableWidth * rect.scaleX - (rect.x - x);
 
-            // const distance = croppableWidth * rect.scaleX - (rect.x - itemX);
             rect.crop.left = Math.round(clamp(distance / rect.scaleX, 0, croppableWidth));
             break;
           }
@@ -334,7 +331,6 @@ export class EditorService extends StatefulService<IEditorServiceState> {
             const croppableWidth = rect.width - rect.crop.left - 2;
             const distance = croppableWidth * rect.scaleX + (rect.x - x);
 
-            // const distance = croppableWidth * rect.scaleX + (rect.x - itemX);
             rect.crop.right = Math.round(clamp(distance / rect.scaleX, 0, croppableWidth));
             break;
           }
@@ -343,7 +339,6 @@ export class EditorService extends StatefulService<IEditorServiceState> {
             const croppableHeight = rect.height - rect.crop.bottom - 2;
             const distance = croppableHeight * rect.scaleY - (rect.y - y);
 
-            // const distance = croppableHeight * rect.scaleY - (rect.y - itemY);
             rect.crop.top = Math.round(clamp(distance / rect.scaleY, 0, croppableHeight));
             break;
           }
@@ -351,8 +346,6 @@ export class EditorService extends StatefulService<IEditorServiceState> {
           case AnchorPoint.North: {
             const croppableHeight = rect.height - rect.crop.top - 2;
             const distance = croppableHeight * rect.scaleY + (rect.y - y);
-
-            // const distance = croppableHeight * rect.scaleY + (rect.y - itemY);
             rect.crop.bottom = Math.round(clamp(distance / rect.scaleY, 0, croppableHeight));
             break;
           }
@@ -509,13 +502,15 @@ export class EditorService extends StatefulService<IEditorServiceState> {
    * given source
    */
   isOverSource(event: IMouseEvent, source: SceneItem) {
+    // obs connects all of the scene items to each display, but only renders those assigned to the display's context
+    // prevent these other scene items from being selectable when they are the opposite context
+    // also prevent this for auto game capture for the vertical display
     if (event.display !== source.display) return false;
-    console.log('source.rectangle ', source.rectangle);
+    if (event.display === 'vertical' && source.getIsAutoGameCapture()) return false;
+
     const rect = new ScalableRectangle(source.rectangle);
     rect.normalize();
 
-    // const scaledWidth = source.display !== 'vertical' ? rect.scaledWidth : source.size.x;
-    // const scaledHeight = source.display !== 'vertical' ? rect.scaledHeight : source.size.y;
     return this.isOverBox(event, rect.x, rect.y, rect.scaledWidth, rect.scaledHeight);
   }
 
@@ -533,8 +528,12 @@ export class EditorService extends StatefulService<IEditorServiceState> {
   isOverResize(event: IMouseEvent) {
     if (this.activeSources.length > 0) {
       return this.resizeRegions.find(region => {
-        console.log('region ', region);
+        // obs connects all of the scene items to each display, but only renders those assigned to the display's context
+        // prevent these other scene items from being selectable when they are the opposite context
+        // also prevent this for auto game capture for the vertical display
         if (event.display !== region.item.display) return false;
+        if (event.display === 'vertical' && region.item.getIsAutoGameCapture()) return false;
+
         return this.isOverBox(event, region.x, region.y, region.width, region.height);
       });
     }
@@ -618,16 +617,6 @@ export class EditorService extends StatefulService<IEditorServiceState> {
     // We don't need to adjust mac coordinates for scale factor
     const factor = byOS({ [OS.Windows]: this.windowsService.state.main.scaleFactor, [OS.Mac]: 1 });
 
-    // const itemX =
-    //   item.type === 'game_capture'
-    //     ? item.size.x
-    //     : this.baseResolutions[item.display ?? 'horizontal'].baseWidth;
-    // const itemY =
-    //   item.type === 'game_capture'
-    //     ? item.size.y
-    //     : this.baseResolutions[item.display ?? 'horizontal'].baseHeight;
-    // const regionRadiusCalc = (renderedRegionRadius * factor * itemX) / itemY;
-    // console.log('calc ', regionRadiusCalc);
     const regionRadius =
       (renderedRegionRadius *
         factor *

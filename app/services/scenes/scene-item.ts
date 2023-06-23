@@ -67,8 +67,8 @@ export class SceneItem extends SceneItemNode {
 
   output?: obs.IVideo;
   display?: TDisplayType;
-  position: IVec2;
-  size: IVec2;
+  readonly position: IVec2;
+  readonly size: IVec2;
 
   // Some computed attributes
 
@@ -128,6 +128,20 @@ export class SceneItem extends SceneItemNode {
 
   getObsInput() {
     return this.source.getObsInput();
+  }
+
+  @ExecuteInWorkerProcess()
+  getObsInputSettings(): string {
+    return JSON.stringify(this.source.getObsInput().settings);
+  }
+
+  // get isAutoGameCapture(): boolean {
+  getIsAutoGameCapture(): boolean {
+    if (this.type !== 'game_capture') return false;
+    const settings = JSON.parse(this.getObsInputSettings());
+    console.log('settings.capture_mode === auto ', settings.capture_mode === 'auto');
+
+    return settings.capture_mode === 'auto';
   }
 
   getObsSceneItem(): obs.ISceneItem {
@@ -282,7 +296,8 @@ export class SceneItem extends SceneItemNode {
     const display = this?.display ?? 'horizontal';
     const context = this.videoSettingsService.contexts[display];
 
-    this.getObsSceneItem().video = context as obs.IVideo;
+    const obsSceneItem = this.getObsSceneItem();
+    obsSceneItem.video = context as obs.IVideo;
 
     this.UPDATE({
       visible,
@@ -301,6 +316,8 @@ export class SceneItem extends SceneItemNode {
       blendingMethod: customSceneItem.blendingMethod,
       display,
       output: context,
+      position: obsSceneItem.position,
+      size: obsSceneItem.size,
     });
   }
 
@@ -470,30 +487,20 @@ export class SceneItem extends SceneItemNode {
    * A rectangle representing this sceneItem
    */
   get rectangle(): IScalableRectangle {
-    // console.log('rectangle ', {
-    //   width: this.size.x,
-    //   height: this.size.y,
-    // });
-    // const width = this.type === 'game_capture' ? this.size.x : this.width;
-
-    // const height = this.type === 'game_capture' ? this.size.y : this.height;
+    const useSize = this.type === 'game_capture' && this.display === 'vertical';
+    const width = useSize && this.size.x > 0 ? this.size.x : this.width;
+    const height = useSize && this.size.y > 0 ? this.size.y : this.height;
 
     const scale = this.editorService.calculateVerticalScale(this.size);
-    const scaleX = this.type === 'game_capture' ? scale.x : this.transform.scale.x;
-    const scaleY = this.type === 'game_capture' ? scale.y : this.transform.scale.y;
+    const scaleX = useSize && this.size.x > 0 ? scale.x : this.transform.scale.x;
+    const scaleY = useSize && this.size.y > 0 ? scale.y : this.transform.scale.y;
     return {
       x: this.transform.position.x,
       y: this.transform.position.y,
-      // scaleX: this.transform.scale.x,
-      // scaleY: this.transform.scale.y,
       scaleX,
       scaleY,
-      width: this.width,
-      height: this.height,
-      // width: this.size.x,
-      // height: this.size.y,
-      // width,
-      // height,
+      width,
+      height,
       crop: this.transform.crop,
       rotation: this.transform.rotation,
     };

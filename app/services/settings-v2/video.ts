@@ -12,7 +12,7 @@ import { Subject } from 'rxjs';
  * Add display type options by adding the display name to the displays array
  * and the context name to the context name map.
  */
-const displays = ['default', 'horizontal', 'vertical'] as const;
+const displays = ['horizontal', 'vertical'] as const;
 export type TDisplayType = typeof displays[number];
 
 export interface IVideoSetting {

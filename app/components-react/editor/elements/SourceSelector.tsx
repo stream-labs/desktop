@@ -34,6 +34,8 @@ interface ISourceMetadata {
   isRecordingVisible: boolean;
   isGuestCamActive: boolean;
   isDualOutputActive: boolean;
+  isGameCapture: boolean;
+  isAutoGameCapture: boolean;
   isFolder: boolean;
   canShowActions: boolean;
   parentId?: string;
@@ -92,6 +94,8 @@ export class SourceSelectorModule {
               isRecordingVisible={sceneNode.isRecordingVisible}
               isGuestCamActive={sceneNode.isGuestCamActive}
               isDualOutputActive={sceneNode.isDualOutputActive}
+              isGameCapture={sceneNode.isGameCapture}
+              isAutoGameCapture={sceneNode.isAutoGameCapture}
               cycleSelectiveRecording={() => this.cycleSelectiveRecording(sceneNode.id)}
               ref={this.nodeRefs[sceneNode.id]}
               onDoubleClick={() => this.sourceProperties(sceneNode.id)}
@@ -129,6 +133,13 @@ export class SourceSelectorModule {
       const isDualOutputActive = this.isDualOutputActive;
 
       const isFolder = !isItem(node);
+
+      // auto game capture is disabled for the vertical display in dual output mode
+      // use the below to determine the visibility of the vertical node
+      const isGameCapture = node.isItem() && node.type === 'game_capture';
+      const isAutoGameCapture = node.isItem() && node.getIsAutoGameCapture();
+
+      // create the object
       return {
         id: node.id,
         title: this.getNameForNode(node),
@@ -139,6 +150,8 @@ export class SourceSelectorModule {
         isStreamVisible,
         isGuestCamActive,
         isDualOutputActive,
+        isGameCapture,
+        isAutoGameCapture,
         parentId: node.parentId,
         sceneId: node.sceneId,
         canShowActions: itemsForNode.length > 0,
@@ -348,7 +361,15 @@ export class SourceSelectorModule {
     }
 
     if (this.isDualOutputActive) {
-      ids.push(this.dualOutputService.views.getVerticalNodeId(info.node.key as string));
+      // add vertical node id to selection only if it's not an auto game capture node
+      const verticalNodeId = this.dualOutputService.views.getVerticalNodeId(
+        info.node.key as string,
+      );
+
+      const node = this.scenesService.views.getSceneItem(verticalNodeId);
+      if (node && !node.getIsAutoGameCapture()) {
+        ids.push(this.dualOutputService.views.getVerticalNodeId(info.node.key as string));
+      }
     }
 
     this.selectionService.views.globalSelection.select(ids);
@@ -415,10 +436,10 @@ export class SourceSelectorModule {
     return this.selectionService.views.globalSelection.getItems();
   }
 
-  toggleVisibility(sceneNodeId: string | undefined) {
+  toggleVisibility(sceneNodeId: string | undefined, status?: boolean) {
     if (!sceneNodeId) return;
     const selection = this.scene.getSelection(sceneNodeId);
-    const visible = !selection.isVisible();
+    const visible = status ?? !selection.isVisible();
     this.editorCommandsService.actions.executeCommand('HideItemsCommand', selection, !visible);
   }
 
@@ -605,6 +626,8 @@ const TreeNode = React.forwardRef(
       selectiveRecordingEnabled: boolean;
       isGuestCamActive: boolean;
       isDualOutputActive: boolean;
+      isGameCapture: boolean;
+      isAutoGameCapture: boolean;
       canShowActions: boolean;
       toggleVisibility: (ev: unknown) => unknown;
       toggleLock: (ev: unknown) => unknown;
@@ -639,7 +662,12 @@ const TreeNode = React.forwardRef(
           <>
             {p.isGuestCamActive && <i className="fa fa-signal" />}
             {p.isDualOutputActive && (
-              <DualOutputSourceSelector nodeId={p.id} sceneId={p?.sceneId} />
+              <DualOutputSourceSelector
+                nodeId={p.id}
+                sceneId={p?.sceneId}
+                isGameCapture={p.isGameCapture}
+                isAutoGameCapture={p.isAutoGameCapture}
+              />
             )}
             {p.selectiveRecordingEnabled && (
               <Tooltip title={selectiveRecordingMetadata().tooltip} placement="left">

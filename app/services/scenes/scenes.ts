@@ -5,7 +5,7 @@ import { mutation, StatefulService } from 'services/core/stateful-service';
 import { TransitionsService } from 'services/transitions';
 import { WindowsService } from 'services/windows';
 import { Scene, SceneItem, TSceneNode, EScaleType, EBlendingMode, EBlendingMethod } from './index';
-import { ISource, SourcesService, ISourceAddOptions } from 'services/sources';
+import { ISource, SourcesService, ISourceAddOptions, TSourceType } from 'services/sources';
 import { Inject } from 'services/core/injector';
 import { IVideo, SceneFactory } from '../../../obs-api';
 import { $t } from 'services/i18n';
@@ -50,6 +50,8 @@ export interface ISceneItemInfo {
   blendingMethod?: EBlendingMethod;
   display?: TDisplayType;
   output?: IVideo;
+  position?: IVec2;
+  size?: IVec2;
 }
 
 export interface IScenesState {
@@ -79,6 +81,7 @@ export interface IPartialTransform {
 }
 
 export interface ISceneItemSettings {
+  type?: TSourceType;
   transform: ITransform;
   visible: boolean;
   locked: boolean;
@@ -102,6 +105,8 @@ export interface IPartialSettings {
   blendingMethod?: EBlendingMethod;
   output?: IVideo; // for obs.ISceneItem, this property is video
   display?: TDisplayType;
+  position?: IVec2;
+  size?: IVec2;
 }
 
 export interface ISceneItem extends ISceneItemSettings, ISceneItemNode {

@@ -27,6 +27,7 @@ import { Button } from 'antd';
 import InputWrapper from '../shared/inputs/InputWrapper';
 import { $t, $translateIfExist } from '../../services/i18n';
 import Utils from 'services/utils';
+import { Services } from '../service-provider';
 
 interface IExtraInputProps {
   debounce?: number;
@@ -133,6 +134,20 @@ function ObsInput(p: IObsInputProps) {
           label: opt.description,
         };
       });
+
+      // disable auto game capture for the vertical display in dual output mode
+      if (Services.DualOutputService.views.dualOutputMode && p.value.name === 'capture_mode') {
+        return (
+          <ListInput
+            {...inputProps}
+            options={options}
+            allowClear={false}
+            description={$t(
+              'Auto game capture is disabled for the vertical display in dual output mode.',
+            )}
+          />
+        );
+      }
       return <ListInput {...inputProps} options={options} allowClear={false} />;
 
     case 'OBS_PROPERTY_BUTTON':
