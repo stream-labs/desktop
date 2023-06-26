@@ -428,7 +428,7 @@ export function VideoSettings() {
               'Stream to horizontal and vertical platforms simultaneously. Recordings will be in horizontal only.',
             )}
             className={styles.doTooltip}
-            placement="bottom"
+            placement="bottomRight"
             lightShadow
           >
             <i className="icon-information" />

@@ -32,28 +32,16 @@ export default function Tooltip(props: PropsWithChildren<ITooltipTipProps>) {
   return (
     <div className={cx(styles.tooltipWrapper, className)}>
       <div className={cx(styles.tooltipArrow)} />
-      {lightShadow ? (
-        <AntdTooltip
-          className={cx(lightShadow && styles.lightShadow)}
-          placement={placement}
-          title={title}
-          style={style}
-          getPopupContainer={triggerNode => triggerNode}
-        >
-          {content}
-          {{ ...props }.children}
-        </AntdTooltip>
-      ) : (
-        <AntdTooltip
-          className={cx(lightShadow && styles.lightShadow)}
-          placement={placement}
-          title={title}
-          style={style}
-        >
-          {content}
-          {{ ...props }.children}
-        </AntdTooltip>
-      )}
+      <AntdTooltip
+        className={cx({ [styles.lightShadow]: lightShadow })}
+        placement={placement}
+        title={title}
+        style={style}
+        getPopupContainer={triggerNode => triggerNode}
+      >
+        {content}
+        {{ ...props }.children}
+      </AntdTooltip>
     </div>
   );
 }

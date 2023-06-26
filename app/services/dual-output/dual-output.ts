@@ -335,6 +335,8 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
       const sceneItems = this.scenesService.views.getSceneItemsBySceneId(sceneToMapId);
       const verticalNodeIds = this.views.getVerticalNodeIds(sceneToMapId);
 
+      if (!sceneItems) return;
+
       sceneItems.forEach((sceneItem: SceneItem, index: number) => {
         const display = verticalNodeIds?.includes(sceneItem.id) ? 'vertical' : 'horizontal';
         this.assignNodeContext(sceneItem, display);
@@ -345,6 +347,8 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
       // so will not have vertical nodes
       const sceneToMapId = sceneId ?? this.views.activeSceneId;
       const sceneItems = this.scenesService.views.getSceneItemsBySceneId(sceneToMapId);
+
+      if (!sceneItems) return;
 
       sceneItems.forEach((sceneItem: SceneItem, index: number) => {
         this.assignNodeContext(sceneItem, 'horizontal');
