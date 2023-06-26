@@ -156,6 +156,10 @@ class SettingsViews extends ViewHandler<ISettingsServiceState> {
     return Utils.numberToBinnaryArray(this.values.Output.RecTracks, 6).reverse();
   }
 
+  get streamService() {
+    return this.values.Stream.service;
+  }
+
   get vodTrackEnabled() {
     return this.values.Output.VodTrackEnabled;
   }

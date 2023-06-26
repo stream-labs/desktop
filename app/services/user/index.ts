@@ -160,6 +160,14 @@ class UserViews extends ViewHandler<IUserServiceState> {
   // Injecting HostsService since it's not stateful
   @Inject() hostsService: HostsService;
 
+  get settingsServiceViews() {
+    return this.getServiceViews(SettingsService);
+  }
+
+  get streamSettingsServiceViews() {
+    return this.getServiceViews(StreamSettingsService);
+  }
+
   get customizationServiceViews() {
     return this.getServiceViews(CustomizationService);
   }
@@ -204,6 +212,25 @@ class UserViews extends ViewHandler<IUserServiceState> {
 
   get isTwitchAuthed() {
     return this.isLoggedIn && this.platform.type === 'twitch';
+  }
+
+  /*
+   * The method above doesn't take into account Advanced mode,
+   * resulting in platform-specific functionality (like VOD track on Twitch)
+   * to appear enabled when it shouldn't if the user has set a different Service
+   * in the advanced view.
+   *
+   * Does not modify the above method as we're not sure how many places this
+   * (perhaps more expensive) check is necessary, or whether it'd match the
+   * expected caller behavior.
+   *
+   * TODO: When going back to Recommended Settings, the Service setting here
+   * doesn't get reset.
+   */
+  get isTwitchAuthedAndActive() {
+    return this.streamSettingsServiceViews.state.protectedModeEnabled
+      ? this.isTwitchAuthed
+      : this.settingsServiceViews.streamService === 'Twitch';
   }
 
   get isFacebookAuthed() {

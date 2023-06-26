@@ -28,7 +28,7 @@ export default function GlobalSettings() {
     streamTrack,
     vodTrack,
     vodTrackEnabled,
-    isTwitchAuthed,
+    isTwitchAuthedAndActive,
     recFormat,
   } = useVuex(() => ({
     advancedAudioSettings: SettingsService.views.advancedAudioSettings,
@@ -37,7 +37,7 @@ export default function GlobalSettings() {
     streamTrack: SettingsService.views.streamTrack,
     vodTrack: SettingsService.views.vodTrack,
     vodTrackEnabled: SettingsService.views.vodTrackEnabled,
-    isTwitchAuthed: UserService.views.isTwitchAuthed,
+    isTwitchAuthedAndActive: UserService.views.isTwitchAuthedAndActive,
     recFormat: SettingsService.views.recFormat,
   }));
 
@@ -96,7 +96,7 @@ export default function GlobalSettings() {
             onChange={value => handleOutputSettingsChange('TrackIndex', value)}
           />
         )}
-        {isAdvancedOutput && isTwitchAuthed && (
+        {isAdvancedOutput && isTwitchAuthedAndActive && (
           <SwitchInput
             label={$t('Enable Twitch VOD Track')}
             value={vodTrackEnabled}
