@@ -529,9 +529,11 @@ export class EditorService extends StatefulService<IEditorServiceState> {
         // obs connects all of the scene items to each display, but only renders those assigned to the display's context
         // prevent these other scene items from being selectable when they are the opposite context
         if (event.display !== region.item.display) return false;
-        if (event.display === 'vertical') return false;
 
-        return this.isOverBox(event, region.x, region.y, region.width, region.height);
+        const regionWidth = event.display === 'vertical' ? region.width + 6 : region.width;
+        const regionHeight = event.display === 'vertical' ? region.height + 6 : region.height;
+
+        return this.isOverBox(event, region.x, region.y, regionWidth, regionHeight);
       });
     }
 

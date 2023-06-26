@@ -51,7 +51,6 @@ export interface ISceneItemInfo {
   display?: TDisplayType;
   output?: IVideo;
   position?: IVec2;
-  size?: IVec2;
 }
 
 export interface IScenesState {
@@ -106,7 +105,6 @@ export interface IPartialSettings {
   output?: IVideo; // for obs.ISceneItem, this property is video
   display?: TDisplayType;
   position?: IVec2;
-  size?: IVec2;
 }
 
 export interface ISceneItem extends ISceneItemSettings, ISceneItemNode {
@@ -119,7 +117,6 @@ export interface ISceneItem extends ISceneItemSettings, ISceneItemNode {
   blendingMethod: EBlendingMethod;
   output?: IVideo; // for obs.ISceneItem, this property is video
   position?: IVec2;
-  size?: IVec2;
 }
 
 export interface ISceneItemActions {

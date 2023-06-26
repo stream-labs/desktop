@@ -68,7 +68,6 @@ export class SceneItem extends SceneItemNode {
   output?: obs.IVideo;
   display?: TDisplayType;
   readonly position: IVec2;
-  readonly size: IVec2;
 
   // Some computed attributes
 
@@ -303,7 +302,6 @@ export class SceneItem extends SceneItemNode {
       display,
       output: context,
       position: obsSceneItem.position,
-      size: obsSceneItem.size,
     });
   }
 
@@ -473,20 +471,13 @@ export class SceneItem extends SceneItemNode {
    * A rectangle representing this sceneItem
    */
   get rectangle(): IScalableRectangle {
-    const useSize = this.type === 'game_capture' && this.display === 'vertical';
-    const width = useSize && this.size.x > 0 ? this.size.x : this.width;
-    const height = useSize && this.size.y > 0 ? this.size.y : this.height;
-
-    const scale = this.editorService.calculateVerticalScale(this.size);
-    const scaleX = useSize && this.size.x > 0 ? scale.x : this.transform.scale.x;
-    const scaleY = useSize && this.size.y > 0 ? scale.y : this.transform.scale.y;
     return {
       x: this.transform.position.x,
       y: this.transform.position.y,
-      scaleX,
-      scaleY,
-      width,
-      height,
+      scaleX: this.transform.scale.x,
+      scaleY: this.transform.scale.y,
+      width: this.width,
+      height: this.height,
       crop: this.transform.crop,
       rotation: this.transform.rotation,
     };

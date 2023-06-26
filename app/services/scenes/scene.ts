@@ -199,7 +199,6 @@ export class Scene {
       obsSceneItem.id,
       display,
       obsSceneItem.position,
-      obsSceneItem.size,
     );
     const sceneItem = this.getItem(sceneItemId)!;
 
@@ -423,7 +422,6 @@ export class Scene {
           obsSceneItem.id,
           display,
           obsSceneItem.position,
-          obsSceneItem.size,
         );
         const item = this.getItem(nodeModel.id)!;
         item.loadItemAttributes(nodeModel);
@@ -542,7 +540,6 @@ export class Scene {
     obsSceneItemId: number,
     display: TDisplayType,
     position: IVec2,
-    size: IVec2,
   ) {
     this.state.nodes.unshift({
       sceneItemId,
@@ -579,7 +576,6 @@ export class Scene {
       blendingMethod: EBlendingMethod.Default,
       display,
       position,
-      size,
     });
   }
 
