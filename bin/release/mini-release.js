@@ -178,6 +178,11 @@ async function runScript({
     info('Compiling assets...');
     executeCmd('yarn compile:production');
 
+    info('Injecting Sentry...');
+    executeCmd(`cp main.js bundles/`);
+    const bundles = path.resolve('.', 'bundles');
+    injectForSentry(bundles);
+
     info('Making the package...');
     executeCmd(`yarn package:${releaseEnvironment}-${releaseChannel}`);
   }
@@ -292,9 +297,9 @@ async function runScript({
 
   if (enableUploadToSentry) {
     info('uploading to sentry...');
-    executeCmd(`cp main.js bundles/`);
+    // executeCmd(`cp main.js bundles/`);
     const bundles = path.resolve('.', 'bundles');
-    injectForSentry(bundles);
+    // injectForSentry(bundles);
     uploadToSentry(sentry.organization, sentry.project, newVersion, bundles);
   } else {
     info('uploading to sentry: SKIP');
