@@ -16,8 +16,9 @@ import { test, useWebdriver } from '../../helpers/webdriver';
 useWebdriver();
 
 // Dual Output Go Live Window
+// In-progress, skip for now
 
-test('Dual Output Go Live Window', async t => {
+test.skip('Dual Output Go Live Window', async t => {
   await logIn('twitch');
   await logIn('trovo');
   await logIn('youtube');
@@ -29,7 +30,7 @@ test('Dual Output Go Live Window', async t => {
 });
 
 // Video
-test('User must be logged in to use Dual Output', async t => {
+test.skip('User must be logged in to use Dual Output', async t => {
   await showSettingsWindow('Video');
   const { assertInputOptions } = useForm();
 });
