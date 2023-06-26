@@ -9,10 +9,6 @@ import styles from './Banner.m.less';
 export default function Banner() {
   const { AnnouncementsService, SettingsService, NavigationService } = Services;
 
-  useEffect(() => {
-    AnnouncementsService.actions.getBanner();
-  }, []);
-
   const { banner } = useVuex(() => ({ banner: AnnouncementsService.views.banner }));
   if (!banner) return <></>;
 
@@ -27,20 +23,26 @@ export default function Banner() {
       } else {
         shell.openExternal(banner.link);
       }
-      if (banner.closeOnLink) AnnouncementsService.actions.clearBanner();
+      if (banner.closeOnLink) close();
     };
+  }
+
+  function close() {
+    AnnouncementsService.actions.clearBanner();
   }
 
   return (
     <div className={styles.bannerContainer}>
-      {banner.thumbnail}
+      {!!banner.thumbnail && <img src={banner.thumbnail} />}
       <strong style={{ color: 'var(--title)' }}>{banner.header}</strong>
       <span>{banner.subHeader}</span>
-      <span style={{ color: 'var(--new)' }} onClick={handleClick}>
+      <span className={styles.link} onClick={handleClick}>
         {banner.linkTitle}
+        <i className="fas fa-arrow-right" />
       </span>
-      <i className="fas fa-arrow-right" style={{ color: 'var(--new)' }} />
-      <span className={styles.close}>{$t('Dismiss')}</span>
+      <span className={styles.close} onClick={close}>
+        {$t('Dismiss')}
+      </span>
     </div>
   );
 }

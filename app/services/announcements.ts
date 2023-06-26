@@ -64,7 +64,10 @@ export class AnnouncementsService extends PersistentStatefulService<IAnnouncemen
 
   init() {
     super.init();
-    this.userService.userLogin.subscribe(() => this.fetchLatestNews());
+    this.userService.userLogin.subscribe(() => {
+      this.fetchLatestNews();
+      this.getBanner();
+    });
   }
 
   get views() {
@@ -81,8 +84,18 @@ export class AnnouncementsService extends PersistentStatefulService<IAnnouncemen
   }
 
   async getBanner() {
-    console.log(await this.fetchBanner());
-    // this.SET_BANNER(await this.fetchBanner());
+    // this.SET_BANNER({
+    //   id: 1,
+    //   header: 'New Desktop Feature',
+    //   subHeader: 'Follow the link to learn more',
+    //   linkTitle: 'Click Me',
+    //   thumbnail: '',
+    //   link: '',
+    //   linkTarget: 'external',
+    //   type: 0,
+    //   closeOnLink: true,
+    // });
+    this.SET_BANNER(await this.fetchBanner());
   }
 
   seenNews() {
