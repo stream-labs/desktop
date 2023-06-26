@@ -213,13 +213,12 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
       this.sceneDuplicate,
     );
 
-    const releaseDelay = Math.min(transition.duration, TRANSITION_DURATION_MAX);
     setTimeout(
       () => {
         oldDuplicate.release();
         this.studioModeLocked = false;
       },
-      releaseDelay
+      Math.min(transition.duration, TRANSITION_DURATION_MAX),
     );
   }
 
