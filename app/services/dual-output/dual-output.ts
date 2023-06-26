@@ -139,6 +139,16 @@ class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
     return this.incrementalRolloutService.views.featureIsEnabled(EAvailableFeatures.dualOutput);
   }
 
+  get showHorizontalDisplay() {
+    return !this.state.dualOutputMode || (this.activeDisplays.horizontal && !this.state.isLoading);
+  }
+
+  get showVerticalDisplay() {
+    return (
+      this.state.dualOutputMode && this.activeDisplayPlatforms.vertical && !this.state.isLoading
+    );
+  }
+
   getPlatformDisplay(platform: TPlatform) {
     return this.state.platformSettings[platform].display;
   }
