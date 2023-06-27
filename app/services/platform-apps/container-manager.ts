@@ -329,6 +329,7 @@ export class PlatformContainerManager {
             'edge.fullstory.com',
             'www.youtube.com',
             'cdn.segment.com',
+            'static.twitchcdn.net',
           ];
 
           const parsed = url.parse(details.url);
