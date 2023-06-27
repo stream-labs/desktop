@@ -111,10 +111,7 @@ export class SourceSelectorModule {
   }
 
   get nodeData(): ISourceMetadata[] {
-    // filter out scene items created for dual output mode
-    const nodes = this.filterNodes();
-
-    return nodes.map(node => {
+    return this.scene.getSourceSelectorNodes().map(node => {
       const itemsForNode = this.scene.getItemsForNode(node.id);
       const isVisible = itemsForNode.some(i => i.visible);
       const isLocked = itemsForNode.every(i => i.locked);
@@ -147,26 +144,6 @@ export class SourceSelectorModule {
         isFolder,
       };
     });
-  }
-
-  filterNodes(): TSceneNode[] {
-    const verticalNodeIds = this.dualOutputService.views.verticalNodeIds;
-
-    if (verticalNodeIds) {
-      if (this.dualOutputService.views.dualOutputMode) {
-        return this.scene.getNodes().filter(node => !verticalNodeIds.includes(node.id));
-      }
-
-      if (this.dualOutputService.views.activeDisplays.horizontal) {
-        return this.scene.getNodes().filter(node => !verticalNodeIds.includes(node.id));
-      }
-
-      if (this.dualOutputService.views.activeDisplays.vertical) {
-        return this.scene.getNodes().filter(node => verticalNodeIds.includes(node.id));
-      }
-    }
-
-    return this.scene.getNodes();
   }
 
   // TODO: Clean this up.  These only access state, no helpers
@@ -558,7 +535,14 @@ function ItemsTree() {
     selectiveRecordingEnabled,
   ]);
 
+  // @@@ TODO: remove
+  const start = performance.now();
+
   const treeData = getTreeData(nodeData);
+
+  // @@@ TODO: remove
+  const end = performance.now();
+  console.log(`getTreeData Execution time: ${end - start} ms`);
 
   return (
     <div

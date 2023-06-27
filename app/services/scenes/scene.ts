@@ -136,6 +136,43 @@ export class Scene {
     return this.state.nodes.map(item => item.id);
   }
 
+  /**
+   * In dual output mode, the active displays determine the nodes shown
+   * in the source selector, so filter them while getting the node models
+   * for optimal performance.
+   */
+  getSourceSelectorNodes(): TSceneNode[] {
+    if (
+      this.dualOutputService.views.hasVerticalNodes &&
+      this.dualOutputService.views.dualOutputMode
+    ) {
+      // for optimized performance, check hashmap instead of list of vertical ids
+      const nodeMap = this.dualOutputService.views.activeSceneNodeMap;
+      if (this.dualOutputService.views.activeDisplays.horizontal) {
+        return this.state.nodes.filter(node => {
+          if (nodeMap[node.id]) {
+            return node.sceneNodeType === 'folder'
+              ? this.getFolder(node.id)!
+              : this.getItem(node.id)!;
+          }
+        }) as TSceneNode[];
+      }
+
+      if (this.dualOutputService.views.activeDisplays.vertical) {
+        return this.state.nodes.filter(node => {
+          if (nodeMap[node.id]) {
+            return node.sceneNodeType === 'folder'
+              ? this.getFolder(node.id)!
+              : this.getItem(node.id)!;
+          }
+        }) as TSceneNode[];
+      }
+    }
+
+    // vanilla scenes will not have vertical nodes so just return all
+    return this.getNodes();
+  }
+
   getSelection(itemsList?: TNodesList): Selection {
     return new Selection(this.id, itemsList);
   }
