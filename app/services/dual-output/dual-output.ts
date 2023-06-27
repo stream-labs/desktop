@@ -144,9 +144,7 @@ class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
   }
 
   get showVerticalDisplay() {
-    return (
-      this.state.dualOutputMode && this.activeDisplayPlatforms.vertical && !this.state.isLoading
-    );
+    return this.state.dualOutputMode && this.activeDisplays.vertical && !this.state.isLoading;
   }
 
   getPlatformDisplay(platform: TPlatform) {
@@ -218,6 +216,31 @@ class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
 
   getPlatformContextName(platform: TPlatform): TOutputOrientation {
     return this.getPlatformDisplay(platform) === 'horizontal' ? 'landscape' : 'portrait';
+  }
+
+  getIsHorizontalVisible(nodeId: string, sceneId?: string) {
+    if (!this.hasVerticalNodes) return;
+    return (
+      !this.isLoading &&
+      this.hasVerticalNodes &&
+      this.scenesService.views.getNodeVisibility(nodeId, sceneId)
+    );
+  }
+
+  getIsVerticalVisible(nodeId: string, sceneId?: string) {
+    // in the source selector, the vertical node id is determined by the visible display
+    if (!this.hasVerticalNodes) return;
+
+    const id =
+      this.activeDisplays.vertical && !this.activeDisplays.horizontal
+        ? nodeId
+        : this.activeSceneNodeMap[nodeId];
+
+    return (
+      !this.isLoading &&
+      this.hasVerticalNodes &&
+      this.scenesService.views.getNodeVisibility(id, sceneId)
+    );
   }
 
   hasNodeMap(sceneId?: string) {
@@ -520,31 +543,10 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
 
   @mutation()
   private SET_DISPLAY_ACTIVE(status: boolean, display: TDisplayType) {
-    const otherDisplay = display === 'horizontal' ? 'vertical' : 'horizontal';
-    if (
-      status === false &&
-      this.state.videoSettings.activeDisplays[display] &&
-      !this.state.videoSettings.activeDisplays[otherDisplay]
-    ) {
-      // if not dual output mode, swap the active displays
-
-      this.state.videoSettings.activeDisplays = {
-        ...this.state.videoSettings.activeDisplays,
-        [display]: status,
-        [otherDisplay]: !status,
-      };
-    } else {
-      this.state.videoSettings.activeDisplays = {
-        ...this.state.videoSettings.activeDisplays,
-        [display]: status,
-      };
-    }
-
-    // swap default display if needed
-    if (!status) {
-      const otherDisplay = display === 'horizontal' ? 'vertical' : 'horizontal';
-      this.state.videoSettings.defaultDisplay = display;
-    }
+    this.state.videoSettings.activeDisplays = {
+      ...this.state.videoSettings.activeDisplays,
+      [display]: status,
+    };
   }
 
   @mutation()

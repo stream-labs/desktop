@@ -10,38 +10,30 @@ interface IDualOutputSourceSelector {
 }
 export function DualOutputSourceSelector(p: IDualOutputSourceSelector) {
   const { toggleVisibility } = useModule(SourceSelectorModule);
-  const { DualOutputService, ScenesService } = Services;
-
-  const horizontalNodeId = p.nodeId;
+  const { DualOutputService } = Services;
 
   const v = useVuex(() => ({
-    verticalNodeId: DualOutputService.views.verticalNodeIds
-      ? DualOutputService.views.activeSceneNodeMap[p.nodeId]
-      : undefined,
-    isHorizontalVisible:
-      !DualOutputService.views.isLoading && DualOutputService.views.hasVerticalNodes
-        ? ScenesService.views.getNodeVisibility(p.nodeId, p?.sceneId)
-        : undefined,
-    isVerticalVisible:
-      !DualOutputService.views.isLoading && DualOutputService.views.hasVerticalNodes
-        ? ScenesService.views.getNodeVisibility(
-            DualOutputService.views.activeSceneNodeMap[p.nodeId],
-            p?.sceneId,
-          )
-        : undefined,
+    verticalNodeId:
+      DualOutputService.views.verticalNodeIds && DualOutputService.views.activeDisplays.horizontal
+        ? DualOutputService.views.activeSceneNodeMap[p.nodeId]
+        : p.nodeId,
+    isHorizontalVisible: DualOutputService.views.getIsHorizontalVisible(p.nodeId, p?.sceneId),
+    isVerticalVisible: DualOutputService.views.getIsVerticalVisible(p.nodeId, p?.sceneId),
     isLoading: DualOutputService.views.isLoading && !DualOutputService.views.hasVerticalNodes,
+    horizontalActive: DualOutputService.views.activeDisplays.horizontal,
+    verticalActive: DualOutputService.views.activeDisplays.vertical,
   }));
 
   return (
     <>
-      {!v?.isLoading && (
+      {!v?.isLoading && v.horizontalActive && (
         <i
-          onClick={() => toggleVisibility(horizontalNodeId)}
+          onClick={() => toggleVisibility(p.nodeId)}
           className={v.isHorizontalVisible ? 'icon-desktop' : 'icon-desktop-hide'}
         />
       )}
 
-      {!v?.isLoading && v?.verticalNodeId && (
+      {!v?.isLoading && v?.verticalNodeId && v.verticalActive && (
         <i
           onClick={() => toggleVisibility(v.verticalNodeId)}
           className={v.isVerticalVisible ? 'icon-phone-case' : 'icon-phone-case-hide'}

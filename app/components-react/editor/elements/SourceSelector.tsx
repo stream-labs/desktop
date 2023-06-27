@@ -535,14 +535,7 @@ function ItemsTree() {
     selectiveRecordingEnabled,
   ]);
 
-  // @@@ TODO: remove
-  const start = performance.now();
-
   const treeData = getTreeData(nodeData);
-
-  // @@@ TODO: remove
-  const end = performance.now();
-  console.log(`getTreeData Execution time: ${end - start} ms`);
 
   return (
     <div

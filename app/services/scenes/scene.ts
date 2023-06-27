@@ -159,8 +159,9 @@ export class Scene {
       }
 
       if (this.dualOutputService.views.activeDisplays.vertical) {
+        const verticalNodeIds = new Set(this.dualOutputService.views.verticalNodeIds);
         return this.state.nodes.filter(node => {
-          if (nodeMap[node.id]) {
+          if (verticalNodeIds.has(node.id)) {
             return node.sceneNodeType === 'folder'
               ? this.getFolder(node.id)!
               : this.getItem(node.id)!;
