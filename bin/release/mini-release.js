@@ -261,7 +261,7 @@ async function runScript({
       tag_name: newTag,
       name: newTag,
       body: patchNote.notes,
-      draft: true,
+      draft: false,
       prerelease: releaseChannel !== 'stable',
     });
 
