@@ -134,6 +134,7 @@ async function runScript({
   if (!(await confirm('Are you sure to release with these configs?', false))) {
     sh.exit(1);
   }
+  const skipCleaningNodeModules = !skipBuild && !(await confirm('skip cleaning node_modules?'));
 
   info(`check whether remote ${target.remote} exists`);
   executeCmd(`git remote get-url ${target.remote}`);
@@ -162,7 +163,6 @@ async function runScript({
   // update package.json with newVersion and git tag
   executeCmd(`yarn version --new-version=${newVersion}`);
 
-  const skipCleaningNodeModules = !skipBuild && !(await confirm('skip cleaning node_modules?'));
   if (skipBuild) {
     info('SKIP build process since skipBuild is set...');
   } else {
