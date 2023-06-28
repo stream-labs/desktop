@@ -324,36 +324,26 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
   assignSceneNodes(sceneId?: string) {
     this.SET_IS_LOADING(true);
     const sceneToMapId = sceneId ?? this.views.activeSceneId;
-    // assign nodes to both contexts in dual output mode
+    const sceneItems = this.scenesService.views.getSceneItemsBySceneId(sceneToMapId);
+    if (!sceneItems) return;
+    const verticalNodeIds = new Set(this.views.getVerticalNodeIds(sceneToMapId));
 
-    if (this.views.hasNodeMap()) {
-      if (!this.videoSettingsService.contexts.vertical) {
-        this.videoSettingsService.establishVideoContext('vertical');
-      }
-
-      const sceneItems = this.scenesService.views.getSceneItemsBySceneId(sceneToMapId);
-      const verticalNodeIds = this.views.getVerticalNodeIds(sceneToMapId);
-
-      if (!sceneItems) return;
-
-      sceneItems.forEach((sceneItem: SceneItem, index: number) => {
-        const display = verticalNodeIds?.includes(sceneItem.id) ? 'vertical' : 'horizontal';
-        this.assignNodeContext(sceneItem, display);
-        this.sceneNodeHandled.next(index);
-      });
-    } else {
-      // if there is no node map for the scene, it has never been active in dual output mode
-      // so will not have vertical nodes
-      const sceneToMapId = sceneId ?? this.views.activeSceneId;
-      const sceneItems = this.scenesService.views.getSceneItemsBySceneId(sceneToMapId);
-
-      if (!sceneItems) return;
-
-      sceneItems.forEach((sceneItem: SceneItem, index: number) => {
-        this.assignNodeContext(sceneItem, 'horizontal');
-        this.sceneNodeHandled.next(index);
-      });
+    if (
+      this.views.getVerticalNodeIds(sceneToMapId).length > 0 &&
+      !this.videoSettingsService.contexts.vertical
+    ) {
+      this.videoSettingsService.establishVideoContext('vertical');
     }
+
+    sceneItems.forEach((sceneItem: SceneItem, index: number) => {
+      // Item already has a context assigned
+      if (sceneItem.output) return;
+
+      const display = verticalNodeIds?.has(sceneItem.id) ? 'vertical' : 'horizontal';
+      this.assignNodeContext(sceneItem, display);
+      this.sceneNodeHandled.next(index);
+    });
+
     this.SET_IS_LOADING(false);
   }
 
