@@ -296,7 +296,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
     this.SET_SHOW_DUAL_OUTPUT();
 
     if (this.state.dualOutputMode) {
-      this.confirmOrCreateVerticalNodes();
+      this.confirmOrCreateVerticalNodes(this.views.activeSceneId);
       this.toggleDisplay(true, 'vertical');
     }
   }
@@ -305,7 +305,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
    * Create or confirm nodes for vertical output when toggling vertical display
    */
 
-  confirmOrCreateVerticalNodes(sceneId?: string) {
+  confirmOrCreateVerticalNodes(sceneId: string) {
     if (!this.views.hasNodeMap(sceneId) && this.state.dualOutputMode) {
       try {
         this.createSceneNodes();
@@ -321,15 +321,14 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
     }
   }
 
-  assignSceneNodes(sceneId?: string) {
+  assignSceneNodes(sceneId: string) {
     this.SET_IS_LOADING(true);
-    const sceneToMapId = sceneId ?? this.views.activeSceneId;
-    const sceneItems = this.scenesService.views.getSceneItemsBySceneId(sceneToMapId);
+    const sceneItems = this.scenesService.views.getSceneItemsBySceneId(sceneId);
     if (!sceneItems) return;
-    const verticalNodeIds = new Set(this.views.getVerticalNodeIds(sceneToMapId));
+    const verticalNodeIds = new Set(this.views.getVerticalNodeIds(sceneId));
 
     if (
-      this.views.getVerticalNodeIds(sceneToMapId).length > 0 &&
+      this.views.getVerticalNodeIds(sceneId).length > 0 &&
       !this.videoSettingsService.contexts.vertical
     ) {
       this.videoSettingsService.establishVideoContext('vertical');
