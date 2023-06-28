@@ -308,7 +308,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
   confirmOrCreateVerticalNodes(sceneId: string) {
     if (!this.views.hasNodeMap(sceneId) && this.state.dualOutputMode) {
       try {
-        this.createSceneNodes();
+        this.createSceneNodes(sceneId);
       } catch (error: unknown) {
         console.error('Error toggling Dual Output mode: ', error);
       }
@@ -346,19 +346,18 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
     this.SET_IS_LOADING(false);
   }
 
-  createSceneNodes(sceneId?: string) {
+  createSceneNodes(sceneId: string) {
     this.SET_IS_LOADING(true);
     if (this.state.dualOutputMode && !this.videoSettingsService.contexts.vertical) {
       this.videoSettingsService.establishVideoContext('vertical');
     }
 
-    const sceneToMapId = sceneId ?? this.views.activeSceneId;
-    const nodes = this.scenesService.views.getScene(sceneToMapId).getNodes();
+    const nodes = this.scenesService.views.getScene(sceneId).getNodes();
 
     this.editorCommandsService.executeCommand(
       'CopyNodesCommand',
-      this.scenesService.views.getScene(sceneToMapId).getSelection(nodes),
-      sceneToMapId,
+      this.scenesService.views.getScene(sceneId).getSelection(nodes),
+      sceneId,
       false,
       'vertical',
     );
