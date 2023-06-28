@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useCallback } from 'react';
 import { getPlatformService, TPlatform } from 'services/platforms';
 import cx from 'classnames';
 import { $t } from 'services/i18n';
@@ -13,6 +13,7 @@ import { useGoLiveSettings } from '../useGoLiveSettings';
 import { alertAsync } from 'components-react/modals';
 import Translate from 'components-react/shared/Translate';
 import DualOutputPlatformSelector from './DualOutputPlatformSelector';
+import { useDebounce } from 'components-react/hooks';
 
 interface INonUltraDestinationSwitchers {
   showSelector?: boolean;
@@ -24,13 +25,23 @@ export function NonUltraDestinationSwitchers(p: INonUltraDestinationSwitchers) {
     customDestinations,
     switchPlatforms,
     switchCustomDestination,
-    togglePlatform,
     isEnabled,
     isPrimaryPlatform,
   } = useGoLiveSettings();
   const enabledPlatformsRef = useRef(enabledPlatforms);
   enabledPlatformsRef.current = enabledPlatforms;
   const destinationSwitcherRef = useRef({ addClass: () => undefined });
+
+  const emitSwitch = useDebounce(500, () => {
+    switchPlatforms(enabledPlatformsRef.current);
+  });
+  const togglePlatform = useCallback((platform: TPlatform, enabled: boolean) => {
+    enabledPlatformsRef.current = enabledPlatformsRef.current.filter(
+      (p: TPlatform) => p !== platform,
+    );
+    if (enabled) enabledPlatformsRef.current.push(platform);
+    emitSwitch();
+  }, []);
 
   return (
     <>
@@ -47,9 +58,7 @@ export function NonUltraDestinationSwitchers(p: INonUltraDestinationSwitchers) {
           key={platform}
           destination={platform}
           enabled={isEnabled(platform)}
-          onChange={enabled => {
-            enabledPlatformsRef.current = togglePlatform(platform, enabled);
-          }}
+          onChange={enabled => togglePlatform(platform, enabled)}
           isPrimary={isPrimaryPlatform(platform)}
         />
       ))}
@@ -67,6 +76,10 @@ export function NonUltraDestinationSwitchers(p: INonUltraDestinationSwitchers) {
 
       {p.showSelector && (
         <DualOutputPlatformSelector
+          togglePlatform={platform => {
+            togglePlatform(platform, true);
+            destinationSwitcherRef.current.addClass();
+          }}
           showSwitcher={destinationSwitcherRef.current.addClass}
           switchDestination={index => {
             switchCustomDestination(index, true);

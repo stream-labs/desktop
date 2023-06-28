@@ -1,5 +1,7 @@
 import { IGoLiveSettings, StreamInfoView } from '../../../services/streaming';
 import { TPlatform } from '../../../services/platforms';
+import { TDisplayDestinations } from 'services/dual-output';
+import { ICustomStreamDestination } from 'services/settings/streaming';
 import { Services } from '../../service-provider';
 import cloneDeep from 'lodash/cloneDeep';
 import { FormInstance } from 'antd/lib/form';
@@ -81,25 +83,6 @@ class GoLiveSettingsState extends StreamInfoView<IGoLiveSettingsState> {
    */
   isEnabled(platform: TPlatform) {
     return this.enabledPlatforms.includes(platform);
-  }
-
-  /**
-   * Show/hide platform card in go live window
-   */
-  togglePlatform(platform: TPlatform, enabled: boolean) {
-    const platforms = enabled
-      ? [...this.enabledPlatforms, platform]
-      : this.enabledPlatforms.filter((p: TPlatform) => p !== platform);
-
-    // set timeout and loading status for toggle and settings animations
-    this.isUpdating = true;
-    this.updatePlatform(platform, { enabled });
-    setTimeout(() => {
-      this.switchPlatforms(platforms);
-      this.isUpdating = false;
-    }, 250);
-
-    return platforms;
   }
 
   /**
@@ -229,13 +212,35 @@ export class GoLiveSettingsModule {
   }
 
   /**
+   * Determine if all dual output go live requirements are fulfilled
+   */
+  getCanStreamDualOutput() {
+    const platformDisplays = Services.StreamingService.views.activeDisplayPlatforms;
+
+    const destinationDisplays = this.state.customDestinations.reduce(
+      (displayDestinations: TDisplayDestinations, destination: ICustomStreamDestination) => {
+        if (destination.enabled) {
+          displayDestinations[destination?.display ?? 'vertical'].push(destination.name);
+        }
+        return displayDestinations;
+      },
+      { horizontal: [], vertical: [] },
+    );
+
+    // determine if both displays are selected for active platforms
+    const horizontalHasDestinations =
+      platformDisplays.horizontal.length > 0 || destinationDisplays.horizontal.length > 0;
+    const verticalHasDestinations =
+      platformDisplays.vertical.length > 0 || destinationDisplays.vertical.length > 0;
+
+    return horizontalHasDestinations && verticalHasDestinations;
+  }
+
+  /**
    * Validate the form and show an error message
    */
   async validate() {
-    if (
-      Services.DualOutputService.views.dualOutputMode &&
-      !Services.DualOutputService.views.canStreamDualOutput
-    ) {
+    if (Services.DualOutputService.views.dualOutputMode && !this.getCanStreamDualOutput()) {
       message.error(
         $t(
           'To use Dual Output you must stream to at least one horizontal and one vertical platform.',

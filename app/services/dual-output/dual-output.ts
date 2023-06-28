@@ -1,10 +1,10 @@
 import { PersistentStatefulService, InitAfter, Inject, ViewHandler, mutation } from 'services/core';
 import {
   TDisplayPlatforms,
+  TDisplayDestinations,
   TDualOutputPlatformSettings,
   DualOutputPlatformSettings,
   IDualOutputDestinationSetting,
-  IDualOutputPlatformSetting,
 } from './dual-output-data';
 import { verticalDisplayData } from '../settings-v2/default-settings-data';
 import { ScenesService, SceneItem, IPartialSettings, TSceneNode } from 'services/scenes';
@@ -44,7 +44,6 @@ interface IDualOutputServiceState {
 class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
   @Inject() private scenesService: ScenesService;
   @Inject() private videoSettingsService: VideoSettingsService;
-  @Inject() private streamingService: StreamingService;
   @Inject() private sceneCollectionsService: SceneCollectionsService;
   @Inject() private incrementalRolloutService: IncrementalRolloutService;
 
@@ -100,27 +99,6 @@ class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
 
   get displays() {
     return this.state.displays;
-  }
-
-  get activeDisplayPlatforms() {
-    const enabledPlatforms = this.streamingService.views.enabledPlatforms;
-    return Object.entries(this.state.platformSettings).reduce(
-      (displayPlatforms: TDisplayPlatforms, [key, val]: [string, IDualOutputPlatformSetting]) => {
-        if (val && enabledPlatforms.includes(val.platform)) {
-          displayPlatforms[val.display].push(val.platform);
-        }
-        return displayPlatforms;
-      },
-      { horizontal: [], vertical: [] },
-    );
-  }
-
-  get canStreamDualOutput(): boolean {
-    // determine if both displays are selected for active platforms
-    return (
-      this.activeDisplayPlatforms.horizontal.length > 0 &&
-      this.activeDisplayPlatforms.vertical.length > 0
-    );
   }
 
   get videoSettings() {

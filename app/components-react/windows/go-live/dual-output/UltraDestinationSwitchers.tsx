@@ -1,4 +1,4 @@
-import React, { useRef, MouseEvent } from 'react';
+import React, { useRef, MouseEvent, useCallback } from 'react';
 import { getPlatformService, TPlatform } from 'services/platforms';
 import cx from 'classnames';
 import { $t } from 'services/i18n';
@@ -13,6 +13,7 @@ import { assertIsDefined } from 'util/properties-type-guards';
 import { useGoLiveSettings } from '../useGoLiveSettings';
 import { alertAsync } from 'components-react/modals';
 import Translate from 'components-react/shared/Translate';
+import { useDebounce } from 'components-react/hooks';
 
 interface IUltraDestinationSwitchers {
   type?: 'default' | 'ultra';
@@ -26,13 +27,32 @@ export function UltraDestinationSwitchers(p: IUltraDestinationSwitchers) {
     enabledPlatforms,
     linkedPlatforms,
     customDestinations,
-    toggleDestination,
-    togglePlatform,
     isPrimaryPlatform,
-    isEnabled,
+    switchPlatforms,
+    switchCustomDestination,
   } = useGoLiveSettings();
   const enabledPlatformsRef = useRef(enabledPlatforms);
   enabledPlatformsRef.current = enabledPlatforms;
+
+  const emitSwitch = useDebounce(500, () => {
+    switchPlatforms(enabledPlatformsRef.current);
+  });
+  const isEnabled = useCallback((platform: TPlatform) => {
+    return enabledPlatformsRef.current.includes(platform);
+  }, []);
+
+  const togglePlatform = useCallback((platform: TPlatform, enabled: boolean) => {
+    enabledPlatformsRef.current = enabledPlatformsRef.current.filter(
+      (p: TPlatform) => p !== platform,
+    );
+    if (enabled) enabledPlatformsRef.current.push(platform);
+    emitSwitch();
+  }, []);
+
+  const toggleDestination = useCallback((index: number, enabled: boolean) => {
+    // this timeout is to allow for the toggle animation
+    setTimeout(() => switchCustomDestination(index, enabled), 500);
+  }, []);
 
   return (
     <>
@@ -49,12 +69,7 @@ export function UltraDestinationSwitchers(p: IUltraDestinationSwitchers) {
           key={platform}
           destination={platform}
           enabled={isEnabled(platform)}
-          onChange={enabled => {
-            // timeout to allow for switch animation
-            setTimeout(() => {
-              enabledPlatformsRef.current = togglePlatform(platform, enabled);
-            }, 500);
-          }}
+          onChange={enabled => togglePlatform(platform, enabled)}
           isPrimary={isPrimaryPlatform(platform)}
         />
       ))}

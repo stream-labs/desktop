@@ -4,7 +4,7 @@ import { EOutputCode, Global, NodeObs } from '../../../obs-api';
 import { Inject } from 'services/core/injector';
 import moment from 'moment';
 import padStart from 'lodash/padStart';
-import { IOutputSettings, OutputSettingsService, SettingsService } from 'services/settings';
+import { IOutputSettings, OutputSettingsService } from 'services/settings';
 import { WindowsService } from 'services/windows';
 import { Subject } from 'rxjs';
 import {
@@ -30,7 +30,6 @@ import {
 } from 'services/notifications';
 import { VideoEncodingOptimizationService } from 'services/video-encoding-optimizations';
 import { VideoSettingsService, TDisplayType } from 'services/settings-v2/video';
-import { DualOutputService } from 'services/dual-output';
 import { StreamSettingsService } from '../settings/streaming';
 import { RestreamService, TOutputOrientation } from 'services/restream';
 import Utils from 'services/utils';
@@ -90,8 +89,6 @@ export class StreamingService
   @Inject() private growService: GrowService;
   @Inject() private recordingModeService: RecordingModeService;
   @Inject() private videoSettingsService: VideoSettingsService;
-  @Inject() private settingsService: SettingsService;
-  @Inject() private dualOutputService: DualOutputService;
   @Inject() private markersService: MarkersService;
 
   streamingStatusChange = new Subject<EStreamingState>();

@@ -6,17 +6,21 @@ import {
   ERecordingState,
   EReplayBufferState,
 } from './streaming-api';
-import { StreamSettingsService } from '../settings/streaming';
+import { StreamSettingsService, ICustomStreamDestination } from '../settings/streaming';
 import { UserService } from '../user';
 import { RestreamService } from '../restream';
-import { DualOutputService } from '../dual-output';
+import {
+  DualOutputService,
+  TDisplayPlatforms,
+  IDualOutputPlatformSetting,
+  TDisplayDestinations,
+} from '../dual-output';
 import { getPlatformService, TPlatform, TPlatformCapability, platformList } from '../platforms';
 import { TwitterService } from '../../app-services';
 import cloneDeep from 'lodash/cloneDeep';
 import difference from 'lodash/difference';
 import { Services } from '../../components-react/service-provider';
 import { getDefined } from '../../util/properties-type-guards';
-import { TDisplayType } from 'services/settings-v2';
 
 /**
  * The stream info view is responsible for keeping
@@ -169,7 +173,43 @@ export class StreamInfoView<T extends Object> extends ViewHandler<T> {
   }
 
   get activeDisplayPlatforms() {
-    return this.dualOutputView.activeDisplayPlatforms;
+    const enabledPlatforms = this.enabledPlatforms;
+
+    return Object.entries(this.dualOutputView.platformSettings).reduce(
+      (displayPlatforms: TDisplayPlatforms, [key, val]: [string, IDualOutputPlatformSetting]) => {
+        if (val && enabledPlatforms.includes(val.platform)) {
+          displayPlatforms[val.display].push(val.platform);
+        }
+        return displayPlatforms;
+      },
+      { horizontal: [], vertical: [] },
+    );
+  }
+
+  get activeCustomDestinations() {
+    const destinations = this.customDestinations;
+
+    return destinations.reduce(
+      (displayDestinations: TDisplayDestinations, destination: ICustomStreamDestination) => {
+        if (destination.enabled) {
+          displayDestinations[destination.display ?? 'horizontal'].push(destination.name);
+        }
+        return displayDestinations;
+      },
+      { horizontal: [], vertical: [] },
+    );
+  }
+
+  get canStreamDualOutput(): boolean {
+    // determine if both displays are selected for active platforms
+    const horizontalHasDestinations =
+      this.activeDisplayPlatforms.horizontal.length > 0 ||
+      this.activeCustomDestinations.horizontal.length > 0;
+    const verticalHasDestinations =
+      this.activeDisplayPlatforms.vertical.length > 0 ||
+      this.activeCustomDestinations.vertical.length > 0;
+
+    return horizontalHasDestinations && verticalHasDestinations;
   }
 
   getPlatformDisplay(platform: TPlatform) {

@@ -14,6 +14,7 @@ const { Option } = Select;
 interface IPlatformSelectorProps {
   showSwitcher: (platform: TPlatform) => void;
   switchDestination: (index: number) => void;
+  togglePlatform: (platform: TPlatform) => void;
 }
 
 /**
@@ -21,13 +22,7 @@ interface IPlatformSelectorProps {
  */
 
 export default function DualOutputPlatformSelector(p: IPlatformSelectorProps) {
-  const {
-    linkedPlatforms,
-    enabledPlatforms,
-    customDestinations,
-    isEnabled,
-    togglePlatform,
-  } = useGoLiveSettings();
+  const { linkedPlatforms, enabledPlatforms, customDestinations, isEnabled } = useGoLiveSettings();
 
   function showStreamSettings() {
     Services.SettingsService.actions.showSettings('Stream');
@@ -91,7 +86,7 @@ export default function DualOutputPlatformSelector(p: IPlatformSelectorProps) {
           // add destination to switchers
           if (linkedPlatforms.includes(option.value as TPlatform)) {
             p.showSwitcher(option.value as TPlatform);
-            togglePlatform(option.value as TPlatform, true);
+            p.togglePlatform(option.value as TPlatform);
           } else {
             customDestinations.forEach((destination: ICustomStreamDestination, index: number) => {
               if (destination.name === option.value) {

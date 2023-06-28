@@ -24,6 +24,10 @@ export type TDisplayPlatforms = {
   [Display in EOutputDisplayType]: TPlatform[];
 };
 
+export type TDisplayDestinations = {
+  [Display in EOutputDisplayType]: string[];
+};
+
 export const DualOutputPlatformSettings: TDualOutputPlatformSettings = {
   [EPlatform.Twitch]: {
     platform: EPlatform.Twitch,
