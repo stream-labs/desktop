@@ -21,8 +21,10 @@ export function $t(...args: any[]): string {
   // some tests try to call this function before dictionaries have been loaded
   if (!vueI18nInstance) return args[0];
 
-  // @ts-ignore
-  return vueI18nInstance.t.call(I18nService.vueI18nInstance, ...args) as string;
+  return vueI18nInstance.t.call(
+    I18nService.vueI18nInstance,
+    ...(args as [key: string, locale: string, values?: VueI18n.Values]),
+  ) as string;
 }
 
 /**

@@ -61,8 +61,7 @@ describe('ParaphraseDictionary', async () => {
 
   // 他の設定に影響を受けていないかどうか、全部試してみる
   const table = replace_rules.elements
-    .filter(elem => isText(elem))
-    //@ts-ignore
+    .filter(isText)
     .map<[string, string]>((elem: replace_text) => [elem.text, elem.replacement]);
   test.each(table)('text %s -> %s', (text, replace) =>
     expect(dictionary.process(text, synthId)).toBe(replace),
