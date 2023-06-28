@@ -60,10 +60,10 @@ export function Ultra() {
       link: 'https://crossclip.streamlabs.com/?refl=slobs-settings',
     },
     {
-      title: 'Willow Link Pro',
-      description: $t('Create a custom personal, all-in-one page to link in bio'),
-      image: 'willow.png',
-      link: 'https://streamlabs.com/willow?refl=slobs-settings',
+      title: 'Podcast Editor Pro',
+      description: $t('Text-based editing of VOD content'),
+      image: 'podcast-editor.png',
+      link: 'https://podcasteditor.streamlabs.com/?refl=slobs-settings',
     },
   ];
 
