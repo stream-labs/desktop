@@ -141,37 +141,25 @@ export class Scene {
    * in the source selector, so filter them while getting the node models
    * for optimal performance.
    */
+
   getSourceSelectorNodes(): TSceneNode[] {
+    let nodes = this.getNodes();
     if (
       this.dualOutputService.views.hasVerticalNodes &&
       this.dualOutputService.views.dualOutputMode
     ) {
-      // for optimized performance, check hashmap instead of list of vertical ids
+      // nodeMap can be used for checking horizontal display nodes,
+      // but cannot lookup vertical display IDs so we use a Set instead
       const nodeMap = this.dualOutputService.views.activeSceneNodeMap;
-      if (this.dualOutputService.views.activeDisplays.horizontal) {
-        return this.state.nodes.filter(node => {
-          if (nodeMap[node.id]) {
-            return node.sceneNodeType === 'folder'
-              ? this.getFolder(node.id)!
-              : this.getItem(node.id)!;
-          }
-        }) as TSceneNode[];
-      }
-
-      if (this.dualOutputService.views.activeDisplays.vertical) {
-        const verticalNodeIds = new Set(this.dualOutputService.views.verticalNodeIds);
-        return this.state.nodes.filter(node => {
-          if (verticalNodeIds.has(node.id)) {
-            return node.sceneNodeType === 'folder'
-              ? this.getFolder(node.id)!
-              : this.getItem(node.id)!;
-          }
-        }) as TSceneNode[];
-      }
+      const verticalNodeIds = new Set(this.dualOutputService.views.verticalNodeIds);
+      nodes = nodes.filter(node => {
+        return this.dualOutputService.views.activeDisplays.horizontal
+          ? nodeMap[node.id]
+          : verticalNodeIds.has(node.id);
+      });
     }
 
-    // vanilla scenes will not have vertical nodes so just return all
-    return this.getNodes();
+    return nodes;
   }
 
   getSelection(itemsList?: TNodesList): Selection {
