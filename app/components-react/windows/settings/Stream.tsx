@@ -217,10 +217,12 @@ class StreamSettingsModule {
     const isUpdateMode = typeof this.state.editCustomDestMode === 'number';
     if (isUpdateMode) {
       const ind = this.state.editCustomDestMode as number;
-      destinations.splice(ind, 1, this.state.customDestForm);
+      // preserve destination display setting or set to horizontal by default
+      const display = destinations[ind]?.display ?? 'horizontal';
+      destinations.splice(ind, 1, { ...this.state.customDestForm, display });
     } else {
-      destinations.push(this.state.customDestForm);
-      this.dualOutputService.actions.updateDestinationSetting(this.state.customDestForm.name);
+      // set display to horizontal by default
+      destinations.push({ ...this.state.customDestForm, display: 'horizontal' });
     }
     this.streamSettingsService.setGoLiveSettings({ customDestinations: destinations });
     this.stopEditing();

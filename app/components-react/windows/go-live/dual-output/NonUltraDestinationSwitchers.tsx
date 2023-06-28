@@ -53,13 +53,14 @@ export function NonUltraDestinationSwitchers(p: INonUltraDestinationSwitchers) {
         }
         hasMargin={true}
       />
-      {enabledPlatforms.map((platform: TPlatform) => (
+      {enabledPlatforms.map((platform: TPlatform, index: number) => (
         <DestinationSwitcher
           key={platform}
           destination={platform}
           enabled={isEnabled(platform)}
           onChange={enabled => togglePlatform(platform, enabled)}
           isPrimary={isPrimaryPlatform(platform)}
+          index={index}
         />
       ))}
       {customDestinations
@@ -71,6 +72,7 @@ export function NonUltraDestinationSwitchers(p: INonUltraDestinationSwitchers) {
             destination={destination}
             enabled={customDestinations[destination.index].enabled}
             onChange={() => switchCustomDestination(destination.index, false)}
+            index={destination.index}
           />
         ))}
 
@@ -96,6 +98,7 @@ interface IDestinationSwitcherProps {
   enabled: boolean;
   onChange: (enabled: boolean) => unknown;
   isPrimary?: boolean;
+  index: number;
 }
 
 /**
@@ -183,7 +186,7 @@ const DestinationSwitcher = React.forwardRef<{ addClass: () => void }, IDestinat
         </div>
         <div className={styles.platformDisplay}>
           <span className={styles.label}>{`${$t('Output')}:`}</span>
-          <DisplaySelector id={title} isPlatform={!!platform} nolabel nomargin />
+          <DisplaySelector title={title} isPlatform={!!platform} index={p.index} nolabel nomargin />
         </div>
       </div>
     );

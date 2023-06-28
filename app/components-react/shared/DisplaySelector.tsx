@@ -1,4 +1,4 @@
-import React, { CSSProperties } from 'react';
+import React, { CSSProperties, useMemo } from 'react';
 import { $t } from 'services/i18n';
 import { useVuex } from 'components-react/hooks';
 import { Services } from 'components-react/service-provider';
@@ -6,9 +6,11 @@ import { RadioInput } from './inputs';
 import { displayLabels } from 'services/dual-output';
 import { TDisplayType } from 'services/settings-v2';
 import { platformLabels } from 'services/platforms';
+import { useGoLiveSettings } from 'components-react/windows/go-live/useGoLiveSettings';
 
 interface IDisplaySelectorProps {
-  id: string;
+  title: string;
+  index: number;
   isPlatform: boolean;
   nolabel?: boolean;
   nomargin?: boolean;
@@ -19,17 +21,17 @@ interface IDisplaySelectorProps {
 export default function DisplaySelector(p: IDisplaySelectorProps) {
   const { DualOutputService, StreamingService } = Services;
 
+  const { customDestinations, updateCustomDestinationDisplay } = useGoLiveSettings();
+
   const v = useVuex(() => ({
     updatePlatformSetting: DualOutputService.actions.updatePlatformSetting,
-    updateDestinationSetting: DualOutputService.actions.updateDestinationSetting,
     platformSettings: DualOutputService.views.platformSettings,
-    destinationSettings: DualOutputService.views.destinationSettings,
     isMidstreamMode: StreamingService.views.isMidStreamMode,
   }));
 
-  const id = p.isPlatform ? p.id.toLowerCase() : p.id;
-  const label = p.isPlatform ? platformLabels(p.id) : p.id;
-  const setting = p.isPlatform ? v.platformSettings[id] : v.destinationSettings[id];
+  const platform = p.title.toLowerCase();
+  const setting = p.isPlatform ? v.platformSettings[platform] : customDestinations[p.index];
+  const label = p.isPlatform ? platformLabels(platform) : setting.name;
 
   const displays = [
     {
@@ -53,7 +55,9 @@ export default function DisplaySelector(p: IDisplaySelectorProps) {
       defaultValue="horizontal"
       options={displays}
       onChange={(val: TDisplayType) =>
-        p.isPlatform ? v.updatePlatformSetting(id, val) : v.updateDestinationSetting(id, val)
+        p.isPlatform
+          ? v.updatePlatformSetting(platform, val)
+          : updateCustomDestinationDisplay(p.index, val)
       }
       value={setting?.display ?? 'horizontal'}
       disabled={v.isMidstreamMode}

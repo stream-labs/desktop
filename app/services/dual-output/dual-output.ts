@@ -9,14 +9,13 @@ import {
 import { verticalDisplayData } from '../settings-v2/default-settings-data';
 import { ScenesService, SceneItem, IPartialSettings, TSceneNode } from 'services/scenes';
 import { IVideoSetting, TDisplayType, VideoSettingsService } from 'services/settings-v2/video';
-import { StreamingService } from 'services/streaming';
 import { TPlatform } from 'services/platforms';
 import { EPlaceType } from 'services/editor-commands/commands/reorder-nodes';
 import { EditorCommandsService } from 'services/editor-commands';
 import { Subject } from 'rxjs';
 import { TOutputOrientation } from 'services/restream';
 import { IVideoInfo } from 'obs-studio-node';
-import { ICustomStreamDestination } from 'services/settings/streaming';
+import { ICustomStreamDestination, StreamSettingsService } from 'services/settings/streaming';
 import {
   ISceneCollectionsManifestEntry,
   SceneCollectionsService,
@@ -233,7 +232,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
   @Inject() private videoSettingsService: VideoSettingsService;
   @Inject() private editorCommandsService: EditorCommandsService;
   @Inject() private sceneCollectionsService: SceneCollectionsService;
-  @Inject() private streamingService: StreamingService;
+  @Inject() private streamSettingsService: StreamSettingsService;
 
   static defaultState: IDualOutputServiceState = {
     displays: ['horizontal', 'vertical'],
@@ -261,7 +260,8 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
   init() {
     super.init();
 
-    this.confirmDestinationDisplays(this.streamingService.views.customDestinations);
+    // confirm custom destinations have a default display
+    this.confirmDestinationDisplays();
 
     // we need to confirm that the scene collection has a node map
     // because this is a new property added for dual output
@@ -439,11 +439,21 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
     this.UPDATE_DESTINATION_SETTING(destination, display);
   }
 
-  confirmDestinationDisplays(destinations: ICustomStreamDestination[]) {
-    if (destinations.length) {
-      destinations.forEach((destination: ICustomStreamDestination) => {
-        if (!this.state.destinationSettings[destination.name]) {
-          this.updateDestinationSetting(destination.name);
+  /**
+   * Confirm custom destinations have assigned displays
+   */
+
+  confirmDestinationDisplays() {
+    const customDestinations = this.streamSettingsService.settings.goLiveSettings
+      .customDestinations;
+    if (customDestinations) {
+      customDestinations.forEach((destination: ICustomStreamDestination, index: number) => {
+        if (!destination.hasOwnProperty('display')) {
+          const updatedDestinations = customDestinations.splice(index, 1, {
+            ...destination,
+            display: 'horizontal',
+          });
+          this.streamSettingsService.setGoLiveSettings({ customDestinations: updatedDestinations });
         }
       });
     }

@@ -11,6 +11,7 @@ import { injectState, useModule } from 'slap';
 import { useForm } from '../../shared/inputs/Form';
 import { getDefined } from '../../../util/properties-type-guards';
 import isEqual from 'lodash/isEqual';
+import { TDisplayType } from 'services/settings-v2';
 
 type TCommonFieldName = 'title' | 'description';
 
@@ -67,6 +68,12 @@ class GoLiveSettingsState extends StreamInfoView<IGoLiveSettingsState> {
   switchCustomDestination(destInd: number, enabled: boolean) {
     const customDestinations = cloneDeep(this.getView().customDestinations);
     customDestinations[destInd].enabled = enabled;
+    this.updateSettings({ customDestinations });
+  }
+
+  updateCustomDestinationDisplay(destInd: number, display: TDisplayType) {
+    const customDestinations = cloneDeep(this.getView().customDestinations);
+    customDestinations[destInd].display = display;
     this.updateSettings({ customDestinations });
   }
 
@@ -217,16 +224,16 @@ export class GoLiveSettingsModule {
   getCanStreamDualOutput() {
     const platformDisplays = Services.StreamingService.views.activeDisplayPlatforms;
 
+    // determine which enabled custom destinations use which displays
     const destinationDisplays = this.state.customDestinations.reduce(
-      (displayDestinations: TDisplayDestinations, destination: ICustomStreamDestination) => {
-        if (destination.enabled) {
-          displayDestinations[destination?.display ?? 'vertical'].push(destination.name);
+      (displays: TDisplayDestinations, destination: ICustomStreamDestination, index: number) => {
+        if (destination.enabled && destination?.display) {
+          displays[destination.display].push(destination.name);
         }
-        return displayDestinations;
+        return displays;
       },
       { horizontal: [], vertical: [] },
     );
-
     // determine if both displays are selected for active platforms
     const horizontalHasDestinations =
       platformDisplays.horizontal.length > 0 || destinationDisplays.horizontal.length > 0;
