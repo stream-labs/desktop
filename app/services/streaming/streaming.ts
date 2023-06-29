@@ -305,6 +305,8 @@ export class StreamingService
         destination.mode = this.views.getDisplayContextName(display);
       });
     }
+    console.log('\nvvv');
+    console.log('--> customDestinations ', JSON.stringify(settings.customDestinations));
 
     // save enabled platforms to reuse setting with the next app start
     this.streamSettingsService.setSettings({ goLiveSettings: settings });
@@ -370,9 +372,16 @@ export class StreamingService
       // if needed, set up multistreaming for dual output
       const shouldMultistreamDisplay = this.views.shouldMultistreamDisplay;
 
+      const destinationDisplays = this.views.activeDisplayDestinations;
+
+      console.log('destinationDisplays ', JSON.stringify(destinationDisplays));
+      console.log('^^^\n');
+
       for (const display in shouldMultistreamDisplay) {
+        // set up restream service to multistream display
         if (shouldMultistreamDisplay[display]) {
-          // check the Restream service is available
+          // set up restream service to multistream display
+          // check the restream service is available
           let ready = false;
           try {
             await this.runCheck(
@@ -401,6 +410,25 @@ export class StreamingService
             console.error('Failed to setup restream', e);
             this.setError('DUAL_OUTPUT_SETUP_FAILED');
             return;
+          }
+        } else {
+          // if a custom destination is enabled for single streaming
+          // move the relevant OBS context to custom ingest mode
+          if (destinationDisplays[display].length > 1) {
+            const destination = this.views.customDestinations.find(d => d.display === display);
+            this.streamSettingsService.setSettings(
+              {
+                streamType: 'rtmp_custom',
+              },
+              display as TDisplayType,
+            );
+            this.streamSettingsService.setSettings(
+              {
+                key: destination.streamKey,
+                server: destination.url,
+              },
+              display as TDisplayType,
+            );
           }
         }
       }
@@ -764,6 +792,10 @@ export class StreamingService
     // start streaming
     if (this.views.isDualOutputMode) {
       // start dual output
+      console.log(JSON.stringify(this.streamSettingsService.views.obsStreamSettings[1].parameters));
+      console.log(
+        JSON.stringify(this.streamSettingsService.views.obsStreamSecondSettings[1].parameters),
+      );
 
       const horizontalContext = this.videoSettingsService.contexts.horizontal;
       const verticalContext = this.videoSettingsService.contexts.vertical;
@@ -789,6 +821,11 @@ export class StreamingService
       // sleep for 1 second to allow the first stream to start
       await new Promise(resolve => setTimeout(resolve, 1000));
     } else {
+      console.log(JSON.stringify(this.streamSettingsService.views.obsStreamSettings[1].parameters));
+      console.log(
+        JSON.stringify(this.streamSettingsService.views.obsStreamSecondSettings[1].parameters),
+      );
+
       // start single output
       const horizontalContext = this.videoSettingsService.contexts.horizontal;
       NodeObs.OBS_service_setVideoInfo(horizontalContext, 'horizontal');

@@ -176,9 +176,9 @@ export class StreamInfoView<T extends Object> extends ViewHandler<T> {
   get shouldMultistreamDisplay(): { horizontal: boolean; vertical: boolean } {
     const numHorizontal =
       this.activeDisplayPlatforms.horizontal.length +
-      this.activeCustomDestinations.horizontal.length;
+      this.activeDisplayDestinations.horizontal.length;
     const numVertical =
-      this.activeDisplayPlatforms.vertical.length + this.activeCustomDestinations.vertical.length;
+      this.activeDisplayPlatforms.vertical.length + this.activeDisplayDestinations.vertical.length;
 
     return {
       horizontal: numHorizontal > 1,
@@ -200,7 +200,7 @@ export class StreamInfoView<T extends Object> extends ViewHandler<T> {
     );
   }
 
-  get activeCustomDestinations(): TDisplayDestinations {
+  get activeDisplayDestinations(): TDisplayDestinations {
     const destinations = this.customDestinations;
 
     return destinations.reduce(

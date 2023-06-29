@@ -447,18 +447,18 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
 
   confirmDestinationDisplays() {
     const customDestinations = this.streamSettingsService.settings.goLiveSettings
-      .customDestinations;
-    if (customDestinations) {
-      customDestinations.forEach((destination: ICustomStreamDestination, index: number) => {
-        if (!destination.hasOwnProperty('display')) {
-          const updatedDestinations = customDestinations.splice(index, 1, {
-            ...destination,
-            display: 'horizontal',
-          });
-          this.streamSettingsService.setGoLiveSettings({ customDestinations: updatedDestinations });
-        }
-      });
-    }
+      ?.customDestinations;
+    if (!customDestinations) return;
+
+    customDestinations.forEach((destination: ICustomStreamDestination, index: number) => {
+      if (!destination.hasOwnProperty('display')) {
+        const updatedDestinations = customDestinations.splice(index, 1, {
+          ...destination,
+          display: 'horizontal',
+        });
+        this.streamSettingsService.setGoLiveSettings({ customDestinations: updatedDestinations });
+      }
+    });
   }
 
   /**
