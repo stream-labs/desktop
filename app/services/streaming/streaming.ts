@@ -305,8 +305,6 @@ export class StreamingService
         destination.mode = this.views.getDisplayContextName(display);
       });
     }
-    console.log('\nvvv');
-    console.log('--> customDestinations ', JSON.stringify(settings.customDestinations));
 
     // save enabled platforms to reuse setting with the next app start
     this.streamSettingsService.setSettings({ goLiveSettings: settings });
@@ -319,7 +317,6 @@ export class StreamingService
 
     // all platforms to stream
     const platforms = this.views.enabledPlatforms;
-    console.log('platforms ', JSON.stringify(platforms));
 
     /**
      * SET PLATFORM STREAM SETTINGS
@@ -374,9 +371,6 @@ export class StreamingService
 
       const destinationDisplays = this.views.activeDisplayDestinations;
 
-      console.log('destinationDisplays ', JSON.stringify(destinationDisplays));
-      console.log('^^^\n');
-
       for (const display in shouldMultistreamDisplay) {
         // set up restream service to multistream display
         if (shouldMultistreamDisplay[display]) {
@@ -411,24 +405,36 @@ export class StreamingService
             this.setError('DUAL_OUTPUT_SETUP_FAILED');
             return;
           }
-        } else {
+        } else if (destinationDisplays[display].length > 0) {
           // if a custom destination is enabled for single streaming
           // move the relevant OBS context to custom ingest mode
-          if (destinationDisplays[display].length > 1) {
-            const destination = this.views.customDestinations.find(d => d.display === display);
-            this.streamSettingsService.setSettings(
-              {
-                streamType: 'rtmp_custom',
-              },
-              display as TDisplayType,
-            );
-            this.streamSettingsService.setSettings(
-              {
-                key: destination.streamKey,
-                server: destination.url,
-              },
-              display as TDisplayType,
-            );
+
+          const destination = this.views.customDestinations.find(d => d.display === display);
+          try {
+            await this.runCheck('setupDualOutput', async () => {
+              if (destination) {
+                this.streamSettingsService.setSettings(
+                  {
+                    streamType: 'rtmp_custom',
+                  },
+                  display as TDisplayType,
+                );
+                this.streamSettingsService.setSettings(
+                  {
+                    key: destination.streamKey,
+                    server: destination.url,
+                  },
+                  display as TDisplayType,
+                );
+              } else {
+                console.error('Custom destination not found');
+              }
+              await Promise.resolve();
+            });
+          } catch (e: unknown) {
+            console.error('Failed to setup custom destination', e);
+            this.setError('DUAL_OUTPUT_SETUP_FAILED');
+            return;
           }
         }
       }
@@ -792,10 +798,6 @@ export class StreamingService
     // start streaming
     if (this.views.isDualOutputMode) {
       // start dual output
-      console.log(JSON.stringify(this.streamSettingsService.views.obsStreamSettings[1].parameters));
-      console.log(
-        JSON.stringify(this.streamSettingsService.views.obsStreamSecondSettings[1].parameters),
-      );
 
       const horizontalContext = this.videoSettingsService.contexts.horizontal;
       const verticalContext = this.videoSettingsService.contexts.vertical;
@@ -821,11 +823,6 @@ export class StreamingService
       // sleep for 1 second to allow the first stream to start
       await new Promise(resolve => setTimeout(resolve, 1000));
     } else {
-      console.log(JSON.stringify(this.streamSettingsService.views.obsStreamSettings[1].parameters));
-      console.log(
-        JSON.stringify(this.streamSettingsService.views.obsStreamSecondSettings[1].parameters),
-      );
-
       // start single output
       const horizontalContext = this.videoSettingsService.contexts.horizontal;
       NodeObs.OBS_service_setVideoInfo(horizontalContext, 'horizontal');
