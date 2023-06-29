@@ -21,6 +21,7 @@ import {
   SceneCollectionsService,
 } from 'services/scene-collections';
 import { IncrementalRolloutService, EAvailableFeatures } from 'services/incremental-rollout';
+import { UserService } from 'services/user';
 
 interface IDisplayVideoSettings {
   defaultDisplay: TDisplayType;
@@ -237,6 +238,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
   @Inject() private editorCommandsService: EditorCommandsService;
   @Inject() private sceneCollectionsService: SceneCollectionsService;
   @Inject() private streamSettingsService: StreamSettingsService;
+  @Inject() private userService: UserService;
 
   static defaultState: IDualOutputServiceState = {
     displays: ['horizontal', 'vertical'],
@@ -289,6 +291,14 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
 
     this.scenesService.sourcesAdded.subscribe((sceneId: string) => {
       this.assignContexts(sceneId);
+    });
+
+    // the user must be logged in to use dual output mode
+    // so toggle off dual output mode on log out
+    this.userService.userLogout.subscribe(() => {
+      if (this.state.dualOutputMode) {
+        this.setdualOutputMode();
+      }
     });
   }
 
