@@ -17,6 +17,7 @@ function error(msg) {
 }
 
 function executeCmd(cmd, options) {
+  log(`Executing: ${cmd}`);
   const result = sh.exec(cmd, options);
 
   if (result.code !== 0) {
@@ -44,7 +45,7 @@ async function input(message, defaultValue) {
     type: 'input',
     name: 'value',
     message,
-    default: defaultValue
+    default: defaultValue,
   });
 
   return result.value;

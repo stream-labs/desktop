@@ -134,6 +134,7 @@ async function runScript({
   if (!(await confirm('Are you sure to release with these configs?', false))) {
     sh.exit(1);
   }
+  const skipCleaningNodeModules = !skipBuild && !(await confirm('skip cleaning node_modules?'));
 
   info(`check whether remote ${target.remote} exists`);
   executeCmd(`git remote get-url ${target.remote}`);
@@ -162,7 +163,6 @@ async function runScript({
   // update package.json with newVersion and git tag
   executeCmd(`yarn version --new-version=${newVersion}`);
 
-  const skipCleaningNodeModules = !skipBuild && !(await confirm('skip cleaning node_modules?'));
   if (skipBuild) {
     info('SKIP build process since skipBuild is set...');
   } else {
@@ -177,6 +177,11 @@ async function runScript({
 
     info('Compiling assets...');
     executeCmd('yarn compile:production');
+
+    info('Injecting Sentry...');
+    executeCmd(`cp main.js bundles/`);
+    const bundles = path.resolve('.', 'bundles');
+    injectForSentry(bundles);
 
     info('Making the package...');
     executeCmd(`yarn package:${releaseEnvironment}-${releaseChannel}`);
@@ -256,7 +261,7 @@ async function runScript({
       tag_name: newTag,
       name: newTag,
       body: patchNote.notes,
-      draft: true,
+      draft: false,
       prerelease: releaseChannel !== 'stable',
     });
 
@@ -292,9 +297,9 @@ async function runScript({
 
   if (enableUploadToSentry) {
     info('uploading to sentry...');
-    executeCmd(`cp main.js bundles/`);
+    // executeCmd(`cp main.js bundles/`);
     const bundles = path.resolve('.', 'bundles');
-    injectForSentry(bundles);
+    // injectForSentry(bundles);
     uploadToSentry(sentry.organization, sentry.project, newVersion, bundles);
   } else {
     info('uploading to sentry: SKIP');

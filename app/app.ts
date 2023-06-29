@@ -38,10 +38,6 @@ type SentryParams = {
 };
 const sentryOrg = 'o170115';
 
-function getSentryDsn(p: SentryParams): string {
-  return `https://${p.key}@${p.organization}.ingest.sentry.io/${p.project}`;
-}
-
 function getSentryCrashReportUrl(p: SentryParams): string {
   return `https://${p.organization}.ingest.sentry.io/api/${p.project}/minidump/?sentry_key=${p.key}`;
 }
@@ -56,8 +52,8 @@ let sentryParam: SentryParams = {
 if (isProduction) {
   // This is the production DSN
   sentryParam = Utils.isUnstable()
-    ? { organization: sentryOrg, project: '1546758', key: '7451aaa71b7640a69ee1d31d6fd9ef78' }
-    : { organization: sentryOrg, project: '1246812', key: '35a02d8ebec14fd3aadc9d95894fabcf' };
+    ? { organization: sentryOrg, project: '5372801', key: '819e76e51864453aafd28c6d0473881f' } // crash-reporter-unstable
+    : { organization: sentryOrg, project: '1520076', key: 'd965eea4b2254c2b9f38d2346fb8a472' }; // crash-reporter
 
   electron.crashReporter.start({
     productName: 'n-air-app',
@@ -106,12 +102,9 @@ window.addEventListener('unhandledrejection', e => {
 });
 
 if ((isProduction || process.env.NAIR_REPORT_TO_SENTRY) && !electron.remote.process.env.NAIR_IPC) {
-  const sentryDsn = getSentryDsn(sentryParam);
-  console.log(`Sentry DSN: ${sentryDsn}`);
   Sentry.init({
-    dsn: sentryDsn,
-    release: nAirVersion,
     sampleRate: /* isPreview ? */ 1.0 /* : 0.1 */,
+    Vue,
   }, sentryVueInit);
 
   const oldConsoleError = console.error;
