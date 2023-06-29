@@ -191,8 +191,12 @@ class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
     return 'horizontal';
   }
 
-  getPlatformContextName(platform: TPlatform): TOutputOrientation {
+  getPlatformContextName(platform?: TPlatform): TOutputOrientation {
     return this.getPlatformDisplay(platform) === 'horizontal' ? 'landscape' : 'portrait';
+  }
+
+  getDisplayContextName(display: TDisplayType): TOutputOrientation {
+    return display === 'horizontal' ? 'landscape' : 'portrait';
   }
 
   getIsHorizontalVisible(nodeId: string, sceneId?: string) {

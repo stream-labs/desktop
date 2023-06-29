@@ -8,7 +8,7 @@ import {
 } from './streaming-api';
 import { StreamSettingsService, ICustomStreamDestination } from '../settings/streaming';
 import { UserService } from '../user';
-import { RestreamService } from '../restream';
+import { RestreamService, TOutputOrientation } from '../restream';
 import {
   DualOutputService,
   TDisplayPlatforms,
@@ -21,6 +21,7 @@ import cloneDeep from 'lodash/cloneDeep';
 import difference from 'lodash/difference';
 import { Services } from '../../components-react/service-provider';
 import { getDefined } from '../../util/properties-type-guards';
+import { TDisplayType } from 'services/settings-v2';
 
 /**
  * The stream info view is responsible for keeping
@@ -172,7 +173,20 @@ export class StreamInfoView<T extends Object> extends ViewHandler<T> {
     return this.dualOutputView.dualOutputMode && this.userView.isLoggedIn;
   }
 
-  get activeDisplayPlatforms() {
+  get shouldMultistreamDisplay(): { horizontal: boolean; vertical: boolean } {
+    const numHorizontal =
+      this.activeDisplayPlatforms.horizontal.length +
+      this.activeCustomDestinations.horizontal.length;
+    const numVertical =
+      this.activeDisplayPlatforms.vertical.length + this.activeCustomDestinations.vertical.length;
+
+    return {
+      horizontal: numHorizontal > 1,
+      vertical: numVertical > 1,
+    };
+  }
+
+  get activeDisplayPlatforms(): TDisplayPlatforms {
     const enabledPlatforms = this.enabledPlatforms;
 
     return Object.entries(this.dualOutputView.platformSettings).reduce(
@@ -186,7 +200,7 @@ export class StreamInfoView<T extends Object> extends ViewHandler<T> {
     );
   }
 
-  get activeCustomDestinations() {
+  get activeCustomDestinations(): TDisplayDestinations {
     const destinations = this.customDestinations;
 
     return destinations.reduce(
@@ -198,18 +212,6 @@ export class StreamInfoView<T extends Object> extends ViewHandler<T> {
       },
       { horizontal: [], vertical: [] },
     );
-  }
-
-  get canStreamDualOutput(): boolean {
-    // determine if both displays are selected for active platforms
-    const horizontalHasDestinations =
-      this.activeDisplayPlatforms.horizontal.length > 0 ||
-      this.activeCustomDestinations.horizontal.length > 0;
-    const verticalHasDestinations =
-      this.activeDisplayPlatforms.vertical.length > 0 ||
-      this.activeCustomDestinations.vertical.length > 0;
-
-    return horizontalHasDestinations && verticalHasDestinations;
   }
 
   getPlatformDisplay(platform: TPlatform) {
@@ -338,6 +340,13 @@ export class StreamInfoView<T extends Object> extends ViewHandler<T> {
       ...platforms.filter(p => !this.isPrimaryPlatform(p) && this.isPlatformLinked(p)),
       ...platforms.filter(p => !this.isPlatformLinked(p)),
     ];
+  }
+
+  /**
+   * Get the mode name based on the platform or destination display
+   */
+  getDisplayContextName(display: TDisplayType): TOutputOrientation {
+    return this.dualOutputView.getDisplayContextName(display);
   }
 
   /**

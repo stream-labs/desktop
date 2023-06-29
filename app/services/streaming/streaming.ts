@@ -289,6 +289,23 @@ export class StreamingService
     // use default settings if no new settings provided
     const settings = newSettings || cloneDeep(this.views.savedSettings);
 
+    if (this.views.isDualOutputMode) {
+      // set custom destination mode and video context before setting settings
+      settings.customDestinations.forEach(destination => {
+        // only update enabled custom destinations
+        if (!destination.enabled) return;
+
+        if (!destination.display) {
+          // set display to horizontal by default if it does not exist
+          destination.display = 'horizontal';
+        }
+
+        const display = destination.display;
+        destination.video = this.videoSettingsService.contexts[display];
+        destination.mode = this.views.getDisplayContextName(display);
+      });
+    }
+
     // save enabled platforms to reuse setting with the next app start
     this.streamSettingsService.setSettings({ goLiveSettings: settings });
 
@@ -300,6 +317,7 @@ export class StreamingService
 
     // all platforms to stream
     const platforms = this.views.enabledPlatforms;
+    console.log('platforms ', JSON.stringify(platforms));
 
     /**
      * SET PLATFORM STREAM SETTINGS
@@ -350,10 +368,10 @@ export class StreamingService
      */
     if (this.views.isDualOutputMode) {
       // if needed, set up multistreaming for dual output
-      const displayPlatforms = this.views.activeDisplayPlatforms;
+      const shouldMultistreamDisplay = this.views.shouldMultistreamDisplay;
 
-      for (const display in displayPlatforms) {
-        if (displayPlatforms[display].length > 1) {
+      for (const display in shouldMultistreamDisplay) {
+        if (shouldMultistreamDisplay[display]) {
           // check the Restream service is available
           let ready = false;
           try {
