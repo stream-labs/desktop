@@ -307,6 +307,9 @@
       "RecMuxerCustom": {
         "name": "Muxerのカスタム設定"
       },
+      "RecSplitFile": {
+        "name": "自動ファイル分割"
+      },
       "MuxerCustom": {
         "name": "@:settings.Output.Recording.RecMuxerCustom.name"
       },
@@ -519,6 +522,8 @@
         "Partial": null,
         "Full": null
       },
+      "SdrWhiteLevel": { "name": "SDR ホワイトレベル" },
+      "HdrNominalPeakLevel": { "name": "HDR 公称ピークレベル" },
       "ForceGPUAsRenderDevice": {
         "name": "描画デバイスにGPUを強制的に指定する"
       }
@@ -531,6 +536,9 @@
       },
       "DisableAudioDucking": {
         "name": "Windowsの自動音量調整機能を無効にする"
+      },
+      "LowLatencyAudioBuffering": {
+        "name": "低遅延オーディオバッファリングモード（Decklink/NDI 出力用）、再起動が必要です"
       }
     },
     "Recording": {

@@ -143,10 +143,28 @@
       </add-source-info>
 
       <add-source-info
+        v-if="inspectedSource === 'vlc_source'"
+        @clickAdd="selectSource('vlc_source')"
+        sourceType="vlc_source"
+        key="16"
+      >
+        <FfmpegSourceIcon slot="media" />
+      </add-source-info>
+
+      <add-source-info
+        v-if="inspectedSource === 'wasapi_process_output_capture'"
+        @clickAdd="selectSource('wasapi_process_output_capture')"
+        sourceType="wasapi_process_output_capture"
+        key="17"
+      >
+        <DshowInputIcon slot="media" />
+      </add-source-info>
+
+      <add-source-info
         v-if="inspectedSource === 'near'"
         @clickAdd="selectNVoiceCharacterSource('near')"
         sourceType="near"
-        key="16"
+        key="18"
       >
         <NVoiceCharacterSourceIcon slot="media" />
       </add-source-info>
@@ -198,16 +216,16 @@
 <script lang="ts" src="./SourcesShowcase.vue.ts"></script>
 
 <style lang="less">
-@import '../../styles/index';
+@import url('../../styles/index');
 
 .source-info {
-  padding: 0 20px;
   display: flex;
+  flex: 0 0 192px;
   flex-direction: row;
   flex-wrap: nowrap;
-  flex: 0 0 192px;
-  height: 192px;
   align-items: center;
+  height: 192px;
+  padding: 0 20px;
 
   svg {
     * {
@@ -224,6 +242,7 @@
 .source-info__text,
 .source-support__list {
   flex: 2;
+
   > h3 {
     font-size: 16px;
   }
@@ -231,20 +250,20 @@
 </style>
 
 <style lang="less" scoped>
-@import '../../styles/index';
+@import url('../../styles/index');
 
 .add-source {
-  color: var(--color-text);
+  position: relative;
   display: flex;
   flex-direction: column;
-  position: relative;
   height: 100%;
+  color: var(--color-text);
 }
 
 .sources {
-  padding: 0 16px;
   display: flex;
   flex: 1 0 auto;
+  padding: 0 16px;
 }
 
 .source-group {
@@ -252,21 +271,21 @@
 }
 
 .source-list {
-  list-style-type: none;
-  margin: 0;
   display: flex;
-  justify-content: space-between;
   flex-wrap: wrap;
+  justify-content: space-between;
+  margin: 0;
+  list-style-type: none;
 }
 
 .source {
-  cursor: pointer;
-  .transition;
-  text-align: center;
+  min-width: calc((100% - 16px * 2) / 3);
   padding: 8px;
   margin-bottom: 16px;
-  min-width: calc((100% - 16px * 2) / 3);
+  text-align: center;
+  cursor: pointer;
   border-radius: 4px;
+  .transition;
 
   &:hover,
   &.source--active {
@@ -275,8 +294,9 @@
 
   > div {
     .text-ellipsis;
-    max-width: 100%;
+
     display: inline-block;
+    max-width: 100%;
   }
 }
 
@@ -285,20 +305,20 @@
 }
 
 .source-info__media {
-  overflow: hidden;
-  text-align: center;
-  padding-left: 20px;
-  align-items: center;
-  align-content: center;
-  max-height: 180px;
-  justify-content: center;
   display: flex;
   flex: 0 0 50%;
+  align-content: center;
+  align-items: center;
+  justify-content: center;
+  max-height: 180px;
+  padding-left: 20px;
+  overflow: hidden;
+  text-align: center;
 }
 
 .attention {
+  padding-right: 16px;
   font-size: @font-size2;
   color: var(--color-text);
-  padding-right: 16px;
 }
 </style>

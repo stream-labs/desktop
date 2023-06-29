@@ -65,7 +65,7 @@ class ObsEditableListProperty extends ObsInput<IObsEditableListInputValue> {
       properties: ['openFile'],
     });
 
-    if (filePaths) {
+    if (filePaths && filePaths.length) {
       const activeIndex = _.indexOf(this.list, this.activeItem);
 
       this.list[activeIndex] = filePaths[0];
@@ -77,25 +77,25 @@ class ObsEditableListProperty extends ObsInput<IObsEditableListInputValue> {
   }
 
   async showFileDialog() {
-    const files = await electron.remote.dialog.showOpenDialog({
+    const { filePaths } = await electron.remote.dialog.showOpenDialog({
       defaultPath: this.value.defaultPath,
       filters: this.value.filters,
       properties: ['openFile', 'multiSelections'],
     });
 
-    if (files) {
-      this.setList(this.list.concat(files.filePaths));
+    if (filePaths && filePaths.length) {
+      this.setList(this.list.concat(filePaths));
     }
   }
 
   async showDirDialog() {
-    const dir = await electron.remote.dialog.showOpenDialog({
+    const { filePaths } = await electron.remote.dialog.showOpenDialog({
       defaultPath: this.value.defaultPath,
       properties: ['openDirectory'],
     });
 
-    if (dir) {
-      this.setList(this.list.concat(dir.filePaths));
+    if (filePaths && filePaths.length) {
+      this.setList(this.list.concat(filePaths));
     }
   }
 

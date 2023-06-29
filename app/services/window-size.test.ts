@@ -247,10 +247,10 @@ describe('updateWindowSize', () => {
     [null, 'CLOSED', false],
     [null, 'OPENED', true],
     [null, 'OPENED', false],
-  ].map(([prev, next, smallerThanMinWidth]: [PanelState | null, PanelState, boolean]) => ({
-    prev,
-    next,
-    smallerThanMinWidth,
+  ].map(([prev, next, smallerThanMinWidth]) => ({
+    prev: prev as PanelState | null,
+    next: next as PanelState,
+    smallerThanMinWidth: smallerThanMinWidth as boolean,
   }));
 
   for (const suite of initSuites) {
@@ -304,10 +304,10 @@ describe('updateWindowSize', () => {
     ['OPENED', 'CLOSED', true],
     ['OPENED', 'INACTIVE', true],
     ['CLOSED', 'INACTIVE', true],
-  ].map(([prev, next, isMaximized]: [PanelState, PanelState, boolean]) => ({
-    prev,
-    next,
-    isMaximized,
+  ].map(([prev, next, isMaximized]) => ({
+    prev: prev as PanelState,
+    next: next as PanelState,
+    isMaximized: isMaximized as boolean,
   }));
   const WIDTH_DIFF = 32;
 
@@ -364,23 +364,14 @@ describe('updateWindowSize', () => {
     ['COMPACT', 'INACTIVE', false, false, false, false],
     ['COMPACT', 'CLOSED', false, false, false, false],
     ['COMPACT', 'OPENED', false, false, false, false],
-  ].map(
-    ([prev, next, isMaximized, maximize, unmaximize, backupMaximized]: [
-      PanelState,
-      PanelState,
-      boolean,
-      boolean,
-      boolean,
-      boolean,
-    ]) => ({
-      prev,
-      next,
-      isMaximized,
-      maximize,
-      unmaximize,
-      backupMaximized,
-    }),
-  );
+  ].map(([prev, next, isMaximized, maximize, unmaximize, backupMaximized]) => ({
+    prev: prev as PanelState,
+    next: next as PanelState,
+    isMaximized: isMaximized as boolean,
+    maximize: maximize as boolean,
+    unmaximize: unmaximize as boolean,
+    backupMaximized: backupMaximized as boolean,
+  }));
 
   for (const suite of compactSuites) {
     test(`${stateName[suite.prev]}${suite.isMaximized ? '(最大化状態)' : ''}→${

@@ -84,9 +84,7 @@
   "typescript.format.enable": true,
   "json.schemas": [
     {
-      "fileMatch": [
-        "**/replace_rules.json",
-      ],
+      "fileMatch": ["**/replace_rules.json"],
       "schema": {
         "type": "object",
         "properties": {
@@ -99,44 +97,35 @@
                   "type": "string"
                 },
                 "onlyFor": {
-                  "enum": [
-                    "webSpeech",
-                    "nVoice"
-                  ],
+                  "enum": ["webSpeech", "nVoice"]
                 },
                 "replacement": {
                   "type": "string"
                 }
               },
-              "required": [
-                "replacement"
-              ],
+              "required": ["replacement"],
               "oneOf": [
                 {
                   "properties": {
                     "regularExpression": {
                       "type": "string"
-                    },
+                    }
                   },
-                  "required": [
-                    "regularExpression"
-                  ]
+                  "required": ["regularExpression"]
                 },
                 {
                   "properties": {
                     "text": {
                       "type": "string"
-                    },
+                    }
                   },
-                  "required": [
-                    "text"
-                  ]
-                },
-              ],
-            },
+                  "required": ["text"]
+                }
+              ]
+            }
           }
         }
-      },
+      }
     }
   ],
   "editor.defaultFormatter": "esbenp.prettier-vscode",

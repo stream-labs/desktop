@@ -1,49 +1,37 @@
 {
-    "version": "0.2.0",
-    "configurations": [
-        {
-            "type": "node",
-            "request": "launch",
-            "name": "Launch",
-            "protocol": "inspector",
-            "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron",
-            "runtimeArgs": [
-                "."
-            ],
-            "cwd": "${workspaceRoot}",
-            "envFile": "${workspaceRoot}/.env",
-            "outputCapture": "std"
-        },
-        {
-            "type": "node",
-            "request": "launch",
-            "name": "Electron: Main",
-            "protocol": "inspector",
-            "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron",
-            "runtimeArgs": [
-                "--remote-debugging-port=44695",
-                "."
-            ],
-            "cwd": "${workspaceRoot}",
-            "envFile": "${workspaceRoot}/.env",
-            "outputCapture": "std"
-        },
-        {
-            "name": "Electron: Renderer",
-            "type": "chrome",
-            "request": "attach",
-            "port": 44695,
-            "webRoot": "${workspaceFolder}",
-            "timeout": 30000
-        }
-    ],
-    "compounds": [
-        {
-            "name": "Electron: All",
-            "configurations": [
-                "Electron: Main",
-                "Electron: Renderer"
-            ]
-        }
-    ]
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Launch",
+      "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron.cmd",
+      "runtimeArgs": [".", "--remote-debugging-port=9222"],
+      "cwd": "${workspaceRoot}",
+      "env": {
+        "NAIR_UNSTABLE": "1",
+        "SLOBS_PRODUCTION_DEBUG": "true"
+      },
+      "preLaunchTask": "npm: compile"
+    },
+    {
+      "type": "chrome",
+      "request": "attach",
+      "name": "Chrome",
+      "port": 9222,
+      "webRoot": "${workspaceRoot}",
+      "sourceMaps": true,
+      "sourceMapPathOverrides": {
+        "webpack://n-air-app/../../${workspaceRoot}/app/*": "${workspaceRoot}/app/*"
+      },
+      "resolveSourceMapLocations": ["${workspaceFolder}/**", "!**/node_modules/**"]
+    }
+  ],
+  "compounds": [
+    {
+      "name": "All",
+      "configurations": ["Launch", "Chrome"],
+      "stopAll": true
+    }
+  ]
 }

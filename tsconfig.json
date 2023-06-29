@@ -2,17 +2,11 @@
   "compileOnSave": false,
   "compilerOptions": {
     "target": "es5",
-    "lib": [
-      "dom",
-      "es7",
-      "es2017"
-    ],
+    "lib": ["dom", "es7", "es2017"],
     "module": "es2015",
     "moduleResolution": "node",
     "isolatedModules": false,
     "experimentalDecorators": true,
-    "noImplicitAny": true,
-    "noImplicitThis": true,
     "removeComments": true,
     "suppressImplicitAnyIndexErrors": true,
     "allowSyntheticDefaultImports": true,
@@ -21,15 +15,20 @@
     "sourceMap": true,
     "sourceRoot": "/",
     "allowJs": false,
-    "strictNullChecks": false,
-    "emitDecoratorMetadata": true,
+    "emitDecoratorMetadata": false,
     "downlevelIteration": true,
-    "baseUrl": "./app"
+    "baseUrl": "./app",
+    "jsx": "preserve",
+
+    "alwaysStrict": true,
+    "noImplicitAny": true,
+    "noImplicitThis": true,
+    "strictBindCallApply": true,
+    "strictFunctionTypes": true,
+    "strictNullChecks": false,
+    "strictPropertyInitialization": false,
+    "useUnknownInCatchVariables": true
   },
-  "exclude": [
-    "node_modules"
-  ],
-  "include": [
-    "./app/**/*"
-  ]
+  "exclude": ["node_modules"],
+  "include": ["./app/**/*"]
 }

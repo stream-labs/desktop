@@ -13,6 +13,9 @@ import {
   ISceneItemSettings,
   ISceneItemNode,
   IPartialTransform,
+  EScaleType,
+  EBlendingMode,
+  EBlendingMethod,
 } from 'services/scenes';
 import { $t } from 'services/i18n';
 import { Inject } from '../core/injector';
@@ -87,6 +90,13 @@ export class SelectionService extends StatefulService<ISelectionState> {
   centerOnVertical: () => void;
   rotate: (deg: number) => void;
   setContentCrop: () => void;
+
+  isScaleFilterSelected: (filter: EScaleType) => boolean;
+  isBlendingModeSelected: (mode: EBlendingMode) => boolean;
+  isBlendingMethodSelected: (method: EBlendingMethod) => boolean;
+  setScaleFilter: (filter: EScaleType) => void;
+  setBlendingMode: (mode: EBlendingMode) => void;
+  setBlendingMethod: (method: EBlendingMethod) => void;
 
   // SCENE NODES METHODS
   placeAfter: (sceneNodeId: string) => void;
@@ -287,6 +297,21 @@ export class Selection {
    */
   isSceneItem(): boolean {
     return this.getSize() === 1 && this.getNodes()[0].isItem();
+  }
+
+  isScaleFilterSelected(filter: EScaleType): boolean {
+    const items = this.getItems().filter(item => item.scaleFilter === filter);
+    return items.length > 0;
+  }
+
+  isBlendingModeSelected(mode: EBlendingMode): boolean {
+    const items = this.getItems().filter(item => item.blendingMode === mode);
+    return items.length > 0;
+  }
+
+  isBlendingMethodSelected(method: EBlendingMethod): boolean {
+    const items = this.getItems().filter(item => item.blendingMethod === method);
+    return items.length > 0;
   }
 
   /**
@@ -530,6 +555,18 @@ export class Selection {
 
   setSettings(settings: Partial<ISceneItemSettings>) {
     this.getItems().forEach(item => item.setSettings(settings));
+  }
+
+  setScaleFilter(filter: EScaleType) {
+    this.getItems().forEach(item => item.setScaleFilter(filter));
+  }
+
+  setBlendingMode(mode: EBlendingMode) {
+    this.getItems().forEach(item => item.setBlendingMode(mode));
+  }
+
+  setBlendingMethod(method: EBlendingMethod) {
+    this.getItems().forEach(item => item.setBlendingMethod(method));
   }
 
   setVisibility(isVisible: boolean) {

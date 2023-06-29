@@ -80,5 +80,6 @@
   "OBSInit.ErrorTitle": "初期化エラー",
   "OBSInit.UnknownError": "OBSの初期化中に不明なエラーが発生しました",
   "OBSInit.ModuleNotFoundError": "DirectXが見つかりませんでした。最新のDirectXをこちら<https://www.microsoft.com/en-us/download/details.aspx?id=35?> からインストールしてから、再度お試しください。",
-  "OBSInit.NotSupportedError": "OBSの初期化に失敗しました。ビデオドライバーが古すぎる、もしくはN Airがサポートしないシステムの可能性があります。"
+  "OBSInit.NotSupportedError": "OBSの初期化に失敗しました。ビデオドライバーが古い、もしくはN Airがサポートしないシステムの可能性があります。",
+  "Interact": "インタラクション(WEB操作)"
 }

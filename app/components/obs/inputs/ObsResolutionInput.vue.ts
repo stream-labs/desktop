@@ -25,7 +25,7 @@ class ObsResolutionInput extends ObsInput<IObsListInput<TObsValue>> {
   }
 
   get currentValue() {
-    let option = this.value.options.find((opt: IObsListOption<string>) => {
+    let option = this.value.options.find(opt => {
       return this.value.value === opt.value;
     });
 

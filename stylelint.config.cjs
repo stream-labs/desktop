@@ -7,6 +7,7 @@ module.exports = {
   ],
   rules: {
     // ルールは随時追加する
+    'declaration-block-no-redundant-longhand-properties': null,
     'selector-class-pattern': null,
     'no-descending-specificity': null,
     'selector-not-notation': 'simple',

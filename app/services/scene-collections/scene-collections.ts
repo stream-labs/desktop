@@ -228,7 +228,7 @@ export class SceneCollectionsService extends Service implements ISceneCollection
         scope.setLevel('error');
         scope.setTag('service', 'SceneCollectionsService');
         scope.setTag('method', 'load');
-        scope.setTag('collectionId', id)
+        scope.setTag('collectionId', id);
         Sentry.captureException(e);
       });
 
@@ -455,10 +455,10 @@ export class SceneCollectionsService extends Service implements ISceneCollection
               return {
                 id: sceneData.id,
                 name: sceneData.name,
-                sceneItems: sceneData.sceneItems.data.items.map((sceneItemData: ISceneItemInfo) => {
+                sceneItems: sceneData.sceneItems.data.items.map(sceneItemData => {
                   return {
                     sceneItemId: sceneItemData.id,
-                    sourceId: sceneItemData.sourceId,
+                    sourceId: (sceneItemData as ISceneItemInfo).sourceId,
                   };
                 }),
               };

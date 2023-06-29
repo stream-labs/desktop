@@ -113,7 +113,6 @@ export class AppService extends StatefulService<IAppState> {
 
       crashHandler.unregisterProcess(this.pid);
 
-      obs.NodeObs.StopCrashHandler();
       obs.IPC.disconnect();
 
       electron.ipcRenderer.send('shutdownComplete');
@@ -165,14 +164,11 @@ export class AppService extends StatefulService<IAppState> {
   @track({ event: 'app_close' })
   private shutdownHandler() {
     this.START_LOADING();
-    obs.NodeObs.StopCrashHandler();
-
-    this.crashReporterService.beginShutdown();
-
-    this.ipcServerService.stopListening();
     this.tcpServerService.stopListening();
 
     window.setTimeout(async () => {
+      obs.NodeObs.InitShutdownSequence();
+      this.crashReporterService.beginShutdown();
       // await this.userService.flushUserSession();
       await this.sceneCollectionsService.deinitialize();
       this.performanceMonitorService.stop();
@@ -210,7 +206,9 @@ export class AppService extends StatefulService<IAppState> {
 
       // This is kind of ugly, but it gives the browser time to paint before
       // we do long blocking operations with OBS.
-      await new Promise(resolve => { setTimeout(resolve, 200) });
+      await new Promise(resolve => {
+        setTimeout(resolve, 200);
+      });
 
       //TODO await this.sceneCollectionsService.disableAutoSave();
     }
@@ -231,7 +229,7 @@ export class AppService extends StatefulService<IAppState> {
       try {
         returningValue = await result;
       } catch (e) {
-        error = e;
+        error = e as Error;
       }
       delete this.loadingPromises[promiseId];
     }

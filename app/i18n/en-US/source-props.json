@@ -40,6 +40,9 @@
     "local_file": {
       "name": "Local file"
     },
+    "reroute_audio": {
+      "name": "Control audio via N Air"
+    },
     "refreshnocache": {
       "name": "Refresh cache of current page"
     },
@@ -236,6 +239,9 @@
     },
     "window": {
       "name": "Window"
+    },
+    "force_sdr": {
+      "name": "Force SDR"
     }
   },
   "game_capture": {
@@ -273,6 +279,12 @@
     },
     "window": {
       "name": "Window"
+    },
+    "user_placeholder_use": {
+      "name": "Customize placeholder"
+    },
+    "user_placeholder_image": {
+      "name": "Placeholder Image"
     }
   },
   "dshow_input": {
@@ -393,5 +405,13 @@
   "near": {
     "name": "KOTOYOMI Near",
     "description": "Add a character to your scene that reads comments to the \"N Voice\" voice."
+  },
+  "wasapi_process_output_capture": {
+    "name": "Application Audio Capture (BETA)",
+    "description": "Capture the audio coming from a specific application."
+  },
+  "vlc_source": {
+    "name": "VLC Source",
+    "description": "Add playlists of videos to your scene."
   }
 }
