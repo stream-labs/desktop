@@ -28,7 +28,7 @@ export default function Banner() {
   }
 
   function close() {
-    AnnouncementsService.actions.clearBanner();
+    AnnouncementsService.actions.closeBanner();
   }
 
   return (

@@ -74,37 +74,22 @@ export class AnnouncementsService extends PersistentStatefulService<IAnnouncemen
     return new AnnouncementsServiceViews(this.state);
   }
 
-  get bannersExist() {
+  get newsExist() {
     return this.state.news.length > 0;
   }
 
   async getNews() {
-    if (this.bannersExist) return;
+    if (this.newsExist) return;
     this.SET_NEWS(await this.fetchNews());
   }
 
   async getBanner() {
-    // this.SET_BANNER({
-    //   id: 1,
-    //   header: 'New Desktop Feature',
-    //   subHeader: 'Follow the link to learn more',
-    //   linkTitle: 'Click Me',
-    //   thumbnail: '',
-    //   link: '',
-    //   linkTarget: 'external',
-    //   type: 0,
-    //   closeOnLink: true,
-    // });
     this.SET_BANNER(await this.fetchBanner());
   }
 
   seenNews() {
-    if (!this.bannersExist) return;
+    if (!this.newsExist) return;
     this.SET_LATEST_READ(this.state.news[0].id);
-  }
-
-  clearBanner() {
-    this.SET_BANNER(null);
   }
 
   private get installDateProxyFilePath() {
@@ -209,6 +194,23 @@ export class AnnouncementsService extends PersistentStatefulService<IAnnouncemen
       return newState[0];
     } catch (e: unknown) {
       return null;
+    }
+  }
+
+  async closeBanner() {
+    const endpoint = 'api/v5/slobs/announcement/close';
+    const req = this.formRequest(endpoint, {
+      method: 'POST',
+      body: JSON.stringify({
+        clientId: this.userService.getLocalUserId(),
+        announcementId: this.state.banner.id,
+      }),
+    });
+
+    try {
+      await jfetch(req);
+    } finally {
+      this.SET_BANNER(null);
     }
   }
 
