@@ -20,6 +20,9 @@ import {
 import { SceneItemNode } from './scene-node';
 import { TSceneNodeType } from './scenes';
 import { assertIsDefined } from 'util/properties-type-guards';
+
+export { EScaleType, EBlendingMode, EBlendingMethod } from '../../../obs-api';
+
 /**
  * A SceneItem is a source that contains
  * all of the information about that source, and
@@ -45,6 +48,10 @@ export class SceneItem extends SceneItemNode {
   transform: ITransform;
   visible: boolean;
   locked: boolean;
+
+  scaleFilter: obs.EScaleType;
+  blendingMode: obs.EBlendingMode;
+  blendingMethod: obs.EBlendingMethod;
 
   sceneNodeType: TSceneNodeType = 'item';
 
@@ -117,6 +124,9 @@ export class SceneItem extends SceneItemNode {
       transform: this.transform,
       locked: this.locked,
       visible: this.visible,
+      scaleFilter: this.scaleFilter,
+      blendingMode: this.blendingMode,
+      blendingMethod: this.blendingMethod,
     };
   }
 
@@ -169,6 +179,18 @@ export class SceneItem extends SceneItemNode {
       this.getObsSceneItem().visible = newSettings.visible;
     }
 
+    if (changed.scaleFilter !== void 0) {
+      this.getObsSceneItem().scaleFilter = newSettings.scaleFilter;
+    }
+
+    if (changed.blendingMode !== void 0) {
+      this.getObsSceneItem().blendingMode = newSettings.blendingMode;
+    }
+
+    if (changed.blendingMethod !== void 0) {
+      this.getObsSceneItem().blendingMethod = newSettings.blendingMethod;
+    }
+
     this.UPDATE({ sceneItemId: this.sceneItemId, ...changed });
 
     this.scenesService.itemUpdated.next(this.getModel());
@@ -203,7 +225,8 @@ export class SceneItem extends SceneItemNode {
   }
 
   loadAttributes() {
-    const { position, scale, visible, crop, rotation } = this.getObsSceneItem();
+    const { position, scale, visible, crop, rotation, scaleFilter, blendingMode, blendingMethod } =
+      this.getObsSceneItem();
     this.UPDATE({
       sceneItemId: this.sceneItemId,
       transform: {
@@ -213,6 +236,9 @@ export class SceneItem extends SceneItemNode {
         rotation,
       },
       visible,
+      scaleFilter,
+      blendingMode,
+      blendingMethod,
     });
   }
 
@@ -231,6 +257,9 @@ export class SceneItem extends SceneItemNode {
       },
       visible,
       locked: !!customSceneItem.locked,
+      scaleFilter: customSceneItem.scaleFilter,
+      blendingMode: customSceneItem.blendingMode,
+      blendingMethod: customSceneItem.blendingMethod,
     });
   }
 
@@ -302,6 +331,18 @@ export class SceneItem extends SceneItemNode {
     return this.getScene()
       .getItems()
       .findIndex(sceneItemModel => sceneItemModel.id === this.id);
+  }
+
+  setScaleFilter(scaleFilter: obs.EScaleType): void {
+    this.setSettings({ scaleFilter });
+  }
+
+  setBlendingMode(blendingMode: obs.EBlendingMode): void {
+    this.setSettings({ blendingMode });
+  }
+
+  setBlendingMethod(blendingMethod: obs.EBlendingMethod): void {
+    this.setSettings({ blendingMethod });
   }
 
   /**

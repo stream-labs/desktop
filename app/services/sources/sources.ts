@@ -89,6 +89,8 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
     id: string;
     name: string;
     type: TSourceType;
+    width: number;
+    height: number;
     channel?: number;
     isTemporary?: boolean;
     propertiesManagerType?: TPropertiesManager;
@@ -108,8 +110,8 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
       doNotDuplicate: false,
 
       // Unscaled width and height
-      width: 0,
-      height: 0,
+      width: addOptions.width,
+      height: addOptions.height,
 
       muted: false,
       resourceId: 'Source' + JSON.stringify([id]),
@@ -169,6 +171,8 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
       id,
       name,
       type,
+      width: obsInput.width,
+      height: obsInput.height,
       channel: options.channel,
       isTemporary: options.isTemporary,
       propertiesManagerType: managerType,
@@ -339,10 +343,10 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
       'wasapi_output_capture',
       'decklink-input',
       'ndi_source',
-      'openvr_capture',
       'liv_capture',
       'ovrstream_dc_source',
       'vlc_source',
+      'wasapi_process_output_capture',
     ];
 
     const availableWhitelistedType = whitelistedTypes.filter(type =>
@@ -482,7 +486,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
       size: {
         width: 600,
         height: 600,
-      }
+      },
     };
 
     // HACK: childWindow で表示してしまうとウィンドウキャプチャでクラッシュするので OneOffWindow で代替している
@@ -492,7 +496,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
       ? this.closeSourcePropertiesWindow()
       : Promise.resolve()
     ).then(() => {
-      if (!sourceId.startsWith("window_capture")) {
+      if (!sourceId.startsWith('window_capture')) {
         this.windowsService.showWindow(baseConfig);
         return;
       }
@@ -545,6 +549,27 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
       size: {
         width: 400,
         height: 250,
+      },
+    });
+  }
+
+  /**
+   * Show a window for interacting with a browser source.
+   * This function does nothing if the source is not a browser source.
+   */
+  showInteractWindow(sourceId: string) {
+    const source = this.getSource(sourceId);
+    if (!source) return;
+
+    if (source.type !== 'browser_source') return;
+
+    this.windowsService.showWindow({
+      componentName: 'BrowserSourceInteraction',
+      queryParams: { sourceId },
+      title: $t('sources.InteractTitle', { sourceName: source.name }),
+      size: {
+        width: 800,
+        height: 600,
       },
     });
   }

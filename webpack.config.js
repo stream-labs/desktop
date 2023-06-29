@@ -2,9 +2,9 @@ const { VueLoaderPlugin } = require('vue-loader');
 const { WebpackManifestPlugin } = require('webpack-manifest-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const ESLintPlugin = require('eslint-webpack-plugin');
+const TerserPlugin = require('terser-webpack-plugin');
 
 const path = require('path');
-const TerserPlugin = require('terser-webpack-plugin');
 
 const plugins = [];
 
@@ -36,6 +36,13 @@ module.exports = {
     publicPath: '/bundles/',
   },
 
+  cache: {
+    type: 'filesystem',
+    buildDependencies: {
+      config: [__filename],
+    },
+  }, // if problem, clean node_modules/.cache
+
   devServer: {
     static: {
       directory: __dirname,
@@ -65,7 +72,7 @@ module.exports = {
   target: 'electron-renderer',
 
   resolve: {
-    extensions: ['.js', '.ts'],
+    extensions: ['.js', '.ts', '.tsx'],
     modules: [path.resolve(__dirname, 'app'), 'node_modules'],
   },
 
@@ -80,6 +87,9 @@ module.exports = {
     'node-fontinfo': 'require("node-fontinfo")',
     'socket.io-client': 'require("socket.io-client")',
     rimraf: 'require("rimraf")',
+
+    'utf-8-validate': 'require("utf-8-validate")',
+    bufferutil: 'require("bufferutil")',
   },
 
   module: {
@@ -99,6 +109,11 @@ module.exports = {
         test: /\.ts$/,
         loader: 'ts-loader',
         exclude: /node_modules|vue\/src/,
+      },
+      {
+        test: /\.tsx$/,
+        exclude: /node_modules|vue\/src/,
+        use: ['babel-loader', { loader: 'ts-loader' }],
       },
       {
         test: /\.js$/,

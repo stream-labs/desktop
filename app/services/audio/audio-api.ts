@@ -17,6 +17,7 @@ export interface IAudioSource {
   muted: boolean;
   resourceId: string;
   mixerHidden: boolean;
+  isControlledViaObs: boolean;
 }
 
 export interface IAudioSourceApi extends IAudioSource {

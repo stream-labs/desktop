@@ -1,31 +1,34 @@
 <template>
-<div :data-test="testingAnchor" class="input-container">
-  <div class="input-label">
-    <label>{{ value.description }}</label>
+  <div :data-test="testingAnchor" class="input-container">
+    <div class="input-label" v-if="!value.info">
+      <label>{{ value.description }}</label>
+    </div>
+    <div class="input-wrapper" v-if="value.multiline">
+      <textarea
+        rows="4"
+        :value="value.value"
+        :disabled="value.enabled == false"
+        @change="onInputHandler"
+      />
+    </div>
+    <div class="input-wrapper" v-else-if="value.info">{{ value.description }}</div>
+    <div class="input-wrapper" v-else>
+      <input
+        :type="textVisible ? 'text' : 'password'"
+        :value="value.value"
+        :disabled="value.enabled == false"
+        @change="onInputHandler"
+      />
+      <button
+        class="button button--secondary button--input"
+        v-if="value.masked"
+        @click="toggleVisible"
+      >
+        {{ textVisible ? 'Hide' : 'Show' }}
+      </button>
+      <slot></slot>
+    </div>
   </div>
-  <div class="input-wrapper" v-if="value.multiline">
-    <textarea
-      rows="4"
-      :value="value.value"
-      :disabled="value.enabled == false"
-      @change="onInputHandler"/>
-  </div>
-  <div class="input-wrapper" v-else>
-    <input
-      :type="textVisible ? 'text' : 'password'"
-      :value="value.value"
-      :disabled="value.enabled == false"
-      @change="onInputHandler"
-    />
-    <button
-      class="button button--secondary button--input"
-      v-if="value.masked"
-      @click="toggleVisible">
-      {{ textVisible ? 'Hide' : 'Show' }}
-    </button>
-    <slot></slot>
-  </div>
-</div>
 </template>
 
 <script lang="ts" src="./ObsTextInput.vue.ts"></script>

@@ -307,6 +307,10 @@
       "RecMuxerCustom": {
         "name": null
       },
+      "RecSplitFile": {
+        "name": null
+      },
+
       "MuxerCustom": {
         "name": "@:settings.Output.Recording.RecMuxerCustom.name"
       },
@@ -519,6 +523,8 @@
         "Partial": null,
         "Full": null
       },
+      "SdrWhiteLevel": { "name": null },
+      "HdrNominalPeakLevel": { "name": null },
       "ForceGPUAsRenderDevice": {
         "name": null
       }
@@ -530,6 +536,9 @@
         "Default": null
       },
       "DisableAudioDucking": {
+        "name": null
+      },
+      "LowLatencyAudioBuffering": {
         "name": null
       }
     },

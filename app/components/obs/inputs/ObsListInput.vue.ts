@@ -34,7 +34,7 @@ class ObsListInput extends ObsInput<IObsListInput<TObsValue>> {
   }
 
   get currentValue() {
-    const option = this.value.options.find((opt: IObsListOption<string>) => {
+    const option = this.value.options.find(opt => {
       return this.value.value === opt.value;
     });
 

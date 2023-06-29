@@ -1,5 +1,5 @@
 import { Node } from './node';
-import { ScenesService } from '../../scenes';
+import { ScenesService, EBlendingMethod, EBlendingMode, EScaleType } from '../../scenes';
 import { Scene } from '../../scenes/scene';
 import { HotkeysNode } from './hotkeys';
 import { SourcesService } from '../../sources';
@@ -21,6 +21,9 @@ export interface ISceneItemInfo extends ISceneNodeInfo {
   locked?: boolean;
   rotation?: number;
   sceneNodeType: 'item';
+  scaleFilter?: EScaleType;
+  blendingMode?: EBlendingMode;
+  blendingMethod?: EBlendingMethod;
 }
 
 interface ISceneItemFolderInfo extends ISceneNodeInfo {
@@ -74,6 +77,9 @@ export class SceneItemsNode extends Node<ISchema, {}> {
               locked: sceneItem.locked,
               rotation: transform.rotation,
               sceneNodeType: 'item',
+              scaleFilter: sceneItem.scaleFilter,
+              blendingMode: sceneItem.blendingMode,
+              blendingMethod: sceneItem.blendingMethod,
             });
           });
         } else {

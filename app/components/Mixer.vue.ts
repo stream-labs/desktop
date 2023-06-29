@@ -33,7 +33,7 @@ export default class Mixer extends Vue {
 
   get audioSources() {
     return this.audioService.getSourcesForCurrentScene().filter(source => {
-      return !source.mixerHidden;
+      return !source.mixerHidden && source.isControlledViaObs;
     });
   }
 

@@ -59,13 +59,13 @@ export function isOk<T>(result: WrappedResult<T>): result is SucceededResult<T> 
   return result.ok === true;
 }
 
-export class NotLoggedInError { }
+export class NotLoggedInError {}
 
 type Quality = {
   bitrate: number;
   height: number;
   fps: number;
-}
+};
 
 export function parseMaxQuality(maxQuality: string, fallback: Quality): Quality {
   try {
@@ -77,7 +77,7 @@ export function parseMaxQuality(maxQuality: string, fallback: Quality): Quality 
       fps: parseInt(match[5], 10) || 30,
     };
   } catch (e) {
-    console.warn('Failed to parse max quality', maxQuality, e)
+    console.warn('Failed to parse max quality', maxQuality, e);
     return fallback;
   }
 }
@@ -130,7 +130,7 @@ export class NicoliveClient {
       console.warn('non-json body', body);
       return {
         ok: false,
-        value: e,
+        value: e as Error,
       };
     }
 
@@ -196,7 +196,7 @@ export class NicoliveClient {
       });
       return NicoliveClient.wrapResult<ProgramSchedules['data']>(res);
     } catch (err) {
-      return NicoliveClient.wrapFetchError(err);
+      return NicoliveClient.wrapFetchError(err as Error);
     }
   }
 
@@ -211,7 +211,7 @@ export class NicoliveClient {
       });
       return NicoliveClient.wrapResult<ProgramInfo['data']>(res);
     } catch (err) {
-      return NicoliveClient.wrapFetchError(err);
+      return NicoliveClient.wrapFetchError(err as Error);
     }
   }
 
@@ -228,7 +228,7 @@ export class NicoliveClient {
 
       return NicoliveClient.wrapResult<Segment['data']>(res);
     } catch (err) {
-      return NicoliveClient.wrapFetchError(err);
+      return NicoliveClient.wrapFetchError(err as Error);
     }
   }
 
@@ -245,7 +245,7 @@ export class NicoliveClient {
 
       return NicoliveClient.wrapResult<Segment['data']>(res);
     } catch (err) {
-      return NicoliveClient.wrapFetchError(err);
+      return NicoliveClient.wrapFetchError(err as Error);
     }
   }
 
@@ -263,7 +263,7 @@ export class NicoliveClient {
 
       return NicoliveClient.wrapResult<Extension['data']>(res);
     } catch (err) {
-      return NicoliveClient.wrapFetchError(err);
+      return NicoliveClient.wrapFetchError(err as Error);
     }
   }
 
@@ -284,7 +284,7 @@ export class NicoliveClient {
 
       return NicoliveClient.wrapResult<void>(res);
     } catch (err) {
-      return NicoliveClient.wrapFetchError(err);
+      return NicoliveClient.wrapFetchError(err as Error);
     }
   }
 
@@ -300,7 +300,7 @@ export class NicoliveClient {
 
       return NicoliveClient.wrapResult<Statistics['data']>(res);
     } catch (err) {
-      return NicoliveClient.wrapFetchError(err);
+      return NicoliveClient.wrapFetchError(err as Error);
     }
   }
 
@@ -321,7 +321,7 @@ export class NicoliveClient {
 
       return NicoliveClient.wrapResult<NicoadStatistics['data']>(res);
     } catch (err) {
-      return NicoliveClient.wrapFetchError(err);
+      return NicoliveClient.wrapFetchError(err as Error);
     }
   }
 
@@ -340,7 +340,7 @@ export class NicoliveClient {
       );
       return NicoliveClient.wrapResult<Filters['data']>(resp);
     } catch (err) {
-      return NicoliveClient.wrapFetchError(err);
+      return NicoliveClient.wrapFetchError(err as Error);
     }
   }
 
@@ -363,7 +363,7 @@ export class NicoliveClient {
       );
       return NicoliveClient.wrapResult<Filters['data']>(resp);
     } catch (err) {
-      return NicoliveClient.wrapFetchError(err);
+      return NicoliveClient.wrapFetchError(err as Error);
     }
   }
 
@@ -385,7 +385,7 @@ export class NicoliveClient {
       );
       return NicoliveClient.wrapResult<void>(resp);
     } catch (err) {
-      return NicoliveClient.wrapFetchError(err);
+      return NicoliveClient.wrapFetchError(err as Error);
     }
   }
 
@@ -413,7 +413,7 @@ export class NicoliveClient {
         },
       });
     } catch (err) {
-      return NicoliveClient.wrapFetchError(err);
+      return NicoliveClient.wrapFetchError(err as Error);
     }
 
     const body = await res.text();
@@ -427,7 +427,7 @@ export class NicoliveClient {
       console.warn('non-json body', body);
       return {
         ok: false,
-        value: e,
+        value: e as Error,
       };
     }
 
@@ -495,7 +495,7 @@ export class NicoliveClient {
       const response = await fetch(request);
       return NicoliveClient.wrapResult<OnairChannelProgramData>(response);
     } catch (error) {
-      return NicoliveClient.wrapFetchError(error);
+      return NicoliveClient.wrapFetchError(error as Error);
     }
   }
 
@@ -511,7 +511,7 @@ export class NicoliveClient {
       const response = await fetch(new Request(url, { headers }));
       return NicoliveClient.wrapResult<OnairChannelData[]>(response);
     } catch (error) {
-      return NicoliveClient.wrapFetchError(error);
+      return NicoliveClient.wrapFetchError(error as Error);
     }
   }
 
@@ -585,18 +585,16 @@ export class NicoliveClient {
       ipcRenderer.send('window-preventLogout', win.id);
       ipcRenderer.send('window-preventNewWindow', win.id);
       const url = 'https://live.nicovideo.jp/create';
-      win.loadURL(url)?.catch(
-        error => {
-          if (error instanceof Error) {
-            Sentry.withScope(scope => {
-              scope.setLevel('warning');
-              scope.setExtra('url', url);
-              scope.setFingerprint(['createProgram', 'loadURL', url]);
-              Sentry.captureException(error);
-            });
-          }
+      win.loadURL(url)?.catch(error => {
+        if (error instanceof Error) {
+          Sentry.withScope(scope => {
+            scope.setLevel('warning');
+            scope.setExtra('url', url);
+            scope.setFingerprint(['createProgram', 'loadURL', url]);
+            Sentry.captureException(error);
+          });
         }
-      );
+      });
     }).then(result => {
       Sentry.addBreadcrumb({
         category: 'createProgram.close',
@@ -605,7 +603,6 @@ export class NicoliveClient {
       return result;
     });
   }
-
 
   private editProgramWindow: Electron.BrowserWindow = null;
   private editProgramId = '';
@@ -663,19 +660,17 @@ export class NicoliveClient {
       ipcRenderer.send('window-preventLogout', win.id);
       ipcRenderer.send('window-preventNewWindow', win.id);
       const url = `https://live.nicovideo.jp/edit/${programID}`;
-      win.loadURL(url)?.catch(
-        error => {
-          if (error instanceof Error) {
-            Sentry.withScope(scope => {
-              scope.setLevel('warning');
-              scope.setExtra('url', url);
-              scope.setTag('programID', programID);
-              scope.setFingerprint(['editProgram', 'loadURL', url]);
-              Sentry.captureException(error);
-            });
-          }
+      win.loadURL(url)?.catch(error => {
+        if (error instanceof Error) {
+          Sentry.withScope(scope => {
+            scope.setLevel('warning');
+            scope.setExtra('url', url);
+            scope.setTag('programID', programID);
+            scope.setFingerprint(['editProgram', 'loadURL', url]);
+            Sentry.captureException(error);
+          });
         }
-      );
+      });
     }).then(result => {
       Sentry.addBreadcrumb({
         category: 'editProgram.close',

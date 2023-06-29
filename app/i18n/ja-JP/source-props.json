@@ -40,6 +40,9 @@
     "local_file": {
       "name": "ローカルファイル"
     },
+    "reroute_audio": {
+      "name": "N Airを介して音声を制御する"
+    },
     "refreshnocache": {
       "name": "キャッシュを消去して再読み込み"
     },
@@ -236,6 +239,9 @@
     },
     "window": {
       "name": "ウィンドウ"
+    },
+    "force_sdr": {
+      "name": "SDRを強制する"
     }
   },
   "game_capture": {
@@ -273,6 +279,12 @@
     },
     "window": {
       "name": "ウィンドウ"
+    },
+    "user_placeholder_use": {
+      "name": "プレースホームをカスタマイズ"
+    },
+    "user_placeholder_image": {
+      "name": "プレースホルダー画像"
     }
   },
   "dshow_input": {
@@ -393,5 +405,13 @@
   "near": {
     "name": "琴詠ニア",
     "description": "シーンにN Voiceの音声に合わせてコメントを読み上げるキャラクターを追加します"
+  },
+  "wasapi_process_output_capture": {
+    "name": "アプリ音声キャプチャ(β版)",
+    "description": "特定のアプリケーションからのオーディオをキャプチャします。"
+  },
+  "vlc_source": {
+    "name": "VLCソース",
+    "description": "ビデオのプレイリストをシーンに追加します。"
   }
 }

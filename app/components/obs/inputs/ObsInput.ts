@@ -421,6 +421,7 @@ export function getPropertiesFormData(obsSource: obs.ISource): TObsFormData {
     if (isTextProperty(obsProp)) {
       Object.assign(formItem as IObsTextInputValue, {
         multiline: obsProp.details.type === obs.ETextType.Multiline,
+        info: obsProp.details.type === obs.ETextType.TextInfo,
       });
     }
 

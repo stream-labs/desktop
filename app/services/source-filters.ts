@@ -16,6 +16,7 @@ import * as obs from '../../obs-api';
 import namingHelpers from '../util/NamingHelpers';
 import { $t } from 'services/i18n';
 import { EOrderMovement } from 'obs-studio-node';
+import { TcpServerService } from './api/tcp-server';
 
 export type TSourceFilterType =
   | 'mask_filter'
@@ -85,7 +86,7 @@ export class SourceFiltersService extends Service {
     const typesList = this.getTypesList();
     const types: ISourceFilterType[] = [];
 
-    obs.FilterFactory.types().forEach((type: TSourceFilterType) => {
+    obs.FilterFactory.types().forEach(type => {
       const listItem = typesList.find(item => item.value === type);
       if (!listItem) {
         console.warn(`filter ${type} is not found in available types`);
@@ -97,7 +98,7 @@ export class SourceFiltersService extends Service {
         audio: !!(obs.ESourceOutputFlags.Audio & flags),
         video: !!(obs.ESourceOutputFlags.Video & flags),
         async: !!(obs.ESourceOutputFlags.Async & flags),
-        type,
+        type: listItem.value,
         description,
       });
     });

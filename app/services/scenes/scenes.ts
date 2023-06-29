@@ -4,7 +4,7 @@ import { Subject } from 'rxjs';
 import { mutation, StatefulService } from 'services/core/stateful-service';
 import { TransitionsService } from 'services/transitions';
 import { WindowsService } from 'services/windows';
-import { Scene, SceneItem } from './index';
+import { Scene, SceneItem, EScaleType, EBlendingMode, EBlendingMethod } from './index';
 import { ISource, SourcesService, ISourceAddOptions } from 'services/sources';
 import { Inject } from 'services/core/injector';
 import * as obs from '../../../obs-api';
@@ -38,6 +38,9 @@ export interface ISceneItemInfo {
   crop: ICrop;
   locked?: boolean;
   rotation?: number;
+  scaleFilter?: EScaleType;
+  blendingMode?: EBlendingMode;
+  blendingMethod?: EBlendingMethod;
 }
 
 export interface IScenesState {
@@ -70,12 +73,18 @@ export interface ISceneItemSettings {
   transform: ITransform;
   visible: boolean;
   locked: boolean;
+  scaleFilter: EScaleType;
+  blendingMode: EBlendingMode;
+  blendingMethod: EBlendingMethod;
 }
 
 export interface IPartialSettings {
   transform?: IPartialTransform;
   visible?: boolean;
   locked?: boolean;
+  scaleFilter?: EScaleType;
+  blendingMode?: EBlendingMode;
+  blendingMethod?: EBlendingMethod;
 }
 
 export interface ISceneItem extends ISceneItemSettings, ISceneItemNode {

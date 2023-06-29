@@ -15,6 +15,10 @@ import electron from 'electron';
 import { $t } from 'services/i18n';
 import { MonitorCaptureCroppingService } from 'services/sources/monitor-capture-cropping';
 
+import { ScaleFilteringMenu } from './ScaleFilteringMenu';
+import { BlendingModeMenu } from './BlendingModeMenu';
+import { BlendingMethodMenu } from './BlendingMethodMenu';
+
 interface IEditMenuOptions {
   selectedSourceId?: string;
   sceneNodeId?: string;
@@ -136,6 +140,21 @@ export class EditMenu extends Menu {
         submenu: this.groupSubmenu().menu,
       });
 
+      this.append({
+        label: $t('sources.ScaleFiltering'),
+        submenu: this.scaleFilteringSubmenu().menu,
+      });
+
+      this.append({
+        label: $t('sources.BlendingMode'),
+        submenu: this.blendingModeSubmenu().menu,
+      });
+
+      this.append({
+        label: $t('sources.BlendingMethod'),
+        submenu: this.blendingMethodSubmenu().menu,
+      });
+
       if (selectedItem) {
         const visibilityLabel = selectedItem.visible ? $t('common.hide') : $t('common.show');
 
@@ -182,6 +201,18 @@ export class EditMenu extends Menu {
             renameId: this.selectionService.getFolders()[0].id,
           }),
       });
+    }
+
+    if (this.source) {
+      if (
+        this.source.type === 'browser_source' &&
+        this.source.propertiesManagerType === 'default'
+      ) {
+        this.append({
+          label: $t('common.Interact'),
+          click: () => this.sourcesService.showInteractWindow(this.source.sourceId),
+        });
+      }
     }
 
     if (this.source && !isMultipleSelection) {
@@ -308,5 +339,17 @@ export class EditMenu extends Menu {
 
   private deinterlaceSubmenu() {
     return new DeinterlaceMenu(this.source);
+  }
+
+  private scaleFilteringSubmenu() {
+    return new ScaleFilteringMenu();
+  }
+
+  private blendingModeSubmenu() {
+    return new BlendingModeMenu();
+  }
+
+  private blendingMethodSubmenu() {
+    return new BlendingMethodMenu();
   }
 }
