@@ -137,28 +137,33 @@ export class Scene {
   }
 
   /**
+   * After a scene has been opened in dual output mode, the vertical nodes
+   * must be filtered. Any scene with dual output nodes will use horizontal nodes
+   * to populate the source selector. This is to prevent the vertical nodes
+   * from showing on their own lines.
+   *
    * In dual output mode, the active displays determine the nodes shown
-   * in the source selector, so filter them while getting the node models
-   * for optimal performance.
+   * in the source selector. The only instance where the vertical nodes are used
+   * to populate the source selector is in dual output mode when the horizontal display is hidden.
    */
-
   getSourceSelectorNodes(): TSceneNode[] {
     let nodes = this.getNodes();
     if (
-      this.dualOutputService.views.hasVerticalNodes &&
+      this.dualOutputService.views.hasVerticalNodes ||
       this.dualOutputService.views.dualOutputMode
     ) {
+      const populateWithVerticalNodes =
+        !this.dualOutputService.views.activeDisplays.horizontal &&
+        this.dualOutputService.views.activeDisplays.vertical;
+
       // nodeMap can be used for checking horizontal display nodes,
       // but cannot lookup vertical display IDs so we use a Set instead
       const nodeMap = this.dualOutputService.views.activeSceneNodeMap;
       const verticalNodeIds = new Set(this.dualOutputService.views.verticalNodeIds);
       nodes = nodes.filter(node => {
-        return this.dualOutputService.views.activeDisplays.horizontal
-          ? nodeMap[node.id]
-          : verticalNodeIds.has(node.id);
+        return !populateWithVerticalNodes ? nodeMap[node.id] : verticalNodeIds.has(node.id);
       });
     }
-
     return nodes;
   }
 
