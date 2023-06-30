@@ -148,7 +148,7 @@
         sourceType="vlc_source"
         key="16"
       >
-        <FfmpegSourceIcon slot="media" />
+        <VlcSourceIcon slot="media" />
       </add-source-info>
 
       <add-source-info
@@ -157,7 +157,7 @@
         sourceType="wasapi_process_output_capture"
         key="17"
       >
-        <DshowInputIcon slot="media" />
+        <AppAudioCaptureSourceIcon slot="media" />
       </add-source-info>
 
       <add-source-info
