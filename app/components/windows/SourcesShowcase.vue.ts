@@ -26,6 +26,8 @@ import MonitorCaptureIcon from '../../../media/images/monitor-capture-icon.svg';
 import NdiSourceIcon from '../../../media/images/ndi-icon.svg';
 import BlackmagicSourceIcon from '../../../media/images/blackmagic-icon.svg';
 import NVoiceCharacterSourceIcon from '../../../media/images/nvoice-character-source-icon.svg';
+import AppAudioCaptureSourceIcon from '../../../media/images/app-speaker.svg';
+import VLCSourceIcon from '../../../media/images/play.svg';
 import { NVoiceCharacterType, NVoiceCharacterTypes } from 'services/nvoice-character';
 import { omit } from 'lodash';
 
@@ -57,6 +59,8 @@ interface ISelectSourceOptions {
     NdiSourceIcon,
     BlackmagicSourceIcon,
     NVoiceCharacterSourceIcon,
+    AppAudioCaptureSourceIcon,
+    VLCSourceIcon,
   },
 })
 export default class SourcesShowcase extends Vue {
