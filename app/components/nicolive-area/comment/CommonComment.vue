@@ -6,15 +6,29 @@
     :speaking="speaking"
     @dblclick="$emit('pinned')"
   >
-    <div class="comment-number">{{ chat.value.no }}</div>
-    <div class="comment-box">
-      <div class="comment-name-box" v-if="chat.value.name" @click.stop="$emit('commentUser')">
-        <img class="comment-icon" :src="userIconURL" />
-        <div class="comment-name">{{ chat.value.name }}</div>
+    <div class="comment-root">
+      <div class="comment-number">{{ chat.value.no }}</div>
+      <div class="comment-box">
+        <div class="comment-name-box" v-if="chat.value.name" @click.stop="$emit('commentUser')">
+          <img class="comment-icon" :src="userIconURL" />
+          <div class="comment-name">{{ chat.value.name }}</div>
+        </div>
+        <div class="comment-body">{{ computedContent }}</div>
       </div>
-      <div class="comment-body">{{ computedContent }}</div>
       <div class="comment-misc" @click.stop="$emit('commentMenu')">
         <i class="icon-btn icon-ellipsis-vertical"></i>
+      </div>
+    </div>
+    <div class="nameplate-hint" v-if="nameplateHint">
+      <div>[なふだ機能]を使ったコメントが投稿されました</div>
+      <div>ニックネームをクリックして、視聴者のことをもっとよく知ってみよう!</div>
+      <div>
+        <a
+          @click.prevent="openInDefaultBrowser($event)"
+          href="https://qa.nicovideo.jp/faq/show/21148?site_domain=default"
+          class="link"
+          >なふだ機能とは?</a
+        >
       </div>
     </div>
   </div>
@@ -27,6 +41,12 @@
 
 .root {
   display: flex;
+  flex-direction: column;
+}
+
+.comment-root {
+  display: flex;
+  flex: 1;
   flex-direction: row;
 
   &:hover,
@@ -45,6 +65,7 @@
 
 .comment-box {
   display: flex;
+  flex: 1;
   flex-direction: column;
 }
 
@@ -85,5 +106,19 @@
   .common__comment-misc;
 
   display: none;
+}
+
+.nameplate-hint {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  padding-right: 8px;
+  padding-left: 8px;
+  margin-left: 16px;
+  background-color: var(--color-bg-secondary);
+}
+
+.nameplate-hint div {
+  flex: 1;
 }
 </style>

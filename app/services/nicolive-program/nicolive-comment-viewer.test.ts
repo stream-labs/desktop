@@ -18,7 +18,10 @@ const setup = createSetupFunction({
   },
 });
 
-jest.mock('services/nicolive-program/nicolive-program', () => ({ NicoliveProgramService: {} }));
+jest.mock('services/nicolive-program/nicolive-program', () => ({
+  NicoliveProgramService: {
+  },
+}));
 jest.mock('services/nicolive-program/nicolive-comment-filter', () => ({
   NicoliveCommentFilterService: {},
 }));
@@ -134,7 +137,17 @@ function connectionSetup() {
       requestLatestMessages() { }
     },
   }));
-  setup({ injectee: { NicoliveProgramService: { stateChange } } });
+  setup({
+    injectee: {
+      NicoliveProgramService: {
+        stateChange,
+        stateService: {
+          state: {},
+        },
+        checkNameplateHint: () => { },
+      }
+    }
+  });
 
   const { NicoliveCommentViewerService } = require('./nicolive-comment-viewer');
   const instance = NicoliveCommentViewerService.instance as NicoliveCommentViewerService;

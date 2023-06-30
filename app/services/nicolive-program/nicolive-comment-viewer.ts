@@ -255,6 +255,13 @@ export class NicoliveCommentViewerService extends StatefulService<INicoliveComme
     const maxQueueToSpeak = 3; // 直近3件つづ読み上げ対象にする
     const recentSeconds = 60;
 
+    if (this.nicoliveProgramService.stateService.state.nameplateHint === undefined) {
+      const firstCommentWithName = values.find(c => !!c.value.name && c.value.no);
+      if (firstCommentWithName) {
+        this.nicoliveProgramService.checkNameplateHint(firstCommentWithName.value.no);
+      }
+    }
+
     const nowSeconds = Date.now() / 1000;
     this.queueToSpeech(
       values

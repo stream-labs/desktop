@@ -21,10 +21,16 @@ type SpeechSynthesizerSettingsState = {
   };
 };
 
+type NameplateHintState = {
+  programID: string;
+  commentNo: number;
+}
+
 interface IState {
   autoExtensionEnabled: boolean;
   panelOpened: boolean;
   speechSynthesizerSettings?: SpeechSynthesizerSettingsState;
+  nameplateHint?: NameplateHintState;
 }
 
 /**
@@ -49,6 +55,10 @@ export class NicoliveProgramStateService extends PersistentStatefulService<IStat
 
   updateSpeechSynthesizerSettings(newState: SpeechSynthesizerSettingsState): void {
     this.setState({ speechSynthesizerSettings: newState });
+  }
+
+  updateNameplateHint(newState?: NameplateHintState): void {
+    this.setState({ nameplateHint: newState });
   }
 
   private setState(nextState: Partial<IState>): void {

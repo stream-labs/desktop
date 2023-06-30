@@ -555,4 +555,10 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
   togglePanelOpened(): void {
     this.stateService.togglePanelOpened();
   }
+
+  checkNameplateHint(commentNo: number) {
+    if (this.stateService.state.nameplateHint === undefined) {
+      this.stateService.updateNameplateHint({ programID: this.state.programID, commentNo });
+    }
+  }
 }

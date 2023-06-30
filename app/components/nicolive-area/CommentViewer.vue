@@ -15,7 +15,7 @@
     <div class="content">
       <div class="list" ref="scroll">
         <component
-          :class="{ row: true, name: item.value.name }"
+          :class="{ row: true, name: item.value.name, hint: item.value.no === nameplateHintNo }"
           v-for="item of items"
           :key="item.seqId"
           :is="componentMap[item.component]"
@@ -23,6 +23,7 @@
           :getFormattedLiveTime="getFormattedLiveTime"
           :commentMenuOpened="commentMenuTarget === item"
           :speaking="speakingSeqId === item.seqId"
+          :nameplateHint="item.value.no === nameplateHintNo"
           @pinned="pin(item)"
           @commentMenu="showCommentMenu(item)"
           @commentUser="showUserInfo(item)"
@@ -131,6 +132,10 @@
 
   &.name {
     height: 64px;
+
+    &.hint {
+      height: 192px;
+    }
   }
 }
 
