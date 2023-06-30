@@ -55,7 +55,7 @@ export function UltraDestinationSwitchers(p: IUltraDestinationSwitchers) {
   }, []);
 
   return (
-    <>
+    <div className={styles.switchWrapper}>
       <InfoBadge
         content={
           <Translate message="<dualoutput>Dual Output</dualoutput> is enabled - you must stream to one horizontal and one vertical platform.">
@@ -83,7 +83,7 @@ export function UltraDestinationSwitchers(p: IUltraDestinationSwitchers) {
           index={index}
         />
       ))}
-    </>
+    </div>
   );
 }
 
@@ -142,7 +142,11 @@ function DestinationSwitcher(p: IDestinationSwitcherProps) {
         title: service.displayName,
         description: platformAuthData.username,
         Logo: () => (
-          <PlatformLogo platform={platform} className={styles[`platform-logo-${platform}`]} />
+          <PlatformLogo
+            platform={platform}
+            className={cx(styles.logo, styles[`platform-logo-${platform}`])}
+            size={36}
+          />
         ),
         Switch: () => (
           <SwitchInput

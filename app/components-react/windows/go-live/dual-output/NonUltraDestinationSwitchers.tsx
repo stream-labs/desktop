@@ -149,7 +149,11 @@ const DestinationSwitcher = React.forwardRef<{ addClass: () => void }, IDestinat
           title: service.displayName,
           description: platformAuthData.username,
           Logo: () => (
-            <PlatformLogo platform={platform} className={styles[`platform-logo-${platform}`]} />
+            <PlatformLogo
+              platform={platform}
+              className={cx(styles.logo, styles[`platform-logo-${platform}`])}
+              size={36}
+            />
           ),
           CloseIcon: () => <i className={cx('icon-close', styles.close)} onClick={removeClass} />,
         };
