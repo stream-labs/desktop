@@ -148,7 +148,7 @@
         sourceType="vlc_source"
         key="16"
       >
-        <FfmpegSourceIcon slot="media" />
+        <VLCSourceIcon slot="media" />
       </add-source-info>
 
       <add-source-info
@@ -157,7 +157,7 @@
         sourceType="wasapi_process_output_capture"
         key="17"
       >
-        <DshowInputIcon slot="media" />
+        <AppAudioCaptureSourceIcon slot="media" />
       </add-source-info>
 
       <add-source-info
@@ -228,15 +228,9 @@
   padding: 0 20px;
 
   svg {
-    * {
-      fill: var(--color-text);
-    }
+    flex: 1;
+    height: 82px;
   }
-}
-
-.source-image {
-  flex: 1;
-  height: 82px;
 }
 
 .source-info__text,
