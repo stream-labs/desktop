@@ -79,6 +79,9 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
     };
   }
 
+  /**
+   * The below conditionals are to prevent undefined errors on app startup
+   */
   get baseResolutions() {
     const videoSettings = this.dualOutputService.views.videoSettings;
     const [widthStr, heightStr] = this.settingsService.views.values.Video.Base.split('x');
@@ -107,6 +110,12 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
     };
   }
 
+  /**
+   * Format video settings for the video settings form
+   *
+   * @param display - Optional, the display for the settings
+   * @returns Settings formatted for the video settings form
+   */
   formatVideoSettings(display: TDisplayType = 'horizontal') {
     const settings = this.state[display] ?? this.dualOutputService.views.videoSettings.vertical;
 
@@ -122,18 +131,24 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
     };
   }
 
+  /**
+   * Load legacy video settings from cache.
+   *
+   * @remarks
+   * Ideally, the first time the user opens the app after the settings
+    * have migrated to being stored on the front end, load the settings from
+    * the legacy settings. Because the legacy settings are just values from basic.ini
+    * if the user is starting from a clean cache, there will be no such file.
+    * In that case, load from the video property.
+
+    * Additionally, because this service is loaded lazily, calling this function elsewhere
+    * before the service has been initiated will call the function twice.
+    * To prevent errors, just return if both properties are null because
+    * the function will be called again as a part of establishing the context.
+   * @param display - Optional, the context's display name
+   */
+
   loadLegacySettings(display: TDisplayType = 'horizontal') {
-    // Ideally, the first time the user opens the app after the settings
-    // have migrated to being stored on the front end, load the settings from
-    // the legacy settings. Because the legacy settings are just values from basic.ini
-    // if the user is starting from a clean cache, there will be no such file.
-    // In that case, load from the video property.
-
-    // Additionally, because this service is loaded lazily, calling this function elsewhere
-    // before the service has been initiated will call the function twice.
-    // To prevent errors, just return if both properties are null because
-    // the function will be called again as a part of establishing the context.
-
     const legacySettings = this.contexts[display].legacySettings;
     const videoSettings = this.contexts[display].video;
 
@@ -158,6 +173,11 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
     }
   }
 
+  /**
+   * Migrate settings from legacy settings or obs
+   *
+   * @param display - Optional, the context's display name
+   */
   migrateSettings(display: TDisplayType = 'horizontal') {
     // if this is the first time starting the app
     // set default settings for horizontal context
@@ -181,6 +201,16 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
     this.SET_VIDEO_CONTEXT(display, this.contexts[display].video);
   }
 
+  /**
+   * Establish the obs video context
+   *
+   * @remarks
+   * Many startup errors in other services will result from a context not being established before
+   * the service initiates.
+   *
+   * @param display - Optional, the context's display name
+   * @returns Boolean denoting success
+   */
   establishVideoContext(display: TDisplayType = 'horizontal') {
     if (this.contexts[display]) return;
     this.SET_VIDEO_CONTEXT(display);
@@ -214,6 +244,12 @@ export class VideoSettingsService extends StatefulService<IVideoSetting> {
     this.dualOutputService.setVideoSetting({ [key]: value }, display);
   }
 
+  /**
+   * Shut down the video settings service
+   *
+   * @remarks
+   * Each context must be destroyed when shutting down the app to prevent errors
+   */
   shutdown() {
     displays.forEach(display => {
       if (this.contexts[display]) {

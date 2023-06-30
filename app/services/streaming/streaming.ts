@@ -240,6 +240,9 @@ export class StreamingService
     this.UPDATE_STREAM_INFO({ lifecycle: 'waitForNewSettings' });
   }
 
+  /**
+   * set platform stream settings
+   */
   async handleSetupPlatform(
     platform: TPlatform,
     settings: IGoLiveSettings,
@@ -289,6 +292,9 @@ export class StreamingService
     // use default settings if no new settings provided
     const settings = newSettings || cloneDeep(this.views.savedSettings);
 
+    /**
+     * Set custom destination stream settings
+     */
     if (this.views.isDualOutputMode) {
       // set custom destination mode and video context before setting settings
       settings.customDestinations.forEach(destination => {

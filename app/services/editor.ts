@@ -16,8 +16,10 @@ import { TcpServerService } from './api/tcp-server';
 import { Subject } from 'rxjs';
 import { TDisplayType, VideoSettingsService } from './settings-v2';
 
-// Examine scene items props
-// Examine second set of scene items for dual output
+/**
+ * Examine scene items props
+ * Examine second set of scene items for dual output
+ */
 interface IResizeRegion {
   name: string;
   x: number;
@@ -73,6 +75,10 @@ export class EditorService extends StatefulService<IEditorServiceState> {
     changingPositionInProgress: false,
   };
 
+  /**
+   * Store data for both displays because the difference in dimensions
+   * effects calculations.
+   */
   renderedWidths = {
     horizontal: 0,
     vertical: 0,
@@ -498,12 +504,19 @@ export class EditorService extends StatefulService<IEditorServiceState> {
   }
 
   /**
-   * Determines if the given mouse event is over the
-   * given source
+   * Determines if the given mouse event is over the given source
+   *
+   * @remarks
+   * Obs connects all of the scene items to each display, but only renders those
+   * assigned to the display's context. This checks the scene item's display because
+   * dual output scenes will have scene items assigned to the other context and the
+   * mouse can access these scene items even though they are not rendered.
+   *
+   * @param event - The mouse event
+   * @param source - The scene item
+   * @returns Boolean representing if the mouse is over the source
    */
   isOverSource(event: IMouseEvent, source: SceneItem) {
-    // obs connects all of the scene items to each display, but only renders those assigned to the display's context
-    // prevent these other scene items from being selectable when they are the opposite context
     if (event.display !== source.display) return false;
 
     const rect = new ScalableRectangle(source.rectangle);
@@ -521,8 +534,20 @@ export class EditorService extends StatefulService<IEditorServiceState> {
     });
   }
 
-  // Determines if the given mouse event is over any
-  // of the active source's resize regions.
+  /**
+   * Determines if the given mouse event is over any of the active source's resize regions.
+   *
+   * @remarks
+   * Obs connects all of the scene items to each display, but only renders those
+   * assigned to the display's context. This checks the region's display because
+   * dual output scenes will have scene items assigned to the other context and the
+   * mouse can access these scene items even though they are not rendered. Additionally,
+   * this expands the resize region's box for the vertical display because the scaling
+   * can make it difficult to select.
+   *
+   * @param event - The mouse event
+   * @returns Boolean representing if the mouse is over the resize box
+   */
   isOverResize(event: IMouseEvent) {
     if (this.activeSources.length > 0) {
       return this.resizeRegions.find(region => {

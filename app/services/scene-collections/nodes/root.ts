@@ -13,12 +13,16 @@ import { DualOutputService } from 'services/dual-output';
 import { SettingsService } from 'services/settings';
 
 interface ISchema {
-  // this is for backward compatibility with vanilla scene collections
+  /**
+   * this is for backward compatibility with vanilla scene collections
+   */
   baseResolution: {
     baseWidth: number;
     baseHeight: number;
   };
-  // this is for scenes created with dual output
+  /**
+   * this is for scenes created with dual output
+   */
   baseResolutions: {
     horizontal: {
       baseWidth: number;
@@ -42,7 +46,9 @@ interface ISchema {
   operatingSystem?: OS;
 }
 
-// This is the root node of the config file
+/**
+ * This is the root node of the config file
+ */
 export class RootNode extends Node<ISchema, {}> {
   schemaVersion = 4;
 
@@ -78,7 +84,11 @@ export class RootNode extends Node<ISchema, {}> {
       operatingSystem: process.platform as OS,
     };
   }
-
+  /**
+   * In order to load the root node without errors on startup
+   * there must be at least one video context established.
+   * This if/else prevents an error by guaranteeing a video context exists.
+   */
   async load(): Promise<void> {
     if (!this.videoSettingsService.contexts.horizontal) {
       const establishedContext = this.videoSettingsService.establishedContext.subscribe(

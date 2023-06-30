@@ -7,6 +7,15 @@ import { RemoveItemCommand } from './remove-item';
 import { DualOutputService } from 'services/dual-output';
 import { SceneCollectionsService } from 'services/scene-collections';
 
+/**
+ * Removes a scene
+ *
+ * @remarks
+ * This leverages the remove item and remove nodes editor commands.
+ * For dual output scenes, also remove the scene node map.
+ *
+ * @param sceneId - The scene id
+ */
 export class RemoveSceneCommand extends Command {
   @Inject() private scenesService: ScenesService;
   @Inject() private dualOutputService: DualOutputService;

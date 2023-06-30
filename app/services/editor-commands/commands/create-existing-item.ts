@@ -8,6 +8,15 @@ import { SceneCollectionsService } from 'services/scene-collections';
 
 /**
  * Creates an item from an existing source
+ *
+ * @remarks
+ * For vanilla scenes, just make a copy of the existing item.
+ * For dual output scenes, copy the existing item and then copy it again
+ * to create both nodes. Do this regardless of whether or not dual output
+ * is active.
+ *
+ * @param sceneId - The id of the scene
+ * @param sourceId - The id of the scene item
  */
 export class CreateExistingItemCommand extends Command {
   @Inject() private sourcesService: SourcesService;

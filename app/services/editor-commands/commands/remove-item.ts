@@ -21,7 +21,14 @@ class SourceReviver extends SourcesNode {
     return [this.source];
   }
 }
-
+/**
+ * Removes an item
+ *
+ * @remarks
+ * For both vanilla and dual output scenes, remove a single scene item.
+ *
+ * @param sceneItemId - The scene item id
+ */
 export class RemoveItemCommand extends Command {
   @Inject() private scenesService: ScenesService;
   @Inject() private videoSettingsService: VideoSettingsService;

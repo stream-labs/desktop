@@ -7,6 +7,16 @@ import { SceneCollectionsService } from 'services/scene-collections';
 import { $t } from 'services/i18n';
 import { Inject } from 'services/core';
 
+/**
+ * Removes scene item nodes
+ *
+ * @remarks
+ * This leverages the remove folder and remove item editor commands.
+ * For dual output scenes, remove both the horizontal and vertical nodes
+ * and remove the scene node map entry.
+ *
+ * @param selection - The selection of nodes
+ */
 export class RemoveNodesCommand extends Command {
   private removeFolderSubCommands: RemoveFolderCommand[];
   private removeItemSubCommands: RemoveItemCommand[];

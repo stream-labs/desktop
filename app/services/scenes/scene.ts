@@ -156,8 +156,11 @@ export class Scene {
         !this.dualOutputService.views.activeDisplays.horizontal &&
         this.dualOutputService.views.activeDisplays.vertical;
 
-      // nodeMap can be used for checking horizontal display nodes,
-      // but cannot lookup vertical display IDs so we use a Set instead
+      /**
+       * nodeMap can be used for checking horizontal display nodes,
+       * but cannot lookup vertical display IDs so we use a Set instead
+       */
+
       const nodeMap = this.dualOutputService.views.activeSceneNodeMap;
       const verticalNodeIds = new Set(this.dualOutputService.views.verticalNodeIds);
       nodes = nodes.filter(node => {

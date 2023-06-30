@@ -10,11 +10,19 @@ import { EditorService } from 'services/editor';
 import { SceneCollectionsService } from 'services/scene-collections';
 
 /**
+ * Copies nodes
+ *
+ * @remarks
  * The copy nodes editor command has small variations when working with:
  *  - a vanilla scene
  *  - a dual output scene
  *  - migrating a vanilla scene to a dual output scene
  * To maximize readability, the code for this is not very DRY.
+ *
+ *  @param selection - The selection of nodes
+ *   @param destSceneId - The scene to copy the nodes to,
+ *   @param duplicateSources - Boolean for whether the sources should be copied
+ *   @param display - Optional, the display to assign the copied nodes to
  */
 export class CopyNodesCommand extends Command {
   @Inject() scenesService: ScenesService;
@@ -73,11 +81,16 @@ export class CopyNodesCommand extends Command {
       });
     }
 
+    /**
+     * If the scene does not already have a node map it is a vanilla scene.
+     * If dual output mode is on, copy all of the nodes and create a scene node map
+     * to migrate the vanilla scene to a dual output scene.
+     *
+     * Otherwise, just copy all of the nodes without creating a node map regardless of.
+     * Whether or not it's a vanilla or dual output scene. The node map for dual output
+     * scenes will be handled when reordering the nodes.
+     */
     if (isDualOutputMode && !this.hasNodeMap) {
-      // if the scene does not already have a node map it is a vanilla scene
-      // if it's dual output mode, copy all of the nodes and create a scene node map
-      // to migrate the vanilla scene to a dual output scene
-
       // Create all nodes first
       this.selection.getNodes().forEach(node => {
         if (node.isFolder()) {
@@ -135,9 +148,6 @@ export class CopyNodesCommand extends Command {
 
       this.hasNodeMap = true;
     } else {
-      // otherwise, just copy all of the nodes without creating a node map
-      // the node map for dual output scenes will be handled when reordering the nodes
-
       // in dual output mode, the user can select horizontal and vertical nodes independent of each other
       // so confirm if dual output nodes should be included
       this.selection.getNodes(isDualOutputMode).forEach(node => {

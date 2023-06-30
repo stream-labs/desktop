@@ -7,6 +7,24 @@ import { $t } from 'services/i18n';
 import { DualOutputService } from 'services/dual-output';
 import { SceneCollectionsService } from 'services/scene-collections';
 
+/**
+ * Creates a folder
+ *
+ * @remarks
+ * For vanilla scenes, create a folder and, if required, move items into folder.
+ * For dual output scenes, it's more complicated because the vertical nodes
+ * also need to be moved into a matching folder.
+ *  1. create a folder for the horizontal display
+ *  2. map over the selection (of horizontal nodes) to locate all the matching vertical nodes
+ *  3. create a folder for the dual output nodes
+ *  4. move the horizontal node selection into the horizontal folder
+ *  5. move the vertical node selection into the vertical folder
+ *  6. create a node map entry
+ *
+ * @param sceneId - The id of the scene
+ * @param name - The name of the folder
+ * @param items - Optional, a selection of items
+ */
 export class CreateFolderCommand extends Command {
   @Inject() private scenesService: ScenesService;
   @Inject() private dualOutputService: DualOutputService;

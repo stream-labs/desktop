@@ -6,6 +6,19 @@ import { $t } from 'services/i18n';
 import { DualOutputService } from 'services/dual-output';
 import { SceneCollectionsService } from 'services/scene-collections';
 
+/**
+ * Creates a new item
+ *
+ * @remarks
+ * For vanilla scenes, create a new item.
+ * For dual output scenes, create a new item and a corresponding vertical item.
+ *
+ * @param sceneId - The scene id
+ * @param name - The scene item name
+ * @param type - The scene item type
+ * @param settings - Optional, A Dictionary of settings
+ * @param options - Optional, ISceneNodeAddOptions, defaults to an empty object,
+ */
 export class CreateNewItemCommand extends Command {
   @Inject() private scenesService: ScenesService;
   @Inject() private dualOutputService: DualOutputService;

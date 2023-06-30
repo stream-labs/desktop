@@ -118,6 +118,14 @@ export class RestreamService extends StatefulService<IRestreamState> {
     return this.streamInfo.isMultiplatformMode || this.streamInfo.isDualOutputMode;
   }
 
+  /**
+   * Fetches user settings for restream
+   * @remarks
+   * In dual output mode, tell the stream which context to use when streaming
+   *
+   * @param mode - Optional, orientation denoting output context
+   * @returns IUserSettings JSON response
+   */
   fetchUserSettings(mode?: 'landscape' | 'portrait'): Promise<IUserSettingsResponse> {
     const headers = authorizedHeaders(this.userService.apiToken);
 
@@ -180,6 +188,15 @@ export class RestreamService extends StatefulService<IRestreamState> {
     await Promise.all([this.setupIngest(context, mode), this.setupTargets(!!mode)]);
   }
 
+  /**
+   * Setup restream ingest
+   * @remarks
+   * In dual output mode, assign a context to the ingest.
+   * Defaults to the horizontal context.
+   *
+   * @param context - Optional, display to stream
+   * @param mode - Optional, mode which denotes which context to stream
+   */
   async setupIngest(context?: TDisplayType, mode?: TOutputOrientation) {
     const ingest = (await this.fetchIngest()).server;
     const settings = mode ? await this.fetchUserSettings(mode) : this.settings;
@@ -201,6 +218,14 @@ export class RestreamService extends StatefulService<IRestreamState> {
     );
   }
 
+  /**
+   * Setup restream targets
+   * @remarks
+   * In dual output mode, assign a contexts to the ingest targets.
+   * Defaults to the horizontal context.
+   *
+   * @param isDualOutputMode - Optional, boolean denoting if dual output mode is on
+   */
   async setupTargets(isDualOutputMode?: boolean) {
     // delete existing targets
     const targets = await this.fetchTargets();
@@ -258,6 +283,14 @@ export class RestreamService extends StatefulService<IRestreamState> {
     );
   }
 
+  /**
+   * Create restream targets
+   * @remarks
+   * In dual output mode, assign a context to the ingest using the mode property.
+   * Defaults to the horizontal context.
+   *
+   * @param targets - Object with the platform name/type, stream key, and output mode
+   */
   async createTargets(
     targets: {
       platform: TPlatform | 'relay';

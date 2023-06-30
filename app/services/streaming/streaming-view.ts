@@ -159,6 +159,9 @@ export class StreamInfoView<T extends Object> extends ViewHandler<T> {
     ) as TPlatform[];
   }
 
+  /**
+   * Returns if the user can or should use the restream service
+   */
   get isMultiplatformMode(): boolean {
     if (this.isDualOutputMode) return false;
     return (
@@ -168,8 +171,10 @@ export class StreamInfoView<T extends Object> extends ViewHandler<T> {
     );
   }
 
+  /**
+   * Returns if dual output mode is on. Dual output mode is only available to logged in users
+   */
   get isDualOutputMode(): boolean {
-    // dual output mode is only available to logged in users
     return this.dualOutputView.dualOutputMode && this.userView.isLoggedIn;
   }
 
@@ -186,6 +191,9 @@ export class StreamInfoView<T extends Object> extends ViewHandler<T> {
     };
   }
 
+  /**
+   * Returns the enabled platforms according to their assigned display
+   */
   get activeDisplayPlatforms(): TDisplayPlatforms {
     const enabledPlatforms = this.enabledPlatforms;
 
@@ -200,6 +208,9 @@ export class StreamInfoView<T extends Object> extends ViewHandler<T> {
     );
   }
 
+  /**
+   * Returns the enabled destinations according to their assigned display
+   */
   get activeDisplayDestinations(): TDisplayDestinations {
     const destinations = this.customDestinations;
 
@@ -214,6 +225,9 @@ export class StreamInfoView<T extends Object> extends ViewHandler<T> {
     );
   }
 
+  /**
+   * Returns the display for a given platform
+   */
   getPlatformDisplay(platform: TPlatform) {
     return this.dualOutputView.getPlatformDisplay(platform);
   }

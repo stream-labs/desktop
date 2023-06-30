@@ -102,7 +102,10 @@ export interface IPartialSettings {
   scaleFilter?: EScaleType;
   blendingMode?: EBlendingMode;
   blendingMethod?: EBlendingMethod;
-  output?: IVideo; // for obs.ISceneItem, this property is video
+  /**
+   *  for obs.ISceneItem, the `output` property is `video`
+   */
+  output?: IVideo;
   display?: TDisplayType;
   position?: IVec2;
 }
@@ -115,7 +118,10 @@ export interface ISceneItem extends ISceneItemSettings, ISceneItemNode {
   scaleFilter: EScaleType;
   blendingMode: EBlendingMode;
   blendingMethod: EBlendingMethod;
-  output?: IVideo; // for obs.ISceneItem, this property is video
+  /**
+   *  for obs.ISceneItem, the `output` property is `video`
+   */
+  output?: IVideo;
   position?: IVec2;
 }
 
@@ -335,8 +341,10 @@ export class ScenesService extends StatefulService<IScenesState> {
           };
           newItem.setSettings(settings);
 
-          // if we're creating the scene in dual output mode
-          // also create scene items for the vertical display
+          /**
+           * when creating the scene in dual output mode
+           * also create scene items for the vertical display
+           */
           if (this.dualOutputService.views.dualOutputMode) {
             this.dualOutputService.actions.createOrAssignOutputNode(newItem, 'vertical', false, id);
           }
