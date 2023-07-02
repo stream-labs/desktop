@@ -196,6 +196,7 @@ export default function StudioEditor() {
                 onContextMenu={eventHandlers.onContextMenu}
               >
                 <Display
+                  id="horizontal-display"
                   type="horizontal"
                   drawUI={true}
                   paddingSize={10}
@@ -227,6 +228,7 @@ export default function StudioEditor() {
                 onContextMenu={eventHandlers.onContextMenu}
               >
                 <Display
+                  id="vertical-display"
                   type="vertical"
                   drawUI={true}
                   paddingSize={10}
@@ -239,12 +241,12 @@ export default function StudioEditor() {
               </div>
             )}
             {v.showHorizontalDisplay && !v.showVerticalDisplay && v.studioMode && (
-              <div className={styles.studioModeDisplayContainer}>
+              <div id="horizontal-display-studio" className={styles.studioModeDisplayContainer}>
                 <Display paddingSize={10} type="horizontal" />
               </div>
             )}
             {!v.showHorizontalDisplay && v.showVerticalDisplay && v.studioMode && (
-              <div className={styles.studioModeDisplayContainer}>
+              <div id="vertical-display-studio" className={styles.studioModeDisplayContainer}>
                 <Display paddingSize={10} type="vertical" />
               </div>
             )}

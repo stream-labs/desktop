@@ -1,22 +1,48 @@
 import {
   clickGoLive,
   prepareToGoLive,
-  stopStream,
-  submit,
-  switchAdvancedMode,
   waitForSettingsWindowLoaded,
 } from '../../helpers/modules/streaming';
-import { fillForm, useForm } from '../../helpers/modules/forms';
-import { click, clickButton, isDisplayed, waitForDisplayed } from '../../helpers/modules/core';
+import { waitForDisplayed, focusMain } from '../../helpers/modules/core';
 import { logIn } from '../../helpers/modules/user';
 import { releaseUserInPool, reserveUserFromPool } from '../../helpers/webdriver/user';
-import { showSettingsWindow } from '../../helpers/modules/settings/settings';
-import { test, useWebdriver } from '../../helpers/webdriver';
+import { showSettingsWindow, toggleDualOutputMode } from '../../helpers/modules/settings/settings';
+import { test, useWebdriver, TExecutionContext } from '../../helpers/webdriver';
 
 useWebdriver();
 
 // Dual Output Go Live Window
 // In-progress, skip for now
+
+/**
+ * Dual output video settings
+ */
+test('User must be logged in to use Dual Output', async (t: TExecutionContext) => {
+  await toggleDualOutputMode(t);
+  await waitForDisplayed('#login-modal');
+  t.pass();
+});
+
+test('Dual output checkbox toggles Dual Output mode', async (t: TExecutionContext) => {
+  await logIn();
+  await toggleDualOutputMode(t, true);
+  await focusMain();
+  await waitForDisplayed('div#vertical-display');
+
+  // await toggleDualOutputMode();
+  // !isDisplayed('#vertical-display');
+  t.pass();
+});
+
+// test('Dual output display toggles show/hide displays', async t => {});
+
+// test('Dual output display toggles show/hide scene items in source selector', async t => {});
+
+// test('Dual output scene item toggles', async t => {});
+
+// test('Dual output folder toggles', async t => {});
+
+// test('Dual output nodes', async t => {});
 
 test.skip('Dual Output Go Live Window', async t => {
   await logIn('twitch');
@@ -27,12 +53,6 @@ test.skip('Dual Output Go Live Window', async t => {
   await prepareToGoLive();
   await clickGoLive();
   await waitForSettingsWindowLoaded();
-});
-
-// Video
-test.skip('User must be logged in to use Dual Output', async t => {
-  await showSettingsWindow('Video');
-  const { assertInputOptions } = useForm();
 });
 
 // test('Multistream default mode', async t => {

@@ -418,6 +418,10 @@ export function VideoSettings() {
           {/* THIS CHECKBOX TOGGLES DUAL OUTPUT MODE FOR THE ENTIRE APP */}
 
           <CheckboxInput
+            id="dual-output-checkbox"
+            name="dual-output-checkbox"
+            data-name="dual-output-checkbox"
+            label="Dual Output Checkbox"
             value={showDualOutputSettings}
             onChange={(val: boolean) => (isLoggedIn ? setShowDualOutput() : handleShowModal(val))}
             className={styles.doCheckbox}
@@ -469,7 +473,7 @@ function LoginPromptModal(p: {
       getContainer={false}
       className={styles.confirmLogout}
     >
-      <Form className={styles.confirmLogout}>
+      <Form id="login-modal" className={styles.confirmLogout}>
         <h2>{$t('Login')}</h2>
         {$t('Please log in to enable dual output. Would you like to log in now?')}
         <div className={styles.buttons}>

@@ -2,16 +2,16 @@ import {
   click,
   clickButton,
   focusChild,
-  getFocusedWindowId,
   useChildWindow,
   useMainWindow,
+  clickCheckbox,
 } from '../core';
 import { mkdtemp } from 'fs-extra';
 import { tmpdir } from 'os';
 import * as path from 'path';
 import { setInputValue } from '../forms/base';
 import { FormMonkey } from '../../form-monkey';
-import { getContext } from '../../webdriver';
+import { TExecutionContext } from '../../../helpers/webdriver';
 
 /**
  * Open the settings window with a given category selected
@@ -54,5 +54,21 @@ export async function setOutputResolution(resolution: string) {
   await showSettingsWindow('Video', async () => {
     await setInputValue('[data-name="outputRes"]', `${width}x${height}`);
     await clickButton('Done');
+  });
+}
+
+/**
+ * Toggle dual output mode
+ */
+export async function toggleDualOutputMode(t: TExecutionContext, closeChildWindow?: boolean) {
+  await showSettingsWindow('Video', async () => {
+    await clickCheckbox('dual-output-checkbox');
+    const form = new FormMonkey(t);
+    const val = await form.getInput('dual-output-checkbox');
+    console.log('val ', val);
+    if (closeChildWindow) {
+      await clickButton('Done');
+    }
+    return val;
   });
 }

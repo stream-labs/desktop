@@ -56,6 +56,11 @@ export async function clickTab(tabText: string) {
   await click(`div[role="tab"]=${tabText}`);
 }
 
+export async function clickCheckbox(dataName: string) {
+  const $checkbox = await select(`[data-name="${dataName}"]`);
+  await $checkbox.click();
+}
+
 // OTHER SHORTCUTS
 
 export async function isDisplayed(selectorOrEl: TSelectorOrEl, waitForOptions?: WaitForOptions) {
