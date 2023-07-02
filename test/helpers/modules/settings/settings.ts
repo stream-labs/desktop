@@ -1,10 +1,10 @@
 import {
   click,
   clickButton,
+  clickCheckbox,
   focusChild,
   useChildWindow,
   useMainWindow,
-  clickCheckbox,
 } from '../core';
 import { mkdtemp } from 'fs-extra';
 import { tmpdir } from 'os';
@@ -60,15 +60,16 @@ export async function setOutputResolution(resolution: string) {
 /**
  * Toggle dual output mode
  */
-export async function toggleDualOutputMode(t: TExecutionContext, closeChildWindow?: boolean) {
+export async function toggleDualOutputMode(
+  t: TExecutionContext,
+  closeChildWindow: boolean = false,
+) {
   await showSettingsWindow('Video', async () => {
+    await focusChild();
     await clickCheckbox('dual-output-checkbox');
-    const form = new FormMonkey(t);
-    const val = await form.getInput('dual-output-checkbox');
-    console.log('val ', val);
+
     if (closeChildWindow) {
       await clickButton('Done');
     }
-    return val;
   });
 }

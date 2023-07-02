@@ -210,8 +210,14 @@ function SceneSelector() {
         </Tooltip>
 
         {v.showDualOutput && (
-          <Tooltip title={horizontalTooltip} placement="bottomRight">
+          <Tooltip
+            id="toggle-horizontal-tooltip"
+            title={horizontalTooltip}
+            placement="bottomRight"
+            visible={true}
+          >
             <i
+              id="horizontal-display-toggle"
               onClick={() => {
                 if (v.isMidStreamMode) {
                   showToggleDisplayErrorMessage();
@@ -229,8 +235,14 @@ function SceneSelector() {
         )}
 
         {v.showDualOutput && (
-          <Tooltip title={verticalTooltip} placement="bottomRight">
+          <Tooltip
+            visible={true}
+            id="toggle-vertical-tooltip"
+            title={verticalTooltip}
+            placement="bottomRight"
+          >
             <i
+              id="vertical-display-toggle"
               onClick={() => {
                 if (v.isMidStreamMode) {
                   showToggleDisplayErrorMessage();

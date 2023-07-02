@@ -3,10 +3,19 @@ import {
   prepareToGoLive,
   waitForSettingsWindowLoaded,
 } from '../../helpers/modules/streaming';
-import { waitForDisplayed, focusMain } from '../../helpers/modules/core';
+import {
+  click,
+  clickIfDisplayed,
+  focusChild,
+  focusMain,
+  hoverElement,
+  isDisplayed,
+  useMainWindow,
+  waitForText,
+} from '../../helpers/modules/core';
 import { logIn } from '../../helpers/modules/user';
 import { releaseUserInPool, reserveUserFromPool } from '../../helpers/webdriver/user';
-import { showSettingsWindow, toggleDualOutputMode } from '../../helpers/modules/settings/settings';
+import { toggleDualOutputMode } from '../../helpers/modules/settings/settings';
 import { test, useWebdriver, TExecutionContext } from '../../helpers/webdriver';
 
 useWebdriver();
@@ -19,22 +28,100 @@ useWebdriver();
  */
 test('User must be logged in to use Dual Output', async (t: TExecutionContext) => {
   await toggleDualOutputMode(t);
-  await waitForDisplayed('#login-modal');
-  t.pass();
+  await focusChild();
+  t.true(await isDisplayed('form#login-modal', { timeout: 1000 }));
 });
 
 test('Dual output checkbox toggles Dual Output mode', async (t: TExecutionContext) => {
   await logIn();
   await toggleDualOutputMode(t, true);
   await focusMain();
-  await waitForDisplayed('div#vertical-display');
+  // @@@ TODO check for property, not element
+  t.true(await isDisplayed('div#vertical-display'));
 
-  // await toggleDualOutputMode();
-  // !isDisplayed('#vertical-display');
-  t.pass();
+  await toggleDualOutputMode(t, false);
+  t.false(await isDisplayed('div#vertical-display'));
 });
 
-// test('Dual output display toggles show/hide displays', async t => {});
+/**
+ * Dual output displays
+ */
+test('Dual output elements show on toggle', async (t: TExecutionContext) => {
+  await logIn();
+  await toggleDualOutputMode(t, true);
+  await focusMain();
+
+  t.true(await isDisplayed('div#vertical-display'));
+  t.true(await isDisplayed('div#dual-output-header'));
+  t.true(await isDisplayed('i#horizontal-display-toggle'));
+  t.true(await isDisplayed('i#vertical-display-toggle'));
+});
+
+test('Dual output toggles', async (t: TExecutionContext) => {
+  await logIn();
+  await toggleDualOutputMode(t, true);
+  await focusMain();
+
+  // check permutations of toggling on and off the displays
+  await clickIfDisplayed('i#horizontal-display-toggle');
+  t.false(await isDisplayed('div#horizontal-display'));
+  t.true(await isDisplayed('div#vertical-display'));
+
+  await clickIfDisplayed('i#vertical-display-toggle');
+  t.false(await isDisplayed('div#horizontal-display'));
+  t.false(await isDisplayed('div#vertical-display'));
+
+  await click('i#horizontal-display-toggle');
+  t.true(await isDisplayed('div#horizontal-display'));
+  t.false(await isDisplayed('div#vertical-display'));
+
+  await click('i#vertical-display-toggle');
+  t.true(await isDisplayed('div#horizontal-display'));
+  t.true(await isDisplayed('div#vertical-display'));
+
+  await click('i#vertical-display-toggle');
+  t.true(await isDisplayed('div#horizontal-display'));
+  t.false(await isDisplayed('div#vertical-display'));
+
+  await click('i#horizontal-display-toggle');
+  t.false(await isDisplayed('div#horizontal-display'));
+  t.false(await isDisplayed('div#vertical-display'));
+
+  await click('i#vertical-display-toggle');
+  t.false(await isDisplayed('div#horizontal-display'));
+  t.true(await isDisplayed('div#vertical-display'));
+
+  await click('i#horizontal-display-toggle');
+  t.true(await isDisplayed('div#horizontal-display'));
+  t.true(await isDisplayed('div#vertical-display'));
+});
+
+test.skip('Dual output toggle tooltip text', async t => {
+  // @@@ TODO hover selector working by tooltip still not showing
+  await logIn();
+  await toggleDualOutputMode(t, true);
+
+  await useMainWindow(async () => {
+    await focusMain();
+
+    await isDisplayed('i#horizontal-display-toggle');
+    await isDisplayed('i#horizontal-display-toggle');
+
+    // check tooltip text changes on hover
+    await hoverElement('i#horizontal-display-toggle', 50000);
+    t.true(await isDisplayed('div#toggle-horizontal-tooltip'));
+    t.true(await waitForText('Hide horizontal display'));
+    await click('i#horizontal-display-toggle');
+    await hoverElement('i#horizontal-display-toggle', 50000);
+    t.true(await waitForText('Show horizontal display'));
+
+    await hoverElement('i#vertical-display-toggle', 50000);
+    t.true(await waitForText('Hide vertical display'));
+    await click('i#vertical-display-toggle');
+    await hoverElement('i#vertical-display-toggle', 50000);
+    t.true(await waitForText('Show vertical display'));
+  });
+});
 
 // test('Dual output display toggles show/hide scene items in source selector', async t => {});
 

@@ -57,11 +57,19 @@ export async function clickTab(tabText: string) {
 }
 
 export async function clickCheckbox(dataName: string) {
-  const $checkbox = await select(`[data-name="${dataName}"]`);
+  const $checkbox = await select(`input[data-name="${dataName}"]`);
   await $checkbox.click();
 }
 
 // OTHER SHORTCUTS
+
+export async function hoverElement(selector: string, duration?: number) {
+  const element = await select(`${selector}`);
+  await element.moveTo();
+  if (duration) {
+    await getClient().pause(duration);
+  }
+}
 
 export async function isDisplayed(selectorOrEl: TSelectorOrEl, waitForOptions?: WaitForOptions) {
   if (waitForOptions) {

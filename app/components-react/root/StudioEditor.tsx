@@ -329,7 +329,10 @@ function DualOutputControls(p: { stacked: boolean }) {
     Services.SettingsService.actions.showSettings('Video');
   }
   return (
-    <div className={cx(styles.dualOutputModeControls, { [styles.stacked]: p.stacked })}>
+    <div
+      id="dual-output-header"
+      className={cx(styles.dualOutputHeader, { [styles.stacked]: p.stacked })}
+    >
       <div className={styles.dualOutputModeDetails}>
         <i className="icon-desktop" />
         <span>{$t('Horizontal Output')}</span>
