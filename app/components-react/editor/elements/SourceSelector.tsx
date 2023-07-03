@@ -285,24 +285,31 @@ export class SourceSelectorModule {
       placement,
     );
 
-    // if the scene has vertical nodes, they should be reordered as well
+    /**
+     * If this is a dual output scene, reorder the corresponding nodes
+     */
     if (this.dualOutputService.views.hasNodeMap(this.scene.id)) {
-      const horizontalNodeId = destNode?.id ?? (info.node.key as string);
-      const verticalNodes = targetNodes.map(node =>
-        this.dualOutputService.views.getVerticalNodeId(node),
-      );
-      const verticalNodesToDrop = this.scene.getSelection(verticalNodes);
-      const verticalDestNodeId = this.dualOutputService.views.getVerticalNodeId(horizontalNodeId);
-      if (!verticalDestNodeId) return;
-      const verticalDestNode = this.scene.getNode(verticalDestNodeId);
+      const destNodeId = destNode?.id ?? (info.node.key as string);
+      const dualOutputNodes = targetNodes
+        .map(nodeId => {
+          const dualOutputNodeId = this.dualOutputService.views.getDualOutputNodeId(nodeId);
+          if (dualOutputNodeId) {
+            return dualOutputNodeId;
+          }
+        })
+        .filter(nodeId => typeof nodeId === 'string') as string[];
+      const dualOutputNodesToDrop = this.scene.getSelection(dualOutputNodes);
+      const dualOutputDestNodeId = this.dualOutputService.views.getDualOutputNodeId(destNodeId);
+      if (!dualOutputDestNodeId) return;
+      const dualOutputNode = this.scene.getNode(dualOutputDestNodeId);
 
-      if (!verticalNodesToDrop || !verticalDestNode) return;
-      if (verticalNodes.some(nodeId => nodeId === verticalDestNode.id)) return;
+      if (!dualOutputNodesToDrop || !dualOutputNode) return;
+      if (dualOutputNodes.some(nodeId => nodeId === dualOutputNode.id)) return;
 
       await this.editorCommandsService.actions.return.executeCommand(
         'ReorderNodesCommand',
-        verticalNodesToDrop,
-        verticalDestNode?.id,
+        dualOutputNodesToDrop,
+        dualOutputNode?.id,
         placement,
       );
     }
@@ -325,9 +332,13 @@ export class SourceSelectorModule {
         .map(i => i.id)
         .slice(swapIdx ? idx2 : idx1, swapIdx ? idx1 + 1 : idx2 + 1);
     }
-
     if (this.isDualOutputActive) {
-      ids.push(this.dualOutputService.views.getVerticalNodeId(info.node.key as string));
+      const dualOutputNodeId = this.dualOutputService.views.getDualOutputNodeId(
+        info.node.key as string,
+      );
+      if (dualOutputNodeId) {
+        ids.push(dualOutputNodeId);
+      }
     }
 
     this.selectionService.views.globalSelection.select(ids);
@@ -426,6 +437,7 @@ export class SourceSelectorModule {
 
   cycleSelectiveRecording(sceneNodeId: string) {
     const selection = this.scene.getSelection(sceneNodeId);
+
     if (selection.isLocked()) return;
     if (selection.isStreamVisible() && selection.isRecordingVisible()) {
       selection.setRecordingVisible(false);
@@ -439,9 +451,24 @@ export class SourceSelectorModule {
   }
 
   toggleLock(sceneNodeId: string) {
-    const selection = this.scene.getSelection(sceneNodeId);
+    const selection = this.createSelection(sceneNodeId);
+
     const locked = !selection.isLocked();
     selection.setSettings({ locked });
+  }
+
+  createSelection(sceneNodeId: string) {
+    if (this.dualOutputService.views.hasNodeMap()) {
+      /**
+       * Toggling the lock applies to both horizontal and vertical scene items
+       */
+      const otherDisplayNodeId = this.dualOutputService.views.getDualOutputNodeId(sceneNodeId);
+      return this.scene.getSelection([sceneNodeId, otherDisplayNodeId] as string[]);
+    }
+    /**
+     * For vanilla scenes, there are no vertical scene items to handle
+     */
+    return this.scene.getSelection(sceneNodeId);
   }
 
   get scene() {

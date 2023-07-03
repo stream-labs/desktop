@@ -1,7 +1,5 @@
 import { PersistentStatefulService, InitAfter, Inject, ViewHandler, mutation } from 'services/core';
 import {
-  TDisplayPlatforms,
-  TDisplayDestinations,
   TDualOutputPlatformSettings,
   DualOutputPlatformSettings,
   IDualOutputDestinationSetting,
@@ -22,6 +20,7 @@ import {
 } from 'services/scene-collections';
 import { IncrementalRolloutService, EAvailableFeatures } from 'services/incremental-rollout';
 import { UserService } from 'services/user';
+import { SelectionService } from 'services/selection';
 
 interface IDisplayVideoSettings {
   defaultDisplay: TDisplayType;
@@ -91,6 +90,12 @@ class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
     return !!this.videoSettingsService.state.vertical;
   }
 
+  get horizontalNodeIds(): string[] {
+    if (!this.activeSceneNodeMap) return;
+
+    return Object.keys(this.activeSceneNodeMap);
+  }
+
   get verticalNodeIds(): string[] {
     if (!this.activeSceneNodeMap) return;
 
@@ -123,6 +128,10 @@ class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
 
   get showVerticalDisplay() {
     return this.state.dualOutputMode && this.activeDisplays.vertical && !this.state.isLoading;
+  }
+
+  get onlyVerticalDisplayActive() {
+    return this.activeDisplays.vertical && !this.activeDisplays.horizontal;
   }
 
   getPlatformDisplay(platform: TPlatform) {
@@ -163,21 +172,16 @@ class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
     );
   }
 
+  getDualOutputNodeId(nodeId: string, sceneId?: string) {
+    return this.onlyVerticalDisplayActive
+      ? this.getHorizontalNodeId(nodeId, sceneId)
+      : this.getVerticalNodeId(nodeId, sceneId);
+  }
+
   getVerticalNodeIds(sceneId: string): string[] {
     if (!this.sceneNodeMaps[sceneId]) return;
 
     return Object.values(this.sceneNodeMaps[sceneId]);
-  }
-
-  getMissingSelectionNodeIds(nodeIds: string[], sceneId?: string) {
-    return nodeIds.reduce((missingNodeIds: string[], nodeId) => {
-      const matchingNodeId =
-        this.getVerticalNodeId(nodeId, sceneId) ?? this.getHorizontalNodeId(nodeId, sceneId);
-      if (matchingNodeId && !nodeIds.includes(matchingNodeId)) {
-        missingNodeIds.push(matchingNodeId);
-      }
-      return missingNodeIds;
-    }, []);
   }
 
   getNodeDisplay(nodeId: string, sceneId: string) {
@@ -202,11 +206,7 @@ class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
 
   getIsHorizontalVisible(nodeId: string, sceneId?: string) {
     if (!this.hasVerticalNodes) return;
-    return (
-      !this.isLoading &&
-      this.hasVerticalNodes &&
-      this.scenesService.views.getNodeVisibility(nodeId, sceneId)
-    );
+    return this.scenesService.views.getNodeVisibility(nodeId, sceneId ?? this.activeSceneId);
   }
 
   getIsVerticalVisible(nodeId: string, sceneId?: string) {
@@ -218,11 +218,7 @@ class DualOutputViews extends ViewHandler<IDualOutputServiceState> {
         ? nodeId
         : this.activeSceneNodeMap[nodeId];
 
-    return (
-      !this.isLoading &&
-      this.hasVerticalNodes &&
-      this.scenesService.views.getNodeVisibility(id, sceneId)
-    );
+    return this.scenesService.views.getNodeVisibility(id, sceneId ?? this.activeSceneId);
   }
 
   hasNodeMap(sceneId?: string) {
@@ -239,6 +235,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
   @Inject() private sceneCollectionsService: SceneCollectionsService;
   @Inject() private streamSettingsService: StreamSettingsService;
   @Inject() private userService: UserService;
+  @Inject() private selectionService: SelectionService;
 
   static defaultState: IDualOutputServiceState = {
     displays: ['horizontal', 'vertical'],
@@ -277,7 +274,7 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
         this.sceneCollectionsService.initNodeMaps();
       }
 
-      if (this.state.dualOutputMode) {
+      if (this.state.isLoading) {
         this.setIsCollectionOrSceneLoading(false);
       }
     });
@@ -312,6 +309,8 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
     if (this.state.dualOutputMode) {
       this.confirmOrCreateVerticalNodes(this.views.activeSceneId);
       this.toggleDisplay(true, 'vertical');
+    } else {
+      this.selectionService.views.globalSelection.reset();
     }
   }
 
@@ -473,8 +472,10 @@ export class DualOutputService extends PersistentStatefulService<IDualOutputServ
 
   /**
    * Show/hide displays
+   *
+   * @param status - Boolean visibility of display
+   * @param display - Name of display
    */
-
   toggleDisplay(status: boolean, display: TDisplayType) {
     this.SET_DISPLAY_ACTIVE(status, display);
   }

@@ -16,7 +16,6 @@ export { Selection, GlobalSelection };
 export interface ISelectionState {
   selectedIds: string[];
   lastSelectedId: string;
-  missingDualOutputNodeIds: string[];
 }
 
 /**
@@ -37,13 +36,11 @@ export class SelectionService extends StatefulService<ISelectionState> {
   static initialState: ISelectionState = {
     selectedIds: [],
     lastSelectedId: '',
-    missingDualOutputNodeIds: [],
   };
 
   updated = new BehaviorSubject<ISelectionState>({
     selectedIds: [],
     lastSelectedId: '',
-    missingDualOutputNodeIds: [],
   });
 
   @Inject() private scenesService: ScenesService;

@@ -210,12 +210,7 @@ function SceneSelector() {
         </Tooltip>
 
         {v.showDualOutput && (
-          <Tooltip
-            id="toggle-horizontal-tooltip"
-            title={horizontalTooltip}
-            placement="bottomRight"
-            visible={true}
-          >
+          <Tooltip id="toggle-horizontal-tooltip" title={horizontalTooltip} placement="bottomRight">
             <i
               id="horizontal-display-toggle"
               onClick={() => {
@@ -235,12 +230,7 @@ function SceneSelector() {
         )}
 
         {v.showDualOutput && (
-          <Tooltip
-            visible={true}
-            id="toggle-vertical-tooltip"
-            title={verticalTooltip}
-            placement="bottomRight"
-          >
+          <Tooltip id="toggle-vertical-tooltip" title={verticalTooltip} placement="bottomRight">
             <i
               id="vertical-display-toggle"
               onClick={() => {

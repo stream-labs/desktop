@@ -148,10 +148,7 @@ export class Scene {
    */
   getSourceSelectorNodes(): TSceneNode[] {
     let nodes = this.getNodes();
-    if (
-      this.dualOutputService.views.hasVerticalNodes ||
-      this.dualOutputService.views.dualOutputMode
-    ) {
+    if (this.dualOutputService.views.hasVerticalNodes) {
       const populateWithVerticalNodes =
         !this.dualOutputService.views.activeDisplays.horizontal &&
         this.dualOutputService.views.activeDisplays.vertical;

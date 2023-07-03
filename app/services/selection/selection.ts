@@ -41,7 +41,6 @@ export class Selection {
   private _state: ISelectionState = {
     selectedIds: [],
     lastSelectedId: '',
-    missingDualOutputNodeIds: [],
   };
 
   protected get state() {
@@ -82,6 +81,7 @@ export class Selection {
     }
 
     let ids = this.resolveItemsList(itemsList);
+
     ids = uniq(ids);
     const scene = this.getScene();
 
@@ -95,18 +95,6 @@ export class Selection {
       if (node.sceneNodeType !== 'folder') return;
       selectedIds.push(...(node as SceneItemFolder).getNestedNodesIds());
     });
-
-    if (this.dualOutputService.views.dualOutputMode) {
-      // in dual output mode, the user can select horizontal and vertical nodes independently of each other
-      // so confirm or add the corresponding node
-      const missingNodeIds: string[] = this.dualOutputService.views.getMissingSelectionNodeIds(
-        selectedIds,
-        this.sceneId,
-      );
-      if (missingNodeIds) {
-        this.setState({ missingDualOutputNodeIds: missingNodeIds });
-      }
-    }
 
     this.setState({ selectedIds });
 
@@ -146,14 +134,12 @@ export class Selection {
   /**
    * return nodes with the order as in the scene
    */
-  getNodes(includeDualOutputNodes?: boolean): TSceneNode[] {
+  getNodes(): TSceneNode[] {
     const scene = this.getScene();
     if (!this.getSize()) return [];
 
     const nodes = scene.getNodes();
-    const ids = includeDualOutputNodes
-      ? this.state.selectedIds.concat(this.state.missingDualOutputNodeIds)
-      : this.state.selectedIds;
+    const ids = this.state.selectedIds;
 
     return nodes.filter(node => ids.includes(node.id));
   }

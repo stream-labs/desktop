@@ -8,6 +8,7 @@ import { DualOutputService } from 'services/dual-output';
 import { TDisplayType, VideoSettingsService } from 'services/settings-v2';
 import { EditorService } from 'services/editor';
 import { SceneCollectionsService } from 'services/scene-collections';
+import { cloneDeep } from 'lodash';
 
 /**
  * Copies nodes
@@ -148,9 +149,20 @@ export class CopyNodesCommand extends Command {
 
       this.hasNodeMap = true;
     } else {
-      // in dual output mode, the user can select horizontal and vertical nodes independent of each other
-      // so confirm if dual output nodes should be included
-      this.selection.getNodes(isDualOutputMode).forEach(node => {
+      const nodeIds = cloneDeep(this.selection.getIds());
+      if (this.hasNodeMap) {
+        // add dual output nodes to selection
+        this.selection.getIds().forEach(nodeId => {
+          const dualOutputNodeId = this.dualOutputService.views.getDualOutputNodeId(nodeId);
+          if (dualOutputNodeId) {
+            nodeIds.push(dualOutputNodeId);
+          }
+        });
+      }
+      const updatedSelection = new Selection(scene.id, nodeIds);
+      updatedSelection.freeze();
+      updatedSelection.getNodes().forEach(node => {
+        // this.selection.getNodes().forEach(node => {
         if (node.isFolder()) {
           // add folder
           const folder = scene.createFolder(node.name, { id: this.nodeIdsMap[node.id] });
