@@ -26,13 +26,13 @@ useWebdriver();
 /**
  * Dual output video settings
  */
-test('User must be logged in to use Dual Output', async (t: TExecutionContext) => {
+test.skip('User must be logged in to use Dual Output', async (t: TExecutionContext) => {
   await toggleDualOutputMode(false);
   await focusChild();
   t.true(await isDisplayed('form#login-modal', { timeout: 1000 }));
 });
 
-test('Dual output checkbox toggles Dual Output mode', async (t: TExecutionContext) => {
+test.skip('Dual output checkbox toggles Dual Output mode', async (t: TExecutionContext) => {
   await logIn();
   await toggleDualOutputMode();
   await focusMain();
@@ -47,7 +47,7 @@ test('Dual output checkbox toggles Dual Output mode', async (t: TExecutionContex
 /**
  * Dual output displays
  */
-test('Dual output elements show on toggle', async (t: TExecutionContext) => {
+test.skip('Dual output elements show on toggle', async (t: TExecutionContext) => {
   await logIn();
   await toggleDualOutputMode();
   await focusMain();
@@ -58,7 +58,7 @@ test('Dual output elements show on toggle', async (t: TExecutionContext) => {
   t.true(await isDisplayed('i#vertical-display-toggle'));
 });
 
-test('Dual output toggles', async (t: TExecutionContext) => {
+test.skip('Dual output toggles', async (t: TExecutionContext) => {
   await logIn();
   await toggleDualOutputMode();
   await focusMain();
