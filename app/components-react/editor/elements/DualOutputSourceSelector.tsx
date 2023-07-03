@@ -3,6 +3,7 @@ import { Services } from 'components-react/service-provider';
 import { useVuex } from 'components-react/hooks';
 import { useModule } from 'slap';
 import { SourceSelectorModule } from './SourceSelector';
+import cx from 'classnames';
 
 interface IDualOutputSourceSelector {
   nodeId: string;
@@ -29,14 +30,20 @@ export function DualOutputSourceSelector(p: IDualOutputSourceSelector) {
       {!v?.isLoading && v.horizontalActive && (
         <i
           onClick={() => toggleVisibility(p.nodeId)}
-          className={v.isHorizontalVisible ? 'icon-desktop' : 'icon-desktop-hide'}
+          className={cx(
+            v.isHorizontalVisible ? 'icon-desktop' : 'icon-desktop-hide',
+            'horizontal-item',
+          )}
         />
       )}
 
       {!v?.isLoading && v?.verticalNodeId && v.verticalActive && (
         <i
           onClick={() => toggleVisibility(v.verticalNodeId)}
-          className={v.isVerticalVisible ? 'icon-phone-case' : 'icon-phone-case-hide'}
+          className={cx(
+            v.isVerticalVisible ? 'icon-phone-case' : 'icon-phone-case-hide',
+            'vertical-item',
+          )}
         />
       )}
     </>

@@ -56,20 +56,3 @@ export async function setOutputResolution(resolution: string) {
     await clickButton('Done');
   });
 }
-
-/**
- * Toggle dual output mode
- */
-export async function toggleDualOutputMode(
-  t: TExecutionContext,
-  closeChildWindow: boolean = false,
-) {
-  await showSettingsWindow('Video', async () => {
-    await focusChild();
-    await clickCheckbox('dual-output-checkbox');
-
-    if (closeChildWindow) {
-      await clickButton('Done');
-    }
-  });
-}

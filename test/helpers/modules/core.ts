@@ -25,6 +25,13 @@ export async function select(selectorOrEl: TSelectorOrEl): Promise<WebdriverIO.E
   return selectorOrEl;
 }
 
+/**
+ * A shortcut for client.$$()
+ */
+export async function selectElements(selector: string): Promise<WebdriverIO.Element[]> {
+  return getClient().$$(selector);
+}
+
 export function selectButton(buttonText: string) {
   return select(`button=${buttonText}`);
 }
